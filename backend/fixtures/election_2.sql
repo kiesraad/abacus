@@ -50,7 +50,11 @@ VALUES (2, 'Municipal Election', 'GSB', 'CSO', 'Heemdamseburg_2024', 'Heemdamseb
 INSERT INTO committee_sessions (id, number, election_id, status, location, start_date_time)
 VALUES (2, 1, 2, 'data_entry', 'Heemdamseburg', '2024-12-05 09:15:00');
 
-INSERT INTO polling_stations (id, committee_session_id, id_prev_session, name, number, number_of_voters, polling_station_type, address,
+INSERT INTO data_entries (id, state, updated_at)
+VALUES (1, '{"status":"Empty"}', '2024-12-05 09:15:00'),
+       (2, '{"status":"Empty"}', '2024-12-05 09:15:00');
+
+INSERT INTO polling_stations (id, committee_session_id, prev_data_entry_id, data_entry_id, name, number, number_of_voters, polling_station_type, address,
                               postal_code, locality)
-VALUES (1, 2, NULL, 'Op Rolletjes', 33, NULL, 'Mobile', 'Rijksweg A12 1', '1234 YQ', 'Den Haag'),
-       (2, 2, NULL, 'Testplek', 34, 1000, 'Special', 'Teststraat 2b', '1234 QY', 'Testdorp');
+VALUES (1, 2, NULL, 1, 'Op Rolletjes', 33, NULL, 'Mobile', 'Rijksweg A12 1', '1234 YQ', 'Den Haag'),
+       (2, 2, NULL, 2, 'Testplek', 34, 1000, 'Special', 'Teststraat 2b', '1234 QY', 'Testdorp');

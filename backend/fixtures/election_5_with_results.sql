@@ -456,17 +456,6 @@ INSERT INTO committee_sessions (id, number, election_id, status, location, start
 VALUES (5, 1, 5, 'completed', 'Grote Stad', '2026-03-19 09:15:00'),
        (6, 2, 5, 'data_entry', '', NULL);
 
-INSERT INTO polling_stations (id, committee_session_id, id_prev_session, name, number, number_of_voters, polling_station_type, address,
-                              postal_code, locality)
-VALUES (8, 5, NULL, 'Testgebouw', 41, NULL, 'FixedLocation', 'Testweg 3', '1234 QA', 'Grote Stad'),
-       (9, 6, 8, 'Testgebouw', 41, NULL, 'FixedLocation', 'Testweg 3', '1234 QA', 'Grote Stad'),
-       (11, 6, NULL, 'Test ander gebouw', 42, NULL, 'FixedLocation', 'Testweg 4', '1234 QA', 'Grote Stad');
-
-INSERT INTO
-    polling_station_investigations
-VALUES
-    (11, "reason", "findings", 1);
-
 INSERT INTO
     data_entries (id, state, updated_at)
 VALUES
@@ -481,5 +470,13 @@ VALUES
         '2026-03-20 17:25:12'
     );
 
-UPDATE polling_stations SET data_entry_id = 501 WHERE id = 8;
-UPDATE polling_stations SET data_entry_id = 502 WHERE id = 11;
+INSERT INTO polling_stations (id, committee_session_id, prev_data_entry_id, data_entry_id, name, number, number_of_voters, polling_station_type,
+                              address, postal_code, locality)
+VALUES (8, 5, NULL, 501, 'Testgebouw', 41, NULL, 'FixedLocation', 'Testweg 3', '1234 QA', 'Grote Stad'),
+       (9, 6, 501, NULL, 'Testgebouw', 41, NULL, 'FixedLocation', 'Testweg 3', '1234 QA', 'Grote Stad'),
+       (11, 6, NULL, 502, 'Test ander gebouw', 42, NULL, 'FixedLocation', 'Testweg 4', '1234 QA', 'Grote Stad');
+
+INSERT INTO
+    polling_station_investigations
+VALUES
+    (11, "reason", "findings", 1);

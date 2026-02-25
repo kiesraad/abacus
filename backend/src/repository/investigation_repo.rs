@@ -179,7 +179,12 @@ pub async fn insert_test_investigation(
         "Test findings",
         corrected_results
     )
-    .execute(conn)
+    .execute(&mut *conn)
     .await?;
+
+    if corrected_results == Some(true) {
+        crate::repository::data_entry_repo::create_empty(conn, polling_station_id).await?;
+    }
+
     Ok(())
 }

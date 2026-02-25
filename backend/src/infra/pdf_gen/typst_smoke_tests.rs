@@ -15,7 +15,7 @@ use crate::{
         committee_session::{CommitteeSession, CommitteeSessionId},
         committee_session_status::CommitteeSessionStatus,
         data_entry::{
-            CandidateVotes, CommonPollingStationResults,
+            CandidateVotes, CommonPollingStationResults, DataEntryId,
             DifferenceCountsCompareVotesCastAdmittedVoters, DifferencesCounts,
             PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, VotersCounts, VotesCounts,
             YesNo,
@@ -177,7 +177,7 @@ fn random_polling_station(
     string_length: usize,
     none_where_possible: bool,
 ) -> PollingStation {
-    let id_prev_session = PollingStationId::from(rng.random_range(0..5));
+    let prev_data_entry_id = DataEntryId::from(rng.random_range(0..5));
     let number_of_voters = rng.random_range(0..=1000);
     let polling_station_type = random_value(
         rng,
@@ -192,7 +192,7 @@ fn random_polling_station(
         id: PollingStationId::from(rng.random_range(0..5)),
         election_id: election.id,
         committee_session_id: CommitteeSessionId::from(rng.random_range(0..5)),
-        id_prev_session: random_option(rng, id_prev_session, none_where_possible),
+        prev_data_entry_id: random_option(rng, prev_data_entry_id, none_where_possible),
         data_entry_id: None,
         name: random_string(rng, string_length),
         number: rng.random_range(0..5),

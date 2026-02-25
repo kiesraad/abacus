@@ -75,7 +75,7 @@ function CategoryRowContent({ category, pollingStation, warning }: CategoryRowCo
       <Table.Cell key={`${pollingStation.id}-name`}>
         <span>{pollingStation.name}</span>
         {pollingStation.status && SHOW_BADGE.includes(pollingStation.status) && (
-          <Badge type={pollingStation.status} userRole={user.role} />
+          <Badge type={pollingStation.status} userRole={user.roleWithoutElection} />
         )}
       </Table.Cell>
       {(category === "in_progress" || category === "first_entry_finished") && (

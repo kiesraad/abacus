@@ -38,6 +38,21 @@ export function translate(path: TranslationPath): string {
   return typeof value === "string" ? value : path;
 }
 
+// Try to translate the given key. If the translation key is not found,
+// print a warning to the console and return the
+// Use this function when translations are desired, but not strictly
+// required.
+export function translateOrWarn(path: string): string {
+  const value = getTranslation(path);
+
+  if (typeof value !== "string") {
+    console.warn("No translation key found for", path);
+    return path;
+  } else {
+    return value;
+  }
+}
+
 /**
  * Translate a text and optionally interpolate variables
  *

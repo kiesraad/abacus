@@ -16,14 +16,19 @@ export function CheckAndSave() {
   const createPath: ELECTION_IMPORT_REQUEST_PATH = `/api/elections/import`;
   const { create } = useCrud<ElectionWithPoliticalGroups>({ createPath, throwAllErrors: true });
 
-  // if no election, election data, candidate data or counting method is found in the state, go back to the beginning
-  if (!state.election || !state.electionDefinitionData || !state.candidateDefinitionData || !state.countingMethod) {
+  // if no election, election role or candidate data is found in the state, go back to the beginning
+  if (!state.election || !state.electionRole || !state.electionDefinitionData || !state.candidateDefinitionData) {
+    return <Navigate to="/elections/create" />;
+  }
+
+  // GSB: if no counting method is found in the state, go back to the beginning
+  if (state.electionRole === "GSB" && !state.countingMethod) {
     return <Navigate to="/elections/create" />;
   }
 
   function handleSubmit() {
-    void create({
-      role: "GSB",
+    let data = {
+      role: state.electionRole,
       election_data: state.electionDefinitionData,
       election_hash: state.electionDefinitionHash,
       candidate_data: state.candidateDefinitionData,
@@ -32,11 +37,23 @@ export function CheckAndSave() {
       polling_station_file_name: state.pollingStationDefinitionFileName,
       counting_method: state.countingMethod,
       number_of_voters: state.numberOfVoters,
-    }).then((result) => {
+    };
+
+    if (state.electionRole === "CSB") {
+      data = {
+        ...data,
+        polling_station_data: undefined,
+        polling_station_file_name: undefined,
+        counting_method: undefined,
+        number_of_voters: undefined,
+      };
+    }
+
+    void create(data).then((result) => {
       if (isSuccess(result)) {
         pushMessage({
           title: t("election.message.election_created", {
-            role: "GSB",
+            role: state.electionRole ? t(`electoral_committee_role.roles.${state.electionRole}.abbreviation`) : "GSB",
             name: result.data.name,
           }),
         });
@@ -54,6 +71,9 @@ export function CheckAndSave() {
           <strong>{t("election.singular")}:</strong> {state.election.name}
         </li>
         <li>
+          <strong>{t("role").toLowerCase()}:</strong> {t(`electoral_committee_role.roles.${state.electionRole}.short`)}
+        </li>
+        <li>
           <strong>{t("area_designation")}:</strong> {state.election.location}
         </li>
       </ul>
@@ -64,13 +84,16 @@ export function CheckAndSave() {
             {t("election.polling_stations.added", { num: state.pollingStations.length })}
           </li>
         )}
-        <li id="counting-method">{t(state.countingMethod)}</li>
-        <li id="number-of-voters">
-          {formatNumber(state.numberOfVoters)} {t("voters")}
-        </li>
+        {state.countingMethod && <li id="counting-method">{t(state.countingMethod)}</li>}
+        {state.numberOfVoters && (
+          <li id="number-of-voters">
+            {formatNumber(state.numberOfVoters)} {t("voters")}
+          </li>
+        )}
       </ul>
       <div className="mt-xl">
         <Button
+          type="submit"
           onClick={() => {
             handleSubmit();
           }}

@@ -8,14 +8,14 @@ import { CommitteeSessionStatusChangeRequestHandler } from "@/testing/api-mocks/
 import { server } from "@/testing/server";
 import { render, screen, spyOnHandler } from "@/testing/test-utils";
 import { getAdminUser, getCoordinatorUser } from "@/testing/user-mock-data";
-import type { CommitteeSessionStatus, Role } from "@/types/generated/openapi";
+import type { CommitteeSessionStatus } from "@/types/generated/openapi";
 
 import { CommitteeSessionCard } from "./CommitteeSessionCard";
 
 const navigate = vi.fn();
 
 type TestCases = {
-  [role in Exclude<Role, "typist">]: Record<
+  [role in "administrator" | "coordinator_gsb"]: Record<
     CommitteeSessionStatus,
     {
       buttonsCurrentSession?: string[];
@@ -32,7 +32,7 @@ type TestCases = {
  * - actionButton: link button of card
  */
 const testCases: TestCases = {
-  coordinator: [
+  coordinator_gsb: [
     {
       // First session
       created: {
@@ -137,7 +137,7 @@ describe("UI component: CommitteeSessionCard", () => {
     const testName = `${role} - session ${sessionNumber} - ${status} ${isCurrentSession ? "(current)" : "(not current)"}`;
 
     test(testName, () => {
-      const user = role === "coordinator" ? getCoordinatorUser() : getAdminUser();
+      const user = role === "coordinator_gsb" ? getCoordinatorUser() : getAdminUser();
       vi.spyOn(useUser, "useUser").mockReturnValue(user);
 
       const expectedTitle = sessionNumber === 1 ? "Eerste zitting" : "Tweede zitting";

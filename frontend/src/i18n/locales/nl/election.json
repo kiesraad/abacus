@@ -13,7 +13,7 @@
     "title": "Controleren en opslaan"
   },
   "check_eml": {
-    "candidates_description": "Het bestand <file>filename</file> is geïmporteerd en bevat de instellingen voor de volgende kandidaten:",
+    "candidates_description": "Het bestand <file>filename</file> is geïmporteerd en bevat de volgende kandidaten:",
     "candidates_title": "Controleer kandidatenlijsten",
     "check_hash": {
       "description": "Vul ter controle de hierboven afgeschermde delen van de digitale vingerafdruk in. De volledige code heb je van de Kiesraad ontvangen.",
@@ -47,6 +47,7 @@
     "description": "Het bestand <file>filename</file> bevat geen geldige lijst met stembureaus. Kies een ander bestand.",
     "title": "Ongeldig stembureaubestand"
   },
+  "invalid_role": "Ongeldige rol van het stembureau",
   "message": {
     "election_created": "Verkiezing {role} {name} toegevoegd"
   },
@@ -83,7 +84,7 @@
     "plural": "Verkiezingen",
     "singular": "Verkiezing"
   },
-  "use_instructions_to_import_candidates_eml": "Je hebt van de Kiesraad instructies gekregen waarmee je de kandidatenlijsten kunt downloaden. Zet het bestand op deze computer en importeer het.",
+  "use_instructions_to_import_candidates_eml": "Je hebt van de Kiesraad instructies gekregen waarmee je het bestand met de kandidatenlijsten kunt downloaden. Zet het bestand op deze computer en importeer het.",
   "use_instructions_to_import_eml": "Je hebt van de Kiesraad instructies gekregen waarmee je de verkiezingsdefinitie kunt downloaden. Zet het bestand op deze computer en importeer het.",
   "use_instructions_to_import_polling_stations_eml": "Importeer het bestand met stembureaus. Heb je geen bestand met stembureaus? Je kan ze later nog handmatig invoeren. Sla deze stap dan over.",
   "voting_method_type": {
@@ -95,12 +96,9 @@
     "dso_not_supported": "Niet ondersteund in deze versie van Abacus",
     "title": "Type stemopneming in"
   },
-  "polling_station_type": {
+  "electoral_committee_role": {
     "title": "Rol van het stembureau",
-    "description": "Voor welke rollen wil je deze Abacus installatie gebruiken?",
-    "gsb": "Gemeentelijk stembureau (GSB)",
-    "csb": "Centraal stembureau (CSB)",
-    "csb_not_supported": "Niet beschikbaar in deze versie",
+    "description": "Voor welk stembureau wil je deze verkiezing nu klaarzetten? Ga je Abacus voor GSB én CSB gebruiken? Zet dan eerst het GSB klaar, en doe daarna hetzelfde voor het CSB.",
     "choose": "Kies een rol"
   },
   "you_cannot_start_data_entry_yet": "Je kan nog geen telresultaten invoeren."

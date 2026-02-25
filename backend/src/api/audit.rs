@@ -7,7 +7,7 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
     APIError, AppState, ErrorResponse,
-    api::middleware::authentication::AdminOrCoordinator,
+    api::middleware::authentication::AdminOrCoordinatorGSB,
     domain::role::Role,
     infra::audit_log::{AuditLogEvent, LogFilter},
 };
@@ -72,10 +72,10 @@ pub struct LogFilterQuery {
         (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
-    security(("cookie_auth" = ["administrator", "coordinator"])),
+    security(("cookie_auth" = ["administrator", "coordinator_gsb"])),
 )]
 async fn audit_log_list(
-    _user: AdminOrCoordinator,
+    _user: AdminOrCoordinatorGSB,
     Query(filter_query): Query<LogFilterQuery>,
     State(pool): State<SqlitePool>,
 ) -> Result<Json<AuditLogListResponse>, APIError> {
@@ -118,10 +118,10 @@ pub struct AuditLogUser {
         (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
-    security(("cookie_auth" = ["administrator", "coordinator"])),
+    security(("cookie_auth" = ["administrator", "coordinator_gsb"])),
 )]
 async fn audit_log_list_users(
-    _user: AdminOrCoordinator,
+    _user: AdminOrCoordinatorGSB,
     State(pool): State<SqlitePool>,
 ) -> Result<Json<Vec<AuditLogUser>>, APIError> {
     let mut conn = pool.acquire().await?;
@@ -154,14 +154,12 @@ mod tests {
         AppState,
         api::{
             audit::{audit_log_list, audit_log_list_users},
+            authentication::UserLoggedInDetails,
             middleware::{airgap::AirgapDetection, authentication::inject_user},
         },
-        infra::audit_log::{
-            AuditEvent, AuditLogListResponse, AuditLogUser, AuditService, UserLoggedInDetails,
-        },
+        infra::audit_log::{AuditLogListResponse, AuditLogUser, AuditService},
         repository::{
-            session_repo,
-            session_repo::Session,
+            session_repo::{self, Session},
             user_repo::{self, User, UserId},
         },
     };
@@ -180,10 +178,10 @@ mod tests {
             .unwrap()
             .unwrap();
         let service = new_test_audit_service(Some(user));
-        let audit_event = AuditEvent::UserLoggedIn(UserLoggedInDetails {
+        let audit_event = UserLoggedInDetails {
             user_agent: "Mozilla/5.0".to_string(),
             logged_in_users_count: 1,
-        });
+        };
         service.log(&mut conn, &audit_event, None).await.unwrap();
         service.log(&mut conn, &audit_event, None).await.unwrap();
         service.log(&mut conn, &audit_event, None).await.unwrap();

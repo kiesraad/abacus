@@ -6,13 +6,15 @@ use axum::{
 use axum_extra::response::Attachment;
 use chrono::Datelike;
 use pdf_gen::generate_pdf;
+use serde::Serialize;
 use sqlx::{SqliteConnection, SqlitePool};
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
     api::{
-        data_entry::delete_data_entry_for_polling_station, middleware::authentication::Coordinator,
+        data_entry::delete_data_entry_for_polling_station,
+        middleware::authentication::CoordinatorGSB,
     },
     domain::{
         committee_session::{CommitteeSession, CommitteeSessionError},
@@ -28,10 +30,10 @@ use crate::{
         votes_table::VotesTablesWithOnlyPreviousVotes,
     },
     error::ErrorReference,
-    infra::audit_log::{AuditEvent, AuditService},
+    infra::audit_log::{AsAuditEvent, AuditEvent, AuditEventType, AuditService, as_audit_event},
     repository::{
         committee_session_repo::get_election_committee_session,
-        data_entry_repo::{data_entry_exists, previous_results_for_polling_station},
+        data_entry_repo::{self, data_entry_exists, previous_results_for_polling_station},
         election_repo,
         investigation_repo::{
             conclude_polling_station_investigation, create_polling_station_investigation,
@@ -42,6 +44,32 @@ use crate::{
     },
     service::change_committee_session_status,
 };
+
+#[derive(Serialize)]
+struct PollingStationInvestigationCreated(pub PollingStationInvestigation);
+#[derive(Serialize)]
+struct PollingStationInvestigationUpdated(pub PollingStationInvestigation);
+#[derive(Serialize)]
+struct PollingStationInvestigationDeleted(pub PollingStationInvestigation);
+#[derive(Serialize)]
+struct PollingStationInvestigationConcluded(pub PollingStationInvestigation);
+
+as_audit_event!(
+    PollingStationInvestigationCreated,
+    AuditEventType::PollingStationInvestigationCreated
+);
+as_audit_event!(
+    PollingStationInvestigationUpdated,
+    AuditEventType::PollingStationInvestigationUpdated
+);
+as_audit_event!(
+    PollingStationInvestigationDeleted,
+    AuditEventType::PollingStationInvestigationDeleted
+);
+as_audit_event!(
+    PollingStationInvestigationConcluded,
+    AuditEventType::PollingStationInvestigationConcluded
+);
 
 pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::default()
@@ -87,7 +115,7 @@ pub async fn delete_investigation_for_polling_station(
         audit_service
             .log(
                 conn,
-                &AuditEvent::PollingStationInvestigationDeleted(investigation),
+                &PollingStationInvestigationDeleted(investigation),
                 None,
             )
             .await?;
@@ -148,10 +176,10 @@ where
     params(
         ("polling_station_id" = PollingStationId, description = "Polling station database id"),
     ),
-    security(("cookie_auth" = ["coordinator"])),
+    security(("cookie_auth" = ["coordinator_gsb"])),
 )]
 async fn polling_station_investigation_create(
-    _user: Coordinator,
+    _user: CoordinatorGSB,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     CurrentSessionPollingStationId(polling_station_id): CurrentSessionPollingStationId,
@@ -171,7 +199,7 @@ async fn polling_station_investigation_create(
     audit_service
         .log(
             &mut tx,
-            &AuditEvent::PollingStationInvestigationCreated(investigation.clone()),
+            &PollingStationInvestigationCreated(investigation.clone()),
             None,
         )
         .await?;
@@ -215,10 +243,10 @@ async fn polling_station_investigation_create(
     params(
         ("polling_station_id" = PollingStationId, description = "Polling station database id"),
     ),
-    security(("cookie_auth" = ["coordinator"])),
+    security(("cookie_auth" = ["coordinator_gsb"])),
 )]
 async fn polling_station_investigation_conclude(
-    _user: Coordinator,
+    _user: CoordinatorGSB,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     CurrentSessionPollingStationId(polling_station_id): CurrentSessionPollingStationId,
@@ -229,13 +257,16 @@ async fn polling_station_investigation_conclude(
     let committee_session = validate_and_get_committee_session(&mut tx, polling_station_id).await?;
 
     let polling_station = polling_station_repo::get(&mut tx, polling_station_id).await?;
-    if polling_station.id_prev_session.is_none() && !polling_station_investigation.corrected_results
+    if polling_station.prev_data_entry_id.is_none()
+        && !polling_station_investigation.corrected_results
     {
         return Err(APIError::Conflict(
             "Investigation requires corrected results, because the polling station is not part of a previous session".into(),
             ErrorReference::InvestigationRequiresCorrectedResults,
         ));
     }
+
+    let corrected_results = polling_station_investigation.corrected_results;
 
     let investigation = conclude_polling_station_investigation(
         &mut tx,
@@ -244,10 +275,14 @@ async fn polling_station_investigation_conclude(
     )
     .await?;
 
+    if corrected_results {
+        data_entry_repo::create_empty(&mut tx, polling_station_id).await?;
+    }
+
     audit_service
         .log(
             &mut tx,
-            &AuditEvent::PollingStationInvestigationConcluded(investigation.clone()),
+            &PollingStationInvestigationConcluded(investigation.clone()),
             None,
         )
         .await?;
@@ -286,7 +321,7 @@ async fn update_investigation(
     audit_service
         .log(
             conn,
-            &AuditEvent::PollingStationInvestigationUpdated(investigation.clone()),
+            &PollingStationInvestigationUpdated(investigation.clone()),
             None,
         )
         .await?;
@@ -319,10 +354,10 @@ async fn update_investigation(
     params(
         ("polling_station_id" = PollingStationId, description = "Polling station database id"),
     ),
-    security(("cookie_auth" = ["coordinator"])),
+    security(("cookie_auth" = ["coordinator_gsb"])),
 )]
 async fn polling_station_investigation_update(
-    _user: Coordinator,
+    _user: CoordinatorGSB,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     CurrentSessionPollingStationId(polling_station_id): CurrentSessionPollingStationId,
@@ -333,7 +368,7 @@ async fn polling_station_investigation_update(
     let committee_session = validate_and_get_committee_session(&mut tx, polling_station_id).await?;
 
     let polling_station = polling_station_repo::get(&mut tx, polling_station_id).await?;
-    if polling_station.id_prev_session.is_none()
+    if polling_station.prev_data_entry_id.is_none()
         && investigation_update_request.corrected_results != Some(true)
     {
         return Err(APIError::Conflict(
@@ -366,6 +401,13 @@ async fn polling_station_investigation_update(
         }
     }
 
+    // If corrected_results is changed to true and no data entry exists, create one
+    if investigation_update_request.corrected_results == Some(true)
+        && !data_entry_exists(&mut tx, polling_station_id).await?
+    {
+        data_entry_repo::create_empty(&mut tx, polling_station_id).await?;
+    }
+
     let investigation = update_investigation(
         &mut tx,
         &audit_service,
@@ -394,10 +436,10 @@ async fn polling_station_investigation_update(
     params(
         ("polling_station_id" = PollingStationId, description = "Polling station database id"),
     ),
-    security(("cookie_auth" = ["coordinator"])),
+    security(("cookie_auth" = ["coordinator_gsb"])),
 )]
 async fn polling_station_investigation_delete(
-    _user: Coordinator,
+    _user: CoordinatorGSB,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     CurrentSessionPollingStationId(polling_station_id): CurrentSessionPollingStationId,
@@ -468,10 +510,10 @@ async fn polling_station_investigation_delete(
     params(
         ("polling_station_id" = PollingStationId, description = "Polling station database id"),
     ),
-    security(("cookie_auth" = ["coordinator"])),
+    security(("cookie_auth" = ["coordinator_gsb"])),
 )]
 async fn polling_station_investigation_download_corrigendum_pdf(
-    _user: Coordinator,
+    _user: CoordinatorGSB,
     State(pool): State<SqlitePool>,
     CurrentSessionPollingStationId(polling_station_id): CurrentSessionPollingStationId,
 ) -> Result<Attachment<Vec<u8>>, APIError> {
@@ -483,7 +525,7 @@ async fn polling_station_investigation_download_corrigendum_pdf(
     let election: ElectionWithPoliticalGroups =
         election_repo::get(&mut conn, polling_station.election_id).await?;
 
-    let previous_results = match polling_station.id_prev_session {
+    let previous_results = match polling_station.prev_data_entry_id {
         Some(_) => {
             match previous_results_for_polling_station(&mut conn, polling_station_id).await {
                 Ok(results) => results,

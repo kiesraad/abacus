@@ -133,9 +133,14 @@ async fn test_listing(pool: SqlitePool) {
     assert_eq!(polling_stations.len(), 2);
     let map = polling_stations
         .iter()
-        .map(|ps| (ps["id"].as_u64().unwrap(), ps["id_prev_session"].as_u64()))
+        .map(|ps| {
+            (
+                ps["id"].as_u64().unwrap(),
+                ps["prev_data_entry_id"].as_u64(),
+            )
+        })
         .collect::<Vec<(u64, Option<u64>)>>();
-    assert_eq!(map, vec![(741, Some(731)), (742, Some(732))]);
+    assert_eq!(map, vec![(741, Some(703)), (742, Some(704))]);
 }
 
 #[test(sqlx::test(fixtures(
@@ -271,7 +276,7 @@ async fn test_get(pool: SqlitePool) {
     let response = get_polling_station(&addr, &coordinator_cookie, 7, 742).await;
     let body: serde_json::Value = response.json().await.unwrap();
     assert_eq!(body["committee_session_id"], 704);
-    assert_eq!(body["id_prev_session"], 732);
+    assert_eq!(body["prev_data_entry_id"], 704);
     assert_eq!(body["name"], "TestB");
     assert_eq!(body["polling_station_type"], "FixedLocation");
 }
@@ -1212,4 +1217,76 @@ async fn test_completed_to_data_entry_on_delete(pool: SqlitePool) {
     let committee_session =
         get_election_committee_session(&addr, &coordinator_login(&addr).await, election_id).await;
     assert_eq!(committee_session["status"], "created");
+}
+
+#[test(sqlx::test(fixtures(
+    path = "../fixtures",
+    scripts("election_6_no_polling_stations", "users")
+)))]
+async fn test_create_creates_empty_data_entry_for_first_session(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    let coordinator_cookie = coordinator_login(&addr).await;
+    let election_id = 6;
+
+    let response = create_polling_station(&addr, &coordinator_cookie, election_id, 1).await;
+
+    assert_eq!(response.status(), StatusCode::CREATED);
+    let body: serde_json::Value = response.json().await.unwrap();
+    assert!(
+        body["data_entry_id"].is_number(),
+        "data_entry_id should be set for first-session polling stations"
+    );
+
+    // Check that the election status shows Empty for this polling station
+    let statuses = get_statuses(&addr, &coordinator_cookie, election_id).await;
+    let polling_station_id = u32::try_from(body["id"].as_u64().unwrap()).unwrap();
+    assert_eq!(statuses[&polling_station_id]["status"], "empty");
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
+async fn test_create_does_not_create_data_entry_for_next_session(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    let coordinator_cookie = coordinator_login(&addr).await;
+    let election_id = 7;
+
+    let response = create_polling_station(&addr, &coordinator_cookie, election_id, 99).await;
+
+    assert_eq!(response.status(), StatusCode::CREATED);
+    let body: serde_json::Value = response.json().await.unwrap();
+    assert!(
+        body["data_entry_id"].is_null(),
+        "data_entry_id should not be set for next-session polling stations"
+    );
+}
+
+#[test(sqlx::test(fixtures(
+    path = "../fixtures",
+    scripts("election_6_no_polling_stations", "users")
+)))]
+async fn test_import_creates_empty_data_entries_for_first_session(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    let coordinator_cookie = coordinator_login(&addr).await;
+    let election_id = 6;
+
+    let data = include_str!("../src/eml/tests/eml110b_test.eml.xml");
+
+    let import_response = import_polling_stations(
+        &addr,
+        &coordinator_cookie,
+        election_id,
+        "eml110b_test.eml.xml",
+        data.into(),
+    )
+    .await;
+    assert_eq!(import_response.status(), StatusCode::OK);
+
+    let body: serde_json::Value = import_response.json().await.unwrap();
+    let polling_stations = body["polling_stations"].as_array().unwrap();
+    assert!(!polling_stations.is_empty());
+    for ps in polling_stations {
+        assert!(
+            ps["data_entry_id"].is_number(),
+            "data_entry_id should be set for all first-session imported polling stations"
+        );
+    }
 }

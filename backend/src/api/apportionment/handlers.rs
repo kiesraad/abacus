@@ -10,11 +10,13 @@ use crate::{
     api::{
         apportionment::{
             mapping::{map_candidate_nomination, map_seat_assignment},
-            structs::{ApportionmentInputData, ElectionApportionmentResponse},
+            structs::{
+                ApportionmentCreated, ApportionmentInputData, ElectionApportionmentResponse,
+            },
         },
-        middleware::authentication::Coordinator,
+        middleware::authentication::CoordinatorGSB,
     },
-    audit_log::{AuditEvent, AuditService},
+    audit_log::AuditService,
     domain::{
         data_entry_status::DataEntryStatusName, election::ElectionId, summary::ElectionSummary,
     },
@@ -41,10 +43,10 @@ use crate::{
     params(
         ("election_id" = u32, description = "Election database id"),
     ),
-    security(("cookie_auth" = ["coordinator"])),
+    security(("cookie_auth" = ["coordinator_gsb"])),
 )]
 pub async fn election_apportionment(
-    _user: Coordinator,
+    _user: CoordinatorGSB,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Path(id): Path<ElectionId>,
@@ -75,7 +77,7 @@ pub async fn election_apportionment(
         audit_service
             .log(
                 &mut conn,
-                &AuditEvent::ApportionmentCreated(election.clone().into()),
+                &ApportionmentCreated(election.clone().into()),
                 None,
             )
             .await?;

@@ -207,10 +207,10 @@ export type LOGOUT_REQUEST_PARAMS = Record<string, never>;
 export type LOGOUT_REQUEST_PATH = `/api/logout`;
 
 // /api/polling_stations/{polling_station_id}/data_entries
-export interface DATA_ENTRIES_AND_RESULT_DELETE_REQUEST_PARAMS {
+export interface DATA_ENTRY_RESET_REQUEST_PARAMS {
   polling_station_id: PollingStationId;
 }
-export type DATA_ENTRIES_AND_RESULT_DELETE_REQUEST_PATH = `/api/polling_stations/${PollingStationId}/data_entries`;
+export type DATA_ENTRY_RESET_REQUEST_PATH = `/api/polling_stations/${PollingStationId}/data_entries`;
 
 // /api/polling_stations/{polling_station_id}/data_entries/get
 export interface DATA_ENTRY_GET_REQUEST_PARAMS {
@@ -336,58 +336,57 @@ export interface AccountUpdateRequest {
   username: string;
 }
 
-export interface ApplicationStartedDetails {
-  commit: string;
-  version: string;
-}
-
-export type AuditEvent =
-  | (UserLoggedInDetails & { event_type: "UserLoggedIn" })
-  | (UserLoginFailedDetails & { event_type: "UserLoginFailed" })
-  | (UserLoggedOutDetails & { event_type: "UserLoggedOut" })
-  | (UserDetails & { event_type: "UserAccountUpdated" })
-  | { event_type: "UserSessionExtended" }
-  | (UserDetails & { event_type: "UserCreated" })
-  | (UserDetails & { event_type: "UserUpdated" })
-  | (UserDetails & { event_type: "UserDeleted" })
-  | (ElectionDetails & { event_type: "ElectionCreated" })
-  | (ElectionDetails & { event_type: "ElectionUpdated" })
-  | (CommitteeSessionDetails & { event_type: "CommitteeSessionCreated" })
-  | (CommitteeSessionDetails & { event_type: "CommitteeSessionDeleted" })
-  | (CommitteeSessionDetails & { event_type: "CommitteeSessionUpdated" })
-  | (PollingStationInvestigation & { event_type: "PollingStationInvestigationCreated" })
-  | (PollingStationInvestigation & { event_type: "PollingStationInvestigationConcluded" })
-  | (PollingStationInvestigation & { event_type: "PollingStationInvestigationUpdated" })
-  | (PollingStationInvestigation & { event_type: "PollingStationInvestigationDeleted" })
-  | (FileDetails & { event_type: "FileCreated" })
-  | (FileDetails & { event_type: "FileDeleted" })
-  | (ElectionDetails & { event_type: "ApportionmentCreated" })
-  | (PollingStationDetails & { event_type: "PollingStationCreated" })
-  | (PollingStationDetails & { event_type: "PollingStationUpdated" })
-  | (PollingStationDetails & { event_type: "PollingStationDeleted" })
-  | (PollingStationImportDetails & { event_type: "PollingStationsImported" })
-  | (DataEntryDetails & { event_type: "DataEntryStarted" })
-  | (DataEntryDetails & { event_type: "DataEntrySaved" })
-  | (DataEntryDetails & { event_type: "DataEntryResumed" })
-  | (DataEntryDetails & { event_type: "DataEntryDeleted" })
-  | (DataEntryDetails & { event_type: "DataEntryFinalised" })
-  | (DataEntryDetails & { event_type: "DataEntryDiscardedFirst" })
-  | (DataEntryDetails & { event_type: "DataEntryReturnedFirst" })
-  | (DataEntryDetails & { event_type: "DataEntryKeptFirst" })
-  | (DataEntryDetails & { event_type: "DataEntryKeptSecond" })
-  | (DataEntryDetails & { event_type: "DataEntryDiscardedBoth" })
-  | { event_type: "AirGapViolationDetected" }
-  | { event_type: "AirGapViolationResolved" }
-  | (ApplicationStartedDetails & { event_type: "ApplicationStarted" })
-  | (ErrorDetails & { event_type: "Error" })
-  | { event_type: "UnknownEvent" };
-
 export const auditEventLevelValues = ["info", "success", "warning", "error"] as const;
 export type AuditEventLevel = (typeof auditEventLevelValues)[number];
 
+export const auditEventTypeValues = [
+  "UserLoggedIn",
+  "UserLoginFailed",
+  "UserLoggedOut",
+  "UserAccountUpdated",
+  "UserSessionExtended",
+  "UserCreated",
+  "UserUpdated",
+  "UserDeleted",
+  "ElectionCreated",
+  "ElectionUpdated",
+  "CommitteeSessionCreated",
+  "CommitteeSessionDeleted",
+  "CommitteeSessionUpdated",
+  "PollingStationInvestigationCreated",
+  "PollingStationInvestigationConcluded",
+  "PollingStationInvestigationUpdated",
+  "PollingStationInvestigationDeleted",
+  "FileCreated",
+  "FileDeleted",
+  "ApportionmentCreated",
+  "PollingStationCreated",
+  "PollingStationUpdated",
+  "PollingStationDeleted",
+  "PollingStationsImported",
+  "DataEntryStarted",
+  "DataEntrySaved",
+  "DataEntryResumed",
+  "DataEntryDeleted",
+  "DataEntryFinalised",
+  "DataEntryDiscardedFirst",
+  "DataEntryReturnedFirst",
+  "DataEntryKeptFirst",
+  "DataEntryKeptSecond",
+  "DataEntryDiscardedBoth",
+  "AirGapViolationDetected",
+  "AirGapViolationResolved",
+  "ApplicationStarted",
+  "ApiError",
+  "ApiWarning",
+  "UnknownEvent",
+] as const;
+export type AuditEventType = (typeof auditEventTypeValues)[number];
+
 export interface AuditLogEvent {
-  event: AuditEvent;
+  event: unknown;
   event_level: AuditEventLevel;
+  event_name: AuditEventType;
   id: AuditLogEventId;
   ip: string;
   message?: string;
@@ -532,18 +531,6 @@ export interface CommitteeSession {
   status: CommitteeSessionStatus;
 }
 
-export interface CommitteeSessionDetails {
-  session_election_id: ElectionId;
-  session_id: CommitteeSessionId;
-  session_location: string;
-  session_number: number;
-  session_overview_pdf?: FileId;
-  session_results_eml?: FileId;
-  session_results_pdf?: FileId;
-  session_start_date_time?: string;
-  session_status: string;
-}
-
 export type CommitteeSessionId = number;
 
 /**
@@ -623,15 +610,6 @@ export interface DataEntry {
   data: PollingStationResults;
   /** Data entry progress between 0 and 100 */
   progress: number;
-}
-
-export interface DataEntryDetails {
-  data_entry_id: DataEntryId;
-  data_entry_progress: string;
-  data_entry_status: string;
-  finished_at?: string;
-  first_entry_user_id?: UserId;
-  second_entry_user_id?: UserId;
 }
 
 export interface DataEntryGetDifferencesResponse {
@@ -748,21 +726,6 @@ export type ElectionDefinitionValidateResponse =
   | (GSBElectionDefinitionValidateResponse & { role: "GSB" })
   | (CSBElectionDefinitionValidateResponse & { role: "CSB" });
 
-export interface ElectionDetails {
-  election_category: string;
-  election_counting_method: string;
-  election_domain_id: string;
-  election_election_date: string;
-  election_election_id: string;
-  election_id: ElectionId;
-  election_location: string;
-  election_name: string;
-  election_nomination_date: string;
-  election_number_of_seats: number;
-  election_number_of_voters: number;
-  election_role: string;
-}
-
 /**
  * Election details response, including the election's candidate list (political groups),
  * its polling stations and its committee sessions and current committee session
@@ -865,12 +828,6 @@ export interface ElectionWithPoliticalGroups {
   role: ElectionRole;
 }
 
-export interface ErrorDetails {
-  level: AuditEventLevel;
-  path: string;
-  reference: ErrorReference;
-}
-
 /**
  * Error reference used to show the corresponding error message to the end-user
  */
@@ -941,14 +898,6 @@ export interface ExtraInvestigation {
   /** Whether extra investigation was done for another reason than an unexplained difference
 ("Heeft het gemeentelijk stembureau extra onderzoek gedaan vanwege een andere reden dan een onverklaard verschil?") */
   extra_investigation_other_reason: YesNo;
-}
-
-export interface FileDetails {
-  file_created_at: string;
-  file_id: FileId;
-  file_mime_type: string;
-  file_name: string;
-  file_size_bytes: number;
 }
 
 export type FileId = number;
@@ -1122,27 +1071,13 @@ export interface PollingStation {
   data_entry_id?: DataEntryId;
   election_id: ElectionId;
   id: PollingStationId;
-  id_prev_session?: PollingStationId;
   locality: string;
   name: string;
   number: number;
   number_of_voters?: number;
   polling_station_type?: PollingStationType;
   postal_code: string;
-}
-
-export interface PollingStationDetails {
-  polling_station_address: string;
-  polling_station_committee_session_id: CommitteeSessionId;
-  polling_station_election_id: ElectionId;
-  polling_station_id: PollingStationId;
-  polling_station_id_prev_session?: PollingStationId;
-  polling_station_locality: string;
-  polling_station_name: string;
-  polling_station_number: number;
-  polling_station_number_of_voters?: number;
-  polling_station_postal_code: string;
-  polling_station_type?: string;
+  prev_data_entry_id?: DataEntryId;
 }
 
 export interface PollingStationFileRequest {
@@ -1150,12 +1085,6 @@ export interface PollingStationFileRequest {
 }
 
 export type PollingStationId = number;
-
-export interface PollingStationImportDetails {
-  import_election_id: ElectionId;
-  import_file_name: string;
-  import_number_of_polling_stations: number;
-}
 
 export interface PollingStationInvestigation {
   corrected_results?: boolean;
@@ -1266,7 +1195,7 @@ export type ResolveDifferencesAction = (typeof resolveDifferencesActionValues)[n
 export const resolveErrorsActionValues = ["discard_first_entry", "resume_first_entry"] as const;
 export type ResolveErrorsAction = (typeof resolveErrorsActionValues)[number];
 
-export const roleValues = ["administrator", "typist", "coordinator"] as const;
+export const roleValues = ["administrator", "coordinator_gsb", "coordinator_csb", "typist_gsb", "typist_csb"] as const;
 export type Role = (typeof roleValues)[number];
 
 /**
@@ -1333,31 +1262,10 @@ export interface User {
   username: string;
 }
 
-export interface UserDetails {
-  fullname?: string;
-  role: string;
-  user_id: UserId;
-  username: string;
-}
-
 export type UserId = number;
 
 export interface UserListResponse {
   users: User[];
-}
-
-export interface UserLoggedInDetails {
-  logged_in_users_count: number;
-  user_agent: string;
-}
-
-export interface UserLoggedOutDetails {
-  session_duration: number;
-}
-
-export interface UserLoginFailedDetails {
-  user_agent: string;
-  username: string;
 }
 
 export interface ValidationResult {

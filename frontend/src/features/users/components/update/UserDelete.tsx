@@ -36,7 +36,7 @@ export function UserDelete({ user, onDeleted, onError }: UserDeleteProps) {
 
   return (
     <div className="mt-md">
-      <Button variant="tertiary-destructive" leftIcon={<IconTrash />} onClick={toggleModal}>
+      <Button variant="tertiary" leftIcon={<IconTrash />} onClick={toggleModal}>
         {t("users.delete")}
       </Button>
 

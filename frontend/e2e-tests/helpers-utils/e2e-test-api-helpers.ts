@@ -1,5 +1,5 @@
-import type { APIRequestContext } from "@playwright/test";
-
+import { type APIRequestContext, expect } from "@playwright/test";
+import type { TestUser } from "e2e-tests/test-data/users";
 import { dataEntryRequest } from "../test-data/request-response-templates";
 import { DataEntryApiClient } from "./api-clients";
 
@@ -8,7 +8,7 @@ export function getTestPassword(username: string, prefix = ""): string {
   return `${prefix}${capitalizedUsername}Password01`;
 }
 
-export async function loginAs(request: APIRequestContext, username: string, passwordPrefix = "") {
+export async function apiLoginAs(request: APIRequestContext, username: string, passwordPrefix = "") {
   const password = getTestPassword(username, passwordPrefix);
   return await request.post("/api/login", {
     data: {
@@ -16,6 +16,10 @@ export async function loginAs(request: APIRequestContext, username: string, pass
       password,
     },
   });
+}
+
+export async function apiLogout(request: APIRequestContext) {
+  return await request.post("/api/logout");
 }
 
 export async function completePollingStationDataEntries(
@@ -34,4 +38,28 @@ export async function completePollingStationDataEntries(
   await secondDataEntry.claim();
   await secondDataEntry.save(secondRequest);
   await secondDataEntry.finalise();
+}
+
+export async function createUser(adminContext: APIRequestContext, user: TestUser) {
+  const response = await adminContext.post("/api/users", {
+    data: {
+      ...user,
+      temp_password: getTestPassword(user.username, "Temp"),
+    },
+  });
+  expect(response.status(), `response status not 201: ${await response.json()}`).toBe(201);
+}
+
+export async function firstLogin(userContext: APIRequestContext, user: TestUser) {
+  const loginResponse = await apiLoginAs(userContext, user.username, "Temp");
+  expect(loginResponse.status(), `response status not 200: ${await loginResponse.json()}`).toBe(200);
+
+  const response = await userContext.put("/api/account", {
+    data: {
+      username: user.username,
+      fullname: user.fullname,
+      password: getTestPassword(user.username),
+    },
+  });
+  expect(response.status(), `response status not 200: ${await response.json()}`).toBe(200);
 }

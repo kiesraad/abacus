@@ -3,6 +3,7 @@ pub enum AppError {
     // wrapped errors
     Database(sqlx::Error),
     DatabaseMigration(sqlx::migrate::MigrateError),
+    Json(serde_json::Error),
     Io(std::io::Error),
     Environment(tracing_subscriber::filter::FromEnvError),
     StdError(Box<dyn std::error::Error>),
@@ -26,6 +27,12 @@ impl From<std::io::Error> for AppError {
 impl From<sqlx::Error> for AppError {
     fn from(err: sqlx::Error) -> Self {
         AppError::Database(err)
+    }
+}
+
+impl From<serde_json::Error> for AppError {
+    fn from(err: serde_json::Error) -> Self {
+        AppError::Json(err)
     }
 }
 
@@ -116,6 +123,7 @@ impl std::fmt::Display for AppError {
             AppError::Io(e) => write!(f, "IO error: {}", e),
             AppError::Environment(e) => write!(f, "Environment error: {}", e),
             AppError::Database(e) => write!(f, "Database error: {}", e),
+            AppError::Json(e) => write!(f, "Json error: {}", e),
             AppError::DatabaseBusy(file) => {
                 write!(
                     f,

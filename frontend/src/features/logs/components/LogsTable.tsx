@@ -1,5 +1,5 @@
 import { Table } from "@/components/ui/Table/Table";
-import { t } from "@/i18n/translate";
+import { t, translateOrWarn } from "@/i18n/translate";
 import type { AuditLogEvent } from "@/types/generated/openapi";
 import { formatDateTime } from "@/utils/dateTime";
 
@@ -25,29 +25,36 @@ export function LogsTable({ events, details, setDetails }: LogsTableProps) {
             <Table.Cell colSpan={7}>{t("log.no_events")}</Table.Cell>
           </Table.Row>
         )}
-        {events.map((event: AuditLogEvent) => (
-          <Table.ClickRow
-            key={event.id}
-            onClick={() => {
-              setDetails(event);
-            }}
-            active={event.id === details?.id}
-          >
-            <Table.Cell>{event.id}</Table.Cell>
-            <Table.Cell className="nowrap">{formatDateTime(new Date(event.time), false)}</Table.Cell>
-            <Table.Cell>{t(`log.level.${event.event_level}`)}</Table.Cell>
-            <Table.Cell>
-              {t(`log.event.${event.event.event_type}`)}
-              {event.event.event_type === "Error" && `: ${t(`error.api_error.${event.event.reference}`)}`}
-            </Table.Cell>
-            <Table.Cell>
-              {event.user_id &&
-                event.username &&
-                event.user_role &&
-                `${event.user_id}, ${event.username} (${t(event.user_role)})`}
-            </Table.Cell>
-          </Table.ClickRow>
-        ))}
+        {events.map((event: AuditLogEvent) => {
+          let errorReference: string | undefined;
+          if (event.event instanceof Object && "error_reference" in event.event) {
+            errorReference = String(event.event.error_reference);
+          }
+
+          return (
+            <Table.ClickRow
+              key={event.id}
+              onClick={() => {
+                setDetails(event);
+              }}
+              active={event.id === details?.id}
+            >
+              <Table.Cell>{event.id}</Table.Cell>
+              <Table.Cell className="nowrap">{formatDateTime(new Date(event.time), false)}</Table.Cell>
+              <Table.Cell>{t(`log.level.${event.event_level}`)}</Table.Cell>
+              <Table.Cell>
+                {t(`log.event.${event.event_name}`)}
+                {errorReference && `: ${translateOrWarn(`error.api_error.${errorReference}`)}`}
+              </Table.Cell>
+              <Table.Cell>
+                {event.user_id &&
+                  event.username &&
+                  event.user_role &&
+                  `${event.user_id}, ${event.username} (${t(event.user_role)})`}
+              </Table.Cell>
+            </Table.ClickRow>
+          );
+        })}
       </Table.Body>
     </Table>
   );

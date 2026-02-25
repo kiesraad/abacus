@@ -121,8 +121,7 @@ export function CommitteeSessionDetailsPage() {
       <header>
         <section>
           <h1>
-            {/* TODO (post 1.0): Change to conditional GSB/HSB/CSB when implemented */}
-            {t("GSB")} {election.location}
+            {t(`electoral_committee_role.roles.${election.role}.short`)} {election.location}
           </h1>
         </section>
       </header>

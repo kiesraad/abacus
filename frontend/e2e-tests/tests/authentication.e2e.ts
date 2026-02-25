@@ -3,8 +3,7 @@ import { getTestPassword } from "e2e-tests/helpers-utils/e2e-test-api-helpers";
 import { AccountSetupPgObj } from "e2e-tests/page-objects/authentication/AccountSetupPgObj";
 import { LoginPgObj } from "e2e-tests/page-objects/authentication/LoginPgObj";
 import { ElectionsOverviewPgObj } from "e2e-tests/page-objects/election/ElectionsOverviewPgObj";
-import { AdminNavBar } from "e2e-tests/page-objects/nav_bar/AdminNavBarPgObj";
-import { TypistNavBar } from "e2e-tests/page-objects/nav_bar/TypistNavBarPgObj";
+import { UserInfoTopBar } from "e2e-tests/page-objects/nav_bar/UserInfoTopBarPgObj";
 import { FIXTURE_TYPIST_TEMP_PASSWORD, test } from "../fixtures";
 
 test.describe("authentication", () => {
@@ -18,9 +17,9 @@ test.describe("authentication", () => {
 
     await page.waitForURL("/elections");
 
-    const navBar = new AdminNavBar(page);
-    await expect(navBar.username).toHaveText("Jef van Reybrouck");
-    await expect(navBar.role).toHaveText("(Beheerder)");
+    const userInfoTopBar = new UserInfoTopBar(page);
+    await expect(userInfoTopBar.username).toHaveText("Jef van Reybrouck");
+    await expect(userInfoTopBar.role).toHaveText("(Beheerder)");
   });
 
   test("login unhappy path", async ({ page }) => {
@@ -52,11 +51,11 @@ test.describe("authentication", () => {
     await accountSetupPage.passwordRepeat.fill(password);
     await accountSetupPage.saveBtn.click();
 
-    const navBar = new TypistNavBar(page);
-    await expect(navBar.username).toHaveText(newTypist.fullname!);
+    const userInfoTopBar = new UserInfoTopBar(page);
+    await expect(userInfoTopBar.username).toHaveText(newTypist.fullname!);
 
     const overviewPage = new ElectionsOverviewPgObj(page);
-    await expect(navBar.username).toHaveText(newTypist.fullname!);
+    await expect(userInfoTopBar.username).toHaveText(newTypist.fullname!);
     await expect(overviewPage.alertAccountSetup).toBeVisible();
   });
 });

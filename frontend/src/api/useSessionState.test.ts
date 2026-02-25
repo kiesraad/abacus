@@ -51,7 +51,7 @@ describe("Test useSessionState", () => {
     overrideOnce("get", "/api/account", 200, {
       user_id: 2,
       username: "typist",
-      role: "typist",
+      role: "typist_gsb",
       fullname: "Typist",
       needs_password_change: false,
     });
@@ -59,7 +59,7 @@ describe("Test useSessionState", () => {
     await result.current.extendSession();
 
     await waitFor(() => {
-      expect(result.current.user?.role).toBe("typist");
+      expect(result.current.user?.role).toBe("typist_gsb");
     });
   });
 

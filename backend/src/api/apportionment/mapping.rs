@@ -108,14 +108,14 @@ pub fn map_candidate_nomination(
 fn test_sort_candidates_alphabetically() {
     // (initials, last name)
     let names: Vec<(&str, &str)> = vec![
-        ("J.", "Duin"),
-        ("P.", "Appel"),
+        ("A.", "Duin"),
+        ("M.", "Appel"),
         ("M.", "Zee"),
         ("A.", "Zee"),
         ("N.", "Zee"),
         ("D.", "Zee"),
-        ("G.A.", "Korte"),
-        ("Z.", "Groen"),
+        ("D.J.E", "Korte"),
+        ("N.", "Groen"),
     ];
 
     let candidates: Vec<Candidate> = names
@@ -141,10 +141,10 @@ fn test_sort_candidates_alphabetically() {
     assert_eq!(
         sorted_names,
         vec![
-            ("P.", "Appel"),
-            ("J.", "Duin"),
-            ("Z.", "Groen"),
-            ("G.A.", "Korte"),
+            ("M.", "Appel"),
+            ("A.", "Duin"),
+            ("N.", "Groen"),
+            ("D.J.E", "Korte"),
             ("A.", "Zee"),
             ("D.", "Zee"),
             ("M.", "Zee"),

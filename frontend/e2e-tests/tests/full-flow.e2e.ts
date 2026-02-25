@@ -1,11 +1,12 @@
 import { stat } from "node:fs/promises";
-import { expect } from "@playwright/test";
+import { expect, request } from "@playwright/test";
 import { test } from "e2e-tests/fixtures";
-import { getTestPassword, loginAs } from "e2e-tests/helpers-utils/e2e-test-api-helpers";
+import { apiLogout, createUser, firstLogin, getTestPassword } from "e2e-tests/helpers-utils/e2e-test-api-helpers";
 import {
   createInvestigation,
   fillCandidatesListPages,
   fillDataEntryPagesAndSave,
+  logout,
   uploadCandidatesAndInputHash,
   uploadElectionAndInputHash,
   uploadPollingStations,
@@ -21,8 +22,8 @@ import { ProgressList } from "e2e-tests/page-objects/data_entry/ProgressListPgOb
 import { VotersAndVotesPage } from "e2e-tests/page-objects/data_entry/VotersAndVotesPgObj";
 import { CheckAndSavePgObj } from "e2e-tests/page-objects/election/create/CheckAndSavePgObj";
 import { CountingMethodTypePgObj } from "e2e-tests/page-objects/election/create/CountingMethodTypePgObj";
+import { ElectoralCommitteeRolePgObj } from "e2e-tests/page-objects/election/create/ElectoralCommitteeRolePgObj.ts";
 import { NumberOfVotersPgObj } from "e2e-tests/page-objects/election/create/NumberOfVotersPgObj";
-import { PollingStationRolePgObj } from "e2e-tests/page-objects/election/create/PollingStationRolePgObj";
 import { ElectionDetailsPgObj } from "e2e-tests/page-objects/election/ElectionDetailsPgObj";
 import { ElectionHome } from "e2e-tests/page-objects/election/ElectionHomePgObj";
 import { ElectionReport } from "e2e-tests/page-objects/election/ElectionReportPgObj";
@@ -33,7 +34,7 @@ import { AddInvestigationPgObj } from "e2e-tests/page-objects/investigations/Add
 import { InvestigationFindingsPgObj } from "e2e-tests/page-objects/investigations/InvestigationFindingsPgObj";
 import { InvestigationOverviewPgObj } from "e2e-tests/page-objects/investigations/InvestigationOverviewPgObj";
 import { AdminNavBar } from "e2e-tests/page-objects/nav_bar/AdminNavBarPgObj";
-import { CoordinatorNavBarPgObj } from "e2e-tests/page-objects/nav_bar/CoordinatorNavBarPgObj";
+import { UserInfoTopBar } from "e2e-tests/page-objects/nav_bar/UserInfoTopBarPgObj";
 import { PollingStationFormPgObj } from "e2e-tests/page-objects/polling_station/PollingStationFormPgObj";
 import { PollingStationListPgObj } from "e2e-tests/page-objects/polling_station/PollingStationListPgObj";
 import { UserCreateDetailsPgObj } from "e2e-tests/page-objects/users/UserCreateDetailsPgObj";
@@ -42,6 +43,7 @@ import { UserCreateTypePgObj } from "e2e-tests/page-objects/users/UserCreateType
 import { UserListPgObj } from "e2e-tests/page-objects/users/UserListPgObj";
 import { eml110b_single } from "e2e-tests/test-data/eml-files";
 import { noRecountNoDifferencesDataEntry } from "e2e-tests/test-data/request-response-templates";
+import type { TestUser } from "e2e-tests/test-data/users";
 
 const investigations = [
   { number: "1", name: "Stadhuis", reason: "Reden", findings: "Probleem", correctedResults: true },
@@ -61,143 +63,74 @@ const investigations = [
   },
 ];
 
-const typistBaseNameUsers = ["typist3", "typist4"];
+// Note: Do not use the randomSuffix in test titles. You cannot interpolate a non-static value.
+// Using the randomSuffix in test titles will result in those tests being executed last.
+const randomSuffix = Date.now();
+
+const adminUser: TestUser = {
+  username: `admin-${randomSuffix}`,
+  fullname: `full flow admin`,
+  role: "administrator",
+};
+
+const coordinatorUser: TestUser = {
+  username: `coordinator-${randomSuffix}`,
+  fullname: `full flow coordinator`,
+  role: "coordinator_gsb",
+};
+
+const typistUsers: TestUser[] = [
+  {
+    username: `typist3-${randomSuffix}`,
+    fullname: `full flow typist3`,
+    role: "typist_gsb",
+  },
+  {
+    username: `typist4-${randomSuffix}`,
+    fullname: `full flow typist4`,
+    role: "typist_gsb",
+  },
+];
 
 test.describe.configure({ mode: "serial" });
 
 test.describe("full flow", () => {
   let electionId: number | null = null;
 
-  test("create browser-specific admin user account", async ({ admin, browserName }) => {
-    const { request } = admin;
+  test("create and complete admin user account", async ({ adminOne }) => {
+    const { request: adminOneContext } = adminOne;
 
-    // Create admin user for each browser.
-    const username = `admin-${browserName}`;
-    const response = await request.post("/api/users", {
-      data: {
-        role: "administrator",
-        fullname: "John Doe",
-        username: username,
-        temp_password: getTestPassword(username, "Temp"),
-      },
-    });
-    expect(response.status()).toBe(201);
+    await createUser(adminOneContext, adminUser);
 
-    const loginResponse = await loginAs(request, username, "Temp");
-    expect(loginResponse.status()).toBe(200);
-
-    const response2 = await request.put("/api/account", {
-      data: {
-        username: username,
-        fullname: "John Doe",
-        password: getTestPassword(username),
-      },
-    });
-
-    expect(response2.status()).toBe(200);
+    const newAdminContext = await request.newContext();
+    await firstLogin(newAdminContext, adminUser);
+    const logoutResponse = await apiLogout(newAdminContext);
+    expect(logoutResponse.status()).toBe(204);
   });
 
-  test(`create browser-specific coordinator for flow`, async ({ page, browserName }) => {
+  test("create election and a new polling station", async ({ page }) => {
     await page.goto("/account/login");
 
-    const adminUsername = `admin-${browserName}`;
     const loginPage = new LoginPgObj(page);
-    await loginPage.login(adminUsername, getTestPassword(adminUsername));
-
-    const navBar = new AdminNavBar(page);
-    await expect(navBar.username).toHaveText(`John Doe`);
-
-    await page.goto(`/users`);
-
-    const userListPgObj = new UserListPgObj(page);
-    await userListPgObj.create.click();
-
-    const userCreateRolePgObj = new UserCreateRolePgObj(page);
-    await userCreateRolePgObj.coordinator.click();
-    await userCreateRolePgObj.continue.click();
-
-    const coordinatorUsername = `coordinator-${browserName}`;
-    const userCreateDetailsPgObj = new UserCreateDetailsPgObj(page);
-    await userCreateDetailsPgObj.username.fill(coordinatorUsername);
-    await userCreateDetailsPgObj.fullname.fill(`Coordinator ${coordinatorUsername}`);
-    await userCreateDetailsPgObj.password.fill(getTestPassword(coordinatorUsername, "Temp"));
-    await userCreateDetailsPgObj.save.click();
-
-    await expect(userListPgObj.alert).toContainText(`${coordinatorUsername} is toegevoegd met de rol Coördinator`);
-  });
-
-  test(`complete account for coordinator`, async ({ page, browserName }) => {
-    await page.goto("/account/login");
-    const loginPage = new LoginPgObj(page);
-    const username = `coordinator-${browserName}`;
-    await loginPage.login(username, getTestPassword(username, "Temp"));
-
-    const password = getTestPassword(username);
-    const accountSetupPage = new AccountSetupPgObj(page);
-    await accountSetupPage.password.fill(password);
-    await accountSetupPage.passwordRepeat.fill(password);
-    await accountSetupPage.saveBtn.click();
-
-    const overviewPage = new ElectionsOverviewPgObj(page);
-    await expect(overviewPage.alertAccountSetup).toBeVisible();
-  });
-
-  test(`create browser-specific typists for flow`, async ({ page, browserName }) => {
-    await page.goto("/account/login");
-
-    const adminUsername = `admin-${browserName}`;
-    const loginPage = new LoginPgObj(page);
-    await loginPage.login(adminUsername, getTestPassword(adminUsername));
-
-    const navBar = new AdminNavBar(page);
-    await expect(navBar.username).toHaveText(`John Doe`);
-
-    // Create browser-specific typists
-    for (const username of typistBaseNameUsers) {
-      await page.goto(`/users`);
-
-      const userListPgObj = new UserListPgObj(page);
-      await userListPgObj.create.click();
-
-      const userCreateRolePgObj = new UserCreateRolePgObj(page);
-      await userCreateRolePgObj.typist.click();
-      await userCreateRolePgObj.continue.click();
-
-      const userCreateTypePgObj = new UserCreateTypePgObj(page);
-      await userCreateTypePgObj.continue.click();
-
-      const typistUsername = `${username}-${browserName}`;
-      const userCreateDetailsPgObj = new UserCreateDetailsPgObj(page);
-      await userCreateDetailsPgObj.username.fill(typistUsername);
-      await userCreateDetailsPgObj.fullname.fill(`Typist ${typistUsername}`);
-      await userCreateDetailsPgObj.password.fill(typistUsername.repeat(3));
-      await userCreateDetailsPgObj.save.click();
-
-      await expect(userListPgObj.alert).toContainText(`${typistUsername} is toegevoegd met de rol Invoerder`);
-    }
-  });
-
-  test("create election and a new polling station", async ({ page, browserName }) => {
-    await page.goto("/account/login");
-
-    const adminUsername = `admin-${browserName}`;
-    const loginPage = new LoginPgObj(page);
-    await loginPage.login(adminUsername, getTestPassword(adminUsername));
+    await loginPage.login(adminUser.username, getTestPassword(adminUser.username));
 
     const electionsOverviewPage = new ElectionsOverviewPgObj(page);
     await electionsOverviewPage.create.click();
 
     await uploadElectionAndInputHash(page);
 
-    const pollingStationRolePage = new PollingStationRolePgObj(page);
-    await expect(pollingStationRolePage.header).toBeVisible();
-    await pollingStationRolePage.next.click();
+    const electoralCommitteeRolePage = new ElectoralCommitteeRolePgObj(page);
+    await expect(electoralCommitteeRolePage.header).toBeVisible();
+    await expect(electoralCommitteeRolePage.gsb).toBeChecked();
+    await electoralCommitteeRolePage.next.click();
 
     await uploadCandidatesAndInputHash(page);
+
     await uploadPollingStations(page, eml110b_single);
 
     const countingMethodPage = new CountingMethodTypePgObj(page);
     await expect(countingMethodPage.header).toBeVisible();
+    await expect(countingMethodPage.cso).toBeChecked();
     await countingMethodPage.next.click();
 
     const numberOfVotersPage = new NumberOfVotersPgObj(page);
@@ -214,10 +147,11 @@ test.describe("full flow", () => {
     electionId = election.id;
 
     await expect(electionsOverviewPage.adminHeader).toBeVisible();
+    await expect(electionsOverviewPage.alertElectionCreated).toBeVisible();
     await electionsOverviewPage.findElectionRowById(electionId).click();
 
     const electionHomePage = new ElectionHome(page);
-    await expect(electionHomePage.header).toContainText("Gemeenteraad Test 2022");
+    await expect(electionHomePage.header).toHaveText("Gemeenteraad Test 2022");
     const sessionCard = electionHomePage.getCommitteeSessionCard(1);
     await expect(sessionCard).toContainText("Eerste zitting — Klaar voor invoer");
 
@@ -227,93 +161,128 @@ test.describe("full flow", () => {
     await pollingStationListPage.createPollingStation.click();
 
     const form = new PollingStationFormPgObj(page);
-
     await form.fillIn({ number: 2, name: "Basisschool de Regenboog" });
     await form.create.click();
-    expect(await pollingStationListPage.alert.textContent()).toContain(
-      "Stembureau 2 (Basisschool de Regenboog) toegevoegd",
-    );
+    await expect(pollingStationListPage.alert).toHaveText("Stembureau 2 (Basisschool de Regenboog) toegevoegd");
+
+    await logout(page);
   });
 
-  test("start data entry", async ({ page, browserName }) => {
+  test(`create coordinator user account`, async ({ page }) => {
     await page.goto("/account/login");
 
-    const username = `coordinator-${browserName}`;
     const loginPage = new LoginPgObj(page);
-    await loginPage.login(username, getTestPassword(username));
+    await loginPage.login(adminUser.username, getTestPassword(adminUser.username));
+
+    const userInfoTopBar = new UserInfoTopBar(page);
+    await expect(userInfoTopBar.username).toHaveText(adminUser.fullname);
+
+    const adminNavBar = new AdminNavBar(page);
+    await adminNavBar.users.click();
+
+    const userListPgObj = new UserListPgObj(page);
+    await userListPgObj.create.click();
+
+    const userCreateRolePgObj = new UserCreateRolePgObj(page);
+    await userCreateRolePgObj.coordinator.click();
+    await userCreateRolePgObj.continue.click();
+
+    const userCreateDetailsPgObj = new UserCreateDetailsPgObj(page);
+    await userCreateDetailsPgObj.createNamedUser(
+      coordinatorUser.username,
+      coordinatorUser.fullname,
+      getTestPassword(coordinatorUser.username, "Temp"),
+    );
+
+    await expect(userListPgObj.alert).toContainText(`${coordinatorUser.username} is toegevoegd met de rol Coördinator`);
+
+    await logout(page);
+  });
+
+  test(`complete coordinator user account`, async ({ page }) => {
+    await page.goto("/account/login");
+    const loginPage = new LoginPgObj(page);
+    await loginPage.login(coordinatorUser.username, getTestPassword(coordinatorUser.username, "Temp"));
+
+    const password = getTestPassword(coordinatorUser.username);
+    const accountSetupPage = new AccountSetupPgObj(page);
+    await accountSetupPage.password.fill(password);
+    await accountSetupPage.passwordRepeat.fill(password);
+    await accountSetupPage.saveBtn.click();
+
+    const overviewPage = new ElectionsOverviewPgObj(page);
+    await expect(overviewPage.alertAccountSetup).toBeVisible();
+
+    await logout(page);
+  });
+
+  test(`create typist user accounts`, async ({ page }) => {
+    await page.goto("/account/login");
+
+    const loginPage = new LoginPgObj(page);
+    await loginPage.login(adminUser.username, getTestPassword(adminUser.username));
+
+    const userInfoTopBar = new UserInfoTopBar(page);
+    await expect(userInfoTopBar.username).toHaveText(adminUser.fullname);
+
+    // Create browser-specific typists
+    for (const typist of typistUsers) {
+      const adminNavBar = new AdminNavBar(page);
+      await adminNavBar.users.click();
+
+      const userListPgObj = new UserListPgObj(page);
+      await userListPgObj.create.click();
+
+      const userCreateRolePgObj = new UserCreateRolePgObj(page);
+      await userCreateRolePgObj.typist.click();
+      await userCreateRolePgObj.continue.click();
+
+      const userCreateTypePgObj = new UserCreateTypePgObj(page);
+      await userCreateTypePgObj.continue.click();
+
+      const userCreateDetailsPgObj = new UserCreateDetailsPgObj(page);
+      await userCreateDetailsPgObj.createNamedUser(typist.username, typist.fullname, typist.username.repeat(3));
+      await expect(userListPgObj.alert).toContainText(`${typist.username} is toegevoegd met de rol Invoerder`);
+    }
+    await logout(page);
+  });
+
+  test("start data entry", async ({ page }) => {
+    await page.goto("/account/login");
+
+    const loginPage = new LoginPgObj(page);
+    await loginPage.login(coordinatorUser.username, getTestPassword(coordinatorUser.username));
 
     const overviewPage = new ElectionsOverviewPgObj(page);
     await expect(overviewPage.header).toBeVisible();
     await overviewPage.findElectionRowById(electionId!).click();
 
-    const electionHomePage = new ElectionHome(page);
-    await expect(electionHomePage.header).toContainText("Gemeenteraad Test 2022");
-    await electionHomePage.detailsButton.click();
+    const electionHome = new ElectionHome(page);
+    await expect(electionHome.header).toHaveText("Gemeenteraad Test 2022");
+    await expect(electionHome.getCommitteeSessionCard(1)).toContainText("Eerste zitting");
+    await electionHome.detailsButton.click();
 
     const electionDetails = new ElectionDetailsPgObj(page);
-    await expect(electionDetails.header).toContainText("Gemeentelijk stembureau Test");
+    await expect(electionDetails.header).toHaveText("Gemeentelijk stembureau Test");
     await electionDetails.fillForm("Pannerdam", "18-03-2026", "21:34");
 
-    await expect(electionHomePage.header).toContainText("Gemeenteraad Test 2022");
+    await expect(electionHome.header).toContainText("Gemeenteraad Test 2022");
     await expect(page.getByText("woensdag 18 maart 2026 om 21:34")).toBeVisible();
-    await electionHomePage.startButton.click();
+    await electionHome.startButton.click();
 
     const electionStatus = new ElectionStatus(page);
     await expect(electionStatus.header).toContainText("Eerste zitting");
+
+    await logout(page);
   });
 
-  test("download Na 31-2 documents", async ({ page, browserName }) => {
-    await page.goto("/account/login");
-
-    const loginPage = new LoginPgObj(page);
-    const username = `coordinator-${browserName}`;
-    await loginPage.login(username, getTestPassword(username));
-
-    const overviewPage = new ElectionsOverviewPgObj(page);
-    await expect(overviewPage.header).toBeVisible();
-    await overviewPage.findElectionRowById(electionId!).click();
-
-    const electionHomePage = new ElectionHome(page);
-    await expect(electionHomePage.header).toContainText("Gemeenteraad Test 2022");
-
-    const downloadPromise = page.waitForEvent("download");
-    await electionHomePage.downloadBijlage1.click();
-    const download = await downloadPromise;
-
-    expect(download.suggestedFilename()).toBe("GR2022_Test_na_31_2_bijlage1.zip");
-    expect((await stat(await download.path())).size).toBeGreaterThan(1024);
-  });
-
-  test("download N10-2 documents", async ({ page, browserName }) => {
-    await page.goto("/account/login");
-
-    const loginPage = new LoginPgObj(page);
-    const username = `coordinator-${browserName}`;
-    await loginPage.login(username, getTestPassword(username));
-
-    const overviewPage = new ElectionsOverviewPgObj(page);
-    await expect(overviewPage.header).toBeVisible();
-    await overviewPage.findElectionRowById(electionId!).click();
-
-    const electionHomePage = new ElectionHome(page);
-    await expect(electionHomePage.header).toContainText("Gemeenteraad Test 2022");
-
-    const downloadPromise = page.waitForEvent("download");
-    await electionHomePage.downloadN10_2.click();
-    const download = await downloadPromise;
-
-    expect(download.suggestedFilename()).toBe("GR2022_Test_n_10_2.zip");
-    expect((await stat(await download.path())).size).toBeGreaterThan(1024);
-  });
-
-  for (const typist of typistBaseNameUsers) {
-    test(`complete account for ${typist}`, async ({ page, browserName }) => {
+  for (const typist of typistUsers) {
+    test(`complete user account for ${typist.fullname}`, async ({ page }) => {
       await page.goto("/account/login");
       const loginPage = new LoginPgObj(page);
-      const username = `${typist}-${browserName}`;
-      await loginPage.login(username, username.repeat(3));
+      await loginPage.login(typist.username, typist.username.repeat(3));
 
-      const password = getTestPassword(typist);
+      const password = getTestPassword(typist.username);
       const accountSetupPage = new AccountSetupPgObj(page);
       await accountSetupPage.password.fill(password);
       await accountSetupPage.passwordRepeat.fill(password);
@@ -321,6 +290,8 @@ test.describe("full flow", () => {
 
       const overviewPage = new ElectionsOverviewPgObj(page);
       await expect(overviewPage.alertAccountSetup).toBeVisible();
+
+      await logout(page);
     });
   }
 
@@ -328,12 +299,13 @@ test.describe("full flow", () => {
     { number: "1", name: "Stadhuis" },
     { number: "2", name: "Basisschool de Regenboog" },
   ]) {
-    test(`first data entry ${station.name}`, async ({ page, browserName }) => {
+    test(`first data entry ${station.name}`, async ({ page }) => {
       await page.goto("/account/login");
 
-      const username = `typist3-${browserName}`;
+      const firstTypist = typistUsers[0]!;
       const loginPage = new LoginPgObj(page);
-      await loginPage.login(username, getTestPassword("typist3"));
+      const password = getTestPassword(firstTypist.username);
+      await loginPage.login(firstTypist.username, password);
 
       const overviewPage = new ElectionsOverviewPgObj(page);
       await expect(overviewPage.header).toBeVisible();
@@ -346,14 +318,17 @@ test.describe("full flow", () => {
       await dataEntryHomePage.clickStart();
 
       await fillDataEntryPagesAndSave(page, noRecountNoDifferencesDataEntry);
+      await expect(dataEntryHomePage.alertDataEntrySaved).toBeVisible();
+
+      await logout(page);
     });
 
-    test(`second data entry ${station.name}`, async ({ page, browserName }) => {
+    test(`second data entry ${station.name}`, async ({ page }) => {
       await page.goto("/account/login");
 
-      const username = `typist4-${browserName}`;
+      const secondTypist = typistUsers[1]!;
       const loginPage = new LoginPgObj(page);
-      await loginPage.login(username, getTestPassword("typist4"));
+      await loginPage.login(secondTypist.username, getTestPassword(secondTypist.username));
 
       const overviewPage = new ElectionsOverviewPgObj(page);
       await expect(overviewPage.header).toBeVisible();
@@ -366,22 +341,24 @@ test.describe("full flow", () => {
       await dataEntryHomePage.clickStart();
 
       await fillDataEntryPagesAndSave(page, noRecountNoDifferencesDataEntry);
+      await expect(dataEntryHomePage.alertDataEntrySaved).toBeVisible();
+
+      await logout(page);
     });
   }
 
-  test("finish data entry", async ({ page, browserName }) => {
+  test("finish first session and download results", async ({ page }) => {
     await page.goto("/account/login");
 
     const loginPage = new LoginPgObj(page);
-    const username = `coordinator-${browserName}`;
-    await loginPage.login(username, getTestPassword(username));
+    await loginPage.login(coordinatorUser.username, getTestPassword(coordinatorUser.username));
 
     const overviewPage = new ElectionsOverviewPgObj(page);
     await expect(overviewPage.header).toBeVisible();
     await overviewPage.findElectionRowById(electionId!).click();
 
     const electionHomePage = new ElectionHome(page);
-    await expect(electionHomePage.header).toContainText("Gemeenteraad Test 2022");
+    await expect(electionHomePage.header).toHaveText("Gemeenteraad Test 2022");
     await electionHomePage.statusButton.click();
 
     const electionStatusPage = new ElectionStatus(page);
@@ -398,39 +375,41 @@ test.describe("full flow", () => {
 
     expect(download.suggestedFilename()).toMatch(/definitieve-documenten_gr2022_test_gemeente_test-\d{8}-\d{6}.zip/);
     expect((await stat(await download.path())).size).toBeGreaterThan(1024);
+
+    await logout(page);
   });
 
-  test("create new committee session", async ({ page, browserName }) => {
+  test("create new committee session", async ({ page }) => {
     await page.goto("/account/login");
 
     const loginPage = new LoginPgObj(page);
-    const username = `coordinator-${browserName}`;
-    await loginPage.login(username, getTestPassword(username));
+    await loginPage.login(coordinatorUser.username, getTestPassword(coordinatorUser.username));
 
     const overviewPage = new ElectionsOverviewPgObj(page);
     await expect(overviewPage.header).toBeVisible();
     await overviewPage.findElectionRowById(electionId!).click();
 
-    const electionDetailsPage = new ElectionDetailsPgObj(page);
-    await electionDetailsPage.newSessionButton.click();
-    await electionDetailsPage.newSessionModalConfirmButton.click();
+    const electionHome = new ElectionHome(page);
+    await expect(electionHome.header).toHaveText("Gemeenteraad Test 2022");
+    await electionHome.newSessionButton.click();
+    await electionHome.newSessionModalConfirmButton.click();
+    await expect(electionHome.getCommitteeSessionCard(2)).toContainText("Tweede zitting");
 
-    await expect(electionDetailsPage.investigationsOverviewButton).toBeVisible();
+    await logout(page);
   });
 
-  test("download Na 31-2 inlegvel", async ({ page, browserName }) => {
+  test("download Na 31-2 inlegvel", async ({ page }) => {
     await page.goto("/account/login");
 
     const loginPage = new LoginPgObj(page);
-    const username = `coordinator-${browserName}`;
-    await loginPage.login(username, getTestPassword(username));
+    await loginPage.login(coordinatorUser.username, getTestPassword(coordinatorUser.username));
 
     const overviewPage = new ElectionsOverviewPgObj(page);
     await expect(overviewPage.header).toBeVisible();
     await overviewPage.findElectionRowById(electionId!).click();
 
     const electionHomePage = new ElectionHome(page);
-    await expect(electionHomePage.header).toContainText("Gemeenteraad Test 2022");
+    await expect(electionHomePage.header).toHaveText("Gemeenteraad Test 2022");
 
     const downloadPromise = page.waitForEvent("download");
     await electionHomePage.downloadInlegvel.click();
@@ -438,24 +417,26 @@ test.describe("full flow", () => {
 
     expect(download.suggestedFilename()).toBe("Model_Na_31_2_Inlegvel.pdf");
     expect((await stat(await download.path())).size).toBeGreaterThan(1024);
+
+    await logout(page);
   });
 
-  test("add missing polling station", async ({ page, browserName }) => {
+  test("add missing polling station", async ({ page }) => {
     await page.goto("/account/login");
 
     const loginPage = new LoginPgObj(page);
-    const username = `coordinator-${browserName}`;
-    await loginPage.login(username, getTestPassword(username));
+    await loginPage.login(coordinatorUser.username, getTestPassword(coordinatorUser.username));
 
     const overviewPage = new ElectionsOverviewPgObj(page);
     await expect(overviewPage.header).toBeVisible();
     await overviewPage.findElectionRowById(electionId!).click();
 
-    const electionDetailsPage = new ElectionDetailsPgObj(page);
-    await expect(electionDetailsPage.header).toContainText("Gemeenteraad Test 2022");
-    await electionDetailsPage.investigationsOverviewButton.click();
+    const electionHome = new ElectionHome(page);
+    await expect(electionHome.header).toHaveText("Gemeenteraad Test 2022");
+    await electionHome.investigationsOverviewButton.click();
 
     const investigationsOverviewPage = new InvestigationOverviewPgObj(page);
+    await expect(investigationsOverviewPage.header).toHaveText("Onderzoeken in tweede zitting");
     await investigationsOverviewPage.addInvestigationButton.click();
 
     const addInvestigationPage = new AddInvestigationPgObj(page);
@@ -463,71 +444,80 @@ test.describe("full flow", () => {
     await addInvestigationPage.addPollingStation.click();
 
     const form = new PollingStationFormPgObj(page);
-
     await form.fillIn({
       number: 5,
       name: "Sportfondsenbad",
     });
-
     await form.create.click();
 
     const pollingStationListPage = new PollingStationListPgObj(page);
-    expect(await pollingStationListPage.alert.textContent()).toContain("Stembureau 5 (Sportfondsenbad) toegevoegd");
+    await expect(pollingStationListPage.alert).toHaveText("Stembureau 5 (Sportfondsenbad) toegevoegd");
+
+    await logout(page);
   });
 
   for (const station of investigations) {
-    test(`create investigation for ${station.name}`, async ({ page, browserName }) => {
+    test(`create investigation for ${station.name}`, async ({ page }) => {
       await page.goto("/account/login");
 
       const loginPage = new LoginPgObj(page);
-      const username = `coordinator-${browserName}`;
-      await loginPage.login(username, getTestPassword(username));
+      await loginPage.login(coordinatorUser.username, getTestPassword(coordinatorUser.username));
 
       const overviewPage = new ElectionsOverviewPgObj(page);
       await expect(overviewPage.header).toBeVisible();
       await overviewPage.findElectionRowById(electionId!).click();
 
+      const electionHome = new ElectionHome(page);
+      await electionHome.investigationsOverviewButton.click();
+
       await createInvestigation(page, station.name, station.reason);
+      const investigationsOverviewPage = new InvestigationOverviewPgObj(page);
+      await expect(investigationsOverviewPage.alert).toHaveText(
+        `Onderzoek voor stembureau ${station.number} (${station.name}) toegevoegd`,
+      );
+
+      await logout(page);
     });
   }
 
-  test("start data entry of corrected results", async ({ page, browserName }) => {
+  test("start data entry of corrected results", async ({ page }) => {
     await page.goto("/account/login");
 
     const loginPage = new LoginPgObj(page);
-    const username = `coordinator-${browserName}`;
-    await loginPage.login(username, getTestPassword(username));
+    await loginPage.login(coordinatorUser.username, getTestPassword(coordinatorUser.username));
 
     const overviewPage = new ElectionsOverviewPgObj(page);
     await expect(overviewPage.header).toBeVisible();
     await overviewPage.findElectionRowById(electionId!).click();
 
-    const electionDetailsPage = new ElectionDetailsPgObj(page);
-    await electionDetailsPage.startDataEntryButton.click();
+    const electionHome = new ElectionHome(page);
+    await expect(electionHome.header).toHaveText("Gemeenteraad Test 2022");
+    await electionHome.startDataEntryButton.click();
 
     const electionStatus = new ElectionStatus(page);
     await expect(electionStatus.header).toContainText("Tweede zitting");
+
+    await logout(page);
   });
 
   for (const station of investigations) {
-    test(`finish investigation for ${station.name}`, async ({ page, browserName }) => {
+    test(`finish investigation for ${station.name}`, async ({ page }) => {
       await page.goto("/account/login");
 
       const loginPage = new LoginPgObj(page);
-      const username = `coordinator-${browserName}`;
-      await loginPage.login(username, getTestPassword(username));
+      await loginPage.login(coordinatorUser.username, getTestPassword(coordinatorUser.username));
 
       const overviewPage = new ElectionsOverviewPgObj(page);
       await expect(overviewPage.header).toBeVisible();
       await overviewPage.findElectionRowById(electionId!).click();
 
-      const electionDetailsPage = new ElectionDetailsPgObj(page);
-      await expect(electionDetailsPage.header).toContainText("Gemeenteraad Test 2022");
-      await electionDetailsPage.investigationsOverviewButton.click();
+      const electionHome = new ElectionHome(page);
+      await expect(electionHome.header).toHaveText("Gemeenteraad Test 2022");
+      await electionHome.investigationsOverviewButton.click();
 
       const investigationsOverviewPage = new InvestigationOverviewPgObj(page);
-      await expect(investigationsOverviewPage.header).toContainText("Onderzoeken in tweede zitting");
-      await investigationsOverviewPage.findInvestigationEditButtonByPollingStation(station.number).click();
+      await expect(investigationsOverviewPage.header).toHaveText("Onderzoeken in tweede zitting");
+      await investigationsOverviewPage.getInvestigationEditButtonByPollingStationId(station.number).click();
 
       const investigationsFindingsPage = new InvestigationFindingsPgObj(page);
       await expect(investigationsFindingsPage.header).toBeVisible();
@@ -535,21 +525,20 @@ test.describe("full flow", () => {
       await investigationsFindingsPage.setCorrectedResults(station.correctedResults);
       await investigationsFindingsPage.save.click();
 
-      const navBar = new CoordinatorNavBarPgObj(page);
-      await navBar.menuButton.click();
-      await navBar.electionsButton.click();
+      await expect(investigationsOverviewPage.alert).toHaveText(
+        `Onderzoek voor stembureau ${station.number} (${station.name}) aangepast`,
+      );
 
-      await expect(overviewPage.header).toBeVisible();
+      await logout(page);
     });
   }
 
-  for (const typist of typistBaseNameUsers) {
-    test(`corrected data entry with ${typist}`, async ({ page, browserName }) => {
+  for (const user of typistUsers) {
+    test(`corrected data entry with ${user.fullname}`, async ({ page }) => {
       await page.goto("/account/login");
 
-      const username = `${typist}-${browserName}`;
       const loginPage = new LoginPgObj(page);
-      await loginPage.login(username, getTestPassword(typist));
+      await loginPage.login(user.username, getTestPassword(user.username));
 
       const overviewPage = new ElectionsOverviewPgObj(page);
       await expect(overviewPage.header).toBeVisible();
@@ -586,17 +575,18 @@ test.describe("full flow", () => {
       const checkAndSavePage = new CheckAndSavePage(page);
       await checkAndSavePage.save.click();
 
-      await expect(dataEntryHomePage.dataEntrySaved).toBeVisible();
+      await expect(dataEntryHomePage.alertDataEntrySaved).toBeVisible();
+
+      await logout(page);
     });
   }
 
-  for (const typist of typistBaseNameUsers) {
-    test(`data entry for new polling station with ${typist}`, async ({ page, browserName }) => {
+  for (const typist of typistUsers) {
+    test(`data entry for new polling station with ${typist.fullname}`, async ({ page }) => {
       await page.goto("/account/login");
 
-      const username = `${typist}-${browserName}`;
       const loginPage = new LoginPgObj(page);
-      await loginPage.login(username, getTestPassword(typist));
+      await loginPage.login(typist.username, getTestPassword(typist.username));
 
       const overviewPage = new ElectionsOverviewPgObj(page);
       await expect(overviewPage.header).toBeVisible();
@@ -624,41 +614,40 @@ test.describe("full flow", () => {
       const checkAndSavePage = new CheckAndSavePage(page);
       await checkAndSavePage.save.click();
 
-      await expect(dataEntryHomePage.dataEntrySaved).toBeVisible();
+      await expect(dataEntryHomePage.alertDataEntrySaved).toBeVisible();
+
+      await logout(page);
     });
   }
 
-  test("check progress", async ({ page, browserName }) => {
+  test("finish second session and download results", async ({ page }) => {
     await page.goto("/account/login");
 
     const loginPage = new LoginPgObj(page);
-    const username = `coordinator-${browserName}`;
-    await loginPage.login(username, getTestPassword(username));
+    await loginPage.login(coordinatorUser.username, getTestPassword(coordinatorUser.username));
 
     const overviewPage = new ElectionsOverviewPgObj(page);
     await expect(overviewPage.header).toBeVisible();
     await overviewPage.findElectionRowById(electionId!).click();
 
     const electionHome = new ElectionHome(page);
+    await expect(electionHome.header).toHaveText("Gemeenteraad Test 2022");
     await expect(electionHome.header).toBeVisible();
     await electionHome.statusButton.click();
 
     const statusPage = new ElectionStatus(page);
     await expect(statusPage.definitive).toBeVisible();
-
-    const finishButton = statusPage.finish;
-    await expect(finishButton).toBeVisible();
-    await finishButton.click();
+    await statusPage.finish.click();
 
     const finishDataEntryPage = new FinishDataEntry(page);
     await finishDataEntryPage.finishDataEntry.click();
 
     const electionDetails = new ElectionDetailsPgObj(page);
-    await expect(electionDetails.header).toContainText("Gemeentelijk stembureau Test");
+    await expect(electionDetails.header).toHaveText("Gemeentelijk stembureau Test");
     await electionDetails.locationInput.fill("Pannerdam");
     await electionDetails.dateInput.fill("18-03-2026");
     await electionDetails.timeInput.fill("21:34");
-    await electionDetails.continue.click();
+    await electionDetails.toCertifiedResults.click();
 
     const electionHomePage = new ElectionReport(page);
     await expect(electionHomePage.header).toContainText("Tweede zitting Gemeentelijk Stembureau");
@@ -668,5 +657,7 @@ test.describe("full flow", () => {
     const download = await downloadPromise;
     expect(download.suggestedFilename()).toMatch(/correctie_gr2022_test_gemeente_test-\d{8}-\d{6}.zip/);
     expect((await stat(await download.path())).size).toBeGreaterThan(1024);
+
+    await logout(page);
   });
 });

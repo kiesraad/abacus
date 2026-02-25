@@ -38,8 +38,8 @@ const navigate = vi.fn();
 
 function electionValidateResponse(
   election: NewElection,
-  polling_stations: PollingStationRequest[] | undefined = undefined,
-  matching_election: boolean | undefined = undefined,
+  polling_stations?: PollingStationRequest[],
+  matching_election?: boolean,
 ): ElectionDefinitionValidateResponse {
   return {
     role: "GSB",
@@ -93,7 +93,7 @@ describe("UploadElectionDefinition component", () => {
     overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
     await user.click(screen.getByRole("button", { name: "Volgende" }));
 
-    expect(navigate).toHaveBeenCalledWith("/elections/create/polling-station-role");
+    expect(navigate).toHaveBeenCalledWith("/elections/create/electoral-committee-role");
   });
 
   test("Shows an error when providing incorrect hash", async () => {

@@ -76,6 +76,42 @@ describe("InitialiseApplicationPage", () => {
     expect(navigate).toHaveBeenCalledWith("/elections");
   });
 
+  test("Enter form field values and use enter instead of clicking submit", async () => {
+    server.use(CreateFirstAdminRequestHandler, AdminExistsRequestHandler, LoginHandler);
+
+    render(<InitialiseApplicationPage />);
+
+    await waitFor(() => {
+      expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Welkom bij Abacus");
+    });
+
+    const nextButton = screen.getByRole("button", { name: "Account voor beheerder aanmaken" });
+    await userEvent.click(nextButton);
+
+    await waitFor(() => {
+      expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Account voor beheerder aanmaken");
+    });
+
+    const user = userEvent.setup();
+    await user.type(screen.getByRole("textbox", { name: "Jouw naam (roepnaam + achternaam)" }), "First Last");
+    await user.type(screen.getByRole("textbox", { name: "Kies een gebruikersnaam" }), "firstlast");
+    await user.type(screen.getByLabelText("Kies een wachtwoord"), "password*password");
+    await user.type(screen.getByLabelText("Herhaal wachtwoord"), "password*password");
+
+    await user.keyboard("{enter}");
+
+    await waitFor(() => {
+      expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Inloggen met account van beheerder");
+    });
+
+    await user.type(screen.getByRole("textbox", { name: "Gebruikersnaam" }), "username");
+    await user.type(screen.getByLabelText("Wachtwoord"), "password*password");
+
+    await user.keyboard("{enter}");
+
+    expect(navigate).toHaveBeenCalledWith("/elections");
+  });
+
   test("Go to login if an account was already created", async () => {
     overrideOnce("get", "/api/initialise/admin-exists", 204, "");
 

@@ -9,7 +9,6 @@ use crate::{
         password::{HashedPassword, ValidatedPassword, hash_password, verify_password},
     },
     domain::{id::id, role::Role},
-    infra::audit_log::UserDetails,
 };
 
 const MIN_UPDATE_LAST_ACTIVITY_AT_SECS: i64 = 60; // 1 minute
@@ -37,17 +36,6 @@ pub struct User {
     updated_at: DateTime<Utc>,
     #[schema(value_type = String)]
     created_at: DateTime<Utc>,
-}
-
-impl From<User> for UserDetails {
-    fn from(user: User) -> Self {
-        Self {
-            user_id: user.id,
-            fullname: user.fullname,
-            username: user.username,
-            role: user.role.to_string(),
-        }
-    }
 }
 
 impl User {
@@ -163,7 +151,7 @@ pub async fn create(
             fullname,
             password_hash,
             needs_password_change as "needs_password_change: bool",
-            role,
+            role as "role: _",
             last_activity_at as "last_activity_at: _",
             updated_at as "updated_at: _",
             created_at as "created_at: _"
@@ -281,7 +269,7 @@ pub async fn get_by_username(
             id as "id: UserId",
             username,
             fullname,
-            role,
+            role as "role: _",
             password_hash,
             needs_password_change as "needs_password_change: bool",
             last_activity_at as "last_activity_at: _",
@@ -309,7 +297,7 @@ pub async fn get_by_id(
             id as "id: UserId",
             username,
             fullname,
-            role,
+            role as "role: _",
             password_hash,
             needs_password_change as "needs_password_change: bool",
             last_activity_at as "last_activity_at: _",
@@ -337,7 +325,7 @@ pub async fn list(
             fullname,
             password_hash,
             needs_password_change as "needs_password_change: bool",
-            role,
+            role as "role: _",
             last_activity_at as "last_activity_at: _",
             updated_at as "updated_at: _",
             created_at as "created_at: _"
@@ -420,7 +408,7 @@ mod tests {
             None,
             "TotallyValidP4ssW0rd",
             true,
-            Role::Typist,
+            Role::TypistGSB,
         )
         .await
         .unwrap();
@@ -453,7 +441,7 @@ mod tests {
             None,
             "TotallyValidP4ssW0rd",
             true,
-            Role::Typist,
+            Role::TypistGSB,
         )
         .await
         .unwrap();
@@ -467,7 +455,7 @@ mod tests {
             None,
             "TotallyValidP4ssW0rd",
             true,
-            Role::Typist,
+            Role::TypistGSB,
         )
         .await;
 
@@ -486,7 +474,7 @@ mod tests {
             Some("Full Name"),
             "TotallyValidP4ssW0rd",
             true,
-            Role::Coordinator,
+            Role::CoordinatorGSB,
         )
         .await
         .unwrap();
@@ -629,7 +617,7 @@ mod tests {
             id: UserId::from(2),
             username: "user1".to_string(),
             fullname: Some("Full Name".to_string()),
-            role: Role::Typist,
+            role: Role::TypistGSB,
             needs_password_change: false,
             password_hash: password::hash_password(
                 password::ValidatedPassword::new("test_user_1", "TotallyValidP4ssW0rd", None)

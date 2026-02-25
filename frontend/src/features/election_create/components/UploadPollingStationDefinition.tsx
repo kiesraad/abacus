@@ -48,7 +48,7 @@ export function UploadPollingStationDefinition() {
       setFile(currentFile);
       const data = await currentFile.text();
       const response = await create({
-        role: "GSB",
+        role: state.electionRole,
         election_hash: state.electionDefinitionHash,
         election_data: state.electionDefinitionData,
         candidate_hash: state.candidateDefinitionHash,
@@ -114,9 +114,7 @@ export function UploadPollingStationDefinition() {
               <PollingStationsPreview pollingStations={state.pollingStations} />
             </FormLayout.Section>
             <FormLayout.Controls>
-              <Button type="button" onClick={() => void next()}>
-                {t("next")}
-              </Button>
+              <Button onClick={() => void next()}>{t("next")}</Button>
             </FormLayout.Controls>
           </FormLayout>
         </Form>
@@ -142,7 +140,7 @@ export function UploadPollingStationDefinition() {
             </FileInput>
 
             <FormLayout.Controls>
-              <Button type="button" variant="underlined" size="md" onClick={() => void skip()}>
+              <Button variant="underlined" size="md" onClick={() => void skip()}>
                 {t("election.polling_stations.skip_step")}
               </Button>
             </FormLayout.Controls>

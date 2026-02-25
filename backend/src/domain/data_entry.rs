@@ -8,13 +8,13 @@ pub use yes_no::YesNo;
 
 use crate::{
     APIError,
+    api::data_entry::DataEntryDetails,
     domain::{
         data_entry_status::{DataEntryStatus, DataEntryStatusName},
         election::{CandidateNumber, PGNumber, PoliticalGroup},
         id::id,
     },
     error::ErrorReference,
-    infra::audit_log::DataEntryDetails,
 };
 
 id!(DataEntryId);

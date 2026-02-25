@@ -158,7 +158,7 @@ test.describe("resume data entry flow", () => {
 
       const dataEntryHomePage = new DataEntryHomePage(page);
       await expect(dataEntryHomePage.fieldset).toBeVisible();
-      await expect(dataEntryHomePage.resumeDataEntry).toBeVisible();
+      await expect(dataEntryHomePage.alertDataEntryInProgress).toBeVisible();
 
       const dataEntryResponse = await request.post(`/api/polling_stations/${pollingStation.id}/data_entries/1/claim`);
       expect(dataEntryResponse.status()).toBe(200);

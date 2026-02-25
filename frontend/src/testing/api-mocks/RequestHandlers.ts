@@ -30,8 +30,6 @@ import type {
   CREATE_FIRST_ADMIN_REQUEST_BODY,
   CREATE_FIRST_ADMIN_REQUEST_PARAMS,
   CREATE_FIRST_ADMIN_REQUEST_PATH,
-  DATA_ENTRIES_AND_RESULT_DELETE_REQUEST_PARAMS,
-  DATA_ENTRIES_AND_RESULT_DELETE_REQUEST_PATH,
   DATA_ENTRY_CLAIM_REQUEST_PARAMS,
   DATA_ENTRY_CLAIM_REQUEST_PATH,
   DATA_ENTRY_DELETE_REQUEST_PARAMS,
@@ -42,6 +40,8 @@ import type {
   DATA_ENTRY_GET_DIFFERENCES_REQUEST_PATH,
   DATA_ENTRY_GET_REQUEST_PARAMS,
   DATA_ENTRY_GET_REQUEST_PATH,
+  DATA_ENTRY_RESET_REQUEST_PARAMS,
+  DATA_ENTRY_RESET_REQUEST_PATH,
   DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_BODY,
   DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_PARAMS,
   DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_PATH,
@@ -132,10 +132,11 @@ import {
   saveDataEntryResponse,
 } from "./DataEntryMockData";
 import {
+  csbElectionImportMockResponse,
   electionDetailsMockResponse,
   electionImportMockResponse,
-  electionImportValidateMockResponse,
   electionListMockResponse,
+  gsbElectionImportValidateMockResponse,
   investigationListMockResponse,
 } from "./ElectionMockData";
 import { statusResponseMock } from "./ElectionStatusMockData";
@@ -310,7 +311,7 @@ export const ElectionStatusRequestHandler = http.get<
   HttpResponse.json(statusResponseMock, { status: 200 }),
 );
 
-export const ElectionImportRequestHandler = http.post<
+export const GSBElectionImportRequestHandler = http.post<
   ParamsToString<ELECTION_IMPORT_REQUEST_PARAMS>,
   ELECTION_IMPORT_REQUEST_BODY,
   ElectionWithPoliticalGroups
@@ -318,12 +319,20 @@ export const ElectionImportRequestHandler = http.post<
   HttpResponse.json(electionImportMockResponse, { status: 201 }),
 );
 
+export const CSBElectionImportRequestHandler = http.post<
+  ParamsToString<ELECTION_IMPORT_REQUEST_PARAMS>,
+  ELECTION_IMPORT_REQUEST_BODY,
+  ElectionWithPoliticalGroups
+>("/api/elections/import" satisfies ELECTION_IMPORT_REQUEST_PATH, () =>
+  HttpResponse.json(csbElectionImportMockResponse, { status: 201 }),
+);
+
 export const ElectionImportValidateRequestHandler = http.post<
   ParamsToString<ELECTION_IMPORT_VALIDATE_REQUEST_PARAMS>,
   ELECTION_IMPORT_VALIDATE_REQUEST_BODY,
   ElectionDefinitionValidateResponse
 >("/api/elections/import/validate" satisfies ELECTION_IMPORT_VALIDATE_REQUEST_PATH, () =>
-  HttpResponse.json(electionImportValidateMockResponse, { status: 200 }),
+  HttpResponse.json(gsbElectionImportValidateMockResponse(), { status: 200 }),
 );
 
 export const ElectionChangeNumberOfVotersHandler = http.put<
@@ -420,11 +429,9 @@ export const PollingStationDataEntryFinaliseHandler = http.post<
   HttpResponse.json({ status: "first_entry_finalised" }, { status: 200 }),
 );
 
-// delete data entries and result handler
-export const PollingStationDataEntriesAndResultDeleteHandler = http.delete<
-  ParamsToString<DATA_ENTRIES_AND_RESULT_DELETE_REQUEST_PARAMS>
->(
-  "/api/polling_stations/5/data_entries" satisfies DATA_ENTRIES_AND_RESULT_DELETE_REQUEST_PATH,
+// reset data entry handler
+export const PollingStationDataEntryResetHandler = http.delete<ParamsToString<DATA_ENTRY_RESET_REQUEST_PARAMS>>(
+  "/api/polling_stations/5/data_entries" satisfies DATA_ENTRY_RESET_REQUEST_PATH,
   () => new HttpResponse(null, { status: 204 }),
 );
 
@@ -509,11 +516,13 @@ export const handlers: HttpHandler[] = [
   InvestigationListRequestHandler,
   PollingStationInvestigationCreateHandler,
   PollingStationInvestigationConcludeHandler,
+  PollingStationInvestigationDeleteHandler,
   PollingStationInvestigationUpdateHandler,
   ElectionListRequestHandler,
   ElectionRequestHandler,
   ElectionStatusRequestHandler,
-  ElectionImportRequestHandler,
+  GSBElectionImportRequestHandler,
+  CSBElectionImportRequestHandler,
   ElectionImportValidateRequestHandler,
   ElectionChangeNumberOfVotersHandler,
   LoginHandler,
@@ -527,7 +536,7 @@ export const handlers: HttpHandler[] = [
   PollingStationDataEntryClaimHandler,
   PollingStationDataEntryDeleteHandler,
   PollingStationDataEntryFinaliseHandler,
-  PollingStationDataEntriesAndResultDeleteHandler,
+  PollingStationDataEntryResetHandler,
   PollingStationCreateHandler,
   PollingStationDeleteHandler,
   PollingStationUpdateHandler,

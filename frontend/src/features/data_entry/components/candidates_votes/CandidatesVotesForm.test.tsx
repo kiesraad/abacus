@@ -12,13 +12,12 @@ import {
 import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMockData";
 import { overrideOnce, server } from "@/testing/server";
 import { getUrlMethodAndBody, render, screen, waitFor, within } from "@/testing/test-utils";
+import { getTypistUser } from "@/testing/user-mock-data";
 import type {
   DATA_ENTRY_SAVE_REQUEST_BODY,
   ElectionWithPoliticalGroups,
-  LoginResponse,
   PoliticalGroup,
 } from "@/types/generated/openapi";
-
 import { getDefaultDataEntryState, getEmptyDataEntryRequest } from "../../testing/mock-data";
 import {
   expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage,
@@ -30,13 +29,6 @@ import {
 } from "../../testing/test.utils";
 import { DataEntryProvider } from "../DataEntryProvider";
 import { DataEntrySection } from "../DataEntrySection";
-
-const testUser: LoginResponse = {
-  username: "test-user-1",
-  user_id: 1,
-  role: "typist",
-  needs_password_change: false,
-};
 
 function renderForm({ election, groupNumber }: { election?: ElectionWithPoliticalGroups; groupNumber?: number } = {}) {
   vi.spyOn(ReactRouter, "useParams").mockReturnValue({ sectionId: `political_group_votes_${groupNumber || 1}` });
@@ -62,7 +54,7 @@ const candidatesFieldIds = {
 
 describe("Test CandidatesVotesForm", () => {
   beforeEach(() => {
-    vi.spyOn(useUser, "useUser").mockReturnValue(testUser);
+    vi.spyOn(useUser, "useUser").mockReturnValue(getTypistUser());
     server.use(PollingStationDataEntryClaimHandler, PollingStationDataEntrySaveHandler);
   });
 

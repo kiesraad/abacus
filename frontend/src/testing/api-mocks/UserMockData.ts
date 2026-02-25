@@ -22,7 +22,7 @@ export const userMockData: User[] = [
   {
     id: 2,
     username: "Jayden",
-    role: "coordinator",
+    role: "coordinator_gsb",
     fullname: "Jayden Ahmen",
     last_activity_at: yesterday.toISOString(),
     created_at,
@@ -31,21 +31,21 @@ export const userMockData: User[] = [
   {
     id: 3,
     username: "Gebruiker01",
-    role: "typist",
+    role: "typist_gsb",
     created_at,
     updated_at,
   },
   {
     id: 4,
     username: "Gebruiker02",
-    role: "typist",
+    role: "typist_gsb",
     created_at,
     updated_at,
   },
   {
     id: 5,
     username: "Gebruiker03",
-    role: "typist",
+    role: "typist_gsb",
     created_at,
     updated_at,
   },

@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n                UPDATE data_entries\n                SET state = ?, updated_at = CURRENT_TIMESTAMP\n                WHERE id = ?\n                RETURNING\n                    id AS \"id: _\",\n                    state AS \"state: _\",\n                    updated_at AS \"updated_at: _\"\n            ",
+  "query": "\n            INSERT INTO data_entries (state)\n            VALUES (?)\n            RETURNING\n                id AS \"id: _\",\n                state AS \"state: _\",\n                updated_at AS \"updated_at: _\"\n        ",
   "describe": {
     "columns": [
       {
@@ -20,7 +20,7 @@
       }
     ],
     "parameters": {
-      "Right": 2
+      "Right": 1
     },
     "nullable": [
       false,
@@ -28,5 +28,5 @@
       false
     ]
   },
-  "hash": "aa4e061ade641c2871ee99ffd76c7f16922d43cec0890ca5fd5771ab7bd54851"
+  "hash": "02cf832a44228422bbf7c2efb960ea5587c90879025db54f9c0766da068c62f2"
 }

@@ -94,7 +94,7 @@ describe("FinishDataEntryPage", () => {
     }) => {
       return (
         <ApiProvider fetchInitialUser={fetchInitialUser}>
-          <TestUserProvider userRole="coordinator">
+          <TestUserProvider userRole="coordinator_gsb">
             <ElectionProvider electionId={1}>
               <ElectionStatusProvider electionId={1}>
                 <ReactRouter.RouterProvider router={router} />
@@ -204,7 +204,7 @@ describe("FinishDataEntryPage", () => {
         ...pollingStationMockData.slice(0, 3),
         {
           ...pollingStationMockData[4]!,
-          id_prev_session: undefined,
+          prev_data_entry_id: undefined,
         },
       ] satisfies PollingStation[],
     });

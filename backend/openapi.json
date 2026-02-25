@@ -12,7 +12,7 @@
   "paths": {
     "/api/account": {
       "get": {
-        "summary": "Get current logged-in user endpoint (administrator, coordinator, typist)",
+        "summary": "Get current logged-in user endpoint (administrator, coordinator_gsb, typist_gsb)",
         "operationId": "account",
         "responses": {
           "200": {
@@ -50,14 +50,14 @@
           {
             "cookie_auth": [
               "administrator",
-              "coordinator",
-              "typist"
+              "coordinator_gsb",
+              "typist_gsb"
             ]
           }
         ]
       },
       "put": {
-        "summary": "Update the user's account with a new password and optionally new fullname (administrator, coordinator, typist)",
+        "summary": "Update the user's account with a new password and optionally new fullname (administrator, coordinator_gsb, typist_gsb)",
         "operationId": "account_update",
         "requestBody": {
           "content": {
@@ -105,8 +105,8 @@
           {
             "cookie_auth": [
               "administrator",
-              "coordinator",
-              "typist"
+              "coordinator_gsb",
+              "typist_gsb"
             ]
           }
         ]
@@ -114,7 +114,7 @@
     },
     "/api/elections": {
       "get": {
-        "summary": "Get a list of all elections, without their candidate lists and\na list of the current committee session for each election (administrator, coordinator, typist)",
+        "summary": "Get a list of all elections, without their candidate lists and\na list of the current committee session for each election (administrator, coordinator_gsb, typist_gsb)",
         "operationId": "election_list",
         "responses": {
           "200": {
@@ -152,8 +152,8 @@
           {
             "cookie_auth": [
               "administrator",
-              "coordinator",
-              "typist"
+              "coordinator_gsb",
+              "typist_gsb"
             ]
           }
         ]
@@ -311,7 +311,7 @@
     },
     "/api/elections/{election_id}": {
       "get": {
-        "summary": "Get election details including the election's candidate list (political groups),\nits polling stations and the current committee session and its investigations (administrator, coordinator, typist)",
+        "summary": "Get election details including the election's candidate list (political groups),\nits polling stations and the current committee session and its investigations (administrator, coordinator_gsb, typist_gsb)",
         "operationId": "election_details",
         "parameters": [
           {
@@ -370,8 +370,8 @@
           {
             "cookie_auth": [
               "administrator",
-              "coordinator",
-              "typist"
+              "coordinator_gsb",
+              "typist_gsb"
             ]
           }
         ]
@@ -379,7 +379,7 @@
     },
     "/api/elections/{election_id}/apportionment": {
       "post": {
-        "summary": "Get the apportionment for an election (coordinator)",
+        "summary": "Get the apportionment for an election (coordinator_gsb)",
         "operationId": "election_apportionment",
         "parameters": [
           {
@@ -469,7 +469,7 @@
         "security": [
           {
             "cookie_auth": [
-              "coordinator"
+              "coordinator_gsb"
             ]
           }
         ]
@@ -477,7 +477,7 @@
     },
     "/api/elections/{election_id}/committee_sessions": {
       "post": {
-        "summary": "Create a new [CommitteeSession]. (coordinator)",
+        "summary": "Create a new [CommitteeSession]. (coordinator_gsb)",
         "operationId": "committee_session_create",
         "parameters": [
           {
@@ -555,7 +555,7 @@
         "security": [
           {
             "cookie_auth": [
-              "coordinator"
+              "coordinator_gsb"
             ]
           }
         ]
@@ -563,7 +563,7 @@
     },
     "/api/elections/{election_id}/committee_sessions/{committee_session_id}": {
       "put": {
-        "summary": "Update a [CommitteeSession]. (coordinator)",
+        "summary": "Update a [CommitteeSession]. (coordinator_gsb)",
         "operationId": "committee_session_update",
         "parameters": [
           {
@@ -653,13 +653,13 @@
         "security": [
           {
             "cookie_auth": [
-              "coordinator"
+              "coordinator_gsb"
             ]
           }
         ]
       },
       "delete": {
-        "summary": "Delete a [CommitteeSession]. (coordinator)",
+        "summary": "Delete a [CommitteeSession]. (coordinator_gsb)",
         "operationId": "committee_session_delete",
         "parameters": [
           {
@@ -739,7 +739,7 @@
         "security": [
           {
             "cookie_auth": [
-              "coordinator"
+              "coordinator_gsb"
             ]
           }
         ]
@@ -747,7 +747,7 @@
     },
     "/api/elections/{election_id}/committee_sessions/{committee_session_id}/download_pdf_results": {
       "get": {
-        "summary": "Download a generated PDF with election results (coordinator)",
+        "summary": "Download a generated PDF with election results (coordinator_gsb)",
         "operationId": "election_download_pdf_results",
         "parameters": [
           {
@@ -838,7 +838,7 @@
         "security": [
           {
             "cookie_auth": [
-              "coordinator"
+              "coordinator_gsb"
             ]
           }
         ]
@@ -846,7 +846,7 @@
     },
     "/api/elections/{election_id}/committee_sessions/{committee_session_id}/download_zip_results": {
       "get": {
-        "summary": "Download a zip containing a PDF for the PV and the EML with election results (coordinator)",
+        "summary": "Download a zip containing a PDF for the PV and the EML with election results (coordinator_gsb)",
         "operationId": "election_download_zip_results",
         "parameters": [
           {
@@ -937,7 +937,7 @@
         "security": [
           {
             "cookie_auth": [
-              "coordinator"
+              "coordinator_gsb"
             ]
           }
         ]
@@ -945,7 +945,7 @@
     },
     "/api/elections/{election_id}/committee_sessions/{committee_session_id}/investigations": {
       "get": {
-        "summary": "Get a list of all [crate::domain::investigation::PollingStationInvestigation]s for a committee session (coordinator)",
+        "summary": "Get a list of all [crate::domain::investigation::PollingStationInvestigation]s for a committee session (coordinator_gsb)",
         "operationId": "committee_session_investigations",
         "parameters": [
           {
@@ -1022,7 +1022,7 @@
         "security": [
           {
             "cookie_auth": [
-              "coordinator"
+              "coordinator_gsb"
             ]
           }
         ]
@@ -1030,7 +1030,7 @@
     },
     "/api/elections/{election_id}/committee_sessions/{committee_session_id}/status": {
       "put": {
-        "summary": "Change the status of a [CommitteeSession]. (coordinator)",
+        "summary": "Change the status of a [CommitteeSession]. (coordinator_gsb)",
         "operationId": "committee_session_status_change",
         "parameters": [
           {
@@ -1120,7 +1120,7 @@
         "security": [
           {
             "cookie_auth": [
-              "coordinator"
+              "coordinator_gsb"
             ]
           }
         ]
@@ -1128,7 +1128,7 @@
     },
     "/api/elections/{election_id}/download_n_10_2": {
       "get": {
-        "summary": "administrator, coordinator",
+        "summary": "administrator, coordinator_gsb",
         "operationId": "election_download_n_10_2",
         "parameters": [
           {
@@ -1211,7 +1211,7 @@
           {
             "cookie_auth": [
               "administrator",
-              "coordinator"
+              "coordinator_gsb"
             ]
           }
         ]
@@ -1219,7 +1219,7 @@
     },
     "/api/elections/{election_id}/download_na_31_2_bijlage1": {
       "get": {
-        "summary": "administrator, coordinator",
+        "summary": "administrator, coordinator_gsb",
         "operationId": "election_download_na_31_2_bijlage1",
         "parameters": [
           {
@@ -1302,7 +1302,7 @@
           {
             "cookie_auth": [
               "administrator",
-              "coordinator"
+              "coordinator_gsb"
             ]
           }
         ]
@@ -1310,7 +1310,7 @@
     },
     "/api/elections/{election_id}/download_na_31_2_inlegvel": {
       "get": {
-        "summary": "administrator, coordinator",
+        "summary": "administrator, coordinator_gsb",
         "operationId": "election_download_na_31_2_inlegvel",
         "parameters": [
           {
@@ -1393,7 +1393,7 @@
           {
             "cookie_auth": [
               "administrator",
-              "coordinator"
+              "coordinator_gsb"
             ]
           }
         ]
@@ -1401,7 +1401,7 @@
     },
     "/api/elections/{election_id}/polling_stations": {
       "get": {
-        "summary": "Get a list of all [PollingStation]s for an election (administrator, coordinator, typist)",
+        "summary": "Get a list of all [PollingStation]s for an election (administrator, coordinator_gsb, typist_gsb)",
         "operationId": "polling_station_list",
         "parameters": [
           {
@@ -1460,14 +1460,14 @@
           {
             "cookie_auth": [
               "administrator",
-              "coordinator",
-              "typist"
+              "coordinator_gsb",
+              "typist_gsb"
             ]
           }
         ]
       },
       "post": {
-        "summary": "Create a new [PollingStation] (administrator, coordinator)",
+        "summary": "Create a new [PollingStation] (administrator, coordinator_gsb)",
         "operationId": "polling_station_create",
         "parameters": [
           {
@@ -1556,7 +1556,7 @@
           {
             "cookie_auth": [
               "administrator",
-              "coordinator"
+              "coordinator_gsb"
             ]
           }
         ]
@@ -1564,7 +1564,7 @@
     },
     "/api/elections/{election_id}/polling_stations/import": {
       "post": {
-        "summary": "Import file with Polling Stations (administrator, coordinator)",
+        "summary": "Import file with Polling Stations (administrator, coordinator_gsb)",
         "operationId": "polling_station_import",
         "parameters": [
           {
@@ -1643,7 +1643,7 @@
           {
             "cookie_auth": [
               "administrator",
-              "coordinator"
+              "coordinator_gsb"
             ]
           }
         ]
@@ -1651,7 +1651,7 @@
     },
     "/api/elections/{election_id}/polling_stations/validate-import": {
       "post": {
-        "summary": "Validate a file with Polling Stations (administrator, coordinator)",
+        "summary": "Validate a file with Polling Stations (administrator, coordinator_gsb)",
         "operationId": "polling_station_validate_import",
         "parameters": [
           {
@@ -1730,7 +1730,7 @@
           {
             "cookie_auth": [
               "administrator",
-              "coordinator"
+              "coordinator_gsb"
             ]
           }
         ]
@@ -1738,7 +1738,7 @@
     },
     "/api/elections/{election_id}/polling_stations/{polling_station_id}": {
       "get": {
-        "summary": "Get a [PollingStation] (administrator, coordinator, typist)",
+        "summary": "Get a [PollingStation] (administrator, coordinator_gsb, typist_gsb)",
         "operationId": "polling_station_get",
         "parameters": [
           {
@@ -1806,14 +1806,14 @@
           {
             "cookie_auth": [
               "administrator",
-              "coordinator",
-              "typist"
+              "coordinator_gsb",
+              "typist_gsb"
             ]
           }
         ]
       },
       "put": {
-        "summary": "Update a [PollingStation] (administrator, coordinator)",
+        "summary": "Update a [PollingStation] (administrator, coordinator_gsb)",
         "operationId": "polling_station_update",
         "parameters": [
           {
@@ -1901,13 +1901,13 @@
           {
             "cookie_auth": [
               "administrator",
-              "coordinator"
+              "coordinator_gsb"
             ]
           }
         ]
       },
       "delete": {
-        "summary": "Delete a [PollingStation] (administrator, coordinator)",
+        "summary": "Delete a [PollingStation] (administrator, coordinator_gsb)",
         "operationId": "polling_station_delete",
         "parameters": [
           {
@@ -1988,7 +1988,7 @@
           {
             "cookie_auth": [
               "administrator",
-              "coordinator"
+              "coordinator_gsb"
             ]
           }
         ]
@@ -1996,7 +1996,7 @@
     },
     "/api/elections/{election_id}/status": {
       "get": {
-        "summary": "Get election polling stations data entry statuses (administrator, coordinator, typist)",
+        "summary": "Get election polling stations data entry statuses (administrator, coordinator_gsb, typist_gsb)",
         "operationId": "election_status",
         "parameters": [
           {
@@ -2055,8 +2055,8 @@
           {
             "cookie_auth": [
               "administrator",
-              "coordinator",
-              "typist"
+              "coordinator_gsb",
+              "typist_gsb"
             ]
           }
         ]
@@ -2064,7 +2064,7 @@
     },
     "/api/elections/{election_id}/voters": {
       "put": {
-        "summary": "Change the number of voters of an [Election]. (administrator, coordinator)",
+        "summary": "Change the number of voters of an [Election]. (administrator, coordinator_gsb)",
         "operationId": "election_number_of_voters_change",
         "parameters": [
           {
@@ -2146,7 +2146,7 @@
           {
             "cookie_auth": [
               "administrator",
-              "coordinator"
+              "coordinator_gsb"
             ]
           }
         ]
@@ -2313,7 +2313,7 @@
     },
     "/api/log": {
       "get": {
-        "summary": "List audit events (administrator, coordinator)",
+        "summary": "List audit events (administrator, coordinator_gsb)",
         "operationId": "audit_log_list",
         "parameters": [
           {
@@ -2433,7 +2433,7 @@
           {
             "cookie_auth": [
               "administrator",
-              "coordinator"
+              "coordinator_gsb"
             ]
           }
         ]
@@ -2441,7 +2441,7 @@
     },
     "/api/log-users": {
       "get": {
-        "summary": "Lists all users that appear in the audit log (administrator, coordinator)",
+        "summary": "Lists all users that appear in the audit log (administrator, coordinator_gsb)",
         "operationId": "audit_log_list_users",
         "responses": {
           "200": {
@@ -2492,7 +2492,7 @@
           {
             "cookie_auth": [
               "administrator",
-              "coordinator"
+              "coordinator_gsb"
             ]
           }
         ]
@@ -2579,8 +2579,8 @@
     },
     "/api/polling_stations/{polling_station_id}/data_entries": {
       "delete": {
-        "summary": "Delete data entries and result for a polling station (coordinator)",
-        "operationId": "data_entries_and_result_delete",
+        "summary": "Reset the data entry for a polling station to empty (coordinator_gsb)",
+        "operationId": "data_entry_reset",
         "parameters": [
           {
             "name": "polling_station_id",
@@ -2650,7 +2650,7 @@
         "security": [
           {
             "cookie_auth": [
-              "coordinator"
+              "coordinator_gsb"
             ]
           }
         ]
@@ -2658,7 +2658,7 @@
     },
     "/api/polling_stations/{polling_station_id}/data_entries/get": {
       "get": {
-        "summary": "Get data entry with validation results (coordinator)",
+        "summary": "Get data entry with validation results (coordinator_gsb)",
         "operationId": "data_entry_get",
         "parameters": [
           {
@@ -2736,7 +2736,7 @@
         "security": [
           {
             "cookie_auth": [
-              "coordinator"
+              "coordinator_gsb"
             ]
           }
         ]
@@ -2744,7 +2744,7 @@
     },
     "/api/polling_stations/{polling_station_id}/data_entries/resolve_differences": {
       "get": {
-        "summary": "Get data entry differences to be resolved (coordinator)",
+        "summary": "Get data entry differences to be resolved (coordinator_gsb)",
         "operationId": "data_entry_get_differences",
         "parameters": [
           {
@@ -2822,13 +2822,13 @@
         "security": [
           {
             "cookie_auth": [
-              "coordinator"
+              "coordinator_gsb"
             ]
           }
         ]
       },
       "post": {
-        "summary": "Resolve data entry differences by providing a `ResolveDifferencesAction` (coordinator)",
+        "summary": "Resolve data entry differences by providing a `ResolveDifferencesAction` (coordinator_gsb)",
         "operationId": "data_entry_resolve_differences",
         "parameters": [
           {
@@ -2926,7 +2926,7 @@
         "security": [
           {
             "cookie_auth": [
-              "coordinator"
+              "coordinator_gsb"
             ]
           }
         ]
@@ -2934,7 +2934,7 @@
     },
     "/api/polling_stations/{polling_station_id}/data_entries/resolve_errors": {
       "post": {
-        "summary": "Resolve accepted data entry errors by providing a `ResolveErrorsAction` (coordinator)",
+        "summary": "Resolve accepted data entry errors by providing a `ResolveErrorsAction` (coordinator_gsb)",
         "operationId": "data_entry_resolve_errors",
         "parameters": [
           {
@@ -3032,7 +3032,7 @@
         "security": [
           {
             "cookie_auth": [
-              "coordinator"
+              "coordinator_gsb"
             ]
           }
         ]
@@ -3040,7 +3040,7 @@
     },
     "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}": {
       "post": {
-        "summary": "Save a data entry for a polling station (typist)",
+        "summary": "Save a data entry for a polling station (typist_gsb)",
         "operationId": "data_entry_save",
         "parameters": [
           {
@@ -3149,13 +3149,13 @@
         "security": [
           {
             "cookie_auth": [
-              "typist"
+              "typist_gsb"
             ]
           }
         ]
       },
       "delete": {
-        "summary": "Delete an in-progress (not finalised) data entry for a polling station (typist)",
+        "summary": "Delete an in-progress (not finalised) data entry for a polling station (typist_gsb)",
         "operationId": "data_entry_delete",
         "parameters": [
           {
@@ -3237,7 +3237,7 @@
         "security": [
           {
             "cookie_auth": [
-              "typist"
+              "typist_gsb"
             ]
           }
         ]
@@ -3245,7 +3245,7 @@
     },
     "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}/claim": {
       "post": {
-        "summary": "Claim a data entry for a polling station, returning any existing progress (typist)",
+        "summary": "Claim a data entry for a polling station, returning any existing progress (typist_gsb)",
         "operationId": "data_entry_claim",
         "parameters": [
           {
@@ -3334,7 +3334,7 @@
         "security": [
           {
             "cookie_auth": [
-              "typist"
+              "typist_gsb"
             ]
           }
         ]
@@ -3342,7 +3342,7 @@
     },
     "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}/finalise": {
       "post": {
-        "summary": "Finalise the data entry for a polling station (typist)",
+        "summary": "Finalise the data entry for a polling station (typist_gsb)",
         "operationId": "data_entry_finalise",
         "parameters": [
           {
@@ -3441,7 +3441,7 @@
         "security": [
           {
             "cookie_auth": [
-              "typist"
+              "typist_gsb"
             ]
           }
         ]
@@ -3449,7 +3449,7 @@
     },
     "/api/polling_stations/{polling_station_id}/investigation": {
       "put": {
-        "summary": "Update an investigation for a polling station (coordinator)",
+        "summary": "Update an investigation for a polling station (coordinator_gsb)",
         "operationId": "polling_station_investigation_update",
         "parameters": [
           {
@@ -3537,13 +3537,13 @@
         "security": [
           {
             "cookie_auth": [
-              "coordinator"
+              "coordinator_gsb"
             ]
           }
         ]
       },
       "post": {
-        "summary": "Create an investigation for a polling station (coordinator)",
+        "summary": "Create an investigation for a polling station (coordinator_gsb)",
         "operationId": "polling_station_investigation_create",
         "parameters": [
           {
@@ -3631,13 +3631,13 @@
         "security": [
           {
             "cookie_auth": [
-              "coordinator"
+              "coordinator_gsb"
             ]
           }
         ]
       },
       "delete": {
-        "summary": "Delete an investigation for a polling station (coordinator)",
+        "summary": "Delete an investigation for a polling station (coordinator_gsb)",
         "operationId": "polling_station_investigation_delete",
         "parameters": [
           {
@@ -3698,7 +3698,7 @@
         "security": [
           {
             "cookie_auth": [
-              "coordinator"
+              "coordinator_gsb"
             ]
           }
         ]
@@ -3706,7 +3706,7 @@
     },
     "/api/polling_stations/{polling_station_id}/investigation/conclude": {
       "post": {
-        "summary": "Conclude an investigation for a polling station (coordinator)",
+        "summary": "Conclude an investigation for a polling station (coordinator_gsb)",
         "operationId": "polling_station_investigation_conclude",
         "parameters": [
           {
@@ -3794,7 +3794,7 @@
         "security": [
           {
             "cookie_auth": [
-              "coordinator"
+              "coordinator_gsb"
             ]
           }
         ]
@@ -3802,7 +3802,7 @@
     },
     "/api/polling_stations/{polling_station_id}/investigation/download_corrigendum_pdf": {
       "get": {
-        "summary": "Download a corrigendum for a polling station (coordinator)",
+        "summary": "Download a corrigendum for a polling station (coordinator_gsb)",
         "operationId": "polling_station_investigation_download_corrigendum_pdf",
         "parameters": [
           {
@@ -3884,7 +3884,7 @@
         "security": [
           {
             "cookie_auth": [
-              "coordinator"
+              "coordinator_gsb"
             ]
           }
         ]
@@ -3892,7 +3892,7 @@
     },
     "/api/users": {
       "get": {
-        "summary": "Lists all users (administrator, coordinator)",
+        "summary": "Lists all users (administrator, coordinator_gsb)",
         "operationId": "user_list",
         "responses": {
           "200": {
@@ -3940,13 +3940,13 @@
           {
             "cookie_auth": [
               "administrator",
-              "coordinator"
+              "coordinator_gsb"
             ]
           }
         ]
       },
       "post": {
-        "summary": "Create a new user (administrator, coordinator)",
+        "summary": "Create a new user (administrator, coordinator_gsb)",
         "operationId": "user_create",
         "requestBody": {
           "content": {
@@ -4024,7 +4024,7 @@
           {
             "cookie_auth": [
               "administrator",
-              "coordinator"
+              "coordinator_gsb"
             ]
           }
         ]
@@ -4032,7 +4032,7 @@
     },
     "/api/users/{user_id}": {
       "get": {
-        "summary": "Get a user (administrator, coordinator)",
+        "summary": "Get a user (administrator, coordinator_gsb)",
         "operationId": "user_get",
         "parameters": [
           {
@@ -4101,13 +4101,13 @@
           {
             "cookie_auth": [
               "administrator",
-              "coordinator"
+              "coordinator_gsb"
             ]
           }
         ]
       },
       "put": {
-        "summary": "Update a user (administrator, coordinator)",
+        "summary": "Update a user (administrator, coordinator_gsb)",
         "operationId": "user_update",
         "parameters": [
           {
@@ -4196,13 +4196,13 @@
           {
             "cookie_auth": [
               "administrator",
-              "coordinator"
+              "coordinator_gsb"
             ]
           }
         ]
       },
       "delete": {
-        "summary": "Delete a user (administrator, coordinator)",
+        "summary": "Delete a user (administrator, coordinator_gsb)",
         "operationId": "user_delete",
         "parameters": [
           {
@@ -4264,7 +4264,7 @@
           {
             "cookie_auth": [
               "administrator",
-              "coordinator"
+              "coordinator_gsb"
             ]
           }
         ]
@@ -4307,816 +4307,6 @@
         },
         "additionalProperties": false
       },
-      "ApplicationStartedDetails": {
-        "type": "object",
-        "required": [
-          "version",
-          "commit"
-        ],
-        "properties": {
-          "commit": {
-            "type": "string"
-          },
-          "version": {
-            "type": "string"
-          }
-        }
-      },
-      "AuditEvent": {
-        "oneOf": [
-          {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/UserLoggedInDetails"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "UserLoggedIn"
-                    ]
-                  }
-                }
-              }
-            ]
-          },
-          {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/UserLoginFailedDetails"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "UserLoginFailed"
-                    ]
-                  }
-                }
-              }
-            ]
-          },
-          {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/UserLoggedOutDetails"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "UserLoggedOut"
-                    ]
-                  }
-                }
-              }
-            ]
-          },
-          {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/UserDetails"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "UserAccountUpdated"
-                    ]
-                  }
-                }
-              }
-            ]
-          },
-          {
-            "type": "object",
-            "required": [
-              "event_type"
-            ],
-            "properties": {
-              "event_type": {
-                "type": "string",
-                "enum": [
-                  "UserSessionExtended"
-                ]
-              }
-            }
-          },
-          {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/UserDetails"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "UserCreated"
-                    ]
-                  }
-                }
-              }
-            ]
-          },
-          {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/UserDetails"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "UserUpdated"
-                    ]
-                  }
-                }
-              }
-            ]
-          },
-          {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/UserDetails"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "UserDeleted"
-                    ]
-                  }
-                }
-              }
-            ]
-          },
-          {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/ElectionDetails"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "ElectionCreated"
-                    ]
-                  }
-                }
-              }
-            ]
-          },
-          {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/ElectionDetails"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "ElectionUpdated"
-                    ]
-                  }
-                }
-              }
-            ]
-          },
-          {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/CommitteeSessionDetails"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "CommitteeSessionCreated"
-                    ]
-                  }
-                }
-              }
-            ]
-          },
-          {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/CommitteeSessionDetails"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "CommitteeSessionDeleted"
-                    ]
-                  }
-                }
-              }
-            ]
-          },
-          {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/CommitteeSessionDetails"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "CommitteeSessionUpdated"
-                    ]
-                  }
-                }
-              }
-            ]
-          },
-          {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/PollingStationInvestigation"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "PollingStationInvestigationCreated"
-                    ]
-                  }
-                }
-              }
-            ]
-          },
-          {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/PollingStationInvestigation"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "PollingStationInvestigationConcluded"
-                    ]
-                  }
-                }
-              }
-            ]
-          },
-          {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/PollingStationInvestigation"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "PollingStationInvestigationUpdated"
-                    ]
-                  }
-                }
-              }
-            ]
-          },
-          {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/PollingStationInvestigation"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "PollingStationInvestigationDeleted"
-                    ]
-                  }
-                }
-              }
-            ]
-          },
-          {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/FileDetails"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "FileCreated"
-                    ]
-                  }
-                }
-              }
-            ]
-          },
-          {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/FileDetails"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "FileDeleted"
-                    ]
-                  }
-                }
-              }
-            ]
-          },
-          {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/ElectionDetails"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "ApportionmentCreated"
-                    ]
-                  }
-                }
-              }
-            ]
-          },
-          {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/PollingStationDetails"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "PollingStationCreated"
-                    ]
-                  }
-                }
-              }
-            ]
-          },
-          {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/PollingStationDetails"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "PollingStationUpdated"
-                    ]
-                  }
-                }
-              }
-            ]
-          },
-          {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/PollingStationDetails"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "PollingStationDeleted"
-                    ]
-                  }
-                }
-              }
-            ]
-          },
-          {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/PollingStationImportDetails"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "PollingStationsImported"
-                    ]
-                  }
-                }
-              }
-            ]
-          },
-          {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DataEntryDetails"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "DataEntryStarted"
-                    ]
-                  }
-                }
-              }
-            ]
-          },
-          {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DataEntryDetails"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "DataEntrySaved"
-                    ]
-                  }
-                }
-              }
-            ]
-          },
-          {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DataEntryDetails"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "DataEntryResumed"
-                    ]
-                  }
-                }
-              }
-            ]
-          },
-          {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DataEntryDetails"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "DataEntryDeleted"
-                    ]
-                  }
-                }
-              }
-            ]
-          },
-          {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DataEntryDetails"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "DataEntryFinalised"
-                    ]
-                  }
-                }
-              }
-            ]
-          },
-          {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DataEntryDetails"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "DataEntryDiscardedFirst"
-                    ]
-                  }
-                }
-              }
-            ]
-          },
-          {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DataEntryDetails"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "DataEntryReturnedFirst"
-                    ]
-                  }
-                }
-              }
-            ]
-          },
-          {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DataEntryDetails"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "DataEntryKeptFirst"
-                    ]
-                  }
-                }
-              }
-            ]
-          },
-          {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DataEntryDetails"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "DataEntryKeptSecond"
-                    ]
-                  }
-                }
-              }
-            ]
-          },
-          {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DataEntryDetails"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "DataEntryDiscardedBoth"
-                    ]
-                  }
-                }
-              }
-            ]
-          },
-          {
-            "type": "object",
-            "required": [
-              "event_type"
-            ],
-            "properties": {
-              "event_type": {
-                "type": "string",
-                "enum": [
-                  "AirGapViolationDetected"
-                ]
-              }
-            }
-          },
-          {
-            "type": "object",
-            "required": [
-              "event_type"
-            ],
-            "properties": {
-              "event_type": {
-                "type": "string",
-                "enum": [
-                  "AirGapViolationResolved"
-                ]
-              }
-            }
-          },
-          {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/ApplicationStartedDetails"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "ApplicationStarted"
-                    ]
-                  }
-                }
-              }
-            ]
-          },
-          {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/ErrorDetails"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "Error"
-                    ]
-                  }
-                }
-              }
-            ]
-          },
-          {
-            "type": "object",
-            "required": [
-              "event_type"
-            ],
-            "properties": {
-              "event_type": {
-                "type": "string",
-                "enum": [
-                  "UnknownEvent"
-                ]
-              }
-            }
-          }
-        ]
-      },
       "AuditEventLevel": {
         "type": "string",
         "enum": [
@@ -5126,21 +4316,68 @@
           "error"
         ]
       },
+      "AuditEventType": {
+        "type": "string",
+        "enum": [
+          "UserLoggedIn",
+          "UserLoginFailed",
+          "UserLoggedOut",
+          "UserAccountUpdated",
+          "UserSessionExtended",
+          "UserCreated",
+          "UserUpdated",
+          "UserDeleted",
+          "ElectionCreated",
+          "ElectionUpdated",
+          "CommitteeSessionCreated",
+          "CommitteeSessionDeleted",
+          "CommitteeSessionUpdated",
+          "PollingStationInvestigationCreated",
+          "PollingStationInvestigationConcluded",
+          "PollingStationInvestigationUpdated",
+          "PollingStationInvestigationDeleted",
+          "FileCreated",
+          "FileDeleted",
+          "ApportionmentCreated",
+          "PollingStationCreated",
+          "PollingStationUpdated",
+          "PollingStationDeleted",
+          "PollingStationsImported",
+          "DataEntryStarted",
+          "DataEntrySaved",
+          "DataEntryResumed",
+          "DataEntryDeleted",
+          "DataEntryFinalised",
+          "DataEntryDiscardedFirst",
+          "DataEntryReturnedFirst",
+          "DataEntryKeptFirst",
+          "DataEntryKeptSecond",
+          "DataEntryDiscardedBoth",
+          "AirGapViolationDetected",
+          "AirGapViolationResolved",
+          "ApplicationStarted",
+          "ApiError",
+          "ApiWarning",
+          "UnknownEvent"
+        ]
+      },
       "AuditLogEvent": {
         "type": "object",
         "required": [
           "id",
           "time",
           "event",
+          "event_name",
           "event_level",
           "ip"
         ],
         "properties": {
-          "event": {
-            "$ref": "#/components/schemas/AuditEvent"
-          },
+          "event": {},
           "event_level": {
             "$ref": "#/components/schemas/AuditEventLevel"
+          },
+          "event_name": {
+            "$ref": "#/components/schemas/AuditEventType"
           },
           "id": {
             "$ref": "#/components/schemas/AuditLogEventId"
@@ -5541,49 +4778,6 @@
         },
         "additionalProperties": false
       },
-      "CommitteeSessionDetails": {
-        "type": "object",
-        "required": [
-          "session_id",
-          "session_number",
-          "session_election_id",
-          "session_location",
-          "session_status"
-        ],
-        "properties": {
-          "session_election_id": {
-            "$ref": "#/components/schemas/ElectionId"
-          },
-          "session_id": {
-            "$ref": "#/components/schemas/CommitteeSessionId"
-          },
-          "session_location": {
-            "type": "string"
-          },
-          "session_number": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
-          },
-          "session_overview_pdf": {
-            "$ref": "#/components/schemas/FileId"
-          },
-          "session_results_eml": {
-            "$ref": "#/components/schemas/FileId"
-          },
-          "session_results_pdf": {
-            "$ref": "#/components/schemas/FileId"
-          },
-          "session_start_date_time": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "session_status": {
-            "type": "string"
-          }
-        },
-        "additionalProperties": false
-      },
       "CommitteeSessionId": {
         "type": "integer",
         "format": "int32",
@@ -5767,35 +4961,6 @@
             "description": "Data entry progress between 0 and 100",
             "maximum": 100,
             "minimum": 0
-          }
-        },
-        "additionalProperties": false
-      },
-      "DataEntryDetails": {
-        "type": "object",
-        "required": [
-          "data_entry_id",
-          "data_entry_status",
-          "data_entry_progress"
-        ],
-        "properties": {
-          "data_entry_id": {
-            "$ref": "#/components/schemas/DataEntryId"
-          },
-          "data_entry_progress": {
-            "type": "string"
-          },
-          "data_entry_status": {
-            "type": "string"
-          },
-          "finished_at": {
-            "type": "string"
-          },
-          "first_entry_user_id": {
-            "$ref": "#/components/schemas/UserId"
-          },
-          "second_entry_user_id": {
-            "$ref": "#/components/schemas/UserId"
           }
         },
         "additionalProperties": false
@@ -6186,68 +5351,6 @@
           }
         ]
       },
-      "ElectionDetails": {
-        "type": "object",
-        "required": [
-          "election_id",
-          "election_name",
-          "election_role",
-          "election_counting_method",
-          "election_election_id",
-          "election_location",
-          "election_domain_id",
-          "election_category",
-          "election_number_of_seats",
-          "election_number_of_voters",
-          "election_election_date",
-          "election_nomination_date"
-        ],
-        "properties": {
-          "election_category": {
-            "type": "string"
-          },
-          "election_counting_method": {
-            "type": "string"
-          },
-          "election_domain_id": {
-            "type": "string"
-          },
-          "election_election_date": {
-            "type": "string",
-            "format": "date"
-          },
-          "election_election_id": {
-            "type": "string"
-          },
-          "election_id": {
-            "$ref": "#/components/schemas/ElectionId"
-          },
-          "election_location": {
-            "type": "string"
-          },
-          "election_name": {
-            "type": "string"
-          },
-          "election_nomination_date": {
-            "type": "string",
-            "format": "date"
-          },
-          "election_number_of_seats": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
-          },
-          "election_number_of_voters": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
-          },
-          "election_role": {
-            "type": "string"
-          }
-        },
-        "additionalProperties": false
-      },
       "ElectionDetailsResponse": {
         "type": "object",
         "description": "Election details response, including the election's candidate list (political groups),\nits polling stations and its committee sessions and current committee session",
@@ -6511,26 +5614,6 @@
         },
         "additionalProperties": false
       },
-      "ErrorDetails": {
-        "type": "object",
-        "required": [
-          "reference",
-          "path",
-          "level"
-        ],
-        "properties": {
-          "level": {
-            "$ref": "#/components/schemas/AuditEventLevel"
-          },
-          "path": {
-            "type": "string"
-          },
-          "reference": {
-            "$ref": "#/components/schemas/ErrorReference"
-          }
-        },
-        "additionalProperties": false
-      },
       "ErrorReference": {
         "type": "string",
         "description": "Error reference used to show the corresponding error message to the end-user",
@@ -6617,36 +5700,6 @@
           "extra_investigation_other_reason": {
             "$ref": "#/components/schemas/YesNo",
             "description": "Whether extra investigation was done for another reason than an unexplained difference\n(\"Heeft het gemeentelijk stembureau extra onderzoek gedaan vanwege een andere reden dan een onverklaard verschil?\")"
-          }
-        },
-        "additionalProperties": false
-      },
-      "FileDetails": {
-        "type": "object",
-        "required": [
-          "file_id",
-          "file_name",
-          "file_mime_type",
-          "file_size_bytes",
-          "file_created_at"
-        ],
-        "properties": {
-          "file_created_at": {
-            "type": "string"
-          },
-          "file_id": {
-            "$ref": "#/components/schemas/FileId"
-          },
-          "file_mime_type": {
-            "type": "string"
-          },
-          "file_name": {
-            "type": "string"
-          },
-          "file_size_bytes": {
-            "type": "integer",
-            "format": "int64",
-            "minimum": 0
           }
         },
         "additionalProperties": false
@@ -7257,9 +6310,6 @@
           "id": {
             "$ref": "#/components/schemas/PollingStationId"
           },
-          "id_prev_session": {
-            "$ref": "#/components/schemas/PollingStationId"
-          },
           "locality": {
             "type": "string"
           },
@@ -7281,59 +6331,9 @@
           },
           "postal_code": {
             "type": "string"
-          }
-        },
-        "additionalProperties": false
-      },
-      "PollingStationDetails": {
-        "type": "object",
-        "required": [
-          "polling_station_id",
-          "polling_station_election_id",
-          "polling_station_committee_session_id",
-          "polling_station_name",
-          "polling_station_number",
-          "polling_station_address",
-          "polling_station_postal_code",
-          "polling_station_locality"
-        ],
-        "properties": {
-          "polling_station_address": {
-            "type": "string"
           },
-          "polling_station_committee_session_id": {
-            "$ref": "#/components/schemas/CommitteeSessionId"
-          },
-          "polling_station_election_id": {
-            "$ref": "#/components/schemas/ElectionId"
-          },
-          "polling_station_id": {
-            "$ref": "#/components/schemas/PollingStationId"
-          },
-          "polling_station_id_prev_session": {
-            "$ref": "#/components/schemas/PollingStationId"
-          },
-          "polling_station_locality": {
-            "type": "string"
-          },
-          "polling_station_name": {
-            "type": "string"
-          },
-          "polling_station_number": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
-          },
-          "polling_station_number_of_voters": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
-          },
-          "polling_station_postal_code": {
-            "type": "string"
-          },
-          "polling_station_type": {
-            "type": "string"
+          "prev_data_entry_id": {
+            "$ref": "#/components/schemas/DataEntryId"
           }
         },
         "additionalProperties": false
@@ -7353,27 +6353,6 @@
         "type": "integer",
         "format": "int32",
         "minimum": 0
-      },
-      "PollingStationImportDetails": {
-        "type": "object",
-        "required": [
-          "import_election_id",
-          "import_file_name",
-          "import_number_of_polling_stations"
-        ],
-        "properties": {
-          "import_election_id": {
-            "$ref": "#/components/schemas/ElectionId"
-          },
-          "import_file_name": {
-            "type": "string"
-          },
-          "import_number_of_polling_stations": {
-            "type": "integer",
-            "format": "int64",
-            "minimum": 0
-          }
-        }
       },
       "PollingStationInvestigation": {
         "type": "object",
@@ -7691,8 +6670,10 @@
         "type": "string",
         "enum": [
           "administrator",
-          "typist",
-          "coordinator"
+          "coordinator_gsb",
+          "coordinator_csb",
+          "typist_gsb",
+          "typist_csb"
         ]
       },
       "SaveDataEntryResponse": {
@@ -7973,29 +6954,6 @@
           }
         }
       },
-      "UserDetails": {
-        "type": "object",
-        "required": [
-          "user_id",
-          "username",
-          "role"
-        ],
-        "properties": {
-          "fullname": {
-            "type": "string"
-          },
-          "role": {
-            "type": "string"
-          },
-          "user_id": {
-            "$ref": "#/components/schemas/UserId"
-          },
-          "username": {
-            "type": "string"
-          }
-        },
-        "additionalProperties": false
-      },
       "UserId": {
         "type": "integer",
         "format": "int32",
@@ -8012,54 +6970,6 @@
             "items": {
               "$ref": "#/components/schemas/User"
             }
-          }
-        },
-        "additionalProperties": false
-      },
-      "UserLoggedInDetails": {
-        "type": "object",
-        "required": [
-          "user_agent",
-          "logged_in_users_count"
-        ],
-        "properties": {
-          "logged_in_users_count": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
-          },
-          "user_agent": {
-            "type": "string"
-          }
-        },
-        "additionalProperties": false
-      },
-      "UserLoggedOutDetails": {
-        "type": "object",
-        "required": [
-          "session_duration"
-        ],
-        "properties": {
-          "session_duration": {
-            "type": "integer",
-            "format": "int64",
-            "minimum": 0
-          }
-        },
-        "additionalProperties": false
-      },
-      "UserLoginFailedDetails": {
-        "type": "object",
-        "required": [
-          "username",
-          "user_agent"
-        ],
-        "properties": {
-          "user_agent": {
-            "type": "string"
-          },
-          "username": {
-            "type": "string"
           }
         },
         "additionalProperties": false

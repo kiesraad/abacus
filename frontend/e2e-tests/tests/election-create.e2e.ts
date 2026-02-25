@@ -9,8 +9,8 @@ import { CheckAndSavePgObj } from "e2e-tests/page-objects/election/create/CheckA
 import { CheckCandidateDefinitionPgObj } from "e2e-tests/page-objects/election/create/CheckCandidateDefinitionPgObj";
 import { CheckElectionDefinitionPgObj } from "e2e-tests/page-objects/election/create/CheckElectionDefinitionPgObj";
 import { CountingMethodTypePgObj } from "e2e-tests/page-objects/election/create/CountingMethodTypePgObj";
+import { ElectoralCommitteeRolePgObj } from "e2e-tests/page-objects/election/create/ElectoralCommitteeRolePgObj.ts";
 import { NumberOfVotersPgObj } from "e2e-tests/page-objects/election/create/NumberOfVotersPgObj";
-import { PollingStationRolePgObj } from "e2e-tests/page-objects/election/create/PollingStationRolePgObj";
 import { UploadCandidateDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadCandidateDefinitionPgObj";
 import { UploadElectionDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadElectionDefinitionPgObj";
 import { UploadPollingStationDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadPollingStationDefinitionPgObj";
@@ -36,10 +36,10 @@ test.describe("Election creation", () => {
     // upload election and check hash
     await uploadElectionAndInputHash(page);
 
-    // polling station role
-    const pollingStationRolePage = new PollingStationRolePgObj(page);
-    await expect(pollingStationRolePage.header).toBeVisible();
-    await pollingStationRolePage.next.click();
+    // electoral committee role
+    const electoralCommitteeRolePage = new ElectoralCommitteeRolePgObj(page);
+    await expect(electoralCommitteeRolePage.header).toBeVisible();
+    await electoralCommitteeRolePage.next.click();
 
     // upload candidates list and check
     await uploadCandidatesAndInputHash(page);
@@ -101,10 +101,10 @@ test.describe("Election creation", () => {
     // upload election and check hash
     await uploadElectionAndInputHash(page);
 
-    // polling station role
-    const pollingStationRolePage = new PollingStationRolePgObj(page);
-    await expect(pollingStationRolePage.header).toBeVisible();
-    await pollingStationRolePage.next.click();
+    // electoral committee role
+    const electoralCommitteeRolePage = new ElectoralCommitteeRolePgObj(page);
+    await expect(electoralCommitteeRolePage.header).toBeVisible();
+    await electoralCommitteeRolePage.next.click();
 
     // upload candidates list and check
     await uploadCandidatesAndInputHash(page);
@@ -144,6 +144,7 @@ test.describe("Election creation", () => {
     await electionRow.click();
 
     const electionHomePage = new ElectionHome(page);
+    await expect(electionHomePage.header).toHaveText("Gemeenteraad Test 2022");
     await electionHomePage.alertLinkToPollingStations.click();
 
     const pollingStationsPage = new PollingStationListEmptyPgObj(page);
@@ -196,8 +197,8 @@ test.describe("Election creation", () => {
       const checkDefinitionPage = new CheckElectionDefinitionPgObj(page);
       await expect(checkDefinitionPage.hashInput1).toBeFocused();
       await checkDefinitionPage.inputHash("476B", "C0DE");
-      const pollingStationRolePage = new PollingStationRolePgObj(page);
-      await expect(pollingStationRolePage.header).toBeVisible();
+      const electoralCommitteeRolePage = new ElectoralCommitteeRolePgObj(page);
+      await expect(electoralCommitteeRolePage.header).toBeVisible();
     });
 
     test("it fails on valid, but incorrect file", async ({ page }) => {
@@ -225,10 +226,10 @@ test.describe("Election creation", () => {
       // upload election and check hash
       await uploadElectionAndInputHash(page);
 
-      // polling station role
-      const pollingStationRolePage = new PollingStationRolePgObj(page);
-      await expect(pollingStationRolePage.header).toBeVisible();
-      await pollingStationRolePage.next.click();
+      // electoral committee role
+      const electoralCommitteeRolePage = new ElectoralCommitteeRolePgObj(page);
+      await expect(electoralCommitteeRolePage.header).toBeVisible();
+      await electoralCommitteeRolePage.next.click();
 
       // Candidate page
       const uploadCandidateDefinitionPage = new UploadCandidateDefinitionPgObj(page);
@@ -250,10 +251,10 @@ test.describe("Election creation", () => {
       // upload election and check hash
       await uploadElectionAndInputHash(page);
 
-      // polling station role
-      const pollingStationRolePage = new PollingStationRolePgObj(page);
-      await expect(pollingStationRolePage.header).toBeVisible();
-      await pollingStationRolePage.next.click();
+      // electoral committee role
+      const electoralCommitteeRolePage = new ElectoralCommitteeRolePgObj(page);
+      await expect(electoralCommitteeRolePage.header).toBeVisible();
+      await electoralCommitteeRolePage.next.click();
 
       // Candidate page
       const uploadCandidateDefinitionPage = new UploadCandidateDefinitionPgObj(page);
@@ -300,10 +301,10 @@ test.describe("Election creation", () => {
       // upload election and check hash
       await uploadElectionAndInputHash(page);
 
-      // polling station role
-      const pollingStationRolePage = new PollingStationRolePgObj(page);
-      await expect(pollingStationRolePage.header).toBeVisible();
-      await pollingStationRolePage.next.click();
+      // electoral committee role
+      const electoralCommitteeRolePage = new ElectoralCommitteeRolePgObj(page);
+      await expect(electoralCommitteeRolePage.header).toBeVisible();
+      await electoralCommitteeRolePage.next.click();
 
       // Candidate page
       const uploadCandidateDefinitionPage = new UploadCandidateDefinitionPgObj(page);
@@ -311,7 +312,7 @@ test.describe("Election creation", () => {
 
       // Back button
       await page.goBack();
-      await expect(pollingStationRolePage.header).toBeVisible();
+      await expect(electoralCommitteeRolePage.header).toBeVisible();
     });
 
     test("after candidate upload, moving back to candidate page resets candidates", async ({ page }) => {
@@ -322,10 +323,10 @@ test.describe("Election creation", () => {
       // upload election and check hash
       await uploadElectionAndInputHash(page);
 
-      // polling station role
-      const pollingStationRolePage = new PollingStationRolePgObj(page);
-      await expect(pollingStationRolePage.header).toBeVisible();
-      await pollingStationRolePage.next.click();
+      // electoral committee role
+      const electoralCommitteeRolePage = new ElectoralCommitteeRolePgObj(page);
+      await expect(electoralCommitteeRolePage.header).toBeVisible();
+      await electoralCommitteeRolePage.next.click();
 
       // upload candidates list and check hash
       await uploadCandidatesAndInputHash(page);
@@ -352,10 +353,10 @@ test.describe("Election creation", () => {
       // upload election and check hash
       await uploadElectionAndInputHash(page);
 
-      // polling station role
-      const pollingStationRolePage = new PollingStationRolePgObj(page);
-      await expect(pollingStationRolePage.header).toBeVisible();
-      await pollingStationRolePage.next.click();
+      // electoral committee role
+      const electoralCommitteeRolePage = new ElectoralCommitteeRolePgObj(page);
+      await expect(electoralCommitteeRolePage.header).toBeVisible();
+      await electoralCommitteeRolePage.next.click();
 
       // upload candidates list and check hash
       await uploadCandidatesAndInputHash(page);
@@ -385,10 +386,10 @@ test.describe("Election creation", () => {
       // upload election and check hash
       await uploadElectionAndInputHash(page);
 
-      // polling station role
-      const pollingStationRolePage = new PollingStationRolePgObj(page);
-      await expect(pollingStationRolePage.header).toBeVisible();
-      await pollingStationRolePage.next.click();
+      // electoral committee role
+      const electoralCommitteeRolePage = new ElectoralCommitteeRolePgObj(page);
+      await expect(electoralCommitteeRolePage.header).toBeVisible();
+      await electoralCommitteeRolePage.next.click();
 
       // upload candidates list and check hash
       await uploadCandidatesAndInputHash(page);
@@ -432,10 +433,10 @@ test.describe("Election creation", () => {
       // upload election and check hash
       await uploadElectionAndInputHash(page);
 
-      // polling station role
-      const pollingStationRolePage = new PollingStationRolePgObj(page);
-      await expect(pollingStationRolePage.header).toBeVisible();
-      await pollingStationRolePage.next.click();
+      // electoral committee role
+      const electoralCommitteeRolePage = new ElectoralCommitteeRolePgObj(page);
+      await expect(electoralCommitteeRolePage.header).toBeVisible();
+      await electoralCommitteeRolePage.next.click();
 
       // upload candidates list and check hash
       await uploadCandidatesAndInputHash(page);
@@ -444,7 +445,7 @@ test.describe("Election creation", () => {
       const uploadElectionDefinitionPage = new UploadPollingStationDefinitionPgObj(page);
       await expect(uploadElectionDefinitionPage.header).toBeVisible();
       await uploadElectionDefinitionPage.uploadFile(eml110a.path);
-      await expect(uploadElectionDefinitionPage.main).toContainText(eml110a.filename);
+      await expect(uploadElectionDefinitionPage.fieldset).toContainText(eml110a.filename);
       await expect(uploadElectionDefinitionPage.invalidFileAlert).toBeVisible();
       await expect(uploadElectionDefinitionPage.invalidFileAlert).toContainText(
         "Het bestand eml110a_test.eml.xml bevat geen geldige lijst met stembureaus. Kies een ander bestand.",

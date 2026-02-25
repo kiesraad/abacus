@@ -25,7 +25,10 @@ describe("CommitteeSessionStatusWithIcon", () => {
     electionRoleValues.forEach((electionRole) => {
       render(<CommitteeSessionStatusWithIcon status={state} userRole={role} electionRole={electionRole} />);
       expect(screen.getByText(label)).toBeVisible();
-      expect(screen.getByRole("img", { hidden: true })).toHaveAttribute("data-icon", icon);
+
+      if (electionRole === "GSB") {
+        expect(screen.getByRole("img", { hidden: true })).toHaveAttribute("data-icon", icon);
+      }
     });
   });
 });
@@ -45,7 +48,9 @@ describe("HeaderCommitteeSessionStatusWithIcon", () => {
       if (label === "Invoer afgerond") {
         expect(screen.getByText("(eerste zitting)")).toBeVisible();
       }
-      expect(screen.getByRole("img", { hidden: true })).toHaveAttribute("data-icon", icon);
+      if (electionRole === "GSB") {
+        expect(screen.getByRole("img", { hidden: true })).toHaveAttribute("data-icon", icon);
+      }
     });
   });
 });

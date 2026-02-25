@@ -12,6 +12,8 @@ import { formatDateTime } from "@/utils/dateTime";
 import { useQueryParam } from "../hooks/useQueryParam";
 import { useUserListRequest } from "../hooks/useUserListRequest";
 
+import cls from "./users.module.css";
+
 export function UserListPage() {
   const { requestState } = useUserListRequest();
   const [createdMessage, clearCreatedMessage] = useQueryParam("created");
@@ -86,7 +88,9 @@ export function UserListPage() {
               {users.map((user) => (
                 <Table.Row key={user.id} to={`${user.id}/update`}>
                   <Table.Cell>{user.username}</Table.Cell>
-                  <Table.Cell>{t(user.role)}</Table.Cell>
+                  <Table.Cell className={cls.ellipsis}>
+                    <div>{t(`users.${user.role}`)}</div>
+                  </Table.Cell>
                   <Table.Cell>{user.fullname || <span className="text-muted">{t("users.not_used")}</span>}</Table.Cell>
                   <Table.Cell>
                     {user.last_activity_at ? formatDateTime(new Date(user.last_activity_at)) : "–"}

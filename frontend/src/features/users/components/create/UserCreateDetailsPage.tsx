@@ -12,7 +12,7 @@ export function UserCreateDetailsPage() {
   const { role, type } = useUserCreateContext();
 
   function handleSubmitted({ username, role }: User) {
-    const createdMessage = t("users.user_created_details", { username, role: t(role) });
+    const createdMessage = t("users.user_created_details", { username, role: t(`users.${role}`) });
     void navigate(`/users?created=${encodeURIComponent(createdMessage)}`);
   }
 
@@ -25,7 +25,7 @@ export function UserCreateDetailsPage() {
       <PageTitle title={`${t("users.add")} - Abacus`} />
       <header>
         <section>
-          <h1>{t("users.add_role", { role: t(role) })}</h1>
+          <h1>{t("users.add_role", { role: t(`users.${role}`) })}</h1>
         </section>
       </header>
       <main>

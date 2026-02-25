@@ -4242,7 +4242,8 @@
           "AirGapViolationDetected",
           "AirGapViolationResolved",
           "ApplicationStarted",
-          "Error",
+          "ApiError",
+          "ApiWarning",
           "UnknownEvent"
         ]
       },

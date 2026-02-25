@@ -27,8 +27,8 @@ export function LogsTable({ events, details, setDetails }: LogsTableProps) {
         )}
         {events.map((event: AuditLogEvent) => {
           let errorReference: string | undefined;
-          if (event.event_name === "Error" && event.event instanceof Object && "reference" in event.event) {
-            errorReference = String(event.event.reference);
+          if (event.event instanceof Object && "error_reference" in event.event) {
+            errorReference = String(event.event.error_reference);
           }
 
           return (

@@ -1,7 +1,7 @@
 use super::{
     super::{
         fraction::Fraction,
-        structs::{LARGE_COUNCIL_THRESHOLD, ListVotesTrait},
+        structs::{LARGE_COUNCIL_THRESHOLD, ListVotes},
     },
     ApportionmentError, get_number_of_candidates, list_numbers,
     structs::{
@@ -15,7 +15,7 @@ use tracing::{debug, info};
 /// This function assigns the residual seats that remain after full seat assignment is finished.
 /// These residual seats are assigned through two different procedures,
 /// depending on how many total seats are available in the election.
-pub fn assign_remainder<T: ListVotesTrait>(
+pub fn assign_remainder<T: ListVotes>(
     initial_standings: &[ListStanding<T::ListNumber>],
     seats: u32,
     total_residual_seats: u32,
@@ -120,7 +120,7 @@ fn list_largest_remainder_assigned_seats<LN: Copy + Eq>(
 
 /// Returns a vector with list numbers of which the same number of seats are assigned
 /// compared to the number of candidates.
-fn list_numbers_without_empty_seats<'a, T: ListVotesTrait>(
+fn list_numbers_without_empty_seats<'a, T: ListVotes>(
     standings: impl Iterator<Item = &'a ListStanding<T::ListNumber>>,
     input_list_votes: &[T],
 ) -> Vec<T::ListNumber>

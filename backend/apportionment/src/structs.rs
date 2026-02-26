@@ -16,19 +16,19 @@ pub enum ApportionmentError {
 }
 
 pub trait ApportionmentInput {
-    type List: ListVotesTrait;
+    type List: ListVotes;
 
     fn number_of_seats(&self) -> u32;
     fn list_votes(&self) -> &[Self::List];
 }
 
-pub struct ApportionmentOutput<'a, T: ListVotesTrait> {
+pub struct ApportionmentOutput<'a, T: ListVotes> {
     pub seat_assignment: SeatAssignmentResult<T>,
     pub candidate_nomination: CandidateNominationResult<'a, T>,
 }
 
-pub trait ListVotesTrait: PartialEq + Debug {
-    type Cv: CandidateVotesTrait;
+pub trait ListVotes: PartialEq + Debug {
+    type Cv: CandidateVotes;
     type ListNumber: Copy + Debug + Eq;
 
     fn number(&self) -> Self::ListNumber;
@@ -41,7 +41,7 @@ pub trait ListVotesTrait: PartialEq + Debug {
     fn candidate_votes(&self) -> &[Self::Cv];
 }
 
-pub trait CandidateVotesTrait: PartialEq + Debug {
+pub trait CandidateVotes: PartialEq + Debug {
     type CandidateNumber: Copy + Debug + Eq;
 
     fn number(&self) -> Self::CandidateNumber;
@@ -49,7 +49,7 @@ pub trait CandidateVotesTrait: PartialEq + Debug {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-pub(crate) struct CandidateNominationInput<'a, L: ListVotesTrait> {
+pub(crate) struct CandidateNominationInput<'a, L: ListVotes> {
     pub number_of_seats: u32,
     pub list_votes: &'a [L],
     pub quota: Fraction,

@@ -3,7 +3,7 @@ mod structs;
 use tracing::{debug, info};
 
 use super::{
-    ApportionmentError, CandidateVotesTrait, ListVotesTrait,
+    ApportionmentError, CandidateVotes, ListVotes,
     fraction::Fraction,
     structs::{CandidateNominationInput, LARGE_COUNCIL_THRESHOLD},
 };
@@ -12,7 +12,7 @@ pub use structs::{
 };
 
 /// Candidate nomination
-pub(crate) fn candidate_nomination<'a, L: ListVotesTrait>(
+pub(crate) fn candidate_nomination<'a, L: ListVotes>(
     input: &CandidateNominationInput<'a, L>,
 ) -> Result<CandidateNominationResult<'a, L>, ApportionmentError> {
     info!("Candidate nomination");
@@ -58,7 +58,7 @@ pub(crate) fn candidate_nomination<'a, L: ListVotesTrait>(
 
 /// Collect all chosen candidates via nomination with preferential votes and
 /// the other nominated candidates into one list
-fn all_chosen_candidates<T: ListVotesTrait>(
+fn all_chosen_candidates<T: ListVotes>(
     list_votes: &[T],
     list_candidate_nomination: &[ListCandidateNomination<T>],
 ) -> Vec<Candidate<T>> {
@@ -92,7 +92,7 @@ fn all_chosen_candidates<T: ListVotesTrait>(
 /// This function nominates candidates for the seats each list has been assigned.  
 /// The candidate nomination is first done based on preferential votes and then the other
 /// candidates are nominated.
-fn candidate_nomination_per_list<'a, T: ListVotesTrait>(
+fn candidate_nomination_per_list<'a, T: ListVotes>(
     seats: u32,
     list_votes: &'a [T],
     preference_threshold: Fraction,
@@ -158,7 +158,7 @@ fn candidate_nomination_per_list<'a, T: ListVotesTrait>(
 }
 
 /// List and sort the candidate votes whose votes meet the preference threshold
-fn candidate_votes_meeting_preference_threshold<T: CandidateVotesTrait>(
+fn candidate_votes_meeting_preference_threshold<T: CandidateVotes>(
     preference_threshold: Fraction,
     candidate_votes: &[T],
 ) -> Vec<&T> {
@@ -171,7 +171,7 @@ fn candidate_votes_meeting_preference_threshold<T: CandidateVotesTrait>(
 }
 
 /// Create a vector containing just the candidate numbers from an iterator of candidate votes
-pub fn candidate_votes_numbers<T: CandidateVotesTrait>(
+pub fn candidate_votes_numbers<T: CandidateVotes>(
     candidate_votes: &[&T],
 ) -> Vec<T::CandidateNumber> {
     candidate_votes
@@ -181,7 +181,7 @@ pub fn candidate_votes_numbers<T: CandidateVotesTrait>(
 }
 
 /// List the other candidates nominated
-fn other_candidate_nomination<'a, T: CandidateVotesTrait>(
+fn other_candidate_nomination<'a, T: CandidateVotes>(
     preferential_candidate_nomination: &[&T],
     candidate_votes: &'a [T],
     non_assigned_seats: usize,
@@ -198,7 +198,7 @@ fn other_candidate_nomination<'a, T: CandidateVotesTrait>(
 }
 
 /// List the candidates nominated with preferential votes
-fn preferential_candidate_nomination<'a, T: CandidateVotesTrait>(
+fn preferential_candidate_nomination<'a, T: CandidateVotes>(
     candidates_meeting_preference_threshold: &[&'a T],
     list_seats: u32,
 ) -> Result<Vec<&'a T>, ApportionmentError> {
@@ -238,7 +238,7 @@ fn preferential_candidate_nomination<'a, T: CandidateVotesTrait>(
 
 /// Update the candidate list, moving the candidates meeting the preference threshold
 /// to the top of the list and keeping the ranking of the rest of candidates on the list the same
-fn update_candidate_ranking<T: CandidateVotesTrait>(
+fn update_candidate_ranking<T: CandidateVotes>(
     preference_threshold: Fraction,
     candidate_votes_meeting_preference_threshold: &[&T],
     candidate_votes: &[T],

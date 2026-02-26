@@ -20,8 +20,7 @@ pub use self::{
         HighestAverageAssignedSeat, SeatAssignmentResult, SeatChange, SeatChangeStep,
     },
     structs::{
-        ApportionmentError, ApportionmentInput, ApportionmentOutput, CandidateVotesTrait,
-        ListVotesTrait,
+        ApportionmentError, ApportionmentInput, ApportionmentOutput, CandidateVotes, ListVotes,
     },
 };
 

@@ -1,7 +1,7 @@
 use std::fmt::Debug;
 
 use super::{ApportionmentError, Fraction};
-use crate::ListVotesTrait;
+use crate::ListVotes;
 use tracing::{debug, info};
 
 /// The result of the seat assignment procedure. This contains the number of seats and the quota
@@ -9,7 +9,7 @@ use tracing::{debug, info};
 /// and each of the changes and intermediate standings. The final standing contains the
 /// number of seats per list that was assigned after all seats were assigned.
 #[derive(Debug, PartialEq)]
-pub struct SeatAssignmentResult<T: ListVotesTrait> {
+pub struct SeatAssignmentResult<T: ListVotes> {
     pub seats: u32,
     pub full_seats: u32,
     pub residual_seats: u32,
@@ -75,7 +75,7 @@ pub struct ListStanding<LN> {
 impl<LN: Debug> ListStanding<LN> {
     /// Create a new instance computing the whole number of seats that
     /// were assigned to a list.
-    pub(crate) fn new<T: ListVotesTrait<ListNumber = LN>>(list: &T, quota: Fraction) -> Self {
+    pub(crate) fn new<T: ListVotes<ListNumber = LN>>(list: &T, quota: Fraction) -> Self {
         let votes_cast = Fraction::from(list.total_votes());
         let full_seats = if votes_cast > Fraction::ZERO {
             u32::try_from((votes_cast / quota).integer_part()).expect("full_seats fit in u32")

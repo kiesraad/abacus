@@ -9,7 +9,7 @@ use self::{
     structs::{AbsoluteMajorityResult, RemainderAssignmentResult},
 };
 use super::{
-    ApportionmentInput, ListVotesTrait,
+    ApportionmentInput, ListVotes,
     fraction::Fraction,
     structs::{ApportionmentError, CandidateNominationInput, CandidateNominationInputType},
 };
@@ -118,7 +118,7 @@ pub(crate) fn seat_assignment<T: ApportionmentInput>(
 }
 
 /// Returns the total number of seats each list number received in the apportionment result.
-pub fn get_total_seats_per_list_number_from_apportionment_result<T: ListVotesTrait>(
+pub fn get_total_seats_per_list_number_from_apportionment_result<T: ListVotes>(
     result: &SeatAssignmentResult<T>,
 ) -> Vec<(T::ListNumber, u32)> {
     result
@@ -150,7 +150,7 @@ fn list_numbers<LN: Copy>(standing: &[&ListStanding<LN>]) -> Vec<LN> {
 }
 
 /// Returns the number of candidates of a list.
-fn get_number_of_candidates<T: ListVotesTrait>(
+fn get_number_of_candidates<T: ListVotes>(
     input_list_votes: &[T],
     list_number: T::ListNumber,
 ) -> u32 {
@@ -163,7 +163,7 @@ fn get_number_of_candidates<T: ListVotesTrait>(
 
 /// Returns a vector with tuples of list numbers and how many more seats it was assigned
 /// compared to the number of candidates.
-fn list_numbers_with_exhausted_seats<T: ListVotesTrait>(
+fn list_numbers_with_exhausted_seats<T: ListVotes>(
     standings: &[ListStanding<T::ListNumber>],
     input_list_votes: &[T],
 ) -> Vec<(T::ListNumber, u32)> {
@@ -184,7 +184,7 @@ fn list_numbers_with_exhausted_seats<T: ListVotesTrait>(
 /// If a list got the absolute majority of votes but not the absolute majority of seats,
 /// re-assign the last residual seat to the list with the absolute majority.  
 /// This re-assignment is done according to article P 9 of the Kieswet.
-fn reassign_residual_seat_for_absolute_majority<T: ListVotesTrait>(
+fn reassign_residual_seat_for_absolute_majority<T: ListVotes>(
     seats: u32,
     total_votes_cast: u32,
     list_votes: &[T],
@@ -251,7 +251,7 @@ fn reassign_residual_seat_for_absolute_majority<T: ListVotesTrait>(
 /// If lists got more seats than candidates on their lists,
 /// re-assign those excess seats to other lists without exhausted lists.  
 /// This re-assignment is done according to article P 10 of the Kieswet.
-fn reassign_residual_seats_for_exhausted_lists<T: ListVotesTrait>(
+fn reassign_residual_seats_for_exhausted_lists<T: ListVotes>(
     previous_standings: Vec<ListStanding<T::ListNumber>>,
     seats: u32,
     list_votes: &[T],
@@ -314,7 +314,7 @@ fn reassign_residual_seats_for_exhausted_lists<T: ListVotesTrait>(
 #[cfg(test)]
 pub(crate) mod tests {
     use crate::{
-        ListVotesTrait, SeatAssignmentResult,
+        ListVotes, SeatAssignmentResult,
         fraction::Fraction,
         seat_assignment::{
             ListStanding, SeatChange, get_total_seats_per_list_number_from_apportionment_result,
@@ -330,7 +330,7 @@ pub(crate) mod tests {
         }
     }
 
-    fn check_total_seats_per_list<T: ListVotesTrait>(
+    fn check_total_seats_per_list<T: ListVotes>(
         result: &SeatAssignmentResult<T>,
         expected_total_seats_per_list: Vec<(T::ListNumber, u32)>,
     ) {

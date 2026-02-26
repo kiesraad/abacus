@@ -1,9 +1,9 @@
 use crate::{
-    ApportionmentInput, CandidateVotesTrait, SeatAssignmentResult,
+    ApportionmentInput, CandidateVotes, SeatAssignmentResult,
     candidate_nomination::{Candidate, ListCandidateNomination, candidate_votes_numbers},
 };
 
-use super::{ListVotesTrait, fraction::Fraction, structs::CandidateNominationInput};
+use super::{ListVotes, fraction::Fraction, structs::CandidateNominationInput};
 
 pub struct ApportionmentInputMock {
     pub number_of_seats: u32,
@@ -28,7 +28,7 @@ pub struct ListVotesMock {
     pub candidate_votes: Vec<CandidateVotesMock>,
 }
 
-impl ListVotesTrait for ListVotesMock {
+impl ListVotes for ListVotesMock {
     type Cv = CandidateVotesMock;
     type ListNumber = u32;
 
@@ -47,7 +47,7 @@ pub struct CandidateVotesMock {
     pub votes: u32,
 }
 
-impl CandidateVotesTrait for CandidateVotesMock {
+impl CandidateVotes for CandidateVotesMock {
     type CandidateNumber = u32;
 
     fn number(&self) -> Self::CandidateNumber {

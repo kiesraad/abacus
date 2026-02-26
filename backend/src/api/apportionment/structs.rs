@@ -1,4 +1,4 @@
-use apportionment::{ApportionmentInput, CandidateVotesTrait, ListVotesTrait};
+use apportionment::{self};
 use serde::Serialize;
 use utoipa::ToSchema;
 
@@ -23,7 +23,7 @@ pub struct ApportionmentInputData {
     pub list_votes: Vec<PoliticalGroupCandidateVotes>,
 }
 
-impl ApportionmentInput for ApportionmentInputData {
+impl apportionment::ApportionmentInput for ApportionmentInputData {
     type List = PoliticalGroupCandidateVotes;
 
     fn number_of_seats(&self) -> u32 {
@@ -35,7 +35,7 @@ impl ApportionmentInput for ApportionmentInputData {
     }
 }
 
-impl ListVotesTrait for PoliticalGroupCandidateVotes {
+impl apportionment::ListVotes for PoliticalGroupCandidateVotes {
     type Cv = CandidateVotes;
     type ListNumber = PGNumber;
 
@@ -48,7 +48,7 @@ impl ListVotesTrait for PoliticalGroupCandidateVotes {
     }
 }
 
-impl CandidateVotesTrait for CandidateVotes {
+impl apportionment::CandidateVotes for CandidateVotes {
     type CandidateNumber = election::CandidateNumber;
 
     fn number(&self) -> Self::CandidateNumber {

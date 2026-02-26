@@ -1223,7 +1223,7 @@ export type SeatChange =
 
 export interface SeatChangeStep {
   change: SeatChange;
-  residual_seat_number?: number | null;
+  residual_seat_number?: number;
   standings: ListStanding[];
 }
 

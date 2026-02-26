@@ -79,6 +79,8 @@ pub struct SeatAssignment {
 
 #[derive(Debug, Serialize, ToSchema)]
 pub struct SeatChangeStep {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
     pub residual_seat_number: Option<u32>,
     pub change: SeatChange,
     pub standings: Vec<ListStanding>,

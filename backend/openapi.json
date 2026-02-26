@@ -6852,10 +6852,7 @@
             "$ref": "#/components/schemas/SeatChange"
           },
           "residual_seat_number": {
-            "type": [
-              "integer",
-              "null"
-            ],
+            "type": "integer",
             "format": "int32",
             "minimum": 0
           },

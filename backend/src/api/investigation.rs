@@ -30,7 +30,7 @@ use crate::{
         votes_table::VotesTablesWithOnlyPreviousVotes,
     },
     error::ErrorReference,
-    infra::audit_log::{AsAuditEvent, AuditEvent, AuditEventType, AuditService, as_audit_event},
+    infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
     repository::{
         committee_session_repo::get_election_committee_session,
         data_entry_repo::{data_entry_exists, previous_results_for_polling_station},
@@ -47,29 +47,31 @@ use crate::{
 
 #[derive(Serialize)]
 struct PollingStationInvestigationCreated(pub PollingStationInvestigation);
-#[derive(Serialize)]
-struct PollingStationInvestigationUpdated(pub PollingStationInvestigation);
-#[derive(Serialize)]
-struct PollingStationInvestigationDeleted(pub PollingStationInvestigation);
+impl AsAuditEvent for PollingStationInvestigationCreated {
+    const EVENT_TYPE: AuditEventType = AuditEventType::PollingStationInvestigationCreated;
+    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Success;
+}
+
 #[derive(Serialize)]
 struct PollingStationInvestigationConcluded(pub PollingStationInvestigation);
+impl AsAuditEvent for PollingStationInvestigationConcluded {
+    const EVENT_TYPE: AuditEventType = AuditEventType::PollingStationInvestigationConcluded;
+    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Success;
+}
 
-as_audit_event!(
-    PollingStationInvestigationCreated,
-    AuditEventType::PollingStationInvestigationCreated
-);
-as_audit_event!(
-    PollingStationInvestigationUpdated,
-    AuditEventType::PollingStationInvestigationUpdated
-);
-as_audit_event!(
-    PollingStationInvestigationDeleted,
-    AuditEventType::PollingStationInvestigationDeleted
-);
-as_audit_event!(
-    PollingStationInvestigationConcluded,
-    AuditEventType::PollingStationInvestigationConcluded
-);
+#[derive(Serialize)]
+struct PollingStationInvestigationUpdated(pub PollingStationInvestigation);
+impl AsAuditEvent for PollingStationInvestigationUpdated {
+    const EVENT_TYPE: AuditEventType = AuditEventType::PollingStationInvestigationUpdated;
+    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Success;
+}
+
+#[derive(Serialize)]
+struct PollingStationInvestigationDeleted(pub PollingStationInvestigation);
+impl AsAuditEvent for PollingStationInvestigationDeleted {
+    const EVENT_TYPE: AuditEventType = AuditEventType::PollingStationInvestigationDeleted;
+    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Info;
+}
 
 pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::default()

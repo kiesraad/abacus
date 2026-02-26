@@ -57,7 +57,11 @@ pub async fn change_committee_session_status(
         committee_session_repo::change_status(&mut tx, committee_session_id, new_status).await?;
 
     audit_service
-        .log(&mut tx, &CommitteeSessionUpdated(committee_session), None)
+        .log(
+            &mut tx,
+            &CommitteeSessionUpdated(committee_session.into()),
+            None,
+        )
         .await?;
 
     tx.commit().await?;

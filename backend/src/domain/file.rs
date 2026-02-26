@@ -5,7 +5,7 @@ use utoipa::ToSchema;
 
 use crate::{
     domain::id::id,
-    infra::audit_log::{AsAuditEvent, AuditEvent, AuditEventType, as_audit_event},
+    infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType},
 };
 
 id!(FileId);
@@ -23,10 +23,16 @@ pub struct FileDetails {
 
 #[derive(Serialize)]
 pub struct FileCreated(pub FileDetails);
+impl AsAuditEvent for FileCreated {
+    const EVENT_TYPE: AuditEventType = AuditEventType::FileCreated;
+    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Success;
+}
 #[derive(Serialize)]
 pub struct FileDeleted(pub FileDetails);
-as_audit_event!(FileCreated, AuditEventType::FileCreated);
-as_audit_event!(FileDeleted, AuditEventType::FileDeleted);
+impl AsAuditEvent for FileDeleted {
+    const EVENT_TYPE: AuditEventType = AuditEventType::FileDeleted;
+    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Info;
+}
 
 /// File
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type, FromRow)]

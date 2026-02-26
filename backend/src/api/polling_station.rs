@@ -27,7 +27,7 @@ use crate::{
         },
     },
     eml::{EML110, EMLDocument, EMLImportError, EmlHash},
-    infra::audit_log::{AsAuditEvent, AuditEvent, AuditEventType, AuditService, as_audit_event},
+    infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
     repository::{
         committee_session_repo::get_election_committee_session,
         election_repo,
@@ -68,20 +68,30 @@ pub struct PollingStationImportDetails {
 
 #[derive(Serialize)]
 struct PollingStationCreated(pub PollingStationDetails);
+impl AsAuditEvent for PollingStationCreated {
+    const EVENT_TYPE: AuditEventType = AuditEventType::PollingStationCreated;
+    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Success;
+}
+
 #[derive(Serialize)]
 struct PollingStationUpdated(pub PollingStationDetails);
+impl AsAuditEvent for PollingStationUpdated {
+    const EVENT_TYPE: AuditEventType = AuditEventType::PollingStationUpdated;
+    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Success;
+}
+
 #[derive(Serialize)]
 struct PollingStationDeleted(pub PollingStationDetails);
+impl AsAuditEvent for PollingStationDeleted {
+    const EVENT_TYPE: AuditEventType = AuditEventType::PollingStationDeleted;
+    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Info;
+}
 #[derive(Serialize)]
 struct PollingStationsImported(pub PollingStationImportDetails);
-
-as_audit_event!(PollingStationCreated, AuditEventType::PollingStationCreated);
-as_audit_event!(PollingStationUpdated, AuditEventType::PollingStationUpdated);
-as_audit_event!(PollingStationDeleted, AuditEventType::PollingStationDeleted);
-as_audit_event!(
-    PollingStationsImported,
-    AuditEventType::PollingStationsImported
-);
+impl AsAuditEvent for PollingStationsImported {
+    const EVENT_TYPE: AuditEventType = AuditEventType::PollingStationsImported;
+    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Success;
+}
 
 pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::default()

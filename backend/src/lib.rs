@@ -30,7 +30,7 @@ use utoipa::ToSchema;
 
 use crate::{
     app_error::{DatabaseErrorWithPath, DatabaseMigrationErrorWithPath},
-    infra::audit_log::{AsAuditEvent, AuditEvent, AuditEventType, as_audit_event},
+    infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType},
 };
 
 /// Maximum size of the request body in megabytes.
@@ -163,19 +163,20 @@ pub struct ApplicationStartedDetails {
     pub commit: String,
 }
 
-#[derive(Serialize)]
-struct ApplicationStarted(pub ApplicationStartedDetails);
-as_audit_event!(ApplicationStarted, AuditEventType::ApplicationStarted);
+impl AsAuditEvent for ApplicationStartedDetails {
+    const EVENT_TYPE: AuditEventType = AuditEventType::ApplicationStarted;
+    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Info;
+}
 
 /// Log that the application started and thereby check that the database is writeable
 /// This maps common sqlite errors to an AppError
 async fn log_app_started(conn: &mut SqliteConnection, db_path: &str) -> Result<(), AppError> {
     Ok(audit_log::create(
         conn,
-        ApplicationStarted(ApplicationStartedDetails {
+        ApplicationStartedDetails {
             version: env!("ABACUS_GIT_VERSION").to_string(),
             commit: env!("ABACUS_GIT_REV").to_string(),
-        })
+        }
         .as_audit_event()?,
         None,
         None,

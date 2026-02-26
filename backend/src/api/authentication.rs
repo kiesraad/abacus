@@ -20,7 +20,7 @@ use crate::{
     },
     domain::role::Role,
     error::ErrorReference,
-    infra::audit_log::{AsAuditEvent, AuditEvent, AuditEventType, AuditService, as_audit_event},
+    infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
     repository::{
         session_repo::{self, Session},
         user_repo::{self, User, UserId},
@@ -38,14 +38,20 @@ pub struct UserLoggedInDetails {
     pub logged_in_users_count: u32,
 }
 
-as_audit_event!(UserLoggedInDetails, AuditEventType::UserLoggedIn);
+impl AsAuditEvent for UserLoggedInDetails {
+    const EVENT_TYPE: AuditEventType = AuditEventType::UserLoggedIn;
+    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Success;
+}
 
 #[derive(Serialize)]
 pub struct UserLoggedOutDetails {
     pub session_duration: u64,
 }
 
-as_audit_event!(UserLoggedOutDetails, AuditEventType::UserLoggedOut);
+impl AsAuditEvent for UserLoggedOutDetails {
+    const EVENT_TYPE: AuditEventType = AuditEventType::UserLoggedOut;
+    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Success;
+}
 
 #[derive(Serialize)]
 pub struct UserLoginFailedDetails {
@@ -53,7 +59,10 @@ pub struct UserLoginFailedDetails {
     pub user_agent: String,
 }
 
-as_audit_event!(UserLoginFailedDetails, AuditEventType::UserLoginFailed);
+impl AsAuditEvent for UserLoginFailedDetails {
+    const EVENT_TYPE: AuditEventType = AuditEventType::UserLoginFailed;
+    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Warning;
+}
 
 #[derive(Serialize)]
 pub struct UserDetails {
@@ -75,18 +84,44 @@ impl From<User> for UserDetails {
     }
 }
 
+impl From<LoginResponse> for UserDetails {
+    fn from(user: LoginResponse) -> Self {
+        Self {
+            user_id: user.user_id,
+            fullname: user.fullname,
+            username: user.username,
+            role: user.role.to_string(),
+        }
+    }
+}
+
 #[derive(Serialize)]
-pub struct UserAccountUpdated(pub LoginResponse);
-as_audit_event!(UserAccountUpdated, AuditEventType::UserAccountUpdated);
+pub struct UserAccountUpdated(pub UserDetails);
+impl AsAuditEvent for UserAccountUpdated {
+    const EVENT_TYPE: AuditEventType = AuditEventType::UserAccountUpdated;
+    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Success;
+}
+
 #[derive(Serialize)]
 pub struct UserCreated(pub UserDetails);
-as_audit_event!(UserCreated, AuditEventType::UserCreated);
+impl AsAuditEvent for UserCreated {
+    const EVENT_TYPE: AuditEventType = AuditEventType::UserCreated;
+    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Success;
+}
+
 #[derive(Serialize)]
 pub struct UserUpdated(pub UserDetails);
-as_audit_event!(UserUpdated, AuditEventType::UserUpdated);
+impl AsAuditEvent for UserUpdated {
+    const EVENT_TYPE: AuditEventType = AuditEventType::UserUpdated;
+    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Success;
+}
+
 #[derive(Serialize)]
 pub struct UserDeleted(pub UserDetails);
-as_audit_event!(UserDeleted, AuditEventType::UserDeleted);
+impl AsAuditEvent for UserDeleted {
+    const EVENT_TYPE: AuditEventType = AuditEventType::UserDeleted;
+    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Info;
+}
 
 pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::default()
@@ -290,7 +325,7 @@ async fn account_update(
     let response = LoginResponse::from(&updated_user);
 
     audit_service
-        .log(&mut tx, &UserAccountUpdated(response.clone()), None)
+        .log(&mut tx, &UserAccountUpdated(response.clone().into()), None)
         .await?;
 
     tx.commit().await?;

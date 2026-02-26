@@ -175,7 +175,7 @@ pub async fn create(
     ip: Option<IpAddr>,
 ) -> Result<(), sqlx::Error> {
     let event_name = audit_event.event_type.to_string();
-    let event_level = audit_event.event_type.level();
+    let event_level = audit_event.event_level;
     let event = Json(audit_event.data);
     let user_id = user.map(|u| u.id());
     let username = user.map(|u| u.username().to_string());

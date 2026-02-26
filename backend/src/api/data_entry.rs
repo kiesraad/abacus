@@ -30,7 +30,7 @@ use crate::{
         validation::{DataError, ValidateRoot, ValidationResults},
     },
     error::{ErrorReference, ErrorResponse},
-    infra::audit_log::{AsAuditEvent, AuditEvent, AuditEventType, AuditService, as_audit_event},
+    infra::audit_log::{AsAuditEvent, AuditEvent, AuditEventLevel, AuditEventType, AuditService},
     repository::{
         committee_session_repo,
         data_entry_repo::{
@@ -81,20 +81,38 @@ pub struct DataEntryDetails {
 
 #[derive(Serialize)]
 struct DataEntryStarted(pub DataEntryDetails);
+impl AsAuditEvent for DataEntryStarted {
+    const EVENT_TYPE: AuditEventType = AuditEventType::DataEntryStarted;
+    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Success;
+}
+
 #[derive(Serialize)]
 struct DataEntrySaved(pub DataEntryDetails);
+impl AsAuditEvent for DataEntrySaved {
+    const EVENT_TYPE: AuditEventType = AuditEventType::DataEntrySaved;
+    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Success;
+}
+
 #[derive(Serialize)]
 struct DataEntryResumed(pub DataEntryDetails);
+impl AsAuditEvent for DataEntryResumed {
+    const EVENT_TYPE: AuditEventType = AuditEventType::DataEntryResumed;
+    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Success;
+}
+
 #[derive(Serialize)]
 struct DataEntryDeleted(pub DataEntryDetails);
+impl AsAuditEvent for DataEntryDeleted {
+    const EVENT_TYPE: AuditEventType = AuditEventType::DataEntryDeleted;
+    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Info;
+}
+
 #[derive(Serialize)]
 struct DataEntryFinalised(pub DataEntryDetails);
-
-as_audit_event!(DataEntryStarted, AuditEventType::DataEntryStarted);
-as_audit_event!(DataEntrySaved, AuditEventType::DataEntrySaved);
-as_audit_event!(DataEntryResumed, AuditEventType::DataEntryResumed);
-as_audit_event!(DataEntryDeleted, AuditEventType::DataEntryDeleted);
-as_audit_event!(DataEntryFinalised, AuditEventType::DataEntryFinalised);
+impl AsAuditEvent for DataEntryFinalised {
+    const EVENT_TYPE: AuditEventType = AuditEventType::DataEntryFinalised;
+    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Success;
+}
 
 /// Response structure for getting data entry of polling station results
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
@@ -741,7 +759,15 @@ async fn data_entry_resolve_errors(
     let event_type = action.audit_event_type();
     let data = serde_json::to_value(DataEntryDetails::from(data_entry.clone()))?;
     audit_service
-        .log(&mut tx, &AuditEvent { event_type, data }, None)
+        .log(
+            &mut tx,
+            &AuditEvent {
+                event_type,
+                event_level: AuditEventLevel::Info,
+                data,
+            },
+            None,
+        )
         .await?;
 
     tx.commit().await?;
@@ -849,7 +875,15 @@ async fn data_entry_resolve_differences(
     let event_type = action.audit_event();
     let data = serde_json::to_value(DataEntryDetails::from(data_entry.clone()))?;
     audit_service
-        .log(&mut tx, &AuditEvent { event_type, data }, None)
+        .log(
+            &mut tx,
+            &AuditEvent {
+                event_type,
+                event_level: AuditEventLevel::Info,
+                data,
+            },
+            None,
+        )
         .await?;
 
     tx.commit().await?;

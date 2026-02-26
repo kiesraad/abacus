@@ -30,7 +30,7 @@ use crate::{
         polling_station::{PollingStation, PollingStationRequest, PollingStationsRequest},
     },
     eml::{EML110, EML230, EMLDocument, EMLImportError, EmlHash, RedactedEmlHash},
-    infra::audit_log::{AsAuditEvent, AuditEvent, AuditEventType, AuditService, as_audit_event},
+    infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
     repository::{
         committee_session_repo, election_repo, investigation_repo, polling_station_repo,
         user_repo::User,
@@ -90,11 +90,17 @@ pub struct ElectionDetails {
 
 #[derive(Serialize)]
 struct ElectionCreated(pub ElectionDetails);
-as_audit_event!(ElectionCreated, AuditEventType::ElectionCreated);
+impl AsAuditEvent for ElectionCreated {
+    const EVENT_TYPE: AuditEventType = AuditEventType::ElectionCreated;
+    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Success;
+}
 
 #[derive(Serialize)]
 struct ElectionUpdated(pub ElectionDetails);
-as_audit_event!(ElectionUpdated, AuditEventType::ElectionUpdated);
+impl AsAuditEvent for ElectionUpdated {
+    const EVENT_TYPE: AuditEventType = AuditEventType::ElectionUpdated;
+    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Success;
+}
 
 /// Get a list of all elections, without their candidate lists and
 /// a list of the current committee session for each election

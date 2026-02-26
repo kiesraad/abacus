@@ -9,7 +9,7 @@ use sqlx::SqlitePool;
 use tokio::{task::JoinSet, time::timeout};
 use tracing::{debug, error, info, trace, warn};
 
-use crate::infra::audit_log::{AsAuditEvent, AuditEvent, AuditEventType, as_audit_event};
+use crate::infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType};
 
 #[derive(Clone)]
 pub struct AirgapDetection {
@@ -43,17 +43,17 @@ pub const AIRGAP_DETECTION_INTERVAL: u64 = 30; // interval in seconds
 
 #[derive(Serialize)]
 struct AirGapViolationDetected;
+impl AsAuditEvent for AirGapViolationDetected {
+    const EVENT_TYPE: AuditEventType = AuditEventType::AirGapViolationDetected;
+    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Error;
+}
+
 #[derive(Serialize)]
 struct AirGapViolationResolved;
-
-as_audit_event!(
-    AirGapViolationDetected,
-    AuditEventType::AirGapViolationDetected
-);
-as_audit_event!(
-    AirGapViolationResolved,
-    AuditEventType::AirGapViolationResolved
-);
+impl AsAuditEvent for AirGapViolationResolved {
+    const EVENT_TYPE: AuditEventType = AuditEventType::AirGapViolationResolved;
+    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Info;
+}
 
 impl AirgapDetection {
     /// Creates a new AirgapDetection instance that does not perform any detection.

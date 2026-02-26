@@ -12,7 +12,7 @@ use crate::{
         committee_session_status::CommitteeSessionStatus, election::ElectionId, file::FileId,
         id::id, investigation::PollingStationInvestigation,
     },
-    infra::audit_log::{AsAuditEvent, AuditEvent, AuditEventType, as_audit_event},
+    infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType},
 };
 
 #[derive(Debug, PartialEq, Eq)]
@@ -79,47 +79,59 @@ impl CommitteeSession {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
-#[serde(deny_unknown_fields)]
-pub struct CommitteeSessionDetails {
+#[derive(Serialize)]
+pub struct CommitteeSessionAuditEvent {
     pub session_id: CommitteeSessionId,
     pub session_number: u32,
     pub session_election_id: ElectionId,
     pub session_location: String,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(value_type = String, format = "date-time", nullable = false)]
     pub session_start_date_time: Option<NaiveDateTime>,
     pub session_status: String,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(nullable = false)]
     pub session_results_eml: Option<FileId>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(nullable = false)]
     pub session_results_pdf: Option<FileId>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(nullable = false)]
     pub session_overview_pdf: Option<FileId>,
 }
 
-#[derive(Serialize)]
-pub struct CommitteeSessionCreated(pub CommitteeSession);
-#[derive(Serialize)]
-pub struct CommitteeSessionUpdated(pub CommitteeSession);
-#[derive(Serialize)]
-pub struct CommitteeSessionDeleted(pub CommitteeSession);
+impl From<CommitteeSession> for CommitteeSessionAuditEvent {
+    fn from(value: CommitteeSession) -> Self {
+        Self {
+            session_id: value.id,
+            session_number: value.number,
+            session_election_id: value.election_id,
+            session_location: value.location,
+            session_start_date_time: value.start_date_time,
+            session_status: value.status.to_string(),
+            session_results_eml: value.results_eml,
+            session_results_pdf: value.results_pdf,
+            session_overview_pdf: value.overview_pdf,
+        }
+    }
+}
 
-as_audit_event!(
-    CommitteeSessionCreated,
-    AuditEventType::CommitteeSessionCreated
-);
-as_audit_event!(
-    CommitteeSessionUpdated,
-    AuditEventType::CommitteeSessionUpdated
-);
-as_audit_event!(
-    CommitteeSessionDeleted,
-    AuditEventType::CommitteeSessionDeleted
-);
+#[derive(Serialize)]
+pub struct CommitteeSessionCreated(pub CommitteeSessionAuditEvent);
+impl AsAuditEvent for CommitteeSessionCreated {
+    const EVENT_TYPE: AuditEventType = AuditEventType::CommitteeSessionCreated;
+    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Success;
+}
+
+#[derive(Serialize)]
+pub struct CommitteeSessionUpdated(pub CommitteeSessionAuditEvent);
+impl AsAuditEvent for CommitteeSessionUpdated {
+    const EVENT_TYPE: AuditEventType = AuditEventType::CommitteeSessionUpdated;
+    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Success;
+}
+
+#[derive(Serialize)]
+pub struct CommitteeSessionDeleted(pub CommitteeSessionAuditEvent);
+impl AsAuditEvent for CommitteeSessionDeleted {
+    const EVENT_TYPE: AuditEventType = AuditEventType::CommitteeSessionDeleted;
+    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Info;
+}
 
 impl IntoResponse for CommitteeSession {
     fn into_response(self) -> Response {

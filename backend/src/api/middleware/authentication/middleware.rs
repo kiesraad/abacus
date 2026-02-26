@@ -14,7 +14,7 @@ use super::{SESSION_LIFE_TIME, SESSION_MIN_LIFE_TIME, session::get_expires_at};
 use crate::{
     SqlitePoolExt,
     api::authentication::set_default_cookie_properties,
-    infra::audit_log::{AsAuditEvent, AuditEvent, AuditEventType, AuditService, as_audit_event},
+    infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
     repository::{
         session_repo::{self, Session, SessionIdentifier},
         user_repo::{self, User},
@@ -23,7 +23,10 @@ use crate::{
 
 #[derive(Serialize)]
 struct UserSessionExtended;
-as_audit_event!(UserSessionExtended, AuditEventType::UserSessionExtended);
+impl AsAuditEvent for UserSessionExtended {
+    const EVENT_TYPE: AuditEventType = AuditEventType::UserSessionExtended;
+    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Info;
+}
 
 /// Inject user and session
 pub(crate) async fn inject_user(

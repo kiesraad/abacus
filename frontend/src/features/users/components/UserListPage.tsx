@@ -1,6 +1,6 @@
 import { IconPlus } from "@/components/generated/icons";
+import { Messages } from "@/components/messages/Messages";
 import { PageTitle } from "@/components/page_title/PageTitle";
-import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
 import { Loader } from "@/components/ui/Loader/Loader";
 import { Table } from "@/components/ui/Table/Table";
@@ -8,17 +8,12 @@ import { Toolbar } from "@/components/ui/Toolbar/Toolbar";
 import { t } from "@/i18n/translate";
 import type { Role } from "@/types/generated/openapi";
 import { formatDateTime } from "@/utils/dateTime";
-
-import { useQueryParam } from "../hooks/useQueryParam";
 import { useUserListRequest } from "../hooks/useUserListRequest";
 
 import cls from "./users.module.css";
 
 export function UserListPage() {
   const { requestState } = useUserListRequest();
-  const [createdMessage, clearCreatedMessage] = useQueryParam("created");
-  const [updatedMessage, clearUpdatedMessage] = useQueryParam("updated");
-  const [deletedMessage, clearDeletedMessage] = useQueryParam("deleted");
 
   if (requestState.status === "loading") {
     return <Loader />;
@@ -48,26 +43,7 @@ export function UserListPage() {
         </section>
       </header>
 
-      {createdMessage && (
-        <Alert type="success" onClose={clearCreatedMessage}>
-          <strong className="heading-md">{t("users.user_created")}</strong>
-          <p>{createdMessage}</p>
-        </Alert>
-      )}
-
-      {updatedMessage && (
-        <Alert type="success" onClose={clearUpdatedMessage}>
-          <strong className="heading-md">{t("users.user_updated")}</strong>
-          <p>{updatedMessage}</p>
-        </Alert>
-      )}
-
-      {deletedMessage && (
-        <Alert type="success" onClose={clearDeletedMessage}>
-          <strong className="heading-md">{t("users.user_deleted")}</strong>
-          <p>{deletedMessage}</p>
-        </Alert>
-      )}
+      <Messages />
 
       <main>
         <article>

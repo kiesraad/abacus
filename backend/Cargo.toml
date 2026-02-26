@@ -83,7 +83,7 @@ tower = "0.5"
 tracing-subscriber = { version = "0.3.22", features = ["env-filter"] }
 tracing.workspace = true
 tower-http = { version = "0.6", features = ["set-header", "trace"] }
-quick-xml = { version = "0.39.1", features = ["serialize"] }
+quick-xml = { version = "0.39.2", features = ["serialize"] }
 sha2 = "0.10.9"
 argon2 = "0.5.3"
 password-hash = { version = "0.5.0", features = ["getrandom"] }

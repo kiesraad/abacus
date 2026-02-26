@@ -69,9 +69,8 @@ pub struct ElectionDetailsResponse {
     pub investigations: Vec<PollingStationInvestigation>,
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
-#[serde(deny_unknown_fields)]
-pub struct ElectionDetails {
+#[derive(Serialize)]
+pub struct ElectionAuditData {
     pub election_id: ElectionId,
     pub election_name: String,
     pub election_role: String,
@@ -82,22 +81,39 @@ pub struct ElectionDetails {
     pub election_category: String,
     pub election_number_of_seats: u32,
     pub election_number_of_voters: u32,
-    #[schema(value_type = String, format = "date")]
     pub election_election_date: NaiveDate,
-    #[schema(value_type = String, format = "date")]
     pub election_nomination_date: NaiveDate,
 }
 
+impl From<Election> for ElectionAuditData {
+    fn from(value: Election) -> Self {
+        Self {
+            election_id: value.id,
+            election_name: value.name,
+            election_role: value.role.to_string(),
+            election_counting_method: value.counting_method.to_string(),
+            election_election_id: value.election_id,
+            election_location: value.location,
+            election_domain_id: value.domain_id,
+            election_category: value.category.to_string(),
+            election_number_of_seats: value.number_of_seats,
+            election_number_of_voters: value.number_of_voters,
+            election_election_date: value.election_date,
+            election_nomination_date: value.nomination_date,
+        }
+    }
+}
+
 #[derive(Serialize)]
-struct ElectionCreated(pub ElectionDetails);
-impl AsAuditEvent for ElectionCreated {
+struct ElectionCreatedAuditData(pub ElectionAuditData);
+impl AsAuditEvent for ElectionCreatedAuditData {
     const EVENT_TYPE: AuditEventType = AuditEventType::ElectionCreated;
     const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Success;
 }
 
 #[derive(Serialize)]
-struct ElectionUpdated(pub ElectionDetails);
-impl AsAuditEvent for ElectionUpdated {
+struct ElectionUpdatedAuditData(pub ElectionAuditData);
+impl AsAuditEvent for ElectionUpdatedAuditData {
     const EVENT_TYPE: AuditEventType = AuditEventType::ElectionUpdated;
     const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Success;
 }
@@ -215,7 +231,11 @@ pub async fn election_number_of_voters_change(
                 .await?;
 
         audit_service
-            .log(&mut tx, &ElectionUpdated(election.clone().into()), None)
+            .log(
+                &mut tx,
+                &ElectionUpdatedAuditData(election.clone().into()),
+                None,
+            )
             .await?;
 
         tx.commit().await?;
@@ -463,7 +483,7 @@ async fn create_election(
     audit_service
         .log(
             conn,
-            &ElectionCreated(election.clone().into()),
+            &ElectionCreatedAuditData(Election::from(election.clone()).into()),
             Some(message),
         )
         .await?;

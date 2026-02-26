@@ -154,7 +154,7 @@ mod tests {
         AppState,
         api::{
             audit::{audit_log_list, audit_log_list_users},
-            authentication::UserLoggedInDetails,
+            authentication::UserLoggedInAuditData,
             middleware::{airgap::AirgapDetection, authentication::inject_user},
         },
         infra::audit_log::{AuditLogListResponse, AuditLogUser, AuditService},
@@ -178,7 +178,7 @@ mod tests {
             .unwrap()
             .unwrap();
         let service = new_test_audit_service(Some(user));
-        let audit_event = UserLoggedInDetails {
+        let audit_event = UserLoggedInAuditData {
             user_agent: "Mozilla/5.0".to_string(),
             logged_in_users_count: 1,
         };

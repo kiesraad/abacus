@@ -46,30 +46,30 @@ use crate::{
 };
 
 #[derive(Serialize)]
-struct PollingStationInvestigationCreated(pub PollingStationInvestigation);
-impl AsAuditEvent for PollingStationInvestigationCreated {
-    const EVENT_TYPE: AuditEventType = AuditEventType::PollingStationInvestigationCreated;
+struct InvestigationCreatedAuditData(pub PollingStationInvestigation);
+impl AsAuditEvent for InvestigationCreatedAuditData {
+    const EVENT_TYPE: AuditEventType = AuditEventType::InvestigationCreated;
     const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Success;
 }
 
 #[derive(Serialize)]
-struct PollingStationInvestigationConcluded(pub PollingStationInvestigation);
-impl AsAuditEvent for PollingStationInvestigationConcluded {
-    const EVENT_TYPE: AuditEventType = AuditEventType::PollingStationInvestigationConcluded;
+struct InvestigationConcludedAuditData(pub PollingStationInvestigation);
+impl AsAuditEvent for InvestigationConcludedAuditData {
+    const EVENT_TYPE: AuditEventType = AuditEventType::InvestigationConcluded;
     const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Success;
 }
 
 #[derive(Serialize)]
-struct PollingStationInvestigationUpdated(pub PollingStationInvestigation);
-impl AsAuditEvent for PollingStationInvestigationUpdated {
-    const EVENT_TYPE: AuditEventType = AuditEventType::PollingStationInvestigationUpdated;
+struct InvestigationUpdatedAuditData(pub PollingStationInvestigation);
+impl AsAuditEvent for InvestigationUpdatedAuditData {
+    const EVENT_TYPE: AuditEventType = AuditEventType::InvestigationUpdated;
     const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Success;
 }
 
 #[derive(Serialize)]
-struct PollingStationInvestigationDeleted(pub PollingStationInvestigation);
-impl AsAuditEvent for PollingStationInvestigationDeleted {
-    const EVENT_TYPE: AuditEventType = AuditEventType::PollingStationInvestigationDeleted;
+struct InvestigationDeletedAuditData(pub PollingStationInvestigation);
+impl AsAuditEvent for InvestigationDeletedAuditData {
+    const EVENT_TYPE: AuditEventType = AuditEventType::InvestigationDeleted;
     const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Info;
 }
 
@@ -115,11 +115,7 @@ pub async fn delete_investigation_for_polling_station(
         delete_polling_station_investigation(conn, polling_station_id).await?
     {
         audit_service
-            .log(
-                conn,
-                &PollingStationInvestigationDeleted(investigation),
-                None,
-            )
+            .log(conn, &InvestigationDeletedAuditData(investigation), None)
             .await?;
 
         if committee_session.status == CommitteeSessionStatus::Completed {
@@ -201,7 +197,7 @@ async fn polling_station_investigation_create(
     audit_service
         .log(
             &mut tx,
-            &PollingStationInvestigationCreated(investigation.clone()),
+            &InvestigationCreatedAuditData(investigation.clone()),
             None,
         )
         .await?;
@@ -284,7 +280,7 @@ async fn polling_station_investigation_conclude(
     audit_service
         .log(
             &mut tx,
-            &PollingStationInvestigationConcluded(investigation.clone()),
+            &InvestigationConcludedAuditData(investigation.clone()),
             None,
         )
         .await?;
@@ -323,7 +319,7 @@ async fn update_investigation(
     audit_service
         .log(
             conn,
-            &PollingStationInvestigationUpdated(investigation.clone()),
+            &InvestigationUpdatedAuditData(investigation.clone()),
             None,
         )
         .await?;

@@ -113,14 +113,14 @@ pub enum AuditEventType {
     CommitteeSessionCreated,
     CommitteeSessionDeleted,
     CommitteeSessionUpdated,
-    // investigation events
-    PollingStationInvestigationCreated,
-    PollingStationInvestigationConcluded,
-    PollingStationInvestigationUpdated,
-    PollingStationInvestigationDeleted,
     // file events
     FileCreated,
     FileDeleted,
+    // investigation events
+    InvestigationCreated,
+    InvestigationConcluded,
+    InvestigationUpdated,
+    InvestigationDeleted,
     // polling station events
     PollingStationCreated,
     PollingStationUpdated,

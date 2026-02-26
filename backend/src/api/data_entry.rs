@@ -18,7 +18,7 @@ use crate::{
         committee_session_status::CommitteeSessionStatus,
         data_entry::{
             CSONextSessionResults, CommonPollingStationResults, DataEntryId,
-            DataEntryStatusResponse, PollingStationResults,
+            DataEntryStatusResponse, PollingStationDataEntry, PollingStationResults,
         },
         data_entry_status::{
             ClientState, CurrentDataEntry, DataEntryStatus, DataEntryStatusName,
@@ -67,7 +67,7 @@ impl From<DataEntryTransitionError> for APIError {
 }
 
 #[derive(Serialize)]
-pub struct DataEntryDetails {
+pub struct DataEntryAuditData {
     pub data_entry_id: DataEntryId,
     pub data_entry_status: String,
     pub data_entry_progress: String,
@@ -79,37 +79,52 @@ pub struct DataEntryDetails {
     pub second_entry_user_id: Option<UserId>,
 }
 
+impl From<PollingStationDataEntry> for DataEntryAuditData {
+    fn from(value: PollingStationDataEntry) -> Self {
+        let state = value.state.0;
+
+        Self {
+            data_entry_id: value.id,
+            data_entry_status: state.status_name().to_string(),
+            data_entry_progress: format!("{}%", state.get_progress()),
+            finished_at: state.finished_at().cloned(),
+            first_entry_user_id: state.get_first_entry_user_id(),
+            second_entry_user_id: state.get_second_entry_user_id(),
+        }
+    }
+}
+
 #[derive(Serialize)]
-struct DataEntryStarted(pub DataEntryDetails);
-impl AsAuditEvent for DataEntryStarted {
+struct DataEntryStartedAuditData(pub DataEntryAuditData);
+impl AsAuditEvent for DataEntryStartedAuditData {
     const EVENT_TYPE: AuditEventType = AuditEventType::DataEntryStarted;
     const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Success;
 }
 
 #[derive(Serialize)]
-struct DataEntrySaved(pub DataEntryDetails);
-impl AsAuditEvent for DataEntrySaved {
+struct DataEntrySavedAuditData(pub DataEntryAuditData);
+impl AsAuditEvent for DataEntrySavedAuditData {
     const EVENT_TYPE: AuditEventType = AuditEventType::DataEntrySaved;
     const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Success;
 }
 
 #[derive(Serialize)]
-struct DataEntryResumed(pub DataEntryDetails);
-impl AsAuditEvent for DataEntryResumed {
+struct DataEntryResumedAuditData(pub DataEntryAuditData);
+impl AsAuditEvent for DataEntryResumedAuditData {
     const EVENT_TYPE: AuditEventType = AuditEventType::DataEntryResumed;
     const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Success;
 }
 
 #[derive(Serialize)]
-struct DataEntryDeleted(pub DataEntryDetails);
-impl AsAuditEvent for DataEntryDeleted {
+struct DataEntryDeletedAuditData(pub DataEntryAuditData);
+impl AsAuditEvent for DataEntryDeletedAuditData {
     const EVENT_TYPE: AuditEventType = AuditEventType::DataEntryDeleted;
     const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Info;
 }
 
 #[derive(Serialize)]
-struct DataEntryFinalised(pub DataEntryDetails);
-impl AsAuditEvent for DataEntryFinalised {
+struct DataEntryFinalisedAuditData(pub DataEntryAuditData);
+impl AsAuditEvent for DataEntryFinalisedAuditData {
     const EVENT_TYPE: AuditEventType = AuditEventType::DataEntryFinalised;
     const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Success;
 }
@@ -207,7 +222,7 @@ pub async fn delete_data_entry_for_polling_station(
 ) -> Result<(), APIError> {
     if let Some(data_entry) = delete_data_entry(conn, polling_station_id).await? {
         audit_service
-            .log(conn, &DataEntryDeleted(data_entry.into()), None)
+            .log(conn, &DataEntryDeletedAuditData(data_entry.into()), None)
             .await?;
 
         if committee_session.status == CommitteeSessionStatus::Completed {
@@ -337,12 +352,12 @@ async fn data_entry_claim(
     match state {
         DataEntryStatus::Empty | DataEntryStatus::FirstEntryFinalised(_) => {
             audit_service
-                .log(&mut tx, &DataEntryStarted(data_entry.into()), None)
+                .log(&mut tx, &DataEntryStartedAuditData(data_entry.into()), None)
                 .await?;
         }
         _ => {
             audit_service
-                .log(&mut tx, &DataEntryResumed(data_entry.into()), None)
+                .log(&mut tx, &DataEntryResumedAuditData(data_entry.into()), None)
                 .await?;
         }
     }
@@ -439,7 +454,7 @@ async fn data_entry_save(
     let data_entry = data_entry_repo::update(&mut tx, polling_station_id, &new_state).await?;
 
     audit_service
-        .log(&mut tx, &DataEntrySaved(data_entry.into()), None)
+        .log(&mut tx, &DataEntrySavedAuditData(data_entry.into()), None)
         .await?;
 
     tx.commit().await?;
@@ -487,7 +502,7 @@ async fn data_entry_delete(
     let data_entry = data_entry_repo::update(&mut tx, polling_station_id, &new_state).await?;
 
     audit_service
-        .log(&mut tx, &DataEntryDeleted(data_entry.into()), None)
+        .log(&mut tx, &DataEntryDeletedAuditData(data_entry.into()), None)
         .await?;
 
     tx.commit().await?;
@@ -540,7 +555,7 @@ async fn data_entry_finalise(
     audit_service
         .log(
             &mut tx,
-            &DataEntryFinalised(data_entry.clone().into()),
+            &DataEntryFinalisedAuditData(data_entry.clone().into()),
             None,
         )
         .await?;
@@ -611,7 +626,7 @@ async fn data_entry_reset(
         data_entry_repo::update(&mut tx, polling_station_id, &DataEntryStatus::Empty).await?;
 
         audit_service
-            .log(&mut tx, &DataEntryDeleted(data_entry.into()), None)
+            .log(&mut tx, &DataEntryDeletedAuditData(data_entry.into()), None)
             .await?;
 
         if committee_session.status == CommitteeSessionStatus::Completed {
@@ -757,7 +772,7 @@ async fn data_entry_resolve_errors(
 
     let data_entry = data_entry_repo::update(&mut tx, polling_station_id, &new_state).await?;
     let event_type = action.audit_event_type();
-    let data = serde_json::to_value(DataEntryDetails::from(data_entry.clone()))?;
+    let data = serde_json::to_value(DataEntryAuditData::from(data_entry.clone()))?;
     audit_service
         .log(
             &mut tx,
@@ -873,7 +888,7 @@ async fn data_entry_resolve_differences(
 
     let data_entry = data_entry_repo::update(&mut tx, polling_station_id, &new_state).await?;
     let event_type = action.audit_event();
-    let data = serde_json::to_value(DataEntryDetails::from(data_entry.clone()))?;
+    let data = serde_json::to_value(DataEntryAuditData::from(data_entry.clone()))?;
     audit_service
         .log(
             &mut tx,

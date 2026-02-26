@@ -2,13 +2,13 @@ use sqlx::{Connection, SqliteConnection};
 
 use crate::{
     APIError,
+    api::{committee_session::CommitteeSessionUpdatedAuditData, report::FileDeletedAuditData},
     domain::{
         committee_session::{
             CommitteeSession, CommitteeSessionFilesUpdateRequest, CommitteeSessionId,
-            CommitteeSessionUpdated,
         },
         committee_session_status::CommitteeSessionStatus,
-        file::{FileDeleted, FileId},
+        file::FileId,
     },
     infra::audit_log::AuditService,
     repository::{committee_session_repo, file_repo},
@@ -59,7 +59,7 @@ pub async fn change_committee_session_status(
     audit_service
         .log(
             &mut tx,
-            &CommitteeSessionUpdated(committee_session.into()),
+            &CommitteeSessionUpdatedAuditData(committee_session.into()),
             None,
         )
         .await?;
@@ -98,7 +98,7 @@ async fn delete_committee_session_files(
         for id in file_ids {
             if let Some(file) = file_repo::delete(conn, id).await? {
                 audit_service
-                    .log(conn, &FileDeleted(file.into()), None)
+                    .log(conn, &FileDeletedAuditData(file.into()), None)
                     .await?;
             }
         }

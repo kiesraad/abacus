@@ -81,7 +81,7 @@ mod test {
     use super::*;
     use crate::{
         SqlitePoolExt,
-        api::authentication::UserLoggedInDetails,
+        api::authentication::UserLoggedInAuditData,
         infra::audit_log::AuditEventLevel,
         repository::user_repo::{self, UserId},
     };
@@ -94,7 +94,7 @@ mod test {
             user: user_repo::get_by_username(&mut tx, "admin1").await.unwrap(),
         };
 
-        let audit_event = UserLoggedInDetails {
+        let audit_event = UserLoggedInAuditData {
             user_agent: "Mozilla/5.0".to_string(),
             logged_in_users_count: 5,
         };

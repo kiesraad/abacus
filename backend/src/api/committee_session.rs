@@ -4,6 +4,7 @@ use axum::{
     http::StatusCode,
 };
 use chrono::NaiveDateTime;
+use serde::Serialize;
 use sqlx::{SqliteConnection, SqlitePool};
 use utoipa_axum::{router::OpenApiRouter, routes};
 
@@ -12,16 +13,16 @@ use crate::{
     api::middleware::authentication::CoordinatorGSB,
     domain::{
         committee_session::{
-            CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionCreated,
-            CommitteeSessionDeleted, CommitteeSessionError, CommitteeSessionId,
-            CommitteeSessionStatusChangeRequest, CommitteeSessionUpdateRequest,
-            CommitteeSessionUpdated, InvestigationListResponse,
+            CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionError,
+            CommitteeSessionId, CommitteeSessionStatusChangeRequest, CommitteeSessionUpdateRequest,
+            InvestigationListResponse,
         },
         committee_session_status::CommitteeSessionStatus,
         election::ElectionId,
+        file::FileId,
     },
     error::ErrorReference,
-    infra::audit_log::AuditService,
+    infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
     repository::{
         committee_session_repo::{create, delete, get, get_election_committee_session, update},
         election_repo,
@@ -29,6 +30,60 @@ use crate::{
     },
     service::change_committee_session_status,
 };
+
+#[derive(Serialize)]
+pub struct CommitteeSessionAuditData {
+    pub session_id: CommitteeSessionId,
+    pub session_number: u32,
+    pub session_election_id: ElectionId,
+    pub session_location: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub session_start_date_time: Option<NaiveDateTime>,
+    pub session_status: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub session_results_eml: Option<FileId>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub session_results_pdf: Option<FileId>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub session_overview_pdf: Option<FileId>,
+}
+
+impl From<CommitteeSession> for CommitteeSessionAuditData {
+    fn from(value: CommitteeSession) -> Self {
+        Self {
+            session_id: value.id,
+            session_number: value.number,
+            session_election_id: value.election_id,
+            session_location: value.location,
+            session_start_date_time: value.start_date_time,
+            session_status: value.status.to_string(),
+            session_results_eml: value.results_eml,
+            session_results_pdf: value.results_pdf,
+            session_overview_pdf: value.overview_pdf,
+        }
+    }
+}
+
+#[derive(Serialize)]
+pub struct CommitteeSessionCreatedAuditData(pub CommitteeSessionAuditData);
+impl AsAuditEvent for CommitteeSessionCreatedAuditData {
+    const EVENT_TYPE: AuditEventType = AuditEventType::CommitteeSessionCreated;
+    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Success;
+}
+
+#[derive(Serialize)]
+pub struct CommitteeSessionUpdatedAuditData(pub CommitteeSessionAuditData);
+impl AsAuditEvent for CommitteeSessionUpdatedAuditData {
+    const EVENT_TYPE: AuditEventType = AuditEventType::CommitteeSessionUpdated;
+    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Success;
+}
+
+#[derive(Serialize)]
+pub struct CommitteeSessionDeletedAuditData(pub CommitteeSessionAuditData);
+impl AsAuditEvent for CommitteeSessionDeletedAuditData {
+    const EVENT_TYPE: AuditEventType = AuditEventType::CommitteeSessionDeleted;
+    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Info;
+}
 
 pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::default()
@@ -66,7 +121,7 @@ pub async fn create_committee_session(
     audit_service
         .log(
             conn,
-            &CommitteeSessionCreated(committee_session.clone().into()),
+            &CommitteeSessionCreatedAuditData(committee_session.clone().into()),
             None,
         )
         .await?;
@@ -162,7 +217,7 @@ pub async fn committee_session_delete(
         audit_service
             .log(
                 &mut tx,
-                &CommitteeSessionDeleted(committee_session.clone().into()),
+                &CommitteeSessionDeletedAuditData(committee_session.clone().into()),
                 None,
             )
             .await?;
@@ -236,7 +291,7 @@ pub async fn committee_session_update(
     audit_service
         .log(
             &mut tx,
-            &CommitteeSessionUpdated(committee_session.clone().into()),
+            &CommitteeSessionUpdatedAuditData(committee_session.clone().into()),
             None,
         )
         .await?;

@@ -42,15 +42,15 @@ const DOMAINS: [&str; 3] = [
 pub const AIRGAP_DETECTION_INTERVAL: u64 = 30; // interval in seconds
 
 #[derive(Serialize)]
-struct AirGapViolationDetected;
-impl AsAuditEvent for AirGapViolationDetected {
+struct AirGapViolationDetectedAuditData;
+impl AsAuditEvent for AirGapViolationDetectedAuditData {
     const EVENT_TYPE: AuditEventType = AuditEventType::AirGapViolationDetected;
     const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Error;
 }
 
 #[derive(Serialize)]
-struct AirGapViolationResolved;
-impl AsAuditEvent for AirGapViolationResolved {
+struct AirGapViolationResolvedAuditData;
+impl AsAuditEvent for AirGapViolationResolvedAuditData {
     const EVENT_TYPE: AuditEventType = AuditEventType::AirGapViolationResolved;
     const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Info;
 }
@@ -92,9 +92,9 @@ impl AirgapDetection {
     #[allow(clippy::cognitive_complexity)]
     async fn log_status_change(&self) {
         let event_result = if self.violation_detected() {
-            AirGapViolationDetected.as_audit_event()
+            AirGapViolationDetectedAuditData.as_audit_event()
         } else {
-            AirGapViolationResolved.as_audit_event()
+            AirGapViolationResolvedAuditData.as_audit_event()
         };
 
         // If we detect an airgap status change, but we're unable to create and save

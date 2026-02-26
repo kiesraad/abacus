@@ -22,8 +22,8 @@ use crate::{
 };
 
 #[derive(Serialize)]
-struct UserSessionExtended;
-impl AsAuditEvent for UserSessionExtended {
+struct UserSessionExtendedAuditData;
+impl AsAuditEvent for UserSessionExtendedAuditData {
     const EVENT_TYPE: AuditEventType = AuditEventType::UserSessionExtended;
     const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Info;
 }
@@ -98,7 +98,7 @@ pub(crate) async fn extend_session(
                 Ok(session) => {
                     let _ = audit_service
                         .with_user(user.clone())
-                        .log(&mut tx, &UserSessionExtended, None)
+                        .log(&mut tx, &UserSessionExtendedAuditData, None)
                         .await;
                     if let Err(err) = tx.commit().await {
                         error!("Failed to commit transaction: {:?}", err);

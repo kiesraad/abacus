@@ -1,10 +1,9 @@
 use sqlx::{Connection, SqliteConnection, query, query_as};
 
-#[cfg(test)]
-use crate::domain::data_entry::DataEntryId;
 use crate::{
     domain::{
         committee_session::CommitteeSessionId,
+        data_entry::DataEntryId,
         election::ElectionId,
         polling_station::{PollingStation, PollingStationId, PollingStationRequest},
     },
@@ -61,7 +60,7 @@ pub async fn list(
     .await
 }
 
-/// Get a single polling station
+/// Get a single polling station in the current (latest) committee session
 pub async fn get(
     conn: &mut SqliteConnection,
     polling_station_id: PollingStationId,
@@ -356,6 +355,39 @@ pub async fn delete(
     tx.commit().await?;
 
     Ok(rows_affected > 0)
+}
+
+/// Set `data_entry_id` on a polling station and return the updated row.
+pub async fn link_data_entry(
+    conn: &mut SqliteConnection,
+    polling_station_id: PollingStationId,
+    data_entry_id: DataEntryId,
+) -> Result<PollingStation, sqlx::Error> {
+    query_as!(
+        PollingStation,
+        r#"
+            UPDATE polling_stations
+            SET data_entry_id = ?
+            WHERE id = ?
+            RETURNING
+                id AS "id: _",
+                (SELECT c.election_id FROM committee_sessions AS c WHERE c.id = committee_session_id) AS "election_id!: _",
+                committee_session_id AS "committee_session_id: _",
+                prev_data_entry_id AS "prev_data_entry_id: _",
+                data_entry_id AS "data_entry_id: _",
+                name,
+                number AS "number: u32",
+                number_of_voters AS "number_of_voters: _",
+                polling_station_type AS "polling_station_type: _",
+                address,
+                postal_code,
+                locality
+        "#,
+        data_entry_id,
+        polling_station_id,
+    )
+    .fetch_one(conn)
+    .await
 }
 
 pub async fn duplicate_for_committee_session(

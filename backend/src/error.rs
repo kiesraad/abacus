@@ -17,6 +17,7 @@ use crate::{
     api::middleware::authentication::error::AuthenticationError,
     domain::{committee_session::CommitteeSessionError, validation::DataError},
     eml::EMLImportError,
+    service::DataEntryServiceError,
 };
 use pdf_gen::{PdfGenError, zip::ZipResponseError};
 
@@ -487,6 +488,14 @@ impl From<Box<dyn Error>> for APIError {
 impl From<CommitteeSessionError> for APIError {
     fn from(err: CommitteeSessionError) -> Self {
         APIError::CommitteeSession(err)
+    }
+}
+
+impl From<DataEntryServiceError> for APIError {
+    fn from(err: DataEntryServiceError) -> Self {
+        match err {
+            DataEntryServiceError::DatabaseError(e) => e.into(),
+        }
     }
 }
 

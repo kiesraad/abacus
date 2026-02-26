@@ -1,19 +1,24 @@
 import { Navigate, useNavigate } from "react-router";
 
 import { PageTitle } from "@/components/page_title/PageTitle";
+import { useMessages } from "@/hooks/messages/useMessages";
 import { t } from "@/i18n/translate";
 import type { User } from "@/types/generated/openapi";
-
 import { useUserCreateContext } from "../../hooks/useUserCreateContext";
 import { UserCreateDetailsForm } from "./UserCreateDetailsForm";
 
 export function UserCreateDetailsPage() {
+  const { pushMessage } = useMessages();
   const navigate = useNavigate();
   const { role, type } = useUserCreateContext();
 
   function handleSubmitted({ username, role }: User) {
-    const createdMessage = t("users.user_created_details", { username, role: t(role) });
-    void navigate(`/users?created=${encodeURIComponent(createdMessage)}`);
+    pushMessage({
+      title: t("users.user_created"),
+      text: t("users.user_created_details", { username, role: t(role) }),
+    });
+
+    void navigate("/users");
   }
 
   if (!role || !type) {

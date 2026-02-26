@@ -2,26 +2,31 @@ import { waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import * as ReactRouter from "react-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
-
+import type { iMessageContext } from "@/hooks/messages/MessagesContext";
+import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
+import * as useMessages from "@/hooks/messages/useMessages";
 import { overrideOnce } from "@/testing/server";
 import { render, screen } from "@/testing/test-utils";
 import type { USER_CREATE_REQUEST_PATH, User } from "@/types/generated/openapi";
-
 import { type IUserCreateContext, UserCreateContext } from "../../hooks/UserCreateContext";
 import { UserCreateDetailsPage } from "./UserCreateDetailsPage";
 
-const navigate = vi.fn();
-
 function renderPage(context: Partial<IUserCreateContext>) {
   return render(
-    <UserCreateContext.Provider value={context as IUserCreateContext}>
-      <UserCreateDetailsPage />
-    </UserCreateContext.Provider>,
+    <MessagesProvider>
+      <UserCreateContext.Provider value={context as IUserCreateContext}>
+        <UserCreateDetailsPage />
+      </UserCreateContext.Provider>
+    </MessagesProvider>,
   );
 }
 
 describe("UserCreateDetailsPage", () => {
+  const pushMessage = vi.fn();
+  const navigate = vi.fn();
+
   beforeEach(() => {
+    vi.spyOn(useMessages, "useMessages").mockReturnValue({ pushMessage } as unknown as iMessageContext);
     vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
     vi.spyOn(ReactRouter, "Navigate").mockImplementation((props) => {
       navigate(props.to);
@@ -61,9 +66,10 @@ describe("UserCreateDetailsPage", () => {
     await user.type(await screen.findByRole("textbox", { name: "Tijdelijk wachtwoord" }), "Wachtwoord12");
     await user.click(await screen.findByRole("button", { name: "Opslaan" }));
 
-    const message = "NieuweGebruiker is toegevoegd met de rol Coördinator";
-    await waitFor(() => {
-      expect(navigate).toHaveBeenCalledExactlyOnceWith(`/users?created=${encodeURIComponent(message)}`);
+    expect(pushMessage).toHaveBeenCalledWith({
+      title: "Gebruiker toegevoegd",
+      text: "NieuweGebruiker is toegevoegd met de rol Coördinator",
     });
+    expect(navigate).toHaveBeenCalledExactlyOnceWith("/users");
   });
 });

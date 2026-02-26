@@ -17,7 +17,10 @@ use crate::{
         middleware::authentication::CoordinatorGSB,
     },
     audit_log::AuditService,
-    domain::{election::ElectionId, summary::ElectionSummary},
+    domain::{
+        committee_session_status::CommitteeSessionStatus, election::ElectionId,
+        summary::ElectionSummary,
+    },
     repository::{committee_session_repo, data_entry_repo, election_repo},
 };
 
@@ -50,13 +53,11 @@ pub async fn election_apportionment(
     let current_committee_session =
         committee_session_repo::get_election_committee_session(&mut conn, election.id).await?;
 
-    if data_entry_repo::are_results_complete_for_committee_session(
-        &mut conn,
-        current_committee_session.id,
-    )
-    .await?
-    {
-        let results = data_entry_repo::list_results_for_committee_session(
+    if current_committee_session.status == CommitteeSessionStatus::Completed {
+        let results: Vec<(
+            crate::domain::polling_station::PollingStation,
+            crate::domain::data_entry::PollingStationResults,
+        )> = data_entry_repo::list_results_for_committee_session(
             &mut conn,
             current_committee_session.id,
         )
@@ -87,7 +88,7 @@ pub async fn election_apportionment(
         }))
     } else {
         Err(APIError::Apportionment(
-            ApportionmentError::ApportionmentNotAvailableUntilDataEntryFinalised,
+            ApportionmentError::CommitteeSessionNotCompleted,
         ))
     }
 }
@@ -95,48 +96,71 @@ pub async fn election_apportionment(
 #[cfg(test)]
 mod tests {
     use axum::{
+        extract::{Path, State},
         http::StatusCode,
-        response::{IntoResponse, Response},
+        response::IntoResponse,
     };
     use http_body_util::BodyExt;
     use sqlx::SqlitePool;
     use test_log::test;
 
-    use super::*;
     use crate::{
-        domain::role::Role,
+        domain::{committee_session::CommitteeSessionId, role::Role},
         error::ErrorReference,
         repository::user_repo::{User, UserId},
+        service::change_committee_session_status,
     };
 
-    async fn get_election_apportionment(pool: SqlitePool, election_id: ElectionId) -> Response {
-        let user = User::test_user(Role::CoordinatorGSB, UserId::from(1));
-
-        election_apportionment(
-            CoordinatorGSB(user.clone()),
-            State(pool.clone()),
-            AuditService::new(Some(user), None),
-            Path(election_id),
-        )
-        .await
-        .into_response()
-    }
+    use super::*;
 
     #[test(sqlx::test(fixtures(path = "../../../fixtures", scripts("election_5_with_results"))))]
     async fn test_election_apportionment(pool: SqlitePool) {
-        let response = get_election_apportionment(pool.clone(), ElectionId::from(5)).await;
+        let mut conn = pool.acquire().await.unwrap();
+
+        let user = User::test_user(Role::CoordinatorGSB, UserId::from(1));
+        let audit_service = AuditService::new(Some(user.clone()), None);
+
+        change_committee_session_status(
+            &mut conn,
+            CommitteeSessionId::from(6),
+            CommitteeSessionStatus::Completed,
+            audit_service.clone(),
+        )
+        .await
+        .unwrap();
+
+        let response = super::election_apportionment(
+            CoordinatorGSB(user),
+            State(pool),
+            audit_service,
+            Path(ElectionId::from(5)),
+        )
+        .await
+        .into_response();
+
         assert_eq!(response.status(), StatusCode::OK);
     }
 
     #[test(sqlx::test(fixtures(path = "../../../fixtures", scripts("election_4"))))]
     async fn test_election_apportionment_not_complete(pool: SqlitePool) {
-        let response = get_election_apportionment(pool.clone(), ElectionId::from(4)).await;
+        let user = User::test_user(Role::CoordinatorGSB, UserId::from(1));
+        let audit_service = AuditService::new(Some(user.clone()), None);
+
+        let response = super::election_apportionment(
+            CoordinatorGSB(user),
+            State(pool),
+            audit_service,
+            Path(ElectionId::from(4)),
+        )
+        .await
+        .into_response();
+
         assert_eq!(response.status(), StatusCode::PRECONDITION_FAILED);
         let body = response.into_body().collect().await.unwrap().to_bytes();
         let result: ErrorResponse = serde_json::from_slice(&body).unwrap();
         assert_eq!(
             result.reference,
-            ErrorReference::ApportionmentNotAvailableUntilDataEntryFinalised
+            ErrorReference::ApportionmentCommitteeSessionNotCompleted
         );
     }
 }

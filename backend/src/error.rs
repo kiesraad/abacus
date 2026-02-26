@@ -28,8 +28,8 @@ pub enum ErrorReference {
     AirgapViolation,
     AlreadyInitialised,
     ApportionmentAllListsExhausted,
+    ApportionmentCommitteeSessionNotCompleted,
     ApportionmentDrawingOfLotsRequired,
-    ApportionmentNotAvailableUntilDataEntryFinalised,
     ApportionmentZeroVotesCast,
     CommitteeSessionPaused,
     DatabaseError,
@@ -387,11 +387,11 @@ impl IntoResponse for APIError {
                             false,
                         ),
                     ),
-                    ApportionmentError::ApportionmentNotAvailableUntilDataEntryFinalised => (
+                    ApportionmentError::CommitteeSessionNotCompleted => (
                         StatusCode::PRECONDITION_FAILED,
                         to_error(
-                            "Election data entry first needs to be finalised",
-                            ErrorReference::ApportionmentNotAvailableUntilDataEntryFinalised,
+                            "Committee session not completed",
+                            ErrorReference::ApportionmentCommitteeSessionNotCompleted,
                             false,
                         ),
                     ),

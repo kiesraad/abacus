@@ -10,7 +10,7 @@ pub(crate) const LARGE_COUNCIL_THRESHOLD: u32 = 19;
 #[derive(Debug, PartialEq)]
 pub enum ApportionmentError {
     AllListsExhausted,
-    ApportionmentNotAvailableUntilDataEntryFinalised,
+    CommitteeSessionNotCompleted,
     DrawingOfLotsNotImplemented,
     ZeroVotesCast,
 }

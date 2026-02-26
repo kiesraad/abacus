@@ -460,7 +460,8 @@ mod tests {
 
         use super::*;
         use crate::{
-            repository::polling_station_repo::insert_test_polling_station,
+            domain::data_entry_status,
+            repository::{polling_station_repo::insert_test_polling_station, user_repo::UserId},
             service::{create_definitive_data_entry, create_test_investigation},
         };
 
@@ -751,13 +752,16 @@ mod tests {
                 .await
                 .unwrap();
 
-            create_definitive_data_entry(
-                &mut conn,
-                PollingStationId::from(733),
-                &create_test_results(10),
-            )
-            .await
-            .unwrap();
+            let state = DataEntryStatus::Definitive(data_entry_status::Definitive {
+                first_entry_user_id: UserId::from(5),
+                second_entry_user_id: UserId::from(6),
+                finished_at: chrono::Utc::now(),
+                finalised_with_warnings: false,
+                results: create_test_results(10),
+            });
+            update(&mut conn, PollingStationId::from(733), &state)
+                .await
+                .unwrap();
 
             // Add new polling station to fourth session, linked to the data entry from third session, but without investigation or results
             let prev_data_entry = get_data_entry(&mut conn, PollingStationId::from(733))

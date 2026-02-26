@@ -60,37 +60,6 @@ pub async fn list(
     .await
 }
 
-/// Get a single polling station by ID, regardless of committee session.
-pub(crate) async fn get_by_id(
-    conn: &mut SqliteConnection,
-    polling_station_id: PollingStationId,
-) -> Result<PollingStation, sqlx::Error> {
-    query_as!(
-        PollingStation,
-        r#"
-        SELECT
-            p.id AS "id: _",
-            c.election_id AS "election_id: _",
-            p.committee_session_id AS "committee_session_id: _",
-            p.prev_data_entry_id AS "prev_data_entry_id: _",
-            p.data_entry_id AS "data_entry_id: _",
-            p.name,
-            p.number AS "number: u32",
-            p.number_of_voters AS "number_of_voters: _",
-            p.polling_station_type AS "polling_station_type: _",
-            p.address,
-            p.postal_code,
-            p.locality
-        FROM polling_stations AS p
-        JOIN committee_sessions AS c ON c.id = p.committee_session_id
-        WHERE p.id = $1
-        "#,
-        polling_station_id,
-    )
-    .fetch_one(conn)
-    .await
-}
-
 /// Get a single polling station in the current (latest) committee session
 pub async fn get(
     conn: &mut SqliteConnection,

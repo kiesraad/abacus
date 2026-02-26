@@ -27,7 +27,7 @@ pub async fn create_empty(
 
     // If data entry already exists, return polling station as-is
     if data_entry_repo::data_entry_exists(&mut tx, polling_station_id).await? {
-        let polling_station = polling_station_repo::get_by_id(&mut tx, polling_station_id).await?;
+        let polling_station = polling_station_repo::get(&mut tx, polling_station_id).await?;
         tx.commit().await?;
         return Ok(polling_station);
     }

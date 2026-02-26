@@ -46,10 +46,6 @@
     align-items: center;
     gap: 0.5rem;
 
-    span {
-      text-transform: lowercase;
-    }
-
     a {
       text-decoration: underline;
       color: inherit;

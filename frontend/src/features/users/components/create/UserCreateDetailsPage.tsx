@@ -15,7 +15,7 @@ export function UserCreateDetailsPage() {
   function handleSubmitted({ username, role }: User) {
     pushMessage({
       title: t("users.user_created"),
-      text: t("users.user_created_details", { username, role: t(role) }),
+      text: t("users.user_created_details", { username, role: t(`users.${role}`) }),
     });
 
     void navigate("/users");
@@ -30,7 +30,7 @@ export function UserCreateDetailsPage() {
       <PageTitle title={`${t("users.add")} - Abacus`} />
       <header>
         <section>
-          <h1>{t("users.add_role", { role: t(role) })}</h1>
+          <h1>{t("users.add_role", { role: t(`users.${role}`) })}</h1>
         </section>
       </header>
       <main>

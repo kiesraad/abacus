@@ -1,4 +1,4 @@
-# Data Entry Forms
+# Data entry forms
 
 This page describes the navigation and rendering logic of the data entry forms through the following flow charts:
 

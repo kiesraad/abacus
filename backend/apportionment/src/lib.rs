@@ -137,49 +137,49 @@ mod tests {
 
         check_chosen_candidates(
             &result.candidate_nomination.chosen_candidates,
-            &input.list_votes[0].number,
+            input.list_votes[0].number,
             &input.list_votes[0].candidate_votes[..7],
             &input.list_votes[0].candidate_votes[8..],
         );
         check_chosen_candidates(
             &result.candidate_nomination.chosen_candidates,
-            &input.list_votes[1].number,
+            input.list_votes[1].number,
             &input.list_votes[1].candidate_votes[..2],
             &input.list_votes[1].candidate_votes[2..],
         );
         check_chosen_candidates(
             &result.candidate_nomination.chosen_candidates,
-            &input.list_votes[2].number,
+            input.list_votes[2].number,
             &input.list_votes[2].candidate_votes[..2],
             &input.list_votes[2].candidate_votes[2..],
         );
         check_chosen_candidates(
             &result.candidate_nomination.chosen_candidates,
-            &input.list_votes[3].number,
+            input.list_votes[3].number,
             &input.list_votes[3].candidate_votes[..1],
             &input.list_votes[3].candidate_votes[1..],
         );
         check_chosen_candidates(
             &result.candidate_nomination.chosen_candidates,
-            &input.list_votes[4].number,
+            input.list_votes[4].number,
             &input.list_votes[4].candidate_votes[..1],
             &input.list_votes[4].candidate_votes[1..],
         );
         check_chosen_candidates(
             &result.candidate_nomination.chosen_candidates,
-            &input.list_votes[5].number,
+            input.list_votes[5].number,
             &input.list_votes[5].candidate_votes[..1],
             &input.list_votes[5].candidate_votes[1..],
         );
         check_chosen_candidates(
             &result.candidate_nomination.chosen_candidates,
-            &input.list_votes[6].number,
+            input.list_votes[6].number,
             &input.list_votes[6].candidate_votes[..1],
             &input.list_votes[6].candidate_votes[2..],
         );
         check_chosen_candidates(
             &result.candidate_nomination.chosen_candidates,
-            &input.list_votes[7].number,
+            input.list_votes[7].number,
             &[],
             &input.list_votes[7].candidate_votes[1..],
         );

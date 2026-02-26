@@ -60,23 +60,23 @@ impl CandidateVotesTrait for CandidateVotesMock {
 }
 
 impl ListVotesMock {
-    pub fn from_test_data_auto(number: u32, candidate_votes: &[u32]) -> Self {
+    pub fn from_test_data_auto(number: u32, candidate_votes: Vec<u32>) -> Self {
         ListVotesMock {
             number,
             candidate_votes: candidate_votes
-                .iter()
+                .into_iter()
                 .enumerate()
                 .map(|(i, votes)| CandidateVotesMock {
                     number: u32::try_from(i + 1).unwrap(),
-                    votes: *votes,
+                    votes,
                 })
                 .collect(),
         }
     }
 }
 
-pub fn get_total_seats_from_apportionment_result<T: ListVotesTrait>(
-    result: &SeatAssignmentResult<T>,
+pub fn get_total_seats_from_apportionment_result(
+    result: &SeatAssignmentResult<ListVotesMock>,
 ) -> Vec<u32> {
     result
         .final_standing
@@ -85,10 +85,8 @@ pub fn get_total_seats_from_apportionment_result<T: ListVotesTrait>(
         .collect::<Vec<_>>()
 }
 
-pub fn check_list_candidate_nomination<
-    T: ListVotesTrait<Cv: CandidateVotesTrait<CandidateNumber = u32>>,
->(
-    nomination: &ListCandidateNomination<T>,
+pub fn check_list_candidate_nomination(
+    nomination: &ListCandidateNomination<ListVotesMock>,
     expected_preferential_nomination: &[u32],
     expected_other_nomination: &[u32],
     expected_updated_ranking: &[u32],
@@ -108,17 +106,15 @@ pub fn check_list_candidate_nomination<
     );
 }
 
-pub fn check_chosen_candidates<
-    T: ListVotesTrait<ListNumber = u32, Cv: CandidateVotesTrait<CandidateNumber = u32>>,
->(
-    chosen_candidates: &[Candidate<T>],
-    list_number: &u32,
-    expected_chosen_candidates: &[T::Cv],
-    expected_not_chosen_candidates: &[T::Cv],
+pub fn check_chosen_candidates(
+    chosen_candidates: &[Candidate<ListVotesMock>],
+    list_number: u32,
+    expected_chosen_candidates: &[CandidateVotesMock],
+    expected_not_chosen_candidates: &[CandidateVotesMock],
 ) {
     assert!(expected_chosen_candidates.iter().all(|expected_candidate| {
         chosen_candidates.iter().any(|chosen_candidate| {
-            chosen_candidate.list_number == *list_number
+            chosen_candidate.list_number == list_number
                 && chosen_candidate.candidate_number == expected_candidate.number()
         })
     }));
@@ -127,32 +123,30 @@ pub fn check_chosen_candidates<
             .iter()
             .all(|expected_candidate| {
                 !chosen_candidates.iter().any(|chosen_candidate| {
-                    chosen_candidate.list_number == *list_number
+                    chosen_candidate.list_number == list_number
                         && chosen_candidate.candidate_number == expected_candidate.number()
                 })
             })
     );
 }
 
-pub fn get_chosen_and_not_chosen_candidates_for_a_list<
-    T: CandidateVotesTrait<CandidateNumber = u32> + Clone,
->(
-    list_candidates: &[T],
+pub fn get_chosen_and_not_chosen_candidates_for_a_list(
+    list_candidates: &[CandidateVotesMock],
     list_preferential_nominated_candidate_numbers: &[u32],
     list_other_nominated_candidate_numbers: &[u32],
-) -> (Vec<T>, Vec<T>) {
+) -> (Vec<CandidateVotesMock>, Vec<CandidateVotesMock>) {
     let nominated_numbers: Vec<&u32> = list_preferential_nominated_candidate_numbers
         .iter()
         .chain(list_other_nominated_candidate_numbers)
         .collect();
 
     // TODO: Using clones, but it is testcode. Could be improved.
-    let chosen_candidates: Vec<T> = list_candidates
+    let chosen_candidates = list_candidates
         .iter()
         .filter(|c| nominated_numbers.iter().any(|&&n| c.number() == n))
         .cloned()
         .collect();
-    let not_chosen_candidates: Vec<T> = list_candidates
+    let not_chosen_candidates = list_candidates
         .iter()
         .filter(|c| !nominated_numbers.iter().any(|&&n| c.number() == n))
         .cloned()
@@ -172,9 +166,9 @@ pub fn candidate_nomination_fixture_with_given_number_of_seats(
         list_votes: &seat_assignment_input.list_votes,
         quota,
         total_seats_per_list: total_seats_per_list
-            .iter()
+            .into_iter()
             .enumerate()
-            .map(|(list_index, total_seats)| (u32::try_from(list_index + 1).unwrap(), *total_seats))
+            .map(|(list_index, total_seats)| (u32::try_from(list_index + 1).unwrap(), total_seats))
             .collect(),
     }
 }
@@ -201,14 +195,14 @@ pub fn seat_assignment_fixture_with_default_50_candidates(
     list_vote_counts: Vec<u32>,
 ) -> ApportionmentInputMock {
     let mut list_votes: Vec<ListVotesMock> = vec![];
-    for (index, votes) in list_vote_counts.iter().enumerate() {
+    for (index, votes) in list_vote_counts.into_iter().enumerate() {
         // Create list with 50 candidates with 0 votes
         let mut candidate_votes: Vec<u32> = vec![0; 50];
         // Set votes to first candidate
-        candidate_votes[0] = *votes;
+        candidate_votes[0] = votes;
         list_votes.push(ListVotesMock::from_test_data_auto(
             u32::try_from(index + 1).unwrap(),
-            &candidate_votes,
+            candidate_votes,
         ))
     }
 
@@ -224,9 +218,9 @@ pub fn seat_assignment_fixture_with_given_list_numbers_and_candidate_votes(
     list_candidate_votes: Vec<(u32, Vec<u32>)>,
 ) -> ApportionmentInputMock {
     let mut list_votes: Vec<ListVotesMock> = vec![];
-    for (list_number, list_candidate_votes) in list_candidate_votes.iter() {
+    for (list_number, list_candidate_votes) in list_candidate_votes.into_iter() {
         list_votes.push(ListVotesMock::from_test_data_auto(
-            *list_number,
+            list_number,
             list_candidate_votes,
         ))
     }
@@ -245,7 +239,7 @@ pub fn seat_assignment_fixture_with_given_candidate_votes(
     candidate_votes: Vec<Vec<u32>>,
 ) -> ApportionmentInputMock {
     let mut list_votes: Vec<ListVotesMock> = vec![];
-    for (list_index, list_candidate_votes) in candidate_votes.iter().enumerate() {
+    for (list_index, list_candidate_votes) in candidate_votes.into_iter().enumerate() {
         list_votes.push(ListVotesMock::from_test_data_auto(
             u32::try_from(list_index + 1).unwrap(),
             list_candidate_votes,
@@ -266,14 +260,14 @@ pub fn seat_assignment_fixture_with_given_list_numbers_candidate_numbers_and_vot
     list_number_candidate_votes: Vec<(u32, Vec<(u32, u32)>)>,
 ) -> ApportionmentInputMock {
     let mut list_votes: Vec<ListVotesMock> = vec![];
-    for (list_number, list_candidate_votes) in list_number_candidate_votes.iter() {
+    for (list_number, list_candidate_votes) in list_number_candidate_votes.into_iter() {
         list_votes.push(ListVotesMock {
-            number: *list_number,
+            number: list_number,
             candidate_votes: list_candidate_votes
-                .iter()
+                .into_iter()
                 .map(|(number, candidate_votes)| CandidateVotesMock {
-                    number: *number,
-                    votes: *candidate_votes,
+                    number,
+                    votes: candidate_votes,
                 })
                 .collect(),
         })

@@ -348,7 +348,7 @@ mod tests {
 
         check_chosen_candidates(
             &result.chosen_candidates,
-            &input.list_votes[0].number,
+            input.list_votes[0].number,
             &[
                 &input.list_votes[0].candidate_votes[..7],
                 &input.list_votes[0].candidate_votes[10..],
@@ -358,7 +358,7 @@ mod tests {
         );
         check_chosen_candidates(
             &result.chosen_candidates,
-            &input.list_votes[1].number,
+            input.list_votes[1].number,
             &[
                 &input.list_votes[1].candidate_votes[..2],
                 &input.list_votes[1].candidate_votes[3..4],
@@ -372,7 +372,7 @@ mod tests {
         );
         check_chosen_candidates(
             &result.chosen_candidates,
-            &input.list_votes[2].number,
+            input.list_votes[2].number,
             &[
                 &input.list_votes[2].candidate_votes[..1],
                 &input.list_votes[2].candidate_votes[2..],
@@ -382,13 +382,13 @@ mod tests {
         );
         check_chosen_candidates(
             &result.chosen_candidates,
-            &input.list_votes[3].number,
+            input.list_votes[3].number,
             &input.list_votes[3].candidate_votes[..1],
             &input.list_votes[3].candidate_votes[2..],
         );
         check_chosen_candidates(
             &result.chosen_candidates,
-            &input.list_votes[4].number,
+            input.list_votes[4].number,
             &input.list_votes[4].candidate_votes[..1],
             &input.list_votes[4].candidate_votes[2..],
         );
@@ -443,31 +443,31 @@ mod tests {
 
         check_chosen_candidates(
             &result.chosen_candidates,
-            &input.list_votes[0].number,
+            input.list_votes[0].number,
             &input.list_votes[0].candidate_votes[..8],
             &input.list_votes[0].candidate_votes[9..],
         );
         check_chosen_candidates(
             &result.chosen_candidates,
-            &input.list_votes[1].number,
+            input.list_votes[1].number,
             &input.list_votes[1].candidate_votes[..3],
             &input.list_votes[1].candidate_votes[4..],
         );
         check_chosen_candidates(
             &result.chosen_candidates,
-            &input.list_votes[2].number,
+            input.list_votes[2].number,
             &input.list_votes[2].candidate_votes[..2],
             &input.list_votes[2].candidate_votes[3..],
         );
         check_chosen_candidates(
             &result.chosen_candidates,
-            &input.list_votes[3].number,
+            input.list_votes[3].number,
             &input.list_votes[3].candidate_votes[..1],
             &input.list_votes[3].candidate_votes[2..],
         );
         check_chosen_candidates(
             &result.chosen_candidates,
-            &input.list_votes[4].number,
+            input.list_votes[4].number,
             &input.list_votes[4].candidate_votes[..1],
             &input.list_votes[4].candidate_votes[2..],
         );
@@ -514,31 +514,31 @@ mod tests {
 
         check_chosen_candidates(
             &result.chosen_candidates,
-            &input.list_votes[0].number,
+            input.list_votes[0].number,
             &input.list_votes[0].candidate_votes[..1],
             &input.list_votes[0].candidate_votes[2..],
         );
         check_chosen_candidates(
             &result.chosen_candidates,
-            &input.list_votes[1].number,
+            input.list_votes[1].number,
             &input.list_votes[1].candidate_votes[..1],
             &input.list_votes[1].candidate_votes[2..],
         );
         check_chosen_candidates(
             &result.chosen_candidates,
-            &input.list_votes[2].number,
+            input.list_votes[2].number,
             &input.list_votes[2].candidate_votes[..1],
             &input.list_votes[2].candidate_votes[2..],
         );
         check_chosen_candidates(
             &result.chosen_candidates,
-            &input.list_votes[3].number,
+            input.list_votes[3].number,
             &input.list_votes[3].candidate_votes[..1],
             &input.list_votes[3].candidate_votes[2..],
         );
         check_chosen_candidates(
             &result.chosen_candidates,
-            &input.list_votes[4].number,
+            input.list_votes[4].number,
             &input.list_votes[4].candidate_votes[..1],
             &input.list_votes[4].candidate_votes[2..],
         );
@@ -594,19 +594,19 @@ mod tests {
 
         check_chosen_candidates(
             &result.chosen_candidates,
-            &input.list_votes[0].number,
+            input.list_votes[0].number,
             &input.list_votes[0].candidate_votes[..11],
             &input.list_votes[0].candidate_votes[11..],
         );
         check_chosen_candidates(
             &result.chosen_candidates,
-            &input.list_votes[1].number,
+            input.list_votes[1].number,
             &input.list_votes[1].candidate_votes[..7],
             &[],
         );
         check_chosen_candidates(
             &result.chosen_candidates,
-            &input.list_votes[2].number,
+            input.list_votes[2].number,
             &[],
             &[],
         );
@@ -668,31 +668,31 @@ mod tests {
 
         check_chosen_candidates(
             &result.chosen_candidates,
-            &input.list_votes[0].number,
+            input.list_votes[0].number,
             &input.list_votes[0].candidate_votes,
             &[],
         );
         check_chosen_candidates(
             &result.chosen_candidates,
-            &input.list_votes[1].number,
+            input.list_votes[1].number,
             &input.list_votes[1].candidate_votes,
             &[],
         );
         check_chosen_candidates(
             &result.chosen_candidates,
-            &input.list_votes[2].number,
+            input.list_votes[2].number,
             &input.list_votes[2].candidate_votes[..5],
             &input.list_votes[2].candidate_votes[5..],
         );
         check_chosen_candidates(
             &result.chosen_candidates,
-            &input.list_votes[3].number,
+            input.list_votes[3].number,
             &input.list_votes[3].candidate_votes[..2],
             &input.list_votes[3].candidate_votes[2..],
         );
         check_chosen_candidates(
             &result.chosen_candidates,
-            &input.list_votes[4].number,
+            input.list_votes[4].number,
             &[],
             &input.list_votes[4].candidate_votes,
         );
@@ -788,7 +788,7 @@ mod tests {
             );
         check_chosen_candidates(
             &result.chosen_candidates,
-            &input.list_votes[0].number,
+            input.list_votes[0].number,
             &list_0_chosen_candidates,
             &list_0_not_chosen_candidates,
         );
@@ -801,7 +801,7 @@ mod tests {
             );
         check_chosen_candidates(
             &result.chosen_candidates,
-            &input.list_votes[1].number,
+            input.list_votes[1].number,
             &list_1_chosen_candidates,
             &list_1_not_chosen_candidates,
         );
@@ -814,7 +814,7 @@ mod tests {
             );
         check_chosen_candidates(
             &result.chosen_candidates,
-            &input.list_votes[2].number,
+            input.list_votes[2].number,
             &list_2_chosen_candidates,
             &list_2_not_chosen_candidates,
         );
@@ -827,7 +827,7 @@ mod tests {
             );
         check_chosen_candidates(
             &result.chosen_candidates,
-            &input.list_votes[3].number,
+            input.list_votes[3].number,
             &list_3_chosen_candidates,
             &list_3_not_chosen_candidates,
         );
@@ -840,7 +840,7 @@ mod tests {
             );
         check_chosen_candidates(
             &result.chosen_candidates,
-            &input.list_votes[4].number,
+            input.list_votes[4].number,
             &list_4_chosen_candidates,
             &list_4_not_chosen_candidates,
         );

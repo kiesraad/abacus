@@ -101,7 +101,7 @@ export function ElectionHomePage() {
         <Modal title={`${t("election_management.delete_session")}?`} onClose={toggleDeleteCommitteeSessionModal}>
           <p>
             {t("election_management.delete_session_are_you_sure", {
-              sessionLabel: committeeSessionLabel(election.role, currentCommitteeSession.number, true).toLowerCase(),
+              sessionLabel: committeeSessionLabel(election.role, currentCommitteeSession.number, true, true),
             })}
           </p>
           <nav>
@@ -126,7 +126,7 @@ export function ElectionHomePage() {
         <Modal title={t("election_management.delete_investigations_first")} onClose={toggleDeleteCommitteeSessionModal}>
           <p>
             {t("election_management.delete_investigations_first_are_you_sure", {
-              sessionLabel: committeeSessionLabel(election.role, currentCommitteeSession.number, true).toLowerCase(),
+              sessionLabel: committeeSessionLabel(election.role, currentCommitteeSession.number, true, true),
             })}
           </p>
           <nav>

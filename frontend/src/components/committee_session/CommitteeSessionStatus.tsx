@@ -6,14 +6,10 @@ import { committeeSessionLabel } from "@/utils/committeeSession";
 import cls from "./CommitteeSessionStatus.module.css";
 
 function CommitteeSessionStatusLabel(
-  electionRole: ElectionRole,
+  _electionRole: ElectionRole,
   status: CommitteeSessionStatus,
   role: "coordinator" | "typist",
 ): string {
-  if (electionRole === "CSB") {
-    return t("committee_session_status.session");
-  }
-
   return t(`committee_session_status.${role}.${status}`);
 }
 
@@ -33,7 +29,7 @@ export function HeaderCommitteeSessionStatusWithIcon({
 }) {
   let sessionLabel: string | undefined;
   if (status === "completed" && userRole === "coordinator") {
-    sessionLabel = `(${committeeSessionLabel(electionRole, committeeSessionNumber).toLowerCase()})`;
+    sessionLabel = `(${committeeSessionLabel(electionRole, committeeSessionNumber, false, true)})`;
   }
   return (
     <div className={cls.committee_session_status}>

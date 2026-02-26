@@ -115,7 +115,9 @@ fn test_sort_candidates_alphabetically() {
         ("N.", "Zee"),
         ("D.", "Zee"),
         ("D.J.E", "Korte"),
+        ("N.B.", "Groen"),
         ("N.", "Groen"),
+        ("N.A.", "Groen"),
     ];
 
     let candidates: Vec<Candidate> = names
@@ -144,6 +146,8 @@ fn test_sort_candidates_alphabetically() {
             ("M.", "Appel"),
             ("A.", "Duin"),
             ("N.", "Groen"),
+            ("N.A.", "Groen"),
+            ("N.B.", "Groen"),
             ("D.J.E", "Korte"),
             ("A.", "Zee"),
             ("D.", "Zee"),

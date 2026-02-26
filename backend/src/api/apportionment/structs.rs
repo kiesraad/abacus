@@ -7,7 +7,7 @@ use crate::{
     domain::{
         data_entry::{CandidateVotes, PoliticalGroupCandidateVotes},
         display_fraction::DisplayFraction,
-        election::{Candidate, CandidateNumber, PGNumber},
+        election::{self, Candidate, PGNumber},
         summary::ElectionSummary,
     },
     infra::audit_log::{AsAuditEvent, AuditEvent, AuditEventType, as_audit_event},
@@ -49,7 +49,7 @@ impl ListVotesTrait for PoliticalGroupCandidateVotes {
 }
 
 impl CandidateVotesTrait for CandidateVotes {
-    type CandidateNumber = CandidateNumber;
+    type CandidateNumber = election::CandidateNumber;
 
     fn number(&self) -> Self::CandidateNumber {
         self.number

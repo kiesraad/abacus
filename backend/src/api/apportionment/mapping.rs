@@ -2,12 +2,11 @@ use std::collections::HashMap;
 
 use crate::{
     api::apportionment::structs::{
-        CandidateNomination, ListCandidateNomination, ListSeatAssignment, PreferenceThreshold,
-        SeatAssignment,
+        CandidateNomination, DisplayFraction, ListCandidateNomination, ListSeatAssignment,
+        PreferenceThreshold, SeatAssignment,
     },
     domain::{
         data_entry::PoliticalGroupCandidateVotes,
-        display_fraction::DisplayFraction,
         election::{Candidate, CandidateNumber, PGNumber, PoliticalGroup},
     },
 };
@@ -104,55 +103,74 @@ pub fn map_candidate_nomination(
     }
 }
 
-#[test]
-fn test_sort_candidates_alphabetically() {
-    // (initials, last name)
-    let names: Vec<(&str, &str)> = vec![
-        ("A.", "Duin"),
-        ("M.", "Appel"),
-        ("M.", "Zee"),
-        ("A.", "Zee"),
-        ("N.", "Zee"),
-        ("D.", "Zee"),
-        ("D.J.E", "Korte"),
-        ("N.B.", "Groen"),
-        ("N.", "Groen"),
-        ("N.A.", "Groen"),
-    ];
+#[cfg(test)]
+mod tests {
+    use crate::{
+        api::apportionment::mapping::sort_candidates_alphabetically,
+        domain::election::{Candidate, CandidateNumber},
+    };
 
-    let candidates: Vec<Candidate> = names
-        .iter()
-        .enumerate()
-        .map(|(i, &(initials, last_name))| Candidate {
-            number: CandidateNumber::from(u32::try_from(i).unwrap() + 1),
-            initials: initials.to_string(),
-            first_name: None,
-            last_name_prefix: None,
-            last_name: last_name.to_string(),
-            locality: String::new(),
-            country_code: None,
-            gender: None,
-        })
-        .collect();
-    let sorted_candidates = sort_candidates_alphabetically(candidates);
+    use super::DisplayFraction;
 
-    let sorted_names: Vec<(&str, &str)> = sorted_candidates
-        .iter()
-        .map(|c| (c.initials.as_str(), c.last_name.as_str()))
-        .collect();
-    assert_eq!(
-        sorted_names,
-        vec![
-            ("M.", "Appel"),
+    #[test]
+    fn test_display_fraction() {
+        let fraction = apportionment::Fraction::new(11, 5);
+        let display_fraction = DisplayFraction::from(fraction);
+        assert_eq!(display_fraction.integer, 2);
+        assert_eq!(display_fraction.numerator, 1);
+        assert_eq!(display_fraction.denominator, 5);
+    }
+
+    #[test]
+    fn test_sort_candidates_alphabetically() {
+        // (initials, last name)
+        let names: Vec<(&str, &str)> = vec![
             ("A.", "Duin"),
+            ("M.", "Appel"),
+            ("M.", "Zee"),
+            ("A.", "Zee"),
+            ("N.", "Zee"),
+            ("D.", "Zee"),
+            ("D.J.E", "Korte"),
+            ("N.B.", "Groen"),
             ("N.", "Groen"),
             ("N.A.", "Groen"),
-            ("N.B.", "Groen"),
-            ("D.J.E", "Korte"),
-            ("A.", "Zee"),
-            ("D.", "Zee"),
-            ("M.", "Zee"),
-            ("N.", "Zee"),
-        ]
-    );
+        ];
+
+        let candidates: Vec<Candidate> = names
+            .iter()
+            .enumerate()
+            .map(|(i, &(initials, last_name))| Candidate {
+                number: CandidateNumber::from(u32::try_from(i).unwrap() + 1),
+                initials: initials.to_string(),
+                first_name: None,
+                last_name_prefix: None,
+                last_name: last_name.to_string(),
+                locality: String::new(),
+                country_code: None,
+                gender: None,
+            })
+            .collect();
+        let sorted_candidates = sort_candidates_alphabetically(candidates);
+
+        let sorted_names: Vec<(&str, &str)> = sorted_candidates
+            .iter()
+            .map(|c| (c.initials.as_str(), c.last_name.as_str()))
+            .collect();
+        assert_eq!(
+            sorted_names,
+            vec![
+                ("M.", "Appel"),
+                ("A.", "Duin"),
+                ("N.", "Groen"),
+                ("N.A.", "Groen"),
+                ("N.B.", "Groen"),
+                ("D.J.E", "Korte"),
+                ("A.", "Zee"),
+                ("D.", "Zee"),
+                ("M.", "Zee"),
+                ("N.", "Zee"),
+            ]
+        );
+    }
 }

@@ -3,7 +3,6 @@ pub mod committee_session_status;
 pub mod comparison;
 pub mod data_entry;
 pub mod data_entry_status;
-pub mod display_fraction;
 pub mod election;
 pub mod entry_number;
 pub mod file;

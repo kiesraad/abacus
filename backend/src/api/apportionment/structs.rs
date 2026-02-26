@@ -6,7 +6,6 @@ use crate::{
     api::election::ElectionDetails,
     domain::{
         data_entry::{CandidateVotes, PoliticalGroupCandidateVotes},
-        display_fraction::DisplayFraction,
         election::{self, Candidate, PGNumber},
         summary::ElectionSummary,
     },
@@ -57,6 +56,25 @@ impl apportionment::CandidateVotes for CandidateVotes {
 
     fn votes(&self) -> u32 {
         self.votes
+    }
+}
+
+/// Fraction with the integer part split out for display purposes
+#[derive(Debug, Serialize, ToSchema)]
+pub struct DisplayFraction {
+    pub integer: u64,
+    pub numerator: u64,
+    pub denominator: u64,
+}
+
+impl From<apportionment::Fraction> for DisplayFraction {
+    fn from(fraction: apportionment::Fraction) -> Self {
+        let remainder = fraction.fractional_part();
+        Self {
+            integer: fraction.integer_part(),
+            numerator: remainder.numerator,
+            denominator: remainder.denominator,
+        }
     }
 }
 

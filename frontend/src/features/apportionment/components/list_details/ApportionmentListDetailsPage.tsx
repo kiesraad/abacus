@@ -134,58 +134,58 @@ function TotalVotesPerCandidateSection({ candidateVotesList, candidates }: Total
 export function ApportionmentListDetailsPage() {
   const { election } = useElection();
   const { seatAssignment, candidateNomination, electionSummary, error } = useApportionmentContext();
-  const pgNumber = useNumericParam("pgNumber");
+  const listNumber = useNumericParam("listNumber");
 
-  const pg = election.political_groups.find((group) => group.number === pgNumber);
+  const list = election.political_groups.find((group) => group.number === listNumber);
 
-  if (!pg) {
+  if (!list) {
     throw new NotFoundError("error.not_found");
   }
 
-  const pgName = formatPoliticalGroupName(pg);
+  const listName = formatPoliticalGroupName(list);
 
   if (error) {
-    return <ApportionmentErrorPage sectionTitle={pgName} error={error} />;
+    return <ApportionmentErrorPage sectionTitle={listName} error={error} />;
   }
   if (seatAssignment && candidateNomination && electionSummary) {
-    const pgTotalSeats = seatAssignment.final_standing[pg.number - 1]?.total_seats;
-    const candidateVotesList = electionSummary.political_group_votes[pg.number - 1]?.candidate_votes;
-    const pgCandidateNomination = candidateNomination.political_group_candidate_nomination[pg.number - 1];
+    const listTotalSeats = seatAssignment.final_standing[list.number - 1]?.total_seats;
+    const candidateVotesList = electionSummary.political_group_votes[list.number - 1]?.candidate_votes;
+    const listCandidateNomination = candidateNomination.list_candidate_nomination[list.number - 1];
 
-    if (pgTotalSeats !== undefined && candidateVotesList && pgCandidateNomination) {
+    if (listTotalSeats !== undefined && candidateVotesList && listCandidateNomination) {
       return (
         <>
-          {render_title_and_header(pgName)}
+          {render_title_and_header(listName)}
           <main>
             <article className={cls.article}>
               <div className={cn(cls.tableDiv, "mb-lg")}>
                 <div>
                   <h2 className={cls.tableTitle}>{t("apportionment.assigned_number_of_seats")}</h2>
-                  <span id="text-political-group-assigned-nr-seats">
+                  <span id="text-list-assigned-nr-seats">
                     {tx(
-                      `apportionment.political_group_assigned_nr_seats.${pgTotalSeats === 1 ? "singular" : "plural"}`,
+                      `apportionment.list_assigned_nr_seats.${listTotalSeats === 1 ? "singular" : "plural"}`,
                       {},
                       {
-                        pg_name: pgName,
-                        num_seats: pgTotalSeats,
+                        list_name: listName,
+                        num_seats: listTotalSeats,
                       },
                     )}
                   </span>
                 </div>
               </div>
               <PreferentiallyChosenCandidatesSection
-                preferentialCandidateNomination={pgCandidateNomination.preferential_candidate_nomination}
+                preferentialCandidateNomination={listCandidateNomination.preferential_candidate_nomination}
                 preferenceThresholdPercentage={candidateNomination.preference_threshold.percentage}
-                candidates={pg.candidates}
+                candidates={list.candidates}
               />
               <OtherChosenCandidatesSection
-                otherCandidateNomination={pgCandidateNomination.other_candidate_nomination}
-                candidates={pg.candidates}
+                otherCandidateNomination={listCandidateNomination.other_candidate_nomination}
+                candidates={list.candidates}
               />
               <UpdatedCandidateRankingSection
-                updatedCandidateRanking={pgCandidateNomination.updated_candidate_ranking}
+                updatedCandidateRanking={listCandidateNomination.updated_candidate_ranking}
               />
-              <TotalVotesPerCandidateSection candidates={pg.candidates} candidateVotesList={candidateVotesList} />
+              <TotalVotesPerCandidateSection candidates={list.candidates} candidateVotesList={candidateVotesList} />
             </article>
           </main>
         </>

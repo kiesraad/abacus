@@ -12,7 +12,7 @@ export const apportionmentRoutes: RouteObject[] = [
     children: [
       { index: true, Component: ApportionmentPage, handle: { roles: ["coordinator_gsb", "coordinator_csb"] } },
       {
-        path: ":pgNumber",
+        path: ":listNumber",
         Component: ApportionmentListDetailsPage,
         handle: { roles: ["coordinator_gsb", "coordinator_csb"] },
       },

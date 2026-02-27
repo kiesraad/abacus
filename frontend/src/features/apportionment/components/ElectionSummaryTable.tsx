@@ -1,7 +1,11 @@
 import { DisplayFraction } from "@/components/ui/DisplayFraction/DisplayFraction";
 import { Table } from "@/components/ui/Table/Table";
 import { t } from "@/i18n/translate";
-import type { Fraction, PreferenceThreshold, VotesCounts } from "@/types/generated/openapi";
+import type {
+  DisplayFraction as DisplayFractionType,
+  PreferenceThreshold,
+  VotesCounts,
+} from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 import { formatNumber } from "@/utils/number";
 
@@ -10,7 +14,7 @@ import cls from "./Apportionment.module.css";
 interface ElectionSummaryTableProps {
   votesCounts: VotesCounts;
   seats: number;
-  quota: Fraction;
+  quota: DisplayFractionType;
   numberOfVoters: number | undefined;
   preferenceThreshold: PreferenceThreshold;
 }

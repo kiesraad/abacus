@@ -5,7 +5,7 @@ import { t, tx } from "@/i18n/translate";
 import { cn } from "@/utils/classnames";
 
 import { useApportionmentContext } from "../../hooks/useApportionmentContext";
-import type { resultChange } from "../../utils/seat-change";
+import type { ResultChange } from "../../utils/seat-change";
 import { getRemovalSteps } from "../../utils/steps";
 import { render_title_and_header } from "../../utils/utils";
 import cls from "../Apportionment.module.css";
@@ -22,11 +22,11 @@ export function ApportionmentFullSeatsPage() {
   }
   if (seatAssignment) {
     const [fullSeatRemovalSteps, ,] = getRemovalSteps(seatAssignment);
-    const resultChanges: resultChange[] = [];
+    const resultChanges: ResultChange[] = [];
     fullSeatRemovalSteps.forEach((step, index) => {
       const footnoteNumber = index + 1;
       resultChanges.push({
-        pgNumber: step.change.pg_retracted_seat,
+        listNumber: step.change.list_retracted_seat,
         footnoteNumber: footnoteNumber,
         increase: 0,
         decrease: 1,
@@ -51,12 +51,12 @@ export function ApportionmentFullSeatsPage() {
               </div>
               {fullSeatRemovalSteps.length > 0 && (
                 <ol id="footnotes-list" className={cn(cls.footnotesList, "w-39")}>
-                  {fullSeatRemovalSteps.map((pgSeatRemoval, index) => {
+                  {fullSeatRemovalSteps.map((listSeatRemoval, index) => {
                     return (
                       // biome-ignore lint/suspicious/noArrayIndexKey: we can use the index as key since there is no unique id
                       <li key={index} id={`step-${index + 1}-list-exhaustion-information`}>
                         {t("apportionment.list_exhaustion_full_seat_removal", {
-                          pg_retracted_seat: pgSeatRemoval.change.pg_retracted_seat,
+                          list_retracted_seat: listSeatRemoval.change.list_retracted_seat,
                         })}
                         {index === 0 && ` ${t("apportionment.article_p10")}`}
                       </li>

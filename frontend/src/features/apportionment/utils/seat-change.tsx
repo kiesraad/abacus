@@ -3,8 +3,8 @@ import type { JSX } from "react/jsx-runtime";
 import cls from "../components/Apportionment.module.css";
 import type { AbsoluteMajorityReassignmentStep, ListExhaustionRemovalStep } from "./steps";
 
-export interface resultChange {
-  pgNumber: number;
+export interface ResultChange {
+  listNumber: number;
   footnoteNumber: number;
   increase: number;
   decrease: number;
@@ -16,12 +16,12 @@ export function getResultChanges(
   absoluteMajorityReassignment?: AbsoluteMajorityReassignmentStep,
   residualSeatRemovalSteps?: ListExhaustionRemovalStep[],
 ) {
-  const resultChanges: resultChange[] = [];
+  const resultChanges: ResultChange[] = [];
   let footnoteNumber = 0;
-  uniquePgNumbersWithFullSeatsRemoved.forEach((pgNumber) => {
+  uniquePgNumbersWithFullSeatsRemoved.forEach((listNumber) => {
     footnoteNumber += 1;
     resultChanges.push({
-      pgNumber: pgNumber,
+      listNumber: listNumber,
       footnoteNumber: footnoteNumber,
       increase: 0,
       decrease: 1,
@@ -31,14 +31,14 @@ export function getResultChanges(
   if (absoluteMajorityReassignment) {
     footnoteNumber += 1;
     resultChanges.push({
-      pgNumber: absoluteMajorityReassignment.change.pg_assigned_seat,
+      listNumber: absoluteMajorityReassignment.change.list_assigned_seat,
       footnoteNumber: footnoteNumber,
       increase: 1,
       decrease: 0,
       type: "residual_seat",
     });
     resultChanges.push({
-      pgNumber: absoluteMajorityReassignment.change.pg_retracted_seat,
+      listNumber: absoluteMajorityReassignment.change.list_retracted_seat,
       footnoteNumber: footnoteNumber,
       increase: 0,
       decrease: 1,
@@ -48,7 +48,7 @@ export function getResultChanges(
   residualSeatRemovalSteps?.forEach((step) => {
     footnoteNumber += 1;
     resultChanges.push({
-      pgNumber: step.change.pg_retracted_seat,
+      listNumber: step.change.list_retracted_seat,
       footnoteNumber: footnoteNumber,
       increase: 0,
       decrease: 1,
@@ -58,8 +58,8 @@ export function getResultChanges(
   return resultChanges;
 }
 
-export function getFootnotesFromResultChanges(pgResultChanges: resultChange[]) {
-  const footnoteNumbers = pgResultChanges.map((pgResultChange) => pgResultChange.footnoteNumber);
+export function getFootnotesFromResultChanges(listResultChanges: ResultChange[]) {
+  const footnoteNumbers = listResultChanges.map((listResultChange) => listResultChange.footnoteNumber);
   const footnoteLinks: JSX.Element[] = [];
   footnoteNumbers.forEach((footnoteNumber, index) => {
     if (index > 0) {

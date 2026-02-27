@@ -3,7 +3,7 @@ import type {
   HighestAverageAssignedSeat,
   LargestRemainderAssignedSeat,
   ListExhaustionRemovedSeat,
-  SeatAssignmentResult,
+  SeatAssignment,
   SeatChangeStep,
 } from "@/types/generated/openapi";
 
@@ -34,7 +34,7 @@ export function isListExhaustionRemovalStep(step: SeatChangeStep): step is ListE
 }
 
 export function getAssignmentSteps(
-  seatAssignment: SeatAssignmentResult,
+  seatAssignment: SeatAssignment,
 ): [
   LargestRemainderAssignmentStep[],
   UniqueHighestAverageAssignmentStep[],
@@ -50,7 +50,7 @@ export function getAssignmentSteps(
 }
 
 export function getRemovalSteps(
-  seatAssignment: SeatAssignmentResult,
+  seatAssignment: SeatAssignment,
 ): [ListExhaustionRemovalStep[], ListExhaustionRemovalStep[], number[]] {
   const listExhaustionSteps = seatAssignment.steps.filter(isListExhaustionRemovalStep);
   const fullSeatRemovalSteps = listExhaustionSteps.filter((step) => step.change.full_seat);
@@ -58,8 +58,8 @@ export function getRemovalSteps(
 
   const uniquePgNumbersWithFullSeatsRemoved: number[] = [];
   fullSeatRemovalSteps.forEach((step) => {
-    if (!uniquePgNumbersWithFullSeatsRemoved.includes(step.change.pg_retracted_seat)) {
-      uniquePgNumbersWithFullSeatsRemoved.push(step.change.pg_retracted_seat);
+    if (!uniquePgNumbersWithFullSeatsRemoved.includes(step.change.list_retracted_seat)) {
+      uniquePgNumbersWithFullSeatsRemoved.push(step.change.list_retracted_seat);
     }
   });
   return [fullSeatRemovalSteps, residualSeatRemovalSteps, uniquePgNumbersWithFullSeatsRemoved];

@@ -125,12 +125,12 @@ describe("ApportionmentPage", () => {
   });
 
   describe("Apportionment not yet available", () => {
-    test("Not available until data entry is finalised", async () => {
+    test("Not available until committee session is completed", async () => {
       overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election, committee_session));
       overrideOnce("post", "/api/elections/1/apportionment", 412, {
-        error: "Election data entry first needs to be finalised",
+        error: "Committee session not completed",
         fatal: false,
-        reference: "ApportionmentNotAvailableUntilDataEntryFinalised",
+        reference: "ApportionmentCommitteeSessionNotCompleted",
       } satisfies ErrorResponse);
 
       renderApportionmentPage(false);
@@ -140,7 +140,7 @@ describe("ApportionmentPage", () => {
 
       expect(await screen.findByText("Zetelverdeling is nog niet beschikbaar")).toBeVisible();
       expect(
-        await screen.findByText("De zetelverdeling kan pas gemaakt worden als alle stembureaus zijn ingevoerd"),
+        await screen.findByText("De zetelverdeling kan pas gemaakt worden als de zitting is afgerond"),
       ).toBeVisible();
 
       expect(screen.queryByTestId("election-summary-table")).not.toBeInTheDocument();
@@ -153,7 +153,7 @@ describe("ApportionmentPage", () => {
       overrideOnce("post", "/api/elections/1/apportionment", 422, {
         error: "Drawing of lots is required",
         fatal: false,
-        reference: "DrawingOfLotsRequired",
+        reference: "ApportionmentDrawingOfLotsRequired",
       } satisfies ErrorResponse);
 
       renderApportionmentPage(false);
@@ -176,7 +176,7 @@ describe("ApportionmentPage", () => {
       overrideOnce("post", "/api/elections/1/apportionment", 422, {
         error: "All lists are exhausted, not enough candidates to fill all seats",
         fatal: false,
-        reference: "AllListsExhausted",
+        reference: "ApportionmentAllListsExhausted",
       } satisfies ErrorResponse);
 
       renderApportionmentPage(false);
@@ -201,7 +201,7 @@ describe("ApportionmentPage", () => {
       overrideOnce("post", "/api/elections/1/apportionment", 422, {
         error: "No votes on candidates cast",
         fatal: false,
-        reference: "ZeroVotesCast",
+        reference: "ApportionmentZeroVotesCast",
       } satisfies ErrorResponse);
 
       renderApportionmentPage(false);

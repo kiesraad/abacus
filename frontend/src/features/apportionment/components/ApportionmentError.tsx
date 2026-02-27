@@ -9,7 +9,7 @@ interface ApportionmentErrorProps {
 }
 
 export function ApportionmentError({ error }: ApportionmentErrorProps) {
-  const isError = error.reference === "ApportionmentNotAvailableUntilDataEntryFinalised";
+  const isError = error.reference === "ApportionmentCommitteeSessionNotCompleted";
   return (
     <FormLayout.Alert>
       <Alert type={isError ? "error" : "warning"}>

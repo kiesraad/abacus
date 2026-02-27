@@ -26,7 +26,7 @@ const renderApportionmentPage = () =>
 
 describe("ApportionmentListDetailsPage", () => {
   test("All tables visible", async () => {
-    vi.spyOn(ReactRouter, "useParams").mockReturnValue({ pgNumber: "1" });
+    vi.spyOn(ReactRouter, "useParams").mockReturnValue({ listNumber: "1" });
     overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election));
     overrideOnce("post", "/api/elections/1/apportionment", 200, {
       seat_assignment: seat_assignment,
@@ -39,7 +39,7 @@ describe("ApportionmentListDetailsPage", () => {
     expect(await screen.findByRole("heading", { level: 1, name: "Lijst 1 - Political Group A" })).toBeVisible();
 
     expect(await screen.findByRole("heading", { level: 2, name: "Toegewezen aantal zetels" })).toBeVisible();
-    expect(await screen.findByTestId("text-political-group-assigned-nr-seats")).toHaveTextContent(
+    expect(await screen.findByTestId("text-list-assigned-nr-seats")).toHaveTextContent(
       "Lijst 1 - Political Group A heeft 12 zetels toegewezen gekregen.",
     );
 
@@ -118,7 +118,7 @@ describe("ApportionmentListDetailsPage", () => {
   });
 
   test("No tables visible because 0 seats assigned", async () => {
-    vi.spyOn(ReactRouter, "useParams").mockReturnValue({ pgNumber: "5" });
+    vi.spyOn(ReactRouter, "useParams").mockReturnValue({ listNumber: "5" });
     overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election));
     overrideOnce("post", "/api/elections/1/apportionment", 200, {
       seat_assignment: seat_assignment,
@@ -131,7 +131,7 @@ describe("ApportionmentListDetailsPage", () => {
     expect(await screen.findByRole("heading", { level: 1, name: "Lijst 5 - Political Group E" })).toBeVisible();
 
     expect(await screen.findByRole("heading", { level: 2, name: "Toegewezen aantal zetels" })).toBeVisible();
-    expect(await screen.findByTestId("text-political-group-assigned-nr-seats")).toHaveTextContent(
+    expect(await screen.findByTestId("text-list-assigned-nr-seats")).toHaveTextContent(
       "Lijst 5 - Political Group E heeft 0 zetels toegewezen gekregen.",
     );
 
@@ -166,13 +166,13 @@ describe("ApportionmentListDetailsPage", () => {
   });
 
   describe("Apportionment not yet available", () => {
-    test("Not available until data entry is finalised", async () => {
-      vi.spyOn(ReactRouter, "useParams").mockReturnValue({ pgNumber: "1" });
+    test("Not available until committee session is completed", async () => {
+      vi.spyOn(ReactRouter, "useParams").mockReturnValue({ listNumber: "1" });
       overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election));
       overrideOnce("post", "/api/elections/1/apportionment", 412, {
-        error: "Election data entry first needs to be finalised",
+        error: "Committee session not completed",
         fatal: false,
-        reference: "ApportionmentNotAvailableUntilDataEntryFinalised",
+        reference: "ApportionmentCommitteeSessionNotCompleted",
       } satisfies ErrorResponse);
 
       renderApportionmentPage();
@@ -182,7 +182,7 @@ describe("ApportionmentListDetailsPage", () => {
 
       expect(await screen.findByText("Zetelverdeling is nog niet beschikbaar")).toBeVisible();
       expect(
-        await screen.findByText("De zetelverdeling kan pas gemaakt worden als alle stembureaus zijn ingevoerd"),
+        await screen.findByText("De zetelverdeling kan pas gemaakt worden als de zitting is afgerond"),
       ).toBeVisible();
 
       expect(screen.queryByTestId("preferentially-chosen-candidates-table")).not.toBeInTheDocument();
@@ -192,12 +192,12 @@ describe("ApportionmentListDetailsPage", () => {
     });
 
     test("Not possible because drawing of lots is not implemented yet", async () => {
-      vi.spyOn(ReactRouter, "useParams").mockReturnValue({ pgNumber: "1" });
+      vi.spyOn(ReactRouter, "useParams").mockReturnValue({ listNumber: "1" });
       overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election));
       overrideOnce("post", "/api/elections/1/apportionment", 422, {
         error: "Drawing of lots is required",
         fatal: false,
-        reference: "DrawingOfLotsRequired",
+        reference: "ApportionmentDrawingOfLotsRequired",
       } satisfies ErrorResponse);
 
       renderApportionmentPage();
@@ -217,12 +217,12 @@ describe("ApportionmentListDetailsPage", () => {
     });
 
     test("Not possible because all lists are exhausted", async () => {
-      vi.spyOn(ReactRouter, "useParams").mockReturnValue({ pgNumber: "1" });
+      vi.spyOn(ReactRouter, "useParams").mockReturnValue({ listNumber: "1" });
       overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election));
       overrideOnce("post", "/api/elections/1/apportionment", 422, {
         error: "All lists are exhausted, not enough candidates to fill all seats",
         fatal: false,
-        reference: "AllListsExhausted",
+        reference: "ApportionmentAllListsExhausted",
       } satisfies ErrorResponse);
 
       renderApportionmentPage();
@@ -244,7 +244,7 @@ describe("ApportionmentListDetailsPage", () => {
     });
 
     test("Internal Server Error renders error page", async () => {
-      vi.spyOn(ReactRouter, "useParams").mockReturnValue({ pgNumber: "1" });
+      vi.spyOn(ReactRouter, "useParams").mockReturnValue({ listNumber: "1" });
       // error is expected
       vi.spyOn(console, "error").mockImplementation(() => {});
       const router = setupTestRouter([

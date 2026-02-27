@@ -1,12 +1,12 @@
 import type {
-  CandidateNominationResult,
+  CandidateNomination,
   CommitteeSession,
   ElectionSummary,
   ElectionWithPoliticalGroups,
-  SeatAssignmentResult,
+  SeatAssignment,
 } from "@/types/generated/openapi";
 
-export const seat_assignment: SeatAssignmentResult = {
+export const seat_assignment: SeatAssignment = {
   seats: 15,
   full_seats: 10,
   residual_seats: 5,
@@ -20,9 +20,9 @@ export const seat_assignment: SeatAssignmentResult = {
       residual_seat_number: 1,
       change: {
         changed_by: "LargestRemainderAssignment",
-        selected_pg_number: 2,
-        pg_options: [2],
-        pg_assigned: [2],
+        selected_list_number: 2,
+        list_options: [2],
+        list_assigned: [2],
         remainder_votes: {
           integer: 296,
           numerator: 7,
@@ -31,7 +31,7 @@ export const seat_assignment: SeatAssignmentResult = {
       },
       standings: [
         {
-          pg_number: 1,
+          list_number: 1,
           votes_cast: 2571,
           remainder_votes: {
             integer: 189,
@@ -48,7 +48,7 @@ export const seat_assignment: SeatAssignmentResult = {
           residual_seats: 0,
         },
         {
-          pg_number: 2,
+          list_number: 2,
           votes_cast: 977,
           remainder_votes: {
             integer: 296,
@@ -65,7 +65,7 @@ export const seat_assignment: SeatAssignmentResult = {
           residual_seats: 0,
         },
         {
-          pg_number: 3,
+          list_number: 3,
           votes_cast: 567,
           remainder_votes: {
             integer: 226,
@@ -82,7 +82,7 @@ export const seat_assignment: SeatAssignmentResult = {
           residual_seats: 0,
         },
         {
-          pg_number: 4,
+          list_number: 4,
           votes_cast: 536,
           remainder_votes: {
             integer: 195,
@@ -99,7 +99,7 @@ export const seat_assignment: SeatAssignmentResult = {
           residual_seats: 0,
         },
         {
-          pg_number: 5,
+          list_number: 5,
           votes_cast: 453,
           remainder_votes: {
             integer: 112,
@@ -121,9 +121,9 @@ export const seat_assignment: SeatAssignmentResult = {
       residual_seat_number: 2,
       change: {
         changed_by: "LargestRemainderAssignment",
-        selected_pg_number: 3,
-        pg_options: [3],
-        pg_assigned: [3],
+        selected_list_number: 3,
+        list_options: [3],
+        list_assigned: [3],
         remainder_votes: {
           integer: 226,
           numerator: 11,
@@ -132,7 +132,7 @@ export const seat_assignment: SeatAssignmentResult = {
       },
       standings: [
         {
-          pg_number: 1,
+          list_number: 1,
           votes_cast: 2571,
           remainder_votes: {
             integer: 189,
@@ -149,7 +149,7 @@ export const seat_assignment: SeatAssignmentResult = {
           residual_seats: 0,
         },
         {
-          pg_number: 2,
+          list_number: 2,
           votes_cast: 977,
           remainder_votes: {
             integer: 296,
@@ -166,7 +166,7 @@ export const seat_assignment: SeatAssignmentResult = {
           residual_seats: 1,
         },
         {
-          pg_number: 3,
+          list_number: 3,
           votes_cast: 567,
           remainder_votes: {
             integer: 226,
@@ -183,7 +183,7 @@ export const seat_assignment: SeatAssignmentResult = {
           residual_seats: 0,
         },
         {
-          pg_number: 4,
+          list_number: 4,
           votes_cast: 536,
           remainder_votes: {
             integer: 195,
@@ -200,7 +200,7 @@ export const seat_assignment: SeatAssignmentResult = {
           residual_seats: 0,
         },
         {
-          pg_number: 5,
+          list_number: 5,
           votes_cast: 453,
           remainder_votes: {
             integer: 112,
@@ -222,9 +222,9 @@ export const seat_assignment: SeatAssignmentResult = {
       residual_seat_number: 3,
       change: {
         changed_by: "LargestRemainderAssignment",
-        selected_pg_number: 4,
-        pg_options: [4],
-        pg_assigned: [4],
+        selected_list_number: 4,
+        list_options: [4],
+        list_assigned: [4],
         remainder_votes: {
           integer: 195,
           numerator: 11,
@@ -233,7 +233,7 @@ export const seat_assignment: SeatAssignmentResult = {
       },
       standings: [
         {
-          pg_number: 1,
+          list_number: 1,
           votes_cast: 2571,
           remainder_votes: {
             integer: 189,
@@ -250,7 +250,7 @@ export const seat_assignment: SeatAssignmentResult = {
           residual_seats: 0,
         },
         {
-          pg_number: 2,
+          list_number: 2,
           votes_cast: 977,
           remainder_votes: {
             integer: 296,
@@ -267,7 +267,7 @@ export const seat_assignment: SeatAssignmentResult = {
           residual_seats: 1,
         },
         {
-          pg_number: 3,
+          list_number: 3,
           votes_cast: 567,
           remainder_votes: {
             integer: 226,
@@ -284,7 +284,7 @@ export const seat_assignment: SeatAssignmentResult = {
           residual_seats: 1,
         },
         {
-          pg_number: 4,
+          list_number: 4,
           votes_cast: 536,
           remainder_votes: {
             integer: 195,
@@ -301,7 +301,7 @@ export const seat_assignment: SeatAssignmentResult = {
           residual_seats: 0,
         },
         {
-          pg_number: 5,
+          list_number: 5,
           votes_cast: 453,
           remainder_votes: {
             integer: 112,
@@ -322,12 +322,12 @@ export const seat_assignment: SeatAssignmentResult = {
     {
       change: {
         changed_by: "AbsoluteMajorityReassignment",
-        pg_retracted_seat: 4,
-        pg_assigned_seat: 1,
+        list_retracted_seat: 4,
+        list_assigned_seat: 1,
       },
       standings: [
         {
-          pg_number: 1,
+          list_number: 1,
           votes_cast: 2571,
           remainder_votes: {
             integer: 189,
@@ -344,7 +344,7 @@ export const seat_assignment: SeatAssignmentResult = {
           residual_seats: 1,
         },
         {
-          pg_number: 2,
+          list_number: 2,
           votes_cast: 977,
           remainder_votes: {
             integer: 296,
@@ -361,7 +361,7 @@ export const seat_assignment: SeatAssignmentResult = {
           residual_seats: 1,
         },
         {
-          pg_number: 3,
+          list_number: 3,
           votes_cast: 567,
           remainder_votes: {
             integer: 226,
@@ -378,7 +378,7 @@ export const seat_assignment: SeatAssignmentResult = {
           residual_seats: 1,
         },
         {
-          pg_number: 4,
+          list_number: 4,
           votes_cast: 536,
           remainder_votes: {
             integer: 195,
@@ -395,7 +395,7 @@ export const seat_assignment: SeatAssignmentResult = {
           residual_seats: 0,
         },
         {
-          pg_number: 5,
+          list_number: 5,
           votes_cast: 453,
           remainder_votes: {
             integer: 112,
@@ -416,12 +416,12 @@ export const seat_assignment: SeatAssignmentResult = {
     {
       change: {
         changed_by: "ListExhaustionRemoval",
-        pg_retracted_seat: 1,
+        list_retracted_seat: 1,
         full_seat: false,
       },
       standings: [
         {
-          pg_number: 1,
+          list_number: 1,
           votes_cast: 2571,
           remainder_votes: {
             integer: 189,
@@ -438,7 +438,7 @@ export const seat_assignment: SeatAssignmentResult = {
           residual_seats: 0,
         },
         {
-          pg_number: 2,
+          list_number: 2,
           votes_cast: 977,
           remainder_votes: {
             integer: 296,
@@ -455,7 +455,7 @@ export const seat_assignment: SeatAssignmentResult = {
           residual_seats: 1,
         },
         {
-          pg_number: 3,
+          list_number: 3,
           votes_cast: 567,
           remainder_votes: {
             integer: 226,
@@ -472,7 +472,7 @@ export const seat_assignment: SeatAssignmentResult = {
           residual_seats: 1,
         },
         {
-          pg_number: 4,
+          list_number: 4,
           votes_cast: 536,
           remainder_votes: {
             integer: 195,
@@ -489,7 +489,7 @@ export const seat_assignment: SeatAssignmentResult = {
           residual_seats: 0,
         },
         {
-          pg_number: 5,
+          list_number: 5,
           votes_cast: 453,
           remainder_votes: {
             integer: 112,
@@ -510,12 +510,12 @@ export const seat_assignment: SeatAssignmentResult = {
     {
       change: {
         changed_by: "ListExhaustionRemoval",
-        pg_retracted_seat: 1,
+        list_retracted_seat: 1,
         full_seat: true,
       },
       standings: [
         {
-          pg_number: 1,
+          list_number: 1,
           votes_cast: 2571,
           remainder_votes: {
             integer: 189,
@@ -532,7 +532,7 @@ export const seat_assignment: SeatAssignmentResult = {
           residual_seats: 0,
         },
         {
-          pg_number: 2,
+          list_number: 2,
           votes_cast: 977,
           remainder_votes: {
             integer: 296,
@@ -549,7 +549,7 @@ export const seat_assignment: SeatAssignmentResult = {
           residual_seats: 1,
         },
         {
-          pg_number: 3,
+          list_number: 3,
           votes_cast: 567,
           remainder_votes: {
             integer: 226,
@@ -566,7 +566,7 @@ export const seat_assignment: SeatAssignmentResult = {
           residual_seats: 1,
         },
         {
-          pg_number: 4,
+          list_number: 4,
           votes_cast: 536,
           remainder_votes: {
             integer: 195,
@@ -583,7 +583,7 @@ export const seat_assignment: SeatAssignmentResult = {
           residual_seats: 0,
         },
         {
-          pg_number: 5,
+          list_number: 5,
           votes_cast: 453,
           remainder_votes: {
             integer: 112,
@@ -604,12 +604,12 @@ export const seat_assignment: SeatAssignmentResult = {
     {
       change: {
         changed_by: "ListExhaustionRemoval",
-        pg_retracted_seat: 1,
+        list_retracted_seat: 1,
         full_seat: true,
       },
       standings: [
         {
-          pg_number: 1,
+          list_number: 1,
           votes_cast: 2571,
           remainder_votes: {
             integer: 189,
@@ -626,7 +626,7 @@ export const seat_assignment: SeatAssignmentResult = {
           residual_seats: 0,
         },
         {
-          pg_number: 2,
+          list_number: 2,
           votes_cast: 977,
           remainder_votes: {
             integer: 296,
@@ -643,7 +643,7 @@ export const seat_assignment: SeatAssignmentResult = {
           residual_seats: 1,
         },
         {
-          pg_number: 3,
+          list_number: 3,
           votes_cast: 567,
           remainder_votes: {
             integer: 226,
@@ -660,7 +660,7 @@ export const seat_assignment: SeatAssignmentResult = {
           residual_seats: 1,
         },
         {
-          pg_number: 4,
+          list_number: 4,
           votes_cast: 536,
           remainder_votes: {
             integer: 195,
@@ -677,7 +677,7 @@ export const seat_assignment: SeatAssignmentResult = {
           residual_seats: 0,
         },
         {
-          pg_number: 5,
+          list_number: 5,
           votes_cast: 453,
           remainder_votes: {
             integer: 112,
@@ -699,9 +699,9 @@ export const seat_assignment: SeatAssignmentResult = {
       residual_seat_number: 4,
       change: {
         changed_by: "LargestRemainderAssignment",
-        selected_pg_number: 4,
-        pg_options: [4],
-        pg_assigned: [4],
+        selected_list_number: 4,
+        list_options: [4],
+        list_assigned: [4],
         remainder_votes: {
           integer: 195,
           numerator: 11,
@@ -710,7 +710,7 @@ export const seat_assignment: SeatAssignmentResult = {
       },
       standings: [
         {
-          pg_number: 1,
+          list_number: 1,
           votes_cast: 2571,
           remainder_votes: {
             integer: 189,
@@ -727,7 +727,7 @@ export const seat_assignment: SeatAssignmentResult = {
           residual_seats: 0,
         },
         {
-          pg_number: 2,
+          list_number: 2,
           votes_cast: 977,
           remainder_votes: {
             integer: 296,
@@ -744,7 +744,7 @@ export const seat_assignment: SeatAssignmentResult = {
           residual_seats: 1,
         },
         {
-          pg_number: 3,
+          list_number: 3,
           votes_cast: 567,
           remainder_votes: {
             integer: 226,
@@ -761,7 +761,7 @@ export const seat_assignment: SeatAssignmentResult = {
           residual_seats: 1,
         },
         {
-          pg_number: 4,
+          list_number: 4,
           votes_cast: 536,
           remainder_votes: {
             integer: 195,
@@ -778,7 +778,7 @@ export const seat_assignment: SeatAssignmentResult = {
           residual_seats: 0,
         },
         {
-          pg_number: 5,
+          list_number: 5,
           votes_cast: 453,
           remainder_votes: {
             integer: 112,
@@ -800,9 +800,9 @@ export const seat_assignment: SeatAssignmentResult = {
       residual_seat_number: 5,
       change: {
         changed_by: "LargestRemainderAssignment",
-        selected_pg_number: 5,
-        pg_options: [5],
-        pg_assigned: [5],
+        selected_list_number: 5,
+        list_options: [5],
+        list_assigned: [5],
         remainder_votes: {
           integer: 112,
           numerator: 11,
@@ -811,7 +811,7 @@ export const seat_assignment: SeatAssignmentResult = {
       },
       standings: [
         {
-          pg_number: 1,
+          list_number: 1,
           votes_cast: 2571,
           remainder_votes: {
             integer: 189,
@@ -828,7 +828,7 @@ export const seat_assignment: SeatAssignmentResult = {
           residual_seats: 0,
         },
         {
-          pg_number: 2,
+          list_number: 2,
           votes_cast: 977,
           remainder_votes: {
             integer: 296,
@@ -845,7 +845,7 @@ export const seat_assignment: SeatAssignmentResult = {
           residual_seats: 1,
         },
         {
-          pg_number: 3,
+          list_number: 3,
           votes_cast: 567,
           remainder_votes: {
             integer: 226,
@@ -862,7 +862,7 @@ export const seat_assignment: SeatAssignmentResult = {
           residual_seats: 1,
         },
         {
-          pg_number: 4,
+          list_number: 4,
           votes_cast: 536,
           remainder_votes: {
             integer: 195,
@@ -879,7 +879,7 @@ export const seat_assignment: SeatAssignmentResult = {
           residual_seats: 1,
         },
         {
-          pg_number: 5,
+          list_number: 5,
           votes_cast: 453,
           remainder_votes: {
             integer: 112,
@@ -901,10 +901,10 @@ export const seat_assignment: SeatAssignmentResult = {
       residual_seat_number: 6,
       change: {
         changed_by: "UniqueHighestAverageAssignment",
-        selected_pg_number: 2,
-        pg_options: [2],
-        pg_assigned: [2],
-        pg_exhausted: [1, 3, 4, 5],
+        selected_list_number: 2,
+        list_options: [2],
+        list_assigned: [2],
+        list_exhausted: [1, 3, 4, 5],
         votes_per_seat: {
           integer: 244,
           numerator: 1,
@@ -913,7 +913,7 @@ export const seat_assignment: SeatAssignmentResult = {
       },
       standings: [
         {
-          pg_number: 1,
+          list_number: 1,
           votes_cast: 2571,
           remainder_votes: {
             integer: 189,
@@ -930,7 +930,7 @@ export const seat_assignment: SeatAssignmentResult = {
           residual_seats: 0,
         },
         {
-          pg_number: 2,
+          list_number: 2,
           votes_cast: 977,
           remainder_votes: {
             integer: 296,
@@ -947,7 +947,7 @@ export const seat_assignment: SeatAssignmentResult = {
           residual_seats: 1,
         },
         {
-          pg_number: 3,
+          list_number: 3,
           votes_cast: 567,
           remainder_votes: {
             integer: 226,
@@ -964,7 +964,7 @@ export const seat_assignment: SeatAssignmentResult = {
           residual_seats: 1,
         },
         {
-          pg_number: 4,
+          list_number: 4,
           votes_cast: 536,
           remainder_votes: {
             integer: 195,
@@ -981,7 +981,7 @@ export const seat_assignment: SeatAssignmentResult = {
           residual_seats: 1,
         },
         {
-          pg_number: 5,
+          list_number: 5,
           votes_cast: 453,
           remainder_votes: {
             integer: 112,
@@ -1002,7 +1002,7 @@ export const seat_assignment: SeatAssignmentResult = {
   ],
   final_standing: [
     {
-      pg_number: 1,
+      list_number: 1,
       votes_cast: 2571,
       remainder_votes: {
         integer: 189,
@@ -1015,7 +1015,7 @@ export const seat_assignment: SeatAssignmentResult = {
       total_seats: 5,
     },
     {
-      pg_number: 2,
+      list_number: 2,
       votes_cast: 977,
       remainder_votes: {
         integer: 296,
@@ -1028,7 +1028,7 @@ export const seat_assignment: SeatAssignmentResult = {
       total_seats: 4,
     },
     {
-      pg_number: 3,
+      list_number: 3,
       votes_cast: 567,
       remainder_votes: {
         integer: 226,
@@ -1041,7 +1041,7 @@ export const seat_assignment: SeatAssignmentResult = {
       total_seats: 2,
     },
     {
-      pg_number: 4,
+      list_number: 4,
       votes_cast: 536,
       remainder_votes: {
         integer: 195,
@@ -1054,7 +1054,7 @@ export const seat_assignment: SeatAssignmentResult = {
       total_seats: 2,
     },
     {
-      pg_number: 5,
+      list_number: 5,
       votes_cast: 453,
       remainder_votes: {
         integer: 112,
@@ -1069,7 +1069,7 @@ export const seat_assignment: SeatAssignmentResult = {
   ],
 };
 
-export const candidate_nomination: CandidateNominationResult = {
+export const candidate_nomination: CandidateNomination = {
   preference_threshold: {
     percentage: 50,
     number_of_votes: {
@@ -1202,11 +1202,11 @@ export const candidate_nomination: CandidateNominationResult = {
       gender: "Male",
     },
   ],
-  political_group_candidate_nomination: [
+  list_candidate_nomination: [
     {
-      pg_number: 1,
-      pg_name: "Political Group A",
-      pg_seats: 5,
+      list_number: 1,
+      list_name: "Political Group A",
+      list_seats: 5,
       preferential_candidate_nomination: [
         {
           number: 1,
@@ -1275,9 +1275,9 @@ export const candidate_nomination: CandidateNominationResult = {
       ],
     },
     {
-      pg_number: 2,
-      pg_name: "Political Group B",
-      pg_seats: 4,
+      list_number: 2,
+      list_name: "Political Group B",
+      list_seats: 4,
       preferential_candidate_nomination: [
         {
           number: 1,
@@ -1334,9 +1334,9 @@ export const candidate_nomination: CandidateNominationResult = {
       ],
     },
     {
-      pg_number: 3,
-      pg_name: "Political Group C",
-      pg_seats: 2,
+      list_number: 3,
+      list_name: "Political Group C",
+      list_seats: 2,
       preferential_candidate_nomination: [
         {
           number: 1,
@@ -1351,9 +1351,9 @@ export const candidate_nomination: CandidateNominationResult = {
       updated_candidate_ranking: [],
     },
     {
-      pg_number: 4,
-      pg_name: "Political Group D",
-      pg_seats: 2,
+      list_number: 4,
+      list_name: "Political Group D",
+      list_seats: 2,
       preferential_candidate_nomination: [
         {
           number: 1,
@@ -1369,9 +1369,9 @@ export const candidate_nomination: CandidateNominationResult = {
       updated_candidate_ranking: [],
     },
     {
-      pg_number: 5,
-      pg_name: "Political Group E",
-      pg_seats: 2,
+      list_number: 5,
+      list_name: "Political Group E",
+      list_seats: 2,
       preferential_candidate_nomination: [
         {
           number: 1,

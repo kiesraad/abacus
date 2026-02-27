@@ -1,11 +1,11 @@
 import type { ReactNode } from "react";
 
-import type { Fraction } from "@/types/generated/openapi";
+import type { DisplayFraction as DisplayFractionType } from "@/types/generated/openapi";
 import { getFractionInteger, getFractionWithoutInteger } from "@/utils/fraction";
 
 import cls from "./DisplayFraction.module.css";
 
-export function DisplayFraction({ id, fraction }: { id: string; fraction: Fraction }): ReactNode {
+export function DisplayFraction({ id, fraction }: { id: string; fraction: DisplayFractionType }): ReactNode {
   return (
     <div id={id} className={cls.displayFraction}>
       <span>{getFractionInteger(fraction)}</span>

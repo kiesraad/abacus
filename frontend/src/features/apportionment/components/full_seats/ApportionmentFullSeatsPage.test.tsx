@@ -89,11 +89,11 @@ describe("ApportionmentFullSeatsPage", () => {
       ["5", "Political Group E", "453", ":", "340", "4/15", "=", "1"],
     ]);
 
-    expect(await screen.findByTestId("1-list-exhaustion-information")).toHaveTextContent(
-      "1 Omdat lijst 1 onvoldoende kandidaten heeft, is één volle zetel herverdeeld als restzetel. (Kieswet, artikel P 10)",
+    expect(await screen.findByTestId("step-1-list-exhaustion-information")).toHaveTextContent(
+      "Omdat lijst 1 onvoldoende kandidaten heeft, is één volle zetel herverdeeld als restzetel. (Kieswet, artikel P 10)",
     );
-    expect(await screen.findByTestId("2-list-exhaustion-information")).toHaveTextContent(
-      "2 Omdat lijst 1 onvoldoende kandidaten heeft, is één volle zetel herverdeeld als restzetel.",
+    expect(await screen.findByTestId("step-2-list-exhaustion-information")).toHaveTextContent(
+      "Omdat lijst 1 onvoldoende kandidaten heeft, is één volle zetel herverdeeld als restzetel.",
     );
 
     expect(await screen.findByRole("heading", { level: 2, name: "Hoeveel restzetels zijn er te verdelen?" }));
@@ -107,12 +107,12 @@ describe("ApportionmentFullSeatsPage", () => {
   });
 
   describe("Apportionment not yet available", () => {
-    test("Not available until data entry is finalised", async () => {
+    test("Not available until committee session is completed", async () => {
       overrideOnce("get", "/api/elections/1", 200, getElectionMockData(lt19Seats.election));
       overrideOnce("post", "/api/elections/1/apportionment", 412, {
-        error: "Election data entry first needs to be finalised",
+        error: "Committee session not completed",
         fatal: false,
-        reference: "ApportionmentNotAvailableUntilDataEntryFinalised",
+        reference: "ApportionmentCommitteeSessionNotCompleted",
       } satisfies ErrorResponse);
 
       renderApportionmentFullSeatsPage();
@@ -122,7 +122,7 @@ describe("ApportionmentFullSeatsPage", () => {
 
       expect(await screen.findByText("Zetelverdeling is nog niet beschikbaar")).toBeVisible();
       expect(
-        await screen.findByText("De zetelverdeling kan pas gemaakt worden als alle stembureaus zijn ingevoerd"),
+        await screen.findByText("De zetelverdeling kan pas gemaakt worden als de zitting is afgerond"),
       ).toBeVisible();
 
       expect(screen.queryByTestId("full-seats-table")).not.toBeInTheDocument();
@@ -134,7 +134,7 @@ describe("ApportionmentFullSeatsPage", () => {
       overrideOnce("post", "/api/elections/1/apportionment", 422, {
         error: "Drawing of lots is required",
         fatal: false,
-        reference: "DrawingOfLotsRequired",
+        reference: "ApportionmentDrawingOfLotsRequired",
       } satisfies ErrorResponse);
 
       renderApportionmentFullSeatsPage();
@@ -156,7 +156,7 @@ describe("ApportionmentFullSeatsPage", () => {
       overrideOnce("post", "/api/elections/1/apportionment", 422, {
         error: "All lists are exhausted, not enough candidates to fill all seats",
         fatal: false,
-        reference: "AllListsExhausted",
+        reference: "ApportionmentAllListsExhausted",
       } satisfies ErrorResponse);
 
       renderApportionmentFullSeatsPage();
@@ -180,7 +180,7 @@ describe("ApportionmentFullSeatsPage", () => {
       overrideOnce("post", "/api/elections/1/apportionment", 422, {
         error: "No votes on candidates cast",
         fatal: false,
-        reference: "ZeroVotesCast",
+        reference: "ApportionmentZeroVotesCast",
       } satisfies ErrorResponse);
 
       renderApportionmentFullSeatsPage();

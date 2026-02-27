@@ -1,6 +1,6 @@
 import { Table } from "@/components/ui/Table/Table";
 import { t } from "@/i18n/translate";
-import type { PoliticalGroup, PoliticalGroupSeatAssignment } from "@/types/generated/openapi";
+import type { ListSeatAssignment, PoliticalGroup } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 
 import type { UniqueHighestAverageAssignmentStep } from "../../utils/steps";
@@ -8,7 +8,7 @@ import cls from "../Apportionment.module.css";
 
 interface UniqueHighestAveragesTableProps {
   steps: UniqueHighestAverageAssignmentStep[];
-  finalStanding: PoliticalGroupSeatAssignment[];
+  finalStanding: ListSeatAssignment[];
   politicalGroups: PoliticalGroup[];
 }
 
@@ -25,23 +25,23 @@ export function UniqueHighestAveragesTable({ steps, finalStanding, politicalGrou
         <Table.HeaderCell className="text-align-r">{t("apportionment.residual_seats_count")}</Table.HeaderCell>
       </Table.Header>
       <Table.Body>
-        {finalStanding.map((pgSeatAssignment) => {
-          if (steps[0]?.change.pg_exhausted.includes(pgSeatAssignment.pg_number)) {
+        {finalStanding.map((listSeatAssignment) => {
+          if (steps[0]?.change.list_exhausted.includes(listSeatAssignment.list_number)) {
             return null;
           } else {
-            const average = steps[0]?.standings[pgSeatAssignment.pg_number - 1]?.next_votes_per_seat;
-            const pgSeatAssignmentSteps = steps.filter((step) => {
-              return step.change.selected_pg_number === pgSeatAssignment.pg_number;
+            const average = steps[0]?.standings[listSeatAssignment.list_number - 1]?.next_votes_per_seat;
+            const listSeatAssignmentSteps = steps.filter((step) => {
+              return step.change.selected_list_number === listSeatAssignment.list_number;
             });
             return (
-              <Table.Row key={pgSeatAssignment.pg_number}>
+              <Table.Row key={listSeatAssignment.list_number}>
                 <Table.Cell className={cn(cls.listNumberColumn, "text-align-r", "font-number")}>
-                  {pgSeatAssignment.pg_number}
+                  {listSeatAssignment.list_number}
                 </Table.Cell>
-                <Table.Cell>{politicalGroups[pgSeatAssignment.pg_number - 1]?.name || ""}</Table.Cell>
-                <Table.NumberCell className="bold">{pgSeatAssignment.full_seats}</Table.NumberCell>
+                <Table.Cell>{politicalGroups[listSeatAssignment.list_number - 1]?.name || ""}</Table.Cell>
+                <Table.NumberCell className="bold">{listSeatAssignment.full_seats}</Table.NumberCell>
                 <Table.DisplayFractionCells>{average}</Table.DisplayFractionCells>
-                <Table.NumberCell className="bold">{pgSeatAssignmentSteps.length}</Table.NumberCell>
+                <Table.NumberCell className="bold">{listSeatAssignmentSteps.length}</Table.NumberCell>
               </Table.Row>
             );
           }

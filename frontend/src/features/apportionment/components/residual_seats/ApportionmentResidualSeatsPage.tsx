@@ -2,10 +2,10 @@ import type { ReactElement } from "react";
 import { Link } from "react-router";
 import { useElection } from "@/hooks/election/useElection";
 import { t, tx } from "@/i18n/translate";
-import type { PoliticalGroup, SeatAssignmentResult } from "@/types/generated/openapi";
+import type { PoliticalGroup, SeatAssignment } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 import { useApportionmentContext } from "../../hooks/useApportionmentContext";
-import { getResultChanges, type resultChange } from "../../utils/seat-change";
+import { getResultChanges, type ResultChange } from "../../utils/seat-change";
 import {
   getAssignmentSteps,
   getRemovalSteps,
@@ -41,10 +41,10 @@ function render_information(seats: number, residualSeats: number) {
 }
 
 interface LargeCouncilSectionProps {
-  seatAssignment: SeatAssignmentResult;
+  seatAssignment: SeatAssignment;
   highestAverageSteps: HighestAverageAssignmentStep[];
   politicalGroups: PoliticalGroup[];
-  resultChanges: resultChange[];
+  resultChanges: ResultChange[];
   footNotes?: ReactElement;
 }
 
@@ -75,10 +75,10 @@ function LargeCouncilSection({
 }
 
 interface LargestRemaindersSectionProps {
-  seatAssignment: SeatAssignmentResult;
+  seatAssignment: SeatAssignment;
   largestRemainderSteps: LargestRemainderAssignmentStep[];
   politicalGroups: PoliticalGroup[];
-  resultChanges: resultChange[];
+  resultChanges: ResultChange[];
   footNotes?: ReactElement;
 }
 
@@ -109,7 +109,7 @@ function LargestRemaindersSection({
 }
 
 interface HighestAveragesSectionProps {
-  seatAssignment: SeatAssignmentResult;
+  seatAssignment: SeatAssignment;
   uniqueHighestAverageSteps: UniqueHighestAverageAssignmentStep[];
   highestAverageSteps: HighestAverageAssignmentStep[];
   politicalGroups: PoliticalGroup[];

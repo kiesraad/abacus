@@ -1,16 +1,16 @@
 import { Table } from "@/components/ui/Table/Table";
 import { t } from "@/i18n/translate";
-import type { Fraction, PoliticalGroup, PoliticalGroupSeatAssignment } from "@/types/generated/openapi";
+import type { DisplayFraction, ListSeatAssignment, PoliticalGroup } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 
-import { getFootnotesFromResultChanges, type resultChange } from "../../utils/seat-change";
+import { getFootnotesFromResultChanges, type ResultChange } from "../../utils/seat-change";
 import cls from "../Apportionment.module.css";
 
 interface FullSeatsTableProps {
-  finalStanding: PoliticalGroupSeatAssignment[];
+  finalStanding: ListSeatAssignment[];
   politicalGroups: PoliticalGroup[];
-  quota: Fraction;
-  resultChanges: resultChange[];
+  quota: DisplayFraction;
+  resultChanges: ResultChange[];
 }
 
 export function FullSeatsTable({ finalStanding, politicalGroups, quota, resultChanges }: FullSeatsTableProps) {
@@ -28,19 +28,23 @@ export function FullSeatsTable({ finalStanding, politicalGroups, quota, resultCh
         <Table.HeaderCell className="text-align-r">{t("apportionment.full_seats_count")}</Table.HeaderCell>
       </Table.Header>
       <Table.Body>
-        {finalStanding.map((standing: PoliticalGroupSeatAssignment) => {
-          const pgResultChanges = resultChanges.filter((change) => change.pgNumber === standing.pg_number);
+        {finalStanding.map((standing: ListSeatAssignment) => {
+          const listResultChanges = resultChanges.filter((change) => change.listNumber === standing.list_number);
           return (
-            <Table.Row key={standing.pg_number}>
-              <Table.Cell className={cn(cls.listNumberColumn, "text-align-r", "bold")}>{standing.pg_number}</Table.Cell>
-              <Table.Cell>{politicalGroups.find((pg) => pg.number === standing.pg_number)?.name ?? ""}</Table.Cell>
+            <Table.Row key={standing.list_number}>
+              <Table.Cell className={cn(cls.listNumberColumn, "text-align-r", "bold")}>
+                {standing.list_number}
+              </Table.Cell>
+              <Table.Cell>
+                {politicalGroups.find((list) => list.number === standing.list_number)?.name ?? ""}
+              </Table.Cell>
               <Table.NumberCell>{standing.votes_cast}</Table.NumberCell>
               <Table.Cell>:</Table.Cell>
               <Table.DisplayFractionCells>{quota}</Table.DisplayFractionCells>
               <Table.Cell>=</Table.Cell>
               <Table.NumberCell className="bold">
-                {pgResultChanges.length > 0 && <s>{standing.full_seats + pgResultChanges.length}</s>}{" "}
-                {getFootnotesFromResultChanges(pgResultChanges)} {standing.full_seats}
+                {listResultChanges.length > 0 && <s>{standing.full_seats + listResultChanges.length}</s>}{" "}
+                {getFootnotesFromResultChanges(listResultChanges)} {standing.full_seats}
               </Table.NumberCell>
             </Table.Row>
           );

@@ -2,7 +2,7 @@ import type { Meta, StoryFn, StoryObj } from "@storybook/react-vite";
 import { expect, fn, userEvent, within } from "storybook/test";
 
 import { IconCheckHeart } from "@/components/generated/icons";
-import type { Fraction } from "@/types/generated/openapi";
+import type { DisplayFraction } from "@/types/generated/openapi";
 
 import { Badge } from "../Badge/Badge";
 import { Icon } from "../Icon/Icon";
@@ -211,7 +211,7 @@ export const LinkTable: StoryObj = {
 
 export const TotalTableWithFractions: StoryObj = {
   render: () => {
-    const data: [number, string, Fraction, number][] = [
+    const data: [number, string, DisplayFraction, number][] = [
       [1, "Political Group A", { integer: 3, numerator: 149, denominator: 150 }, 15],
       [2, "Political Group B", { integer: 5, numerator: 0, denominator: 1 }, 11],
       [3, "Political Group C", { integer: 8, numerator: 1, denominator: 150 }, 4],

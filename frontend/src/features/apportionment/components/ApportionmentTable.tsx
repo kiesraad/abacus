@@ -1,12 +1,12 @@
 import { Table } from "@/components/ui/Table/Table";
 import { t } from "@/i18n/translate";
-import type { PoliticalGroup, PoliticalGroupSeatAssignment } from "@/types/generated/openapi";
+import type { ListSeatAssignment, PoliticalGroup } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 
 import cls from "./Apportionment.module.css";
 
 interface ApportionmentTableProps {
-  finalStanding: PoliticalGroupSeatAssignment[];
+  finalStanding: ListSeatAssignment[];
   politicalGroups: PoliticalGroup[];
   fullSeats: number;
   residualSeats: number;
@@ -37,12 +37,12 @@ export function ApportionmentTable({
         <Table.HeaderCell className="text-align-r link-cell-padding">{t("apportionment.total_seats")}</Table.HeaderCell>
       </Table.Header>
       <Table.Body>
-        {finalStanding.map((standing: PoliticalGroupSeatAssignment) => (
-          <Table.Row key={standing.pg_number} to={`./${standing.pg_number}`}>
+        {finalStanding.map((standing: ListSeatAssignment) => (
+          <Table.Row key={standing.list_number} to={`./${standing.list_number}`}>
             <Table.Cell className={cn(cls.listNumberColumn, "text-align-r", "font-number")}>
-              {standing.pg_number}
+              {standing.list_number}
             </Table.Cell>
-            <Table.Cell>{politicalGroups[standing.pg_number - 1]?.name || ""}</Table.Cell>
+            <Table.Cell>{politicalGroups[standing.list_number - 1]?.name || ""}</Table.Cell>
             <Table.NumberCell>{convert_zero_to_dash(standing.full_seats)}</Table.NumberCell>
             <Table.NumberCell>{convert_zero_to_dash(standing.residual_seats)}</Table.NumberCell>
             <Table.NumberCell className="bold">{convert_zero_to_dash(standing.total_seats)}</Table.NumberCell>

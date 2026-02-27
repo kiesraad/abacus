@@ -1,17 +1,17 @@
 import { Table } from "@/components/ui/Table/Table";
 import { t } from "@/i18n/translate";
-import type { PoliticalGroup, PoliticalGroupSeatAssignment } from "@/types/generated/openapi";
+import type { ListSeatAssignment, PoliticalGroup } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 
-import { getFootnotesFromResultChanges, type resultChange } from "../../utils/seat-change";
+import { getFootnotesFromResultChanges, type ResultChange } from "../../utils/seat-change";
 import type { HighestAverageAssignmentStep } from "../../utils/steps";
 import cls from "../Apportionment.module.css";
 
 interface HighestAveragesTableProps {
   steps: HighestAverageAssignmentStep[];
-  finalStanding: PoliticalGroupSeatAssignment[];
+  finalStanding: ListSeatAssignment[];
   politicalGroups: PoliticalGroup[];
-  resultChanges: resultChange[];
+  resultChanges: ResultChange[];
 }
 
 export function HighestAveragesTable({
@@ -36,37 +36,39 @@ export function HighestAveragesTable({
           </Table.HeaderCell>
         </Table.Header>
         <Table.Body>
-          {finalStanding.map((pgSeatAssignment: PoliticalGroupSeatAssignment) => {
+          {finalStanding.map((listSeatAssignment: ListSeatAssignment) => {
             let residualSeats = steps.filter((step) => {
-              return step.change.selected_pg_number === pgSeatAssignment.pg_number;
+              return step.change.selected_list_number === listSeatAssignment.list_number;
             }).length;
-            const pgResultChanges = resultChanges.filter((change) => change.pgNumber === pgSeatAssignment.pg_number);
-            pgResultChanges.forEach((pgResultChange) => {
-              residualSeats = residualSeats + pgResultChange.increase - pgResultChange.decrease;
+            const listResultChanges = resultChanges.filter(
+              (change) => change.listNumber === listSeatAssignment.list_number,
+            );
+            listResultChanges.forEach((listResultChange) => {
+              residualSeats = residualSeats + listResultChange.increase - listResultChange.decrease;
             });
             return (
-              <Table.Row key={pgSeatAssignment.pg_number}>
+              <Table.Row key={listSeatAssignment.list_number}>
                 <Table.Cell className={cn(cls.listNumberColumn, cls.sticky, "text-align-r", "font-number")}>
-                  {pgSeatAssignment.pg_number}
+                  {listSeatAssignment.list_number}
                 </Table.Cell>
                 <Table.Cell className={cls.sticky}>
-                  {politicalGroups[pgSeatAssignment.pg_number - 1]?.name || ""}
+                  {politicalGroups[listSeatAssignment.list_number - 1]?.name || ""}
                 </Table.Cell>
                 {steps.map((step) => {
-                  const average = step.standings[pgSeatAssignment.pg_number - 1]?.next_votes_per_seat;
+                  const average = step.standings[listSeatAssignment.list_number - 1]?.next_votes_per_seat;
                   return (
                     <Table.DisplayFractionCells
-                      key={`${pgSeatAssignment.pg_number}-${step.residual_seat_number}`}
+                      key={`${listSeatAssignment.list_number}-${step.residual_seat_number}`}
                       className={
-                        step.change.pg_options.includes(pgSeatAssignment.pg_number) ? "bg-yellow bold" : undefined
+                        step.change.list_options.includes(listSeatAssignment.list_number) ? "bg-yellow bold" : undefined
                       }
                     >
-                      {!step.change.pg_exhausted.includes(pgSeatAssignment.pg_number) ? average : undefined}
+                      {!step.change.list_exhausted.includes(listSeatAssignment.list_number) ? average : undefined}
                     </Table.DisplayFractionCells>
                   );
                 })}
                 <Table.NumberCell className={cn(cls.sticky, "bold")}>
-                  {getFootnotesFromResultChanges(pgResultChanges)} {residualSeats}
+                  {getFootnotesFromResultChanges(listResultChanges)} {residualSeats}
                 </Table.NumberCell>
               </Table.Row>
             );
@@ -78,7 +80,7 @@ export function HighestAveragesTable({
             </Table.Cell>
             {steps.map((step) => (
               <Table.NumberCell key={step.residual_seat_number} colSpan={2}>
-                {step.change.selected_pg_number}
+                {step.change.selected_list_number}
               </Table.NumberCell>
             ))}
             <Table.Cell className={cls.sticky} />

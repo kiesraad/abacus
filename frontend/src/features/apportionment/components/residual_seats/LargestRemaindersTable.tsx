@@ -1,17 +1,17 @@
 import { Table } from "@/components/ui/Table/Table";
 import { t } from "@/i18n/translate";
-import type { PoliticalGroup, PoliticalGroupSeatAssignment } from "@/types/generated/openapi";
+import type { ListSeatAssignment, PoliticalGroup } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 
-import { getFootnotesFromResultChanges, type resultChange } from "../../utils/seat-change";
+import { getFootnotesFromResultChanges, type ResultChange } from "../../utils/seat-change";
 import type { LargestRemainderAssignmentStep } from "../../utils/steps";
 import cls from "../Apportionment.module.css";
 
 interface LargestRemaindersTableProps {
   steps: LargestRemainderAssignmentStep[];
-  finalStanding: PoliticalGroupSeatAssignment[];
+  finalStanding: ListSeatAssignment[];
   politicalGroups: PoliticalGroup[];
-  resultChanges: resultChange[];
+  resultChanges: ResultChange[];
 }
 
 export function LargestRemaindersTable({
@@ -21,7 +21,7 @@ export function LargestRemaindersTable({
   resultChanges,
 }: LargestRemaindersTableProps) {
   const finalStandingPgsMeetingThreshold = finalStanding.filter(
-    (pgSeatAssignment) => pgSeatAssignment.meets_remainder_threshold,
+    (listSeatAssignment) => listSeatAssignment.meets_remainder_threshold,
   );
   return (
     <Table id="largest-remainders-table" className={cls.table}>
@@ -35,32 +35,32 @@ export function LargestRemaindersTable({
         <Table.HeaderCell className="text-align-r">{t("apportionment.residual_seats_count")}</Table.HeaderCell>
       </Table.Header>
       <Table.Body>
-        {finalStandingPgsMeetingThreshold.map((pgSeatAssignment) => {
+        {finalStandingPgsMeetingThreshold.map((listSeatAssignment) => {
           let residualSeats = steps.filter((step) => {
-            return step.change.selected_pg_number === pgSeatAssignment.pg_number;
+            return step.change.selected_list_number === listSeatAssignment.list_number;
           }).length;
-          const pgResultChanges = resultChanges.filter(
-            (change) => change.type === "residual_seat" && change.pgNumber === pgSeatAssignment.pg_number,
+          const listResultChanges = resultChanges.filter(
+            (change) => change.type === "residual_seat" && change.listNumber === listSeatAssignment.list_number,
           );
-          pgResultChanges.forEach((pgResultChange) => {
-            residualSeats = residualSeats + pgResultChange.increase - pgResultChange.decrease;
+          listResultChanges.forEach((listResultChange) => {
+            residualSeats = residualSeats + listResultChange.increase - listResultChange.decrease;
           });
-          const pgFullSeatsNotes = resultChanges.filter(
-            (change) => change.type === "full_seat" && change.pgNumber === pgSeatAssignment.pg_number,
+          const listFullSeatsNotes = resultChanges.filter(
+            (change) => change.type === "full_seat" && change.listNumber === listSeatAssignment.list_number,
           );
           return (
-            <Table.Row key={pgSeatAssignment.pg_number}>
+            <Table.Row key={listSeatAssignment.list_number}>
               <Table.Cell className={cn(cls.listNumberColumn, "text-align-r", "font-number")}>
-                {pgSeatAssignment.pg_number}
+                {listSeatAssignment.list_number}
               </Table.Cell>
-              <Table.Cell>{politicalGroups[pgSeatAssignment.pg_number - 1]?.name || ""}</Table.Cell>
+              <Table.Cell>{politicalGroups[listSeatAssignment.list_number - 1]?.name || ""}</Table.Cell>
               <Table.NumberCell className="bold">
-                {pgFullSeatsNotes.length > 0 && getFootnotesFromResultChanges(pgFullSeatsNotes)}{" "}
-                {pgSeatAssignment.full_seats}
+                {listFullSeatsNotes.length > 0 && getFootnotesFromResultChanges(listFullSeatsNotes)}{" "}
+                {listSeatAssignment.full_seats}
               </Table.NumberCell>
-              <Table.DisplayFractionCells>{pgSeatAssignment.remainder_votes}</Table.DisplayFractionCells>
+              <Table.DisplayFractionCells>{listSeatAssignment.remainder_votes}</Table.DisplayFractionCells>
               <Table.NumberCell className="bold">
-                {getFootnotesFromResultChanges(pgResultChanges)} {residualSeats}
+                {getFootnotesFromResultChanges(listResultChanges)} {residualSeats}
               </Table.NumberCell>
             </Table.Row>
           );

@@ -1,8 +1,12 @@
 {
   "add_role": "{role} toevoegen",
   "add": "Gebruiker toevoegen",
+  "administrator": "Beheerder",
   "change_password_hint": "De gebruiker heeft een nieuw wachtwoord gekozen. Als het nodig is, kan het wachtwoord gereset worden.",
   "change_password": "Wijzig wachtwoord",
+  "coordinator": "Coördinator",
+  "coordinator_csb": "Coördinator centraal stembureau (CSB)",
+  "coordinator_gsb": "Coördinator gemeentelijk stembureau (GSB)",
   "delete_are_you_sure": "Je kan dit niet ongedaan maken. Weet je zeker dat je deze gebruiker wilt verwijderen?",
   "delete": "Gebruiker verwijderen",
   "details_title": "Details van het account",
@@ -32,6 +36,9 @@
   "type_hint": "Gebruikers met een anoniem account moeten bij de eerste keer inloggen hun echte naam invoeren. Anonieme accounts zijn vooral handig als je veel invoerders verwacht, en nog niet precies weet wie wel en wie niet aanwezig zal zijn.",
   "type_label": "Type account",
   "type_title": "Wat voor account wil je aanmaken?",
+  "typist": "Invoerder",
+  "typist_csb": "Invoerder centraal stembureau (CSB)",
+  "typist_gsb": "Invoerder gemeentelijk stembureau (GSB)",
   "unauthorized_title": "Je hebt geen toegang tot deze pagina",
   "unauthorized": "Log in met een account dat wel toegang heeft om verder te gaan.",
   "user_created_details": "{username} is toegevoegd met de rol {role}",
@@ -45,6 +52,5 @@
   "username_not_unique_error": "Er bestaat al een gebruiker met gebruikersnaam {username}",
   "username_unique": "De gebruikersnaam moet uniek zijn",
   "username": "Gebruikersnaam",
-  "users": "Gebruikers",
-  "id": "Gebruikers-ID"
+  "users": "Gebruikers"
 }

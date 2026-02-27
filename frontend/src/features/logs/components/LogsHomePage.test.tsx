@@ -26,14 +26,14 @@ describe("LogsHomePage", () => {
     await waitFor(() => {
       expect(table).toHaveTableContent([
         ["Nummer", "Tijdstip", "Type", "Gebeurtenis", "Gebruiker: id, gebruikersnaam (rol)"],
-        ["24", formattedDate, "Succes", "Gebruiker ingelogd", "1, admin (Beheerder)"],
-        ["23", formattedDate, "Succes", "Gebruiker uitgelogd", "1, admin (Beheerder)"],
-        ["22", formattedDate, "Succes", "Gebruiker ingelogd", "1, admin (Beheerder)"],
-        ["21", formattedDate, "Succes", "Gebruiker uitgelogd", "2, typist (Invoerder)"],
-        ["20", formattedDate, "Succes", "Gebruiker ingelogd", "2, typist (Invoerder)"],
-        ["19", formattedDate, "Succes", "Gebruiker uitgelogd", "3, coordinator (Coördinator)"],
-        ["18", formattedDate, "Succes", "Gebruiker ingelogd", "3, coordinator (Coördinator)"],
-        ["17", formattedDate, "Succes", "Gebruiker uitgelogd", "3, coordinator (Coördinator)"],
+        ["24", formattedDate, "Succes", "Gebruiker ingelogd", "1, admin (beheerder)"],
+        ["23", formattedDate, "Succes", "Gebruiker uitgelogd", "1, admin (beheerder)"],
+        ["22", formattedDate, "Succes", "Gebruiker ingelogd", "1, admin (beheerder)"],
+        ["21", formattedDate, "Succes", "Gebruiker uitgelogd", "2, typist (invoerder GSB)"],
+        ["20", formattedDate, "Succes", "Gebruiker ingelogd", "2, typist (invoerder GSB)"],
+        ["19", formattedDate, "Succes", "Gebruiker uitgelogd", "3, coordinator (coördinator GSB)"],
+        ["18", formattedDate, "Succes", "Gebruiker ingelogd", "3, coordinator (coördinator GSB)"],
+        ["17", formattedDate, "Succes", "Gebruiker uitgelogd", "3, coordinator (coördinator GSB)"],
       ]);
     });
 
@@ -57,7 +57,7 @@ describe("LogsHomePage", () => {
     expect(await screen.findByRole("heading", { level: 1, name: "Activiteitenlog" })).toBeVisible();
 
     const firstRow = await screen.findByRole("row", {
-      name: "24 11 mrt om 10:02 Succes Gebruiker ingelogd 1, admin (Beheerder)",
+      name: "24 11 mrt om 10:02 Succes Gebruiker ingelogd 1, admin (beheerder)",
     });
     await user.click(firstRow);
 
@@ -75,7 +75,7 @@ describe("LogsHomePage", () => {
         "Volledige naam",
         "Sanne Molenaar",
         "Rol",
-        "Beheerder",
+        "beheerder",
         "Gebruikers-ID",
         "1",
         "Toelichting",

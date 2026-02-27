@@ -71,7 +71,7 @@ export function UserCreateRolePage() {
                   name={"role"}
                   defaultValue={"administrator"}
                   defaultChecked={role === "administrator"}
-                  label={t("administrator")}
+                  label={t("users.administrator")}
                 >
                   {t("users.role_administrator_hint")}
                 </ChoiceList.Radio>
@@ -80,7 +80,7 @@ export function UserCreateRolePage() {
                   name={"role"}
                   defaultValue={"coordinator_gsb"}
                   defaultChecked={role === "coordinator_gsb"}
-                  label={t("coordinator")}
+                  label={t("users.coordinator")}
                 >
                   {t("users.role_coordinator_hint")}
                 </ChoiceList.Radio>
@@ -89,7 +89,7 @@ export function UserCreateRolePage() {
                   name={"role"}
                   defaultValue={"typist_gsb"}
                   defaultChecked={role === "typist_gsb"}
-                  label={t("typist")}
+                  label={t("users.typist")}
                 >
                   {t("users.role_typist_hint")}
                 </ChoiceList.Radio>

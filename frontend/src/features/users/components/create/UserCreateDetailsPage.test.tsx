@@ -45,7 +45,12 @@ describe("UserCreateDetailsPage", () => {
   test("Render empty form", async () => {
     renderPage({ role: "coordinator_gsb", type: "fullname" });
 
-    expect(await screen.findByRole("heading", { level: 1, name: "Coördinator toevoegen" })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", {
+        level: 1,
+        name: "Coördinator gemeentelijk stembureau (GSB) toevoegen",
+      }),
+    ).toBeInTheDocument();
 
     expect(await screen.findByRole("textbox", { name: "Gebruikersnaam" })).toHaveValue("");
     expect(await screen.findByRole("textbox", { name: "Volledige naam" })).toHaveValue("");
@@ -68,7 +73,7 @@ describe("UserCreateDetailsPage", () => {
 
     expect(pushMessage).toHaveBeenCalledWith({
       title: "Gebruiker toegevoegd",
-      text: "NieuweGebruiker is toegevoegd met de rol Coördinator",
+      text: "NieuweGebruiker is toegevoegd met de rol Coördinator gemeentelijk stembureau (GSB)",
     });
     expect(navigate).toHaveBeenCalledExactlyOnceWith("/users");
   });

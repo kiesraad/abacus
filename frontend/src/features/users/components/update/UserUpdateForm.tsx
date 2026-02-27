@@ -127,7 +127,7 @@ export function UserUpdateForm({ user, onSaved, onAbort }: UserUpdateFormProps) 
                 </Button>
               </FormLayout.Field>
             )}
-            <FormLayout.Field label={t("role")}>{t(user.role)}</FormLayout.Field>
+            <FormLayout.Field label={t("role")}>{t(`users.${user.role}`)}</FormLayout.Field>
           </FormLayout.Section>
           <FormLayout.Controls>
             <Button type="submit">{t("save_changes")}</Button>

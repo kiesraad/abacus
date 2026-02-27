@@ -19,6 +19,10 @@ pub struct CoordinatorGSB(pub User);
 #[allow(unused)]
 pub struct TypistGSB(pub User);
 
+/// A user with the admin or any coordinator role
+#[allow(unused)]
+pub struct AdminOrCoordinator(pub User);
+
 /// A user with the admin or coordinator GSB role
 #[allow(unused)]
 pub struct AdminOrCoordinatorGSB(pub User);
@@ -55,6 +59,17 @@ impl TryFrom<User> for TypistGSB {
     fn try_from(user: User) -> Result<Self, Self::Error> {
         match user.role() {
             Role::TypistGSB => Ok(Self(user)),
+            _ => Err(()),
+        }
+    }
+}
+
+impl TryFrom<User> for AdminOrCoordinator {
+    type Error = ();
+
+    fn try_from(user: User) -> Result<Self, Self::Error> {
+        match user.role() {
+            Role::Administrator | Role::CoordinatorCSB | Role::CoordinatorGSB => Ok(Self(user)),
             _ => Err(()),
         }
     }
@@ -110,6 +125,20 @@ where
         let user = <User as FromRequestParts<S>>::from_request_parts(parts, state).await?;
 
         TypistGSB::try_from(user).map_err(|_| AuthenticationError::Forbidden.into())
+    }
+}
+
+impl<S> FromRequestParts<S> for AdminOrCoordinator
+where
+    SqlitePool: FromRef<S>,
+    S: Send + Sync,
+{
+    type Rejection = APIError;
+
+    async fn from_request_parts(parts: &mut Parts, state: &S) -> Result<Self, Self::Rejection> {
+        let user = <User as FromRequestParts<S>>::from_request_parts(parts, state).await?;
+
+        AdminOrCoordinator::try_from(user).map_err(|_| AuthenticationError::Forbidden.into())
     }
 }
 

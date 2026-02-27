@@ -7,15 +7,16 @@ import { PageTitle } from "@/components/page_title/PageTitle";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { Loader } from "@/components/ui/Loader/Loader";
+import { useMessages } from "@/hooks/messages/useMessages";
 import { useNumericParam } from "@/hooks/useNumericParam";
 import { useUser } from "@/hooks/user/useUser";
 import { t } from "@/i18n/translate";
 import type { USER_GET_REQUEST_PATH, User } from "@/types/generated/openapi";
-
 import { UserDelete } from "./UserDelete";
 import { UserUpdateForm } from "./UserUpdateForm";
 
 export function UserUpdatePage() {
+  const { pushMessage } = useMessages();
   const navigate = useNavigate();
   const loggedInUser = useUser();
   const userId = useNumericParam("userId");
@@ -38,13 +39,21 @@ export function UserUpdatePage() {
   const itsMe = loggedInUser?.user_id === userId;
 
   function handleSaved({ fullname, username }: User) {
-    const updatedMessage = t("users.user_updated_details", { fullname: fullname || username });
-    void navigate(`/users?updated=${encodeURIComponent(updatedMessage)}`);
+    pushMessage({
+      title: t("users.user_updated"),
+      text: t("users.user_updated_details", { name: fullname ?? username }),
+    });
+
+    void navigate("/users");
   }
 
   function handleDeleted() {
-    const deletedMessage = t("users.user_deleted_details", { fullname: user.fullname || user.username });
-    void navigate(`/users?deleted=${encodeURIComponent(deletedMessage)}`, { replace: true });
+    pushMessage({
+      title: t("users.user_deleted"),
+      text: t("users.user_deleted_details", { name: user.fullname ?? user.username }),
+    });
+
+    void navigate("/users", { replace: true });
   }
 
   function handleAbort() {

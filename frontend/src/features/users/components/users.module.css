@@ -1,0 +1,10 @@
+/* https://weblog.west-wind.com/posts/2023/Jan/26/HTML-Table-Cell-Overflow-Handling */
+.ellipsis {
+  max-width: 14rem;
+
+  > div {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+}

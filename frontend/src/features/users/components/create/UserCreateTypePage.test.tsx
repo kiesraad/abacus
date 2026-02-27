@@ -34,7 +34,12 @@ describe("UserCreateTypePage", () => {
   test("Shows initial form", async () => {
     renderPage({ role: "typist_gsb" });
 
-    expect(await screen.findByRole("heading", { level: 1, name: "Invoerder toevoegen" })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", {
+        level: 1,
+        name: "Invoerder gemeentelijk stembureau (GSB) toevoegen",
+      }),
+    ).toBeInTheDocument();
 
     expect(await screen.findByRole("radio", { name: /Op naam/ })).toBeChecked();
     expect(await screen.findByRole("radio", { name: /Anonieme gebruikersnaam/ })).not.toBeChecked();

@@ -9,7 +9,7 @@ use sqlx::SqlitePool;
 use tokio::{task::JoinSet, time::timeout};
 use tracing::{debug, error, info, trace, warn};
 
-use crate::infra::audit_log::{AsAuditEvent, AuditEvent, AuditEventType, as_audit_event};
+use crate::infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType};
 
 #[derive(Clone)]
 pub struct AirgapDetection {
@@ -42,18 +42,18 @@ const DOMAINS: [&str; 3] = [
 pub const AIRGAP_DETECTION_INTERVAL: u64 = 30; // interval in seconds
 
 #[derive(Serialize)]
-struct AirGapViolationDetected;
-#[derive(Serialize)]
-struct AirGapViolationResolved;
+struct AirGapViolationDetectedAuditData;
+impl AsAuditEvent for AirGapViolationDetectedAuditData {
+    const EVENT_TYPE: AuditEventType = AuditEventType::AirGapViolationDetected;
+    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Error;
+}
 
-as_audit_event!(
-    AirGapViolationDetected,
-    AuditEventType::AirGapViolationDetected
-);
-as_audit_event!(
-    AirGapViolationResolved,
-    AuditEventType::AirGapViolationResolved
-);
+#[derive(Serialize)]
+struct AirGapViolationResolvedAuditData;
+impl AsAuditEvent for AirGapViolationResolvedAuditData {
+    const EVENT_TYPE: AuditEventType = AuditEventType::AirGapViolationResolved;
+    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Info;
+}
 
 impl AirgapDetection {
     /// Creates a new AirgapDetection instance that does not perform any detection.
@@ -92,9 +92,9 @@ impl AirgapDetection {
     #[allow(clippy::cognitive_complexity)]
     async fn log_status_change(&self) {
         let event_result = if self.violation_detected() {
-            AirGapViolationDetected.as_audit_event()
+            AirGapViolationDetectedAuditData.as_audit_event()
         } else {
-            AirGapViolationResolved.as_audit_event()
+            AirGapViolationResolvedAuditData.as_audit_event()
         };
 
         // If we detect an airgap status change, but we're unable to create and save

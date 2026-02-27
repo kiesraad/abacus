@@ -1,5 +1,5 @@
 import type { RouteObject } from "react-router";
-
+import { UsersLayout } from "@/features/users/components/UsersLayout";
 import { UserCreateDetailsPage } from "./components/create/UserCreateDetailsPage";
 import { UserCreateLayout } from "./components/create/UserCreateLayout";
 import { UserCreateRolePage } from "./components/create/UserCreateRolePage";
@@ -8,19 +8,28 @@ import { UserListPage } from "./components/UserListPage";
 import { UserUpdatePage } from "./components/update/UserUpdatePage";
 
 export const usersRoutes: RouteObject[] = [
-  { index: true, Component: UserListPage, handle: { roles: ["administrator", "coordinator_gsb"] } },
   {
-    path: "create",
-    Component: UserCreateLayout,
+    Component: UsersLayout,
     children: [
-      { index: true, Component: UserCreateRolePage, handle: { roles: ["administrator", "coordinator_gsb"] } },
-      { path: "type", Component: UserCreateTypePage, handle: { roles: ["administrator", "coordinator_gsb"] } },
-      { path: "details", Component: UserCreateDetailsPage, handle: { roles: ["administrator", "coordinator_gsb"] } },
+      { index: true, Component: UserListPage, handle: { roles: ["administrator", "coordinator_gsb"] } },
+      {
+        path: "create",
+        Component: UserCreateLayout,
+        children: [
+          { index: true, Component: UserCreateRolePage, handle: { roles: ["administrator", "coordinator_gsb"] } },
+          { path: "type", Component: UserCreateTypePage, handle: { roles: ["administrator", "coordinator_gsb"] } },
+          {
+            path: "details",
+            Component: UserCreateDetailsPage,
+            handle: { roles: ["administrator", "coordinator_gsb"] },
+          },
+        ],
+      },
+      {
+        path: ":userId/update",
+        Component: UserUpdatePage,
+        handle: { roles: ["administrator", "coordinator_gsb"] },
+      },
     ],
-  },
-  {
-    path: ":userId/update",
-    Component: UserUpdatePage,
-    handle: { roles: ["administrator", "coordinator_gsb"] },
   },
 ];

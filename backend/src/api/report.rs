@@ -8,6 +8,7 @@ use pdf_gen::{
     generate_pdf,
     zip::{ZipResponse, ZipResponseError, slugify_filename, zip_single_file},
 };
+use serde::Serialize;
 use sqlx::{SqliteConnection, SqlitePool};
 use utoipa_axum::{router::OpenApiRouter, routes};
 
@@ -22,7 +23,7 @@ use crate::{
         committee_session_status::CommitteeSessionStatus,
         data_entry::PollingStationResults,
         election::{ElectionId, ElectionWithPoliticalGroups},
-        file::{File, FileCreated},
+        file::File,
         investigation::PollingStationInvestigation,
         models::{ModelNa14_2Input, ModelNa31_2Input, ModelP2aInput, PdfFileModel, ToPdfFileModel},
         polling_station::PollingStation,
@@ -31,7 +32,7 @@ use crate::{
     },
     eml::{EML510, EMLDocument, EmlHash},
     error::ErrorReference,
-    infra::audit_log::AuditService,
+    infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
     repository::{
         committee_session_repo::{self, change_files, get_previous_session},
         data_entry_repo::{
@@ -41,6 +42,7 @@ use crate::{
         investigation_repo::list_investigations_for_committee_session,
         polling_station_repo,
     },
+    service::FileAuditData,
 };
 
 /// Default date time format for reports
@@ -48,6 +50,13 @@ pub const DEFAULT_DATE_TIME_FORMAT: &str = "%d-%m-%Y %H:%M:%S %Z";
 
 const EML_MIME_TYPE: &str = "text/xml";
 const PDF_MIME_TYPE: &str = "application/pdf";
+
+#[derive(Serialize)]
+pub struct FileCreatedAuditData(pub FileAuditData);
+impl AsAuditEvent for FileCreatedAuditData {
+    const EVENT_TYPE: AuditEventType = AuditEventType::FileCreated;
+    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Success;
+}
 
 pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::default()
@@ -387,7 +396,7 @@ async fn create_file(
     let file = file_repo::create(conn, filename, data, mime_type, created_at).await?;
 
     audit_service
-        .log(conn, &FileCreated(file.clone().into()), None)
+        .log(conn, &FileCreatedAuditData(file.clone().into()), None)
         .await?;
     Ok(file)
 }

@@ -2,19 +2,11 @@ use apportionment::{self};
 use serde::Serialize;
 use utoipa::ToSchema;
 
-use crate::{
-    api::election::ElectionDetails,
-    domain::{
-        data_entry::{CandidateVotes, PoliticalGroupCandidateVotes},
-        election::{self, Candidate, PGNumber},
-        summary::ElectionSummary,
-    },
-    infra::audit_log::{AsAuditEvent, AuditEvent, AuditEventType, as_audit_event},
+use crate::domain::{
+    data_entry::{CandidateVotes, PoliticalGroupCandidateVotes},
+    election::{self, Candidate, PGNumber},
+    summary::ElectionSummary,
 };
-
-#[derive(Serialize)]
-pub struct ApportionmentCreated(pub ElectionDetails);
-as_audit_event!(ApportionmentCreated, AuditEventType::ApportionmentCreated);
 
 #[derive(Clone, Debug)]
 pub struct ApportionmentInputData {

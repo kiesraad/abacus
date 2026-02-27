@@ -3,6 +3,7 @@ use axum::{
     Json,
     extract::{Path, State},
 };
+use serde::Serialize;
 use sqlx::SqlitePool;
 
 use crate::{
@@ -10,19 +11,29 @@ use crate::{
     api::{
         apportionment::{
             mapping::{map_candidate_nomination, map_seat_assignment},
-            structs::{
-                ApportionmentCreated, ApportionmentInputData, ElectionApportionmentResponse,
-            },
+            structs::{ApportionmentInputData, ElectionApportionmentResponse},
         },
+        election::ElectionAuditData,
         middleware::authentication::CoordinatorGSB,
     },
     audit_log::AuditService,
     domain::{
-        committee_session_status::CommitteeSessionStatus, data_entry::PollingStationResults,
-        election::ElectionId, polling_station::PollingStation, summary::ElectionSummary,
+        committee_session_status::CommitteeSessionStatus,
+        data_entry::PollingStationResults,
+        election::{Election, ElectionId},
+        polling_station::PollingStation,
+        summary::ElectionSummary,
     },
+    infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType},
     repository::{committee_session_repo, data_entry_repo, election_repo},
 };
+
+#[derive(Serialize)]
+pub struct ApportionmentCreated(pub ElectionAuditData);
+impl AsAuditEvent for ApportionmentCreated {
+    const EVENT_TYPE: AuditEventType = AuditEventType::ApportionmentCreated;
+    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Success;
+}
 
 /// Get the apportionment for an election
 #[utoipa::path(
@@ -71,7 +82,7 @@ pub async fn election_apportionment(
         audit_service
             .log(
                 &mut conn,
-                &ApportionmentCreated(election.clone().into()),
+                &ApportionmentCreated(Election::from(election.clone()).into()),
                 None,
             )
             .await?;

@@ -40,7 +40,7 @@ function renderForm({ election, groupNumber }: { election?: ElectionWithPolitica
         pollingStation={pollingStationMockData[0]!}
         entryNumber={1}
       >
-        <DataEntrySection />
+        <DataEntrySection electionRole={electionMockData.role} />
       </DataEntryProvider>
     </MessagesProvider>,
   );

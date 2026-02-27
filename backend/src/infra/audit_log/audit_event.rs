@@ -10,33 +10,31 @@ use crate::{ErrorResponse, error::ErrorReference};
 #[derive(Debug, Serialize, Clone)]
 pub struct AuditEvent {
     pub event_type: AuditEventType,
+    pub event_level: AuditEventLevel,
     pub data: serde_json::Value,
 }
 
-pub trait AsAuditEvent {
-    fn as_audit_event(&self) -> Result<AuditEvent, serde_json::Error>;
+pub trait AsAuditEvent: serde::Serialize {
+    const EVENT_TYPE: AuditEventType;
+    const EVENT_LEVEL: AuditEventLevel;
+
+    fn as_audit_event(&self) -> Result<AuditEvent, serde_json::Error> {
+        Ok(AuditEvent {
+            event_type: Self::EVENT_TYPE,
+            event_level: Self::EVENT_LEVEL,
+            data: serde_json::to_value(self)?,
+        })
+    }
 }
 
 impl AsAuditEvent for AuditEvent {
+    const EVENT_TYPE: AuditEventType = AuditEventType::UnknownEvent;
+    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Info;
+
     fn as_audit_event(&self) -> Result<AuditEvent, serde_json::Error> {
         Ok(self.clone())
     }
 }
-
-macro_rules! as_audit_event {
-    ($identifier:ident, $audit_event_type:path) => {
-        impl AsAuditEvent for $identifier {
-            fn as_audit_event(&self) -> Result<crate::audit_log::AuditEvent, serde_json::Error> {
-                Ok(AuditEvent {
-                    event_type: $audit_event_type,
-                    data: serde_json::to_value(self)?,
-                })
-            }
-        }
-    };
-}
-
-pub(crate) use as_audit_event;
 
 /// Generic error type
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
@@ -62,13 +60,19 @@ impl ErrorDetails {
 }
 
 impl AsAuditEvent for ErrorDetails {
+    const EVENT_TYPE: AuditEventType = AuditEventType::UnknownEvent;
+    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Error;
+
     fn as_audit_event(&self) -> Result<AuditEvent, serde_json::Error> {
+        let (event_type, event_level) = if self.fatal {
+            (AuditEventType::ApiError, AuditEventLevel::Error)
+        } else {
+            (AuditEventType::ApiWarning, AuditEventLevel::Warning)
+        };
+
         Ok(AuditEvent {
-            event_type: if self.fatal {
-                AuditEventType::ApiError
-            } else {
-                AuditEventType::ApiWarning
-            },
+            event_type,
+            event_level,
             data: json!({
                 "error_reference": self.error_reference,
                 "path": self.path,
@@ -109,16 +113,16 @@ pub enum AuditEventType {
     CommitteeSessionCreated,
     CommitteeSessionDeleted,
     CommitteeSessionUpdated,
-    // investigation events
-    PollingStationInvestigationCreated,
-    PollingStationInvestigationConcluded,
-    PollingStationInvestigationUpdated,
-    PollingStationInvestigationDeleted,
     // file events
     FileCreated,
     FileDeleted,
     // apportionment
     ApportionmentCreated,
+    // investigation events
+    InvestigationCreated,
+    InvestigationConcluded,
+    InvestigationUpdated,
+    InvestigationDeleted,
     // polling station events
     PollingStationCreated,
     PollingStationUpdated,
@@ -158,52 +162,5 @@ impl From<serde_json::Value> for AuditEventType {
 impl From<sqlx::types::Json<AuditEventType>> for AuditEventType {
     fn from(value: sqlx::types::Json<AuditEventType>) -> Self {
         value.0
-    }
-}
-
-impl AuditEventType {
-    pub fn level(&self) -> AuditEventLevel {
-        match self {
-            AuditEventType::UserLoggedIn => AuditEventLevel::Success,
-            AuditEventType::UserLoginFailed => AuditEventLevel::Warning,
-            AuditEventType::UserLoggedOut => AuditEventLevel::Success,
-            AuditEventType::UserSessionExtended => AuditEventLevel::Info,
-            AuditEventType::UserAccountUpdated => AuditEventLevel::Success,
-            AuditEventType::UserCreated => AuditEventLevel::Success,
-            AuditEventType::UserUpdated => AuditEventLevel::Success,
-            AuditEventType::UserDeleted => AuditEventLevel::Info,
-            AuditEventType::ElectionCreated => AuditEventLevel::Success,
-            AuditEventType::ElectionUpdated => AuditEventLevel::Success,
-            AuditEventType::CommitteeSessionCreated => AuditEventLevel::Success,
-            AuditEventType::CommitteeSessionDeleted => AuditEventLevel::Info,
-            AuditEventType::CommitteeSessionUpdated => AuditEventLevel::Success,
-            AuditEventType::FileCreated => AuditEventLevel::Success,
-            AuditEventType::FileDeleted => AuditEventLevel::Info,
-            AuditEventType::ApportionmentCreated => AuditEventLevel::Success,
-            AuditEventType::PollingStationCreated => AuditEventLevel::Success,
-            AuditEventType::PollingStationUpdated => AuditEventLevel::Success,
-            AuditEventType::PollingStationDeleted => AuditEventLevel::Info,
-            AuditEventType::PollingStationsImported => AuditEventLevel::Success,
-            AuditEventType::PollingStationInvestigationCreated => AuditEventLevel::Success,
-            AuditEventType::PollingStationInvestigationConcluded => AuditEventLevel::Success,
-            AuditEventType::PollingStationInvestigationUpdated => AuditEventLevel::Success,
-            AuditEventType::PollingStationInvestigationDeleted => AuditEventLevel::Info,
-            AuditEventType::DataEntryStarted => AuditEventLevel::Success,
-            AuditEventType::DataEntrySaved => AuditEventLevel::Success,
-            AuditEventType::DataEntryResumed => AuditEventLevel::Success,
-            AuditEventType::DataEntryDeleted => AuditEventLevel::Info,
-            AuditEventType::DataEntryFinalised => AuditEventLevel::Success,
-            AuditEventType::ApplicationStarted => AuditEventLevel::Info,
-            AuditEventType::UnknownEvent => AuditEventLevel::Warning,
-            AuditEventType::DataEntryDiscardedFirst => AuditEventLevel::Info,
-            AuditEventType::DataEntryReturnedFirst => AuditEventLevel::Info,
-            AuditEventType::DataEntryKeptFirst => AuditEventLevel::Info,
-            AuditEventType::DataEntryKeptSecond => AuditEventLevel::Info,
-            AuditEventType::DataEntryDiscardedBoth => AuditEventLevel::Info,
-            AuditEventType::AirGapViolationDetected => AuditEventLevel::Error,
-            AuditEventType::AirGapViolationResolved => AuditEventLevel::Info,
-            AuditEventType::ApiError => AuditEventLevel::Error,
-            AuditEventType::ApiWarning => AuditEventLevel::Warning,
-        }
     }
 }

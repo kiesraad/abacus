@@ -59,35 +59,41 @@ export function ElectionInformationTable({
           </Table.HeaderCell>
           <Table.Cell>{getListsAndCandidatesLabel(election)}</Table.Cell>
         </Table.Row>
-        <Table.Row to={rowLink}>
-          <Table.HeaderCell scope="row" className="normal">
-            {t("number_of_voters")}
-          </Table.HeaderCell>
-          <Table.Cell className={rowLink && "underlined"}>
-            {election.number_of_voters ? formatNumber(election.number_of_voters) : "0"}
-          </Table.Cell>
-        </Table.Row>
+        {election.role === "GSB" && (
+          <Table.Row to={rowLink}>
+            <Table.HeaderCell scope="row" className="normal">
+              {t("number_of_voters")}
+            </Table.HeaderCell>
+            <Table.Cell className={rowLink && "underlined"}>
+              {election.number_of_voters ? formatNumber(election.number_of_voters) : "0"}
+            </Table.Cell>
+          </Table.Row>
+        )}
         <Table.Row>
           <Table.HeaderCell scope="row" className="normal">
             {t("election_management.to_do_data_entry_for")}
           </Table.HeaderCell>
           <Table.Cell>{t(`electoral_committee_role.roles.${election.role}.short`)}</Table.Cell>
         </Table.Row>
-        <Table.Row key={election.id} to="polling-stations">
-          <Table.HeaderCell scope="row" className="normal">
-            {t("polling_station.title.plural")}
-          </Table.HeaderCell>
-          <Table.Cell className="underlined">
-            {numberOfPollingStations}{" "}
-            {t(`polling_station.title.${numberOfPollingStations === 1 ? "singular" : "plural"}`).toLowerCase()}
-          </Table.Cell>
-        </Table.Row>
-        <Table.Row>
-          <Table.HeaderCell scope="row" className="normal">
-            {t("counting_method_type")}
-          </Table.HeaderCell>
-          <Table.Cell>{t(election.counting_method)}</Table.Cell>
-        </Table.Row>
+        {election.role === "GSB" && (
+          <>
+            <Table.Row key={election.id} to="polling-stations">
+              <Table.HeaderCell scope="row" className="normal">
+                {t("polling_station.title.plural")}
+              </Table.HeaderCell>
+              <Table.Cell className="underlined">
+                {numberOfPollingStations}{" "}
+                {t(`polling_station.title.${numberOfPollingStations === 1 ? "singular" : "plural"}`).toLowerCase()}
+              </Table.Cell>
+            </Table.Row>
+            <Table.Row>
+              <Table.HeaderCell scope="row" className="normal">
+                {t("counting_method_type")}
+              </Table.HeaderCell>
+              <Table.Cell>{t(election.counting_method)}</Table.Cell>
+            </Table.Row>
+          </>
+        )}
       </Table.Body>
     </Table>
   );

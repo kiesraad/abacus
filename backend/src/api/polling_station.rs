@@ -3,9 +3,8 @@ use axum::{
     extract::{Path, State},
     http::StatusCode,
 };
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use sqlx::{Connection, SqliteConnection, SqlitePool};
-use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
@@ -27,61 +26,85 @@ use crate::{
         },
     },
     eml::{EML110, EMLDocument, EMLImportError, EmlHash},
-    infra::audit_log::{AsAuditEvent, AuditEvent, AuditEventType, AuditService, as_audit_event},
+    infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
     repository::{
         committee_session_repo::get_election_committee_session,
-        data_entry_repo, election_repo,
+        election_repo,
         polling_station_repo::{create, create_many, delete, get_for_election, list, update},
         user_repo::User,
     },
-    service::change_committee_session_status,
+    service::{change_committee_session_status, create_empty_data_entry},
 };
 
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
-#[serde(deny_unknown_fields)]
-pub struct PollingStationDetails {
+#[derive(Serialize)]
+pub struct PollingStationAuditData {
     pub polling_station_id: PollingStationId,
     pub polling_station_election_id: ElectionId,
     pub polling_station_committee_session_id: CommitteeSessionId,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(nullable = false)]
     pub polling_station_prev_data_entry_id: Option<DataEntryId>,
     pub polling_station_name: String,
     pub polling_station_number: u32,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(nullable = false)]
     pub polling_station_number_of_voters: Option<u32>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(nullable = false)]
     pub polling_station_type: Option<String>,
     pub polling_station_address: String,
     pub polling_station_postal_code: String,
     pub polling_station_locality: String,
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
-pub struct PollingStationImportDetails {
+impl From<PollingStation> for PollingStationAuditData {
+    fn from(value: PollingStation) -> Self {
+        Self {
+            polling_station_id: value.id,
+            polling_station_election_id: value.election_id,
+            polling_station_committee_session_id: value.committee_session_id,
+            polling_station_prev_data_entry_id: value.prev_data_entry_id,
+            polling_station_name: value.name,
+            polling_station_number: value.number,
+            polling_station_number_of_voters: value.number_of_voters,
+            polling_station_type: value.polling_station_type.map(|t| t.to_string()),
+            polling_station_address: value.address,
+            polling_station_postal_code: value.postal_code,
+            polling_station_locality: value.locality,
+        }
+    }
+}
+
+#[derive(Serialize)]
+pub struct PollingStationImportAuditData {
     pub import_election_id: ElectionId,
     pub import_file_name: String,
     pub import_number_of_polling_stations: u64,
 }
 
 #[derive(Serialize)]
-struct PollingStationCreated(pub PollingStationDetails);
-#[derive(Serialize)]
-struct PollingStationUpdated(pub PollingStationDetails);
-#[derive(Serialize)]
-struct PollingStationDeleted(pub PollingStationDetails);
-#[derive(Serialize)]
-struct PollingStationsImported(pub PollingStationImportDetails);
+struct PollingStationCreatedAuditData(pub PollingStationAuditData);
+impl AsAuditEvent for PollingStationCreatedAuditData {
+    const EVENT_TYPE: AuditEventType = AuditEventType::PollingStationCreated;
+    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Success;
+}
 
-as_audit_event!(PollingStationCreated, AuditEventType::PollingStationCreated);
-as_audit_event!(PollingStationUpdated, AuditEventType::PollingStationUpdated);
-as_audit_event!(PollingStationDeleted, AuditEventType::PollingStationDeleted);
-as_audit_event!(
-    PollingStationsImported,
-    AuditEventType::PollingStationsImported
-);
+#[derive(Serialize)]
+struct PollingStationUpdatedAuditData(pub PollingStationAuditData);
+impl AsAuditEvent for PollingStationUpdatedAuditData {
+    const EVENT_TYPE: AuditEventType = AuditEventType::PollingStationUpdated;
+    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Success;
+}
+
+#[derive(Serialize)]
+struct PollingStationDeletedAuditData(pub PollingStationAuditData);
+impl AsAuditEvent for PollingStationDeletedAuditData {
+    const EVENT_TYPE: AuditEventType = AuditEventType::PollingStationDeleted;
+    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Info;
+}
+#[derive(Serialize)]
+struct PollingStationsImportedAuditData(pub PollingStationImportAuditData);
+impl AsAuditEvent for PollingStationsImportedAuditData {
+    const EVENT_TYPE: AuditEventType = AuditEventType::PollingStationsImported;
+    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Success;
+}
 
 pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::default()
@@ -179,14 +202,13 @@ async fn polling_station_create(
     let mut polling_station = create(&mut tx, election_id, new_polling_station).await?;
 
     if !committee_session.is_next_session() {
-        let data_entry = data_entry_repo::create_empty(&mut tx, polling_station.id).await?;
-        polling_station.data_entry_id = Some(data_entry.id);
+        polling_station = create_empty_data_entry(&mut tx, polling_station.id).await?;
     }
 
     audit_service
         .log(
             &mut tx,
-            &PollingStationCreated(polling_station.clone().into()),
+            &PollingStationCreatedAuditData(polling_station.clone().into()),
             None,
         )
         .await?;
@@ -288,7 +310,7 @@ async fn polling_station_update(
     audit_service
         .log(
             &mut tx,
-            &PollingStationUpdated(polling_station.clone().into()),
+            &PollingStationUpdatedAuditData(polling_station.clone().into()),
             None,
         )
         .await?;
@@ -363,7 +385,7 @@ async fn polling_station_delete(
     audit_service
         .log(
             &mut tx,
-            &PollingStationDeleted(polling_station.clone().into()),
+            &PollingStationDeletedAuditData(polling_station.clone().into()),
             None,
         )
         .await?;
@@ -431,8 +453,7 @@ pub async fn create_imported_polling_stations(
 
     if !committee_session.is_next_session() {
         for polling_station in &mut polling_stations {
-            let data_entry = data_entry_repo::create_empty(&mut tx, polling_station.id).await?;
-            polling_station.data_entry_id = Some(data_entry.id);
+            *polling_station = create_empty_data_entry(&mut tx, polling_station.id).await?;
         }
     }
 
@@ -440,7 +461,7 @@ pub async fn create_imported_polling_stations(
     audit_service
         .log(
             &mut tx,
-            &PollingStationsImported(PollingStationImportDetails {
+            &PollingStationsImportedAuditData(PollingStationImportAuditData {
                 import_election_id: election_id,
                 import_file_name: polling_stations_request.file_name,
                 import_number_of_polling_stations: u64::try_from(polling_stations.len())

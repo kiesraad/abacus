@@ -75,7 +75,7 @@ pub async fn election_apportionment(
         let summary = ElectionSummary::from_results(&election, &results)?;
         let input = ApportionmentInputData {
             number_of_seats: election.number_of_seats,
-            list_votes: summary.political_group_votes.clone(),
+            list_votes: &summary.political_group_votes,
         };
         let result = apportionment::process(&input)?;
 

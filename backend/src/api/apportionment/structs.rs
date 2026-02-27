@@ -9,12 +9,12 @@ use crate::domain::{
 };
 
 #[derive(Clone, Debug)]
-pub struct ApportionmentInputData {
+pub struct ApportionmentInputData<'a> {
     pub number_of_seats: u32,
-    pub list_votes: Vec<PoliticalGroupCandidateVotes>,
+    pub list_votes: &'a [PoliticalGroupCandidateVotes],
 }
 
-impl apportionment::ApportionmentInput for ApportionmentInputData {
+impl<'a> apportionment::ApportionmentInput for ApportionmentInputData<'a> {
     type List = PoliticalGroupCandidateVotes;
 
     fn number_of_seats(&self) -> u32 {
@@ -22,7 +22,7 @@ impl apportionment::ApportionmentInput for ApportionmentInputData {
     }
 
     fn list_votes(&self) -> &[Self::List] {
-        &self.list_votes
+        self.list_votes
     }
 }
 

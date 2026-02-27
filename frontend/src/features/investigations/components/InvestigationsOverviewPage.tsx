@@ -25,7 +25,7 @@ import { InvestigationCard } from "./InvestigationCard";
 
 // biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function InvestigationsOverviewPage() {
-  const { currentCommitteeSession } = useElection();
+  const { currentCommitteeSession, election } = useElection();
   const { investigations, currentInvestigations, handledInvestigations, missingInvestigations } = useInvestigations();
   const { refetch: refetchStatuses } = useElectionStatus();
   const { isCoordinator } = useUserRole();
@@ -66,7 +66,7 @@ export function InvestigationsOverviewPage() {
         <section>
           <h1>
             {t("investigations.investigations_in_committee_session", {
-              sessionLabel: committeeSessionLabel(currentCommitteeSession.number).toLowerCase(),
+              sessionLabel: committeeSessionLabel(election.role, currentCommitteeSession.number, false, true),
             })}
           </h1>
         </section>

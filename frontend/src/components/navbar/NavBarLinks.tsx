@@ -14,7 +14,9 @@ type NavBarLinksProps = { location: { pathname: string } };
 function ElectionBreadcrumb({ election }: { election: Election }) {
   return (
     <>
-      <span className="bold">{election.location}</span>
+      <span className="bold">
+        {election.role} {election.domain_id} {election.location}
+      </span>
       <span>&mdash;</span>
       <span>{election.name}</span>
     </>
@@ -65,7 +67,9 @@ function ElectionManagementLinks({ location }: NavBarLinksProps) {
       {location.pathname.match(/^\/elections\/\d+\/status\/\d+\/(resolve-differences|detail(\/\w+)?)$/) && (
         <>
           <IconChevronRight />
-          <Link to={`/elections/${election.id}/status`}>{committeeSessionLabel(currentCommitteeSession.number)}</Link>
+          <Link to={`/elections/${election.id}/status`}>
+            {committeeSessionLabel(election.role, currentCommitteeSession.number)}
+          </Link>
         </>
       )}
       {location.pathname.match(/^\/elections\/\d+\/investigations\/add/) && (

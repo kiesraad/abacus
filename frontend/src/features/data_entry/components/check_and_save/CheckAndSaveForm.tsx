@@ -145,7 +145,7 @@ export function CheckAndSaveForm() {
       <DataEntryNavigation onSubmit={onSubmit} />
 
       {error instanceof FatalApiError && error.reference === "CommitteeSessionPaused" && (
-        <CommitteeSessionPausedModal showUnsavedChanges />
+        <CommitteeSessionPausedModal showUnsavedChanges electionRole={election.role} />
       )}
       {error instanceof ApiError && <ErrorModal error={error} />}
 

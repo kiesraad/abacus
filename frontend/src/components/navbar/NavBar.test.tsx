@@ -54,10 +54,10 @@ describe("NavBar", () => {
 
     expect(screen.queryByRole("link", { name: "Verkiezingen" })).toBeVisible();
     expect(
-      screen.queryByRole("link", { name: "Heemdamseburg — Gemeenteraadsverkiezingen 2026" }),
+      screen.queryByRole("link", { name: "GSB 0035 Heemdamseburg — Gemeenteraadsverkiezingen 2026" }),
     ).not.toBeInTheDocument();
 
-    expect(screen.queryByText("Heemdamseburg")).toBeVisible();
+    expect(screen.queryByText("GSB 0035 Heemdamseburg")).toBeVisible();
     expect(screen.queryByText("Gemeenteraadsverkiezingen 2026")).toBeVisible();
   });
 
@@ -73,7 +73,7 @@ describe("NavBar", () => {
 
     expect(screen.queryByRole("link", { name: "Verkiezingen" })).toBeVisible();
     expect(
-      screen.queryByRole("link", { name: ["Heemdamseburg", "—", "Gemeenteraadsverkiezingen 2026"].join("") }),
+      screen.queryByRole("link", { name: ["GSB 0035 Heemdamseburg", "—", "Gemeenteraadsverkiezingen 2026"].join("") }),
     ).toBeVisible();
   });
 
@@ -132,7 +132,7 @@ describe("NavBar", () => {
 
     expect(screen.queryByRole("link", { name: "Verkiezingen" })).not.toBeInTheDocument();
     expect(
-      screen.queryByRole("link", { name: ["Heemdamseburg", "—", "Gemeenteraadsverkiezingen 2026"].join("") }),
+      screen.queryByRole("link", { name: ["GSB 0035 Heemdamseburg", "—", "Gemeenteraadsverkiezingen 2026"].join("") }),
     ).toBeVisible();
   });
 
@@ -145,7 +145,7 @@ describe("NavBar", () => {
 
     expect(screen.queryByRole("link", { name: "Verkiezingen" })).not.toBeInTheDocument();
     expect(
-      screen.queryByRole("link", { name: ["Heemdamseburg", "—", "Gemeenteraadsverkiezingen 2026"].join("") }),
+      screen.queryByRole("link", { name: ["GSB 0035 Heemdamseburg", "—", "Gemeenteraadsverkiezingen 2026"].join("") }),
     ).toBeVisible();
     expect(screen.queryByRole("link", { name: "Eerste zitting" })).toBeVisible();
   });
@@ -158,7 +158,7 @@ describe("NavBar", () => {
 
     expect(screen.queryByRole("link", { name: "Verkiezingen" })).not.toBeInTheDocument();
     expect(
-      screen.queryByRole("link", { name: ["Heemdamseburg", "—", "Gemeenteraadsverkiezingen 2026"].join("") }),
+      screen.queryByRole("link", { name: ["GSB 0035 Heemdamseburg", "—", "Gemeenteraadsverkiezingen 2026"].join("") }),
     ).toBeVisible();
     expect(screen.queryByRole("link", { name: "Stembureaus" })).toBeVisible();
   });

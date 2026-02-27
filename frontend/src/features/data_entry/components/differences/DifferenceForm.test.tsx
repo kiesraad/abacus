@@ -32,7 +32,7 @@ function renderForm() {
   return render(
     <MessagesProvider>
       <DataEntryProvider election={electionMockData} pollingStation={pollingStationMockData[0]!} entryNumber={1}>
-        <DataEntrySection />
+        <DataEntrySection electionRole={electionMockData.role} />
       </DataEntryProvider>
     </MessagesProvider>,
   );

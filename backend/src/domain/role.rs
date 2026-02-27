@@ -104,7 +104,7 @@ mod tests {
     }
 
     #[test]
-    fn administrator_manages_all_other_roles() {
+    fn administrator_manages_all_roles() {
         for role in Role::VARIANTS {
             assert!(Role::Administrator.manages(role));
         }

@@ -12,7 +12,12 @@ export function isTypist(role?: Role) {
   return role === "typist_gsb" || role === "typist_csb";
 }
 
-export type RoleWithoutElection = "administrator" | "coordinator" | "typist";
+export const roleWithoutElectionValues = ["administrator", "coordinator", "typist"] as const;
+export type RoleWithoutElection = (typeof roleWithoutElectionValues)[number];
+
+export function isRoleWithoutElection(value: string): value is RoleWithoutElection {
+  return (roleWithoutElectionValues as readonly string[]).includes(value);
+}
 
 export function roleWithoutElection(role: Role): RoleWithoutElection {
   switch (role) {

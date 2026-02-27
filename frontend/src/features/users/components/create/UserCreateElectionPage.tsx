@@ -1,4 +1,4 @@
-import type { FormEvent } from "react";
+import { type FormEvent, useState } from "react";
 import { Navigate, useNavigate } from "react-router";
 
 import { PageTitle } from "@/components/page_title/PageTitle";
@@ -11,23 +11,30 @@ import { StringFormData } from "@/utils/stringFormData";
 
 import { useUserCreateContext } from "../../hooks/useUserCreateContext";
 
-export function UserCreateTypePage() {
+export function UserCreateElectionPage() {
   const navigate = useNavigate();
-  const { fullRole, type, setType } = useUserCreateContext();
+  const [error, setError] = useState<string>("");
+  const { role, election, setElection, setType } = useUserCreateContext();
 
-  if (!fullRole) {
+  if (role !== "coordinator" && role !== "typist") {
     return <Navigate to="/users/create" />;
   }
-
-  // Preselect fullname if there was nothing selected yet
-  const fullnameChecked = type ? type === "fullname" : true;
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new StringFormData(event.currentTarget);
-    const type = formData.getString("type");
-    if (type === "fullname" || type === "anonymous") {
-      setType(type);
+    const electionValue = formData.getString("election");
+    if (electionValue !== "csb" && electionValue !== "gsb") {
+      setError(t("users.mandatory"));
+      return;
+    }
+
+    setElection(electionValue);
+
+    if (role === "typist") {
+      void navigate("/users/create/type");
+    } else {
+      setType("fullname");
       void navigate("/users/create/details");
     }
   }
@@ -37,29 +44,30 @@ export function UserCreateTypePage() {
       <PageTitle title={`${t("users.add")} - Abacus`} />
       <header>
         <section>
-          <h1>{t("users.add_role", { role: t(`users.${fullRole}`) })}</h1>
+          <h1>{t("users.add_role", { role: t(`users.${role}`) })}</h1>
         </section>
       </header>
       <main>
-        <Form title={t("users.type_title")} onSubmit={handleSubmit}>
+        <Form title={t("users.election_title", { role: t(`users.${role}`).toLowerCase() })} onSubmit={handleSubmit}>
           <FormLayout>
             <FormLayout.Section>
-              <p>{t("users.type_hint")}</p>
+              <p>{t("users.election_hint")}</p>
               <ChoiceList>
-                <ChoiceList.Legend>{t("users.type_label")}</ChoiceList.Legend>
+                <ChoiceList.Legend>{t("users.election_label")}</ChoiceList.Legend>
+                {error && <ChoiceList.Error id="election-error">{error}</ChoiceList.Error>}
                 <ChoiceList.Radio
-                  id="role-fullname"
-                  name="type"
-                  defaultValue="fullname"
-                  defaultChecked={fullnameChecked}
-                  label={t("users.type_fullname")}
+                  id="election-gsb"
+                  name="election"
+                  defaultValue="gsb"
+                  defaultChecked={election === "gsb"}
+                  label={t("users.election_gsb")}
                 />
                 <ChoiceList.Radio
-                  id="role-anonymous"
-                  name="type"
-                  defaultValue="anonymous"
-                  defaultChecked={!fullnameChecked}
-                  label={t("users.type_anonymous")}
+                  id="election-csb"
+                  name="election"
+                  defaultValue="csb"
+                  defaultChecked={election === "csb"}
+                  label={t("users.election_csb")}
                 />
               </ChoiceList>
             </FormLayout.Section>

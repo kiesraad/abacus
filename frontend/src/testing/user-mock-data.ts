@@ -10,10 +10,10 @@ export function getTypistUser(): NonNullable<UseUserReturn> {
   };
 }
 
-export function getCoordinatorUser(): NonNullable<UseUserReturn> {
+export function getCoordinatorUser(election: "csb" | "gsb" = "gsb"): NonNullable<UseUserReturn> {
   return {
     needs_password_change: false,
-    role: "coordinator_gsb",
+    role: `coordinator_${election}`,
     roleWithoutElection: "coordinator",
     user_id: 2,
     username: "testcoordinator",

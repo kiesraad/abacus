@@ -1,7 +1,15 @@
 import { describe, expect, test } from "vitest";
 
 import { type Role, roleValues } from "@/types/generated/openapi";
-import { isAdministrator, isCoordinator, isTypist, roleWithoutElection } from "@/utils/role";
+import {
+  isAdministrator,
+  isCoordinator,
+  isRoleWithoutElection,
+  isTypist,
+  type RoleWithoutElection,
+  roleWithoutElection,
+  roleWithoutElectionValues,
+} from "@/utils/role";
 
 describe("Role util", () => {
   test.each(
@@ -24,5 +32,13 @@ describe("Role util", () => {
   test.each(roleValues)("Role %j without election should be the first part of role", (role: Role) => {
     const roleWithout = roleWithoutElection(role);
     expect(role.startsWith(roleWithout)).toBe(true);
+  });
+
+  test.each(roleWithoutElectionValues)("String %j should be a RoleWithoutElection", (role: RoleWithoutElection) => {
+    expect(isRoleWithoutElection(role as string)).toBe(true);
+  });
+
+  test('String "typist_gsb" is not a RoleWithoutElection', () => {
+    expect(isRoleWithoutElection("typist_gsb")).toBe(false);
   });
 });

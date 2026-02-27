@@ -8,45 +8,52 @@ import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { useUser } from "@/hooks/user/useUser";
 import { t } from "@/i18n/translate";
-import { isCoordinator } from "@/utils/role";
+import { isCoordinator, isRoleWithoutElection } from "@/utils/role";
 import { StringFormData } from "@/utils/stringFormData";
+import type { Election } from "../../hooks/UserCreateContext";
 import { useUserCreateContext } from "../../hooks/useUserCreateContext";
+
+function electionFromRole(role: "coordinator_csb" | "coordinator_gsb"): Election {
+  switch (role) {
+    case "coordinator_csb":
+      return "csb";
+    case "coordinator_gsb":
+      return "gsb";
+  }
+}
 
 export function UserCreateRolePage() {
   const navigate = useNavigate();
   const [error, setError] = useState<string>("");
-  const { role, setRole, setType } = useUserCreateContext();
-  const user = useUser();
+  const { role, setRole, setElection, setType } = useUserCreateContext();
+  const loggedInUser = useUser();
 
-  // If the user is a coordinator, set the role to "typist" and navigate to the type page
+  // If the user is a coordinator, set role and election, and navigate to the type page
   useEffect(() => {
-    if (isCoordinator(user?.role)) {
-      setRole("typist_gsb");
-      void navigate("/users/create/type");
+    if (isCoordinator(loggedInUser?.role)) {
+      setRole("typist");
+      setElection(electionFromRole(loggedInUser.role));
+      void navigate("/users/create/type", { replace: true });
     }
-  }, [user, navigate, setRole]);
-
-  if (user?.role !== "administrator") {
-    return null;
-  }
+  }, [loggedInUser, navigate, setRole, setElection]);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new StringFormData(event.currentTarget);
     const roleValue = formData.getString("role") || null;
 
-    if (!roleValue) {
-      setError(t("users.role_mandatory"));
+    if (!roleValue || !isRoleWithoutElection(roleValue)) {
+      setError(t("users.mandatory"));
       return;
     }
 
-    if (roleValue === "typist_gsb") {
-      setRole(roleValue);
-      void navigate("/users/create/type");
-    } else if (roleValue === "coordinator_gsb" || roleValue === "administrator") {
-      setRole(roleValue);
+    if (roleValue === "administrator") {
+      setRole("administrator");
       setType("fullname");
       void navigate("/users/create/details");
+    } else {
+      setRole(roleValue);
+      void navigate("/users/create/election");
     }
   }
 
@@ -67,28 +74,28 @@ export function UserCreateRolePage() {
                 <ChoiceList.Legend>{t("users.role_label")}</ChoiceList.Legend>
                 {error && <ChoiceList.Error id="role-error">{error}</ChoiceList.Error>}
                 <ChoiceList.Radio
-                  id={"role-administrator"}
-                  name={"role"}
-                  defaultValue={"administrator"}
+                  id="role-administrator"
+                  name="role"
+                  defaultValue="administrator"
                   defaultChecked={role === "administrator"}
                   label={t("users.administrator")}
                 >
                   {t("users.role_administrator_hint")}
                 </ChoiceList.Radio>
                 <ChoiceList.Radio
-                  id={"role-coordinator"}
-                  name={"role"}
-                  defaultValue={"coordinator_gsb"}
-                  defaultChecked={role === "coordinator_gsb"}
+                  id="role-coordinator"
+                  name="role"
+                  defaultValue="coordinator"
+                  defaultChecked={role === "coordinator"}
                   label={t("users.coordinator")}
                 >
                   {t("users.role_coordinator_hint")}
                 </ChoiceList.Radio>
                 <ChoiceList.Radio
-                  id={"role-typist"}
-                  name={"role"}
-                  defaultValue={"typist_gsb"}
-                  defaultChecked={role === "typist_gsb"}
+                  id="role-typist"
+                  name="role"
+                  defaultValue="typist"
+                  defaultChecked={role === "typist"}
                   label={t("users.typist")}
                 >
                   {t("users.role_typist_hint")}

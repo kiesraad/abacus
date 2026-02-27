@@ -10,7 +10,7 @@ import { UserCreateDetailsForm } from "./UserCreateDetailsForm";
 export function UserCreateDetailsPage() {
   const { pushMessage } = useMessages();
   const navigate = useNavigate();
-  const { role, type } = useUserCreateContext();
+  const { fullRole, type } = useUserCreateContext();
 
   function handleSubmitted({ username, role }: User) {
     pushMessage({
@@ -21,7 +21,7 @@ export function UserCreateDetailsPage() {
     void navigate("/users");
   }
 
-  if (!role || !type) {
+  if (!fullRole || !type) {
     return <Navigate to="/users/create" />;
   }
 
@@ -30,12 +30,12 @@ export function UserCreateDetailsPage() {
       <PageTitle title={`${t("users.add")} - Abacus`} />
       <header>
         <section>
-          <h1>{t("users.add_role", { role: t(`users.${role}`) })}</h1>
+          <h1>{t("users.add_role", { role: t(`users.${fullRole}`) })}</h1>
         </section>
       </header>
       <main>
         <article>
-          <UserCreateDetailsForm role={role} showFullname={type === "fullname"} onSubmitted={handleSubmitted} />
+          <UserCreateDetailsForm role={fullRole} showFullname={type === "fullname"} onSubmitted={handleSubmitted} />
         </article>
       </main>
     </>

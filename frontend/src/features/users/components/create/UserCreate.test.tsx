@@ -36,6 +36,13 @@ const rolePage = {
   continue: () => screen.getByRole("button", { name: "Verder" }),
 };
 
+const electionPage = {
+  radioGroup: () => screen.getByRole("group", { name: "Kies een niveau" }),
+  gsb: () => screen.getByRole("radio", { name: /GSB/ }),
+  csb: () => screen.getByRole("radio", { name: /CSB/ }),
+  continue: () => screen.getByRole("button", { name: "Verder" }),
+};
+
 const typePage = {
   radioGroup: () => screen.getByRole("group", { name: "Type account" }),
   withName: () => screen.getByRole("radio", { name: /Op naam/ }),
@@ -59,15 +66,33 @@ describe("User create pages integration test", () => {
   });
 
   describe("Navigation and fullname presence", () => {
-    test.each(["administrator", "coordinator"] as const)("For %s", async (role) => {
+    test("For administrator", async () => {
       const router = renderWithRouter();
       const user = userEvent.setup();
 
       await router.navigate("/users/create");
 
       await waitFor(rolePage.radioGroup);
-      await user.click(rolePage[role]());
+      await user.click(rolePage.administrator());
       await user.click(rolePage.continue());
+
+      await waitFor(detailsPage.title);
+      expect(detailsPage.fullname()).toBeInTheDocument();
+    });
+
+    test("For coordinator", async () => {
+      const router = renderWithRouter();
+      const user = userEvent.setup();
+
+      await router.navigate("/users/create");
+
+      await waitFor(rolePage.radioGroup);
+      await user.click(rolePage.coordinator());
+      await user.click(rolePage.continue());
+
+      await waitFor(electionPage.radioGroup);
+      await user.click(electionPage.gsb());
+      await user.click(electionPage.continue());
 
       await waitFor(detailsPage.title);
       expect(detailsPage.fullname()).toBeInTheDocument();
@@ -82,6 +107,10 @@ describe("User create pages integration test", () => {
       await waitFor(rolePage.radioGroup);
       await user.click(rolePage.typist());
       await user.click(rolePage.continue());
+
+      await waitFor(electionPage.radioGroup);
+      await user.click(electionPage.gsb());
+      await user.click(electionPage.continue());
 
       await waitFor(typePage.radioGroup);
       expect(typePage.withName()).toBeChecked();

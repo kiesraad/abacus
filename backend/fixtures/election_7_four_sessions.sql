@@ -76,8 +76,10 @@ VALUES (711, 701, NULL, 701, 'TestA', 1, NULL, 'FixedLocation', 'Testweg 1a', '1
        (741, 704, 703, NULL, 'TestA', 1, NULL, 'FixedLocation', 'Testweg 1a', '1234 AA', 'Grote Stad'),
        (742, 704, 704, NULL, 'TestB', 2, NULL, 'FixedLocation', 'Testweg 1b', '1234 BB', 'Grote Stad');
 
-INSERT INTO
-    polling_station_investigations
-VALUES
-    (721, "reason", "findings", 1),
-    (732, "reason", "findings", 1);
+UPDATE polling_stations
+SET investigation_state = '{"polling_station_id":721,"reason":"reason","findings":"findings","corrected_results":true}'
+WHERE id = 721;
+
+UPDATE polling_stations
+SET investigation_state = '{"polling_station_id":732,"reason":"reason","findings":"findings","corrected_results":true}'
+WHERE id = 732;

@@ -476,7 +476,6 @@ VALUES (8, 5, NULL, 501, 'Testgebouw', 41, NULL, 'FixedLocation', 'Testweg 3', '
        (9, 6, 501, NULL, 'Testgebouw', 41, NULL, 'FixedLocation', 'Testweg 3', '1234 QA', 'Grote Stad'),
        (11, 6, NULL, 502, 'Test ander gebouw', 42, NULL, 'FixedLocation', 'Testweg 4', '1234 QA', 'Grote Stad');
 
-INSERT INTO
-    polling_station_investigations
-VALUES
-    (11, "reason", "findings", 1);
+UPDATE polling_stations
+SET investigation_state = '{"polling_station_id":11,"reason":"reason","findings":"findings","corrected_results":true}'
+WHERE id = 11;

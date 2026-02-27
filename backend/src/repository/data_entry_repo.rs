@@ -207,8 +207,7 @@ pub async fn statuses(
             FROM polling_stations AS p
             LEFT JOIN committee_sessions AS c ON c.id = p.committee_session_id
             LEFT JOIN data_entries AS de ON de.id = p.data_entry_id
-            LEFT JOIN polling_station_investigations AS psi ON psi.polling_station_id = p.id
-            WHERE c.id = $1 AND (c.number = 1 OR psi.corrected_results = 1)
+            WHERE c.id = $1 AND (c.number = 1 OR json_extract(p.investigation_state, '$.corrected_results') = 1)
         "#,
         committee_session_id
     )
@@ -297,7 +296,7 @@ async fn fetch_results_for_committee_session(
                    CASE
                        WHEN json_extract(de.state, '$.status') = 'Definitive'
                            THEN json_extract(de.state, '$.state.results')
-                       WHEN psi.polling_station_id IS NULL
+                       WHEN json_extract(ps.investigation_state, '$.corrected_results') IS NOT 1
                            AND json_extract(prev_de.state, '$.status') = 'Definitive'
                            THEN json_extract(prev_de.state, '$.state.results')
                        ELSE NULL
@@ -305,8 +304,6 @@ async fn fetch_results_for_committee_session(
             FROM polling_stations AS ps
             LEFT JOIN data_entries AS de ON de.id = ps.data_entry_id
             LEFT JOIN data_entries AS prev_de ON prev_de.id = ps.prev_data_entry_id
-            LEFT JOIN polling_station_investigations AS psi
-                ON psi.polling_station_id = ps.id AND psi.corrected_results = 1
             WHERE ps.committee_session_id = $1 AND ($2 IS NULL OR ps.id = $2)
         )
         SELECT
@@ -408,12 +405,12 @@ pub async fn are_results_complete_for_committee_session(
     let all_investigations_finished = query!(
         r#"
         SELECT COUNT(*) = 0 as "result: bool"
-        FROM polling_station_investigations AS psi
-        JOIN polling_stations AS ps ON ps.id = psi.polling_station_id
+        FROM polling_stations AS ps
         LEFT JOIN data_entries AS de ON de.id = ps.data_entry_id
         WHERE ps.committee_session_id = ?
-        AND (psi.corrected_results IS NULL
-             OR (psi.corrected_results = 1
+        AND ps.investigation_state IS NOT NULL
+        AND (json_extract(ps.investigation_state, '$.corrected_results') IS NULL
+             OR (json_extract(ps.investigation_state, '$.corrected_results') = 1
                  AND (de.state IS NULL OR json_extract(de.state, '$.status') != 'Definitive')))
         "#,
         committee_session_id

@@ -10,6 +10,7 @@ import { getRemovalSteps } from "../../utils/steps";
 import { render_title_and_header } from "../../utils/utils";
 import cls from "../Apportionment.module.css";
 import { ApportionmentErrorPage } from "../ApportionmentError";
+import { Footnotes } from "./Footnotes";
 import { FullSeatsTable } from "./FullSeatsTable";
 import { ResidualSeatsCalculationTable } from "./ResidualSeatsCalculationTable";
 
@@ -49,21 +50,7 @@ export function ApportionmentFullSeatsPage() {
                   resultChanges={resultChanges}
                 />
               </div>
-              {fullSeatRemovalSteps.length > 0 && (
-                <ol id="footnotes-list" className={cn(cls.footnotesList, "w-39")}>
-                  {fullSeatRemovalSteps.map((listSeatRemoval, index) => {
-                    return (
-                      // biome-ignore lint/suspicious/noArrayIndexKey: we can use the index as key since there is no unique id
-                      <li key={index} id={`step-${index + 1}-list-exhaustion-information`}>
-                        {t("apportionment.list_exhaustion_full_seat_removal", {
-                          list_retracted_seat: listSeatRemoval.change.list_retracted_seat,
-                        })}
-                        {index === 0 && ` ${t("apportionment.article_p10")}`}
-                      </li>
-                    );
-                  })}
-                </ol>
-              )}
+              {fullSeatRemovalSteps.length > 0 && <Footnotes fullSeatRemovalSteps={fullSeatRemovalSteps} />}
             </div>
             <div className={cn(cls.tableDiv, "mb-lg")}>
               <div>

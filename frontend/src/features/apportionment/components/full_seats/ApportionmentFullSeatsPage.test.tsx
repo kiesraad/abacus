@@ -53,6 +53,8 @@ describe("ApportionmentFullSeatsPage", () => {
       ["8", "Political Group H", "52", ":", "80", "", "=", "0"],
     ]);
 
+    expect(screen.queryByTestId("footnotes-list")).not.toBeInTheDocument();
+
     expect(
       await screen.findByRole("heading", { level: 2, name: "Hoeveel restzetels zijn er te verdelen?" }),
     ).toBeVisible();
@@ -89,11 +91,8 @@ describe("ApportionmentFullSeatsPage", () => {
       ["5", "Political Group E", "453", ":", "340", "4/15", "=", "1"],
     ]);
 
-    expect(await screen.findByTestId("step-1-list-exhaustion-information")).toHaveTextContent(
-      "Omdat lijst 1 onvoldoende kandidaten heeft, is één volle zetel herverdeeld als restzetel. (Kieswet, artikel P 10)",
-    );
-    expect(await screen.findByTestId("step-2-list-exhaustion-information")).toHaveTextContent(
-      "Omdat lijst 1 onvoldoende kandidaten heeft, is één volle zetel herverdeeld als restzetel.",
+    expect(await screen.findByTestId("footnotes-list")).toHaveTextContent(
+      /^Omdat lijst 1 onvoldoende kandidaten heeft, is één volle zetel herverdeeld als restzetel. \(Kieswet, artikel P 10\)Omdat lijst 1 onvoldoende kandidaten heeft, is één volle zetel herverdeeld als restzetel.$/,
     );
 
     expect(await screen.findByRole("heading", { level: 2, name: "Hoeveel restzetels zijn er te verdelen?" }));
@@ -126,6 +125,7 @@ describe("ApportionmentFullSeatsPage", () => {
       ).toBeVisible();
 
       expect(screen.queryByTestId("full-seats-table")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("footnotes-list")).not.toBeInTheDocument();
       expect(screen.queryByTestId("residual-seats-calculation-table")).not.toBeInTheDocument();
     });
 
@@ -148,6 +148,7 @@ describe("ApportionmentFullSeatsPage", () => {
       ).toBeVisible();
 
       expect(screen.queryByTestId("full-seats-table")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("footnotes-list")).not.toBeInTheDocument();
       expect(screen.queryByTestId("residual-seats-calculation-table")).not.toBeInTheDocument();
     });
 
@@ -172,6 +173,7 @@ describe("ApportionmentFullSeatsPage", () => {
       ).toBeVisible();
 
       expect(screen.queryByTestId("full-seats-table")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("footnotes-list")).not.toBeInTheDocument();
       expect(screen.queryByTestId("residual-seats-calculation-table")).not.toBeInTheDocument();
     });
 
@@ -196,6 +198,7 @@ describe("ApportionmentFullSeatsPage", () => {
       ).toBeVisible();
 
       expect(screen.queryByTestId("full-seats-table")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("footnotes-list")).not.toBeInTheDocument();
       expect(screen.queryByTestId("residual-seats-calculation-table")).not.toBeInTheDocument();
     });
 

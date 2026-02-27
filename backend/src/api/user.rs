@@ -191,10 +191,11 @@ pub async fn user_update(
     Path(user_id): Path<UserId>,
     Json(update_user_req): Json<UpdateUserRequest>,
 ) -> Result<Json<User>, APIError> {
-    // fetch the current user
+    let mut tx = pool.begin_immediate().await?;
+
     if logged_in_user.role().is_coordinator() {
-        let mut conn = pool.acquire().await?;
-        let user = user_repo::get_by_id(&mut conn, user_id)
+        // fetch the current user to determine role
+        let user = user_repo::get_by_id(&mut tx, user_id)
             .await?
             .ok_or(sqlx::Error::RowNotFound)?;
 
@@ -203,8 +204,6 @@ pub async fn user_update(
             return Err(AuthenticationError::Forbidden.into());
         }
     }
-
-    let mut tx = pool.begin_immediate().await?;
 
     if let Some(fullname) = update_user_req.fullname {
         user_repo::update_fullname(&mut tx, user_id, &fullname).await?
@@ -251,9 +250,9 @@ async fn user_delete(
     audit_service: AuditService,
     Path(user_id): Path<UserId>,
 ) -> Result<StatusCode, APIError> {
-    // fetch the current user
     let mut tx = pool.begin_immediate().await?;
 
+    // fetch the current user to determine role and audit logging
     let user = user_repo::get_by_id(&mut tx, user_id)
         .await?
         .ok_or(sqlx::Error::RowNotFound)?;

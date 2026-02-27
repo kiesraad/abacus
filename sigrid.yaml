@@ -27,7 +27,7 @@ languages:
         - ".*/frontend/.*.stories[.]tsx"
         - ".*/frontend/src/components/error/NotAvailableInMock[.]tsx"
         - ".*/frontend/src/features/dev/.*"
-        - ".*/frontend/src/testing/.*"
+        - ".*/frontend/.*/testing/.*"
         - ".*/frontend/e2e-tests/.*"
     generated:
       include:

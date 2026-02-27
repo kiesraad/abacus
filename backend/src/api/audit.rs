@@ -134,38 +134,22 @@ async fn audit_log_list_users(
 mod tests {
     use std::net::Ipv4Addr;
 
-    use axum::{
-        Router,
-        body::Body,
-        http::{
-            Method, Request,
-            header::{COOKIE, USER_AGENT},
-        },
-        middleware,
-        routing::get,
-    };
-    use chrono::TimeDelta;
+    use axum::{extract::State, response::IntoResponse};
+    use axum_extra::extract::Query;
     use http_body_util::BodyExt;
     use sqlx::SqlitePool;
     use test_log::test;
-    use tower::ServiceExt;
 
     use crate::{
-        AppState,
         api::{
-            audit::{audit_log_list, audit_log_list_users},
-            authentication::UserLoggedInDetails,
-            middleware::{airgap::AirgapDetection, authentication::inject_user},
+            audit::{LogFilterQuery, audit_log_list, audit_log_list_users},
+            authentication::{UserLoggedInDetails, UserLoginFailedDetails},
+            middleware::authentication::AdminOrCoordinatorGSB,
         },
+        domain::role::Role,
         infra::audit_log::{AuditLogListResponse, AuditLogUser, AuditService},
-        repository::{
-            session_repo::{self, Session},
-            user_repo::{self, User, UserId},
-        },
+        repository::user_repo::{self, User, UserId},
     };
-
-    const TEST_USER_AGENT: &str = "TestAgent/1.0";
-    const TEST_IP_ADDRESS: &str = "0.0.0.0";
 
     fn new_test_audit_service(user: Option<User>) -> AuditService {
         AuditService::new(user, Some(Ipv4Addr::new(203, 0, 113, 0).into()))
@@ -185,116 +169,136 @@ mod tests {
         service.log(&mut conn, &audit_event, None).await.unwrap();
         service.log(&mut conn, &audit_event, None).await.unwrap();
         service.log(&mut conn, &audit_event, None).await.unwrap();
+
+        let service = new_test_audit_service(None);
+        let audit_event = UserLoginFailedDetails {
+            username: "random".to_string(),
+            user_agent: "Mozilla/5.0".to_string(),
+        };
+        service.log(&mut conn, &audit_event, None).await.unwrap();
+    }
+
+    async fn get_list(pool: SqlitePool, query: LogFilterQuery) -> AuditLogListResponse {
+        let user = User::test_user(Role::Administrator, UserId::from(1));
+        let response = audit_log_list(
+            AdminOrCoordinatorGSB(user.clone()),
+            Query(query),
+            State(pool.clone()),
+        )
+        .await
+        .into_response();
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        serde_json::from_slice(&body).unwrap()
     }
 
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
     async fn test_list(pool: SqlitePool) {
-        let state = AppState {
-            pool: pool.clone(),
-            airgap_detection: AirgapDetection::nop(),
-        };
+        create_log_entries(pool.clone()).await;
 
-        let mut conn = pool.acquire().await.unwrap();
-        let session = Session::create(
-            UserId::from(1),
-            TEST_USER_AGENT,
-            TEST_IP_ADDRESS,
-            TimeDelta::seconds(60 * 30),
-        );
-        session_repo::save(&mut conn, &session).await.unwrap();
-
-        let app = Router::new()
-            .route("/api/log", get(audit_log_list))
-            .layer(middleware::map_request_with_state(
-                state.clone(),
-                inject_user,
-            ))
-            .with_state(state);
-
-        create_log_entries(pool).await;
-
-        let response = app
-            .clone()
-            .oneshot(
-                Request::builder()
-                    .method(Method::GET)
-                    .header(USER_AGENT, TEST_USER_AGENT)
-                    .header(COOKIE, session.get_cookie().encoded().to_string())
-                    .uri("/api/log")
-                    .body(Body::empty())
-                    .unwrap(),
-            )
-            .await
-            .unwrap();
-
-        let body = response.into_body().collect().await.unwrap().to_bytes();
-        let result: AuditLogListResponse = serde_json::from_slice(&body).unwrap();
-
-        assert_eq!(result.events.len(), 3);
+        let result = get_list(
+            pool.clone(),
+            LogFilterQuery {
+                page: 1,
+                per_page: 200,
+                level: vec![],
+                event: vec![],
+                user: vec![],
+                since: None,
+            },
+        )
+        .await;
+        assert_eq!(result.events.len(), 4);
         assert_eq!(result.page, 1);
         assert_eq!(result.pages, 1);
+    }
 
-        let response = app
-            .oneshot(
-                Request::builder()
-                    .method(Method::GET)
-                    .header(USER_AGENT, TEST_USER_AGENT)
-                    .header(COOKIE, session.get_cookie().encoded().to_string())
-                    .uri("/api/log?per_page=2&page=2")
-                    .body(Body::empty())
-                    .unwrap(),
-            )
-            .await
-            .unwrap();
+    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
+    async fn test_list_paging(pool: SqlitePool) {
+        create_log_entries(pool.clone()).await;
 
-        let body = response.into_body().collect().await.unwrap().to_bytes();
-        let result: AuditLogListResponse = serde_json::from_slice(&body).unwrap();
-
+        let result = get_list(
+            pool.clone(),
+            LogFilterQuery {
+                page: 2,
+                per_page: 3,
+                level: vec![],
+                event: vec![],
+                user: vec![],
+                since: None,
+            },
+        )
+        .await;
         assert_eq!(result.events.len(), 1);
         assert_eq!(result.page, 2);
         assert_eq!(result.pages, 2);
     }
 
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
+    async fn test_list_filter_event(pool: SqlitePool) {
+        create_log_entries(pool.clone()).await;
+
+        let result = get_list(
+            pool.clone(),
+            LogFilterQuery {
+                page: 1,
+                per_page: 200,
+                level: vec![],
+                event: vec!["UserLoginFailed".to_string()],
+                user: vec![],
+                since: None,
+            },
+        )
+        .await;
+        assert_eq!(result.events.len(), 1);
+    }
+
+    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
+    async fn test_list_filter_level(pool: SqlitePool) {
+        create_log_entries(pool.clone()).await;
+
+        let result = get_list(
+            pool.clone(),
+            LogFilterQuery {
+                page: 1,
+                per_page: 200,
+                level: vec!["warning".to_string()],
+                event: vec![],
+                user: vec![],
+                since: None,
+            },
+        )
+        .await;
+        assert_eq!(result.events.len(), 1);
+    }
+
+    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
+    async fn test_list_filter_user(pool: SqlitePool) {
+        create_log_entries(pool.clone()).await;
+
+        let result = get_list(
+            pool.clone(),
+            LogFilterQuery {
+                page: 1,
+                per_page: 200,
+                level: vec![],
+                event: vec![],
+                user: vec![1],
+                since: None,
+            },
+        )
+        .await;
+        assert_eq!(result.events.len(), 3);
+    }
+
+    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
     async fn test_list_users(pool: SqlitePool) {
-        let state = AppState {
-            pool: pool.clone(),
-            airgap_detection: AirgapDetection::nop(),
-        };
+        create_log_entries(pool.clone()).await;
 
-        let mut conn = pool.acquire().await.unwrap();
-        let session = Session::create(
-            UserId::from(1),
-            TEST_USER_AGENT,
-            TEST_IP_ADDRESS,
-            TimeDelta::seconds(60 * 30),
-        );
-        session_repo::save(&mut conn, &session).await.unwrap();
-
-        let app = Router::new()
-            .route("/api/log-users", get(audit_log_list_users))
-            .layer(middleware::map_request_with_state(
-                state.clone(),
-                inject_user,
-            ))
-            .with_state(state);
-
-        create_log_entries(pool).await;
-
-        let response = app
-            .clone()
-            .oneshot(
-                Request::builder()
-                    .method(Method::GET)
-                    .header(USER_AGENT, TEST_USER_AGENT)
-                    .header(COOKIE, session.get_cookie().encoded().to_string())
-                    .uri("/api/log-users")
-                    .body(Body::empty())
-                    .unwrap(),
-            )
-            .await
-            .unwrap();
-
+        let user = User::test_user(Role::Administrator, UserId::from(1));
+        let response =
+            audit_log_list_users(AdminOrCoordinatorGSB(user.clone()), State(pool.clone()))
+                .await
+                .into_response();
         let body = response.into_body().collect().await.unwrap().to_bytes();
         let result: Vec<AuditLogUser> = serde_json::from_slice(&body).unwrap();
 

@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "SELECT\n            audit_log.id as \"id: AuditLogEventId\",\n            time as \"time: _\",\n            json(event) as \"event!: serde_json::Value\",\n            event_name as \"event_name: AuditEventType\",\n            event_level as \"event_level: _\",\n            message,\n            ip as \"ip: String\",\n            user_id as \"user_id: UserId\",\n            audit_log.username,\n            user_fullname,\n            user_role as \"user_role: Role\"\n        FROM audit_log\n        WHERE (json_array_length($1) = 0 OR event_level IN (SELECT value FROM json_each($1)))\n            AND (json_array_length($2) = 0 OR event ->> 'eventType' IN (SELECT value FROM json_each($2)))\n            AND (json_array_length($3) = 0 OR user_id IN (SELECT value FROM json_each($3)))\n            AND ($4 IS NULL OR unixepoch(time) >= $4)\n        ORDER BY\n            CASE WHEN $4 IS NULL THEN time ELSE 1 END DESC,\n            CASE WHEN $4 IS NULL THEN 1 ELSE time END ASC\n        LIMIT $5 OFFSET $6\n        ",
+  "query": "SELECT\n            audit_log.id as \"id: AuditLogEventId\",\n            time as \"time: _\",\n            json(event) as \"event!: serde_json::Value\",\n            event_name as \"event_name: AuditEventType\",\n            event_level as \"event_level: _\",\n            message,\n            ip as \"ip: String\",\n            user_id as \"user_id: UserId\",\n            audit_log.username,\n            user_fullname,\n            user_role as \"user_role: Role\"\n        FROM audit_log\n        WHERE (json_array_length($1) = 0 OR event_level IN (SELECT value FROM json_each($1)))\n            AND (json_array_length($2) = 0 OR event_name IN (SELECT value FROM json_each($2)))\n            AND (json_array_length($3) = 0 OR user_id IN (SELECT value FROM json_each($3)))\n            AND ($4 IS NULL OR unixepoch(time) >= $4)\n        ORDER BY\n            CASE WHEN $4 IS NULL THEN time ELSE 1 END DESC,\n            CASE WHEN $4 IS NULL THEN 1 ELSE time END ASC\n        LIMIT $5 OFFSET $6\n        ",
   "describe": {
     "columns": [
       {
@@ -76,5 +76,5 @@
       true
     ]
   },
-  "hash": "53424e7a555b83a32fd2879cfdf9cbf22f9bb227988acafbb95f0f712fa1d4c6"
+  "hash": "9b5467bef363f34cf4018a28946a72bf4071e3d3ad1d65f95c4ce5750eae2601"
 }

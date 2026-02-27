@@ -29,9 +29,9 @@ use crate::{
 };
 
 #[derive(Serialize)]
-pub struct ApportionmentCreated(pub ElectionAuditData);
-impl AsAuditEvent for ApportionmentCreated {
-    const EVENT_TYPE: AuditEventType = AuditEventType::ApportionmentCreated;
+pub struct ApportionmentProcessed(pub ElectionAuditData);
+impl AsAuditEvent for ApportionmentProcessed {
+    const EVENT_TYPE: AuditEventType = AuditEventType::ApportionmentProcessed;
     const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Success;
 }
 
@@ -82,7 +82,7 @@ pub async fn election_apportionment(
         audit_service
             .log(
                 &mut conn,
-                &ApportionmentCreated(Election::from(election.clone()).into()),
+                &ApportionmentProcessed(Election::from(election.clone()).into()),
                 None,
             )
             .await?;

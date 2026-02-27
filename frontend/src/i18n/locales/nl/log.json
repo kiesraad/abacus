@@ -10,7 +10,7 @@
     "ApiError": "API fout",
     "ApiWarning": "API waarschuwing",
     "ApplicationStarted": "Abacus is gestart",
-    "ApportionmentCreated": "Zetelverdeling gemaakt",
+    "ApportionmentProcessed": "Zetelverdeling verwerkt",
     "CommitteeSessionCreated": "Zitting aangemaakt",
     "CommitteeSessionDeleted": "Zitting verwijderd",
     "CommitteeSessionUpdated": "Zitting bijgewerkt",

@@ -4334,7 +4334,7 @@
           "CommitteeSessionUpdated",
           "FileCreated",
           "FileDeleted",
-          "ApportionmentCreated",
+          "ApportionmentProcessed",
           "InvestigationCreated",
           "InvestigationConcluded",
           "InvestigationUpdated",

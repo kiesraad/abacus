@@ -355,7 +355,7 @@ export const auditEventTypeValues = [
   "CommitteeSessionUpdated",
   "FileCreated",
   "FileDeleted",
-  "ApportionmentCreated",
+  "ApportionmentProcessed",
   "InvestigationCreated",
   "InvestigationConcluded",
   "InvestigationUpdated",

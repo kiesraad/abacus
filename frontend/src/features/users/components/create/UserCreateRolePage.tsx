@@ -37,6 +37,11 @@ export function UserCreateRolePage() {
     }
   }, [loggedInUser, navigate, setRole, setElection]);
 
+  if (loggedInUser?.role !== "administrator") {
+    // Do not show page content while navigating away for the coordinator
+    return null;
+  }
+
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new StringFormData(event.currentTarget);

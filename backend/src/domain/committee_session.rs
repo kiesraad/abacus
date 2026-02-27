@@ -7,12 +7,9 @@ use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, Type};
 use utoipa::ToSchema;
 
-use crate::{
-    domain::{
-        committee_session_status::CommitteeSessionStatus, election::ElectionId, file::FileId,
-        id::id, investigation::PollingStationInvestigation,
-    },
-    infra::audit_log::{AsAuditEvent, AuditEvent, AuditEventType, as_audit_event},
+use crate::domain::{
+    committee_session_status::CommitteeSessionStatus, election::ElectionId, file::FileId, id::id,
+    investigation::PollingStationInvestigation,
 };
 
 #[derive(Debug, PartialEq, Eq)]
@@ -78,48 +75,6 @@ impl CommitteeSession {
         }
     }
 }
-
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
-#[serde(deny_unknown_fields)]
-pub struct CommitteeSessionDetails {
-    pub session_id: CommitteeSessionId,
-    pub session_number: u32,
-    pub session_election_id: ElectionId,
-    pub session_location: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(value_type = String, format = "date-time", nullable = false)]
-    pub session_start_date_time: Option<NaiveDateTime>,
-    pub session_status: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(nullable = false)]
-    pub session_results_eml: Option<FileId>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(nullable = false)]
-    pub session_results_pdf: Option<FileId>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(nullable = false)]
-    pub session_overview_pdf: Option<FileId>,
-}
-
-#[derive(Serialize)]
-pub struct CommitteeSessionCreated(pub CommitteeSession);
-#[derive(Serialize)]
-pub struct CommitteeSessionUpdated(pub CommitteeSession);
-#[derive(Serialize)]
-pub struct CommitteeSessionDeleted(pub CommitteeSession);
-
-as_audit_event!(
-    CommitteeSessionCreated,
-    AuditEventType::CommitteeSessionCreated
-);
-as_audit_event!(
-    CommitteeSessionUpdated,
-    AuditEventType::CommitteeSessionUpdated
-);
-as_audit_event!(
-    CommitteeSessionDeleted,
-    AuditEventType::CommitteeSessionDeleted
-);
 
 impl IntoResponse for CommitteeSession {
     fn into_response(self) -> Response {

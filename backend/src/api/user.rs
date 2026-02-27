@@ -11,7 +11,7 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
     api::{
-        authentication::{UserCreated, UserDeleted, UserUpdated},
+        authentication::{UserCreatedAuditData, UserDeletedAuditData, UserUpdatedAuditData},
         middleware::authentication::{AdminOrCoordinatorGSB, error::AuthenticationError},
     },
     domain::role::Role,
@@ -125,7 +125,7 @@ pub async fn user_create(
     )
     .await?;
     audit_service
-        .log(&mut tx, &UserCreated(user.clone().into()), None)
+        .log(&mut tx, &UserCreatedAuditData(user.clone().into()), None)
         .await?;
     tx.commit().await?;
 
@@ -221,7 +221,7 @@ pub async fn user_update(
         .ok_or(sqlx::Error::RowNotFound)?;
 
     audit_service
-        .log(&mut tx, &UserUpdated(user.clone().into()), None)
+        .log(&mut tx, &UserUpdatedAuditData(user.clone().into()), None)
         .await?;
 
     tx.commit().await?;
@@ -279,7 +279,7 @@ async fn user_delete(
 
     if deleted {
         audit_service
-            .log(&mut tx, &UserDeleted(user.clone().into()), None)
+            .log(&mut tx, &UserDeletedAuditData(user.clone().into()), None)
             .await?;
 
         tx.commit().await?;

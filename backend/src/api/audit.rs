@@ -143,7 +143,7 @@ mod tests {
     use crate::{
         api::{
             audit::{LogFilterQuery, audit_log_list, audit_log_list_users},
-            authentication::{UserLoggedInDetails, UserLoginFailedDetails},
+            authentication::{UserLoggedInAuditData, UserLoginFailedAuditData},
             middleware::authentication::AdminOrCoordinatorGSB,
         },
         domain::role::Role,
@@ -162,7 +162,7 @@ mod tests {
             .unwrap()
             .unwrap();
         let service = new_test_audit_service(Some(user));
-        let audit_event = UserLoggedInDetails {
+        let audit_event = UserLoggedInAuditData {
             user_agent: "Mozilla/5.0".to_string(),
             logged_in_users_count: 1,
         };
@@ -171,7 +171,7 @@ mod tests {
         service.log(&mut conn, &audit_event, None).await.unwrap();
 
         let service = new_test_audit_service(None);
-        let audit_event = UserLoginFailedDetails {
+        let audit_event = UserLoginFailedAuditData {
             username: "random".to_string(),
             user_agent: "Mozilla/5.0".to_string(),
         };

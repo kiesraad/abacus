@@ -674,7 +674,8 @@ mod tests {
         let mut conn = pool.acquire().await.unwrap();
 
         // Update investigations, set no corrections
-        sqlx::query("UPDATE polling_station_investigations SET corrected_results = false")
+        // TODO: change to service function call when investigation state machine is implemented () (#2904)
+        sqlx::query("UPDATE polling_stations SET investigation_state = json_set(investigation_state, '$.corrected_results', json('false')) WHERE investigation_state IS NOT NULL")
             .execute(&mut *conn)
             .await
             .unwrap();

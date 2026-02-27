@@ -684,14 +684,4 @@ VALUES
         let result = update(&mut conn, election_id, polling_station_id, data).await;
         assert!(result.is_err());
     }
-
-    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
-    async fn test_delete_restricted_when_prev_session(pool: SqlitePool) {
-        // Try to delete a polling station that has a prev_data_entry_id reference
-        let result = query!("DELETE FROM polling_stations WHERE id = 721")
-            .execute(&pool)
-            .await;
-
-        assert!(result.is_err());
-    }
 }

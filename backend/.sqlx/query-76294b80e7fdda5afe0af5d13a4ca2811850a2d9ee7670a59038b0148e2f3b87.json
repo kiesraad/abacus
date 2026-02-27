@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        SELECT EXISTS(\n            SELECT 1 FROM polling_stations\n            WHERE committee_session_id = ? AND investigation_state IS NOT NULL\n        ) as `exists`",
+  "describe": {
+    "columns": [
+      {
+        "name": "exists",
+        "ordinal": 0,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "76294b80e7fdda5afe0af5d13a4ca2811850a2d9ee7670a59038b0148e2f3b87"
+}

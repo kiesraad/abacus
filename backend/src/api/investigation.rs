@@ -192,7 +192,14 @@ async fn polling_station_investigation_create(
         polling_station_id,
         polling_station_investigation,
     )
-    .await?;
+    .await
+    .map_err(|err| match err {
+        sqlx::Error::RowNotFound => APIError::Conflict(
+            "Investigation already exists for this polling station".into(),
+            ErrorReference::EntryNotUnique,
+        ),
+        other => other.into(),
+    })?;
 
     audit_service
         .log(

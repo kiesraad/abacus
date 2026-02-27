@@ -4,6 +4,7 @@ CREATE TABLE polling_stations
     committee_session_id  INTEGER                           NOT NULL,
     prev_data_entry_id    INTEGER,
     data_entry_id         INTEGER,
+    investigation_state   TEXT,
     name                  TEXT                              NOT NULL,
     number                INTEGER                           NOT NULL,
     number_of_voters      INTEGER,

@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        SELECT COUNT(*) = 0 as \"result: bool\"\n        FROM polling_stations AS ps\n        LEFT JOIN data_entries AS de ON de.id = ps.data_entry_id\n        WHERE ps.committee_session_id = ?\n        AND ps.investigation_state IS NOT NULL\n        AND (json_extract(ps.investigation_state, '$.corrected_results') IS NULL\n             OR (json_extract(ps.investigation_state, '$.corrected_results') = 1\n                 AND (de.state IS NULL OR json_extract(de.state, '$.status') != 'Definitive')))\n        ",
+  "describe": {
+    "columns": [
+      {
+        "name": "result: bool",
+        "ordinal": 0,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "98ef1b8516bb5a556656bdb3373fce6b8e9dc66912d58382f9bd128f002da4a6"
+}

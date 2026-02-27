@@ -19,13 +19,16 @@ use crate::{
         },
         committee_session_status::CommitteeSessionStatus,
         election::ElectionId,
+        validation::DataError,
     },
     error::ErrorReference,
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
     repository::{
         committee_session_repo::{create, delete, get, get_election_committee_session, update},
         election_repo,
-        investigation_repo::list_investigations_for_committee_session,
+        investigation_repo::{
+            has_investigations_for_committee_session, list_investigations_for_committee_session,
+        },
     },
     service::{
         CommitteeSessionAuditData, CommitteeSessionUpdatedAuditData,
@@ -174,6 +177,12 @@ pub async fn committee_session_delete(
         && (committee_session.status == CommitteeSessionStatus::Created
             || committee_session.status == CommitteeSessionStatus::InPreparation)
     {
+        if has_investigations_for_committee_session(&mut tx, committee_session_id).await? {
+            return Err(APIError::InvalidData(DataError::new(
+                "Cannot delete committee session with active investigations",
+            )));
+        }
+
         delete(&mut tx, committee_session_id).await?;
 
         audit_service

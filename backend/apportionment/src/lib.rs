@@ -4,22 +4,24 @@
 
 mod candidate_nomination;
 mod fraction;
-mod int_newtype_macro;
 mod seat_assignment;
 mod structs;
 #[cfg(test)]
 mod test_helpers;
 
-pub use self::{
-    candidate_nomination::CandidateNominationResult,
-    fraction::Fraction,
-    seat_assignment::SeatAssignmentResult,
-    structs::{ApportionmentError, ApportionmentInput, CandidateVotesTrait, ListVotesTrait},
-};
 use self::{
     candidate_nomination::candidate_nomination,
     seat_assignment::{as_candidate_nomination_input, seat_assignment},
-    structs::ApportionmentOutput,
+};
+pub use self::{
+    candidate_nomination::{CandidateNominationResult, PreferenceThreshold},
+    fraction::Fraction,
+    seat_assignment::{
+        HighestAverageAssignedSeat, SeatAssignmentResult, SeatChange, SeatChangeStep,
+    },
+    structs::{
+        ApportionmentError, ApportionmentInput, ApportionmentOutput, CandidateVotes, ListVotes,
+    },
 };
 
 /// Perform seat assignment and candidate nomination on apportionment input.
@@ -28,7 +30,7 @@ pub fn process<T: ApportionmentInput>(
 ) -> Result<ApportionmentOutput<'_, T::List>, ApportionmentError> {
     let seat_assignment = seat_assignment(input)?;
     let candidate_nomination_input = as_candidate_nomination_input(input, &seat_assignment);
-    let candidate_nomination = candidate_nomination::<T>(&candidate_nomination_input)?;
+    let candidate_nomination = candidate_nomination(&candidate_nomination_input)?;
 
     Ok(ApportionmentOutput {
         seat_assignment,
@@ -42,7 +44,6 @@ mod tests {
     use crate::test_helpers::{check_chosen_candidates, check_list_candidate_nomination};
     use crate::{
         Fraction,
-        structs::ListNumber,
         test_helpers::{
             get_total_seats_from_apportionment_result,
             seat_assignment_fixture_with_default_50_candidates,
@@ -63,13 +64,13 @@ mod tests {
             result.seat_assignment.steps[0]
                 .change
                 .list_number_assigned(),
-            ListNumber::from(1)
+            1
         );
         assert_eq!(
             result.seat_assignment.steps[1]
                 .change
                 .list_number_assigned(),
-            ListNumber::from(7)
+            7
         );
         let total_seats = get_total_seats_from_apportionment_result(&result.seat_assignment);
         assert_eq!(total_seats, vec![7, 2, 2, 1, 1, 1, 1, 0]);
@@ -135,49 +136,49 @@ mod tests {
 
         check_chosen_candidates(
             &result.candidate_nomination.chosen_candidates,
-            &input.list_votes[0].number,
+            input.list_votes[0].number,
             &input.list_votes[0].candidate_votes[..7],
             &input.list_votes[0].candidate_votes[8..],
         );
         check_chosen_candidates(
             &result.candidate_nomination.chosen_candidates,
-            &input.list_votes[1].number,
+            input.list_votes[1].number,
             &input.list_votes[1].candidate_votes[..2],
             &input.list_votes[1].candidate_votes[2..],
         );
         check_chosen_candidates(
             &result.candidate_nomination.chosen_candidates,
-            &input.list_votes[2].number,
+            input.list_votes[2].number,
             &input.list_votes[2].candidate_votes[..2],
             &input.list_votes[2].candidate_votes[2..],
         );
         check_chosen_candidates(
             &result.candidate_nomination.chosen_candidates,
-            &input.list_votes[3].number,
+            input.list_votes[3].number,
             &input.list_votes[3].candidate_votes[..1],
             &input.list_votes[3].candidate_votes[1..],
         );
         check_chosen_candidates(
             &result.candidate_nomination.chosen_candidates,
-            &input.list_votes[4].number,
+            input.list_votes[4].number,
             &input.list_votes[4].candidate_votes[..1],
             &input.list_votes[4].candidate_votes[1..],
         );
         check_chosen_candidates(
             &result.candidate_nomination.chosen_candidates,
-            &input.list_votes[5].number,
+            input.list_votes[5].number,
             &input.list_votes[5].candidate_votes[..1],
             &input.list_votes[5].candidate_votes[1..],
         );
         check_chosen_candidates(
             &result.candidate_nomination.chosen_candidates,
-            &input.list_votes[6].number,
+            input.list_votes[6].number,
             &input.list_votes[6].candidate_votes[..1],
             &input.list_votes[6].candidate_votes[2..],
         );
         check_chosen_candidates(
             &result.candidate_nomination.chosen_candidates,
-            &input.list_votes[7].number,
+            input.list_votes[7].number,
             &[],
             &input.list_votes[7].candidate_votes[1..],
         );

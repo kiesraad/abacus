@@ -23,7 +23,7 @@ use crate::{
         committee_session_status::CommitteeSessionStatus,
         data_entry::PollingStationResults,
         election::{ElectionId, ElectionWithPoliticalGroups},
-        file::{File, FileId},
+        file::File,
         investigation::PollingStationInvestigation,
         models::{ModelNa14_2Input, ModelNa31_2Input, ModelP2aInput, PdfFileModel, ToPdfFileModel},
         polling_station::PollingStation,
@@ -42,6 +42,7 @@ use crate::{
         investigation_repo::list_investigations_for_committee_session,
         polling_station_repo,
     },
+    service::FileAuditData,
 };
 
 /// Default date time format for reports
@@ -51,37 +52,10 @@ const EML_MIME_TYPE: &str = "text/xml";
 const PDF_MIME_TYPE: &str = "application/pdf";
 
 #[derive(Serialize)]
-pub struct FileAuditData {
-    pub file_id: FileId,
-    pub file_name: String,
-    pub file_mime_type: String,
-    pub file_size_bytes: u64,
-    pub file_created_at: DateTime<Utc>,
-}
-
-impl From<File> for FileAuditData {
-    fn from(file: File) -> Self {
-        Self {
-            file_id: file.id,
-            file_name: file.name,
-            file_mime_type: file.mime_type,
-            file_size_bytes: file.data.len() as u64,
-            file_created_at: file.created_at,
-        }
-    }
-}
-
-#[derive(Serialize)]
 pub struct FileCreatedAuditData(pub FileAuditData);
 impl AsAuditEvent for FileCreatedAuditData {
     const EVENT_TYPE: AuditEventType = AuditEventType::FileCreated;
     const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Success;
-}
-#[derive(Serialize)]
-pub struct FileDeletedAuditData(pub FileAuditData);
-impl AsAuditEvent for FileDeletedAuditData {
-    const EVENT_TYPE: AuditEventType = AuditEventType::FileDeleted;
-    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Info;
 }
 
 pub fn router() -> OpenApiRouter<AppState> {

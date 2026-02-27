@@ -19,7 +19,6 @@ use crate::{
         },
         committee_session_status::CommitteeSessionStatus,
         election::ElectionId,
-        file::FileId,
     },
     error::ErrorReference,
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
@@ -28,53 +27,16 @@ use crate::{
         election_repo,
         investigation_repo::list_investigations_for_committee_session,
     },
-    service::change_committee_session_status,
+    service::{
+        CommitteeSessionAuditData, CommitteeSessionUpdatedAuditData,
+        change_committee_session_status,
+    },
 };
-
-#[derive(Serialize)]
-pub struct CommitteeSessionAuditData {
-    pub session_id: CommitteeSessionId,
-    pub session_number: u32,
-    pub session_election_id: ElectionId,
-    pub session_location: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub session_start_date_time: Option<NaiveDateTime>,
-    pub session_status: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub session_results_eml: Option<FileId>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub session_results_pdf: Option<FileId>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub session_overview_pdf: Option<FileId>,
-}
-
-impl From<CommitteeSession> for CommitteeSessionAuditData {
-    fn from(value: CommitteeSession) -> Self {
-        Self {
-            session_id: value.id,
-            session_number: value.number,
-            session_election_id: value.election_id,
-            session_location: value.location,
-            session_start_date_time: value.start_date_time,
-            session_status: value.status.to_string(),
-            session_results_eml: value.results_eml,
-            session_results_pdf: value.results_pdf,
-            session_overview_pdf: value.overview_pdf,
-        }
-    }
-}
 
 #[derive(Serialize)]
 pub struct CommitteeSessionCreatedAuditData(pub CommitteeSessionAuditData);
 impl AsAuditEvent for CommitteeSessionCreatedAuditData {
     const EVENT_TYPE: AuditEventType = AuditEventType::CommitteeSessionCreated;
-    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Success;
-}
-
-#[derive(Serialize)]
-pub struct CommitteeSessionUpdatedAuditData(pub CommitteeSessionAuditData);
-impl AsAuditEvent for CommitteeSessionUpdatedAuditData {
-    const EVENT_TYPE: AuditEventType = AuditEventType::CommitteeSessionUpdated;
     const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Success;
 }
 

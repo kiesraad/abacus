@@ -164,8 +164,47 @@ function HighestAveragesSection({
   );
 }
 
-// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
-// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: TODO function should be refactored
+interface SmallCouncilSectionProps {
+  seatAssignment: SeatAssignment;
+  largestRemainderSteps: LargestRemainderAssignmentStep[];
+  uniqueHighestAverageSteps: UniqueHighestAverageAssignmentStep[];
+  highestAverageSteps: HighestAverageAssignmentStep[];
+  politicalGroups: PoliticalGroup[];
+  resultChanges: ResultChange[];
+  footNotes?: ReactElement;
+}
+
+function SmallCouncilSection({
+  seatAssignment,
+  largestRemainderSteps,
+  uniqueHighestAverageSteps,
+  highestAverageSteps,
+  politicalGroups,
+  resultChanges,
+  footNotes,
+}: SmallCouncilSectionProps) {
+  return (
+    <>
+      <LargestRemaindersSection
+        seatAssignment={seatAssignment}
+        largestRemainderSteps={largestRemainderSteps}
+        politicalGroups={politicalGroups}
+        resultChanges={resultChanges}
+        footNotes={uniqueHighestAverageSteps.length === 0 && resultChanges.length > 0 ? footNotes : undefined}
+      />
+      {uniqueHighestAverageSteps.length > 0 && (
+        <HighestAveragesSection
+          seatAssignment={seatAssignment}
+          uniqueHighestAverageSteps={uniqueHighestAverageSteps}
+          highestAverageSteps={highestAverageSteps}
+          politicalGroups={politicalGroups}
+          footNotes={resultChanges.length > 0 ? footNotes : undefined}
+        />
+      )}
+    </>
+  );
+}
+
 export function ApportionmentResidualSeatsPage() {
   const { election } = useElection();
   const { seatAssignment, error } = useApportionmentContext();
@@ -210,28 +249,15 @@ export function ApportionmentResidualSeatsPage() {
                   footNotes={resultChanges.length > 0 ? render_footnotes() : undefined}
                 />
               ) : (
-                <>
-                  <LargestRemaindersSection
-                    seatAssignment={seatAssignment}
-                    largestRemainderSteps={largestRemainderSteps}
-                    politicalGroups={election.political_groups}
-                    resultChanges={resultChanges}
-                    footNotes={
-                      uniqueHighestAverageSteps.length === 0 && resultChanges.length > 0
-                        ? render_footnotes()
-                        : undefined
-                    }
-                  />
-                  {uniqueHighestAverageSteps.length > 0 && (
-                    <HighestAveragesSection
-                      seatAssignment={seatAssignment}
-                      uniqueHighestAverageSteps={uniqueHighestAverageSteps}
-                      highestAverageSteps={highestAverageSteps}
-                      politicalGroups={election.political_groups}
-                      footNotes={resultChanges.length > 0 ? render_footnotes() : undefined}
-                    />
-                  )}
-                </>
+                <SmallCouncilSection
+                  seatAssignment={seatAssignment}
+                  largestRemainderSteps={largestRemainderSteps}
+                  uniqueHighestAverageSteps={uniqueHighestAverageSteps}
+                  highestAverageSteps={highestAverageSteps}
+                  politicalGroups={election.political_groups}
+                  resultChanges={resultChanges}
+                  footNotes={render_footnotes()}
+                />
               )
             ) : (
               <span>{t("apportionment.no_residual_seats_to_assign")}</span>

@@ -7,7 +7,7 @@ import { cn } from "@/utils/classnames";
 import { useApportionmentContext } from "../../hooks/useApportionmentContext";
 import type { ResultChange } from "../../utils/seat-change";
 import { getRemovalSteps } from "../../utils/steps";
-import { render_title_and_header } from "../../utils/utils";
+import { renderTitleAndHeader } from "../../utils/utils";
 import cls from "../Apportionment.module.css";
 import { ApportionmentErrorPage } from "../ApportionmentError";
 import { Footnotes } from "./Footnotes";
@@ -36,7 +36,7 @@ export function ApportionmentFullSeatsPage() {
     });
     return (
       <>
-        {render_title_and_header(t("apportionment.details_full_seats"))}
+        {renderTitleAndHeader(t("apportionment.details_full_seats"))}
         <main>
           <article className={cls.article}>
             <div className={cn(cls.tableDiv, "mb-lg")}>

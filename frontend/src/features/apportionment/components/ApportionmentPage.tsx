@@ -5,14 +5,14 @@ import { t } from "@/i18n/translate";
 import { cn } from "@/utils/classnames";
 
 import { useApportionmentContext } from "../hooks/useApportionmentContext";
-import { render_title_and_header } from "../utils/utils";
+import { renderTitleAndHeader } from "../utils/utils";
 import cls from "./Apportionment.module.css";
 import { ApportionmentError } from "./ApportionmentError";
 import { ApportionmentTable } from "./ApportionmentTable";
 import { ChosenCandidatesTable } from "./ChosenCandidatesTable";
 import { ElectionSummaryTable } from "./ElectionSummaryTable";
 
-function get_number_of_seats_assigned_sentence(seats: number, type: "residual_seat" | "full_seat"): string {
+function getNumberOfSeatsAssignedSentence(seats: number, type: "residual_seat" | "full_seat"): string {
   return t(`apportionment.seats_assigned.${seats === 1 ? "singular" : "plural"}`, {
     num_seat: seats,
     type_seat: t(`apportionment.${type}.singular`).toLowerCase(),
@@ -25,7 +25,7 @@ export function ApportionmentPage() {
 
   return (
     <>
-      {render_title_and_header(t("apportionment.title"))}
+      {renderTitleAndHeader(t("apportionment.title"))}
       <main>
         <article className={cls.article}>
           {error ? (
@@ -61,11 +61,11 @@ export function ApportionmentPage() {
                   <div className={cls.footnoteDiv}>
                     <ul>
                       <li>
-                        {get_number_of_seats_assigned_sentence(seatAssignment.full_seats, "full_seat")} (
+                        {getNumberOfSeatsAssignedSentence(seatAssignment.full_seats, "full_seat")} (
                         <Link to="./details-full-seats">{t("apportionment.view_details")}</Link>)
                       </li>
                       <li>
-                        {get_number_of_seats_assigned_sentence(seatAssignment.residual_seats, "residual_seat")} (
+                        {getNumberOfSeatsAssignedSentence(seatAssignment.residual_seats, "residual_seat")} (
                         <Link to="./details-residual-seats">{t("apportionment.view_details")}</Link>)
                       </li>
                     </ul>

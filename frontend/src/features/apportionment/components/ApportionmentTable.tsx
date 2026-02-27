@@ -13,7 +13,7 @@ interface ApportionmentTableProps {
   seats: number;
 }
 
-function convert_zero_to_dash(number: number): string {
+function convertZeroToDash(number: number): string {
   if (number === 0) {
     return "-";
   }
@@ -43,9 +43,9 @@ export function ApportionmentTable({
               {standing.list_number}
             </Table.Cell>
             <Table.Cell>{politicalGroups[standing.list_number - 1]?.name || ""}</Table.Cell>
-            <Table.NumberCell>{convert_zero_to_dash(standing.full_seats)}</Table.NumberCell>
-            <Table.NumberCell>{convert_zero_to_dash(standing.residual_seats)}</Table.NumberCell>
-            <Table.NumberCell className="bold">{convert_zero_to_dash(standing.total_seats)}</Table.NumberCell>
+            <Table.NumberCell>{convertZeroToDash(standing.full_seats)}</Table.NumberCell>
+            <Table.NumberCell>{convertZeroToDash(standing.residual_seats)}</Table.NumberCell>
+            <Table.NumberCell className="bold">{convertZeroToDash(standing.total_seats)}</Table.NumberCell>
           </Table.Row>
         ))}
         <Table.TotalRow>

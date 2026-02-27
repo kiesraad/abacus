@@ -13,7 +13,7 @@ import {
   type LargestRemainderAssignmentStep,
   type UniqueHighestAverageAssignmentStep,
 } from "../../utils/steps";
-import { render_title_and_header } from "../../utils/utils";
+import { renderTitleAndHeader } from "../../utils/utils";
 import cls from "../Apportionment.module.css";
 import { ApportionmentErrorPage } from "../ApportionmentError";
 import { Footnotes } from "./Footnotes";
@@ -23,7 +23,7 @@ import { UniqueHighestAveragesTable } from "./UniqueHighestAveragesTable";
 
 export const LARGE_COUNCIL_THRESHOLD = 19;
 
-function render_information(seats: number, residualSeats: number) {
+function renderInformation(seats: number, residualSeats: number) {
   return (
     <span className={cls.tableInformation}>
       {tx(
@@ -59,7 +59,7 @@ function LargeCouncilSection({
     <div className={cn(cls.tableDiv, "mb-lg")}>
       <div>
         <h2 className={cls.tableTitle}>{t("apportionment.residual_seats_highest_averages")}</h2>
-        {render_information(seatAssignment.seats, seatAssignment.residual_seats)}
+        {renderInformation(seatAssignment.seats, seatAssignment.residual_seats)}
         {highestAverageSteps.length > 0 && (
           <HighestAveragesTable
             steps={highestAverageSteps}
@@ -93,7 +93,7 @@ function LargestRemaindersSection({
     <div className={cn(cls.tableDiv, "mb-lg")}>
       <div>
         <h2 className={cls.tableTitle}>{t("apportionment.residual_seats_largest_remainders")}</h2>
-        {render_information(seatAssignment.seats, seatAssignment.residual_seats)}
+        {renderInformation(seatAssignment.seats, seatAssignment.residual_seats)}
         {largestRemainderSteps.length > 0 && (
           <LargestRemaindersTable
             steps={largestRemainderSteps}
@@ -223,7 +223,7 @@ export function ApportionmentResidualSeatsPage() {
       residualSeatRemovalSteps,
     );
 
-    function render_footnotes(): ReactElement {
+    function renderFootnotes(): ReactElement {
       return (
         <Footnotes
           uniquePgNumbersWithFullSeatsRemoved={uniquePgNumbersWithFullSeatsRemoved}
@@ -236,7 +236,7 @@ export function ApportionmentResidualSeatsPage() {
 
     return (
       <>
-        {render_title_and_header(t("apportionment.details_residual_seats"))}
+        {renderTitleAndHeader(t("apportionment.details_residual_seats"))}
         <main>
           <article className={cls.article}>
             {seatAssignment.residual_seats > 0 ? (
@@ -246,7 +246,7 @@ export function ApportionmentResidualSeatsPage() {
                   highestAverageSteps={highestAverageSteps}
                   politicalGroups={election.political_groups}
                   resultChanges={resultChanges}
-                  footNotes={resultChanges.length > 0 ? render_footnotes() : undefined}
+                  footNotes={resultChanges.length > 0 ? renderFootnotes() : undefined}
                 />
               ) : (
                 <SmallCouncilSection
@@ -256,7 +256,7 @@ export function ApportionmentResidualSeatsPage() {
                   highestAverageSteps={highestAverageSteps}
                   politicalGroups={election.political_groups}
                   resultChanges={resultChanges}
-                  footNotes={render_footnotes()}
+                  footNotes={renderFootnotes()}
                 />
               )
             ) : (

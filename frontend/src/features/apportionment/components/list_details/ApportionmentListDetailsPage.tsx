@@ -6,7 +6,7 @@ import type { Candidate, CandidateVotes } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 import { formatPoliticalGroupName } from "@/utils/politicalGroup";
 import { useApportionmentContext } from "../../hooks/useApportionmentContext";
-import { render_title_and_header } from "../../utils/utils";
+import { renderTitleAndHeader } from "../../utils/utils";
 import cls from "../Apportionment.module.css";
 import { ApportionmentErrorPage } from "../ApportionmentError";
 import { CandidatesRankingTable } from "./CandidatesRankingTable";
@@ -155,7 +155,7 @@ export function ApportionmentListDetailsPage() {
     if (listTotalSeats !== undefined && candidateVotesList && listCandidateNomination) {
       return (
         <>
-          {render_title_and_header(listName)}
+          {renderTitleAndHeader(listName)}
           <main>
             <article className={cls.article}>
               <div className={cn(cls.tableDiv, "mb-lg")}>

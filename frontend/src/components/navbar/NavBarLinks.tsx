@@ -14,7 +14,9 @@ type NavBarLinksProps = { location: { pathname: string } };
 function ElectionBreadcrumb({ election }: { election: Election }) {
   return (
     <>
-      <span className="bold">{election.location}</span>
+      <span className="bold">
+        {election.role} {election.domain_id} {election.location}
+      </span>
       <span>&mdash;</span>
       <span>{election.name}</span>
     </>

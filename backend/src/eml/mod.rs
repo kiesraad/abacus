@@ -287,6 +287,26 @@ impl Candidate {
             },
         })
     }
+
+    fn as_candidate_lists_candidate(&self) -> Result<CandidateListsCandidate, EMLError> {
+        CandidateListsCandidate::builder()
+            .identifier(CandidateId::new(self.number.as_internal_u32().to_string())?)
+            .full_name(
+                PersonName::new(&self.last_name)
+                    .with_first_name_option(self.first_name.as_ref())
+                    .with_initials_option(if self.initials.is_empty() {
+                        None
+                    } else {
+                        Some(&self.initials)
+                    })
+                    .with_name_prefix_option(self.last_name_prefix.as_ref()),
+            )
+            .qualifying_address(QualifyingAddress::new(
+                &self.locality[..],
+                self.country_code.as_deref(),
+            ))
+            .build()
+    }
 }
 
 impl ElectionWithPoliticalGroups {
@@ -371,33 +391,7 @@ impl ElectionWithPoliticalGroups {
                                 .candidates(
                                     pg.candidates
                                         .iter()
-                                        .map(|can| {
-                                            CandidateListsCandidate::builder()
-                                                .identifier(CandidateId::new(
-                                                    can.number.as_internal_u32().to_string(),
-                                                )?)
-                                                .full_name(
-                                                    PersonName::new(&can.last_name)
-                                                        .with_first_name_option(
-                                                            can.first_name.as_ref(),
-                                                        )
-                                                        .with_initials_option(
-                                                            if can.initials.is_empty() {
-                                                                None
-                                                            } else {
-                                                                Some(&can.initials)
-                                                            },
-                                                        )
-                                                        .with_name_prefix_option(
-                                                            can.last_name_prefix.as_ref(),
-                                                        ),
-                                                )
-                                                .qualifying_address(QualifyingAddress::new(
-                                                    &can.locality[..],
-                                                    can.country_code.as_deref(),
-                                                ))
-                                                .build()
-                                        })
+                                        .map(|can| can.as_candidate_lists_candidate())
                                         .collect::<Result<Vec<_>, EMLError>>()?,
                                 )
                                 .build()

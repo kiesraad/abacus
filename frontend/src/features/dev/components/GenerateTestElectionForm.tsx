@@ -9,6 +9,7 @@ import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { InputField } from "@/components/ui/InputField/InputField";
 import { type ElectionRole, electionRoleValues } from "@/types/generated/openapi";
+import { StringFormData } from "@/utils/stringFormData.ts";
 
 const RANGE_HINT = "Gebruik notatie zoals 10..50 of 9..=45 of een enkel getal zoals 40";
 
@@ -64,13 +65,16 @@ export function GenerateTestElectionForm() {
     setFormState((prev) => ({ ...prev, with_data_entry: checked }));
   };
 
-  const submitForm = async () => {
+  const submitForm = async (event: FormEvent<HTMLFormElement>) => {
+    const formData = new StringFormData(event.currentTarget);
+    const election_role = formData.getString("election_role");
+
     const payload = RANGE_FIELDS.reduce<Record<string, string | boolean>>(
       (acc, field) =>
         Object.assign(acc, { [field.key]: formState[field.key] ? formState[field.key] : field.placeholder }),
       {
-        election_role: formState.election_role,
-        with_data_entry: formState.election_role === "CSB" ? false : formState.with_data_entry,
+        election_role,
+        with_data_entry: election_role === "CSB" ? false : formState.with_data_entry,
       },
     );
 
@@ -92,7 +96,7 @@ export function GenerateTestElectionForm() {
     <Form
       onSubmit={(event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        void submitForm();
+        void submitForm(event);
       }}
     >
       <FormLayout>
@@ -101,8 +105,9 @@ export function GenerateTestElectionForm() {
             <ChoiceList.Radio
               id={electionRole}
               key={electionRole}
-              name={"election-role"}
+              name={"election_role"}
               defaultChecked={index === 0}
+              defaultValue={electionRole}
               label={electionRole}
             />
           ))}

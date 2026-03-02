@@ -18,7 +18,7 @@ use crate::{
         },
         data_entry_status::{DataEntryStatus, Definitive, FirstEntryFinalised},
         election::{
-            self, CandidateGender, CandidateNumber, CommitteeCategory, ElectionCategory,
+            self, CandidateGender, CandidateNumber, ElectionCategory,
             ElectionWithPoliticalGroups, NewElection, PGNumber, PoliticalGroup, VoteCountingMethod,
         },
         polling_station::{PollingStation, PollingStationRequest, PollingStationType},
@@ -165,7 +165,7 @@ fn generate_election(rng: &mut impl rand::RngExt, args: &GenerateElectionArgs) -
     // and put it all in the struct (generating some additional fields where needed)
     NewElection {
         name,
-        committee_category: CommitteeCategory::GSB,
+        committee_category: args.committee_category,
         counting_method: VoteCountingMethod::CSO,
         domain_id: super::data::domain_id(rng),
         election_id,
@@ -589,11 +589,14 @@ fn distribute_power_law(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{repository::election_repo, test_data_gen::RandomRange};
+    use crate::{
+        domain::election::CommitteeCategory, repository::election_repo, test_data_gen::RandomRange
+    };
 
     #[sqlx::test]
     async fn test_create_test_election(pool: SqlitePool) {
         let args = GenerateElectionArgs {
+            committee_category: CommitteeCategory::GSB,
             political_groups: RandomRange(20..50),
             candidates_per_group: RandomRange(10..50),
             polling_stations: RandomRange(50..200),

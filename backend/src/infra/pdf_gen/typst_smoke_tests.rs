@@ -116,7 +116,7 @@ fn random_election(
     ElectionWithPoliticalGroups {
         id: ElectionId::from(rng.random_range(0..5)),
         name: random_string(rng, string_length),
-        committee_category: CommitteeCategory::GSB,
+        committee_category: random_value(rng, &[CommitteeCategory::GSB, CommitteeCategory::CSB]),
         counting_method: random_value(rng, &[VoteCountingMethod::CSO, VoteCountingMethod::DSO]),
         election_id: random_string(rng, string_length),
         location: random_string(rng, string_length),

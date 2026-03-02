@@ -4,9 +4,11 @@ import { isSuccess } from "@/api/ApiResult";
 import { useApiClient } from "@/api/useApiClient";
 import { Button } from "@/components/ui/Button/Button";
 import { Checkbox } from "@/components/ui/CheckboxAndRadio/CheckboxAndRadio";
+import { ChoiceList } from "@/components/ui/CheckboxAndRadio/ChoiceList";
 import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { InputField } from "@/components/ui/InputField/InputField";
+import { type ElectionRole, electionRoleValues } from "@/types/generated/openapi";
 
 const RANGE_HINT = "Gebruik notatie zoals 10..50 of 9..=45 of een enkel getal zoals 40";
 
@@ -32,6 +34,7 @@ type RangeFieldKey = (typeof RANGE_FIELDS)[number]["key"];
 type RangeFormState = Record<RangeFieldKey, string>;
 
 interface FormState extends RangeFormState {
+  election_role: ElectionRole;
   with_data_entry: boolean;
 }
 
@@ -42,6 +45,7 @@ const INITIAL_RANGE_STATE: RangeFormState = Object.fromEntries(
 
 const INITIAL_FORM_STATE: FormState = {
   ...INITIAL_RANGE_STATE,
+  election_role: electionRoleValues[0],
   with_data_entry: true,
 };
 
@@ -64,7 +68,10 @@ export function GenerateTestElectionForm() {
     const payload = RANGE_FIELDS.reduce<Record<string, string | boolean>>(
       (acc, field) =>
         Object.assign(acc, { [field.key]: formState[field.key] ? formState[field.key] : field.placeholder }),
-      { with_data_entry: formState.with_data_entry },
+      {
+        election_role: formState.election_role,
+        with_data_entry: formState.election_role === "CSB" ? false : formState.with_data_entry,
+      },
     );
 
     try {
@@ -89,6 +96,17 @@ export function GenerateTestElectionForm() {
       }}
     >
       <FormLayout>
+        <ChoiceList>
+          {electionRoleValues.map((electionRole, index) => (
+            <ChoiceList.Radio
+              id={electionRole}
+              key={electionRole}
+              name={"election-role"}
+              defaultChecked={index === 0}
+              label={electionRole}
+            />
+          ))}
+        </ChoiceList>
         {RANGE_FIELDS.map((field) => {
           const input = (
             <InputField

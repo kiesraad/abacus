@@ -79,17 +79,18 @@ impl NewElection {
 
         // typically number of voters is not available in the EML, but it could
         // be so we try and extract it anyway
-        let number_of_voters = election
-            .contest
-            .max_votes
-            .copied_value()
+        let max_votes = election.contest.max_votes.copied_value();
+        let number_of_voters = max_votes
             .map(|v| v.get())
             .unwrap_or(0)
             .try_into()
             .unwrap_or(0);
 
         // the number of seats must be between 9 and 45 for municipal elections
-        #[allow(clippy::manual_range_contains, reason = "clippy suggests way less readable alternative")]
+        #[expect(
+            clippy::manual_range_contains,
+            reason = "clippy suggests way less readable alternative"
+        )]
         if number_of_seats < 9 || number_of_seats > 45 {
             return Err(EMLImportError::NumberOfSeatsNotInRange);
         }

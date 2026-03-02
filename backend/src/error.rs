@@ -7,6 +7,7 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
 };
+use eml_nl::EMLError;
 use hyper::header::InvalidHeaderValue;
 use quick_xml::{DeError, SeError};
 use serde::{Deserialize, Serialize};
@@ -40,6 +41,7 @@ pub enum ErrorReference {
     DataEntryGetNotAllowed,
     DataEntryNotAllowed,
     EmlImportError,
+    EmlError,
     EntryNotFound,
     EntryNotUnique,
     Forbidden,
@@ -101,6 +103,7 @@ pub enum APIError {
     ContentTooLarge(String, ErrorReference),
     DataIntegrityError(String),
     EmlImportError(EMLImportError),
+    EmlError(EMLError),
     InvalidData(DataError),
     InvalidHeaderValue,
     InvalidHashError,
@@ -374,6 +377,13 @@ impl IntoResponse for APIError {
                 (
                     StatusCode::BAD_REQUEST,
                     to_error("EML import error", ErrorReference::EmlImportError, false),
+                )
+            }
+            APIError::EmlError(err) => {
+                error!("Error with EML file: {:?}", err);
+                (
+                    StatusCode::BAD_REQUEST,
+                    to_error("EML error", ErrorReference::EmlError, false),
                 )
             }
             APIError::Apportionment(err) => {

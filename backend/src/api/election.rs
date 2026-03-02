@@ -4,6 +4,7 @@ use axum::{
     http::StatusCode,
 };
 use chrono::NaiveDate;
+use eml_nl::EMLError;
 use quick_xml::{DeError, SeError};
 use serde::{Deserialize, Serialize};
 use sqlx::{SqliteConnection, SqlitePool};
@@ -29,7 +30,11 @@ use crate::{
         investigation::PollingStationInvestigation,
         polling_station::{PollingStation, PollingStationRequest, PollingStationsRequest},
     },
-    eml::{EML110, EML230, EMLDocument, EMLImportError, EmlHash, RedactedEmlHash},
+    eml::{
+        EMLImportError, EmlHash, RedactedEmlHash, number_of_voters_from_polling_stations_eml,
+        parse_polling_stations_eml_str, polling_stations_eml_matches_election,
+        polling_stations_from_eml, polling_stations_from_eml_str,
+    },
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
     repository::{
         committee_session_repo, election_repo, investigation_repo, polling_station_repo,
@@ -388,11 +393,11 @@ fn validate_gsb_election(
             return Err(APIError::EmlImportError(EMLImportError::MissingFileName));
         }
 
-        let eml110b = EML110::from_str(&data)?;
-        polling_stations = Some(eml110b.get_polling_stations()?);
-        number_of_voters = eml110b.get_number_of_voters().unwrap_or_default();
+        let eml = parse_polling_stations_eml_str(&data)?;
+        polling_stations = Some(polling_stations_from_eml(&eml)?);
+        number_of_voters = number_of_voters_from_polling_stations_eml(&eml)?;
         polling_station_definition_matches_election =
-            Some(EML110::from_str(&data)?.polling_station_definition_matches_election(&election)?);
+            Some(polling_stations_eml_matches_election(&eml, &election)?);
     } else {
         polling_stations = None;
     }
@@ -532,7 +537,7 @@ async fn import_gsb_election(
         if edu.polling_station_file_name.is_none() {
             return Err(APIError::EmlImportError(EMLImportError::MissingFileName));
         }
-        EML110::from_str(polling_station_data)?.get_polling_stations()?;
+        polling_stations_from_eml_str(polling_station_data)?;
     }
 
     new_election.counting_method = edu.counting_method;
@@ -615,10 +620,11 @@ fn parse_election_candidates_eml(
     election_eml_data: &str,
     candidate_eml_data: Option<&str>,
 ) -> Result<NewElection, APIError> {
-    let mut election = EML110::from_str(election_eml_data)?.as_abacus_election()?;
-    if let Some(candidate_data) = candidate_eml_data {
-        election = EML230::from_str(candidate_data)?.add_candidate_lists(election)?;
+    let mut election = NewElection::from_eml_str(election_eml_data)?;
+    if let Some(candidate_eml_data) = candidate_eml_data {
+        election.add_candidates_from_eml_str(candidate_eml_data)?;
     }
+
     Ok(election)
 }
 
@@ -665,5 +671,11 @@ impl From<SeError> for APIError {
 impl From<EMLImportError> for APIError {
     fn from(err: EMLImportError) -> Self {
         APIError::EmlImportError(err)
+    }
+}
+
+impl From<EMLError> for APIError {
+    fn from(err: EMLError) -> Self {
+        APIError::EmlError(err)
     }
 }

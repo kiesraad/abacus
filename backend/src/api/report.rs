@@ -4,6 +4,7 @@ use axum::{
 };
 use axum_extra::response::Attachment;
 use chrono::{DateTime, Local, Utc};
+use eml_nl::{EMLError, documents::election_count::ElectionCount, io::EMLWrite};
 use pdf_gen::{
     generate_pdf,
     zip::{ZipResponse, ZipResponseError, slugify_filename, zip_single_file},
@@ -30,7 +31,7 @@ use crate::{
         summary::ElectionSummary,
         votes_table::{VotesTables, VotesTablesWithPreviousVotes},
     },
-    eml::{EML510, EMLDocument, EmlHash},
+    eml::EmlHash,
     error::ErrorReference,
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
     repository::{
@@ -126,13 +127,13 @@ impl ResultsInput {
         })
     }
 
-    fn as_xml(&self) -> EML510 {
-        EML510::from_results(
-            &self.election,
+    fn as_xml(&self) -> Result<ElectionCount, EMLError> {
+        self.election.as_count_eml(
+            None,
             &self.committee_session,
             &self.results,
             &self.summary,
-            &self.created_at,
+            self.created_at,
         )
     }
 
@@ -324,7 +325,7 @@ async fn generate_and_save_files(
     let mut pdf_file: Option<File> = None;
     let mut overview_pdf_file: Option<File> = None;
     let created_at = input.created_at.with_timezone(&Utc);
-    let xml_string = input.as_xml().to_xml_string()?;
+    let xml_string = input.as_xml()?.write_eml_root_str(true, true)?;
 
     let xml_hash = EmlHash::from(xml_string.as_bytes());
     let xml_filename = input.xml_filename();

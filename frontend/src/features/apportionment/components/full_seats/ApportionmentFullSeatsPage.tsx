@@ -22,7 +22,7 @@ export function ApportionmentFullSeatsPage() {
     return <ApportionmentErrorPage sectionTitle={t("apportionment.details_full_seats")} error={error} />;
   }
   if (seatAssignment) {
-    const [fullSeatRemovalSteps, ,] = getRemovalSteps(seatAssignment);
+    const { fullSeatRemovalSteps } = getRemovalSteps(seatAssignment);
     const resultChanges: ResultChange[] = [];
     fullSeatRemovalSteps.forEach((step, index) => {
       const footnoteNumber = index + 1;

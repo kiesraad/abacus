@@ -33,25 +33,29 @@ export function isListExhaustionRemovalStep(step: SeatChangeStep): step is ListE
   return step.change.changed_by === "ListExhaustionRemoval";
 }
 
-export function getAssignmentSteps(
-  seatAssignment: SeatAssignment,
-): [
-  LargestRemainderAssignmentStep[],
-  UniqueHighestAverageAssignmentStep[],
-  HighestAverageAssignmentStep[],
-  AbsoluteMajorityReassignmentStep | undefined,
-] {
-  const largestRemainderSteps = seatAssignment.steps.filter(isLargestRemainderAssignmentStep);
-  const uniqueHighestAverageSteps = seatAssignment.steps.filter(isUniqueHighestAverageAssignmentStep);
-  const highestAverageSteps = seatAssignment.steps.filter(isHighestAverageAssignmentStep);
-
-  const absoluteMajorityReassignment = seatAssignment.steps.find(isAbsoluteMajorityReassignmentStep);
-  return [largestRemainderSteps, uniqueHighestAverageSteps, highestAverageSteps, absoluteMajorityReassignment];
+export interface AssignmentSteps {
+  largestRemainderSteps: LargestRemainderAssignmentStep[];
+  uniqueHighestAverageSteps: UniqueHighestAverageAssignmentStep[];
+  highestAverageSteps: HighestAverageAssignmentStep[];
+  absoluteMajorityReassignment?: AbsoluteMajorityReassignmentStep;
 }
 
-export function getRemovalSteps(
-  seatAssignment: SeatAssignment,
-): [ListExhaustionRemovalStep[], ListExhaustionRemovalStep[], number[]] {
+export function getAssignmentSteps(seatAssignment: SeatAssignment): AssignmentSteps {
+  return {
+    largestRemainderSteps: seatAssignment.steps.filter(isLargestRemainderAssignmentStep),
+    uniqueHighestAverageSteps: seatAssignment.steps.filter(isUniqueHighestAverageAssignmentStep),
+    highestAverageSteps: seatAssignment.steps.filter(isHighestAverageAssignmentStep),
+    absoluteMajorityReassignment: seatAssignment.steps.find(isAbsoluteMajorityReassignmentStep),
+  };
+}
+
+export interface RemovalSteps {
+  fullSeatRemovalSteps: ListExhaustionRemovalStep[];
+  residualSeatRemovalSteps: ListExhaustionRemovalStep[];
+  uniquePgNumbersWithFullSeatsRemoved: number[];
+}
+
+export function getRemovalSteps(seatAssignment: SeatAssignment): RemovalSteps {
   const listExhaustionSteps = seatAssignment.steps.filter(isListExhaustionRemovalStep);
   const fullSeatRemovalSteps = listExhaustionSteps.filter((step) => step.change.full_seat);
   const residualSeatRemovalSteps = listExhaustionSteps.filter((step) => !step.change.full_seat);
@@ -62,5 +66,5 @@ export function getRemovalSteps(
       uniquePgNumbersWithFullSeatsRemoved.push(step.change.list_retracted_seat);
     }
   });
-  return [fullSeatRemovalSteps, residualSeatRemovalSteps, uniquePgNumbersWithFullSeatsRemoved];
+  return { fullSeatRemovalSteps, residualSeatRemovalSteps, uniquePgNumbersWithFullSeatsRemoved };
 }

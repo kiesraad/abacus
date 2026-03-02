@@ -4,7 +4,7 @@ import { getRemovalSteps } from "../../utils/steps";
 import { Footnotes } from "./Footnotes";
 
 export const Default: StoryFn = () => {
-  const [fullSeatRemovalSteps, ,] = getRemovalSteps(lt19SeatsAndP9AndP10.seat_assignment);
+  const { fullSeatRemovalSteps } = getRemovalSteps(lt19SeatsAndP9AndP10.seat_assignment);
 
   return <Footnotes fullSeatRemovalSteps={fullSeatRemovalSteps} />;
 };

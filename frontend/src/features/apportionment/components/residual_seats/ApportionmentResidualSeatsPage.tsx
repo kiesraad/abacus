@@ -211,9 +211,9 @@ export function ApportionmentResidualSeatsPage() {
     return <ApportionmentErrorPage sectionTitle={t("apportionment.details_residual_seats")} error={error} />;
   }
   if (seatAssignment) {
-    const [largestRemainderSteps, uniqueHighestAverageSteps, highestAverageSteps, absoluteMajorityReassignment] =
+    const { largestRemainderSteps, uniqueHighestAverageSteps, highestAverageSteps, absoluteMajorityReassignment } =
       getAssignmentSteps(seatAssignment);
-    const [, residualSeatRemovalSteps, uniquePgNumbersWithFullSeatsRemoved] = getRemovalSteps(seatAssignment);
+    const { residualSeatRemovalSteps, uniquePgNumbersWithFullSeatsRemoved } = getRemovalSteps(seatAssignment);
 
     const resultChanges = getResultChanges(
       uniquePgNumbersWithFullSeatsRemoved,

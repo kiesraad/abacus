@@ -133,13 +133,11 @@ function HighestAveragesSection({
             { num_seats: uniqueHighestAverageSteps.length + highestAverageSteps.length },
           )}
         </span>
-        {
-          <UniqueHighestAveragesTable
-            steps={uniqueHighestAverageSteps}
-            finalStanding={seatAssignment.final_standing}
-            politicalGroups={politicalGroups}
-          />
-        }
+        <UniqueHighestAveragesTable
+          steps={uniqueHighestAverageSteps}
+          finalStanding={seatAssignment.final_standing}
+          politicalGroups={politicalGroups}
+        />
         {highestAverageSteps.length > 0 && (
           <>
             <span className={cn(cls.tableInformation, "mt-lg")}>

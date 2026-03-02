@@ -89,8 +89,7 @@ impl NewElection {
             .unwrap_or(0);
 
         // the number of seats must be between 9 and 45 for municipal elections
-        // clippy suggests way less readable alternative
-        #[allow(clippy::manual_range_contains)]
+        #[allow(clippy::manual_range_contains, reason = "clippy suggests way less readable alternative")]
         if number_of_seats < 9 || number_of_seats > 45 {
             return Err(EMLImportError::NumberOfSeatsNotInRange);
         }

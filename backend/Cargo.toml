@@ -47,7 +47,7 @@ name = "gen-openapi"
 required-features = ["openapi"]
 
 [[bin]]
-name = "gen-test-gsb-election"
+name = "gen-test-election"
 required-features = ["dev-database"]
 
 [[bin]]

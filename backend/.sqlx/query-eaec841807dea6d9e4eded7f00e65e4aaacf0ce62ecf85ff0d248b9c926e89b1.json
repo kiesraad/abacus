@@ -1,0 +1,26 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT\n            investigation_state AS \"investigation_state: Json<InvestigationStatus>\",\n            data_entry_id AS \"data_entry_id: DataEntryId\"\n           FROM polling_stations WHERE id = ?",
+  "describe": {
+    "columns": [
+      {
+        "name": "investigation_state: Json<InvestigationStatus>",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "data_entry_id: DataEntryId",
+        "ordinal": 1,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      true,
+      true
+    ]
+  },
+  "hash": "eaec841807dea6d9e4eded7f00e65e4aaacf0ce62ecf85ff0d248b9c926e89b1"
+}

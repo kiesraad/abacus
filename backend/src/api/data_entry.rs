@@ -26,6 +26,7 @@ use crate::{
         },
         election::{ElectionId, ElectionWithPoliticalGroups, PoliticalGroup},
         entry_number::EntryNumber,
+        investigation::InvestigationStatus,
         polling_station::{PollingStation, PollingStationId},
         validation::{DataError, ValidateRoot, ValidationResults},
     },
@@ -36,9 +37,7 @@ use crate::{
         data_entry_repo::{
             self, delete_data_entry, get_data_entry, previous_results_for_polling_station,
         },
-        election_repo,
-        investigation_repo::get_polling_station_investigation,
-        polling_station_repo,
+        election_repo, investigation_repo, polling_station_repo,
         user_repo::{User, UserId},
     },
     service::change_committee_session_status,
@@ -177,16 +176,16 @@ async fn validate_and_get_data(
     let data_entry_status = data_entry_repo::get_or_default(conn, polling_station_id).await?;
 
     // Validate polling station
-    if committee_session.is_next_session() {
-        match get_polling_station_investigation(conn, polling_station.id).await {
-            Ok(investigation) if investigation.corrected_results == Some(true) => {}
-            _ => {
-                return Err(APIError::Conflict(
-                    "Data entry not allowed, no investigation with corrected results.".to_string(),
-                    ErrorReference::DataEntryNotAllowed,
-                ));
-            }
-        }
+    if committee_session.is_next_session()
+        && !matches!(
+            investigation_repo::get(conn, polling_station.id).await,
+            Ok(Some(InvestigationStatus::ConcludedWithNewResults(_)))
+        )
+    {
+        return Err(APIError::Conflict(
+            "Data entry not allowed, no investigation with corrected results.".to_string(),
+            ErrorReference::DataEntryNotAllowed,
+        ));
     }
 
     // Validate state based on user role

@@ -25,10 +25,7 @@ use crate::{
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
     repository::{
         committee_session_repo::{create, delete, get, get_election_committee_session, update},
-        election_repo,
-        investigation_repo::{
-            has_investigations_for_committee_session, list_investigations_for_committee_session,
-        },
+        election_repo, investigation_repo,
     },
     service::{
         CommitteeSessionAuditData, CommitteeSessionUpdatedAuditData,
@@ -177,7 +174,12 @@ pub async fn committee_session_delete(
         && (committee_session.status == CommitteeSessionStatus::Created
             || committee_session.status == CommitteeSessionStatus::InPreparation)
     {
-        if has_investigations_for_committee_session(&mut tx, committee_session_id).await? {
+        if investigation_repo::has_investigations_for_committee_session(
+            &mut tx,
+            committee_session_id,
+        )
+        .await?
+        {
             return Err(APIError::InvalidData(DataError::new(
                 "Cannot delete committee session with active investigations",
             )));
@@ -348,10 +350,16 @@ pub async fn committee_session_investigations(
 
     let committee_session = get(&mut conn, committee_session_id).await?;
 
-    Ok(Json(InvestigationListResponse {
-        investigations: list_investigations_for_committee_session(&mut conn, committee_session.id)
-            .await?,
-    }))
+    let investigations =
+        investigation_repo::list_for_committee_session(&mut conn, committee_session.id)
+            .await?
+            .iter()
+            .map(|(ps_id, status)| {
+                crate::domain::investigation::PollingStationInvestigation::from((*ps_id, status))
+            })
+            .collect();
+
+    Ok(Json(InvestigationListResponse { investigations }))
 }
 
 #[cfg(test)]

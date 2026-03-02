@@ -175,11 +175,14 @@ pub async fn election_details(
         .clone();
     let polling_stations =
         polling_station_repo::list(&mut conn, current_committee_session.id).await?;
-    let investigations = investigation_repo::list_investigations_for_committee_session(
-        &mut conn,
-        current_committee_session.id,
-    )
-    .await?;
+    let investigations =
+        investigation_repo::list_for_committee_session(&mut conn, current_committee_session.id)
+            .await?
+            .iter()
+            .map(|(ps_id, status)| {
+                crate::domain::investigation::PollingStationInvestigation::from((*ps_id, status))
+            })
+            .collect();
 
     Ok(Json(ElectionDetailsResponse {
         current_committee_session,

@@ -105,12 +105,12 @@ describe("UserCreateRolePage", () => {
     vi.spyOn(useUser, "useUser").mockReturnValue(getCoordinatorUser("gsb"));
 
     const setRole = vi.fn();
-    const setElection = vi.fn();
-    renderPage({ setRole, setElection });
+    const setCommitteeCategory = vi.fn();
+    renderPage({ setRole, setCommitteeCategory });
 
     await waitFor(() => {
       expect(setRole).toHaveBeenCalledExactlyOnceWith("typist");
-      expect(setElection).toHaveBeenCalledExactlyOnceWith("gsb");
+      expect(setCommitteeCategory).toHaveBeenCalledExactlyOnceWith("gsb");
       expect(navigate).toHaveBeenCalledExactlyOnceWith("/users/create/type", { replace: true });
     });
   });

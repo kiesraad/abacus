@@ -4,11 +4,11 @@ import { type Role, roleValues } from "@/types/generated/openapi";
 import {
   isAdministrator,
   isCoordinator,
-  isRoleWithoutElection,
+  isRoleWithoutCommitteeCategory,
   isTypist,
-  type RoleWithoutElection,
-  roleWithoutElection,
-  roleWithoutElectionValues,
+  type RoleWithoutCommitteeCategory,
+  roleWithoutCommitteeCategory,
+  roleWithoutCommitteeCategoryValues,
 } from "@/utils/role";
 
 describe("Role util", () => {
@@ -29,16 +29,18 @@ describe("Role util", () => {
     expect(fn(undefined)).toBe(false);
   });
 
-  test.each(roleValues)("Role %j without election should be the first part of role", (role: Role) => {
-    const roleWithout = roleWithoutElection(role);
+  test.each(roleValues)("Role %j without committee category should be the first part of role", (role: Role) => {
+    const roleWithout = roleWithoutCommitteeCategory(role);
     expect(role.startsWith(roleWithout)).toBe(true);
   });
 
-  test.each(roleWithoutElectionValues)("String %j should be a RoleWithoutElection", (role: RoleWithoutElection) => {
-    expect(isRoleWithoutElection(role as string)).toBe(true);
+  test.each(
+    roleWithoutCommitteeCategoryValues,
+  )("String %j should be a RoleWithoutCommitteeCategory", (role: RoleWithoutCommitteeCategory) => {
+    expect(isRoleWithoutCommitteeCategory(role as string)).toBe(true);
   });
 
-  test('String "typist_gsb" is not a RoleWithoutElection', () => {
-    expect(isRoleWithoutElection("typist_gsb")).toBe(false);
+  test('String "typist_gsb" is not a RoleWithoutCommitteeCategory', () => {
+    expect(isRoleWithoutCommitteeCategory("typist_gsb")).toBe(false);
   });
 });

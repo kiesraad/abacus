@@ -8,12 +8,12 @@ import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { useUser } from "@/hooks/user/useUser";
 import { t } from "@/i18n/translate";
-import { isCoordinator, isRoleWithoutElection } from "@/utils/role";
+import { isCoordinator, isRoleWithoutCommitteeCategory } from "@/utils/role";
 import { StringFormData } from "@/utils/stringFormData";
-import type { Election } from "../../hooks/UserCreateContext";
+import type { CommitteeCategory } from "../../hooks/UserCreateContext";
 import { useUserCreateContext } from "../../hooks/useUserCreateContext";
 
-function electionFromRole(role: "coordinator_csb" | "coordinator_gsb"): Election {
+function committeeCategoryFromRole(role: "coordinator_csb" | "coordinator_gsb"): CommitteeCategory {
   switch (role) {
     case "coordinator_csb":
       return "csb";
@@ -25,17 +25,17 @@ function electionFromRole(role: "coordinator_csb" | "coordinator_gsb"): Election
 export function UserCreateRolePage() {
   const navigate = useNavigate();
   const [error, setError] = useState<string>("");
-  const { role, setRole, setElection, setType } = useUserCreateContext();
+  const { role, setRole, setCommitteeCategory, setType } = useUserCreateContext();
   const loggedInUser = useUser();
 
-  // If the user is a coordinator, set role and election, and navigate to the type page
+  // If the user is a coordinator, set role and committee category, and navigate to the type page
   useEffect(() => {
     if (isCoordinator(loggedInUser?.role)) {
       setRole("typist");
-      setElection(electionFromRole(loggedInUser.role));
+      setCommitteeCategory(committeeCategoryFromRole(loggedInUser.role));
       void navigate("/users/create/type", { replace: true });
     }
-  }, [loggedInUser, navigate, setRole, setElection]);
+  }, [loggedInUser, navigate, setRole, setCommitteeCategory]);
 
   if (loggedInUser?.role !== "administrator") {
     // Do not show page content while navigating away for the coordinator
@@ -47,7 +47,7 @@ export function UserCreateRolePage() {
     const formData = new StringFormData(event.currentTarget);
     const roleValue = formData.getString("role") || null;
 
-    if (!roleValue || !isRoleWithoutElection(roleValue)) {
+    if (!roleValue || !isRoleWithoutCommitteeCategory(roleValue)) {
       setError(t("users.mandatory"));
       return;
     }

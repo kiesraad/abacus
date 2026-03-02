@@ -11,10 +11,10 @@ import { StringFormData } from "@/utils/stringFormData";
 
 import { useUserCreateContext } from "../../hooks/useUserCreateContext";
 
-export function UserCreateElectionPage() {
+export function UserCreateCommitteeCategoryPage() {
   const navigate = useNavigate();
   const [error, setError] = useState<string>("");
-  const { role, election, setElection, setType } = useUserCreateContext();
+  const { role, committeeCategory, setCommitteeCategory, setType } = useUserCreateContext();
 
   if (role !== "coordinator" && role !== "typist") {
     return <Navigate to="/users/create" />;
@@ -23,13 +23,13 @@ export function UserCreateElectionPage() {
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new StringFormData(event.currentTarget);
-    const electionValue = formData.getString("election");
-    if (electionValue !== "csb" && electionValue !== "gsb") {
+    const committeeCategoryValue = formData.getString("committee-category");
+    if (committeeCategoryValue !== "csb" && committeeCategoryValue !== "gsb") {
       setError(t("users.mandatory"));
       return;
     }
 
-    setElection(electionValue);
+    setCommitteeCategory(committeeCategoryValue);
 
     if (role === "typist") {
       void navigate("/users/create/type");
@@ -48,26 +48,29 @@ export function UserCreateElectionPage() {
         </section>
       </header>
       <main>
-        <Form title={t("users.election_title", { role: t(`users.${role}`).toLowerCase() })} onSubmit={handleSubmit}>
+        <Form
+          title={t("users.committee_category_title", { role: t(`users.${role}`).toLowerCase() })}
+          onSubmit={handleSubmit}
+        >
           <FormLayout>
             <FormLayout.Section>
-              <p>{t("users.election_hint")}</p>
+              <p>{t("users.committee_category_hint")}</p>
               <ChoiceList>
-                <ChoiceList.Legend>{t("users.election_label")}</ChoiceList.Legend>
-                {error && <ChoiceList.Error id="election-error">{error}</ChoiceList.Error>}
+                <ChoiceList.Legend>{t("users.committee_category_label")}</ChoiceList.Legend>
+                {error && <ChoiceList.Error id="committee-category-error">{error}</ChoiceList.Error>}
                 <ChoiceList.Radio
-                  id="election-gsb"
-                  name="election"
+                  id="committee-category-gsb"
+                  name="committee-category"
                   defaultValue="gsb"
-                  defaultChecked={election === "gsb"}
-                  label={t("users.election_gsb")}
+                  defaultChecked={committeeCategory === "gsb"}
+                  label={t("users.committee_category_gsb")}
                 />
                 <ChoiceList.Radio
-                  id="election-csb"
-                  name="election"
+                  id="committee-category-csb"
+                  name="committee-category"
                   defaultValue="csb"
-                  defaultChecked={election === "csb"}
-                  label={t("users.election_csb")}
+                  defaultChecked={committeeCategory === "csb"}
+                  label={t("users.committee_category_csb")}
                 />
               </ChoiceList>
             </FormLayout.Section>

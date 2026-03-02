@@ -109,7 +109,7 @@ pub async fn user_create(
     audit_service: AuditService,
     Json(create_user_req): Json<CreateUserRequest>,
 ) -> Result<(StatusCode, Json<User>), APIError> {
-    // Coordinators can only create Typists of the same election
+    // Coordinators can only create Typists for the same committee category
     if !logged_in_user.role().manages(&create_user_req.role) {
         return Err(AuthenticationError::Forbidden.into());
     }
@@ -158,7 +158,7 @@ async fn user_get(
         .await?
         .ok_or(sqlx::Error::RowNotFound)?;
 
-    // Coordinators can only fetch Typists of the same election
+    // Coordinators can only fetch Typists for the same committee category
     if !logged_in_user.role().manages(&user.role()) {
         return Err(AuthenticationError::Forbidden.into());
     }
@@ -199,7 +199,7 @@ pub async fn user_update(
             .await?
             .ok_or(sqlx::Error::RowNotFound)?;
 
-        // Coordinators can only update Typists of the same election
+        // Coordinators can only update Typists for the same committee category
         if !logged_in_user.role().manages(&user.role()) {
             return Err(AuthenticationError::Forbidden.into());
         }
@@ -257,7 +257,7 @@ async fn user_delete(
         .await?
         .ok_or(sqlx::Error::RowNotFound)?;
 
-    // Coordinators can only delete Typists of the same election
+    // Coordinators can only delete Typists for the same committee category
     if !logged_in_user.role().manages(&user.role()) {
         return Err(AuthenticationError::Forbidden.into());
     }

@@ -1,7 +1,7 @@
 import type { RouteObject } from "react-router";
 import { UsersLayout } from "@/features/users/components/UsersLayout";
+import { UserCreateCommitteeCategoryPage } from "./components/create/UserCreateCommitteeCategoryPage";
 import { UserCreateDetailsPage } from "./components/create/UserCreateDetailsPage";
-import { UserCreateElectionPage } from "./components/create/UserCreateElectionPage";
 import { UserCreateLayout } from "./components/create/UserCreateLayout";
 import { UserCreateRolePage } from "./components/create/UserCreateRolePage";
 import { UserCreateTypePage } from "./components/create/UserCreateTypePage";
@@ -33,7 +33,7 @@ export const usersRoutes: RouteObject[] = [
           },
           {
             path: "election",
-            Component: UserCreateElectionPage,
+            Component: UserCreateCommitteeCategoryPage,
             handle: { roles: ["administrator", "coordinator_csb", "coordinator_gsb"] },
           },
           {

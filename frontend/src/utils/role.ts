@@ -12,14 +12,14 @@ export function isTypist(role?: Role) {
   return role === "typist_gsb" || role === "typist_csb";
 }
 
-export const roleWithoutElectionValues = ["administrator", "coordinator", "typist"] as const;
-export type RoleWithoutElection = (typeof roleWithoutElectionValues)[number];
+export const roleWithoutCommitteeCategoryValues = ["administrator", "coordinator", "typist"] as const;
+export type RoleWithoutCommitteeCategory = (typeof roleWithoutCommitteeCategoryValues)[number];
 
-export function isRoleWithoutElection(value: string): value is RoleWithoutElection {
-  return (roleWithoutElectionValues as readonly string[]).includes(value);
+export function isRoleWithoutCommitteeCategory(value: string): value is RoleWithoutCommitteeCategory {
+  return (roleWithoutCommitteeCategoryValues as readonly string[]).includes(value);
 }
 
-export function roleWithoutElection(role: Role): RoleWithoutElection {
+export function roleWithoutCommitteeCategory(role: Role): RoleWithoutCommitteeCategory {
   switch (role) {
     case "administrator":
       return "administrator";

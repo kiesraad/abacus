@@ -1,16 +1,16 @@
 import { createContext } from "react";
 
 import type { Role } from "@/types/generated/openapi";
-import type { RoleWithoutElection } from "@/utils/role";
+import type { RoleWithoutCommitteeCategory } from "@/utils/role";
 
-export type Election = "csb" | "gsb";
+export type CommitteeCategory = "csb" | "gsb";
 export type UserType = "fullname" | "anonymous";
 
 export interface IUserCreateContext {
-  role?: RoleWithoutElection;
-  setRole: (role: RoleWithoutElection) => void;
-  election?: Election;
-  setElection: (election: Election) => void;
+  role?: RoleWithoutCommitteeCategory;
+  setRole: (role: RoleWithoutCommitteeCategory) => void;
+  committeeCategory?: CommitteeCategory;
+  setCommitteeCategory: (committeeCategory: CommitteeCategory) => void;
   fullRole?: Role;
   type?: UserType;
   setType: (type: UserType) => void;

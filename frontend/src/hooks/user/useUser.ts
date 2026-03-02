@@ -2,9 +2,9 @@ import { useContext } from "react";
 
 import { ApiProviderContext, type ApiState } from "@/api/ApiProviderContext";
 import type { LoginResponse } from "@/types/generated/openapi";
-import { type RoleWithoutElection, roleWithoutElection } from "@/utils/role";
+import { type RoleWithoutCommitteeCategory, roleWithoutCommitteeCategory } from "@/utils/role";
 
-export type UseUserReturn = (LoginResponse & { roleWithoutElection: RoleWithoutElection }) | null;
+export type UseUserReturn = (LoginResponse & { roleWithoutCommitteeCategory: RoleWithoutCommitteeCategory }) | null;
 
 export function useUser(): UseUserReturn {
   const apiState = useContext<ApiState | null>(ApiProviderContext);
@@ -19,6 +19,6 @@ export function useUser(): UseUserReturn {
 
   return {
     ...apiState.user,
-    roleWithoutElection: roleWithoutElection(apiState.user.role),
+    roleWithoutCommitteeCategory: roleWithoutCommitteeCategory(apiState.user.role),
   };
 }

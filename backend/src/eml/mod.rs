@@ -146,6 +146,15 @@ impl NewElection {
         let identifier = &election.identifier;
         let election_id = identifier.id.cloned_value()?;
         let election_date = identifier.election_date.copied_value()?.date;
+        let election_domain = identifier
+            .domain
+            .as_ref()
+            .ok_or(EMLImportError::MissingElectionDomain)?;
+        let election_domain_id = election_domain
+            .id
+            .as_ref()
+            .ok_or(EMLImportError::MissingElectionDomain)?
+            .cloned_value()?;
 
         if self.election_id != election_id.to_raw_value() {
             return Err(EMLImportError::MismatchElection);
@@ -153,6 +162,10 @@ impl NewElection {
 
         if self.election_date != election_date {
             return Err(EMLImportError::MismatchElectionDate);
+        }
+
+        if self.domain_id != election_domain_id.value() {
+            return Err(EMLImportError::MismatchElectionDomain);
         }
 
         let contest = election

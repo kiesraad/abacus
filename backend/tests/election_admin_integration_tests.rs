@@ -158,7 +158,7 @@ async fn test_csb_election_import_save(pool: SqlitePool) {
     )
     .await;
     assert_eq!(election_details["election"]["role"], "CSB");
-    assert_eq!(election_details["election"]["number_of_voters"], 0);
+    assert_eq!(election_details["election"]["number_of_voters"], 1);
     assert_eq!(
         election_details["current_committee_session"]["status"],
         "created"

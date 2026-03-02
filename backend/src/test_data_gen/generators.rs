@@ -158,7 +158,7 @@ fn generate_election(rng: &mut impl rand::RngExt, args: &GenerateElectionArgs) -
     // use the previous data to generate some identifiers and names
     let name = format!("Gemeenteraad {locality} {year}");
     let cleaned_up_locality = locality.replace(" ", "_").replace("'", "");
-    let election_id = format!("{cleaned_up_locality}_{year}");
+    let election_id = format!("GR{year}_{cleaned_up_locality}");
 
     info!("Election has name '{name}'");
 

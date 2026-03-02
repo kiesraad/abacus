@@ -366,12 +366,16 @@ impl ElectionWithPoliticalGroups {
                             CandidateListsAffiliation::builder()
                                 .affiliation_type(AffiliationType::StandAloneList)
                                 .registered_name(&pg.name)
+                                .publish_gender(true)
                                 .id(AffiliationId::new(pg.number.as_internal_u32().to_string())?)
                                 .candidates(
                                     pg.candidates
                                         .iter()
                                         .map(|can| {
                                             CandidateListsCandidate::builder()
+                                                .identifier(CandidateId::new(
+                                                    can.number.as_internal_u32().to_string(),
+                                                )?)
                                                 .full_name(
                                                     PersonName::new(&can.last_name)
                                                         .with_first_name_option(
@@ -466,6 +470,11 @@ impl ElectionWithPoliticalGroups {
                     NonZeroU64::new(self.number_of_voters as u64)
                         .ok_or(EMLError::custom("number of voters must be greater than 0"))?,
                 )
+                .voting_method(VotingMethod::SPV)
+                .reporting_unit(ReportingUnitIdentifier::new(
+                    ReportingUnitIdentifierId::new(&self.domain_id)?,
+                    &self.location,
+                ))
                 .polling_places(
                     polling_stations
                         .iter()

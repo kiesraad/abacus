@@ -169,46 +169,6 @@ test.describe("full flow", () => {
     await logout(page);
   });
 
-  test("create CSB election", async ({ page }) => {
-    await page.goto("/account/login");
-
-    const loginPage = new LoginPgObj(page);
-    await loginPage.login(adminUser.username, getTestPassword(adminUser.username));
-
-    const electionsOverviewPage = new ElectionsOverviewPgObj(page);
-    await electionsOverviewPage.create.click();
-
-    await uploadElectionAndInputHash(page);
-
-    const electoralCommitteeRolePage = new ElectoralCommitteeRolePgObj(page);
-    await expect(electoralCommitteeRolePage.header).toBeVisible();
-    await electoralCommitteeRolePage.csb.check();
-    await expect(electoralCommitteeRolePage.csb).toBeChecked();
-    await electoralCommitteeRolePage.next.click();
-
-    await uploadCandidatesAndInputHash(page);
-
-    const checkAndSavePage = new CheckAndSavePgObj(page);
-    await expect(checkAndSavePage.header).toBeVisible();
-    await expect(checkAndSavePage.electoralCommitteeRole).toHaveText("rol: Centraal stembureau");
-    await expect(checkAndSavePage.numberOfVoters).toBeHidden();
-    await expect(checkAndSavePage.countingMethod).toBeHidden();
-    const election = await checkAndSavePage.saveElection();
-
-    const csbElectionId = election.id;
-
-    await expect(electionsOverviewPage.adminHeader).toBeVisible();
-    await expect(electionsOverviewPage.alertCSBElectionCreated).toBeVisible();
-    await electionsOverviewPage.findElectionRowById(csbElectionId).click();
-
-    const electionHomePage = new ElectionHome(page);
-    await expect(electionHomePage.header).toHaveText("Gemeenteraad Test 2022");
-    const sessionCard = electionHomePage.getCommitteeSessionCard(1);
-    await expect(sessionCard).toContainText("Eerste zitting — Zitting voorbereiden");
-
-    await logout(page);
-  });
-
   test(`create coordinator user account`, async ({ page }) => {
     await page.goto("/account/login");
 

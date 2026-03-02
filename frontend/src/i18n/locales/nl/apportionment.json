@@ -8,7 +8,7 @@
   "details_full_seats": "Verdeling van de volle zetels",
   "election_summary": "Kengetallen",
   "full_seat": {
-    "singular": "volle zetel",
+    "singular": "Volle zetel",
     "plural": "Volle zetels"
   },
   "full_seat_removed_remainder_information": "Het overschot is berekend op basis van de {num_full_seats} volle zetels die de lijst heeft gehaald voordat lijstuitputting is meegenomen (Kieswet, artikel P 8).",

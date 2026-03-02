@@ -10,7 +10,7 @@ describe("DisplayFraction", () => {
     const { getByTestId } = render(
       <DisplayFraction
         id="fraction1"
-        fraction={{ integer: 8, numerator: 4, denominator: 12 } as DisplayFractionType}
+        fraction={{ integer: 8, numerator: 4, denominator: 12 } satisfies DisplayFractionType}
       />,
     );
     const fraction1 = getByTestId("fraction1");

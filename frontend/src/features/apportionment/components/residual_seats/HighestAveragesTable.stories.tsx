@@ -1,14 +1,13 @@
 import type { StoryObj } from "@storybook/react-vite";
 import { expect } from "storybook/test";
 import * as gte19Seats from "../../testing/gte-19-seats";
-import type { HighestAverageAssignmentStep } from "../../utils/steps";
 import { HighestAveragesTable } from "./HighestAveragesTable";
 
 export const Default: StoryObj = {
   render: () => {
     return (
       <HighestAveragesTable
-        steps={gte19Seats.seat_assignment.steps as HighestAverageAssignmentStep[]}
+        steps={gte19Seats.steps}
         finalStanding={gte19Seats.seat_assignment.final_standing}
         politicalGroups={gte19Seats.election.political_groups}
         resultChanges={[]}

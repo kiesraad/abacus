@@ -67,3 +67,139 @@ De volgende rollen zijn mogelijk: voorzitter, plaatsvervangend voorzitter of lid
 
 #pagebreak(weak: true)
 
+== Verslag van controlewerkzaamheden
+
+=== Zijn er controlewerkzaamheden uitgevoerd vanwege telverschillen of andere mogelijke fouten
+
+#checkbox()[Nee]
+
+#checkbox()[Ja, #sym.arrow.r Zie bijlage 2 #TODO[ref naar bijlage 2]]
+
+== Bezwaren
+
+=== Tijdens de zitting zijn:
+
+#checkbox()[Geen bezwaren ingebracht]
+
+#checkbox()[Bezwaren ingebracht. Deze staan in bijlage 3 bij dit proces-verbaal. De reactie van het centraal stembureau staat daar ook bij.]
+
+#pagebreak(weak: true)
+
+= Uitslag en zetelverdeling
+
+== Aantal kiesgerechtigden
+
+#letterbox("Z", value: input.election.number_of_voters)[Kiesgerechtigden]
+
+== Toegelaten kiezers
+
+#if not "voter_card_count" in input.summary.voters_counts [
+  Tel het aantal geldige stempassen en volmachtbewijzen
+
+  #sum(
+    letterbox("A", value: input.summary.voters_counts.poll_card_count)[Stempassen],
+    letterbox(
+      "B",
+      value: input.summary.voters_counts.proxy_certificate_count,
+    )[Volmachtbewijzen (schriftelijk of via ingevulde stempas)],
+    letterbox(
+      "D",
+      light: false,
+      value: input.summary.voters_counts.total_admitted_voters_count,
+    )[Totaal toegelaten kiezers (A+B)],
+  )
+] else [
+  Tel het aantal geldige stempassen, volmachtbewijzen en kiezerspassen
+
+  #sum(
+    letterbox("A", value: input.summary.voters_counts.poll_card_count)[Stempassen],
+    letterbox(
+      "B",
+      value: input.summary.voters_counts.proxy_certificate_count,
+    )[Volmachtbewijzen (schriftelijk of via ingevulde stempas)],
+    letterbox("C", value: input.summary.voters_counts.voter_card_count)[Kiezerspassen],
+    letterbox(
+      "D",
+      light: false,
+      value: input.summary.voters_counts.total_admitted_voters_count,
+    )[Totaal toegelaten kiezers (A+B+C)],
+  )
+]
+
+#pagebreak(weak: true)
+
+== Uitgebrachte stemmen
+
+#TODO[Votes table]
+
+#pagebreak(weak: true)
+
+== Verschillen tussen aantal kiezers en uitgebrachte stemmen
+
+=== Is het aantal uitgebrachte stemmen en het aantal toegelaten kiezers gelijk?
+
+#let differences = input.summary.differences_counts.more_ballots_count.count > 0 or input.summary.differences_counts.fewer_ballots_count.count > 0
+
+#checkbox(checked: not differences)[Ja, #sym.arrow.r Ga door naar 2.5 #TODO[ref?]]
+
+#checkbox(checked: differences)[Nee, er zijn stembureaus met een verschil]
+
+=== In de stembureaus zijn in totaal *méér* uitgebrachte stemmen dan toegelaten kiezers geteld.
+
+#letterbox(
+  "I",
+  value: input.summary.differences_counts.more_ballots_count.count,
+)[Totaal aantal méér getelde stemmen]
+
+=== In de stembureaus zijn in totaal *minder* uitgebrachte stemmen dan toegelaten kiezers geteld.
+
+#letterbox(
+  "J",
+  value: input.summary.differences_counts.fewer_ballots_count.count,
+)[Totaal aantal minder getelde stemmen]
+
+== Kiesdeler
+
+Met de kiesdeler wordt de zetelverdeling bepaald. De kiesdeler is het aantal stemmen dat nodig is voor een zetel. De kiesdeler is het totaal aantal uitgebrachte stemmen op een kandidaat gedeeld door het aantal te verdelen zetels.
+
+#TODO[Kiesdeler tabel]\
+
+6790 ÷ 13 = 522 #math.frac([4], [13])
+
+#pagebreak(weak: true)
+
+== Aantal volle zetels per lijst
+Hieronder is berekend hoe vaak elke lijst qua stemmenaantal de kiesdeler heeft gehaald. Het resultaat van deze deling geeft het aantal volle zetels dat per lijst is behaald.
+
+#TODO[Volle zetels tabel]\
+
+#pagebreak(weak: true)
+
+== Restzetels
+
+=== Na toewijzing van de volle zetels blijft een aantal te verdelen zetels over. Dit zijn de restzetels.
+
+#TODO[Apply values]\
+#sum(
+  operator_label: "- verschil",
+  number_box(
+    value: 99,
+  )[Totaal aantal te verdelen zetels],
+  number_box(
+    value: 99,
+  )[Toegewezen volle zetels],
+  number_box(
+    value: 99,
+  )[*Aantal restzetels*],
+)
+
+#pagebreak(weak: true)
+
+=== Verdeling van de restzetels
+
+- Het centraal berekent hoeveel stemmen elke lijst overhoudt na toekenning van de volle zetels. Dat is het ‘overschot’ aan stemmen voor die lijst.
+- Het centraal stembureau verdeelt de restzetels, in volgorde van de grootste overschotten. Elke lijst kan maar één restzetel krijgen. Alleen lijsten die ten minste 75% van de kiesdeler hebben behaald kunnen een restzetel krijgen.
+- Als er daarna nog restzetels over zijn, verdeelt het centraal stembureau die volgens het systeem van de grootste gemiddelden. Ook bij deze verdeling mag iedere lijst maar één restzetel krijgen
+- Als lijsten precies evenveel stemmen behalen en er niet voldoende restzetels zijn voor die lijsten, dan wordt geloot welke lijst de restzetel krijgt.
+
+#pagebreak(weak: true)

@@ -35,7 +35,7 @@ export const Coordinator: Story = {
     id: "feedback-error",
     type: "error",
     data: ["F201", "F202"],
-    userRole: "coordinator",
+    userRole: "coordinator_gsb",
   },
   play: async ({ canvas }) => {
     const titles = await canvas.findAllByRole("heading");
@@ -58,7 +58,7 @@ export const Typist: Story = {
     id: "feedback-error",
     type: "error",
     data: ["F201", "F202"],
-    userRole: "typist",
+    userRole: "typist_gsb",
   },
   play: async ({ canvas }) => {
     const titles = await canvas.findAllByRole("heading");

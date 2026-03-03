@@ -1,10 +1,10 @@
 import { type ReactNode, useEffect, useRef } from "react";
 
 import { hasTranslation, t, tx } from "@/i18n/translate";
-import type { ValidationResult } from "@/types/generated/openapi";
+import type { Role, ValidationResult } from "@/types/generated/openapi";
 import type { AlertType, FeedbackId } from "@/types/ui";
 import { cn } from "@/utils/classnames";
-import type { RoleWithoutCommitteeCategory } from "@/utils/role";
+import { isAdministrator, isCoordinator } from "@/utils/role";
 import { dottedCode } from "@/utils/ValidationResults";
 import { AlertIcon } from "../Icon/AlertIcon";
 import cls from "./Feedback.module.css";
@@ -20,14 +20,14 @@ interface FeedbackProps {
   id: FeedbackId;
   type: AlertType;
   data: ValidationResult[];
-  userRole: RoleWithoutCommitteeCategory;
+  userRole: Role;
   shouldFocus?: boolean;
 }
 
 export function Feedback({ id, type, data, userRole, shouldFocus = true }: FeedbackProps) {
   const feedbackHeader = useRef<HTMLHeadingElement | null>(null);
-  // NOTE: administrator roles are always mapped to coordinator here
-  const role = userRole === "administrator" ? "coordinator" : userRole;
+  // NOTE: Administrators get the same feedback messages as the coordinator
+  const role = isAdministrator(userRole) || isCoordinator(userRole) ? "coordinator" : "typist";
   const feedbackList: FeedbackItem[] = [];
   for (const { code, context } of data) {
     const title = t(`feedback.${code}.${role}.title`, { ...context });

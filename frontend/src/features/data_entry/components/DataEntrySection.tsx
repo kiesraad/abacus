@@ -94,20 +94,14 @@ export function DataEntrySection({ committeeCategory }: DataEntryProps) {
         )}
         {error instanceof ApiError && <ErrorModal error={error} />}
         {formSection.isSaved && memoizedErrors.length > 0 && (
-          <Feedback
-            id="feedback-error"
-            type="error"
-            data={memoizedErrors}
-            userRole={user.roleWithoutCommitteeCategory}
-            shouldFocus={true}
-          />
+          <Feedback id="feedback-error" type="error" data={memoizedErrors} userRole={user.role} shouldFocus={true} />
         )}
         {formSection.isSaved && memoizedWarnings.length > 0 && (
           <Feedback
             id="feedback-warning"
             type="warning"
             data={memoizedWarnings}
-            userRole={user.roleWithoutCommitteeCategory}
+            userRole={user.role}
             shouldFocus={formSection.errors.isEmpty()}
           />
         )}

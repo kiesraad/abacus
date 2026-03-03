@@ -1,5 +1,5 @@
 INSERT INTO elections (id, name, committee_category, counting_method, election_id, location, domain_id, category, number_of_seats, number_of_voters, election_date, nomination_date, political_groups)
-VALUES (7, 'Test Election >= 19 seats', 'GSB', 'CSO', 'GroteStad_2026', 'Grote Stad', '0000', 'Municipal', 23, 15000, '2026-03-18', '2026-02-02',
+VALUES (7, 'Test Election >= 19 seats', 'GSB', 'CSO', 'GR2026_GroteStad', 'Grote Stad', '0000', 'Municipal', 23, 15000, '2026-03-18', '2026-02-02',
         '[
           {
             "number": 1,
@@ -77,9 +77,9 @@ VALUES (711, 701, NULL, 701, 'TestA', 1, NULL, 'FixedLocation', 'Testweg 1a', '1
        (742, 704, 704, NULL, 'TestB', 2, NULL, 'FixedLocation', 'Testweg 1b', '1234 BB', 'Grote Stad');
 
 UPDATE polling_stations
-SET investigation_state = '{"polling_station_id":721,"reason":"reason","findings":"findings","corrected_results":true}'
+SET investigation_state = '{"status":"ConcludedWithNewResults","state":{"reason":"reason","findings":"findings"}}'
 WHERE id = 721;
 
 UPDATE polling_stations
-SET investigation_state = '{"polling_station_id":732,"reason":"reason","findings":"findings","corrected_results":true}'
+SET investigation_state = '{"status":"ConcludedWithNewResults","state":{"reason":"reason","findings":"findings"}}'
 WHERE id = 732;

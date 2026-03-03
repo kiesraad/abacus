@@ -846,6 +846,7 @@ export const errorReferenceValues = [
   "DataEntryGetNotAllowed",
   "DataEntryNotAllowed",
   "EmlImportError",
+  "EmlError",
   "EntryNotFound",
   "EntryNotUnique",
   "Forbidden",

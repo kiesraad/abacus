@@ -5632,6 +5632,7 @@
           "DataEntryGetNotAllowed",
           "DataEntryNotAllowed",
           "EmlImportError",
+          "EmlError",
           "EntryNotFound",
           "EntryNotUnique",
           "Forbidden",

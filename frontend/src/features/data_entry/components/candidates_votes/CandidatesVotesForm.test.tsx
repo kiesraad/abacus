@@ -305,7 +305,7 @@ describe("Test CandidatesVotesForm", () => {
         name: "Gemeenteraadsverkiezingen 2026",
         committee_category: "GSB",
         counting_method: "CSO",
-        election_id: "Heemdamseburg_2024",
+        election_id: "GR2024_Heemdamseburg",
         location: "Heemdamseburg",
         domain_id: "0000",
         category: "Municipal",

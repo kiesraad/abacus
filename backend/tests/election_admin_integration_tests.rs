@@ -36,7 +36,7 @@ async fn test_gsb_election_validate_valid(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
-async fn test_gsb_election_validate_invalid_election_subcategory(pool: SqlitePool) {
+async fn test_gsb_election_validate_invalid_election_only_municipal_supported(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     let url = format!("http://{addr}/api/elections/import/validate");
@@ -46,7 +46,7 @@ async fn test_gsb_election_validate_invalid_election_subcategory(pool: SqlitePoo
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
           "committee_category": "GSB",
-          "election_data": include_str!("../src/eml/tests/eml110a_invalid_election_subcategory.eml.xml"),
+          "election_data": include_str!("../src/eml/tests/eml110a_invalid_election_only_municipal_supported.eml.xml"),
         }))
         .send()
         .await
@@ -158,7 +158,7 @@ async fn test_csb_election_import_save(pool: SqlitePool) {
     )
     .await;
     assert_eq!(election_details["election"]["committee_category"], "CSB");
-    assert_eq!(election_details["election"]["number_of_voters"], 0);
+    assert_eq!(election_details["election"]["number_of_voters"], 1);
     assert_eq!(
         election_details["current_committee_session"]["status"],
         "created"
@@ -166,7 +166,7 @@ async fn test_csb_election_import_save(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
-async fn test_election_validate_invalid_election_number_of_seats(pool: SqlitePool) {
+async fn test_election_validate_number_of_seats_out_of_range(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     let url = format!("http://{addr}/api/elections/import/validate");
@@ -176,7 +176,7 @@ async fn test_election_validate_invalid_election_number_of_seats(pool: SqlitePoo
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
           "committee_category": "GSB",
-          "election_data": include_str!("../src/eml/tests/eml110a_invalid_election_number_of_seats.eml.xml"),
+          "election_data": include_str!("../src/eml/tests/eml110a_invalid_election_number_of_seats_out_of_range.eml.xml"),
         }))
         .send()
         .await
@@ -187,7 +187,7 @@ async fn test_election_validate_invalid_election_number_of_seats(pool: SqlitePoo
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
-async fn test_election_validate_invalid_xml(pool: SqlitePool) {
+async fn test_election_validate_missing_election_domain(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     let url = format!("http://{addr}/api/elections/import/validate");
@@ -197,7 +197,7 @@ async fn test_election_validate_invalid_xml(pool: SqlitePool) {
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
           "committee_category": "GSB",
-          "election_data": include_str!("../src/eml/tests/eml110a_invalid_xml.eml.xml"),
+          "election_data": include_str!("../src/eml/tests/eml110a_invalid_election_missing_election_domain.eml.xml"),
         }))
         .send()
         .await

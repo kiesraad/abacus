@@ -16,10 +16,10 @@ use abacus::{
         summary::ElectionSummary,
         votes_table::VotesTables,
     },
-    eml::{EML110, EML230, EMLDocument},
     test_data_gen::{GenerateElectionArgs, RandomRange, create_test_election, parse_range},
 };
 use clap::Parser;
+use eml_nl::io::EMLWrite as _;
 use tracing::{info, level_filters::LevelFilter};
 use tracing_subscriber::EnvFilter;
 
@@ -170,23 +170,28 @@ async fn export_election(
 
     info!("Exporting definitions to {:?}", export_dir);
 
-    let transaction_id = "1";
+    let transaction_id = Some(1);
 
     info!("Converting election to EML definitions");
-    let definition_eml = EML110::definition_from_abacus_election(election, transaction_id);
-    let polling_stations_eml =
-        EML110::polling_stations_from_election(election, polling_stations, transaction_id);
-    let candidates_eml = EML230::candidates_from_abacus_election(election, transaction_id);
+    let definition_eml = election
+        .as_definition_eml(transaction_id, None)
+        .expect("Failed to convert election to EML definition");
+    let polling_stations_eml = election
+        .as_polling_stations_eml(polling_stations, transaction_id, None)
+        .expect("Failed to convert polling stations to EML");
+    let candidates_eml = election
+        .as_candidates_eml(transaction_id, None)
+        .expect("Failed to convert candidates to EML");
 
     info!("Converting EML definitions to XML strings");
     let definition_data = definition_eml
-        .to_xml_string()
+        .write_eml_root_str(true, true)
         .expect("Failed to convert definition to XML string");
     let polling_stations_data = polling_stations_eml
-        .to_xml_string()
+        .write_eml_root_str(true, true)
         .expect("Failed to convert polling stations to XML string");
     let candidates_data = candidates_eml
-        .to_xml_string()
+        .write_eml_root_str(true, true)
         .expect("Failed to convert candidates to XML string");
 
     let def_filename = export_dir.join(format!(

@@ -38,6 +38,12 @@ macro_rules! id {
                 Ok(Self::from(u32::try_from(value)?))
             }
         }
+
+        impl $identifier {
+            pub fn as_internal_u32(&self) -> u32 {
+                self.0
+            }
+        }
     };
 }
 

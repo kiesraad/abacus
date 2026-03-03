@@ -22,8 +22,9 @@ use crate::{
         data_entry::PollingStationResults,
         election::ElectionWithPoliticalGroups,
         investigation::{
-            PollingStationInvestigation, PollingStationInvestigationConcludeRequest,
-            PollingStationInvestigationCreateRequest, PollingStationInvestigationUpdateRequest,
+            InvestigationStatus, InvestigationTransitionError, PollingStationInvestigation,
+            PollingStationInvestigationConcludeRequest, PollingStationInvestigationCreateRequest,
+            PollingStationInvestigationUpdateRequest,
         },
         models::{ModelNa14_2Bijlage1Input, ToPdfFileModel},
         polling_station::{PollingStation, PollingStationId},
@@ -34,13 +35,7 @@ use crate::{
     repository::{
         committee_session_repo::get_election_committee_session,
         data_entry_repo::{data_entry_exists, previous_results_for_polling_station},
-        election_repo,
-        investigation_repo::{
-            conclude_polling_station_investigation, create_polling_station_investigation,
-            delete_polling_station_investigation, get_polling_station_investigation,
-            list_investigations_for_committee_session, update_polling_station_investigation,
-        },
-        polling_station_repo,
+        election_repo, investigation_repo, polling_station_repo,
     },
     service::{change_committee_session_status, create_empty_data_entry},
 };
@@ -111,9 +106,8 @@ pub async fn delete_investigation_for_polling_station(
     committee_session: &CommitteeSession,
     polling_station_id: PollingStationId,
 ) -> Result<(), APIError> {
-    if let Some(investigation) =
-        delete_polling_station_investigation(conn, polling_station_id).await?
-    {
+    if let Some(old_status) = investigation_repo::delete(conn, polling_station_id).await? {
+        let investigation = PollingStationInvestigation::from((polling_station_id, &old_status));
         audit_service
             .log(conn, &InvestigationDeletedAuditData(investigation), None)
             .await?;
@@ -129,6 +123,21 @@ pub async fn delete_investigation_for_polling_station(
         }
     }
     Ok(())
+}
+
+impl From<InvestigationTransitionError> for APIError {
+    fn from(err: InvestigationTransitionError) -> Self {
+        match err {
+            InvestigationTransitionError::Invalid => APIError::Conflict(
+                "Invalid investigation state transition".into(),
+                ErrorReference::InvalidStateTransition,
+            ),
+            InvestigationTransitionError::RequiresCorrectedResults => APIError::Conflict(
+                "Investigation requires corrected results, because the polling station newly created in this committee session".into(),
+                ErrorReference::InvestigationRequiresCorrectedResults,
+            ),
+        }
+    }
 }
 
 pub struct CurrentSessionPollingStationId(pub PollingStationId);
@@ -181,26 +190,25 @@ async fn polling_station_investigation_create(
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     CurrentSessionPollingStationId(polling_station_id): CurrentSessionPollingStationId,
-    Json(polling_station_investigation): Json<PollingStationInvestigationCreateRequest>,
+    Json(request): Json<PollingStationInvestigationCreateRequest>,
 ) -> Result<(StatusCode, PollingStationInvestigation), APIError> {
     let mut tx = pool.begin_immediate().await?;
 
     let committee_session = validate_and_get_committee_session(&mut tx, polling_station_id).await?;
 
-    let investigation = create_polling_station_investigation(
-        &mut tx,
-        polling_station_id,
-        polling_station_investigation,
-    )
-    .await
-    .map_err(|err| match err {
-        sqlx::Error::RowNotFound => APIError::Conflict(
-            "Investigation already exists for this polling station".into(),
-            ErrorReference::EntryNotUnique,
-        ),
-        other => other.into(),
-    })?;
+    let status = InvestigationStatus::new(request.reason);
 
+    investigation_repo::create(&mut tx, polling_station_id, &status)
+        .await
+        .map_err(|err| match err {
+            sqlx::Error::RowNotFound => APIError::Conflict(
+                "Investigation already exists for this polling station".into(),
+                ErrorReference::EntryNotUnique,
+            ),
+            other => other.into(),
+        })?;
+
+    let investigation = PollingStationInvestigation::from((polling_station_id, &status));
     audit_service
         .log(
             &mut tx,
@@ -255,35 +263,36 @@ async fn polling_station_investigation_conclude(
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     CurrentSessionPollingStationId(polling_station_id): CurrentSessionPollingStationId,
-    Json(polling_station_investigation): Json<PollingStationInvestigationConcludeRequest>,
+    Json(request): Json<PollingStationInvestigationConcludeRequest>,
 ) -> Result<PollingStationInvestigation, APIError> {
     let mut tx = pool.begin_immediate().await?;
 
     let committee_session = validate_and_get_committee_session(&mut tx, polling_station_id).await?;
 
-    let polling_station = polling_station_repo::get(&mut tx, polling_station_id).await?;
-    if polling_station.prev_data_entry_id.is_none()
-        && !polling_station_investigation.corrected_results
-    {
-        return Err(APIError::Conflict(
-            "Investigation requires corrected results, because the polling station is not part of a previous session".into(),
-            ErrorReference::InvestigationRequiresCorrectedResults,
-        ));
-    }
+    let current = investigation_repo::get(&mut tx, polling_station_id)
+        .await?
+        .ok_or_else(|| {
+            APIError::NotFound(
+                "Investigation not found".into(),
+                ErrorReference::EntryNotFound,
+            )
+        })?;
 
-    let corrected_results = polling_station_investigation.corrected_results;
+    let status = if request.corrected_results {
+        let ps = create_empty_data_entry(&mut tx, polling_station_id).await?;
+        let data_entry_id = ps
+            .data_entry_id
+            .expect("create_empty_data_entry should set data_entry_id");
+        current.conclude_with_new_results(request.findings, data_entry_id)?
+    } else {
+        let polling_station = polling_station_repo::get(&mut tx, polling_station_id).await?;
+        let new_polling_station = polling_station.prev_data_entry_id.is_none();
+        current.conclude_without_new_results(request.findings, new_polling_station)?
+    };
 
-    let investigation = conclude_polling_station_investigation(
-        &mut tx,
-        polling_station_id,
-        polling_station_investigation,
-    )
-    .await?;
+    investigation_repo::save(&mut tx, polling_station_id, &status).await?;
 
-    if corrected_results {
-        create_empty_data_entry(&mut tx, polling_station_id).await?;
-    }
-
+    let investigation = PollingStationInvestigation::from((polling_station_id, &status));
     audit_service
         .log(
             &mut tx,
@@ -309,38 +318,162 @@ async fn polling_station_investigation_conclude(
     Ok(investigation)
 }
 
-async fn update_investigation(
+/// Determine the correct state transition based on the current state and request
+async fn apply_update(
     conn: &mut SqliteConnection,
     audit_service: &AuditService,
     committee_session: &CommitteeSession,
-    investigation_update_request: PollingStationInvestigationUpdateRequest,
     polling_station_id: PollingStationId,
-) -> Result<PollingStationInvestigation, APIError> {
-    let investigation = update_polling_station_investigation(
-        conn,
-        polling_station_id,
-        investigation_update_request,
-    )
-    .await?;
-
-    audit_service
-        .log(
-            conn,
-            &InvestigationUpdatedAuditData(investigation.clone()),
+    current: InvestigationStatus,
+    request: PollingStationInvestigationUpdateRequest,
+) -> Result<InvestigationStatus, APIError> {
+    match (&current, request.corrected_results) {
+        // InProgress: text-only update
+        (InvestigationStatus::InProgress(_), None) => {
+            let mut status = current;
+            status.update_in_progress(request.reason)?;
+            Ok(status)
+        }
+        // InProgress + corrected_results set: invalid (must use conclude endpoint)
+        (InvestigationStatus::InProgress(_), Some(_)) => {
+            Err(InvestigationTransitionError::Invalid.into())
+        }
+        // Concluded + corrected_results omitted -> reopen to InProgress
+        (
+            InvestigationStatus::ConcludedWithoutNewResults(_)
+            | InvestigationStatus::ConcludedWithNewResults(_),
             None,
-        )
-        .await?;
-
-    if committee_session.status == CommitteeSessionStatus::Completed {
-        change_committee_session_status(
-            conn,
-            committee_session.id,
-            CommitteeSessionStatus::DataEntry,
-            audit_service.clone(),
-        )
-        .await?;
+        ) => {
+            reopen_investigation(
+                conn,
+                audit_service,
+                committee_session,
+                polling_station_id,
+                current,
+                &request,
+            )
+            .await
+        }
+        // ConcludedWithoutNewResults: same-state text update
+        (InvestigationStatus::ConcludedWithoutNewResults(_), Some(false)) => {
+            let ps = polling_station_repo::get(conn, polling_station_id).await?;
+            let findings = request.findings.unwrap_or_default();
+            Ok(current.switch_to_without_new_results(
+                request.reason,
+                findings,
+                ps.prev_data_entry_id.is_none(),
+            )?)
+        }
+        // ConcludedWithoutNewResults -> ConcludedWithNewResults
+        (InvestigationStatus::ConcludedWithoutNewResults(_), Some(true)) => {
+            switch_to_with_new_results(conn, polling_station_id, current, request).await
+        }
+        // ConcludedWithNewResults: same-state text update
+        (InvestigationStatus::ConcludedWithNewResults(_), Some(true)) => {
+            create_empty_data_entry(conn, polling_station_id).await?;
+            let ps = polling_station_repo::get(conn, polling_station_id).await?;
+            let de_id = ps
+                .data_entry_id
+                .expect("data entry should exist after create_empty_data_entry");
+            let findings = request.findings.unwrap_or_default();
+            Ok(current.switch_to_with_new_results(request.reason, findings, de_id)?)
+        }
+        // ConcludedWithNewResults -> ConcludedWithoutNewResults
+        (InvestigationStatus::ConcludedWithNewResults(_), Some(false)) => {
+            switch_to_without_new_results(
+                conn,
+                audit_service,
+                committee_session,
+                polling_station_id,
+                current,
+                request,
+            )
+            .await
+        }
     }
-    Ok(investigation)
+}
+
+/// Reopen a concluded investigation back to InProgress
+///
+/// Deletes linked data entries if present (requires `accept_data_entry_deletion`).
+async fn reopen_investigation(
+    conn: &mut SqliteConnection,
+    audit_service: &AuditService,
+    committee_session: &CommitteeSession,
+    polling_station_id: PollingStationId,
+    current: InvestigationStatus,
+    request: &PollingStationInvestigationUpdateRequest,
+) -> Result<InvestigationStatus, APIError> {
+    if data_entry_exists(conn, polling_station_id).await? {
+        if request.accept_data_entry_deletion == Some(true) {
+            delete_data_entry_for_polling_station(
+                conn,
+                audit_service,
+                committee_session,
+                polling_station_id,
+            )
+            .await?;
+        } else {
+            return Err(APIError::Conflict(
+                "Investigation has data entries or results".into(),
+                ErrorReference::InvestigationHasDataEntryOrResult,
+            ));
+        }
+    }
+    let mut status = current.reopen()?;
+    status.update_in_progress(request.reason.clone())?;
+    Ok(status)
+}
+
+/// Switch a concluded investigation to ConcludedWithoutNewResults
+async fn switch_to_without_new_results(
+    conn: &mut SqliteConnection,
+    audit_service: &AuditService,
+    committee_session: &CommitteeSession,
+    polling_station_id: PollingStationId,
+    current: InvestigationStatus,
+    request: PollingStationInvestigationUpdateRequest,
+) -> Result<InvestigationStatus, APIError> {
+    if data_entry_exists(conn, polling_station_id).await? {
+        if request.accept_data_entry_deletion == Some(true) {
+            delete_data_entry_for_polling_station(
+                conn,
+                audit_service,
+                committee_session,
+                polling_station_id,
+            )
+            .await?;
+        } else {
+            return Err(APIError::Conflict(
+                "Investigation has data entries or results".into(),
+                ErrorReference::InvestigationHasDataEntryOrResult,
+            ));
+        }
+    }
+
+    let polling_station = polling_station_repo::get(conn, polling_station_id).await?;
+    let new_polling_station = polling_station.prev_data_entry_id.is_none();
+    let findings = request.findings.unwrap_or_default();
+    let status =
+        current.switch_to_without_new_results(request.reason, findings, new_polling_station)?;
+    Ok(status)
+}
+
+/// Switch a concluded investigation to ConcludedWithNewResults
+async fn switch_to_with_new_results(
+    conn: &mut SqliteConnection,
+    polling_station_id: PollingStationId,
+    current: InvestigationStatus,
+    request: PollingStationInvestigationUpdateRequest,
+) -> Result<InvestigationStatus, APIError> {
+    let ps = create_empty_data_entry(conn, polling_station_id).await?;
+    let de_id = ps
+        .data_entry_id
+        .expect("create_empty_data_entry should set data_entry_id");
+
+    let findings = request.findings.unwrap_or_default();
+    let status = current.switch_to_with_new_results(request.reason, findings, de_id)?;
+    Ok(status)
 }
 
 /// Update an investigation for a polling station
@@ -366,59 +499,59 @@ async fn polling_station_investigation_update(
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     CurrentSessionPollingStationId(polling_station_id): CurrentSessionPollingStationId,
-    Json(investigation_update_request): Json<PollingStationInvestigationUpdateRequest>,
+    Json(request): Json<PollingStationInvestigationUpdateRequest>,
 ) -> Result<PollingStationInvestigation, APIError> {
     let mut tx = pool.begin_immediate().await?;
 
     let committee_session = validate_and_get_committee_session(&mut tx, polling_station_id).await?;
 
     let polling_station = polling_station_repo::get(&mut tx, polling_station_id).await?;
-    if polling_station.prev_data_entry_id.is_none()
-        && investigation_update_request.corrected_results != Some(true)
-    {
+    if polling_station.prev_data_entry_id.is_none() && request.corrected_results != Some(true) {
         return Err(APIError::Conflict(
             "Investigation requires corrected results, because it is not part of a previous session".into(),
             ErrorReference::InvestigationRequiresCorrectedResults,
         ));
     }
 
-    // If corrected_results is changed from yes to no, check if there are data entries.
-    // If deleting them is accepted, delete them. If not, return an error.
-    if investigation_update_request.corrected_results == Some(false)
-        && let Ok(current) = get_polling_station_investigation(&mut tx, polling_station_id).await
-        && current.corrected_results == Some(true)
-        && data_entry_exists(&mut tx, polling_station_id).await?
-    {
-        if investigation_update_request.accept_data_entry_deletion == Some(true) {
-            let polling_station = polling_station_repo::get(&mut tx, polling_station_id).await?;
-            delete_data_entry_for_polling_station(
-                &mut tx,
-                &audit_service,
-                &committee_session,
-                polling_station.id,
+    let current = investigation_repo::get(&mut tx, polling_station_id)
+        .await?
+        .ok_or_else(|| {
+            APIError::NotFound(
+                "Investigation not found".into(),
+                ErrorReference::EntryNotFound,
             )
-            .await?;
-        } else {
-            return Err(APIError::Conflict(
-                "Investigation has data entries or results".into(),
-                ErrorReference::InvestigationHasDataEntryOrResult,
-            ));
-        }
-    }
+        })?;
 
-    // If corrected_results is changed to true, create a data entry (idempotent)
-    if investigation_update_request.corrected_results == Some(true) {
-        create_empty_data_entry(&mut tx, polling_station_id).await?;
-    }
-
-    let investigation = update_investigation(
+    let status = apply_update(
         &mut tx,
         &audit_service,
         &committee_session,
-        investigation_update_request,
         polling_station_id,
+        current,
+        request,
     )
     .await?;
+
+    investigation_repo::save(&mut tx, polling_station_id, &status).await?;
+
+    let investigation = PollingStationInvestigation::from((polling_station_id, &status));
+    audit_service
+        .log(
+            &mut tx,
+            &InvestigationUpdatedAuditData(investigation.clone()),
+            None,
+        )
+        .await?;
+
+    if committee_session.status == CommitteeSessionStatus::Completed {
+        change_committee_session_status(
+            &mut tx,
+            committee_session.id,
+            CommitteeSessionStatus::DataEntry,
+            audit_service,
+        )
+        .await?;
+    }
 
     tx.commit().await?;
 
@@ -451,11 +584,33 @@ async fn polling_station_investigation_delete(
 
     let committee_session = validate_and_get_committee_session(&mut tx, polling_station_id).await?;
 
-    get_polling_station_investigation(&mut tx, polling_station_id).await?;
-    let polling_station = polling_station_repo::get(&mut tx, polling_station_id).await?;
+    // Delete investigation (returns old status, or None if none existed)
+    let old_status = investigation_repo::delete(&mut tx, polling_station_id)
+        .await?
+        .ok_or_else(|| {
+            APIError::NotFound(
+                "Investigation not found".into(),
+                ErrorReference::EntryNotFound,
+            )
+        })?;
 
-    // Delete investigation
-    delete_investigation_for_polling_station(
+    let investigation = PollingStationInvestigation::from((polling_station_id, &old_status));
+    audit_service
+        .log(&mut tx, &InvestigationDeletedAuditData(investigation), None)
+        .await?;
+
+    if committee_session.status == CommitteeSessionStatus::Completed {
+        change_committee_session_status(
+            &mut tx,
+            committee_session.id,
+            CommitteeSessionStatus::DataEntry,
+            audit_service.clone(),
+        )
+        .await?;
+    }
+
+    // Delete potential data entry linked to the polling station
+    delete_data_entry_for_polling_station(
         &mut tx,
         &audit_service,
         &committee_session,
@@ -463,19 +618,9 @@ async fn polling_station_investigation_delete(
     )
     .await?;
 
-    // Delete potential data entry and result linked to the polling station
-    delete_data_entry_for_polling_station(
-        &mut tx,
-        &audit_service,
-        &committee_session,
-        polling_station.id,
-    )
-    .await?;
-
     // Change committee session status if last investigation is deleted
-    if list_investigations_for_committee_session(&mut tx, committee_session.id)
+    if !investigation_repo::has_investigations_for_committee_session(&mut tx, committee_session.id)
         .await?
-        .is_empty()
     {
         change_committee_session_status(
             &mut tx,
@@ -521,8 +666,17 @@ async fn polling_station_investigation_download_corrigendum_pdf(
     CurrentSessionPollingStationId(polling_station_id): CurrentSessionPollingStationId,
 ) -> Result<Attachment<Vec<u8>>, APIError> {
     let mut conn = pool.acquire().await?;
-    let investigation: PollingStationInvestigation =
-        get_polling_station_investigation(&mut conn, polling_station_id).await?;
+
+    let status = investigation_repo::get(&mut conn, polling_station_id)
+        .await?
+        .ok_or_else(|| {
+            APIError::NotFound(
+                "Investigation not found".into(),
+                ErrorReference::EntryNotFound,
+            )
+        })?;
+    let investigation = PollingStationInvestigation::from((polling_station_id, &status));
+
     let polling_station: PollingStation =
         polling_station_repo::get(&mut conn, polling_station_id).await?;
     let election: ElectionWithPoliticalGroups =

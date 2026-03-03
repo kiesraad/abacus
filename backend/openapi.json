@@ -6294,7 +6294,7 @@
       },
       "PollingStation": {
         "type": "object",
-        "description": "Polling station of a certain [crate::domain::election::Election]",
+        "description": "Polling station linked to an election, committee session and (previous) data entry.",
         "required": [
           "id",
           "election_id",

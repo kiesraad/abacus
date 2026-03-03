@@ -2,7 +2,6 @@
 
 use abacus::{
     domain::{
-        committee_session::CommitteeSessionId,
         data_entry::{
             CSOFirstSessionResults, CountingDifferencesPollingStation,
             DifferenceCountsCompareVotesCastAdmittedVoters, DifferencesCounts, ExtraInvestigation,
@@ -94,9 +93,6 @@ fn polling_station() -> PollingStation {
     PollingStation {
         id: PollingStationId::from(1),
         election_id: ElectionId::from(1),
-        committee_session_id: CommitteeSessionId::from(1),
-        prev_data_entry_id: None,
-        data_entry_id: None,
         name: "Test polling station".to_string(),
         number: 1,
         number_of_voters: None,

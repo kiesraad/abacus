@@ -2544,7 +2544,6 @@
   "polling_station": {
     "id": 87,
     "election_id": 2,
-    "committee_session_id": 1,
     "name": "Hotel Van Den Stem",
     "number": 1,
     "number_of_voters": 820,

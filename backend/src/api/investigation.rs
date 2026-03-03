@@ -84,15 +84,15 @@ async fn validate_and_get_committee_session(
     conn: &mut SqliteConnection,
     polling_station_id: PollingStationId,
 ) -> Result<CommitteeSession, APIError> {
-    let polling_station = polling_station_repo::get(conn, polling_station_id).await?;
+    let polling_station_row = polling_station_repo::get(conn, polling_station_id).await?;
 
     // Get latest committee session for the election
     let committee_session =
-        get_election_committee_session(conn, polling_station.election_id).await?;
+        get_election_committee_session(conn, polling_station_row.election_id).await?;
 
     // Ensure this is not the first session and that the polling station is part of the last session
     if !committee_session.is_next_session()
-        || polling_station.committee_session_id != committee_session.id
+        || polling_station_row.committee_session_id != committee_session.id
     {
         return Err(CommitteeSessionError::InvalidCommitteeSessionStatus.into());
     }
@@ -677,12 +677,11 @@ async fn polling_station_investigation_download_corrigendum_pdf(
         })?;
     let investigation = PollingStationInvestigation::from((polling_station_id, &status));
 
-    let polling_station: PollingStation =
-        polling_station_repo::get(&mut conn, polling_station_id).await?;
+    let polling_station_row = polling_station_repo::get(&mut conn, polling_station_id).await?;
     let election: ElectionWithPoliticalGroups =
-        election_repo::get(&mut conn, polling_station.election_id).await?;
+        election_repo::get(&mut conn, polling_station_row.election_id).await?;
 
-    let previous_results = match polling_station.prev_data_entry_id {
+    let previous_results = match polling_station_row.prev_data_entry_id {
         Some(_) => {
             match previous_results_for_polling_station(&mut conn, polling_station_id).await {
                 Ok(results) => results,
@@ -696,6 +695,8 @@ async fn polling_station_investigation_download_corrigendum_pdf(
         }
         None => PollingStationResults::empty_cso_first_session(&election.political_groups),
     };
+
+    let polling_station: PollingStation = polling_station_row.into();
 
     let name = format!(
         "Model_Na14-2_{}{}_Stembureau_{}_Bijlage_1.pdf",

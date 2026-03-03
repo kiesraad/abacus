@@ -1,8 +1,8 @@
 use sqlx::{Connection, SqliteConnection};
 
 use crate::{
-    domain::polling_station::{PollingStation, PollingStationId},
-    repository::{data_entry_repo, polling_station_repo},
+    domain::polling_station::PollingStationId,
+    repository::{data_entry_repo, polling_station_repo, polling_station_repo::PollingStationRow},
 };
 
 #[derive(Debug)]
@@ -22,7 +22,7 @@ impl From<sqlx::Error> for DataEntryServiceError {
 pub async fn create_empty(
     conn: &mut SqliteConnection,
     polling_station_id: PollingStationId,
-) -> Result<PollingStation, DataEntryServiceError> {
+) -> Result<PollingStationRow, DataEntryServiceError> {
     let mut tx = conn.begin().await?;
 
     // If data entry already exists, return polling station as-is

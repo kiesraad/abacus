@@ -28,7 +28,7 @@ use crate::{
             ElectionWithPoliticalGroups, NewElection, VoteCountingMethod,
         },
         investigation::PollingStationInvestigation,
-        polling_station::{PollingStation, PollingStationRequest, PollingStationsRequest},
+        polling_station::{PollingStationRequest, PollingStationResponse, PollingStationsRequest},
     },
     eml::{
         EMLImportError, EmlHash, RedactedEmlHash, number_of_voters_from_polling_stations_eml,
@@ -68,7 +68,7 @@ pub struct ElectionDetailsResponse {
     pub current_committee_session: CommitteeSession,
     pub committee_sessions: Vec<CommitteeSession>,
     pub election: ElectionWithPoliticalGroups,
-    pub polling_stations: Vec<PollingStation>,
+    pub polling_stations: Vec<PollingStationResponse>,
     pub investigations: Vec<PollingStationInvestigation>,
 }
 
@@ -176,8 +176,12 @@ pub async fn election_details(
         .first()
         .expect("There is always one committee session")
         .clone();
-    let polling_stations =
-        polling_station_repo::list(&mut conn, current_committee_session.id).await?;
+    let polling_stations: Vec<PollingStationResponse> =
+        polling_station_repo::list(&mut conn, current_committee_session.id)
+            .await?
+            .into_iter()
+            .map(PollingStationResponse::from)
+            .collect();
     let investigations =
         list_investigations_for_committee_session(&mut conn, current_committee_session.id).await?;
 

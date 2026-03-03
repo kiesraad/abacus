@@ -4,7 +4,7 @@ use axum::{
     response::{IntoResponse, Response},
 };
 use serde::{Deserialize, Serialize};
-use sqlx::{FromRow, Type};
+use sqlx::Type;
 use utoipa::ToSchema;
 
 use crate::{
@@ -18,10 +18,29 @@ use crate::{
 pub type PollingStationNumber = u32;
 id!(PollingStationId);
 
-/// Polling station of a certain [crate::domain::election::Election]
-#[derive(Serialize, Deserialize, ToSchema, Debug, FromRow, Clone)]
+/// Polling station base entity, linked to an election but
+/// independent of the committee session or data entry.
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct PollingStation {
+    pub id: PollingStationId,
+    pub election_id: ElectionId,
+    pub name: String,
+    pub number: PollingStationNumber,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub number_of_voters: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub polling_station_type: Option<PollingStationType>,
+    pub address: String,
+    pub postal_code: String,
+    pub locality: String,
+}
+
+/// Polling station linked to an election, committee session and (previous) data entry.
+#[derive(Serialize, Deserialize, ToSchema, Debug, Clone)]
+#[schema(as = PollingStation)]
+#[serde(deny_unknown_fields)]
+pub struct PollingStationResponse {
     pub id: PollingStationId,
     pub election_id: ElectionId,
     pub committee_session_id: CommitteeSessionId,
@@ -45,7 +64,7 @@ pub struct PollingStation {
     pub locality: String,
 }
 
-impl IntoResponse for PollingStation {
+impl IntoResponse for PollingStationResponse {
     fn into_response(self) -> Response {
         Json(self).into_response()
     }
@@ -81,7 +100,7 @@ pub struct PollingStationsRequest {
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct PollingStationListResponse {
-    pub polling_stations: Vec<PollingStation>,
+    pub polling_stations: Vec<PollingStationResponse>,
 }
 
 impl IntoResponse for PollingStationListResponse {
@@ -125,22 +144,15 @@ impl From<String> for PollingStationType {
 #[cfg(test)]
 pub(crate) mod test_helpers {
     use super::*;
-    use crate::domain::{
-        committee_session::committee_session_fixture,
-        election::{ElectionWithPoliticalGroups, tests::election_fixture},
-    };
+    use crate::domain::election::{ElectionWithPoliticalGroups, tests::election_fixture};
 
     /// Create a test polling station.
     pub fn polling_station_fixture(number_of_voters: Option<u32>) -> PollingStation {
         let election = election_fixture(&[]);
-        let committee_session = committee_session_fixture(election.id);
 
         PollingStation {
             id: PollingStationId::from(1),
             election_id: election.id,
-            committee_session_id: committee_session.id,
-            prev_data_entry_id: None,
-            data_entry_id: None,
             name: "Testplek".to_string(),
             number: 34,
             number_of_voters,
@@ -155,7 +167,6 @@ pub(crate) mod test_helpers {
     /// on the length of the `polling_station_voter_count` slice parameter.
     pub fn polling_stations_fixture(
         election: &ElectionWithPoliticalGroups,
-        committee_session_id: CommitteeSessionId,
         polling_station_voter_count: &[u32],
     ) -> Vec<PollingStation> {
         let mut polling_stations = Vec::new();
@@ -164,9 +175,6 @@ pub(crate) mod test_helpers {
             polling_stations.push(PollingStation {
                 id: PollingStationId::from(u32::try_from(idx).unwrap()),
                 election_id: election.id,
-                committee_session_id,
-                prev_data_entry_id: None,
-                data_entry_id: None,
                 name: format!("Testplek {idx}"),
                 number: u32::try_from(idx).unwrap() + 30,
                 number_of_voters: Some(*voter_count),

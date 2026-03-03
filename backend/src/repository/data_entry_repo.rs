@@ -275,10 +275,11 @@ async fn fetch_results_for_committee_session(
     let mut tx = conn.begin().await?;
 
     // Get and index polling stations by id for performance
-    let polling_stations: HashMap<PollingStationId, _> =
+    let polling_stations: HashMap<PollingStationId, PollingStation> =
         polling_station_repo::list(&mut tx, committee_session_id)
             .await?
             .into_iter()
+            .map(PollingStation::from)
             .filter(|ps| polling_station_id.is_none_or(|id| ps.id == id))
             .map(|ps| (ps.id, ps))
             .collect();
@@ -348,8 +349,8 @@ pub async fn previous_results_for_polling_station(
     conn: &mut SqliteConnection,
     polling_station_id: PollingStationId,
 ) -> Result<PollingStationResults, sqlx::Error> {
-    let polling_station = polling_station_repo::get(conn, polling_station_id).await?;
-    let prev_data_entry_id = polling_station
+    let polling_station_row = polling_station_repo::get(conn, polling_station_id).await?;
+    let prev_data_entry_id = polling_station_row
         .prev_data_entry_id
         .ok_or(sqlx::Error::RowNotFound)?;
 

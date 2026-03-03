@@ -84,7 +84,12 @@ impl ResultsInput {
     ) -> Result<ResultsInput, APIError> {
         let committee_session = committee_session_repo::get(conn, committee_session_id).await?;
         let election = election_repo::get(conn, committee_session.election_id).await?;
-        let polling_stations = polling_station_repo::list(conn, committee_session.id).await?;
+        let polling_stations: Vec<PollingStation> =
+            polling_station_repo::list(conn, committee_session.id)
+                .await?
+                .into_iter()
+                .map(PollingStation::from)
+                .collect();
         let results = list_results_for_committee_session(conn, committee_session.id).await?;
 
         // get investigations if this is not the first session

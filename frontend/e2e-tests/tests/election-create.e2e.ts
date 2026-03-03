@@ -94,6 +94,78 @@ test.describe("Election creation", () => {
       await expect(electionRow).toContainText("GSB - Test (0000)");
       await expect(electionRow).toContainText("Klaar voor invoer");
     });
+
+    test("it uploads an election file, candidate list but adds polling stations afterwards", async ({ page }) => {
+      await page.goto("/elections");
+      const overviewPage = new ElectionsOverviewPgObj(page);
+      await overviewPage.create.click();
+
+      // upload election and check hash
+      await uploadElectionAndInputHash(page);
+
+      // electoral committee role
+      const electoralCommitteeRolePage = new ElectoralCommitteeRolePgObj(page);
+      await expect(electoralCommitteeRolePage.header).toBeVisible();
+      await electoralCommitteeRolePage.next.click();
+
+      // upload candidates list and check
+      await uploadCandidatesAndInputHash(page);
+
+      // skip polling stations
+      const uploadPollingStationsPage = new UploadPollingStationDefinitionPgObj(page);
+      await expect(uploadPollingStationsPage.header).toBeVisible();
+      await uploadPollingStationsPage.skipButton.click();
+
+      // Counting method page
+      const countingMethodPage = new CountingMethodTypePgObj(page);
+      await expect(countingMethodPage.header).toBeVisible();
+      await countingMethodPage.next.click();
+
+      // Number of voters page
+      const numberOfVotersPage = new NumberOfVotersPgObj(page);
+      await expect(numberOfVotersPage.header).toBeVisible();
+      await expect(numberOfVotersPage.hint).toBeHidden();
+      await numberOfVotersPage.next.click();
+
+      // Expect error, input a value and try clicking Next again
+      await expect(numberOfVotersPage.error).toBeVisible();
+      await numberOfVotersPage.input.fill("1234");
+      await numberOfVotersPage.next.click();
+
+      // Now we should be at the check and save page
+      const checkAndSavePage = new CheckAndSavePgObj(page);
+      await expect(checkAndSavePage.header).toBeVisible();
+
+      const election = await checkAndSavePage.saveElection();
+      await expect(overviewPage.adminHeader).toBeVisible();
+
+      const electionRow = overviewPage.findElectionRowById(election.id);
+      await expect(electionRow).toBeVisible();
+      await expect(electionRow).toContainText("Gemeenteraad Test 2022");
+      await expect(electionRow).toContainText("Zitting voorbereiden");
+      await electionRow.click();
+
+      const electionHomePage = new ElectionHome(page);
+      await expect(electionHomePage.header).toHaveText("Gemeenteraad Test 2022");
+      await electionHomePage.alertLinkToPollingStations.click();
+
+      const pollingStationsPage = new PollingStationListEmptyPgObj(page);
+      await pollingStationsPage.importButton.click();
+      const importPage = new PollingStationImportPgObj(page);
+      await importPage.uploadFile(eml110b.path);
+      await importPage.importButton.click();
+
+      const listPage = new PollingStationListPgObj(page);
+      await expect(listPage.header).toBeVisible();
+      await expect(listPage.alert).toContainText(/Er zijn \d+ stembureaus geïmporteerd/);
+
+      const navBar = new AdminNavBar(page);
+      await navBar.getElectionBreadcrumb(eml110a.electionName).click();
+
+      await expect(electionHomePage.header).toBeVisible();
+      const session = electionHomePage.getCommitteeSessionCard(1);
+      await expect(session).toContainText("Klaar voor invoer");
+    });
   });
 
   test.describe("CSB election creation", () => {
@@ -131,80 +203,8 @@ test.describe("Election creation", () => {
       await expect(electionRow).toBeVisible();
       await expect(electionRow).toContainText("Gemeenteraad Test 2022");
       await expect(electionRow).toContainText("CSB - Test (0000)");
-      await expect(electionRow).toContainText("Zitting voorbereiden— Eerste zitting");
+      await expect(electionRow).toContainText("Zitting voorbereiden— Zitting CSB");
     });
-  });
-
-  test("it uploads an election file, candidate list but adds polling stations afterwards", async ({ page }) => {
-    await page.goto("/elections");
-    const overviewPage = new ElectionsOverviewPgObj(page);
-    await overviewPage.create.click();
-
-    // upload election and check hash
-    await uploadElectionAndInputHash(page);
-
-    // electoral committee role
-    const electoralCommitteeRolePage = new ElectoralCommitteeRolePgObj(page);
-    await expect(electoralCommitteeRolePage.header).toBeVisible();
-    await electoralCommitteeRolePage.next.click();
-
-    // upload candidates list and check
-    await uploadCandidatesAndInputHash(page);
-
-    // skip polling stations
-    const uploadPollingStationsPage = new UploadPollingStationDefinitionPgObj(page);
-    await expect(uploadPollingStationsPage.header).toBeVisible();
-    await uploadPollingStationsPage.skipButton.click();
-
-    // Counting method page
-    const countingMethodPage = new CountingMethodTypePgObj(page);
-    await expect(countingMethodPage.header).toBeVisible();
-    await countingMethodPage.next.click();
-
-    // Number of voters page
-    const numberOfVotersPage = new NumberOfVotersPgObj(page);
-    await expect(numberOfVotersPage.header).toBeVisible();
-    await expect(numberOfVotersPage.hint).toBeHidden();
-    await numberOfVotersPage.next.click();
-
-    // Expect error, input a value and try clicking Next again
-    await expect(numberOfVotersPage.error).toBeVisible();
-    await numberOfVotersPage.input.fill("1234");
-    await numberOfVotersPage.next.click();
-
-    // Now we should be at the check and save page
-    const checkAndSavePage = new CheckAndSavePgObj(page);
-    await expect(checkAndSavePage.header).toBeVisible();
-
-    const election = await checkAndSavePage.saveElection();
-    await expect(overviewPage.adminHeader).toBeVisible();
-
-    const electionRow = overviewPage.findElectionRowById(election.id);
-    await expect(electionRow).toBeVisible();
-    await expect(electionRow).toContainText("Gemeenteraad Test 2022");
-    await expect(electionRow).toContainText("Zitting voorbereiden");
-    await electionRow.click();
-
-    const electionHomePage = new ElectionHome(page);
-    await expect(electionHomePage.header).toHaveText("Gemeenteraad Test 2022");
-    await electionHomePage.alertLinkToPollingStations.click();
-
-    const pollingStationsPage = new PollingStationListEmptyPgObj(page);
-    await pollingStationsPage.importButton.click();
-    const importPage = new PollingStationImportPgObj(page);
-    await importPage.uploadFile(eml110b.path);
-    await importPage.importButton.click();
-
-    const listPage = new PollingStationListPgObj(page);
-    await expect(listPage.header).toBeVisible();
-    await expect(listPage.alert).toContainText(/Er zijn \d+ stembureaus geïmporteerd/);
-
-    const navBar = new AdminNavBar(page);
-    await navBar.getElectionBreadcrumb(eml110a.electionName).click();
-
-    await expect(electionHomePage.header).toBeVisible();
-    const session = electionHomePage.getCommitteeSessionCard(1);
-    await expect(session).toContainText("Klaar voor invoer");
   });
 
   test.describe("election definition", () => {

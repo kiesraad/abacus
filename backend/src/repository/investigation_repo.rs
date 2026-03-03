@@ -1,4 +1,4 @@
-use sqlx::{SqliteConnection, query, query_as};
+use sqlx::{SqliteConnection, query, types::Json};
 
 use crate::domain::{
     committee_session::CommitteeSessionId,
@@ -9,29 +9,53 @@ use crate::domain::{
     polling_station::PollingStationId,
 };
 
+async fn save(
+    conn: &mut SqliteConnection,
+    polling_station_id: PollingStationId,
+    investigation: &PollingStationInvestigation,
+) -> Result<(), sqlx::Error> {
+    let state = Json(investigation);
+    let result = query!(
+        "UPDATE polling_stations SET investigation_state = ? WHERE id = ?",
+        state,
+        polling_station_id,
+    )
+    .execute(conn)
+    .await?;
+
+    if result.rows_affected() == 0 {
+        return Err(sqlx::Error::RowNotFound);
+    }
+
+    Ok(())
+}
+
 pub async fn create_polling_station_investigation(
     conn: &mut SqliteConnection,
     polling_station_id: PollingStationId,
     polling_station_investigation: PollingStationInvestigationCreateRequest,
 ) -> Result<PollingStationInvestigation, sqlx::Error> {
-    query_as!(
-        PollingStationInvestigation,
-        r#"
-        INSERT INTO polling_station_investigations (
-          polling_station_id,
-          reason
-        ) VALUES (?,?)
-        RETURNING
-          polling_station_id as "polling_station_id: PollingStationId",
-          reason,
-          findings,
-          corrected_results as "corrected_results: bool"
-        "#,
+    let investigation = PollingStationInvestigation {
         polling_station_id,
-        polling_station_investigation.reason,
+        reason: polling_station_investigation.reason,
+        findings: None,
+        corrected_results: None,
+    };
+    let state = Json(&investigation);
+
+    let result = query!(
+        "UPDATE polling_stations SET investigation_state = ? WHERE id = ? AND investigation_state IS NULL",
+        state,
+        polling_station_id,
     )
-    .fetch_one(conn)
-    .await
+    .execute(conn)
+    .await?;
+
+    if result.rows_affected() == 0 {
+        return Err(sqlx::Error::RowNotFound);
+    }
+
+    Ok(investigation)
 }
 
 pub async fn conclude_polling_station_investigation(
@@ -39,27 +63,11 @@ pub async fn conclude_polling_station_investigation(
     polling_station_id: PollingStationId,
     polling_station_investigation: PollingStationInvestigationConcludeRequest,
 ) -> Result<PollingStationInvestigation, sqlx::Error> {
-    query_as!(
-        PollingStationInvestigation,
-        r#"
-        UPDATE polling_station_investigations
-        SET
-          findings = ?,
-          corrected_results = ?
-        WHERE
-          polling_station_id = ?
-        RETURNING
-          polling_station_id as "polling_station_id: PollingStationId",
-          reason,
-          findings,
-          corrected_results as "corrected_results: bool"
-        "#,
-        polling_station_investigation.findings,
-        polling_station_investigation.corrected_results,
-        polling_station_id,
-    )
-    .fetch_one(conn)
-    .await
+    let mut investigation = get_polling_station_investigation(conn, polling_station_id).await?;
+    investigation.findings = Some(polling_station_investigation.findings);
+    investigation.corrected_results = Some(polling_station_investigation.corrected_results);
+    save(conn, polling_station_id, &investigation).await?;
+    Ok(investigation)
 }
 
 pub async fn update_polling_station_investigation(
@@ -67,60 +75,55 @@ pub async fn update_polling_station_investigation(
     polling_station_id: PollingStationId,
     polling_station_investigation: PollingStationInvestigationUpdateRequest,
 ) -> Result<PollingStationInvestigation, sqlx::Error> {
-    query_as!(
-        PollingStationInvestigation,
-        r#"
-        UPDATE polling_station_investigations
-        SET
-          reason = ?,
-          findings = ?,
-          corrected_results = ?
-        WHERE
-          polling_station_id = ?
-        RETURNING
-          polling_station_id as "polling_station_id: PollingStationId",
-          reason,
-          findings,
-          corrected_results as "corrected_results: bool"
-        "#,
-        polling_station_investigation.reason,
-        polling_station_investigation.findings,
-        polling_station_investigation.corrected_results,
-        polling_station_id,
-    )
-    .fetch_one(conn)
-    .await
+    let mut investigation = get_polling_station_investigation(conn, polling_station_id).await?;
+    investigation.reason = polling_station_investigation.reason;
+    investigation.findings = polling_station_investigation.findings;
+    investigation.corrected_results = polling_station_investigation.corrected_results;
+    save(conn, polling_station_id, &investigation).await?;
+    Ok(investigation)
 }
 
 pub async fn get_polling_station_investigation(
     conn: &mut SqliteConnection,
     polling_station_id: PollingStationId,
 ) -> Result<PollingStationInvestigation, sqlx::Error> {
-    query_as("SELECT * FROM polling_station_investigations WHERE polling_station_id = ?")
-        .bind(polling_station_id)
-        .fetch_one(conn)
-        .await
+    let row = query!(
+        r#"SELECT investigation_state AS "investigation_state: Json<PollingStationInvestigation>"
+           FROM polling_stations WHERE id = ?"#,
+        polling_station_id,
+    )
+    .fetch_one(conn)
+    .await?;
+
+    row.investigation_state
+        .map(|json| json.0)
+        .ok_or(sqlx::Error::RowNotFound)
 }
 
 pub async fn delete_polling_station_investigation(
     conn: &mut SqliteConnection,
     polling_station_id: PollingStationId,
 ) -> Result<Option<PollingStationInvestigation>, sqlx::Error> {
-    query_as!(
-        PollingStationInvestigation,
-        r#"
-            DELETE FROM polling_station_investigations
-            WHERE polling_station_id = ?
-            RETURNING
-                polling_station_id AS "polling_station_id: PollingStationId",
-                reason,
-                findings,
-                corrected_results as "corrected_results: bool"
-        "#,
+    let row = query!(
+        r#"SELECT investigation_state AS "investigation_state: Json<PollingStationInvestigation>"
+           FROM polling_stations WHERE id = ?"#,
         polling_station_id,
     )
-    .fetch_optional(conn)
-    .await
+    .fetch_one(&mut *conn)
+    .await?;
+
+    let investigation = row.investigation_state.map(|json| json.0);
+
+    if investigation.is_some() {
+        query!(
+            "UPDATE polling_stations SET investigation_state = NULL WHERE id = ?",
+            polling_station_id,
+        )
+        .execute(conn)
+        .await?;
+    }
+
+    Ok(investigation)
 }
 
 pub async fn has_investigations_for_committee_session(
@@ -130,9 +133,8 @@ pub async fn has_investigations_for_committee_session(
     let result = query!(
         r#"
         SELECT EXISTS(
-            SELECT 1 FROM polling_station_investigations psi
-            JOIN polling_stations ps ON ps.id = psi.polling_station_id
-            WHERE ps.committee_session_id = ?
+            SELECT 1 FROM polling_stations
+            WHERE committee_session_id = ? AND investigation_state IS NOT NULL
         ) as `exists`"#,
         committee_session_id
     )
@@ -146,22 +148,21 @@ pub async fn list_investigations_for_committee_session(
     conn: &mut SqliteConnection,
     committee_session_id: CommitteeSessionId,
 ) -> Result<Vec<PollingStationInvestigation>, sqlx::Error> {
-    query_as!(
-        PollingStationInvestigation,
+    let rows = query!(
         r#"
-        SELECT
-            psi.polling_station_id as "polling_station_id: PollingStationId",
-            psi.reason,
-            psi.findings,
-            psi.corrected_results as "corrected_results: bool"
-        FROM polling_station_investigations psi
-        JOIN polling_stations ps ON ps.id = psi.polling_station_id
-        WHERE ps.committee_session_id = ?
+        SELECT investigation_state AS "investigation_state!: Json<PollingStationInvestigation>"
+        FROM polling_stations
+        WHERE committee_session_id = ? AND investigation_state IS NOT NULL
         "#,
         committee_session_id,
     )
     .fetch_all(conn)
-    .await
+    .await?;
+
+    Ok(rows
+        .into_iter()
+        .map(|row| row.investigation_state.0)
+        .collect())
 }
 
 #[cfg(test)]
@@ -170,12 +171,18 @@ pub async fn insert_test_investigation(
     polling_station_id: PollingStationId,
     corrected_results: Option<bool>,
 ) -> Result<(), sqlx::Error> {
-    query!(
-        "INSERT INTO polling_station_investigations (polling_station_id, reason, findings, corrected_results) VALUES (?, ?, ?, ?)",
+    let investigation = PollingStationInvestigation {
         polling_station_id,
-        "Test reason",
-        "Test findings",
-        corrected_results
+        reason: "Test reason".to_string(),
+        findings: Some("Test findings".to_string()),
+        corrected_results,
+    };
+    let state = Json(&investigation);
+
+    query!(
+        "UPDATE polling_stations SET investigation_state = ? WHERE id = ?",
+        state,
+        polling_station_id,
     )
     .execute(&mut *conn)
     .await?;

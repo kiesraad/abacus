@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            SELECT COUNT(*) AS \"count: u32\"\n            FROM audit_log\n            WHERE (json_array_length($1) = 0 OR event_level IN (SELECT value FROM json_each($1)))\n                AND (json_array_length($2) = 0 OR event_name IN (SELECT value FROM json_each($2)))\n                AND (json_array_length($3) = 0 OR user_id IN (SELECT value FROM json_each($3)))\n                AND ($4 IS NULL OR unixepoch(time) >= $4)\n        ",
+  "describe": {
+    "columns": [
+      {
+        "name": "count: u32",
+        "ordinal": 0,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 4
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "d508dc792dd9d20f7105d9624d140d561263e4ab2579fe7aa710ebc9aa9ecec6"
+}

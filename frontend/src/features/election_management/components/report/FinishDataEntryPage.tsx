@@ -53,7 +53,8 @@ export function FinishDataEntryPage() {
       <header>
         <section>
           <h1>
-            {t("election_management.data_entry")} {committeeSessionLabel(currentCommitteeSession.number).toLowerCase()}{" "}
+            {t("election_management.data_entry")}{" "}
+            {committeeSessionLabel(election.role, currentCommitteeSession.number, false, true)}{" "}
             {t("complete").toLowerCase()}
           </h1>
         </section>

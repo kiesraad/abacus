@@ -14,14 +14,19 @@ import { Form } from "@/components/ui/Form/Form";
 import { KeyboardKeys } from "@/components/ui/KeyboardKeys/KeyboardKeys";
 import { useUser } from "@/hooks/user/useUser";
 import { t } from "@/i18n/translate";
+import type { ElectionRole } from "@/types/generated/openapi.ts";
 import { KeyboardKey } from "@/types/ui";
 
 import { useDataEntryFormSection } from "../hooks/useDataEntryFormSection";
 import { DataEntryNavigation } from "./DataEntryNavigation";
 import cls from "./DataEntrySection.module.css";
 
+export interface DataEntryProps {
+  electionRole: ElectionRole;
+}
+
 // biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
-export function DataEntrySection() {
+export function DataEntrySection({ electionRole }: DataEntryProps) {
   const user = useUser();
   const {
     error,
@@ -85,7 +90,7 @@ export function DataEntrySection() {
       <DataEntryNavigation onSubmit={onSubmit} currentValues={currentValues} />
       <div className={cls.formContainer}>
         {error instanceof FatalApiError && error.reference === "CommitteeSessionPaused" && (
-          <CommitteeSessionPausedModal showUnsavedChanges />
+          <CommitteeSessionPausedModal showUnsavedChanges electionRole={electionRole} />
         )}
         {error instanceof ApiError && <ErrorModal error={error} />}
         {formSection.isSaved && memoizedErrors.length > 0 && (

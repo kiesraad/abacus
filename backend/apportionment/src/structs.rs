@@ -1,39 +1,37 @@
 use super::{
     candidate_nomination::CandidateNominationResult, fraction::Fraction,
-    int_newtype_macro::int_newtype, seat_assignment::SeatAssignmentResult,
+    seat_assignment::SeatAssignmentResult,
 };
 use std::fmt::Debug;
 
 pub(crate) const LARGE_COUNCIL_THRESHOLD: u32 = 19;
 
-int_newtype!(CandidateNumber);
-int_newtype!(ListNumber);
-
 /// Errors that can occur during apportionment
 #[derive(Debug, PartialEq)]
 pub enum ApportionmentError {
     AllListsExhausted,
-    ApportionmentNotAvailableUntilDataEntryFinalised,
+    CommitteeSessionNotCompleted,
     DrawingOfLotsNotImplemented,
     ZeroVotesCast,
 }
 
 pub trait ApportionmentInput {
-    type List: ListVotesTrait;
+    type List: ListVotes;
 
     fn number_of_seats(&self) -> u32;
     fn list_votes(&self) -> &[Self::List];
 }
 
-pub struct ApportionmentOutput<'a, T: ListVotesTrait> {
-    pub seat_assignment: SeatAssignmentResult,
-    pub candidate_nomination: CandidateNominationResult<'a, T::Cv>,
+pub struct ApportionmentOutput<'a, T: ListVotes> {
+    pub seat_assignment: SeatAssignmentResult<T>,
+    pub candidate_nomination: CandidateNominationResult<'a, T>,
 }
 
-pub trait ListVotesTrait: PartialEq + Debug {
-    type Cv: CandidateVotesTrait;
+pub trait ListVotes: PartialEq + Debug {
+    type Cv: CandidateVotes;
+    type ListNumber: Copy + Debug + Eq;
 
-    fn number(&self) -> ListNumber;
+    fn number(&self) -> Self::ListNumber;
     fn total_votes(&self) -> u32 {
         self.candidate_votes()
             .iter()
@@ -43,17 +41,19 @@ pub trait ListVotesTrait: PartialEq + Debug {
     fn candidate_votes(&self) -> &[Self::Cv];
 }
 
-pub trait CandidateVotesTrait: PartialEq + Debug {
-    fn number(&self) -> CandidateNumber;
+pub trait CandidateVotes: PartialEq + Debug {
+    type CandidateNumber: Copy + Debug + Eq;
+
+    fn number(&self) -> Self::CandidateNumber;
     fn votes(&self) -> u32;
 }
 
 #[derive(Clone, Debug, PartialEq)]
-pub(crate) struct CandidateNominationInput<'a, L: ListVotesTrait> {
+pub(crate) struct CandidateNominationInput<'a, L: ListVotes> {
     pub number_of_seats: u32,
     pub list_votes: &'a [L],
     pub quota: Fraction,
-    pub total_seats_per_list: Vec<(ListNumber, u32)>,
+    pub total_seats_per_list: Vec<(L::ListNumber, u32)>,
 }
 
 pub(crate) type CandidateNominationInputType<'a, T> =

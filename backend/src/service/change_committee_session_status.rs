@@ -1,3 +1,5 @@
+use chrono::{DateTime, NaiveDateTime, Utc};
+use serde::Serialize;
 use sqlx::{Connection, SqliteConnection};
 
 use crate::{
@@ -5,14 +7,82 @@ use crate::{
     domain::{
         committee_session::{
             CommitteeSession, CommitteeSessionFilesUpdateRequest, CommitteeSessionId,
-            CommitteeSessionUpdated,
         },
         committee_session_status::CommitteeSessionStatus,
-        file::{FileDeleted, FileId},
+        election::ElectionId,
+        file::{File, FileId},
     },
-    infra::audit_log::AuditService,
+    infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
     repository::{committee_session_repo, file_repo},
 };
+
+#[derive(Serialize)]
+pub struct CommitteeSessionAuditData {
+    pub session_id: CommitteeSessionId,
+    pub session_number: u32,
+    pub session_election_id: ElectionId,
+    pub session_location: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub session_start_date_time: Option<NaiveDateTime>,
+    pub session_status: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub session_results_eml: Option<FileId>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub session_results_pdf: Option<FileId>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub session_overview_pdf: Option<FileId>,
+}
+
+impl From<CommitteeSession> for CommitteeSessionAuditData {
+    fn from(value: CommitteeSession) -> Self {
+        Self {
+            session_id: value.id,
+            session_number: value.number,
+            session_election_id: value.election_id,
+            session_location: value.location,
+            session_start_date_time: value.start_date_time,
+            session_status: value.status.to_string(),
+            session_results_eml: value.results_eml,
+            session_results_pdf: value.results_pdf,
+            session_overview_pdf: value.overview_pdf,
+        }
+    }
+}
+
+#[derive(Serialize)]
+pub struct CommitteeSessionUpdatedAuditData(pub CommitteeSessionAuditData);
+impl AsAuditEvent for CommitteeSessionUpdatedAuditData {
+    const EVENT_TYPE: AuditEventType = AuditEventType::CommitteeSessionUpdated;
+    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Success;
+}
+
+#[derive(Serialize)]
+pub struct FileAuditData {
+    pub file_id: FileId,
+    pub file_name: String,
+    pub file_mime_type: String,
+    pub file_size_bytes: u64,
+    pub file_created_at: DateTime<Utc>,
+}
+
+impl From<File> for FileAuditData {
+    fn from(file: File) -> Self {
+        Self {
+            file_id: file.id,
+            file_name: file.name,
+            file_mime_type: file.mime_type,
+            file_size_bytes: file.data.len() as u64,
+            file_created_at: file.created_at,
+        }
+    }
+}
+
+#[derive(Serialize)]
+pub struct FileDeletedAuditData(pub FileAuditData);
+impl AsAuditEvent for FileDeletedAuditData {
+    const EVENT_TYPE: AuditEventType = AuditEventType::FileDeleted;
+    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Info;
+}
 
 pub async fn change_committee_session_status(
     conn: &mut SqliteConnection,
@@ -57,7 +127,11 @@ pub async fn change_committee_session_status(
         committee_session_repo::change_status(&mut tx, committee_session_id, new_status).await?;
 
     audit_service
-        .log(&mut tx, &CommitteeSessionUpdated(committee_session), None)
+        .log(
+            &mut tx,
+            &CommitteeSessionUpdatedAuditData(committee_session.into()),
+            None,
+        )
         .await?;
 
     tx.commit().await?;
@@ -94,7 +168,7 @@ async fn delete_committee_session_files(
         for id in file_ids {
             if let Some(file) = file_repo::delete(conn, id).await? {
                 audit_service
-                    .log(conn, &FileDeleted(file.into()), None)
+                    .log(conn, &FileDeletedAuditData(file.into()), None)
                     .await?;
             }
         }

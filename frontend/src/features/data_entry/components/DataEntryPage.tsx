@@ -59,7 +59,12 @@ export function DataEntryPage() {
           <DataEntryProgress />
         </StickyNav>
         <article>
-          {sectionId && (sectionId === "save" ? <CheckAndSaveForm /> : <DataEntrySection key={sectionId} />)}
+          {sectionId &&
+            (sectionId === "save" ? (
+              <CheckAndSaveForm />
+            ) : (
+              <DataEntrySection key={sectionId} electionRole={election.role} />
+            ))}
         </article>
       </main>
     </DataEntryProvider>

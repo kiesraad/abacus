@@ -105,10 +105,11 @@ export function OverviewPage() {
       committeeSessionStatus = (
         <CommitteeSessionStatusWithIcon
           status={committeeSession.status}
+          electionRole={election.role}
           userRole={isAdminOrCoordinator ? "coordinator" : "typist"}
         />
       );
-      committeeSessionString = committeeSessionLabel(committeeSession.number);
+      committeeSessionString = committeeSessionLabel(election.role, committeeSession.number);
     }
     return (
       <Table.Row id={`election-row-${election.id}`} key={election.id} to={electionLink}>

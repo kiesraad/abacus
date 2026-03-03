@@ -377,6 +377,104 @@
         ]
       }
     },
+    "/api/elections/{election_id}/apportionment": {
+      "post": {
+        "summary": "Get the apportionment for an election (coordinator_gsb)",
+        "operationId": "election_apportionment",
+        "parameters": [
+          {
+            "name": "election_id",
+            "in": "path",
+            "description": "Election database id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Election Apportionment",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ElectionApportionmentResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Election apportionment is not yet available",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Election apportionment is not possible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "coordinator_gsb"
+            ]
+          }
+        ]
+      }
+    },
     "/api/elections/{election_id}/committee_sessions": {
       "post": {
         "summary": "Create a new [CommitteeSession]. (coordinator_gsb)",
@@ -4180,6 +4278,21 @@
   },
   "components": {
     "schemas": {
+      "AbsoluteMajorityReassignedSeat": {
+        "type": "object",
+        "required": [
+          "list_retracted_seat",
+          "list_assigned_seat"
+        ],
+        "properties": {
+          "list_assigned_seat": {
+            "$ref": "#/components/schemas/PGNumber"
+          },
+          "list_retracted_seat": {
+            "$ref": "#/components/schemas/PGNumber"
+          }
+        }
+      },
       "AccountUpdateRequest": {
         "type": "object",
         "required": [
@@ -4224,12 +4337,13 @@
           "CommitteeSessionCreated",
           "CommitteeSessionDeleted",
           "CommitteeSessionUpdated",
-          "PollingStationInvestigationCreated",
-          "PollingStationInvestigationConcluded",
-          "PollingStationInvestigationUpdated",
-          "PollingStationInvestigationDeleted",
           "FileCreated",
           "FileDeleted",
+          "ApportionmentProcessed",
+          "InvestigationCreated",
+          "InvestigationConcluded",
+          "InvestigationUpdated",
+          "InvestigationDeleted",
           "PollingStationCreated",
           "PollingStationUpdated",
           "PollingStationDeleted",
@@ -4555,6 +4669,31 @@
           "Female",
           "X"
         ]
+      },
+      "CandidateNomination": {
+        "type": "object",
+        "required": [
+          "preference_threshold",
+          "chosen_candidates",
+          "list_candidate_nomination"
+        ],
+        "properties": {
+          "chosen_candidates": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Candidate"
+            }
+          },
+          "list_candidate_nomination": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ListCandidateNomination"
+            }
+          },
+          "preference_threshold": {
+            "$ref": "#/components/schemas/PreferenceThreshold"
+          }
+        }
       },
       "CandidateVotes": {
         "type": "object",
@@ -4964,6 +5103,32 @@
         },
         "additionalProperties": false
       },
+      "DisplayFraction": {
+        "type": "object",
+        "description": "Fraction with the integer part split out for display purposes",
+        "required": [
+          "integer",
+          "numerator",
+          "denominator"
+        ],
+        "properties": {
+          "denominator": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "integer": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "numerator": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          }
+        }
+      },
       "Election": {
         "type": "object",
         "description": "Election without political groups",
@@ -5026,6 +5191,25 @@
           }
         },
         "additionalProperties": false
+      },
+      "ElectionApportionmentResponse": {
+        "type": "object",
+        "required": [
+          "seat_assignment",
+          "candidate_nomination",
+          "election_summary"
+        ],
+        "properties": {
+          "candidate_nomination": {
+            "$ref": "#/components/schemas/CandidateNomination"
+          },
+          "election_summary": {
+            "$ref": "#/components/schemas/ElectionSummary"
+          },
+          "seat_assignment": {
+            "$ref": "#/components/schemas/SeatAssignment"
+          }
+        }
       },
       "ElectionCategory": {
         "type": "string",
@@ -5328,6 +5512,43 @@
         },
         "additionalProperties": false
       },
+      "ElectionSummary": {
+        "type": "object",
+        "description": "Contains a summary of the election results, added up from the votes of all polling stations.",
+        "required": [
+          "voters_counts",
+          "votes_counts",
+          "differences_counts",
+          "political_group_votes",
+          "polling_station_investigations"
+        ],
+        "properties": {
+          "differences_counts": {
+            "$ref": "#/components/schemas/SummaryDifferencesCounts",
+            "description": "The differences between voters and votes"
+          },
+          "political_group_votes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PoliticalGroupCandidateVotes"
+            },
+            "description": "The summary votes for each political group (and each candidate within)"
+          },
+          "polling_station_investigations": {
+            "$ref": "#/components/schemas/PollingStationInvestigations",
+            "description": "Polling stations where results were investigated by the GSB"
+          },
+          "voters_counts": {
+            "$ref": "#/components/schemas/VotersCounts",
+            "description": "The total number of voters"
+          },
+          "votes_counts": {
+            "$ref": "#/components/schemas/VotesCounts",
+            "description": "The total number of votes"
+          }
+        },
+        "additionalProperties": false
+      },
       "ElectionWithPoliticalGroups": {
         "type": "object",
         "description": "Election with political groups",
@@ -5404,6 +5625,10 @@
         "enum": [
           "AirgapViolation",
           "AlreadyInitialised",
+          "ApportionmentAllListsExhausted",
+          "ApportionmentCommitteeSessionNotCompleted",
+          "ApportionmentDrawingOfLotsRequired",
+          "ApportionmentZeroVotesCast",
           "CommitteeSessionPaused",
           "DatabaseError",
           "DataEntryAlreadyClaimed",
@@ -5668,6 +5893,42 @@
           }
         }
       },
+      "HighestAverageAssignedSeat": {
+        "type": "object",
+        "required": [
+          "selected_list_number",
+          "list_options",
+          "list_assigned",
+          "list_exhausted",
+          "votes_per_seat"
+        ],
+        "properties": {
+          "list_assigned": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PGNumber"
+            }
+          },
+          "list_exhausted": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PGNumber"
+            }
+          },
+          "list_options": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PGNumber"
+            }
+          },
+          "selected_list_number": {
+            "$ref": "#/components/schemas/PGNumber"
+          },
+          "votes_per_seat": {
+            "$ref": "#/components/schemas/DisplayFraction"
+          }
+        }
+      },
       "InvestigationListResponse": {
         "type": "object",
         "description": "Investigation list response",
@@ -5683,6 +5944,176 @@
           }
         },
         "additionalProperties": false
+      },
+      "LargestRemainderAssignedSeat": {
+        "type": "object",
+        "required": [
+          "selected_list_number",
+          "list_options",
+          "list_assigned",
+          "remainder_votes"
+        ],
+        "properties": {
+          "list_assigned": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PGNumber"
+            }
+          },
+          "list_options": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PGNumber"
+            }
+          },
+          "remainder_votes": {
+            "$ref": "#/components/schemas/DisplayFraction"
+          },
+          "selected_list_number": {
+            "$ref": "#/components/schemas/PGNumber"
+          }
+        }
+      },
+      "ListCandidateNomination": {
+        "type": "object",
+        "required": [
+          "list_number",
+          "list_name",
+          "list_seats",
+          "preferential_candidate_nomination",
+          "other_candidate_nomination",
+          "updated_candidate_ranking"
+        ],
+        "properties": {
+          "list_name": {
+            "type": "string"
+          },
+          "list_number": {
+            "$ref": "#/components/schemas/PGNumber"
+          },
+          "list_seats": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "other_candidate_nomination": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CandidateVotes"
+            }
+          },
+          "preferential_candidate_nomination": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CandidateVotes"
+            }
+          },
+          "updated_candidate_ranking": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Candidate"
+            }
+          }
+        }
+      },
+      "ListExhaustionRemovedSeat": {
+        "type": "object",
+        "required": [
+          "list_retracted_seat",
+          "full_seat"
+        ],
+        "properties": {
+          "full_seat": {
+            "type": "boolean"
+          },
+          "list_retracted_seat": {
+            "$ref": "#/components/schemas/PGNumber"
+          }
+        }
+      },
+      "ListSeatAssignment": {
+        "type": "object",
+        "required": [
+          "list_number",
+          "votes_cast",
+          "remainder_votes",
+          "meets_remainder_threshold",
+          "full_seats",
+          "residual_seats",
+          "total_seats"
+        ],
+        "properties": {
+          "full_seats": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "list_number": {
+            "$ref": "#/components/schemas/PGNumber"
+          },
+          "meets_remainder_threshold": {
+            "type": "boolean"
+          },
+          "remainder_votes": {
+            "$ref": "#/components/schemas/DisplayFraction"
+          },
+          "residual_seats": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "total_seats": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "votes_cast": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          }
+        }
+      },
+      "ListStanding": {
+        "type": "object",
+        "required": [
+          "list_number",
+          "votes_cast",
+          "remainder_votes",
+          "meets_remainder_threshold",
+          "next_votes_per_seat",
+          "full_seats",
+          "residual_seats"
+        ],
+        "properties": {
+          "full_seats": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "list_number": {
+            "$ref": "#/components/schemas/PGNumber"
+          },
+          "meets_remainder_threshold": {
+            "type": "boolean"
+          },
+          "next_votes_per_seat": {
+            "$ref": "#/components/schemas/DisplayFraction"
+          },
+          "remainder_votes": {
+            "$ref": "#/components/schemas/DisplayFraction"
+          },
+          "residual_seats": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "votes_cast": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          }
+        }
       },
       "LoginResponse": {
         "type": "object",
@@ -5776,6 +6207,11 @@
           }
         },
         "additionalProperties": false
+      },
+      "PGNumber": {
+        "type": "integer",
+        "format": "int32",
+        "minimum": 0
       },
       "PoliticalGroup": {
         "type": "object",
@@ -5994,6 +6430,45 @@
         },
         "additionalProperties": false
       },
+      "PollingStationInvestigations": {
+        "type": "object",
+        "description": "Polling stations where results were investigated by the GSB,\nas vectors of polling station numbers",
+        "required": [
+          "admitted_voters_recounted",
+          "investigated_other_reason",
+          "ballots_recounted"
+        ],
+        "properties": {
+          "admitted_voters_recounted": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            },
+            "description": "Admitted voters were recounted\n(\"Toegelaten kiezers opnieuw vastgesteld?\")"
+          },
+          "ballots_recounted": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            },
+            "description": "Ballots were (partially) recounted\n(\"Stembiljetten (deels) herteld?\")"
+          },
+          "investigated_other_reason": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            },
+            "description": "Investigated for other reasons than unexplained difference\n(\"Onderzocht vanwege andere reden dan onverklaard verschil?\")"
+          }
+        },
+        "additionalProperties": false
+      },
       "PollingStationListResponse": {
         "type": "object",
         "description": "Polling station list response",
@@ -6137,6 +6612,23 @@
           }
         }
       },
+      "PreferenceThreshold": {
+        "type": "object",
+        "required": [
+          "percentage",
+          "number_of_votes"
+        ],
+        "properties": {
+          "number_of_votes": {
+            "$ref": "#/components/schemas/DisplayFraction"
+          },
+          "percentage": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          }
+        }
+      },
       "RandomRange": {
         "type": "string"
       },
@@ -6198,6 +6690,222 @@
         "properties": {
           "validation_results": {
             "$ref": "#/components/schemas/ValidationResults"
+          }
+        },
+        "additionalProperties": false
+      },
+      "SeatAssignment": {
+        "type": "object",
+        "required": [
+          "seats",
+          "full_seats",
+          "residual_seats",
+          "quota",
+          "steps",
+          "final_standing"
+        ],
+        "properties": {
+          "final_standing": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ListSeatAssignment"
+            }
+          },
+          "full_seats": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "quota": {
+            "$ref": "#/components/schemas/DisplayFraction"
+          },
+          "residual_seats": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "seats": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "steps": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SeatChangeStep"
+            }
+          }
+        }
+      },
+      "SeatChange": {
+        "oneOf": [
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/HighestAverageAssignedSeat"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "changed_by"
+                ],
+                "properties": {
+                  "changed_by": {
+                    "type": "string",
+                    "enum": [
+                      "HighestAverageAssignment"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/HighestAverageAssignedSeat"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "changed_by"
+                ],
+                "properties": {
+                  "changed_by": {
+                    "type": "string",
+                    "enum": [
+                      "UniqueHighestAverageAssignment"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/LargestRemainderAssignedSeat"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "changed_by"
+                ],
+                "properties": {
+                  "changed_by": {
+                    "type": "string",
+                    "enum": [
+                      "LargestRemainderAssignment"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AbsoluteMajorityReassignedSeat"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "changed_by"
+                ],
+                "properties": {
+                  "changed_by": {
+                    "type": "string",
+                    "enum": [
+                      "AbsoluteMajorityReassignment"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ListExhaustionRemovedSeat"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "changed_by"
+                ],
+                "properties": {
+                  "changed_by": {
+                    "type": "string",
+                    "enum": [
+                      "ListExhaustionRemoval"
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "SeatChangeStep": {
+        "type": "object",
+        "required": [
+          "change",
+          "standings"
+        ],
+        "properties": {
+          "change": {
+            "$ref": "#/components/schemas/SeatChange"
+          },
+          "residual_seat_number": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "standings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ListStanding"
+            }
+          }
+        }
+      },
+      "SumCount": {
+        "type": "object",
+        "description": "Contains a summary count, containing both the count and a list of polling\nstations that contributed to it.",
+        "required": [
+          "count",
+          "polling_stations"
+        ],
+        "properties": {
+          "count": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "polling_stations": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "SummaryDifferencesCounts": {
+        "type": "object",
+        "description": "Contains a summary of the differences, containing which polling stations had differences.",
+        "required": [
+          "more_ballots_count",
+          "fewer_ballots_count"
+        ],
+        "properties": {
+          "fewer_ballots_count": {
+            "$ref": "#/components/schemas/SumCount"
+          },
+          "more_ballots_count": {
+            "$ref": "#/components/schemas/SumCount"
           }
         },
         "additionalProperties": false

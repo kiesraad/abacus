@@ -30,7 +30,7 @@ use crate::{
         votes_table::VotesTablesWithOnlyPreviousVotes,
     },
     error::ErrorReference,
-    infra::audit_log::{AsAuditEvent, AuditEvent, AuditEventType, AuditService, as_audit_event},
+    infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
     repository::{
         committee_session_repo::get_election_committee_session,
         data_entry_repo::{data_entry_exists, previous_results_for_polling_station},
@@ -46,30 +46,32 @@ use crate::{
 };
 
 #[derive(Serialize)]
-struct PollingStationInvestigationCreated(pub PollingStationInvestigation);
-#[derive(Serialize)]
-struct PollingStationInvestigationUpdated(pub PollingStationInvestigation);
-#[derive(Serialize)]
-struct PollingStationInvestigationDeleted(pub PollingStationInvestigation);
-#[derive(Serialize)]
-struct PollingStationInvestigationConcluded(pub PollingStationInvestigation);
+struct InvestigationCreatedAuditData(pub PollingStationInvestigation);
+impl AsAuditEvent for InvestigationCreatedAuditData {
+    const EVENT_TYPE: AuditEventType = AuditEventType::InvestigationCreated;
+    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Success;
+}
 
-as_audit_event!(
-    PollingStationInvestigationCreated,
-    AuditEventType::PollingStationInvestigationCreated
-);
-as_audit_event!(
-    PollingStationInvestigationUpdated,
-    AuditEventType::PollingStationInvestigationUpdated
-);
-as_audit_event!(
-    PollingStationInvestigationDeleted,
-    AuditEventType::PollingStationInvestigationDeleted
-);
-as_audit_event!(
-    PollingStationInvestigationConcluded,
-    AuditEventType::PollingStationInvestigationConcluded
-);
+#[derive(Serialize)]
+struct InvestigationConcludedAuditData(pub PollingStationInvestigation);
+impl AsAuditEvent for InvestigationConcludedAuditData {
+    const EVENT_TYPE: AuditEventType = AuditEventType::InvestigationConcluded;
+    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Success;
+}
+
+#[derive(Serialize)]
+struct InvestigationUpdatedAuditData(pub PollingStationInvestigation);
+impl AsAuditEvent for InvestigationUpdatedAuditData {
+    const EVENT_TYPE: AuditEventType = AuditEventType::InvestigationUpdated;
+    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Success;
+}
+
+#[derive(Serialize)]
+struct InvestigationDeletedAuditData(pub PollingStationInvestigation);
+impl AsAuditEvent for InvestigationDeletedAuditData {
+    const EVENT_TYPE: AuditEventType = AuditEventType::InvestigationDeleted;
+    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Info;
+}
 
 pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::default()
@@ -113,11 +115,7 @@ pub async fn delete_investigation_for_polling_station(
         delete_polling_station_investigation(conn, polling_station_id).await?
     {
         audit_service
-            .log(
-                conn,
-                &PollingStationInvestigationDeleted(investigation),
-                None,
-            )
+            .log(conn, &InvestigationDeletedAuditData(investigation), None)
             .await?;
 
         if committee_session.status == CommitteeSessionStatus::Completed {
@@ -194,12 +192,19 @@ async fn polling_station_investigation_create(
         polling_station_id,
         polling_station_investigation,
     )
-    .await?;
+    .await
+    .map_err(|err| match err {
+        sqlx::Error::RowNotFound => APIError::Conflict(
+            "Investigation already exists for this polling station".into(),
+            ErrorReference::EntryNotUnique,
+        ),
+        other => other.into(),
+    })?;
 
     audit_service
         .log(
             &mut tx,
-            &PollingStationInvestigationCreated(investigation.clone()),
+            &InvestigationCreatedAuditData(investigation.clone()),
             None,
         )
         .await?;
@@ -282,7 +287,7 @@ async fn polling_station_investigation_conclude(
     audit_service
         .log(
             &mut tx,
-            &PollingStationInvestigationConcluded(investigation.clone()),
+            &InvestigationConcludedAuditData(investigation.clone()),
             None,
         )
         .await?;
@@ -321,7 +326,7 @@ async fn update_investigation(
     audit_service
         .log(
             conn,
-            &PollingStationInvestigationUpdated(investigation.clone()),
+            &InvestigationUpdatedAuditData(investigation.clone()),
             None,
         )
         .await?;

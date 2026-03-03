@@ -74,7 +74,9 @@ export function GenerateTestElectionForm() {
         Object.assign(acc, { [field.key]: formState[field.key] ? formState[field.key] : field.placeholder }),
       {
         election_role,
+        // TODO: Once data entry is implemented for CSB (#2811), we don't need this check
         with_data_entry: election_role === "CSB" ? false : formState.with_data_entry,
+        // with_data_entry: formState.with_data_entry,
       },
     );
 

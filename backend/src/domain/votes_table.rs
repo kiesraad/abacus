@@ -312,7 +312,7 @@ mod tests {
     use super::*;
     use crate::domain::{
         data_entry,
-        election::{ElectionCategory, ElectionId, ElectionRole, VoteCountingMethod},
+        election::{CommitteeCategory, ElectionCategory, ElectionId, VoteCountingMethod},
     };
 
     fn sample_candidate(number: CandidateNumber) -> Candidate {
@@ -343,7 +343,7 @@ mod tests {
         ElectionWithPoliticalGroups {
             id: ElectionId::from(1),
             name: "Test election".to_string(),
-            role: ElectionRole::GSB,
+            committee_category: CommitteeCategory::GSB,
             counting_method: VoteCountingMethod::CSO,
             election_id: "Test_2025".to_string(),
             location: "Test locatie".to_string(),

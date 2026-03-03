@@ -10,8 +10,8 @@ import { t } from "@/i18n/translate";
 import type {
   COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY,
   COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH,
+  CommitteeCategory,
   CommitteeSession,
-  ElectionRole,
 } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 import { committeeSessionLabel } from "@/utils/committeeSession";
@@ -82,7 +82,7 @@ function ButtonLinkList({ buttonLinks, firstRowBold }: ButtonLinkListProps) {
 export interface CommitteeSessionCardProps {
   committeeSession: CommitteeSession;
   isCurrentSession: boolean;
-  electionRole: ElectionRole;
+  committeeCategory: CommitteeCategory;
 }
 
 // biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
@@ -90,7 +90,7 @@ export interface CommitteeSessionCardProps {
 export function CommitteeSessionCard({
   committeeSession,
   isCurrentSession,
-  electionRole,
+  committeeCategory,
   ...props
 }: CommitteeSessionCardProps & DivProps) {
   const navigate = useNavigate();
@@ -108,7 +108,7 @@ export function CommitteeSessionCard({
   }
 
   const icon = CommitteeSessionStatusIcon({ status: committeeSession.status, size: "xl" });
-  const label = committeeSessionLabel(electionRole, committeeSession.number);
+  const label = committeeSessionLabel(committeeCategory, committeeSession.number);
   const status = t(`committee_session_status.coordinator.${committeeSession.status}`);
   const date = committeeSession.start_date_time
     ? formatDateTimeFull(new Date(committeeSession.start_date_time))

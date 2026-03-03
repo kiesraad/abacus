@@ -99,13 +99,13 @@ export function ElectionStatusPage() {
       <PageTitle title={`${t("election_status.title")} - Abacus`} />
       <header>
         <section>
-          <h1>{committeeSessionLabel(election.role, currentCommitteeSession.number)}</h1>
+          <h1>{committeeSessionLabel(election.committee_category, currentCommitteeSession.number)}</h1>
         </section>
         <section>
           <div className="election_status">
             <HeaderCommitteeSessionStatusWithIcon
               status={currentCommitteeSession.status}
-              electionRole={election.role}
+              committeeCategory={election.committee_category}
               userRole="coordinator"
               committeeSessionNumber={currentCommitteeSession.number}
             />

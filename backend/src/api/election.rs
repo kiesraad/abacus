@@ -23,7 +23,7 @@ use crate::{
         },
         committee_session_status::CommitteeSessionStatus,
         election::{
-            Election, ElectionId, ElectionNumberOfVotersChangeRequest, ElectionRole,
+            CommitteeCategory, Election, ElectionId, ElectionNumberOfVotersChangeRequest,
             ElectionWithPoliticalGroups, NewElection, VoteCountingMethod,
         },
         investigation::PollingStationInvestigation,
@@ -73,7 +73,7 @@ pub struct ElectionDetailsResponse {
 pub struct ElectionAuditData {
     pub election_id: ElectionId,
     pub election_name: String,
-    pub election_role: String,
+    pub election_committee_category: String,
     pub election_counting_method: String,
     pub election_election_id: String,
     pub election_location: String,
@@ -90,7 +90,7 @@ impl From<Election> for ElectionAuditData {
         Self {
             election_id: value.id,
             election_name: value.name,
-            election_role: value.role.to_string(),
+            election_committee_category: value.committee_category.to_string(),
             election_counting_method: value.counting_method.to_string(),
             election_election_id: value.election_id,
             election_location: value.location,
@@ -251,7 +251,7 @@ pub async fn election_number_of_voters_change(
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
-#[serde(tag = "role")]
+#[serde(tag = "committee_category")]
 pub enum ElectionCreationValidateRequest {
     GSB(GSBElectionCreationValidateRequest),
     CSB(CSBElectionCreationValidateRequest),
@@ -306,7 +306,7 @@ pub struct CSBElectionCreationValidateRequest {
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
-#[serde(tag = "role")]
+#[serde(tag = "committee_category")]
 pub enum ElectionDefinitionValidateResponse {
     GSB(GSBElectionDefinitionValidateResponse),
     CSB(CSBElectionDefinitionValidateResponse),
@@ -423,7 +423,7 @@ fn validate_csb_election(
     let mut hash = RedactedEmlHash::from(edu.election_data.as_bytes());
     let mut election =
         parse_election_candidates_eml(&edu.election_data, edu.candidate_data.as_deref())?;
-    election.role = ElectionRole::CSB;
+    election.committee_category = CommitteeCategory::CSB;
 
     if let Some(ref data) = edu.candidate_data {
         hash = RedactedEmlHash::from(data.as_bytes());
@@ -435,7 +435,7 @@ fn validate_csb_election(
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
-#[serde(tag = "role")]
+#[serde(tag = "committee_category")]
 pub enum ElectionCreationRequest {
     GSB(GSBElectionCreationRequest),
     CSB(CSBElectionCreationRequest),
@@ -579,7 +579,7 @@ async fn import_csb_election(
 
     let mut new_election =
         parse_election_candidates_eml(&edu.election_data, Some(&edu.candidate_data))?;
-    new_election.role = ElectionRole::CSB;
+    new_election.committee_category = CommitteeCategory::CSB;
 
     let mut tx = pool.begin_immediate().await?;
     let election = create_election_with_committee_session(

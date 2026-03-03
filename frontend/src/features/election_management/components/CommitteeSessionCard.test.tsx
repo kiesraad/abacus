@@ -158,12 +158,12 @@ describe("UI component: CommitteeSessionCard", () => {
         location: "Juinen",
       });
 
-      const electionRole = electionMockData.role;
+      const committeeCategory = electionMockData.committee_category;
 
       render(
         <CommitteeSessionCard
           committeeSession={committeeSession}
-          electionRole={electionRole}
+          committeeCategory={committeeCategory}
           isCurrentSession={isCurrentSession}
         />,
       );
@@ -221,9 +221,13 @@ describe("UI component: CommitteeSessionCard", () => {
       start_date_time: "",
       location: "Juinen",
     });
-    const electionRole = electionMockData.role;
+    const committeeCategory = electionMockData.committee_category;
     render(
-      <CommitteeSessionCard committeeSession={committeeSession} electionRole={electionRole} isCurrentSession={true} />,
+      <CommitteeSessionCard
+        committeeSession={committeeSession}
+        committeeCategory={committeeCategory}
+        isCurrentSession={true}
+      />,
     );
 
     const dataEntryButton = await screen.findByRole("button", { name: "Start invoer" });
@@ -243,9 +247,13 @@ describe("UI component: CommitteeSessionCard", () => {
       start_date_time: "",
       location: "Juinen",
     });
-    const electionRole = electionMockData.role;
+    const committeeCategory = electionMockData.committee_category;
     render(
-      <CommitteeSessionCard committeeSession={committeeSession} electionRole={electionRole} isCurrentSession={true} />,
+      <CommitteeSessionCard
+        committeeSession={committeeSession}
+        committeeCategory={committeeCategory}
+        isCurrentSession={true}
+      />,
     );
 
     const deleteButton = await screen.findByRole("button", { name: "Zitting verwijderen" });

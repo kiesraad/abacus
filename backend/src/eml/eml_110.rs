@@ -157,7 +157,7 @@ impl EML110 {
         // construct the election
         let election = election::NewElection {
             name: self.election_identifier().election_name.clone(),
-            role: election::ElectionRole::GSB,
+            committee_category: election::CommitteeCategory::GSB,
             counting_method: VoteCountingMethod::CSO,
             election_id: self.election_identifier().id.clone(),
             location: election_domain.name.clone(),

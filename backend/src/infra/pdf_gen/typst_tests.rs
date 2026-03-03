@@ -5,7 +5,7 @@ use test_log::test;
 use crate::domain::{
     committee_session::committee_session_fixture,
     election::{
-        ElectionCategory, ElectionId, ElectionRole, ElectionWithPoliticalGroups,
+        CommitteeCategory, ElectionCategory, ElectionId, ElectionWithPoliticalGroups,
         VoteCountingMethod, tests::election_fixture,
     },
     models::{ModelNa31_2Input, PdfFileModel, PdfModel, ToPdfFileModel, filter_input},
@@ -19,7 +19,7 @@ async fn it_generates_a_pdf() {
     let election = ElectionWithPoliticalGroups {
         id: ElectionId::from(1),
         name: "Municipal Election".to_string(),
-        role: ElectionRole::GSB,
+        committee_category: CommitteeCategory::GSB,
         counting_method: VoteCountingMethod::CSO,
         election_id: "MunicipalElection_2025".to_string(),
         location: "Heemdamseburg".to_string(),

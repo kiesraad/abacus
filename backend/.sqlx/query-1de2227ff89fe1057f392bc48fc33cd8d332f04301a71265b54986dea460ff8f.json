@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n        UPDATE elections\n        SET number_of_voters = ?\n        WHERE id = ?\n        RETURNING\n            id as \"id: ElectionId\",\n            name,\n            role as \"role: _\",\n            counting_method as \"counting_method: _\", \n            election_id,\n            location,\n            domain_id,\n            category as \"category: _\",\n            number_of_seats as \"number_of_seats: u32\",\n            number_of_voters as \"number_of_voters: u32\",\n            election_date as \"election_date: _\",\n            nomination_date as \"nomination_date: _\"\n        ",
+  "query": "\n        UPDATE elections\n        SET number_of_voters = ?\n        WHERE id = ?\n        RETURNING\n            id as \"id: ElectionId\",\n            name,\n            committee_category as \"committee_category: _\",\n            counting_method as \"counting_method: _\", \n            election_id,\n            location,\n            domain_id,\n            category as \"category: _\",\n            number_of_seats as \"number_of_seats: u32\",\n            number_of_voters as \"number_of_voters: u32\",\n            election_date as \"election_date: _\",\n            nomination_date as \"nomination_date: _\"\n        ",
   "describe": {
     "columns": [
       {
@@ -14,7 +14,7 @@
         "type_info": "Text"
       },
       {
-        "name": "role: _",
+        "name": "committee_category: _",
         "ordinal": 2,
         "type_info": "Text"
       },
@@ -82,5 +82,5 @@
       false
     ]
   },
-  "hash": "d4f9eb3131a31338dd65166c6095f16a62b6c8690472662b375dc188f6b3f45f"
+  "hash": "1de2227ff89fe1057f392bc48fc33cd8d332f04301a71265b54986dea460ff8f"
 }

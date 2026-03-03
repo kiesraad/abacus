@@ -18,7 +18,7 @@ use crate::{
         },
         data_entry_status::{DataEntryStatus, Definitive, FirstEntryFinalised},
         election::{
-            self, CandidateGender, CandidateNumber, ElectionCategory, ElectionRole,
+            self, CandidateGender, CandidateNumber, CommitteeCategory, ElectionCategory,
             ElectionWithPoliticalGroups, NewElection, PGNumber, PoliticalGroup, VoteCountingMethod,
         },
         polling_station::{PollingStation, PollingStationRequest, PollingStationType},
@@ -165,7 +165,7 @@ fn generate_election(rng: &mut impl rand::RngExt, args: &GenerateElectionArgs) -
     // and put it all in the struct (generating some additional fields where needed)
     NewElection {
         name,
-        role: ElectionRole::GSB,
+        committee_category: CommitteeCategory::GSB,
         counting_method: VoteCountingMethod::CSO,
         domain_id: super::data::domain_id(rng),
         election_id,

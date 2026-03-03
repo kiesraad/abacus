@@ -54,7 +54,7 @@ export function FinishDataEntryPage() {
         <section>
           <h1>
             {t("election_management.data_entry")}{" "}
-            {committeeSessionLabel(election.role, currentCommitteeSession.number, false, true)}{" "}
+            {committeeSessionLabel(election.committee_category, currentCommitteeSession.number, false, true)}{" "}
             {t("complete").toLowerCase()}
           </h1>
         </section>

@@ -42,7 +42,7 @@ function electionValidateResponse(
   matching_election?: boolean,
 ): ElectionDefinitionValidateResponse {
   return {
-    role: "GSB",
+    committee_category: "GSB",
     hash: {
       chunks: [
         "asdf",

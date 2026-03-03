@@ -15,7 +15,7 @@ function ElectionBreadcrumb({ election }: { election: Election }) {
   return (
     <>
       <span className="bold">
-        {election.role} {election.domain_id} {election.location}
+        {election.committee_category} {election.domain_id} {election.location}
       </span>
       <span>&mdash;</span>
       <span>{election.name}</span>
@@ -68,7 +68,7 @@ function ElectionManagementLinks({ location }: NavBarLinksProps) {
         <>
           <IconChevronRight />
           <Link to={`/elections/${election.id}/status`}>
-            {committeeSessionLabel(election.role, currentCommitteeSession.number)}
+            {committeeSessionLabel(election.committee_category, currentCommitteeSession.number)}
           </Link>
         </>
       )}

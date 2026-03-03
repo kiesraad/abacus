@@ -22,14 +22,14 @@ export function ElectoralCommitteeRole() {
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new StringFormData(event.currentTarget);
-    const role = formData.getString("role");
-    if (!role || (role !== "GSB" && role !== "CSB")) {
+    const committeeCategory = formData.getString("committee_category");
+    if (!committeeCategory || (committeeCategory !== "GSB" && committeeCategory !== "CSB")) {
       return;
     }
 
     dispatch({
-      type: "SET_ROLE_TYPE",
-      electionRole: role,
+      type: "SET_COMMITTEE_CATEGORY",
+      committeeCategory,
     });
     await navigate("/elections/create/list-of-candidates");
   }
@@ -51,17 +51,17 @@ export function ElectoralCommitteeRole() {
               <ChoiceList.Legend>{t("election.electoral_committee_role.choose")}</ChoiceList.Legend>
               <ChoiceList.Radio
                 id="gsb"
-                name={"role"}
-                label={t("electoral_committee_role.roles.GSB.full")}
+                name={"committee_category"}
+                label={t("committee_category.GSB.full")}
                 defaultValue={"GSB"}
-                defaultChecked={state.electionRole === "GSB" || !state.electionRole}
+                defaultChecked={state.committeeCategory === "GSB" || !state.committeeCategory}
               ></ChoiceList.Radio>
               <ChoiceList.Radio
                 id="csb"
-                name={"role"}
-                label={t("electoral_committee_role.roles.CSB.full")}
+                name={"committee_category"}
+                label={t("committee_category.CSB.full")}
                 defaultValue={"CSB"}
-                defaultChecked={state.electionRole === "CSB"}
+                defaultChecked={state.committeeCategory === "CSB"}
               ></ChoiceList.Radio>
             </ChoiceList>
           </FormLayout.Section>

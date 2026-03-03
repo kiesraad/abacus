@@ -38,7 +38,7 @@ export function NumberOfVotersPage() {
       <header>
         <section>
           <h1>
-            {t(`electoral_committee_role.roles.${election.role}.short`)} {election.location}
+            {t(`committee_category.${election.committee_category}.short`)} {election.location}
           </h1>
         </section>
       </header>

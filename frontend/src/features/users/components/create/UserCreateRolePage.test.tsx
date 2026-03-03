@@ -84,7 +84,7 @@ describe("UserCreateRolePage", () => {
 
     expect(setRole).toHaveBeenCalledExactlyOnceWith("coordinator");
     expect(setType).not.toHaveBeenCalled();
-    expect(navigate).toHaveBeenCalledExactlyOnceWith("/users/create/election");
+    expect(navigate).toHaveBeenCalledExactlyOnceWith("/users/create/committee");
   });
 
   test("Continue with typist", async () => {
@@ -98,7 +98,7 @@ describe("UserCreateRolePage", () => {
 
     expect(setRole).toHaveBeenCalledExactlyOnceWith("typist");
     expect(setType).not.toHaveBeenCalled();
-    expect(navigate).toHaveBeenCalledExactlyOnceWith("/users/create/election");
+    expect(navigate).toHaveBeenCalledExactlyOnceWith("/users/create/committee");
   });
 
   test("Logged in coordinator is redirected to type selection step", async () => {

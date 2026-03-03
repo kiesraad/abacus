@@ -36,7 +36,7 @@ const rolePage = {
   continue: () => screen.getByRole("button", { name: "Verder" }),
 };
 
-const electionCommitteeCategoryPage = {
+const committeeCategoryPage = {
   radioGroup: () => screen.getByRole("group", { name: "Kies een niveau" }),
   gsb: () => screen.getByRole("radio", { name: /GSB/ }),
   csb: () => screen.getByRole("radio", { name: /CSB/ }),
@@ -90,9 +90,9 @@ describe("User create pages integration test", () => {
       await user.click(rolePage.coordinator());
       await user.click(rolePage.continue());
 
-      await waitFor(electionCommitteeCategoryPage.radioGroup);
-      await user.click(electionCommitteeCategoryPage.gsb());
-      await user.click(electionCommitteeCategoryPage.continue());
+      await waitFor(committeeCategoryPage.radioGroup);
+      await user.click(committeeCategoryPage.gsb());
+      await user.click(committeeCategoryPage.continue());
 
       await waitFor(detailsPage.title);
       expect(detailsPage.fullname()).toBeInTheDocument();
@@ -108,9 +108,9 @@ describe("User create pages integration test", () => {
       await user.click(rolePage.typist());
       await user.click(rolePage.continue());
 
-      await waitFor(electionCommitteeCategoryPage.radioGroup);
-      await user.click(electionCommitteeCategoryPage.gsb());
-      await user.click(electionCommitteeCategoryPage.continue());
+      await waitFor(committeeCategoryPage.radioGroup);
+      await user.click(committeeCategoryPage.gsb());
+      await user.click(committeeCategoryPage.continue());
 
       await waitFor(typePage.radioGroup);
       expect(typePage.withName()).toBeChecked();

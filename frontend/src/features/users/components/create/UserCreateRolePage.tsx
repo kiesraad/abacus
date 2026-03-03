@@ -58,7 +58,7 @@ export function UserCreateRolePage() {
       void navigate("/users/create/details");
     } else {
       setRole(roleValue);
-      void navigate("/users/create/election");
+      void navigate("/users/create/committee");
     }
   }
 

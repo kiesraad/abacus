@@ -32,7 +32,7 @@ export const usersRoutes: RouteObject[] = [
             handle: { roles: ["administrator", "coordinator_csb", "coordinator_gsb"] },
           },
           {
-            path: "election",
+            path: "committee",
             Component: UserCreateCommitteeCategoryPage,
             handle: { roles: ["administrator", "coordinator_csb", "coordinator_gsb"] },
           },

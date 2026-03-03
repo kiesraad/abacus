@@ -285,9 +285,8 @@ async fn polling_station_investigation_conclude(
             .expect("create_empty_data_entry should set data_entry_id");
         current.conclude_with_new_results(request.findings, data_entry_id)?
     } else {
-        let polling_station = polling_station_repo::get(&mut tx, polling_station_id).await?;
-        let new_polling_station = polling_station.prev_data_entry_id.is_none();
-        current.conclude_without_new_results(request.findings, new_polling_station)?
+        let ps = polling_station_repo::get_next_session(&mut tx, polling_station_id).await?;
+        current.conclude_without_new_results(request.findings, ps.is_new_polling_station())?
     };
 
     investigation_repo::save(&mut tx, polling_station_id, &status).await?;
@@ -356,12 +355,12 @@ async fn apply_update(
         }
         // ConcludedWithoutNewResults: same-state text update
         (InvestigationStatus::ConcludedWithoutNewResults(_), Some(false)) => {
-            let ps = polling_station_repo::get(conn, polling_station_id).await?;
+            let ps = polling_station_repo::get_next_session(conn, polling_station_id).await?;
             let findings = request.findings.unwrap_or_default();
             Ok(current.switch_to_without_new_results(
                 request.reason,
                 findings,
-                ps.prev_data_entry_id.is_none(),
+                ps.is_new_polling_station(),
             )?)
         }
         // ConcludedWithoutNewResults -> ConcludedWithNewResults
@@ -451,11 +450,13 @@ async fn switch_to_without_new_results(
         }
     }
 
-    let polling_station = polling_station_repo::get(conn, polling_station_id).await?;
-    let new_polling_station = polling_station.prev_data_entry_id.is_none();
+    let ps = polling_station_repo::get_next_session(conn, polling_station_id).await?;
     let findings = request.findings.unwrap_or_default();
-    let status =
-        current.switch_to_without_new_results(request.reason, findings, new_polling_station)?;
+    let status = current.switch_to_without_new_results(
+        request.reason,
+        findings,
+        ps.is_new_polling_station(),
+    )?;
     Ok(status)
 }
 
@@ -505,8 +506,8 @@ async fn polling_station_investigation_update(
 
     let committee_session = validate_and_get_committee_session(&mut tx, polling_station_id).await?;
 
-    let polling_station = polling_station_repo::get(&mut tx, polling_station_id).await?;
-    if polling_station.prev_data_entry_id.is_none() && request.corrected_results != Some(true) {
+    let ps = polling_station_repo::get_next_session(&mut tx, polling_station_id).await?;
+    if ps.is_new_polling_station() && request.corrected_results != Some(true) {
         return Err(APIError::Conflict(
             "Investigation requires corrected results, because it is not part of a previous session".into(),
             ErrorReference::InvestigationRequiresCorrectedResults,

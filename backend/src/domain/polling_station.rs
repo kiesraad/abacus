@@ -11,7 +11,7 @@ use crate::{
     APIError,
     domain::{
         committee_session::CommitteeSessionId, data_entry::DataEntryId, election::ElectionId,
-        id::id,
+        id::id, investigation::InvestigationStatus,
     },
 };
 
@@ -137,6 +137,71 @@ impl From<String> for PollingStationType {
             "Special" => Self::Special,
             "Mobile" => Self::Mobile,
             _ => panic!("invalid PollingStationType `{value}`"),
+        }
+    }
+}
+
+/// Polling station in a first committee session.
+/// No investigations, no previous data entries.
+#[derive(Debug, Clone)]
+pub struct PollingStationFirstSession {
+    pub committee_session_id: CommitteeSessionId,
+    pub polling_station: PollingStation,
+    pub data_entry_id: Option<DataEntryId>,
+}
+
+/// Polling station in a next committee session.
+/// May have previous data entries and investigation state.
+#[derive(Debug, Clone)]
+pub struct PollingStationNextSession {
+    pub committee_session_id: CommitteeSessionId,
+    pub polling_station: PollingStation,
+    pub prev_data_entry_id: Option<DataEntryId>,
+    pub data_entry_id: Option<DataEntryId>,
+    pub investigation_status: Option<InvestigationStatus>,
+}
+
+impl PollingStationNextSession {
+    /// Returns true if this polling station was newly added in this session.
+    pub fn is_new_polling_station(&self) -> bool {
+        self.prev_data_entry_id.is_none()
+    }
+}
+
+impl From<PollingStationFirstSession> for PollingStationResponse {
+    fn from(ps: PollingStationFirstSession) -> Self {
+        Self {
+            id: ps.polling_station.id,
+            election_id: ps.polling_station.election_id,
+            committee_session_id: ps.committee_session_id,
+            prev_data_entry_id: None,
+            data_entry_id: ps.data_entry_id,
+            name: ps.polling_station.name,
+            number: ps.polling_station.number,
+            number_of_voters: ps.polling_station.number_of_voters,
+            polling_station_type: ps.polling_station.polling_station_type,
+            address: ps.polling_station.address,
+            postal_code: ps.polling_station.postal_code,
+            locality: ps.polling_station.locality,
+        }
+    }
+}
+
+impl From<PollingStationNextSession> for PollingStationResponse {
+    fn from(ps: PollingStationNextSession) -> Self {
+        Self {
+            id: ps.polling_station.id,
+            election_id: ps.polling_station.election_id,
+            committee_session_id: ps.committee_session_id,
+            prev_data_entry_id: ps.prev_data_entry_id,
+            data_entry_id: ps.data_entry_id,
+            name: ps.polling_station.name,
+            number: ps.polling_station.number,
+            number_of_voters: ps.polling_station.number_of_voters,
+            polling_station_type: ps.polling_station.polling_station_type,
+            address: ps.polling_station.address,
+            postal_code: ps.polling_station.postal_code,
+            locality: ps.polling_station.locality,
         }
     }
 }

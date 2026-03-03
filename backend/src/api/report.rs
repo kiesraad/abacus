@@ -84,12 +84,19 @@ impl ResultsInput {
     ) -> Result<ResultsInput, APIError> {
         let committee_session = committee_session_repo::get(conn, committee_session_id).await?;
         let election = election_repo::get(conn, committee_session.election_id).await?;
-        let polling_stations: Vec<PollingStation> =
-            polling_station_repo::list(conn, committee_session.id)
+        let polling_stations: Vec<PollingStation> = if committee_session.is_next_session() {
+            polling_station_repo::list_next_session(conn, committee_session.id)
                 .await?
                 .into_iter()
-                .map(PollingStation::from)
-                .collect();
+                .map(|ps| ps.polling_station)
+                .collect()
+        } else {
+            polling_station_repo::list_first_session(conn, committee_session.id)
+                .await?
+                .into_iter()
+                .map(|ps| ps.polling_station)
+                .collect()
+        };
         let results = list_results_for_committee_session(conn, committee_session.id).await?;
 
         // get investigations if this is not the first session

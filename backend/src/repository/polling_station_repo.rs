@@ -1,12 +1,14 @@
-use sqlx::{Connection, FromRow, SqliteConnection, query, query_as};
+use sqlx::{Connection, FromRow, SqliteConnection, query, query_as, types::Json};
 
 use crate::{
     domain::{
         committee_session::CommitteeSessionId,
         data_entry::DataEntryId,
         election::ElectionId,
+        investigation::InvestigationStatus,
         polling_station::{
-            PollingStation, PollingStationId, PollingStationNumber, PollingStationRequest,
+            PollingStation, PollingStationFirstSession, PollingStationId,
+            PollingStationNextSession, PollingStationNumber, PollingStationRequest,
             PollingStationResponse, PollingStationType,
         },
     },
@@ -21,6 +23,7 @@ pub struct PollingStationRow {
     pub committee_session_id: CommitteeSessionId,
     pub prev_data_entry_id: Option<DataEntryId>,
     pub data_entry_id: Option<DataEntryId>,
+    pub investigation_state: Option<Json<InvestigationStatus>>,
     pub name: String,
     pub number: PollingStationNumber,
     pub number_of_voters: Option<u32>,
@@ -65,6 +68,61 @@ impl From<PollingStationRow> for PollingStationResponse {
     }
 }
 
+impl From<PollingStationRow> for PollingStationFirstSession {
+    fn from(row: PollingStationRow) -> Self {
+        Self {
+            committee_session_id: row.committee_session_id,
+            data_entry_id: row.data_entry_id,
+            polling_station: PollingStation::from(row),
+        }
+    }
+}
+
+impl From<PollingStationRow> for PollingStationNextSession {
+    fn from(row: PollingStationRow) -> Self {
+        let PollingStationRow {
+            id,
+            election_id,
+            committee_session_id,
+            prev_data_entry_id,
+            data_entry_id,
+            investigation_state,
+            name,
+            number,
+            number_of_voters,
+            polling_station_type,
+            address,
+            postal_code,
+            locality,
+        } = row;
+        Self {
+            committee_session_id,
+            prev_data_entry_id,
+            data_entry_id,
+            investigation_status: investigation_state.map(|json| {
+                let status = json.0;
+                match (&status, data_entry_id) {
+                    (InvestigationStatus::ConcludedWithNewResults(_), Some(id)) => {
+                        status.with_data_entry_id(id)
+                    }
+                    _ => status,
+                }
+            }),
+            polling_station: PollingStation {
+                id,
+                election_id,
+                name,
+                number,
+                number_of_voters,
+                polling_station_type,
+                address,
+                postal_code,
+                locality,
+            },
+        }
+    }
+}
+
 /// Returns if a committee session has polling stations
 pub async fn has_any(
     conn: &mut SqliteConnection,
@@ -98,6 +156,7 @@ pub async fn list(
             p.committee_session_id AS "committee_session_id: _",
             p.prev_data_entry_id AS "prev_data_entry_id: _",
             p.data_entry_id AS "data_entry_id: _",
+            p.investigation_state AS "investigation_state: Json<InvestigationStatus>",
             p.name,
             p.number AS "number: u32",
             p.number_of_voters AS "number_of_voters: _",
@@ -129,6 +188,7 @@ pub async fn get(
             p.committee_session_id AS "committee_session_id: _",
             p.prev_data_entry_id AS "prev_data_entry_id: _",
             p.data_entry_id AS "data_entry_id: _",
+            p.investigation_state AS "investigation_state: Json<InvestigationStatus>",
             p.name,
             p.number AS "number: u32",
             p.number_of_voters AS "number_of_voters: _",
@@ -170,6 +230,7 @@ pub async fn get_for_election(
             p.committee_session_id AS "committee_session_id: _",
             p.prev_data_entry_id AS "prev_data_entry_id: _",
             p.data_entry_id AS "data_entry_id: _",
+            p.investigation_state AS "investigation_state: Json<InvestigationStatus>",
             p.name,
             p.number AS "number: u32",
             p.number_of_voters AS "number_of_voters: _",
@@ -226,6 +287,7 @@ pub async fn create(
             committee_session_id AS "committee_session_id: _",
             prev_data_entry_id AS "prev_data_entry_id: _",
             data_entry_id AS "data_entry_id: _",
+            investigation_state AS "investigation_state: Json<InvestigationStatus>",
             name,
             number AS "number: u32",
             number_of_voters AS "number_of_voters: _",
@@ -252,6 +314,7 @@ pub async fn create(
 }
 
 /// Create many polling stations for an election
+#[allow(clippy::too_many_lines)]
 pub async fn create_many(
     conn: &mut SqliteConnection,
     election_id: ElectionId,
@@ -293,6 +356,7 @@ pub async fn create_many(
                 committee_session_id AS "committee_session_id: _",
                 prev_data_entry_id AS "prev_data_entry_id: _",
                 data_entry_id AS "data_entry_id: _",
+                investigation_state AS "investigation_state: Json<InvestigationStatus>",
                 name,
                 number AS "number: u32",
                 number_of_voters AS "number_of_voters: _",
@@ -361,6 +425,7 @@ pub async fn update(
             committee_session_id AS "committee_session_id: _",
             prev_data_entry_id AS "prev_data_entry_id: _",
             data_entry_id AS "data_entry_id: _",
+            investigation_state AS "investigation_state: Json<InvestigationStatus>",
             name,
             number AS "number: u32",
             number_of_voters AS "number_of_voters: _",
@@ -430,6 +495,7 @@ pub async fn link_data_entry(
                 committee_session_id AS "committee_session_id: _",
                 prev_data_entry_id AS "prev_data_entry_id: _",
                 data_entry_id AS "data_entry_id: _",
+                investigation_state AS "investigation_state: Json<InvestigationStatus>",
                 name,
                 number AS "number: u32",
                 number_of_voters AS "number_of_voters: _",
@@ -443,6 +509,46 @@ pub async fn link_data_entry(
     )
     .fetch_one(conn)
     .await
+}
+
+/// List all polling stations for a first committee session
+pub async fn list_first_session(
+    conn: &mut SqliteConnection,
+    committee_session_id: CommitteeSessionId,
+) -> Result<Vec<PollingStationFirstSession>, sqlx::Error> {
+    Ok(list(conn, committee_session_id)
+        .await?
+        .into_iter()
+        .map(PollingStationFirstSession::from)
+        .collect())
+}
+
+/// List all polling stations for a next committee session
+pub async fn list_next_session(
+    conn: &mut SqliteConnection,
+    committee_session_id: CommitteeSessionId,
+) -> Result<Vec<PollingStationNextSession>, sqlx::Error> {
+    Ok(list(conn, committee_session_id)
+        .await?
+        .into_iter()
+        .map(PollingStationNextSession::from)
+        .collect())
+}
+
+/// Get a single polling station typed for a first committee session
+pub async fn get_first_session(
+    conn: &mut SqliteConnection,
+    polling_station_id: PollingStationId,
+) -> Result<PollingStationFirstSession, sqlx::Error> {
+    Ok(get(conn, polling_station_id).await?.into())
+}
+
+/// Get a single polling station typed for a next committee session
+pub async fn get_next_session(
+    conn: &mut SqliteConnection,
+    polling_station_id: PollingStationId,
+) -> Result<PollingStationNextSession, sqlx::Error> {
+    Ok(get(conn, polling_station_id).await?.into())
 }
 
 pub async fn duplicate_for_committee_session(

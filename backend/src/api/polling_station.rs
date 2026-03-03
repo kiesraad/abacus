@@ -30,10 +30,12 @@ use crate::{
     repository::{
         committee_session_repo::get_election_committee_session,
         election_repo,
-        polling_station_repo::{create, create_many, delete, get_for_election, list, update},
+        polling_station_repo::{create, create_many, delete, get_for_election, has_any, update},
         user_repo::User,
     },
-    service::{change_committee_session_status, create_empty_data_entry},
+    service::{
+        change_committee_session_status, create_empty_data_entry, list_polling_stations_for_session,
+    },
 };
 
 #[derive(Serialize)]
@@ -145,11 +147,9 @@ async fn polling_station_list(
     let committee_session = get_election_committee_session(&mut conn, election_id).await?;
 
     Ok(PollingStationListResponse {
-        polling_stations: list(&mut conn, committee_session.id)
+        polling_stations: list_polling_stations_for_session(&mut conn, &committee_session)
             .await?
-            .into_iter()
-            .map(PollingStationResponse::from)
-            .collect(),
+            .into_responses(),
     })
 }
 
@@ -397,7 +397,7 @@ async fn polling_station_delete(
         )
         .await?;
 
-    if list(&mut tx, committee_session.id).await?.is_empty() {
+    if !has_any(&mut tx, committee_session.id).await? {
         change_committee_session_status(
             &mut tx,
             committee_session.id,
@@ -529,7 +529,7 @@ async fn polling_station_import(
     election_repo::get(&mut tx, election_id).await?;
     let committee_session = get_election_committee_session(&mut tx, election_id).await?;
 
-    if !list(&mut tx, committee_session.id).await?.is_empty() {
+    if has_any(&mut tx, committee_session.id).await? {
         return Err(AuthenticationError::Forbidden.into());
     }
 

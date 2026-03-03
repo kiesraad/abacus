@@ -1,15 +1,15 @@
 mod change_committee_session_status;
 mod data_entry;
 mod investigation;
+mod polling_station;
 
 pub use change_committee_session_status::{
     CommitteeSessionAuditData, CommitteeSessionUpdatedAuditData, FileAuditData,
     change_committee_session_status,
 };
 pub use data_entry::{DataEntryServiceError, create_empty as create_empty_data_entry};
-pub use investigation::{
-    InvestigationServiceError,
-    list_for_committee_session as list_investigations_for_committee_session,
+pub use polling_station::{
+    PollingStationServiceError, list_for_session as list_polling_stations_for_session,
 };
 
 #[cfg(test)]

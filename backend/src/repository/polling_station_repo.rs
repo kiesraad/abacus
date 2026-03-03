@@ -535,14 +535,6 @@ pub async fn list_next_session(
         .collect())
 }
 
-/// Get a single polling station typed for a first committee session
-pub async fn get_first_session(
-    conn: &mut SqliteConnection,
-    polling_station_id: PollingStationId,
-) -> Result<PollingStationFirstSession, sqlx::Error> {
-    Ok(get(conn, polling_station_id).await?.into())
-}
-
 /// Get a single polling station typed for a next committee session
 pub async fn get_next_session(
     conn: &mut SqliteConnection,

@@ -10,8 +10,11 @@ use utoipa::ToSchema;
 use crate::{
     APIError,
     domain::{
-        committee_session::CommitteeSessionId, data_entry::DataEntryId, election::ElectionId,
-        id::id, investigation::InvestigationStatus,
+        committee_session::CommitteeSessionId,
+        data_entry::DataEntryId,
+        election::ElectionId,
+        id::id,
+        investigation::{InvestigationStatus, PollingStationInvestigation},
     },
 };
 
@@ -202,6 +205,60 @@ impl From<PollingStationNextSession> for PollingStationResponse {
             address: ps.polling_station.address,
             postal_code: ps.polling_station.postal_code,
             locality: ps.polling_station.locality,
+        }
+    }
+}
+
+/// Polling stations for either a first or next committee session
+pub enum PollingStationsForSession {
+    First(Vec<PollingStationFirstSession>),
+    Next(Vec<PollingStationNextSession>),
+}
+
+impl PollingStationsForSession {
+    /// Returns investigations derived from investigation_status.
+    /// Empty for first sessions (no investigations can exist).
+    pub fn investigations(&self) -> Vec<PollingStationInvestigation> {
+        match self {
+            Self::First(_) => vec![],
+            Self::Next(pss) => pss
+                .iter()
+                .filter_map(|ps| {
+                    ps.investigation_status.as_ref().map(|status| {
+                        PollingStationInvestigation::from((ps.polling_station.id, status))
+                    })
+                })
+                .collect(),
+        }
+    }
+
+    /// Returns true if any investigation concluded with new (corrected) results.
+    /// Always false for first sessions.
+    pub fn has_corrections(&self) -> bool {
+        match self {
+            Self::First(_) => false,
+            Self::Next(pss) => pss.iter().any(|ps| {
+                matches!(
+                    ps.investigation_status,
+                    Some(InvestigationStatus::ConcludedWithNewResults(_))
+                )
+            }),
+        }
+    }
+
+    /// Convert into polling station API responses.
+    pub fn into_responses(self) -> Vec<PollingStationResponse> {
+        match self {
+            Self::First(pss) => pss.into_iter().map(PollingStationResponse::from).collect(),
+            Self::Next(pss) => pss.into_iter().map(PollingStationResponse::from).collect(),
+        }
+    }
+
+    /// Extract the inner polling stations, discarding session metadata.
+    pub fn into_polling_stations(self) -> Vec<PollingStation> {
+        match self {
+            Self::First(pss) => pss.into_iter().map(|ps| ps.polling_station).collect(),
+            Self::Next(pss) => pss.into_iter().map(|ps| ps.polling_station).collect(),
         }
     }
 }

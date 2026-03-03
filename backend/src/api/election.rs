@@ -36,8 +36,8 @@ use crate::{
         polling_stations_from_eml, polling_stations_from_eml_str,
     },
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
-    repository::{committee_session_repo, election_repo, polling_station_repo, user_repo::User},
-    service::list_investigations_for_committee_session,
+    repository::{committee_session_repo, election_repo, user_repo::User},
+    service::list_polling_stations_for_session,
 };
 
 pub fn router() -> OpenApiRouter<AppState> {
@@ -176,14 +176,10 @@ pub async fn election_details(
         .first()
         .expect("There is always one committee session")
         .clone();
-    let polling_stations: Vec<PollingStationResponse> =
-        polling_station_repo::list(&mut conn, current_committee_session.id)
-            .await?
-            .into_iter()
-            .map(PollingStationResponse::from)
-            .collect();
-    let investigations =
-        list_investigations_for_committee_session(&mut conn, current_committee_session.id).await?;
+    let session_pss =
+        list_polling_stations_for_session(&mut conn, &current_committee_session).await?;
+    let investigations = session_pss.investigations();
+    let polling_stations = session_pss.into_responses();
 
     Ok(Json(ElectionDetailsResponse {
         current_committee_session,

@@ -4,9 +4,12 @@ import { isSuccess } from "@/api/ApiResult";
 import { useApiClient } from "@/api/useApiClient";
 import { Button } from "@/components/ui/Button/Button";
 import { Checkbox } from "@/components/ui/CheckboxAndRadio/CheckboxAndRadio";
+import { ChoiceList } from "@/components/ui/CheckboxAndRadio/ChoiceList";
 import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { InputField } from "@/components/ui/InputField/InputField";
+import { type CommitteeCategory, committeeCategoryValues } from "@/types/generated/openapi";
+import { StringFormData } from "@/utils/stringFormData.ts";
 
 const RANGE_HINT = "Gebruik notatie zoals 10..50 of 9..=45 of een enkel getal zoals 40";
 
@@ -32,6 +35,7 @@ type RangeFieldKey = (typeof RANGE_FIELDS)[number]["key"];
 type RangeFormState = Record<RangeFieldKey, string>;
 
 interface FormState extends RangeFormState {
+  election_role: CommitteeCategory;
   with_data_entry: boolean;
 }
 
@@ -42,6 +46,7 @@ const INITIAL_RANGE_STATE: RangeFormState = Object.fromEntries(
 
 const INITIAL_FORM_STATE: FormState = {
   ...INITIAL_RANGE_STATE,
+  election_role: committeeCategoryValues[0],
   with_data_entry: true,
 };
 
@@ -60,11 +65,17 @@ export function GenerateTestElectionForm() {
     setFormState((prev) => ({ ...prev, with_data_entry: checked }));
   };
 
-  const submitForm = async () => {
+  const submitForm = async (event: FormEvent<HTMLFormElement>) => {
+    const formData = new StringFormData(event.currentTarget);
+    const election_role = formData.getString("election_role");
+
     const payload = RANGE_FIELDS.reduce<Record<string, string | boolean>>(
       (acc, field) =>
         Object.assign(acc, { [field.key]: formState[field.key] ? formState[field.key] : field.placeholder }),
-      { with_data_entry: formState.with_data_entry },
+      {
+        election_role,
+        with_data_entry: formState.with_data_entry,
+      },
     );
 
     try {
@@ -85,10 +96,22 @@ export function GenerateTestElectionForm() {
     <Form
       onSubmit={(event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        void submitForm();
+        void submitForm(event);
       }}
     >
       <FormLayout>
+        <ChoiceList>
+          {committeeCategoryValues.map((committeeCategory, index) => (
+            <ChoiceList.Radio
+              id={committeeCategory}
+              key={committeeCategory}
+              name={"election_role"}
+              defaultChecked={index === 0}
+              defaultValue={committeeCategory}
+              label={committeeCategory}
+            />
+          ))}
+        </ChoiceList>
         {RANGE_FIELDS.map((field) => {
           const input = (
             <InputField

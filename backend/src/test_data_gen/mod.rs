@@ -11,12 +11,17 @@ mod generators;
 pub use api::router;
 pub use generators::create_test_election;
 
+use crate::domain::election::CommitteeCategory;
+
 #[derive(Clone, Debug)]
 pub struct RandomRange(pub Range<u32>);
 
 /// Abacus API and asset server
 #[derive(Debug, Deserialize, ToSchema, Clone)]
 pub struct GenerateElectionArgs {
+    /// GSB or CSB
+    pub committee_category: CommitteeCategory,
+
     /// Number of political groups to create
     pub political_groups: RandomRange,
 

@@ -5837,6 +5837,7 @@
         "type": "object",
         "description": "Abacus API and asset server",
         "required": [
+          "committee_category",
           "political_groups",
           "candidates_per_group",
           "polling_stations",
@@ -5856,6 +5857,10 @@
           "candidates_per_group": {
             "$ref": "#/components/schemas/RandomRange",
             "description": "Number of candidates to create"
+          },
+          "committee_category": {
+            "$ref": "#/components/schemas/CommitteeCategory",
+            "description": "GSB or CSB"
           },
           "first_data_entry": {
             "$ref": "#/components/schemas/RandomRange",

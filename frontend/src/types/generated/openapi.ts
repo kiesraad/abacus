@@ -940,6 +940,8 @@ export interface GenerateElectionArgs {
   candidate_distribution_slope: RandomRange;
   /** Number of candidates to create */
   candidates_per_group: RandomRange;
+  /** GSB or CSB */
+  committee_category: CommitteeCategory;
   /** Percentage of the first data entry to complete if data entry is included */
   first_data_entry: RandomRange;
   political_group_distribution_slope: RandomRange;

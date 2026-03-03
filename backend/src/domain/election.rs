@@ -130,7 +130,18 @@ impl ElectionCategory {
 
 /// Committee category
 #[derive(
-    Serialize, Deserialize, strum::Display, ToSchema, Clone, Copy, Debug, PartialEq, Eq, Hash, Type,
+    Serialize,
+    Deserialize,
+    strum::Display,
+    strum::EnumString,
+    ToSchema,
+    Clone,
+    Copy,
+    Debug,
+    PartialEq,
+    Eq,
+    Hash,
+    Type,
 )]
 pub enum CommitteeCategory {
     /// Gemeentelijk stembureau

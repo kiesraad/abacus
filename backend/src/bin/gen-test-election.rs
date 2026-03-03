@@ -10,7 +10,7 @@ use abacus::{
     domain::{
         committee_session::CommitteeSession,
         data_entry::PollingStationResults,
-        election::ElectionWithPoliticalGroups,
+        election::{CommitteeCategory, ElectionWithPoliticalGroups},
         models::{ModelNa31_2Input, ToPdfFileModel},
         polling_station::PollingStation,
         summary::ElectionSummary,
@@ -26,6 +26,10 @@ use tracing_subscriber::EnvFilter;
 /// Abacus API and asset server
 #[derive(Parser, Debug, Clone)]
 struct Args {
+    /// The committee category
+    #[arg(value_enum)]
+    committee_category: CommitteeCategory,
+
     /// Location of the database file, will be created if it doesn't exist
     #[arg(short, long, default_value = "db.sqlite")]
     database: String,
@@ -90,6 +94,7 @@ struct Args {
 impl From<Args> for GenerateElectionArgs {
     fn from(args: Args) -> Self {
         GenerateElectionArgs {
+            committee_category: args.committee_category,
             political_groups: RandomRange(args.political_groups),
             candidates_per_group: RandomRange(args.candidates_per_group),
             polling_stations: RandomRange(args.polling_stations),

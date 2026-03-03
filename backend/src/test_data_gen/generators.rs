@@ -25,8 +25,9 @@ use crate::{
         validation::{FieldPath, Validate, ValidationResults},
     },
     repository::{
-        committee_session_repo, data_entry_repo,
-        data_entry_repo::list_results_for_committee_session, election_repo, polling_station_repo,
+        committee_session_repo,
+        data_entry_repo::{self, list_results_for_committee_session},
+        election_repo, polling_station_repo,
         user_repo::UserId,
     },
     service::create_empty_data_entry,
@@ -83,36 +84,45 @@ pub async fn create_test_election(
     )
     .await?;
 
-    // generate the polling stations for the election
-    let polling_stations = generate_polling_stations(&mut rng, &election, &mut tx, &args).await;
+    // TODO: Once data entry is implemented for CSB (#2811), we don't need this check
+    let (polling_stations, data_entry_completed) = if args.committee_category
+        != CommitteeCategory::CSB
+    {
+        // generate the polling stations for the election
+        let polling_stations = generate_polling_stations(&mut rng, &election, &mut tx, &args).await;
+
+        if !polling_stations.is_empty() {
+            committee_session = committee_session_repo::change_status(
+                &mut tx,
+                committee_session.id,
+                CommitteeSessionStatus::InPreparation,
+            )
+            .await?;
+        }
+
+        let data_entry_completed = if args.with_data_entry && !polling_stations.is_empty() {
+            generate_data_entries(
+                &mut tx,
+                &mut rng,
+                args,
+                &committee_session,
+                &election,
+                &polling_stations,
+            )
+            .await?
+        } else {
+            false
+        };
+
+        (polling_stations, data_entry_completed)
+    } else {
+        (Vec::new(), false)
+    };
 
     info!(
         "Election generated with election id: {}, election name: '{}'",
         election.id, election.name
     );
-
-    if !polling_stations.is_empty() {
-        committee_session = committee_session_repo::change_status(
-            &mut tx,
-            committee_session.id,
-            CommitteeSessionStatus::InPreparation,
-        )
-        .await?;
-    }
-
-    let data_entry_completed = if args.with_data_entry && !polling_stations.is_empty() {
-        generate_data_entries(
-            &mut tx,
-            &mut rng,
-            args,
-            &committee_session,
-            &election,
-            &polling_stations,
-        )
-        .await?
-    } else {
-        false
-    };
 
     let results = if data_entry_completed {
         list_results_for_committee_session(&mut tx, committee_session.id).await?
@@ -165,7 +175,7 @@ fn generate_election(rng: &mut impl rand::RngExt, args: &GenerateElectionArgs) -
     // and put it all in the struct (generating some additional fields where needed)
     NewElection {
         name,
-        committee_category: CommitteeCategory::GSB,
+        committee_category: args.committee_category,
         counting_method: VoteCountingMethod::CSO,
         domain_id: super::data::domain_id(rng),
         election_id,
@@ -589,11 +599,14 @@ fn distribute_power_law(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{repository::election_repo, test_data_gen::RandomRange};
+    use crate::{
+        domain::election::CommitteeCategory, repository::election_repo, test_data_gen::RandomRange,
+    };
 
     #[sqlx::test]
     async fn test_create_test_election(pool: SqlitePool) {
         let args = GenerateElectionArgs {
+            committee_category: CommitteeCategory::GSB,
             political_groups: RandomRange(20..50),
             candidates_per_group: RandomRange(10..50),
             polling_stations: RandomRange(50..200),

@@ -8,7 +8,7 @@ import { ChoiceList } from "@/components/ui/CheckboxAndRadio/ChoiceList";
 import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { InputField } from "@/components/ui/InputField/InputField";
-import { type ElectionRole, electionRoleValues } from "@/types/generated/openapi";
+import { type CommitteeCategory, committeeCategoryValues } from "@/types/generated/openapi";
 import { StringFormData } from "@/utils/stringFormData.ts";
 
 const RANGE_HINT = "Gebruik notatie zoals 10..50 of 9..=45 of een enkel getal zoals 40";
@@ -35,7 +35,7 @@ type RangeFieldKey = (typeof RANGE_FIELDS)[number]["key"];
 type RangeFormState = Record<RangeFieldKey, string>;
 
 interface FormState extends RangeFormState {
-  election_role: ElectionRole;
+  election_role: CommitteeCategory;
   with_data_entry: boolean;
 }
 
@@ -46,7 +46,7 @@ const INITIAL_RANGE_STATE: RangeFormState = Object.fromEntries(
 
 const INITIAL_FORM_STATE: FormState = {
   ...INITIAL_RANGE_STATE,
-  election_role: electionRoleValues[0],
+  election_role: committeeCategoryValues[0],
   with_data_entry: true,
 };
 
@@ -74,9 +74,7 @@ export function GenerateTestElectionForm() {
         Object.assign(acc, { [field.key]: formState[field.key] ? formState[field.key] : field.placeholder }),
       {
         election_role,
-        // TODO: Once data entry is implemented for CSB (#2811), we don't need this check
-        with_data_entry: election_role === "CSB" ? false : formState.with_data_entry,
-        // with_data_entry: formState.with_data_entry,
+        with_data_entry: formState.with_data_entry,
       },
     );
 
@@ -103,14 +101,14 @@ export function GenerateTestElectionForm() {
     >
       <FormLayout>
         <ChoiceList>
-          {electionRoleValues.map((electionRole, index) => (
+          {committeeCategoryValues.map((committeeCategory, index) => (
             <ChoiceList.Radio
-              id={electionRole}
-              key={electionRole}
+              id={committeeCategory}
+              key={committeeCategory}
               name={"election_role"}
               defaultChecked={index === 0}
-              defaultValue={electionRole}
-              label={electionRole}
+              defaultValue={committeeCategory}
+              label={committeeCategory}
             />
           ))}
         </ChoiceList>

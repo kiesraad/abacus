@@ -4,7 +4,7 @@ use crate::domain::election::{Election, ElectionId, ElectionWithPoliticalGroups,
 
 pub async fn list(conn: &mut SqliteConnection) -> Result<Vec<Election>, sqlx::Error> {
     let elections: Vec<Election> = query_as(
-        "SELECT id, name, role, counting_method, election_id, location, domain_id, category, number_of_seats, number_of_voters, election_date, nomination_date FROM elections",
+        "SELECT id, name, committee_category, counting_method, election_id, location, domain_id, category, number_of_seats, number_of_voters, election_date, nomination_date FROM elections",
     )
     .fetch_all(conn)
     .await?;
@@ -30,7 +30,7 @@ pub async fn create(
         r#"
         INSERT INTO elections (
             name,
-            role,
+            committee_category,
             counting_method,
             election_id,
             location,
@@ -45,7 +45,7 @@ pub async fn create(
         RETURNING
             id,
             name,
-            role,
+            committee_category,
             counting_method,
             election_id,
             location,
@@ -59,7 +59,7 @@ pub async fn create(
         "#,
     )
     .bind(election.name)
-    .bind(election.role)
+    .bind(election.committee_category)
     .bind(election.counting_method)
     .bind(election.election_id)
     .bind(election.location)
@@ -88,7 +88,7 @@ pub async fn change_number_of_voters(
         RETURNING
             id as "id: ElectionId",
             name,
-            role as "role: _",
+            committee_category as "committee_category: _",
             counting_method as "counting_method: _", 
             election_id,
             location,

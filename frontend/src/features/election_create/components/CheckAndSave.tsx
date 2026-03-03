@@ -16,19 +16,19 @@ export function CheckAndSave() {
   const createPath: ELECTION_IMPORT_REQUEST_PATH = `/api/elections/import`;
   const { create } = useCrud<ElectionWithPoliticalGroups>({ createPath, throwAllErrors: true });
 
-  // if no election, election role or candidate data is found in the state, go back to the beginning
-  if (!state.election || !state.electionRole || !state.electionDefinitionData || !state.candidateDefinitionData) {
+  // if no election, committee category or candidate data is found in the state, go back to the beginning
+  if (!state.election || !state.committeeCategory || !state.electionDefinitionData || !state.candidateDefinitionData) {
     return <Navigate to="/elections/create" />;
   }
 
   // GSB: if no counting method is found in the state, go back to the beginning
-  if (state.electionRole === "GSB" && !state.countingMethod) {
+  if (state.committeeCategory === "GSB" && !state.countingMethod) {
     return <Navigate to="/elections/create" />;
   }
 
   function handleSubmit() {
     let data = {
-      role: state.electionRole,
+      committee_category: state.committeeCategory,
       election_data: state.electionDefinitionData,
       election_hash: state.electionDefinitionHash,
       candidate_data: state.candidateDefinitionData,
@@ -39,7 +39,7 @@ export function CheckAndSave() {
       number_of_voters: state.numberOfVoters,
     };
 
-    if (state.electionRole === "CSB") {
+    if (state.committeeCategory === "CSB") {
       data = {
         ...data,
         polling_station_data: undefined,
@@ -53,7 +53,9 @@ export function CheckAndSave() {
       if (isSuccess(result)) {
         pushMessage({
           title: t("election.message.election_created", {
-            role: state.electionRole ? t(`electoral_committee_role.roles.${state.electionRole}.abbreviation`) : "GSB",
+            committee_category: state.committeeCategory
+              ? t(`committee_category.${state.committeeCategory}.abbreviation`)
+              : "GSB",
             name: result.data.name,
           }),
         });
@@ -71,7 +73,7 @@ export function CheckAndSave() {
           <strong>{t("election.singular")}:</strong> {state.election.name}
         </li>
         <li id="electoral-committee-role">
-          <strong>{t("role").toLowerCase()}:</strong> {t(`electoral_committee_role.roles.${state.electionRole}.short`)}
+          <strong>{t("role").toLowerCase()}:</strong> {t(`committee_category.${state.committeeCategory}.short`)}
         </li>
         <li>
           <strong>{t("area_designation")}:</strong> {state.election.location}

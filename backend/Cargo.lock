@@ -14,6 +14,7 @@ dependencies = [
  "chrono",
  "clap",
  "cookie",
+ "eml-nl",
  "http-body-util",
  "hyper",
  "memory-serve",
@@ -960,6 +961,19 @@ name = "embedded-io"
 version = "0.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "edd0f118536f44f5ccd48bcb8b111bdc3de888b58c74639dfb034a357d0f206d"
+
+[[package]]
+name = "eml-nl"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2ecf0fe14ed5bb8b63871c5540c5d83e11fa3e0fd138c4e5805872eca430a925"
+dependencies = [
+ "chrono",
+ "quick-xml 0.38.4",
+ "regex",
+ "thiserror",
+ "tracing",
+]
 
 [[package]]
 name = "enum-ordinalize"

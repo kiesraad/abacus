@@ -4734,6 +4734,14 @@
         },
         "additionalProperties": false
       },
+      "CommitteeCategory": {
+        "type": "string",
+        "description": "Committee category",
+        "enum": [
+          "GSB",
+          "CSB"
+        ]
+      },
       "CommitteeSession": {
         "type": "object",
         "description": "Committee session",
@@ -5130,7 +5138,7 @@
         "required": [
           "id",
           "name",
-          "role",
+          "committee_category",
           "counting_method",
           "election_id",
           "location",
@@ -5144,6 +5152,9 @@
         "properties": {
           "category": {
             "$ref": "#/components/schemas/ElectionCategory"
+          },
+          "committee_category": {
+            "$ref": "#/components/schemas/CommitteeCategory"
           },
           "counting_method": {
             "$ref": "#/components/schemas/VoteCountingMethod"
@@ -5180,9 +5191,6 @@
             "type": "integer",
             "format": "int32",
             "minimum": 0
-          },
-          "role": {
-            "$ref": "#/components/schemas/ElectionRole"
           }
         },
         "additionalProperties": false
@@ -5223,10 +5231,10 @@
               {
                 "type": "object",
                 "required": [
-                  "role"
+                  "committee_category"
                 ],
                 "properties": {
-                  "role": {
+                  "committee_category": {
                     "type": "string",
                     "enum": [
                       "GSB"
@@ -5244,10 +5252,10 @@
               {
                 "type": "object",
                 "required": [
-                  "role"
+                  "committee_category"
                 ],
                 "properties": {
-                  "role": {
+                  "committee_category": {
                     "type": "string",
                     "enum": [
                       "CSB"
@@ -5269,10 +5277,10 @@
               {
                 "type": "object",
                 "required": [
-                  "role"
+                  "committee_category"
                 ],
                 "properties": {
-                  "role": {
+                  "committee_category": {
                     "type": "string",
                     "enum": [
                       "GSB"
@@ -5290,10 +5298,10 @@
               {
                 "type": "object",
                 "required": [
-                  "role"
+                  "committee_category"
                 ],
                 "properties": {
-                  "role": {
+                  "committee_category": {
                     "type": "string",
                     "enum": [
                       "CSB"
@@ -5315,10 +5323,10 @@
               {
                 "type": "object",
                 "required": [
-                  "role"
+                  "committee_category"
                 ],
                 "properties": {
-                  "role": {
+                  "committee_category": {
                     "type": "string",
                     "enum": [
                       "GSB"
@@ -5336,10 +5344,10 @@
               {
                 "type": "object",
                 "required": [
-                  "role"
+                  "committee_category"
                 ],
                 "properties": {
-                  "role": {
+                  "committee_category": {
                     "type": "string",
                     "enum": [
                       "CSB"
@@ -5431,14 +5439,6 @@
           }
         },
         "additionalProperties": false
-      },
-      "ElectionRole": {
-        "type": "string",
-        "description": "Election role",
-        "enum": [
-          "GSB",
-          "CSB"
-        ]
       },
       "ElectionStatusResponse": {
         "type": "object",
@@ -5550,7 +5550,7 @@
         "required": [
           "id",
           "name",
-          "role",
+          "committee_category",
           "counting_method",
           "election_id",
           "location",
@@ -5565,6 +5565,9 @@
         "properties": {
           "category": {
             "$ref": "#/components/schemas/ElectionCategory"
+          },
+          "committee_category": {
+            "$ref": "#/components/schemas/CommitteeCategory"
           },
           "counting_method": {
             "$ref": "#/components/schemas/VoteCountingMethod"
@@ -5607,9 +5610,6 @@
             "items": {
               "$ref": "#/components/schemas/PoliticalGroup"
             }
-          },
-          "role": {
-            "$ref": "#/components/schemas/ElectionRole"
           }
         },
         "additionalProperties": false
@@ -5632,6 +5632,7 @@
           "DataEntryGetNotAllowed",
           "DataEntryNotAllowed",
           "EmlImportError",
+          "EmlError",
           "EntryNotFound",
           "EntryNotUnique",
           "Forbidden",
@@ -6142,7 +6143,7 @@
         "description": "Election request",
         "required": [
           "name",
-          "role",
+          "committee_category",
           "counting_method",
           "election_id",
           "location",
@@ -6157,6 +6158,9 @@
         "properties": {
           "category": {
             "$ref": "#/components/schemas/ElectionCategory"
+          },
+          "committee_category": {
+            "$ref": "#/components/schemas/CommitteeCategory"
           },
           "counting_method": {
             "$ref": "#/components/schemas/VoteCountingMethod"
@@ -6196,9 +6200,6 @@
             "items": {
               "$ref": "#/components/schemas/PoliticalGroup"
             }
-          },
-          "role": {
-            "$ref": "#/components/schemas/ElectionRole"
           }
         },
         "additionalProperties": false

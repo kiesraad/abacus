@@ -254,9 +254,9 @@ export const electionListMockResponse: ElectionListResponse = {
     {
       id: 1,
       name: "Gemeenteraadsverkiezingen 2026",
-      role: "GSB",
+      committee_category: "GSB",
       counting_method: "CSO",
-      election_id: "Heemdamseburg_2024",
+      election_id: "GR2024_Heemdamseburg",
       location: "Heemdamseburg",
       domain_id: "0035",
       category: "Municipal",
@@ -268,9 +268,9 @@ export const electionListMockResponse: ElectionListResponse = {
     {
       id: 2,
       name: "Gemeenteraadsverkiezingen 2026",
-      role: "CSB",
+      committee_category: "CSB",
       counting_method: "CSO",
-      election_id: "Heemdamseburg_2024",
+      election_id: "GR2024_Heemdamseburg",
       location: "Heemdamseburg",
       domain_id: "0035",
       category: "Municipal",
@@ -379,18 +379,17 @@ export const csbElectionDetailsMockResponse: Required<ElectionDetailsResponse> =
 export const electionMockData = electionDetailsMockResponse.election;
 export const newElectionMockData = {
   ...electionDetailsMockResponse.election,
-  polling_stations: pollingStationMockData,
-} as Required<NewElection>;
+} satisfies Required<NewElection>;
 
 export const newCSBElectionMockData = {
   ...csbElectionDetailsMockResponse.election,
-  role: "CSB",
-} as Required<NewElection>;
+  committee_category: "CSB",
+} satisfies Required<NewElection>;
 
 export const electionImportMockResponse: ElectionWithPoliticalGroups = {
   id: 2,
   name: "Gemeenteraad Test 2022",
-  role: "GSB",
+  committee_category: "GSB",
   counting_method: "CSO",
   election_id: "GR2022_Test",
   location: "Test",
@@ -406,7 +405,7 @@ export const electionImportMockResponse: ElectionWithPoliticalGroups = {
 export const csbElectionImportMockResponse: ElectionWithPoliticalGroups = {
   id: 2,
   name: "Gemeenteraad Test 2022",
-  role: "CSB",
+  committee_category: "CSB",
   counting_method: "CSO",
   election_id: "GR2022_Test",
   location: "Test",
@@ -424,19 +423,19 @@ export const gsbElectionImportValidateMockResponse = (
   number_of_voters: number = 0,
 ): ElectionDefinitionValidateResponse => {
   return {
-    role: "GSB",
+    committee_category: "GSB",
     hash: {
       chunks: [
         "asdf",
         "qwer",
-        "zxcv",
+        "",
         "tyui",
         "ghjk",
         "bnml",
         "1234",
         "5678",
         "8765",
-        "gfsd",
+        "",
         "a345",
         "qwer",
         "lgmg",
@@ -454,19 +453,19 @@ export const gsbElectionImportValidateMockResponse = (
 };
 
 export const csbElectionImportValidateMockResponse: ElectionDefinitionValidateResponse = {
-  role: "CSB",
+  committee_category: "CSB",
   hash: {
     chunks: [
       "asdf",
       "qwer",
-      "zxcv",
+      "",
       "tyui",
       "ghjk",
       "bnml",
       "1234",
       "5678",
       "8765",
-      "gfsd",
+      "",
       "a345",
       "qwer",
       "lgmg",

@@ -17,7 +17,7 @@ id!(ElectionId);
 pub struct Election {
     pub id: ElectionId,
     pub name: String,
-    pub role: ElectionRole,
+    pub committee_category: CommitteeCategory,
     pub counting_method: VoteCountingMethod,
     pub election_id: String,
     pub location: String,
@@ -37,7 +37,7 @@ pub struct Election {
 pub struct ElectionWithPoliticalGroups {
     pub id: ElectionId,
     pub name: String,
-    pub role: ElectionRole,
+    pub committee_category: CommitteeCategory,
     pub counting_method: VoteCountingMethod,
     pub election_id: String,
     pub location: String,
@@ -58,7 +58,7 @@ impl From<ElectionWithPoliticalGroups> for Election {
         Self {
             id: value.id,
             name: value.name,
-            role: value.role,
+            committee_category: value.committee_category,
             counting_method: value.counting_method,
             election_id: value.election_id,
             location: value.location,
@@ -89,7 +89,7 @@ impl IntoResponse for ElectionWithPoliticalGroups {
 #[serde(deny_unknown_fields)]
 pub struct NewElection {
     pub name: String,
-    pub role: ElectionRole,
+    pub committee_category: CommitteeCategory,
     pub counting_method: VoteCountingMethod,
     pub election_id: String,
     pub location: String,
@@ -128,11 +128,11 @@ impl ElectionCategory {
     }
 }
 
-/// Election role
+/// Committee category
 #[derive(
     Serialize, Deserialize, strum::Display, ToSchema, Clone, Copy, Debug, PartialEq, Eq, Hash, Type,
 )]
-pub enum ElectionRole {
+pub enum CommitteeCategory {
     /// Gemeentelijk stembureau
     GSB,
     /// Centraal stembureau
@@ -233,7 +233,7 @@ pub(crate) mod tests {
         ElectionWithPoliticalGroups {
             id: ElectionId::from(1),
             name: "Test".to_string(),
-            role: ElectionRole::GSB,
+            committee_category: CommitteeCategory::GSB,
             counting_method: VoteCountingMethod::CSO,
             election_id: "Test_2023".to_string(),
             location: "Test".to_string(),

@@ -22,7 +22,7 @@ async fn test_gsb_election_validate_valid(pool: SqlitePool) {
         .post(&url)
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
-          "role": "GSB",
+          "committee_category": "GSB",
           "election_data": include_str!("../src/eml/tests/eml110a_test.eml.xml"),
         }))
         .send()
@@ -32,11 +32,11 @@ async fn test_gsb_election_validate_valid(pool: SqlitePool) {
     // Ensure the response is what we expect
     assert_eq!(response.status(), StatusCode::OK);
     let body: serde_json::Value = response.json().await.unwrap();
-    assert_eq!(body["role"], "GSB");
+    assert_eq!(body["committee_category"], "GSB");
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
-async fn test_gsb_election_validate_invalid_election_subcategory(pool: SqlitePool) {
+async fn test_gsb_election_validate_invalid_election_only_municipal_supported(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     let url = format!("http://{addr}/api/elections/import/validate");
@@ -45,8 +45,8 @@ async fn test_gsb_election_validate_invalid_election_subcategory(pool: SqlitePoo
         .post(&url)
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
-          "role": "GSB",
-          "election_data": include_str!("../src/eml/tests/eml110a_invalid_election_subcategory.eml.xml"),
+          "committee_category": "GSB",
+          "election_data": include_str!("../src/eml/tests/eml110a_invalid_election_only_municipal_supported.eml.xml"),
         }))
         .send()
         .await
@@ -66,7 +66,7 @@ async fn test_csb_election_validate_valid(pool: SqlitePool) {
         .post(&url)
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
-          "role": "CSB",
+          "committee_category": "CSB",
           "election_data": include_str!("../src/eml/tests/eml110a_test.eml.xml"),
         }))
         .send()
@@ -75,8 +75,8 @@ async fn test_csb_election_validate_valid(pool: SqlitePool) {
 
     assert_eq!(response.status(), StatusCode::OK);
     let body: serde_json::Value = response.json().await.unwrap();
-    assert_eq!(body["role"], "CSB");
-    assert_eq!(body["election"]["role"], "CSB");
+    assert_eq!(body["committee_category"], "CSB");
+    assert_eq!(body["election"]["committee_category"], "CSB");
     // CSB responses don't have these GSB-specific fields
     assert!(body.get("number_of_voters").is_none());
     assert!(body.get("polling_stations").is_none());
@@ -96,7 +96,7 @@ async fn test_csb_election_validate_with_candidates(pool: SqlitePool) {
         .post(&url)
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
-            "role": "CSB",
+            "committee_category": "CSB",
             "election_hash": [
                 "4291", "a4e7", "c76e", "ed19",
                 "476b", "ae90", "3882", "c2dc",
@@ -112,8 +112,8 @@ async fn test_csb_election_validate_with_candidates(pool: SqlitePool) {
 
     assert_eq!(response.status(), StatusCode::OK);
     let body: serde_json::Value = response.json().await.unwrap();
-    assert_eq!(body["role"], "CSB");
-    assert_eq!(body["election"]["role"], "CSB");
+    assert_eq!(body["committee_category"], "CSB");
+    assert_eq!(body["election"]["committee_category"], "CSB");
     // CSB responses don't have number_of_voters field
     assert!(body.get("number_of_voters").is_none());
 }
@@ -128,7 +128,7 @@ async fn test_csb_election_import_save(pool: SqlitePool) {
         .post(&url)
         .header("cookie", &admin_cookie)
         .json(&serde_json::json!({
-            "role": "CSB",
+            "committee_category": "CSB",
             "election_hash": [
                 "4291", "a4e7", "c76e", "ed19",
                 "476b", "ae90", "3882", "c2dc",
@@ -150,15 +150,15 @@ async fn test_csb_election_import_save(pool: SqlitePool) {
 
     assert_eq!(response.status(), StatusCode::CREATED);
     let body: serde_json::Value = response.json().await.unwrap();
-    assert_eq!(body["role"], "CSB");
+    assert_eq!(body["committee_category"], "CSB");
     let election_details = get_election_details(
         &addr,
         &admin_cookie,
         u32::try_from(body["id"].as_u64().unwrap()).unwrap(),
     )
     .await;
-    assert_eq!(election_details["election"]["role"], "CSB");
-    assert_eq!(election_details["election"]["number_of_voters"], 0);
+    assert_eq!(election_details["election"]["committee_category"], "CSB");
+    assert_eq!(election_details["election"]["number_of_voters"], 1);
     assert_eq!(
         election_details["current_committee_session"]["status"],
         "created"
@@ -166,7 +166,7 @@ async fn test_csb_election_import_save(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
-async fn test_election_validate_invalid_election_number_of_seats(pool: SqlitePool) {
+async fn test_election_validate_number_of_seats_out_of_range(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     let url = format!("http://{addr}/api/elections/import/validate");
@@ -175,8 +175,8 @@ async fn test_election_validate_invalid_election_number_of_seats(pool: SqlitePoo
         .post(&url)
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
-          "role": "GSB",
-          "election_data": include_str!("../src/eml/tests/eml110a_invalid_election_number_of_seats.eml.xml"),
+          "committee_category": "GSB",
+          "election_data": include_str!("../src/eml/tests/eml110a_invalid_election_number_of_seats_out_of_range.eml.xml"),
         }))
         .send()
         .await
@@ -187,7 +187,7 @@ async fn test_election_validate_invalid_election_number_of_seats(pool: SqlitePoo
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
-async fn test_election_validate_invalid_xml(pool: SqlitePool) {
+async fn test_election_validate_missing_election_domain(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     let url = format!("http://{addr}/api/elections/import/validate");
@@ -196,8 +196,8 @@ async fn test_election_validate_invalid_xml(pool: SqlitePool) {
         .post(&url)
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
-          "role": "GSB",
-          "election_data": include_str!("../src/eml/tests/eml110a_invalid_xml.eml.xml"),
+          "committee_category": "GSB",
+          "election_data": include_str!("../src/eml/tests/eml110a_invalid_election_missing_election_domain.eml.xml"),
         }))
         .send()
         .await
@@ -216,7 +216,7 @@ async fn test_election_candidates_validate_valid(pool: SqlitePool) {
         .post(&url)
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
-            "role": "GSB",
+            "committee_category": "GSB",
             "candidate_data": include_str!("../src/eml/tests/eml230b_test.eml.xml"),
             "election_hash": [
                 "4291", "a4e7", "c76e", "ed19",
@@ -244,7 +244,7 @@ async fn test_election_candidates_validate_wrong_file(pool: SqlitePool) {
         .post(&url)
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
-            "role": "GSB",
+            "committee_category": "GSB",
             "election_hash": [
                 "4291", "a4e7", "c76e", "ed19",
                 "476b", "ae90", "3882", "c2dc",
@@ -271,7 +271,7 @@ async fn test_election_candidates_validate_missing_authority(pool: SqlitePool) {
         .post(&url)
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
-            "role": "GSB",
+            "committee_category": "GSB",
             "election_hash": [
                 "4291", "a4e7", "c76e", "ed19",
                 "476b", "ae90", "3882", "c2dc",
@@ -298,7 +298,7 @@ async fn test_election_candidates_validate_wrong_election_type(pool: SqlitePool)
         .post(&url)
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
-            "role": "GSB",
+            "committee_category": "GSB",
             "election_hash": [
                 "4291", "a4e7", "c76e", "ed19",
                 "476b", "ae90", "3882", "c2dc",
@@ -325,7 +325,7 @@ async fn test_election_candidates_validate_wrong_election_id(pool: SqlitePool) {
         .post(&url)
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
-            "role": "GSB",
+            "committee_category": "GSB",
             "election_hash": [
                 "4291", "a4e7", "c76e", "ed19",
                 "476b", "ae90", "3882", "c2dc",
@@ -352,7 +352,7 @@ async fn test_election_candidates_validate_missing_election_domain(pool: SqliteP
         .post(&url)
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
-            "role": "GSB",
+            "committee_category": "GSB",
             "election_hash": [
                 "4291", "a4e7", "c76e", "ed19",
                 "476b", "ae90", "3882", "c2dc",
@@ -379,7 +379,7 @@ async fn test_election_candidates_validate_wrong_domain_id(pool: SqlitePool) {
         .post(&url)
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
-            "role": "GSB",
+            "committee_category": "GSB",
             "election_hash": [
                 "4291", "a4e7", "c76e", "ed19",
                 "476b", "ae90", "3882", "c2dc",
@@ -406,7 +406,7 @@ async fn test_election_candidates_validate_wrong_election_date(pool: SqlitePool)
         .post(&url)
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
-            "role": "GSB",
+            "committee_category": "GSB",
             "election_hash": [
                 "4291", "a4e7", "c76e", "ed19",
                 "476b", "ae90", "3882", "c2dc",
@@ -433,7 +433,7 @@ async fn test_election_candidates_validate_empty_affiliates(pool: SqlitePool) {
         .post(&url)
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
-            "role": "GSB",
+            "committee_category": "GSB",
             "election_hash": [
                 "4291", "a4e7", "c76e", "ed19",
                 "476b", "ae90", "3882", "c2dc",
@@ -460,7 +460,7 @@ async fn test_election_candidates_validate_empty_candidates(pool: SqlitePool) {
         .post(&url)
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
-            "role": "GSB",
+            "committee_category": "GSB",
             "election_hash": [
                 "4291", "a4e7", "c76e", "ed19",
                 "476b", "ae90", "3882", "c2dc",
@@ -489,7 +489,7 @@ async fn test_election_import_save_with_polling_stations(pool: SqlitePool) {
         .post(&url)
         .header("cookie", &admin_cookie)
         .json(&serde_json::json!({
-            "role": "GSB",
+            "committee_category": "GSB",
             "election_hash": [
                 "4291", "a4e7", "c76e", "ed19",
                 "476b", "ae90", "3882", "c2dc",
@@ -539,7 +539,7 @@ async fn test_election_import_save_without_polling_stations(pool: SqlitePool) {
         .post(&url)
         .header("cookie", &admin_cookie)
         .json(&serde_json::json!({
-            "role": "GSB",
+            "committee_category": "GSB",
             "election_hash": [
                 "4291", "a4e7", "c76e", "ed19",
                 "476b", "ae90", "3882", "c2dc",
@@ -587,7 +587,7 @@ async fn test_election_import_save_empty_stubs(pool: SqlitePool) {
         .post(&url)
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
-            "role": "GSB",
+            "committee_category": "GSB",
             "election_hash": [
                 "4291", "a4e7", "c76e", "ed19",
                 "", "ae90", "3882", "c2dc",
@@ -624,7 +624,7 @@ async fn test_election_import_save_empty_candidate_stubs(pool: SqlitePool) {
         .post(&url)
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
-            "role": "GSB",
+            "committee_category": "GSB",
             "election_hash": [
                 "4291", "a4e7", "c76e", "ed19",
                 "476b", "ae90", "3882", "c2dc",
@@ -661,7 +661,7 @@ async fn test_election_import_save_wrong_hash(pool: SqlitePool) {
         .post(&url)
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
-            "role": "GSB",
+            "committee_category": "GSB",
             "election_hash": [
                 "4291", "a4e7", "c76e", "ed19",
                 "1234", "ae90", "3882", "c2dc",
@@ -698,7 +698,7 @@ async fn test_election_import_missing_file_name(pool: SqlitePool) {
         .post(&url)
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
-            "role": "GSB",
+            "committee_category": "GSB",
             "election_hash": [
                 "84c9", "caba", "ff33", "6c42",
                 "9825", "b20c", "2ba9", "1ceb",
@@ -733,7 +733,7 @@ async fn test_election_polling_stations_not_matching_election(pool: SqlitePool) 
         .post(&url)
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
-          "role": "GSB",
+          "committee_category": "GSB",
           "election_hash": [
                 "4291", "a4e7", "c76e", "ed19",
                 "476b", "ae90", "3882", "c2dc",
@@ -772,7 +772,7 @@ async fn test_election_polling_stations_validate_valid(pool: SqlitePool) {
         .post(&url)
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
-          "role": "GSB",
+          "committee_category": "GSB",
           "election_hash": [
                 "4291", "a4e7", "c76e", "ed19",
                 "476b", "ae90", "3882", "c2dc",
@@ -811,7 +811,7 @@ async fn test_election_polling_stations_validate_missing_filename(pool: SqlitePo
         .post(&url)
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
-          "role": "GSB",
+          "committee_category": "GSB",
           "election_hash": [
               "84c9", "caba", "ff33", "6c42",
               "9825", "b20c", "2ba9", "1ceb",
@@ -845,7 +845,7 @@ async fn test_election_polling_stations_validate_invalid(pool: SqlitePool) {
         .post(&url)
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
-          "role": "GSB",
+          "committee_category": "GSB",
           "election_hash": [
                 "4291", "a4e7", "c76e", "ed19",
                 "476b", "ae90", "3882", "c2dc",

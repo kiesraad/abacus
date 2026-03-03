@@ -8,12 +8,12 @@ use abacus::{
             DifferenceCountsCompareVotesCastAdmittedVoters, DifferencesCounts, ExtraInvestigation,
             PollingStationResults, VotersCounts, VotesCounts, YesNo,
         },
+        data_entry_status::{CurrentDataEntry, DataEntryStatus, DataEntryTransitionError},
         election::{
-            ElectionCategory, ElectionId, ElectionRole, ElectionWithPoliticalGroups,
+            CommitteeCategory, ElectionCategory, ElectionId, ElectionWithPoliticalGroups,
             VoteCountingMethod,
         },
         polling_station::{PollingStation, PollingStationId, PollingStationType},
-        data_entry_status::{CurrentDataEntry, DataEntryStatus, DataEntryTransitionError},
     },
     repository::user_repo::UserId,
 };
@@ -111,7 +111,7 @@ fn election() -> ElectionWithPoliticalGroups {
     ElectionWithPoliticalGroups {
         id: ElectionId::from(1),
         name: "Test election".to_string(),
-        role: ElectionRole::GSB,
+        committee_category: CommitteeCategory::GSB,
         counting_method: VoteCountingMethod::CSO,
         election_id: "Test_2025".to_string(),
         location: "Test locatie".to_string(),

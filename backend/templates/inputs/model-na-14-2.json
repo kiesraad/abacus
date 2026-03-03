@@ -18,7 +18,7 @@
   "election": {
     "id": 4,
     "name": "Gemeenteraad Hovenerwoud 2022",
-    "role": "GSB",
+    "committee_category": "GSB",
     "counting_method": "CSO",
     "election_id": "Hovenerwoud_2022",
     "location": "Hovenerwoud",

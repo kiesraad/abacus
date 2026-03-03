@@ -1,4 +1,4 @@
-INSERT INTO elections (id, name, role, counting_method, election_id, location, domain_id, category, number_of_seats, number_of_voters, election_date, nomination_date, political_groups)
+INSERT INTO elections (id, name, committee_category, counting_method, election_id, location, domain_id, category, number_of_seats, number_of_voters, election_date, nomination_date, political_groups)
 VALUES (6, 'Nieuwe Verkiezing', 'GSB', 'CSO','KleinDorp_2024', 'KleinDorp', '0123', 'Municipal', 29, 2500, '2024-12-31', '2024-12-01',
         '[
           {

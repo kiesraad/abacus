@@ -101,7 +101,12 @@ export function ElectionHomePage() {
         <Modal title={`${t("election_management.delete_session")}?`} onClose={toggleDeleteCommitteeSessionModal}>
           <p>
             {t("election_management.delete_session_are_you_sure", {
-              sessionLabel: committeeSessionLabel(election.role, currentCommitteeSession.number, true, true),
+              sessionLabel: committeeSessionLabel(
+                election.committee_category,
+                currentCommitteeSession.number,
+                true,
+                true,
+              ),
             })}
           </p>
           <nav>
@@ -126,7 +131,12 @@ export function ElectionHomePage() {
         <Modal title={t("election_management.delete_investigations_first")} onClose={toggleDeleteCommitteeSessionModal}>
           <p>
             {t("election_management.delete_investigations_first_are_you_sure", {
-              sessionLabel: committeeSessionLabel(election.role, currentCommitteeSession.number, true, true),
+              sessionLabel: committeeSessionLabel(
+                election.committee_category,
+                currentCommitteeSession.number,
+                true,
+                true,
+              ),
             })}
           </p>
           <nav>
@@ -139,7 +149,7 @@ export function ElectionHomePage() {
           </nav>
         </Modal>
       )}
-      {election.role === "GSB" && pollingStations.length === 0 && (
+      {election.committee_category === "GSB" && pollingStations.length === 0 && (
         <Alert type="warning">
           <strong className="heading-md" id="noPollingStationsWarningAlertTitle">
             {t("election_management.no_polling_stations")}
@@ -155,7 +165,7 @@ export function ElectionHomePage() {
           <div className="mb-xl">
             <div>
               <h2>
-                {t(`electoral_committee_role.roles.${election.role}.short`)} {election.location}
+                {t(`committee_category.${election.committee_category}.short`)} {election.location}
               </h2>
             </div>
           </div>
@@ -165,7 +175,7 @@ export function ElectionHomePage() {
                 <CommitteeSessionCard
                   key={committeeSession.id}
                   committeeSession={committeeSession}
-                  electionRole={election.role}
+                  committeeCategory={election.committee_category}
                   isCurrentSession={index === 0}
                 />
               ))}
@@ -185,7 +195,7 @@ export function ElectionHomePage() {
               numberOfPollingStations={pollingStations.length}
             />
           </div>
-          {election.role === "GSB" &&
+          {election.committee_category === "GSB" &&
             (currentCommitteeSession.number === 1 ? (
               <div className={cn(cls.downloadModels, "mt-xl")}>
                 <h3 className={cls.tableTitle}>{t("election_management.empty_documents_title")}</h3>

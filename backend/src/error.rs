@@ -7,6 +7,7 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
 };
+use eml_nl::EMLError;
 use hyper::header::InvalidHeaderValue;
 use quick_xml::{DeError, SeError};
 use serde::{Deserialize, Serialize};
@@ -18,7 +19,7 @@ use crate::{
     api::middleware::authentication::error::AuthenticationError,
     domain::{committee_session::CommitteeSessionError, validation::DataError},
     eml::EMLImportError,
-    service::DataEntryServiceError,
+    service::{DataEntryServiceError, InvestigationServiceError},
 };
 use pdf_gen::{PdfGenError, zip::ZipResponseError};
 
@@ -40,6 +41,7 @@ pub enum ErrorReference {
     DataEntryGetNotAllowed,
     DataEntryNotAllowed,
     EmlImportError,
+    EmlError,
     EntryNotFound,
     EntryNotUnique,
     Forbidden,
@@ -101,6 +103,7 @@ pub enum APIError {
     ContentTooLarge(String, ErrorReference),
     DataIntegrityError(String),
     EmlImportError(EMLImportError),
+    EmlError(EMLError),
     InvalidData(DataError),
     InvalidHeaderValue,
     InvalidHashError,
@@ -376,6 +379,13 @@ impl IntoResponse for APIError {
                     to_error("EML import error", ErrorReference::EmlImportError, false),
                 )
             }
+            APIError::EmlError(err) => {
+                error!("Error with EML file: {:?}", err);
+                (
+                    StatusCode::BAD_REQUEST,
+                    to_error("EML error", ErrorReference::EmlError, false),
+                )
+            }
             APIError::Apportionment(err) => {
                 error!("Apportionment error: {:?}", err);
 
@@ -539,6 +549,14 @@ impl From<DataEntryServiceError> for APIError {
     fn from(err: DataEntryServiceError) -> Self {
         match err {
             DataEntryServiceError::DatabaseError(e) => e.into(),
+        }
+    }
+}
+
+impl From<InvestigationServiceError> for APIError {
+    fn from(err: InvestigationServiceError) -> Self {
+        match err {
+            InvestigationServiceError::DatabaseError(e) => e.into(),
         }
     }
 }

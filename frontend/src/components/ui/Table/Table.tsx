@@ -1,6 +1,8 @@
 import type { ReactNode, TableHTMLAttributes } from "react";
 import { type To, useNavigate } from "react-router";
+import type { DisplayFraction } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
+import { getFractionInteger, getFractionWithoutInteger } from "@/utils/fraction";
 import cls from "./Table.module.css";
 
 interface TableProps extends TableHTMLAttributes<HTMLTableElement> {
@@ -23,6 +25,7 @@ Table.ClickRow = ClickRow;
 Table.TotalRow = TotalRow;
 Table.Cell = Cell;
 Table.NumberCell = NumberCell;
+Table.DisplayFractionCells = DisplayFractionCells;
 
 function Header({ children, className }: { children: ReactNode; className?: string }) {
   return (
@@ -119,5 +122,16 @@ function NumberCell({ children, colSpan, className }: { children?: ReactNode; co
     <td colSpan={colSpan} className={cn(cls.numberCell, className)}>
       {children}
     </td>
+  );
+}
+
+function DisplayFractionCells({ children, className }: { children: DisplayFraction | undefined; className?: string }) {
+  return (
+    <>
+      <td className={cn(cls.integerCell, "font-number", className)}>{children && getFractionInteger(children)}</td>
+      <td className={cn(cls.fractionCell, "font-number", className)}>
+        {children && getFractionWithoutInteger(children)}
+      </td>
+    </>
   );
 }

@@ -232,17 +232,29 @@ async fn test_partials_update(pool: SqlitePool) {
     assert_eq!(investigations[0]["reason"], "Partially updated reason");
     assert!(investigations[0]["findings"].is_null());
 
+    // Conclude the investigation
+    assert_eq!(
+        conclude_investigation(
+            &addr,
+            polling_station_id,
+            Some(serde_json::json!({"findings": "Initial findings", "corrected_results": false})),
+        )
+        .await
+        .status(),
+        StatusCode::OK
+    );
+
+    // Update reason + findings on a concluded investigation
     let updated = update_investigation(
         &addr,
         polling_station_id,
         Some(serde_json::json!({
             "reason": "Partially updated reason",
-            "findings": "Partially updated findings"
+            "findings": "Partially updated findings",
+            "corrected_results": false
         })),
     )
     .await;
-
-    // Update only the findings
     assert_eq!(updated.status(), StatusCode::OK);
 
     let election_details =
@@ -252,18 +264,20 @@ async fn test_partials_update(pool: SqlitePool) {
     assert_eq!(investigations[0]["polling_station_id"], polling_station_id);
     assert_eq!(investigations[0]["reason"], "Partially updated reason");
     assert_eq!(investigations[0]["findings"], "Partially updated findings");
+    assert_eq!(investigations[0]["corrected_results"], false);
 
+    // Change corrected_results to true on a concluded investigation
     let updated = update_investigation(
         &addr,
         polling_station_id,
         Some(serde_json::json!({
             "reason": "Partially updated reason",
+            "findings": "Partially updated findings",
             "corrected_results": true
         })),
     )
     .await;
 
-    // Update only the corrected_results
     assert_eq!(updated.status(), StatusCode::OK);
 
     let election_details =
@@ -272,7 +286,7 @@ async fn test_partials_update(pool: SqlitePool) {
     assert_eq!(investigations.len(), 1);
     assert_eq!(investigations[0]["polling_station_id"], polling_station_id);
     assert_eq!(investigations[0]["reason"], "Partially updated reason");
-    assert!(investigations[0]["findings"].is_null());
+    assert_eq!(investigations[0]["findings"], "Partially updated findings");
     assert_eq!(investigations[0]["corrected_results"], true);
 }
 
@@ -898,18 +912,6 @@ async fn test_completed_to_data_entry_on_update(pool: SqlitePool) {
         &addr,
         true,
         || update_investigation(&addr, 9, None),
-        StatusCode::OK,
-    )
-    .await;
-}
-
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
-async fn test_completed_to_data_entry_on_conclude(pool: SqlitePool) {
-    let addr = serve_api(pool).await;
-    check_completed_to_data_entry_on(
-        &addr,
-        true,
-        || conclude_investigation(&addr, 9, None),
         StatusCode::OK,
     )
     .await;

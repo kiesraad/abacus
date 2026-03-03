@@ -22,7 +22,7 @@ import { getRouter, type Router } from "@/testing/router";
 import { overrideOnce, server } from "@/testing/server";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 import { screen, setupTestRouter, waitFor } from "@/testing/test-utils";
-import type { ElectionRole } from "@/types/generated/openapi";
+import type { CommitteeCategory } from "@/types/generated/openapi";
 import { electionCreateRoutes } from "../routes";
 
 const Providers = ({
@@ -71,9 +71,9 @@ function renderWithRouter() {
  * Helper function; navigate to /elections/create
  * and upload an election definition.
  */
-async function uploadElectionDefinition(router: Router, file: File, electionRole: ElectionRole = "GSB") {
+async function uploadElectionDefinition(router: Router, file: File, committeeCategory: CommitteeCategory = "GSB") {
   const user = userEvent.setup();
-  if (electionRole === "CSB") {
+  if (committeeCategory === "CSB") {
     overrideOnce("post", "/api/elections/import/validate", 200, csbElectionImportValidateMockResponse);
   } else {
     overrideOnce("post", "/api/elections/import/validate", 200, gsbElectionImportValidateMockResponse(true, 2000));
@@ -94,10 +94,10 @@ async function uploadElectionDefinition(router: Router, file: File, electionRole
  * Helper function; assuming we are at the check election hash stage,
  * input the hash and continue.
  */
-async function inputElectionHash(electionRole: ElectionRole = "GSB") {
+async function inputElectionHash(committeeCategory: CommitteeCategory = "GSB") {
   const user = userEvent.setup();
 
-  if (electionRole === "CSB") {
+  if (committeeCategory === "CSB") {
     overrideOnce("post", "/api/elections/import/validate", 200, csbElectionImportValidateMockResponse);
 
     // Wait for the page to be loaded and expect the election name to be present
@@ -122,10 +122,10 @@ async function inputElectionHash(electionRole: ElectionRole = "GSB") {
  * Helper function: assuming we are on the electoral committee role page,
  * assert right checkbox is checked and continue.
  */
-async function setElectoralCommitteeRole(electionRole: ElectionRole = "GSB") {
+async function setElectoralCommitteeRole(committeeCategory: CommitteeCategory = "GSB") {
   const user = userEvent.setup();
 
-  if (electionRole === "CSB") {
+  if (committeeCategory === "CSB") {
     overrideOnce("post", "/api/elections/import/validate", 200, csbElectionImportValidateMockResponse);
 
     expect(await screen.findByRole("heading", { level: 2, name: "Rol van het stembureau" })).toBeInTheDocument();
@@ -150,9 +150,9 @@ async function setElectoralCommitteeRole(electionRole: ElectionRole = "GSB") {
  * Helper function; assuming we are on the upload candidate page,
  * upload a valid candidate file.
  */
-async function uploadCandidateDefinition(file: File, electionRole: ElectionRole = "GSB") {
+async function uploadCandidateDefinition(file: File, committeeCategory: CommitteeCategory = "GSB") {
   const user = userEvent.setup();
-  if (electionRole === "CSB") {
+  if (committeeCategory === "CSB") {
     overrideOnce("post", "/api/elections/import/validate", 200, csbElectionImportValidateMockResponse);
   } else {
     overrideOnce("post", "/api/elections/import/validate", 200, gsbElectionImportValidateMockResponse(true, 2000));
@@ -173,9 +173,9 @@ async function uploadCandidateDefinition(file: File, electionRole: ElectionRole 
  * Helper function; assuming we are at the check candidate hash stage,
  * input the hash and continue.
  */
-async function inputCandidateHash(electionRole: ElectionRole = "GSB") {
+async function inputCandidateHash(committeeCategory: CommitteeCategory = "GSB") {
   const user = userEvent.setup();
-  if (electionRole === "CSB") {
+  if (committeeCategory === "CSB") {
     overrideOnce("post", "/api/elections/import/validate", 200, csbElectionImportValidateMockResponse);
   } else {
     overrideOnce("post", "/api/elections/import/validate", 200, gsbElectionImportValidateMockResponse(true, 2000));

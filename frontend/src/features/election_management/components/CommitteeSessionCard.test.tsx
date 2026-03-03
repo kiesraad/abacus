@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import * as useUser from "@/hooks/user/useUser";
 import { getCommitteeSessionMockData } from "@/testing/api-mocks/CommitteeSessionMockData";
+import { electionMockData } from "@/testing/api-mocks/ElectionMockData.ts";
 import { CommitteeSessionStatusChangeRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { server } from "@/testing/server";
 import { render, screen, spyOnHandler } from "@/testing/test-utils";
@@ -157,7 +158,15 @@ describe("UI component: CommitteeSessionCard", () => {
         location: "Juinen",
       });
 
-      render(<CommitteeSessionCard committeeSession={committeeSession} isCurrentSession={isCurrentSession} />);
+      const electionRole = electionMockData.role;
+
+      render(
+        <CommitteeSessionCard
+          committeeSession={committeeSession}
+          electionRole={electionRole}
+          isCurrentSession={isCurrentSession}
+        />,
+      );
 
       expect(screen.getByText(expectedTitle)).toBeVisible();
       expect(screen.getByText(expectedSubtitle)).toBeVisible();
@@ -212,7 +221,10 @@ describe("UI component: CommitteeSessionCard", () => {
       start_date_time: "",
       location: "Juinen",
     });
-    render(<CommitteeSessionCard committeeSession={committeeSession} isCurrentSession={true} />);
+    const electionRole = electionMockData.role;
+    render(
+      <CommitteeSessionCard committeeSession={committeeSession} electionRole={electionRole} isCurrentSession={true} />,
+    );
 
     const dataEntryButton = await screen.findByRole("button", { name: "Start invoer" });
     await user.click(dataEntryButton);
@@ -231,7 +243,10 @@ describe("UI component: CommitteeSessionCard", () => {
       start_date_time: "",
       location: "Juinen",
     });
-    render(<CommitteeSessionCard committeeSession={committeeSession} isCurrentSession={true} />);
+    const electionRole = electionMockData.role;
+    render(
+      <CommitteeSessionCard committeeSession={committeeSession} electionRole={electionRole} isCurrentSession={true} />,
+    );
 
     const deleteButton = await screen.findByRole("button", { name: "Zitting verwijderen" });
     await user.click(deleteButton);

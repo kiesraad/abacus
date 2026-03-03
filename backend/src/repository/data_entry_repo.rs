@@ -123,24 +123,13 @@ pub async fn update(
     res
 }
 
-/// Create an empty data entry and link it to the given polling station.
-/// If the polling station already has a data entry, this is a no-op and
-/// returns the existing data entry.
+/// Create an empty data entry row (not linked to any polling station)
 pub async fn create_empty(
     conn: &mut SqliteConnection,
-    polling_station_id: PollingStationId,
 ) -> Result<PollingStationDataEntry, sqlx::Error> {
-    let mut tx = conn.begin().await?;
-
-    // Guard against double creation: if a data entry already exists, return it
-    if let Some(existing) = get_data_entry_optional(&mut tx, polling_station_id).await? {
-        tx.commit().await?;
-        return Ok(existing);
-    }
-
     let state = Json(DataEntryStatus::Empty);
 
-    let data_entry = query_as!(
+    query_as!(
         PollingStationDataEntry,
         r#"
             INSERT INTO data_entries (state)
@@ -152,19 +141,8 @@ pub async fn create_empty(
         "#,
         state
     )
-    .fetch_one(&mut *tx)
-    .await?;
-
-    query!(
-        "UPDATE polling_stations SET data_entry_id = ? WHERE id = ?",
-        data_entry.id,
-        polling_station_id
-    )
-    .execute(&mut *tx)
-    .await?;
-
-    tx.commit().await?;
-    Ok(data_entry)
+    .fetch_one(conn)
+    .await
 }
 
 pub async fn delete_data_entry(
@@ -229,8 +207,7 @@ pub async fn statuses(
             FROM polling_stations AS p
             LEFT JOIN committee_sessions AS c ON c.id = p.committee_session_id
             LEFT JOIN data_entries AS de ON de.id = p.data_entry_id
-            LEFT JOIN polling_station_investigations AS psi ON psi.polling_station_id = p.id
-            WHERE c.id = $1 AND (c.number = 1 OR psi.corrected_results = 1)
+            WHERE c.id = $1 AND (c.number = 1 OR json_extract(p.investigation_state, '$.corrected_results') = 1)
         "#,
         committee_session_id
     )
@@ -319,7 +296,7 @@ async fn fetch_results_for_committee_session(
                    CASE
                        WHEN json_extract(de.state, '$.status') = 'Definitive'
                            THEN json_extract(de.state, '$.state.results')
-                       WHEN psi.polling_station_id IS NULL
+                       WHEN json_extract(ps.investigation_state, '$.corrected_results') IS NOT 1
                            AND json_extract(prev_de.state, '$.status') = 'Definitive'
                            THEN json_extract(prev_de.state, '$.state.results')
                        ELSE NULL
@@ -327,8 +304,6 @@ async fn fetch_results_for_committee_session(
             FROM polling_stations AS ps
             LEFT JOIN data_entries AS de ON de.id = ps.data_entry_id
             LEFT JOIN data_entries AS prev_de ON prev_de.id = ps.prev_data_entry_id
-            LEFT JOIN polling_station_investigations AS psi
-                ON psi.polling_station_id = ps.id AND psi.corrected_results = 1
             WHERE ps.committee_session_id = $1 AND ($2 IS NULL OR ps.id = $2)
         )
         SELECT
@@ -430,12 +405,12 @@ pub async fn are_results_complete_for_committee_session(
     let all_investigations_finished = query!(
         r#"
         SELECT COUNT(*) = 0 as "result: bool"
-        FROM polling_station_investigations AS psi
-        JOIN polling_stations AS ps ON ps.id = psi.polling_station_id
+        FROM polling_stations AS ps
         LEFT JOIN data_entries AS de ON de.id = ps.data_entry_id
         WHERE ps.committee_session_id = ?
-        AND (psi.corrected_results IS NULL
-             OR (psi.corrected_results = 1
+        AND ps.investigation_state IS NOT NULL
+        AND (json_extract(ps.investigation_state, '$.corrected_results') IS NULL
+             OR (json_extract(ps.investigation_state, '$.corrected_results') = 1
                  AND (de.state IS NULL OR json_extract(de.state, '$.status') != 'Definitive')))
         "#,
         committee_session_id
@@ -447,30 +422,6 @@ pub async fn are_results_complete_for_committee_session(
     tx.commit().await?;
 
     Ok(all_new_ps_have_data && all_investigations_finished)
-}
-
-/// Insert a test result by creating a Definitive data entry state
-#[cfg(test)]
-pub async fn insert_test_result(
-    conn: &mut SqliteConnection,
-    polling_station_id: PollingStationId,
-    results: &PollingStationResults,
-) -> Result<(), sqlx::Error> {
-    use crate::{domain::data_entry_status::Definitive, repository::user_repo::UserId};
-
-    let state = DataEntryStatus::Definitive(Definitive {
-        first_entry_user_id: UserId::from(5),
-        second_entry_user_id: UserId::from(6),
-        finished_at: chrono::Utc::now(),
-        finalised_with_warnings: false,
-        results: results.clone(),
-    });
-
-    if !data_entry_exists(conn, polling_station_id).await? {
-        create_empty(conn, polling_station_id).await?;
-    }
-    update(conn, polling_station_id, &state).await?;
-    Ok(())
 }
 
 #[cfg(test)]
@@ -505,9 +456,10 @@ mod tests {
         use test_log::test;
 
         use super::*;
-        use crate::repository::{
-            investigation_repo::insert_test_investigation,
-            polling_station_repo::insert_test_polling_station,
+        use crate::{
+            domain::data_entry_status,
+            repository::{polling_station_repo::insert_test_polling_station, user_repo::UserId},
+            service::{create_definitive_data_entry, create_test_investigation},
         };
 
         /// Test with first session, 2 polling stations with results
@@ -516,14 +468,14 @@ mod tests {
             let mut conn = pool.acquire().await.unwrap();
             let committee_session_id = CommitteeSessionId::from(2);
 
-            insert_test_result(
+            create_definitive_data_entry(
                 &mut conn,
                 PollingStationId::from(1),
                 &create_test_results(10),
             )
             .await
             .unwrap();
-            insert_test_result(
+            create_definitive_data_entry(
                 &mut conn,
                 PollingStationId::from(2),
                 &create_test_results(20),
@@ -549,7 +501,7 @@ mod tests {
             let mut conn = pool.acquire().await.unwrap();
             let committee_session_id = CommitteeSessionId::from(2);
 
-            insert_test_result(
+            create_definitive_data_entry(
                 &mut conn,
                 PollingStationId::from(1),
                 &create_test_results(10),
@@ -571,7 +523,7 @@ mod tests {
             let mut conn = pool.acquire().await.unwrap();
             let committee_session_id = CommitteeSessionId::from(704);
 
-            insert_test_investigation(&mut conn, PollingStationId::from(741), Some(false))
+            create_test_investigation(&mut conn, PollingStationId::from(741), Some(false))
                 .await
                 .unwrap();
 
@@ -597,11 +549,11 @@ mod tests {
             let committee_session_id = CommitteeSessionId::from(704);
             let polling_station_id = PollingStationId::from(741);
 
-            insert_test_investigation(&mut conn, polling_station_id, Some(true))
+            create_test_investigation(&mut conn, polling_station_id, Some(true))
                 .await
                 .unwrap();
 
-            insert_test_result(&mut conn, polling_station_id, &create_test_results(10))
+            create_definitive_data_entry(&mut conn, polling_station_id, &create_test_results(10))
                 .await
                 .unwrap();
 
@@ -626,7 +578,7 @@ mod tests {
             let mut conn = pool.acquire().await.unwrap();
             let committee_session_id = CommitteeSessionId::from(704);
 
-            insert_test_investigation(&mut conn, PollingStationId::from(741), Some(true))
+            create_test_investigation(&mut conn, PollingStationId::from(741), Some(true))
                 .await
                 .unwrap();
 
@@ -682,7 +634,7 @@ mod tests {
             .await
             .unwrap();
 
-            insert_test_investigation(&mut conn, new_polling_station_id, Some(false))
+            create_test_investigation(&mut conn, new_polling_station_id, Some(false))
                 .await
                 .unwrap();
 
@@ -713,13 +665,17 @@ mod tests {
             .await
             .unwrap();
 
-            insert_test_investigation(&mut conn, new_polling_station_id, Some(true))
+            create_test_investigation(&mut conn, new_polling_station_id, Some(true))
                 .await
                 .unwrap();
 
-            insert_test_result(&mut conn, new_polling_station_id, &create_test_results(10))
-                .await
-                .unwrap();
+            create_definitive_data_entry(
+                &mut conn,
+                new_polling_station_id,
+                &create_test_results(10),
+            )
+            .await
+            .unwrap();
 
             let results = list_results_for_committee_session(&mut conn, committee_session_id)
                 .await
@@ -758,7 +714,7 @@ mod tests {
             .await
             .unwrap();
 
-            insert_test_investigation(&mut conn, new_polling_station_id, Some(true))
+            create_test_investigation(&mut conn, new_polling_station_id, Some(true))
                 .await
                 .unwrap();
 
@@ -789,17 +745,20 @@ mod tests {
             .await
             .unwrap();
 
-            insert_test_investigation(&mut conn, PollingStationId::from(733), Some(true))
+            create_test_investigation(&mut conn, PollingStationId::from(733), Some(true))
                 .await
                 .unwrap();
 
-            insert_test_result(
-                &mut conn,
-                PollingStationId::from(733),
-                &create_test_results(10),
-            )
-            .await
-            .unwrap();
+            let state = DataEntryStatus::Definitive(data_entry_status::Definitive {
+                first_entry_user_id: UserId::from(5),
+                second_entry_user_id: UserId::from(6),
+                finished_at: chrono::Utc::now(),
+                finalised_with_warnings: false,
+                results: create_test_results(10),
+            });
+            update(&mut conn, PollingStationId::from(733), &state)
+                .await
+                .unwrap();
 
             // Add new polling station to fourth session, linked to the data entry from third session, but without investigation or results
             let prev_data_entry = get_data_entry(&mut conn, PollingStationId::from(733))
@@ -842,12 +801,12 @@ mod tests {
                 PollingStationInvestigationCreateRequest,
             },
             repository::{
-                data_entry_repo::insert_test_result,
                 investigation_repo::{
                     conclude_polling_station_investigation, create_polling_station_investigation,
                 },
                 polling_station_repo::insert_test_polling_station,
             },
+            service::create_definitive_data_entry,
         };
 
         async fn create_test_investigation(
@@ -886,7 +845,7 @@ mod tests {
             conn: &mut SqliteConnection,
             polling_station_id: PollingStationId,
         ) {
-            insert_test_result(conn, polling_station_id, &create_test_results(10))
+            create_definitive_data_entry(conn, polling_station_id, &create_test_results(10))
                 .await
                 .unwrap();
         }
@@ -907,7 +866,7 @@ mod tests {
         async fn test_first_session_without_results_on_one_polling_station(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
 
-            insert_test_result(
+            create_definitive_data_entry(
                 &mut conn,
                 PollingStationId::from(1),
                 &create_test_results(10),
@@ -927,14 +886,14 @@ mod tests {
         async fn test_first_session_with_results(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
 
-            insert_test_result(
+            create_definitive_data_entry(
                 &mut conn,
                 PollingStationId::from(1),
                 &create_test_results(10),
             )
             .await
             .unwrap();
-            insert_test_result(
+            create_definitive_data_entry(
                 &mut conn,
                 PollingStationId::from(2),
                 &create_test_results(10),
@@ -989,7 +948,7 @@ mod tests {
             )
             .await
             .unwrap();
-            insert_test_result(
+            create_definitive_data_entry(
                 &mut conn,
                 PollingStationId::from(743),
                 &create_test_results(10),

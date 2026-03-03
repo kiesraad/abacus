@@ -2,7 +2,7 @@ use std::{future::Future, net::SocketAddr, str::FromStr};
 
 use api::middleware::airgap::AirgapDetection;
 use axum::{extract::FromRef, serve::ListenerExt};
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use sqlx::{
     Sqlite, SqliteConnection, SqlitePool,
     sqlite::{SqliteConnectOptions, SqliteJournalMode},
@@ -26,11 +26,10 @@ pub use error::{APIError, ErrorResponse};
 #[cfg(feature = "dev-database")]
 use infra::seed_data;
 use infra::{audit_log, router};
-use utoipa::ToSchema;
 
 use crate::{
     app_error::{DatabaseErrorWithPath, DatabaseMigrationErrorWithPath},
-    infra::audit_log::{AsAuditEvent, AuditEvent, AuditEventType, as_audit_event},
+    infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType},
 };
 
 /// Maximum size of the request body in megabytes.
@@ -157,25 +156,26 @@ pub async fn shutdown_signal() {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
-pub struct ApplicationStartedDetails {
+#[derive(Serialize)]
+pub struct ApplicationStartedAuditData {
     pub version: String,
     pub commit: String,
 }
 
-#[derive(Serialize)]
-struct ApplicationStarted(pub ApplicationStartedDetails);
-as_audit_event!(ApplicationStarted, AuditEventType::ApplicationStarted);
+impl AsAuditEvent for ApplicationStartedAuditData {
+    const EVENT_TYPE: AuditEventType = AuditEventType::ApplicationStarted;
+    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Info;
+}
 
 /// Log that the application started and thereby check that the database is writeable
 /// This maps common sqlite errors to an AppError
 async fn log_app_started(conn: &mut SqliteConnection, db_path: &str) -> Result<(), AppError> {
     Ok(audit_log::create(
         conn,
-        ApplicationStarted(ApplicationStartedDetails {
+        ApplicationStartedAuditData {
             version: env!("ABACUS_GIT_VERSION").to_string(),
             commit: env!("ABACUS_GIT_REV").to_string(),
-        })
+        }
         .as_audit_event()?,
         None,
         None,

@@ -29,6 +29,12 @@ export interface ELECTION_DETAILS_REQUEST_PARAMS {
 }
 export type ELECTION_DETAILS_REQUEST_PATH = `/api/elections/${ElectionId}`;
 
+// /api/elections/{election_id}/apportionment
+export interface ELECTION_APPORTIONMENT_REQUEST_PARAMS {
+  election_id: number;
+}
+export type ELECTION_APPORTIONMENT_REQUEST_PATH = `/api/elections/${number}/apportionment`;
+
 // /api/elections/{election_id}/committee_sessions
 export interface COMMITTEE_SESSION_CREATE_REQUEST_PARAMS {
   election_id: ElectionId;
@@ -319,6 +325,11 @@ export type USER_DELETE_REQUEST_PATH = `/api/users/${UserId}`;
 
 /** TYPES **/
 
+export interface AbsoluteMajorityReassignedSeat {
+  list_assigned_seat: PGNumber;
+  list_retracted_seat: PGNumber;
+}
+
 export interface AccountUpdateRequest {
   fullname?: string;
   password: string;
@@ -342,12 +353,13 @@ export const auditEventTypeValues = [
   "CommitteeSessionCreated",
   "CommitteeSessionDeleted",
   "CommitteeSessionUpdated",
-  "PollingStationInvestigationCreated",
-  "PollingStationInvestigationConcluded",
-  "PollingStationInvestigationUpdated",
-  "PollingStationInvestigationDeleted",
   "FileCreated",
   "FileDeleted",
+  "ApportionmentProcessed",
+  "InvestigationCreated",
+  "InvestigationConcluded",
+  "InvestigationUpdated",
+  "InvestigationDeleted",
   "PollingStationCreated",
   "PollingStationUpdated",
   "PollingStationDeleted",
@@ -482,6 +494,12 @@ export interface Candidate {
  */
 export const candidateGenderValues = ["Male", "Female", "X"] as const;
 export type CandidateGender = (typeof candidateGenderValues)[number];
+
+export interface CandidateNomination {
+  chosen_candidates: Candidate[];
+  list_candidate_nomination: ListCandidateNomination[];
+  preference_threshold: PreferenceThreshold;
+}
 
 export interface CandidateVotes {
   number: number;
@@ -658,6 +676,15 @@ export interface DifferencesCounts {
 }
 
 /**
+ * Fraction with the integer part split out for display purposes
+ */
+export interface DisplayFraction {
+  denominator: number;
+  integer: number;
+  numerator: number;
+}
+
+/**
  * Election without political groups
  */
 export interface Election {
@@ -673,6 +700,12 @@ export interface Election {
   number_of_seats: number;
   number_of_voters: number;
   role: ElectionRole;
+}
+
+export interface ElectionApportionmentResponse {
+  candidate_nomination: CandidateNomination;
+  election_summary: ElectionSummary;
+  seat_assignment: SeatAssignment;
 }
 
 /**
@@ -761,6 +794,22 @@ export interface ElectionStatusResponseEntry {
 }
 
 /**
+ * Contains a summary of the election results, added up from the votes of all polling stations.
+ */
+export interface ElectionSummary {
+  /** The differences between voters and votes */
+  differences_counts: SummaryDifferencesCounts;
+  /** The summary votes for each political group (and each candidate within) */
+  political_group_votes: PoliticalGroupCandidateVotes[];
+  /** Polling stations where results were investigated by the GSB */
+  polling_station_investigations: PollingStationInvestigations;
+  /** The total number of voters */
+  voters_counts: VotersCounts;
+  /** The total number of votes */
+  votes_counts: VotesCounts;
+}
+
+/**
  * Election with political groups
  */
 export interface ElectionWithPoliticalGroups {
@@ -785,6 +834,10 @@ export interface ElectionWithPoliticalGroups {
 export const errorReferenceValues = [
   "AirgapViolation",
   "AlreadyInitialised",
+  "ApportionmentAllListsExhausted",
+  "ApportionmentCommitteeSessionNotCompleted",
+  "ApportionmentDrawingOfLotsRequired",
+  "ApportionmentZeroVotesCast",
   "CommitteeSessionPaused",
   "DatabaseError",
   "DataEntryAlreadyClaimed",
@@ -905,11 +958,60 @@ export interface GenerateElectionArgs {
   with_data_entry: boolean;
 }
 
+export interface HighestAverageAssignedSeat {
+  list_assigned: PGNumber[];
+  list_exhausted: PGNumber[];
+  list_options: PGNumber[];
+  selected_list_number: PGNumber;
+  votes_per_seat: DisplayFraction;
+}
+
 /**
  * Investigation list response
  */
 export interface InvestigationListResponse {
   investigations: PollingStationInvestigation[];
+}
+
+export interface LargestRemainderAssignedSeat {
+  list_assigned: PGNumber[];
+  list_options: PGNumber[];
+  remainder_votes: DisplayFraction;
+  selected_list_number: PGNumber;
+}
+
+export interface ListCandidateNomination {
+  list_name: string;
+  list_number: PGNumber;
+  list_seats: number;
+  other_candidate_nomination: CandidateVotes[];
+  preferential_candidate_nomination: CandidateVotes[];
+  updated_candidate_ranking: Candidate[];
+}
+
+export interface ListExhaustionRemovedSeat {
+  full_seat: boolean;
+  list_retracted_seat: PGNumber;
+}
+
+export interface ListSeatAssignment {
+  full_seats: number;
+  list_number: PGNumber;
+  meets_remainder_threshold: boolean;
+  remainder_votes: DisplayFraction;
+  residual_seats: number;
+  total_seats: number;
+  votes_cast: number;
+}
+
+export interface ListStanding {
+  full_seats: number;
+  list_number: PGNumber;
+  meets_remainder_threshold: boolean;
+  next_votes_per_seat: DisplayFraction;
+  remainder_votes: DisplayFraction;
+  residual_seats: number;
+  votes_cast: number;
 }
 
 export interface LoginResponse {
@@ -937,6 +1039,8 @@ export interface NewElection {
   political_groups: PoliticalGroup[];
   role: ElectionRole;
 }
+
+export type PGNumber = number;
 
 /**
  * Political group with its candidates
@@ -1006,6 +1110,22 @@ export interface PollingStationInvestigationUpdateRequest {
 }
 
 /**
+ * Polling stations where results were investigated by the GSB,
+ * as vectors of polling station numbers
+ */
+export interface PollingStationInvestigations {
+  /** Admitted voters were recounted
+("Toegelaten kiezers opnieuw vastgesteld?") */
+  admitted_voters_recounted: number[];
+  /** Ballots were (partially) recounted
+("Stembiljetten (deels) herteld?") */
+  ballots_recounted: number[];
+  /** Investigated for other reasons than unexplained difference
+("Onderzocht vanwege andere reden dan onverklaard verschil?") */
+  investigated_other_reason: number[];
+}
+
+/**
  * Polling station list response
  */
 export interface PollingStationListResponse {
@@ -1051,6 +1171,11 @@ export interface PollingStationsRequest {
   polling_stations: string;
 }
 
+export interface PreferenceThreshold {
+  number_of_votes: DisplayFraction;
+  percentage: number;
+}
+
 export type RandomRange = string;
 
 export interface RedactedEmlHash {
@@ -1078,6 +1203,45 @@ export type Role = (typeof roleValues)[number];
  */
 export interface SaveDataEntryResponse {
   validation_results: ValidationResults;
+}
+
+export interface SeatAssignment {
+  final_standing: ListSeatAssignment[];
+  full_seats: number;
+  quota: DisplayFraction;
+  residual_seats: number;
+  seats: number;
+  steps: SeatChangeStep[];
+}
+
+export type SeatChange =
+  | (HighestAverageAssignedSeat & { changed_by: "HighestAverageAssignment" })
+  | (HighestAverageAssignedSeat & { changed_by: "UniqueHighestAverageAssignment" })
+  | (LargestRemainderAssignedSeat & { changed_by: "LargestRemainderAssignment" })
+  | (AbsoluteMajorityReassignedSeat & { changed_by: "AbsoluteMajorityReassignment" })
+  | (ListExhaustionRemovedSeat & { changed_by: "ListExhaustionRemoval" });
+
+export interface SeatChangeStep {
+  change: SeatChange;
+  residual_seat_number?: number;
+  standings: ListStanding[];
+}
+
+/**
+ * Contains a summary count, containing both the count and a list of polling
+ * stations that contributed to it.
+ */
+export interface SumCount {
+  count: number;
+  polling_stations: number[];
+}
+
+/**
+ * Contains a summary of the differences, containing which polling stations had differences.
+ */
+export interface SummaryDifferencesCounts {
+  fewer_ballots_count: SumCount;
+  more_ballots_count: SumCount;
 }
 
 export interface UpdateUserRequest {

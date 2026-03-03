@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT investigation_state AS \"investigation_state: Json<PollingStationInvestigation>\"\n           FROM polling_stations WHERE id = ?",
+  "describe": {
+    "columns": [
+      {
+        "name": "investigation_state: Json<PollingStationInvestigation>",
+        "ordinal": 0,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      true
+    ]
+  },
+  "hash": "2d70528190c451f34822e2fec70e9657b29d4bcd17fc96712e0b7b8ca04e9fdb"
+}

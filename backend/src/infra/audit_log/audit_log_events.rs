@@ -175,7 +175,7 @@ pub async fn create(
     ip: Option<IpAddr>,
 ) -> Result<(), sqlx::Error> {
     let event_name = audit_event.event_type.to_string();
-    let event_level = audit_event.event_type.level();
+    let event_level = audit_event.event_level;
     let event = Json(audit_event.data);
     let user_id = user.map(|u| u.id());
     let username = user.map(|u| u.username().to_string());
@@ -258,7 +258,7 @@ pub async fn list(
             user_role as "user_role: Role"
         FROM audit_log
         WHERE (json_array_length($1) = 0 OR event_level IN (SELECT value FROM json_each($1)))
-            AND (json_array_length($2) = 0 OR event ->> 'eventType' IN (SELECT value FROM json_each($2)))
+            AND (json_array_length($2) = 0 OR event_name IN (SELECT value FROM json_each($2)))
             AND (json_array_length($3) = 0 OR user_id IN (SELECT value FROM json_each($3)))
             AND ($4 IS NULL OR unixepoch(time) >= $4)
         ORDER BY
@@ -282,11 +282,12 @@ pub async fn list(
 pub async fn count(conn: &mut SqliteConnection, filter: &LogFilter) -> Result<u32, APIError> {
     let (level, event, user, since) = filter.as_query_values()?;
 
-    let row_count = sqlx::query!(r#"
+    let row_count = sqlx::query!(
+        r#"
             SELECT COUNT(*) AS "count: u32"
             FROM audit_log
             WHERE (json_array_length($1) = 0 OR event_level IN (SELECT value FROM json_each($1)))
-                AND (json_array_length($2) = 0 OR event ->> 'eventType' IN (SELECT value FROM json_each($2)))
+                AND (json_array_length($2) = 0 OR event_name IN (SELECT value FROM json_each($2)))
                 AND (json_array_length($3) = 0 OR user_id IN (SELECT value FROM json_each($3)))
                 AND ($4 IS NULL OR unixepoch(time) >= $4)
         "#,
@@ -295,8 +296,8 @@ pub async fn count(conn: &mut SqliteConnection, filter: &LogFilter) -> Result<u3
         user,
         since,
     )
-        .fetch_one(conn)
-        .await?;
+    .fetch_one(conn)
+    .await?;
 
     Ok(row_count.count)
 }
@@ -311,9 +312,9 @@ pub async fn list_users(conn: &mut SqliteConnection) -> Result<Vec<AuditLogUser>
             user_role as "role!: Role"
         FROM audit_log
         WHERE user_id IS NOT NULL
-        AND user_fullname IS NOT NULL
-        AND username IS NOT NULL
-        AND user_role IS NOT NULL
+            AND user_fullname IS NOT NULL
+            AND username IS NOT NULL
+            AND user_role IS NOT NULL
         GROUP BY user_id
         ORDER BY username"#
     )

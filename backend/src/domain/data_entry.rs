@@ -8,7 +8,6 @@ pub use yes_no::YesNo;
 
 use crate::{
     APIError,
-    api::data_entry::DataEntryDetails,
     domain::{
         data_entry_status::{DataEntryStatus, DataEntryStatusName},
         election::{CandidateNumber, PGNumber, PoliticalGroup},
@@ -27,21 +26,6 @@ pub struct PollingStationDataEntry {
     pub state: Json<DataEntryStatus>,
     #[schema(value_type = String)]
     pub updated_at: DateTime<Utc>,
-}
-
-impl From<PollingStationDataEntry> for DataEntryDetails {
-    fn from(value: PollingStationDataEntry) -> Self {
-        let state = value.state.0;
-
-        Self {
-            data_entry_id: value.id,
-            data_entry_status: state.status_name().to_string(),
-            data_entry_progress: format!("{}%", state.get_progress()),
-            finished_at: state.finished_at().cloned(),
-            first_entry_user_id: state.get_first_entry_user_id(),
-            second_entry_user_id: state.get_second_entry_user_id(),
-        }
-    }
 }
 
 /// PollingStationResults contains the results for a polling station.

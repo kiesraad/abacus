@@ -4,6 +4,7 @@ use axum::{
     http::StatusCode,
 };
 use chrono::NaiveDateTime;
+use serde::Serialize;
 use sqlx::{SqliteConnection, SqlitePool};
 use utoipa_axum::{router::OpenApiRouter, routes};
 
@@ -12,23 +13,42 @@ use crate::{
     api::middleware::authentication::CoordinatorGSB,
     domain::{
         committee_session::{
-            CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionCreated,
-            CommitteeSessionDeleted, CommitteeSessionError, CommitteeSessionId,
-            CommitteeSessionStatusChangeRequest, CommitteeSessionUpdateRequest,
-            CommitteeSessionUpdated, InvestigationListResponse,
+            CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionError,
+            CommitteeSessionId, CommitteeSessionStatusChangeRequest, CommitteeSessionUpdateRequest,
+            InvestigationListResponse,
         },
         committee_session_status::CommitteeSessionStatus,
         election::ElectionId,
+        validation::DataError,
     },
     error::ErrorReference,
-    infra::audit_log::AuditService,
+    infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
     repository::{
         committee_session_repo::{create, delete, get, get_election_committee_session, update},
         election_repo,
-        investigation_repo::list_investigations_for_committee_session,
+        investigation_repo::{
+            has_investigations_for_committee_session, list_investigations_for_committee_session,
+        },
     },
-    service::change_committee_session_status,
+    service::{
+        CommitteeSessionAuditData, CommitteeSessionUpdatedAuditData,
+        change_committee_session_status,
+    },
 };
+
+#[derive(Serialize)]
+pub struct CommitteeSessionCreatedAuditData(pub CommitteeSessionAuditData);
+impl AsAuditEvent for CommitteeSessionCreatedAuditData {
+    const EVENT_TYPE: AuditEventType = AuditEventType::CommitteeSessionCreated;
+    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Success;
+}
+
+#[derive(Serialize)]
+pub struct CommitteeSessionDeletedAuditData(pub CommitteeSessionAuditData);
+impl AsAuditEvent for CommitteeSessionDeletedAuditData {
+    const EVENT_TYPE: AuditEventType = AuditEventType::CommitteeSessionDeleted;
+    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Info;
+}
 
 pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::default()
@@ -66,7 +86,7 @@ pub async fn create_committee_session(
     audit_service
         .log(
             conn,
-            &CommitteeSessionCreated(committee_session.clone()),
+            &CommitteeSessionCreatedAuditData(committee_session.clone().into()),
             None,
         )
         .await?;
@@ -157,12 +177,18 @@ pub async fn committee_session_delete(
         && (committee_session.status == CommitteeSessionStatus::Created
             || committee_session.status == CommitteeSessionStatus::InPreparation)
     {
+        if has_investigations_for_committee_session(&mut tx, committee_session_id).await? {
+            return Err(APIError::InvalidData(DataError::new(
+                "Cannot delete committee session with active investigations",
+            )));
+        }
+
         delete(&mut tx, committee_session_id).await?;
 
         audit_service
             .log(
                 &mut tx,
-                &CommitteeSessionDeleted(committee_session.clone()),
+                &CommitteeSessionDeletedAuditData(committee_session.clone().into()),
                 None,
             )
             .await?;
@@ -236,7 +262,7 @@ pub async fn committee_session_update(
     audit_service
         .log(
             &mut tx,
-            &CommitteeSessionUpdated(committee_session.clone()),
+            &CommitteeSessionUpdatedAuditData(committee_session.clone().into()),
             None,
         )
         .await?;

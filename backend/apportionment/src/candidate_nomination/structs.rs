@@ -1,22 +1,19 @@
-use crate::{
-    CandidateVotesTrait, Fraction,
-    structs::{CandidateNumber, ListNumber},
-};
+use crate::{CandidateVotes, Fraction, ListVotes};
 
 /// Contains information about the chosen candidates and
 /// the candidate list ranking for a specific list.
 #[derive(Debug, PartialEq)]
-pub struct ListCandidateNomination<'a, T: CandidateVotesTrait> {
+pub struct ListCandidateNomination<'a, T: ListVotes> {
     /// List number for which this nomination applies
-    pub list_number: ListNumber,
+    pub list_number: T::ListNumber,
     /// The number of seats assigned to this group
     pub list_seats: u32,
     /// The list of chosen candidates via preferential votes, can be empty
-    pub preferential_candidate_nomination: Vec<&'a T>,
+    pub preferential_candidate_nomination: Vec<&'a T::Cv>,
     /// The list of other chosen candidates, can be empty
-    pub other_candidate_nomination: Vec<&'a T>,
+    pub other_candidate_nomination: Vec<&'a T::Cv>,
     /// The updated ranking of the whole candidate list, can be empty
-    pub updated_candidate_ranking: Vec<CandidateNumber>,
+    pub updated_candidate_ranking: Vec<<T::Cv as CandidateVotes>::CandidateNumber>,
 }
 
 /// Contains the preference threshold as a percentage and as a fraction of the number of votes.
@@ -34,18 +31,18 @@ pub struct PreferenceThreshold {
 /// It also contains the preferential nomination of candidates, the remaining
 /// nomination of candidates and the final ranking of candidates for each list.
 #[derive(Debug, PartialEq)]
-pub struct CandidateNominationResult<'a, T: CandidateVotesTrait> {
+pub struct CandidateNominationResult<'a, T: ListVotes> {
     /// Preference threshold percentage and number of votes
     pub preference_threshold: PreferenceThreshold,
     /// List of chosen candidates
-    pub chosen_candidates: Vec<Candidate>,
+    pub chosen_candidates: Vec<Candidate<T>>,
     /// List of chosen candidates and candidate list ranking per list
     pub list_candidate_nomination: Vec<ListCandidateNomination<'a, T>>,
 }
 
 /// Contains the list number the candidate is listed on and the candidate number on that list.
 #[derive(Debug, PartialEq)]
-pub struct Candidate {
-    pub list_number: ListNumber,
-    pub candidate_number: CandidateNumber,
+pub struct Candidate<T: ListVotes> {
+    pub list_number: T::ListNumber,
+    pub candidate_number: <T::Cv as CandidateVotes>::CandidateNumber,
 }

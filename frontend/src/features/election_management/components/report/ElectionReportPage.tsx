@@ -46,7 +46,7 @@ export function ElectionReportPage() {
     throw requestState.error;
   }
 
-  const sessionLabel = committeeSessionLabel(committeeSession.number);
+  const sessionLabel = committeeSessionLabel(election.role, committeeSession.number);
 
   // Redirect to update details page if committee session details have not been filled in
   if (committeeSession.location === "" || !committeeSession.start_date_time) {

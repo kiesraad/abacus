@@ -9,7 +9,6 @@ use utoipa::ToSchema;
 
 use crate::{
     APIError,
-    api::polling_station::PollingStationDetails,
     domain::{
         committee_session::CommitteeSessionId, data_entry::DataEntryId, election::ElectionId,
         id::id,
@@ -49,24 +48,6 @@ pub struct PollingStation {
 impl IntoResponse for PollingStation {
     fn into_response(self) -> Response {
         Json(self).into_response()
-    }
-}
-
-impl From<PollingStation> for PollingStationDetails {
-    fn from(value: PollingStation) -> Self {
-        Self {
-            polling_station_id: value.id,
-            polling_station_election_id: value.election_id,
-            polling_station_committee_session_id: value.committee_session_id,
-            polling_station_prev_data_entry_id: value.prev_data_entry_id,
-            polling_station_name: value.name,
-            polling_station_number: value.number,
-            polling_station_number_of_voters: value.number_of_voters,
-            polling_station_type: value.polling_station_type.map(|t| t.to_string()),
-            polling_station_address: value.address,
-            polling_station_postal_code: value.postal_code,
-            polling_station_locality: value.locality,
-        }
     }
 }
 

@@ -1,3 +1,10 @@
+use sqlx::SqliteConnection;
+
+use crate::{
+    domain::{committee_session::CommitteeSessionId, investigation::PollingStationInvestigation},
+    repository::investigation_repo,
+};
+
 #[derive(Debug)]
 pub enum InvestigationServiceError {
     DatabaseError(sqlx::Error),
@@ -15,6 +22,19 @@ impl From<super::data_entry::DataEntryServiceError> for InvestigationServiceErro
             super::data_entry::DataEntryServiceError::DatabaseError(e) => Self::DatabaseError(e),
         }
     }
+}
+
+pub async fn list_for_committee_session(
+    conn: &mut SqliteConnection,
+    committee_session_id: CommitteeSessionId,
+) -> Result<Vec<PollingStationInvestigation>, InvestigationServiceError> {
+    Ok(
+        investigation_repo::list_for_committee_session(conn, committee_session_id)
+            .await?
+            .iter()
+            .map(|(ps_id, status)| PollingStationInvestigation::from((*ps_id, status)))
+            .collect(),
+    )
 }
 
 #[cfg(test)]

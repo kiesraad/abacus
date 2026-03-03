@@ -31,10 +31,8 @@ use crate::{
     },
     eml::{EML110, EML230, EMLDocument, EMLImportError, EmlHash, RedactedEmlHash},
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
-    repository::{
-        committee_session_repo, election_repo, investigation_repo, polling_station_repo,
-        user_repo::User,
-    },
+    repository::{committee_session_repo, election_repo, polling_station_repo, user_repo::User},
+    service::list_investigations_for_committee_session,
 };
 
 pub fn router() -> OpenApiRouter<AppState> {
@@ -176,13 +174,7 @@ pub async fn election_details(
     let polling_stations =
         polling_station_repo::list(&mut conn, current_committee_session.id).await?;
     let investigations =
-        investigation_repo::list_for_committee_session(&mut conn, current_committee_session.id)
-            .await?
-            .iter()
-            .map(|(ps_id, status)| {
-                crate::domain::investigation::PollingStationInvestigation::from((*ps_id, status))
-            })
-            .collect();
+        list_investigations_for_committee_session(&mut conn, current_committee_session.id).await?;
 
     Ok(Json(ElectionDetailsResponse {
         current_committee_session,

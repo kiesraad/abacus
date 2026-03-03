@@ -29,7 +29,7 @@ use crate::{
     },
     service::{
         CommitteeSessionAuditData, CommitteeSessionUpdatedAuditData,
-        change_committee_session_status,
+        change_committee_session_status, list_investigations_for_committee_session,
     },
 };
 
@@ -351,13 +351,7 @@ pub async fn committee_session_investigations(
     let committee_session = get(&mut conn, committee_session_id).await?;
 
     let investigations =
-        investigation_repo::list_for_committee_session(&mut conn, committee_session.id)
-            .await?
-            .iter()
-            .map(|(ps_id, status)| {
-                crate::domain::investigation::PollingStationInvestigation::from((*ps_id, status))
-            })
-            .collect();
+        list_investigations_for_committee_session(&mut conn, committee_session.id).await?;
 
     Ok(Json(InvestigationListResponse { investigations }))
 }

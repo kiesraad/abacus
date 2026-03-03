@@ -38,9 +38,9 @@ use crate::{
         data_entry_repo::{
             are_results_complete_for_committee_session, list_results_for_committee_session,
         },
-        election_repo, file_repo, investigation_repo, polling_station_repo,
+        election_repo, file_repo, polling_station_repo,
     },
-    service::FileAuditData,
+    service::{FileAuditData, list_investigations_for_committee_session},
 };
 
 /// Default date time format for reports
@@ -89,11 +89,7 @@ impl ResultsInput {
         // get investigations if this is not the first session
         let investigations: Vec<PollingStationInvestigation> =
             if committee_session.is_next_session() {
-                investigation_repo::list_for_committee_session(conn, committee_session.id)
-                    .await?
-                    .iter()
-                    .map(|(ps_id, status)| PollingStationInvestigation::from((*ps_id, status)))
-                    .collect()
+                list_investigations_for_committee_session(conn, committee_session.id).await?
             } else {
                 vec![]
             };
@@ -438,11 +434,7 @@ async fn get_files(
     let mut conn = pool.acquire().await?;
     let committee_session = committee_session_repo::get(&mut conn, committee_session_id).await?;
     let investigations: Vec<PollingStationInvestigation> =
-        investigation_repo::list_for_committee_session(&mut conn, committee_session.id)
-            .await?
-            .iter()
-            .map(|(ps_id, status)| PollingStationInvestigation::from((*ps_id, status)))
-            .collect();
+        list_investigations_for_committee_session(&mut conn, committee_session.id).await?;
     let corrections = investigations
         .iter()
         .any(|inv| matches!(inv.corrected_results, Some(true)));
@@ -623,6 +615,7 @@ mod tests {
             polling_station::PollingStationId,
         },
         infra::audit_log::list_event_names,
+        repository::investigation_repo,
     };
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]

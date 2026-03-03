@@ -12,6 +12,7 @@ use crate::{
         data_entry_status::{DataEntryStatus, DataEntryStatusName},
         election::{CandidateNumber, PGNumber, PoliticalGroup},
         id::id,
+        polling_station_results::common_polling_station_results::CommonPollingStationResults,
         polling_station_results::count::Count,
     },
     error::ErrorReference,
@@ -251,41 +252,6 @@ impl PollingStationResults {
                 total: 0,
             })
             .collect()
-    }
-}
-
-/// CommonPollingStationResults contains the common fields for polling station results,
-#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
-#[serde(deny_unknown_fields)]
-pub struct CommonPollingStationResults {
-    /// Voters counts ("Aantal toegelaten kiezers")
-    pub voters_counts: VotersCounts,
-    /// Votes counts ("Aantal getelde stembiljetten")
-    pub votes_counts: VotesCounts,
-    /// Differences counts ("Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten")
-    pub differences_counts: DifferencesCounts,
-    /// Vote counts per list and candidate ("Aantal stemmen per lijst en kandidaat")
-    pub political_group_votes: Vec<PoliticalGroupCandidateVotes>,
-}
-
-#[derive(Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct CommonPollingStationResultsWithoutVotes {
-    /// Voters counts ("Aantal toegelaten kiezers")
-    pub voters_counts: VotersCounts,
-    /// Votes counts ("Aantal getelde stembiljetten")
-    pub votes_counts: VotesCounts,
-    /// Differences counts ("Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten")
-    pub differences_counts: DifferencesCounts,
-}
-
-impl From<CommonPollingStationResults> for CommonPollingStationResultsWithoutVotes {
-    fn from(value: CommonPollingStationResults) -> Self {
-        Self {
-            voters_counts: value.voters_counts,
-            votes_counts: value.votes_counts,
-            differences_counts: value.differences_counts,
-        }
     }
 }
 

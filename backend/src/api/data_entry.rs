@@ -17,8 +17,8 @@ use crate::{
         committee_session::{CommitteeSession, CommitteeSessionError},
         committee_session_status::CommitteeSessionStatus,
         data_entry::{
-            CSONextSessionResults, CommonPollingStationResults, DataEntryId,
-            DataEntryStatusResponse, PollingStationDataEntry, PollingStationResults,
+            CSONextSessionResults, DataEntryId, DataEntryStatusResponse, PollingStationDataEntry,
+            PollingStationResults,
         },
         data_entry_status::{
             ClientState, CurrentDataEntry, DataEntryStatus, DataEntryStatusName,
@@ -28,6 +28,7 @@ use crate::{
         entry_number::EntryNumber,
         investigation::InvestigationStatus,
         polling_station::{PollingStation, PollingStationId},
+        polling_station_results::common_polling_station_results::CommonPollingStationResults,
         validation::{DataError, ValidateRoot, ValidationResults},
     },
     error::{ErrorReference, ErrorResponse},

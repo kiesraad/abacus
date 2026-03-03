@@ -5,11 +5,13 @@ use serde::{Deserialize, Serialize};
 use crate::{
     APIError,
     domain::{
-        data_entry::{CommonPollingStationResults, PoliticalGroupCandidateVotes},
+        data_entry::PoliticalGroupCandidateVotes,
         election::{
             Candidate, CandidateNumber, ElectionWithPoliticalGroups, PGNumber, PoliticalGroup,
         },
-        polling_station_results::count::Count,
+        polling_station_results::{
+            common_polling_station_results::CommonPollingStationResults, count::Count,
+        },
         summary::ElectionSummary,
     },
 };

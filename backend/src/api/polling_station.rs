@@ -206,10 +206,10 @@ async fn polling_station_create(
     let mut polling_station = create(&mut tx, election_id, new_polling_station).await?;
 
     if !committee_session.is_next_session() {
-        polling_station = create_empty_data_entry(&mut tx, polling_station.id).await?;
+        polling_station = create_empty_data_entry(&mut tx, polling_station.id()).await?;
     }
 
-    let response: PollingStationResponse = polling_station.into();
+    let response: PollingStationResponse = polling_station.into_response();
 
     audit_service
         .log(
@@ -266,8 +266,8 @@ async fn polling_station_get(
     Path((election_id, polling_station_id)): Path<(ElectionId, PollingStationId)>,
 ) -> Result<(StatusCode, PollingStationResponse), APIError> {
     let mut conn = pool.acquire().await?;
-    let row = get_for_election(&mut conn, election_id, polling_station_id).await?;
-    Ok((StatusCode::OK, row.into()))
+    let polling_station = get_for_election(&mut conn, election_id, polling_station_id).await?;
+    Ok((StatusCode::OK, polling_station.into_response()))
 }
 
 /// Update a [PollingStation]
@@ -311,7 +311,7 @@ async fn polling_station_update(
     )
     .await?;
 
-    let response: PollingStationResponse = polling_station.into();
+    let response: PollingStationResponse = polling_station.into_response();
 
     audit_service
         .log(
@@ -368,13 +368,13 @@ async fn polling_station_delete(
 
     validate_user_is_allowed_to_perform_action(user, &committee_session)?;
 
-    let polling_station_row = get_for_election(&mut tx, election_id, polling_station_id).await?;
+    let polling_station = get_for_election(&mut tx, election_id, polling_station_id).await?;
 
     delete_data_entry_for_polling_station(
         &mut tx,
         &audit_service,
         &committee_session,
-        polling_station_row.id,
+        polling_station.id(),
     )
     .await?;
 
@@ -382,13 +382,13 @@ async fn polling_station_delete(
         &mut tx,
         &audit_service,
         &committee_session,
-        polling_station_row.id,
+        polling_station.id(),
     )
     .await?;
 
     delete(&mut tx, election_id, polling_station_id).await?;
 
-    let response: PollingStationResponse = polling_station_row.into();
+    let response: PollingStationResponse = polling_station.into_response();
     audit_service
         .log(
             &mut tx,
@@ -455,11 +455,11 @@ pub async fn create_imported_polling_stations(
     let file_hash = EmlHash::from(polling_stations_request.polling_stations.as_bytes()).chunks;
 
     // Create new polling stations
-    let mut polling_station_rows = create_many(&mut tx, election_id, polling_stations).await?;
+    let mut polling_station_list = create_many(&mut tx, election_id, polling_stations).await?;
 
     if !committee_session.is_next_session() {
-        for row in &mut polling_station_rows {
-            *row = create_empty_data_entry(&mut tx, row.id).await?;
+        for ps in &mut polling_station_list {
+            *ps = create_empty_data_entry(&mut tx, ps.id()).await?;
         }
     }
 
@@ -470,7 +470,7 @@ pub async fn create_imported_polling_stations(
             &PollingStationsImportedAuditData(PollingStationImportAuditData {
                 import_election_id: election_id,
                 import_file_name: polling_stations_request.file_name,
-                import_number_of_polling_stations: u64::try_from(polling_station_rows.len())
+                import_number_of_polling_stations: u64::try_from(polling_station_list.len())
                     .map_err(|_| EMLImportError::NumberOfPollingStationsNotInRange)?,
             }),
             Some(format!(
@@ -493,9 +493,9 @@ pub async fn create_imported_polling_stations(
 
     tx.commit().await?;
 
-    Ok(polling_station_rows
+    Ok(polling_station_list
         .into_iter()
-        .map(PollingStationResponse::from)
+        .map(|ps| ps.into_response())
         .collect())
 }
 
@@ -659,7 +659,7 @@ VALUES
         let result = update(
             &mut conn,
             ElectionId::from(7),
-            polling_station.id,
+            polling_station.id(),
             data.clone(),
         )
         .await;

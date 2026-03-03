@@ -42,7 +42,7 @@ pub async fn create_test_investigation(
         Some(true) => {
             let ps = create_empty_data_entry(conn, polling_station_id).await?;
             let data_entry_id = ps
-                .data_entry_id
+                .data_entry_id()
                 .expect("create_empty_data_entry should set data_entry_id");
             InvestigationStatus::new("Test reason".to_string())
                 .conclude_with_new_results("Test findings".to_string(), data_entry_id)

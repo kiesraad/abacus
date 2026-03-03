@@ -209,6 +209,65 @@ impl From<PollingStationNextSession> for PollingStationResponse {
     }
 }
 
+/// A single polling station for either a first or next committee session
+#[derive(Debug, Clone)]
+pub enum PollingStationForSession {
+    First(PollingStationFirstSession),
+    Next(PollingStationNextSession),
+}
+
+impl PollingStationForSession {
+    pub fn polling_station(&self) -> &PollingStation {
+        match self {
+            Self::First(ps) => &ps.polling_station,
+            Self::Next(ps) => &ps.polling_station,
+        }
+    }
+
+    pub fn id(&self) -> PollingStationId {
+        self.polling_station().id
+    }
+
+    pub fn election_id(&self) -> ElectionId {
+        self.polling_station().election_id
+    }
+
+    pub fn committee_session_id(&self) -> CommitteeSessionId {
+        match self {
+            Self::First(ps) => ps.committee_session_id,
+            Self::Next(ps) => ps.committee_session_id,
+        }
+    }
+
+    pub fn data_entry_id(&self) -> Option<DataEntryId> {
+        match self {
+            Self::First(ps) => ps.data_entry_id,
+            Self::Next(ps) => ps.data_entry_id,
+        }
+    }
+
+    pub fn prev_data_entry_id(&self) -> Option<DataEntryId> {
+        match self {
+            Self::First(_) => None,
+            Self::Next(ps) => ps.prev_data_entry_id,
+        }
+    }
+
+    pub fn into_response(self) -> PollingStationResponse {
+        match self {
+            Self::First(ps) => ps.into(),
+            Self::Next(ps) => ps.into(),
+        }
+    }
+
+    pub fn into_polling_station(self) -> PollingStation {
+        match self {
+            Self::First(ps) => ps.polling_station,
+            Self::Next(ps) => ps.polling_station,
+        }
+    }
+}
+
 /// Polling stations for either a first or next committee session
 pub enum PollingStationsForSession {
     First(Vec<PollingStationFirstSession>),

@@ -7,9 +7,9 @@ use crate::{
         election::ElectionId,
         investigation::InvestigationStatus,
         polling_station::{
-            PollingStation, PollingStationFirstSession, PollingStationId,
+            PollingStation, PollingStationFirstSession, PollingStationForSession, PollingStationId,
             PollingStationNextSession, PollingStationNumber, PollingStationRequest,
-            PollingStationResponse, PollingStationType,
+            PollingStationType,
         },
     },
     repository::committee_session_repo,
@@ -17,20 +17,21 @@ use crate::{
 
 /// Polling station database row, matching the SQL schema
 #[derive(FromRow, Debug, Clone)]
-pub struct PollingStationRow {
-    pub id: PollingStationId,
-    pub election_id: ElectionId,
-    pub committee_session_id: CommitteeSessionId,
-    pub prev_data_entry_id: Option<DataEntryId>,
-    pub data_entry_id: Option<DataEntryId>,
-    pub investigation_state: Option<Json<InvestigationStatus>>,
-    pub name: String,
-    pub number: PollingStationNumber,
-    pub number_of_voters: Option<u32>,
-    pub polling_station_type: Option<PollingStationType>,
-    pub address: String,
-    pub postal_code: String,
-    pub locality: String,
+struct PollingStationRow {
+    id: PollingStationId,
+    election_id: ElectionId,
+    committee_session_id: CommitteeSessionId,
+    committee_session_number: u32,
+    prev_data_entry_id: Option<DataEntryId>,
+    data_entry_id: Option<DataEntryId>,
+    investigation_state: Option<Json<InvestigationStatus>>,
+    name: String,
+    number: PollingStationNumber,
+    number_of_voters: Option<u32>,
+    polling_station_type: Option<PollingStationType>,
+    address: String,
+    postal_code: String,
+    locality: String,
 }
 
 impl From<PollingStationRow> for PollingStation {
@@ -49,31 +50,38 @@ impl From<PollingStationRow> for PollingStation {
     }
 }
 
-impl From<PollingStationRow> for PollingStationResponse {
-    fn from(row: PollingStationRow) -> Self {
-        Self {
-            id: row.id,
-            election_id: row.election_id,
-            committee_session_id: row.committee_session_id,
-            prev_data_entry_id: row.prev_data_entry_id,
-            data_entry_id: row.data_entry_id,
-            name: row.name,
-            number: row.number,
-            number_of_voters: row.number_of_voters,
-            polling_station_type: row.polling_station_type,
-            address: row.address,
-            postal_code: row.postal_code,
-            locality: row.locality,
-        }
-    }
-}
-
 impl From<PollingStationRow> for PollingStationFirstSession {
     fn from(row: PollingStationRow) -> Self {
+        let PollingStationRow {
+            id,
+            election_id,
+            committee_session_id,
+            committee_session_number: _,
+            prev_data_entry_id: _,
+            data_entry_id,
+            investigation_state: _,
+            name,
+            number,
+            number_of_voters,
+            polling_station_type,
+            address,
+            postal_code,
+            locality,
+        } = row;
         Self {
-            committee_session_id: row.committee_session_id,
-            data_entry_id: row.data_entry_id,
-            polling_station: PollingStation::from(row),
+            committee_session_id,
+            data_entry_id,
+            polling_station: PollingStation {
+                id,
+                election_id,
+                name,
+                number,
+                number_of_voters,
+                polling_station_type,
+                address,
+                postal_code,
+                locality,
+            },
         }
     }
 }
@@ -84,6 +92,7 @@ impl From<PollingStationRow> for PollingStationNextSession {
             id,
             election_id,
             committee_session_id,
+            committee_session_number: _,
             prev_data_entry_id,
             data_entry_id,
             investigation_state,
@@ -123,6 +132,16 @@ impl From<PollingStationRow> for PollingStationNextSession {
     }
 }
 
+impl From<PollingStationRow> for PollingStationForSession {
+    fn from(row: PollingStationRow) -> Self {
+        if row.committee_session_number > 1 {
+            Self::Next(PollingStationNextSession::from(row))
+        } else {
+            Self::First(PollingStationFirstSession::from(row))
+        }
+    }
+}
+
 /// Returns if a committee session has polling stations
 pub async fn has_any(
     conn: &mut SqliteConnection,
@@ -143,7 +162,7 @@ pub async fn has_any(
 }
 
 /// List all polling stations from a committee session
-pub async fn list(
+async fn list(
     conn: &mut SqliteConnection,
     committee_session_id: CommitteeSessionId,
 ) -> Result<Vec<PollingStationRow>, sqlx::Error> {
@@ -154,6 +173,7 @@ pub async fn list(
             p.id AS "id: _",
             c.election_id AS "election_id: _",
             p.committee_session_id AS "committee_session_id: _",
+            c.number AS "committee_session_number: u32",
             p.prev_data_entry_id AS "prev_data_entry_id: _",
             p.data_entry_id AS "data_entry_id: _",
             p.investigation_state AS "investigation_state: Json<InvestigationStatus>",
@@ -178,7 +198,7 @@ pub async fn list(
 pub async fn get(
     conn: &mut SqliteConnection,
     polling_station_id: PollingStationId,
-) -> Result<PollingStationRow, sqlx::Error> {
+) -> Result<PollingStationForSession, sqlx::Error> {
     query_as!(
         PollingStationRow,
         r#"
@@ -186,6 +206,7 @@ pub async fn get(
             p.id AS "id: _",
             c.election_id AS "election_id: _",
             p.committee_session_id AS "committee_session_id: _",
+            c.number AS "committee_session_number: u32",
             p.prev_data_entry_id AS "prev_data_entry_id: _",
             p.data_entry_id AS "data_entry_id: _",
             p.investigation_state AS "investigation_state: Json<InvestigationStatus>",
@@ -208,6 +229,7 @@ pub async fn get(
     )
     .fetch_one(conn)
     .await
+    .map(PollingStationForSession::from)
 }
 
 /// Get a single polling station for an election
@@ -215,7 +237,7 @@ pub async fn get_for_election(
     conn: &mut SqliteConnection,
     election_id: ElectionId,
     polling_station_id: PollingStationId,
-) -> Result<PollingStationRow, sqlx::Error> {
+) -> Result<PollingStationForSession, sqlx::Error> {
     let committee_session_id =
         committee_session_repo::get_current_id_for_election(conn, election_id)
             .await?
@@ -228,6 +250,7 @@ pub async fn get_for_election(
             p.id AS "id: _",
             c.election_id AS "election_id: _",
             p.committee_session_id AS "committee_session_id: _",
+            c.number AS "committee_session_number: u32",
             p.prev_data_entry_id AS "prev_data_entry_id: _",
             p.data_entry_id AS "data_entry_id: _",
             p.investigation_state AS "investigation_state: Json<InvestigationStatus>",
@@ -247,6 +270,7 @@ pub async fn get_for_election(
     )
     .fetch_one(&mut *conn)
     .await
+    .map(PollingStationForSession::from)
 }
 
 /// Create a single polling station for an election
@@ -254,7 +278,7 @@ pub async fn create(
     conn: &mut SqliteConnection,
     election_id: ElectionId,
     new_polling_station: PollingStationRequest,
-) -> Result<PollingStationRow, sqlx::Error> {
+) -> Result<PollingStationForSession, sqlx::Error> {
     let mut tx = conn.begin().await?;
     let committee_session_id =
         committee_session_repo::get_current_id_for_election(&mut tx, election_id)
@@ -285,6 +309,7 @@ pub async fn create(
             id AS "id: _",
             ? AS "election_id!: _", -- Workaround to get election_id in the result without a temporary struct
             committee_session_id AS "committee_session_id: _",
+            (SELECT c.number FROM committee_sessions AS c WHERE c.id = committee_session_id) AS "committee_session_number!: u32",
             prev_data_entry_id AS "prev_data_entry_id: _",
             data_entry_id AS "data_entry_id: _",
             investigation_state AS "investigation_state: Json<InvestigationStatus>",
@@ -310,7 +335,7 @@ pub async fn create(
     .fetch_one(&mut *tx)
     .await?;
     tx.commit().await?;
-    Ok(res)
+    Ok(PollingStationForSession::from(res))
 }
 
 /// Create many polling stations for an election
@@ -319,8 +344,8 @@ pub async fn create_many(
     conn: &mut SqliteConnection,
     election_id: ElectionId,
     new_polling_stations: Vec<PollingStationRequest>,
-) -> Result<Vec<PollingStationRow>, sqlx::Error> {
-    let mut stations: Vec<PollingStationRow> = Vec::new();
+) -> Result<Vec<PollingStationForSession>, sqlx::Error> {
+    let mut stations: Vec<PollingStationForSession> = Vec::new();
     let mut tx = conn.begin().await?;
 
     let committee_session_id =
@@ -335,7 +360,7 @@ pub async fn create_many(
             ));
         }
 
-        stations.push(
+        stations.push(PollingStationForSession::from(
             query_as!(
                 PollingStationRow,
                 r#"
@@ -354,6 +379,7 @@ pub async fn create_many(
                 id AS "id: _",
                 ? AS "election_id!: ElectionId", -- Workaround to get election_id in the result without a temporary struct
                 committee_session_id AS "committee_session_id: _",
+                (SELECT c.number FROM committee_sessions AS c WHERE c.id = committee_session_id) AS "committee_session_number!: u32",
                 prev_data_entry_id AS "prev_data_entry_id: _",
                 data_entry_id AS "data_entry_id: _",
                 investigation_state AS "investigation_state: Json<InvestigationStatus>",
@@ -378,7 +404,7 @@ pub async fn create_many(
             )
             .fetch_one(&mut *tx)
             .await?,
-        );
+        ));
     }
     tx.commit().await?;
     Ok(stations)
@@ -390,7 +416,7 @@ pub async fn update(
     election_id: ElectionId,
     polling_station_id: PollingStationId,
     polling_station_update: PollingStationRequest,
-) -> Result<PollingStationRow, sqlx::Error> {
+) -> Result<PollingStationForSession, sqlx::Error> {
     let mut tx = conn.begin().await?;
     let committee_session_id =
         committee_session_repo::get_current_id_for_election(&mut tx, election_id)
@@ -398,7 +424,7 @@ pub async fn update(
             .ok_or(sqlx::Error::RowNotFound)?;
 
     let polling_station = get(&mut tx, polling_station_id).await?;
-    if polling_station.prev_data_entry_id.is_some() && polling_station_update.number.is_some() {
+    if polling_station.prev_data_entry_id().is_some() && polling_station_update.number.is_some() {
         return Err(sqlx::Error::InvalidArgument(
             "number cannot be updated for polling stations linked to a previous session"
                 .to_string(),
@@ -423,6 +449,7 @@ pub async fn update(
             id AS "id: _",
             ? AS "election_id!: _", -- Workaround to get election_id in the result without a temporary struct
             committee_session_id AS "committee_session_id: _",
+            (SELECT c.number FROM committee_sessions AS c WHERE c.id = committee_session_id) AS "committee_session_number!: u32",
             prev_data_entry_id AS "prev_data_entry_id: _",
             data_entry_id AS "data_entry_id: _",
             investigation_state AS "investigation_state: Json<InvestigationStatus>",
@@ -448,7 +475,7 @@ pub async fn update(
     .fetch_one(&mut *tx)
     .await?;
     tx.commit().await?;
-    Ok(res)
+    Ok(PollingStationForSession::from(res))
 }
 
 /// Delete a single polling station for an election
@@ -482,7 +509,7 @@ pub async fn link_data_entry(
     conn: &mut SqliteConnection,
     polling_station_id: PollingStationId,
     data_entry_id: DataEntryId,
-) -> Result<PollingStationRow, sqlx::Error> {
+) -> Result<PollingStationForSession, sqlx::Error> {
     query_as!(
         PollingStationRow,
         r#"
@@ -493,6 +520,7 @@ pub async fn link_data_entry(
                 id AS "id: _",
                 (SELECT c.election_id FROM committee_sessions AS c WHERE c.id = committee_session_id) AS "election_id!: _",
                 committee_session_id AS "committee_session_id: _",
+                (SELECT c.number FROM committee_sessions AS c WHERE c.id = committee_session_id) AS "committee_session_number!: u32",
                 prev_data_entry_id AS "prev_data_entry_id: _",
                 data_entry_id AS "data_entry_id: _",
                 investigation_state AS "investigation_state: Json<InvestigationStatus>",
@@ -509,6 +537,19 @@ pub async fn link_data_entry(
     )
     .fetch_one(conn)
     .await
+    .map(PollingStationForSession::from)
+}
+
+/// List all polling stations for a committee session (without session metadata)
+pub async fn list_polling_stations(
+    conn: &mut SqliteConnection,
+    committee_session_id: CommitteeSessionId,
+) -> Result<Vec<PollingStation>, sqlx::Error> {
+    Ok(list(conn, committee_session_id)
+        .await?
+        .into_iter()
+        .map(PollingStation::from)
+        .collect())
 }
 
 /// List all polling stations for a first committee session
@@ -540,7 +581,10 @@ pub async fn get_next_session(
     conn: &mut SqliteConnection,
     polling_station_id: PollingStationId,
 ) -> Result<PollingStationNextSession, sqlx::Error> {
-    Ok(get(conn, polling_station_id).await?.into())
+    match get(conn, polling_station_id).await? {
+        PollingStationForSession::Next(ps) => Ok(ps),
+        PollingStationForSession::First(_) => Err(sqlx::Error::RowNotFound),
+    }
 }
 
 pub async fn duplicate_for_committee_session(

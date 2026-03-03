@@ -168,9 +168,9 @@ async fn validate_and_get_data(
     ),
     APIError,
 > {
-    let polling_station_row = polling_station_repo::get(conn, polling_station_id).await?;
+    let polling_station = polling_station_repo::get(conn, polling_station_id).await?;
     let committee_session =
-        committee_session_repo::get(conn, polling_station_row.committee_session_id).await?;
+        committee_session_repo::get(conn, polling_station.committee_session_id()).await?;
     let election = election_repo::get(conn, committee_session.election_id).await?;
 
     let data_entry_status = data_entry_repo::get_or_default(conn, polling_station_id).await?;
@@ -178,7 +178,7 @@ async fn validate_and_get_data(
     // Validate polling station
     if committee_session.is_next_session()
         && !matches!(
-            investigation_repo::get(conn, polling_station_row.id).await,
+            investigation_repo::get(conn, polling_station.id()).await,
             Ok(Some(InvestigationStatus::ConcludedWithNewResults(_)))
         )
     {
@@ -206,7 +206,7 @@ async fn validate_and_get_data(
     }
 
     Ok((
-        polling_station_row.into(),
+        polling_station.into_polling_station(),
         election,
         committee_session,
         data_entry_status,
@@ -606,7 +606,7 @@ async fn data_entry_reset(
 
     let polling_station = polling_station_repo::get(&mut tx, polling_station_id).await?;
     let committee_session =
-        committee_session_repo::get(&mut tx, polling_station.committee_session_id).await?;
+        committee_session_repo::get(&mut tx, polling_station.committee_session_id()).await?;
 
     let data_entry = get_data_entry(&mut tx, polling_station_id).await?;
 

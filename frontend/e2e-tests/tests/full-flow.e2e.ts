@@ -109,7 +109,7 @@ test.describe("full flow", () => {
     expect(logoutResponse.status()).toBe(204);
   });
 
-  test("create election and a new polling station", async ({ page }) => {
+  test("create GSB election and a new polling station", async ({ page }) => {
     await page.goto("/account/login");
 
     const loginPage = new LoginPgObj(page);
@@ -142,13 +142,14 @@ test.describe("full flow", () => {
 
     const checkAndSavePage = new CheckAndSavePgObj(page);
     await expect(checkAndSavePage.header).toBeVisible();
+    await expect(checkAndSavePage.electoralCommitteeRole).toHaveText("rol: Gemeentelijk stembureau");
     await expect(checkAndSavePage.numberOfVoters).toHaveText("61.269 kiesgerechtigden");
     const election = await checkAndSavePage.saveElection();
 
     electionId = election.id;
 
     await expect(electionsOverviewPage.adminHeader).toBeVisible();
-    await expect(electionsOverviewPage.alertElectionCreated).toBeVisible();
+    await expect(electionsOverviewPage.alertGSBElectionCreated).toBeVisible();
     await electionsOverviewPage.findElectionRowById(electionId).click();
 
     const electionHomePage = new ElectionHome(page);

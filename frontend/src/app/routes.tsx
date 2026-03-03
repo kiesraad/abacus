@@ -7,6 +7,7 @@ import { ElectionLayout } from "@/components/layout/ElectionLayout";
 import { ElectionStatusLayout } from "@/components/layout/ElectionStatusLayout";
 import { PrivacyStatementPage } from "@/components/privacy_statement/PrivacyStatementPage";
 import { accountRoutes } from "@/features/account/routes";
+import { apportionmentRoutes } from "@/features/apportionment/routes";
 import { dataEntryRoutes } from "@/features/data_entry/routes";
 import { detailRoutes } from "@/features/data_entry_detail/routes";
 import { dataEntryHomeRoutes } from "@/features/data_entry_home/routes";
@@ -79,6 +80,10 @@ export const routes: RouteObject[] = [
                     children: detailRoutes,
                   },
                 ],
+              },
+              {
+                path: "apportionment",
+                children: apportionmentRoutes,
               },
               {
                 path: "investigations",

@@ -26,7 +26,7 @@ use tracing_subscriber::EnvFilter;
 /// Abacus API and asset server
 #[derive(Parser, Debug, Clone)]
 struct Args {
-    /// The committee type
+    /// The committee category
     #[arg(value_enum)]
     committee_category: CommitteeCategory,
 

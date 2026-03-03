@@ -1,4 +1,4 @@
-INSERT INTO elections (id, name, role, counting_method, election_id, location, domain_id, category, number_of_seats, number_of_voters, election_date, nomination_date, political_groups)
+INSERT INTO elections (id, name, committee_category, counting_method, election_id, location, domain_id, category, number_of_seats, number_of_voters, election_date, nomination_date, political_groups)
 -- number_of_seats explicitly set to a value less than 19, to be used in elections with less than 19 seats
 VALUES (2, 'Municipal Election', 'GSB', 'CSO', 'GR2024_Heemdamseburg', 'Heemdamseburg', '0000', 'Municipal', 15, 2000, '2024-11-30', '2024-11-01',
         '[

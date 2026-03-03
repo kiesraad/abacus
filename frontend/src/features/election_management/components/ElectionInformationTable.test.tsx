@@ -23,7 +23,7 @@ const renderTable = (
         election={{
           id: 1,
           name: "Gemeenteraadsverkiezingen 2026",
-          role: "GSB",
+          committee_category: "GSB",
           counting_method: "DSO",
           election_id: "Heemdamseburg_2024",
           location: "Heemdamseburg",

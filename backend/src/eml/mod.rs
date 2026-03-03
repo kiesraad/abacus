@@ -36,8 +36,8 @@ use crate::domain::{
     committee_session::CommitteeSession,
     data_entry::PoliticalGroupCandidateVotes,
     election::{
-        Candidate, CandidateGender, CandidateNumber, ElectionRole, ElectionWithPoliticalGroups,
-        NewElection, PGNumber, PoliticalGroup, VoteCountingMethod,
+        Candidate, CandidateGender, CandidateNumber, CommitteeCategory,
+        ElectionWithPoliticalGroups, NewElection, PGNumber, PoliticalGroup, VoteCountingMethod,
     },
     summary::ElectionSummary,
 };
@@ -114,7 +114,7 @@ impl NewElection {
 
         Ok(Self {
             name: identifier.name.clone(),
-            role: ElectionRole::GSB,
+            committee_category: CommitteeCategory::GSB,
             counting_method: VoteCountingMethod::CSO,
             election_id: identifier.id.raw().into_owned(),
             location: domain.name.clone(),

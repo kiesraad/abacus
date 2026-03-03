@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { getCommitteeSessionMockData } from "@/testing/api-mocks/CommitteeSessionMockData";
-import type { CommitteeSessionStatus, ElectionRole } from "@/types/generated/openapi";
+import type { CommitteeCategory, CommitteeSessionStatus } from "@/types/generated/openapi";
 
 import { CommitteeSessionCard } from "./CommitteeSessionCard";
 
@@ -10,11 +10,11 @@ type Props = {
   status: CommitteeSessionStatus;
   startDateTime: string;
   isCurrentSession: boolean;
-  electionRole: ElectionRole;
+  committeeCategory: CommitteeCategory;
 };
 
 export const DefaultCommitteeSessionCard: StoryObj<Props> = {
-  render: ({ number, status, startDateTime, isCurrentSession, electionRole }) => {
+  render: ({ number, status, startDateTime, isCurrentSession, committeeCategory }) => {
     const committeeSession = getCommitteeSessionMockData({
       number: number,
       status: status,
@@ -24,7 +24,7 @@ export const DefaultCommitteeSessionCard: StoryObj<Props> = {
     return (
       <CommitteeSessionCard
         committeeSession={committeeSession}
-        electionRole={electionRole}
+        committeeCategory={committeeCategory}
         isCurrentSession={isCurrentSession}
       />
     );

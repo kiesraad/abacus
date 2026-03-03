@@ -63,7 +63,7 @@ export function DataEntryPage() {
             (sectionId === "save" ? (
               <CheckAndSaveForm />
             ) : (
-              <DataEntrySection key={sectionId} electionRole={election.role} />
+              <DataEntrySection key={sectionId} committeeCategory={election.committee_category} />
             ))}
         </article>
       </main>

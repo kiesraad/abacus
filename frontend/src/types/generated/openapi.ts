@@ -517,6 +517,12 @@ export interface ClaimDataEntryResponse {
 }
 
 /**
+ * Committee category
+ */
+export const committeeCategoryValues = ["GSB", "CSB"] as const;
+export type CommitteeCategory = (typeof committeeCategoryValues)[number];
+
+/**
  * Committee session
  */
 export interface CommitteeSession {
@@ -689,6 +695,7 @@ export interface DisplayFraction {
  */
 export interface Election {
   category: ElectionCategory;
+  committee_category: CommitteeCategory;
   counting_method: VoteCountingMethod;
   domain_id: string;
   election_date: string;
@@ -699,7 +706,6 @@ export interface Election {
   nomination_date: string;
   number_of_seats: number;
   number_of_voters: number;
-  role: ElectionRole;
 }
 
 export interface ElectionApportionmentResponse {
@@ -715,16 +721,16 @@ export const electionCategoryValues = ["Municipal"] as const;
 export type ElectionCategory = (typeof electionCategoryValues)[number];
 
 export type ElectionCreationRequest =
-  | (GSBElectionCreationRequest & { role: "GSB" })
-  | (CSBElectionCreationRequest & { role: "CSB" });
+  | (GSBElectionCreationRequest & { committee_category: "GSB" })
+  | (CSBElectionCreationRequest & { committee_category: "CSB" });
 
 export type ElectionCreationValidateRequest =
-  | (GSBElectionCreationValidateRequest & { role: "GSB" })
-  | (CSBElectionCreationValidateRequest & { role: "CSB" });
+  | (GSBElectionCreationValidateRequest & { committee_category: "GSB" })
+  | (CSBElectionCreationValidateRequest & { committee_category: "CSB" });
 
 export type ElectionDefinitionValidateResponse =
-  | (GSBElectionDefinitionValidateResponse & { role: "GSB" })
-  | (CSBElectionDefinitionValidateResponse & { role: "CSB" });
+  | (GSBElectionDefinitionValidateResponse & { committee_category: "GSB" })
+  | (CSBElectionDefinitionValidateResponse & { committee_category: "CSB" });
 
 /**
  * Election details response, including the election's candidate list (political groups),
@@ -757,12 +763,6 @@ export interface ElectionListResponse {
 export interface ElectionNumberOfVotersChangeRequest {
   number_of_voters: number;
 }
-
-/**
- * Election role
- */
-export const electionRoleValues = ["GSB", "CSB"] as const;
-export type ElectionRole = (typeof electionRoleValues)[number];
 
 /**
  * Election polling stations data entry statuses response
@@ -814,6 +814,7 @@ export interface ElectionSummary {
  */
 export interface ElectionWithPoliticalGroups {
   category: ElectionCategory;
+  committee_category: CommitteeCategory;
   counting_method: VoteCountingMethod;
   domain_id: string;
   election_date: string;
@@ -825,7 +826,6 @@ export interface ElectionWithPoliticalGroups {
   number_of_seats: number;
   number_of_voters: number;
   political_groups: PoliticalGroup[];
-  role: ElectionRole;
 }
 
 /**
@@ -1028,6 +1028,7 @@ export interface LoginResponse {
  */
 export interface NewElection {
   category: ElectionCategory;
+  committee_category: CommitteeCategory;
   counting_method: VoteCountingMethod;
   domain_id: string;
   election_date: string;
@@ -1038,7 +1039,6 @@ export interface NewElection {
   number_of_seats: number;
   number_of_voters: number;
   political_groups: PoliticalGroup[];
-  role: ElectionRole;
 }
 
 export type PGNumber = number;

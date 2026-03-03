@@ -59,7 +59,7 @@ export function ElectionInformationTable({
           </Table.HeaderCell>
           <Table.Cell>{getListsAndCandidatesLabel(election)}</Table.Cell>
         </Table.Row>
-        {election.role === "GSB" && (
+        {election.committee_category === "GSB" && (
           <Table.Row to={rowLink}>
             <Table.HeaderCell scope="row" className="normal">
               {t("number_of_voters")}
@@ -73,9 +73,9 @@ export function ElectionInformationTable({
           <Table.HeaderCell scope="row" className="normal">
             {t("election_management.to_do_data_entry_for")}
           </Table.HeaderCell>
-          <Table.Cell>{t(`electoral_committee_role.roles.${election.role}.short`)}</Table.Cell>
+          <Table.Cell>{t(`committee_category.${election.committee_category}.short`)}</Table.Cell>
         </Table.Row>
-        {election.role === "GSB" && (
+        {election.committee_category === "GSB" && (
           <>
             <Table.Row key={election.id} to="polling-stations">
               <Table.HeaderCell scope="row" className="normal">

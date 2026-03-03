@@ -44,6 +44,15 @@ impl Role {
     pub(crate) fn is_typist(&self) -> bool {
         matches!(self, Self::TypistGSB | Self::TypistCSB)
     }
+
+    pub fn manages(&self, other: &Role) -> bool {
+        matches!(
+            (self, other),
+            (Self::Administrator, _)
+                | (Self::CoordinatorCSB, Self::TypistCSB)
+                | (Self::CoordinatorGSB, Self::TypistGSB)
+        )
+    }
 }
 
 #[cfg(test)]
@@ -91,6 +100,27 @@ mod tests {
                 (true, false, false) | (false, true, false) | (false, false, true) => {}
                 _ => panic!("Expected exactly one is_* == true for {}", role),
             }
+        }
+    }
+
+    #[test]
+    fn administrator_manages_all_roles() {
+        for role in Role::VARIANTS {
+            assert!(Role::Administrator.manages(role));
+        }
+    }
+
+    #[test]
+    fn all_coordinators_manage_exactly_one_typist_role() {
+        let coordinators = Role::VARIANTS.iter().filter(|role| role.is_coordinator());
+        for coordinator in coordinators {
+            let manages: Vec<_> = Role::VARIANTS
+                .iter()
+                .filter(|role| coordinator.manages(role))
+                .collect();
+
+            assert_eq!(manages.len(), 1);
+            assert!(manages[0].is_typist());
         }
     }
 }

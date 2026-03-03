@@ -4,7 +4,7 @@ import { hasTranslation, t, tx } from "@/i18n/translate";
 import type { ValidationResult } from "@/types/generated/openapi";
 import type { AlertType, FeedbackId } from "@/types/ui";
 import { cn } from "@/utils/classnames";
-import type { RoleWithoutElection } from "@/utils/role";
+import type { RoleWithoutCommitteeCategory } from "@/utils/role";
 import { dottedCode } from "@/utils/ValidationResults";
 import { AlertIcon } from "../Icon/AlertIcon";
 import cls from "./Feedback.module.css";
@@ -20,7 +20,7 @@ interface FeedbackProps {
   id: FeedbackId;
   type: AlertType;
   data: ValidationResult[];
-  userRole: RoleWithoutElection;
+  userRole: RoleWithoutCommitteeCategory;
   shouldFocus?: boolean;
 }
 

@@ -43,12 +43,12 @@ describe("UserCreateDetailsPage", () => {
   });
 
   test("Render empty form", async () => {
-    renderPage({ role: "coordinator_gsb", type: "fullname" });
+    renderPage({ fullRole: "administrator", type: "fullname" });
 
     expect(
       await screen.findByRole("heading", {
         level: 1,
-        name: "Coördinator gemeentelijk stembureau (GSB) toevoegen",
+        name: "Beheerder toevoegen",
       }),
     ).toBeInTheDocument();
 
@@ -59,11 +59,11 @@ describe("UserCreateDetailsPage", () => {
 
   test("Navigate to user list after submitting", async () => {
     overrideOnce("post", "/api/users" satisfies USER_CREATE_REQUEST_PATH, 201, {
-      role: "coordinator_gsb",
+      role: "administrator",
       username: "NieuweGebruiker",
     } satisfies Partial<User>);
 
-    renderPage({ role: "coordinator_gsb", type: "fullname" });
+    renderPage({ fullRole: "administrator", type: "fullname" });
 
     const user = userEvent.setup();
     await user.type(await screen.findByRole("textbox", { name: "Gebruikersnaam" }), "NieuweGebruiker");
@@ -73,7 +73,7 @@ describe("UserCreateDetailsPage", () => {
 
     expect(pushMessage).toHaveBeenCalledWith({
       title: "Gebruiker toegevoegd",
-      text: "NieuweGebruiker is toegevoegd met de rol Coördinator gemeentelijk stembureau (GSB)",
+      text: "NieuweGebruiker is toegevoegd met de rol Beheerder",
     });
     expect(navigate).toHaveBeenCalledExactlyOnceWith("/users");
   });

@@ -47,7 +47,7 @@ export function DataEntryPage() {
           <PollingStationNumber>{pollingStation.number}</PollingStationNumber>
           <h1>{pollingStation.name}</h1>
           {pollingStationStatus.status && (
-            <Badge type={pollingStationStatus.status} userRole={user.roleWithoutElection} />
+            <Badge type={pollingStationStatus.status} userRole={user.roleWithoutCommitteeCategory} />
           )}
         </section>
         <section>

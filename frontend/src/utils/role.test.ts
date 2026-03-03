@@ -1,7 +1,15 @@
 import { describe, expect, test } from "vitest";
 
 import { type Role, roleValues } from "@/types/generated/openapi";
-import { isAdministrator, isCoordinator, isTypist, roleWithoutElection } from "@/utils/role";
+import {
+  isAdministrator,
+  isCoordinator,
+  isRoleWithoutCommitteeCategory,
+  isTypist,
+  type RoleWithoutCommitteeCategory,
+  roleWithoutCommitteeCategory,
+  roleWithoutCommitteeCategoryValues,
+} from "@/utils/role";
 
 describe("Role util", () => {
   test.each(
@@ -21,8 +29,18 @@ describe("Role util", () => {
     expect(fn(undefined)).toBe(false);
   });
 
-  test.each(roleValues)("Role %j without election should be the first part of role", (role: Role) => {
-    const roleWithout = roleWithoutElection(role);
+  test.each(roleValues)("Role %j without committee category should be the first part of role", (role: Role) => {
+    const roleWithout = roleWithoutCommitteeCategory(role);
     expect(role.startsWith(roleWithout)).toBe(true);
+  });
+
+  test.each(
+    roleWithoutCommitteeCategoryValues,
+  )("String %j should be a RoleWithoutCommitteeCategory", (role: RoleWithoutCommitteeCategory) => {
+    expect(isRoleWithoutCommitteeCategory(role as string)).toBe(true);
+  });
+
+  test('String "typist_gsb" is not a RoleWithoutCommitteeCategory', () => {
+    expect(isRoleWithoutCommitteeCategory("typist_gsb")).toBe(false);
   });
 });

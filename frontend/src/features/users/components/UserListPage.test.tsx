@@ -29,10 +29,10 @@ describe("PollingStationListPage", () => {
     expect(table).toHaveTableContent([
       ["Gebruikersnaam", "Rol", "Volledige naam", "Laatste activiteit"],
       ["Sanne", "Beheerder", "Sanne Molenaar", "vandaag om 10:20"],
-      ["Jayden", "Coördinator gemeentelijk stembureau (GSB)", "Jayden Ahmen", "gisteren om 10:20"],
-      ["Gebruiker01", "Invoerder gemeentelijk stembureau (GSB)", "Account nog niet gebruikt", "–"],
-      ["Gebruiker02", "Invoerder gemeentelijk stembureau (GSB)", "Account nog niet gebruikt", "–"],
-      ["Gebruiker03", "Invoerder gemeentelijk stembureau (GSB)", "Account nog niet gebruikt", "–"],
+      ["Jayden", "Coördinator gemeentelijk stembureau", "Jayden Ahmen", "gisteren om 10:20"],
+      ["Gebruiker01", "Invoerder gemeentelijk stembureau", "Account nog niet gebruikt", "–"],
+      ["Gebruiker02", "Invoerder gemeentelijk stembureau", "Account nog niet gebruikt", "–"],
+      ["Gebruiker03", "Invoerder gemeentelijk stembureau", "Account nog niet gebruikt", "–"],
     ]);
   });
 
@@ -47,10 +47,10 @@ describe("PollingStationListPage", () => {
     expect(table).toHaveTableContent([
       ["Gebruikersnaam", "Rol", "Volledige naam", "Laatste activiteit"],
       ["Sanne", "Beheerder", "Sanne Molenaar", "vandaag om 10:20"],
-      ["Jayden", "Coördinator gemeentelijk stembureau (GSB)", "Jayden Ahmen", "gisteren om 10:20"],
-      ["Gebruiker01", "Invoerder gemeentelijk stembureau (GSB)", "Account nog niet gebruikt", "–"],
-      ["Gebruiker02", "Invoerder gemeentelijk stembureau (GSB)", "Account nog niet gebruikt", "–"],
-      ["Gebruiker03", "Invoerder gemeentelijk stembureau (GSB)", "Account nog niet gebruikt", "–"],
+      ["Jayden", "Coördinator gemeentelijk stembureau", "Jayden Ahmen", "gisteren om 10:20"],
+      ["Gebruiker01", "Invoerder gemeentelijk stembureau", "Account nog niet gebruikt", "–"],
+      ["Gebruiker02", "Invoerder gemeentelijk stembureau", "Account nog niet gebruikt", "–"],
+      ["Gebruiker03", "Invoerder gemeentelijk stembureau", "Account nog niet gebruikt", "–"],
     ]);
   });
 });

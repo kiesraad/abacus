@@ -4,17 +4,17 @@ export function getTypistUser(): NonNullable<UseUserReturn> {
   return {
     needs_password_change: false,
     role: "typist_gsb",
-    roleWithoutElection: "typist",
+    roleWithoutCommitteeCategory: "typist",
     user_id: 1,
     username: "testuser",
   };
 }
 
-export function getCoordinatorUser(): NonNullable<UseUserReturn> {
+export function getCoordinatorUser(committeeCategory: "csb" | "gsb" = "gsb"): NonNullable<UseUserReturn> {
   return {
     needs_password_change: false,
-    role: "coordinator_gsb",
-    roleWithoutElection: "coordinator",
+    role: `coordinator_${committeeCategory}`,
+    roleWithoutCommitteeCategory: "coordinator",
     user_id: 2,
     username: "testcoordinator",
   };
@@ -24,7 +24,7 @@ export function getAdminUser(): NonNullable<UseUserReturn> {
   return {
     needs_password_change: false,
     role: "administrator",
-    roleWithoutElection: "administrator",
+    roleWithoutCommitteeCategory: "administrator",
     user_id: 3,
     username: "testadministrator",
   };

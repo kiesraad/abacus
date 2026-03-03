@@ -36,7 +36,7 @@ describe("UserCreateRolePage", () => {
   });
 
   test("Shows form previously selected", async () => {
-    renderPage({ role: "typist_gsb" });
+    renderPage({ role: "typist" });
 
     expect(await screen.findByRole("radio", { name: /Beheerder/ })).not.toBeChecked();
     expect(await screen.findByRole("radio", { name: /Coördinator/ })).not.toBeChecked();
@@ -82,9 +82,9 @@ describe("UserCreateRolePage", () => {
     await user.click(await screen.findByRole("radio", { name: /Coördinator/ }));
     await user.click(await screen.findByRole("button", { name: "Verder" }));
 
-    expect(setRole).toHaveBeenCalledExactlyOnceWith("coordinator_gsb");
-    expect(setType).toHaveBeenCalledExactlyOnceWith("fullname");
-    expect(navigate).toHaveBeenCalledExactlyOnceWith("/users/create/details");
+    expect(setRole).toHaveBeenCalledExactlyOnceWith("coordinator");
+    expect(setType).not.toHaveBeenCalled();
+    expect(navigate).toHaveBeenCalledExactlyOnceWith("/users/create/committee");
   });
 
   test("Continue with typist", async () => {
@@ -96,20 +96,22 @@ describe("UserCreateRolePage", () => {
     await user.click(await screen.findByRole("radio", { name: /Invoerder/ }));
     await user.click(await screen.findByRole("button", { name: "Verder" }));
 
-    expect(setRole).toHaveBeenCalledExactlyOnceWith("typist_gsb");
+    expect(setRole).toHaveBeenCalledExactlyOnceWith("typist");
     expect(setType).not.toHaveBeenCalled();
-    expect(navigate).toHaveBeenCalledExactlyOnceWith("/users/create/type");
+    expect(navigate).toHaveBeenCalledExactlyOnceWith("/users/create/committee");
   });
 
-  test("Coordinator skips role selection", async () => {
-    vi.spyOn(useUser, "useUser").mockReturnValue(getCoordinatorUser());
+  test("Logged in coordinator is redirected to type selection step", async () => {
+    vi.spyOn(useUser, "useUser").mockReturnValue(getCoordinatorUser("gsb"));
 
     const setRole = vi.fn();
-    renderPage({ setRole });
+    const setCommitteeCategory = vi.fn();
+    renderPage({ setRole, setCommitteeCategory });
 
     await waitFor(() => {
-      expect(setRole).toHaveBeenCalledExactlyOnceWith("typist_gsb");
-      expect(navigate).toHaveBeenCalledExactlyOnceWith("/users/create/type");
+      expect(setRole).toHaveBeenCalledExactlyOnceWith("typist");
+      expect(setCommitteeCategory).toHaveBeenCalledExactlyOnceWith("gsb");
+      expect(navigate).toHaveBeenCalledExactlyOnceWith("/users/create/type", { replace: true });
     });
   });
 });

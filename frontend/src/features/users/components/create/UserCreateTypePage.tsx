@@ -13,9 +13,9 @@ import { useUserCreateContext } from "../../hooks/useUserCreateContext";
 
 export function UserCreateTypePage() {
   const navigate = useNavigate();
-  const { role, type, setType } = useUserCreateContext();
+  const { fullRole, type, setType } = useUserCreateContext();
 
-  if (!role) {
+  if (!fullRole) {
     return <Navigate to="/users/create" />;
   }
 
@@ -37,7 +37,7 @@ export function UserCreateTypePage() {
       <PageTitle title={`${t("users.add")} - Abacus`} />
       <header>
         <section>
-          <h1>{t("users.add_role", { role: t(`users.${role}`) })}</h1>
+          <h1>{t("users.add_role", { role: t(`users.${fullRole}`) })}</h1>
         </section>
       </header>
       <main>
@@ -48,16 +48,16 @@ export function UserCreateTypePage() {
               <ChoiceList>
                 <ChoiceList.Legend>{t("users.type_label")}</ChoiceList.Legend>
                 <ChoiceList.Radio
-                  id={"role-fullname"}
-                  name={"type"}
-                  defaultValue={"fullname"}
+                  id="role-fullname"
+                  name="type"
+                  defaultValue="fullname"
                   defaultChecked={fullnameChecked}
                   label={t("users.type_fullname")}
                 />
                 <ChoiceList.Radio
-                  id={"role-anonymous"}
-                  name={"type"}
-                  defaultValue={"anonymous"}
+                  id="role-anonymous"
+                  name="type"
+                  defaultValue="anonymous"
                   defaultChecked={!fullnameChecked}
                   label={t("users.type_anonymous")}
                 />

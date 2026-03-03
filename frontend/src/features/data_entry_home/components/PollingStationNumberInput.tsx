@@ -123,7 +123,7 @@ export function PollingStationNumberInput({
                     <span className="bold">{currentPollingStation.name}</span>
                     <Badge
                       type={currentPollingStation.statusEntry.status}
-                      userRole={user.roleWithoutElection}
+                      userRole={user.roleWithoutCommitteeCategory}
                       showIcon
                     />
                   </>

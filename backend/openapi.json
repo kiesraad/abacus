@@ -3892,7 +3892,7 @@
     },
     "/api/users": {
       "get": {
-        "summary": "Lists all users (administrator, coordinator_gsb)",
+        "summary": "Lists all users (administrator, coordinator_csb, coordinator_gsb)",
         "operationId": "user_list",
         "responses": {
           "200": {
@@ -3940,13 +3940,14 @@
           {
             "cookie_auth": [
               "administrator",
+              "coordinator_csb",
               "coordinator_gsb"
             ]
           }
         ]
       },
       "post": {
-        "summary": "Create a new user (administrator, coordinator_gsb)",
+        "summary": "Create a new user (administrator, coordinator_csb, coordinator_gsb)",
         "operationId": "user_create",
         "requestBody": {
           "content": {
@@ -4024,6 +4025,7 @@
           {
             "cookie_auth": [
               "administrator",
+              "coordinator_csb",
               "coordinator_gsb"
             ]
           }
@@ -4032,7 +4034,7 @@
     },
     "/api/users/{user_id}": {
       "get": {
-        "summary": "Get a user (administrator, coordinator_gsb)",
+        "summary": "Get a user (administrator, coordinator_csb, coordinator_gsb)",
         "operationId": "user_get",
         "parameters": [
           {
@@ -4101,13 +4103,14 @@
           {
             "cookie_auth": [
               "administrator",
+              "coordinator_csb",
               "coordinator_gsb"
             ]
           }
         ]
       },
       "put": {
-        "summary": "Update a user (administrator, coordinator_gsb)",
+        "summary": "Update a user (administrator, coordinator_csb, coordinator_gsb)",
         "operationId": "user_update",
         "parameters": [
           {
@@ -4196,13 +4199,14 @@
           {
             "cookie_auth": [
               "administrator",
+              "coordinator_csb",
               "coordinator_gsb"
             ]
           }
         ]
       },
       "delete": {
-        "summary": "Delete a user (administrator, coordinator_gsb)",
+        "summary": "Delete a user (administrator, coordinator_csb, coordinator_gsb)",
         "operationId": "user_delete",
         "parameters": [
           {
@@ -4264,6 +4268,7 @@
           {
             "cookie_auth": [
               "administrator",
+              "coordinator_csb",
               "coordinator_gsb"
             ]
           }

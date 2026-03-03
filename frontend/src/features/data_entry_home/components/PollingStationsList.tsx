@@ -37,7 +37,11 @@ export function PollingStationsList({ pollingStations }: PollingStationsListProp
                 <Table.NumberCell>{pollingStation.number}</Table.NumberCell>
                 <Table.Cell>
                   <span>{pollingStation.name}</span>
-                  <Badge type={pollingStation.statusEntry.status} userRole={user.roleWithoutElection} showIcon />
+                  <Badge
+                    type={pollingStation.statusEntry.status}
+                    userRole={user.roleWithoutCommitteeCategory}
+                    showIcon
+                  />
                 </Table.Cell>
               </Table.Row>
             ),

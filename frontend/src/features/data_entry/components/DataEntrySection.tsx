@@ -98,7 +98,7 @@ export function DataEntrySection({ committeeCategory }: DataEntryProps) {
             id="feedback-error"
             type="error"
             data={memoizedErrors}
-            userRole={user.roleWithoutElection}
+            userRole={user.roleWithoutCommitteeCategory}
             shouldFocus={true}
           />
         )}
@@ -107,7 +107,7 @@ export function DataEntrySection({ committeeCategory }: DataEntryProps) {
             id="feedback-warning"
             type="warning"
             data={memoizedWarnings}
-            userRole={user.roleWithoutElection}
+            userRole={user.roleWithoutCommitteeCategory}
             shouldFocus={formSection.errors.isEmpty()}
           />
         )}

@@ -58,16 +58,15 @@ impl InvestigationStatus {
 
     /// InProgress -> ConcludedWithoutNewResults
     ///
-    /// `has_previous_results` must be true (the polling station must have results
-    /// from a previous session), otherwise corrected results are required.
+    /// `new_polling_station` must be false: for a new polling station, corrected results are required (there are no previous results).
     pub fn conclude_without_new_results(
         self,
         findings: String,
-        has_previous_results: bool,
+        new_polling_station: bool,
     ) -> Result<Self, InvestigationTransitionError> {
         match self {
             Self::InProgress(state) => {
-                if !has_previous_results {
+                if new_polling_station {
                     return Err(InvestigationTransitionError::RequiresCorrectedResults);
                 }
                 Ok(Self::ConcludedWithoutNewResults(
@@ -119,11 +118,11 @@ impl InvestigationStatus {
         self,
         reason: String,
         findings: String,
-        has_previous_results: bool,
+        new_polling_station: bool,
     ) -> Result<Self, InvestigationTransitionError> {
         match self {
             Self::ConcludedWithoutNewResults(_) | Self::ConcludedWithNewResults(_) => {
-                if !has_previous_results {
+                if new_polling_station {
                     return Err(InvestigationTransitionError::RequiresCorrectedResults);
                 }
                 Ok(Self::ConcludedWithoutNewResults(
@@ -322,7 +321,7 @@ mod tests {
     #[test]
     fn test_conclude_without_new_results_ok() {
         let s = in_progress()
-            .conclude_without_new_results("findings".into(), true)
+            .conclude_without_new_results("findings".into(), false)
             .unwrap();
         assert_eq!(
             s.status_name(),
@@ -335,7 +334,7 @@ mod tests {
     #[test]
     fn test_conclude_without_new_results_requires_previous() {
         let err = in_progress()
-            .conclude_without_new_results("findings".into(), false)
+            .conclude_without_new_results("findings".into(), true)
             .unwrap_err();
         assert_eq!(err, InvestigationTransitionError::RequiresCorrectedResults);
     }
@@ -343,7 +342,7 @@ mod tests {
     #[test]
     fn test_conclude_without_new_results_wrong_state() {
         let err = concluded_without()
-            .conclude_without_new_results("findings".into(), true)
+            .conclude_without_new_results("findings".into(), false)
             .unwrap_err();
         assert_eq!(err, InvestigationTransitionError::Invalid);
     }
@@ -392,7 +391,7 @@ mod tests {
     #[test]
     fn test_switch_to_without_from_concluded_with() {
         let s = concluded_with(DataEntryId::from(1))
-            .switch_to_without_new_results("new reason".into(), "new findings".into(), true)
+            .switch_to_without_new_results("new reason".into(), "new findings".into(), false)
             .unwrap();
         assert_eq!(
             s.status_name(),
@@ -406,7 +405,7 @@ mod tests {
     #[test]
     fn test_switch_to_without_from_concluded_without() {
         let s = concluded_without()
-            .switch_to_without_new_results("new reason".into(), "new findings".into(), true)
+            .switch_to_without_new_results("new reason".into(), "new findings".into(), false)
             .unwrap();
         assert_eq!(
             s.status_name(),
@@ -418,7 +417,7 @@ mod tests {
     #[test]
     fn test_switch_to_without_requires_previous_results() {
         let err = concluded_with(DataEntryId::from(1))
-            .switch_to_without_new_results("r".into(), "f".into(), false)
+            .switch_to_without_new_results("r".into(), "f".into(), true)
             .unwrap_err();
         assert_eq!(err, InvestigationTransitionError::RequiresCorrectedResults);
     }
@@ -426,7 +425,7 @@ mod tests {
     #[test]
     fn test_switch_to_without_from_in_progress_fails() {
         let err = in_progress()
-            .switch_to_without_new_results("r".into(), "f".into(), true)
+            .switch_to_without_new_results("r".into(), "f".into(), false)
             .unwrap_err();
         assert_eq!(err, InvestigationTransitionError::Invalid);
     }

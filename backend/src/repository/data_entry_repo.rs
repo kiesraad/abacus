@@ -831,7 +831,7 @@ mod tests {
                     .expect("conclude_with_new_results should succeed")
             } else {
                 current
-                    .conclude_without_new_results("Test findings".to_string(), true)
+                    .conclude_without_new_results("Test findings".to_string(), false)
                     .expect("conclude_without_new_results should succeed")
             };
             investigation_repo::save(conn, polling_station_id, &status)

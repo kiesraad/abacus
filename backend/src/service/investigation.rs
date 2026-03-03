@@ -51,7 +51,7 @@ pub async fn create_test_investigation(
     let status = match corrected_results {
         None => InvestigationStatus::new("Test reason".to_string()),
         Some(false) => InvestigationStatus::new("Test reason".to_string())
-            .conclude_without_new_results("Test findings".to_string(), true)
+            .conclude_without_new_results("Test findings".to_string(), false)
             .expect("conclude_without_new_results should succeed"),
         Some(true) => {
             let ps = create_empty_data_entry(conn, polling_station_id).await?;

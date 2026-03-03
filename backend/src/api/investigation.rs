@@ -286,8 +286,8 @@ async fn polling_station_investigation_conclude(
         current.conclude_with_new_results(request.findings, data_entry_id)?
     } else {
         let polling_station = polling_station_repo::get(&mut tx, polling_station_id).await?;
-        let has_prev = polling_station.prev_data_entry_id.is_some();
-        current.conclude_without_new_results(request.findings, has_prev)?
+        let new_polling_station = polling_station.prev_data_entry_id.is_none();
+        current.conclude_without_new_results(request.findings, new_polling_station)?
     };
 
     investigation_repo::save(&mut tx, polling_station_id, &status).await?;
@@ -361,7 +361,7 @@ async fn apply_update(
             Ok(current.switch_to_without_new_results(
                 request.reason,
                 findings,
-                ps.prev_data_entry_id.is_some(),
+                ps.prev_data_entry_id.is_none(),
             )?)
         }
         // ConcludedWithoutNewResults -> ConcludedWithNewResults
@@ -452,9 +452,10 @@ async fn switch_to_without_new_results(
     }
 
     let polling_station = polling_station_repo::get(conn, polling_station_id).await?;
-    let has_prev = polling_station.prev_data_entry_id.is_some();
+    let new_polling_station = polling_station.prev_data_entry_id.is_none();
     let findings = request.findings.unwrap_or_default();
-    let status = current.switch_to_without_new_results(request.reason, findings, has_prev)?;
+    let status =
+        current.switch_to_without_new_results(request.reason, findings, new_polling_station)?;
     Ok(status)
 }
 

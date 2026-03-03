@@ -19,6 +19,7 @@
     "DataEntryGetNotAllowed": "De status van de invoer staat deze actie niet toe",
     "DataEntryNotAllowed": "De invoer voor dit stembureau is niet toegestaan",
     "EmlImportError": "Het EML-bestand is niet geldig",
+    "EmlError": "Er is een fout opgetreden bij het verwerken van het EML-bestand",
     "EntryNotFound": "Niet gevonden",
     "EntryNotUnique": "Deze invoer bestaat al",
     "Forbidden": "Je hebt niet de juiste rechten",

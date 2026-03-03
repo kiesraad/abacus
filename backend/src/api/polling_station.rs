@@ -25,7 +25,7 @@ use crate::{
             PollingStationsRequest,
         },
     },
-    eml::{EML110, EMLDocument, EMLImportError, EmlHash},
+    eml::{EMLImportError, EmlHash, polling_stations_from_eml_str},
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
     repository::{
         committee_session_repo::get_election_committee_session,
@@ -429,8 +429,7 @@ async fn polling_station_validate_import(
     Ok((
         StatusCode::OK,
         Json(PollingStationRequestListResponse {
-            polling_stations: EML110::from_str(&polling_station_request.data)?
-                .get_polling_stations()?,
+            polling_stations: polling_stations_from_eml_str(&polling_station_request.data)?,
         }),
     ))
 }
@@ -445,7 +444,7 @@ pub async fn create_imported_polling_stations(
 
     let committee_session = get_election_committee_session(&mut tx, election_id).await?;
     let polling_stations =
-        EML110::from_str(&polling_stations_request.polling_stations)?.get_polling_stations()?;
+        polling_stations_from_eml_str(&polling_stations_request.polling_stations)?;
     let file_hash = EmlHash::from(polling_stations_request.polling_stations.as_bytes()).chunks;
 
     // Create new polling stations

@@ -12,6 +12,7 @@ use crate::{
         data_entry_status::{DataEntryStatus, DataEntryStatusName},
         election::{CandidateNumber, PGNumber, PoliticalGroup},
         id::id,
+        polling_station_results::count::Count,
     },
     error::ErrorReference,
 };
@@ -352,8 +353,6 @@ pub struct CSONextSessionResults {
     /// Vote counts per list and candidate ("Aantal stemmen per lijst en kandidaat")
     pub political_group_votes: Vec<PoliticalGroupCandidateVotes>,
 }
-
-pub type Count = u32;
 
 /// Voters counts, part of the polling station results.
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]

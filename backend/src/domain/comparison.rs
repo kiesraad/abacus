@@ -1,6 +1,6 @@
 use crate::domain::{
     data_entry::{
-        CSOFirstSessionResults, CSONextSessionResults, CandidateVotes, Count,
+        CSOFirstSessionResults, CSONextSessionResults, CandidateVotes,
         CountingDifferencesPollingStation, DifferenceCountsCompareVotesCastAdmittedVoters,
         DifferencesCounts, ExtraInvestigation, PoliticalGroupCandidateVotes,
         PoliticalGroupTotalVotes, PollingStationResults, VotersCounts, VotesCounts, YesNo,
@@ -139,19 +139,6 @@ impl Compare for YesNo {
 }
 
 impl Compare for bool {
-    fn compare(
-        &self,
-        first_entry: &Self,
-        different_fields: &mut Vec<String>,
-        field_name: &FieldPath,
-    ) {
-        if self != first_entry {
-            different_fields.push(field_name.to_string());
-        }
-    }
-}
-
-impl Compare for Count {
     fn compare(
         &self,
         first_entry: &Self,

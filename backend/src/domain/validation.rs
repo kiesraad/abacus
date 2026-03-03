@@ -6,7 +6,7 @@ use utoipa::ToSchema;
 use crate::domain::{
     comparison::Compare,
     data_entry::{
-        CandidateVotes, CommonPollingStationResults, Count, CountingDifferencesPollingStation,
+        CandidateVotes, CommonPollingStationResults, CountingDifferencesPollingStation,
         DifferencesCounts, ExtraInvestigation, PoliticalGroupCandidateVotes,
         PoliticalGroupTotalVotes, PollingStationResults, VotersCounts, VotesCounts,
     },
@@ -200,7 +200,7 @@ impl From<String> for FieldPath {
 
 #[derive(Debug, Eq, PartialEq)]
 pub struct DataError {
-    message: &'static str,
+    pub message: &'static str,
 }
 
 impl DataError {
@@ -1101,21 +1101,6 @@ impl Validate for CandidateVotes {
             validation_results,
             &path.field("votes"),
         )
-    }
-}
-
-impl Validate for Count {
-    fn validate(
-        &self,
-        _election: &ElectionWithPoliticalGroups,
-        _polling_station: &PollingStation,
-        _validation_results: &mut ValidationResults,
-        _field_name: &FieldPath,
-    ) -> Result<(), DataError> {
-        if self > &999_999_999 {
-            return Err(DataError::new("count out of range"));
-        }
-        Ok(())
     }
 }
 
@@ -3370,22 +3355,6 @@ mod tests {
         // appending should combine the errors and warnings
         assert_eq!(result1.errors.len(), 2);
         assert_eq!(result1.warnings.len(), 0);
-    }
-
-    #[test]
-    fn test_count_err_out_of_range() {
-        let mut validation_results = ValidationResults::default();
-        let count: Count = 1_000_000_000;
-
-        let result = count.validate(
-            &election_fixture(&[]),
-            &polling_station_fixture(None),
-            &mut validation_results,
-            &"".into(),
-        );
-
-        assert!(result.is_err());
-        assert!(result.unwrap_err().message.eq("count out of range"),);
     }
 
     /// Tests the above_percentage_threshold function with various input combinations.

@@ -38,11 +38,9 @@ use crate::{
         data_entry_repo::{
             are_results_complete_for_committee_session, list_results_for_committee_session,
         },
-        election_repo, file_repo,
-        investigation_repo::list_investigations_for_committee_session,
-        polling_station_repo,
+        election_repo, file_repo, polling_station_repo,
     },
-    service::FileAuditData,
+    service::{FileAuditData, list_investigations_for_committee_session},
 };
 
 /// Default date time format for reports
@@ -89,11 +87,12 @@ impl ResultsInput {
         let results = list_results_for_committee_session(conn, committee_session.id).await?;
 
         // get investigations if this is not the first session
-        let investigations = if committee_session.is_next_session() {
-            list_investigations_for_committee_session(conn, committee_session.id).await?
-        } else {
-            vec![]
-        };
+        let investigations: Vec<PollingStationInvestigation> =
+            if committee_session.is_next_session() {
+                list_investigations_for_committee_session(conn, committee_session.id).await?
+            } else {
+                vec![]
+            };
 
         // get the previous committee session if this is not the first session
         let previous_committee_session = if committee_session.is_next_session() {
@@ -434,7 +433,7 @@ async fn get_files(
 ) -> Result<(Option<File>, Option<File>, Option<File>, DateTime<Utc>), APIError> {
     let mut conn = pool.acquire().await?;
     let committee_session = committee_session_repo::get(&mut conn, committee_session_id).await?;
-    let investigations =
+    let investigations: Vec<PollingStationInvestigation> =
         list_investigations_for_committee_session(&mut conn, committee_session.id).await?;
     let corrections = investigations
         .iter()
@@ -609,7 +608,15 @@ mod tests {
     use test_log::test;
 
     use super::*;
-    use crate::{domain::file::FileId, infra::audit_log::list_event_names};
+    use crate::{
+        domain::{
+            file::FileId,
+            investigation::{InvestigationConcludedWithoutNewResults, InvestigationStatus},
+            polling_station::PollingStationId,
+        },
+        infra::audit_log::list_event_names,
+        repository::investigation_repo,
+    };
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
     async fn test_get_files_first_session(pool: SqlitePool) {
@@ -673,10 +680,17 @@ mod tests {
         let audit_service = AuditService::new(None, None);
         let mut conn = pool.acquire().await.unwrap();
 
-        // Update investigations, set no corrections
-        // TODO: change to service function call when investigation state machine is implemented () (#2904)
-        sqlx::query("UPDATE polling_stations SET investigation_state = json_set(investigation_state, '$.corrected_results', json('false')) WHERE investigation_state IS NOT NULL")
-            .execute(&mut *conn)
+        // Update investigations, set no corrections (ConcludedWithoutNewResults)
+        let status = InvestigationStatus::ConcludedWithoutNewResults(
+            InvestigationConcludedWithoutNewResults {
+                reason: "reason".into(),
+                findings: "findings".into(),
+            },
+        );
+        investigation_repo::save(&mut conn, PollingStationId::from(721), &status)
+            .await
+            .unwrap();
+        investigation_repo::save(&mut conn, PollingStationId::from(732), &status)
             .await
             .unwrap();
 

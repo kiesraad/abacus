@@ -7,7 +7,10 @@ pub use change_committee_session_status::{
     change_committee_session_status,
 };
 pub use data_entry::{DataEntryServiceError, create_empty as create_empty_data_entry};
-pub use investigation::InvestigationServiceError;
+pub use investigation::{
+    InvestigationServiceError,
+    list_for_committee_session as list_investigations_for_committee_session,
+};
 
 #[cfg(test)]
 pub use data_entry::create_definitive_data_entry;

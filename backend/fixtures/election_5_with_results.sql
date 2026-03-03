@@ -477,5 +477,5 @@ VALUES (8, 5, NULL, 501, 'Testgebouw', 41, NULL, 'FixedLocation', 'Testweg 3', '
        (11, 6, NULL, 502, 'Test ander gebouw', 42, NULL, 'FixedLocation', 'Testweg 4', '1234 QA', 'Grote Stad');
 
 UPDATE polling_stations
-SET investigation_state = '{"polling_station_id":11,"reason":"reason","findings":"findings","corrected_results":true}'
+SET investigation_state = '{"status":"ConcludedWithNewResults","state":{"reason":"reason","findings":"findings"}}'
 WHERE id = 11;

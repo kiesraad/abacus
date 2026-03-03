@@ -1,0 +1,32 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        SELECT\n            id AS \"polling_station_id: PollingStationId\",\n            investigation_state AS \"investigation_state!: Json<InvestigationStatus>\",\n            data_entry_id AS \"data_entry_id: DataEntryId\"\n        FROM polling_stations\n        WHERE committee_session_id = ? AND investigation_state IS NOT NULL\n        ",
+  "describe": {
+    "columns": [
+      {
+        "name": "polling_station_id: PollingStationId",
+        "ordinal": 0,
+        "type_info": "Integer"
+      },
+      {
+        "name": "investigation_state!: Json<InvestigationStatus>",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "data_entry_id: DataEntryId",
+        "ordinal": 2,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      true,
+      true
+    ]
+  },
+  "hash": "c6f9a4343a82763aa3d87bbd50f8948f3d195e3e1e40b70c31ce95e6f7ae233b"
+}

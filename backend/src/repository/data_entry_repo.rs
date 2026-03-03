@@ -207,7 +207,7 @@ pub async fn statuses(
             FROM polling_stations AS p
             LEFT JOIN committee_sessions AS c ON c.id = p.committee_session_id
             LEFT JOIN data_entries AS de ON de.id = p.data_entry_id
-            WHERE c.id = $1 AND (c.number = 1 OR json_extract(p.investigation_state, '$.corrected_results') = 1)
+            WHERE c.id = $1 AND (c.number = 1 OR json_extract(p.investigation_state, '$.status') = 'ConcludedWithNewResults')
         "#,
         committee_session_id
     )
@@ -296,7 +296,7 @@ async fn fetch_results_for_committee_session(
                    CASE
                        WHEN json_extract(de.state, '$.status') = 'Definitive'
                            THEN json_extract(de.state, '$.state.results')
-                       WHEN json_extract(ps.investigation_state, '$.corrected_results') IS NOT 1
+                       WHEN json_extract(ps.investigation_state, '$.status') IS NOT 'ConcludedWithNewResults'
                            AND json_extract(prev_de.state, '$.status') = 'Definitive'
                            THEN json_extract(prev_de.state, '$.state.results')
                        ELSE NULL
@@ -409,8 +409,8 @@ pub async fn are_results_complete_for_committee_session(
         LEFT JOIN data_entries AS de ON de.id = ps.data_entry_id
         WHERE ps.committee_session_id = ?
         AND ps.investigation_state IS NOT NULL
-        AND (json_extract(ps.investigation_state, '$.corrected_results') IS NULL
-             OR (json_extract(ps.investigation_state, '$.corrected_results') = 1
+        AND (json_extract(ps.investigation_state, '$.status') = 'InProgress'
+             OR (json_extract(ps.investigation_state, '$.status') = 'ConcludedWithNewResults'
                  AND (de.state IS NULL OR json_extract(de.state, '$.status') != 'Definitive')))
         "#,
         committee_session_id
@@ -796,32 +796,19 @@ mod tests {
 
         use super::*;
         use crate::{
-            domain::investigation::{
-                PollingStationInvestigationConcludeRequest,
-                PollingStationInvestigationCreateRequest,
-            },
-            repository::{
-                investigation_repo::{
-                    conclude_polling_station_investigation, create_polling_station_investigation,
-                },
-                polling_station_repo::insert_test_polling_station,
-            },
-            service::create_definitive_data_entry,
+            domain::investigation::InvestigationStatus,
+            repository::{investigation_repo, polling_station_repo::insert_test_polling_station},
+            service::{create_definitive_data_entry, create_empty_data_entry},
         };
 
         async fn create_test_investigation(
             conn: &mut SqliteConnection,
             polling_station_id: PollingStationId,
         ) {
-            create_polling_station_investigation(
-                conn,
-                polling_station_id,
-                PollingStationInvestigationCreateRequest {
-                    reason: "Test investigation reason".to_string(),
-                },
-            )
-            .await
-            .unwrap();
+            let status = InvestigationStatus::new("Test investigation reason".to_string());
+            investigation_repo::create(conn, polling_station_id, &status)
+                .await
+                .unwrap();
         }
 
         async fn conclude_test_investigation(
@@ -829,16 +816,27 @@ mod tests {
             polling_station_id: PollingStationId,
             corrected_results: bool,
         ) {
-            conclude_polling_station_investigation(
-                conn,
-                polling_station_id,
-                PollingStationInvestigationConcludeRequest {
-                    findings: "Test findings".to_string(),
-                    corrected_results,
-                },
-            )
-            .await
-            .unwrap();
+            let current = investigation_repo::get(conn, polling_station_id)
+                .await
+                .unwrap()
+                .expect("investigation should exist");
+
+            let status = if corrected_results {
+                let ps = create_empty_data_entry(conn, polling_station_id)
+                    .await
+                    .unwrap();
+                let data_entry_id = ps.data_entry_id.expect("should have data_entry_id");
+                current
+                    .conclude_with_new_results("Test findings".to_string(), data_entry_id)
+                    .expect("conclude_with_new_results should succeed")
+            } else {
+                current
+                    .conclude_without_new_results("Test findings".to_string(), false)
+                    .expect("conclude_without_new_results should succeed")
+            };
+            investigation_repo::save(conn, polling_station_id, &status)
+                .await
+                .unwrap();
         }
 
         async fn insert_test_polling_station_results(

@@ -1,9 +1,8 @@
 use crate::domain::{
     data_entry::{
-        CSOFirstSessionResults, CSONextSessionResults, CandidateVotes,
-        DifferenceCountsCompareVotesCastAdmittedVoters, DifferencesCounts, ExtraInvestigation,
-        PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, PollingStationResults,
-        VotersCounts, VotesCounts, YesNo,
+        CSONextSessionResults, CandidateVotes, DifferenceCountsCompareVotesCastAdmittedVoters,
+        DifferencesCounts, ExtraInvestigation, PoliticalGroupCandidateVotes,
+        PoliticalGroupTotalVotes, PollingStationResults, VotersCounts, VotesCounts, YesNo,
     },
     validation::FieldPath,
 };
@@ -27,46 +26,6 @@ impl Compare for PollingStationResults {
                 different_fields.push(path.to_string());
             }
         }
-    }
-}
-
-impl Compare for CSOFirstSessionResults {
-    fn compare(&self, first_entry: &Self, different_fields: &mut Vec<String>, path: &FieldPath) {
-        self.extra_investigation.compare(
-            &first_entry.extra_investigation,
-            different_fields,
-            &path.field("extra_investigation"),
-        );
-
-        self.counting_differences_polling_station.compare(
-            &first_entry.counting_differences_polling_station,
-            different_fields,
-            &path.field("counting_differences_polling_station"),
-        );
-
-        self.voters_counts.compare(
-            &first_entry.voters_counts,
-            different_fields,
-            &path.field("voters_counts"),
-        );
-
-        self.votes_counts.compare(
-            &first_entry.votes_counts,
-            different_fields,
-            &path.field("votes_counts"),
-        );
-
-        self.differences_counts.compare(
-            &first_entry.differences_counts,
-            different_fields,
-            &path.field("differences_counts"),
-        );
-
-        self.political_group_votes.compare(
-            &first_entry.political_group_votes,
-            different_fields,
-            &path.field("political_group_votes"),
-        );
     }
 }
 
@@ -286,7 +245,10 @@ mod tests {
     use test_log::test;
 
     use super::*;
-    use crate::domain::election::PGNumber;
+    use crate::domain::{
+        election::PGNumber,
+        polling_station_results::cso_first_session_results::CSOFirstSessionResults,
+    };
 
     /// Tests that polling station results with equal data and no differences counts are correctly identified as equal.
     #[test]

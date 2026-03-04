@@ -11,9 +11,9 @@ use crate::{
         committee_session::{CommitteeSession, CommitteeSessionCreateRequest},
         committee_session_status::CommitteeSessionStatus,
         data_entry::{
-            CSOFirstSessionResults, CandidateVotes, DifferenceCountsCompareVotesCastAdmittedVoters,
-            DifferencesCounts, ExtraInvestigation, PoliticalGroupCandidateVotes,
-            PoliticalGroupTotalVotes, PollingStationResults, VotersCounts, VotesCounts, YesNo,
+            CandidateVotes, DifferenceCountsCompareVotesCastAdmittedVoters, DifferencesCounts,
+            ExtraInvestigation, PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes,
+            PollingStationResults, VotersCounts, VotesCounts, YesNo,
         },
         data_entry_status::{DataEntryStatus, Definitive, FirstEntryFinalised},
         election::{
@@ -21,7 +21,10 @@ use crate::{
             ElectionWithPoliticalGroups, NewElection, PGNumber, PoliticalGroup, VoteCountingMethod,
         },
         polling_station::{PollingStation, PollingStationRequest, PollingStationType},
-        polling_station_results::counting_differences_polling_station::CountingDifferencesPollingStation,
+        polling_station_results::{
+            counting_differences_polling_station::CountingDifferencesPollingStation,
+            cso_first_session_results::CSOFirstSessionResults,
+        },
         validation::{FieldPath, Validate, ValidationResults},
     },
     repository::{

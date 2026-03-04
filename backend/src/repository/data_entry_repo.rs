@@ -430,8 +430,9 @@ mod tests {
     use test_log::test;
 
     use super::*;
-    use crate::domain::data_entry::{
-        CSOFirstSessionResults, DifferencesCounts, VotersCounts, VotesCounts, tests::ValidDefault,
+    use crate::domain::{
+        data_entry::{DifferencesCounts, VotersCounts, VotesCounts, tests::ValidDefault},
+        polling_station_results::cso_first_session_results::CSOFirstSessionResults,
     };
 
     fn create_test_results(proxy_certificate_count: u32) -> PollingStationResults {

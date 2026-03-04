@@ -14,7 +14,7 @@ use crate::{
         id::id,
         polling_station_results::{
             common_polling_station_results::CommonPollingStationResults, count::Count,
-            counting_differences_polling_station::CountingDifferencesPollingStation,
+            cso_first_session_results::CSOFirstSessionResults,
         },
     },
     error::ErrorReference,
@@ -254,52 +254,6 @@ impl PollingStationResults {
                 total: 0,
             })
             .collect()
-    }
-}
-
-/// CSOFirstSessionResults, following the fields in Model Na 31-2 Bijlage 2.
-///
-/// See "Model Na 31-2. Proces-verbaal van een gemeentelijk stembureau/stembureau voor het openbaar
-/// lichaam in een gemeente/openbaar lichaam waar een centrale stemopneming wordt verricht,
-/// Bijlage 2: uitkomsten per stembureau" from the
-/// [Kiesregeling](https://wetten.overheid.nl/BWBR0034180/2026-01-01#Bijlage1_DivisieNa31.2) or
-/// [Verkiezingstoolbox](https://www.rijksoverheid.nl/onderwerpen/verkiezingen/verkiezingentoolkit/modellen).
-#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
-#[serde(deny_unknown_fields)]
-pub struct CSOFirstSessionResults {
-    /// Extra investigation ("B1-1 Alleen bij extra onderzoek")
-    pub extra_investigation: ExtraInvestigation,
-    /// Counting Differences Polling Station ("B1-2 Verschillen met telresultaten van het stembureau")
-    pub counting_differences_polling_station: CountingDifferencesPollingStation,
-    /// Voters counts ("1. Aantal toegelaten kiezers")
-    pub voters_counts: VotersCounts,
-    /// Votes counts ("2. Aantal getelde stembiljetten")
-    pub votes_counts: VotesCounts,
-    /// Differences counts ("3. Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten")
-    pub differences_counts: DifferencesCounts,
-    /// Vote counts per list and candidate (5. "Aantal stemmen per lijst en kandidaat")
-    pub political_group_votes: Vec<PoliticalGroupCandidateVotes>,
-}
-
-impl CSOFirstSessionResults {
-    /// The admitted voters have been recounted in this session
-    pub fn admitted_voters_have_been_recounted(&self) -> bool {
-        matches!(
-            self.counting_differences_polling_station
-                .unexplained_difference_ballots_voters
-                .as_bool(),
-            Some(true)
-        ) || matches!(
-            self.counting_differences_polling_station
-                .difference_ballots_per_list
-                .as_bool(),
-            Some(true)
-        ) || matches!(
-            self.differences_counts
-                .difference_completely_accounted_for
-                .as_bool(),
-            Some(false)
-        )
     }
 }
 

@@ -1,7 +1,8 @@
 use chrono::TimeDelta;
 pub(crate) use middleware::*;
 pub use role::{
-    Admin, AdminOrCoordinator, AdminOrCoordinatorGSB, CoordinatorGSB, IncompleteUser, TypistGSB,
+    Admin, AdminOrCoordinator, AdminOrCoordinatorGSB, Coordinator, CoordinatorGSB, IncompleteUser,
+    TypistGSB,
 };
 
 pub mod error;

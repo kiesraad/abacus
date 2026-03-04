@@ -10,6 +10,9 @@ use crate::{APIError, domain::role::Role, repository::user_repo::User};
 /// A user with the admin role
 pub struct Admin(pub User);
 
+/// A user with any coordinator role
+pub struct Coordinator(pub User);
+
 /// A user with the coordinator GSB role
 pub struct CoordinatorGSB(pub User);
 
@@ -31,6 +34,17 @@ impl TryFrom<User> for Admin {
     fn try_from(user: User) -> Result<Self, Self::Error> {
         match user.role() {
             Role::Administrator => Ok(Self(user)),
+            _ => Err(()),
+        }
+    }
+}
+
+impl TryFrom<User> for Coordinator {
+    type Error = ();
+
+    fn try_from(user: User) -> Result<Self, Self::Error> {
+        match user.role() {
+            Role::CoordinatorCSB | Role::CoordinatorGSB => Ok(Self(user)),
             _ => Err(()),
         }
     }
@@ -91,6 +105,20 @@ where
         let user = <User as FromRequestParts<S>>::from_request_parts(parts, state).await?;
 
         Admin::try_from(user).map_err(|_| AuthenticationError::Forbidden.into())
+    }
+}
+
+impl<S> FromRequestParts<S> for Coordinator
+where
+    SqlitePool: FromRef<S>,
+    S: Send + Sync,
+{
+    type Rejection = APIError;
+
+    async fn from_request_parts(parts: &mut Parts, state: &S) -> Result<Self, Self::Rejection> {
+        let user = <User as FromRequestParts<S>>::from_request_parts(parts, state).await?;
+
+        Coordinator::try_from(user).map_err(|_| AuthenticationError::Forbidden.into())
     }
 }
 

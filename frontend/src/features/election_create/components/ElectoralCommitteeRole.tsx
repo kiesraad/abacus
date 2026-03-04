@@ -40,7 +40,7 @@ export function ElectoralCommitteeRole() {
         <FormLayout>
           <FormLayout.Section>
             {error && (
-              <Alert type="error" title={t("election.invalid_role")} inline>
+              <Alert type="error" title={t("election.invalid_committee_category")} inline>
                 <p>{error}</p>
               </Alert>
             )}

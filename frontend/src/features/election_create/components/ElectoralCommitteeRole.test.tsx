@@ -36,7 +36,7 @@ describe("ElectoralCommitteeRole component", () => {
       </ElectionCreateContextProvider>,
     );
 
-    expect(await screen.findByRole("heading", { name: "Rol van het stembureau" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Type stembureau" })).toBeInTheDocument();
     expect(screen.getByRole("radio", { name: "Gemeentelijk stembureau (GSB)" })).toBeChecked();
     expect(screen.getByRole("radio", { name: "Centraal stembureau (CSB)" })).not.toBeChecked();
     await user.click(screen.getByRole("button", { name: "Volgende" }));
@@ -62,7 +62,7 @@ describe("ElectoralCommitteeRole component", () => {
       </ElectionCreateContextProvider>,
     );
 
-    expect(await screen.findByRole("heading", { name: "Rol van het stembureau" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Type stembureau" })).toBeInTheDocument();
     expect(screen.getByRole("radio", { name: "Gemeentelijk stembureau (GSB)" })).not.toBeChecked();
     expect(screen.getByRole("radio", { name: "Centraal stembureau (CSB)" })).toBeChecked();
     await user.click(screen.getByRole("button", { name: "Volgende" }));

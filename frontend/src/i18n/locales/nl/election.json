@@ -47,7 +47,7 @@
     "description": "Het bestand <file>filename</file> bevat geen geldige lijst met stembureaus. Kies een ander bestand.",
     "title": "Ongeldig stembureaubestand"
   },
-  "invalid_role": "Ongeldige rol van het stembureau",
+  "invalid_committee_category": "Ongeldig type stembureau",
   "message": {
     "election_created": "Verkiezing {committee_category} {name} toegevoegd"
   },
@@ -55,7 +55,7 @@
     "title": "Afwijkende verkiezing",
     "description": "Het bestand <file>filename</file> bevat stembureaus voor een andere verkiezing. Controleer voor je verder gaat of de stembureaus juist zijn."
   },
-  "level_polling_station": "Niveau stembureau",
+  "level_polling_station": "Type stembureau",
   "location": "Gebied",
   "manage": "Verkiezingen beheren",
   "no_elections_added": "Nog geen verkiezingen ingesteld",
@@ -97,9 +97,9 @@
     "title": "Type stemopneming in"
   },
   "electoral_committee_role": {
-    "title": "Rol van het stembureau",
+    "title": "Type stembureau",
     "description": "Voor welk stembureau wil je deze verkiezing nu klaarzetten? Ga je Abacus voor GSB én CSB gebruiken? Zet dan eerst het GSB klaar, en doe daarna hetzelfde voor het CSB.",
-    "choose": "Kies een rol"
+    "choose": "Kies het type stembureau"
   },
   "you_cannot_start_data_entry_yet": "Je kan nog geen telresultaten invoeren."
 }

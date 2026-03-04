@@ -128,7 +128,7 @@ async function setElectoralCommitteeRole(committeeCategory: CommitteeCategory = 
   if (committeeCategory === "CSB") {
     overrideOnce("post", "/api/elections/import/validate", 200, csbElectionImportValidateMockResponse);
 
-    expect(await screen.findByRole("heading", { level: 2, name: "Rol van het stembureau" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 2, name: "Type stembureau" })).toBeInTheDocument();
     await waitFor(() => {
       screen.getByRole("radio", { name: "Centraal stembureau (CSB)" }).click();
     });

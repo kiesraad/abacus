@@ -170,7 +170,7 @@ async fn validate_and_get_data(
 > {
     let polling_station = polling_station_repo::get(conn, polling_station_id).await?;
     let committee_session =
-        committee_session_repo::get(conn, polling_station.committee_session_id).await?;
+        committee_session_repo::get(conn, polling_station.committee_session_id()).await?;
     let election = election_repo::get(conn, committee_session.election_id).await?;
 
     let data_entry_status = data_entry_repo::get_or_default(conn, polling_station_id).await?;
@@ -178,7 +178,7 @@ async fn validate_and_get_data(
     // Validate polling station
     if committee_session.is_next_session()
         && !matches!(
-            investigation_repo::get(conn, polling_station.id).await,
+            investigation_repo::get(conn, polling_station.id()).await,
             Ok(Some(InvestigationStatus::ConcludedWithNewResults(_)))
         )
     {
@@ -206,7 +206,7 @@ async fn validate_and_get_data(
     }
 
     Ok((
-        polling_station,
+        polling_station.into_polling_station(),
         election,
         committee_session,
         data_entry_status,
@@ -320,11 +320,9 @@ async fn data_entry_claim(
     let (polling_station, election, committee_session, state) =
         validate_and_get_data(&mut tx, polling_station_id, &user.0).await?;
 
-    let previous_results = if polling_station.prev_data_entry_id.is_some() {
-        Some(previous_results_for_polling_station(&mut tx, polling_station_id).await?)
-    } else {
-        None
-    };
+    let previous_results = previous_results_for_polling_station(&mut tx, polling_station_id)
+        .await
+        .ok();
 
     let new_data_entry = initial_current_data_entry(
         user.0.id(),
@@ -608,7 +606,7 @@ async fn data_entry_reset(
 
     let polling_station = polling_station_repo::get(&mut tx, polling_station_id).await?;
     let committee_session =
-        committee_session_repo::get(&mut tx, polling_station.committee_session_id).await?;
+        committee_session_repo::get(&mut tx, polling_station.committee_session_id()).await?;
 
     let data_entry = get_data_entry(&mut tx, polling_station_id).await?;
 

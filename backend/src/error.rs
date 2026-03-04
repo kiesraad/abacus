@@ -19,7 +19,7 @@ use crate::{
     api::middleware::authentication::error::AuthenticationError,
     domain::{committee_session::CommitteeSessionError, validation::DataError},
     eml::EMLImportError,
-    service::{DataEntryServiceError, InvestigationServiceError},
+    service::{DataEntryServiceError, PollingStationServiceError},
 };
 use pdf_gen::{PdfGenError, zip::ZipResponseError};
 
@@ -553,10 +553,10 @@ impl From<DataEntryServiceError> for APIError {
     }
 }
 
-impl From<InvestigationServiceError> for APIError {
-    fn from(err: InvestigationServiceError) -> Self {
+impl From<PollingStationServiceError> for APIError {
+    fn from(err: PollingStationServiceError) -> Self {
         match err {
-            InvestigationServiceError::DatabaseError(e) => e.into(),
+            PollingStationServiceError::DatabaseError(e) => e.into(),
         }
     }
 }

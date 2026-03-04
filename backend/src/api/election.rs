@@ -28,7 +28,7 @@ use crate::{
             ElectionWithPoliticalGroups, NewElection, VoteCountingMethod,
         },
         investigation::PollingStationInvestigation,
-        polling_station::{PollingStation, PollingStationRequest, PollingStationsRequest},
+        polling_station::{PollingStationRequest, PollingStationResponse, PollingStationsRequest},
     },
     eml::{
         EMLImportError, EmlHash, RedactedEmlHash, number_of_voters_from_polling_stations_eml,
@@ -36,8 +36,8 @@ use crate::{
         polling_stations_from_eml, polling_stations_from_eml_str,
     },
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
-    repository::{committee_session_repo, election_repo, polling_station_repo, user_repo::User},
-    service::list_investigations_for_committee_session,
+    repository::{committee_session_repo, election_repo, user_repo::User},
+    service::list_polling_stations_for_session,
 };
 
 pub fn router() -> OpenApiRouter<AppState> {
@@ -68,7 +68,7 @@ pub struct ElectionDetailsResponse {
     pub current_committee_session: CommitteeSession,
     pub committee_sessions: Vec<CommitteeSession>,
     pub election: ElectionWithPoliticalGroups,
-    pub polling_stations: Vec<PollingStation>,
+    pub polling_stations: Vec<PollingStationResponse>,
     pub investigations: Vec<PollingStationInvestigation>,
 }
 
@@ -176,10 +176,10 @@ pub async fn election_details(
         .first()
         .expect("There is always one committee session")
         .clone();
-    let polling_stations =
-        polling_station_repo::list(&mut conn, current_committee_session.id).await?;
-    let investigations =
-        list_investigations_for_committee_session(&mut conn, current_committee_session.id).await?;
+    let session_pss =
+        list_polling_stations_for_session(&mut conn, &current_committee_session).await?;
+    let investigations = session_pss.investigations();
+    let polling_stations = session_pss.into_responses();
 
     Ok(Json(ElectionDetailsResponse {
         current_committee_session,

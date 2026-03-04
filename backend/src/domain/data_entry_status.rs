@@ -713,7 +713,6 @@ impl Display for DataEntryTransitionError {
 mod tests {
     use super::*;
     use crate::domain::{
-        committee_session::CommitteeSessionId,
         data_entry::{
             CSOFirstSessionResults, CandidateVotes, PoliticalGroupCandidateVotes,
             PoliticalGroupTotalVotes, VotersCounts, VotesCounts,
@@ -777,9 +776,6 @@ mod tests {
         PollingStation {
             id: PollingStationId::from(1),
             election_id: ElectionId::from(1),
-            committee_session_id: CommitteeSessionId::from(1),
-            prev_data_entry_id: None,
-            data_entry_id: None,
             name: "Test polling station".to_string(),
             number: 1,
             number_of_voters: None,

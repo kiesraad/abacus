@@ -332,8 +332,16 @@ mod tests {
                 Some(get_user_cookie(&mut tx, UserId::from(1)).await),
             ),
             (
+                Some(Role::CoordinatorCSB),
+                Some(get_user_cookie(&mut tx, UserId::from(7)).await),
+            ),
+            (
                 Some(Role::CoordinatorGSB),
                 Some(get_user_cookie(&mut tx, UserId::from(3)).await),
+            ),
+            (
+                Some(Role::TypistCSB),
+                Some(get_user_cookie(&mut tx, UserId::from(9)).await),
             ),
             (
                 Some(Role::TypistGSB),

@@ -8,27 +8,21 @@ use super::error::AuthenticationError;
 use crate::{APIError, domain::role::Role, repository::user_repo::User};
 
 /// A user with the admin role
-#[allow(unused)]
 pub struct Admin(pub User);
 
 /// A user with the coordinator GSB role
-#[allow(unused)]
 pub struct CoordinatorGSB(pub User);
 
 /// A user with the typist GSB role
-#[allow(unused)]
 pub struct TypistGSB(pub User);
 
 /// A user with the admin or any coordinator role
-#[allow(unused)]
 pub struct AdminOrCoordinator(pub User);
 
 /// A user with the admin or coordinator GSB role
-#[allow(unused)]
 pub struct AdminOrCoordinatorGSB(pub User);
 
 /// A user with potentially no fullname or needs_password_change=true
-#[allow(unused)]
 pub struct IncompleteUser(pub User);
 
 impl TryFrom<User> for Admin {

@@ -15,6 +15,7 @@ use crate::{
         polling_station_results::{
             common_polling_station_results::CommonPollingStationResults, count::Count,
             cso_first_session_results::CSOFirstSessionResults,
+            cso_next_session_results::CSONextSessionResults,
         },
     },
     error::ErrorReference,
@@ -255,25 +256,6 @@ impl PollingStationResults {
             })
             .collect()
     }
-}
-
-/// CSONextSessionResults, following the fields in Model Na 14-2 Bijlage 1.
-///
-/// See "Model Na 14-2. Corrigendum bij het proces-verbaal van een gemeentelijk stembureau/
-/// stembureau voor het openbaar lichaam, Bijlage 1: uitkomsten per stembureau" from the
-/// [Kiesregeling](https://wetten.overheid.nl/BWBR0034180/2026-01-01#Bijlage1_DivisieNa14.2) or
-/// [Verkiezingstoolbox](https://www.rijksoverheid.nl/onderwerpen/verkiezingen/verkiezingentoolkit/modellen).
-#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
-#[serde(deny_unknown_fields)]
-pub struct CSONextSessionResults {
-    /// Voters counts ("Aantal toegelaten kiezers")
-    pub voters_counts: VotersCounts,
-    /// Votes counts ("Aantal getelde stembiljetten")
-    pub votes_counts: VotesCounts,
-    /// Differences counts ("Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten")
-    pub differences_counts: DifferencesCounts,
-    /// Vote counts per list and candidate ("Aantal stemmen per lijst en kandidaat")
-    pub political_group_votes: Vec<PoliticalGroupCandidateVotes>,
 }
 
 /// Voters counts, part of the polling station results.

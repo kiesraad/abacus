@@ -12,7 +12,7 @@
   "paths": {
     "/api/account": {
       "get": {
-        "summary": "Get current logged-in user endpoint (administrator, coordinator_gsb, typist_gsb)",
+        "summary": "Get current logged-in user endpoint (administrator, coordinator_csb, coordinator_gsb, typist_csb, typist_gsb)",
         "operationId": "account",
         "responses": {
           "200": {
@@ -50,14 +50,16 @@
           {
             "cookie_auth": [
               "administrator",
+              "coordinator_csb",
               "coordinator_gsb",
+              "typist_csb",
               "typist_gsb"
             ]
           }
         ]
       },
       "put": {
-        "summary": "Update the user's account with a new password and optionally new fullname (administrator, coordinator_gsb, typist_gsb)",
+        "summary": "Update the user's account with a new password and optionally new fullname (administrator, coordinator_csb, coordinator_gsb, typist_csb, typist_gsb)",
         "operationId": "account_update",
         "requestBody": {
           "content": {
@@ -105,7 +107,9 @@
           {
             "cookie_auth": [
               "administrator",
+              "coordinator_csb",
               "coordinator_gsb",
+              "typist_csb",
               "typist_gsb"
             ]
           }
@@ -114,7 +118,7 @@
     },
     "/api/elections": {
       "get": {
-        "summary": "Get a list of all elections, without their candidate lists and\na list of the current committee session for each election (administrator, coordinator_gsb, typist_gsb)",
+        "summary": "Get a list of all elections, without their candidate lists and\na list of the current committee session for each election (administrator, coordinator_csb, coordinator_gsb, typist_csb, typist_gsb)",
         "operationId": "election_list",
         "responses": {
           "200": {
@@ -152,7 +156,9 @@
           {
             "cookie_auth": [
               "administrator",
+              "coordinator_csb",
               "coordinator_gsb",
+              "typist_csb",
               "typist_gsb"
             ]
           }
@@ -311,7 +317,7 @@
     },
     "/api/elections/{election_id}": {
       "get": {
-        "summary": "Get election details including the election's candidate list (political groups),\nits polling stations and the current committee session and its investigations (administrator, coordinator_gsb, typist_gsb)",
+        "summary": "Get election details including the election's candidate list (political groups),\nits polling stations and the current committee session and its investigations (administrator, coordinator_csb, coordinator_gsb, typist_csb, typist_gsb)",
         "operationId": "election_details",
         "parameters": [
           {
@@ -370,7 +376,9 @@
           {
             "cookie_auth": [
               "administrator",
+              "coordinator_csb",
               "coordinator_gsb",
+              "typist_csb",
               "typist_gsb"
             ]
           }
@@ -747,7 +755,7 @@
     },
     "/api/elections/{election_id}/committee_sessions/{committee_session_id}/download_pdf_results": {
       "get": {
-        "summary": "Download a generated PDF with election results (coordinator_gsb)",
+        "summary": "Download a generated PDF with election results (coordinator_csb, coordinator_gsb)",
         "operationId": "election_download_pdf_results",
         "parameters": [
           {
@@ -838,6 +846,7 @@
         "security": [
           {
             "cookie_auth": [
+              "coordinator_csb",
               "coordinator_gsb"
             ]
           }
@@ -846,7 +855,7 @@
     },
     "/api/elections/{election_id}/committee_sessions/{committee_session_id}/download_zip_results": {
       "get": {
-        "summary": "Download a zip containing a PDF for the PV and the EML with election results (coordinator_gsb)",
+        "summary": "Download a zip containing a PDF for the PV and the EML with election results (coordinator_csb, coordinator_gsb)",
         "operationId": "election_download_zip_results",
         "parameters": [
           {
@@ -937,6 +946,7 @@
         "security": [
           {
             "cookie_auth": [
+              "coordinator_csb",
               "coordinator_gsb"
             ]
           }
@@ -1030,7 +1040,7 @@
     },
     "/api/elections/{election_id}/committee_sessions/{committee_session_id}/status": {
       "put": {
-        "summary": "Change the status of a [CommitteeSession]. (coordinator_gsb)",
+        "summary": "Change the status of a [CommitteeSession]. (coordinator_csb, coordinator_gsb)",
         "operationId": "committee_session_status_change",
         "parameters": [
           {
@@ -1120,6 +1130,7 @@
         "security": [
           {
             "cookie_auth": [
+              "coordinator_csb",
               "coordinator_gsb"
             ]
           }

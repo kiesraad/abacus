@@ -5,7 +5,7 @@ use utoipa::ToSchema;
 
 use crate::domain::{
     comparison::Compare,
-    data_entry::{PoliticalGroupTotalVotes, PollingStationResults, VotersCounts, VotesCounts},
+    data_entry::{PoliticalGroupTotalVotes, PollingStationResults, VotesCounts},
     data_entry_status::{
         DataEntryStatus, FirstEntryFinalised, FirstEntryHasErrors, FirstEntryInProgress,
     },
@@ -327,49 +327,6 @@ impl Validate for PollingStationResults {
     }
 }
 
-impl Validate for VotersCounts {
-    fn validate(
-        &self,
-        election: &ElectionWithPoliticalGroups,
-        polling_station: &PollingStation,
-        validation_results: &mut ValidationResults,
-        path: &FieldPath,
-    ) -> Result<(), DataError> {
-        // validate all counts
-        self.poll_card_count.validate(
-            election,
-            polling_station,
-            validation_results,
-            &path.field("poll_card_count"),
-        )?;
-        self.proxy_certificate_count.validate(
-            election,
-            polling_station,
-            validation_results,
-            &path.field("proxy_certificate_count"),
-        )?;
-        self.total_admitted_voters_count.validate(
-            election,
-            polling_station,
-            validation_results,
-            &path.field("total_admitted_voters_count"),
-        )?;
-
-        if self.poll_card_count + self.proxy_certificate_count != self.total_admitted_voters_count {
-            validation_results.errors.push(ValidationResult {
-                fields: vec![
-                    path.field("poll_card_count").to_string(),
-                    path.field("proxy_certificate_count").to_string(),
-                    path.field("total_admitted_voters_count").to_string(),
-                ],
-                code: ValidationResultCode::F201,
-                context: None,
-            });
-        }
-        Ok(())
-    }
-}
-
 impl VotesCounts {
     fn validate_votes_counts_errors(
         &self,
@@ -542,57 +499,6 @@ mod tests {
     use crate::domain::{
         election::tests::election_fixture, polling_station::test_helpers::polling_station_fixture,
     };
-
-    mod voters_counts {
-        use test_log::test;
-
-        use super::*;
-
-        fn validate(
-            poll_card_count: u32,
-            proxy_certificate_count: u32,
-            total_admitted_voters_count: u32,
-        ) -> Result<ValidationResults, DataError> {
-            let voters_counts = VotersCounts {
-                poll_card_count,
-                proxy_certificate_count,
-                total_admitted_voters_count,
-            };
-
-            let mut validation_results = ValidationResults::default();
-            voters_counts.validate(
-                &election_fixture(&[]),
-                &polling_station_fixture(None),
-                &mut validation_results,
-                &"voters_counts".into(),
-            )?;
-
-            Ok(validation_results)
-        }
-
-        /// CSO/DSO | F.201: 'Aantal kiezers en stemmen': stempassen + volmachten <> totaal toegelaten kiezers
-        #[test]
-        fn test_f201() -> Result<(), DataError> {
-            let validation_results = validate(100, 50, 150)?;
-            assert!(validation_results.errors.is_empty());
-
-            let validation_results = validate(100, 150, 151)?;
-            assert_eq!(
-                validation_results.errors,
-                [ValidationResult {
-                    code: ValidationResultCode::F201,
-                    fields: vec![
-                        "voters_counts.poll_card_count".into(),
-                        "voters_counts.proxy_certificate_count".into(),
-                        "voters_counts.total_admitted_voters_count".into()
-                    ],
-                    context: None,
-                }]
-            );
-
-            Ok(())
-        }
-    }
 
     mod votes_counts {
         use test_log::test;

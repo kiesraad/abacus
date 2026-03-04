@@ -1,4 +1,4 @@
-use std::{collections::HashSet, ops::AddAssign};
+use std::collections::HashSet;
 
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
@@ -19,6 +19,7 @@ use crate::{
             cso_next_session_results::CSONextSessionResults,
             differences_counts::DifferencesCounts,
             political_group_candidate_votes::{CandidateVotes, PoliticalGroupCandidateVotes},
+            voters_counts::VotersCounts,
         },
     },
     error::ErrorReference,
@@ -258,29 +259,6 @@ impl PollingStationResults {
                 total: 0,
             })
             .collect()
-    }
-}
-
-/// Voters counts, part of the polling station results.
-#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
-#[serde(deny_unknown_fields)]
-pub struct VotersCounts {
-    /// Number of valid poll cards ("Aantal geldige stempassen")
-    #[schema(value_type = u32)]
-    pub poll_card_count: Count,
-    /// Number of valid proxy certificates ("Aantal geldige volmachtbewijzen")
-    #[schema(value_type = u32)]
-    pub proxy_certificate_count: Count,
-    /// Total number of admitted voters ("Totaal aantal toegelaten kiezers")
-    #[schema(value_type = u32)]
-    pub total_admitted_voters_count: Count,
-}
-
-impl AddAssign<&VotersCounts> for VotersCounts {
-    fn add_assign(&mut self, other: &Self) {
-        self.poll_card_count += other.poll_card_count;
-        self.proxy_certificate_count += other.proxy_certificate_count;
-        self.total_admitted_voters_count += other.total_admitted_voters_count;
     }
 }
 

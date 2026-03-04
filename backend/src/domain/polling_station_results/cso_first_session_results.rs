@@ -1,10 +1,10 @@
 use crate::domain::{
     comparison::Compare,
-    data_entry::{VotersCounts, VotesCounts},
+    data_entry::VotesCounts,
     polling_station_results::{
         counting_differences_polling_station::CountingDifferencesPollingStation,
         differences_counts::DifferencesCounts, extra_investigation::ExtraInvestigation,
-        political_group_candidate_votes::PoliticalGroupCandidateVotes,
+        political_group_candidate_votes::PoliticalGroupCandidateVotes, voters_counts::VotersCounts,
     },
     validation::FieldPath,
 };

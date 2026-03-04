@@ -715,7 +715,7 @@ mod tests {
     use crate::domain::{
         committee_session::CommitteeSessionId,
         data_entry::{
-            PoliticalGroupTotalVotes, VotersCounts, VotesCounts,
+            PoliticalGroupTotalVotes, VotesCounts,
             tests::{ValidDefault, example_polling_station_results},
         },
         election::{
@@ -726,6 +726,7 @@ mod tests {
         polling_station_results::{
             cso_first_session_results::CSOFirstSessionResults,
             political_group_candidate_votes::{CandidateVotes, PoliticalGroupCandidateVotes},
+            voters_counts::VotersCounts,
         },
     };
 

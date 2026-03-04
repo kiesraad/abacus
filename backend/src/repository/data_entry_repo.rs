@@ -431,10 +431,10 @@ mod tests {
 
     use super::*;
     use crate::domain::{
-        data_entry::{VotersCounts, VotesCounts, tests::ValidDefault},
+        data_entry::{VotesCounts, tests::ValidDefault},
         polling_station_results::{
             cso_first_session_results::CSOFirstSessionResults,
-            differences_counts::DifferencesCounts,
+            differences_counts::DifferencesCounts, voters_counts::VotersCounts,
         },
     };
 

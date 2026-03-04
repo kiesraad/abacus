@@ -10,7 +10,7 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
-    api::middleware::authentication::CoordinatorGSB,
+    api::middleware::authentication::{Coordinator, CoordinatorGSB, error::AuthenticationError},
     domain::{
         committee_session::{
             CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionError,
@@ -24,7 +24,9 @@ use crate::{
     error::ErrorReference,
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
     repository::{
-        committee_session_repo::{create, delete, get, get_election_committee_session, update},
+        committee_session_repo::{
+            create, delete, get, get_committee_category, get_election_committee_session, update,
+        },
         election_repo, investigation_repo,
     },
     service::{
@@ -108,12 +110,18 @@ pub async fn create_committee_session(
     security(("cookie_auth" = ["coordinator_gsb"])),
 )]
 pub async fn committee_session_create(
-    _user: CoordinatorGSB,
+    CoordinatorGSB(user): CoordinatorGSB,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Path(election_id): Path<ElectionId>,
 ) -> Result<(StatusCode, CommitteeSession), APIError> {
     let mut tx = pool.begin_immediate().await?;
+
+    let election = election_repo::get(&mut tx, election_id).await?;
+    let committee_category = &election.committee_category;
+    if !user.role().can_manage_committee(committee_category) {
+        return Err(AuthenticationError::Forbidden.into());
+    }
 
     let current_committee_session = get_election_committee_session(&mut tx, election_id).await?;
 
@@ -156,12 +164,17 @@ pub async fn committee_session_create(
     security(("cookie_auth" = ["coordinator_gsb"])),
 )]
 pub async fn committee_session_delete(
-    _user: CoordinatorGSB,
+    CoordinatorGSB(user): CoordinatorGSB,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Path((election_id, committee_session_id)): Path<(ElectionId, CommitteeSessionId)>,
 ) -> Result<StatusCode, APIError> {
     let mut tx = pool.begin_immediate().await?;
+
+    let committee_category = get_committee_category(&mut tx, committee_session_id).await?;
+    if !user.role().can_manage_committee(&committee_category) {
+        return Err(AuthenticationError::Forbidden.into());
+    }
 
     let committee_session = validate_committee_session_is_current_committee_session(
         &mut tx,
@@ -227,12 +240,19 @@ pub async fn committee_session_delete(
     security(("cookie_auth" = ["coordinator_gsb"])),
 )]
 pub async fn committee_session_update(
-    _user: CoordinatorGSB,
+    CoordinatorGSB(user): CoordinatorGSB,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Path((election_id, committee_session_id)): Path<(ElectionId, CommitteeSessionId)>,
     Json(request): Json<CommitteeSessionUpdateRequest>,
 ) -> Result<StatusCode, APIError> {
+    let mut tx = pool.begin_immediate().await?;
+
+    let committee_category = get_committee_category(&mut tx, committee_session_id).await?;
+    if !user.role().can_manage_committee(&committee_category) {
+        return Err(AuthenticationError::Forbidden.into());
+    }
+
     if request.location.is_empty() {
         return Err(APIError::CommitteeSession(
             CommitteeSessionError::InvalidDetails,
@@ -248,8 +268,6 @@ pub async fn committee_session_update(
             ));
         }
     };
-
-    let mut tx = pool.begin_immediate().await?;
 
     validate_committee_session_is_current_committee_session(
         &mut tx,
@@ -291,16 +309,21 @@ pub async fn committee_session_update(
         ("election_id" = ElectionId, description = "Election database id"),
         ("committee_session_id" = CommitteeSessionId, description = "Committee session database id"),
     ),
-    security(("cookie_auth" = ["coordinator_gsb"])),
+    security(("cookie_auth" = ["coordinator_csb", "coordinator_gsb"])),
 )]
 pub async fn committee_session_status_change(
-    _user: CoordinatorGSB,
+    Coordinator(user): Coordinator,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Path((election_id, committee_session_id)): Path<(ElectionId, CommitteeSessionId)>,
     Json(committee_session_request): Json<CommitteeSessionStatusChangeRequest>,
 ) -> Result<StatusCode, APIError> {
     let mut tx = pool.begin_immediate().await?;
+
+    let committee_category = get_committee_category(&mut tx, committee_session_id).await?;
+    if !user.role().can_manage_committee(&committee_category) {
+        return Err(AuthenticationError::Forbidden.into());
+    }
 
     validate_committee_session_is_current_committee_session(
         &mut tx,
@@ -339,14 +362,16 @@ pub async fn committee_session_status_change(
     security(("cookie_auth" = ["coordinator_gsb"])),
 )]
 pub async fn committee_session_investigations(
-    _user: CoordinatorGSB,
+    CoordinatorGSB(user): CoordinatorGSB,
     State(pool): State<SqlitePool>,
-    Path((election_id, committee_session_id)): Path<(ElectionId, CommitteeSessionId)>,
+    Path((_election_id, committee_session_id)): Path<(ElectionId, CommitteeSessionId)>,
 ) -> Result<Json<InvestigationListResponse>, APIError> {
     let mut conn = pool.acquire().await?;
 
-    // Check if the election exists, will respond with NOT_FOUND otherwise
-    election_repo::get(&mut conn, election_id).await?;
+    let committee_category = get_committee_category(&mut conn, committee_session_id).await?;
+    if !user.role().can_manage_committee(&committee_category) {
+        return Err(AuthenticationError::Forbidden.into());
+    }
 
     let committee_session = get(&mut conn, committee_session_id).await?;
 

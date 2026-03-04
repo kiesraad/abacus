@@ -15,7 +15,7 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
-    api::middleware::authentication::CoordinatorGSB,
+    api::middleware::authentication::{Coordinator, error::AuthenticationError},
     domain::{
         committee_session::{
             CommitteeSession, CommitteeSessionError, CommitteeSessionFilesUpdateRequest,
@@ -513,15 +513,22 @@ async fn get_files(
         ("election_id" = ElectionId, description = "Election database id"),
         ("committee_session_id" = CommitteeSessionId, description = "Committee session database id"),
     ),
-    security(("cookie_auth" = ["coordinator_gsb"])),
+    security(("cookie_auth" = ["coordinator_csb", "coordinator_gsb"])),
 )]
 async fn election_download_zip_results(
-    _user: CoordinatorGSB,
+    Coordinator(user): Coordinator,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Path((election_id, committee_session_id)): Path<(ElectionId, CommitteeSessionId)>,
 ) -> Result<impl IntoResponse, APIError> {
     let mut conn = pool.acquire().await?;
+
+    let committee_category =
+        committee_session_repo::get_committee_category(&mut conn, committee_session_id).await?;
+    if !user.role().can_manage_committee(&committee_category) {
+        return Err(AuthenticationError::Forbidden.into());
+    }
+
     let election = election_repo::get(&mut conn, election_id).await?;
     let committee_session = committee_session_repo::get(&mut conn, committee_session_id).await?;
     let (eml_file, pdf_file, overview_file, created_at) =
@@ -584,14 +591,22 @@ async fn election_download_zip_results(
         ("election_id" = ElectionId, description = "Election database id"),
         ("committee_session_id" = CommitteeSessionId, description = "Committee session database id"),
     ),
-    security(("cookie_auth" = ["coordinator_gsb"])),
+    security(("cookie_auth" = ["coordinator_csb", "coordinator_gsb"])),
 )]
 async fn election_download_pdf_results(
-    _user: CoordinatorGSB,
+    Coordinator(user): Coordinator,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Path((_election_id, committee_session_id)): Path<(ElectionId, CommitteeSessionId)>,
 ) -> Result<Attachment<Vec<u8>>, APIError> {
+    let mut conn = pool.acquire().await?;
+
+    let committee_category =
+        committee_session_repo::get_committee_category(&mut conn, committee_session_id).await?;
+    if !user.role().can_manage_committee(&committee_category) {
+        return Err(AuthenticationError::Forbidden.into());
+    }
+
     let (_, pdf_file, _, _) = get_files(&pool, audit_service, committee_session_id).await?;
 
     let pdf_file = pdf_file.ok_or(APIError::BadRequest(

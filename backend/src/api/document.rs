@@ -11,7 +11,7 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
     APIError, AppState, ErrorResponse,
-    api::middleware::authentication::AdminOrCoordinatorGSB,
+    api::middleware::authentication::{AdminOrCoordinatorGSB, error::AuthenticationError},
     domain::{
         election::ElectionId,
         models::{
@@ -54,12 +54,18 @@ pub fn router() -> OpenApiRouter<AppState> {
     security(("cookie_auth" = ["administrator", "coordinator_gsb"])),
 )]
 async fn election_download_n_10_2(
-    _user: AdminOrCoordinatorGSB,
+    AdminOrCoordinatorGSB(user): AdminOrCoordinatorGSB,
     State(pool): State<SqlitePool>,
     Path(election_id): Path<ElectionId>,
 ) -> Result<impl IntoResponse, APIError> {
     let mut conn = pool.acquire().await?;
+
     let election = election_repo::get(&mut conn, election_id).await?;
+    let category = &election.committee_category;
+    if !user.role().can_manage_committee(category) {
+        return Err(AuthenticationError::Forbidden.into());
+    }
+
     let current_committee_session =
         committee_session_repo::get_election_committee_session(&mut conn, election.id).await?;
     let polling_stations =
@@ -133,12 +139,18 @@ async fn election_download_n_10_2(
     security(("cookie_auth" = ["administrator", "coordinator_gsb"])),
 )]
 async fn election_download_na_31_2_bijlage1(
-    _user: AdminOrCoordinatorGSB,
+    AdminOrCoordinatorGSB(user): AdminOrCoordinatorGSB,
     State(pool): State<SqlitePool>,
     Path(election_id): Path<ElectionId>,
 ) -> Result<impl IntoResponse, APIError> {
     let mut conn = pool.acquire().await?;
+
     let election = election_repo::get(&mut conn, election_id).await?;
+    let category = &election.committee_category;
+    if !user.role().can_manage_committee(category) {
+        return Err(AuthenticationError::Forbidden.into());
+    }
+
     let current_committee_session =
         committee_session_repo::get_election_committee_session(&mut conn, election.id).await?;
     let polling_stations =

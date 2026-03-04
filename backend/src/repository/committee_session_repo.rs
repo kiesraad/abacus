@@ -1,5 +1,5 @@
 use chrono::NaiveDateTime;
-use sqlx::{Connection, SqliteConnection, query, query_as};
+use sqlx::{Connection, SqliteConnection, query, query_as, query_scalar};
 
 use crate::{
     domain::{
@@ -8,10 +8,27 @@ use crate::{
             CommitteeSessionId,
         },
         committee_session_status::CommitteeSessionStatus,
-        election::ElectionId,
+        election::{CommitteeCategory, ElectionId},
     },
     repository::polling_station_repo::duplicate_for_committee_session,
 };
+
+pub async fn get_committee_category(
+    conn: &mut SqliteConnection,
+    committee_session_id: CommitteeSessionId,
+) -> Result<CommitteeCategory, sqlx::Error> {
+    query_scalar!(
+        r#"
+        SELECT e.committee_category as "committee_category: _"
+        FROM committee_sessions AS c
+        JOIN elections AS e ON c.election_id = e.id
+        WHERE c.id = ?
+        "#,
+        committee_session_id
+    )
+    .fetch_one(conn)
+    .await
+}
 
 pub async fn get(
     conn: &mut SqliteConnection,

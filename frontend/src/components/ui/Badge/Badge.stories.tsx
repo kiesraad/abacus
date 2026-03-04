@@ -23,7 +23,7 @@ export const Badges: StoryObj = {
         {badgeTypes.map((type) => (
           <div key={type} className="mb-lg">
             <h2>{type}</h2>
-            <Badge id={type} type={type} showIcon userRole={"coordinator"} />
+            <Badge id={type} type={type} showIcon userRole={"coordinator_gsb"} />
           </div>
         ))}
       </>
@@ -62,7 +62,7 @@ export const CustomizableBadge: StoryObj<BadgeProps> = {
       control: { type: "radio" },
     },
   },
-  render: ({ type, showIcon }) => <Badge type={type} showIcon={showIcon} userRole={"coordinator"} />,
+  render: ({ type, showIcon }) => <Badge type={type} showIcon={showIcon} userRole={"coordinator_gsb"} />,
 };
 
 export default {};

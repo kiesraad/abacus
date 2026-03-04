@@ -11,6 +11,7 @@ pub mod investigation;
 pub mod models;
 pub mod polling_station;
 pub mod role;
+pub mod sub_committee;
 pub mod summary;
 pub mod validation;
 pub mod votes_table;

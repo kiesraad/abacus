@@ -1,0 +1,44 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        SELECT\n            id AS \"id: _\",\n            committee_session_id AS \"committee_session_id: _\",\n            data_entry_id AS \"data_entry_id!: _\",\n            name,\n            category AS \"category: _\"\n        FROM sub_committees\n        WHERE committee_session_id = $1\n        ",
+  "describe": {
+    "columns": [
+      {
+        "name": "id: _",
+        "ordinal": 0,
+        "type_info": "Integer"
+      },
+      {
+        "name": "committee_session_id: _",
+        "ordinal": 1,
+        "type_info": "Integer"
+      },
+      {
+        "name": "data_entry_id!: _",
+        "ordinal": 2,
+        "type_info": "Integer"
+      },
+      {
+        "name": "name",
+        "ordinal": 3,
+        "type_info": "Text"
+      },
+      {
+        "name": "category: _",
+        "ordinal": 4,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "17a7b42defdad413b04403d86820bc43f3e37666755b45ce2f0f8d6c1b830b99"
+}

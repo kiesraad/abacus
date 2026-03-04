@@ -19,7 +19,7 @@ use crate::{
     api::middleware::authentication::error::AuthenticationError,
     domain::{committee_session::CommitteeSessionError, validation::DataError},
     eml::EMLImportError,
-    service::{DataEntryServiceError, PollingStationServiceError},
+    service::{DataEntryServiceError, PollingStationServiceError, SubCommitteeServiceError},
 };
 use pdf_gen::{PdfGenError, zip::ZipResponseError};
 
@@ -557,6 +557,14 @@ impl From<PollingStationServiceError> for APIError {
     fn from(err: PollingStationServiceError) -> Self {
         match err {
             PollingStationServiceError::DatabaseError(e) => e.into(),
+        }
+    }
+}
+
+impl From<SubCommitteeServiceError> for APIError {
+    fn from(err: SubCommitteeServiceError) -> Self {
+        match err {
+            SubCommitteeServiceError::DatabaseError(e) => e.into(),
         }
     }
 }

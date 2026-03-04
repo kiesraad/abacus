@@ -6,9 +6,8 @@ use utoipa::ToSchema;
 use crate::domain::{
     comparison::Compare,
     data_entry::{
-        CandidateVotes, CountingDifferencesPollingStation, DifferencesCounts, ExtraInvestigation,
-        PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, PollingStationResults,
-        VotersCounts, VotesCounts,
+        CandidateVotes, DifferencesCounts, ExtraInvestigation, PoliticalGroupCandidateVotes,
+        PoliticalGroupTotalVotes, PollingStationResults, VotersCounts, VotesCounts,
     },
     data_entry_status::{
         DataEntryStatus, FirstEntryFinalised, FirstEntryHasErrors, FirstEntryInProgress,
@@ -589,38 +588,6 @@ impl Validate for ExtraInvestigation {
     }
 }
 
-impl Validate for CountingDifferencesPollingStation {
-    fn validate(
-        &self,
-        _election: &ElectionWithPoliticalGroups,
-        _polling_station: &PollingStation,
-        validation_results: &mut ValidationResults,
-        path: &FieldPath,
-    ) -> Result<(), DataError> {
-        if self.unexplained_difference_ballots_voters.is_empty()
-            || self.difference_ballots_per_list.is_empty()
-        {
-            validation_results.errors.push(ValidationResult {
-                fields: vec![path.to_string()],
-                code: ValidationResultCode::F111,
-                context: None,
-            });
-        }
-
-        if self.unexplained_difference_ballots_voters.is_both()
-            || self.difference_ballots_per_list.is_both()
-        {
-            validation_results.errors.push(ValidationResult {
-                fields: vec![path.to_string()],
-                code: ValidationResultCode::F112,
-                context: None,
-            });
-        }
-
-        Ok(())
-    }
-}
-
 impl Validate for VotersCounts {
     fn validate(
         &self,
@@ -1076,157 +1043,6 @@ mod tests {
                     ValidationResult {
                         code: ValidationResultCode::F102,
                         fields: vec!["extra_investigation".into()],
-                        context: None,
-                    }
-                ]
-            );
-
-            Ok(())
-        }
-    }
-
-    mod counting_differences_polling_station {
-        use test_log::test;
-
-        use super::*;
-
-        fn validate(
-            unexplained_yes: bool,
-            unexplained_no: bool,
-            ballots_yes: bool,
-            ballots_no: bool,
-        ) -> Result<ValidationResults, DataError> {
-            let counting_differences_polling_station = CountingDifferencesPollingStation {
-                unexplained_difference_ballots_voters: YesNo::new(unexplained_yes, unexplained_no),
-                difference_ballots_per_list: YesNo::new(ballots_yes, ballots_no),
-            };
-
-            let mut validation_results = ValidationResults::default();
-            counting_differences_polling_station.validate(
-                &election_fixture(&[]),
-                &polling_station_fixture(None),
-                &mut validation_results,
-                &"counting_differences_polling_station".into(),
-            )?;
-
-            assert_eq!(validation_results.warnings.len(), 0);
-            Ok(validation_results)
-        }
-
-        #[test]
-        fn test_no_validation_errors() -> Result<(), DataError> {
-            let validation_results = validate(false, true, false, true)?;
-            assert_eq!(validation_results.errors, []);
-
-            let validation_results = validate(true, false, true, false)?;
-            assert_eq!(validation_results.errors, []);
-
-            Ok(())
-        }
-
-        /// CSO | F.111: 'Verschillen met telresultaten van het stembureau': één of beide vragen zijn niet beantwoord
-        #[test]
-        fn test_f111() -> Result<(), DataError> {
-            let validation_results = validate(false, true, false, false)?;
-            assert_eq!(
-                validation_results.errors,
-                [ValidationResult {
-                    code: ValidationResultCode::F111,
-                    fields: vec!["counting_differences_polling_station".into()],
-                    context: None,
-                }]
-            );
-
-            let validation_results = validate(false, false, false, true)?;
-            assert_eq!(
-                validation_results.errors,
-                [ValidationResult {
-                    code: ValidationResultCode::F111,
-                    fields: vec!["counting_differences_polling_station".into()],
-                    context: None,
-                }]
-            );
-
-            let validation_results = validate(false, false, false, false)?;
-            assert_eq!(
-                validation_results.errors,
-                [ValidationResult {
-                    code: ValidationResultCode::F111,
-                    fields: vec!["counting_differences_polling_station".into()],
-                    context: None,
-                }]
-            );
-
-            Ok(())
-        }
-
-        // CSO | F.112: 'Verschillen met telresultaten van het stembureau': meerdere antwoorden per vraag
-        #[test]
-        fn test_f112() -> Result<(), DataError> {
-            let validation_results = validate(true, true, false, true)?;
-            assert_eq!(
-                validation_results.errors,
-                [ValidationResult {
-                    code: ValidationResultCode::F112,
-                    fields: vec!["counting_differences_polling_station".into()],
-                    context: None,
-                }]
-            );
-
-            let validation_results = validate(false, true, true, true)?;
-            assert_eq!(
-                validation_results.errors,
-                [ValidationResult {
-                    code: ValidationResultCode::F112,
-                    fields: vec!["counting_differences_polling_station".into()],
-                    context: None,
-                }]
-            );
-
-            let validation_results = validate(true, true, true, true)?;
-            assert_eq!(
-                validation_results.errors,
-                [ValidationResult {
-                    code: ValidationResultCode::F112,
-                    fields: vec!["counting_differences_polling_station".into()],
-                    context: None,
-                }]
-            );
-
-            Ok(())
-        }
-
-        #[test]
-        fn test_multiple_errors() -> Result<(), DataError> {
-            let validation_results = validate(true, true, false, false)?;
-            assert_eq!(
-                validation_results.errors,
-                [
-                    ValidationResult {
-                        code: ValidationResultCode::F111,
-                        fields: vec!["counting_differences_polling_station".into()],
-                        context: None,
-                    },
-                    ValidationResult {
-                        code: ValidationResultCode::F112,
-                        fields: vec!["counting_differences_polling_station".into()],
-                        context: None,
-                    }
-                ]
-            );
-
-            let validation_results = validate(false, false, true, true)?;
-            assert_eq!(
-                validation_results.errors,
-                [
-                    ValidationResult {
-                        code: ValidationResultCode::F111,
-                        fields: vec!["counting_differences_polling_station".into()],
-                        context: None,
-                    },
-                    ValidationResult {
-                        code: ValidationResultCode::F112,
-                        fields: vec!["counting_differences_polling_station".into()],
                         context: None,
                     }
                 ]

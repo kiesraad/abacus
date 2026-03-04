@@ -1,9 +1,9 @@
 use crate::domain::{
     data_entry::{
         CSOFirstSessionResults, CSONextSessionResults, CandidateVotes,
-        CountingDifferencesPollingStation, DifferenceCountsCompareVotesCastAdmittedVoters,
-        DifferencesCounts, ExtraInvestigation, PoliticalGroupCandidateVotes,
-        PoliticalGroupTotalVotes, PollingStationResults, VotersCounts, VotesCounts, YesNo,
+        DifferenceCountsCompareVotesCastAdmittedVoters, DifferencesCounts, ExtraInvestigation,
+        PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, PollingStationResults,
+        VotersCounts, VotesCounts, YesNo,
     },
     validation::FieldPath,
 };
@@ -110,22 +110,6 @@ impl Compare for ExtraInvestigation {
             &first_entry.ballots_recounted_extra_investigation,
             different_fields,
             &path.field("ballots_recounted_extra_investigation"),
-        );
-    }
-}
-
-impl Compare for CountingDifferencesPollingStation {
-    fn compare(&self, first_entry: &Self, different_fields: &mut Vec<String>, path: &FieldPath) {
-        self.unexplained_difference_ballots_voters.compare(
-            &first_entry.unexplained_difference_ballots_voters,
-            different_fields,
-            &path.field("unexplained_difference_ballots_voters"),
-        );
-
-        self.difference_ballots_per_list.compare(
-            &first_entry.difference_ballots_per_list,
-            different_fields,
-            &path.field("difference_ballots_per_list"),
         );
     }
 }

@@ -4,7 +4,7 @@ use abacus::{
     domain::{
         committee_session::CommitteeSessionId,
         data_entry::{
-            CSOFirstSessionResults, CountingDifferencesPollingStation,
+            CSOFirstSessionResults,
             DifferenceCountsCompareVotesCastAdmittedVoters, DifferencesCounts, ExtraInvestigation,
             PollingStationResults, VotersCounts, VotesCounts, YesNo,
         },
@@ -14,6 +14,7 @@ use abacus::{
             VoteCountingMethod,
         },
         polling_station::{PollingStation, PollingStationId, PollingStationType},
+        polling_station_results::counting_differences_polling_station::CountingDifferencesPollingStation
     },
     repository::user_repo::UserId,
 };

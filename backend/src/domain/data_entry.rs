@@ -12,8 +12,10 @@ use crate::{
         data_entry_status::{DataEntryStatus, DataEntryStatusName},
         election::{CandidateNumber, PGNumber, PoliticalGroup},
         id::id,
-        polling_station_results::common_polling_station_results::CommonPollingStationResults,
-        polling_station_results::count::Count,
+        polling_station_results::{
+            common_polling_station_results::CommonPollingStationResults, count::Count,
+            counting_differences_polling_station::CountingDifferencesPollingStation,
+        },
     },
     error::ErrorReference,
 };
@@ -533,19 +535,6 @@ pub struct ExtraInvestigation {
     pub ballots_recounted_extra_investigation: YesNo,
 }
 
-/// Counting Differences Polling Station,
-/// part of the polling station results ("B1-2 Verschillen met telresultaten van het stembureau")
-#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
-#[serde(deny_unknown_fields)]
-pub struct CountingDifferencesPollingStation {
-    /// Whether there was an unexplained difference between the number of voters and votes
-    /// ("Was er in de telresultaten van het stembureau een onverklaard verschil tussen het totaal aantal getelde stembiljetten en het aantal toegelaten kiezers?")
-    pub unexplained_difference_ballots_voters: YesNo,
-    /// Whether there was a difference between the total votes per list as determined by the polling station and by the typist
-    /// ("Is er een verschil tussen het totaal aantal getelde stembiljetten per lijst zoals eerder vastgesteld door het stembureau en zoals door u geteld op het gemeentelijk stembureau?")
-    pub difference_ballots_per_list: YesNo,
-}
-
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
 pub struct PoliticalGroupCandidateVotes {
@@ -661,15 +650,6 @@ pub mod tests {
             Self {
                 extra_investigation_other_reason: YesNo::default(),
                 ballots_recounted_extra_investigation: YesNo::default(),
-            }
-        }
-    }
-
-    impl ValidDefault for CountingDifferencesPollingStation {
-        fn valid_default() -> Self {
-            Self {
-                unexplained_difference_ballots_voters: YesNo::no(),
-                difference_ballots_per_list: YesNo::no(),
             }
         }
     }

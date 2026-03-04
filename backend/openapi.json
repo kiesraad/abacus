@@ -755,7 +755,7 @@
     },
     "/api/elections/{election_id}/committee_sessions/{committee_session_id}/download_pdf_results": {
       "get": {
-        "summary": "Download a generated PDF with election results (coordinator_csb, coordinator_gsb)",
+        "summary": "Download a generated PDF with election results (coordinator_gsb)",
         "operationId": "election_download_pdf_results",
         "parameters": [
           {
@@ -846,7 +846,6 @@
         "security": [
           {
             "cookie_auth": [
-              "coordinator_csb",
               "coordinator_gsb"
             ]
           }
@@ -855,7 +854,7 @@
     },
     "/api/elections/{election_id}/committee_sessions/{committee_session_id}/download_zip_results": {
       "get": {
-        "summary": "Download a zip containing a PDF for the PV and the EML with election results (coordinator_csb, coordinator_gsb)",
+        "summary": "Download a zip containing a PDF for the PV and the EML with election results (coordinator_gsb)",
         "operationId": "election_download_zip_results",
         "parameters": [
           {
@@ -946,7 +945,6 @@
         "security": [
           {
             "cookie_auth": [
-              "coordinator_csb",
               "coordinator_gsb"
             ]
           }
@@ -1040,7 +1038,7 @@
     },
     "/api/elections/{election_id}/committee_sessions/{committee_session_id}/status": {
       "put": {
-        "summary": "Change the status of a [CommitteeSession]. (coordinator_csb, coordinator_gsb)",
+        "summary": "Change the status of a [CommitteeSession]. (coordinator_gsb)",
         "operationId": "committee_session_status_change",
         "parameters": [
           {
@@ -1130,7 +1128,6 @@
         "security": [
           {
             "cookie_auth": [
-              "coordinator_csb",
               "coordinator_gsb"
             ]
           }
@@ -2007,7 +2004,7 @@
     },
     "/api/elections/{election_id}/status": {
       "get": {
-        "summary": "Get election polling stations data entry statuses (administrator, coordinator_gsb, typist_gsb)",
+        "summary": "Get election polling stations data entry statuses (administrator, coordinator_csb, coordinator_gsb, typist_csb, typist_gsb)",
         "operationId": "election_status",
         "parameters": [
           {
@@ -2066,7 +2063,9 @@
           {
             "cookie_auth": [
               "administrator",
+              "coordinator_csb",
               "coordinator_gsb",
+              "typist_csb",
               "typist_gsb"
             ]
           }

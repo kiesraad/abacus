@@ -15,7 +15,7 @@ use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
     api::{
         committee_session::create_committee_session,
-        middleware::authentication::{Admin, AdminOrCoordinatorGSB},
+        middleware::authentication::{Admin, AdminOrCoordinatorGSB, error::AuthenticationError},
         polling_station::create_imported_polling_stations,
     },
     domain::{
@@ -131,7 +131,7 @@ impl AsAuditEvent for ElectionUpdatedAuditData {
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
-    security(("cookie_auth" = ["administrator", "coordinator_gsb", "typist_gsb"])),
+    security(("cookie_auth" = ["administrator", "coordinator_csb", "coordinator_gsb", "typist_csb", "typist_gsb"])),
 )]
 pub async fn election_list(
     _user: User,
@@ -161,15 +161,21 @@ pub async fn election_list(
     params(
         ("election_id" = ElectionId, description = "Election database id"),
     ),
-    security(("cookie_auth" = ["administrator", "coordinator_gsb", "typist_gsb"])),
+    security(("cookie_auth" = ["administrator", "coordinator_csb", "coordinator_gsb", "typist_csb", "typist_gsb"])),
 )]
 pub async fn election_details(
-    _user: User,
+    user: User,
     State(pool): State<SqlitePool>,
     Path(election_id): Path<ElectionId>,
 ) -> Result<Json<ElectionDetailsResponse>, APIError> {
     let mut conn = pool.acquire().await?;
+
     let election = election_repo::get(&mut conn, election_id).await?;
+    let category = &election.committee_category;
+    if !user.role().can_manage_committee(category) {
+        return Err(AuthenticationError::Forbidden.into());
+    }
+
     let committee_sessions =
         committee_session_repo::get_election_committee_session_list(&mut conn, election_id).await?;
     let current_committee_session = committee_sessions
@@ -209,7 +215,7 @@ pub async fn election_details(
     security(("cookie_auth" = ["administrator", "coordinator_gsb"])),
 )]
 pub async fn election_number_of_voters_change(
-    _user: AdminOrCoordinatorGSB,
+    AdminOrCoordinatorGSB(user): AdminOrCoordinatorGSB,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Path(election_id): Path<ElectionId>,
@@ -217,7 +223,12 @@ pub async fn election_number_of_voters_change(
 ) -> Result<StatusCode, APIError> {
     let mut tx = pool.begin_immediate().await?;
 
-    election_repo::get(&mut tx, election_id).await?;
+    let election = election_repo::get(&mut tx, election_id).await?;
+    let category = &election.committee_category;
+    if !user.role().can_manage_committee(category) {
+        return Err(AuthenticationError::Forbidden.into());
+    }
+
     let current_committee_session =
         committee_session_repo::get_election_committee_session(&mut tx, election_id).await?;
 

@@ -959,14 +959,20 @@ pub struct ElectionStatusResponseEntry {
     params(
         ("election_id" = ElectionId, description = "Election database id"),
     ),
-    security(("cookie_auth" = ["administrator", "coordinator_gsb", "typist_gsb"])),
+    security(("cookie_auth" = ["administrator", "coordinator_csb", "coordinator_gsb", "typist_csb", "typist_gsb"])),
 )]
 async fn election_status(
-    _user: User,
+    user: User,
     State(pool): State<SqlitePool>,
     Path(election_id): Path<ElectionId>,
 ) -> Result<Json<ElectionStatusResponse>, APIError> {
     let mut conn = pool.acquire().await?;
+
+    let election = election_repo::get(&mut conn, election_id).await?;
+    let category = &election.committee_category;
+    if !user.role().can_manage_committee(category) {
+        return Err(AuthenticationError::Forbidden.into());
+    }
 
     let current_committee_session =
         committee_session_repo::get_election_committee_session(&mut conn, election_id).await?;

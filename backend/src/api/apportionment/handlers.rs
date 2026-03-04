@@ -14,7 +14,7 @@ use crate::{
             structs::{ApportionmentInputData, ElectionApportionmentResponse},
         },
         election::ElectionAuditData,
-        middleware::authentication::CoordinatorGSB,
+        middleware::authentication::{CoordinatorGSB, error::AuthenticationError},
     },
     audit_log::AuditService,
     domain::{
@@ -54,13 +54,19 @@ impl AsAuditEvent for ApportionmentProcessed {
     security(("cookie_auth" = ["coordinator_gsb"])),
 )]
 pub async fn election_apportionment(
-    _user: CoordinatorGSB,
+    CoordinatorGSB(user): CoordinatorGSB,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Path(id): Path<ElectionId>,
 ) -> Result<Json<ElectionApportionmentResponse>, APIError> {
     let mut conn = pool.acquire().await?;
+
     let election = election_repo::get(&mut conn, id).await?;
+    let category = &election.committee_category;
+    if !user.role().can_manage_committee(category) {
+        return Err(AuthenticationError::Forbidden.into());
+    }
+
     let current_committee_session =
         committee_session_repo::get_election_committee_session(&mut conn, election.id).await?;
 

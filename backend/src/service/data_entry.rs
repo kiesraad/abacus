@@ -45,7 +45,7 @@ pub async fn create_empty(
 pub async fn create_definitive_data_entry(
     conn: &mut SqliteConnection,
     polling_station_id: PollingStationId,
-    results: &crate::domain::data_entry::PollingStationResults,
+    results: &crate::domain::polling_station_results::PollingStationResults,
 ) -> Result<(), DataEntryServiceError> {
     use crate::{
         domain::data_entry_status::{DataEntryStatus, Definitive},

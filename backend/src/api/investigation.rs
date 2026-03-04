@@ -19,7 +19,6 @@ use crate::{
     domain::{
         committee_session::{CommitteeSession, CommitteeSessionError},
         committee_session_status::CommitteeSessionStatus,
-        data_entry::PollingStationResults,
         election::ElectionWithPoliticalGroups,
         investigation::{
             InvestigationStatus, InvestigationTransitionError, PollingStationInvestigation,
@@ -28,6 +27,7 @@ use crate::{
         },
         models::{ModelNa14_2Bijlage1Input, ToPdfFileModel},
         polling_station::{PollingStation, PollingStationId},
+        polling_station_results::PollingStationResults,
         votes_table::VotesTablesWithOnlyPreviousVotes,
     },
     error::ErrorReference,

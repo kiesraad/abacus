@@ -19,9 +19,9 @@ use crate::{
     audit_log::AuditService,
     domain::{
         committee_session_status::CommitteeSessionStatus,
-        data_entry::PollingStationResults,
         election::{Election, ElectionId},
         polling_station::PollingStation,
+        polling_station_results::PollingStationResults,
         summary::ElectionSummary,
     },
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType},

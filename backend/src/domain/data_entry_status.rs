@@ -7,9 +7,9 @@ use utoipa::ToSchema;
 
 use crate::{
     domain::{
-        data_entry::PollingStationResults,
         election::ElectionWithPoliticalGroups,
         polling_station::PollingStation,
+        polling_station_results::PollingStationResults,
         validation::{DataError, ValidateRoot, ValidationResults},
     },
     repository::user_repo::UserId,
@@ -714,10 +714,7 @@ mod tests {
     use super::*;
     use crate::domain::{
         committee_session::CommitteeSessionId,
-        data_entry::{
-            PoliticalGroupTotalVotes,
-            tests::{ValidDefault, example_polling_station_results},
-        },
+        data_entry::{PoliticalGroupTotalVotes, tests::ValidDefault},
         election::{
             Candidate, CandidateNumber, CommitteeCategory, ElectionCategory, ElectionId, PGNumber,
             PoliticalGroup, VoteCountingMethod,
@@ -726,6 +723,7 @@ mod tests {
         polling_station_results::{
             cso_first_session_results::CSOFirstSessionResults,
             political_group_candidate_votes::{CandidateVotes, PoliticalGroupCandidateVotes},
+            tests::example_polling_station_results,
             voters_counts::VotersCounts,
             votes_counts::VotesCounts,
         },
@@ -1624,7 +1622,6 @@ mod tests {
     mod finalised_with_warnings {
         use crate::{
             domain::{
-                data_entry::PollingStationResults,
                 data_entry_status::{
                     DataEntryStatus,
                     tests::{
@@ -1632,6 +1629,7 @@ mod tests {
                         first_entry_in_progress, polling_station, second_entry_in_progress,
                     },
                 },
+                polling_station_results::PollingStationResults,
             },
             repository::user_repo::UserId,
         };

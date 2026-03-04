@@ -106,6 +106,25 @@ mod tests {
     };
     use test_log::test;
 
+    #[test]
+    fn test_voters_addition() {
+        let mut curr_votes = VotersCounts {
+            poll_card_count: 2,
+            proxy_certificate_count: 3,
+            total_admitted_voters_count: 9,
+        };
+
+        curr_votes += &VotersCounts {
+            poll_card_count: 1,
+            proxy_certificate_count: 2,
+            total_admitted_voters_count: 5,
+        };
+
+        assert_eq!(curr_votes.poll_card_count, 3);
+        assert_eq!(curr_votes.proxy_certificate_count, 5);
+        assert_eq!(curr_votes.total_admitted_voters_count, 14);
+    }
+
     fn validate(
         poll_card_count: u32,
         proxy_certificate_count: u32,

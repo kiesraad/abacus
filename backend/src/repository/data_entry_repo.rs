@@ -6,9 +6,10 @@ use crate::{
     api::data_entry::ElectionStatusResponseEntry,
     domain::{
         committee_session::CommitteeSessionId,
-        data_entry::{PollingStationDataEntry, PollingStationResults},
+        data_entry::PollingStationDataEntry,
         data_entry_status::DataEntryStatus,
         polling_station::{PollingStation, PollingStationId},
+        polling_station_results::PollingStationResults,
     },
     repository::{committee_session_repo, polling_station_repo},
 };

@@ -270,6 +270,91 @@ mod tests {
     };
     use test_log::test;
 
+    #[test]
+    fn test_votes_addition() {
+        let mut curr_votes = VotesCounts {
+            political_group_total_votes: vec![
+                PoliticalGroupTotalVotes {
+                    number: PGNumber::from(1),
+                    total: 10,
+                },
+                PoliticalGroupTotalVotes {
+                    number: PGNumber::from(2),
+                    total: 20,
+                },
+            ],
+            total_votes_candidates_count: 2,
+            blank_votes_count: 3,
+            invalid_votes_count: 4,
+            total_votes_cast_count: 9,
+        };
+
+        curr_votes
+            .add(&VotesCounts {
+                political_group_total_votes: vec![
+                    PoliticalGroupTotalVotes {
+                        number: PGNumber::from(1),
+                        total: 11,
+                    },
+                    PoliticalGroupTotalVotes {
+                        number: PGNumber::from(2),
+                        total: 12,
+                    },
+                ],
+                total_votes_candidates_count: 1,
+                blank_votes_count: 2,
+                invalid_votes_count: 3,
+                total_votes_cast_count: 5,
+            })
+            .unwrap();
+
+        assert_eq!(curr_votes.political_group_total_votes.len(), 2);
+        assert_eq!(curr_votes.political_group_total_votes[0].total, 21);
+        assert_eq!(curr_votes.political_group_total_votes[1].total, 32);
+
+        assert_eq!(curr_votes.total_votes_candidates_count, 3);
+        assert_eq!(curr_votes.blank_votes_count, 5);
+        assert_eq!(curr_votes.invalid_votes_count, 7);
+        assert_eq!(curr_votes.total_votes_cast_count, 14);
+    }
+
+    #[test]
+    fn test_votes_addition_error() {
+        let mut curr_votes = VotesCounts {
+            political_group_total_votes: vec![PoliticalGroupTotalVotes {
+                number: PGNumber::from(1),
+                total: 10,
+            }],
+            total_votes_candidates_count: 2,
+            blank_votes_count: 3,
+            invalid_votes_count: 4,
+            total_votes_cast_count: 9,
+        };
+
+        let mut other = VotesCounts {
+            political_group_total_votes: vec![PoliticalGroupTotalVotes {
+                number: PGNumber::from(2),
+                total: 20,
+            }],
+            total_votes_candidates_count: 1,
+            blank_votes_count: 2,
+            invalid_votes_count: 3,
+            total_votes_cast_count: 5,
+        };
+
+        let result = curr_votes.add(&other);
+        assert!(matches!(
+            result,
+            Err(APIError::AddError(_, ErrorReference::InvalidVoteGroup))
+        ));
+
+        let result = other.add(&curr_votes);
+        assert!(matches!(
+            result,
+            Err(APIError::AddError(_, ErrorReference::InvalidVoteGroup))
+        ));
+    }
+
     fn validate(
         political_group_total_votes: &[u32],
         total_votes_candidates_count: u32,

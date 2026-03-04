@@ -16,9 +16,7 @@ use crate::{
     domain::{
         committee_session::{CommitteeSession, CommitteeSessionError},
         committee_session_status::CommitteeSessionStatus,
-        data_entry::{
-            DataEntryId, DataEntryStatusResponse, PollingStationDataEntry, PollingStationResults,
-        },
+        data_entry::{DataEntryId, DataEntryStatusResponse, PollingStationDataEntry},
         data_entry_status::{
             ClientState, CurrentDataEntry, DataEntryStatus, DataEntryStatusName,
             DataEntryTransitionError, EntriesDifferent,
@@ -28,7 +26,7 @@ use crate::{
         investigation::InvestigationStatus,
         polling_station::{PollingStation, PollingStationId},
         polling_station_results::{
-            common_polling_station_results::CommonPollingStationResults,
+            PollingStationResults, common_polling_station_results::CommonPollingStationResults,
             cso_next_session_results::CSONextSessionResults,
         },
         validation::{DataError, ValidateRoot, ValidationResults},
@@ -990,7 +988,7 @@ mod tests {
         domain::{
             committee_session::CommitteeSessionId,
             committee_session_status::CommitteeSessionStatus,
-            data_entry::tests::example_polling_station_results,
+            polling_station_results::tests::example_polling_station_results,
             role::Role,
             validation::{ValidationResult, ValidationResultCode},
         },

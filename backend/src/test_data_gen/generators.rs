@@ -10,7 +10,7 @@ use crate::{
     domain::{
         committee_session::{CommitteeSession, CommitteeSessionCreateRequest},
         committee_session_status::CommitteeSessionStatus,
-        data_entry::{PoliticalGroupTotalVotes, PollingStationResults, YesNo},
+        data_entry::{PoliticalGroupTotalVotes, YesNo},
         data_entry_status::{DataEntryStatus, Definitive, FirstEntryFinalised},
         election::{
             self, CandidateGender, CandidateNumber, CommitteeCategory, ElectionCategory,
@@ -18,6 +18,7 @@ use crate::{
         },
         polling_station::{PollingStation, PollingStationRequest, PollingStationType},
         polling_station_results::{
+            PollingStationResults,
             counting_differences_polling_station::CountingDifferencesPollingStation,
             cso_first_session_results::CSOFirstSessionResults,
             differences_counts::{

@@ -1,28 +1,10 @@
 use crate::domain::{
-    data_entry::{PoliticalGroupTotalVotes, PollingStationResults, YesNo},
+    data_entry::{PoliticalGroupTotalVotes, YesNo},
     validation::FieldPath,
 };
 
 pub trait Compare {
     fn compare(&self, first_entry: &Self, different_fields: &mut Vec<String>, path: &FieldPath);
-}
-
-impl Compare for PollingStationResults {
-    fn compare(&self, first_entry: &Self, different_fields: &mut Vec<String>, path: &FieldPath) {
-        match (self, first_entry) {
-            (
-                PollingStationResults::CSOFirstSession(s),
-                PollingStationResults::CSOFirstSession(f),
-            ) => s.compare(f, different_fields, path),
-            (
-                PollingStationResults::CSONextSession(s),
-                PollingStationResults::CSONextSession(f),
-            ) => s.compare(f, different_fields, path),
-            _ => {
-                different_fields.push(path.to_string());
-            }
-        }
-    }
 }
 
 impl Compare for YesNo {

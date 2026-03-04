@@ -5,7 +5,7 @@ use utoipa::ToSchema;
 
 use crate::domain::{
     comparison::Compare,
-    data_entry::{PoliticalGroupTotalVotes, PollingStationResults},
+    data_entry::PoliticalGroupTotalVotes,
     data_entry_status::{
         DataEntryStatus, FirstEntryFinalised, FirstEntryHasErrors, FirstEntryInProgress,
     },
@@ -273,43 +273,6 @@ impl Validate for DataEntryStatus {
                 Ok(())
             }
             _ => Ok(()),
-        }
-    }
-}
-
-impl ValidateRoot for PollingStationResults {}
-
-impl Validate for PollingStationResults {
-    fn validate(
-        &self,
-        election: &ElectionWithPoliticalGroups,
-        polling_station: &PollingStation,
-        validation_results: &mut ValidationResults,
-        path: &FieldPath,
-    ) -> Result<(), DataError> {
-        match self {
-            PollingStationResults::CSOFirstSession(results) => {
-                results.extra_investigation.validate(
-                    election,
-                    polling_station,
-                    validation_results,
-                    &path.field("extra_investigation"),
-                )?;
-
-                results.counting_differences_polling_station.validate(
-                    election,
-                    polling_station,
-                    validation_results,
-                    &path.field("counting_differences_polling_station"),
-                )?;
-
-                self.as_common()
-                    .validate(election, polling_station, validation_results, path)
-            }
-            PollingStationResults::CSONextSession(_) => {
-                self.as_common()
-                    .validate(election, polling_station, validation_results, path)
-            }
         }
     }
 }

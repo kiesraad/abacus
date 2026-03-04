@@ -4,8 +4,6 @@
   "administrator": "Beheerder",
   "change_password_hint": "De gebruiker heeft een nieuw wachtwoord gekozen. Als het nodig is, kan het wachtwoord gereset worden.",
   "change_password": "Wijzig wachtwoord",
-  "committee_category_csb": "Centraal stembureau (CSB)",
-  "committee_category_gsb": "Gemeentelijk stembureau (GSB)",
   "committee_category_hint": "Kies het soort stembureaus waar de nieuwe gebruiker deze rol krijgt. Deze keuze kan na het aanmaken van de gebruiker niet worden aangepast.",
   "committee_category_label": "Kies een niveau",
   "committee_category_title": "Voor welk soort stembureaus wordt deze gebruiker {role}?",

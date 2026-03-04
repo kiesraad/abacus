@@ -14,9 +14,9 @@ interface ElectionCreateFormSection {
 const sections: ElectionCreateFormSection[] = [
   { key: "election_definition", label: t("election_definition"), path: "create", hidden: false },
   {
-    key: "electoral_committee_role",
-    label: t("election.electoral_committee_role.title"),
-    path: "create/electoral-committee-role",
+    key: "committee_category",
+    label: t("election.committee_category.title"),
+    path: "create/committee-category",
     hidden: false,
   },
   { key: "list_of_candidates", label: t("candidate.list.plural"), path: "create/list-of-candidates", hidden: false },

@@ -96,7 +96,7 @@
     "dso_not_supported": "Niet ondersteund in deze versie van Abacus",
     "title": "Type stemopneming in"
   },
-  "electoral_committee_role": {
+  "committee_category": {
     "title": "Type stembureau",
     "description": "Voor welk stembureau wil je deze verkiezing nu klaarzetten? Ga je Abacus voor GSB én CSB gebruiken? Zet dan eerst het GSB klaar, en doe daarna hetzelfde voor het CSB.",
     "choose": "Kies het type stembureau"

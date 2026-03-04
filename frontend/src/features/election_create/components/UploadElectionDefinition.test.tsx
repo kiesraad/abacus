@@ -93,7 +93,7 @@ describe("UploadElectionDefinition component", () => {
     overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
     await user.click(screen.getByRole("button", { name: "Volgende" }));
 
-    expect(navigate).toHaveBeenCalledWith("/elections/create/electoral-committee-role");
+    expect(navigate).toHaveBeenCalledWith("/elections/create/committee-category");
   });
 
   test("Shows an error when providing incorrect hash", async () => {

@@ -10,7 +10,7 @@ use crate::{
     domain::{
         committee_session::{CommitteeSession, CommitteeSessionCreateRequest},
         committee_session_status::CommitteeSessionStatus,
-        data_entry::{PoliticalGroupTotalVotes, YesNo},
+        data_entry::PoliticalGroupTotalVotes,
         data_entry_status::{DataEntryStatus, Definitive, FirstEntryFinalised},
         election::{
             self, CandidateGender, CandidateNumber, CommitteeCategory, ElectionCategory,
@@ -28,6 +28,7 @@ use crate::{
             political_group_candidate_votes::{CandidateVotes, PoliticalGroupCandidateVotes},
             voters_counts::VotersCounts,
             votes_counts::VotesCounts,
+            yes_no::YesNo,
         },
         validation::{FieldPath, Validate, ValidationResults},
     },

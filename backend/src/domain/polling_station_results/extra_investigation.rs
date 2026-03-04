@@ -1,8 +1,8 @@
 use crate::domain::{
     comparison::Compare,
-    data_entry::YesNo,
     election::ElectionWithPoliticalGroups,
     polling_station::PollingStation,
+    polling_station_results::yes_no::YesNo,
     validation::{
         DataError, FieldPath, Validate, ValidationResult, ValidationResultCode, ValidationResults,
     },

@@ -305,10 +305,10 @@ mod tests {
     use super::*;
     use crate::domain::{
         committee_session::committee_session_fixture,
-        data_entry::{YesNo, tests::ValidDefault},
+        data_entry::tests::ValidDefault,
         election::{PGNumber, tests::election_fixture},
         polling_station::test_helpers::polling_stations_fixture,
-        polling_station_results::extra_investigation::ExtraInvestigation,
+        polling_station_results::{extra_investigation::ExtraInvestigation, yes_no::YesNo},
     };
 
     fn polling_station_results_fixture_a() -> PollingStationResults {

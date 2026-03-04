@@ -2,7 +2,6 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, types::Json};
 use utoipa::ToSchema;
-pub use yes_no::YesNo;
 
 use crate::domain::{
     data_entry_status::{DataEntryStatus, DataEntryStatusName},
@@ -21,56 +20,6 @@ pub struct PollingStationDataEntry {
     pub state: Json<DataEntryStatus>,
     #[schema(value_type = String)]
     pub updated_at: DateTime<Utc>,
-}
-
-mod yes_no {
-    use super::*;
-
-    /// Yes/No response structure for boolean questions with separate yes and no fields.
-    #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
-    #[serde(deny_unknown_fields)]
-    pub struct YesNo {
-        yes: bool,
-        no: bool,
-    }
-
-    impl YesNo {
-        pub fn new(yes: bool, no: bool) -> Self {
-            Self { yes, no }
-        }
-
-        pub fn yes() -> Self {
-            Self::new(true, false)
-        }
-
-        pub fn no() -> Self {
-            Self::new(false, true)
-        }
-
-        pub fn both() -> Self {
-            Self::new(true, true)
-        }
-
-        /// true if both `yes` and `no` are false
-        pub fn is_empty(&self) -> bool {
-            !self.yes && !self.no
-        }
-
-        /// true if both `yes` and `no` are true
-        pub fn is_both(&self) -> bool {
-            self.yes && self.no
-        }
-
-        /// Some(true) if `yes` is true and `no` is false,
-        /// Some(false) if `yes` is false and `no` is true, otherwise None
-        pub fn as_bool(&self) -> Option<bool> {
-            match (self.yes, self.no) {
-                (true, false) => Some(true),
-                (false, true) => Some(false),
-                _ => None,
-            }
-        }
-    }
 }
 
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]

@@ -1,18 +1,7 @@
-use crate::domain::{
-    data_entry::{PoliticalGroupTotalVotes, YesNo},
-    validation::FieldPath,
-};
+use crate::domain::{data_entry::PoliticalGroupTotalVotes, validation::FieldPath};
 
 pub trait Compare {
     fn compare(&self, first_entry: &Self, different_fields: &mut Vec<String>, path: &FieldPath);
-}
-
-impl Compare for YesNo {
-    fn compare(&self, first_entry: &Self, different_fields: &mut Vec<String>, path: &FieldPath) {
-        if self != first_entry {
-            different_fields.push(path.to_string());
-        }
-    }
 }
 
 impl Compare for bool {

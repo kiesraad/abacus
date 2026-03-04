@@ -2,6 +2,8 @@ use serde::{Deserialize, Serialize};
 use sqlx::Type;
 use utoipa::ToSchema;
 
+use crate::domain::election::CommitteeCategory;
+
 #[derive(
     Serialize,
     Deserialize,
@@ -43,6 +45,21 @@ impl Role {
 
     pub(crate) fn is_typist(&self) -> bool {
         matches!(self, Self::TypistGSB | Self::TypistCSB)
+    }
+
+    pub fn can_manage_committee(&self, category: &CommitteeCategory) -> bool {
+        matches!(
+            (self, category),
+            (Self::Administrator, _)
+                | (
+                    Self::CoordinatorGSB | Self::TypistGSB,
+                    CommitteeCategory::GSB
+                )
+                | (
+                    Self::CoordinatorCSB | Self::TypistCSB,
+                    CommitteeCategory::CSB
+                )
+        )
     }
 
     pub fn manages(&self, other: &Role) -> bool {

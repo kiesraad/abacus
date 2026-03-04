@@ -5,12 +5,12 @@ use serde::{Deserialize, Serialize};
 use crate::{
     APIError,
     domain::{
-        data_entry::PoliticalGroupCandidateVotes,
         election::{
             Candidate, CandidateNumber, ElectionWithPoliticalGroups, PGNumber, PoliticalGroup,
         },
         polling_station_results::{
             common_polling_station_results::CommonPollingStationResults, count::Count,
+            political_group_candidate_votes::PoliticalGroupCandidateVotes,
         },
         summary::ElectionSummary,
     },
@@ -314,8 +314,8 @@ mod tests {
 
     use super::*;
     use crate::domain::{
-        data_entry,
         election::{CommitteeCategory, ElectionCategory, ElectionId, VoteCountingMethod},
+        polling_station_results::political_group_candidate_votes::CandidateVotes,
     };
 
     fn sample_candidate(number: CandidateNumber) -> Candidate {
@@ -370,7 +370,7 @@ mod tests {
             total,
             candidate_votes: entries
                 .iter()
-                .map(|&(candidate_number, votes)| data_entry::CandidateVotes {
+                .map(|&(candidate_number, votes)| CandidateVotes {
                     number: CandidateNumber::from(candidate_number),
                     votes,
                 })

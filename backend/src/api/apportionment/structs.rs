@@ -3,8 +3,10 @@ use serde::Serialize;
 use utoipa::ToSchema;
 
 use crate::domain::{
-    data_entry::{CandidateVotes, PoliticalGroupCandidateVotes},
     election::{self, Candidate, PGNumber},
+    polling_station_results::political_group_candidate_votes::{
+        CandidateVotes, PoliticalGroupCandidateVotes,
+    },
     summary::ElectionSummary,
 };
 

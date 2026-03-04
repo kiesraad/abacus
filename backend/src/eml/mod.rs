@@ -34,11 +34,11 @@ pub use hash::{EmlHash, RedactedEmlHash};
 
 use crate::domain::{
     committee_session::CommitteeSession,
-    data_entry::PoliticalGroupCandidateVotes,
     election::{
         Candidate, CandidateGender, CandidateNumber, CommitteeCategory,
         ElectionWithPoliticalGroups, NewElection, PGNumber, PoliticalGroup, VoteCountingMethod,
     },
+    polling_station_results::political_group_candidate_votes::PoliticalGroupCandidateVotes,
     summary::ElectionSummary,
 };
 

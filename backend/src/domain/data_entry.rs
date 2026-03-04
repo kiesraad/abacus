@@ -10,12 +10,15 @@ use crate::{
     APIError,
     domain::{
         data_entry_status::{DataEntryStatus, DataEntryStatusName},
-        election::{CandidateNumber, PGNumber, PoliticalGroup},
+        election::{PGNumber, PoliticalGroup},
         id::id,
         polling_station_results::{
-            common_polling_station_results::CommonPollingStationResults, count::Count,
+            common_polling_station_results::CommonPollingStationResults,
+            count::Count,
             cso_first_session_results::CSOFirstSessionResults,
-            cso_next_session_results::CSONextSessionResults, differences_counts::DifferencesCounts,
+            cso_next_session_results::CSONextSessionResults,
+            differences_counts::DifferencesCounts,
+            political_group_candidate_votes::{CandidateVotes, PoliticalGroupCandidateVotes},
         },
     },
     error::ErrorReference,
@@ -412,82 +415,11 @@ mod yes_no {
 
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
-pub struct PoliticalGroupCandidateVotes {
-    #[schema(value_type = u32)]
-    pub number: PGNumber,
-    #[schema(value_type = u32)]
-    pub total: Count,
-    pub candidate_votes: Vec<CandidateVotes>,
-}
-
-impl PoliticalGroupCandidateVotes {
-    pub fn add(&mut self, other: &Self) -> Result<(), APIError> {
-        if self.number != other.number {
-            return Err(APIError::AddError(
-                format!(
-                    "Attempted to add votes of group '{}' to '{}'",
-                    other.number, self.number
-                ),
-                ErrorReference::InvalidVoteGroup,
-            ));
-        }
-
-        self.total += other.total;
-
-        for cv in other.candidate_votes.iter() {
-            let Some(found_can) = self
-                .candidate_votes
-                .iter_mut()
-                .find(|c| c.number == cv.number)
-            else {
-                return Err(APIError::AddError(
-                    format!(
-                        "Attempted to add candidate '{}' votes in group '{}', but no such candidate exists",
-                        cv.number, self.number
-                    ),
-                    ErrorReference::InvalidVoteCandidate,
-                ));
-            };
-            found_can.votes += cv.votes;
-        }
-
-        Ok(())
-    }
-
-    /// Create `PoliticalGroupCandidateVotes` from test data with candidate numbers automatically generated starting from 1.
-    #[cfg(test)]
-    pub fn from_test_data_auto(number: PGNumber, candidate_votes: &[Count]) -> Self {
-        PoliticalGroupCandidateVotes {
-            number,
-            total: candidate_votes.iter().sum(),
-            candidate_votes: candidate_votes
-                .iter()
-                .enumerate()
-                .map(|(i, votes)| CandidateVotes {
-                    number: CandidateNumber::try_from(i + 1).unwrap(),
-                    votes: *votes,
-                })
-                .collect(),
-        }
-    }
-}
-
-#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
-#[serde(deny_unknown_fields)]
 pub struct PoliticalGroupTotalVotes {
     #[schema(value_type = u32)]
     pub number: PGNumber,
     #[schema(value_type = u32)]
     pub total: Count,
-}
-
-#[derive(Serialize, Deserialize, ToSchema, Clone, Copy, Debug, PartialEq, Eq, Hash)]
-#[serde(deny_unknown_fields)]
-pub struct CandidateVotes {
-    #[schema(value_type = u32)]
-    pub number: CandidateNumber,
-    #[schema(value_type = u32)]
-    pub votes: Count,
 }
 
 #[derive(Serialize, Deserialize, ToSchema, Debug)]

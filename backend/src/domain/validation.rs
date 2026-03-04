@@ -5,14 +5,11 @@ use utoipa::ToSchema;
 
 use crate::domain::{
     comparison::Compare,
-    data_entry::{
-        CandidateVotes, PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes,
-        PollingStationResults, VotersCounts, VotesCounts,
-    },
+    data_entry::{PoliticalGroupTotalVotes, PollingStationResults, VotersCounts, VotesCounts},
     data_entry_status::{
         DataEntryStatus, FirstEntryFinalised, FirstEntryHasErrors, FirstEntryInProgress,
     },
-    election::{CandidateNumber, ElectionWithPoliticalGroups, PGNumber},
+    election::{ElectionWithPoliticalGroups, PGNumber},
     polling_station::PollingStation,
 };
 
@@ -537,107 +534,6 @@ impl Validate for Vec<PoliticalGroupTotalVotes> {
     }
 }
 
-impl Validate for Vec<PoliticalGroupCandidateVotes> {
-    fn validate(
-        &self,
-        election: &ElectionWithPoliticalGroups,
-        polling_station: &PollingStation,
-        validation_results: &mut ValidationResults,
-        path: &FieldPath,
-    ) -> Result<(), DataError> {
-        // check if the list of political groups has the correct length
-        if election.political_groups.len() != self.len() {
-            return Err(DataError::new(
-                "list of political groups does not have correct length",
-            ));
-        }
-
-        // check each political group
-        let mut previous_number = PGNumber::from(0);
-        for (i, pgv) in self.iter().enumerate() {
-            let number = pgv.number;
-            if number <= previous_number {
-                return Err(DataError::new("political group numbers are not increasing"));
-            }
-            previous_number = number;
-
-            pgv.validate(
-                election,
-                polling_station,
-                validation_results,
-                &path.index(i),
-            )?;
-        }
-        Ok(())
-    }
-}
-
-impl Validate for PoliticalGroupCandidateVotes {
-    fn validate(
-        &self,
-        election: &ElectionWithPoliticalGroups,
-        polling_station: &PollingStation,
-        validation_results: &mut ValidationResults,
-        path: &FieldPath,
-    ) -> Result<(), DataError> {
-        // check if the list of candidates has the correct length
-        let pg = election
-            .political_groups
-            .iter()
-            .find(|pg| pg.number == self.number)
-            .ok_or(DataError::new("political group should exist"))?;
-
-        // check if the number of candidates is correct
-        if pg.candidates.len() != self.candidate_votes.len() {
-            return Err(DataError::new("incorrect number of candidates"));
-        }
-
-        // validate all candidates
-        let mut prev_number = CandidateNumber::from(0);
-        for (i, cv) in self.candidate_votes.iter().enumerate() {
-            let number = cv.number;
-            if number <= prev_number {
-                return Err(DataError::new("candidate numbers are not increasing"));
-            }
-            prev_number = number;
-
-            cv.validate(
-                election,
-                polling_station,
-                validation_results,
-                &path.field("candidate_votes").index(i),
-            )?;
-        }
-
-        // validate the total number of votes
-        self.total.validate(
-            election,
-            polling_station,
-            validation_results,
-            &path.field("total"),
-        )?;
-
-        Ok(())
-    }
-}
-
-impl Validate for CandidateVotes {
-    fn validate(
-        &self,
-        election: &ElectionWithPoliticalGroups,
-        polling_station: &PollingStation,
-        validation_results: &mut ValidationResults,
-        path: &FieldPath,
-    ) -> Result<(), DataError> {
-        self.votes.validate(
-            election,
-            polling_station,
-            validation_results,
-            &path.field("votes"),
-        )
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use test_log::test;
@@ -921,9 +817,14 @@ mod tests {
     }
 
     mod political_group_votes {
-        use test_log::test;
-
         use super::*;
+        use crate::domain::{
+            election::CandidateNumber,
+            polling_station_results::political_group_candidate_votes::{
+                CandidateVotes, PoliticalGroupCandidateVotes,
+            },
+        };
+        use test_log::test;
 
         /// Takes a list of tuples where each tuple contains:
         /// - Candidate vote counts for the political group

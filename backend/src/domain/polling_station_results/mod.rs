@@ -5,3 +5,4 @@ pub mod cso_first_session_results;
 pub mod cso_next_session_results;
 pub mod differences_counts;
 pub mod extra_investigation;
+pub mod political_group_candidate_votes;

@@ -1,7 +1,6 @@
 use crate::domain::{
     data_entry::{
-        CandidateVotes, PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes,
-        PollingStationResults, VotersCounts, VotesCounts, YesNo,
+        PoliticalGroupTotalVotes, PollingStationResults, VotersCounts, VotesCounts, YesNo,
     },
     validation::FieldPath,
 };
@@ -112,38 +111,5 @@ impl Compare for Vec<PoliticalGroupTotalVotes> {
                 &path.index(i).field("total"),
             );
         }
-    }
-}
-
-impl Compare for Vec<PoliticalGroupCandidateVotes> {
-    fn compare(&self, first_entry: &Self, different_fields: &mut Vec<String>, path: &FieldPath) {
-        // compare each political group
-        for (i, pgv) in self.iter().enumerate() {
-            pgv.compare(&first_entry[i], different_fields, &path.index(i));
-        }
-    }
-}
-
-impl Compare for PoliticalGroupCandidateVotes {
-    fn compare(&self, first_entry: &Self, different_fields: &mut Vec<String>, path: &FieldPath) {
-        // compare all candidates
-        for (i, cv) in self.candidate_votes.iter().enumerate() {
-            cv.compare(
-                &first_entry.candidate_votes[i],
-                different_fields,
-                &path.field("candidate_votes").index(i),
-            );
-        }
-
-        // compare the total number of votes
-        self.total
-            .compare(&first_entry.total, different_fields, &path.field("total"));
-    }
-}
-
-impl Compare for CandidateVotes {
-    fn compare(&self, first_entry: &Self, different_fields: &mut Vec<String>, path: &FieldPath) {
-        self.votes
-            .compare(&first_entry.votes, different_fields, &path.field("votes"))
     }
 }

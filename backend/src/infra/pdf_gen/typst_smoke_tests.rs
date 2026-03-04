@@ -14,10 +14,7 @@ use crate::{
     domain::{
         committee_session::{CommitteeSession, CommitteeSessionId},
         committee_session_status::CommitteeSessionStatus,
-        data_entry::{
-            CandidateVotes, DataEntryId, PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes,
-            VotersCounts, VotesCounts, YesNo,
-        },
+        data_entry::{DataEntryId, PoliticalGroupTotalVotes, VotersCounts, VotesCounts, YesNo},
         election::{
             Candidate, CandidateGender, CandidateNumber, CommitteeCategory, ElectionCategory,
             ElectionId, ElectionWithPoliticalGroups, PGNumber, PoliticalGroup, VoteCountingMethod,
@@ -34,6 +31,7 @@ use crate::{
             differences_counts::{
                 DifferenceCountsCompareVotesCastAdmittedVoters, DifferencesCounts,
             },
+            political_group_candidate_votes::{CandidateVotes, PoliticalGroupCandidateVotes},
         },
         summary::{
             ElectionSummary, PollingStationInvestigations, SumCount, SummaryDifferencesCounts,

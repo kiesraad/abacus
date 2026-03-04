@@ -4,7 +4,7 @@ use utoipa::ToSchema;
 use crate::{
     APIError,
     domain::{
-        data_entry::{PoliticalGroupTotalVotes, PollingStationResults, VotesCounts},
+        data_entry::{PoliticalGroupTotalVotes, PollingStationResults},
         election::ElectionWithPoliticalGroups,
         polling_station::{PollingStation, PollingStationNumber},
         polling_station_results::{
@@ -13,6 +13,7 @@ use crate::{
             differences_counts::DifferencesCounts,
             political_group_candidate_votes::{CandidateVotes, PoliticalGroupCandidateVotes},
             voters_counts::VotersCounts,
+            votes_counts::VotesCounts,
         },
         validation::{Validate, ValidationResults},
     },

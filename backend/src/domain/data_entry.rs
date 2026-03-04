@@ -1,28 +1,23 @@
-use std::collections::HashSet;
-
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, types::Json};
 use utoipa::ToSchema;
 pub use yes_no::YesNo;
 
-use crate::{
-    APIError,
-    domain::{
-        data_entry_status::{DataEntryStatus, DataEntryStatusName},
-        election::{PGNumber, PoliticalGroup},
-        id::id,
-        polling_station_results::{
-            common_polling_station_results::CommonPollingStationResults,
-            count::Count,
-            cso_first_session_results::CSOFirstSessionResults,
-            cso_next_session_results::CSONextSessionResults,
-            differences_counts::DifferencesCounts,
-            political_group_candidate_votes::{CandidateVotes, PoliticalGroupCandidateVotes},
-            voters_counts::VotersCounts,
-        },
+use crate::domain::{
+    data_entry_status::{DataEntryStatus, DataEntryStatusName},
+    election::{PGNumber, PoliticalGroup},
+    id::id,
+    polling_station_results::{
+        common_polling_station_results::CommonPollingStationResults,
+        count::Count,
+        cso_first_session_results::CSOFirstSessionResults,
+        cso_next_session_results::CSONextSessionResults,
+        differences_counts::DifferencesCounts,
+        political_group_candidate_votes::{CandidateVotes, PoliticalGroupCandidateVotes},
+        voters_counts::VotersCounts,
+        votes_counts::VotesCounts,
     },
-    error::ErrorReference,
 };
 
 id!(DataEntryId);
@@ -259,85 +254,6 @@ impl PollingStationResults {
                 total: 0,
             })
             .collect()
-    }
-}
-
-/// Votes counts, part of the polling station results.
-/// Following the fields in Model CSO Na 31-2 Bijlage 1.
-#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
-#[serde(deny_unknown_fields)]
-pub struct VotesCounts {
-    /// Total votes per list
-    pub political_group_total_votes: Vec<PoliticalGroupTotalVotes>,
-    /// Total number of valid votes on candidates
-    /// ("Totaal stemmen op kandidaten")
-    #[schema(value_type = u32)]
-    pub total_votes_candidates_count: Count,
-    /// Number of blank votes ("Blanco stembiljetten")
-    #[schema(value_type = u32)]
-    pub blank_votes_count: Count,
-    /// Number of invalid votes ("Ongeldige stembiljetten")
-    #[schema(value_type = u32)]
-    pub invalid_votes_count: Count,
-    /// Total number of votes cast ("Totaal uitgebrachte stemmen")
-    #[schema(value_type = u32)]
-    pub total_votes_cast_count: Count,
-}
-
-impl VotesCounts {
-    pub fn add(&mut self, other: &Self) -> Result<(), APIError> {
-        // Get sets of political group numbers from both collections
-        let self_numbers: HashSet<_> = self
-            .political_group_total_votes
-            .iter()
-            .map(|pg| pg.number)
-            .collect();
-        let other_numbers: HashSet<_> = other
-            .political_group_total_votes
-            .iter()
-            .map(|pg| pg.number)
-            .collect();
-
-        // Check that both have exactly the same political groups
-        if self_numbers != other_numbers {
-            let missing_in_self: Vec<_> = other_numbers.difference(&self_numbers).collect();
-            let missing_in_other: Vec<_> = self_numbers.difference(&other_numbers).collect();
-
-            if !missing_in_self.is_empty() {
-                return Err(APIError::AddError(
-                    format!(
-                        "Political group(s) {missing_in_self:?} exist in source but not in target",
-                    ),
-                    ErrorReference::InvalidVoteGroup,
-                ));
-            }
-            if !missing_in_other.is_empty() {
-                return Err(APIError::AddError(
-                    format!(
-                        "Political group(s) {missing_in_other:?} exist in target but not in source",
-                    ),
-                    ErrorReference::InvalidVoteGroup,
-                ));
-            }
-        }
-
-        // Add totals of political groups with the same number
-        for pg in &other.political_group_total_votes {
-            if let Some(existing) = self
-                .political_group_total_votes
-                .iter_mut()
-                .find(|e| e.number == pg.number)
-            {
-                existing.total += pg.total;
-            }
-        }
-
-        self.total_votes_candidates_count += other.total_votes_candidates_count;
-        self.blank_votes_count += other.blank_votes_count;
-        self.invalid_votes_count += other.invalid_votes_count;
-        self.total_votes_cast_count += other.total_votes_cast_count;
-
-        Ok(())
     }
 }
 

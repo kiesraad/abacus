@@ -1,11 +1,11 @@
 use crate::domain::{
-    data_entry::VotesCounts,
     election::ElectionWithPoliticalGroups,
     polling_station::PollingStation,
     polling_station_results::{
         differences_counts::{DifferencesCounts, validate_differences_counts},
         political_group_candidate_votes::PoliticalGroupCandidateVotes,
         voters_counts::VotersCounts,
+        votes_counts::VotesCounts,
     },
     validation::{
         DataError, FieldPath, Validate, ValidationResult, ValidationResultCode,

@@ -362,15 +362,13 @@ mod tests {
 
     use super::*;
     use crate::domain::{
-        data_entry::{
-            PoliticalGroupTotalVotes, PollingStationResults, VotesCounts, tests::ValidDefault,
-        },
+        data_entry::{PoliticalGroupTotalVotes, PollingStationResults, tests::ValidDefault},
         election::PGNumber,
         polling_station_results::{
             cso_first_session_results::CSOFirstSessionResults,
             cso_next_session_results::CSONextSessionResults,
             political_group_candidate_votes::PoliticalGroupCandidateVotes,
-            voters_counts::VotersCounts,
+            voters_counts::VotersCounts, votes_counts::VotesCounts,
         },
     };
 

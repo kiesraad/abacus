@@ -1,5 +1,5 @@
 use crate::domain::{
-    data_entry::{PoliticalGroupTotalVotes, PollingStationResults, VotesCounts, YesNo},
+    data_entry::{PoliticalGroupTotalVotes, PollingStationResults, YesNo},
     validation::FieldPath,
 };
 
@@ -43,38 +43,6 @@ impl Compare for bool {
         if self != first_entry {
             different_fields.push(field_name.to_string());
         }
-    }
-}
-
-impl Compare for VotesCounts {
-    fn compare(&self, first_entry: &Self, different_fields: &mut Vec<String>, path: &FieldPath) {
-        self.political_group_total_votes.compare(
-            &first_entry.political_group_total_votes,
-            different_fields,
-            &path.field("political_group_total_votes"),
-        );
-
-        // compare all counts
-        self.total_votes_candidates_count.compare(
-            &first_entry.total_votes_candidates_count,
-            different_fields,
-            &path.field("total_votes_candidates_count"),
-        );
-        self.blank_votes_count.compare(
-            &first_entry.blank_votes_count,
-            different_fields,
-            &path.field("blank_votes_count"),
-        );
-        self.invalid_votes_count.compare(
-            &first_entry.invalid_votes_count,
-            different_fields,
-            &path.field("invalid_votes_count"),
-        );
-        self.total_votes_cast_count.compare(
-            &first_entry.total_votes_cast_count,
-            different_fields,
-            &path.field("total_votes_cast_count"),
-        );
     }
 }
 

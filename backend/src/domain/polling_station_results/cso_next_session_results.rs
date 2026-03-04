@@ -1,9 +1,9 @@
 use crate::domain::{
     comparison::Compare,
-    data_entry::VotesCounts,
     polling_station_results::{
         differences_counts::DifferencesCounts,
         political_group_candidate_votes::PoliticalGroupCandidateVotes, voters_counts::VotersCounts,
+        votes_counts::VotesCounts,
     },
     validation::FieldPath,
 };

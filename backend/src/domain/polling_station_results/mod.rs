@@ -7,3 +7,4 @@ pub mod differences_counts;
 pub mod extra_investigation;
 pub mod political_group_candidate_votes;
 pub mod voters_counts;
+pub mod votes_counts;

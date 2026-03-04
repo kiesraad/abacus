@@ -11,9 +11,8 @@ use crate::{
         committee_session::{CommitteeSession, CommitteeSessionCreateRequest},
         committee_session_status::CommitteeSessionStatus,
         data_entry::{
-            CandidateVotes, DifferenceCountsCompareVotesCastAdmittedVoters, DifferencesCounts,
-            ExtraInvestigation, PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes,
-            PollingStationResults, VotersCounts, VotesCounts, YesNo,
+            CandidateVotes, ExtraInvestigation, PoliticalGroupCandidateVotes,
+            PoliticalGroupTotalVotes, PollingStationResults, VotersCounts, VotesCounts, YesNo,
         },
         data_entry_status::{DataEntryStatus, Definitive, FirstEntryFinalised},
         election::{
@@ -24,6 +23,9 @@ use crate::{
         polling_station_results::{
             counting_differences_polling_station::CountingDifferencesPollingStation,
             cso_first_session_results::CSOFirstSessionResults,
+            differences_counts::{
+                DifferenceCountsCompareVotesCastAdmittedVoters, DifferencesCounts,
+            },
         },
         validation::{FieldPath, Validate, ValidationResults},
     },

@@ -5,13 +5,14 @@ use crate::{
     APIError,
     domain::{
         data_entry::{
-            CandidateVotes, DifferencesCounts, PoliticalGroupCandidateVotes,
-            PoliticalGroupTotalVotes, PollingStationResults, VotersCounts, VotesCounts,
+            CandidateVotes, PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes,
+            PollingStationResults, VotersCounts, VotesCounts,
         },
         election::ElectionWithPoliticalGroups,
         polling_station::{PollingStation, PollingStationNumber},
         polling_station_results::{
             count::Count, cso_first_session_results::CSOFirstSessionResults,
+            differences_counts::DifferencesCounts,
         },
         validation::{Validate, ValidationResults},
     },

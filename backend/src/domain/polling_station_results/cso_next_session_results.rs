@@ -1,6 +1,7 @@
 use crate::domain::{
     comparison::Compare,
-    data_entry::{DifferencesCounts, PoliticalGroupCandidateVotes, VotersCounts, VotesCounts},
+    data_entry::{PoliticalGroupCandidateVotes, VotersCounts, VotesCounts},
+    polling_station_results::differences_counts::DifferencesCounts,
     validation::FieldPath,
 };
 use serde::{Deserialize, Serialize};

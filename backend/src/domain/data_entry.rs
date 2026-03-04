@@ -15,7 +15,7 @@ use crate::{
         polling_station_results::{
             common_polling_station_results::CommonPollingStationResults, count::Count,
             cso_first_session_results::CSOFirstSessionResults,
-            cso_next_session_results::CSONextSessionResults,
+            cso_next_session_results::CSONextSessionResults, differences_counts::DifferencesCounts,
         },
     },
     error::ErrorReference,
@@ -360,55 +360,6 @@ impl VotesCounts {
     }
 }
 
-/// Differences counts, part of the polling station results.
-/// (B1-3.3 "Verschillen tussen aantal kiezers en uitgebrachte stemmen")
-#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
-#[serde(deny_unknown_fields)]
-pub struct DifferencesCounts {
-    /// Whether total of admitted voters and total of votes cast match.
-    /// (B1-3.3.1 "Vergelijk D (totaal toegelaten kiezers) en H (totaal uitgebrachte stemmen)")
-    pub compare_votes_cast_admitted_voters: DifferenceCountsCompareVotesCastAdmittedVoters,
-    /// Number of more counted ballots ("Aantal méér getelde stemmen (bereken: H min D)")
-    #[schema(value_type = u32)]
-    pub more_ballots_count: Count,
-    /// Number of fewer counted ballots ("Aantal minder getelde stemmen (bereken: D min H)")
-    #[schema(value_type = u32)]
-    pub fewer_ballots_count: Count,
-    /// Whether the difference between the total of admitted voters and total of votes cast is explained.
-    /// (B1-3.3.2 "Zijn er tijdens de stemming dingen opgeschreven die het verschil tussen D en H volledig verklaren?")
-    pub difference_completely_accounted_for: YesNo,
-}
-
-/// Compare votes cast admitted voters, part of the differences counts.
-#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
-#[serde(deny_unknown_fields)]
-pub struct DifferenceCountsCompareVotesCastAdmittedVoters {
-    /// Whether total of admitted voters and total of votes cast match.
-    /// ("D en H zijn gelijk")
-    pub admitted_voters_equal_votes_cast: bool,
-    /// Whether total of admitted voters is greater than total of votes cast match.
-    /// ("H is groter dan D (meer uitgebrachte stemmen dan toegelaten kiezers)")
-    pub votes_cast_greater_than_admitted_voters: bool,
-    /// Whether total of admitted voters is less than total of votes cast match.
-    /// ("H is kleiner dan D (minder uitgebrachte stemmen dan toegelaten kiezers)")
-    pub votes_cast_smaller_than_admitted_voters: bool,
-}
-
-impl DifferencesCounts {
-    pub fn zero() -> DifferencesCounts {
-        DifferencesCounts {
-            more_ballots_count: 0,
-            fewer_ballots_count: 0,
-            difference_completely_accounted_for: Default::default(),
-            compare_votes_cast_admitted_voters: DifferenceCountsCompareVotesCastAdmittedVoters {
-                admitted_voters_equal_votes_cast: false,
-                votes_cast_greater_than_admitted_voters: false,
-                votes_cast_smaller_than_admitted_voters: false,
-            },
-        }
-    }
-}
-
 mod yes_no {
     use super::*;
 
@@ -576,6 +527,7 @@ impl From<DataEntryStatus> for DataEntryStatusResponse {
 #[cfg(test)]
 pub mod tests {
     use super::*;
+    use crate::domain::polling_station_results::differences_counts::DifferenceCountsCompareVotesCastAdmittedVoters;
 
     pub trait ValidDefault {
         fn valid_default() -> Self;
@@ -586,23 +538,6 @@ pub mod tests {
             Self {
                 extra_investigation_other_reason: YesNo::default(),
                 ballots_recounted_extra_investigation: YesNo::default(),
-            }
-        }
-    }
-
-    impl ValidDefault for DifferencesCounts {
-        fn valid_default() -> Self {
-            Self {
-                compare_votes_cast_admitted_voters: {
-                    DifferenceCountsCompareVotesCastAdmittedVoters {
-                        admitted_voters_equal_votes_cast: true,
-                        votes_cast_greater_than_admitted_voters: false,
-                        votes_cast_smaller_than_admitted_voters: false,
-                    }
-                },
-                more_ballots_count: 0,
-                fewer_ballots_count: 0,
-                difference_completely_accounted_for: YesNo::yes(),
             }
         }
     }

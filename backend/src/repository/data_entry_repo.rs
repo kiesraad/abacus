@@ -431,8 +431,11 @@ mod tests {
 
     use super::*;
     use crate::domain::{
-        data_entry::{DifferencesCounts, VotersCounts, VotesCounts, tests::ValidDefault},
-        polling_station_results::cso_first_session_results::CSOFirstSessionResults,
+        data_entry::{VotersCounts, VotesCounts, tests::ValidDefault},
+        polling_station_results::{
+            cso_first_session_results::CSOFirstSessionResults,
+            differences_counts::DifferencesCounts,
+        },
     };
 
     fn create_test_results(proxy_certificate_count: u32) -> PollingStationResults {

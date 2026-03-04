@@ -1,10 +1,11 @@
 use crate::domain::{
-    data_entry::{DifferencesCounts, PoliticalGroupCandidateVotes, VotersCounts, VotesCounts},
+    data_entry::{PoliticalGroupCandidateVotes, VotersCounts, VotesCounts},
     election::ElectionWithPoliticalGroups,
     polling_station::PollingStation,
+    polling_station_results::differences_counts::{DifferencesCounts, validate_differences_counts},
     validation::{
         DataError, FieldPath, Validate, ValidationResult, ValidationResultCode,
-        ValidationResultContext, ValidationResults, validate_differences_counts,
+        ValidationResultContext, ValidationResults,
     },
 };
 use serde::{Deserialize, Serialize};

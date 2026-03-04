@@ -15,8 +15,7 @@ use crate::{
         committee_session::{CommitteeSession, CommitteeSessionId},
         committee_session_status::CommitteeSessionStatus,
         data_entry::{
-            CandidateVotes, DataEntryId, DifferenceCountsCompareVotesCastAdmittedVoters,
-            DifferencesCounts, PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes,
+            CandidateVotes, DataEntryId, PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes,
             VotersCounts, VotesCounts, YesNo,
         },
         election::{
@@ -30,7 +29,12 @@ use crate::{
             ModelNa31_2Input, ModelP2aInput, PdfFileModel, PdfModel,
         },
         polling_station::{PollingStation, PollingStationId, PollingStationType},
-        polling_station_results::common_polling_station_results::CommonPollingStationResults,
+        polling_station_results::{
+            common_polling_station_results::CommonPollingStationResults,
+            differences_counts::{
+                DifferenceCountsCompareVotesCastAdmittedVoters, DifferencesCounts,
+            },
+        },
         summary::{
             ElectionSummary, PollingStationInvestigations, SumCount, SummaryDifferencesCounts,
         },

@@ -6,7 +6,7 @@ use utoipa::ToSchema;
 use crate::domain::{
     comparison::Compare,
     data_entry::{
-        CandidateVotes, ExtraInvestigation, PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes,
+        CandidateVotes, PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes,
         PollingStationResults, VotersCounts, VotesCounts,
     },
     data_entry_status::{
@@ -330,38 +330,6 @@ impl Validate for PollingStationResults {
     }
 }
 
-impl Validate for ExtraInvestigation {
-    fn validate(
-        &self,
-        _election: &ElectionWithPoliticalGroups,
-        _polling_station: &PollingStation,
-        validation_results: &mut ValidationResults,
-        path: &FieldPath,
-    ) -> Result<(), DataError> {
-        if self.extra_investigation_other_reason.is_empty()
-            != self.ballots_recounted_extra_investigation.is_empty()
-        {
-            validation_results.errors.push(ValidationResult {
-                fields: vec![path.to_string()],
-                code: ValidationResultCode::F101,
-                context: None,
-            });
-        }
-
-        if self.extra_investigation_other_reason.is_both()
-            || self.ballots_recounted_extra_investigation.is_both()
-        {
-            validation_results.errors.push(ValidationResult {
-                fields: vec![path.to_string()],
-                code: ValidationResultCode::F102,
-                context: None,
-            });
-        }
-
-        Ok(())
-    }
-}
-
 impl Validate for VotersCounts {
     fn validate(
         &self,
@@ -676,130 +644,8 @@ mod tests {
 
     use super::*;
     use crate::domain::{
-        data_entry::YesNo, election::tests::election_fixture,
-        polling_station::test_helpers::polling_station_fixture,
+        election::tests::election_fixture, polling_station::test_helpers::polling_station_fixture,
     };
-
-    mod extra_investigation {
-        use test_log::test;
-
-        use super::*;
-
-        fn validate(
-            investigation_yes: bool,
-            investigation_no: bool,
-            recounted_yes: bool,
-            recounted_no: bool,
-        ) -> Result<ValidationResults, DataError> {
-            let extra_investigation = ExtraInvestigation {
-                extra_investigation_other_reason: YesNo::new(investigation_yes, investigation_no),
-                ballots_recounted_extra_investigation: YesNo::new(recounted_yes, recounted_no),
-            };
-
-            let mut validation_results = ValidationResults::default();
-            extra_investigation.validate(
-                &election_fixture(&[]),
-                &polling_station_fixture(None),
-                &mut validation_results,
-                &"extra_investigation".into(),
-            )?;
-
-            assert_eq!(validation_results.warnings.len(), 0);
-            Ok(validation_results)
-        }
-
-        #[test]
-        fn test_no_validation_errors() -> Result<(), DataError> {
-            let validation_results = validate(false, false, false, false)?;
-            assert_eq!(validation_results.errors, []);
-
-            let validation_results = validate(true, false, false, true)?;
-            assert_eq!(validation_results.errors, []);
-
-            Ok(())
-        }
-
-        /// CSO | F.101: 'Alleen bij extra onderzoek B1-1': één van beide vragen is beantwoord, en de andere niet
-        #[test]
-        fn test_f101() -> Result<(), DataError> {
-            let validation_results = validate(false, true, false, false)?;
-            assert_eq!(
-                validation_results.errors,
-                [ValidationResult {
-                    code: ValidationResultCode::F101,
-                    fields: vec!["extra_investigation".into()],
-                    context: None,
-                }]
-            );
-
-            let validation_results = validate(false, false, false, true)?;
-            assert_eq!(
-                validation_results.errors,
-                [ValidationResult {
-                    code: ValidationResultCode::F101,
-                    fields: vec!["extra_investigation".into()],
-                    context: None,
-                }]
-            );
-
-            Ok(())
-        }
-
-        /// CSO | F.102: 'Alleen bij extra onderzoek B1-1': meerdere antwoorden op 1 van de vragen
-        #[test]
-        fn test_f102() -> Result<(), DataError> {
-            let validation_results = validate(true, true, true, true)?;
-            assert_eq!(
-                validation_results.errors,
-                [ValidationResult {
-                    code: ValidationResultCode::F102,
-                    fields: vec!["extra_investigation".into()],
-                    context: None,
-                }]
-            );
-
-            Ok(())
-        }
-
-        #[test]
-        fn test_multiple_errors() -> Result<(), DataError> {
-            let validation_results = validate(true, true, false, false)?;
-            assert_eq!(
-                validation_results.errors,
-                [
-                    ValidationResult {
-                        code: ValidationResultCode::F101,
-                        fields: vec!["extra_investigation".into()],
-                        context: None,
-                    },
-                    ValidationResult {
-                        code: ValidationResultCode::F102,
-                        fields: vec!["extra_investigation".into()],
-                        context: None,
-                    }
-                ]
-            );
-
-            let validation_results = validate(false, false, true, true)?;
-            assert_eq!(
-                validation_results.errors,
-                [
-                    ValidationResult {
-                        code: ValidationResultCode::F101,
-                        fields: vec!["extra_investigation".into()],
-                        context: None,
-                    },
-                    ValidationResult {
-                        code: ValidationResultCode::F102,
-                        fields: vec!["extra_investigation".into()],
-                        context: None,
-                    }
-                ]
-            );
-
-            Ok(())
-        }
-    }
 
     mod voters_counts {
         use test_log::test;

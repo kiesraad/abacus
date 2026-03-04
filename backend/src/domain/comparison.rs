@@ -1,6 +1,6 @@
 use crate::domain::{
     data_entry::{
-        CandidateVotes, ExtraInvestigation, PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes,
+        CandidateVotes, PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes,
         PollingStationResults, VotersCounts, VotesCounts, YesNo,
     },
     validation::FieldPath,
@@ -25,22 +25,6 @@ impl Compare for PollingStationResults {
                 different_fields.push(path.to_string());
             }
         }
-    }
-}
-
-impl Compare for ExtraInvestigation {
-    fn compare(&self, first_entry: &Self, different_fields: &mut Vec<String>, path: &FieldPath) {
-        self.extra_investigation_other_reason.compare(
-            &first_entry.extra_investigation_other_reason,
-            different_fields,
-            &path.field("extra_investigation_other_reason"),
-        );
-
-        self.ballots_recounted_extra_investigation.compare(
-            &first_entry.ballots_recounted_extra_investigation,
-            different_fields,
-            &path.field("ballots_recounted_extra_investigation"),
-        );
     }
 }
 

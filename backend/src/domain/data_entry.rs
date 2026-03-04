@@ -410,18 +410,6 @@ mod yes_no {
     }
 }
 
-/// Extra investigation, part of the polling station results ("B1-1 Alleen bij extra onderzoek")
-#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
-#[serde(deny_unknown_fields)]
-pub struct ExtraInvestigation {
-    /// Whether extra investigation was done for another reason than an unexplained difference
-    /// ("Heeft het gemeentelijk stembureau extra onderzoek gedaan vanwege een andere reden dan een onverklaard verschil?")
-    pub extra_investigation_other_reason: YesNo,
-    /// Whether ballots were (partially) recounted following the extra investigation
-    /// ("Zijn de stembiljetten naar aanleiding van het extra onderzoek (gedeeltelijk) herteld?")
-    pub ballots_recounted_extra_investigation: YesNo,
-}
-
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
 pub struct PoliticalGroupCandidateVotes {
@@ -531,15 +519,6 @@ pub mod tests {
 
     pub trait ValidDefault {
         fn valid_default() -> Self;
-    }
-
-    impl ValidDefault for ExtraInvestigation {
-        fn valid_default() -> Self {
-            Self {
-                extra_investigation_other_reason: YesNo::default(),
-                ballots_recounted_extra_investigation: YesNo::default(),
-            }
-        }
     }
 
     pub fn example_polling_station_results() -> PollingStationResults {

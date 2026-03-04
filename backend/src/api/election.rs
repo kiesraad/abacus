@@ -29,6 +29,7 @@ use crate::{
         },
         investigation::PollingStationInvestigation,
         polling_station::{PollingStation, PollingStationRequest, PollingStationsRequest},
+        role::Role,
     },
     eml::{
         EMLImportError, EmlHash, RedactedEmlHash, number_of_voters_from_polling_stations_eml,
@@ -134,11 +135,18 @@ impl AsAuditEvent for ElectionUpdatedAuditData {
     security(("cookie_auth" = ["administrator", "coordinator_gsb", "typist_gsb"])),
 )]
 pub async fn election_list(
-    _user: User,
+    user: User,
     State(pool): State<SqlitePool>,
 ) -> Result<Json<ElectionListResponse>, APIError> {
     let mut conn = pool.acquire().await?;
-    let elections = election_repo::list(&mut conn).await?;
+
+    let only_allow_committee_category = match user.role() {
+        Role::CoordinatorCSB | Role::TypistCSB => Some(CommitteeCategory::CSB),
+        Role::CoordinatorGSB | Role::TypistGSB => Some(CommitteeCategory::GSB),
+        _ => None,
+    };
+
+    let elections = election_repo::list(&mut conn, only_allow_committee_category).await?;
     let committee_sessions =
         committee_session_repo::get_committee_session_for_each_election(&mut conn).await?;
     Ok(Json(ElectionListResponse {

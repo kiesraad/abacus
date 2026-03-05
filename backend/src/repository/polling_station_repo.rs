@@ -19,7 +19,6 @@ use crate::{
 #[derive(FromRow, Debug, Clone)]
 struct PollingStationRow {
     id: PollingStationId,
-    election_id: ElectionId,
     committee_session_id: CommitteeSessionId,
     committee_session_number: u32,
     prev_data_entry_id: Option<DataEntryId>,
@@ -38,7 +37,6 @@ impl From<PollingStationRow> for PollingStation {
     fn from(row: PollingStationRow) -> Self {
         Self {
             id: row.id,
-            election_id: row.election_id,
             name: row.name,
             number: row.number,
             number_of_voters: row.number_of_voters,
@@ -54,7 +52,6 @@ impl From<PollingStationRow> for PollingStationFirstSession {
     fn from(row: PollingStationRow) -> Self {
         let PollingStationRow {
             id,
-            election_id,
             committee_session_id,
             committee_session_number: _,
             prev_data_entry_id: _,
@@ -73,7 +70,6 @@ impl From<PollingStationRow> for PollingStationFirstSession {
             data_entry_id,
             polling_station: PollingStation {
                 id,
-                election_id,
                 name,
                 number,
                 number_of_voters,
@@ -90,7 +86,6 @@ impl From<PollingStationRow> for PollingStationNextSession {
     fn from(row: PollingStationRow) -> Self {
         let PollingStationRow {
             id,
-            election_id,
             committee_session_id,
             committee_session_number: _,
             prev_data_entry_id,
@@ -119,7 +114,6 @@ impl From<PollingStationRow> for PollingStationNextSession {
             }),
             polling_station: PollingStation {
                 id,
-                election_id,
                 name,
                 number,
                 number_of_voters,
@@ -171,7 +165,6 @@ async fn list(
         r#"
         SELECT
             p.id AS "id: _",
-            c.election_id AS "election_id: _",
             p.committee_session_id AS "committee_session_id: _",
             c.number AS "committee_session_number: u32",
             p.prev_data_entry_id AS "prev_data_entry_id: _",
@@ -204,7 +197,6 @@ pub async fn get(
         r#"
         SELECT
             p.id AS "id: _",
-            c.election_id AS "election_id: _",
             p.committee_session_id AS "committee_session_id: _",
             c.number AS "committee_session_number: u32",
             p.prev_data_entry_id AS "prev_data_entry_id: _",
@@ -248,7 +240,6 @@ pub async fn get_for_election(
         r#"
         SELECT
             p.id AS "id: _",
-            c.election_id AS "election_id: _",
             p.committee_session_id AS "committee_session_id: _",
             c.number AS "committee_session_number: u32",
             p.prev_data_entry_id AS "prev_data_entry_id: _",
@@ -307,7 +298,6 @@ pub async fn create(
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         RETURNING
             id AS "id: _",
-            ? AS "election_id!: _", -- Workaround to get election_id in the result without a temporary struct
             committee_session_id AS "committee_session_id: _",
             (SELECT c.number FROM committee_sessions AS c WHERE c.id = committee_session_id) AS "committee_session_number!: u32",
             prev_data_entry_id AS "prev_data_entry_id: _",
@@ -330,7 +320,6 @@ pub async fn create(
         new_polling_station.address,
         new_polling_station.postal_code,
         new_polling_station.locality,
-        election_id,
     )
     .fetch_one(&mut *tx)
     .await?;
@@ -377,7 +366,6 @@ pub async fn create_many(
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             RETURNING
                 id AS "id: _",
-                ? AS "election_id!: ElectionId", -- Workaround to get election_id in the result without a temporary struct
                 committee_session_id AS "committee_session_id: _",
                 (SELECT c.number FROM committee_sessions AS c WHERE c.id = committee_session_id) AS "committee_session_number!: u32",
                 prev_data_entry_id AS "prev_data_entry_id: _",
@@ -400,7 +388,6 @@ pub async fn create_many(
                 new_polling_station.address,
                 new_polling_station.postal_code,
                 new_polling_station.locality,
-                election_id,
             )
             .fetch_one(&mut *tx)
             .await?,
@@ -447,7 +434,6 @@ pub async fn update(
             id = ? AND committee_session_id = ?
         RETURNING
             id AS "id: _",
-            ? AS "election_id!: _", -- Workaround to get election_id in the result without a temporary struct
             committee_session_id AS "committee_session_id: _",
             (SELECT c.number FROM committee_sessions AS c WHERE c.id = committee_session_id) AS "committee_session_number!: u32",
             prev_data_entry_id AS "prev_data_entry_id: _",
@@ -470,7 +456,6 @@ pub async fn update(
         polling_station_update.locality,
         polling_station_id,
         committee_session_id,
-        election_id,
     )
     .fetch_one(&mut *tx)
     .await?;
@@ -518,7 +503,6 @@ pub async fn link_data_entry(
             WHERE id = ?
             RETURNING
                 id AS "id: _",
-                (SELECT c.election_id FROM committee_sessions AS c WHERE c.id = committee_session_id) AS "election_id!: _",
                 committee_session_id AS "committee_session_id: _",
                 (SELECT c.number FROM committee_sessions AS c WHERE c.id = committee_session_id) AS "committee_session_number!: u32",
                 prev_data_entry_id AS "prev_data_entry_id: _",

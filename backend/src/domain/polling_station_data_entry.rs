@@ -1,8 +1,7 @@
 use crate::domain::{data_entry_status::DataEntryStatus, identifier::id};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use sqlx::FromRow;
-use sqlx::types::Json;
+use sqlx::{FromRow, types::Json};
 use utoipa::ToSchema;
 
 id!(DataEntryId);

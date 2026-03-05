@@ -18,17 +18,6 @@ struct SubCommitteeRow {
     category: CommitteeCategory,
 }
 
-impl From<SubCommitteeRow> for SubCommittee {
-    fn from(row: SubCommitteeRow) -> Self {
-        Self {
-            id: row.id,
-            number: row.number,
-            name: row.name,
-            category: row.category,
-        }
-    }
-}
-
 impl From<SubCommitteeRow> for SubCommitteeFirstSession {
     fn from(row: SubCommitteeRow) -> Self {
         let SubCommitteeRow {

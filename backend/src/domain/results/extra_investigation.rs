@@ -1,9 +1,9 @@
+use super::yes_no::YesNo;
 use crate::domain::{
     compare::Compare,
     election::ElectionWithPoliticalGroups,
     field_path::FieldPath,
     polling_station::PollingStation,
-    results::yes_no::YesNo,
     validate::{DataError, Validate, ValidationResult, ValidationResultCode, ValidationResults},
 };
 use serde::{Deserialize, Serialize};

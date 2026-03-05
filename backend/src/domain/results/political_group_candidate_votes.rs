@@ -1,3 +1,4 @@
+use super::count::Count;
 use crate::{
     APIError,
     domain::{
@@ -5,7 +6,6 @@ use crate::{
         election::{CandidateNumber, ElectionWithPoliticalGroups, PGNumber},
         field_path::FieldPath,
         polling_station::PollingStation,
-        results::count::Count,
         validate::{DataError, Validate, ValidationResults},
     },
     error::ErrorReference,

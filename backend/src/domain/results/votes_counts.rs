@@ -1,3 +1,4 @@
+use super::{count::Count, political_group_total_votes::PoliticalGroupTotalVotes};
 use crate::{
     APIError,
     domain::{
@@ -5,7 +6,6 @@ use crate::{
         election::ElectionWithPoliticalGroups,
         field_path::FieldPath,
         polling_station::PollingStation,
-        results::{count::Count, political_group_total_votes::PoliticalGroupTotalVotes},
         validate::{
             DataError, Validate, ValidationResult, ValidationResultCode, ValidationResults,
         },

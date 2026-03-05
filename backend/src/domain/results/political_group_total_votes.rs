@@ -1,9 +1,9 @@
+use super::count::Count;
 use crate::domain::{
     compare::Compare,
     election::{ElectionWithPoliticalGroups, PGNumber},
     field_path::FieldPath,
     polling_station::PollingStation,
-    results::count::Count,
     validate::{DataError, Validate, ValidationResults},
 };
 use serde::{Deserialize, Serialize};

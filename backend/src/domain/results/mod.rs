@@ -3,20 +3,20 @@ use crate::domain::{
     election::{ElectionWithPoliticalGroups, PoliticalGroup},
     field_path::FieldPath,
     polling_station::PollingStation,
-    results::{
-        common_polling_station_results::CommonPollingStationResults,
-        cso_first_session_results::CSOFirstSessionResults,
-        cso_next_session_results::CSONextSessionResults,
-        differences_counts::DifferencesCounts,
-        political_group_candidate_votes::{CandidateVotes, PoliticalGroupCandidateVotes},
-        political_group_total_votes::PoliticalGroupTotalVotes,
-        voters_counts::VotersCounts,
-        votes_counts::VotesCounts,
-    },
     validate::{DataError, Validate, ValidateRoot, ValidationResults},
 };
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
+use {
+    common_polling_station_results::CommonPollingStationResults,
+    cso_first_session_results::CSOFirstSessionResults,
+    cso_next_session_results::CSONextSessionResults,
+    differences_counts::DifferencesCounts,
+    political_group_candidate_votes::{CandidateVotes, PoliticalGroupCandidateVotes},
+    political_group_total_votes::PoliticalGroupTotalVotes,
+    voters_counts::VotersCounts,
+    votes_counts::VotesCounts,
+};
 
 pub mod common_polling_station_results;
 pub mod count;

@@ -1,13 +1,13 @@
+use super::{
+    differences_counts::{DifferencesCounts, validate_differences_counts},
+    political_group_candidate_votes::PoliticalGroupCandidateVotes,
+    voters_counts::VotersCounts,
+    votes_counts::VotesCounts,
+};
 use crate::domain::{
     election::ElectionWithPoliticalGroups,
     field_path::FieldPath,
     polling_station::PollingStation,
-    results::{
-        differences_counts::{DifferencesCounts, validate_differences_counts},
-        political_group_candidate_votes::PoliticalGroupCandidateVotes,
-        voters_counts::VotersCounts,
-        votes_counts::VotesCounts,
-    },
     validate::{
         DataError, Validate, ValidationResult, ValidationResultCode, ValidationResultContext,
         ValidationResults,

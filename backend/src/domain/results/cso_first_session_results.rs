@@ -1,13 +1,10 @@
-use crate::domain::{
-    compare::Compare,
-    field_path::FieldPath,
-    results::{
-        counting_differences_polling_station::CountingDifferencesPollingStation,
-        differences_counts::DifferencesCounts, extra_investigation::ExtraInvestigation,
-        political_group_candidate_votes::PoliticalGroupCandidateVotes, voters_counts::VotersCounts,
-        votes_counts::VotesCounts,
-    },
+use super::{
+    counting_differences_polling_station::CountingDifferencesPollingStation,
+    differences_counts::DifferencesCounts, extra_investigation::ExtraInvestigation,
+    political_group_candidate_votes::PoliticalGroupCandidateVotes, voters_counts::VotersCounts,
+    votes_counts::VotesCounts,
 };
+use crate::domain::{compare::Compare, field_path::FieldPath};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 

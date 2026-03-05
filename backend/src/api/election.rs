@@ -179,7 +179,7 @@ pub async fn election_details(
     let session_pss =
         list_polling_stations_for_session(&mut conn, &current_committee_session).await?;
     let investigations = session_pss.investigations();
-    let polling_stations = session_pss.into_responses();
+    let polling_stations = session_pss.into_responses(election_id);
 
     Ok(Json(ElectionDetailsResponse {
         current_committee_session,

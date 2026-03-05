@@ -90,7 +90,6 @@
   "polling_stations": [
     {
       "id": 87,
-      "election_id": 2,
       "name": "Hotel Van Den Stem",
       "number": 1,
       "number_of_voters": 820,
@@ -101,7 +100,6 @@
     },
     {
       "id": 88,
-      "election_id": 2,
       "name": "Café Voor het Veld",
       "number": 2,
       "number_of_voters": 825,
@@ -112,7 +110,6 @@
     },
     {
       "id": 89,
-      "election_id": 2,
       "name": "Museum De Genieter",
       "number": 3,
       "number_of_voters": 817,
@@ -123,7 +120,6 @@
     },
     {
       "id": 90,
-      "election_id": 2,
       "name": "Winkelcentrum Het Gemeentehuis",
       "number": 4,
       "number_of_voters": 798,
@@ -134,7 +130,6 @@
     },
     {
       "id": 91,
-      "election_id": 2,
       "name": "Clubhuis Achter Het Huis",
       "number": 5,
       "number_of_voters": 772,
@@ -145,7 +140,6 @@
     },
     {
       "id": 92,
-      "election_id": 2,
       "name": "Clubhuis 'Door de Kamer'",
       "number": 6,
       "number_of_voters": 846,
@@ -156,7 +150,6 @@
     },
     {
       "id": 93,
-      "election_id": 2,
       "name": "Winkelcentrum Achter De Stembus",
       "number": 7,
       "number_of_voters": 833,
@@ -167,7 +160,6 @@
     },
     {
       "id": 94,
-      "election_id": 2,
       "name": "Café Het Binnenhof",
       "number": 8,
       "number_of_voters": 845,
@@ -178,7 +170,6 @@
     },
     {
       "id": 95,
-      "election_id": 2,
       "name": "Winkelcentrum Het Pronkstuk",
       "number": 9,
       "number_of_voters": 886,
@@ -189,7 +180,6 @@
     },
     {
       "id": 96,
-      "election_id": 2,
       "name": "Cultuurcentrum De Vliegende Stemmer",
       "number": 10,
       "number_of_voters": 854,
@@ -200,7 +190,6 @@
     },
     {
       "id": 97,
-      "election_id": 2,
       "name": "Steunpunt Het Gebouw",
       "number": 11,
       "number_of_voters": 826,
@@ -211,7 +200,6 @@
     },
     {
       "id": 98,
-      "election_id": 2,
       "name": "OBS Het Binnenhof",
       "number": 12,
       "number_of_voters": 800,
@@ -222,7 +210,6 @@
     },
     {
       "id": 99,
-      "election_id": 2,
       "name": "Filmhuis Het Stemmende Vogeltje",
       "number": 13,
       "number_of_voters": 878,
@@ -233,7 +220,6 @@
     },
     {
       "id": 100,
-      "election_id": 2,
       "name": "Café Van Den Stem",
       "number": 14,
       "number_of_voters": 832,
@@ -244,7 +230,6 @@
     },
     {
       "id": 101,
-      "election_id": 2,
       "name": "Steunpunt Achter Het Huis",
       "number": 15,
       "number_of_voters": 847,
@@ -255,7 +240,6 @@
     },
     {
       "id": 102,
-      "election_id": 2,
       "name": "Museum Het Potlood",
       "number": 16,
       "number_of_voters": 883,
@@ -266,7 +250,6 @@
     },
     {
       "id": 103,
-      "election_id": 2,
       "name": "Studio Door de Kamer",
       "number": 17,
       "number_of_voters": 827,
@@ -277,7 +260,6 @@
     },
     {
       "id": 104,
-      "election_id": 2,
       "name": "Wijkcentrum De Sprankelende Stembus",
       "number": 18,
       "number_of_voters": 886,
@@ -288,7 +270,6 @@
     },
     {
       "id": 105,
-      "election_id": 2,
       "name": "Hotel Het Potlood",
       "number": 19,
       "number_of_voters": 790,
@@ -299,7 +280,6 @@
     },
     {
       "id": 106,
-      "election_id": 2,
       "name": "Bioscoop Het Potlood",
       "number": 20,
       "number_of_voters": 888,
@@ -310,7 +290,6 @@
     },
     {
       "id": 107,
-      "election_id": 2,
       "name": "Sportzaal Het Gebouw",
       "number": 21,
       "number_of_voters": 779,
@@ -321,7 +300,6 @@
     },
     {
       "id": 108,
-      "election_id": 2,
       "name": "Bioscoop Het Potlood",
       "number": 22,
       "number_of_voters": 870,
@@ -332,7 +310,6 @@
     },
     {
       "id": 109,
-      "election_id": 2,
       "name": "Theater Achter Het Huis",
       "number": 23,
       "number_of_voters": 882,
@@ -343,7 +320,6 @@
     },
     {
       "id": 110,
-      "election_id": 2,
       "name": "Hotel \"Het Vriendelijke Bureau\"",
       "number": 24,
       "number_of_voters": 865,
@@ -354,7 +330,6 @@
     },
     {
       "id": 111,
-      "election_id": 2,
       "name": "Theater De Sprankelende Stembus",
       "number": 25,
       "number_of_voters": 882,
@@ -365,7 +340,6 @@
     },
     {
       "id": 112,
-      "election_id": 2,
       "name": "OBS De Gang",
       "number": 26,
       "number_of_voters": 861,
@@ -376,7 +350,6 @@
     },
     {
       "id": 113,
-      "election_id": 2,
       "name": "Buurthuis 'De Doorstemmer'",
       "number": 27,
       "number_of_voters": 831,
@@ -387,7 +360,6 @@
     },
     {
       "id": 114,
-      "election_id": 2,
       "name": "Sportcomplex Het Pronkstuk",
       "number": 28,
       "number_of_voters": 803,
@@ -398,7 +370,6 @@
     },
     {
       "id": 115,
-      "election_id": 2,
       "name": "Sportzaal De Vliegende Stemmer",
       "number": 29,
       "number_of_voters": 818,
@@ -409,7 +380,6 @@
     },
     {
       "id": 116,
-      "election_id": 2,
       "name": "Theater Het Kleurende Potlood",
       "number": 30,
       "number_of_voters": 734,
@@ -420,7 +390,6 @@
     },
     {
       "id": 117,
-      "election_id": 2,
       "name": "Wijkcentrum Door de Kamer",
       "number": 31,
       "number_of_voters": 797,
@@ -431,7 +400,6 @@
     },
     {
       "id": 118,
-      "election_id": 2,
       "name": "OBS Voor het Veld",
       "number": 32,
       "number_of_voters": 822,
@@ -442,7 +410,6 @@
     },
     {
       "id": 119,
-      "election_id": 2,
       "name": "Wijkcentrum Het Vriendelijke Bureau",
       "number": 33,
       "number_of_voters": 805,
@@ -453,7 +420,6 @@
     },
     {
       "id": 120,
-      "election_id": 2,
       "name": "Buurthuis De Gang",
       "number": 34,
       "number_of_voters": 849,
@@ -464,7 +430,6 @@
     },
     {
       "id": 121,
-      "election_id": 2,
       "name": "Winkelcentrum Het Gebouw",
       "number": 35,
       "number_of_voters": 733,
@@ -475,7 +440,6 @@
     },
     {
       "id": 122,
-      "election_id": 2,
       "name": "Winkelcentrum 'Het Potlood'",
       "number": 36,
       "number_of_voters": 873,
@@ -486,7 +450,6 @@
     },
     {
       "id": 123,
-      "election_id": 2,
       "name": "Clubhuis Via De Stemgang",
       "number": 37,
       "number_of_voters": 726,
@@ -497,7 +460,6 @@
     },
     {
       "id": 124,
-      "election_id": 2,
       "name": "Studio 'De Gang'",
       "number": 38,
       "number_of_voters": 806,
@@ -508,7 +470,6 @@
     },
     {
       "id": 125,
-      "election_id": 2,
       "name": "Café Achter Het Huis",
       "number": 39,
       "number_of_voters": 760,
@@ -519,7 +480,6 @@
     },
     {
       "id": 126,
-      "election_id": 2,
       "name": "Bioscoop De Gang",
       "number": 40,
       "number_of_voters": 821,
@@ -530,7 +490,6 @@
     },
     {
       "id": 127,
-      "election_id": 2,
       "name": "Cultuurcentrum De Kiezende Olifant",
       "number": 41,
       "number_of_voters": 886,
@@ -541,7 +500,6 @@
     },
     {
       "id": 128,
-      "election_id": 2,
       "name": "Openbare Basisschool Via De Stemgang",
       "number": 42,
       "number_of_voters": 778,
@@ -552,7 +510,6 @@
     },
     {
       "id": 129,
-      "election_id": 2,
       "name": "Bioscoop De Doorstemmer",
       "number": 43,
       "number_of_voters": 838,
@@ -563,7 +520,6 @@
     },
     {
       "id": 130,
-      "election_id": 2,
       "name": "Theater Voor het Veld",
       "number": 44,
       "number_of_voters": 801,
@@ -574,7 +530,6 @@
     },
     {
       "id": 131,
-      "election_id": 2,
       "name": "Bioscoop De Tweede Kamer",
       "number": 45,
       "number_of_voters": 865,
@@ -585,7 +540,6 @@
     },
     {
       "id": 132,
-      "election_id": 2,
       "name": "Cultuurcentrum De Vliegende Stemmer",
       "number": 46,
       "number_of_voters": 808,
@@ -596,7 +550,6 @@
     },
     {
       "id": 133,
-      "election_id": 2,
       "name": "Winkelcentrum Het Gemeentehuis",
       "number": 47,
       "number_of_voters": 775,
@@ -607,7 +560,6 @@
     },
     {
       "id": 134,
-      "election_id": 2,
       "name": "Steunpunt De Genieter",
       "number": 48,
       "number_of_voters": 804,
@@ -618,7 +570,6 @@
     },
     {
       "id": 135,
-      "election_id": 2,
       "name": "Cultuurcentrum Achter Het Huis",
       "number": 49,
       "number_of_voters": 818,
@@ -629,7 +580,6 @@
     },
     {
       "id": 136,
-      "election_id": 2,
       "name": "Buurthuis Via De Stemgang",
       "number": 50,
       "number_of_voters": 793,
@@ -640,7 +590,6 @@
     },
     {
       "id": 137,
-      "election_id": 2,
       "name": "Buurthuis Achter Het Huis",
       "number": 51,
       "number_of_voters": 786,
@@ -651,7 +600,6 @@
     },
     {
       "id": 138,
-      "election_id": 2,
       "name": "Steunpunt Het Pronkstuk",
       "number": 52,
       "number_of_voters": 756,
@@ -662,7 +610,6 @@
     },
     {
       "id": 139,
-      "election_id": 2,
       "name": "Wijkcentrum Het Potlood",
       "number": 53,
       "number_of_voters": 854,
@@ -673,7 +620,6 @@
     },
     {
       "id": 140,
-      "election_id": 2,
       "name": "Sportcomplex 'Het Gebouw'",
       "number": 54,
       "number_of_voters": 779,
@@ -684,7 +630,6 @@
     },
     {
       "id": 141,
-      "election_id": 2,
       "name": "Openbare Basisschool De Gang",
       "number": 55,
       "number_of_voters": 730,
@@ -695,7 +640,6 @@
     },
     {
       "id": 142,
-      "election_id": 2,
       "name": "Studio Voor het Hek",
       "number": 56,
       "number_of_voters": 767,
@@ -706,7 +650,6 @@
     },
     {
       "id": 143,
-      "election_id": 2,
       "name": "Café Het Gemeentehuis",
       "number": 57,
       "number_of_voters": 758,
@@ -717,7 +660,6 @@
     },
     {
       "id": 144,
-      "election_id": 2,
       "name": "Studio Achter De Stembus",
       "number": 58,
       "number_of_voters": 754,
@@ -728,7 +670,6 @@
     },
     {
       "id": 145,
-      "election_id": 2,
       "name": "Winkelcentrum Via De Stemgang",
       "number": 59,
       "number_of_voters": 778,
@@ -739,7 +680,6 @@
     },
     {
       "id": 146,
-      "election_id": 2,
       "name": "Cultuurcentrum Achter De Stembus",
       "number": 60,
       "number_of_voters": 810,
@@ -750,7 +690,6 @@
     },
     {
       "id": 147,
-      "election_id": 2,
       "name": "Wijkcentrum Voor het Hek",
       "number": 61,
       "number_of_voters": 869,
@@ -761,7 +700,6 @@
     },
     {
       "id": 148,
-      "election_id": 2,
       "name": "Cultuurcentrum \"De Doorstemmer\"",
       "number": 62,
       "number_of_voters": 752,
@@ -772,7 +710,6 @@
     },
     {
       "id": 149,
-      "election_id": 2,
       "name": "Wijkcentrum \"Het Kleurende Potlood\"",
       "number": 63,
       "number_of_voters": 784,
@@ -783,7 +720,6 @@
     },
     {
       "id": 150,
-      "election_id": 2,
       "name": "Wijkcentrum De Vliegende Stemmer",
       "number": 64,
       "number_of_voters": 806,
@@ -794,7 +730,6 @@
     },
     {
       "id": 151,
-      "election_id": 2,
       "name": "Buurthuis De Kiezende Olifant",
       "number": 65,
       "number_of_voters": 731,
@@ -805,7 +740,6 @@
     },
     {
       "id": 152,
-      "election_id": 2,
       "name": "Filmhuis De Vliegende Stemmer",
       "number": 66,
       "number_of_voters": 812,
@@ -816,7 +750,6 @@
     },
     {
       "id": 153,
-      "election_id": 2,
       "name": "Cultuurcentrum De Kiezende Olifant",
       "number": 67,
       "number_of_voters": 773,
@@ -827,7 +760,6 @@
     },
     {
       "id": 154,
-      "election_id": 2,
       "name": "Clubhuis De Gang",
       "number": 68,
       "number_of_voters": 777,
@@ -838,7 +770,6 @@
     },
     {
       "id": 155,
-      "election_id": 2,
       "name": "Steunpunt De Kiezende Olifant",
       "number": 69,
       "number_of_voters": 766,
@@ -849,7 +780,6 @@
     },
     {
       "id": 156,
-      "election_id": 2,
       "name": "Winkelcentrum Het Binnenhof",
       "number": 70,
       "number_of_voters": 768,
@@ -860,7 +790,6 @@
     },
     {
       "id": 157,
-      "election_id": 2,
       "name": "Theater Voor het Hek",
       "number": 71,
       "number_of_voters": 744,
@@ -871,7 +800,6 @@
     },
     {
       "id": 158,
-      "election_id": 2,
       "name": "Openbare Basisschool Den Echte Stemmer",
       "number": 72,
       "number_of_voters": 779,
@@ -882,7 +810,6 @@
     },
     {
       "id": 159,
-      "election_id": 2,
       "name": "Hotel De Genieter",
       "number": 73,
       "number_of_voters": 879,
@@ -893,7 +820,6 @@
     },
     {
       "id": 160,
-      "election_id": 2,
       "name": "Winkelcentrum Het Gebouw",
       "number": 74,
       "number_of_voters": 785,
@@ -904,7 +830,6 @@
     },
     {
       "id": 161,
-      "election_id": 2,
       "name": "Steunpunt De Gang",
       "number": 75,
       "number_of_voters": 754,
@@ -915,7 +840,6 @@
     },
     {
       "id": 162,
-      "election_id": 2,
       "name": "Theater Achter De Stembus",
       "number": 76,
       "number_of_voters": 760,
@@ -926,7 +850,6 @@
     },
     {
       "id": 163,
-      "election_id": 2,
       "name": "Café Het Stemmende Vogeltje",
       "number": 77,
       "number_of_voters": 784,
@@ -937,7 +860,6 @@
     },
     {
       "id": 164,
-      "election_id": 2,
       "name": "Studio Den Echte Stemmer",
       "number": 78,
       "number_of_voters": 861,
@@ -948,7 +870,6 @@
     },
     {
       "id": 165,
-      "election_id": 2,
       "name": "Wijkcentrum Het Potlood",
       "number": 79,
       "number_of_voters": 739,
@@ -959,7 +880,6 @@
     },
     {
       "id": 166,
-      "election_id": 2,
       "name": "Openbare Basisschool De Tweede Kamer",
       "number": 80,
       "number_of_voters": 870,
@@ -970,7 +890,6 @@
     },
     {
       "id": 167,
-      "election_id": 2,
       "name": "Openbare Basisschool Het Potlood",
       "number": 81,
       "number_of_voters": 893,
@@ -981,7 +900,6 @@
     },
     {
       "id": 168,
-      "election_id": 2,
       "name": "Buurthuis De Deur",
       "number": 82,
       "number_of_voters": 801,
@@ -992,7 +910,6 @@
     },
     {
       "id": 169,
-      "election_id": 2,
       "name": "Steunpunt De Sprankelende Stembus",
       "number": 83,
       "number_of_voters": 773,
@@ -1003,7 +920,6 @@
     },
     {
       "id": 170,
-      "election_id": 2,
       "name": "Sportcomplex Het Gebouw",
       "number": 84,
       "number_of_voters": 893,
@@ -1014,7 +930,6 @@
     },
     {
       "id": 171,
-      "election_id": 2,
       "name": "OBS Het Binnenhof",
       "number": 85,
       "number_of_voters": 894,
@@ -1025,7 +940,6 @@
     },
     {
       "id": 172,
-      "election_id": 2,
       "name": "Theater Achter De Stembus",
       "number": 86,
       "number_of_voters": 806,
@@ -1036,7 +950,6 @@
     },
     {
       "id": 173,
-      "election_id": 2,
       "name": "Wijkcentrum Achter De Stembus",
       "number": 87,
       "number_of_voters": 775,
@@ -1047,7 +960,6 @@
     },
     {
       "id": 174,
-      "election_id": 2,
       "name": "Cultuurcentrum De Kiezende Olifant",
       "number": 88,
       "number_of_voters": 745,
@@ -1058,7 +970,6 @@
     },
     {
       "id": 175,
-      "election_id": 2,
       "name": "Openbare Basisschool 'Voor het Veld'",
       "number": 89,
       "number_of_voters": 851,
@@ -1069,7 +980,6 @@
     },
     {
       "id": 176,
-      "election_id": 2,
       "name": "Hotel Het Binnenhof",
       "number": 90,
       "number_of_voters": 778,
@@ -1080,7 +990,6 @@
     },
     {
       "id": 177,
-      "election_id": 2,
       "name": "Café De Tweede Kamer",
       "number": 91,
       "number_of_voters": 786,
@@ -1091,7 +1000,6 @@
     },
     {
       "id": 178,
-      "election_id": 2,
       "name": "Sportcomplex Voor het Veld",
       "number": 92,
       "number_of_voters": 888,
@@ -1102,7 +1010,6 @@
     },
     {
       "id": 179,
-      "election_id": 2,
       "name": "Sportzaal De Tweede Kamer",
       "number": 93,
       "number_of_voters": 868,
@@ -1113,7 +1020,6 @@
     },
     {
       "id": 180,
-      "election_id": 2,
       "name": "Café De Tweede Kamer",
       "number": 94,
       "number_of_voters": 787,
@@ -1124,7 +1030,6 @@
     },
     {
       "id": 181,
-      "election_id": 2,
       "name": "Theater Het Binnenhof",
       "number": 95,
       "number_of_voters": 746,
@@ -1135,7 +1040,6 @@
     },
     {
       "id": 182,
-      "election_id": 2,
       "name": "Hotel De Genieter",
       "number": 96,
       "number_of_voters": 772,
@@ -1146,7 +1050,6 @@
     },
     {
       "id": 183,
-      "election_id": 2,
       "name": "Clubhuis Den Echte Stemmer",
       "number": 97,
       "number_of_voters": 775,
@@ -1157,7 +1060,6 @@
     },
     {
       "id": 184,
-      "election_id": 2,
       "name": "Sportzaal Het Stemmende Vogeltje",
       "number": 98,
       "number_of_voters": 868,
@@ -1168,7 +1070,6 @@
     },
     {
       "id": 185,
-      "election_id": 2,
       "name": "Sportcomplex De Vliegende Stemmer",
       "number": 99,
       "number_of_voters": 801,
@@ -1179,7 +1080,6 @@
     },
     {
       "id": 186,
-      "election_id": 2,
       "name": "Cultuurcentrum Door de Kamer",
       "number": 100,
       "number_of_voters": 821,
@@ -1190,7 +1090,6 @@
     },
     {
       "id": 187,
-      "election_id": 2,
       "name": "Filmhuis Den Echte Stemmer",
       "number": 101,
       "number_of_voters": 739,
@@ -1201,7 +1100,6 @@
     },
     {
       "id": 188,
-      "election_id": 2,
       "name": "Café De Vliegende Stemmer",
       "number": 102,
       "number_of_voters": 890,
@@ -1212,7 +1110,6 @@
     },
     {
       "id": 189,
-      "election_id": 2,
       "name": "Buurthuis Via De Stemgang",
       "number": 103,
       "number_of_voters": 891,
@@ -1223,7 +1120,6 @@
     },
     {
       "id": 190,
-      "election_id": 2,
       "name": "Buurthuis Achter Het Huis",
       "number": 104,
       "number_of_voters": 793,
@@ -1234,7 +1130,6 @@
     },
     {
       "id": 191,
-      "election_id": 2,
       "name": "Openbare Basisschool Het Gemeentehuis",
       "number": 105,
       "number_of_voters": 759,
@@ -1245,7 +1140,6 @@
     },
     {
       "id": 192,
-      "election_id": 2,
       "name": "Sportzaal De Sprankelende Stembus",
       "number": 106,
       "number_of_voters": 840,
@@ -1256,7 +1150,6 @@
     },
     {
       "id": 193,
-      "election_id": 2,
       "name": "Studio De Gang",
       "number": 107,
       "number_of_voters": 859,
@@ -1267,7 +1160,6 @@
     },
     {
       "id": 194,
-      "election_id": 2,
       "name": "Filmhuis Het Gemeentehuis",
       "number": 108,
       "number_of_voters": 823,
@@ -1278,7 +1170,6 @@
     },
     {
       "id": 195,
-      "election_id": 2,
       "name": "Clubhuis Het Stemmende Vogeltje",
       "number": 109,
       "number_of_voters": 810,
@@ -1289,7 +1180,6 @@
     },
     {
       "id": 196,
-      "election_id": 2,
       "name": "Bioscoop Het Binnenhof",
       "number": 110,
       "number_of_voters": 823,
@@ -1300,7 +1190,6 @@
     },
     {
       "id": 197,
-      "election_id": 2,
       "name": "Sportzaal De Deur",
       "number": 111,
       "number_of_voters": 759,
@@ -1311,7 +1200,6 @@
     },
     {
       "id": 198,
-      "election_id": 2,
       "name": "Sportzaal Het Kleurende Potlood",
       "number": 112,
       "number_of_voters": 758,
@@ -1322,7 +1210,6 @@
     },
     {
       "id": 199,
-      "election_id": 2,
       "name": "Café Het Gebouw",
       "number": 113,
       "number_of_voters": 789,
@@ -1333,7 +1220,6 @@
     },
     {
       "id": 200,
-      "election_id": 2,
       "name": "Bioscoop De Sprankelende Stembus",
       "number": 114,
       "number_of_voters": 766,
@@ -1344,7 +1230,6 @@
     },
     {
       "id": 201,
-      "election_id": 2,
       "name": "Museum Voor het Veld",
       "number": 115,
       "number_of_voters": 787,
@@ -1355,7 +1240,6 @@
     },
     {
       "id": 202,
-      "election_id": 2,
       "name": "Hotel Het Gemeentehuis",
       "number": 116,
       "number_of_voters": 813,
@@ -1366,7 +1250,6 @@
     },
     {
       "id": 203,
-      "election_id": 2,
       "name": "Sportcomplex Het Vriendelijke Bureau",
       "number": 117,
       "number_of_voters": 809,
@@ -1377,7 +1260,6 @@
     },
     {
       "id": 204,
-      "election_id": 2,
       "name": "Buurthuis Voor het Hek",
       "number": 118,
       "number_of_voters": 826,
@@ -1388,7 +1270,6 @@
     },
     {
       "id": 205,
-      "election_id": 2,
       "name": "Wijkcentrum Van Den Stem",
       "number": 119,
       "number_of_voters": 841,
@@ -1399,7 +1280,6 @@
     },
     {
       "id": 206,
-      "election_id": 2,
       "name": "Theater Het Kleurende Potlood",
       "number": 120,
       "number_of_voters": 824,
@@ -1410,7 +1290,6 @@
     },
     {
       "id": 207,
-      "election_id": 2,
       "name": "Buurthuis De Kiezende Olifant",
       "number": 121,
       "number_of_voters": 789,
@@ -1421,7 +1300,6 @@
     },
     {
       "id": 208,
-      "election_id": 2,
       "name": "Buurthuis Voor het Veld",
       "number": 122,
       "number_of_voters": 786,
@@ -1432,7 +1310,6 @@
     },
     {
       "id": 209,
-      "election_id": 2,
       "name": "Wijkcentrum De Vliegende Stemmer",
       "number": 123,
       "number_of_voters": 853,
@@ -1443,7 +1320,6 @@
     },
     {
       "id": 210,
-      "election_id": 2,
       "name": "Sportzaal De Doorstemmer",
       "number": 124,
       "number_of_voters": 806,
@@ -1454,7 +1330,6 @@
     },
     {
       "id": 211,
-      "election_id": 2,
       "name": "Sportzaal Het Potlood",
       "number": 125,
       "number_of_voters": 738,
@@ -1465,7 +1340,6 @@
     },
     {
       "id": 212,
-      "election_id": 2,
       "name": "Winkelcentrum Den Echte Stemmer",
       "number": 126,
       "number_of_voters": 840,
@@ -1476,7 +1350,6 @@
     },
     {
       "id": 213,
-      "election_id": 2,
       "name": "Openbare Basisschool \"Het Potlood\"",
       "number": 127,
       "number_of_voters": 851,
@@ -1487,7 +1360,6 @@
     },
     {
       "id": 214,
-      "election_id": 2,
       "name": "Filmhuis Het Binnenhof",
       "number": 128,
       "number_of_voters": 810,
@@ -1498,7 +1370,6 @@
     },
     {
       "id": 215,
-      "election_id": 2,
       "name": "Buurthuis Achter Het Huis",
       "number": 129,
       "number_of_voters": 870,
@@ -1509,7 +1380,6 @@
     },
     {
       "id": 216,
-      "election_id": 2,
       "name": "Sportcomplex Achter Het Huis",
       "number": 130,
       "number_of_voters": 774,
@@ -1520,7 +1390,6 @@
     },
     {
       "id": 217,
-      "election_id": 2,
       "name": "Filmhuis Het Gemeentehuis",
       "number": 131,
       "number_of_voters": 781,
@@ -1531,7 +1400,6 @@
     },
     {
       "id": 218,
-      "election_id": 2,
       "name": "Studio \"Het Potlood\"",
       "number": 132,
       "number_of_voters": 847,
@@ -1542,7 +1410,6 @@
     },
     {
       "id": 219,
-      "election_id": 2,
       "name": "Theater Van Den Stem",
       "number": 133,
       "number_of_voters": 763,
@@ -1553,7 +1420,6 @@
     },
     {
       "id": 220,
-      "election_id": 2,
       "name": "Buurthuis Het Gebouw",
       "number": 134,
       "number_of_voters": 817,
@@ -1564,7 +1430,6 @@
     },
     {
       "id": 221,
-      "election_id": 2,
       "name": "Studio Achter De Stembus",
       "number": 135,
       "number_of_voters": 805,
@@ -1575,7 +1440,6 @@
     },
     {
       "id": 222,
-      "election_id": 2,
       "name": "Sportcomplex Achter De Stembus",
       "number": 136,
       "number_of_voters": 879,
@@ -1586,7 +1450,6 @@
     },
     {
       "id": 223,
-      "election_id": 2,
       "name": "Steunpunt Achter Het Huis",
       "number": 137,
       "number_of_voters": 852,
@@ -1597,7 +1460,6 @@
     },
     {
       "id": 224,
-      "election_id": 2,
       "name": "Openbare Basisschool Voor het Veld",
       "number": 138,
       "number_of_voters": 771,
@@ -1608,7 +1470,6 @@
     },
     {
       "id": 225,
-      "election_id": 2,
       "name": "Openbare Basisschool Voor het Hek",
       "number": 139,
       "number_of_voters": 815,
@@ -1619,7 +1480,6 @@
     },
     {
       "id": 226,
-      "election_id": 2,
       "name": "Museum De Deur",
       "number": 140,
       "number_of_voters": 819,
@@ -1630,7 +1490,6 @@
     },
     {
       "id": 227,
-      "election_id": 2,
       "name": "Museum Het Binnenhof",
       "number": 141,
       "number_of_voters": 764,
@@ -1641,7 +1500,6 @@
     },
     {
       "id": 228,
-      "election_id": 2,
       "name": "Museum \"Achter De Stembus\"",
       "number": 142,
       "number_of_voters": 787,
@@ -1652,7 +1510,6 @@
     },
     {
       "id": 229,
-      "election_id": 2,
       "name": "Clubhuis Door de Kamer",
       "number": 143,
       "number_of_voters": 767,
@@ -1663,7 +1520,6 @@
     },
     {
       "id": 230,
-      "election_id": 2,
       "name": "OBS Het Pronkstuk",
       "number": 144,
       "number_of_voters": 786,
@@ -1674,7 +1530,6 @@
     },
     {
       "id": 231,
-      "election_id": 2,
       "name": "Openbare Basisschool Door de Kamer",
       "number": 145,
       "number_of_voters": 806,
@@ -1685,7 +1540,6 @@
     },
     {
       "id": 232,
-      "election_id": 2,
       "name": "Cultuurcentrum Het Gebouw",
       "number": 146,
       "number_of_voters": 780,
@@ -1696,7 +1550,6 @@
     },
     {
       "id": 233,
-      "election_id": 2,
       "name": "Steunpunt Het Gemeentehuis",
       "number": 147,
       "number_of_voters": 778,
@@ -1707,7 +1560,6 @@
     },
     {
       "id": 234,
-      "election_id": 2,
       "name": "Studio De Kiezende Olifant",
       "number": 148,
       "number_of_voters": 878,
@@ -1718,7 +1570,6 @@
     },
     {
       "id": 235,
-      "election_id": 2,
       "name": "Cultuurcentrum Het Binnenhof",
       "number": 149,
       "number_of_voters": 929,
@@ -1729,7 +1580,6 @@
     },
     {
       "id": 236,
-      "election_id": 2,
       "name": "Buurthuis \"Het Kleurende Potlood\"",
       "number": 150,
       "number_of_voters": 763,
@@ -1740,7 +1590,6 @@
     },
     {
       "id": 237,
-      "election_id": 2,
       "name": "Winkelcentrum Via De Stemgang",
       "number": 151,
       "number_of_voters": 767,
@@ -1751,7 +1600,6 @@
     },
     {
       "id": 238,
-      "election_id": 2,
       "name": "Sportcomplex De Doorstemmer",
       "number": 152,
       "number_of_voters": 821,
@@ -1762,7 +1610,6 @@
     },
     {
       "id": 239,
-      "election_id": 2,
       "name": "Filmhuis \"Voor het Hek\"",
       "number": 153,
       "number_of_voters": 788,
@@ -1773,7 +1620,6 @@
     },
     {
       "id": 240,
-      "election_id": 2,
       "name": "Steunpunt Het Binnenhof",
       "number": 154,
       "number_of_voters": 849,
@@ -1784,7 +1630,6 @@
     },
     {
       "id": 241,
-      "election_id": 2,
       "name": "Openbare Basisschool De Sprankelende Stembus",
       "number": 155,
       "number_of_voters": 879,
@@ -1795,7 +1640,6 @@
     },
     {
       "id": 242,
-      "election_id": 2,
       "name": "Museum Achter De Stembus",
       "number": 156,
       "number_of_voters": 969,
@@ -1806,7 +1650,6 @@
     },
     {
       "id": 243,
-      "election_id": 2,
       "name": "OBS Het Gebouw",
       "number": 157,
       "number_of_voters": 795,
@@ -1817,7 +1660,6 @@
     },
     {
       "id": 244,
-      "election_id": 2,
       "name": "Museum Het Vriendelijke Bureau",
       "number": 158,
       "number_of_voters": 909,
@@ -1828,7 +1670,6 @@
     },
     {
       "id": 245,
-      "election_id": 2,
       "name": "Cultuurcentrum Het Vriendelijke Bureau",
       "number": 159,
       "number_of_voters": 859,

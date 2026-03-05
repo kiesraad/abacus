@@ -63,14 +63,14 @@ export function UserCreateCommitteeCategoryPage() {
                   name="committee-category"
                   defaultValue="gsb"
                   defaultChecked={committeeCategory === "gsb"}
-                  label={t("users.committee_category_gsb")}
+                  label={t("committee_category.GSB.full")}
                 />
                 <ChoiceList.Radio
                   id="committee-category-csb"
                   name="committee-category"
                   defaultValue="csb"
                   defaultChecked={committeeCategory === "csb"}
-                  label={t("users.committee_category_csb")}
+                  label={t("committee_category.CSB.full")}
                 />
               </ChoiceList>
             </FormLayout.Section>

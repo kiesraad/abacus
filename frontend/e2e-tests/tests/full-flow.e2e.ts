@@ -21,8 +21,8 @@ import { ExtraInvestigationPage } from "e2e-tests/page-objects/data_entry/ExtraI
 import { ProgressList } from "e2e-tests/page-objects/data_entry/ProgressListPgObj";
 import { VotersAndVotesPage } from "e2e-tests/page-objects/data_entry/VotersAndVotesPgObj";
 import { CheckAndSavePgObj } from "e2e-tests/page-objects/election/create/CheckAndSavePgObj";
+import { CommitteeCategoryPgObj } from "e2e-tests/page-objects/election/create/CommitteeCategoryPgObj.ts";
 import { CountingMethodTypePgObj } from "e2e-tests/page-objects/election/create/CountingMethodTypePgObj";
-import { ElectoralCommitteeRolePgObj } from "e2e-tests/page-objects/election/create/ElectoralCommitteeRolePgObj.ts";
 import { NumberOfVotersPgObj } from "e2e-tests/page-objects/election/create/NumberOfVotersPgObj";
 import { ElectionDetailsPgObj } from "e2e-tests/page-objects/election/ElectionDetailsPgObj";
 import { ElectionHome } from "e2e-tests/page-objects/election/ElectionHomePgObj";
@@ -38,13 +38,13 @@ import { UserInfoTopBar } from "e2e-tests/page-objects/nav_bar/UserInfoTopBarPgO
 import { PollingStationFormPgObj } from "e2e-tests/page-objects/polling_station/PollingStationFormPgObj";
 import { PollingStationListPgObj } from "e2e-tests/page-objects/polling_station/PollingStationListPgObj";
 import { UserCreateDetailsPgObj } from "e2e-tests/page-objects/users/UserCreateDetailsPgObj";
+import { UserCreateElectionPgObj } from "e2e-tests/page-objects/users/UserCreateElectionPgObj";
 import { UserCreateRolePgObj } from "e2e-tests/page-objects/users/UserCreateRolePgObj";
 import { UserCreateTypePgObj } from "e2e-tests/page-objects/users/UserCreateTypePgObj";
 import { UserListPgObj } from "e2e-tests/page-objects/users/UserListPgObj";
 import { eml110b_single } from "e2e-tests/test-data/eml-files";
 import { noRecountNoDifferencesDataEntry } from "e2e-tests/test-data/request-response-templates";
 import type { TestUser } from "e2e-tests/test-data/users";
-import { UserCreateElectionPgObj } from "../page-objects/users/UserCreateElectionPgObj";
 
 const investigations = [
   { number: "1", name: "Stadhuis", reason: "Reden", findings: "Probleem", correctedResults: true },
@@ -120,10 +120,10 @@ test.describe("full flow", () => {
 
     await uploadElectionAndInputHash(page);
 
-    const electoralCommitteeRolePage = new ElectoralCommitteeRolePgObj(page);
-    await expect(electoralCommitteeRolePage.header).toBeVisible();
-    await expect(electoralCommitteeRolePage.gsb).toBeChecked();
-    await electoralCommitteeRolePage.next.click();
+    const committeeCategoryPage = new CommitteeCategoryPgObj(page);
+    await expect(committeeCategoryPage.header).toBeVisible();
+    await expect(committeeCategoryPage.gsb).toBeChecked();
+    await committeeCategoryPage.next.click();
 
     await uploadCandidatesAndInputHash(page);
 
@@ -142,7 +142,7 @@ test.describe("full flow", () => {
 
     const checkAndSavePage = new CheckAndSavePgObj(page);
     await expect(checkAndSavePage.header).toBeVisible();
-    await expect(checkAndSavePage.electoralCommitteeRole).toHaveText("rol: Gemeentelijk stembureau");
+    await expect(checkAndSavePage.committeeCategory).toHaveText("type stembureau: Gemeentelijk stembureau");
     await expect(checkAndSavePage.numberOfVoters).toHaveText("61.269 kiesgerechtigden");
     const election = await checkAndSavePage.saveElection();
 

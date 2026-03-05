@@ -9,7 +9,7 @@ import { t } from "@/i18n/translate";
 import { StringFormData } from "@/utils/stringFormData.ts";
 import { useElectionCreateContext } from "../hooks/useElectionCreateContext";
 
-export function ElectoralCommitteeRole() {
+export function CommitteeCategory() {
   const { state, dispatch } = useElectionCreateContext();
   const navigate = useNavigate();
   const [error] = useState<ReactNode | undefined>();
@@ -36,19 +36,19 @@ export function ElectoralCommitteeRole() {
 
   return (
     <section className="md">
-      <Form title={t("election.electoral_committee_role.title")} onSubmit={(e) => void handleSubmit(e)}>
+      <Form title={t("election.committee_category.title")} onSubmit={(e) => void handleSubmit(e)}>
         <FormLayout>
           <FormLayout.Section>
             {error && (
-              <Alert type="error" title={t("election.invalid_role")} inline>
+              <Alert type="error" title={t("election.invalid_committee_category")} inline>
                 <p>{error}</p>
               </Alert>
             )}
 
-            <p>{t("election.electoral_committee_role.description")}</p>
+            <p>{t("election.committee_category.description")}</p>
 
             <ChoiceList>
-              <ChoiceList.Legend>{t("election.electoral_committee_role.choose")}</ChoiceList.Legend>
+              <ChoiceList.Legend>{t("election.committee_category.choose")}</ChoiceList.Legend>
               <ChoiceList.Radio
                 id="gsb"
                 name={"committee_category"}

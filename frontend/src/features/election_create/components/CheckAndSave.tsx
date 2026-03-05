@@ -72,8 +72,9 @@ export function CheckAndSave() {
         <li>
           <strong>{t("election.singular")}:</strong> {state.election.name}
         </li>
-        <li id="electoral-committee-role">
-          <strong>{t("role").toLowerCase()}:</strong> {t(`committee_category.${state.committeeCategory}.short`)}
+        <li id="committee-category">
+          <strong>{t("election.committee_category.title").toLowerCase()}:</strong>{" "}
+          {t(`committee_category.${state.committeeCategory}.short`)}
         </li>
         <li>
           <strong>{t("area_designation")}:</strong> {state.election.location}

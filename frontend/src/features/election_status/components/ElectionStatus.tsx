@@ -94,11 +94,11 @@ export function ElectionStatus({
           </div>
         </Progress>
         <article className={cls.statusArticle}>
-          {election.committee_category === "GSB" && statuses.length === 0 && committeeSession.number === 1 && (
-            <p>{t("election_status.no_polling_stations")}</p>
-          )}
-          {statuses.length === 0 && committeeSession.number > 1 && (
-            <p>{t("election_status.no_investigations_with_corrected_results")}</p>
+          {election.committee_category === "GSB" && statuses.length === 0 && (
+            <>
+              {committeeSession.number === 1 && <p>{t("election_status.no_polling_stations")}</p>}
+              {committeeSession.number > 1 && <p>{t("election_status.no_investigations_with_corrected_results")}</p>}
+            </>
           )}
           {statuses.length > 0 &&
             tableCategories.map((cat) => (

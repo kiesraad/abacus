@@ -13,6 +13,7 @@ struct SubCommitteeRow {
     id: SubCommitteeId,
     committee_session_id: CommitteeSessionId,
     data_entry_id: DataEntryId,
+    number: String,
     name: String,
     category: CommitteeCategory,
 }
@@ -21,6 +22,7 @@ impl From<SubCommitteeRow> for SubCommittee {
     fn from(row: SubCommitteeRow) -> Self {
         Self {
             id: row.id,
+            number: row.number,
             name: row.name,
             category: row.category,
         }
@@ -33,13 +35,19 @@ impl From<SubCommitteeRow> for SubCommitteeFirstSession {
             id,
             committee_session_id,
             data_entry_id,
+            number,
             name,
             category,
         } = row;
         Self {
             committee_session_id,
             data_entry_id,
-            sub_committee: SubCommittee { id, name, category },
+            sub_committee: SubCommittee {
+                id,
+                number,
+                name,
+                category,
+            },
         }
     }
 }
@@ -56,6 +64,7 @@ async fn list(
             id AS "id: _",
             committee_session_id AS "committee_session_id: _",
             data_entry_id AS "data_entry_id!: _",
+            number,
             name,
             category AS "category: _"
         FROM sub_committees
@@ -84,6 +93,7 @@ pub async fn create(
     conn: &mut SqliteConnection,
     committee_session_id: CommitteeSessionId,
     data_entry_id: DataEntryId,
+    number: &str,
     name: &str,
     category: CommitteeCategory,
 ) -> Result<SubCommitteeFirstSession, sqlx::Error> {
@@ -93,18 +103,21 @@ pub async fn create(
         INSERT INTO sub_committees (
             committee_session_id,
             data_entry_id,
+            number,
             name,
             category
-        ) VALUES (?, ?, ?, ?)
+        ) VALUES (?, ?, ?, ?, ?)
         RETURNING
             id AS "id: _",
             committee_session_id AS "committee_session_id: _",
             data_entry_id AS "data_entry_id!: _",
+            number,
             name,
             category AS "category: _"
         "#,
         committee_session_id,
         data_entry_id,
+        number,
         name,
         category,
     )

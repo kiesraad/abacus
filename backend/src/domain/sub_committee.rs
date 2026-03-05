@@ -13,6 +13,7 @@ id!(SubCommitteeId);
 #[serde(deny_unknown_fields)]
 pub struct SubCommittee {
     pub id: SubCommitteeId,
+    pub number: String,
     pub name: String,
     pub category: CommitteeCategory,
 }

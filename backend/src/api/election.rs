@@ -667,6 +667,7 @@ async fn create_sub_committees(
             create_sub_committee(
                 tx,
                 committee_session_id,
+                &election.domain_id,
                 &election.location,
                 CommitteeCategory::GSB,
             )

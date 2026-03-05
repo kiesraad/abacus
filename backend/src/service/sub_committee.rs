@@ -22,14 +22,21 @@ impl From<sqlx::Error> for SubCommitteeServiceError {
 pub async fn create(
     conn: &mut SqliteConnection,
     committee_session_id: CommitteeSessionId,
+    number: &str,
     name: &str,
     category: CommitteeCategory,
 ) -> Result<SubCommitteeFirstSession, SubCommitteeServiceError> {
     let mut tx = conn.begin().await?;
     let data_entry = data_entry_repo::create_empty(&mut tx).await?;
-    let sub_committee =
-        sub_committee_repo::create(&mut tx, committee_session_id, data_entry.id, name, category)
-            .await?;
+    let sub_committee = sub_committee_repo::create(
+        &mut tx,
+        committee_session_id,
+        data_entry.id,
+        number,
+        name,
+        category,
+    )
+    .await?;
     tx.commit().await?;
     Ok(sub_committee)
 }
@@ -57,12 +64,14 @@ mod tests {
         let created = create(
             &mut conn,
             committee_session_id,
+            "0042",
             "Test GSB",
             CommitteeCategory::GSB,
         )
         .await
         .unwrap();
 
+        assert_eq!(created.sub_committee.number, "0042");
         assert_eq!(created.sub_committee.name, "Test GSB");
         assert_eq!(created.sub_committee.category, CommitteeCategory::GSB);
         assert_eq!(created.committee_session_id, committee_session_id);

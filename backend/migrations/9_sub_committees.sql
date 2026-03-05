@@ -3,6 +3,7 @@ CREATE TABLE sub_committees
     id                    INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
     committee_session_id  INTEGER                           NOT NULL,
     data_entry_id         INTEGER                           NOT NULL,
+    number                TEXT                              NOT NULL,
     name                  TEXT                              NOT NULL,
     category              TEXT                              NOT NULL,
 

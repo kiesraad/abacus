@@ -69,6 +69,11 @@ user_role! {
     AdminOrCoordinatorGSB => Role::Administrator | Role::CoordinatorGSB
 }
 
+user_role! {
+    /// A user with admin or GSB role
+    AdminOrGSB => Role::Administrator | Role::CoordinatorGSB | Role::TypistGSB
+}
+
 /// A user with potentially no fullname or needs_password_change=true
 pub struct IncompleteUser(pub User);
 

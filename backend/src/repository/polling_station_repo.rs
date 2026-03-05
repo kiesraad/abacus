@@ -1,14 +1,32 @@
-use sqlx::{Connection, SqliteConnection, query, query_as};
+use sqlx::{Connection, SqliteConnection, query, query_as, query_scalar};
 
 use crate::{
     domain::{
         committee_session::CommitteeSessionId,
         data_entry::DataEntryId,
-        election::ElectionId,
+        election::{CommitteeCategory, ElectionId},
         polling_station::{PollingStation, PollingStationId, PollingStationRequest},
     },
     repository::committee_session_repo,
 };
+
+pub async fn get_committee_category(
+    conn: &mut SqliteConnection,
+    polling_station_id: PollingStationId,
+) -> Result<CommitteeCategory, sqlx::Error> {
+    query_scalar!(
+        r#"
+        SELECT e.committee_category as "committee_category: _"
+        FROM polling_stations AS p
+        JOIN committee_sessions AS c ON c.id = p.committee_session_id
+        JOIN elections AS e ON c.election_id = e.id
+        WHERE p.id = ?
+        "#,
+        polling_station_id
+    )
+    .fetch_one(conn)
+    .await
+}
 
 /// Returns if a committee session has polling stations
 pub async fn has_any(

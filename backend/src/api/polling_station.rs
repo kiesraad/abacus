@@ -12,13 +12,15 @@ use crate::{
     api::{
         data_entry::delete_data_entry_for_polling_station,
         investigation::delete_investigation_for_polling_station,
-        middleware::authentication::{AdminOrCoordinatorGSB, error::AuthenticationError},
+        middleware::authentication::{
+            AdminOrCoordinatorGSB, AdminOrGSB, error::AuthenticationError,
+        },
     },
     domain::{
         committee_session::{CommitteeSession, CommitteeSessionId},
         committee_session_status::CommitteeSessionStatus,
         data_entry::DataEntryId,
-        election::ElectionId,
+        election::{CommitteeCategory, ElectionId},
         polling_station::{
             PollingStation, PollingStationFileRequest, PollingStationId,
             PollingStationListResponse, PollingStationRequest, PollingStationRequestListResponse,
@@ -30,8 +32,9 @@ use crate::{
     repository::{
         committee_session_repo::get_election_committee_session,
         election_repo,
-        polling_station_repo::{create, create_many, delete, get_for_election, list, update},
-        user_repo::User,
+        polling_station_repo::{
+            create, create_many, delete, get_committee_category, get_for_election, list, update,
+        },
     },
     service::{change_committee_session_status, create_empty_data_entry},
 };
@@ -133,14 +136,18 @@ pub fn router() -> OpenApiRouter<AppState> {
     security(("cookie_auth" = ["administrator", "coordinator_gsb", "typist_gsb"])),
 )]
 async fn polling_station_list(
-    _user: User,
+    AdminOrGSB(user): AdminOrGSB,
     State(pool): State<SqlitePool>,
     Path(election_id): Path<ElectionId>,
 ) -> Result<PollingStationListResponse, APIError> {
     let mut conn = pool.acquire().await?;
 
     // Check if the election exists, will respond with NOT_FOUND otherwise
-    election_repo::get(&mut conn, election_id).await?;
+    let election = election_repo::get(&mut conn, election_id).await?;
+    let committee_category = &election.committee_category;
+    if !user.role().can_manage_committee(committee_category) {
+        return Err(AuthenticationError::Forbidden.into());
+    }
 
     let committee_session = get_election_committee_session(&mut conn, election_id).await?;
 
@@ -152,7 +159,12 @@ async fn polling_station_list(
 pub fn validate_user_is_allowed_to_perform_action(
     AdminOrCoordinatorGSB(user): AdminOrCoordinatorGSB,
     committee_session: &CommitteeSession,
+    committee_category: &CommitteeCategory,
 ) -> Result<(), APIError> {
+    if !user.role().can_manage_committee(committee_category) {
+        return Err(AuthenticationError::Forbidden.into());
+    }
+
     // Check if the user is allowed to perform the action in this committee session status,
     // respond with FORBIDDEN otherwise
     if user.role().is_coordinator()
@@ -194,10 +206,13 @@ async fn polling_station_create(
     let mut tx = pool.begin_immediate().await?;
 
     // Check if the election and a committee session exist, will respond with NOT_FOUND otherwise
-    election_repo::get(&mut tx, election_id).await?;
+    let election = election_repo::get(&mut tx, election_id).await?;
     let committee_session = get_election_committee_session(&mut tx, election_id).await?;
-
-    validate_user_is_allowed_to_perform_action(user, &committee_session)?;
+    validate_user_is_allowed_to_perform_action(
+        user,
+        &committee_session,
+        &election.committee_category,
+    )?;
 
     let mut polling_station = create(&mut tx, election_id, new_polling_station).await?;
 
@@ -255,11 +270,17 @@ async fn polling_station_create(
     security(("cookie_auth" = ["administrator", "coordinator_gsb", "typist_gsb"])),
 )]
 async fn polling_station_get(
-    _user: User,
+    AdminOrGSB(user): AdminOrGSB,
     State(pool): State<SqlitePool>,
     Path((election_id, polling_station_id)): Path<(ElectionId, PollingStationId)>,
 ) -> Result<(StatusCode, PollingStation), APIError> {
     let mut conn = pool.acquire().await?;
+
+    let committee_category = get_committee_category(&mut conn, polling_station_id).await?;
+    if !user.role().can_manage_committee(&committee_category) {
+        return Err(AuthenticationError::Forbidden.into());
+    }
+
     Ok((
         StatusCode::OK,
         get_for_election(&mut conn, election_id, polling_station_id).await?,
@@ -294,10 +315,13 @@ async fn polling_station_update(
     let mut tx = pool.begin_immediate().await?;
 
     // Check if the election and a committee session exist, will respond with NOT_FOUND otherwise
-    election_repo::get(&mut tx, election_id).await?;
+    let election = election_repo::get(&mut tx, election_id).await?;
     let committee_session = get_election_committee_session(&mut tx, election_id).await?;
-
-    validate_user_is_allowed_to_perform_action(user, &committee_session)?;
+    validate_user_is_allowed_to_perform_action(
+        user,
+        &committee_session,
+        &election.committee_category,
+    )?;
 
     let polling_station = update(
         &mut tx,
@@ -357,10 +381,13 @@ async fn polling_station_delete(
     let mut tx = pool.begin_immediate().await?;
 
     // Check if the election and a committee session exist, will respond with NOT_FOUND otherwise
-    election_repo::get(&mut tx, election_id).await?;
+    let election = election_repo::get(&mut tx, election_id).await?;
     let committee_session = get_election_committee_session(&mut tx, election_id).await?;
-
-    validate_user_is_allowed_to_perform_action(user, &committee_session)?;
+    validate_user_is_allowed_to_perform_action(
+        user,
+        &committee_session,
+        &election.committee_category,
+    )?;
 
     let polling_station = get_for_election(&mut tx, election_id, polling_station_id).await?;
 
@@ -423,9 +450,19 @@ async fn polling_station_delete(
     security(("cookie_auth" = ["administrator", "coordinator_gsb"])),
 )]
 async fn polling_station_validate_import(
-    _user: AdminOrCoordinatorGSB,
+    AdminOrCoordinatorGSB(user): AdminOrCoordinatorGSB,
+    State(pool): State<SqlitePool>,
+    Path(election_id): Path<ElectionId>,
     Json(polling_station_request): Json<PollingStationFileRequest>,
 ) -> Result<(StatusCode, Json<PollingStationRequestListResponse>), APIError> {
+    let mut tx = pool.begin_immediate().await?;
+
+    let election = election_repo::get(&mut tx, election_id).await?;
+    let committee_category = &election.committee_category;
+    if !user.role().can_manage_committee(committee_category) {
+        return Err(AuthenticationError::Forbidden.into());
+    }
+
     Ok((
         StatusCode::OK,
         Json(PollingStationRequestListResponse {
@@ -507,7 +544,7 @@ pub async fn create_imported_polling_stations(
     security(("cookie_auth" = ["administrator", "coordinator_gsb"])),
 )]
 async fn polling_station_import(
-    _user: AdminOrCoordinatorGSB,
+    AdminOrCoordinatorGSB(user): AdminOrCoordinatorGSB,
     State(pool): State<SqlitePool>,
     Path(election_id): Path<ElectionId>,
     audit_service: AuditService,
@@ -515,10 +552,13 @@ async fn polling_station_import(
 ) -> Result<(StatusCode, PollingStationListResponse), APIError> {
     let mut tx = pool.begin_immediate().await?;
 
-    // Check if the election and a committee session exist, will respond with NOT_FOUND otherwise
-    election_repo::get(&mut tx, election_id).await?;
-    let committee_session = get_election_committee_session(&mut tx, election_id).await?;
+    let election = election_repo::get(&mut tx, election_id).await?;
+    let committee_category = &election.committee_category;
+    if !user.role().can_manage_committee(committee_category) {
+        return Err(AuthenticationError::Forbidden.into());
+    }
 
+    let committee_session = get_election_committee_session(&mut tx, election_id).await?;
     if !list(&mut tx, committee_session.id).await?.is_empty() {
         return Err(AuthenticationError::Forbidden.into());
     }

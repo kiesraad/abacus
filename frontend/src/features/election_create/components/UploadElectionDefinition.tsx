@@ -82,7 +82,7 @@ export function UploadElectionDefinition() {
           type: "SET_ELECTION_DEFINITION_HASH",
           electionDefinitionHash: chunks,
         });
-        await navigate("/elections/create/electoral-committee-role");
+        await navigate("/elections/create/committee-category");
       } else if (isError(response) && response instanceof ApiError && response.reference === "InvalidHash") {
         setError(response.message);
       }

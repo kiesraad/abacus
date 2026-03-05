@@ -4,14 +4,14 @@ import type { Election } from "@/types/generated/openapi";
 
 export class CheckAndSavePgObj {
   readonly header: Locator;
-  readonly electoralCommitteeRole: Locator;
+  readonly committeeCategory: Locator;
   readonly numberOfVoters: Locator;
   readonly countingMethod: Locator;
   readonly save: Locator;
 
   constructor(protected readonly page: Page) {
     this.header = page.getByRole("heading", { level: 2, name: "Controleren en opslaan" });
-    this.electoralCommitteeRole = page.getByTestId("electoral-committee-role");
+    this.committeeCategory = page.getByTestId("committee-category");
     this.numberOfVoters = page.getByTestId("number-of-voters");
     this.countingMethod = page.getByTestId("counting-method");
     this.save = page.getByRole("button", { name: "Opslaan" });

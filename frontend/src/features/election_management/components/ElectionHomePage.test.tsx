@@ -87,7 +87,7 @@ describe("ElectionHomePage", () => {
       ["Kiesgebied", "0035 - Gemeente Heemdamseburg"],
       ["Lijsten en kandidaten", "2 lijsten en 31 kandidaten"],
       ["Aantal kiesgerechtigden", "2.000"],
-      ["Invoer doen voor", "Gemeentelijk stembureau"],
+      ["Type stembureau", "Gemeentelijk stembureau"],
       ["Stembureaus", "8 stembureaus"],
       ["Type stemopneming", "Centrale stemopneming"],
     ]);
@@ -157,7 +157,7 @@ describe("ElectionHomePage", () => {
       ["Kiesgebied", "0035 - Gemeente Heemdamseburg"],
       ["Lijsten en kandidaten", "2 lijsten en 31 kandidaten"],
       ["Aantal kiesgerechtigden", "2.000"],
-      ["Invoer doen voor", "Gemeentelijk stembureau"],
+      ["Type stembureau", "Gemeentelijk stembureau"],
       ["Stembureaus", "8 stembureaus"],
       ["Type stemopneming", "Centrale stemopneming"],
     ]);
@@ -351,7 +351,7 @@ describe("ElectionHomePage", () => {
       ["Kiesgebied", "0035 - Gemeente Heemdamseburg"],
       ["Lijsten en kandidaten", "2 lijsten en 31 kandidaten"],
       ["Aantal kiesgerechtigden", "2.000"],
-      ["Invoer doen voor", "Gemeentelijk stembureau"],
+      ["Type stembureau", "Gemeentelijk stembureau"],
       ["Stembureaus", "0 stembureaus"],
       ["Type stemopneming", "Centrale stemopneming"],
     ]);

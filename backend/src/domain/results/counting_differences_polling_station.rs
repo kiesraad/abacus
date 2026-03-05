@@ -1,3 +1,6 @@
+use serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
+
 use super::yes_no::YesNo;
 use crate::domain::{
     compare::Compare,
@@ -6,8 +9,6 @@ use crate::domain::{
     polling_station::PollingStation,
     validate::{DataError, Validate, ValidationResult, ValidationResultCode, ValidationResults},
 };
-use serde::{Deserialize, Serialize};
-use utoipa::ToSchema;
 
 /// Counting Differences Polling Station,
 /// part of the polling station results ("B1-2 Verschillen met telresultaten van het stembureau")
@@ -72,12 +73,13 @@ impl Compare for CountingDifferencesPollingStation {
 
 #[cfg(test)]
 mod tests {
+    use test_log::test;
+
     use super::*;
     use crate::domain::{
         election::tests::election_fixture, polling_station::test_helpers::polling_station_fixture,
         valid_default::ValidDefault,
     };
-    use test_log::test;
 
     impl ValidDefault for CountingDifferencesPollingStation {
         fn valid_default() -> Self {

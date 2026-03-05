@@ -1,21 +1,20 @@
+use common_polling_station_results::CommonPollingStationResults;
+use cso_first_session_results::CSOFirstSessionResults;
+use cso_next_session_results::CSONextSessionResults;
+use differences_counts::DifferencesCounts;
+use political_group_candidate_votes::{CandidateVotes, PoliticalGroupCandidateVotes};
+use political_group_total_votes::PoliticalGroupTotalVotes;
+use serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
+use voters_counts::VotersCounts;
+use votes_counts::VotesCounts;
+
 use crate::domain::{
     compare::Compare,
     election::{ElectionWithPoliticalGroups, PoliticalGroup},
     field_path::FieldPath,
     polling_station::PollingStation,
     validate::{DataError, Validate, ValidateRoot, ValidationResults},
-};
-use serde::{Deserialize, Serialize};
-use utoipa::ToSchema;
-use {
-    common_polling_station_results::CommonPollingStationResults,
-    cso_first_session_results::CSOFirstSessionResults,
-    cso_next_session_results::CSONextSessionResults,
-    differences_counts::DifferencesCounts,
-    political_group_candidate_votes::{CandidateVotes, PoliticalGroupCandidateVotes},
-    political_group_total_votes::PoliticalGroupTotalVotes,
-    voters_counts::VotersCounts,
-    votes_counts::VotesCounts,
 };
 
 pub mod common_polling_station_results;
@@ -313,6 +312,8 @@ impl Validate for PollingStationResults {
 
 #[cfg(test)]
 pub mod tests {
+    use test_log::test;
+
     use super::*;
     use crate::domain::{
         election::PGNumber,
@@ -322,7 +323,6 @@ pub mod tests {
         },
         valid_default::ValidDefault,
     };
-    use test_log::test;
 
     pub fn example_polling_station_results() -> PollingStationResults {
         PollingStationResults::CSOFirstSession(CSOFirstSessionResults {

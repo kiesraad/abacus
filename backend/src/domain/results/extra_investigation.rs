@@ -1,3 +1,6 @@
+use serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
+
 use super::yes_no::YesNo;
 use crate::domain::{
     compare::Compare,
@@ -6,8 +9,6 @@ use crate::domain::{
     polling_station::PollingStation,
     validate::{DataError, Validate, ValidationResult, ValidationResultCode, ValidationResults},
 };
-use serde::{Deserialize, Serialize};
-use utoipa::ToSchema;
 
 /// Extra investigation, part of the polling station results ("B1-1 Alleen bij extra onderzoek")
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]

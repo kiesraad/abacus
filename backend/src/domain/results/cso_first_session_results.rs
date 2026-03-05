@@ -1,3 +1,6 @@
+use serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
+
 use super::{
     counting_differences_polling_station::CountingDifferencesPollingStation,
     differences_counts::DifferencesCounts, extra_investigation::ExtraInvestigation,
@@ -5,8 +8,6 @@ use super::{
     votes_counts::VotesCounts,
 };
 use crate::domain::{compare::Compare, field_path::FieldPath};
-use serde::{Deserialize, Serialize};
-use utoipa::ToSchema;
 
 /// CSOFirstSessionResults, following the fields in Model Na 31-2 Bijlage 2.
 ///

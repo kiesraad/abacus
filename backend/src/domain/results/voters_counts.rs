@@ -1,3 +1,8 @@
+use std::ops::AddAssign;
+
+use serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
+
 use super::count::Count;
 use crate::domain::{
     compare::Compare,
@@ -6,9 +11,6 @@ use crate::domain::{
     polling_station::PollingStation,
     validate::{DataError, Validate, ValidationResult, ValidationResultCode, ValidationResults},
 };
-use serde::{Deserialize, Serialize};
-use std::ops::AddAssign;
-use utoipa::ToSchema;
 
 /// Voters counts, part of the polling station results.
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
@@ -99,11 +101,12 @@ impl Validate for VotersCounts {
 
 #[cfg(test)]
 mod tests {
+    use test_log::test;
+
     use super::*;
     use crate::domain::{
         election::tests::election_fixture, polling_station::test_helpers::polling_station_fixture,
     };
-    use test_log::test;
 
     #[test]
     fn test_voters_addition() {

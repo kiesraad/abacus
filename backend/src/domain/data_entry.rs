@@ -2,8 +2,7 @@ use std::fmt::Display;
 
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use sqlx::types::Json;
-use sqlx::{FromRow, Type};
+use sqlx::{FromRow, Type, types::Json};
 use utoipa::ToSchema;
 
 use crate::{

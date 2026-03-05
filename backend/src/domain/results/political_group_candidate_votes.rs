@@ -1,3 +1,6 @@
+use serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
+
 use super::count::Count;
 use crate::{
     APIError,
@@ -10,8 +13,6 @@ use crate::{
     },
     error::ErrorReference,
 };
-use serde::{Deserialize, Serialize};
-use utoipa::ToSchema;
 
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]

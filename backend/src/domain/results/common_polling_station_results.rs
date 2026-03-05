@@ -1,3 +1,6 @@
+use serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
+
 use super::{
     differences_counts::{DifferencesCounts, validate_differences_counts},
     political_group_candidate_votes::PoliticalGroupCandidateVotes,
@@ -13,8 +16,6 @@ use crate::domain::{
         ValidationResults,
     },
 };
-use serde::{Deserialize, Serialize};
-use utoipa::ToSchema;
 
 /// CommonPollingStationResults contains the common fields for polling station results,
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
@@ -203,6 +204,8 @@ impl From<CommonPollingStationResults> for CommonPollingStationResultsWithoutVot
 
 #[cfg(test)]
 mod tests {
+    use test_log::test;
+
     use super::*;
     use crate::domain::{
         election::{PGNumber, tests::election_fixture},
@@ -210,7 +213,6 @@ mod tests {
         results::political_group_total_votes::PoliticalGroupTotalVotes,
         valid_default::ValidDefault,
     };
-    use test_log::test;
 
     fn create_test_data() -> CommonPollingStationResults {
         CommonPollingStationResults {

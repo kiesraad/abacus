@@ -1,3 +1,6 @@
+use serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
+
 use super::{count::Count, yes_no::YesNo};
 use crate::domain::{
     compare::Compare,
@@ -6,8 +9,6 @@ use crate::domain::{
     polling_station::PollingStation,
     validate::{DataError, Validate, ValidationResult, ValidationResultCode, ValidationResults},
 };
-use serde::{Deserialize, Serialize};
-use utoipa::ToSchema;
 
 /// Differences counts, part of the polling station results.
 /// (B1-3.3 "Verschillen tussen aantal kiezers en uitgebrachte stemmen")

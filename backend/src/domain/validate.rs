@@ -1,11 +1,13 @@
+use std::fmt;
+
+use serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
+
 use crate::domain::{
     election::{ElectionWithPoliticalGroups, PGNumber},
     field_path::FieldPath,
     polling_station::PollingStation,
 };
-use serde::{Deserialize, Serialize};
-use std::fmt;
-use utoipa::ToSchema;
 
 #[derive(Serialize, Deserialize, ToSchema, Debug, Default, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]

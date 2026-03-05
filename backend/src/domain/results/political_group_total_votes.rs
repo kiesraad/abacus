@@ -1,3 +1,6 @@
+use serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
+
 use super::count::Count;
 use crate::domain::{
     compare::Compare,
@@ -6,8 +9,6 @@ use crate::domain::{
     polling_station::PollingStation,
     validate::{DataError, Validate, ValidationResults},
 };
-use serde::{Deserialize, Serialize};
-use utoipa::ToSchema;
 
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
@@ -70,13 +71,14 @@ impl Validate for Vec<PoliticalGroupTotalVotes> {
 
 #[cfg(test)]
 mod tests {
+    use test_log::test;
+
     use super::*;
     use crate::domain::{
         election::{CandidateNumber, tests::election_fixture},
         polling_station::test_helpers::polling_station_fixture,
         results::political_group_candidate_votes::{CandidateVotes, PoliticalGroupCandidateVotes},
     };
-    use test_log::test;
 
     /// Takes a list of tuples where each tuple contains:
     /// - Candidate vote counts for the political group

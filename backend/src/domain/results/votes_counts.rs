@@ -1,3 +1,8 @@
+use std::collections::HashSet;
+
+use serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
+
 use super::{count::Count, political_group_total_votes::PoliticalGroupTotalVotes};
 use crate::{
     APIError,
@@ -12,9 +17,6 @@ use crate::{
     },
     error::ErrorReference,
 };
-use serde::{Deserialize, Serialize};
-use std::collections::HashSet;
-use utoipa::ToSchema;
 
 /// Votes counts, part of the polling station results.
 /// Following the fields in Model CSO Na 31-2 Bijlage 1.
@@ -267,12 +269,13 @@ impl Validate for VotesCounts {
 
 #[cfg(test)]
 mod tests {
+    use test_log::test;
+
     use super::*;
     use crate::domain::{
         election::{PGNumber, tests::election_fixture},
         polling_station::test_helpers::polling_station_fixture,
     };
-    use test_log::test;
 
     #[test]
     fn test_votes_addition() {

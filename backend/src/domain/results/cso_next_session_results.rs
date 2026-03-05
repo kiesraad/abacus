@@ -1,11 +1,12 @@
+use serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
+
 use super::{
     differences_counts::DifferencesCounts,
     political_group_candidate_votes::PoliticalGroupCandidateVotes, voters_counts::VotersCounts,
     votes_counts::VotesCounts,
 };
 use crate::domain::{compare::Compare, field_path::FieldPath};
-use serde::{Deserialize, Serialize};
-use utoipa::ToSchema;
 
 /// CSONextSessionResults, following the fields in Model Na 14-2 Bijlage 1.
 ///

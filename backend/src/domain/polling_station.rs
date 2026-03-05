@@ -11,10 +11,10 @@ use crate::{
     APIError,
     domain::{
         committee_session::CommitteeSessionId,
+        data_entry_status::DataEntryId,
         election::ElectionId,
         identifier::id,
         investigation::{InvestigationStatus, PollingStationInvestigation},
-        polling_station_data_entry::DataEntryId,
     },
 };
 

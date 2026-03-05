@@ -6,9 +6,8 @@ use crate::{
     api::data_entry::ElectionStatusResponseEntry,
     domain::{
         committee_session::CommitteeSessionId,
-        data_entry_status::DataEntryStatus,
+        data_entry_status::{DataEntryStatus, PollingStationDataEntry},
         polling_station::{PollingStation, PollingStationId},
-        polling_station_data_entry::PollingStationDataEntry,
         polling_station_results::PollingStationResults,
     },
     repository::{committee_session_repo, polling_station_repo},

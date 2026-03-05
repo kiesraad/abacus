@@ -17,13 +17,13 @@ use crate::{
     domain::{
         committee_session::{CommitteeSession, CommitteeSessionId},
         committee_session_status::CommitteeSessionStatus,
+        data_entry_status::DataEntryId,
         election::ElectionId,
         polling_station::{
             PollingStationFileRequest, PollingStationId, PollingStationListResponse,
             PollingStationRequest, PollingStationRequestListResponse, PollingStationResponse,
             PollingStationsRequest,
         },
-        polling_station_data_entry::DataEntryId,
     },
     eml::{EMLImportError, EmlHash, polling_stations_from_eml_str},
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},

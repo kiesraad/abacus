@@ -2,16 +2,17 @@ use std::fmt::Display;
 
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use sqlx::Type;
+use sqlx::types::Json;
+use sqlx::{FromRow, Type};
 use utoipa::ToSchema;
 
+use crate::domain::identifier::id;
 use crate::{
     domain::{
         compare::Compare,
         election::ElectionWithPoliticalGroups,
         field_path::FieldPath,
         polling_station::PollingStation,
-        polling_station_data_entry::PollingStationDataEntry,
         polling_station_results::PollingStationResults,
         validate::{
             DataError, Validate, ValidateRoot, ValidationResult, ValidationResultCode,
@@ -20,6 +21,8 @@ use crate::{
     },
     repository::user_repo::UserId,
 };
+
+id!(DataEntryId);
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum DataEntryTransitionError {
@@ -60,6 +63,16 @@ impl From<DataEntryStatus> for DataEntryStatusResponse {
             status: data_entry_status.status_name(),
         }
     }
+}
+
+#[derive(Serialize, Deserialize, Clone, ToSchema, Debug, FromRow)]
+#[serde(deny_unknown_fields)]
+pub struct PollingStationDataEntry {
+    pub id: DataEntryId,
+    #[schema(value_type = DataEntryStatus)]
+    pub state: Json<DataEntryStatus>,
+    #[schema(value_type = String)]
+    pub updated_at: DateTime<Utc>,
 }
 
 impl From<PollingStationDataEntry> for DataEntryStatusResponse {

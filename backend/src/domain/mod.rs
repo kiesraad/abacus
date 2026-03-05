@@ -10,7 +10,6 @@ pub mod identifier;
 pub mod investigation;
 pub mod models;
 pub mod polling_station;
-pub mod polling_station_data_entry;
 pub mod polling_station_results;
 pub mod role;
 pub mod summary;

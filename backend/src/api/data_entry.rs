@@ -17,14 +17,14 @@ use crate::{
         committee_session::{CommitteeSession, CommitteeSessionError},
         committee_session_status::CommitteeSessionStatus,
         data_entry_status::{
-            ClientState, CurrentDataEntry, DataEntryStatus, DataEntryStatusName,
+            ClientState, CurrentDataEntry, DataEntryId, DataEntryStatus, DataEntryStatusName,
             DataEntryStatusResponse, DataEntryTransitionError, EntriesDifferent,
+            PollingStationDataEntry,
         },
         election::{ElectionId, ElectionWithPoliticalGroups, PoliticalGroup},
         entry_number::EntryNumber,
         investigation::InvestigationStatus,
         polling_station::{PollingStation, PollingStationId},
-        polling_station_data_entry::{DataEntryId, PollingStationDataEntry},
         polling_station_results::{
             PollingStationResults, common_polling_station_results::CommonPollingStationResults,
             cso_next_session_results::CSONextSessionResults,

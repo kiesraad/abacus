@@ -245,6 +245,26 @@ pub async fn data_entry_exists(
     Ok(res.exists == 1)
 }
 
+/// Returns if a committee session has any data entries
+pub async fn has_any(
+    conn: &mut SqliteConnection,
+    committee_session_id: CommitteeSessionId,
+) -> Result<bool, sqlx::Error> {
+    let result = query!(
+        r#"
+        SELECT EXISTS(
+            SELECT 1 FROM polling_stations as ps
+            INNER JOIN data_entries AS de ON de.id = ps.data_entry_id
+            WHERE committee_session_id = $1
+        ) as `exists`"#,
+        committee_session_id
+    )
+    .fetch_one(conn)
+    .await?;
+
+    Ok(result.exists == 1)
+}
+
 #[cfg(test)]
 pub async fn get_data_entries(
     conn: &mut SqliteConnection,

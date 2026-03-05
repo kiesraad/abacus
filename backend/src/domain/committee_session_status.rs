@@ -35,8 +35,8 @@ pub enum CommitteeSessionStatus {
     Completed,
 }
 
-pub trait CommitteeSessionHasPollingStationsProvider {
-    fn has_polling_stations(
+pub trait CommitteeSessionHasDataEntriesProvider {
+    fn has_data_entries(
         &mut self,
         committee_session_id: CommitteeSessionId,
     ) -> impl Future<Output = Result<bool, CommitteeSessionError>>;
@@ -49,8 +49,8 @@ pub trait CommitteeSessionHasInvestigationsProvider {
     ) -> impl Future<Output = Result<bool, CommitteeSessionError>>;
 }
 
-pub trait DataEntryCompleteResultsProvider {
-    fn has_complete_results(
+pub trait CommitteeSessionDataEntriesDefinitiveProvider {
+    fn data_entries_definitive(
         &mut self,
         committee_session_id: CommitteeSessionId,
     ) -> impl Future<Output = Result<bool, CommitteeSessionError>>;
@@ -63,7 +63,7 @@ impl CommitteeSessionStatus {
         provider: &mut T,
     ) -> Result<Self, CommitteeSessionError>
     where
-        T: CommitteeSessionHasPollingStationsProvider + CommitteeSessionHasInvestigationsProvider,
+        T: CommitteeSessionHasDataEntriesProvider + CommitteeSessionHasInvestigationsProvider,
     {
         match self {
             CommitteeSessionStatus::Created => Ok(self),
@@ -71,13 +71,17 @@ impl CommitteeSessionStatus {
             | CommitteeSessionStatus::DataEntry
             | CommitteeSessionStatus::Paused
             | CommitteeSessionStatus::Completed => {
-                if !provider.has_polling_stations(committee_session.id).await?
-                    || (committee_session.is_next_session()
-                        && !provider.has_investigations(committee_session.id).await?)
-                {
-                    return Ok(CommitteeSessionStatus::Created);
+                let has_items = if committee_session.is_next_session() {
+                    provider.has_investigations(committee_session.id).await?
+                } else {
+                    provider.has_data_entries(committee_session.id).await?
+                };
+
+                if !has_items {
+                    Ok(CommitteeSessionStatus::Created)
+                } else {
+                    Err(CommitteeSessionError::InvalidStatusTransition)
                 }
-                Err(CommitteeSessionError::InvalidStatusTransition)
             }
         }
     }
@@ -88,17 +92,21 @@ impl CommitteeSessionStatus {
         provider: &mut T,
     ) -> Result<Self, CommitteeSessionError>
     where
-        T: CommitteeSessionHasPollingStationsProvider + CommitteeSessionHasInvestigationsProvider,
+        T: CommitteeSessionHasDataEntriesProvider + CommitteeSessionHasInvestigationsProvider,
     {
         match self {
             CommitteeSessionStatus::Created => {
-                if !provider.has_polling_stations(committee_session.id).await?
-                    || (committee_session.is_next_session()
-                        && !provider.has_investigations(committee_session.id).await?)
-                {
-                    return Err(CommitteeSessionError::InvalidStatusTransition);
+                let has_items = if committee_session.is_next_session() {
+                    provider.has_investigations(committee_session.id).await?
+                } else {
+                    provider.has_data_entries(committee_session.id).await?
+                };
+
+                if has_items {
+                    Ok(CommitteeSessionStatus::InPreparation)
+                } else {
+                    Err(CommitteeSessionError::InvalidStatusTransition)
                 }
-                Ok(CommitteeSessionStatus::InPreparation)
             }
             CommitteeSessionStatus::InPreparation => Ok(self),
             CommitteeSessionStatus::DataEntry
@@ -139,17 +147,21 @@ impl CommitteeSessionStatus {
         provider: &mut T,
     ) -> Result<Self, CommitteeSessionError>
     where
-        T: DataEntryCompleteResultsProvider,
+        T: CommitteeSessionDataEntriesDefinitiveProvider,
     {
         match self {
             CommitteeSessionStatus::Created | CommitteeSessionStatus::InPreparation => {
                 Err(CommitteeSessionError::InvalidStatusTransition)
             }
             CommitteeSessionStatus::DataEntry | CommitteeSessionStatus::Paused => {
-                if !provider.has_complete_results(committee_session.id).await? {
-                    return Err(CommitteeSessionError::InvalidStatusTransition);
+                if provider
+                    .data_entries_definitive(committee_session.id)
+                    .await?
+                {
+                    Ok(CommitteeSessionStatus::Completed)
+                } else {
+                    Err(CommitteeSessionError::InvalidStatusTransition)
                 }
-                Ok(CommitteeSessionStatus::Completed)
             }
             CommitteeSessionStatus::Completed => Ok(self),
         }
@@ -160,33 +172,34 @@ impl CommitteeSessionStatus {
 mod tests {
     use super::*;
 
-    struct HasPollingStationsOrInvestigationsMock(bool, bool);
-    struct HasCompleteResultsMock(bool);
+    // None indicates that we do not expect the provider method to be called
+    struct HasDataEntriesOrInvestigationsMock(Option<bool>, Option<bool>);
+    struct DataEntriesDefinitiveMock(Option<bool>);
 
-    impl CommitteeSessionHasPollingStationsProvider for HasPollingStationsOrInvestigationsMock {
-        async fn has_polling_stations(
+    impl CommitteeSessionHasDataEntriesProvider for HasDataEntriesOrInvestigationsMock {
+        async fn has_data_entries(
             &mut self,
             _: CommitteeSessionId,
         ) -> Result<bool, CommitteeSessionError> {
-            Ok(self.0)
+            Ok(self.0.expect("should not call provider method"))
         }
     }
 
-    impl CommitteeSessionHasInvestigationsProvider for HasPollingStationsOrInvestigationsMock {
+    impl CommitteeSessionHasInvestigationsProvider for HasDataEntriesOrInvestigationsMock {
         async fn has_investigations(
             &mut self,
             _: CommitteeSessionId,
         ) -> Result<bool, CommitteeSessionError> {
-            Ok(self.1)
+            Ok(self.1.expect("should not call provider method"))
         }
     }
 
-    impl DataEntryCompleteResultsProvider for HasCompleteResultsMock {
-        async fn has_complete_results(
+    impl CommitteeSessionDataEntriesDefinitiveProvider for DataEntriesDefinitiveMock {
+        async fn data_entries_definitive(
             &mut self,
             _: CommitteeSessionId,
         ) -> Result<bool, CommitteeSessionError> {
-            Ok(self.0)
+            Ok(self.0.expect("should not call provider method"))
         }
     }
 
@@ -216,44 +229,42 @@ mod tests {
         async fn prepare_data_entry() {
             use CommitteeSessionStatus::*;
             use SessionType::*;
-            for (from, session_type, has_polling_stations, has_investigations, expected) in [
+            for (from, session_type, has_data_entries, has_investigations, expected) in [
                 // Created stays Created
-                (Created, First, false, false, Ok(Created)),
-                (Created, First, true, false, Ok(Created)),
-                (Created, Next, true, true, Ok(Created)),
-                (Created, Next, true, false, Ok(Created)),
-                // No polling stations
-                (InPreparation, First, false, false, Ok(Created)),
-                (DataEntry, First, false, false, Ok(Created)),
-                (Paused, First, false, false, Ok(Created)),
-                (Completed, First, false, false, Ok(Created)),
-                // First session + polling stations
-                (InPreparation, First, true, false, err()),
-                (DataEntry, First, true, false, err()),
-                (Paused, First, true, false, err()),
-                (Completed, First, true, false, err()),
-                // Next session + polling stations but no investigations
-                (InPreparation, Next, true, false, Ok(Created)),
-                (DataEntry, Next, true, false, Ok(Created)),
-                (Paused, Next, true, false, Ok(Created)),
-                (Completed, Next, true, false, Ok(Created)),
-                // Next session + polling stations + investigations
-                (InPreparation, Next, true, true, err()),
-                (DataEntry, Next, true, true, err()),
-                (Paused, Next, true, true, err()),
-                (Completed, Next, true, true, err()),
+                (Created, First, None, None, Ok(Created)),
+                (Created, Next, None, None, Ok(Created)),
+                // First session + no data entries
+                (InPreparation, First, Some(false), None, Ok(Created)),
+                (DataEntry, First, Some(false), None, Ok(Created)),
+                (Paused, First, Some(false), None, Ok(Created)),
+                (Completed, First, Some(false), None, Ok(Created)),
+                // First session + data entries
+                (InPreparation, First, Some(true), None, err()),
+                (DataEntry, First, Some(true), None, err()),
+                (Paused, First, Some(true), None, err()),
+                (Completed, First, Some(true), None, err()),
+                // Next session + no investigations
+                (InPreparation, Next, None, Some(false), Ok(Created)),
+                (DataEntry, Next, None, Some(false), Ok(Created)),
+                (Paused, Next, None, Some(false), Ok(Created)),
+                (Completed, Next, None, Some(false), Ok(Created)),
+                // Next session + investigations
+                (InPreparation, Next, None, Some(true), err()),
+                (DataEntry, Next, None, Some(true), err()),
+                (Paused, Next, None, Some(true), err()),
+                (Completed, Next, None, Some(true), err()),
             ] {
                 assert_eq!(
                     from.prepare_data_entry(
                         &session(&session_type),
-                        &mut HasPollingStationsOrInvestigationsMock(
-                            has_polling_stations,
+                        &mut HasDataEntriesOrInvestigationsMock(
+                            has_data_entries,
                             has_investigations
                         )
                     )
                     .await,
                     expected,
-                    "{from:?} (session_type={session_type:?}, has_polling_stations={has_polling_stations}, has_investigations={has_investigations})"
+                    "{from:?} (session_type={session_type:?}, has_data_entries={has_data_entries:?}, has_investigations={has_investigations:?})"
                 );
             }
         }
@@ -262,36 +273,35 @@ mod tests {
         async fn ready_for_data_entry() {
             use CommitteeSessionStatus::*;
             use SessionType::*;
-            for (from, session_type, has_polling_stations, has_investigations, expected) in [
-                // Created: needs polling stations in first session
-                (Created, First, false, false, err()),
-                (Created, First, true, false, Ok(InPreparation)),
-                // Created: needs polling stations and investigations in next session
-                (Created, Next, false, false, err()),
-                (Created, Next, true, false, err()),
-                (Created, Next, true, true, Ok(InPreparation)),
+            for (from, session_type, has_data_entries, has_investigations, expected) in [
+                // Created: needs data entries in first session
+                (Created, First, Some(false), None, err()),
+                (Created, First, Some(true), None, Ok(InPreparation)),
+                // Created: needs investigations in next session
+                (Created, Next, None, Some(false), err()),
+                (Created, Next, None, Some(true), Ok(InPreparation)),
                 // InPreparation stays InPreparation
-                (InPreparation, First, true, false, Ok(InPreparation)),
-                (InPreparation, Next, true, true, Ok(InPreparation)),
+                (InPreparation, First, None, None, Ok(InPreparation)),
+                (InPreparation, Next, None, None, Ok(InPreparation)),
                 // DataEntry, Paused, Completed are not allowed
-                (DataEntry, First, true, false, err()),
-                (DataEntry, Next, true, true, err()),
-                (Paused, First, true, false, err()),
-                (Paused, Next, true, true, err()),
-                (Completed, First, true, false, err()),
-                (Completed, Next, true, true, err()),
+                (DataEntry, First, None, None, err()),
+                (DataEntry, Next, None, None, err()),
+                (Paused, First, None, None, err()),
+                (Paused, Next, None, None, err()),
+                (Completed, First, None, None, err()),
+                (Completed, Next, None, None, err()),
             ] {
                 assert_eq!(
                     from.ready_for_data_entry(
                         &session(&session_type),
-                        &mut HasPollingStationsOrInvestigationsMock(
-                            has_polling_stations,
+                        &mut HasDataEntriesOrInvestigationsMock(
+                            has_data_entries,
                             has_investigations
                         )
                     )
                     .await,
                     expected,
-                    "{from:?} (session_type={session_type:?}, has_polling_stations={has_polling_stations}, has_investigations={has_investigations})"
+                    "{from:?} (session_type={session_type:?}, has_data_entries={has_data_entries:?}, has_investigations={has_investigations:?})"
                 );
             }
         }
@@ -327,38 +337,35 @@ mod tests {
         #[test(tokio::test)]
         async fn finish_data_entry() {
             use CommitteeSessionStatus::*;
-            for (from, has_complete_results, expected) in [
+            for (from, definitive, expected) in [
                 // Created/InPreparation are not allowed
-                (Created, false, err()),
-                (Created, true, err()),
-                (InPreparation, false, err()),
-                (InPreparation, true, err()),
+                (Created, None, err()),
+                (InPreparation, None, err()),
                 // DataEntry/Paused needs complete results
-                (DataEntry, false, err()),
-                (DataEntry, true, Ok(Completed)),
-                (Paused, false, err()),
-                (Paused, true, Ok(Completed)),
+                (DataEntry, Some(false), err()),
+                (DataEntry, Some(true), Ok(Completed)),
+                (Paused, Some(false), err()),
+                (Paused, Some(true), Ok(Completed)),
                 // Completed stays Completed
-                (Completed, false, Ok(Completed)),
-                (Completed, true, Ok(Completed)),
+                (Completed, None, Ok(Completed)),
             ] {
                 assert_eq!(
                     from.finish_data_entry(
                         &session(&SessionType::First),
-                        &mut HasCompleteResultsMock(has_complete_results)
+                        &mut DataEntriesDefinitiveMock(definitive)
                     )
                     .await,
                     expected,
-                    "{from:?} (first session, has_complete_results={has_complete_results})"
+                    "{from:?} (first session, definitive={definitive:?})"
                 );
                 assert_eq!(
                     from.finish_data_entry(
                         &session(&SessionType::Next),
-                        &mut HasCompleteResultsMock(has_complete_results)
+                        &mut DataEntriesDefinitiveMock(definitive)
                     )
                     .await,
                     expected,
-                    "{from:?} (next session, has_complete_results={has_complete_results})"
+                    "{from:?} (next session, definitive={definitive:?})"
                 );
             }
         }

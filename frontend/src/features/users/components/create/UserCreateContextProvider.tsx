@@ -1,9 +1,9 @@
 import { type ReactNode, useState } from "react";
 import type { Role } from "@/types/generated/openapi";
-import type { RoleWithoutCommitteeCategory } from "@/utils/role";
 import {
   type CommitteeCategory,
   type IUserCreateContext,
+  type RoleWithoutCommitteeCategory,
   UserCreateContext,
   type UserType,
 } from "../../hooks/UserCreateContext";

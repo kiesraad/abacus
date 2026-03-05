@@ -284,10 +284,10 @@ async fn generate_polling_stations(
         )
         .await
         .expect("Failed to create polling station");
-        ps = create_empty_data_entry(conn, ps.id)
+        ps = create_empty_data_entry(conn, ps.id())
             .await
             .expect("Failed to create empty data entry");
-        polling_stations.push(ps);
+        polling_stations.push(ps.into_polling_station());
     }
 
     polling_stations

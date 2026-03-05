@@ -20,7 +20,7 @@ export function ReadOnlyDataEntrySection({
   data: pollingStationResults,
   validationResults,
 }: ReadOnlyDataEntrySectionProps) {
-  const userRole = "coordinator";
+  const userRole = "coordinator_gsb";
 
   // Create validation result sets from the validation results
   const errors = getValidationResultSetForSection(validationResults.errors, section);

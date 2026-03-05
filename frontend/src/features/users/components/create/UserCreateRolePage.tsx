@@ -8,9 +8,9 @@ import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { useUser } from "@/hooks/user/useUser";
 import { t } from "@/i18n/translate";
-import { isCoordinator, isRoleWithoutCommitteeCategory } from "@/utils/role";
+import { isCoordinator } from "@/utils/role";
 import { StringFormData } from "@/utils/stringFormData";
-import type { CommitteeCategory } from "../../hooks/UserCreateContext";
+import { type CommitteeCategory, isRoleWithoutCommitteeCategory } from "../../hooks/UserCreateContext";
 import { useUserCreateContext } from "../../hooks/useUserCreateContext";
 
 function committeeCategoryFromRole(role: "coordinator_csb" | "coordinator_gsb"): CommitteeCategory {

@@ -88,11 +88,11 @@ async fn validate_and_get_committee_session(
 
     // Get latest committee session for the election
     let committee_session =
-        get_election_committee_session(conn, polling_station.election_id).await?;
+        get_election_committee_session(conn, polling_station.election_id()).await?;
 
     // Ensure this is not the first session and that the polling station is part of the last session
     if !committee_session.is_next_session()
-        || polling_station.committee_session_id != committee_session.id
+        || polling_station.committee_session_id() != committee_session.id
     {
         return Err(CommitteeSessionError::InvalidCommitteeSessionStatus.into());
     }
@@ -281,13 +281,12 @@ async fn polling_station_investigation_conclude(
     let status = if request.corrected_results {
         let ps = create_empty_data_entry(&mut tx, polling_station_id).await?;
         let data_entry_id = ps
-            .data_entry_id
+            .data_entry_id()
             .expect("create_empty_data_entry should set data_entry_id");
         current.conclude_with_new_results(request.findings, data_entry_id)?
     } else {
-        let polling_station = polling_station_repo::get(&mut tx, polling_station_id).await?;
-        let new_polling_station = polling_station.prev_data_entry_id.is_none();
-        current.conclude_without_new_results(request.findings, new_polling_station)?
+        let ps = polling_station_repo::get_next_session(&mut tx, polling_station_id).await?;
+        current.conclude_without_new_results(request.findings, ps.is_new_polling_station())?
     };
 
     investigation_repo::save(&mut tx, polling_station_id, &status).await?;
@@ -356,12 +355,12 @@ async fn apply_update(
         }
         // ConcludedWithoutNewResults: same-state text update
         (InvestigationStatus::ConcludedWithoutNewResults(_), Some(false)) => {
-            let ps = polling_station_repo::get(conn, polling_station_id).await?;
+            let ps = polling_station_repo::get_next_session(conn, polling_station_id).await?;
             let findings = request.findings.unwrap_or_default();
             Ok(current.switch_to_without_new_results(
                 request.reason,
                 findings,
-                ps.prev_data_entry_id.is_none(),
+                ps.is_new_polling_station(),
             )?)
         }
         // ConcludedWithoutNewResults -> ConcludedWithNewResults
@@ -370,10 +369,9 @@ async fn apply_update(
         }
         // ConcludedWithNewResults: same-state text update
         (InvestigationStatus::ConcludedWithNewResults(_), Some(true)) => {
-            create_empty_data_entry(conn, polling_station_id).await?;
-            let ps = polling_station_repo::get(conn, polling_station_id).await?;
+            let ps = create_empty_data_entry(conn, polling_station_id).await?;
             let de_id = ps
-                .data_entry_id
+                .data_entry_id()
                 .expect("data entry should exist after create_empty_data_entry");
             let findings = request.findings.unwrap_or_default();
             Ok(current.switch_to_with_new_results(request.reason, findings, de_id)?)
@@ -451,11 +449,13 @@ async fn switch_to_without_new_results(
         }
     }
 
-    let polling_station = polling_station_repo::get(conn, polling_station_id).await?;
-    let new_polling_station = polling_station.prev_data_entry_id.is_none();
+    let ps = polling_station_repo::get_next_session(conn, polling_station_id).await?;
     let findings = request.findings.unwrap_or_default();
-    let status =
-        current.switch_to_without_new_results(request.reason, findings, new_polling_station)?;
+    let status = current.switch_to_without_new_results(
+        request.reason,
+        findings,
+        ps.is_new_polling_station(),
+    )?;
     Ok(status)
 }
 
@@ -468,7 +468,7 @@ async fn switch_to_with_new_results(
 ) -> Result<InvestigationStatus, APIError> {
     let ps = create_empty_data_entry(conn, polling_station_id).await?;
     let de_id = ps
-        .data_entry_id
+        .data_entry_id()
         .expect("create_empty_data_entry should set data_entry_id");
 
     let findings = request.findings.unwrap_or_default();
@@ -505,8 +505,8 @@ async fn polling_station_investigation_update(
 
     let committee_session = validate_and_get_committee_session(&mut tx, polling_station_id).await?;
 
-    let polling_station = polling_station_repo::get(&mut tx, polling_station_id).await?;
-    if polling_station.prev_data_entry_id.is_none() && request.corrected_results != Some(true) {
+    let ps = polling_station_repo::get_next_session(&mut tx, polling_station_id).await?;
+    if ps.is_new_polling_station() && request.corrected_results != Some(true) {
         return Err(APIError::Conflict(
             "Investigation requires corrected results, because it is not part of a previous session".into(),
             ErrorReference::InvestigationRequiresCorrectedResults,
@@ -677,12 +677,11 @@ async fn polling_station_investigation_download_corrigendum_pdf(
         })?;
     let investigation = PollingStationInvestigation::from((polling_station_id, &status));
 
-    let polling_station: PollingStation =
-        polling_station_repo::get(&mut conn, polling_station_id).await?;
+    let ps = polling_station_repo::get(&mut conn, polling_station_id).await?;
     let election: ElectionWithPoliticalGroups =
-        election_repo::get(&mut conn, polling_station.election_id).await?;
+        election_repo::get(&mut conn, ps.election_id()).await?;
 
-    let previous_results = match polling_station.prev_data_entry_id {
+    let previous_results = match ps.prev_data_entry_id() {
         Some(_) => {
             match previous_results_for_polling_station(&mut conn, polling_station_id).await {
                 Ok(results) => results,
@@ -696,6 +695,8 @@ async fn polling_station_investigation_download_corrigendum_pdf(
         }
         None => PollingStationResults::empty_cso_first_session(&election.political_groups),
     };
+
+    let polling_station: PollingStation = ps.into_polling_station();
 
     let name = format!(
         "Model_Na14-2_{}{}_Stembureau_{}_Bijlage_1.pdf",

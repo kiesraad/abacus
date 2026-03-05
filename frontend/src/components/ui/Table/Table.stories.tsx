@@ -117,14 +117,14 @@ export const StyledTable: StoryObj = {
             <Table.NumberCell className="bg-gray">33</Table.NumberCell>
             <Table.Cell>
               <span>Op rolletjes</span>
-              <Badge type="first_entry_in_progress" userRole={"coordinator"} />
+              <Badge type="first_entry_in_progress" userRole={"coordinator_gsb"} />
             </Table.Cell>
           </Table.Row>
           <Table.Row>
             <Table.NumberCell className="bg-gray">34</Table.NumberCell>
             <Table.Cell>
               <span>Testplek</span>
-              <Badge type="empty" userRole={"coordinator"} />
+              <Badge type="empty" userRole={"coordinator_gsb"} />
             </Table.Cell>
           </Table.Row>
         </Table.Body>
@@ -326,7 +326,7 @@ export const IconBadgeTable: StoryObj = {
               </Table.Cell>
               <Table.Cell>
                 <span>{row[2]}</span>
-                <Badge type="first_entry_in_progress" showIcon userRole={"coordinator"} />
+                <Badge type="first_entry_in_progress" showIcon userRole={"coordinator_gsb"} />
               </Table.Cell>
             </Table.Row>
           ))}

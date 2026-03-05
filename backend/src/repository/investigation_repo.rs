@@ -130,39 +130,6 @@ pub async fn has_investigations_for_committee_session(
     Ok(result.exists == 1)
 }
 
-pub async fn list_for_committee_session(
-    conn: &mut SqliteConnection,
-    committee_session_id: CommitteeSessionId,
-) -> Result<Vec<(PollingStationId, InvestigationStatus)>, sqlx::Error> {
-    let rows = query!(
-        r#"
-        SELECT
-            id AS "polling_station_id: PollingStationId",
-            investigation_state AS "investigation_state!: Json<InvestigationStatus>",
-            data_entry_id AS "data_entry_id: DataEntryId"
-        FROM polling_stations
-        WHERE committee_session_id = ? AND investigation_state IS NOT NULL
-        "#,
-        committee_session_id,
-    )
-    .fetch_all(conn)
-    .await?;
-
-    Ok(rows
-        .into_iter()
-        .map(|row| {
-            let status = row.investigation_state.0;
-            let status = match (&status, row.data_entry_id) {
-                (InvestigationStatus::ConcludedWithNewResults(_), Some(id)) => {
-                    status.with_data_entry_id(id)
-                }
-                _ => status,
-            };
-            (row.polling_station_id, status)
-        })
-        .collect())
-}
-
 #[cfg(test)]
 pub async fn insert_test_investigation(
     conn: &mut SqliteConnection,

@@ -276,8 +276,8 @@ async fn fetch_results_for_committee_session(
     let mut tx = conn.begin().await?;
 
     // Get and index polling stations by id for performance
-    let polling_stations: HashMap<PollingStationId, _> =
-        polling_station_repo::list(&mut tx, committee_session_id)
+    let polling_stations: HashMap<PollingStationId, PollingStation> =
+        polling_station_repo::list_polling_stations(&mut tx, committee_session_id)
             .await?
             .into_iter()
             .filter(|ps| polling_station_id.is_none_or(|id| ps.id == id))
@@ -351,7 +351,7 @@ pub async fn previous_results_for_polling_station(
 ) -> Result<PollingStationResults, sqlx::Error> {
     let polling_station = polling_station_repo::get(conn, polling_station_id).await?;
     let prev_data_entry_id = polling_station
-        .prev_data_entry_id
+        .prev_data_entry_id()
         .ok_or(sqlx::Error::RowNotFound)?;
 
     let row = query!(
@@ -831,7 +831,7 @@ mod tests {
                 let ps = create_empty_data_entry(conn, polling_station_id)
                     .await
                     .unwrap();
-                let data_entry_id = ps.data_entry_id.expect("should have data_entry_id");
+                let data_entry_id = ps.data_entry_id().expect("should have data_entry_id");
                 current
                     .conclude_with_new_results("Test findings".to_string(), data_entry_id)
                     .expect("conclude_with_new_results should succeed")

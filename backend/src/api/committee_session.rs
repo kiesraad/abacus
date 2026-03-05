@@ -29,7 +29,7 @@ use crate::{
     },
     service::{
         CommitteeSessionAuditData, CommitteeSessionUpdatedAuditData,
-        change_committee_session_status, list_investigations_for_committee_session,
+        change_committee_session_status, list_polling_stations_for_session,
     },
 };
 
@@ -350,8 +350,9 @@ pub async fn committee_session_investigations(
 
     let committee_session = get(&mut conn, committee_session_id).await?;
 
-    let investigations =
-        list_investigations_for_committee_session(&mut conn, committee_session.id).await?;
+    let investigations = list_polling_stations_for_session(&mut conn, &committee_session)
+        .await?
+        .investigations();
 
     Ok(Json(InvestigationListResponse { investigations }))
 }

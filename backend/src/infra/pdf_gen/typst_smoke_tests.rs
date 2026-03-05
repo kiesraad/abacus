@@ -25,7 +25,6 @@ use crate::{
             ModelNa31_2Input, ModelP2aInput, PdfFileModel, PdfModel,
         },
         polling_station::{PollingStation, PollingStationId, PollingStationType},
-        polling_station_data_entry::DataEntryId,
         polling_station_results::{
             common_polling_station_results::CommonPollingStationResults,
             differences_counts::{
@@ -182,7 +181,6 @@ fn random_polling_station(
     string_length: usize,
     none_where_possible: bool,
 ) -> PollingStation {
-    let prev_data_entry_id = DataEntryId::from(rng.random_range(0..5));
     let number_of_voters = rng.random_range(0..=1000);
     let polling_station_type = random_value(
         rng,
@@ -196,9 +194,6 @@ fn random_polling_station(
     PollingStation {
         id: PollingStationId::from(rng.random_range(0..5)),
         election_id: election.id,
-        committee_session_id: CommitteeSessionId::from(rng.random_range(0..5)),
-        prev_data_entry_id: random_option(rng, prev_data_entry_id, none_where_possible),
-        data_entry_id: None,
         name: random_string(rng, string_length),
         number: rng.random_range(0..5),
         number_of_voters: random_option(rng, number_of_voters, none_where_possible),

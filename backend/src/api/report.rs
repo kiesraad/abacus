@@ -39,9 +39,9 @@ use crate::{
         data_entry_repo::{
             are_results_complete_for_committee_session, list_results_for_committee_session,
         },
-        election_repo, file_repo, polling_station_repo,
+        election_repo, file_repo,
     },
-    service::{FileAuditData, list_investigations_for_committee_session},
+    service::{FileAuditData, list_polling_stations_for_session},
 };
 
 /// Default date time format for reports
@@ -84,16 +84,10 @@ impl ResultsInput {
     ) -> Result<ResultsInput, APIError> {
         let committee_session = committee_session_repo::get(conn, committee_session_id).await?;
         let election = election_repo::get(conn, committee_session.election_id).await?;
-        let polling_stations = polling_station_repo::list(conn, committee_session.id).await?;
+        let session_pss = list_polling_stations_for_session(conn, &committee_session).await?;
+        let investigations = session_pss.investigations();
+        let polling_stations = session_pss.into_polling_stations();
         let results = list_results_for_committee_session(conn, committee_session.id).await?;
-
-        // get investigations if this is not the first session
-        let investigations: Vec<PollingStationInvestigation> =
-            if committee_session.is_next_session() {
-                list_investigations_for_committee_session(conn, committee_session.id).await?
-            } else {
-                vec![]
-            };
 
         // get the previous committee session if this is not the first session
         let previous_committee_session = if committee_session.is_next_session() {
@@ -434,11 +428,8 @@ async fn get_files(
 ) -> Result<(Option<File>, Option<File>, Option<File>, DateTime<Utc>), APIError> {
     let mut conn = pool.acquire().await?;
     let committee_session = committee_session_repo::get(&mut conn, committee_session_id).await?;
-    let investigations: Vec<PollingStationInvestigation> =
-        list_investigations_for_committee_session(&mut conn, committee_session.id).await?;
-    let corrections = investigations
-        .iter()
-        .any(|inv| matches!(inv.corrected_results, Some(true)));
+    let session_pss = list_polling_stations_for_session(&mut conn, &committee_session).await?;
+    let corrections = session_pss.has_corrections();
 
     // Only generate files if the committee session is completed and has all the data needed
     if committee_session.status != CommitteeSessionStatus::Completed

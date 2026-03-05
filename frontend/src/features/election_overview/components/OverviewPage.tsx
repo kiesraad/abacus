@@ -166,7 +166,7 @@ export function OverviewPage() {
                 <Table.Header>
                   <Table.HeaderCell>{t("election.title.singular")}</Table.HeaderCell>
                   <Table.HeaderCell>
-                    {isTypist ? t("election.location") : t("election.level_polling_station")}
+                    {isTypist ? t("election.location") : t("election.committee_category.title")}
                   </Table.HeaderCell>
                   <Table.HeaderCell>{t("election_status.label")}</Table.HeaderCell>
                 </Table.Header>

@@ -71,7 +71,7 @@ export function ElectionInformationTable({
         )}
         <Table.Row>
           <Table.HeaderCell scope="row" className="normal">
-            {t("election_management.to_do_data_entry_for")}
+            {t("election.committee_category.title")}
           </Table.HeaderCell>
           <Table.Cell>{t(`committee_category.${election.committee_category}.short`)}</Table.Cell>
         </Table.Row>

@@ -119,16 +119,16 @@ async function inputElectionHash(committeeCategory: CommitteeCategory = "GSB") {
 }
 
 /**
- * Helper function: assuming we are on the electoral committee role page,
+ * Helper function: assuming we are on the committee category page,
  * assert right checkbox is checked and continue.
  */
-async function setElectoralCommitteeRole(committeeCategory: CommitteeCategory = "GSB") {
+async function setCommitteeCategory(committeeCategory: CommitteeCategory = "GSB") {
   const user = userEvent.setup();
 
   if (committeeCategory === "CSB") {
     overrideOnce("post", "/api/elections/import/validate", 200, csbElectionImportValidateMockResponse);
 
-    expect(await screen.findByRole("heading", { level: 2, name: "Rol van het stembureau" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 2, name: "Type stembureau" })).toBeInTheDocument();
     await waitFor(() => {
       screen.getByRole("radio", { name: "Centraal stembureau (CSB)" }).click();
     });
@@ -231,7 +231,7 @@ describe("Election create pages", () => {
       // update election and set hash, and continue
       await uploadElectionDefinition(router, file);
       await inputElectionHash();
-      await setElectoralCommitteeRole();
+      await setCommitteeCategory();
 
       // upload candidate file
       await uploadCandidateDefinition(file);
@@ -254,7 +254,7 @@ describe("Election create pages", () => {
       // update election and set hash, and continue
       await uploadElectionDefinition(router, file);
       await inputElectionHash();
-      await setElectoralCommitteeRole();
+      await setCommitteeCategory();
 
       // upload candidate file
       await uploadCandidateDefinition(file);
@@ -298,7 +298,7 @@ describe("Election create pages", () => {
       // update election and set hash, and continue
       await uploadElectionDefinition(router, file);
       await inputElectionHash();
-      await setElectoralCommitteeRole();
+      await setCommitteeCategory();
 
       // upload candidate file
       await uploadCandidateDefinition(file);
@@ -328,7 +328,7 @@ describe("Election create pages", () => {
       // update election and set hash, and continue
       await uploadElectionDefinition(router, file);
       await inputElectionHash();
-      await setElectoralCommitteeRole();
+      await setCommitteeCategory();
 
       // upload candidate file
       await uploadCandidateDefinition(file);
@@ -359,7 +359,7 @@ describe("Election create pages", () => {
       // update election and set hash, and continue
       await uploadElectionDefinition(router, file);
       await inputElectionHash();
-      await setElectoralCommitteeRole();
+      await setCommitteeCategory();
 
       // upload candidate file
       await uploadCandidateDefinition(file);
@@ -389,7 +389,7 @@ describe("Election create pages", () => {
       // upload election and set hash, and continue
       await uploadElectionDefinition(router, file);
       await inputElectionHash();
-      await setElectoralCommitteeRole();
+      await setCommitteeCategory();
 
       // upload candidate file, set hash and continue
       await uploadCandidateDefinition(file);
@@ -414,7 +414,7 @@ describe("Election create pages", () => {
       // upload election and set hash, and continue
       await uploadElectionDefinition(router, file);
       await inputElectionHash();
-      await setElectoralCommitteeRole();
+      await setCommitteeCategory();
 
       // upload candidate file, set hash and continue
       await uploadCandidateDefinition(file);
@@ -465,8 +465,8 @@ describe("Election create pages", () => {
       await uploadElectionDefinition(router, file);
       await inputElectionHash();
 
-      // electoral committee role
-      await setElectoralCommitteeRole();
+      // committee category
+      await setCommitteeCategory();
 
       // candidates lists
       await uploadCandidateDefinition(file);
@@ -525,8 +525,8 @@ describe("Election create pages", () => {
       await uploadElectionDefinition(router, file, "CSB");
       await inputElectionHash("CSB");
 
-      // electoral committee role
-      await setElectoralCommitteeRole("CSB");
+      // committee category
+      await setCommitteeCategory("CSB");
 
       // candidates lists
       await uploadCandidateDefinition(file, "CSB");

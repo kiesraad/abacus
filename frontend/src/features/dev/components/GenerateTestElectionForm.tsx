@@ -35,7 +35,7 @@ type RangeFieldKey = (typeof RANGE_FIELDS)[number]["key"];
 type RangeFormState = Record<RangeFieldKey, string>;
 
 interface FormState extends RangeFormState {
-  election_role: CommitteeCategory;
+  committee_category: CommitteeCategory;
   with_data_entry: boolean;
 }
 
@@ -46,7 +46,7 @@ const INITIAL_RANGE_STATE: RangeFormState = Object.fromEntries(
 
 const INITIAL_FORM_STATE: FormState = {
   ...INITIAL_RANGE_STATE,
-  election_role: committeeCategoryValues[0],
+  committee_category: committeeCategoryValues[0],
   with_data_entry: true,
 };
 
@@ -67,13 +67,13 @@ export function GenerateTestElectionForm() {
 
   const submitForm = async (event: FormEvent<HTMLFormElement>) => {
     const formData = new StringFormData(event.currentTarget);
-    const election_role = formData.getString("election_role");
+    const committee_category = formData.getString("committee_category");
 
     const payload = RANGE_FIELDS.reduce<Record<string, string | boolean>>(
       (acc, field) =>
         Object.assign(acc, { [field.key]: formState[field.key] ? formState[field.key] : field.placeholder }),
       {
-        election_role,
+        committee_category,
         with_data_entry: formState.with_data_entry,
       },
     );
@@ -105,7 +105,7 @@ export function GenerateTestElectionForm() {
             <ChoiceList.Radio
               id={committeeCategory}
               key={committeeCategory}
-              name={"election_role"}
+              name={"committee_category"}
               defaultChecked={index === 0}
               defaultValue={committeeCategory}
               label={committeeCategory}

@@ -37,7 +37,7 @@ const rolePage = {
 };
 
 const committeeCategoryPage = {
-  radioGroup: () => screen.getByRole("group", { name: "Kies een niveau" }),
+  radioGroup: () => screen.getByRole("group", { name: "Kies het type stembureau" }),
   gsb: () => screen.getByRole("radio", { name: /GSB/ }),
   csb: () => screen.getByRole("radio", { name: /CSB/ }),
   continue: () => screen.getByRole("button", { name: "Verder" }),

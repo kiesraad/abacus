@@ -36,7 +36,7 @@ jobs:
         run: pnpm install --prod
       - name: Build
         run: pnpm build
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         with:
           name: frontend-production-build
           path: frontend/dist
@@ -68,7 +68,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: Download Abacus Frontend
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: frontend-production-build
           path: frontend/dist
@@ -84,7 +84,7 @@ jobs:
       # no airgap detection build
       - name: Build without airgap detection
         run: cargo --locked build --release --no-default-features --features memory-serve,embed-typst --target=${{ matrix.target.name }}
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         with:
           name: abacus-${{ matrix.target.os }}-no-airgap-detection
           path: ${{ matrix.target.binary }}
@@ -92,10 +92,10 @@ jobs:
       - name: Build
         run: cargo --locked build --release --no-default-features --features memory-serve,embed-typst,airgap-detection --target=${{ matrix.target.name }}
       - name: Attest build provenance
-        uses: actions/attest-build-provenance@v3
+        uses: actions/attest-build-provenance@v4
         with:
           subject-path: ${{ matrix.target.binary }}
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         with:
           name: abacus-release-${{ matrix.target.os }}
           path: ${{ matrix.target.binary }}
@@ -132,7 +132,7 @@ jobs:
       - name: Install Playwright Browsers
         run: pnpm playwright install --with-deps --no-shell
       - name: Download abacus
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: abacus-${{ matrix.os }}-no-airgap-detection
           path: builds/backend
@@ -142,7 +142,7 @@ jobs:
       - name: Run Playwright e2e tests
         run: pnpm test:e2e --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
       - name: Upload Playwright report
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: ${{ !cancelled() }}
         with:
           name: playwright-report-release-${{ matrix.os }}-${{ matrix.shardIndex }}
@@ -168,7 +168,7 @@ jobs:
       - name: Create release directory
         run: mkdir -p release
       - name: Download abacus
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           pattern: abacus-release-*
           path: release/
@@ -214,7 +214,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download abacus
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: abacus-ubuntu-latest-no-airgap-detection
       - name: Upload binary to test server

@@ -1,4 +1,4 @@
-use crate::domain::{comparison::Compare, validation::FieldPath};
+use crate::domain::{compare::Compare, field_path::FieldPath};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 

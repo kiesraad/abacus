@@ -10,12 +10,12 @@ use crate::{
     domain::{
         committee_session::{CommitteeSession, CommitteeSessionCreateRequest},
         committee_session_status::CommitteeSessionStatus,
-        data_entry::PoliticalGroupTotalVotes,
         data_entry_status::{DataEntryStatus, Definitive, FirstEntryFinalised},
         election::{
             self, CandidateGender, CandidateNumber, CommitteeCategory, ElectionCategory,
             ElectionWithPoliticalGroups, NewElection, PGNumber, PoliticalGroup, VoteCountingMethod,
         },
+        field_path::FieldPath,
         polling_station::{PollingStation, PollingStationRequest, PollingStationType},
         polling_station_results::{
             PollingStationResults,
@@ -26,11 +26,12 @@ use crate::{
             },
             extra_investigation::ExtraInvestigation,
             political_group_candidate_votes::{CandidateVotes, PoliticalGroupCandidateVotes},
+            political_group_total_votes::PoliticalGroupTotalVotes,
             voters_counts::VotersCounts,
             votes_counts::VotesCounts,
             yes_no::YesNo,
         },
-        validation::{FieldPath, Validate, ValidationResults},
+        validate::{Validate, ValidationResults},
     },
     repository::{
         committee_session_repo,

@@ -4,7 +4,6 @@ use utoipa::ToSchema;
 use crate::{
     APIError,
     domain::{
-        data_entry::PoliticalGroupTotalVotes,
         election::ElectionWithPoliticalGroups,
         polling_station::{PollingStation, PollingStationNumber},
         polling_station_results::{
@@ -13,10 +12,11 @@ use crate::{
             cso_first_session_results::CSOFirstSessionResults,
             differences_counts::DifferencesCounts,
             political_group_candidate_votes::{CandidateVotes, PoliticalGroupCandidateVotes},
+            political_group_total_votes::PoliticalGroupTotalVotes,
             voters_counts::VotersCounts,
             votes_counts::VotesCounts,
         },
-        validation::{Validate, ValidationResults},
+        validate::{Validate, ValidationResults},
     },
     error::ErrorReference,
 };
@@ -305,10 +305,10 @@ mod tests {
     use super::*;
     use crate::domain::{
         committee_session::committee_session_fixture,
-        data_entry::tests::ValidDefault,
         election::{PGNumber, tests::election_fixture},
         polling_station::test_helpers::polling_stations_fixture,
         polling_station_results::{extra_investigation::ExtraInvestigation, yes_no::YesNo},
+        valid_default::ValidDefault,
     };
 
     fn polling_station_results_fixture_a() -> PollingStationResults {

@@ -6,9 +6,9 @@ use crate::{
     api::data_entry::ElectionStatusResponseEntry,
     domain::{
         committee_session::CommitteeSessionId,
-        data_entry::PollingStationDataEntry,
         data_entry_status::DataEntryStatus,
         polling_station::{PollingStation, PollingStationId},
+        polling_station_data_entry::PollingStationDataEntry,
         polling_station_results::PollingStationResults,
     },
     repository::{committee_session_repo, polling_station_repo},
@@ -432,12 +432,12 @@ mod tests {
 
     use super::*;
     use crate::domain::{
-        data_entry::tests::ValidDefault,
         polling_station_results::{
             cso_first_session_results::CSOFirstSessionResults,
             differences_counts::DifferencesCounts, voters_counts::VotersCounts,
             votes_counts::VotesCounts,
         },
+        valid_default::ValidDefault,
     };
 
     fn create_test_results(proxy_certificate_count: u32) -> PollingStationResults {

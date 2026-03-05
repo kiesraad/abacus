@@ -3,9 +3,9 @@ use sqlx::{Connection, SqliteConnection, query, query_as};
 use crate::{
     domain::{
         committee_session::CommitteeSessionId,
-        data_entry::DataEntryId,
         election::ElectionId,
         polling_station::{PollingStation, PollingStationId, PollingStationRequest},
+        polling_station_data_entry::DataEntryId,
     },
     repository::committee_session_repo,
 };

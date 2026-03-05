@@ -1,8 +1,8 @@
 use sqlx::{SqliteConnection, query, types::Json};
 
 use crate::domain::{
-    committee_session::CommitteeSessionId, data_entry::DataEntryId,
-    investigation::InvestigationStatus, polling_station::PollingStationId,
+    committee_session::CommitteeSessionId, investigation::InvestigationStatus,
+    polling_station::PollingStationId, polling_station_data_entry::DataEntryId,
 };
 
 pub async fn save(

@@ -1,12 +1,15 @@
-use crate::APIError;
-use crate::domain::{
-    comparison::Compare,
-    election::{CandidateNumber, ElectionWithPoliticalGroups, PGNumber},
-    polling_station::PollingStation,
-    polling_station_results::count::Count,
-    validation::{DataError, FieldPath, Validate, ValidationResults},
+use crate::{
+    APIError,
+    domain::{
+        compare::Compare,
+        election::{CandidateNumber, ElectionWithPoliticalGroups, PGNumber},
+        field_path::FieldPath,
+        polling_station::PollingStation,
+        polling_station_results::count::Count,
+        validate::{DataError, Validate, ValidationResults},
+    },
+    error::ErrorReference,
 };
-use crate::error::ErrorReference;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 

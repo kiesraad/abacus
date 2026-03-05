@@ -1,13 +1,19 @@
-use crate::APIError;
-use crate::domain::comparison::Compare;
-use crate::domain::data_entry::PoliticalGroupTotalVotes;
-use crate::domain::election::ElectionWithPoliticalGroups;
-use crate::domain::polling_station::PollingStation;
-use crate::domain::polling_station_results::count::Count;
-use crate::domain::validation::{
-    DataError, FieldPath, Validate, ValidationResult, ValidationResultCode, ValidationResults,
+use crate::{
+    APIError,
+    domain::{
+        compare::Compare,
+        election::ElectionWithPoliticalGroups,
+        field_path::FieldPath,
+        polling_station::PollingStation,
+        polling_station_results::{
+            count::Count, political_group_total_votes::PoliticalGroupTotalVotes,
+        },
+        validate::{
+            DataError, Validate, ValidationResult, ValidationResultCode, ValidationResults,
+        },
+    },
+    error::ErrorReference,
 };
-use crate::error::ErrorReference;
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 use utoipa::ToSchema;

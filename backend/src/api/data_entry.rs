@@ -16,20 +16,20 @@ use crate::{
     domain::{
         committee_session::{CommitteeSession, CommitteeSessionError},
         committee_session_status::CommitteeSessionStatus,
-        data_entry::{DataEntryId, DataEntryStatusResponse, PollingStationDataEntry},
         data_entry_status::{
             ClientState, CurrentDataEntry, DataEntryStatus, DataEntryStatusName,
-            DataEntryTransitionError, EntriesDifferent,
+            DataEntryStatusResponse, DataEntryTransitionError, EntriesDifferent,
         },
         election::{ElectionId, ElectionWithPoliticalGroups, PoliticalGroup},
         entry_number::EntryNumber,
         investigation::InvestigationStatus,
         polling_station::{PollingStation, PollingStationId},
+        polling_station_data_entry::{DataEntryId, PollingStationDataEntry},
         polling_station_results::{
             PollingStationResults, common_polling_station_results::CommonPollingStationResults,
             cso_next_session_results::CSONextSessionResults,
         },
-        validation::{DataError, ValidateRoot, ValidationResults},
+        validate::{DataError, ValidateRoot, ValidationResults},
     },
     error::{ErrorReference, ErrorResponse},
     infra::audit_log::{AsAuditEvent, AuditEvent, AuditEventLevel, AuditEventType, AuditService},
@@ -990,7 +990,7 @@ mod tests {
             committee_session_status::CommitteeSessionStatus,
             polling_station_results::tests::example_polling_station_results,
             role::Role,
-            validation::{ValidationResult, ValidationResultCode},
+            validate::{ValidationResult, ValidationResultCode},
         },
         infra::audit_log::{self, AuditEventLevel},
         repository::{

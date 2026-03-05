@@ -1,11 +1,10 @@
 use crate::domain::{
-    comparison::Compare,
+    compare::Compare,
     election::ElectionWithPoliticalGroups,
+    field_path::FieldPath,
     polling_station::PollingStation,
     polling_station_results::{count::Count, yes_no::YesNo},
-    validation::{
-        DataError, FieldPath, Validate, ValidationResult, ValidationResultCode, ValidationResults,
-    },
+    validate::{DataError, Validate, ValidationResult, ValidationResultCode, ValidationResults},
 };
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
@@ -361,14 +360,15 @@ mod tests {
 
     use super::*;
     use crate::domain::{
-        data_entry::{PoliticalGroupTotalVotes, tests::ValidDefault},
         election::PGNumber,
         polling_station_results::{
             PollingStationResults, cso_first_session_results::CSOFirstSessionResults,
             cso_next_session_results::CSONextSessionResults,
             political_group_candidate_votes::PoliticalGroupCandidateVotes,
-            voters_counts::VotersCounts, votes_counts::VotesCounts,
+            political_group_total_votes::PoliticalGroupTotalVotes, voters_counts::VotersCounts,
+            votes_counts::VotesCounts,
         },
+        valid_default::ValidDefault,
     };
 
     impl ValidDefault for DifferencesCounts {

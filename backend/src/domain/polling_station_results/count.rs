@@ -1,8 +1,9 @@
 use crate::domain::{
-    comparison::Compare,
+    compare::Compare,
     election::ElectionWithPoliticalGroups,
+    field_path::FieldPath,
     polling_station::PollingStation,
-    validation::{DataError, FieldPath, Validate, ValidationResults},
+    validate::{DataError, Validate, ValidationResults},
 };
 
 pub type Count = u32;

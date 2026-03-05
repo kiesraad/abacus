@@ -7,10 +7,16 @@ use utoipa::ToSchema;
 
 use crate::{
     domain::{
+        compare::Compare,
         election::ElectionWithPoliticalGroups,
+        field_path::FieldPath,
         polling_station::PollingStation,
+        polling_station_data_entry::PollingStationDataEntry,
         polling_station_results::PollingStationResults,
-        validation::{DataError, ValidateRoot, ValidationResults},
+        validate::{
+            DataError, Validate, ValidateRoot, ValidationResult, ValidationResultCode,
+            ValidationResults,
+        },
     },
     repository::user_repo::UserId,
 };
@@ -42,6 +48,28 @@ impl From<ValidationResults> for DataEntryTransitionError {
     }
 }
 
+#[derive(Serialize, Deserialize, ToSchema, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct DataEntryStatusResponse {
+    pub status: DataEntryStatusName,
+}
+
+impl From<DataEntryStatus> for DataEntryStatusResponse {
+    fn from(data_entry_status: DataEntryStatus) -> Self {
+        DataEntryStatusResponse {
+            status: data_entry_status.status_name(),
+        }
+    }
+}
+
+impl From<PollingStationDataEntry> for DataEntryStatusResponse {
+    fn from(data_entry: PollingStationDataEntry) -> Self {
+        DataEntryStatusResponse {
+            status: data_entry.state.0.status_name(),
+        }
+    }
+}
+
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema)]
 #[serde(deny_unknown_fields, tag = "status", content = "state")]
 #[derive(Default)]
@@ -54,6 +82,64 @@ pub enum DataEntryStatus {
     SecondEntryInProgress(SecondEntryInProgress),
     EntriesDifferent(EntriesDifferent),
     Definitive(Definitive), // First and second entry are finished
+}
+
+impl ValidateRoot for DataEntryStatus {}
+
+impl Validate for DataEntryStatus {
+    fn validate(
+        &self,
+        election: &ElectionWithPoliticalGroups,
+        polling_station: &PollingStation,
+        validation_results: &mut ValidationResults,
+        path: &FieldPath,
+    ) -> Result<(), DataError> {
+        match self {
+            DataEntryStatus::FirstEntryInProgress(FirstEntryInProgress {
+                first_entry: entry,
+                ..
+            })
+            | DataEntryStatus::FirstEntryHasErrors(FirstEntryHasErrors {
+                finalised_first_entry: entry,
+                ..
+            })
+            | DataEntryStatus::FirstEntryFinalised(FirstEntryFinalised {
+                finalised_first_entry: entry,
+                ..
+            }) => {
+                entry.validate(
+                    election,
+                    polling_station,
+                    validation_results,
+                    &"data".into(),
+                )?;
+                Ok(())
+            }
+            DataEntryStatus::SecondEntryInProgress(state) => {
+                state.second_entry.validate(
+                    election,
+                    polling_station,
+                    validation_results,
+                    &"data".into(),
+                )?;
+                let mut different_fields: Vec<String> = vec![];
+                state.second_entry.compare(
+                    &state.finalised_first_entry,
+                    &mut different_fields,
+                    path,
+                );
+                if !different_fields.is_empty() {
+                    validation_results.warnings.push(ValidationResult {
+                        fields: different_fields.clone(),
+                        code: ValidationResultCode::W001,
+                        context: None,
+                    });
+                }
+                Ok(())
+            }
+            _ => Ok(()),
+        }
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize, strum::Display, Clone, PartialEq, Eq, ToSchema)]
@@ -714,7 +800,6 @@ mod tests {
     use super::*;
     use crate::domain::{
         committee_session::CommitteeSessionId,
-        data_entry::{PoliticalGroupTotalVotes, tests::ValidDefault},
         election::{
             Candidate, CandidateNumber, CommitteeCategory, ElectionCategory, ElectionId, PGNumber,
             PoliticalGroup, VoteCountingMethod,
@@ -723,10 +808,12 @@ mod tests {
         polling_station_results::{
             cso_first_session_results::CSOFirstSessionResults,
             political_group_candidate_votes::{CandidateVotes, PoliticalGroupCandidateVotes},
+            political_group_total_votes::PoliticalGroupTotalVotes,
             tests::example_polling_station_results,
             voters_counts::VotersCounts,
             votes_counts::VotesCounts,
         },
+        valid_default::ValidDefault,
     };
 
     fn cso_first_session_result() -> CSOFirstSessionResults {

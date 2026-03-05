@@ -5,7 +5,7 @@ use axum::{
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
-use crate::domain::{data_entry::DataEntryId, polling_station::PollingStationId};
+use crate::domain::{polling_station::PollingStationId, polling_station_data_entry::DataEntryId};
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
 #[serde(deny_unknown_fields, tag = "status", content = "state")]

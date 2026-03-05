@@ -1,7 +1,7 @@
 use crate::domain::{
-    comparison::Compare,
-    data_entry::PoliticalGroupTotalVotes,
+    compare::Compare,
     election::{ElectionWithPoliticalGroups, PoliticalGroup},
+    field_path::FieldPath,
     polling_station::PollingStation,
     polling_station_results::{
         common_polling_station_results::CommonPollingStationResults,
@@ -9,10 +9,11 @@ use crate::domain::{
         cso_next_session_results::CSONextSessionResults,
         differences_counts::DifferencesCounts,
         political_group_candidate_votes::{CandidateVotes, PoliticalGroupCandidateVotes},
+        political_group_total_votes::PoliticalGroupTotalVotes,
         voters_counts::VotersCounts,
         votes_counts::VotesCounts,
     },
-    validation::{DataError, FieldPath, Validate, ValidateRoot, ValidationResults},
+    validate::{DataError, Validate, ValidateRoot, ValidationResults},
 };
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
@@ -25,6 +26,7 @@ pub mod cso_next_session_results;
 pub mod differences_counts;
 pub mod extra_investigation;
 pub mod political_group_candidate_votes;
+pub mod political_group_total_votes;
 pub mod voters_counts;
 pub mod votes_counts;
 pub mod yes_no;
@@ -313,12 +315,12 @@ impl Validate for PollingStationResults {
 pub mod tests {
     use super::*;
     use crate::domain::{
-        data_entry::tests::ValidDefault,
         election::PGNumber,
         polling_station_results::{
             count::Count, differences_counts::DifferenceCountsCompareVotesCastAdmittedVoters,
             yes_no::YesNo,
         },
+        valid_default::ValidDefault,
     };
     use test_log::test;
 

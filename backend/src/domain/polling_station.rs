@@ -10,8 +10,8 @@ use utoipa::ToSchema;
 use crate::{
     APIError,
     domain::{
-        committee_session::CommitteeSessionId, data_entry::DataEntryId, election::ElectionId,
-        id::id,
+        committee_session::CommitteeSessionId, election::ElectionId, identifier::id,
+        polling_station_data_entry::DataEntryId,
     },
 };
 

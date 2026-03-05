@@ -1,5 +1,6 @@
 use crate::domain::{
     election::ElectionWithPoliticalGroups,
+    field_path::FieldPath,
     polling_station::PollingStation,
     polling_station_results::{
         differences_counts::{DifferencesCounts, validate_differences_counts},
@@ -7,9 +8,9 @@ use crate::domain::{
         voters_counts::VotersCounts,
         votes_counts::VotesCounts,
     },
-    validation::{
-        DataError, FieldPath, Validate, ValidationResult, ValidationResultCode,
-        ValidationResultContext, ValidationResults,
+    validate::{
+        DataError, Validate, ValidationResult, ValidationResultCode, ValidationResultContext,
+        ValidationResults,
     },
 };
 use serde::{Deserialize, Serialize};
@@ -204,9 +205,10 @@ impl From<CommonPollingStationResults> for CommonPollingStationResultsWithoutVot
 mod tests {
     use super::*;
     use crate::domain::{
-        data_entry::{PoliticalGroupTotalVotes, tests::ValidDefault},
         election::{PGNumber, tests::election_fixture},
         polling_station::test_helpers::polling_station_fixture,
+        polling_station_results::political_group_total_votes::PoliticalGroupTotalVotes,
+        valid_default::ValidDefault,
     };
     use test_log::test;
 

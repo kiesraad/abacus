@@ -1,11 +1,10 @@
 use crate::domain::{
-    comparison::Compare,
+    compare::Compare,
     election::ElectionWithPoliticalGroups,
+    field_path::FieldPath,
     polling_station::PollingStation,
     polling_station_results::count::Count,
-    validation::{
-        DataError, FieldPath, Validate, ValidationResult, ValidationResultCode, ValidationResults,
-    },
+    validate::{DataError, Validate, ValidationResult, ValidationResultCode, ValidationResults},
 };
 use serde::{Deserialize, Serialize};
 use std::ops::AddAssign;

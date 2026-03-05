@@ -1,11 +1,10 @@
 use crate::domain::{
-    comparison::Compare,
+    compare::Compare,
     election::ElectionWithPoliticalGroups,
+    field_path::FieldPath,
     polling_station::PollingStation,
     polling_station_results::yes_no::YesNo,
-    validation::{
-        DataError, FieldPath, Validate, ValidationResult, ValidationResultCode, ValidationResults,
-    },
+    validate::{DataError, Validate, ValidationResult, ValidationResultCode, ValidationResults},
 };
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
@@ -76,8 +75,8 @@ pub mod tests {
 
     use super::*;
     use crate::domain::{
-        data_entry::tests::ValidDefault, election::tests::election_fixture,
-        polling_station::test_helpers::polling_station_fixture,
+        election::tests::election_fixture, polling_station::test_helpers::polling_station_fixture,
+        valid_default::ValidDefault,
     };
 
     impl ValidDefault for ExtraInvestigation {

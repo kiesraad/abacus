@@ -572,7 +572,6 @@
     [
       {
         "id": 521,
-        "election_id": 4,
         "name": "Filmhuis De Gang",
         "number": 1,
         "number_of_voters": 1419,
@@ -591,7 +590,6 @@
     [
       {
         "id": 527,
-        "election_id": 4,
         "name": "Café Achter De Stembus",
         "number": 7,
         "number_of_voters": 1343,
@@ -610,7 +608,6 @@
     [
       {
         "id": 538,
-        "election_id": 4,
         "name": "Clubhuis De Genieter",
         "number": 18,
         "number_of_voters": 1521,

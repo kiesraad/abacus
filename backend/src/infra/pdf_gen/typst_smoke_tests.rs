@@ -172,7 +172,6 @@ fn random_election(
 
 fn random_polling_station(
     rng: &mut impl RngExt,
-    election: &ElectionWithPoliticalGroups,
     string_length: usize,
     none_where_possible: bool,
 ) -> PollingStation {
@@ -188,7 +187,6 @@ fn random_polling_station(
 
     PollingStation {
         id: PollingStationId::from(rng.random_range(0..5)),
-        election_id: election.id,
         name: random_string(rng, string_length),
         number: rng.random_range(0..5),
         number_of_voters: random_option(rng, number_of_voters, none_where_possible),
@@ -201,13 +199,12 @@ fn random_polling_station(
 
 fn random_polling_stations(
     rng: &mut impl RngExt,
-    election: &ElectionWithPoliticalGroups,
     string_length: usize,
     none_where_possible: bool,
 ) -> Vec<PollingStation> {
     let polling_station_count = rng.random_range(1..=5);
     (0..polling_station_count)
-        .map(|_| random_polling_station(rng, election, string_length, none_where_possible))
+        .map(|_| random_polling_station(rng, string_length, none_where_possible))
         .collect()
 }
 
@@ -411,7 +408,7 @@ async fn test_na_14_2() {
         let previous_committee_session =
             random_committee_session(&mut rng, election.id, string_length, none_where_possible);
         let polling_stations =
-            random_polling_stations(&mut rng, &election, string_length, none_where_possible);
+            random_polling_stations(&mut rng, string_length, none_where_possible);
         let previous_summary = random_election_summary(&mut rng, &election, &polling_stations);
         let summary = random_election_summary(&mut rng, &election, &polling_stations);
 
@@ -448,8 +445,7 @@ async fn test_na_14_2_bijlage_1() {
             string_length,
             none_where_possible,
         );
-        let polling_station =
-            random_polling_station(&mut rng, &election, string_length, none_where_possible);
+        let polling_station = random_polling_station(&mut rng, string_length, none_where_possible);
         let investigation = random_investigation(
             &mut rng,
             &polling_station,
@@ -486,7 +482,7 @@ async fn test_na_31_2() {
         let committee_session =
             random_committee_session(&mut rng, election.id, string_length, none_where_possible);
         let polling_stations =
-            random_polling_stations(&mut rng, &election, string_length, none_where_possible);
+            random_polling_stations(&mut rng, string_length, none_where_possible);
         let summary = random_election_summary(&mut rng, &election, &polling_stations);
         let hash = random_string(&mut rng, 64);
         let creation_date_time = random_date_time(&mut rng)
@@ -519,8 +515,7 @@ async fn test_na_31_2_bijlage_1() {
             string_length,
             none_where_possible,
         );
-        let polling_station =
-            random_polling_station(&mut rng, &election, string_length, none_where_possible);
+        let polling_station = random_polling_station(&mut rng, string_length, none_where_possible);
 
         let model = PdfModel::ModelNa31_2Bijlage1(Box::new(ModelNa31_2Bijlage1Input {
             candidates_tables: CandidatesTables::new(&election).unwrap(),
@@ -544,8 +539,7 @@ async fn test_n_10_2() {
             string_length,
             none_where_possible,
         );
-        let polling_station =
-            random_polling_station(&mut rng, &election, string_length, none_where_possible);
+        let polling_station = random_polling_station(&mut rng, string_length, none_where_possible);
 
         let model = PdfModel::ModelN10_2(Box::new(ModelN10_2Input {
             election,
@@ -571,7 +565,7 @@ async fn test_p_2a() {
         let committee_session =
             random_committee_session(&mut rng, election.id, string_length, none_where_possible);
         let polling_stations =
-            random_polling_stations(&mut rng, &election, string_length, none_where_possible);
+            random_polling_stations(&mut rng, string_length, none_where_possible);
 
         let mut investigations = polling_stations
             .iter()

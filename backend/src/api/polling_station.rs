@@ -149,7 +149,7 @@ async fn polling_station_list(
     Ok(PollingStationListResponse {
         polling_stations: list_polling_stations_for_session(&mut conn, &committee_session)
             .await?
-            .into_responses(),
+            .into_responses(election_id),
     })
 }
 
@@ -209,7 +209,7 @@ async fn polling_station_create(
         polling_station = create_empty_data_entry(&mut tx, polling_station.id()).await?;
     }
 
-    let response: PollingStationResponse = polling_station.into_response();
+    let response: PollingStationResponse = polling_station.into_response(election_id);
 
     audit_service
         .log(
@@ -267,7 +267,7 @@ async fn polling_station_get(
 ) -> Result<(StatusCode, PollingStationResponse), APIError> {
     let mut conn = pool.acquire().await?;
     let polling_station = get_for_election(&mut conn, election_id, polling_station_id).await?;
-    Ok((StatusCode::OK, polling_station.into_response()))
+    Ok((StatusCode::OK, polling_station.into_response(election_id)))
 }
 
 /// Update a [PollingStation]
@@ -311,7 +311,7 @@ async fn polling_station_update(
     )
     .await?;
 
-    let response: PollingStationResponse = polling_station.into_response();
+    let response: PollingStationResponse = polling_station.into_response(election_id);
 
     audit_service
         .log(
@@ -388,7 +388,7 @@ async fn polling_station_delete(
 
     delete(&mut tx, election_id, polling_station_id).await?;
 
-    let response: PollingStationResponse = polling_station.into_response();
+    let response: PollingStationResponse = polling_station.into_response(election_id);
     audit_service
         .log(
             &mut tx,
@@ -495,7 +495,7 @@ pub async fn create_imported_polling_stations(
 
     Ok(polling_station_list
         .into_iter()
-        .map(|ps| ps.into_response())
+        .map(|ps| ps.into_response(election_id))
         .collect())
 }
 

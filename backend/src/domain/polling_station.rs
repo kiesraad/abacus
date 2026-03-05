@@ -27,7 +27,6 @@ id!(PollingStationId);
 #[serde(deny_unknown_fields)]
 pub struct PollingStation {
     pub id: PollingStationId,
-    pub election_id: ElectionId,
     pub name: String,
     pub number: PollingStationNumber,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -171,40 +170,40 @@ impl PollingStationNextSession {
     }
 }
 
-impl From<PollingStationFirstSession> for PollingStationResponse {
-    fn from(ps: PollingStationFirstSession) -> Self {
-        Self {
-            id: ps.polling_station.id,
-            election_id: ps.polling_station.election_id,
-            committee_session_id: ps.committee_session_id,
+impl PollingStationFirstSession {
+    pub fn into_response(self, election_id: ElectionId) -> PollingStationResponse {
+        PollingStationResponse {
+            id: self.polling_station.id,
+            election_id,
+            committee_session_id: self.committee_session_id,
             prev_data_entry_id: None,
-            data_entry_id: ps.data_entry_id,
-            name: ps.polling_station.name,
-            number: ps.polling_station.number,
-            number_of_voters: ps.polling_station.number_of_voters,
-            polling_station_type: ps.polling_station.polling_station_type,
-            address: ps.polling_station.address,
-            postal_code: ps.polling_station.postal_code,
-            locality: ps.polling_station.locality,
+            data_entry_id: self.data_entry_id,
+            name: self.polling_station.name,
+            number: self.polling_station.number,
+            number_of_voters: self.polling_station.number_of_voters,
+            polling_station_type: self.polling_station.polling_station_type,
+            address: self.polling_station.address,
+            postal_code: self.polling_station.postal_code,
+            locality: self.polling_station.locality,
         }
     }
 }
 
-impl From<PollingStationNextSession> for PollingStationResponse {
-    fn from(ps: PollingStationNextSession) -> Self {
-        Self {
-            id: ps.polling_station.id,
-            election_id: ps.polling_station.election_id,
-            committee_session_id: ps.committee_session_id,
-            prev_data_entry_id: ps.prev_data_entry_id,
-            data_entry_id: ps.data_entry_id,
-            name: ps.polling_station.name,
-            number: ps.polling_station.number,
-            number_of_voters: ps.polling_station.number_of_voters,
-            polling_station_type: ps.polling_station.polling_station_type,
-            address: ps.polling_station.address,
-            postal_code: ps.polling_station.postal_code,
-            locality: ps.polling_station.locality,
+impl PollingStationNextSession {
+    pub fn into_response(self, election_id: ElectionId) -> PollingStationResponse {
+        PollingStationResponse {
+            id: self.polling_station.id,
+            election_id,
+            committee_session_id: self.committee_session_id,
+            prev_data_entry_id: self.prev_data_entry_id,
+            data_entry_id: self.data_entry_id,
+            name: self.polling_station.name,
+            number: self.polling_station.number,
+            number_of_voters: self.polling_station.number_of_voters,
+            polling_station_type: self.polling_station.polling_station_type,
+            address: self.polling_station.address,
+            postal_code: self.polling_station.postal_code,
+            locality: self.polling_station.locality,
         }
     }
 }
@@ -228,10 +227,6 @@ impl PollingStationForSession {
         self.polling_station().id
     }
 
-    pub fn election_id(&self) -> ElectionId {
-        self.polling_station().election_id
-    }
-
     pub fn committee_session_id(&self) -> CommitteeSessionId {
         match self {
             Self::First(ps) => ps.committee_session_id,
@@ -253,10 +248,10 @@ impl PollingStationForSession {
         }
     }
 
-    pub fn into_response(self) -> PollingStationResponse {
+    pub fn into_response(self, election_id: ElectionId) -> PollingStationResponse {
         match self {
-            Self::First(ps) => ps.into(),
-            Self::Next(ps) => ps.into(),
+            Self::First(ps) => ps.into_response(election_id),
+            Self::Next(ps) => ps.into_response(election_id),
         }
     }
 
@@ -306,10 +301,16 @@ impl PollingStationsForSession {
     }
 
     /// Convert into polling station API responses.
-    pub fn into_responses(self) -> Vec<PollingStationResponse> {
+    pub fn into_responses(self, election_id: ElectionId) -> Vec<PollingStationResponse> {
         match self {
-            Self::First(pss) => pss.into_iter().map(PollingStationResponse::from).collect(),
-            Self::Next(pss) => pss.into_iter().map(PollingStationResponse::from).collect(),
+            Self::First(pss) => pss
+                .into_iter()
+                .map(|ps| ps.into_response(election_id))
+                .collect(),
+            Self::Next(pss) => pss
+                .into_iter()
+                .map(|ps| ps.into_response(election_id))
+                .collect(),
         }
     }
 
@@ -325,15 +326,11 @@ impl PollingStationsForSession {
 #[cfg(test)]
 pub(crate) mod test_helpers {
     use super::*;
-    use crate::domain::election::{ElectionWithPoliticalGroups, tests::election_fixture};
 
     /// Create a test polling station.
     pub fn polling_station_fixture(number_of_voters: Option<u32>) -> PollingStation {
-        let election = election_fixture(&[]);
-
         PollingStation {
             id: PollingStationId::from(1),
-            election_id: election.id,
             name: "Testplek".to_string(),
             number: 34,
             number_of_voters,
@@ -346,16 +343,12 @@ pub(crate) mod test_helpers {
 
     /// Fixture for a vector of polling stations. The number of polling stations returned depends
     /// on the length of the `polling_station_voter_count` slice parameter.
-    pub fn polling_stations_fixture(
-        election: &ElectionWithPoliticalGroups,
-        polling_station_voter_count: &[u32],
-    ) -> Vec<PollingStation> {
+    pub fn polling_stations_fixture(polling_station_voter_count: &[u32]) -> Vec<PollingStation> {
         let mut polling_stations = Vec::new();
         for (i, voter_count) in polling_station_voter_count.iter().enumerate() {
             let idx = i + 1;
             polling_stations.push(PollingStation {
                 id: PollingStationId::from(u32::try_from(idx).unwrap()),
-                election_id: election.id,
                 name: format!("Testplek {idx}"),
                 number: u32::try_from(idx).unwrap() + 30,
                 number_of_voters: Some(*voter_count),

@@ -1,7 +1,7 @@
 pub mod committee_session;
 pub mod committee_session_status;
 pub mod compare;
-pub mod data_entry_status;
+pub mod data_entry;
 pub mod election;
 pub mod entry_number;
 pub mod field_path;

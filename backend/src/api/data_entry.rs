@@ -16,7 +16,7 @@ use crate::{
     domain::{
         committee_session::{CommitteeSession, CommitteeSessionError},
         committee_session_status::CommitteeSessionStatus,
-        data_entry_status::{
+        data_entry::{
             ClientState, CurrentDataEntry, DataEntryId, DataEntryStatus, DataEntryStatusName,
             DataEntryStatusResponse, DataEntryTransitionError, EntriesDifferent,
             PollingStationDataEntry,

@@ -1,7 +1,7 @@
 use sqlx::{SqliteConnection, query, types::Json};
 
 use crate::domain::{
-    committee_session::CommitteeSessionId, data_entry_status::DataEntryId,
+    committee_session::CommitteeSessionId, data_entry::DataEntryId,
     investigation::InvestigationStatus, polling_station::PollingStationId,
 };
 

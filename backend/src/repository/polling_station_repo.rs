@@ -3,7 +3,7 @@ use sqlx::{Connection, FromRow, SqliteConnection, query, query_as, types::Json};
 use crate::{
     domain::{
         committee_session::CommitteeSessionId,
-        data_entry_status::DataEntryId,
+        data_entry::DataEntryId,
         election::ElectionId,
         investigation::InvestigationStatus,
         polling_station::{

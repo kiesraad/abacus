@@ -2,7 +2,7 @@
 
 use abacus::{
     domain::{
-        data_entry_status::{CurrentDataEntry, DataEntryStatus, DataEntryTransitionError},
+        data_entry::{CurrentDataEntry, DataEntryStatus, DataEntryTransitionError},
         election::{
             CommitteeCategory, ElectionCategory, ElectionId, ElectionWithPoliticalGroups,
             VoteCountingMethod,

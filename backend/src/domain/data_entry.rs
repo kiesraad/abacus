@@ -6,12 +6,12 @@ use sqlx::types::Json;
 use sqlx::{FromRow, Type};
 use utoipa::ToSchema;
 
-use crate::domain::identifier::id;
 use crate::{
     domain::{
         compare::Compare,
         election::ElectionWithPoliticalGroups,
         field_path::FieldPath,
+        identifier::id,
         polling_station::PollingStation,
         results::PollingStationResults,
         validate::{
@@ -1718,7 +1718,7 @@ mod tests {
     mod finalised_with_warnings {
         use crate::{
             domain::{
-                data_entry_status::{
+                data_entry::{
                     DataEntryStatus,
                     tests::{
                         election, entries_different, example_polling_station_results,

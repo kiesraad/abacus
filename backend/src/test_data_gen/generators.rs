@@ -10,7 +10,7 @@ use crate::{
     domain::{
         committee_session::{CommitteeSession, CommitteeSessionCreateRequest},
         committee_session_status::CommitteeSessionStatus,
-        data_entry_status::{DataEntryStatus, Definitive, FirstEntryFinalised},
+        data_entry::{DataEntryStatus, Definitive, FirstEntryFinalised},
         election::{
             self, CandidateGender, CandidateNumber, CommitteeCategory, ElectionCategory,
             ElectionWithPoliticalGroups, NewElection, PGNumber, PoliticalGroup, VoteCountingMethod,

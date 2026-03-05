@@ -6,7 +6,7 @@ use crate::{
     api::data_entry::ElectionStatusResponseEntry,
     domain::{
         committee_session::CommitteeSessionId,
-        data_entry_status::{DataEntryStatus, PollingStationDataEntry},
+        data_entry::{DataEntryStatus, PollingStationDataEntry},
         polling_station::{PollingStation, PollingStationId},
         results::PollingStationResults,
     },
@@ -462,7 +462,7 @@ mod tests {
 
         use super::*;
         use crate::{
-            domain::data_entry_status,
+            domain::data_entry,
             repository::{polling_station_repo::insert_test_polling_station, user_repo::UserId},
             service::{create_definitive_data_entry, create_test_investigation},
         };
@@ -754,7 +754,7 @@ mod tests {
                 .await
                 .unwrap();
 
-            let state = DataEntryStatus::Definitive(data_entry_status::Definitive {
+            let state = DataEntryStatus::Definitive(data_entry::Definitive {
                 first_entry_user_id: UserId::from(5),
                 second_entry_user_id: UserId::from(6),
                 finished_at: chrono::Utc::now(),

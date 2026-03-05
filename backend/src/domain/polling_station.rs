@@ -11,7 +11,7 @@ use crate::{
     APIError,
     domain::{
         committee_session::CommitteeSessionId,
-        data_entry_status::DataEntryId,
+        data_entry::DataEntryId,
         election::ElectionId,
         identifier::id,
         investigation::{InvestigationStatus, PollingStationInvestigation},

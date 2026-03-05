@@ -48,7 +48,7 @@ pub async fn create_definitive_data_entry(
     results: &crate::domain::results::PollingStationResults,
 ) -> Result<(), DataEntryServiceError> {
     use crate::{
-        domain::data_entry_status::{DataEntryStatus, Definitive},
+        domain::data_entry::{DataEntryStatus, Definitive},
         repository::user_repo::UserId,
     };
 

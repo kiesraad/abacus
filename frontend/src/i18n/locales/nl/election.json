@@ -55,7 +55,6 @@
     "title": "Afwijkende verkiezing",
     "description": "Het bestand <file>filename</file> bevat stembureaus voor een andere verkiezing. Controleer voor je verder gaat of de stembureaus juist zijn."
   },
-  "level_polling_station": "Type stembureau",
   "location": "Gebied",
   "manage": "Verkiezingen beheren",
   "no_elections_added": "Nog geen verkiezingen ingesteld",

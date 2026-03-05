@@ -16,7 +16,7 @@
     "candidates_description": "Het bestand <file>filename</file> is geïmporteerd en bevat de volgende kandidaten:",
     "candidates_title": "Controleer kandidatenlijsten",
     "check_hash": {
-      "description": "Vul ter controle de hierboven afgeschermde delen van de digitale vingerafdruk in. De volledige code heb je van de Kiesraad ontvangen.",
+      "description": "Vul ter controle de hierboven afgeschermde delen van de digitale vingerafdruk in. De volledige code heb je van het centraal stembureau ontvangen.",
       "hint": "Vul 4 karakters in",
       "label": "Controle deel {stub}"
     },
@@ -83,8 +83,8 @@
     "plural": "Verkiezingen",
     "singular": "Verkiezing"
   },
-  "use_instructions_to_import_candidates_eml": "Je hebt van de Kiesraad instructies gekregen waarmee je het bestand met de kandidatenlijsten kunt downloaden. Zet het bestand op deze computer en importeer het.",
-  "use_instructions_to_import_eml": "Je hebt van de Kiesraad instructies gekregen waarmee je de verkiezingsdefinitie kunt downloaden. Zet het bestand op deze computer en importeer het.",
+  "use_instructions_to_import_candidates_eml": "Je hebt van het centraal stembureau instructies gekregen waarmee je het bestand met de kandidatenlijsten kunt downloaden. Zet het bestand op deze computer en importeer het.",
+  "use_instructions_to_import_eml": "Je hebt van het centraal stembureau instructies gekregen waarmee je de verkiezingsdefinitie kunt downloaden. Zet het bestand op deze computer en importeer het.",
   "use_instructions_to_import_polling_stations_eml": "Importeer het bestand met stembureaus. Heb je geen bestand met stembureaus? Je kan ze later nog handmatig invoeren. Sla deze stap dan over.",
   "voting_method_type": {
     "cso": "Centrale stemopneming (CSO)",

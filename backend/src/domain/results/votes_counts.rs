@@ -5,9 +5,7 @@ use crate::{
         election::ElectionWithPoliticalGroups,
         field_path::FieldPath,
         polling_station::PollingStation,
-        polling_station_results::{
-            count::Count, political_group_total_votes::PoliticalGroupTotalVotes,
-        },
+        results::{count::Count, political_group_total_votes::PoliticalGroupTotalVotes},
         validate::{
             DataError, Validate, ValidationResult, ValidationResultCode, ValidationResults,
         },

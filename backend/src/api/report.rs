@@ -27,7 +27,7 @@ use crate::{
         investigation::PollingStationInvestigation,
         models::{ModelNa14_2Input, ModelNa31_2Input, ModelP2aInput, PdfFileModel, ToPdfFileModel},
         polling_station::PollingStation,
-        polling_station_results::PollingStationResults,
+        results::PollingStationResults,
         summary::ElectionSummary,
         votes_table::{VotesTables, VotesTablesWithPreviousVotes},
     },

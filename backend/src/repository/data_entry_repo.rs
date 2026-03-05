@@ -8,7 +8,7 @@ use crate::{
         committee_session::CommitteeSessionId,
         data_entry_status::{DataEntryStatus, PollingStationDataEntry},
         polling_station::{PollingStation, PollingStationId},
-        polling_station_results::PollingStationResults,
+        results::PollingStationResults,
     },
     repository::{committee_session_repo, polling_station_repo},
 };
@@ -431,7 +431,7 @@ mod tests {
 
     use super::*;
     use crate::domain::{
-        polling_station_results::{
+        results::{
             cso_first_session_results::CSOFirstSessionResults,
             differences_counts::DifferencesCounts, voters_counts::VotersCounts,
             votes_counts::VotesCounts,

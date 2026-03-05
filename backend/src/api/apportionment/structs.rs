@@ -4,9 +4,7 @@ use utoipa::ToSchema;
 
 use crate::domain::{
     election::{self, Candidate, PGNumber},
-    polling_station_results::political_group_candidate_votes::{
-        CandidateVotes, PoliticalGroupCandidateVotes,
-    },
+    results::political_group_candidate_votes::{CandidateVotes, PoliticalGroupCandidateVotes},
     summary::ElectionSummary,
 };
 

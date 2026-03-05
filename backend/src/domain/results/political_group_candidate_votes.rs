@@ -5,7 +5,7 @@ use crate::{
         election::{CandidateNumber, ElectionWithPoliticalGroups, PGNumber},
         field_path::FieldPath,
         polling_station::PollingStation,
-        polling_station_results::count::Count,
+        results::count::Count,
         validate::{DataError, Validate, ValidationResults},
     },
     error::ErrorReference,

@@ -12,7 +12,7 @@ use abacus::{
         election::{CommitteeCategory, ElectionWithPoliticalGroups},
         models::{ModelNa31_2Input, ToPdfFileModel},
         polling_station::PollingStation,
-        polling_station_results::PollingStationResults,
+        results::PollingStationResults,
         summary::ElectionSummary,
         votes_table::VotesTables,
     },

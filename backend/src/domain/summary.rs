@@ -6,7 +6,7 @@ use crate::{
     domain::{
         election::ElectionWithPoliticalGroups,
         polling_station::{PollingStation, PollingStationNumber},
-        polling_station_results::{
+        results::{
             PollingStationResults,
             count::Count,
             cso_first_session_results::CSOFirstSessionResults,
@@ -306,7 +306,7 @@ mod tests {
     use crate::domain::{
         election::{PGNumber, tests::election_fixture},
         polling_station::test_helpers::polling_stations_fixture,
-        polling_station_results::{extra_investigation::ExtraInvestigation, yes_no::YesNo},
+        results::{extra_investigation::ExtraInvestigation, yes_no::YesNo},
         valid_default::ValidDefault,
     };
 

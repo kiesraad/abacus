@@ -3,7 +3,7 @@ use crate::domain::{
     election::ElectionWithPoliticalGroups,
     field_path::FieldPath,
     polling_station::PollingStation,
-    polling_station_results::count::Count,
+    results::count::Count,
     validate::{DataError, Validate, ValidationResult, ValidationResultCode, ValidationResults},
 };
 use serde::{Deserialize, Serialize};

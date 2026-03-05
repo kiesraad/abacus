@@ -8,7 +8,7 @@ use crate::{
         election::{
             Candidate, CandidateNumber, ElectionWithPoliticalGroups, PGNumber, PoliticalGroup,
         },
-        polling_station_results::{
+        results::{
             common_polling_station_results::CommonPollingStationResults, count::Count,
             political_group_candidate_votes::PoliticalGroupCandidateVotes,
         },
@@ -315,7 +315,7 @@ mod tests {
     use super::*;
     use crate::domain::{
         election::{CommitteeCategory, ElectionCategory, ElectionId, VoteCountingMethod},
-        polling_station_results::political_group_candidate_votes::CandidateVotes,
+        results::political_group_candidate_votes::CandidateVotes,
     };
 
     fn sample_candidate(number: CandidateNumber) -> Candidate {

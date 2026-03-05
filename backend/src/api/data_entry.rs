@@ -25,7 +25,7 @@ use crate::{
         entry_number::EntryNumber,
         investigation::InvestigationStatus,
         polling_station::{PollingStation, PollingStationId},
-        polling_station_results::{
+        results::{
             PollingStationResults, common_polling_station_results::CommonPollingStationResults,
             cso_next_session_results::CSONextSessionResults,
         },
@@ -986,7 +986,7 @@ mod tests {
         domain::{
             committee_session::CommitteeSessionId,
             committee_session_status::CommitteeSessionStatus,
-            polling_station_results::tests::example_polling_station_results,
+            results::tests::example_polling_station_results,
             role::Role,
             validate::{ValidationResult, ValidationResultCode},
         },

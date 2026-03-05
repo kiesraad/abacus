@@ -3,7 +3,7 @@ use crate::domain::{
     election::{ElectionWithPoliticalGroups, PoliticalGroup},
     field_path::FieldPath,
     polling_station::PollingStation,
-    polling_station_results::{
+    results::{
         common_polling_station_results::CommonPollingStationResults,
         cso_first_session_results::CSOFirstSessionResults,
         cso_next_session_results::CSONextSessionResults,
@@ -316,7 +316,7 @@ pub mod tests {
     use super::*;
     use crate::domain::{
         election::PGNumber,
-        polling_station_results::{
+        results::{
             count::Count, differences_counts::DifferenceCountsCompareVotesCastAdmittedVoters,
             yes_no::YesNo,
         },

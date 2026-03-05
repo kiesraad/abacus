@@ -2,7 +2,7 @@ use crate::domain::{
     election::ElectionWithPoliticalGroups,
     field_path::FieldPath,
     polling_station::PollingStation,
-    polling_station_results::{
+    results::{
         differences_counts::{DifferencesCounts, validate_differences_counts},
         political_group_candidate_votes::PoliticalGroupCandidateVotes,
         voters_counts::VotersCounts,
@@ -207,7 +207,7 @@ mod tests {
     use crate::domain::{
         election::{PGNumber, tests::election_fixture},
         polling_station::test_helpers::polling_station_fixture,
-        polling_station_results::political_group_total_votes::PoliticalGroupTotalVotes,
+        results::political_group_total_votes::PoliticalGroupTotalVotes,
         valid_default::ValidDefault,
     };
     use test_log::test;

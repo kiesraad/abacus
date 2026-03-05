@@ -10,7 +10,7 @@ pub mod identifier;
 pub mod investigation;
 pub mod models;
 pub mod polling_station;
-pub mod polling_station_results;
+pub mod results;
 pub mod role;
 pub mod summary;
 #[cfg(test)]

@@ -25,7 +25,7 @@ use crate::{
             ModelNa31_2Input, ModelP2aInput, PdfFileModel, PdfModel,
         },
         polling_station::{PollingStation, PollingStationId, PollingStationType},
-        polling_station_results::{
+        results::{
             common_polling_station_results::CommonPollingStationResults,
             differences_counts::{
                 DifferenceCountsCompareVotesCastAdmittedVoters, DifferencesCounts,

@@ -13,7 +13,7 @@ use crate::{
         election::ElectionWithPoliticalGroups,
         field_path::FieldPath,
         polling_station::PollingStation,
-        polling_station_results::PollingStationResults,
+        results::PollingStationResults,
         validate::{
             DataError, Validate, ValidateRoot, ValidationResult, ValidationResultCode,
             ValidationResults,
@@ -817,7 +817,7 @@ mod tests {
             PoliticalGroup, VoteCountingMethod,
         },
         polling_station::{PollingStation, PollingStationId, PollingStationType},
-        polling_station_results::{
+        results::{
             cso_first_session_results::CSOFirstSessionResults,
             political_group_candidate_votes::{CandidateVotes, PoliticalGroupCandidateVotes},
             political_group_total_votes::PoliticalGroupTotalVotes,
@@ -1725,7 +1725,7 @@ mod tests {
                         first_entry_in_progress, polling_station, second_entry_in_progress,
                     },
                 },
-                polling_station_results::PollingStationResults,
+                results::PollingStationResults,
             },
             repository::user_repo::UserId,
         };

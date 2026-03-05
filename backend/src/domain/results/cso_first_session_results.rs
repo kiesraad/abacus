@@ -1,7 +1,7 @@
 use crate::domain::{
     compare::Compare,
     field_path::FieldPath,
-    polling_station_results::{
+    results::{
         counting_differences_polling_station::CountingDifferencesPollingStation,
         differences_counts::DifferencesCounts, extra_investigation::ExtraInvestigation,
         political_group_candidate_votes::PoliticalGroupCandidateVotes, voters_counts::VotersCounts,

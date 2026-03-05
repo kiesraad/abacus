@@ -17,7 +17,7 @@ use crate::{
         },
         field_path::FieldPath,
         polling_station::{PollingStation, PollingStationRequest, PollingStationType},
-        polling_station_results::{
+        results::{
             PollingStationResults,
             counting_differences_polling_station::CountingDifferencesPollingStation,
             cso_first_session_results::CSOFirstSessionResults,

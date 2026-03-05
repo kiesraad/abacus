@@ -38,7 +38,7 @@ use crate::domain::{
         Candidate, CandidateGender, CandidateNumber, CommitteeCategory,
         ElectionWithPoliticalGroups, NewElection, PGNumber, PoliticalGroup, VoteCountingMethod,
     },
-    polling_station_results::political_group_candidate_votes::PoliticalGroupCandidateVotes,
+    results::political_group_candidate_votes::PoliticalGroupCandidateVotes,
     summary::ElectionSummary,
 };
 
@@ -495,7 +495,7 @@ impl ElectionWithPoliticalGroups {
         committee_session: &CommitteeSession,
         results: &[(
             crate::domain::polling_station::PollingStation,
-            crate::domain::polling_station_results::PollingStationResults,
+            crate::domain::results::PollingStationResults,
         )],
         summary: &ElectionSummary,
         timestamp: DateTime<Local>,
@@ -528,7 +528,7 @@ impl ElectionWithPoliticalGroups {
         committee_session: &CommitteeSession,
         results: &[(
             crate::domain::polling_station::PollingStation,
-            crate::domain::polling_station_results::PollingStationResults,
+            crate::domain::results::PollingStationResults,
         )],
         summary: &ElectionSummary,
         authority_id: &str,
@@ -618,7 +618,7 @@ impl ElectionWithPoliticalGroups {
         committee_session: &CommitteeSession,
         authority_id: &str,
         polling_station: &crate::domain::polling_station::PollingStation,
-        results: &crate::domain::polling_station_results::PollingStationResults,
+        results: &crate::domain::results::PollingStationResults,
     ) -> Result<ReportingUnitVotes, EMLError> {
         let mut builder = ReportingUnitVotes::builder()
             .identifier(ReportingUnitIdentifier::new(
@@ -670,7 +670,7 @@ impl ElectionWithPoliticalGroups {
 fn add_reporting_unit_investigations(
     mut builder: ReportingUnitVotesBuilder,
     committee_session: &CommitteeSession,
-    results: &crate::domain::polling_station_results::PollingStationResults,
+    results: &crate::domain::results::PollingStationResults,
 ) -> ReportingUnitVotesBuilder {
     if !committee_session.is_next_session()
         && let Some(first_session_result) = results.as_cso_first_session()

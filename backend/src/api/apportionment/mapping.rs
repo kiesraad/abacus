@@ -7,7 +7,7 @@ use crate::{
     },
     domain::{
         election::{Candidate, CandidateNumber, PGNumber, PoliticalGroup},
-        polling_station_results::political_group_candidate_votes::PoliticalGroupCandidateVotes,
+        results::political_group_candidate_votes::PoliticalGroupCandidateVotes,
     },
 };
 

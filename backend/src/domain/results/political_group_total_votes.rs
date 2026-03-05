@@ -3,7 +3,7 @@ use crate::domain::{
     election::{ElectionWithPoliticalGroups, PGNumber},
     field_path::FieldPath,
     polling_station::PollingStation,
-    polling_station_results::count::Count,
+    results::count::Count,
     validate::{DataError, Validate, ValidationResults},
 };
 use serde::{Deserialize, Serialize};
@@ -74,9 +74,7 @@ mod tests {
     use crate::domain::{
         election::{CandidateNumber, tests::election_fixture},
         polling_station::test_helpers::polling_station_fixture,
-        polling_station_results::political_group_candidate_votes::{
-            CandidateVotes, PoliticalGroupCandidateVotes,
-        },
+        results::political_group_candidate_votes::{CandidateVotes, PoliticalGroupCandidateVotes},
     };
     use test_log::test;
 

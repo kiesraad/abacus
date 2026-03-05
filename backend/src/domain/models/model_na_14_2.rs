@@ -6,7 +6,7 @@ use crate::domain::{
     investigation::PollingStationInvestigation,
     models::{PdfFileModel, PdfModel, ToPdfFileModel},
     polling_station::PollingStation,
-    polling_station_results::common_polling_station_results::CommonPollingStationResultsWithoutVotes,
+    results::common_polling_station_results::CommonPollingStationResultsWithoutVotes,
     summary::ElectionSummaryWithoutVotes,
     votes_table::{VotesTablesWithOnlyPreviousVotes, VotesTablesWithPreviousVotes},
 };

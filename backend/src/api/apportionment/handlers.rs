@@ -21,7 +21,7 @@ use crate::{
         committee_session_status::CommitteeSessionStatus,
         election::{Election, ElectionId},
         polling_station::PollingStation,
-        polling_station_results::PollingStationResults,
+        results::PollingStationResults,
         summary::ElectionSummary,
     },
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType},

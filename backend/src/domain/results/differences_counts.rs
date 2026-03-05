@@ -3,7 +3,7 @@ use crate::domain::{
     election::ElectionWithPoliticalGroups,
     field_path::FieldPath,
     polling_station::PollingStation,
-    polling_station_results::{count::Count, yes_no::YesNo},
+    results::{count::Count, yes_no::YesNo},
     validate::{DataError, Validate, ValidationResult, ValidationResultCode, ValidationResults},
 };
 use serde::{Deserialize, Serialize};
@@ -361,7 +361,7 @@ mod tests {
     use super::*;
     use crate::domain::{
         election::PGNumber,
-        polling_station_results::{
+        results::{
             PollingStationResults, cso_first_session_results::CSOFirstSessionResults,
             cso_next_session_results::CSONextSessionResults,
             political_group_candidate_votes::PoliticalGroupCandidateVotes,

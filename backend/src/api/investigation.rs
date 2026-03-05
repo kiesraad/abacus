@@ -27,7 +27,7 @@ use crate::{
         },
         models::{ModelNa14_2Bijlage1Input, ToPdfFileModel},
         polling_station::{PollingStation, PollingStationId},
-        polling_station_results::PollingStationResults,
+        results::PollingStationResults,
         votes_table::VotesTablesWithOnlyPreviousVotes,
     },
     error::ErrorReference,

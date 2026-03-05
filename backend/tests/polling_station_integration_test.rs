@@ -147,7 +147,7 @@ async fn test_listing(pool: SqlitePool) {
     path = "../fixtures",
     scripts("election_6_no_polling_stations", "users")
 )))]
-async fn test_creation_for_committee_session_with_created_and_in_preparation_status_as_coordinator_works(
+async fn test_creation_for_committee_session_with_created_and_ready_status_as_coordinator_works(
     pool: SqlitePool,
 ) {
     let addr = serve_api(pool).await;
@@ -172,7 +172,7 @@ async fn test_creation_for_committee_session_with_created_and_in_preparation_sta
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(committee_session["status"], "in_preparation");
+    assert_eq!(committee_session["status"], "ready");
 
     // Create another polling station
     let response = create_polling_station(&addr, &coordinator_cookie, election_id, 2).await;
@@ -188,7 +188,7 @@ async fn test_creation_for_committee_session_with_created_and_in_preparation_sta
     path = "../fixtures",
     scripts("election_6_no_polling_stations", "users")
 )))]
-async fn test_creation_for_committee_session_with_created_and_in_preparation_status_as_administrator_works(
+async fn test_creation_for_committee_session_with_created_and_ready_status_as_administrator_works(
     pool: SqlitePool,
 ) {
     let addr = serve_api(pool).await;
@@ -211,7 +211,7 @@ async fn test_creation_for_committee_session_with_created_and_in_preparation_sta
     assert_eq!(body["polling_station_type"], "FixedLocation");
 
     let committee_session = get_election_committee_session(&addr, &admin_cookie, election_id).await;
-    assert_eq!(committee_session["status"], "in_preparation");
+    assert_eq!(committee_session["status"], "ready");
 
     // Create another polling station
     let response = create_polling_station(&addr, &admin_cookie, election_id, 2).await;
@@ -400,7 +400,7 @@ async fn test_update_for_committee_session_with_created_status_as_administrator_
     path = "../fixtures",
     scripts("election_6_no_polling_stations", "users")
 )))]
-async fn test_update_for_committee_session_with_in_preparation_status_as_coordinator_works(
+async fn test_update_for_committee_session_with_ready_status_as_coordinator_works(
     pool: SqlitePool,
 ) {
     let addr = serve_api(pool).await;
@@ -417,7 +417,7 @@ async fn test_update_for_committee_session_with_in_preparation_status_as_coordin
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(committee_session["status"], "in_preparation");
+    assert_eq!(committee_session["status"], "ready");
 
     let response = update_polling_station(
         &addr,
@@ -455,14 +455,14 @@ async fn test_update_for_committee_session_with_in_preparation_status_as_coordin
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(committee_session["status"], "in_preparation");
+    assert_eq!(committee_session["status"], "ready");
 }
 
 #[test(sqlx::test(fixtures(
     path = "../fixtures",
     scripts("election_6_no_polling_stations", "users")
 )))]
-async fn test_update_for_committee_session_with_in_preparation_status_as_administrator_works(
+async fn test_update_for_committee_session_with_ready_status_as_administrator_works(
     pool: SqlitePool,
 ) {
     let addr = serve_api(pool).await;
@@ -477,7 +477,7 @@ async fn test_update_for_committee_session_with_in_preparation_status_as_adminis
     let polling_station_id = u32::try_from(body.get("id").unwrap().as_u64().unwrap()).unwrap();
 
     let committee_session = get_election_committee_session(&addr, &admin_cookie, election_id).await;
-    assert_eq!(committee_session["status"], "in_preparation");
+    assert_eq!(committee_session["status"], "ready");
 
     let response = update_polling_station(
         &addr,
@@ -513,7 +513,7 @@ async fn test_update_for_committee_session_with_in_preparation_status_as_adminis
     assert_eq!(body["address"], "Teststraat 2a");
 
     let committee_session = get_election_committee_session(&addr, &admin_cookie, election_id).await;
-    assert_eq!(committee_session["status"], "in_preparation");
+    assert_eq!(committee_session["status"], "ready");
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_4", "users"))))]
@@ -737,7 +737,7 @@ async fn test_delete_for_committee_session_with_created_status_as_administrator_
     path = "../fixtures",
     scripts("election_6_no_polling_stations", "users")
 )))]
-async fn test_delete_for_committee_session_with_in_preparation_status_as_coordinator_works(
+async fn test_delete_for_committee_session_with_ready_status_as_coordinator_works(
     pool: SqlitePool,
 ) {
     let addr = serve_api(pool).await;
@@ -754,7 +754,7 @@ async fn test_delete_for_committee_session_with_in_preparation_status_as_coordin
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(committee_session["status"], "in_preparation");
+    assert_eq!(committee_session["status"], "ready");
 
     let response =
         delete_polling_station(&addr, &coordinator_cookie, election_id, polling_station_id).await;
@@ -770,7 +770,7 @@ async fn test_delete_for_committee_session_with_in_preparation_status_as_coordin
     path = "../fixtures",
     scripts("election_6_no_polling_stations", "users")
 )))]
-async fn test_delete_for_committee_session_with_in_preparation_status_as_administrator_works(
+async fn test_delete_for_committee_session_with_ready_status_as_administrator_works(
     pool: SqlitePool,
 ) {
     let addr = serve_api(pool).await;
@@ -785,7 +785,7 @@ async fn test_delete_for_committee_session_with_in_preparation_status_as_adminis
     let polling_station_id = u32::try_from(body.get("id").unwrap().as_u64().unwrap()).unwrap();
 
     let committee_session = get_election_committee_session(&addr, &admin_cookie, election_id).await;
-    assert_eq!(committee_session["status"], "in_preparation");
+    assert_eq!(committee_session["status"], "ready");
 
     let response =
         delete_polling_station(&addr, &admin_cookie, election_id, polling_station_id).await;
@@ -1125,7 +1125,7 @@ async fn test_import_correct_file(pool: SqlitePool) {
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(committee_session["status"], "in_preparation");
+    assert_eq!(committee_session["status"], "ready");
 }
 
 async fn check_completed_to_data_entry_on<F, Fut>(

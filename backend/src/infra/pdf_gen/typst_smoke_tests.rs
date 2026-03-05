@@ -231,7 +231,7 @@ fn random_committee_session(
             rng,
             &[
                 CommitteeSessionStatus::Created,
-                CommitteeSessionStatus::InPreparation,
+                CommitteeSessionStatus::Ready,
                 CommitteeSessionStatus::DataEntry,
                 CommitteeSessionStatus::Paused,
                 CommitteeSessionStatus::Completed,

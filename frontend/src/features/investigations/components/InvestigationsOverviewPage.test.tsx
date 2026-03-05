@@ -274,7 +274,7 @@ describe("InvestigationsOverviewPage", () => {
   test("Shows start data entry modal when clicking fill findings button", async () => {
     server.use(CommitteeSessionStatusChangeRequestHandler);
 
-    const electionData = getElectionMockData({}, { number: 2, status: "in_preparation" }, [
+    const electionData = getElectionMockData({}, { number: 2, status: "ready" }, [
       {
         polling_station_id: 1,
         reason: "Test reason 1",

@@ -149,7 +149,7 @@ export function CommitteeSessionCard({
       addIf(detailsButtonLink, isCurrentSession && isCoordinator);
       addIf(deleteButtonLink, isCurrentSession && isCoordinator && isNextSession);
       break;
-    case "in_preparation":
+    case "ready":
       addIf(investigationsButtonLink, isCurrentSession && isNextSession);
       addIf(detailsButtonLink, isCurrentSession && isCoordinator);
       addIf(deleteButtonLink, isCurrentSession && isCoordinator && isNextSession);

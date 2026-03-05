@@ -162,7 +162,7 @@ pub fn validate_user_is_allowed_to_perform_action(
     if user.role().is_coordinator()
         || (user.role().is_administrator()
             && (committee_session.status == CommitteeSessionStatus::Created
-                || committee_session.status == CommitteeSessionStatus::InPreparation))
+                || committee_session.status == CommitteeSessionStatus::Ready))
     {
         Ok(())
     } else {
@@ -225,7 +225,7 @@ async fn polling_station_create(
         change_committee_session_status(
             &mut tx,
             committee_session.id,
-            CommitteeSessionStatus::InPreparation,
+            CommitteeSessionStatus::Ready,
             audit_service,
         )
         .await?;
@@ -481,11 +481,11 @@ pub async fn create_imported_polling_stations(
         .await?;
 
     if committee_session.status == CommitteeSessionStatus::Created {
-        // Change committee session status to InPreparation
+        // Change committee session status to Ready
         change_committee_session_status(
             &mut tx,
             committee_session.id,
-            CommitteeSessionStatus::InPreparation,
+            CommitteeSessionStatus::Ready,
             audit_service,
         )
         .await?;

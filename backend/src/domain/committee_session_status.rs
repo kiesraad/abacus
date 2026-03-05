@@ -28,10 +28,15 @@ use crate::domain::committee_session::{
 #[derive(Default)]
 pub enum CommitteeSessionStatus {
     #[default]
+    /// Zitting voorbereiden
     Created,
-    InPreparation,
+    /// Klaar voor invoer
+    Ready,
+    /// Invoer bezig
     DataEntry,
+    /// Invoer gepauzeerd
     Paused,
+    /// Invoer afgerond
     Completed,
 }
 
@@ -67,7 +72,7 @@ impl CommitteeSessionStatus {
     {
         match self {
             CommitteeSessionStatus::Created => Ok(self),
-            CommitteeSessionStatus::InPreparation
+            CommitteeSessionStatus::Ready
             | CommitteeSessionStatus::DataEntry
             | CommitteeSessionStatus::Paused
             | CommitteeSessionStatus::Completed => {
@@ -98,9 +103,9 @@ impl CommitteeSessionStatus {
                 {
                     return Err(CommitteeSessionError::InvalidStatusTransition);
                 }
-                Ok(CommitteeSessionStatus::InPreparation)
+                Ok(CommitteeSessionStatus::Ready)
             }
-            CommitteeSessionStatus::InPreparation => Ok(self),
+            CommitteeSessionStatus::Ready => Ok(self),
             CommitteeSessionStatus::DataEntry
             | CommitteeSessionStatus::Paused
             | CommitteeSessionStatus::Completed => {
@@ -112,7 +117,7 @@ impl CommitteeSessionStatus {
     pub fn start_data_entry(self) -> Result<Self, CommitteeSessionError> {
         match self {
             CommitteeSessionStatus::Created => Err(CommitteeSessionError::InvalidStatusTransition),
-            CommitteeSessionStatus::InPreparation => Ok(CommitteeSessionStatus::DataEntry),
+            CommitteeSessionStatus::Ready => Ok(CommitteeSessionStatus::DataEntry),
             CommitteeSessionStatus::DataEntry => Ok(self),
             CommitteeSessionStatus::Paused | CommitteeSessionStatus::Completed => {
                 Ok(CommitteeSessionStatus::DataEntry)
@@ -122,7 +127,7 @@ impl CommitteeSessionStatus {
 
     pub fn pause_data_entry(self) -> Result<Self, CommitteeSessionError> {
         match self {
-            CommitteeSessionStatus::Created | CommitteeSessionStatus::InPreparation => {
+            CommitteeSessionStatus::Created | CommitteeSessionStatus::Ready => {
                 Err(CommitteeSessionError::InvalidStatusTransition)
             }
             CommitteeSessionStatus::DataEntry => Ok(CommitteeSessionStatus::Paused),
@@ -142,7 +147,7 @@ impl CommitteeSessionStatus {
         T: DataEntryCompleteResultsProvider,
     {
         match self {
-            CommitteeSessionStatus::Created | CommitteeSessionStatus::InPreparation => {
+            CommitteeSessionStatus::Created | CommitteeSessionStatus::Ready => {
                 Err(CommitteeSessionError::InvalidStatusTransition)
             }
             CommitteeSessionStatus::DataEntry | CommitteeSessionStatus::Paused => {
@@ -223,22 +228,22 @@ mod tests {
                 (Created, Next, true, true, Ok(Created)),
                 (Created, Next, true, false, Ok(Created)),
                 // No polling stations
-                (InPreparation, First, false, false, Ok(Created)),
+                (Ready, First, false, false, Ok(Created)),
                 (DataEntry, First, false, false, Ok(Created)),
                 (Paused, First, false, false, Ok(Created)),
                 (Completed, First, false, false, Ok(Created)),
                 // First session + polling stations
-                (InPreparation, First, true, false, err()),
+                (Ready, First, true, false, err()),
                 (DataEntry, First, true, false, err()),
                 (Paused, First, true, false, err()),
                 (Completed, First, true, false, err()),
                 // Next session + polling stations but no investigations
-                (InPreparation, Next, true, false, Ok(Created)),
+                (Ready, Next, true, false, Ok(Created)),
                 (DataEntry, Next, true, false, Ok(Created)),
                 (Paused, Next, true, false, Ok(Created)),
                 (Completed, Next, true, false, Ok(Created)),
                 // Next session + polling stations + investigations
-                (InPreparation, Next, true, true, err()),
+                (Ready, Next, true, true, err()),
                 (DataEntry, Next, true, true, err()),
                 (Paused, Next, true, true, err()),
                 (Completed, Next, true, true, err()),
@@ -265,14 +270,14 @@ mod tests {
             for (from, session_type, has_polling_stations, has_investigations, expected) in [
                 // Created: needs polling stations in first session
                 (Created, First, false, false, err()),
-                (Created, First, true, false, Ok(InPreparation)),
+                (Created, First, true, false, Ok(Ready)),
                 // Created: needs polling stations and investigations in next session
                 (Created, Next, false, false, err()),
                 (Created, Next, true, false, err()),
-                (Created, Next, true, true, Ok(InPreparation)),
-                // InPreparation stays InPreparation
-                (InPreparation, First, true, false, Ok(InPreparation)),
-                (InPreparation, Next, true, true, Ok(InPreparation)),
+                (Created, Next, true, true, Ok(Ready)),
+                // Ready stays Ready
+                (Ready, First, true, false, Ok(Ready)),
+                (Ready, Next, true, true, Ok(Ready)),
                 // DataEntry, Paused, Completed are not allowed
                 (DataEntry, First, true, false, err()),
                 (DataEntry, Next, true, true, err()),
@@ -301,7 +306,7 @@ mod tests {
             use CommitteeSessionStatus::*;
             for (from, expected) in [
                 (Created, err()),
-                (InPreparation, Ok(DataEntry)),
+                (Ready, Ok(DataEntry)),
                 (DataEntry, Ok(DataEntry)),
                 (Paused, Ok(DataEntry)),
                 (Completed, Ok(DataEntry)),
@@ -315,7 +320,7 @@ mod tests {
             use CommitteeSessionStatus::*;
             for (from, expected) in [
                 (Created, err()),
-                (InPreparation, err()),
+                (Ready, err()),
                 (DataEntry, Ok(Paused)),
                 (Paused, Ok(Paused)),
                 (Completed, err()),
@@ -328,11 +333,11 @@ mod tests {
         async fn finish_data_entry() {
             use CommitteeSessionStatus::*;
             for (from, has_complete_results, expected) in [
-                // Created/InPreparation are not allowed
+                // Created/Ready are not allowed
                 (Created, false, err()),
                 (Created, true, err()),
-                (InPreparation, false, err()),
-                (InPreparation, true, err()),
+                (Ready, false, err()),
+                (Ready, true, err()),
                 // DataEntry/Paused needs complete results
                 (DataEntry, false, err()),
                 (DataEntry, true, Ok(Completed)),

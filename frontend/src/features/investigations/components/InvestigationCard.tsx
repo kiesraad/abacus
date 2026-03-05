@@ -30,7 +30,7 @@ export function InvestigationCard({ investigation }: InvestigationCardProps) {
   const goToFindings = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
 
-    if (currentCommitteeSession.status === "in_preparation") {
+    if (currentCommitteeSession.status === "ready") {
       setShowModal(true);
     } else {
       void navigate(`./${investigation.pollingStation.id}/findings`);

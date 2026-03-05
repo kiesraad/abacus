@@ -497,7 +497,7 @@ async fn test_committee_session_status_change_invalid_status(pool: SqlitePool) {
     let response = reqwest::Client::new()
         .put(&url)
         .header("cookie", coordinator_cookie)
-        .json(&serde_json::json!({"status": "in_preparation"}))
+        .json(&serde_json::json!({"status": "ready"}))
         .send()
         .await
         .unwrap();

@@ -52,7 +52,7 @@ export function ElectionStatusPage() {
   }
 
   function getLink() {
-    if (currentCommitteeSession.status === "in_preparation") {
+    if (currentCommitteeSession.status === "ready") {
       return (
         <Button
           key="start"

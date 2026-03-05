@@ -7,7 +7,6 @@ export function isPollingStationCreateAndUpdateAllowed(
 ) {
   return (
     isCoordinator ||
-    (isAdministrator &&
-      (currentCommitteeSessionStatus === "created" || currentCommitteeSessionStatus === "in_preparation"))
+    (isAdministrator && (currentCommitteeSessionStatus === "created" || currentCommitteeSessionStatus === "ready"))
   );
 }

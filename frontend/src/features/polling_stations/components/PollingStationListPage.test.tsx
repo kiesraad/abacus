@@ -91,7 +91,7 @@ describe("PollingStationListPage", () => {
 
   test.each([
     { status: "created", allowed: true },
-    { status: "in_preparation", allowed: true },
+    { status: "ready", allowed: true },
     { status: "data_entry", allowed: false },
     { status: "paused", allowed: false },
     { status: "completed", allowed: false },

@@ -39,7 +39,7 @@ const testCases: TestCases = {
       created: {
         buttonsCurrentSession: ["Details van de zitting"],
       },
-      in_preparation: {
+      ready: {
         buttonsCurrentSession: ["Details van de zitting", "Start invoer"],
       },
       data_entry: {
@@ -59,7 +59,7 @@ const testCases: TestCases = {
       created: {
         buttonsCurrentSession: ["Aangevraagde onderzoeken", "Details van de zitting", "Zitting verwijderen"],
       },
-      in_preparation: {
+      ready: {
         buttonsCurrentSession: [
           "Aangevraagde onderzoeken",
           "Details van de zitting",
@@ -88,7 +88,7 @@ const testCases: TestCases = {
     {
       // First session
       created: {},
-      in_preparation: {},
+      ready: {},
       data_entry: {
         actionButton: "Bekijk voortgang",
       },
@@ -104,7 +104,7 @@ const testCases: TestCases = {
       created: {
         buttonsCurrentSession: ["Aangevraagde onderzoeken"],
       },
-      in_preparation: {
+      ready: {
         buttonsCurrentSession: ["Aangevraagde onderzoeken"],
       },
       data_entry: {
@@ -145,7 +145,7 @@ describe("UI component: CommitteeSessionCard", () => {
       const expectedSubtitle =
         {
           created: "— Zitting voorbereiden",
-          in_preparation: "— Klaar voor invoer",
+          ready: "— Klaar voor invoer",
           data_entry: "— Invoer bezig",
           paused: "— Invoer gepauzeerd",
           completed: "— Invoer afgerond",
@@ -217,7 +217,7 @@ describe("UI component: CommitteeSessionCard", () => {
     const user = userEvent.setup();
     const committeeSession = getCommitteeSessionMockData({
       number: 1,
-      status: "in_preparation",
+      status: "ready",
       start_date_time: "",
       location: "Juinen",
     });
@@ -243,7 +243,7 @@ describe("UI component: CommitteeSessionCard", () => {
     const user = userEvent.setup();
     const committeeSession = getCommitteeSessionMockData({
       number: 2,
-      status: "in_preparation",
+      status: "ready",
       start_date_time: "",
       location: "Juinen",
     });

@@ -284,7 +284,7 @@ describe("ElectionHomePage", () => {
       },
     ]);
     const user = userEvent.setup();
-    const committeeSessionData: Partial<CommitteeSession> = { status: "in_preparation" };
+    const committeeSessionData: Partial<CommitteeSession> = { status: "ready" };
     const electionData = getElectionMockData({}, committeeSessionData);
     electionData.committee_sessions = getCommitteeSessionListMockData(committeeSessionData);
     server.use(

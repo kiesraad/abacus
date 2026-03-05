@@ -172,7 +172,7 @@ pub async fn committee_session_delete(
 
     if committee_session.is_next_session()
         && (committee_session.status == CommitteeSessionStatus::Created
-            || committee_session.status == CommitteeSessionStatus::InPreparation)
+            || committee_session.status == CommitteeSessionStatus::Ready)
     {
         if investigation_repo::has_investigations_for_committee_session(
             &mut tx,

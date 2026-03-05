@@ -100,7 +100,7 @@ pub async fn change_committee_session_status(
                 .prepare_data_entry(&committee_session, &mut *tx)
                 .await?
         }
-        CommitteeSessionStatus::InPreparation => {
+        CommitteeSessionStatus::Ready => {
             committee_session
                 .status
                 .ready_for_data_entry(&committee_session, &mut *tx)

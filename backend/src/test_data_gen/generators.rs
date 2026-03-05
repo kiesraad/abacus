@@ -95,7 +95,7 @@ pub async fn create_test_election(
             committee_session = committee_session_repo::change_status(
                 &mut tx,
                 committee_session.id,
-                CommitteeSessionStatus::InPreparation,
+                CommitteeSessionStatus::Ready,
             )
             .await?;
         }

@@ -96,8 +96,8 @@ describe("AddInvestigationLayout", () => {
 
   describe("Navigation: data entry modal", () => {
     test.each([
-      { to: "print-corrigendum", status: "in_preparation", expectShown: false },
-      { to: "findings", status: "in_preparation", expectShown: true },
+      { to: "print-corrigendum", status: "ready", expectShown: false },
+      { to: "findings", status: "ready", expectShown: true },
       { to: "findings", status: "data_entry", expectShown: false },
     ] satisfies Array<{
       to: string;
@@ -122,8 +122,8 @@ describe("AddInvestigationLayout", () => {
       expect(modal).toHaveTextContent("Invoerfase starten?");
     });
 
-    test("When immediately navigating to findings with status=in_preparation should show the modal", async () => {
-      const electionData = getElectionMockData({}, { number: 2, status: "in_preparation" }, []);
+    test("When immediately navigating to findings with status=ready should show the modal", async () => {
+      const electionData = getElectionMockData({}, { number: 2, status: "ready" }, []);
       overrideOnce("get", "/api/elections/1", 200, electionData);
 
       await renderPage("findings");
@@ -145,7 +145,7 @@ describe("AddInvestigationLayout", () => {
       server.use(CommitteeSessionStatusChangeRequestHandler);
       const updateCommitteeSession = spyOnHandler(CommitteeSessionStatusChangeRequestHandler);
 
-      const electionData = getElectionMockData({}, { number: 2, status: "in_preparation" }, []);
+      const electionData = getElectionMockData({}, { number: 2, status: "ready" }, []);
       overrideOnce("get", "/api/elections/1", 200, electionData);
 
       await renderPage("findings");
@@ -165,7 +165,7 @@ describe("AddInvestigationLayout", () => {
       server.use(CommitteeSessionStatusChangeRequestHandler);
       const updateCommitteeSession = spyOnHandler(CommitteeSessionStatusChangeRequestHandler);
 
-      const electionData = getElectionMockData({}, { number: 2, status: "in_preparation" }, []);
+      const electionData = getElectionMockData({}, { number: 2, status: "ready" }, []);
       overrideOnce("get", "/api/elections/1", 200, electionData);
 
       await renderPage("print-corrigendum");
@@ -187,7 +187,7 @@ describe("AddInvestigationLayout", () => {
       server.use(CommitteeSessionStatusChangeRequestHandler);
       const updateCommitteeSession = spyOnHandler(CommitteeSessionStatusChangeRequestHandler);
 
-      let electionData = getElectionMockData({}, { number: 2, status: "in_preparation" }, []);
+      let electionData = getElectionMockData({}, { number: 2, status: "ready" }, []);
       overrideOnce("get", "/api/elections/1", 200, electionData);
 
       await renderPage("print-corrigendum");

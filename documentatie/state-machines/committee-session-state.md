@@ -9,9 +9,9 @@ committee session, and an "investigation" in any subsequent committee session.
 ```mermaid
 stateDiagram-v2
   [*] --> Created
-  Created --> InPreparation: add <br/> PS/Inv
-  InPreparation --> DataEntry: click start <br/> data entry
-  InPreparation --> Created: delete last <br/> PS/Inv
+  Created --> Ready: add <br/> PS/Inv
+  Ready --> DataEntry: click start <br/> data entry
+  Ready --> Created: delete last <br/> PS/Inv
   DataEntry --> Created: delete last <br/> PS/Inv
   DataEntry --> Completed: click finish <br/> data entry
   DataEntry --> Paused: click pause <br/> data entry

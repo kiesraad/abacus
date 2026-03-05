@@ -90,8 +90,8 @@ describe("ElectionInformationTable", () => {
     });
   });
 
-  test("renders a table with the election information for first committee session status in_preparation for coordinator", async () => {
-    renderTable("coordinator_gsb", 1234, 1, "in_preparation");
+  test("renders a table with the election information for first committee session status ready for coordinator", async () => {
+    renderTable("coordinator_gsb", 1234, 1, "ready");
 
     const election_information_table = await screen.findByTestId("election-information-table");
     expect(election_information_table).toBeVisible();

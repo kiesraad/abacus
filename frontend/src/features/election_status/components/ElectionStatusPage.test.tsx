@@ -98,13 +98,13 @@ describe("ElectionStatusPage", () => {
     expect(navigate).toHaveBeenCalledWith("/elections/1/polling-stations");
   });
 
-  test("Page render when committee session status is in_preparation for coordinator", async () => {
+  test("Page render when committee session status is ready for coordinator", async () => {
     vi.spyOn(useUser, "useUser").mockReturnValue(getCoordinatorUser());
     const user = userEvent.setup();
     const statusChange = spyOnHandler(CommitteeSessionStatusChangeRequestHandler);
     server.use(
       http.get("/api/elections/1", () =>
-        HttpResponse.json(getElectionMockData({}, { status: "in_preparation" }) satisfies ElectionDetailsResponse, {
+        HttpResponse.json(getElectionMockData({}, { status: "ready" }) satisfies ElectionDetailsResponse, {
           status: 200,
         }),
       ),
@@ -128,11 +128,11 @@ describe("ElectionStatusPage", () => {
     expect(navigate).not.toHaveBeenCalled();
   });
 
-  test("Page render when committee session status is in_preparation for administrator", async () => {
+  test("Page render when committee session status is ready for administrator", async () => {
     vi.spyOn(useUser, "useUser").mockReturnValue(getAdminUser());
     server.use(
       http.get("/api/elections/1", () =>
-        HttpResponse.json(getElectionMockData({}, { status: "in_preparation" }) satisfies ElectionDetailsResponse, {
+        HttpResponse.json(getElectionMockData({}, { status: "ready" }) satisfies ElectionDetailsResponse, {
           status: 200,
         }),
       ),

@@ -4801,7 +4801,7 @@
         "description": "Committee session status",
         "enum": [
           "created",
-          "in_preparation",
+          "ready",
           "data_entry",
           "paused",
           "completed"

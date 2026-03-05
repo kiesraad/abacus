@@ -44,7 +44,7 @@ export default {
       control: { type: "radio" },
     },
     status: {
-      options: ["created", "in_preparation", "data_entry", "paused", "completed"],
+      options: ["created", "ready", "data_entry", "paused", "completed"],
       control: { type: "radio" },
     },
     startDateTime: {

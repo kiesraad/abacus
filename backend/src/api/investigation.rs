@@ -221,7 +221,7 @@ async fn polling_station_investigation_create(
         change_committee_session_status(
             &mut tx,
             committee_session.id,
-            CommitteeSessionStatus::InPreparation,
+            CommitteeSessionStatus::Ready,
             audit_service,
         )
         .await?;
@@ -300,7 +300,7 @@ async fn polling_station_investigation_conclude(
         )
         .await?;
 
-    if committee_session.status == CommitteeSessionStatus::InPreparation
+    if committee_session.status == CommitteeSessionStatus::Ready
         || committee_session.status == CommitteeSessionStatus::Completed
     {
         change_committee_session_status(

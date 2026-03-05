@@ -1,7 +1,7 @@
 {
   "coordinator": {
     "created": "Zitting voorbereiden",
-    "in_preparation": "Klaar voor invoer",
+    "ready": "Klaar voor invoer",
     "data_entry": "Invoer bezig",
     "paused": "Invoer gepauzeerd",
     "completed": "Invoer afgerond"
@@ -19,7 +19,7 @@
   "the": "de",
   "typist": {
     "created": "Nog niet gestart",
-    "in_preparation": "Nog niet gestart",
+    "ready": "Nog niet gestart",
     "data_entry": "Je kan invoeren",
     "paused": "Invoer gepauzeerd",
     "completed": "Alles is ingevoerd"

@@ -33,7 +33,7 @@ export function AddInvestigationLayout() {
   const shouldShowModal = useCallback(
     (path: string) => {
       const section = path.split("/").pop();
-      return section === "findings" && currentCommitteeSession.status === "in_preparation";
+      return section === "findings" && currentCommitteeSession.status === "ready";
     },
     [currentCommitteeSession.status],
   );

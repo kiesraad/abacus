@@ -140,7 +140,7 @@ describe("CommitteeSessionDetailsPage", () => {
         {},
         {
           number: 2,
-          status: "in_preparation",
+          status: "ready",
           location: "Den Haag",
           start_date_time: "2026-03-18T21:36:00",
         },
@@ -180,7 +180,7 @@ describe("CommitteeSessionDetailsPage", () => {
       getElectionMockData(
         {},
         {
-          status: "in_preparation",
+          status: "ready",
           location: "Den Haag",
           start_date_time: "2026-03-18T21:36:00",
         },
@@ -213,7 +213,7 @@ describe("CommitteeSessionDetailsPage", () => {
       getElectionMockData(
         {},
         {
-          status: "in_preparation",
+          status: "ready",
           location: "Den Haag",
           start_date_time: "2026-03-18T21:36:00",
         },

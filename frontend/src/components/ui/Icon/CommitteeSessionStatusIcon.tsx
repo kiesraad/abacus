@@ -23,7 +23,7 @@ export function CommitteeSessionStatusIcon({
 }: CommitteeSessionStatusIconProps) {
   switch (status) {
     case "created":
-    case "in_preparation":
+    case "ready":
       return (
         <Icon
           size={size}

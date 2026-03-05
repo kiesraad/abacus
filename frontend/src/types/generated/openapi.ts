@@ -542,7 +542,7 @@ export type CommitteeSessionId = number;
 /**
  * Committee session status
  */
-export const committeeSessionStatusValues = ["created", "in_preparation", "data_entry", "paused", "completed"] as const;
+export const committeeSessionStatusValues = ["created", "ready", "data_entry", "paused", "completed"] as const;
 export type CommitteeSessionStatus = (typeof committeeSessionStatusValues)[number];
 
 /**

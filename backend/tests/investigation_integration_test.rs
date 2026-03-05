@@ -157,7 +157,7 @@ async fn test_deletion_setting_committee_session_back_to_created_status(pool: Sq
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_login(&addr).await, election_id).await;
-    assert_eq!(committee_session["status"], "in_preparation");
+    assert_eq!(committee_session["status"], "ready");
 
     // Delete last investigation
     assert_eq!(
@@ -458,7 +458,7 @@ async fn test_creation_for_committee_session_with_created_status(pool: SqlitePoo
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_login(&addr).await, election_id).await;
-    assert_eq!(committee_session["status"], "in_preparation");
+    assert_eq!(committee_session["status"], "ready");
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]

@@ -172,7 +172,7 @@ async fn test_election_number_of_voters_change_first_session_created_works_for_c
     path = "../fixtures",
     scripts("election_6_no_polling_stations", "users")
 )))]
-async fn test_election_number_of_voters_change_first_session_in_preparation_works_for_administrator(
+async fn test_election_number_of_voters_change_first_session_ready_works_for_administrator(
     pool: SqlitePool,
 ) {
     let addr = serve_api(pool).await;
@@ -187,7 +187,7 @@ async fn test_election_number_of_voters_change_first_session_in_preparation_work
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(committee_session["status"], "in_preparation");
+    assert_eq!(committee_session["status"], "ready");
 
     let url = format!("http://{addr}/api/elections/{election_id}/voters");
     let admin_cookie = admin_login(&addr).await;

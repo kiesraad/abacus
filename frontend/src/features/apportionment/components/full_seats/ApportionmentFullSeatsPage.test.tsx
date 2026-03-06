@@ -47,7 +47,7 @@ describe("ApportionmentFullSeatsPage", () => {
       ["2", "Political Group B", "60", ":", "80", "", "=", "0"],
       ["3", "Political Group C", "58", ":", "80", "", "=", "0"],
       ["4", "Political Group D", "57", ":", "80", "", "=", "0"],
-      ["5", "Political Group E", "56", ":", "80", "", "=", "0"],
+      ["5", "", "56", ":", "80", "", "=", "0"],
       ["6", "Political Group F", "55", ":", "80", "", "=", "0"],
       ["7", "Political Group G", "54", ":", "80", "", "=", "0"],
       ["8", "Political Group H", "52", ":", "80", "", "=", "0"],
@@ -88,7 +88,7 @@ describe("ApportionmentFullSeatsPage", () => {
       ["2", "Political Group B", "977", ":", "340", "4/15", "=", "2"],
       ["3", "Political Group C", "567", ":", "340", "4/15", "=", "1"],
       ["4", "Political Group D", "536", ":", "340", "4/15", "=", "1"],
-      ["5", "Political Group E", "453", ":", "340", "4/15", "=", "1"],
+      ["5", "", "453", ":", "340", "4/15", "=", "1"],
     ]);
 
     expect(await screen.findByTestId("footnotes-list")).toHaveTextContent(

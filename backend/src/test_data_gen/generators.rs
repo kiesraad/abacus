@@ -10,19 +10,28 @@ use crate::{
     domain::{
         committee_session::{CommitteeSession, CommitteeSessionCreateRequest},
         committee_session_status::CommitteeSessionStatus,
-        data_entry::{
-            CSOFirstSessionResults, CandidateVotes, CountingDifferencesPollingStation,
-            DifferenceCountsCompareVotesCastAdmittedVoters, DifferencesCounts, ExtraInvestigation,
-            PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, PollingStationResults,
-            VotersCounts, VotesCounts, YesNo,
-        },
-        data_entry_status::{DataEntryStatus, Definitive, FirstEntryFinalised},
+        data_entry::{DataEntryStatus, Definitive, FirstEntryFinalised},
         election::{
             self, CandidateGender, CandidateNumber, CommitteeCategory, ElectionCategory,
             ElectionWithPoliticalGroups, NewElection, PGNumber, PoliticalGroup, VoteCountingMethod,
         },
+        field_path::FieldPath,
         polling_station::{PollingStation, PollingStationRequest, PollingStationType},
-        validation::{FieldPath, Validate, ValidationResults},
+        results::{
+            PollingStationResults,
+            counting_differences_polling_station::CountingDifferencesPollingStation,
+            cso_first_session_results::CSOFirstSessionResults,
+            differences_counts::{
+                DifferenceCountsCompareVotesCastAdmittedVoters, DifferencesCounts,
+            },
+            extra_investigation::ExtraInvestigation,
+            political_group_candidate_votes::{CandidateVotes, PoliticalGroupCandidateVotes},
+            political_group_total_votes::PoliticalGroupTotalVotes,
+            voters_counts::VotersCounts,
+            votes_counts::VotesCounts,
+            yes_no::YesNo,
+        },
+        validate::{Validate, ValidationResults},
     },
     repository::{
         committee_session_repo,

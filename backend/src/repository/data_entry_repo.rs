@@ -6,9 +6,9 @@ use crate::{
     api::data_entry::ElectionStatusResponseEntry,
     domain::{
         committee_session::CommitteeSessionId,
-        data_entry::{PollingStationDataEntry, PollingStationResults},
-        data_entry_status::DataEntryStatus,
+        data_entry::{DataEntryStatus, PollingStationDataEntry},
         polling_station::{PollingStation, PollingStationId},
+        results::PollingStationResults,
     },
     repository::{committee_session_repo, polling_station_repo},
 };
@@ -430,8 +430,13 @@ mod tests {
     use test_log::test;
 
     use super::*;
-    use crate::domain::data_entry::{
-        CSOFirstSessionResults, DifferencesCounts, VotersCounts, VotesCounts, tests::ValidDefault,
+    use crate::domain::{
+        results::{
+            cso_first_session_results::CSOFirstSessionResults,
+            differences_counts::DifferencesCounts, voters_counts::VotersCounts,
+            votes_counts::VotesCounts,
+        },
+        valid_default::ValidDefault,
     };
 
     fn create_test_results(proxy_certificate_count: u32) -> PollingStationResults {
@@ -457,7 +462,7 @@ mod tests {
 
         use super::*;
         use crate::{
-            domain::data_entry_status,
+            domain::data_entry,
             repository::{polling_station_repo::insert_test_polling_station, user_repo::UserId},
             service::{create_definitive_data_entry, create_test_investigation},
         };
@@ -749,7 +754,7 @@ mod tests {
                 .await
                 .unwrap();
 
-            let state = DataEntryStatus::Definitive(data_entry_status::Definitive {
+            let state = DataEntryStatus::Definitive(data_entry::Definitive {
                 first_entry_user_id: UserId::from(5),
                 second_entry_user_id: UserId::from(6),
                 finished_at: chrono::Utc::now(),

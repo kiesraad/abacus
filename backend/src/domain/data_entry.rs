@@ -1,22 +1,68 @@
-use std::{collections::HashSet, ops::AddAssign};
+use std::fmt::Display;
 
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use sqlx::{FromRow, types::Json};
+use sqlx::{FromRow, Type, types::Json};
 use utoipa::ToSchema;
-pub use yes_no::YesNo;
 
 use crate::{
-    APIError,
     domain::{
-        data_entry_status::{DataEntryStatus, DataEntryStatusName},
-        election::{CandidateNumber, PGNumber, PoliticalGroup},
-        id::id,
+        compare::Compare,
+        election::ElectionWithPoliticalGroups,
+        field_path::FieldPath,
+        identifier::id,
+        polling_station::PollingStation,
+        results::PollingStationResults,
+        validate::{
+            DataError, Validate, ValidateRoot, ValidationResult, ValidationResultCode,
+            ValidationResults,
+        },
     },
-    error::ErrorReference,
+    repository::user_repo::UserId,
 };
 
 id!(DataEntryId);
+
+#[derive(Debug, PartialEq, Eq)]
+pub enum DataEntryTransitionError {
+    Invalid,
+    FirstEntryAlreadyClaimed,
+    SecondEntryAlreadyClaimed,
+    FirstEntryAlreadyFinalised,
+    SecondEntryAlreadyFinalised,
+    /// An existing first/second data entry needs to be saved, finalised, or deleted by the same user
+    CannotTransitionUsingDifferentUser,
+    /// The second data entry needs to be claimed by a user other than the one who claimed the first entry
+    SecondEntryNeedsDifferentUser,
+    ValidatorError(DataError),
+    ValidationError(ValidationResults),
+}
+
+impl From<DataError> for DataEntryTransitionError {
+    fn from(err: DataError) -> Self {
+        Self::ValidatorError(err)
+    }
+}
+
+impl From<ValidationResults> for DataEntryTransitionError {
+    fn from(err: ValidationResults) -> Self {
+        Self::ValidationError(err)
+    }
+}
+
+#[derive(Serialize, Deserialize, ToSchema, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct DataEntryStatusResponse {
+    pub status: DataEntryStatusName,
+}
+
+impl From<DataEntryStatus> for DataEntryStatusResponse {
+    fn from(data_entry_status: DataEntryStatus) -> Self {
+        DataEntryStatusResponse {
+            status: data_entry_status.status_name(),
+        }
+    }
+}
 
 #[derive(Serialize, Deserialize, Clone, ToSchema, Debug, FromRow)]
 #[serde(deny_unknown_fields)]
@@ -28,645 +74,6 @@ pub struct PollingStationDataEntry {
     pub updated_at: DateTime<Utc>,
 }
 
-/// PollingStationResults contains the results for a polling station.
-///
-/// The exact type of results depends on the election counting method and
-/// whether this is the first or any subsequent data entry session. Based on
-/// this, any of four different models can apply
-#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
-#[serde(tag = "model")]
-pub enum PollingStationResults {
-    /// Results for centrally counted (CSO) elections, first election committee session.
-    /// This contains the data entry values from Model Na 31-2 Bijlage 2.
-    CSOFirstSession(CSOFirstSessionResults),
-    /// Results for centrally counted (CSO) elections, any subsequent election committee session.
-    /// This contains the data entry values from Model Na 14-2 Bijlage 1.
-    CSONextSession(CSONextSessionResults),
-}
-
-impl PollingStationResults {
-    /// Get a reference to the inner CSOFirstSessionResults, if this is of that type.
-    pub fn as_cso_first_session(&self) -> Option<&CSOFirstSessionResults> {
-        match self {
-            PollingStationResults::CSOFirstSession(results) => Some(results),
-            _ => None,
-        }
-    }
-
-    /// Get a mutable reference to the inner CSOFirstSessionResults, if this is of that type.
-    pub fn as_cso_first_session_mut(&mut self) -> Option<&mut CSOFirstSessionResults> {
-        match self {
-            PollingStationResults::CSOFirstSession(results) => Some(results),
-            _ => None,
-        }
-    }
-
-    /// Consume self and return the inner CSOFirstSessionResults, if this is of that type.
-    pub fn into_cso_first_session(self) -> Option<CSOFirstSessionResults> {
-        match self {
-            PollingStationResults::CSOFirstSession(results) => Some(results),
-            _ => None,
-        }
-    }
-
-    pub fn empty_cso_first_session(political_groups: &[PoliticalGroup]) -> Self {
-        PollingStationResults::CSOFirstSession(CSOFirstSessionResults {
-            extra_investigation: Default::default(),
-            counting_differences_polling_station: Default::default(),
-            voters_counts: Default::default(),
-            votes_counts: VotesCounts {
-                political_group_total_votes:
-                    PollingStationResults::default_political_group_total_votes(political_groups),
-                ..Default::default()
-            },
-            differences_counts: Default::default(),
-            political_group_votes: PollingStationResults::default_political_group_votes(
-                political_groups,
-            ),
-        })
-    }
-
-    pub fn empty_cso_next_session(political_groups: &[PoliticalGroup]) -> Self {
-        PollingStationResults::CSONextSession(CSONextSessionResults {
-            voters_counts: Default::default(),
-            votes_counts: VotesCounts {
-                political_group_total_votes:
-                    PollingStationResults::default_political_group_total_votes(political_groups),
-                ..Default::default()
-            },
-            differences_counts: Default::default(),
-            political_group_votes: PollingStationResults::default_political_group_votes(
-                political_groups,
-            ),
-        })
-    }
-
-    /// Get a reference to the inner CSONextSessionResults, if this is of that type.
-    pub fn as_cso_next_session(&self) -> Option<&CSONextSessionResults> {
-        match self {
-            PollingStationResults::CSONextSession(results) => Some(results),
-            _ => None,
-        }
-    }
-
-    /// Get a mutable reference to the inner CSONextSessionResults, if this is of that type.
-    pub fn as_cso_next_session_mut(&mut self) -> Option<&mut CSONextSessionResults> {
-        match self {
-            PollingStationResults::CSONextSession(results) => Some(results),
-            _ => None,
-        }
-    }
-
-    /// Consume self and return the inner CSONextSessionResults, if this is of that type.
-    pub fn into_cso_next_session(self) -> Option<CSONextSessionResults> {
-        match self {
-            PollingStationResults::CSONextSession(results) => Some(results),
-            _ => None,
-        }
-    }
-
-    /// Common accessor for voter counts regardless of the underlying model.
-    pub fn voters_counts(&self) -> &VotersCounts {
-        match self {
-            PollingStationResults::CSOFirstSession(results) => &results.voters_counts,
-            PollingStationResults::CSONextSession(results) => &results.voters_counts,
-        }
-    }
-
-    /// Common mutable accessor for voter counts regardless of the underlying model.
-    #[cfg(test)]
-    pub fn voters_counts_mut(&mut self) -> &mut VotersCounts {
-        match self {
-            PollingStationResults::CSOFirstSession(results) => &mut results.voters_counts,
-            PollingStationResults::CSONextSession(results) => &mut results.voters_counts,
-        }
-    }
-
-    /// Common accessor for votes counts regardless of the underlying model.
-    pub fn votes_counts(&self) -> &VotesCounts {
-        match self {
-            PollingStationResults::CSOFirstSession(results) => &results.votes_counts,
-            PollingStationResults::CSONextSession(results) => &results.votes_counts,
-        }
-    }
-
-    /// Common mutable accessor for votes counts regardless of the underlying model.
-    #[cfg(test)]
-    pub fn votes_counts_mut(&mut self) -> &mut VotesCounts {
-        match self {
-            PollingStationResults::CSOFirstSession(results) => &mut results.votes_counts,
-            PollingStationResults::CSONextSession(results) => &mut results.votes_counts,
-        }
-    }
-
-    /// Common accessor for differences counts regardless of the underlying model.
-    pub fn differences_counts(&self) -> &DifferencesCounts {
-        match self {
-            PollingStationResults::CSOFirstSession(results) => &results.differences_counts,
-            PollingStationResults::CSONextSession(results) => &results.differences_counts,
-        }
-    }
-
-    /// Common mutable accessor for differences counts regardless of the underlying model.
-    #[cfg(test)]
-    pub fn differences_counts_mut(&mut self) -> &mut DifferencesCounts {
-        match self {
-            PollingStationResults::CSOFirstSession(results) => &mut results.differences_counts,
-            PollingStationResults::CSONextSession(results) => &mut results.differences_counts,
-        }
-    }
-
-    /// Common accessor for political group votes regardless of the underlying model.
-    pub fn political_group_votes(&self) -> &[PoliticalGroupCandidateVotes] {
-        match self {
-            PollingStationResults::CSOFirstSession(results) => &results.political_group_votes,
-            PollingStationResults::CSONextSession(results) => &results.political_group_votes,
-        }
-    }
-
-    /// Common mutable accessor for political group votes regardless of the underlying model.
-    #[cfg(test)]
-    pub fn political_group_votes_mut(&mut self) -> &mut Vec<PoliticalGroupCandidateVotes> {
-        match self {
-            PollingStationResults::CSOFirstSession(results) => &mut results.political_group_votes,
-            PollingStationResults::CSONextSession(results) => &mut results.political_group_votes,
-        }
-    }
-
-    /// Convert to CommonPollingStationResults, which contains only the common fields.
-    pub fn as_common(&self) -> CommonPollingStationResults {
-        CommonPollingStationResults {
-            voters_counts: self.voters_counts().clone(),
-            votes_counts: self.votes_counts().clone(),
-            differences_counts: self.differences_counts().clone(),
-            political_group_votes: self.political_group_votes().to_vec(),
-        }
-    }
-
-    /// Returns true if both are of the same model variant, false otherwise.
-    pub fn is_same_model(&self, other: &Self) -> bool {
-        matches!(
-            (self, other),
-            (
-                PollingStationResults::CSOFirstSession(_),
-                PollingStationResults::CSOFirstSession(_)
-            ) | (
-                PollingStationResults::CSONextSession(_),
-                PollingStationResults::CSONextSession(_)
-            )
-        )
-    }
-
-    /// Create a default value for `political_group_votes` (type `Vec<PoliticalGroup>`)
-    /// for the given political groups, with all votes set to 0.
-    pub fn default_political_group_votes(
-        political_groups: &[PoliticalGroup],
-    ) -> Vec<PoliticalGroupCandidateVotes> {
-        political_groups
-            .iter()
-            .map(|pg| PoliticalGroupCandidateVotes {
-                number: pg.number,
-                total: 0,
-                candidate_votes: pg
-                    .candidates
-                    .iter()
-                    .map(|c| CandidateVotes {
-                        number: c.number,
-                        votes: 0,
-                    })
-                    .collect(),
-            })
-            .collect()
-    }
-
-    /// Create a default value for `political_group_total_votes` in `votes_counts`
-    pub fn default_political_group_total_votes(
-        political_groups: &[PoliticalGroup],
-    ) -> Vec<PoliticalGroupTotalVotes> {
-        political_groups
-            .iter()
-            .map(|pg| PoliticalGroupTotalVotes {
-                number: pg.number,
-                total: 0,
-            })
-            .collect()
-    }
-}
-
-/// CommonPollingStationResults contains the common fields for polling station results,
-#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
-#[serde(deny_unknown_fields)]
-pub struct CommonPollingStationResults {
-    /// Voters counts ("Aantal toegelaten kiezers")
-    pub voters_counts: VotersCounts,
-    /// Votes counts ("Aantal getelde stembiljetten")
-    pub votes_counts: VotesCounts,
-    /// Differences counts ("Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten")
-    pub differences_counts: DifferencesCounts,
-    /// Vote counts per list and candidate ("Aantal stemmen per lijst en kandidaat")
-    pub political_group_votes: Vec<PoliticalGroupCandidateVotes>,
-}
-
-#[derive(Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct CommonPollingStationResultsWithoutVotes {
-    /// Voters counts ("Aantal toegelaten kiezers")
-    pub voters_counts: VotersCounts,
-    /// Votes counts ("Aantal getelde stembiljetten")
-    pub votes_counts: VotesCounts,
-    /// Differences counts ("Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten")
-    pub differences_counts: DifferencesCounts,
-}
-
-impl From<CommonPollingStationResults> for CommonPollingStationResultsWithoutVotes {
-    fn from(value: CommonPollingStationResults) -> Self {
-        Self {
-            voters_counts: value.voters_counts,
-            votes_counts: value.votes_counts,
-            differences_counts: value.differences_counts,
-        }
-    }
-}
-
-/// CSOFirstSessionResults, following the fields in Model Na 31-2 Bijlage 2.
-///
-/// See "Model Na 31-2. Proces-verbaal van een gemeentelijk stembureau/stembureau voor het openbaar
-/// lichaam in een gemeente/openbaar lichaam waar een centrale stemopneming wordt verricht,
-/// Bijlage 2: uitkomsten per stembureau" from the
-/// [Kiesregeling](https://wetten.overheid.nl/BWBR0034180/2026-01-01#Bijlage1_DivisieNa31.2) or
-/// [Verkiezingstoolbox](https://www.rijksoverheid.nl/onderwerpen/verkiezingen/verkiezingentoolkit/modellen).
-#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
-#[serde(deny_unknown_fields)]
-pub struct CSOFirstSessionResults {
-    /// Extra investigation ("B1-1 Alleen bij extra onderzoek")
-    pub extra_investigation: ExtraInvestigation,
-    /// Counting Differences Polling Station ("B1-2 Verschillen met telresultaten van het stembureau")
-    pub counting_differences_polling_station: CountingDifferencesPollingStation,
-    /// Voters counts ("1. Aantal toegelaten kiezers")
-    pub voters_counts: VotersCounts,
-    /// Votes counts ("2. Aantal getelde stembiljetten")
-    pub votes_counts: VotesCounts,
-    /// Differences counts ("3. Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten")
-    pub differences_counts: DifferencesCounts,
-    /// Vote counts per list and candidate (5. "Aantal stemmen per lijst en kandidaat")
-    pub political_group_votes: Vec<PoliticalGroupCandidateVotes>,
-}
-
-impl CSOFirstSessionResults {
-    /// The admitted voters have been recounted in this session
-    pub fn admitted_voters_have_been_recounted(&self) -> bool {
-        matches!(
-            self.counting_differences_polling_station
-                .unexplained_difference_ballots_voters
-                .as_bool(),
-            Some(true)
-        ) || matches!(
-            self.counting_differences_polling_station
-                .difference_ballots_per_list
-                .as_bool(),
-            Some(true)
-        ) || matches!(
-            self.differences_counts
-                .difference_completely_accounted_for
-                .as_bool(),
-            Some(false)
-        )
-    }
-}
-
-/// CSONextSessionResults, following the fields in Model Na 14-2 Bijlage 1.
-///
-/// See "Model Na 14-2. Corrigendum bij het proces-verbaal van een gemeentelijk stembureau/
-/// stembureau voor het openbaar lichaam, Bijlage 1: uitkomsten per stembureau" from the
-/// [Kiesregeling](https://wetten.overheid.nl/BWBR0034180/2026-01-01#Bijlage1_DivisieNa14.2) or
-/// [Verkiezingstoolbox](https://www.rijksoverheid.nl/onderwerpen/verkiezingen/verkiezingentoolkit/modellen).
-#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
-#[serde(deny_unknown_fields)]
-pub struct CSONextSessionResults {
-    /// Voters counts ("Aantal toegelaten kiezers")
-    pub voters_counts: VotersCounts,
-    /// Votes counts ("Aantal getelde stembiljetten")
-    pub votes_counts: VotesCounts,
-    /// Differences counts ("Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten")
-    pub differences_counts: DifferencesCounts,
-    /// Vote counts per list and candidate ("Aantal stemmen per lijst en kandidaat")
-    pub political_group_votes: Vec<PoliticalGroupCandidateVotes>,
-}
-
-pub type Count = u32;
-
-/// Voters counts, part of the polling station results.
-#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
-#[serde(deny_unknown_fields)]
-pub struct VotersCounts {
-    /// Number of valid poll cards ("Aantal geldige stempassen")
-    #[schema(value_type = u32)]
-    pub poll_card_count: Count,
-    /// Number of valid proxy certificates ("Aantal geldige volmachtbewijzen")
-    #[schema(value_type = u32)]
-    pub proxy_certificate_count: Count,
-    /// Total number of admitted voters ("Totaal aantal toegelaten kiezers")
-    #[schema(value_type = u32)]
-    pub total_admitted_voters_count: Count,
-}
-
-impl AddAssign<&VotersCounts> for VotersCounts {
-    fn add_assign(&mut self, other: &Self) {
-        self.poll_card_count += other.poll_card_count;
-        self.proxy_certificate_count += other.proxy_certificate_count;
-        self.total_admitted_voters_count += other.total_admitted_voters_count;
-    }
-}
-
-/// Votes counts, part of the polling station results.
-/// Following the fields in Model CSO Na 31-2 Bijlage 1.
-#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
-#[serde(deny_unknown_fields)]
-pub struct VotesCounts {
-    /// Total votes per list
-    pub political_group_total_votes: Vec<PoliticalGroupTotalVotes>,
-    /// Total number of valid votes on candidates
-    /// ("Totaal stemmen op kandidaten")
-    #[schema(value_type = u32)]
-    pub total_votes_candidates_count: Count,
-    /// Number of blank votes ("Blanco stembiljetten")
-    #[schema(value_type = u32)]
-    pub blank_votes_count: Count,
-    /// Number of invalid votes ("Ongeldige stembiljetten")
-    #[schema(value_type = u32)]
-    pub invalid_votes_count: Count,
-    /// Total number of votes cast ("Totaal uitgebrachte stemmen")
-    #[schema(value_type = u32)]
-    pub total_votes_cast_count: Count,
-}
-
-impl VotesCounts {
-    pub fn add(&mut self, other: &Self) -> Result<(), APIError> {
-        // Get sets of political group numbers from both collections
-        let self_numbers: HashSet<_> = self
-            .political_group_total_votes
-            .iter()
-            .map(|pg| pg.number)
-            .collect();
-        let other_numbers: HashSet<_> = other
-            .political_group_total_votes
-            .iter()
-            .map(|pg| pg.number)
-            .collect();
-
-        // Check that both have exactly the same political groups
-        if self_numbers != other_numbers {
-            let missing_in_self: Vec<_> = other_numbers.difference(&self_numbers).collect();
-            let missing_in_other: Vec<_> = self_numbers.difference(&other_numbers).collect();
-
-            if !missing_in_self.is_empty() {
-                return Err(APIError::AddError(
-                    format!(
-                        "Political group(s) {missing_in_self:?} exist in source but not in target",
-                    ),
-                    ErrorReference::InvalidVoteGroup,
-                ));
-            }
-            if !missing_in_other.is_empty() {
-                return Err(APIError::AddError(
-                    format!(
-                        "Political group(s) {missing_in_other:?} exist in target but not in source",
-                    ),
-                    ErrorReference::InvalidVoteGroup,
-                ));
-            }
-        }
-
-        // Add totals of political groups with the same number
-        for pg in &other.political_group_total_votes {
-            if let Some(existing) = self
-                .political_group_total_votes
-                .iter_mut()
-                .find(|e| e.number == pg.number)
-            {
-                existing.total += pg.total;
-            }
-        }
-
-        self.total_votes_candidates_count += other.total_votes_candidates_count;
-        self.blank_votes_count += other.blank_votes_count;
-        self.invalid_votes_count += other.invalid_votes_count;
-        self.total_votes_cast_count += other.total_votes_cast_count;
-
-        Ok(())
-    }
-}
-
-/// Differences counts, part of the polling station results.
-/// (B1-3.3 "Verschillen tussen aantal kiezers en uitgebrachte stemmen")
-#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
-#[serde(deny_unknown_fields)]
-pub struct DifferencesCounts {
-    /// Whether total of admitted voters and total of votes cast match.
-    /// (B1-3.3.1 "Vergelijk D (totaal toegelaten kiezers) en H (totaal uitgebrachte stemmen)")
-    pub compare_votes_cast_admitted_voters: DifferenceCountsCompareVotesCastAdmittedVoters,
-    /// Number of more counted ballots ("Aantal méér getelde stemmen (bereken: H min D)")
-    #[schema(value_type = u32)]
-    pub more_ballots_count: Count,
-    /// Number of fewer counted ballots ("Aantal minder getelde stemmen (bereken: D min H)")
-    #[schema(value_type = u32)]
-    pub fewer_ballots_count: Count,
-    /// Whether the difference between the total of admitted voters and total of votes cast is explained.
-    /// (B1-3.3.2 "Zijn er tijdens de stemming dingen opgeschreven die het verschil tussen D en H volledig verklaren?")
-    pub difference_completely_accounted_for: YesNo,
-}
-
-/// Compare votes cast admitted voters, part of the differences counts.
-#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
-#[serde(deny_unknown_fields)]
-pub struct DifferenceCountsCompareVotesCastAdmittedVoters {
-    /// Whether total of admitted voters and total of votes cast match.
-    /// ("D en H zijn gelijk")
-    pub admitted_voters_equal_votes_cast: bool,
-    /// Whether total of admitted voters is greater than total of votes cast match.
-    /// ("H is groter dan D (meer uitgebrachte stemmen dan toegelaten kiezers)")
-    pub votes_cast_greater_than_admitted_voters: bool,
-    /// Whether total of admitted voters is less than total of votes cast match.
-    /// ("H is kleiner dan D (minder uitgebrachte stemmen dan toegelaten kiezers)")
-    pub votes_cast_smaller_than_admitted_voters: bool,
-}
-
-impl DifferencesCounts {
-    pub fn zero() -> DifferencesCounts {
-        DifferencesCounts {
-            more_ballots_count: 0,
-            fewer_ballots_count: 0,
-            difference_completely_accounted_for: Default::default(),
-            compare_votes_cast_admitted_voters: DifferenceCountsCompareVotesCastAdmittedVoters {
-                admitted_voters_equal_votes_cast: false,
-                votes_cast_greater_than_admitted_voters: false,
-                votes_cast_smaller_than_admitted_voters: false,
-            },
-        }
-    }
-}
-
-mod yes_no {
-    use super::*;
-
-    /// Yes/No response structure for boolean questions with separate yes and no fields.
-    #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
-    #[serde(deny_unknown_fields)]
-    pub struct YesNo {
-        yes: bool,
-        no: bool,
-    }
-
-    impl YesNo {
-        pub fn new(yes: bool, no: bool) -> Self {
-            Self { yes, no }
-        }
-
-        pub fn yes() -> Self {
-            Self::new(true, false)
-        }
-
-        pub fn no() -> Self {
-            Self::new(false, true)
-        }
-
-        pub fn both() -> Self {
-            Self::new(true, true)
-        }
-
-        /// true if both `yes` and `no` are false
-        pub fn is_empty(&self) -> bool {
-            !self.yes && !self.no
-        }
-
-        /// true if both `yes` and `no` are true
-        pub fn is_both(&self) -> bool {
-            self.yes && self.no
-        }
-
-        /// Some(true) if `yes` is true and `no` is false,
-        /// Some(false) if `yes` is false and `no` is true, otherwise None
-        pub fn as_bool(&self) -> Option<bool> {
-            match (self.yes, self.no) {
-                (true, false) => Some(true),
-                (false, true) => Some(false),
-                _ => None,
-            }
-        }
-    }
-}
-
-/// Extra investigation, part of the polling station results ("B1-1 Alleen bij extra onderzoek")
-#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
-#[serde(deny_unknown_fields)]
-pub struct ExtraInvestigation {
-    /// Whether extra investigation was done for another reason than an unexplained difference
-    /// ("Heeft het gemeentelijk stembureau extra onderzoek gedaan vanwege een andere reden dan een onverklaard verschil?")
-    pub extra_investigation_other_reason: YesNo,
-    /// Whether ballots were (partially) recounted following the extra investigation
-    /// ("Zijn de stembiljetten naar aanleiding van het extra onderzoek (gedeeltelijk) herteld?")
-    pub ballots_recounted_extra_investigation: YesNo,
-}
-
-/// Counting Differences Polling Station,
-/// part of the polling station results ("B1-2 Verschillen met telresultaten van het stembureau")
-#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
-#[serde(deny_unknown_fields)]
-pub struct CountingDifferencesPollingStation {
-    /// Whether there was an unexplained difference between the number of voters and votes
-    /// ("Was er in de telresultaten van het stembureau een onverklaard verschil tussen het totaal aantal getelde stembiljetten en het aantal toegelaten kiezers?")
-    pub unexplained_difference_ballots_voters: YesNo,
-    /// Whether there was a difference between the total votes per list as determined by the polling station and by the typist
-    /// ("Is er een verschil tussen het totaal aantal getelde stembiljetten per lijst zoals eerder vastgesteld door het stembureau en zoals door u geteld op het gemeentelijk stembureau?")
-    pub difference_ballots_per_list: YesNo,
-}
-
-#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
-#[serde(deny_unknown_fields)]
-pub struct PoliticalGroupCandidateVotes {
-    #[schema(value_type = u32)]
-    pub number: PGNumber,
-    #[schema(value_type = u32)]
-    pub total: Count,
-    pub candidate_votes: Vec<CandidateVotes>,
-}
-
-impl PoliticalGroupCandidateVotes {
-    pub fn add(&mut self, other: &Self) -> Result<(), APIError> {
-        if self.number != other.number {
-            return Err(APIError::AddError(
-                format!(
-                    "Attempted to add votes of group '{}' to '{}'",
-                    other.number, self.number
-                ),
-                ErrorReference::InvalidVoteGroup,
-            ));
-        }
-
-        self.total += other.total;
-
-        for cv in other.candidate_votes.iter() {
-            let Some(found_can) = self
-                .candidate_votes
-                .iter_mut()
-                .find(|c| c.number == cv.number)
-            else {
-                return Err(APIError::AddError(
-                    format!(
-                        "Attempted to add candidate '{}' votes in group '{}', but no such candidate exists",
-                        cv.number, self.number
-                    ),
-                    ErrorReference::InvalidVoteCandidate,
-                ));
-            };
-            found_can.votes += cv.votes;
-        }
-
-        Ok(())
-    }
-
-    /// Create `PoliticalGroupCandidateVotes` from test data with candidate numbers automatically generated starting from 1.
-    #[cfg(test)]
-    pub fn from_test_data_auto(number: PGNumber, candidate_votes: &[Count]) -> Self {
-        PoliticalGroupCandidateVotes {
-            number,
-            total: candidate_votes.iter().sum(),
-            candidate_votes: candidate_votes
-                .iter()
-                .enumerate()
-                .map(|(i, votes)| CandidateVotes {
-                    number: CandidateNumber::try_from(i + 1).unwrap(),
-                    votes: *votes,
-                })
-                .collect(),
-        }
-    }
-}
-
-#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
-#[serde(deny_unknown_fields)]
-pub struct PoliticalGroupTotalVotes {
-    #[schema(value_type = u32)]
-    pub number: PGNumber,
-    #[schema(value_type = u32)]
-    pub total: Count,
-}
-
-#[derive(Serialize, Deserialize, ToSchema, Clone, Copy, Debug, PartialEq, Eq, Hash)]
-#[serde(deny_unknown_fields)]
-pub struct CandidateVotes {
-    #[schema(value_type = u32)]
-    pub number: CandidateNumber,
-    #[schema(value_type = u32)]
-    pub votes: Count,
-}
-
-#[derive(Serialize, Deserialize, ToSchema, Debug)]
-#[serde(deny_unknown_fields)]
-pub struct DataEntryStatusResponse {
-    pub status: DataEntryStatusName,
-}
-
 impl From<PollingStationDataEntry> for DataEntryStatusResponse {
     fn from(data_entry: PollingStationDataEntry) -> Self {
         DataEntryStatusResponse {
@@ -675,303 +82,1806 @@ impl From<PollingStationDataEntry> for DataEntryStatusResponse {
     }
 }
 
-impl From<DataEntryStatus> for DataEntryStatusResponse {
-    fn from(data_entry_status: DataEntryStatus) -> Self {
-        DataEntryStatusResponse {
-            status: data_entry_status.status_name(),
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema)]
+#[serde(deny_unknown_fields, tag = "status", content = "state")]
+#[derive(Default)]
+pub enum DataEntryStatus {
+    #[default]
+    Empty, // First entry has not started yet
+    FirstEntryInProgress(FirstEntryInProgress),
+    FirstEntryHasErrors(FirstEntryHasErrors),
+    FirstEntryFinalised(FirstEntryFinalised),
+    SecondEntryInProgress(SecondEntryInProgress),
+    EntriesDifferent(EntriesDifferent),
+    Definitive(Definitive), // First and second entry are finished
+}
+
+impl ValidateRoot for DataEntryStatus {}
+
+impl Validate for DataEntryStatus {
+    fn validate(
+        &self,
+        election: &ElectionWithPoliticalGroups,
+        polling_station: &PollingStation,
+        validation_results: &mut ValidationResults,
+        path: &FieldPath,
+    ) -> Result<(), DataError> {
+        match self {
+            DataEntryStatus::FirstEntryInProgress(FirstEntryInProgress {
+                first_entry: entry,
+                ..
+            })
+            | DataEntryStatus::FirstEntryHasErrors(FirstEntryHasErrors {
+                finalised_first_entry: entry,
+                ..
+            })
+            | DataEntryStatus::FirstEntryFinalised(FirstEntryFinalised {
+                finalised_first_entry: entry,
+                ..
+            }) => {
+                entry.validate(
+                    election,
+                    polling_station,
+                    validation_results,
+                    &"data".into(),
+                )?;
+                Ok(())
+            }
+            DataEntryStatus::SecondEntryInProgress(state) => {
+                state.second_entry.validate(
+                    election,
+                    polling_station,
+                    validation_results,
+                    &"data".into(),
+                )?;
+                let mut different_fields: Vec<String> = vec![];
+                state.second_entry.compare(
+                    &state.finalised_first_entry,
+                    &mut different_fields,
+                    path,
+                );
+                if !different_fields.is_empty() {
+                    validation_results.warnings.push(ValidationResult {
+                        fields: different_fields.clone(),
+                        code: ValidationResultCode::W001,
+                        context: None,
+                    });
+                }
+                Ok(())
+            }
+            _ => Ok(()),
+        }
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize, strum::Display, Clone, PartialEq, Eq, ToSchema)]
+#[serde(deny_unknown_fields, rename_all = "snake_case")]
+#[strum(serialize_all = "snake_case")]
+pub enum DataEntryStatusName {
+    Empty,
+    FirstEntryInProgress,
+    FirstEntryHasErrors,
+    FirstEntryFinalised,
+    SecondEntryInProgress,
+    EntriesDifferent,
+    Definitive,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type)]
+#[serde(deny_unknown_fields)]
+pub struct FirstEntryInProgress {
+    /// Data entry progress between 0 and 100
+    #[schema(maximum = 100)]
+    pub progress: u8,
+    /// User who is doing the first data entry
+    pub first_entry_user_id: UserId,
+    /// First data entry for a polling station
+    pub first_entry: PollingStationResults,
+    #[schema(value_type = Object)]
+    /// Client state for the data entry (arbitrary JSON)
+    pub client_state: ClientState,
+}
+
+#[derive(Debug, Default, Serialize, Deserialize, Clone, Type, Eq, PartialEq)]
+#[serde(deny_unknown_fields, transparent)]
+pub struct ClientState(pub Option<serde_json::Value>);
+
+impl ClientState {
+    pub fn as_ref(&self) -> Option<&serde_json::Value> {
+        self.0.as_ref()
+    }
+
+    pub fn new_from_str(s: Option<&str>) -> Result<ClientState, serde_json::Error> {
+        let res = s.map(serde_json::from_str).transpose()?;
+        Ok(ClientState(res))
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type)]
+#[serde(deny_unknown_fields)]
+pub struct FirstEntryHasErrors {
+    /// User who did the first data entry
+    pub first_entry_user_id: UserId,
+    /// First data entry for a polling station
+    pub finalised_first_entry: PollingStationResults,
+    /// When the first data entry was finalised
+    #[schema(value_type = String)]
+    pub first_entry_finished_at: DateTime<Utc>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type)]
+#[serde(deny_unknown_fields)]
+pub struct FirstEntryFinalised {
+    /// User who did the first data entry
+    pub first_entry_user_id: UserId,
+    /// First data entry for a polling station
+    pub finalised_first_entry: PollingStationResults,
+    /// When the first data entry was finalised
+    #[schema(value_type = String)]
+    pub first_entry_finished_at: DateTime<Utc>,
+    /// Whether the first data entry was finalised with warnings
+    pub finalised_with_warnings: bool,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type)]
+#[serde(deny_unknown_fields)]
+pub struct SecondEntryInProgress {
+    /// User who did the first data entry
+    pub first_entry_user_id: UserId,
+    /// First data entry for a polling station
+    pub finalised_first_entry: PollingStationResults,
+    /// When the first data entry was finalised
+    #[schema(value_type = String)]
+    pub first_entry_finished_at: DateTime<Utc>,
+    /// Data entry progress between 0 and 100
+    #[schema(maximum = 100)]
+    pub progress: u8,
+    /// User who is doing the second data entry
+    pub second_entry_user_id: UserId,
+    /// Second data entry for a polling station
+    pub second_entry: PollingStationResults,
+    #[schema(value_type = Object)]
+    /// Client state for the data entry (arbitrary JSON)
+    pub client_state: ClientState,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type)]
+#[serde(deny_unknown_fields)]
+pub struct EntriesDifferent {
+    /// User who did the first data entry
+    pub first_entry_user_id: UserId,
+    /// User who did the second data entry
+    pub second_entry_user_id: UserId,
+    /// First data entry for a polling station
+    pub first_entry: PollingStationResults,
+    /// Second data entry for a polling station
+    pub second_entry: PollingStationResults,
+    /// When the first data entry was finalised
+    #[schema(value_type = String)]
+    pub first_entry_finished_at: DateTime<Utc>,
+    /// When the second data entry was finalised
+    #[schema(value_type = String)]
+    pub second_entry_finished_at: DateTime<Utc>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type)]
+#[serde(deny_unknown_fields)]
+pub struct Definitive {
+    /// User who did the first data entry
+    pub first_entry_user_id: UserId,
+    /// User who did the second data entry
+    pub second_entry_user_id: UserId,
+    /// The definitive results data
+    pub results: PollingStationResults,
+    /// When the result was finalised
+    #[schema(value_type = String)]
+    pub finished_at: DateTime<Utc>,
+    /// Whether the result has warnings
+    pub finalised_with_warnings: bool,
+}
+
+/// Current data entry, used for function parameters only
+#[derive(Debug, Clone)]
+pub struct CurrentDataEntry {
+    pub progress: Option<u8>,
+    pub user_id: UserId,
+    pub entry: PollingStationResults,
+    pub client_state: Option<ClientState>,
+}
+
+impl DataEntryStatus {
+    /// Claim of the first entry by a specific typist
+    pub fn claim_first_entry(
+        self,
+        current_data_entry: CurrentDataEntry,
+    ) -> Result<Self, DataEntryTransitionError> {
+        match self {
+            DataEntryStatus::Empty => Ok(Self::FirstEntryInProgress(FirstEntryInProgress {
+                progress: current_data_entry.progress.unwrap_or(0),
+                first_entry_user_id: current_data_entry.user_id,
+                first_entry: current_data_entry.entry,
+                client_state: current_data_entry.client_state.unwrap_or_default(),
+            })),
+            DataEntryStatus::FirstEntryInProgress(_) => {
+                if current_data_entry.user_id
+                    == self.get_first_entry_user_id().expect("user id is present")
+                {
+                    Ok(self)
+                } else {
+                    Err(DataEntryTransitionError::FirstEntryAlreadyClaimed)
+                }
+            }
+            DataEntryStatus::FirstEntryFinalised(_) => {
+                Err(DataEntryTransitionError::FirstEntryAlreadyFinalised)
+            }
+            DataEntryStatus::Definitive(_) => {
+                Err(DataEntryTransitionError::SecondEntryAlreadyFinalised)
+            }
+            _ => Err(DataEntryTransitionError::Invalid),
+        }
+    }
+
+    /// Claim of the second entry by a specific typist
+    pub fn claim_second_entry(
+        self,
+        current_data_entry: CurrentDataEntry,
+    ) -> Result<Self, DataEntryTransitionError> {
+        match self {
+            DataEntryStatus::FirstEntryFinalised(state) => {
+                if current_data_entry.user_id == state.first_entry_user_id {
+                    Err(DataEntryTransitionError::SecondEntryNeedsDifferentUser)
+                } else if !state
+                    .finalised_first_entry
+                    .is_same_model(&current_data_entry.entry)
+                {
+                    Err(DataEntryTransitionError::Invalid)
+                } else {
+                    Ok(Self::SecondEntryInProgress(SecondEntryInProgress {
+                        first_entry_user_id: state.first_entry_user_id,
+                        finalised_first_entry: state.finalised_first_entry,
+                        first_entry_finished_at: state.first_entry_finished_at,
+                        progress: current_data_entry.progress.unwrap_or(0),
+                        second_entry_user_id: current_data_entry.user_id,
+                        second_entry: current_data_entry.entry,
+                        client_state: current_data_entry.client_state.unwrap_or_default(),
+                    }))
+                }
+            }
+            DataEntryStatus::SecondEntryInProgress(_) => {
+                if current_data_entry.user_id
+                    == self.get_second_entry_user_id().expect("user id is present")
+                {
+                    Ok(self)
+                } else {
+                    Err(DataEntryTransitionError::SecondEntryAlreadyClaimed)
+                }
+            }
+            DataEntryStatus::Definitive(_) => {
+                Err(DataEntryTransitionError::SecondEntryAlreadyFinalised)
+            }
+            _ => Err(DataEntryTransitionError::Invalid),
+        }
+    }
+
+    /// Update the data in the first entry while it is in progress
+    pub fn update_first_entry(
+        self,
+        current_data_entry: CurrentDataEntry,
+    ) -> Result<Self, DataEntryTransitionError> {
+        match self {
+            DataEntryStatus::FirstEntryInProgress(state) => {
+                if state.first_entry_user_id != current_data_entry.user_id {
+                    return Err(DataEntryTransitionError::CannotTransitionUsingDifferentUser);
+                }
+
+                if !state.first_entry.is_same_model(&current_data_entry.entry) {
+                    return Err(DataEntryTransitionError::Invalid);
+                }
+
+                Ok(Self::FirstEntryInProgress(FirstEntryInProgress {
+                    progress: current_data_entry.progress.unwrap_or(0),
+                    first_entry_user_id: state.first_entry_user_id,
+                    first_entry: current_data_entry.entry,
+                    client_state: current_data_entry.client_state.unwrap_or_default(),
+                }))
+            }
+            DataEntryStatus::FirstEntryFinalised(_) | DataEntryStatus::SecondEntryInProgress(_) => {
+                Err(DataEntryTransitionError::FirstEntryAlreadyFinalised)
+            }
+            DataEntryStatus::Definitive(_) => {
+                Err(DataEntryTransitionError::SecondEntryAlreadyFinalised)
+            }
+            _ => Err(DataEntryTransitionError::Invalid),
+        }
+    }
+
+    /// Update the data in the second entry while it is in progress
+    pub fn update_second_entry(
+        self,
+        current_data_entry: CurrentDataEntry,
+    ) -> Result<Self, DataEntryTransitionError> {
+        match self {
+            DataEntryStatus::SecondEntryInProgress(state) => {
+                if state.second_entry_user_id != current_data_entry.user_id {
+                    return Err(DataEntryTransitionError::CannotTransitionUsingDifferentUser);
+                }
+
+                if !state.second_entry.is_same_model(&current_data_entry.entry) {
+                    return Err(DataEntryTransitionError::Invalid);
+                }
+
+                Ok(Self::SecondEntryInProgress(SecondEntryInProgress {
+                    first_entry_user_id: state.first_entry_user_id,
+                    finalised_first_entry: state.finalised_first_entry,
+                    first_entry_finished_at: state.first_entry_finished_at,
+                    progress: current_data_entry.progress.unwrap_or(0),
+                    second_entry_user_id: state.second_entry_user_id,
+                    second_entry: current_data_entry.entry,
+                    client_state: current_data_entry.client_state.unwrap_or_default(),
+                }))
+            }
+            DataEntryStatus::Definitive(_) => {
+                Err(DataEntryTransitionError::SecondEntryAlreadyFinalised)
+            }
+            _ => Err(DataEntryTransitionError::Invalid),
+        }
+    }
+
+    /// Complete the first entry and allow a second entry to be started
+    pub fn finalise_first_entry(
+        self,
+        polling_station: &PollingStation,
+        election: &ElectionWithPoliticalGroups,
+        user_id: UserId,
+    ) -> Result<Self, DataEntryTransitionError> {
+        match &self {
+            DataEntryStatus::FirstEntryInProgress(state) => {
+                if state.first_entry_user_id != user_id {
+                    return Err(DataEntryTransitionError::CannotTransitionUsingDifferentUser);
+                }
+
+                let validation_results = self.start_validate(polling_station, election)?;
+
+                if validation_results.has_errors() {
+                    Ok(Self::FirstEntryHasErrors(FirstEntryHasErrors {
+                        first_entry_user_id: state.first_entry_user_id,
+                        finalised_first_entry: state.first_entry.clone(),
+                        first_entry_finished_at: Utc::now(),
+                    }))
+                } else {
+                    Ok(Self::FirstEntryFinalised(FirstEntryFinalised {
+                        first_entry_user_id: state.first_entry_user_id,
+                        finalised_first_entry: state.first_entry.clone(),
+                        first_entry_finished_at: Utc::now(),
+                        finalised_with_warnings: validation_results.has_warnings(),
+                    }))
+                }
+            }
+            DataEntryStatus::FirstEntryFinalised(_) | DataEntryStatus::SecondEntryInProgress(_) => {
+                Err(DataEntryTransitionError::FirstEntryAlreadyFinalised)
+            }
+            DataEntryStatus::Definitive(_) => {
+                Err(DataEntryTransitionError::SecondEntryAlreadyFinalised)
+            }
+            _ => Err(DataEntryTransitionError::Invalid),
+        }
+    }
+
+    /// Complete the second entry and compare the two entries, then either
+    /// make the data entry process definitive or return the conflict
+    pub fn finalise_second_entry(
+        self,
+        polling_station: &PollingStation,
+        election: &ElectionWithPoliticalGroups,
+        user_id: UserId,
+    ) -> Result<Self, DataEntryTransitionError> {
+        match &self {
+            DataEntryStatus::SecondEntryInProgress(state) => {
+                if state.second_entry_user_id != user_id {
+                    return Err(DataEntryTransitionError::CannotTransitionUsingDifferentUser);
+                }
+
+                if state.finalised_first_entry == state.second_entry {
+                    let validation_results = self.start_validate(polling_station, election)?;
+
+                    if validation_results.has_errors() {
+                        return Err(validation_results.into());
+                    }
+
+                    Ok(Self::Definitive(Definitive {
+                        first_entry_user_id: state.first_entry_user_id,
+                        second_entry_user_id: state.second_entry_user_id,
+                        finished_at: Utc::now(),
+                        finalised_with_warnings: validation_results.has_warnings(),
+                        results: state.second_entry.clone(),
+                    }))
+                } else {
+                    Ok(Self::EntriesDifferent(EntriesDifferent {
+                        first_entry_user_id: state.first_entry_user_id,
+                        second_entry_user_id: state.second_entry_user_id,
+                        first_entry: state.finalised_first_entry.clone(),
+                        second_entry: state.second_entry.clone(),
+                        first_entry_finished_at: state.first_entry_finished_at,
+                        second_entry_finished_at: Utc::now(),
+                    }))
+                }
+            }
+            DataEntryStatus::Definitive(_) => {
+                Err(DataEntryTransitionError::SecondEntryAlreadyFinalised)
+            }
+            _ => Err(DataEntryTransitionError::Invalid),
+        }
+    }
+
+    /// Delete the first entry while it is in progress
+    pub fn delete_first_entry(self, user_id: UserId) -> Result<Self, DataEntryTransitionError> {
+        match self {
+            DataEntryStatus::FirstEntryInProgress(state) => {
+                if state.first_entry_user_id != user_id {
+                    return Err(DataEntryTransitionError::CannotTransitionUsingDifferentUser);
+                }
+
+                Ok(DataEntryStatus::Empty)
+            }
+            DataEntryStatus::FirstEntryFinalised(_) | DataEntryStatus::SecondEntryInProgress(_) => {
+                Err(DataEntryTransitionError::FirstEntryAlreadyFinalised)
+            }
+            DataEntryStatus::Definitive(_) => {
+                Err(DataEntryTransitionError::SecondEntryAlreadyFinalised)
+            }
+            _ => Err(DataEntryTransitionError::Invalid),
+        }
+    }
+
+    /// Delete the second entry while it is in progress
+    pub fn delete_second_entry(
+        self,
+        user_id: UserId,
+        polling_station: &PollingStation,
+        election: &ElectionWithPoliticalGroups,
+    ) -> Result<Self, DataEntryTransitionError> {
+        match self {
+            DataEntryStatus::SecondEntryInProgress(SecondEntryInProgress {
+                finalised_first_entry,
+                first_entry_finished_at,
+                first_entry_user_id,
+                second_entry_user_id,
+                ..
+            }) => {
+                if second_entry_user_id != user_id {
+                    return Err(DataEntryTransitionError::CannotTransitionUsingDifferentUser);
+                }
+
+                let validation_results =
+                    finalised_first_entry.start_validate(polling_station, election)?;
+
+                Ok(DataEntryStatus::FirstEntryFinalised(FirstEntryFinalised {
+                    first_entry_user_id,
+                    finalised_first_entry,
+                    first_entry_finished_at,
+                    finalised_with_warnings: validation_results.has_warnings(),
+                }))
+            }
+            DataEntryStatus::Definitive(_) => {
+                Err(DataEntryTransitionError::SecondEntryAlreadyFinalised)
+            }
+            _ => Err(DataEntryTransitionError::Invalid),
+        }
+    }
+
+    /// Resume first data entry while resolving accepted errors
+    pub fn resume_first_entry(&self) -> Result<Self, DataEntryTransitionError> {
+        match self {
+            DataEntryStatus::FirstEntryHasErrors(state) => {
+                Ok(Self::FirstEntryInProgress(FirstEntryInProgress {
+                    progress: 0,
+                    first_entry_user_id: state.first_entry_user_id,
+                    first_entry: state.finalised_first_entry.clone(),
+                    client_state: Default::default(),
+                }))
+            }
+            _ => Err(DataEntryTransitionError::Invalid),
+        }
+    }
+
+    /// Discard first data entry while resolving accepted errors
+    pub fn discard_first_entry(&self) -> Result<Self, DataEntryTransitionError> {
+        match self {
+            DataEntryStatus::FirstEntryHasErrors(_) => Ok(Self::Empty),
+            _ => Err(DataEntryTransitionError::Invalid),
+        }
+    }
+
+    /// Delete both entries while resolving differences
+    pub fn delete_entries(self) -> Result<Self, DataEntryTransitionError> {
+        match self {
+            DataEntryStatus::EntriesDifferent(_) => Ok(Self::Empty),
+            _ => Err(DataEntryTransitionError::Invalid),
+        }
+    }
+
+    /// Keep first entry while resolving differences
+    pub fn keep_first_entry(
+        self,
+        polling_station: &PollingStation,
+        election: &ElectionWithPoliticalGroups,
+    ) -> Result<Self, DataEntryTransitionError> {
+        match &self {
+            DataEntryStatus::EntriesDifferent(state) => {
+                let validation_results = state
+                    .first_entry
+                    .start_validate(polling_station, election)?;
+
+                Ok(Self::FirstEntryFinalised(FirstEntryFinalised {
+                    first_entry_user_id: state.first_entry_user_id,
+                    finalised_first_entry: state.first_entry.clone(),
+                    first_entry_finished_at: state.first_entry_finished_at,
+                    finalised_with_warnings: validation_results.has_warnings(),
+                }))
+            }
+            _ => Err(DataEntryTransitionError::Invalid),
+        }
+    }
+
+    /// Keep second entry while resolving differences; it becomes the first entry
+    pub fn keep_second_entry(
+        self,
+        polling_station: &PollingStation,
+        election: &ElectionWithPoliticalGroups,
+    ) -> Result<Self, DataEntryTransitionError> {
+        match &self {
+            DataEntryStatus::EntriesDifferent(state) => {
+                // Note that by setting the second entry to the first
+                // entry, we keep the second entry and discard the first entry
+                let validation_results = state
+                    .second_entry
+                    .start_validate(polling_station, election)?;
+
+                if validation_results.has_errors() {
+                    Ok(Self::FirstEntryHasErrors(FirstEntryHasErrors {
+                        first_entry_user_id: state.second_entry_user_id,
+                        finalised_first_entry: state.second_entry.clone(),
+                        first_entry_finished_at: state.second_entry_finished_at,
+                    }))
+                } else {
+                    Ok(Self::FirstEntryFinalised(FirstEntryFinalised {
+                        first_entry_user_id: state.second_entry_user_id,
+                        finalised_first_entry: state.second_entry.clone(),
+                        first_entry_finished_at: state.second_entry_finished_at,
+                        finalised_with_warnings: validation_results.has_warnings(),
+                    }))
+                }
+            }
+            _ => Err(DataEntryTransitionError::Invalid),
+        }
+    }
+
+    /// Get the progress of the first entry (if there is a first entry), from 0 to 100
+    pub fn get_first_entry_progress(&self) -> Option<u8> {
+        match self {
+            DataEntryStatus::Empty => None,
+            DataEntryStatus::FirstEntryInProgress(state) => Some(state.progress),
+            _ => Some(100),
+        }
+    }
+
+    /// Get the progress of the second entry (if there is a second entry), from 0 to 100
+    pub fn get_second_entry_progress(&self) -> Option<u8> {
+        match self {
+            DataEntryStatus::Empty
+            | DataEntryStatus::FirstEntryInProgress(_)
+            | DataEntryStatus::FirstEntryFinalised(_) => None,
+            DataEntryStatus::SecondEntryInProgress(state) => Some(state.progress),
+            _ => Some(100),
+        }
+    }
+
+    /// Get the total progress of the data entry process, from 0 to 100
+    pub fn get_progress(&self) -> u8 {
+        match self {
+            DataEntryStatus::Empty => 0,
+            DataEntryStatus::FirstEntryInProgress(state) => state.progress,
+            DataEntryStatus::FirstEntryHasErrors(_) => 100,
+            DataEntryStatus::FirstEntryFinalised(_) => 0,
+            DataEntryStatus::SecondEntryInProgress(state) => state.progress,
+            DataEntryStatus::EntriesDifferent(_) => 100,
+            DataEntryStatus::Definitive(_) => 100,
+        }
+    }
+
+    /// Get the user ID of the first entry typist
+    pub fn get_first_entry_user_id(&self) -> Option<UserId> {
+        match self {
+            DataEntryStatus::FirstEntryInProgress(state) => Some(state.first_entry_user_id),
+            DataEntryStatus::FirstEntryFinalised(state) => Some(state.first_entry_user_id),
+            DataEntryStatus::SecondEntryInProgress(state) => Some(state.first_entry_user_id),
+            DataEntryStatus::EntriesDifferent(state) => Some(state.first_entry_user_id),
+            DataEntryStatus::Definitive(state) => Some(state.first_entry_user_id),
+            _ => None,
+        }
+    }
+
+    /// Get the user ID of the second entry typist
+    pub fn get_second_entry_user_id(&self) -> Option<UserId> {
+        match self {
+            DataEntryStatus::SecondEntryInProgress(state) => Some(state.second_entry_user_id),
+            DataEntryStatus::EntriesDifferent(state) => Some(state.second_entry_user_id),
+            DataEntryStatus::Definitive(state) => Some(state.second_entry_user_id),
+            _ => None,
+        }
+    }
+
+    /// Get the data for the current entry if there is any
+    pub fn get_data(&self) -> Option<&PollingStationResults> {
+        match self {
+            DataEntryStatus::FirstEntryInProgress(state) => Some(&state.first_entry),
+            DataEntryStatus::SecondEntryInProgress(state) => Some(&state.second_entry),
+            _ => None,
+        }
+    }
+
+    /// Extract the client state if there is any
+    pub fn get_client_state(&self) -> Option<&serde_json::Value> {
+        match self {
+            DataEntryStatus::FirstEntryInProgress(state) => state.client_state.as_ref(),
+            DataEntryStatus::SecondEntryInProgress(state) => state.client_state.as_ref(),
+            _ => None,
+        }
+    }
+
+    /// Get the name of the current status
+    pub fn status_name(&self) -> DataEntryStatusName {
+        match self {
+            DataEntryStatus::Empty => DataEntryStatusName::Empty,
+            DataEntryStatus::FirstEntryInProgress(_) => DataEntryStatusName::FirstEntryInProgress,
+            DataEntryStatus::FirstEntryHasErrors(_) => DataEntryStatusName::FirstEntryHasErrors,
+            DataEntryStatus::FirstEntryFinalised(_) => DataEntryStatusName::FirstEntryFinalised,
+            DataEntryStatus::SecondEntryInProgress(_) => DataEntryStatusName::SecondEntryInProgress,
+            DataEntryStatus::EntriesDifferent(_) => DataEntryStatusName::EntriesDifferent,
+            DataEntryStatus::Definitive(_) => DataEntryStatusName::Definitive,
+        }
+    }
+
+    /// Returns the timestamp at which point this data entry process was made definitive
+    pub fn finished_at(&self) -> Option<&DateTime<Utc>> {
+        match self {
+            DataEntryStatus::FirstEntryFinalised(FirstEntryFinalised {
+                first_entry_finished_at,
+                ..
+            }) => Some(first_entry_finished_at),
+            DataEntryStatus::SecondEntryInProgress(SecondEntryInProgress {
+                first_entry_finished_at,
+                ..
+            }) => Some(first_entry_finished_at),
+            DataEntryStatus::Definitive(Definitive { finished_at, .. }) => Some(finished_at),
+            _ => None,
+        }
+    }
+
+    /// Returns whether the finalised first or second data entry has warnings
+    pub fn finalised_with_warnings(&self) -> Option<&bool> {
+        match self {
+            DataEntryStatus::FirstEntryFinalised(FirstEntryFinalised {
+                finalised_with_warnings,
+                ..
+            }) => Some(finalised_with_warnings),
+            DataEntryStatus::Definitive(Definitive {
+                finalised_with_warnings,
+                ..
+            }) => Some(finalised_with_warnings),
+            _ => None,
+        }
+    }
+}
+
+impl Display for DataEntryTransitionError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            DataEntryTransitionError::FirstEntryAlreadyClaimed => {
+                write!(f, "First entry already claimed")
+            }
+            DataEntryTransitionError::SecondEntryAlreadyClaimed => {
+                write!(f, "Second entry already claimed")
+            }
+            DataEntryTransitionError::SecondEntryAlreadyFinalised => {
+                write!(f, "Second entry already finalised")
+            }
+            DataEntryTransitionError::FirstEntryAlreadyFinalised => {
+                write!(f, "First entry already finalised")
+            }
+            DataEntryTransitionError::CannotTransitionUsingDifferentUser => {
+                write!(f, "Cannot save using a different user")
+            }
+            DataEntryTransitionError::SecondEntryNeedsDifferentUser => {
+                write!(
+                    f,
+                    "Second entry needs a different user than the first entry"
+                )
+            }
+            DataEntryTransitionError::Invalid => write!(f, "Invalid state transition"),
+            DataEntryTransitionError::ValidatorError(data_error) => {
+                write!(f, "Validator error: {data_error}")
+            }
+            DataEntryTransitionError::ValidationError(_) => write!(f, "Validation errors"),
         }
     }
 }
 
 #[cfg(test)]
-pub mod tests {
+mod tests {
     use super::*;
+    use crate::domain::{
+        election::{
+            Candidate, CandidateNumber, CommitteeCategory, ElectionCategory, ElectionId, PGNumber,
+            PoliticalGroup, VoteCountingMethod,
+        },
+        polling_station::{PollingStation, PollingStationId, PollingStationType},
+        results::{
+            cso_first_session_results::CSOFirstSessionResults,
+            political_group_candidate_votes::{CandidateVotes, PoliticalGroupCandidateVotes},
+            political_group_total_votes::PoliticalGroupTotalVotes,
+            tests::example_polling_station_results,
+            voters_counts::VotersCounts,
+            votes_counts::VotesCounts,
+        },
+        valid_default::ValidDefault,
+    };
 
-    pub trait ValidDefault {
-        fn valid_default() -> Self;
-    }
-
-    impl ValidDefault for ExtraInvestigation {
-        fn valid_default() -> Self {
-            Self {
-                extra_investigation_other_reason: YesNo::default(),
-                ballots_recounted_extra_investigation: YesNo::default(),
-            }
-        }
-    }
-
-    impl ValidDefault for CountingDifferencesPollingStation {
-        fn valid_default() -> Self {
-            Self {
-                unexplained_difference_ballots_voters: YesNo::no(),
-                difference_ballots_per_list: YesNo::no(),
-            }
-        }
-    }
-
-    impl ValidDefault for DifferencesCounts {
-        fn valid_default() -> Self {
-            Self {
-                compare_votes_cast_admitted_voters: {
-                    DifferenceCountsCompareVotesCastAdmittedVoters {
-                        admitted_voters_equal_votes_cast: true,
-                        votes_cast_greater_than_admitted_voters: false,
-                        votes_cast_smaller_than_admitted_voters: false,
-                    }
-                },
-                more_ballots_count: 0,
-                fewer_ballots_count: 0,
-                difference_completely_accounted_for: YesNo::yes(),
-            }
-        }
-    }
-
-    pub fn example_polling_station_results() -> PollingStationResults {
-        PollingStationResults::CSOFirstSession(CSOFirstSessionResults {
+    fn cso_first_session_result() -> CSOFirstSessionResults {
+        CSOFirstSessionResults {
             extra_investigation: ValidDefault::valid_default(),
             counting_differences_polling_station: ValidDefault::valid_default(),
-            voters_counts: VotersCounts {
-                poll_card_count: 99,
-                proxy_certificate_count: 1,
-                total_admitted_voters_count: 100,
-            },
-            votes_counts: VotesCounts {
-                political_group_total_votes: vec![
-                    PoliticalGroupTotalVotes {
-                        number: PGNumber::from(1),
-                        total: 56,
-                    },
-                    PoliticalGroupTotalVotes {
-                        number: PGNumber::from(2),
-                        total: 40,
-                    },
-                ],
-                total_votes_candidates_count: 96,
-                blank_votes_count: 2,
-                invalid_votes_count: 2,
-                total_votes_cast_count: 100,
-            },
-            differences_counts: DifferencesCounts {
-                more_ballots_count: 0,
-                fewer_ballots_count: 0,
-                compare_votes_cast_admitted_voters:
-                    DifferenceCountsCompareVotesCastAdmittedVoters {
-                        admitted_voters_equal_votes_cast: true,
-                        votes_cast_greater_than_admitted_voters: false,
-                        votes_cast_smaller_than_admitted_voters: false,
-                    },
-                difference_completely_accounted_for: YesNo::yes(),
-            },
-            political_group_votes: vec![
-                PoliticalGroupCandidateVotes::from_test_data_auto(PGNumber::from(1), &[36, 20]),
-                PoliticalGroupCandidateVotes::from_test_data_auto(PGNumber::from(2), &[30, 10]),
-            ],
+            voters_counts: Default::default(),
+            votes_counts: Default::default(),
+            differences_counts: ValidDefault::valid_default(),
+            political_group_votes: vec![],
+        }
+    }
+
+    fn empty_current_data_entry() -> CurrentDataEntry {
+        CurrentDataEntry {
+            progress: None,
+            user_id: UserId::from(0),
+            entry: example_polling_station_results(),
+            client_state: None,
+        }
+    }
+
+    fn empty_current_second_data_entry() -> CurrentDataEntry {
+        CurrentDataEntry {
+            progress: None,
+            user_id: UserId::from(1),
+            entry: example_polling_station_results(),
+            client_state: None,
+        }
+    }
+
+    fn next_session_data_entry() -> CurrentDataEntry {
+        CurrentDataEntry {
+            progress: None,
+            user_id: UserId::from(0),
+            entry: PollingStationResults::CSONextSession(Default::default()),
+            client_state: None,
+        }
+    }
+
+    fn next_session_second_data_entry() -> CurrentDataEntry {
+        CurrentDataEntry {
+            progress: None,
+            user_id: UserId::from(1),
+            entry: PollingStationResults::CSONextSession(Default::default()),
+            client_state: None,
+        }
+    }
+
+    fn polling_station() -> PollingStation {
+        PollingStation {
+            id: PollingStationId::from(1),
+            name: "Test polling station".to_string(),
+            number: 1,
+            number_of_voters: None,
+            polling_station_type: Some(PollingStationType::FixedLocation),
+            address: "Test street".to_string(),
+            postal_code: "1234 YQ".to_string(),
+            locality: "Test city".to_string(),
+        }
+    }
+
+    fn election() -> ElectionWithPoliticalGroups {
+        ElectionWithPoliticalGroups {
+            id: ElectionId::from(1),
+            name: "Test election".to_string(),
+            committee_category: CommitteeCategory::GSB,
+            counting_method: VoteCountingMethod::CSO,
+            election_id: "Test_2025".to_string(),
+            location: "Test location".to_string(),
+            domain_id: "0000".to_string(),
+            category: ElectionCategory::Municipal,
+            number_of_seats: 18,
+            number_of_voters: 1000,
+            election_date: Utc::now().date_naive(),
+            nomination_date: Utc::now().date_naive(),
+            political_groups: (1..=2)
+                .map(|number| PoliticalGroup {
+                    number: PGNumber::from(number),
+                    name: format!("Partij {number}"),
+                    candidates: (1..=2)
+                        .map(|number| Candidate {
+                            number: CandidateNumber::from(number),
+                            initials: "A".to_string(),
+                            first_name: None,
+                            last_name_prefix: None,
+                            last_name: format!("Kandidaat {number}"),
+                            locality: "Juinen".to_string(),
+                            country_code: None,
+                            gender: None,
+                        })
+                        .collect(),
+                })
+                .collect(),
+        }
+    }
+
+    fn first_entry_in_progress() -> DataEntryStatus {
+        DataEntryStatus::FirstEntryInProgress(FirstEntryInProgress {
+            progress: 0,
+            first_entry_user_id: UserId::from(0),
+            first_entry: example_polling_station_results(),
+            client_state: ClientState::new_from_str(Some("{}")).unwrap(),
         })
     }
 
-    impl PollingStationResults {
-        pub fn with_warning(mut self) -> Self {
-            let extra_blank_votes: Count = 100;
-
-            let voters_counts = self.voters_counts_mut();
-            voters_counts.poll_card_count += extra_blank_votes;
-            voters_counts.total_admitted_voters_count += extra_blank_votes;
-
-            let votes_counts = self.votes_counts_mut();
-            votes_counts.blank_votes_count += extra_blank_votes;
-            votes_counts.total_votes_cast_count += extra_blank_votes;
-
-            self
-        }
-
-        pub fn with_error(mut self) -> Self {
-            let voters_counts = self.voters_counts_mut();
-            voters_counts.poll_card_count = 10;
-            voters_counts.proxy_certificate_count = 10;
-            voters_counts.total_admitted_voters_count = 80;
-
-            self
-        }
-
-        pub fn with_difference(mut self) -> Self {
-            let extra_proxy_certificate: Count = 10;
-
-            let voters_counts = self.voters_counts_mut();
-            voters_counts.poll_card_count -= extra_proxy_certificate;
-            voters_counts.proxy_certificate_count += extra_proxy_certificate;
-
-            self
-        }
+    fn first_entry_has_errors() -> DataEntryStatus {
+        DataEntryStatus::FirstEntryHasErrors(FirstEntryHasErrors {
+            first_entry_user_id: UserId::from(0),
+            finalised_first_entry: example_polling_station_results(),
+            first_entry_finished_at: Utc::now(),
+        })
     }
 
-    mod polling_station_results {
-        use test_log::test;
-
-        use super::*;
-
-        #[test]
-        fn test_cso_first_session_as() {
-            let cso_first_session = PollingStationResults::CSOFirstSession(Default::default());
-            assert!(cso_first_session.as_cso_first_session().is_some());
-            assert!(cso_first_session.as_cso_next_session().is_none());
-            assert!(
-                cso_first_session
-                    .clone()
-                    .as_cso_first_session_mut()
-                    .is_some()
-            );
-            assert!(
-                cso_first_session
-                    .clone()
-                    .as_cso_next_session_mut()
-                    .is_none()
-            );
-        }
-
-        #[test]
-        fn test_cso_next_session_as() {
-            let cso_next_session = PollingStationResults::CSONextSession(Default::default());
-            assert!(cso_next_session.as_cso_first_session().is_none());
-            assert!(cso_next_session.as_cso_next_session().is_some());
-
-            assert!(
-                cso_next_session
-                    .clone()
-                    .as_cso_first_session_mut()
-                    .is_none()
-            );
-            assert!(cso_next_session.clone().as_cso_next_session_mut().is_some());
-        }
-
-        #[test]
-        fn test_cso_first_session_into() {
-            let cso_first_session = PollingStationResults::CSOFirstSession(Default::default());
-            assert!(cso_first_session.clone().into_cso_first_session().is_some());
-            assert!(cso_first_session.clone().into_cso_next_session().is_none());
-        }
-
-        #[test]
-        fn test_cso_next_session_into() {
-            let cso_next_session = PollingStationResults::CSONextSession(Default::default());
-            assert!(cso_next_session.clone().into_cso_first_session().is_none());
-            assert!(cso_next_session.clone().into_cso_next_session().is_some());
-        }
+    fn first_entry_finalised() -> DataEntryStatus {
+        DataEntryStatus::FirstEntryFinalised(FirstEntryFinalised {
+            first_entry_user_id: UserId::from(0),
+            finalised_first_entry: example_polling_station_results(),
+            first_entry_finished_at: Utc::now(),
+            finalised_with_warnings: true,
+        })
     }
 
-    mod votes_counts {
-        use test_log::test;
+    fn second_entry_in_progress() -> DataEntryStatus {
+        DataEntryStatus::SecondEntryInProgress(SecondEntryInProgress {
+            first_entry_user_id: UserId::from(0),
+            finalised_first_entry: example_polling_station_results(),
+            first_entry_finished_at: Utc::now(),
+            progress: 0,
+            second_entry_user_id: UserId::from(0),
+            second_entry: example_polling_station_results(),
+            client_state: ClientState::new_from_str(Some("{}")).unwrap(),
+        })
+    }
 
-        use super::*;
-        use crate::{APIError, error::ErrorReference};
+    fn definitive() -> DataEntryStatus {
+        DataEntryStatus::Definitive(Definitive {
+            first_entry_user_id: UserId::from(0),
+            second_entry_user_id: UserId::from(0),
+            finished_at: Utc::now(),
+            finalised_with_warnings: false,
+            results: example_polling_station_results(),
+        })
+    }
 
-        #[test]
-        fn test_votes_addition() {
-            let mut curr_votes = VotesCounts {
-                political_group_total_votes: vec![
-                    PoliticalGroupTotalVotes {
+    fn entries_different() -> DataEntryStatus {
+        DataEntryStatus::EntriesDifferent(EntriesDifferent {
+            first_entry: example_polling_station_results(),
+            first_entry_user_id: UserId::from(0),
+            second_entry: example_polling_station_results().with_difference(),
+            second_entry_user_id: UserId::from(0),
+            first_entry_finished_at: Utc::now(),
+            second_entry_finished_at: Utc::now(),
+        })
+    }
+
+    /// Empty --> FirstEntryInProgress: claim
+    #[test]
+    fn empty_to_first_entry_in_progress() {
+        // Happy path
+        assert!(matches!(
+            DataEntryStatus::Empty.claim_first_entry(empty_current_data_entry()),
+            Ok(DataEntryStatus::FirstEntryInProgress(_))
+        ));
+    }
+
+    /// FirstEntryInProgress --> FirstEntryInProgress: claim with same user
+    #[test]
+    fn first_entry_in_progress_claim_first_entry_ok() {
+        assert!(matches!(
+            first_entry_in_progress().claim_first_entry(empty_current_data_entry()),
+            Ok(DataEntryStatus::FirstEntryInProgress(_))
+        ));
+    }
+
+    /// FirstEntryInProgress --> FirstEntryInProgress: claim with different user returns error
+    #[test]
+    fn first_entry_in_progress_claim_first_entry_other_user_error() {
+        let current_data_entry = CurrentDataEntry {
+            progress: None,
+            user_id: UserId::from(1),
+            entry: example_polling_station_results(),
+            client_state: None,
+        };
+        assert_eq!(
+            first_entry_in_progress().claim_first_entry(current_data_entry),
+            Err(DataEntryTransitionError::FirstEntryAlreadyClaimed)
+        );
+    }
+
+    #[test]
+    fn definitive_claim_first_entry_error() {
+        assert_eq!(
+            definitive().claim_first_entry(empty_current_data_entry()),
+            Err(DataEntryTransitionError::SecondEntryAlreadyFinalised)
+        );
+    }
+
+    #[test]
+    fn first_entry_finalised_claim_first_entry_error() {
+        assert_eq!(
+            first_entry_finalised().claim_first_entry(empty_current_data_entry()),
+            Err(DataEntryTransitionError::FirstEntryAlreadyFinalised)
+        );
+    }
+
+    #[test]
+    fn second_entry_in_progress_claim_first_entry_error() {
+        assert_eq!(
+            second_entry_in_progress().claim_first_entry(empty_current_data_entry()),
+            Err(DataEntryTransitionError::Invalid)
+        );
+    }
+
+    /// FirstEntryInProgress --> FirstEntryInProgress: save
+    #[test]
+    fn first_entry_in_progress_to_first_entry_in_progress() {
+        assert!(matches!(
+            first_entry_in_progress().update_first_entry(empty_current_data_entry()),
+            Ok(DataEntryStatus::FirstEntryInProgress(_))
+        ));
+    }
+
+    /// FirstEntryInProgress --> FirstEntryFinalised: finalise
+    #[test]
+    fn first_entry_in_progress_to_first_entry_finalised() {
+        // Happy path
+        let status = first_entry_in_progress()
+            .finalise_first_entry(&polling_station(), &election(), UserId::from(0))
+            .unwrap();
+
+        assert_eq!(
+            status.status_name(),
+            DataEntryStatusName::FirstEntryFinalised
+        );
+    }
+
+    /// FirstEntryInProgress --> FirstEntryInProgress: error when updating as a different user
+    #[test]
+    fn first_entry_in_progress_save_as_other_user_error() {
+        assert_eq!(
+            first_entry_in_progress().update_first_entry(CurrentDataEntry {
+                progress: None,
+                user_id: UserId::from(1),
+                entry: example_polling_station_results(),
+                client_state: None,
+            }),
+            Err(DataEntryTransitionError::CannotTransitionUsingDifferentUser)
+        );
+    }
+
+    #[test]
+    fn first_entry_finalised_finalise_first_entry_error() {
+        assert_eq!(
+            first_entry_finalised().finalise_first_entry(
+                &polling_station(),
+                &election(),
+                UserId::from(0)
+            ),
+            Err(DataEntryTransitionError::FirstEntryAlreadyFinalised)
+        );
+    }
+
+    #[test]
+    fn second_entry_in_progress_finalise_first_entry_error() {
+        assert_eq!(
+            second_entry_in_progress().finalise_first_entry(
+                &polling_station(),
+                &election(),
+                UserId::from(0)
+            ),
+            Err(DataEntryTransitionError::FirstEntryAlreadyFinalised)
+        );
+    }
+
+    #[test]
+    fn definitive_finalise_first_entry_error() {
+        assert_eq!(
+            definitive().finalise_first_entry(&polling_station(), &election(), UserId::from(0)),
+            Err(DataEntryTransitionError::SecondEntryAlreadyFinalised)
+        );
+    }
+
+    #[test]
+    fn finalise_first_entry_validation_error() {
+        // Create data with validation errors that will trigger FirstEntryHasErrors
+        let invalid_entry = example_polling_station_results().with_error();
+
+        let initial = DataEntryStatus::FirstEntryInProgress(FirstEntryInProgress {
+            progress: 0,
+            first_entry_user_id: UserId::from(0),
+            first_entry: invalid_entry,
+            client_state: ClientState::new_from_str(Some("{}")).unwrap(),
+        });
+        let next = initial
+            .finalise_first_entry(&polling_station(), &election(), UserId::from(0))
+            .expect("should be Ok");
+        assert!(
+            matches!(next, DataEntryStatus::FirstEntryHasErrors(_)),
+            "actual: {next:?}"
+        );
+    }
+
+    /// FirstEntryInProgress --> Empty: delete
+    #[test]
+    fn first_entry_in_progress_to_empty() {
+        // Happy path
+        assert!(matches!(
+            first_entry_in_progress()
+                .delete_first_entry(UserId::from(0))
+                .unwrap(),
+            DataEntryStatus::Empty
+        ));
+    }
+
+    // Error states
+    #[test]
+    fn first_entry_finalised_delete_first_entry_error() {
+        assert_eq!(
+            first_entry_finalised().delete_first_entry(UserId::from(0)),
+            Err(DataEntryTransitionError::FirstEntryAlreadyFinalised)
+        );
+    }
+    #[test]
+    fn second_entry_in_progress_delete_first_entry_error() {
+        assert_eq!(
+            second_entry_in_progress().delete_first_entry(UserId::from(0)),
+            Err(DataEntryTransitionError::FirstEntryAlreadyFinalised)
+        );
+    }
+    #[test]
+    fn definitive_delete_first_entry_error() {
+        assert_eq!(
+            definitive().delete_first_entry(UserId::from(0)),
+            Err(DataEntryTransitionError::SecondEntryAlreadyFinalised)
+        );
+    }
+
+    /// FirstEntryInProgress --> Empty: error when deleting as a different user
+    #[test]
+    fn first_entry_in_progress_delete_as_other_user_error() {
+        assert_eq!(
+            first_entry_in_progress().delete_first_entry(UserId::from(1)),
+            Err(DataEntryTransitionError::CannotTransitionUsingDifferentUser)
+        );
+    }
+
+    /// FirstEntryFinalised --> SecondEntryInProgress: claim
+    #[test]
+    fn first_entry_finalised_to_second_entry_in_progress() {
+        assert!(matches!(
+            first_entry_finalised()
+                .claim_second_entry(empty_current_second_data_entry())
+                .unwrap(),
+            DataEntryStatus::SecondEntryInProgress(_)
+        ));
+    }
+
+    /// FirstEntryFinalised --> SecondEntryInProgress: claim with same user as first entry returns error
+    #[test]
+    fn first_entry_finalised_claim_second_entry_same_user_error() {
+        assert!(matches!(
+            first_entry_finalised().claim_second_entry(empty_current_data_entry()),
+            Err(DataEntryTransitionError::SecondEntryNeedsDifferentUser)
+        ));
+    }
+
+    /// SecondEntryInProgress --> SecondEntryInProgress: claim with same user
+    #[test]
+    fn second_entry_in_progress_claim_second_entry_ok() {
+        assert!(matches!(
+            second_entry_in_progress().claim_second_entry(empty_current_data_entry()),
+            Ok(DataEntryStatus::SecondEntryInProgress(_))
+        ));
+    }
+
+    /// SecondEntryInProgress --> SecondEntryInProgress: claim with different user returns error
+    #[test]
+    fn second_entry_in_progress_claim_second_entry_other_user_error() {
+        let current_data_entry = CurrentDataEntry {
+            progress: None,
+            user_id: UserId::from(1),
+            entry: example_polling_station_results(),
+            client_state: None,
+        };
+        assert_eq!(
+            second_entry_in_progress().claim_second_entry(current_data_entry),
+            Err(DataEntryTransitionError::SecondEntryAlreadyClaimed)
+        );
+    }
+
+    #[test]
+    fn definitive_claim_second_entry_error() {
+        assert_eq!(
+            definitive().claim_second_entry(empty_current_data_entry()),
+            Err(DataEntryTransitionError::SecondEntryAlreadyFinalised)
+        );
+    }
+
+    #[test]
+    fn empty_claim_second_entry_error() {
+        assert_eq!(
+            DataEntryStatus::Empty.claim_second_entry(empty_current_data_entry()),
+            Err(DataEntryTransitionError::Invalid)
+        );
+    }
+
+    #[test]
+    fn claim_second_entry_wrong_model_error() {
+        assert_eq!(
+            first_entry_finalised().claim_second_entry(next_session_second_data_entry()),
+            Err(DataEntryTransitionError::Invalid)
+        );
+    }
+
+    /// SecondEntryInProgress --> SecondEntryInProgress: save
+    #[test]
+    fn second_entry_in_progress_to_second_entry_in_progress() {
+        assert!(matches!(
+            second_entry_in_progress()
+                .update_second_entry(empty_current_data_entry())
+                .unwrap(),
+            DataEntryStatus::SecondEntryInProgress(_)
+        ));
+    }
+
+    #[test]
+    fn definitive_update_second_entry_error() {
+        assert_eq!(
+            definitive().update_second_entry(empty_current_data_entry()),
+            Err(DataEntryTransitionError::SecondEntryAlreadyFinalised)
+        );
+    }
+
+    #[test]
+    fn first_entry_in_progress_update_second_entry_error() {
+        assert_eq!(
+            first_entry_in_progress().update_second_entry(empty_current_data_entry()),
+            Err(DataEntryTransitionError::Invalid)
+        );
+    }
+
+    /// SecondEntryInProgress --> SecondEntryInProgress: error when updating as a different user
+    #[test]
+    fn second_entry_in_progress_save_as_other_user_error() {
+        assert_eq!(
+            second_entry_in_progress().update_second_entry(CurrentDataEntry {
+                progress: None,
+                user_id: UserId::from(1),
+                entry: example_polling_station_results(),
+                client_state: None,
+            }),
+            Err(DataEntryTransitionError::CannotTransitionUsingDifferentUser)
+        );
+    }
+
+    #[test]
+    fn update_second_entry_wrong_model_error() {
+        assert_eq!(
+            second_entry_in_progress().update_second_entry(next_session_data_entry()),
+            Err(DataEntryTransitionError::Invalid)
+        );
+    }
+
+    /// SecondEntryInProgress --> is_equal: finalise
+    /// is_equal --> Definitive: equal? yes
+    #[test]
+    fn second_entry_in_progress_finalise_equal() {
+        let status = second_entry_in_progress()
+            .finalise_second_entry(&polling_station(), &election(), UserId::from(0))
+            .unwrap();
+        assert_eq!(status.status_name(), DataEntryStatusName::Definitive);
+    }
+
+    #[test]
+    fn second_entry_in_progress_finalise_not_equal_and_has_error() {
+        let first_entry = example_polling_station_results();
+        let different_second_entry =
+            PollingStationResults::CSOFirstSession(CSOFirstSessionResults {
+                votes_counts: VotesCounts {
+                    political_group_total_votes: vec![],
+                    total_votes_candidates_count: 0,
+                    blank_votes_count: 1, // Different from first entry which has blank_votes_count: 0
+                    invalid_votes_count: 0,
+                    total_votes_cast_count: 1,
+                },
+                ..cso_first_session_result()
+            });
+
+        let initial = DataEntryStatus::SecondEntryInProgress(SecondEntryInProgress {
+            progress: 0,
+            second_entry_user_id: UserId::from(0),
+            second_entry: different_second_entry,
+            client_state: Default::default(),
+            first_entry_user_id: UserId::from(0),
+            finalised_first_entry: first_entry,
+            first_entry_finished_at: Utc::now(),
+        });
+        let next = initial
+            .finalise_second_entry(&polling_station(), &election(), UserId::from(0))
+            .unwrap();
+        assert!(matches!(next, DataEntryStatus::EntriesDifferent(_)));
+    }
+
+    /// FirstEntryInProgress --> FirstEntryFinalised: error when finalising as a different user
+    #[test]
+    fn first_entry_in_progress_finalise_as_other_user_error() {
+        assert_eq!(
+            first_entry_in_progress().finalise_first_entry(
+                &polling_station(),
+                &election(),
+                UserId::from(1)
+            ),
+            Err(DataEntryTransitionError::CannotTransitionUsingDifferentUser)
+        );
+    }
+
+    /// SecondEntryInProgress --> Definitive: error when finalising as a different user
+    #[test]
+    fn second_entry_in_progress_finalise_as_other_user_error() {
+        assert_eq!(
+            second_entry_in_progress().finalise_second_entry(
+                &polling_station(),
+                &election(),
+                UserId::from(1)
+            ),
+            Err(DataEntryTransitionError::CannotTransitionUsingDifferentUser)
+        );
+    }
+
+    /// SecondEntryInProgress --> is_equal: finalise
+    /// is_equal --> EntriesDifferent: equal? no
+    #[allow(clippy::too_many_lines)]
+    #[test]
+    fn second_entry_in_progress_finalise_not_equal() {
+        let initial = DataEntryStatus::SecondEntryInProgress(SecondEntryInProgress {
+            first_entry_user_id: UserId::from(0),
+            finalised_first_entry: PollingStationResults::CSOFirstSession(CSOFirstSessionResults {
+                voters_counts: VotersCounts {
+                    poll_card_count: 1,
+                    proxy_certificate_count: 0,
+                    total_admitted_voters_count: 1,
+                },
+                votes_counts: VotesCounts {
+                    political_group_total_votes: vec![PoliticalGroupTotalVotes {
                         number: PGNumber::from(1),
-                        total: 10,
-                    },
-                    PoliticalGroupTotalVotes {
-                        number: PGNumber::from(2),
-                        total: 20,
-                    },
-                ],
-                total_votes_candidates_count: 2,
-                blank_votes_count: 3,
-                invalid_votes_count: 4,
-                total_votes_cast_count: 9,
-            };
-
-            curr_votes
-                .add(&VotesCounts {
-                    political_group_total_votes: vec![
-                        PoliticalGroupTotalVotes {
-                            number: PGNumber::from(1),
-                            total: 11,
-                        },
-                        PoliticalGroupTotalVotes {
-                            number: PGNumber::from(2),
-                            total: 12,
-                        },
-                    ],
-                    total_votes_candidates_count: 1,
-                    blank_votes_count: 2,
-                    invalid_votes_count: 3,
-                    total_votes_cast_count: 5,
-                })
-                .unwrap();
-
-            assert_eq!(curr_votes.political_group_total_votes.len(), 2);
-            assert_eq!(curr_votes.political_group_total_votes[0].total, 21);
-            assert_eq!(curr_votes.political_group_total_votes[1].total, 32);
-
-            assert_eq!(curr_votes.total_votes_candidates_count, 3);
-            assert_eq!(curr_votes.blank_votes_count, 5);
-            assert_eq!(curr_votes.invalid_votes_count, 7);
-            assert_eq!(curr_votes.total_votes_cast_count, 14);
-        }
-
-        #[test]
-        fn test_votes_addition_error() {
-            let mut curr_votes = VotesCounts {
-                political_group_total_votes: vec![PoliticalGroupTotalVotes {
+                        total: 0,
+                    }],
+                    total_votes_candidates_count: 0,
+                    blank_votes_count: 1,
+                    invalid_votes_count: 0,
+                    total_votes_cast_count: 1,
+                },
+                political_group_votes: vec![PoliticalGroupCandidateVotes {
                     number: PGNumber::from(1),
-                    total: 10,
+                    total: 0,
+                    candidate_votes: vec![CandidateVotes {
+                        number: CandidateNumber::from(1),
+                        votes: 0,
+                    }],
                 }],
-                total_votes_candidates_count: 2,
-                blank_votes_count: 3,
-                invalid_votes_count: 4,
-                total_votes_cast_count: 9,
-            };
-
-            let mut other = VotesCounts {
-                political_group_total_votes: vec![PoliticalGroupTotalVotes {
-                    number: PGNumber::from(2),
-                    total: 20,
+                ..cso_first_session_result()
+            }),
+            first_entry_finished_at: Utc::now(),
+            progress: 0,
+            second_entry_user_id: UserId::from(0),
+            second_entry: PollingStationResults::CSOFirstSession(CSOFirstSessionResults {
+                voters_counts: VotersCounts {
+                    poll_card_count: 1,
+                    proxy_certificate_count: 0,
+                    total_admitted_voters_count: 1,
+                },
+                votes_counts: VotesCounts {
+                    political_group_total_votes: vec![PoliticalGroupTotalVotes {
+                        number: PGNumber::from(1),
+                        total: 1,
+                    }],
+                    total_votes_candidates_count: 1,
+                    blank_votes_count: 0,
+                    invalid_votes_count: 0,
+                    total_votes_cast_count: 1,
+                },
+                political_group_votes: vec![PoliticalGroupCandidateVotes {
+                    number: PGNumber::from(1),
+                    total: 1,
+                    candidate_votes: vec![CandidateVotes {
+                        number: CandidateNumber::from(1),
+                        votes: 1,
+                    }],
                 }],
-                total_votes_candidates_count: 1,
-                blank_votes_count: 2,
-                invalid_votes_count: 3,
-                total_votes_cast_count: 5,
-            };
+                ..cso_first_session_result()
+            }),
+            client_state: ClientState::default(),
+        });
 
-            let result = curr_votes.add(&other);
-            assert!(matches!(
-                result,
-                Err(APIError::AddError(_, ErrorReference::InvalidVoteGroup))
-            ));
-
-            let result = other.add(&curr_votes);
-            assert!(matches!(
-                result,
-                Err(APIError::AddError(_, ErrorReference::InvalidVoteGroup))
-            ));
-        }
+        let next = initial
+            .finalise_second_entry(
+                &polling_station(),
+                &ElectionWithPoliticalGroups {
+                    political_groups: vec![PoliticalGroup {
+                        number: PGNumber::from(1),
+                        name: "Test group".to_string(),
+                        candidates: vec![Candidate {
+                            number: CandidateNumber::from(1),
+                            initials: "A.".to_string(),
+                            first_name: None,
+                            last_name_prefix: None,
+                            last_name: "Candidate".to_string(),
+                            locality: "Test locality".to_string(),
+                            country_code: None,
+                            gender: None,
+                        }],
+                    }],
+                    ..election()
+                },
+                UserId::from(0),
+            )
+            .unwrap();
+        assert!(matches!(next, DataEntryStatus::EntriesDifferent(_)));
     }
 
-    mod voters_counts {
-        use test_log::test;
+    /// SecondEntryInProgress --> FirstEntryFinalised: delete
+    #[test]
+    fn second_entry_in_progress_to_first_entry_finalised() {
+        assert!(matches!(
+            second_entry_in_progress()
+                .delete_second_entry(UserId::from(0), &polling_station(), &election())
+                .unwrap(),
+            DataEntryStatus::FirstEntryFinalised(_)
+        ));
+    }
 
-        use super::*;
+    /// SecondEntryInProgress --> FirstEntryFinalised: error when deleting as a different user
+    #[test]
+    fn second_entry_in_progress_delete_as_other_user_error() {
+        assert_eq!(
+            second_entry_in_progress().delete_second_entry(
+                UserId::from(1),
+                &polling_station(),
+                &election()
+            ),
+            Err(DataEntryTransitionError::CannotTransitionUsingDifferentUser)
+        );
+    }
+
+    #[test]
+    fn has_errors_discard_first() {
+        assert!(matches!(
+            first_entry_has_errors().discard_first_entry(),
+            Ok(DataEntryStatus::Empty)
+        ));
+    }
+
+    #[test]
+    fn has_errors_resume_first() {
+        assert!(matches!(
+            first_entry_has_errors().resume_first_entry(),
+            Ok(DataEntryStatus::FirstEntryInProgress(
+                FirstEntryInProgress {
+                    first_entry_user_id,
+                    ..
+                }
+            )) if first_entry_user_id == UserId::from(0)
+        ));
+    }
+
+    #[test]
+    fn definitive_delete_second_entry_error() {
+        assert_eq!(
+            definitive().delete_second_entry(UserId::from(0), &polling_station(), &election()),
+            Err(DataEntryTransitionError::SecondEntryAlreadyFinalised)
+        );
+    }
+
+    /// EntriesDifferent --> SecondEntryInProgress: resolve (keep first entry)
+    #[test]
+    fn entries_different_to_first_entry_finalised_keep_first_entry() {
+        // Create a difference, so we can check that we keep the right entry
+        let first_entry = example_polling_station_results();
+        let second_entry = example_polling_station_results().with_difference();
+
+        let initial = entries_different();
+        let next = initial
+            .keep_first_entry(&polling_station(), &election())
+            .unwrap();
+
+        if let DataEntryStatus::FirstEntryFinalised(kept_entry) = next {
+            assert_eq!(kept_entry.finalised_first_entry, first_entry);
+            assert_ne!(kept_entry.finalised_first_entry, second_entry);
+        } else {
+            panic!()
+        };
+    }
+
+    #[test]
+    fn definitive_keep_first_entry_error() {
+        assert_eq!(
+            definitive().keep_first_entry(&polling_station(), &election()),
+            Err(DataEntryTransitionError::Invalid)
+        );
+    }
+
+    #[test]
+    fn entries_different_to_first_entry_finalised_keep_second_entry() {
+        // Create valid data without errors, so we transition to FirstEntryFinalised
+        let first_entry = example_polling_station_results();
+        let second_entry = example_polling_station_results().with_difference();
+
+        let initial = DataEntryStatus::EntriesDifferent(EntriesDifferent {
+            first_entry: first_entry.clone(),
+            first_entry_user_id: UserId::from(0),
+            second_entry: second_entry.clone(),
+            second_entry_user_id: UserId::from(0),
+            first_entry_finished_at: Utc::now(),
+            second_entry_finished_at: Utc::now(),
+        });
+
+        let next = initial
+            .keep_second_entry(&polling_station(), &election())
+            .unwrap();
+
+        if let DataEntryStatus::FirstEntryFinalised(kept_entry) = next {
+            assert_eq!(kept_entry.finalised_first_entry, second_entry);
+        } else {
+            panic!("{next:?}")
+        };
+    }
+
+    #[test]
+    fn entries_different_to_first_entry_finalised_keep_second_entry_which_has_errors() {
+        let first_entry = example_polling_station_results();
+        // Create second entry with validation errors that will trigger FirstEntryHasErrors
+        let second_entry = example_polling_station_results().with_error();
+
+        let initial = DataEntryStatus::EntriesDifferent(EntriesDifferent {
+            first_entry: first_entry.clone(),
+            first_entry_user_id: UserId::from(0),
+            second_entry: second_entry.clone(),
+            second_entry_user_id: UserId::from(0),
+            first_entry_finished_at: Utc::now(),
+            second_entry_finished_at: Utc::now(),
+        });
+        let next = initial
+            .keep_second_entry(&polling_station(), &election())
+            .unwrap();
+
+        if let DataEntryStatus::FirstEntryHasErrors(kept_entry) = next {
+            assert_eq!(kept_entry.finalised_first_entry, second_entry);
+        } else {
+            panic!("{next:?}")
+        };
+    }
+
+    #[test]
+    fn definitive_keep_second_entry_error() {
+        assert_eq!(
+            definitive().keep_second_entry(&polling_station(), &election()),
+            Err(DataEntryTransitionError::Invalid)
+        );
+    }
+
+    #[test]
+    fn entries_different_to_empty() {
+        let initial = entries_different();
+        let next = initial.delete_entries().unwrap();
+        assert!(matches!(next, DataEntryStatus::Empty));
+    }
+
+    #[test]
+    fn definitive_delete_entries_error() {
+        assert_eq!(
+            definitive().delete_entries(),
+            Err(DataEntryTransitionError::Invalid)
+        );
+    }
+
+    /// update_first_entry should fail for other states
+    #[test]
+    fn first_entry_finalised_update_first_entry() {
+        assert!(matches!(
+            first_entry_finalised().update_first_entry(empty_current_data_entry()),
+            Err(DataEntryTransitionError::FirstEntryAlreadyFinalised)
+        ));
+    }
+
+    #[test]
+    fn second_entry_in_progress_update_first_entry() {
+        assert!(matches!(
+            second_entry_in_progress().update_first_entry(empty_current_data_entry()),
+            Err(DataEntryTransitionError::FirstEntryAlreadyFinalised)
+        ));
+    }
+
+    #[test]
+    fn entries_different_update_first_entry() {
+        assert!(matches!(
+            entries_different().update_first_entry(empty_current_data_entry()),
+            Err(DataEntryTransitionError::Invalid)
+        ));
+    }
+
+    #[test]
+    fn definitive_entry_update_first_entry() {
+        assert!(matches!(
+            definitive().update_first_entry(empty_current_data_entry()),
+            Err(DataEntryTransitionError::SecondEntryAlreadyFinalised)
+        ));
+    }
+
+    #[test]
+    fn update_first_entry_wrong_model_error() {
+        assert_eq!(
+            first_entry_in_progress().update_first_entry(next_session_data_entry()),
+            Err(DataEntryTransitionError::Invalid)
+        );
+    }
+
+    #[test]
+    fn check_get_client_state_return_values() {
+        assert!(DataEntryStatus::Empty.get_client_state().is_none());
+        assert!(first_entry_in_progress().get_client_state().is_some());
+        assert!(first_entry_finalised().get_client_state().is_none());
+        assert!(second_entry_in_progress().get_client_state().is_some());
+        assert!(entries_different().get_client_state().is_none());
+    }
+
+    #[test]
+    fn check_finished_at_method_return_values() {
+        assert!(first_entry_in_progress().finished_at().is_none());
+        assert!(entries_different().finished_at().is_none());
+        assert!(first_entry_finalised().finished_at().is_some());
+        assert!(second_entry_in_progress().finished_at().is_some());
+        assert!(definitive().finished_at().is_some());
+    }
+
+    #[test]
+    fn check_get_progress_method_return_values() {
+        assert_eq!(first_entry_in_progress().get_progress(), 0);
+        assert_eq!(first_entry_finalised().get_progress(), 0);
+        assert_eq!(second_entry_in_progress().get_progress(), 0);
+        assert_eq!(entries_different().get_progress(), 100);
+        assert_eq!(definitive().get_progress(), 100);
+    }
+
+    #[test]
+    fn call_finalize_on_definitive_state() {
+        assert_eq!(
+            definitive().finalise_second_entry(&polling_station(), &election(), UserId::from(1)),
+            Err(DataEntryTransitionError::SecondEntryAlreadyFinalised)
+        );
+    }
+
+    #[test]
+    fn check_first_entry_user_id() {
+        assert!(DataEntryStatus::Empty.get_first_entry_user_id().is_none());
+        assert!(
+            first_entry_in_progress()
+                .get_first_entry_user_id()
+                .is_some()
+        );
+        assert!(first_entry_finalised().get_first_entry_user_id().is_some());
+        assert!(
+            second_entry_in_progress()
+                .get_first_entry_user_id()
+                .is_some()
+        );
+        assert!(entries_different().get_first_entry_user_id().is_some());
+        assert!(definitive().get_first_entry_user_id().is_some());
+    }
+
+    #[test]
+    fn check_second_entry_user_id() {
+        assert!(DataEntryStatus::Empty.get_second_entry_user_id().is_none());
+        assert!(
+            first_entry_in_progress()
+                .get_second_entry_user_id()
+                .is_none()
+        );
+        assert!(first_entry_finalised().get_second_entry_user_id().is_none());
+        assert!(
+            second_entry_in_progress()
+                .get_second_entry_user_id()
+                .is_some()
+        );
+        assert!(entries_different().get_second_entry_user_id().is_some());
+        assert!(definitive().get_second_entry_user_id().is_some());
+    }
+
+    mod finalised_with_warnings {
+        use crate::{
+            domain::{
+                data_entry::{
+                    DataEntryStatus,
+                    tests::{
+                        election, entries_different, example_polling_station_results,
+                        first_entry_in_progress, polling_station, second_entry_in_progress,
+                    },
+                },
+                results::PollingStationResults,
+            },
+            repository::user_repo::UserId,
+        };
+
+        impl DataEntryStatus {
+            pub fn set_first_entry(&mut self, results: PollingStationResults) {
+                match self {
+                    DataEntryStatus::FirstEntryInProgress(state) => state.first_entry = results,
+                    DataEntryStatus::SecondEntryInProgress(state) => {
+                        state.finalised_first_entry = results
+                    }
+                    DataEntryStatus::EntriesDifferent(state) => state.first_entry = results,
+                    _ => panic!("first_entry() not implemented for this status"),
+                }
+            }
+
+            pub fn set_second_entry(&mut self, results: PollingStationResults) {
+                match self {
+                    DataEntryStatus::SecondEntryInProgress(state) => state.second_entry = results,
+                    DataEntryStatus::EntriesDifferent(state) => state.second_entry = results,
+                    _ => panic!("second_entry() not implemented for this status"),
+                }
+            }
+        }
 
         #[test]
-        fn test_voters_addition() {
-            let mut curr_votes = VotersCounts {
-                poll_card_count: 2,
-                proxy_certificate_count: 3,
-                total_admitted_voters_count: 9,
-            };
+        fn finalise_first_entry_without_warnings() {
+            assert_eq!(
+                first_entry_in_progress()
+                    .finalise_first_entry(&polling_station(), &election(), UserId::from(0))
+                    .unwrap()
+                    .finalised_with_warnings(),
+                Some(&false)
+            )
+        }
 
-            curr_votes += &VotersCounts {
-                poll_card_count: 1,
-                proxy_certificate_count: 2,
-                total_admitted_voters_count: 5,
-            };
+        #[test]
+        fn finalise_first_entry_with_warnings() {
+            let mut status = first_entry_in_progress();
+            status.set_first_entry(example_polling_station_results().with_warning());
+            assert_eq!(
+                status
+                    .finalise_first_entry(&polling_station(), &election(), UserId::from(0))
+                    .unwrap()
+                    .finalised_with_warnings(),
+                Some(&true)
+            )
+        }
 
-            assert_eq!(curr_votes.poll_card_count, 3);
-            assert_eq!(curr_votes.proxy_certificate_count, 5);
-            assert_eq!(curr_votes.total_admitted_voters_count, 14);
+        #[test]
+        fn finalise_second_entry_without_warnings() {
+            assert_eq!(
+                second_entry_in_progress()
+                    .finalise_second_entry(&polling_station(), &election(), UserId::from(0))
+                    .unwrap()
+                    .finalised_with_warnings(),
+                Some(&false)
+            )
+        }
+
+        #[test]
+        fn finalise_second_entry_with_warnings() {
+            let mut status = second_entry_in_progress();
+            status.set_first_entry(example_polling_station_results().with_warning());
+            status.set_second_entry(example_polling_station_results().with_warning());
+
+            assert_eq!(
+                status
+                    .finalise_second_entry(&polling_station(), &election(), UserId::from(0))
+                    .unwrap()
+                    .finalised_with_warnings(),
+                Some(&true)
+            )
+        }
+
+        #[test]
+        fn delete_second_entry_without_warnings() {
+            assert_eq!(
+                second_entry_in_progress()
+                    .delete_second_entry(UserId::from(0), &polling_station(), &election())
+                    .unwrap()
+                    .finalised_with_warnings(),
+                Some(&false)
+            )
+        }
+        #[test]
+        fn delete_second_entry_first_with_warnings() {
+            let mut status = second_entry_in_progress();
+            status.set_first_entry(example_polling_station_results().with_warning());
+
+            assert_eq!(
+                status
+                    .delete_second_entry(UserId::from(0), &polling_station(), &election())
+                    .unwrap()
+                    .finalised_with_warnings(),
+                Some(&true)
+            )
+        }
+
+        #[test]
+        fn delete_second_entry_second_with_warnings() {
+            let mut status = second_entry_in_progress();
+            status.set_second_entry(example_polling_station_results().with_warning());
+
+            assert_eq!(
+                status
+                    .delete_second_entry(UserId::from(0), &polling_station(), &election())
+                    .unwrap()
+                    .finalised_with_warnings(),
+                Some(&false)
+            )
+        }
+
+        #[test]
+        fn keep_first_entry_without_warnings() {
+            assert_eq!(
+                entries_different()
+                    .keep_first_entry(&polling_station(), &election())
+                    .unwrap()
+                    .finalised_with_warnings(),
+                Some(&false)
+            )
+        }
+
+        #[test]
+        fn keep_first_entry_with_warnings() {
+            let mut status = entries_different();
+            status.set_first_entry(example_polling_station_results().with_warning());
+            assert_eq!(
+                status
+                    .keep_first_entry(&polling_station(), &election())
+                    .unwrap()
+                    .finalised_with_warnings(),
+                Some(&true)
+            )
+        }
+
+        #[test]
+        fn keep_second_entry_without_warnings() {
+            assert_eq!(
+                entries_different()
+                    .keep_second_entry(&polling_station(), &election())
+                    .unwrap()
+                    .finalised_with_warnings(),
+                Some(&false)
+            )
+        }
+        #[test]
+        fn keep_second_entry_with_warnings() {
+            let mut status = entries_different();
+            status.set_second_entry(example_polling_station_results().with_warning());
+            assert_eq!(
+                status
+                    .keep_second_entry(&polling_station(), &election())
+                    .unwrap()
+                    .finalised_with_warnings(),
+                Some(&true)
+            )
         }
     }
 }

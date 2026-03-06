@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::domain::{
     committee_session::CommitteeSessionId, data_entry::DataEntryId, election::CommitteeCategory,
-    id::id,
+    identifier::id,
 };
 
 id!(SubCommitteeId);

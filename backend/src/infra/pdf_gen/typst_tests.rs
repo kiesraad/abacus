@@ -103,7 +103,7 @@ async fn it_generates_a_pdf_with_polling_stations() {
         &ModelNa31_2Input {
             votes_tables: VotesTables::new(&election, &summary).unwrap(),
             summary: summary.into(),
-            polling_stations: polling_stations_fixture(&election, &[100, 200, 300]),
+            polling_stations: polling_stations_fixture(&[100, 200, 300]),
             committee_session,
             election: election.into(),
             hash: "ed36 60eb 017a 0d3a d3ef 72b1 6865 f991 a36a 9f92 72d9 1516 39cd 422b 4756 d161"

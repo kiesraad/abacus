@@ -1,17 +1,20 @@
 pub mod committee_session;
 pub mod committee_session_status;
-pub mod comparison;
+pub mod compare;
 pub mod data_entry;
-pub mod data_entry_status;
 pub mod election;
 pub mod entry_number;
+pub mod field_path;
 pub mod file;
-pub mod id;
+pub mod identifier;
 pub mod investigation;
 pub mod models;
 pub mod polling_station;
+pub mod results;
 pub mod role;
 pub mod sub_committee;
 pub mod summary;
-pub mod validation;
+#[cfg(test)]
+pub mod valid_default;
+pub mod validate;
 pub mod votes_table;

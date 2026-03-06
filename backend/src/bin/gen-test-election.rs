@@ -9,10 +9,10 @@ use abacus::{
     create_sqlite_pool,
     domain::{
         committee_session::CommitteeSession,
-        data_entry::PollingStationResults,
         election::{CommitteeCategory, ElectionWithPoliticalGroups},
         models::{ModelNa31_2Input, ToPdfFileModel},
         polling_station::PollingStation,
+        results::PollingStationResults,
         summary::ElectionSummary,
         votes_table::VotesTables,
     },

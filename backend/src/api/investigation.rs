@@ -19,7 +19,6 @@ use crate::{
     domain::{
         committee_session::{CommitteeSession, CommitteeSessionError},
         committee_session_status::CommitteeSessionStatus,
-        data_entry::PollingStationResults,
         election::ElectionWithPoliticalGroups,
         investigation::{
             InvestigationStatus, InvestigationTransitionError, PollingStationInvestigation,
@@ -28,12 +27,13 @@ use crate::{
         },
         models::{ModelNa14_2Bijlage1Input, ToPdfFileModel},
         polling_station::{PollingStation, PollingStationId},
+        results::PollingStationResults,
         votes_table::VotesTablesWithOnlyPreviousVotes,
     },
     error::ErrorReference,
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
     repository::{
-        committee_session_repo::get_election_committee_session,
+        committee_session_repo,
         data_entry_repo::{data_entry_exists, previous_results_for_polling_station},
         election_repo, investigation_repo, polling_station_repo,
     },
@@ -88,7 +88,7 @@ async fn validate_and_get_committee_session(
 
     // Get latest committee session for the election
     let committee_session =
-        get_election_committee_session(conn, polling_station.election_id()).await?;
+        committee_session_repo::get(conn, polling_station.committee_session_id()).await?;
 
     // Ensure this is not the first session and that the polling station is part of the last session
     if !committee_session.is_next_session()
@@ -678,8 +678,9 @@ async fn polling_station_investigation_download_corrigendum_pdf(
     let investigation = PollingStationInvestigation::from((polling_station_id, &status));
 
     let ps = polling_station_repo::get(&mut conn, polling_station_id).await?;
+    let session = committee_session_repo::get(&mut conn, ps.committee_session_id()).await?;
     let election: ElectionWithPoliticalGroups =
-        election_repo::get(&mut conn, ps.election_id()).await?;
+        election_repo::get(&mut conn, session.election_id).await?;
 
     let previous_results = match ps.prev_data_entry_id() {
         Some(_) => {

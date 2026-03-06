@@ -14,12 +14,6 @@ use crate::{
     domain::{
         committee_session::{CommitteeSession, CommitteeSessionId},
         committee_session_status::CommitteeSessionStatus,
-        data_entry::{
-            CandidateVotes, CommonPollingStationResults,
-            DifferenceCountsCompareVotesCastAdmittedVoters, DifferencesCounts,
-            PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, VotersCounts, VotesCounts,
-            YesNo,
-        },
         election::{
             Candidate, CandidateGender, CandidateNumber, CommitteeCategory, ElectionCategory,
             ElectionId, ElectionWithPoliticalGroups, PGNumber, PoliticalGroup, VoteCountingMethod,
@@ -31,6 +25,17 @@ use crate::{
             ModelNa31_2Input, ModelP2aInput, PdfFileModel, PdfModel,
         },
         polling_station::{PollingStation, PollingStationId, PollingStationType},
+        results::{
+            common_polling_station_results::CommonPollingStationResults,
+            differences_counts::{
+                DifferenceCountsCompareVotesCastAdmittedVoters, DifferencesCounts,
+            },
+            political_group_candidate_votes::{CandidateVotes, PoliticalGroupCandidateVotes},
+            political_group_total_votes::PoliticalGroupTotalVotes,
+            voters_counts::VotersCounts,
+            votes_counts::VotesCounts,
+            yes_no::YesNo,
+        },
         summary::{
             ElectionSummary, PollingStationInvestigations, SumCount, SummaryDifferencesCounts,
         },

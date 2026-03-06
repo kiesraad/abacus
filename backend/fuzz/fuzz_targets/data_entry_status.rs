@@ -2,17 +2,24 @@
 
 use abacus::{
     domain::{
-        data_entry::{
-            CSOFirstSessionResults, CountingDifferencesPollingStation,
-            DifferenceCountsCompareVotesCastAdmittedVoters, DifferencesCounts, ExtraInvestigation,
-            PollingStationResults, VotersCounts, VotesCounts, YesNo,
-        },
-        data_entry_status::{CurrentDataEntry, DataEntryStatus, DataEntryTransitionError},
+        data_entry::{CurrentDataEntry, DataEntryStatus, DataEntryTransitionError},
         election::{
             CommitteeCategory, ElectionCategory, ElectionId, ElectionWithPoliticalGroups,
             VoteCountingMethod,
         },
         polling_station::{PollingStation, PollingStationId, PollingStationType},
+        results::{
+            counting_differences_polling_station::CountingDifferencesPollingStation,
+            cso_first_session_results::CSOFirstSessionResults,
+            differences_counts::{
+                DifferenceCountsCompareVotesCastAdmittedVoters, DifferencesCounts,
+            },
+            extra_investigation::ExtraInvestigation,
+            voters_counts::VotersCounts,
+            votes_counts::VotesCounts,
+            yes_no::YesNo,
+            PollingStationResults,
+        },
     },
     repository::user_repo::UserId,
 };
@@ -405,9 +412,11 @@ fuzz_target!(|transitions: Vec<Transition>| {
                 &polling_station(),
                 &election(),
             ),
-            Transition::FinaliseSecondEntry(correct_user) => {
-                state.finalise_second_entry(&polling_station(), &election(), users.second(correct_user))
-            }
+            Transition::FinaliseSecondEntry(correct_user) => state.finalise_second_entry(
+                &polling_station(),
+                &election(),
+                users.second(correct_user),
+            ),
             Transition::ResumeFirstEntry => state.resume_first_entry(),
             Transition::DeleteBothEntries => state.delete_entries(),
             Transition::KeepFirstEntry => state.keep_first_entry(&polling_station(), &election()),

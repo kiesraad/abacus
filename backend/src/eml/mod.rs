@@ -34,11 +34,11 @@ pub use hash::{EmlHash, RedactedEmlHash};
 
 use crate::domain::{
     committee_session::CommitteeSession,
-    data_entry::PoliticalGroupCandidateVotes,
     election::{
         Candidate, CandidateGender, CandidateNumber, CommitteeCategory,
         ElectionWithPoliticalGroups, NewElection, PGNumber, PoliticalGroup, VoteCountingMethod,
     },
+    results::political_group_candidate_votes::PoliticalGroupCandidateVotes,
     summary::ElectionSummary,
 };
 
@@ -495,7 +495,7 @@ impl ElectionWithPoliticalGroups {
         committee_session: &CommitteeSession,
         results: &[(
             crate::domain::polling_station::PollingStation,
-            crate::domain::data_entry::PollingStationResults,
+            crate::domain::results::PollingStationResults,
         )],
         summary: &ElectionSummary,
         timestamp: DateTime<Local>,
@@ -528,7 +528,7 @@ impl ElectionWithPoliticalGroups {
         committee_session: &CommitteeSession,
         results: &[(
             crate::domain::polling_station::PollingStation,
-            crate::domain::data_entry::PollingStationResults,
+            crate::domain::results::PollingStationResults,
         )],
         summary: &ElectionSummary,
         authority_id: &str,
@@ -618,7 +618,7 @@ impl ElectionWithPoliticalGroups {
         committee_session: &CommitteeSession,
         authority_id: &str,
         polling_station: &crate::domain::polling_station::PollingStation,
-        results: &crate::domain::data_entry::PollingStationResults,
+        results: &crate::domain::results::PollingStationResults,
     ) -> Result<ReportingUnitVotes, EMLError> {
         let mut builder = ReportingUnitVotes::builder()
             .identifier(ReportingUnitIdentifier::new(
@@ -670,7 +670,7 @@ impl ElectionWithPoliticalGroups {
 fn add_reporting_unit_investigations(
     mut builder: ReportingUnitVotesBuilder,
     committee_session: &CommitteeSession,
-    results: &crate::domain::data_entry::PollingStationResults,
+    results: &crate::domain::results::PollingStationResults,
 ) -> ReportingUnitVotesBuilder {
     if !committee_session.is_next_session()
         && let Some(first_session_result) = results.as_cso_first_session()

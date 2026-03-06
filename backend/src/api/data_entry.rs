@@ -17,18 +17,19 @@ use crate::{
         committee_session::{CommitteeSession, CommitteeSessionError},
         committee_session_status::CommitteeSessionStatus,
         data_entry::{
-            CSONextSessionResults, CommonPollingStationResults, DataEntryId,
-            DataEntryStatusResponse, PollingStationDataEntry, PollingStationResults,
-        },
-        data_entry_status::{
-            ClientState, CurrentDataEntry, DataEntryStatus, DataEntryStatusName,
-            DataEntryTransitionError, EntriesDifferent,
+            ClientState, CurrentDataEntry, DataEntryId, DataEntryStatus, DataEntryStatusName,
+            DataEntryStatusResponse, DataEntryTransitionError, EntriesDifferent,
+            PollingStationDataEntry,
         },
         election::{ElectionId, ElectionWithPoliticalGroups, PoliticalGroup},
         entry_number::EntryNumber,
         investigation::InvestigationStatus,
         polling_station::{PollingStation, PollingStationId},
-        validation::{DataError, ValidateRoot, ValidationResults},
+        results::{
+            PollingStationResults, common_polling_station_results::CommonPollingStationResults,
+            cso_next_session_results::CSONextSessionResults,
+        },
+        validate::{DataError, ValidateRoot, ValidationResults},
     },
     error::{ErrorReference, ErrorResponse},
     infra::audit_log::{AsAuditEvent, AuditEvent, AuditEventLevel, AuditEventType, AuditService},
@@ -985,9 +986,9 @@ mod tests {
         domain::{
             committee_session::CommitteeSessionId,
             committee_session_status::CommitteeSessionStatus,
-            data_entry::tests::example_polling_station_results,
+            results::tests::example_polling_station_results,
             role::Role,
-            validation::{ValidationResult, ValidationResultCode},
+            validate::{ValidationResult, ValidationResultCode},
         },
         infra::audit_log::{self, AuditEventLevel},
         repository::{

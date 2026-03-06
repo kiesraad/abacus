@@ -8,8 +8,8 @@ use sqlx::{FromRow, Type};
 use utoipa::ToSchema;
 
 use crate::domain::{
-    committee_session_status::CommitteeSessionStatus, election::ElectionId, file::FileId, id::id,
-    investigation::PollingStationInvestigation,
+    committee_session_status::CommitteeSessionStatus, election::ElectionId, file::FileId,
+    identifier::id, investigation::PollingStationInvestigation,
 };
 
 #[derive(Debug, PartialEq, Eq)]

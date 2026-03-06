@@ -17,7 +17,7 @@ use utoipa::ToSchema;
 use crate::{
     MAX_BODY_SIZE_MB,
     api::middleware::authentication::error::AuthenticationError,
-    domain::{committee_session::CommitteeSessionError, validation::DataError},
+    domain::{committee_session::CommitteeSessionError, validate::DataError},
     eml::EMLImportError,
     service::{DataEntryServiceError, PollingStationServiceError},
 };

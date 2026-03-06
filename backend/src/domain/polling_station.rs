@@ -13,7 +13,7 @@ use crate::{
         committee_session::CommitteeSessionId,
         data_entry::DataEntryId,
         election::ElectionId,
-        id::id,
+        identifier::id,
         investigation::{InvestigationStatus, PollingStationInvestigation},
     },
 };

@@ -4,14 +4,19 @@ use utoipa::ToSchema;
 use crate::{
     APIError,
     domain::{
-        data_entry::{
-            CSOFirstSessionResults, CandidateVotes, Count, DifferencesCounts,
-            PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, PollingStationResults,
-            VotersCounts, VotesCounts,
-        },
         election::ElectionWithPoliticalGroups,
         polling_station::{PollingStation, PollingStationNumber},
-        validation::{Validate, ValidationResults},
+        results::{
+            PollingStationResults,
+            count::Count,
+            cso_first_session_results::CSOFirstSessionResults,
+            differences_counts::DifferencesCounts,
+            political_group_candidate_votes::{CandidateVotes, PoliticalGroupCandidateVotes},
+            political_group_total_votes::PoliticalGroupTotalVotes,
+            voters_counts::VotersCounts,
+            votes_counts::VotesCounts,
+        },
+        validate::{Validate, ValidationResults},
     },
     error::ErrorReference,
 };
@@ -299,9 +304,10 @@ mod tests {
 
     use super::*;
     use crate::domain::{
-        data_entry::{ExtraInvestigation, YesNo, tests::ValidDefault},
         election::{PGNumber, tests::election_fixture},
         polling_station::test_helpers::polling_stations_fixture,
+        results::{extra_investigation::ExtraInvestigation, yes_no::YesNo},
+        valid_default::ValidDefault,
     };
 
     fn polling_station_results_fixture_a() -> PollingStationResults {

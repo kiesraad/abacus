@@ -19,7 +19,7 @@ use crate::{
         },
         committee_session_status::CommitteeSessionStatus,
         election::ElectionId,
-        validation::DataError,
+        validate::DataError,
     },
     error::ErrorReference,
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},

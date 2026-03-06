@@ -2,11 +2,11 @@ use serde::{Deserialize, Serialize};
 
 use crate::domain::{
     committee_session::CommitteeSession,
-    data_entry::CommonPollingStationResultsWithoutVotes,
     election::Election,
     investigation::PollingStationInvestigation,
     models::{PdfFileModel, PdfModel, ToPdfFileModel},
     polling_station::PollingStation,
+    results::common_polling_station_results::CommonPollingStationResultsWithoutVotes,
     summary::ElectionSummaryWithoutVotes,
     votes_table::{VotesTablesWithOnlyPreviousVotes, VotesTablesWithPreviousVotes},
 };

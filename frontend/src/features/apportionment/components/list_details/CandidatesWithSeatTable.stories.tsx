@@ -50,7 +50,7 @@ export const DefaultWithPositionAndStartSeatNumber: StoryObj = {
     const table = canvas.getByRole("table");
     await expect(table).toBeVisible();
     expect(table).toHaveTableContent([
-      ["Zetel", "Naam", "Woonplaats", "Positie op de lijst"],
+      ["Zetel", "Naam", "Woonplaats", "Positie op lijst"],
       ["5", "Kok, K. (Karin) (v)", "Test Location", "12"],
       ["6", "Oud, L. (Lidewij) (v)", "Test Location", "1"],
       ["7", "Van der Weijden, B. (Berta) (v)", "Test Location", "6"],

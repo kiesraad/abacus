@@ -1,4 +1,4 @@
-import { type FormEvent, type ReactElement, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { type ReactElement, type SubmitEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { Link, useNavigate, useParams } from "react-router";
 
@@ -133,7 +133,7 @@ export function CheckAndSaveForm() {
 
   return (
     <Form
-      onSubmit={(event: FormEvent<HTMLFormElement>) => {
+      onSubmit={(event: SubmitEvent<HTMLFormElement>) => {
         event.preventDefault();
         void onFinalise();
       }}

@@ -1,4 +1,4 @@
-import { type FormEvent, useState } from "react";
+import { type SubmitEvent, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 
 import { type AnyApiError, ApiError, isSuccess } from "@/api/ApiResult";
@@ -54,7 +54,7 @@ export function CommitteeSessionDetailsPage() {
     throw submitError;
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
     const locationValue = formData.get("location");

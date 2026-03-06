@@ -1,4 +1,4 @@
-import { type ChangeEvent, type FormEvent, Fragment, useState } from "react";
+import { type ChangeEvent, Fragment, type SubmitEvent, useState } from "react";
 
 import { isSuccess } from "@/api/ApiResult";
 import { useApiClient } from "@/api/useApiClient";
@@ -65,7 +65,7 @@ export function GenerateTestElectionForm() {
     setFormState((prev) => ({ ...prev, with_data_entry: checked }));
   };
 
-  const submitForm = async (event: FormEvent<HTMLFormElement>) => {
+  const submitForm = async (event: SubmitEvent<HTMLFormElement>) => {
     const formData = new StringFormData(event.currentTarget);
     const committee_category = formData.getString("committee_category");
 
@@ -94,7 +94,7 @@ export function GenerateTestElectionForm() {
 
   return (
     <Form
-      onSubmit={(event: FormEvent<HTMLFormElement>) => {
+      onSubmit={(event: SubmitEvent<HTMLFormElement>) => {
         event.preventDefault();
         void submitForm(event);
       }}

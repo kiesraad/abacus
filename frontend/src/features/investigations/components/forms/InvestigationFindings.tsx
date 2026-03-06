@@ -1,4 +1,4 @@
-import { type FormEvent, useState } from "react";
+import { type SubmitEvent, useState } from "react";
 import { useNavigate } from "react-router";
 
 import { type AnyApiError, ApiError, type ApiResult, isSuccess } from "@/api/ApiResult";
@@ -59,7 +59,7 @@ export function InvestigationFindings({ pollingStationId }: InvestigationFinding
   const requiresCorrectedResults = !pollingStation.prev_data_entry_id;
 
   // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: TODO function should be refactored
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     setNonEmptyError(false);

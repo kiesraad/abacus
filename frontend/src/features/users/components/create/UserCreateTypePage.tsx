@@ -1,4 +1,4 @@
-import type { FormEvent } from "react";
+import type { SubmitEvent } from "react";
 import { Navigate, useNavigate } from "react-router";
 
 import { PageTitle } from "@/components/page_title/PageTitle";
@@ -22,7 +22,7 @@ export function UserCreateTypePage() {
   // Preselect fullname if there was nothing selected yet
   const fullnameChecked = type ? type === "fullname" : true;
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new StringFormData(event.currentTarget);
     const type = formData.getString("type");

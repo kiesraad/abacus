@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { type FormEvent, useState } from "react";
+import { type SubmitEvent, useState } from "react";
 
 import { Form } from "./Form";
 
@@ -23,7 +23,7 @@ export const DefaultForm: StoryObj<StoryProps> = {
   render: ({ title }) => {
     const [formSubmitted, setFormSubmitted] = useState(false);
 
-    function handleFormSubmit(event: FormEvent) {
+    function handleFormSubmit(event: SubmitEvent) {
       event.preventDefault();
       setFormSubmitted(true);
     }

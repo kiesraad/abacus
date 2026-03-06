@@ -1,5 +1,5 @@
 import { userEvent } from "@testing-library/user-event";
-import type { FormEvent, FormEventHandler, ReactNode } from "react";
+import type { ReactNode, SubmitEvent, SubmitEventHandler } from "react";
 import { describe, expect, test, vi } from "vitest";
 
 import { Form } from "@/components/ui/Form/Form";
@@ -7,7 +7,7 @@ import { render, screen } from "@/testing/test-utils";
 
 import { useFormKeyboardNavigation } from "./useFormKeyboardNavigation";
 
-const FormWithNavigation = ({ onSubmit, children }: { onSubmit: FormEventHandler; children: ReactNode }) => {
+const FormWithNavigation = ({ onSubmit, children }: { onSubmit: SubmitEventHandler; children: ReactNode }) => {
   const ref = useFormKeyboardNavigation();
 
   return (
@@ -52,7 +52,7 @@ describe("useKeyboard", () => {
   });
 
   test("Enter submits when submit button has focus", async () => {
-    const onSubmit = vi.fn((e: FormEvent) => {
+    const onSubmit = vi.fn((e: SubmitEvent) => {
       e.preventDefault();
     });
 
@@ -77,7 +77,7 @@ describe("useKeyboard", () => {
   });
 
   test("Move focus", async () => {
-    const onSubmit = vi.fn((e: FormEvent) => {
+    const onSubmit = vi.fn((e: SubmitEvent) => {
       e.preventDefault();
     });
 

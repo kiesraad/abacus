@@ -16,3 +16,7 @@ export function getCandidateFullNameWithGender(candidate: Candidate): string {
   const gender = candidate.gender ? t(`candidate.${candidate.gender}`) : undefined;
   return gender ? `${fullName} (${gender})` : fullName;
 }
+
+export function getLocalityWithCountryCode(candidate: Candidate): string {
+  return candidate.country_code ? `${candidate.locality} (${candidate.country_code})` : candidate.locality;
+}

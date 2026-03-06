@@ -128,11 +128,11 @@ describe("ApportionmentListDetailsPage", () => {
 
     renderApportionmentPage();
 
-    expect(await screen.findByRole("heading", { level: 1, name: "Lijst 5 - Political Group E" })).toBeVisible();
+    expect(await screen.findByRole("heading", { level: 1, name: "Lijst 5" })).toBeVisible();
 
     expect(await screen.findByRole("heading", { level: 2, name: "Toegewezen aantal zetels" })).toBeVisible();
     expect(await screen.findByTestId("text-list-assigned-nr-seats")).toHaveTextContent(
-      "Lijst 5 - Political Group E heeft 0 zetels toegewezen gekregen.",
+      "Lijst 5 heeft 0 zetels toegewezen gekregen.",
     );
 
     expect(await screen.findByRole("heading", { level: 2, name: "Met voorkeur gekozen kandidaten" })).toBeVisible();

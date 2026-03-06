@@ -7,11 +7,15 @@ import type { PoliticalGroup } from "@/types/generated/openapi";
  * For unnamed groups: "Lijst {number}"
  */
 export function formatPoliticalGroupName(politicalGroup: PoliticalGroup): string {
-  const listPrefix = `${t("list")} ${politicalGroup.number}`;
+  return getPoliticalGroupName(politicalGroup.number, politicalGroup.name);
+}
 
-  if (politicalGroup.name === "") {
+export function getPoliticalGroupName(number: number, name: string): string {
+  const listPrefix = `${t("list")} ${number}`;
+
+  if (name === "") {
     return listPrefix;
   } else {
-    return `${listPrefix} - ${politicalGroup.name}`;
+    return `${listPrefix} - ${name}`;
   }
 }

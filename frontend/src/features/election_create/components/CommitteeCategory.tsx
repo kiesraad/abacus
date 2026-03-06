@@ -1,4 +1,4 @@
-import { type FormEvent, type ReactNode, useState } from "react";
+import { type ReactNode, type SubmitEvent, useState } from "react";
 import { Navigate, useNavigate } from "react-router";
 import { Alert } from "@/components/ui/Alert/Alert.tsx";
 import { Button } from "@/components/ui/Button/Button";
@@ -19,7 +19,7 @@ export function CommitteeCategory() {
     return <Navigate to="/elections/create" />;
   }
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new StringFormData(event.currentTarget);
     const committeeCategory = formData.getString("committee_category");

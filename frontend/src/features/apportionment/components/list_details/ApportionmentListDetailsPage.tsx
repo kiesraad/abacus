@@ -10,6 +10,7 @@ import { renderTitleAndHeader } from "../../utils/utils";
 import cls from "../Apportionment.module.css";
 import { ApportionmentErrorPage } from "../ApportionmentError";
 import { CandidatesRankingTable } from "./CandidatesRankingTable";
+import { CandidatesWithSeatTable } from "./CandidatesWithSeatTable";
 import { CandidatesWithVotesTable } from "./CandidatesWithVotesTable";
 
 interface PreferentiallyChosenCandidatesSectionProps {
@@ -34,10 +35,10 @@ function PreferentiallyChosenCandidatesSection({
                 percentage: preferenceThresholdPercentage,
               })}
             </span>
-            <CandidatesWithVotesTable
+            <CandidatesWithSeatTable
               id="preferentially-chosen-candidates-table"
-              showNumber={false}
-              showLocality={true}
+              showPosition={false}
+              showVotes={true}
               candidateList={candidates}
               candidateVotesList={preferentialCandidateNomination}
             />
@@ -57,9 +58,14 @@ function PreferentiallyChosenCandidatesSection({
 interface OtherChosenCandidatesSectionProps {
   otherCandidateNomination: CandidateVotes[];
   candidates: Candidate[];
+  startSeatNumber: number;
 }
 
-function OtherChosenCandidatesSection({ otherCandidateNomination, candidates }: OtherChosenCandidatesSectionProps) {
+function OtherChosenCandidatesSection({
+  otherCandidateNomination,
+  candidates,
+  startSeatNumber,
+}: OtherChosenCandidatesSectionProps) {
   return (
     <div className={cn(cls.tableDiv, "mb-lg")}>
       <div>
@@ -69,10 +75,11 @@ function OtherChosenCandidatesSection({ otherCandidateNomination, candidates }: 
             <span id="text-other-chosen-candidates" className={cls.tableInformation}>
               {t("apportionment.other_chosen_candidates_info")}
             </span>
-            <CandidatesWithVotesTable
+            <CandidatesWithSeatTable
               id="other-chosen-candidates-table"
-              showNumber={false}
-              showLocality={true}
+              startSeatNumber={startSeatNumber}
+              showPosition={true}
+              showVotes={false}
               candidateList={candidates}
               candidateVotesList={otherCandidateNomination}
             />
@@ -121,8 +128,6 @@ function TotalVotesPerCandidateSection({ candidateVotesList, candidates }: Total
         <h2 className={cls.tableTitle}>{t("apportionment.total_number_votes_per_candidate")}</h2>
         <CandidatesWithVotesTable
           id="total-votes-per-candidate-table"
-          showNumber={true}
-          showLocality={false}
           candidateList={candidates}
           candidateVotesList={candidateVotesList}
         />
@@ -181,6 +186,7 @@ export function ApportionmentListDetailsPage() {
               <OtherChosenCandidatesSection
                 otherCandidateNomination={listCandidateNomination.other_candidate_nomination}
                 candidates={list.candidates}
+                startSeatNumber={listCandidateNomination.preferential_candidate_nomination.length + 1}
               />
               <UpdatedCandidateRankingSection
                 updatedCandidateRanking={listCandidateNomination.updated_candidate_ranking}

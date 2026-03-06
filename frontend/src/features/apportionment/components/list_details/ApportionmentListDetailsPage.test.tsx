@@ -43,36 +43,43 @@ describe("ApportionmentListDetailsPage", () => {
       "Lijst 1 - Political Group A heeft 12 zetels toegewezen gekregen.",
     );
 
-    expect(await screen.findByRole("heading", { level: 2, name: "Met voorkeur gekozen kandidaten" })).toBeVisible();
+    expect(
+      await screen.findByRole("heading", { level: 2, name: "Met voorkeursstemmen gekozen kandidaten" }),
+    ).toBeVisible();
     expect(await screen.findByTestId("text-preferentially-chosen-candidates")).toHaveTextContent(
       "De volgende kandidaten zijn met voorkeursstemmen gekozen. Deze kandidaten hebben meer dan 50% van de kiesdeler gehaald.",
     );
     const preferentially_chosen_candidates_table = await screen.findByTestId("preferentially-chosen-candidates-table");
     expect(preferentially_chosen_candidates_table).toBeVisible();
     expect(preferentially_chosen_candidates_table).toHaveTableContent([
-      ["Kandidaat", "Woonplaats", "Aantal stemmen"],
-      ["Kok, K. (Karin) (v)", "Test Location", "200"],
-      ["Oud, L. (Lidewij) (v)", "Test Location", "138"],
-      ["Van der Weijden, B. (Berta) (v)", "Test Location", "100"],
-      ["Oud, K. (Klaas) (m)", "Test Location", "60"],
-      ["Oud, M. (Marijke) (v)", "Test Location", "55"],
-      ["Van der Weijden, H. (Henk) (m)", "Test Location", "50"],
-      ["De Jong, R. (Rolf) (m)", "Test Location", "50"],
-      ["Jansen, A. (Arie) (m)", "Test Location", "45"],
-      ["Bakker, S. (Sophie) (v)", "Test Location", "40"],
+      ["Zetel", "Naam", "Woonplaats", "Aantal stemmen"],
+      ["1", "Kok, K. (Karin) (v)", "Test Location", "200"],
+      ["2", "Oud, L. (Lidewij) (v)", "Test Location", "138"],
+      ["3", "Van der Weijden, B. (Berta) (v)", "Test Location", "100"],
+      ["4", "Oud, K. (Klaas) (m)", "Test Location", "60"],
+      ["5", "Oud, M. (Marijke) (v)", "Test Location", "55"],
+      ["6", "Van der Weijden, H. (Henk) (m)", "Test Location", "50"],
+      ["7", "De Jong, R. (Rolf) (m)", "Test Location", "50"],
+      ["8", "Jansen, A. (Arie) (m)", "Test Location", "45"],
+      ["9", "Bakker, S. (Sophie) (v)", "Test Location", "40"],
     ]);
 
-    expect(await screen.findByRole("heading", { level: 2, name: "Overige gekozen kandidaten" })).toBeVisible();
+    expect(
+      await screen.findByRole("heading", {
+        level: 2,
+        name: "Kandidaten die gekozen zijn vanwege hun positie op de lijst",
+      }),
+    ).toBeVisible();
     expect(await screen.findByTestId("text-other-chosen-candidates")).toHaveTextContent(
-      "De overige aan de lijst toegewezen zetels gaan naar de volgende kandidaten.",
+      "Deze kandidaten hebben zelfstandig niet voldoende stemmen gehaald voor een zetel, maar hebben een zetel toegewezen gekregen vanwege hun positie op de lijst.",
     );
     const other_chosen_candidates_table = await screen.findByTestId("other-chosen-candidates-table");
     expect(other_chosen_candidates_table).toBeVisible();
     expect(other_chosen_candidates_table).toHaveTableContent([
-      ["Kandidaat", "Woonplaats", "Aantal stemmen"],
-      ["Oud, J. (Johan) (m)", "Test Location", "20"],
-      ["De Vries, J. (Johan) (m)", "Test Location", "30"],
-      ["Van den Berg, M. (Marijke) (v)", "Test Location", "20"],
+      ["Zetel", "Naam", "Woonplaats", "Positie op de lijst"],
+      ["10", "Oud, J. (Johan) (m)", "Test Location", "2"],
+      ["11", "De Vries, J. (Johan) (m)", "Test Location", "9"],
+      ["12", "Van den Berg, M. (Marijke) (v)", "Test Location", "10"],
     ]);
 
     expect(await screen.findByRole("heading", { level: 2, name: "Rangschikking kandidaten" })).toBeVisible();
@@ -82,38 +89,38 @@ describe("ApportionmentListDetailsPage", () => {
     const candidates_ranking_table = await screen.findByTestId("candidates-ranking-table");
     expect(candidates_ranking_table).toBeVisible();
     expect(candidates_ranking_table).toHaveTableContent([
-      ["Kandidaat", "Woonplaats"],
-      ["Kok, K. (Karin) (v)", "Test Location"],
-      ["Oud, L. (Lidewij) (v)", "Test Location"],
-      ["Van der Weijden, B. (Berta) (v)", "Test Location"],
-      ["Oud, K. (Klaas) (m)", "Test Location"],
-      ["Oud, M. (Marijke) (v)", "Test Location"],
-      ["Van der Weijden, H. (Henk) (m)", "Test Location"],
-      ["De Jong, R. (Rolf) (m)", "Test Location"],
-      ["Jansen, A. (Arie) (m)", "Test Location"],
-      ["Bakker, S. (Sophie) (v)", "Test Location"],
-      ["Oud, J. (Johan) (m)", "Test Location"],
-      ["De Vries, J. (Johan) (m)", "Test Location"],
-      ["Van den Berg, M. (Marijke) (v)", "Test Location"],
+      ["Rang", "Naam", "Woonplaats", "Positie op de lijst"],
+      ["1", "Kok, K. (Karin) (v)", "Test Location", "12"],
+      ["2", "Oud, L. (Lidewij) (v)", "Test Location", "1"],
+      ["3", "Van der Weijden, B. (Berta) (v)", "Test Location", "6"],
+      ["4", "Oud, K. (Klaas) (m)", "Test Location", "7"],
+      ["5", "Oud, M. (Marijke) (v)", "Test Location", "3"],
+      ["6", "Van der Weijden, H. (Henk) (m)", "Test Location", "5"],
+      ["7", "De Jong, R. (Rolf) (m)", "Test Location", "11"],
+      ["8", "Jansen, A. (Arie) (m)", "Test Location", "4"],
+      ["9", "Bakker, S. (Sophie) (v)", "Test Location", "8"],
+      ["10", "Oud, J. (Johan) (m)", "Test Location", "2"],
+      ["11", "De Vries, J. (Johan) (m)", "Test Location", "9"],
+      ["12", "Van den Berg, M. (Marijke) (v)", "Test Location", "10"],
     ]);
 
     expect(await screen.findByRole("heading", { level: 2, name: "Totaal aantal stemmen per kandidaat" })).toBeVisible();
     const total_votes_per_candidate_table = await screen.findByTestId("total-votes-per-candidate-table");
     expect(total_votes_per_candidate_table).toBeVisible();
     expect(total_votes_per_candidate_table).toHaveTableContent([
-      ["Nummer", "Kandidaat", "Aantal stemmen"],
-      ["1", "Oud, L. (Lidewij) (v)", "138"],
-      ["2", "Oud, J. (Johan) (m)", "20"],
-      ["3", "Oud, M. (Marijke) (v)", "55"],
-      ["4", "Jansen, A. (Arie) (m)", "45"],
-      ["5", "Van der Weijden, H. (Henk) (m)", "50"],
-      ["6", "Van der Weijden, B. (Berta) (v)", "100"],
-      ["7", "Oud, K. (Klaas) (m)", "60"],
-      ["8", "Bakker, S. (Sophie) (v)", "40"],
-      ["9", "De Vries, J. (Johan) (m)", "30"],
-      ["10", "Van den Berg, M. (Marijke) (v)", "20"],
-      ["11", "De Jong, R. (Rolf) (m)", "50"],
-      ["12", "Kok, K. (Karin) (v)", "200"],
+      ["Nummer", "Naam", "Woonplaats", "Aantal stemmen"],
+      ["1", "Oud, L. (Lidewij) (v)", "Test Location", "138"],
+      ["2", "Oud, J. (Johan) (m)", "Test Location", "20"],
+      ["3", "Oud, M. (Marijke) (v)", "Test Location", "55"],
+      ["4", "Jansen, A. (Arie) (m)", "Test Location", "45"],
+      ["5", "Van der Weijden, H. (Henk) (m)", "Test Location", "50"],
+      ["6", "Van der Weijden, B. (Berta) (v)", "Test Location", "100"],
+      ["7", "Oud, K. (Klaas) (m)", "Test Location", "60"],
+      ["8", "Bakker, S. (Sophie) (v)", "Test Location", "40"],
+      ["9", "De Vries, J. (Johan) (m)", "Test Location", "30"],
+      ["10", "Van den Berg, M. (Marijke) (v)", "Test Location", "20"],
+      ["11", "De Jong, R. (Rolf) (m)", "Test Location", "50"],
+      ["12", "Kok, K. (Karin) (v)", "Test Location", "200"],
     ]);
   });
 
@@ -135,15 +142,22 @@ describe("ApportionmentListDetailsPage", () => {
       "Lijst 5 heeft 0 zetels toegewezen gekregen.",
     );
 
-    expect(await screen.findByRole("heading", { level: 2, name: "Met voorkeur gekozen kandidaten" })).toBeVisible();
+    expect(
+      await screen.findByRole("heading", { level: 2, name: "Met voorkeursstemmen gekozen kandidaten" }),
+    ).toBeVisible();
     expect(await screen.findByTestId("text-preferentially-chosen-candidates")).toHaveTextContent(
       "Geen van de kandidaten heeft meer dan 50% van de kiesdeler gehaald. Niemand is met voorkeursstemmen gekozen.",
     );
     expect(screen.queryByTestId("preferentially-chosen-candidates-table")).not.toBeInTheDocument();
 
-    expect(await screen.findByRole("heading", { level: 2, name: "Overige gekozen kandidaten" })).toBeVisible();
+    expect(
+      await screen.findByRole("heading", {
+        level: 2,
+        name: "Kandidaten die gekozen zijn vanwege hun positie op de lijst",
+      }),
+    ).toBeVisible();
     expect(await screen.findByTestId("text-other-chosen-candidates")).toHaveTextContent(
-      "Er zijn geen andere kandidaten gekozen.",
+      "Geen enkele kandidaat is zonder voorkeursstemmen gekozen.",
     );
     expect(screen.queryByTestId("other-chosen-candidates-table")).not.toBeInTheDocument();
 
@@ -157,11 +171,11 @@ describe("ApportionmentListDetailsPage", () => {
     const total_votes_per_candidate_table = await screen.findByTestId("total-votes-per-candidate-table");
     expect(total_votes_per_candidate_table).toBeVisible();
     expect(total_votes_per_candidate_table).toHaveTableContent([
-      ["Nummer", "Kandidaat", "Aantal stemmen"],
-      ["1", "Smit, G. (Gert) (m)", "20"],
-      ["2", "Koster, E. (Eva) (v)", "15"],
-      ["3", "Hofman, L. (Leon) (m)", "5"],
-      ["4", "Visser, S. (Sophie) (v)", "16"],
+      ["Nummer", "Naam", "Woonplaats", "Aantal stemmen"],
+      ["1", "Smit, G. (Gert) (m)", "Test Location", "20"],
+      ["2", "Koster, E. (Eva) (v)", "Test Location", "15"],
+      ["3", "Hofman, L. (Leon) (m)", "Test Location", "5"],
+      ["4", "Visser, S. (Sophie) (v)", "Test Location", "16"],
     ]);
   });
 

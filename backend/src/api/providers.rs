@@ -4,19 +4,19 @@ use crate::{
     domain::{
         committee_session::{CommitteeSessionError, CommitteeSessionId},
         committee_session_status::{
-            CommitteeSessionHasInvestigationsProvider, CommitteeSessionHasPollingStationsProvider,
-            DataEntryCompleteResultsProvider,
+            CommitteeSessionDataEntriesDefinitiveProvider, CommitteeSessionHasDataEntriesProvider,
+            CommitteeSessionHasInvestigationsProvider,
         },
     },
-    repository::{data_entry_repo, investigation_repo, polling_station_repo},
+    repository::{data_entry_repo, investigation_repo},
 };
 
-impl CommitteeSessionHasPollingStationsProvider for SqliteConnection {
-    async fn has_polling_stations(
+impl CommitteeSessionHasDataEntriesProvider for SqliteConnection {
+    async fn has_data_entries(
         &mut self,
         committee_session_id: CommitteeSessionId,
     ) -> Result<bool, CommitteeSessionError> {
-        polling_station_repo::has_any(self, committee_session_id)
+        data_entry_repo::has_any(self, committee_session_id)
             .await
             .map_err(|_| CommitteeSessionError::ProviderError)
     }
@@ -33,8 +33,8 @@ impl CommitteeSessionHasInvestigationsProvider for SqliteConnection {
     }
 }
 
-impl DataEntryCompleteResultsProvider for SqliteConnection {
-    async fn has_complete_results(
+impl CommitteeSessionDataEntriesDefinitiveProvider for SqliteConnection {
+    async fn data_entries_definitive(
         &mut self,
         committee_session_id: CommitteeSessionId,
     ) -> Result<bool, CommitteeSessionError> {

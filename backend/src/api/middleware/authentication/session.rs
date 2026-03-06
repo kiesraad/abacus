@@ -52,6 +52,9 @@ impl Session {
             .max_age(cookie::time::Duration::seconds(
                 SESSION_LIFE_TIME.num_seconds(),
             ))
+            .http_only(true)
+            .same_site(cookie::SameSite::Lax)
+            .path("/")
             .build()
     }
 }

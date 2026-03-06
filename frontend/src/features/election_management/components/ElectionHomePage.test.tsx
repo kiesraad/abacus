@@ -10,8 +10,11 @@ import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { electionManagementRoutes } from "@/features/election_management/routes";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
-import { getCommitteeSessionListMockData } from "@/testing/api-mocks/CommitteeSessionMockData";
-import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
+import {
+  getCommitteeSessionListMockData,
+  getCSBCommitteeSessionMockData,
+} from "@/testing/api-mocks/CommitteeSessionMockData";
+import { getCSBElectionMockData, getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import {
   CommitteeSessionCreateHandler,
   CommitteeSessionDeleteHandler,
@@ -21,11 +24,17 @@ import { getRouter, type Router } from "@/testing/router";
 import { overrideOnce, server } from "@/testing/server";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 import { expectConflictErrorPage, render, screen, setupTestRouter, spyOnHandler, within } from "@/testing/test-utils";
-import type { CommitteeSession, ElectionDetailsResponse, ErrorResponse, Role } from "@/types/generated/openapi";
+import type {
+  CommitteeCategory,
+  CommitteeSession,
+  ElectionDetailsResponse,
+  ErrorResponse,
+  Role,
+} from "@/types/generated/openapi";
 
 import { ElectionHomePage } from "./ElectionHomePage";
 
-const renderPage = async (userRole: Role) => {
+const renderPage = async (userRole: Role, committeeCategory: CommitteeCategory = "GSB") => {
   render(
     <TestUserProvider userRole={userRole}>
       <ElectionProvider electionId={1}>
@@ -36,7 +45,14 @@ const renderPage = async (userRole: Role) => {
     </TestUserProvider>,
   );
   expect(await screen.findByRole("heading", { level: 1, name: "Gemeenteraadsverkiezingen 2026" })).toBeVisible();
-  expect(await screen.findByRole("heading", { level: 2, name: "Gemeentelijk stembureau Heemdamseburg" })).toBeVisible();
+
+  if (committeeCategory === "CSB") {
+    expect(await screen.findByRole("heading", { level: 2, name: "Centraal stembureau Heemdamseburg" })).toBeVisible();
+  } else {
+    expect(
+      await screen.findByRole("heading", { level: 2, name: "Gemeentelijk stembureau Heemdamseburg" }),
+    ).toBeVisible();
+  }
 };
 
 describe("ElectionHomePage", () => {
@@ -410,5 +426,42 @@ describe("ElectionHomePage", () => {
     expect(screen.queryByText("Na 31-2 Bijlage 1")).not.toBeInTheDocument();
     expect(screen.queryByText("N 10-2")).not.toBeInTheDocument();
     expect(screen.queryByText("Na 31-2 Inlegvel")).not.toBeInTheDocument();
+  });
+
+  describe("CSB", () => {
+    test("Shows committee session card and election information table", async () => {
+      const committeeSessionData: Partial<CommitteeSession> = {
+        status: "data_entry",
+        location: "Den Haag",
+        start_date_time: "2026-03-18T21:36:00",
+      };
+      const electionData = getCSBElectionMockData({}, committeeSessionData);
+      electionData.committee_sessions = [getCSBCommitteeSessionMockData(committeeSessionData)];
+      server.use(
+        http.get("/api/elections/1", () =>
+          HttpResponse.json(electionData satisfies ElectionDetailsResponse, { status: 200 }),
+        ),
+      );
+
+      await renderPage("coordinator_csb", "CSB");
+
+      const committee_session_cards = await screen.findByTestId("committee-session-cards");
+      expect(committee_session_cards).toBeVisible();
+
+      expect(within(committee_session_cards).getByTestId("session-1")).toHaveTextContent(/Zitting CSB — Invoer bezig/);
+
+      expect(screen.queryByRole("button", { name: "Nieuwe zitting voorbereiden" })).not.toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: "Zitting verwijderen" })).not.toBeInTheDocument();
+
+      expect(await screen.findByRole("heading", { level: 3, name: "Over deze verkiezing" })).toBeVisible();
+      const election_information_table = await screen.findByTestId("election-information-table");
+      expect(election_information_table).toBeVisible();
+      expect(election_information_table).toHaveTableContent([
+        ["Verkiezing", "Gemeenteraadsverkiezingen 2026, 30 november"],
+        ["Kiesgebied", "0035 - Gemeente Heemdamseburg"],
+        ["Lijsten en kandidaten", "2 lijsten en 31 kandidaten"],
+        ["Type stembureau", "Centraal stembureau"],
+      ]);
+    });
   });
 });

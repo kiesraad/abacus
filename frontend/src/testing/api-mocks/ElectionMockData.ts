@@ -357,7 +357,7 @@ export const getCSBElectionMockData = (
     committee_sessions: [updatedCommitteeSession],
     election: {
       ...electionListMockResponse.elections[1]!,
-      political_groups: [],
+      political_groups: politicalGroupsMockData,
       ...election,
     },
     polling_stations: [],

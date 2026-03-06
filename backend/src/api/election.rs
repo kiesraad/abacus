@@ -21,11 +21,13 @@ use crate::{
     domain::{
         committee_session::{
             CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionError,
+            CommitteeSessionId,
         },
         committee_session_status::CommitteeSessionStatus,
         election::{
-            CommitteeCategory, Election, ElectionId, ElectionNumberOfVotersChangeRequest,
-            ElectionWithPoliticalGroups, NewElection, VoteCountingMethod,
+            CommitteeCategory, Election, ElectionCategory, ElectionId,
+            ElectionNumberOfVotersChangeRequest, ElectionWithPoliticalGroups, NewElection,
+            VoteCountingMethod,
         },
         investigation::PollingStationInvestigation,
         polling_station::{PollingStationRequest, PollingStationResponse, PollingStationsRequest},
@@ -37,7 +39,7 @@ use crate::{
     },
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
     repository::{committee_session_repo, election_repo, user_repo::User},
-    service::list_polling_stations_for_session,
+    service::{create_sub_committee, list_polling_stations_for_session},
 };
 
 pub fn router() -> OpenApiRouter<AppState> {
@@ -639,7 +641,7 @@ async fn create_election_with_committee_session(
         candidate_data_hash,
     )
     .await?;
-    create_committee_session(
+    let committee_session = create_committee_session(
         tx,
         audit_service,
         CommitteeSessionCreateRequest {
@@ -648,7 +650,36 @@ async fn create_election_with_committee_session(
         },
     )
     .await?;
+
+    create_sub_committees(tx, &election, committee_session.id).await?;
+
     Ok(election)
+}
+
+/// Create sub electoral committees for CSB elections
+async fn create_sub_committees(
+    tx: &mut SqliteConnection,
+    election: &ElectionWithPoliticalGroups,
+    committee_session_id: CommitteeSessionId,
+) -> Result<(), APIError> {
+    match (election.committee_category, election.category) {
+        (CommitteeCategory::CSB, ElectionCategory::Municipal) => {
+            let number = election
+                .domain_id
+                .parse()
+                .expect("domain_id should be numeric");
+            create_sub_committee(
+                tx,
+                committee_session_id,
+                number,
+                &election.location,
+                CommitteeCategory::GSB,
+            )
+            .await?;
+        }
+        (CommitteeCategory::GSB, _) => {}
+    }
+    Ok(())
 }
 
 impl From<DeError> for APIError {

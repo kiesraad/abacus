@@ -1,0 +1,50 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        INSERT INTO sub_committees (\n            committee_session_id,\n            data_entry_id,\n            number,\n            name,\n            category\n        ) VALUES (?, ?, ?, ?, ?)\n        RETURNING\n            id AS \"id: _\",\n            committee_session_id AS \"committee_session_id: _\",\n            data_entry_id AS \"data_entry_id!: _\",\n            number AS \"number: SubCommitteeNumber\",\n            name,\n            category AS \"category: _\"\n        ",
+  "describe": {
+    "columns": [
+      {
+        "name": "id: _",
+        "ordinal": 0,
+        "type_info": "Integer"
+      },
+      {
+        "name": "committee_session_id: _",
+        "ordinal": 1,
+        "type_info": "Integer"
+      },
+      {
+        "name": "data_entry_id!: _",
+        "ordinal": 2,
+        "type_info": "Integer"
+      },
+      {
+        "name": "number: SubCommitteeNumber",
+        "ordinal": 3,
+        "type_info": "Integer"
+      },
+      {
+        "name": "name",
+        "ordinal": 4,
+        "type_info": "Text"
+      },
+      {
+        "name": "category: _",
+        "ordinal": 5,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 5
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "f0f4b5d65a9fbc7e50e4144d134e39fd437e47d6c933d7772363fa222a5ea702"
+}

@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "DELETE FROM sub_committees WHERE committee_session_id = ?",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": []
+  },
+  "hash": "e4cefb982789676d5487aaf17da09238559515291c251b5905db12817501e6bf"
+}

@@ -4681,7 +4681,7 @@
           "chosen_candidates": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/Candidate"
+              "$ref": "#/components/schemas/ChosenCandidate"
             }
           },
           "list_candidate_nomination": {
@@ -4708,6 +4708,53 @@
             "minimum": 0
           },
           "votes": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          }
+        },
+        "additionalProperties": false
+      },
+      "ChosenCandidate": {
+        "type": "object",
+        "description": "Chosen candidate",
+        "required": [
+          "number",
+          "initials",
+          "last_name",
+          "locality",
+          "list_number",
+          "list_name"
+        ],
+        "properties": {
+          "country_code": {
+            "type": "string"
+          },
+          "first_name": {
+            "type": "string"
+          },
+          "gender": {
+            "$ref": "#/components/schemas/CandidateGender"
+          },
+          "initials": {
+            "type": "string"
+          },
+          "last_name": {
+            "type": "string"
+          },
+          "last_name_prefix": {
+            "type": "string"
+          },
+          "list_name": {
+            "type": "string"
+          },
+          "list_number": {
+            "$ref": "#/components/schemas/PGNumber"
+          },
+          "locality": {
+            "type": "string"
+          },
+          "number": {
             "type": "integer",
             "format": "int32",
             "minimum": 0

@@ -3,7 +3,7 @@ use serde::Serialize;
 use utoipa::ToSchema;
 
 use crate::domain::{
-    election::{self, Candidate, PGNumber},
+    election::{self, Candidate, CandidateGender, CandidateNumber, PGNumber},
     results::political_group_candidate_votes::{CandidateVotes, PoliticalGroupCandidateVotes},
     summary::ElectionSummary,
 };
@@ -160,7 +160,7 @@ pub struct ListSeatAssignment {
 #[derive(Debug, Serialize, ToSchema)]
 pub struct CandidateNomination {
     pub preference_threshold: PreferenceThreshold,
-    pub chosen_candidates: Vec<Candidate>,
+    pub chosen_candidates: Vec<ChosenCandidate>,
     pub list_candidate_nomination: Vec<ListCandidateNomination>,
 }
 
@@ -178,6 +178,48 @@ pub struct ListCandidateNomination {
     pub preferential_candidate_nomination: Vec<CandidateVotes>,
     pub other_candidate_nomination: Vec<CandidateVotes>,
     pub updated_candidate_ranking: Vec<Candidate>,
+}
+
+/// Chosen candidate
+#[derive(Debug, Serialize, ToSchema)]
+#[serde(deny_unknown_fields)]
+pub struct ChosenCandidate {
+    #[schema(value_type = u32)]
+    pub number: CandidateNumber,
+    pub initials: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    pub first_name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    pub last_name_prefix: Option<String>,
+    pub last_name: String,
+    pub locality: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    pub country_code: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    pub gender: Option<CandidateGender>,
+    pub list_number: PGNumber,
+    pub list_name: String,
+}
+
+impl ChosenCandidate {
+    pub fn new(candidate: Candidate, list_number: PGNumber, list_name: String) -> Self {
+        Self {
+            number: candidate.number,
+            initials: candidate.initials,
+            first_name: candidate.first_name,
+            last_name_prefix: candidate.last_name_prefix,
+            last_name: candidate.last_name,
+            locality: candidate.locality,
+            country_code: candidate.country_code,
+            gender: candidate.gender,
+            list_number,
+            list_name,
+        }
+    }
 }
 
 impl From<apportionment::SeatChange<PGNumber>> for SeatChange {

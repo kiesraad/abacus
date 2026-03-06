@@ -360,7 +360,23 @@ async fn test_api_output(pool: SqlitePool) {
             "first_name": "Sophie",
             "last_name": "Bakker",
             "locality": "Juinen",
-            "gender": "Female"
+            "gender": "Female",
+            "list_number": 1,
+            "list_name": "Political Group A"
+        })
+    );
+    assert_eq!(
+        cn["chosen_candidates"][1],
+        json!({
+            "number": 1,
+            "initials": "T.",
+            "first_name": "Tinus",
+            "last_name": "Bakker",
+            "locality": "Test Location",
+            "gender": "Male",
+            "country_code": "BE",
+            "list_number": 2,
+            "list_name": "Political Group B"
         })
     );
 
@@ -388,7 +404,7 @@ async fn test_api_output(pool: SqlitePool) {
     assert_eq!(
         second_list_nomination["updated_candidate_ranking"],
         json!([
-            { "number": 1, "initials": "T.", "first_name": "Tinus", "last_name": "Bakker", "locality": "Test Location", "gender": "Male" },
+            { "number": 1, "initials": "T.", "first_name": "Tinus", "last_name": "Bakker", "locality": "Test Location", "gender": "Male", "country_code": "BE" },
             { "number": 2, "initials": "D.", "last_name": "Po", "locality": "Test Location", "gender": "X" },
             { "number": 6, "initials": "H.", "first_name": "Henk", "last_name_prefix": "van den", "last_name": "Berg", "locality": "Test Location", "gender": "Male" },
             { "number": 5, "initials": "L.", "first_name": "Liesbeth", "last_name": "Jansen", "locality": "Test Location", "gender": "Female" },

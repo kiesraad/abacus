@@ -4,7 +4,7 @@ use crate::domain::{
     committee_session::CommitteeSessionId,
     data_entry::DataEntryId,
     election::CommitteeCategory,
-    sub_committee::{SubCommittee, SubCommitteeFirstSession, SubCommitteeId},
+    sub_committee::{SubCommittee, SubCommitteeFirstSession, SubCommitteeId, SubCommitteeNumber},
 };
 
 /// Sub electoral committee database row, matching the SQL schema
@@ -13,7 +13,7 @@ struct SubCommitteeRow {
     id: SubCommitteeId,
     committee_session_id: CommitteeSessionId,
     data_entry_id: DataEntryId,
-    number: String,
+    number: SubCommitteeNumber,
     name: String,
     category: CommitteeCategory,
 }
@@ -53,7 +53,7 @@ async fn list(
             id AS "id: _",
             committee_session_id AS "committee_session_id: _",
             data_entry_id AS "data_entry_id!: _",
-            number,
+            number AS "number: SubCommitteeNumber",
             name,
             category AS "category: _"
         FROM sub_committees
@@ -82,7 +82,7 @@ pub async fn create(
     conn: &mut SqliteConnection,
     committee_session_id: CommitteeSessionId,
     data_entry_id: DataEntryId,
-    number: &str,
+    number: SubCommitteeNumber,
     name: &str,
     category: CommitteeCategory,
 ) -> Result<SubCommitteeFirstSession, sqlx::Error> {
@@ -100,7 +100,7 @@ pub async fn create(
             id AS "id: _",
             committee_session_id AS "committee_session_id: _",
             data_entry_id AS "data_entry_id!: _",
-            number,
+            number AS "number: SubCommitteeNumber",
             name,
             category AS "category: _"
         "#,

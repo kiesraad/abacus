@@ -2,8 +2,9 @@ use sqlx::{Connection, SqliteConnection};
 
 use crate::{
     domain::{
-        committee_session::CommitteeSessionId, election::CommitteeCategory,
-        sub_committee::SubCommitteeFirstSession,
+        committee_session::CommitteeSessionId,
+        election::CommitteeCategory,
+        sub_committee::{SubCommitteeFirstSession, SubCommitteeNumber},
     },
     repository::{data_entry_repo, sub_committee_repo},
 };
@@ -22,7 +23,7 @@ impl From<sqlx::Error> for SubCommitteeServiceError {
 pub async fn create(
     conn: &mut SqliteConnection,
     committee_session_id: CommitteeSessionId,
-    number: &str,
+    number: SubCommitteeNumber,
     name: &str,
     category: CommitteeCategory,
 ) -> Result<SubCommitteeFirstSession, SubCommitteeServiceError> {
@@ -64,14 +65,14 @@ mod tests {
         let created = create(
             &mut conn,
             committee_session_id,
-            "0042",
+            42,
             "Test GSB",
             CommitteeCategory::GSB,
         )
         .await
         .unwrap();
 
-        assert_eq!(created.sub_committee.number, "0042");
+        assert_eq!(created.sub_committee.number, 42);
         assert_eq!(created.sub_committee.name, "Test GSB");
         assert_eq!(created.sub_committee.category, CommitteeCategory::GSB);
         assert_eq!(created.committee_session_id, committee_session_id);

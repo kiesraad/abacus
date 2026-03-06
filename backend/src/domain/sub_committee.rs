@@ -7,13 +7,15 @@ use crate::domain::{
 
 id!(SubCommitteeId);
 
+pub type SubCommitteeNumber = u32;
+
 /// Sub electoral committee base entity, independent
 /// of the election, committee session and data entry.
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct SubCommittee {
     pub id: SubCommitteeId,
-    pub number: String,
+    pub number: SubCommitteeNumber,
     pub name: String,
     pub category: CommitteeCategory,
 }

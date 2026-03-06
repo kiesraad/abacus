@@ -664,10 +664,14 @@ async fn create_sub_committees(
 ) -> Result<(), APIError> {
     match (election.committee_category, election.category) {
         (CommitteeCategory::CSB, ElectionCategory::Municipal) => {
+            let number = election
+                .domain_id
+                .parse()
+                .expect("domain_id should be numeric");
             create_sub_committee(
                 tx,
                 committee_session_id,
-                &election.domain_id,
+                number,
                 &election.location,
                 CommitteeCategory::GSB,
             )

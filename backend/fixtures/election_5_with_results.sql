@@ -266,7 +266,8 @@ VALUES (5, 'Corrigendum 2026', 'GSB', 'CSO', 'GR2026_GroteStad', 'Grote Stad', '
                 "first_name": "Tinus",
                 "last_name": "Bakker",
                 "locality": "Test Location",
-                "gender": "Male"
+                "gender": "Male",
+                "country_code": "BE"
               },
               {
                 "number": 2,

@@ -37,7 +37,7 @@
   "other_chosen_candidates": "Kandidaten die gekozen zijn vanwege hun positie op de lijst",
   "other_chosen_candidates_empty": "Geen enkele kandidaat is zonder voorkeursstemmen gekozen.",
   "other_chosen_candidates_info": "Deze kandidaten hebben zelfstandig niet voldoende stemmen gehaald voor een zetel, maar hebben een zetel toegewezen gekregen vanwege hun positie op de lijst.",
-  "position_on_list": "Positie op de lijst",
+  "position_on_list": "Positie op lijst",
   "preference_threshold": "Voorkeursdrempel",
   "preference_threshold_description": "{percentage}% van de kiesdeler",
   "preferentially_chosen_candidates": "Met voorkeursstemmen gekozen kandidaten",

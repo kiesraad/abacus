@@ -76,7 +76,7 @@ describe("ApportionmentListDetailsPage", () => {
     const other_chosen_candidates_table = await screen.findByTestId("other-chosen-candidates-table");
     expect(other_chosen_candidates_table).toBeVisible();
     expect(other_chosen_candidates_table).toHaveTableContent([
-      ["Zetel", "Naam", "Woonplaats", "Positie op de lijst"],
+      ["Zetel", "Naam", "Woonplaats", "Positie op lijst"],
       ["10", "Oud, J. (Johan) (m)", "Test Location", "2"],
       ["11", "De Vries, J. (Johan) (m)", "Test Location", "9"],
       ["12", "Van den Berg, M. (Marijke) (v)", "Test Location", "10"],
@@ -89,7 +89,7 @@ describe("ApportionmentListDetailsPage", () => {
     const candidates_ranking_table = await screen.findByTestId("candidates-ranking-table");
     expect(candidates_ranking_table).toBeVisible();
     expect(candidates_ranking_table).toHaveTableContent([
-      ["Rang", "Naam", "Woonplaats", "Positie op de lijst"],
+      ["Rang", "Naam", "Woonplaats", "Positie op lijst"],
       ["1", "Kok, K. (Karin) (v)", "Test Location", "12"],
       ["2", "Oud, L. (Lidewij) (v)", "Test Location", "1"],
       ["3", "Van der Weijden, B. (Berta) (v)", "Test Location", "6"],
@@ -108,7 +108,7 @@ describe("ApportionmentListDetailsPage", () => {
     const total_votes_per_candidate_table = await screen.findByTestId("total-votes-per-candidate-table");
     expect(total_votes_per_candidate_table).toBeVisible();
     expect(total_votes_per_candidate_table).toHaveTableContent([
-      ["Nummer", "Naam", "Woonplaats", "Aantal stemmen"],
+      ["Nummer", "Kandidaat", "Woonplaats", "Aantal stemmen"],
       ["1", "Oud, L. (Lidewij) (v)", "Test Location", "138"],
       ["2", "Oud, J. (Johan) (m)", "Test Location", "20"],
       ["3", "Oud, M. (Marijke) (v)", "Test Location", "55"],
@@ -171,7 +171,7 @@ describe("ApportionmentListDetailsPage", () => {
     const total_votes_per_candidate_table = await screen.findByTestId("total-votes-per-candidate-table");
     expect(total_votes_per_candidate_table).toBeVisible();
     expect(total_votes_per_candidate_table).toHaveTableContent([
-      ["Nummer", "Naam", "Woonplaats", "Aantal stemmen"],
+      ["Nummer", "Kandidaat", "Woonplaats", "Aantal stemmen"],
       ["1", "Smit, G. (Gert) (m)", "Test Location", "20"],
       ["2", "Koster, E. (Eva) (v)", "Test Location", "15"],
       ["3", "Hofman, L. (Leon) (m)", "Test Location", "5"],

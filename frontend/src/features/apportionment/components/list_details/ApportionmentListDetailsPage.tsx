@@ -92,21 +92,21 @@ function OtherChosenCandidatesSection({
   );
 }
 
-interface UpdatedCandidateRankingSectionProps {
-  updatedCandidateRanking: Candidate[];
+interface UnelectedCandidatesRankingSectionProps {
+  unelectedCandidatesRanking: Candidate[];
 }
 
-function UpdatedCandidateRankingSection({ updatedCandidateRanking }: UpdatedCandidateRankingSectionProps) {
+function UnelectedCandidatesRankingSection({ unelectedCandidatesRanking }: UnelectedCandidatesRankingSectionProps) {
   return (
     <div className={cn(cls.tableDiv, "mb-lg")}>
       <div>
         <h2 className={cls.tableTitle}>{t("apportionment.ranking_candidates")}</h2>
-        {updatedCandidateRanking.length > 0 ? (
+        {unelectedCandidatesRanking.length > 0 ? (
           <>
             <span id="text-ranking-candidates" className={cls.tableInformation}>
               {t("apportionment.ranking_candidates_info")}
             </span>
-            <CandidatesRankingTable candidateRanking={updatedCandidateRanking} />
+            <CandidatesRankingTable candidateRanking={unelectedCandidatesRanking} />
           </>
         ) : (
           <span id="text-ranking-candidates">{t("apportionment.ranking_candidates_empty")}</span>
@@ -158,6 +158,12 @@ export function ApportionmentListDetailsPage() {
     const listCandidateNomination = candidateNomination.list_candidate_nomination[list.number - 1];
 
     if (listTotalSeats !== undefined && candidateVotesList && listCandidateNomination) {
+      let unelectedCandidatesRanking: Candidate[];
+      if (listCandidateNomination.updated_candidate_ranking.length > 0) {
+        unelectedCandidatesRanking = listCandidateNomination.updated_candidate_ranking.slice(listTotalSeats);
+      } else {
+        unelectedCandidatesRanking = list.candidates.slice(listTotalSeats);
+      }
       return (
         <>
           {renderTitleAndHeader(listName)}
@@ -188,9 +194,7 @@ export function ApportionmentListDetailsPage() {
                 candidates={list.candidates}
                 startSeatNumber={listCandidateNomination.preferential_candidate_nomination.length + 1}
               />
-              <UpdatedCandidateRankingSection
-                updatedCandidateRanking={listCandidateNomination.updated_candidate_ranking}
-              />
+              <UnelectedCandidatesRankingSection unelectedCandidatesRanking={unelectedCandidatesRanking} />
               <TotalVotesPerCandidateSection candidates={list.candidates} candidateVotesList={candidateVotesList} />
             </article>
           </main>

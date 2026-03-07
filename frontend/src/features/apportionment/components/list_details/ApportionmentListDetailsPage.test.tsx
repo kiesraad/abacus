@@ -82,27 +82,13 @@ describe("ApportionmentListDetailsPage", () => {
       ["12", "Van den Berg, M. (Marijke) (v)", "Test Location", "10"],
     ]);
 
-    expect(await screen.findByRole("heading", { level: 2, name: "Rangschikking kandidaten" })).toBeVisible();
+    expect(
+      await screen.findByRole("heading", { level: 2, name: "Rangschikking van kandidaten voor opvolging" }),
+    ).toBeVisible();
     expect(await screen.findByTestId("text-ranking-candidates")).toHaveTextContent(
-      "De kandidaten zijn gerangschikt in de volgorde zoals hieronder aangegeven.",
+      "een enkele kandidaat is niet gekozen.",
     );
-    const candidates_ranking_table = await screen.findByTestId("candidates-ranking-table");
-    expect(candidates_ranking_table).toBeVisible();
-    expect(candidates_ranking_table).toHaveTableContent([
-      ["Rang", "Naam", "Woonplaats", "Positie op lijst"],
-      ["1", "Kok, K. (Karin) (v)", "Test Location", "12"],
-      ["2", "Oud, L. (Lidewij) (v)", "Test Location", "1"],
-      ["3", "Van der Weijden, B. (Berta) (v)", "Test Location", "6"],
-      ["4", "Oud, K. (Klaas) (m)", "Test Location", "7"],
-      ["5", "Oud, M. (Marijke) (v)", "Test Location", "3"],
-      ["6", "Van der Weijden, H. (Henk) (m)", "Test Location", "5"],
-      ["7", "De Jong, R. (Rolf) (m)", "Test Location", "11"],
-      ["8", "Jansen, A. (Arie) (m)", "Test Location", "4"],
-      ["9", "Bakker, S. (Sophie) (v)", "Test Location", "8"],
-      ["10", "Oud, J. (Johan) (m)", "Test Location", "2"],
-      ["11", "De Vries, J. (Johan) (m)", "Test Location", "9"],
-      ["12", "Van den Berg, M. (Marijke) (v)", "Test Location", "10"],
-    ]);
+    expect(screen.queryByTestId("candidates-ranking-table")).not.toBeInTheDocument();
 
     expect(await screen.findByRole("heading", { level: 2, name: "Totaal aantal stemmen per kandidaat" })).toBeVisible();
     const total_votes_per_candidate_table = await screen.findByTestId("total-votes-per-candidate-table");
@@ -124,7 +110,7 @@ describe("ApportionmentListDetailsPage", () => {
     ]);
   });
 
-  test("No tables visible because 0 seats assigned", async () => {
+  test("No elected candidates tables visible because 0 seats assigned", async () => {
     vi.spyOn(ReactRouter, "useParams").mockReturnValue({ listNumber: "5" });
     overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election));
     overrideOnce("post", "/api/elections/1/apportionment", 200, {
@@ -161,11 +147,21 @@ describe("ApportionmentListDetailsPage", () => {
     );
     expect(screen.queryByTestId("other-chosen-candidates-table")).not.toBeInTheDocument();
 
-    expect(await screen.findByRole("heading", { level: 2, name: "Rangschikking kandidaten" })).toBeVisible();
+    expect(
+      await screen.findByRole("heading", { level: 2, name: "Rangschikking van kandidaten voor opvolging" }),
+    ).toBeVisible();
     expect(await screen.findByTestId("text-ranking-candidates")).toHaveTextContent(
-      "De kandidaten zijn gerangschikt in de volgorde zoals ze op de lijst stonden.",
+      "De volgende kandidaten hebben geen zetel toegewezen gekregen. Als een zetel vrijkomt wordt deze via de onderstaande volgorde aan opvolgers toegewezen.",
     );
-    expect(screen.queryByTestId("candidates-ranking-table")).not.toBeInTheDocument();
+    const candidates_ranking_table = await screen.findByTestId("candidates-ranking-table");
+    expect(candidates_ranking_table).toBeVisible();
+    expect(candidates_ranking_table).toHaveTableContent([
+      ["Rang", "Naam", "Woonplaats", "Positie op lijst"],
+      ["1", "Smit, G. (Gert) (m)", "Test Location", "1"],
+      ["2", "Koster, E. (Eva) (v)", "Test Location", "2"],
+      ["3", "Hofman, L. (Leon) (m)", "Test Location", "3"],
+      ["4", "Visser, S. (Sophie) (v)", "Test Location", "4"],
+    ]);
 
     expect(await screen.findByRole("heading", { level: 2, name: "Totaal aantal stemmen per kandidaat" })).toBeVisible();
     const total_votes_per_candidate_table = await screen.findByTestId("total-votes-per-candidate-table");

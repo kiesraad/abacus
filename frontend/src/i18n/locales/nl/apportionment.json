@@ -46,9 +46,9 @@
   "quota": "Kiesdeler",
   "quota_description": "Benodigde stemmen per volle zetel",
   "rank": "Rang",
-  "ranking_candidates": "Rangschikking kandidaten",
-  "ranking_candidates_empty": "De kandidaten zijn gerangschikt in de volgorde zoals ze op de lijst stonden.",
-  "ranking_candidates_info": "De kandidaten zijn gerangschikt in de volgorde zoals hieronder aangegeven.",
+  "ranking_candidates": "Rangschikking van kandidaten voor opvolging",
+  "ranking_candidates_empty": "Geen enkele kandidaat is niet gekozen.",
+  "ranking_candidates_info": "De volgende kandidaten hebben geen zetel toegewezen gekregen. Als een zetel vrijkomt wordt deze via de onderstaande volgorde aan opvolgers toegewezen.",
   "remainder": "Overschot",
   "remaining_residual_seats_assignment": "Verdeling overige restzetels",
   "remaining_residual_seats_amount_and_information": {

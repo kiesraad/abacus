@@ -22,7 +22,7 @@ export const Default: StoryObj = {
       ["2", "Political Group B", "0", "30", "", "0"],
       ["3", "Political Group C", "0", "58", "", "1"],
       ["4", "Political Group D", "0", "57", "", "1"],
-      ["5", "Political Group E", "0", "56", "", "0"],
+      ["5", "", "0", "56", "", "0"],
       ["6", "Political Group F", "0", "55", "", "0"],
       ["7", "Political Group G", "0", "54", "", "0"],
       ["8", "Political Group H", "0", "52", "", "0"],

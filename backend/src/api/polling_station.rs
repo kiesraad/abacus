@@ -29,7 +29,7 @@ use crate::{
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
     repository::{
         committee_session_repo::get_election_committee_session,
-        election_repo,
+        data_entry_repo, election_repo, investigation_repo,
         polling_station_repo::{create, create_many, delete, get_for_election, has_any, update},
         user_repo::User,
     },
@@ -397,7 +397,14 @@ async fn polling_station_delete(
         )
         .await?;
 
-    if !has_any(&mut tx, committee_session.id).await? {
+    let has_items = if committee_session.is_next_session() {
+        investigation_repo::has_investigations_for_committee_session(&mut tx, committee_session.id)
+            .await?
+    } else {
+        data_entry_repo::has_any(&mut tx, committee_session.id).await?
+    };
+
+    if !has_items {
         change_committee_session_status(
             &mut tx,
             committee_session.id,

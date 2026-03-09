@@ -50,6 +50,8 @@ updates:
       # ESLint major upgrades usually have breaking changes
       - dependency-name: "eslint"
         update-types: ["version-update:semver-major"]
+      # @biomejs/biome updates should be done manually, if only for updating $schema in biome.jsonc
+      - dependency-name: "@biomejs/biome"
       # React Router major upgrades usually have breaking changes
       - dependency-name: "react-router"
         update-types: ["version-update:semver-major"]

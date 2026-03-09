@@ -203,3 +203,130 @@ Hieronder is berekend hoe vaak elke lijst qua stemmenaantal de kiesdeler heeft g
 - Als lijsten precies evenveel stemmen behalen en er niet voldoende restzetels zijn voor die lijsten, dan wordt geloot welke lijst de restzetel krijgt.
 
 #pagebreak(weak: true)
+
+=== Verdeling van de restzetels
+
+De resterende restzetels zijn verdeeld via het systeem van de grootste
+gemiddelden. De lijst die na toewijzing van een restzetel het hoogste gemiddeld
+aantal stemmen per zetel zou hebben, krijgt een restzetel. Ook bij deze verdeling
+mag iedere lijst maar één restzetel krijgen.
+
+#TODO[Restzetel tabel]
+
+#pagebreak(weak: true)
+
+== Verdeling van de zetels
+
+De aan de lijsten toegewezen volle zetels en restzetels zijn bij elkaar opgeteld. De
+verdeling van alle zetels ziet er als volgt uit:
+
+#TODO[Zetelverdeling tabel]
+
+== Toewijzing van zetels aan kandidaten
+
+Aantal zetels: #TODO[Aantal zetels]
+
+#emph_block[*Met voorkeursstemmen gekozen kandidaten*]
+
+Het overzicht met de stemmen per kandidaat is te vinden in bijlage 1 bij dit proces-
+verbaal. Deze kandidaten hebben als gevolg van het aantal voorkeursstemmen direct
+een zetel gekregen.
+
+#TODO[\<19 zetels]
+#TODO[\>19 zetels]
+
+#TODO[Zetel tabel]
+#emph_block[*Kandidaten die gekozen zijn vanwege hun positie op de lijst*]
+Deze kandidaten hebben zelfstandig niet voldoende stemmen gehaald voor een zetel,
+maar hebben een zetel toegewezen vanwege hun positie op de lijst.
+
+#TODO[Zetel tabel]
+
+#emph_block[*Rangschikking van kandidaten voor opvolging*]
+De volgende kandidaten hebben geen zetel toegewezen gekregen. Als een zetel vrijkomt
+wordt deze via de onderstaande volgorde aan opvolgers toegewezen.
+
+#pagebreak(weak: true)
+
+== Gekozen kandidaten in alfabetische volgorde
+
+#TODO[Kandidaten tabel alph. volgorde]
+
+#pagebreak(weak: true)
+
+== Uitkomst controleprotocol
+
+=== Voer de controle uit volgens de stappen in het controleprotocol. Kruis aan wat van toepassing is:
+
+#checkbox()[Er zijn geen verschillen geconstateerd.]
+#checkbox()[Er zijn verschillen geconstateerd. Er is contact opgenomen met de Kiesraad. Noteer hieronder wat daarvan de uitkomst is:]
+
+#TODO[Format table]
+#empty_table()
+
+=== Is voor de invoer gebruik gemaakt van de bestanden die zijn uitgewisseld via het platform ‘Teluitslagen’?
+
+#checkbox()[Ja]
+#checkbox()[Nee, de resultaten van de papieren processen-verbaal twee keer handmatig ingevoerd in de uitslagensoftware]
+
+=== Heeft het gemeentelijk stembureau/hoofdstembureau verschillen geconstateerd bij de uitvoering van het controleprotocol?
+
+#checkbox()[Nee]
+#checkbox()[Ja, noteer hieronder wat het gemeentelijk stembureau/hoofdstembureau daarover heeft opgeschreven.]
+
+#TODO[Format table]
+#empty_table()
+
+#pagebreak(weak: true)
+
+== Hertelling
+#TODO[make this whole section conditional]
+
+Het centraal stembureau heeft besloten tot een hertelling van (een deel van) de stemmen, omdat er een ernstig vermoeden bestaat dat bij de stemopneming zodanige fouten zijn gemaakt dat die van invloed kunnen zijn op de zetelverdeling. Het gemeentelijk stembureau heeft de hertelling uitgevoerd onder mandaat en machtiging van het centraal stembureau.
+
+=== Wat is er herteld?
+
+In opdracht van het centraal stembureau heeft hertelling plaatsgevonden bij de volgende stembureaus:
+
+#TODO[opsomming]
+
+De uitkomsten van de hertelling zijn als volgt:
+
+=== Resultaten hertelling
+#TODO[Tabel met verschillen met oorspronkelijke telling Van tabellen 2.3 tot en met 2.5]
+
+=== Heeft de hertelling geleid tot een aangepaste zetelverdeling?
+
+#checkbox()[Nee]
+#checkbox()[Ja, #sym.arrow.r Zie bijgevoegde nieuwe zetelverdeling #TODO[ref naar nieuwe zetelverdeling?]]
+
+#TODO[Nieuwe zetelverdeling (tabellen uit 2.6 t/m 2.10)]
+
+#pagebreak(weak: true)
+
+#emph_block[Deze pagina is expres leeg]
+
+Zo komt het handtekeningen-blad altijd op een losse pagina, ook als het verslag dubbelzijdig is geprint.
+
+#pagebreak(weak: true)
+
+= Ondertekening
+
+
+=== Datum
+
+#textbox[Datum en tijd:][Plaats:]
+
+=== Voorzitter van het #location_type:
+
+#textbox[Naam:][Handtekening:]
+
+=== Plaatsvervangend voorzitter van het #location_type:
+
+#stack(spacing: 0.5em, ..range(0, is_municipality(2, 4)).map(_ => textbox[Naam:][Handtekening:]))
+
+=== De andere leden van het centraal stembureau: #location_type
+
+#stack(spacing: 0.5em, ..range(0, 5).map(_ => textbox[Naam:][Handtekening:]))
+
+#pagebreak(weak: true)

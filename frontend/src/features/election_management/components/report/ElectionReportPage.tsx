@@ -101,8 +101,16 @@ export function ElectionReportPage() {
                   ? formatDateTimeFull(new Date(committeeSession.start_date_time))
                   : "",
               })}
-              .<br />
-              {t("election_report.there_was_counting_method", { method: t(election.counting_method).toLowerCase() })}.
+              .
+              {election.counting_method && (
+                <>
+                  <br />
+                  {t("election_report.there_was_counting_method", {
+                    method: t(election.counting_method).toLowerCase(),
+                  })}
+                  .
+                </>
+              )}
               <DownloadButton
                 icon="download"
                 href={`/api/elections/${election.id}/committee_sessions/${committeeSession.id}/download_zip_results`}

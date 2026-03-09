@@ -23,7 +23,7 @@ import cls from "./ElectionStatus.module.css";
 
 export interface ElectionStatusProps {
   statuses: ElectionStatusResponseEntry[];
-  election: Required<Election>;
+  election: Election;
   committeeSession: CommitteeSession;
   pollingStations: PollingStation[];
   addLinks: boolean;

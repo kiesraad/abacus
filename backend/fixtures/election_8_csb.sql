@@ -1,5 +1,5 @@
 INSERT INTO elections (id, name, committee_category, counting_method, election_id, location, domain_id, category, number_of_seats, number_of_voters, election_date, nomination_date, political_groups)
-VALUES (8, 'Municipal Election', 'CSB', 'CSO', 'GR2024_Heemdamseburg', 'Heemdamseburg', '0042', 'Municipal', 15, 2000, '2024-11-30', '2024-11-01',
+VALUES (8, 'Municipal Election', 'CSB', NULL, 'GR2024_Heemdamseburg', 'Heemdamseburg', '0042', 'Municipal', 15, 2000, '2024-11-30', '2024-11-01',
         '[
           {
             "number": 1,

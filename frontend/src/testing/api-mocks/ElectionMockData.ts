@@ -269,7 +269,6 @@ export const electionListMockResponse: ElectionListResponse = {
       id: 2,
       name: "Gemeenteraadsverkiezingen 2026",
       committee_category: "CSB",
-      counting_method: "CSO",
       election_id: "GR2024_Heemdamseburg",
       location: "Heemdamseburg",
       domain_id: "0035",
@@ -379,12 +378,12 @@ export const csbElectionDetailsMockResponse: Required<ElectionDetailsResponse> =
 export const electionMockData = electionDetailsMockResponse.election;
 export const newElectionMockData = {
   ...electionDetailsMockResponse.election,
-} satisfies Required<NewElection>;
+} satisfies NewElection;
 
 export const newCSBElectionMockData = {
   ...csbElectionDetailsMockResponse.election,
   committee_category: "CSB",
-} satisfies Required<NewElection>;
+} satisfies NewElection;
 
 export const electionImportMockResponse: ElectionWithPoliticalGroups = {
   id: 2,
@@ -406,7 +405,6 @@ export const csbElectionImportMockResponse: ElectionWithPoliticalGroups = {
   id: 2,
   name: "Gemeenteraad Test 2022",
   committee_category: "CSB",
-  counting_method: "CSO",
   election_id: "GR2022_Test",
   location: "Test",
   domain_id: "0000",

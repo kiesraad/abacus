@@ -892,7 +892,7 @@ mod tests {
             id: ElectionId::from(1),
             name: "Test election".to_string(),
             committee_category: CommitteeCategory::GSB,
-            counting_method: VoteCountingMethod::CSO,
+            counting_method: Some(VoteCountingMethod::CSO),
             election_id: "Test_2025".to_string(),
             location: "Test location".to_string(),
             domain_id: "0000".to_string(),

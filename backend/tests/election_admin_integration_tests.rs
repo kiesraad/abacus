@@ -151,6 +151,7 @@ async fn test_csb_election_import_save(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::CREATED);
     let body: serde_json::Value = response.json().await.unwrap();
     assert_eq!(body["committee_category"], "CSB");
+    assert!(body["counting_method"].is_null());
     let election_details = get_election_details(
         &addr,
         &admin_cookie,
@@ -158,6 +159,7 @@ async fn test_csb_election_import_save(pool: SqlitePool) {
     )
     .await;
     assert_eq!(election_details["election"]["committee_category"], "CSB");
+    assert!(election_details["election"]["counting_method"].is_null());
     assert_eq!(election_details["election"]["number_of_voters"], 1);
     assert_eq!(
         election_details["current_committee_session"]["status"],

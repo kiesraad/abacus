@@ -18,7 +18,9 @@ pub struct Election {
     pub id: ElectionId,
     pub name: String,
     pub committee_category: CommitteeCategory,
-    pub counting_method: VoteCountingMethod,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    pub counting_method: Option<VoteCountingMethod>,
     pub election_id: String,
     pub location: String,
     pub domain_id: String,
@@ -38,7 +40,9 @@ pub struct ElectionWithPoliticalGroups {
     pub id: ElectionId,
     pub name: String,
     pub committee_category: CommitteeCategory,
-    pub counting_method: VoteCountingMethod,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    pub counting_method: Option<VoteCountingMethod>,
     pub election_id: String,
     pub location: String,
     pub domain_id: String,
@@ -90,7 +94,9 @@ impl IntoResponse for ElectionWithPoliticalGroups {
 pub struct NewElection {
     pub name: String,
     pub committee_category: CommitteeCategory,
-    pub counting_method: VoteCountingMethod,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    pub counting_method: Option<VoteCountingMethod>,
     pub election_id: String,
     pub location: String,
     pub domain_id: String,
@@ -245,7 +251,7 @@ pub(crate) mod tests {
             id: ElectionId::from(1),
             name: "Test".to_string(),
             committee_category: CommitteeCategory::GSB,
-            counting_method: VoteCountingMethod::CSO,
+            counting_method: Some(VoteCountingMethod::CSO),
             election_id: "Test_2023".to_string(),
             location: "Test".to_string(),
             domain_id: "0000".to_string(),

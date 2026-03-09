@@ -696,7 +696,7 @@ export interface DisplayFraction {
 export interface Election {
   category: ElectionCategory;
   committee_category: CommitteeCategory;
-  counting_method: VoteCountingMethod;
+  counting_method?: VoteCountingMethod;
   domain_id: string;
   election_date: string;
   election_id: string;
@@ -815,7 +815,7 @@ export interface ElectionSummary {
 export interface ElectionWithPoliticalGroups {
   category: ElectionCategory;
   committee_category: CommitteeCategory;
-  counting_method: VoteCountingMethod;
+  counting_method?: VoteCountingMethod;
   domain_id: string;
   election_date: string;
   election_id: string;
@@ -1031,7 +1031,7 @@ export interface LoginResponse {
 export interface NewElection {
   category: ElectionCategory;
   committee_category: CommitteeCategory;
-  counting_method: VoteCountingMethod;
+  counting_method?: VoteCountingMethod;
   domain_id: string;
   election_date: string;
   election_id: string;

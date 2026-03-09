@@ -5144,7 +5144,6 @@
           "id",
           "name",
           "committee_category",
-          "counting_method",
           "election_id",
           "location",
           "domain_id",
@@ -5556,7 +5555,6 @@
           "id",
           "name",
           "committee_category",
-          "counting_method",
           "election_id",
           "location",
           "domain_id",
@@ -6154,7 +6152,6 @@
         "required": [
           "name",
           "committee_category",
-          "counting_method",
           "election_id",
           "location",
           "domain_id",

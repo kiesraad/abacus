@@ -185,7 +185,7 @@ fn generate_election(rng: &mut impl rand::RngExt, args: &GenerateElectionArgs) -
     NewElection {
         name,
         committee_category: args.committee_category,
-        counting_method: VoteCountingMethod::CSO,
+        counting_method: Some(VoteCountingMethod::CSO),
         domain_id: super::data::domain_id(rng),
         election_id,
         location: locality,

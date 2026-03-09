@@ -86,12 +86,14 @@ export function ElectionInformationTable({
                 {t(`polling_station.title.${numberOfPollingStations === 1 ? "singular" : "plural"}`).toLowerCase()}
               </Table.Cell>
             </Table.Row>
-            <Table.Row>
-              <Table.HeaderCell scope="row" className="normal">
-                {t("counting_method_type")}
-              </Table.HeaderCell>
-              <Table.Cell>{t(election.counting_method)}</Table.Cell>
-            </Table.Row>
+            {election.counting_method && (
+              <Table.Row>
+                <Table.HeaderCell scope="row" className="normal">
+                  {t("counting_method_type")}
+                </Table.HeaderCell>
+                <Table.Cell>{t(election.counting_method)}</Table.Cell>
+              </Table.Row>
+            )}
           </>
         )}
       </Table.Body>

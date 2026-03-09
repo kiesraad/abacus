@@ -20,7 +20,7 @@ async fn it_generates_a_pdf() {
         id: ElectionId::from(1),
         name: "Municipal Election".to_string(),
         committee_category: CommitteeCategory::GSB,
-        counting_method: VoteCountingMethod::CSO,
+        counting_method: Some(VoteCountingMethod::CSO),
         election_id: "MunicipalElection_2025".to_string(),
         location: "Heemdamseburg".to_string(),
         domain_id: "0000".to_string(),

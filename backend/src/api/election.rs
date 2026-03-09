@@ -79,7 +79,7 @@ pub struct ElectionAuditData {
     pub election_id: ElectionId,
     pub election_name: String,
     pub election_committee_category: String,
-    pub election_counting_method: String,
+    pub election_counting_method: Option<String>,
     pub election_election_id: String,
     pub election_location: String,
     pub election_domain_id: String,
@@ -96,7 +96,7 @@ impl From<Election> for ElectionAuditData {
             election_id: value.id,
             election_name: value.name,
             election_committee_category: value.committee_category.to_string(),
-            election_counting_method: value.counting_method.to_string(),
+            election_counting_method: value.counting_method.map(|cm| cm.to_string()),
             election_election_id: value.election_id,
             election_location: value.location,
             election_domain_id: value.domain_id,
@@ -378,7 +378,7 @@ fn validate_gsb_election(
     }
 
     if let Some(cm) = edu.counting_method {
-        election.counting_method = cm;
+        election.counting_method = Some(cm);
     }
 
     // parse and validate polling stations, and update number of voters
@@ -537,7 +537,7 @@ async fn import_gsb_election(
         polling_stations_from_eml_str(polling_station_data)?;
     }
 
-    new_election.counting_method = edu.counting_method;
+    new_election.counting_method = Some(edu.counting_method);
     new_election.number_of_voters = edu.number_of_voters;
 
     let mut tx = pool.begin_immediate().await?;

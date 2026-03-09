@@ -1,5 +1,5 @@
 import type { Meta, StoryFn } from "@storybook/react-vite";
-import { type FormEvent, useState } from "react";
+import { type SubmitEvent, useState } from "react";
 
 import { Form } from "@/components/ui/Form/Form";
 
@@ -10,7 +10,7 @@ export const FormKeyboardNavigation: StoryFn = () => {
 
   const [keyboardFormSubmitted, setKeyboardFormSubmitted] = useState(false);
 
-  function handleKeyboardFormSubmit(event: FormEvent) {
+  function handleKeyboardFormSubmit(event: SubmitEvent) {
     event.preventDefault();
     setKeyboardFormSubmitted(true);
   }

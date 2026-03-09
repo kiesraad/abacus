@@ -1,4 +1,4 @@
-import { type FormEvent, useState } from "react";
+import { type SubmitEvent, useState } from "react";
 
 import { ApiError, isSuccess } from "@/api/ApiResult";
 import { useCrud } from "@/api/useCrud";
@@ -55,7 +55,7 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
     updatePath: isUpdate ? `/api/elections/${electionId}/polling_stations/${pollingStation.id}` : undefined,
   });
 
-  const handleSubmit = (event: FormEvent<HTMLForm>) => {
+  const handleSubmit = (event: SubmitEvent<HTMLForm>) => {
     event.preventDefault();
     const elements = event.currentTarget.elements;
 

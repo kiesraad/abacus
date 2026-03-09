@@ -1,4 +1,4 @@
-import { type FormEvent, useState } from "react";
+import { type SubmitEvent, useState } from "react";
 
 import { type AnyApiError, ApiError, isSuccess } from "@/api/ApiResult";
 import { useCrud } from "@/api/useCrud";
@@ -28,7 +28,7 @@ export function CreateFirstAdminForm({ next }: CreateFirstAdminFormProps) {
   const { create, isLoading } = useCrud<LoginResponse>({ createPath });
   const [apiError, setApiError] = useState<AnyApiError | null>(null);
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
 
     const formData = new StringFormData(event.currentTarget);

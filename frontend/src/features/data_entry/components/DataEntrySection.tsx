@@ -1,4 +1,4 @@
-import { type FormEvent, useEffect, useMemo, useRef } from "react";
+import { type SubmitEvent, useEffect, useMemo, useRef } from "react";
 
 import { ApiError, FatalApiError } from "@/api/ApiResult";
 import { CommitteeSessionPausedModal } from "@/components/data_entry/CommitteeSessionPausedModal";
@@ -71,8 +71,8 @@ export function DataEntrySection({ committeeCategory }: DataEntryProps) {
     }
   }, [formSection]);
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleSubmit = (event: SubmitEvent<HTMLFormElement>) => {
+    event.preventDefault();
     void onSubmit();
   };
 

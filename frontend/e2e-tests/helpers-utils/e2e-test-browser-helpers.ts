@@ -50,7 +50,7 @@ export async function fillCandidatesListPages(page: Page, results: PollingStatio
   const candidateListNames: string[] = await new ProgressList(page).allListNames();
 
   // make sure the form has the same number of political groups as the input data
-  expect(candidateListNames.length).toBe(results.political_group_votes.length);
+  expect(candidateListNames).toHaveLength(results.political_group_votes.length);
 
   for (const { index, value } of results.political_group_votes.map((value, index) => ({ index, value }))) {
     const candidatesListPage = new CandidatesListPage(page, index, candidateListNames[index]!);

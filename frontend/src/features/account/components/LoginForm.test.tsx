@@ -124,11 +124,8 @@ describe("LoginForm", () => {
   test("Show unauthorized message when state indicates unauthorized", async () => {
     vi.spyOn(ReactRouter, "useLocation").mockReturnValue({
       pathname: "/login",
-      search: "",
-      hash: "",
       state: { unauthorized: true },
-      key: "default",
-    });
+    } as Partial<ReactRouter.Location> as ReactRouter.Location);
 
     render(<LoginForm />);
 

@@ -1,4 +1,4 @@
-import { type FormEvent, useState } from "react";
+import { type SubmitEvent, useState } from "react";
 import { Form, useLocation, useNavigate } from "react-router";
 
 import { type AnyApiError, FatalError, isError } from "@/api/ApiResult";
@@ -33,9 +33,8 @@ export function LoginForm() {
   }
 
   // Handle form submission
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-
+  async function handleSubmit(e: SubmitEvent<HTMLFormElement>) {
+    e.preventDefault();
     setLoading(true);
     const result = await login(username, password);
 
@@ -65,7 +64,7 @@ export function LoginForm() {
 
   return (
     <Form
-      onSubmit={(e) => {
+      onSubmit={(e: SubmitEvent<HTMLFormElement>) => {
         void handleSubmit(e);
       }}
     >

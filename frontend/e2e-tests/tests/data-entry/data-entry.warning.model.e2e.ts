@@ -207,7 +207,6 @@ test.describe("Data entry model test - warnings", () => {
   createTestModel(machine)
     .getSimplePaths()
     .forEach((path) => {
-      // eslint-disable-next-line playwright/valid-title
       test(path.description, async ({ page, pollingStation, election }) => {
         const dataEntryHomePage = new DataEntryHomePage(page);
         const extraInvestigationPage = new ExtraInvestigationPage(page);

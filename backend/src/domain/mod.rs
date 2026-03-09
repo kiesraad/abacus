@@ -12,6 +12,7 @@ pub mod models;
 pub mod polling_station;
 pub mod results;
 pub mod role;
+pub mod sub_committee;
 pub mod summary;
 #[cfg(test)]
 pub mod valid_default;

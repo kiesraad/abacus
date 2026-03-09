@@ -5,4 +5,5 @@ pub mod file_repo;
 pub mod investigation_repo;
 pub mod polling_station_repo;
 pub mod session_repo;
+pub mod sub_committee_repo;
 pub mod user_repo;

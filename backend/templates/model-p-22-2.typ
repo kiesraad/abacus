@@ -8,14 +8,17 @@
 
 #let location_name = is_municipality[Gemeente #input.election.domain_id #input.election.location][Openbaar lichaam #input.election.location]
 #let location_type = [centraal stembureau]
+#let LARGE_COUNCIL_THRESHOLD = 19
 
-#show: doc => conf(doc, header-right: location_name, footer: [
-  Proces-verbaal van een #location_type (nieuwe zitting)\
-  Model P 2a
+#show: doc => conf(doc, header-right: [Centraal stembureau #input.election.location], footer: [
+  Proces-verbaal van het #location_type\
+  Model P 22-2
+  #TODO[hash toevoegen EML 520]
 ])
 
 #set heading(numbering: none)
 
+#TODO[election.name in voorbeeld is "De verkiezing van de leden van de gemeenteraad van 18 maart 2026"]
 #title_page(
   is_municipality[#input.election.domain_id #input.election.location][#input.election.location],
   [Centraal Stembureau],
@@ -27,7 +30,7 @@
 
 == Details van het #location_type
 
-#input.committee_session.location #format_date_time(input.committee_session.start_date_time)
+#input.committee_session.location #format_date_time(input.committee_session.start_date_time).
 
 == Proces-verbaal
 
@@ -73,7 +76,7 @@ De volgende rollen zijn mogelijk: voorzitter, plaatsvervangend voorzitter of lid
 
 #checkbox()[Nee]
 
-#checkbox()[Ja, #sym.arrow.r Zie bijlage 2 #TODO[ref naar bijlage 2]]
+#checkbox()[Ja, *#sym.arrow.r Zie bijlage 2* #TODO[ref naar bijlage 2 -> kan niet, die maken we niet met Abacus]]
 
 == Bezwaren
 
@@ -106,7 +109,7 @@ De volgende rollen zijn mogelijk: voorzitter, plaatsvervangend voorzitter of lid
       "D",
       light: false,
       value: input.summary.voters_counts.total_admitted_voters_count,
-    )[Totaal toegelaten kiezers (A+B)],
+    )[*Totaal toegelaten kiezers (A+B)*],
   )
 ] else [
   Tel het aantal geldige stempassen, volmachtbewijzen en kiezerspassen
@@ -122,7 +125,7 @@ De volgende rollen zijn mogelijk: voorzitter, plaatsvervangend voorzitter of lid
       "D",
       light: false,
       value: input.summary.voters_counts.total_admitted_voters_count,
-    )[Totaal toegelaten kiezers (A+B+C)],
+    )[*Totaal toegelaten kiezers (A+B+C)*],
   )
 ]
 
@@ -140,7 +143,7 @@ De volgende rollen zijn mogelijk: voorzitter, plaatsvervangend voorzitter of lid
 
 #let differences = input.summary.differences_counts.more_ballots_count.count > 0 or input.summary.differences_counts.fewer_ballots_count.count > 0
 
-#checkbox(checked: not differences)[Ja, #sym.arrow.r Ga door naar 2.5 #TODO[ref?]]
+#checkbox(checked: not differences)[Ja, *#sym.arrow.r Ga door naar 2.5* #TODO[ref?]]
 
 #checkbox(checked: differences)[Nee, er zijn stembureaus met een verschil]
 
@@ -177,11 +180,13 @@ Hieronder is berekend hoe vaak elke lijst qua stemmenaantal de kiesdeler heeft g
 
 == Restzetels
 
-=== Na toewijzing van de volle zetels blijft een aantal te verdelen zetels over. Dit zijn de restzetels.
+=== Berekening aantal restzetels
+
+Na toewijzing van de volle zetels blijft een aantal te verdelen zetels over. Dit zijn de restzetels.
 
 #TODO[Apply values]\
 #sum(
-  operator_label: "- verschil",
+  operator_label: "- Verschil",
   number_box(
     value: 99,
   )[Totaal aantal te verdelen zetels],
@@ -196,29 +201,44 @@ Hieronder is berekend hoe vaak elke lijst qua stemmenaantal de kiesdeler heeft g
 #pagebreak(weak: true)
 
 === Verdeling van de restzetels
+#TODO[Breedte tekst op pagina's fixen, hoort kleiner te zijn]\
+#if input.election.number_of_seats < LARGE_COUNCIL_THRESHOLD [
+  - Het centraal stembureau berekent hoeveel stemmen elke lijst overhoudt na toekenning van de volle zetels. Dat is het ‘overschot’ aan stemmen voor die lijst.
+  - Het centraal stembureau verdeelt de restzetels, in volgorde van de grootste overschotten. Elke lijst kan maar één restzetel krijgen. Alleen lijsten die ten minste 75% van de kiesdeler hebben behaald kunnen een restzetel krijgen.
+  - Als er daarna nog restzetels over zijn, verdeelt het centraal stembureau die volgens het systeem van de grootste gemiddelden. Ook bij deze verdeling mag iedere lijst maar één restzetel krijgen
+  - Als lijsten precies evenveel stemmen behalen en er niet voldoende restzetels zijn voor die lijsten, dan wordt geloot welke lijst de restzetel krijgt.
 
-- Het centraal berekent hoeveel stemmen elke lijst overhoudt na toekenning van de volle zetels. Dat is het ‘overschot’ aan stemmen voor die lijst.
-- Het centraal stembureau verdeelt de restzetels, in volgorde van de grootste overschotten. Elke lijst kan maar één restzetel krijgen. Alleen lijsten die ten minste 75% van de kiesdeler hebben behaald kunnen een restzetel krijgen.
-- Als er daarna nog restzetels over zijn, verdeelt het centraal stembureau die volgens het systeem van de grootste gemiddelden. Ook bij deze verdeling mag iedere lijst maar één restzetel krijgen
-- Als lijsten precies evenveel stemmen behalen en er niet voldoende restzetels zijn voor die lijsten, dan wordt geloot welke lijst de restzetel krijgt.
+  #TODO[largest remainders table]
+] else [
+  - Eerst wordt voor alle lijsten berekend hoeveel stemmen per zetel op een bepaalde lijst zouden zijn uitgebracht als die lijst één zetel extra zou krijgen: de op de lijst uitgebrachte stemmen worden gedeeld door het aantal volle zetels plus 1.
+  - De uitkomsten van deze berekening zijn gemiddelden per zetel; zij worden naar grootte gerangschikt.
+  - De eerste restzetel gaat naar de lijst met het grootste gemiddelde per zetel. Voor deze lijst wordt opnieuw berekend wat het gemiddelde nu is, uitgaande van het aantal volle zetels, de toegewezen restzetel en weer één extra zetel.
+  - Als er nog een restzetel te verdelen is, wordt deze toegewezen aan de lijst met nu het grootste gemiddelde.
+  - Het centraal stembureau herhaalt de procedure totdat alle restzetels verdeeld zijn.
+
+  Als meerdere lijsten gelijke gemiddelden hebben en er niet voldoende restzetels zijn voor toekenning ervan aan die lijsten, wordt geloot welke lijst de restzetel krijgt.
+
+  #TODO[highest averages table]
+]
+
+#TODO[Voetnoten]
 
 #pagebreak(weak: true)
 
-=== Verdeling van de restzetels
+#if input.election.number_of_seats < LARGE_COUNCIL_THRESHOLD [
+#TODO[Als nog restzetels over]
+=== Verdeling van de restzetels 
 
-De resterende restzetels zijn verdeeld via het systeem van de grootste
-gemiddelden. De lijst die na toewijzing van een restzetel het hoogste gemiddeld
-aantal stemmen per zetel zou hebben, krijgt een restzetel. Ook bij deze verdeling
-mag iedere lijst maar één restzetel krijgen.
+De resterende restzetels zijn verdeeld via het systeem van de grootste gemiddelden. De lijst die na toewijzing van een restzetel het hoogste gemiddeld aantal stemmen per zetel zou hebben, krijgt een restzetel. Ook bij deze verdeling mag iedere lijst maar één restzetel krijgen.
 
-#TODO[Restzetel tabel]
+#TODO[unique highest averages table]
 
 #pagebreak(weak: true)
+]
 
 == Verdeling van de zetels
 
-De aan de lijsten toegewezen volle zetels en restzetels zijn bij elkaar opgeteld. De
-verdeling van alle zetels ziet er als volgt uit:
+De aan de lijsten toegewezen volle zetels en restzetels zijn bij elkaar opgeteld. De verdeling van alle zetels ziet er als volgt uit:
 
 #TODO[Zetelverdeling tabel]
 
@@ -232,25 +252,27 @@ Het overzicht met de stemmen per kandidaat is te vinden in bijlage 1 bij dit pro
 verbaal. Deze kandidaten hebben als gevolg van het aantal voorkeursstemmen direct
 een zetel gekregen.
 
-#TODO[\<19 zetels]
-#TODO[\>19 zetels]
+Deze kandidaten hebben meer dan #if input.election.number_of_seats < LARGE_COUNCIL_THRESHOLD [50%] else [25%] van de kiesdeler gehaald.
 
-#TODO[Zetel tabel]
+#TODO[Zetel tabel met aantal stemmen]
+
 #emph_block[*Kandidaten die gekozen zijn vanwege hun positie op de lijst*]
 Deze kandidaten hebben zelfstandig niet voldoende stemmen gehaald voor een zetel,
 maar hebben een zetel toegewezen vanwege hun positie op de lijst.
 
-#TODO[Zetel tabel]
+#TODO[Zetel tabel met positie op lijst]
 
 #emph_block[*Rangschikking van kandidaten voor opvolging*]
 De volgende kandidaten hebben geen zetel toegewezen gekregen. Als een zetel vrijkomt
 wordt deze via de onderstaande volgorde aan opvolgers toegewezen.
 
+#TODO[Rang tabel met positie op lijst]
+
 #pagebreak(weak: true)
 
 == Gekozen kandidaten in alfabetische volgorde
 
-#TODO[Kandidaten tabel alph. volgorde]
+#TODO[Kandidaten tabel met lijst nummer en naam]
 
 #pagebreak(weak: true)
 
@@ -261,8 +283,7 @@ wordt deze via de onderstaande volgorde aan opvolgers toegewezen.
 #checkbox()[Er zijn geen verschillen geconstateerd.]
 #checkbox()[Er zijn verschillen geconstateerd. Er is contact opgenomen met de Kiesraad. Noteer hieronder wat daarvan de uitkomst is:]
 
-#TODO[Format table]
-#empty_table()
+#empty_lines(5)
 
 === Is voor de invoer gebruik gemaakt van de bestanden die zijn uitgewisseld via het platform ‘Teluitslagen’?
 
@@ -274,13 +295,12 @@ wordt deze via de onderstaande volgorde aan opvolgers toegewezen.
 #checkbox()[Nee]
 #checkbox()[Ja, noteer hieronder wat het gemeentelijk stembureau/hoofdstembureau daarover heeft opgeschreven.]
 
-#TODO[Format table]
-#empty_table()
+#empty_lines(6)
 
 #pagebreak(weak: true)
 
 == Hertelling
-#TODO[make this whole section conditional]
+#TODO[make this whole section conditional -> I believe we can leave this section out entirely]
 
 Het centraal stembureau heeft besloten tot een hertelling van (een deel van) de stemmen, omdat er een ernstig vermoeden bestaat dat bij de stemopneming zodanige fouten zijn gemaakt dat die van invloed kunnen zijn op de zetelverdeling. Het gemeentelijk stembureau heeft de hertelling uitgevoerd onder mandaat en machtiging van het centraal stembureau.
 
@@ -312,7 +332,6 @@ Zo komt het handtekeningen-blad altijd op een losse pagina, ook als het verslag 
 
 = Ondertekening
 
-
 === Datum
 
 #textbox[Datum en tijd:][Plaats:]
@@ -328,5 +347,3 @@ Zo komt het handtekeningen-blad altijd op een losse pagina, ook als het verslag 
 === De andere leden van het centraal stembureau: #location_type
 
 #stack(spacing: 0.5em, ..range(0, 5).map(_ => textbox[Naam:][Handtekening:]))
-
-#pagebreak(weak: true)

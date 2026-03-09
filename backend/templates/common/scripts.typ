@@ -303,6 +303,7 @@
   format_date(date)
   " "
   time.slice(0, 5)
+  " uur"
 }
 
 // A title without any numbering

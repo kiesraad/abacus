@@ -1,0 +1,2469 @@
+{
+  "committee_session": {
+    "id": 2,
+    "number": 1,
+    "election_id": 5,
+    "location": "Juinen",
+    "start_date_time": "2026-03-19T10:12:00",
+    "status": "completed"
+  },
+  "summary": {
+    "voters_counts": {
+      "poll_card_count": 15001,
+      "proxy_certificate_count": 1,
+      "total_admitted_voters_count": 15002
+    },
+    "votes_counts": {
+      "political_group_total_votes": [
+        {
+          "number": 1,
+          "total": 7501
+        },
+        {
+          "number": 2,
+          "total": 1249
+        },
+        {
+          "number": 3,
+          "total": 1249
+        },
+        {
+          "number": 4,
+          "total": 1249
+        },
+        {
+          "number": 5,
+          "total": 1249
+        },
+        {
+          "number": 6,
+          "total": 1249
+        },
+        {
+          "number": 7,
+          "total": 1248
+        },
+        {
+          "number": 8,
+          "total": 7
+        }
+      ],
+      "total_votes_candidates_count": 15001,
+      "blank_votes_count": 0,
+      "invalid_votes_count": 1,
+      "total_votes_cast_count": 15002
+    },
+    "differences_counts": {
+      "more_ballots_count": {
+        "count": 0,
+        "polling_stations": []
+      },
+      "fewer_ballots_count": {
+        "count": 0,
+        "polling_stations": []
+      }
+    },
+    "polling_station_investigations": {
+      "admitted_voters_recounted": [],
+      "ballots_recounted": [],
+      "investigated_other_reason": []
+    },
+    "political_group_votes": [
+      {
+        "number": 1,
+        "total": 7501,
+        "candidate_votes": [
+          {
+            "number": 1,
+            "votes": 1069
+          },
+          {
+            "number": 2,
+            "votes": 403
+          },
+          {
+            "number": 3,
+            "votes": 421
+          },
+          {
+            "number": 4,
+            "votes": 310
+          },
+          {
+            "number": 5,
+            "votes": 368
+          },
+          {
+            "number": 6,
+            "votes": 500
+          },
+          {
+            "number": 7,
+            "votes": 400
+          },
+          {
+            "number": 8,
+            "votes": 425
+          },
+          {
+            "number": 9,
+            "votes": 315
+          },
+          {
+            "number": 10,
+            "votes": 370
+          },
+          {
+            "number": 11,
+            "votes": 1200
+          },
+          {
+            "number": 12,
+            "votes": 720
+          },
+          {
+            "number": 13,
+            "votes": 1000
+          }
+        ]
+      },
+      {
+        "number": 2,
+        "total": 1249,
+        "candidate_votes": [
+          {
+            "number": 1,
+            "votes": 552
+          },
+          {
+            "number": 2,
+            "votes": 307
+          },
+          {
+            "number": 3,
+            "votes": 180
+          },
+          {
+            "number": 4,
+            "votes": 210
+          }
+        ]
+      },
+      {
+        "number": 3,
+        "total": 1249,
+        "candidate_votes": [
+          {
+            "number": 1,
+            "votes": 1000
+          },
+          {
+            "number": 2,
+            "votes": 249
+          }
+        ]
+      },
+      {
+        "number": 4,
+        "total": 1249,
+        "candidate_votes": [
+          {
+            "number": 1,
+            "votes": 800
+          },
+          {
+            "number": 2,
+            "votes": 449
+          }
+        ]
+      },
+      {
+        "number": 5,
+        "total": 1249,
+        "candidate_votes": [
+          {
+            "number": 1,
+            "votes": 949
+          },
+          {
+            "number": 2,
+            "votes": 300
+          }
+        ]
+      },
+      {
+        "number": 6,
+        "total": 1249,
+        "candidate_votes": [
+          {
+            "number": 1,
+            "votes": 266
+          },
+          {
+            "number": 2,
+            "votes": 300
+          },
+          {
+            "number": 3,
+            "votes": 280
+          },
+          {
+            "number": 4,
+            "votes": 403
+          }
+        ]
+      },
+      {
+        "number": 7,
+        "total": 1248,
+        "candidate_votes": [
+          {
+            "number": 1,
+            "votes": 500
+          },
+          {
+            "number": 2,
+            "votes": 248
+          },
+          {
+            "number": 3,
+            "votes": 200
+          },
+          {
+            "number": 4,
+            "votes": 300
+          }
+        ]
+      },
+      {
+        "number": 8,
+        "total": 7,
+        "candidate_votes": [
+          {
+            "number": 1,
+            "votes": 5
+          },
+          {
+            "number": 2,
+            "votes": 1
+          },
+          {
+            "number": 3,
+            "votes": 1
+          }
+        ]
+      }
+    ]
+  },
+  "election": {
+    "id": 5,
+    "name": "Test Election >= 19 seats & Absolute Majority Change",
+    "counting_method": "CSO",
+    "committee_category": "CSB",
+    "election_id": "TestLocation_2026",
+    "location": "Test Location",
+    "domain_id": "0000",
+    "category": "Municipal",
+    "number_of_seats": 24,
+    "election_date": "2026-03-18",
+    "nomination_date": "2026-02-02",
+    "number_of_voters": 20000,
+    "political_groups": [
+      {
+        "number": 1,
+        "name": "Political Group A",
+        "candidates": [
+          {
+            "number": 1,
+            "initials": "L.",
+            "first_name": "Lidewij",
+            "last_name": "Oud",
+            "locality": "Test Location",
+            "gender": "Female"
+          },
+          {
+            "number": 2,
+            "initials": "J.",
+            "first_name": "Johan",
+            "last_name": "Oud",
+            "locality": "Test Location",
+            "gender": "Male"
+          },
+          {
+            "number": 3,
+            "initials": "M.",
+            "first_name": "Marijke",
+            "last_name": "Oud",
+            "locality": "Test Location",
+            "gender": "Female"
+          },
+          {
+            "number": 4,
+            "initials": "A.",
+            "first_name": "Arie",
+            "last_name": "Jansen",
+            "locality": "Test Location",
+            "gender": "Male"
+          },
+          {
+            "number": 5,
+            "initials": "H.",
+            "first_name": "Henk",
+            "last_name_prefix": "van der",
+            "last_name": "Weijden",
+            "locality": "Test Location",
+            "gender": "Male"
+          },
+          {
+            "number": 6,
+            "initials": "B.",
+            "first_name": "Berta",
+            "last_name_prefix": "van der",
+            "last_name": "Weijden",
+            "locality": "Test Location",
+            "gender": "Female"
+          },
+          {
+            "number": 7,
+            "initials": "K.",
+            "first_name": "Klaas",
+            "last_name": "Oud",
+            "locality": "Test Location",
+            "gender": "Male"
+          },
+          {
+            "number": 8,
+            "initials": "S.",
+            "first_name": "Sophie",
+            "last_name": "Bakker",
+            "locality": "Test Location",
+            "gender": "Female"
+          },
+          {
+            "number": 9,
+            "initials": "J.",
+            "first_name": "Johan",
+            "last_name_prefix": "de",
+            "last_name": "Vries",
+            "locality": "Test Location",
+            "gender": "Male"
+          },
+          {
+            "number": 10,
+            "initials": "M.",
+            "first_name": "Marijke",
+            "last_name_prefix": "van den",
+            "last_name": "Berg",
+            "locality": "Test Location",
+            "gender": "Female"
+          },
+          {
+            "number": 11,
+            "initials": "R.",
+            "first_name": "Rolf",
+            "last_name_prefix": "de",
+            "last_name": "Jong",
+            "locality": "Test Location",
+            "gender": "Male"
+          },
+          {
+            "number": 12,
+            "initials": "K.",
+            "first_name": "Karin",
+            "last_name": "Kok",
+            "locality": "Test Location",
+            "gender": "Female"
+          },
+          {
+            "number": 13,
+            "initials": "G.",
+            "first_name": "Gert",
+            "last_name": "Smit",
+            "locality": "Test Location",
+            "gender": "Male"
+          }
+        ]
+      },
+      {
+        "number": 2,
+        "name": "Political Group B",
+        "candidates": [
+          {
+            "number": 1,
+            "initials": "T.",
+            "first_name": "Tinus",
+            "last_name": "Bakker",
+            "locality": "Test Location",
+            "gender": "Male",
+            "country_code": "BE"
+          },
+          {
+            "number": 2,
+            "initials": "D.",
+            "last_name": "Po",
+            "locality": "Test Location",
+            "gender": "X"
+          },
+          {
+            "number": 3,
+            "initials": "W.",
+            "first_name": "Willem",
+            "last_name_prefix": "de",
+            "last_name": "Vries",
+            "locality": "Test Location",
+            "gender": "Male"
+          },
+          {
+            "number": 4,
+            "initials": "K.",
+            "first_name": "Klaas",
+            "last_name": "Kloosterboer",
+            "locality": "Test Location",
+            "gender": "Male"
+          }
+        ]
+      },
+      {
+        "number": 3,
+        "name": "Political Group C",
+        "candidates": [
+          {
+            "number": 1,
+            "initials": "G.",
+            "first_name": "Gert",
+            "last_name": "Smit",
+            "locality": "Test Location",
+            "gender": "Male"
+          },
+          {
+            "number": 2,
+            "initials": "E.",
+            "first_name": "Eva",
+            "last_name": "Koster",
+            "locality": "Test Location",
+            "gender": "Female"
+          }
+        ]
+      },
+      {
+        "number": 4,
+        "name": "Political Group D",
+        "candidates": [
+          {
+            "number": 1,
+            "initials": "T.",
+            "first_name": "Tjolk",
+            "last_name": "Hekking",
+            "locality": "Test Location",
+            "gender": "Male"
+          },
+          {
+            "number": 2,
+            "initials": "H.",
+            "first_name": "Henny",
+            "last_name": "Hekking",
+            "locality": "Test Location",
+            "gender": "Female"
+          }
+        ]
+      },
+      {
+        "number": 5,
+        "name": "",
+        "candidates": [
+          {
+            "number": 1,
+            "initials": "F.",
+            "first_name": "Frederik",
+            "last_name": "Jacobse",
+            "locality": "Test Location",
+            "gender": "Male"
+          },
+          {
+            "number": 2,
+            "initials": "T.J.",
+            "first_name": "Tedje Johannes",
+            "last_name_prefix": "van",
+            "last_name": "Es",
+            "locality": "Test Location",
+            "gender": "Male"
+          }
+        ]
+      },
+      {
+        "number": 6,
+        "name": "Political Group F",
+        "candidates": [
+          {
+            "number": 1,
+            "initials": "D.",
+            "first_name": "Dirk",
+            "last_name": "Bakker",
+            "locality": "Test Location",
+            "gender": "Male"
+          },
+          {
+            "number": 2,
+            "initials": "P.",
+            "first_name": "Piet",
+            "last_name": "Jansen",
+            "locality": "Test Location",
+            "gender": "Male"
+          },
+          {
+            "number": 3,
+            "initials": "A.",
+            "first_name": "Annelies",
+            "last_name_prefix": "van",
+            "last_name": "Loon",
+            "locality": "Test Location",
+            "gender": "Female"
+          },
+          {
+            "number": 4,
+            "initials": "T.J.",
+            "first_name": "Tessa",
+            "last_name": "Jansen",
+            "locality": "Test Location",
+            "gender": "Female"
+          }
+        ]
+      },
+      {
+        "number": 7,
+        "name": "Political Group G",
+        "candidates": [
+          {
+            "number": 1,
+            "initials": "T.",
+            "first_name": "Tjolk",
+            "last_name": "Hekking",
+            "locality": "Test Location",
+            "gender": "Male"
+          },
+          {
+            "number": 2,
+            "initials": "H.",
+            "first_name": "Henny",
+            "last_name": "Hekking",
+            "locality": "Test Location",
+            "gender": "Female"
+          },
+          {
+            "number": 3,
+            "initials": "W.",
+            "first_name": "Hans",
+            "last_name_prefix": "van der",
+            "last_name": "Vaart",
+            "locality": "Test Location",
+            "gender": "Male"
+          },
+          {
+            "number": 4,
+            "initials": "T.H.",
+            "first_name": "Tjolkse Hendrika",
+            "last_name": "Hekking",
+            "locality": "Test Location",
+            "gender": "Female"
+          }
+        ]
+      },
+      {
+        "number": 8,
+        "name": "Political Group H",
+        "candidates": [
+          {
+            "number": 1,
+            "initials": "F.",
+            "first_name": "Frederik",
+            "last_name": "Jacobse",
+            "locality": "Test Location",
+            "gender": "Male"
+          },
+          {
+            "number": 2,
+            "initials": "T.J.",
+            "first_name": "Tedje Johannes",
+            "last_name_prefix": "van",
+            "last_name": "Es",
+            "locality": "Test Location",
+            "gender": "Male"
+          },
+          {
+            "number": 3,
+            "initials": "K.",
+            "first_name": "Karel",
+            "last_name_prefix": "van",
+            "last_name": "Es",
+            "locality": "Test Location",
+            "gender": "Male"
+          }
+        ]
+      }
+    ]
+  },
+  "candidate_nomination": {
+    "preference_threshold": {
+      "percentage": 25,
+      "number_of_votes": {
+        "integer": 156,
+        "numerator": 625,
+        "denominator": 2400
+      }
+    },
+    "chosen_candidates": [
+      {
+        "number": 8,
+        "initials": "S.",
+        "first_name": "Sophie",
+        "last_name": "Bakker",
+        "locality": "Test Location",
+        "gender": "Female",
+        "list_number": 1,
+        "list_name": "Political Group A"
+      },
+      {
+        "number": 1,
+        "initials": "T.",
+        "first_name": "Tinus",
+        "last_name": "Bakker",
+        "locality": "Test Location",
+        "gender": "Male",
+        "country_code": "BE",
+        "list_number": 2,
+        "list_name": "Political Group B"
+      },
+      {
+        "number": 10,
+        "initials": "M.",
+        "first_name": "Marijke",
+        "last_name_prefix": "van den",
+        "last_name": "Berg",
+        "locality": "Test Location",
+        "gender": "Female",
+        "list_number": 1,
+        "list_name": "Political Group A"
+      },
+      {
+        "number": 2,
+        "initials": "T.J.",
+        "first_name": "Tedje Johannes",
+        "last_name_prefix": "van",
+        "last_name": "Es",
+        "locality": "Test Location",
+        "gender": "Male",
+        "list_number": 5,
+        "list_name": ""
+      },
+      {
+        "number": 2,
+        "initials": "H.",
+        "first_name": "Henny",
+        "last_name": "Hekking",
+        "locality": "Test Location",
+        "gender": "Female",
+        "list_number": 4,
+        "list_name": "Political Group D"
+      },
+      {
+        "number": 1,
+        "initials": "T.",
+        "first_name": "Tjolk",
+        "last_name": "Hekking",
+        "locality": "Test Location",
+        "gender": "Male",
+        "list_number": 4,
+        "list_name": "Political Group D"
+      },
+      {
+        "number": 1,
+        "initials": "T.",
+        "first_name": "Tjolk",
+        "last_name": "Hekking",
+        "locality": "Test Location",
+        "gender": "Male",
+        "list_number": 7,
+        "list_name": "Political Group G"
+      },
+      {
+        "number": 1,
+        "initials": "F.",
+        "first_name": "Frederik",
+        "last_name": "Jacobse",
+        "locality": "Test Location",
+        "gender": "Male",
+        "list_number": 5,
+        "list_name": ""
+      },
+      {
+        "number": 4,
+        "initials": "A.",
+        "first_name": "Arie",
+        "last_name": "Jansen",
+        "locality": "Test Location",
+        "gender": "Male",
+        "list_number": 1,
+        "list_name": "Political Group A"
+      },
+      {
+        "number": 2,
+        "initials": "P.",
+        "first_name": "Piet",
+        "last_name": "Jansen",
+        "locality": "Test Location",
+        "gender": "Male",
+        "list_number": 6,
+        "list_name": "Political Group F"
+      },
+      {
+        "number": 4,
+        "initials": "T.J.",
+        "first_name": "Tessa",
+        "last_name": "Jansen",
+        "locality": "Test Location",
+        "gender": "Female",
+        "list_number": 6,
+        "list_name": "Political Group F"
+      },
+      {
+        "number": 11,
+        "initials": "R.",
+        "first_name": "Rolf",
+        "last_name_prefix": "de",
+        "last_name": "Jong",
+        "locality": "Test Location",
+        "gender": "Male",
+        "list_number": 1,
+        "list_name": "Political Group A"
+      },
+      {
+        "number": 12,
+        "initials": "K.",
+        "first_name": "Karin",
+        "last_name": "Kok",
+        "locality": "Test Location",
+        "gender": "Female",
+        "list_number": 1,
+        "list_name": "Political Group A"
+      },
+      {
+        "number": 2,
+        "initials": "E.",
+        "first_name": "Eva",
+        "last_name": "Koster",
+        "locality": "Test Location",
+        "gender": "Female",
+        "list_number": 3,
+        "list_name": "Political Group C"
+      },
+      {
+        "number": 2,
+        "initials": "J.",
+        "first_name": "Johan",
+        "last_name": "Oud",
+        "locality": "Test Location",
+        "gender": "Male",
+        "list_number": 1,
+        "list_name": "Political Group A"
+      },
+      {
+        "number": 7,
+        "initials": "K.",
+        "first_name": "Klaas",
+        "last_name": "Oud",
+        "locality": "Test Location",
+        "gender": "Male",
+        "list_number": 1,
+        "list_name": "Political Group A"
+      },
+      {
+        "number": 1,
+        "initials": "L.",
+        "first_name": "Lidewij",
+        "last_name": "Oud",
+        "locality": "Test Location",
+        "gender": "Female",
+        "list_number": 1,
+        "list_name": "Political Group A"
+      },
+      {
+        "number": 3,
+        "initials": "M.",
+        "first_name": "Marijke",
+        "last_name": "Oud",
+        "locality": "Test Location",
+        "gender": "Female",
+        "list_number": 1,
+        "list_name": "Political Group A"
+      },
+      {
+        "number": 2,
+        "initials": "D.",
+        "last_name": "Po",
+        "locality": "Test Location",
+        "gender": "X",
+        "list_number": 2,
+        "list_name": "Political Group B"
+      },
+      {
+        "number": 13,
+        "initials": "G.",
+        "first_name": "Gert",
+        "last_name": "Smit",
+        "locality": "Test Location",
+        "gender": "Male",
+        "list_number": 1,
+        "list_name": "Political Group A"
+      },
+      {
+        "number": 1,
+        "initials": "G.",
+        "first_name": "Gert",
+        "last_name": "Smit",
+        "locality": "Test Location",
+        "gender": "Male",
+        "list_number": 3,
+        "list_name": "Political Group C"
+      },
+      {
+        "number": 9,
+        "initials": "J.",
+        "first_name": "Johan",
+        "last_name_prefix": "de",
+        "last_name": "Vries",
+        "locality": "Test Location",
+        "gender": "Male",
+        "list_number": 1,
+        "list_name": "Political Group A"
+      },
+      {
+        "number": 6,
+        "initials": "B.",
+        "first_name": "Berta",
+        "last_name_prefix": "van der",
+        "last_name": "Weijden",
+        "locality": "Test Location",
+        "gender": "Female",
+        "list_number": 1,
+        "list_name": "Political Group A"
+      },
+      {
+        "number": 5,
+        "initials": "H.",
+        "first_name": "Henk",
+        "last_name_prefix": "van der",
+        "last_name": "Weijden",
+        "locality": "Test Location",
+        "gender": "Male",
+        "list_number": 1,
+        "list_name": "Political Group A"
+      }
+    ],
+    "list_candidate_nomination": [
+      {
+        "list_number": 1,
+        "list_name": "Political Group A",
+        "list_seats": 13,
+        "preferential_candidate_nomination": [
+          {
+            "number": 11,
+            "votes": 1200
+          },
+          {
+            "number": 1,
+            "votes": 1069
+          },
+          {
+            "number": 13,
+            "votes": 1000
+          },
+          {
+            "number": 12,
+            "votes": 720
+          },
+          {
+            "number": 6,
+            "votes": 500
+          },
+          {
+            "number": 8,
+            "votes": 425
+          },
+          {
+            "number": 3,
+            "votes": 421
+          },
+          {
+            "number": 2,
+            "votes": 403
+          },
+          {
+            "number": 7,
+            "votes": 400
+          },
+          {
+            "number": 10,
+            "votes": 370
+          },
+          {
+            "number": 5,
+            "votes": 368
+          },
+          {
+            "number": 9,
+            "votes": 315
+          },
+          {
+            "number": 4,
+            "votes": 310
+          }
+        ],
+        "other_candidate_nomination": [],
+        "updated_candidate_ranking": [
+          {
+            "number": 11,
+            "initials": "R.",
+            "first_name": "Rolf",
+            "last_name_prefix": "de",
+            "last_name": "Jong",
+            "locality": "Test Location",
+            "gender": "Male"
+          },
+          {
+            "number": 1,
+            "initials": "L.",
+            "first_name": "Lidewij",
+            "last_name": "Oud",
+            "locality": "Test Location",
+            "gender": "Female"
+          },
+          {
+            "number": 13,
+            "initials": "G.",
+            "first_name": "Gert",
+            "last_name": "Smit",
+            "locality": "Test Location",
+            "gender": "Male"
+          },
+          {
+            "number": 12,
+            "initials": "K.",
+            "first_name": "Karin",
+            "last_name": "Kok",
+            "locality": "Test Location",
+            "gender": "Female"
+          },
+          {
+            "number": 6,
+            "initials": "B.",
+            "first_name": "Berta",
+            "last_name_prefix": "van der",
+            "last_name": "Weijden",
+            "locality": "Test Location",
+            "gender": "Female"
+          },
+          {
+            "number": 8,
+            "initials": "S.",
+            "first_name": "Sophie",
+            "last_name": "Bakker",
+            "locality": "Test Location",
+            "gender": "Female"
+          },
+          {
+            "number": 3,
+            "initials": "M.",
+            "first_name": "Marijke",
+            "last_name": "Oud",
+            "locality": "Test Location",
+            "gender": "Female"
+          },
+          {
+            "number": 2,
+            "initials": "J.",
+            "first_name": "Johan",
+            "last_name": "Oud",
+            "locality": "Test Location",
+            "gender": "Male"
+          },
+          {
+            "number": 7,
+            "initials": "K.",
+            "first_name": "Klaas",
+            "last_name": "Oud",
+            "locality": "Test Location",
+            "gender": "Male"
+          },
+          {
+            "number": 10,
+            "initials": "M.",
+            "first_name": "Marijke",
+            "last_name_prefix": "van den",
+            "last_name": "Berg",
+            "locality": "Test Location",
+            "gender": "Female"
+          },
+          {
+            "number": 5,
+            "initials": "H.",
+            "first_name": "Henk",
+            "last_name_prefix": "van der",
+            "last_name": "Weijden",
+            "locality": "Test Location",
+            "gender": "Male"
+          },
+          {
+            "number": 9,
+            "initials": "J.",
+            "first_name": "Johan",
+            "last_name_prefix": "de",
+            "last_name": "Vries",
+            "locality": "Test Location",
+            "gender": "Male"
+          },
+          {
+            "number": 4,
+            "initials": "A.",
+            "first_name": "Arie",
+            "last_name": "Jansen",
+            "locality": "Test Location",
+            "gender": "Male"
+          }
+        ]
+      },
+      {
+        "list_number": 2,
+        "list_name": "Political Group B",
+        "list_seats": 2,
+        "preferential_candidate_nomination": [
+          {
+            "number": 1,
+            "votes": 552
+          },
+          {
+            "number": 2,
+            "votes": 307
+          }
+        ],
+        "other_candidate_nomination": [],
+        "updated_candidate_ranking": [
+          {
+            "number": 1,
+            "initials": "T.",
+            "first_name": "Tinus",
+            "last_name": "Bakker",
+            "locality": "Test Location",
+            "gender": "Male",
+            "country_code": "BE"
+          },
+          {
+            "number": 2,
+            "initials": "D.",
+            "last_name": "Po",
+            "locality": "Test Location",
+            "gender": "X"
+          },
+          {
+            "number": 4,
+            "initials": "K.",
+            "first_name": "Klaas",
+            "last_name": "Kloosterboer",
+            "locality": "Test Location",
+            "gender": "Male"
+          },
+          {
+            "number": 3,
+            "initials": "W.",
+            "first_name": "Willem",
+            "last_name_prefix": "de",
+            "last_name": "Vries",
+            "locality": "Test Location",
+            "gender": "Male"
+          }
+        ]
+      },
+      {
+        "list_number": 3,
+        "list_name": "Political Group C",
+        "list_seats": 2,
+        "preferential_candidate_nomination": [
+          {
+            "number": 1,
+            "votes": 1000
+          },
+          {
+            "number": 2,
+            "votes": 249
+          }
+        ],
+        "other_candidate_nomination": [],
+        "updated_candidate_ranking": []
+      },
+      {
+        "list_number": 4,
+        "list_name": "Political Group D",
+        "list_seats": 2,
+        "preferential_candidate_nomination": [
+          {
+            "number": 1,
+            "votes": 800
+          },
+          {
+            "number": 2,
+            "votes": 449
+          }
+        ],
+        "other_candidate_nomination": [],
+        "updated_candidate_ranking": []
+      },
+      {
+        "list_number": 5,
+        "list_name": "",
+        "list_seats": 2,
+        "preferential_candidate_nomination": [
+          {
+            "number": 1,
+            "votes": 949
+          },
+          {
+            "number": 2,
+            "votes": 300
+          }
+        ],
+        "other_candidate_nomination": [],
+        "updated_candidate_ranking": []
+      },
+      {
+        "list_number": 6,
+        "list_name": "Political Group F",
+        "list_seats": 2,
+        "preferential_candidate_nomination": [
+          {
+            "number": 4,
+            "votes": 403
+          },
+          {
+            "number": 2,
+            "votes": 300
+          }
+        ],
+        "other_candidate_nomination": [],
+        "updated_candidate_ranking": [
+          {
+            "number": 4,
+            "initials": "T.J.",
+            "first_name": "Tessa",
+            "last_name": "Jansen",
+            "locality": "Test Location",
+            "gender": "Female"
+          },
+          {
+            "number": 2,
+            "initials": "P.",
+            "first_name": "Piet",
+            "last_name": "Jansen",
+            "locality": "Test Location",
+            "gender": "Male"
+          },
+          {
+            "number": 3,
+            "initials": "A.",
+            "first_name": "Annelies",
+            "last_name_prefix": "van",
+            "last_name": "Loon",
+            "locality": "Test Location",
+            "gender": "Female"
+          },
+          {
+            "number": 1,
+            "initials": "D.",
+            "first_name": "Dirk",
+            "last_name": "Bakker",
+            "locality": "Test Location",
+            "gender": "Male"
+          }
+        ]
+      },
+      {
+        "list_number": 7,
+        "list_name": "Political Group G",
+        "list_seats": 1,
+        "preferential_candidate_nomination": [
+          {
+            "number": 1,
+            "votes": 500
+          }
+        ],
+        "other_candidate_nomination": [],
+        "updated_candidate_ranking": [
+          {
+            "number": 1,
+            "initials": "T.",
+            "first_name": "Tjolk",
+            "last_name": "Hekking",
+            "locality": "Test Location",
+            "gender": "Male"
+          },
+          {
+            "number": 4,
+            "initials": "T.H.",
+            "first_name": "Tjolkse Hendrika",
+            "last_name": "Hekking",
+            "locality": "Test Location",
+            "gender": "Female"
+          },
+          {
+            "number": 2,
+            "initials": "H.",
+            "first_name": "Henny",
+            "last_name": "Hekking",
+            "locality": "Test Location",
+            "gender": "Female"
+          },
+          {
+            "number": 3,
+            "initials": "W.",
+            "first_name": "Hans",
+            "last_name_prefix": "van der",
+            "last_name": "Vaart",
+            "locality": "Test Location",
+            "gender": "Male"
+          }
+        ]
+      },
+      {
+        "list_number": 8,
+        "list_name": "Political Group H",
+        "list_seats": 0,
+        "preferential_candidate_nomination": [],
+        "other_candidate_nomination": [],
+        "updated_candidate_ranking": []
+      }
+    ]
+  },
+  "seat_assignment": {
+    "seats": 24,
+    "full_seats": 18,
+    "residual_seats": 6,
+    "quota": {
+      "integer": 625,
+      "numerator": 1,
+      "denominator": 24
+    },
+    "steps": [
+      {
+        "residual_seat_number": 1,
+        "change": {
+          "changed_by": "HighestAverageAssignment",
+          "selected_list_number": 2,
+          "list_options": [
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "list_assigned": [
+            2
+          ],
+          "list_exhausted": [],
+          "votes_per_seat": {
+            "integer": 624,
+            "numerator": 1,
+            "denominator": 2
+          }
+        },
+        "standings": [
+          {
+            "list_number": 1,
+            "votes_cast": 7501,
+            "remainder_votes": {
+              "integer": 0,
+              "numerator": 12,
+              "denominator": 24
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 577,
+              "numerator": 0,
+              "denominator": 13
+            },
+            "full_seats": 12,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 2,
+            "votes_cast": 1249,
+            "remainder_votes": {
+              "integer": 623,
+              "numerator": 23,
+              "denominator": 24
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 624,
+              "numerator": 1,
+              "denominator": 2
+            },
+            "full_seats": 1,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 3,
+            "votes_cast": 1249,
+            "remainder_votes": {
+              "integer": 623,
+              "numerator": 23,
+              "denominator": 24
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 624,
+              "numerator": 1,
+              "denominator": 2
+            },
+            "full_seats": 1,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 4,
+            "votes_cast": 1249,
+            "remainder_votes": {
+              "integer": 623,
+              "numerator": 23,
+              "denominator": 24
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 624,
+              "numerator": 1,
+              "denominator": 2
+            },
+            "full_seats": 1,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 5,
+            "votes_cast": 1249,
+            "remainder_votes": {
+              "integer": 623,
+              "numerator": 23,
+              "denominator": 24
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 624,
+              "numerator": 1,
+              "denominator": 2
+            },
+            "full_seats": 1,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 6,
+            "votes_cast": 1249,
+            "remainder_votes": {
+              "integer": 623,
+              "numerator": 23,
+              "denominator": 24
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 624,
+              "numerator": 1,
+              "denominator": 2
+            },
+            "full_seats": 1,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 7,
+            "votes_cast": 1248,
+            "remainder_votes": {
+              "integer": 622,
+              "numerator": 23,
+              "denominator": 24
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 624,
+              "numerator": 0,
+              "denominator": 2
+            },
+            "full_seats": 1,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 8,
+            "votes_cast": 7,
+            "remainder_votes": {
+              "integer": 7,
+              "numerator": 0,
+              "denominator": 24
+            },
+            "meets_remainder_threshold": false,
+            "next_votes_per_seat": {
+              "integer": 7,
+              "numerator": 0,
+              "denominator": 1
+            },
+            "full_seats": 0,
+            "residual_seats": 0
+          }
+        ]
+      },
+      {
+        "residual_seat_number": 2,
+        "change": {
+          "changed_by": "HighestAverageAssignment",
+          "selected_list_number": 3,
+          "list_options": [
+            3,
+            4,
+            5,
+            6
+          ],
+          "list_assigned": [
+            2,
+            3
+          ],
+          "list_exhausted": [],
+          "votes_per_seat": {
+            "integer": 624,
+            "numerator": 1,
+            "denominator": 2
+          }
+        },
+        "standings": [
+          {
+            "list_number": 1,
+            "votes_cast": 7501,
+            "remainder_votes": {
+              "integer": 0,
+              "numerator": 12,
+              "denominator": 24
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 577,
+              "numerator": 0,
+              "denominator": 13
+            },
+            "full_seats": 12,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 2,
+            "votes_cast": 1249,
+            "remainder_votes": {
+              "integer": 623,
+              "numerator": 23,
+              "denominator": 24
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 416,
+              "numerator": 1,
+              "denominator": 3
+            },
+            "full_seats": 1,
+            "residual_seats": 1
+          },
+          {
+            "list_number": 3,
+            "votes_cast": 1249,
+            "remainder_votes": {
+              "integer": 623,
+              "numerator": 23,
+              "denominator": 24
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 624,
+              "numerator": 1,
+              "denominator": 2
+            },
+            "full_seats": 1,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 4,
+            "votes_cast": 1249,
+            "remainder_votes": {
+              "integer": 623,
+              "numerator": 23,
+              "denominator": 24
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 624,
+              "numerator": 1,
+              "denominator": 2
+            },
+            "full_seats": 1,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 5,
+            "votes_cast": 1249,
+            "remainder_votes": {
+              "integer": 623,
+              "numerator": 23,
+              "denominator": 24
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 624,
+              "numerator": 1,
+              "denominator": 2
+            },
+            "full_seats": 1,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 6,
+            "votes_cast": 1249,
+            "remainder_votes": {
+              "integer": 623,
+              "numerator": 23,
+              "denominator": 24
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 624,
+              "numerator": 1,
+              "denominator": 2
+            },
+            "full_seats": 1,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 7,
+            "votes_cast": 1248,
+            "remainder_votes": {
+              "integer": 622,
+              "numerator": 23,
+              "denominator": 24
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 624,
+              "numerator": 0,
+              "denominator": 2
+            },
+            "full_seats": 1,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 8,
+            "votes_cast": 7,
+            "remainder_votes": {
+              "integer": 7,
+              "numerator": 0,
+              "denominator": 24
+            },
+            "meets_remainder_threshold": false,
+            "next_votes_per_seat": {
+              "integer": 7,
+              "numerator": 0,
+              "denominator": 1
+            },
+            "full_seats": 0,
+            "residual_seats": 0
+          }
+        ]
+      },
+      {
+        "residual_seat_number": 3,
+        "change": {
+          "changed_by": "HighestAverageAssignment",
+          "selected_list_number": 4,
+          "list_options": [
+            4,
+            5,
+            6
+          ],
+          "list_assigned": [
+            2,
+            3,
+            4
+          ],
+          "list_exhausted": [],
+          "votes_per_seat": {
+            "integer": 624,
+            "numerator": 1,
+            "denominator": 2
+          }
+        },
+        "standings": [
+          {
+            "list_number": 1,
+            "votes_cast": 7501,
+            "remainder_votes": {
+              "integer": 0,
+              "numerator": 12,
+              "denominator": 24
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 577,
+              "numerator": 0,
+              "denominator": 13
+            },
+            "full_seats": 12,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 2,
+            "votes_cast": 1249,
+            "remainder_votes": {
+              "integer": 623,
+              "numerator": 23,
+              "denominator": 24
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 416,
+              "numerator": 1,
+              "denominator": 3
+            },
+            "full_seats": 1,
+            "residual_seats": 1
+          },
+          {
+            "list_number": 3,
+            "votes_cast": 1249,
+            "remainder_votes": {
+              "integer": 623,
+              "numerator": 23,
+              "denominator": 24
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 416,
+              "numerator": 1,
+              "denominator": 3
+            },
+            "full_seats": 1,
+            "residual_seats": 1
+          },
+          {
+            "list_number": 4,
+            "votes_cast": 1249,
+            "remainder_votes": {
+              "integer": 623,
+              "numerator": 23,
+              "denominator": 24
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 624,
+              "numerator": 1,
+              "denominator": 2
+            },
+            "full_seats": 1,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 5,
+            "votes_cast": 1249,
+            "remainder_votes": {
+              "integer": 623,
+              "numerator": 23,
+              "denominator": 24
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 624,
+              "numerator": 1,
+              "denominator": 2
+            },
+            "full_seats": 1,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 6,
+            "votes_cast": 1249,
+            "remainder_votes": {
+              "integer": 623,
+              "numerator": 23,
+              "denominator": 24
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 624,
+              "numerator": 1,
+              "denominator": 2
+            },
+            "full_seats": 1,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 7,
+            "votes_cast": 1248,
+            "remainder_votes": {
+              "integer": 622,
+              "numerator": 23,
+              "denominator": 24
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 624,
+              "numerator": 0,
+              "denominator": 2
+            },
+            "full_seats": 1,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 8,
+            "votes_cast": 7,
+            "remainder_votes": {
+              "integer": 7,
+              "numerator": 0,
+              "denominator": 24
+            },
+            "meets_remainder_threshold": false,
+            "next_votes_per_seat": {
+              "integer": 7,
+              "numerator": 0,
+              "denominator": 1
+            },
+            "full_seats": 0,
+            "residual_seats": 0
+          }
+        ]
+      },
+      {
+        "residual_seat_number": 4,
+        "change": {
+          "changed_by": "HighestAverageAssignment",
+          "selected_list_number": 5,
+          "list_options": [
+            5,
+            6
+          ],
+          "list_assigned": [
+            2,
+            3,
+            4,
+            5
+          ],
+          "list_exhausted": [],
+          "votes_per_seat": {
+            "integer": 624,
+            "numerator": 1,
+            "denominator": 2
+          }
+        },
+        "standings": [
+          {
+            "list_number": 1,
+            "votes_cast": 7501,
+            "remainder_votes": {
+              "integer": 0,
+              "numerator": 12,
+              "denominator": 24
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 577,
+              "numerator": 0,
+              "denominator": 13
+            },
+            "full_seats": 12,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 2,
+            "votes_cast": 1249,
+            "remainder_votes": {
+              "integer": 623,
+              "numerator": 23,
+              "denominator": 24
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 416,
+              "numerator": 1,
+              "denominator": 3
+            },
+            "full_seats": 1,
+            "residual_seats": 1
+          },
+          {
+            "list_number": 3,
+            "votes_cast": 1249,
+            "remainder_votes": {
+              "integer": 623,
+              "numerator": 23,
+              "denominator": 24
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 416,
+              "numerator": 1,
+              "denominator": 3
+            },
+            "full_seats": 1,
+            "residual_seats": 1
+          },
+          {
+            "list_number": 4,
+            "votes_cast": 1249,
+            "remainder_votes": {
+              "integer": 623,
+              "numerator": 23,
+              "denominator": 24
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 416,
+              "numerator": 1,
+              "denominator": 3
+            },
+            "full_seats": 1,
+            "residual_seats": 1
+          },
+          {
+            "list_number": 5,
+            "votes_cast": 1249,
+            "remainder_votes": {
+              "integer": 623,
+              "numerator": 23,
+              "denominator": 24
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 624,
+              "numerator": 1,
+              "denominator": 2
+            },
+            "full_seats": 1,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 6,
+            "votes_cast": 1249,
+            "remainder_votes": {
+              "integer": 623,
+              "numerator": 23,
+              "denominator": 24
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 624,
+              "numerator": 1,
+              "denominator": 2
+            },
+            "full_seats": 1,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 7,
+            "votes_cast": 1248,
+            "remainder_votes": {
+              "integer": 622,
+              "numerator": 23,
+              "denominator": 24
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 624,
+              "numerator": 0,
+              "denominator": 2
+            },
+            "full_seats": 1,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 8,
+            "votes_cast": 7,
+            "remainder_votes": {
+              "integer": 7,
+              "numerator": 0,
+              "denominator": 24
+            },
+            "meets_remainder_threshold": false,
+            "next_votes_per_seat": {
+              "integer": 7,
+              "numerator": 0,
+              "denominator": 1
+            },
+            "full_seats": 0,
+            "residual_seats": 0
+          }
+        ]
+      },
+      {
+        "residual_seat_number": 5,
+        "change": {
+          "changed_by": "HighestAverageAssignment",
+          "selected_list_number": 6,
+          "list_options": [
+            6
+          ],
+          "list_assigned": [
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "list_exhausted": [],
+          "votes_per_seat": {
+            "integer": 624,
+            "numerator": 1,
+            "denominator": 2
+          }
+        },
+        "standings": [
+          {
+            "list_number": 1,
+            "votes_cast": 7501,
+            "remainder_votes": {
+              "integer": 0,
+              "numerator": 12,
+              "denominator": 24
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 577,
+              "numerator": 0,
+              "denominator": 13
+            },
+            "full_seats": 12,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 2,
+            "votes_cast": 1249,
+            "remainder_votes": {
+              "integer": 623,
+              "numerator": 23,
+              "denominator": 24
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 416,
+              "numerator": 1,
+              "denominator": 3
+            },
+            "full_seats": 1,
+            "residual_seats": 1
+          },
+          {
+            "list_number": 3,
+            "votes_cast": 1249,
+            "remainder_votes": {
+              "integer": 623,
+              "numerator": 23,
+              "denominator": 24
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 416,
+              "numerator": 1,
+              "denominator": 3
+            },
+            "full_seats": 1,
+            "residual_seats": 1
+          },
+          {
+            "list_number": 4,
+            "votes_cast": 1249,
+            "remainder_votes": {
+              "integer": 623,
+              "numerator": 23,
+              "denominator": 24
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 416,
+              "numerator": 1,
+              "denominator": 3
+            },
+            "full_seats": 1,
+            "residual_seats": 1
+          },
+          {
+            "list_number": 5,
+            "votes_cast": 1249,
+            "remainder_votes": {
+              "integer": 623,
+              "numerator": 23,
+              "denominator": 24
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 416,
+              "numerator": 1,
+              "denominator": 3
+            },
+            "full_seats": 1,
+            "residual_seats": 1
+          },
+          {
+            "list_number": 6,
+            "votes_cast": 1249,
+            "remainder_votes": {
+              "integer": 623,
+              "numerator": 23,
+              "denominator": 24
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 624,
+              "numerator": 1,
+              "denominator": 2
+            },
+            "full_seats": 1,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 7,
+            "votes_cast": 1248,
+            "remainder_votes": {
+              "integer": 622,
+              "numerator": 23,
+              "denominator": 24
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 624,
+              "numerator": 0,
+              "denominator": 2
+            },
+            "full_seats": 1,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 8,
+            "votes_cast": 7,
+            "remainder_votes": {
+              "integer": 7,
+              "numerator": 0,
+              "denominator": 24
+            },
+            "meets_remainder_threshold": false,
+            "next_votes_per_seat": {
+              "integer": 7,
+              "numerator": 0,
+              "denominator": 1
+            },
+            "full_seats": 0,
+            "residual_seats": 0
+          }
+        ]
+      },
+      {
+        "residual_seat_number": 6,
+        "change": {
+          "changed_by": "HighestAverageAssignment",
+          "selected_list_number": 7,
+          "list_options": [
+            7
+          ],
+          "list_assigned": [
+            7
+          ],
+          "list_exhausted": [],
+          "votes_per_seat": {
+            "integer": 624,
+            "numerator": 0,
+            "denominator": 2
+          }
+        },
+        "standings": [
+          {
+            "list_number": 1,
+            "votes_cast": 7501,
+            "remainder_votes": {
+              "integer": 0,
+              "numerator": 12,
+              "denominator": 24
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 577,
+              "numerator": 0,
+              "denominator": 13
+            },
+            "full_seats": 12,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 2,
+            "votes_cast": 1249,
+            "remainder_votes": {
+              "integer": 623,
+              "numerator": 23,
+              "denominator": 24
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 416,
+              "numerator": 1,
+              "denominator": 3
+            },
+            "full_seats": 1,
+            "residual_seats": 1
+          },
+          {
+            "list_number": 3,
+            "votes_cast": 1249,
+            "remainder_votes": {
+              "integer": 623,
+              "numerator": 23,
+              "denominator": 24
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 416,
+              "numerator": 1,
+              "denominator": 3
+            },
+            "full_seats": 1,
+            "residual_seats": 1
+          },
+          {
+            "list_number": 4,
+            "votes_cast": 1249,
+            "remainder_votes": {
+              "integer": 623,
+              "numerator": 23,
+              "denominator": 24
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 416,
+              "numerator": 1,
+              "denominator": 3
+            },
+            "full_seats": 1,
+            "residual_seats": 1
+          },
+          {
+            "list_number": 5,
+            "votes_cast": 1249,
+            "remainder_votes": {
+              "integer": 623,
+              "numerator": 23,
+              "denominator": 24
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 416,
+              "numerator": 1,
+              "denominator": 3
+            },
+            "full_seats": 1,
+            "residual_seats": 1
+          },
+          {
+            "list_number": 6,
+            "votes_cast": 1249,
+            "remainder_votes": {
+              "integer": 623,
+              "numerator": 23,
+              "denominator": 24
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 416,
+              "numerator": 1,
+              "denominator": 3
+            },
+            "full_seats": 1,
+            "residual_seats": 1
+          },
+          {
+            "list_number": 7,
+            "votes_cast": 1248,
+            "remainder_votes": {
+              "integer": 622,
+              "numerator": 23,
+              "denominator": 24
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 624,
+              "numerator": 0,
+              "denominator": 2
+            },
+            "full_seats": 1,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 8,
+            "votes_cast": 7,
+            "remainder_votes": {
+              "integer": 7,
+              "numerator": 0,
+              "denominator": 24
+            },
+            "meets_remainder_threshold": false,
+            "next_votes_per_seat": {
+              "integer": 7,
+              "numerator": 0,
+              "denominator": 1
+            },
+            "full_seats": 0,
+            "residual_seats": 0
+          }
+        ]
+      },
+      {
+        "change": {
+          "changed_by": "AbsoluteMajorityReassignment",
+          "list_retracted_seat": 7,
+          "list_assigned_seat": 1
+        },
+        "standings": [
+          {
+            "list_number": 1,
+            "votes_cast": 7501,
+            "remainder_votes": {
+              "integer": 0,
+              "numerator": 12,
+              "denominator": 24
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 577,
+              "numerator": 0,
+              "denominator": 13
+            },
+            "full_seats": 12,
+            "residual_seats": 1
+          },
+          {
+            "list_number": 2,
+            "votes_cast": 1249,
+            "remainder_votes": {
+              "integer": 623,
+              "numerator": 23,
+              "denominator": 24
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 416,
+              "numerator": 1,
+              "denominator": 3
+            },
+            "full_seats": 1,
+            "residual_seats": 1
+          },
+          {
+            "list_number": 3,
+            "votes_cast": 1249,
+            "remainder_votes": {
+              "integer": 623,
+              "numerator": 23,
+              "denominator": 24
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 416,
+              "numerator": 1,
+              "denominator": 3
+            },
+            "full_seats": 1,
+            "residual_seats": 1
+          },
+          {
+            "list_number": 4,
+            "votes_cast": 1249,
+            "remainder_votes": {
+              "integer": 623,
+              "numerator": 23,
+              "denominator": 24
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 416,
+              "numerator": 1,
+              "denominator": 3
+            },
+            "full_seats": 1,
+            "residual_seats": 1
+          },
+          {
+            "list_number": 5,
+            "votes_cast": 1249,
+            "remainder_votes": {
+              "integer": 623,
+              "numerator": 23,
+              "denominator": 24
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 416,
+              "numerator": 1,
+              "denominator": 3
+            },
+            "full_seats": 1,
+            "residual_seats": 1
+          },
+          {
+            "list_number": 6,
+            "votes_cast": 1249,
+            "remainder_votes": {
+              "integer": 623,
+              "numerator": 23,
+              "denominator": 24
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 416,
+              "numerator": 1,
+              "denominator": 3
+            },
+            "full_seats": 1,
+            "residual_seats": 1
+          },
+          {
+            "list_number": 7,
+            "votes_cast": 1248,
+            "remainder_votes": {
+              "integer": 622,
+              "numerator": 23,
+              "denominator": 24
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 416,
+              "numerator": 0,
+              "denominator": 3
+            },
+            "full_seats": 1,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 8,
+            "votes_cast": 7,
+            "remainder_votes": {
+              "integer": 7,
+              "numerator": 0,
+              "denominator": 24
+            },
+            "meets_remainder_threshold": false,
+            "next_votes_per_seat": {
+              "integer": 7,
+              "numerator": 0,
+              "denominator": 1
+            },
+            "full_seats": 0,
+            "residual_seats": 0
+          }
+        ]
+      }
+    ],
+    "final_standing": [
+      {
+        "list_number": 1,
+        "votes_cast": 7501,
+        "remainder_votes": {
+          "integer": 0,
+          "numerator": 12,
+          "denominator": 24
+        },
+        "meets_remainder_threshold": true,
+        "full_seats": 12,
+        "residual_seats": 1,
+        "total_seats": 13
+      },
+      {
+        "list_number": 2,
+        "votes_cast": 1249,
+        "remainder_votes": {
+          "integer": 623,
+          "numerator": 23,
+          "denominator": 24
+        },
+        "meets_remainder_threshold": true,
+        "full_seats": 1,
+        "residual_seats": 1,
+        "total_seats": 2
+      },
+      {
+        "list_number": 3,
+        "votes_cast": 1249,
+        "remainder_votes": {
+          "integer": 623,
+          "numerator": 23,
+          "denominator": 24
+        },
+        "meets_remainder_threshold": true,
+        "full_seats": 1,
+        "residual_seats": 1,
+        "total_seats": 2
+      },
+      {
+        "list_number": 4,
+        "votes_cast": 1249,
+        "remainder_votes": {
+          "integer": 623,
+          "numerator": 23,
+          "denominator": 24
+        },
+        "meets_remainder_threshold": true,
+        "full_seats": 1,
+        "residual_seats": 1,
+        "total_seats": 2
+      },
+      {
+        "list_number": 5,
+        "votes_cast": 1249,
+        "remainder_votes": {
+          "integer": 623,
+          "numerator": 23,
+          "denominator": 24
+        },
+        "meets_remainder_threshold": true,
+        "full_seats": 1,
+        "residual_seats": 1,
+        "total_seats": 2
+      },
+      {
+        "list_number": 6,
+        "votes_cast": 1249,
+        "remainder_votes": {
+          "integer": 623,
+          "numerator": 23,
+          "denominator": 24
+        },
+        "meets_remainder_threshold": true,
+        "full_seats": 1,
+        "residual_seats": 1,
+        "total_seats": 2
+      },
+      {
+        "list_number": 7,
+        "votes_cast": 1248,
+        "remainder_votes": {
+          "integer": 622,
+          "numerator": 23,
+          "denominator": 24
+        },
+        "meets_remainder_threshold": true,
+        "full_seats": 1,
+        "residual_seats": 0,
+        "total_seats": 1
+      },
+      {
+        "list_number": 8,
+        "votes_cast": 7,
+        "remainder_votes": {
+          "integer": 7,
+          "numerator": 0,
+          "denominator": 24
+        },
+        "meets_remainder_threshold": false,
+        "full_seats": 0,
+        "residual_seats": 0,
+        "total_seats": 0
+      }
+    ]
+  }
+}

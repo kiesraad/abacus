@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, Type};
 use utoipa::ToSchema;
 
-use crate::domain::id::id;
+use crate::domain::identifier::id;
 
 id!(ElectionId);
 
@@ -17,8 +17,10 @@ id!(ElectionId);
 pub struct Election {
     pub id: ElectionId,
     pub name: String,
-    pub role: ElectionRole,
-    pub counting_method: VoteCountingMethod,
+    pub committee_category: CommitteeCategory,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    pub counting_method: Option<VoteCountingMethod>,
     pub election_id: String,
     pub location: String,
     pub domain_id: String,
@@ -37,8 +39,10 @@ pub struct Election {
 pub struct ElectionWithPoliticalGroups {
     pub id: ElectionId,
     pub name: String,
-    pub role: ElectionRole,
-    pub counting_method: VoteCountingMethod,
+    pub committee_category: CommitteeCategory,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    pub counting_method: Option<VoteCountingMethod>,
     pub election_id: String,
     pub location: String,
     pub domain_id: String,
@@ -58,7 +62,7 @@ impl From<ElectionWithPoliticalGroups> for Election {
         Self {
             id: value.id,
             name: value.name,
-            role: value.role,
+            committee_category: value.committee_category,
             counting_method: value.counting_method,
             election_id: value.election_id,
             location: value.location,
@@ -89,8 +93,10 @@ impl IntoResponse for ElectionWithPoliticalGroups {
 #[serde(deny_unknown_fields)]
 pub struct NewElection {
     pub name: String,
-    pub role: ElectionRole,
-    pub counting_method: VoteCountingMethod,
+    pub committee_category: CommitteeCategory,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    pub counting_method: Option<VoteCountingMethod>,
     pub election_id: String,
     pub location: String,
     pub domain_id: String,
@@ -128,11 +134,22 @@ impl ElectionCategory {
     }
 }
 
-/// Election role
+/// Committee category
 #[derive(
-    Serialize, Deserialize, strum::Display, ToSchema, Clone, Copy, Debug, PartialEq, Eq, Hash, Type,
+    Serialize,
+    Deserialize,
+    strum::Display,
+    strum::EnumString,
+    ToSchema,
+    Clone,
+    Copy,
+    Debug,
+    PartialEq,
+    Eq,
+    Hash,
+    Type,
 )]
-pub enum ElectionRole {
+pub enum CommitteeCategory {
     /// Gemeentelijk stembureau
     GSB,
     /// Centraal stembureau
@@ -233,8 +250,8 @@ pub(crate) mod tests {
         ElectionWithPoliticalGroups {
             id: ElectionId::from(1),
             name: "Test".to_string(),
-            role: ElectionRole::GSB,
-            counting_method: VoteCountingMethod::CSO,
+            committee_category: CommitteeCategory::GSB,
+            counting_method: Some(VoteCountingMethod::CSO),
             election_id: "Test_2023".to_string(),
             location: "Test".to_string(),
             domain_id: "0000".to_string(),

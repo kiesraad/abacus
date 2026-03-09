@@ -10,23 +10,33 @@ use crate::{
     domain::{
         committee_session::{CommitteeSession, CommitteeSessionCreateRequest},
         committee_session_status::CommitteeSessionStatus,
-        data_entry::{
-            CSOFirstSessionResults, CandidateVotes, CountingDifferencesPollingStation,
-            DifferenceCountsCompareVotesCastAdmittedVoters, DifferencesCounts, ExtraInvestigation,
-            PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, PollingStationResults,
-            VotersCounts, VotesCounts, YesNo,
-        },
-        data_entry_status::{DataEntryStatus, Definitive, FirstEntryFinalised},
+        data_entry::{DataEntryStatus, Definitive, FirstEntryFinalised},
         election::{
-            self, CandidateGender, CandidateNumber, ElectionCategory, ElectionRole,
+            self, CandidateGender, CandidateNumber, CommitteeCategory, ElectionCategory,
             ElectionWithPoliticalGroups, NewElection, PGNumber, PoliticalGroup, VoteCountingMethod,
         },
+        field_path::FieldPath,
         polling_station::{PollingStation, PollingStationRequest, PollingStationType},
-        validation::{FieldPath, Validate, ValidationResults},
+        results::{
+            PollingStationResults,
+            counting_differences_polling_station::CountingDifferencesPollingStation,
+            cso_first_session_results::CSOFirstSessionResults,
+            differences_counts::{
+                DifferenceCountsCompareVotesCastAdmittedVoters, DifferencesCounts,
+            },
+            extra_investigation::ExtraInvestigation,
+            political_group_candidate_votes::{CandidateVotes, PoliticalGroupCandidateVotes},
+            political_group_total_votes::PoliticalGroupTotalVotes,
+            voters_counts::VotersCounts,
+            votes_counts::VotesCounts,
+            yes_no::YesNo,
+        },
+        validate::{Validate, ValidationResults},
     },
     repository::{
-        committee_session_repo, data_entry_repo,
-        data_entry_repo::list_results_for_committee_session, election_repo, polling_station_repo,
+        committee_session_repo,
+        data_entry_repo::{self, list_results_for_committee_session},
+        election_repo, polling_station_repo,
         user_repo::UserId,
     },
     service::create_empty_data_entry,
@@ -83,36 +93,45 @@ pub async fn create_test_election(
     )
     .await?;
 
-    // generate the polling stations for the election
-    let polling_stations = generate_polling_stations(&mut rng, &election, &mut tx, &args).await;
+    // TODO: Once data entry is implemented for CSB (#2811), we don't need this check
+    let (polling_stations, data_entry_completed) = if args.committee_category
+        != CommitteeCategory::CSB
+    {
+        // generate the polling stations for the election
+        let polling_stations = generate_polling_stations(&mut rng, &election, &mut tx, &args).await;
+
+        if !polling_stations.is_empty() {
+            committee_session = committee_session_repo::change_status(
+                &mut tx,
+                committee_session.id,
+                CommitteeSessionStatus::InPreparation,
+            )
+            .await?;
+        }
+
+        let data_entry_completed = if args.with_data_entry && !polling_stations.is_empty() {
+            generate_data_entries(
+                &mut tx,
+                &mut rng,
+                args,
+                &committee_session,
+                &election,
+                &polling_stations,
+            )
+            .await?
+        } else {
+            false
+        };
+
+        (polling_stations, data_entry_completed)
+    } else {
+        (Vec::new(), false)
+    };
 
     info!(
         "Election generated with election id: {}, election name: '{}'",
         election.id, election.name
     );
-
-    if !polling_stations.is_empty() {
-        committee_session = committee_session_repo::change_status(
-            &mut tx,
-            committee_session.id,
-            CommitteeSessionStatus::InPreparation,
-        )
-        .await?;
-    }
-
-    let data_entry_completed = if args.with_data_entry && !polling_stations.is_empty() {
-        generate_data_entries(
-            &mut tx,
-            &mut rng,
-            args,
-            &committee_session,
-            &election,
-            &polling_stations,
-        )
-        .await?
-    } else {
-        false
-    };
 
     let results = if data_entry_completed {
         list_results_for_committee_session(&mut tx, committee_session.id).await?
@@ -158,15 +177,15 @@ fn generate_election(rng: &mut impl rand::RngExt, args: &GenerateElectionArgs) -
     // use the previous data to generate some identifiers and names
     let name = format!("Gemeenteraad {locality} {year}");
     let cleaned_up_locality = locality.replace(" ", "_").replace("'", "");
-    let election_id = format!("{cleaned_up_locality}_{year}");
+    let election_id = format!("GR{year}_{cleaned_up_locality}");
 
     info!("Election has name '{name}'");
 
     // and put it all in the struct (generating some additional fields where needed)
     NewElection {
         name,
-        role: ElectionRole::GSB,
-        counting_method: VoteCountingMethod::CSO,
+        committee_category: args.committee_category,
+        counting_method: Some(VoteCountingMethod::CSO),
         domain_id: super::data::domain_id(rng),
         election_id,
         location: locality,
@@ -265,10 +284,10 @@ async fn generate_polling_stations(
         )
         .await
         .expect("Failed to create polling station");
-        ps = create_empty_data_entry(conn, ps.id)
+        ps = create_empty_data_entry(conn, ps.id())
             .await
             .expect("Failed to create empty data entry");
-        polling_stations.push(ps);
+        polling_stations.push(ps.into_polling_station());
     }
 
     polling_stations
@@ -589,11 +608,14 @@ fn distribute_power_law(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{repository::election_repo, test_data_gen::RandomRange};
+    use crate::{
+        domain::election::CommitteeCategory, repository::election_repo, test_data_gen::RandomRange,
+    };
 
     #[sqlx::test]
     async fn test_create_test_election(pool: SqlitePool) {
         let args = GenerateElectionArgs {
+            committee_category: CommitteeCategory::GSB,
             political_groups: RandomRange(20..50),
             candidates_per_group: RandomRange(10..50),
             polling_stations: RandomRange(50..200),

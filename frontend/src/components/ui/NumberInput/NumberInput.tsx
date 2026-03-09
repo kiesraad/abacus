@@ -2,8 +2,8 @@ import {
   type ClipboardEventHandler,
   type DetailedHTMLProps,
   type FocusEvent,
-  type FormEvent,
   forwardRef,
+  type InputEvent,
   type InputHTMLAttributes,
   useCallback,
   useState,
@@ -101,7 +101,7 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(functi
 });
 
 //only accept numbers
-function onInput(event: FormEvent<HTMLInputElement>) {
+function onInput(event: InputEvent<HTMLInputElement>) {
   const input = event.currentTarget;
   input.value = input.value.replace(/[^0-9]/g, "");
 }

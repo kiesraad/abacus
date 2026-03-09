@@ -32,12 +32,12 @@ describe("UserCreateTypePage", () => {
   });
 
   test("Shows initial form", async () => {
-    renderPage({ role: "typist_gsb" });
+    renderPage({ fullRole: "typist_gsb" });
 
     expect(
       await screen.findByRole("heading", {
         level: 1,
-        name: "Invoerder gemeentelijk stembureau (GSB) toevoegen",
+        name: "Invoerder gemeentelijk stembureau toevoegen",
       }),
     ).toBeInTheDocument();
 
@@ -46,7 +46,7 @@ describe("UserCreateTypePage", () => {
   });
 
   test("Shows form previously selected", async () => {
-    renderPage({ role: "typist_gsb", type: "anonymous" });
+    renderPage({ fullRole: "typist_gsb", type: "anonymous" });
 
     expect(await screen.findByRole("radio", { name: /Op naam/ })).not.toBeChecked();
     expect(await screen.findByRole("radio", { name: /Anonieme gebruikersnaam/ })).toBeChecked();
@@ -54,7 +54,7 @@ describe("UserCreateTypePage", () => {
 
   test("Continue after selecting fullname", async () => {
     const setType = vi.fn();
-    renderPage({ role: "typist_gsb", setType });
+    renderPage({ fullRole: "typist_gsb", setType });
 
     const user = userEvent.setup();
 
@@ -70,7 +70,7 @@ describe("UserCreateTypePage", () => {
 
   test("Continue after selecting anonymous", async () => {
     const setType = vi.fn();
-    renderPage({ role: "typist_gsb", setType });
+    renderPage({ fullRole: "typist_gsb", setType });
 
     const user = userEvent.setup();
 

@@ -2016,7 +2016,7 @@ export const election: ElectionWithPoliticalGroups = {
   id: 5,
   name: "Test Election >= 19 seats & Absolute Majority Change",
   counting_method: "CSO",
-  role: "CSB",
+  committee_category: "CSB",
   election_id: "TestLocation_2026",
   location: "Test Location",
   domain_id: "0000",

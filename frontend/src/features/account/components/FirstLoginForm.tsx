@@ -1,4 +1,4 @@
-import { type FormEvent, type ReactNode, useState } from "react";
+import { type ReactNode, type SubmitEvent, useState } from "react";
 import { useNavigate } from "react-router";
 
 import { isError } from "@/api/ApiResult";
@@ -24,7 +24,7 @@ export function FirstLoginForm({ prev }: FirstLoginFormProps) {
   const [error, setError] = useState<boolean>(false);
 
   // Handle form submission
-  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
 
     setLoading(true);

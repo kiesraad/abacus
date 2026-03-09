@@ -2,17 +2,22 @@ import { CommitteeSessionStatusWithRightIcon } from "@/components/committee_sess
 import { Button } from "@/components/ui/Button/Button";
 import { Modal } from "@/components/ui/Modal/Modal";
 import { t } from "@/i18n/translate";
-import type { ElectionRole } from "@/types/generated/openapi.ts";
+import type { CommitteeCategory } from "@/types/generated/openapi.ts";
 
 interface CommitteeSessionPausedModalProps {
   showUnsavedChanges?: boolean;
-  electionRole: ElectionRole;
+  committeeCategory: CommitteeCategory;
 }
 
-export function CommitteeSessionPausedModal({ showUnsavedChanges, electionRole }: CommitteeSessionPausedModalProps) {
+export function CommitteeSessionPausedModal({
+  showUnsavedChanges,
+  committeeCategory,
+}: CommitteeSessionPausedModalProps) {
   return (
     <Modal
-      title={<CommitteeSessionStatusWithRightIcon electionRole={electionRole} status="paused" userRole="typist" />}
+      title={
+        <CommitteeSessionStatusWithRightIcon committeeCategory={committeeCategory} status="paused" userRole="typist" />
+      }
     >
       <p>
         {t("error.api_error.CommitteeSessionPaused")}

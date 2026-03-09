@@ -21,8 +21,8 @@ import { ExtraInvestigationPage } from "e2e-tests/page-objects/data_entry/ExtraI
 import { ProgressList } from "e2e-tests/page-objects/data_entry/ProgressListPgObj";
 import { VotersAndVotesPage } from "e2e-tests/page-objects/data_entry/VotersAndVotesPgObj";
 import { CheckAndSavePgObj } from "e2e-tests/page-objects/election/create/CheckAndSavePgObj";
+import { CommitteeCategoryPgObj } from "e2e-tests/page-objects/election/create/CommitteeCategoryPgObj.ts";
 import { CountingMethodTypePgObj } from "e2e-tests/page-objects/election/create/CountingMethodTypePgObj";
-import { ElectoralCommitteeRolePgObj } from "e2e-tests/page-objects/election/create/ElectoralCommitteeRolePgObj.ts";
 import { NumberOfVotersPgObj } from "e2e-tests/page-objects/election/create/NumberOfVotersPgObj";
 import { ElectionDetailsPgObj } from "e2e-tests/page-objects/election/ElectionDetailsPgObj";
 import { ElectionHome } from "e2e-tests/page-objects/election/ElectionHomePgObj";
@@ -38,6 +38,7 @@ import { UserInfoTopBar } from "e2e-tests/page-objects/nav_bar/UserInfoTopBarPgO
 import { PollingStationFormPgObj } from "e2e-tests/page-objects/polling_station/PollingStationFormPgObj";
 import { PollingStationListPgObj } from "e2e-tests/page-objects/polling_station/PollingStationListPgObj";
 import { UserCreateDetailsPgObj } from "e2e-tests/page-objects/users/UserCreateDetailsPgObj";
+import { UserCreateElectionPgObj } from "e2e-tests/page-objects/users/UserCreateElectionPgObj";
 import { UserCreateRolePgObj } from "e2e-tests/page-objects/users/UserCreateRolePgObj";
 import { UserCreateTypePgObj } from "e2e-tests/page-objects/users/UserCreateTypePgObj";
 import { UserListPgObj } from "e2e-tests/page-objects/users/UserListPgObj";
@@ -108,7 +109,7 @@ test.describe("full flow", () => {
     expect(logoutResponse.status()).toBe(204);
   });
 
-  test("create election and a new polling station", async ({ page }) => {
+  test("create GSB election and a new polling station", async ({ page }) => {
     await page.goto("/account/login");
 
     const loginPage = new LoginPgObj(page);
@@ -119,10 +120,10 @@ test.describe("full flow", () => {
 
     await uploadElectionAndInputHash(page);
 
-    const electoralCommitteeRolePage = new ElectoralCommitteeRolePgObj(page);
-    await expect(electoralCommitteeRolePage.header).toBeVisible();
-    await expect(electoralCommitteeRolePage.gsb).toBeChecked();
-    await electoralCommitteeRolePage.next.click();
+    const committeeCategoryPage = new CommitteeCategoryPgObj(page);
+    await expect(committeeCategoryPage.header).toBeVisible();
+    await expect(committeeCategoryPage.gsb).toBeChecked();
+    await committeeCategoryPage.next.click();
 
     await uploadCandidatesAndInputHash(page);
 
@@ -141,13 +142,14 @@ test.describe("full flow", () => {
 
     const checkAndSavePage = new CheckAndSavePgObj(page);
     await expect(checkAndSavePage.header).toBeVisible();
+    await expect(checkAndSavePage.committeeCategory).toHaveText("type stembureau: Gemeentelijk stembureau");
     await expect(checkAndSavePage.numberOfVoters).toHaveText("61.269 kiesgerechtigden");
     const election = await checkAndSavePage.saveElection();
 
     electionId = election.id;
 
     await expect(electionsOverviewPage.adminHeader).toBeVisible();
-    await expect(electionsOverviewPage.alertElectionCreated).toBeVisible();
+    await expect(electionsOverviewPage.alertGSBElectionCreated).toBeVisible();
     await electionsOverviewPage.findElectionRowById(electionId).click();
 
     const electionHomePage = new ElectionHome(page);
@@ -186,6 +188,10 @@ test.describe("full flow", () => {
     const userCreateRolePgObj = new UserCreateRolePgObj(page);
     await userCreateRolePgObj.coordinator.click();
     await userCreateRolePgObj.continue.click();
+
+    const userCreateElectionPgObj = new UserCreateElectionPgObj(page);
+    await userCreateElectionPgObj.gsb.click();
+    await userCreateElectionPgObj.continue.click();
 
     const userCreateDetailsPgObj = new UserCreateDetailsPgObj(page);
     await userCreateDetailsPgObj.createNamedUser(
@@ -236,6 +242,10 @@ test.describe("full flow", () => {
       const userCreateRolePgObj = new UserCreateRolePgObj(page);
       await userCreateRolePgObj.typist.click();
       await userCreateRolePgObj.continue.click();
+
+      const userCreateElectionPgObj = new UserCreateElectionPgObj(page);
+      await userCreateElectionPgObj.gsb.click();
+      await userCreateElectionPgObj.continue.click();
 
       const userCreateTypePgObj = new UserCreateTypePgObj(page);
       await userCreateTypePgObj.continue.click();

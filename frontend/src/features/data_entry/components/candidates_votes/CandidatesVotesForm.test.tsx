@@ -40,7 +40,7 @@ function renderForm({ election, groupNumber }: { election?: ElectionWithPolitica
         pollingStation={pollingStationMockData[0]!}
         entryNumber={1}
       >
-        <DataEntrySection electionRole={electionMockData.role} />
+        <DataEntrySection committeeCategory={electionMockData.committee_category} />
       </DataEntryProvider>
     </MessagesProvider>,
   );
@@ -303,9 +303,9 @@ describe("Test CandidatesVotesForm", () => {
       const electionMockData: ElectionWithPoliticalGroups = {
         id: 1,
         name: "Gemeenteraadsverkiezingen 2026",
-        role: "GSB",
+        committee_category: "GSB",
         counting_method: "CSO",
-        election_id: "Heemdamseburg_2024",
+        election_id: "GR2024_Heemdamseburg",
         location: "Heemdamseburg",
         domain_id: "0000",
         category: "Municipal",

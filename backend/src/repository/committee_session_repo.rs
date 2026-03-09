@@ -216,6 +216,13 @@ pub async fn delete(
     let mut tx = conn.begin().await?;
 
     query!(
+        "DELETE FROM sub_committees WHERE committee_session_id = ?",
+        committee_session_id,
+    )
+    .execute(&mut *tx)
+    .await?;
+
+    query!(
         "DELETE FROM polling_stations WHERE committee_session_id = ?",
         committee_session_id,
     )

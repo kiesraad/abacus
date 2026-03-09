@@ -1,4 +1,4 @@
-import { type FormEvent, useState } from "react";
+import { type SubmitEvent, useState } from "react";
 import { useNavigate } from "react-router";
 
 import { isSuccess } from "@/api/ApiResult";
@@ -40,7 +40,7 @@ export function InvestigationReason({ pollingStationId }: InvestigationReasonPro
     return <Loader />;
   }
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const formData = new StringFormData(event.currentTarget);

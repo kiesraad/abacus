@@ -46,7 +46,9 @@ export function DataEntryHomePage() {
           <h1>{election.name}</h1>
         </section>
       </header>
-      {currentCommitteeSession.status === "paused" && <CommitteeSessionPausedModal electionRole={election.role} />}
+      {currentCommitteeSession.status === "paused" && (
+        <CommitteeSessionPausedModal committeeCategory={election.committee_category} />
+      )}
       {dataEntryDone && (
         <Alert type="success" onClose={closeDataEntrySavedAlert}>
           <strong className="heading-md">{t("data_entry.entry_saved")}</strong>

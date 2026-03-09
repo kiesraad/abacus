@@ -50,7 +50,7 @@ describe("Data Entry cache behavior", () => {
     render(
       <MessagesProvider>
         <DataEntryProvider election={electionMockData} pollingStation={pollingStationMockData[0]!} entryNumber={1}>
-          <DataEntrySection electionRole={electionMockData.role} />
+          <DataEntrySection committeeCategory={electionMockData.committee_category} />
         </DataEntryProvider>
       </MessagesProvider>,
     );

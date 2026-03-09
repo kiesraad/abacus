@@ -1,6 +1,7 @@
 import { expect } from "@playwright/test";
 import { createRandomUsername } from "e2e-tests/helpers-utils/e2e-test-utils";
 import { UserCreateDetailsPgObj } from "e2e-tests/page-objects/users/UserCreateDetailsPgObj";
+import { UserCreateElectionPgObj } from "e2e-tests/page-objects/users/UserCreateElectionPgObj";
 import { UserCreateRolePgObj } from "e2e-tests/page-objects/users/UserCreateRolePgObj";
 import { UserCreateTypePgObj } from "e2e-tests/page-objects/users/UserCreateTypePgObj";
 import { UserDeleteModal } from "e2e-tests/page-objects/users/UserDeleteModalPgObj";
@@ -53,6 +54,10 @@ test.describe("Users", () => {
 
     await userCreateRolePgObj.typist.click();
     await userCreateRolePgObj.continue.click();
+
+    const userCreateElectionPgObj = new UserCreateElectionPgObj(page);
+    await userCreateElectionPgObj.gsb.click();
+    await userCreateElectionPgObj.continue.click();
 
     const userCreateTypePgObj = new UserCreateTypePgObj(page);
     await expect(userCreateTypePgObj.withName).toBeChecked();

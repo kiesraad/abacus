@@ -1,13 +1,13 @@
 import { hasTranslation, t } from "@/i18n/translate";
-import type { ElectionRole } from "@/types/generated/openapi.ts";
+import type { CommitteeCategory } from "@/types/generated/openapi.ts";
 
 export function committeeSessionLabel(
-  role: ElectionRole,
+  committeeCategory: CommitteeCategory,
   sessionNumber: number,
   addArticle = false,
   lowerCase = false,
 ): string {
-  if (role === "CSB") {
+  if (committeeCategory === "CSB") {
     if (lowerCase) {
       return t("committee_session_status.session_CSB_lowercase");
     }

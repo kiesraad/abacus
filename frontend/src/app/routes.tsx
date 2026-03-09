@@ -45,7 +45,7 @@ export const routes: RouteObject[] = [
           {
             index: true,
             Component: OverviewPage,
-            handle: { roles: ["administrator", "coordinator_gsb", "typist_gsb"] },
+            handle: { roles: ["administrator", "coordinator_csb", "coordinator_gsb", "typist_csb", "typist_gsb"] },
           },
           { path: "create", children: electionCreateRoutes },
           {

@@ -36,7 +36,7 @@ describe("UserUpdateForm", () => {
   test("renders username and role", async () => {
     await renderForm();
     expect(await screen.findByText("Gebruiker0123")).toBeInTheDocument();
-    expect(await screen.findByText("Invoerder gemeentelijk stembureau (GSB)")).toBeInTheDocument();
+    expect(await screen.findByText("Invoerder gemeentelijk stembureau")).toBeInTheDocument();
   });
 
   test("fullname field", async () => {

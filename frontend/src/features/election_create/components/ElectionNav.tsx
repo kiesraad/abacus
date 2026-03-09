@@ -14,9 +14,9 @@ interface ElectionCreateFormSection {
 const sections: ElectionCreateFormSection[] = [
   { key: "election_definition", label: t("election_definition"), path: "create", hidden: false },
   {
-    key: "electoral_committee_role",
-    label: t("electoral_committee_role.role"),
-    path: "create/electoral-committee-role",
+    key: "committee_category",
+    label: t("election.committee_category.title"),
+    path: "create/committee-category",
     hidden: false,
   },
   { key: "list_of_candidates", label: t("candidate.list.plural"), path: "create/list-of-candidates", hidden: false },
@@ -32,7 +32,7 @@ export function ElectionNav() {
   const formSections = sections.map((s) => ({ ...s }));
 
   // Update menu for CSB
-  if (state.electionRole === "CSB") {
+  if (state.committeeCategory === "CSB") {
     // Hide items instead of deleting them, so that we can show them when role changes from CSB to GSB.
     formSections.forEach((formSection) => {
       if (
@@ -46,7 +46,7 @@ export function ElectionNav() {
   }
 
   // Show all menu items.
-  if (state.electionRole === "GSB") {
+  if (state.committeeCategory === "GSB") {
     formSections.forEach((formSection) => {
       if (formSection.hidden) {
         formSection.hidden = false;

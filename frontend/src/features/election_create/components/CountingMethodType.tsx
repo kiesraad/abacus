@@ -1,4 +1,4 @@
-import type { FormEvent } from "react";
+import type { SubmitEvent } from "react";
 import { Navigate, useNavigate } from "react-router";
 
 import { Button } from "@/components/ui/Button/Button";
@@ -21,7 +21,7 @@ export function CountingMethodType() {
     return <Navigate to="/elections/create" />;
   }
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
     dispatch({
       type: "SET_COUNTING_METHOD_TYPE",

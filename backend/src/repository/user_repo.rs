@@ -8,7 +8,7 @@ use crate::{
         error::AuthenticationError,
         password::{HashedPassword, ValidatedPassword, hash_password, verify_password},
     },
-    domain::{id::id, role::Role},
+    domain::{identifier::id, role::Role},
 };
 
 const MIN_UPDATE_LAST_ACTIVITY_AT_SECS: i64 = 60; // 1 minute

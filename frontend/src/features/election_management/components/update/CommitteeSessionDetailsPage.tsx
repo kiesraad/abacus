@@ -1,4 +1,4 @@
-import { type FormEvent, useState } from "react";
+import { type SubmitEvent, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 
 import { type AnyApiError, ApiError, isSuccess } from "@/api/ApiResult";
@@ -32,7 +32,7 @@ export function CommitteeSessionDetailsPage() {
   const [validationErrors, setValidationErrors] = useState<ValidationErrors | null>(null);
   const [errorAlert, setErrorAlert] = useState<string | null>(null);
   const redirectToReportPage = location.hash === "#redirect-to-report";
-  const sessionLabel = committeeSessionLabel(election.role, currentCommitteeSession.number, true, true);
+  const sessionLabel = committeeSessionLabel(election.committee_category, currentCommitteeSession.number, true, true);
   const updatePath: COMMITTEE_SESSION_UPDATE_REQUEST_PATH = `/api/elections/${currentCommitteeSession.election_id}/committee_sessions/${currentCommitteeSession.id}`;
   const { update } = useCrud({ updatePath });
 
@@ -54,7 +54,7 @@ export function CommitteeSessionDetailsPage() {
     throw submitError;
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
     const locationValue = formData.get("location");
@@ -121,7 +121,7 @@ export function CommitteeSessionDetailsPage() {
       <header>
         <section>
           <h1>
-            {t(`electoral_committee_role.roles.${election.role}.short`)} {election.location}
+            {t(`committee_category.${election.committee_category}.short`)} {election.location}
           </h1>
         </section>
       </header>

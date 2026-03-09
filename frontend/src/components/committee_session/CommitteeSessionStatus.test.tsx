@@ -1,11 +1,11 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, test } from "vitest";
 
-import type { CommitteeSessionStatus, ElectionRole } from "@/types/generated/openapi";
+import type { CommitteeCategory, CommitteeSessionStatus } from "@/types/generated/openapi";
 
 import { CommitteeSessionStatusWithIcon, HeaderCommitteeSessionStatusWithIcon } from "./CommitteeSessionStatus";
 
-type Scenario = [ElectionRole, CommitteeSessionStatus, "coordinator" | "typist", string, string];
+type Scenario = [CommitteeCategory, CommitteeSessionStatus, "coordinator" | "typist", string, string];
 
 const testScenarios: Scenario[] = [
   ["GSB", "created", "coordinator", "IconSettings", "Zitting voorbereiden"],
@@ -31,21 +31,25 @@ const testScenarios: Scenario[] = [
 ];
 
 describe("CommitteeSessionStatusWithIcon", () => {
-  test.each(testScenarios)("%s: Status with icon for %s with role %s", (electionRole, state, role, icon, label) => {
-    render(<CommitteeSessionStatusWithIcon status={state} userRole={role} electionRole={electionRole} />);
+  test.each(
+    testScenarios,
+  )("%s: Status with icon for %s with role %s", (committeeCategory, state, role, icon, label) => {
+    render(<CommitteeSessionStatusWithIcon status={state} userRole={role} committeeCategory={committeeCategory} />);
     expect(screen.getByText(label)).toBeVisible();
 
-    if (electionRole === "GSB") {
+    if (committeeCategory === "GSB") {
       expect(screen.getByRole("img", { hidden: true })).toHaveAttribute("data-icon", icon);
     }
   });
 });
 
 describe("HeaderCommitteeSessionStatusWithIcon", () => {
-  test.each(testScenarios)("%s: Status with icon for %s with role %s", (electionRole, state, role, icon, label) => {
+  test.each(
+    testScenarios,
+  )("%s: Status with icon for %s with role %s", (committeeCategory, state, role, icon, label) => {
     render(
       <HeaderCommitteeSessionStatusWithIcon
-        electionRole={electionRole}
+        committeeCategory={committeeCategory}
         status={state}
         userRole={role}
         committeeSessionNumber={1}
@@ -53,13 +57,13 @@ describe("HeaderCommitteeSessionStatusWithIcon", () => {
     );
     expect(screen.getByText(label)).toBeVisible();
     if (label === "Invoer afgerond") {
-      if (electionRole === "CSB") {
+      if (committeeCategory === "CSB") {
         expect(screen.getByText("(zitting CSB)")).toBeVisible();
       } else {
         expect(screen.getByText("(eerste zitting)")).toBeVisible();
       }
     }
-    if (electionRole === "GSB") {
+    if (committeeCategory === "GSB") {
       expect(screen.getByRole("img", { hidden: true })).toHaveAttribute("data-icon", icon);
     }
   });

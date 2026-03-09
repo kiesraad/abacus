@@ -46,9 +46,7 @@ export function DataEntryPage() {
         <section className="smaller-gap">
           <PollingStationNumber>{pollingStation.number}</PollingStationNumber>
           <h1>{pollingStation.name}</h1>
-          {pollingStationStatus.status && (
-            <Badge type={pollingStationStatus.status} userRole={user.roleWithoutElection} />
-          )}
+          {pollingStationStatus.status && <Badge type={pollingStationStatus.status} userRole={user.role} />}
         </section>
         <section>
           <AbortDataEntryControl />
@@ -63,7 +61,7 @@ export function DataEntryPage() {
             (sectionId === "save" ? (
               <CheckAndSaveForm />
             ) : (
-              <DataEntrySection key={sectionId} electionRole={election.role} />
+              <DataEntrySection key={sectionId} committeeCategory={election.committee_category} />
             ))}
         </article>
       </main>

@@ -7,6 +7,7 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
 };
+use eml_nl::EMLError;
 use hyper::header::InvalidHeaderValue;
 use quick_xml::{DeError, SeError};
 use serde::{Deserialize, Serialize};
@@ -16,9 +17,9 @@ use utoipa::ToSchema;
 use crate::{
     MAX_BODY_SIZE_MB,
     api::middleware::authentication::error::AuthenticationError,
-    domain::{committee_session::CommitteeSessionError, validation::DataError},
+    domain::{committee_session::CommitteeSessionError, validate::DataError},
     eml::EMLImportError,
-    service::{DataEntryServiceError, InvestigationServiceError},
+    service::{DataEntryServiceError, PollingStationServiceError, SubCommitteeServiceError},
 };
 use pdf_gen::{PdfGenError, zip::ZipResponseError};
 
@@ -40,6 +41,7 @@ pub enum ErrorReference {
     DataEntryGetNotAllowed,
     DataEntryNotAllowed,
     EmlImportError,
+    EmlError,
     EntryNotFound,
     EntryNotUnique,
     Forbidden,
@@ -101,6 +103,7 @@ pub enum APIError {
     ContentTooLarge(String, ErrorReference),
     DataIntegrityError(String),
     EmlImportError(EMLImportError),
+    EmlError(EMLError),
     InvalidData(DataError),
     InvalidHeaderValue,
     InvalidHashError,
@@ -376,6 +379,13 @@ impl IntoResponse for APIError {
                     to_error("EML import error", ErrorReference::EmlImportError, false),
                 )
             }
+            APIError::EmlError(err) => {
+                error!("Error with EML file: {:?}", err);
+                (
+                    StatusCode::BAD_REQUEST,
+                    to_error("EML error", ErrorReference::EmlError, false),
+                )
+            }
             APIError::Apportionment(err) => {
                 error!("Apportionment error: {:?}", err);
 
@@ -543,10 +553,18 @@ impl From<DataEntryServiceError> for APIError {
     }
 }
 
-impl From<InvestigationServiceError> for APIError {
-    fn from(err: InvestigationServiceError) -> Self {
+impl From<PollingStationServiceError> for APIError {
+    fn from(err: PollingStationServiceError) -> Self {
         match err {
-            InvestigationServiceError::DatabaseError(e) => e.into(),
+            PollingStationServiceError::DatabaseError(e) => e.into(),
+        }
+    }
+}
+
+impl From<SubCommitteeServiceError> for APIError {
+    fn from(err: SubCommitteeServiceError) -> Self {
+        match err {
+            SubCommitteeServiceError::DatabaseError(e) => e.into(),
         }
     }
 }

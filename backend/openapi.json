@@ -3892,7 +3892,7 @@
     },
     "/api/users": {
       "get": {
-        "summary": "Lists all users (administrator, coordinator_gsb)",
+        "summary": "Lists all users (administrator, coordinator_csb, coordinator_gsb)",
         "operationId": "user_list",
         "responses": {
           "200": {
@@ -3940,13 +3940,14 @@
           {
             "cookie_auth": [
               "administrator",
+              "coordinator_csb",
               "coordinator_gsb"
             ]
           }
         ]
       },
       "post": {
-        "summary": "Create a new user (administrator, coordinator_gsb)",
+        "summary": "Create a new user (administrator, coordinator_csb, coordinator_gsb)",
         "operationId": "user_create",
         "requestBody": {
           "content": {
@@ -4024,6 +4025,7 @@
           {
             "cookie_auth": [
               "administrator",
+              "coordinator_csb",
               "coordinator_gsb"
             ]
           }
@@ -4032,7 +4034,7 @@
     },
     "/api/users/{user_id}": {
       "get": {
-        "summary": "Get a user (administrator, coordinator_gsb)",
+        "summary": "Get a user (administrator, coordinator_csb, coordinator_gsb)",
         "operationId": "user_get",
         "parameters": [
           {
@@ -4101,13 +4103,14 @@
           {
             "cookie_auth": [
               "administrator",
+              "coordinator_csb",
               "coordinator_gsb"
             ]
           }
         ]
       },
       "put": {
-        "summary": "Update a user (administrator, coordinator_gsb)",
+        "summary": "Update a user (administrator, coordinator_csb, coordinator_gsb)",
         "operationId": "user_update",
         "parameters": [
           {
@@ -4196,13 +4199,14 @@
           {
             "cookie_auth": [
               "administrator",
+              "coordinator_csb",
               "coordinator_gsb"
             ]
           }
         ]
       },
       "delete": {
-        "summary": "Delete a user (administrator, coordinator_gsb)",
+        "summary": "Delete a user (administrator, coordinator_csb, coordinator_gsb)",
         "operationId": "user_delete",
         "parameters": [
           {
@@ -4264,6 +4268,7 @@
           {
             "cookie_auth": [
               "administrator",
+              "coordinator_csb",
               "coordinator_gsb"
             ]
           }
@@ -4734,6 +4739,14 @@
         },
         "additionalProperties": false
       },
+      "CommitteeCategory": {
+        "type": "string",
+        "description": "Committee category",
+        "enum": [
+          "GSB",
+          "CSB"
+        ]
+      },
       "CommitteeSession": {
         "type": "object",
         "description": "Committee session",
@@ -5130,8 +5143,7 @@
         "required": [
           "id",
           "name",
-          "role",
-          "counting_method",
+          "committee_category",
           "election_id",
           "location",
           "domain_id",
@@ -5144,6 +5156,9 @@
         "properties": {
           "category": {
             "$ref": "#/components/schemas/ElectionCategory"
+          },
+          "committee_category": {
+            "$ref": "#/components/schemas/CommitteeCategory"
           },
           "counting_method": {
             "$ref": "#/components/schemas/VoteCountingMethod"
@@ -5180,9 +5195,6 @@
             "type": "integer",
             "format": "int32",
             "minimum": 0
-          },
-          "role": {
-            "$ref": "#/components/schemas/ElectionRole"
           }
         },
         "additionalProperties": false
@@ -5223,10 +5235,10 @@
               {
                 "type": "object",
                 "required": [
-                  "role"
+                  "committee_category"
                 ],
                 "properties": {
-                  "role": {
+                  "committee_category": {
                     "type": "string",
                     "enum": [
                       "GSB"
@@ -5244,10 +5256,10 @@
               {
                 "type": "object",
                 "required": [
-                  "role"
+                  "committee_category"
                 ],
                 "properties": {
-                  "role": {
+                  "committee_category": {
                     "type": "string",
                     "enum": [
                       "CSB"
@@ -5269,10 +5281,10 @@
               {
                 "type": "object",
                 "required": [
-                  "role"
+                  "committee_category"
                 ],
                 "properties": {
-                  "role": {
+                  "committee_category": {
                     "type": "string",
                     "enum": [
                       "GSB"
@@ -5290,10 +5302,10 @@
               {
                 "type": "object",
                 "required": [
-                  "role"
+                  "committee_category"
                 ],
                 "properties": {
-                  "role": {
+                  "committee_category": {
                     "type": "string",
                     "enum": [
                       "CSB"
@@ -5315,10 +5327,10 @@
               {
                 "type": "object",
                 "required": [
-                  "role"
+                  "committee_category"
                 ],
                 "properties": {
-                  "role": {
+                  "committee_category": {
                     "type": "string",
                     "enum": [
                       "GSB"
@@ -5336,10 +5348,10 @@
               {
                 "type": "object",
                 "required": [
-                  "role"
+                  "committee_category"
                 ],
                 "properties": {
-                  "role": {
+                  "committee_category": {
                     "type": "string",
                     "enum": [
                       "CSB"
@@ -5431,14 +5443,6 @@
           }
         },
         "additionalProperties": false
-      },
-      "ElectionRole": {
-        "type": "string",
-        "description": "Election role",
-        "enum": [
-          "GSB",
-          "CSB"
-        ]
       },
       "ElectionStatusResponse": {
         "type": "object",
@@ -5550,8 +5554,7 @@
         "required": [
           "id",
           "name",
-          "role",
-          "counting_method",
+          "committee_category",
           "election_id",
           "location",
           "domain_id",
@@ -5565,6 +5568,9 @@
         "properties": {
           "category": {
             "$ref": "#/components/schemas/ElectionCategory"
+          },
+          "committee_category": {
+            "$ref": "#/components/schemas/CommitteeCategory"
           },
           "counting_method": {
             "$ref": "#/components/schemas/VoteCountingMethod"
@@ -5607,9 +5613,6 @@
             "items": {
               "$ref": "#/components/schemas/PoliticalGroup"
             }
-          },
-          "role": {
-            "$ref": "#/components/schemas/ElectionRole"
           }
         },
         "additionalProperties": false
@@ -5632,6 +5635,7 @@
           "DataEntryGetNotAllowed",
           "DataEntryNotAllowed",
           "EmlImportError",
+          "EmlError",
           "EntryNotFound",
           "EntryNotUnique",
           "Forbidden",
@@ -5831,6 +5835,7 @@
         "type": "object",
         "description": "Abacus API and asset server",
         "required": [
+          "committee_category",
           "political_groups",
           "candidates_per_group",
           "polling_stations",
@@ -5850,6 +5855,10 @@
           "candidates_per_group": {
             "$ref": "#/components/schemas/RandomRange",
             "description": "Number of candidates to create"
+          },
+          "committee_category": {
+            "$ref": "#/components/schemas/CommitteeCategory",
+            "description": "GSB or CSB"
           },
           "first_data_entry": {
             "$ref": "#/components/schemas/RandomRange",
@@ -6142,8 +6151,7 @@
         "description": "Election request",
         "required": [
           "name",
-          "role",
-          "counting_method",
+          "committee_category",
           "election_id",
           "location",
           "domain_id",
@@ -6157,6 +6165,9 @@
         "properties": {
           "category": {
             "$ref": "#/components/schemas/ElectionCategory"
+          },
+          "committee_category": {
+            "$ref": "#/components/schemas/CommitteeCategory"
           },
           "counting_method": {
             "$ref": "#/components/schemas/VoteCountingMethod"
@@ -6196,9 +6207,6 @@
             "items": {
               "$ref": "#/components/schemas/PoliticalGroup"
             }
-          },
-          "role": {
-            "$ref": "#/components/schemas/ElectionRole"
           }
         },
         "additionalProperties": false
@@ -6283,7 +6291,7 @@
       },
       "PollingStation": {
         "type": "object",
-        "description": "Polling station of a certain [crate::domain::election::Election]",
+        "description": "Polling station linked to an election, committee session and (previous) data entry.",
         "required": [
           "id",
           "election_id",

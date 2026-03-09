@@ -46,7 +46,7 @@ export function ElectionReportPage() {
     throw requestState.error;
   }
 
-  const sessionLabel = committeeSessionLabel(election.role, committeeSession.number);
+  const sessionLabel = committeeSessionLabel(election.committee_category, committeeSession.number);
 
   // Redirect to update details page if committee session details have not been filled in
   if (committeeSession.location === "" || !committeeSession.start_date_time) {
@@ -78,7 +78,9 @@ export function ElectionReportPage() {
         <section>
           <h1>
             {sessionLabel}{" "}
-            {t(`electoral_committee_role.roles.${election.role}.short`).replace(/(^\w|\s\w)/g, (m) => m.toUpperCase())}
+            {t(`committee_category.${election.committee_category}.short`).replace(/(^\w|\s\w)/g, (m) =>
+              m.toUpperCase(),
+            )}
           </h1>
         </section>
       </header>
@@ -90,7 +92,7 @@ export function ElectionReportPage() {
           <div>
             <h2 className="form_title">
               {t("election_report.counting_results")} {sessionLabel.toLowerCase()}{" "}
-              {t(`electoral_committee_role.roles.${election.role}.short`).toLowerCase()}{" "}
+              {t(`committee_category.${election.committee_category}.short`).toLowerCase()}{" "}
               {t("municipality").toLowerCase()} {election.location}
             </h2>
             <div className={cls.reportInfoSection}>
@@ -99,8 +101,16 @@ export function ElectionReportPage() {
                   ? formatDateTimeFull(new Date(committeeSession.start_date_time))
                   : "",
               })}
-              .<br />
-              {t("election_report.there_was_counting_method", { method: t(election.counting_method).toLowerCase() })}.
+              .
+              {election.counting_method && (
+                <>
+                  <br />
+                  {t("election_report.there_was_counting_method", {
+                    method: t(election.counting_method).toLowerCase(),
+                  })}
+                  .
+                </>
+              )}
               <DownloadButton
                 icon="download"
                 href={`/api/elections/${election.id}/committee_sessions/${committeeSession.id}/download_zip_results`}

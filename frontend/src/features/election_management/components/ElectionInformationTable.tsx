@@ -59,7 +59,7 @@ export function ElectionInformationTable({
           </Table.HeaderCell>
           <Table.Cell>{getListsAndCandidatesLabel(election)}</Table.Cell>
         </Table.Row>
-        {election.role === "GSB" && (
+        {election.committee_category === "GSB" && (
           <Table.Row to={rowLink}>
             <Table.HeaderCell scope="row" className="normal">
               {t("number_of_voters")}
@@ -71,11 +71,11 @@ export function ElectionInformationTable({
         )}
         <Table.Row>
           <Table.HeaderCell scope="row" className="normal">
-            {t("election_management.to_do_data_entry_for")}
+            {t("election.committee_category.title")}
           </Table.HeaderCell>
-          <Table.Cell>{t(`electoral_committee_role.roles.${election.role}.short`)}</Table.Cell>
+          <Table.Cell>{t(`committee_category.${election.committee_category}.short`)}</Table.Cell>
         </Table.Row>
-        {election.role === "GSB" && (
+        {election.committee_category === "GSB" && (
           <>
             <Table.Row key={election.id} to="polling-stations">
               <Table.HeaderCell scope="row" className="normal">
@@ -86,12 +86,14 @@ export function ElectionInformationTable({
                 {t(`polling_station.title.${numberOfPollingStations === 1 ? "singular" : "plural"}`).toLowerCase()}
               </Table.Cell>
             </Table.Row>
-            <Table.Row>
-              <Table.HeaderCell scope="row" className="normal">
-                {t("counting_method_type")}
-              </Table.HeaderCell>
-              <Table.Cell>{t(election.counting_method)}</Table.Cell>
-            </Table.Row>
+            {election.counting_method && (
+              <Table.Row>
+                <Table.HeaderCell scope="row" className="normal">
+                  {t("counting_method_type")}
+                </Table.HeaderCell>
+                <Table.Cell>{t(election.counting_method)}</Table.Cell>
+              </Table.Row>
+            )}
           </>
         )}
       </Table.Body>

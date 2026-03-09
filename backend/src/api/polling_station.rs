@@ -20,20 +20,22 @@ use crate::{
         data_entry::DataEntryId,
         election::ElectionId,
         polling_station::{
-            PollingStation, PollingStationFileRequest, PollingStationId,
-            PollingStationListResponse, PollingStationRequest, PollingStationRequestListResponse,
+            PollingStationFileRequest, PollingStationId, PollingStationListResponse,
+            PollingStationRequest, PollingStationRequestListResponse, PollingStationResponse,
             PollingStationsRequest,
         },
     },
-    eml::{EML110, EMLDocument, EMLImportError, EmlHash},
+    eml::{EMLImportError, EmlHash, polling_stations_from_eml_str},
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
     repository::{
         committee_session_repo::get_election_committee_session,
         election_repo,
-        polling_station_repo::{create, create_many, delete, get_for_election, list, update},
+        polling_station_repo::{create, create_many, delete, get_for_election, has_any, update},
         user_repo::User,
     },
-    service::{change_committee_session_status, create_empty_data_entry},
+    service::{
+        change_committee_session_status, create_empty_data_entry, list_polling_stations_for_session,
+    },
 };
 
 #[derive(Serialize)]
@@ -54,8 +56,8 @@ pub struct PollingStationAuditData {
     pub polling_station_locality: String,
 }
 
-impl From<PollingStation> for PollingStationAuditData {
-    fn from(value: PollingStation) -> Self {
+impl From<PollingStationResponse> for PollingStationAuditData {
+    fn from(value: PollingStationResponse) -> Self {
         Self {
             polling_station_id: value.id,
             polling_station_election_id: value.election_id,
@@ -145,7 +147,9 @@ async fn polling_station_list(
     let committee_session = get_election_committee_session(&mut conn, election_id).await?;
 
     Ok(PollingStationListResponse {
-        polling_stations: list(&mut conn, committee_session.id).await?,
+        polling_stations: list_polling_stations_for_session(&mut conn, &committee_session)
+            .await?
+            .into_responses(election_id),
     })
 }
 
@@ -172,7 +176,7 @@ pub fn validate_user_is_allowed_to_perform_action(
     path = "/api/elections/{election_id}/polling_stations",
     request_body = PollingStationRequest,
     responses(
-        (status = 201, description = "Polling station created successfully", body = PollingStation),
+        (status = 201, description = "Polling station created successfully", body = PollingStationResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "Election not found", body = ErrorResponse),
@@ -190,7 +194,7 @@ async fn polling_station_create(
     Path(election_id): Path<ElectionId>,
     audit_service: AuditService,
     new_polling_station: PollingStationRequest,
-) -> Result<(StatusCode, PollingStation), APIError> {
+) -> Result<(StatusCode, PollingStationResponse), APIError> {
     let mut tx = pool.begin_immediate().await?;
 
     // Check if the election and a committee session exist, will respond with NOT_FOUND otherwise
@@ -202,13 +206,15 @@ async fn polling_station_create(
     let mut polling_station = create(&mut tx, election_id, new_polling_station).await?;
 
     if !committee_session.is_next_session() {
-        polling_station = create_empty_data_entry(&mut tx, polling_station.id).await?;
+        polling_station = create_empty_data_entry(&mut tx, polling_station.id()).await?;
     }
+
+    let response: PollingStationResponse = polling_station.into_response(election_id);
 
     audit_service
         .log(
             &mut tx,
-            &PollingStationCreatedAuditData(polling_station.clone().into()),
+            &PollingStationCreatedAuditData(response.clone().into()),
             None,
         )
         .await?;
@@ -235,7 +241,7 @@ async fn polling_station_create(
 
     tx.commit().await?;
 
-    Ok((StatusCode::CREATED, polling_station))
+    Ok((StatusCode::CREATED, response))
 }
 
 /// Get a [PollingStation]
@@ -243,7 +249,7 @@ async fn polling_station_create(
     get,
     path = "/api/elections/{election_id}/polling_stations/{polling_station_id}",
     responses(
-        (status = 200, description = "Polling station found", body = PollingStation),
+        (status = 200, description = "Polling station found", body = PollingStationResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 404, description = "Polling station not found", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
@@ -258,12 +264,10 @@ async fn polling_station_get(
     _user: User,
     State(pool): State<SqlitePool>,
     Path((election_id, polling_station_id)): Path<(ElectionId, PollingStationId)>,
-) -> Result<(StatusCode, PollingStation), APIError> {
+) -> Result<(StatusCode, PollingStationResponse), APIError> {
     let mut conn = pool.acquire().await?;
-    Ok((
-        StatusCode::OK,
-        get_for_election(&mut conn, election_id, polling_station_id).await?,
-    ))
+    let polling_station = get_for_election(&mut conn, election_id, polling_station_id).await?;
+    Ok((StatusCode::OK, polling_station.into_response(election_id)))
 }
 
 /// Update a [PollingStation]
@@ -272,7 +276,7 @@ async fn polling_station_get(
     path = "/api/elections/{election_id}/polling_stations/{polling_station_id}",
     request_body = PollingStationRequest,
     responses(
-        (status = 200, description = "Polling station updated successfully", body = PollingStation),
+        (status = 200, description = "Polling station updated successfully", body = PollingStationResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "Polling station not found", body = ErrorResponse),
@@ -290,7 +294,7 @@ async fn polling_station_update(
     audit_service: AuditService,
     Path((election_id, polling_station_id)): Path<(ElectionId, PollingStationId)>,
     polling_station_update: PollingStationRequest,
-) -> Result<(StatusCode, PollingStation), APIError> {
+) -> Result<(StatusCode, PollingStationResponse), APIError> {
     let mut tx = pool.begin_immediate().await?;
 
     // Check if the election and a committee session exist, will respond with NOT_FOUND otherwise
@@ -307,10 +311,12 @@ async fn polling_station_update(
     )
     .await?;
 
+    let response: PollingStationResponse = polling_station.into_response(election_id);
+
     audit_service
         .log(
             &mut tx,
-            &PollingStationUpdatedAuditData(polling_station.clone().into()),
+            &PollingStationUpdatedAuditData(response.clone().into()),
             None,
         )
         .await?;
@@ -327,7 +333,7 @@ async fn polling_station_update(
 
     tx.commit().await?;
 
-    Ok((StatusCode::OK, polling_station))
+    Ok((StatusCode::OK, response))
 }
 
 /// Delete a [PollingStation]
@@ -368,7 +374,7 @@ async fn polling_station_delete(
         &mut tx,
         &audit_service,
         &committee_session,
-        polling_station.id,
+        polling_station.id(),
     )
     .await?;
 
@@ -376,21 +382,22 @@ async fn polling_station_delete(
         &mut tx,
         &audit_service,
         &committee_session,
-        polling_station.id,
+        polling_station.id(),
     )
     .await?;
 
     delete(&mut tx, election_id, polling_station_id).await?;
 
+    let response: PollingStationResponse = polling_station.into_response(election_id);
     audit_service
         .log(
             &mut tx,
-            &PollingStationDeletedAuditData(polling_station.clone().into()),
+            &PollingStationDeletedAuditData(response.into()),
             None,
         )
         .await?;
 
-    if list(&mut tx, committee_session.id).await?.is_empty() {
+    if !has_any(&mut tx, committee_session.id).await? {
         change_committee_session_status(
             &mut tx,
             committee_session.id,
@@ -429,8 +436,7 @@ async fn polling_station_validate_import(
     Ok((
         StatusCode::OK,
         Json(PollingStationRequestListResponse {
-            polling_stations: EML110::from_str(&polling_station_request.data)?
-                .get_polling_stations()?,
+            polling_stations: polling_stations_from_eml_str(&polling_station_request.data)?,
         }),
     ))
 }
@@ -440,20 +446,20 @@ pub async fn create_imported_polling_stations(
     audit_service: AuditService,
     election_id: ElectionId,
     polling_stations_request: PollingStationsRequest,
-) -> Result<Vec<PollingStation>, APIError> {
+) -> Result<Vec<PollingStationResponse>, APIError> {
     let mut tx = conn.begin().await?;
 
     let committee_session = get_election_committee_session(&mut tx, election_id).await?;
     let polling_stations =
-        EML110::from_str(&polling_stations_request.polling_stations)?.get_polling_stations()?;
+        polling_stations_from_eml_str(&polling_stations_request.polling_stations)?;
     let file_hash = EmlHash::from(polling_stations_request.polling_stations.as_bytes()).chunks;
 
     // Create new polling stations
-    let mut polling_stations = create_many(&mut tx, election_id, polling_stations).await?;
+    let mut polling_station_list = create_many(&mut tx, election_id, polling_stations).await?;
 
     if !committee_session.is_next_session() {
-        for polling_station in &mut polling_stations {
-            *polling_station = create_empty_data_entry(&mut tx, polling_station.id).await?;
+        for ps in &mut polling_station_list {
+            *ps = create_empty_data_entry(&mut tx, ps.id()).await?;
         }
     }
 
@@ -464,7 +470,7 @@ pub async fn create_imported_polling_stations(
             &PollingStationsImportedAuditData(PollingStationImportAuditData {
                 import_election_id: election_id,
                 import_file_name: polling_stations_request.file_name,
-                import_number_of_polling_stations: u64::try_from(polling_stations.len())
+                import_number_of_polling_stations: u64::try_from(polling_station_list.len())
                     .map_err(|_| EMLImportError::NumberOfPollingStationsNotInRange)?,
             }),
             Some(format!(
@@ -487,7 +493,10 @@ pub async fn create_imported_polling_stations(
 
     tx.commit().await?;
 
-    Ok(polling_stations)
+    Ok(polling_station_list
+        .into_iter()
+        .map(|ps| ps.into_response(election_id))
+        .collect())
 }
 
 /// Import file with Polling Stations
@@ -520,11 +529,11 @@ async fn polling_station_import(
     election_repo::get(&mut tx, election_id).await?;
     let committee_session = get_election_committee_session(&mut tx, election_id).await?;
 
-    if !list(&mut tx, committee_session.id).await?.is_empty() {
+    if has_any(&mut tx, committee_session.id).await? {
         return Err(AuthenticationError::Forbidden.into());
     }
 
-    let polling_stations: Vec<PollingStation> = create_imported_polling_stations(
+    let polling_stations = create_imported_polling_stations(
         &mut tx,
         audit_service,
         election_id,
@@ -650,7 +659,7 @@ VALUES
         let result = update(
             &mut conn,
             ElectionId::from(7),
-            polling_station.id,
+            polling_station.id(),
             data.clone(),
         )
         .await;

@@ -4,6 +4,7 @@ use axum::{
     http::StatusCode,
 };
 use chrono::NaiveDate;
+use eml_nl::EMLError;
 use quick_xml::{DeError, SeError};
 use serde::{Deserialize, Serialize};
 use sqlx::{SqliteConnection, SqlitePool};
@@ -20,19 +21,25 @@ use crate::{
     domain::{
         committee_session::{
             CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionError,
+            CommitteeSessionId,
         },
         committee_session_status::CommitteeSessionStatus,
         election::{
-            Election, ElectionId, ElectionNumberOfVotersChangeRequest, ElectionRole,
-            ElectionWithPoliticalGroups, NewElection, VoteCountingMethod,
+            CommitteeCategory, Election, ElectionCategory, ElectionId,
+            ElectionNumberOfVotersChangeRequest, ElectionWithPoliticalGroups, NewElection,
+            VoteCountingMethod,
         },
         investigation::PollingStationInvestigation,
-        polling_station::{PollingStation, PollingStationRequest, PollingStationsRequest},
+        polling_station::{PollingStationRequest, PollingStationResponse, PollingStationsRequest},
     },
-    eml::{EML110, EML230, EMLDocument, EMLImportError, EmlHash, RedactedEmlHash},
+    eml::{
+        EMLImportError, EmlHash, RedactedEmlHash, number_of_voters_from_polling_stations_eml,
+        parse_polling_stations_eml_str, polling_stations_eml_matches_election,
+        polling_stations_from_eml, polling_stations_from_eml_str,
+    },
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
-    repository::{committee_session_repo, election_repo, polling_station_repo, user_repo::User},
-    service::list_investigations_for_committee_session,
+    repository::{committee_session_repo, election_repo, user_repo::User},
+    service::{create_sub_committee, list_polling_stations_for_session},
 };
 
 pub fn router() -> OpenApiRouter<AppState> {
@@ -63,7 +70,7 @@ pub struct ElectionDetailsResponse {
     pub current_committee_session: CommitteeSession,
     pub committee_sessions: Vec<CommitteeSession>,
     pub election: ElectionWithPoliticalGroups,
-    pub polling_stations: Vec<PollingStation>,
+    pub polling_stations: Vec<PollingStationResponse>,
     pub investigations: Vec<PollingStationInvestigation>,
 }
 
@@ -71,8 +78,8 @@ pub struct ElectionDetailsResponse {
 pub struct ElectionAuditData {
     pub election_id: ElectionId,
     pub election_name: String,
-    pub election_role: String,
-    pub election_counting_method: String,
+    pub election_committee_category: String,
+    pub election_counting_method: Option<String>,
     pub election_election_id: String,
     pub election_location: String,
     pub election_domain_id: String,
@@ -88,8 +95,8 @@ impl From<Election> for ElectionAuditData {
         Self {
             election_id: value.id,
             election_name: value.name,
-            election_role: value.role.to_string(),
-            election_counting_method: value.counting_method.to_string(),
+            election_committee_category: value.committee_category.to_string(),
+            election_counting_method: value.counting_method.map(|cm| cm.to_string()),
             election_election_id: value.election_id,
             election_location: value.location,
             election_domain_id: value.domain_id,
@@ -171,10 +178,10 @@ pub async fn election_details(
         .first()
         .expect("There is always one committee session")
         .clone();
-    let polling_stations =
-        polling_station_repo::list(&mut conn, current_committee_session.id).await?;
-    let investigations =
-        list_investigations_for_committee_session(&mut conn, current_committee_session.id).await?;
+    let session_pss =
+        list_polling_stations_for_session(&mut conn, &current_committee_session).await?;
+    let investigations = session_pss.investigations();
+    let polling_stations = session_pss.into_responses(election_id);
 
     Ok(Json(ElectionDetailsResponse {
         current_committee_session,
@@ -246,7 +253,7 @@ pub async fn election_number_of_voters_change(
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
-#[serde(tag = "role")]
+#[serde(tag = "committee_category")]
 pub enum ElectionCreationValidateRequest {
     GSB(GSBElectionCreationValidateRequest),
     CSB(CSBElectionCreationValidateRequest),
@@ -301,7 +308,7 @@ pub struct CSBElectionCreationValidateRequest {
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
-#[serde(tag = "role")]
+#[serde(tag = "committee_category")]
 pub enum ElectionDefinitionValidateResponse {
     GSB(GSBElectionDefinitionValidateResponse),
     CSB(CSBElectionDefinitionValidateResponse),
@@ -371,7 +378,7 @@ fn validate_gsb_election(
     }
 
     if let Some(cm) = edu.counting_method {
-        election.counting_method = cm;
+        election.counting_method = Some(cm);
     }
 
     // parse and validate polling stations, and update number of voters
@@ -383,11 +390,11 @@ fn validate_gsb_election(
             return Err(APIError::EmlImportError(EMLImportError::MissingFileName));
         }
 
-        let eml110b = EML110::from_str(&data)?;
-        polling_stations = Some(eml110b.get_polling_stations()?);
-        number_of_voters = eml110b.get_number_of_voters().unwrap_or_default();
+        let eml = parse_polling_stations_eml_str(&data)?;
+        polling_stations = Some(polling_stations_from_eml(&eml)?);
+        number_of_voters = number_of_voters_from_polling_stations_eml(&eml)?;
         polling_station_definition_matches_election =
-            Some(EML110::from_str(&data)?.polling_station_definition_matches_election(&election)?);
+            Some(polling_stations_eml_matches_election(&eml, &election)?);
     } else {
         polling_stations = None;
     }
@@ -418,7 +425,7 @@ fn validate_csb_election(
     let mut hash = RedactedEmlHash::from(edu.election_data.as_bytes());
     let mut election =
         parse_election_candidates_eml(&edu.election_data, edu.candidate_data.as_deref())?;
-    election.role = ElectionRole::CSB;
+    election.committee_category = CommitteeCategory::CSB;
 
     if let Some(ref data) = edu.candidate_data {
         hash = RedactedEmlHash::from(data.as_bytes());
@@ -430,7 +437,7 @@ fn validate_csb_election(
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
-#[serde(tag = "role")]
+#[serde(tag = "committee_category")]
 pub enum ElectionCreationRequest {
     GSB(GSBElectionCreationRequest),
     CSB(CSBElectionCreationRequest),
@@ -527,10 +534,10 @@ async fn import_gsb_election(
         if edu.polling_station_file_name.is_none() {
             return Err(APIError::EmlImportError(EMLImportError::MissingFileName));
         }
-        EML110::from_str(polling_station_data)?.get_polling_stations()?;
+        polling_stations_from_eml_str(polling_station_data)?;
     }
 
-    new_election.counting_method = edu.counting_method;
+    new_election.counting_method = Some(edu.counting_method);
     new_election.number_of_voters = edu.number_of_voters;
 
     let mut tx = pool.begin_immediate().await?;
@@ -574,7 +581,7 @@ async fn import_csb_election(
 
     let mut new_election =
         parse_election_candidates_eml(&edu.election_data, Some(&edu.candidate_data))?;
-    new_election.role = ElectionRole::CSB;
+    new_election.committee_category = CommitteeCategory::CSB;
 
     let mut tx = pool.begin_immediate().await?;
     let election = create_election_with_committee_session(
@@ -610,10 +617,11 @@ fn parse_election_candidates_eml(
     election_eml_data: &str,
     candidate_eml_data: Option<&str>,
 ) -> Result<NewElection, APIError> {
-    let mut election = EML110::from_str(election_eml_data)?.as_abacus_election()?;
-    if let Some(candidate_data) = candidate_eml_data {
-        election = EML230::from_str(candidate_data)?.add_candidate_lists(election)?;
+    let mut election = NewElection::from_eml_str(election_eml_data)?;
+    if let Some(candidate_eml_data) = candidate_eml_data {
+        election.add_candidates_from_eml_str(candidate_eml_data)?;
     }
+
     Ok(election)
 }
 
@@ -633,7 +641,7 @@ async fn create_election_with_committee_session(
         candidate_data_hash,
     )
     .await?;
-    create_committee_session(
+    let committee_session = create_committee_session(
         tx,
         audit_service,
         CommitteeSessionCreateRequest {
@@ -642,7 +650,36 @@ async fn create_election_with_committee_session(
         },
     )
     .await?;
+
+    create_sub_committees(tx, &election, committee_session.id).await?;
+
     Ok(election)
+}
+
+/// Create sub electoral committees for CSB elections
+async fn create_sub_committees(
+    tx: &mut SqliteConnection,
+    election: &ElectionWithPoliticalGroups,
+    committee_session_id: CommitteeSessionId,
+) -> Result<(), APIError> {
+    match (election.committee_category, election.category) {
+        (CommitteeCategory::CSB, ElectionCategory::Municipal) => {
+            let number = election
+                .domain_id
+                .parse()
+                .expect("domain_id should be numeric");
+            create_sub_committee(
+                tx,
+                committee_session_id,
+                number,
+                &election.location,
+                CommitteeCategory::GSB,
+            )
+            .await?;
+        }
+        (CommitteeCategory::GSB, _) => {}
+    }
+    Ok(())
 }
 
 impl From<DeError> for APIError {
@@ -660,5 +697,11 @@ impl From<SeError> for APIError {
 impl From<EMLImportError> for APIError {
     fn from(err: EMLImportError) -> Self {
         APIError::EmlImportError(err)
+    }
+}
+
+impl From<EMLError> for APIError {
+    fn from(err: EMLError) -> Self {
+        APIError::EmlError(err)
     }
 }

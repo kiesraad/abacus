@@ -66,7 +66,12 @@ export function InvestigationsOverviewPage() {
         <section>
           <h1>
             {t("investigations.investigations_in_committee_session", {
-              sessionLabel: committeeSessionLabel(election.role, currentCommitteeSession.number, false, true),
+              sessionLabel: committeeSessionLabel(
+                election.committee_category,
+                currentCommitteeSession.number,
+                false,
+                true,
+              ),
             })}
           </h1>
         </section>

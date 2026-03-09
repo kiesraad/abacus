@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest";
 
 import { type Role, roleValues } from "@/types/generated/openapi";
-import { isAdministrator, isCoordinator, isTypist, roleWithoutElection } from "@/utils/role";
+import { isAdministrator, isCoordinator, isTypist } from "@/utils/role";
 
 describe("Role util", () => {
   test.each(
@@ -19,10 +19,5 @@ describe("Role util", () => {
     role?: Role,
   ) => boolean) => {
     expect(fn(undefined)).toBe(false);
-  });
-
-  test.each(roleValues)("Role %j without election should be the first part of role", (role: Role) => {
-    const roleWithout = roleWithoutElection(role);
-    expect(role.startsWith(roleWithout)).toBe(true);
   });
 });

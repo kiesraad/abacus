@@ -75,7 +75,7 @@ export function OverviewPage() {
           <Table.Cell>
             {isTypist
               ? election.location
-              : `${t(`electoral_committee_role.roles.${election.role}.abbreviation`)} - ${election.location} (${election.domain_id})`}
+              : `${t(`committee_category.${election.committee_category}.abbreviation`)} - ${election.location} (${election.domain_id})`}
           </Table.Cell>
           <Table.Cell>
             {isTypist ? (
@@ -105,11 +105,11 @@ export function OverviewPage() {
       committeeSessionStatus = (
         <CommitteeSessionStatusWithIcon
           status={committeeSession.status}
-          electionRole={election.role}
+          committeeCategory={election.committee_category}
           userRole={isAdminOrCoordinator ? "coordinator" : "typist"}
         />
       );
-      committeeSessionString = committeeSessionLabel(election.role, committeeSession.number);
+      committeeSessionString = committeeSessionLabel(election.committee_category, committeeSession.number);
     }
     return (
       <Table.Row id={`election-row-${election.id}`} key={election.id} to={electionLink}>
@@ -166,7 +166,7 @@ export function OverviewPage() {
                 <Table.Header>
                   <Table.HeaderCell>{t("election.title.singular")}</Table.HeaderCell>
                   <Table.HeaderCell>
-                    {isTypist ? t("election.location") : t("election.level_polling_station")}
+                    {isTypist ? t("election.location") : t("election.committee_category.title")}
                   </Table.HeaderCell>
                   <Table.HeaderCell>{t("election_status.label")}</Table.HeaderCell>
                 </Table.Header>

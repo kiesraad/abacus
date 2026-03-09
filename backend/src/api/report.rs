@@ -4,6 +4,7 @@ use axum::{
 };
 use axum_extra::response::Attachment;
 use chrono::{DateTime, Local, Utc};
+use eml_nl::{EMLError, documents::election_count::ElectionCount, io::EMLWrite};
 use pdf_gen::{
     generate_pdf,
     zip::{ZipResponse, ZipResponseError, slugify_filename, zip_single_file},
@@ -21,16 +22,16 @@ use crate::{
             CommitteeSessionId,
         },
         committee_session_status::CommitteeSessionStatus,
-        data_entry::PollingStationResults,
         election::{ElectionId, ElectionWithPoliticalGroups},
         file::File,
         investigation::PollingStationInvestigation,
         models::{ModelNa14_2Input, ModelNa31_2Input, ModelP2aInput, PdfFileModel, ToPdfFileModel},
         polling_station::PollingStation,
+        results::PollingStationResults,
         summary::ElectionSummary,
         votes_table::{VotesTables, VotesTablesWithPreviousVotes},
     },
-    eml::{EML510, EMLDocument, EmlHash},
+    eml::EmlHash,
     error::ErrorReference,
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
     repository::{
@@ -38,9 +39,9 @@ use crate::{
         data_entry_repo::{
             are_results_complete_for_committee_session, list_results_for_committee_session,
         },
-        election_repo, file_repo, polling_station_repo,
+        election_repo, file_repo,
     },
-    service::{FileAuditData, list_investigations_for_committee_session},
+    service::{FileAuditData, list_polling_stations_for_session},
 };
 
 /// Default date time format for reports
@@ -83,16 +84,10 @@ impl ResultsInput {
     ) -> Result<ResultsInput, APIError> {
         let committee_session = committee_session_repo::get(conn, committee_session_id).await?;
         let election = election_repo::get(conn, committee_session.election_id).await?;
-        let polling_stations = polling_station_repo::list(conn, committee_session.id).await?;
+        let session_pss = list_polling_stations_for_session(conn, &committee_session).await?;
+        let investigations = session_pss.investigations();
+        let polling_stations = session_pss.into_polling_stations();
         let results = list_results_for_committee_session(conn, committee_session.id).await?;
-
-        // get investigations if this is not the first session
-        let investigations: Vec<PollingStationInvestigation> =
-            if committee_session.is_next_session() {
-                list_investigations_for_committee_session(conn, committee_session.id).await?
-            } else {
-                vec![]
-            };
 
         // get the previous committee session if this is not the first session
         let previous_committee_session = if committee_session.is_next_session() {
@@ -125,13 +120,13 @@ impl ResultsInput {
         })
     }
 
-    fn as_xml(&self) -> EML510 {
-        EML510::from_results(
-            &self.election,
+    fn as_xml(&self) -> Result<ElectionCount, EMLError> {
+        self.election.as_count_eml(
+            None,
             &self.committee_session,
             &self.results,
             &self.summary,
-            &self.created_at,
+            self.created_at,
         )
     }
 
@@ -323,7 +318,7 @@ async fn generate_and_save_files(
     let mut pdf_file: Option<File> = None;
     let mut overview_pdf_file: Option<File> = None;
     let created_at = input.created_at.with_timezone(&Utc);
-    let xml_string = input.as_xml().to_xml_string()?;
+    let xml_string = input.as_xml()?.write_eml_root_str(true, true)?;
 
     let xml_hash = EmlHash::from(xml_string.as_bytes());
     let xml_filename = input.xml_filename();
@@ -433,11 +428,8 @@ async fn get_files(
 ) -> Result<(Option<File>, Option<File>, Option<File>, DateTime<Utc>), APIError> {
     let mut conn = pool.acquire().await?;
     let committee_session = committee_session_repo::get(&mut conn, committee_session_id).await?;
-    let investigations: Vec<PollingStationInvestigation> =
-        list_investigations_for_committee_session(&mut conn, committee_session.id).await?;
-    let corrections = investigations
-        .iter()
-        .any(|inv| matches!(inv.corrected_results, Some(true)));
+    let session_pss = list_polling_stations_for_session(&mut conn, &committee_session).await?;
+    let corrections = session_pss.has_corrections();
 
     // Only generate files if the committee session is completed and has all the data needed
     if committee_session.status != CommitteeSessionStatus::Completed

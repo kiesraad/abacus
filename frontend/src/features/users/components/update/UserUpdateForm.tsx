@@ -1,4 +1,4 @@
-import { type FormEvent, useState } from "react";
+import { type SubmitEvent, useState } from "react";
 
 import { ApiError, isSuccess } from "@/api/ApiResult";
 import { useCrud } from "@/api/useCrud";
@@ -28,7 +28,7 @@ export function UserUpdateForm({ user, onSaved, onAbort }: UserUpdateFormProps) 
   const { update, isLoading } = useCrud<User>({ updatePath });
   const [error, setError] = useState<ErrorReference | null>(null);
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new StringFormData(event.currentTarget);
 

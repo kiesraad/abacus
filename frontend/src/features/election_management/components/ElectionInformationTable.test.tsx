@@ -23,7 +23,7 @@ const renderTable = (
         election={{
           id: 1,
           name: "Gemeenteraadsverkiezingen 2026",
-          role: "GSB",
+          committee_category: "GSB",
           counting_method: "DSO",
           election_id: "Heemdamseburg_2024",
           location: "Heemdamseburg",
@@ -77,7 +77,7 @@ describe("ElectionInformationTable", () => {
       ["Kiesgebied", "0035 - Gemeente Heemdamseburg"],
       ["Lijsten en kandidaten", "1 lijst en 1 kandidaat"],
       ["Aantal kiesgerechtigden", "0"],
-      ["Invoer doen voor", "Gemeentelijk stembureau"],
+      ["Type stembureau", "Gemeentelijk stembureau"],
       ["Stembureaus", "1 stembureau"],
       ["Type stemopneming", "Decentrale stemopneming"],
     ]);
@@ -100,7 +100,7 @@ describe("ElectionInformationTable", () => {
       ["Kiesgebied", "0035 - Gemeente Heemdamseburg"],
       ["Lijsten en kandidaten", "1 lijst en 1 kandidaat"],
       ["Aantal kiesgerechtigden", "1.234"],
-      ["Invoer doen voor", "Gemeentelijk stembureau"],
+      ["Type stembureau", "Gemeentelijk stembureau"],
       ["Stembureaus", "1 stembureau"],
       ["Type stemopneming", "Decentrale stemopneming"],
     ]);
@@ -123,7 +123,7 @@ describe("ElectionInformationTable", () => {
       ["Kiesgebied", "0035 - Gemeente Heemdamseburg"],
       ["Lijsten en kandidaten", "1 lijst en 1 kandidaat"],
       ["Aantal kiesgerechtigden", "1.234"],
-      ["Invoer doen voor", "Gemeentelijk stembureau"],
+      ["Type stembureau", "Gemeentelijk stembureau"],
       ["Stembureaus", "1 stembureau"],
       ["Type stemopneming", "Decentrale stemopneming"],
     ]);
@@ -146,7 +146,7 @@ describe("ElectionInformationTable", () => {
       ["Kiesgebied", "0035 - Gemeente Heemdamseburg"],
       ["Lijsten en kandidaten", "1 lijst en 1 kandidaat"],
       ["Aantal kiesgerechtigden", "1.234"],
-      ["Invoer doen voor", "Gemeentelijk stembureau"],
+      ["Type stembureau", "Gemeentelijk stembureau"],
       ["Stembureaus", "1 stembureau"],
       ["Type stemopneming", "Decentrale stemopneming"],
     ]);
@@ -169,7 +169,7 @@ describe("ElectionInformationTable", () => {
       ["Kiesgebied", "0035 - Gemeente Heemdamseburg"],
       ["Lijsten en kandidaten", "1 lijst en 1 kandidaat"],
       ["Aantal kiesgerechtigden", "1.234"],
-      ["Invoer doen voor", "Gemeentelijk stembureau"],
+      ["Type stembureau", "Gemeentelijk stembureau"],
       ["Stembureaus", "1 stembureau"],
       ["Type stemopneming", "Decentrale stemopneming"],
     ]);

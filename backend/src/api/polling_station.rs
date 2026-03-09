@@ -29,8 +29,8 @@ use crate::{
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
     repository::{
         committee_session_repo::get_election_committee_session,
-        election_repo,
-        polling_station_repo::{create, create_many, delete, get_for_election, has_any, update},
+        data_entry_repo, election_repo,
+        polling_station_repo::{create, create_many, delete, get_for_election, update},
         user_repo::User,
     },
     service::{
@@ -397,7 +397,7 @@ async fn polling_station_delete(
         )
         .await?;
 
-    if !has_any(&mut tx, committee_session.id).await? {
+    if !data_entry_repo::has_any(&mut tx, committee_session.id).await? {
         change_committee_session_status(
             &mut tx,
             committee_session.id,
@@ -480,8 +480,7 @@ pub async fn create_imported_polling_stations(
         )
         .await?;
 
-    if committee_session.status == CommitteeSessionStatus::Created {
-        // Change committee session status to InPreparation
+    if !polling_station_list.is_empty() {
         change_committee_session_status(
             &mut tx,
             committee_session.id,
@@ -529,7 +528,7 @@ async fn polling_station_import(
     election_repo::get(&mut tx, election_id).await?;
     let committee_session = get_election_committee_session(&mut tx, election_id).await?;
 
-    if has_any(&mut tx, committee_session.id).await? {
+    if committee_session.status != CommitteeSessionStatus::Created {
         return Err(AuthenticationError::Forbidden.into());
     }
 

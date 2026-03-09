@@ -365,6 +365,25 @@
   name.trim()
 }
 
+// Format the location of a candidate
+#let candidate_location(election_candidate) = {
+  let location = ""
+
+  if election_candidate == none {
+    return location
+  }
+
+  if "locality" in election_candidate {
+    location += election_candidate.locality
+  }
+
+  if "country_code" in election_candidate {
+    location += " (" + election_candidate.country_code + ")"
+  }
+
+  location.trim()
+}
+
 // Default table layout
 #let light_table(columns: (), headers: (), values: ()) = {
   table(

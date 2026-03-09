@@ -1,6 +1,6 @@
 #import "common/style.typ": conf, default_header, document_numbering
 #import "common/scripts.typ": *
-#let input = json("inputs/model-p-22-2.json")
+#let input = json("inputs/model-p-22-2/gte-19-seats.json")
 
 #let is_municipality = (municipal, public_body) => if (
   input.election.category == "Municipal"
@@ -184,17 +184,16 @@ Hieronder is berekend hoe vaak elke lijst qua stemmenaantal de kiesdeler heeft g
 
 Na toewijzing van de volle zetels blijft een aantal te verdelen zetels over. Dit zijn de restzetels.
 
-#TODO[Apply values]\
 #sum(
   operator_label: "- Verschil",
   number_box(
-    value: 99,
+    value: input.seat_assignment.seats,
   )[Totaal aantal te verdelen zetels],
   number_box(
-    value: 99,
+    value: input.seat_assignment.full_seats,
   )[Toegewezen volle zetels],
   number_box(
-    value: 99,
+    value: input.seat_assignment.residual_seats,
   )[*Aantal restzetels*],
 )
 

@@ -30,7 +30,7 @@ export function UniqueHighestAveragesTable({ steps, finalStanding, politicalGrou
             return null;
           } else {
             const average = steps[0]?.standings.find(
-              (step) => step.list_number === listSeatAssignment.list_number,
+              (standing) => standing.list_number === listSeatAssignment.list_number,
             )?.next_votes_per_seat;
             const listSeatAssignmentSteps = steps.filter((step) => {
               return step.change.selected_list_number === listSeatAssignment.list_number;

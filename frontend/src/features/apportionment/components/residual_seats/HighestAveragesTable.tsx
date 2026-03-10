@@ -59,7 +59,7 @@ export function HighestAveragesTable({
                 </Table.Cell>
                 {steps.map((step) => {
                   const average = step.standings.find(
-                    (step) => step.list_number === listSeatAssignment.list_number,
+                    (standing) => standing.list_number === listSeatAssignment.list_number,
                   )?.next_votes_per_seat;
                   return (
                     <Table.DisplayFractionCells

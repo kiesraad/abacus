@@ -300,31 +300,6 @@ wordt deze via de onderstaande volgorde aan opvolgers toegewezen.
 
 #pagebreak(weak: true)
 
-== Hertelling
-#TODO[make this whole section conditional -> I believe we can leave this section out entirely]
-
-Het centraal stembureau heeft besloten tot een hertelling van (een deel van) de stemmen, omdat er een ernstig vermoeden bestaat dat bij de stemopneming zodanige fouten zijn gemaakt dat die van invloed kunnen zijn op de zetelverdeling. Het gemeentelijk stembureau heeft de hertelling uitgevoerd onder mandaat en machtiging van het centraal stembureau.
-
-=== Wat is er herteld?
-
-In opdracht van het centraal stembureau heeft hertelling plaatsgevonden bij de volgende stembureaus:
-
-#TODO[opsomming]
-
-De uitkomsten van de hertelling zijn als volgt:
-
-=== Resultaten hertelling
-#TODO[Tabel met verschillen met oorspronkelijke telling Van tabellen 2.3 tot en met 2.5]
-
-=== Heeft de hertelling geleid tot een aangepaste zetelverdeling?
-
-#checkbox()[Nee]
-#checkbox()[Ja, #sym.arrow.r Zie bijgevoegde nieuwe zetelverdeling #TODO[ref naar nieuwe zetelverdeling?]]
-
-#TODO[Nieuwe zetelverdeling (tabellen uit 2.6 t/m 2.10)]
-
-#pagebreak(weak: true)
-
 #emph_block[Deze pagina is expres leeg]
 
 Zo komt het handtekeningen-blad altijd op een losse pagina, ook als het verslag dubbelzijdig is geprint.

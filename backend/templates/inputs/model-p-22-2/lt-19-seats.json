@@ -361,6 +361,7 @@
             "last_name_prefix": "van der",
             "last_name": "Weijden",
             "locality": "Test Location",
+            "country_code": "BE",
             "gender": "Female"
           },
           {
@@ -878,6 +879,7 @@
         "last_name_prefix": "van der",
         "last_name": "Weijden",
         "locality": "Test Location",
+        "country_code": "BE",
         "gender": "Female",
         "list_number": 1,
         "list_name": "Political Group A"
@@ -975,6 +977,7 @@
             "last_name_prefix": "van der",
             "last_name": "Weijden",
             "locality": "Test Location",
+            "country_code": "BE",
             "gender": "Female"
           },
           {

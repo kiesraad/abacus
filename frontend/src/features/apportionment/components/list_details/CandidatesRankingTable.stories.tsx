@@ -18,7 +18,7 @@ export const Default: StoryObj = {
       ["Rang", "Naam", "Woonplaats", "Positie op lijst"],
       ["1", "Kok, K. (Karin) (v)", "Test Location", "12"],
       ["2", "Oud, L. (Lidewij) (v)", "Test Location", "1"],
-      ["3", "Van der Weijden, B. (Berta) (v)", "Test Location", "6"],
+      ["3", "Van der Weijden, B. (Berta) (v)", "Test Location (BE)", "6"],
       ["4", "Oud, K. (Klaas) (m)", "Test Location", "7"],
       ["5", "Oud, M. (Marijke) (v)", "Test Location", "3"],
       ["6", "Van der Weijden, H. (Henk) (m)", "Test Location", "5"],

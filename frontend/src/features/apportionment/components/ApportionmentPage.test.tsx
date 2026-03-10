@@ -112,7 +112,7 @@ describe("ApportionmentPage", () => {
       ["Oud, L. (Lidewij) (v)", "Test Location", "Lijst 1 - Political Group A"],
       ["Oud, M. (Marijke) (v)", "Test Location", "Lijst 1 - Political Group A"],
       ["De Vries, J. (Johan) (m)", "Test Location", "Lijst 1 - Political Group A"],
-      ["Van der Weijden, B. (Berta) (v)", "Test Location", "Lijst 1 - Political Group A"],
+      ["Van der Weijden, B. (Berta) (v)", "Test Location (BE)", "Lijst 1 - Political Group A"],
       ["Van der Weijden, H. (Henk) (m)", "Test Location", "Lijst 1 - Political Group A"],
     ]);
 

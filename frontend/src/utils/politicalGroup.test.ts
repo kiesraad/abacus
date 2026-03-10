@@ -5,6 +5,10 @@ import type { Candidate, PoliticalGroup } from "@/types/generated/openapi";
 import { formatPoliticalGroupName } from "./politicalGroup";
 
 describe("formatPoliticalGroupName", () => {
+  it("returns empty string when no political group provided", () => {
+    expect(formatPoliticalGroupName(undefined)).toBe("");
+  });
+
   it("formats named political groups correctly", () => {
     const politicalGroup1: PoliticalGroup = { name: "Group Name", number: 10, candidates: [] };
 

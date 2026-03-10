@@ -16,6 +16,8 @@ export function getInitialState(
     error: null,
     previousResults: null,
     pollingStationResults: null,
+    source: null,
+    dataEntryStatus: null,
     entryNumber,
     dataEntryStructure: null,
     formState: null,
@@ -45,6 +47,8 @@ export default function dataEntryReducer(state: DataEntryState, action: DataEntr
           targetFormSectionId,
           previousResults: action.dataEntry.previous_results ?? null,
           pollingStationResults: action.dataEntry.data,
+          source: action.dataEntry.source,
+          dataEntryStatus: action.dataEntry.status,
           error: null,
         };
       } else {
@@ -59,6 +63,8 @@ export default function dataEntryReducer(state: DataEntryState, action: DataEntr
           targetFormSectionId,
           previousResults: action.dataEntry.previous_results ?? null,
           pollingStationResults: action.dataEntry.data,
+          source: action.dataEntry.source,
+          dataEntryStatus: action.dataEntry.status,
           error: null,
         };
       }

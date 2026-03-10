@@ -2,8 +2,8 @@ use std::collections::HashMap;
 
 use crate::{
     api::apportionment::structs::{
-        CandidateNomination, DisplayFraction, ListCandidateNomination, ListSeatAssignment,
-        PreferenceThreshold, SeatAssignment,
+        CandidateNomination, ChosenCandidate, DisplayFraction, ListCandidateNomination,
+        ListSeatAssignment, PreferenceThreshold, SeatAssignment,
     },
     domain::{
         election::{Candidate, CandidateNumber, PGNumber, PoliticalGroup},
@@ -36,7 +36,7 @@ pub fn map_seat_assignment(
     }
 }
 
-fn sort_candidates_alphabetically(mut candidates: Vec<Candidate>) -> Vec<Candidate> {
+fn sort_candidates_alphabetically(mut candidates: Vec<ChosenCandidate>) -> Vec<ChosenCandidate> {
     candidates.sort_by(|a, b| {
         a.last_name
             .cmp(&b.last_name)
@@ -58,10 +58,19 @@ pub fn map_candidate_nomination(
         list_names.insert(list.number, list.name);
     }
 
-    let mut chosen_candidates: Vec<Candidate> = cn
+    let mut chosen_candidates: Vec<ChosenCandidate> = cn
         .chosen_candidates
         .iter()
-        .map(|c| candidate_map[&(c.list_number, c.candidate_number)].clone())
+        .map(|c| {
+            ChosenCandidate::new(
+                candidate_map[&(c.list_number, c.candidate_number)].clone(),
+                c.list_number,
+                list_names
+                    .get(&c.list_number)
+                    .expect("list name should exist")
+                    .clone(),
+            )
+        })
         .collect();
     chosen_candidates = sort_candidates_alphabetically(chosen_candidates);
 
@@ -105,12 +114,11 @@ pub fn map_candidate_nomination(
 
 #[cfg(test)]
 mod tests {
+    use super::{DisplayFraction, sort_candidates_alphabetically};
     use crate::{
-        api::apportionment::mapping::sort_candidates_alphabetically,
-        domain::election::{Candidate, CandidateNumber},
+        api::apportionment::structs::ChosenCandidate,
+        domain::election::{CandidateNumber, PGNumber},
     };
-
-    use super::DisplayFraction;
 
     #[test]
     fn test_display_fraction() {
@@ -137,10 +145,10 @@ mod tests {
             ("N.A.", "Groen"),
         ];
 
-        let candidates: Vec<Candidate> = names
+        let candidates: Vec<ChosenCandidate> = names
             .iter()
             .enumerate()
-            .map(|(i, &(initials, last_name))| Candidate {
+            .map(|(i, &(initials, last_name))| ChosenCandidate {
                 number: CandidateNumber::from(u32::try_from(i).unwrap() + 1),
                 initials: initials.to_string(),
                 first_name: None,
@@ -149,6 +157,8 @@ mod tests {
                 locality: String::new(),
                 country_code: None,
                 gender: None,
+                list_number: PGNumber::from(1),
+                list_name: String::new(),
             })
             .collect();
         let sorted_candidates = sort_candidates_alphabetically(candidates);

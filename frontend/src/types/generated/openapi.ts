@@ -496,7 +496,7 @@ export const candidateGenderValues = ["Male", "Female", "X"] as const;
 export type CandidateGender = (typeof candidateGenderValues)[number];
 
 export interface CandidateNomination {
-  chosen_candidates: Candidate[];
+  chosen_candidates: ChosenCandidate[];
   list_candidate_nomination: ListCandidateNomination[];
   preference_threshold: PreferenceThreshold;
 }
@@ -504,6 +504,22 @@ export interface CandidateNomination {
 export interface CandidateVotes {
   number: number;
   votes: number;
+}
+
+/**
+ * Chosen candidate
+ */
+export interface ChosenCandidate {
+  country_code?: string;
+  first_name?: string;
+  gender?: CandidateGender;
+  initials: string;
+  last_name: string;
+  last_name_prefix?: string;
+  list_name: string;
+  list_number: PGNumber;
+  locality: string;
+  number: number;
 }
 
 /**

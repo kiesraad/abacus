@@ -40,7 +40,7 @@ export function CandidatesWithSeatTable({
       <Table.Body>
         {candidateWithVotesList.map((candidate, index) => (
           <Table.Row key={candidate.number}>
-            <Table.Cell>{startSeatNumber + index}</Table.Cell>
+            <Table.Cell className="text-align-r">{startSeatNumber + index}</Table.Cell>
             <Table.Cell>{getCandidateFullNameWithGender(candidate)}</Table.Cell>
             <Table.Cell>{candidate.locality}</Table.Cell>
             {showPosition && <Table.Cell className="text-align-r">{candidate.number}</Table.Cell>}

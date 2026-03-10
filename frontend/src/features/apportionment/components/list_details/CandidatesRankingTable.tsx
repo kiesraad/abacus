@@ -22,7 +22,7 @@ export function CandidatesRankingTable({ candidateRanking }: CandidatesRankingTa
       <Table.Body>
         {candidateRanking.map((candidate, index) => (
           <Table.Row key={candidate.number}>
-            <Table.Cell>{index + 1}</Table.Cell>
+            <Table.Cell className="text-align-r">{index + 1}</Table.Cell>
             <Table.Cell>{getCandidateFullNameWithGender(candidate)}</Table.Cell>
             <Table.Cell>{candidate.locality}</Table.Cell>
             <Table.Cell className="text-align-r">{candidate.number}</Table.Cell>

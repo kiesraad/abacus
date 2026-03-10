@@ -27,7 +27,7 @@ export function CandidatesWithVotesTable({ id, candidateList, candidateVotesList
       <Table.Body>
         {candidateWithVotesList.map((candidate) => (
           <Table.Row key={candidate.number}>
-            <Table.Cell>{candidate.number}</Table.Cell>
+            <Table.Cell className="text-align-r">{candidate.number}</Table.Cell>
             <Table.Cell>{getCandidateFullNameWithGender(candidate)}</Table.Cell>
             <Table.Cell>{candidate.locality}</Table.Cell>
             <Table.Cell className="text-align-r">{candidate.votes}</Table.Cell>

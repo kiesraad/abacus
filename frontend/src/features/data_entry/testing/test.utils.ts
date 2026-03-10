@@ -1,5 +1,5 @@
 import { expect } from "vitest";
-
+import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
 import { overrideOnce } from "@/testing/server";
 import { screen, within } from "@/testing/test-utils";
 import type {
@@ -9,7 +9,6 @@ import type {
   PoliticalGroup,
 } from "@/types/generated/openapi";
 import { getCandidateFullName } from "@/utils/candidate";
-
 import type { FormState } from "../types/types";
 import { getClientState } from "../utils/dataEntryUtils";
 import { getInitialValues } from "./mock-data";
@@ -37,6 +36,13 @@ export function overrideServerClaimDataEntryResponse({
       ...pollingStationResults,
     },
     validation_results: validationResults,
+    source: {
+      type: "PollingStation",
+      id: pollingStationMockData[0]!.id,
+      number: pollingStationMockData[0]!.number,
+      name: pollingStationMockData[0]!.name,
+    },
+    status: "first_entry_in_progress",
   } satisfies ClaimDataEntryResponse);
 }
 

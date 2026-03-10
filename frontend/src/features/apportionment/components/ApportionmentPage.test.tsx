@@ -74,7 +74,7 @@ describe("ApportionmentPage", () => {
       ["2", "Political Group B", "-", "1", "1"],
       ["3", "Political Group C", "-", "1", "1"],
       ["4", "Political Group D", "-", "1", "1"],
-      ["5", "", "-", "-", "-"],
+      ["5", "Blanco (Smit, G.)", "-", "-", "-"],
       ["6", "Political Group F", "-", "-", "-"],
       ["7", "Political Group G", "-", "-", "-"],
       ["8", "Political Group H", "-", "-", "-"],

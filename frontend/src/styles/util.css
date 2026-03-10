@@ -73,6 +73,10 @@
 }
 
 /* Width */
+.w-5 {
+  width: 5rem;
+}
+
 .w-6 {
   width: 6rem;
 }

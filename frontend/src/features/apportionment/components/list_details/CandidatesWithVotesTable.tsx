@@ -19,7 +19,7 @@ export function CandidatesWithVotesTable({ id, candidateList, candidateVotesList
   return (
     <Table id={id} className={cn(cls.table)}>
       <Table.Header>
-        <Table.HeaderCell>{t("number")}</Table.HeaderCell>
+        <Table.HeaderCell className="text-align-r w-5">{t("number")}</Table.HeaderCell>
         <Table.HeaderCell>{t("candidate.title.singular")}</Table.HeaderCell>
         <Table.HeaderCell>{t("candidate.locality")}</Table.HeaderCell>
         <Table.HeaderCell className="text-align-r">{t("vote_count")}</Table.HeaderCell>

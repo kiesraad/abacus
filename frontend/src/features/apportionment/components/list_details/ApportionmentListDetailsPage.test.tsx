@@ -121,11 +121,11 @@ describe("ApportionmentListDetailsPage", () => {
 
     renderApportionmentPage();
 
-    expect(await screen.findByRole("heading", { level: 1, name: "Lijst 5" })).toBeVisible();
+    expect(await screen.findByRole("heading", { level: 1, name: "Lijst 5 - Blanco (Smit, G.)" })).toBeVisible();
 
     expect(await screen.findByRole("heading", { level: 2, name: "Toegewezen aantal zetels" })).toBeVisible();
     expect(await screen.findByTestId("text-list-assigned-nr-seats")).toHaveTextContent(
-      "Lijst 5 heeft 0 zetels toegewezen gekregen.",
+      "Lijst 5 - Blanco (Smit, G.) heeft 0 zetels toegewezen gekregen.",
     );
 
     expect(

@@ -29,7 +29,7 @@ export function CandidatesWithSeatTable({
   return (
     <Table id={id} className={cn(cls.table)}>
       <Table.Header>
-        <Table.HeaderCell>{t("apportionment.seat")}</Table.HeaderCell>
+        <Table.HeaderCell className="text-align-r w-5">{t("apportionment.seat")}</Table.HeaderCell>
         <Table.HeaderCell>{t("name")}</Table.HeaderCell>
         <Table.HeaderCell>{t("candidate.locality")}</Table.HeaderCell>
         {showPosition && (

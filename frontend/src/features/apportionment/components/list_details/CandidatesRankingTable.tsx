@@ -14,7 +14,7 @@ export function CandidatesRankingTable({ candidateRanking }: CandidatesRankingTa
   return (
     <Table id="candidates-ranking-table" className={cn(cls.table)}>
       <Table.Header>
-        <Table.HeaderCell>{t("apportionment.rank")}</Table.HeaderCell>
+        <Table.HeaderCell className="text-align-r w-5">{t("apportionment.rank")}</Table.HeaderCell>
         <Table.HeaderCell>{t("name")}</Table.HeaderCell>
         <Table.HeaderCell>{t("candidate.locality")}</Table.HeaderCell>
         <Table.HeaderCell className="text-align-r">{t("apportionment.position_on_list")}</Table.HeaderCell>

@@ -13,8 +13,10 @@
 #show: doc => conf(doc, header-right: [Centraal stembureau #input.election.location], footer: [
   Proces-verbaal van het #location_type\
   Model P 22-2
-  #TODO[hash toevoegen EML 520]
-])
+  
+  Datum: #input.creation_date_time - SHA-256-Hashcode: \
+  #input.hash
+], margin-bottom: 3.2cm)
 
 #set heading(numbering: none)
 

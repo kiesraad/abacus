@@ -243,6 +243,22 @@ De aan de lijsten toegewezen volle zetels en restzetels zijn bij elkaar opgeteld
 
 #TODO[Zetelverdeling tabel]
 
+#table(
+  columns: (1fr, 10em),
+  table.hline(stroke: none),
+  table.header(
+    ..([Lijst], [Toegewezen zetels]).enumerate().map(((idx, h)) => table.cell(stroke: none, align: bottom + if idx == 0 { left } else { right }, small_header_text(h))),
+  ),
+  table.hline(stroke: 1pt + black),
+  fill: (_, y) => if y > 1 and calc.even(y) { luma(245) },
+  ..for standing in input.seat_assignment.final_standing.sorted(key: standing => standing.total_seats, by: (l, r) => l >= r) {
+    (
+      table.cell(political_group_name(input.election.political_groups.find(pg => pg.number == standing.list_number), withPrefix: false)),
+      table.cell(align: right, [#standing.total_seats])
+    )
+  }.flatten(),
+)
+
 == Toewijzing van zetels aan kandidaten
 
 Aantal zetels: #TODO[Aantal zetels]

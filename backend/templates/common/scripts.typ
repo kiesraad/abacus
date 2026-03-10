@@ -335,7 +335,7 @@
 }
 
 // Format the name of a candidate
-#let candidate_name(election_candidate) = {
+#let candidate_name(election_candidate, withFirstName: true, withGender: true) = {
   let name = ""
 
   if election_candidate == none {
@@ -348,11 +348,11 @@
 
   name += election_candidate.last_name + ", " + election_candidate.initials + " "
   
-  if "first_name" in election_candidate {
+  if "first_name" in election_candidate and withFirstName {
     name += "(" + election_candidate.first_name + ") "
   }
 
-  if "gender" in election_candidate {
+  if "gender" in election_candidate and withGender {
     if election_candidate.gender == "Male" {
       name += "(m)"
     } else if election_candidate.gender == "Female" {
@@ -382,6 +382,32 @@
   }
 
   location.trim()
+}
+
+// Format the name of a political group
+#let political_group_name(election_political_group, withPrefix: true) = {
+  let name = ""
+
+  if election_political_group == none {
+    return name
+  }
+
+  let listPrefix = "";
+  if (withPrefix) {
+    listPrefix += "Lijst " + election_political_group.number + " - ";
+  }
+
+  if (election_political_group.name == "") {
+    if (election_political_group.candidates.first() != none) {
+      name = listPrefix + "Blanco (" + candidate_name(election_political_group.candidates.first(), withFirstName: false, withGender: false) + ")";
+    } else {
+      name = listPrefix + "Blanco";
+    }
+  } else {
+    name = listPrefix + election_political_group.name
+  }
+
+  name.trim()
 }
 
 // Default table layout

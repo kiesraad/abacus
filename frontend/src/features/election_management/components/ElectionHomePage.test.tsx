@@ -24,17 +24,11 @@ import { getRouter, type Router } from "@/testing/router";
 import { overrideOnce, server } from "@/testing/server";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 import { expectConflictErrorPage, render, screen, setupTestRouter, spyOnHandler, within } from "@/testing/test-utils";
-import type {
-  CommitteeCategory,
-  CommitteeSession,
-  ElectionDetailsResponse,
-  ErrorResponse,
-  Role,
-} from "@/types/generated/openapi";
+import type { CommitteeSession, ElectionDetailsResponse, ErrorResponse, Role } from "@/types/generated/openapi";
 
 import { ElectionHomePage } from "./ElectionHomePage";
 
-const renderPage = async (userRole: Role, committeeCategory: CommitteeCategory = "GSB") => {
+const renderGSBPage = async (userRole: Role) => {
   render(
     <TestUserProvider userRole={userRole}>
       <ElectionProvider electionId={1}>
@@ -46,13 +40,22 @@ const renderPage = async (userRole: Role, committeeCategory: CommitteeCategory =
   );
   expect(await screen.findByRole("heading", { level: 1, name: "Gemeenteraadsverkiezingen 2026" })).toBeVisible();
 
-  if (committeeCategory === "CSB") {
-    expect(await screen.findByRole("heading", { level: 2, name: "Centraal stembureau Heemdamseburg" })).toBeVisible();
-  } else {
-    expect(
-      await screen.findByRole("heading", { level: 2, name: "Gemeentelijk stembureau Heemdamseburg" }),
-    ).toBeVisible();
-  }
+  expect(await screen.findByRole("heading", { level: 2, name: "Gemeentelijk stembureau Heemdamseburg" })).toBeVisible();
+};
+
+const renderCSBPage = async () => {
+  render(
+    <TestUserProvider userRole={"coordinator_csb"}>
+      <ElectionProvider electionId={2}>
+        <ElectionStatusProvider electionId={2}>
+          <ElectionHomePage />
+        </ElectionStatusProvider>
+      </ElectionProvider>
+    </TestUserProvider>,
+  );
+  expect(await screen.findByRole("heading", { level: 1, name: "Gemeenteraadsverkiezingen 2026" })).toBeVisible();
+
+  expect(await screen.findByRole("heading", { level: 2, name: "Centraal stembureau Heemdamseburg" })).toBeVisible();
 };
 
 describe("ElectionHomePage", () => {
@@ -76,7 +79,7 @@ describe("ElectionHomePage", () => {
       ),
     );
 
-    await renderPage("coordinator_gsb");
+    await renderGSBPage("coordinator_gsb");
 
     const committee_session_cards = await screen.findByTestId("committee-session-cards");
     expect(committee_session_cards).toBeVisible();
@@ -120,7 +123,7 @@ describe("ElectionHomePage", () => {
       ),
     );
 
-    await renderPage("coordinator_gsb");
+    await renderGSBPage("coordinator_gsb");
 
     const committee_session_cards = await screen.findByTestId("committee-session-cards");
     expect(committee_session_cards).toBeVisible();
@@ -154,7 +157,7 @@ describe("ElectionHomePage", () => {
       ),
     );
 
-    await renderPage("administrator");
+    await renderGSBPage("administrator");
 
     const committee_session_cards = await screen.findByTestId("committee-session-cards");
     expect(committee_session_cards).toBeVisible();
@@ -189,7 +192,7 @@ describe("ElectionHomePage", () => {
         ),
       );
 
-      await renderPage("coordinator_gsb");
+      await renderGSBPage("coordinator_gsb");
 
       const deleteButton = screen.getByRole("button", { name: "Zitting verwijderen" });
       expect(deleteButton).toBeVisible();
@@ -204,7 +207,7 @@ describe("ElectionHomePage", () => {
         ),
       );
 
-      await renderPage("administrator");
+      await renderGSBPage("administrator");
 
       expect(screen.queryByRole("button", { name: "Zitting verwijderen" })).not.toBeInTheDocument();
     });
@@ -218,7 +221,7 @@ describe("ElectionHomePage", () => {
         ),
       );
 
-      await renderPage("coordinator_gsb");
+      await renderGSBPage("coordinator_gsb");
 
       const user = userEvent.setup();
       const deleteButton = screen.getByRole("button", { name: "Zitting verwijderen" });
@@ -245,7 +248,7 @@ describe("ElectionHomePage", () => {
         ),
       );
 
-      await renderPage("coordinator_gsb");
+      await renderGSBPage("coordinator_gsb");
 
       const user = userEvent.setup();
       const deleteButton = screen.getByRole("button", { name: "Zitting verwijderen" });
@@ -346,7 +349,7 @@ describe("ElectionHomePage", () => {
       ),
     );
 
-    await renderPage("coordinator_gsb");
+    await renderGSBPage("coordinator_gsb");
 
     const alert = await screen.findByRole("alert");
     expect(within(alert).getByRole("strong")).toHaveTextContent("Geen stembureaus");
@@ -376,7 +379,7 @@ describe("ElectionHomePage", () => {
   test("Shows empty documents section for first committee session", async () => {
     server.use(ElectionRequestHandler);
 
-    await renderPage("coordinator_gsb");
+    await renderGSBPage("coordinator_gsb");
 
     expect(
       await screen.findByRole("heading", { level: 3, name: "Lege processen-verbaal voor deze verkiezing" }),
@@ -394,7 +397,7 @@ describe("ElectionHomePage", () => {
       ),
     );
 
-    await renderPage("coordinator_gsb");
+    await renderGSBPage("coordinator_gsb");
 
     expect(await screen.findByRole("heading", { level: 3, name: "Leeg inlegvel voor deze verkiezing" })).toBeVisible();
     expect(screen.getByText("Na 31-2 Inlegvel")).toBeVisible();
@@ -415,7 +418,7 @@ describe("ElectionHomePage", () => {
       ),
     );
 
-    await renderPage("coordinator_gsb");
+    await renderGSBPage("coordinator_gsb");
 
     expect(
       screen.queryByRole("heading", { level: 3, name: "Lege processen-verbaal voor deze verkiezing" }),
@@ -430,6 +433,10 @@ describe("ElectionHomePage", () => {
 
   describe("CSB", () => {
     test("Shows committee session card and election information table", async () => {
+      overrideOnce("get", "/api/elections/2/status", 200, {
+        statuses: [],
+      });
+
       const committeeSessionData: Partial<CommitteeSession> = {
         status: "data_entry",
         location: "Den Haag",
@@ -438,12 +445,12 @@ describe("ElectionHomePage", () => {
       const electionData = getCSBElectionMockData({}, committeeSessionData);
       electionData.committee_sessions = [getCSBCommitteeSessionMockData(committeeSessionData)];
       server.use(
-        http.get("/api/elections/1", () =>
+        http.get("/api/elections/2", () =>
           HttpResponse.json(electionData satisfies ElectionDetailsResponse, { status: 200 }),
         ),
       );
 
-      await renderPage("coordinator_csb", "CSB");
+      await renderCSBPage();
 
       const committee_session_cards = await screen.findByTestId("committee-session-cards");
       expect(committee_session_cards).toBeVisible();

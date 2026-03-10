@@ -107,13 +107,13 @@ describe("ApportionmentPage", () => {
       ["Jansen, A. (Arie) (m)", "Test Location"],
       ["De Jong, R. (Rolf) (m)", "Test Location"],
       ["Kok, K. (Karin) (v)", "Test Location"],
-      ["Oud, L. (Lidewij) (v)", "Test Location"],
       ["Oud, J. (Johan) (m)", "Test Location"],
-      ["Oud, M. (Marijke) (v)", "Test Location"],
       ["Oud, K. (Klaas) (m)", "Test Location"],
+      ["Oud, L. (Lidewij) (v)", "Test Location"],
+      ["Oud, M. (Marijke) (v)", "Test Location"],
       ["De Vries, J. (Johan) (m)", "Test Location"],
-      ["Van der Weijden, H. (Henk) (m)", "Test Location"],
       ["Van der Weijden, B. (Berta) (v)", "Test Location"],
+      ["Van der Weijden, H. (Henk) (m)", "Test Location"],
     ]);
 
     // Check if the link to the list details page works

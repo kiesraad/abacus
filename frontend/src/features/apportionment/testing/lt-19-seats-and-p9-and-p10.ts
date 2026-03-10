@@ -1086,6 +1086,9 @@ export const candidate_nomination: CandidateNomination = {
       last_name: "Bakker",
       locality: "Test Location",
       gender: "Male",
+      country_code: "BE",
+      list_number: 2,
+      list_name: "Political Group B",
     },
     {
       number: 2,
@@ -1095,14 +1098,8 @@ export const candidate_nomination: CandidateNomination = {
       last_name: "Es",
       locality: "Test Location",
       gender: "Male",
-    },
-    {
-      number: 1,
-      initials: "T.",
-      first_name: "Tjolk",
-      last_name: "Hekking",
-      locality: "Test Location",
-      gender: "Male",
+      list_number: 5,
+      list_name: "Political Group E",
     },
     {
       number: 2,
@@ -1111,6 +1108,18 @@ export const candidate_nomination: CandidateNomination = {
       last_name: "Hekking",
       locality: "Test Location",
       gender: "Female",
+      list_number: 4,
+      list_name: "Political Group D",
+    },
+    {
+      number: 1,
+      initials: "T.",
+      first_name: "Tjolk",
+      last_name: "Hekking",
+      locality: "Test Location",
+      gender: "Male",
+      list_number: 4,
+      list_name: "Political Group D",
     },
     {
       number: 1,
@@ -1119,6 +1128,8 @@ export const candidate_nomination: CandidateNomination = {
       last_name: "Jacobse",
       locality: "Test Location",
       gender: "Male",
+      list_number: 5,
+      list_name: "Political Group E",
     },
     {
       number: 4,
@@ -1127,6 +1138,8 @@ export const candidate_nomination: CandidateNomination = {
       last_name: "Jansen",
       locality: "Test Location",
       gender: "X",
+      list_number: 1,
+      list_name: "Political Group A",
     },
     {
       number: 4,
@@ -1135,6 +1148,8 @@ export const candidate_nomination: CandidateNomination = {
       last_name: "Kloosterboer",
       locality: "Test Location",
       gender: "Male",
+      list_number: 2,
+      list_name: "Political Group B",
     },
     {
       number: 2,
@@ -1143,14 +1158,8 @@ export const candidate_nomination: CandidateNomination = {
       last_name: "Koster",
       locality: "Test Location",
       gender: "Female",
-    },
-    {
-      number: 1,
-      initials: "L.",
-      first_name: "Lidewij",
-      last_name: "Oud",
-      locality: "Test Location",
-      gender: "Female",
+      list_number: 3,
+      list_name: "Political Group C",
     },
     {
       number: 2,
@@ -1159,6 +1168,18 @@ export const candidate_nomination: CandidateNomination = {
       last_name: "Oud",
       locality: "Test Location",
       gender: "Male",
+      list_number: 1,
+      list_name: "Political Group A",
+    },
+    {
+      number: 1,
+      initials: "L.",
+      first_name: "Lidewij",
+      last_name: "Oud",
+      locality: "Test Location",
+      gender: "Female",
+      list_number: 1,
+      list_name: "Political Group A",
     },
     {
       number: 3,
@@ -1167,6 +1188,8 @@ export const candidate_nomination: CandidateNomination = {
       last_name: "Oud",
       locality: "Test Location",
       gender: "Female",
+      list_number: 1,
+      list_name: "Political Group A",
     },
     {
       number: 2,
@@ -1174,6 +1197,8 @@ export const candidate_nomination: CandidateNomination = {
       last_name: "Po",
       locality: "Test Location",
       gender: "X",
+      list_number: 2,
+      list_name: "Political Group B",
     },
     {
       number: 1,
@@ -1182,6 +1207,8 @@ export const candidate_nomination: CandidateNomination = {
       last_name: "Smit",
       locality: "Test Location",
       gender: "Male",
+      list_number: 3,
+      list_name: "Political Group C",
     },
     {
       number: 3,
@@ -1191,6 +1218,8 @@ export const candidate_nomination: CandidateNomination = {
       last_name: "Vries",
       locality: "Test Location",
       gender: "Male",
+      list_number: 2,
+      list_name: "Political Group B",
     },
     {
       number: 5,
@@ -1200,6 +1229,8 @@ export const candidate_nomination: CandidateNomination = {
       last_name: "Weijden",
       locality: "Test Location",
       gender: "Male",
+      list_number: 1,
+      list_name: "Political Group A",
     },
   ],
   list_candidate_nomination: [
@@ -1306,6 +1337,7 @@ export const candidate_nomination: CandidateNomination = {
           last_name: "Bakker",
           locality: "Test Location",
           gender: "Male",
+          country_code: "BE",
         },
         {
           number: 3,
@@ -1597,6 +1629,7 @@ export const election: ElectionWithPoliticalGroups = {
           last_name: "Bakker",
           locality: "Test Location",
           gender: "Male",
+          country_code: "BE",
         },
         {
           number: 2,

@@ -16,7 +16,7 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
     api::middleware::authentication::{
-        IncompleteUser, RouteAuthorization, SECURE_COOKIES, SESSION_COOKIE_NAME, SESSION_LIFE_TIME,
+        RouteAuthorization, SECURE_COOKIES, SESSION_COOKIE_NAME, SESSION_LIFE_TIME,
         error::AuthenticationError,
     },
     domain::role::Role,
@@ -130,7 +130,7 @@ pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::default()
         .routes(routes!(login).public())
         .routes(routes!(account).authorize(ALL_ROLES))
-        .routes(routes!(account_update).authorize(ALL_ROLES))
+        .routes(routes!(account_update).allow_setup_user())
         .routes(routes!(initialised).public())
         .routes(routes!(create_first_admin).public())
         .routes(routes!(admin_exists).public())
@@ -300,7 +300,7 @@ async fn account(user: Option<User>) -> Result<impl IntoResponse, APIError> {
   ),
 )]
 async fn account_update(
-    IncompleteUser(user): IncompleteUser,
+    user: User,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Json(account): Json<AccountUpdateRequest>,

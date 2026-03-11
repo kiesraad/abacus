@@ -51,6 +51,35 @@ async fn test_route_authorized_wrong_role(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+async fn test_route_authorized_incomplete_user(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    let admin_cookie = admin_login(&addr).await;
+    let coordinator_cookie = coordinator_login(&addr).await;
+
+    let client = reqwest::Client::new();
+
+    // Set a temporary password for the coordinator, which makes the account incomplete
+    let response = client
+        .put(format!("http://{addr}/api/users/3"))
+        .header("cookie", admin_cookie)
+        .header("content-type", "application/json")
+        .json(&serde_json::json!({ "temp_password": "Coordinator1Password01" }))
+        .send()
+        .await
+        .unwrap();
+    assert_eq!(response.status(), StatusCode::OK);
+
+    let url = format!("http://{addr}/api/users");
+    let response = client
+        .get(&url)
+        .header("cookie", coordinator_cookie)
+        .send()
+        .await
+        .unwrap();
+    assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
 async fn test_route_incomplete_user(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = coordinator_login(&addr).await;

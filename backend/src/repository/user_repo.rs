@@ -106,6 +106,12 @@ impl User {
             created_at: Utc::now(),
         }
     }
+
+    #[cfg(test)]
+    pub fn with_needs_password_change(mut self, needs_password_change: bool) -> Self {
+        self.needs_password_change = needs_password_change;
+        self
+    }
 }
 
 /// Authenticate a user by their username and password, returns a user instance on success or an error

@@ -1,6 +1,6 @@
 use chrono::TimeDelta;
 pub(crate) use middleware::*;
-pub use role::{IncompleteUser, RouteAuthorization};
+pub use role::RouteAuthorization;
 
 pub mod error;
 mod middleware;

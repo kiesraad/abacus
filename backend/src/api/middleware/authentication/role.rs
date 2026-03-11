@@ -9,6 +9,7 @@ use axum::{
     http::request::Parts,
     response::{IntoResponse, Response},
 };
+use strum::VariantArray;
 use tower::{Layer, Service};
 use utoipa::openapi::security::SecurityRequirement;
 use utoipa_axum::router::UtoipaMethodRouter;
@@ -22,6 +23,7 @@ pub trait RouteAuthorization<S>
 where
     S: Send + Sync + Clone + 'static,
 {
+    fn allow_setup_user(self) -> UtoipaMethodRouter<S>;
     fn authorize(self, roles: &[Role]) -> UtoipaMethodRouter<S>;
     fn public(self) -> UtoipaMethodRouter<S>;
 }
@@ -30,23 +32,12 @@ impl<S> RouteAuthorization<S> for UtoipaMethodRouter<S>
 where
     S: Send + Sync + Clone + 'static,
 {
+    fn allow_setup_user(self) -> UtoipaMethodRouter<S> {
+        authorize_impl(self, Role::VARIANTS, false)
+    }
+
     fn authorize(self, roles: &[Role]) -> UtoipaMethodRouter<S> {
-        let (schemas, mut paths, method_router) = self;
-
-        let scopes: Vec<String> = roles.iter().map(|r| r.to_string()).collect();
-        let security_req = SecurityRequirement::new(super::SECURITY_SCHEME_NAME, scopes.clone());
-        let extra = scopes.join(", ");
-
-        for_each_operation(&mut paths, |operation| {
-            operation.security = Some(vec![security_req.clone()]);
-            operation.summary = Some(match &operation.summary {
-                Some(existing) => format!("{} ({})", existing, extra),
-                None => extra.clone(),
-            });
-        });
-
-        // Add the middleware layer to the method router
-        (schemas, paths, method_router.layer(authorize_roles(roles)))
+        authorize_impl(self, roles, true)
     }
 
     fn public(self) -> UtoipaMethodRouter<S> {
@@ -67,6 +58,36 @@ where
     }
 }
 
+fn authorize_impl<S>(
+    router: UtoipaMethodRouter<S>,
+    roles: &[Role],
+    is_complete_user: bool,
+) -> UtoipaMethodRouter<S>
+where
+    S: Send + Sync + Clone + 'static,
+{
+    let (schemas, mut paths, method_router) = router;
+
+    let scopes: Vec<String> = roles.iter().map(|r| r.to_string()).collect();
+    let security_req = SecurityRequirement::new(super::SECURITY_SCHEME_NAME, scopes.clone());
+    let extra = scopes.join(", ");
+
+    for_each_operation(&mut paths, |operation| {
+        operation.security = Some(vec![security_req.clone()]);
+        operation.summary = Some(match &operation.summary {
+            Some(existing) => format!("{} ({})", existing, extra),
+            None => extra.clone(),
+        });
+    });
+
+    // Add the middleware layer to the method router
+    (
+        schemas,
+        paths,
+        method_router.layer(authorize_roles(roles, is_complete_user)),
+    )
+}
+
 fn for_each_operation(paths: &mut Paths, f: impl Fn(&mut Operation)) {
     for path_item in paths.paths.values_mut() {
         for operation in [
@@ -84,15 +105,17 @@ fn for_each_operation(paths: &mut Paths, f: impl Fn(&mut Operation)) {
     }
 }
 
-pub fn authorize_roles(roles: &[Role]) -> RouteAuthorizationLayer {
+pub fn authorize_roles(roles: &[Role], is_complete_user: bool) -> RouteAuthorizationLayer {
     RouteAuthorizationLayer {
         roles: roles.to_vec(),
+        is_complete_user,
     }
 }
 
 #[derive(Clone)]
 pub struct RouteAuthorizationLayer {
     roles: Vec<Role>,
+    is_complete_user: bool,
 }
 
 impl<S> Layer<S> for RouteAuthorizationLayer {
@@ -101,6 +124,7 @@ impl<S> Layer<S> for RouteAuthorizationLayer {
     fn layer(&self, inner: S) -> Self::Service {
         RouteAuthorizationService {
             roles: self.roles.clone(),
+            is_complete_user: self.is_complete_user,
             inner,
         }
     }
@@ -109,6 +133,8 @@ impl<S> Layer<S> for RouteAuthorizationLayer {
 #[derive(Clone)]
 pub struct RouteAuthorizationService<S> {
     roles: Vec<Role>,
+    is_complete_user: bool,
+
     inner: S,
 }
 
@@ -127,46 +153,39 @@ where
 
     fn call(&mut self, request: Request) -> Self::Future {
         let roles = self.roles.clone();
+        let is_complete_user = self.is_complete_user;
         let clone = self.inner.clone();
 
         // https://docs.rs/tower/latest/tower/trait.Service.html#be-careful-when-cloning-inner-services
         let mut inner = std::mem::replace(&mut self.inner, clone);
 
         Box::pin(async move {
-            let user = request.extensions().get::<User>();
+            // Check if user exists
+            let Some(user) = request.extensions().get::<User>() else {
+                return Ok(APIError::from(AuthenticationError::Unauthenticated).into_response());
+            };
 
-            match user {
-                None => Ok(APIError::from(AuthenticationError::Unauthenticated).into_response()),
-                Some(user) if !roles.contains(&user.role()) => {
-                    Ok(APIError::from(AuthenticationError::Forbidden).into_response())
+            // Verify if user is setup or not, according to given is_complete_user
+            let is_user_setup = user.fullname().is_some() && !user.needs_password_change();
+            match (is_user_setup, is_complete_user) {
+                (true, false) => {
+                    return Ok(
+                        APIError::from(AuthenticationError::UserAlreadySetup).into_response()
+                    );
                 }
-                _ => inner.call(request).await,
+                (false, true) => {
+                    return Ok(APIError::from(AuthenticationError::Unauthenticated).into_response());
+                }
+                _ => {}
             }
+
+            // Check for role
+            if !roles.contains(&user.role()) {
+                return Ok(APIError::from(AuthenticationError::Forbidden).into_response());
+            }
+
+            inner.call(request).await
         })
-    }
-}
-
-/// A user with potentially no fullname or needs_password_change=true
-pub struct IncompleteUser(pub User);
-
-/// Implement the FromRequestParts trait for IncompleteUser,
-/// for endpoints that are needed to fully set up the account
-impl<S> FromRequestParts<S> for IncompleteUser
-where
-    S: Send + Sync,
-{
-    type Rejection = APIError;
-
-    async fn from_request_parts(parts: &mut Parts, _state: &S) -> Result<Self, Self::Rejection> {
-        let Some(user) = parts.extensions.get::<User>() else {
-            return Err(AuthenticationError::Unauthenticated.into());
-        };
-
-        if user.fullname().is_some() && !user.needs_password_change() {
-            return Err(AuthenticationError::UserAlreadySetup.into());
-        }
-
-        Ok(IncompleteUser(user.clone()))
     }
 }
 
@@ -181,10 +200,6 @@ where
         let Some(user) = parts.extensions.get::<User>() else {
             return Err(AuthenticationError::Unauthenticated.into());
         };
-
-        if user.fullname().is_none() || user.needs_password_change() {
-            return Err(AuthenticationError::Unauthenticated.into());
-        }
 
         Ok(user.clone())
     }
@@ -304,6 +319,43 @@ mod tests {
             let (_, _, mut method_router) = router.authorize(roles);
 
             let request = Request::builder().body(Body::empty()).unwrap();
+
+            let response = ServiceExt::<Request<Body>>::ready(&mut method_router)
+                .await
+                .unwrap()
+                .call(request)
+                .await
+                .unwrap();
+            assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
+        }
+
+        #[tokio::test]
+        async fn allow_incomplete_user_for_allow_setup_user() {
+            let router = build_method_router(Some("Test endpoint"));
+            let (_, _, mut method_router) = router.allow_setup_user();
+
+            let user = User::test_user(Role::TypistGSB, 2.into()).with_needs_password_change(true);
+            let mut request = Request::builder().body(Body::empty()).unwrap();
+            request.extensions_mut().insert(user);
+
+            let response = ServiceExt::<Request<Body>>::ready(&mut method_router)
+                .await
+                .unwrap()
+                .call(request)
+                .await
+                .unwrap();
+            assert_eq!(response.status(), StatusCode::OK);
+        }
+
+        #[tokio::test]
+        async fn reject_incomplete_user() {
+            let router = build_method_router(Some("Test endpoint"));
+            let roles = &[Role::Administrator];
+            let (_, _, mut method_router) = router.authorize(roles);
+
+            let user = User::test_user(Role::TypistGSB, 2.into()).with_needs_password_change(true);
+            let mut request = Request::builder().body(Body::empty()).unwrap();
+            request.extensions_mut().insert(user);
 
             let response = ServiceExt::<Request<Body>>::ready(&mut method_router)
                 .await

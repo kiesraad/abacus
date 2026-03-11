@@ -1,8 +1,14 @@
 use sqlx::{Connection, SqliteConnection};
 
 use crate::{
-    domain::polling_station::{PollingStationForSession, PollingStationId},
-    repository::{data_entry_repo, polling_station_repo},
+    api::data_entry::ElectionStatusResponseEntry,
+    domain::{
+        committee_session::CommitteeSession,
+        data_entry::DataEntryStatusWithSource,
+        election::{CommitteeCategory, Election},
+        polling_station::{PollingStationForSession, PollingStationId},
+    },
+    repository::{data_entry_repo, polling_station_repo, sub_committee_repo},
 };
 
 #[derive(Debug)]
@@ -38,6 +44,46 @@ pub async fn create_empty(
 
     tx.commit().await?;
     Ok(polling_station)
+}
+
+fn map_to_response_entry(entry: DataEntryStatusWithSource) -> ElectionStatusResponseEntry {
+    let status = &entry.status;
+    ElectionStatusResponseEntry {
+        source: entry.source,
+        status: status.status_name(),
+        first_entry_user_id: status.get_first_entry_user_id(),
+        second_entry_user_id: status.get_second_entry_user_id(),
+        first_entry_progress: status.get_first_entry_progress(),
+        second_entry_progress: status.get_second_entry_progress(),
+        finished_at: status.finished_at().cloned(),
+        finalised_with_warnings: status.finalised_with_warnings().cloned(),
+    }
+}
+
+/// Get election statuses for the current committee session,
+/// picking the right data source based on committee category and session number.
+pub async fn election_statuses(
+    conn: &mut SqliteConnection,
+    election: &Election,
+    committee_session: &CommitteeSession,
+) -> Result<Vec<ElectionStatusResponseEntry>, DataEntryServiceError> {
+    let is_next_session = committee_session.is_next_session();
+    let entries = match (election.committee_category, is_next_session) {
+        (CommitteeCategory::GSB, false) => {
+            polling_station_repo::list_first_session_with_status(conn, committee_session.id).await?
+        }
+        (CommitteeCategory::GSB, true) => {
+            polling_station_repo::list_next_session_with_status(conn, committee_session.id).await?
+        }
+        (CommitteeCategory::CSB, false) => {
+            sub_committee_repo::list_first_session_with_status(conn, committee_session.id).await?
+        }
+        (CommitteeCategory::CSB, true) => {
+            unreachable!("CSB elections only have a single session")
+        }
+    };
+
+    Ok(entries.into_iter().map(map_to_response_entry).collect())
 }
 
 /// Create a data entry in the Definitive state with given results

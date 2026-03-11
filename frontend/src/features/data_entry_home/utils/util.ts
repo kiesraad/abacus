@@ -33,7 +33,9 @@ export function getPollingStationWithStatusList({
 }): PollingStationWithStatus[] {
   // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: TODO function should be refactored
   return pollingStations.flatMap((pollingStation: PollingStation) => {
-    const statusEntry = statuses.find((status) => status.polling_station_id === pollingStation.id);
+    const statusEntry = statuses.find(
+      (status) => status.source.type === "PollingStation" && status.source.id === pollingStation.id,
+    );
     const result: PollingStationWithStatus = {
       ...pollingStation,
       statusEntry,

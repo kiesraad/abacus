@@ -908,19 +908,19 @@ async fn data_entry_resolve_differences(
     Ok(Json(new_state.into()))
 }
 
-/// Election polling stations data entry statuses response
+/// Election data entry statuses response
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct ElectionStatusResponse {
     pub statuses: Vec<ElectionStatusResponseEntry>,
 }
 
-/// Election polling stations data entry statuses response
+/// Election data entry statuses response entry
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct ElectionStatusResponseEntry {
-    /// Polling station id
-    pub polling_station_id: PollingStationId,
+    /// Data entry source (polling station or sub committee)
+    pub source: DataEntrySource,
     /// Data entry status
     pub status: DataEntryStatusName,
     /// First entry user id
@@ -971,10 +971,17 @@ async fn election_status(
 ) -> Result<Json<ElectionStatusResponse>, APIError> {
     let mut conn = pool.acquire().await?;
 
+    let election = election_repo::get(&mut conn, election_id).await?;
     let current_committee_session =
         committee_session_repo::get_election_committee_session(&mut conn, election_id).await?;
 
-    let statuses = data_entry_repo::statuses(&mut conn, current_committee_session.id).await?;
+    let statuses =
+        crate::service::election_statuses(&mut conn, &election.into(), &current_committee_session)
+            .await
+            .map_err(|e| match e {
+                crate::service::DataEntryServiceError::DatabaseError(e) => APIError::from(e),
+            })?;
+
     Ok(Json(ElectionStatusResponse { statuses }))
 }
 

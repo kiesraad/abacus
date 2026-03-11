@@ -256,11 +256,11 @@ describe("Test PollingStationPicker", () => {
             {
               statuses: [
                 {
-                  polling_station_id: 1,
+                  source: { type: "PollingStation", id: 1, number: 1, name: "Stembureau 1" },
                   status: "first_entry_finalised",
                 },
                 {
-                  polling_station_id: 2,
+                  source: { type: "PollingStation", id: 2, number: 2, name: "Stembureau 2" },
                   status: "definitive",
                 },
               ],
@@ -324,7 +324,12 @@ describe("Test PollingStationPicker", () => {
       overrideOnce("get", "api/elections/1/status", 200, {
         statuses: [
           {
-            polling_station_id: testPollingStation.id,
+            source: {
+              type: "PollingStation",
+              id: testPollingStation.id,
+              number: testPollingStation.number,
+              name: testPollingStation.name,
+            },
             status: "first_entry_in_progress",
             first_entry_user_id: testUser.user_id + 1,
             first_entry_progress: 42,
@@ -352,19 +357,19 @@ describe("Test PollingStationPicker", () => {
             {
               statuses: [
                 {
-                  polling_station_id: 1,
+                  source: { type: "PollingStation", id: 1, number: 1, name: "Stembureau 1" },
                   status: "definitive",
                 },
                 {
-                  polling_station_id: 2,
+                  source: { type: "PollingStation", id: 2, number: 2, name: "Stembureau 2" },
                   status: "definitive",
                 },
                 {
-                  polling_station_id: 3,
+                  source: { type: "PollingStation", id: 3, number: 3, name: "Stembureau 3" },
                   status: "definitive",
                 },
                 {
-                  polling_station_id: 4,
+                  source: { type: "PollingStation", id: 4, number: 4, name: "Stembureau 4" },
                   status: "entries_different",
                 },
               ],
@@ -393,11 +398,11 @@ describe("Test PollingStationPicker", () => {
             {
               statuses: [
                 {
-                  polling_station_id: 1,
+                  source: { type: "PollingStation", id: 1, number: 1, name: "Stembureau 1" },
                   status: "first_entry_finalised",
                 },
                 {
-                  polling_station_id: 2,
+                  source: { type: "PollingStation", id: 2, number: 2, name: "Stembureau 2" },
                   status: "definitive",
                 },
               ],
@@ -429,20 +434,25 @@ describe("Test PollingStationPicker", () => {
           HttpResponse.json(
             {
               statuses: [
-                { polling_station_id: 1, status: "empty" },
+                { source: { type: "PollingStation", id: 1, number: 1, name: "Stembureau 1" }, status: "empty" },
                 {
-                  polling_station_id: 2,
+                  source: { type: "PollingStation", id: 2, number: 2, name: "Stembureau 2" },
                   status: "first_entry_in_progress",
                   first_entry_user_id: 1,
                   first_entry_progress: 42,
                 },
                 {
-                  polling_station_id: 3,
+                  source: { type: "PollingStation", id: 3, number: 3, name: "Stembureau 3" },
                   status: "first_entry_in_progress",
                   first_entry_user_id: 1,
                   first_entry_progress: 42,
                 },
-                { polling_station_id: 4, status: "definitive", first_entry_user_id: 1, second_entry_user_id: 2 },
+                {
+                  source: { type: "PollingStation", id: 4, number: 4, name: "Stembureau 4" },
+                  status: "definitive",
+                  first_entry_user_id: 1,
+                  second_entry_user_id: 2,
+                },
               ],
             } satisfies ElectionStatusResponse,
             { status: 200 },
@@ -470,7 +480,12 @@ describe("Test PollingStationPicker", () => {
             {
               statuses: [
                 {
-                  polling_station_id: testPollingStation.id,
+                  source: {
+                    type: "PollingStation",
+                    id: testPollingStation.id,
+                    number: testPollingStation.number,
+                    name: testPollingStation.name,
+                  },
                   status: "first_entry_in_progress",
                   first_entry_user_id: testUser.user_id + 1,
                   first_entry_progress: 42,
@@ -523,7 +538,12 @@ describe("Test PollingStationPicker", () => {
             {
               statuses: [
                 {
-                  polling_station_id: testPollingStation.id,
+                  source: {
+                    type: "PollingStation",
+                    id: testPollingStation.id,
+                    number: testPollingStation.number,
+                    name: testPollingStation.name,
+                  },
                   status: "first_entry_in_progress",
                   first_entry_user_id: testUser.user_id,
                   first_entry_progress: 42,
@@ -556,7 +576,7 @@ describe("Test PollingStationPicker", () => {
 
   describe("Polling station with data entry that has errors", () => {
     const hasErrors = statusResponseMock.statuses.find(({ status }) => status === "first_entry_has_errors");
-    const testPollingStation = pollingStationMockData.find(({ id }) => id === hasErrors!.polling_station_id)!;
+    const testPollingStation = pollingStationMockData.find(({ id }) => id === hasErrors!.source.id)!;
 
     beforeEach(() => {
       server.use(ElectionRequestHandler, ElectionStatusRequestHandler);
@@ -594,7 +614,12 @@ describe("Test PollingStationPicker", () => {
           {
             statuses: [
               {
-                polling_station_id: testPollingStation.id,
+                source: {
+                  type: "PollingStation",
+                  id: testPollingStation.id,
+                  number: testPollingStation.number,
+                  name: testPollingStation.name,
+                },
                 status: "first_entry_in_progress",
                 first_entry_user_id: testUser.user_id,
                 first_entry_progress: 42,
@@ -624,7 +649,12 @@ describe("Test PollingStationPicker", () => {
           {
             statuses: [
               {
-                polling_station_id: testPollingStation.id,
+                source: {
+                  type: "PollingStation",
+                  id: testPollingStation.id,
+                  number: testPollingStation.number,
+                  name: testPollingStation.name,
+                },
                 status: "first_entry_in_progress",
                 first_entry_user_id: testUser.user_id + 1,
               },

@@ -213,8 +213,8 @@ describe("ElectionStatusPage", () => {
         HttpResponse.json(
           {
             statuses: [
-              { polling_station_id: 1, status: "definitive" },
-              { polling_station_id: 2, status: "definitive" },
+              { source: { type: "PollingStation", id: 1, number: 1, name: "Stembureau 1" }, status: "definitive" },
+              { source: { type: "PollingStation", id: 2, number: 2, name: "Stembureau 2" }, status: "definitive" },
             ],
           } satisfies ElectionStatusResponse,
           { status: 200 },
@@ -241,8 +241,8 @@ describe("ElectionStatusPage", () => {
     vi.spyOn(useUser, "useUser").mockReturnValue(getAdminUser());
     overrideOnce("get", "/api/elections/1/status", 200, {
       statuses: [
-        { polling_station_id: 1, status: "definitive" },
-        { polling_station_id: 2, status: "definitive" },
+        { source: { type: "PollingStation", id: 1, number: 1, name: "Stembureau 1" }, status: "definitive" },
+        { source: { type: "PollingStation", id: 2, number: 2, name: "Stembureau 2" }, status: "definitive" },
       ],
     });
 
@@ -270,8 +270,8 @@ describe("ElectionStatusPage", () => {
         HttpResponse.json(
           {
             statuses: [
-              { polling_station_id: 1, status: "definitive" },
-              { polling_station_id: 2, status: "definitive" },
+              { source: { type: "PollingStation", id: 1, number: 1, name: "Stembureau 1" }, status: "definitive" },
+              { source: { type: "PollingStation", id: 2, number: 2, name: "Stembureau 2" }, status: "definitive" },
             ],
           } satisfies ElectionStatusResponse,
           { status: 200 },
@@ -363,8 +363,8 @@ describe("ElectionStatusPage", () => {
     );
     overrideOnce("get", "/api/elections/1/status", 200, {
       statuses: [
-        { polling_station_id: 1, status: "definitive" },
-        { polling_station_id: 2, status: "definitive" },
+        { source: { type: "PollingStation", id: 1, number: 1, name: "Stembureau 1" }, status: "definitive" },
+        { source: { type: "PollingStation", id: 2, number: 2, name: "Stembureau 2" }, status: "definitive" },
       ],
     });
 

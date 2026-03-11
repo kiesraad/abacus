@@ -2,7 +2,7 @@ import { useMemo } from "react";
 
 import type { PercentageAndColorClass, ProgressBarColorClass } from "@/components/ui/ProgressBar/ProgressBar";
 import { useUsers } from "@/hooks/user/useUsers";
-import type { DataEntryStatusName, ElectionStatusResponseEntry, PollingStation } from "@/types/generated/openapi";
+import type { DataEntryStatusName, ElectionStatusResponseEntry } from "@/types/generated/openapi";
 
 export const statusCategories = [
   "errors_and_warnings",
@@ -14,7 +14,8 @@ export const statusCategories = [
 
 export type StatusCategory = (typeof statusCategories)[number];
 
-export interface PollingStationWithStatusAndTypist extends PollingStation, Partial<ElectionStatusResponseEntry> {
+export interface StatusEntryWithTypist {
+  entry: ElectionStatusResponseEntry;
   typist?: string;
 }
 
@@ -53,14 +54,11 @@ function getTypist(status: ElectionStatusResponseEntry | undefined): number | un
 interface ElectionStatusData {
   progressBarData: PercentageAndColorClass[];
   categoryCounts: Record<StatusCategory, number>;
-  pollingStationWithStatusAndTypist: PollingStationWithStatusAndTypist[];
+  statusEntriesWithTypist: StatusEntryWithTypist[];
   tableCategories: StatusCategory[];
 }
 
-export function useElectionStatus(
-  statuses: ElectionStatusResponseEntry[],
-  pollingStations: PollingStation[],
-): ElectionStatusData {
+export function useElectionStatus(statuses: ElectionStatusResponseEntry[]): ElectionStatusData {
   const { getName } = useUsers();
 
   const categoryCounts: Record<StatusCategory, number> = useMemo(
@@ -88,21 +86,21 @@ export function useElectionStatus(
     return data;
   }, [statuses, categoryCounts]);
 
-  const pollingStationWithStatusAndTypist = pollingStations.map((ps) => {
-    const status = statuses.find((element) => element.polling_station_id === ps.id);
-    return {
-      ...ps,
-      ...status,
-      typist: getName(getTypist(status)),
-    } satisfies PollingStationWithStatusAndTypist;
-  });
+  const statusEntriesWithTypist = useMemo(
+    () =>
+      statuses.map((status) => ({
+        entry: status,
+        typist: getName(getTypist(status)),
+      })),
+    [statuses, getName],
+  );
 
   const tableCategories = statusCategories.filter((cat) => categoryCounts[cat] !== 0);
 
   return {
     progressBarData,
     categoryCounts,
-    pollingStationWithStatusAndTypist,
+    statusEntriesWithTypist,
     tableCategories,
   };
 }

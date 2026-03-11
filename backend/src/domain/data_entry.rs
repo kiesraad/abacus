@@ -92,10 +92,15 @@ pub enum DataEntrySource {
 
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
 pub struct PollingStationSource {
-    id: PollingStationId,
+    pub id: PollingStationId,
     #[schema(value_type = u32)]
-    number: PollingStationNumber,
-    name: String,
+    pub number: PollingStationNumber,
+    pub name: String,
+}
+
+pub struct DataEntryStatusWithSource {
+    pub source: DataEntrySource,
+    pub status: DataEntryStatus,
 }
 
 impl From<PollingStation> for DataEntrySource {

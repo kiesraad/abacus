@@ -5547,7 +5547,7 @@
       },
       "ElectionStatusResponse": {
         "type": "object",
-        "description": "Election polling stations data entry statuses response",
+        "description": "Election data entry statuses response",
         "required": [
           "statuses"
         ],
@@ -5563,9 +5563,9 @@
       },
       "ElectionStatusResponseEntry": {
         "type": "object",
-        "description": "Election polling stations data entry statuses response",
+        "description": "Election data entry statuses response entry",
         "required": [
-          "polling_station_id",
+          "source",
           "status"
         ],
         "properties": {
@@ -5589,10 +5589,6 @@
             "description": "First entry user id",
             "minimum": 0
           },
-          "polling_station_id": {
-            "$ref": "#/components/schemas/PollingStationId",
-            "description": "Polling station id"
-          },
           "second_entry_progress": {
             "type": "integer",
             "format": "int32",
@@ -5604,6 +5600,10 @@
             "format": "int32",
             "description": "Second entry user id",
             "minimum": 0
+          },
+          "source": {
+            "$ref": "#/components/schemas/DataEntrySource",
+            "description": "Data entry source (polling station or sub committee)"
           },
           "status": {
             "$ref": "#/components/schemas/DataEntryStatusName",

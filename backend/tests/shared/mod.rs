@@ -201,7 +201,8 @@ async fn check_data_entry_status_is_definitive(
     assert_eq!(
         statuses
             .iter()
-            .find(|s| s["polling_station_id"] == polling_station_id)
+            .find(|s| s["source"]["type"] == "PollingStation"
+                && s["source"]["id"] == polling_station_id)
             .unwrap()["status"],
         "definitive"
     );
@@ -362,7 +363,7 @@ pub async fn get_statuses(
         .iter()
         .fold(BTreeMap::new(), |mut acc, entry| {
             acc.insert(
-                u32::try_from(entry["polling_station_id"].as_u64().unwrap()).unwrap(),
+                u32::try_from(entry["source"]["id"].as_u64().unwrap()).unwrap(),
                 entry.clone(),
             );
             acc

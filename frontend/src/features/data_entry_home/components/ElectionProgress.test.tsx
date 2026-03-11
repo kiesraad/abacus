@@ -10,19 +10,19 @@ describe("ElectionProgress", () => {
     vi.spyOn(useElectionStatus, "useElectionStatus").mockReturnValue({
       statuses: [
         {
-          polling_station_id: 1,
+          source: { type: "PollingStation", id: 1, number: 1, name: "Stembureau 1" },
           status: "empty",
         },
         {
-          polling_station_id: 2,
+          source: { type: "PollingStation", id: 2, number: 2, name: "Stembureau 2" },
           status: "first_entry_finalised",
         },
         {
-          polling_station_id: 3,
+          source: { type: "PollingStation", id: 3, number: 3, name: "Stembureau 3" },
           status: "definitive",
         },
         {
-          polling_station_id: 4,
+          source: { type: "PollingStation", id: 4, number: 4, name: "Stembureau 4" },
           status: "first_entry_in_progress",
         },
       ],

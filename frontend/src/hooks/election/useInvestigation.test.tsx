@@ -131,7 +131,12 @@ describe("useInvestigations", () => {
       ]),
     );
     overrideOnce("get", "/api/elections/1/status", 200, {
-      statuses: [{ polling_station_id: 1, status: "second_entry_in_progress" }],
+      statuses: [
+        {
+          source: { type: "PollingStation", id: 1, number: 1, name: "Stembureau 1" },
+          status: "second_entry_in_progress",
+        },
+      ],
     } satisfies ElectionStatusResponse);
 
     const result = renderUseInvestigations();

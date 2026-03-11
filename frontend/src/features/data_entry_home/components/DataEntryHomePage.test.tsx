@@ -71,8 +71,8 @@ describe("DataEntryHomePage", () => {
   test("Alert visible when completed", async () => {
     overrideOnce("get", "/api/elections/1/status", 200, {
       statuses: [
-        { polling_station_id: 1, status: "definitive" },
-        { polling_station_id: 2, status: "definitive" },
+        { source: { type: "PollingStation", id: 1, number: 1, name: "Stembureau 1" }, status: "definitive" },
+        { source: { type: "PollingStation", id: 2, number: 2, name: "Stembureau 2" }, status: "definitive" },
       ],
     });
 
@@ -84,8 +84,12 @@ describe("DataEntryHomePage", () => {
   test("Resume input visible when some are uncompleted", async () => {
     overrideOnce("get", "/api/elections/1/status", 200, {
       statuses: [
-        { polling_station_id: 1, status: "first_entry_in_progress", first_entry_user_id: getTypistUser().user_id },
-        { polling_station_id: 2, status: "empty" },
+        {
+          source: { type: "PollingStation", id: 1, number: 1, name: "Stembureau 1" },
+          status: "first_entry_in_progress",
+          first_entry_user_id: getTypistUser().user_id,
+        },
+        { source: { type: "PollingStation", id: 2, number: 2, name: "Stembureau 2" }, status: "empty" },
       ],
     } satisfies ElectionStatusResponse);
 
@@ -100,8 +104,8 @@ describe("DataEntryHomePage", () => {
   test("Resume input invisible when none are unfinished", async () => {
     overrideOnce("get", "/api/elections/1/status", 200, {
       statuses: [
-        { polling_station_id: 1, status: "empty" },
-        { polling_station_id: 2, status: "definitive" },
+        { source: { type: "PollingStation", id: 1, number: 1, name: "Stembureau 1" }, status: "empty" },
+        { source: { type: "PollingStation", id: 2, number: 2, name: "Stembureau 2" }, status: "definitive" },
       ],
     });
 

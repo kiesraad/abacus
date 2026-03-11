@@ -9,13 +9,14 @@ use cookie::{Cookie, SameSite};
 use hyper::StatusCode;
 use serde::{Deserialize, Serialize};
 use sqlx::SqlitePool;
+use strum::VariantArray;
 use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
     api::middleware::authentication::{
-        IncompleteUser, SECURE_COOKIES, SESSION_COOKIE_NAME, SESSION_LIFE_TIME,
+        IncompleteUser, RouteAuthorization, SECURE_COOKIES, SESSION_COOKIE_NAME, SESSION_LIFE_TIME,
         error::AuthenticationError,
     },
     domain::role::Role,
@@ -124,14 +125,16 @@ impl AsAuditEvent for UserDeletedAuditData {
 }
 
 pub fn router() -> OpenApiRouter<AppState> {
+    const ALL_ROLES: &[Role] = Role::VARIANTS;
+
     OpenApiRouter::default()
-        .routes(routes!(login))
-        .routes(routes!(account))
-        .routes(routes!(account_update))
-        .routes(routes!(initialised))
-        .routes(routes!(create_first_admin))
-        .routes(routes!(admin_exists))
-        .routes(routes!(logout))
+        .routes(routes!(login).public())
+        .routes(routes!(account).authorize(ALL_ROLES))
+        .routes(routes!(account_update).authorize(ALL_ROLES))
+        .routes(routes!(initialised).public())
+        .routes(routes!(create_first_admin).public())
+        .routes(routes!(admin_exists).public())
+        .routes(routes!(logout).public())
 }
 
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
@@ -278,7 +281,6 @@ pub struct AccountUpdateRequest {
       (status = 401, description = "Invalid user session", body = ErrorResponse),
       (status = 500, description = "Internal server error", body = ErrorResponse),
   ),
-  security(("cookie_auth" = ["administrator", "coordinator_gsb", "typist_gsb"])),
 )]
 async fn account(user: Option<User>) -> Result<impl IntoResponse, APIError> {
     let user = user.ok_or(AuthenticationError::UserNotFound)?;
@@ -296,7 +298,6 @@ async fn account(user: Option<User>) -> Result<impl IntoResponse, APIError> {
       (status = 400, description = "Bad request", body = ErrorResponse),
       (status = 500, description = "Internal server error", body = ErrorResponse),
   ),
-  security(("cookie_auth" = ["administrator", "coordinator_gsb", "typist_gsb"])),
 )]
 async fn account_update(
     IncompleteUser(user): IncompleteUser,

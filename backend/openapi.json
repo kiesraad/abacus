@@ -12,7 +12,7 @@
   "paths": {
     "/api/account": {
       "get": {
-        "summary": "Get current logged-in user endpoint (administrator, coordinator_gsb, typist_gsb)",
+        "summary": "Get current logged-in user endpoint (administrator, coordinator_gsb, coordinator_csb, typist_gsb, typist_csb)",
         "operationId": "account",
         "responses": {
           "200": {
@@ -51,13 +51,15 @@
             "cookie_auth": [
               "administrator",
               "coordinator_gsb",
-              "typist_gsb"
+              "coordinator_csb",
+              "typist_gsb",
+              "typist_csb"
             ]
           }
         ]
       },
       "put": {
-        "summary": "Update the user's account with a new password and optionally new fullname (administrator, coordinator_gsb, typist_gsb)",
+        "summary": "Update the user's account with a new password and optionally new fullname (administrator, coordinator_gsb, coordinator_csb, typist_gsb, typist_csb)",
         "operationId": "account_update",
         "requestBody": {
           "content": {
@@ -106,7 +108,9 @@
             "cookie_auth": [
               "administrator",
               "coordinator_gsb",
-              "typist_gsb"
+              "coordinator_csb",
+              "typist_gsb",
+              "typist_csb"
             ]
           }
         ]
@@ -114,7 +118,7 @@
     },
     "/api/elections": {
       "get": {
-        "summary": "Get a list of all elections, without their candidate lists and\na list of the current committee session for each election (administrator, coordinator_gsb, typist_gsb)",
+        "summary": "Get a list of all elections, without their candidate lists and\na list of the current committee session for each election (administrator, coordinator_gsb, coordinator_csb, typist_gsb, typist_csb)",
         "operationId": "election_list",
         "responses": {
           "200": {
@@ -153,7 +157,9 @@
             "cookie_auth": [
               "administrator",
               "coordinator_gsb",
-              "typist_gsb"
+              "coordinator_csb",
+              "typist_gsb",
+              "typist_csb"
             ]
           }
         ]
@@ -311,7 +317,7 @@
     },
     "/api/elections/{election_id}": {
       "get": {
-        "summary": "Get election details including the election's candidate list (political groups),\nits polling stations and the current committee session and its investigations (administrator, coordinator_gsb, typist_gsb)",
+        "summary": "Get election details including the election's candidate list (political groups),\nits polling stations and the current committee session and its investigations (administrator, coordinator_gsb, coordinator_csb, typist_gsb, typist_csb)",
         "operationId": "election_details",
         "parameters": [
           {
@@ -371,7 +377,9 @@
             "cookie_auth": [
               "administrator",
               "coordinator_gsb",
-              "typist_gsb"
+              "coordinator_csb",
+              "typist_gsb",
+              "typist_csb"
             ]
           }
         ]
@@ -1996,7 +2004,7 @@
     },
     "/api/elections/{election_id}/status": {
       "get": {
-        "summary": "Get election polling stations data entry statuses (administrator, coordinator_gsb, typist_gsb)",
+        "summary": "Get election polling stations data entry statuses (administrator, coordinator_gsb, coordinator_csb, typist_gsb, typist_csb)",
         "operationId": "election_status",
         "parameters": [
           {
@@ -2056,7 +2064,9 @@
             "cookie_auth": [
               "administrator",
               "coordinator_gsb",
-              "typist_gsb"
+              "coordinator_csb",
+              "typist_gsb",
+              "typist_csb"
             ]
           }
         ]
@@ -2154,6 +2164,9 @@
     },
     "/api/generate_test_election": {
       "post": {
+        "tags": [
+          "public"
+        ],
         "operationId": "generate_election_handler",
         "requestBody": {
           "content": {
@@ -2184,6 +2197,9 @@
     },
     "/api/initialise/admin-exists": {
       "get": {
+        "tags": [
+          "public"
+        ],
         "operationId": "admin_exists",
         "responses": {
           "204": {
@@ -2224,6 +2240,9 @@
     },
     "/api/initialise/first-admin": {
       "post": {
+        "tags": [
+          "public"
+        ],
         "summary": "Create the first admin user, only allowed if no users exist yet",
         "operationId": "create_first_admin",
         "requestBody": {
@@ -2282,6 +2301,9 @@
     },
     "/api/initialised": {
       "get": {
+        "tags": [
+          "public"
+        ],
         "summary": "Check whether the application is initialised (an admin user exists + has logged in at least once)",
         "operationId": "initialised",
         "responses": {
@@ -2500,6 +2522,9 @@
     },
     "/api/login": {
       "post": {
+        "tags": [
+          "public"
+        ],
         "summary": "Login endpoint, authenticates a user and creates a new session + session cookie",
         "operationId": "login",
         "requestBody": {
@@ -2558,6 +2583,9 @@
     },
     "/api/logout": {
       "post": {
+        "tags": [
+          "public"
+        ],
         "summary": "Logout endpoint, deletes the session cookie",
         "operationId": "logout",
         "responses": {

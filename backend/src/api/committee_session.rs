@@ -10,7 +10,7 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
-    api::middleware::authentication::CoordinatorGSB,
+    api::middleware::authentication::RouteAuthorization,
     domain::{
         committee_session::{
             CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionError,
@@ -19,6 +19,7 @@ use crate::{
         },
         committee_session_status::CommitteeSessionStatus,
         election::ElectionId,
+        role::Role,
         validate::DataError,
     },
     error::ErrorReference,
@@ -26,6 +27,7 @@ use crate::{
     repository::{
         committee_session_repo::{create, delete, get, get_election_committee_session, update},
         election_repo, investigation_repo,
+        user_repo::User,
     },
     service::{
         CommitteeSessionAuditData, CommitteeSessionUpdatedAuditData,
@@ -48,12 +50,16 @@ impl AsAuditEvent for CommitteeSessionDeletedAuditData {
 }
 
 pub fn router() -> OpenApiRouter<AppState> {
+    use Role::*;
+
+    const ALLOWED_ROLES: &[Role] = &[CoordinatorGSB];
+
     OpenApiRouter::default()
-        .routes(routes!(committee_session_create))
-        .routes(routes!(committee_session_delete))
-        .routes(routes!(committee_session_update))
-        .routes(routes!(committee_session_status_change))
-        .routes(routes!(committee_session_investigations))
+        .routes(routes!(committee_session_create).authorize(ALLOWED_ROLES))
+        .routes(routes!(committee_session_delete).authorize(ALLOWED_ROLES))
+        .routes(routes!(committee_session_update).authorize(ALLOWED_ROLES))
+        .routes(routes!(committee_session_status_change).authorize(ALLOWED_ROLES))
+        .routes(routes!(committee_session_investigations).authorize(ALLOWED_ROLES))
 }
 
 pub async fn validate_committee_session_is_current_committee_session(
@@ -105,10 +111,9 @@ pub async fn create_committee_session(
     params(
         ("election_id" = ElectionId, description = "Election database id"),
     ),
-    security(("cookie_auth" = ["coordinator_gsb"])),
 )]
 pub async fn committee_session_create(
-    _user: CoordinatorGSB,
+    _user: User,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Path(election_id): Path<ElectionId>,
@@ -153,10 +158,9 @@ pub async fn committee_session_create(
         ("election_id" = ElectionId, description = "Election database id"),
         ("committee_session_id" = CommitteeSessionId, description = "Committee session database id"),
     ),
-    security(("cookie_auth" = ["coordinator_gsb"])),
 )]
 pub async fn committee_session_delete(
-    _user: CoordinatorGSB,
+    _user: User,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Path((election_id, committee_session_id)): Path<(ElectionId, CommitteeSessionId)>,
@@ -224,10 +228,9 @@ pub async fn committee_session_delete(
         ("election_id" = ElectionId, description = "Election database id"),
         ("committee_session_id" = CommitteeSessionId, description = "Committee session database id"),
     ),
-    security(("cookie_auth" = ["coordinator_gsb"])),
 )]
 pub async fn committee_session_update(
-    _user: CoordinatorGSB,
+    _user: User,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Path((election_id, committee_session_id)): Path<(ElectionId, CommitteeSessionId)>,
@@ -291,10 +294,9 @@ pub async fn committee_session_update(
         ("election_id" = ElectionId, description = "Election database id"),
         ("committee_session_id" = CommitteeSessionId, description = "Committee session database id"),
     ),
-    security(("cookie_auth" = ["coordinator_gsb"])),
 )]
 pub async fn committee_session_status_change(
-    _user: CoordinatorGSB,
+    _user: User,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Path((election_id, committee_session_id)): Path<(ElectionId, CommitteeSessionId)>,
@@ -336,10 +338,9 @@ pub async fn committee_session_status_change(
         ("election_id" = ElectionId, description = "Election database id"),
         ("committee_session_id" = CommitteeSessionId, description = "Committee session database id"),
     ),
-    security(("cookie_auth" = ["coordinator_gsb"])),
 )]
 pub async fn committee_session_investigations(
-    _user: CoordinatorGSB,
+    _user: User,
     State(pool): State<SqlitePool>,
     Path((election_id, committee_session_id)): Path<(ElectionId, CommitteeSessionId)>,
 ) -> Result<Json<InvestigationListResponse>, APIError> {
@@ -356,6 +357,3 @@ pub async fn committee_session_investigations(
 
     Ok(Json(InvestigationListResponse { investigations }))
 }
-
-#[cfg(test)]
-pub mod tests {}

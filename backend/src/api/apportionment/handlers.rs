@@ -14,7 +14,6 @@ use crate::{
             structs::{ApportionmentInputData, ElectionApportionmentResponse},
         },
         election::ElectionAuditData,
-        middleware::authentication::CoordinatorGSB,
     },
     audit_log::AuditService,
     domain::{
@@ -25,7 +24,7 @@ use crate::{
         summary::ElectionSummary,
     },
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType},
-    repository::{committee_session_repo, data_entry_repo, election_repo},
+    repository::{committee_session_repo, data_entry_repo, election_repo, user_repo::User},
 };
 
 #[derive(Serialize)]
@@ -51,10 +50,9 @@ impl AsAuditEvent for ApportionmentProcessed {
     params(
         ("election_id" = u32, description = "Election database id"),
     ),
-    security(("cookie_auth" = ["coordinator_gsb"])),
 )]
 pub async fn election_apportionment(
-    _user: CoordinatorGSB,
+    _user: User,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Path(id): Path<ElectionId>,
@@ -139,7 +137,7 @@ mod tests {
         .unwrap();
 
         let response = super::election_apportionment(
-            CoordinatorGSB(user),
+            user,
             State(pool),
             audit_service,
             Path(ElectionId::from(5)),
@@ -156,7 +154,7 @@ mod tests {
         let audit_service = AuditService::new(Some(user.clone()), None);
 
         let response = super::election_apportionment(
-            CoordinatorGSB(user),
+            user,
             State(pool),
             audit_service,
             Path(ElectionId::from(4)),

@@ -1,8 +1,6 @@
 use chrono::TimeDelta;
 pub(crate) use middleware::*;
-pub use role::{
-    Admin, AdminOrCoordinator, AdminOrCoordinatorGSB, CoordinatorGSB, IncompleteUser, TypistGSB,
-};
+pub use role::{IncompleteUser, RouteAuthorization};
 
 pub mod error;
 mod middleware;
@@ -720,7 +718,7 @@ mod tests {
         assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
         let body = response.into_body().collect().await.unwrap().to_bytes();
         let result: ErrorResponse = serde_json::from_slice(&body).unwrap();
-        assert_eq!(result.reference, ErrorReference::UserNotFound);
+        assert_eq!(result.reference, ErrorReference::Unauthorized);
     }
 
     #[test(sqlx::test(fixtures("../../../../fixtures/users.sql")))]
@@ -746,6 +744,6 @@ mod tests {
         assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
         let body = response.into_body().collect().await.unwrap().to_bytes();
         let result: ErrorResponse = serde_json::from_slice(&body).unwrap();
-        assert_eq!(result.reference, ErrorReference::UserNotFound);
+        assert_eq!(result.reference, ErrorReference::Unauthorized);
     }
 }

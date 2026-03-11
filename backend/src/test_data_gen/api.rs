@@ -2,11 +2,14 @@ use axum::{Json, extract::State, http::StatusCode};
 use sqlx::SqlitePool;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
-use crate::{APIError, AppState, ErrorResponse, test_data_gen::GenerateElectionArgs};
+use crate::{
+    APIError, AppState, ErrorResponse, api::middleware::authentication::RouteAuthorization,
+    test_data_gen::GenerateElectionArgs,
+};
 
 /// Router for the test data generation API
 pub fn router() -> OpenApiRouter<AppState> {
-    OpenApiRouter::default().routes(routes!(generate_election_handler))
+    OpenApiRouter::default().routes(routes!(generate_election_handler).public())
 }
 
 #[utoipa::path(

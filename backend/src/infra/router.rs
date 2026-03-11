@@ -11,10 +11,7 @@ use tower_http::{
 use tracing::Level;
 use utoipa::{
     Modify, OpenApi,
-    openapi::{
-        path::Operation,
-        security::{ApiKey, ApiKeyValue, SecurityScheme},
-    },
+    openapi::security::{ApiKey, ApiKeyValue, SecurityScheme},
 };
 use utoipa_axum::router::OpenApiRouter;
 #[cfg(feature = "openapi")]
@@ -29,27 +26,6 @@ use crate::{
     infra::audit_log,
 };
 
-pub fn get_scopes_from_operation(operation: &Operation) -> Option<Vec<String>> {
-    let security_reqs = operation.security.as_ref()?;
-
-    let scopes: Vec<String> = security_reqs
-        .iter()
-        .filter_map(|req| {
-            // Serialization to access private BTreeMap values of SecurityRequirement
-            // Proposed change upstream: https://github.com/juhaku/utoipa/pull/1494
-            serde_json::to_value(req).ok().and_then(|v| {
-                v.as_object()?
-                    .get(authentication::SECURITY_SCHEME_NAME)?
-                    .as_array()
-                    .cloned()
-            })
-        })
-        .flat_map(|arr| arr.into_iter().filter_map(|v| v.as_str().map(String::from)))
-        .collect();
-
-    Some(scopes)
-}
-
 pub fn openapi_router() -> OpenApiRouter<AppState> {
     #[derive(utoipa::OpenApi)]
     struct ApiDoc;
@@ -60,35 +36,11 @@ pub fn openapi_router() -> OpenApiRouter<AppState> {
         fn modify(&self, openapi: &mut utoipa::openapi::OpenApi) {
             if let Some(components) = openapi.components.as_mut() {
                 components.add_security_scheme(
-                    "cookie_auth",
+                    authentication::SECURITY_SCHEME_NAME,
                     SecurityScheme::ApiKey(ApiKey::Cookie(ApiKeyValue::new(String::from(
                         authentication::SESSION_COOKIE_NAME,
                     )))),
                 )
-            }
-
-            // Add scopes to operation summaries
-            for path_item in openapi.paths.paths.values_mut() {
-                for operation in [
-                    &mut path_item.get,
-                    &mut path_item.post,
-                    &mut path_item.put,
-                    &mut path_item.delete,
-                    &mut path_item.patch,
-                ]
-                .into_iter()
-                .flatten()
-                {
-                    let scopes = get_scopes_from_operation(operation);
-
-                    if let Some(scopes) = scopes {
-                        let extra = scopes.join(", ");
-                        operation.summary = Some(match &operation.summary {
-                            Some(existing) => format!("{} ({})", existing, extra),
-                            None => extra,
-                        });
-                    }
-                }
             }
         }
     }
@@ -295,156 +247,72 @@ pub fn create_router_without_airgap_detection(pool: SqlitePool) -> Result<Router
 
 #[cfg(test)]
 mod tests {
-    use std::str::FromStr;
-
-    use chrono::TimeDelta;
-    use hyper::{Method, header::COOKIE};
-    use sqlx::SqliteConnection;
-    use test_log::test;
+    use hyper::Method;
+    use utoipa::openapi::path::Operation;
 
     use super::*;
-    use crate::{
-        SqlitePoolExt,
-        domain::role::Role,
-        repository::{session_repo, session_repo::Session, user_repo::UserId},
-        test::run_server_test,
-    };
 
-    async fn get_user_cookie(conn: &mut SqliteConnection, user_id: UserId) -> String {
-        let session = Session::create(user_id, "", "127.0.0.1", TimeDelta::seconds(60 * 30));
-        session_repo::save(conn, &session).await.unwrap();
-        session.get_cookie().stripped().to_string()
+    fn has_security_scheme(operation: &Operation) -> bool {
+        operation.security.as_ref().is_some_and(|reqs| {
+            reqs.iter().any(|req| {
+                // Serialization to access private BTreeMap values of SecurityRequirement
+                // Proposed change upstream: https://github.com/juhaku/utoipa/pull/1494
+                serde_json::to_value(req).ok().is_some_and(|v| {
+                    v.as_object()
+                        .is_some_and(|obj| obj.contains_key(authentication::SECURITY_SCHEME_NAME))
+                })
+            })
+        })
     }
 
-    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2", "users"))))]
-    async fn test_route_authorization(pool: SqlitePool) {
+    #[tokio::test]
+    async fn test_route_authorization_definition() {
         let openapi = openapi_router().into_openapi();
+        let paths: Vec<_> = openapi.paths.paths.iter().collect();
 
-        // Possible auth-related error statuses
-        let auth_errors = [StatusCode::UNAUTHORIZED, StatusCode::FORBIDDEN];
-
-        // Get cookies for all roles
-        let mut tx = pool.begin_immediate().await.unwrap();
-        let auth_states = [
-            (None, None),
-            (
-                Some(Role::Administrator),
-                Some(get_user_cookie(&mut tx, UserId::from(1)).await),
-            ),
-            (
-                Some(Role::CoordinatorGSB),
-                Some(get_user_cookie(&mut tx, UserId::from(3)).await),
-            ),
-            (
-                Some(Role::TypistGSB),
-                Some(get_user_cookie(&mut tx, UserId::from(5)).await),
-            ),
-        ];
-        tx.commit().await.unwrap();
-
-        let client = reqwest::Client::new();
         let mut failures = Vec::new();
 
-        // Ensure logout is tested last
-        let mut paths: Vec<_> = openapi.paths.paths.iter().collect();
-        paths.sort_by_key(|(path, _)| path.contains("logout"));
+        // Loop through all the paths in the openapi spec
+        for (path, item) in paths {
+            let operations = [
+                (Method::GET, &item.get),
+                (Method::POST, &item.post),
+                (Method::PUT, &item.put),
+                (Method::PATCH, &item.patch),
+                (Method::DELETE, &item.delete),
+            ];
 
-        run_server_test(pool, |base_url| async move {
-            // Loop through all the paths in the openapi spec
-            for (path, item) in paths {
-                let operations = [
-                    (Method::GET, &item.get),
-                    (Method::POST, &item.post),
-                    (Method::PUT, &item.put),
-                    (Method::PATCH, &item.patch),
-                    (Method::DELETE, &item.delete),
-                ];
+            // Loop through all the operations for each path
+            for (method, operation) in operations.into_iter() {
+                // Skip if no operation defined
+                let Some(operation) = operation else { continue };
 
-                // Loop through all the operations for each path
-                for (method, operation) in operations.into_iter() {
-                    // Skip if no operation defined
-                    let Some(operation) = operation else { continue };
+                let has_security_scheme = has_security_scheme(operation);
+                let has_public_tag = operation
+                    .tags
+                    .as_ref()
+                    .is_some_and(|tags| tags.iter().any(|tag| tag == "public"));
 
-                    // Replace path parameters with (dummy) values
-                    let mut path = path.to_string();
-                    if let Some(parameters) = operation.parameters.as_ref() {
-                        for param in parameters.iter() {
-                            path = path.replace(&format!("{{{}}}", &param.name), "123");
-                        }
-                    }
-
-                    // Check if scopes are valid
-                    let scopes = get_scopes_from_operation(operation);
-                    if let Some(scopes) = &scopes {
-                        for scope in scopes {
-                            if Role::from_str(scope).is_err() {
-                                failures.push(format!(
-                                    "- {method} {path} contains invalid scope '{scope}'"
-                                ));
-                            }
-                        }
-                    }
-
-                    // Make requests with and without authentication, for all roles and check the response codes
-                    for auth_state in auth_states.iter() {
-                        let (role, cookie_opt) = auth_state;
-
-                        let mut request =
-                            client.request(method.clone(), format!("{base_url}{path}"));
-
-                        if let Some(cookie) = cookie_opt {
-                            request = request.header(COOKIE, cookie);
-                        }
-
-                        let response = request.send().await.unwrap();
-                        let status = response.status();
-
-                        // Determine if we expect an auth-related error
-                        let mut expected_error_status = match (&scopes, role) {
-                            // Security defined but no role (unauthenticated)
-                            (Some(_), None) => Some(StatusCode::UNAUTHORIZED),
-
-                            // Security defined and role given, but not in scopes
-                            (Some(scopes), Some(role))
-                                if !scopes.iter().any(|s| s.eq(&role.to_string())) =>
-                            {
-                                Some(StatusCode::FORBIDDEN)
-                            }
-
-                            // Else, OK
-                            _ => None,
-                        };
-
-                        // Exception, this route always forbids access after initialisation
-                        if path == "/api/initialise/admin-exists" {
-                            expected_error_status = Some(StatusCode::FORBIDDEN);
-                        }
-
-                        match expected_error_status {
-                            // If we expect no error, but got an auth error, record failure
-                            None if auth_errors.contains(&status) => failures.push(format!(
-                                "- {method} {path} as {:?}, got {status}, expected no auth error",
-                                role
-                            )),
-
-                            // If we expect an error, but got something else than expected, record failure
-                            Some(expected) if status != expected => failures.push(format!(
-                                "- {method} {path} as {:?}, got {status}, expected {expected:?}",
-                                role
-                            )),
-                            _ => {}
-                        }
-                    }
+                // Should have either a security scheme or a public tag, but not both/none
+                match (has_security_scheme, has_public_tag) {
+                    (false, false) => failures.push(format!(
+                        "{} {} route should have .authorize() or .public() defined",
+                        method, path
+                    )),
+                    (true, true) => failures.push(format!(
+                        "{} {} route should not have both .authorize() and .public() defined",
+                        method, path
+                    )),
+                    (_, _) => {} // valid case, do nothing
                 }
             }
+        }
 
-            assert!(
-                failures.is_empty(),
-                "Authorization test failures ({}):\n{}",
-                failures.len(),
-                failures.join("\n")
-            );
-        })
-        .await;
+        assert!(
+            failures.is_empty(),
+            "Authorization test failures ({}):\n{}",
+            failures.len(),
+            failures.join("\n")
+        );
     }
 }

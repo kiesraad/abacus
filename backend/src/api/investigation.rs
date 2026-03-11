@@ -14,7 +14,7 @@ use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
     api::{
         data_entry::delete_data_entry_for_polling_station,
-        middleware::authentication::CoordinatorGSB,
+        middleware::authentication::RouteAuthorization,
     },
     domain::{
         committee_session::{CommitteeSession, CommitteeSessionError},
@@ -28,6 +28,7 @@ use crate::{
         models::{ModelNa14_2Bijlage1Input, ToPdfFileModel},
         polling_station::{PollingStation, PollingStationId},
         results::PollingStationResults,
+        role::Role,
         votes_table::VotesTablesWithOnlyPreviousVotes,
     },
     error::ErrorReference,
@@ -36,6 +37,7 @@ use crate::{
         committee_session_repo,
         data_entry_repo::{data_entry_exists, previous_results_for_polling_station},
         election_repo, investigation_repo, polling_station_repo,
+        user_repo::User,
     },
     service::{change_committee_session_status, create_empty_data_entry},
 };
@@ -69,14 +71,19 @@ impl AsAuditEvent for InvestigationDeletedAuditData {
 }
 
 pub fn router() -> OpenApiRouter<AppState> {
+    use Role::*;
+
+    const ALLOWED_ROLES: &[Role] = &[CoordinatorGSB];
+
     OpenApiRouter::default()
-        .routes(routes!(polling_station_investigation_create))
-        .routes(routes!(polling_station_investigation_conclude))
-        .routes(routes!(polling_station_investigation_update))
-        .routes(routes!(polling_station_investigation_delete))
-        .routes(routes!(
-            polling_station_investigation_download_corrigendum_pdf
-        ))
+        .routes(routes!(polling_station_investigation_create).authorize(ALLOWED_ROLES))
+        .routes(routes!(polling_station_investigation_conclude).authorize(ALLOWED_ROLES))
+        .routes(routes!(polling_station_investigation_update).authorize(ALLOWED_ROLES))
+        .routes(routes!(polling_station_investigation_delete).authorize(ALLOWED_ROLES))
+        .routes(
+            routes!(polling_station_investigation_download_corrigendum_pdf)
+                .authorize(ALLOWED_ROLES),
+        )
 }
 
 /// Validate that the committee session is in a state that allows mutations
@@ -183,10 +190,9 @@ where
     params(
         ("polling_station_id" = PollingStationId, description = "Polling station database id"),
     ),
-    security(("cookie_auth" = ["coordinator_gsb"])),
 )]
 async fn polling_station_investigation_create(
-    _user: CoordinatorGSB,
+    _user: User,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     CurrentSessionPollingStationId(polling_station_id): CurrentSessionPollingStationId,
@@ -256,10 +262,9 @@ async fn polling_station_investigation_create(
     params(
         ("polling_station_id" = PollingStationId, description = "Polling station database id"),
     ),
-    security(("cookie_auth" = ["coordinator_gsb"])),
 )]
 async fn polling_station_investigation_conclude(
-    _user: CoordinatorGSB,
+    _user: User,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     CurrentSessionPollingStationId(polling_station_id): CurrentSessionPollingStationId,
@@ -492,10 +497,9 @@ async fn switch_to_with_new_results(
     params(
         ("polling_station_id" = PollingStationId, description = "Polling station database id"),
     ),
-    security(("cookie_auth" = ["coordinator_gsb"])),
 )]
 async fn polling_station_investigation_update(
-    _user: CoordinatorGSB,
+    _user: User,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     CurrentSessionPollingStationId(polling_station_id): CurrentSessionPollingStationId,
@@ -572,10 +576,9 @@ async fn polling_station_investigation_update(
     params(
         ("polling_station_id" = PollingStationId, description = "Polling station database id"),
     ),
-    security(("cookie_auth" = ["coordinator_gsb"])),
 )]
 async fn polling_station_investigation_delete(
-    _user: CoordinatorGSB,
+    _user: User,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     CurrentSessionPollingStationId(polling_station_id): CurrentSessionPollingStationId,
@@ -658,10 +661,9 @@ async fn polling_station_investigation_delete(
     params(
         ("polling_station_id" = PollingStationId, description = "Polling station database id"),
     ),
-    security(("cookie_auth" = ["coordinator_gsb"])),
 )]
 async fn polling_station_investigation_download_corrigendum_pdf(
-    _user: CoordinatorGSB,
+    _user: User,
     State(pool): State<SqlitePool>,
     CurrentSessionPollingStationId(polling_station_id): CurrentSessionPollingStationId,
 ) -> Result<Attachment<Vec<u8>>, APIError> {

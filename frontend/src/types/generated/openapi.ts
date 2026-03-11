@@ -529,6 +529,8 @@ export interface ClaimDataEntryResponse {
   client_state: unknown;
   data: PollingStationResults;
   previous_results?: CommonPollingStationResults;
+  source: DataEntrySource;
+  status: DataEntryStatusName;
   validation_results: ValidationResults;
 }
 
@@ -649,6 +651,10 @@ export interface DataEntryGetResponse {
 }
 
 export type DataEntryId = number;
+
+export type DataEntrySource =
+  | (PollingStationSource & { type: "PollingStation" })
+  | (SubCommittee & { type: "SubCommittee" });
 
 export const dataEntryStatusNameValues = [
   "empty",
@@ -1179,6 +1185,12 @@ export type PollingStationResults =
   | (CSOFirstSessionResults & { model: "CSOFirstSession" })
   | (CSONextSessionResults & { model: "CSONextSession" });
 
+export interface PollingStationSource {
+  id: PollingStationId;
+  name: string;
+  number: number;
+}
+
 /**
  * Type of Polling station
  */
@@ -1245,6 +1257,19 @@ export interface SeatChangeStep {
   residual_seat_number?: number;
   standings: ListStanding[];
 }
+
+/**
+ * Sub electoral committee base entity, independent
+ * of the election, committee session and data entry.
+ */
+export interface SubCommittee {
+  category: CommitteeCategory;
+  id: SubCommitteeId;
+  name: string;
+  number: number;
+}
+
+export type SubCommitteeId = number;
 
 /**
  * Contains a summary count, containing both the count and a list of polling

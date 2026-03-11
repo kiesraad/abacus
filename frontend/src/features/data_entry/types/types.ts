@@ -3,6 +3,8 @@ import type { Dispatch } from "react";
 import type { AnyApiError } from "@/api/ApiResult";
 import type {
   ClaimDataEntryResponse,
+  DataEntrySource,
+  DataEntryStatusName,
   DataEntryStatusResponse,
   ElectionWithPoliticalGroups,
   ValidationResults,
@@ -22,6 +24,8 @@ export interface DataEntryState {
   // backend data structures
   previousResults: DataEntryResults | null;
   pollingStationResults: DataEntryResults | null;
+  source: DataEntrySource | null;
+  dataEntryStatus: DataEntryStatusName | null;
 
   // state of the forms excl. data
   dataEntryStructure: DataEntryStructure | null;
@@ -34,6 +38,8 @@ export interface DataEntryState {
 
 export interface DataEntryStateLoaded extends DataEntryState {
   pollingStationResults: DataEntryResults;
+  source: DataEntrySource;
+  dataEntryStatus: DataEntryStatusName;
   dataEntryStructure: DataEntryStructure;
   formState: FormState;
 }

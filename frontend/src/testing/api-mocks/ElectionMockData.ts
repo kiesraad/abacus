@@ -365,7 +365,7 @@ export const getCSBElectionMockData = (
       ...election,
     },
     polling_stations: [],
-    investigations: updatedCommitteeSession.number > 1 ? investigations : [],
+    investigations: [],
   };
 };
 

@@ -601,7 +601,6 @@ impl ResolveErrorsAction {
     ),
 )]
 async fn data_entry_reset(
-    _user: User,
     State(pool): State<SqlitePool>,
     Path(polling_station_id): Path<PollingStationId>,
     audit_service: AuditService,
@@ -959,7 +958,6 @@ pub struct ElectionStatusResponseEntry {
     ),
 )]
 async fn election_status(
-    _user: User,
     State(pool): State<SqlitePool>,
     Path(election_id): Path<ElectionId>,
 ) -> Result<Json<ElectionStatusResponse>, APIError> {
@@ -1088,7 +1086,6 @@ mod tests {
     ) -> Response {
         let user = User::test_user(Role::CoordinatorGSB, UserId::from(1));
         data_entry_reset(
-            user.clone(),
             State(pool),
             Path(polling_station_id),
             AuditService::new(Some(user), None),
@@ -2425,11 +2422,9 @@ mod tests {
     /// First committee session, should return all polling station statuses
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
     async fn test_statuses_first_session_all_polling_stations(pool: SqlitePool) {
-        let user = User::test_user(Role::CoordinatorGSB, UserId::from(1));
-        let response =
-            election_status(user.clone(), State(pool.clone()), Path(ElectionId::from(2)))
-                .await
-                .into_response();
+        let response = election_status(State(pool.clone()), Path(ElectionId::from(2)))
+            .await
+            .into_response();
 
         assert_eq!(response.status(), StatusCode::OK);
         let body = response.into_body().collect().await.unwrap().to_bytes();
@@ -2440,11 +2435,9 @@ mod tests {
     /// New committee session without investigations, should return no polling station statuses
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
     async fn test_statuses_second_session_no_polling_stations(pool: SqlitePool) {
-        let user = User::test_user(Role::CoordinatorGSB, UserId::from(1));
-        let response =
-            election_status(user.clone(), State(pool.clone()), Path(ElectionId::from(7)))
-                .await
-                .into_response();
+        let response = election_status(State(pool.clone()), Path(ElectionId::from(7)))
+            .await
+            .into_response();
 
         assert_eq!(response.status(), StatusCode::OK);
         let body = response.into_body().collect().await.unwrap().to_bytes();
@@ -2455,12 +2448,9 @@ mod tests {
     /// Second committee session with 1 investigation, should return 1 polling station status
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
     async fn test_statuses_second_session_with_investigation(pool: SqlitePool) {
-        let user = User::test_user(Role::CoordinatorGSB, UserId::from(1));
-
-        let response =
-            election_status(user.clone(), State(pool.clone()), Path(ElectionId::from(5)))
-                .await
-                .into_response();
+        let response = election_status(State(pool.clone()), Path(ElectionId::from(5)))
+            .await
+            .into_response();
 
         assert_eq!(response.status(), StatusCode::OK);
         let body = response.into_body().collect().await.unwrap().to_bytes();

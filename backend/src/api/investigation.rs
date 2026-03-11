@@ -37,7 +37,6 @@ use crate::{
         committee_session_repo,
         data_entry_repo::{data_entry_exists, previous_results_for_polling_station},
         election_repo, investigation_repo, polling_station_repo,
-        user_repo::User,
     },
     service::{change_committee_session_status, create_empty_data_entry},
 };
@@ -192,7 +191,6 @@ where
     ),
 )]
 async fn polling_station_investigation_create(
-    _user: User,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     CurrentSessionPollingStationId(polling_station_id): CurrentSessionPollingStationId,
@@ -264,7 +262,6 @@ async fn polling_station_investigation_create(
     ),
 )]
 async fn polling_station_investigation_conclude(
-    _user: User,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     CurrentSessionPollingStationId(polling_station_id): CurrentSessionPollingStationId,
@@ -499,7 +496,6 @@ async fn switch_to_with_new_results(
     ),
 )]
 async fn polling_station_investigation_update(
-    _user: User,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     CurrentSessionPollingStationId(polling_station_id): CurrentSessionPollingStationId,
@@ -578,7 +574,6 @@ async fn polling_station_investigation_update(
     ),
 )]
 async fn polling_station_investigation_delete(
-    _user: User,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     CurrentSessionPollingStationId(polling_station_id): CurrentSessionPollingStationId,
@@ -663,7 +658,6 @@ async fn polling_station_investigation_delete(
     ),
 )]
 async fn polling_station_investigation_download_corrigendum_pdf(
-    _user: User,
     State(pool): State<SqlitePool>,
     CurrentSessionPollingStationId(polling_station_id): CurrentSessionPollingStationId,
 ) -> Result<Attachment<Vec<u8>>, APIError> {

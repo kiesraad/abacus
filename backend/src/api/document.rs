@@ -21,7 +21,7 @@ use crate::{
         votes_table::CandidatesTables,
     },
     error::ErrorReference,
-    repository::{committee_session_repo, election_repo, user_repo::User},
+    repository::{committee_session_repo, election_repo},
     service::list_polling_stations_for_session,
 };
 
@@ -59,7 +59,6 @@ pub fn router() -> OpenApiRouter<AppState> {
     ),
 )]
 async fn election_download_n_10_2(
-    _user: User,
     State(pool): State<SqlitePool>,
     Path(election_id): Path<ElectionId>,
 ) -> Result<impl IntoResponse, APIError> {
@@ -138,7 +137,6 @@ async fn election_download_n_10_2(
     ),
 )]
 async fn election_download_na_31_2_bijlage1(
-    _user: User,
     State(pool): State<SqlitePool>,
     Path(election_id): Path<ElectionId>,
 ) -> Result<impl IntoResponse, APIError> {
@@ -218,7 +216,6 @@ async fn election_download_na_31_2_bijlage1(
     ),
 )]
 async fn election_download_na_31_2_inlegvel(
-    _user: User,
     State(pool): State<SqlitePool>,
     Path(election_id): Path<ElectionId>,
 ) -> Result<impl IntoResponse, APIError> {

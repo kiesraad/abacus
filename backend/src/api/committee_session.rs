@@ -27,7 +27,6 @@ use crate::{
     repository::{
         committee_session_repo::{create, delete, get, get_election_committee_session, update},
         election_repo, investigation_repo,
-        user_repo::User,
     },
     service::{
         CommitteeSessionAuditData, CommitteeSessionUpdatedAuditData,
@@ -113,7 +112,6 @@ pub async fn create_committee_session(
     ),
 )]
 pub async fn committee_session_create(
-    _user: User,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Path(election_id): Path<ElectionId>,
@@ -160,7 +158,6 @@ pub async fn committee_session_create(
     ),
 )]
 pub async fn committee_session_delete(
-    _user: User,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Path((election_id, committee_session_id)): Path<(ElectionId, CommitteeSessionId)>,
@@ -230,7 +227,6 @@ pub async fn committee_session_delete(
     ),
 )]
 pub async fn committee_session_update(
-    _user: User,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Path((election_id, committee_session_id)): Path<(ElectionId, CommitteeSessionId)>,
@@ -296,7 +292,6 @@ pub async fn committee_session_update(
     ),
 )]
 pub async fn committee_session_status_change(
-    _user: User,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Path((election_id, committee_session_id)): Path<(ElectionId, CommitteeSessionId)>,
@@ -340,7 +335,6 @@ pub async fn committee_session_status_change(
     ),
 )]
 pub async fn committee_session_investigations(
-    _user: User,
     State(pool): State<SqlitePool>,
     Path((election_id, committee_session_id)): Path<(ElectionId, CommitteeSessionId)>,
 ) -> Result<Json<InvestigationListResponse>, APIError> {

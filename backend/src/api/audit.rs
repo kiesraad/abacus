@@ -10,7 +10,6 @@ use crate::{
     api::middleware::authentication::RouteAuthorization,
     domain::role::Role,
     infra::audit_log::{AuditLogEvent, LogFilter},
-    repository::user_repo::User,
 };
 
 pub fn router() -> OpenApiRouter<AppState> {
@@ -79,7 +78,6 @@ pub struct LogFilterQuery {
     ),
 )]
 async fn audit_log_list(
-    _user: User,
     Query(filter_query): Query<LogFilterQuery>,
     State(pool): State<SqlitePool>,
 ) -> Result<Json<AuditLogListResponse>, APIError> {
@@ -124,7 +122,6 @@ pub struct AuditLogUser {
     ),
 )]
 async fn audit_log_list_users(
-    _user: User,
     State(pool): State<SqlitePool>,
 ) -> Result<Json<Vec<AuditLogUser>>, APIError> {
     let mut conn = pool.acquire().await?;
@@ -148,9 +145,8 @@ mod tests {
             audit::{LogFilterQuery, audit_log_list, audit_log_list_users},
             authentication::{UserLoggedInAuditData, UserLoginFailedAuditData},
         },
-        domain::role::Role,
         infra::audit_log::{AuditLogListResponse, AuditLogUser, AuditService},
-        repository::user_repo::{self, User, UserId},
+        repository::user_repo::{self, User},
     };
 
     fn new_test_audit_service(user: Option<User>) -> AuditService {
@@ -181,8 +177,7 @@ mod tests {
     }
 
     async fn get_list(pool: SqlitePool, query: LogFilterQuery) -> AuditLogListResponse {
-        let user = User::test_user(Role::Administrator, UserId::from(1));
-        let response = audit_log_list(user, Query(query), State(pool))
+        let response = audit_log_list(Query(query), State(pool))
             .await
             .into_response();
         let body = response.into_body().collect().await.unwrap().to_bytes();
@@ -292,10 +287,7 @@ mod tests {
     async fn test_list_users(pool: SqlitePool) {
         create_log_entries(pool.clone()).await;
 
-        let user = User::test_user(Role::Administrator, UserId::from(1));
-        let response = audit_log_list_users(user, State(pool))
-            .await
-            .into_response();
+        let response = audit_log_list_users(State(pool)).await.into_response();
         let body = response.into_body().collect().await.unwrap().to_bytes();
         let result: Vec<AuditLogUser> = serde_json::from_slice(&body).unwrap();
 

@@ -40,7 +40,7 @@ use crate::{
         polling_stations_from_eml, polling_stations_from_eml_str,
     },
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
-    repository::{committee_session_repo, election_repo, user_repo::User},
+    repository::{committee_session_repo, election_repo},
     service::{create_sub_committee, list_polling_stations_for_session},
 };
 
@@ -143,7 +143,6 @@ impl AsAuditEvent for ElectionUpdatedAuditData {
     ),
 )]
 pub async fn election_list(
-    _user: User,
     State(pool): State<SqlitePool>,
 ) -> Result<Json<ElectionListResponse>, APIError> {
     let mut conn = pool.acquire().await?;
@@ -172,7 +171,6 @@ pub async fn election_list(
     ),
 )]
 pub async fn election_details(
-    _user: User,
     State(pool): State<SqlitePool>,
     Path(election_id): Path<ElectionId>,
 ) -> Result<Json<ElectionDetailsResponse>, APIError> {
@@ -216,7 +214,6 @@ pub async fn election_details(
     ),
 )]
 pub async fn election_number_of_voters_change(
-    _user: User,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Path(election_id): Path<ElectionId>,
@@ -355,7 +352,6 @@ pub struct CSBElectionDefinitionValidateResponse {
     ),
 )]
 pub async fn election_import_validate(
-    _user: User,
     Json(request): Json<ElectionCreationValidateRequest>,
 ) -> Result<Json<ElectionDefinitionValidateResponse>, APIError> {
     match request {
@@ -510,7 +506,6 @@ async fn create_election(
     ),
 )]
 pub async fn election_import(
-    _user: User,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Json(request): Json<ElectionCreationRequest>,

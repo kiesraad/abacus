@@ -41,7 +41,6 @@ use crate::{
             are_results_complete_for_committee_session, list_results_for_committee_session,
         },
         election_repo, file_repo,
-        user_repo::User,
     },
     service::{FileAuditData, list_polling_stations_for_session},
 };
@@ -512,7 +511,6 @@ async fn get_files(
     ),
 )]
 async fn election_download_zip_results(
-    _user: User,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Path((election_id, committee_session_id)): Path<(ElectionId, CommitteeSessionId)>,
@@ -582,7 +580,6 @@ async fn election_download_zip_results(
     ),
 )]
 async fn election_download_pdf_results(
-    _user: User,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Path((_election_id, committee_session_id)): Path<(ElectionId, CommitteeSessionId)>,

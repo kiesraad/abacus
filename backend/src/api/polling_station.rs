@@ -140,7 +140,6 @@ pub fn router() -> OpenApiRouter<AppState> {
     ),
 )]
 async fn polling_station_list(
-    _user: User,
     State(pool): State<SqlitePool>,
     Path(election_id): Path<ElectionId>,
 ) -> Result<PollingStationListResponse, APIError> {
@@ -264,7 +263,6 @@ async fn polling_station_create(
     ),
 )]
 async fn polling_station_get(
-    _user: User,
     State(pool): State<SqlitePool>,
     Path((election_id, polling_station_id)): Path<(ElectionId, PollingStationId)>,
 ) -> Result<(StatusCode, PollingStationResponse), APIError> {
@@ -437,7 +435,6 @@ async fn polling_station_delete(
     ),
 )]
 async fn polling_station_validate_import(
-    _user: User,
     Json(polling_station_request): Json<PollingStationFileRequest>,
 ) -> Result<(StatusCode, Json<PollingStationRequestListResponse>), APIError> {
     Ok((
@@ -523,7 +520,6 @@ pub async fn create_imported_polling_stations(
     ),
 )]
 async fn polling_station_import(
-    _user: User,
     State(pool): State<SqlitePool>,
     Path(election_id): Path<ElectionId>,
     audit_service: AuditService,

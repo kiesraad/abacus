@@ -248,6 +248,7 @@ pub fn create_router_without_airgap_detection(pool: SqlitePool) -> Result<Router
 #[cfg(test)]
 mod tests {
     use hyper::Method;
+    use test_log::test;
     use utoipa::openapi::path::Operation;
 
     use super::*;
@@ -265,8 +266,8 @@ mod tests {
         })
     }
 
-    #[tokio::test]
-    async fn test_route_authorization_definition() {
+    #[test]
+    fn test_route_authorization_definition() {
         let openapi = openapi_router().into_openapi();
         let paths: Vec<_> = openapi.paths.paths.iter().collect();
 

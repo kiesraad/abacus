@@ -349,7 +349,6 @@ export const getElectionMockData = (
 export const getCSBElectionMockData = (
   election: Partial<ElectionWithPoliticalGroups> = {},
   committeeSession: Partial<CommitteeSession> = {},
-  investigations: PollingStationInvestigation[] = mockInvestigations,
 ): Required<ElectionDetailsResponse> => {
   const updatedCommitteeSession = getCSBCommitteeSessionMockData(committeeSession);
 

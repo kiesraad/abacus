@@ -163,7 +163,7 @@ async fn test_csb_election_import_save(pool: SqlitePool) {
     assert_eq!(election_details["election"]["number_of_voters"], 1);
     assert_eq!(
         election_details["current_committee_session"]["status"],
-        "created"
+        "data_entry"
     );
 }
 

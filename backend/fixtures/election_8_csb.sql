@@ -18,4 +18,4 @@ VALUES (8, 'Municipal Election', 'CSB', NULL, 'GR2024_Heemdamseburg', 'Heemdamse
         ]');
 
 INSERT INTO committee_sessions (id, number, election_id, status, location, start_date_time)
-VALUES (8, 1, 8, 'created', 'Heemdamseburg', '2024-12-05 09:15:00');
+VALUES (8, 1, 8, 'data_entry', 'Heemdamseburg', '2024-12-05 09:15:00');

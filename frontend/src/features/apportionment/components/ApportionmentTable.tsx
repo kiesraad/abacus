@@ -2,7 +2,7 @@ import { Table } from "@/components/ui/Table/Table";
 import { t } from "@/i18n/translate";
 import type { ListSeatAssignment, PoliticalGroup } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
-
+import { formatPoliticalGroupName } from "@/utils/politicalGroup";
 import cls from "./Apportionment.module.css";
 
 interface ApportionmentTableProps {
@@ -42,7 +42,12 @@ export function ApportionmentTable({
             <Table.Cell className={cn(cls.listNumberColumn, "text-align-r", "font-number")}>
               {standing.list_number}
             </Table.Cell>
-            <Table.Cell>{politicalGroups[standing.list_number - 1]?.name || ""}</Table.Cell>
+            <Table.Cell>
+              {formatPoliticalGroupName(
+                politicalGroups.find((pg) => pg.number === standing.list_number),
+                false,
+              )}
+            </Table.Cell>
             <Table.NumberCell>{convertZeroToDash(standing.full_seats)}</Table.NumberCell>
             <Table.NumberCell>{convertZeroToDash(standing.residual_seats)}</Table.NumberCell>
             <Table.NumberCell className="bold">{convertZeroToDash(standing.total_seats)}</Table.NumberCell>

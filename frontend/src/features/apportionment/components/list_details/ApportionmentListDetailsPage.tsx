@@ -10,6 +10,7 @@ import { renderTitleAndHeader } from "../../utils/utils";
 import cls from "../Apportionment.module.css";
 import { ApportionmentErrorPage } from "../ApportionmentError";
 import { CandidatesRankingTable } from "./CandidatesRankingTable";
+import { CandidatesWithSeatTable } from "./CandidatesWithSeatTable";
 import { CandidatesWithVotesTable } from "./CandidatesWithVotesTable";
 
 interface PreferentiallyChosenCandidatesSectionProps {
@@ -34,10 +35,10 @@ function PreferentiallyChosenCandidatesSection({
                 percentage: preferenceThresholdPercentage,
               })}
             </span>
-            <CandidatesWithVotesTable
+            <CandidatesWithSeatTable
               id="preferentially-chosen-candidates-table"
-              showNumber={false}
-              showLocality={true}
+              showPosition={false}
+              showVotes={true}
               candidateList={candidates}
               candidateVotesList={preferentialCandidateNomination}
             />
@@ -57,9 +58,14 @@ function PreferentiallyChosenCandidatesSection({
 interface OtherChosenCandidatesSectionProps {
   otherCandidateNomination: CandidateVotes[];
   candidates: Candidate[];
+  startSeatNumber: number;
 }
 
-function OtherChosenCandidatesSection({ otherCandidateNomination, candidates }: OtherChosenCandidatesSectionProps) {
+function OtherChosenCandidatesSection({
+  otherCandidateNomination,
+  candidates,
+  startSeatNumber,
+}: OtherChosenCandidatesSectionProps) {
   return (
     <div className={cn(cls.tableDiv, "mb-lg")}>
       <div>
@@ -69,10 +75,11 @@ function OtherChosenCandidatesSection({ otherCandidateNomination, candidates }: 
             <span id="text-other-chosen-candidates" className={cls.tableInformation}>
               {t("apportionment.other_chosen_candidates_info")}
             </span>
-            <CandidatesWithVotesTable
+            <CandidatesWithSeatTable
               id="other-chosen-candidates-table"
-              showNumber={false}
-              showLocality={true}
+              startSeatNumber={startSeatNumber}
+              showPosition={true}
+              showVotes={false}
               candidateList={candidates}
               candidateVotesList={otherCandidateNomination}
             />
@@ -85,21 +92,21 @@ function OtherChosenCandidatesSection({ otherCandidateNomination, candidates }: 
   );
 }
 
-interface UpdatedCandidateRankingSectionProps {
-  updatedCandidateRanking: Candidate[];
+interface UnelectedCandidatesRankingSectionProps {
+  unelectedCandidatesRanking: Candidate[];
 }
 
-function UpdatedCandidateRankingSection({ updatedCandidateRanking }: UpdatedCandidateRankingSectionProps) {
+function UnelectedCandidatesRankingSection({ unelectedCandidatesRanking }: UnelectedCandidatesRankingSectionProps) {
   return (
     <div className={cn(cls.tableDiv, "mb-lg")}>
       <div>
         <h2 className={cls.tableTitle}>{t("apportionment.ranking_candidates")}</h2>
-        {updatedCandidateRanking.length > 0 ? (
+        {unelectedCandidatesRanking.length > 0 ? (
           <>
             <span id="text-ranking-candidates" className={cls.tableInformation}>
               {t("apportionment.ranking_candidates_info")}
             </span>
-            <CandidatesRankingTable candidateRanking={updatedCandidateRanking} />
+            <CandidatesRankingTable candidateRanking={unelectedCandidatesRanking} />
           </>
         ) : (
           <span id="text-ranking-candidates">{t("apportionment.ranking_candidates_empty")}</span>
@@ -121,8 +128,6 @@ function TotalVotesPerCandidateSection({ candidateVotesList, candidates }: Total
         <h2 className={cls.tableTitle}>{t("apportionment.total_number_votes_per_candidate")}</h2>
         <CandidatesWithVotesTable
           id="total-votes-per-candidate-table"
-          showNumber={true}
-          showLocality={false}
           candidateList={candidates}
           candidateVotesList={candidateVotesList}
         />
@@ -153,6 +158,12 @@ export function ApportionmentListDetailsPage() {
     const listCandidateNomination = candidateNomination.list_candidate_nomination[list.number - 1];
 
     if (listTotalSeats !== undefined && candidateVotesList && listCandidateNomination) {
+      let unelectedCandidatesRanking: Candidate[];
+      if (listCandidateNomination.updated_candidate_ranking.length > 0) {
+        unelectedCandidatesRanking = listCandidateNomination.updated_candidate_ranking.slice(listTotalSeats);
+      } else {
+        unelectedCandidatesRanking = list.candidates.slice(listTotalSeats);
+      }
       return (
         <>
           {renderTitleAndHeader(listName)}
@@ -181,10 +192,9 @@ export function ApportionmentListDetailsPage() {
               <OtherChosenCandidatesSection
                 otherCandidateNomination={listCandidateNomination.other_candidate_nomination}
                 candidates={list.candidates}
+                startSeatNumber={listCandidateNomination.preferential_candidate_nomination.length + 1}
               />
-              <UpdatedCandidateRankingSection
-                updatedCandidateRanking={listCandidateNomination.updated_candidate_ranking}
-              />
+              <UnelectedCandidatesRankingSection unelectedCandidatesRanking={unelectedCandidatesRanking} />
               <TotalVotesPerCandidateSection candidates={list.candidates} candidateVotesList={candidateVotesList} />
             </article>
           </main>

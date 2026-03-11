@@ -2,7 +2,7 @@ import { Table } from "@/components/ui/Table/Table";
 import { t } from "@/i18n/translate";
 import type { ListSeatAssignment, PoliticalGroup } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
-
+import { formatPoliticalGroupName } from "@/utils/politicalGroup";
 import { getFootnotesFromResultChanges, type ResultChange } from "../../utils/seat-change";
 import type { HighestAverageAssignmentStep } from "../../utils/steps";
 import cls from "../Apportionment.module.css";
@@ -52,10 +52,15 @@ export function HighestAveragesTable({
                   {listSeatAssignment.list_number}
                 </Table.Cell>
                 <Table.Cell className={cls.sticky}>
-                  {politicalGroups[listSeatAssignment.list_number - 1]?.name || ""}
+                  {formatPoliticalGroupName(
+                    politicalGroups.find((pg) => pg.number === listSeatAssignment.list_number),
+                    false,
+                  )}
                 </Table.Cell>
                 {steps.map((step) => {
-                  const average = step.standings[listSeatAssignment.list_number - 1]?.next_votes_per_seat;
+                  const average = step.standings.find(
+                    (standing) => standing.list_number === listSeatAssignment.list_number,
+                  )?.next_votes_per_seat;
                   return (
                     <Table.DisplayFractionCells
                       key={`${listSeatAssignment.list_number}-${step.residual_seat_number}`}

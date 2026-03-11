@@ -2,7 +2,7 @@ import { Table } from "@/components/ui/Table/Table";
 import { t } from "@/i18n/translate";
 import type { ListSeatAssignment, PoliticalGroup } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
-
+import { formatPoliticalGroupName } from "@/utils/politicalGroup";
 import { getFootnotesFromResultChanges, type ResultChange } from "../../utils/seat-change";
 import type { LargestRemainderAssignmentStep } from "../../utils/steps";
 import cls from "../Apportionment.module.css";
@@ -53,7 +53,12 @@ export function LargestRemaindersTable({
               <Table.Cell className={cn(cls.listNumberColumn, "text-align-r", "font-number")}>
                 {listSeatAssignment.list_number}
               </Table.Cell>
-              <Table.Cell>{politicalGroups[listSeatAssignment.list_number - 1]?.name || ""}</Table.Cell>
+              <Table.Cell>
+                {formatPoliticalGroupName(
+                  politicalGroups.find((pg) => pg.number === listSeatAssignment.list_number),
+                  false,
+                )}
+              </Table.Cell>
               <Table.NumberCell className="bold">
                 {listFullSeatsNotes.length > 0 && getFootnotesFromResultChanges(listFullSeatsNotes)}{" "}
                 {listSeatAssignment.full_seats}

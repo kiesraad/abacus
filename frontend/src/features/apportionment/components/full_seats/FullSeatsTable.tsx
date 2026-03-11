@@ -2,7 +2,7 @@ import { Table } from "@/components/ui/Table/Table";
 import { t } from "@/i18n/translate";
 import type { DisplayFraction, ListSeatAssignment, PoliticalGroup } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
-
+import { formatPoliticalGroupName } from "@/utils/politicalGroup";
 import { getFootnotesFromResultChanges, type ResultChange } from "../../utils/seat-change";
 import cls from "../Apportionment.module.css";
 
@@ -36,7 +36,10 @@ export function FullSeatsTable({ finalStanding, politicalGroups, quota, resultCh
                 {standing.list_number}
               </Table.Cell>
               <Table.Cell>
-                {politicalGroups.find((list) => list.number === standing.list_number)?.name ?? ""}
+                {formatPoliticalGroupName(
+                  politicalGroups.find((list) => list.number === standing.list_number),
+                  false,
+                )}
               </Table.Cell>
               <Table.NumberCell>{standing.votes_cast}</Table.NumberCell>
               <Table.Cell>:</Table.Cell>

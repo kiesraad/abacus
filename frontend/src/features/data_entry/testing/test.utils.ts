@@ -78,7 +78,7 @@ export function expectFieldsToNotHaveIcon(fields: Array<string>) {
 }
 
 export function getCandidateFullNamesFromMockData(politicalGroupMockData: PoliticalGroup): string[] {
-  return politicalGroupMockData.candidates.map(getCandidateFullName);
+  return politicalGroupMockData.candidates.map((candidate) => getCandidateFullName(candidate));
 }
 
 export function expectCheckboxToBeValidAndToNotHaveAccessibleErrorMessage(fields: Array<string>) {

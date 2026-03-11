@@ -209,28 +209,26 @@ where
 mod tests {
     use super::super::SECURITY_SCHEME_NAME;
     use super::*;
+    use utoipa::openapi::path::{HttpMethod, OperationBuilder, PathItemBuilder, PathsBuilder};
+
+    fn build_method_router(summary: Option<&str>) -> UtoipaMethodRouter<()> {
+        let mut builder = OperationBuilder::new();
+        if let Some(s) = summary {
+            builder = builder.summary(Some(s));
+        }
+        let operation = builder.build();
+        let path_item = PathItemBuilder::new()
+            .operation(HttpMethod::Get, operation)
+            .build();
+        let paths = PathsBuilder::new().path("/test", path_item).build();
+        let method_router = axum::routing::get(|| async { "ok" });
+        (vec![], paths, method_router)
+    }
 
     mod utoipa_route_authorization {
-        use utoipa::openapi::{
-            SecurityRequirement,
-            path::{HttpMethod, OperationBuilder, PathItemBuilder, PathsBuilder},
-        };
+        use utoipa::openapi::SecurityRequirement;
 
         use super::*;
-
-        fn build_method_router(summary: Option<&str>) -> UtoipaMethodRouter<()> {
-            let mut builder = OperationBuilder::new();
-            if let Some(s) = summary {
-                builder = builder.summary(Some(s));
-            }
-            let operation = builder.build();
-            let path_item = PathItemBuilder::new()
-                .operation(HttpMethod::Get, operation)
-                .build();
-            let paths = PathsBuilder::new().path("/test", path_item).build();
-            let method_router = axum::routing::get(|| async { "ok" });
-            (vec![], paths, method_router)
-        }
 
         #[test]
         fn authorize_sets_security() {
@@ -300,13 +298,14 @@ mod tests {
         use super::*;
 
         #[tokio::test]
-        async fn service_reject_unauthenticated_user() {
-            let mut service = authorize_roles(&[Role::Administrator])
-                .layer(axum::routing::get(|| async { "ok" }));
+        async fn reject_unauthenticated_user() {
+            let router = build_method_router(Some("Test endpoint"));
+            let roles = &[Role::Administrator];
+            let (_, _, mut method_router) = router.authorize(roles);
 
             let request = Request::builder().body(Body::empty()).unwrap();
 
-            let response = ServiceExt::<Request<Body>>::ready(&mut service)
+            let response = ServiceExt::<Request<Body>>::ready(&mut method_router)
                 .await
                 .unwrap()
                 .call(request)
@@ -316,15 +315,16 @@ mod tests {
         }
 
         #[tokio::test]
-        async fn service_allow_correct_role() {
-            let mut service = authorize_roles(&[Role::Administrator])
-                .layer(axum::routing::get(|| async { "ok" }));
+        async fn allow_correct_role() {
+            let router = build_method_router(Some("Test endpoint"));
+            let roles = &[Role::Administrator];
+            let (_, _, mut method_router) = router.authorize(roles);
 
             let user = User::test_user(Role::Administrator, 1.into());
             let mut request = Request::builder().body(Body::empty()).unwrap();
             request.extensions_mut().insert(user);
 
-            let response = ServiceExt::<Request<Body>>::ready(&mut service)
+            let response = ServiceExt::<Request<Body>>::ready(&mut method_router)
                 .await
                 .unwrap()
                 .call(request)
@@ -334,15 +334,16 @@ mod tests {
         }
 
         #[tokio::test]
-        async fn service_rejects_wrong_role() {
-            let mut service = authorize_roles(&[Role::Administrator])
-                .layer(axum::routing::get(|| async { "ok" }));
+        async fn rejects_wrong_role() {
+            let router = build_method_router(Some("Test endpoint"));
+            let roles = &[Role::Administrator];
+            let (_, _, mut method_router) = router.authorize(roles);
 
             let user = User::test_user(Role::TypistGSB, 2.into());
             let mut request = Request::builder().body(Body::empty()).unwrap();
             request.extensions_mut().insert(user);
 
-            let response = ServiceExt::<Request<Body>>::ready(&mut service)
+            let response = ServiceExt::<Request<Body>>::ready(&mut method_router)
                 .await
                 .unwrap()
                 .call(request)
@@ -352,15 +353,16 @@ mod tests {
         }
 
         #[tokio::test]
-        async fn service_allows_any_of_correct_roles() {
-            let mut service = authorize_roles(&[Role::CoordinatorGSB, Role::CoordinatorCSB])
-                .layer(axum::routing::get(|| async { "ok" }));
+        async fn allows_any_of_authorized_roles() {
+            let router = build_method_router(Some("Test endpoint"));
+            let roles = &[Role::CoordinatorGSB, Role::CoordinatorCSB];
+            let (_, _, mut method_router) = router.authorize(roles);
 
             let user = User::test_user(Role::CoordinatorCSB, 3.into());
             let mut request = Request::builder().body(Body::empty()).unwrap();
             request.extensions_mut().insert(user);
 
-            let response = ServiceExt::<Request<Body>>::ready(&mut service)
+            let response = ServiceExt::<Request<Body>>::ready(&mut method_router)
                 .await
                 .unwrap()
                 .call(request)

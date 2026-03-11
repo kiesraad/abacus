@@ -78,119 +78,121 @@ describe("ElectionInformationTable", () => {
     vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
   });
 
-  test("renders a table with the election information for first committee session status created for coordinator", async () => {
-    // Number of voters can technically not be lower than 1
-    renderGSBTable("coordinator_gsb", 0, 1, "created");
+  describe("GSB", () => {
+    test("renders a table with the election information for first committee session status created for coordinator", async () => {
+      // Number of voters can technically not be lower than 1
+      renderGSBTable("coordinator_gsb", 0, 1, "created");
 
-    const election_information_table = await screen.findByTestId("election-information-table");
-    expect(election_information_table).toBeVisible();
-    expect(election_information_table).toHaveTableContent([
-      ["Verkiezing", "Gemeenteraadsverkiezingen 2026, 30 november"],
-      ["Kiesgebied", "0035 - Gemeente Heemdamseburg"],
-      ["Lijsten en kandidaten", "1 lijst en 1 kandidaat"],
-      ["Aantal kiesgerechtigden", "0"],
-      ["Type stembureau", "Gemeentelijk stembureau"],
-      ["Stembureaus", "1 stembureau"],
-      ["Type stemopneming", "Decentrale stemopneming"],
-    ]);
+      const election_information_table = await screen.findByTestId("election-information-table");
+      expect(election_information_table).toBeVisible();
+      expect(election_information_table).toHaveTableContent([
+        ["Verkiezing", "Gemeenteraadsverkiezingen 2026, 30 november"],
+        ["Kiesgebied", "0035 - Gemeente Heemdamseburg"],
+        ["Lijsten en kandidaten", "1 lijst en 1 kandidaat"],
+        ["Aantal kiesgerechtigden", "0"],
+        ["Type stembureau", "Gemeentelijk stembureau"],
+        ["Stembureaus", "1 stembureau"],
+        ["Type stemopneming", "Decentrale stemopneming"],
+      ]);
 
-    const tableRows = within(election_information_table).getAllByRole("row");
-    expect(tableRows[3]!.textContent).toEqual("Aantal kiesgerechtigden0");
-    tableRows[3]!.click();
-    await waitFor(() => {
-      expect(navigate).toHaveBeenCalledWith("number-of-voters");
+      const tableRows = within(election_information_table).getAllByRole("row");
+      expect(tableRows[3]!.textContent).toEqual("Aantal kiesgerechtigden0");
+      tableRows[3]!.click();
+      await waitFor(() => {
+        expect(navigate).toHaveBeenCalledWith("number-of-voters");
+      });
     });
-  });
 
-  test("renders a table with the election information for first committee session status in_preparation for coordinator", async () => {
-    renderGSBTable("coordinator_gsb", 1234, 1, "in_preparation");
+    test("renders a table with the election information for first committee session status in_preparation for coordinator", async () => {
+      renderGSBTable("coordinator_gsb", 1234, 1, "in_preparation");
 
-    const election_information_table = await screen.findByTestId("election-information-table");
-    expect(election_information_table).toBeVisible();
-    expect(election_information_table).toHaveTableContent([
-      ["Verkiezing", "Gemeenteraadsverkiezingen 2026, 30 november"],
-      ["Kiesgebied", "0035 - Gemeente Heemdamseburg"],
-      ["Lijsten en kandidaten", "1 lijst en 1 kandidaat"],
-      ["Aantal kiesgerechtigden", "1.234"],
-      ["Type stembureau", "Gemeentelijk stembureau"],
-      ["Stembureaus", "1 stembureau"],
-      ["Type stemopneming", "Decentrale stemopneming"],
-    ]);
+      const election_information_table = await screen.findByTestId("election-information-table");
+      expect(election_information_table).toBeVisible();
+      expect(election_information_table).toHaveTableContent([
+        ["Verkiezing", "Gemeenteraadsverkiezingen 2026, 30 november"],
+        ["Kiesgebied", "0035 - Gemeente Heemdamseburg"],
+        ["Lijsten en kandidaten", "1 lijst en 1 kandidaat"],
+        ["Aantal kiesgerechtigden", "1.234"],
+        ["Type stembureau", "Gemeentelijk stembureau"],
+        ["Stembureaus", "1 stembureau"],
+        ["Type stemopneming", "Decentrale stemopneming"],
+      ]);
 
-    const tableRows = within(election_information_table).getAllByRole("row");
-    expect(tableRows[3]!.textContent).toEqual("Aantal kiesgerechtigden1.234");
-    tableRows[3]!.click();
-    await waitFor(() => {
-      expect(navigate).toHaveBeenCalledWith("number-of-voters");
+      const tableRows = within(election_information_table).getAllByRole("row");
+      expect(tableRows[3]!.textContent).toEqual("Aantal kiesgerechtigden1.234");
+      tableRows[3]!.click();
+      await waitFor(() => {
+        expect(navigate).toHaveBeenCalledWith("number-of-voters");
+      });
     });
-  });
 
-  test("renders a table with the election information for first committee session status data_entry for coordinator", async () => {
-    renderGSBTable("coordinator_gsb", 1234, 1, "data_entry");
+    test("renders a table with the election information for first committee session status data_entry for coordinator", async () => {
+      renderGSBTable("coordinator_gsb", 1234, 1, "data_entry");
 
-    const election_information_table = await screen.findByTestId("election-information-table");
-    expect(election_information_table).toBeVisible();
-    expect(election_information_table).toHaveTableContent([
-      ["Verkiezing", "Gemeenteraadsverkiezingen 2026, 30 november"],
-      ["Kiesgebied", "0035 - Gemeente Heemdamseburg"],
-      ["Lijsten en kandidaten", "1 lijst en 1 kandidaat"],
-      ["Aantal kiesgerechtigden", "1.234"],
-      ["Type stembureau", "Gemeentelijk stembureau"],
-      ["Stembureaus", "1 stembureau"],
-      ["Type stemopneming", "Decentrale stemopneming"],
-    ]);
+      const election_information_table = await screen.findByTestId("election-information-table");
+      expect(election_information_table).toBeVisible();
+      expect(election_information_table).toHaveTableContent([
+        ["Verkiezing", "Gemeenteraadsverkiezingen 2026, 30 november"],
+        ["Kiesgebied", "0035 - Gemeente Heemdamseburg"],
+        ["Lijsten en kandidaten", "1 lijst en 1 kandidaat"],
+        ["Aantal kiesgerechtigden", "1.234"],
+        ["Type stembureau", "Gemeentelijk stembureau"],
+        ["Stembureaus", "1 stembureau"],
+        ["Type stemopneming", "Decentrale stemopneming"],
+      ]);
 
-    const tableRows = within(election_information_table).getAllByRole("row");
-    expect(tableRows[3]!.textContent).toEqual("Aantal kiesgerechtigden1.234");
-    tableRows[3]!.click();
-    await waitFor(() => {
-      expect(navigate).not.toHaveBeenCalled();
+      const tableRows = within(election_information_table).getAllByRole("row");
+      expect(tableRows[3]!.textContent).toEqual("Aantal kiesgerechtigden1.234");
+      tableRows[3]!.click();
+      await waitFor(() => {
+        expect(navigate).not.toHaveBeenCalled();
+      });
     });
-  });
 
-  test("renders a table with the election information for second committee session status created for coordinator", async () => {
-    renderGSBTable("coordinator_gsb", 1234, 2, "created");
+    test("renders a table with the election information for second committee session status created for coordinator", async () => {
+      renderGSBTable("coordinator_gsb", 1234, 2, "created");
 
-    const election_information_table = await screen.findByTestId("election-information-table");
-    expect(election_information_table).toBeVisible();
-    expect(election_information_table).toHaveTableContent([
-      ["Verkiezing", "Gemeenteraadsverkiezingen 2026, 30 november"],
-      ["Kiesgebied", "0035 - Gemeente Heemdamseburg"],
-      ["Lijsten en kandidaten", "1 lijst en 1 kandidaat"],
-      ["Aantal kiesgerechtigden", "1.234"],
-      ["Type stembureau", "Gemeentelijk stembureau"],
-      ["Stembureaus", "1 stembureau"],
-      ["Type stemopneming", "Decentrale stemopneming"],
-    ]);
+      const election_information_table = await screen.findByTestId("election-information-table");
+      expect(election_information_table).toBeVisible();
+      expect(election_information_table).toHaveTableContent([
+        ["Verkiezing", "Gemeenteraadsverkiezingen 2026, 30 november"],
+        ["Kiesgebied", "0035 - Gemeente Heemdamseburg"],
+        ["Lijsten en kandidaten", "1 lijst en 1 kandidaat"],
+        ["Aantal kiesgerechtigden", "1.234"],
+        ["Type stembureau", "Gemeentelijk stembureau"],
+        ["Stembureaus", "1 stembureau"],
+        ["Type stemopneming", "Decentrale stemopneming"],
+      ]);
 
-    const tableRows = within(election_information_table).getAllByRole("row");
-    expect(tableRows[3]!.textContent).toEqual("Aantal kiesgerechtigden1.234");
-    tableRows[3]!.click();
-    await waitFor(() => {
-      expect(navigate).not.toHaveBeenCalled();
+      const tableRows = within(election_information_table).getAllByRole("row");
+      expect(tableRows[3]!.textContent).toEqual("Aantal kiesgerechtigden1.234");
+      tableRows[3]!.click();
+      await waitFor(() => {
+        expect(navigate).not.toHaveBeenCalled();
+      });
     });
-  });
 
-  test("renders a table with the election information for administrator", async () => {
-    renderGSBTable("administrator", 1234, 1, "created");
+    test("renders a table with the election information for administrator", async () => {
+      renderGSBTable("administrator", 1234, 1, "created");
 
-    const election_information_table = await screen.findByTestId("election-information-table");
-    expect(election_information_table).toBeVisible();
-    expect(election_information_table).toHaveTableContent([
-      ["Verkiezing", "Gemeenteraadsverkiezingen 2026, 30 november"],
-      ["Kiesgebied", "0035 - Gemeente Heemdamseburg"],
-      ["Lijsten en kandidaten", "1 lijst en 1 kandidaat"],
-      ["Aantal kiesgerechtigden", "1.234"],
-      ["Type stembureau", "Gemeentelijk stembureau"],
-      ["Stembureaus", "1 stembureau"],
-      ["Type stemopneming", "Decentrale stemopneming"],
-    ]);
+      const election_information_table = await screen.findByTestId("election-information-table");
+      expect(election_information_table).toBeVisible();
+      expect(election_information_table).toHaveTableContent([
+        ["Verkiezing", "Gemeenteraadsverkiezingen 2026, 30 november"],
+        ["Kiesgebied", "0035 - Gemeente Heemdamseburg"],
+        ["Lijsten en kandidaten", "1 lijst en 1 kandidaat"],
+        ["Aantal kiesgerechtigden", "1.234"],
+        ["Type stembureau", "Gemeentelijk stembureau"],
+        ["Stembureaus", "1 stembureau"],
+        ["Type stemopneming", "Decentrale stemopneming"],
+      ]);
 
-    const tableRows = within(election_information_table).getAllByRole("row");
-    expect(tableRows[3]!.textContent).toEqual("Aantal kiesgerechtigden1.234");
-    tableRows[3]!.click();
-    await waitFor(() => {
-      expect(navigate).toHaveBeenCalledWith("number-of-voters");
+      const tableRows = within(election_information_table).getAllByRole("row");
+      expect(tableRows[3]!.textContent).toEqual("Aantal kiesgerechtigden1.234");
+      tableRows[3]!.click();
+      await waitFor(() => {
+        expect(navigate).toHaveBeenCalledWith("number-of-voters");
+      });
     });
   });
 

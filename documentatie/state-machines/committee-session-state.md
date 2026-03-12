@@ -3,46 +3,45 @@
 This document describes the states a committee session can have.
 The transition labels describe the action that is used for performing the transition.
 
-The label "PS/Inv" on several transitions indicates a "polling station" for the first
-committee session, and an "investigation" in any subsequent committee session.
+Data entry can be linked to a polling station (GSB) or subcommittee (CSB).
+
+**CSB**  
+Follow the regular (uninterrupted) lines and use "data entry" (discard "investigation") for this flow.
+
+**GSB**  
+Follow the regular (uninterrupted) lines combined with the dotted lines.
+
+In case of the first committee session, use "data entry" (discard "investigation") for this flow.  
+For every next committee session, use "investigations" (discard "data entry") for this flow.
 
 ```mermaid
-graph TD
-  classDef gsb_node fill:#bbf,color:#000,stroke:#333,stroke-width:4px;
-    
-  csb_created[Created]
-  csb_in_preparation[InPreparation]
-  csb_data_entry[DataEntry]
-  csb_paused[Paused]
-  csb_completed[Completed]
-    
-  csb_created --> csb_in_preparation
-  csb_in_preparation -->|click start<br/>data entry| csb_data_entry
-  csb_data_entry -->|click finish<br/>data entry| csb_completed
-  csb_data_entry -->|click pause<br/>data entry| csb_paused
-  csb_paused -->|click resume<br/>data entry| csb_data_entry
-  csb_paused -->|click finish<br/>data entry| csb_completed
-  csb_completed -->|click resume<br/>data entry| csb_data_entry
-    
-  gsb_ci_add["add <br/> PS/Inv"]
-  gsb_delete["delete last <br/> PS/Inv"]
-  gsb_cd_update["add/update<br/> PS/Inv"]
-  gsb_cd_ps_result["delete polling<br/>station result/Inv"]
+flowchart
+  flow_start@{ shape: sm-circ }
+  flow_end@{ shape: sm-circ }
 
-  csb_paused -..-> gsb_delete
-  csb_data_entry -.-> gsb_delete
-  csb_in_preparation -.-> gsb_delete
-  csb_completed -.-> gsb_delete
-  gsb_delete -.-> csb_created
+  created(Created)
+  in_preparation(InPreparation)
+  data_entry(DataEntry)
+  paused(Paused)
+  completed(Completed)
 
-  gsb_ci_add -.-> csb_in_preparation
-  csb_created -.-> gsb_ci_add
-    
-  csb_completed -.-> gsb_cd_update
-  gsb_cd_update -.-> csb_data_entry
+  flow_start --> created
+  in_preparation -->|click start| data_entry
+  data_entry -->|click finish| completed
+  data_entry -->|click pause| paused
+  paused --->|click resume| data_entry
+  paused -->|click finish| completed
+  completed -->|click resume| data_entry
+  completed --> flow_end
 
-  csb_completed ~~~ gsb_delete
+  paused -.->|delete last<br/>data entry or<br/>investigation| created
+  data_entry -.->|delete last<br/>data entry or<br/>investigation| created
+  in_preparation -.->|delete last<br/>data entry or<br/>investigation| created
+  completed -.->|delete last<br/>data entry or<br/>investigation| created
 
-  csb_completed -.-> gsb_cd_ps_result
-  gsb_cd_ps_result -.-> csb_data_entry
+  created -->|add<br/>data entry or<br/>investigation| in_preparation
+
+  completed -.->|add/update<br/>data entry or<br/>investigation| data_entry
+
+  completed -.->|delete polling<br/>station result or<br/>investigation| data_entry
 ```

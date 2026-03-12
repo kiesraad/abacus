@@ -629,7 +629,7 @@ pub async fn list_first_session_with_status(
         FROM polling_stations AS p
         JOIN committee_sessions AS c ON c.id = p.committee_session_id
         LEFT JOIN data_entries AS de ON de.id = p.data_entry_id
-        WHERE c.id = $1
+        WHERE c.id = $1 AND c.number = 1
         "#,
         committee_session_id
     )
@@ -663,7 +663,7 @@ pub async fn list_next_session_with_status(
         FROM polling_stations AS p
         JOIN committee_sessions AS c ON c.id = p.committee_session_id
         LEFT JOIN data_entries AS de ON de.id = p.data_entry_id
-        WHERE c.id = $1 AND json_extract(p.investigation_state, '$.status') = 'ConcludedWithNewResults'
+        WHERE c.id = $1 AND c.number > 1 AND json_extract(p.investigation_state, '$.status') = 'ConcludedWithNewResults'
         "#,
         committee_session_id
     )

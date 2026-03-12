@@ -169,7 +169,7 @@ Met de kiesdeler wordt de zetelverdeling bepaald. De kiesdeler is het aantal ste
 
 #TODO[Kiesdeler tabel]\
 
-6790 ÷ 13 = 522 #math.frac([4], [13])
+6790 ÷ 13 = 522 4/13
 
 #pagebreak(weak: true)
 
@@ -204,7 +204,7 @@ Na toewijzing van de volle zetels blijft een aantal te verdelen zetels over. Dit
 === Verdeling van de restzetels
 #TODO[Breedte tekst op pagina's fixen, hoort kleiner te zijn]\
 #if input.election.number_of_seats < LARGE_COUNCIL_THRESHOLD [
-  - Het centraal stembureau berekent hoeveel stemmen elke lijst overhoudt na toekenning van de volle zetels. Dat is het ‘overschot’ aan stemmen voor die lijst.
+  - Het centraal stembureau berekent hoeveel stemmen elke lijst overhoudt na toekenning van de volle zetels. Dat is het 'overschot' aan stemmen voor die lijst.
   - Het centraal stembureau verdeelt de restzetels, in volgorde van de grootste overschotten. Elke lijst kan maar één restzetel krijgen. Alleen lijsten die ten minste 75% van de kiesdeler hebben behaald kunnen een restzetel krijgen.
   - Als er daarna nog restzetels over zijn, verdeelt het centraal stembureau die volgens het systeem van de grootste gemiddelden. Ook bij deze verdeling mag iedere lijst maar één restzetel krijgen
   - Als lijsten precies evenveel stemmen behalen en er niet voldoende restzetels zijn voor die lijsten, dan wordt geloot welke lijst de restzetel krijgt.
@@ -264,8 +264,7 @@ maar hebben een zetel toegewezen vanwege hun positie op de lijst.
 #TODO[Zetel tabel met positie op lijst]
 
 #emph_block[*Rangschikking van kandidaten voor opvolging*]
-De volgende kandidaten hebben geen zetel toegewezen gekregen. Als een zetel vrijkomt
-wordt deze via de onderstaande volgorde aan opvolgers toegewezen.
+De volgende kandidaten hebben geen zetel toegewezen gekregen. Als een zetel vrijkomt wordt deze via de onderstaande volgorde aan opvolgers toegewezen.
 
 #TODO[Rang tabel met positie op lijst]
 
@@ -286,7 +285,7 @@ wordt deze via de onderstaande volgorde aan opvolgers toegewezen.
 
 #empty_lines(5)
 
-=== Is voor de invoer gebruik gemaakt van de bestanden die zijn uitgewisseld via het platform ‘Teluitslagen’?
+=== Is voor de invoer gebruik gemaakt van de bestanden die zijn uitgewisseld via het platform 'Teluitslagen'?
 
 #checkbox()[Ja]
 #checkbox()[Nee, de resultaten van de papieren processen-verbaal twee keer handmatig ingevoerd in de uitslagensoftware]

@@ -9,9 +9,25 @@ export const committeeSessionMockData: CommitteeSession = {
   start_date_time: "",
 };
 
+export const csbCommitteeSessionMockData: CommitteeSession = {
+  id: 1,
+  number: 1,
+  election_id: 2,
+  status: "data_entry",
+  location: "",
+  start_date_time: "",
+};
+
 export const getCommitteeSessionMockData = (committeeSession: Partial<CommitteeSession> = {}): CommitteeSession => {
   return {
     ...committeeSessionMockData,
+    ...committeeSession,
+  };
+};
+
+export const getCSBCommitteeSessionMockData = (committeeSession: Partial<CommitteeSession> = {}): CommitteeSession => {
+  return {
+    ...csbCommitteeSessionMockData,
     ...committeeSession,
   };
 };

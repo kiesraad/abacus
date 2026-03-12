@@ -48,27 +48,28 @@ export function ElectionStatus({
       <div className={cls.statusTitle} id="status-heading">
         <h2>{t("election_status.main_title")}</h2>
         <div className={cls.buttons}>
-          {committeeSession.number === 1 ? (
-            <Button
-              size="md"
-              variant="secondary"
-              onClick={() => {
-                navigate(`/elections/${election.id}/polling-stations`);
-              }}
-            >
-              {t("polling_station.title.plural")}
-            </Button>
-          ) : (
-            <Button
-              size="md"
-              variant="secondary"
-              onClick={() => {
-                navigate(`/elections/${election.id}/investigations`);
-              }}
-            >
-              {t("investigations.title")}
-            </Button>
-          )}
+          {election.committee_category === "GSB" &&
+            (committeeSession.number === 1 ? (
+              <Button
+                size="md"
+                variant="secondary"
+                onClick={() => {
+                  navigate(`/elections/${election.id}/polling-stations`);
+                }}
+              >
+                {t("polling_station.title.plural")}
+              </Button>
+            ) : (
+              <Button
+                size="md"
+                variant="secondary"
+                onClick={() => {
+                  navigate(`/elections/${election.id}/investigations`);
+                }}
+              >
+                {t("investigations.title")}
+              </Button>
+            ))}
         </div>
       </div>
       <div className={cls.statusSection}>
@@ -93,9 +94,11 @@ export function ElectionStatus({
           </div>
         </Progress>
         <article className={cls.statusArticle}>
-          {statuses.length === 0 && committeeSession.number === 1 && <p>{t("election_status.no_polling_stations")}</p>}
-          {statuses.length === 0 && committeeSession.number > 1 && (
-            <p>{t("election_status.no_investigations_with_corrected_results")}</p>
+          {election.committee_category === "GSB" && statuses.length === 0 && (
+            <>
+              {committeeSession.number === 1 && <p>{t("election_status.no_polling_stations")}</p>}
+              {committeeSession.number > 1 && <p>{t("election_status.no_investigations_with_corrected_results")}</p>}
+            </>
           )}
           {statuses.length > 0 &&
             tableCategories.map((cat) => (

@@ -12,7 +12,7 @@ use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
     api::{
         authentication::{UserCreatedAuditData, UserDeletedAuditData, UserUpdatedAuditData},
-        middleware::authentication::{AdminOrCoordinator, error::AuthenticationError},
+        middleware::authentication::{RouteAuthorization, error::AuthenticationError},
     },
     domain::role::Role,
     infra::audit_log::AuditService,
@@ -23,12 +23,16 @@ use crate::{
 };
 
 pub fn user_router() -> OpenApiRouter<AppState> {
+    use Role::*;
+
+    const ALLOWED_ROLES: &[Role] = &[Administrator, CoordinatorCSB, CoordinatorGSB];
+
     OpenApiRouter::default()
-        .routes(routes!(user_list))
-        .routes(routes!(user_create))
-        .routes(routes!(user_get))
-        .routes(routes!(user_update))
-        .routes(routes!(user_delete))
+        .routes(routes!(user_list).authorize(ALLOWED_ROLES))
+        .routes(routes!(user_create).authorize(ALLOWED_ROLES))
+        .routes(routes!(user_get).authorize(ALLOWED_ROLES))
+        .routes(routes!(user_update).authorize(ALLOWED_ROLES))
+        .routes(routes!(user_delete).authorize(ALLOWED_ROLES))
 }
 
 #[derive(Serialize, Deserialize, ToSchema)]
@@ -47,10 +51,9 @@ pub struct UserListResponse {
         (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
-    security(("cookie_auth" = ["administrator", "coordinator_csb", "coordinator_gsb"])),
 )]
 async fn user_list(
-    AdminOrCoordinator(user): AdminOrCoordinator,
+    user: User,
     State(pool): State<SqlitePool>,
 ) -> Result<Json<UserListResponse>, APIError> {
     let mut conn = pool.acquire().await?;
@@ -101,10 +104,9 @@ pub struct UpdateUserRequest {
         (status = 409, description = "Conflict (username already exists)", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
-    security(("cookie_auth" = ["administrator", "coordinator_csb", "coordinator_gsb"])),
 )]
 pub async fn user_create(
-    AdminOrCoordinator(logged_in_user): AdminOrCoordinator,
+    logged_in_user: User,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Json(create_user_req): Json<CreateUserRequest>,
@@ -146,10 +148,9 @@ pub async fn user_create(
     params(
         ("user_id" = UserId, description = "User id"),
     ),
-    security(("cookie_auth" = ["administrator", "coordinator_csb", "coordinator_gsb"])),
 )]
 async fn user_get(
-    AdminOrCoordinator(logged_in_user): AdminOrCoordinator,
+    logged_in_user: User,
     State(pool): State<SqlitePool>,
     Path(user_id): Path<UserId>,
 ) -> Result<Json<User>, APIError> {
@@ -182,10 +183,9 @@ async fn user_get(
     params(
         ("user_id" = UserId, description = "User id"),
     ),
-    security(("cookie_auth" = ["administrator", "coordinator_csb", "coordinator_gsb"])),
 )]
 pub async fn user_update(
-    AdminOrCoordinator(logged_in_user): AdminOrCoordinator,
+    logged_in_user: User,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Path(user_id): Path<UserId>,
@@ -242,10 +242,9 @@ pub async fn user_update(
     params(
         ("user_id" = UserId, description = "User id"),
     ),
-    security(("cookie_auth" = ["administrator", "coordinator_csb", "coordinator_gsb"])),
 )]
 async fn user_delete(
-    AdminOrCoordinator(logged_in_user): AdminOrCoordinator,
+    logged_in_user: User,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Path(user_id): Path<UserId>,

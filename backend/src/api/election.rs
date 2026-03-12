@@ -8,6 +8,7 @@ use eml_nl::EMLError;
 use quick_xml::{DeError, SeError};
 use serde::{Deserialize, Serialize};
 use sqlx::{SqliteConnection, SqlitePool};
+use strum::VariantArray;
 use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
@@ -15,7 +16,7 @@ use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
     api::{
         committee_session::create_committee_session,
-        middleware::authentication::{Admin, AdminOrCoordinatorGSB},
+        middleware::authentication::RouteAuthorization,
         polling_station::create_imported_polling_stations,
     },
     domain::{
@@ -31,6 +32,7 @@ use crate::{
         },
         investigation::PollingStationInvestigation,
         polling_station::{PollingStationRequest, PollingStationResponse, PollingStationsRequest},
+        role::Role,
     },
     eml::{
         EMLImportError, EmlHash, RedactedEmlHash, number_of_voters_from_polling_stations_eml,
@@ -38,17 +40,23 @@ use crate::{
         polling_stations_from_eml, polling_stations_from_eml_str,
     },
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
-    repository::{committee_session_repo, election_repo, user_repo::User},
+    repository::{committee_session_repo, election_repo},
     service::{create_sub_committee, list_polling_stations_for_session},
 };
 
 pub fn router() -> OpenApiRouter<AppState> {
+    use Role::*;
+
+    const ALL_ROLES: &[Role] = Role::VARIANTS;
+    const ADMIN: &[Role] = &[Administrator];
+    const ADMIN_GSB_COORDINATOR: &[Role] = &[Administrator, CoordinatorGSB];
+
     OpenApiRouter::default()
-        .routes(routes!(election_import_validate))
-        .routes(routes!(election_import))
-        .routes(routes!(election_list))
-        .routes(routes!(election_details))
-        .routes(routes!(election_number_of_voters_change))
+        .routes(routes!(election_import_validate).authorize(ADMIN))
+        .routes(routes!(election_import).authorize(ADMIN))
+        .routes(routes!(election_list).authorize(ALL_ROLES))
+        .routes(routes!(election_details).authorize(ALL_ROLES))
+        .routes(routes!(election_number_of_voters_change).authorize(ADMIN_GSB_COORDINATOR))
 }
 
 /// Election list response
@@ -133,10 +141,8 @@ impl AsAuditEvent for ElectionUpdatedAuditData {
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
-    security(("cookie_auth" = ["administrator", "coordinator_gsb", "typist_gsb"])),
 )]
 pub async fn election_list(
-    _user: User,
     State(pool): State<SqlitePool>,
 ) -> Result<Json<ElectionListResponse>, APIError> {
     let mut conn = pool.acquire().await?;
@@ -163,10 +169,8 @@ pub async fn election_list(
     params(
         ("election_id" = ElectionId, description = "Election database id"),
     ),
-    security(("cookie_auth" = ["administrator", "coordinator_gsb", "typist_gsb"])),
 )]
 pub async fn election_details(
-    _user: User,
     State(pool): State<SqlitePool>,
     Path(election_id): Path<ElectionId>,
 ) -> Result<Json<ElectionDetailsResponse>, APIError> {
@@ -208,10 +212,8 @@ pub async fn election_details(
     params(
         ("election_id" = ElectionId, description = "Election database id"),
     ),
-    security(("cookie_auth" = ["administrator", "coordinator_gsb"])),
 )]
 pub async fn election_number_of_voters_change(
-    _user: AdminOrCoordinatorGSB,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Path(election_id): Path<ElectionId>,
@@ -348,10 +350,8 @@ pub struct CSBElectionDefinitionValidateResponse {
         (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
-    security(("cookie_auth" = ["administrator"])),
 )]
 pub async fn election_import_validate(
-    _user: Admin,
     Json(request): Json<ElectionCreationValidateRequest>,
 ) -> Result<Json<ElectionDefinitionValidateResponse>, APIError> {
     match request {
@@ -504,10 +504,8 @@ async fn create_election(
         (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
-    security(("cookie_auth" = ["administrator"])),
 )]
 pub async fn election_import(
-    _user: Admin,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Json(request): Json<ElectionCreationRequest>,

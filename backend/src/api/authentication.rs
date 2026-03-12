@@ -282,9 +282,7 @@ pub struct AccountUpdateRequest {
       (status = 500, description = "Internal server error", body = ErrorResponse),
   ),
 )]
-async fn account(user: Option<User>) -> Result<impl IntoResponse, APIError> {
-    let user = user.ok_or(AuthenticationError::UserNotFound)?;
-
+async fn account(user: User) -> Result<impl IntoResponse, APIError> {
     Ok(Json(LoginResponse::from(&user)))
 }
 

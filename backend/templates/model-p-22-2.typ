@@ -241,23 +241,26 @@ De resterende restzetels zijn verdeeld via het systeem van de grootste gemiddeld
 
 De aan de lijsten toegewezen volle zetels en restzetels zijn bij elkaar opgeteld. De verdeling van alle zetels ziet er als volgt uit:
 
-#TODO[Zetelverdeling tabel]
-
 #table(
   columns: (1fr, 10em),
+  stroke: 0.5pt + gray,
+  fill: (_, y) => if y > 1 and calc.even(y) { luma(245) },
   table.hline(stroke: none),
   table.header(
     ..([Lijst], [Toegewezen zetels]).enumerate().map(((idx, h)) => table.cell(stroke: none, align: bottom + if idx == 0 { left } else { right }, small_header_text(h))),
   ),
   table.hline(stroke: 1pt + black),
-  fill: (_, y) => if y > 1 and calc.even(y) { luma(245) },
+  
   ..for standing in input.seat_assignment.final_standing.sorted(key: standing => standing.total_seats, by: (l, r) => l >= r) {
     (
       table.cell(political_group_name(input.election.political_groups.find(pg => pg.number == standing.list_number), withPrefix: false)),
       table.cell(align: right, [#standing.total_seats])
     )
   }.flatten(),
+  table.hline(stroke: 1pt + black),
 )
+
+#pagebreak(weak: true)
 
 == Toewijzing van zetels aan kandidaten
 

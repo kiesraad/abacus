@@ -251,9 +251,12 @@ describe("Test PollingStationPicker", () => {
 
       server.use(
         http.get("/api/elections/1/status", () =>
-          HttpResponse.json(getElectionStatusMockData({ status: "first_entry_finalised" }, { status: "definitive" }), {
-            status: 200,
-          }),
+          HttpResponse.json(
+            getElectionStatusMockData([{ status: "first_entry_finalised" }, { status: "definitive" }]),
+            {
+              status: 200,
+            },
+          ),
         ),
       );
 
@@ -311,11 +314,13 @@ describe("Test PollingStationPicker", () => {
         "get",
         "api/elections/1/status",
         200,
-        getElectionStatusMockData({
-          status: "first_entry_in_progress",
-          first_entry_user_id: testUser.user_id + 1,
-          first_entry_progress: 42,
-        }),
+        getElectionStatusMockData([
+          {
+            status: "first_entry_in_progress",
+            first_entry_user_id: testUser.user_id + 1,
+            first_entry_progress: 42,
+          },
+        ]),
       );
 
       await renderPollingStationPicker();
@@ -335,12 +340,12 @@ describe("Test PollingStationPicker", () => {
       server.use(
         http.get("/api/elections/1/status", () =>
           HttpResponse.json(
-            getElectionStatusMockData(
+            getElectionStatusMockData([
               { status: "definitive" },
               { status: "definitive" },
               { status: "definitive" },
               { status: "entries_different" },
-            ),
+            ]),
             { status: 200 },
           ),
         ),
@@ -361,9 +366,12 @@ describe("Test PollingStationPicker", () => {
       overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
       server.use(
         http.get("/api/elections/1/status", () =>
-          HttpResponse.json(getElectionStatusMockData({ status: "first_entry_finalised" }, { status: "definitive" }), {
-            status: 200,
-          }),
+          HttpResponse.json(
+            getElectionStatusMockData([{ status: "first_entry_finalised" }, { status: "definitive" }]),
+            {
+              status: 200,
+            },
+          ),
         ),
       );
       const router = await renderPollingStationPicker();
@@ -387,7 +395,7 @@ describe("Test PollingStationPicker", () => {
       server.use(
         http.get("/api/elections/1/status", () =>
           HttpResponse.json(
-            getElectionStatusMockData(
+            getElectionStatusMockData([
               {
                 status: "empty",
               },
@@ -406,7 +414,7 @@ describe("Test PollingStationPicker", () => {
                 first_entry_user_id: 1,
                 second_entry_user_id: 2,
               },
-            ),
+            ]),
             { status: 200 },
           ),
         ),
@@ -421,11 +429,13 @@ describe("Test PollingStationPicker", () => {
     });
 
     test("Show polling stations as 'in progress' with different users", async () => {
-      const electionStatus = getElectionStatusMockData({
-        status: "first_entry_in_progress",
-        first_entry_user_id: testUser.user_id + 1,
-        first_entry_progress: 42,
-      });
+      const electionStatus = getElectionStatusMockData([
+        {
+          status: "first_entry_in_progress",
+          first_entry_user_id: testUser.user_id + 1,
+          first_entry_progress: 42,
+        },
+      ]);
       const testPollingStation = electionStatus.statuses[0]!.source;
 
       server.use(ElectionRequestHandler);
@@ -463,11 +473,13 @@ describe("Test PollingStationPicker", () => {
     });
 
     test("Show in progress for current user", async () => {
-      const electionStatus = getElectionStatusMockData({
-        status: "first_entry_in_progress",
-        first_entry_user_id: testUser.user_id,
-        first_entry_progress: 42,
-      });
+      const electionStatus = getElectionStatusMockData([
+        {
+          status: "first_entry_in_progress",
+          first_entry_user_id: testUser.user_id,
+          first_entry_progress: 42,
+        },
+      ]);
       const testPollingStation = electionStatus.statuses[0]!.source;
 
       server.use(ElectionRequestHandler);
@@ -526,11 +538,13 @@ describe("Test PollingStationPicker", () => {
 
   test("Show uncompleted data entries for current user", async () => {
     server.use(ElectionRequestHandler);
-    const electionStatus = getElectionStatusMockData({
-      status: "first_entry_in_progress",
-      first_entry_user_id: testUser.user_id,
-      first_entry_progress: 42,
-    });
+    const electionStatus = getElectionStatusMockData([
+      {
+        status: "first_entry_in_progress",
+        first_entry_user_id: testUser.user_id,
+        first_entry_progress: 42,
+      },
+    ]);
     const testPollingStation = electionStatus.statuses[0]!.source;
     // Have the server return an in progress polling station that is owned by a logged-in user.
     server.use(http.get("/api/elections/1/status", () => HttpResponse.json(electionStatus, { status: 200 })));
@@ -544,11 +558,13 @@ describe("Test PollingStationPicker", () => {
   });
 
   test("Show recent status when searching for polling station", async () => {
-    const electionStatus = getElectionStatusMockData({
-      status: "first_entry_in_progress",
-      first_entry_user_id: testUser.user_id + 1,
-      first_entry_progress: 42,
-    });
+    const electionStatus = getElectionStatusMockData([
+      {
+        status: "first_entry_in_progress",
+        first_entry_user_id: testUser.user_id + 1,
+        first_entry_progress: 42,
+      },
+    ]);
     const testPollingStation = electionStatus.statuses[0]!.source;
 
     server.use(ElectionRequestHandler);

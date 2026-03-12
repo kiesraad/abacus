@@ -8,12 +8,12 @@ import { ElectionProgress } from "./ElectionProgress";
 describe("ElectionProgress", () => {
   test("renders a progress bar for the definitive status", () => {
     vi.spyOn(useElectionStatus, "useElectionStatus").mockReturnValue({
-      ...getElectionStatusMockData(
+      ...getElectionStatusMockData([
         { status: "empty" },
         { status: "first_entry_finalised" },
         { status: "definitive" },
         { status: "first_entry_in_progress" },
-      ),
+      ]),
       refetch: vi.fn(),
     });
 

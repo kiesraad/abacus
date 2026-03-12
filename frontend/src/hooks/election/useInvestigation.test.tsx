@@ -130,7 +130,7 @@ describe("useInvestigations", () => {
       "get",
       "/api/elections/1/status",
       200,
-      getElectionStatusMockData({ status: "second_entry_in_progress" }),
+      getElectionStatusMockData([{ status: "second_entry_in_progress" }]),
     );
 
     const result = renderUseInvestigations();

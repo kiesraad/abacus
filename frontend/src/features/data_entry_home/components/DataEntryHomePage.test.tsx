@@ -73,7 +73,7 @@ describe("DataEntryHomePage", () => {
       "get",
       "/api/elections/1/status",
       200,
-      getElectionStatusMockData({ status: "definitive" }, { status: "definitive" }),
+      getElectionStatusMockData([{ status: "definitive" }, { status: "definitive" }]),
     );
 
     renderDataEntryHomePage();
@@ -86,10 +86,10 @@ describe("DataEntryHomePage", () => {
       "get",
       "/api/elections/1/status",
       200,
-      getElectionStatusMockData(
+      getElectionStatusMockData([
         { status: "first_entry_in_progress", first_entry_user_id: getTypistUser().user_id },
         { status: "empty" },
-      ),
+      ]),
     );
 
     renderDataEntryHomePage();
@@ -105,7 +105,7 @@ describe("DataEntryHomePage", () => {
       "get",
       "/api/elections/1/status",
       200,
-      getElectionStatusMockData({ status: "empty" }, { status: "definitive" }),
+      getElectionStatusMockData([{ status: "empty" }, { status: "definitive" }]),
     );
 
     renderDataEntryHomePage();

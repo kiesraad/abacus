@@ -210,7 +210,7 @@ describe("ElectionStatusPage", () => {
     const user = userEvent.setup();
     server.use(
       http.get("/api/elections/1/status", () =>
-        HttpResponse.json(getElectionStatusMockData({ status: "definitive" }, { status: "definitive" }), {
+        HttpResponse.json(getElectionStatusMockData([{ status: "definitive" }, { status: "definitive" }]), {
           status: 200,
         }),
       ),
@@ -237,7 +237,7 @@ describe("ElectionStatusPage", () => {
       "get",
       "/api/elections/1/status",
       200,
-      getElectionStatusMockData({ status: "definitive" }, { status: "definitive" }),
+      getElectionStatusMockData([{ status: "definitive" }, { status: "definitive" }]),
     );
 
     await renderPage();
@@ -261,7 +261,7 @@ describe("ElectionStatusPage", () => {
     );
     server.use(
       http.get("/api/elections/1/status", () =>
-        HttpResponse.json(getElectionStatusMockData({ status: "definitive" }, { status: "definitive" }), {
+        HttpResponse.json(getElectionStatusMockData([{ status: "definitive" }, { status: "definitive" }]), {
           status: 200,
         }),
       ),
@@ -353,7 +353,7 @@ describe("ElectionStatusPage", () => {
       "get",
       "/api/elections/1/status",
       200,
-      getElectionStatusMockData({ status: "definitive" }, { status: "definitive" }),
+      getElectionStatusMockData([{ status: "definitive" }, { status: "definitive" }]),
     );
 
     await renderPage();

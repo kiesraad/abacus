@@ -77,7 +77,7 @@ export const electionStatusesMock: ElectionStatusResponseEntry[] = [
  * @param statuses rest param with ElectionStatusResponseEntry objects where only the status is mandatory
  */
 export const getElectionStatusMockData = (
-  ...statuses: (Partial<ElectionStatusResponseEntry> & { status: ElectionStatusResponseEntry["status"] })[]
+  statuses: (Partial<ElectionStatusResponseEntry> & { status: ElectionStatusResponseEntry["status"] })[],
 ): ElectionStatusResponse => ({
   statuses: statuses.map((status, i) => {
     const { data_entry_id, source } = electionStatusesMock[i]!;

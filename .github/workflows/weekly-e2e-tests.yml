@@ -1,0 +1,130 @@
+name: Weekly end-to-end tests
+
+on:
+    workflow_dispatch:
+    # Run every Monday at 05:00 UTC
+    schedule:
+        - cron: "0 5 * * 1"
+
+permissions:
+  contents: read
+
+jobs:
+  build-frontend:
+    name: Build production frontend (on linux only)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    env:
+      SHOW_DEV_PAGE: false
+    steps:
+      - uses: actions/checkout@v6
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          package-manager-cache: false
+      - name: Install pnpm
+        run: >
+          npm install --global corepack@latest &&
+          corepack enable &&
+          corepack prepare pnpm@latest-10 --activate
+      - name: Install dependencies
+        run: pnpm install --prod
+      - name: Build
+        run: pnpm build
+      - uses: actions/upload-artifact@v7
+        with:
+          name: frontend-weekly-build
+          path: frontend/dist
+
+  build:
+    name: Build
+    needs:
+      - build-frontend
+    strategy:
+      matrix:
+        target:
+          - os: ubuntu-latest
+            name: x86_64-unknown-linux-musl
+            binary: backend/target/x86_64-unknown-linux-musl/release/abacus
+          - os: windows-latest
+            name: x86_64-pc-windows-msvc
+            binary: backend/target/x86_64-pc-windows-msvc/release/abacus.exe
+    runs-on: ${{ matrix.target.os }}
+    defaults:
+      run:
+        working-directory: ./backend
+    env:
+      CARGO_TERM_COLOR: always
+      SQLX_OFFLINE: "true"
+    steps:
+      - uses: actions/checkout@v6
+      - name: Download Abacus Frontend
+        uses: actions/download-artifact@v8
+        with:
+          name: frontend-weekly-build
+          path: frontend/dist
+      - name: Setup Rust
+        run: rustup update stable && rustup default stable
+      - name: Install target
+        run: rustup target add ${{ matrix.target.name }}
+      - name: Install musl
+        run: sudo apt-get update && sudo apt-get install -y musl-tools
+        if: matrix.target.os == 'ubuntu-latest'
+      - name: Build without airgap detection
+        run: cargo --locked build --release --no-default-features --features memory-serve,embed-typst --target=${{ matrix.target.name }}
+      - uses: actions/upload-artifact@v7
+        with:
+          name: abacus-${{ matrix.target.os }}-weekly
+          path: ${{ matrix.target.binary }}
+
+  playwright-e2e:
+    name: Playwright e2e tests (${{ matrix.os }} ${{ matrix.shardIndex }}/${{ matrix.shardTotal }})
+    needs:
+      - build
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        shardIndex: [1, 2, 3]
+        shardTotal: [3]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: frontend
+    env:
+      RELEASE_BUILD: true
+    steps:
+      - uses: actions/checkout@v6
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          package-manager-cache: false
+      - name: Install pnpm
+        run: >
+          npm install --global --force corepack@latest &&
+          corepack enable &&
+          corepack prepare pnpm@latest-10 --activate
+      - name: Install dependencies
+        run: pnpm install
+      - name: Install Playwright Browsers
+        run: pnpm playwright install --with-deps --no-shell
+      - name: Download abacus
+        uses: actions/download-artifact@v8
+        with:
+          name: abacus-${{ matrix.os }}-weekly
+          path: builds/backend
+      - name: make backend build executable
+        run: chmod a+x ../builds/backend/abacus
+        if: runner.os != 'Windows'
+      - name: Run Playwright e2e tests
+        run: pnpm test:e2e --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
+      - name: Upload Playwright report
+        uses: actions/upload-artifact@v7
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report-release-${{ matrix.os }}-${{ matrix.shardIndex }}
+          path: frontend/playwright-report/
+          retention-days: 30

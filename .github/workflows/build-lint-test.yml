@@ -202,8 +202,6 @@ jobs:
           corepack prepare pnpm@latest-10 --activate
       - name: Install dependencies
         run: pnpm install
-      - name: Install Playwright Browsers
-        run: pnpm playwright install --with-deps --no-shell
       - name: Download Abacus
         uses: actions/download-artifact@v8
         with:
@@ -211,8 +209,8 @@ jobs:
           path: builds/backend
       - name: Make Abacus executable
         run: chmod a+x ../builds/backend/abacus
-      - name: Run e2e playwright tests
-        run: pnpm test:e2e --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
+      - name: Run e2e playwright tests in Chrome
+        run: pnpm test:e2e --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }} --project chrome
       - name: Upload Playwright report
         uses: actions/upload-artifact@v7
         if: ${{ !cancelled() }}

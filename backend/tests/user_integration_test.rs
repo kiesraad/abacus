@@ -124,7 +124,7 @@ async fn test_user_listing(pool: SqlitePool) {
     );
     let body: serde_json::Value = response.json().await.unwrap();
     let users = body["users"].as_array().unwrap();
-    assert_eq!(users.len(), 6);
+    assert_eq!(users.len(), 10);
     assert!(users.iter().any(|ps| {
         [
             "admin1",

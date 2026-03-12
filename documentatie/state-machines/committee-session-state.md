@@ -4,7 +4,7 @@ This document describes the states a committee session can have.
 The transition labels describe the action that is used for performing the transition.
 
 **CSB**  
-Follow the regular (uninterrupted) lines and use `subcommittee` (discard `polling station` and `investigation`) for this flow.
+Follow the regular (uninterrupted) lines and use `subcommittee` (ignore `polling station` and `investigation`) for this flow.
 
 > **Note:** The subcommittee is automatically created when a CSB election is created.  
 > Therefor the status will move directly from `Created` to `InPreparation`.
@@ -12,8 +12,8 @@ Follow the regular (uninterrupted) lines and use `subcommittee` (discard `pollin
 **GSB**  
 Follow the regular (uninterrupted) lines combined with the dotted lines.
 
-In case of the first committee session, use `polling station` (discard `investigation`) for this flow.  
-For every next committee session, use `investigation` (discard `polling station`) for this flow.
+In case of the first committee session, use `polling station` (ignore `investigation`) for this flow.  
+For every next committee session, use `investigation` (ignore `polling station`) for this flow.
 
 ```mermaid
 flowchart

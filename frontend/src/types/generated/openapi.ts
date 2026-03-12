@@ -787,16 +787,18 @@ export interface ElectionNumberOfVotersChangeRequest {
 }
 
 /**
- * Election polling stations data entry statuses response
+ * Election data entry statuses response
  */
 export interface ElectionStatusResponse {
   statuses: ElectionStatusResponseEntry[];
 }
 
 /**
- * Election polling stations data entry statuses response
+ * Election data entry statuses response entry
  */
 export interface ElectionStatusResponseEntry {
+  /** Data entry id */
+  data_entry_id: DataEntryId;
   /** Whether the finalised first or second data entry has warnings */
   finalised_with_warnings?: boolean;
   /** Time when the data entry was finalised */
@@ -805,12 +807,12 @@ export interface ElectionStatusResponseEntry {
   first_entry_progress?: number;
   /** First entry user id */
   first_entry_user_id?: number;
-  /** Polling station id */
-  polling_station_id: PollingStationId;
   /** Second entry progress as a percentage (0 to 100) */
   second_entry_progress?: number;
   /** Second entry user id */
   second_entry_user_id?: number;
+  /** Data entry source (polling station or sub committee) */
+  source: DataEntrySource;
   /** Data entry status */
   status: DataEntryStatusName;
 }

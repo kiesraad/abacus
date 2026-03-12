@@ -651,6 +651,24 @@ async fn create_election_with_committee_session(
 
     create_sub_committees(tx, &election, committee_session.id).await?;
 
+    // CSB elections have sub committees created at import time, so they can
+    // go straight to InPreparation.
+    if election.committee_category == CommitteeCategory::CSB {
+        let committee_session = committee_session_repo::change_status(
+            tx,
+            committee_session.id,
+            CommitteeSessionStatus::InPreparation,
+        )
+        .await?;
+        audit_service
+            .log(
+                tx,
+                &crate::service::CommitteeSessionUpdatedAuditData(committee_session.into()),
+                None,
+            )
+            .await?;
+    }
+
     Ok(election)
 }
 

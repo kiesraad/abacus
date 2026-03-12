@@ -10,6 +10,7 @@ import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider"
 import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
 import * as useUser from "@/hooks/user/useUser";
 import { electionDetailsMockResponse, getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
+import { getElectionStatusMockData } from "@/testing/api-mocks/ElectionStatusMockData";
 import {
   ElectionListRequestHandler,
   ElectionRequestHandler,
@@ -19,8 +20,7 @@ import { Providers } from "@/testing/Providers";
 import { overrideOnce, server } from "@/testing/server";
 import { render, screen, setupTestRouter, within } from "@/testing/test-utils";
 import { getTypistUser } from "@/testing/user-mock-data";
-import type { ElectionDetailsResponse, ElectionStatusResponse } from "@/types/generated/openapi";
-
+import type { ElectionDetailsResponse } from "@/types/generated/openapi";
 import { dataEntryHomeRoutes } from "../routes";
 import { DataEntryHomePage } from "./DataEntryHomePage";
 
@@ -69,12 +69,12 @@ describe("DataEntryHomePage", () => {
   });
 
   test("Alert visible when completed", async () => {
-    overrideOnce("get", "/api/elections/1/status", 200, {
-      statuses: [
-        { polling_station_id: 1, status: "definitive" },
-        { polling_station_id: 2, status: "definitive" },
-      ],
-    });
+    overrideOnce(
+      "get",
+      "/api/elections/1/status",
+      200,
+      getElectionStatusMockData([{ status: "definitive" }, { status: "definitive" }]),
+    );
 
     renderDataEntryHomePage();
 
@@ -82,12 +82,15 @@ describe("DataEntryHomePage", () => {
   });
 
   test("Resume input visible when some are uncompleted", async () => {
-    overrideOnce("get", "/api/elections/1/status", 200, {
-      statuses: [
-        { polling_station_id: 1, status: "first_entry_in_progress", first_entry_user_id: getTypistUser().user_id },
-        { polling_station_id: 2, status: "empty" },
-      ],
-    } satisfies ElectionStatusResponse);
+    overrideOnce(
+      "get",
+      "/api/elections/1/status",
+      200,
+      getElectionStatusMockData([
+        { status: "first_entry_in_progress", first_entry_user_id: getTypistUser().user_id },
+        { status: "empty" },
+      ]),
+    );
 
     renderDataEntryHomePage();
 
@@ -98,12 +101,12 @@ describe("DataEntryHomePage", () => {
   });
 
   test("Resume input invisible when none are unfinished", async () => {
-    overrideOnce("get", "/api/elections/1/status", 200, {
-      statuses: [
-        { polling_station_id: 1, status: "empty" },
-        { polling_station_id: 2, status: "definitive" },
-      ],
-    });
+    overrideOnce(
+      "get",
+      "/api/elections/1/status",
+      200,
+      getElectionStatusMockData([{ status: "empty" }, { status: "definitive" }]),
+    );
 
     renderDataEntryHomePage();
 

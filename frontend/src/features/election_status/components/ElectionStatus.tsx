@@ -4,12 +4,7 @@ import { Progress } from "@/components/ui/ProgressBar/Progress";
 import { ProgressBar } from "@/components/ui/ProgressBar/ProgressBar";
 import { Table } from "@/components/ui/Table/Table";
 import { t } from "@/i18n/translate";
-import type {
-  CommitteeSession,
-  Election,
-  ElectionStatusResponseEntry,
-  PollingStation,
-} from "@/types/generated/openapi";
+import type { CommitteeSession, Election, ElectionStatusResponseEntry } from "@/types/generated/openapi";
 
 import {
   categoryColorClass,
@@ -25,23 +20,12 @@ export interface ElectionStatusProps {
   statuses: ElectionStatusResponseEntry[];
   election: Election;
   committeeSession: CommitteeSession;
-  pollingStations: PollingStation[];
   addLinks: boolean;
   navigate: (path: string) => void;
 }
 
-export function ElectionStatus({
-  statuses,
-  election,
-  committeeSession,
-  pollingStations,
-  addLinks,
-  navigate,
-}: ElectionStatusProps) {
-  const { progressBarData, categoryCounts, pollingStationWithStatusAndTypist, tableCategories } = useElectionStatus(
-    statuses,
-    pollingStations,
-  );
+export function ElectionStatus({ statuses, election, committeeSession, addLinks, navigate }: ElectionStatusProps) {
+  const { progressBarData, categoryCounts, statusEntriesWithTypist, tableCategories } = useElectionStatus(statuses);
 
   return (
     <div className={cls.container}>
@@ -112,15 +96,15 @@ export function ElectionStatus({
                 <Table id={cat} key={cat} aria-label={t(`status.${cat}`)}>
                   <CategoryHeader category={cat} />
                   <Table.Body key={cat} className="fs-sm">
-                    {pollingStationWithStatusAndTypist
-                      .filter((ps) => ps.status !== undefined && statusesForCategory[cat].includes(ps.status))
-                      .map((ps) => (
+                    {statusEntriesWithTypist
+                      .filter((se) => statusesForCategory[cat].includes(se.entry.status))
+                      .map((se) => (
                         <CategoryRow
-                          key={`${cat}-${ps.id}`}
+                          key={`${cat}-${se.entry.source.type}-${se.entry.source.id}`}
                           category={cat}
-                          pollingStation={ps}
+                          statusEntryWithTypist={se}
                           addLink={addLinks}
-                          warning={ps.finalised_with_warnings}
+                          warning={se.entry.finalised_with_warnings}
                         />
                       ))}
                   </Table.Body>

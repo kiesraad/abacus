@@ -30,7 +30,9 @@ export function PollingStationUpdatePage() {
 
   const { requestState } = usePollingStationGet(election.id, pollingStationId);
   const electionStatuses = useElectionStatus();
-  const status = electionStatuses.statuses.find((status) => status.polling_station_id === pollingStationId);
+  const status = electionStatuses.statuses.find(
+    (status) => status.source.type === "PollingStation" && status.source.id === pollingStationId,
+  );
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   function toggleShowDeleteModal() {

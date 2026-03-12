@@ -30,7 +30,9 @@ export default function useInvestigations(): InvestigationsOverview {
   const investigationsWithStatus = investigations
     .map((investigation) => {
       const pollingStation = pollingStations.find((ps) => ps.id === investigation.polling_station_id);
-      const status = statuses.find((s) => s.polling_station_id === investigation.polling_station_id);
+      const status = statuses.find(
+        (s) => s.source.type === "PollingStation" && s.source.id === investigation.polling_station_id,
+      );
 
       if (!pollingStation) {
         return null;

@@ -3,16 +3,12 @@ import { describe, expect, test } from "vitest";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
 import { getElectionMockData, mockInvestigations } from "@/testing/api-mocks/ElectionMockData";
+import { getElectionStatusMockData } from "@/testing/api-mocks/ElectionStatusMockData";
 import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
 import { Providers } from "@/testing/Providers";
 import { overrideOnce } from "@/testing/server";
 import { renderHook, waitFor } from "@/testing/test-utils";
-import type {
-  ElectionDetailsResponse,
-  ElectionStatusResponse,
-  PollingStationInvestigation,
-} from "@/types/generated/openapi";
-
+import type { ElectionDetailsResponse, PollingStationInvestigation } from "@/types/generated/openapi";
 import useInvestigations from "./useInvestigations";
 
 function renderUseInvestigations() {
@@ -130,9 +126,12 @@ describe("useInvestigations", () => {
         },
       ]),
     );
-    overrideOnce("get", "/api/elections/1/status", 200, {
-      statuses: [{ polling_station_id: 1, status: "second_entry_in_progress" }],
-    } satisfies ElectionStatusResponse);
+    overrideOnce(
+      "get",
+      "/api/elections/1/status",
+      200,
+      getElectionStatusMockData([{ status: "second_entry_in_progress" }]),
+    );
 
     const result = renderUseInvestigations();
 

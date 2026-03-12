@@ -19,7 +19,9 @@ export function InvestigationDelete({ pollingStation, onDeleted }: Investigation
   const [showModal, setShowModal] = useState(false);
   const { refetch } = useElection(pollingStation.id);
   const electionStatuses = useElectionStatus();
-  const status = electionStatuses.statuses.find((status) => status.polling_station_id === pollingStation.id);
+  const status = electionStatuses.statuses.find(
+    (status) => status.source.type === "PollingStation" && status.source.id === pollingStation.id,
+  );
   const removePath = `/api/polling_stations/${pollingStation.id}/investigation`;
   const { remove, isLoading } = useCrud({ removePath, throwAllErrors: true });
 

@@ -5,7 +5,6 @@ import { expect, fn, mocked, within } from "storybook/test";
 import { committeeSessionMockData } from "@/testing/api-mocks/CommitteeSessionMockData";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { electionStatusesMock } from "@/testing/api-mocks/ElectionStatusMockData";
-import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 
 import { ElectionStatus } from "./ElectionStatus";
@@ -31,7 +30,6 @@ export const ElectionStatusNoLinks: StoryObj<StoryProps> = {
           statuses={mockStatuses}
           committeeSession={committeeSessionMockData}
           election={electionMockData}
-          pollingStations={pollingStationMockData}
           addLinks={addLinks}
           navigate={buttonNavigate}
         />
@@ -156,7 +154,6 @@ export const ElectionStatusWithLinks: StoryObj<StoryProps> = {
           statuses={mockStatuses}
           committeeSession={committeeSessionMockData}
           election={electionMockData}
-          pollingStations={pollingStationMockData}
           addLinks={addLinks}
           navigate={buttonNavigate}
         />
@@ -235,7 +232,6 @@ export const Empty: StoryObj<StoryProps> = {
         statuses={[]}
         election={electionMockData}
         committeeSession={committeeSessionMockData}
-        pollingStations={[]}
         addLinks={addLinks}
         navigate={buttonNavigate}
       />
@@ -271,7 +267,6 @@ export const NextSession: StoryObj<StoryProps> = {
           statuses={mockStatuses}
           committeeSession={{ ...committeeSessionMockData, number: 2 }}
           election={electionMockData}
-          pollingStations={pollingStationMockData}
           addLinks={addLinks}
           navigate={buttonNavigate}
         />
@@ -298,7 +293,6 @@ export const NextSessionEmpty: StoryObj<StoryProps> = {
         statuses={[]}
         election={electionMockData}
         committeeSession={{ ...committeeSessionMockData, number: 2 }}
-        pollingStations={[]}
         addLinks={addLinks}
         navigate={buttonNavigate}
       />

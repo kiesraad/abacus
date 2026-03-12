@@ -26,7 +26,7 @@ import { ElectionStatus } from "./ElectionStatus";
 // biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function ElectionStatusPage() {
   const navigate = useNavigate();
-  const { currentCommitteeSession, election, pollingStations, refetch: refetchElection } = useElection();
+  const { currentCommitteeSession, election, refetch: refetchElection } = useElection();
   const { statuses, refetch: refetchStatuses } = useElectionStatus();
   const { isCoordinator } = useUserRole();
   const [showPauseModal, setShowPauseModal] = useState(false);
@@ -170,7 +170,6 @@ export function ElectionStatusPage() {
         <ElectionStatus
           committeeSession={currentCommitteeSession}
           election={election}
-          pollingStations={pollingStations}
           statuses={statuses}
           addLinks={
             isCoordinator &&

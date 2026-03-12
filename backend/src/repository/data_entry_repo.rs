@@ -3,7 +3,6 @@ use std::collections::HashMap;
 use sqlx::{Connection, SqliteConnection, query, query_as, types::Json};
 
 use crate::{
-    api::data_entry::ElectionStatusResponseEntry,
     domain::{
         committee_session::CommitteeSessionId,
         data_entry::{DataEntryStatus, PollingStationDataEntry},
@@ -190,42 +189,6 @@ pub async fn delete_data_entry(
 
     tx.commit().await?;
     Ok(res)
-}
-
-/// Get the status for each polling station data entry in a committee session
-pub async fn statuses(
-    conn: &mut SqliteConnection,
-    committee_session_id: CommitteeSessionId,
-) -> Result<Vec<ElectionStatusResponseEntry>, sqlx::Error> {
-    // If this is not the first committee session, we only want to include
-    // polling stations with corrected results in this committee session
-    query!(
-        r#"
-            SELECT
-                p.id AS "polling_station_id: PollingStationId",
-                de.state AS "state: Json<DataEntryStatus>"
-            FROM polling_stations AS p
-            LEFT JOIN committee_sessions AS c ON c.id = p.committee_session_id
-            LEFT JOIN data_entries AS de ON de.id = p.data_entry_id
-            WHERE c.id = $1 AND (c.number = 1 OR json_extract(p.investigation_state, '$.status') = 'ConcludedWithNewResults')
-        "#,
-        committee_session_id
-    )
-    .map(|status| {
-        let state = status.state.unwrap_or_default();
-        ElectionStatusResponseEntry {
-            polling_station_id: status.polling_station_id,
-            status: state.status_name(),
-            first_entry_user_id: state.get_first_entry_user_id(),
-            second_entry_user_id: state.get_second_entry_user_id(),
-            first_entry_progress: state.get_first_entry_progress(),
-            second_entry_progress: state.get_second_entry_progress(),
-            finished_at: state.finished_at().cloned(),
-            finalised_with_warnings: state.finalised_with_warnings().cloned(),
-        }
-    })
-    .fetch_all(conn)
-    .await
 }
 
 /// Check if a polling station has a data entry

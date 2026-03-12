@@ -1,3 +1,4 @@
+import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
 import type {
   ClaimDataEntryResponse,
   CommonPollingStationResults,
@@ -7,7 +8,6 @@ import type {
   SaveDataEntryResponse,
   ValidationResults,
 } from "@/types/generated/openapi";
-
 import { electionMockData, politicalGroupMockData } from "./ElectionMockData";
 import { validationResultMockData } from "./ValidationResultMockData";
 
@@ -83,6 +83,13 @@ export const claimDataEntryResponse: ClaimDataEntryResponse = {
   data: emptyPollingStationResults(),
   validation_results: emptyValidationResults,
   client_state: null,
+  source: {
+    type: "PollingStation",
+    id: pollingStationMockData[0]!.id,
+    number: pollingStationMockData[0]!.number,
+    name: pollingStationMockData[0]!.name,
+  },
+  status: "first_entry_in_progress",
 };
 
 export const saveDataEntryResponse: SaveDataEntryResponse = {

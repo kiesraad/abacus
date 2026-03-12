@@ -415,7 +415,7 @@ VALUES (5, 'Corrigendum 2026', 'GSB', 'CSO', 'GR2026_GroteStad', 'Grote Stad', '
             ]
           }, {
             "number": 5,
-            "name": "Political Group E",
+            "name": "",
             "candidates": [
               {
                 "number": 1,

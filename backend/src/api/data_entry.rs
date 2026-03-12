@@ -18,9 +18,9 @@ use crate::{
         committee_session::{CommitteeSession, CommitteeSessionError},
         committee_session_status::CommitteeSessionStatus,
         data_entry::{
-            ClientState, CurrentDataEntry, DataEntryId, DataEntryStatus, DataEntryStatusName,
-            DataEntryStatusResponse, DataEntryTransitionError, EntriesDifferent,
-            PollingStationDataEntry,
+            ClientState, CurrentDataEntry, DataEntryId, DataEntrySource, DataEntryStatus,
+            DataEntryStatusName, DataEntryStatusResponse, DataEntryTransitionError,
+            EntriesDifferent, PollingStationDataEntry,
         },
         election::{ElectionId, ElectionWithPoliticalGroups, PoliticalGroup},
         entry_number::EntryNumber,
@@ -142,6 +142,8 @@ pub struct ClaimDataEntryResponse {
     #[serde(skip_serializing_if = "Option::is_none", default)]
     #[schema(nullable = false)]
     pub previous_results: Option<CommonPollingStationResults>,
+    pub source: DataEntrySource,
+    pub status: DataEntryStatusName,
 }
 
 pub fn router() -> OpenApiRouter<AppState> {
@@ -376,6 +378,8 @@ async fn data_entry_claim(
         client_state,
         validation_results,
         previous_results: previous_results.map(|r| r.as_common()),
+        source: polling_station.into(),
+        status: new_state.status_name(),
     }))
 }
 

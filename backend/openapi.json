@@ -4796,7 +4796,9 @@
         "required": [
           "data",
           "client_state",
-          "validation_results"
+          "validation_results",
+          "source",
+          "status"
         ],
         "properties": {
           "client_state": {
@@ -4807,6 +4809,12 @@
           },
           "previous_results": {
             "$ref": "#/components/schemas/CommonPollingStationResults"
+          },
+          "source": {
+            "$ref": "#/components/schemas/DataEntrySource"
+          },
+          "status": {
+            "$ref": "#/components/schemas/DataEntryStatusName"
           },
           "validation_results": {
             "$ref": "#/components/schemas/ValidationResults"
@@ -5104,6 +5112,52 @@
         "type": "integer",
         "format": "int32",
         "minimum": 0
+      },
+      "DataEntrySource": {
+        "oneOf": [
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PollingStationSource"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "type"
+                ],
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "PollingStation"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SubCommittee"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "type"
+                ],
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "SubCommittee"
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        ]
       },
       "DataEntryStatusName": {
         "type": "string",
@@ -6666,6 +6720,27 @@
         ],
         "description": "PollingStationResults contains the results for a polling station.\n\nThe exact type of results depends on the election counting method and\nwhether this is the first or any subsequent data entry session. Based on\nthis, any of four different models can apply"
       },
+      "PollingStationSource": {
+        "type": "object",
+        "required": [
+          "id",
+          "number",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/PollingStationId"
+          },
+          "name": {
+            "type": "string"
+          },
+          "number": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          }
+        }
+      },
       "PollingStationType": {
         "type": "string",
         "description": "Type of Polling station",
@@ -6946,6 +7021,38 @@
             }
           }
         }
+      },
+      "SubCommittee": {
+        "type": "object",
+        "description": "Sub electoral committee base entity, independent\nof the election, committee session and data entry.",
+        "required": [
+          "id",
+          "number",
+          "name",
+          "category"
+        ],
+        "properties": {
+          "category": {
+            "$ref": "#/components/schemas/CommitteeCategory"
+          },
+          "id": {
+            "$ref": "#/components/schemas/SubCommitteeId"
+          },
+          "name": {
+            "type": "string"
+          },
+          "number": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          }
+        },
+        "additionalProperties": false
+      },
+      "SubCommitteeId": {
+        "type": "integer",
+        "format": "int32",
+        "minimum": 0
       },
       "SumCount": {
         "type": "object",

@@ -52,6 +52,10 @@
   background-color: var(--bg-gray);
 }
 
+.bg-white {
+  background-color: var(--base-white);
+}
+
 .bg-yellow {
   background-color: var(--yellow-200);
 }
@@ -73,6 +77,10 @@
 }
 
 /* Width */
+.w-5 {
+  width: 5rem;
+}
+
 .w-6 {
   width: 6rem;
 }

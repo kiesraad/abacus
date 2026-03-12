@@ -40,6 +40,7 @@ pub(super) fn load_sources() -> &'static [SourceFile] {
         include_source!("model-na-31-2-bijlage1.typ"),
         include_source!("model-na-31-2-inlegvel.typ"),
         include_source!("model-p-2a.typ"),
+        include_source!("model-p-22-2.typ"),
         #[cfg(test)]
         include_source!("test-teletex-charset.typ"),
         #[cfg(test)]

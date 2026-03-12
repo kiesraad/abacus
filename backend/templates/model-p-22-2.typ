@@ -1,6 +1,6 @@
 #import "common/style.typ": conf, default_header, document_numbering
 #import "common/scripts.typ": *
-#let input = json("inputs/model-p-22-2/gte-19-seats.json")
+#let input = json("inputs/model-p-22-2.json")
 
 #let is_municipality = (municipal, public_body) => if (
   input.election.category == "Municipal"

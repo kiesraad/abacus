@@ -24,7 +24,7 @@ export const Default: StoryObj = {
       ["2", "Political Group B", "5", "1", "6"],
       ["3", "Political Group C", "1", "-", "1"],
       ["4", "Political Group D", "1", "1", "2"],
-      ["5", "Political Group E", "1", "1", "2"],
+      ["5", "Blanco (Smit, G.)", "1", "1", "2"],
       ["", "Totaal", "19", "4", "23"],
     ]);
   },

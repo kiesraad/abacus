@@ -1,8 +1,8 @@
-use sqlx::{FromRow, SqliteConnection, query_as};
+use sqlx::{FromRow, SqliteConnection, query, query_as, types::Json};
 
 use crate::domain::{
     committee_session::CommitteeSessionId,
-    data_entry::DataEntryId,
+    data_entry::{DataEntryId, DataEntrySource, DataEntryStatus, DataEntryStatusWithSource},
     election::CommitteeCategory,
     sub_committee::{SubCommittee, SubCommitteeFirstSession, SubCommitteeId, SubCommitteeNumber},
 };
@@ -113,4 +113,38 @@ pub async fn create(
     .fetch_one(conn)
     .await
     .map(SubCommitteeFirstSession::from)
+}
+
+/// List all sub committees for a first committee session with their data entry status.
+pub async fn list_first_session_with_status(
+    conn: &mut SqliteConnection,
+    committee_session_id: CommitteeSessionId,
+) -> Result<Vec<DataEntryStatusWithSource>, sqlx::Error> {
+    query!(
+        r#"
+        SELECT
+            de.id AS "data_entry_id: DataEntryId",
+            sc.id AS "id: SubCommitteeId",
+            sc.number AS "number: SubCommitteeNumber",
+            sc.name,
+            sc.category AS "category: CommitteeCategory",
+            de.state AS "state!: Json<DataEntryStatus>"
+        FROM sub_committees AS sc
+        JOIN data_entries AS de ON de.id = sc.data_entry_id
+        WHERE sc.committee_session_id = $1
+        "#,
+        committee_session_id
+    )
+    .map(|row| DataEntryStatusWithSource {
+        data_entry_id: row.data_entry_id,
+        source: DataEntrySource::SubCommittee(SubCommittee {
+            id: row.id,
+            number: row.number,
+            name: row.name,
+            category: row.category,
+        }),
+        status: row.state.0,
+    })
+    .fetch_all(conn)
+    .await
 }

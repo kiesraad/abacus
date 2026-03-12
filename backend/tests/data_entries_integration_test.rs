@@ -546,6 +546,7 @@ async fn test_election_details_status_no_other_election_statuses(pool: SqlitePoo
     let body: serde_json::Value = response.json().await.unwrap();
     let statuses = body["statuses"].as_array().unwrap();
     assert_eq!(statuses.len(), 1);
-    assert_eq!(statuses[0]["polling_station_id"], 3);
+    assert_eq!(statuses[0]["source"]["type"], "PollingStation");
+    assert_eq!(statuses[0]["source"]["id"], 3);
     assert_eq!(statuses[0]["status"], "first_entry_in_progress");
 }

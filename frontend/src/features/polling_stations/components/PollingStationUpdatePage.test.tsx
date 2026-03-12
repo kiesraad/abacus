@@ -202,7 +202,7 @@ describe("PollingStationUpdatePage", () => {
       status,
       extra_warning,
     }) => {
-      overrideOnce("get", "/api/elections/1/status", 200, getElectionStatusMockData({ status: status }));
+      overrideOnce("get", "/api/elections/1/status", 200, getElectionStatusMockData([{ status }]));
       const user = userEvent.setup();
 
       renderPage("coordinator_gsb");
@@ -240,7 +240,7 @@ describe("PollingStationUpdatePage", () => {
       double_warning,
     }) => {
       overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { number: 2 }));
-      overrideOnce("get", "/api/elections/1/status", 200, getElectionStatusMockData({ status: status }));
+      overrideOnce("get", "/api/elections/1/status", 200, getElectionStatusMockData([{ status }]));
       const user = userEvent.setup();
 
       renderPage("coordinator_gsb");

@@ -7,15 +7,19 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
     APIError, AppState, ErrorResponse,
-    api::middleware::authentication::AdminOrCoordinatorGSB,
+    api::middleware::authentication::RouteAuthorization,
     domain::role::Role,
     infra::audit_log::{AuditLogEvent, LogFilter},
 };
 
 pub fn router() -> OpenApiRouter<AppState> {
+    use Role::*;
+
+    const ALLOWED_ROLES: &[Role] = &[Administrator, CoordinatorGSB];
+
     OpenApiRouter::default()
-        .routes(routes!(audit_log_list))
-        .routes(routes!(audit_log_list_users))
+        .routes(routes!(audit_log_list).authorize(ALLOWED_ROLES))
+        .routes(routes!(audit_log_list_users).authorize(ALLOWED_ROLES))
 }
 
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
@@ -72,10 +76,8 @@ pub struct LogFilterQuery {
         (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
-    security(("cookie_auth" = ["administrator", "coordinator_gsb"])),
 )]
 async fn audit_log_list(
-    _user: AdminOrCoordinatorGSB,
     Query(filter_query): Query<LogFilterQuery>,
     State(pool): State<SqlitePool>,
 ) -> Result<Json<AuditLogListResponse>, APIError> {
@@ -118,10 +120,8 @@ pub struct AuditLogUser {
         (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
-    security(("cookie_auth" = ["administrator", "coordinator_gsb"])),
 )]
 async fn audit_log_list_users(
-    _user: AdminOrCoordinatorGSB,
     State(pool): State<SqlitePool>,
 ) -> Result<Json<Vec<AuditLogUser>>, APIError> {
     let mut conn = pool.acquire().await?;
@@ -144,11 +144,9 @@ mod tests {
         api::{
             audit::{LogFilterQuery, audit_log_list, audit_log_list_users},
             authentication::{UserLoggedInAuditData, UserLoginFailedAuditData},
-            middleware::authentication::AdminOrCoordinatorGSB,
         },
-        domain::role::Role,
         infra::audit_log::{AuditLogListResponse, AuditLogUser, AuditService},
-        repository::user_repo::{self, User, UserId},
+        repository::user_repo::{self, User},
     };
 
     fn new_test_audit_service(user: Option<User>) -> AuditService {
@@ -179,14 +177,9 @@ mod tests {
     }
 
     async fn get_list(pool: SqlitePool, query: LogFilterQuery) -> AuditLogListResponse {
-        let user = User::test_user(Role::Administrator, UserId::from(1));
-        let response = audit_log_list(
-            AdminOrCoordinatorGSB(user.clone()),
-            Query(query),
-            State(pool.clone()),
-        )
-        .await
-        .into_response();
+        let response = audit_log_list(Query(query), State(pool))
+            .await
+            .into_response();
         let body = response.into_body().collect().await.unwrap().to_bytes();
         serde_json::from_slice(&body).unwrap()
     }
@@ -294,11 +287,7 @@ mod tests {
     async fn test_list_users(pool: SqlitePool) {
         create_log_entries(pool.clone()).await;
 
-        let user = User::test_user(Role::Administrator, UserId::from(1));
-        let response =
-            audit_log_list_users(AdminOrCoordinatorGSB(user.clone()), State(pool.clone()))
-                .await
-                .into_response();
+        let response = audit_log_list_users(State(pool)).await.into_response();
         let body = response.into_body().collect().await.unwrap().to_bytes();
         let result: Vec<AuditLogUser> = serde_json::from_slice(&body).unwrap();
 

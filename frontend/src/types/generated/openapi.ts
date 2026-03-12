@@ -529,6 +529,8 @@ export interface ClaimDataEntryResponse {
   client_state: unknown;
   data: PollingStationResults;
   previous_results?: CommonPollingStationResults;
+  source: DataEntrySource;
+  status: DataEntryStatusName;
   validation_results: ValidationResults;
 }
 
@@ -649,6 +651,10 @@ export interface DataEntryGetResponse {
 }
 
 export type DataEntryId = number;
+
+export type DataEntrySource =
+  | (PollingStationSource & { type: "PollingStation" })
+  | (SubCommittee & { type: "SubCommittee" });
 
 export const dataEntryStatusNameValues = [
   "empty",
@@ -781,16 +787,18 @@ export interface ElectionNumberOfVotersChangeRequest {
 }
 
 /**
- * Election polling stations data entry statuses response
+ * Election data entry statuses response
  */
 export interface ElectionStatusResponse {
   statuses: ElectionStatusResponseEntry[];
 }
 
 /**
- * Election polling stations data entry statuses response
+ * Election data entry statuses response entry
  */
 export interface ElectionStatusResponseEntry {
+  /** Data entry id */
+  data_entry_id: DataEntryId;
   /** Whether the finalised first or second data entry has warnings */
   finalised_with_warnings?: boolean;
   /** Time when the data entry was finalised */
@@ -799,12 +807,12 @@ export interface ElectionStatusResponseEntry {
   first_entry_progress?: number;
   /** First entry user id */
   first_entry_user_id?: number;
-  /** Polling station id */
-  polling_station_id: PollingStationId;
   /** Second entry progress as a percentage (0 to 100) */
   second_entry_progress?: number;
   /** Second entry user id */
   second_entry_user_id?: number;
+  /** Data entry source (polling station or sub committee) */
+  source: DataEntrySource;
   /** Data entry status */
   status: DataEntryStatusName;
 }
@@ -1179,6 +1187,12 @@ export type PollingStationResults =
   | (CSOFirstSessionResults & { model: "CSOFirstSession" })
   | (CSONextSessionResults & { model: "CSONextSession" });
 
+export interface PollingStationSource {
+  id: PollingStationId;
+  name: string;
+  number: number;
+}
+
 /**
  * Type of Polling station
  */
@@ -1245,6 +1259,19 @@ export interface SeatChangeStep {
   residual_seat_number?: number;
   standings: ListStanding[];
 }
+
+/**
+ * Sub electoral committee base entity, independent
+ * of the election, committee session and data entry.
+ */
+export interface SubCommittee {
+  category: CommitteeCategory;
+  id: SubCommitteeId;
+  name: string;
+  number: number;
+}
+
+export type SubCommitteeId = number;
 
 /**
  * Contains a summary count, containing both the count and a list of polling

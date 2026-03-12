@@ -12,7 +12,7 @@ use crate::{
     api::{
         data_entry::delete_data_entry_for_polling_station,
         investigation::delete_investigation_for_polling_station,
-        middleware::authentication::{AdminOrCoordinatorGSB, error::AuthenticationError},
+        middleware::authentication::{RouteAuthorization, error::AuthenticationError},
     },
     domain::{
         committee_session::{CommitteeSession, CommitteeSessionId},
@@ -24,6 +24,7 @@ use crate::{
             PollingStationRequest, PollingStationRequestListResponse, PollingStationResponse,
             PollingStationsRequest,
         },
+        role::Role,
     },
     eml::{EMLImportError, EmlHash, polling_stations_from_eml_str},
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
@@ -109,14 +110,19 @@ impl AsAuditEvent for PollingStationsImportedAuditData {
 }
 
 pub fn router() -> OpenApiRouter<AppState> {
+    use Role::*;
+
+    const ADMIN_GSB_ALL: &[Role] = &[Administrator, CoordinatorGSB, TypistGSB];
+    const ADMIN_GSB_COORDINATOR: &[Role] = &[Administrator, CoordinatorGSB];
+
     OpenApiRouter::default()
-        .routes(routes!(polling_station_list))
-        .routes(routes!(polling_station_create))
-        .routes(routes!(polling_station_get))
-        .routes(routes!(polling_station_update))
-        .routes(routes!(polling_station_delete))
-        .routes(routes!(polling_station_validate_import))
-        .routes(routes!(polling_station_import))
+        .routes(routes!(polling_station_list).authorize(ADMIN_GSB_ALL))
+        .routes(routes!(polling_station_create).authorize(ADMIN_GSB_COORDINATOR))
+        .routes(routes!(polling_station_get).authorize(ADMIN_GSB_ALL))
+        .routes(routes!(polling_station_update).authorize(ADMIN_GSB_COORDINATOR))
+        .routes(routes!(polling_station_delete).authorize(ADMIN_GSB_COORDINATOR))
+        .routes(routes!(polling_station_validate_import).authorize(ADMIN_GSB_COORDINATOR))
+        .routes(routes!(polling_station_import).authorize(ADMIN_GSB_COORDINATOR))
 }
 
 /// Get a list of all [PollingStation]s for an election
@@ -132,10 +138,8 @@ pub fn router() -> OpenApiRouter<AppState> {
     params(
         ("election_id" = ElectionId, description = "Election database id"),
     ),
-    security(("cookie_auth" = ["administrator", "coordinator_gsb", "typist_gsb"])),
 )]
 async fn polling_station_list(
-    _user: User,
     State(pool): State<SqlitePool>,
     Path(election_id): Path<ElectionId>,
 ) -> Result<PollingStationListResponse, APIError> {
@@ -154,7 +158,7 @@ async fn polling_station_list(
 }
 
 pub fn validate_user_is_allowed_to_perform_action(
-    AdminOrCoordinatorGSB(user): AdminOrCoordinatorGSB,
+    user: User,
     committee_session: &CommitteeSession,
 ) -> Result<(), APIError> {
     // Check if the user is allowed to perform the action in this committee session status,
@@ -186,10 +190,9 @@ pub fn validate_user_is_allowed_to_perform_action(
     params(
         ("election_id" = ElectionId, description = "Election database id"),
     ),
-    security(("cookie_auth" = ["administrator", "coordinator_gsb"])),
 )]
 async fn polling_station_create(
-    user: AdminOrCoordinatorGSB,
+    user: User,
     State(pool): State<SqlitePool>,
     Path(election_id): Path<ElectionId>,
     audit_service: AuditService,
@@ -258,10 +261,8 @@ async fn polling_station_create(
         ("election_id" = ElectionId, description = "Election database id"),
         ("polling_station_id" = PollingStationId, description = "Polling station database id"),
     ),
-    security(("cookie_auth" = ["administrator", "coordinator_gsb", "typist_gsb"])),
 )]
 async fn polling_station_get(
-    _user: User,
     State(pool): State<SqlitePool>,
     Path((election_id, polling_station_id)): Path<(ElectionId, PollingStationId)>,
 ) -> Result<(StatusCode, PollingStationResponse), APIError> {
@@ -286,10 +287,9 @@ async fn polling_station_get(
         ("election_id" = ElectionId, description = "Election database id"),
         ("polling_station_id" = PollingStationId, description = "Polling station database id"),
     ),
-    security(("cookie_auth" = ["administrator", "coordinator_gsb"])),
 )]
 async fn polling_station_update(
-    user: AdminOrCoordinatorGSB,
+    user: User,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Path((election_id, polling_station_id)): Path<(ElectionId, PollingStationId)>,
@@ -352,10 +352,9 @@ async fn polling_station_update(
         ("election_id" = ElectionId, description = "Election database id"),
         ("polling_station_id" = PollingStationId, description = "Polling station database id"),
     ),
-    security(("cookie_auth" = ["administrator", "coordinator_gsb"])),
 )]
 async fn polling_station_delete(
-    user: AdminOrCoordinatorGSB,
+    user: User,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Path((election_id, polling_station_id)): Path<(ElectionId, PollingStationId)>,
@@ -434,10 +433,8 @@ async fn polling_station_delete(
     params(
         ("election_id" = ElectionId, description = "Election database id"),
     ),
-    security(("cookie_auth" = ["administrator", "coordinator_gsb"])),
 )]
 async fn polling_station_validate_import(
-    _user: AdminOrCoordinatorGSB,
     Json(polling_station_request): Json<PollingStationFileRequest>,
 ) -> Result<(StatusCode, Json<PollingStationRequestListResponse>), APIError> {
     Ok((
@@ -521,10 +518,8 @@ pub async fn create_imported_polling_stations(
     params(
         ("election_id" = ElectionId, description = "Election database id"),
     ),
-    security(("cookie_auth" = ["administrator", "coordinator_gsb"])),
 )]
 async fn polling_station_import(
-    _user: AdminOrCoordinatorGSB,
     State(pool): State<SqlitePool>,
     Path(election_id): Path<ElectionId>,
     audit_service: AuditService,

@@ -15,11 +15,7 @@ export interface LabelProps {
   icon?: ReactElement;
 }
 
-function typeToLabel(userRole: Role, badgeType: BadgeType): LabelProps {
-  if (badgeType === "first_entry_finalised" && isTypist(userRole)) {
-    badgeType = "first_entry_finalised_for_typist";
-  }
-
+function typeToLabel(badgeType: BadgeType): LabelProps {
   switch (badgeType) {
     case "empty":
       return { label: t("data_entry.first_entry") };
@@ -48,7 +44,10 @@ export interface BadgeProps {
 }
 
 export function Badge({ id, type, userRole, showIcon = false }: BadgeProps) {
-  const { label, icon } = typeToLabel(userRole, type);
+  if (type === "first_entry_finalised" && isTypist(userRole)) {
+    type = "first_entry_finalised_for_typist";
+  }
+  const { label, icon } = typeToLabel(type);
   return (
     <div id={id} className={`${cls[type]} ${cls.badge}`}>
       {label}

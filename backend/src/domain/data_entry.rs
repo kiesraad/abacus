@@ -11,8 +11,9 @@ use crate::{
         election::ElectionWithPoliticalGroups,
         field_path::FieldPath,
         identifier::id,
-        polling_station::PollingStation,
+        polling_station::{PollingStation, PollingStationId, PollingStationNumber},
         results::PollingStationResults,
+        sub_committee::SubCommittee,
         validate::{
             DataError, Validate, ValidateRoot, ValidationResult, ValidationResultCode,
             ValidationResults,
@@ -79,6 +80,43 @@ impl From<PollingStationDataEntry> for DataEntryStatusResponse {
         DataEntryStatusResponse {
             status: data_entry.state.0.status_name(),
         }
+    }
+}
+
+#[derive(Serialize, Deserialize, ToSchema, Debug)]
+#[serde(tag = "type")]
+pub enum DataEntrySource {
+    PollingStation(PollingStationSource),
+    SubCommittee(SubCommittee),
+}
+
+#[derive(Serialize, Deserialize, ToSchema, Debug)]
+pub struct PollingStationSource {
+    pub id: PollingStationId,
+    #[schema(value_type = u32)]
+    pub number: PollingStationNumber,
+    pub name: String,
+}
+
+pub struct DataEntryStatusWithSource {
+    pub data_entry_id: DataEntryId,
+    pub source: DataEntrySource,
+    pub status: DataEntryStatus,
+}
+
+impl From<PollingStation> for DataEntrySource {
+    fn from(polling_station: PollingStation) -> Self {
+        DataEntrySource::PollingStation(PollingStationSource {
+            id: polling_station.id,
+            number: polling_station.number,
+            name: polling_station.name,
+        })
+    }
+}
+
+impl From<SubCommittee> for DataEntrySource {
+    fn from(sub_committee: SubCommittee) -> Self {
+        DataEntrySource::SubCommittee(sub_committee)
     }
 }
 

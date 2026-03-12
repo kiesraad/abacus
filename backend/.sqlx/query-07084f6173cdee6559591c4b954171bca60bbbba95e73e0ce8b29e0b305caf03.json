@@ -1,0 +1,50 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        SELECT\n            de.id AS \"data_entry_id: DataEntryId\",\n            sc.id AS \"id: SubCommitteeId\",\n            sc.number AS \"number: SubCommitteeNumber\",\n            sc.name,\n            sc.category AS \"category: CommitteeCategory\",\n            de.state AS \"state!: Json<DataEntryStatus>\"\n        FROM sub_committees AS sc\n        JOIN data_entries AS de ON de.id = sc.data_entry_id\n        WHERE sc.committee_session_id = $1\n        ",
+  "describe": {
+    "columns": [
+      {
+        "name": "data_entry_id: DataEntryId",
+        "ordinal": 0,
+        "type_info": "Integer"
+      },
+      {
+        "name": "id: SubCommitteeId",
+        "ordinal": 1,
+        "type_info": "Integer"
+      },
+      {
+        "name": "number: SubCommitteeNumber",
+        "ordinal": 2,
+        "type_info": "Integer"
+      },
+      {
+        "name": "name",
+        "ordinal": 3,
+        "type_info": "Text"
+      },
+      {
+        "name": "category: CommitteeCategory",
+        "ordinal": 4,
+        "type_info": "Text"
+      },
+      {
+        "name": "state!: Json<DataEntryStatus>",
+        "ordinal": 5,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "07084f6173cdee6559591c4b954171bca60bbbba95e73e0ce8b29e0b305caf03"
+}

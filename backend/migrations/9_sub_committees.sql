@@ -9,5 +9,6 @@ CREATE TABLE sub_committees
 
     FOREIGN KEY (committee_session_id) REFERENCES committee_sessions (id),
     FOREIGN KEY (data_entry_id)        REFERENCES data_entries (id),
-    CONSTRAINT number UNIQUE (committee_session_id, number)
+    CONSTRAINT number UNIQUE (committee_session_id, number),
+    CONSTRAINT data_entry UNIQUE (data_entry_id)
 ) STRICT;

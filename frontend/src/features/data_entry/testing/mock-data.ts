@@ -1,9 +1,9 @@
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
+import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
 import type { CSOFirstSessionResults, DATA_ENTRY_SAVE_REQUEST_BODY } from "@/types/generated/openapi";
 import type { DataEntryModel, DataEntryStructure, FormSectionId } from "@/types/types";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 import { ValidationResultSet } from "@/utils/ValidationResults";
-
 import type { DataEntryStateAndActionsLoaded, DataEntryStateLoaded, FormSection } from "../types/types";
 
 export function getInitialValues(election = electionMockData): CSOFirstSessionResults {
@@ -78,6 +78,13 @@ export function getDefaultDataEntryState(): DataEntryStateLoaded {
     pollingStationResults: { model, ...getInitialValues() },
     entryNumber: 1,
     previousResults: null,
+    source: {
+      type: "PollingStation",
+      id: pollingStationMockData[0]!.id,
+      number: pollingStationMockData[0]!.number,
+      name: pollingStationMockData[0]!.name,
+    },
+    dataEntryStatus: "first_entry_in_progress",
     dataEntryStructure: getDataEntryStructure(model, electionMockData),
     formState: {
       furthest: "voters_votes_counts",

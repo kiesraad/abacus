@@ -53,7 +53,7 @@ describe("ApportionmentResidualSeatsPage", () => {
       ["2", "Political Group B", "50", "2/6", "50", "2/6", "43", "1/7", "43", "1/7", "1"],
       ["3", "Political Group C", "49", "", "49", "", "49", "", "49", "", "0"],
       ["4", "Political Group D", "49", "1/2", "49", "1/2", "49", "1/2", "49", "1/2", "1"],
-      ["5", "Political Group E", "50", "1/2", "33", "2/3", "33", "2/3", "33", "2/3", "1"],
+      ["5", "Blanco (Smit, G.)", "50", "1/2", "33", "2/3", "33", "2/3", "33", "2/3", "1"],
       ["", "Restzetel toegekend aan lijst", "5", "2", "1", "4", ""],
     ]);
 
@@ -138,7 +138,7 @@ describe("ApportionmentResidualSeatsPage", () => {
       ],
       [
         "5",
-        "Political Group E",
+        "Blanco (Jacobse, F.)",
         "624",
         "1/2",
         "624",
@@ -218,7 +218,7 @@ describe("ApportionmentResidualSeatsPage", () => {
       ["2", "Political Group B", "0", "30", "", "0"],
       ["3", "Political Group C", "0", "58", "", "1"],
       ["4", "Political Group D", "0", "57", "", "1"],
-      ["5", "Political Group E", "0", "56", "", "0"],
+      ["5", "Blanco (Smit, G.)", "0", "56", "", "0"],
       ["6", "Political Group F", "0", "55", "", "0"],
       ["7", "Political Group G", "0", "54", "", "0"],
       ["8", "Political Group H", "0", "52", "", "0"],
@@ -288,7 +288,7 @@ describe("ApportionmentResidualSeatsPage", () => {
       ["2", "Political Group B", "2", "296", "7/15", "1"],
       ["3", "Political Group C", "1", "226", "11/15", "1"],
       ["4", "Political Group D", "1", "195", "11/15", "2 1"],
-      ["5", "Political Group E", "1", "112", "11/15", "1"],
+      ["5", "Blanco (Jacobse, F.)", "1", "112", "11/15", "1"],
     ]);
 
     expect(

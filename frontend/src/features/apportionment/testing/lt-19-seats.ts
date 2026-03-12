@@ -979,6 +979,7 @@ export const political_group_1_candidate_nomination: ListCandidateNomination = {
       last_name_prefix: "van der",
       last_name: "Weijden",
       locality: "Test Location",
+      country_code: "BE",
       gender: "Female",
     },
     {
@@ -1062,7 +1063,7 @@ export const political_group_1_candidate_nomination: ListCandidateNomination = {
 
 export const political_group_5_candidate_nomination: ListCandidateNomination = {
   list_number: 5,
-  list_name: "Political Group E",
+  list_name: "",
   list_seats: 0,
   preferential_candidate_nomination: [],
   other_candidate_nomination: [],
@@ -1221,6 +1222,7 @@ export const candidate_nomination: CandidateNomination = {
       last_name_prefix: "van der",
       last_name: "Weijden",
       locality: "Test Location",
+      country_code: "BE",
       gender: "Female",
       list_number: 1,
       list_name: "Political Group A",
@@ -1625,6 +1627,7 @@ export const political_group_1: PoliticalGroup = {
       last_name_prefix: "van der",
       last_name: "Weijden",
       locality: "Test Location",
+      country_code: "BE",
       gender: "Female",
     },
     {
@@ -1867,7 +1870,7 @@ export const election: ElectionWithPoliticalGroups = {
     },
     {
       number: 5,
-      name: "Political Group E",
+      name: "",
       candidates: [
         {
           number: 1,

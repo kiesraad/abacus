@@ -3,15 +3,19 @@ import { describe, expect, test, vi } from "vitest";
 import { ApiClient } from "@/api/ApiClient";
 import { ApiResponseStatus } from "@/api/ApiResult";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
+import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
 import {
   PollingStationDataEntryDeleteHandler,
   PollingStationDataEntryFinaliseHandler,
 } from "@/testing/api-mocks/RequestHandlers";
 import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMockData";
 import { overrideOnce, server } from "@/testing/server";
-import type { DATA_ENTRY_FINALISE_REQUEST_PATH, PollingStationResults } from "@/types/generated/openapi";
+import type {
+  DATA_ENTRY_FINALISE_REQUEST_PATH,
+  DataEntrySource,
+  PollingStationResults,
+} from "@/types/generated/openapi";
 import { ValidationResultSet } from "@/utils/ValidationResults";
-
 import { getDefaultDataEntryState, getInitialValues } from "../testing/mock-data";
 import type { DataEntryAction, DataEntryState } from "../types/types";
 import { onDeleteDataEntry, onFinaliseDataEntry, onSubmitForm } from "./actions";
@@ -20,6 +24,13 @@ import dataEntryReducer, { getInitialState as _getInitialState } from "./reducer
 function getInitialState(): DataEntryState {
   return _getInitialState(electionMockData, 1, 1);
 }
+
+const source: DataEntrySource = {
+  type: "PollingStation",
+  id: pollingStationMockData[0]!.id,
+  number: pollingStationMockData[0]!.number,
+  name: pollingStationMockData[0]!.name,
+};
 
 test("should handle CSOFirstSession DATA_ENTRY_CLAIMED with no client_state", () => {
   const action: DataEntryAction = {
@@ -30,6 +41,8 @@ test("should handle CSOFirstSession DATA_ENTRY_CLAIMED with no client_state", ()
         model: "CSOFirstSession",
         ...getInitialValues(),
       },
+      source,
+      status: "first_entry_in_progress",
       validation_results: {
         errors: [],
         warnings: [],
@@ -60,6 +73,8 @@ test("should handle CSONextSession DATA_ENTRY_CLAIMED with no client_state", () 
         model: "CSONextSession",
         ...getInitialValues(),
       },
+      source,
+      status: "first_entry_in_progress",
       validation_results: {
         errors: [],
         warnings: [],

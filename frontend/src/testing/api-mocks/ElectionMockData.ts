@@ -10,7 +10,11 @@ import type {
   PollingStationInvestigation,
 } from "@/types/generated/openapi";
 
-import { committeeSessionMockData, getCommitteeSessionMockData } from "./CommitteeSessionMockData";
+import {
+  committeeSessionMockData,
+  getCommitteeSessionMockData,
+  getCSBCommitteeSessionMockData,
+} from "./CommitteeSessionMockData";
 import { pollingStationMockData } from "./PollingStationMockData";
 
 export const politicalGroupMockData: PoliticalGroup = {
@@ -344,9 +348,8 @@ export const getElectionMockData = (
 export const getCSBElectionMockData = (
   election: Partial<ElectionWithPoliticalGroups> = {},
   committeeSession: Partial<CommitteeSession> = {},
-  investigations: PollingStationInvestigation[] = mockInvestigations,
 ): Required<ElectionDetailsResponse> => {
-  const updatedCommitteeSession = getCommitteeSessionMockData(committeeSession);
+  const updatedCommitteeSession = getCSBCommitteeSessionMockData(committeeSession);
 
   updatedCommitteeSession.id = 2;
   updatedCommitteeSession.election_id = 2;
@@ -356,11 +359,11 @@ export const getCSBElectionMockData = (
     committee_sessions: [updatedCommitteeSession],
     election: {
       ...electionListMockResponse.elections[1]!,
-      political_groups: [],
+      political_groups: politicalGroupsMockData,
       ...election,
     },
     polling_stations: [],
-    investigations: updatedCommitteeSession.number > 1 ? investigations : [],
+    investigations: [],
   };
 };
 

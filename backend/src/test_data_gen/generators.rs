@@ -39,7 +39,7 @@ use crate::{
         election_repo, polling_station_repo,
         user_repo::UserId,
     },
-    service::create_empty_data_entry,
+    service::{create_empty_data_entry, create_sub_committee},
     test_data_gen::GenerateElectionArgs,
 };
 
@@ -72,6 +72,72 @@ async fn generate_data_entries(
     Ok(second_entries == polling_stations.len())
 }
 
+/// Generate polling stations and data entries for a GSB election
+async fn generate_gsb_election_data(
+    rng: &mut StdRng,
+    tx: &mut SqliteConnection,
+    args: GenerateElectionArgs,
+    committee_session: &mut CommitteeSession,
+    election: &ElectionWithPoliticalGroups,
+) -> Result<(Vec<PollingStation>, bool), Box<dyn Error>> {
+    let polling_stations = generate_polling_stations(rng, election, tx, &args).await;
+
+    if !polling_stations.is_empty() {
+        *committee_session = committee_session_repo::change_status(
+            tx,
+            committee_session.id,
+            CommitteeSessionStatus::InPreparation,
+        )
+        .await?;
+    }
+
+    let data_entry_completed = if args.with_data_entry && !polling_stations.is_empty() {
+        generate_data_entries(
+            tx,
+            rng,
+            args,
+            committee_session,
+            election,
+            &polling_stations,
+        )
+        .await?
+    } else {
+        false
+    };
+
+    Ok((polling_stations, data_entry_completed))
+}
+
+/// Create sub committee and set status to InPreparation for a CSB election
+async fn generate_csb_election_data(
+    tx: &mut SqliteConnection,
+    committee_session: &mut CommitteeSession,
+    election: &ElectionWithPoliticalGroups,
+) -> Result<(Vec<PollingStation>, bool), Box<dyn Error>> {
+    if election.category == ElectionCategory::Municipal {
+        let number = election
+            .domain_id
+            .parse()
+            .expect("domain_id should be numeric");
+        create_sub_committee(
+            tx,
+            committee_session.id,
+            number,
+            &election.location,
+            CommitteeCategory::GSB,
+        )
+        .await
+        .map_err(|e| format!("{e:?}"))?;
+    }
+    *committee_session = committee_session_repo::change_status(
+        tx,
+        committee_session.id,
+        CommitteeSessionStatus::InPreparation,
+    )
+    .await?;
+    Ok((Vec::new(), false))
+}
+
 pub async fn create_test_election(
     args: GenerateElectionArgs,
     pool: SqlitePool,
@@ -93,39 +159,14 @@ pub async fn create_test_election(
     )
     .await?;
 
-    // TODO: Once data entry is implemented for CSB (#2811), we don't need this check
-    let (polling_stations, data_entry_completed) = if args.committee_category
-        != CommitteeCategory::CSB
-    {
-        // generate the polling stations for the election
-        let polling_stations = generate_polling_stations(&mut rng, &election, &mut tx, &args).await;
-
-        if !polling_stations.is_empty() {
-            committee_session = committee_session_repo::change_status(
-                &mut tx,
-                committee_session.id,
-                CommitteeSessionStatus::InPreparation,
-            )
-            .await?;
+    let (polling_stations, data_entry_completed) = match args.committee_category {
+        CommitteeCategory::GSB => {
+            generate_gsb_election_data(&mut rng, &mut tx, args, &mut committee_session, &election)
+                .await?
         }
-
-        let data_entry_completed = if args.with_data_entry && !polling_stations.is_empty() {
-            generate_data_entries(
-                &mut tx,
-                &mut rng,
-                args,
-                &committee_session,
-                &election,
-                &polling_stations,
-            )
-            .await?
-        } else {
-            false
-        };
-
-        (polling_stations, data_entry_completed)
-    } else {
-        (Vec::new(), false)
+        CommitteeCategory::CSB => {
+            generate_csb_election_data(&mut tx, &mut committee_session, &election).await?
+        }
     };
 
     info!(

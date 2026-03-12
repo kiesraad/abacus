@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
 
 use crate::domain::{
     committee_session::CommitteeSessionId, data_entry::DataEntryId, election::CommitteeCategory,
@@ -11,10 +12,11 @@ pub type SubCommitteeNumber = u32;
 
 /// Sub electoral committee base entity, independent
 /// of the election, committee session and data entry.
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, ToSchema, Debug, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct SubCommittee {
     pub id: SubCommitteeId,
+    #[schema(value_type = u32)]
     pub number: SubCommitteeNumber,
     pub name: String,
     pub category: CommitteeCategory,

@@ -14,7 +14,6 @@ use crate::{
             structs::{ApportionmentInputData, ElectionApportionmentResponse},
         },
         election::ElectionAuditData,
-        middleware::authentication::CoordinatorGSB,
     },
     audit_log::AuditService,
     domain::{
@@ -51,10 +50,8 @@ impl AsAuditEvent for ApportionmentProcessed {
     params(
         ("election_id" = u32, description = "Election database id"),
     ),
-    security(("cookie_auth" = ["coordinator_gsb"])),
 )]
 pub async fn election_apportionment(
-    _user: CoordinatorGSB,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Path(id): Path<ElectionId>,
@@ -138,14 +135,10 @@ mod tests {
         .await
         .unwrap();
 
-        let response = super::election_apportionment(
-            CoordinatorGSB(user),
-            State(pool),
-            audit_service,
-            Path(ElectionId::from(5)),
-        )
-        .await
-        .into_response();
+        let response =
+            super::election_apportionment(State(pool), audit_service, Path(ElectionId::from(5)))
+                .await
+                .into_response();
 
         assert_eq!(response.status(), StatusCode::OK);
     }
@@ -155,14 +148,10 @@ mod tests {
         let user = User::test_user(Role::CoordinatorGSB, UserId::from(1));
         let audit_service = AuditService::new(Some(user.clone()), None);
 
-        let response = super::election_apportionment(
-            CoordinatorGSB(user),
-            State(pool),
-            audit_service,
-            Path(ElectionId::from(4)),
-        )
-        .await
-        .into_response();
+        let response =
+            super::election_apportionment(State(pool), audit_service, Path(ElectionId::from(4)))
+                .await
+                .into_response();
 
         assert_eq!(response.status(), StatusCode::PRECONDITION_FAILED);
         let body = response.into_body().collect().await.unwrap().to_bytes();

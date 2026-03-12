@@ -3,7 +3,10 @@ use sqlx::{Connection, FromRow, SqliteConnection, query, query_as, types::Json};
 use crate::{
     domain::{
         committee_session::CommitteeSessionId,
-        data_entry::DataEntryId,
+        data_entry::{
+            DataEntryId, DataEntrySource, DataEntryStatus, DataEntryStatusWithSource,
+            PollingStationSource,
+        },
         election::ElectionId,
         investigation::InvestigationStatus,
         polling_station::{
@@ -608,6 +611,73 @@ pub async fn duplicate_for_committee_session(
     .execute(conn)
     .await?;
     Ok(())
+}
+
+/// List all polling stations for a first committee session with their data entry status
+pub async fn list_first_session_with_status(
+    conn: &mut SqliteConnection,
+    committee_session_id: CommitteeSessionId,
+) -> Result<Vec<DataEntryStatusWithSource>, sqlx::Error> {
+    query!(
+        r#"
+        SELECT
+            de.id AS "data_entry_id: DataEntryId",
+            p.id AS "id: PollingStationId",
+            p.number AS "number: PollingStationNumber",
+            p.name,
+            de.state AS "state: Json<DataEntryStatus>"
+        FROM polling_stations AS p
+        JOIN committee_sessions AS c ON c.id = p.committee_session_id
+        LEFT JOIN data_entries AS de ON de.id = p.data_entry_id
+        WHERE c.id = $1 AND c.number = 1
+        "#,
+        committee_session_id
+    )
+    .map(|row| DataEntryStatusWithSource {
+        data_entry_id: row.data_entry_id,
+        source: DataEntrySource::PollingStation(PollingStationSource {
+            id: row.id,
+            number: row.number,
+            name: row.name,
+        }),
+        status: row.state.map(|j| j.0).unwrap_or_default(),
+    })
+    .fetch_all(conn)
+    .await
+}
+
+/// List polling stations for a next committee session with their data entry status,
+/// filtered to those with `ConcludedWithNewResults` investigation state
+pub async fn list_next_session_with_status(
+    conn: &mut SqliteConnection,
+    committee_session_id: CommitteeSessionId,
+) -> Result<Vec<DataEntryStatusWithSource>, sqlx::Error> {
+    query!(
+        r#"
+        SELECT
+            de.id AS "data_entry_id: DataEntryId",
+            p.id AS "id: PollingStationId",
+            p.number AS "number: PollingStationNumber",
+            p.name,
+            de.state AS "state: Json<DataEntryStatus>"
+        FROM polling_stations AS p
+        JOIN committee_sessions AS c ON c.id = p.committee_session_id
+        LEFT JOIN data_entries AS de ON de.id = p.data_entry_id
+        WHERE c.id = $1 AND c.number > 1 AND json_extract(p.investigation_state, '$.status') = 'ConcludedWithNewResults'
+        "#,
+        committee_session_id
+    )
+    .map(|row| DataEntryStatusWithSource {
+        data_entry_id: row.data_entry_id,
+        source: DataEntrySource::PollingStation(PollingStationSource {
+            id: row.id,
+            number: row.number,
+            name: row.name,
+        }),
+        status: row.state.map(|j| j.0).unwrap_or_default(),
+    })
+    .fetch_all(conn)
+    .await
 }
 
 #[cfg(test)]

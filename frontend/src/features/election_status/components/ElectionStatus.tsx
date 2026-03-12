@@ -4,12 +4,7 @@ import { Progress } from "@/components/ui/ProgressBar/Progress";
 import { ProgressBar } from "@/components/ui/ProgressBar/ProgressBar";
 import { Table } from "@/components/ui/Table/Table";
 import { t } from "@/i18n/translate";
-import type {
-  CommitteeSession,
-  Election,
-  ElectionStatusResponseEntry,
-  PollingStation,
-} from "@/types/generated/openapi";
+import type { CommitteeSession, Election, ElectionStatusResponseEntry } from "@/types/generated/openapi";
 
 import {
   categoryColorClass,
@@ -25,50 +20,40 @@ export interface ElectionStatusProps {
   statuses: ElectionStatusResponseEntry[];
   election: Election;
   committeeSession: CommitteeSession;
-  pollingStations: PollingStation[];
   addLinks: boolean;
   navigate: (path: string) => void;
 }
 
-export function ElectionStatus({
-  statuses,
-  election,
-  committeeSession,
-  pollingStations,
-  addLinks,
-  navigate,
-}: ElectionStatusProps) {
-  const { progressBarData, categoryCounts, pollingStationWithStatusAndTypist, tableCategories } = useElectionStatus(
-    statuses,
-    pollingStations,
-  );
+export function ElectionStatus({ statuses, election, committeeSession, addLinks, navigate }: ElectionStatusProps) {
+  const { progressBarData, categoryCounts, statusEntriesWithTypist, tableCategories } = useElectionStatus(statuses);
 
   return (
     <div className={cls.container}>
       <div className={cls.statusTitle} id="status-heading">
         <h2>{t("election_status.main_title")}</h2>
         <div className={cls.buttons}>
-          {committeeSession.number === 1 ? (
-            <Button
-              size="md"
-              variant="secondary"
-              onClick={() => {
-                navigate(`/elections/${election.id}/polling-stations`);
-              }}
-            >
-              {t("polling_station.title.plural")}
-            </Button>
-          ) : (
-            <Button
-              size="md"
-              variant="secondary"
-              onClick={() => {
-                navigate(`/elections/${election.id}/investigations`);
-              }}
-            >
-              {t("investigations.title")}
-            </Button>
-          )}
+          {election.committee_category === "GSB" &&
+            (committeeSession.number === 1 ? (
+              <Button
+                size="md"
+                variant="secondary"
+                onClick={() => {
+                  navigate(`/elections/${election.id}/polling-stations`);
+                }}
+              >
+                {t("polling_station.title.plural")}
+              </Button>
+            ) : (
+              <Button
+                size="md"
+                variant="secondary"
+                onClick={() => {
+                  navigate(`/elections/${election.id}/investigations`);
+                }}
+              >
+                {t("investigations.title")}
+              </Button>
+            ))}
         </div>
       </div>
       <div className={cls.statusSection}>
@@ -93,9 +78,11 @@ export function ElectionStatus({
           </div>
         </Progress>
         <article className={cls.statusArticle}>
-          {statuses.length === 0 && committeeSession.number === 1 && <p>{t("election_status.no_polling_stations")}</p>}
-          {statuses.length === 0 && committeeSession.number > 1 && (
-            <p>{t("election_status.no_investigations_with_corrected_results")}</p>
+          {election.committee_category === "GSB" && statuses.length === 0 && (
+            <>
+              {committeeSession.number === 1 && <p>{t("election_status.no_polling_stations")}</p>}
+              {committeeSession.number > 1 && <p>{t("election_status.no_investigations_with_corrected_results")}</p>}
+            </>
           )}
           {statuses.length > 0 &&
             tableCategories.map((cat) => (
@@ -109,15 +96,15 @@ export function ElectionStatus({
                 <Table id={cat} key={cat} aria-label={t(`status.${cat}`)}>
                   <CategoryHeader category={cat} />
                   <Table.Body key={cat} className="fs-sm">
-                    {pollingStationWithStatusAndTypist
-                      .filter((ps) => ps.status !== undefined && statusesForCategory[cat].includes(ps.status))
-                      .map((ps) => (
+                    {statusEntriesWithTypist
+                      .filter((se) => statusesForCategory[cat].includes(se.entry.status))
+                      .map((se) => (
                         <CategoryRow
-                          key={`${cat}-${ps.id}`}
+                          key={`${cat}-${se.entry.source.type}-${se.entry.source.id}`}
                           category={cat}
-                          pollingStation={ps}
+                          statusEntryWithTypist={se}
                           addLink={addLinks}
-                          warning={ps.finalised_with_warnings}
+                          warning={se.entry.finalised_with_warnings}
                         />
                       ))}
                   </Table.Body>

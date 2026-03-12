@@ -11,12 +11,13 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
     APIError, AppState, ErrorResponse,
-    api::middleware::authentication::AdminOrCoordinatorGSB,
+    api::middleware::authentication::RouteAuthorization,
     domain::{
         election::ElectionId,
         models::{
             ModelN10_2Input, ModelNa31_2Bijlage1Input, ModelNa31_2InlegvelInput, ToPdfFileModel,
         },
+        role::Role,
         votes_table::CandidatesTables,
     },
     error::ErrorReference,
@@ -25,10 +26,14 @@ use crate::{
 };
 
 pub fn router() -> OpenApiRouter<AppState> {
+    use Role::*;
+
+    const ALLOWED_ROLES: &[Role] = &[Administrator, CoordinatorGSB];
+
     OpenApiRouter::default()
-        .routes(routes!(election_download_n_10_2))
-        .routes(routes!(election_download_na_31_2_bijlage1))
-        .routes(routes!(election_download_na_31_2_inlegvel))
+        .routes(routes!(election_download_n_10_2).authorize(ALLOWED_ROLES))
+        .routes(routes!(election_download_na_31_2_bijlage1).authorize(ALLOWED_ROLES))
+        .routes(routes!(election_download_na_31_2_inlegvel).authorize(ALLOWED_ROLES))
 }
 
 #[utoipa::path(
@@ -52,10 +57,8 @@ pub fn router() -> OpenApiRouter<AppState> {
     params(
         ("election_id" = ElectionId, description = "Election database id"),
     ),
-    security(("cookie_auth" = ["administrator", "coordinator_gsb"])),
 )]
 async fn election_download_n_10_2(
-    _user: AdminOrCoordinatorGSB,
     State(pool): State<SqlitePool>,
     Path(election_id): Path<ElectionId>,
 ) -> Result<impl IntoResponse, APIError> {
@@ -132,10 +135,8 @@ async fn election_download_n_10_2(
     params(
         ("election_id" = ElectionId, description = "Election database id"),
     ),
-    security(("cookie_auth" = ["administrator", "coordinator_gsb"])),
 )]
 async fn election_download_na_31_2_bijlage1(
-    _user: AdminOrCoordinatorGSB,
     State(pool): State<SqlitePool>,
     Path(election_id): Path<ElectionId>,
 ) -> Result<impl IntoResponse, APIError> {
@@ -213,10 +214,8 @@ async fn election_download_na_31_2_bijlage1(
     params(
         ("election_id" = ElectionId, description = "Election database id"),
     ),
-    security(("cookie_auth" = ["administrator", "coordinator_gsb"])),
 )]
 async fn election_download_na_31_2_inlegvel(
-    _user: AdminOrCoordinatorGSB,
     State(pool): State<SqlitePool>,
     Path(election_id): Path<ElectionId>,
 ) -> Result<impl IntoResponse, APIError> {

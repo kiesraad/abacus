@@ -23,9 +23,12 @@ async fn test_route_public(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
 async fn test_route_authorized(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let coordinator_cookie = coordinator_login(&addr).await;
-
     let url = format!("http://{addr}/api/users");
+
+    let response = reqwest::Client::new().get(&url).send().await.unwrap();
+    assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
+
+    let coordinator_cookie = coordinator_login(&addr).await;
     let response = reqwest::Client::new()
         .get(&url)
         .header("cookie", coordinator_cookie)

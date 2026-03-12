@@ -17,8 +17,8 @@ For every next committee session, use `investigation` (discard `polling station`
 
 ```mermaid
 flowchart
-%%  flow_start@{ shape: sm-circ }
-%%  flow_end@{ shape: sm-circ }
+  flow_start@{ shape: sm-circ }
+  flow_end@{ shape: sm-circ }
 
   created(Created)
   in_preparation(InPreparation)
@@ -26,14 +26,14 @@ flowchart
   paused(Paused)
   completed(Completed)
 
-%%  flow_start --> created
+  flow_start --> created
   in_preparation -->|click start| data_entry
   data_entry -->|click finish| completed
   data_entry -->|click pause| paused
   paused --->|click resume| data_entry
   paused -->|click finish| completed
   completed -->|click resume| data_entry
-%%  completed --> flow_end
+  completed --> flow_end
 
   paused -.->|delete last<br/>polling station<br/>or investigation| created
   data_entry -.->|delete last<br/>polling station<br/>or investigation| created

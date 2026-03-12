@@ -3,16 +3,19 @@
 This document describes the states a committee session can have.
 The transition labels describe the action that is used for performing the transition.
 
-Data entry can be linked to a polling station (GSB) or subcommittee (CSB).
+Data entry can be linked to a polling station (GSB), investigation (GSB) or subcommittee (CSB).
 
 **CSB**  
-Follow the regular (uninterrupted) lines and use "data entry" (discard "investigation") for this flow.
+Follow the regular (uninterrupted) lines and use `subcommittee` (discard `polling station` and `investigation`) for this flow.
+
+> **Note:** The subcommittee is automatically created when a CSB election is created.  
+> Therefor the status will move directly from `Created` to `InPreparation`.
 
 **GSB**  
 Follow the regular (uninterrupted) lines combined with the dotted lines.
 
-In case of the first committee session, use "data entry" (discard "investigation") for this flow.  
-For every next committee session, use "investigations" (discard "data entry") for this flow.
+In case of the first committee session, use `polling station` (discard `investigation`) for this flow.  
+For every next committee session, use `investigation` (discard `polling station`) for this flow.
 
 ```mermaid
 flowchart
@@ -34,14 +37,14 @@ flowchart
   completed -->|click resume| data_entry
   completed --> flow_end
 
-  paused -.->|delete last<br/>data entry or<br/>investigation| created
-  data_entry -.->|delete last<br/>data entry or<br/>investigation| created
-  in_preparation -.->|delete last<br/>data entry or<br/>investigation| created
-  completed -.->|delete last<br/>data entry or<br/>investigation| created
+  paused -.->|delete last<br/>polling station<br/>or investigation| created
+  data_entry -.->|delete last<br/>polling station<br/>or investigation| created
+  in_preparation -.->|delete last<br/>polling station<br/>or investigation| created
+  completed -.->|delete last<br/>polling station<br/>or investigation| created
 
-  created -->|add<br/>data entry or<br/>investigation| in_preparation
+  created -->|add<br/>polling station,<br/>investigation or<br/>subcommittee*| in_preparation
 
-  completed -.->|add/update<br/>data entry or<br/>investigation| data_entry
+  completed -.->|add/update<br/>polling station<br/>or investigation| data_entry
 
-  completed -.->|delete polling<br/>station result or<br/>investigation| data_entry
+  completed -.->|delete<br/>polling station<br/>or investigation| data_entry
 ```

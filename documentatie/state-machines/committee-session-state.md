@@ -8,45 +8,41 @@ committee session, and an "investigation" in any subsequent committee session.
 
 ```mermaid
 graph TD
-  subgraph Standaard flow voor CSB/GSB
-    csb_created[Created]
-    csb_inpreparation[InPreparation]
-    csb_dataentry[DataEntry]
-    csb_paused[Paused]
-    csb_completed[Completed]
-
-    csb_created --> csb_inpreparation
-    csb_inpreparation -->|click start<br/>data entry| csb_dataentry
-    csb_dataentry -->|click finish<br/>data entry| csb_completed
-    csb_dataentry -->|click pause<br/>data entry| csb_paused
-    csb_paused -->|click resume<br/>data entry| csb_dataentry
-    csb_paused -->|click finish<br/>data entry| csb_completed
-    csb_completed -->|click resume<br/>data entry| csb_dataentry
-  end
-
   classDef gsb_node fill:#bbf,color:#000,stroke:#333,stroke-width:4px;
     
-  gsb{"GSB specifiek"}
+  csb_created[Created]
+  csb_in_preparation[InPreparation]
+  csb_data_entry[DataEntry]
+  csb_paused[Paused]
+  csb_completed[Completed]
     
-  gsb_ci_add{"add <br/> PS/Inv"}
-  gsb_delete{"delete last <br/> PS/Inv"}
-  gsb_cd_update{"add/update<br/> PS/Inv"}
-  gsb_cd_psresult{"delete polling<br/>station result/Inv"}
+  csb_created --> csb_in_preparation
+  csb_in_preparation -->|click start<br/>data entry| csb_data_entry
+  csb_data_entry -->|click finish<br/>data entry| csb_completed
+  csb_data_entry -->|click pause<br/>data entry| csb_paused
+  csb_paused -->|click resume<br/>data entry| csb_data_entry
+  csb_paused -->|click finish<br/>data entry| csb_completed
+  csb_completed -->|click resume<br/>data entry| csb_data_entry
+    
+  gsb_ci_add["add <br/> PS/Inv"]
+  gsb_delete["delete last <br/> PS/Inv"]
+  gsb_cd_update["add/update<br/> PS/Inv"]
+  gsb_cd_ps_result["delete polling<br/>station result/Inv"]
 
   csb_paused -..-> gsb_delete
-  csb_dataentry -.-> gsb_delete
-  csb_inpreparation -.-> gsb_delete
+  csb_data_entry -.-> gsb_delete
+  csb_in_preparation -.-> gsb_delete
   csb_completed -.-> gsb_delete
   gsb_delete -.-> csb_created
 
-  gsb_ci_add -.-> csb_inpreparation
+  gsb_ci_add -.-> csb_in_preparation
   csb_created -.-> gsb_ci_add
     
   csb_completed -.-> gsb_cd_update
-  gsb_cd_update -.-> csb_dataentry
+  gsb_cd_update -.-> csb_data_entry
 
   csb_completed ~~~ gsb_delete
 
-  csb_completed -.-> gsb_cd_psresult
-  gsb_cd_psresult -.-> csb_dataentry
+  csb_completed -.-> gsb_cd_ps_result
+  gsb_cd_ps_result -.-> csb_data_entry
 ```

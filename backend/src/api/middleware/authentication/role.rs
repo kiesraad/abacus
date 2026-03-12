@@ -23,7 +23,7 @@ pub trait RouteAuthorization<S>
 where
     S: Send + Sync + Clone + 'static,
 {
-    fn allow_setup_user(self) -> UtoipaMethodRouter<S>;
+    fn allow_incomplete_user(self) -> UtoipaMethodRouter<S>;
     fn authorize(self, roles: &[Role]) -> UtoipaMethodRouter<S>;
     fn public(self) -> UtoipaMethodRouter<S>;
 }
@@ -32,7 +32,7 @@ impl<S> RouteAuthorization<S> for UtoipaMethodRouter<S>
 where
     S: Send + Sync + Clone + 'static,
 {
-    fn allow_setup_user(self) -> UtoipaMethodRouter<S> {
+    fn allow_incomplete_user(self) -> UtoipaMethodRouter<S> {
         authorize_impl(self, Role::VARIANTS, false)
     }
 
@@ -61,7 +61,7 @@ where
 fn authorize_impl<S>(
     router: UtoipaMethodRouter<S>,
     roles: &[Role],
-    is_complete_user: bool,
+    require_complete_user: bool,
 ) -> UtoipaMethodRouter<S>
 where
     S: Send + Sync + Clone + 'static,
@@ -84,7 +84,7 @@ where
     (
         schemas,
         paths,
-        method_router.layer(authorize_roles(roles, is_complete_user)),
+        method_router.layer(authorize_roles(roles, require_complete_user)),
     )
 }
 
@@ -105,17 +105,17 @@ fn for_each_operation(paths: &mut Paths, f: impl Fn(&mut Operation)) {
     }
 }
 
-pub fn authorize_roles(roles: &[Role], is_complete_user: bool) -> RouteAuthorizationLayer {
+pub fn authorize_roles(roles: &[Role], require_complete_user: bool) -> RouteAuthorizationLayer {
     RouteAuthorizationLayer {
         roles: roles.to_vec(),
-        is_complete_user,
+        require_complete_user,
     }
 }
 
 #[derive(Clone)]
 pub struct RouteAuthorizationLayer {
     roles: Vec<Role>,
-    is_complete_user: bool,
+    require_complete_user: bool,
 }
 
 impl<S> Layer<S> for RouteAuthorizationLayer {
@@ -124,7 +124,7 @@ impl<S> Layer<S> for RouteAuthorizationLayer {
     fn layer(&self, inner: S) -> Self::Service {
         RouteAuthorizationService {
             roles: self.roles.clone(),
-            is_complete_user: self.is_complete_user,
+            require_complete_user: self.require_complete_user,
             inner,
         }
     }
@@ -133,7 +133,7 @@ impl<S> Layer<S> for RouteAuthorizationLayer {
 #[derive(Clone)]
 pub struct RouteAuthorizationService<S> {
     roles: Vec<Role>,
-    is_complete_user: bool,
+    require_complete_user: bool,
 
     inner: S,
 }
@@ -153,7 +153,7 @@ where
 
     fn call(&mut self, request: Request) -> Self::Future {
         let roles = self.roles.clone();
-        let is_complete_user = self.is_complete_user;
+        let require_complete_user = self.require_complete_user;
         let clone = self.inner.clone();
 
         // https://docs.rs/tower/latest/tower/trait.Service.html#be-careful-when-cloning-inner-services
@@ -165,9 +165,9 @@ where
                 return Ok(APIError::from(AuthenticationError::Unauthenticated).into_response());
             };
 
-            // Verify if user is setup or not, according to given is_complete_user
-            let is_user_setup = user.fullname().is_some() && !user.needs_password_change();
-            match (is_user_setup, is_complete_user) {
+            // Verify if user is setup or not, according to given require_complete_user
+            let is_user_complete = user.fullname().is_some() && !user.needs_password_change();
+            match (is_user_complete, require_complete_user) {
                 (true, false) => {
                     return Ok(
                         APIError::from(AuthenticationError::UserAlreadySetup).into_response()
@@ -330,9 +330,9 @@ mod tests {
         }
 
         #[tokio::test]
-        async fn allow_incomplete_user_for_allow_setup_user() {
+        async fn allow_incomplete_user_for_allow_incomplete_user() {
             let router = build_method_router(Some("Test endpoint"));
-            let (_, _, mut method_router) = router.allow_setup_user();
+            let (_, _, mut method_router) = router.allow_incomplete_user();
 
             let user = User::test_user(Role::TypistGSB, 2.into()).with_needs_password_change(true);
             let mut request = Request::builder().body(Body::empty()).unwrap();

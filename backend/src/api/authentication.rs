@@ -130,7 +130,7 @@ pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::default()
         .routes(routes!(login).public())
         .routes(routes!(account).authorize(ALL_ROLES))
-        .routes(routes!(account_update).allow_setup_user())
+        .routes(routes!(account_update).allow_incomplete_user())
         .routes(routes!(initialised).public())
         .routes(routes!(create_first_admin).public())
         .routes(routes!(admin_exists).public())

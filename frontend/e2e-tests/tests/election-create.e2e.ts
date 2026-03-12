@@ -203,7 +203,7 @@ test.describe("Election creation", () => {
       await expect(electionRow).toBeVisible();
       await expect(electionRow).toContainText("Gemeenteraad Test 2022");
       await expect(electionRow).toContainText("CSB - Test (0000)");
-      await expect(electionRow).toContainText("Invoer bezig— Zitting CSB");
+      await expect(electionRow).toContainText("Klaar voor invoer— Zitting CSB");
     });
   });
 

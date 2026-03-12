@@ -8,6 +8,7 @@ import { ElectionLayout } from "@/components/layout/ElectionLayout";
 import { ElectionStatusLayout } from "@/components/layout/ElectionStatusLayout";
 import * as useUser from "@/hooks/user/useUser";
 import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
+import { getElectionStatusMockData } from "@/testing/api-mocks/ElectionStatusMockData";
 import {
   CommitteeSessionStatusChangeRequestHandler,
   ElectionListRequestHandler,
@@ -25,8 +26,7 @@ import {
   spyOnHandler,
 } from "@/testing/test-utils";
 import { getAdminUser, getCoordinatorUser, getTypistUser } from "@/testing/user-mock-data";
-import type { ElectionDetailsResponse, ElectionStatusResponse, ErrorResponse } from "@/types/generated/openapi";
-
+import type { ElectionDetailsResponse, ErrorResponse } from "@/types/generated/openapi";
 import { electionStatusRoutes } from "../routes";
 
 const navigate = vi.fn();
@@ -210,15 +210,9 @@ describe("ElectionStatusPage", () => {
     const user = userEvent.setup();
     server.use(
       http.get("/api/elections/1/status", () =>
-        HttpResponse.json(
-          {
-            statuses: [
-              { source: { type: "PollingStation", id: 1, number: 1, name: "Stembureau 1" }, status: "definitive" },
-              { source: { type: "PollingStation", id: 2, number: 2, name: "Stembureau 2" }, status: "definitive" },
-            ],
-          } satisfies ElectionStatusResponse,
-          { status: 200 },
-        ),
+        HttpResponse.json(getElectionStatusMockData({ status: "definitive" }, { status: "definitive" }), {
+          status: 200,
+        }),
       ),
     );
 
@@ -239,12 +233,12 @@ describe("ElectionStatusPage", () => {
 
   test("Finish input alert not visible when data entry has completed for administrator", async () => {
     vi.spyOn(useUser, "useUser").mockReturnValue(getAdminUser());
-    overrideOnce("get", "/api/elections/1/status", 200, {
-      statuses: [
-        { source: { type: "PollingStation", id: 1, number: 1, name: "Stembureau 1" }, status: "definitive" },
-        { source: { type: "PollingStation", id: 2, number: 2, name: "Stembureau 2" }, status: "definitive" },
-      ],
-    });
+    overrideOnce(
+      "get",
+      "/api/elections/1/status",
+      200,
+      getElectionStatusMockData({ status: "definitive" }, { status: "definitive" }),
+    );
 
     await renderPage();
 
@@ -267,15 +261,9 @@ describe("ElectionStatusPage", () => {
     );
     server.use(
       http.get("/api/elections/1/status", () =>
-        HttpResponse.json(
-          {
-            statuses: [
-              { source: { type: "PollingStation", id: 1, number: 1, name: "Stembureau 1" }, status: "definitive" },
-              { source: { type: "PollingStation", id: 2, number: 2, name: "Stembureau 2" }, status: "definitive" },
-            ],
-          } satisfies ElectionStatusResponse,
-          { status: 200 },
-        ),
+        HttpResponse.json(getElectionStatusMockData({ status: "definitive" }, { status: "definitive" }), {
+          status: 200,
+        }),
       ),
     );
 
@@ -361,12 +349,12 @@ describe("ElectionStatusPage", () => {
         }),
       ),
     );
-    overrideOnce("get", "/api/elections/1/status", 200, {
-      statuses: [
-        { source: { type: "PollingStation", id: 1, number: 1, name: "Stembureau 1" }, status: "definitive" },
-        { source: { type: "PollingStation", id: 2, number: 2, name: "Stembureau 2" }, status: "definitive" },
-      ],
-    });
+    overrideOnce(
+      "get",
+      "/api/elections/1/status",
+      200,
+      getElectionStatusMockData({ status: "definitive" }, { status: "definitive" }),
+    );
 
     await renderPage();
 

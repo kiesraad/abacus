@@ -5565,10 +5565,15 @@
         "type": "object",
         "description": "Election data entry statuses response entry",
         "required": [
+          "data_entry_id",
           "source",
           "status"
         ],
         "properties": {
+          "data_entry_id": {
+            "$ref": "#/components/schemas/DataEntryId",
+            "description": "Data entry id"
+          },
           "finalised_with_warnings": {
             "type": "boolean",
             "description": "Whether the finalised first or second data entry has warnings"

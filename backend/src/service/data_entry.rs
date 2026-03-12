@@ -49,6 +49,7 @@ pub async fn create_empty(
 fn map_to_response_entry(entry: DataEntryStatusWithSource) -> ElectionStatusResponseEntry {
     let status = &entry.status;
     ElectionStatusResponseEntry {
+        data_entry_id: entry.data_entry_id,
         source: entry.source,
         status: status.status_name(),
         first_entry_user_id: status.get_first_entry_user_id(),

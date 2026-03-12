@@ -2,30 +2,18 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
 
 import * as useElectionStatus from "@/hooks/election/useElectionStatus";
-
+import { getElectionStatusMockData } from "@/testing/api-mocks/ElectionStatusMockData";
 import { ElectionProgress } from "./ElectionProgress";
 
 describe("ElectionProgress", () => {
   test("renders a progress bar for the definitive status", () => {
     vi.spyOn(useElectionStatus, "useElectionStatus").mockReturnValue({
-      statuses: [
-        {
-          source: { type: "PollingStation", id: 1, number: 1, name: "Stembureau 1" },
-          status: "empty",
-        },
-        {
-          source: { type: "PollingStation", id: 2, number: 2, name: "Stembureau 2" },
-          status: "first_entry_finalised",
-        },
-        {
-          source: { type: "PollingStation", id: 3, number: 3, name: "Stembureau 3" },
-          status: "definitive",
-        },
-        {
-          source: { type: "PollingStation", id: 4, number: 4, name: "Stembureau 4" },
-          status: "first_entry_in_progress",
-        },
-      ],
+      ...getElectionStatusMockData(
+        { status: "empty" },
+        { status: "first_entry_finalised" },
+        { status: "definitive" },
+        { status: "first_entry_in_progress" },
+      ),
       refetch: vi.fn(),
     });
 

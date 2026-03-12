@@ -797,6 +797,8 @@ export interface ElectionStatusResponse {
  * Election data entry statuses response entry
  */
 export interface ElectionStatusResponseEntry {
+  /** Data entry id */
+  data_entry_id: DataEntryId;
   /** Whether the finalised first or second data entry has warnings */
   finalised_with_warnings?: boolean;
   /** Time when the data entry was finalised */

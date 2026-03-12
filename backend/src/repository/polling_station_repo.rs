@@ -621,6 +621,7 @@ pub async fn list_first_session_with_status(
     query!(
         r#"
         SELECT
+            de.id AS "data_entry_id: DataEntryId",
             p.id AS "id: PollingStationId",
             p.number AS "number: PollingStationNumber",
             p.name,
@@ -633,6 +634,7 @@ pub async fn list_first_session_with_status(
         committee_session_id
     )
     .map(|row| DataEntryStatusWithSource {
+        data_entry_id: row.data_entry_id,
         source: DataEntrySource::PollingStation(PollingStationSource {
             id: row.id,
             number: row.number,
@@ -653,6 +655,7 @@ pub async fn list_next_session_with_status(
     query!(
         r#"
         SELECT
+            de.id AS "data_entry_id: DataEntryId",
             p.id AS "id: PollingStationId",
             p.number AS "number: PollingStationNumber",
             p.name,
@@ -665,6 +668,7 @@ pub async fn list_next_session_with_status(
         committee_session_id
     )
     .map(|row| DataEntryStatusWithSource {
+        data_entry_id: row.data_entry_id,
         source: DataEntrySource::PollingStation(PollingStationSource {
             id: row.id,
             number: row.number,

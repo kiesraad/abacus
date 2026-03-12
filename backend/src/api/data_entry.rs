@@ -919,6 +919,8 @@ pub struct ElectionStatusResponse {
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct ElectionStatusResponseEntry {
+    /// Data entry id
+    pub data_entry_id: DataEntryId,
     /// Data entry source (polling station or sub committee)
     pub source: DataEntrySource,
     /// Data entry status

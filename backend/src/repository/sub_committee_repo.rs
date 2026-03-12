@@ -123,6 +123,7 @@ pub async fn list_first_session_with_status(
     query!(
         r#"
         SELECT
+            de.id AS "data_entry_id: DataEntryId",
             sc.id AS "id: SubCommitteeId",
             sc.number AS "number: SubCommitteeNumber",
             sc.name,
@@ -135,6 +136,7 @@ pub async fn list_first_session_with_status(
         committee_session_id
     )
     .map(|row| DataEntryStatusWithSource {
+        data_entry_id: row.data_entry_id,
         source: DataEntrySource::SubCommittee(SubCommittee {
             id: row.id,
             number: row.number,

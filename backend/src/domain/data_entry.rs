@@ -99,6 +99,7 @@ pub struct PollingStationSource {
 }
 
 pub struct DataEntryStatusWithSource {
+    pub data_entry_id: DataEntryId,
     pub source: DataEntrySource,
     pub status: DataEntryStatus,
 }

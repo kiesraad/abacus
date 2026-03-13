@@ -141,7 +141,7 @@ De volgende rollen zijn mogelijk: voorzitter, plaatsvervangend voorzitter of lid
     left: if x > 0 { 0.5pt + gray },
     top: if y > 0 { 0.5pt + gray },
   ),
-  fill: (_, y) => if y > 1 and calc.even(y) { luma(245) },
+  fill: (_, y) => if y > 1 and y <= input.seat_assignment.final_standing.len() and calc.even(y) { luma(245) },
   table.header(
     ..([Lijst], [Stemmen]).enumerate().map(((idx, h)) => {
       table.cell(
@@ -159,8 +159,8 @@ De volgende rollen zijn mogelijk: voorzitter, plaatsvervangend voorzitter of lid
   table.hline(stroke: 1pt + black),
   table.cell(small_header_text([Stemmen op kandidaten])),
   table.cell(align: right, small_header_text([#input.summary.votes_counts.total_votes_candidates_count])),
-  table.cell([Blanco stemmen]),
-  table.cell(align: right, [#input.summary.votes_counts.blank_votes_count]),
+  table.cell(fill: luma(245), [Blanco stemmen]),
+  table.cell(fill: luma(245), align: right, [#input.summary.votes_counts.blank_votes_count]),
   table.cell([Ongeldige stemmen]),
   table.cell(align: right, [#input.summary.votes_counts.invalid_votes_count]),
   table.hline(stroke: 1pt + black),
@@ -198,9 +198,23 @@ De volgende rollen zijn mogelijk: voorzitter, plaatsvervangend voorzitter of lid
 
 Met de kiesdeler wordt de zetelverdeling bepaald. De kiesdeler is het aantal stemmen dat nodig is voor een zetel. De kiesdeler is het totaal aantal uitgebrachte stemmen op een kandidaat gedeeld door het aantal te verdelen zetels.
 
-#TODO[Kiesdeler tabel]\
-
-6790 ÷ 13 = 522 4/13
+#table(
+  columns: 5,
+  stroke: none,
+  table.header(
+    table.cell(small_header_text([Geldige stemmen op kandidaten])),
+    table.cell([]),
+    table.cell(align: center, small_header_text([Aantal zetels])),
+    table.cell([]),
+    table.cell(small_header_text([Kiesdeler])),
+  ),
+  table.hline(stroke: 1pt + black),
+  table.cell(align: right, [#input.summary.votes_counts.total_votes_candidates_count]),
+  table.cell(align: center, [÷]),
+  table.cell(align: center, [#input.seat_assignment.seats]),
+  table.cell(align: center, [=]),
+  table.cell(format_quota(input.seat_assignment.quota)),
+)
 
 #pagebreak(weak: true)
 

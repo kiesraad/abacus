@@ -135,7 +135,38 @@ De volgende rollen zijn mogelijk: voorzitter, plaatsvervangend voorzitter of lid
 
 == Uitgebrachte stemmen
 
-#TODO[Votes table]
+#table(
+  columns: (1fr, 10em),
+  stroke: (x, y) => (
+    left: if x > 0 { 0.5pt + gray },
+    top: if y > 0 { 0.5pt + gray },
+  ),
+  fill: (_, y) => if y > 1 and calc.even(y) { luma(245) },
+  table.header(
+    ..([Lijst], [Stemmen]).enumerate().map(((idx, h)) => {
+      table.cell(
+        align: bottom + if idx == 0 { left } else { right }, small_header_text(h)
+      )
+    })
+  ),
+  table.hline(stroke: 1pt + black),
+  ..for standing in input.seat_assignment.final_standing.sorted(key: standing => standing.total_seats, by: (l, r) => l >= r) {
+    (
+      table.cell(political_group_name(input.election.political_groups.find(pg => pg.number == standing.list_number), withPrefix: true)),
+      table.cell(align: right, [#standing.votes_cast])
+    )
+  }.flatten(),
+  table.hline(stroke: 1pt + black),
+  table.cell(small_header_text([Stemmen op kandidaten])),
+  table.cell(align: right, small_header_text([#input.summary.votes_counts.total_votes_candidates_count])),
+  table.cell([Blanco stemmen]),
+  table.cell(align: right, [#input.summary.votes_counts.blank_votes_count]),
+  table.cell([Ongeldige stemmen]),
+  table.cell(align: right, [#input.summary.votes_counts.invalid_votes_count]),
+  table.hline(stroke: 1pt + black),
+  table.cell(small_header_text([Totaal uitgebrachte stemmen])),
+  table.cell(align: right, small_header_text([#input.summary.votes_counts.total_votes_cast_count])),
+)
 
 #pagebreak(weak: true)
 

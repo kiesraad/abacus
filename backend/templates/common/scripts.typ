@@ -306,6 +306,10 @@
   " uur"
 }
 
+#let format_quota(quota) = {
+  str(quota.integer) + " " + str(quota.numerator) + "/" + str(quota.denominator)
+}
+
 // A title without any numbering
 #let title(value) = {
   text(size: 14pt, weight: "semibold", value)

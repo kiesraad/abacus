@@ -145,9 +145,9 @@ De volgende rollen zijn mogelijk: voorzitter, plaatsvervangend voorzitter of lid
 
 #let differences = input.summary.differences_counts.more_ballots_count.count > 0 or input.summary.differences_counts.fewer_ballots_count.count > 0
 
-#checkbox(checked: not differences)[Ja, *#sym.arrow.r Ga door naar 2.5* #TODO[ref?]]
+#checkbox(checked: not differences)[Ja, *#sym.arrow.r Ga door naar #ref(<kiesdeler>)*]
 
-#checkbox(checked: differences)[Nee, er zijn stembureaus met een verschil]
+#checkbox(checked: differences)[Nee, er zijn verschillen]
 
 === In de stembureaus zijn in totaal *méér* uitgebrachte stemmen dan toegelaten kiezers geteld.
 
@@ -163,7 +163,7 @@ De volgende rollen zijn mogelijk: voorzitter, plaatsvervangend voorzitter of lid
   value: input.summary.differences_counts.fewer_ballots_count.count,
 )[Totaal aantal minder getelde stemmen]
 
-== Kiesdeler
+== Kiesdeler <kiesdeler>
 
 Met de kiesdeler wordt de zetelverdeling bepaald. De kiesdeler is het aantal stemmen dat nodig is voor een zetel. De kiesdeler is het totaal aantal uitgebrachte stemmen op een kandidaat gedeeld door het aantal te verdelen zetels.
 

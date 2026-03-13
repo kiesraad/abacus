@@ -221,7 +221,34 @@ Met de kiesdeler wordt de zetelverdeling bepaald. De kiesdeler is het aantal ste
 == Aantal volle zetels per lijst
 Hieronder is berekend hoe vaak elke lijst qua stemmenaantal de kiesdeler heeft gehaald. Het resultaat van deze deling geeft het aantal volle zetels dat per lijst is behaald.
 
-#TODO[Volle zetels tabel]\
+#table(
+  columns: (1fr, 10em, 9em, 9em),
+  stroke: (x, y) => (
+    left: if x > 0 { 0.5pt + gray },
+    top: if y > 0 { 0.5pt + gray },
+  ),
+  fill: (_, y) => if y > 1 and y <= input.seat_assignment.final_standing.len() and calc.even(y) { luma(245) },
+  table.header(
+    table.cell(small_header_text([Lijst])),
+    table.cell(align: right, small_header_text([Aantal stemmen])),
+    table.cell(align: center, small_header_text([÷ Kiesdeler =])),
+    table.cell(stroke: none, align: right, small_header_text([Volle zetels])),
+  ),
+  table.hline(stroke: 1pt + black),
+  ..for standing in input.seat_assignment.final_standing.sorted(key: standing => standing.total_seats, by: (l, r) => l >= r) {
+    (
+      table.cell(political_group_name(input.election.political_groups.find(pg => pg.number == standing.list_number), withPrefix: true)),
+      table.cell(align: right, [#standing.votes_cast]),
+      table.cell(align: center, [÷ #format_quota(input.seat_assignment.quota) =]),
+      table.cell(align: right, [#standing.full_seats])
+    )
+  }.flatten(),
+  table.hline(stroke: 1pt + black),
+  table.cell(small_header_text([Totaal])),
+  table.cell(align: right, small_header_text([#input.summary.votes_counts.total_votes_candidates_count])),
+  table.cell([]),
+  table.cell(stroke: none, align: right, small_header_text([#input.seat_assignment.full_seats])),
+)
 
 #pagebreak(weak: true)
 

@@ -20,6 +20,6 @@ describe("DevHomePage", () => {
     );
 
     expect(await screen.findByRole("heading", { level: 1, name: "Abacus 🧮" })).toBeVisible();
-    expect(screen.getAllByRole("link", { name: "Gemeenteraadsverkiezingen 2026" })[0]).toBeVisible();
+    expect(screen.getAllByRole("link", { name: "Gemeenteraadsverkiezingen 2026 (GSB)" })[0]).toBeVisible();
   });
 });

@@ -59,7 +59,7 @@ mod tests {
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_8_csb"))))]
     async fn test_create_and_list(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
-        let committee_session_id = CommitteeSessionId::from(8);
+        let committee_session_id = CommitteeSessionId::from(801);
 
         // Create a sub committee
         let created = create(
@@ -82,10 +82,10 @@ mod tests {
             .await
             .unwrap();
 
-        assert_eq!(list.len(), 1);
-        assert_eq!(list[0].sub_committee.id, created.sub_committee.id);
-        assert_eq!(list[0].sub_committee.name, "Test GSB");
-        assert_eq!(list[0].sub_committee.category, CommitteeCategory::GSB);
-        assert_eq!(list[0].data_entry_id, created.data_entry_id);
+        assert_eq!(list.len(), 2);
+        assert_eq!(list[1].sub_committee.id, created.sub_committee.id);
+        assert_eq!(list[1].sub_committee.name, "Test GSB");
+        assert_eq!(list[1].sub_committee.category, CommitteeCategory::GSB);
+        assert_eq!(list[1].data_entry_id, created.data_entry_id);
     }
 }

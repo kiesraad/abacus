@@ -44,7 +44,7 @@
 }
 
 #let small_header_text(value) = {
-  text(size: 6pt, weight: "semibold", value)
+  text(weight: "semibold", value)
 }
 
 #let prefilled_text(value) = {
@@ -394,7 +394,7 @@
 
   let listPrefix = "";
   if (withPrefix) {
-    listPrefix += "Lijst " + election_political_group.number + " - ";
+    listPrefix += "Lijst " + str(election_political_group.number) + " - ";
   }
 
   if (election_political_group.name == "") {

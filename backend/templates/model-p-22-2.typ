@@ -231,7 +231,7 @@ Hieronder is berekend hoe vaak elke lijst qua stemmenaantal de kiesdeler heeft g
   table.header(
     table.cell(small_header_text([Lijst])),
     table.cell(align: right, small_header_text([Aantal stemmen])),
-    table.cell(align: center, small_header_text([÷ Kiesdeler =])),
+    table.cell(stroke: none, align: center, small_header_text([÷ Kiesdeler =])),
     table.cell(stroke: none, align: right, small_header_text([Volle zetels])),
   ),
   table.hline(stroke: 1pt + black),
@@ -246,7 +246,7 @@ Hieronder is berekend hoe vaak elke lijst qua stemmenaantal de kiesdeler heeft g
   table.hline(stroke: 1pt + black),
   table.cell(small_header_text([Totaal])),
   table.cell(align: right, small_header_text([#input.summary.votes_counts.total_votes_candidates_count])),
-  table.cell([]),
+  table.cell(stroke: none, []),
   table.cell(stroke: none, align: right, small_header_text([#input.seat_assignment.full_seats])),
 )
 
@@ -306,6 +306,10 @@ De resterende restzetels zijn verdeeld via het systeem van de grootste gemiddeld
 
 #TODO[unique highest averages table]
 
+#TODO[Als nog meer restzetels over]
+#TODO[Welke tekst moet hier nog bij?]
+#TODO[highest averages table]
+
 #pagebreak(weak: true)
 ]
 
@@ -314,8 +318,11 @@ De resterende restzetels zijn verdeeld via het systeem van de grootste gemiddeld
 De aan de lijsten toegewezen volle zetels en restzetels zijn bij elkaar opgeteld. De verdeling van alle zetels ziet er als volgt uit:
 
 #table(
-  columns: (1fr, 10em),
-  stroke: 0.5pt + gray,
+  columns: (1fr, 11em),
+  stroke: (x, y) => (
+    left: if x > 0 { 0.5pt + gray },
+    top: if y > 0 { 0.5pt + gray },
+  ),
   fill: (_, y) => if y > 1 and calc.even(y) { luma(245) },
   table.hline(stroke: none),
   table.header(
@@ -336,30 +343,72 @@ De aan de lijsten toegewezen volle zetels en restzetels zijn bij elkaar opgeteld
 
 == Toewijzing van zetels aan kandidaten
 
-Aantal zetels: #TODO[Aantal zetels]
+#for list_candidate_nomination in input.candidate_nomination.list_candidate_nomination.filter((lcn) => lcn.list_seats > 0) {
+  let pg = input.election.political_groups.find(pg => pg.number == list_candidate_nomination.list_number)
+  list_heading_text(political_group_name(pg))
+  v(4pt)
+  [Aantal zetels: #list_candidate_nomination.list_seats]
+  
+  emph_block[*Met voorkeursstemmen gekozen kandidaten*]
 
-#emph_block[*Met voorkeursstemmen gekozen kandidaten*]
+  if list_candidate_nomination.preferential_candidate_nomination.len() > 0 {
+    [Het overzicht met de stemmen per kandidaat is te vinden in bijlage 1 bij dit proces-verbaal. Deze kandidaten hebben als gevolg van het aantal voorkeursstemmen direct een zetel gekregen.]
+    v(4pt)
+    [Deze kandidaten hebben meer dan #if input.election.number_of_seats < LARGE_COUNCIL_THRESHOLD [50%] else [25%] van de kiesdeler gehaald.]
+  
+    candidates_with_seat_table(1, false, true, pg.candidates, list_candidate_nomination.preferential_candidate_nomination)
+  } else {
+    [Er is geen enkele kandidaat met voorkeursstemmen gekozen.]
+  }
 
-Het overzicht met de stemmen per kandidaat is te vinden in bijlage 1 bij dit proces-
-verbaal. Deze kandidaten hebben als gevolg van het aantal voorkeursstemmen direct
-een zetel gekregen.
+  emph_block[*Kandidaten die gekozen zijn vanwege hun positie op de lijst*]
+  if list_candidate_nomination.other_candidate_nomination.len() > 0 {
+    [Deze kandidaten hebben zelfstandig niet voldoende stemmen gehaald voor een zetel, maar hebben een zetel toegewezen vanwege hun positie op de lijst.]
 
-Deze kandidaten hebben meer dan #if input.election.number_of_seats < LARGE_COUNCIL_THRESHOLD [50%] else [25%] van de kiesdeler gehaald.
+    candidates_with_seat_table(list_candidate_nomination.preferential_candidate_nomination.len() + 1, true, false, pg.candidates, list_candidate_nomination.other_candidate_nomination)
+  } else {
+    [Geen enkele kandidaat is zonder voorkeursstemmen gekozen.]
+  }
 
-#TODO[Zetel tabel met aantal stemmen]
+  emph_block[*Rangschikking van kandidaten voor opvolging*]
+  let unelected_candidates_ranking = if (list_candidate_nomination.updated_candidate_ranking.len() > 0) {
+    list_candidate_nomination.updated_candidate_ranking.slice(list_candidate_nomination.list_seats)
+  } else {
+    pg.candidates.slice(list_candidate_nomination.list_seats)
+  }
 
-#emph_block[*Kandidaten die gekozen zijn vanwege hun positie op de lijst*]
-Deze kandidaten hebben zelfstandig niet voldoende stemmen gehaald voor een zetel,
-maar hebben een zetel toegewezen vanwege hun positie op de lijst.
+  if unelected_candidates_ranking.len() > 0 {
+    [De volgende kandidaten hebben geen zetel toegewezen gekregen. Als een zetel vrijkomt wordt deze via de onderstaande volgorde aan opvolgers toegewezen.]
 
-#TODO[Zetel tabel met positie op lijst]
-
-#emph_block[*Rangschikking van kandidaten voor opvolging*]
-De volgende kandidaten hebben geen zetel toegewezen gekregen. Als een zetel vrijkomt wordt deze via de onderstaande volgorde aan opvolgers toegewezen.
-
-#TODO[Rang tabel met positie op lijst]
-
-#pagebreak(weak: true)
+    table(
+      columns: (4em, 1.5fr, 1fr, 10em),
+      stroke: (x, y) => (
+        left: if x > 0 { 0.5pt + gray },
+        top: if y > 0 { 0.5pt + gray },
+      ),
+      table.header(
+        table.cell(stroke: none, small_header_text([Rang])),
+        table.cell(stroke: none, small_header_text([Naam])),
+        table.cell(stroke: none, small_header_text([Woonplaats])),
+        table.cell(stroke: none, align: right, small_header_text([Positie op lijst]))
+      ),
+      table.hline(stroke: 1pt + black),
+      ..unelected_candidates_ranking.enumerate().map(((idx, unelected_candidate)) => {
+        (
+          table.cell(align: right, str(idx + 1)),
+          table.cell([#candidate_name(unelected_candidate)]),
+          table.cell([#candidate_location(unelected_candidate)]),
+          table.cell(align: right, [#unelected_candidate.number]),
+        )
+      }).flatten(),
+      table.hline(stroke: 0.5pt + gray),
+    )
+  } else {
+    [Geen enkele kandidaat is niet gekozen.]
+  }
+  
+  pagebreak(weak: true)
+}
 
 == Gekozen kandidaten in alfabetische volgorde
 

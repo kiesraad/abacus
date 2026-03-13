@@ -1,6 +1,6 @@
 // A paragraph with a vertical line on the left
 #let emph_block(content) = {
-  block(width: 75%, above: 3em, below: 3em, outset: (left: 6pt, top: 3pt, bottom: 3pt), stroke: (left: 1pt), text(
+  block(width: 75%, above: 3em, below: 1.5em, outset: (left: 6pt, top: 3pt, bottom: 3pt), stroke: (left: 1pt), text(
     size: 10pt,
     content,
   ))
@@ -45,6 +45,10 @@
 
 #let small_header_text(value) = {
   text(weight: "semibold", value)
+}
+
+#let list_heading_text(value) = {
+  text(size: 15pt, weight: "semibold", value)
 }
 
 #let prefilled_text(value) = {
@@ -647,6 +651,41 @@
   }
 
   pagebreak(weak: true)
+}
+
+// View a table with candidate names with seat, locality and either votes or position on list
+#let candidates_with_seat_table(
+  startSeatNumber,
+  showPosition,
+  showVotes,
+  candidates,
+  candidateVotes,
+) = {
+  table(
+    columns: (4em, 1.5fr, 1fr, 10em),
+    stroke: (x, y) => (
+      left: if x > 0 { 0.5pt + gray },
+      top: if y > 0 { 0.5pt + gray },
+    ),
+    table.header(
+      table.cell(stroke: none, small_header_text([Zetel])),
+      table.cell(stroke: none, small_header_text([Naam])),
+      table.cell(stroke: none, small_header_text([Woonplaats])),
+      if showVotes { table.cell(stroke: none, align: right, small_header_text([Aantal stemmen]))} else if showPosition { table.cell(stroke: none, align: right, small_header_text([Positie op lijst])) }
+    ),
+    table.hline(stroke: 1pt + black),
+    ..candidateVotes.enumerate().map(((idx, chosen_candidate)) => {
+      let candidate = candidates.find(candidate => candidate.number == chosen_candidate.number)
+      (
+        table.cell(align: right, str(startSeatNumber + idx)),
+        table.cell([#candidate_name(candidate)]),
+        table.cell([#candidate_location(candidate)]),
+        if showVotes { table.cell(align: right, [#chosen_candidate.votes])}
+        else if showPosition { table.cell(align: right, [#candidate.number])},
+      )
+    }).flatten(),
+    table.hline(stroke: 0.5pt + gray),
+  )
 }
 
 /// Display a TODO label

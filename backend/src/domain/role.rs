@@ -2,6 +2,8 @@ use serde::{Deserialize, Serialize};
 use sqlx::Type;
 use utoipa::ToSchema;
 
+use crate::domain::election::CommitteeCategory;
+
 #[derive(
     Serialize,
     Deserialize,
@@ -32,6 +34,8 @@ pub enum Role {
     TypistCSB,
 }
 
+pub struct RoleNotAuthorizedError;
+
 impl Role {
     pub(crate) fn is_administrator(&self) -> bool {
         matches!(self, Self::Administrator)
@@ -52,6 +56,19 @@ impl Role {
                 | (Self::CoordinatorCSB, Self::TypistCSB)
                 | (Self::CoordinatorGSB, Self::TypistGSB)
         )
+    }
+
+    pub fn is_authorized(
+        &self,
+        category: &CommitteeCategory,
+    ) -> Result<(), RoleNotAuthorizedError> {
+        (self.is_administrator()
+            || match category {
+                CommitteeCategory::GSB => matches!(self, Self::CoordinatorGSB | Self::TypistGSB),
+                CommitteeCategory::CSB => matches!(self, Self::CoordinatorCSB | Self::TypistCSB),
+            })
+        .then_some(())
+        .ok_or(RoleNotAuthorizedError)
     }
 }
 

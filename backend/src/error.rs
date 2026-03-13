@@ -17,7 +17,9 @@ use utoipa::ToSchema;
 use crate::{
     MAX_BODY_SIZE_MB,
     api::middleware::authentication::error::AuthenticationError,
-    domain::{committee_session::CommitteeSessionError, validate::DataError},
+    domain::{
+        committee_session::CommitteeSessionError, role::RoleNotAuthorizedError, validate::DataError,
+    },
     eml::EMLImportError,
     service::{DataEntryServiceError, PollingStationServiceError, SubCommitteeServiceError},
 };
@@ -558,6 +560,12 @@ impl From<PollingStationServiceError> for APIError {
         match err {
             PollingStationServiceError::DatabaseError(e) => e.into(),
         }
+    }
+}
+
+impl From<RoleNotAuthorizedError> for APIError {
+    fn from(_: RoleNotAuthorizedError) -> Self {
+        APIError::Authentication(AuthenticationError::Forbidden)
     }
 }
 

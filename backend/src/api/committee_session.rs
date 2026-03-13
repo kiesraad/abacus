@@ -25,8 +25,11 @@ use crate::{
     error::ErrorReference,
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
     repository::{
-        committee_session_repo::{create, delete, get, get_election_committee_session, update},
+        committee_session_repo::{
+            create, delete, get, get_committee_category, get_election_committee_session, update,
+        },
         election_repo, investigation_repo,
+        user_repo::User,
     },
     service::{
         CommitteeSessionAuditData, CommitteeSessionUpdatedAuditData,
@@ -51,14 +54,15 @@ impl AsAuditEvent for CommitteeSessionDeletedAuditData {
 pub fn router() -> OpenApiRouter<AppState> {
     use Role::*;
 
-    const ALLOWED_ROLES: &[Role] = &[CoordinatorGSB];
+    const COORDINATOR: &[Role] = &[CoordinatorCSB, CoordinatorGSB];
+    const COORDINATOR_GSB: &[Role] = &[CoordinatorGSB];
 
     OpenApiRouter::default()
-        .routes(routes!(committee_session_create).authorize(ALLOWED_ROLES))
-        .routes(routes!(committee_session_delete).authorize(ALLOWED_ROLES))
-        .routes(routes!(committee_session_update).authorize(ALLOWED_ROLES))
-        .routes(routes!(committee_session_status_change).authorize(ALLOWED_ROLES))
-        .routes(routes!(committee_session_investigations).authorize(ALLOWED_ROLES))
+        .routes(routes!(committee_session_create).authorize(COORDINATOR_GSB))
+        .routes(routes!(committee_session_delete).authorize(COORDINATOR_GSB))
+        .routes(routes!(committee_session_update).authorize(COORDINATOR_GSB))
+        .routes(routes!(committee_session_status_change).authorize(COORDINATOR))
+        .routes(routes!(committee_session_investigations).authorize(COORDINATOR_GSB))
 }
 
 pub async fn validate_committee_session_is_current_committee_session(
@@ -112,11 +116,15 @@ pub async fn create_committee_session(
     ),
 )]
 pub async fn committee_session_create(
+    user: User,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Path(election_id): Path<ElectionId>,
 ) -> Result<(StatusCode, CommitteeSession), APIError> {
     let mut tx = pool.begin_immediate().await?;
+
+    let election = election_repo::get(&mut tx, election_id).await?;
+    user.role().is_authorized(&election.committee_category)?;
 
     let current_committee_session = get_election_committee_session(&mut tx, election_id).await?;
 
@@ -227,11 +235,16 @@ pub async fn committee_session_delete(
     ),
 )]
 pub async fn committee_session_update(
+    user: User,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Path((election_id, committee_session_id)): Path<(ElectionId, CommitteeSessionId)>,
     Json(request): Json<CommitteeSessionUpdateRequest>,
 ) -> Result<StatusCode, APIError> {
+    let mut tx = pool.begin_immediate().await?;
+    user.role()
+        .is_authorized(&get_committee_category(&mut tx, committee_session_id).await?)?;
+
     if request.location.is_empty() {
         return Err(APIError::CommitteeSession(
             CommitteeSessionError::InvalidDetails,
@@ -247,8 +260,6 @@ pub async fn committee_session_update(
             ));
         }
     };
-
-    let mut tx = pool.begin_immediate().await?;
 
     validate_committee_session_is_current_committee_session(
         &mut tx,
@@ -292,12 +303,15 @@ pub async fn committee_session_update(
     ),
 )]
 pub async fn committee_session_status_change(
+    user: User,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Path((election_id, committee_session_id)): Path<(ElectionId, CommitteeSessionId)>,
     Json(committee_session_request): Json<CommitteeSessionStatusChangeRequest>,
 ) -> Result<StatusCode, APIError> {
     let mut tx = pool.begin_immediate().await?;
+    user.role()
+        .is_authorized(&get_committee_category(&mut tx, committee_session_id).await?)?;
 
     validate_committee_session_is_current_committee_session(
         &mut tx,
@@ -335,13 +349,13 @@ pub async fn committee_session_status_change(
     ),
 )]
 pub async fn committee_session_investigations(
+    user: User,
     State(pool): State<SqlitePool>,
-    Path((election_id, committee_session_id)): Path<(ElectionId, CommitteeSessionId)>,
+    Path((_election_id, committee_session_id)): Path<(ElectionId, CommitteeSessionId)>,
 ) -> Result<Json<InvestigationListResponse>, APIError> {
     let mut conn = pool.acquire().await?;
-
-    // Check if the election exists, will respond with NOT_FOUND otherwise
-    election_repo::get(&mut conn, election_id).await?;
+    user.role()
+        .is_authorized(&get_committee_category(&mut conn, committee_session_id).await?)?;
 
     let committee_session = get(&mut conn, committee_session_id).await?;
 

@@ -21,6 +21,16 @@ function returnWebserverCommand(): string {
   return `cd ../backend && cargo run --features memory-serve,embed-typst -- --database ../backend/target/debug/playwright.sqlite --port 8081`;
 }
 
+function chromeUseOptions() {
+  const executablePath = process.env.CHROME_BIN;
+  return {
+    ...devices["Desktop Chrome"],
+    userAgent: "Abacus-User-Agent/1",
+    // Use custom Chrome binary (e.g. Chromium) if set or use Playwright default
+    ...(executablePath ? { launchOptions: { executablePath } } : { channel: "chrome" }),
+  };
+}
+
 const config: PlaywrightTestConfig = defineConfig({
   // Fail the build on CI if you accidentally left test.only in the source code
   forbidOnly: !!process.env.CI,
@@ -57,21 +67,13 @@ const config: PlaywrightTestConfig = defineConfig({
       name: "initialisation-test",
       workers: 1,
       testMatch: /initialisation\.e2e\.ts/,
-      use: {
-        ...devices["Desktop Chrome"],
-        channel: "chrome",
-        userAgent: "Abacus-User-Agent/1",
-      },
+      use: chromeUseOptions(),
     },
     {
       name: "setup-test-users",
       workers: 1,
       testMatch: /setup-test-users\.ts/,
-      use: {
-        ...devices["Desktop Chrome"],
-        channel: "chrome",
-        userAgent: "Abacus-User-Agent/1",
-      },
+      use: chromeUseOptions(),
       dependencies: ["initialisation-test"],
     },
     {
@@ -82,9 +84,7 @@ const config: PlaywrightTestConfig = defineConfig({
         contextOptions: {
           permissions: ["clipboard-read", "clipboard-write"],
         },
-        ...devices["Desktop Chrome"],
-        channel: "chrome",
-        userAgent: "Abacus-User-Agent/1",
+        ...chromeUseOptions(),
       },
       dependencies: ["setup-test-users"],
     },

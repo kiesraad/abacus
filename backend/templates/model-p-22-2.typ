@@ -412,7 +412,27 @@ De aan de lijsten toegewezen volle zetels en restzetels zijn bij elkaar opgeteld
 
 == Gekozen kandidaten in alfabetische volgorde
 
-#TODO[Kandidaten tabel met lijst nummer en naam]
+#table(
+  columns: (1.5fr, 1fr, 1.5fr),
+  stroke: (x, y) => (
+    left: if x > 0 { 0.5pt + gray },
+    top: if y > 0 { 0.5pt + gray },
+  ),
+  table.header(
+    table.cell(stroke: none, small_header_text([Naam])),
+    table.cell(stroke: none, small_header_text([Woonplaats])),
+    table.cell(stroke: none, small_header_text([Lijst]))
+  ),
+  table.hline(stroke: 1pt + black),
+  ..input.candidate_nomination.chosen_candidates.map(((chosen_candidate)) => {
+    (
+      table.cell([#candidate_name(chosen_candidate)]),
+      table.cell([#candidate_location(chosen_candidate)]),
+      table.cell([#political_group_name(input.election.political_groups.find(pg => pg.number == chosen_candidate.list_number))]),
+    )
+  }).flatten(),
+  table.hline(stroke: 0.5pt + gray),
+)
 
 #pagebreak(weak: true)
 

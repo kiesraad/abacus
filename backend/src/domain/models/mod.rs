@@ -2,6 +2,7 @@ pub mod filter_input;
 mod model_n_10_2;
 mod model_na_14_2;
 mod model_na_31_2;
+mod model_p_22_2;
 mod model_p_2a;
 
 use std::error::Error;
@@ -11,6 +12,7 @@ pub use model_n_10_2::*;
 pub use model_na_14_2::*;
 pub use model_na_31_2::*;
 pub use model_p_2a::*;
+pub use model_p_22_2::*;
 
 pub trait ToPdfFileModel {
     fn to_pdf_file_model(self, file_name: String) -> PdfFileModel;
@@ -36,6 +38,7 @@ pub enum PdfModel {
     ModelNa31_2Inlegvel(Box<ModelNa31_2InlegvelInput>),
     ModelN10_2(Box<ModelN10_2Input>),
     ModelP2a(Box<ModelP2aInput>),
+    ModelP22_2(Box<ModelP22_2Input>),
     #[cfg(test)]
     TestTeletexCharset(),
     #[cfg(test)]
@@ -53,6 +56,7 @@ impl PdfModel {
             Self::ModelNa31_2Inlegvel(_) => "model-na-31-2-inlegvel",
             Self::ModelN10_2(_) => "model-n-10-2",
             Self::ModelP2a(_) => "model-p-2a",
+            Self::ModelP22_2(_) => "model-p-22-2",
             #[cfg(test)]
             Self::TestTeletexCharset() => "test-teletex-charset",
             #[cfg(test)]
@@ -70,6 +74,7 @@ impl PdfModel {
             Self::ModelNa31_2Inlegvel(_) => "model-na-31-2-inlegvel.typ",
             Self::ModelN10_2(_) => "model-n-10-2.typ",
             Self::ModelP2a(_) => "model-p-2a.typ",
+            Self::ModelP22_2(_) => "model-p-22-2.typ",
             #[cfg(test)]
             Self::TestTeletexCharset() => "test-teletex-charset.typ",
             #[cfg(test)]
@@ -87,6 +92,7 @@ impl PdfModel {
             Self::ModelNa31_2Inlegvel(_) => "inputs/model-na-31-2-inlegvel.json",
             Self::ModelN10_2(_) => "inputs/model-n-10-2.json",
             Self::ModelP2a(_) => "inputs/model-p-2a.json",
+            Self::ModelP22_2(_) => "inputs/model-p-22-2.json",
             #[cfg(test)]
             Self::TestTeletexCharset() => "inputs/test-teletex-charset.json",
             #[cfg(test)]
@@ -104,6 +110,7 @@ impl PdfModel {
             Self::ModelNa31_2Inlegvel(input) => serde_json::to_string(input),
             Self::ModelN10_2(input) => serde_json::to_string(input),
             Self::ModelP2a(input) => serde_json::to_string(input),
+            Self::ModelP22_2(input) => serde_json::to_string(input),
             #[cfg(test)]
             Self::TestTeletexCharset() => {
                 Ok(include_str!("../../../templates/inputs/test-teletex-charset.json").to_string())
@@ -130,6 +137,7 @@ impl PdfModel {
             "model-na-31-2-inlegvel" => Ok(Self::ModelNa31_2Inlegvel(serde_json::from_str(input)?)),
             "model-n-10-2" => Ok(Self::ModelN10_2(serde_json::from_str(input)?)),
             "model-p-2a" => Ok(Self::ModelP2a(serde_json::from_str(input)?)),
+            "model-p-22-2" => Ok(Self::ModelP22_2(serde_json::from_str(input)?)),
             _ => Err(Error::new(ErrorKind::InvalidInput, "Unknown model").into()),
         }
     }

@@ -70,7 +70,7 @@
 }
 
 // Default document styling
-#let conf(doc, header-left: none, header-right: none, footer: none) = [
+#let conf(doc, header-left: none, header-right: none, footer: none, margin-bottom: 2.0cm) = [
   #set text(
     lang: "nl",
     region: "nl",
@@ -80,7 +80,7 @@
 
   #set page(
     paper: "a4",
-    margin: (x: 1.5cm, y: 2.0cm),
+    margin: (x: 1.5cm, top: 2.0cm, bottom: margin-bottom),
     numbering: (current, total) => [Pagina #current van #total],
     header: default_header(header-left, header-right),
     footer: context (

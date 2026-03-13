@@ -20,7 +20,7 @@
 #title_page(
   is_municipality[#input.election.domain_id #input.election.location][#input.election.location],
   is_municipality[Gemeentelijk stembureau][Stembureau voor het openbaar lichaam],
-  [#input.election.name #format_date(input.election.election_date)],
+  [#input.election.name - #format_date(input.election.election_date)],
   [
     Verslag en gecorrigeerde telresultaten per lijst en
     kandidaat – Model P 2a

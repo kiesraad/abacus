@@ -1,4 +1,4 @@
-#import "common/style.typ": conf, default_header, document_numbering
+#import "common/style.typ": conf, document_numbering, default_header
 #import "common/scripts.typ": *
 #let input = json("inputs/model-n-10-2.json")
 
@@ -23,7 +23,7 @@
 #title_page(
   [#input.election.location Stembureau #input.polling_station.number #input.polling_station.name],
   "",
-  [#input.election.name #format_date(input.election.election_date)],
+  [#input.election.name - #format_date(input.election.election_date)],
   [
     Verslag en telresultaten per lijst –
     Model N 10-2

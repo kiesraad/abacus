@@ -20,11 +20,10 @@
 
 #set heading(numbering: none)
 
-#TODO[election.name in voorbeeld is "De verkiezing van de leden van de gemeenteraad van 18 maart 2026"]
 #title_page(
   is_municipality[#input.election.domain_id #input.election.location][#input.election.location],
   [Centraal Stembureau],
-  [#input.election.name #format_date(input.election.election_date)],
+  [#input.election.name - #format_date(input.election.election_date)],
   [
     Verslag, uitslag en zetelverdeling – Model P 22-2
   ],
@@ -78,7 +77,7 @@ De volgende rollen zijn mogelijk: voorzitter, plaatsvervangend voorzitter of lid
 
 #checkbox()[Nee]
 
-#checkbox()[Ja, *#sym.arrow.r Zie bijlage 2* #TODO[ref naar bijlage 2 -> kan niet, die maken we niet met Abacus]]
+#checkbox()[Ja, *#sym.arrow.r Zie bijlage 2*]
 
 == Bezwaren
 

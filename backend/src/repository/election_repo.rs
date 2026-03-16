@@ -1,10 +1,32 @@
 use sqlx::{SqliteConnection, query_as, types::Json};
 
-use crate::domain::election::{Election, ElectionId, ElectionWithPoliticalGroups, NewElection};
+use crate::domain::election::{
+    CommitteeCategory, Election, ElectionId, ElectionWithPoliticalGroups, NewElection,
+};
 
-pub async fn list(conn: &mut SqliteConnection) -> Result<Vec<Election>, sqlx::Error> {
-    let elections: Vec<Election> = query_as(
-        "SELECT id, name, committee_category, counting_method, election_id, location, domain_id, category, number_of_seats, number_of_voters, election_date, nomination_date FROM elections",
+pub async fn list(
+    conn: &mut SqliteConnection,
+    filter_committee_category: Option<CommitteeCategory>,
+) -> Result<Vec<Election>, sqlx::Error> {
+    let elections = query_as!(
+        Election,
+        r#"SELECT
+            id as "id: ElectionId",
+            name, 
+            committee_category as "committee_category: _",
+            counting_method as "counting_method: _",
+            election_id, 
+            location, 
+            domain_id, 
+            category as "category: _",
+            number_of_seats as "number_of_seats: u32",
+            number_of_voters as "number_of_voters: u32",
+            election_date as "election_date: _",
+            nomination_date as "nomination_date: _"
+        FROM elections 
+        WHERE ($1 IS NULL OR committee_category = $1)
+        "#,
+        filter_committee_category
     )
     .fetch_all(conn)
     .await?;

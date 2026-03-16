@@ -1038,7 +1038,7 @@
     },
     "/api/elections/{election_id}/committee_sessions/{committee_session_id}/status": {
       "put": {
-        "summary": "Change the status of a [CommitteeSession]. (coordinator_gsb)",
+        "summary": "Change the status of a [CommitteeSession]. (coordinator_csb, coordinator_gsb)",
         "operationId": "committee_session_status_change",
         "parameters": [
           {
@@ -1128,6 +1128,7 @@
         "security": [
           {
             "cookie_auth": [
+              "coordinator_csb",
               "coordinator_gsb"
             ]
           }
@@ -2335,7 +2336,7 @@
     },
     "/api/log": {
       "get": {
-        "summary": "List audit events (administrator, coordinator_gsb)",
+        "summary": "List audit events (administrator, coordinator_csb, coordinator_gsb)",
         "operationId": "audit_log_list",
         "parameters": [
           {
@@ -2455,6 +2456,7 @@
           {
             "cookie_auth": [
               "administrator",
+              "coordinator_csb",
               "coordinator_gsb"
             ]
           }
@@ -2463,7 +2465,7 @@
     },
     "/api/log-users": {
       "get": {
-        "summary": "Lists all users that appear in the audit log (administrator, coordinator_gsb)",
+        "summary": "Lists all users that appear in the audit log (administrator, coordinator_csb, coordinator_gsb)",
         "operationId": "audit_log_list_users",
         "responses": {
           "200": {
@@ -2514,6 +2516,7 @@
           {
             "cookie_auth": [
               "administrator",
+              "coordinator_csb",
               "coordinator_gsb"
             ]
           }

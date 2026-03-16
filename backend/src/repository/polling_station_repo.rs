@@ -1,4 +1,4 @@
-use sqlx::{Connection, FromRow, SqliteConnection, query, query_as, types::Json};
+use sqlx::{Connection, FromRow, SqliteConnection, query, query_as, query_scalar, types::Json};
 
 use crate::{
     domain::{
@@ -7,7 +7,7 @@ use crate::{
             DataEntryId, DataEntrySource, DataEntryStatus, DataEntryStatusWithSource,
             PollingStationSource,
         },
-        election::ElectionId,
+        election::{CommitteeCategory, ElectionId},
         investigation::InvestigationStatus,
         polling_station::{
             PollingStation, PollingStationFirstSession, PollingStationForSession, PollingStationId,
@@ -137,6 +137,25 @@ impl From<PollingStationRow> for PollingStationForSession {
             Self::First(PollingStationFirstSession::from(row))
         }
     }
+}
+
+/// Returns the committee category for the related election
+pub async fn get_committee_category(
+    conn: &mut SqliteConnection,
+    polling_station_id: PollingStationId,
+) -> Result<CommitteeCategory, sqlx::Error> {
+    query_scalar!(
+        r#"
+        SELECT e.committee_category as "committee_category: _"
+        FROM polling_stations AS p
+        JOIN committee_sessions AS c ON c.id = p.committee_session_id
+        JOIN elections AS e ON c.election_id = e.id
+        WHERE p.id = ?
+        "#,
+        polling_station_id
+    )
+    .fetch_one(conn)
+    .await
 }
 
 /// Returns if a committee session has polling stations

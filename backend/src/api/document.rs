@@ -21,7 +21,7 @@ use crate::{
         votes_table::CandidatesTables,
     },
     error::ErrorReference,
-    repository::{committee_session_repo, election_repo},
+    repository::{committee_session_repo, election_repo, user_repo::User},
     service::list_polling_stations_for_session,
 };
 
@@ -59,11 +59,14 @@ pub fn router() -> OpenApiRouter<AppState> {
     ),
 )]
 async fn election_download_n_10_2(
+    user: User,
     State(pool): State<SqlitePool>,
     Path(election_id): Path<ElectionId>,
 ) -> Result<impl IntoResponse, APIError> {
     let mut conn = pool.acquire().await?;
     let election = election_repo::get(&mut conn, election_id).await?;
+    user.role().is_authorized(&election.committee_category)?;
+
     let current_committee_session =
         committee_session_repo::get_election_committee_session(&mut conn, election.id).await?;
     let polling_stations = list_polling_stations_for_session(&mut conn, &current_committee_session)
@@ -137,11 +140,14 @@ async fn election_download_n_10_2(
     ),
 )]
 async fn election_download_na_31_2_bijlage1(
+    user: User,
     State(pool): State<SqlitePool>,
     Path(election_id): Path<ElectionId>,
 ) -> Result<impl IntoResponse, APIError> {
     let mut conn = pool.acquire().await?;
     let election = election_repo::get(&mut conn, election_id).await?;
+    user.role().is_authorized(&election.committee_category)?;
+
     let current_committee_session =
         committee_session_repo::get_election_committee_session(&mut conn, election.id).await?;
     let polling_stations = list_polling_stations_for_session(&mut conn, &current_committee_session)
@@ -216,11 +222,13 @@ async fn election_download_na_31_2_bijlage1(
     ),
 )]
 async fn election_download_na_31_2_inlegvel(
+    user: User,
     State(pool): State<SqlitePool>,
     Path(election_id): Path<ElectionId>,
 ) -> Result<impl IntoResponse, APIError> {
     let mut conn = pool.acquire().await?;
     let election = election_repo::get(&mut conn, election_id).await?;
+    user.role().is_authorized(&election.committee_category)?;
     drop(conn);
 
     let name = "Model_Na_31_2_Inlegvel.pdf".to_string();

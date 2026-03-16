@@ -7,13 +7,13 @@ The transition labels describe the action that is used for performing the transi
 Follow the regular (uninterrupted) lines and use `subcommittee` (ignore `polling station` and `investigation`) for this flow.
 
 > **Note:** The subcommittee is automatically created when a CSB election is created.  
-> Therefor the status will move directly from `Created` to `InPreparation`.
+> Therefore the status will move directly from `Created` to `InPreparation`.
 
 **GSB**  
 Follow the regular (uninterrupted) lines combined with the dotted lines.
 
-In case of the first committee session, use `polling station` (ignore `investigation`) for this flow.  
-For every next committee session, use `investigation` (ignore `polling station`) for this flow.
+In case of the first committee session, use `polling station` (ignore `investigation` and `subcommittee`) for this flow.  
+For every next committee session, use `investigation` (ignore `polling station` and `subcommittee`) for this flow.
 
 ```mermaid
 flowchart
@@ -44,5 +44,5 @@ flowchart
 
   completed -.->|add/update<br/>polling station<br/>or investigation| data_entry
 
-  completed -.->|delete<br/>polling station<br/>or investigation| data_entry
+  completed -.->|delete<br/>data entry<br/>, polling station<br/> or investigation| data_entry
 ```

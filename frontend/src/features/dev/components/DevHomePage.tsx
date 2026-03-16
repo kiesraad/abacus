@@ -55,9 +55,12 @@ interface LinksProps {
 }
 
 function TypistLinks({ electionList }: LinksProps) {
+  const { role } = useUserRole();
+  if (!role) return null;
+
   return (
     <>
-      <strong>{t("typist_gsb")}</strong>
+      <strong>{t(role)}</strong>
       <ul>
         <li>
           <Link to={"/elections"}>{t("election.title.plural")}</Link>
@@ -65,7 +68,9 @@ function TypistLinks({ electionList }: LinksProps) {
         <ul>
           {electionList.map((election) => (
             <li key={election.id}>
-              <Link to={`/elections/${election.id}/data-entry`}>{election.name}</Link>
+              <Link to={`/elections/${election.id}/data-entry`}>
+                {election.name} ({election.committee_category})
+              </Link>
             </li>
           ))}
         </ul>
@@ -75,13 +80,12 @@ function TypistLinks({ electionList }: LinksProps) {
 }
 
 function AdministratorCoordinatorLinks({ electionList, committeeSessions }: LinksProps) {
-  const { isAdministrator } = useUserRole();
+  const { role, isAdministrator } = useUserRole();
+  if (!role) return null;
 
   return (
     <>
-      <strong>
-        {t("administrator")} / {t("coordinator_gsb")}
-      </strong>
+      <strong>{t(role)}</strong>
       <ul>
         <li>
           <Link to={"/elections"}>{isAdministrator ? t("election.manage") : t("election.title.plural")}</Link>
@@ -92,18 +96,26 @@ function AdministratorCoordinatorLinks({ electionList, committeeSessions }: Link
 
             return (
               <li key={election.id}>
-                <Link to={`/elections/${election.id}`}>{election.name}</Link>
+                <Link to={`/elections/${election.id}`}>
+                  {election.name} ({election.committee_category})
+                </Link>
                 <ul>
                   <li>
                     <Link to={`/elections/${election.id}/status`}>{t("election_status.main_title")}</Link>
                   </li>
-                  <li>
-                    <Link to={`/elections/${election.id}/polling-stations`}>{t("polling_station.title.plural")}</Link>
-                  </li>
-                  {committeeSession && committeeSession.number > 1 && (
-                    <li>
-                      <Link to={`/elections/${election.id}/investigations`}>{t("investigations.title")}</Link>
-                    </li>
+                  {election.committee_category === "GSB" && (
+                    <>
+                      <li>
+                        <Link to={`/elections/${election.id}/polling-stations`}>
+                          {t("polling_station.title.plural")}
+                        </Link>
+                      </li>
+                      {committeeSession && committeeSession.number > 1 && (
+                        <li>
+                          <Link to={`/elections/${election.id}/investigations`}>{t("investigations.title")}</Link>
+                        </li>
+                      )}
+                    </>
                   )}
                 </ul>
               </li>
@@ -130,6 +142,25 @@ function DevLinks() {
   if (response !== null && isError(response)) {
     throw response;
   }
+
+  const users: Record<string, [string, string, string][]> = {
+    Admin: [
+      ["admin1", "Admin1Password01", `${t("administrator")} 1`],
+      ["admin2", "Admin2Password01", `${t("administrator")} 2`],
+    ],
+    GSB: [
+      ["coordinator1", "Coordinator1Password01", `${t("coordinator_gsb")} 1`],
+      ["coordinator2", "Coordinator2Password01", `${t("coordinator_gsb")} 2`],
+      ["typist1", "Typist1Password01", `${t("typist_gsb")} 1`],
+      ["typist2", "Typist2Password01", `${t("typist_gsb")} 2`],
+    ],
+    CSB: [
+      ["coordinator3", "Coordinator3Password03", `${t("coordinator_csb")} 3`],
+      ["coordinator4", "Coordinator4Password04", `${t("coordinator_csb")} 4`],
+      ["typist3", "Typist3Password03", `${t("typist_csb")} 3`],
+      ["typist4", "Typist4Password04", `${t("typist_csb")} 4`],
+    ],
+  };
 
   return (
     <>
@@ -170,66 +201,25 @@ function DevLinks() {
         <>
           <strong>Inloggen als</strong>
           <ul>
-            <li>
-              <Link
-                to="/dev"
-                onClick={() => {
-                  void login("admin1", "Admin1Password01").then(setResponse);
-                }}
-              >
-                {t("administrator")} 1
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/dev"
-                onClick={() => {
-                  void login("admin2", "Admin2Password01").then(setResponse);
-                }}
-              >
-                {t("administrator")} 2
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/dev"
-                onClick={() => {
-                  void login("coordinator1", "Coordinator1Password01").then(setResponse);
-                }}
-              >
-                {t("coordinator_gsb")} 1
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/dev"
-                onClick={() => {
-                  void login("coordinator2", "Coordinator2Password01").then(setResponse);
-                }}
-              >
-                {t("coordinator_gsb")} 2
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/dev"
-                onClick={() => {
-                  void login("typist1", "Typist1Password01").then(setResponse);
-                }}
-              >
-                {t("typist_gsb")} 1
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/dev"
-                onClick={() => {
-                  void login("typist2", "Typist2Password01").then(setResponse);
-                }}
-              >
-                {t("typist_gsb")} 2
-              </Link>
-            </li>
+            {Object.entries(users).map(([group, entries]) => (
+              <li key={group}>
+                {group}
+                <ul>
+                  {entries.map(([username, password, label]) => (
+                    <li key={username}>
+                      <Link
+                        to="/dev"
+                        onClick={() => {
+                          void login(username, password).then(setResponse);
+                        }}
+                      >
+                        {label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </li>
+            ))}
             {user && (
               <li>
                 <Link

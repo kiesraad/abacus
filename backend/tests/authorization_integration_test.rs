@@ -5,7 +5,7 @@ use sqlx::SqlitePool;
 use test_log::test;
 
 use crate::{
-    shared::{admin_login, coordinator_login, typist_login},
+    shared::{FixtureUser, login},
     utils::serve_api,
 };
 pub mod shared;
@@ -28,7 +28,7 @@ async fn test_route_authorized(pool: SqlitePool) {
     let response = reqwest::Client::new().get(&url).send().await.unwrap();
     assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
 
-    let coordinator_cookie = coordinator_login(&addr).await;
+    let coordinator_cookie = login(&addr, FixtureUser::CoordinatorGSB).await;
     let response = reqwest::Client::new()
         .get(&url)
         .header("cookie", coordinator_cookie)
@@ -41,7 +41,7 @@ async fn test_route_authorized(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
 async fn test_route_authorized_wrong_role(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let typist_cookie = typist_login(&addr).await;
+    let typist_cookie = login(&addr, FixtureUser::TypistGSB).await;
 
     let url = format!("http://{addr}/api/users");
     let response = reqwest::Client::new()
@@ -56,8 +56,8 @@ async fn test_route_authorized_wrong_role(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
 async fn test_route_authorized_incomplete_user(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let admin_cookie = admin_login(&addr).await;
-    let coordinator_cookie = coordinator_login(&addr).await;
+    let admin_cookie = login(&addr, FixtureUser::Admin).await;
+    let coordinator_cookie = login(&addr, FixtureUser::CoordinatorGSB).await;
 
     let client = reqwest::Client::new();
 
@@ -85,8 +85,8 @@ async fn test_route_authorized_incomplete_user(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
 async fn test_route_incomplete_user(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let coordinator_cookie = coordinator_login(&addr).await;
-    let admin_cookie = admin_login(&addr).await;
+    let coordinator_cookie = login(&addr, FixtureUser::CoordinatorGSB).await;
+    let admin_cookie = login(&addr, FixtureUser::Admin).await;
 
     let client = reqwest::Client::new();
     let url = format!("http://{addr}/api/account");
@@ -114,7 +114,7 @@ async fn test_route_incomplete_user(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::OK);
 
     // Try again, now it should be allowed.
-    let coordinator_cookie = coordinator_login(&addr).await;
+    let coordinator_cookie = login(&addr, FixtureUser::CoordinatorGSB).await;
     let response = client
         .put(&url)
         .header("cookie", coordinator_cookie)

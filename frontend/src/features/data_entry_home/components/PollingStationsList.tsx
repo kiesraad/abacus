@@ -2,14 +2,15 @@ import { Badge } from "@/components/ui/Badge/Badge";
 import { Table } from "@/components/ui/Table/Table";
 import { useUser } from "@/hooks/user/useUser";
 import { t } from "@/i18n/translate";
-
-import { getUrlForDataEntry, type PollingStationWithStatus } from "../utils/util";
+import type { ElectionId } from "@/types/generated/openapi";
+import { type DataEntryStatusWithUserStatus, getUrlForDataEntry } from "../utils/util";
 
 export interface PollingStationsListProps {
-  pollingStations: PollingStationWithStatus[];
+  electionId: ElectionId;
+  dataEntries: DataEntryStatusWithUserStatus[];
 }
 
-export function PollingStationsList({ pollingStations }: PollingStationsListProps) {
+export function PollingStationsList({ electionId, dataEntries }: PollingStationsListProps) {
   const user = useUser();
 
   if (!user) {
@@ -23,25 +24,18 @@ export function PollingStationsList({ pollingStations }: PollingStationsListProp
         <Table.HeaderCell>{t("polling_station.title.singular")}</Table.HeaderCell>
       </Table.Header>
       <Table.Body>
-        {pollingStations.map(
-          (pollingStation) =>
-            pollingStation.statusEntry && (
-              <Table.Row
-                key={pollingStation.number}
-                to={getUrlForDataEntry(
-                  pollingStation.election_id,
-                  pollingStation.id,
-                  pollingStation.statusEntry.status,
-                )}
-              >
-                <Table.NumberCell>{pollingStation.number}</Table.NumberCell>
-                <Table.Cell>
-                  <span>{pollingStation.name}</span>
-                  <Badge type={pollingStation.statusEntry.status} userRole={user.role} showIcon />
-                </Table.Cell>
-              </Table.Row>
-            ),
-        )}
+        {dataEntries.map((dataEntry) => {
+          const source = dataEntry.statusEntry.source;
+          return (
+            <Table.Row key={source.number} to={getUrlForDataEntry(electionId, dataEntry.statusEntry)}>
+              <Table.NumberCell>{source.number}</Table.NumberCell>
+              <Table.Cell>
+                <span>{source.name}</span>
+                <Badge type={dataEntry.statusEntry.status} userRole={user.role} showIcon />
+              </Table.Cell>
+            </Table.Row>
+          );
+        })}
       </Table.Body>
     </Table>
   );

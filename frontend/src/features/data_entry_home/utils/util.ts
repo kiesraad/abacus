@@ -1,11 +1,6 @@
-import type {
-  DataEntryStatusName,
-  ElectionStatusResponseEntry,
-  LoginResponse,
-  PollingStation,
-} from "@/types/generated/openapi";
+import type { DataEntryStatusName, ElectionStatusResponseEntry, LoginResponse } from "@/types/generated/openapi";
 
-export enum PollingStationUserStatus {
+export enum DataEntryUserStatus {
   Available,
   EntryNotAllowed,
   InProgressCurrentUser,
@@ -15,65 +10,49 @@ export enum PollingStationUserStatus {
   Finished,
 }
 
-export type PollingStationWithStatus = PollingStation & {
-  statusEntry?: ElectionStatusResponseEntry;
-  userStatus: PollingStationUserStatus;
-};
+export interface DataEntryStatusWithUserStatus {
+  statusEntry: ElectionStatusResponseEntry;
+  userStatus: DataEntryUserStatus;
+}
 
 const finishedStatuses: DataEntryStatusName[] = ["entries_different", "definitive"];
 
-export function getPollingStationWithStatusList({
-  pollingStations,
+export function getDataEntryWithStatusList({
   statuses,
   user,
 }: {
-  pollingStations: PollingStation[];
   statuses: ElectionStatusResponseEntry[];
   user: LoginResponse | null;
-}): PollingStationWithStatus[] {
-  // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: TODO function should be refactored
-  return pollingStations.flatMap((pollingStation: PollingStation) => {
-    const statusEntry = statuses.find(
-      (status) => status.source.type === "PollingStation" && status.source.id === pollingStation.id,
-    );
-    const result: PollingStationWithStatus = {
-      ...pollingStation,
-      statusEntry,
-      userStatus: PollingStationUserStatus.Available,
-    };
+}): DataEntryStatusWithUserStatus[] {
+  return statuses.map((statusEntry: ElectionStatusResponseEntry) => {
+    const result: DataEntryStatusWithUserStatus = { statusEntry, userStatus: DataEntryUserStatus.Available };
 
-    if (!statusEntry) {
-      result.userStatus = PollingStationUserStatus.EntryNotAllowed;
-    } else if (finishedStatuses.includes(statusEntry.status)) {
-      result.userStatus = PollingStationUserStatus.Finished;
+    if (finishedStatuses.includes(statusEntry.status)) {
+      result.userStatus = DataEntryUserStatus.Finished;
     } else if (statusEntry.status === "first_entry_in_progress") {
       if (statusEntry.first_entry_user_id === user?.user_id) {
-        result.userStatus = PollingStationUserStatus.InProgressCurrentUser;
+        result.userStatus = DataEntryUserStatus.InProgressCurrentUser;
       } else {
-        result.userStatus = PollingStationUserStatus.InProgressOtherUser;
+        result.userStatus = DataEntryUserStatus.InProgressOtherUser;
       }
     } else if (statusEntry.status === "second_entry_in_progress") {
       if (statusEntry.second_entry_user_id === user?.user_id) {
-        result.userStatus = PollingStationUserStatus.InProgressCurrentUser;
+        result.userStatus = DataEntryUserStatus.InProgressCurrentUser;
       } else {
-        result.userStatus = PollingStationUserStatus.InProgressOtherUser;
+        result.userStatus = DataEntryUserStatus.InProgressOtherUser;
       }
     } else if (statusEntry.status === "first_entry_finalised" && statusEntry.first_entry_user_id === user?.user_id) {
-      result.userStatus = PollingStationUserStatus.SecondEntryNotAllowed;
+      result.userStatus = DataEntryUserStatus.SecondEntryNotAllowed;
     } else if (statusEntry.status === "first_entry_has_errors") {
-      result.userStatus = PollingStationUserStatus.HasErrors;
+      result.userStatus = DataEntryUserStatus.HasErrors;
     }
 
     return result;
   });
 }
 
-export function getUrlForDataEntry(
-  electionId: number,
-  pollingStationId: number,
-  pollingStationStatus?: DataEntryStatusName,
-): string {
+export function getUrlForDataEntry(electionId: number, dataEntry: ElectionStatusResponseEntry): string {
   const entryNumber =
-    pollingStationStatus === "first_entry_finalised" || pollingStationStatus === "second_entry_in_progress" ? 2 : 1;
-  return `/elections/${electionId}/data-entry/${pollingStationId}/${entryNumber}`;
+    dataEntry.status === "first_entry_finalised" || dataEntry.status === "second_entry_in_progress" ? 2 : 1;
+  return `/elections/${electionId}/data-entry/${dataEntry.source.id}/${entryNumber}`;
 }

@@ -10,7 +10,7 @@ import { t, tx } from "@/i18n/translate";
 import { cn } from "@/utils/classnames";
 import { removeLeadingZeros } from "@/utils/strings";
 import { useSingleCall } from "../hooks/useSingleCall";
-import { PollingStationUserStatus, type PollingStationWithStatus } from "../utils/util";
+import { type DataEntryStatusWithUserStatus, DataEntryUserStatus } from "../utils/util";
 import cls from "./PollingStationChoice.module.css";
 
 interface FeedbackMessageProps {
@@ -34,11 +34,11 @@ const FeedbackMessage = ({ messageType, content, icon }: FeedbackMessageProps) =
 );
 
 export interface PollingStationNumberInputProps {
-  pollingStationNumber: string;
-  updatePollingStationNumber: (n: string) => void;
+  number: string;
+  updateNumber: (n: string) => void;
   loading: boolean;
   setLoading: Dispatch<SetStateAction<boolean>>;
-  currentPollingStation: PollingStationWithStatus | undefined;
+  currentDataEntry: DataEntryStatusWithUserStatus | undefined;
   setAlert: Dispatch<SetStateAction<string | undefined>>;
   handleSubmit: () => void;
   refetchStatuses: () => void;
@@ -46,10 +46,10 @@ export interface PollingStationNumberInputProps {
 
 // biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function PollingStationNumberInput({
-  pollingStationNumber,
-  updatePollingStationNumber,
+  number,
+  updateNumber,
   loading,
-  currentPollingStation,
+  currentDataEntry,
   setAlert,
   handleSubmit,
   refetchStatuses,
@@ -68,7 +68,6 @@ export function PollingStationNumberInput({
     />
   );
 
-  // biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
   const getFeedbackContent = () => {
     if (loading) {
       return (
@@ -80,53 +79,34 @@ export function PollingStationNumberInput({
       );
     }
 
-    if (currentPollingStation) {
-      switch (currentPollingStation.userStatus) {
-        case PollingStationUserStatus.InProgressOtherUser:
+    if (currentDataEntry) {
+      const { number: nr, name } = currentDataEntry.statusEntry.source;
+
+      switch (currentDataEntry.userStatus) {
+        case DataEntryUserStatus.InProgressOtherUser:
           return renderWarningMessage(
-            tx("polling_station_choice.alert.in_progress_other_user_selector", undefined, {
-              nr: currentPollingStation.number,
-            }),
+            tx("polling_station_choice.alert.in_progress_other_user_selector", undefined, { nr }),
           );
-        case PollingStationUserStatus.SecondEntryNotAllowed:
-          return renderWarningMessage(
-            tx("polling_station_choice.alert.second_entry_not_allowed", undefined, {
-              nr: currentPollingStation.number,
-            }),
-          );
-        case PollingStationUserStatus.HasErrors:
-          return renderWarningMessage(
-            tx("polling_station_choice.alert.has_errors", undefined, {
-              nr: currentPollingStation.number,
-            }),
-          );
-        case PollingStationUserStatus.Finished:
-          return renderWarningMessage(
-            tx("polling_station_choice.alert.finished_selector", undefined, {
-              nr: currentPollingStation.number,
-              name: currentPollingStation.name,
-            }),
-          );
-        case PollingStationUserStatus.EntryNotAllowed:
-          return renderWarningMessage(
-            tx("polling_station_choice.alert.entry_not_allowed", undefined, {
-              nr: currentPollingStation.number,
-            }),
-          );
+        case DataEntryUserStatus.SecondEntryNotAllowed:
+          return renderWarningMessage(tx("polling_station_choice.alert.second_entry_not_allowed", undefined, { nr }));
+        case DataEntryUserStatus.HasErrors:
+          return renderWarningMessage(tx("polling_station_choice.alert.has_errors", undefined, { nr }));
+        case DataEntryUserStatus.Finished:
+          return renderWarningMessage(tx("polling_station_choice.alert.finished_selector", undefined, { nr, name }));
+        case DataEntryUserStatus.EntryNotAllowed:
+          return renderWarningMessage(tx("polling_station_choice.alert.entry_not_allowed", undefined, { nr }));
         default:
-          if (currentPollingStation.statusEntry) {
-            return (
-              <FeedbackMessage
-                messageType="success"
-                content={
-                  <>
-                    <span className="bold">{currentPollingStation.name}</span>
-                    <Badge type={currentPollingStation.statusEntry.status} userRole={user.role} showIcon />
-                  </>
-                }
-              />
-            );
-          }
+          return (
+            <FeedbackMessage
+              messageType="success"
+              content={
+                <>
+                  <span className="bold">{name}</span>
+                  <Badge type={currentDataEntry.statusEntry.status} userRole={user.role} showIcon />
+                </>
+              }
+            />
+          );
       }
     }
 
@@ -134,7 +114,7 @@ export function PollingStationNumberInput({
       <FeedbackMessage
         messageType="error"
         content={t("polling_station_choice.no_polling_station_found_with_number", {
-          nr: removeLeadingZeros(pollingStationNumber),
+          nr: removeLeadingZeros(number),
         })}
         icon={<IconError aria-label={t("contains_error")} aria-hidden="false" />}
       />
@@ -147,14 +127,14 @@ export function PollingStationNumberInput({
         id="pollingStation"
         className={cn(cls.input, "font-number")}
         name="number"
-        value={pollingStationNumber}
+        value={number}
         label={t("polling_station_choice.insert_number")}
         fieldWidth="narrow"
         maxLength={6}
         autoFocus={true}
         onChange={(e) => {
           setAlert(undefined);
-          updatePollingStationNumber(e.target.value);
+          updateNumber(e.target.value);
         }}
         onKeyDown={(e) => {
           refetch();
@@ -166,7 +146,7 @@ export function PollingStationNumberInput({
         margin="mb-lg"
       />
 
-      {pollingStationNumber.trim() !== "" && getFeedbackContent()}
+      {number.trim() !== "" && getFeedbackContent()}
     </div>
   );
 }

@@ -73,8 +73,8 @@ export const electionStatusesMock: ElectionStatusResponseEntry[] = [
 ];
 
 /**
- * Return an ElectionStatusResponse with the given status supplemented with data_entry_id, source
- * @param statuses rest param with ElectionStatusResponseEntry objects where only the status is mandatory
+ * Return an ElectionStatusResponse with the given statuses supplemented with data_entry_id, source
+ * @param statuses array with ElectionStatusResponseEntry objects where only the status is mandatory
  */
 export const getElectionStatusMockData = (
   statuses: (Partial<ElectionStatusResponseEntry> & { status: ElectionStatusResponseEntry["status"] })[],

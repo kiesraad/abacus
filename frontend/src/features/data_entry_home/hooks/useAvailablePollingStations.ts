@@ -1,55 +1,36 @@
 import { useMemo } from "react";
-import { useElection } from "@/hooks/election/useElection";
 import { useElectionStatus } from "@/hooks/election/useElectionStatus";
 import { useUser } from "@/hooks/user/useUser";
-import type { ElectionStatusResponseEntry, LoginResponse, PollingStation } from "@/types/generated/openapi";
-import {
-  getPollingStationWithStatusList,
-  PollingStationUserStatus,
-  type PollingStationWithStatus,
-} from "../utils/util";
+import { type DataEntryStatusWithUserStatus, DataEntryUserStatus, getDataEntryWithStatusList } from "../utils/util";
 
-const NOT_AVAILABLE_STATUSES: PollingStationUserStatus[] = [
-  PollingStationUserStatus.Finished,
-  PollingStationUserStatus.EntryNotAllowed,
-  PollingStationUserStatus.SecondEntryNotAllowed,
-  PollingStationUserStatus.HasErrors,
+const NOT_AVAILABLE_STATUSES: DataEntryUserStatus[] = [
+  DataEntryUserStatus.Finished,
+  DataEntryUserStatus.EntryNotAllowed,
+  DataEntryUserStatus.SecondEntryNotAllowed,
+  DataEntryUserStatus.HasErrors,
 ];
 
 export interface UseAvailablePollingStationsParams {
-  pollingStations: PollingStation[];
-  statuses: ElectionStatusResponseEntry[];
-  user: LoginResponse | null;
+  dataEntryWithStatus: DataEntryStatusWithUserStatus[];
+  availableCurrentUser: DataEntryStatusWithUserStatus[];
+  inProgressCurrentUser: DataEntryStatusWithUserStatus[];
 }
 
-export interface AvailablePollingStations {
-  pollingStationsWithStatus: PollingStationWithStatus[];
-  availableCurrentUser: PollingStationWithStatus[];
-  inProgressCurrentUser: PollingStationWithStatus[];
-}
-
-export function useAvailablePollingStations(): AvailablePollingStations {
+export function useAvailablePollingStations(): UseAvailablePollingStationsParams {
   const user = useUser();
-  const { pollingStations } = useElection();
   const { statuses } = useElectionStatus();
 
   return useMemo(() => {
-    const pollingStationsWithStatus = getPollingStationWithStatusList({
-      pollingStations,
-      statuses,
-      user,
-    });
+    const dataEntryWithStatus = getDataEntryWithStatusList({ statuses, user });
 
-    const available = pollingStationsWithStatus.filter(
-      (pollingStation) => !NOT_AVAILABLE_STATUSES.includes(pollingStation.userStatus),
-    );
+    const available = dataEntryWithStatus.filter((dataEntry) => !NOT_AVAILABLE_STATUSES.includes(dataEntry.userStatus));
     const availableCurrentUser = available.filter(
-      (pollingStation) => pollingStation.userStatus !== PollingStationUserStatus.InProgressOtherUser,
+      (dataEntry) => dataEntry.userStatus !== DataEntryUserStatus.InProgressOtherUser,
     );
     const inProgressCurrentUser = availableCurrentUser.filter(
-      (pollingStation) => pollingStation.userStatus === PollingStationUserStatus.InProgressCurrentUser,
+      (dataEntry) => dataEntry.userStatus === DataEntryUserStatus.InProgressCurrentUser,
     );
 
-    return { pollingStationsWithStatus, availableCurrentUser, inProgressCurrentUser };
-  }, [pollingStations, statuses, user]);
+    return { dataEntryWithStatus, availableCurrentUser, inProgressCurrentUser };
+  }, [statuses, user]);
 }

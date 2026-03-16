@@ -11,13 +11,13 @@ import { useElection } from "@/hooks/election/useElection";
 import { useElectionStatus } from "@/hooks/election/useElectionStatus";
 import type { TranslationPath } from "@/i18n/i18n.types";
 import { t, tx } from "@/i18n/translate";
+import type { ElectionId } from "@/types/generated/openapi";
 import { KeyboardKey } from "@/types/ui";
 import { cn } from "@/utils/classnames";
 import { parseIntUserInput } from "@/utils/strings";
-
 import { useAvailablePollingStations } from "../hooks/useAvailablePollingStations";
 import { useDebouncedCallback } from "../hooks/useDebouncedCallback";
-import { getUrlForDataEntry, PollingStationUserStatus, type PollingStationWithStatus } from "../utils/util";
+import { type DataEntryStatusWithUserStatus, DataEntryUserStatus, getUrlForDataEntry } from "../utils/util";
 import cls from "./PollingStationChoice.module.css";
 import { PollingStationLink } from "./PollingStationLink";
 import { PollingStationNumberInput } from "./PollingStationNumberInput";
@@ -25,12 +25,12 @@ import { PollingStationsList } from "./PollingStationsList";
 
 const USER_INPUT_DEBOUNCE: number = 500; // ms
 
-const STATUS_ALERTS: Partial<Record<PollingStationUserStatus, TranslationPath>> = {
-  [PollingStationUserStatus.EntryNotAllowed]: "polling_station_choice.alert.entry_not_allowed",
-  [PollingStationUserStatus.Finished]: "polling_station_choice.alert.finished",
-  [PollingStationUserStatus.InProgressOtherUser]: "polling_station_choice.alert.in_progress_other_user",
-  [PollingStationUserStatus.HasErrors]: "polling_station_choice.alert.has_errors",
-  [PollingStationUserStatus.SecondEntryNotAllowed]: "polling_station_choice.alert.second_entry_not_allowed",
+const STATUS_ALERTS: Partial<Record<DataEntryUserStatus, TranslationPath>> = {
+  [DataEntryUserStatus.EntryNotAllowed]: "polling_station_choice.alert.entry_not_allowed",
+  [DataEntryUserStatus.Finished]: "polling_station_choice.alert.finished",
+  [DataEntryUserStatus.InProgressOtherUser]: "polling_station_choice.alert.in_progress_other_user",
+  [DataEntryUserStatus.HasErrors]: "polling_station_choice.alert.has_errors",
+  [DataEntryUserStatus.SecondEntryNotAllowed]: "polling_station_choice.alert.second_entry_not_allowed",
 };
 
 interface AlertMessageProps {
@@ -49,41 +49,31 @@ function AlertMessage({ message }: AlertMessageProps) {
 }
 
 interface UnfinishedEntriesListProps {
-  pollingStations: PollingStationWithStatus[];
+  electionId: ElectionId;
+  dataEntries: DataEntryStatusWithUserStatus[];
 }
 
-function UnfinishedEntriesList({ pollingStations }: UnfinishedEntriesListProps) {
+function UnfinishedEntriesList({ electionId, dataEntries }: UnfinishedEntriesListProps) {
   return (
     <div className="mb-lg" id="unfinished-list">
       <Alert type="notify" variant="no-icon">
         <strong className="heading-md">{t("polling_station_choice.unfinished_input_title")}</strong>
         <p>{t("polling_station_choice.unfinished_input_content")}</p>
-        {pollingStations.map(
-          (pollingStation) =>
-            pollingStation.statusEntry && (
-              <PollingStationLink
-                key={pollingStation.id}
-                pollingStation={pollingStation}
-                status={pollingStation.statusEntry.status}
-              />
-            ),
-        )}
+        {dataEntries.map(({ statusEntry }) => (
+          <PollingStationLink key={statusEntry.data_entry_id} electionId={electionId} dataEntry={statusEntry} />
+        ))}
       </Alert>
     </div>
   );
 }
 
 interface PollingStationListDetailsProps {
-  availablePollingStations: PollingStationWithStatus[];
-  hasAnyPollingStations: boolean;
+  electionId: ElectionId;
+  availableDataEntries: DataEntryStatusWithUserStatus[];
   onToggle: () => void;
 }
 
-function PollingStationListDetails({
-  availablePollingStations,
-  hasAnyPollingStations,
-  onToggle,
-}: PollingStationListDetailsProps) {
+function PollingStationListDetails({ electionId, availableDataEntries, onToggle }: PollingStationListDetailsProps) {
   return (
     <div className={cls.dataEntryList}>
       <details onToggle={onToggle}>
@@ -95,16 +85,12 @@ function PollingStationListDetails({
           </span>
         </summary>
         <h3 className="mb-lg">{t("polling_station_choice.choose_polling_station")}</h3>
-        {!hasAnyPollingStations ? (
-          <Alert type="error" small>
-            <p>{t("no_polling_stations_found")}</p>
-          </Alert>
-        ) : !availablePollingStations.length ? (
+        {availableDataEntries.length === 0 ? (
           <Alert type="notify" small>
             <p>{t("polling_station_choice.there_are_no_polling_stations_left_to_fill_in")}</p>
           </Alert>
         ) : (
-          <PollingStationsList pollingStations={availablePollingStations} />
+          <PollingStationsList electionId={electionId} dataEntries={availableDataEntries} />
         )}
       </details>
     </div>
@@ -115,19 +101,20 @@ export interface PollingStationPickerProps {
   anotherEntry?: boolean;
 }
 
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored after #2997
 export function PollingStationPicker({ anotherEntry }: PollingStationPickerProps) {
   const navigate = useNavigate();
-  const { election, pollingStations } = useElection();
+  const { election } = useElection();
   const { refetch: refetchStatuses } = useElectionStatus();
-  const { pollingStationsWithStatus, availableCurrentUser, inProgressCurrentUser } = useAvailablePollingStations();
-  const [pollingStationNumber, setPollingStationNumber] = useState<string>("");
+  const { dataEntryWithStatus, availableCurrentUser, inProgressCurrentUser } = useAvailablePollingStations();
+  const [number, setNumber] = useState<string>("");
   const [alert, setAlert] = useState<string | undefined>(undefined);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const currentPollingStation = useMemo(() => {
-    const parsedInt = parseIntUserInput(pollingStationNumber);
-    return pollingStationsWithStatus.find((ps) => ps.number === parsedInt);
-  }, [pollingStationNumber, pollingStationsWithStatus]);
+  const currentDataEntry = useMemo(() => {
+    const parsedInt = parseIntUserInput(number);
+    return dataEntryWithStatus.find(({ statusEntry }) => statusEntry.source.number === parsedInt);
+  }, [number, dataEntryWithStatus]);
 
   const debouncedCallback = useDebouncedCallback(() => {
     void refetchStatuses().then(() => {
@@ -136,27 +123,32 @@ export function PollingStationPicker({ anotherEntry }: PollingStationPickerProps
   }, USER_INPUT_DEBOUNCE);
 
   // set polling station number and trigger debounced lookup
-  const updatePollingStationNumber = (n: string) => {
-    setPollingStationNumber(n);
+  const updateNumber = (n: string) => {
+    setNumber(n);
     setLoading(true);
     debouncedCallback();
   };
 
   const handleSubmit = () => {
-    if (!currentPollingStation) {
+    if (!currentDataEntry) {
       setAlert(t("polling_station_choice.enter_a_valid_number_to_start"));
       setLoading(false);
       return;
     }
 
-    const alertMessage = STATUS_ALERTS[currentPollingStation.userStatus];
+    const alertMessage = STATUS_ALERTS[currentDataEntry.userStatus];
     if (alertMessage) {
-      setAlert(t(alertMessage, { nr: currentPollingStation.number, name: currentPollingStation.name }));
+      setAlert(
+        t(alertMessage, {
+          nr: currentDataEntry.statusEntry.source.number,
+          name: currentDataEntry.statusEntry.source.name,
+        }),
+      );
       setLoading(false);
       return;
     }
 
-    void navigate(getUrlForDataEntry(election.id, currentPollingStation.id, currentPollingStation.statusEntry?.status));
+    void navigate(getUrlForDataEntry(election.id, currentDataEntry.statusEntry));
   };
 
   return (
@@ -165,7 +157,9 @@ export function PollingStationPicker({ anotherEntry }: PollingStationPickerProps
         e.preventDefault();
       }}
     >
-      {inProgressCurrentUser.length > 0 && <UnfinishedEntriesList pollingStations={inProgressCurrentUser} />}
+      {inProgressCurrentUser.length > 0 && (
+        <UnfinishedEntriesList electionId={election.id} dataEntries={inProgressCurrentUser} />
+      )}
       <fieldset>
         <legend className="mb-sm">
           <h2>
@@ -173,11 +167,11 @@ export function PollingStationPicker({ anotherEntry }: PollingStationPickerProps
           </h2>
         </legend>
         <PollingStationNumberInput
-          pollingStationNumber={pollingStationNumber}
-          updatePollingStationNumber={updatePollingStationNumber}
+          number={number}
+          updateNumber={updateNumber}
           loading={loading}
           setLoading={setLoading}
-          currentPollingStation={currentPollingStation}
+          currentDataEntry={currentDataEntry}
           setAlert={setAlert}
           handleSubmit={handleSubmit}
           refetchStatuses={() => void refetchStatuses()}
@@ -192,8 +186,8 @@ export function PollingStationPicker({ anotherEntry }: PollingStationPickerProps
         </BottomBar>
       </fieldset>
       <PollingStationListDetails
-        availablePollingStations={availableCurrentUser}
-        hasAnyPollingStations={pollingStations.length > 0}
+        electionId={election.id}
+        availableDataEntries={availableCurrentUser}
         onToggle={() => void refetchStatuses()}
       />
     </form>

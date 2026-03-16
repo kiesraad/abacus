@@ -5,7 +5,6 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
 import * as useUser from "@/hooks/user/useUser";
-import { electionDetailsMockResponse, getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { getElectionStatusMockData, statusResponseMock } from "@/testing/api-mocks/ElectionStatusMockData";
 import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
 import { ElectionRequestHandler, ElectionStatusRequestHandler } from "@/testing/api-mocks/RequestHandlers";
@@ -35,12 +34,11 @@ describe("Test PollingStationPicker", () => {
   beforeEach(() => {
     // mock a current logged in user
     vi.spyOn(useUser, "useUser").mockReturnValue(testUser);
-    server.use(ElectionStatusRequestHandler);
+    server.use(ElectionRequestHandler, ElectionStatusRequestHandler);
   });
 
   describe("Polling station choice form", () => {
     test("Form field entry", async () => {
-      overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
       const user = userEvent.setup();
 
       await renderPollingStationPicker();
@@ -63,7 +61,6 @@ describe("Test PollingStationPicker", () => {
     });
 
     test("Selecting a valid polling station", async () => {
-      overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
       const user = userEvent.setup();
       await renderPollingStationPicker(true);
 
@@ -76,7 +73,6 @@ describe("Test PollingStationPicker", () => {
     });
 
     test("Selecting a valid polling station with leading zeros", async () => {
-      overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
       const user = userEvent.setup();
       await renderPollingStationPicker();
 
@@ -142,7 +138,6 @@ describe("Test PollingStationPicker", () => {
       selectorFeedback,
       submitFeedback,
     }) => {
-      overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
       overrideOnce("get", "/api/elections/1/status", 200, statusResponseMock);
 
       const user = userEvent.setup();
@@ -164,7 +159,6 @@ describe("Test PollingStationPicker", () => {
     });
 
     test("Selecting a non-existing polling station", async () => {
-      overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
       const user = userEvent.setup();
       await renderPollingStationPicker();
 
@@ -183,27 +177,7 @@ describe("Test PollingStationPicker", () => {
       expect(await within(pollingStationFeedback2).findByText("Geen stembureau gevonden met nummer 0")).toBeVisible();
     });
 
-    test("Selecting a polling station in next session without corrected_results=true", async () => {
-      // Set to session 2, with an investigation on polling station 1 without corrected_results=true
-      const electionDataSecondSession = getElectionMockData({}, { id: 1, number: 2, status: "in_preparation" }, [
-        { polling_station_id: 1, reason: "Test reason 1" },
-      ]);
-      overrideOnce("get", "/api/elections/1", 200, electionDataSecondSession);
-      server.use(http.get("/api/elections/1/status", () => HttpResponse.json({ statuses: [] }, { status: 200 })));
-
-      const user = userEvent.setup();
-      await renderPollingStationPicker();
-
-      const pollingStation = await screen.findByTestId("pollingStation");
-      await user.type(pollingStation, "33");
-      const pollingStationFeedback = await screen.findByTestId("pollingStationNumberInputFeedback");
-      expect(
-        await within(pollingStationFeedback).findByText("Stembureau 33 kan nu niet ingevoerd worden"),
-      ).toBeVisible();
-    });
-
     test("Submitting an empty or invalid polling station shows alert", async () => {
-      overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
       const user = userEvent.setup();
       await renderPollingStationPicker();
 
@@ -235,7 +209,6 @@ describe("Test PollingStationPicker", () => {
     });
 
     test("Form displays message when searching", async () => {
-      overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
       const user = userEvent.setup();
       await renderPollingStationPicker();
 
@@ -247,8 +220,6 @@ describe("Test PollingStationPicker", () => {
     });
 
     test("Selecting polling station with second data entry opens correct page", async () => {
-      overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
-
       server.use(
         http.get("/api/elections/1/status", () =>
           HttpResponse.json(
@@ -271,9 +242,8 @@ describe("Test PollingStationPicker", () => {
     });
   });
 
-  describe("Polling station list", () => {
-    test("Polling station list is displayed", async () => {
-      overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
+  describe("Election status list", () => {
+    test("Election status list is displayed", async () => {
       overrideOnce("get", "/api/elections/1/status", 200, statusResponseMock);
 
       const user = userEvent.setup();
@@ -295,8 +265,10 @@ describe("Test PollingStationPicker", () => {
       expect(within(pollingStationList).queryByText("Testplek")).toBe(null);
     });
 
-    test("Empty polling station list shows message", async () => {
-      overrideOnce("get", "/api/elections/1", 200, { ...electionDetailsMockResponse, polling_stations: [] });
+    test("Empty election status list shows message", async () => {
+      server.use(
+        http.get("/api/elections/1/status", () => HttpResponse.json(getElectionStatusMockData([]), { status: 200 })),
+      );
       const user = userEvent.setup();
       await renderPollingStationPicker();
 
@@ -305,11 +277,10 @@ describe("Test PollingStationPicker", () => {
       expect(screen.getByText("Kies het stembureau")).toBeVisible();
 
       // Check if the error message is visible
-      expect(screen.getByText("Geen stembureaus gevonden")).toBeVisible();
+      expect(screen.getByText("Er zijn voor jou op dit moment geen stembureaus om in te voeren")).toBeVisible();
     });
 
     test("Show polling station list for current user only", async () => {
-      server.use(ElectionRequestHandler);
       overrideOnce(
         "get",
         "api/elections/1/status",
@@ -335,8 +306,6 @@ describe("Test PollingStationPicker", () => {
     });
 
     test("All data entries of polling stations are completed, polling station list shows message", async () => {
-      overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
-
       server.use(
         http.get("/api/elections/1/status", () =>
           HttpResponse.json(
@@ -363,7 +332,6 @@ describe("Test PollingStationPicker", () => {
     });
 
     test("Second data entry has correct link", async () => {
-      overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
       server.use(
         http.get("/api/elections/1/status", () =>
           HttpResponse.json(
@@ -391,7 +359,6 @@ describe("Test PollingStationPicker", () => {
 
   describe("Polling station in progress", () => {
     test("Show polling stations as 'in progress'", async () => {
-      server.use(ElectionRequestHandler);
       server.use(
         http.get("/api/elections/1/status", () =>
           HttpResponse.json(
@@ -438,8 +405,6 @@ describe("Test PollingStationPicker", () => {
       ]);
       const testPollingStation = electionStatus.statuses[0]!.source;
 
-      server.use(ElectionRequestHandler);
-
       // Have the server return an in progress polling station that is owned by a different user.
       server.use(http.get("/api/elections/1/status", () => HttpResponse.json(electionStatus, { status: 200 })));
 
@@ -482,8 +447,6 @@ describe("Test PollingStationPicker", () => {
       ]);
       const testPollingStation = electionStatus.statuses[0]!.source;
 
-      server.use(ElectionRequestHandler);
-
       // Have the server return an in progress polling station that is owned by a logged-in user.
       server.use(http.get("/api/elections/1/status", () => HttpResponse.json(electionStatus, { status: 200 })));
 
@@ -510,10 +473,6 @@ describe("Test PollingStationPicker", () => {
     const hasErrors = statusResponseMock.statuses.find(({ status }) => status === "first_entry_has_errors");
     const testPollingStation = pollingStationMockData.find(({ id }) => id === hasErrors!.source.id)!;
 
-    beforeEach(() => {
-      server.use(ElectionRequestHandler, ElectionStatusRequestHandler);
-    });
-
     test("Show message when searching", async () => {
       await renderPollingStationPicker();
       const user = userEvent.setup();
@@ -537,7 +496,6 @@ describe("Test PollingStationPicker", () => {
   });
 
   test("Show uncompleted data entries for current user", async () => {
-    server.use(ElectionRequestHandler);
     const electionStatus = getElectionStatusMockData([
       {
         status: "first_entry_in_progress",
@@ -567,7 +525,6 @@ describe("Test PollingStationPicker", () => {
     ]);
     const testPollingStation = electionStatus.statuses[0]!.source;
 
-    server.use(ElectionRequestHandler);
     server.use(http.get("/api/elections/1/status", () => HttpResponse.json(electionStatus, { status: 200 })));
 
     await renderPollingStationPicker();

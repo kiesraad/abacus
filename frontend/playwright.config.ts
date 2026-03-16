@@ -21,13 +21,14 @@ function returnWebserverCommand(): string {
   return `cd ../backend && cargo run --features memory-serve,embed-typst -- --database ../backend/target/debug/playwright.sqlite --port 8081`;
 }
 
-function chromeUseOptions() {
-  const executablePath = process.env.CHROME_BIN;
+function chromiumUseOptions() {
+  const channel = process.env.CHROMIUM_CHANNEL ?? "chromium";
+  const executablePath = process.env.CHROMIUM_BIN;
   return {
     ...devices["Desktop Chrome"],
     userAgent: "Abacus-User-Agent/1",
-    // Use custom Chrome binary (e.g. Chromium) if set or use Playwright's default path
-    ...(executablePath ? { launchOptions: { executablePath } } : { channel: "chrome" }),
+    channel: channel,
+    launchOptions: { executablePath: executablePath },
   };
 }
 
@@ -67,13 +68,13 @@ const config: PlaywrightTestConfig = defineConfig({
       name: "initialisation-test",
       workers: 1,
       testMatch: /initialisation\.e2e\.ts/,
-      use: chromeUseOptions(),
+      use: chromiumUseOptions(),
     },
     {
       name: "setup-test-users",
       workers: 1,
       testMatch: /setup-test-users\.ts/,
-      use: chromeUseOptions(),
+      use: chromiumUseOptions(),
       dependencies: ["initialisation-test"],
     },
     {
@@ -84,7 +85,7 @@ const config: PlaywrightTestConfig = defineConfig({
         contextOptions: {
           permissions: ["clipboard-read", "clipboard-write"],
         },
-        ...chromeUseOptions(),
+        ...chromiumUseOptions(),
       },
       dependencies: ["setup-test-users"],
     },

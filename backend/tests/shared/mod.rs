@@ -210,7 +210,7 @@ async fn check_data_entry_status_is_definitive(
 
 pub async fn create_investigation(addr: &SocketAddr, polling_station_id: u32) -> Response {
     let url = format!("http://{addr}/api/polling_stations/{polling_station_id}/investigation");
-    let coordinator_cookie = coordinator_login(addr).await;
+    let coordinator_cookie = login(addr, FixtureUser::CoordinatorGSB).await;
     reqwest::Client::new()
         .post(&url)
         .header("cookie", coordinator_cookie)
@@ -228,7 +228,7 @@ pub async fn update_investigation(
     polling_station_id: u32,
     body: Option<serde_json::Value>,
 ) -> Response {
-    let coordinator_cookie = coordinator_login(addr).await;
+    let coordinator_cookie = login(addr, FixtureUser::CoordinatorGSB).await;
     let body = body.unwrap_or(serde_json::json!({
         "reason": "Updated reason",
         "findings": "updated test findings",
@@ -246,7 +246,7 @@ pub async fn update_investigation(
 }
 
 pub async fn create_result(addr: &SocketAddr, polling_station_id: u32, election_id: u32) {
-    let typist_cookie = typist_login(addr).await;
+    let typist_cookie = login(addr, FixtureUser::TypistGSB).await;
     complete_data_entry(
         addr,
         &typist_cookie,
@@ -255,7 +255,7 @@ pub async fn create_result(addr: &SocketAddr, polling_station_id: u32, election_
         example_data_entry(None),
     )
     .await;
-    let typist2_cookie = typist2_login(addr).await;
+    let typist2_cookie = login(addr, FixtureUser::Typist2GSB).await;
     complete_data_entry(
         addr,
         &typist2_cookie,
@@ -274,7 +274,7 @@ pub async fn create_result_with_non_example_data_entry(
     election_id: u32,
     data_entry: serde_json::Value,
 ) {
-    let typist_cookie = typist_login(addr).await;
+    let typist_cookie = login(addr, FixtureUser::TypistGSB).await;
     complete_data_entry(
         addr,
         &typist_cookie,
@@ -283,7 +283,7 @@ pub async fn create_result_with_non_example_data_entry(
         data_entry.clone(),
     )
     .await;
-    let typist2_cookie = typist2_login(addr).await;
+    let typist2_cookie = login(addr, FixtureUser::Typist2GSB).await;
     complete_data_entry(addr, &typist2_cookie, polling_station_id, 2, data_entry).await;
     check_data_entry_status_is_definitive(addr, &typist2_cookie, polling_station_id, election_id)
         .await;
@@ -370,28 +370,42 @@ pub async fn get_statuses(
         })
 }
 
-/// Calls the login endpoint for an Admin user and returns the session cookie
-pub async fn admin_login(addr: &SocketAddr) -> HeaderValue {
-    login(addr, "admin1", "Admin1Password01").await
+pub enum FixtureUser {
+    Admin,
+    CoordinatorGSB,
+    CoordinatorCSB,
+    TypistGSB,
+    Typist2GSB,
+    TypistCSB,
+    Typist2CSB,
 }
 
-/// Calls the login endpoint for a Coordinator user and returns the session cookie
-pub async fn coordinator_login(addr: &SocketAddr) -> HeaderValue {
-    login(addr, "coordinator1", "Coordinator1Password01").await
+impl FixtureUser {
+    fn credentials(&self) -> (&'static str, &'static str) {
+        match self {
+            Self::Admin => ("admin1", "Admin1Password01"),
+            Self::CoordinatorGSB => ("coordinator1", "Coordinator1Password01"),
+            Self::CoordinatorCSB => ("coordinator3", "Coordinator3Password03"),
+            Self::TypistGSB => ("typist1", "Typist1Password01"),
+            Self::Typist2GSB => ("typist2", "Typist2Password01"),
+            Self::TypistCSB => ("typist3", "Typist3Password03"),
+            Self::Typist2CSB => ("typist4", "Typist4Password04"),
+        }
+    }
 }
 
-/// Calls the login endpoint for a Typist user and returns the session cookie
-pub async fn typist_login(addr: &SocketAddr) -> HeaderValue {
-    login(addr, "typist1", "Typist1Password01").await
-}
-
-/// Calls the login endpoint for a Typist user and returns the session cookie
-pub async fn typist2_login(addr: &SocketAddr) -> HeaderValue {
-    login(addr, "typist2", "Typist2Password01").await
+/// Calls the login endpoint for a user fixture and returns the session cookie
+pub async fn login(addr: &SocketAddr, user: FixtureUser) -> HeaderValue {
+    let (username, password) = user.credentials();
+    login_with_credentials(addr, username, password).await
 }
 
 /// Calls the login endpoint with a username and password
-pub async fn login(addr: &SocketAddr, username: &str, password: &str) -> HeaderValue {
+pub async fn login_with_credentials(
+    addr: &SocketAddr,
+    username: &str,
+    password: &str,
+) -> HeaderValue {
     let url = format!("http://{addr}/api/login");
 
     let response = reqwest::Client::new()

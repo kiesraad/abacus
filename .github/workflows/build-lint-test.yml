@@ -211,6 +211,8 @@ jobs:
         run: chmod a+x ../builds/backend/abacus
       - name: Run e2e playwright tests in Chrome
         run: pnpm test:e2e --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }} --project chrome
+        env:
+          CHROMIUM_CHANNEL: chrome
       - name: Upload Playwright report
         uses: actions/upload-artifact@v7
         if: ${{ !cancelled() }}

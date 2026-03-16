@@ -156,7 +156,7 @@ pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::default()
         .routes(routes!(data_entry_claim).authorize(TYPIST_GSB))
         .routes(routes!(data_entry_save).authorize(TYPIST_GSB))
-        .routes(routes!(data_entry_delete).authorize(TYPIST_GSB))
+        .routes(routes!(data_entry_discard).authorize(TYPIST_GSB))
         .routes(routes!(data_entry_finalise).authorize(TYPIST_GSB))
         .routes(routes!(data_entry_reset).authorize(COORDINATOR_GSB))
         .routes(routes!(data_entry_get).authorize(COORDINATOR_GSB))
@@ -470,12 +470,12 @@ async fn data_entry_save(
     Ok(SaveDataEntryResponse { validation_results })
 }
 
-/// Delete an in-progress (not finalised) data entry for a polling station
+/// Discard an in-progress (not finalised) data entry for a polling station
 #[utoipa::path(
     delete,
     path = "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}",
     responses(
-        (status = 204, description = "Data entry deleted successfully"),
+        (status = 204, description = "Data entry discarded successfully"),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
@@ -487,7 +487,7 @@ async fn data_entry_save(
         ("entry_number" = u8, description = "Data entry number (first or second data entry)"),
     ),
 )]
-async fn data_entry_delete(
+async fn data_entry_discard(
     user: User,
     State(pool): State<SqlitePool>,
     Path((polling_station_id, entry_number)): Path<(PollingStationId, EntryNumber)>,
@@ -1083,7 +1083,7 @@ mod tests {
             EntryNumber::FirstEntry => User::test_user(Role::TypistGSB, UserId::from(1)),
             EntryNumber::SecondEntry => User::test_user(Role::TypistGSB, UserId::from(2)),
         };
-        data_entry_delete(
+        data_entry_discard(
             user.clone(),
             State(pool),
             Path((polling_station_id, entry_number)),
@@ -1771,7 +1771,7 @@ mod tests {
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
-    async fn test_data_entry_delete_first_entry(pool: SqlitePool) {
+    async fn test_data_entry_discard_first_entry(pool: SqlitePool) {
         // create data entry
         let request_body = example_data_entry();
         let polling_station_id = PollingStationId::from(1);
@@ -1804,7 +1804,7 @@ mod tests {
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
-    async fn test_data_entry_delete_second_entry(pool: SqlitePool) {
+    async fn test_data_entry_discard_second_entry(pool: SqlitePool) {
         // create data entry with warning
         let request_body = example_data_entry_with_warning();
         let polling_station_id = PollingStationId::from(1);
@@ -1876,7 +1876,7 @@ mod tests {
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
-    async fn test_data_entry_delete_committee_session_status_is_paused(pool: SqlitePool) {
+    async fn test_data_entry_discard_committee_session_status_is_paused(pool: SqlitePool) {
         // create data entry
         let request_body = example_data_entry();
         let polling_station_id = PollingStationId::from(1);
@@ -1914,7 +1914,7 @@ mod tests {
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
-    async fn test_data_entry_delete_committee_session_status_not_paused_or_data_entry(
+    async fn test_data_entry_discard_committee_session_status_not_paused_or_data_entry(
         pool: SqlitePool,
     ) {
         // create data entry
@@ -1957,10 +1957,10 @@ mod tests {
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
-    async fn test_data_entry_delete_nonexistent(pool: SqlitePool) {
+    async fn test_data_entry_discard_nonexistent(pool: SqlitePool) {
         let user = User::test_user(Role::TypistGSB, UserId::from(1));
-        // check that deleting a non-existing data entry returns 404
-        let response = data_entry_delete(
+        // check that discarding a non-existing data entry returns 404
+        let response = data_entry_discard(
             User::test_user(Role::TypistGSB, UserId::from(1)),
             State(pool.clone()),
             Path((PollingStationId::from(1), EntryNumber::FirstEntry)),
@@ -1973,7 +1973,7 @@ mod tests {
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
-    async fn test_data_entry_delete_finalised_not_possible(pool: SqlitePool) {
+    async fn test_data_entry_discard_finalised_not_possible(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
         let polling_station_id = PollingStationId::from(1);
 

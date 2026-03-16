@@ -32,8 +32,8 @@ import type {
   CREATE_FIRST_ADMIN_REQUEST_PATH,
   DATA_ENTRY_CLAIM_REQUEST_PARAMS,
   DATA_ENTRY_CLAIM_REQUEST_PATH,
-  DATA_ENTRY_DELETE_REQUEST_PARAMS,
-  DATA_ENTRY_DELETE_REQUEST_PATH,
+  DATA_ENTRY_DISCARD_REQUEST_PARAMS,
+  DATA_ENTRY_DISCARD_REQUEST_PATH,
   DATA_ENTRY_FINALISE_REQUEST_PARAMS,
   DATA_ENTRY_FINALISE_REQUEST_PATH,
   DATA_ENTRY_GET_DIFFERENCES_REQUEST_PARAMS,
@@ -414,9 +414,9 @@ export const PollingStationDataEntryClaimHandler = http.post<
   HttpResponse.json(claimDataEntryResponse, { status: 200 }),
 );
 
-// delete data entry handler
-export const PollingStationDataEntryDeleteHandler = http.delete<ParamsToString<DATA_ENTRY_DELETE_REQUEST_PARAMS>>(
-  "/api/polling_stations/1/data_entries/1" satisfies DATA_ENTRY_DELETE_REQUEST_PATH,
+// discard data entry handler
+export const PollingStationDataEntryDiscardHandler = http.delete<ParamsToString<DATA_ENTRY_DISCARD_REQUEST_PARAMS>>(
+  "/api/polling_stations/1/data_entries/1" satisfies DATA_ENTRY_DISCARD_REQUEST_PATH,
   () => new HttpResponse(null, { status: 204 }),
 );
 
@@ -534,7 +534,7 @@ export const handlers: HttpHandler[] = [
   PollingStationListRequestHandler,
   PollingStationDataEntrySaveHandler,
   PollingStationDataEntryClaimHandler,
-  PollingStationDataEntryDeleteHandler,
+  PollingStationDataEntryDiscardHandler,
   PollingStationDataEntryFinaliseHandler,
   PollingStationDataEntryResetHandler,
   PollingStationCreateHandler,

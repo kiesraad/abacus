@@ -51,7 +51,7 @@ export interface DataEntryStateAndActions extends DataEntryState {
     currentValues: SectionValues,
     options?: SubmitCurrentFormOptions,
   ) => Promise<boolean>;
-  onDeleteDataEntry: () => Promise<boolean>;
+  onDiscardDataEntry: () => Promise<boolean>;
   onFinaliseDataEntry: () => Promise<DataEntryStatusResponse | undefined>;
   setCache: (cache: TemporaryCache) => void;
   updateFormSection: (sectionId: FormSectionId, partialFormSection: Partial<FormSection>) => void;
@@ -123,7 +123,7 @@ export type TemporaryCache = {
 
 // Status of the form controller
 // This is a type instead of an enum because of https://github.com/ArnaudBarre/eslint-plugin-react-refresh/issues/36
-export type Status = "idle" | "saving" | "deleting" | "deleted" | "finalising" | "finalised" | "aborted";
+export type Status = "idle" | "saving" | "discarding" | "discarded" | "finalising" | "finalised" | "aborted";
 
 export interface ClientState {
   furthest: FormSectionId;

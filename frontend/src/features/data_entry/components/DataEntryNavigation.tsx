@@ -28,7 +28,7 @@ export function DataEntryNavigation({ onSubmit, currentValues = {} }: DataEntryN
     formState,
     setCache,
     entryNumber,
-    onDeleteDataEntry,
+    onDiscardDataEntry,
     updateFormSection,
   } = useDataEntryContext();
   const params = useParams<{ sectionId: FormSectionId }>();
@@ -52,7 +52,7 @@ export function DataEntryNavigation({ onSubmit, currentValues = {} }: DataEntryN
     }
 
     if (
-      status === "deleted" ||
+      status === "discarded" ||
       status === "finalising" ||
       status === "finalised" ||
       status === "aborted" ||
@@ -149,7 +149,7 @@ export function DataEntryNavigation({ onSubmit, currentValues = {} }: DataEntryN
 
   // when discard is chosen in the abort dialog
   const onAbortModalDelete = async () => {
-    if (await onDeleteDataEntry()) {
+    if (await onDiscardDataEntry()) {
       blocker.proceed();
     } else {
       blocker.reset();
@@ -182,7 +182,7 @@ export function DataEntryNavigation({ onSubmit, currentValues = {} }: DataEntryN
           onClick={() => {
             void onAbortModalDelete();
           }}
-          disabled={status === "deleting"}
+          disabled={status === "discarding"}
         >
           {t("data_entry.abort.discard_input")}
         </Button>

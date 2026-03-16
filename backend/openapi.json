@@ -3183,8 +3183,8 @@
         ]
       },
       "delete": {
-        "summary": "Delete an in-progress (not finalised) data entry for a polling station (typist_gsb)",
-        "operationId": "data_entry_delete",
+        "summary": "Discard an in-progress (not finalised) data entry for a polling station (typist_gsb)",
+        "operationId": "data_entry_discard",
         "parameters": [
           {
             "name": "polling_station_id",
@@ -3209,7 +3209,7 @@
         ],
         "responses": {
           "204": {
-            "description": "Data entry deleted successfully"
+            "description": "Data entry discarded successfully"
           },
           "401": {
             "description": "Unauthorized",

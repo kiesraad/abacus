@@ -246,11 +246,11 @@ export interface DATA_ENTRY_SAVE_REQUEST_PARAMS {
 }
 export type DATA_ENTRY_SAVE_REQUEST_PATH = `/api/polling_stations/${PollingStationId}/data_entries/${number}`;
 export type DATA_ENTRY_SAVE_REQUEST_BODY = DataEntry;
-export interface DATA_ENTRY_DELETE_REQUEST_PARAMS {
+export interface DATA_ENTRY_DISCARD_REQUEST_PARAMS {
   polling_station_id: PollingStationId;
   entry_number: number;
 }
-export type DATA_ENTRY_DELETE_REQUEST_PATH = `/api/polling_stations/${PollingStationId}/data_entries/${number}`;
+export type DATA_ENTRY_DISCARD_REQUEST_PATH = `/api/polling_stations/${PollingStationId}/data_entries/${number}`;
 
 // /api/polling_stations/{polling_station_id}/data_entries/{entry_number}/claim
 export interface DATA_ENTRY_CLAIM_REQUEST_PARAMS {

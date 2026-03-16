@@ -170,17 +170,16 @@ fn add_frontend_memory_serve(router: Router<AppState>) -> Router<AppState> {
 /// Add memory-serve router to serve Storybook
 #[cfg(feature = "storybook")]
 fn add_storybook_memory_serve(router: Router<AppState>) -> Router<AppState> {
-    router
-        .nest(
-            "/storybook/",
-            memory_serve::from_local_build!("storybook")
-                .index_file(Some("/index.html"))
-                .into_router()
-                .layer(SetResponseHeaderLayer::overriding(
-                    header::X_FRAME_OPTIONS,
-                    HeaderValue::from_static("sameorigin"),
-                )),
-        )
+    router.nest(
+        "/storybook/",
+        memory_serve::from_local_build!("storybook")
+            .index_file(Some("/index.html"))
+            .into_router()
+            .layer(SetResponseHeaderLayer::overriding(
+                header::X_FRAME_OPTIONS,
+                HeaderValue::from_static("sameorigin"),
+            )),
+    )
 }
 
 /// Add headers for security hardening

@@ -137,9 +137,9 @@ export function onSubmitForm(
   };
 }
 
-export function onDeleteDataEntry(client: ApiClient, requestPath: string, dispatch: DataEntryDispatch) {
+export function onDiscardDataEntry(client: ApiClient, requestPath: string, dispatch: DataEntryDispatch) {
   return async (): Promise<boolean> => {
-    dispatch({ type: "SET_STATUS", status: "deleting" });
+    dispatch({ type: "SET_STATUS", status: "discarding" });
 
     const response = await client.deleteRequest(requestPath);
 
@@ -149,7 +149,7 @@ export function onDeleteDataEntry(client: ApiClient, requestPath: string, dispat
       return false;
     }
 
-    dispatch({ type: "SET_STATUS", status: "deleted" });
+    dispatch({ type: "SET_STATUS", status: "discarded" });
     return true;
   };
 }

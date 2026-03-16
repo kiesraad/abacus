@@ -26,7 +26,7 @@ function chromeUseOptions() {
   return {
     ...devices["Desktop Chrome"],
     userAgent: "Abacus-User-Agent/1",
-    // Use custom Chrome binary (e.g. Chromium) if set or use Playwright default
+    // Use custom Chrome binary (e.g. Chromium) if set or use Playwright's default path
     ...(executablePath ? { launchOptions: { executablePath } } : { channel: "chrome" }),
   };
 }

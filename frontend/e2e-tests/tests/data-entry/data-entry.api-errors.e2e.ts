@@ -87,9 +87,9 @@ test.describe("data entry - api error responses", () => {
     await page.goto(`/elections/${pollingStationFirstEntryDone.election_id}/data-entry`);
     const dataEntryHomePage = new DataEntryHomePage(page);
 
-    await dataEntryHomePage.pollingStationNumber.fill(pollingStationFirstEntryDone.number.toString());
+    await dataEntryHomePage.number.fill(pollingStationFirstEntryDone.number.toString());
 
-    await expect(dataEntryHomePage.pollingStationFeedback).toContainText(
+    await expect(dataEntryHomePage.feedback).toContainText(
       `Je mag stembureau ${pollingStationFirstEntryDone.number} niet nog een keer invoeren`,
     );
   });

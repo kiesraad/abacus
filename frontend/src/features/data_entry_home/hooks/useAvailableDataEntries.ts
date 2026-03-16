@@ -10,13 +10,13 @@ const NOT_AVAILABLE_STATUSES: DataEntryUserStatus[] = [
   DataEntryUserStatus.HasErrors,
 ];
 
-export interface UseAvailablePollingStationsParams {
+export interface UseAvailableDataEntries {
   dataEntryWithStatus: DataEntryStatusWithUserStatus[];
   availableCurrentUser: DataEntryStatusWithUserStatus[];
   inProgressCurrentUser: DataEntryStatusWithUserStatus[];
 }
 
-export function useAvailablePollingStations(): UseAvailablePollingStationsParams {
+export function useAvailableDataEntries(): UseAvailableDataEntries {
   const user = useUser();
   const { statuses } = useElectionStatus();
 

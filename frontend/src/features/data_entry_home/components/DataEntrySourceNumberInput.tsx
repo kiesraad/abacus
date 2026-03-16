@@ -20,7 +20,7 @@ interface FeedbackMessageProps {
 }
 
 const FeedbackMessage = ({ messageType, content, icon }: FeedbackMessageProps) => (
-  <div id="pollingStationNumberInputFeedback" className={cn(cls.message, cls[messageType])}>
+  <div id="inputFeedback" className={cn(cls.message, cls[messageType])}>
     {icon && (
       <span className={cls.icon}>
         <Icon
@@ -122,7 +122,7 @@ export function DataEntrySourceNumberInput({
   return (
     <div className={cls.container}>
       <InputField
-        id="pollingStation"
+        id="numberInput"
         className={cn(cls.input, "font-number")}
         name="number"
         value={number}

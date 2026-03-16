@@ -197,7 +197,7 @@ test.describe("resume data entry flow", () => {
         },
       });
 
-      await dataEntryHomePage.selectPollingStationAndClickStart(pollingStation);
+      await dataEntryHomePage.enterNumberAndClickStart(pollingStation);
       await expect(votersAndVotesPage.fieldset).toBeVisible();
     });
 
@@ -287,7 +287,7 @@ test.describe("resume data entry flow", () => {
         },
       } satisfies Partial<ClaimDataEntryResponse>);
 
-      await dataEntryHomePage.selectPollingStationAndClickStart(pollingStation);
+      await dataEntryHomePage.enterNumberAndClickStart(pollingStation);
       await expect(votersAndVotesPage.fieldset).toBeVisible();
     });
 
@@ -314,7 +314,7 @@ test.describe("resume data entry flow", () => {
       await abortInputModal.saveInput.click();
 
       const dataEntryHomePage = new DataEntryHomePage(page);
-      await dataEntryHomePage.selectPollingStationAndClickStart(pollingStation);
+      await dataEntryHomePage.enterNumberAndClickStart(pollingStation);
 
       await expect(votersAndVotesPage.fieldset).toBeVisible();
       await expect(votersAndVotesPage.pollCardCount).toHaveValue("42");

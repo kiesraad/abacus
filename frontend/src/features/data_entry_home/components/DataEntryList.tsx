@@ -18,7 +18,7 @@ export function DataEntryList({ electionId, dataEntries }: DataEntryListProps) {
   }
 
   return (
-    <Table id="polling_station_list">
+    <Table id="data_entry_list">
       <Table.Header>
         <Table.HeaderCell className="text-align-r">{t("number")}</Table.HeaderCell>
         <Table.HeaderCell>{t("polling_station.title.singular")}</Table.HeaderCell>

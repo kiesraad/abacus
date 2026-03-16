@@ -15,7 +15,7 @@ import type { ElectionId } from "@/types/generated/openapi";
 import { KeyboardKey } from "@/types/ui";
 import { cn } from "@/utils/classnames";
 import { parseIntUserInput } from "@/utils/strings";
-import { useAvailablePollingStations } from "../hooks/useAvailablePollingStations";
+import { useAvailableDataEntries } from "../hooks/useAvailableDataEntries";
 import { useDebouncedCallback } from "../hooks/useDebouncedCallback";
 import { type DataEntryStatusWithUserStatus, DataEntryUserStatus, getUrlForDataEntry } from "../utils/util";
 import cls from "./DataEntryHome.module.css";
@@ -39,7 +39,7 @@ interface AlertMessageProps {
 
 function AlertMessage({ message }: AlertMessageProps) {
   return (
-    <div id="pollingStationSubmitFeedback" className={cn(cls.message, cls.submit, cls.error)}>
+    <div id="submitFeedback" className={cn(cls.message, cls.submit, cls.error)}>
       <span className={cls.icon}>
         <Icon icon={<IconError aria-label={t("contains_error")} aria-hidden="false" />} color="error" />
       </span>
@@ -106,7 +106,7 @@ export function DataEntryPicker({ anotherEntry }: DataEntryPickerProps) {
   const navigate = useNavigate();
   const { election } = useElection();
   const { refetch: refetchStatuses } = useElectionStatus();
-  const { dataEntryWithStatus, availableCurrentUser, inProgressCurrentUser } = useAvailablePollingStations();
+  const { dataEntryWithStatus, availableCurrentUser, inProgressCurrentUser } = useAvailableDataEntries();
   const [number, setNumber] = useState<string>("");
   const [alert, setAlert] = useState<string | undefined>(undefined);
   const [loading, setLoading] = useState<boolean>(false);
@@ -122,7 +122,7 @@ export function DataEntryPicker({ anotherEntry }: DataEntryPickerProps) {
     });
   }, USER_INPUT_DEBOUNCE);
 
-  // set polling station number and trigger debounced lookup
+  // set number and trigger debounced lookup
   const updateNumber = (n: string) => {
     setNumber(n);
     setLoading(true);

@@ -181,13 +181,6 @@ fn add_storybook_memory_serve(router: Router<AppState>) -> Router<AppState> {
                     HeaderValue::from_static("sameorigin"),
                 )),
         )
-        // Workaround for https://github.com/storybookjs/storybook/issues/32428
-        .route(
-            "/vite-inject-mocker-entry.js",
-            axum::routing::get(|| async {
-                axum::response::Redirect::temporary("/storybook/vite-inject-mocker-entry.js")
-            }),
-        )
 }
 
 /// Add headers for security hardening

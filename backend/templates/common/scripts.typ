@@ -310,8 +310,8 @@
   " uur"
 }
 
-#let format_quota(quota) = {
-  str(quota.integer) + " " + str(quota.numerator) + "/" + str(quota.denominator)
+#let format_fraction(fraction) = {
+  str(fraction.integer) + " " + str(fraction.numerator) + "/" + str(fraction.denominator)
 }
 
 // A title without any numbering
@@ -343,7 +343,7 @@
 }
 
 // Format the name of a candidate
-#let candidate_name(election_candidate, withFirstName: true, withGender: true) = {
+#let candidate_name(election_candidate, with_first_name: true, with_gender: true) = {
   let name = ""
 
   if election_candidate == none {
@@ -356,11 +356,11 @@
 
   name += election_candidate.last_name + ", " + election_candidate.initials + " "
   
-  if "first_name" in election_candidate and withFirstName {
+  if "first_name" in election_candidate and with_first_name {
     name += "(" + election_candidate.first_name + ") "
   }
 
-  if "gender" in election_candidate and withGender {
+  if "gender" in election_candidate and with_gender {
     if election_candidate.gender == "Male" {
       name += "(m)"
     } else if election_candidate.gender == "Female" {
@@ -393,26 +393,28 @@
 }
 
 // Format the name of a political group
-#let political_group_name(election_political_group, withPrefix: true) = {
+#let political_group_name(election_political_group, with_prefix: none) = {
   let name = ""
 
   if election_political_group == none {
     return name
   }
 
-  let listPrefix = "";
-  if (withPrefix) {
-    listPrefix += "Lijst " + str(election_political_group.number) + " - ";
+  let prefix = "";
+  if (with_prefix == "with_list_prefix") {
+    prefix += "Lijst " + str(election_political_group.number) + " ";
+  } else if (with_prefix == "only_list_number") {
+    prefix += str(election_political_group.number) + " ";
   }
 
   if (election_political_group.name == "") {
     if (election_political_group.candidates.first() != none) {
-      name = listPrefix + "Blanco (" + candidate_name(election_political_group.candidates.first(), withFirstName: false, withGender: false) + ")";
+      name = prefix + "Blanco (" + candidate_name(election_political_group.candidates.first(), with_first_name: false, with_gender: false) + ")";
     } else {
-      name = listPrefix + "Blanco";
+      name = prefix + "Blanco";
     }
   } else {
-    name = listPrefix + election_political_group.name
+    name = prefix + election_political_group.name
   }
 
   name.trim()
@@ -682,6 +684,49 @@
         table.cell([#candidate_location(candidate)]),
         if showVotes { table.cell(align: right, [#chosen_candidate.votes])}
         else if showPosition { table.cell(align: right, [#candidate.number])},
+      )
+    }).flatten(),
+    table.hline(stroke: 0.5pt + gray),
+  )
+}
+
+// View a table with list names with residual seat assignment and total number of residual seats
+#let highest_averages_table(
+  steps,
+  final_standing,
+  political_groups,
+) = {
+  table(
+    columns: (1fr,) + (steps.len() + 1) * (auto,),
+    stroke: (x, y) => (
+      left: if x > 0 { 0.5pt + gray },
+      top: if y > 0 { 0.5pt + gray },
+    ),
+    table.header(
+      table.cell(rowspan: 2, stroke: none, small_header_text([Lijst])),
+      table.cell(align: center, colspan: steps.len(), small_header_text([Restzetel])),
+      table.cell(rowspan: 2, small_header_text([Aantal\ restzetels])),
+      ..steps.enumerate().map(((idx, step)) => {
+        table.cell(rowspan: 1, str(idx + 1))
+      }),
+    ),
+    table.hline(stroke: 1pt + black),
+    ..final_standing.map((list_seat_assignment) => {
+      let residual_seats = steps.filter(step => {
+        step.change.selected_list_number == list_seat_assignment.list_number
+      }).len()
+      // let list_result_changes = result_changes.filter((change) => change.listNumber == list_seat_assignment.list_number)
+      // list_result_changes.forEach((list_result_change) => {
+      //   residual_seats = residual_seats + list_result_change.increase - list_result_change.decrease;
+      // });
+      (
+        table.cell(political_group_name(political_groups.find(pg => pg.number == list_seat_assignment.list_number), with_prefix: "only_list_number")),
+        ..steps.map(step => {
+          let average = step.standings.find((standing) => standing.list_number == list_seat_assignment.list_number).next_votes_per_seat;
+          table.cell(
+          if not step.change.list_exhausted.contains(list_seat_assignment.list_number) { format_fraction(average) } else {""})
+        }),
+        table.cell(align: right, str(residual_seats))
       )
     }).flatten(),
     table.hline(stroke: 0.5pt + gray),

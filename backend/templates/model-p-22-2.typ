@@ -1,6 +1,6 @@
 #import "common/style.typ": conf, default_header, document_numbering
 #import "common/scripts.typ": *
-#let input = json("inputs/model-p-22-2.json")
+#let input = json("inputs/extra-model-p-22-2-variations/gte-19-seats-and-p9.json")
 
 #let is_municipality = (municipal, public_body) => if (
   input.election.category == "Municipal"
@@ -151,7 +151,7 @@ De volgende rollen zijn mogelijk: voorzitter, plaatsvervangend voorzitter of lid
   table.hline(stroke: 1pt + black),
   ..for standing in input.seat_assignment.final_standing.sorted(key: standing => standing.total_seats, by: (l, r) => l >= r) {
     (
-      table.cell(political_group_name(input.election.political_groups.find(pg => pg.number == standing.list_number), withPrefix: true)),
+      table.cell(political_group_name(input.election.political_groups.find(pg => pg.number == standing.list_number), with_prefix: "only_list_number")),
       table.cell(align: right, [#standing.votes_cast])
     )
   }.flatten(),
@@ -212,7 +212,7 @@ Met de kiesdeler wordt de zetelverdeling bepaald. De kiesdeler is het aantal ste
   table.cell(align: center, [÷]),
   table.cell(align: center, [#input.seat_assignment.seats]),
   table.cell(align: center, [=]),
-  table.cell(format_quota(input.seat_assignment.quota)),
+  table.cell(format_fraction(input.seat_assignment.quota)),
 )
 
 #pagebreak(weak: true)
@@ -236,9 +236,9 @@ Hieronder is berekend hoe vaak elke lijst qua stemmenaantal de kiesdeler heeft g
   table.hline(stroke: 1pt + black),
   ..for standing in input.seat_assignment.final_standing.sorted(key: standing => standing.total_seats, by: (l, r) => l >= r) {
     (
-      table.cell(political_group_name(input.election.political_groups.find(pg => pg.number == standing.list_number), withPrefix: true)),
+      table.cell(political_group_name(input.election.political_groups.find(pg => pg.number == standing.list_number), with_prefix: "only_list_number")),
       table.cell(align: right, [#standing.votes_cast]),
-      table.cell(align: center, [÷ #format_quota(input.seat_assignment.quota) =]),
+      table.cell(align: center, [÷ #format_fraction(input.seat_assignment.quota) =]),
       table.cell(align: right, [#standing.full_seats])
     )
   }.flatten(),
@@ -273,42 +273,49 @@ Na toewijzing van de volle zetels blijft een aantal te verdelen zetels over. Dit
 #pagebreak(weak: true)
 
 === Verdeling van de restzetels
-#if input.election.number_of_seats < LARGE_COUNCIL_THRESHOLD [
-  - Het centraal stembureau berekent hoeveel stemmen elke lijst overhoudt na toekenning van de volle zetels. Dat is het 'overschot' aan stemmen voor die lijst.
-  - Het centraal stembureau verdeelt de restzetels, in volgorde van de grootste overschotten. Elke lijst kan maar één restzetel krijgen. Alleen lijsten die ten minste 75% van de kiesdeler hebben behaald kunnen een restzetel krijgen.
-  - Als er daarna nog restzetels over zijn, verdeelt het centraal stembureau die volgens het systeem van de grootste gemiddelden. Ook bij deze verdeling mag iedere lijst maar één restzetel krijgen
-  - Als lijsten precies evenveel stemmen behalen en er niet voldoende restzetels zijn voor die lijsten, dan wordt geloot welke lijst de restzetel krijgt.
+#if input.seat_assignment.residual_seats > 0 [
+  #if input.election.number_of_seats < LARGE_COUNCIL_THRESHOLD [
+    - Het centraal stembureau berekent hoeveel stemmen elke lijst overhoudt na toekenning van de volle zetels. Dat is het 'overschot' aan stemmen voor die lijst.
+    - Het centraal stembureau verdeelt de restzetels, in volgorde van de grootste overschotten. Elke lijst kan maar één restzetel krijgen. Alleen lijsten die ten minste 75% van de kiesdeler hebben behaald kunnen een restzetel krijgen.
+    - Als er daarna nog restzetels over zijn, verdeelt het centraal stembureau die volgens het systeem van de grootste gemiddelden. Ook bij deze verdeling mag iedere lijst maar één restzetel krijgen
+    - Als lijsten precies evenveel stemmen behalen en er niet voldoende restzetels zijn voor die lijsten, dan wordt geloot welke lijst de restzetel krijgt.
+  
+    #TODO[largest remainders table]
+  ] else [
+    - Eerst wordt voor alle lijsten berekend hoeveel stemmen per zetel op een bepaalde lijst zouden zijn uitgebracht als die lijst één zetel extra zou krijgen: de op de lijst uitgebrachte stemmen worden gedeeld door het aantal volle zetels plus 1.
+    - De uitkomsten van deze berekening zijn gemiddelden per zetel; zij worden naar grootte gerangschikt.
+    - De eerste restzetel gaat naar de lijst met het grootste gemiddelde per zetel. Voor deze lijst wordt opnieuw berekend wat het gemiddelde nu is, uitgaande van het aantal volle zetels, de toegewezen restzetel en weer één extra zetel.
+    - Als er nog een restzetel te verdelen is, wordt deze toegewezen aan de lijst met nu het grootste gemiddelde.
+    - Het centraal stembureau herhaalt de procedure totdat alle restzetels verdeeld zijn.
+  
+    Als meerdere lijsten gelijke gemiddelden hebben en er niet voldoende restzetels zijn voor toekenning ervan aan die lijsten, wordt geloot welke lijst de restzetel krijgt.
 
-  #TODO[largest remainders table]
+    #TODO[add result changes to highest averages table]
+    #TODO[move part of highest averages table to next page when > 6 residual seats?]
+  
+    #highest_averages_table(input.seat_assignment.steps.filter(step => step.change.changed_by == "HighestAverageAssignment"), input.seat_assignment.final_standing, input.election.political_groups)
+  ]
+
+  #TODO[Voetnoten]
+  
+  #pagebreak(weak: true)
+  
+  #if input.election.number_of_seats < LARGE_COUNCIL_THRESHOLD and input.seat_assignment.steps.filter(step => step.change.changed_by == "UniqueHighestAverageAssignment").len() > 0 [
+    === Verdeling van de restzetels 
+    
+    De resterende restzetels zijn verdeeld via het systeem van de grootste gemiddelden. De lijst die na toewijzing van een restzetel het hoogste gemiddeld aantal stemmen per zetel zou hebben, krijgt een restzetel. Ook bij deze verdeling mag iedere lijst maar één restzetel krijgen.
+    
+    #TODO[unique highest averages table]
+  
+    #if input.seat_assignment.steps.filter(step => step.change.changed_by == "HighestAverageAssignment").len() > 0 [
+      #TODO[Welke tekst moet hier nog bij?]
+    #highest_averages_table(input.seat_assignment.steps.filter(step => step.change.changed_by == "HighestAverageAssignment"), input.seat_assignment.final_standing, input.election.political_groups)
+    ]
+    
+    #pagebreak(weak: true)
+  ]
 ] else [
-  - Eerst wordt voor alle lijsten berekend hoeveel stemmen per zetel op een bepaalde lijst zouden zijn uitgebracht als die lijst één zetel extra zou krijgen: de op de lijst uitgebrachte stemmen worden gedeeld door het aantal volle zetels plus 1.
-  - De uitkomsten van deze berekening zijn gemiddelden per zetel; zij worden naar grootte gerangschikt.
-  - De eerste restzetel gaat naar de lijst met het grootste gemiddelde per zetel. Voor deze lijst wordt opnieuw berekend wat het gemiddelde nu is, uitgaande van het aantal volle zetels, de toegewezen restzetel en weer één extra zetel.
-  - Als er nog een restzetel te verdelen is, wordt deze toegewezen aan de lijst met nu het grootste gemiddelde.
-  - Het centraal stembureau herhaalt de procedure totdat alle restzetels verdeeld zijn.
-
-  Als meerdere lijsten gelijke gemiddelden hebben en er niet voldoende restzetels zijn voor toekenning ervan aan die lijsten, wordt geloot welke lijst de restzetel krijgt.
-
-  #TODO[highest averages table]
-]
-
-#TODO[Voetnoten]
-
-#pagebreak(weak: true)
-
-#if input.election.number_of_seats < LARGE_COUNCIL_THRESHOLD [
-#TODO[Als nog restzetels over]
-=== Verdeling van de restzetels 
-
-De resterende restzetels zijn verdeeld via het systeem van de grootste gemiddelden. De lijst die na toewijzing van een restzetel het hoogste gemiddeld aantal stemmen per zetel zou hebben, krijgt een restzetel. Ook bij deze verdeling mag iedere lijst maar één restzetel krijgen.
-
-#TODO[unique highest averages table]
-
-#TODO[Als nog meer restzetels over]
-#TODO[Welke tekst moet hier nog bij?]
-#TODO[highest averages table]
-
-#pagebreak(weak: true)
+  Er zijn geen restzetels te verdelen.
 ]
 
 == Verdeling van de zetels
@@ -330,7 +337,7 @@ De aan de lijsten toegewezen volle zetels en restzetels zijn bij elkaar opgeteld
   
   ..for standing in input.seat_assignment.final_standing.sorted(key: standing => standing.total_seats, by: (l, r) => l >= r) {
     (
-      table.cell(political_group_name(input.election.political_groups.find(pg => pg.number == standing.list_number), withPrefix: false)),
+      table.cell(political_group_name(input.election.political_groups.find(pg => pg.number == standing.list_number), with_prefix: "only_list_number")),
       table.cell(align: right, [#standing.total_seats])
     )
   }.flatten(),
@@ -343,7 +350,7 @@ De aan de lijsten toegewezen volle zetels en restzetels zijn bij elkaar opgeteld
 
 #for list_candidate_nomination in input.candidate_nomination.list_candidate_nomination.filter((lcn) => lcn.list_seats > 0) {
   let pg = input.election.political_groups.find(pg => pg.number == list_candidate_nomination.list_number)
-  list_heading_text(political_group_name(pg))
+  list_heading_text(political_group_name(pg, with_prefix: "with_list_prefix"))
   v(4pt)
   [Aantal zetels: #list_candidate_nomination.list_seats]
   
@@ -426,7 +433,7 @@ De aan de lijsten toegewezen volle zetels en restzetels zijn bij elkaar opgeteld
     (
       table.cell([#candidate_name(chosen_candidate)]),
       table.cell([#candidate_location(chosen_candidate)]),
-      table.cell([#political_group_name(input.election.political_groups.find(pg => pg.number == chosen_candidate.list_number))]),
+      table.cell([#political_group_name(input.election.political_groups.find(pg => pg.number == chosen_candidate.list_number), with_prefix: "only_list_number")]),
     )
   }).flatten(),
   table.hline(stroke: 0.5pt + gray),

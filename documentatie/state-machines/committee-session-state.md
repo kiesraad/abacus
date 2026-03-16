@@ -44,5 +44,5 @@ flowchart
 
   completed -.->|add/update<br/>polling station<br/>or investigation| data_entry
 
-  completed -.->|delete<br/>data entry<br/>, polling station<br/> or investigation| data_entry
+  completed -.->|delete<br/>data entry,</br> polling station<br/> or investigation| data_entry
 ```

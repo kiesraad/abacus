@@ -18,19 +18,19 @@ import { parseIntUserInput } from "@/utils/strings";
 import { useAvailablePollingStations } from "../hooks/useAvailablePollingStations";
 import { useDebouncedCallback } from "../hooks/useDebouncedCallback";
 import { type DataEntryStatusWithUserStatus, DataEntryUserStatus, getUrlForDataEntry } from "../utils/util";
-import cls from "./PollingStationChoice.module.css";
-import { PollingStationLink } from "./PollingStationLink";
-import { PollingStationNumberInput } from "./PollingStationNumberInput";
-import { PollingStationsList } from "./PollingStationsList";
+import cls from "./DataEntryHome.module.css";
+import { DataEntryLink } from "./DataEntryLink";
+import { DataEntryList } from "./DataEntryList";
+import { DataEntrySourceNumberInput } from "./DataEntrySourceNumberInput";
 
 const USER_INPUT_DEBOUNCE: number = 500; // ms
 
 const STATUS_ALERTS: Partial<Record<DataEntryUserStatus, TranslationPath>> = {
-  [DataEntryUserStatus.EntryNotAllowed]: "polling_station_choice.alert.entry_not_allowed",
-  [DataEntryUserStatus.Finished]: "polling_station_choice.alert.finished",
-  [DataEntryUserStatus.InProgressOtherUser]: "polling_station_choice.alert.in_progress_other_user",
-  [DataEntryUserStatus.HasErrors]: "polling_station_choice.alert.has_errors",
-  [DataEntryUserStatus.SecondEntryNotAllowed]: "polling_station_choice.alert.second_entry_not_allowed",
+  [DataEntryUserStatus.EntryNotAllowed]: "data_entry_home.alert.entry_not_allowed",
+  [DataEntryUserStatus.Finished]: "data_entry_home.alert.finished",
+  [DataEntryUserStatus.InProgressOtherUser]: "data_entry_home.alert.in_progress_other_user",
+  [DataEntryUserStatus.HasErrors]: "data_entry_home.alert.has_errors",
+  [DataEntryUserStatus.SecondEntryNotAllowed]: "data_entry_home.alert.second_entry_not_allowed",
 };
 
 interface AlertMessageProps {
@@ -57,52 +57,52 @@ function UnfinishedEntriesList({ electionId, dataEntries }: UnfinishedEntriesLis
   return (
     <div className="mb-lg" id="unfinished-list">
       <Alert type="notify" variant="no-icon">
-        <strong className="heading-md">{t("polling_station_choice.unfinished_input_title")}</strong>
-        <p>{t("polling_station_choice.unfinished_input_content")}</p>
+        <strong className="heading-md">{t("data_entry_home.unfinished_input_title")}</strong>
+        <p>{t("data_entry_home.unfinished_input_content")}</p>
         {dataEntries.map(({ statusEntry }) => (
-          <PollingStationLink key={statusEntry.data_entry_id} electionId={electionId} dataEntry={statusEntry} />
+          <DataEntryLink key={statusEntry.data_entry_id} electionId={electionId} dataEntry={statusEntry} />
         ))}
       </Alert>
     </div>
   );
 }
 
-interface PollingStationListDetailsProps {
+interface CollapsibleDataEntryListProps {
   electionId: ElectionId;
   availableDataEntries: DataEntryStatusWithUserStatus[];
   onToggle: () => void;
 }
 
-function PollingStationListDetails({ electionId, availableDataEntries, onToggle }: PollingStationListDetailsProps) {
+function CollapsibleDataEntryList({ electionId, availableDataEntries, onToggle }: CollapsibleDataEntryListProps) {
   return (
     <div className={cls.dataEntryList}>
       <details onToggle={onToggle}>
         <summary>
-          {t("polling_station_choice.unknown_number")}
+          {t("data_entry_home.unknown_number")}
           <br />
-          <span id="openPollingStationList" className={cn("underlined", cls.pointer)}>
-            {t("polling_station_choice.view_list")}
+          <span id="openList" className={cn("underlined", cls.pointer)}>
+            {t("data_entry_home.view_list")}
           </span>
         </summary>
-        <h3 className="mb-lg">{t("polling_station_choice.choose_polling_station")}</h3>
+        <h3 className="mb-lg">{t("data_entry_home.choose_polling_station")}</h3>
         {availableDataEntries.length === 0 ? (
           <Alert type="notify" small>
-            <p>{t("polling_station_choice.there_are_no_polling_stations_left_to_fill_in")}</p>
+            <p>{t("data_entry_home.there_are_no_polling_stations_left_to_fill_in")}</p>
           </Alert>
         ) : (
-          <PollingStationsList electionId={electionId} dataEntries={availableDataEntries} />
+          <DataEntryList electionId={electionId} dataEntries={availableDataEntries} />
         )}
       </details>
     </div>
   );
 }
 
-export interface PollingStationPickerProps {
+export interface DataEntryPickerProps {
   anotherEntry?: boolean;
 }
 
 // biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored after #2997
-export function PollingStationPicker({ anotherEntry }: PollingStationPickerProps) {
+export function DataEntryPicker({ anotherEntry }: DataEntryPickerProps) {
   const navigate = useNavigate();
   const { election } = useElection();
   const { refetch: refetchStatuses } = useElectionStatus();
@@ -131,7 +131,7 @@ export function PollingStationPicker({ anotherEntry }: PollingStationPickerProps
 
   const handleSubmit = () => {
     if (!currentDataEntry) {
-      setAlert(t("polling_station_choice.enter_a_valid_number_to_start"));
+      setAlert(t("data_entry_home.enter_a_valid_number_to_start"));
       setLoading(false);
       return;
     }
@@ -162,11 +162,9 @@ export function PollingStationPicker({ anotherEntry }: PollingStationPickerProps
       )}
       <fieldset>
         <legend className="mb-sm">
-          <h2>
-            {anotherEntry ? t("polling_station_choice.insert_another") : t("polling_station_choice.insert_title")}
-          </h2>
+          <h2>{anotherEntry ? t("data_entry_home.insert_another") : t("data_entry_home.insert_title")}</h2>
         </legend>
-        <PollingStationNumberInput
+        <DataEntrySourceNumberInput
           number={number}
           updateNumber={updateNumber}
           loading={loading}
@@ -176,7 +174,7 @@ export function PollingStationPicker({ anotherEntry }: PollingStationPickerProps
           handleSubmit={handleSubmit}
           refetchStatuses={() => void refetchStatuses()}
         />
-        <p className="mb-lg">{tx("polling_station_choice.name_correct_warning")}</p>
+        <p className="mb-lg">{tx("data_entry_home.name_correct_warning")}</p>
         {alert && <AlertMessage message={alert} />}
         <BottomBar type="form">
           <BottomBar.Row>
@@ -185,7 +183,7 @@ export function PollingStationPicker({ anotherEntry }: PollingStationPickerProps
           </BottomBar.Row>
         </BottomBar>
       </fieldset>
-      <PollingStationListDetails
+      <CollapsibleDataEntryList
         electionId={election.id}
         availableDataEntries={availableCurrentUser}
         onToggle={() => void refetchStatuses()}

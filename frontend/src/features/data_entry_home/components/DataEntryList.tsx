@@ -5,12 +5,12 @@ import { t } from "@/i18n/translate";
 import type { ElectionId } from "@/types/generated/openapi";
 import { type DataEntryStatusWithUserStatus, getUrlForDataEntry } from "../utils/util";
 
-export interface PollingStationsListProps {
+export interface DataEntryListProps {
   electionId: ElectionId;
   dataEntries: DataEntryStatusWithUserStatus[];
 }
 
-export function PollingStationsList({ electionId, dataEntries }: PollingStationsListProps) {
+export function DataEntryList({ electionId, dataEntries }: DataEntryListProps) {
   const user = useUser();
 
   if (!user) {

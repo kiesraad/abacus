@@ -11,13 +11,13 @@ import { ElectionRequestHandler, ElectionStatusRequestHandler } from "@/testing/
 import { overrideOnce, server } from "@/testing/server";
 import { renderReturningRouter, screen, waitFor, within } from "@/testing/test-utils";
 import { getTypistUser } from "@/testing/user-mock-data";
-import { PollingStationPicker } from "./PollingStationPicker";
+import { DataEntryPicker } from "./DataEntryPicker";
 
 async function renderPollingStationPicker(anotherEntry?: boolean) {
   const router = renderReturningRouter(
     <ElectionProvider electionId={1}>
       <ElectionStatusProvider electionId={1}>
-        <PollingStationPicker anotherEntry={anotherEntry} />
+        <DataEntryPicker anotherEntry={anotherEntry} />
       </ElectionStatusProvider>
     </ElectionProvider>,
   );
@@ -250,8 +250,8 @@ describe("Test PollingStationPicker", () => {
       await renderPollingStationPicker();
 
       expect(await screen.findByText("Kies het stembureau")).not.toBeVisible();
-      const openPollingStationList = screen.getByTestId("openPollingStationList");
-      await user.click(openPollingStationList);
+      const openList = screen.getByTestId("openList");
+      await user.click(openList);
 
       expect(screen.getByText("Kies het stembureau")).toBeVisible();
 
@@ -272,8 +272,8 @@ describe("Test PollingStationPicker", () => {
       const user = userEvent.setup();
       await renderPollingStationPicker();
 
-      const openPollingStationList = await screen.findByTestId("openPollingStationList");
-      await user.click(openPollingStationList);
+      const openList = await screen.findByTestId("openList");
+      await user.click(openList);
       expect(screen.getByText("Kies het stembureau")).toBeVisible();
 
       // Check if the error message is visible
@@ -323,8 +323,8 @@ describe("Test PollingStationPicker", () => {
       const user = userEvent.setup();
       await renderPollingStationPicker();
 
-      const openPollingStationList = await screen.findByTestId("openPollingStationList");
-      await user.click(openPollingStationList);
+      const openList = await screen.findByTestId("openList");
+      await user.click(openList);
       expect(screen.getByText("Kies het stembureau")).toBeVisible();
 
       // Check if the error message is visible
@@ -346,8 +346,8 @@ describe("Test PollingStationPicker", () => {
 
       // Open the polling station list
       const user = userEvent.setup();
-      const openPollingStationList = await screen.findByTestId("openPollingStationList");
-      await user.click(openPollingStationList);
+      const openList = await screen.findByTestId("openList");
+      await user.click(openList);
 
       // Click polling station 33 and check if the link is correct
       const pollingStationList = await screen.findByTestId("polling_station_list");

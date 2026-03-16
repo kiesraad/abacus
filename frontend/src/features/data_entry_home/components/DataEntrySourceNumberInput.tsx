@@ -11,7 +11,7 @@ import { cn } from "@/utils/classnames";
 import { removeLeadingZeros } from "@/utils/strings";
 import { useSingleCall } from "../hooks/useSingleCall";
 import { type DataEntryStatusWithUserStatus, DataEntryUserStatus } from "../utils/util";
-import cls from "./PollingStationChoice.module.css";
+import cls from "./DataEntryHome.module.css";
 
 interface FeedbackMessageProps {
   messageType: "notify" | "warning" | "error" | "success";
@@ -33,7 +33,7 @@ const FeedbackMessage = ({ messageType, content, icon }: FeedbackMessageProps) =
   </div>
 );
 
-export interface PollingStationNumberInputProps {
+export interface DataEntrySourceNumberInputProps {
   number: string;
   updateNumber: (n: string) => void;
   loading: boolean;
@@ -45,7 +45,7 @@ export interface PollingStationNumberInputProps {
 }
 
 // biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
-export function PollingStationNumberInput({
+export function DataEntrySourceNumberInput({
   number,
   updateNumber,
   loading,
@@ -53,7 +53,7 @@ export function PollingStationNumberInput({
   setAlert,
   handleSubmit,
   refetchStatuses,
-}: PollingStationNumberInputProps) {
+}: DataEntrySourceNumberInputProps) {
   const [refetch, reset] = useSingleCall(refetchStatuses);
   const user = useUser();
   if (!user) {
@@ -73,7 +73,7 @@ export function PollingStationNumberInput({
       return (
         <FeedbackMessage
           messageType="notify"
-          content={<>{t("polling_station_choice.searching")} &hellip;</>}
+          content={<>{t("data_entry_home.searching")} &hellip;</>}
           icon={<Spinner size="md" />}
         />
       );
@@ -84,17 +84,15 @@ export function PollingStationNumberInput({
 
       switch (currentDataEntry.userStatus) {
         case DataEntryUserStatus.InProgressOtherUser:
-          return renderWarningMessage(
-            tx("polling_station_choice.alert.in_progress_other_user_selector", undefined, { nr }),
-          );
+          return renderWarningMessage(tx("data_entry_home.alert.in_progress_other_user_selector", undefined, { nr }));
         case DataEntryUserStatus.SecondEntryNotAllowed:
-          return renderWarningMessage(tx("polling_station_choice.alert.second_entry_not_allowed", undefined, { nr }));
+          return renderWarningMessage(tx("data_entry_home.alert.second_entry_not_allowed", undefined, { nr }));
         case DataEntryUserStatus.HasErrors:
-          return renderWarningMessage(tx("polling_station_choice.alert.has_errors", undefined, { nr }));
+          return renderWarningMessage(tx("data_entry_home.alert.has_errors", undefined, { nr }));
         case DataEntryUserStatus.Finished:
-          return renderWarningMessage(tx("polling_station_choice.alert.finished_selector", undefined, { nr, name }));
+          return renderWarningMessage(tx("data_entry_home.alert.finished_selector", undefined, { nr, name }));
         case DataEntryUserStatus.EntryNotAllowed:
-          return renderWarningMessage(tx("polling_station_choice.alert.entry_not_allowed", undefined, { nr }));
+          return renderWarningMessage(tx("data_entry_home.alert.entry_not_allowed", undefined, { nr }));
         default:
           return (
             <FeedbackMessage
@@ -113,7 +111,7 @@ export function PollingStationNumberInput({
     return (
       <FeedbackMessage
         messageType="error"
-        content={t("polling_station_choice.no_polling_station_found_with_number", {
+        content={t("data_entry_home.no_polling_station_found_with_number", {
           nr: removeLeadingZeros(number),
         })}
         icon={<IconError aria-label={t("contains_error")} aria-hidden="false" />}
@@ -128,7 +126,7 @@ export function PollingStationNumberInput({
         className={cn(cls.input, "font-number")}
         name="number"
         value={number}
-        label={t("polling_station_choice.insert_number")}
+        label={t("data_entry_home.insert_number")}
         fieldWidth="narrow"
         maxLength={6}
         autoFocus={true}

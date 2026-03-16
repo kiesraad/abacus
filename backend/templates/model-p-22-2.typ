@@ -273,7 +273,6 @@ Na toewijzing van de volle zetels blijft een aantal te verdelen zetels over. Dit
 #pagebreak(weak: true)
 
 === Verdeling van de restzetels
-#TODO[Breedte tekst op pagina's fixen, hoort kleiner te zijn]\
 #if input.election.number_of_seats < LARGE_COUNCIL_THRESHOLD [
   - Het centraal stembureau berekent hoeveel stemmen elke lijst overhoudt na toekenning van de volle zetels. Dat is het 'overschot' aan stemmen voor die lijst.
   - Het centraal stembureau verdeelt de restzetels, in volgorde van de grootste overschotten. Elke lijst kan maar één restzetel krijgen. Alleen lijsten die ten minste 75% van de kiesdeler hebben behaald kunnen een restzetel krijgen.

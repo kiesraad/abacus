@@ -94,6 +94,7 @@
   #set list(spacing: 1.5em)
 
   #show par: content => block(width: 75%, content)
+  #show list: content => block(width: 75%, content)
 
   #show heading: set block(above: 2em, below: 1.5em)
 

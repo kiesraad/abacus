@@ -157,7 +157,7 @@ async fn election_download_na_31_2_bijlage1(
 
     if election.committee_category != CommitteeCategory::GSB {
         return Err(APIError::NotFound(
-            "NA 31-2 Bijlage 1 is only available for GSB elections".into(),
+            "Na 31-2 Bijlage 1 is only available for GSB elections".into(),
             ErrorReference::EntryNotFound,
         ));
     }
@@ -247,7 +247,7 @@ async fn election_download_na_31_2_inlegvel(
     user.role().is_authorized(&election.committee_category)?;
     if election.committee_category != CommitteeCategory::GSB {
         return Err(APIError::NotFound(
-            "NA 31-2 Inlegvel is only available for GSB elections".into(),
+            "Na 31-2 Inlegvel is only available for GSB elections".into(),
             ErrorReference::EntryNotFound,
         ));
     }

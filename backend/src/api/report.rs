@@ -62,7 +62,7 @@ impl AsAuditEvent for FileCreatedAuditData {
 pub fn router() -> OpenApiRouter<AppState> {
     use Role::*;
 
-    const ALLOWED_ROLES: &[Role] = &[CoordinatorGSB];
+    const ALLOWED_ROLES: &[Role] = &[CoordinatorCSB, CoordinatorGSB];
 
     OpenApiRouter::default()
         .routes(routes!(election_download_zip_results).authorize(ALLOWED_ROLES))

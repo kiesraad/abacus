@@ -473,10 +473,10 @@ VALUES
 
 INSERT INTO polling_stations (id, committee_session_id, prev_data_entry_id, data_entry_id, name, number, number_of_voters, polling_station_type,
                               address, postal_code, locality)
-VALUES (8, 5, NULL, 501, 'Testgebouw', 41, NULL, 'FixedLocation', 'Testweg 3', '1234 QA', 'Grote Stad'),
-       (9, 6, 501, NULL, 'Testgebouw', 41, NULL, 'FixedLocation', 'Testweg 3', '1234 QA', 'Grote Stad'),
-       (11, 6, NULL, 502, 'Test ander gebouw', 42, NULL, 'FixedLocation', 'Testweg 4', '1234 QA', 'Grote Stad');
+VALUES (518, 5, NULL, 501, 'Testgebouw', 41, NULL, 'FixedLocation', 'Testweg 3', '1234 QA', 'Grote Stad'),
+       (529, 6, 501, NULL, 'Testgebouw', 41, NULL, 'FixedLocation', 'Testweg 3', '1234 QA', 'Grote Stad'),
+       (5211, 6, NULL, 502, 'Test ander gebouw', 42, NULL, 'FixedLocation', 'Testweg 4', '1234 QA', 'Grote Stad');
 
 UPDATE polling_stations
 SET investigation_state = '{"status":"ConcludedWithNewResults","state":{"reason":"reason","findings":"findings"}}'
-WHERE id = 11;
+WHERE id = 5211;

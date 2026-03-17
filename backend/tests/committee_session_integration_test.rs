@@ -418,8 +418,8 @@ async fn test_committee_session_status_change_completed_to_data_entry_deletes_fi
     let addr = serve_api(pool).await;
     let coordinator_cookie = login(&addr, FixtureUser::CoordinatorGSB).await;
     let election_id = 2;
-    create_result(&addr, 1, election_id).await;
-    create_result(&addr, 2, election_id).await;
+    create_result(&addr, 211, election_id).await;
+    create_result(&addr, 212, election_id).await;
 
     // Change committee session status to Completed
     let url = format!("http://{addr}/api/elections/{election_id}/committee_sessions/2/status");

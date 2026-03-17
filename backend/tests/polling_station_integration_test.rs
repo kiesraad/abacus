@@ -522,7 +522,7 @@ async fn test_update_for_committee_session_with_data_entry_status_as_coordinator
     let addr = serve_api(pool).await;
     let coordinator_cookie = login(&addr, FixtureUser::CoordinatorGSB).await;
     let election_id = 4;
-    let polling_station_id = 7;
+    let polling_station_id = 417;
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
@@ -570,7 +570,7 @@ async fn test_update_for_committee_session_with_data_entry_status_as_administrat
     let addr = serve_api(pool).await;
     let admin_cookie = login(&addr, FixtureUser::Admin).await;
     let election_id = 4;
-    let polling_station_id = 7;
+    let polling_station_id = 417;
 
     let committee_session = get_election_committee_session(&addr, &admin_cookie, election_id).await;
     assert_eq!(committee_session["status"], "data_entry");
@@ -607,7 +607,7 @@ async fn test_update_empty_type_ok(pool: SqlitePool) {
         &addr,
         &coordinator_cookie,
         2,
-        2,
+        212,
         serde_json::json!({
             "name": "Testverandering",
             "number": 34,
@@ -808,7 +808,7 @@ async fn test_delete_for_committee_session_with_data_entry_status_as_coordinator
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
     assert_eq!(committee_session["status"], "data_entry");
 
-    let response = delete_polling_station(&addr, &coordinator_cookie, election_id, 2).await;
+    let response = delete_polling_station(&addr, &coordinator_cookie, election_id, 212).await;
 
     assert_eq!(
         response.status(),
@@ -820,7 +820,7 @@ async fn test_delete_for_committee_session_with_data_entry_status_as_coordinator
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
     assert_eq!(committee_session["status"], "data_entry");
 
-    let gone = get_polling_station(&addr, &coordinator_cookie, election_id, 2).await;
+    let gone = get_polling_station(&addr, &coordinator_cookie, election_id, 212).await;
     assert_eq!(
         gone.status(),
         StatusCode::NOT_FOUND,
@@ -828,7 +828,7 @@ async fn test_delete_for_committee_session_with_data_entry_status_as_coordinator
     );
 
     // Remove last polling station for election
-    let response = delete_polling_station(&addr, &coordinator_cookie, election_id, 1).await;
+    let response = delete_polling_station(&addr, &coordinator_cookie, election_id, 211).await;
     assert_eq!(
         response.status(),
         StatusCode::NO_CONTENT,
@@ -864,7 +864,7 @@ async fn test_delete_for_committee_session_with_data_entry_status_as_administrat
 async fn test_delete_with_data_entry_works(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let election_id = 2;
-    let polling_station_id = 1;
+    let polling_station_id = 211;
 
     let typist_cookie = login(&addr, FixtureUser::TypistGSB).await;
     claim_data_entry(&addr, &typist_cookie, polling_station_id, 1).await;
@@ -899,7 +899,7 @@ async fn test_delete_with_data_entry_works(pool: SqlitePool) {
 async fn test_delete_with_result_works(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let election_id = 2;
-    let polling_station_id = 1;
+    let polling_station_id = 211;
 
     let coordinator_cookie = login(&addr, FixtureUser::CoordinatorGSB).await;
     create_result(&addr, polling_station_id, election_id).await;
@@ -924,7 +924,7 @@ async fn test_delete_with_result_works(pool: SqlitePool) {
 async fn test_delete_with_investigation_works(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let election_id = 5;
-    let polling_station_id = 9;
+    let polling_station_id = 529;
 
     assert_eq!(
         create_investigation(&addr, polling_station_id)
@@ -1138,8 +1138,8 @@ async fn check_completed_to_data_entry_on<F, Fut>(
     let coordinator_cookie = login(addr, FixtureUser::CoordinatorGSB).await;
     let election_id = 2;
 
-    create_result(addr, 1, election_id).await;
-    create_result(addr, 2, election_id).await;
+    create_result(addr, 211, election_id).await;
+    create_result(addr, 212, election_id).await;
 
     change_status_committee_session(addr, &coordinator_cookie, election_id, 2, "completed").await;
     let committee_session =
@@ -1185,7 +1185,7 @@ async fn test_completed_to_data_entry_on_update(pool: SqlitePool) {
                 &addr,
                 &login(&addr, FixtureUser::CoordinatorGSB).await,
                 2,
-                1,
+                211,
                 serde_json::json!({
                     "name": "Testverandering",
                     "number_of_voters": 2000,
@@ -1214,7 +1214,7 @@ async fn test_completed_to_data_entry_on_delete(pool: SqlitePool) {
                 &addr,
                 &login(&addr, FixtureUser::CoordinatorGSB).await,
                 election_id,
-                2,
+                212,
             )
             .await
         },
@@ -1227,7 +1227,7 @@ async fn test_completed_to_data_entry_on_delete(pool: SqlitePool) {
         &addr,
         &login(&addr, FixtureUser::CoordinatorGSB).await,
         election_id,
-        1,
+        211,
     )
     .await;
     assert_eq!(response.status(), StatusCode::NO_CONTENT);

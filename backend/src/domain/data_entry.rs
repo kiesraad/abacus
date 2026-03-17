@@ -914,7 +914,7 @@ mod tests {
 
     fn polling_station() -> PollingStation {
         PollingStation {
-            id: PollingStationId::from(1),
+            id: PollingStationId::from(9911),
             name: "Test polling station".to_string(),
             number: 1,
             number_of_voters: None,

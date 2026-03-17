@@ -811,13 +811,13 @@ INSERT INTO committee_sessions (id, number, election_id, status, location, start
 VALUES (1, 1, 1, 'data_entry', '', NULL);
 
 INSERT INTO data_entries (id, state, updated_at)
-VALUES (4, '{"status":"Empty"}', '2024-12-05 09:15:00'),
-       (5, '{"status":"Empty"}', '2024-12-05 09:15:00'),
-       (6, '{"status":"Empty"}', '2024-12-05 09:15:00');
+VALUES (104, '{"status":"Empty"}', '2024-12-05 09:15:00'),
+       (105, '{"status":"Empty"}', '2024-12-05 09:15:00'),
+       (106, '{"status":"Empty"}', '2024-12-05 09:15:00');
 
 INSERT INTO polling_stations (id, committee_session_id, prev_data_entry_id, data_entry_id, name, number, number_of_voters, polling_station_type, address,
                               postal_code, locality)
-VALUES (4, 1, NULL, 4, 'Studio The Rules', 1, NULL, 'FixedLocation', 'Gerontoplein 1', '1337 YQ', 'Juinen'),
-       (5, 1, NULL, 5, 'Buurtcentrum de Mattenklopper', 2, 1000, 'Special', 'Complexiteitslaan 2b', '1337 QY',
+VALUES (114, 1, NULL, 104, 'Studio The Rules', 1, NULL, 'FixedLocation', 'Gerontoplein 1', '1337 YQ', 'Juinen'),
+       (115, 1, NULL, 105, 'Buurtcentrum de Mattenklopper', 2, 1000, 'Special', 'Complexiteitslaan 2b', '1337 QY',
         'Juinen'),
-       (6, 1, NULL, 6, 'Positivo Zaal', 3, NULL, NULL, 'Kerkweg 3', '1337 QA', 'Juinen');
+       (116, 1, NULL, 106, 'Positivo Zaal', 3, NULL, NULL, 'Kerkweg 3', '1337 QA', 'Juinen');

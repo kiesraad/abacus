@@ -194,7 +194,7 @@ fn random_polling_station(
     );
 
     PollingStation {
-        id: PollingStationId::from(rng.random_range(0..5)),
+        id: PollingStationId::from(rng.random_range(9910..9915)),
         name: random_string(rng, string_length),
         number: rng.random_range(0..5),
         number_of_voters: random_option(rng, number_of_voters, none_where_possible),

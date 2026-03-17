@@ -51,8 +51,8 @@ VALUES (3, 1, 3, 'data_entry', '', NULL);
 
 
 INSERT INTO data_entries (id, state, updated_at)
-VALUES (3, '{"status":"Empty"}', '2024-12-05 09:15:00');
+VALUES (303, '{"status":"Empty"}', '2024-12-05 09:15:00');
 
 INSERT INTO polling_stations (id, committee_session_id, prev_data_entry_id, data_entry_id, name, number, number_of_voters, polling_station_type, address,
                               postal_code, locality)
-VALUES (3, 3, NULL, 3, 'Testgebouw', 35, NULL, 'FixedLocation', 'Testweg 3', '1234 QA', 'Teststad');
+VALUES (313, 3, NULL, 303, 'Testgebouw', 35, NULL, 'FixedLocation', 'Testweg 3', '1234 QA', 'Teststad');

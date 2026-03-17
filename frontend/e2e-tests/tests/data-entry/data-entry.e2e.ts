@@ -36,8 +36,8 @@ test.describe("full data entry flow", () => {
 
     const dataEntryHomePage = new DataEntryHomePage(page);
     await expect(dataEntryHomePage.fieldset).toBeVisible();
-    await dataEntryHomePage.pollingStationNumber.fill(pollingStation.number.toString());
-    await expect(dataEntryHomePage.pollingStationFeedback).toContainText(pollingStation.name);
+    await dataEntryHomePage.number.fill(pollingStation.number.toString());
+    await expect(dataEntryHomePage.feedback).toContainText(pollingStation.name);
     await dataEntryHomePage.clickStart();
 
     const extraInvestigationPage = new ExtraInvestigationPage(page);
@@ -122,7 +122,7 @@ test.describe("full data entry flow", () => {
 
     await checkAndSavePage.save.click();
 
-    await expect(dataEntryHomePage.fieldsetNextPollingStation).toBeVisible();
+    await expect(dataEntryHomePage.fieldsetContinueNext).toBeVisible();
     await expect(dataEntryHomePage.alertDataEntrySaved).toBeVisible();
 
     await expect(dataEntryHomePage.alertDataEntrySaved).toHaveText(
@@ -139,7 +139,7 @@ test.describe("full data entry flow", () => {
 
     const dataEntryHomePage = new DataEntryHomePage(page);
     await expect(dataEntryHomePage.fieldset).toBeVisible();
-    await dataEntryHomePage.selectPollingStationAndClickStart(pollingStation);
+    await dataEntryHomePage.enterNumberAndClickStart(pollingStation);
 
     const extraInvestigationPage = new ExtraInvestigationPage(page);
     await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
@@ -202,7 +202,7 @@ test.describe("full data entry flow", () => {
 
     const dataEntryHomePage = new DataEntryHomePage(page);
     await expect(dataEntryHomePage.fieldset).toBeVisible();
-    await dataEntryHomePage.selectPollingStationAndClickStart(pollingStation);
+    await dataEntryHomePage.enterNumberAndClickStart(pollingStation);
 
     const extraInvestigationPage = new ExtraInvestigationPage(page);
     await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
@@ -278,7 +278,7 @@ test.describe("full data entry flow", () => {
 
     const dataEntryHomePage = new DataEntryHomePage(page);
     await expect(dataEntryHomePage.fieldset).toBeVisible();
-    await dataEntryHomePage.selectPollingStationAndClickStart(pollingStation);
+    await dataEntryHomePage.enterNumberAndClickStart(pollingStation);
 
     const extraInvestigationPage = new ExtraInvestigationPage(page);
     await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
@@ -437,7 +437,7 @@ test.describe("full data entry flow", () => {
 
     await checkAndSavePage.save.click();
     const dataEntryHomePage = new DataEntryHomePage(page);
-    await expect(dataEntryHomePage.fieldsetNextPollingStation).toBeVisible();
+    await expect(dataEntryHomePage.fieldsetContinueNext).toBeVisible();
     await expect(dataEntryHomePage.alertDataEntrySaved).toBeVisible();
   });
 
@@ -521,7 +521,7 @@ test.describe("full data entry flow", () => {
     await checkAndSavePage.complete.click();
 
     const dataEntryHomePage = new DataEntryHomePage(page);
-    await expect(dataEntryHomePage.fieldsetNextPollingStation).toBeVisible();
+    await expect(dataEntryHomePage.fieldsetContinueNext).toBeVisible();
     await expect(dataEntryHomePage.alertDataEntryErrors).toBeVisible();
   });
 });
@@ -536,8 +536,8 @@ test.describe("second data entry", () => {
 
     const dataEntryHomePage = new DataEntryHomePage(page);
     await expect(dataEntryHomePage.fieldset).toBeVisible();
-    await dataEntryHomePage.pollingStationNumber.fill(pollingStation.number.toString());
-    await expect(dataEntryHomePage.pollingStationFeedback).toContainText(pollingStation.name);
+    await dataEntryHomePage.number.fill(pollingStation.number.toString());
+    await expect(dataEntryHomePage.feedback).toContainText(pollingStation.name);
     await dataEntryHomePage.clickStart();
 
     await expect(page).toHaveURL(
@@ -551,13 +551,11 @@ test.describe("second data entry", () => {
       ["Je invoer is opgeslagen", "Geef het papieren proces-verbaal terug aan de coördinator."].join(""),
     );
 
-    await expect(dataEntryHomePage.fieldsetNextPollingStation).toBeVisible();
-    await dataEntryHomePage.pollingStationNumber.fill(pollingStation.number.toString());
-    await expect(dataEntryHomePage.pollingStationFeedback).toContainText(
-      "Stembureau 33 (Op Rolletjes) is al twee keer ingevoerd",
-    );
+    await expect(dataEntryHomePage.fieldsetContinueNext).toBeVisible();
+    await dataEntryHomePage.number.fill(pollingStation.number.toString());
+    await expect(dataEntryHomePage.feedback).toContainText("Stembureau 33 (Op Rolletjes) is al twee keer ingevoerd");
     await dataEntryHomePage.clickStart();
-    await expect(dataEntryHomePage.pollingStationSubmitFeedback).toContainText(
+    await expect(dataEntryHomePage.submitFeedback).toContainText(
       "Het stembureau dat je geselecteerd hebt kan niet meer ingevoerd worden",
     );
   });
@@ -572,8 +570,8 @@ test.describe("second data entry", () => {
 
     const dataEntryHomePage = new DataEntryHomePage(typistPage);
     await expect(dataEntryHomePage.fieldset).toBeVisible();
-    await dataEntryHomePage.pollingStationNumber.fill(pollingStation.number.toString());
-    await expect(dataEntryHomePage.pollingStationFeedback).toContainText(pollingStation.name);
+    await dataEntryHomePage.number.fill(pollingStation.number.toString());
+    await expect(dataEntryHomePage.feedback).toContainText(pollingStation.name);
     await dataEntryHomePage.clickStart();
 
     await expect(typistPage).toHaveURL(
@@ -649,8 +647,8 @@ test.describe("second data entry", () => {
 
     const dataEntryHomePage = new DataEntryHomePage(typistPage);
     await expect(dataEntryHomePage.fieldset).toBeVisible();
-    await dataEntryHomePage.pollingStationNumber.fill(pollingStation.number.toString());
-    await expect(dataEntryHomePage.pollingStationFeedback).toContainText(pollingStation.name);
+    await dataEntryHomePage.number.fill(pollingStation.number.toString());
+    await expect(dataEntryHomePage.feedback).toContainText(pollingStation.name);
     await dataEntryHomePage.clickStart();
 
     await expect(typistPage).toHaveURL(

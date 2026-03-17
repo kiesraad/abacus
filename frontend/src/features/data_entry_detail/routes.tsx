@@ -8,8 +8,8 @@ export const detailRoutes: RouteObject[] = [
   {
     Component: DetailLayout,
     children: [
-      { index: true, Component: DetailIndexPage, handle: { roles: ["coordinator_gsb"] } },
-      { path: ":sectionId", Component: DetailSectionPage, handle: { roles: ["coordinator_gsb"] } },
+      { index: true, Component: DetailIndexPage, handle: { roles: ["coordinator_csb", "coordinator_gsb"] } },
+      { path: ":sectionId", Component: DetailSectionPage, handle: { roles: ["coordinator_csb", "coordinator_gsb"] } },
     ],
   },
 ];

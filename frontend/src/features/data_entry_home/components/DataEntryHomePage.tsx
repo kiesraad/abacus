@@ -9,8 +9,8 @@ import { useElectionStatus } from "@/hooks/election/useElectionStatus";
 import { useLiveData } from "@/hooks/useLiveData";
 import { t } from "@/i18n/translate";
 
+import { DataEntryPicker } from "./DataEntryPicker";
 import { ElectionProgress } from "./ElectionProgress";
-import { PollingStationPicker } from "./PollingStationPicker";
 
 export function DataEntryHomePage() {
   const navigate = useNavigate();
@@ -89,8 +89,8 @@ export function DataEntryHomePage() {
         </Alert>
       )}
       <main>
-        <article id="polling-station-choice-form">
-          <PollingStationPicker anotherEntry={!!dataEntryDone || !!dataEntryNotification} />
+        <article>
+          <DataEntryPicker anotherEntry={!!dataEntryDone || !!dataEntryNotification} />
         </article>
         <ElectionProgress />
       </main>

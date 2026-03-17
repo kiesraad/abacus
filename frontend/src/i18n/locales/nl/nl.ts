@@ -8,6 +8,7 @@ import committee_session_status from "./committee_session_status.json";
 import counting_differences_polling_station from "./counting_differences_polling_station.json";
 import data_entry from "./data_entry.json";
 import data_entry_detail from "./data_entry_detail.json";
+import data_entry_home from "./data_entry_home.json";
 import differences_counts from "./differences_counts.json";
 import election from "./election.json";
 import election_management from "./election_management.json";
@@ -23,7 +24,6 @@ import investigations from "./investigations.json";
 import log from "./log.json";
 import messages from "./messages.json";
 import polling_station from "./polling_station.json";
-import polling_station_choice from "./polling_station_choice.json";
 import polling_station_results from "./polling_station_results.json";
 import privacy_statement from "./privacy_statement.json";
 import resolve_differences from "./resolve_differences.json";
@@ -57,7 +57,7 @@ const nl = {
   log,
   messages,
   polling_station,
-  polling_station_choice,
+  data_entry_home,
   polling_station_results,
   privacy_statement,
   resolve_differences,

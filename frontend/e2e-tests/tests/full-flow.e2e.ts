@@ -323,8 +323,8 @@ test.describe("full flow", () => {
 
       const dataEntryHomePage = new DataEntryHomePage(page);
       await expect(dataEntryHomePage.fieldset).toBeVisible();
-      await dataEntryHomePage.pollingStationNumber.fill(station.number);
-      await expect(dataEntryHomePage.pollingStationFeedback).toContainText(station.name);
+      await dataEntryHomePage.number.fill(station.number);
+      await expect(dataEntryHomePage.feedback).toContainText(station.name);
       await dataEntryHomePage.clickStart();
 
       await fillDataEntryPagesAndSave(page, noRecountNoDifferencesDataEntry);
@@ -346,8 +346,8 @@ test.describe("full flow", () => {
 
       const dataEntryHomePage = new DataEntryHomePage(page);
       await expect(dataEntryHomePage.fieldset).toBeVisible();
-      await dataEntryHomePage.pollingStationNumber.fill(station.number);
-      await expect(dataEntryHomePage.pollingStationFeedback).toContainText(station.name);
+      await dataEntryHomePage.number.fill(station.number);
+      await expect(dataEntryHomePage.feedback).toContainText(station.name);
       await dataEntryHomePage.clickStart();
 
       await fillDataEntryPagesAndSave(page, noRecountNoDifferencesDataEntry);
@@ -556,8 +556,8 @@ test.describe("full flow", () => {
 
       const dataEntryHomePage = new DataEntryHomePage(page);
       await expect(dataEntryHomePage.fieldset).toBeVisible();
-      await dataEntryHomePage.pollingStationNumber.fill("1");
-      await expect(dataEntryHomePage.pollingStationFeedback).toContainText("Stadhuis");
+      await dataEntryHomePage.number.fill("1");
+      await expect(dataEntryHomePage.feedback).toContainText("Stadhuis");
       await dataEntryHomePage.clickStart();
 
       const extraInvestigationPage = new ExtraInvestigationPage(page);
@@ -604,8 +604,8 @@ test.describe("full flow", () => {
 
       const dataEntryHomePage = new DataEntryHomePage(page);
       await expect(dataEntryHomePage.fieldset).toBeVisible();
-      await dataEntryHomePage.pollingStationNumber.fill("5");
-      await expect(dataEntryHomePage.pollingStationFeedback).toContainText("Sportfondsenbad");
+      await dataEntryHomePage.number.fill("5");
+      await expect(dataEntryHomePage.feedback).toContainText("Sportfondsenbad");
       await dataEntryHomePage.clickStart();
 
       const votersAndVotesPage = new VotersAndVotesPage(page);

@@ -220,7 +220,7 @@ test.describe("Data entry model test - errors", () => {
         const navBar = new TypistNavBar(page);
 
         await page.goto(`/elections/${pollingStation.election_id}/data-entry`);
-        await dataEntryHomePage.selectPollingStationAndClickStart(pollingStation);
+        await dataEntryHomePage.enterNumberAndClickStart(pollingStation);
         await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
         await countingDifferencesPage.fillAndClickNext(noDifferences);
 
@@ -244,7 +244,7 @@ test.describe("Data entry model test - errors", () => {
         };
         const dataEntryHomePageEvents = {
           RESUME_DATA_ENTRY: async () => {
-            await dataEntryHomePage.clickDataEntryInProgress(pollingStation.number, pollingStation.name);
+            await dataEntryHomePage.clickDataEntryInProgress(pollingStation);
           },
         };
 

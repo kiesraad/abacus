@@ -13,7 +13,7 @@ use crate::{
     APIError, AppState, ErrorResponse,
     api::middleware::authentication::RouteAuthorization,
     domain::{
-        election::ElectionId,
+        election::{CommitteeCategory, ElectionId},
         models::{
             ModelN10_2Input, ModelNa31_2Bijlage1Input, ModelNa31_2InlegvelInput, ToPdfFileModel,
         },
@@ -66,6 +66,13 @@ async fn election_download_n_10_2(
     let mut conn = pool.acquire().await?;
     let election = election_repo::get(&mut conn, election_id).await?;
     user.role().is_authorized(&election.committee_category)?;
+
+    if election.committee_category != CommitteeCategory::GSB {
+        return Err(APIError::NotFound(
+            "N 10-2 is only available for GSB elections".into(),
+            ErrorReference::EntryNotFound,
+        ));
+    }
 
     let current_committee_session =
         committee_session_repo::get_election_committee_session(&mut conn, election.id).await?;
@@ -148,6 +155,13 @@ async fn election_download_na_31_2_bijlage1(
     let election = election_repo::get(&mut conn, election_id).await?;
     user.role().is_authorized(&election.committee_category)?;
 
+    if election.committee_category != CommitteeCategory::GSB {
+        return Err(APIError::NotFound(
+            "NA 31-2 Bijlage 1 is only available for GSB elections".into(),
+            ErrorReference::EntryNotFound,
+        ));
+    }
+
     let current_committee_session =
         committee_session_repo::get_election_committee_session(&mut conn, election.id).await?;
     let polling_stations = list_polling_stations_for_session(&mut conn, &current_committee_session)
@@ -228,8 +242,15 @@ async fn election_download_na_31_2_inlegvel(
 ) -> Result<impl IntoResponse, APIError> {
     let mut conn = pool.acquire().await?;
     let election = election_repo::get(&mut conn, election_id).await?;
-    user.role().is_authorized(&election.committee_category)?;
     drop(conn);
+
+    user.role().is_authorized(&election.committee_category)?;
+    if election.committee_category != CommitteeCategory::GSB {
+        return Err(APIError::NotFound(
+            "NA 31-2 Inlegvel is only available for GSB elections".into(),
+            ErrorReference::EntryNotFound,
+        ));
+    }
 
     let name = "Model_Na_31_2_Inlegvel.pdf".to_string();
 

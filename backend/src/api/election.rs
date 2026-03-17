@@ -16,7 +16,7 @@ use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
     api::{
         committee_session::create_committee_session,
-        middleware::authentication::RouteAuthorization,
+        middleware::authentication::{RouteAuthorization, error::AuthenticationError},
         polling_station::create_imported_polling_stations,
     },
     domain::{
@@ -234,6 +234,12 @@ pub async fn election_number_of_voters_change(
 
     let election = election_repo::get(&mut tx, election_id).await?;
     user.role().is_authorized(&election.committee_category)?;
+
+    // Only allow number of voters change for GSB elections
+    // For other categories that is a sum of the number of voters of sub committees
+    if election.committee_category != CommitteeCategory::GSB {
+        return Err(AuthenticationError::Forbidden.into());
+    }
 
     let current_committee_session =
         committee_session_repo::get_election_committee_session(&mut tx, election_id).await?;

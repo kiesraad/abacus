@@ -18,7 +18,7 @@ use crate::{
         committee_session::{CommitteeSession, CommitteeSessionId},
         committee_session_status::CommitteeSessionStatus,
         data_entry::DataEntryId,
-        election::ElectionId,
+        election::{CommitteeCategory, ElectionId},
         polling_station::{
             PollingStationFileRequest, PollingStationId, PollingStationListResponse,
             PollingStationRequest, PollingStationRequestListResponse, PollingStationResponse,
@@ -151,6 +151,11 @@ async fn polling_station_list(
     let election = election_repo::get(&mut conn, election_id).await?;
     user.role().is_authorized(&election.committee_category)?;
 
+    // Only GSB elections have polling stations
+    if election.committee_category != CommitteeCategory::GSB {
+        return Err(AuthenticationError::Forbidden.into());
+    }
+
     let committee_session = get_election_committee_session(&mut conn, election_id).await?;
 
     Ok(PollingStationListResponse {
@@ -205,6 +210,11 @@ async fn polling_station_create(
 
     let election = election_repo::get(&mut tx, election_id).await?;
     user.role().is_authorized(&election.committee_category)?;
+
+    // Only GSB elections have polling stations
+    if election.committee_category != CommitteeCategory::GSB {
+        return Err(AuthenticationError::Forbidden.into());
+    }
 
     let committee_session = get_election_committee_session(&mut tx, election_id).await?;
     validate_user_is_allowed_to_perform_action(user, &committee_session)?;
@@ -275,6 +285,11 @@ async fn polling_station_get(
     let committee_category = get_committee_category(&mut conn, polling_station_id).await?;
     user.role().is_authorized(&committee_category)?;
 
+    // Only GSB elections have polling stations
+    if committee_category != CommitteeCategory::GSB {
+        return Err(AuthenticationError::Forbidden.into());
+    }
+
     let polling_station = get_for_election(&mut conn, election_id, polling_station_id).await?;
     Ok((StatusCode::OK, polling_station.into_response(election_id)))
 }
@@ -307,6 +322,11 @@ async fn polling_station_update(
 
     let committee_category = get_committee_category(&mut tx, polling_station_id).await?;
     user.role().is_authorized(&committee_category)?;
+
+    // Only GSB elections have polling stations
+    if committee_category != CommitteeCategory::GSB {
+        return Err(AuthenticationError::Forbidden.into());
+    }
 
     let committee_session = get_election_committee_session(&mut tx, election_id).await?;
     validate_user_is_allowed_to_perform_action(user, &committee_session)?;
@@ -371,6 +391,11 @@ async fn polling_station_delete(
 
     let committee_category = get_committee_category(&mut tx, polling_station_id).await?;
     user.role().is_authorized(&committee_category)?;
+
+    // Only GSB elections have polling stations
+    if committee_category != CommitteeCategory::GSB {
+        return Err(AuthenticationError::Forbidden.into());
+    }
 
     let committee_session = get_election_committee_session(&mut tx, election_id).await?;
     validate_user_is_allowed_to_perform_action(user, &committee_session)?;
@@ -452,6 +477,11 @@ async fn polling_station_validate_import(
 
     let election = election_repo::get(&mut conn, election_id).await?;
     user.role().is_authorized(&election.committee_category)?;
+
+    // Only GSB elections have polling stations
+    if election.committee_category != CommitteeCategory::GSB {
+        return Err(AuthenticationError::Forbidden.into());
+    }
 
     Ok((
         StatusCode::OK,
@@ -546,6 +576,11 @@ async fn polling_station_import(
 
     let election = election_repo::get(&mut tx, election_id).await?;
     user.role().is_authorized(&election.committee_category)?;
+
+    // Only GSB elections have polling stations
+    if election.committee_category != CommitteeCategory::GSB {
+        return Err(AuthenticationError::Forbidden.into());
+    }
 
     let committee_session = get_election_committee_session(&mut tx, election_id).await?;
 

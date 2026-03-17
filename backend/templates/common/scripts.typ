@@ -311,7 +311,10 @@
 }
 
 #let format_fraction(fraction) = {
-  str(fraction.integer) + " " + text(size: 7pt, str(fraction.numerator) + "/" + str(fraction.denominator))
+  str(fraction.integer)
+  if fraction.numerator > 0 {
+    " " + super[#fraction.numerator] + "⁄" + sub[#fraction.denominator]
+  }
 }
 
 // A title without any numbering
@@ -697,7 +700,7 @@
   political_groups,
 ) = {
   table(
-    columns: (1fr,) + (steps.len() + 1) * (auto,),
+    columns: (1fr,) + steps.len() * (6em,) + (6em,),
     stroke: (x, y) => (
       left: if x > 0 { 0.5pt + gray },
       top: if y > 0 { 0.5pt + gray },

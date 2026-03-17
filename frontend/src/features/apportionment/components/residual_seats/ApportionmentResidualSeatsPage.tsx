@@ -110,6 +110,7 @@ function LargestRemaindersSection({
 
 interface HighestAveragesSectionProps {
   seatAssignment: SeatAssignment;
+  largestRemainderSteps: LargestRemainderAssignmentStep[];
   uniqueHighestAverageSteps: UniqueHighestAverageAssignmentStep[];
   highestAverageSteps: HighestAverageAssignmentStep[];
   politicalGroups: PoliticalGroup[];
@@ -118,6 +119,7 @@ interface HighestAveragesSectionProps {
 
 function HighestAveragesSection({
   seatAssignment,
+  largestRemainderSteps,
   uniqueHighestAverageSteps,
   highestAverageSteps,
   politicalGroups,
@@ -135,6 +137,7 @@ function HighestAveragesSection({
         </span>
         <UniqueHighestAveragesTable
           steps={uniqueHighestAverageSteps}
+          largestRemainderSteps={largestRemainderSteps}
           finalStanding={seatAssignment.final_standing}
           politicalGroups={politicalGroups}
         />
@@ -193,6 +196,7 @@ function SmallCouncilSection({
       {uniqueHighestAverageSteps.length > 0 && (
         <HighestAveragesSection
           seatAssignment={seatAssignment}
+          largestRemainderSteps={largestRemainderSteps}
           uniqueHighestAverageSteps={uniqueHighestAverageSteps}
           highestAverageSteps={highestAverageSteps}
           politicalGroups={politicalGroups}

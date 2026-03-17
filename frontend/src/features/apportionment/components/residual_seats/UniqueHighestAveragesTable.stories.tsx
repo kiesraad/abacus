@@ -8,6 +8,7 @@ export const Default: StoryObj = {
     return (
       <UniqueHighestAveragesTable
         steps={lt19Seats.highest_average_steps}
+        largestRemainderSteps={lt19Seats.largest_remainder_steps}
         finalStanding={lt19Seats.seat_assignment.final_standing}
         politicalGroups={lt19Seats.election.political_groups}
       />
@@ -17,9 +18,9 @@ export const Default: StoryObj = {
     const table = canvas.getByRole("table");
     await expect(table).toBeVisible();
     expect(table).toHaveTableContent([
-      ["Lijst", "Lijstnaam", "Aantal volle zetels", "Gemiddelde", "Aantal restzetels"],
-      ["1", "Political Group A", "10", "67", "4/12", "1"],
-      ["2", "Political Group B", "0", "30", "", "0"],
+      ["Lijst", "Lijstnaam", "Reeds toegewezen", "Gemiddelde", "Aantal restzetels"],
+      ["1", "Political Group A", "11", "67", "4/12", "1"],
+      ["2", "Political Group B", "1", "30", "", "0"],
       ["3", "Political Group C", "0", "58", "", "1"],
       ["4", "Political Group D", "0", "57", "", "1"],
       ["5", "Blanco (Smit, G.)", "0", "56", "", "0"],

@@ -12,17 +12,17 @@ import { Icon } from "@/components/ui/Icon/Icon";
 import { Loader } from "@/components/ui/Loader/Loader";
 import { useElection } from "@/hooks/election/useElection";
 import { useNumericParam } from "@/hooks/useNumericParam";
-import { t, tx } from "@/i18n/translate";
+import { t } from "@/i18n/translate";
 import type {
   COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY,
   COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH,
 } from "@/types/generated/openapi";
-import { cn } from "@/utils/classnames";
 import { committeeSessionLabel } from "@/utils/committeeSession";
 import { formatDateTimeFull } from "@/utils/dateTime";
 
 import { useCommitteeSessionInvestigationListRequest } from "../../hooks/useCommitteeSessionInvestigationListRequest";
 import cls from "../ElectionManagement.module.css";
+import { ElectionReportSection } from "./ElectionReportSection.tsx";
 
 // biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function ElectionReportPage() {
@@ -58,8 +58,6 @@ export function ElectionReportPage() {
     throw new ApplicationError(t("error.forbidden_message"), "InvalidCommitteeSessionStatus");
   }
 
-  const isFirstCommitteeSession = committeeSession.number === 1;
-
   const wasCorrected = requestState.data.investigations.some((i) => i.corrected_results);
 
   function handleResume() {
@@ -71,17 +69,48 @@ export function ElectionReportPage() {
     });
   }
 
+  function pageTitle() {
+    if (election.committee_category === "CSB") {
+      return (
+        <>
+          {t("election_report.report")}{" "}
+          {t(`committee_category.${election.committee_category}.short`).replace(/(^\w|\s\w)/g, (m) => m.toLowerCase())}
+        </>
+      );
+    }
+
+    return (
+      <>
+        {sessionLabel}{" "}
+        {t(`committee_category.${election.committee_category}.short`).replace(/(^\w|\s\w)/g, (m) => m.toUpperCase())}
+      </>
+    );
+  }
+
+  function formTitle() {
+    if (election.committee_category === "CSB") {
+      return (
+        <>
+          {t("apportionment.title")} {t("municipality").toLowerCase()} {election.location}
+        </>
+      );
+    }
+
+    return (
+      <>
+        {t("election_report.counting_results")} {sessionLabel.toLowerCase()}{" "}
+        {t(`committee_category.${election.committee_category}.short`).toLowerCase()} {t("municipality").toLowerCase()}
+        {election.location}
+      </>
+    );
+  }
+
   return (
     <>
       <PageTitle title={`${t("election.title.finish_data_entry")} - Abacus`} />
       <header>
         <section>
-          <h1>
-            {sessionLabel}{" "}
-            {t(`committee_category.${election.committee_category}.short`).replace(/(^\w|\s\w)/g, (m) =>
-              m.toUpperCase(),
-            )}
-          </h1>
+          <h1>{pageTitle()}</h1>
         </section>
       </header>
       <main className={cls.reportMain}>
@@ -90,11 +119,7 @@ export function ElectionReportPage() {
             <Icon size="lg" color="default" icon={<IconCheckVerified />} />
           </div>
           <div>
-            <h2 className="form_title">
-              {t("election_report.counting_results")} {sessionLabel.toLowerCase()}{" "}
-              {t(`committee_category.${election.committee_category}.short`).toLowerCase()}{" "}
-              {t("municipality").toLowerCase()} {election.location}
-            </h2>
+            <h2 className="form_title">{formTitle()}</h2>
             <div className={cls.reportInfoSection}>
               {t("election_report.committee_session_started", {
                 date_time: committeeSession.start_date_time
@@ -102,7 +127,7 @@ export function ElectionReportPage() {
                   : "",
               })}
               .
-              {election.counting_method && (
+              {election.committee_category === "GSB" && election.counting_method && (
                 <>
                   <br />
                   {t("election_report.there_was_counting_method", {
@@ -111,40 +136,36 @@ export function ElectionReportPage() {
                   .
                 </>
               )}
+              {election.committee_category === "CSB" && (
+                <>
+                  <DownloadButton
+                    icon="download"
+                    href={`/api/elections/${election.id}/committee_sessions/${committeeSession.id}/download_zip_results`}
+                    title={t("election_management.CSB.determination_election_results.download")}
+                    subtitle={t("election_management.zip_file")}
+                  />
+                  <DownloadButton
+                    icon="download"
+                    href={`/api/elections/${election.id}/committee_sessions/${committeeSession.id}/download_zip_results`}
+                    title={t("election_management.CSB.p_22_2_attachment.download")}
+                    subtitle={t("election_management.zip_file")}
+                  />
+                </>
+              )}
               <DownloadButton
                 icon="download"
                 href={`/api/elections/${election.id}/committee_sessions/${committeeSession.id}/download_zip_results`}
-                title={t("election_management.download_definitive_documents", {
+                title={t(`election_management.${election.committee_category}.download_definitive_documents`, {
                   sessionLabel: sessionLabel.toLowerCase(),
                 })}
                 subtitle={t("election_management.zip_file")}
               />
             </div>
-            <section className={cn(cls.reportInfoSection, "sm")}>
-              <h3>{t("election_management.what_now")}?</h3>
-              <p>{t("election_management.download_definitive_files")}</p>
-              <section className="sm">
-                <p>
-                  {t(
-                    isFirstCommitteeSession
-                      ? "election_management.first_session.zip_file_explanation"
-                      : wasCorrected
-                        ? "election_management.next_session.with_corrections.zip_file_explanation"
-                        : "election_management.next_session.without_corrections.zip_file_explanation",
-                  )}
-                </p>
-                <ol className={cls.list}>
-                  {tx(
-                    isFirstCommitteeSession
-                      ? "election_management.first_session.documents"
-                      : wasCorrected
-                        ? "election_management.next_session.with_corrections.documents"
-                        : "election_management.next_session.without_corrections.documents",
-                  )}
-                </ol>
-                <p>{t("election_management.upload_the_zip")}</p>
-              </section>
-            </section>
+            <ElectionReportSection
+              committeeSession={committeeSession}
+              election={election}
+              wasCorrected={wasCorrected}
+            />
 
             <FormLayout.Controls>
               <Button.Link to="../..">{t("back_to_overview")}</Button.Link>

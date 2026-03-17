@@ -311,7 +311,7 @@
 }
 
 #let format_fraction(fraction) = {
-  str(fraction.integer) + " " + str(fraction.numerator) + "/" + str(fraction.denominator)
+  str(fraction.integer) + " " + text(size: 7pt, str(fraction.numerator) + "/" + str(fraction.denominator))
 }
 
 // A title without any numbering
@@ -729,7 +729,7 @@
         table.cell(align: right, str(residual_seats))
       )
     }).flatten(),
-    table.hline(stroke: 0.5pt + gray),
+    table.hline(stroke: 1pt + black),
   )
 }
 

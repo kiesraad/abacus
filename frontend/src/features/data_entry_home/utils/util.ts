@@ -2,7 +2,6 @@ import type { DataEntryStatusName, ElectionStatusResponseEntry, LoginResponse } 
 
 export enum DataEntryUserStatus {
   Available,
-  EntryNotAllowed,
   InProgressCurrentUser,
   InProgressOtherUser,
   SecondEntryNotAllowed,

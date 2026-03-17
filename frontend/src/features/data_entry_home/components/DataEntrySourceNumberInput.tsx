@@ -91,8 +91,6 @@ export function DataEntrySourceNumberInput({
           return renderWarningMessage(tx("data_entry_home.alert.has_errors", undefined, { nr }));
         case DataEntryUserStatus.Finished:
           return renderWarningMessage(tx("data_entry_home.alert.finished_selector", undefined, { nr, name }));
-        case DataEntryUserStatus.EntryNotAllowed:
-          return renderWarningMessage(tx("data_entry_home.alert.entry_not_allowed", undefined, { nr }));
         default:
           return (
             <FeedbackMessage

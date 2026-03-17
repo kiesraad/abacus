@@ -26,7 +26,6 @@ import { DataEntrySourceNumberInput } from "./DataEntrySourceNumberInput";
 const USER_INPUT_DEBOUNCE: number = 500; // ms
 
 const STATUS_ALERTS: Partial<Record<DataEntryUserStatus, TranslationPath>> = {
-  [DataEntryUserStatus.EntryNotAllowed]: "data_entry_home.alert.entry_not_allowed",
   [DataEntryUserStatus.Finished]: "data_entry_home.alert.finished",
   [DataEntryUserStatus.InProgressOtherUser]: "data_entry_home.alert.in_progress_other_user",
   [DataEntryUserStatus.HasErrors]: "data_entry_home.alert.has_errors",

@@ -5,7 +5,6 @@ import { type DataEntryStatusWithUserStatus, DataEntryUserStatus, getDataEntryWi
 
 const NOT_AVAILABLE_STATUSES: DataEntryUserStatus[] = [
   DataEntryUserStatus.Finished,
-  DataEntryUserStatus.EntryNotAllowed,
   DataEntryUserStatus.SecondEntryNotAllowed,
   DataEntryUserStatus.HasErrors,
 ];

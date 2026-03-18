@@ -11,7 +11,7 @@ use crate::{
     shared::{
         FixtureUser, change_status_committee_session, claim_data_entry, create_investigation,
         create_polling_station, create_result, example_data_entry, get_election_committee_session,
-        get_election_details, get_statuses, login, save_data_entry,
+        get_election_details, get_investigations, get_statuses, login, save_data_entry,
     },
     utils::serve_api,
 };
@@ -280,18 +280,21 @@ async fn test_get(pool: SqlitePool) {
     assert_eq!(body["polling_station_type"], "FixedLocation");
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
 async fn test_get_from_previous_committee_session_fails(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = login(&addr, FixtureUser::CoordinatorGSB).await;
+    let election_id = 7;
+    let polling_station_id = 721;
 
-    let response = get_polling_station(&addr, &coordinator_cookie, 5, 8).await;
+    // Assert that the polling station exists, for a previous session
+    let investigations = get_investigations(&addr, &coordinator_cookie, election_id, 702).await;
+    assert_eq!(investigations[0]["polling_station_id"], polling_station_id);
 
-    assert_eq!(
-        response.status(),
-        StatusCode::NOT_FOUND,
-        "Unexpected response status"
-    );
+    // Not found for the current session
+    let response =
+        get_polling_station(&addr, &coordinator_cookie, election_id, polling_station_id).await;
+    assert_eq!(response.status(), StatusCode::NOT_FOUND);
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
@@ -630,16 +633,23 @@ async fn test_update_empty_type_ok(pool: SqlitePool) {
     assert_eq!(body["polling_station_type"], serde_json::Value::Null);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
 async fn test_update_from_previous_committee_session_fails(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = login(&addr, FixtureUser::CoordinatorGSB).await;
+    let election_id = 7;
+    let polling_station_id = 721;
 
+    // Assert that the polling station exists, for a previous session
+    let investigations = get_investigations(&addr, &coordinator_cookie, election_id, 702).await;
+    assert_eq!(investigations[0]["polling_station_id"], polling_station_id);
+
+    // Not found for the current session
     let response = update_polling_station(
         &addr,
         &coordinator_cookie,
-        5,
-        8,
+        election_id,
+        polling_station_id,
         serde_json::json!({
             "name": "Testverandering",
             "number": 34,
@@ -650,12 +660,7 @@ async fn test_update_from_previous_committee_session_fails(pool: SqlitePool) {
         }),
     )
     .await;
-
-    assert_eq!(
-        response.status(),
-        StatusCode::NOT_FOUND,
-        "Unexpected response status"
-    );
+    assert_eq!(response.status(), StatusCode::NOT_FOUND);
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
@@ -955,18 +960,21 @@ async fn test_delete_with_investigation_works(pool: SqlitePool) {
     );
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
 async fn test_delete_from_previous_committee_session_fails(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = login(&addr, FixtureUser::CoordinatorGSB).await;
+    let election_id = 7;
+    let polling_station_id = 721;
 
-    let response = delete_polling_station(&addr, &coordinator_cookie, 5, 8).await;
+    // Assert that the polling station exists, for a previous session
+    let investigations = get_investigations(&addr, &coordinator_cookie, election_id, 702).await;
+    assert_eq!(investigations[0]["polling_station_id"], polling_station_id);
 
-    assert_eq!(
-        response.status(),
-        StatusCode::NOT_FOUND,
-        "Unexpected response status"
-    );
+    // Not found for the current session
+    let response =
+        delete_polling_station(&addr, &coordinator_cookie, election_id, polling_station_id).await;
+    assert_eq!(response.status(), StatusCode::NOT_FOUND);
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]

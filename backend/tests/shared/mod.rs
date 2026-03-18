@@ -305,6 +305,27 @@ pub async fn get_election_details(
     response.json().await.unwrap()
 }
 
+pub async fn get_investigations(
+    addr: &SocketAddr,
+    cookie: &HeaderValue,
+    election_id: u32,
+    session_id: u32,
+) -> serde_json::Value {
+    let url = format!(
+        "http://{addr}/api/elections/{election_id}/committee_sessions/{session_id}/investigations"
+    );
+    let response = reqwest::Client::new()
+        .get(&url)
+        .header("cookie", cookie)
+        .send()
+        .await
+        .unwrap();
+    assert_eq!(&response.status(), &StatusCode::OK);
+
+    let body: serde_json::Value = response.json().await.unwrap();
+    body["investigations"].clone()
+}
+
 pub async fn get_election_committee_session(
     addr: &SocketAddr,
     cookie: &HeaderValue,

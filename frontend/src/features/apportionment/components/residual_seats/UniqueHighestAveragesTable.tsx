@@ -3,22 +3,28 @@ import { t } from "@/i18n/translate";
 import type { ListSeatAssignment, PoliticalGroup } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 import { formatPoliticalGroupName } from "@/utils/politicalGroup";
-import type { UniqueHighestAverageAssignmentStep } from "../../utils/steps";
+import type { LargestRemainderAssignmentStep, UniqueHighestAverageAssignmentStep } from "../../utils/steps";
 import cls from "../Apportionment.module.css";
 
 interface UniqueHighestAveragesTableProps {
   steps: UniqueHighestAverageAssignmentStep[];
+  largestRemainderSteps: LargestRemainderAssignmentStep[];
   finalStanding: ListSeatAssignment[];
   politicalGroups: PoliticalGroup[];
 }
 
-export function UniqueHighestAveragesTable({ steps, finalStanding, politicalGroups }: UniqueHighestAveragesTableProps) {
+export function UniqueHighestAveragesTable({
+  steps,
+  largestRemainderSteps,
+  finalStanding,
+  politicalGroups,
+}: UniqueHighestAveragesTableProps) {
   return (
     <Table id="unique-highest-averages-table" className={cls.table}>
       <Table.Header>
         <Table.HeaderCell className="text-align-r">{t("list")}</Table.HeaderCell>
         <Table.HeaderCell className="w-full">{t("list_name")}</Table.HeaderCell>
-        <Table.HeaderCell className="text-align-r">{t("apportionment.full_seats_count")}</Table.HeaderCell>
+        <Table.HeaderCell className="text-align-r">{t("apportionment.already_assigned")}</Table.HeaderCell>
         <Table.HeaderCell span={2} className="text-align-r">
           {t("apportionment.average")}
         </Table.HeaderCell>
@@ -29,6 +35,9 @@ export function UniqueHighestAveragesTable({ steps, finalStanding, politicalGrou
           if (steps[0]?.change.list_exhausted.includes(listSeatAssignment.list_number)) {
             return null;
           } else {
+            const residualSeatsAlreadyAssigned = largestRemainderSteps.filter((step) => {
+              return step.change.selected_list_number === listSeatAssignment.list_number;
+            }).length;
             const average = steps[0]?.standings.find(
               (standing) => standing.list_number === listSeatAssignment.list_number,
             )?.next_votes_per_seat;
@@ -46,7 +55,9 @@ export function UniqueHighestAveragesTable({ steps, finalStanding, politicalGrou
                     false,
                   )}
                 </Table.Cell>
-                <Table.NumberCell className="bold">{listSeatAssignment.full_seats}</Table.NumberCell>
+                <Table.NumberCell className="bold">
+                  {listSeatAssignment.full_seats + residualSeatsAlreadyAssigned}
+                </Table.NumberCell>
                 <Table.DisplayFractionCells>{average}</Table.DisplayFractionCells>
                 <Table.NumberCell className="bold">{listSeatAssignmentSteps.length}</Table.NumberCell>
               </Table.Row>

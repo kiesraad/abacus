@@ -213,9 +213,9 @@ describe("ApportionmentResidualSeatsPage", () => {
     const unique_highest_averages_table = await screen.findByTestId("unique-highest-averages-table");
     expect(unique_highest_averages_table).toBeVisible();
     expect(unique_highest_averages_table).toHaveTableContent([
-      ["Lijst", "Lijstnaam", "Aantal volle zetels", "Gemiddelde", "Aantal restzetels"],
-      ["1", "Political Group A", "10", "67", "4/12", "1"],
-      ["2", "Political Group B", "0", "30", "", "0"],
+      ["Lijst", "Lijstnaam", "Reeds toegewezen", "Gemiddelde", "Aantal restzetels"],
+      ["1", "Political Group A", "11", "67", "4/12", "1"],
+      ["2", "Political Group B", "1", "30", "", "0"],
       ["3", "Political Group C", "0", "58", "", "1"],
       ["4", "Political Group D", "0", "57", "", "1"],
       ["5", "Blanco (Smit, G.)", "0", "56", "", "0"],
@@ -300,8 +300,8 @@ describe("ApportionmentResidualSeatsPage", () => {
     const unique_highest_averages_table = await screen.findByTestId("unique-highest-averages-table");
     expect(unique_highest_averages_table).toBeVisible();
     expect(unique_highest_averages_table).toHaveTableContent([
-      ["Lijst", "Lijstnaam", "Aantal volle zetels", "Gemiddelde", "Aantal restzetels"],
-      ["2", "Political Group B", "2", "244", "1/4", "1"],
+      ["Lijst", "Lijstnaam", "Reeds toegewezen", "Gemiddelde", "Aantal restzetels"],
+      ["2", "Political Group B", "3", "244", "1/4", "1"],
     ]);
 
     expect(await screen.findByTestId("footnotes-list")).toHaveTextContent(
@@ -345,7 +345,7 @@ describe("ApportionmentResidualSeatsPage", () => {
     const unique_highest_averages_table = await screen.findByTestId("unique-highest-averages-table");
     expect(unique_highest_averages_table).toBeVisible();
     expect(unique_highest_averages_table).toHaveTableContent([
-      ["Lijst", "Lijstnaam", "Aantal volle zetels", "Gemiddelde", "Aantal restzetels"],
+      ["Lijst", "Lijstnaam", "Reeds toegewezen", "Gemiddelde", "Aantal restzetels"],
       ["1", "Political Group A", "0", "5", "", "1"],
       ["2", "Political Group B", "0", "5", "", "1"],
     ]);

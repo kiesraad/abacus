@@ -239,4 +239,16 @@ describe("getDataEntryStructure", () => {
 
     expect(structure.map((section) => section.id)).toStrictEqual(expectedSectionIds);
   });
+
+  // Exhaustive check if all models are included
+  const allModels = (<T extends DataEntryModel[]>(
+    models: [Exclude<DataEntryModel, T[number]>] extends [never] ? T : never,
+  ) => models)(["CSOFirstSession", "CSONextSession"]);
+
+  // Snapshot test every model to catch any unintended changes in the structure
+  test.each(allModels)("%s structure snapshot", async (model) => {
+    await expect(getDataEntryStructure(model, electionMockData)).toMatchFileSnapshot(
+      `./__snapshots__/dataEntryStructure.${model}.snap`,
+    );
+  });
 });

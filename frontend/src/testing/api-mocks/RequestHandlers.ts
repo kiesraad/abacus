@@ -132,6 +132,7 @@ import {
   saveDataEntryResponse,
 } from "./DataEntryMockData";
 import {
+  csbElectionDetailsMockResponse,
   csbElectionImportMockResponse,
   electionDetailsMockResponse,
   electionImportMockResponse,
@@ -199,6 +200,14 @@ export const CommitteeSessionStatusChangeRequestHandler = http.put<
   ParamsToString<COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PARAMS>,
   COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY
 >("/api/elections/1/committee_sessions/1/status" satisfies COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH, () =>
+  HttpResponse.json(null, { status: 200 }),
+);
+
+// committee session status change handler
+export const CSBCommitteeSessionStatusChangeRequestHandler = http.put<
+  ParamsToString<COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PARAMS>,
+  COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY
+>("/api/elections/2/committee_sessions/2/status" satisfies COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH, () =>
   HttpResponse.json(null, { status: 200 }),
 );
 
@@ -302,12 +311,30 @@ export const ElectionRequestHandler = http.get<
   HttpResponse.json(electionDetailsMockResponse, { status: 200 }),
 );
 
+// get election details handler
+export const CSBElectionRequestHandler = http.get<
+  ParamsToString<ELECTION_DETAILS_REQUEST_PARAMS>,
+  null,
+  ElectionDetailsResponse | ErrorResponse
+>("/api/elections/2" satisfies ELECTION_DETAILS_REQUEST_PATH, () =>
+  HttpResponse.json(csbElectionDetailsMockResponse, { status: 200 }),
+);
+
 // get election status handler
 export const ElectionStatusRequestHandler = http.get<
   ParamsToString<ELECTION_STATUS_REQUEST_PARAMS>,
   null,
   ElectionStatusResponse
 >("/api/elections/1/status" satisfies ELECTION_STATUS_REQUEST_PATH, () =>
+  HttpResponse.json(statusResponseMock, { status: 200 }),
+);
+
+// get election status handler
+export const CSBElectionStatusRequestHandler = http.get<
+  ParamsToString<ELECTION_STATUS_REQUEST_PARAMS>,
+  null,
+  ElectionStatusResponse
+>("/api/elections/2/status" satisfies ELECTION_STATUS_REQUEST_PATH, () =>
   HttpResponse.json(statusResponseMock, { status: 200 }),
 );
 
@@ -510,6 +537,7 @@ export const handlers: HttpHandler[] = [
   LogRequestHandler,
   LogUsersRequestHandler,
   CommitteeSessionStatusChangeRequestHandler,
+  CSBCommitteeSessionStatusChangeRequestHandler,
   CommitteeSessionUpdateHandler,
   CommitteeSessionCreateHandler,
   CommitteeSessionDeleteHandler,
@@ -521,6 +549,7 @@ export const handlers: HttpHandler[] = [
   ElectionListRequestHandler,
   ElectionRequestHandler,
   ElectionStatusRequestHandler,
+  CSBElectionStatusRequestHandler,
   GSBElectionImportRequestHandler,
   CSBElectionImportRequestHandler,
   ElectionImportValidateRequestHandler,

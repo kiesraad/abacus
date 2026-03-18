@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/Button/Button";
 import { DownloadButton } from "@/components/ui/DownloadButton/DownloadButton";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { Icon } from "@/components/ui/Icon/Icon";
-import { Loader } from "@/components/ui/Loader/Loader";
 import { useElection } from "@/hooks/election/useElection";
 import { useNumericParam } from "@/hooks/useNumericParam";
 import { t } from "@/i18n/translate";
@@ -17,12 +16,13 @@ import type {
   COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY,
   COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH,
 } from "@/types/generated/openapi";
+import { cn } from "@/utils/classnames";
 import { committeeSessionLabel } from "@/utils/committeeSession";
 import { formatDateTimeFull } from "@/utils/dateTime";
 
-import { useCommitteeSessionInvestigationListRequest } from "../../hooks/useCommitteeSessionInvestigationListRequest";
 import cls from "../ElectionManagement.module.css";
-import { ElectionReportSection } from "./ElectionReportSection.tsx";
+import { CSBElectionReportSection } from "./CSBElectionReportSection.tsx";
+import { GSBElectionReportSection } from "./GSBElectionReportSection.tsx";
 
 // biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function ElectionReportPage() {
@@ -37,15 +37,6 @@ export function ElectionReportPage() {
   const updatePath: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/elections/${committeeSession.election_id}/committee_sessions/${committeeSession.id}/status`;
   const { update, isLoading } = useCrud({ updatePath, throwAllErrors: true });
 
-  // We have to specifically request the investigations of the committee session the page is rendered for
-  const { requestState } = useCommitteeSessionInvestigationListRequest(election.id, committeeSession.id);
-  if (requestState.status === "loading") {
-    return <Loader />;
-  }
-  if ("error" in requestState) {
-    throw requestState.error;
-  }
-
   const sessionLabel = committeeSessionLabel(election.committee_category, committeeSession.number);
 
   // Redirect to update details page if committee session details have not been filled in
@@ -57,8 +48,6 @@ export function ElectionReportPage() {
   if (committeeSession.status !== "completed") {
     throw new ApplicationError(t("error.forbidden_message"), "InvalidCommitteeSessionStatus");
   }
-
-  const wasCorrected = requestState.data.investigations.some((i) => i.corrected_results);
 
   function handleResume() {
     const body: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = { status: "data_entry" };
@@ -99,7 +88,7 @@ export function ElectionReportPage() {
     return (
       <>
         {t("election_report.counting_results")} {sessionLabel.toLowerCase()}{" "}
-        {t(`committee_category.${election.committee_category}.short`).toLowerCase()} {t("municipality").toLowerCase()}
+        {t(`committee_category.${election.committee_category}.short`).toLowerCase()} {t("municipality").toLowerCase()}{" "}
         {election.location}
       </>
     );
@@ -137,6 +126,7 @@ export function ElectionReportPage() {
                 </>
               )}
               {election.committee_category === "CSB" && (
+                // TODO #2972: update hrefs for both download buttons once backend is updated
                 <>
                   <DownloadButton
                     icon="download"
@@ -161,11 +151,18 @@ export function ElectionReportPage() {
                 subtitle={t("election_management.zip_file")}
               />
             </div>
-            <ElectionReportSection
-              committeeSession={committeeSession}
-              election={election}
-              wasCorrected={wasCorrected}
-            />
+            <section className={cn(cls.reportInfoSection, "sm")}>
+              <h3>{t("election_management.what_now")}?</h3>
+              <p>{t(`election_management.${election.committee_category}.download_definitive_files`)}</p>
+              <section className="sm">
+                {election.committee_category === "GSB" ? (
+                  <GSBElectionReportSection election={election} committeeSession={committeeSession} />
+                ) : (
+                  <CSBElectionReportSection election={election} />
+                )}
+                <p>{t(`election_management.${election.committee_category}.upload_the_zip`)}</p>
+              </section>
+            </section>
 
             <FormLayout.Controls>
               <Button.Link to="../..">{t("back_to_overview")}</Button.Link>

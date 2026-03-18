@@ -140,4 +140,32 @@ mod tests {
             assert!(manages[0].is_typist());
         }
     }
+
+    #[test]
+    fn admin_is_authorized_for_all_categories() {
+        let categories = CommitteeCategory::VARIANTS
+            .iter()
+            .filter(|category| Role::Administrator.is_authorized(category).is_ok())
+            .collect::<Vec<_>>();
+        assert_eq!(categories.len(), CommitteeCategory::VARIANTS.len());
+    }
+
+    #[test]
+    fn non_admin_is_authorized_for_one_category() {
+        let roles = Role::VARIANTS
+            .iter()
+            .filter(|role| !role.is_administrator());
+        for role in roles {
+            let categories = CommitteeCategory::VARIANTS
+                .iter()
+                .filter(|category| role.is_authorized(category).is_ok())
+                .collect::<Vec<_>>();
+
+            assert_eq!(
+                categories.len(),
+                1,
+                "Role {role:?} should be authorized for one category"
+            );
+        }
+    }
 }

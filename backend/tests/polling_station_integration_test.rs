@@ -852,11 +852,17 @@ async fn test_delete_for_committee_session_with_data_entry_status_as_administrat
     let addr = serve_api(pool).await;
     let admin_cookie = login(&addr, FixtureUser::Admin).await;
     let election_id = 2;
+    let polling_station_id = 211;
 
     let committee_session = get_election_committee_session(&addr, &admin_cookie, election_id).await;
     assert_eq!(committee_session["status"], "data_entry");
 
-    let response = delete_polling_station(&addr, &admin_cookie, election_id, 2).await;
+    // Assert that the polling station does exist
+    let response = get_polling_station(&addr, &admin_cookie, election_id, polling_station_id).await;
+    assert_eq!(response.status(), StatusCode::OK);
+
+    let response =
+        delete_polling_station(&addr, &admin_cookie, election_id, polling_station_id).await;
 
     assert_eq!(
         response.status(),

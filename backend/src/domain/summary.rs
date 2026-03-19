@@ -79,12 +79,7 @@ impl ElectionSummary {
 
             // validate result and make sure that there are no errors
             let mut validation_results = ValidationResults::default();
-            result.validate(
-                election,
-                polling_station,
-                &mut validation_results,
-                &"data".into(),
-            )?;
+            result.validate(election, &mut validation_results, &"data".into())?;
             if validation_results.has_errors() {
                 return Err(APIError::AddError(
                     format!(

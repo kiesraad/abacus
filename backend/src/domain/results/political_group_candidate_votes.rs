@@ -8,7 +8,6 @@ use crate::{
         compare::Compare,
         election::{CandidateNumber, ElectionWithPoliticalGroups, PGNumber},
         field_path::FieldPath,
-        polling_station::PollingStation,
         validate::{DataError, Validate, ValidationResults},
     },
     error::ErrorReference,
@@ -106,7 +105,6 @@ impl Validate for Vec<PoliticalGroupCandidateVotes> {
     fn validate(
         &self,
         election: &ElectionWithPoliticalGroups,
-        polling_station: &PollingStation,
         validation_results: &mut ValidationResults,
         path: &FieldPath,
     ) -> Result<(), DataError> {
@@ -126,12 +124,7 @@ impl Validate for Vec<PoliticalGroupCandidateVotes> {
             }
             previous_number = number;
 
-            pgv.validate(
-                election,
-                polling_station,
-                validation_results,
-                &path.index(i),
-            )?;
+            pgv.validate(election, validation_results, &path.index(i))?;
         }
         Ok(())
     }
@@ -141,7 +134,6 @@ impl Validate for PoliticalGroupCandidateVotes {
     fn validate(
         &self,
         election: &ElectionWithPoliticalGroups,
-        polling_station: &PollingStation,
         validation_results: &mut ValidationResults,
         path: &FieldPath,
     ) -> Result<(), DataError> {
@@ -168,19 +160,14 @@ impl Validate for PoliticalGroupCandidateVotes {
 
             cv.validate(
                 election,
-                polling_station,
                 validation_results,
                 &path.field("candidate_votes").index(i),
             )?;
         }
 
         // validate the total number of votes
-        self.total.validate(
-            election,
-            polling_station,
-            validation_results,
-            &path.field("total"),
-        )?;
+        self.total
+            .validate(election, validation_results, &path.field("total"))?;
 
         Ok(())
     }
@@ -206,15 +193,10 @@ impl Validate for CandidateVotes {
     fn validate(
         &self,
         election: &ElectionWithPoliticalGroups,
-        polling_station: &PollingStation,
         validation_results: &mut ValidationResults,
         path: &FieldPath,
     ) -> Result<(), DataError> {
-        self.votes.validate(
-            election,
-            polling_station,
-            validation_results,
-            &path.field("votes"),
-        )
+        self.votes
+            .validate(election, validation_results, &path.field("votes"))
     }
 }

@@ -8,7 +8,6 @@ use crate::domain::{
     compare::Compare,
     election::ElectionWithPoliticalGroups,
     field_path::FieldPath,
-    polling_station::PollingStation,
     validate::{DataError, Validate, ValidationResult, ValidationResultCode, ValidationResults},
 };
 
@@ -60,26 +59,22 @@ impl Validate for VotersCounts {
     fn validate(
         &self,
         election: &ElectionWithPoliticalGroups,
-        polling_station: &PollingStation,
         validation_results: &mut ValidationResults,
         path: &FieldPath,
     ) -> Result<(), DataError> {
         // validate all counts
         self.poll_card_count.validate(
             election,
-            polling_station,
             validation_results,
             &path.field("poll_card_count"),
         )?;
         self.proxy_certificate_count.validate(
             election,
-            polling_station,
             validation_results,
             &path.field("proxy_certificate_count"),
         )?;
         self.total_admitted_voters_count.validate(
             election,
-            polling_station,
             validation_results,
             &path.field("total_admitted_voters_count"),
         )?;
@@ -104,9 +99,7 @@ mod tests {
     use test_log::test;
 
     use super::*;
-    use crate::domain::{
-        election::tests::election_fixture, polling_station::test_helpers::polling_station_fixture,
-    };
+    use crate::domain::election::tests::election_fixture;
 
     #[test]
     fn test_voters_addition() {
@@ -141,7 +134,6 @@ mod tests {
         let mut validation_results = ValidationResults::default();
         voters_counts.validate(
             &election_fixture(&[]),
-            &polling_station_fixture(None),
             &mut validation_results,
             &"voters_counts".into(),
         )?;

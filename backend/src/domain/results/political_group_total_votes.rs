@@ -6,7 +6,6 @@ use crate::domain::{
     compare::Compare,
     election::{ElectionWithPoliticalGroups, PGNumber},
     field_path::FieldPath,
-    polling_station::PollingStation,
     validate::{DataError, Validate, ValidationResults},
 };
 
@@ -36,7 +35,6 @@ impl Validate for Vec<PoliticalGroupTotalVotes> {
     fn validate(
         &self,
         election: &ElectionWithPoliticalGroups,
-        polling_station: &PollingStation,
         validation_results: &mut ValidationResults,
         path: &FieldPath,
     ) -> Result<(), DataError> {
@@ -58,12 +56,8 @@ impl Validate for Vec<PoliticalGroupTotalVotes> {
             }
             previous_number = number;
 
-            pgv.total.validate(
-                election,
-                polling_station,
-                validation_results,
-                &path.index(i).field("total"),
-            )?;
+            pgv.total
+                .validate(election, validation_results, &path.index(i).field("total"))?;
         }
         Ok(())
     }
@@ -76,7 +70,6 @@ mod tests {
     use super::*;
     use crate::domain::{
         election::{CandidateNumber, tests::election_fixture},
-        polling_station::test_helpers::polling_station_fixture,
         results::political_group_candidate_votes::{CandidateVotes, PoliticalGroupCandidateVotes},
     };
 
@@ -125,7 +118,6 @@ mod tests {
         let mut validation_results = ValidationResults::default();
         let result = political_group_votes.validate(
             &election,
-            &polling_station_fixture(None),
             &mut validation_results,
             &"political_group_votes".into(),
         );
@@ -151,7 +143,6 @@ mod tests {
         let mut validation_results = ValidationResults::default();
         let result: Result<(), DataError> = political_group_votes.validate(
             &election,
-            &polling_station_fixture(None),
             &mut validation_results,
             &"political_group_votes".into(),
         );
@@ -171,7 +162,6 @@ mod tests {
         let mut validation_results = ValidationResults::default();
         let result: Result<(), DataError> = political_group_votes.validate(
             &election,
-            &polling_station_fixture(None),
             &mut validation_results,
             &"political_group_votes".into(),
         );
@@ -195,7 +185,6 @@ mod tests {
         let mut validation_results = ValidationResults::default();
         let result = political_group_votes.validate(
             &election,
-            &polling_station_fixture(None),
             &mut validation_results,
             &"political_group_votes".into(),
         );
@@ -220,7 +209,6 @@ mod tests {
         let mut validation_results = ValidationResults::default();
         let result = political_group_votes.validate(
             &election,
-            &polling_station_fixture(None),
             &mut validation_results,
             &"political_group_votes".into(),
         );
@@ -239,7 +227,6 @@ mod tests {
         let mut validation_results = ValidationResults::default();
         let result = political_group_votes.validate(
             &election,
-            &polling_station_fixture(None),
             &mut validation_results,
             &"political_group_votes".into(),
         );

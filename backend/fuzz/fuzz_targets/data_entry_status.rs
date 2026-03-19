@@ -7,7 +7,6 @@ use abacus::{
             CommitteeCategory, ElectionCategory, ElectionId, ElectionWithPoliticalGroups,
             VoteCountingMethod,
         },
-        polling_station::{PollingStation, PollingStationId, PollingStationType},
         results::{
             counting_differences_polling_station::CountingDifferencesPollingStation,
             cso_first_session_results::CSOFirstSessionResults,
@@ -93,19 +92,6 @@ fn get_cde(user_id: UserId, correct_entry: bool) -> CurrentDataEntry {
             invalid_polling_station_result()
         },
         client_state: None,
-    }
-}
-
-fn polling_station() -> PollingStation {
-    PollingStation {
-        id: PollingStationId::from(1),
-        name: "Test polling station".to_string(),
-        number: 1,
-        number_of_voters: None,
-        polling_station_type: Some(PollingStationType::FixedLocation),
-        address: "Test street".to_string(),
-        postal_code: "1234 YQ".to_string(),
-        locality: "Test city".to_string(),
     }
 }
 
@@ -384,11 +370,9 @@ fuzz_target!(|transitions: Vec<Transition>| {
                 };
                 res
             }
-            Transition::FinaliseFirstEntry(correct_user) => state.finalise_first_entry(
-                &polling_station(),
-                &election(),
-                users.first(correct_user),
-            ),
+            Transition::FinaliseFirstEntry(correct_user) => {
+                state.finalise_first_entry(&election(), users.first(correct_user))
+            }
             Transition::DeleteFirstEntry(correct_user) => {
                 state.delete_first_entry(users.first(correct_user))
             }
@@ -407,21 +391,17 @@ fuzz_target!(|transitions: Vec<Transition>| {
                 };
                 res
             }
-            Transition::DeleteSecondEntry(correct_user) => state.delete_second_entry(
-                users.second(correct_user),
-                &polling_station(),
-                &election(),
-            ),
-            Transition::FinaliseSecondEntry(correct_user) => state.finalise_second_entry(
-                &polling_station(),
-                &election(),
-                users.second(correct_user),
-            ),
+            Transition::DeleteSecondEntry(correct_user) => {
+                state.delete_second_entry(users.second(correct_user), &election())
+            }
+            Transition::FinaliseSecondEntry(correct_user) => {
+                state.finalise_second_entry(&election(), users.second(correct_user))
+            }
             Transition::ResumeFirstEntry => state.resume_first_entry(),
             Transition::DeleteBothEntries => state.delete_entries(),
-            Transition::KeepFirstEntry => state.keep_first_entry(&polling_station(), &election()),
+            Transition::KeepFirstEntry => state.keep_first_entry(&election()),
             Transition::KeepSecondEntry => {
-                let res = state.keep_second_entry(&polling_station(), &election());
+                let res = state.keep_second_entry(&election());
                 if res.is_ok() {
                     users.swap(); // second user becomes first, because second entry becomes first entry
                     first_entry_correct = second_entry_correct;

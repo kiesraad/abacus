@@ -351,7 +351,7 @@ async fn data_entry_claim(
     let data = new_state
         .get_data()
         .expect("data should be present because data entry is in progress");
-    let validation_results = new_state.start_validate(&polling_station, &election)?;
+    let validation_results = new_state.start_validate(&election)?;
 
     // Save the new data entry state
     let data_entry = data_entry_repo::update(&mut tx, polling_station_id, &new_state).await?;
@@ -439,7 +439,7 @@ async fn data_entry_save(
 ) -> Result<SaveDataEntryResponse, APIError> {
     let mut tx = pool.begin_immediate().await?;
 
-    let (polling_station, election, .., state) =
+    let (_, election, .., state) =
         validate_and_get_data(&mut tx, polling_station_id, &user).await?;
 
     let current_data_entry = CurrentDataEntry {
@@ -456,7 +456,7 @@ async fn data_entry_save(
     };
 
     // Validate the state
-    let validation_results = new_state.start_validate(&polling_station, &election)?;
+    let validation_results = new_state.start_validate(&election)?;
 
     // Save the new data entry state
     let data_entry = data_entry_repo::update(&mut tx, polling_station_id, &new_state).await?;
@@ -495,15 +495,13 @@ async fn data_entry_discard(
 ) -> Result<StatusCode, APIError> {
     let mut tx = pool.begin_immediate().await?;
 
-    let (polling_station, election, .., state) =
+    let (_, election, .., state) =
         validate_and_get_data(&mut tx, polling_station_id, &user).await?;
 
     let user_id = user.id();
     let new_state = match entry_number {
         EntryNumber::FirstEntry => state.delete_first_entry(user_id)?,
-        EntryNumber::SecondEntry => {
-            state.delete_second_entry(user_id, &polling_station, &election)?
-        }
+        EntryNumber::SecondEntry => state.delete_second_entry(user_id, &election)?,
     };
 
     let data_entry = data_entry_repo::update(&mut tx, polling_station_id, &new_state).await?;
@@ -543,17 +541,17 @@ async fn data_entry_finalise(
 ) -> Result<Json<DataEntryStatusResponse>, APIError> {
     let mut tx = pool.begin_immediate().await?;
 
-    let (polling_station, election, .., state) =
+    let (_, election, .., state) =
         validate_and_get_data(&mut tx, polling_station_id, &user).await?;
 
     let user_id = user.id();
     let data_entry = match entry_number {
         EntryNumber::FirstEntry => {
-            let new_state = state.finalise_first_entry(&polling_station, &election, user_id)?;
+            let new_state = state.finalise_first_entry(&election, user_id)?;
             data_entry_repo::update(&mut tx, polling_station_id, &new_state).await?
         }
         EntryNumber::SecondEntry => {
-            let new_state = state.finalise_second_entry(&polling_station, &election, user_id)?;
+            let new_state = state.finalise_second_entry(&election, user_id)?;
             data_entry_repo::update(&mut tx, polling_station_id, &new_state).await?
         }
     };
@@ -683,7 +681,7 @@ async fn data_entry_get(
 ) -> Result<Json<DataEntryGetResponse>, APIError> {
     let mut conn = pool.acquire().await?;
 
-    let (polling_station, election, .., state) =
+    let (_, election, .., state) =
         validate_and_get_data(&mut conn, polling_station_id, &user).await?;
 
     match state.clone() {
@@ -700,7 +698,7 @@ async fn data_entry_get(
                 user_id: Some(first_entry_has_errors_state.first_entry_user_id),
                 data: first_entry_has_errors_state.finalised_first_entry,
                 status: state.status_name(),
-                validation_results: state.start_validate(&polling_station, &election)?,
+                validation_results: state.start_validate(&election)?,
             }))
         }
         DataEntryStatus::FirstEntryFinalised(first_entry_finalised_state) => {
@@ -708,7 +706,7 @@ async fn data_entry_get(
                 user_id: Some(first_entry_finalised_state.first_entry_user_id),
                 data: first_entry_finalised_state.finalised_first_entry,
                 status: state.status_name(),
-                validation_results: state.start_validate(&polling_station, &election)?,
+                validation_results: state.start_validate(&election)?,
             }))
         }
         DataEntryStatus::SecondEntryInProgress(second_entry_in_progress_state) => {
@@ -720,9 +718,7 @@ async fn data_entry_get(
             }))
         }
         DataEntryStatus::Definitive(definitive_state) => {
-            let validation_results = definitive_state
-                .results
-                .start_validate(&polling_station, &election)?;
+            let validation_results = definitive_state.results.start_validate(&election)?;
 
             Ok(Json(DataEntryGetResponse {
                 user_id: None,
@@ -873,16 +869,11 @@ async fn data_entry_resolve_differences(
 ) -> Result<Json<DataEntryStatusResponse>, APIError> {
     let mut tx = pool.begin_immediate().await?;
 
-    let (polling_station, election, _, state) =
-        validate_and_get_data(&mut tx, polling_station_id, &user).await?;
+    let (_, election, _, state) = validate_and_get_data(&mut tx, polling_station_id, &user).await?;
 
     let new_state = match action {
-        ResolveDifferencesAction::KeepFirstEntry => {
-            state.keep_first_entry(&polling_station, &election)?
-        }
-        ResolveDifferencesAction::KeepSecondEntry => {
-            state.keep_second_entry(&polling_station, &election)?
-        }
+        ResolveDifferencesAction::KeepFirstEntry => state.keep_first_entry(&election)?,
+        ResolveDifferencesAction::KeepSecondEntry => state.keep_second_entry(&election)?,
         ResolveDifferencesAction::DiscardBothEntries => state.delete_entries()?,
     };
 

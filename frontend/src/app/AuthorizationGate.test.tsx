@@ -7,16 +7,16 @@ import { InitialisedHandler } from "@/testing/api-mocks/RequestHandlers";
 import { server } from "@/testing/server";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 import { render, screen, setupTestRouter, waitFor } from "@/testing/test-utils";
-import { AuthorizationDialog } from "./AuthorizationDialog";
+import { AuthorizationGate } from "./AuthorizationGate";
 import { EXPIRATION_DIALOG_SECONDS } from "./authorizationConstants";
 import { routes } from "./routes";
 
-describe("AuthorizationDialog", () => {
+describe("AuthorizationGate", () => {
   test("Does not show dialog when session is still valid", () => {
     const togo = 1000 * 60 * EXPIRATION_DIALOG_SECONDS;
     render(
       <TestUserProvider userRole="typist_gsb" overrideExpiration={new Date(Date.now() + togo + 1000)}>
-        <AuthorizationDialog />
+        <AuthorizationGate />
       </TestUserProvider>,
     );
     expect(screen.queryByTestId("modal-title")).toBeNull();
@@ -25,7 +25,7 @@ describe("AuthorizationDialog", () => {
   test("Show dialog on short session lifetime", () => {
     render(
       <TestUserProvider userRole="typist_gsb" overrideExpiration={new Date(Date.now() + 1000)}>
-        <AuthorizationDialog />
+        <AuthorizationGate />
       </TestUserProvider>,
     );
 
@@ -35,7 +35,7 @@ describe("AuthorizationDialog", () => {
   test("Does not show dialog when the user is not logged in", () => {
     render(
       <TestUserProvider userRole={null} overrideExpiration={new Date(Date.now() + 1000)}>
-        <AuthorizationDialog />
+        <AuthorizationGate />
       </TestUserProvider>,
     );
 
@@ -45,7 +45,7 @@ describe("AuthorizationDialog", () => {
   test("Dialog can be closed", async () => {
     render(
       <TestUserProvider userRole="typist_gsb" overrideExpiration={new Date(Date.now() + 1000)}>
-        <AuthorizationDialog />
+        <AuthorizationGate />
       </TestUserProvider>,
     );
 
@@ -59,7 +59,7 @@ describe("AuthorizationDialog", () => {
   test("Dialog can be dismissed", async () => {
     render(
       <TestUserProvider userRole="typist_gsb" overrideExpiration={new Date(Date.now() + 1000)}>
-        <AuthorizationDialog />
+        <AuthorizationGate />
       </TestUserProvider>,
     );
 

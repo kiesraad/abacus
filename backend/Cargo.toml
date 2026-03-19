@@ -68,7 +68,7 @@ clap = { version = "4.5", default-features = false, features = [
     "help",
     "env",
 ] }
-eml-nl = { version = "0.4.0" }
+eml-nl = { version = "0.5.0" }
 hyper = { version = "1", features = ["full"] }
 tokio.workspace = true
 memory-serve = { version = "1.2.2", optional = true, features = [
@@ -81,13 +81,13 @@ serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 sqlx = { version = "0.8", features = ["runtime-tokio", "sqlite", "chrono"] }
 tower = "0.5"
-tracing-subscriber = { version = "0.3.22", features = ["env-filter"] }
+tracing-subscriber = { version = "0.3.23", features = ["env-filter"] }
 tracing.workspace = true
 tower-http = { version = "0.6", features = ["set-header", "trace"] }
 quick-xml = { version = "0.39.2", features = ["serialize"] }
 sha2 = "0.10.9"
 argon2 = "0.5.3"
-password-hash = { version = "0.5.0", features = ["getrandom"] }
+password-hash = { version = "0.6.0", features = ["getrandom"] }
 rand.workspace = true
 cookie = { version = "0.18.1", features = ["percent-encode"] }
 strum.workspace = true

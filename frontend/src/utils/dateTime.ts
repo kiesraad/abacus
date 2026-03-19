@@ -35,6 +35,7 @@ export function formatDateTimeFull(date: Date) {
   return date.toLocaleTimeString(t("date_locale"), {
     hour: "numeric",
     minute: "numeric",
+    second: "numeric",
     weekday: "long",
     day: "numeric",
     month: "long",
@@ -43,7 +44,11 @@ export function formatDateTimeFull(date: Date) {
 }
 
 export function formatDateTime(date: Date, relative = true) {
-  const timeString = date.toLocaleTimeString(t("date_locale"), { hour: "numeric", minute: "numeric" });
+  const timeString = date.toLocaleTimeString(t("date_locale"), {
+    hour: "numeric",
+    minute: "numeric",
+    second: "numeric",
+  });
 
   if (relative) {
     const today = new Date();

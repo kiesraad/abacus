@@ -154,6 +154,7 @@ export function DataEntryPicker({ anotherEntry }: DataEntryPickerProps) {
     <form
       onSubmit={(e) => {
         e.preventDefault();
+        handleSubmit();
       }}
     >
       {inProgressCurrentUser.length > 0 && (

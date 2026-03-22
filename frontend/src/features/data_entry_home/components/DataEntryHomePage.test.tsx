@@ -96,8 +96,8 @@ describe("DataEntryHomePage", () => {
 
     const alert = await screen.findByRole("alert");
     expect(within(alert).getByRole("strong")).toHaveTextContent("Je hebt nog een openstaande invoer");
-    const pollingStations = await within(alert).findAllByRole("link");
-    expect(pollingStations.map((ps) => ps.textContent)).toEqual(["33 - Op Rolletjes"]);
+    const dataEntries = await within(alert).findAllByRole("link");
+    expect(dataEntries.map((ps) => ps.textContent)).toEqual(["33 - Op Rolletjes"]);
   });
 
   test("Resume input invisible when none are unfinished", async () => {

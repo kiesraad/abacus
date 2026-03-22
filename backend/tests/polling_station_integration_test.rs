@@ -9,10 +9,9 @@ use test_log::test;
 
 use crate::{
     shared::{
-        admin_login, change_status_committee_session, claim_data_entry, coordinator_login,
-        create_investigation, create_polling_station, create_result, example_data_entry,
-        get_election_committee_session, get_election_details, get_statuses, save_data_entry,
-        typist_login,
+        FixtureUser, change_status_committee_session, claim_data_entry, create_investigation,
+        create_polling_station, create_result, example_data_entry, get_election_committee_session,
+        get_election_details, get_statuses, login, save_data_entry,
     },
     utils::serve_api,
 };
@@ -112,7 +111,7 @@ async fn delete_polling_station(
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
 async fn test_listing(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let coordinator_cookie = coordinator_login(&addr).await;
+    let coordinator_cookie = login(&addr, FixtureUser::CoordinatorGSB).await;
     let url = format!("http://{addr}/api/elections/7/polling_stations");
     let response = reqwest::Client::new()
         .get(&url)
@@ -151,7 +150,7 @@ async fn test_creation_for_committee_session_with_created_and_in_preparation_sta
     pool: SqlitePool,
 ) {
     let addr = serve_api(pool).await;
-    let coordinator_cookie = coordinator_login(&addr).await;
+    let coordinator_cookie = login(&addr, FixtureUser::CoordinatorGSB).await;
     let election_id = 6;
 
     let committee_session =
@@ -192,7 +191,7 @@ async fn test_creation_for_committee_session_with_created_and_in_preparation_sta
     pool: SqlitePool,
 ) {
     let addr = serve_api(pool).await;
-    let admin_cookie = admin_login(&addr).await;
+    let admin_cookie = login(&addr, FixtureUser::Admin).await;
     let election_id = 6;
 
     let committee_session = get_election_committee_session(&addr, &admin_cookie, election_id).await;
@@ -228,7 +227,7 @@ async fn test_creation_for_committee_session_with_data_entry_status_as_coordinat
     pool: SqlitePool,
 ) {
     let addr = serve_api(pool).await;
-    let coordinator_cookie = coordinator_login(&addr).await;
+    let coordinator_cookie = login(&addr, FixtureUser::CoordinatorGSB).await;
     let election_id = 4;
 
     let committee_session =
@@ -253,7 +252,7 @@ async fn test_creation_for_committee_session_with_data_entry_status_as_administr
     pool: SqlitePool,
 ) {
     let addr = serve_api(pool).await;
-    let admin_cookie = admin_login(&addr).await;
+    let admin_cookie = login(&addr, FixtureUser::Admin).await;
     let election_id = 4;
 
     let committee_session = get_election_committee_session(&addr, &admin_cookie, election_id).await;
@@ -271,7 +270,7 @@ async fn test_creation_for_committee_session_with_data_entry_status_as_administr
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
 async fn test_get(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let coordinator_cookie = coordinator_login(&addr).await;
+    let coordinator_cookie = login(&addr, FixtureUser::CoordinatorGSB).await;
 
     let response = get_polling_station(&addr, &coordinator_cookie, 7, 742).await;
     let body: serde_json::Value = response.json().await.unwrap();
@@ -284,7 +283,7 @@ async fn test_get(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
 async fn test_get_from_previous_committee_session_fails(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let coordinator_cookie = coordinator_login(&addr).await;
+    let coordinator_cookie = login(&addr, FixtureUser::CoordinatorGSB).await;
 
     let response = get_polling_station(&addr, &coordinator_cookie, 5, 8).await;
 
@@ -300,7 +299,7 @@ async fn test_update_for_committee_session_with_created_status_as_coordinator_wo
     pool: SqlitePool,
 ) {
     let addr = serve_api(pool).await;
-    let coordinator_cookie = coordinator_login(&addr).await;
+    let coordinator_cookie = login(&addr, FixtureUser::CoordinatorGSB).await;
     let election_id = 7;
     let polling_station_id = 741;
 
@@ -352,7 +351,7 @@ async fn test_update_for_committee_session_with_created_status_as_administrator_
     pool: SqlitePool,
 ) {
     let addr = serve_api(pool).await;
-    let admin_cookie = admin_login(&addr).await;
+    let admin_cookie = login(&addr, FixtureUser::Admin).await;
     let election_id = 7;
     let polling_station_id = 741;
 
@@ -404,7 +403,7 @@ async fn test_update_for_committee_session_with_in_preparation_status_as_coordin
     pool: SqlitePool,
 ) {
     let addr = serve_api(pool).await;
-    let coordinator_cookie = coordinator_login(&addr).await;
+    let coordinator_cookie = login(&addr, FixtureUser::CoordinatorGSB).await;
     let election_id = 6;
 
     let committee_session =
@@ -466,7 +465,7 @@ async fn test_update_for_committee_session_with_in_preparation_status_as_adminis
     pool: SqlitePool,
 ) {
     let addr = serve_api(pool).await;
-    let admin_cookie = admin_login(&addr).await;
+    let admin_cookie = login(&addr, FixtureUser::Admin).await;
     let election_id = 6;
 
     let committee_session = get_election_committee_session(&addr, &admin_cookie, election_id).await;
@@ -521,7 +520,7 @@ async fn test_update_for_committee_session_with_data_entry_status_as_coordinator
     pool: SqlitePool,
 ) {
     let addr = serve_api(pool).await;
-    let coordinator_cookie = coordinator_login(&addr).await;
+    let coordinator_cookie = login(&addr, FixtureUser::CoordinatorGSB).await;
     let election_id = 4;
     let polling_station_id = 7;
 
@@ -569,7 +568,7 @@ async fn test_update_for_committee_session_with_data_entry_status_as_administrat
     pool: SqlitePool,
 ) {
     let addr = serve_api(pool).await;
-    let admin_cookie = admin_login(&addr).await;
+    let admin_cookie = login(&addr, FixtureUser::Admin).await;
     let election_id = 4;
     let polling_station_id = 7;
 
@@ -602,7 +601,7 @@ async fn test_update_for_committee_session_with_data_entry_status_as_administrat
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_update_empty_type_ok(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let coordinator_cookie = coordinator_login(&addr).await;
+    let coordinator_cookie = login(&addr, FixtureUser::CoordinatorGSB).await;
 
     let response = update_polling_station(
         &addr,
@@ -634,7 +633,7 @@ async fn test_update_empty_type_ok(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
 async fn test_update_from_previous_committee_session_fails(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let coordinator_cookie = coordinator_login(&addr).await;
+    let coordinator_cookie = login(&addr, FixtureUser::CoordinatorGSB).await;
 
     let response = update_polling_station(
         &addr,
@@ -662,7 +661,7 @@ async fn test_update_from_previous_committee_session_fails(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_update_not_found(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let coordinator_cookie = coordinator_login(&addr).await;
+    let coordinator_cookie = login(&addr, FixtureUser::CoordinatorGSB).await;
 
     let response = update_polling_station(
         &addr,
@@ -693,7 +692,7 @@ async fn test_delete_for_committee_session_with_created_status_as_coordinator_wo
     pool: SqlitePool,
 ) {
     let addr = serve_api(pool).await;
-    let coordinator_cookie = coordinator_login(&addr).await;
+    let coordinator_cookie = login(&addr, FixtureUser::CoordinatorGSB).await;
     let election_id = 7;
     let polling_station_id = 741;
 
@@ -716,7 +715,7 @@ async fn test_delete_for_committee_session_with_created_status_as_administrator_
     pool: SqlitePool,
 ) {
     let addr = serve_api(pool).await;
-    let admin_cookie = admin_login(&addr).await;
+    let admin_cookie = login(&addr, FixtureUser::Admin).await;
     let election_id = 7;
     let polling_station_id = 741;
 
@@ -741,7 +740,7 @@ async fn test_delete_for_committee_session_with_in_preparation_status_as_coordin
     pool: SqlitePool,
 ) {
     let addr = serve_api(pool).await;
-    let coordinator_cookie = coordinator_login(&addr).await;
+    let coordinator_cookie = login(&addr, FixtureUser::CoordinatorGSB).await;
     let election_id = 6;
 
     let committee_session =
@@ -774,7 +773,7 @@ async fn test_delete_for_committee_session_with_in_preparation_status_as_adminis
     pool: SqlitePool,
 ) {
     let addr = serve_api(pool).await;
-    let admin_cookie = admin_login(&addr).await;
+    let admin_cookie = login(&addr, FixtureUser::Admin).await;
     let election_id = 6;
 
     let committee_session = get_election_committee_session(&addr, &admin_cookie, election_id).await;
@@ -802,7 +801,7 @@ async fn test_delete_for_committee_session_with_data_entry_status_as_coordinator
     pool: SqlitePool,
 ) {
     let addr = serve_api(pool).await;
-    let coordinator_cookie = coordinator_login(&addr).await;
+    let coordinator_cookie = login(&addr, FixtureUser::CoordinatorGSB).await;
     let election_id = 2;
 
     let committee_session =
@@ -846,7 +845,7 @@ async fn test_delete_for_committee_session_with_data_entry_status_as_administrat
     pool: SqlitePool,
 ) {
     let addr = serve_api(pool).await;
-    let admin_cookie = admin_login(&addr).await;
+    let admin_cookie = login(&addr, FixtureUser::Admin).await;
     let election_id = 2;
 
     let committee_session = get_election_committee_session(&addr, &admin_cookie, election_id).await;
@@ -867,7 +866,7 @@ async fn test_delete_with_data_entry_works(pool: SqlitePool) {
     let election_id = 2;
     let polling_station_id = 1;
 
-    let typist_cookie = typist_login(&addr).await;
+    let typist_cookie = login(&addr, FixtureUser::TypistGSB).await;
     claim_data_entry(&addr, &typist_cookie, polling_station_id, 1).await;
     save_data_entry(
         &addr,
@@ -878,7 +877,7 @@ async fn test_delete_with_data_entry_works(pool: SqlitePool) {
     )
     .await;
 
-    let coordinator_cookie = coordinator_login(&addr).await;
+    let coordinator_cookie = login(&addr, FixtureUser::CoordinatorGSB).await;
     let statuses = get_statuses(&addr, &coordinator_cookie, election_id).await;
     assert_eq!(statuses.len(), 2);
 
@@ -902,7 +901,7 @@ async fn test_delete_with_result_works(pool: SqlitePool) {
     let election_id = 2;
     let polling_station_id = 1;
 
-    let coordinator_cookie = coordinator_login(&addr).await;
+    let coordinator_cookie = login(&addr, FixtureUser::CoordinatorGSB).await;
     create_result(&addr, polling_station_id, election_id).await;
     let statuses = get_statuses(&addr, &coordinator_cookie, election_id).await;
     assert_eq!(statuses.len(), 2);
@@ -933,7 +932,7 @@ async fn test_delete_with_investigation_works(pool: SqlitePool) {
             .status(),
         StatusCode::CREATED
     );
-    let coordinator_cookie = coordinator_login(&addr).await;
+    let coordinator_cookie = login(&addr, FixtureUser::CoordinatorGSB).await;
     let election_details = get_election_details(&addr, &coordinator_cookie, election_id).await;
     assert_eq!(
         election_details["investigations"].as_array().unwrap().len(),
@@ -959,7 +958,7 @@ async fn test_delete_with_investigation_works(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
 async fn test_delete_from_previous_committee_session_fails(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let coordinator_cookie = coordinator_login(&addr).await;
+    let coordinator_cookie = login(&addr, FixtureUser::CoordinatorGSB).await;
 
     let response = delete_polling_station(&addr, &coordinator_cookie, 5, 8).await;
 
@@ -973,7 +972,7 @@ async fn test_delete_from_previous_committee_session_fails(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_delete_not_found(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let coordinator_cookie = coordinator_login(&addr).await;
+    let coordinator_cookie = login(&addr, FixtureUser::CoordinatorGSB).await;
 
     let response = delete_polling_station(&addr, &coordinator_cookie, 2, 40404).await;
 
@@ -987,7 +986,7 @@ async fn test_delete_not_found(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_non_unique_number(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let coordinator_cookie = coordinator_login(&addr).await;
+    let coordinator_cookie = login(&addr, FixtureUser::CoordinatorGSB).await;
     let election_id = 2;
 
     let response = create_polling_station(&addr, &coordinator_cookie, election_id, 33).await;
@@ -1002,7 +1001,7 @@ async fn test_non_unique_number(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_list_invalid_election(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let coordinator_cookie = coordinator_login(&addr).await;
+    let coordinator_cookie = login(&addr, FixtureUser::CoordinatorGSB).await;
     let url = format!("http://{addr}/api/elections/1234/polling_stations");
     let response = reqwest::Client::new()
         .get(&url)
@@ -1017,7 +1016,7 @@ async fn test_list_invalid_election(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_import_validate_correct_file(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let coordinator_cookie = coordinator_login(&addr).await;
+    let coordinator_cookie = login(&addr, FixtureUser::CoordinatorGSB).await;
     let response = import_validate_polling_stations(
         &addr,
         &coordinator_cookie,
@@ -1034,7 +1033,7 @@ async fn test_import_validate_correct_file(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_import_validate_wrong_file(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let coordinator_cookie = coordinator_login(&addr).await;
+    let coordinator_cookie = login(&addr, FixtureUser::CoordinatorGSB).await;
     let response = import_validate_polling_stations(
         &addr,
         &coordinator_cookie,
@@ -1052,7 +1051,7 @@ async fn test_import_validate_wrong_file(pool: SqlitePool) {
 )))]
 async fn test_import_missing_data(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let coordinator_cookie = coordinator_login(&addr).await;
+    let coordinator_cookie = login(&addr, FixtureUser::CoordinatorGSB).await;
     let response = import_polling_stations(
         &addr,
         &coordinator_cookie,
@@ -1068,7 +1067,7 @@ async fn test_import_missing_data(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
 async fn test_import_fails_when_polling_stations_exist(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let coordinator_cookie = coordinator_login(&addr).await;
+    let coordinator_cookie = login(&addr, FixtureUser::CoordinatorGSB).await;
     let election_id = 7;
 
     let committee_session =
@@ -1098,7 +1097,7 @@ async fn test_import_fails_when_polling_stations_exist(pool: SqlitePool) {
 )))]
 async fn test_import_correct_file(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let coordinator_cookie = coordinator_login(&addr).await;
+    let coordinator_cookie = login(&addr, FixtureUser::CoordinatorGSB).await;
     let election_id = 6;
 
     let committee_session =
@@ -1136,7 +1135,7 @@ async fn check_completed_to_data_entry_on<F, Fut>(
     F: FnOnce() -> Fut,
     Fut: Future<Output = Response>,
 {
-    let coordinator_cookie = coordinator_login(addr).await;
+    let coordinator_cookie = login(addr, FixtureUser::CoordinatorGSB).await;
     let election_id = 2;
 
     create_result(addr, 1, election_id).await;
@@ -1150,7 +1149,7 @@ async fn check_completed_to_data_entry_on<F, Fut>(
     let status = action().await.status();
     assert_eq!(status, expected_status, "Unexpected response status");
 
-    let coordinator_cookie = coordinator_login(addr).await;
+    let coordinator_cookie = login(addr, FixtureUser::CoordinatorGSB).await;
     let committee_session =
         get_election_committee_session(addr, &coordinator_cookie, election_id).await;
     assert_eq!(committee_session["status"], "data_entry");
@@ -1161,7 +1160,15 @@ async fn test_completed_to_data_entry_on_create(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     check_completed_to_data_entry_on(
         &addr,
-        || async { create_polling_station(&addr, &coordinator_login(&addr).await, 2, 35).await },
+        || async {
+            create_polling_station(
+                &addr,
+                &login(&addr, FixtureUser::CoordinatorGSB).await,
+                2,
+                35,
+            )
+            .await
+        },
         StatusCode::CREATED,
     )
     .await;
@@ -1176,7 +1183,7 @@ async fn test_completed_to_data_entry_on_update(pool: SqlitePool) {
         || async {
             update_polling_station(
                 &addr,
-                &coordinator_login(&addr).await,
+                &login(&addr, FixtureUser::CoordinatorGSB).await,
                 2,
                 1,
                 serde_json::json!({
@@ -1203,19 +1210,34 @@ async fn test_completed_to_data_entry_on_delete(pool: SqlitePool) {
     check_completed_to_data_entry_on(
         &addr,
         || async {
-            delete_polling_station(&addr, &coordinator_login(&addr).await, election_id, 2).await
+            delete_polling_station(
+                &addr,
+                &login(&addr, FixtureUser::CoordinatorGSB).await,
+                election_id,
+                2,
+            )
+            .await
         },
         StatusCode::NO_CONTENT,
     )
     .await;
 
     // Delete last polling station
-    let response =
-        delete_polling_station(&addr, &coordinator_login(&addr).await, election_id, 1).await;
+    let response = delete_polling_station(
+        &addr,
+        &login(&addr, FixtureUser::CoordinatorGSB).await,
+        election_id,
+        1,
+    )
+    .await;
     assert_eq!(response.status(), StatusCode::NO_CONTENT);
 
-    let committee_session =
-        get_election_committee_session(&addr, &coordinator_login(&addr).await, election_id).await;
+    let committee_session = get_election_committee_session(
+        &addr,
+        &login(&addr, FixtureUser::CoordinatorGSB).await,
+        election_id,
+    )
+    .await;
     assert_eq!(committee_session["status"], "created");
 }
 
@@ -1225,7 +1247,7 @@ async fn test_completed_to_data_entry_on_delete(pool: SqlitePool) {
 )))]
 async fn test_create_creates_empty_data_entry_for_first_session(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let coordinator_cookie = coordinator_login(&addr).await;
+    let coordinator_cookie = login(&addr, FixtureUser::CoordinatorGSB).await;
     let election_id = 6;
 
     let response = create_polling_station(&addr, &coordinator_cookie, election_id, 1).await;
@@ -1246,7 +1268,7 @@ async fn test_create_creates_empty_data_entry_for_first_session(pool: SqlitePool
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
 async fn test_create_does_not_create_data_entry_for_next_session(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let coordinator_cookie = coordinator_login(&addr).await;
+    let coordinator_cookie = login(&addr, FixtureUser::CoordinatorGSB).await;
     let election_id = 7;
 
     let response = create_polling_station(&addr, &coordinator_cookie, election_id, 99).await;
@@ -1265,7 +1287,7 @@ async fn test_create_does_not_create_data_entry_for_next_session(pool: SqlitePoo
 )))]
 async fn test_import_creates_empty_data_entries_for_first_session(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let coordinator_cookie = coordinator_login(&addr).await;
+    let coordinator_cookie = login(&addr, FixtureUser::CoordinatorGSB).await;
     let election_id = 6;
 
     let data = include_str!("../src/eml/tests/eml110b_test.eml.xml");

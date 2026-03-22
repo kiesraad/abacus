@@ -67,7 +67,7 @@ jobs:
           rustup default stable &&
           rustup target add x86_64-unknown-linux-musl
       - name: Cargo cache
-        uses: Swatinem/rust-cache@779680da715d629ac1d338a641029a2f4372abb5 # v2
+        uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4 # v2
         with:
           workspaces: "backend -> target"
       - name: Build
@@ -114,7 +114,7 @@ jobs:
           rustup target add x86_64-unknown-linux-musl &&
           rustup component add --toolchain stable clippy rustfmt
       - name: Cargo cache
-        uses: Swatinem/rust-cache@779680da715d629ac1d338a641029a2f4372abb5 # v2
+        uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4 # v2
         with:
           workspaces: "backend -> target"
       - name: Create empty frontend build dir for memory-serve
@@ -211,6 +211,8 @@ jobs:
         run: chmod a+x ../builds/backend/abacus
       - name: Run e2e playwright tests in Chrome
         run: pnpm test:e2e --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }} --project chrome
+        env:
+          CHROMIUM_CHANNEL: chrome
       - name: Upload Playwright report
         uses: actions/upload-artifact@v7
         if: ${{ !cancelled() }}
@@ -264,7 +266,7 @@ jobs:
           rustup update nightly &&
           rustup default nightly
       - name: Cargo cache
-        uses: Swatinem/rust-cache@779680da715d629ac1d338a641029a2f4372abb5 # v2
+        uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4 # v2
         with:
           workspaces: "backend/fuzz -> target"
           shared-key: "fuzzer"

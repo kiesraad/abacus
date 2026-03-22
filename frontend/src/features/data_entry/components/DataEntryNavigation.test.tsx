@@ -40,7 +40,7 @@ function renderComponent(onSubmit: (options?: SubmitCurrentFormOptions) => Promi
 describe("DataEntryNavigation", () => {
   describe("Blocker behaviour", () => {
     test.each<Status>([
-      "deleted",
+      "discarded",
       "finalised",
       "finalising",
       "aborted",
@@ -63,7 +63,7 @@ describe("DataEntryNavigation", () => {
     test.each<Status>([
       "idle",
       "saving",
-      "deleting",
+      "discarding",
     ])("Does not block navigation without changes for status: %s", async (status) => {
       const state: DataEntryStateAndActionsLoaded = {
         ...getDefaultDataEntryStateAndActionsLoaded(),
@@ -83,7 +83,7 @@ describe("DataEntryNavigation", () => {
     test.each<Status>([
       "idle",
       "saving",
-      "deleting",
+      "discarding",
     ])("Blocks navigation when form has changes for status: %s", async (status) => {
       const state: DataEntryStateAndActionsLoaded = {
         ...getDefaultDataEntryStateAndActionsLoaded(),
@@ -182,12 +182,12 @@ describe("DataEntryNavigation", () => {
 
   describe("Abort modal actions", () => {
     test("Abort modal delete", async () => {
-      const onDeleteDataEntry = vi.fn(async () => {
+      const onDiscardDataEntry = vi.fn(async () => {
         return Promise.resolve(true);
       });
       const state: DataEntryStateAndActionsLoaded = {
         ...getDefaultDataEntryStateAndActionsLoaded(),
-        onDeleteDataEntry,
+        onDiscardDataEntry,
         status: "idle",
       };
 
@@ -208,7 +208,7 @@ describe("DataEntryNavigation", () => {
       expect(deleteButton).toBeVisible();
       deleteButton.click();
 
-      expect(onDeleteDataEntry).toHaveBeenCalled();
+      expect(onDiscardDataEntry).toHaveBeenCalled();
       await waitFor(() => {
         expect(router.state.location.pathname).toBe("/test");
       });

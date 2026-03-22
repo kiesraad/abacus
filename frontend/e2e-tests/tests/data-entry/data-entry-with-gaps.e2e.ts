@@ -28,8 +28,8 @@ test.describe("full data entry flow with gaps in party/candidate numbers", () =>
 
     const dataEntryHomePage = new DataEntryHomePage(page);
     await expect(dataEntryHomePage.fieldset).toBeVisible();
-    await dataEntryHomePage.pollingStationNumber.fill(pollingStation.number.toString());
-    await expect(dataEntryHomePage.pollingStationFeedback).toContainText(pollingStation.name);
+    await dataEntryHomePage.number.fill(pollingStation.number.toString());
+    await expect(dataEntryHomePage.feedback).toContainText(pollingStation.name);
     await dataEntryHomePage.clickStart();
 
     const extraInvestigationPage = new ExtraInvestigationPage(page);
@@ -107,7 +107,7 @@ test.describe("full data entry flow with gaps in party/candidate numbers", () =>
 
     await checkAndSavePage.save.click();
 
-    await expect(dataEntryHomePage.fieldsetNextPollingStation).toBeVisible();
+    await expect(dataEntryHomePage.fieldsetContinueNext).toBeVisible();
     await expect(dataEntryHomePage.alertDataEntrySaved).toBeVisible();
 
     await expect(dataEntryHomePage.alertDataEntrySaved).toHaveText(

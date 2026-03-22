@@ -3,7 +3,7 @@ import { useReducer } from "react";
 import { useApiClient } from "@/api/useApiClient";
 import type {
   DATA_ENTRY_CLAIM_REQUEST_PATH,
-  DATA_ENTRY_DELETE_REQUEST_PATH,
+  DATA_ENTRY_DISCARD_REQUEST_PATH,
   DATA_ENTRY_FINALISE_REQUEST_PATH,
   DATA_ENTRY_SAVE_REQUEST_PATH,
   ElectionWithPoliticalGroups,
@@ -11,7 +11,7 @@ import type {
 import type { FormSectionId } from "@/types/types";
 
 import type { DataEntryStateAndActions } from "../types/types";
-import { onDeleteDataEntry, onFinaliseDataEntry, onSubmitForm, setCache, updateFormSection } from "../utils/actions";
+import { onDiscardDataEntry, onFinaliseDataEntry, onSubmitForm, setCache, updateFormSection } from "../utils/actions";
 import dataEntryReducer, { getInitialState } from "../utils/reducer";
 import useDataEntryNavigation from "./useDataEntryNavigation";
 import { useInitialDataEntryState } from "./useInitialDataEntryState";
@@ -27,7 +27,7 @@ export default function useDataEntry(
 
   // initial request to get the current data entry from the backend
   const saveRequestPath: DATA_ENTRY_SAVE_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/data_entries/${entryNumber}`;
-  const deleteRequestPath: DATA_ENTRY_DELETE_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/data_entries/${entryNumber}`;
+  const discardRequestPath: DATA_ENTRY_DISCARD_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/data_entries/${entryNumber}`;
   const finaliseRequestPath: DATA_ENTRY_FINALISE_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/data_entries/${entryNumber}/finalise`;
   const claimRequestPath: DATA_ENTRY_CLAIM_REQUEST_PATH = `${saveRequestPath}/claim`;
   useInitialDataEntryState(client, dispatch, claimRequestPath);
@@ -39,7 +39,7 @@ export default function useDataEntry(
     ...state,
     dispatch,
     onSubmitForm: onSubmitForm(client, saveRequestPath, dispatch, state),
-    onDeleteDataEntry: onDeleteDataEntry(client, deleteRequestPath, dispatch),
+    onDiscardDataEntry: onDiscardDataEntry(client, discardRequestPath, dispatch),
     onFinaliseDataEntry: onFinaliseDataEntry(client, finaliseRequestPath, dispatch),
     setCache: setCache(dispatch),
     updateFormSection: updateFormSection(dispatch),

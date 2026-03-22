@@ -5,7 +5,7 @@ import { ApiResponseStatus } from "@/api/ApiResult";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
 import {
-  PollingStationDataEntryDeleteHandler,
+  PollingStationDataEntryDiscardHandler,
   PollingStationDataEntryFinaliseHandler,
 } from "@/testing/api-mocks/RequestHandlers";
 import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMockData";
@@ -18,7 +18,7 @@ import type {
 import { ValidationResultSet } from "@/utils/ValidationResults";
 import { getDefaultDataEntryState, getInitialValues } from "../testing/mock-data";
 import type { DataEntryAction, DataEntryState } from "../types/types";
-import { onDeleteDataEntry, onFinaliseDataEntry, onSubmitForm } from "./actions";
+import { onDiscardDataEntry, onFinaliseDataEntry, onSubmitForm } from "./actions";
 import dataEntryReducer, { getInitialState as _getInitialState } from "./reducer";
 
 function getInitialState(): DataEntryState {
@@ -345,23 +345,25 @@ describe("onSubmitForm", () => {
   });
 });
 
-describe("onDeleteDataEntry", () => {
-  test("should handle delete data entry", async () => {
-    server.use(PollingStationDataEntryDeleteHandler);
+describe("onDiscardDataEntry", () => {
+  test("should handle discard data entry", async () => {
+    server.use(PollingStationDataEntryDiscardHandler);
 
     const dispatch = vi.fn();
     const client = new ApiClient();
 
     const requestPath = "/api/polling_stations/1/data_entries/1";
-    const onDelete = onDeleteDataEntry(client, requestPath, dispatch);
+    const onDiscard = onDiscardDataEntry(client, requestPath, dispatch);
 
-    const result = await onDelete();
+    const result = await onDiscard();
 
     expect(dispatch).toHaveBeenCalledTimes(2);
     expect(dispatch.mock.calls[0]).toStrictEqual([
-      { type: "SET_STATUS", status: "deleting" } satisfies DataEntryAction,
+      { type: "SET_STATUS", status: "discarding" } satisfies DataEntryAction,
     ]);
-    expect(dispatch.mock.calls[1]).toStrictEqual([{ type: "SET_STATUS", status: "deleted" } satisfies DataEntryAction]);
+    expect(dispatch.mock.calls[1]).toStrictEqual([
+      { type: "SET_STATUS", status: "discarded" } satisfies DataEntryAction,
+    ]);
 
     expect(result).toBe(true);
   });

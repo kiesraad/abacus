@@ -1,6 +1,6 @@
 #import "common/style.typ": conf, default_header, document_numbering
 #import "common/scripts.typ": *
-#let input = json("inputs/extra-model-p-22-2-variations/lt-19-seats-and-p10.json")
+#let input = json("inputs/model-p-22-2.json")
 
 #let is_municipality = (municipal, public_body) => if (
   input.election.category == "Municipal"
@@ -140,6 +140,7 @@ De volgende rollen zijn mogelijk: voorzitter, plaatsvervangend voorzitter of lid
     left: if x > 0 { 0.5pt + gray },
     top: if y > 0 { 0.5pt + gray },
   ),
+  inset: (x: 4pt, y: 8pt),
   fill: (_, y) => if y > 1 and y <= input.seat_assignment.final_standing.len() and calc.even(y) { luma(245) },
   table.header(
     ..([Lijst], [Stemmen]).enumerate().map(((idx, h)) => {
@@ -200,6 +201,7 @@ Met de kiesdeler wordt de zetelverdeling bepaald. De kiesdeler is het aantal ste
 #table(
   columns: 5,
   stroke: none,
+  inset: (x: 4pt, y: 8pt),
   table.header(
     table.cell(small_header_text([Geldige stemmen op kandidaten])),
     table.cell([]),
@@ -226,6 +228,7 @@ Hieronder is berekend hoe vaak elke lijst qua stemmenaantal de kiesdeler heeft g
     left: if x > 0 { 0.5pt + gray },
     top: if y > 0 { 0.5pt + gray },
   ),
+  inset: (x: 4pt, y: 8pt),
   fill: (_, y) => if y > 1 and y <= input.seat_assignment.final_standing.len() and calc.even(y) { luma(245) },
   table.header(
     table.cell(small_header_text([Lijst])),
@@ -287,6 +290,7 @@ Na toewijzing van de volle zetels blijft een aantal te verdelen zetels over. Dit
         left: if x > 0 { 0.5pt + gray },
         top: if y > 0 { 0.5pt + gray },
       ),
+      inset: (x: 4pt, y: 8pt),
       table.header(
         table.cell(stroke: none, small_header_text([Lijst])),
         table.cell(small_header_text([Aantal volle zetels])),
@@ -337,11 +341,12 @@ Na toewijzing van de volle zetels blijft een aantal te verdelen zetels over. Dit
     De resterende restzetels zijn verdeeld via het systeem van de grootste gemiddelden. De lijst die na toewijzing van een restzetel het hoogste gemiddeld aantal stemmen per zetel zou hebben, krijgt een restzetel. Ook bij deze verdeling mag iedere lijst maar één restzetel krijgen.
     
     #table(
-      columns: (1fr, 9em, 12em, 8em),
+      columns: (1fr, 9em, 13em, 8em),
       stroke: (x, y) => (
         left: if x > 0 { 0.5pt + gray },
         top: if y > 0 { 0.5pt + gray },
       ),
+      inset: (x: 4pt, y: 8pt),
       table.header(
         table.cell(stroke: none, small_header_text([Lijst])),
         table.cell(align: right, small_header_text([Reeds toegewezen zetels])),
@@ -398,6 +403,7 @@ De aan de lijsten toegewezen volle zetels en restzetels zijn bij elkaar opgeteld
     left: if x > 0 { 0.5pt + gray },
     top: if y > 0 { 0.5pt + gray },
   ),
+  inset: (x: 4pt, y: 8pt),
   fill: (_, y) => if y > 1 and calc.even(y) { luma(245) },
   table.hline(stroke: none),
   table.header(
@@ -461,6 +467,7 @@ De aan de lijsten toegewezen volle zetels en restzetels zijn bij elkaar opgeteld
         left: if x > 0 { 0.5pt + gray },
         top: if y > 0 { 0.5pt + gray },
       ),
+      inset: (x: 4pt, y: 8pt),
       table.header(
         table.cell(stroke: none, small_header_text([Rang])),
         table.cell(stroke: none, small_header_text([Naam])),
@@ -493,6 +500,7 @@ De aan de lijsten toegewezen volle zetels en restzetels zijn bij elkaar opgeteld
     left: if x > 0 { 0.5pt + gray },
     top: if y > 0 { 0.5pt + gray },
   ),
+  inset: (x: 4pt, y: 8pt),
   table.header(
     table.cell(stroke: none, small_header_text([Naam])),
     table.cell(stroke: none, small_header_text([Woonplaats])),

@@ -672,6 +672,7 @@
       left: if x > 0 { 0.5pt + gray },
       top: if y > 0 { 0.5pt + gray },
     ),
+    inset: (x: 4pt, y: 8pt),
     table.header(
       table.cell(stroke: none, small_header_text([Zetel])),
       table.cell(stroke: none, small_header_text([Naam])),
@@ -705,6 +706,7 @@
       left: if x > 0 { 0.5pt + gray },
       top: if y > 0 { 0.5pt + gray },
     ),
+    inset: (x: 4pt, y: 8pt),
     table.header(
       table.cell(rowspan: 2, stroke: none, small_header_text([Lijst])),
       table.cell(align: center, colspan: steps.len(), small_header_text([Restzetel])),

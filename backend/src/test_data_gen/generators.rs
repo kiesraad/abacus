@@ -386,7 +386,6 @@ async fn generate_data_entry(
             let mut validation_results = ValidationResults::default();
             if let Err(e) = results.validate(
                 election,
-                ps,
                 &mut validation_results,
                 &FieldPath::new("data".to_string()),
             ) {

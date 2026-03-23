@@ -6,7 +6,6 @@ use crate::domain::{
     compare::Compare,
     election::ElectionWithPoliticalGroups,
     field_path::FieldPath,
-    polling_station::PollingStation,
     validate::{DataError, Validate, ValidationResult, ValidationResultCode, ValidationResults},
 };
 
@@ -334,20 +333,17 @@ impl Validate for DifferencesCounts {
     fn validate(
         &self,
         election: &ElectionWithPoliticalGroups,
-        polling_station: &PollingStation,
         validation_results: &mut ValidationResults,
         path: &FieldPath,
     ) -> Result<(), DataError> {
         // validate all counts
         self.more_ballots_count.validate(
             election,
-            polling_station,
             validation_results,
             &path.field("more_ballots_count"),
         )?;
         self.fewer_ballots_count.validate(
             election,
-            polling_station,
             validation_results,
             &path.field("fewer_ballots_count"),
         )?;

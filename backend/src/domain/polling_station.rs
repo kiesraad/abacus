@@ -327,20 +327,6 @@ impl PollingStationsForSession {
 pub(crate) mod test_helpers {
     use super::*;
 
-    /// Create a test polling station.
-    pub fn polling_station_fixture(number_of_voters: Option<u32>) -> PollingStation {
-        PollingStation {
-            id: PollingStationId::from(9911),
-            name: "Testplek".to_string(),
-            number: 34,
-            number_of_voters,
-            polling_station_type: Some(PollingStationType::Special),
-            address: "Teststraat 2a".to_string(),
-            postal_code: "1234 QY".to_string(),
-            locality: "Testdorp".to_string(),
-        }
-    }
-
     /// Fixture for a vector of polling stations. The number of polling stations returned depends
     /// on the length of the `polling_station_voter_count` slice parameter.
     pub fn polling_stations_fixture(polling_station_voter_count: &[u32]) -> Vec<PollingStation> {

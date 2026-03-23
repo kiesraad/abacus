@@ -140,7 +140,6 @@ impl Validate for DataEntryStatus {
     fn validate(
         &self,
         election: &ElectionWithPoliticalGroups,
-        polling_station: &PollingStation,
         validation_results: &mut ValidationResults,
         path: &FieldPath,
     ) -> Result<(), DataError> {
@@ -157,21 +156,13 @@ impl Validate for DataEntryStatus {
                 finalised_first_entry: entry,
                 ..
             }) => {
-                entry.validate(
-                    election,
-                    polling_station,
-                    validation_results,
-                    &"data".into(),
-                )?;
+                entry.validate(election, validation_results, &"data".into())?;
                 Ok(())
             }
             DataEntryStatus::SecondEntryInProgress(state) => {
-                state.second_entry.validate(
-                    election,
-                    polling_station,
-                    validation_results,
-                    &"data".into(),
-                )?;
+                state
+                    .second_entry
+                    .validate(election, validation_results, &"data".into())?;
                 let mut different_fields: Vec<String> = vec![];
                 state.second_entry.compare(
                     &state.finalised_first_entry,
@@ -468,7 +459,6 @@ impl DataEntryStatus {
     /// Complete the first entry and allow a second entry to be started
     pub fn finalise_first_entry(
         self,
-        polling_station: &PollingStation,
         election: &ElectionWithPoliticalGroups,
         user_id: UserId,
     ) -> Result<Self, DataEntryTransitionError> {
@@ -478,7 +468,7 @@ impl DataEntryStatus {
                     return Err(DataEntryTransitionError::CannotTransitionUsingDifferentUser);
                 }
 
-                let validation_results = self.start_validate(polling_station, election)?;
+                let validation_results = self.start_validate(election)?;
 
                 if validation_results.has_errors() {
                     Ok(Self::FirstEntryHasErrors(FirstEntryHasErrors {
@@ -509,7 +499,6 @@ impl DataEntryStatus {
     /// make the data entry process definitive or return the conflict
     pub fn finalise_second_entry(
         self,
-        polling_station: &PollingStation,
         election: &ElectionWithPoliticalGroups,
         user_id: UserId,
     ) -> Result<Self, DataEntryTransitionError> {
@@ -520,7 +509,7 @@ impl DataEntryStatus {
                 }
 
                 if state.finalised_first_entry == state.second_entry {
-                    let validation_results = self.start_validate(polling_station, election)?;
+                    let validation_results = self.start_validate(election)?;
 
                     if validation_results.has_errors() {
                         return Err(validation_results.into());
@@ -575,7 +564,6 @@ impl DataEntryStatus {
     pub fn delete_second_entry(
         self,
         user_id: UserId,
-        polling_station: &PollingStation,
         election: &ElectionWithPoliticalGroups,
     ) -> Result<Self, DataEntryTransitionError> {
         match self {
@@ -590,8 +578,7 @@ impl DataEntryStatus {
                     return Err(DataEntryTransitionError::CannotTransitionUsingDifferentUser);
                 }
 
-                let validation_results =
-                    finalised_first_entry.start_validate(polling_station, election)?;
+                let validation_results = finalised_first_entry.start_validate(election)?;
 
                 Ok(DataEntryStatus::FirstEntryFinalised(FirstEntryFinalised {
                     first_entry_user_id,
@@ -641,14 +628,11 @@ impl DataEntryStatus {
     /// Keep first entry while resolving differences
     pub fn keep_first_entry(
         self,
-        polling_station: &PollingStation,
         election: &ElectionWithPoliticalGroups,
     ) -> Result<Self, DataEntryTransitionError> {
         match &self {
             DataEntryStatus::EntriesDifferent(state) => {
-                let validation_results = state
-                    .first_entry
-                    .start_validate(polling_station, election)?;
+                let validation_results = state.first_entry.start_validate(election)?;
 
                 Ok(Self::FirstEntryFinalised(FirstEntryFinalised {
                     first_entry_user_id: state.first_entry_user_id,
@@ -664,16 +648,13 @@ impl DataEntryStatus {
     /// Keep second entry while resolving differences; it becomes the first entry
     pub fn keep_second_entry(
         self,
-        polling_station: &PollingStation,
         election: &ElectionWithPoliticalGroups,
     ) -> Result<Self, DataEntryTransitionError> {
         match &self {
             DataEntryStatus::EntriesDifferent(state) => {
                 // Note that by setting the second entry to the first
                 // entry, we keep the second entry and discard the first entry
-                let validation_results = state
-                    .second_entry
-                    .start_validate(polling_station, election)?;
+                let validation_results = state.second_entry.start_validate(election)?;
 
                 if validation_results.has_errors() {
                     Ok(Self::FirstEntryHasErrors(FirstEntryHasErrors {
@@ -853,7 +834,6 @@ mod tests {
             Candidate, CandidateNumber, CommitteeCategory, ElectionCategory, ElectionId, PGNumber,
             PoliticalGroup, VoteCountingMethod,
         },
-        polling_station::{PollingStation, PollingStationId, PollingStationType},
         results::{
             cso_first_session_results::CSOFirstSessionResults,
             political_group_candidate_votes::{CandidateVotes, PoliticalGroupCandidateVotes},
@@ -909,19 +889,6 @@ mod tests {
             user_id: UserId::from(1),
             entry: PollingStationResults::CSONextSession(Default::default()),
             client_state: None,
-        }
-    }
-
-    fn polling_station() -> PollingStation {
-        PollingStation {
-            id: PollingStationId::from(9911),
-            name: "Test polling station".to_string(),
-            number: 1,
-            number_of_voters: None,
-            polling_station_type: Some(PollingStationType::FixedLocation),
-            address: "Test street".to_string(),
-            postal_code: "1234 YQ".to_string(),
-            locality: "Test city".to_string(),
         }
     }
 
@@ -1091,7 +1058,7 @@ mod tests {
     fn first_entry_in_progress_to_first_entry_finalised() {
         // Happy path
         let status = first_entry_in_progress()
-            .finalise_first_entry(&polling_station(), &election(), UserId::from(0))
+            .finalise_first_entry(&election(), UserId::from(0))
             .unwrap();
 
         assert_eq!(
@@ -1117,11 +1084,7 @@ mod tests {
     #[test]
     fn first_entry_finalised_finalise_first_entry_error() {
         assert_eq!(
-            first_entry_finalised().finalise_first_entry(
-                &polling_station(),
-                &election(),
-                UserId::from(0)
-            ),
+            first_entry_finalised().finalise_first_entry(&election(), UserId::from(0)),
             Err(DataEntryTransitionError::FirstEntryAlreadyFinalised)
         );
     }
@@ -1129,11 +1092,7 @@ mod tests {
     #[test]
     fn second_entry_in_progress_finalise_first_entry_error() {
         assert_eq!(
-            second_entry_in_progress().finalise_first_entry(
-                &polling_station(),
-                &election(),
-                UserId::from(0)
-            ),
+            second_entry_in_progress().finalise_first_entry(&election(), UserId::from(0)),
             Err(DataEntryTransitionError::FirstEntryAlreadyFinalised)
         );
     }
@@ -1141,7 +1100,7 @@ mod tests {
     #[test]
     fn definitive_finalise_first_entry_error() {
         assert_eq!(
-            definitive().finalise_first_entry(&polling_station(), &election(), UserId::from(0)),
+            definitive().finalise_first_entry(&election(), UserId::from(0)),
             Err(DataEntryTransitionError::SecondEntryAlreadyFinalised)
         );
     }
@@ -1158,7 +1117,7 @@ mod tests {
             client_state: ClientState::new_from_str(Some("{}")).unwrap(),
         });
         let next = initial
-            .finalise_first_entry(&polling_station(), &election(), UserId::from(0))
+            .finalise_first_entry(&election(), UserId::from(0))
             .expect("should be Ok");
         assert!(
             matches!(next, DataEntryStatus::FirstEntryHasErrors(_)),
@@ -1332,7 +1291,7 @@ mod tests {
     #[test]
     fn second_entry_in_progress_finalise_equal() {
         let status = second_entry_in_progress()
-            .finalise_second_entry(&polling_station(), &election(), UserId::from(0))
+            .finalise_second_entry(&election(), UserId::from(0))
             .unwrap();
         assert_eq!(status.status_name(), DataEntryStatusName::Definitive);
     }
@@ -1362,7 +1321,7 @@ mod tests {
             first_entry_finished_at: Utc::now(),
         });
         let next = initial
-            .finalise_second_entry(&polling_station(), &election(), UserId::from(0))
+            .finalise_second_entry(&election(), UserId::from(0))
             .unwrap();
         assert!(matches!(next, DataEntryStatus::EntriesDifferent(_)));
     }
@@ -1371,11 +1330,7 @@ mod tests {
     #[test]
     fn first_entry_in_progress_finalise_as_other_user_error() {
         assert_eq!(
-            first_entry_in_progress().finalise_first_entry(
-                &polling_station(),
-                &election(),
-                UserId::from(1)
-            ),
+            first_entry_in_progress().finalise_first_entry(&election(), UserId::from(1)),
             Err(DataEntryTransitionError::CannotTransitionUsingDifferentUser)
         );
     }
@@ -1384,11 +1339,7 @@ mod tests {
     #[test]
     fn second_entry_in_progress_finalise_as_other_user_error() {
         assert_eq!(
-            second_entry_in_progress().finalise_second_entry(
-                &polling_station(),
-                &election(),
-                UserId::from(1)
-            ),
+            second_entry_in_progress().finalise_second_entry(&election(), UserId::from(1)),
             Err(DataEntryTransitionError::CannotTransitionUsingDifferentUser)
         );
     }
@@ -1460,7 +1411,6 @@ mod tests {
 
         let next = initial
             .finalise_second_entry(
-                &polling_station(),
                 &ElectionWithPoliticalGroups {
                     political_groups: vec![PoliticalGroup {
                         number: PGNumber::from(1),
@@ -1489,7 +1439,7 @@ mod tests {
     fn second_entry_in_progress_to_first_entry_finalised() {
         assert!(matches!(
             second_entry_in_progress()
-                .delete_second_entry(UserId::from(0), &polling_station(), &election())
+                .delete_second_entry(UserId::from(0), &election())
                 .unwrap(),
             DataEntryStatus::FirstEntryFinalised(_)
         ));
@@ -1499,11 +1449,7 @@ mod tests {
     #[test]
     fn second_entry_in_progress_delete_as_other_user_error() {
         assert_eq!(
-            second_entry_in_progress().delete_second_entry(
-                UserId::from(1),
-                &polling_station(),
-                &election()
-            ),
+            second_entry_in_progress().delete_second_entry(UserId::from(1), &election()),
             Err(DataEntryTransitionError::CannotTransitionUsingDifferentUser)
         );
     }
@@ -1532,7 +1478,7 @@ mod tests {
     #[test]
     fn definitive_delete_second_entry_error() {
         assert_eq!(
-            definitive().delete_second_entry(UserId::from(0), &polling_station(), &election()),
+            definitive().delete_second_entry(UserId::from(0), &election()),
             Err(DataEntryTransitionError::SecondEntryAlreadyFinalised)
         );
     }
@@ -1545,9 +1491,7 @@ mod tests {
         let second_entry = example_polling_station_results().with_difference();
 
         let initial = entries_different();
-        let next = initial
-            .keep_first_entry(&polling_station(), &election())
-            .unwrap();
+        let next = initial.keep_first_entry(&election()).unwrap();
 
         if let DataEntryStatus::FirstEntryFinalised(kept_entry) = next {
             assert_eq!(kept_entry.finalised_first_entry, first_entry);
@@ -1560,7 +1504,7 @@ mod tests {
     #[test]
     fn definitive_keep_first_entry_error() {
         assert_eq!(
-            definitive().keep_first_entry(&polling_station(), &election()),
+            definitive().keep_first_entry(&election()),
             Err(DataEntryTransitionError::Invalid)
         );
     }
@@ -1580,9 +1524,7 @@ mod tests {
             second_entry_finished_at: Utc::now(),
         });
 
-        let next = initial
-            .keep_second_entry(&polling_station(), &election())
-            .unwrap();
+        let next = initial.keep_second_entry(&election()).unwrap();
 
         if let DataEntryStatus::FirstEntryFinalised(kept_entry) = next {
             assert_eq!(kept_entry.finalised_first_entry, second_entry);
@@ -1605,9 +1547,7 @@ mod tests {
             first_entry_finished_at: Utc::now(),
             second_entry_finished_at: Utc::now(),
         });
-        let next = initial
-            .keep_second_entry(&polling_station(), &election())
-            .unwrap();
+        let next = initial.keep_second_entry(&election()).unwrap();
 
         if let DataEntryStatus::FirstEntryHasErrors(kept_entry) = next {
             assert_eq!(kept_entry.finalised_first_entry, second_entry);
@@ -1619,7 +1559,7 @@ mod tests {
     #[test]
     fn definitive_keep_second_entry_error() {
         assert_eq!(
-            definitive().keep_second_entry(&polling_station(), &election()),
+            definitive().keep_second_entry(&election()),
             Err(DataEntryTransitionError::Invalid)
         );
     }
@@ -1710,7 +1650,7 @@ mod tests {
     #[test]
     fn call_finalize_on_definitive_state() {
         assert_eq!(
-            definitive().finalise_second_entry(&polling_station(), &election(), UserId::from(1)),
+            definitive().finalise_second_entry(&election(), UserId::from(1)),
             Err(DataEntryTransitionError::SecondEntryAlreadyFinalised)
         );
     }
@@ -1758,7 +1698,7 @@ mod tests {
                     DataEntryStatus,
                     tests::{
                         election, entries_different, example_polling_station_results,
-                        first_entry_in_progress, polling_station, second_entry_in_progress,
+                        first_entry_in_progress, second_entry_in_progress,
                     },
                 },
                 results::PollingStationResults,
@@ -1791,7 +1731,7 @@ mod tests {
         fn finalise_first_entry_without_warnings() {
             assert_eq!(
                 first_entry_in_progress()
-                    .finalise_first_entry(&polling_station(), &election(), UserId::from(0))
+                    .finalise_first_entry(&election(), UserId::from(0))
                     .unwrap()
                     .finalised_with_warnings(),
                 Some(&false)
@@ -1804,7 +1744,7 @@ mod tests {
             status.set_first_entry(example_polling_station_results().with_warning());
             assert_eq!(
                 status
-                    .finalise_first_entry(&polling_station(), &election(), UserId::from(0))
+                    .finalise_first_entry(&election(), UserId::from(0))
                     .unwrap()
                     .finalised_with_warnings(),
                 Some(&true)
@@ -1815,7 +1755,7 @@ mod tests {
         fn finalise_second_entry_without_warnings() {
             assert_eq!(
                 second_entry_in_progress()
-                    .finalise_second_entry(&polling_station(), &election(), UserId::from(0))
+                    .finalise_second_entry(&election(), UserId::from(0))
                     .unwrap()
                     .finalised_with_warnings(),
                 Some(&false)
@@ -1830,7 +1770,7 @@ mod tests {
 
             assert_eq!(
                 status
-                    .finalise_second_entry(&polling_station(), &election(), UserId::from(0))
+                    .finalise_second_entry(&election(), UserId::from(0))
                     .unwrap()
                     .finalised_with_warnings(),
                 Some(&true)
@@ -1841,7 +1781,7 @@ mod tests {
         fn delete_second_entry_without_warnings() {
             assert_eq!(
                 second_entry_in_progress()
-                    .delete_second_entry(UserId::from(0), &polling_station(), &election())
+                    .delete_second_entry(UserId::from(0), &election())
                     .unwrap()
                     .finalised_with_warnings(),
                 Some(&false)
@@ -1854,7 +1794,7 @@ mod tests {
 
             assert_eq!(
                 status
-                    .delete_second_entry(UserId::from(0), &polling_station(), &election())
+                    .delete_second_entry(UserId::from(0), &election())
                     .unwrap()
                     .finalised_with_warnings(),
                 Some(&true)
@@ -1868,7 +1808,7 @@ mod tests {
 
             assert_eq!(
                 status
-                    .delete_second_entry(UserId::from(0), &polling_station(), &election())
+                    .delete_second_entry(UserId::from(0), &election())
                     .unwrap()
                     .finalised_with_warnings(),
                 Some(&false)
@@ -1879,7 +1819,7 @@ mod tests {
         fn keep_first_entry_without_warnings() {
             assert_eq!(
                 entries_different()
-                    .keep_first_entry(&polling_station(), &election())
+                    .keep_first_entry(&election())
                     .unwrap()
                     .finalised_with_warnings(),
                 Some(&false)
@@ -1892,7 +1832,7 @@ mod tests {
             status.set_first_entry(example_polling_station_results().with_warning());
             assert_eq!(
                 status
-                    .keep_first_entry(&polling_station(), &election())
+                    .keep_first_entry(&election())
                     .unwrap()
                     .finalised_with_warnings(),
                 Some(&true)
@@ -1903,7 +1843,7 @@ mod tests {
         fn keep_second_entry_without_warnings() {
             assert_eq!(
                 entries_different()
-                    .keep_second_entry(&polling_station(), &election())
+                    .keep_second_entry(&election())
                     .unwrap()
                     .finalised_with_warnings(),
                 Some(&false)
@@ -1915,7 +1855,7 @@ mod tests {
             status.set_second_entry(example_polling_station_results().with_warning());
             assert_eq!(
                 status
-                    .keep_second_entry(&polling_station(), &election())
+                    .keep_second_entry(&election())
                     .unwrap()
                     .finalised_with_warnings(),
                 Some(&true)

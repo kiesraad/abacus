@@ -13,7 +13,6 @@ use crate::domain::{
     compare::Compare,
     election::{ElectionWithPoliticalGroups, PoliticalGroup},
     field_path::FieldPath,
-    polling_station::PollingStation,
     validate::{DataError, Validate, ValidateRoot, ValidationResults},
 };
 
@@ -279,7 +278,6 @@ impl Validate for PollingStationResults {
     fn validate(
         &self,
         election: &ElectionWithPoliticalGroups,
-        polling_station: &PollingStation,
         validation_results: &mut ValidationResults,
         path: &FieldPath,
     ) -> Result<(), DataError> {
@@ -287,24 +285,22 @@ impl Validate for PollingStationResults {
             PollingStationResults::CSOFirstSession(results) => {
                 results.extra_investigation.validate(
                     election,
-                    polling_station,
                     validation_results,
                     &path.field("extra_investigation"),
                 )?;
 
                 results.counting_differences_polling_station.validate(
                     election,
-                    polling_station,
                     validation_results,
                     &path.field("counting_differences_polling_station"),
                 )?;
 
                 self.as_common()
-                    .validate(election, polling_station, validation_results, path)
+                    .validate(election, validation_results, path)
             }
             PollingStationResults::CSONextSession(_) => {
                 self.as_common()
-                    .validate(election, polling_station, validation_results, path)
+                    .validate(election, validation_results, path)
             }
         }
     }

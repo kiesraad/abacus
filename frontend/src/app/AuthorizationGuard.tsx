@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Navigate, useMatches } from "react-router";
 import { useApiState } from "@/api/useApiState";
+import { getPostLoginPath } from "@/features/account/utils/getPostLoginPath";
 import { AuthorizationDialog } from "./AuthorizationDialog";
 import { EXPIRATION_DIALOG_SECONDS } from "./authorizationConstants";
 
@@ -27,7 +28,8 @@ interface AuthorizationGuardProps {
  *   redirected to `/account/login` with `{ unauthorized: true }` (this shows a message on the login page).
  * - If the current route is not public and the computed session lifetime has expired, the user is redirected to
  *   `/account/login` with `{ unauthorized: true }`.
- * - If the user is already logged in and tries to open `/account/login`, the user is redirected to `/elections`.
+ * - If the user is already logged in and tries to open `/account/login`, the user is redirected to the same
+ *   post-login destination used by the login form: `/account/setup` for first-login users, otherwise `/elections`.
  *
  * If none of the redirect conditions apply, the guard renders the session-expiration dialog and the protected
  * children.
@@ -87,7 +89,7 @@ export function AuthorizationGuard({ children }: AuthorizationGuardProps) {
 
   // navigate to the overview if the user is logged in and tries to access the login page
   if (routeMatch?.pathname === "/account/login" && user !== null) {
-    return <Navigate to="/elections" />;
+    return <Navigate to={getPostLoginPath(user)} replace />;
   }
 
   return (

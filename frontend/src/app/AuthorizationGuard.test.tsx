@@ -2,9 +2,11 @@ import { render as rtlRender } from "@testing-library/react";
 import { type RouteObject, RouterProvider } from "react-router";
 import { describe, expect, test, vi } from "vitest";
 
+import { ApiClient } from "@/api/ApiClient";
+import { ApiProviderContext, type ApiState } from "@/api/ApiProviderContext";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 import { screen, setupTestRouter, waitFor } from "@/testing/test-utils";
-import type { Role } from "@/types/generated/openapi";
+import type { LoginResponse, Role } from "@/types/generated/openapi";
 import { AuthorizationGuard } from "./AuthorizationGuard";
 
 async function renderAuthorizationGuard({
@@ -25,6 +27,41 @@ async function renderAuthorizationGuard({
     <TestUserProvider userRole={userRole} overrideExpiration={expiration}>
       <RouterProvider router={router} />
     </TestUserProvider>,
+  );
+
+  return router;
+}
+
+async function renderAuthorizationGuardWithUser({
+  routes,
+  initialPath,
+  user,
+  expiration,
+}: {
+  routes: RouteObject[];
+  initialPath: string;
+  user: LoginResponse;
+  expiration?: Date;
+}) {
+  const router = setupTestRouter(routes);
+  await router.navigate(initialPath);
+
+  const apiState: ApiState = {
+    client: new ApiClient(),
+    user,
+    setUser: () => {},
+    logout: async () => Promise.reject(new Error("Not implemented in test")),
+    login: async () => Promise.reject(new Error("Not implemented in test")),
+    loading: false,
+    expiration: expiration ?? new Date(Date.now() + 1000 * 60 * 30),
+    extendSession: async () => {},
+    airGapError: false,
+  };
+
+  rtlRender(
+    <ApiProviderContext.Provider value={apiState}>
+      <RouterProvider router={router} />
+    </ApiProviderContext.Provider>,
   );
 
   return router;
@@ -120,5 +157,37 @@ describe("AuthorizationGuard", () => {
 
     expect(router.state.location.pathname).toBe("/elections");
     expect(screen.getByText("Elections overview")).toBeVisible();
+  });
+
+  test("redirects a first-login user from the login page to /account/setup", async () => {
+    const router = await renderAuthorizationGuardWithUser({
+      initialPath: "/account/login",
+      user: {
+        user_id: 1,
+        username: "test",
+        role: "administrator",
+        fullname: "",
+        needs_password_change: true,
+      },
+      routes: [
+        {
+          path: "/account/login",
+          element: (
+            <AuthorizationGuard>
+              <div>Login page</div>
+            </AuthorizationGuard>
+          ),
+          handle: { public: true },
+        },
+        {
+          path: "/account/setup",
+          element: <div>Account setup</div>,
+          handle: { roles: ["administrator"] },
+        },
+      ],
+    });
+
+    expect(router.state.location.pathname).toBe("/account/setup");
+    expect(screen.getByText("Account setup")).toBeVisible();
   });
 });

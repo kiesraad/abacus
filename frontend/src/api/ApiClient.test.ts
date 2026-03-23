@@ -21,10 +21,10 @@ describe("ApiClient", () => {
     });
 
     test("200 response is parsed as success", async () => {
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, { fizz: "buzz" });
+      overrideOnce("post", "/api/data_entries/1/1", 200, { fizz: "buzz" });
 
       const client = new ApiClient();
-      const parsedResponse = await client.postRequest("/api/polling_stations/1/data_entries/1", {
+      const parsedResponse = await client.postRequest("/api/data_entries/1/1", {
         data: null,
       });
 
@@ -36,14 +36,14 @@ describe("ApiClient", () => {
     });
 
     test("422 response is parsed as client error", async () => {
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 422, {
+      overrideOnce("post", "/api/data_entries/1/1", 422, {
         error: "Error message",
         fatal: true,
         reference: "InternalServerError",
       });
 
       const client = new ApiClient();
-      const parsedResponse = await client.postRequest("/api/polling_stations/1/data_entries/1", undefined);
+      const parsedResponse = await client.postRequest("/api/data_entries/1/1", undefined);
 
       const expectedResponse = new FatalApiError(ApiResponseStatus.ClientError, 422, "Error message");
       expect(parsedResponse).toStrictEqual(expectedResponse);
@@ -55,10 +55,10 @@ describe("ApiClient", () => {
         fatal: true,
         reference: "InternalServerError",
       };
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 500, responseBody);
+      overrideOnce("post", "/api/data_entries/1/1", 500, responseBody);
 
       const client = new ApiClient();
-      const parsedResponse = await client.postRequest("/api/polling_stations/1/data_entries/1", {
+      const parsedResponse = await client.postRequest("/api/data_entries/1/1", {
         data: null,
       });
 
@@ -71,10 +71,10 @@ describe("ApiClient", () => {
         fatal: false,
         reference: "InternalServerError",
       };
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 500, responseBody);
+      overrideOnce("post", "/api/data_entries/1/1", 500, responseBody);
 
       const client = new ApiClient();
-      const parsedResponse = await client.postRequest("/api/polling_stations/1/data_entries/1", {
+      const parsedResponse = await client.postRequest("/api/data_entries/1/1", {
         data: null,
       });
 
@@ -87,10 +87,10 @@ describe("ApiClient", () => {
         fatal: false,
         reference: "MultipleChoices",
       };
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 300, responseBody);
+      overrideOnce("post", "/api/data_entries/1/1", 300, responseBody);
 
       const client = new ApiClient();
-      const parsedResponse = await client.postRequest("/api/polling_stations/1/data_entries/1", {
+      const parsedResponse = await client.postRequest("/api/data_entries/1/1", {
         data: null,
       });
 
@@ -103,11 +103,11 @@ describe("ApiClient", () => {
   describe("Responses with non-json body", () => {
     test("318 response returns an error", async () => {
       const responseStatus = 318;
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", responseStatus, "");
+      overrideOnce("post", "/api/data_entries/1/1", responseStatus, "");
 
       const client = new ApiClient();
 
-      const parsedResponse = await client.postRequest("/api/polling_stations/1/data_entries/1", { data: null });
+      const parsedResponse = await client.postRequest("/api/data_entries/1/1", { data: null });
 
       const expectedResponse = new FatalApiError(
         ApiResponseStatus.ServerError,

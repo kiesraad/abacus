@@ -1,9 +1,11 @@
 import { userEvent } from "@testing-library/user-event";
 import * as ReactRouter from "react-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
+import { ElectionStatusProviderContext } from "@/hooks/election/ElectionStatusProviderContext";
 import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
 import * as useUser from "@/hooks/user/useUser";
 import { electionMockData, politicalGroupMockData } from "@/testing/api-mocks/ElectionMockData";
+import { electionStatusesMock } from "@/testing/api-mocks/ElectionStatusMockData";
 import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
 import {
   PollingStationDataEntryClaimHandler,
@@ -34,15 +36,17 @@ function renderForm({ election, groupNumber }: { election?: ElectionWithPolitica
   vi.spyOn(ReactRouter, "useParams").mockReturnValue({ sectionId: `political_group_votes_${groupNumber || 1}` });
 
   return render(
-    <MessagesProvider>
-      <DataEntryProvider
-        election={election || electionMockData}
-        pollingStation={pollingStationMockData[0]!}
-        entryNumber={1}
-      >
-        <DataEntrySection committeeCategory={electionMockData.committee_category} />
-      </DataEntryProvider>
-    </MessagesProvider>,
+    <ElectionStatusProviderContext.Provider value={{ statuses: electionStatusesMock, refetch: vi.fn() }}>
+      <MessagesProvider>
+        <DataEntryProvider
+          election={election || electionMockData}
+          pollingStation={pollingStationMockData[0]!}
+          entryNumber={1}
+        >
+          <DataEntrySection committeeCategory={electionMockData.committee_category} />
+        </DataEntryProvider>
+      </MessagesProvider>
+    </ElectionStatusProviderContext.Provider>,
   );
 }
 
@@ -199,7 +203,7 @@ describe("Test CandidatesVotesForm", () => {
     });
 
     test("Form field entry and keybindings", async () => {
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+      overrideOnce("post", "/api/data_entries/1/1", 200, {
         validation_results: { errors: [], warnings: [] },
       });
 
@@ -440,7 +444,7 @@ describe("Test CandidatesVotesForm", () => {
 
       expect(spy).toHaveBeenCalled();
       const { url, method, body } = getUrlMethodAndBody(spy.mock.calls);
-      expect(url).toEqual("/api/polling_stations/1/data_entries/1");
+      expect(url).toEqual("/api/data_entries/1/1");
       expect(method).toEqual("POST");
       const request_body = body as DATA_ENTRY_SAVE_REQUEST_BODY;
       expect(request_body.data).toEqual(expectedRequest.data);
@@ -458,7 +462,7 @@ describe("Test CandidatesVotesForm", () => {
       renderForm();
 
       await screen.findByTestId("political_group_votes_1_form");
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+      overrideOnce("post", "/api/data_entries/1/1", 200, {
         validation_results: { errors: [validationResultMockData.F401], warnings: [] },
       });
 
@@ -494,7 +498,7 @@ describe("Test CandidatesVotesForm", () => {
       renderForm();
 
       await screen.findByTestId("political_group_votes_1_form");
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+      overrideOnce("post", "/api/data_entries/1/1", 200, {
         validation_results: { errors: [validationResultMockData.F402], warnings: [] },
       });
 

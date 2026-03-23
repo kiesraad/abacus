@@ -41,7 +41,7 @@ const renderPage = async () => {
 };
 
 function overrideResponseStatus(status: DataEntryStatusName) {
-  overrideOnce("post", "/api/polling_stations/3/data_entries/resolve_differences", 200, { status });
+  overrideOnce("post", "/api/data_entries/3/resolve_differences", 200, { status });
 }
 
 describe("ResolveDifferencesPage", () => {

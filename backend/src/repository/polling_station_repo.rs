@@ -546,6 +546,20 @@ pub async fn link_data_entry(
     .map(PollingStationForSession::from)
 }
 
+/// Clear `data_entry_id` on a polling station (counterpart to `link_data_entry`).
+pub async fn unlink_data_entry(
+    conn: &mut SqliteConnection,
+    polling_station_id: PollingStationId,
+) -> Result<(), sqlx::Error> {
+    query!(
+        "UPDATE polling_stations SET data_entry_id = NULL WHERE id = ?",
+        polling_station_id
+    )
+    .execute(conn)
+    .await?;
+    Ok(())
+}
+
 /// List all polling stations for a committee session (without session metadata)
 pub async fn list_polling_stations(
     conn: &mut SqliteConnection,
@@ -644,6 +658,7 @@ pub async fn list_first_session_with_status(
             p.id AS "id: PollingStationId",
             p.number AS "number: PollingStationNumber",
             p.name,
+            p.prev_data_entry_id AS "prev_data_entry_id: DataEntryId",
             de.state AS "state: Json<DataEntryStatus>"
         FROM polling_stations AS p
         JOIN committee_sessions AS c ON c.id = p.committee_session_id
@@ -658,6 +673,7 @@ pub async fn list_first_session_with_status(
             id: row.id,
             number: row.number,
             name: row.name,
+            prev_data_entry_id: row.prev_data_entry_id,
         }),
         status: row.state.map(|j| j.0).unwrap_or_default(),
     })
@@ -678,6 +694,7 @@ pub async fn list_next_session_with_status(
             p.id AS "id: PollingStationId",
             p.number AS "number: PollingStationNumber",
             p.name,
+            p.prev_data_entry_id AS "prev_data_entry_id: DataEntryId",
             de.state AS "state: Json<DataEntryStatus>"
         FROM polling_stations AS p
         JOIN committee_sessions AS c ON c.id = p.committee_session_id
@@ -692,6 +709,7 @@ pub async fn list_next_session_with_status(
             id: row.id,
             number: row.number,
             name: row.name,
+            prev_data_entry_id: row.prev_data_entry_id,
         }),
         status: row.state.map(|j| j.0).unwrap_or_default(),
     })

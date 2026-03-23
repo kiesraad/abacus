@@ -1,9 +1,11 @@
 import { type UserEvent, userEvent } from "@testing-library/user-event";
 import * as ReactRouter from "react-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
+import { ElectionStatusProviderContext } from "@/hooks/election/ElectionStatusProviderContext";
 import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
 import * as useUser from "@/hooks/user/useUser";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
+import { electionStatusesMock } from "@/testing/api-mocks/ElectionStatusMockData";
 import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
 import {
   PollingStationDataEntryClaimHandler,
@@ -23,11 +25,13 @@ function renderComponent(sectionId: string) {
   vi.spyOn(ReactRouter, "useParams").mockReturnValue({ sectionId });
 
   return renderReturningRouter(
-    <MessagesProvider>
-      <DataEntryProvider election={electionMockData} pollingStation={pollingStationMockData[0]!} entryNumber={1}>
-        <DataEntrySection committeeCategory={electionMockData.committee_category} />
-      </DataEntryProvider>
-    </MessagesProvider>,
+    <ElectionStatusProviderContext.Provider value={{ statuses: electionStatusesMock, refetch: vi.fn() }}>
+      <MessagesProvider>
+        <DataEntryProvider election={electionMockData} pollingStation={pollingStationMockData[0]!} entryNumber={1}>
+          <DataEntrySection committeeCategory={electionMockData.committee_category} />
+        </DataEntryProvider>
+      </MessagesProvider>
+    </ElectionStatusProviderContext.Provider>,
   );
 }
 
@@ -83,7 +87,7 @@ describe("DataEntrySection", () => {
 
   describe("Session paused", () => {
     test("Redirect when committee session is paused is returned on claim", async () => {
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1/claim", 409, {
+      overrideOnce("post", "/api/data_entries/1/1/claim", 409, {
         error: "Committee session data entry is paused",
         fatal: true,
         reference: "CommitteeSessionPaused",
@@ -98,7 +102,7 @@ describe("DataEntrySection", () => {
 
     test("Alert when committee session is paused is shown on save and navigate back to overview", async () => {
       const user = userEvent.setup();
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 409, {
+      overrideOnce("post", "/api/data_entries/1/1", 409, {
         error: "Committee session data entry is paused",
         fatal: true,
         reference: "CommitteeSessionPaused",
@@ -142,7 +146,7 @@ describe("DataEntrySection", () => {
 
     beforeEach(async () => {
       user = userEvent.setup();
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+      overrideOnce("post", "/api/data_entries/1/1", 200, {
         validation_results: { errors: [], warnings: [validationResultMockData.W001] },
       } satisfies SaveDataEntryResponse);
       renderComponent("voters_votes_counts");

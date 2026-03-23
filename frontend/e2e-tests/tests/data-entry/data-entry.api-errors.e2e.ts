@@ -100,7 +100,7 @@ test.describe("data entry - api error responses", () => {
     const extraInvestigationPage = new ExtraInvestigationPage(page);
     await expect(extraInvestigationPage.fieldset).toBeVisible();
 
-    await page.route(`*/**/api/polling_stations/${pollingStation.id}/data_entries/1`, async (route) => {
+    await page.route(`*/**/api/data_entries/*/1`, async (route) => {
       await route.fulfill({
         status: 422,
         json: {
@@ -125,7 +125,7 @@ test.describe("data entry - api error responses", () => {
   test("5xx fatal response results in error shown", async ({ page, pollingStation }) => {
     await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1`);
 
-    await page.route(`*/**/api/polling_stations/${pollingStation.id}/data_entries/1`, async (route) => {
+    await page.route(`*/**/api/data_entries/*/1`, async (route) => {
       await route.fulfill({
         status: 500,
         json: {

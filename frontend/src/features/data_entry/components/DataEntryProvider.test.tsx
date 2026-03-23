@@ -2,8 +2,10 @@ import { waitFor } from "@testing-library/react";
 import * as ReactRouter from "react-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import { DataEntryProvider } from "@/features/data_entry/components/DataEntryProvider";
+import { ElectionStatusProviderContext } from "@/hooks/election/ElectionStatusProviderContext";
 import * as useMessages from "@/hooks/messages/useMessages";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
+import { electionStatusesMock } from "@/testing/api-mocks/ElectionStatusMockData";
 import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
 import { ElectionRequestHandler, PollingStationDataEntryClaimHandler } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
@@ -14,9 +16,11 @@ function renderProvider() {
   vi.spyOn(ReactRouter, "useParams").mockReturnValue({ sectionId: "test" });
 
   return render(
-    <DataEntryProvider election={electionMockData} pollingStation={pollingStationMockData[0]!} entryNumber={1}>
-      <div>Children</div>
-    </DataEntryProvider>,
+    <ElectionStatusProviderContext.Provider value={{ statuses: electionStatusesMock, refetch: vi.fn() }}>
+      <DataEntryProvider election={electionMockData} pollingStation={pollingStationMockData[0]!} entryNumber={1}>
+        <div>Children</div>
+      </DataEntryProvider>
+    </ElectionStatusProviderContext.Provider>,
   );
 }
 
@@ -42,7 +46,7 @@ describe("DataEntryProvider", () => {
   });
 
   test("Navigate and show message on DataEntryAlreadyClaimed", async () => {
-    overrideOnce("post", "/api/polling_stations/1/data_entries/1/claim", 409, {
+    overrideOnce("post", "/api/data_entries/1/1/claim", 409, {
       error: "First entry already claimed",
       fatal: false,
       reference: "DataEntryAlreadyClaimed",
@@ -61,7 +65,7 @@ describe("DataEntryProvider", () => {
   });
 
   test("Navigate and show message on DataEntryAlreadyFinalised", async () => {
-    overrideOnce("post", "/api/polling_stations/1/data_entries/1/claim", 409, {
+    overrideOnce("post", "/api/data_entries/1/1/claim", 409, {
       error: "First entry already finalised",
       fatal: false,
       reference: "DataEntryAlreadyFinalised",
@@ -80,7 +84,7 @@ describe("DataEntryProvider", () => {
   });
 
   test("Navigate and show message on DataEntryNotAllowed", async () => {
-    overrideOnce("post", "/api/polling_stations/1/data_entries/1/claim", 409, {
+    overrideOnce("post", "/api/data_entries/1/1/claim", 409, {
       error: "Data entry not allowed, no investigation with corrected results.",
       fatal: false,
       reference: "DataEntryNotAllowed",
@@ -99,7 +103,7 @@ describe("DataEntryProvider", () => {
   });
 
   test("Navigate and show message on InvalidStateTransition", async () => {
-    overrideOnce("post", "/api/polling_stations/1/data_entries/1/claim", 409, {
+    overrideOnce("post", "/api/data_entries/1/1/claim", 409, {
       error: "Invalid state transition",
       fatal: false,
       reference: "InvalidStateTransition",

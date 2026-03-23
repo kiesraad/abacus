@@ -357,7 +357,7 @@ export const PollingStationDataEntryGetDifferencesHandler = http.get<
   ParamsToString<DATA_ENTRY_GET_DIFFERENCES_REQUEST_PARAMS>,
   null,
   DataEntryGetDifferencesResponse
->("/api/polling_stations/3/data_entries/resolve_differences" satisfies DATA_ENTRY_GET_DIFFERENCES_REQUEST_PATH, () =>
+>("/api/data_entries/3/resolve_differences" satisfies DATA_ENTRY_GET_DIFFERENCES_REQUEST_PATH, () =>
   HttpResponse.json(dataEntryStatusDifferences, { status: 200 }),
 );
 
@@ -365,7 +365,7 @@ export const PollingStationDataEntryGetHandler = http.get<
   ParamsToString<DATA_ENTRY_GET_REQUEST_PARAMS>,
   null,
   DataEntryGetResponse
->("/api/polling_stations/5/data_entries/get" satisfies DATA_ENTRY_GET_REQUEST_PATH, () =>
+>("/api/data_entries/5/get" satisfies DATA_ENTRY_GET_REQUEST_PATH, () =>
   HttpResponse.json(dataEntryHasErrorsGetMockResponse, { status: 200 }),
 );
 
@@ -373,16 +373,15 @@ export const PollingStationDataEntryResolveDifferencesHandler = http.post<
   ParamsToString<DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_PARAMS>,
   DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_BODY,
   DataEntryStatusResponse
->(
-  "/api/polling_stations/3/data_entries/resolve_differences" satisfies DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_PATH,
-  () => HttpResponse.json({ status: "empty" }, { status: 200 }),
+>("/api/data_entries/3/resolve_differences" satisfies DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_PATH, () =>
+  HttpResponse.json({ status: "empty" }, { status: 200 }),
 );
 
 export const PollingStationDataEntryResolveErrorsHandler = http.post<
   ParamsToString<DATA_ENTRY_RESOLVE_ERRORS_REQUEST_PARAMS>,
   DATA_ENTRY_RESOLVE_ERRORS_REQUEST_BODY,
   DataEntryStatusResponse
->("/api/polling_stations/5/data_entries/resolve_errors" satisfies DATA_ENTRY_RESOLVE_ERRORS_REQUEST_PATH, () =>
+>("/api/data_entries/5/resolve_errors" satisfies DATA_ENTRY_RESOLVE_ERRORS_REQUEST_PATH, () =>
   HttpResponse.json({ status: "empty" }, { status: 200 }),
 );
 
@@ -401,7 +400,7 @@ export const PollingStationDataEntrySaveHandler = http.post<
   ParamsToString<DATA_ENTRY_SAVE_REQUEST_PARAMS>,
   DATA_ENTRY_SAVE_REQUEST_BODY,
   SaveDataEntryResponse | ErrorResponse
->("/api/polling_stations/1/data_entries/1" satisfies DATA_ENTRY_SAVE_REQUEST_PATH, () =>
+>("/api/data_entries/1/1" satisfies DATA_ENTRY_SAVE_REQUEST_PATH, () =>
   HttpResponse.json(saveDataEntryResponse, { status: 200 }),
 );
 
@@ -410,13 +409,13 @@ export const PollingStationDataEntryClaimHandler = http.post<
   ParamsToString<DATA_ENTRY_CLAIM_REQUEST_PARAMS>,
   null,
   ClaimDataEntryResponse | ErrorResponse
->("/api/polling_stations/1/data_entries/1/claim" satisfies DATA_ENTRY_CLAIM_REQUEST_PATH, () =>
+>("/api/data_entries/1/1/claim" satisfies DATA_ENTRY_CLAIM_REQUEST_PATH, () =>
   HttpResponse.json(claimDataEntryResponse, { status: 200 }),
 );
 
 // discard data entry handler
 export const PollingStationDataEntryDiscardHandler = http.delete<ParamsToString<DATA_ENTRY_DISCARD_REQUEST_PARAMS>>(
-  "/api/polling_stations/1/data_entries/1" satisfies DATA_ENTRY_DISCARD_REQUEST_PATH,
+  "/api/data_entries/1/1" satisfies DATA_ENTRY_DISCARD_REQUEST_PATH,
   () => new HttpResponse(null, { status: 204 }),
 );
 
@@ -425,13 +424,13 @@ export const PollingStationDataEntryFinaliseHandler = http.post<
   ParamsToString<DATA_ENTRY_FINALISE_REQUEST_PARAMS>,
   null,
   DataEntryStatusResponse | ErrorResponse
->("/api/polling_stations/1/data_entries/1/finalise" satisfies DATA_ENTRY_FINALISE_REQUEST_PATH, () =>
+>("/api/data_entries/1/1/finalise" satisfies DATA_ENTRY_FINALISE_REQUEST_PATH, () =>
   HttpResponse.json({ status: "first_entry_finalised" }, { status: 200 }),
 );
 
 // reset data entry handler
 export const PollingStationDataEntryResetHandler = http.delete<ParamsToString<DATA_ENTRY_RESET_REQUEST_PARAMS>>(
-  "/api/polling_stations/5/data_entries" satisfies DATA_ENTRY_RESET_REQUEST_PATH,
+  "/api/data_entries/5" satisfies DATA_ENTRY_RESET_REQUEST_PATH,
   () => new HttpResponse(null, { status: 204 }),
 );
 

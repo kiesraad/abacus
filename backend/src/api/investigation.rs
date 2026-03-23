@@ -34,10 +34,8 @@ use crate::{
     error::ErrorReference,
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
     repository::{
-        committee_session_repo,
-        data_entry_repo::{data_entry_exists, previous_results_for_polling_station},
-        election_repo, investigation_repo, polling_station_repo,
-        user_repo::User,
+        committee_session_repo, data_entry_repo::previous_results_for_polling_station,
+        election_repo, investigation_repo, polling_station_repo, user_repo::User,
     },
     service::{change_committee_session_status, create_empty_data_entry},
 };
@@ -415,7 +413,8 @@ async fn reopen_investigation(
     current: InvestigationStatus,
     request: &PollingStationInvestigationUpdateRequest,
 ) -> Result<InvestigationStatus, APIError> {
-    if data_entry_exists(conn, polling_station_id).await? {
+    let ps = polling_station_repo::get(conn, polling_station_id).await?;
+    if ps.data_entry_id().is_some() {
         if request.accept_data_entry_deletion == Some(true) {
             delete_data_entry_for_polling_station(
                 conn,
@@ -445,7 +444,8 @@ async fn switch_to_without_new_results(
     current: InvestigationStatus,
     request: PollingStationInvestigationUpdateRequest,
 ) -> Result<InvestigationStatus, APIError> {
-    if data_entry_exists(conn, polling_station_id).await? {
+    let ps = polling_station_repo::get(conn, polling_station_id).await?;
+    if ps.data_entry_id().is_some() {
         if request.accept_data_entry_deletion == Some(true) {
             delete_data_entry_for_polling_station(
                 conn,

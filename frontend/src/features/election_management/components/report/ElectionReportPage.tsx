@@ -59,19 +59,10 @@ export function ElectionReportPage() {
   }
 
   function pageTitle() {
-    if (election.committee_category === "CSB") {
-      return (
-        <>
-          {t("election_report.report")}{" "}
-          {t(`committee_category.${election.committee_category}.short`).replace(/(^\w|\s\w)/g, (m) => m.toLowerCase())}
-        </>
-      );
-    }
-
     return (
       <>
-        {sessionLabel}{" "}
-        {t(`committee_category.${election.committee_category}.short`).replace(/(^\w|\s\w)/g, (m) => m.toUpperCase())}
+        {election.committee_category === "CSB" ? t("election_report.report") : sessionLabel}{" "}
+        {t(`committee_category.${election.committee_category}.short`).replace(/(^\w|\s\w)/g, (m) => m.toLowerCase())}
       </>
     );
   }
@@ -96,7 +87,7 @@ export function ElectionReportPage() {
 
   return (
     <>
-      <PageTitle title={`${t("election.title.finish_data_entry")} - Abacus`} />
+      <PageTitle title={`${pageTitle.toString()} - Abacus`} />
       <header>
         <section>
           <h1>{pageTitle()}</h1>

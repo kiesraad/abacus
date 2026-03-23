@@ -125,7 +125,7 @@ describe("ElectionReportPage", () => {
       const router = renderPage();
 
       expect(
-        await screen.findByRole("heading", { level: 1, name: "Eerste zitting Gemeentelijk Stembureau" }),
+        await screen.findByRole("heading", { level: 1, name: "Eerste zitting gemeentelijk stembureau" }),
       ).toBeVisible();
       expect(
         await screen.findByRole("heading", {
@@ -157,7 +157,7 @@ describe("ElectionReportPage", () => {
       renderPage();
 
       expect(
-        await screen.findByRole("heading", { level: 1, name: "Eerste zitting Gemeentelijk Stembureau" }),
+        await screen.findByRole("heading", { level: 1, name: "Eerste zitting gemeentelijk stembureau" }),
       ).toBeVisible();
       expect(
         await screen.findByRole("heading", {
@@ -192,7 +192,7 @@ describe("ElectionReportPage", () => {
       renderPage();
 
       expect(
-        await screen.findByRole("heading", { level: 1, name: "Eerste zitting Gemeentelijk Stembureau" }),
+        await screen.findByRole("heading", { level: 1, name: "Eerste zitting gemeentelijk stembureau" }),
       ).toBeVisible();
       expect(
         await screen.findByRole("heading", {
@@ -241,7 +241,7 @@ describe("ElectionReportPage", () => {
       rtlRender(<Providers router={router} />);
 
       expect(
-        await screen.findByRole("heading", { level: 1, name: "Eerste zitting Gemeentelijk Stembureau" }),
+        await screen.findByRole("heading", { level: 1, name: "Eerste zitting gemeentelijk stembureau" }),
       ).toBeVisible();
       expect(
         await screen.findByRole("heading", {
@@ -315,7 +315,7 @@ describe("ElectionReportPage", () => {
       rtlRender(<Providers router={router} />);
 
       expect(
-        await screen.findByRole("heading", { level: 1, name: "Tweede zitting Gemeentelijk Stembureau" }),
+        await screen.findByRole("heading", { level: 1, name: "Tweede zitting gemeentelijk stembureau" }),
       ).toBeVisible();
 
       expect(
@@ -353,7 +353,7 @@ describe("ElectionReportPage", () => {
       rtlRender(<Providers router={router} />);
 
       expect(
-        await screen.findByRole("heading", { level: 1, name: "Tweede zitting Gemeentelijk Stembureau" }),
+        await screen.findByRole("heading", { level: 1, name: "Tweede zitting gemeentelijk stembureau" }),
       ).toBeVisible();
 
       expect(

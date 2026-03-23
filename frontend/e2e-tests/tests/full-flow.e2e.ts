@@ -660,7 +660,7 @@ test.describe("full flow", () => {
     await electionDetails.toCertifiedResults.click();
 
     const electionHomePage = new ElectionReport(page);
-    await expect(electionHomePage.header).toContainText("Tweede zitting Gemeentelijk Stembureau");
+    await expect(electionHomePage.header).toContainText("Tweede zitting gemeentelijk stembureau");
     const downloadPromise = page.waitForEvent("download");
     await electionHomePage.downloadSecondSessionZip.click();
 

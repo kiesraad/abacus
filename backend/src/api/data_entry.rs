@@ -955,12 +955,15 @@ pub struct ElectionStatusResponseEntry {
     ),
 )]
 async fn election_status(
+    user: User,
     State(pool): State<SqlitePool>,
     Path(election_id): Path<ElectionId>,
 ) -> Result<Json<ElectionStatusResponse>, APIError> {
     let mut conn = pool.acquire().await?;
 
     let election = election_repo::get(&mut conn, election_id).await?;
+    user.role().is_authorized(&election.committee_category)?;
+
     let current_committee_session =
         committee_session_repo::get_election_committee_session(&mut conn, election_id).await?;
 
@@ -2426,7 +2429,8 @@ mod tests {
     /// First committee session, should return all polling station statuses
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
     async fn test_statuses_first_session_all_polling_stations(pool: SqlitePool) {
-        let response = election_status(State(pool.clone()), Path(ElectionId::from(2)))
+        let user = User::test_user(Role::CoordinatorGSB, UserId::from(1));
+        let response = election_status(user, State(pool.clone()), Path(ElectionId::from(2)))
             .await
             .into_response();
 
@@ -2439,7 +2443,8 @@ mod tests {
     /// New committee session without investigations, should return no polling station statuses
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
     async fn test_statuses_second_session_no_polling_stations(pool: SqlitePool) {
-        let response = election_status(State(pool.clone()), Path(ElectionId::from(7)))
+        let user = User::test_user(Role::CoordinatorGSB, UserId::from(1));
+        let response = election_status(user, State(pool.clone()), Path(ElectionId::from(7)))
             .await
             .into_response();
 
@@ -2452,7 +2457,8 @@ mod tests {
     /// Second committee session with 1 investigation, should return 1 polling station status
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
     async fn test_statuses_second_session_with_investigation(pool: SqlitePool) {
-        let response = election_status(State(pool.clone()), Path(ElectionId::from(5)))
+        let user = User::test_user(Role::CoordinatorGSB, UserId::from(1));
+        let response = election_status(user, State(pool.clone()), Path(ElectionId::from(5)))
             .await
             .into_response();
 

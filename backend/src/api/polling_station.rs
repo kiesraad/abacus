@@ -18,7 +18,7 @@ use crate::{
         committee_session::{CommitteeSession, CommitteeSessionId},
         committee_session_status::CommitteeSessionStatus,
         data_entry::DataEntryId,
-        election::ElectionId,
+        election::{CommitteeCategory, ElectionId},
         polling_station::{
             PollingStationFileRequest, PollingStationId, PollingStationListResponse,
             PollingStationRequest, PollingStationRequestListResponse, PollingStationResponse,
@@ -31,7 +31,9 @@ use crate::{
     repository::{
         committee_session_repo::get_election_committee_session,
         data_entry_repo, election_repo, investigation_repo,
-        polling_station_repo::{create, create_many, delete, get_for_election, has_any, update},
+        polling_station_repo::{
+            create, create_many, delete, get_committee_category, get_for_election, has_any, update,
+        },
         user_repo::User,
     },
     service::{
@@ -125,6 +127,20 @@ pub fn router() -> OpenApiRouter<AppState> {
         .routes(routes!(polling_station_import).authorize(ADMIN_GSB_COORDINATOR))
 }
 
+pub fn authorize_user_and_gsb_election(
+    user: &User,
+    committee_category: &CommitteeCategory,
+) -> Result<(), APIError> {
+    user.role().is_authorized(committee_category)?;
+
+    // Only GSB elections have polling stations
+    if *committee_category != CommitteeCategory::GSB {
+        return Err(AuthenticationError::Forbidden.into());
+    }
+
+    Ok(())
+}
+
 /// Get a list of all [PollingStation]s for an election
 #[utoipa::path(
     get,
@@ -140,13 +156,14 @@ pub fn router() -> OpenApiRouter<AppState> {
     ),
 )]
 async fn polling_station_list(
+    user: User,
     State(pool): State<SqlitePool>,
     Path(election_id): Path<ElectionId>,
 ) -> Result<PollingStationListResponse, APIError> {
     let mut conn = pool.acquire().await?;
 
-    // Check if the election exists, will respond with NOT_FOUND otherwise
-    election_repo::get(&mut conn, election_id).await?;
+    let election = election_repo::get(&mut conn, election_id).await?;
+    authorize_user_and_gsb_election(&user, &election.committee_category)?;
 
     let committee_session = get_election_committee_session(&mut conn, election_id).await?;
 
@@ -200,10 +217,10 @@ async fn polling_station_create(
 ) -> Result<(StatusCode, PollingStationResponse), APIError> {
     let mut tx = pool.begin_immediate().await?;
 
-    // Check if the election and a committee session exist, will respond with NOT_FOUND otherwise
-    election_repo::get(&mut tx, election_id).await?;
-    let committee_session = get_election_committee_session(&mut tx, election_id).await?;
+    let election = election_repo::get(&mut tx, election_id).await?;
+    authorize_user_and_gsb_election(&user, &election.committee_category)?;
 
+    let committee_session = get_election_committee_session(&mut tx, election_id).await?;
     validate_user_is_allowed_to_perform_action(user, &committee_session)?;
 
     let mut polling_station = create(&mut tx, election_id, new_polling_station).await?;
@@ -263,10 +280,15 @@ async fn polling_station_create(
     ),
 )]
 async fn polling_station_get(
+    user: User,
     State(pool): State<SqlitePool>,
     Path((election_id, polling_station_id)): Path<(ElectionId, PollingStationId)>,
 ) -> Result<(StatusCode, PollingStationResponse), APIError> {
     let mut conn = pool.acquire().await?;
+
+    let committee_category = get_committee_category(&mut conn, polling_station_id).await?;
+    authorize_user_and_gsb_election(&user, &committee_category)?;
+
     let polling_station = get_for_election(&mut conn, election_id, polling_station_id).await?;
     Ok((StatusCode::OK, polling_station.into_response(election_id)))
 }
@@ -297,10 +319,10 @@ async fn polling_station_update(
 ) -> Result<(StatusCode, PollingStationResponse), APIError> {
     let mut tx = pool.begin_immediate().await?;
 
-    // Check if the election and a committee session exist, will respond with NOT_FOUND otherwise
-    election_repo::get(&mut tx, election_id).await?;
-    let committee_session = get_election_committee_session(&mut tx, election_id).await?;
+    let committee_category = get_committee_category(&mut tx, polling_station_id).await?;
+    authorize_user_and_gsb_election(&user, &committee_category)?;
 
+    let committee_session = get_election_committee_session(&mut tx, election_id).await?;
     validate_user_is_allowed_to_perform_action(user, &committee_session)?;
 
     let polling_station = update(
@@ -361,10 +383,10 @@ async fn polling_station_delete(
 ) -> Result<StatusCode, APIError> {
     let mut tx = pool.begin_immediate().await?;
 
-    // Check if the election and a committee session exist, will respond with NOT_FOUND otherwise
-    election_repo::get(&mut tx, election_id).await?;
-    let committee_session = get_election_committee_session(&mut tx, election_id).await?;
+    let committee_category = get_committee_category(&mut tx, polling_station_id).await?;
+    authorize_user_and_gsb_election(&user, &committee_category)?;
 
+    let committee_session = get_election_committee_session(&mut tx, election_id).await?;
     validate_user_is_allowed_to_perform_action(user, &committee_session)?;
 
     let polling_station = get_for_election(&mut tx, election_id, polling_station_id).await?;
@@ -435,8 +457,16 @@ async fn polling_station_delete(
     ),
 )]
 async fn polling_station_validate_import(
+    user: User,
+    State(pool): State<SqlitePool>,
+    Path(election_id): Path<ElectionId>,
     Json(polling_station_request): Json<PollingStationFileRequest>,
 ) -> Result<(StatusCode, Json<PollingStationRequestListResponse>), APIError> {
+    let mut conn = pool.acquire().await?;
+
+    let election = election_repo::get(&mut conn, election_id).await?;
+    authorize_user_and_gsb_election(&user, &election.committee_category)?;
+
     Ok((
         StatusCode::OK,
         Json(PollingStationRequestListResponse {
@@ -520,6 +550,7 @@ pub async fn create_imported_polling_stations(
     ),
 )]
 async fn polling_station_import(
+    user: User,
     State(pool): State<SqlitePool>,
     Path(election_id): Path<ElectionId>,
     audit_service: AuditService,
@@ -527,8 +558,9 @@ async fn polling_station_import(
 ) -> Result<(StatusCode, PollingStationListResponse), APIError> {
     let mut tx = pool.begin_immediate().await?;
 
-    // Check if the election and a committee session exist, will respond with NOT_FOUND otherwise
-    election_repo::get(&mut tx, election_id).await?;
+    let election = election_repo::get(&mut tx, election_id).await?;
+    authorize_user_and_gsb_election(&user, &election.committee_category)?;
+
     let committee_session = get_election_committee_session(&mut tx, election_id).await?;
 
     if has_any(&mut tx, committee_session.id).await? {

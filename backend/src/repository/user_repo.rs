@@ -321,7 +321,7 @@ pub async fn get_by_id(
 
 pub async fn list(
     conn: &mut SqliteConnection,
-    only_allow_role: Option<Role>,
+    filter_role: Option<Role>,
 ) -> Result<Vec<User>, sqlx::Error> {
     let users = query_as!(
         User,
@@ -338,7 +338,7 @@ pub async fn list(
         FROM users
         WHERE ($1 IS NULL OR role = $1)
         "#,
-        only_allow_role,
+        filter_role,
     )
     .fetch_all(conn)
     .await?;

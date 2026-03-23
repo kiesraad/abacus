@@ -133,7 +133,25 @@ function AdministratorCoordinatorLinks({ electionList, committeeSessions }: Link
   );
 }
 
-// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
+const users: Record<string, [string, string, string][]> = {
+  Admin: [
+    ["admin1", "Admin1Password01", `${t("administrator")} 1`],
+    ["admin2", "Admin2Password01", `${t("administrator")} 2`],
+  ],
+  GSB: [
+    ["coordinator1", "Coordinator1Password01", `${t("coordinator_gsb")} 1`],
+    ["coordinator2", "Coordinator2Password01", `${t("coordinator_gsb")} 2`],
+    ["typist1", "Typist1Password01", `${t("typist_gsb")} 1`],
+    ["typist2", "Typist2Password01", `${t("typist_gsb")} 2`],
+  ],
+  CSB: [
+    ["coordinator3", "Coordinator3Password03", `${t("coordinator_csb")} 3`],
+    ["coordinator4", "Coordinator4Password04", `${t("coordinator_csb")} 4`],
+    ["typist3", "Typist3Password03", `${t("typist_csb")} 3`],
+    ["typist4", "Typist4Password04", `${t("typist_csb")} 4`],
+  ],
+};
+
 function DevLinks() {
   const { user, login, logout } = useApiState();
   const [response, setResponse] = useState<ApiResult<LoginResponse> | null>(null);
@@ -142,25 +160,6 @@ function DevLinks() {
   if (response !== null && isError(response)) {
     throw response;
   }
-
-  const users: Record<string, [string, string, string][]> = {
-    Admin: [
-      ["admin1", "Admin1Password01", `${t("administrator")} 1`],
-      ["admin2", "Admin2Password01", `${t("administrator")} 2`],
-    ],
-    GSB: [
-      ["coordinator1", "Coordinator1Password01", `${t("coordinator_gsb")} 1`],
-      ["coordinator2", "Coordinator2Password01", `${t("coordinator_gsb")} 2`],
-      ["typist1", "Typist1Password01", `${t("typist_gsb")} 1`],
-      ["typist2", "Typist2Password01", `${t("typist_gsb")} 2`],
-    ],
-    CSB: [
-      ["coordinator3", "Coordinator3Password03", `${t("coordinator_csb")} 3`],
-      ["coordinator4", "Coordinator4Password04", `${t("coordinator_csb")} 4`],
-      ["typist3", "Typist3Password03", `${t("typist_csb")} 3`],
-      ["typist4", "Typist4Password04", `${t("typist_csb")} 4`],
-    ],
-  };
 
   return (
     <>
@@ -235,7 +234,7 @@ function DevLinks() {
           </ul>
         </>
       )}
-      {(__API_MSW__ || user) && <Links />}
+      {(__API_MSW__ || user) && <Links key={user?.username} />}
       {!__API_MSW__ && showGenerateElectionModal && (
         <Modal
           title="Genereer testverkiezing"

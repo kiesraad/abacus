@@ -37,6 +37,7 @@ use crate::{
         committee_session_repo,
         data_entry_repo::{data_entry_exists, previous_results_for_polling_station},
         election_repo, investigation_repo, polling_station_repo,
+        user_repo::User,
     },
     service::{change_committee_session_status, create_empty_data_entry},
 };
@@ -191,12 +192,17 @@ where
     ),
 )]
 async fn polling_station_investigation_create(
+    user: User,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     CurrentSessionPollingStationId(polling_station_id): CurrentSessionPollingStationId,
     Json(request): Json<PollingStationInvestigationCreateRequest>,
 ) -> Result<(StatusCode, PollingStationInvestigation), APIError> {
     let mut tx = pool.begin_immediate().await?;
+
+    let committee_category =
+        polling_station_repo::get_committee_category(&mut tx, polling_station_id).await?;
+    user.role().is_authorized(&committee_category)?;
 
     let committee_session = validate_and_get_committee_session(&mut tx, polling_station_id).await?;
 
@@ -262,12 +268,17 @@ async fn polling_station_investigation_create(
     ),
 )]
 async fn polling_station_investigation_conclude(
+    user: User,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     CurrentSessionPollingStationId(polling_station_id): CurrentSessionPollingStationId,
     Json(request): Json<PollingStationInvestigationConcludeRequest>,
 ) -> Result<PollingStationInvestigation, APIError> {
     let mut tx = pool.begin_immediate().await?;
+
+    let committee_category =
+        polling_station_repo::get_committee_category(&mut tx, polling_station_id).await?;
+    user.role().is_authorized(&committee_category)?;
 
     let committee_session = validate_and_get_committee_session(&mut tx, polling_station_id).await?;
 
@@ -496,12 +507,17 @@ async fn switch_to_with_new_results(
     ),
 )]
 async fn polling_station_investigation_update(
+    user: User,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     CurrentSessionPollingStationId(polling_station_id): CurrentSessionPollingStationId,
     Json(request): Json<PollingStationInvestigationUpdateRequest>,
 ) -> Result<PollingStationInvestigation, APIError> {
     let mut tx = pool.begin_immediate().await?;
+
+    let committee_category =
+        polling_station_repo::get_committee_category(&mut tx, polling_station_id).await?;
+    user.role().is_authorized(&committee_category)?;
 
     let committee_session = validate_and_get_committee_session(&mut tx, polling_station_id).await?;
 
@@ -574,11 +590,16 @@ async fn polling_station_investigation_update(
     ),
 )]
 async fn polling_station_investigation_delete(
+    user: User,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     CurrentSessionPollingStationId(polling_station_id): CurrentSessionPollingStationId,
 ) -> Result<StatusCode, APIError> {
     let mut tx = pool.begin_immediate().await?;
+
+    let committee_category =
+        polling_station_repo::get_committee_category(&mut tx, polling_station_id).await?;
+    user.role().is_authorized(&committee_category)?;
 
     let committee_session = validate_and_get_committee_session(&mut tx, polling_station_id).await?;
 
@@ -658,10 +679,15 @@ async fn polling_station_investigation_delete(
     ),
 )]
 async fn polling_station_investigation_download_corrigendum_pdf(
+    user: User,
     State(pool): State<SqlitePool>,
     CurrentSessionPollingStationId(polling_station_id): CurrentSessionPollingStationId,
 ) -> Result<Attachment<Vec<u8>>, APIError> {
     let mut conn = pool.acquire().await?;
+
+    let committee_category =
+        polling_station_repo::get_committee_category(&mut conn, polling_station_id).await?;
+    user.role().is_authorized(&committee_category)?;
 
     let status = investigation_repo::get(&mut conn, polling_station_id)
         .await?

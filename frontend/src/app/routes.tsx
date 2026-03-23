@@ -22,8 +22,10 @@ import { logsRoutes } from "@/features/logs/routes";
 import { pollingStationsRoutes } from "@/features/polling_stations/routes";
 import { resolveDifferencesRoutes } from "@/features/resolve_differences/routes";
 import { usersRoutes } from "@/features/users/routes";
+import { roleValues } from "@/types/generated/openapi";
 import { RootLayout } from "./RootLayout";
 
+const allRoles = [...roleValues];
 const showDevPage = __SHOW_DEV_PAGE__;
 
 export const routes: RouteObject[] = [
@@ -45,7 +47,7 @@ export const routes: RouteObject[] = [
           {
             index: true,
             Component: OverviewPage,
-            handle: { roles: ["administrator", "coordinator_csb", "coordinator_gsb", "typist_csb", "typist_gsb"] },
+            handle: { roles: allRoles },
           },
           { path: "create", children: electionCreateRoutes },
           {

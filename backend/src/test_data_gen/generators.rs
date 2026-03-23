@@ -672,7 +672,7 @@ mod tests {
         create_test_election(args, pool.clone()).await.unwrap();
 
         let mut conn = pool.acquire().await.unwrap();
-        let elections = election_repo::list(&mut conn).await.unwrap();
+        let elections = election_repo::list(&mut conn, None).await.unwrap();
         assert_eq!(elections.len(), 1);
     }
 }

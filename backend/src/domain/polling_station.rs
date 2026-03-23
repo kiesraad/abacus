@@ -330,7 +330,7 @@ pub(crate) mod test_helpers {
     /// Create a test polling station.
     pub fn polling_station_fixture(number_of_voters: Option<u32>) -> PollingStation {
         PollingStation {
-            id: PollingStationId::from(1),
+            id: PollingStationId::from(9911),
             name: "Testplek".to_string(),
             number: 34,
             number_of_voters,

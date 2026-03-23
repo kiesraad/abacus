@@ -703,3 +703,19 @@ pub async fn insert_test_polling_station(
     .await?;
     Ok(())
 }
+
+/// Check if a polling station exists, regardless of the committee session it belongs to
+#[cfg(test)]
+pub async fn exists(
+    conn: &mut SqliteConnection,
+    polling_station_id: PollingStationId,
+) -> Result<bool, sqlx::Error> {
+    let exists = sqlx::query_scalar!(
+        r#"SELECT EXISTS(SELECT 1 FROM polling_stations WHERE id = $1)"#,
+        polling_station_id,
+    )
+    .fetch_one(conn)
+    .await?;
+
+    Ok(exists != 0)
+}

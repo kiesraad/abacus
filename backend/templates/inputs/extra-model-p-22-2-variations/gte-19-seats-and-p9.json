@@ -2466,6 +2466,23 @@
       }
     ]
   },
+  "result_changes_full_seats": [],
+  "result_changes_residual_seats": [
+    {
+      "list_number": 1,
+      "footnote_number": 1,
+      "increase": 1,
+      "decrease": 0,
+      "type": "residual_seat"
+    },
+    {
+      "list_number": 7,
+      "footnote_number": 1,
+      "increase": 0,
+      "decrease": 1,
+      "type": "residual_seat"
+    }
+  ],
   "hash": "dedf17b4684e1214fcabb770925dc75c624be3380bd3464729c37a80a37940ad",
   "creation_date_time": "19-03-2023 17:07:00 +02:00"
 }

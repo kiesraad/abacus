@@ -415,8 +415,8 @@ INSERT INTO committee_sessions (id, number, election_id, status, location, start
 VALUES (4, 1, 4, 'data_entry', '', NULL);
 
 INSERT INTO data_entries (id, state, updated_at)
-VALUES (7, '{"status":"Empty"}', '2024-12-05 09:15:00');
+VALUES (407, '{"status":"Empty"}', '2024-12-05 09:15:00');
 
 INSERT INTO polling_stations (id, committee_session_id, prev_data_entry_id, data_entry_id, name, number, number_of_voters, polling_station_type, address,
                               postal_code, locality)
-VALUES (7, 4, NULL, 7, 'Testgebouw', 40, NULL, 'FixedLocation', 'Testweg 3', '1234 QA', 'Klein Dorp');
+VALUES (417, 4, NULL, 407, 'Testgebouw', 40, NULL, 'FixedLocation', 'Testweg 3', '1234 QA', 'Klein Dorp');

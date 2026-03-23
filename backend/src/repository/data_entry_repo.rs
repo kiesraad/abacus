@@ -458,14 +458,14 @@ mod tests {
 
             create_definitive_data_entry(
                 &mut conn,
-                PollingStationId::from(1),
+                PollingStationId::from(211),
                 &create_test_results(10),
             )
             .await
             .unwrap();
             create_definitive_data_entry(
                 &mut conn,
-                PollingStationId::from(2),
+                PollingStationId::from(212),
                 &create_test_results(20),
             )
             .await
@@ -476,10 +476,10 @@ mod tests {
                 .unwrap();
             assert_eq!(results.len(), 2);
 
-            assert_eq!(results[0].0.id, PollingStationId::from(1));
+            assert_eq!(results[0].0.id, PollingStationId::from(211));
             assert_eq!(results[0].1.voters_counts().proxy_certificate_count, 10);
 
-            assert_eq!(results[1].0.id, PollingStationId::from(2));
+            assert_eq!(results[1].0.id, PollingStationId::from(212));
             assert_eq!(results[1].1.voters_counts().proxy_certificate_count, 20);
         }
 
@@ -491,7 +491,7 @@ mod tests {
 
             create_definitive_data_entry(
                 &mut conn,
-                PollingStationId::from(1),
+                PollingStationId::from(211),
                 &create_test_results(10),
             )
             .await
@@ -854,7 +854,7 @@ mod tests {
 
             create_definitive_data_entry(
                 &mut conn,
-                PollingStationId::from(1),
+                PollingStationId::from(211),
                 &create_test_results(10),
             )
             .await
@@ -874,14 +874,14 @@ mod tests {
 
             create_definitive_data_entry(
                 &mut conn,
-                PollingStationId::from(1),
+                PollingStationId::from(211),
                 &create_test_results(10),
             )
             .await
             .unwrap();
             create_definitive_data_entry(
                 &mut conn,
-                PollingStationId::from(2),
+                PollingStationId::from(212),
                 &create_test_results(10),
             )
             .await

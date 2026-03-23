@@ -176,7 +176,7 @@ async fn test_deletion_setting_committee_session_back_to_created_status(pool: Sq
 async fn test_deletion_removes_polling_station_from_status(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let election_id = 5;
-    let polling_station_id = 11;
+    let polling_station_id = 5211;
 
     let statuses = get_statuses(&addr, &login(&addr, CoordinatorGSB).await, election_id).await;
     assert_eq!(statuses.len(), 1);
@@ -775,8 +775,8 @@ async fn test_cannot_conclude_update_new_polling_station_corrected_results_false
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
 async fn test_polling_station_corrigendum_download_with_previous_results(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    // Polling station 9 has previous results, but no investigation yet
-    let polling_station_id = 9;
+    // Polling station 529 has previous results, but no investigation yet
+    let polling_station_id = 529;
 
     assert_eq!(
         create_investigation(&addr, polling_station_id)
@@ -815,8 +815,8 @@ async fn test_polling_station_corrigendum_download_with_previous_results(pool: S
 async fn test_polling_station_corrigendum_download_without_previous_results(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = login(&addr, CoordinatorGSB).await;
-    // Polling station 11 is new and has no previous results. An investigation already exists.
-    let polling_station_id = 11;
+    // Polling station 5211 is new and has no previous results. An investigation already exists.
+    let polling_station_id = 5211;
 
     let url = format!(
         "http://{addr}/api/polling_stations/{polling_station_id}/investigation/download_corrigendum_pdf"
@@ -858,14 +858,14 @@ async fn check_completed_to_data_entry_on<F, Fut>(
 
     if pre_create {
         assert_eq!(
-            create_investigation(addr, 9).await.status(),
+            create_investigation(addr, 529).await.status(),
             StatusCode::CREATED
         );
 
         assert_eq!(
             conclude_investigation(
                 addr,
-                9,
+                529,
                 Some(serde_json::json!({"findings": "Test findings", "corrected_results": false})),
             )
             .await
@@ -902,7 +902,7 @@ async fn test_completed_to_data_entry_on_create(pool: SqlitePool) {
     check_completed_to_data_entry_on(
         &addr,
         false,
-        || create_investigation(&addr, 9),
+        || create_investigation(&addr, 529),
         StatusCode::CREATED,
     )
     .await;
@@ -914,7 +914,7 @@ async fn test_completed_to_data_entry_on_update(pool: SqlitePool) {
     check_completed_to_data_entry_on(
         &addr,
         true,
-        || update_investigation(&addr, 9, None),
+        || update_investigation(&addr, 529, None),
         StatusCode::OK,
     )
     .await;
@@ -926,7 +926,7 @@ async fn test_completed_to_data_entry_on_delete_non_last(pool: SqlitePool) {
     check_completed_to_data_entry_on(
         &addr,
         true,
-        || delete_investigation(&addr, 9),
+        || delete_investigation(&addr, 529),
         StatusCode::NO_CONTENT,
     )
     .await;

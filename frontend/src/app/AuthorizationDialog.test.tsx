@@ -1,22 +1,54 @@
 import { render as rtlRender, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { RouterProvider } from "react-router";
+import { useState } from "react";
+import { type RouteObject, RouterProvider } from "react-router";
 import { describe, expect, test, vi } from "vitest";
 
-import { InitialisedHandler } from "@/testing/api-mocks/RequestHandlers";
-import { server } from "@/testing/server";
+import { LoginForm } from "@/features/account/components/LoginForm";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 import { render, screen, setupTestRouter, waitFor } from "@/testing/test-utils";
+import type { Role } from "@/types/generated/openapi";
+
 import { AuthorizationDialog } from "./AuthorizationDialog";
+import { AuthorizationGuard } from "./AuthorizationGuard";
 import { EXPIRATION_DIALOG_SECONDS } from "./authorizationConstants";
-import { routes } from "./routes";
+
+function TestAuthorizationDialog({ sessionValidFor }: { sessionValidFor: number | null }) {
+  const [hideDialog, setHideDialog] = useState(false);
+
+  return (
+    <AuthorizationDialog sessionValidFor={sessionValidFor} hideDialog={hideDialog} setHideDialog={setHideDialog} />
+  );
+}
+
+async function renderAuthorizationRouter({
+  initialPath,
+  routes,
+  userRole,
+  expiration,
+}: {
+  initialPath: string;
+  routes: RouteObject[];
+  userRole: Role | null;
+  expiration: Date;
+}) {
+  const router = setupTestRouter(routes);
+  await router.navigate(initialPath);
+
+  rtlRender(
+    <TestUserProvider userRole={userRole} overrideExpiration={expiration}>
+      <RouterProvider router={router} />
+    </TestUserProvider>,
+  );
+
+  return router;
+}
 
 describe("AuthorizationDialog", () => {
   test("Does not show dialog when session is still valid", () => {
-    const togo = 1000 * 60 * EXPIRATION_DIALOG_SECONDS;
     render(
-      <TestUserProvider userRole="typist_gsb" overrideExpiration={new Date(Date.now() + togo + 1000)}>
-        <AuthorizationDialog />
+      <TestUserProvider userRole="typist_gsb">
+        <TestAuthorizationDialog sessionValidFor={EXPIRATION_DIALOG_SECONDS + 1} />
       </TestUserProvider>,
     );
     expect(screen.queryByTestId("modal-title")).toBeNull();
@@ -24,8 +56,8 @@ describe("AuthorizationDialog", () => {
 
   test("Show dialog on short session lifetime", () => {
     render(
-      <TestUserProvider userRole="typist_gsb" overrideExpiration={new Date(Date.now() + 1000)}>
-        <AuthorizationDialog />
+      <TestUserProvider userRole="typist_gsb">
+        <TestAuthorizationDialog sessionValidFor={60} />
       </TestUserProvider>,
     );
 
@@ -34,8 +66,8 @@ describe("AuthorizationDialog", () => {
 
   test("Does not show dialog when the user is not logged in", () => {
     render(
-      <TestUserProvider userRole={null} overrideExpiration={new Date(Date.now() + 1000)}>
-        <AuthorizationDialog />
+      <TestUserProvider userRole={null}>
+        <TestAuthorizationDialog sessionValidFor={60} />
       </TestUserProvider>,
     );
 
@@ -44,8 +76,8 @@ describe("AuthorizationDialog", () => {
 
   test("Dialog can be closed", async () => {
     render(
-      <TestUserProvider userRole="typist_gsb" overrideExpiration={new Date(Date.now() + 1000)}>
-        <AuthorizationDialog />
+      <TestUserProvider userRole="typist_gsb">
+        <TestAuthorizationDialog sessionValidFor={60} />
       </TestUserProvider>,
     );
 
@@ -58,8 +90,8 @@ describe("AuthorizationDialog", () => {
 
   test("Dialog can be dismissed", async () => {
     render(
-      <TestUserProvider userRole="typist_gsb" overrideExpiration={new Date(Date.now() + 1000)}>
-        <AuthorizationDialog />
+      <TestUserProvider userRole="typist_gsb">
+        <TestAuthorizationDialog sessionValidFor={60} />
       </TestUserProvider>,
     );
 
@@ -71,18 +103,31 @@ describe("AuthorizationDialog", () => {
   });
 
   test("Redirect should happen after expiration", async () => {
-    server.use(InitialisedHandler);
+    const router = await renderAuthorizationRouter({
+      initialPath: "/account",
+      userRole: "administrator",
+      expiration: new Date(Date.now() - 1000),
+      routes: [
+        {
+          path: "/account",
+          element: (
+            <AuthorizationGuard>
+              <div>Account page</div>
+            </AuthorizationGuard>
+          ),
+          handle: { roles: ["administrator"] },
+        },
+        {
+          path: "/account/login",
+          element: <LoginForm />,
+          handle: { public: true },
+        },
+      ],
+    });
 
-    const router = setupTestRouter(routes);
-    await router.navigate("/account");
-
-    rtlRender(
-      <TestUserProvider userRole="administrator" overrideExpiration={new Date(Date.now() - 1000)}>
-        <RouterProvider router={router} />
-      </TestUserProvider>,
-    );
-
-    expect(router.state.location.pathname).toBe("/account/login");
+    await waitFor(() => {
+      expect(router.state.location.pathname).toBe("/account/login");
+    });
 
     const logoutText = within(await screen.findByRole("alert")).getByRole("strong");
     expect(logoutText).toHaveTextContent("Je bent automatisch uitgelogd");
@@ -91,16 +136,28 @@ describe("AuthorizationDialog", () => {
 
   test("Redirect should happen when not authorized", async () => {
     vi.spyOn(console, "error").mockImplementation(() => {});
-    server.use(InitialisedHandler);
 
-    const router = setupTestRouter(routes);
-    await router.navigate("/logs");
-
-    rtlRender(
-      <TestUserProvider userRole={null} overrideExpiration={new Date(Date.now() + 1000 * 60)}>
-        <RouterProvider router={router} />
-      </TestUserProvider>,
-    );
+    const router = await renderAuthorizationRouter({
+      initialPath: "/logs",
+      userRole: null,
+      expiration: new Date(Date.now() + 1000 * 60),
+      routes: [
+        {
+          path: "/logs",
+          element: (
+            <AuthorizationGuard>
+              <div>Logs page</div>
+            </AuthorizationGuard>
+          ),
+          handle: { roles: ["administrator"] },
+        },
+        {
+          path: "/account/login",
+          element: <LoginForm />,
+          handle: { public: true },
+        },
+      ],
+    });
 
     expect(router.state.location.pathname).toBe("/account/login");
     expect(router.state.location.state).toEqual({ unauthorized: true });

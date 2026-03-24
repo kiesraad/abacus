@@ -97,22 +97,24 @@
   let has_content = content != none and content != ""
   let size = if checked == true or checked == none and not small { 14pt } else { 10pt }
 
-  grid(
-    columns: if has_content { (14pt, 6pt, auto) } else { (size) },
-    align: horizon + center,
-    box(
-      width: size,
-      height: size,
-      inset: 2.5pt,
-      stroke: if checked == none or checked == true { 0.5pt + black } else {
-        (thickness: 0.4pt, dash: "densely-dotted", cap: "square")
-      },
-      clip: true,
-      fill: if checked == true { black } else { white },
-      if checked == true { checkmark() },
-    ),
-    if has_content { " " },
-    if has_content { align(left, content) },
+  block(width: 75%,
+    grid(
+      columns: if has_content { (14pt, 6pt, auto) } else { (size) },
+      align: horizon + center,
+      box(
+        width: size,
+        height: size,
+        inset: 2.5pt,
+        stroke: if checked == none or checked == true { 0.5pt + black } else {
+          (thickness: 0.4pt, dash: "densely-dotted", cap: "square")
+        },
+        clip: true,
+        fill: if checked == true { black } else { white },
+        if checked == true { checkmark() },
+      ),
+      if has_content { " " },
+      if has_content { align(left, content) },
+    )
   )
 }
 

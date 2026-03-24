@@ -10,11 +10,7 @@ import {
 } from "@/testing/api-mocks/RequestHandlers";
 import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMockData";
 import { overrideOnce, server } from "@/testing/server";
-import type {
-  DATA_ENTRY_FINALISE_REQUEST_PATH,
-  DataEntrySource,
-  PollingStationResults,
-} from "@/types/generated/openapi";
+import type { DATA_ENTRY_FINALISE_REQUEST_PATH, DataEntrySource, Results } from "@/types/generated/openapi";
 import { ValidationResultSet } from "@/utils/ValidationResults";
 import { getDefaultDataEntryState, getInitialValues } from "../testing/mock-data";
 import type { DataEntryAction, DataEntryState } from "../types/types";
@@ -60,7 +56,7 @@ test("should handle CSOFirstSession DATA_ENTRY_CLAIMED with no client_state", ()
     "political_group_votes_2",
   ]);
   expect(state.targetFormSectionId).toEqual("extra_investigation");
-  expect(state.pollingStationResults).toEqual(action.dataEntry.data);
+  expect(state.results).toEqual(action.dataEntry.data);
   expect(state.error).toBeNull();
 });
 
@@ -90,7 +86,7 @@ test("should handle CSONextSession DATA_ENTRY_CLAIMED with no client_state", () 
     "political_group_votes_2",
   ]);
   expect(state.targetFormSectionId).toEqual("voters_votes_counts");
-  expect(state.pollingStationResults).toEqual(action.dataEntry.data);
+  expect(state.results).toEqual(action.dataEntry.data);
   expect(state.error).toBeNull();
 });
 
@@ -201,7 +197,7 @@ test("should handle FORM_SAVED", () => {
 
   const state = dataEntryReducer(getDefaultDataEntryState(), action);
   expect(state.error).toBeNull();
-  expect(state.pollingStationResults).toEqual(action.data);
+  expect(state.results).toEqual(action.data);
   expect(state.targetFormSectionId).toBeDefined();
   expect(state.targetFormSectionId).toEqual("differences_counts");
 });
@@ -236,7 +232,7 @@ describe("onSubmitForm", () => {
     const defaultState = getDefaultDataEntryState();
     const state: DataEntryState = {
       ...defaultState,
-      pollingStationResults: {
+      results: {
         model: "CSOFirstSession",
         ...getInitialValues(),
       },
@@ -270,7 +266,7 @@ describe("onSubmitForm", () => {
     const defaultState = getDefaultDataEntryState();
     const state: DataEntryState = {
       ...defaultState,
-      pollingStationResults: {
+      results: {
         model: "CSOFirstSession",
         ...getInitialValues(),
       },
@@ -311,7 +307,7 @@ describe("onSubmitForm", () => {
     ]);
     expect(dispatch.mock.calls[1]).toStrictEqual([{ type: "SET_STATUS", status: "aborted" } satisfies DataEntryAction]);
 
-    const data: PollingStationResults = {
+    const data: Results = {
       model: "CSOFirstSession",
       ...getInitialValues(),
       voters_counts: {

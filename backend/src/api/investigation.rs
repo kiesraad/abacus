@@ -27,7 +27,7 @@ use crate::{
         },
         models::{ModelNa14_2Bijlage1Input, ToPdfFileModel},
         polling_station::{PollingStation, PollingStationId},
-        results::PollingStationResults,
+        results::Results,
         role::Role,
         votes_table::VotesTablesWithOnlyPreviousVotes,
     },
@@ -716,7 +716,7 @@ async fn polling_station_investigation_download_corrigendum_pdf(
                 }
             }
         }
-        None => PollingStationResults::empty_cso_first_session(&election.political_groups),
+        None => Results::empty_cso_first_session(&election.political_groups),
     };
 
     let polling_station: PollingStation = ps.into_polling_station();

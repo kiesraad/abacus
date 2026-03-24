@@ -18,7 +18,7 @@ use crate::{
         field_path::FieldPath,
         polling_station::{PollingStation, PollingStationRequest, PollingStationType},
         results::{
-            PollingStationResults,
+            Results,
             counting_differences_polling_station::CountingDifferencesPollingStation,
             cso_first_session_results::CSOFirstSessionResults,
             differences_counts::{
@@ -47,7 +47,7 @@ pub struct CreateTestElectionResult {
     pub election: ElectionWithPoliticalGroups,
     pub committee_session: CommitteeSession,
     pub polling_stations: Vec<PollingStation>,
-    pub results: Vec<(PollingStation, PollingStationResults)>,
+    pub results: Vec<(PollingStation, Results)>,
     pub data_entry_completed: bool,
 }
 
@@ -373,14 +373,13 @@ async fn generate_data_entry(
 
             let candidate_slope =
                 rng.random_range(args.candidate_distribution_slope.clone()) as f64 / 1000.0;
-            let results =
-                PollingStationResults::CSOFirstSession(generate_cso_first_session_results(
-                    rng,
-                    &election.political_groups,
-                    voters_turned_out,
-                    &group_weights,
-                    candidate_slope,
-                ));
+            let results = Results::CSOFirstSession(generate_cso_first_session_results(
+                rng,
+                &election.political_groups,
+                voters_turned_out,
+                &group_weights,
+                candidate_slope,
+            ));
 
             // Validate the generated results to catch issues early
             let mut validation_results = ValidationResults::default();
@@ -396,7 +395,7 @@ async fn generate_data_entry(
             }
             if validation_results.has_errors() {
                 panic!(
-                    "Generated invalid polling station results for station {}: {:?}",
+                    "Generated invalid results for polling station {}: {:?}",
                     ps.number, validation_results.errors
                 );
             }

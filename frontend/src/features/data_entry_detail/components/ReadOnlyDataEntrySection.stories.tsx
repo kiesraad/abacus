@@ -2,13 +2,13 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMockData";
-import type { PollingStationResults, ValidationResults } from "@/types/generated/openapi";
+import type { Results, ValidationResults } from "@/types/generated/openapi";
 import type { FormSectionId } from "@/types/types";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
 import { ReadOnlyDataEntrySection } from "./ReadOnlyDataEntrySection";
 
-const pollingStationResults: PollingStationResults = {
+const results: Results = {
   model: "CSOFirstSession",
   extra_investigation: {
     extra_investigation_other_reason: { yes: false, no: false },
@@ -108,13 +108,7 @@ export const ReadOnlySection: StoryObj<Props> = {
       return <div>Section not found</div>;
     }
 
-    return (
-      <ReadOnlyDataEntrySection
-        section={selectedSection}
-        data={pollingStationResults}
-        validationResults={validationResults}
-      />
-    );
+    return <ReadOnlyDataEntrySection section={selectedSection} data={results} validationResults={validationResults} />;
   },
 };
 

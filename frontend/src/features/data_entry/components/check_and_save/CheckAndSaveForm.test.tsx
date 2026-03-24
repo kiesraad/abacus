@@ -132,7 +132,7 @@ describe("Test CheckAndSaveForm", () => {
   test("Data entry does not show finalise button with errors", async () => {
     overrideServerClaimDataEntryResponse({
       formState: customFormState(),
-      pollingStationResults: getInitialValues(),
+      results: getInitialValues(),
       validationResults: { errors: [validationResultMockData.F201], warnings: [] },
     });
     renderForm();
@@ -147,7 +147,7 @@ describe("Test CheckAndSaveForm", () => {
   test("Data entry does not show finalise button with unaccepted warnings", async () => {
     overrideServerClaimDataEntryResponse({
       formState: customFormState(),
-      pollingStationResults: getInitialValues(),
+      results: getInitialValues(),
       validationResults: { errors: [], warnings: [validationResultMockData.W202] },
     });
     renderForm();
@@ -165,7 +165,7 @@ describe("Test CheckAndSaveForm", () => {
 
     overrideServerClaimDataEntryResponse({
       formState: formState,
-      pollingStationResults: getInitialValues(),
+      results: getInitialValues(),
       validationResults: { errors: [], warnings: [validationResultMockData.W202] },
     });
     renderForm();
@@ -191,7 +191,7 @@ describe("Test CheckAndSaveForm", () => {
 
     overrideServerClaimDataEntryResponse({
       formState: mockFormState,
-      pollingStationResults: getInitialValues(),
+      results: getInitialValues(),
       validationResults: { errors: [validationResultMockData.F201], warnings: [validationResultMockData.W203] },
     });
     renderForm();
@@ -228,7 +228,7 @@ describe("Test CheckAndSaveForm", () => {
       const defaultValues = getEmptyDataEntryRequest().data;
       overrideServerClaimDataEntryResponse({
         formState: mockFormState,
-        pollingStationResults: defaultValues,
+        results: defaultValues,
         validationResults: { errors: [validationResultMockData.F201], warnings: [validationResultMockData.W203] },
       });
       renderForm();
@@ -275,7 +275,7 @@ describe("Test CheckAndSaveForm summary", () => {
   test("Blocking", async () => {
     overrideServerClaimDataEntryResponse({
       formState: customFormState(),
-      pollingStationResults: getInitialValues(),
+      results: getInitialValues(),
       validationResults: { errors: [validationResultMockData.F201], warnings: [validationResultMockData.W201] },
     });
     renderForm();
@@ -298,7 +298,7 @@ describe("Test CheckAndSaveForm summary", () => {
     formState.sections.voters_votes_counts!.acceptErrorsAndWarnings = true;
     overrideServerClaimDataEntryResponse({
       formState: formState,
-      pollingStationResults: getInitialValues(),
+      results: getInitialValues(),
       validationResults: { errors: [], warnings: [validationResultMockData.W201] },
     });
     renderForm();
@@ -317,7 +317,7 @@ describe("Test CheckAndSaveForm summary", () => {
   test("Unaccepted warnings", async () => {
     overrideServerClaimDataEntryResponse({
       formState: customFormState(),
-      pollingStationResults: getEmptyDataEntryRequest().data,
+      results: getEmptyDataEntryRequest().data,
       validationResults: { errors: [], warnings: [validationResultMockData.W201] },
     });
     renderForm();

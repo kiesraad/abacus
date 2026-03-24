@@ -7,7 +7,7 @@ use crate::{
         committee_session::CommitteeSessionId,
         data_entry::{DataEntryStatus, PollingStationDataEntry},
         polling_station::{PollingStation, PollingStationId},
-        results::PollingStationResults,
+        results::Results,
     },
     repository::{committee_session_repo, polling_station_repo},
 };
@@ -254,7 +254,7 @@ async fn fetch_results_for_committee_session(
     conn: &mut SqliteConnection,
     committee_session_id: CommitteeSessionId,
     polling_station_id: Option<PollingStationId>,
-) -> Result<Vec<(PollingStation, PollingStationResults)>, sqlx::Error> {
+) -> Result<Vec<(PollingStation, Results)>, sqlx::Error> {
     let mut tx = conn.begin().await?;
 
     // Get and index polling stations by id for performance
@@ -291,7 +291,7 @@ async fn fetch_results_for_committee_session(
         )
         SELECT
             original_id AS "original_id!: PollingStationId",
-            data AS "data: Json<PollingStationResults>"
+            data AS "data: Json<Results>"
         FROM results
         WHERE data IS NOT NULL
         "#,
@@ -321,7 +321,7 @@ async fn fetch_results_for_committee_session(
 pub async fn list_results_for_committee_session(
     conn: &mut SqliteConnection,
     committee_session_id: CommitteeSessionId,
-) -> Result<Vec<(PollingStation, PollingStationResults)>, sqlx::Error> {
+) -> Result<Vec<(PollingStation, Results)>, sqlx::Error> {
     fetch_results_for_committee_session(conn, committee_session_id, None).await
 }
 
@@ -330,7 +330,7 @@ pub async fn list_results_for_committee_session(
 pub async fn previous_results_for_polling_station(
     conn: &mut SqliteConnection,
     polling_station_id: PollingStationId,
-) -> Result<PollingStationResults, sqlx::Error> {
+) -> Result<Results, sqlx::Error> {
     let polling_station = polling_station_repo::get(conn, polling_station_id).await?;
     let prev_data_entry_id = polling_station
         .prev_data_entry_id()
@@ -338,7 +338,7 @@ pub async fn previous_results_for_polling_station(
 
     let row = query!(
         r#"
-        SELECT json_extract(de.state, '$.state.results') AS "data: Json<PollingStationResults>"
+        SELECT json_extract(de.state, '$.state.results') AS "data: Json<Results>"
         FROM data_entries AS de
         WHERE de.id = $1 AND json_extract(de.state, '$.status') = 'Definitive'
         "#,
@@ -422,8 +422,8 @@ mod tests {
         valid_default::ValidDefault,
     };
 
-    fn create_test_results(proxy_certificate_count: u32) -> PollingStationResults {
-        PollingStationResults::CSOFirstSession(CSOFirstSessionResults {
+    fn create_test_results(proxy_certificate_count: u32) -> Results {
+        Results::CSOFirstSession(CSOFirstSessionResults {
             extra_investigation: ValidDefault::valid_default(),
             counting_differences_polling_station: ValidDefault::valid_default(),
             voters_counts: {
@@ -827,7 +827,7 @@ mod tests {
                 .unwrap();
         }
 
-        async fn insert_test_polling_station_results(
+        async fn insert_test_results(
             conn: &mut SqliteConnection,
             polling_station_id: PollingStationId,
         ) {
@@ -1007,7 +1007,7 @@ mod tests {
 
             create_test_investigation(&mut conn, polling_station_id).await;
             conclude_test_investigation(&mut conn, polling_station_id, true).await;
-            insert_test_polling_station_results(&mut conn, polling_station_id).await;
+            insert_test_results(&mut conn, polling_station_id).await;
 
             assert!(
                 are_results_complete_for_committee_session(

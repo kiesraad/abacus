@@ -2,16 +2,16 @@ import { describe, expect, test } from "vitest";
 
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { render, screen } from "@/testing/test-utils";
-import type { PollingStationResults } from "@/types/generated/openapi";
+import type { Results } from "@/types/generated/openapi";
 import type { DataEntrySection, HeadingSubsection, InputGridSubsection } from "@/types/types";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
-import { pollingStationResultsMockData } from "../testing/polling-station-results";
+import { resultsMockData } from "../testing/polling-station-results";
 import { ResolveDifferencesTables } from "./ResolveDifferencesTables";
 
 describe("ResolveDifferencesTables", () => {
-  const first = pollingStationResultsMockData(true);
-  const second = pollingStationResultsMockData(false);
+  const first = resultsMockData(true);
+  const second = resultsMockData(false);
   const structure = getDataEntryStructure("CSOFirstSession", electionMockData);
 
   test("renders the resolve differences tables", async () => {
@@ -104,7 +104,7 @@ describe("ResolveDifferencesTables", () => {
           yes: true,
           no: false,
         },
-      }) as unknown as PollingStationResults;
+      }) as unknown as Results;
 
     const createSecondResults = () =>
       ({
@@ -112,7 +112,7 @@ describe("ResolveDifferencesTables", () => {
           yes: false,
           no: true,
         },
-      }) as unknown as PollingStationResults;
+      }) as unknown as Results;
 
     test("renders no table when checkbox values are the same", () => {
       const checkboxSection = createCheckboxesSection();

@@ -4,7 +4,7 @@ import type {
   CommonPollingStationResults,
   DataEntryGetDifferencesResponse,
   DataEntryGetResponse,
-  PollingStationResults,
+  Results,
   SaveDataEntryResponse,
   ValidationResults,
 } from "@/types/generated/openapi";
@@ -16,9 +16,7 @@ export const emptyValidationResults: ValidationResults = {
   warnings: [],
 };
 
-export function emptyPollingStationResults(
-  model: "CSOFirstSession" | "CSONextSession" = "CSOFirstSession",
-): PollingStationResults {
+export function emptyResults(model: "CSOFirstSession" | "CSONextSession" = "CSOFirstSession"): Results {
   const commonPollingStationResults: CommonPollingStationResults = {
     voters_counts: {
       poll_card_count: 0,
@@ -80,7 +78,7 @@ export function emptyPollingStationResults(
 }
 
 export const claimDataEntryResponse: ClaimDataEntryResponse = {
-  data: emptyPollingStationResults(),
+  data: emptyResults(),
   validation_results: emptyValidationResults,
   client_state: null,
   source: {
@@ -223,7 +221,7 @@ export const dataEntryStatusDifferences: DataEntryGetDifferencesResponse = {
 
 export const dataEntryHasErrorsGetMockResponse: DataEntryGetResponse = {
   user_id: 3,
-  data: emptyPollingStationResults(),
+  data: emptyResults(),
   status: "first_entry_has_errors",
   validation_results: {
     errors: [validationResultMockData.F201],
@@ -233,7 +231,7 @@ export const dataEntryHasErrorsGetMockResponse: DataEntryGetResponse = {
 
 export const dataEntryHasWarningsGetMockResponse: DataEntryGetResponse = {
   user_id: 3,
-  data: emptyPollingStationResults(),
+  data: emptyResults(),
   status: "first_entry_finalised",
   validation_results: {
     errors: [],
@@ -243,7 +241,7 @@ export const dataEntryHasWarningsGetMockResponse: DataEntryGetResponse = {
 
 export const dataEntryValidGetMockResponse: DataEntryGetResponse = {
   user_id: 3,
-  data: emptyPollingStationResults(),
+  data: emptyResults(),
   status: "first_entry_finalised",
   validation_results: {
     errors: [],

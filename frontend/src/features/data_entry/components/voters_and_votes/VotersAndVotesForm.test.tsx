@@ -20,7 +20,7 @@ import {
   waitFor,
 } from "@/testing/test-utils";
 import { getTypistUser } from "@/testing/user-mock-data";
-import type { DATA_ENTRY_SAVE_REQUEST_BODY, PollingStationResults } from "@/types/generated/openapi";
+import type { DATA_ENTRY_SAVE_REQUEST_BODY, Results } from "@/types/generated/openapi";
 import { getDefaultDataEntryState, getEmptyDataEntryRequest } from "../../testing/mock-data";
 import {
   expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage,
@@ -117,7 +117,7 @@ describe("Test VotersAndVotesForm", () => {
       const user = userEvent.setup();
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {},
+        results: {},
       });
       renderForm();
 
@@ -219,14 +219,14 @@ describe("Test VotersAndVotesForm", () => {
             invalid_votes_count: 6,
             total_votes_cast_count: 15,
           },
-        } satisfies PollingStationResults,
+        } satisfies Results,
         client_state: {},
       };
 
       const user = userEvent.setup();
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {},
+        results: {},
       });
       renderForm();
 

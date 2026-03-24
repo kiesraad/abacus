@@ -64,7 +64,7 @@ describe("Test DifferencesForm", () => {
 
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {},
+        results: {},
       });
       renderForm();
 
@@ -83,7 +83,7 @@ describe("Test DifferencesForm", () => {
       const user = userEvent.setup();
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {},
+        results: {},
       });
 
       renderForm();
@@ -106,7 +106,7 @@ describe("Test DifferencesForm", () => {
       const user = userEvent.setup();
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {},
+        results: {},
       });
       renderForm();
 
@@ -170,7 +170,7 @@ describe("Test DifferencesForm", () => {
       const user = userEvent.setup();
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {
+        results: {
           ...votersAndVotesValues,
         },
       });
@@ -208,7 +208,7 @@ describe("Test DifferencesForm", () => {
 
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {},
+        results: {},
       });
       renderForm();
 
@@ -249,7 +249,7 @@ describe("Test DifferencesForm", () => {
       const user = userEvent.setup();
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {},
+        results: {},
       });
       renderForm();
 
@@ -292,7 +292,7 @@ describe("Test DifferencesForm", () => {
 
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {},
+        results: {},
       });
 
       renderForm();
@@ -335,7 +335,7 @@ describe("Test DifferencesForm", () => {
 
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {},
+        results: {},
       });
 
       renderForm();
@@ -378,7 +378,7 @@ describe("Test DifferencesForm", () => {
 
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {},
+        results: {},
       });
 
       renderForm();
@@ -420,7 +420,7 @@ describe("Test DifferencesForm", () => {
 
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {},
+        results: {},
       });
 
       renderForm();
@@ -462,7 +462,7 @@ describe("Test DifferencesForm", () => {
 
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {},
+        results: {},
       });
 
       renderForm();
@@ -504,7 +504,7 @@ describe("Test DifferencesForm", () => {
 
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {},
+        results: {},
       });
 
       renderForm();
@@ -546,7 +546,7 @@ describe("Test DifferencesForm", () => {
 
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {},
+        results: {},
       });
 
       renderForm();
@@ -588,7 +588,7 @@ describe("Test DifferencesForm", () => {
 
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {},
+        results: {},
       });
 
       renderForm();

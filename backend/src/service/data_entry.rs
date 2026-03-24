@@ -92,7 +92,7 @@ pub async fn election_statuses(
 pub async fn create_definitive_data_entry(
     conn: &mut SqliteConnection,
     polling_station_id: PollingStationId,
-    results: &crate::domain::results::PollingStationResults,
+    results: &crate::domain::results::Results,
 ) -> Result<(), DataEntryServiceError> {
     use crate::{
         domain::data_entry::{DataEntryStatus, Definitive},

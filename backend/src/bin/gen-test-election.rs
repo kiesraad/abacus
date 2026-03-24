@@ -12,7 +12,7 @@ use abacus::{
         election::{CommitteeCategory, ElectionWithPoliticalGroups},
         models::{ModelNa31_2Input, ToPdfFileModel},
         polling_station::PollingStation,
-        results::PollingStationResults,
+        results::Results,
         summary::ElectionSummary,
         votes_table::VotesTables,
     },
@@ -163,7 +163,7 @@ async fn export_election(
     election: &ElectionWithPoliticalGroups,
     polling_stations: &[PollingStation],
     export_results_json: bool,
-    results: Vec<(PollingStation, PollingStationResults)>,
+    results: Vec<(PollingStation, Results)>,
 ) {
     if export_dir.exists() && !export_dir.is_dir() {
         panic!("Export directory already exists and is not a directory");

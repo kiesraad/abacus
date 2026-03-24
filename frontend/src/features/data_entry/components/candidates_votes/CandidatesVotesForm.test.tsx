@@ -140,7 +140,7 @@ describe("Test CandidatesVotesForm", () => {
       const user = userEvent.setup();
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {},
+        results: {},
       });
 
       renderForm();
@@ -162,7 +162,7 @@ describe("Test CandidatesVotesForm", () => {
       const user = userEvent.setup();
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {},
+        results: {},
       });
 
       renderForm();
@@ -178,7 +178,7 @@ describe("Test CandidatesVotesForm", () => {
       const user = userEvent.setup();
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {},
+        results: {},
       });
 
       renderForm();
@@ -206,7 +206,7 @@ describe("Test CandidatesVotesForm", () => {
       const user = userEvent.setup();
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {},
+        results: {},
       });
       renderForm();
 
@@ -341,7 +341,7 @@ describe("Test CandidatesVotesForm", () => {
 
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {
+        results: {
           ...getEmptyDataEntryRequest().data,
           political_group_votes: [
             {
@@ -453,7 +453,7 @@ describe("Test CandidatesVotesForm", () => {
 
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {},
+        results: {},
       });
       renderForm();
 
@@ -489,7 +489,7 @@ describe("Test CandidatesVotesForm", () => {
 
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {},
+        results: {},
       });
       renderForm();
 

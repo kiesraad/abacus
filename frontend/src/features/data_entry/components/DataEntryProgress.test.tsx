@@ -43,7 +43,7 @@ function getDefaultFormState(): FormState {
   };
 }
 
-const pollingStationResults = {
+const results = {
   differences_counts: {
     more_ballots_count: 5,
     fewer_ballots_count: 0,
@@ -83,7 +83,7 @@ describe("DataEntryProgress", () => {
 
     overrideServerClaimDataEntryResponse({
       formState: formState,
-      pollingStationResults: pollingStationResults,
+      results: results,
       continueToNextSection: false,
       validationResults: {
         errors: [validationResultMockData.F201],
@@ -138,7 +138,7 @@ describe("DataEntryProgress", () => {
 
     overrideServerClaimDataEntryResponse({
       formState: formState,
-      pollingStationResults: pollingStationResults,
+      results: results,
       continueToNextSection: false,
       validationResults: {
         errors: [validationResultMockData.F201],
@@ -167,7 +167,7 @@ describe("DataEntryProgress", () => {
 
     overrideServerClaimDataEntryResponse({
       formState: formState,
-      pollingStationResults: pollingStationResults,
+      results: results,
       continueToNextSection: false,
       validationResults: undefined,
     });
@@ -215,7 +215,7 @@ describe("DataEntryProgress", () => {
 
     overrideServerClaimDataEntryResponse({
       formState: formState,
-      pollingStationResults: pollingStationResults,
+      results: results,
       continueToNextSection: false,
       validationResults: undefined,
     });
@@ -261,7 +261,7 @@ describe("DataEntryProgress", () => {
 
     overrideServerClaimDataEntryResponse({
       formState: formState,
-      pollingStationResults: pollingStationResults,
+      results: results,
     });
     renderForm();
 

@@ -251,7 +251,7 @@ async fn test_data_entry_invalid(pool: SqlitePool) {
     assert_eq!(
         body["error"],
         "Failed to deserialize the JSON body into the target type: data: \
-         invalid type: null, expected internally tagged enum PollingStationResults at line 1 column 12"
+         invalid type: null, expected internally tagged enum Results at line 1 column 12"
     );
 }
 

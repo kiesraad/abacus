@@ -46,12 +46,10 @@
     "download_explanation": "Hierin zitten de volgende documenten:",
     "determination_election_results": {
       "download": "Vaststelling uitslag",
-      "explanation_title": "Uitslag {electionName}:",
       "explanation_text": "<li>Proces-verbaal model P 22-2.</li><li>EML_NL telbestand 520 met zetelverdeling.</li>"
     },
     "p_22_2_attachment": {
-      "download": "Model-p22-2-bijlage",
-      "explanation_title": "Bijlage {electionName}:",
+      "download": "Model P 22-2 Bijlage 1",
       "explanation_text": "<li>Bijlage 1 van proces-verbaal P 22-2 met tellingen per lijst en kandidaat.</li>"
     },
     "definitive_documents": {

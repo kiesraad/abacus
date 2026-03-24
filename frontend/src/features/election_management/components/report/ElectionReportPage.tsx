@@ -121,12 +121,13 @@ export function ElectionReportPage() {
                     title={t("election_management.CSB.determination_election_results.download")}
                     subtitle={t("election_management.zip_file")}
                   />
-                  <DownloadButton
-                    icon="download"
-                    href={`/api/elections/${election.id}/committee_sessions/${committeeSession.id}/download_zip_results`}
-                    title={t("election_management.CSB.p_22_2_attachment.download")}
-                    subtitle={t("election_management.zip_file")}
-                  />
+                  {/* Disabled for now: https://github.com/kiesraad/abacus/issues/2967 */}
+                  {/*<DownloadButton*/}
+                  {/*  icon="download"*/}
+                  {/*  href={`/api/elections/${election.id}/committee_sessions/${committeeSession.id}/download_zip_results`}*/}
+                  {/*  title={t("election_management.CSB.p_22_2_attachment.download")}*/}
+                  {/*  subtitle={t("election_management.zip_file")}*/}
+                  {/*/>*/}
                 </>
               )}
               <DownloadButton

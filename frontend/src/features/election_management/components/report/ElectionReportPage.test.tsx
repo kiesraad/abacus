@@ -411,7 +411,8 @@ describe("ElectionReportPage", () => {
         }),
       ).toBeVisible();
       expect(await screen.findByRole("link", { name: /Vaststelling uitslag/ })).toBeVisible();
-      expect(await screen.findByRole("link", { name: /Model-p22-2-bijlage/ })).toBeVisible();
+      // Disabled for now: https://github.com/kiesraad/abacus/issues/2967
+      // expect(await screen.findByRole("link", { name: /Model-p22-2-bijlage/ })).toBeVisible();
       expect(await screen.findByRole("link", { name: /Definitieve documenten/ })).toBeVisible();
       expect(await screen.findByRole("link", { name: "Terug naar overzicht" })).toBeVisible();
       expect(await screen.findByRole("button", { name: "Invoer hervatten" })).toBeVisible();
@@ -445,7 +446,8 @@ describe("ElectionReportPage", () => {
         }),
       ).toBeVisible();
       expect(await screen.findByRole("link", { name: /Vaststelling uitslag/ })).toBeVisible();
-      expect(await screen.findByRole("link", { name: /Model-p22-2-bijlage/ })).toBeVisible();
+      // Disabled for now: https://github.com/kiesraad/abacus/issues/2967
+      //expect(await screen.findByRole("link", { name: /Model-p22-2-bijlage/ })).toBeVisible();
       expect(await screen.findByRole("link", { name: /Definitieve documenten/ })).toBeVisible();
       expect(await screen.findByRole("link", { name: "Terug naar overzicht" })).toBeVisible();
 
@@ -482,7 +484,8 @@ describe("ElectionReportPage", () => {
         }),
       ).toBeVisible();
       expect(await screen.findByRole("link", { name: /Vaststelling uitslag/ })).toBeVisible();
-      expect(await screen.findByRole("link", { name: /Model-p22-2-bijlage/ })).toBeVisible();
+      // Disabled for now: https://github.com/kiesraad/abacus/issues/2967
+      // expect(await screen.findByRole("link", { name: /Model-p22-2-bijlage/ })).toBeVisible();
       expect(await screen.findByRole("link", { name: /Definitieve documenten/ })).toBeVisible();
       expect(await screen.findByRole("link", { name: "Terug naar overzicht" })).toBeVisible();
       expect(screen.queryByRole("button", { name: "Invoer hervatten" })).not.toBeInTheDocument();
@@ -533,7 +536,8 @@ describe("ElectionReportPage", () => {
         }),
       ).toBeVisible();
       expect(await screen.findByRole("link", { name: /Vaststelling uitslag/ })).toBeVisible();
-      expect(await screen.findByRole("link", { name: /Model-p22-2-bijlage/ })).toBeVisible();
+      // Disabled for now: https://github.com/kiesraad/abacus/issues/2967
+      // expect(await screen.findByRole("link", { name: /Model-p22-2-bijlage/ })).toBeVisible();
       expect(await screen.findByRole("link", { name: /Definitieve documenten/ })).toBeVisible();
       expect(await screen.findByRole("link", { name: "Terug naar overzicht" })).toBeVisible();
 

@@ -4,8 +4,9 @@ import { describe, expect, test, vi } from "vitest";
 
 import { ApiClient } from "@/api/ApiClient";
 import { ApiProviderContext, type ApiState } from "@/api/ApiProviderContext";
+import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { TestUserProvider } from "@/testing/TestUserProvider";
-import { screen, setupTestRouter, waitFor } from "@/testing/test-utils";
+import { expectForbiddenErrorPage, screen, setupTestRouter, waitFor } from "@/testing/test-utils";
 import type { LoginResponse, Role } from "@/types/generated/openapi";
 import { AuthorizationGuard } from "./AuthorizationGuard";
 
@@ -112,15 +113,16 @@ describe("AuthorizationGuard", () => {
     expect(console.error).toHaveBeenCalledWith("Forbidden access to route /logs for unauthenticated user");
   });
 
-  test("redirects an authenticated user with wrong role to the login page", async () => {
+  test("shows an error for an authenticated user with the wrong role", async () => {
     vi.spyOn(console, "error").mockImplementation(() => {});
 
-    const router = await renderAuthorizationGuard({
+    await renderAuthorizationGuard({
       initialPath: "/logs",
       userRole: "typist_gsb",
       routes: [
         {
           path: "/logs",
+          errorElement: <ErrorBoundary />,
           element: (
             <AuthorizationGuard>
               <div>Protected content</div>
@@ -132,8 +134,7 @@ describe("AuthorizationGuard", () => {
       ],
     });
 
-    expect(router.state.location.pathname).toBe("/account/login");
-    expect(router.state.location.state).toEqual({ unauthorized: true });
+    await expectForbiddenErrorPage();
     expect(console.error).toHaveBeenCalledWith("Forbidden access to route /logs for role typist_gsb");
   });
 

@@ -3,12 +3,10 @@ import userEvent from "@testing-library/user-event";
 import { useState } from "react";
 import { type RouteObject, RouterProvider } from "react-router";
 import { describe, expect, test, vi } from "vitest";
-
 import { LoginForm } from "@/features/account/components/LoginForm";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 import { render, screen, setupTestRouter, waitFor } from "@/testing/test-utils";
 import type { Role } from "@/types/generated/openapi";
-
 import { AuthorizationDialog } from "./AuthorizationDialog";
 import { AuthorizationGuard } from "./AuthorizationGuard";
 import { EXPIRATION_DIALOG_SECONDS } from "./authorizationConstants";
@@ -134,7 +132,7 @@ describe("AuthorizationDialog", () => {
     expect(logoutText).toBeVisible();
   });
 
-  test("Redirect should happen when not authorized", async () => {
+  test("Redirect should happen when not authenticated", async () => {
     vi.spyOn(console, "error").mockImplementation(() => {});
 
     const router = await renderAuthorizationRouter({

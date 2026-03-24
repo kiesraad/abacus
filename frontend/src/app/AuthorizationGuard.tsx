@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { Navigate, useMatches } from "react-router";
+import { ApplicationError } from "@/api/ApiResult";
 import { useApiState } from "@/api/useApiState";
 import { getPostLoginPath } from "@/features/account/utils/getPostLoginPath";
+import { t } from "@/i18n/translate";
 import { AuthorizationDialog } from "./AuthorizationDialog";
 import { EXPIRATION_DIALOG_SECONDS } from "./authorizationConstants";
 
@@ -23,9 +25,10 @@ interface AuthorizationGuardProps {
  *   session later becomes valid again for longer than `EXPIRATION_DIALOG_SECONDS`, the hidden state is reset so the
  *   warning can be shown again on a future near-expiry.
  *
- * Redirect rules, in evaluation order:
- * - If the current route is not public and the current role is not allowed for `handle.roles`, the user is
- *   redirected to `/account/login` with `{ unauthorized: true }` (this shows a message on the login page).
+ * Rules, in evaluation order:
+ * - If the current route is not public and the current role is not allowed for `handle.roles`:
+ *    - An unauthenticated user is redirected to the login page with `{ unauthorized: true }`
+ *    - An authenticated user is presented with an unauthorized error
  * - If the current route is not public and the computed session lifetime has expired, the user is redirected to
  *   `/account/login` with `{ unauthorized: true }`.
  * - If the user is already logged in and tries to open `/account/login`, the user is redirected to the same
@@ -41,6 +44,7 @@ export function AuthorizationGuard({ children }: AuthorizationGuardProps) {
   const matches = useMatches();
 
   const routeMatch = matches[matches.length - 1];
+  const isAuthenticated = user !== null;
   const isPublic = routeMatch?.handle.public;
   const isAllowed = isPublic || (user?.role && routeMatch?.handle.roles.includes(user.role));
 
@@ -72,14 +76,19 @@ export function AuthorizationGuard({ children }: AuthorizationGuardProps) {
     }
   }, [expiration, user, setUser, hideDialog]);
 
-  // navigate to login page if the user is not allowed to access the route
+  // if user is not allowed on this route
   if (!isAllowed) {
     const route = routeMatch?.pathname || "unknown";
-    console.error(
-      `Forbidden access to route ${route}` + ` for ${user?.role ? `role ${user.role}` : "unauthenticated user"}`,
-    );
 
-    return <Navigate to="/account/login" state={{ unauthorized: true }} />;
+    // redirect to login page if not authenticated
+    if (!isAuthenticated) {
+      console.error(`Forbidden access to route ${route} for unauthenticated user`);
+      return <Navigate to="/account/login" state={{ unauthorized: true }} />;
+    }
+
+    // otherwise show forbidden error
+    console.error(`Forbidden access to route ${route} for role ${user.role}`);
+    throw new ApplicationError(t("error.forbidden_message"), "Forbidden");
   }
 
   // navigate to login page if the session has expired
@@ -88,7 +97,7 @@ export function AuthorizationGuard({ children }: AuthorizationGuardProps) {
   }
 
   // navigate to the overview if the user is logged in and tries to access the login page
-  if (routeMatch?.pathname === "/account/login" && user !== null) {
+  if (routeMatch?.pathname === "/account/login" && isAuthenticated) {
     return <Navigate to={getPostLoginPath(user)} replace />;
   }
 

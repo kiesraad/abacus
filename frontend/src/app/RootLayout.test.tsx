@@ -5,7 +5,7 @@ import { describe, expect, test, vi } from "vitest";
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { LoginPage } from "@/features/account/components/LoginPage";
 import { TestUserProvider } from "@/testing/TestUserProvider";
-import { setupTestRouter } from "@/testing/test-utils";
+import { expectForbiddenErrorPage, setupTestRouter } from "@/testing/test-utils";
 import type { Role } from "@/types/generated/openapi";
 import { RootLayout } from "./RootLayout";
 
@@ -34,7 +34,7 @@ describe("Route authorisation is handled", () => {
     handle: RouteObject["handle"];
     ownRole: Role | null;
     allowed: boolean;
-  }>)("$handle, ownRole=$ownRole, allowed=$allowed", ({ handle, ownRole, allowed }) => {
+  }>)("$handle, ownRole=$ownRole, allowed=$allowed", async ({ handle, ownRole, allowed }) => {
     vi.spyOn(console, "error").mockImplementation(() => {});
 
     const router = render(
@@ -45,15 +45,17 @@ describe("Route authorisation is handled", () => {
       ownRole,
     );
 
-    expect(router.state.location.pathname).toEqual(allowed ? "/" : "/account/login");
-    expect(router.state.location.state).toEqual(allowed ? null : { unauthorized: true });
-
     if (allowed) {
+      expect(router.state.location.pathname).toEqual("/");
       expect(console.error).not.toHaveBeenCalled();
+    } else if (ownRole === null) {
+      // Expect redirect to login when not authenticated
+      expect(router.state.location.pathname).toEqual("/account/login");
+      expect(router.state.location.state).toEqual({ unauthorized: true });
     } else {
-      expect(console.error).toHaveBeenCalledWith(
-        `Forbidden access to route / for ${ownRole ? `role ${ownRole}` : "unauthenticated user"}`,
-      );
+      // Expect forbidden error when authenticated but not authorized
+      await expectForbiddenErrorPage();
+      expect(console.error).toHaveBeenCalledWith(`Forbidden access to route / for role ${ownRole}`);
     }
   });
 });

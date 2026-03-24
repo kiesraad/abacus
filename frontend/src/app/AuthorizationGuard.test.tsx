@@ -88,7 +88,7 @@ describe("AuthorizationGuard", () => {
     expect(screen.getByText("Protected content")).toBeVisible();
   });
 
-  test("redirects an unauthorized user to the login page", async () => {
+  test("redirects an unauthenticated user to the login page", async () => {
     vi.spyOn(console, "error").mockImplementation(() => {});
 
     const router = await renderAuthorizationGuard({
@@ -110,6 +110,31 @@ describe("AuthorizationGuard", () => {
     expect(router.state.location.pathname).toBe("/account/login");
     expect(router.state.location.state).toEqual({ unauthorized: true });
     expect(console.error).toHaveBeenCalledWith("Forbidden access to route /logs for unauthenticated user");
+  });
+
+  test("redirects an authenticated user with wrong role to the login page", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+
+    const router = await renderAuthorizationGuard({
+      initialPath: "/logs",
+      userRole: "typist_gsb",
+      routes: [
+        {
+          path: "/logs",
+          element: (
+            <AuthorizationGuard>
+              <div>Protected content</div>
+            </AuthorizationGuard>
+          ),
+          handle: { roles: ["administrator"] },
+        },
+        { path: "/account/login", element: <div>Login page</div>, handle: { public: true } },
+      ],
+    });
+
+    expect(router.state.location.pathname).toBe("/account/login");
+    expect(router.state.location.state).toEqual({ unauthorized: true });
+    expect(console.error).toHaveBeenCalledWith("Forbidden access to route /logs for role typist_gsb");
   });
 
   test("redirects to the login page when the session has expired", async () => {

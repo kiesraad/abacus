@@ -1,10 +1,11 @@
 import { render as rtlRender } from "@testing-library/react";
 import { type RouteObject, RouterProvider } from "react-router";
+import { within } from "storybook/test";
 import { describe, expect, test, vi } from "vitest";
-
 import { ApiClient } from "@/api/ApiClient";
 import { ApiProviderContext, type ApiState } from "@/api/ApiProviderContext";
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
+import { LoginForm } from "@/features/account/components/LoginForm";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 import { expectForbiddenErrorPage, screen, setupTestRouter, waitFor } from "@/testing/test-utils";
 import type { LoginResponse, Role } from "@/types/generated/openapi";
@@ -153,13 +154,17 @@ describe("AuthorizationGuard", () => {
           ),
           handle: { roles: ["administrator"] },
         },
-        { path: "/account/login", element: <div>Login page</div>, handle: { public: true } },
+        { path: "/account/login", element: <LoginForm />, handle: { public: true } },
       ],
     });
 
-    await waitFor(() => {
+    await waitFor(async () => {
       expect(router.state.location.pathname).toBe("/account/login");
       expect(router.state.location.state).toEqual({ unauthorized: true });
+
+      const logoutText = within(await screen.findByRole("alert")).getByRole("strong");
+      expect(logoutText).toHaveTextContent("Je bent automatisch uitgelogd");
+      expect(logoutText).toBeVisible();
     });
   });
 

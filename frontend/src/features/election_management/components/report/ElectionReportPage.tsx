@@ -59,12 +59,10 @@ export function ElectionReportPage() {
   }
 
   function pageTitle() {
-    return (
-      <>
-        {election.committee_category === "CSB" ? t("election_report.report") : sessionLabel}{" "}
-        {t(`committee_category.${election.committee_category}.short`).replace(/(^\w|\s\w)/g, (m) => m.toLowerCase())}
-      </>
-    );
+    return `
+      ${election.committee_category === "CSB" ? t("election_report.report") : sessionLabel} 
+      ${t(`committee_category.${election.committee_category}.short`).replace(/(^\w|\s\w)/g, (m) => m.toLowerCase())}
+    `;
   }
 
   function formTitle() {
@@ -76,18 +74,16 @@ export function ElectionReportPage() {
       );
     }
 
-    return (
-      <>
-        {t("election_report.counting_results")} {sessionLabel.toLowerCase()}{" "}
-        {t(`committee_category.${election.committee_category}.short`).toLowerCase()} {t("municipality").toLowerCase()}{" "}
-        {election.location}
-      </>
-    );
+    return `
+        ${t("election_report.counting_results")} ${sessionLabel.toLowerCase()} 
+        ${t(`committee_category.${election.committee_category}.short`).toLowerCase()} ${t("municipality").toLowerCase()} 
+        ${election.location}
+      `;
   }
 
   return (
     <>
-      <PageTitle title={`${pageTitle.toString()} - Abacus`} />
+      <PageTitle title={`${pageTitle()} - Abacus`} />
       <header>
         <section>
           <h1>{pageTitle()}</h1>

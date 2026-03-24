@@ -22,13 +22,15 @@ use crate::{
             DataEntrySourceContext, DataEntryStatus, DataEntryStatusName, DataEntryStatusResponse,
             DataEntryTransitionError, EntriesDifferent,
         },
-        election::{ElectionId, PoliticalGroup},
+        election::{CommitteeCategory, ElectionId, PoliticalGroup},
         entry_number::EntryNumber,
         investigation::InvestigationStatus,
         polling_station::PollingStationId,
         results::{
-            Results, common_polling_station_results::CommonPollingStationResults,
-            cso_next_session_results::CSONextSessionResults,
+            PollingStationResults, Results,
+            common_polling_station_results::CommonPollingStationResults,
+            cso_first_session_results::CSOFirstSessionResults,
+            cso_next_session_results::CSONextSessionResults, gsb_results::GSBResults,
         },
         role::Role,
         validate::{DataError, ValidateRoot, ValidationResults},
@@ -147,20 +149,20 @@ pub struct ClaimDataEntryResponse {
 pub fn router() -> OpenApiRouter<AppState> {
     use Role::*;
 
+    const TYPIST: &[Role] = &[TypistCSB, TypistGSB];
+    const COORDINATOR: &[Role] = &[CoordinatorCSB, CoordinatorGSB];
     const ALL_ROLES: &[Role] = Role::VARIANTS;
-    const COORDINATOR_GSB: &[Role] = &[CoordinatorGSB];
-    const TYPIST_GSB: &[Role] = &[TypistGSB];
 
     OpenApiRouter::default()
-        .routes(routes!(data_entry_claim).authorize(TYPIST_GSB))
-        .routes(routes!(data_entry_save).authorize(TYPIST_GSB))
-        .routes(routes!(data_entry_discard).authorize(TYPIST_GSB))
-        .routes(routes!(data_entry_finalise).authorize(TYPIST_GSB))
-        .routes(routes!(data_entry_reset).authorize(COORDINATOR_GSB))
-        .routes(routes!(data_entry_get).authorize(COORDINATOR_GSB))
-        .routes(routes!(data_entry_resolve_errors).authorize(COORDINATOR_GSB))
-        .routes(routes!(data_entry_get_differences).authorize(COORDINATOR_GSB))
-        .routes(routes!(data_entry_resolve_differences).authorize(COORDINATOR_GSB))
+        .routes(routes!(data_entry_claim).authorize(TYPIST))
+        .routes(routes!(data_entry_save).authorize(TYPIST))
+        .routes(routes!(data_entry_discard).authorize(TYPIST))
+        .routes(routes!(data_entry_finalise).authorize(TYPIST))
+        .routes(routes!(data_entry_reset).authorize(COORDINATOR))
+        .routes(routes!(data_entry_get).authorize(COORDINATOR))
+        .routes(routes!(data_entry_resolve_errors).authorize(COORDINATOR))
+        .routes(routes!(data_entry_get_differences).authorize(COORDINATOR))
+        .routes(routes!(data_entry_resolve_differences).authorize(COORDINATOR))
         .routes(routes!(election_status).authorize(ALL_ROLES))
 }
 
@@ -238,29 +240,34 @@ pub async fn delete_data_entry_for_polling_station(
 
 fn initial_current_data_entry(
     user_id: UserId,
+    committee_category: &CommitteeCategory,
     political_groups: &[PoliticalGroup],
     committee_session: &CommitteeSession,
-    previous_results: Option<&Results>,
+    previous_results: Option<&CommonPollingStationResults>,
 ) -> CurrentDataEntry {
-    let entry = if committee_session.is_next_session() {
-        if let Some(prev) = previous_results {
-            let mut copy = CSONextSessionResults {
-                voters_counts: prev.voters_counts().clone(),
-                votes_counts: prev.votes_counts().clone(),
-                differences_counts: prev.differences_counts().clone(),
-                political_group_votes: prev.political_group_votes().to_vec(),
-            };
-
-            // clear checkboxes in differences because they always need to be re-entered
-            copy.differences_counts.compare_votes_cast_admitted_voters = Default::default();
-            copy.differences_counts.difference_completely_accounted_for = Default::default();
-
-            Results::CSONextSession(copy)
-        } else {
-            Results::empty_cso_next_session(political_groups)
+    let entry = match (committee_category, committee_session.is_next_session()) {
+        (CommitteeCategory::GSB, false) => {
+            Results::CSOFirstSession(CSOFirstSessionResults::empty(political_groups))
         }
-    } else {
-        Results::empty_cso_first_session(political_groups)
+        (CommitteeCategory::GSB, true) => {
+            if let Some(prev) = previous_results {
+                let mut copy = CSONextSessionResults {
+                    voters_counts: prev.voters_counts.clone(),
+                    votes_counts: prev.votes_counts.clone(),
+                    differences_counts: prev.differences_counts.clone(),
+                    political_group_votes: prev.political_group_votes.to_vec(),
+                };
+
+                // clear checkboxes in differences because they always need to be re-entered
+                copy.differences_counts.compare_votes_cast_admitted_voters = Default::default();
+                copy.differences_counts.difference_completely_accounted_for = Default::default();
+
+                Results::CSONextSession(copy)
+            } else {
+                Results::CSONextSession(CSONextSessionResults::empty(political_groups))
+            }
+        }
+        (CommitteeCategory::CSB, _) => Results::GSB(GSBResults::empty(political_groups)),
     };
 
     CurrentDataEntry {
@@ -322,9 +329,15 @@ async fn data_entry_claim(
         _ => None,
     };
 
-    let previous_results: Option<Results> = match prev_data_entry_id {
+    // If there is a previous data entry with status definitive
+    let previous_results: Option<CommonPollingStationResults> = match prev_data_entry_id {
         Some(prev_id) => match data_entry_repo::get_status(&mut tx, prev_id).await? {
-            DataEntryStatus::Definitive(d) => Some(d.results),
+            // Match polling station results onl and get the common results
+            DataEntryStatus::Definitive(d) => match d.results {
+                Results::CSOFirstSession(r) => Some(r.as_common()),
+                Results::CSONextSession(r) => Some(r.as_common()),
+                _ => None,
+            },
             _ => None,
         },
         None => None,
@@ -332,6 +345,7 @@ async fn data_entry_claim(
 
     let new_data_entry = initial_current_data_entry(
         user.id(),
+        &context.election.committee_category,
         &context.election.political_groups,
         &context.committee_session,
         previous_results.as_ref(),
@@ -373,7 +387,7 @@ async fn data_entry_claim(
         data: data.clone(),
         client_state,
         validation_results,
-        previous_results: previous_results.map(|r| r.as_common()),
+        previous_results,
         source: context.source,
         status: new_state.status_name(),
     }))
@@ -1216,17 +1230,10 @@ mod tests {
 
         // Save and finalise a different second data entry
         let mut request_body = example_data_entry();
+        request_body.data.voters_counts_mut().poll_card_count = 100;
         request_body
             .data
-            .as_cso_first_session_mut()
-            .unwrap()
-            .voters_counts
-            .poll_card_count = 100;
-        request_body
-            .data
-            .as_cso_first_session_mut()
-            .unwrap()
-            .voters_counts
+            .voters_counts_mut()
             .proxy_certificate_count = 0;
         let response = claim(pool.clone(), polling_station_id, EntryNumber::SecondEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
@@ -1251,12 +1258,7 @@ mod tests {
         let mut request_body = example_data_entry();
         let polling_station_id = PollingStationId::from(211);
 
-        request_body
-            .data
-            .as_cso_first_session_mut()
-            .unwrap()
-            .voters_counts
-            .poll_card_count = 100; // incorrect value
+        request_body.data.voters_counts_mut().poll_card_count = 100; // incorrect value
 
         let response = claim(pool.clone(), polling_station_id, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
@@ -1557,16 +1559,8 @@ mod tests {
             panic!("Expected entry to be in FirstEntryInProgress state");
         };
         assert_eq!(
-            state
-                .first_entry
-                .as_cso_first_session()
-                .map(|r| r.voters_counts.poll_card_count)
-                .unwrap(),
-            request_body
-                .data
-                .as_cso_first_session()
-                .map(|r| r.voters_counts.poll_card_count)
-                .unwrap()
+            state.first_entry.voters_counts().poll_card_count,
+            request_body.data.voters_counts().poll_card_count,
         );
     }
 
@@ -2154,12 +2148,7 @@ mod tests {
         let status: DataEntryStatus = data_entry.state.0;
         if let DataEntryStatus::FirstEntryFinalised(entry) = status {
             assert_eq!(
-                entry
-                    .finalised_first_entry
-                    .as_cso_first_session()
-                    .unwrap()
-                    .voters_counts
-                    .poll_card_count,
+                entry.finalised_first_entry.voters_counts().poll_card_count,
                 99
             )
         } else {
@@ -2192,12 +2181,7 @@ mod tests {
         let status: DataEntryStatus = data_entry.state.0;
         if let DataEntryStatus::FirstEntryFinalised(entry) = status {
             assert_eq!(
-                entry
-                    .finalised_first_entry
-                    .as_cso_first_session()
-                    .unwrap()
-                    .voters_counts
-                    .poll_card_count,
+                entry.finalised_first_entry.voters_counts().poll_card_count,
                 100
             )
         } else {
@@ -2495,7 +2479,7 @@ mod tests {
 
             assert_eq!(result.status, DataEntryStatusName::FirstEntryInProgress);
             assert_eq!(result.user_id, Some(UserId::from(1)));
-            assert_eq!(result.data.as_common().voters_counts.poll_card_count, 0);
+            assert_eq!(result.data.voters_counts().poll_card_count, 0);
             assert!(!result.validation_results.has_errors());
             assert!(!result.validation_results.has_warnings());
         }
@@ -2523,7 +2507,7 @@ mod tests {
 
             assert_eq!(result.status, DataEntryStatusName::FirstEntryHasErrors);
             assert_eq!(result.user_id, Some(UserId::from(1)));
-            assert_eq!(result.data.as_common().voters_counts.poll_card_count, 1234);
+            assert_eq!(result.data.voters_counts().poll_card_count, 1234);
             assert_eq!(
                 result.validation_results.errors,
                 [ValidationResult {
@@ -2557,7 +2541,7 @@ mod tests {
 
             assert_eq!(result.status, DataEntryStatusName::FirstEntryFinalised);
             assert_eq!(result.user_id, Some(UserId::from(1)));
-            assert_eq!(result.data.as_common().voters_counts.poll_card_count, 199);
+            assert_eq!(result.data.voters_counts().poll_card_count, 199);
             assert!(!result.validation_results.has_errors());
             assert!(result.validation_results.has_warnings());
         }
@@ -2587,7 +2571,7 @@ mod tests {
 
             assert_eq!(result.status, DataEntryStatusName::SecondEntryInProgress);
             assert_eq!(result.user_id, Some(UserId::from(2)));
-            assert_eq!(result.data.as_common().voters_counts.poll_card_count, 0);
+            assert_eq!(result.data.voters_counts().poll_card_count, 0);
             assert!(!result.validation_results.has_errors());
             assert!(!result.validation_results.has_warnings());
         }

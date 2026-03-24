@@ -1,7 +1,6 @@
 use common_polling_station_results::CommonPollingStationResults;
 use cso_first_session_results::CSOFirstSessionResults;
 use cso_next_session_results::CSONextSessionResults;
-use differences_counts::DifferencesCounts;
 use political_group_candidate_votes::{CandidateVotes, PoliticalGroupCandidateVotes};
 use political_group_total_votes::PoliticalGroupTotalVotes;
 use serde::{Deserialize, Serialize};
@@ -13,16 +12,20 @@ use crate::domain::{
     compare::Compare,
     election::{ElectionWithPoliticalGroups, PoliticalGroup},
     field_path::FieldPath,
+    results::{count::Count, gsb_results::GSBResults},
     validate::{DataError, Validate, ValidateRoot, ValidationResults},
 };
 
 pub mod common_polling_station_results;
+pub mod common_results;
 pub mod count;
 pub mod counting_differences_polling_station;
 pub mod cso_first_session_results;
 pub mod cso_next_session_results;
 pub mod differences_counts;
 pub mod extra_investigation;
+pub mod gsb_differences_counts;
+pub mod gsb_results;
 pub mod political_group_candidate_votes;
 pub mod political_group_total_votes;
 pub mod voters_counts;
@@ -37,97 +40,35 @@ pub mod yes_no;
 #[serde(tag = "model")]
 pub enum Results {
     /// Results for centrally counted (CSO) elections, first election committee session.
-    /// This contains the data entry values from Model Na 31-2 Bijlage 2.
+    /// This contains the data entry values from Model Na 31-2 Bijlage 1.
     CSOFirstSession(CSOFirstSessionResults),
     /// Results for centrally counted (CSO) elections, any subsequent election committee session.
     /// This contains the data entry values from Model Na 14-2 Bijlage 1.
     CSONextSession(CSONextSessionResults),
+    /// HSB/CSB enters GSB results
+    /// This contains the data entry values from Model Na 31-2.
+    GSB(GSBResults),
 }
 
+pub struct CommonDifferencesCounts<'a> {
+    pub more_ballots_count: &'a Count,
+    pub fewer_ballots_count: &'a Count,
+}
+
+#[cfg(test)]
+pub struct CommonDifferenceCountsMut<'a> {
+    pub more_ballots_count: &'a mut Count,
+    pub fewer_ballots_count: &'a mut Count,
+}
+
+/// Contains common functions for all result models
 impl Results {
-    /// Get a reference to the inner CSOFirstSessionResults, if this is of that type.
-    pub fn as_cso_first_session(&self) -> Option<&CSOFirstSessionResults> {
-        match self {
-            Results::CSOFirstSession(results) => Some(results),
-            _ => None,
-        }
-    }
-
-    /// Get a mutable reference to the inner CSOFirstSessionResults, if this is of that type.
-    pub fn as_cso_first_session_mut(&mut self) -> Option<&mut CSOFirstSessionResults> {
-        match self {
-            Results::CSOFirstSession(results) => Some(results),
-            _ => None,
-        }
-    }
-
-    /// Consume self and return the inner CSOFirstSessionResults, if this is of that type.
-    pub fn into_cso_first_session(self) -> Option<CSOFirstSessionResults> {
-        match self {
-            Results::CSOFirstSession(results) => Some(results),
-            _ => None,
-        }
-    }
-
-    pub fn empty_cso_first_session(political_groups: &[PoliticalGroup]) -> Self {
-        Results::CSOFirstSession(CSOFirstSessionResults {
-            extra_investigation: Default::default(),
-            counting_differences_polling_station: Default::default(),
-            voters_counts: Default::default(),
-            votes_counts: VotesCounts {
-                political_group_total_votes: Results::default_political_group_total_votes(
-                    political_groups,
-                ),
-                ..Default::default()
-            },
-            differences_counts: Default::default(),
-            political_group_votes: Results::default_political_group_votes(political_groups),
-        })
-    }
-
-    pub fn empty_cso_next_session(political_groups: &[PoliticalGroup]) -> Self {
-        Results::CSONextSession(CSONextSessionResults {
-            voters_counts: Default::default(),
-            votes_counts: VotesCounts {
-                political_group_total_votes: Results::default_political_group_total_votes(
-                    political_groups,
-                ),
-                ..Default::default()
-            },
-            differences_counts: Default::default(),
-            political_group_votes: Results::default_political_group_votes(political_groups),
-        })
-    }
-
-    /// Get a reference to the inner CSONextSessionResults, if this is of that type.
-    pub fn as_cso_next_session(&self) -> Option<&CSONextSessionResults> {
-        match self {
-            Results::CSONextSession(results) => Some(results),
-            _ => None,
-        }
-    }
-
-    /// Get a mutable reference to the inner CSONextSessionResults, if this is of that type.
-    pub fn as_cso_next_session_mut(&mut self) -> Option<&mut CSONextSessionResults> {
-        match self {
-            Results::CSONextSession(results) => Some(results),
-            _ => None,
-        }
-    }
-
-    /// Consume self and return the inner CSONextSessionResults, if this is of that type.
-    pub fn into_cso_next_session(self) -> Option<CSONextSessionResults> {
-        match self {
-            Results::CSONextSession(results) => Some(results),
-            _ => None,
-        }
-    }
-
     /// Common accessor for voter counts regardless of the underlying model.
     pub fn voters_counts(&self) -> &VotersCounts {
         match self {
             Results::CSOFirstSession(results) => &results.voters_counts,
             Results::CSONextSession(results) => &results.voters_counts,
+            Results::GSB(results) => &results.voters_counts,
         }
     }
 
@@ -137,6 +78,7 @@ impl Results {
         match self {
             Results::CSOFirstSession(results) => &mut results.voters_counts,
             Results::CSONextSession(results) => &mut results.voters_counts,
+            Results::GSB(results) => &mut results.voters_counts,
         }
     }
 
@@ -145,6 +87,7 @@ impl Results {
         match self {
             Results::CSOFirstSession(results) => &results.votes_counts,
             Results::CSONextSession(results) => &results.votes_counts,
+            Results::GSB(results) => &results.votes_counts,
         }
     }
 
@@ -154,23 +97,44 @@ impl Results {
         match self {
             Results::CSOFirstSession(results) => &mut results.votes_counts,
             Results::CSONextSession(results) => &mut results.votes_counts,
+            Results::GSB(results) => &mut results.votes_counts,
         }
     }
 
     /// Common accessor for differences counts regardless of the underlying model.
-    pub fn differences_counts(&self) -> &DifferencesCounts {
+    pub fn differences_counts(&self) -> CommonDifferencesCounts<'_> {
         match self {
-            Results::CSOFirstSession(results) => &results.differences_counts,
-            Results::CSONextSession(results) => &results.differences_counts,
+            Results::CSOFirstSession(results) => CommonDifferencesCounts {
+                more_ballots_count: &results.differences_counts.more_ballots_count,
+                fewer_ballots_count: &results.differences_counts.fewer_ballots_count,
+            },
+            Results::CSONextSession(results) => CommonDifferencesCounts {
+                more_ballots_count: &results.differences_counts.more_ballots_count,
+                fewer_ballots_count: &results.differences_counts.fewer_ballots_count,
+            },
+            Results::GSB(results) => CommonDifferencesCounts {
+                more_ballots_count: &results.differences_counts.more_ballots_count,
+                fewer_ballots_count: &results.differences_counts.fewer_ballots_count,
+            },
         }
     }
 
     /// Common mutable accessor for differences counts regardless of the underlying model.
     #[cfg(test)]
-    pub fn differences_counts_mut(&mut self) -> &mut DifferencesCounts {
+    pub fn differences_counts_mut(&mut self) -> CommonDifferenceCountsMut<'_> {
         match self {
-            Results::CSOFirstSession(results) => &mut results.differences_counts,
-            Results::CSONextSession(results) => &mut results.differences_counts,
+            Results::CSOFirstSession(results) => CommonDifferenceCountsMut {
+                more_ballots_count: &mut results.differences_counts.more_ballots_count,
+                fewer_ballots_count: &mut results.differences_counts.fewer_ballots_count,
+            },
+            Results::CSONextSession(results) => CommonDifferenceCountsMut {
+                more_ballots_count: &mut results.differences_counts.more_ballots_count,
+                fewer_ballots_count: &mut results.differences_counts.fewer_ballots_count,
+            },
+            Results::GSB(results) => CommonDifferenceCountsMut {
+                more_ballots_count: &mut results.differences_counts.more_ballots_count,
+                fewer_ballots_count: &mut results.differences_counts.fewer_ballots_count,
+            },
         }
     }
 
@@ -179,6 +143,7 @@ impl Results {
         match self {
             Results::CSOFirstSession(results) => &results.political_group_votes,
             Results::CSONextSession(results) => &results.political_group_votes,
+            Results::GSB(results) => &results.political_group_votes,
         }
     }
 
@@ -188,16 +153,7 @@ impl Results {
         match self {
             Results::CSOFirstSession(results) => &mut results.political_group_votes,
             Results::CSONextSession(results) => &mut results.political_group_votes,
-        }
-    }
-
-    /// Convert to CommonPollingStationResults, which contains only the common fields.
-    pub fn as_common(&self) -> CommonPollingStationResults {
-        CommonPollingStationResults {
-            voters_counts: self.voters_counts().clone(),
-            votes_counts: self.votes_counts().clone(),
-            differences_counts: self.differences_counts().clone(),
-            political_group_votes: self.political_group_votes().to_vec(),
+            Results::GSB(results) => &mut results.political_group_votes,
         }
     }
 
@@ -207,6 +163,7 @@ impl Results {
             (self, other),
             (Results::CSOFirstSession(_), Results::CSOFirstSession(_))
                 | (Results::CSONextSession(_), Results::CSONextSession(_))
+                | (Results::GSB(_), Results::GSB(_))
         )
     }
 
@@ -246,6 +203,83 @@ impl Results {
     }
 }
 
+/// Contains common functions which are specific to polling station results
+pub trait PollingStationResults {
+    /// Convert to CommonPollingStationResults, which contains only the common fields.
+    fn as_common(&self) -> CommonPollingStationResults;
+
+    fn empty(political_groups: &[PoliticalGroup]) -> Self;
+}
+
+impl PollingStationResults for CSOFirstSessionResults {
+    fn as_common(&self) -> CommonPollingStationResults {
+        CommonPollingStationResults {
+            voters_counts: self.voters_counts.clone(),
+            votes_counts: self.votes_counts.clone(),
+            differences_counts: self.differences_counts.clone(),
+            political_group_votes: self.political_group_votes.to_vec(),
+        }
+    }
+
+    fn empty(political_groups: &[PoliticalGroup]) -> Self {
+        Self {
+            extra_investigation: Default::default(),
+            counting_differences_polling_station: Default::default(),
+            voters_counts: Default::default(),
+            votes_counts: VotesCounts {
+                political_group_total_votes: Results::default_political_group_total_votes(
+                    political_groups,
+                ),
+                ..Default::default()
+            },
+            differences_counts: Default::default(),
+            political_group_votes: Results::default_political_group_votes(political_groups),
+        }
+    }
+}
+
+impl PollingStationResults for CSONextSessionResults {
+    fn as_common(&self) -> CommonPollingStationResults {
+        CommonPollingStationResults {
+            voters_counts: self.voters_counts.clone(),
+            votes_counts: self.votes_counts.clone(),
+            differences_counts: self.differences_counts.clone(),
+            political_group_votes: self.political_group_votes.to_vec(),
+        }
+    }
+
+    fn empty(political_groups: &[PoliticalGroup]) -> Self {
+        Self {
+            voters_counts: Default::default(),
+            votes_counts: VotesCounts {
+                political_group_total_votes: Results::default_political_group_total_votes(
+                    political_groups,
+                ),
+                ..Default::default()
+            },
+            differences_counts: Default::default(),
+            political_group_votes: Results::default_political_group_votes(political_groups),
+        }
+    }
+}
+
+impl GSBResults {
+    pub fn empty(political_groups: &[PoliticalGroup]) -> Self {
+        Self {
+            number_of_voters: 0,
+            voters_counts: Default::default(),
+            votes_counts: VotesCounts {
+                political_group_total_votes: Results::default_political_group_total_votes(
+                    political_groups,
+                ),
+                ..Default::default()
+            },
+            differences_counts: Default::default(),
+            political_group_votes: Results::default_political_group_votes(political_groups),
+        }
+    }
+}
+
 impl Compare for Results {
     fn compare(&self, first_entry: &Self, different_fields: &mut Vec<String>, path: &FieldPath) {
         match (self, first_entry) {
@@ -255,6 +289,7 @@ impl Compare for Results {
             (Results::CSONextSession(s), Results::CSONextSession(f)) => {
                 s.compare(f, different_fields, path)
             }
+            (Results::GSB(s), Results::GSB(f)) => s.compare(f, different_fields, path),
             _ => {
                 different_fields.push(path.to_string());
             }
@@ -285,26 +320,30 @@ impl Validate for Results {
                     &path.field("counting_differences_polling_station"),
                 )?;
 
-                self.as_common()
+                results
+                    .as_common()
                     .validate(election, validation_results, path)
             }
-            Results::CSONextSession(_) => {
-                self.as_common()
+            Results::CSONextSession(results) => {
+                results
+                    .as_common()
                     .validate(election, validation_results, path)
             }
+            Results::GSB(results) => results.validate(election, validation_results, path),
         }
     }
 }
 
 #[cfg(test)]
 pub mod tests {
-    use test_log::test;
-
     use super::*;
     use crate::domain::{
         election::PGNumber,
         results::{
-            count::Count, differences_counts::DifferenceCountsCompareVotesCastAdmittedVoters,
+            count::Count,
+            differences_counts::{
+                DifferenceCountsCompareVotesCastAdmittedVoters, DifferencesCounts,
+            },
             yes_no::YesNo,
         },
         valid_default::ValidDefault,
@@ -386,53 +425,5 @@ pub mod tests {
 
             self
         }
-    }
-
-    #[test]
-    fn test_cso_first_session_as() {
-        let cso_first_session = Results::CSOFirstSession(Default::default());
-        assert!(cso_first_session.as_cso_first_session().is_some());
-        assert!(cso_first_session.as_cso_next_session().is_none());
-        assert!(
-            cso_first_session
-                .clone()
-                .as_cso_first_session_mut()
-                .is_some()
-        );
-        assert!(
-            cso_first_session
-                .clone()
-                .as_cso_next_session_mut()
-                .is_none()
-        );
-    }
-
-    #[test]
-    fn test_cso_next_session_as() {
-        let cso_next_session = Results::CSONextSession(Default::default());
-        assert!(cso_next_session.as_cso_first_session().is_none());
-        assert!(cso_next_session.as_cso_next_session().is_some());
-
-        assert!(
-            cso_next_session
-                .clone()
-                .as_cso_first_session_mut()
-                .is_none()
-        );
-        assert!(cso_next_session.clone().as_cso_next_session_mut().is_some());
-    }
-
-    #[test]
-    fn test_cso_first_session_into() {
-        let cso_first_session = Results::CSOFirstSession(Default::default());
-        assert!(cso_first_session.clone().into_cso_first_session().is_some());
-        assert!(cso_first_session.clone().into_cso_next_session().is_none());
-    }
-
-    #[test]
-    fn test_cso_next_session_into() {
-        let cso_next_session = Results::CSONextSession(Default::default());
-        assert!(cso_next_session.clone().into_cso_first_session().is_none());
-        assert!(cso_next_session.clone().into_cso_next_session().is_some());
     }
 }

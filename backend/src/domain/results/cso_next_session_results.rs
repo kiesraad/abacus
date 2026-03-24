@@ -11,9 +11,8 @@ use crate::domain::{compare::Compare, field_path::FieldPath};
 /// CSONextSessionResults, following the fields in Model Na 14-2 Bijlage 1.
 ///
 /// See "Model Na 14-2. Corrigendum bij het proces-verbaal van een gemeentelijk stembureau/
-/// stembureau voor het openbaar lichaam, Bijlage 1: uitkomsten per stembureau" from the
-/// [Kiesregeling](https://wetten.overheid.nl/BWBR0034180/2026-01-01#Bijlage1_DivisieNa14.2) or
-/// [Verkiezingstoolbox](https://www.rijksoverheid.nl/onderwerpen/verkiezingen/verkiezingentoolkit/modellen).
+/// stembureau voor het openbaar lichaam, Bijlage 1: uitkomsten per stembureau" from
+/// [Kiesraad](https://www.kiesraad.nl/documenten/2025/11/27/na-14-2-corrigendum-gsb-inclusief-bijlage-voor-cso).
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
 pub struct CSONextSessionResults {

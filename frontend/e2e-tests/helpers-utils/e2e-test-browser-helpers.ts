@@ -6,6 +6,7 @@ import { CountingDifferencesPollingStationPage } from "e2e-tests/page-objects/da
 import { DataEntryHomePage } from "e2e-tests/page-objects/data_entry/DataEntryHomePgObj";
 import { DifferencesPage } from "e2e-tests/page-objects/data_entry/DifferencesPgObj";
 import { ExtraInvestigationPage } from "e2e-tests/page-objects/data_entry/ExtraInvestigationPgObj";
+import { GSBDifferencesPage } from "e2e-tests/page-objects/data_entry/GSBDifferencesPgObj";
 import { ProgressList } from "e2e-tests/page-objects/data_entry/ProgressListPgObj";
 import { VotersAndVotesPage } from "e2e-tests/page-objects/data_entry/VotersAndVotesPgObj";
 import { CheckCandidateDefinitionPgObj } from "e2e-tests/page-objects/election/create/CheckCandidateDefinitionPgObj";
@@ -35,9 +36,28 @@ export async function fillDataEntryPages(page: Page, results: Results) {
   await expect(votersAndVotesPage.fieldset).toBeVisible();
   await votersAndVotesPage.fillInPageAndClickNext(results.voters_counts, results.votes_counts);
 
-  const differencesPage = new DifferencesPage(page);
-  await expect(differencesPage.fieldset).toBeVisible();
-  await differencesPage.fillInPageAndClickNext(results.differences_counts);
+  switch (results.model) {
+    case "CSOFirstSession":
+    case "CSONextSession":
+      {
+        const differencesPage = new DifferencesPage(page);
+        await expect(differencesPage.fieldset).toBeVisible();
+        await differencesPage.fillInPageAndClickNext(results.differences_counts);
+      }
+      break;
+
+    case "GSB":
+      {
+        const gsbDifferencesPage = new GSBDifferencesPage(page);
+        await expect(gsbDifferencesPage.fieldset).toBeVisible();
+        await gsbDifferencesPage.fillInPageAndClickNext(results.differences_counts);
+      }
+      break;
+
+    default:
+      // Exhaustive check
+      results satisfies never;
+  }
 
   await fillCandidatesListPages(page, results);
 

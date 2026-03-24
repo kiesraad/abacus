@@ -11,7 +11,7 @@ import {
   setValueAtPath,
   stringRepresentsInteger,
 } from "./dataEntryMapping";
-import { createVotersAndVotesSection, differencesSection } from "./dataEntryStructure";
+import { createDifferencesSection, createVotersAndVotesSection } from "./dataEntryStructure";
 
 // Helper function to create a checkbox section for testing
 const createCheckboxesSection = (): DataEntrySection => {
@@ -480,7 +480,7 @@ describe("mapResultsToSectionValues", () => {
       },
     };
 
-    const section = differencesSection("CSOFirstSession");
+    const section = createDifferencesSection("CSOFirstSession");
     const formValues = mapResultsToSectionValues(section, results);
     expect(formValues["differences_counts.more_ballots_count"]).toBe("2");
     expect(formValues["differences_counts.fewer_ballots_count"]).toBe("1");

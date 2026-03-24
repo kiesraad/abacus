@@ -566,16 +566,8 @@ mod tests {
             )],
         });
         let mut second_entry = first_entry.clone();
-        second_entry
-            .as_cso_first_session_mut()
-            .unwrap()
-            .voters_counts
-            .poll_card_count = 101;
-        second_entry
-            .as_cso_first_session_mut()
-            .unwrap()
-            .voters_counts
-            .total_admitted_voters_count = 106;
+        second_entry.voters_counts_mut().poll_card_count = 101;
+        second_entry.voters_counts_mut().total_admitted_voters_count = 106;
         second_entry.compare(&first_entry, &mut different_fields, &"results".into());
         assert_eq!(different_fields.len(), 2);
         assert_eq!(different_fields[0], "results.voters_counts.poll_card_count");
@@ -624,19 +616,19 @@ mod tests {
             )],
         });
         let mut second_entry = first_entry.clone();
-        second_entry
-            .as_cso_first_session_mut()
-            .unwrap()
-            .differences_counts = DifferencesCounts {
-            more_ballots_count: 0,
-            fewer_ballots_count: 2,
-            compare_votes_cast_admitted_voters: DifferenceCountsCompareVotesCastAdmittedVoters {
-                admitted_voters_equal_votes_cast: true,
-                votes_cast_greater_than_admitted_voters: false,
-                votes_cast_smaller_than_admitted_voters: false,
-            },
-            difference_completely_accounted_for: Default::default(),
-        };
+        if let Results::CSOFirstSession(ref mut results) = second_entry {
+            results.differences_counts = DifferencesCounts {
+                more_ballots_count: 0,
+                fewer_ballots_count: 2,
+                compare_votes_cast_admitted_voters:
+                    DifferenceCountsCompareVotesCastAdmittedVoters {
+                        admitted_voters_equal_votes_cast: true,
+                        votes_cast_greater_than_admitted_voters: false,
+                        votes_cast_smaller_than_admitted_voters: false,
+                    },
+                difference_completely_accounted_for: Default::default(),
+            };
+        }
         second_entry.compare(&first_entry, &mut different_fields, &"results".into());
         assert_eq!(different_fields.len(), 3);
         assert_eq!(
@@ -682,18 +674,12 @@ mod tests {
             )],
         });
         let mut second_entry = first_entry.clone();
-        second_entry
-            .as_cso_first_session_mut()
-            .unwrap()
-            .voters_counts = VotersCounts {
+        *second_entry.voters_counts_mut() = VotersCounts {
             poll_card_count: 101,
             proxy_certificate_count: 1,
             total_admitted_voters_count: 102,
         };
-        second_entry
-            .as_cso_first_session_mut()
-            .unwrap()
-            .votes_counts = VotesCounts {
+        *second_entry.votes_counts_mut() = VotesCounts {
             political_group_total_votes: vec![PoliticalGroupTotalVotes {
                 number: PGNumber::from(1),
                 total: 101,
@@ -779,10 +765,7 @@ mod tests {
             ],
         });
         let mut second_entry = first_entry.clone();
-        second_entry
-            .as_cso_next_session_mut()
-            .unwrap()
-            .political_group_votes = vec![
+        *second_entry.political_group_votes_mut() = vec![
             PoliticalGroupCandidateVotes::from_test_data_auto(PGNumber::from(1), &[50, 30]),
             PoliticalGroupCandidateVotes::from_test_data_auto(PGNumber::from(2), &[20]),
         ];

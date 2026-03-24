@@ -429,13 +429,12 @@ export interface CSBElectionDefinitionValidateResponse {
 }
 
 /**
- * CSOFirstSessionResults, following the fields in Model Na 31-2 Bijlage 2.
+ * CSOFirstSessionResults, following the fields in Model Na 31-2 Bijlage 1.
  *
  * See "Model Na 31-2. Proces-verbaal van een gemeentelijk stembureau/stembureau voor het openbaar
  * lichaam in een gemeente/openbaar lichaam waar een centrale stemopneming wordt verricht,
- * Bijlage 2: uitkomsten per stembureau" from the
- * [Kiesregeling](https://wetten.overheid.nl/BWBR0034180/2026-01-01#Bijlage1_DivisieNa31.2) or
- * [Verkiezingstoolbox](https://www.rijksoverheid.nl/onderwerpen/verkiezingen/verkiezingentoolkit/modellen).
+ * Bijlage 1: Verslagen van tellingen van stembureaus" from
+ * [Kiesraad](https://www.kiesraad.nl/documenten/2025/11/27/na-31-2-pv-gsb-cso).
  */
 export interface CSOFirstSessionResults {
   /** Counting Differences Polling Station ("B1-2 Verschillen met telresultaten van het stembureau") */
@@ -456,9 +455,8 @@ export interface CSOFirstSessionResults {
  * CSONextSessionResults, following the fields in Model Na 14-2 Bijlage 1.
  *
  * See "Model Na 14-2. Corrigendum bij het proces-verbaal van een gemeentelijk stembureau/
- * stembureau voor het openbaar lichaam, Bijlage 1: uitkomsten per stembureau" from the
- * [Kiesregeling](https://wetten.overheid.nl/BWBR0034180/2026-01-01#Bijlage1_DivisieNa14.2) or
- * [Verkiezingstoolbox](https://www.rijksoverheid.nl/onderwerpen/verkiezingen/verkiezingentoolkit/modellen).
+ * stembureau voor het openbaar lichaam, Bijlage 1: uitkomsten per stembureau" from
+ * [Kiesraad](https://www.kiesraad.nl/documenten/2025/11/27/na-14-2-corrigendum-gsb-inclusief-bijlage-voor-cso).
  */
 export interface CSONextSessionResults {
   /** Differences counts ("Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten") */
@@ -925,6 +923,17 @@ export interface ExtraInvestigation {
 
 export type FileId = number;
 
+/**
+ * Differences counts for GSB, part of the results.
+ * (1.4 "Verschillen tussen aantal kiezers en uitgebrachte stemmen")
+ */
+export interface GSBDifferencesCounts {
+  /** Number of fewer counted ballots ("Totaal aantal minder getelde stemmen") */
+  fewer_ballots_count: number;
+  /** Number of more counted ballots ("Totaal aantal méér getelde stemmen") */
+  more_ballots_count: number;
+}
+
 export interface GSBElectionCreationRequest {
   candidate_data: string;
   candidate_hash: string[];
@@ -953,6 +962,26 @@ export interface GSBElectionDefinitionValidateResponse {
   number_of_voters: number;
   polling_station_definition_matches_election?: boolean;
   polling_stations?: PollingStationRequest[];
+}
+
+/**
+ * GSBResults, following the fields in Model Na 31-2.
+ *
+ * See "Model Na 31-2. Proces-verbaal van een gemeentelijk stembureau/stembureau voor het openbaar
+ * lichaam in een gemeente/openbaar lichaam waar een centrale stemopneming wordt verricht" from
+ * [Kiesraad](https://www.kiesraad.nl/documenten/2025/11/27/na-31-2-pv-gsb-cso).
+ */
+export interface GSBResults {
+  /** Differences counts ("Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten") */
+  differences_counts: GSBDifferencesCounts;
+  /** Number of voters ("Kiesgerechtigden") */
+  number_of_voters: number;
+  /** Vote counts per list and candidate ("Aantal stemmen per lijst en kandidaat") */
+  political_group_votes: PoliticalGroupCandidateVotes[];
+  /** Voters counts ("Aantal toegelaten kiezers") */
+  voters_counts: VotersCounts;
+  /** Votes counts ("Aantal getelde stembiljetten") */
+  votes_counts: VotesCounts;
 }
 
 /**
@@ -1223,7 +1252,8 @@ export type ResolveErrorsAction = (typeof resolveErrorsActionValues)[number];
  */
 export type Results =
   | (CSOFirstSessionResults & { model: "CSOFirstSession" })
-  | (CSONextSessionResults & { model: "CSONextSession" });
+  | (CSONextSessionResults & { model: "CSONextSession" })
+  | (GSBResults & { model: "GSB" });
 
 export const roleValues = ["administrator", "coordinator_gsb", "coordinator_csb", "typist_gsb", "typist_csb"] as const;
 export type Role = (typeof roleValues)[number];

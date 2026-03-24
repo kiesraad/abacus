@@ -32,8 +32,9 @@ pub async fn create_empty(
     let mut tx = conn.begin().await?;
 
     // If data entry already exists, return polling station as-is
-    let polling_station = polling_station_repo::get(&mut tx, polling_station_id).await?;
-    if polling_station.data_entry_id().is_some() {
+    let existing = polling_station_repo::get_data_entry_id(&mut tx, polling_station_id).await?;
+    if existing.is_some() {
+        let polling_station = polling_station_repo::get(&mut tx, polling_station_id).await?;
         tx.commit().await?;
         return Ok(polling_station);
     }

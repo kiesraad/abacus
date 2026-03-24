@@ -70,7 +70,8 @@ impl From<PollingStationRow> for PollingStationFirstSession {
         } = row;
         Self {
             committee_session_id,
-            data_entry_id,
+            data_entry_id: data_entry_id
+                .expect("first-session polling stations always have a data_entry_id"),
             polling_station: PollingStation {
                 id,
                 name,
@@ -286,12 +287,13 @@ pub async fn get_for_election(
     .map(PollingStationForSession::from)
 }
 
-/// Create a single polling station for an election
+/// Create a single polling station for an election, returning its id.
+/// The caller is responsible for linking a data entry afterwards.
 pub async fn create(
     conn: &mut SqliteConnection,
     election_id: ElectionId,
     new_polling_station: PollingStationRequest,
-) -> Result<PollingStationForSession, sqlx::Error> {
+) -> Result<PollingStationId, sqlx::Error> {
     let mut tx = conn.begin().await?;
     let committee_session_id =
         committee_session_repo::get_current_id_for_election(&mut tx, election_id)
@@ -304,8 +306,7 @@ pub async fn create(
         ));
     }
 
-    let res = query_as!(
-        PollingStationRow,
+    let id = query_scalar!(
         r#"
         INSERT INTO polling_stations (
             committee_session_id,
@@ -318,20 +319,7 @@ pub async fn create(
             postal_code,
             locality
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        RETURNING
-            id AS "id: _",
-            committee_session_id AS "committee_session_id: _",
-            (SELECT c.number FROM committee_sessions AS c WHERE c.id = committee_session_id) AS "committee_session_number!: u32",
-            prev_data_entry_id AS "prev_data_entry_id: _",
-            data_entry_id AS "data_entry_id: _",
-            investigation_state AS "investigation_state: Json<InvestigationStatus>",
-            name,
-            number AS "number: u32",
-            number_of_voters AS "number_of_voters: _",
-            polling_station_type AS "polling_station_type: _",
-            address,
-            postal_code,
-            locality
+        RETURNING id AS "id: _"
         "#,
         committee_session_id,
         None::<u32> as _,
@@ -346,17 +334,17 @@ pub async fn create(
     .fetch_one(&mut *tx)
     .await?;
     tx.commit().await?;
-    Ok(PollingStationForSession::from(res))
+    Ok(id)
 }
 
-/// Create many polling stations for an election
-#[allow(clippy::too_many_lines)]
+/// Create many polling stations for an election, returning their ids.
+/// The caller is responsible for creating and linking data entries afterwards.
 pub async fn create_many(
     conn: &mut SqliteConnection,
     election_id: ElectionId,
     new_polling_stations: Vec<PollingStationRequest>,
-) -> Result<Vec<PollingStationForSession>, sqlx::Error> {
-    let mut stations: Vec<PollingStationForSession> = Vec::new();
+) -> Result<Vec<PollingStationId>, sqlx::Error> {
+    let mut ids: Vec<PollingStationId> = Vec::new();
     let mut tx = conn.begin().await?;
 
     let committee_session_id =
@@ -371,10 +359,8 @@ pub async fn create_many(
             ));
         }
 
-        stations.push(PollingStationForSession::from(
-            query_as!(
-                PollingStationRow,
-                r#"
+        let id = query_scalar!(
+            r#"
             INSERT INTO polling_stations (
                 committee_session_id,
                 prev_data_entry_id,
@@ -386,37 +372,24 @@ pub async fn create_many(
                 postal_code,
                 locality
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-            RETURNING
-                id AS "id: _",
-                committee_session_id AS "committee_session_id: _",
-                (SELECT c.number FROM committee_sessions AS c WHERE c.id = committee_session_id) AS "committee_session_number!: u32",
-                prev_data_entry_id AS "prev_data_entry_id: _",
-                data_entry_id AS "data_entry_id: _",
-                investigation_state AS "investigation_state: Json<InvestigationStatus>",
-                name,
-                number AS "number: u32",
-                number_of_voters AS "number_of_voters: _",
-                polling_station_type AS "polling_station_type: _",
-                address,
-                postal_code,
-                locality
+            RETURNING id AS "id: _"
             "#,
-                committee_session_id,
-                None::<u32> as _,
-                new_polling_station.name,
-                new_polling_station.number,
-                new_polling_station.number_of_voters,
-                new_polling_station.polling_station_type,
-                new_polling_station.address,
-                new_polling_station.postal_code,
-                new_polling_station.locality,
-            )
-            .fetch_one(&mut *tx)
-            .await?,
-        ));
+            committee_session_id,
+            None::<u32> as _,
+            new_polling_station.name,
+            new_polling_station.number,
+            new_polling_station.number_of_voters,
+            new_polling_station.polling_station_type,
+            new_polling_station.address,
+            new_polling_station.postal_code,
+            new_polling_station.locality,
+        )
+        .fetch_one(&mut *tx)
+        .await?;
+        ids.push(id);
     }
     tx.commit().await?;
-    Ok(stations)
+    Ok(ids)
 }
 
 /// Update a single polling station for an election
@@ -509,6 +482,21 @@ pub async fn delete(
     tx.commit().await?;
 
     Ok(rows_affected > 0)
+}
+
+/// Returns the current `data_entry_id` for a polling station without
+/// constructing a `PollingStationForSession`. Used to check if a data entry
+/// needs to be created.
+pub async fn get_data_entry_id(
+    conn: &mut SqliteConnection,
+    polling_station_id: PollingStationId,
+) -> Result<Option<DataEntryId>, sqlx::Error> {
+    query_scalar!(
+        r#"SELECT data_entry_id AS "data_entry_id: _" FROM polling_stations WHERE id = ?"#,
+        polling_station_id
+    )
+    .fetch_one(conn)
+    .await
 }
 
 /// Set `data_entry_id` on a polling station and return the updated row.
@@ -654,15 +642,15 @@ pub async fn list_first_session_with_status(
     query!(
         r#"
         SELECT
-            de.id AS "data_entry_id: DataEntryId",
+            de.id AS "data_entry_id!: DataEntryId",
             p.id AS "id: PollingStationId",
             p.number AS "number: PollingStationNumber",
             p.name,
             p.prev_data_entry_id AS "prev_data_entry_id: DataEntryId",
-            de.state AS "state: Json<DataEntryStatus>"
+            de.state AS "state!: Json<DataEntryStatus>"
         FROM polling_stations AS p
         JOIN committee_sessions AS c ON c.id = p.committee_session_id
-        LEFT JOIN data_entries AS de ON de.id = p.data_entry_id
+        JOIN data_entries AS de ON de.id = p.data_entry_id
         WHERE c.id = $1 AND c.number = 1
         "#,
         committee_session_id
@@ -675,7 +663,7 @@ pub async fn list_first_session_with_status(
             name: row.name,
             prev_data_entry_id: row.prev_data_entry_id,
         }),
-        status: row.state.map(|j| j.0).unwrap_or_default(),
+        status: row.state.0,
     })
     .fetch_all(conn)
     .await

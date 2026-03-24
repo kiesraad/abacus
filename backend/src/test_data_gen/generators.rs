@@ -315,7 +315,7 @@ async fn generate_polling_stations(
         };
         remaining_voters -= ps_num_voters;
 
-        let ps = polling_station_repo::create(
+        let ps_id = polling_station_repo::create(
             conn,
             election.id,
             PollingStationRequest {
@@ -330,12 +330,10 @@ async fn generate_polling_stations(
         )
         .await
         .expect("Failed to create polling station");
-        let ps = create_empty_data_entry(conn, ps.id())
+        let ps = create_empty_data_entry(conn, ps_id)
             .await
             .expect("Failed to create empty data entry");
-        let data_entry_id = ps
-            .data_entry_id()
-            .expect("data entry should exist after create_empty_data_entry");
+        let data_entry_id = ps.data_entry_id().expect("data entry should exist");
         polling_stations.push((ps.into_polling_station(), data_entry_id));
     }
 

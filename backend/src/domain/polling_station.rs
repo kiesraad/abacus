@@ -149,7 +149,7 @@ impl From<String> for PollingStationType {
 pub struct PollingStationFirstSession {
     pub committee_session_id: CommitteeSessionId,
     pub polling_station: PollingStation,
-    pub data_entry_id: Option<DataEntryId>,
+    pub data_entry_id: DataEntryId,
 }
 
 /// Polling station in a next committee session.
@@ -177,7 +177,7 @@ impl PollingStationFirstSession {
             election_id,
             committee_session_id: self.committee_session_id,
             prev_data_entry_id: None,
-            data_entry_id: self.data_entry_id,
+            data_entry_id: Some(self.data_entry_id),
             name: self.polling_station.name,
             number: self.polling_station.number,
             number_of_voters: self.polling_station.number_of_voters,
@@ -236,7 +236,7 @@ impl PollingStationForSession {
 
     pub fn data_entry_id(&self) -> Option<DataEntryId> {
         match self {
-            Self::First(ps) => ps.data_entry_id,
+            Self::First(ps) => Some(ps.data_entry_id),
             Self::Next(ps) => ps.data_entry_id,
         }
     }

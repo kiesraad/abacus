@@ -8,6 +8,7 @@
 
 #let location_name = is_municipality[Gemeente #input.election.domain_id #input.election.location][Openbaar lichaam #input.election.location]
 #let location_type = [centraal stembureau]
+#let subcommittee_type = [gemeentelijk stembureau]
 #let LARGE_COUNCIL_THRESHOLD = 19
 
 #show: doc => conf(doc, header-right: [Centraal stembureau #input.election.location], footer: [
@@ -35,7 +36,7 @@
 
 == Proces-verbaal
 
-Het centraal stembureau maakt bij een verkiezing een verslag van de controlewerkzaamheden, de uitslag en de zetelverdeling. Dit heet een proces-verbaal.
+Het #location_type maakt bij een verkiezing een verslag van de controlewerkzaamheden, de uitslag en de zetelverdeling. Dit heet een proces-verbaal.
 
 == Inhoudsopgave
 - Deel 1 - *Verslag van de zitting*
@@ -73,7 +74,7 @@ De volgende rollen zijn mogelijk: voorzitter, plaatsvervangend voorzitter of lid
 
 == Verslag van controlewerkzaamheden
 
-=== Zijn er controlewerkzaamheden uitgevoerd vanwege telverschillen of andere mogelijke fouten
+=== Zijn er controlewerkzaamheden uitgevoerd vanwege telverschillen of andere mogelijke fouten?
 
 #checkbox()[Nee]
 
@@ -85,7 +86,7 @@ De volgende rollen zijn mogelijk: voorzitter, plaatsvervangend voorzitter of lid
 
 #checkbox()[Geen bezwaren ingebracht]
 
-#checkbox()[Bezwaren ingebracht. Deze staan in bijlage 3 bij dit proces-verbaal. De reactie van het centraal stembureau staat daar ook bij.]
+#checkbox()[Bezwaren ingebracht. Deze staan in bijlage 3 bij dit proces-verbaal. De reactie van het #location_type staat daar ook bij.]
 
 #pagebreak(weak: true)
 
@@ -220,6 +221,7 @@ Met de kiesdeler wordt de zetelverdeling bepaald. De kiesdeler is het aantal ste
 #pagebreak(weak: true)
 
 == Aantal volle zetels per lijst
+
 Hieronder is berekend hoe vaak elke lijst qua stemmenaantal de kiesdeler heeft gehaald. Het resultaat van deze deling geeft het aantal volle zetels dat per lijst is behaald.
 
 #table(
@@ -277,12 +279,13 @@ Na toewijzing van de volle zetels blijft een aantal te verdelen zetels over. Dit
 )
 
 === Verdeling van de restzetels
+
 #let highest_averages_steps = input.seat_assignment.steps.filter(step => step.change.changed_by == "HighestAverageAssignment")
 #if input.seat_assignment.residual_seats > 0 [
   #if input.election.number_of_seats < LARGE_COUNCIL_THRESHOLD [
-    - Het centraal stembureau berekent hoeveel stemmen elke lijst overhoudt na toekenning van de volle zetels. Dat is het 'overschot' aan stemmen voor die lijst.
-    - Het centraal stembureau verdeelt de restzetels, in volgorde van de grootste overschotten. Elke lijst kan maar één restzetel krijgen. Alleen lijsten die ten minste 75% van de kiesdeler hebben behaald kunnen een restzetel krijgen.
-    - Als er daarna nog restzetels over zijn, verdeelt het centraal stembureau die volgens het systeem van de grootste gemiddelden. Ook bij deze verdeling mag iedere lijst maar één restzetel krijgen
+    - Het #location_type berekent hoeveel stemmen elke lijst overhoudt na toekenning van de volle zetels. Dat is het 'overschot' aan stemmen voor die lijst.
+    - Het #location_type verdeelt de restzetels, in volgorde van de grootste overschotten. Elke lijst kan maar één restzetel krijgen. Alleen lijsten die ten minste 75% van de kiesdeler hebben behaald kunnen een restzetel krijgen.
+    - Als er daarna nog restzetels over zijn, verdeelt het #location_type die volgens het systeem van de grootste gemiddelden. Ook bij deze verdeling mag iedere lijst maar één restzetel krijgen
     - Als lijsten precies evenveel stemmen behalen en er niet voldoende restzetels zijn voor die lijsten, dan wordt geloot welke lijst de restzetel krijgt.
 
     #let final_standing_pgs_meeting_threshold = input.seat_assignment.final_standing.filter(
@@ -323,7 +326,7 @@ Na toewijzing van de volle zetels blijft een aantal te verdelen zetels over. Dit
     - De uitkomsten van deze berekening zijn gemiddelden per zetel; zij worden naar grootte gerangschikt.
     - De eerste restzetel gaat naar de lijst met het grootste gemiddelde per zetel. Voor deze lijst wordt opnieuw berekend wat het gemiddelde nu is, uitgaande van het aantal volle zetels, de toegewezen restzetel en weer één extra zetel.
     - Als er nog een restzetel te verdelen is, wordt deze toegewezen aan de lijst met nu het grootste gemiddelde.
-    - Het centraal stembureau herhaalt de procedure totdat alle restzetels verdeeld zijn.
+    - Het #location_type herhaalt de procedure totdat alle restzetels verdeeld zijn.
   
     Als meerdere lijsten gelijke gemiddelden hebben en er niet voldoende restzetels zijn voor toekenning ervan aan die lijsten, wordt geloot welke lijst de restzetel krijgt.
 
@@ -432,7 +435,10 @@ De aan de lijsten toegewezen volle zetels en restzetels zijn bij elkaar opgeteld
   emph_block[*Met voorkeursstemmen gekozen kandidaten*]
 
   if list_candidate_nomination.preferential_candidate_nomination.len() > 0 {
-    [Het overzicht met de stemmen per kandidaat is te vinden in bijlage 1 bij dit proces-verbaal. Deze kandidaten hebben als gevolg van het aantal voorkeursstemmen direct een zetel gekregen.]
+    [
+      Het overzicht met de stemmen per kandidaat is te vinden in bijlage 1 bij dit proces-verbaal. 
+      Deze kandidaten hebben als gevolg van het aantal voorkeursstemmen direct een zetel gekregen.
+    ]
     v(4pt)
     [Deze kandidaten hebben meer dan #if input.election.number_of_seats < LARGE_COUNCIL_THRESHOLD [50%] else [25%] van de kiesdeler gehaald.]
   
@@ -532,20 +538,24 @@ De aan de lijsten toegewezen volle zetels en restzetels zijn bij elkaar opgeteld
 #checkbox()[Ja]
 #checkbox()[Nee, de resultaten van de papieren processen-verbaal twee keer handmatig ingevoerd in de uitslagensoftware]
 
-=== Heeft het gemeentelijk stembureau/hoofdstembureau verschillen geconstateerd bij de uitvoering van het controleprotocol?
+=== Heeft het #subcommittee_type verschillen geconstateerd bij de uitvoering van het controleprotocol?
 
 #checkbox()[Nee]
-#checkbox()[Ja, noteer hieronder wat het gemeentelijk stembureau/hoofdstembureau daarover heeft opgeschreven.]
+#checkbox()[Ja, noteer hieronder wat het #subcommittee_type daarover heeft opgeschreven.]
 
 #empty_lines(6)
 
 #pagebreak(weak: true)
+
+#set page(header: "")
 
 #emph_block[Deze pagina is expres leeg]
 
 Zo komt het handtekeningen-blad altijd op een losse pagina, ook als het verslag dubbelzijdig is geprint.
 
 #pagebreak(weak: true)
+
+#set page(header: default_header(none, [Centraal stembureau #input.election.location]))
 
 = Ondertekening
 
@@ -561,6 +571,6 @@ Zo komt het handtekeningen-blad altijd op een losse pagina, ook als het verslag 
 
 #stack(spacing: 0.5em, ..range(0, is_municipality(2, 4)).map(_ => textbox[Naam:][Handtekening:]))
 
-=== De andere leden van het centraal stembureau: #location_type
+=== De andere leden van het #location_type:
 
 #stack(spacing: 0.5em, ..range(0, 5).map(_ => textbox[Naam:][Handtekening:]))

@@ -12,7 +12,10 @@
   "paths": {
     "/api/account": {
       "get": {
-        "summary": "Get current logged-in user endpoint (administrator, coordinator_gsb, coordinator_csb, typist_gsb, typist_csb)",
+        "tags": [
+          "public"
+        ],
+        "summary": "Get current logged-in user endpoint",
         "operationId": "account",
         "responses": {
           "200": {
@@ -45,18 +48,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "cookie_auth": [
-              "administrator",
-              "coordinator_gsb",
-              "coordinator_csb",
-              "typist_gsb",
-              "typist_csb"
-            ]
-          }
-        ]
+        }
       },
       "put": {
         "summary": "Update the user's account with a new password and optionally new fullname (administrator, coordinator_gsb, coordinator_csb, typist_gsb, typist_csb)",

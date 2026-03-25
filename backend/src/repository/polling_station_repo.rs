@@ -15,7 +15,7 @@ use crate::{
             PollingStationType,
         },
     },
-    repository::committee_session_repo,
+    repository::{committee_session_repo, data_entry_repo},
 };
 
 /// Polling station database row, matching the SQL schema
@@ -106,7 +106,6 @@ impl From<PollingStationRow> for PollingStationNextSession {
         Self {
             committee_session_id,
             prev_data_entry_id,
-            data_entry_id,
             investigation_status: investigation_state.map(|json| {
                 let status = json.0;
                 match (&status, data_entry_id) {
@@ -484,19 +483,27 @@ pub async fn delete(
     Ok(rows_affected > 0)
 }
 
-/// Returns the current `data_entry_id` for a polling station without
-/// constructing a `PollingStationForSession`. Used to check if a data entry
-/// needs to be created.
-pub async fn get_data_entry_id(
+/// Returns the existing `data_entry_id` for the polling station,
+/// or creates a new empty data entry, links it, and returns its id.
+pub async fn ensure_data_entry(
     conn: &mut SqliteConnection,
     polling_station_id: PollingStationId,
-) -> Result<Option<DataEntryId>, sqlx::Error> {
-    query_scalar!(
+) -> Result<DataEntryId, sqlx::Error> {
+    let mut tx = conn.begin().await?;
+    let existing: Option<DataEntryId> = query_scalar!(
         r#"SELECT data_entry_id AS "data_entry_id: _" FROM polling_stations WHERE id = ?"#,
         polling_station_id
     )
-    .fetch_one(conn)
-    .await
+    .fetch_one(&mut *tx)
+    .await?;
+    if let Some(id) = existing {
+        tx.commit().await?;
+        return Ok(id);
+    }
+    let data_entry = data_entry_repo::create_empty(&mut tx).await?;
+    link_data_entry(&mut tx, polling_station_id, data_entry.id).await?;
+    tx.commit().await?;
+    Ok(data_entry.id)
 }
 
 /// Set `data_entry_id` on a polling station and return the updated row.
@@ -678,15 +685,15 @@ pub async fn list_next_session_with_status(
     query!(
         r#"
         SELECT
-            de.id AS "data_entry_id: DataEntryId",
+            de.id AS "data_entry_id!: DataEntryId",
             p.id AS "id: PollingStationId",
             p.number AS "number: PollingStationNumber",
             p.name,
             p.prev_data_entry_id AS "prev_data_entry_id: DataEntryId",
-            de.state AS "state: Json<DataEntryStatus>"
+            de.state AS "state!: Json<DataEntryStatus>"
         FROM polling_stations AS p
         JOIN committee_sessions AS c ON c.id = p.committee_session_id
-        LEFT JOIN data_entries AS de ON de.id = p.data_entry_id
+        JOIN data_entries AS de ON de.id = p.data_entry_id
         WHERE c.id = $1 AND c.number > 1 AND json_extract(p.investigation_state, '$.status') = 'ConcludedWithNewResults'
         "#,
         committee_session_id
@@ -699,7 +706,7 @@ pub async fn list_next_session_with_status(
             name: row.name,
             prev_data_entry_id: row.prev_data_entry_id,
         }),
-        status: row.state.map(|j| j.0).unwrap_or_default(),
+        status: row.state.0,
     })
     .fetch_all(conn)
     .await

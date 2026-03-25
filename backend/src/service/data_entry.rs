@@ -1,4 +1,4 @@
-use sqlx::{Connection, SqliteConnection};
+use sqlx::SqliteConnection;
 
 use crate::{
     api::data_entry::ElectionStatusResponseEntry,
@@ -6,9 +6,8 @@ use crate::{
         committee_session::CommitteeSession,
         data_entry::DataEntryStatusWithSource,
         election::{CommitteeCategory, Election},
-        polling_station::{PollingStationForSession, PollingStationId},
     },
-    repository::{data_entry_repo, polling_station_repo, sub_committee_repo},
+    repository::{polling_station_repo, sub_committee_repo},
 };
 
 #[derive(Debug)]
@@ -20,31 +19,6 @@ impl From<sqlx::Error> for DataEntryServiceError {
     fn from(err: sqlx::Error) -> Self {
         Self::DatabaseError(err)
     }
-}
-
-/// Create an empty data entry and link it to the given polling station.
-/// If the polling station already has a data entry, this is a no-op and
-/// returns the polling station as-is.
-pub async fn create_empty(
-    conn: &mut SqliteConnection,
-    polling_station_id: PollingStationId,
-) -> Result<PollingStationForSession, DataEntryServiceError> {
-    let mut tx = conn.begin().await?;
-
-    // If data entry already exists, return polling station as-is
-    let existing = polling_station_repo::get_data_entry_id(&mut tx, polling_station_id).await?;
-    if existing.is_some() {
-        let polling_station = polling_station_repo::get(&mut tx, polling_station_id).await?;
-        tx.commit().await?;
-        return Ok(polling_station);
-    }
-
-    let data_entry = data_entry_repo::create_empty(&mut tx).await?;
-    let polling_station =
-        polling_station_repo::link_data_entry(&mut tx, polling_station_id, data_entry.id).await?;
-
-    tx.commit().await?;
-    Ok(polling_station)
 }
 
 fn map_to_response_entry(entry: DataEntryStatusWithSource) -> ElectionStatusResponseEntry {
@@ -92,12 +66,12 @@ pub async fn election_statuses(
 #[cfg(test)]
 pub async fn create_definitive_data_entry(
     conn: &mut SqliteConnection,
-    polling_station_id: PollingStationId,
+    polling_station_id: crate::domain::polling_station::PollingStationId,
     results: &crate::domain::results::Results,
 ) -> Result<(), DataEntryServiceError> {
     use crate::{
         domain::data_entry::{DataEntryStatus, Definitive},
-        repository::user_repo::UserId,
+        repository::{data_entry_repo, user_repo::UserId},
     };
 
     let state = DataEntryStatus::Definitive(Definitive {
@@ -108,8 +82,9 @@ pub async fn create_definitive_data_entry(
         results: results.clone(),
     });
 
-    let ps = create_empty(conn, polling_station_id).await?;
-    let data_entry_id = ps.data_entry_id().expect("just created");
+    let data_entry_id = polling_station_repo::ensure_data_entry(conn, polling_station_id)
+        .await
+        .map_err(DataEntryServiceError::DatabaseError)?;
     data_entry_repo::update(conn, data_entry_id, &state).await?;
     Ok(())
 }

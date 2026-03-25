@@ -36,9 +36,7 @@ use crate::{
         },
         user_repo::User,
     },
-    service::{
-        change_committee_session_status, create_empty_data_entry, list_polling_stations_for_session,
-    },
+    service::{change_committee_session_status, list_polling_stations_for_session},
 };
 
 #[derive(Serialize)]
@@ -224,12 +222,10 @@ async fn polling_station_create(
     validate_user_is_allowed_to_perform_action(user, &committee_session)?;
 
     let ps_id = create(&mut tx, election_id, new_polling_station).await?;
-    let polling_station = if !committee_session.is_next_session() {
-        create_empty_data_entry(&mut tx, ps_id).await?
-    } else {
-        polling_station_repo::get(&mut tx, ps_id).await?
-    };
-
+    if !committee_session.is_next_session() {
+        polling_station_repo::ensure_data_entry(&mut tx, ps_id).await?;
+    }
+    let polling_station = polling_station_repo::get(&mut tx, ps_id).await?;
     let response: PollingStationResponse = polling_station.into_response(election_id);
 
     audit_service
@@ -493,12 +489,10 @@ pub async fn create_imported_polling_stations(
     let ps_ids = create_many(&mut tx, election_id, polling_stations).await?;
     let mut polling_station_list: Vec<_> = Vec::with_capacity(ps_ids.len());
     for id in ps_ids {
-        let ps = if !committee_session.is_next_session() {
-            create_empty_data_entry(&mut tx, id).await?
-        } else {
-            polling_station_repo::get(&mut tx, id).await?
-        };
-        polling_station_list.push(ps);
+        if !committee_session.is_next_session() {
+            polling_station_repo::ensure_data_entry(&mut tx, id).await?;
+        }
+        polling_station_list.push(polling_station_repo::get(&mut tx, id).await?);
     }
 
     // Create audit event

@@ -37,7 +37,7 @@ use crate::{
         committee_session_repo, data_entry_repo::previous_results_for_polling_station,
         election_repo, investigation_repo, polling_station_repo, user_repo::User,
     },
-    service::{change_committee_session_status, create_empty_data_entry},
+    service::change_committee_session_status,
 };
 
 #[derive(Serialize)]
@@ -290,10 +290,9 @@ async fn polling_station_investigation_conclude(
         })?;
 
     let status = if request.corrected_results {
-        let ps = create_empty_data_entry(&mut tx, polling_station_id).await?;
-        let data_entry_id = ps
-            .data_entry_id()
-            .expect("create_empty_data_entry should set data_entry_id");
+        let data_entry_id = polling_station_repo::ensure_data_entry(&mut tx, polling_station_id)
+            .await
+            .map_err(APIError::from)?;
         current.conclude_with_new_results(request.findings, data_entry_id)?
     } else {
         let ps = polling_station_repo::get_next_session(&mut tx, polling_station_id).await?;
@@ -380,10 +379,9 @@ async fn apply_update(
         }
         // ConcludedWithNewResults: same-state text update
         (InvestigationStatus::ConcludedWithNewResults(_), Some(true)) => {
-            let ps = create_empty_data_entry(conn, polling_station_id).await?;
-            let de_id = ps
-                .data_entry_id()
-                .expect("data entry should exist after create_empty_data_entry");
+            let de_id = polling_station_repo::ensure_data_entry(conn, polling_station_id)
+                .await
+                .map_err(APIError::from)?;
             let findings = request.findings.unwrap_or_default();
             Ok(current.switch_to_with_new_results(request.reason, findings, de_id)?)
         }
@@ -479,10 +477,9 @@ async fn switch_to_with_new_results(
     current: InvestigationStatus,
     request: PollingStationInvestigationUpdateRequest,
 ) -> Result<InvestigationStatus, APIError> {
-    let ps = create_empty_data_entry(conn, polling_station_id).await?;
-    let de_id = ps
-        .data_entry_id()
-        .expect("create_empty_data_entry should set data_entry_id");
+    let de_id = polling_station_repo::ensure_data_entry(conn, polling_station_id)
+        .await
+        .map_err(APIError::from)?;
 
     let findings = request.findings.unwrap_or_default();
     let status = current.switch_to_with_new_results(request.reason, findings, de_id)?;

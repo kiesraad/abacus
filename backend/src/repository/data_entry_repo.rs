@@ -801,8 +801,11 @@ mod tests {
         use super::*;
         use crate::{
             domain::investigation::InvestigationStatus,
-            repository::{investigation_repo, polling_station_repo::insert_test_polling_station},
-            service::{create_definitive_data_entry, create_empty_data_entry},
+            repository::{
+                investigation_repo,
+                polling_station_repo::{self, insert_test_polling_station},
+            },
+            service::create_definitive_data_entry,
         };
 
         async fn create_test_investigation(
@@ -826,10 +829,10 @@ mod tests {
                 .expect("investigation should exist");
 
             let status = if corrected_results {
-                let ps = create_empty_data_entry(conn, polling_station_id)
-                    .await
-                    .unwrap();
-                let data_entry_id = ps.data_entry_id().expect("should have data_entry_id");
+                let data_entry_id =
+                    polling_station_repo::ensure_data_entry(conn, polling_station_id)
+                        .await
+                        .unwrap();
                 current
                     .conclude_with_new_results("Test findings".to_string(), data_entry_id)
                     .expect("conclude_with_new_results should succeed")

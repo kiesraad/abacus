@@ -39,7 +39,7 @@ use crate::{
         election_repo, polling_station_repo,
         user_repo::UserId,
     },
-    service::{create_empty_data_entry, create_sub_committee},
+    service::create_sub_committee,
     test_data_gen::GenerateElectionArgs,
 };
 
@@ -330,10 +330,12 @@ async fn generate_polling_stations(
         )
         .await
         .expect("Failed to create polling station");
-        let ps = create_empty_data_entry(conn, ps_id)
+        let data_entry_id = polling_station_repo::ensure_data_entry(conn, ps_id)
             .await
             .expect("Failed to create empty data entry");
-        let data_entry_id = ps.data_entry_id().expect("data entry should exist");
+        let ps = polling_station_repo::get(conn, ps_id)
+            .await
+            .expect("Failed to get polling station");
         polling_stations.push((ps.into_polling_station(), data_entry_id));
     }
 

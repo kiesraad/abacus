@@ -116,16 +116,16 @@ export function DataEntryNavigation({ onSubmit, currentValues = {} }: DataEntryN
 
   // when unsaved changes are detected and navigating within the data entry flow
   if (isPartOfDataEntryFlow(blocker.location.pathname)) {
-    const title = dataEntryStructure.find((s) => s.id === sectionId)?.title || t("polling_station.current_form");
+    const title = dataEntryStructure.find((s) => s.id === sectionId)?.title || t("data_entry.current_form");
     return (
       <Modal
-        title={t("polling_station.unsaved_changes_title")}
+        title={t("data_entry.unsaved_changes_title")}
         onClose={() => {
           blocker.reset();
         }}
       >
-        <p>{tx("polling_station.unsaved_changes_message", {}, { name: title })}</p>
-        <p>{t("polling_station.save_changes")}</p>
+        <p>{tx("data_entry.unsaved_changes_message", {}, { name: title })}</p>
+        <p>{t("data_entry.save_changes")}</p>
         <nav>
           <Button
             onClick={() => {

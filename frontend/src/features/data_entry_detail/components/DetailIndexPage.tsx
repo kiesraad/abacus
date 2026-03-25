@@ -13,7 +13,7 @@ import { t, tx } from "@/i18n/translate";
 import type { ResolveErrorsAction } from "@/types/generated/openapi";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
-import { usePollingStationDataEntryErrors } from "../hooks/usePollingStationDataEntryErrors";
+import { useDataEntryErrors } from "../hooks/useDataEntryErrors";
 import cls from "./detail.module.css";
 import { ErrorsAndWarningsOverview } from "./ErrorsAndWarningsOverview";
 
@@ -23,7 +23,7 @@ export function DetailIndexPage() {
   const navigate = useNavigate();
   const dataEntryId = useNumericParam("dataEntryId");
   const { election, loading, dataEntry, action, setAction, onSubmit, validationError } =
-    usePollingStationDataEntryErrors(dataEntryId);
+    useDataEntryErrors(dataEntryId);
 
   const afterSave = (action: ResolveErrorsAction) => {
     if (!dataEntry) {

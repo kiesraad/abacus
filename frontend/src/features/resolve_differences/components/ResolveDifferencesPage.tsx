@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router";
 
 import { PageTitle } from "@/components/page_title/PageTitle";
-import { PollingStationNumber } from "@/components/ui/Badge/PollingStationNumber";
+import { DataEntrySourceNumber } from "@/components/ui/Badge/DataEntrySourceNumber";
 import { Button } from "@/components/ui/Button/Button";
 import { ChoiceList } from "@/components/ui/CheckboxAndRadio/ChoiceList";
 import { Form } from "@/components/ui/Form/Form";
@@ -13,7 +13,7 @@ import { useUsers } from "@/hooks/user/useUsers";
 import { t } from "@/i18n/translate";
 import type { DataEntryStatusName } from "@/types/generated/openapi";
 
-import { usePollingStationDataEntryDifferences } from "../hooks/usePollingStationDataEntryDifferences";
+import { useDataEntryDifferences } from "../hooks/useDataEntryDifferences";
 import cls from "./ResolveDifferences.module.css";
 import { ResolveDifferencesOverview } from "./ResolveDifferencesOverview";
 import { ResolveDifferencesTables } from "./ResolveDifferencesTables";
@@ -24,7 +24,7 @@ export function ResolveDifferencesPage() {
   const navigate = useNavigate();
   const dataEntryId = useNumericParam("dataEntryId");
   const { election, loading, differences, dataEntryStructure, action, setAction, onSubmit, validationError } =
-    usePollingStationDataEntryDifferences(dataEntryId, afterSave);
+    useDataEntryDifferences(dataEntryId, afterSave);
   const { getName } = useUsers();
 
   function afterSave(status: DataEntryStatusName, firstEntryUserId: number | undefined) {
@@ -69,7 +69,7 @@ export function ResolveDifferencesPage() {
       <PageTitle title={`${t("resolve_differences.page_title")} - Abacus`} />
       <header>
         <section className="smaller-gap">
-          <PollingStationNumber>{source.number}</PollingStationNumber>
+          <DataEntrySourceNumber>{source.number}</DataEntrySourceNumber>
           <h1>{source.name}</h1>
         </section>
       </header>

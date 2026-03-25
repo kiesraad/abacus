@@ -9,7 +9,6 @@
   "import": "Stembureaus importeren",
   "import_subtitle": "Importeer stembureaus gemeente {location}",
   "import_instructions": "Kies het bestand met de stembureaus.",
-  "current_form": "het huidige formulier",
   "delete": "Stembureau verwijderen",
   "delete_modal": {
     "action_cannot_be_reverted": "Deze actie kan niet worden teruggedraaid.",
@@ -47,7 +46,6 @@
   },
   "postal_code": "Postcode",
   "recounted_question": "Is er herteld?",
-  "save_changes": "Wil je deze wijzigingen bewaren?",
   "title": {
     "address": "Adres van het stembureau",
     "how_to_add": "Hoe wil je stembureaus toevoegen?",
@@ -62,8 +60,6 @@
     "SpecialExplanation": "Bijzonder (afwijkende openingstijden)",
     "Unknown": "Onbekend"
   },
-  "unsaved_changes_title": "Let op: niet opgeslagen wijzigingen",
-  "unsaved_changes_message": "Je hebt in <strong>{name}</strong> wijzigingen gemaakt die nog niet zijn opgeslagen.",
   "update": "Stembureaugegevens wijzigen",
   "voters_and_vote_count": "Aantal kiezers en stemmen",
   "warning_completed": {

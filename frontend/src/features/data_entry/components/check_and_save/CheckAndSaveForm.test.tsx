@@ -7,10 +7,10 @@ import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
 import {
+  DataEntryClaimHandler,
+  DataEntryFinaliseHandler,
+  DataEntrySaveHandler,
   ElectionRequestHandler,
-  PollingStationDataEntryClaimHandler,
-  PollingStationDataEntryFinaliseHandler,
-  PollingStationDataEntrySaveHandler,
 } from "@/testing/api-mocks/RequestHandlers";
 import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMockData";
 import { overrideOnce, server } from "@/testing/server";
@@ -52,12 +52,7 @@ function renderForm() {
 
 describe("Test CheckAndSaveForm", () => {
   beforeEach(() => {
-    server.use(
-      ElectionRequestHandler,
-      PollingStationDataEntryClaimHandler,
-      PollingStationDataEntrySaveHandler,
-      PollingStationDataEntryFinaliseHandler,
-    );
+    server.use(ElectionRequestHandler, DataEntryClaimHandler, DataEntrySaveHandler, DataEntryFinaliseHandler);
   });
 
   test("Data entry can be finalised and check redirect", async () => {
@@ -65,7 +60,7 @@ describe("Test CheckAndSaveForm", () => {
     const user = userEvent.setup();
 
     // set up a listener to check if the finalisation request is made
-    const finalise = spyOnHandler(PollingStationDataEntryFinaliseHandler);
+    const finalise = spyOnHandler(DataEntryFinaliseHandler);
 
     // click the save button
     await user.click(await screen.findByRole("button", { name: "Opslaan" }));
@@ -83,7 +78,7 @@ describe("Test CheckAndSaveForm", () => {
     const user = userEvent.setup();
 
     // set up a listener to check if the finalisation request is made
-    const finalise = spyOnHandler(PollingStationDataEntryFinaliseHandler);
+    const finalise = spyOnHandler(DataEntryFinaliseHandler);
 
     const response: DataEntryStatusResponse = { status: "entries_different" };
     overrideOnce("post", "/api/data_entries/1/1/finalise", 200, response);
@@ -104,7 +99,7 @@ describe("Test CheckAndSaveForm", () => {
     const user = userEvent.setup();
 
     // set up a listener to check if the finalisation request is made
-    const finalise = spyOnHandler(PollingStationDataEntryFinaliseHandler);
+    const finalise = spyOnHandler(DataEntryFinaliseHandler);
 
     const response: DataEntryStatusResponse = { status: "first_entry_has_errors" };
     overrideOnce("post", "/api/data_entries/1/1/finalise", 200, response);
@@ -122,7 +117,7 @@ describe("Test CheckAndSaveForm", () => {
 
   test("Shift+Enter submits form", async () => {
     renderForm();
-    const finalise = spyOnHandler(PollingStationDataEntryFinaliseHandler);
+    const finalise = spyOnHandler(DataEntryFinaliseHandler);
 
     expect(await screen.findByRole("group", { name: "Controleren en opslaan" })).toBeVisible();
 
@@ -263,7 +258,7 @@ describe("Test CheckAndSaveForm", () => {
       await userEvent.click(acceptErrorsCheckbox);
 
       expect(acceptErrorsCheckbox).toBeChecked();
-      const finalise = spyOnHandler(PollingStationDataEntryFinaliseHandler);
+      const finalise = spyOnHandler(DataEntryFinaliseHandler);
 
       await userEvent.click(completeButton);
 
@@ -274,7 +269,7 @@ describe("Test CheckAndSaveForm", () => {
 
 describe("Test CheckAndSaveForm summary", () => {
   beforeEach(() => {
-    server.use(ElectionRequestHandler, PollingStationDataEntryClaimHandler, PollingStationDataEntrySaveHandler);
+    server.use(ElectionRequestHandler, DataEntryClaimHandler, DataEntrySaveHandler);
   });
   test("Blocking", async () => {
     overrideServerClaimDataEntryResponse({

@@ -12,11 +12,11 @@ import {
   emptyResults,
 } from "@/testing/api-mocks/DataEntryMockData";
 import {
+  DataEntryGetHandler,
+  DataEntryResolveErrorsHandler,
   ElectionListRequestHandler,
   ElectionRequestHandler,
   ElectionStatusRequestHandler,
-  PollingStationDataEntryGetHandler,
-  PollingStationDataEntryResolveErrorsHandler,
   UserListRequestHandler,
 } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
@@ -54,8 +54,8 @@ describe("DetailIndexPage", () => {
       ElectionRequestHandler,
       ElectionStatusRequestHandler,
       ElectionListRequestHandler,
-      PollingStationDataEntryGetHandler,
-      PollingStationDataEntryResolveErrorsHandler,
+      DataEntryGetHandler,
+      DataEntryResolveErrorsHandler,
       UserListRequestHandler,
     );
   });
@@ -88,7 +88,7 @@ describe("DetailIndexPage", () => {
 
   test("should only submit after making a selection", async () => {
     const user = userEvent.setup();
-    const resolve = spyOnHandler(PollingStationDataEntryResolveErrorsHandler);
+    const resolve = spyOnHandler(DataEntryResolveErrorsHandler);
 
     renderPage();
 

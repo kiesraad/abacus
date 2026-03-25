@@ -5,7 +5,7 @@ import { DataEntryProvider } from "@/features/data_entry/components/DataEntryPro
 import * as useMessages from "@/hooks/messages/useMessages";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
-import { ElectionRequestHandler, PollingStationDataEntryClaimHandler } from "@/testing/api-mocks/RequestHandlers";
+import { DataEntryClaimHandler, ElectionRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
 import { render, screen } from "@/testing/test-utils";
 import type { ErrorResponse } from "@/types/generated/openapi";
@@ -37,7 +37,7 @@ describe("DataEntryProvider", () => {
 
     vi.spyOn(ReactRouter, "useNavigate").mockReturnValue(navigate);
 
-    server.use(ElectionRequestHandler, PollingStationDataEntryClaimHandler);
+    server.use(ElectionRequestHandler, DataEntryClaimHandler);
   });
 
   test("Render DataEntryProvider", async () => {

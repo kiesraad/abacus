@@ -1,9 +1,11 @@
 import { userEvent } from "@testing-library/user-event";
 import * as ReactRouter from "react-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
+import { ElectionStatusProviderContext } from "@/hooks/election/ElectionStatusProviderContext";
 import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
 import * as useUser from "@/hooks/user/useUser";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
+import { electionStatusesMock } from "@/testing/api-mocks/ElectionStatusMockData";
 import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
 import {
   PollingStationDataEntryClaimHandler,
@@ -30,11 +32,13 @@ function renderForm() {
   vi.spyOn(ReactRouter, "useParams").mockReturnValue({ sectionId: "differences_counts" });
 
   return render(
-    <MessagesProvider>
-      <DataEntryProvider election={electionMockData} pollingStation={pollingStationMockData[0]!} entryNumber={1}>
-        <DataEntrySection committeeCategory={electionMockData.committee_category} />
-      </DataEntryProvider>
-    </MessagesProvider>,
+    <ElectionStatusProviderContext.Provider value={{ statuses: electionStatusesMock, refetch: vi.fn() }}>
+      <MessagesProvider>
+        <DataEntryProvider election={electionMockData} pollingStation={pollingStationMockData[0]!} entryNumber={1}>
+          <DataEntrySection committeeCategory={electionMockData.committee_category} />
+        </DataEntryProvider>
+      </MessagesProvider>
+    </ElectionStatusProviderContext.Provider>,
   );
 }
 
@@ -99,7 +103,7 @@ describe("Test DifferencesForm", () => {
     });
 
     test("Form field entry and keybindings", async () => {
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+      overrideOnce("post", "/api/data_entries/1/1", 200, {
         validation_results: { errors: [], warnings: [] },
       });
 
@@ -193,7 +197,7 @@ describe("Test DifferencesForm", () => {
 
       expect(spy).toHaveBeenCalled();
       const { url, method, body } = getUrlMethodAndBody(spy.mock.calls);
-      expect(url).toEqual("/api/polling_stations/1/data_entries/1");
+      expect(url).toEqual("/api/data_entries/1/1");
       expect(method).toEqual("POST");
       const request_body = body as DATA_ENTRY_SAVE_REQUEST_BODY;
       expect(request_body.data).toEqual(expectedRequest.data);
@@ -213,7 +217,7 @@ describe("Test DifferencesForm", () => {
       renderForm();
 
       await screen.findByTestId("differences_counts_form");
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+      overrideOnce("post", "/api/data_entries/1/1", 200, {
         validation_results: { errors: [validationResultMockData.F301], warnings: [] },
       });
 
@@ -254,7 +258,7 @@ describe("Test DifferencesForm", () => {
       renderForm();
 
       await screen.findByTestId("differences_counts_form");
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+      overrideOnce("post", "/api/data_entries/1/1", 200, {
         validation_results: { errors: [validationResultMockData.F302], warnings: [] },
       });
 
@@ -298,7 +302,7 @@ describe("Test DifferencesForm", () => {
       renderForm();
 
       await screen.findByTestId("differences_counts_form");
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+      overrideOnce("post", "/api/data_entries/1/1", 200, {
         validation_results: { errors: [validationResultMockData.F303], warnings: [] },
       });
 
@@ -341,7 +345,7 @@ describe("Test DifferencesForm", () => {
       renderForm();
 
       await screen.findByTestId("differences_counts_form");
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+      overrideOnce("post", "/api/data_entries/1/1", 200, {
         validation_results: { errors: [validationResultMockData.F304], warnings: [] },
       });
 
@@ -384,7 +388,7 @@ describe("Test DifferencesForm", () => {
       renderForm();
 
       await screen.findByTestId("differences_counts_form");
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+      overrideOnce("post", "/api/data_entries/1/1", 200, {
         validation_results: { errors: [validationResultMockData.F305], warnings: [] },
       });
 
@@ -426,7 +430,7 @@ describe("Test DifferencesForm", () => {
       renderForm();
 
       await screen.findByTestId("differences_counts_form");
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+      overrideOnce("post", "/api/data_entries/1/1", 200, {
         validation_results: { errors: [validationResultMockData.F306], warnings: [] },
       });
 
@@ -468,7 +472,7 @@ describe("Test DifferencesForm", () => {
       renderForm();
 
       await screen.findByTestId("differences_counts_form");
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+      overrideOnce("post", "/api/data_entries/1/1", 200, {
         validation_results: { errors: [validationResultMockData.F307], warnings: [] },
       });
 
@@ -510,7 +514,7 @@ describe("Test DifferencesForm", () => {
       renderForm();
 
       await screen.findByTestId("differences_counts_form");
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+      overrideOnce("post", "/api/data_entries/1/1", 200, {
         validation_results: { errors: [validationResultMockData.F308], warnings: [] },
       });
 
@@ -552,7 +556,7 @@ describe("Test DifferencesForm", () => {
       renderForm();
 
       await screen.findByTestId("differences_counts_form");
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+      overrideOnce("post", "/api/data_entries/1/1", 200, {
         validation_results: { errors: [validationResultMockData.F309], warnings: [] },
       });
 
@@ -594,7 +598,7 @@ describe("Test DifferencesForm", () => {
       renderForm();
 
       await screen.findByTestId("differences_counts_form");
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+      overrideOnce("post", "/api/data_entries/1/1", 200, {
         validation_results: { errors: [validationResultMockData.F310], warnings: [] },
       });
 

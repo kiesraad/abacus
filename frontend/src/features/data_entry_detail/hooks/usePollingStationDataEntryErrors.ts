@@ -6,6 +6,7 @@ import { useApiClient } from "@/api/useApiClient";
 import { useInitialApiGet } from "@/api/useInitialApiGet";
 import { ElectionStatusProviderContext } from "@/hooks/election/ElectionStatusProviderContext";
 import { useElection } from "@/hooks/election/useElection";
+import { getDataEntryIdForPollingStation, useElectionStatus } from "@/hooks/election/useElectionStatus";
 import { t } from "@/i18n/translate";
 import type {
   DATA_ENTRY_GET_REQUEST_PATH,
@@ -33,19 +34,21 @@ export function usePollingStationDataEntryErrors(pollingStationId: number): Data
   const client = useApiClient();
   const { election, pollingStations } = useElection();
   const pollingStation = pollingStations.find((ps) => ps.id === pollingStationId);
+  const { statuses } = useElectionStatus();
+  const dataEntryId = getDataEntryIdForPollingStation(statuses, pollingStationId);
   const [action, setAction] = useState<ResolveErrorsAction>();
   const electionContext = useContext(ElectionStatusProviderContext);
   const [error, setError] = useState<AnyApiError | null>(null);
   const [validationError, setValidationError] = useState<string>();
 
-  // fetch the data entry with errors and warnings
-  const path: DATA_ENTRY_GET_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/data_entries/get`;
-  const { requestState } = useInitialApiGet<DataEntryGetResponse>(path);
-
-  // 404 error if polling station is not found
-  if (!pollingStation) {
+  // 'Not found' error if polling station or data entry is not found
+  if (!pollingStation || dataEntryId === undefined) {
     throw new NotFoundError("error.polling_station_not_found");
   }
+
+  // fetch the data entry with errors and warnings
+  const path: DATA_ENTRY_GET_REQUEST_PATH = `/api/data_entries/${dataEntryId}/get`;
+  const { requestState } = useInitialApiGet<DataEntryGetResponse>(path);
 
   // propagate error that occurred during a save request
   if (error) {
@@ -69,7 +72,7 @@ export function usePollingStationDataEntryErrors(pollingStationId: number): Data
       setValidationError(undefined);
     }
 
-    const path: DATA_ENTRY_RESOLVE_ERRORS_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/data_entries/resolve_errors`;
+    const path: DATA_ENTRY_RESOLVE_ERRORS_REQUEST_PATH = `/api/data_entries/${dataEntryId}/resolve_errors`;
     const body: DATA_ENTRY_RESOLVE_ERRORS_REQUEST_BODY = action;
     const response = await client.postRequest(path, body);
 

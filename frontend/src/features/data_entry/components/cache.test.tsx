@@ -1,9 +1,11 @@
 import * as ReactRouter from "react-router";
 
 import { describe, expect, test, vi } from "vitest";
+import { ElectionStatusProviderContext } from "@/hooks/election/ElectionStatusProviderContext";
 import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
 import * as useUser from "@/hooks/user/useUser";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
+import { electionStatusesMock } from "@/testing/api-mocks/ElectionStatusMockData";
 import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
 import {
   PollingStationDataEntryClaimHandler,
@@ -48,11 +50,13 @@ describe("Data Entry cache behavior", () => {
     vi.spyOn(ReactRouter, "useParams").mockReturnValue({ sectionId: "voters_votes_counts" });
 
     render(
-      <MessagesProvider>
-        <DataEntryProvider election={electionMockData} pollingStation={pollingStationMockData[0]!} entryNumber={1}>
-          <DataEntrySection committeeCategory={electionMockData.committee_category} />
-        </DataEntryProvider>
-      </MessagesProvider>,
+      <ElectionStatusProviderContext.Provider value={{ statuses: electionStatusesMock, refetch: vi.fn() }}>
+        <MessagesProvider>
+          <DataEntryProvider election={electionMockData} pollingStation={pollingStationMockData[0]!} entryNumber={1}>
+            <DataEntrySection committeeCategory={electionMockData.committee_category} />
+          </DataEntryProvider>
+        </MessagesProvider>
+      </ElectionStatusProviderContext.Provider>,
     );
 
     const pollCards = await screen.findByRole("textbox", { name: "A Stempassen" });

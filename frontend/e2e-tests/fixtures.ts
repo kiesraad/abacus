@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { type APIRequestContext, test as base, expect, type Page } from "@playwright/test";
 import { DataEntryApiClient } from "e2e-tests/helpers-utils/api-clients";
-import { completePollingStationDataEntries } from "e2e-tests/helpers-utils/e2e-test-api-helpers";
+import { completePollingStationDataEntries, resolveDataEntryId } from "e2e-tests/helpers-utils/e2e-test-api-helpers";
 import { createRandomUsername } from "e2e-tests/helpers-utils/e2e-test-utils";
 import { type Eml230b, eml110a, eml230b } from "e2e-tests/test-data/eml-files";
 import {
@@ -92,10 +92,11 @@ export const test = base.extend<Fixtures>({
     await use({ page: page, request: context.request });
     await context.close();
   },
-  pollingStationFirstEntryClaimed: async ({ typistOne, pollingStation }, use) => {
+  pollingStationFirstEntryClaimed: async ({ typistOne, pollingStation, election }, use) => {
     const { request } = typistOne;
+    const dataEntryId = await resolveDataEntryId(request, election.election.id, pollingStation.id);
 
-    const firstDataEntry = new DataEntryApiClient(request, pollingStation.id, 1);
+    const firstDataEntry = new DataEntryApiClient(request, dataEntryId, 1);
     await firstDataEntry.claim();
     await use(pollingStation);
   },
@@ -163,34 +164,38 @@ export const test = base.extend<Fixtures>({
 
     await use(pollingStation);
   },
-  pollingStationFirstEntryDone: async ({ pollingStation, typistOne }, use) => {
+  pollingStationFirstEntryDone: async ({ pollingStation, typistOne, election }, use) => {
     const { request } = typistOne;
+    const dataEntryId = await resolveDataEntryId(request, election.election.id, pollingStation.id);
 
-    const firstDataEntry = new DataEntryApiClient(request, pollingStation.id, 1);
+    const firstDataEntry = new DataEntryApiClient(request, dataEntryId, 1);
     await firstDataEntry.claim();
     await firstDataEntry.save(dataEntryRequest);
     await firstDataEntry.finalise();
 
     await use(pollingStation);
   },
-  pollingStationFirstEntryHasErrors: async ({ pollingStation, typistOne }, use) => {
+  pollingStationFirstEntryHasErrors: async ({ pollingStation, typistOne, election }, use) => {
     const { request } = typistOne;
+    const dataEntryId = await resolveDataEntryId(request, election.election.id, pollingStation.id);
 
-    const firstDataEntry = new DataEntryApiClient(request, pollingStation.id, 1);
+    const firstDataEntry = new DataEntryApiClient(request, dataEntryId, 1);
     await firstDataEntry.claim();
     await firstDataEntry.save(dataEntryWithErrorRequest);
     await firstDataEntry.finalise();
 
     await use(pollingStation);
   },
-  pollingStationDefinitive: async ({ pollingStation, typistOne, typistTwo }, use) => {
-    await completePollingStationDataEntries(pollingStation.id, typistOne.request, typistTwo.request);
+  pollingStationDefinitive: async ({ pollingStation, typistOne, typistTwo, election }, use) => {
+    const dataEntryId = await resolveDataEntryId(typistOne.request, election.election.id, pollingStation.id);
+    await completePollingStationDataEntries(dataEntryId, typistOne.request, typistTwo.request);
 
     await use(pollingStation);
   },
-  pollingStationEntriesDifferent: async ({ pollingStation, typistOne, typistTwo }, use) => {
+  pollingStationEntriesDifferent: async ({ pollingStation, typistOne, typistTwo, election }, use) => {
+    const dataEntryId = await resolveDataEntryId(typistOne.request, election.election.id, pollingStation.id);
     await completePollingStationDataEntries(
-      pollingStation.id,
+      dataEntryId,
       typistOne.request,
       typistTwo.request,
       dataEntryRequest,
@@ -199,9 +204,10 @@ export const test = base.extend<Fixtures>({
 
     await use(pollingStation);
   },
-  pollingStationEntriesDifferentWithErrors: async ({ pollingStation, typistOne, typistTwo }, use) => {
+  pollingStationEntriesDifferentWithErrors: async ({ pollingStation, typistOne, typistTwo, election }, use) => {
+    const dataEntryId = await resolveDataEntryId(typistOne.request, election.election.id, pollingStation.id);
     await completePollingStationDataEntries(
-      pollingStation.id,
+      dataEntryId,
       typistOne.request,
       typistTwo.request,
       dataEntryRequest,
@@ -212,8 +218,9 @@ export const test = base.extend<Fixtures>({
   },
   completedElection: async ({ election, typistOne, typistTwo }, use) => {
     // finalise both data entries for all polling stations
-    for (const pollingStationId of election.polling_stations.map((ps) => ps.id)) {
-      await completePollingStationDataEntries(pollingStationId, typistOne.request, typistTwo.request);
+    for (const ps of election.polling_stations) {
+      const dataEntryId = await resolveDataEntryId(typistOne.request, election.election.id, ps.id);
+      await completePollingStationDataEntries(dataEntryId, typistOne.request, typistTwo.request);
     }
 
     await use(election.election);

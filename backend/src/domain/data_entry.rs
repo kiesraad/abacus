@@ -7,11 +7,12 @@ use utoipa::ToSchema;
 
 use crate::{
     domain::{
+        committee_session::CommitteeSession,
         compare::Compare,
         election::ElectionWithPoliticalGroups,
         field_path::FieldPath,
         identifier::id,
-        polling_station::{PollingStation, PollingStationId, PollingStationNumber},
+        polling_station::{PollingStationId, PollingStationNumber},
         results::Results,
         sub_committee::SubCommittee,
         validate::{
@@ -67,7 +68,7 @@ impl From<DataEntryStatus> for DataEntryStatusResponse {
 
 #[derive(Serialize, Deserialize, Clone, ToSchema, Debug, FromRow)]
 #[serde(deny_unknown_fields)]
-pub struct PollingStationDataEntry {
+pub struct DataEntryRow {
     pub id: DataEntryId,
     #[schema(value_type = DataEntryStatus)]
     pub state: Json<DataEntryStatus>,
@@ -75,8 +76,8 @@ pub struct PollingStationDataEntry {
     pub updated_at: DateTime<Utc>,
 }
 
-impl From<PollingStationDataEntry> for DataEntryStatusResponse {
-    fn from(data_entry: PollingStationDataEntry) -> Self {
+impl From<DataEntryRow> for DataEntryStatusResponse {
+    fn from(data_entry: DataEntryRow) -> Self {
         DataEntryStatusResponse {
             status: data_entry.state.0.status_name(),
         }
@@ -96,22 +97,22 @@ pub struct PollingStationSource {
     #[schema(value_type = u32)]
     pub number: PollingStationNumber,
     pub name: String,
+    #[serde(skip)]
+    #[schema(ignore)]
+    pub prev_data_entry_id: Option<DataEntryId>,
+}
+
+/// Context about which entity owns a given data entry
+pub struct DataEntrySourceContext {
+    pub source: DataEntrySource,
+    pub election: ElectionWithPoliticalGroups,
+    pub committee_session: CommitteeSession,
 }
 
 pub struct DataEntryStatusWithSource {
     pub data_entry_id: DataEntryId,
     pub source: DataEntrySource,
     pub status: DataEntryStatus,
-}
-
-impl From<PollingStation> for DataEntrySource {
-    fn from(polling_station: PollingStation) -> Self {
-        DataEntrySource::PollingStation(PollingStationSource {
-            id: polling_station.id,
-            number: polling_station.number,
-            name: polling_station.name,
-        })
-    }
 }
 
 impl From<SubCommittee> for DataEntrySource {

@@ -28,7 +28,7 @@ export function overrideServerClaimDataEntryResponse({
   continueToNextSection = true,
   validationResults = { errors: [], warnings: [] },
 }: OverrideServerClaimDataEntryResponseProps) {
-  overrideOnce("post", "/api/polling_stations/1/data_entries/1/claim" satisfies DATA_ENTRY_CLAIM_REQUEST_PATH, 200, {
+  overrideOnce("post", "/api/data_entries/1/1/claim" satisfies DATA_ENTRY_CLAIM_REQUEST_PATH, 200, {
     client_state: getClientState(formState, formState.furthest, false, continueToNextSection),
     data: {
       model: "CSOFirstSession",

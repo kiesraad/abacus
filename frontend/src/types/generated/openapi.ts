@@ -9,6 +9,63 @@ export type ACCOUNT_UPDATE_REQUEST_PARAMS = Record<string, never>;
 export type ACCOUNT_UPDATE_REQUEST_PATH = `/api/account`;
 export type ACCOUNT_UPDATE_REQUEST_BODY = AccountUpdateRequest;
 
+// /api/data_entries/{data_entry_id}
+export interface DATA_ENTRY_RESET_REQUEST_PARAMS {
+  data_entry_id: DataEntryId;
+}
+export type DATA_ENTRY_RESET_REQUEST_PATH = `/api/data_entries/${DataEntryId}`;
+
+// /api/data_entries/{data_entry_id}/get
+export interface DATA_ENTRY_GET_REQUEST_PARAMS {
+  data_entry_id: DataEntryId;
+}
+export type DATA_ENTRY_GET_REQUEST_PATH = `/api/data_entries/${DataEntryId}/get`;
+
+// /api/data_entries/{data_entry_id}/resolve_differences
+export interface DATA_ENTRY_GET_DIFFERENCES_REQUEST_PARAMS {
+  data_entry_id: DataEntryId;
+}
+export type DATA_ENTRY_GET_DIFFERENCES_REQUEST_PATH = `/api/data_entries/${DataEntryId}/resolve_differences`;
+export interface DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_PARAMS {
+  data_entry_id: DataEntryId;
+}
+export type DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_PATH = `/api/data_entries/${DataEntryId}/resolve_differences`;
+export type DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_BODY = ResolveDifferencesAction;
+
+// /api/data_entries/{data_entry_id}/resolve_errors
+export interface DATA_ENTRY_RESOLVE_ERRORS_REQUEST_PARAMS {
+  data_entry_id: DataEntryId;
+}
+export type DATA_ENTRY_RESOLVE_ERRORS_REQUEST_PATH = `/api/data_entries/${DataEntryId}/resolve_errors`;
+export type DATA_ENTRY_RESOLVE_ERRORS_REQUEST_BODY = ResolveErrorsAction;
+
+// /api/data_entries/{data_entry_id}/{entry_number}
+export interface DATA_ENTRY_SAVE_REQUEST_PARAMS {
+  data_entry_id: DataEntryId;
+  entry_number: number;
+}
+export type DATA_ENTRY_SAVE_REQUEST_PATH = `/api/data_entries/${DataEntryId}/${number}`;
+export type DATA_ENTRY_SAVE_REQUEST_BODY = DataEntry;
+export interface DATA_ENTRY_DISCARD_REQUEST_PARAMS {
+  data_entry_id: DataEntryId;
+  entry_number: number;
+}
+export type DATA_ENTRY_DISCARD_REQUEST_PATH = `/api/data_entries/${DataEntryId}/${number}`;
+
+// /api/data_entries/{data_entry_id}/{entry_number}/claim
+export interface DATA_ENTRY_CLAIM_REQUEST_PARAMS {
+  data_entry_id: DataEntryId;
+  entry_number: number;
+}
+export type DATA_ENTRY_CLAIM_REQUEST_PATH = `/api/data_entries/${DataEntryId}/${number}/claim`;
+
+// /api/data_entries/{data_entry_id}/{entry_number}/finalise
+export interface DATA_ENTRY_FINALISE_REQUEST_PARAMS {
+  data_entry_id: DataEntryId;
+  entry_number: number;
+}
+export type DATA_ENTRY_FINALISE_REQUEST_PATH = `/api/data_entries/${DataEntryId}/${number}/finalise`;
+
 // /api/elections
 export type ELECTION_LIST_REQUEST_PARAMS = Record<string, never>;
 export type ELECTION_LIST_REQUEST_PATH = `/api/elections`;
@@ -205,67 +262,6 @@ export type LOGIN_REQUEST_BODY = Credentials;
 // /api/logout
 export type LOGOUT_REQUEST_PARAMS = Record<string, never>;
 export type LOGOUT_REQUEST_PATH = `/api/logout`;
-
-// /api/polling_stations/{polling_station_id}/data_entries
-export interface DATA_ENTRY_RESET_REQUEST_PARAMS {
-  polling_station_id: PollingStationId;
-}
-export type DATA_ENTRY_RESET_REQUEST_PATH = `/api/polling_stations/${PollingStationId}/data_entries`;
-
-// /api/polling_stations/{polling_station_id}/data_entries/get
-export interface DATA_ENTRY_GET_REQUEST_PARAMS {
-  polling_station_id: PollingStationId;
-}
-export type DATA_ENTRY_GET_REQUEST_PATH = `/api/polling_stations/${PollingStationId}/data_entries/get`;
-
-// /api/polling_stations/{polling_station_id}/data_entries/resolve_differences
-export interface DATA_ENTRY_GET_DIFFERENCES_REQUEST_PARAMS {
-  polling_station_id: PollingStationId;
-}
-export type DATA_ENTRY_GET_DIFFERENCES_REQUEST_PATH =
-  `/api/polling_stations/${PollingStationId}/data_entries/resolve_differences`;
-export interface DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_PARAMS {
-  polling_station_id: PollingStationId;
-}
-export type DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_PATH =
-  `/api/polling_stations/${PollingStationId}/data_entries/resolve_differences`;
-export type DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_BODY = ResolveDifferencesAction;
-
-// /api/polling_stations/{polling_station_id}/data_entries/resolve_errors
-export interface DATA_ENTRY_RESOLVE_ERRORS_REQUEST_PARAMS {
-  polling_station_id: PollingStationId;
-}
-export type DATA_ENTRY_RESOLVE_ERRORS_REQUEST_PATH =
-  `/api/polling_stations/${PollingStationId}/data_entries/resolve_errors`;
-export type DATA_ENTRY_RESOLVE_ERRORS_REQUEST_BODY = ResolveErrorsAction;
-
-// /api/polling_stations/{polling_station_id}/data_entries/{entry_number}
-export interface DATA_ENTRY_SAVE_REQUEST_PARAMS {
-  polling_station_id: PollingStationId;
-  entry_number: number;
-}
-export type DATA_ENTRY_SAVE_REQUEST_PATH = `/api/polling_stations/${PollingStationId}/data_entries/${number}`;
-export type DATA_ENTRY_SAVE_REQUEST_BODY = DataEntry;
-export interface DATA_ENTRY_DISCARD_REQUEST_PARAMS {
-  polling_station_id: PollingStationId;
-  entry_number: number;
-}
-export type DATA_ENTRY_DISCARD_REQUEST_PATH = `/api/polling_stations/${PollingStationId}/data_entries/${number}`;
-
-// /api/polling_stations/{polling_station_id}/data_entries/{entry_number}/claim
-export interface DATA_ENTRY_CLAIM_REQUEST_PARAMS {
-  polling_station_id: PollingStationId;
-  entry_number: number;
-}
-export type DATA_ENTRY_CLAIM_REQUEST_PATH = `/api/polling_stations/${PollingStationId}/data_entries/${number}/claim`;
-
-// /api/polling_stations/{polling_station_id}/data_entries/{entry_number}/finalise
-export interface DATA_ENTRY_FINALISE_REQUEST_PARAMS {
-  polling_station_id: PollingStationId;
-  entry_number: number;
-}
-export type DATA_ENTRY_FINALISE_REQUEST_PATH =
-  `/api/polling_stations/${PollingStationId}/data_entries/${number}/finalise`;
 
 // /api/polling_stations/{polling_station_id}/investigation
 export interface POLLING_STATION_INVESTIGATION_UPDATE_REQUEST_PARAMS {
@@ -523,7 +519,7 @@ export interface ChosenCandidate {
 }
 
 /**
- * Response structure for claiming data entry
+ * Response structure for getting data entry results
  */
 export interface ClaimDataEntryResponse {
   client_state: unknown;

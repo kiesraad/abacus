@@ -288,7 +288,7 @@ describe("onSubmitForm", () => {
 
     const client = new ApiClient();
 
-    const requestPath = "/api/polling_stations/1/data_entries/1";
+    const requestPath = "/api/data_entries/1/1";
     const submit = onSubmitForm(client, requestPath, dispatch, state);
 
     overrideOnce("post", requestPath, 200, {
@@ -348,7 +348,7 @@ describe("onDiscardDataEntry", () => {
     const dispatch = vi.fn();
     const client = new ApiClient();
 
-    const requestPath = "/api/polling_stations/1/data_entries/1";
+    const requestPath = "/api/data_entries/1/1";
     const onDiscard = onDiscardDataEntry(client, requestPath, dispatch);
 
     const result = await onDiscard();
@@ -371,7 +371,7 @@ describe("onFinaliseDataEntry", () => {
     const dispatch = vi.fn();
     const client = new ApiClient();
 
-    const finaliseUrl: DATA_ENTRY_FINALISE_REQUEST_PATH = "/api/polling_stations/1/data_entries/1/finalise";
+    const finaliseUrl: DATA_ENTRY_FINALISE_REQUEST_PATH = "/api/data_entries/1/1/finalise";
     const onFinalise = onFinaliseDataEntry(client, finaliseUrl, dispatch);
 
     const result = await onFinalise();

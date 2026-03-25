@@ -1,5 +1,6 @@
 import { type APIRequestContext, expect } from "@playwright/test";
 import type { TestUser } from "e2e-tests/test-data/users";
+import type { ElectionStatusResponse } from "@/types/generated/openapi";
 import { dataEntryRequest } from "../test-data/request-response-templates";
 import { DataEntryApiClient } from "./api-clients";
 
@@ -22,19 +23,32 @@ export async function apiLogout(request: APIRequestContext) {
   return await request.post("/api/logout");
 }
 
-export async function completePollingStationDataEntries(
+export async function resolveDataEntryId(
+  request: APIRequestContext,
+  electionId: number,
   pollingStationId: number,
+): Promise<number> {
+  const response = await request.get(`/api/elections/${electionId}/status`);
+  expect(response.ok()).toBeTruthy();
+  const body = (await response.json()) as ElectionStatusResponse;
+  const entry = body.statuses.find((s) => s.source.type === "PollingStation" && s.source.id === pollingStationId);
+  expect(entry, `Could not find data_entry_id for polling station ${pollingStationId}`).toBeDefined();
+  return entry!.data_entry_id;
+}
+
+export async function completePollingStationDataEntries(
+  dataEntryId: number,
   typistOneRequest: APIRequestContext,
   typistTwoRequest: APIRequestContext,
   firstRequest = dataEntryRequest,
   secondRequest = dataEntryRequest,
 ) {
-  const firstDataEntry = new DataEntryApiClient(typistOneRequest, pollingStationId, 1);
+  const firstDataEntry = new DataEntryApiClient(typistOneRequest, dataEntryId, 1);
   await firstDataEntry.claim();
   await firstDataEntry.save(firstRequest);
   await firstDataEntry.finalise();
 
-  const secondDataEntry = new DataEntryApiClient(typistTwoRequest, pollingStationId, 2);
+  const secondDataEntry = new DataEntryApiClient(typistTwoRequest, dataEntryId, 2);
   await secondDataEntry.claim();
   await secondDataEntry.save(secondRequest);
   await secondDataEntry.finalise();

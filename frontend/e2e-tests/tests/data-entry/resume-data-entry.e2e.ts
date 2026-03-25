@@ -1,4 +1,5 @@
 import { expect, type Page } from "@playwright/test";
+import { resolveDataEntryId } from "e2e-tests/helpers-utils/e2e-test-api-helpers";
 import { AbortInputModal } from "e2e-tests/page-objects/data_entry/AbortInputModalPgObj";
 import { CandidatesListPage } from "e2e-tests/page-objects/data_entry/CandidatesListPgObj";
 import { CheckAndSavePage } from "e2e-tests/page-objects/data_entry/CheckAndSavePgObj";
@@ -160,7 +161,8 @@ test.describe("resume data entry flow", () => {
       await expect(dataEntryHomePage.fieldset).toBeVisible();
       await expect(dataEntryHomePage.alertDataEntryInProgress).toBeVisible();
 
-      const dataEntryResponse = await request.post(`/api/polling_stations/${pollingStation.id}/data_entries/1/claim`);
+      const dataEntryId = await resolveDataEntryId(request, pollingStation.election_id, pollingStation.id);
+      const dataEntryResponse = await request.post(`/api/data_entries/${dataEntryId}/1/claim`);
       expect(dataEntryResponse.status()).toBe(200);
       expect(await dataEntryResponse.json()).toMatchObject({
         data: {
@@ -242,7 +244,8 @@ test.describe("resume data entry flow", () => {
       const dataEntryHomePage = new DataEntryHomePage(page);
       await expect(dataEntryHomePage.fieldset).toBeVisible();
 
-      const dataEntryResponse = await request.post(`/api/polling_stations/${pollingStation.id}/data_entries/1/claim`);
+      const dataEntryId = await resolveDataEntryId(request, pollingStation.election_id, pollingStation.id);
+      const dataEntryResponse = await request.post(`/api/data_entries/${dataEntryId}/1/claim`);
       expect(dataEntryResponse.status()).toBe(200);
       expect(await dataEntryResponse.json()).toMatchObject({
         data: {
@@ -342,7 +345,7 @@ test.describe("resume data entry flow", () => {
       await votersAndVotesPage.abortInput.click();
 
       const abortInputModal = new AbortInputModal(page);
-      const responsePromise = page.waitForResponse(`/api/polling_stations/${pollingStation.id}/data_entries/1`);
+      const responsePromise = page.waitForResponse(/\/api\/data_entries\/\d+\/1$/);
       await abortInputModal.saveInput.click();
 
       const response = await responsePromise;
@@ -484,7 +487,8 @@ test.describe("resume data entry flow", () => {
       const dataEntryHomePage = new DataEntryHomePage(page);
       await expect(dataEntryHomePage.fieldset).toBeVisible();
 
-      const claimResponse = await request.post(`/api/polling_stations/${pollingStation.id}/data_entries/1/claim`);
+      const dataEntryId = await resolveDataEntryId(request, pollingStation.election_id, pollingStation.id);
+      const claimResponse = await request.post(`/api/data_entries/${dataEntryId}/1/claim`);
       expect(claimResponse.status()).toBe(200);
       expect(await claimResponse.json()).toMatchObject({ data: emptyCSOFirstSessionResults() });
     });
@@ -532,7 +536,8 @@ test.describe("resume data entry flow", () => {
       const dataEntryHomePage = new DataEntryHomePage(page);
       await expect(dataEntryHomePage.fieldset).toBeVisible();
 
-      const claimResponse = await request.post(`/api/polling_stations/${pollingStation.id}/data_entries/1/claim`);
+      const dataEntryId = await resolveDataEntryId(request, pollingStation.election_id, pollingStation.id);
+      const claimResponse = await request.post(`/api/data_entries/${dataEntryId}/1/claim`);
       expect(claimResponse.status()).toBe(200);
       expect(await claimResponse.json()).toMatchObject({ data: emptyCSOFirstSessionResults() });
     });
@@ -595,7 +600,8 @@ test.describe("resume data entry flow", () => {
       const dataEntryHomePage = new DataEntryHomePage(page);
       await expect(dataEntryHomePage.fieldset).toBeVisible();
 
-      const claimResponse = await request.post(`/api/polling_stations/${pollingStation.id}/data_entries/1/claim`);
+      const dataEntryId = await resolveDataEntryId(request, pollingStation.election_id, pollingStation.id);
+      const claimResponse = await request.post(`/api/data_entries/${dataEntryId}/1/claim`);
       expect(claimResponse.status()).toBe(200);
       expect(await claimResponse.json()).toMatchObject({ data: emptyCSOFirstSessionResults() });
     });

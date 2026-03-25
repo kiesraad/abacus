@@ -18,6 +18,7 @@ import { useInitialDataEntryState } from "./useInitialDataEntryState";
 
 export default function useDataEntry(
   election: ElectionWithPoliticalGroups,
+  dataEntryId: number,
   pollingStationId: number,
   entryNumber: number,
   sectionId: FormSectionId | null,
@@ -26,9 +27,9 @@ export default function useDataEntry(
   const [state, dispatch] = useReducer(dataEntryReducer, getInitialState(election, pollingStationId, entryNumber));
 
   // initial request to get the current data entry from the backend
-  const saveRequestPath: DATA_ENTRY_SAVE_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/data_entries/${entryNumber}`;
-  const discardRequestPath: DATA_ENTRY_DISCARD_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/data_entries/${entryNumber}`;
-  const finaliseRequestPath: DATA_ENTRY_FINALISE_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/data_entries/${entryNumber}/finalise`;
+  const saveRequestPath: DATA_ENTRY_SAVE_REQUEST_PATH = `/api/data_entries/${dataEntryId}/${entryNumber}`;
+  const discardRequestPath: DATA_ENTRY_DISCARD_REQUEST_PATH = `/api/data_entries/${dataEntryId}/${entryNumber}`;
+  const finaliseRequestPath: DATA_ENTRY_FINALISE_REQUEST_PATH = `/api/data_entries/${dataEntryId}/${entryNumber}/finalise`;
   const claimRequestPath: DATA_ENTRY_CLAIM_REQUEST_PATH = `${saveRequestPath}/claim`;
   useInitialDataEntryState(client, dispatch, claimRequestPath);
 

@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        SELECT EXISTS(\n            SELECT 1 FROM polling_stations AS ps\n            INNER JOIN data_entries AS de ON de.id = ps.data_entry_id\n            WHERE ps.committee_session_id = $1\n            UNION ALL\n            SELECT 1 FROM sub_committees AS sc\n            INNER JOIN data_entries AS de ON de.id = sc.data_entry_id\n            WHERE sc.committee_session_id = $1\n        ) as `exists`",
+  "describe": {
+    "columns": [
+      {
+        "name": "exists",
+        "ordinal": 0,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "639f678e0311711577f409740189260a5a557cd3996419cbdf352244ab6c0150"
+}

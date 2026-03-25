@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/Badge/Badge";
 import { PollingStationNumber } from "@/components/ui/Badge/PollingStationNumber";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { useElection } from "@/hooks/election/useElection";
+import { getDataEntryIdForPollingStation, useElectionStatus } from "@/hooks/election/useElectionStatus";
 import { useMessages } from "@/hooks/messages/useMessages";
 import { useNumericParam } from "@/hooks/useNumericParam";
 import { useUser } from "@/hooks/user/useUser.ts";
@@ -24,6 +25,8 @@ export function DetailLayout() {
   const { pushMessage } = useMessages();
   const pollingStationId = useNumericParam("pollingStationId");
   const { election, pollingStation } = useElection(pollingStationId);
+  const { statuses } = useElectionStatus();
+  const dataEntryId = getDataEntryIdForPollingStation(statuses, pollingStationId);
   const { loading, dataEntry } = usePollingStationDataEntryErrors(pollingStationId);
   const [error, setError] = useState<AnyApiError>();
   const user = useUser();
@@ -32,7 +35,7 @@ export function DetailLayout() {
     throw error;
   }
 
-  if (!pollingStation) {
+  if (!pollingStation || dataEntryId === undefined) {
     throw new NotFoundError("error.polling_station_not_found");
   }
 
@@ -75,6 +78,7 @@ export function DetailLayout() {
           <section>
             <ReadOnlyDataEntryDelete
               pollingStation={pollingStation}
+              dataEntryId={dataEntryId}
               status={dataEntry.status}
               onDeleted={handleDeleted}
               onError={setError}

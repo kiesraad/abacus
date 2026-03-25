@@ -3,8 +3,10 @@ import * as ReactRouter from "react-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
+import { ElectionStatusProviderContext } from "@/hooks/election/ElectionStatusProviderContext";
 import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
+import { electionStatusesMock } from "@/testing/api-mocks/ElectionStatusMockData";
 import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
 import {
   ElectionRequestHandler,
@@ -37,11 +39,13 @@ function renderForm() {
 
   return renderReturningRouter(
     <ElectionProvider electionId={1}>
-      <MessagesProvider>
-        <DataEntryProvider election={electionMockData} pollingStation={pollingStationMockData[0]!} entryNumber={1}>
-          <CheckAndSaveForm />
-        </DataEntryProvider>
-      </MessagesProvider>
+      <ElectionStatusProviderContext.Provider value={{ statuses: electionStatusesMock, refetch: vi.fn() }}>
+        <MessagesProvider>
+          <DataEntryProvider election={electionMockData} pollingStation={pollingStationMockData[0]!} entryNumber={1}>
+            <CheckAndSaveForm />
+          </DataEntryProvider>
+        </MessagesProvider>
+      </ElectionStatusProviderContext.Provider>
     </ElectionProvider>,
   );
 }
@@ -82,7 +86,7 @@ describe("Test CheckAndSaveForm", () => {
     const finalise = spyOnHandler(PollingStationDataEntryFinaliseHandler);
 
     const response: DataEntryStatusResponse = { status: "entries_different" };
-    overrideOnce("post", "/api/polling_stations/1/data_entries/1/finalise", 200, response);
+    overrideOnce("post", "/api/data_entries/1/1/finalise", 200, response);
 
     // click the save button
     await user.click(await screen.findByRole("button", { name: "Opslaan" }));
@@ -103,7 +107,7 @@ describe("Test CheckAndSaveForm", () => {
     const finalise = spyOnHandler(PollingStationDataEntryFinaliseHandler);
 
     const response: DataEntryStatusResponse = { status: "first_entry_has_errors" };
-    overrideOnce("post", "/api/polling_stations/1/data_entries/1/finalise", 200, response);
+    overrideOnce("post", "/api/data_entries/1/1/finalise", 200, response);
 
     // click the save button
     await user.click(await screen.findByRole("button", { name: "Opslaan" }));
@@ -335,7 +339,7 @@ describe("Test CheckAndSaveForm summary", () => {
 
   test("Alert when committee session is paused is shown on save and then logs out", async () => {
     const user = userEvent.setup();
-    overrideOnce("post", "/api/polling_stations/1/data_entries/1/finalise", 409, {
+    overrideOnce("post", "/api/data_entries/1/1/finalise", 409, {
       error: "Committee session data entry is paused",
       fatal: true,
       reference: "CommitteeSessionPaused",

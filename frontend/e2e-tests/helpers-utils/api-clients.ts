@@ -11,9 +11,9 @@ export class DataEntryApiClient {
   private session: APIRequestContext;
   private readonly baseUrl: DATA_ENTRY_SAVE_REQUEST_PATH;
 
-  public constructor(request: APIRequestContext, pollingStationId: number, entryNumber: number) {
+  public constructor(request: APIRequestContext, dataEntryId: number, entryNumber: number) {
     this.session = request;
-    this.baseUrl = `/api/polling_stations/${pollingStationId}/data_entries/${entryNumber}`;
+    this.baseUrl = `/api/data_entries/${dataEntryId}/${entryNumber}`;
   }
 
   public async claim() {

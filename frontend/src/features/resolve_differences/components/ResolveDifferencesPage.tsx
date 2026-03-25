@@ -22,40 +22,36 @@ import { ResolveDifferencesTables } from "./ResolveDifferencesTables";
 export function ResolveDifferencesPage() {
   const { pushMessage } = useMessages();
   const navigate = useNavigate();
-  const pollingStationId = useNumericParam("pollingStationId");
-  const {
-    pollingStation,
-    election,
-    loading,
-    differences,
-    dataEntryStructure,
-    action,
-    setAction,
-    onSubmit,
-    validationError,
-  } = usePollingStationDataEntryDifferences(pollingStationId, afterSave);
+  const dataEntryId = useNumericParam("dataEntryId");
+  const { election, loading, differences, dataEntryStructure, action, setAction, onSubmit, validationError } =
+    usePollingStationDataEntryDifferences(dataEntryId, afterSave);
   const { getName } = useUsers();
 
   function afterSave(status: DataEntryStatusName, firstEntryUserId: number | undefined) {
+    if (!differences) {
+      return;
+    }
+    const number = differences.source.number;
+
     switch (status) {
       case "first_entry_has_errors":
         pushMessage({
-          title: t("data_entry_detail.resolve_errors.differences_resolved", { number: pollingStation.number }),
+          title: t("data_entry_detail.resolve_errors.differences_resolved", { number }),
           text: t("data_entry_detail.resolve_errors.alert_contains_errors"),
         });
-        void navigate(`/elections/${election.id}/status/${pollingStationId}/detail`);
+        void navigate(`/elections/${election.id}/status/${dataEntryId}/detail`);
         break;
       case "first_entry_finalised":
         pushMessage({
-          title: t("election_status.success.differences_resolved", { nr: pollingStation.number }),
+          title: t("election_status.success.differences_resolved", { number }),
           text: t("election_status.success.data_entry_kept", { typist: getName(firstEntryUserId) }),
         });
         void navigate(`/elections/${election.id}/status`);
         break;
       case "empty":
         pushMessage({
-          title: t("election_status.success.differences_resolved", { nr: pollingStation.number }),
-          text: t("election_status.success.data_entries_discarded", { nr: pollingStation.number }),
+          title: t("election_status.success.differences_resolved", { number }),
+          text: t("election_status.success.data_entries_discarded", { number }),
         });
         void navigate(`/elections/${election.id}/status`);
         break;
@@ -66,15 +62,15 @@ export function ResolveDifferencesPage() {
     return <Loader />;
   }
 
-  const { first_entry, first_entry_user_id, second_entry, second_entry_user_id } = differences;
+  const { first_entry, first_entry_user_id, second_entry, second_entry_user_id, source } = differences;
 
   return (
     <>
       <PageTitle title={`${t("resolve_differences.page_title")} - Abacus`} />
       <header>
         <section className="smaller-gap">
-          <PollingStationNumber>{pollingStation.number}</PollingStationNumber>
-          <h1>{pollingStation.name}</h1>
+          <PollingStationNumber>{source.number}</PollingStationNumber>
+          <h1>{source.name}</h1>
         </section>
       </header>
       <main className={cls.resolveDifferences}>

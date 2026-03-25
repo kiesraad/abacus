@@ -26,17 +26,13 @@ const SHOW_BADGE: DataEntryStatusName[] = [
 ];
 
 function getCategoryRowUrl(entry: ElectionStatusResponseEntry): string | null {
-  if (entry.source.type === "SubCommittee") {
-    // TODO #2977: add detail links for sub committees
-    return null;
-  }
   switch (entry.status) {
     case "empty":
       return null;
     case "entries_different":
-      return `./${entry.source.id}/resolve-differences`;
+      return `./${entry.data_entry_id}/resolve-differences`;
     default:
-      return `./${entry.source.id}/detail`;
+      return `./${entry.data_entry_id}/detail`;
   }
 }
 

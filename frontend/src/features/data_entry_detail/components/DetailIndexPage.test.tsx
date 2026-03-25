@@ -48,7 +48,7 @@ describe("DetailIndexPage", () => {
 
   beforeEach(() => {
     vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
-    vi.spyOn(ReactRouter, "useParams").mockReturnValue({ pollingStationId: "5" });
+    vi.spyOn(ReactRouter, "useParams").mockReturnValue({ dataEntryId: "5" });
     vi.spyOn(useMessages, "useMessages").mockReturnValue({ pushMessage, popMessages: vi.fn(() => []), hasMessages });
     server.use(
       ElectionRequestHandler,

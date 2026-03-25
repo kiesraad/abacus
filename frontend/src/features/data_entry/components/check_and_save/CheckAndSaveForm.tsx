@@ -34,16 +34,8 @@ export function CheckAndSaveForm() {
   const { election } = useElection();
   const [isConfirmed, setIsConfirmed] = useState(false);
   const [isConfirmedError, setIsConfirmedError] = useState<string | null>(null);
-  const {
-    error,
-    dataEntryStructure,
-    formState,
-    onSubmitForm,
-    status,
-    onFinaliseDataEntry,
-    pollingStationId,
-    entryNumber,
-  } = useDataEntryContext();
+  const { error, dataEntryStructure, formState, onSubmitForm, status, onFinaliseDataEntry, dataEntryId, entryNumber } =
+    useDataEntryContext();
   const acceptCheckboxRef = useRef<HTMLInputElement>(null);
 
   const params = useParams<{ sectionId: FormSectionId }>();
@@ -55,9 +47,9 @@ export function CheckAndSaveForm() {
 
   const getUrlForFormSection = useCallback(
     (id: FormSectionId) => {
-      return getUrlForFormSectionID(election.id, pollingStationId, entryNumber, id);
+      return getUrlForFormSectionID(election.id, dataEntryId, entryNumber, id);
     },
-    [election, pollingStationId, entryNumber],
+    [election, dataEntryId, entryNumber],
   );
 
   // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: TODO function should be refactored

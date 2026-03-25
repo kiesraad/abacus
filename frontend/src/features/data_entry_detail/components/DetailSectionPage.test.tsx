@@ -3,7 +3,6 @@ import * as ReactRouter from "react-router";
 import { describe, expect, test, vi } from "vitest";
 
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
-import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
 import {
   ElectionListRequestHandler,
   ElectionRequestHandler,
@@ -20,9 +19,7 @@ const renderSectionPage = () => {
   return render(
     <TestUserProvider userRole="coordinator_gsb">
       <ElectionProvider electionId={1}>
-        <ElectionStatusProvider electionId={1}>
-          <DetailSectionPage />
-        </ElectionStatusProvider>
+        <DetailSectionPage />
       </ElectionProvider>
     </TestUserProvider>,
   );
@@ -38,7 +35,7 @@ describe("DetailSectionPage", () => {
     );
     vi.spyOn(ReactRouter, "useParams").mockReturnValue({
       electionId: "1",
-      pollingStationId: "5",
+      dataEntryId: "5",
       sectionId: "voters_votes_counts",
     });
 

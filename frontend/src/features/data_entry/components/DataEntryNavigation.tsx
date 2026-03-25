@@ -23,7 +23,7 @@ export function DataEntryNavigation({ onSubmit, currentValues = {} }: DataEntryN
     error,
     status,
     election,
-    pollingStationId,
+    dataEntryId,
     dataEntryStructure,
     formState,
     setCache,
@@ -37,7 +37,7 @@ export function DataEntryNavigation({ onSubmit, currentValues = {} }: DataEntryN
 
   // path check to see if the current location is part of the data entry flow
   const isPartOfDataEntryFlow = (pathname: string) =>
-    pathname.startsWith(`/elections/${election.id}/data-entry/${pollingStationId}/${entryNumber}`);
+    pathname.startsWith(`/elections/${election.id}/data-entry/${dataEntryId}/${entryNumber}`);
 
   // block navigation if there are unsaved changes
   // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: TODO function should be refactored

@@ -2,10 +2,9 @@ import { type ReactNode, useEffect } from "react";
 import { Navigate, useNavigate, useParams } from "react-router";
 
 import { ApiError, FatalApiError, NotFoundError } from "@/api/ApiResult";
-import { getDataEntryIdForPollingStation, useElectionStatus } from "@/hooks/election/useElectionStatus";
 import { useMessages } from "@/hooks/messages/useMessages";
 import { t } from "@/i18n/translate";
-import type { ElectionWithPoliticalGroups, PollingStation } from "@/types/generated/openapi";
+import type { DataEntryId, ElectionWithPoliticalGroups } from "@/types/generated/openapi";
 import type { FormSectionId } from "@/types/types";
 
 import { DataEntryContext } from "../hooks/DataEntryContext";
@@ -15,23 +14,16 @@ import { isStateLoaded } from "../utils/utils";
 
 export interface DataEntryProviderProps {
   election: ElectionWithPoliticalGroups;
-  pollingStation: PollingStation;
+  dataEntryId: DataEntryId;
   entryNumber: number;
   children: ReactNode;
 }
 
-export function DataEntryProvider({ election, pollingStation, entryNumber, children }: DataEntryProviderProps) {
+export function DataEntryProvider({ election, dataEntryId, entryNumber, children }: DataEntryProviderProps) {
   const navigate = useNavigate();
   const params = useParams<{ sectionId: FormSectionId }>();
   const sectionId = params.sectionId ?? null;
-  const { statuses } = useElectionStatus();
-  const dataEntryId = getDataEntryIdForPollingStation(statuses, pollingStation.id);
-
-  if (dataEntryId === undefined) {
-    throw new NotFoundError("error.data_entry_not_found");
-  }
-
-  const stateAndActions = useDataEntry(election, dataEntryId, pollingStation.id, entryNumber, sectionId);
+  const stateAndActions = useDataEntry(election, dataEntryId, entryNumber, sectionId);
   const { pushMessage } = useMessages();
 
   // handle non-fatal error navigation
@@ -42,12 +34,12 @@ export function DataEntryProvider({ election, pollingStation, entryNumber, child
     ) {
       pushMessage({
         type: "warning",
-        title: t("data_entry.data_entry_not_possible", { nr: pollingStation.number }),
+        title: t("data_entry.data_entry_not_possible"),
         text: t(`error.api_error.${stateAndActions.error.reference}`),
       });
       void navigate(`/elections/${election.id}/data-entry`);
     }
-  }, [election.id, navigate, pushMessage, stateAndActions.error, pollingStation.number]);
+  }, [election.id, navigate, pushMessage, stateAndActions.error]);
 
   // throw fatal errors, so the error boundary can catch them and show the full page error
   if (stateAndActions.error instanceof FatalApiError) {

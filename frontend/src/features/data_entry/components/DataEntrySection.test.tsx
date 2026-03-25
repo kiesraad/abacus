@@ -1,11 +1,9 @@
 import { type UserEvent, userEvent } from "@testing-library/user-event";
 import * as ReactRouter from "react-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
-import { ElectionStatusProviderContext } from "@/hooks/election/ElectionStatusProviderContext";
 import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
 import * as useUser from "@/hooks/user/useUser";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
-import { electionStatusesMock } from "@/testing/api-mocks/ElectionStatusMockData";
 import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
 import {
   PollingStationDataEntryClaimHandler,
@@ -25,13 +23,15 @@ function renderComponent(sectionId: string) {
   vi.spyOn(ReactRouter, "useParams").mockReturnValue({ sectionId });
 
   return renderReturningRouter(
-    <ElectionStatusProviderContext.Provider value={{ statuses: electionStatusesMock, refetch: vi.fn() }}>
-      <MessagesProvider>
-        <DataEntryProvider election={electionMockData} pollingStation={pollingStationMockData[0]!} entryNumber={1}>
-          <DataEntrySection committeeCategory={electionMockData.committee_category} />
-        </DataEntryProvider>
-      </MessagesProvider>
-    </ElectionStatusProviderContext.Provider>,
+    <MessagesProvider>
+      <DataEntryProvider
+        election={electionMockData}
+        dataEntryId={pollingStationMockData[0]!.data_entry_id!}
+        entryNumber={1}
+      >
+        <DataEntrySection committeeCategory={electionMockData.committee_category} />
+      </DataEntryProvider>
+    </MessagesProvider>,
   );
 }
 

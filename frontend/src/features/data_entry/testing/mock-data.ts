@@ -73,7 +73,7 @@ export function getDefaultDataEntryState(): DataEntryStateLoaded {
   const model: DataEntryModel = "CSOFirstSession";
   return {
     election: electionMockData,
-    pollingStationId: 1,
+    dataEntryId: 1,
     error: null,
     pollingStationResults: { model, ...getInitialValues() },
     entryNumber: 1,

@@ -3,10 +3,8 @@ import * as ReactRouter from "react-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
-import { ElectionStatusProviderContext } from "@/hooks/election/ElectionStatusProviderContext";
 import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
-import { electionStatusesMock } from "@/testing/api-mocks/ElectionStatusMockData";
 import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
 import { ElectionRequestHandler, PollingStationDataEntryClaimHandler } from "@/testing/api-mocks/RequestHandlers";
 import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMockData";
@@ -23,13 +21,15 @@ import { DataEntryProvider } from "./DataEntryProvider";
 function renderForm() {
   return render(
     <ElectionProvider electionId={1}>
-      <ElectionStatusProviderContext.Provider value={{ statuses: electionStatusesMock, refetch: vi.fn() }}>
-        <MessagesProvider>
-          <DataEntryProvider election={electionMockData} pollingStation={pollingStationMockData[0]!} entryNumber={1}>
-            <DataEntryProgress />
-          </DataEntryProvider>
-        </MessagesProvider>
-      </ElectionStatusProviderContext.Provider>
+      <MessagesProvider>
+        <DataEntryProvider
+          election={electionMockData}
+          dataEntryId={pollingStationMockData[0]!.data_entry_id!}
+          entryNumber={1}
+        >
+          <DataEntryProgress />
+        </DataEntryProvider>
+      </MessagesProvider>
     </ElectionProvider>,
   );
 }
@@ -78,7 +78,7 @@ describe("DataEntryProgress", () => {
   });
 
   test("shows different states for entries", async () => {
-    vi.spyOn(ReactRouter, "useParams").mockReturnValue({ pollingStationId: "1", sectionId: "political_group_votes_2" });
+    vi.spyOn(ReactRouter, "useParams").mockReturnValue({ dataEntryId: "1", sectionId: "political_group_votes_2" });
     const formState = getDefaultFormState();
 
     formState.furthest = "political_group_votes_2";
@@ -132,7 +132,7 @@ describe("DataEntryProgress", () => {
   });
 
   test("Prioritise errors over warnings", async () => {
-    vi.spyOn(ReactRouter, "useParams").mockReturnValue({ pollingStationId: "1", sectionId: "political_group_votes_2" });
+    vi.spyOn(ReactRouter, "useParams").mockReturnValue({ dataEntryId: "1", sectionId: "political_group_votes_2" });
     const formState = getDefaultFormState();
 
     formState.furthest = "political_group_votes_2";
@@ -164,7 +164,7 @@ describe("DataEntryProgress", () => {
   });
 
   test("shows links to other pages when on last page", async () => {
-    vi.spyOn(ReactRouter, "useParams").mockReturnValue({ pollingStationId: "1", sectionId: "save" });
+    vi.spyOn(ReactRouter, "useParams").mockReturnValue({ dataEntryId: "1", sectionId: "save" });
     const formState = getDefaultFormState();
 
     formState.furthest = "save";
@@ -212,7 +212,7 @@ describe("DataEntryProgress", () => {
   });
 
   test("shows links when navigating to earlier page", async () => {
-    vi.spyOn(ReactRouter, "useParams").mockReturnValue({ pollingStationId: "1", sectionId: "political_group_votes_1" });
+    vi.spyOn(ReactRouter, "useParams").mockReturnValue({ dataEntryId: "1", sectionId: "political_group_votes_1" });
     const formState = getDefaultFormState();
 
     formState.furthest = "save";
@@ -256,7 +256,7 @@ describe("DataEntryProgress", () => {
   });
 
   test("Mismatch between election data and formState", async () => {
-    vi.spyOn(ReactRouter, "useParams").mockReturnValue({ pollingStationId: "1", sectionId: "differences_counts" });
+    vi.spyOn(ReactRouter, "useParams").mockReturnValue({ dataEntryId: "1", sectionId: "differences_counts" });
     const formState = getDefaultFormState();
     delete formState.sections.political_group_votes_2;
     formState.sections.political_group_votes_3 = getDefaultFormSection("political_group_votes_3", 6);

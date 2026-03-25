@@ -2,7 +2,6 @@ import { userEvent } from "@testing-library/user-event";
 import * as ReactRouter from "react-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
-import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
 import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
 import * as useMessages from "@/hooks/messages/useMessages";
 import {
@@ -29,11 +28,9 @@ const renderLayout = () => {
   return render(
     <TestUserProvider userRole="coordinator_gsb">
       <ElectionProvider electionId={1}>
-        <ElectionStatusProvider electionId={1}>
-          <MessagesProvider>
-            <DetailLayout />
-          </MessagesProvider>
-        </ElectionStatusProvider>
+        <MessagesProvider>
+          <DetailLayout />
+        </MessagesProvider>
       </ElectionProvider>
     </TestUserProvider>,
   );
@@ -51,7 +48,7 @@ describe("DetailLayout", () => {
       PollingStationDataEntryGetHandler,
     );
     vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
-    vi.spyOn(ReactRouter, "useParams").mockReturnValue({ electionId: "1", pollingStationId: "5" });
+    vi.spyOn(ReactRouter, "useParams").mockReturnValue({ electionId: "1", dataEntryId: "5" });
     vi.spyOn(useMessages, "useMessages").mockReturnValue({ pushMessage, popMessages: vi.fn(() => []), hasMessages });
     vi.spyOn(ReactRouter, "Outlet").mockReturnValue(<div>Outlet Content</div>);
   });
@@ -124,7 +121,7 @@ describe("DetailLayout", () => {
   });
 
   test("Redirect to status page on error DataEntryGetNotAllowed", async () => {
-    vi.spyOn(ReactRouter, "useParams").mockReturnValue({ electionId: "1", pollingStationId: "3" });
+    vi.spyOn(ReactRouter, "useParams").mockReturnValue({ electionId: "1", dataEntryId: "3" });
 
     overrideOnce("get", "/api/data_entries/3/get", 409, {
       error: "Data entry is in the wrong state",

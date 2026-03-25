@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Outlet, useNavigate } from "react-router";
 
-import { type AnyApiError, ApiError, NotFoundError } from "@/api/ApiResult";
+import { type AnyApiError, ApiError } from "@/api/ApiResult";
 import { Messages } from "@/components/messages/Messages";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { Alert } from "@/components/ui/Alert/Alert";
@@ -10,7 +10,6 @@ import { Badge } from "@/components/ui/Badge/Badge";
 import { PollingStationNumber } from "@/components/ui/Badge/PollingStationNumber";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { useElection } from "@/hooks/election/useElection";
-import { getDataEntryIdForPollingStation, useElectionStatus } from "@/hooks/election/useElectionStatus";
 import { useMessages } from "@/hooks/messages/useMessages";
 import { useNumericParam } from "@/hooks/useNumericParam";
 import { useUser } from "@/hooks/user/useUser.ts";
@@ -23,20 +22,14 @@ import { ReadOnlyDataEntryDelete } from "./delete/ReadOnlyDataEntryDelete";
 export function DetailLayout() {
   const navigate = useNavigate();
   const { pushMessage } = useMessages();
-  const pollingStationId = useNumericParam("pollingStationId");
-  const { election, pollingStation } = useElection(pollingStationId);
-  const { statuses } = useElectionStatus();
-  const dataEntryId = getDataEntryIdForPollingStation(statuses, pollingStationId);
-  const { loading, dataEntry } = usePollingStationDataEntryErrors(pollingStationId);
+  const dataEntryId = useNumericParam("dataEntryId");
+  const { election } = useElection();
+  const { loading, dataEntry } = usePollingStationDataEntryErrors(dataEntryId);
   const [error, setError] = useState<AnyApiError>();
   const user = useUser();
 
   if (error && !(error instanceof ApiError)) {
     throw error;
-  }
-
-  if (!pollingStation || dataEntryId === undefined) {
-    throw new NotFoundError("error.polling_station_not_found");
   }
 
   if (loading || !dataEntry || !user) {
@@ -48,7 +41,7 @@ export function DetailLayout() {
   function handleDeleted() {
     pushMessage({
       title: t("data_entry_detail.data_entry_deleted"),
-      text: t("data_entry_detail.data_entry_deleted_details", { nr: pollingStation?.number ?? "-" }),
+      text: t("data_entry_detail.data_entry_deleted_details", { nr: dataEntry?.source.number ?? "-" }),
     });
 
     void navigate(`/elections/${election.id}/status`, { replace: true });
@@ -70,14 +63,14 @@ export function DetailLayout() {
 
       <header>
         <section className="smaller-gap">
-          <PollingStationNumber>{pollingStation.number}</PollingStationNumber>
-          <h1>{pollingStation.name}</h1>
+          <PollingStationNumber>{dataEntry.source.number}</PollingStationNumber>
+          <h1>{dataEntry.source.name}</h1>
           <Badge type={dataEntry.status} userRole={user.role} />
         </section>
         {dataEntry.status !== "first_entry_has_errors" && (
           <section>
             <ReadOnlyDataEntryDelete
-              pollingStation={pollingStation}
+              dataEntrySource={dataEntry.source}
               dataEntryId={dataEntryId}
               status={dataEntry.status}
               onDeleted={handleDeleted}

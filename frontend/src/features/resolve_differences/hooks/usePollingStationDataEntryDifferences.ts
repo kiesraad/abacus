@@ -1,11 +1,10 @@
 import { useContext, useState } from "react";
 
-import { type AnyApiError, isSuccess, NotFoundError } from "@/api/ApiResult";
+import { type AnyApiError, isSuccess } from "@/api/ApiResult";
 import { useApiClient } from "@/api/useApiClient";
 import { useInitialApiGet } from "@/api/useInitialApiGet";
 import { ElectionStatusProviderContext } from "@/hooks/election/ElectionStatusProviderContext";
 import { useElection } from "@/hooks/election/useElection";
-import { getDataEntryIdForPollingStation, useElectionStatus } from "@/hooks/election/useElectionStatus";
 import { t } from "@/i18n/translate";
 import type {
   DATA_ENTRY_GET_DIFFERENCES_REQUEST_PATH,
@@ -15,7 +14,6 @@ import type {
   DataEntryStatusName,
   DataEntryStatusResponse,
   ElectionWithPoliticalGroups,
-  PollingStation,
   ResolveDifferencesAction,
 } from "@/types/generated/openapi";
 import type { DataEntryStructure } from "@/types/types";
@@ -24,7 +22,6 @@ import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 interface PollingStationDataEntryDifferences {
   action: ResolveDifferencesAction | undefined;
   setAction: (action: ResolveDifferencesAction | undefined) => void;
-  pollingStation: PollingStation;
   election: ElectionWithPoliticalGroups;
   loading: boolean;
   differences: DataEntryGetDifferencesResponse | null;
@@ -34,23 +31,15 @@ interface PollingStationDataEntryDifferences {
 }
 
 export function usePollingStationDataEntryDifferences(
-  pollingStationId: number,
+  dataEntryId: number,
   afterSave: (status: DataEntryStatusName, firstEntryUserId: number | undefined) => void,
 ): PollingStationDataEntryDifferences {
   const client = useApiClient();
-  const { election, pollingStations } = useElection();
-  const pollingStation = pollingStations.find((ps) => ps.id === pollingStationId);
-  const { statuses } = useElectionStatus();
-  const dataEntryId = getDataEntryIdForPollingStation(statuses, pollingStationId);
+  const { election } = useElection();
   const [action, setAction] = useState<ResolveDifferencesAction>();
   const electionContext = useContext(ElectionStatusProviderContext);
   const [error, setError] = useState<AnyApiError | null>(null);
   const [validationError, setValidationError] = useState<string>();
-
-  // 'Not found' error if polling station or data entry is not found
-  if (!pollingStation || dataEntryId === undefined) {
-    throw new NotFoundError("error.polling_station_not_found");
-  }
 
   const path: DATA_ENTRY_GET_DIFFERENCES_REQUEST_PATH = `/api/data_entries/${dataEntryId}/resolve_differences`;
   const { requestState } = useInitialApiGet<DataEntryGetDifferencesResponse>(path);
@@ -102,7 +91,6 @@ export function usePollingStationDataEntryDifferences(
   return {
     action,
     setAction,
-    pollingStation,
     election,
     loading: requestState.status === "loading",
     differences,

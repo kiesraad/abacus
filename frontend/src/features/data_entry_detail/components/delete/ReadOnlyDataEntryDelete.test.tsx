@@ -5,17 +5,20 @@ import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockDa
 import { PollingStationDataEntryResetHandler } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
 import { render, screen, spyOnHandler } from "@/testing/test-utils";
-import type { DATA_ENTRY_RESET_REQUEST_PATH, DataEntryStatusName } from "@/types/generated/openapi";
+import type { DATA_ENTRY_RESET_REQUEST_PATH, DataEntrySource, DataEntryStatusName } from "@/types/generated/openapi";
 
 import { ReadOnlyDataEntryDelete } from "./ReadOnlyDataEntryDelete";
 
 function renderComponent(status: DataEntryStatusName) {
   const onDeleted = vi.fn();
   const onError = vi.fn();
+  const { data_entry_id, id, name, number } = pollingStationMockData[4]!;
+  const source: DataEntrySource = { type: "PollingStation", id, name, number };
+
   render(
     <ReadOnlyDataEntryDelete
-      pollingStation={pollingStationMockData[4]!}
-      dataEntryId={5}
+      dataEntrySource={source}
+      dataEntryId={data_entry_id!}
       status={status}
       onDeleted={onDeleted}
       onError={onError}

@@ -51,7 +51,7 @@ describe("ResolveDifferencesPage", () => {
   beforeEach(() => {
     vi.spyOn(useMessages, "useMessages").mockReturnValue({ pushMessage, popMessages: vi.fn(() => []), hasMessages });
     vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
-    vi.spyOn(ReactRouter, "useParams").mockReturnValue({ pollingStationId: "3" });
+    vi.spyOn(ReactRouter, "useParams").mockReturnValue({ dataEntryId: "3" });
     vi.spyOn(ReactRouter, "useLocation").mockReturnValue({
       pathname: "/",
     } as Partial<ReactRouter.Location> as ReactRouter.Location);

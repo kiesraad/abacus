@@ -4,6 +4,7 @@ import type {
   CommonPollingStationResults,
   DataEntryGetDifferencesResponse,
   DataEntryGetResponse,
+  DataEntrySource,
   PollingStationResults,
   SaveDataEntryResponse,
   ValidationResults,
@@ -14,6 +15,11 @@ import { validationResultMockData } from "./ValidationResultMockData";
 export const emptyValidationResults: ValidationResults = {
   errors: [],
   warnings: [],
+};
+
+const source = (id: number): DataEntrySource => {
+  const { number, name } = pollingStationMockData.find((p) => p.id === id)!;
+  return { type: "PollingStation", id, number, name };
 };
 
 export function emptyPollingStationResults(
@@ -83,12 +89,7 @@ export const claimDataEntryResponse: ClaimDataEntryResponse = {
   data: emptyPollingStationResults(),
   validation_results: emptyValidationResults,
   client_state: null,
-  source: {
-    type: "PollingStation",
-    id: pollingStationMockData[0]!.id,
-    number: pollingStationMockData[0]!.number,
-    name: pollingStationMockData[0]!.name,
-  },
+  source: source(1),
   status: "first_entry_in_progress",
 };
 
@@ -219,6 +220,7 @@ export const dataEntryStatusDifferences: DataEntryGetDifferencesResponse = {
       },
     ],
   },
+  source: source(3),
 };
 
 export const dataEntryHasErrorsGetMockResponse: DataEntryGetResponse = {
@@ -229,6 +231,7 @@ export const dataEntryHasErrorsGetMockResponse: DataEntryGetResponse = {
     errors: [validationResultMockData.F201],
     warnings: [validationResultMockData.W001, validationResultMockData.W201, validationResultMockData.W202],
   },
+  source: source(5),
 };
 
 export const dataEntryHasWarningsGetMockResponse: DataEntryGetResponse = {
@@ -239,6 +242,7 @@ export const dataEntryHasWarningsGetMockResponse: DataEntryGetResponse = {
     errors: [],
     warnings: [validationResultMockData.W001, validationResultMockData.W201, validationResultMockData.W202],
   },
+  source: source(1),
 };
 
 export const dataEntryValidGetMockResponse: DataEntryGetResponse = {
@@ -249,4 +253,5 @@ export const dataEntryValidGetMockResponse: DataEntryGetResponse = {
     errors: [],
     warnings: [],
   },
+  source: source(5),
 };

@@ -646,6 +646,7 @@ pub struct DataEntryGetResponse {
     pub data: PollingStationResults,
     pub status: DataEntryStatusName,
     pub validation_results: ValidationResults,
+    pub source: DataEntrySource,
 }
 
 /// Get data entry with validation results
@@ -680,6 +681,7 @@ async fn data_entry_get(
                 data: first_entry_in_progress_state.first_entry,
                 status: state.status_name(),
                 validation_results: ValidationResults::default(),
+                source: context.source,
             }))
         }
         DataEntryStatus::FirstEntryHasErrors(first_entry_has_errors_state) => {
@@ -688,6 +690,7 @@ async fn data_entry_get(
                 data: first_entry_has_errors_state.finalised_first_entry,
                 status: state.status_name(),
                 validation_results: state.start_validate(&context.election)?,
+                source: context.source,
             }))
         }
         DataEntryStatus::FirstEntryFinalised(first_entry_finalised_state) => {
@@ -696,6 +699,7 @@ async fn data_entry_get(
                 data: first_entry_finalised_state.finalised_first_entry,
                 status: state.status_name(),
                 validation_results: state.start_validate(&context.election)?,
+                source: context.source,
             }))
         }
         DataEntryStatus::SecondEntryInProgress(second_entry_in_progress_state) => {
@@ -704,6 +708,7 @@ async fn data_entry_get(
                 data: second_entry_in_progress_state.second_entry,
                 status: state.status_name(),
                 validation_results: ValidationResults::default(),
+                source: context.source,
             }))
         }
         DataEntryStatus::Definitive(definitive_state) => {
@@ -714,6 +719,7 @@ async fn data_entry_get(
                 data: definitive_state.results,
                 status: state.status_name(),
                 validation_results,
+                source: context.source,
             }))
         }
         _ => Err(APIError::Conflict(
@@ -784,6 +790,7 @@ pub struct DataEntryGetDifferencesResponse {
     pub first_entry: PollingStationResults,
     pub second_entry_user_id: UserId,
     pub second_entry: PollingStationResults,
+    pub source: DataEntrySource,
 }
 
 /// Get data entry differences to be resolved
@@ -809,7 +816,7 @@ async fn data_entry_get_differences(
 ) -> Result<Json<DataEntryGetDifferencesResponse>, APIError> {
     let mut conn = pool.acquire().await?;
 
-    let (_, state) = validate_and_get_data(&mut conn, data_entry_id, &user).await?;
+    let (context, state) = validate_and_get_data(&mut conn, data_entry_id, &user).await?;
 
     match state {
         DataEntryStatus::EntriesDifferent(EntriesDifferent {
@@ -823,6 +830,7 @@ async fn data_entry_get_differences(
             first_entry,
             second_entry_user_id,
             second_entry,
+            source: context.source,
         })),
         _ => Err(APIError::NotFound(
             "No data entry with differences found".to_string(),

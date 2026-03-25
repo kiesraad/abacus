@@ -353,7 +353,7 @@ export const InitialisedHandler = http.get<INITIALISED_REQUEST_PARAMS>(
   () => new HttpResponse(null, { status: 200 }),
 );
 
-export const PollingStationDataEntryGetDifferencesHandler = http.get<
+export const DataEntryGetDifferencesHandler = http.get<
   ParamsToString<DATA_ENTRY_GET_DIFFERENCES_REQUEST_PARAMS>,
   null,
   DataEntryGetDifferencesResponse
@@ -361,15 +361,12 @@ export const PollingStationDataEntryGetDifferencesHandler = http.get<
   HttpResponse.json(dataEntryStatusDifferences, { status: 200 }),
 );
 
-export const PollingStationDataEntryGetHandler = http.get<
-  ParamsToString<DATA_ENTRY_GET_REQUEST_PARAMS>,
-  null,
-  DataEntryGetResponse
->("/api/data_entries/5/get" satisfies DATA_ENTRY_GET_REQUEST_PATH, () =>
-  HttpResponse.json(dataEntryHasErrorsGetMockResponse, { status: 200 }),
+export const DataEntryGetHandler = http.get<ParamsToString<DATA_ENTRY_GET_REQUEST_PARAMS>, null, DataEntryGetResponse>(
+  "/api/data_entries/5/get" satisfies DATA_ENTRY_GET_REQUEST_PATH,
+  () => HttpResponse.json(dataEntryHasErrorsGetMockResponse, { status: 200 }),
 );
 
-export const PollingStationDataEntryResolveDifferencesHandler = http.post<
+export const DataEntryResolveDifferencesHandler = http.post<
   ParamsToString<DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_PARAMS>,
   DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_BODY,
   DataEntryStatusResponse
@@ -377,7 +374,7 @@ export const PollingStationDataEntryResolveDifferencesHandler = http.post<
   HttpResponse.json({ status: "empty" }, { status: 200 }),
 );
 
-export const PollingStationDataEntryResolveErrorsHandler = http.post<
+export const DataEntryResolveErrorsHandler = http.post<
   ParamsToString<DATA_ENTRY_RESOLVE_ERRORS_REQUEST_PARAMS>,
   DATA_ENTRY_RESOLVE_ERRORS_REQUEST_BODY,
   DataEntryStatusResponse
@@ -396,7 +393,7 @@ export const PollingStationListRequestHandler = http.get<
 });
 
 // save data entry handler
-export const PollingStationDataEntrySaveHandler = http.post<
+export const DataEntrySaveHandler = http.post<
   ParamsToString<DATA_ENTRY_SAVE_REQUEST_PARAMS>,
   DATA_ENTRY_SAVE_REQUEST_BODY,
   SaveDataEntryResponse | ErrorResponse
@@ -405,7 +402,7 @@ export const PollingStationDataEntrySaveHandler = http.post<
 );
 
 // get data entry handler
-export const PollingStationDataEntryClaimHandler = http.post<
+export const DataEntryClaimHandler = http.post<
   ParamsToString<DATA_ENTRY_CLAIM_REQUEST_PARAMS>,
   null,
   ClaimDataEntryResponse | ErrorResponse
@@ -414,13 +411,13 @@ export const PollingStationDataEntryClaimHandler = http.post<
 );
 
 // discard data entry handler
-export const PollingStationDataEntryDiscardHandler = http.delete<ParamsToString<DATA_ENTRY_DISCARD_REQUEST_PARAMS>>(
+export const DataEntryDiscardHandler = http.delete<ParamsToString<DATA_ENTRY_DISCARD_REQUEST_PARAMS>>(
   "/api/data_entries/1/1" satisfies DATA_ENTRY_DISCARD_REQUEST_PATH,
   () => new HttpResponse(null, { status: 204 }),
 );
 
 // finalise data entry handler
-export const PollingStationDataEntryFinaliseHandler = http.post<
+export const DataEntryFinaliseHandler = http.post<
   ParamsToString<DATA_ENTRY_FINALISE_REQUEST_PARAMS>,
   null,
   DataEntryStatusResponse | ErrorResponse
@@ -429,7 +426,7 @@ export const PollingStationDataEntryFinaliseHandler = http.post<
 );
 
 // reset data entry handler
-export const PollingStationDataEntryResetHandler = http.delete<ParamsToString<DATA_ENTRY_RESET_REQUEST_PARAMS>>(
+export const DataEntryResetHandler = http.delete<ParamsToString<DATA_ENTRY_RESET_REQUEST_PARAMS>>(
   "/api/data_entries/5" satisfies DATA_ENTRY_RESET_REQUEST_PATH,
   () => new HttpResponse(null, { status: 204 }),
 );
@@ -526,16 +523,16 @@ export const handlers: HttpHandler[] = [
   ElectionChangeNumberOfVotersHandler,
   LoginHandler,
   InitialisedHandler,
-  PollingStationDataEntryGetDifferencesHandler,
-  PollingStationDataEntryGetHandler,
-  PollingStationDataEntryResolveDifferencesHandler,
-  PollingStationDataEntryResolveErrorsHandler,
+  DataEntryGetDifferencesHandler,
+  DataEntryGetHandler,
+  DataEntryResolveDifferencesHandler,
+  DataEntryResolveErrorsHandler,
   PollingStationListRequestHandler,
-  PollingStationDataEntrySaveHandler,
-  PollingStationDataEntryClaimHandler,
-  PollingStationDataEntryDiscardHandler,
-  PollingStationDataEntryFinaliseHandler,
-  PollingStationDataEntryResetHandler,
+  DataEntrySaveHandler,
+  DataEntryClaimHandler,
+  DataEntryDiscardHandler,
+  DataEntryFinaliseHandler,
+  DataEntryResetHandler,
   PollingStationCreateHandler,
   PollingStationDeleteHandler,
   PollingStationUpdateHandler,

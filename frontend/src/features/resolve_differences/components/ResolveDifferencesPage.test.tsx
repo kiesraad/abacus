@@ -9,11 +9,11 @@ import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider"
 import * as useMessages from "@/hooks/messages/useMessages";
 import { UsersProvider } from "@/hooks/user/UsersProvider";
 import {
+  DataEntryGetDifferencesHandler,
+  DataEntryResolveDifferencesHandler,
   ElectionListRequestHandler,
   ElectionRequestHandler,
   ElectionStatusRequestHandler,
-  PollingStationDataEntryGetDifferencesHandler,
-  PollingStationDataEntryResolveDifferencesHandler,
   UserListRequestHandler,
 } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
@@ -59,8 +59,8 @@ describe("ResolveDifferencesPage", () => {
       ElectionRequestHandler,
       ElectionStatusRequestHandler,
       ElectionListRequestHandler,
-      PollingStationDataEntryGetDifferencesHandler,
-      PollingStationDataEntryResolveDifferencesHandler,
+      DataEntryGetDifferencesHandler,
+      DataEntryResolveDifferencesHandler,
       UserListRequestHandler,
     );
   });
@@ -114,7 +114,7 @@ describe("ResolveDifferencesPage", () => {
 
   test("should only submit after making a selection", async () => {
     const user = userEvent.setup();
-    const resolve = spyOnHandler(PollingStationDataEntryResolveDifferencesHandler);
+    const resolve = spyOnHandler(DataEntryResolveDifferencesHandler);
 
     await renderPage();
     const submit = await screen.findByRole("button", { name: "Opslaan" });

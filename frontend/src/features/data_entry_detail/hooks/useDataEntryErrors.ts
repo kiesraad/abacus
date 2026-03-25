@@ -26,7 +26,7 @@ interface DataEntryErrors {
   validationError: string | undefined;
 }
 
-export function usePollingStationDataEntryErrors(dataEntryId: number): DataEntryErrors {
+export function useDataEntryErrors(dataEntryId: number): DataEntryErrors {
   const navigate = useNavigate();
   const client = useApiClient();
   const { election } = useElection();

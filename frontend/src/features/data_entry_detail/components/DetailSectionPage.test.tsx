@@ -4,10 +4,10 @@ import { describe, expect, test, vi } from "vitest";
 
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import {
+  DataEntryGetHandler,
   ElectionListRequestHandler,
   ElectionRequestHandler,
   ElectionStatusRequestHandler,
-  PollingStationDataEntryGetHandler,
 } from "@/testing/api-mocks/RequestHandlers";
 import { server } from "@/testing/server";
 import { TestUserProvider } from "@/testing/TestUserProvider";
@@ -27,12 +27,7 @@ const renderSectionPage = () => {
 
 describe("DetailSectionPage", () => {
   test("renders read-only section with valid section id", async () => {
-    server.use(
-      ElectionRequestHandler,
-      ElectionStatusRequestHandler,
-      ElectionListRequestHandler,
-      PollingStationDataEntryGetHandler,
-    );
+    server.use(ElectionRequestHandler, ElectionStatusRequestHandler, ElectionListRequestHandler, DataEntryGetHandler);
     vi.spyOn(ReactRouter, "useParams").mockReturnValue({
       electionId: "1",
       dataEntryId: "5",

@@ -2,7 +2,7 @@ import { type MouseEvent, useState } from "react";
 import { Link, useNavigate } from "react-router";
 
 import { IconCheckmarkSmall, IconMinus, IconPencil, IconPrinter } from "@/components/generated/icons";
-import { PollingStationNumber } from "@/components/ui/Badge/PollingStationNumber";
+import { DataEntrySourceNumber } from "@/components/ui/Badge/DataEntrySourceNumber";
 import { Button } from "@/components/ui/Button/Button";
 import { Icon } from "@/components/ui/Icon/Icon";
 import { useElection } from "@/hooks/election/useElection";
@@ -40,7 +40,7 @@ export function InvestigationCard({ investigation }: InvestigationCardProps) {
   return (
     <div className={cls.card} id={`investigation-${investigation.pollingStation.number}`}>
       <div className={cls.card_header}>
-        <PollingStationNumber size="sm">{investigation.pollingStation.number}</PollingStationNumber>
+        <DataEntrySourceNumber size="sm">{investigation.pollingStation.number}</DataEntrySourceNumber>
         <h3>{investigation.pollingStation.name}</h3>
         {isCoordinator && investigation.findings && (
           <Link to={`./${investigation.pollingStation.id}/findings`}>

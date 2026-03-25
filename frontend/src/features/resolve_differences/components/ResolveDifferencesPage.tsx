@@ -13,7 +13,7 @@ import { useUsers } from "@/hooks/user/useUsers";
 import { t } from "@/i18n/translate";
 import type { DataEntryStatusName } from "@/types/generated/openapi";
 
-import { usePollingStationDataEntryDifferences } from "../hooks/usePollingStationDataEntryDifferences";
+import { useDataEntryDifferences } from "../hooks/useDataEntryDifferences";
 import cls from "./ResolveDifferences.module.css";
 import { ResolveDifferencesOverview } from "./ResolveDifferencesOverview";
 import { ResolveDifferencesTables } from "./ResolveDifferencesTables";
@@ -24,7 +24,7 @@ export function ResolveDifferencesPage() {
   const navigate = useNavigate();
   const dataEntryId = useNumericParam("dataEntryId");
   const { election, loading, differences, dataEntryStructure, action, setAction, onSubmit, validationError } =
-    usePollingStationDataEntryDifferences(dataEntryId, afterSave);
+    useDataEntryDifferences(dataEntryId, afterSave);
   const { getName } = useUsers();
 
   function afterSave(status: DataEntryStatusName, firstEntryUserId: number | undefined) {

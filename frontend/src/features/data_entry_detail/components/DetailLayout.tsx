@@ -15,7 +15,7 @@ import { useNumericParam } from "@/hooks/useNumericParam";
 import { useUser } from "@/hooks/user/useUser.ts";
 import { t } from "@/i18n/translate";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
-import { usePollingStationDataEntryErrors } from "../hooks/usePollingStationDataEntryErrors";
+import { useDataEntryErrors } from "../hooks/useDataEntryErrors";
 import { DetailNavigation } from "./DetailNavigation";
 import { ReadOnlyDataEntryDelete } from "./delete/ReadOnlyDataEntryDelete";
 
@@ -24,7 +24,7 @@ export function DetailLayout() {
   const { pushMessage } = useMessages();
   const dataEntryId = useNumericParam("dataEntryId");
   const { election } = useElection();
-  const { loading, dataEntry } = usePollingStationDataEntryErrors(dataEntryId);
+  const { loading, dataEntry } = useDataEntryErrors(dataEntryId);
   const [error, setError] = useState<AnyApiError>();
   const user = useUser();
 

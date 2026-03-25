@@ -19,7 +19,7 @@ import type {
 import type { DataEntryStructure } from "@/types/types";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
-interface PollingStationDataEntryDifferences {
+interface DataEntryDifferences {
   action: ResolveDifferencesAction | undefined;
   setAction: (action: ResolveDifferencesAction | undefined) => void;
   election: ElectionWithPoliticalGroups;
@@ -30,10 +30,10 @@ interface PollingStationDataEntryDifferences {
   validationError: string | undefined;
 }
 
-export function usePollingStationDataEntryDifferences(
+export function useDataEntryDifferences(
   dataEntryId: number,
   afterSave: (status: DataEntryStatusName, firstEntryUserId: number | undefined) => void,
-): PollingStationDataEntryDifferences {
+): DataEntryDifferences {
   const client = useApiClient();
   const { election } = useElection();
   const [action, setAction] = useState<ResolveDifferencesAction>();

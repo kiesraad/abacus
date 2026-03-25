@@ -54,7 +54,7 @@ export function DataEntryProvider({ election, pollingStation, entryNumber, child
     // exception for CommitteeSessionPaused error which has to trigger the rendering of a modal
     if (stateAndActions.error.reference === "CommitteeSessionPaused") {
       // on initial claim, navigate back to DataEntryHomePage (modal is rendered there)
-      if (!stateAndActions.pollingStationResults) {
+      if (!stateAndActions.results) {
         return <Navigate to={`/elections/${election.id}/data-entry`} />;
       }
     } else {

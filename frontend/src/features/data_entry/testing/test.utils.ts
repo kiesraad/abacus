@@ -15,7 +15,7 @@ import { getInitialValues } from "./mock-data";
 
 export interface OverrideServerClaimDataEntryResponseProps {
   formState: FormState;
-  pollingStationResults: Partial<CSOFirstSessionResults>;
+  results: Partial<CSOFirstSessionResults>;
   acceptErrorsAndWarnings?: boolean;
   continueToNextSection?: boolean;
   progress?: number;
@@ -24,7 +24,7 @@ export interface OverrideServerClaimDataEntryResponseProps {
 
 export function overrideServerClaimDataEntryResponse({
   formState,
-  pollingStationResults,
+  results,
   continueToNextSection = true,
   validationResults = { errors: [], warnings: [] },
 }: OverrideServerClaimDataEntryResponseProps) {
@@ -33,7 +33,7 @@ export function overrideServerClaimDataEntryResponse({
     data: {
       model: "CSOFirstSession",
       ...getInitialValues(),
-      ...pollingStationResults,
+      ...results,
     },
     validation_results: validationResults,
     source: {

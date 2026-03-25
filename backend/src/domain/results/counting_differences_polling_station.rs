@@ -10,7 +10,7 @@ use crate::domain::{
 };
 
 /// Counting Differences Polling Station,
-/// part of the polling station results ("B1-2 Verschillen met telresultaten van het stembureau")
+/// part of the results ("B1-2 Verschillen met telresultaten van het stembureau")
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
 pub struct CountingDifferencesPollingStation {

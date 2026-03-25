@@ -17,7 +17,7 @@ use crate::{
     error::ErrorReference,
 };
 
-/// Votes counts, part of the polling station results.
+/// Votes counts, part of the results.
 /// Following the fields in Model CSO Na 31-2 Bijlage 1.
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]

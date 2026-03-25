@@ -9,7 +9,7 @@ use crate::domain::{
     validate::{DataError, Validate, ValidationResult, ValidationResultCode, ValidationResults},
 };
 
-/// Extra investigation, part of the polling station results ("B1-1 Alleen bij extra onderzoek")
+/// Extra investigation, part of the results ("B1-1 Alleen bij extra onderzoek")
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
 pub struct ExtraInvestigation {

@@ -2,7 +2,7 @@ import type {
   CSOFirstSessionResults,
   DataEntry,
   PollingStationRequest,
-  PollingStationResults,
+  Results,
   SaveDataEntryResponse,
 } from "@/types/generated/openapi";
 
@@ -157,7 +157,7 @@ export function emptyCSOFirstSessionResults(): CSOFirstSessionResults {
   };
 }
 
-export const noRecountNoDifferencesDataEntry: PollingStationResults = {
+export const noRecountNoDifferencesDataEntry: Results = {
   model: "CSOFirstSession",
   extra_investigation: {
     extra_investigation_other_reason: { yes: false, no: true },
@@ -341,7 +341,7 @@ export const noErrorsWarningsResponse: SaveDataEntryResponse = {
   },
 };
 
-export const noRecountNoDifferencesDataEntryWithGaps: PollingStationResults = {
+export const noRecountNoDifferencesDataEntryWithGaps: Results = {
   model: "CSOFirstSession",
   extra_investigation: {
     extra_investigation_other_reason: { yes: false, no: true },

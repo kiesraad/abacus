@@ -5,7 +5,7 @@ import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import type { ResolveDifferencesAction } from "@/types/generated/openapi";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
-import { pollingStationResultsMockData } from "../testing/polling-station-results";
+import { resultsMockData } from "../testing/polling-station-results";
 import cls from "./ResolveDifferences.module.css";
 import { ResolveDifferencesTables } from "./ResolveDifferencesTables";
 
@@ -14,8 +14,8 @@ type Props = {
 };
 
 const actions: ResolveDifferencesAction[] = ["keep_first_entry", "keep_second_entry", "discard_both_entries"];
-const first = pollingStationResultsMockData(true);
-const second = pollingStationResultsMockData(false);
+const first = resultsMockData(true);
+const second = resultsMockData(false);
 const structure = getDataEntryStructure("CSOFirstSession", electionMockData);
 
 export const DefaultResolveDifferencesTables: StoryObj<Props> = {

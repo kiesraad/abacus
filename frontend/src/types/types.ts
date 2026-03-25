@@ -1,9 +1,9 @@
 import type { ReactElement } from "react";
 
-import type { PollingStationResults } from "./generated/openapi";
+import type { Results } from "./generated/openapi";
 
 export type FormSectionId = string;
-export type PollingStationResultsPath = string;
+export type ResultsPath = string;
 
 export type SectionValues = Record<string, string>;
 
@@ -36,12 +36,12 @@ export interface RadioSubsection {
   /** Short title for differences view */
   short_title: string;
   error: string;
-  path: PollingStationResultsPath;
+  path: ResultsPath;
   options: RadioSubsectionOption[];
 }
 
 export interface CheckboxesSubsectionOption {
-  path: PollingStationResultsPath;
+  path: ResultsPath;
   /** Label for data entry form view */
   label: string;
   /** Short label for differences view */
@@ -58,7 +58,7 @@ export interface CheckboxesSubsection {
   /** Short title for differences view */
   short_title: string;
   /** Path in results object that will indicate an error */
-  error_path: PollingStationResultsPath;
+  error_path: ResultsPath;
   /** Error message to be shown when there is an error for error_path */
   error_message: string;
   options: CheckboxesSubsectionOption[];
@@ -66,7 +66,7 @@ export interface CheckboxesSubsection {
 
 export interface InputGridSubsectionRow {
   code?: string;
-  path: PollingStationResultsPath;
+  path: ResultsPath;
   title: string;
   isTotal?: boolean;
   isListTotal?: boolean;
@@ -96,7 +96,7 @@ export interface DataEntrySection {
   subsections: DataEntrySubsection[];
 }
 
-export type DataEntryModel = PollingStationResults["model"];
+export type DataEntryModel = Results["model"];
 export type DataEntryStructure = DataEntrySection[];
 
 export type DataEntryResults = object;

@@ -18,7 +18,7 @@ import { getUrlForFormSectionID } from "../utils/utils";
 export function DataEntryProgress() {
   const pollingStationId = useNumericParam("pollingStationId");
   const { election } = useElection();
-  const { dataEntryStructure, formState, pollingStationResults, entryNumber } = useDataEntryContext();
+  const { dataEntryStructure, formState, results, entryNumber } = useDataEntryContext();
   const params = useParams<{ sectionId: FormSectionId }>();
   const sectionId = params.sectionId ?? null;
 
@@ -40,7 +40,7 @@ export function DataEntryProgress() {
       if (furthestSection) {
         //check if section has been left empty
         if (formSection.index < furthestSection.index) {
-          if (isFormSectionEmpty(dataEntryStructure, formSection, pollingStationResults)) {
+          if (isFormSectionEmpty(dataEntryStructure, formSection, results)) {
             return "empty";
           }
         }
@@ -52,7 +52,7 @@ export function DataEntryProgress() {
 
       return "idle";
     },
-    [formState, pollingStationResults, dataEntryStructure],
+    [formState, results, dataEntryStructure],
   );
 
   const currentIndex = formState.sections[formState.furthest]?.index || 0;

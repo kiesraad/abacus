@@ -27,7 +27,7 @@ use crate::{
         investigation::InvestigationStatus,
         polling_station::PollingStationId,
         results::{
-            PollingStationResults, common_polling_station_results::CommonPollingStationResults,
+            Results, common_polling_station_results::CommonPollingStationResults,
             cso_next_session_results::CSONextSessionResults,
         },
         role::Role,
@@ -133,7 +133,7 @@ impl AsAuditEvent for DataEntryFinalisedAuditData {
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct ClaimDataEntryResponse {
-    pub data: PollingStationResults,
+    pub data: Results,
     #[schema(value_type = Object)]
     pub client_state: Option<serde_json::Value>,
     pub validation_results: ValidationResults,
@@ -240,7 +240,7 @@ fn initial_current_data_entry(
     user_id: UserId,
     political_groups: &[PoliticalGroup],
     committee_session: &CommitteeSession,
-    previous_results: Option<&PollingStationResults>,
+    previous_results: Option<&Results>,
 ) -> CurrentDataEntry {
     let entry = if committee_session.is_next_session() {
         if let Some(prev) = previous_results {
@@ -255,12 +255,12 @@ fn initial_current_data_entry(
             copy.differences_counts.compare_votes_cast_admitted_voters = Default::default();
             copy.differences_counts.difference_completely_accounted_for = Default::default();
 
-            PollingStationResults::CSONextSession(copy)
+            Results::CSONextSession(copy)
         } else {
-            PollingStationResults::empty_cso_next_session(political_groups)
+            Results::empty_cso_next_session(political_groups)
         }
     } else {
-        PollingStationResults::empty_cso_first_session(political_groups)
+        Results::empty_cso_first_session(political_groups)
     };
 
     CurrentDataEntry {
@@ -322,7 +322,7 @@ async fn data_entry_claim(
         _ => None,
     };
 
-    let previous_results: Option<PollingStationResults> = match prev_data_entry_id {
+    let previous_results: Option<Results> = match prev_data_entry_id {
         Some(prev_id) => match data_entry_repo::get_status(&mut tx, prev_id).await? {
             DataEntryStatus::Definitive(d) => Some(d.results),
             _ => None,
@@ -379,7 +379,7 @@ async fn data_entry_claim(
     }))
 }
 
-/// Request structure for saving data entry of polling station results
+/// Request structure for saving data entry
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, FromRequest)]
 #[from_request(via(axum::Json), rejection(APIError))]
 #[serde(deny_unknown_fields)]
@@ -388,13 +388,13 @@ pub struct DataEntry {
     #[schema(maximum = 100)]
     pub progress: u8,
     /// Data entry for a polling station
-    pub data: PollingStationResults,
+    pub data: Results,
     #[schema(value_type = Object)]
     /// Client state for the data entry (arbitrary JSON)
     pub client_state: ClientState,
 }
 
-/// Response structure for saving data entry of polling station results
+/// Response structure for saving data entry
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct SaveDataEntryResponse {
@@ -643,7 +643,7 @@ pub struct DataEntryGetResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
     pub user_id: Option<UserId>,
-    pub data: PollingStationResults,
+    pub data: Results,
     pub status: DataEntryStatusName,
     pub validation_results: ValidationResults,
 }
@@ -781,9 +781,9 @@ async fn data_entry_resolve_errors(
 #[serde(deny_unknown_fields)]
 pub struct DataEntryGetDifferencesResponse {
     pub first_entry_user_id: UserId,
-    pub first_entry: PollingStationResults,
+    pub first_entry: Results,
     pub second_entry_user_id: UserId,
-    pub second_entry: PollingStationResults,
+    pub second_entry: Results,
 }
 
 /// Get data entry differences to be resolved
@@ -978,7 +978,7 @@ mod tests {
         domain::{
             committee_session::CommitteeSessionId,
             committee_session_status::CommitteeSessionStatus,
-            results::tests::example_polling_station_results,
+            results::tests::example_results,
             role::Role,
             validate::{ValidationResult, ValidationResultCode},
         },
@@ -993,7 +993,7 @@ mod tests {
     fn example_data_entry() -> DataEntry {
         DataEntry {
             progress: 100,
-            data: example_polling_station_results(),
+            data: example_results(),
             client_state: ClientState(None),
         }
     }
@@ -1001,7 +1001,7 @@ mod tests {
     fn example_data_entry_with_warning() -> DataEntry {
         DataEntry {
             progress: 100,
-            data: example_polling_station_results().with_warning(),
+            data: example_results().with_warning(),
             client_state: ClientState(None),
         }
     }

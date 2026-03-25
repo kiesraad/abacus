@@ -15,19 +15,15 @@ interface ReadOnlyDataEntrySectionProps {
   validationResults: ValidationResults;
 }
 
-export function ReadOnlyDataEntrySection({
-  section,
-  data: pollingStationResults,
-  validationResults,
-}: ReadOnlyDataEntrySectionProps) {
+export function ReadOnlyDataEntrySection({ section, data: results, validationResults }: ReadOnlyDataEntrySectionProps) {
   const userRole = "coordinator_gsb";
 
   // Create validation result sets from the validation results
   const errors = getValidationResultSetForSection(validationResults.errors, section);
   const warnings = getValidationResultSetForSection(validationResults.warnings, section);
 
-  // Map polling station results to section values for display
-  const sectionValues: SectionValues = mapResultsToSectionValues(section, pollingStationResults);
+  // Map results to section values for display
+  const sectionValues: SectionValues = mapResultsToSectionValues(section, results);
 
   // Create default props for DataEntrySubsections
   const defaultProps = {

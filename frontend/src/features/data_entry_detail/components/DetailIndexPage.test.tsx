@@ -9,7 +9,7 @@ import { UsersProvider } from "@/hooks/user/UsersProvider";
 import {
   dataEntryHasWarningsGetMockResponse,
   dataEntryValidGetMockResponse,
-  emptyPollingStationResults,
+  emptyResults,
 } from "@/testing/api-mocks/DataEntryMockData";
 import {
   ElectionListRequestHandler,
@@ -147,7 +147,7 @@ describe("DetailIndexPage", () => {
   test("should redirect to voters_votes_counts for next committee sessions when there are no errors or warnings", async () => {
     const secondCommitteeSessionGetMockResponse: DataEntryGetResponse = {
       ...dataEntryValidGetMockResponse,
-      data: emptyPollingStationResults("CSONextSession"),
+      data: emptyResults("CSONextSession"),
     };
     overrideOnce("get", "/api/data_entries/5/get", 200, secondCommitteeSessionGetMockResponse);
 

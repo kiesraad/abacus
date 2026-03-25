@@ -238,6 +238,9 @@ pub struct PollingStationInvestigation {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
     pub corrected_results: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    pub data_entry_id: Option<DataEntryId>,
 }
 
 impl From<(PollingStationId, &InvestigationStatus)> for PollingStationInvestigation {
@@ -247,6 +250,7 @@ impl From<(PollingStationId, &InvestigationStatus)> for PollingStationInvestigat
             reason: status.reason().to_owned(),
             findings: status.findings().map(str::to_owned),
             corrected_results: status.corrected_results(),
+            data_entry_id: status.data_entry_id(),
         }
     }
 }

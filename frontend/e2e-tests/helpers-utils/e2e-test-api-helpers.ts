@@ -1,6 +1,5 @@
 import { type APIRequestContext, expect } from "@playwright/test";
 import type { TestUser } from "e2e-tests/test-data/users";
-import type { ElectionStatusResponse } from "@/types/generated/openapi";
 import { dataEntryRequest } from "../test-data/request-response-templates";
 import { DataEntryApiClient } from "./api-clients";
 
@@ -21,19 +20,6 @@ export async function apiLoginAs(request: APIRequestContext, username: string, p
 
 export async function apiLogout(request: APIRequestContext) {
   return await request.post("/api/logout");
-}
-
-export async function resolveDataEntryId(
-  request: APIRequestContext,
-  electionId: number,
-  pollingStationId: number,
-): Promise<number> {
-  const response = await request.get(`/api/elections/${electionId}/status`);
-  expect(response.ok()).toBeTruthy();
-  const body = (await response.json()) as ElectionStatusResponse;
-  const entry = body.statuses.find((s) => s.source.type === "PollingStation" && s.source.id === pollingStationId);
-  expect(entry, `Could not find data_entry_id for polling station ${pollingStationId}`).toBeDefined();
-  return entry!.data_entry_id;
 }
 
 export async function completePollingStationDataEntries(

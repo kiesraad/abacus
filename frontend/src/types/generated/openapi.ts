@@ -1113,6 +1113,7 @@ export type PollingStationId = number;
 
 export interface PollingStationInvestigation {
   corrected_results?: boolean;
+  data_entry_id?: DataEntryId;
   findings?: string;
   polling_station_id: PollingStationId;
   reason: string;

@@ -10,7 +10,7 @@ use test_log::test;
 use crate::{
     shared::{
         FixtureUser::*, change_status_committee_session, claim_data_entry, complete_data_entry,
-        example_data_entry, get_data_entry_id, login,
+        example_data_entry, login,
     },
     utils::serve_api,
 };
@@ -105,7 +105,7 @@ async fn test_data_entry_get_errors(pool: SqlitePool) {
     let addr = serve_api(pool.clone()).await;
 
     let typist_cookie = login(&addr, TypistGSB).await;
-    let data_entry_id = get_data_entry_id(&addr, &typist_cookie, 2, 211).await;
+    let data_entry_id = 201;
     let res = complete_data_entry(
         &addr,
         &typist_cookie,
@@ -150,7 +150,7 @@ async fn test_data_entry_no_errors(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     let typist = login(&addr, TypistGSB).await;
-    let data_entry_id = get_data_entry_id(&addr, &typist, 2, 211).await;
+    let data_entry_id = 201;
     let data_entry_no_errors = example_data_entry(None);
     let res = complete_data_entry(&addr, &typist, data_entry_id, 1, data_entry_no_errors).await;
     let data_entry_status: serde_json::Value = res.json().await.unwrap();
@@ -174,7 +174,7 @@ async fn test_data_entry_resolve_errors_discard(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     let typist = login(&addr, TypistGSB).await;
-    let data_entry_id = get_data_entry_id(&addr, &typist, 2, 211).await;
+    let data_entry_id = 201;
     let res = complete_data_entry(&addr, &typist, data_entry_id, 1, data_entry_with_error()).await;
     let data_entry_status: serde_json::Value = res.json().await.unwrap();
     assert_eq!(data_entry_status["status"], "first_entry_has_errors");
@@ -197,7 +197,7 @@ async fn test_data_entry_resolve_errors_resume(pool: SqlitePool) {
     let addr = serve_api(pool.clone()).await;
 
     let typist_cookie = login(&addr, TypistGSB).await;
-    let data_entry_id = get_data_entry_id(&addr, &typist_cookie, 2, 211).await;
+    let data_entry_id = 201;
     let res = complete_data_entry(
         &addr,
         &typist_cookie,
@@ -230,7 +230,7 @@ async fn test_data_entry_resolve_errors_wrong_state(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     let typist = login(&addr, TypistGSB).await;
-    let data_entry_id = get_data_entry_id(&addr, &typist, 2, 211).await;
+    let data_entry_id = 201;
     claim_data_entry(&addr, &typist, data_entry_id, 1).await;
 
     let coordinator_cookie = login(&addr, CoordinatorGSB).await;
@@ -249,7 +249,7 @@ async fn test_data_entry_resolve_errors_wrong_action(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     let typist = login(&addr, TypistGSB).await;
-    let data_entry_id = get_data_entry_id(&addr, &typist, 2, 211).await;
+    let data_entry_id = 201;
     let res = complete_data_entry(&addr, &typist, data_entry_id, 1, data_entry_with_error()).await;
     let data_entry_status: serde_json::Value = res.json().await.unwrap();
     assert_eq!(data_entry_status["status"], "first_entry_has_errors");
@@ -265,7 +265,7 @@ async fn test_data_entry_get_differences(pool: SqlitePool) {
     let (first_entry, second_entry) = different_data_entries();
 
     let typist_cookie = login(&addr, TypistGSB).await;
-    let data_entry_id = get_data_entry_id(&addr, &typist_cookie, 2, 211).await;
+    let data_entry_id = 201;
     complete_data_entry(&addr, &typist_cookie, data_entry_id, 1, first_entry).await;
 
     let typist2_cookie = login(&addr, Typist2GSB).await;
@@ -296,7 +296,7 @@ async fn test_data_entry_differences_not_found(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     let typist = login(&addr, TypistGSB).await;
-    let data_entry_id = get_data_entry_id(&addr, &typist, 2, 211).await;
+    let data_entry_id = 201;
     let data_entry = example_data_entry(None);
     let res = complete_data_entry(&addr, &typist, data_entry_id, 1, data_entry).await;
     let data_entry_status: serde_json::Value = res.json().await.unwrap();
@@ -327,7 +327,7 @@ async fn test_data_entry_resolve_differences(pool: SqlitePool) {
     );
 
     let typist = login(&addr, TypistGSB).await;
-    let data_entry_id = get_data_entry_id(&addr, &typist, 2, 211).await;
+    let data_entry_id = 201;
     let res = complete_data_entry(&addr, &typist, data_entry_id, 1, first_data_entry).await;
     let data_entry_status: serde_json::Value = res.json().await.unwrap();
     assert_eq!(data_entry_status["status"], "first_entry_finalised");
@@ -359,7 +359,7 @@ async fn test_data_entry_resolve_differences_then_resolve_errors(pool: SqlitePoo
     second_data_entry["data"]["voters_counts"]["poll_card_count"] = serde_json::Value::from(0);
 
     let typist = login(&addr, TypistGSB).await;
-    let data_entry_id = get_data_entry_id(&addr, &typist, 2, 211).await;
+    let data_entry_id = 201;
     let res = complete_data_entry(&addr, &typist, data_entry_id, 1, first_data_entry).await;
     let data_entry_status: serde_json::Value = res.json().await.unwrap();
     assert_eq!(data_entry_status["status"], "first_entry_finalised");

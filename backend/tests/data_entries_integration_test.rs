@@ -11,7 +11,7 @@ use test_log::test;
 use crate::{
     shared::{
         FixtureUser::*, claim_data_entry, complete_data_entry, example_data_entry,
-        finalise_data_entry, get_data_entry_id, get_statuses, login, save_data_entry,
+        finalise_data_entry, get_statuses, login, save_data_entry,
     },
     utils::serve_api,
 };
@@ -23,7 +23,7 @@ pub mod utils;
 async fn test_data_entry_valid(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let typist_cookie = login(&addr, TypistGSB).await;
-    let data_entry_id = get_data_entry_id(&addr, &typist_cookie, 2, 211).await;
+    let data_entry_id = 201;
 
     claim_data_entry(&addr, &typist_cookie, data_entry_id, 1).await;
 
@@ -59,7 +59,7 @@ async fn test_data_entry_validation(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let typist_cookie = login(&addr, TypistGSB).await;
 
-    let data_entry_id = get_data_entry_id(&addr, &typist_cookie, 2, 211).await;
+    let data_entry_id = 201;
     let url = format!("http://{addr}/api/data_entries/{data_entry_id}/1/claim");
     let response = reqwest::Client::new()
         .post(&url)
@@ -304,7 +304,7 @@ async fn test_data_entry_claim(pool: SqlitePool) {
     let typist_cookie = login(&addr, TypistGSB).await;
 
     let request_body = example_data_entry(None);
-    let data_entry_id = get_data_entry_id(&addr, &typist_cookie, 2, 211).await;
+    let data_entry_id = 201;
 
     // claim a data entry
     let claim_url = format!("http://{addr}/api/data_entries/{data_entry_id}/1/claim");
@@ -351,7 +351,7 @@ async fn test_data_entry_claim(pool: SqlitePool) {
 async fn test_data_entry_claim_finalised(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let typist_cookie = login(&addr, TypistGSB).await;
-    let data_entry_id = get_data_entry_id(&addr, &typist_cookie, 2, 211).await;
+    let data_entry_id = 201;
     complete_data_entry(
         &addr,
         &typist_cookie,
@@ -378,7 +378,7 @@ async fn test_data_entry_deletion(pool: SqlitePool) {
     let typist_cookie = login(&addr, TypistGSB).await;
     let request_body = example_data_entry(None);
 
-    let data_entry_id = get_data_entry_id(&addr, &typist_cookie, 2, 211).await;
+    let data_entry_id = 201;
 
     // claim a data entry
     let url = format!("http://{addr}/api/data_entries/{data_entry_id}/1/claim");
@@ -432,8 +432,8 @@ async fn test_election_details_status(pool: SqlitePool) {
     let typist2_user_id = 6;
     let coordinator_cookie = login(&addr, CoordinatorGSB).await;
     let election_id = 2;
-    let data_entry_id_1 = get_data_entry_id(&addr, &typist_cookie, election_id, 211).await;
-    let data_entry_id_2 = get_data_entry_id(&addr, &typist_cookie, election_id, 212).await;
+    let data_entry_id_1 = 201;
+    let data_entry_id_2 = 202;
 
     // Ensure the statuses are "NotStarted"
     let statuses = get_statuses(&addr, &coordinator_cookie, election_id).await;
@@ -552,7 +552,7 @@ async fn test_election_details_status_no_other_election_statuses(pool: SqlitePoo
     let typist_cookie = login(&addr, TypistGSB).await;
 
     // Save data entry for election 2, polling station 1
-    let data_entry_id_1 = get_data_entry_id(&addr, &typist_cookie, 2, 211).await;
+    let data_entry_id_1 = 201;
     claim_data_entry(&addr, &typist_cookie, data_entry_id_1, 1).await;
     save_data_entry(
         &addr,
@@ -564,7 +564,7 @@ async fn test_election_details_status_no_other_election_statuses(pool: SqlitePoo
     .await;
 
     // Save data entry for election 3, polling station 3
-    let data_entry_id_3 = get_data_entry_id(&addr, &typist_cookie, 3, 313).await;
+    let data_entry_id_3 = 303;
     claim_data_entry(&addr, &typist_cookie, data_entry_id_3, 1).await;
     save_data_entry(
         &addr,

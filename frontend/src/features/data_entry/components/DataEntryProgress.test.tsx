@@ -186,28 +186,28 @@ describe("DataEntryProgress", () => {
     const list1 = screen.getByTestId("list-item-political_group_votes_1");
 
     const electionId = 1;
-    const pollingStationId = 1;
+    const dataEntryId = 1;
     const entryNumber = 1;
 
     const votersAndVotesLink = within(votersAndVotes).getByRole("link", { name: "Aantal kiezers en stemmen" });
     expect(votersAndVotesLink).toBeVisible();
     expect(votersAndVotesLink).toHaveAttribute(
       "href",
-      `/elections/${electionId}/data-entry/${pollingStationId}/${entryNumber}/voters_votes_counts`,
+      `/elections/${electionId}/data-entry/${dataEntryId}/${entryNumber}/voters_votes_counts`,
     );
 
     const differencesLink = within(differences).getByRole("link", { name: "Verschillen D & H" });
     expect(differencesLink).toBeVisible();
     expect(differencesLink).toHaveAttribute(
       "href",
-      `/elections/${electionId}/data-entry/${pollingStationId}/${entryNumber}/differences_counts`,
+      `/elections/${electionId}/data-entry/${dataEntryId}/${entryNumber}/differences_counts`,
     );
 
     const list1Link = within(list1).getByRole("link", { name: "Lijst 1 - Vurige Vleugels Partij" });
     expect(list1Link).toBeVisible();
     expect(list1Link).toHaveAttribute(
       "href",
-      `/elections/${electionId}/data-entry/${pollingStationId}/${entryNumber}/political_group_votes_1`,
+      `/elections/${electionId}/data-entry/${dataEntryId}/${entryNumber}/political_group_votes_1`,
     );
   });
 
@@ -233,7 +233,7 @@ describe("DataEntryProgress", () => {
     const checkAndSave = screen.getByTestId("list-item-save");
 
     const electionId = 1;
-    const pollingStationId = 1;
+    const dataEntryId = 1;
     const entryNumber = 1;
 
     expect(list1).toHaveClass("active empty");
@@ -251,7 +251,7 @@ describe("DataEntryProgress", () => {
     expect(checkAndSaveLink).toBeVisible();
     expect(checkAndSaveLink).toHaveAttribute(
       "href",
-      `/elections/${electionId}/data-entry/${pollingStationId}/${entryNumber}/save`,
+      `/elections/${electionId}/data-entry/${dataEntryId}/${entryNumber}/save`,
     );
   });
 

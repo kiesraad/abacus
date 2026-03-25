@@ -8,6 +8,7 @@ use abacus::{
             VoteCountingMethod,
         },
         results::{
+            Results,
             counting_differences_polling_station::CountingDifferencesPollingStation,
             cso_first_session_results::CSOFirstSessionResults,
             differences_counts::{
@@ -17,7 +18,6 @@ use abacus::{
             voters_counts::VotersCounts,
             votes_counts::VotesCounts,
             yes_no::YesNo,
-            PollingStationResults,
         },
     },
     repository::user_repo::UserId,
@@ -28,8 +28,8 @@ use libfuzzer_sys::{
     fuzz_target,
 };
 
-fn valid_polling_station_result() -> PollingStationResults {
-    PollingStationResults::CSOFirstSession(CSOFirstSessionResults {
+fn valid_result() -> Results {
+    Results::CSOFirstSession(CSOFirstSessionResults {
         extra_investigation: ExtraInvestigation {
             extra_investigation_other_reason: YesNo::default(),
             ballots_recounted_extra_investigation: YesNo::default(),
@@ -56,8 +56,8 @@ fn valid_polling_station_result() -> PollingStationResults {
     })
 }
 
-fn invalid_polling_station_result() -> PollingStationResults {
-    PollingStationResults::CSOFirstSession(CSOFirstSessionResults {
+fn invalid_result() -> Results {
+    Results::CSOFirstSession(CSOFirstSessionResults {
         extra_investigation: Default::default(),
         counting_differences_polling_station: Default::default(),
         voters_counts: VotersCounts {
@@ -87,9 +87,9 @@ fn get_cde(user_id: UserId, correct_entry: bool) -> CurrentDataEntry {
         progress: None,
         user_id,
         entry: if correct_entry {
-            valid_polling_station_result()
+            valid_result()
         } else {
-            invalid_polling_station_result()
+            invalid_result()
         },
         client_state: None,
     }

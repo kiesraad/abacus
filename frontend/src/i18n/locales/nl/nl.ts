@@ -24,9 +24,9 @@ import investigations from "./investigations.json";
 import log from "./log.json";
 import messages from "./messages.json";
 import polling_station from "./polling_station.json";
-import polling_station_results from "./polling_station_results.json";
 import privacy_statement from "./privacy_statement.json";
 import resolve_differences from "./resolve_differences.json";
+import results from "./results.json";
 import status from "./status.json";
 import users from "./users.json";
 import voters_votes_counts from "./voters_votes_counts.json";
@@ -58,7 +58,7 @@ const nl = {
   messages,
   polling_station,
   data_entry_home,
-  polling_station_results,
+  results,
   privacy_statement,
   resolve_differences,
   status,

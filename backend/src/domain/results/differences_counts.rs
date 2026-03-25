@@ -9,7 +9,7 @@ use crate::domain::{
     validate::{DataError, Validate, ValidationResult, ValidationResultCode, ValidationResults},
 };
 
-/// Differences counts, part of the polling station results.
+/// Differences counts, part of the results.
 /// (B1-3.3 "Verschillen tussen aantal kiezers en uitgebrachte stemmen")
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
@@ -359,7 +359,7 @@ mod tests {
     use crate::domain::{
         election::PGNumber,
         results::{
-            PollingStationResults, cso_first_session_results::CSOFirstSessionResults,
+            Results, cso_first_session_results::CSOFirstSessionResults,
             cso_next_session_results::CSONextSessionResults,
             political_group_candidate_votes::PoliticalGroupCandidateVotes,
             political_group_total_votes::PoliticalGroupTotalVotes, voters_counts::VotersCounts,
@@ -385,11 +385,11 @@ mod tests {
         }
     }
 
-    /// Tests that polling station results with equal data and no differences counts are correctly identified as equal.
+    /// Tests that results with equal data and no differences counts are correctly identified as equal.
     #[test]
     fn test_equal_no_differences_counts() {
         let mut different_fields: Vec<String> = vec![];
-        let first_entry = PollingStationResults::CSOFirstSession(CSOFirstSessionResults {
+        let first_entry = Results::CSOFirstSession(CSOFirstSessionResults {
             extra_investigation: Default::default(),
             counting_differences_polling_station: Default::default(),
             voters_counts: VotersCounts {
@@ -414,19 +414,15 @@ mod tests {
             )],
         });
         let second_entry = first_entry.clone();
-        second_entry.compare(
-            &first_entry,
-            &mut different_fields,
-            &"polling_station_results".into(),
-        );
+        second_entry.compare(&first_entry, &mut different_fields, &"results".into());
         assert_eq!(different_fields.len(), 0);
     }
 
-    /// Tests that polling station results with equal data and with differences counts are correctly identified as equal.
+    /// Tests that results with equal data and with differences counts are correctly identified as equal.
     #[test]
     fn test_equal_with_differences_counts() {
         let mut different_fields: Vec<String> = vec![];
-        let first_entry = PollingStationResults::CSOFirstSession(CSOFirstSessionResults {
+        let first_entry = Results::CSOFirstSession(CSOFirstSessionResults {
             extra_investigation: Default::default(),
             counting_differences_polling_station: Default::default(),
             voters_counts: VotersCounts {
@@ -461,19 +457,15 @@ mod tests {
             )],
         });
         let second_entry = first_entry.clone();
-        second_entry.compare(
-            &first_entry,
-            &mut different_fields,
-            &"polling_station_results".into(),
-        );
+        second_entry.compare(&first_entry, &mut different_fields, &"results".into());
         assert_eq!(different_fields.len(), 0);
     }
 
-    /// Tests that polling station results with equal data and no differences counts are correctly identified as equal.
+    /// Tests that results with equal data and no differences counts are correctly identified as equal.
     #[test]
     fn test_equal_no_differences_counts_variant() {
         let mut different_fields = vec![];
-        let first_entry = PollingStationResults::CSOFirstSession(CSOFirstSessionResults {
+        let first_entry = Results::CSOFirstSession(CSOFirstSessionResults {
             extra_investigation: Default::default(),
             counting_differences_polling_station: Default::default(),
             voters_counts: VotersCounts {
@@ -498,19 +490,15 @@ mod tests {
             )],
         });
         let second_entry = first_entry.clone();
-        second_entry.compare(
-            &first_entry,
-            &mut different_fields,
-            &"polling_station_results".into(),
-        );
+        second_entry.compare(&first_entry, &mut different_fields, &"results".into());
         assert_eq!(different_fields.len(), 0);
     }
 
-    /// Tests that polling station results with equal data and with differences counts are correctly identified as equal.
+    /// Tests that results with equal data and with differences counts are correctly identified as equal.
     #[test]
     fn test_equal_with_differences_counts_variant() {
         let mut different_fields = vec![];
-        let first_entry = PollingStationResults::CSOFirstSession(CSOFirstSessionResults {
+        let first_entry = Results::CSOFirstSession(CSOFirstSessionResults {
             extra_investigation: Default::default(),
             counting_differences_polling_station: Default::default(),
             voters_counts: VotersCounts {
@@ -545,19 +533,15 @@ mod tests {
             )],
         });
         let second_entry = first_entry.clone();
-        second_entry.compare(
-            &first_entry,
-            &mut different_fields,
-            &"polling_station_results".into(),
-        );
+        second_entry.compare(&first_entry, &mut different_fields, &"results".into());
         assert_eq!(different_fields.len(), 0);
     }
 
-    /// Tests that polling station results with voters count differences are correctly identified as not equal.
+    /// Tests that results with voters count differences are correctly identified as not equal.
     #[test]
     fn test_not_equal_voters_counts_differences() {
         let mut different_fields: Vec<String> = vec![];
-        let first_entry = PollingStationResults::CSOFirstSession(CSOFirstSessionResults {
+        let first_entry = Results::CSOFirstSession(CSOFirstSessionResults {
             extra_investigation: Default::default(),
             counting_differences_polling_station: Default::default(),
             voters_counts: VotersCounts {
@@ -592,27 +576,20 @@ mod tests {
             .unwrap()
             .voters_counts
             .total_admitted_voters_count = 106;
-        second_entry.compare(
-            &first_entry,
-            &mut different_fields,
-            &"polling_station_results".into(),
-        );
+        second_entry.compare(&first_entry, &mut different_fields, &"results".into());
         assert_eq!(different_fields.len(), 2);
-        assert_eq!(
-            different_fields[0],
-            "polling_station_results.voters_counts.poll_card_count"
-        );
+        assert_eq!(different_fields[0], "results.voters_counts.poll_card_count");
         assert_eq!(
             different_fields[1],
-            "polling_station_results.voters_counts.total_admitted_voters_count"
+            "results.voters_counts.total_admitted_voters_count"
         );
     }
 
-    /// Tests that polling station results with differences in differences counts are correctly identified as not equal.
+    /// Tests that results with differences in differences counts are correctly identified as not equal.
     #[test]
     fn test_not_equal_differences_counts_differences() {
         let mut different_fields: Vec<String> = vec![];
-        let first_entry = PollingStationResults::CSOFirstSession(CSOFirstSessionResults {
+        let first_entry = Results::CSOFirstSession(CSOFirstSessionResults {
             extra_investigation: Default::default(),
             counting_differences_polling_station: Default::default(),
             voters_counts: VotersCounts {
@@ -660,31 +637,27 @@ mod tests {
             },
             difference_completely_accounted_for: Default::default(),
         };
-        second_entry.compare(
-            &first_entry,
-            &mut different_fields,
-            &"polling_station_results".into(),
-        );
+        second_entry.compare(&first_entry, &mut different_fields, &"results".into());
         assert_eq!(different_fields.len(), 3);
         assert_eq!(
             different_fields[0],
-            "polling_station_results.differences_counts.compare_votes_cast_admitted_voters.admitted_voters_equal_votes_cast"
+            "results.differences_counts.compare_votes_cast_admitted_voters.admitted_voters_equal_votes_cast"
         );
         assert_eq!(
             different_fields[1],
-            "polling_station_results.differences_counts.compare_votes_cast_admitted_voters.votes_cast_greater_than_admitted_voters"
+            "results.differences_counts.compare_votes_cast_admitted_voters.votes_cast_greater_than_admitted_voters"
         );
         assert_eq!(
             different_fields[2],
-            "polling_station_results.differences_counts.compare_votes_cast_admitted_voters.votes_cast_smaller_than_admitted_voters"
+            "results.differences_counts.compare_votes_cast_admitted_voters.votes_cast_smaller_than_admitted_voters"
         );
     }
 
-    /// Tests that polling station results with differences in both voters counts and votes counts are correctly identified as not equal.
+    /// Tests that results with differences in both voters counts and votes counts are correctly identified as not equal.
     #[test]
     fn test_not_equal_voters_counts_and_votes_counts_differences() {
         let mut different_fields = vec![];
-        let first_entry = PollingStationResults::CSOFirstSession(CSOFirstSessionResults {
+        let first_entry = Results::CSOFirstSession(CSOFirstSessionResults {
             extra_investigation: Default::default(),
             counting_differences_polling_station: Default::default(),
             voters_counts: VotersCounts {
@@ -730,51 +703,44 @@ mod tests {
             invalid_votes_count: 1,
             total_votes_cast_count: 103,
         };
-        second_entry.compare(
-            &first_entry,
-            &mut different_fields,
-            &"polling_station_results".into(),
-        );
+        second_entry.compare(&first_entry, &mut different_fields, &"results".into());
         assert_eq!(different_fields.len(), 8);
-        assert_eq!(
-            different_fields[0],
-            "polling_station_results.voters_counts.poll_card_count"
-        );
+        assert_eq!(different_fields[0], "results.voters_counts.poll_card_count");
         assert_eq!(
             different_fields[1],
-            "polling_station_results.voters_counts.proxy_certificate_count"
+            "results.voters_counts.proxy_certificate_count"
         );
         assert_eq!(
             different_fields[2],
-            "polling_station_results.voters_counts.total_admitted_voters_count"
+            "results.voters_counts.total_admitted_voters_count"
         );
         assert_eq!(
             different_fields[3],
-            "polling_station_results.votes_counts.political_group_total_votes.0.total"
+            "results.votes_counts.political_group_total_votes.0.total"
         );
         assert_eq!(
             different_fields[4],
-            "polling_station_results.votes_counts.total_votes_candidates_count"
+            "results.votes_counts.total_votes_candidates_count"
         );
         assert_eq!(
             different_fields[5],
-            "polling_station_results.votes_counts.blank_votes_count"
+            "results.votes_counts.blank_votes_count"
         );
         assert_eq!(
             different_fields[6],
-            "polling_station_results.votes_counts.invalid_votes_count"
+            "results.votes_counts.invalid_votes_count"
         );
         assert_eq!(
             different_fields[7],
-            "polling_station_results.votes_counts.total_votes_cast_count"
+            "results.votes_counts.total_votes_cast_count"
         );
     }
 
-    /// Tests that polling station results with differences in political group votes are correctly identified as not equal.
+    /// Tests that results with differences in political group votes are correctly identified as not equal.
     #[test]
     fn test_not_equal_political_group_votes_differences() {
         let mut different_fields = vec![];
-        let first_entry = PollingStationResults::CSONextSession(CSONextSessionResults {
+        let first_entry = Results::CSONextSession(CSONextSessionResults {
             voters_counts: VotersCounts {
                 poll_card_count: 103,
                 proxy_certificate_count: 2,
@@ -820,32 +786,22 @@ mod tests {
             PoliticalGroupCandidateVotes::from_test_data_auto(PGNumber::from(1), &[50, 30]),
             PoliticalGroupCandidateVotes::from_test_data_auto(PGNumber::from(2), &[20]),
         ];
-        second_entry.compare(
-            &first_entry,
-            &mut different_fields,
-            &"polling_station_results".into(),
-        );
+        second_entry.compare(&first_entry, &mut different_fields, &"results".into());
         assert_eq!(different_fields.len(), 5);
         assert_eq!(
             different_fields[0],
-            "polling_station_results.political_group_votes.0.candidate_votes.0.votes"
+            "results.political_group_votes.0.candidate_votes.0.votes"
         );
         assert_eq!(
             different_fields[1],
-            "polling_station_results.political_group_votes.0.candidate_votes.1.votes"
+            "results.political_group_votes.0.candidate_votes.1.votes"
         );
-        assert_eq!(
-            different_fields[2],
-            "polling_station_results.political_group_votes.0.total"
-        );
+        assert_eq!(different_fields[2], "results.political_group_votes.0.total");
         assert_eq!(
             different_fields[3],
-            "polling_station_results.political_group_votes.1.candidate_votes.0.votes"
+            "results.political_group_votes.1.candidate_votes.0.votes"
         );
-        assert_eq!(
-            different_fields[4],
-            "polling_station_results.political_group_votes.1.total"
-        );
+        assert_eq!(different_fields[4], "results.political_group_votes.1.total");
     }
 
     fn validate(

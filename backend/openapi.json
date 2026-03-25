@@ -4810,7 +4810,7 @@
             "type": "object"
           },
           "data": {
-            "$ref": "#/components/schemas/PollingStationResults"
+            "$ref": "#/components/schemas/Results"
           },
           "previous_results": {
             "$ref": "#/components/schemas/CommonPollingStationResults"
@@ -4963,7 +4963,7 @@
       },
       "CountingDifferencesPollingStation": {
         "type": "object",
-        "description": "Counting Differences Polling Station,\npart of the polling station results (\"B1-2 Verschillen met telresultaten van het stembureau\")",
+        "description": "Counting Differences Polling Station,\npart of the results (\"B1-2 Verschillen met telresultaten van het stembureau\")",
         "required": [
           "unexplained_difference_ballots_voters",
           "difference_ballots_per_list"
@@ -5041,7 +5041,7 @@
       },
       "DataEntry": {
         "type": "object",
-        "description": "Request structure for saving data entry of polling station results",
+        "description": "Request structure for saving data entry",
         "required": [
           "progress",
           "data",
@@ -5053,7 +5053,7 @@
             "description": "Client state for the data entry (arbitrary JSON)"
           },
           "data": {
-            "$ref": "#/components/schemas/PollingStationResults",
+            "$ref": "#/components/schemas/Results",
             "description": "Data entry for a polling station"
           },
           "progress": {
@@ -5077,13 +5077,13 @@
         ],
         "properties": {
           "first_entry": {
-            "$ref": "#/components/schemas/PollingStationResults"
+            "$ref": "#/components/schemas/Results"
           },
           "first_entry_user_id": {
             "$ref": "#/components/schemas/UserId"
           },
           "second_entry": {
-            "$ref": "#/components/schemas/PollingStationResults"
+            "$ref": "#/components/schemas/Results"
           },
           "second_entry_user_id": {
             "$ref": "#/components/schemas/UserId"
@@ -5104,7 +5104,7 @@
         ],
         "properties": {
           "data": {
-            "$ref": "#/components/schemas/PollingStationResults"
+            "$ref": "#/components/schemas/Results"
           },
           "source": {
             "$ref": "#/components/schemas/DataEntrySource"
@@ -5222,7 +5222,7 @@
       },
       "DifferencesCounts": {
         "type": "object",
-        "description": "Differences counts, part of the polling station results.\n(B1-3.3 \"Verschillen tussen aantal kiezers en uitgebrachte stemmen\")",
+        "description": "Differences counts, part of the results.\n(B1-3.3 \"Verschillen tussen aantal kiezers en uitgebrachte stemmen\")",
         "required": [
           "compare_votes_cast_admitted_voters",
           "more_ballots_count",
@@ -5838,7 +5838,7 @@
       },
       "ExtraInvestigation": {
         "type": "object",
-        "description": "Extra investigation, part of the polling station results (\"B1-1 Alleen bij extra onderzoek\")",
+        "description": "Extra investigation, part of the results (\"B1-1 Alleen bij extra onderzoek\")",
         "required": [
           "extra_investigation_other_reason",
           "ballots_recounted_extra_investigation"
@@ -6687,57 +6687,6 @@
           }
         }
       },
-      "PollingStationResults": {
-        "oneOf": [
-          {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/CSOFirstSessionResults",
-                "description": "Results for centrally counted (CSO) elections, first election committee session.\nThis contains the data entry values from Model Na 31-2 Bijlage 2."
-              },
-              {
-                "type": "object",
-                "required": [
-                  "model"
-                ],
-                "properties": {
-                  "model": {
-                    "type": "string",
-                    "enum": [
-                      "CSOFirstSession"
-                    ]
-                  }
-                }
-              }
-            ],
-            "description": "Results for centrally counted (CSO) elections, first election committee session.\nThis contains the data entry values from Model Na 31-2 Bijlage 2."
-          },
-          {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/CSONextSessionResults",
-                "description": "Results for centrally counted (CSO) elections, any subsequent election committee session.\nThis contains the data entry values from Model Na 14-2 Bijlage 1."
-              },
-              {
-                "type": "object",
-                "required": [
-                  "model"
-                ],
-                "properties": {
-                  "model": {
-                    "type": "string",
-                    "enum": [
-                      "CSONextSession"
-                    ]
-                  }
-                }
-              }
-            ],
-            "description": "Results for centrally counted (CSO) elections, any subsequent election committee session.\nThis contains the data entry values from Model Na 14-2 Bijlage 1."
-          }
-        ],
-        "description": "PollingStationResults contains the results for a polling station.\n\nThe exact type of results depends on the election counting method and\nwhether this is the first or any subsequent data entry session. Based on\nthis, any of four different models can apply"
-      },
       "PollingStationSource": {
         "type": "object",
         "required": [
@@ -6842,6 +6791,57 @@
           "resume_first_entry"
         ]
       },
+      "Results": {
+        "oneOf": [
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CSOFirstSessionResults",
+                "description": "Results for centrally counted (CSO) elections, first election committee session.\nThis contains the data entry values from Model Na 31-2 Bijlage 2."
+              },
+              {
+                "type": "object",
+                "required": [
+                  "model"
+                ],
+                "properties": {
+                  "model": {
+                    "type": "string",
+                    "enum": [
+                      "CSOFirstSession"
+                    ]
+                  }
+                }
+              }
+            ],
+            "description": "Results for centrally counted (CSO) elections, first election committee session.\nThis contains the data entry values from Model Na 31-2 Bijlage 2."
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CSONextSessionResults",
+                "description": "Results for centrally counted (CSO) elections, any subsequent election committee session.\nThis contains the data entry values from Model Na 14-2 Bijlage 1."
+              },
+              {
+                "type": "object",
+                "required": [
+                  "model"
+                ],
+                "properties": {
+                  "model": {
+                    "type": "string",
+                    "enum": [
+                      "CSONextSession"
+                    ]
+                  }
+                }
+              }
+            ],
+            "description": "Results for centrally counted (CSO) elections, any subsequent election committee session.\nThis contains the data entry values from Model Na 14-2 Bijlage 1."
+          }
+        ],
+        "description": "Results contains the results for a data entry\n\nThe exact type of results depends on the election counting method,\nelection committee category and whether this is the first or any subsequent data entry session."
+      },
       "Role": {
         "type": "string",
         "enum": [
@@ -6854,7 +6854,7 @@
       },
       "SaveDataEntryResponse": {
         "type": "object",
-        "description": "Response structure for saving data entry of polling station results",
+        "description": "Response structure for saving data entry",
         "required": [
           "validation_results"
         ],
@@ -7273,7 +7273,7 @@
       },
       "VotersCounts": {
         "type": "object",
-        "description": "Voters counts, part of the polling station results.",
+        "description": "Voters counts, part of the results.",
         "required": [
           "poll_card_count",
           "proxy_certificate_count",
@@ -7303,7 +7303,7 @@
       },
       "VotesCounts": {
         "type": "object",
-        "description": "Votes counts, part of the polling station results.\nFollowing the fields in Model CSO Na 31-2 Bijlage 1.",
+        "description": "Votes counts, part of the results.\nFollowing the fields in Model CSO Na 31-2 Bijlage 1.",
         "required": [
           "political_group_total_votes",
           "total_votes_candidates_count",

@@ -75,7 +75,7 @@ export function getDefaultDataEntryState(): DataEntryStateLoaded {
     election: electionMockData,
     dataEntryId: 1,
     error: null,
-    pollingStationResults: { model, ...getInitialValues() },
+    results: { model, ...getInitialValues() },
     entryNumber: 1,
     previousResults: null,
     source: {
@@ -123,6 +123,6 @@ export function getDefaultDataEntryStateAndActionsLoaded(): DataEntryStateAndAct
     onFinaliseDataEntry: () => Promise.resolve(undefined),
     setCache: () => null,
     updateFormSection: () => null,
-    pollingStationResults: getInitialValues(),
+    results: getInitialValues(),
   };
 }

@@ -17,14 +17,14 @@ export function getUrlForFormSectionID(
 }
 
 /**
- * Check if pollingStationResults, dataEntryStructure, formState are all initialized.
+ * Check if results, dataEntryStructure, formState are all initialized.
  */
 export function isStateLoaded(state: DataEntryState): state is DataEntryStateLoaded {
-  return state.pollingStationResults !== null && state.dataEntryStructure !== null && state.formState !== null;
+  return state.results !== null && state.dataEntryStructure !== null && state.formState !== null;
 }
 
 /**
- * Assert that pollingStationResults, dataEntryStructure, formState are all initialized.
+ * Assert that results, dataEntryStructure, formState are all initialized.
  */
 export function assertStateIsLoaded(state: DataEntryState): asserts state is DataEntryStateLoaded {
   if (!isStateLoaded(state)) {

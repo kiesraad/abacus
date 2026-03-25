@@ -11,7 +11,7 @@ use crate::domain::{
     validate::{DataError, Validate, ValidationResult, ValidationResultCode, ValidationResults},
 };
 
-/// Voters counts, part of the polling station results.
+/// Voters counts, part of the results.
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
 pub struct VotersCounts {

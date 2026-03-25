@@ -523,7 +523,7 @@ export interface ChosenCandidate {
  */
 export interface ClaimDataEntryResponse {
   client_state: unknown;
-  data: PollingStationResults;
+  data: Results;
   previous_results?: CommonPollingStationResults;
   source: DataEntrySource;
   status: DataEntryStatusName;
@@ -591,7 +591,7 @@ export interface CommonPollingStationResults {
 
 /**
  * Counting Differences Polling Station,
- * part of the polling station results ("B1-2 Verschillen met telresultaten van het stembureau")
+ * part of the results ("B1-2 Verschillen met telresultaten van het stembureau")
  */
 export interface CountingDifferencesPollingStation {
   /** Whether there was a difference between the total votes per list as determined by the polling station and by the typist
@@ -621,27 +621,27 @@ export interface Credentials {
 }
 
 /**
- * Request structure for saving data entry of polling station results
+ * Request structure for saving data entry
  */
 export interface DataEntry {
   /** Client state for the data entry (arbitrary JSON) */
   client_state: unknown;
   /** Data entry for a polling station */
-  data: PollingStationResults;
+  data: Results;
   /** Data entry progress between 0 and 100 */
   progress: number;
 }
 
 export interface DataEntryGetDifferencesResponse {
-  first_entry: PollingStationResults;
+  first_entry: Results;
   first_entry_user_id: UserId;
-  second_entry: PollingStationResults;
+  second_entry: Results;
   second_entry_user_id: UserId;
   source: DataEntrySource;
 }
 
 export interface DataEntryGetResponse {
-  data: PollingStationResults;
+  data: Results;
   source: DataEntrySource;
   status: DataEntryStatusName;
   user_id?: UserId;
@@ -685,7 +685,7 @@ export interface DifferenceCountsCompareVotesCastAdmittedVoters {
 }
 
 /**
- * Differences counts, part of the polling station results.
+ * Differences counts, part of the results.
  * (B1-3.3 "Verschillen tussen aantal kiezers en uitgebrachte stemmen")
  */
 export interface DifferencesCounts {
@@ -912,7 +912,7 @@ export interface ErrorResponse {
 }
 
 /**
- * Extra investigation, part of the polling station results ("B1-1 Alleen bij extra onderzoek")
+ * Extra investigation, part of the results ("B1-1 Alleen bij extra onderzoek")
  */
 export interface ExtraInvestigation {
   /** Whether ballots were (partially) recounted following the extra investigation
@@ -1174,17 +1174,6 @@ export interface PollingStationRequestListResponse {
   polling_stations: PollingStationRequest[];
 }
 
-/**
- * PollingStationResults contains the results for a polling station.
- *
- * The exact type of results depends on the election counting method and
- * whether this is the first or any subsequent data entry session. Based on
- * this, any of four different models can apply
- */
-export type PollingStationResults =
-  | (CSOFirstSessionResults & { model: "CSOFirstSession" })
-  | (CSONextSessionResults & { model: "CSONextSession" });
-
 export interface PollingStationSource {
   id: PollingStationId;
   name: string;
@@ -1226,11 +1215,21 @@ export type ResolveDifferencesAction = (typeof resolveDifferencesActionValues)[n
 export const resolveErrorsActionValues = ["discard_first_entry", "resume_first_entry"] as const;
 export type ResolveErrorsAction = (typeof resolveErrorsActionValues)[number];
 
+/**
+ * Results contains the results for a data entry
+ *
+ * The exact type of results depends on the election counting method,
+ * election committee category and whether this is the first or any subsequent data entry session.
+ */
+export type Results =
+  | (CSOFirstSessionResults & { model: "CSOFirstSession" })
+  | (CSONextSessionResults & { model: "CSONextSession" });
+
 export const roleValues = ["administrator", "coordinator_gsb", "coordinator_csb", "typist_gsb", "typist_csb"] as const;
 export type Role = (typeof roleValues)[number];
 
 /**
- * Response structure for saving data entry of polling station results
+ * Response structure for saving data entry
  */
 export interface SaveDataEntryResponse {
   validation_results: ValidationResults;
@@ -1360,7 +1359,7 @@ export const voteCountingMethodValues = ["CSO", "DSO"] as const;
 export type VoteCountingMethod = (typeof voteCountingMethodValues)[number];
 
 /**
- * Voters counts, part of the polling station results.
+ * Voters counts, part of the results.
  */
 export interface VotersCounts {
   /** Number of valid poll cards ("Aantal geldige stempassen") */
@@ -1372,7 +1371,7 @@ export interface VotersCounts {
 }
 
 /**
- * Votes counts, part of the polling station results.
+ * Votes counts, part of the results.
  * Following the fields in Model CSO Na 31-2 Bijlage 1.
  */
 export interface VotesCounts {

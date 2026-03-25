@@ -170,7 +170,8 @@ pub async fn resolve_source(
 ) -> Result<DataEntrySourceContext, ResolveSourceError> {
     let mut tx = conn.begin().await?;
 
-    let row = query!(
+    let row = query_as!(
+        ResolveSourceRow,
         r#"
         SELECT
             p.id AS "polling_station_id?: PollingStationId",
@@ -194,22 +195,7 @@ pub async fn resolve_source(
     .await?;
 
     // Extract the source and committee_session_id, validating that exactly one matched
-    let (source, committee_session_id) = resolve_source_from_row(
-        data_entry_id,
-        ResolveSourceRow {
-            polling_station_id: row.polling_station_id,
-            ps_committee_session_id: row.ps_committee_session_id,
-            ps_prev_data_entry_id: row.ps_prev_data_entry_id,
-            ps_name: row.ps_name,
-            ps_number: row.ps_number,
-            sub_committee_id: row.sub_committee_id,
-            sc_number: row.sc_number,
-            sc_name: row.sc_name,
-            sc_category: row.sc_category,
-            sc_committee_session_id: row.sc_committee_session_id,
-        },
-    )?;
-
+    let (source, committee_session_id) = resolve_source_from_row(data_entry_id, row)?;
     let committee_session = committee_session_repo::get(&mut tx, committee_session_id).await?;
     let election = election_repo::get(&mut tx, committee_session.election_id).await?;
 

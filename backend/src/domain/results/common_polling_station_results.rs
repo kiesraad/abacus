@@ -10,7 +10,6 @@ use super::{
 use crate::domain::{
     election::ElectionWithPoliticalGroups,
     field_path::FieldPath,
-    polling_station::PollingStation,
     validate::{
         DataError, Validate, ValidationResult, ValidationResultCode, ValidationResultContext,
         ValidationResults,
@@ -94,29 +93,20 @@ impl Validate for CommonPollingStationResults {
     fn validate(
         &self,
         election: &ElectionWithPoliticalGroups,
-        polling_station: &PollingStation,
         validation_results: &mut ValidationResults,
         path: &FieldPath,
     ) -> Result<(), DataError> {
         let total_votes_count = self.votes_counts.total_votes_cast_count;
 
-        self.votes_counts.validate(
-            election,
-            polling_station,
-            validation_results,
-            &path.field("votes_counts"),
-        )?;
+        self.votes_counts
+            .validate(election, validation_results, &path.field("votes_counts"))?;
 
         let votes_counts_path = path.field("votes_counts");
         let voters_counts_path = path.field("voters_counts");
 
         let total_voters_count = self.voters_counts.total_admitted_voters_count;
-        self.voters_counts.validate(
-            election,
-            polling_station,
-            validation_results,
-            &voters_counts_path,
-        )?;
+        self.voters_counts
+            .validate(election, validation_results, &voters_counts_path)?;
 
         if difference_admitted_voters_count_and_votes_cast_count_above_threshold(
             total_voters_count,
@@ -138,12 +128,8 @@ impl Validate for CommonPollingStationResults {
 
         let differences_counts_path = path.field("differences_counts");
 
-        self.differences_counts.validate(
-            election,
-            polling_station,
-            validation_results,
-            &differences_counts_path,
-        )?;
+        self.differences_counts
+            .validate(election, validation_results, &differences_counts_path)?;
 
         validate_differences_counts(
             &self.differences_counts,
@@ -155,7 +141,6 @@ impl Validate for CommonPollingStationResults {
 
         self.political_group_votes.validate(
             election,
-            polling_station,
             validation_results,
             &path.field("political_group_votes"),
         )?;
@@ -209,7 +194,6 @@ mod tests {
     use super::*;
     use crate::domain::{
         election::{PGNumber, tests::election_fixture},
-        polling_station::test_helpers::polling_station_fixture,
         results::political_group_total_votes::PoliticalGroupTotalVotes,
         valid_default::ValidDefault,
     };
@@ -257,7 +241,6 @@ mod tests {
                     .map(|pg| u32::try_from(pg.candidate_votes.len()).unwrap())
                     .collect::<Vec<_>>(),
             ),
-            &polling_station_fixture(None),
             &mut validation_results,
             &"data".into(),
         )?;

@@ -5,131 +5,94 @@ use sqlx::{Connection, SqliteConnection, query, query_as, types::Json};
 use crate::{
     domain::{
         committee_session::CommitteeSessionId,
-        data_entry::{DataEntryStatus, PollingStationDataEntry},
+        data_entry::{
+            DataEntryId, DataEntryRow, DataEntrySource, DataEntrySourceContext, DataEntryStatus,
+            PollingStationSource,
+        },
+        election::CommitteeCategory,
         polling_station::{PollingStation, PollingStationId},
-        results::PollingStationResults,
+        results::Results,
+        sub_committee::{SubCommittee, SubCommitteeId},
     },
-    repository::{committee_session_repo, polling_station_repo},
+    repository::{committee_session_repo, election_repo, polling_station_repo},
 };
 
-/// Get the full polling station data entry row for a given polling station
-/// id, or return None if there is no linked data entry
-async fn get_data_entry_optional(
-    conn: &mut SqliteConnection,
-    polling_station_id: PollingStationId,
-) -> Result<Option<PollingStationDataEntry>, sqlx::Error> {
-    query_as!(
-        PollingStationDataEntry,
-        r#"
-            SELECT
-                de.id AS "id: _",
-                de.state AS "state: _",
-                de.updated_at AS "updated_at: _"
-            FROM polling_stations AS p
-            JOIN data_entries AS de ON de.id = p.data_entry_id
-            WHERE p.id = ?
-        "#,
-        polling_station_id,
-    )
-    .fetch_optional(conn)
-    .await
+struct ResolveSourceRow {
+    polling_station_id: Option<PollingStationId>,
+    ps_committee_session_id: Option<CommitteeSessionId>,
+    ps_prev_data_entry_id: Option<DataEntryId>,
+    ps_name: Option<String>,
+    ps_number: Option<u32>,
+    sub_committee_id: Option<SubCommitteeId>,
+    sc_number: Option<u32>,
+    sc_name: Option<String>,
+    sc_category: Option<CommitteeCategory>,
+    sc_committee_session_id: Option<CommitteeSessionId>,
 }
 
-/// Get the full polling station data entry row for a given polling station
-/// id, or return an error if there is no data
-pub async fn get_data_entry(
-    conn: &mut SqliteConnection,
-    polling_station_id: PollingStationId,
-) -> Result<PollingStationDataEntry, sqlx::Error> {
-    get_data_entry_optional(conn, polling_station_id)
-        .await?
-        .ok_or(sqlx::Error::RowNotFound)
+fn resolve_source_from_row(
+    data_entry_id: DataEntryId,
+    row: ResolveSourceRow,
+) -> Result<(DataEntrySource, CommitteeSessionId), ResolveSourceError> {
+    match (row.polling_station_id, row.sub_committee_id) {
+        (Some(polling_station_id), None) => Ok((
+            DataEntrySource::PollingStation(PollingStationSource {
+                id: polling_station_id,
+                number: row.ps_number.expect("ps_number should be present"),
+                name: row.ps_name.expect("ps_name should be present"),
+                prev_data_entry_id: row.ps_prev_data_entry_id,
+            }),
+            row.ps_committee_session_id
+                .expect("ps_committee_session_id"),
+        )),
+        (None, Some(sub_committee_id)) => Ok((
+            DataEntrySource::SubCommittee(SubCommittee {
+                id: sub_committee_id,
+                number: row.sc_number.expect("sc_number should be present"),
+                name: row.sc_name.expect("sc_name should be present"),
+                category: row.sc_category.expect("sc_category should be present"),
+            }),
+            row.sc_committee_session_id
+                .expect("sc_committee_session_id"),
+        )),
+        (Some(_), Some(_)) => {
+            tracing::error!(
+                data_entry_id = %data_entry_id,
+                "Data entry found in both polling_stations and sub_committees tables"
+            );
+            Err(ResolveSourceError::DataIntegrity(format!(
+                "data_entry_id {data_entry_id} found in both polling_stations and sub_committees"
+            )))
+        }
+        (None, None) => {
+            tracing::error!(
+                data_entry_id = %data_entry_id,
+                "Data entry exists but has no associated polling station or sub-committee (orphaned)"
+            );
+            Err(ResolveSourceError::OrphanedDataEntry(data_entry_id))
+        }
+    }
 }
 
-/// Get a data entry or return an error if there is no data entry for the
-/// given polling station id
-pub async fn get(
-    conn: &mut SqliteConnection,
-    polling_station_id: PollingStationId,
-) -> Result<DataEntryStatus, sqlx::Error> {
-    get_data_entry(conn, polling_station_id)
-        .await
-        .map(|psde| psde.state.0)
+#[derive(Debug)]
+pub enum ResolveSourceError {
+    Sqlx(sqlx::Error),
+    DataIntegrity(String),
+    OrphanedDataEntry(DataEntryId),
 }
 
-/// Get a data entry or return the default data entry state for the given
-/// polling station id
-pub async fn get_or_default(
-    conn: &mut SqliteConnection,
-    polling_station_id: PollingStationId,
-) -> Result<DataEntryStatus, sqlx::Error> {
-    Ok(query_as!(
-        PollingStationDataEntry,
-        r#"
-            SELECT
-                de.id AS "id: _",
-                de.state AS "state: _",
-                de.updated_at AS "updated_at: _"
-            FROM polling_stations AS p
-            JOIN data_entries AS de ON de.id = p.data_entry_id
-            WHERE p.id = ?
-        "#,
-        polling_station_id,
-    )
-    .fetch_optional(conn)
-    .await?
-    .map(|psde| psde.state.0)
-    .unwrap_or(DataEntryStatus::Empty))
-}
-
-/// Updates an existing data entry for a given polling station id.
-/// Returns an error if no data entry exists for the polling station.
-pub async fn update(
-    conn: &mut SqliteConnection,
-    polling_station_id: PollingStationId,
-    state: &DataEntryStatus,
-) -> Result<PollingStationDataEntry, sqlx::Error> {
-    let mut tx = conn.begin().await?;
-    let state = Json(state);
-
-    let row = query!(
-        r#"SELECT data_entry_id FROM polling_stations WHERE id = ?"#,
-        polling_station_id
-    )
-    .fetch_one(&mut *tx)
-    .await?;
-
-    let data_entry_id = row.data_entry_id.ok_or(sqlx::Error::RowNotFound)?;
-
-    let res = query_as!(
-        PollingStationDataEntry,
-        r#"
-            UPDATE data_entries
-            SET state = ?, updated_at = CURRENT_TIMESTAMP
-            WHERE id = ?
-            RETURNING
-                id AS "id: _",
-                state AS "state: _",
-                updated_at AS "updated_at: _"
-        "#,
-        state,
-        data_entry_id
-    )
-    .fetch_one(&mut *tx)
-    .await;
-
-    tx.commit().await?;
-    res
+impl From<sqlx::Error> for ResolveSourceError {
+    fn from(err: sqlx::Error) -> Self {
+        Self::Sqlx(err)
+    }
 }
 
 /// Create an empty data entry row (not linked to any polling station)
-pub async fn create_empty(
-    conn: &mut SqliteConnection,
-) -> Result<PollingStationDataEntry, sqlx::Error> {
+pub async fn create_empty(conn: &mut SqliteConnection) -> Result<DataEntryRow, sqlx::Error> {
     let state = Json(DataEntryStatus::Empty);
 
     query_as!(
-        PollingStationDataEntry,
+        DataEntryRow,
         r#"
             INSERT INTO data_entries (state)
             VALUES (?)
@@ -144,36 +107,114 @@ pub async fn create_empty(
     .await
 }
 
-pub async fn delete_data_entry(
+/// Get the full data entry row by its primary key.
+pub async fn get(
     conn: &mut SqliteConnection,
-    polling_station_id: PollingStationId,
-) -> Result<Option<PollingStationDataEntry>, sqlx::Error> {
+    data_entry_id: DataEntryId,
+) -> Result<DataEntryRow, sqlx::Error> {
+    query_as!(
+        DataEntryRow,
+        r#"
+            SELECT
+                id AS "id: _",
+                state AS "state: _",
+                updated_at AS "updated_at: _"
+            FROM data_entries
+            WHERE id = ?
+        "#,
+        data_entry_id,
+    )
+    .fetch_one(conn)
+    .await
+}
+
+/// Get the status of a data entry by its primary key.
+pub async fn get_status(
+    conn: &mut SqliteConnection,
+    data_entry_id: DataEntryId,
+) -> Result<DataEntryStatus, sqlx::Error> {
+    get(conn, data_entry_id).await.map(|psde| psde.state.0)
+}
+
+/// Update a data entry directly by its primary key.
+pub async fn update(
+    conn: &mut SqliteConnection,
+    data_entry_id: DataEntryId,
+    state: &DataEntryStatus,
+) -> Result<DataEntryRow, sqlx::Error> {
+    let state = Json(state);
+
+    query_as!(
+        DataEntryRow,
+        r#"
+            UPDATE data_entries
+            SET state = ?, updated_at = CURRENT_TIMESTAMP
+            WHERE id = ?
+            RETURNING
+                id AS "id: _",
+                state AS "state: _",
+                updated_at AS "updated_at: _"
+        "#,
+        state,
+        data_entry_id
+    )
+    .fetch_one(conn)
+    .await
+}
+
+/// Find which entity (polling station or sub committee) is the source of a data entry.
+/// We expect to only find one match: either a polling station or a sub committee, not both.
+pub async fn resolve_source(
+    conn: &mut SqliteConnection,
+    data_entry_id: DataEntryId,
+) -> Result<DataEntrySourceContext, ResolveSourceError> {
     let mut tx = conn.begin().await?;
 
-    // Get data_entry_id from polling station
-    let row = query!(
-        r#"SELECT data_entry_id FROM polling_stations WHERE id = ?"#,
-        polling_station_id
+    let row = query_as!(
+        ResolveSourceRow,
+        r#"
+        SELECT
+            p.id AS "polling_station_id?: PollingStationId",
+            p.committee_session_id AS "ps_committee_session_id?: CommitteeSessionId",
+            p.prev_data_entry_id AS "ps_prev_data_entry_id?: DataEntryId",
+            p.name AS "ps_name?",
+            p.number AS "ps_number?: u32",
+            sc.id AS "sub_committee_id?: SubCommitteeId",
+            sc.number AS "sc_number?: u32",
+            sc.name AS "sc_name?",
+            sc.category AS "sc_category?: crate::domain::election::CommitteeCategory",
+            sc.committee_session_id AS "sc_committee_session_id?: CommitteeSessionId"
+        FROM data_entries AS de
+        LEFT JOIN polling_stations AS p ON p.data_entry_id = de.id
+        LEFT JOIN sub_committees AS sc ON sc.data_entry_id = de.id
+        WHERE de.id = ?
+        "#,
+        data_entry_id,
     )
     .fetch_one(&mut *tx)
     .await?;
 
-    let Some(data_entry_id) = row.data_entry_id else {
-        tx.commit().await?;
-        return Ok(None);
-    };
+    // Extract the source and committee_session_id, validating that exactly one matched
+    let (source, committee_session_id) = resolve_source_from_row(data_entry_id, row)?;
+    let committee_session = committee_session_repo::get(&mut tx, committee_session_id).await?;
+    let election = election_repo::get(&mut tx, committee_session.election_id).await?;
 
-    // Unlink from polling station
-    query!(
-        "UPDATE polling_stations SET data_entry_id = NULL WHERE id = ?",
-        polling_station_id
-    )
-    .execute(&mut *tx)
-    .await?;
+    tx.commit().await?;
 
-    // Delete the data entry
-    let res = query_as!(
-        PollingStationDataEntry,
+    Ok(DataEntrySourceContext {
+        source,
+        election,
+        committee_session,
+    })
+}
+
+/// Delete a data entry by its primary key.
+pub async fn delete(
+    conn: &mut SqliteConnection,
+    data_entry_id: DataEntryId,
+) -> Result<DataEntryRow, sqlx::Error> {
+    query_as!(
+        DataEntryRow,
         r#"
             DELETE FROM data_entries
             WHERE id = ?
@@ -184,28 +225,8 @@ pub async fn delete_data_entry(
         "#,
         data_entry_id,
     )
-    .fetch_optional(&mut *tx)
-    .await?;
-
-    tx.commit().await?;
-    Ok(res)
-}
-
-/// Check if a polling station has a data entry
-pub async fn data_entry_exists(
-    conn: &mut SqliteConnection,
-    polling_station_id: PollingStationId,
-) -> Result<bool, sqlx::Error> {
-    let res = query!(
-        r#"
-        SELECT data_entry_id IS NOT NULL AS `exists`
-        FROM polling_stations
-        WHERE id = ?"#,
-        polling_station_id
-    )
     .fetch_one(conn)
-    .await?;
-    Ok(res.exists == 1)
+    .await
 }
 
 /// Returns if a committee session has any data entries
@@ -216,9 +237,13 @@ pub async fn has_any(
     let result = query!(
         r#"
         SELECT EXISTS(
-            SELECT 1 FROM polling_stations as ps
+            SELECT 1 FROM polling_stations AS ps
             INNER JOIN data_entries AS de ON de.id = ps.data_entry_id
-            WHERE committee_session_id = $1
+            WHERE ps.committee_session_id = $1
+            UNION ALL
+            SELECT 1 FROM sub_committees AS sc
+            INNER JOIN data_entries AS de ON de.id = sc.data_entry_id
+            WHERE sc.committee_session_id = $1
         ) as `exists`"#,
         committee_session_id
     )
@@ -228,33 +253,11 @@ pub async fn has_any(
     Ok(result.exists == 1)
 }
 
-#[cfg(test)]
-pub async fn get_data_entries(
-    conn: &mut SqliteConnection,
-    polling_station_id: PollingStationId,
-) -> Result<Vec<PollingStationDataEntry>, sqlx::Error> {
-    query_as!(
-        PollingStationDataEntry,
-        r#"
-            SELECT
-                de.id AS "id: _",
-                de.state AS "state: _",
-                de.updated_at AS "updated_at: _"
-            FROM polling_stations AS p
-            JOIN data_entries AS de ON de.id = p.data_entry_id
-            WHERE p.id = ?
-            "#,
-        polling_station_id,
-    )
-    .fetch_all(conn)
-    .await
-}
-
 async fn fetch_results_for_committee_session(
     conn: &mut SqliteConnection,
     committee_session_id: CommitteeSessionId,
     polling_station_id: Option<PollingStationId>,
-) -> Result<Vec<(PollingStation, PollingStationResults)>, sqlx::Error> {
+) -> Result<Vec<(PollingStation, Results)>, sqlx::Error> {
     let mut tx = conn.begin().await?;
 
     // Get and index polling stations by id for performance
@@ -291,7 +294,7 @@ async fn fetch_results_for_committee_session(
         )
         SELECT
             original_id AS "original_id!: PollingStationId",
-            data AS "data: Json<PollingStationResults>"
+            data AS "data: Json<Results>"
         FROM results
         WHERE data IS NOT NULL
         "#,
@@ -321,7 +324,7 @@ async fn fetch_results_for_committee_session(
 pub async fn list_results_for_committee_session(
     conn: &mut SqliteConnection,
     committee_session_id: CommitteeSessionId,
-) -> Result<Vec<(PollingStation, PollingStationResults)>, sqlx::Error> {
+) -> Result<Vec<(PollingStation, Results)>, sqlx::Error> {
     fetch_results_for_committee_session(conn, committee_session_id, None).await
 }
 
@@ -330,7 +333,7 @@ pub async fn list_results_for_committee_session(
 pub async fn previous_results_for_polling_station(
     conn: &mut SqliteConnection,
     polling_station_id: PollingStationId,
-) -> Result<PollingStationResults, sqlx::Error> {
+) -> Result<Results, sqlx::Error> {
     let polling_station = polling_station_repo::get(conn, polling_station_id).await?;
     let prev_data_entry_id = polling_station
         .prev_data_entry_id()
@@ -338,7 +341,7 @@ pub async fn previous_results_for_polling_station(
 
     let row = query!(
         r#"
-        SELECT json_extract(de.state, '$.state.results') AS "data: Json<PollingStationResults>"
+        SELECT json_extract(de.state, '$.state.results') AS "data: Json<Results>"
         FROM data_entries AS de
         WHERE de.id = $1 AND json_extract(de.state, '$.status') = 'Definitive'
         "#,
@@ -422,8 +425,8 @@ mod tests {
         valid_default::ValidDefault,
     };
 
-    fn create_test_results(proxy_certificate_count: u32) -> PollingStationResults {
-        PollingStationResults::CSOFirstSession(CSOFirstSessionResults {
+    fn create_test_results(proxy_certificate_count: u32) -> Results {
+        Results::CSOFirstSession(CSOFirstSessionResults {
             extra_investigation: ValidDefault::valid_default(),
             counting_differences_polling_station: ValidDefault::valid_default(),
             voters_counts: {
@@ -446,7 +449,10 @@ mod tests {
         use super::*;
         use crate::{
             domain::data_entry,
-            repository::{polling_station_repo::insert_test_polling_station, user_repo::UserId},
+            repository::{
+                polling_station_repo::{self, insert_test_polling_station},
+                user_repo::UserId,
+            },
             service::{create_definitive_data_entry, create_test_investigation},
         };
 
@@ -458,14 +464,14 @@ mod tests {
 
             create_definitive_data_entry(
                 &mut conn,
-                PollingStationId::from(1),
+                PollingStationId::from(211),
                 &create_test_results(10),
             )
             .await
             .unwrap();
             create_definitive_data_entry(
                 &mut conn,
-                PollingStationId::from(2),
+                PollingStationId::from(212),
                 &create_test_results(20),
             )
             .await
@@ -476,10 +482,10 @@ mod tests {
                 .unwrap();
             assert_eq!(results.len(), 2);
 
-            assert_eq!(results[0].0.id, PollingStationId::from(1));
+            assert_eq!(results[0].0.id, PollingStationId::from(211));
             assert_eq!(results[0].1.voters_counts().proxy_certificate_count, 10);
 
-            assert_eq!(results[1].0.id, PollingStationId::from(2));
+            assert_eq!(results[1].0.id, PollingStationId::from(212));
             assert_eq!(results[1].1.voters_counts().proxy_certificate_count, 20);
         }
 
@@ -491,7 +497,7 @@ mod tests {
 
             create_definitive_data_entry(
                 &mut conn,
-                PollingStationId::from(1),
+                PollingStationId::from(211),
                 &create_test_results(10),
             )
             .await
@@ -733,9 +739,23 @@ mod tests {
             .await
             .unwrap();
 
-            create_test_investigation(&mut conn, PollingStationId::from(733), Some(true))
+            // Can't use create_test_investigation because PS 733 is in session 703, not the latest.
+            // Manually create data entry, investigation, and definitive results.
+            let empty = create_empty(&mut conn).await.unwrap();
+            polling_station_repo::link_data_entry(&mut conn, PollingStationId::from(733), empty.id)
                 .await
                 .unwrap();
+            let inv_status =
+                crate::domain::investigation::InvestigationStatus::new("Test reason".to_string())
+                    .conclude_with_new_results("Test findings".to_string(), empty.id)
+                    .expect("conclude_with_new_results should succeed");
+            crate::repository::investigation_repo::insert_test_investigation(
+                &mut conn,
+                PollingStationId::from(733),
+                &inv_status,
+            )
+            .await
+            .unwrap();
 
             let state = DataEntryStatus::Definitive(data_entry::Definitive {
                 first_entry_user_id: UserId::from(5),
@@ -744,14 +764,10 @@ mod tests {
                 finalised_with_warnings: false,
                 results: create_test_results(10),
             });
-            update(&mut conn, PollingStationId::from(733), &state)
-                .await
-                .unwrap();
+            update(&mut conn, empty.id, &state).await.unwrap();
 
             // Add new polling station to fourth session, linked to the data entry from third session, but without investigation or results
-            let prev_data_entry = get_data_entry(&mut conn, PollingStationId::from(733))
-                .await
-                .unwrap();
+            let prev_data_entry = get(&mut conn, empty.id).await.unwrap();
             insert_test_polling_station(
                 &mut conn,
                 PollingStationId::from(743),
@@ -827,7 +843,7 @@ mod tests {
                 .unwrap();
         }
 
-        async fn insert_test_polling_station_results(
+        async fn insert_test_results(
             conn: &mut SqliteConnection,
             polling_station_id: PollingStationId,
         ) {
@@ -854,7 +870,7 @@ mod tests {
 
             create_definitive_data_entry(
                 &mut conn,
-                PollingStationId::from(1),
+                PollingStationId::from(211),
                 &create_test_results(10),
             )
             .await
@@ -874,14 +890,14 @@ mod tests {
 
             create_definitive_data_entry(
                 &mut conn,
-                PollingStationId::from(1),
+                PollingStationId::from(211),
                 &create_test_results(10),
             )
             .await
             .unwrap();
             create_definitive_data_entry(
                 &mut conn,
-                PollingStationId::from(2),
+                PollingStationId::from(212),
                 &create_test_results(10),
             )
             .await
@@ -1007,7 +1023,7 @@ mod tests {
 
             create_test_investigation(&mut conn, polling_station_id).await;
             conclude_test_investigation(&mut conn, polling_station_id, true).await;
-            insert_test_polling_station_results(&mut conn, polling_station_id).await;
+            insert_test_results(&mut conn, polling_station_id).await;
 
             assert!(
                 are_results_complete_for_committee_session(

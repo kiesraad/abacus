@@ -2,6 +2,8 @@ use serde::{Deserialize, Serialize};
 use sqlx::Type;
 use utoipa::ToSchema;
 
+use crate::domain::election::CommitteeCategory;
+
 #[derive(
     Serialize,
     Deserialize,
@@ -32,6 +34,8 @@ pub enum Role {
     TypistCSB,
 }
 
+pub struct RoleNotAuthorizedError;
+
 impl Role {
     pub(crate) fn is_administrator(&self) -> bool {
         matches!(self, Self::Administrator)
@@ -52,6 +56,19 @@ impl Role {
                 | (Self::CoordinatorCSB, Self::TypistCSB)
                 | (Self::CoordinatorGSB, Self::TypistGSB)
         )
+    }
+
+    pub fn is_authorized(
+        &self,
+        category: &CommitteeCategory,
+    ) -> Result<(), RoleNotAuthorizedError> {
+        (self.is_administrator()
+            || match category {
+                CommitteeCategory::GSB => matches!(self, Self::CoordinatorGSB | Self::TypistGSB),
+                CommitteeCategory::CSB => matches!(self, Self::CoordinatorCSB | Self::TypistCSB),
+            })
+        .then_some(())
+        .ok_or(RoleNotAuthorizedError)
     }
 }
 
@@ -121,6 +138,34 @@ mod tests {
 
             assert_eq!(manages.len(), 1);
             assert!(manages[0].is_typist());
+        }
+    }
+
+    #[test]
+    fn admin_is_authorized_for_all_categories() {
+        let categories = CommitteeCategory::VARIANTS
+            .iter()
+            .filter(|category| Role::Administrator.is_authorized(category).is_ok())
+            .collect::<Vec<_>>();
+        assert_eq!(categories.len(), CommitteeCategory::VARIANTS.len());
+    }
+
+    #[test]
+    fn non_admin_is_authorized_for_one_category() {
+        let roles = Role::VARIANTS
+            .iter()
+            .filter(|role| !role.is_administrator());
+        for role in roles {
+            let categories = CommitteeCategory::VARIANTS
+                .iter()
+                .filter(|category| role.is_authorized(category).is_ok())
+                .collect::<Vec<_>>();
+
+            assert_eq!(
+                categories.len(),
+                1,
+                "Role {role:?} should be authorized for one category"
+            );
         }
     }
 }

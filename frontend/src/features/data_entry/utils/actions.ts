@@ -1,12 +1,7 @@
 import type { ApiClient } from "@/api/ApiClient";
 import { type ApiResult, isSuccess } from "@/api/ApiResult";
 import { assertStateIsLoaded } from "@/features/data_entry/utils/utils";
-import type {
-  DataEntry,
-  DataEntryStatusResponse,
-  PollingStationResults,
-  SaveDataEntryResponse,
-} from "@/types/generated/openapi";
+import type { DataEntry, DataEntryStatusResponse, Results, SaveDataEntryResponse } from "@/types/generated/openapi";
 import type { DataEntryResults, FormSectionId, SectionValues } from "@/types/types";
 import { mapSectionValues } from "@/utils/dataEntryMapping";
 import { isRecord } from "@/utils/typeChecks";
@@ -20,7 +15,7 @@ import type {
 } from "../types/types";
 import { calculateDataEntryProgress, getClientState } from "./dataEntryUtils";
 
-function isPollingStationResults(value: DataEntryResults): value is PollingStationResults {
+function isResults(value: DataEntryResults): value is Results {
   if (!isRecord(value)) {
     return false;
   }
@@ -85,11 +80,11 @@ export function onSubmitForm(
       return false;
     }
 
-    if (!isPollingStationResults(state.pollingStationResults)) {
+    if (!isResults(state.results)) {
       return false;
     }
 
-    let data = mapSectionValues(state.pollingStationResults, currentValues, dataEntrySection);
+    let data = mapSectionValues(state.results, currentValues, dataEntrySection);
     if (aborting && state.cache) {
       const cache = state.cache;
       const cachedDataEntrySection = state.dataEntryStructure.find((s) => s.id === cache.key);

@@ -10,8 +10,7 @@ import {
 import { overrideOnce, server } from "@/testing/server";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 import { expectErrorPage, expectNotFound, setupTestRouter } from "@/testing/test-utils";
-import type { Role } from "@/types/generated/openapi";
-
+import type { DATA_ENTRY_CLAIM_REQUEST_PATH, ErrorResponse, Role } from "@/types/generated/openapi";
 import { routes } from "./routes";
 
 const renderWithRouter = (userRole: Role | null = null) => {
@@ -60,12 +59,17 @@ describe("routes", () => {
     await expectNotFound("Verkiezing niet gevonden");
   });
 
-  test("Non existing polling station id results in not found page", async () => {
+  test("EntryNotFound API response results in not found page", async () => {
+    overrideOnce("post", "/api/data_entries/9876/1/claim" satisfies DATA_ENTRY_CLAIM_REQUEST_PATH, 404, {
+      error: "Item not found",
+      fatal: true,
+      reference: "EntryNotFound",
+    } satisfies ErrorResponse);
     // Navigate to a non-existing page
     const router = renderWithRouter("typist_gsb");
     await router.navigate("/elections/1/data-entry/9876/1");
     expect(router.state.location.pathname).toEqual("/elections/1/data-entry/9876/1");
-    await expectNotFound("Stembureau niet gevonden");
+    await expectNotFound("Niet gevonden");
   });
 
   test("Non existing entry number results in not found page", async () => {

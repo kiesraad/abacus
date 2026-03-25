@@ -9,6 +9,63 @@ export type ACCOUNT_UPDATE_REQUEST_PARAMS = Record<string, never>;
 export type ACCOUNT_UPDATE_REQUEST_PATH = `/api/account`;
 export type ACCOUNT_UPDATE_REQUEST_BODY = AccountUpdateRequest;
 
+// /api/data_entries/{data_entry_id}
+export interface DATA_ENTRY_RESET_REQUEST_PARAMS {
+  data_entry_id: DataEntryId;
+}
+export type DATA_ENTRY_RESET_REQUEST_PATH = `/api/data_entries/${DataEntryId}`;
+
+// /api/data_entries/{data_entry_id}/get
+export interface DATA_ENTRY_GET_REQUEST_PARAMS {
+  data_entry_id: DataEntryId;
+}
+export type DATA_ENTRY_GET_REQUEST_PATH = `/api/data_entries/${DataEntryId}/get`;
+
+// /api/data_entries/{data_entry_id}/resolve_differences
+export interface DATA_ENTRY_GET_DIFFERENCES_REQUEST_PARAMS {
+  data_entry_id: DataEntryId;
+}
+export type DATA_ENTRY_GET_DIFFERENCES_REQUEST_PATH = `/api/data_entries/${DataEntryId}/resolve_differences`;
+export interface DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_PARAMS {
+  data_entry_id: DataEntryId;
+}
+export type DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_PATH = `/api/data_entries/${DataEntryId}/resolve_differences`;
+export type DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_BODY = ResolveDifferencesAction;
+
+// /api/data_entries/{data_entry_id}/resolve_errors
+export interface DATA_ENTRY_RESOLVE_ERRORS_REQUEST_PARAMS {
+  data_entry_id: DataEntryId;
+}
+export type DATA_ENTRY_RESOLVE_ERRORS_REQUEST_PATH = `/api/data_entries/${DataEntryId}/resolve_errors`;
+export type DATA_ENTRY_RESOLVE_ERRORS_REQUEST_BODY = ResolveErrorsAction;
+
+// /api/data_entries/{data_entry_id}/{entry_number}
+export interface DATA_ENTRY_SAVE_REQUEST_PARAMS {
+  data_entry_id: DataEntryId;
+  entry_number: number;
+}
+export type DATA_ENTRY_SAVE_REQUEST_PATH = `/api/data_entries/${DataEntryId}/${number}`;
+export type DATA_ENTRY_SAVE_REQUEST_BODY = DataEntry;
+export interface DATA_ENTRY_DISCARD_REQUEST_PARAMS {
+  data_entry_id: DataEntryId;
+  entry_number: number;
+}
+export type DATA_ENTRY_DISCARD_REQUEST_PATH = `/api/data_entries/${DataEntryId}/${number}`;
+
+// /api/data_entries/{data_entry_id}/{entry_number}/claim
+export interface DATA_ENTRY_CLAIM_REQUEST_PARAMS {
+  data_entry_id: DataEntryId;
+  entry_number: number;
+}
+export type DATA_ENTRY_CLAIM_REQUEST_PATH = `/api/data_entries/${DataEntryId}/${number}/claim`;
+
+// /api/data_entries/{data_entry_id}/{entry_number}/finalise
+export interface DATA_ENTRY_FINALISE_REQUEST_PARAMS {
+  data_entry_id: DataEntryId;
+  entry_number: number;
+}
+export type DATA_ENTRY_FINALISE_REQUEST_PATH = `/api/data_entries/${DataEntryId}/${number}/finalise`;
+
 // /api/elections
 export type ELECTION_LIST_REQUEST_PARAMS = Record<string, never>;
 export type ELECTION_LIST_REQUEST_PATH = `/api/elections`;
@@ -205,67 +262,6 @@ export type LOGIN_REQUEST_BODY = Credentials;
 // /api/logout
 export type LOGOUT_REQUEST_PARAMS = Record<string, never>;
 export type LOGOUT_REQUEST_PATH = `/api/logout`;
-
-// /api/polling_stations/{polling_station_id}/data_entries
-export interface DATA_ENTRY_RESET_REQUEST_PARAMS {
-  polling_station_id: PollingStationId;
-}
-export type DATA_ENTRY_RESET_REQUEST_PATH = `/api/polling_stations/${PollingStationId}/data_entries`;
-
-// /api/polling_stations/{polling_station_id}/data_entries/get
-export interface DATA_ENTRY_GET_REQUEST_PARAMS {
-  polling_station_id: PollingStationId;
-}
-export type DATA_ENTRY_GET_REQUEST_PATH = `/api/polling_stations/${PollingStationId}/data_entries/get`;
-
-// /api/polling_stations/{polling_station_id}/data_entries/resolve_differences
-export interface DATA_ENTRY_GET_DIFFERENCES_REQUEST_PARAMS {
-  polling_station_id: PollingStationId;
-}
-export type DATA_ENTRY_GET_DIFFERENCES_REQUEST_PATH =
-  `/api/polling_stations/${PollingStationId}/data_entries/resolve_differences`;
-export interface DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_PARAMS {
-  polling_station_id: PollingStationId;
-}
-export type DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_PATH =
-  `/api/polling_stations/${PollingStationId}/data_entries/resolve_differences`;
-export type DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_BODY = ResolveDifferencesAction;
-
-// /api/polling_stations/{polling_station_id}/data_entries/resolve_errors
-export interface DATA_ENTRY_RESOLVE_ERRORS_REQUEST_PARAMS {
-  polling_station_id: PollingStationId;
-}
-export type DATA_ENTRY_RESOLVE_ERRORS_REQUEST_PATH =
-  `/api/polling_stations/${PollingStationId}/data_entries/resolve_errors`;
-export type DATA_ENTRY_RESOLVE_ERRORS_REQUEST_BODY = ResolveErrorsAction;
-
-// /api/polling_stations/{polling_station_id}/data_entries/{entry_number}
-export interface DATA_ENTRY_SAVE_REQUEST_PARAMS {
-  polling_station_id: PollingStationId;
-  entry_number: number;
-}
-export type DATA_ENTRY_SAVE_REQUEST_PATH = `/api/polling_stations/${PollingStationId}/data_entries/${number}`;
-export type DATA_ENTRY_SAVE_REQUEST_BODY = DataEntry;
-export interface DATA_ENTRY_DISCARD_REQUEST_PARAMS {
-  polling_station_id: PollingStationId;
-  entry_number: number;
-}
-export type DATA_ENTRY_DISCARD_REQUEST_PATH = `/api/polling_stations/${PollingStationId}/data_entries/${number}`;
-
-// /api/polling_stations/{polling_station_id}/data_entries/{entry_number}/claim
-export interface DATA_ENTRY_CLAIM_REQUEST_PARAMS {
-  polling_station_id: PollingStationId;
-  entry_number: number;
-}
-export type DATA_ENTRY_CLAIM_REQUEST_PATH = `/api/polling_stations/${PollingStationId}/data_entries/${number}/claim`;
-
-// /api/polling_stations/{polling_station_id}/data_entries/{entry_number}/finalise
-export interface DATA_ENTRY_FINALISE_REQUEST_PARAMS {
-  polling_station_id: PollingStationId;
-  entry_number: number;
-}
-export type DATA_ENTRY_FINALISE_REQUEST_PATH =
-  `/api/polling_stations/${PollingStationId}/data_entries/${number}/finalise`;
 
 // /api/polling_stations/{polling_station_id}/investigation
 export interface POLLING_STATION_INVESTIGATION_UPDATE_REQUEST_PARAMS {
@@ -523,11 +519,11 @@ export interface ChosenCandidate {
 }
 
 /**
- * Response structure for getting data entry of polling station results
+ * Response structure for getting data entry results
  */
 export interface ClaimDataEntryResponse {
   client_state: unknown;
-  data: PollingStationResults;
+  data: Results;
   previous_results?: CommonPollingStationResults;
   source: DataEntrySource;
   status: DataEntryStatusName;
@@ -595,7 +591,7 @@ export interface CommonPollingStationResults {
 
 /**
  * Counting Differences Polling Station,
- * part of the polling station results ("B1-2 Verschillen met telresultaten van het stembureau")
+ * part of the results ("B1-2 Verschillen met telresultaten van het stembureau")
  */
 export interface CountingDifferencesPollingStation {
   /** Whether there was a difference between the total votes per list as determined by the polling station and by the typist
@@ -625,26 +621,28 @@ export interface Credentials {
 }
 
 /**
- * Request structure for saving data entry of polling station results
+ * Request structure for saving data entry
  */
 export interface DataEntry {
   /** Client state for the data entry (arbitrary JSON) */
   client_state: unknown;
   /** Data entry for a polling station */
-  data: PollingStationResults;
+  data: Results;
   /** Data entry progress between 0 and 100 */
   progress: number;
 }
 
 export interface DataEntryGetDifferencesResponse {
-  first_entry: PollingStationResults;
+  first_entry: Results;
   first_entry_user_id: UserId;
-  second_entry: PollingStationResults;
+  second_entry: Results;
   second_entry_user_id: UserId;
+  source: DataEntrySource;
 }
 
 export interface DataEntryGetResponse {
-  data: PollingStationResults;
+  data: Results;
+  source: DataEntrySource;
   status: DataEntryStatusName;
   user_id?: UserId;
   validation_results: ValidationResults;
@@ -687,7 +685,7 @@ export interface DifferenceCountsCompareVotesCastAdmittedVoters {
 }
 
 /**
- * Differences counts, part of the polling station results.
+ * Differences counts, part of the results.
  * (B1-3.3 "Verschillen tussen aantal kiezers en uitgebrachte stemmen")
  */
 export interface DifferencesCounts {
@@ -914,7 +912,7 @@ export interface ErrorResponse {
 }
 
 /**
- * Extra investigation, part of the polling station results ("B1-1 Alleen bij extra onderzoek")
+ * Extra investigation, part of the results ("B1-1 Alleen bij extra onderzoek")
  */
 export interface ExtraInvestigation {
   /** Whether ballots were (partially) recounted following the extra investigation
@@ -1176,17 +1174,6 @@ export interface PollingStationRequestListResponse {
   polling_stations: PollingStationRequest[];
 }
 
-/**
- * PollingStationResults contains the results for a polling station.
- *
- * The exact type of results depends on the election counting method and
- * whether this is the first or any subsequent data entry session. Based on
- * this, any of four different models can apply
- */
-export type PollingStationResults =
-  | (CSOFirstSessionResults & { model: "CSOFirstSession" })
-  | (CSONextSessionResults & { model: "CSONextSession" });
-
 export interface PollingStationSource {
   id: PollingStationId;
   name: string;
@@ -1228,11 +1215,21 @@ export type ResolveDifferencesAction = (typeof resolveDifferencesActionValues)[n
 export const resolveErrorsActionValues = ["discard_first_entry", "resume_first_entry"] as const;
 export type ResolveErrorsAction = (typeof resolveErrorsActionValues)[number];
 
+/**
+ * Results contains the results for a data entry
+ *
+ * The exact type of results depends on the election counting method,
+ * election committee category and whether this is the first or any subsequent data entry session.
+ */
+export type Results =
+  | (CSOFirstSessionResults & { model: "CSOFirstSession" })
+  | (CSONextSessionResults & { model: "CSONextSession" });
+
 export const roleValues = ["administrator", "coordinator_gsb", "coordinator_csb", "typist_gsb", "typist_csb"] as const;
 export type Role = (typeof roleValues)[number];
 
 /**
- * Response structure for saving data entry of polling station results
+ * Response structure for saving data entry
  */
 export interface SaveDataEntryResponse {
   validation_results: ValidationResults;
@@ -1362,7 +1359,7 @@ export const voteCountingMethodValues = ["CSO", "DSO"] as const;
 export type VoteCountingMethod = (typeof voteCountingMethodValues)[number];
 
 /**
- * Voters counts, part of the polling station results.
+ * Voters counts, part of the results.
  */
 export interface VotersCounts {
   /** Number of valid poll cards ("Aantal geldige stempassen") */
@@ -1374,7 +1371,7 @@ export interface VotersCounts {
 }
 
 /**
- * Votes counts, part of the polling station results.
+ * Votes counts, part of the results.
  * Following the fields in Model CSO Na 31-2 Bijlage 1.
  */
 export interface VotesCounts {

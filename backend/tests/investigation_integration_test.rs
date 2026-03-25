@@ -9,10 +9,10 @@ use test_log::test;
 
 use crate::{
     shared::{
-        FixtureUser, change_status_committee_session, complete_data_entry, create_investigation,
+        FixtureUser::*, change_status_committee_session, complete_data_entry, create_investigation,
         create_polling_station, create_result_with_non_example_data_entry, differences_counts_zero,
-        get_election_committee_session, get_election_details, get_statuses, login,
-        political_group_votes_from_test_data_auto, update_investigation,
+        get_data_entry_id, get_election_committee_session, get_election_details, get_statuses,
+        login, political_group_votes_from_test_data_auto, update_investigation,
     },
     utils::serve_api,
 };
@@ -25,7 +25,7 @@ async fn conclude_investigation(
     polling_station_id: u32,
     body: Option<serde_json::Value>,
 ) -> Response {
-    let coordinator_cookie = login(addr, FixtureUser::CoordinatorGSB).await;
+    let coordinator_cookie = login(addr, CoordinatorGSB).await;
     let body = body.unwrap_or(serde_json::json!({
         "findings": "Test findings",
         "corrected_results": false
@@ -44,7 +44,7 @@ async fn conclude_investigation(
 }
 
 async fn delete_investigation(addr: &SocketAddr, polling_station_id: u32) -> Response {
-    let coordinator_cookie = login(addr, FixtureUser::CoordinatorGSB).await;
+    let coordinator_cookie = login(addr, CoordinatorGSB).await;
     let url = format!("http://{addr}/api/polling_stations/{polling_station_id}/investigation");
     reqwest::Client::new()
         .delete(&url)
@@ -61,12 +61,8 @@ async fn test_create_conclude_update_delete(pool: SqlitePool) {
     let election_id = 7;
     let polling_station_id = 741;
 
-    let election_details = get_election_details(
-        &addr,
-        &login(&addr, FixtureUser::CoordinatorGSB).await,
-        election_id,
-    )
-    .await;
+    let election_details =
+        get_election_details(&addr, &login(&addr, CoordinatorGSB).await, election_id).await;
     assert_eq!(
         election_details["investigations"].as_array().unwrap().len(),
         0
@@ -79,12 +75,8 @@ async fn test_create_conclude_update_delete(pool: SqlitePool) {
         StatusCode::CREATED
     );
 
-    let election_details = get_election_details(
-        &addr,
-        &login(&addr, FixtureUser::CoordinatorGSB).await,
-        election_id,
-    )
-    .await;
+    let election_details =
+        get_election_details(&addr, &login(&addr, CoordinatorGSB).await, election_id).await;
     let investigations = election_details["investigations"].as_array().unwrap();
     assert_eq!(investigations.len(), 1);
     assert_eq!(investigations[0]["polling_station_id"], polling_station_id);
@@ -98,12 +90,8 @@ async fn test_create_conclude_update_delete(pool: SqlitePool) {
         StatusCode::OK
     );
 
-    let election_details = get_election_details(
-        &addr,
-        &login(&addr, FixtureUser::CoordinatorGSB).await,
-        election_id,
-    )
-    .await;
+    let election_details =
+        get_election_details(&addr, &login(&addr, CoordinatorGSB).await, election_id).await;
     let investigations = election_details["investigations"].as_array().unwrap();
     assert_eq!(investigations.len(), 1);
     assert_eq!(investigations[0]["polling_station_id"], polling_station_id);
@@ -118,12 +106,8 @@ async fn test_create_conclude_update_delete(pool: SqlitePool) {
         StatusCode::OK
     );
 
-    let election_details = get_election_details(
-        &addr,
-        &login(&addr, FixtureUser::CoordinatorGSB).await,
-        election_id,
-    )
-    .await;
+    let election_details =
+        get_election_details(&addr, &login(&addr, CoordinatorGSB).await, election_id).await;
     let investigations = election_details["investigations"].as_array().unwrap();
     assert_eq!(investigations.len(), 1);
     assert_eq!(investigations[0]["polling_station_id"], polling_station_id);
@@ -137,12 +121,8 @@ async fn test_create_conclude_update_delete(pool: SqlitePool) {
             .status(),
         StatusCode::NO_CONTENT
     );
-    let election_details = get_election_details(
-        &addr,
-        &login(&addr, FixtureUser::CoordinatorGSB).await,
-        election_id,
-    )
-    .await;
+    let election_details =
+        get_election_details(&addr, &login(&addr, CoordinatorGSB).await, election_id).await;
     assert_eq!(
         election_details["investigations"].as_array().unwrap().len(),
         0
@@ -154,12 +134,9 @@ async fn test_deletion_setting_committee_session_back_to_created_status(pool: Sq
     let addr = serve_api(pool).await;
     let election_id = 7;
 
-    let committee_session = get_election_committee_session(
-        &addr,
-        &login(&addr, FixtureUser::CoordinatorGSB).await,
-        election_id,
-    )
-    .await;
+    let committee_session =
+        get_election_committee_session(&addr, &login(&addr, CoordinatorGSB).await, election_id)
+            .await;
     assert_eq!(committee_session["status"], "created");
 
     // Create 2 investigations
@@ -178,12 +155,9 @@ async fn test_deletion_setting_committee_session_back_to_created_status(pool: Sq
         StatusCode::NO_CONTENT
     );
 
-    let committee_session = get_election_committee_session(
-        &addr,
-        &login(&addr, FixtureUser::CoordinatorGSB).await,
-        election_id,
-    )
-    .await;
+    let committee_session =
+        get_election_committee_session(&addr, &login(&addr, CoordinatorGSB).await, election_id)
+            .await;
     assert_eq!(committee_session["status"], "in_preparation");
 
     // Delete last investigation
@@ -192,12 +166,9 @@ async fn test_deletion_setting_committee_session_back_to_created_status(pool: Sq
         StatusCode::NO_CONTENT
     );
 
-    let committee_session = get_election_committee_session(
-        &addr,
-        &login(&addr, FixtureUser::CoordinatorGSB).await,
-        election_id,
-    )
-    .await;
+    let committee_session =
+        get_election_committee_session(&addr, &login(&addr, CoordinatorGSB).await, election_id)
+            .await;
     assert_eq!(committee_session["status"], "created");
 }
 
@@ -205,14 +176,9 @@ async fn test_deletion_setting_committee_session_back_to_created_status(pool: Sq
 async fn test_deletion_removes_polling_station_from_status(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let election_id = 5;
-    let polling_station_id = 11;
+    let polling_station_id = 5211;
 
-    let statuses = get_statuses(
-        &addr,
-        &login(&addr, FixtureUser::CoordinatorGSB).await,
-        election_id,
-    )
-    .await;
+    let statuses = get_statuses(&addr, &login(&addr, CoordinatorGSB).await, election_id).await;
     assert_eq!(statuses.len(), 1);
     assert_eq!(statuses[&polling_station_id]["status"], "definitive");
 
@@ -223,12 +189,7 @@ async fn test_deletion_removes_polling_station_from_status(pool: SqlitePool) {
         StatusCode::NO_CONTENT
     );
 
-    let statuses = get_statuses(
-        &addr,
-        &login(&addr, FixtureUser::CoordinatorGSB).await,
-        election_id,
-    )
-    .await;
+    let statuses = get_statuses(&addr, &login(&addr, CoordinatorGSB).await, election_id).await;
     assert_eq!(statuses.len(), 0);
 }
 
@@ -245,12 +206,8 @@ async fn test_partials_update(pool: SqlitePool) {
         StatusCode::CREATED
     );
 
-    let election_details = get_election_details(
-        &addr,
-        &login(&addr, FixtureUser::CoordinatorGSB).await,
-        election_id,
-    )
-    .await;
+    let election_details =
+        get_election_details(&addr, &login(&addr, CoordinatorGSB).await, election_id).await;
     let investigations = election_details["investigations"].as_array().unwrap();
     assert_eq!(investigations.len(), 1);
     assert_eq!(investigations[0]["polling_station_id"], polling_station_id);
@@ -269,12 +226,8 @@ async fn test_partials_update(pool: SqlitePool) {
 
     assert_eq!(updated.status(), StatusCode::OK);
 
-    let election_details = get_election_details(
-        &addr,
-        &login(&addr, FixtureUser::CoordinatorGSB).await,
-        election_id,
-    )
-    .await;
+    let election_details =
+        get_election_details(&addr, &login(&addr, CoordinatorGSB).await, election_id).await;
     let investigations = election_details["investigations"].as_array().unwrap();
     assert_eq!(investigations.len(), 1);
     assert_eq!(investigations[0]["polling_station_id"], polling_station_id);
@@ -306,12 +259,8 @@ async fn test_partials_update(pool: SqlitePool) {
     .await;
     assert_eq!(updated.status(), StatusCode::OK);
 
-    let election_details = get_election_details(
-        &addr,
-        &login(&addr, FixtureUser::CoordinatorGSB).await,
-        election_id,
-    )
-    .await;
+    let election_details =
+        get_election_details(&addr, &login(&addr, CoordinatorGSB).await, election_id).await;
     let investigations = election_details["investigations"].as_array().unwrap();
     assert_eq!(investigations.len(), 1);
     assert_eq!(investigations[0]["polling_station_id"], polling_station_id);
@@ -333,12 +282,8 @@ async fn test_partials_update(pool: SqlitePool) {
 
     assert_eq!(updated.status(), StatusCode::OK);
 
-    let election_details = get_election_details(
-        &addr,
-        &login(&addr, FixtureUser::CoordinatorGSB).await,
-        election_id,
-    )
-    .await;
+    let election_details =
+        get_election_details(&addr, &login(&addr, CoordinatorGSB).await, election_id).await;
     let investigations = election_details["investigations"].as_array().unwrap();
     assert_eq!(investigations.len(), 1);
     assert_eq!(investigations[0]["polling_station_id"], polling_station_id);
@@ -410,12 +355,7 @@ async fn test_update_with_result(pool: SqlitePool) {
     )
     .await;
 
-    let statuses = get_statuses(
-        &addr,
-        &login(&addr, FixtureUser::CoordinatorGSB).await,
-        election_id,
-    )
-    .await;
+    let statuses = get_statuses(&addr, &login(&addr, CoordinatorGSB).await, election_id).await;
     assert_eq!(statuses[&polling_station_id]["status"], "definitive");
 
     // Try to update investigation corrected_results to false
@@ -431,12 +371,7 @@ async fn test_update_with_result(pool: SqlitePool) {
     assert_eq!(body["reference"], "InvestigationHasDataEntryOrResult");
 
     // Data entry result is still there
-    let statuses = get_statuses(
-        &addr,
-        &login(&addr, FixtureUser::CoordinatorGSB).await,
-        election_id,
-    )
-    .await;
+    let statuses = get_statuses(&addr, &login(&addr, CoordinatorGSB).await, election_id).await;
     assert_eq!(statuses[&polling_station_id]["status"], "definitive");
 
     // Accept deletion
@@ -445,12 +380,7 @@ async fn test_update_with_result(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::OK);
 
     // Data entry result is deleted
-    let statuses = get_statuses(
-        &addr,
-        &login(&addr, FixtureUser::CoordinatorGSB).await,
-        election_id,
-    )
-    .await;
+    let statuses = get_statuses(&addr, &login(&addr, CoordinatorGSB).await, election_id).await;
     assert_eq!(statuses.len(), 0);
 }
 
@@ -473,22 +403,19 @@ async fn test_update_with_data_entry(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::OK);
 
     // First data entry
-    let typist_cookie = login(&addr, FixtureUser::TypistGSB).await;
+    let typist_cookie = login(&addr, TypistGSB).await;
+    let data_entry_id =
+        get_data_entry_id(&addr, &typist_cookie, election_id, polling_station_id).await;
     complete_data_entry(
         &addr,
         &typist_cookie,
-        polling_station_id,
+        data_entry_id,
         1,
         second_session_data_entry_two_political_groups(),
     )
     .await;
 
-    let statuses = get_statuses(
-        &addr,
-        &login(&addr, FixtureUser::CoordinatorGSB).await,
-        election_id,
-    )
-    .await;
+    let statuses = get_statuses(&addr, &login(&addr, CoordinatorGSB).await, election_id).await;
     assert_eq!(
         statuses[&polling_station_id]["status"],
         "first_entry_finalised"
@@ -507,12 +434,7 @@ async fn test_update_with_data_entry(pool: SqlitePool) {
     assert_eq!(body["reference"], "InvestigationHasDataEntryOrResult");
 
     // Data entry is still there
-    let statuses = get_statuses(
-        &addr,
-        &login(&addr, FixtureUser::CoordinatorGSB).await,
-        election_id,
-    )
-    .await;
+    let statuses = get_statuses(&addr, &login(&addr, CoordinatorGSB).await, election_id).await;
     assert_eq!(
         statuses[&polling_station_id]["status"],
         "first_entry_finalised"
@@ -524,12 +446,7 @@ async fn test_update_with_data_entry(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::OK);
 
     // Data entry is deleted
-    let statuses = get_statuses(
-        &addr,
-        &login(&addr, FixtureUser::CoordinatorGSB).await,
-        election_id,
-    )
-    .await;
+    let statuses = get_statuses(&addr, &login(&addr, CoordinatorGSB).await, election_id).await;
     assert_eq!(statuses.len(), 0);
 }
 
@@ -543,12 +460,9 @@ async fn test_creation_for_committee_session_with_created_status(pool: SqlitePoo
         StatusCode::CREATED
     );
 
-    let committee_session = get_election_committee_session(
-        &addr,
-        &login(&addr, FixtureUser::CoordinatorGSB).await,
-        election_id,
-    )
-    .await;
+    let committee_session =
+        get_election_committee_session(&addr, &login(&addr, CoordinatorGSB).await, election_id)
+            .await;
     assert_eq!(committee_session["status"], "in_preparation");
 }
 
@@ -643,12 +557,7 @@ async fn test_conclude_creates_data_entry_when_corrected_results_true(pool: Sqli
     );
 
     // Verify PS 741 is now in statuses with status "empty"
-    let statuses = get_statuses(
-        &addr,
-        &login(&addr, FixtureUser::CoordinatorGSB).await,
-        election_id,
-    )
-    .await;
+    let statuses = get_statuses(&addr, &login(&addr, CoordinatorGSB).await, election_id).await;
     assert_eq!(statuses[&polling_station_id]["status"], "empty");
 }
 
@@ -678,12 +587,7 @@ async fn test_conclude_does_not_create_data_entry_when_corrected_results_false(p
     );
 
     // Verify PS 741 is not in statuses (no data entry created)
-    let statuses = get_statuses(
-        &addr,
-        &login(&addr, FixtureUser::CoordinatorGSB).await,
-        election_id,
-    )
-    .await;
+    let statuses = get_statuses(&addr, &login(&addr, CoordinatorGSB).await, election_id).await;
     assert!(!statuses.contains_key(&polling_station_id));
 }
 
@@ -712,12 +616,7 @@ async fn test_update_creates_data_entry_when_corrected_results_changed_to_true(p
     );
 
     // Verify no data entry exists
-    let statuses = get_statuses(
-        &addr,
-        &login(&addr, FixtureUser::CoordinatorGSB).await,
-        election_id,
-    )
-    .await;
+    let statuses = get_statuses(&addr, &login(&addr, CoordinatorGSB).await, election_id).await;
     assert!(!statuses.contains_key(&polling_station_id));
 
     // Update corrected_results to true
@@ -733,12 +632,7 @@ async fn test_update_creates_data_entry_when_corrected_results_changed_to_true(p
     );
 
     // Verify data entry was created
-    let statuses = get_statuses(
-        &addr,
-        &login(&addr, FixtureUser::CoordinatorGSB).await,
-        election_id,
-    )
-    .await;
+    let statuses = get_statuses(&addr, &login(&addr, CoordinatorGSB).await, election_id).await;
     assert_eq!(statuses[&polling_station_id]["status"], "empty");
 }
 
@@ -767,12 +661,7 @@ async fn test_update_deletes_data_entry_when_corrected_results_changed_to_false(
     );
 
     // Verify data entry exists
-    let statuses = get_statuses(
-        &addr,
-        &login(&addr, FixtureUser::CoordinatorGSB).await,
-        election_id,
-    )
-    .await;
+    let statuses = get_statuses(&addr, &login(&addr, CoordinatorGSB).await, election_id).await;
     assert_eq!(statuses[&polling_station_id]["status"], "empty");
 
     // Update corrected_results to false without accepting deletion — should fail
@@ -787,12 +676,7 @@ async fn test_update_deletes_data_entry_when_corrected_results_changed_to_false(
     assert_eq!(body["reference"], "InvestigationHasDataEntryOrResult");
 
     // Data entry still exists
-    let statuses = get_statuses(
-        &addr,
-        &login(&addr, FixtureUser::CoordinatorGSB).await,
-        election_id,
-    )
-    .await;
+    let statuses = get_statuses(&addr, &login(&addr, CoordinatorGSB).await, election_id).await;
     assert_eq!(statuses[&polling_station_id]["status"], "empty");
 
     // Update corrected_results to false with accepted deletion
@@ -808,19 +692,14 @@ async fn test_update_deletes_data_entry_when_corrected_results_changed_to_false(
     );
 
     // Verify data entry was deleted
-    let statuses = get_statuses(
-        &addr,
-        &login(&addr, FixtureUser::CoordinatorGSB).await,
-        election_id,
-    )
-    .await;
+    let statuses = get_statuses(&addr, &login(&addr, CoordinatorGSB).await, election_id).await;
     assert!(!statuses.contains_key(&polling_station_id));
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
 async fn test_can_conclude_update_new_polling_station_corrected_results_true(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let coordinator_cookie = login(&addr, FixtureUser::CoordinatorGSB).await;
+    let coordinator_cookie = login(&addr, CoordinatorGSB).await;
     let ps_response = create_polling_station(&addr, &coordinator_cookie, 7, 123).await;
     let ps_body: serde_json::Value = ps_response.json().await.unwrap();
     let new_ps_id = u32::try_from(ps_body["id"].as_u64().unwrap()).unwrap();
@@ -853,7 +732,7 @@ async fn test_can_conclude_update_new_polling_station_corrected_results_true(poo
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
 async fn test_cannot_conclude_update_new_polling_station_corrected_results_false(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let coordinator_cookie = login(&addr, FixtureUser::CoordinatorGSB).await;
+    let coordinator_cookie = login(&addr, CoordinatorGSB).await;
     let ps_response = create_polling_station(&addr, &coordinator_cookie, 7, 123).await;
     let ps_body: serde_json::Value = ps_response.json().await.unwrap();
     let new_ps_id = u32::try_from(ps_body["id"].as_u64().unwrap()).unwrap();
@@ -898,8 +777,8 @@ async fn test_cannot_conclude_update_new_polling_station_corrected_results_false
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
 async fn test_polling_station_corrigendum_download_with_previous_results(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    // Polling station 9 has previous results, but no investigation yet
-    let polling_station_id = 9;
+    // Polling station 529 has previous results, but no investigation yet
+    let polling_station_id = 529;
 
     assert_eq!(
         create_investigation(&addr, polling_station_id)
@@ -913,7 +792,7 @@ async fn test_polling_station_corrigendum_download_with_previous_results(pool: S
     );
     let response = reqwest::Client::new()
         .get(&url)
-        .header("cookie", login(&addr, FixtureUser::CoordinatorGSB).await)
+        .header("cookie", login(&addr, CoordinatorGSB).await)
         .send()
         .await
         .unwrap();
@@ -937,9 +816,9 @@ async fn test_polling_station_corrigendum_download_with_previous_results(pool: S
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
 async fn test_polling_station_corrigendum_download_without_previous_results(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let coordinator_cookie = login(&addr, FixtureUser::CoordinatorGSB).await;
-    // Polling station 11 is new and has no previous results. An investigation already exists.
-    let polling_station_id = 11;
+    let coordinator_cookie = login(&addr, CoordinatorGSB).await;
+    // Polling station 5211 is new and has no previous results. An investigation already exists.
+    let polling_station_id = 5211;
 
     let url = format!(
         "http://{addr}/api/polling_stations/{polling_station_id}/investigation/download_corrigendum_pdf"
@@ -981,14 +860,14 @@ async fn check_completed_to_data_entry_on<F, Fut>(
 
     if pre_create {
         assert_eq!(
-            create_investigation(addr, 9).await.status(),
+            create_investigation(addr, 529).await.status(),
             StatusCode::CREATED
         );
 
         assert_eq!(
             conclude_investigation(
                 addr,
-                9,
+                529,
                 Some(serde_json::json!({"findings": "Test findings", "corrected_results": false})),
             )
             .await
@@ -997,7 +876,7 @@ async fn check_completed_to_data_entry_on<F, Fut>(
         );
     }
 
-    let coordinator_cookie = login(addr, FixtureUser::CoordinatorGSB).await;
+    let coordinator_cookie = login(addr, CoordinatorGSB).await;
     change_status_committee_session(
         addr,
         &coordinator_cookie,
@@ -1013,7 +892,7 @@ async fn check_completed_to_data_entry_on<F, Fut>(
     let status = action().await.status();
     assert_eq!(status, expected_status, "Unexpected response status");
 
-    let coordinator_cookie = login(addr, FixtureUser::CoordinatorGSB).await;
+    let coordinator_cookie = login(addr, CoordinatorGSB).await;
     let committee_session =
         get_election_committee_session(addr, &coordinator_cookie, election_id).await;
     assert_eq!(committee_session["status"], "data_entry");
@@ -1025,7 +904,7 @@ async fn test_completed_to_data_entry_on_create(pool: SqlitePool) {
     check_completed_to_data_entry_on(
         &addr,
         false,
-        || create_investigation(&addr, 9),
+        || create_investigation(&addr, 529),
         StatusCode::CREATED,
     )
     .await;
@@ -1037,7 +916,7 @@ async fn test_completed_to_data_entry_on_update(pool: SqlitePool) {
     check_completed_to_data_entry_on(
         &addr,
         true,
-        || update_investigation(&addr, 9, None),
+        || update_investigation(&addr, 529, None),
         StatusCode::OK,
     )
     .await;
@@ -1049,7 +928,7 @@ async fn test_completed_to_data_entry_on_delete_non_last(pool: SqlitePool) {
     check_completed_to_data_entry_on(
         &addr,
         true,
-        || delete_investigation(&addr, 9),
+        || delete_investigation(&addr, 529),
         StatusCode::NO_CONTENT,
     )
     .await;
@@ -1077,7 +956,7 @@ async fn test_completed_to_created_on_delete_last(pool: SqlitePool) {
         StatusCode::OK
     );
 
-    let coordinator_cookie = login(&addr, FixtureUser::CoordinatorGSB).await;
+    let coordinator_cookie = login(&addr, CoordinatorGSB).await;
     change_status_committee_session(
         &addr,
         &coordinator_cookie,
@@ -1093,7 +972,7 @@ async fn test_completed_to_created_on_delete_last(pool: SqlitePool) {
     let status = delete_investigation(&addr, 741).await.status();
     assert_eq!(status, StatusCode::NO_CONTENT);
 
-    let coordinator_cookie = login(&addr, FixtureUser::CoordinatorGSB).await;
+    let coordinator_cookie = login(&addr, CoordinatorGSB).await;
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
     assert_eq!(committee_session["status"], "created");

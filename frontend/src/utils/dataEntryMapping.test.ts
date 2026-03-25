@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { emptyPollingStationResults } from "@/testing/api-mocks/DataEntryMockData";
+import { emptyResults } from "@/testing/api-mocks/DataEntryMockData";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import type { DataEntrySection } from "@/types/types";
 import {
@@ -118,7 +118,7 @@ describe("mapSectionValues", () => {
   });
 
   test("should handle numbers correctly when section info is provided", () => {
-    const current = emptyPollingStationResults();
+    const current = emptyResults();
     const formValues = {
       "voters_counts.poll_card_count": "1234", // Number for inputGrid
       "voters_counts.proxy_certificate_count": "2567", // Another number for inputGrid
@@ -147,7 +147,7 @@ describe("mapSectionValues", () => {
   });
 
   test("should handle voters_counts fields", () => {
-    const current = emptyPollingStationResults();
+    const current = emptyResults();
     const formValues = {
       "voters_counts.poll_card_count": "123",
       "voters_counts.proxy_certificate_count": "45",
@@ -179,7 +179,7 @@ describe("mapSectionValues", () => {
   });
 
   test("should handle votes_counts fields", () => {
-    const current = emptyPollingStationResults();
+    const current = emptyResults();
     const formValues = {
       "votes_counts.total_votes_candidates_count": "200",
       "votes_counts.blank_votes_count": "5",
@@ -214,7 +214,7 @@ describe("mapSectionValues", () => {
   });
 
   test("should handle differences_counts fields", () => {
-    const current = emptyPollingStationResults();
+    const current = emptyResults();
     const formValues = {
       "differences_counts.more_ballots_count": "2",
       "differences_counts.fewer_ballots_count": "1",
@@ -286,7 +286,7 @@ describe("mapSectionValues", () => {
   });
 
   test("should handle political_group_votes candidate votes", () => {
-    const current = emptyPollingStationResults();
+    const current = emptyResults();
     const formValues = {
       "political_group_votes.0.candidate_votes.0.votes": "25",
       "political_group_votes.0.candidate_votes.1.votes": "15",
@@ -328,7 +328,7 @@ describe("mapSectionValues", () => {
   });
 
   test("should handle numbers", () => {
-    const current = emptyPollingStationResults();
+    const current = emptyResults();
     const formValues = {
       "voters_counts.poll_card_count": "1234",
       "votes_counts.total_votes_candidates_count": "2567",
@@ -360,7 +360,7 @@ describe("mapSectionValues", () => {
   });
 
   test("should handle empty values as 0", () => {
-    const current = emptyPollingStationResults();
+    const current = emptyResults();
     const formValues = {
       "voters_counts.poll_card_count": "",
       "votes_counts.blank_votes_count": "",
@@ -430,7 +430,7 @@ describe("mapResultsToSectionValues", () => {
   });
 
   test("should extract voters_votes_counts section fields", () => {
-    const results = emptyPollingStationResults();
+    const results = emptyResults();
     results.voters_counts = {
       poll_card_count: 123,
       proxy_certificate_count: 45,
@@ -465,7 +465,7 @@ describe("mapResultsToSectionValues", () => {
   });
 
   test("should extract differences_counts section fields", () => {
-    const results = emptyPollingStationResults();
+    const results = emptyResults();
     results.differences_counts = {
       more_ballots_count: 2,
       fewer_ballots_count: 1,
@@ -498,7 +498,7 @@ describe("mapResultsToSectionValues", () => {
   });
 
   test("should extract political group section fields", () => {
-    const results = emptyPollingStationResults();
+    const results = emptyResults();
     results.political_group_votes = [
       {
         number: 1,
@@ -543,7 +543,7 @@ describe("mapResultsToSectionValues", () => {
   });
 
   test("should handle missing political group data", () => {
-    const results = emptyPollingStationResults();
+    const results = emptyResults();
 
     const politicalGroupSection: DataEntrySection = {
       id: "political_group_votes_1",
@@ -570,7 +570,7 @@ describe("mapResultsToSectionValues", () => {
   });
 
   test("should handle sparse political group arrays", () => {
-    const results = emptyPollingStationResults();
+    const results = emptyResults();
     results.political_group_votes = [];
     results.political_group_votes[2] = {
       number: 3,
@@ -602,7 +602,7 @@ describe("mapResultsToSectionValues", () => {
   });
 
   test("should handle zero values", () => {
-    const results = emptyPollingStationResults();
+    const results = emptyResults();
 
     const section = createVotersAndVotesSection("CSOFirstSession", electionMockData);
     const formValues = mapResultsToSectionValues(section, results);
@@ -611,7 +611,7 @@ describe("mapResultsToSectionValues", () => {
   });
 
   test("should handle section with empty subsections", () => {
-    const results = emptyPollingStationResults();
+    const results = emptyResults();
     const emptySubsectionsSection: DataEntrySection = {
       id: "voters_votes_counts",
       title: "Test Section",
@@ -625,7 +625,7 @@ describe("mapResultsToSectionValues", () => {
   });
 
   test("should handle section with only message and heading components", () => {
-    const results = emptyPollingStationResults();
+    const results = emptyResults();
     const messageSection: DataEntrySection = {
       id: "voters_votes_counts",
       title: "Test Section",
@@ -793,7 +793,7 @@ describe("getValueAtPath", () => {
 });
 
 describe("setValueAtPath", () => {
-  const data = emptyPollingStationResults();
+  const data = emptyResults();
 
   test.each([
     {

@@ -19,10 +19,10 @@ import { InvestigationOverviewPgObj } from "e2e-tests/page-objects/investigation
 import { InvestigationPrintCorrigendumPgObj } from "e2e-tests/page-objects/investigations/InvestigationPrintCorrigendumPgObj";
 import { InvestigationReasonPgObj } from "e2e-tests/page-objects/investigations/InvestigationReasonPgObj";
 import { UserInfoTopBar } from "e2e-tests/page-objects/nav_bar/UserInfoTopBarPgObj";
-import type { PollingStationResults } from "@/types/generated/openapi";
+import type { Results } from "@/types/generated/openapi";
 import { eml110a, eml110b, eml230b } from "../test-data/eml-files";
 
-export async function fillDataEntryPages(page: Page, results: PollingStationResults) {
+export async function fillDataEntryPages(page: Page, results: Results) {
   if (results.model === "CSOFirstSession") {
     const extraInvestigationPage = new ExtraInvestigationPage(page);
     await extraInvestigationPage.fillAndClickNext(results.extra_investigation);
@@ -46,7 +46,7 @@ export async function fillDataEntryPages(page: Page, results: PollingStationResu
   return checkAndSavePage;
 }
 
-export async function fillCandidatesListPages(page: Page, results: PollingStationResults) {
+export async function fillCandidatesListPages(page: Page, results: Results) {
   const candidateListNames: string[] = await new ProgressList(page).allListNames();
 
   // make sure the form has the same number of political groups as the input data
@@ -65,7 +65,7 @@ export async function fillCandidatesListPages(page: Page, results: PollingStatio
   }
 }
 
-export async function fillDataEntryPagesAndSave(page: Page, results: PollingStationResults) {
+export async function fillDataEntryPagesAndSave(page: Page, results: Results) {
   await fillDataEntryPages(page, results);
 
   const checkAndSavePage = new CheckAndSavePage(page);

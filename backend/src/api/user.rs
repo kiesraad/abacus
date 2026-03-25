@@ -58,14 +58,14 @@ async fn user_list(
 ) -> Result<Json<UserListResponse>, APIError> {
     let mut conn = pool.acquire().await?;
 
-    let only_allow_role = match user.role() {
+    let role_filter = match user.role() {
         Role::CoordinatorCSB => Some(Role::TypistCSB),
         Role::CoordinatorGSB => Some(Role::TypistGSB),
         _ => None,
     };
 
     Ok(Json(UserListResponse {
-        users: user_repo::list(&mut conn, only_allow_role).await?,
+        users: user_repo::list(&mut conn, role_filter).await?,
     }))
 }
 

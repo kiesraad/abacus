@@ -1,7 +1,7 @@
 import { useContext, useState } from "react";
 import { useNavigate } from "react-router";
 
-import { type AnyApiError, isSuccess, NotFoundError } from "@/api/ApiResult";
+import { type AnyApiError, isSuccess } from "@/api/ApiResult";
 import { useApiClient } from "@/api/useApiClient";
 import { useInitialApiGet } from "@/api/useInitialApiGet";
 import { ElectionStatusProviderContext } from "@/hooks/election/ElectionStatusProviderContext";
@@ -13,14 +13,12 @@ import type {
   DATA_ENTRY_RESOLVE_ERRORS_REQUEST_PATH,
   DataEntryGetResponse,
   ElectionWithPoliticalGroups,
-  PollingStation,
   ResolveErrorsAction,
 } from "@/types/generated/openapi";
 
 interface DataEntryErrors {
   action: ResolveErrorsAction | undefined;
   setAction: (action: ResolveErrorsAction | undefined) => void;
-  pollingStation: PollingStation;
   election: ElectionWithPoliticalGroups;
   loading: boolean;
   dataEntry: DataEntryGetResponse | null;
@@ -28,24 +26,18 @@ interface DataEntryErrors {
   validationError: string | undefined;
 }
 
-export function usePollingStationDataEntryErrors(pollingStationId: number): DataEntryErrors {
+export function usePollingStationDataEntryErrors(dataEntryId: number): DataEntryErrors {
   const navigate = useNavigate();
   const client = useApiClient();
-  const { election, pollingStations } = useElection();
-  const pollingStation = pollingStations.find((ps) => ps.id === pollingStationId);
+  const { election } = useElection();
   const [action, setAction] = useState<ResolveErrorsAction>();
   const electionContext = useContext(ElectionStatusProviderContext);
   const [error, setError] = useState<AnyApiError | null>(null);
   const [validationError, setValidationError] = useState<string>();
 
   // fetch the data entry with errors and warnings
-  const path: DATA_ENTRY_GET_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/data_entries/get`;
+  const path: DATA_ENTRY_GET_REQUEST_PATH = `/api/data_entries/${dataEntryId}/get`;
   const { requestState } = useInitialApiGet<DataEntryGetResponse>(path);
-
-  // 404 error if polling station is not found
-  if (!pollingStation) {
-    throw new NotFoundError("error.polling_station_not_found");
-  }
 
   // propagate error that occurred during a save request
   if (error) {
@@ -69,7 +61,7 @@ export function usePollingStationDataEntryErrors(pollingStationId: number): Data
       setValidationError(undefined);
     }
 
-    const path: DATA_ENTRY_RESOLVE_ERRORS_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/data_entries/resolve_errors`;
+    const path: DATA_ENTRY_RESOLVE_ERRORS_REQUEST_PATH = `/api/data_entries/${dataEntryId}/resolve_errors`;
     const body: DATA_ENTRY_RESOLVE_ERRORS_REQUEST_BODY = action;
     const response = await client.postRequest(path, body);
 
@@ -85,7 +77,6 @@ export function usePollingStationDataEntryErrors(pollingStationId: number): Data
   return {
     action,
     setAction,
-    pollingStation,
     election,
     loading: requestState.status === "loading",
     dataEntry: requestState.status === "success" ? requestState.data : null,

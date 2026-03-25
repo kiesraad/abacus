@@ -813,4 +813,4 @@ INSERT INTO data_entries (id, state, updated_at)
 VALUES (801, '{"status":"Empty"}', '2024-12-05 09:15:00');
 
 INSERT INTO sub_committees (id, committee_session_id, data_entry_id, name, number, category)
-VALUES (801, 801, 801, 'Juinen', 1, 'GSB');
+VALUES (811, 801, 801, 'Juinen', 1, 'GSB');

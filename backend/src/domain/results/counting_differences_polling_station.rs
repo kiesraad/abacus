@@ -6,12 +6,11 @@ use crate::domain::{
     compare::Compare,
     election::ElectionWithPoliticalGroups,
     field_path::FieldPath,
-    polling_station::PollingStation,
     validate::{DataError, Validate, ValidationResult, ValidationResultCode, ValidationResults},
 };
 
 /// Counting Differences Polling Station,
-/// part of the polling station results ("B1-2 Verschillen met telresultaten van het stembureau")
+/// part of the results ("B1-2 Verschillen met telresultaten van het stembureau")
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
 pub struct CountingDifferencesPollingStation {
@@ -27,7 +26,6 @@ impl Validate for CountingDifferencesPollingStation {
     fn validate(
         &self,
         _election: &ElectionWithPoliticalGroups,
-        _polling_station: &PollingStation,
         validation_results: &mut ValidationResults,
         path: &FieldPath,
     ) -> Result<(), DataError> {
@@ -76,10 +74,7 @@ mod tests {
     use test_log::test;
 
     use super::*;
-    use crate::domain::{
-        election::tests::election_fixture, polling_station::test_helpers::polling_station_fixture,
-        valid_default::ValidDefault,
-    };
+    use crate::domain::{election::tests::election_fixture, valid_default::ValidDefault};
 
     impl ValidDefault for CountingDifferencesPollingStation {
         fn valid_default() -> Self {
@@ -104,7 +99,6 @@ mod tests {
         let mut validation_results = ValidationResults::default();
         counting_differences_polling_station.validate(
             &election_fixture(&[]),
-            &polling_station_fixture(None),
             &mut validation_results,
             &"counting_differences_polling_station".into(),
         )?;

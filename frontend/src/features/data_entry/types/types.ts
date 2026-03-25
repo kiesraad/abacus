@@ -3,6 +3,7 @@ import type { Dispatch } from "react";
 import type { AnyApiError } from "@/api/ApiResult";
 import type {
   ClaimDataEntryResponse,
+  DataEntryId,
   DataEntrySource,
   DataEntryStatusName,
   DataEntryStatusResponse,
@@ -15,7 +16,7 @@ import type { ValidationResultSet } from "@/utils/ValidationResults";
 export interface DataEntryState {
   // state from providers
   election: ElectionWithPoliticalGroups;
-  pollingStationId: number;
+  dataEntryId: DataEntryId;
   entryNumber: number;
 
   // api error objects
@@ -23,7 +24,7 @@ export interface DataEntryState {
 
   // backend data structures
   previousResults: DataEntryResults | null;
-  pollingStationResults: DataEntryResults | null;
+  results: DataEntryResults | null;
   source: DataEntrySource | null;
   dataEntryStatus: DataEntryStatusName | null;
 
@@ -37,7 +38,7 @@ export interface DataEntryState {
 }
 
 export interface DataEntryStateLoaded extends DataEntryState {
-  pollingStationResults: DataEntryResults;
+  results: DataEntryResults;
   source: DataEntrySource;
   dataEntryStatus: DataEntryStatusName;
   dataEntryStructure: DataEntryStructure;

@@ -8,21 +8,28 @@ import { Modal } from "@/components/ui/Modal/Modal";
 import { t } from "@/i18n/translate";
 import type {
   DATA_ENTRY_RESET_REQUEST_PATH,
+  DataEntrySource,
   DataEntryStatusName,
-  PollingStation,
   PollingStationInvestigation,
 } from "@/types/generated/openapi";
 
 interface ReadOnlyDataEntryDeleteProps {
-  pollingStation: PollingStation;
+  dataEntrySource: DataEntrySource;
+  dataEntryId: number;
   status: DataEntryStatusName;
   onDeleted: () => void;
   onError: (error: AnyApiError) => void;
 }
 
-export function ReadOnlyDataEntryDelete({ pollingStation, status, onDeleted, onError }: ReadOnlyDataEntryDeleteProps) {
+export function ReadOnlyDataEntryDelete({
+  dataEntrySource,
+  dataEntryId,
+  status,
+  onDeleted,
+  onError,
+}: ReadOnlyDataEntryDeleteProps) {
   const [showModal, setShowModal] = useState(false);
-  const removePath: DATA_ENTRY_RESET_REQUEST_PATH = `/api/polling_stations/${pollingStation.id}/data_entries`;
+  const removePath: DATA_ENTRY_RESET_REQUEST_PATH = `/api/data_entries/${dataEntryId}`;
   const { remove, isLoading } = useCrud<PollingStationInvestigation>({ removePath });
 
   function toggleModal() {
@@ -49,9 +56,9 @@ export function ReadOnlyDataEntryDelete({ pollingStation, status, onDeleted, onE
       {showModal && (
         <Modal title={t("data_entry_detail.delete")} onClose={toggleModal}>
           {status === "second_entry_in_progress" || status === "definitive" ? (
-            <p>{t("data_entry_detail.delete_all_are_you_sure", { nr: pollingStation.number })}</p>
+            <p>{t("data_entry_detail.delete_all_are_you_sure", { nr: dataEntrySource.number })}</p>
           ) : (
-            <p>{t("data_entry_detail.delete_are_you_sure", { nr: pollingStation.number })}</p>
+            <p>{t("data_entry_detail.delete_are_you_sure", { nr: dataEntrySource.number })}</p>
           )}
           <nav>
             <Button

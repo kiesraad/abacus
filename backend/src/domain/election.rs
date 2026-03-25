@@ -140,6 +140,7 @@ impl ElectionCategory {
     Deserialize,
     strum::Display,
     strum::EnumString,
+    strum::VariantArray,
     ToSchema,
     Clone,
     Copy,

@@ -23,9 +23,7 @@ test.describe("data entry - api error responses", () => {
     const dataEntryHomePage = new DataEntryHomePage(page);
     await expect(dataEntryHomePage.fieldset).toBeVisible();
     await expect(dataEntryHomePage.alertDataEntryWarning).toBeVisible();
-    await expect(dataEntryHomePage.alertDataEntryWarning).toContainText(
-      `Je kan stembureau ${pollingStation.number} niet invoeren`,
-    );
+    await expect(dataEntryHomePage.alertDataEntryWarning).toContainText("Je kan dit stembureau niet invoeren");
     await expect(dataEntryHomePage.alertDataEntryWarning).toContainText(
       "Een andere invoerder is bezig met dit stembureau",
     );
@@ -42,9 +40,7 @@ test.describe("data entry - api error responses", () => {
     const dataEntryHomePage = new DataEntryHomePage(page);
     await expect(dataEntryHomePage.fieldset).toBeVisible();
     await expect(dataEntryHomePage.alertDataEntryWarning).toBeVisible();
-    await expect(dataEntryHomePage.alertDataEntryWarning).toContainText(
-      `Je kan stembureau ${pollingStationFirstEntryDone.number} niet invoeren`,
-    );
+    await expect(dataEntryHomePage.alertDataEntryWarning).toContainText("Je kan dit stembureau niet invoeren");
     await expect(dataEntryHomePage.alertDataEntryWarning).toContainText("De invoer voor dit stembureau is al gedaan");
   });
 
@@ -57,9 +53,7 @@ test.describe("data entry - api error responses", () => {
     const dataEntryHomePage = new DataEntryHomePage(page);
     await expect(dataEntryHomePage.fieldset).toBeVisible();
     await expect(dataEntryHomePage.alertDataEntryWarning).toBeVisible();
-    await expect(dataEntryHomePage.alertDataEntryWarning).toContainText(
-      `Je kan stembureau ${pollingStationDefinitive.number} niet invoeren`,
-    );
+    await expect(dataEntryHomePage.alertDataEntryWarning).toContainText("Je kan dit stembureau niet invoeren");
     await expect(dataEntryHomePage.alertDataEntryWarning).toContainText("De invoer voor dit stembureau is al gedaan");
   });
 
@@ -74,9 +68,7 @@ test.describe("data entry - api error responses", () => {
     const dataEntryHomePage = new DataEntryHomePage(page);
     await expect(dataEntryHomePage.fieldset).toBeVisible();
     await expect(dataEntryHomePage.alertDataEntryWarning).toBeVisible();
-    await expect(dataEntryHomePage.alertDataEntryWarning).toContainText(
-      `Je kan stembureau ${pollingStation.number} niet invoeren`,
-    );
+    await expect(dataEntryHomePage.alertDataEntryWarning).toContainText("Je kan dit stembureau niet invoeren");
     await expect(dataEntryHomePage.alertDataEntryWarning).toContainText("Er is een ongeldige actie uitgevoerd");
   });
 
@@ -100,7 +92,7 @@ test.describe("data entry - api error responses", () => {
     const extraInvestigationPage = new ExtraInvestigationPage(page);
     await expect(extraInvestigationPage.fieldset).toBeVisible();
 
-    await page.route(`*/**/api/polling_stations/${pollingStation.id}/data_entries/1`, async (route) => {
+    await page.route(`*/**/api/data_entries/*/1`, async (route) => {
       await route.fulfill({
         status: 422,
         json: {
@@ -125,7 +117,7 @@ test.describe("data entry - api error responses", () => {
   test("5xx fatal response results in error shown", async ({ page, pollingStation }) => {
     await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1`);
 
-    await page.route(`*/**/api/polling_stations/${pollingStation.id}/data_entries/1`, async (route) => {
+    await page.route(`*/**/api/data_entries/*/1`, async (route) => {
       await route.fulfill({
         status: 500,
         json: {

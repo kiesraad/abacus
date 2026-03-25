@@ -1,13 +1,13 @@
 import { describe, expect, test } from "vitest";
 
-import { pollingStationResultsMockData } from "@/features/resolve_differences/testing/polling-station-results";
+import { resultsMockData } from "@/features/resolve_differences/testing/polling-station-results";
 import { sectionHasDifferences } from "@/features/resolve_differences/utils/differences";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
 describe("Resolve differences, differences util", () => {
-  const first = pollingStationResultsMockData(true);
-  const second = pollingStationResultsMockData(false);
+  const first = resultsMockData(true);
+  const second = resultsMockData(false);
   const structure = getDataEntryStructure("CSOFirstSession", electionMockData);
 
   test.each([

@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        SELECT json_extract(de.state, '$.state.results') AS \"data: Json<Results>\"\n        FROM data_entries AS de\n        WHERE de.id = $1 AND json_extract(de.state, '$.status') = 'Definitive'\n        ",
+  "describe": {
+    "columns": [
+      {
+        "name": "data: Json<Results>",
+        "ordinal": 0,
+        "type_info": "Null"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "b7b0b8e967d8539bfeb2e53d7768be528817e08e94f87b9e9e6f830a98c59348"
+}

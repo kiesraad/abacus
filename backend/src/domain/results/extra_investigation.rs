@@ -6,11 +6,10 @@ use crate::domain::{
     compare::Compare,
     election::ElectionWithPoliticalGroups,
     field_path::FieldPath,
-    polling_station::PollingStation,
     validate::{DataError, Validate, ValidationResult, ValidationResultCode, ValidationResults},
 };
 
-/// Extra investigation, part of the polling station results ("B1-1 Alleen bij extra onderzoek")
+/// Extra investigation, part of the results ("B1-1 Alleen bij extra onderzoek")
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
 pub struct ExtraInvestigation {
@@ -42,7 +41,6 @@ impl Validate for ExtraInvestigation {
     fn validate(
         &self,
         _election: &ElectionWithPoliticalGroups,
-        _polling_station: &PollingStation,
         validation_results: &mut ValidationResults,
         path: &FieldPath,
     ) -> Result<(), DataError> {
@@ -75,10 +73,7 @@ pub mod tests {
     use test_log::test;
 
     use super::*;
-    use crate::domain::{
-        election::tests::election_fixture, polling_station::test_helpers::polling_station_fixture,
-        valid_default::ValidDefault,
-    };
+    use crate::domain::{election::tests::election_fixture, valid_default::ValidDefault};
 
     impl ValidDefault for ExtraInvestigation {
         fn valid_default() -> Self {
@@ -103,7 +98,6 @@ pub mod tests {
         let mut validation_results = ValidationResults::default();
         extra_investigation.validate(
             &election_fixture(&[]),
-            &polling_station_fixture(None),
             &mut validation_results,
             &"extra_investigation".into(),
         )?;

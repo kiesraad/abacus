@@ -3,7 +3,9 @@ import { useNavigate } from "react-router";
 
 import { type AnyApiError, isError } from "@/api/ApiResult";
 import { useApiState } from "@/api/useApiState";
+import { PageTitle } from "@/components/page_title/PageTitle";
 import { Loader } from "@/components/ui/Loader/Loader";
+import { t } from "@/i18n/translate";
 
 export function Logout() {
   const { logout } = useApiState();
@@ -25,5 +27,10 @@ export function Logout() {
     throw error;
   }
 
-  return <Loader />;
+  return (
+    <>
+      <PageTitle title={`${t("account.logout")} - Abacus`} />
+      <Loader />
+    </>
+  );
 }

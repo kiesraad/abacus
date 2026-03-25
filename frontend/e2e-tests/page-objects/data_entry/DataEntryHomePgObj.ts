@@ -34,7 +34,7 @@ export class DataEntryHomePage {
     this.alertDataEntrySaved = this.alert.filter({ hasText: "Je invoer is opgeslagen" });
     this.alertDataEntryDifferent = this.alert.filter({ hasText: "Let op: verschil met eerste invoer" });
     this.alertDataEntryErrors = this.alert.filter({ hasText: "Let op: fouten in het proces-verbaal" });
-    this.alertDataEntryWarning = this.alert.filter({ hasText: /^Je kan stembureau \d+ niet invoeren/ });
+    this.alertDataEntryWarning = this.alert.filter({ hasText: "Je kan dit stembureau niet invoeren" });
     this.alertDataEntryInProgress = this.alert.filter({ hasText: "Je hebt nog een openstaande invoer" });
     this.allDataEntriesInProgress = this.alertDataEntryInProgress.getByRole("link");
   }

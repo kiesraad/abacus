@@ -14,7 +14,11 @@ function renderProvider() {
   vi.spyOn(ReactRouter, "useParams").mockReturnValue({ sectionId: "test" });
 
   return render(
-    <DataEntryProvider election={electionMockData} pollingStation={pollingStationMockData[0]!} entryNumber={1}>
+    <DataEntryProvider
+      election={electionMockData}
+      dataEntryId={pollingStationMockData[0]!.data_entry_id!}
+      entryNumber={1}
+    >
       <div>Children</div>
     </DataEntryProvider>,
   );
@@ -42,7 +46,7 @@ describe("DataEntryProvider", () => {
   });
 
   test("Navigate and show message on DataEntryAlreadyClaimed", async () => {
-    overrideOnce("post", "/api/polling_stations/1/data_entries/1/claim", 409, {
+    overrideOnce("post", "/api/data_entries/1/1/claim", 409, {
       error: "First entry already claimed",
       fatal: false,
       reference: "DataEntryAlreadyClaimed",
@@ -53,7 +57,7 @@ describe("DataEntryProvider", () => {
     await waitFor(() => {
       expect(pushMessage).toHaveBeenCalledWith({
         type: "warning",
-        title: "Je kan stembureau 33 niet invoeren",
+        title: "Je kan dit stembureau niet invoeren",
         text: "Een andere invoerder is bezig met dit stembureau",
       });
       expect(navigate).toHaveBeenCalledWith("/elections/1/data-entry");
@@ -61,7 +65,7 @@ describe("DataEntryProvider", () => {
   });
 
   test("Navigate and show message on DataEntryAlreadyFinalised", async () => {
-    overrideOnce("post", "/api/polling_stations/1/data_entries/1/claim", 409, {
+    overrideOnce("post", "/api/data_entries/1/1/claim", 409, {
       error: "First entry already finalised",
       fatal: false,
       reference: "DataEntryAlreadyFinalised",
@@ -72,7 +76,7 @@ describe("DataEntryProvider", () => {
     await waitFor(() => {
       expect(pushMessage).toHaveBeenCalledWith({
         type: "warning",
-        title: "Je kan stembureau 33 niet invoeren",
+        title: "Je kan dit stembureau niet invoeren",
         text: "De invoer voor dit stembureau is al gedaan",
       });
       expect(navigate).toHaveBeenCalledWith("/elections/1/data-entry");
@@ -80,7 +84,7 @@ describe("DataEntryProvider", () => {
   });
 
   test("Navigate and show message on DataEntryNotAllowed", async () => {
-    overrideOnce("post", "/api/polling_stations/1/data_entries/1/claim", 409, {
+    overrideOnce("post", "/api/data_entries/1/1/claim", 409, {
       error: "Data entry not allowed, no investigation with corrected results.",
       fatal: false,
       reference: "DataEntryNotAllowed",
@@ -91,7 +95,7 @@ describe("DataEntryProvider", () => {
     await waitFor(() => {
       expect(pushMessage).toHaveBeenCalledWith({
         type: "warning",
-        title: "Je kan stembureau 33 niet invoeren",
+        title: "Je kan dit stembureau niet invoeren",
         text: "De invoer voor dit stembureau is niet toegestaan",
       });
       expect(navigate).toHaveBeenCalledWith("/elections/1/data-entry");
@@ -99,7 +103,7 @@ describe("DataEntryProvider", () => {
   });
 
   test("Navigate and show message on InvalidStateTransition", async () => {
-    overrideOnce("post", "/api/polling_stations/1/data_entries/1/claim", 409, {
+    overrideOnce("post", "/api/data_entries/1/1/claim", 409, {
       error: "Invalid state transition",
       fatal: false,
       reference: "InvalidStateTransition",
@@ -110,7 +114,7 @@ describe("DataEntryProvider", () => {
     await waitFor(() => {
       expect(pushMessage).toHaveBeenCalledWith({
         type: "warning",
-        title: "Je kan stembureau 33 niet invoeren",
+        title: "Je kan dit stembureau niet invoeren",
         text: "Er is een ongeldige actie uitgevoerd",
       });
       expect(navigate).toHaveBeenCalledWith("/elections/1/data-entry");

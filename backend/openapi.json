@@ -108,6 +108,876 @@
         ]
       }
     },
+    "/api/data_entries/{data_entry_id}": {
+      "delete": {
+        "summary": "Reset the data entry to empty (coordinator_gsb)",
+        "operationId": "data_entry_reset",
+        "parameters": [
+          {
+            "name": "data_entry_id",
+            "in": "path",
+            "description": "Data entry database id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/DataEntryId"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Data entries deleted successfully"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Request cannot be completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "coordinator_gsb"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/data_entries/{data_entry_id}/get": {
+      "get": {
+        "summary": "Get data entry with validation results (coordinator_gsb)",
+        "operationId": "data_entry_get",
+        "parameters": [
+          {
+            "name": "data_entry_id",
+            "in": "path",
+            "description": "Data entry database id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/DataEntryId"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Data entry with validation results",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataEntryGetResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Data entry not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Request cannot be completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "coordinator_gsb"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/data_entries/{data_entry_id}/resolve_differences": {
+      "get": {
+        "summary": "Get data entry differences to be resolved (coordinator_gsb)",
+        "operationId": "data_entry_get_differences",
+        "parameters": [
+          {
+            "name": "data_entry_id",
+            "in": "path",
+            "description": "Data entry database id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/DataEntryId"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Data entry differences to be resolved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataEntryGetDifferencesResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No data entry with differences found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Request cannot be completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "coordinator_gsb"
+            ]
+          }
+        ]
+      },
+      "post": {
+        "summary": "Resolve data entry differences by providing a `ResolveDifferencesAction` (coordinator_gsb)",
+        "operationId": "data_entry_resolve_differences",
+        "parameters": [
+          {
+            "name": "data_entry_id",
+            "in": "path",
+            "description": "Data entry database id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/DataEntryId"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResolveDifferencesAction"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Differences resolved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataEntryStatusResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Request cannot be completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "JSON error or invalid data (Unprocessable Content)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "coordinator_gsb"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/data_entries/{data_entry_id}/resolve_errors": {
+      "post": {
+        "summary": "Resolve accepted data entry errors by providing a `ResolveErrorsAction` (coordinator_gsb)",
+        "operationId": "data_entry_resolve_errors",
+        "parameters": [
+          {
+            "name": "data_entry_id",
+            "in": "path",
+            "description": "Data entry database id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/DataEntryId"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResolveErrorsAction"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Errors resolved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataEntryStatusResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Request cannot be completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "JSON error or invalid data (Unprocessable Content)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "coordinator_gsb"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/data_entries/{data_entry_id}/{entry_number}": {
+      "post": {
+        "summary": "Save a data entry (typist_gsb)",
+        "operationId": "data_entry_save",
+        "parameters": [
+          {
+            "name": "data_entry_id",
+            "in": "path",
+            "description": "Data entry database id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/DataEntryId"
+            }
+          },
+          {
+            "name": "entry_number",
+            "in": "path",
+            "description": "Data entry number (first or second data entry)",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DataEntry"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Data entry saved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SaveDataEntryResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Request cannot be completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "JSON error or invalid data (Unprocessable Content)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "typist_gsb"
+            ]
+          }
+        ]
+      },
+      "delete": {
+        "summary": "Discard an in-progress (not finalised) data entry (typist_gsb)",
+        "operationId": "data_entry_discard",
+        "parameters": [
+          {
+            "name": "data_entry_id",
+            "in": "path",
+            "description": "Data entry database id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/DataEntryId"
+            }
+          },
+          {
+            "name": "entry_number",
+            "in": "path",
+            "description": "Data entry number (first or second data entry)",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Data entry discarded successfully"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Request cannot be completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "typist_gsb"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/data_entries/{data_entry_id}/{entry_number}/claim": {
+      "post": {
+        "summary": "Claim a data entry, returning any existing progress (typist_gsb)",
+        "operationId": "data_entry_claim",
+        "parameters": [
+          {
+            "name": "data_entry_id",
+            "in": "path",
+            "description": "Data entry database id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/DataEntryId"
+            }
+          },
+          {
+            "name": "entry_number",
+            "in": "path",
+            "description": "Data entry number (first or second data entry)",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Data entry claimed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClaimDataEntryResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Request cannot be completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "typist_gsb"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/data_entries/{data_entry_id}/{entry_number}/finalise": {
+      "post": {
+        "summary": "Finalise the data entry (typist_gsb)",
+        "operationId": "data_entry_finalise",
+        "parameters": [
+          {
+            "name": "data_entry_id",
+            "in": "path",
+            "description": "Data entry database id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/DataEntryId"
+            }
+          },
+          {
+            "name": "entry_number",
+            "in": "path",
+            "description": "Data entry number (first or second data entry)",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Data entry finalised successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataEntryStatusResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Request cannot be completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "JSON error or invalid data (Unprocessable Content)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "typist_gsb"
+            ]
+          }
+        ]
+      }
+    },
     "/api/elections": {
       "get": {
         "summary": "Get a list of all elections, without their candidate lists and\na list of the current committee session for each election (administrator, coordinator_gsb, coordinator_csb, typist_gsb, typist_csb)",
@@ -747,7 +1617,7 @@
     },
     "/api/elections/{election_id}/committee_sessions/{committee_session_id}/download_pdf_results": {
       "get": {
-        "summary": "Download a generated PDF with election results (coordinator_gsb)",
+        "summary": "Download a generated PDF with election results (coordinator_csb, coordinator_gsb)",
         "operationId": "election_download_pdf_results",
         "parameters": [
           {
@@ -838,6 +1708,7 @@
         "security": [
           {
             "cookie_auth": [
+              "coordinator_csb",
               "coordinator_gsb"
             ]
           }
@@ -846,7 +1717,7 @@
     },
     "/api/elections/{election_id}/committee_sessions/{committee_session_id}/download_zip_results": {
       "get": {
-        "summary": "Download a zip containing a PDF for the PV and the EML with election results (coordinator_gsb)",
+        "summary": "Download a zip containing a PDF for the PV and the EML with election results (coordinator_csb, coordinator_gsb)",
         "operationId": "election_download_zip_results",
         "parameters": [
           {
@@ -937,6 +1808,7 @@
         "security": [
           {
             "cookie_auth": [
+              "coordinator_csb",
               "coordinator_gsb"
             ]
           }
@@ -1030,7 +1902,7 @@
     },
     "/api/elections/{election_id}/committee_sessions/{committee_session_id}/status": {
       "put": {
-        "summary": "Change the status of a [CommitteeSession]. (coordinator_gsb)",
+        "summary": "Change the status of a [CommitteeSession]. (coordinator_csb, coordinator_gsb)",
         "operationId": "committee_session_status_change",
         "parameters": [
           {
@@ -1120,6 +1992,7 @@
         "security": [
           {
             "cookie_auth": [
+              "coordinator_csb",
               "coordinator_gsb"
             ]
           }
@@ -2327,7 +3200,7 @@
     },
     "/api/log": {
       "get": {
-        "summary": "List audit events (administrator, coordinator_gsb)",
+        "summary": "List audit events (administrator, coordinator_csb, coordinator_gsb)",
         "operationId": "audit_log_list",
         "parameters": [
           {
@@ -2447,6 +3320,7 @@
           {
             "cookie_auth": [
               "administrator",
+              "coordinator_csb",
               "coordinator_gsb"
             ]
           }
@@ -2455,7 +3329,7 @@
     },
     "/api/log-users": {
       "get": {
-        "summary": "Lists all users that appear in the audit log (administrator, coordinator_gsb)",
+        "summary": "Lists all users that appear in the audit log (administrator, coordinator_csb, coordinator_gsb)",
         "operationId": "audit_log_list_users",
         "responses": {
           "200": {
@@ -2506,6 +3380,7 @@
           {
             "cookie_auth": [
               "administrator",
+              "coordinator_csb",
               "coordinator_gsb"
             ]
           }
@@ -2595,876 +3470,6 @@
             }
           }
         }
-      }
-    },
-    "/api/polling_stations/{polling_station_id}/data_entries": {
-      "delete": {
-        "summary": "Reset the data entry for a polling station to empty (coordinator_gsb)",
-        "operationId": "data_entry_reset",
-        "parameters": [
-          {
-            "name": "polling_station_id",
-            "in": "path",
-            "description": "Polling station database id",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/PollingStationId"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "Data entries deleted successfully"
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Request cannot be completed",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "cookie_auth": [
-              "coordinator_gsb"
-            ]
-          }
-        ]
-      }
-    },
-    "/api/polling_stations/{polling_station_id}/data_entries/get": {
-      "get": {
-        "summary": "Get data entry with validation results (coordinator_gsb)",
-        "operationId": "data_entry_get",
-        "parameters": [
-          {
-            "name": "polling_station_id",
-            "in": "path",
-            "description": "Polling station database id",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/PollingStationId"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Data entry with validation results",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DataEntryGetResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Data entry not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Request cannot be completed",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "cookie_auth": [
-              "coordinator_gsb"
-            ]
-          }
-        ]
-      }
-    },
-    "/api/polling_stations/{polling_station_id}/data_entries/resolve_differences": {
-      "get": {
-        "summary": "Get data entry differences to be resolved (coordinator_gsb)",
-        "operationId": "data_entry_get_differences",
-        "parameters": [
-          {
-            "name": "polling_station_id",
-            "in": "path",
-            "description": "Polling station database id",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/PollingStationId"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Data entry differences to be resolved",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DataEntryGetDifferencesResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "No data entry with differences found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Request cannot be completed",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "cookie_auth": [
-              "coordinator_gsb"
-            ]
-          }
-        ]
-      },
-      "post": {
-        "summary": "Resolve data entry differences by providing a `ResolveDifferencesAction` (coordinator_gsb)",
-        "operationId": "data_entry_resolve_differences",
-        "parameters": [
-          {
-            "name": "polling_station_id",
-            "in": "path",
-            "description": "Polling station database id",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/PollingStationId"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ResolveDifferencesAction"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Differences resolved successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DataEntryStatusResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Request cannot be completed",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "JSON error or invalid data (Unprocessable Content)",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "cookie_auth": [
-              "coordinator_gsb"
-            ]
-          }
-        ]
-      }
-    },
-    "/api/polling_stations/{polling_station_id}/data_entries/resolve_errors": {
-      "post": {
-        "summary": "Resolve accepted data entry errors by providing a `ResolveErrorsAction` (coordinator_gsb)",
-        "operationId": "data_entry_resolve_errors",
-        "parameters": [
-          {
-            "name": "polling_station_id",
-            "in": "path",
-            "description": "Polling station database id",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/PollingStationId"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ResolveErrorsAction"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Errors resolved successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DataEntryStatusResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Request cannot be completed",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "JSON error or invalid data (Unprocessable Content)",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "cookie_auth": [
-              "coordinator_gsb"
-            ]
-          }
-        ]
-      }
-    },
-    "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}": {
-      "post": {
-        "summary": "Save a data entry for a polling station (typist_gsb)",
-        "operationId": "data_entry_save",
-        "parameters": [
-          {
-            "name": "polling_station_id",
-            "in": "path",
-            "description": "Polling station database id",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/PollingStationId"
-            }
-          },
-          {
-            "name": "entry_number",
-            "in": "path",
-            "description": "Data entry number (first or second data entry)",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/DataEntry"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Data entry saved successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SaveDataEntryResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Request cannot be completed",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "JSON error or invalid data (Unprocessable Content)",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "cookie_auth": [
-              "typist_gsb"
-            ]
-          }
-        ]
-      },
-      "delete": {
-        "summary": "Discard an in-progress (not finalised) data entry for a polling station (typist_gsb)",
-        "operationId": "data_entry_discard",
-        "parameters": [
-          {
-            "name": "polling_station_id",
-            "in": "path",
-            "description": "Polling station database id",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/PollingStationId"
-            }
-          },
-          {
-            "name": "entry_number",
-            "in": "path",
-            "description": "Data entry number (first or second data entry)",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "Data entry discarded successfully"
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Request cannot be completed",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "cookie_auth": [
-              "typist_gsb"
-            ]
-          }
-        ]
-      }
-    },
-    "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}/claim": {
-      "post": {
-        "summary": "Claim a data entry for a polling station, returning any existing progress (typist_gsb)",
-        "operationId": "data_entry_claim",
-        "parameters": [
-          {
-            "name": "polling_station_id",
-            "in": "path",
-            "description": "Polling station database id",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/PollingStationId"
-            }
-          },
-          {
-            "name": "entry_number",
-            "in": "path",
-            "description": "Data entry number (first or second data entry)",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Data entry claimed successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ClaimDataEntryResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Request cannot be completed",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Invalid data",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "cookie_auth": [
-              "typist_gsb"
-            ]
-          }
-        ]
-      }
-    },
-    "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}/finalise": {
-      "post": {
-        "summary": "Finalise the data entry for a polling station (typist_gsb)",
-        "operationId": "data_entry_finalise",
-        "parameters": [
-          {
-            "name": "polling_station_id",
-            "in": "path",
-            "description": "Polling station database id",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/PollingStationId"
-            }
-          },
-          {
-            "name": "entry_number",
-            "in": "path",
-            "description": "Data entry number (first or second data entry)",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Data entry finalised successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DataEntryStatusResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Request cannot be completed",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "JSON error or invalid data (Unprocessable Content)",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "cookie_auth": [
-              "typist_gsb"
-            ]
-          }
-        ]
       }
     },
     "/api/polling_stations/{polling_station_id}/investigation": {
@@ -4784,7 +4789,7 @@
       },
       "ClaimDataEntryResponse": {
         "type": "object",
-        "description": "Response structure for getting data entry of polling station results",
+        "description": "Response structure for getting data entry results",
         "required": [
           "data",
           "client_state",
@@ -4797,7 +4802,7 @@
             "type": "object"
           },
           "data": {
-            "$ref": "#/components/schemas/PollingStationResults"
+            "$ref": "#/components/schemas/Results"
           },
           "previous_results": {
             "$ref": "#/components/schemas/CommonPollingStationResults"
@@ -4950,7 +4955,7 @@
       },
       "CountingDifferencesPollingStation": {
         "type": "object",
-        "description": "Counting Differences Polling Station,\npart of the polling station results (\"B1-2 Verschillen met telresultaten van het stembureau\")",
+        "description": "Counting Differences Polling Station,\npart of the results (\"B1-2 Verschillen met telresultaten van het stembureau\")",
         "required": [
           "unexplained_difference_ballots_voters",
           "difference_ballots_per_list"
@@ -5028,7 +5033,7 @@
       },
       "DataEntry": {
         "type": "object",
-        "description": "Request structure for saving data entry of polling station results",
+        "description": "Request structure for saving data entry",
         "required": [
           "progress",
           "data",
@@ -5040,7 +5045,7 @@
             "description": "Client state for the data entry (arbitrary JSON)"
           },
           "data": {
-            "$ref": "#/components/schemas/PollingStationResults",
+            "$ref": "#/components/schemas/Results",
             "description": "Data entry for a polling station"
           },
           "progress": {
@@ -5059,20 +5064,24 @@
           "first_entry_user_id",
           "first_entry",
           "second_entry_user_id",
-          "second_entry"
+          "second_entry",
+          "source"
         ],
         "properties": {
           "first_entry": {
-            "$ref": "#/components/schemas/PollingStationResults"
+            "$ref": "#/components/schemas/Results"
           },
           "first_entry_user_id": {
             "$ref": "#/components/schemas/UserId"
           },
           "second_entry": {
-            "$ref": "#/components/schemas/PollingStationResults"
+            "$ref": "#/components/schemas/Results"
           },
           "second_entry_user_id": {
             "$ref": "#/components/schemas/UserId"
+          },
+          "source": {
+            "$ref": "#/components/schemas/DataEntrySource"
           }
         },
         "additionalProperties": false
@@ -5082,11 +5091,15 @@
         "required": [
           "data",
           "status",
-          "validation_results"
+          "validation_results",
+          "source"
         ],
         "properties": {
           "data": {
-            "$ref": "#/components/schemas/PollingStationResults"
+            "$ref": "#/components/schemas/Results"
+          },
+          "source": {
+            "$ref": "#/components/schemas/DataEntrySource"
           },
           "status": {
             "$ref": "#/components/schemas/DataEntryStatusName"
@@ -5201,7 +5214,7 @@
       },
       "DifferencesCounts": {
         "type": "object",
-        "description": "Differences counts, part of the polling station results.\n(B1-3.3 \"Verschillen tussen aantal kiezers en uitgebrachte stemmen\")",
+        "description": "Differences counts, part of the results.\n(B1-3.3 \"Verschillen tussen aantal kiezers en uitgebrachte stemmen\")",
         "required": [
           "compare_votes_cast_admitted_voters",
           "more_ballots_count",
@@ -5817,7 +5830,7 @@
       },
       "ExtraInvestigation": {
         "type": "object",
-        "description": "Extra investigation, part of the polling station results (\"B1-1 Alleen bij extra onderzoek\")",
+        "description": "Extra investigation, part of the results (\"B1-1 Alleen bij extra onderzoek\")",
         "required": [
           "extra_investigation_other_reason",
           "ballots_recounted_extra_investigation"
@@ -6666,57 +6679,6 @@
           }
         }
       },
-      "PollingStationResults": {
-        "oneOf": [
-          {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/CSOFirstSessionResults",
-                "description": "Results for centrally counted (CSO) elections, first election committee session.\nThis contains the data entry values from Model Na 31-2 Bijlage 2."
-              },
-              {
-                "type": "object",
-                "required": [
-                  "model"
-                ],
-                "properties": {
-                  "model": {
-                    "type": "string",
-                    "enum": [
-                      "CSOFirstSession"
-                    ]
-                  }
-                }
-              }
-            ],
-            "description": "Results for centrally counted (CSO) elections, first election committee session.\nThis contains the data entry values from Model Na 31-2 Bijlage 2."
-          },
-          {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/CSONextSessionResults",
-                "description": "Results for centrally counted (CSO) elections, any subsequent election committee session.\nThis contains the data entry values from Model Na 14-2 Bijlage 1."
-              },
-              {
-                "type": "object",
-                "required": [
-                  "model"
-                ],
-                "properties": {
-                  "model": {
-                    "type": "string",
-                    "enum": [
-                      "CSONextSession"
-                    ]
-                  }
-                }
-              }
-            ],
-            "description": "Results for centrally counted (CSO) elections, any subsequent election committee session.\nThis contains the data entry values from Model Na 14-2 Bijlage 1."
-          }
-        ],
-        "description": "PollingStationResults contains the results for a polling station.\n\nThe exact type of results depends on the election counting method and\nwhether this is the first or any subsequent data entry session. Based on\nthis, any of four different models can apply"
-      },
       "PollingStationSource": {
         "type": "object",
         "required": [
@@ -6821,6 +6783,57 @@
           "resume_first_entry"
         ]
       },
+      "Results": {
+        "oneOf": [
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CSOFirstSessionResults",
+                "description": "Results for centrally counted (CSO) elections, first election committee session.\nThis contains the data entry values from Model Na 31-2 Bijlage 2."
+              },
+              {
+                "type": "object",
+                "required": [
+                  "model"
+                ],
+                "properties": {
+                  "model": {
+                    "type": "string",
+                    "enum": [
+                      "CSOFirstSession"
+                    ]
+                  }
+                }
+              }
+            ],
+            "description": "Results for centrally counted (CSO) elections, first election committee session.\nThis contains the data entry values from Model Na 31-2 Bijlage 2."
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CSONextSessionResults",
+                "description": "Results for centrally counted (CSO) elections, any subsequent election committee session.\nThis contains the data entry values from Model Na 14-2 Bijlage 1."
+              },
+              {
+                "type": "object",
+                "required": [
+                  "model"
+                ],
+                "properties": {
+                  "model": {
+                    "type": "string",
+                    "enum": [
+                      "CSONextSession"
+                    ]
+                  }
+                }
+              }
+            ],
+            "description": "Results for centrally counted (CSO) elections, any subsequent election committee session.\nThis contains the data entry values from Model Na 14-2 Bijlage 1."
+          }
+        ],
+        "description": "Results contains the results for a data entry\n\nThe exact type of results depends on the election counting method,\nelection committee category and whether this is the first or any subsequent data entry session."
+      },
       "Role": {
         "type": "string",
         "enum": [
@@ -6833,7 +6846,7 @@
       },
       "SaveDataEntryResponse": {
         "type": "object",
-        "description": "Response structure for saving data entry of polling station results",
+        "description": "Response structure for saving data entry",
         "required": [
           "validation_results"
         ],
@@ -7252,7 +7265,7 @@
       },
       "VotersCounts": {
         "type": "object",
-        "description": "Voters counts, part of the polling station results.",
+        "description": "Voters counts, part of the results.",
         "required": [
           "poll_card_count",
           "proxy_certificate_count",
@@ -7282,7 +7295,7 @@
       },
       "VotesCounts": {
         "type": "object",
-        "description": "Votes counts, part of the polling station results.\nFollowing the fields in Model CSO Na 31-2 Bijlage 1.",
+        "description": "Votes counts, part of the results.\nFollowing the fields in Model CSO Na 31-2 Bijlage 1.",
         "required": [
           "political_group_total_votes",
           "total_votes_candidates_count",

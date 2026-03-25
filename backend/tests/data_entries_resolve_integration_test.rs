@@ -9,8 +9,8 @@ use test_log::test;
 
 use crate::{
     shared::{
-        FixtureUser, change_status_committee_session, claim_data_entry, complete_data_entry,
-        example_data_entry, login,
+        FixtureUser::*, change_status_committee_session, claim_data_entry, complete_data_entry,
+        example_data_entry, get_data_entry_id, login,
     },
     utils::serve_api,
 };
@@ -44,12 +44,8 @@ pub fn different_data_entries() -> (serde_json::Value, serde_json::Value) {
     (first_data_entry, second_data_entry)
 }
 
-async fn get_data_entry(
-    addr: &SocketAddr,
-    cookie: &HeaderValue,
-    polling_station_id: u32,
-) -> Response {
-    let url = format!("http://{addr}/api/polling_stations/{polling_station_id}/data_entries/get");
+async fn get_data_entry(addr: &SocketAddr, cookie: &HeaderValue, data_entry_id: u32) -> Response {
+    let url = format!("http://{addr}/api/data_entries/{data_entry_id}/get");
     Client::new()
         .get(&url)
         .header("cookie", cookie)
@@ -61,12 +57,10 @@ async fn get_data_entry(
 async fn resolve_errors(
     addr: &SocketAddr,
     cookie: &HeaderValue,
-    polling_station_id: u32,
+    data_entry_id: u32,
     action: &str,
 ) -> Response {
-    let url = format!(
-        "http://{addr}/api/polling_stations/{polling_station_id}/data_entries/resolve_errors"
-    );
+    let url = format!("http://{addr}/api/data_entries/{data_entry_id}/resolve_errors");
     Client::new()
         .post(&url)
         .header("cookie", cookie)
@@ -79,11 +73,9 @@ async fn resolve_errors(
 async fn get_resolve_differences(
     addr: &SocketAddr,
     cookie: &HeaderValue,
-    polling_station_id: u32,
+    data_entry_id: u32,
 ) -> Response {
-    let url = format!(
-        "http://{addr}/api/polling_stations/{polling_station_id}/data_entries/resolve_differences"
-    );
+    let url = format!("http://{addr}/api/data_entries/{data_entry_id}/resolve_differences");
     Client::new()
         .get(&url)
         .header("cookie", cookie)
@@ -95,12 +87,10 @@ async fn get_resolve_differences(
 async fn resolve_differences(
     addr: &SocketAddr,
     cookie: &HeaderValue,
-    polling_station_id: u32,
+    data_entry_id: u32,
     action: &str,
 ) -> Response {
-    let url = format!(
-        "http://{addr}/api/polling_stations/{polling_station_id}/data_entries/resolve_differences"
-    );
+    let url = format!("http://{addr}/api/data_entries/{data_entry_id}/resolve_differences");
     Client::new()
         .post(&url)
         .header("cookie", cookie)
@@ -114,13 +104,21 @@ async fn resolve_differences(
 async fn test_data_entry_get_errors(pool: SqlitePool) {
     let addr = serve_api(pool.clone()).await;
 
-    let typist_cookie = login(&addr, FixtureUser::TypistGSB).await;
-    let res = complete_data_entry(&addr, &typist_cookie, 1, 1, data_entry_with_error()).await;
+    let typist_cookie = login(&addr, TypistGSB).await;
+    let data_entry_id = get_data_entry_id(&addr, &typist_cookie, 2, 211).await;
+    let res = complete_data_entry(
+        &addr,
+        &typist_cookie,
+        data_entry_id,
+        1,
+        data_entry_with_error(),
+    )
+    .await;
     let data_entry_status: serde_json::Value = res.json().await.unwrap();
     assert_eq!(data_entry_status["status"], "first_entry_has_errors");
 
-    let coordinator_cookie = login(&addr, FixtureUser::CoordinatorGSB).await;
-    let response = get_data_entry(&addr, &coordinator_cookie, 1).await;
+    let coordinator_cookie = login(&addr, CoordinatorGSB).await;
+    let response = get_data_entry(&addr, &coordinator_cookie, data_entry_id).await;
     assert_eq!(response.status(), StatusCode::OK);
     let body: serde_json::Value = response.json().await.unwrap();
 
@@ -143,7 +141,7 @@ async fn test_data_entry_get_errors(pool: SqlitePool) {
 
     change_status_committee_session(&addr, &coordinator_cookie, 2, 2, "paused").await;
 
-    let response = get_data_entry(&addr, &coordinator_cookie, 1).await;
+    let response = get_data_entry(&addr, &coordinator_cookie, data_entry_id).await;
     assert_eq!(response.status(), StatusCode::OK);
 }
 
@@ -151,14 +149,15 @@ async fn test_data_entry_get_errors(pool: SqlitePool) {
 async fn test_data_entry_no_errors(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
-    let typist = login(&addr, FixtureUser::TypistGSB).await;
+    let typist = login(&addr, TypistGSB).await;
+    let data_entry_id = get_data_entry_id(&addr, &typist, 2, 211).await;
     let data_entry_no_errors = example_data_entry(None);
-    let res = complete_data_entry(&addr, &typist, 1, 1, data_entry_no_errors).await;
+    let res = complete_data_entry(&addr, &typist, data_entry_id, 1, data_entry_no_errors).await;
     let data_entry_status: serde_json::Value = res.json().await.unwrap();
     assert_eq!(data_entry_status["status"], "first_entry_finalised");
 
-    let coordinator_cookie = login(&addr, FixtureUser::CoordinatorGSB).await;
-    let res = get_data_entry(&addr, &coordinator_cookie, 1).await;
+    let coordinator_cookie = login(&addr, CoordinatorGSB).await;
+    let res = get_data_entry(&addr, &coordinator_cookie, data_entry_id).await;
     assert_eq!(res.status(), StatusCode::OK);
 
     let body: serde_json::Value = res.json().await.unwrap();
@@ -174,13 +173,20 @@ async fn test_data_entry_no_errors(pool: SqlitePool) {
 async fn test_data_entry_resolve_errors_discard(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
-    let typist = login(&addr, FixtureUser::TypistGSB).await;
-    let res = complete_data_entry(&addr, &typist, 1, 1, data_entry_with_error()).await;
+    let typist = login(&addr, TypistGSB).await;
+    let data_entry_id = get_data_entry_id(&addr, &typist, 2, 211).await;
+    let res = complete_data_entry(&addr, &typist, data_entry_id, 1, data_entry_with_error()).await;
     let data_entry_status: serde_json::Value = res.json().await.unwrap();
     assert_eq!(data_entry_status["status"], "first_entry_has_errors");
 
-    let coordinator_cookie = login(&addr, FixtureUser::CoordinatorGSB).await;
-    let res = resolve_errors(&addr, &coordinator_cookie, 1, "discard_first_entry").await;
+    let coordinator_cookie = login(&addr, CoordinatorGSB).await;
+    let res = resolve_errors(
+        &addr,
+        &coordinator_cookie,
+        data_entry_id,
+        "discard_first_entry",
+    )
+    .await;
     assert_eq!(res.status(), StatusCode::OK);
     let body: serde_json::Value = res.json().await.unwrap();
     assert_eq!(body["status"], "empty");
@@ -190,16 +196,30 @@ async fn test_data_entry_resolve_errors_discard(pool: SqlitePool) {
 async fn test_data_entry_resolve_errors_resume(pool: SqlitePool) {
     let addr = serve_api(pool.clone()).await;
 
-    let typist_cookie = login(&addr, FixtureUser::TypistGSB).await;
-    let res = complete_data_entry(&addr, &typist_cookie, 1, 1, data_entry_with_error()).await;
+    let typist_cookie = login(&addr, TypistGSB).await;
+    let data_entry_id = get_data_entry_id(&addr, &typist_cookie, 2, 211).await;
+    let res = complete_data_entry(
+        &addr,
+        &typist_cookie,
+        data_entry_id,
+        1,
+        data_entry_with_error(),
+    )
+    .await;
     let data_entry_status: serde_json::Value = res.json().await.unwrap();
     assert_eq!(data_entry_status["status"], "first_entry_has_errors");
 
-    let coordinator_cookie = login(&addr, FixtureUser::CoordinatorGSB).await;
+    let coordinator_cookie = login(&addr, CoordinatorGSB).await;
 
     change_status_committee_session(&addr, &coordinator_cookie, 2, 2, "paused").await;
 
-    let res = resolve_errors(&addr, &coordinator_cookie, 1, "resume_first_entry").await;
+    let res = resolve_errors(
+        &addr,
+        &coordinator_cookie,
+        data_entry_id,
+        "resume_first_entry",
+    )
+    .await;
     assert_eq!(res.status(), StatusCode::OK);
     let body: serde_json::Value = res.json().await.unwrap();
     assert_eq!(body["status"], "first_entry_in_progress");
@@ -209,11 +229,18 @@ async fn test_data_entry_resolve_errors_resume(pool: SqlitePool) {
 async fn test_data_entry_resolve_errors_wrong_state(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
-    let typist = login(&addr, FixtureUser::TypistGSB).await;
-    claim_data_entry(&addr, &typist, 1, 1).await;
+    let typist = login(&addr, TypistGSB).await;
+    let data_entry_id = get_data_entry_id(&addr, &typist, 2, 211).await;
+    claim_data_entry(&addr, &typist, data_entry_id, 1).await;
 
-    let coordinator_cookie = login(&addr, FixtureUser::CoordinatorGSB).await;
-    let response = resolve_errors(&addr, &coordinator_cookie, 1, "discard_first_entry").await;
+    let coordinator_cookie = login(&addr, CoordinatorGSB).await;
+    let response = resolve_errors(
+        &addr,
+        &coordinator_cookie,
+        data_entry_id,
+        "discard_first_entry",
+    )
+    .await;
     assert_eq!(response.status(), StatusCode::CONFLICT);
 }
 
@@ -221,13 +248,14 @@ async fn test_data_entry_resolve_errors_wrong_state(pool: SqlitePool) {
 async fn test_data_entry_resolve_errors_wrong_action(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
-    let typist = login(&addr, FixtureUser::TypistGSB).await;
-    let res = complete_data_entry(&addr, &typist, 1, 1, data_entry_with_error()).await;
+    let typist = login(&addr, TypistGSB).await;
+    let data_entry_id = get_data_entry_id(&addr, &typist, 2, 211).await;
+    let res = complete_data_entry(&addr, &typist, data_entry_id, 1, data_entry_with_error()).await;
     let data_entry_status: serde_json::Value = res.json().await.unwrap();
     assert_eq!(data_entry_status["status"], "first_entry_has_errors");
 
-    let coordinator_cookie = login(&addr, FixtureUser::CoordinatorGSB).await;
-    let response = resolve_errors(&addr, &coordinator_cookie, 1, "make_tea").await;
+    let coordinator_cookie = login(&addr, CoordinatorGSB).await;
+    let response = resolve_errors(&addr, &coordinator_cookie, data_entry_id, "make_tea").await;
     assert_eq!(response.status(), StatusCode::UNPROCESSABLE_ENTITY);
 }
 
@@ -236,16 +264,17 @@ async fn test_data_entry_get_differences(pool: SqlitePool) {
     let addr = serve_api(pool.clone()).await;
     let (first_entry, second_entry) = different_data_entries();
 
-    let typist_cookie = login(&addr, FixtureUser::TypistGSB).await;
-    complete_data_entry(&addr, &typist_cookie, 1, 1, first_entry).await;
+    let typist_cookie = login(&addr, TypistGSB).await;
+    let data_entry_id = get_data_entry_id(&addr, &typist_cookie, 2, 211).await;
+    complete_data_entry(&addr, &typist_cookie, data_entry_id, 1, first_entry).await;
 
-    let typist2_cookie = login(&addr, FixtureUser::Typist2GSB).await;
-    let res = complete_data_entry(&addr, &typist2_cookie, 1, 2, second_entry).await;
+    let typist2_cookie = login(&addr, Typist2GSB).await;
+    let res = complete_data_entry(&addr, &typist2_cookie, data_entry_id, 2, second_entry).await;
     let data_entry_status: serde_json::Value = res.json().await.unwrap();
     assert_eq!(data_entry_status["status"], "entries_different");
 
-    let coordinator_cookie = login(&addr, FixtureUser::CoordinatorGSB).await;
-    let res = get_resolve_differences(&addr, &coordinator_cookie, 1).await;
+    let coordinator_cookie = login(&addr, CoordinatorGSB).await;
+    let res = get_resolve_differences(&addr, &coordinator_cookie, data_entry_id).await;
     assert_eq!(res.status(), StatusCode::OK);
     let result: serde_json::Value = res.json().await.unwrap();
 
@@ -258,7 +287,7 @@ async fn test_data_entry_get_differences(pool: SqlitePool) {
 
     change_status_committee_session(&addr, &coordinator_cookie, 2, 2, "paused").await;
 
-    let res = get_resolve_differences(&addr, &coordinator_cookie, 1).await;
+    let res = get_resolve_differences(&addr, &coordinator_cookie, data_entry_id).await;
     assert_eq!(res.status(), StatusCode::OK);
 }
 
@@ -266,14 +295,15 @@ async fn test_data_entry_get_differences(pool: SqlitePool) {
 async fn test_data_entry_differences_not_found(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
-    let typist = login(&addr, FixtureUser::TypistGSB).await;
+    let typist = login(&addr, TypistGSB).await;
+    let data_entry_id = get_data_entry_id(&addr, &typist, 2, 211).await;
     let data_entry = example_data_entry(None);
-    let res = complete_data_entry(&addr, &typist, 1, 1, data_entry).await;
+    let res = complete_data_entry(&addr, &typist, data_entry_id, 1, data_entry).await;
     let data_entry_status: serde_json::Value = res.json().await.unwrap();
     assert_eq!(data_entry_status["status"], "first_entry_finalised");
 
-    let coordinator_cookie = login(&addr, FixtureUser::CoordinatorGSB).await;
-    let res = get_resolve_differences(&addr, &coordinator_cookie, 1).await;
+    let coordinator_cookie = login(&addr, CoordinatorGSB).await;
+    let res = get_resolve_differences(&addr, &coordinator_cookie, data_entry_id).await;
     assert_eq!(res.status(), StatusCode::NOT_FOUND);
 }
 
@@ -296,18 +326,25 @@ async fn test_data_entry_resolve_differences(pool: SqlitePool) {
             + 2,
     );
 
-    let typist = login(&addr, FixtureUser::TypistGSB).await;
-    let res = complete_data_entry(&addr, &typist, 1, 1, first_data_entry).await;
+    let typist = login(&addr, TypistGSB).await;
+    let data_entry_id = get_data_entry_id(&addr, &typist, 2, 211).await;
+    let res = complete_data_entry(&addr, &typist, data_entry_id, 1, first_data_entry).await;
     let data_entry_status: serde_json::Value = res.json().await.unwrap();
     assert_eq!(data_entry_status["status"], "first_entry_finalised");
 
-    let typist2 = login(&addr, FixtureUser::Typist2GSB).await;
-    let res = complete_data_entry(&addr, &typist2, 1, 2, second_data_entry).await;
+    let typist2 = login(&addr, Typist2GSB).await;
+    let res = complete_data_entry(&addr, &typist2, data_entry_id, 2, second_data_entry).await;
     let data_entry_status: serde_json::Value = res.json().await.unwrap();
     assert_eq!(data_entry_status["status"], "entries_different");
 
-    let coordinator_cookie = login(&addr, FixtureUser::CoordinatorGSB).await;
-    let res = resolve_differences(&addr, &coordinator_cookie, 1, "keep_first_entry").await;
+    let coordinator_cookie = login(&addr, CoordinatorGSB).await;
+    let res = resolve_differences(
+        &addr,
+        &coordinator_cookie,
+        data_entry_id,
+        "keep_first_entry",
+    )
+    .await;
     assert_eq!(res.status(), StatusCode::OK);
     let body: serde_json::Value = res.json().await.unwrap();
     assert_eq!(body["status"], "first_entry_finalised");
@@ -321,23 +358,36 @@ async fn test_data_entry_resolve_differences_then_resolve_errors(pool: SqlitePoo
     let mut second_data_entry = first_data_entry.clone();
     second_data_entry["data"]["voters_counts"]["poll_card_count"] = serde_json::Value::from(0);
 
-    let typist = login(&addr, FixtureUser::TypistGSB).await;
-    let res = complete_data_entry(&addr, &typist, 1, 1, first_data_entry).await;
+    let typist = login(&addr, TypistGSB).await;
+    let data_entry_id = get_data_entry_id(&addr, &typist, 2, 211).await;
+    let res = complete_data_entry(&addr, &typist, data_entry_id, 1, first_data_entry).await;
     let data_entry_status: serde_json::Value = res.json().await.unwrap();
     assert_eq!(data_entry_status["status"], "first_entry_finalised");
 
-    let typist2 = login(&addr, FixtureUser::Typist2GSB).await;
-    let res = complete_data_entry(&addr, &typist2, 1, 2, second_data_entry).await;
+    let typist2 = login(&addr, Typist2GSB).await;
+    let res = complete_data_entry(&addr, &typist2, data_entry_id, 2, second_data_entry).await;
     let data_entry_status: serde_json::Value = res.json().await.unwrap();
     assert_eq!(data_entry_status["status"], "entries_different");
 
-    let coordinator_cookie = login(&addr, FixtureUser::CoordinatorGSB).await;
-    let res = resolve_differences(&addr, &coordinator_cookie, 1, "keep_second_entry").await;
+    let coordinator_cookie = login(&addr, CoordinatorGSB).await;
+    let res = resolve_differences(
+        &addr,
+        &coordinator_cookie,
+        data_entry_id,
+        "keep_second_entry",
+    )
+    .await;
     assert_eq!(res.status(), StatusCode::OK);
     let body: serde_json::Value = res.json().await.unwrap();
     assert_eq!(body["status"], "first_entry_has_errors");
 
-    let res = resolve_errors(&addr, &coordinator_cookie, 1, "resume_first_entry").await;
+    let res = resolve_errors(
+        &addr,
+        &coordinator_cookie,
+        data_entry_id,
+        "resume_first_entry",
+    )
+    .await;
     assert_eq!(res.status(), StatusCode::OK);
     let body: serde_json::Value = res.json().await.unwrap();
     assert_eq!(body["status"], "first_entry_in_progress");

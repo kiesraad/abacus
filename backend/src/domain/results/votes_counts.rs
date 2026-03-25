@@ -10,7 +10,6 @@ use crate::{
         compare::Compare,
         election::ElectionWithPoliticalGroups,
         field_path::FieldPath,
-        polling_station::PollingStation,
         validate::{
             DataError, Validate, ValidationResult, ValidationResultCode, ValidationResults,
         },
@@ -18,7 +17,7 @@ use crate::{
     error::ErrorReference,
 };
 
-/// Votes counts, part of the polling station results.
+/// Votes counts, part of the results.
 /// Following the fields in Model CSO Na 31-2 Bijlage 1.
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
@@ -223,38 +222,32 @@ impl Validate for VotesCounts {
     fn validate(
         &self,
         election: &ElectionWithPoliticalGroups,
-        polling_station: &PollingStation,
         validation_results: &mut ValidationResults,
         path: &FieldPath,
     ) -> Result<(), DataError> {
         // validate all counts
         self.political_group_total_votes.validate(
             election,
-            polling_station,
             validation_results,
             &path.field("political_group_total_votes"),
         )?;
         self.total_votes_candidates_count.validate(
             election,
-            polling_station,
             validation_results,
             &path.field("total_votes_candidates_count"),
         )?;
         self.blank_votes_count.validate(
             election,
-            polling_station,
             validation_results,
             &path.field("blank_votes_count"),
         )?;
         self.invalid_votes_count.validate(
             election,
-            polling_station,
             validation_results,
             &path.field("invalid_votes_count"),
         )?;
         self.total_votes_cast_count.validate(
             election,
-            polling_station,
             validation_results,
             &path.field("total_votes_cast_count"),
         )?;
@@ -272,10 +265,7 @@ mod tests {
     use test_log::test;
 
     use super::*;
-    use crate::domain::{
-        election::{PGNumber, tests::election_fixture},
-        polling_station::test_helpers::polling_station_fixture,
-    };
+    use crate::domain::election::{PGNumber, tests::election_fixture};
 
     #[test]
     fn test_votes_addition() {
@@ -387,7 +377,6 @@ mod tests {
         let mut validation_results = ValidationResults::default();
         votes_counts.validate(
             &election_fixture(&[1, 1, 1]),
-            &polling_station_fixture(None),
             &mut validation_results,
             &"votes_counts".into(),
         )?;

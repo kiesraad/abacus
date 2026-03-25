@@ -38,7 +38,11 @@ function renderForm() {
   return renderReturningRouter(
     <ElectionProvider electionId={1}>
       <MessagesProvider>
-        <DataEntryProvider election={electionMockData} pollingStation={pollingStationMockData[0]!} entryNumber={1}>
+        <DataEntryProvider
+          election={electionMockData}
+          dataEntryId={pollingStationMockData[0]!.data_entry_id!}
+          entryNumber={1}
+        >
           <CheckAndSaveForm />
         </DataEntryProvider>
       </MessagesProvider>
@@ -82,7 +86,7 @@ describe("Test CheckAndSaveForm", () => {
     const finalise = spyOnHandler(PollingStationDataEntryFinaliseHandler);
 
     const response: DataEntryStatusResponse = { status: "entries_different" };
-    overrideOnce("post", "/api/polling_stations/1/data_entries/1/finalise", 200, response);
+    overrideOnce("post", "/api/data_entries/1/1/finalise", 200, response);
 
     // click the save button
     await user.click(await screen.findByRole("button", { name: "Opslaan" }));
@@ -103,7 +107,7 @@ describe("Test CheckAndSaveForm", () => {
     const finalise = spyOnHandler(PollingStationDataEntryFinaliseHandler);
 
     const response: DataEntryStatusResponse = { status: "first_entry_has_errors" };
-    overrideOnce("post", "/api/polling_stations/1/data_entries/1/finalise", 200, response);
+    overrideOnce("post", "/api/data_entries/1/1/finalise", 200, response);
 
     // click the save button
     await user.click(await screen.findByRole("button", { name: "Opslaan" }));
@@ -132,7 +136,7 @@ describe("Test CheckAndSaveForm", () => {
   test("Data entry does not show finalise button with errors", async () => {
     overrideServerClaimDataEntryResponse({
       formState: customFormState(),
-      pollingStationResults: getInitialValues(),
+      results: getInitialValues(),
       validationResults: { errors: [validationResultMockData.F201], warnings: [] },
     });
     renderForm();
@@ -147,7 +151,7 @@ describe("Test CheckAndSaveForm", () => {
   test("Data entry does not show finalise button with unaccepted warnings", async () => {
     overrideServerClaimDataEntryResponse({
       formState: customFormState(),
-      pollingStationResults: getInitialValues(),
+      results: getInitialValues(),
       validationResults: { errors: [], warnings: [validationResultMockData.W202] },
     });
     renderForm();
@@ -165,7 +169,7 @@ describe("Test CheckAndSaveForm", () => {
 
     overrideServerClaimDataEntryResponse({
       formState: formState,
-      pollingStationResults: getInitialValues(),
+      results: getInitialValues(),
       validationResults: { errors: [], warnings: [validationResultMockData.W202] },
     });
     renderForm();
@@ -191,7 +195,7 @@ describe("Test CheckAndSaveForm", () => {
 
     overrideServerClaimDataEntryResponse({
       formState: mockFormState,
-      pollingStationResults: getInitialValues(),
+      results: getInitialValues(),
       validationResults: { errors: [validationResultMockData.F201], warnings: [validationResultMockData.W203] },
     });
     renderForm();
@@ -228,7 +232,7 @@ describe("Test CheckAndSaveForm", () => {
       const defaultValues = getEmptyDataEntryRequest().data;
       overrideServerClaimDataEntryResponse({
         formState: mockFormState,
-        pollingStationResults: defaultValues,
+        results: defaultValues,
         validationResults: { errors: [validationResultMockData.F201], warnings: [validationResultMockData.W203] },
       });
       renderForm();
@@ -275,7 +279,7 @@ describe("Test CheckAndSaveForm summary", () => {
   test("Blocking", async () => {
     overrideServerClaimDataEntryResponse({
       formState: customFormState(),
-      pollingStationResults: getInitialValues(),
+      results: getInitialValues(),
       validationResults: { errors: [validationResultMockData.F201], warnings: [validationResultMockData.W201] },
     });
     renderForm();
@@ -298,7 +302,7 @@ describe("Test CheckAndSaveForm summary", () => {
     formState.sections.voters_votes_counts!.acceptErrorsAndWarnings = true;
     overrideServerClaimDataEntryResponse({
       formState: formState,
-      pollingStationResults: getInitialValues(),
+      results: getInitialValues(),
       validationResults: { errors: [], warnings: [validationResultMockData.W201] },
     });
     renderForm();
@@ -317,7 +321,7 @@ describe("Test CheckAndSaveForm summary", () => {
   test("Unaccepted warnings", async () => {
     overrideServerClaimDataEntryResponse({
       formState: customFormState(),
-      pollingStationResults: getEmptyDataEntryRequest().data,
+      results: getEmptyDataEntryRequest().data,
       validationResults: { errors: [], warnings: [validationResultMockData.W201] },
     });
     renderForm();
@@ -335,7 +339,7 @@ describe("Test CheckAndSaveForm summary", () => {
 
   test("Alert when committee session is paused is shown on save and then logs out", async () => {
     const user = userEvent.setup();
-    overrideOnce("post", "/api/polling_stations/1/data_entries/1/finalise", 409, {
+    overrideOnce("post", "/api/data_entries/1/1/finalise", 409, {
       error: "Committee session data entry is paused",
       fatal: true,
       reference: "CommitteeSessionPaused",

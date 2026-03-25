@@ -16,7 +16,7 @@ export function useDataEntryFormSection() {
     cache,
     status,
     previousResults,
-    pollingStationResults,
+    results,
     dataEntryStructure,
     formState,
     onSubmitForm,
@@ -40,7 +40,7 @@ export function useDataEntryFormSection() {
     if (cache?.key === sectionId) {
       return cache.data;
     } else {
-      return mapResultsToSectionValues(section, pollingStationResults);
+      return mapResultsToSectionValues(section, results);
     }
   });
 
@@ -97,7 +97,7 @@ export function useDataEntryFormSection() {
     formRef,
     onSubmit,
     previousValues,
-    pollingStationResults,
+    results,
     currentValues,
     dataEntryStructure,
     formSection,

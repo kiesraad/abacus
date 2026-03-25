@@ -15,7 +15,7 @@ use crate::{
 pub fn router() -> OpenApiRouter<AppState> {
     use Role::*;
 
-    const ALLOWED_ROLES: &[Role] = &[Administrator, CoordinatorGSB];
+    const ALLOWED_ROLES: &[Role] = &[Administrator, CoordinatorCSB, CoordinatorGSB];
 
     OpenApiRouter::default()
         .routes(routes!(audit_log_list).authorize(ALLOWED_ROLES))

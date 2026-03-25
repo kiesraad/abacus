@@ -16,7 +16,7 @@ use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
     api::{
         committee_session::create_committee_session,
-        middleware::authentication::RouteAuthorization,
+        middleware::authentication::{RouteAuthorization, error::AuthenticationError},
         polling_station::create_imported_polling_stations,
     },
     domain::{
@@ -40,7 +40,7 @@ use crate::{
         polling_stations_from_eml, polling_stations_from_eml_str,
     },
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
-    repository::{committee_session_repo, election_repo},
+    repository::{committee_session_repo, election_repo, user_repo::User},
     service::{create_sub_committee, list_polling_stations_for_session},
 };
 
@@ -143,10 +143,17 @@ impl AsAuditEvent for ElectionUpdatedAuditData {
     ),
 )]
 pub async fn election_list(
+    user: User,
     State(pool): State<SqlitePool>,
 ) -> Result<Json<ElectionListResponse>, APIError> {
     let mut conn = pool.acquire().await?;
-    let elections = election_repo::list(&mut conn).await?;
+    let committee_category_filter = match user.role() {
+        Role::CoordinatorCSB | Role::TypistCSB => Some(CommitteeCategory::CSB),
+        Role::CoordinatorGSB | Role::TypistGSB => Some(CommitteeCategory::GSB),
+        _ => None,
+    };
+
+    let elections = election_repo::list(&mut conn, committee_category_filter).await?;
     let committee_sessions =
         committee_session_repo::get_committee_session_for_each_election(&mut conn).await?;
     Ok(Json(ElectionListResponse {
@@ -171,11 +178,14 @@ pub async fn election_list(
     ),
 )]
 pub async fn election_details(
+    user: User,
     State(pool): State<SqlitePool>,
     Path(election_id): Path<ElectionId>,
 ) -> Result<Json<ElectionDetailsResponse>, APIError> {
     let mut conn = pool.acquire().await?;
     let election = election_repo::get(&mut conn, election_id).await?;
+    user.role().is_authorized(&election.committee_category)?;
+
     let committee_sessions =
         committee_session_repo::get_election_committee_session_list(&mut conn, election_id).await?;
     let current_committee_session = committee_sessions
@@ -214,6 +224,7 @@ pub async fn election_details(
     ),
 )]
 pub async fn election_number_of_voters_change(
+    user: User,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Path(election_id): Path<ElectionId>,
@@ -221,7 +232,15 @@ pub async fn election_number_of_voters_change(
 ) -> Result<StatusCode, APIError> {
     let mut tx = pool.begin_immediate().await?;
 
-    election_repo::get(&mut tx, election_id).await?;
+    let election = election_repo::get(&mut tx, election_id).await?;
+    user.role().is_authorized(&election.committee_category)?;
+
+    // Only allow number of voters change for GSB elections
+    // For other categories that is a sum of the number of voters of sub committees
+    if election.committee_category != CommitteeCategory::GSB {
+        return Err(AuthenticationError::Forbidden.into());
+    }
+
     let current_committee_session =
         committee_session_repo::get_election_committee_session(&mut tx, election_id).await?;
 

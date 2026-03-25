@@ -20,7 +20,7 @@ import {
   waitFor,
 } from "@/testing/test-utils";
 import { getTypistUser } from "@/testing/user-mock-data";
-import type { DATA_ENTRY_SAVE_REQUEST_BODY, PollingStationResults } from "@/types/generated/openapi";
+import type { DATA_ENTRY_SAVE_REQUEST_BODY, Results } from "@/types/generated/openapi";
 import { getDefaultDataEntryState, getEmptyDataEntryRequest } from "../../testing/mock-data";
 import {
   expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage,
@@ -37,7 +37,11 @@ function renderForm() {
 
   return render(
     <MessagesProvider>
-      <DataEntryProvider election={electionMockData} pollingStation={pollingStationMockData[0]!} entryNumber={1}>
+      <DataEntryProvider
+        election={electionMockData}
+        dataEntryId={pollingStationMockData[0]!.data_entry_id!}
+        entryNumber={1}
+      >
         <DataEntrySection committeeCategory={electionMockData.committee_category} />
       </DataEntryProvider>
     </MessagesProvider>,
@@ -117,7 +121,7 @@ describe("Test VotersAndVotesForm", () => {
       const user = userEvent.setup();
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {},
+        results: {},
       });
       renderForm();
 
@@ -219,14 +223,14 @@ describe("Test VotersAndVotesForm", () => {
             invalid_votes_count: 6,
             total_votes_cast_count: 15,
           },
-        } satisfies PollingStationResults,
+        } satisfies Results,
         client_state: {},
       };
 
       const user = userEvent.setup();
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {},
+        results: {},
       });
       renderForm();
 
@@ -249,7 +253,7 @@ describe("Test VotersAndVotesForm", () => {
       expect(spy).toHaveBeenCalled();
       const { url, method, body } = getUrlMethodAndBody(spy.mock.calls);
 
-      expect(url).toEqual("/api/polling_stations/1/data_entries/1");
+      expect(url).toEqual("/api/data_entries/1/1");
       expect(method).toEqual("POST");
       const request_body = body as DATA_ENTRY_SAVE_REQUEST_BODY;
       expect(request_body.data).toEqual(expectedRequest.data);
@@ -263,7 +267,7 @@ describe("Test VotersAndVotesForm", () => {
       renderForm();
 
       await screen.findByTestId("voters_votes_counts_form");
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+      overrideOnce("post", "/api/data_entries/1/1", 200, {
         validation_results: {
           errors: [
             {
@@ -300,7 +304,7 @@ describe("Test VotersAndVotesForm", () => {
       renderForm();
 
       await screen.findByTestId("voters_votes_counts_form");
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+      overrideOnce("post", "/api/data_entries/1/1", 200, {
         validation_results: {
           errors: [
             {
@@ -353,7 +357,7 @@ describe("Test VotersAndVotesForm", () => {
       renderForm();
 
       await screen.findByTestId("voters_votes_counts_form");
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+      overrideOnce("post", "/api/data_entries/1/1", 200, {
         validation_results: { errors: [validationResultMockData.F203], warnings: [] },
       });
 
@@ -396,7 +400,7 @@ describe("Test VotersAndVotesForm", () => {
       renderForm();
 
       await screen.findByTestId("voters_votes_counts_form");
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+      overrideOnce("post", "/api/data_entries/1/1", 200, {
         validation_results: { errors: [], warnings: [validationResultMockData.W201] },
       });
 
@@ -453,7 +457,7 @@ describe("Test VotersAndVotesForm", () => {
 
       await waitFor(() => expect(acceptFeedbackCheckbox).not.toBeInTheDocument());
 
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+      overrideOnce("post", "/api/data_entries/1/1", 200, {
         validation_results: {
           errors: [],
           warnings: [validationResultMockData.W201],
@@ -484,7 +488,7 @@ describe("Test VotersAndVotesForm", () => {
       renderForm();
 
       await screen.findByTestId("voters_votes_counts_form");
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+      overrideOnce("post", "/api/data_entries/1/1", 200, {
         validation_results: {
           errors: [],
           warnings: [{ fields: ["data.votes_counts.blank_votes_count"], code: "W201" }],
@@ -526,7 +530,7 @@ describe("Test VotersAndVotesForm", () => {
       renderForm();
 
       await screen.findByTestId("voters_votes_counts_form");
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+      overrideOnce("post", "/api/data_entries/1/1", 200, {
         validation_results: {
           errors: [],
           warnings: [{ fields: ["data.votes_counts.invalid_votes_count"], code: "W202" }],
@@ -568,7 +572,7 @@ describe("Test VotersAndVotesForm", () => {
       renderForm();
 
       await screen.findByTestId("voters_votes_counts_form");
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+      overrideOnce("post", "/api/data_entries/1/1", 200, {
         validation_results: { errors: [], warnings: [validationResultMockData.W203] },
       });
 
@@ -606,7 +610,7 @@ describe("Test VotersAndVotesForm", () => {
       renderForm();
 
       await screen.findByTestId("voters_votes_counts_form");
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+      overrideOnce("post", "/api/data_entries/1/1", 200, {
         validation_results: { errors: [], warnings: [validationResultMockData.W204] },
       });
 
@@ -646,7 +650,7 @@ describe("Test VotersAndVotesForm", () => {
     let acceptErrorsAndWarningsCheckbox: HTMLInputElement;
 
     beforeEach(async () => {
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+      overrideOnce("post", "/api/data_entries/1/1", 200, {
         validation_results: {
           errors: [],
           warnings: [{ fields: ["data.votes_counts.blank_votes_count"], code: "W201" }],
@@ -714,7 +718,7 @@ describe("Test VotersAndVotesForm", () => {
 
   describe("VotersAndVotesForm errors AND warnings", () => {
     test("Both errors and warning feedback should be shown", async () => {
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+      overrideOnce("post", "/api/data_entries/1/1", 200, {
         validation_results: {
           errors: [
             {

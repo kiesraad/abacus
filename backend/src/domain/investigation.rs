@@ -365,7 +365,7 @@ mod tests {
     #[test]
     fn test_conclude_with_new_results_wrong_state() {
         let err = concluded_without()
-            .conclude_with_new_results("findings".into(), DataEntryId::from(1))
+            .conclude_with_new_results("findings".into(), DataEntryId::from(9901))
             .unwrap_err();
         assert_eq!(err, InvestigationTransitionError::Invalid);
     }
@@ -390,7 +390,7 @@ mod tests {
 
     #[test]
     fn test_switch_to_without_from_concluded_with() {
-        let s = concluded_with(DataEntryId::from(1))
+        let s = concluded_with(DataEntryId::from(9901))
             .switch_to_without_new_results("new reason".into(), "new findings".into(), false)
             .unwrap();
         assert_eq!(
@@ -416,7 +416,7 @@ mod tests {
 
     #[test]
     fn test_switch_to_without_requires_previous_results() {
-        let err = concluded_with(DataEntryId::from(1))
+        let err = concluded_with(DataEntryId::from(9901))
             .switch_to_without_new_results("r".into(), "f".into(), true)
             .unwrap_err();
         assert_eq!(err, InvestigationTransitionError::RequiresCorrectedResults);
@@ -448,8 +448,8 @@ mod tests {
 
     #[test]
     fn test_switch_to_with_from_concluded_with() {
-        let de_id = DataEntryId::from(99);
-        let s = concluded_with(DataEntryId::from(1))
+        let de_id = DataEntryId::from(9902);
+        let s = concluded_with(DataEntryId::from(9901))
             .switch_to_with_new_results("new reason".into(), "new findings".into(), de_id)
             .unwrap();
         assert_eq!(
@@ -462,7 +462,7 @@ mod tests {
     #[test]
     fn test_switch_to_with_from_in_progress_fails() {
         let err = in_progress()
-            .switch_to_with_new_results("r".into(), "f".into(), DataEntryId::from(1))
+            .switch_to_with_new_results("r".into(), "f".into(), DataEntryId::from(9901))
             .unwrap_err();
         assert_eq!(err, InvestigationTransitionError::Invalid);
     }
@@ -503,7 +503,7 @@ mod tests {
 
     #[test]
     fn test_json_roundtrip_concluded_with() {
-        let s = concluded_with(DataEntryId::from(99));
+        let s = concluded_with(DataEntryId::from(9901));
         let json = serde_json::to_string(&s).unwrap();
         // data_entry_id is excluded from serialization
         assert_eq!(
@@ -518,7 +518,7 @@ mod tests {
 
     #[test]
     fn test_compat_from_in_progress() {
-        let ps_id = PollingStationId::from(10);
+        let ps_id = PollingStationId::from(9921);
         let status = in_progress();
         let compat = PollingStationInvestigation::from((ps_id, &status));
         assert_eq!(compat.polling_station_id, ps_id);
@@ -529,7 +529,7 @@ mod tests {
 
     #[test]
     fn test_compat_from_concluded_without() {
-        let ps_id = PollingStationId::from(10);
+        let ps_id = PollingStationId::from(9921);
         let status = concluded_without();
         let compat = PollingStationInvestigation::from((ps_id, &status));
         assert_eq!(compat.findings, Some("findings".into()));
@@ -538,8 +538,8 @@ mod tests {
 
     #[test]
     fn test_compat_from_concluded_with() {
-        let ps_id = PollingStationId::from(10);
-        let status = concluded_with(DataEntryId::from(1));
+        let ps_id = PollingStationId::from(9921);
+        let status = concluded_with(DataEntryId::from(9901));
         let compat = PollingStationInvestigation::from((ps_id, &status));
         assert_eq!(compat.findings, Some("findings".into()));
         assert_eq!(compat.corrected_results, Some(true));

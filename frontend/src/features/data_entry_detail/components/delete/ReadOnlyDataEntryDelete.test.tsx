@@ -5,16 +5,20 @@ import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockDa
 import { PollingStationDataEntryResetHandler } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
 import { render, screen, spyOnHandler } from "@/testing/test-utils";
-import type { DATA_ENTRY_RESET_REQUEST_PATH, DataEntryStatusName } from "@/types/generated/openapi";
+import type { DATA_ENTRY_RESET_REQUEST_PATH, DataEntrySource, DataEntryStatusName } from "@/types/generated/openapi";
 
 import { ReadOnlyDataEntryDelete } from "./ReadOnlyDataEntryDelete";
 
 function renderComponent(status: DataEntryStatusName) {
   const onDeleted = vi.fn();
   const onError = vi.fn();
+  const { data_entry_id, id, name, number } = pollingStationMockData[4]!;
+  const source: DataEntrySource = { type: "PollingStation", id, name, number };
+
   render(
     <ReadOnlyDataEntryDelete
-      pollingStation={pollingStationMockData[4]!}
+      dataEntrySource={source}
+      dataEntryId={data_entry_id!}
       status={status}
       onDeleted={onDeleted}
       onError={onError}
@@ -82,7 +86,7 @@ describe("ReadOnlyDataEntryDelete", () => {
   });
 
   test("on error", async () => {
-    overrideOnce("delete", "/api/polling_stations/5/data_entries" satisfies DATA_ENTRY_RESET_REQUEST_PATH, 401, {
+    overrideOnce("delete", "/api/data_entries/5" satisfies DATA_ENTRY_RESET_REQUEST_PATH, 401, {
       error: "Invalid session",
       fatal: false,
       reference: "InvalidSession",

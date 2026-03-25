@@ -6,7 +6,6 @@ use utoipa::ToSchema;
 use crate::domain::{
     election::{ElectionWithPoliticalGroups, PGNumber},
     field_path::FieldPath,
-    polling_station::PollingStation,
 };
 
 #[derive(Serialize, Deserialize, ToSchema, Debug, Default, PartialEq, Eq)]
@@ -125,7 +124,6 @@ pub trait Validate {
     fn validate(
         &self,
         election: &ElectionWithPoliticalGroups,
-        polling_station: &PollingStation,
         validation_results: &mut ValidationResults,
         path: &FieldPath,
     ) -> Result<(), DataError>;
@@ -134,16 +132,10 @@ pub trait Validate {
 pub trait ValidateRoot: Validate {
     fn start_validate(
         &self,
-        polling_station: &PollingStation,
         election: &ElectionWithPoliticalGroups,
     ) -> Result<ValidationResults, DataError> {
         let mut validation_results = ValidationResults::default();
-        self.validate(
-            election,
-            polling_station,
-            &mut validation_results,
-            &"data".into(),
-        )?;
+        self.validate(election, &mut validation_results, &"data".into())?;
         validation_results
             .errors
             .sort_by(|a, b| a.code.cmp(&b.code));

@@ -1,10 +1,10 @@
 import { describe, expect, test } from "vitest";
 
-import { emptyPollingStationResults } from "@/testing/api-mocks/DataEntryMockData";
+import { emptyResults } from "@/testing/api-mocks/DataEntryMockData";
 import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMockData";
 import { render, screen, within } from "@/testing/test-utils";
-import type { PollingStationResults, ValidationResults } from "@/types/generated/openapi";
+import type { Results, ValidationResults } from "@/types/generated/openapi";
 import type { DataEntrySection } from "@/types/types";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
@@ -12,14 +12,14 @@ import { ReadOnlyDataEntrySection } from "./ReadOnlyDataEntrySection";
 
 describe("ReadOnlyDataEntrySection", () => {
   const electionMockData = getElectionMockData().election;
-  const pollingStationResultsMockData = emptyPollingStationResults();
+  const resultsMockData = emptyResults();
 
   const structure = getDataEntryStructure("CSOFirstSession", electionMockData);
   const votersVotesSection = structure.find((s) => s.id === "voters_votes_counts")!;
 
   const renderComponent = (
     section: DataEntrySection = votersVotesSection,
-    data: PollingStationResults = pollingStationResultsMockData,
+    data: Results = resultsMockData,
     validationResults: ValidationResults = { errors: [], warnings: [] },
   ) => {
     return render(<ReadOnlyDataEntrySection section={section} data={data} validationResults={validationResults} />);
@@ -61,7 +61,7 @@ describe("ReadOnlyDataEntrySection", () => {
       warnings: [],
     };
 
-    renderComponent(votersVotesSection, pollingStationResultsMockData, validationResults);
+    renderComponent(votersVotesSection, resultsMockData, validationResults);
 
     const errorFeedback = screen.getByTestId("feedback-error");
     expect(within(errorFeedback).getByText("F.201")).toBeInTheDocument();
@@ -80,7 +80,7 @@ describe("ReadOnlyDataEntrySection", () => {
       ],
     };
 
-    renderComponent(votersVotesSection, pollingStationResultsMockData, validationResults);
+    renderComponent(votersVotesSection, resultsMockData, validationResults);
 
     const warningFeedback = screen.getByTestId("feedback-warning");
     expect(within(warningFeedback).getByText("W.201")).toBeInTheDocument();
@@ -93,7 +93,7 @@ describe("ReadOnlyDataEntrySection", () => {
       warnings: [validationResultMockData.W201],
     };
 
-    renderComponent(votersVotesSection, pollingStationResultsMockData, validationResults);
+    renderComponent(votersVotesSection, resultsMockData, validationResults);
 
     const errorFeedback = screen.getByTestId("feedback-error");
     expect(within(errorFeedback).getByText("F.201")).toBeInTheDocument();
@@ -108,7 +108,7 @@ describe("ReadOnlyDataEntrySection", () => {
       warnings: [validationResultMockData.W201],
     };
 
-    renderComponent(votersVotesSection, pollingStationResultsMockData, validationResults);
+    renderComponent(votersVotesSection, resultsMockData, validationResults);
 
     const feedbackHeaders = screen.getAllByRole("heading", { level: 3 });
     feedbackHeaders.forEach((element) => {

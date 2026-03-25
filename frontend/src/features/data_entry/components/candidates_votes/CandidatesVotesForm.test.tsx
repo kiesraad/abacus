@@ -37,7 +37,7 @@ function renderForm({ election, groupNumber }: { election?: ElectionWithPolitica
     <MessagesProvider>
       <DataEntryProvider
         election={election || electionMockData}
-        pollingStation={pollingStationMockData[0]!}
+        dataEntryId={pollingStationMockData[0]!.data_entry_id!}
         entryNumber={1}
       >
         <DataEntrySection committeeCategory={electionMockData.committee_category} />
@@ -140,7 +140,7 @@ describe("Test CandidatesVotesForm", () => {
       const user = userEvent.setup();
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {},
+        results: {},
       });
 
       renderForm();
@@ -162,7 +162,7 @@ describe("Test CandidatesVotesForm", () => {
       const user = userEvent.setup();
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {},
+        results: {},
       });
 
       renderForm();
@@ -178,7 +178,7 @@ describe("Test CandidatesVotesForm", () => {
       const user = userEvent.setup();
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {},
+        results: {},
       });
 
       renderForm();
@@ -199,14 +199,14 @@ describe("Test CandidatesVotesForm", () => {
     });
 
     test("Form field entry and keybindings", async () => {
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+      overrideOnce("post", "/api/data_entries/1/1", 200, {
         validation_results: { errors: [], warnings: [] },
       });
 
       const user = userEvent.setup();
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {},
+        results: {},
       });
       renderForm();
 
@@ -341,7 +341,7 @@ describe("Test CandidatesVotesForm", () => {
 
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {
+        results: {
           ...getEmptyDataEntryRequest().data,
           political_group_votes: [
             {
@@ -440,7 +440,7 @@ describe("Test CandidatesVotesForm", () => {
 
       expect(spy).toHaveBeenCalled();
       const { url, method, body } = getUrlMethodAndBody(spy.mock.calls);
-      expect(url).toEqual("/api/polling_stations/1/data_entries/1");
+      expect(url).toEqual("/api/data_entries/1/1");
       expect(method).toEqual("POST");
       const request_body = body as DATA_ENTRY_SAVE_REQUEST_BODY;
       expect(request_body.data).toEqual(expectedRequest.data);
@@ -453,12 +453,12 @@ describe("Test CandidatesVotesForm", () => {
 
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {},
+        results: {},
       });
       renderForm();
 
       await screen.findByTestId("political_group_votes_1_form");
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+      overrideOnce("post", "/api/data_entries/1/1", 200, {
         validation_results: { errors: [validationResultMockData.F401], warnings: [] },
       });
 
@@ -489,12 +489,12 @@ describe("Test CandidatesVotesForm", () => {
 
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {},
+        results: {},
       });
       renderForm();
 
       await screen.findByTestId("political_group_votes_1_form");
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+      overrideOnce("post", "/api/data_entries/1/1", 200, {
         validation_results: { errors: [validationResultMockData.F402], warnings: [] },
       });
 

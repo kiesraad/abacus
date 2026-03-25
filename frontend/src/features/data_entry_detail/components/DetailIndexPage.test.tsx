@@ -9,7 +9,7 @@ import { UsersProvider } from "@/hooks/user/UsersProvider";
 import {
   dataEntryHasWarningsGetMockResponse,
   dataEntryValidGetMockResponse,
-  emptyPollingStationResults,
+  emptyResults,
 } from "@/testing/api-mocks/DataEntryMockData";
 import {
   ElectionListRequestHandler,
@@ -48,7 +48,7 @@ describe("DetailIndexPage", () => {
 
   beforeEach(() => {
     vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
-    vi.spyOn(ReactRouter, "useParams").mockReturnValue({ pollingStationId: "5" });
+    vi.spyOn(ReactRouter, "useParams").mockReturnValue({ dataEntryId: "5" });
     vi.spyOn(useMessages, "useMessages").mockReturnValue({ pushMessage, popMessages: vi.fn(() => []), hasMessages });
     server.use(
       ElectionRequestHandler,
@@ -135,7 +135,7 @@ describe("DetailIndexPage", () => {
   });
 
   test("should redirect to extra_investigation when there are no errors or warnings", async () => {
-    overrideOnce("get", "/api/polling_stations/5/data_entries/get", 200, dataEntryValidGetMockResponse);
+    overrideOnce("get", "/api/data_entries/5/get", 200, dataEntryValidGetMockResponse);
 
     const router = renderPage();
 
@@ -147,9 +147,9 @@ describe("DetailIndexPage", () => {
   test("should redirect to voters_votes_counts for next committee sessions when there are no errors or warnings", async () => {
     const secondCommitteeSessionGetMockResponse: DataEntryGetResponse = {
       ...dataEntryValidGetMockResponse,
-      data: emptyPollingStationResults("CSONextSession"),
+      data: emptyResults("CSONextSession"),
     };
-    overrideOnce("get", "/api/polling_stations/5/data_entries/get", 200, secondCommitteeSessionGetMockResponse);
+    overrideOnce("get", "/api/data_entries/5/get", 200, secondCommitteeSessionGetMockResponse);
 
     const router = renderPage();
 
@@ -171,7 +171,7 @@ describe("DetailIndexPage", () => {
   });
 
   test("should render only warnings overview on detail index page", async () => {
-    overrideOnce("get", "/api/polling_stations/5/data_entries/get", 200, dataEntryHasWarningsGetMockResponse);
+    overrideOnce("get", "/api/data_entries/5/get", 200, dataEntryHasWarningsGetMockResponse);
 
     renderPage();
 

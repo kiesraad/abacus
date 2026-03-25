@@ -111,12 +111,10 @@ pub async fn create_polling_station(
 pub async fn claim_data_entry(
     addr: &SocketAddr,
     cookie: &HeaderValue,
-    polling_station_id: u32,
+    data_entry_id: u32,
     entry_number: u32,
 ) {
-    let url = format!(
-        "http://{addr}/api/polling_stations/{polling_station_id}/data_entries/{entry_number}/claim"
-    );
+    let url = format!("http://{addr}/api/data_entries/{data_entry_id}/{entry_number}/claim");
     let res = reqwest::Client::new()
         .post(&url)
         .header("cookie", cookie)
@@ -130,13 +128,11 @@ pub async fn claim_data_entry(
 pub async fn save_data_entry(
     addr: &SocketAddr,
     cookie: &HeaderValue,
-    polling_station_id: u32,
+    data_entry_id: u32,
     entry_number: u32,
     data_entry: serde_json::Value,
 ) -> Response {
-    let url = format!(
-        "http://{addr}/api/polling_stations/{polling_station_id}/data_entries/{entry_number}"
-    );
+    let url = format!("http://{addr}/api/data_entries/{data_entry_id}/{entry_number}");
     let res = reqwest::Client::new()
         .post(&url)
         .header("cookie", cookie)
@@ -152,12 +148,10 @@ pub async fn save_data_entry(
 pub async fn finalise_data_entry(
     addr: &SocketAddr,
     cookie: &HeaderValue,
-    polling_station_id: u32,
+    data_entry_id: u32,
     entry_number: u32,
 ) -> Response {
-    let url = format!(
-        "http://{addr}/api/polling_stations/{polling_station_id}/data_entries/{entry_number}/finalise"
-    );
+    let url = format!("http://{addr}/api/data_entries/{data_entry_id}/{entry_number}/finalise");
     let res = reqwest::Client::new()
         .post(&url)
         .header("cookie", cookie)
@@ -172,13 +166,13 @@ pub async fn finalise_data_entry(
 pub async fn complete_data_entry(
     addr: &SocketAddr,
     cookie: &HeaderValue,
-    polling_station_id: u32,
+    data_entry_id: u32,
     entry_number: u32,
     data_entry: serde_json::Value,
 ) -> Response {
-    claim_data_entry(addr, cookie, polling_station_id, entry_number).await;
-    save_data_entry(addr, cookie, polling_station_id, entry_number, data_entry).await;
-    finalise_data_entry(addr, cookie, polling_station_id, entry_number).await
+    claim_data_entry(addr, cookie, data_entry_id, entry_number).await;
+    save_data_entry(addr, cookie, data_entry_id, entry_number, data_entry).await;
+    finalise_data_entry(addr, cookie, data_entry_id, entry_number).await
 }
 
 async fn check_data_entry_status_is_definitive(
@@ -247,10 +241,12 @@ pub async fn update_investigation(
 
 pub async fn create_result(addr: &SocketAddr, polling_station_id: u32, election_id: u32) {
     let typist_cookie = login(addr, FixtureUser::TypistGSB).await;
+    let data_entry_id =
+        get_data_entry_id(addr, &typist_cookie, election_id, polling_station_id).await;
     complete_data_entry(
         addr,
         &typist_cookie,
-        polling_station_id,
+        data_entry_id,
         1,
         example_data_entry(None),
     )
@@ -259,7 +255,7 @@ pub async fn create_result(addr: &SocketAddr, polling_station_id: u32, election_
     complete_data_entry(
         addr,
         &typist2_cookie,
-        polling_station_id,
+        data_entry_id,
         2,
         example_data_entry(None),
     )
@@ -275,16 +271,11 @@ pub async fn create_result_with_non_example_data_entry(
     data_entry: serde_json::Value,
 ) {
     let typist_cookie = login(addr, FixtureUser::TypistGSB).await;
-    complete_data_entry(
-        addr,
-        &typist_cookie,
-        polling_station_id,
-        1,
-        data_entry.clone(),
-    )
-    .await;
+    let data_entry_id =
+        get_data_entry_id(addr, &typist_cookie, election_id, polling_station_id).await;
+    complete_data_entry(addr, &typist_cookie, data_entry_id, 1, data_entry.clone()).await;
     let typist2_cookie = login(addr, FixtureUser::Typist2GSB).await;
-    complete_data_entry(addr, &typist2_cookie, polling_station_id, 2, data_entry).await;
+    complete_data_entry(addr, &typist2_cookie, data_entry_id, 2, data_entry).await;
     check_data_entry_status_is_definitive(addr, &typist2_cookie, polling_station_id, election_id)
         .await;
 }
@@ -303,6 +294,27 @@ pub async fn get_election_details(
         .unwrap();
     assert_eq!(response.status(), StatusCode::OK);
     response.json().await.unwrap()
+}
+
+pub async fn get_investigations(
+    addr: &SocketAddr,
+    cookie: &HeaderValue,
+    election_id: u32,
+    session_id: u32,
+) -> serde_json::Value {
+    let url = format!(
+        "http://{addr}/api/elections/{election_id}/committee_sessions/{session_id}/investigations"
+    );
+    let response = reqwest::Client::new()
+        .get(&url)
+        .header("cookie", cookie)
+        .send()
+        .await
+        .unwrap();
+    assert_eq!(&response.status(), &StatusCode::OK);
+
+    let body: serde_json::Value = response.json().await.unwrap();
+    body["investigations"].clone()
 }
 
 pub async fn get_election_committee_session(
@@ -340,6 +352,22 @@ pub async fn change_status_committee_session(
         .await
         .unwrap();
     assert_eq!(response.status(), StatusCode::NO_CONTENT);
+}
+
+/// Get the data_entry_id for a polling station from the election status endpoint
+pub async fn get_data_entry_id(
+    addr: &SocketAddr,
+    cookie: &HeaderValue,
+    election_id: u32,
+    polling_station_id: u32,
+) -> u32 {
+    let statuses = get_statuses(addr, cookie, election_id).await;
+    u32::try_from(
+        statuses[&polling_station_id]["data_entry_id"]
+            .as_u64()
+            .unwrap(),
+    )
+    .unwrap()
 }
 
 pub async fn get_statuses(

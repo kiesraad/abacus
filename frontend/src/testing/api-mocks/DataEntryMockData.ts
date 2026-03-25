@@ -4,7 +4,8 @@ import type {
   CommonPollingStationResults,
   DataEntryGetDifferencesResponse,
   DataEntryGetResponse,
-  PollingStationResults,
+  DataEntrySource,
+  Results,
   SaveDataEntryResponse,
   ValidationResults,
 } from "@/types/generated/openapi";
@@ -16,9 +17,12 @@ export const emptyValidationResults: ValidationResults = {
   warnings: [],
 };
 
-export function emptyPollingStationResults(
-  model: "CSOFirstSession" | "CSONextSession" = "CSOFirstSession",
-): PollingStationResults {
+const source = (id: number): DataEntrySource => {
+  const { number, name } = pollingStationMockData.find((p) => p.id === id)!;
+  return { type: "PollingStation", id, number, name };
+};
+
+export function emptyResults(model: "CSOFirstSession" | "CSONextSession" = "CSOFirstSession"): Results {
   const commonPollingStationResults: CommonPollingStationResults = {
     voters_counts: {
       poll_card_count: 0,
@@ -80,15 +84,10 @@ export function emptyPollingStationResults(
 }
 
 export const claimDataEntryResponse: ClaimDataEntryResponse = {
-  data: emptyPollingStationResults(),
+  data: emptyResults(),
   validation_results: emptyValidationResults,
   client_state: null,
-  source: {
-    type: "PollingStation",
-    id: pollingStationMockData[0]!.id,
-    number: pollingStationMockData[0]!.number,
-    name: pollingStationMockData[0]!.name,
-  },
+  source: source(1),
   status: "first_entry_in_progress",
 };
 
@@ -219,34 +218,38 @@ export const dataEntryStatusDifferences: DataEntryGetDifferencesResponse = {
       },
     ],
   },
+  source: source(3),
 };
 
 export const dataEntryHasErrorsGetMockResponse: DataEntryGetResponse = {
   user_id: 3,
-  data: emptyPollingStationResults(),
+  data: emptyResults(),
   status: "first_entry_has_errors",
   validation_results: {
     errors: [validationResultMockData.F201],
     warnings: [validationResultMockData.W001, validationResultMockData.W201, validationResultMockData.W202],
   },
+  source: source(5),
 };
 
 export const dataEntryHasWarningsGetMockResponse: DataEntryGetResponse = {
   user_id: 3,
-  data: emptyPollingStationResults(),
+  data: emptyResults(),
   status: "first_entry_finalised",
   validation_results: {
     errors: [],
     warnings: [validationResultMockData.W001, validationResultMockData.W201, validationResultMockData.W202],
   },
+  source: source(1),
 };
 
 export const dataEntryValidGetMockResponse: DataEntryGetResponse = {
   user_id: 3,
-  data: emptyPollingStationResults(),
+  data: emptyResults(),
   status: "first_entry_finalised",
   validation_results: {
     errors: [],
     warnings: [],
   },
+  source: source(5),
 };

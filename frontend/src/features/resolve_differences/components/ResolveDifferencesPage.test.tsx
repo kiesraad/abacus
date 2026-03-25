@@ -41,7 +41,7 @@ const renderPage = async () => {
 };
 
 function overrideResponseStatus(status: DataEntryStatusName) {
-  overrideOnce("post", "/api/polling_stations/3/data_entries/resolve_differences", 200, { status });
+  overrideOnce("post", "/api/data_entries/3/resolve_differences", 200, { status });
 }
 
 describe("ResolveDifferencesPage", () => {
@@ -51,7 +51,7 @@ describe("ResolveDifferencesPage", () => {
   beforeEach(() => {
     vi.spyOn(useMessages, "useMessages").mockReturnValue({ pushMessage, popMessages: vi.fn(() => []), hasMessages });
     vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
-    vi.spyOn(ReactRouter, "useParams").mockReturnValue({ pollingStationId: "3" });
+    vi.spyOn(ReactRouter, "useParams").mockReturnValue({ dataEntryId: "3" });
     vi.spyOn(ReactRouter, "useLocation").mockReturnValue({
       pathname: "/",
     } as Partial<ReactRouter.Location> as ReactRouter.Location);

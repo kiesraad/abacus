@@ -67,6 +67,5 @@
   "not_found_feedback": "We kunnen de pagina die je zoekt niet vinden. Het kan zijn dat de pagina is verplaatst of verwijderd.",
   "not_possible": "Dit kan nu niet",
   "page_not_found": "De pagina <code>{path}</code> is niet gevonden.",
-  "polling_station_not_found": "Stembureau niet gevonden",
   "title": "Abacus is stuk"
 }

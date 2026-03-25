@@ -31,7 +31,11 @@ function renderForm() {
 
   return render(
     <MessagesProvider>
-      <DataEntryProvider election={electionMockData} pollingStation={pollingStationMockData[0]!} entryNumber={1}>
+      <DataEntryProvider
+        election={electionMockData}
+        dataEntryId={pollingStationMockData[0]!.data_entry_id!}
+        entryNumber={1}
+      >
         <DataEntrySection committeeCategory={electionMockData.committee_category} />
       </DataEntryProvider>
     </MessagesProvider>,
@@ -64,7 +68,7 @@ describe("Test DifferencesForm", () => {
 
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {},
+        results: {},
       });
       renderForm();
 
@@ -83,7 +87,7 @@ describe("Test DifferencesForm", () => {
       const user = userEvent.setup();
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {},
+        results: {},
       });
 
       renderForm();
@@ -99,14 +103,14 @@ describe("Test DifferencesForm", () => {
     });
 
     test("Form field entry and keybindings", async () => {
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+      overrideOnce("post", "/api/data_entries/1/1", 200, {
         validation_results: { errors: [], warnings: [] },
       });
 
       const user = userEvent.setup();
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {},
+        results: {},
       });
       renderForm();
 
@@ -170,7 +174,7 @@ describe("Test DifferencesForm", () => {
       const user = userEvent.setup();
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {
+        results: {
           ...votersAndVotesValues,
         },
       });
@@ -193,7 +197,7 @@ describe("Test DifferencesForm", () => {
 
       expect(spy).toHaveBeenCalled();
       const { url, method, body } = getUrlMethodAndBody(spy.mock.calls);
-      expect(url).toEqual("/api/polling_stations/1/data_entries/1");
+      expect(url).toEqual("/api/data_entries/1/1");
       expect(method).toEqual("POST");
       const request_body = body as DATA_ENTRY_SAVE_REQUEST_BODY;
       expect(request_body.data).toEqual(expectedRequest.data);
@@ -208,12 +212,12 @@ describe("Test DifferencesForm", () => {
 
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {},
+        results: {},
       });
       renderForm();
 
       await screen.findByTestId("differences_counts_form");
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+      overrideOnce("post", "/api/data_entries/1/1", 200, {
         validation_results: { errors: [validationResultMockData.F301], warnings: [] },
       });
 
@@ -249,12 +253,12 @@ describe("Test DifferencesForm", () => {
       const user = userEvent.setup();
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {},
+        results: {},
       });
       renderForm();
 
       await screen.findByTestId("differences_counts_form");
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+      overrideOnce("post", "/api/data_entries/1/1", 200, {
         validation_results: { errors: [validationResultMockData.F302], warnings: [] },
       });
 
@@ -292,13 +296,13 @@ describe("Test DifferencesForm", () => {
 
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {},
+        results: {},
       });
 
       renderForm();
 
       await screen.findByTestId("differences_counts_form");
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+      overrideOnce("post", "/api/data_entries/1/1", 200, {
         validation_results: { errors: [validationResultMockData.F303], warnings: [] },
       });
 
@@ -335,13 +339,13 @@ describe("Test DifferencesForm", () => {
 
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {},
+        results: {},
       });
 
       renderForm();
 
       await screen.findByTestId("differences_counts_form");
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+      overrideOnce("post", "/api/data_entries/1/1", 200, {
         validation_results: { errors: [validationResultMockData.F304], warnings: [] },
       });
 
@@ -378,13 +382,13 @@ describe("Test DifferencesForm", () => {
 
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {},
+        results: {},
       });
 
       renderForm();
 
       await screen.findByTestId("differences_counts_form");
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+      overrideOnce("post", "/api/data_entries/1/1", 200, {
         validation_results: { errors: [validationResultMockData.F305], warnings: [] },
       });
 
@@ -420,13 +424,13 @@ describe("Test DifferencesForm", () => {
 
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {},
+        results: {},
       });
 
       renderForm();
 
       await screen.findByTestId("differences_counts_form");
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+      overrideOnce("post", "/api/data_entries/1/1", 200, {
         validation_results: { errors: [validationResultMockData.F306], warnings: [] },
       });
 
@@ -462,13 +466,13 @@ describe("Test DifferencesForm", () => {
 
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {},
+        results: {},
       });
 
       renderForm();
 
       await screen.findByTestId("differences_counts_form");
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+      overrideOnce("post", "/api/data_entries/1/1", 200, {
         validation_results: { errors: [validationResultMockData.F307], warnings: [] },
       });
 
@@ -504,13 +508,13 @@ describe("Test DifferencesForm", () => {
 
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {},
+        results: {},
       });
 
       renderForm();
 
       await screen.findByTestId("differences_counts_form");
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+      overrideOnce("post", "/api/data_entries/1/1", 200, {
         validation_results: { errors: [validationResultMockData.F308], warnings: [] },
       });
 
@@ -546,13 +550,13 @@ describe("Test DifferencesForm", () => {
 
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {},
+        results: {},
       });
 
       renderForm();
 
       await screen.findByTestId("differences_counts_form");
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+      overrideOnce("post", "/api/data_entries/1/1", 200, {
         validation_results: { errors: [validationResultMockData.F309], warnings: [] },
       });
 
@@ -588,13 +592,13 @@ describe("Test DifferencesForm", () => {
 
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {},
+        results: {},
       });
 
       renderForm();
 
       await screen.findByTestId("differences_counts_form");
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+      overrideOnce("post", "/api/data_entries/1/1", 200, {
         validation_results: { errors: [validationResultMockData.F310], warnings: [] },
       });
 

@@ -1,4 +1,4 @@
-use sqlx::{Connection, FromRow, SqliteConnection, query, query_as, types::Json};
+use sqlx::{Connection, FromRow, SqliteConnection, query, query_as, query_scalar, types::Json};
 
 use crate::{
     domain::{
@@ -7,7 +7,7 @@ use crate::{
             DataEntryId, DataEntrySource, DataEntryStatus, DataEntryStatusWithSource,
             PollingStationSource,
         },
-        election::ElectionId,
+        election::{CommitteeCategory, ElectionId},
         investigation::InvestigationStatus,
         polling_station::{
             PollingStation, PollingStationFirstSession, PollingStationForSession, PollingStationId,
@@ -137,6 +137,25 @@ impl From<PollingStationRow> for PollingStationForSession {
             Self::First(PollingStationFirstSession::from(row))
         }
     }
+}
+
+/// Returns the committee category for the related election
+pub async fn get_committee_category(
+    conn: &mut SqliteConnection,
+    polling_station_id: PollingStationId,
+) -> Result<CommitteeCategory, sqlx::Error> {
+    query_scalar!(
+        r#"
+        SELECT e.committee_category as "committee_category: _"
+        FROM polling_stations AS p
+        JOIN committee_sessions AS c ON c.id = p.committee_session_id
+        JOIN elections AS e ON c.election_id = e.id
+        WHERE p.id = ?
+        "#,
+        polling_station_id
+    )
+    .fetch_one(conn)
+    .await
 }
 
 /// Returns if a committee session has polling stations
@@ -527,6 +546,20 @@ pub async fn link_data_entry(
     .map(PollingStationForSession::from)
 }
 
+/// Clear `data_entry_id` on a polling station (counterpart to `link_data_entry`).
+pub async fn unlink_data_entry(
+    conn: &mut SqliteConnection,
+    polling_station_id: PollingStationId,
+) -> Result<(), sqlx::Error> {
+    query!(
+        "UPDATE polling_stations SET data_entry_id = NULL WHERE id = ?",
+        polling_station_id
+    )
+    .execute(conn)
+    .await?;
+    Ok(())
+}
+
 /// List all polling stations for a committee session (without session metadata)
 pub async fn list_polling_stations(
     conn: &mut SqliteConnection,
@@ -625,6 +658,7 @@ pub async fn list_first_session_with_status(
             p.id AS "id: PollingStationId",
             p.number AS "number: PollingStationNumber",
             p.name,
+            p.prev_data_entry_id AS "prev_data_entry_id: DataEntryId",
             de.state AS "state: Json<DataEntryStatus>"
         FROM polling_stations AS p
         JOIN committee_sessions AS c ON c.id = p.committee_session_id
@@ -639,6 +673,7 @@ pub async fn list_first_session_with_status(
             id: row.id,
             number: row.number,
             name: row.name,
+            prev_data_entry_id: row.prev_data_entry_id,
         }),
         status: row.state.map(|j| j.0).unwrap_or_default(),
     })
@@ -659,6 +694,7 @@ pub async fn list_next_session_with_status(
             p.id AS "id: PollingStationId",
             p.number AS "number: PollingStationNumber",
             p.name,
+            p.prev_data_entry_id AS "prev_data_entry_id: DataEntryId",
             de.state AS "state: Json<DataEntryStatus>"
         FROM polling_stations AS p
         JOIN committee_sessions AS c ON c.id = p.committee_session_id
@@ -673,6 +709,7 @@ pub async fn list_next_session_with_status(
             id: row.id,
             number: row.number,
             name: row.name,
+            prev_data_entry_id: row.prev_data_entry_id,
         }),
         status: row.state.map(|j| j.0).unwrap_or_default(),
     })
@@ -702,4 +739,20 @@ pub async fn insert_test_polling_station(
     .execute(conn)
     .await?;
     Ok(())
+}
+
+/// Check if a polling station exists, regardless of the committee session it belongs to
+#[cfg(test)]
+pub async fn exists(
+    conn: &mut SqliteConnection,
+    polling_station_id: PollingStationId,
+) -> Result<bool, sqlx::Error> {
+    let exists = sqlx::query_scalar!(
+        r#"SELECT EXISTS(SELECT 1 FROM polling_stations WHERE id = $1)"#,
+        polling_station_id,
+    )
+    .fetch_one(conn)
+    .await?;
+
+    Ok(exists != 0)
 }

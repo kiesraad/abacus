@@ -1,5 +1,5 @@
 import { assertStateIsLoaded } from "@/features/data_entry/utils/utils";
-import type { ElectionWithPoliticalGroups } from "@/types/generated/openapi";
+import type { DataEntryId, ElectionWithPoliticalGroups } from "@/types/generated/openapi";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
 import type { ClientState, DataEntryAction, DataEntryState } from "../types/types";
@@ -7,15 +7,15 @@ import { buildFormState, getInitialFormState, getNextSectionID, updateFormStateA
 
 export function getInitialState(
   election: ElectionWithPoliticalGroups,
-  pollingStationId: number,
+  dataEntryId: DataEntryId,
   entryNumber: number,
 ): DataEntryState {
   return {
     election,
-    pollingStationId,
+    dataEntryId,
     error: null,
     previousResults: null,
-    pollingStationResults: null,
+    results: null,
     source: null,
     dataEntryStatus: null,
     entryNumber,
@@ -46,7 +46,7 @@ export default function dataEntryReducer(state: DataEntryState, action: DataEntr
           formState,
           targetFormSectionId,
           previousResults: action.dataEntry.previous_results ?? null,
-          pollingStationResults: action.dataEntry.data,
+          results: action.dataEntry.data,
           source: action.dataEntry.source,
           dataEntryStatus: action.dataEntry.status,
           error: null,
@@ -62,7 +62,7 @@ export default function dataEntryReducer(state: DataEntryState, action: DataEntr
           formState: getInitialFormState(dataEntryStructure),
           targetFormSectionId,
           previousResults: action.dataEntry.previous_results ?? null,
-          pollingStationResults: action.dataEntry.data,
+          results: action.dataEntry.data,
           source: action.dataEntry.source,
           dataEntryStatus: action.dataEntry.status,
           error: null,
@@ -126,7 +126,7 @@ export default function dataEntryReducer(state: DataEntryState, action: DataEntr
         ...state,
         status: "idle",
         error: null,
-        pollingStationResults: action.data,
+        results: action.data,
         formState,
         targetFormSectionId: action.continueToNextSection
           ? getNextSectionID(formState, action.sectionId)

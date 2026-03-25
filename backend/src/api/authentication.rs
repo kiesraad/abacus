@@ -256,7 +256,14 @@ async fn login(
     set_default_cookie_properties(&mut cookie);
     let updated_jar = jar.add(cookie);
 
-    Ok((updated_jar, Json(LoginResponse::from(&user))))
+    // Explicitly set the x-session-expires-at header, since the middleware will not do this for the login route
+    let response_headers = [("x-session-expires-at", session.expires_at().to_rfc3339())];
+
+    Ok((
+        updated_jar,
+        response_headers,
+        Json(LoginResponse::from(&user)),
+    ))
 }
 
 #[derive(Debug, Serialize, Deserialize, ToSchema)]

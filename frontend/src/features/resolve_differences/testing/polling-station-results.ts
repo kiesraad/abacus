@@ -1,5 +1,5 @@
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
-import type { Candidate, CandidateVotes, PollingStationResults } from "@/types/generated/openapi";
+import type { Candidate, CandidateVotes, Results } from "@/types/generated/openapi";
 
 /**
  * Base candidate votes on given mock data to ensure there are the same number of candidates.
@@ -18,10 +18,10 @@ const baseCandidateVotesOn = (candidates: Candidate[], votes: Record<number, num
 };
 
 /**
- * Return PollingStationResults data for testing the resolve differences feature.
+ * Return Results data for testing the resolve differences feature.
  * @param first true for the first entry, false for the second entry
  */
-export function pollingStationResultsMockData(first: boolean): PollingStationResults {
+export function resultsMockData(first: boolean): Results {
   return {
     model: "CSOFirstSession",
     extra_investigation: {

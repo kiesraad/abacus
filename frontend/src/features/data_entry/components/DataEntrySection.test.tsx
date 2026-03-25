@@ -24,7 +24,11 @@ function renderComponent(sectionId: string) {
 
   return renderReturningRouter(
     <MessagesProvider>
-      <DataEntryProvider election={electionMockData} pollingStation={pollingStationMockData[0]!} entryNumber={1}>
+      <DataEntryProvider
+        election={electionMockData}
+        dataEntryId={pollingStationMockData[0]!.data_entry_id!}
+        entryNumber={1}
+      >
         <DataEntrySection committeeCategory={electionMockData.committee_category} />
       </DataEntryProvider>
     </MessagesProvider>,
@@ -83,7 +87,7 @@ describe("DataEntrySection", () => {
 
   describe("Session paused", () => {
     test("Redirect when committee session is paused is returned on claim", async () => {
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1/claim", 409, {
+      overrideOnce("post", "/api/data_entries/1/1/claim", 409, {
         error: "Committee session data entry is paused",
         fatal: true,
         reference: "CommitteeSessionPaused",
@@ -98,7 +102,7 @@ describe("DataEntrySection", () => {
 
     test("Alert when committee session is paused is shown on save and navigate back to overview", async () => {
       const user = userEvent.setup();
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 409, {
+      overrideOnce("post", "/api/data_entries/1/1", 409, {
         error: "Committee session data entry is paused",
         fatal: true,
         reference: "CommitteeSessionPaused",
@@ -142,7 +146,7 @@ describe("DataEntrySection", () => {
 
     beforeEach(async () => {
       user = userEvent.setup();
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+      overrideOnce("post", "/api/data_entries/1/1", 200, {
         validation_results: { errors: [], warnings: [validationResultMockData.W001] },
       } satisfies SaveDataEntryResponse);
       renderComponent("voters_votes_counts");

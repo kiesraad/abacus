@@ -17,8 +17,11 @@ use utoipa::ToSchema;
 use crate::{
     MAX_BODY_SIZE_MB,
     api::middleware::authentication::error::AuthenticationError,
-    domain::{committee_session::CommitteeSessionError, validate::DataError},
+    domain::{
+        committee_session::CommitteeSessionError, role::RoleNotAuthorizedError, validate::DataError,
+    },
     eml::EMLImportError,
+    repository::data_entry_repo::ResolveSourceError,
     service::{DataEntryServiceError, PollingStationServiceError, SubCommitteeServiceError},
 };
 use pdf_gen::{PdfGenError, zip::ZipResponseError};
@@ -561,10 +564,29 @@ impl From<PollingStationServiceError> for APIError {
     }
 }
 
+impl From<RoleNotAuthorizedError> for APIError {
+    fn from(_: RoleNotAuthorizedError) -> Self {
+        APIError::Authentication(AuthenticationError::Forbidden)
+    }
+}
+
 impl From<SubCommitteeServiceError> for APIError {
     fn from(err: SubCommitteeServiceError) -> Self {
         match err {
             SubCommitteeServiceError::DatabaseError(e) => e.into(),
+        }
+    }
+}
+
+impl From<ResolveSourceError> for APIError {
+    fn from(err: ResolveSourceError) -> Self {
+        match err {
+            ResolveSourceError::Sqlx(e) => e.into(),
+            ResolveSourceError::DataIntegrity(msg) => APIError::DataIntegrityError(msg),
+            ResolveSourceError::OrphanedDataEntry(id) => APIError::NotFound(
+                format!("Data entry {id} has no associated source"),
+                ErrorReference::EntryNotFound,
+            ),
         }
     }
 }

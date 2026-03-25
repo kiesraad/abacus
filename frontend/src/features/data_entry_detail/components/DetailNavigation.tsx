@@ -16,7 +16,7 @@ interface DetailNavigationProps {
 }
 
 export function DetailNavigation({ structure, status, validationResults }: DetailNavigationProps) {
-  const pollingStationId = useNumericParam("pollingStationId");
+  const dataEntryId = useNumericParam("dataEntryId");
   const electionId = useNumericParam("electionId");
   const params = useParams<{ sectionId?: string }>();
   const currentSectionId = params.sectionId ?? null;
@@ -42,7 +42,7 @@ export function DetailNavigation({ structure, status, validationResults }: Detai
   };
 
   const getSectionUrl = (sectionId: string): string => {
-    const basePath = `/elections/${electionId}/status/${pollingStationId}/detail`;
+    const basePath = `/elections/${electionId}/status/${dataEntryId}/detail`;
     return sectionId ? `${basePath}/${sectionId}` : basePath;
   };
 

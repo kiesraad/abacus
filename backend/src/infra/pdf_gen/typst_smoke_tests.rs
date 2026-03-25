@@ -194,7 +194,7 @@ fn random_polling_station(
     );
 
     PollingStation {
-        id: PollingStationId::from(rng.random_range(0..5)),
+        id: PollingStationId::from(rng.random_range(9910..9915)),
         name: random_string(rng, string_length),
         number: rng.random_range(0..5),
         number_of_voters: random_option(rng, number_of_voters, none_where_possible),
@@ -248,7 +248,7 @@ fn random_committee_session(
     }
 }
 
-fn random_polling_station_result(
+fn random_result(
     rng: &mut impl RngExt,
     election: &ElectionWithPoliticalGroups,
 ) -> CommonPollingStationResults {
@@ -325,7 +325,7 @@ fn random_election_summary(
     election: &ElectionWithPoliticalGroups,
     polling_stations: &[PollingStation],
 ) -> ElectionSummary {
-    let result = random_polling_station_result(rng, election);
+    let result = random_result(rng, election);
 
     ElectionSummary {
         voters_counts: result.voters_counts,
@@ -460,7 +460,7 @@ async fn test_na_14_2_bijlage_1() {
             string_length,
             none_where_possible,
         );
-        let previous_results = random_polling_station_result(&mut rng, &election);
+        let previous_results = random_result(&mut rng, &election);
 
         let model = PdfModel::ModelNa14_2Bijlage1(Box::new(ModelNa14_2Bijlage1Input {
             votes_tables: VotesTablesWithOnlyPreviousVotes::new(&election, &previous_results)

@@ -10,7 +10,7 @@ use test_log::test;
 
 use crate::{
     shared::{
-        FixtureUser, create_result, create_result_with_non_example_data_entry,
+        FixtureUser::*, create_result, create_result_with_non_example_data_entry,
         differences_counts_zero, login, political_group_votes_from_test_data_auto,
     },
     utils::serve_api,
@@ -28,7 +28,7 @@ fn get_total_seats_from_seat_assignment(seat_assignment: &serde_json::Value) -> 
 }
 
 async fn get_apportionment(addr: &SocketAddr, election_id: u32) -> Response {
-    let coordinator_cookie = shared::login(addr, FixtureUser::CoordinatorGSB).await;
+    let coordinator_cookie = shared::login(addr, CoordinatorGSB).await;
     let url = format!("http://{addr}/api/elections/{election_id}/apportionment");
     reqwest::Client::new()
         .post(&url)
@@ -115,9 +115,9 @@ async fn test_lt_19_seats(pool: SqlitePool) {
         "progress": 100,
         "client_state": {}
     });
-    create_result_with_non_example_data_entry(&addr, 7, 4, request_body).await;
+    create_result_with_non_example_data_entry(&addr, 417, 4, request_body).await;
 
-    let coordinator_cookie = login(&addr, FixtureUser::CoordinatorGSB).await;
+    let coordinator_cookie = login(&addr, CoordinatorGSB).await;
     shared::change_status_committee_session(&addr, &coordinator_cookie, 4, 4, "completed").await;
 
     let response = get_apportionment(&addr, 4).await;
@@ -144,7 +144,7 @@ async fn test_lt_19_seats(pool: SqlitePool) {
 async fn test_gte_19_seats(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
-    let coordinator_cookie = login(&addr, FixtureUser::CoordinatorGSB).await;
+    let coordinator_cookie = login(&addr, CoordinatorGSB).await;
     shared::change_status_committee_session(&addr, &coordinator_cookie, 5, 6, "completed").await;
 
     let response = get_apportionment(&addr, 5).await;
@@ -171,9 +171,9 @@ async fn test_gte_19_seats(pool: SqlitePool) {
 async fn test_error_all_lists_exhausted(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
-    create_result(&addr, 3, 3).await;
+    create_result(&addr, 313, 3).await;
 
-    let coordinator_cookie = login(&addr, FixtureUser::CoordinatorGSB).await;
+    let coordinator_cookie = login(&addr, CoordinatorGSB).await;
     shared::change_status_committee_session(&addr, &coordinator_cookie, 3, 3, "completed").await;
 
     let response = get_apportionment(&addr, 3).await;
@@ -230,9 +230,9 @@ async fn test_error_drawing_of_lots_not_implemented(pool: SqlitePool) {
         "progress": 100,
         "client_state": {}
     });
-    create_result_with_non_example_data_entry(&addr, 3, 3, request_body).await;
+    create_result_with_non_example_data_entry(&addr, 313, 3, request_body).await;
 
-    let coordinator_cookie = login(&addr, FixtureUser::CoordinatorGSB).await;
+    let coordinator_cookie = login(&addr, CoordinatorGSB).await;
     shared::change_status_committee_session(&addr, &coordinator_cookie, 3, 3, "completed").await;
 
     let response = get_apportionment(&addr, 3).await;
@@ -255,7 +255,7 @@ async fn test_error_invalid_election(pool: SqlitePool) {
 async fn test_api_output(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
-    let coordinator_cookie = login(&addr, FixtureUser::CoordinatorGSB).await;
+    let coordinator_cookie = login(&addr, CoordinatorGSB).await;
     shared::change_status_committee_session(&addr, &coordinator_cookie, 5, 6, "completed").await;
 
     let response = get_apportionment(&addr, 5).await;

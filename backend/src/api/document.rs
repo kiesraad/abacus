@@ -13,7 +13,7 @@ use crate::{
     APIError, AppState, ErrorResponse,
     api::middleware::authentication::RouteAuthorization,
     domain::{
-        election::ElectionId,
+        election::{CommitteeCategory, ElectionId},
         models::{
             ModelN10_2Input, ModelNa31_2Bijlage1Input, ModelNa31_2InlegvelInput, ToPdfFileModel,
         },
@@ -21,7 +21,7 @@ use crate::{
         votes_table::CandidatesTables,
     },
     error::ErrorReference,
-    repository::{committee_session_repo, election_repo},
+    repository::{committee_session_repo, election_repo, user_repo::User},
     service::list_polling_stations_for_session,
 };
 
@@ -59,11 +59,21 @@ pub fn router() -> OpenApiRouter<AppState> {
     ),
 )]
 async fn election_download_n_10_2(
+    user: User,
     State(pool): State<SqlitePool>,
     Path(election_id): Path<ElectionId>,
 ) -> Result<impl IntoResponse, APIError> {
     let mut conn = pool.acquire().await?;
     let election = election_repo::get(&mut conn, election_id).await?;
+    user.role().is_authorized(&election.committee_category)?;
+
+    if election.committee_category != CommitteeCategory::GSB {
+        return Err(APIError::NotFound(
+            "N 10-2 is only available for GSB elections".into(),
+            ErrorReference::EntryNotFound,
+        ));
+    }
+
     let current_committee_session =
         committee_session_repo::get_election_committee_session(&mut conn, election.id).await?;
     let polling_stations = list_polling_stations_for_session(&mut conn, &current_committee_session)
@@ -137,11 +147,21 @@ async fn election_download_n_10_2(
     ),
 )]
 async fn election_download_na_31_2_bijlage1(
+    user: User,
     State(pool): State<SqlitePool>,
     Path(election_id): Path<ElectionId>,
 ) -> Result<impl IntoResponse, APIError> {
     let mut conn = pool.acquire().await?;
     let election = election_repo::get(&mut conn, election_id).await?;
+    user.role().is_authorized(&election.committee_category)?;
+
+    if election.committee_category != CommitteeCategory::GSB {
+        return Err(APIError::NotFound(
+            "Na 31-2 Bijlage 1 is only available for GSB elections".into(),
+            ErrorReference::EntryNotFound,
+        ));
+    }
+
     let current_committee_session =
         committee_session_repo::get_election_committee_session(&mut conn, election.id).await?;
     let polling_stations = list_polling_stations_for_session(&mut conn, &current_committee_session)
@@ -216,12 +236,21 @@ async fn election_download_na_31_2_bijlage1(
     ),
 )]
 async fn election_download_na_31_2_inlegvel(
+    user: User,
     State(pool): State<SqlitePool>,
     Path(election_id): Path<ElectionId>,
 ) -> Result<impl IntoResponse, APIError> {
     let mut conn = pool.acquire().await?;
     let election = election_repo::get(&mut conn, election_id).await?;
     drop(conn);
+
+    user.role().is_authorized(&election.committee_category)?;
+    if election.committee_category != CommitteeCategory::GSB {
+        return Err(APIError::NotFound(
+            "Na 31-2 Inlegvel is only available for GSB elections".into(),
+            ErrorReference::EntryNotFound,
+        ));
+    }
 
     let name = "Model_Na_31_2_Inlegvel.pdf".to_string();
 

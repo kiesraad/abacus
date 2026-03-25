@@ -27,7 +27,7 @@ use crate::{
         investigation::PollingStationInvestigation,
         models::{ModelNa14_2Input, ModelNa31_2Input, ModelP2aInput, PdfFileModel, ToPdfFileModel},
         polling_station::PollingStation,
-        results::PollingStationResults,
+        results::Results,
         role::Role,
         summary::ElectionSummary,
         votes_table::{VotesTables, VotesTablesWithPreviousVotes},
@@ -41,6 +41,7 @@ use crate::{
             are_results_complete_for_committee_session, list_results_for_committee_session,
         },
         election_repo, file_repo,
+        user_repo::User,
     },
     service::{FileAuditData, list_polling_stations_for_session},
 };
@@ -61,7 +62,7 @@ impl AsAuditEvent for FileCreatedAuditData {
 pub fn router() -> OpenApiRouter<AppState> {
     use Role::*;
 
-    const ALLOWED_ROLES: &[Role] = &[CoordinatorGSB];
+    const ALLOWED_ROLES: &[Role] = &[CoordinatorCSB, CoordinatorGSB];
 
     OpenApiRouter::default()
         .routes(routes!(election_download_zip_results).authorize(ALLOWED_ROLES))
@@ -74,7 +75,7 @@ struct ResultsInput {
     election: ElectionWithPoliticalGroups,
     polling_stations: Vec<PollingStation>,
     investigations: Vec<PollingStationInvestigation>,
-    results: Vec<(PollingStation, PollingStationResults)>,
+    results: Vec<(PollingStation, Results)>,
     summary: ElectionSummary,
     previous_summary: Option<ElectionSummary>,
     previous_committee_session: Option<CommitteeSession>,
@@ -511,11 +512,17 @@ async fn get_files(
     ),
 )]
 async fn election_download_zip_results(
+    user: User,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Path((election_id, committee_session_id)): Path<(ElectionId, CommitteeSessionId)>,
 ) -> Result<impl IntoResponse, APIError> {
     let mut conn = pool.acquire().await?;
+
+    let committee_category =
+        committee_session_repo::get_committee_category(&mut conn, committee_session_id).await?;
+    user.role().is_authorized(&committee_category)?;
+
     let election = election_repo::get(&mut conn, election_id).await?;
     let committee_session = committee_session_repo::get(&mut conn, committee_session_id).await?;
     let (eml_file, pdf_file, overview_file, created_at) =
@@ -580,10 +587,17 @@ async fn election_download_zip_results(
     ),
 )]
 async fn election_download_pdf_results(
+    user: User,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Path((_election_id, committee_session_id)): Path<(ElectionId, CommitteeSessionId)>,
 ) -> Result<Attachment<Vec<u8>>, APIError> {
+    let mut conn = pool.acquire().await?;
+
+    let committee_category =
+        committee_session_repo::get_committee_category(&mut conn, committee_session_id).await?;
+    user.role().is_authorized(&committee_category)?;
+
     let (_, pdf_file, _, _) = get_files(&pool, audit_service, committee_session_id).await?;
 
     let pdf_file = pdf_file.ok_or(APIError::BadRequest(

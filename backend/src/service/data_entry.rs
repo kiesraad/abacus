@@ -32,8 +32,8 @@ pub async fn create_empty(
     let mut tx = conn.begin().await?;
 
     // If data entry already exists, return polling station as-is
-    if data_entry_repo::data_entry_exists(&mut tx, polling_station_id).await? {
-        let polling_station = polling_station_repo::get(&mut tx, polling_station_id).await?;
+    let polling_station = polling_station_repo::get(&mut tx, polling_station_id).await?;
+    if polling_station.data_entry_id().is_some() {
         tx.commit().await?;
         return Ok(polling_station);
     }
@@ -107,7 +107,8 @@ pub async fn create_definitive_data_entry(
         results: results.clone(),
     });
 
-    create_empty(conn, polling_station_id).await?;
-    data_entry_repo::update(conn, polling_station_id, &state).await?;
+    let ps = create_empty(conn, polling_station_id).await?;
+    let data_entry_id = ps.data_entry_id().expect("just created");
+    data_entry_repo::update(conn, data_entry_id, &state).await?;
     Ok(())
 }

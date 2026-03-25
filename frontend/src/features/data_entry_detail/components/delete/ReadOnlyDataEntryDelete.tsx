@@ -15,14 +15,21 @@ import type {
 
 interface ReadOnlyDataEntryDeleteProps {
   pollingStation: PollingStation;
+  dataEntryId: number;
   status: DataEntryStatusName;
   onDeleted: () => void;
   onError: (error: AnyApiError) => void;
 }
 
-export function ReadOnlyDataEntryDelete({ pollingStation, status, onDeleted, onError }: ReadOnlyDataEntryDeleteProps) {
+export function ReadOnlyDataEntryDelete({
+  pollingStation,
+  dataEntryId,
+  status,
+  onDeleted,
+  onError,
+}: ReadOnlyDataEntryDeleteProps) {
   const [showModal, setShowModal] = useState(false);
-  const removePath: DATA_ENTRY_RESET_REQUEST_PATH = `/api/polling_stations/${pollingStation.id}/data_entries`;
+  const removePath: DATA_ENTRY_RESET_REQUEST_PATH = `/api/data_entries/${dataEntryId}`;
   const { remove, isLoading } = useCrud<PollingStationInvestigation>({ removePath });
 
   function toggleModal() {

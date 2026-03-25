@@ -10,7 +10,7 @@ use crate::{
     domain::{
         committee_session::{CommitteeSession, CommitteeSessionCreateRequest},
         committee_session_status::CommitteeSessionStatus,
-        data_entry::{DataEntryStatus, Definitive, FirstEntryFinalised},
+        data_entry::{DataEntryId, DataEntryStatus, Definitive, FirstEntryFinalised},
         election::{
             self, CandidateGender, CandidateNumber, CommitteeCategory, ElectionCategory,
             ElectionWithPoliticalGroups, NewElection, PGNumber, PoliticalGroup, VoteCountingMethod,
@@ -58,7 +58,7 @@ async fn generate_data_entries(
     args: GenerateElectionArgs,
     committee_session: &CommitteeSession,
     election: &ElectionWithPoliticalGroups,
-    polling_stations: &[PollingStation],
+    polling_stations: &[(PollingStation, DataEntryId)],
 ) -> Result<bool, Box<dyn Error>> {
     committee_session_repo::change_status(
         conn,
@@ -80,9 +80,9 @@ async fn generate_gsb_election_data(
     committee_session: &mut CommitteeSession,
     election: &ElectionWithPoliticalGroups,
 ) -> Result<(Vec<PollingStation>, bool), Box<dyn Error>> {
-    let polling_stations = generate_polling_stations(rng, election, tx, &args).await;
+    let polling_stations_with_ids = generate_polling_stations(rng, election, tx, &args).await;
 
-    if !polling_stations.is_empty() {
+    if !polling_stations_with_ids.is_empty() {
         *committee_session = committee_session_repo::change_status(
             tx,
             committee_session.id,
@@ -91,20 +91,24 @@ async fn generate_gsb_election_data(
         .await?;
     }
 
-    let data_entry_completed = if args.with_data_entry && !polling_stations.is_empty() {
+    let data_entry_completed = if args.with_data_entry && !polling_stations_with_ids.is_empty() {
         generate_data_entries(
             tx,
             rng,
             args,
             committee_session,
             election,
-            &polling_stations,
+            &polling_stations_with_ids,
         )
         .await?
     } else {
         false
     };
 
+    let polling_stations = polling_stations_with_ids
+        .into_iter()
+        .map(|(ps, _)| ps)
+        .collect();
     Ok((polling_stations, data_entry_completed))
 }
 
@@ -283,13 +287,14 @@ fn generate_political_party(
     }
 }
 
-/// Generate the polling stations for the given election using the limits from args
+/// Generate the polling stations for the given election using the limits from args.
+/// Returns each polling station together with its data entry id.
 async fn generate_polling_stations(
     rng: &mut impl rand::RngExt,
     election: &ElectionWithPoliticalGroups,
     conn: &mut SqliteConnection,
     args: &GenerateElectionArgs,
-) -> Vec<PollingStation> {
+) -> Vec<(PollingStation, DataEntryId)> {
     let number_of_ps = rng.random_range(args.polling_stations.clone());
     info!("Generating {number_of_ps} polling stations for election");
 
@@ -310,7 +315,7 @@ async fn generate_polling_stations(
         };
         remaining_voters -= ps_num_voters;
 
-        let mut ps = polling_station_repo::create(
+        let ps = polling_station_repo::create(
             conn,
             election.id,
             PollingStationRequest {
@@ -325,10 +330,13 @@ async fn generate_polling_stations(
         )
         .await
         .expect("Failed to create polling station");
-        ps = create_empty_data_entry(conn, ps.id())
+        let ps = create_empty_data_entry(conn, ps.id())
             .await
             .expect("Failed to create empty data entry");
-        polling_stations.push(ps.into_polling_station());
+        let data_entry_id = ps
+            .data_entry_id()
+            .expect("data entry should exist after create_empty_data_entry");
+        polling_stations.push((ps.into_polling_station(), data_entry_id));
     }
 
     polling_stations
@@ -338,7 +346,7 @@ async fn generate_polling_stations(
 #[allow(clippy::too_many_lines)]
 async fn generate_data_entry(
     election: &ElectionWithPoliticalGroups,
-    polling_stations: &[PollingStation],
+    polling_stations: &[(PollingStation, DataEntryId)],
     rng: &mut impl rand::RngExt,
     conn: &mut SqliteConnection,
     args: &GenerateElectionArgs,
@@ -356,7 +364,7 @@ async fn generate_data_entry(
     let mut generated_first_entries = 0;
     let mut generated_second_entries = 0;
 
-    for ps in polling_stations {
+    for (ps, data_entry_id) in polling_stations {
         if rng.random_ratio(first_entry_chance, 100) {
             let ts = super::data::datetime_around(rng, now, TimeDelta::hours(-24));
 
@@ -411,7 +419,7 @@ async fn generate_data_entry(
                     results: results.clone(),
                 });
 
-                data_entry_repo::update(conn, ps.id, &state)
+                data_entry_repo::update(conn, *data_entry_id, &state)
                     .await
                     .expect("Could not create definitive data entry");
                 generated_second_entries += 1;
@@ -423,7 +431,7 @@ async fn generate_data_entry(
                     first_entry_finished_at: ts,
                     finalised_with_warnings: validation_results.has_warnings(),
                 });
-                data_entry_repo::update(conn, ps.id, &state)
+                data_entry_repo::update(conn, *data_entry_id, &state)
                     .await
                     .expect("Could not create first data entry");
                 generated_first_entries += 1;

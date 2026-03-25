@@ -3,8 +3,10 @@ import * as ReactRouter from "react-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
+import { ElectionStatusProviderContext } from "@/hooks/election/ElectionStatusProviderContext";
 import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
+import { electionStatusesMock } from "@/testing/api-mocks/ElectionStatusMockData";
 import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
 import { ElectionRequestHandler, PollingStationDataEntryClaimHandler } from "@/testing/api-mocks/RequestHandlers";
 import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMockData";
@@ -21,11 +23,13 @@ import { DataEntryProvider } from "./DataEntryProvider";
 function renderForm() {
   return render(
     <ElectionProvider electionId={1}>
-      <MessagesProvider>
-        <DataEntryProvider election={electionMockData} pollingStation={pollingStationMockData[0]!} entryNumber={1}>
-          <DataEntryProgress />
-        </DataEntryProvider>
-      </MessagesProvider>
+      <ElectionStatusProviderContext.Provider value={{ statuses: electionStatusesMock, refetch: vi.fn() }}>
+        <MessagesProvider>
+          <DataEntryProvider election={electionMockData} pollingStation={pollingStationMockData[0]!} entryNumber={1}>
+            <DataEntryProgress />
+          </DataEntryProvider>
+        </MessagesProvider>
+      </ElectionStatusProviderContext.Provider>
     </ElectionProvider>,
   );
 }

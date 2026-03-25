@@ -2,6 +2,7 @@ import { type ReactNode, useEffect } from "react";
 import { Navigate, useNavigate, useParams } from "react-router";
 
 import { ApiError, FatalApiError, NotFoundError } from "@/api/ApiResult";
+import { getDataEntryIdForPollingStation, useElectionStatus } from "@/hooks/election/useElectionStatus";
 import { useMessages } from "@/hooks/messages/useMessages";
 import { t } from "@/i18n/translate";
 import type { ElectionWithPoliticalGroups, PollingStation } from "@/types/generated/openapi";
@@ -23,7 +24,14 @@ export function DataEntryProvider({ election, pollingStation, entryNumber, child
   const navigate = useNavigate();
   const params = useParams<{ sectionId: FormSectionId }>();
   const sectionId = params.sectionId ?? null;
-  const stateAndActions = useDataEntry(election, pollingStation.id, entryNumber, sectionId);
+  const { statuses } = useElectionStatus();
+  const dataEntryId = getDataEntryIdForPollingStation(statuses, pollingStation.id);
+
+  if (dataEntryId === undefined) {
+    throw new NotFoundError("error.data_entry_not_found");
+  }
+
+  const stateAndActions = useDataEntry(election, dataEntryId, pollingStation.id, entryNumber, sectionId);
   const { pushMessage } = useMessages();
 
   // handle non-fatal error navigation

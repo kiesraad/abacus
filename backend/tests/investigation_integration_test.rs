@@ -11,8 +11,8 @@ use crate::{
     shared::{
         FixtureUser::*, change_status_committee_session, complete_data_entry, create_investigation,
         create_polling_station, create_result_with_non_example_data_entry, differences_counts_zero,
-        get_election_committee_session, get_election_details, get_statuses, login,
-        political_group_votes_from_test_data_auto, update_investigation,
+        get_data_entry_id, get_election_committee_session, get_election_details, get_statuses,
+        login, political_group_votes_from_test_data_auto, update_investigation,
     },
     utils::serve_api,
 };
@@ -404,10 +404,12 @@ async fn test_update_with_data_entry(pool: SqlitePool) {
 
     // First data entry
     let typist_cookie = login(&addr, TypistGSB).await;
+    let data_entry_id =
+        get_data_entry_id(&addr, &typist_cookie, election_id, polling_station_id).await;
     complete_data_entry(
         &addr,
         &typist_cookie,
-        polling_station_id,
+        data_entry_id,
         1,
         second_session_data_entry_two_political_groups(),
     )

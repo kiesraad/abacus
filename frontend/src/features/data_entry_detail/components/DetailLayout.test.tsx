@@ -75,7 +75,7 @@ describe("DetailLayout", () => {
   });
 
   test("Render badge for first_entry_finalised as 1e invoer", async () => {
-    overrideOnce("get", "/api/polling_stations/5/data_entries/get", 200, dataEntryHasWarningsGetMockResponse);
+    overrideOnce("get", "/api/data_entries/5/get", 200, dataEntryHasWarningsGetMockResponse);
 
     renderLayout();
 
@@ -87,7 +87,7 @@ describe("DetailLayout", () => {
 
   test("Delete data entry and return to status page with a message", async () => {
     server.use(PollingStationDataEntryResetHandler);
-    overrideOnce("get", "/api/polling_stations/5/data_entries/get", 200, dataEntryValidGetMockResponse);
+    overrideOnce("get", "/api/data_entries/5/get", 200, dataEntryValidGetMockResponse);
     const user = userEvent.setup();
 
     renderLayout();
@@ -126,7 +126,7 @@ describe("DetailLayout", () => {
   test("Redirect to status page on error DataEntryGetNotAllowed", async () => {
     vi.spyOn(ReactRouter, "useParams").mockReturnValue({ electionId: "1", pollingStationId: "3" });
 
-    overrideOnce("get", "/api/polling_stations/3/data_entries/get", 409, {
+    overrideOnce("get", "/api/data_entries/3/get", 409, {
       error: "Data entry is in the wrong state",
       fatal: false,
       reference: "DataEntryGetNotAllowed",

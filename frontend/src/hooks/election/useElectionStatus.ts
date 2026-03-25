@@ -1,7 +1,5 @@
 import { useContext } from "react";
 
-import type { ElectionStatusResponseEntry } from "@/types/generated/openapi";
-
 import { ElectionStatusProviderContext } from "./ElectionStatusProviderContext";
 
 export function useElectionStatus() {
@@ -12,11 +10,4 @@ export function useElectionStatus() {
   }
 
   return context;
-}
-
-export function getDataEntryIdForPollingStation(
-  statuses: ElectionStatusResponseEntry[],
-  pollingStationId: number,
-): number | undefined {
-  return statuses.find((s) => s.source.type === "PollingStation" && s.source.id === pollingStationId)?.data_entry_id;
 }

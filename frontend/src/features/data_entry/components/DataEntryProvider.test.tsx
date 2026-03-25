@@ -2,10 +2,8 @@ import { waitFor } from "@testing-library/react";
 import * as ReactRouter from "react-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import { DataEntryProvider } from "@/features/data_entry/components/DataEntryProvider";
-import { ElectionStatusProviderContext } from "@/hooks/election/ElectionStatusProviderContext";
 import * as useMessages from "@/hooks/messages/useMessages";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
-import { electionStatusesMock } from "@/testing/api-mocks/ElectionStatusMockData";
 import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
 import { ElectionRequestHandler, PollingStationDataEntryClaimHandler } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
@@ -16,11 +14,13 @@ function renderProvider() {
   vi.spyOn(ReactRouter, "useParams").mockReturnValue({ sectionId: "test" });
 
   return render(
-    <ElectionStatusProviderContext.Provider value={{ statuses: electionStatusesMock, refetch: vi.fn() }}>
-      <DataEntryProvider election={electionMockData} pollingStation={pollingStationMockData[0]!} entryNumber={1}>
-        <div>Children</div>
-      </DataEntryProvider>
-    </ElectionStatusProviderContext.Provider>,
+    <DataEntryProvider
+      election={electionMockData}
+      dataEntryId={pollingStationMockData[0]!.data_entry_id!}
+      entryNumber={1}
+    >
+      <div>Children</div>
+    </DataEntryProvider>,
   );
 }
 
@@ -57,7 +57,7 @@ describe("DataEntryProvider", () => {
     await waitFor(() => {
       expect(pushMessage).toHaveBeenCalledWith({
         type: "warning",
-        title: "Je kan stembureau 33 niet invoeren",
+        title: "Je kan dit stembureau niet invoeren",
         text: "Een andere invoerder is bezig met dit stembureau",
       });
       expect(navigate).toHaveBeenCalledWith("/elections/1/data-entry");
@@ -76,7 +76,7 @@ describe("DataEntryProvider", () => {
     await waitFor(() => {
       expect(pushMessage).toHaveBeenCalledWith({
         type: "warning",
-        title: "Je kan stembureau 33 niet invoeren",
+        title: "Je kan dit stembureau niet invoeren",
         text: "De invoer voor dit stembureau is al gedaan",
       });
       expect(navigate).toHaveBeenCalledWith("/elections/1/data-entry");
@@ -95,7 +95,7 @@ describe("DataEntryProvider", () => {
     await waitFor(() => {
       expect(pushMessage).toHaveBeenCalledWith({
         type: "warning",
-        title: "Je kan stembureau 33 niet invoeren",
+        title: "Je kan dit stembureau niet invoeren",
         text: "De invoer voor dit stembureau is niet toegestaan",
       });
       expect(navigate).toHaveBeenCalledWith("/elections/1/data-entry");
@@ -114,7 +114,7 @@ describe("DataEntryProvider", () => {
     await waitFor(() => {
       expect(pushMessage).toHaveBeenCalledWith({
         type: "warning",
-        title: "Je kan stembureau 33 niet invoeren",
+        title: "Je kan dit stembureau niet invoeren",
         text: "Er is een ongeldige actie uitgevoerd",
       });
       expect(navigate).toHaveBeenCalledWith("/elections/1/data-entry");

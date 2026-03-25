@@ -53,5 +53,5 @@ export function getDataEntryWithStatusList({
 export function getUrlForDataEntry(electionId: number, dataEntry: ElectionStatusResponseEntry): string {
   const entryNumber =
     dataEntry.status === "first_entry_finalised" || dataEntry.status === "second_entry_in_progress" ? 2 : 1;
-  return `/elections/${electionId}/data-entry/${dataEntry.source.id}/${entryNumber}`;
+  return `/elections/${electionId}/data-entry/${dataEntry.data_entry_id}/${entryNumber}`;
 }

@@ -6,6 +6,7 @@ import type {
   DATA_ENTRY_DISCARD_REQUEST_PATH,
   DATA_ENTRY_FINALISE_REQUEST_PATH,
   DATA_ENTRY_SAVE_REQUEST_PATH,
+  DataEntryId,
   ElectionWithPoliticalGroups,
 } from "@/types/generated/openapi";
 import type { FormSectionId } from "@/types/types";
@@ -18,13 +19,12 @@ import { useInitialDataEntryState } from "./useInitialDataEntryState";
 
 export default function useDataEntry(
   election: ElectionWithPoliticalGroups,
-  dataEntryId: number,
-  pollingStationId: number,
+  dataEntryId: DataEntryId,
   entryNumber: number,
   sectionId: FormSectionId | null,
 ): DataEntryStateAndActions {
   const client = useApiClient();
-  const [state, dispatch] = useReducer(dataEntryReducer, getInitialState(election, pollingStationId, entryNumber));
+  const [state, dispatch] = useReducer(dataEntryReducer, getInitialState(election, dataEntryId, entryNumber));
 
   // initial request to get the current data entry from the backend
   const saveRequestPath: DATA_ENTRY_SAVE_REQUEST_PATH = `/api/data_entries/${dataEntryId}/${entryNumber}`;
@@ -34,7 +34,7 @@ export default function useDataEntry(
   useInitialDataEntryState(client, dispatch, claimRequestPath);
 
   // navigate to the correct section
-  useDataEntryNavigation(state, dispatch, election, pollingStationId, entryNumber, sectionId);
+  useDataEntryNavigation(state, dispatch, election, dataEntryId, entryNumber, sectionId);
 
   return {
     ...state,

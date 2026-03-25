@@ -16,7 +16,7 @@ import { getUrlForFormSectionID } from "../utils/utils";
 
 // biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function DataEntryProgress() {
-  const pollingStationId = useNumericParam("pollingStationId");
+  const dataEntryId = useNumericParam("dataEntryId");
   const { election } = useElection();
   const { dataEntryStructure, formState, results, entryNumber } = useDataEntryContext();
   const params = useParams<{ sectionId: FormSectionId }>();
@@ -82,7 +82,7 @@ export function DataEntryProgress() {
           scrollIntoView={options.scrollIntoView}
         >
           {canNavigate ? (
-            <Link to={getUrlForFormSectionID(election.id, pollingStationId, entryNumber, section.id)}>
+            <Link to={getUrlForFormSectionID(election.id, dataEntryId, entryNumber, section.id)}>
               <span>{section.short_title}</span>
             </Link>
           ) : (
@@ -91,7 +91,7 @@ export function DataEntryProgress() {
         </ProgressList.Item>
       );
     },
-    [formState, currentIndex, sectionId, menuStatusForFormSection, election.id, pollingStationId, entryNumber],
+    [formState, currentIndex, sectionId, menuStatusForFormSection, election.id, dataEntryId, entryNumber],
   );
 
   // Separate sections into fixed and scrollable groups

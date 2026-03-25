@@ -1,12 +1,11 @@
 import { useContext, useState } from "react";
 import { useNavigate } from "react-router";
 
-import { type AnyApiError, isSuccess, NotFoundError } from "@/api/ApiResult";
+import { type AnyApiError, isSuccess } from "@/api/ApiResult";
 import { useApiClient } from "@/api/useApiClient";
 import { useInitialApiGet } from "@/api/useInitialApiGet";
 import { ElectionStatusProviderContext } from "@/hooks/election/ElectionStatusProviderContext";
 import { useElection } from "@/hooks/election/useElection";
-import { getDataEntryIdForPollingStation, useElectionStatus } from "@/hooks/election/useElectionStatus";
 import { t } from "@/i18n/translate";
 import type {
   DATA_ENTRY_GET_REQUEST_PATH,
@@ -14,14 +13,12 @@ import type {
   DATA_ENTRY_RESOLVE_ERRORS_REQUEST_PATH,
   DataEntryGetResponse,
   ElectionWithPoliticalGroups,
-  PollingStation,
   ResolveErrorsAction,
 } from "@/types/generated/openapi";
 
 interface DataEntryErrors {
   action: ResolveErrorsAction | undefined;
   setAction: (action: ResolveErrorsAction | undefined) => void;
-  pollingStation: PollingStation;
   election: ElectionWithPoliticalGroups;
   loading: boolean;
   dataEntry: DataEntryGetResponse | null;
@@ -29,22 +26,14 @@ interface DataEntryErrors {
   validationError: string | undefined;
 }
 
-export function usePollingStationDataEntryErrors(pollingStationId: number): DataEntryErrors {
+export function usePollingStationDataEntryErrors(dataEntryId: number): DataEntryErrors {
   const navigate = useNavigate();
   const client = useApiClient();
-  const { election, pollingStations } = useElection();
-  const pollingStation = pollingStations.find((ps) => ps.id === pollingStationId);
-  const { statuses } = useElectionStatus();
-  const dataEntryId = getDataEntryIdForPollingStation(statuses, pollingStationId);
+  const { election } = useElection();
   const [action, setAction] = useState<ResolveErrorsAction>();
   const electionContext = useContext(ElectionStatusProviderContext);
   const [error, setError] = useState<AnyApiError | null>(null);
   const [validationError, setValidationError] = useState<string>();
-
-  // 'Not found' error if polling station or data entry is not found
-  if (!pollingStation || dataEntryId === undefined) {
-    throw new NotFoundError("error.polling_station_not_found");
-  }
 
   // fetch the data entry with errors and warnings
   const path: DATA_ENTRY_GET_REQUEST_PATH = `/api/data_entries/${dataEntryId}/get`;
@@ -88,7 +77,6 @@ export function usePollingStationDataEntryErrors(pollingStationId: number): Data
   return {
     action,
     setAction,
-    pollingStation,
     election,
     loading: requestState.status === "loading",
     dataEntry: requestState.status === "success" ? requestState.data : null,

@@ -13,14 +13,10 @@ import { DataEntryProvider } from "./DataEntryProvider";
 import { DataEntrySection } from "./DataEntrySection";
 
 export function DataEntryPage() {
-  const pollingStationId = useNumericParam("pollingStationId");
+  const dataEntryId = useNumericParam("dataEntryId");
   const entryNumber = useNumericParam("entryNumber");
-  const { election, pollingStation } = useElection(pollingStationId);
+  const { election } = useElection();
   const user = useUser();
-
-  if (!pollingStation) {
-    throw new NotFoundError("error.polling_station_not_found");
-  }
 
   if (entryNumber !== 1 && entryNumber !== 2) {
     throw new NotFoundError("error.data_entry_not_found");
@@ -34,7 +30,7 @@ export function DataEntryPage() {
   }
 
   return (
-    <DataEntryProvider election={election} pollingStation={pollingStation} entryNumber={entryNumber}>
+    <DataEntryProvider election={election} dataEntryId={dataEntryId} entryNumber={entryNumber}>
       <DataEntryHeader />
       <main>
         <StickyNav>

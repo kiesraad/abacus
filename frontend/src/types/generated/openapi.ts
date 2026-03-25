@@ -637,10 +637,12 @@ export interface DataEntryGetDifferencesResponse {
   first_entry_user_id: UserId;
   second_entry: Results;
   second_entry_user_id: UserId;
+  source: DataEntrySource;
 }
 
 export interface DataEntryGetResponse {
   data: Results;
+  source: DataEntrySource;
   status: DataEntryStatusName;
   user_id?: UserId;
   validation_results: ValidationResults;

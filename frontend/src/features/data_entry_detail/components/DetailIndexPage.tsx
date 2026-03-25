@@ -21,24 +21,28 @@ import { ErrorsAndWarningsOverview } from "./ErrorsAndWarningsOverview";
 export function DetailIndexPage() {
   const { pushMessage } = useMessages();
   const navigate = useNavigate();
-  const pollingStationId = useNumericParam("pollingStationId");
-  const { pollingStation, election, loading, dataEntry, action, setAction, onSubmit, validationError } =
-    usePollingStationDataEntryErrors(pollingStationId);
+  const dataEntryId = useNumericParam("dataEntryId");
+  const { election, loading, dataEntry, action, setAction, onSubmit, validationError } =
+    usePollingStationDataEntryErrors(dataEntryId);
 
   const afterSave = (action: ResolveErrorsAction) => {
+    if (!dataEntry) {
+      return;
+    }
+
     switch (action) {
       case "resume_first_entry":
         pushMessage({
           title: t("election_status.success.data_entry_resumed", {
-            nr: pollingStation.number,
-            typist: getName(dataEntry?.user_id),
+            nr: dataEntry.source.number,
+            typist: getName(dataEntry.user_id),
           }),
           text: t("election_status.success.typist_can_continue_data_entry"),
         });
         break;
       case "discard_first_entry":
         pushMessage({
-          title: t("election_status.success.data_entry_discarded", { nr: pollingStation.number }),
+          title: t("election_status.success.data_entry_discarded", { nr: dataEntry.source.number }),
           text: t("election_status.success.polling_station_can_be_filled_again"),
         });
         break;
@@ -60,7 +64,7 @@ export function DetailIndexPage() {
     if (firstSectionId === undefined) {
       throw new Error("Could not determine first section id");
     }
-    return <Navigate to={`/elections/${election.id}/status/${pollingStationId}/detail/${firstSectionId}`} replace />;
+    return <Navigate to={`/elections/${election.id}/status/${dataEntryId}/detail/${firstSectionId}`} replace />;
   } else {
     const resolveErrors = dataEntry.status === "first_entry_has_errors";
     const translationPrefix = resolveErrors ? "data_entry_detail.resolve_errors" : "data_entry_detail.read_only";

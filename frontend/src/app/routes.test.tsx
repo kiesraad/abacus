@@ -11,7 +11,7 @@ import { Providers } from "@/testing/Providers";
 import { overrideOnce, server } from "@/testing/server";
 import { expectErrorPage, expectNotFound, setupTestRouter } from "@/testing/test-utils";
 import { getTypistUser } from "@/testing/user-mock-data";
-
+import type { DATA_ENTRY_CLAIM_REQUEST_PATH, ErrorResponse } from "@/types/generated/openapi";
 import { routes } from "./routes";
 
 const renderWithRouter = () => {
@@ -60,14 +60,19 @@ describe("routes", () => {
     await expectNotFound("Verkiezing niet gevonden");
   });
 
-  test("Non existing polling station id results in not found page", async () => {
+  test("EntryNotFound API response results in not found page", async () => {
     vi.spyOn(useUser, "useUser").mockReturnValue(getTypistUser());
+    overrideOnce("post", "/api/data_entries/9876/1/claim" satisfies DATA_ENTRY_CLAIM_REQUEST_PATH, 404, {
+      error: "Item not found",
+      fatal: true,
+      reference: "EntryNotFound",
+    } satisfies ErrorResponse);
 
     // Navigate to a non-existing page
     const router = renderWithRouter();
     await router.navigate("/elections/1/data-entry/9876/1");
     expect(router.state.location.pathname).toEqual("/elections/1/data-entry/9876/1");
-    await expectNotFound("Stembureau niet gevonden");
+    await expectNotFound("Niet gevonden");
   });
 
   test("Non existing entry number results in not found page", async () => {

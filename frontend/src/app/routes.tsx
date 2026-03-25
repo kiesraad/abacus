@@ -62,7 +62,7 @@ export const routes: RouteObject[] = [
                   // index
                   ...dataEntryHomeRoutes,
                   {
-                    path: ":pollingStationId/:entryNumber",
+                    path: ":dataEntryId/:entryNumber",
                     children: dataEntryRoutes,
                   },
                 ],
@@ -74,11 +74,11 @@ export const routes: RouteObject[] = [
                   // index
                   ...electionStatusRoutes,
                   {
-                    path: ":pollingStationId/resolve-differences",
+                    path: ":dataEntryId/resolve-differences",
                     children: resolveDifferencesRoutes,
                   },
                   {
-                    path: ":pollingStationId/detail",
+                    path: ":dataEntryId/detail",
                     children: detailRoutes,
                   },
                 ],

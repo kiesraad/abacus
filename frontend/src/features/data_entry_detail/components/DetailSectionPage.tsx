@@ -12,9 +12,9 @@ import { ReadOnlyDataEntrySection } from "./ReadOnlyDataEntrySection";
 export function DetailSectionPage() {
   const params = useParams<{ sectionId: FormSectionId }>();
   const sectionId = params.sectionId;
-  const pollingStationId = useNumericParam("pollingStationId");
-  const { election } = useElection(pollingStationId);
-  const { loading, dataEntry } = usePollingStationDataEntryErrors(pollingStationId);
+  const dataEntryId = useNumericParam("dataEntryId");
+  const { election } = useElection();
+  const { loading, dataEntry } = usePollingStationDataEntryErrors(dataEntryId);
 
   if (loading || dataEntry === null) {
     return <Loader />;

@@ -12,7 +12,7 @@ import type { DataEntryStateAndActionsLoaded, Status, SubmitCurrentFormOptions }
 import { DataEntryNavigation } from "./DataEntryNavigation";
 
 const baseMockData = getDefaultDataEntryStateAndActionsLoaded();
-const testPath = `/elections/${baseMockData.election.id}/data-entry/${baseMockData.pollingStationId}/1`;
+const testPath = `/elections/${baseMockData.election.id}/data-entry/${baseMockData.dataEntryId}/1`;
 
 function renderComponent(onSubmit: (options?: SubmitCurrentFormOptions) => Promise<boolean>) {
   const router = setupTestRouter([

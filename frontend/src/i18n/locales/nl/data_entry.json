@@ -16,7 +16,7 @@
   "continue_after_check": "Je kan alleen verder als je het papieren proces-verbaal hebt gecontroleerd.",
   "continue_with_errors": "Je kan alleen verder als je dit met de coördinator hebt overlegd.",
   "corrected": "Gecorrigeerd",
-  "data_entry_not_possible": "Je kan stembureau {nr} niet invoeren",
+  "data_entry_not_possible": "Je kan dit stembureau niet invoeren",
   "definitive": "Definitief",
   "entry_different": "Let op: verschil met eerste invoer",
   "entry_errors": "Let op: fouten in het proces-verbaal",

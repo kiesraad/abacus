@@ -37,6 +37,12 @@ describe("DetailNavigation", () => {
     ],
   };
 
+  const params = {
+    electionId: "1",
+    dataEntryId: "5",
+    sectionId: undefined,
+  };
+
   const renderNavigation = (
     validationResults: ValidationResults,
     status: DataEntryStatusName,
@@ -46,11 +52,7 @@ describe("DetailNavigation", () => {
   };
 
   beforeEach(() => {
-    vi.spyOn(ReactRouter, "useParams").mockReturnValue({
-      electionId: "1",
-      pollingStationId: "5",
-      sectionId: undefined,
-    });
+    vi.spyOn(ReactRouter, "useParams").mockReturnValue(params);
   });
 
   test("renders overview link and links to all sections", () => {
@@ -129,8 +131,7 @@ describe("DetailNavigation", () => {
 
   test("shows overview link as active when sectionId param is null", () => {
     vi.spyOn(ReactRouter, "useParams").mockReturnValue({
-      electionId: "1",
-      pollingStationId: "5",
+      ...params,
       sectionId: undefined,
     });
 
@@ -142,8 +143,7 @@ describe("DetailNavigation", () => {
 
   test("shows section link as active when sectionId param is not null", () => {
     vi.spyOn(ReactRouter, "useParams").mockReturnValue({
-      electionId: "1",
-      pollingStationId: "5",
+      ...params,
       sectionId: "voters_votes_counts",
     });
 

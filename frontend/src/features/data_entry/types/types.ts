@@ -3,6 +3,7 @@ import type { Dispatch } from "react";
 import type { AnyApiError } from "@/api/ApiResult";
 import type {
   ClaimDataEntryResponse,
+  DataEntryId,
   DataEntrySource,
   DataEntryStatusName,
   DataEntryStatusResponse,
@@ -15,7 +16,7 @@ import type { ValidationResultSet } from "@/utils/ValidationResults";
 export interface DataEntryState {
   // state from providers
   election: ElectionWithPoliticalGroups;
-  pollingStationId: number;
+  dataEntryId: DataEntryId;
   entryNumber: number;
 
   // api error objects

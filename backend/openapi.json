@@ -5072,7 +5072,8 @@
           "first_entry_user_id",
           "first_entry",
           "second_entry_user_id",
-          "second_entry"
+          "second_entry",
+          "source"
         ],
         "properties": {
           "first_entry": {
@@ -5086,6 +5087,9 @@
           },
           "second_entry_user_id": {
             "$ref": "#/components/schemas/UserId"
+          },
+          "source": {
+            "$ref": "#/components/schemas/DataEntrySource"
           }
         },
         "additionalProperties": false
@@ -5095,11 +5099,15 @@
         "required": [
           "data",
           "status",
-          "validation_results"
+          "validation_results",
+          "source"
         ],
         "properties": {
           "data": {
             "$ref": "#/components/schemas/Results"
+          },
+          "source": {
+            "$ref": "#/components/schemas/DataEntrySource"
           },
           "status": {
             "$ref": "#/components/schemas/DataEntryStatusName"

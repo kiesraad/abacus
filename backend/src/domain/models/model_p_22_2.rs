@@ -5,17 +5,43 @@ use crate::domain::{
     committee_session::CommitteeSession,
     election::ElectionWithPoliticalGroups,
     models::{PdfFileModel, PdfModel, ToPdfFileModel},
-    summary::ElectionSummary,
+    results::{voters_counts::VotersCounts, votes_counts::VotesCounts},
+    summary::SummaryDifferencesCounts,
 };
+
+/// Contains a limited summary of the election results, added up from the votes of all polling stations.
+#[derive(Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct LimitedElectionSummary {
+    /// The total number of voters
+    pub voters_counts: VotersCounts,
+    /// The total number of votes
+    pub votes_counts: VotesCounts,
+    /// The differences between voters and votes
+    pub differences_counts: SummaryDifferencesCounts,
+}
+
+/// Contains the result changes that have occurred in the apportionment
+#[derive(Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct ResultChange {
+    pub list_number: u32,
+    pub footnote_number: u32,
+    pub increase: u32,
+    pub decrease: u32,
+    pub seat_type: String,
+}
 
 #[derive(Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct ModelP22_2Input {
     pub committee_session: CommitteeSession,
     pub election: ElectionWithPoliticalGroups,
-    pub summary: ElectionSummary,
+    pub summary: LimitedElectionSummary,
     pub seat_assignment: SeatAssignment,
     pub candidate_nomination: CandidateNomination,
+    pub result_changes_full_seats: Vec<ResultChange>,
+    pub result_changes_residual_seats: Vec<ResultChange>,
     pub hash: String,
     pub creation_date_time: String,
 }

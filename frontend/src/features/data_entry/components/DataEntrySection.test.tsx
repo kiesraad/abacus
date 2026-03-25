@@ -5,10 +5,7 @@ import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
 import * as useUser from "@/hooks/user/useUser";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
-import {
-  PollingStationDataEntryClaimHandler,
-  PollingStationDataEntrySaveHandler,
-} from "@/testing/api-mocks/RequestHandlers";
+import { DataEntryClaimHandler, DataEntrySaveHandler } from "@/testing/api-mocks/RequestHandlers";
 import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMockData";
 import { overrideOnce, server } from "@/testing/server";
 import { renderReturningRouter, screen, spyOnHandler, waitFor, within } from "@/testing/test-utils";
@@ -38,7 +35,7 @@ function renderComponent(sectionId: string) {
 describe("DataEntrySection", () => {
   beforeEach(() => {
     vi.spyOn(useUser, "useUser").mockReturnValue(getTypistUser());
-    server.use(PollingStationDataEntryClaimHandler, PollingStationDataEntrySaveHandler);
+    server.use(DataEntryClaimHandler, DataEntrySaveHandler);
   });
 
   describe("Section Badge Display", () => {
@@ -134,7 +131,7 @@ describe("DataEntrySection", () => {
     const user = userEvent.setup();
     renderComponent("extra_investigation");
 
-    const saveHandler = spyOnHandler(PollingStationDataEntrySaveHandler);
+    const saveHandler = spyOnHandler(DataEntrySaveHandler);
     await user.keyboard("{shift>}{enter}{/shift}");
 
     expect(saveHandler).toHaveBeenCalledOnce();

@@ -5,10 +5,7 @@ import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
 import * as useUser from "@/hooks/user/useUser";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
-import {
-  PollingStationDataEntryClaimHandler,
-  PollingStationDataEntrySaveHandler,
-} from "@/testing/api-mocks/RequestHandlers";
+import { DataEntryClaimHandler, DataEntrySaveHandler } from "@/testing/api-mocks/RequestHandlers";
 import { server } from "@/testing/server";
 import { render, screen } from "@/testing/test-utils";
 import { getTypistUser } from "@/testing/user-mock-data";
@@ -22,7 +19,7 @@ import { DataEntrySection } from "./DataEntrySection";
 describe("Data Entry cache behavior", () => {
   test("VotersAndVotesForm with cache", async () => {
     vi.spyOn(useUser, "useUser").mockReturnValue(getTypistUser());
-    server.use(PollingStationDataEntryClaimHandler, PollingStationDataEntrySaveHandler);
+    server.use(DataEntryClaimHandler, DataEntrySaveHandler);
 
     const cacheData: SectionValues = {
       "voters_counts.poll_card_count": "100",

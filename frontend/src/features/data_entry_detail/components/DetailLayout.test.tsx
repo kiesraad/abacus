@@ -9,11 +9,11 @@ import {
   dataEntryValidGetMockResponse,
 } from "@/testing/api-mocks/DataEntryMockData";
 import {
+  DataEntryGetHandler,
+  DataEntryResetHandler,
   ElectionListRequestHandler,
   ElectionRequestHandler,
   ElectionStatusRequestHandler,
-  PollingStationDataEntryGetHandler,
-  PollingStationDataEntryResetHandler,
 } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
 import { TestUserProvider } from "@/testing/TestUserProvider";
@@ -41,12 +41,7 @@ describe("DetailLayout", () => {
   const hasMessages = vi.fn();
 
   beforeEach(() => {
-    server.use(
-      ElectionRequestHandler,
-      ElectionStatusRequestHandler,
-      ElectionListRequestHandler,
-      PollingStationDataEntryGetHandler,
-    );
+    server.use(ElectionRequestHandler, ElectionStatusRequestHandler, ElectionListRequestHandler, DataEntryGetHandler);
     vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
     vi.spyOn(ReactRouter, "useParams").mockReturnValue({ electionId: "1", dataEntryId: "5" });
     vi.spyOn(useMessages, "useMessages").mockReturnValue({ pushMessage, popMessages: vi.fn(() => []), hasMessages });
@@ -83,7 +78,7 @@ describe("DetailLayout", () => {
   });
 
   test("Delete data entry and return to status page with a message", async () => {
-    server.use(PollingStationDataEntryResetHandler);
+    server.use(DataEntryResetHandler);
     overrideOnce("get", "/api/data_entries/5/get", 200, dataEntryValidGetMockResponse);
     const user = userEvent.setup();
 
@@ -96,7 +91,7 @@ describe("DetailLayout", () => {
     expect(modal).toHaveTextContent(
       "Weet je zeker dat je de invoer voor stembureau 37 wilt verwijderen? Deze actie kan niet worden teruggedraaid.",
     );
-    const deleteDataEntries = spyOnHandler(PollingStationDataEntryResetHandler);
+    const deleteDataEntries = spyOnHandler(DataEntryResetHandler);
 
     const confirmButton = await within(modal).findByRole("button", { name: "Verwijder invoer" });
     await user.click(confirmButton);

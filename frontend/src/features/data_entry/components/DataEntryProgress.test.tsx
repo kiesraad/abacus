@@ -6,7 +6,7 @@ import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
-import { ElectionRequestHandler, PollingStationDataEntryClaimHandler } from "@/testing/api-mocks/RequestHandlers";
+import { DataEntryClaimHandler, ElectionRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMockData";
 import { server } from "@/testing/server";
 import { render, screen, waitFor, within } from "@/testing/test-utils";
@@ -74,7 +74,7 @@ const results = {
 
 describe("DataEntryProgress", () => {
   beforeEach(() => {
-    server.use(ElectionRequestHandler, PollingStationDataEntryClaimHandler);
+    server.use(ElectionRequestHandler, DataEntryClaimHandler);
   });
 
   test("shows different states for entries", async () => {

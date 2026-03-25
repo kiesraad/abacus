@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router";
 
 import { PageTitle } from "@/components/page_title/PageTitle";
-import { PollingStationNumber } from "@/components/ui/Badge/PollingStationNumber";
+import { DataEntrySourceNumber } from "@/components/ui/Badge/DataEntrySourceNumber";
 import { Button } from "@/components/ui/Button/Button";
 import { ChoiceList } from "@/components/ui/CheckboxAndRadio/ChoiceList";
 import { Form } from "@/components/ui/Form/Form";
@@ -69,7 +69,7 @@ export function ResolveDifferencesPage() {
       <PageTitle title={`${t("resolve_differences.page_title")} - Abacus`} />
       <header>
         <section className="smaller-gap">
-          <PollingStationNumber>{source.number}</PollingStationNumber>
+          <DataEntrySourceNumber>{source.number}</DataEntrySourceNumber>
           <h1>{source.name}</h1>
         </section>
       </header>

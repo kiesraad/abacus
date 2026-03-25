@@ -4,7 +4,7 @@ import { Link, Outlet, useBlocker, useLocation, useNavigate } from "react-router
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { StickyNav } from "@/components/ui/AppLayout/StickyNav";
-import { PollingStationNumber } from "@/components/ui/Badge/PollingStationNumber";
+import { DataEntrySourceNumber } from "@/components/ui/Badge/DataEntrySourceNumber";
 import { Loader } from "@/components/ui/Loader/Loader";
 import { ProgressList } from "@/components/ui/ProgressList/ProgressList";
 import { useElection } from "@/hooks/election/useElection";
@@ -79,7 +79,7 @@ export function AddInvestigationLayout() {
       />
       <header>
         <section className="smaller-gap">
-          <PollingStationNumber>{pollingStation.number}</PollingStationNumber>
+          <DataEntrySourceNumber>{pollingStation.number}</DataEntrySourceNumber>
           <h1>{pollingStation.name}</h1>
         </section>
       </header>

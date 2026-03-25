@@ -11,8 +11,8 @@ use crate::{
     shared::{
         FixtureUser::*, change_status_committee_session, complete_data_entry, create_investigation,
         create_polling_station, create_result_with_non_example_data_entry, differences_counts_zero,
-        get_data_entry_id, get_election_committee_session, get_election_details, get_statuses,
-        login, political_group_votes_from_test_data_auto, update_investigation,
+        get_election_committee_session, get_election_details, get_statuses, login,
+        political_group_votes_from_test_data_auto, update_investigation,
     },
     utils::serve_api,
 };
@@ -345,11 +345,13 @@ async fn test_update_with_result(pool: SqlitePool) {
     )
     .await;
     assert_eq!(response.status(), StatusCode::OK);
+    let conclude_body: serde_json::Value = response.json().await.unwrap();
+    let data_entry_id = u32::try_from(conclude_body["data_entry_id"].as_u64().unwrap()).unwrap();
 
     // Complete data entry
     create_result_with_non_example_data_entry(
         &addr,
-        polling_station_id,
+        data_entry_id,
         election_id,
         second_session_data_entry_two_political_groups(),
     )
@@ -401,11 +403,11 @@ async fn test_update_with_data_entry(pool: SqlitePool) {
     )
     .await;
     assert_eq!(response.status(), StatusCode::OK);
+    let conclude_body: serde_json::Value = response.json().await.unwrap();
+    let data_entry_id = u32::try_from(conclude_body["data_entry_id"].as_u64().unwrap()).unwrap();
 
     // First data entry
     let typist_cookie = login(&addr, TypistGSB).await;
-    let data_entry_id =
-        get_data_entry_id(&addr, &typist_cookie, election_id, polling_station_id).await;
     complete_data_entry(
         &addr,
         &typist_cookie,

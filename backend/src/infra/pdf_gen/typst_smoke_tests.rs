@@ -356,6 +356,7 @@ fn random_investigation(
         reason: random_string(rng, string_length),
         findings: random_string_option(rng, string_length, none_where_possible),
         corrected_results: random_option(rng, corrected_result, none_where_possible),
+        data_entry_id: None,
     }
 }
 
@@ -371,6 +372,7 @@ fn random_finished_investigation(
         reason: random_string(rng, string_length),
         findings: Some(random_string(rng, string_length)),
         corrected_results: Some(corrected_results),
+        data_entry_id: None,
     }
 }
 

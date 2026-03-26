@@ -1,3 +1,5 @@
+use argon2::password_hash;
+
 #[derive(Debug)]
 pub enum AuthenticationError {
     AlreadyInitialised,

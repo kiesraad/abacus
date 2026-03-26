@@ -18,7 +18,6 @@ dependencies = [
  "http-body-util",
  "hyper",
  "memory-serve",
- "password-hash",
  "pdf_gen",
  "quick-xml 0.39.2",
  "rand 0.10.0",

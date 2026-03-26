@@ -137,9 +137,7 @@ Bijvoorbeeld een schorsing of als er meerdere verkiezingen tegelijk werden georg
 
 #set page(header: "")
 
-#show heading.where(level: 3): it =>[
-    #block(it.body)
-]
+#show heading.where(level: 3): it => [#block(it.body)]
 
 === Deze pagina is expres leeg
 Zo komt het handtekeningen-blad altijd op een losse pagina, ook als het verslag dubbelzijdig is geprint.

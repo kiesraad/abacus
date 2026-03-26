@@ -162,16 +162,13 @@ ingevuld te worden in de kolom ‘gecorrigeerd'. Onder ‘oorspronkelijk’ staa
   )
 }
 
-#show heading.where(level: 3): it =>[
-    #block(it.body)
-]
-
 #pagebreak(weak: true)
 
 #set page(header: "")
 
-#emph_block[Deze pagina is expres leeg]
+#show heading.where(level: 3): it => [#block(it.body)]
 
+=== Deze pagina is expres leeg
 Zo komt het handtekeningen-blad altijd op een losse pagina, ook als het verslag dubbelzijdig is geprint.
 
 #pagebreak(weak: true)

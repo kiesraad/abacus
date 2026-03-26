@@ -1,4 +1,4 @@
-import { useLocation, useNavigate } from "react-router";
+import { useLocation } from "react-router";
 import { CommitteeSessionPausedModal } from "@/components/data_entry/CommitteeSessionPausedModal";
 import { Footer } from "@/components/footer/Footer";
 import { Messages } from "@/components/messages/Messages";
@@ -13,7 +13,6 @@ import { DataEntryPicker } from "./DataEntryPicker";
 import { ElectionProgress } from "./ElectionProgress";
 
 export function DataEntryHomePage() {
-  const navigate = useNavigate();
   const location = useLocation();
   const { currentCommitteeSession, election, refetch: refetchElection } = useElection();
   const { statuses, refetch: refetchStatuses } = useElectionStatus();
@@ -22,21 +21,7 @@ export function DataEntryHomePage() {
   useLiveData(refetchStatuses, true);
   useLiveData(refetchElection, true);
 
-  const showFirstDataEntrySavedAlert = location.hash.startsWith("#data-entry-1-saved") ? location.hash : null;
-  const showSecondDataEntrySavedAlert = location.hash.startsWith("#data-entry-2-saved") ? location.hash : null;
-  const dataEntryDone = showFirstDataEntrySavedAlert || showSecondDataEntrySavedAlert || undefined;
-
-  const showDifferenceWithFirstEntryAlert = location.hash.startsWith("#data-entry-different") ? location.hash : null;
-  const showFirstEntryHasErrorsAlert = location.hash.startsWith("#data-entry-errors") ? location.hash : null;
-  const dataEntryNotification = showDifferenceWithFirstEntryAlert || showFirstEntryHasErrorsAlert || undefined;
-
-  function closeDataEntrySavedAlert() {
-    void navigate(location.pathname);
-  }
-
-  function closeDataEntryNotifyAlert() {
-    void navigate(location.pathname);
-  }
+  const anotherEntry = location.hash === "#next";
 
   return (
     <>
@@ -48,34 +33,6 @@ export function DataEntryHomePage() {
       </header>
       {currentCommitteeSession.status === "paused" && (
         <CommitteeSessionPausedModal committeeCategory={election.committee_category} />
-      )}
-      {dataEntryDone && (
-        <Alert type="success" onClose={closeDataEntrySavedAlert}>
-          <strong className="heading-md">{t("data_entry.entry_saved")}</strong>
-          <p>
-            {t("data_entry.success.return_paper")}.
-            {showFirstDataEntrySavedAlert && (
-              <>
-                <br />
-                {t("data_entry.success.second_entry_info")}
-              </>
-            )}
-          </p>
-        </Alert>
-      )}
-
-      {dataEntryNotification && (
-        <Alert type="notify" onClose={closeDataEntryNotifyAlert}>
-          <strong className="heading-md">
-            {showDifferenceWithFirstEntryAlert ? t("data_entry.entry_different") : t("data_entry.entry_errors")}
-          </strong>
-          <p>
-            {t("data_entry.entry_saved")}. {t("data_entry.success.return_paper")},<br />
-            {showDifferenceWithFirstEntryAlert
-              ? t("data_entry.success.different_entry_info")
-              : t("data_entry.success.errors_entry_info")}
-          </p>
-        </Alert>
       )}
 
       <Messages />
@@ -90,7 +47,7 @@ export function DataEntryHomePage() {
       )}
       <main>
         <article>
-          <DataEntryPicker anotherEntry={!!dataEntryDone || !!dataEntryNotification} />
+          <DataEntryPicker anotherEntry={anotherEntry} />
         </article>
         <ElectionProgress />
       </main>

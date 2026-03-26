@@ -4,7 +4,7 @@ import { useNavigate } from "react-router";
 import type { DataEntryId, ElectionWithPoliticalGroups } from "@/types/generated/openapi";
 import type { FormSectionId } from "@/types/types";
 
-import type { DataEntryDispatch, DataEntryState } from "../types/types";
+import type { DataEntryDispatch, DataEntryState, EntryNumber } from "../types/types";
 import { getBaseUrl, getUrlForFormSectionID } from "../utils/utils";
 
 export default function useDataEntryNavigation(
@@ -12,7 +12,7 @@ export default function useDataEntryNavigation(
   dispatch: DataEntryDispatch,
   election: ElectionWithPoliticalGroups,
   dataEntryId: DataEntryId,
-  entryNumber: number,
+  entryNumber: EntryNumber,
   sectionId: FormSectionId | null,
 ) {
   const navigate = useNavigate();

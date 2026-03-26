@@ -210,6 +210,27 @@
   )
 }
 
+/// Display a box either empty or with a value.
+/// Can be used in combination with #sum()
+#let number_box(value: none, content) = {
+  grid(
+    inset: 9pt,
+    columns: (8em, 1fr),
+    align: (center, right),
+    grid.vline(stroke: (thickness: 0.5pt, dash: "solid")),
+    grid.cell(
+        align: right,
+        stroke: (
+          y: 0.5pt + black,
+          x: (paint: black, thickness: 0.5pt, dash: "densely-dotted"),
+        ),
+        if value != none { prefilled_number(value) } else { " " }
+      ),
+    grid.vline(stroke: (thickness: 0.5pt, dash: "solid")),
+    grid.cell(align: horizon + left, content)
+  )
+}
+
 #let correction_title_grid(correction_width: 8em, input_width: 8em) = {
   grid(
     columns: (correction_width, input_width, 3.5em, 1fr),
@@ -221,7 +242,7 @@
 }
 
 // Mathematical addition layout
-#let sum(..boxes, with_correction_title: false, sum_box) = {
+#let sum(..boxes, with_correction_title: false, operator_label: "+ tel op", sum_box) = {
   grid(
     rows: auto,
     ..cell_if(with_correction_title, correction_title_grid()),
@@ -230,7 +251,7 @@
     grid(
       columns: (1fr, 5em),
       grid.cell(align: horizon, line(length: 100%, stroke: 0.5pt)),
-      grid.cell(align: horizon + right, "+ tel op"),
+      grid.cell(align: horizon + right, operator_label),
     ),
     v(1em),
     grid.cell(sum_box)
@@ -282,6 +303,7 @@
   format_date(date)
   " "
   time.slice(0, 5)
+  " uur"
 }
 
 // A title without any numbering
@@ -341,6 +363,25 @@
   }
 
   name.trim()
+}
+
+// Format the location of a candidate
+#let candidate_location(election_candidate) = {
+  let location = ""
+
+  if election_candidate == none {
+    return location
+  }
+
+  if "locality" in election_candidate {
+    location += election_candidate.locality
+  }
+
+  if "country_code" in election_candidate {
+    location += " (" + election_candidate.country_code + ")"
+  }
+
+  location.trim()
 }
 
 // Default table layout

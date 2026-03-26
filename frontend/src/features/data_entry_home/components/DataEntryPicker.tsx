@@ -2,7 +2,6 @@ import { useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 
 import { IconError } from "@/components/generated/icons";
-import { Alert } from "@/components/ui/Alert/Alert";
 import { BottomBar } from "@/components/ui/BottomBar/BottomBar";
 import { Button } from "@/components/ui/Button/Button";
 import { Icon } from "@/components/ui/Icon/Icon";
@@ -11,16 +10,12 @@ import { useElection } from "@/hooks/election/useElection";
 import { useElectionStatus } from "@/hooks/election/useElectionStatus";
 import type { TranslationPath } from "@/i18n/i18n.types";
 import { t, tx } from "@/i18n/translate";
-import type { ElectionId } from "@/types/generated/openapi";
 import { KeyboardKey } from "@/types/ui";
 import { cn } from "@/utils/classnames";
 import { parseIntUserInput } from "@/utils/strings";
-import { useAvailableDataEntries } from "../hooks/useAvailableDataEntries";
 import { useDebouncedCallback } from "../hooks/useDebouncedCallback";
 import { type DataEntryStatusWithUserStatus, DataEntryUserStatus, getUrlForDataEntry } from "../utils/util";
 import cls from "./DataEntryHome.module.css";
-import { DataEntryLink } from "./DataEntryLink";
-import { DataEntryList } from "./DataEntryList";
 import { DataEntrySourceNumberInput } from "./DataEntrySourceNumberInput";
 
 const USER_INPUT_DEBOUNCE: number = 500; // ms
@@ -47,65 +42,15 @@ function AlertMessage({ message }: AlertMessageProps) {
   );
 }
 
-interface UnfinishedEntriesListProps {
-  electionId: ElectionId;
-  dataEntries: DataEntryStatusWithUserStatus[];
-}
-
-function UnfinishedEntriesList({ electionId, dataEntries }: UnfinishedEntriesListProps) {
-  return (
-    <div className="mb-lg" id="unfinished-list">
-      <Alert type="notify" variant="no-icon">
-        <strong className="heading-md">{t("data_entry_home.unfinished_input_title")}</strong>
-        <p>{t("data_entry_home.unfinished_input_content")}</p>
-        {dataEntries.map(({ statusEntry }) => (
-          <DataEntryLink key={statusEntry.data_entry_id} electionId={electionId} dataEntry={statusEntry} />
-        ))}
-      </Alert>
-    </div>
-  );
-}
-
-interface CollapsibleDataEntryListProps {
-  electionId: ElectionId;
-  availableDataEntries: DataEntryStatusWithUserStatus[];
-  onToggle: () => void;
-}
-
-function CollapsibleDataEntryList({ electionId, availableDataEntries, onToggle }: CollapsibleDataEntryListProps) {
-  return (
-    <div className={cls.dataEntryList}>
-      <details onToggle={onToggle}>
-        <summary>
-          {t("data_entry_home.unknown_number")}
-          <br />
-          <span id="openList" className={cn("underlined", cls.pointer)}>
-            {t("data_entry_home.view_list")}
-          </span>
-        </summary>
-        <h3 className="mb-lg">{t("data_entry_home.choose_polling_station")}</h3>
-        {availableDataEntries.length === 0 ? (
-          <Alert type="notify" small>
-            <p>{t("data_entry_home.there_are_no_polling_stations_left_to_fill_in")}</p>
-          </Alert>
-        ) : (
-          <DataEntryList electionId={electionId} dataEntries={availableDataEntries} />
-        )}
-      </details>
-    </div>
-  );
-}
-
 export interface DataEntryPickerProps {
-  anotherEntry?: boolean;
+  dataEntryWithStatus: DataEntryStatusWithUserStatus[];
 }
 
-// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored after #2997
-export function DataEntryPicker({ anotherEntry }: DataEntryPickerProps) {
+export function DataEntryPicker({ dataEntryWithStatus }: DataEntryPickerProps) {
   const navigate = useNavigate();
   const { election } = useElection();
   const { refetch: refetchStatuses } = useElectionStatus();
-  const { dataEntryWithStatus, availableCurrentUser, inProgressCurrentUser } = useAvailableDataEntries();
+
   const [number, setNumber] = useState<string>("");
   const [alert, setAlert] = useState<string | undefined>(undefined);
   const [loading, setLoading] = useState<boolean>(false);
@@ -156,37 +101,27 @@ export function DataEntryPicker({ anotherEntry }: DataEntryPickerProps) {
         e.preventDefault();
       }}
     >
-      {inProgressCurrentUser.length > 0 && (
-        <UnfinishedEntriesList electionId={election.id} dataEntries={inProgressCurrentUser} />
-      )}
-      <fieldset>
-        <legend className="mb-sm">
-          <h2>{anotherEntry ? t("data_entry_home.insert_another") : t("data_entry_home.insert_title")}</h2>
-        </legend>
-        <DataEntrySourceNumberInput
-          number={number}
-          updateNumber={updateNumber}
-          loading={loading}
-          setLoading={setLoading}
-          currentDataEntry={currentDataEntry}
-          setAlert={setAlert}
-          handleSubmit={handleSubmit}
-          refetchStatuses={() => void refetchStatuses()}
-        />
-        <p className="mb-lg">{tx("data_entry_home.name_correct_warning")}</p>
-        {alert && <AlertMessage message={alert} />}
-        <BottomBar type="form">
-          <BottomBar.Row>
-            <Button onClick={handleSubmit}>{t("start")}</Button>
-            <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Enter]} />
-          </BottomBar.Row>
-        </BottomBar>
-      </fieldset>
-      <CollapsibleDataEntryList
-        electionId={election.id}
-        availableDataEntries={availableCurrentUser}
-        onToggle={() => void refetchStatuses()}
+      <DataEntrySourceNumberInput
+        number={number}
+        updateNumber={updateNumber}
+        loading={loading}
+        setLoading={setLoading}
+        currentDataEntry={currentDataEntry}
+        setAlert={setAlert}
+        handleSubmit={handleSubmit}
+        refetchStatuses={() => void refetchStatuses()}
       />
+
+      <p className="mb-lg">{tx("data_entry_home.name_correct_warning")}</p>
+
+      {alert && <AlertMessage message={alert} />}
+
+      <BottomBar type="form">
+        <BottomBar.Row>
+          <Button onClick={handleSubmit}>{t("start")}</Button>
+          <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Enter]} />
+        </BottomBar.Row>
+      </BottomBar>
     </form>
   );
 }

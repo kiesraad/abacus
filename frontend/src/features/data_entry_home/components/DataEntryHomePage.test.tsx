@@ -77,40 +77,6 @@ describe("DataEntryHomePage", () => {
     expect(await screen.findByText("Alle stembureaus zijn ingevoerd")).toBeVisible();
   });
 
-  test("Resume input visible when some are uncompleted", async () => {
-    overrideOnce(
-      "get",
-      "/api/elections/1/status",
-      200,
-      getElectionStatusMockData([
-        { status: "first_entry_in_progress", first_entry_user_id: getTypistUser().user_id },
-        { status: "empty" },
-      ]),
-    );
-
-    renderDataEntryHomePage();
-
-    const alert = await screen.findByRole("alert");
-    expect(within(alert).getByRole("strong")).toHaveTextContent("Je hebt nog een openstaande invoer");
-    const dataEntries = await within(alert).findAllByRole("link");
-    expect(dataEntries.map((ps) => ps.textContent)).toEqual(["33 - Op Rolletjes"]);
-  });
-
-  test("Resume input invisible when none are unfinished", async () => {
-    overrideOnce(
-      "get",
-      "/api/elections/1/status",
-      200,
-      getElectionStatusMockData([{ status: "empty" }, { status: "definitive" }]),
-    );
-
-    renderDataEntryHomePage();
-
-    // Ensure the page is rendered before testing
-    await screen.findByText("Gemeenteraadsverkiezingen 2026");
-    expect(screen.queryByRole("alert")).toBeNull();
-  });
-
   test("Messages are shown", async () => {
     vi.spyOn(useMessages, "useMessages").mockReturnValue({
       hasMessages: vi.fn(),

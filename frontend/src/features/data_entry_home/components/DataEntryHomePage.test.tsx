@@ -1,13 +1,11 @@
-import { waitForElementToBeRemoved } from "@testing-library/dom";
-import { render as rtlRender } from "@testing-library/react";
-import { userEvent } from "@testing-library/user-event";
+import { waitFor } from "@testing-library/react";
 import { HttpResponse, http } from "msw";
 import { beforeEach, describe, expect, test, vi } from "vitest";
-import { ErrorBoundary } from "@/components/error/ErrorBoundary";
-import { ElectionLayout } from "@/components/layout/ElectionLayout";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
+import type { Message } from "@/hooks/messages/MessagesContext";
 import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
+import * as useMessages from "@/hooks/messages/useMessages";
 import * as useUser from "@/hooks/user/useUser";
 import { electionDetailsMockResponse, getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { getElectionStatusMockData } from "@/testing/api-mocks/ElectionStatusMockData";
@@ -16,16 +14,14 @@ import {
   ElectionRequestHandler,
   ElectionStatusRequestHandler,
 } from "@/testing/api-mocks/RequestHandlers";
-import { Providers } from "@/testing/Providers";
 import { overrideOnce, server } from "@/testing/server";
-import { render, screen, setupTestRouter, within } from "@/testing/test-utils";
+import { renderReturningRouter, screen, within } from "@/testing/test-utils";
 import { getTypistUser } from "@/testing/user-mock-data";
 import type { ElectionDetailsResponse } from "@/types/generated/openapi";
-import { dataEntryHomeRoutes } from "../routes";
 import { DataEntryHomePage } from "./DataEntryHomePage";
 
 const renderDataEntryHomePage = () =>
-  render(
+  renderReturningRouter(
     <ElectionProvider electionId={1}>
       <ElectionStatusProvider electionId={1}>
         <MessagesProvider>
@@ -115,121 +111,28 @@ describe("DataEntryHomePage", () => {
     expect(screen.queryByRole("alert")).toBeNull();
   });
 
-  test("Data entry saved alert works", async () => {
-    const user = userEvent.setup();
+  test("Messages are shown", async () => {
+    vi.spyOn(useMessages, "useMessages").mockReturnValue({
+      hasMessages: vi.fn(),
+      popMessages: vi.fn(() => [{ title: "Let op: fouten in het proces-verbaal" }] as Message[]),
+      pushMessage: vi.fn(),
+    });
 
-    // Set up router and navigate to the data entry home page
-    const router = setupTestRouter([
-      {
-        path: "/elections/:electionId/data-entry",
-        Component: ElectionLayout,
-        errorElement: <ErrorBoundary />,
-        children: dataEntryHomeRoutes,
-      },
-    ]);
+    renderDataEntryHomePage();
 
-    await router.navigate("/elections/1/data-entry");
-    rtlRender(<Providers router={router} />);
-
-    // Wait for the page to be loaded
-    expect(
-      await screen.findByRole("heading", {
-        level: 1,
-        name: electionDetailsMockResponse.election.name,
-      }),
-    ).toBeVisible();
-
-    // Expect the alert to not be visible
-    const alertHeading = "Je invoer is opgeslagen";
-    expect(screen.queryByText(alertHeading)).not.toBeInTheDocument();
-
-    // Set the hash to show the alert and expect it to be visible
-    await router.navigate({ hash: "data-entry-1-saved" });
     const alert = await screen.findByRole("alert");
-    expect(within(alert).getByRole("strong")).toHaveTextContent(alertHeading);
-
-    // Close the alert and expect it to be hidden
-    const alertClosed = waitForElementToBeRemoved(alert);
-    await user.click(within(alert).getByRole("button", { name: "Melding sluiten" }));
-    await alertClosed;
+    expect(within(alert).getByRole("strong")).toHaveTextContent("Let op: fouten in het proces-verbaal");
   });
 
-  test("Data entry different alert works", async () => {
-    const user = userEvent.setup();
+  test("Show different title for next data entry", async () => {
+    const router = renderDataEntryHomePage();
+    expect(await screen.findByRole("heading", { name: "Welk stembureau ga je invoeren?" })).toBeVisible();
 
-    // Set up router and navigate to the data entry home page
-    const router = setupTestRouter([
-      {
-        path: "/elections/:electionId/data-entry",
-        Component: ElectionLayout,
-        errorElement: <ErrorBoundary />,
-        children: dataEntryHomeRoutes,
-      },
-    ]);
-
-    await router.navigate("/elections/1/data-entry");
-    rtlRender(<Providers router={router} />);
-
-    // Wait for the page to be loaded
-    expect(
-      await screen.findByRole("heading", {
-        level: 1,
-        name: electionDetailsMockResponse.election.name,
-      }),
-    ).toBeVisible();
-
-    // Expect the alert to not be visible
-    const alertHeading = "Let op: verschil met eerste invoer";
-    expect(screen.queryByText(alertHeading)).not.toBeInTheDocument();
-
-    // Set the hash to show the alert and expect it to be visible
-    await router.navigate({ hash: "data-entry-different" });
-    const alert = await screen.findByRole("alert");
-    expect(within(alert).getByRole("strong")).toHaveTextContent(alertHeading);
-
-    // Close the alert and expect it to be hidden
-    const alertClosed = waitForElementToBeRemoved(alert);
-    await user.click(within(alert).getByRole("button", { name: "Melding sluiten" }));
-    await alertClosed;
-  });
-
-  test("Data entry errors alert works", async () => {
-    const user = userEvent.setup();
-
-    // Set up router and navigate to the data entry home page
-    const router = setupTestRouter([
-      {
-        path: "/elections/:electionId/data-entry",
-        Component: ElectionLayout,
-        errorElement: <ErrorBoundary />,
-        children: dataEntryHomeRoutes,
-      },
-    ]);
-
-    await router.navigate("/elections/1/data-entry");
-    rtlRender(<Providers router={router} />);
-
-    // Wait for the page to be loaded
-    expect(
-      await screen.findByRole("heading", {
-        level: 1,
-        name: electionDetailsMockResponse.election.name,
-      }),
-    ).toBeVisible();
-
-    // Expect the alert to not be visible
-    const alertHeading = "Let op: fouten in het proces-verbaal";
-    expect(screen.queryByText(alertHeading)).not.toBeInTheDocument();
-
-    // Set the hash to show the alert and expect it to be visible
-    await router.navigate({ hash: "data-entry-errors" });
-    const alert = await screen.findByRole("alert");
-    expect(within(alert).getByRole("strong")).toHaveTextContent(alertHeading);
-
-    // Close the alert and expect it to be hidden
-    const alertClosed = waitForElementToBeRemoved(alert);
-    await user.click(within(alert).getByRole("button", { name: "Melding sluiten" }));
-    await alertClosed;
+    await router.navigate({ hash: "next" });
+    await waitFor(() => {
+      expect(screen.queryByRole("heading", { name: "Welk stembureau ga je invoeren?" })).not.toBeInTheDocument();
+    });
+    expect(await screen.findByRole("heading", { name: "Verder met een volgend stembureau?" })).toBeVisible();
   });
 
   test("Alert when committee session is paused is shown", async () => {

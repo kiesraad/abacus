@@ -1550,13 +1550,21 @@ mod tests {
 
         // Check if the data was updated
         let data_entry = get_data_entry_for_ps(&mut conn, polling_station_id).await;
+
         let status: DataEntryStatus = data_entry.state.0;
         let DataEntryStatus::FirstEntryInProgress(state) = status else {
             panic!("Expected entry to be in FirstEntryInProgress state");
         };
+        let Results::CSOFirstSession(first_entry) = state.first_entry else {
+            panic!("Expected entry to be CSOFirstSession model");
+        };
+        let Results::CSOFirstSession(request_first_entry) = request_body.data else {
+            panic!("Expected request data to be CSOFirstSession model");
+        };
+
         assert_eq!(
-            state.first_entry.voters_counts().poll_card_count,
-            request_body.data.voters_counts().poll_card_count,
+            first_entry.voters_counts.poll_card_count,
+            request_first_entry.voters_counts.poll_card_count,
         );
     }
 
@@ -2151,15 +2159,16 @@ mod tests {
 
         let mut conn = pool.acquire().await.unwrap();
         let data_entry = get_data_entry_for_ps(&mut conn, polling_station_id).await;
+
         let status: DataEntryStatus = data_entry.state.0;
-        if let DataEntryStatus::FirstEntryFinalised(entry) = status {
-            assert_eq!(
-                entry.finalised_first_entry.voters_counts().poll_card_count,
-                99
-            )
-        } else {
-            panic!("invalid state")
-        }
+        let DataEntryStatus::FirstEntryFinalised(state) = status else {
+            panic!("Expected entry to be in FirstEntryFinalised state");
+        };
+        let Results::CSOFirstSession(first_entry) = state.finalised_first_entry else {
+            panic!("Expected entry to be CSOFirstSession model");
+        };
+
+        assert_eq!(first_entry.voters_counts.poll_card_count, 99);
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
@@ -2185,15 +2194,16 @@ mod tests {
 
         let mut conn = pool.acquire().await.unwrap();
         let data_entry = get_data_entry_for_ps(&mut conn, polling_station_id).await;
+
         let status: DataEntryStatus = data_entry.state.0;
-        if let DataEntryStatus::FirstEntryFinalised(entry) = status {
-            assert_eq!(
-                entry.finalised_first_entry.voters_counts().poll_card_count,
-                100
-            )
-        } else {
-            panic!("invalid state: {status:?}")
-        }
+        let DataEntryStatus::FirstEntryFinalised(state) = status else {
+            panic!("Expected entry to be in FirstEntryFinalised state");
+        };
+        let Results::CSOFirstSession(first_entry) = state.finalised_first_entry else {
+            panic!("Expected entry to be CSOFirstSession model");
+        };
+
+        assert_eq!(first_entry.voters_counts.poll_card_count, 100);
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]

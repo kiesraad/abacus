@@ -245,17 +245,15 @@ Hieronder is berekend hoe vaak elke lijst qua stemmenaantal de kiesdeler heeft g
       table.cell(political_group_name(input.election.political_groups.find(pg => pg.number == standing.list_number), with_prefix: "only_list_number")),
       table.cell(align: right, [#standing.votes_cast]),
       table.cell(align: center, [÷ #format_fraction(input.seat_assignment.quota) =]),
-      table.cell(align: right, [#if list_result_changes.len() > 0 {strike(str(standing.full_seats + list_result_changes.len())) + " "}#standing.full_seats])
+      table.cell(align: right, [#str(standing.full_seats + list_result_changes.len())])
     )
   }.flatten(),
   table.hline(stroke: 1pt + black),
   table.cell(header_text([Totaal])),
   table.cell(align: right, header_text([#input.summary.votes_counts.total_votes_candidates_count])),
   table.cell(stroke: none, []),
-  table.cell(stroke: none, align: right, header_text([#input.seat_assignment.full_seats])),
+  table.cell(stroke: none, align: right, header_text([#str(input.seat_assignment.full_seats + input.result_changes_full_seats.len())])),
 )
-
-#TODO[Voetnoten - https://typst.app/docs/reference/model/numbering/]
 
 #pagebreak(weak: true)
 
@@ -308,13 +306,10 @@ Na toewijzing van de volle zetels blijft een aantal te verdelen zetels over. Dit
         let residual_seats = input.seat_assignment.steps.filter(step => step.change.changed_by == "LargestRemainderAssignment").filter(step => {
           step.change.selected_list_number == list_seat_assignment.list_number
         }).len()
-        let list_result_changes = input.result_changes_residual_seats.filter((change) => change.type == "residual_seat" and change.list_number == list_seat_assignment.list_number)
-        for list_result_change in list_result_changes {
-          residual_seats = residual_seats + list_result_change.increase - list_result_change.decrease;
-        };
+        let list_result_changes_full_seats = input.result_changes_full_seats.filter((change) => change.list_number == list_seat_assignment.list_number)
         (
           table.cell(political_group_name(input.election.political_groups.find(pg => pg.number == list_seat_assignment.list_number), with_prefix: "only_list_number")),
-          table.cell(align: right, str(list_seat_assignment.full_seats)),
+          table.cell(align: right, str(list_seat_assignment.full_seats + list_result_changes_full_seats.len())),
           table.cell(align: right, format_fraction(list_seat_assignment.remainder_votes)),
           table.cell(align: right, str(residual_seats))
         )
@@ -332,7 +327,7 @@ Na toewijzing van de volle zetels blijft een aantal te verdelen zetels over. Dit
 
     #TODO[move part of highest averages table to next page when > 6 residual seats?]
   
-    #highest_averages_table(highest_averages_steps, input.seat_assignment.final_standing, input.election.political_groups, input.result_changes_residual_seats)
+    #highest_averages_table(highest_averages_steps, input.seat_assignment.final_standing, input.election.political_groups)
   ]
 
   #TODO[Voetnoten - https://typst.app/docs/reference/model/numbering/]
@@ -355,7 +350,7 @@ Na toewijzing van de volle zetels blijft een aantal te verdelen zetels over. Dit
       table.header(
         table.cell(stroke: none, header_text([Lijst])),
         table.cell(align: right, header_text([Reeds toegewezen zetels])),
-        table.cell(align: right, stroke: none, header_text([Gemiddeld aantal\ stemmen per zetel bij\ toewijzing restzetels])),
+        table.cell(align: right, stroke: none, header_text([Gemiddeld aantal stemmen per zetel bij toewijzing restzetels])),
         table.cell(align: right, header_text([Toegekende restzetels])),
       ),
       table.hline(stroke: 1pt + black),
@@ -386,7 +381,7 @@ Na toewijzing van de volle zetels blijft een aantal te verdelen zetels over. Dit
       } else {
         [Hierna waren er nog #highest_averages_steps.len() restzetels te verdelen. Deze zetels zijn toegewezen aan de lijsten die met een zetel erbij het grootste gemiddelde aantal stemmen per zetel zouden hebben.]
       }
-      #highest_averages_table(highest_averages_steps, input.seat_assignment.final_standing, input.election.political_groups, ())
+      #highest_averages_table(highest_averages_steps, input.seat_assignment.final_standing, input.election.political_groups)
     ]
   ]
 ] else [

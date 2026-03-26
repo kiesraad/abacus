@@ -63,7 +63,7 @@ describe("Custom matchers", () => {
           ["Column One", "Column Two"],
           ["Cell One", "Cell Two"],
         ]);
-      }).toThrowError(/Expected table to have content/);
+      }).toThrow(/Expected table to have content/);
     });
 
     test("Expect not to have table content to fail", async () => {
@@ -75,14 +75,14 @@ describe("Custom matchers", () => {
           ["Big Cell"],
           ["Text badge", "52 4/23"],
         ]);
-      }).toThrowError(/Expected table not to have content/);
+      }).toThrow(/Expected table not to have content/);
     });
 
     test("Expect to fail for non-table elements", async () => {
       const heading = await screen.findByRole("heading");
       expect(() => {
         expect(heading).toHaveTableContent([["Content"]]);
-      }).toThrowError(/Expected an HTMLTableElement/);
+      }).toThrow(/Expected an HTMLTableElement/);
     });
   });
 });

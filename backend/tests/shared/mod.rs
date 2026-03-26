@@ -178,10 +178,10 @@ pub async fn complete_data_entry(
 async fn check_data_entry_status_is_definitive(
     addr: &SocketAddr,
     cookie: &HeaderValue,
-    polling_station_id: u32,
+    data_entry_id: u32,
     election_id: u32,
 ) {
-    // check that data entry status for this polling station is now Definitive
+    // check that data entry status for this data entry is now Definitive
     let url = format!("http://{addr}/api/elections/{election_id}/status");
     let response = reqwest::Client::new()
         .get(&url)
@@ -195,8 +195,7 @@ async fn check_data_entry_status_is_definitive(
     assert_eq!(
         statuses
             .iter()
-            .find(|s| s["source"]["type"] == "PollingStation"
-                && s["source"]["id"] == polling_station_id)
+            .find(|s| s["data_entry_id"] == data_entry_id)
             .unwrap()["status"],
         "definitive"
     );
@@ -239,10 +238,8 @@ pub async fn update_investigation(
         .unwrap()
 }
 
-pub async fn create_result(addr: &SocketAddr, polling_station_id: u32, election_id: u32) {
+pub async fn create_result(addr: &SocketAddr, data_entry_id: u32, election_id: u32) {
     let typist_cookie = login(addr, FixtureUser::TypistGSB).await;
-    let data_entry_id =
-        get_data_entry_id(addr, &typist_cookie, election_id, polling_station_id).await;
     complete_data_entry(
         addr,
         &typist_cookie,
@@ -260,24 +257,20 @@ pub async fn create_result(addr: &SocketAddr, polling_station_id: u32, election_
         example_data_entry(None),
     )
     .await;
-    check_data_entry_status_is_definitive(addr, &typist2_cookie, polling_station_id, election_id)
-        .await;
+    check_data_entry_status_is_definitive(addr, &typist2_cookie, data_entry_id, election_id).await;
 }
 
 pub async fn create_result_with_non_example_data_entry(
     addr: &SocketAddr,
-    polling_station_id: u32,
+    data_entry_id: u32,
     election_id: u32,
     data_entry: serde_json::Value,
 ) {
     let typist_cookie = login(addr, FixtureUser::TypistGSB).await;
-    let data_entry_id =
-        get_data_entry_id(addr, &typist_cookie, election_id, polling_station_id).await;
     complete_data_entry(addr, &typist_cookie, data_entry_id, 1, data_entry.clone()).await;
     let typist2_cookie = login(addr, FixtureUser::Typist2GSB).await;
     complete_data_entry(addr, &typist2_cookie, data_entry_id, 2, data_entry).await;
-    check_data_entry_status_is_definitive(addr, &typist2_cookie, polling_station_id, election_id)
-        .await;
+    check_data_entry_status_is_definitive(addr, &typist2_cookie, data_entry_id, election_id).await;
 }
 
 pub async fn get_election_details(
@@ -352,22 +345,6 @@ pub async fn change_status_committee_session(
         .await
         .unwrap();
     assert_eq!(response.status(), StatusCode::NO_CONTENT);
-}
-
-/// Get the data_entry_id for a polling station from the election status endpoint
-pub async fn get_data_entry_id(
-    addr: &SocketAddr,
-    cookie: &HeaderValue,
-    election_id: u32,
-    polling_station_id: u32,
-) -> u32 {
-    let statuses = get_statuses(addr, cookie, election_id).await;
-    u32::try_from(
-        statuses[&polling_station_id]["data_entry_id"]
-            .as_u64()
-            .unwrap(),
-    )
-    .unwrap()
 }
 
 pub async fn get_statuses(

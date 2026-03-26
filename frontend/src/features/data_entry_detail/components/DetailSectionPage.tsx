@@ -6,7 +6,7 @@ import { useNumericParam } from "@/hooks/useNumericParam";
 import type { FormSectionId } from "@/types/types";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
-import { usePollingStationDataEntryErrors } from "../hooks/usePollingStationDataEntryErrors";
+import { useDataEntryErrors } from "../hooks/useDataEntryErrors";
 import { ReadOnlyDataEntrySection } from "./ReadOnlyDataEntrySection";
 
 export function DetailSectionPage() {
@@ -14,7 +14,7 @@ export function DetailSectionPage() {
   const sectionId = params.sectionId;
   const dataEntryId = useNumericParam("dataEntryId");
   const { election } = useElection();
-  const { loading, dataEntry } = usePollingStationDataEntryErrors(dataEntryId);
+  const { loading, dataEntry } = useDataEntryErrors(dataEntryId);
 
   if (loading || dataEntry === null) {
     return <Loader />;

@@ -7,7 +7,7 @@ import { PageTitle } from "@/components/page_title/PageTitle";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { StickyNav } from "@/components/ui/AppLayout/StickyNav";
 import { Badge } from "@/components/ui/Badge/Badge";
-import { PollingStationNumber } from "@/components/ui/Badge/PollingStationNumber";
+import { DataEntrySourceNumber } from "@/components/ui/Badge/DataEntrySourceNumber";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { useElection } from "@/hooks/election/useElection";
 import { useMessages } from "@/hooks/messages/useMessages";
@@ -15,7 +15,7 @@ import { useNumericParam } from "@/hooks/useNumericParam";
 import { useUser } from "@/hooks/user/useUser.ts";
 import { t } from "@/i18n/translate";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
-import { usePollingStationDataEntryErrors } from "../hooks/usePollingStationDataEntryErrors";
+import { useDataEntryErrors } from "../hooks/useDataEntryErrors";
 import { DetailNavigation } from "./DetailNavigation";
 import { ReadOnlyDataEntryDelete } from "./delete/ReadOnlyDataEntryDelete";
 
@@ -24,7 +24,7 @@ export function DetailLayout() {
   const { pushMessage } = useMessages();
   const dataEntryId = useNumericParam("dataEntryId");
   const { election } = useElection();
-  const { loading, dataEntry } = usePollingStationDataEntryErrors(dataEntryId);
+  const { loading, dataEntry } = useDataEntryErrors(dataEntryId);
   const [error, setError] = useState<AnyApiError>();
   const user = useUser();
 
@@ -63,7 +63,7 @@ export function DetailLayout() {
 
       <header>
         <section className="smaller-gap">
-          <PollingStationNumber>{dataEntry.source.number}</PollingStationNumber>
+          <DataEntrySourceNumber>{dataEntry.source.number}</DataEntrySourceNumber>
           <h1>{dataEntry.source.name}</h1>
           <Badge type={dataEntry.status} userRole={user.role} />
         </section>

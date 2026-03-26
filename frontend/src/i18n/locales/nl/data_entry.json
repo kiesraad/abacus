@@ -16,6 +16,7 @@
   "continue_after_check": "Je kan alleen verder als je het papieren proces-verbaal hebt gecontroleerd.",
   "continue_with_errors": "Je kan alleen verder als je dit met de coördinator hebt overlegd.",
   "corrected": "Gecorrigeerd",
+  "current_form": "het huidige formulier",
   "data_entry_not_possible": "Je kan dit stembureau niet invoeren",
   "definitive": "Definitief",
   "entry_different": "Let op: verschil met eerste invoer",
@@ -29,6 +30,7 @@
   },
   "original": "Oorspronkelijk",
   "pick_polling_station": "Kies een stembureau",
+  "save_changes": "Wil je deze wijzigingen bewaren?",
   "second_entry": "2e invoer",
   "success": {
     "different_entry_info": "en geef aan dat er een verschil is met de eerste invoer.",
@@ -37,5 +39,7 @@
     "second_entry_info": "Een andere invoerder doet straks de tweede invoer."
   },
   "title": "Invoeren",
-  "to_overview": "Naar startscherm"
+  "to_overview": "Naar startscherm",
+  "unsaved_changes_message": "Je hebt in <strong>{name}</strong> wijzigingen gemaakt die nog niet zijn opgeslagen.",
+  "unsaved_changes_title": "Let op: niet opgeslagen wijzigingen"
 }

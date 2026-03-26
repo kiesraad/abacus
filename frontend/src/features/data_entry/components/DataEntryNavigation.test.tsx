@@ -22,7 +22,7 @@ function renderComponent(onSubmit: (options?: SubmitCurrentFormOptions) => Promi
       handle: { public: true },
     },
     {
-      path: "/elections/:electionId/data-entry/:pollingStationId/:entryNumber",
+      path: "/elections/:electionId/data-entry/:dataEntryId/:entryNumber",
       element: <DataEntryNavigation onSubmit={onSubmit} />,
       children: [{ path: "differences_counts", element: <div>Differences</div>, handle: { public: true } }],
     },

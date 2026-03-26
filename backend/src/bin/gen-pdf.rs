@@ -22,6 +22,7 @@ static MODELS: &[&str] = &[
     "model-na-31-2-inlegvel",
     "model-n-10-2",
     "model-p-2a",
+    "model-p-22-2",
 ];
 
 /// Temporary path to store generated PDFs

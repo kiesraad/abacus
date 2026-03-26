@@ -4,10 +4,7 @@ import { ApiClient } from "@/api/ApiClient";
 import { ApiResponseStatus } from "@/api/ApiResult";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
-import {
-  PollingStationDataEntryDiscardHandler,
-  PollingStationDataEntryFinaliseHandler,
-} from "@/testing/api-mocks/RequestHandlers";
+import { DataEntryDiscardHandler, DataEntryFinaliseHandler } from "@/testing/api-mocks/RequestHandlers";
 import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMockData";
 import { overrideOnce, server } from "@/testing/server";
 import type { DATA_ENTRY_FINALISE_REQUEST_PATH, DataEntrySource, Results } from "@/types/generated/openapi";
@@ -343,7 +340,7 @@ describe("onSubmitForm", () => {
 
 describe("onDiscardDataEntry", () => {
   test("should handle discard data entry", async () => {
-    server.use(PollingStationDataEntryDiscardHandler);
+    server.use(DataEntryDiscardHandler);
 
     const dispatch = vi.fn();
     const client = new ApiClient();
@@ -367,7 +364,7 @@ describe("onDiscardDataEntry", () => {
 
 describe("onFinaliseDataEntry", () => {
   test("should handle finalise data entry", async () => {
-    server.use(PollingStationDataEntryFinaliseHandler);
+    server.use(DataEntryFinaliseHandler);
     const dispatch = vi.fn();
     const client = new ApiClient();
 

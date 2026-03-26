@@ -10,7 +10,7 @@ export const committeeSessionMockData: CommitteeSession = {
 };
 
 export const csbCommitteeSessionMockData: CommitteeSession = {
-  id: 1,
+  id: 2,
   number: 1,
   election_id: 2,
   status: "data_entry",

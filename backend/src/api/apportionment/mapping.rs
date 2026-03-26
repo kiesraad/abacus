@@ -1,14 +1,12 @@
 use std::collections::HashMap;
 
-use crate::{
-    api::apportionment::structs::{
+use crate::domain::{
+    apportionment::{
         CandidateNomination, ChosenCandidate, DisplayFraction, ListCandidateNomination,
         ListSeatAssignment, PreferenceThreshold, SeatAssignment,
     },
-    domain::{
-        election::{Candidate, CandidateNumber, PGNumber, PoliticalGroup},
-        results::political_group_candidate_votes::PoliticalGroupCandidateVotes,
-    },
+    election::{Candidate, CandidateNumber, PGNumber, PoliticalGroup},
+    results::political_group_candidate_votes::PoliticalGroupCandidateVotes,
 };
 
 pub fn map_seat_assignment(
@@ -115,9 +113,9 @@ pub fn map_candidate_nomination(
 #[cfg(test)]
 mod tests {
     use super::{DisplayFraction, sort_candidates_alphabetically};
-    use crate::{
-        api::apportionment::structs::ChosenCandidate,
-        domain::election::{CandidateNumber, PGNumber},
+    use crate::domain::{
+        apportionment::ChosenCandidate,
+        election::{CandidateNumber, PGNumber},
     };
 
     #[test]

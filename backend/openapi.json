@@ -6590,6 +6590,9 @@
           "corrected_results": {
             "type": "boolean"
           },
+          "data_entry_id": {
+            "$ref": "#/components/schemas/DataEntryId"
+          },
           "findings": {
             "type": "string"
           },

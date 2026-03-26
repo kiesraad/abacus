@@ -75,7 +75,7 @@ jobs:
       - name: Run tests with coverage
         run: cargo llvm-cov nextest --workspace --branch --profile ci --features embed-typst,airgap-detection --cobertura --output-path ./target/llvm-cov-target/codecov.json
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5
+        uses: codecov/codecov-action@1af58845a975a7985b0beb0cbe6fbbb71a41dbad # v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           name: Backend Nextest Coverage
@@ -108,16 +108,16 @@ jobs:
           corepack prepare pnpm@latest-10 --activate
       - name: Install dependencies
         run: pnpm install
-      - name: Install Playwright Chromium Browser
-        run: pnpm playwright install --with-deps chromium
       - name: Run Vite build to report bundle size
         run: pnpm vite build --config vite.config.ts
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       - name: Run tests with coverage
         run: pnpm vitest run --coverage
+        env:
+          CHROMIUM_CHANNEL: chrome
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5
+        uses: codecov/codecov-action@1af58845a975a7985b0beb0cbe6fbbb71a41dbad # v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           name: Frontend Vitest Coverage

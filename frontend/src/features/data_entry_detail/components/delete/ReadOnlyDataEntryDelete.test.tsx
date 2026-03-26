@@ -2,7 +2,7 @@ import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, type Mock, test, vi } from "vitest";
 
 import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
-import { PollingStationDataEntryResetHandler } from "@/testing/api-mocks/RequestHandlers";
+import { DataEntryResetHandler } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
 import { render, screen, spyOnHandler } from "@/testing/test-utils";
 import type { DATA_ENTRY_RESET_REQUEST_PATH, DataEntrySource, DataEntryStatusName } from "@/types/generated/openapi";
@@ -31,8 +31,8 @@ describe("ReadOnlyDataEntryDelete", () => {
   let deleteDataEntry: Mock;
 
   beforeEach(() => {
-    server.use(PollingStationDataEntryResetHandler);
-    deleteDataEntry = spyOnHandler(PollingStationDataEntryResetHandler);
+    server.use(DataEntryResetHandler);
+    deleteDataEntry = spyOnHandler(DataEntryResetHandler);
   });
 
   test("delete after confirm", async () => {

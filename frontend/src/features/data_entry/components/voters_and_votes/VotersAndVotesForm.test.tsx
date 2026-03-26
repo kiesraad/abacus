@@ -5,10 +5,7 @@ import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
 import * as useUser from "@/hooks/user/useUser";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
-import {
-  PollingStationDataEntryClaimHandler,
-  PollingStationDataEntrySaveHandler,
-} from "@/testing/api-mocks/RequestHandlers";
+import { DataEntryClaimHandler, DataEntrySaveHandler } from "@/testing/api-mocks/RequestHandlers";
 import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMockData";
 import { overrideOnce, server } from "@/testing/server";
 import {
@@ -66,7 +63,7 @@ const votesFieldIds = {
 describe("Test VotersAndVotesForm", () => {
   beforeEach(() => {
     vi.spyOn(useUser, "useUser").mockReturnValue(getTypistUser());
-    server.use(PollingStationDataEntryClaimHandler, PollingStationDataEntrySaveHandler);
+    server.use(DataEntryClaimHandler, DataEntrySaveHandler);
   });
 
   describe("VotersAndVotesForm user interactions", () => {

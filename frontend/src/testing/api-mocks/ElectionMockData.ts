@@ -351,9 +351,6 @@ export const getCSBElectionMockData = (
 ): Required<ElectionDetailsResponse> => {
   const updatedCommitteeSession = getCSBCommitteeSessionMockData(committeeSession);
 
-  updatedCommitteeSession.id = 2;
-  updatedCommitteeSession.election_id = 2;
-
   return {
     current_committee_session: updatedCommitteeSession,
     committee_sessions: [updatedCommitteeSession],

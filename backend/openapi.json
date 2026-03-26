@@ -118,7 +118,7 @@
     },
     "/api/data_entries/{data_entry_id}": {
       "delete": {
-        "summary": "Reset the data entry to empty (coordinator_gsb)",
+        "summary": "Reset the data entry to empty (coordinator_csb, coordinator_gsb)",
         "operationId": "data_entry_reset",
         "parameters": [
           {
@@ -189,6 +189,7 @@
         "security": [
           {
             "cookie_auth": [
+              "coordinator_csb",
               "coordinator_gsb"
             ]
           }
@@ -197,7 +198,7 @@
     },
     "/api/data_entries/{data_entry_id}/get": {
       "get": {
-        "summary": "Get data entry with validation results (coordinator_gsb)",
+        "summary": "Get data entry with validation results (coordinator_csb, coordinator_gsb)",
         "operationId": "data_entry_get",
         "parameters": [
           {
@@ -275,6 +276,7 @@
         "security": [
           {
             "cookie_auth": [
+              "coordinator_csb",
               "coordinator_gsb"
             ]
           }
@@ -283,7 +285,7 @@
     },
     "/api/data_entries/{data_entry_id}/resolve_differences": {
       "get": {
-        "summary": "Get data entry differences to be resolved (coordinator_gsb)",
+        "summary": "Get data entry differences to be resolved (coordinator_csb, coordinator_gsb)",
         "operationId": "data_entry_get_differences",
         "parameters": [
           {
@@ -361,13 +363,14 @@
         "security": [
           {
             "cookie_auth": [
+              "coordinator_csb",
               "coordinator_gsb"
             ]
           }
         ]
       },
       "post": {
-        "summary": "Resolve data entry differences by providing a `ResolveDifferencesAction` (coordinator_gsb)",
+        "summary": "Resolve data entry differences by providing a `ResolveDifferencesAction` (coordinator_csb, coordinator_gsb)",
         "operationId": "data_entry_resolve_differences",
         "parameters": [
           {
@@ -465,6 +468,7 @@
         "security": [
           {
             "cookie_auth": [
+              "coordinator_csb",
               "coordinator_gsb"
             ]
           }
@@ -473,7 +477,7 @@
     },
     "/api/data_entries/{data_entry_id}/resolve_errors": {
       "post": {
-        "summary": "Resolve accepted data entry errors by providing a `ResolveErrorsAction` (coordinator_gsb)",
+        "summary": "Resolve accepted data entry errors by providing a `ResolveErrorsAction` (coordinator_csb, coordinator_gsb)",
         "operationId": "data_entry_resolve_errors",
         "parameters": [
           {
@@ -571,6 +575,7 @@
         "security": [
           {
             "cookie_auth": [
+              "coordinator_csb",
               "coordinator_gsb"
             ]
           }
@@ -579,7 +584,7 @@
     },
     "/api/data_entries/{data_entry_id}/{entry_number}": {
       "post": {
-        "summary": "Save a data entry (typist_gsb)",
+        "summary": "Save a data entry (typist_csb, typist_gsb)",
         "operationId": "data_entry_save",
         "parameters": [
           {
@@ -688,13 +693,14 @@
         "security": [
           {
             "cookie_auth": [
+              "typist_csb",
               "typist_gsb"
             ]
           }
         ]
       },
       "delete": {
-        "summary": "Discard an in-progress (not finalised) data entry (typist_gsb)",
+        "summary": "Discard an in-progress (not finalised) data entry (typist_csb, typist_gsb)",
         "operationId": "data_entry_discard",
         "parameters": [
           {
@@ -776,6 +782,7 @@
         "security": [
           {
             "cookie_auth": [
+              "typist_csb",
               "typist_gsb"
             ]
           }
@@ -784,7 +791,7 @@
     },
     "/api/data_entries/{data_entry_id}/{entry_number}/claim": {
       "post": {
-        "summary": "Claim a data entry, returning any existing progress (typist_gsb)",
+        "summary": "Claim a data entry, returning any existing progress (typist_csb, typist_gsb)",
         "operationId": "data_entry_claim",
         "parameters": [
           {
@@ -873,6 +880,7 @@
         "security": [
           {
             "cookie_auth": [
+              "typist_csb",
               "typist_gsb"
             ]
           }
@@ -881,7 +889,7 @@
     },
     "/api/data_entries/{data_entry_id}/{entry_number}/finalise": {
       "post": {
-        "summary": "Finalise the data entry (typist_gsb)",
+        "summary": "Finalise the data entry (typist_csb, typist_gsb)",
         "operationId": "data_entry_finalise",
         "parameters": [
           {
@@ -980,6 +988,7 @@
         "security": [
           {
             "cookie_auth": [
+              "typist_csb",
               "typist_gsb"
             ]
           }

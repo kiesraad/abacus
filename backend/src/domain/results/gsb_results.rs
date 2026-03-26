@@ -8,7 +8,7 @@ use super::{
     votes_counts::VotesCounts,
 };
 use crate::domain::election::ElectionWithPoliticalGroups;
-use crate::domain::results::common_results::difference_admitted_voters_count_and_votes_cast_count_above_threshold;
+use crate::domain::results::common_validation::difference_admitted_voters_count_and_votes_cast_count_above_threshold;
 use crate::domain::results::gsb_differences_counts::validate_gsb_differences_counts;
 use crate::domain::validate::{
     DataError, Validate, ValidationResult, ValidationResultCode, ValidationResultContext,

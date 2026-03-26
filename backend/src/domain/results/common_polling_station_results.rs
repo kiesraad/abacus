@@ -10,7 +10,7 @@ use super::{
 use crate::domain::{
     election::ElectionWithPoliticalGroups,
     field_path::FieldPath,
-    results::common_results::difference_admitted_voters_count_and_votes_cast_count_above_threshold,
+    results::common_validation::difference_admitted_voters_count_and_votes_cast_count_above_threshold,
     validate::{
         DataError, Validate, ValidationResult, ValidationResultCode, ValidationResultContext,
         ValidationResults,

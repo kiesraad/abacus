@@ -2279,17 +2279,13 @@
   "result_changes_residual_seats": [
     {
       "list_number": 1,
-      "footnote_number": 1,
       "increase": 1,
-      "decrease": 0,
-      "type": "residual_seat"
+      "decrease": 0
     },
     {
       "list_number": 7,
-      "footnote_number": 1,
       "increase": 0,
-      "decrease": 1,
-      "type": "residual_seat"
+      "decrease": 1
     }
   ],
   "hash": "dedf17b4684e1214fcabb770925dc75c624be3380bd3464729c37a80a37940ad",

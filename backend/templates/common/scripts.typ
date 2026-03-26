@@ -704,7 +704,8 @@
 #let highest_averages_table(
   steps,
   final_standing,
-  political_groups
+  political_groups,
+  result_changes
 ) = {
   table(
     columns: (1fr,) + steps.len() * (6em,) + (6em,),
@@ -726,6 +727,10 @@
       let residual_seats = steps.filter(step => {
         step.change.selected_list_number == list_seat_assignment.list_number
       }).len()
+      let list_result_changes = result_changes.filter((change) => change.list_number == list_seat_assignment.list_number)
+      for list_result_change in list_result_changes {
+        residual_seats = residual_seats + list_result_change.increase
+      };
       (
         table.cell(political_group_name(political_groups.find(pg => pg.number == list_seat_assignment.list_number), with_prefix: "only_list_number")),
         ..steps.map(step => {

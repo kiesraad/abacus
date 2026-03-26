@@ -919,40 +919,25 @@
   "result_changes_full_seats": [
     {
       "list_number": 3,
-      "footnote_number": 1,
       "increase": 0,
-      "decrease": 1,
-      "type": "full_seat"
+      "decrease": 1
     },
     {
       "list_number": 3,
-      "footnote_number": 2,
       "increase": 0,
-      "decrease": 1,
-      "type": "full_seat"
+      "decrease": 1
     },
     {
       "list_number": 3,
-      "footnote_number": 3,
       "increase": 0,
-      "decrease": 1,
-      "type": "full_seat"
+      "decrease": 1
     }
   ],
   "result_changes_residual_seats": [
     {
       "list_number": 3,
-      "footnote_number": 1,
       "increase": 0,
-      "decrease": 1,
-      "type": "full_seat"
-    },
-    {
-      "list_number": 3,
-      "footnote_number": 2,
-      "increase": 0,
-      "decrease": 1,
-      "type": "residual_seat"
+      "decrease": 1
     }
   ],
   "hash": "dedf17b4684e1214fcabb770925dc75c624be3380bd3464729c37a80a37940ad",

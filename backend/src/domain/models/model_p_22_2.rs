@@ -26,10 +26,8 @@ pub struct LimitedElectionSummary {
 #[serde(deny_unknown_fields)]
 pub struct ResultChange {
     pub list_number: u32,
-    pub footnote_number: u32,
     pub increase: u32,
     pub decrease: u32,
-    pub seat_type: String,
 }
 
 #[derive(Serialize, Deserialize)]

@@ -1370,6 +1370,19 @@ mod tests {
         assert!(ps_has_data_entry(&mut conn, polling_station_id).await);
     }
 
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
+    async fn test_claim_data_entry_prev_session_err(pool: SqlitePool) {
+        let data_entry_id = DataEntryId::from(701);
+        let response = claim(pool.clone(), data_entry_id, EntryNumber::FirstEntry).await;
+        assert_eq!(response.status(), StatusCode::CONFLICT);
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let result: ErrorResponse = serde_json::from_slice(&body).unwrap();
+        assert_eq!(
+            result.reference,
+            ErrorReference::InvalidCommitteeSessionStatus
+        );
+    }
+
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
     async fn test_create_data_entry(pool: SqlitePool) {
         let request_body = example_data_entry();

@@ -26,8 +26,9 @@
 #pagebreak(weak: true)
 
 #for political_group in input.votes_tables {
+  let pg = input.election.political_groups.find(pg => pg.number == political_group.number)
   votes_table(
-    title: [#political_group.number #political_group.name],
+    title: [#political_group_name(pg, with_prefix: "only_list_number")],
     headers: ("Kandidaat", "", "Stemmen"),
     total: political_group.total,
     votes_columns: political_group.columns,

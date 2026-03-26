@@ -1268,15 +1268,39 @@ mod tests {
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
-    async fn test_claim_data_entry_ok(pool: SqlitePool) {
-        let polling_station_id = PollingStationId::from(211);
+    async fn test_claim_data_entry_cso_ok(pool: SqlitePool) {
         let data_entry_id = DataEntryId::from(201);
         let response = claim(pool.clone(), data_entry_id, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
 
-        // Check that row was created
-        let mut conn = pool.acquire().await.unwrap();
-        assert!(ps_has_data_entry(&mut conn, polling_station_id).await);
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let ClaimDataEntryResponse {
+            data,
+            source,
+            status,
+            ..
+        } = serde_json::from_slice(&body).unwrap();
+        assert!(matches!(data, Results::CSOFirstSession(_)));
+        assert!(matches!(source, DataEntrySource::PollingStation(_)));
+        assert_eq!(status, DataEntryStatusName::FirstEntryInProgress);
+    }
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_8_csb"))))]
+    async fn test_claim_data_entry_gsb_ok(pool: SqlitePool) {
+        let data_entry_id = DataEntryId::from(801);
+        let response = claim(pool.clone(), data_entry_id, EntryNumber::FirstEntry).await;
+        assert_eq!(response.status(), StatusCode::OK);
+
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let ClaimDataEntryResponse {
+            data,
+            source,
+            status,
+            ..
+        } = serde_json::from_slice(&body).unwrap();
+        assert!(matches!(data, Results::GSB(_)));
+        assert!(matches!(source, DataEntrySource::SubCommittee(_)));
+        assert_eq!(status, DataEntryStatusName::FirstEntryInProgress);
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]

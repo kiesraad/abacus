@@ -373,11 +373,6 @@ function buildDataEntryStructure(model: DataEntryModel, election: ElectionWithPo
         createDifferencesSection(model),
         ...createPoliticalGroupSections(election),
       ];
-    default: {
-      // Exhaustive check
-      model satisfies never;
-      return [];
-    }
   }
 }
 

@@ -2481,14 +2481,11 @@ mod tests {
 
         #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
         async fn test_status_first_entry_in_progress(pool: SqlitePool) {
-            claim(
-                pool.clone(),
-                DataEntryId::from(201),
-                EntryNumber::FirstEntry,
-            )
-            .await;
+            let data_entry_id = DataEntryId::from(201);
 
-            let result = call_data_entry_get(pool.clone(), DataEntryId::from(201))
+            claim(pool.clone(), data_entry_id, EntryNumber::FirstEntry).await;
+
+            let result = call_data_entry_get(pool.clone(), data_entry_id)
                 .await
                 .unwrap();
 
@@ -2502,30 +2499,21 @@ mod tests {
         #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
         async fn test_status_first_entry_has_errors(pool: SqlitePool) {
             let mut data_entry_body = example_data_entry();
+            let data_entry_id = DataEntryId::from(201);
 
             data_entry_body.data.voters_counts_mut().poll_card_count = 1234; // incorrect value
 
-            claim(
-                pool.clone(),
-                DataEntryId::from(201),
-                EntryNumber::FirstEntry,
-            )
-            .await;
+            claim(pool.clone(), data_entry_id, EntryNumber::FirstEntry).await;
             save(
                 pool.clone(),
                 data_entry_body,
-                DataEntryId::from(201),
+                data_entry_id,
                 EntryNumber::FirstEntry,
             )
             .await;
-            finalise(
-                pool.clone(),
-                DataEntryId::from(201),
-                EntryNumber::FirstEntry,
-            )
-            .await;
+            finalise(pool.clone(), data_entry_id, EntryNumber::FirstEntry).await;
 
-            let result = call_data_entry_get(pool.clone(), DataEntryId::from(201))
+            let result = call_data_entry_get(pool.clone(), data_entry_id)
                 .await
                 .unwrap();
 
@@ -2548,27 +2536,20 @@ mod tests {
 
         #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
         async fn test_status_first_entry_finalised(pool: SqlitePool) {
-            claim(
-                pool.clone(),
-                DataEntryId::from(201),
-                EntryNumber::FirstEntry,
-            )
-            .await;
+            let data_entry_body = example_data_entry_with_warning();
+            let data_entry_id = DataEntryId::from(201);
+
+            claim(pool.clone(), data_entry_id, EntryNumber::FirstEntry).await;
             save(
                 pool.clone(),
-                example_data_entry_with_warning(),
-                DataEntryId::from(201),
+                data_entry_body,
+                data_entry_id,
                 EntryNumber::FirstEntry,
             )
             .await;
-            finalise(
-                pool.clone(),
-                DataEntryId::from(201),
-                EntryNumber::FirstEntry,
-            )
-            .await;
+            finalise(pool.clone(), data_entry_id, EntryNumber::FirstEntry).await;
 
-            let result = call_data_entry_get(pool.clone(), DataEntryId::from(201))
+            let result = call_data_entry_get(pool.clone(), data_entry_id)
                 .await
                 .unwrap();
 
@@ -2581,38 +2562,24 @@ mod tests {
 
         #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
         async fn test_status_second_entry_in_progress(pool: SqlitePool) {
-            // Complete first entry
             let data_entry_body = example_data_entry_with_warning();
+            let data_entry_id = DataEntryId::from(201);
 
-            claim(
-                pool.clone(),
-                DataEntryId::from(201),
-                EntryNumber::FirstEntry,
-            )
-            .await;
+            // Complete first entry
+            claim(pool.clone(), data_entry_id, EntryNumber::FirstEntry).await;
             save(
                 pool.clone(),
                 data_entry_body,
-                DataEntryId::from(201),
+                data_entry_id,
                 EntryNumber::FirstEntry,
             )
             .await;
-            finalise(
-                pool.clone(),
-                DataEntryId::from(201),
-                EntryNumber::FirstEntry,
-            )
-            .await;
+            finalise(pool.clone(), data_entry_id, EntryNumber::FirstEntry).await;
 
             // Start second entry
-            claim(
-                pool.clone(),
-                DataEntryId::from(201),
-                EntryNumber::SecondEntry,
-            )
-            .await;
+            claim(pool.clone(), data_entry_id, EntryNumber::SecondEntry).await;
 
-            let result = call_data_entry_get(pool.clone(), DataEntryId::from(201))
+            let result = call_data_entry_get(pool.clone(), data_entry_id)
                 .await
                 .unwrap();
 
@@ -2625,27 +2592,19 @@ mod tests {
 
         #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
         async fn test_status_entries_different(pool: SqlitePool) {
-            // Complete first entry
             let data_entry_body = example_data_entry();
-            claim(
-                pool.clone(),
-                DataEntryId::from(201),
-                EntryNumber::FirstEntry,
-            )
-            .await;
+            let data_entry_id = DataEntryId::from(201);
+
+            // Complete first entry
+            claim(pool.clone(), data_entry_id, EntryNumber::FirstEntry).await;
             save(
                 pool.clone(),
                 data_entry_body,
-                DataEntryId::from(201),
+                data_entry_id,
                 EntryNumber::FirstEntry,
             )
             .await;
-            finalise(
-                pool.clone(),
-                DataEntryId::from(201),
-                EntryNumber::FirstEntry,
-            )
-            .await;
+            finalise(pool.clone(), data_entry_id, EntryNumber::FirstEntry).await;
 
             // Start and complete second entry with different values
             let mut data_entry_body = example_data_entry();
@@ -2655,27 +2614,17 @@ mod tests {
                 .voters_counts_mut()
                 .proxy_certificate_count = 20;
 
-            claim(
-                pool.clone(),
-                DataEntryId::from(201),
-                EntryNumber::SecondEntry,
-            )
-            .await;
+            claim(pool.clone(), data_entry_id, EntryNumber::SecondEntry).await;
             save(
                 pool.clone(),
                 data_entry_body,
-                DataEntryId::from(201),
+                data_entry_id,
                 EntryNumber::SecondEntry,
             )
             .await;
-            finalise(
-                pool.clone(),
-                DataEntryId::from(201),
-                EntryNumber::SecondEntry,
-            )
-            .await;
+            finalise(pool.clone(), data_entry_id, EntryNumber::SecondEntry).await;
 
-            let result = call_data_entry_get(pool.clone(), DataEntryId::from(201))
+            let result = call_data_entry_get(pool.clone(), data_entry_id)
                 .await
                 .err()
                 .unwrap();
@@ -2685,52 +2634,33 @@ mod tests {
 
         #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
         async fn test_status_definitive(pool: SqlitePool) {
-            // Complete first entry
             let data_entry_body = example_data_entry_with_warning();
+            let data_entry_id = DataEntryId::from(201);
 
-            claim(
-                pool.clone(),
-                DataEntryId::from(201),
-                EntryNumber::FirstEntry,
-            )
-            .await;
+            // Complete first entry
+            claim(pool.clone(), data_entry_id, EntryNumber::FirstEntry).await;
             save(
                 pool.clone(),
                 data_entry_body,
-                DataEntryId::from(201),
+                data_entry_id,
                 EntryNumber::FirstEntry,
             )
             .await;
-            finalise(
-                pool.clone(),
-                DataEntryId::from(201),
-                EntryNumber::FirstEntry,
-            )
-            .await;
+            finalise(pool.clone(), data_entry_id, EntryNumber::FirstEntry).await;
 
             // Complete second entry
             let data_entry_body = example_data_entry_with_warning();
-            claim(
-                pool.clone(),
-                DataEntryId::from(201),
-                EntryNumber::SecondEntry,
-            )
-            .await;
+            claim(pool.clone(), data_entry_id, EntryNumber::SecondEntry).await;
             save(
                 pool.clone(),
                 data_entry_body,
-                DataEntryId::from(201),
+                data_entry_id,
                 EntryNumber::SecondEntry,
             )
             .await;
-            finalise(
-                pool.clone(),
-                DataEntryId::from(201),
-                EntryNumber::SecondEntry,
-            )
-            .await;
+            finalise(pool.clone(), data_entry_id, EntryNumber::SecondEntry).await;
 
-            let result = call_data_entry_get(pool.clone(), DataEntryId::from(201))
+            let result = call_data_entry_get(pool.clone(), data_entry_id)
                 .await
                 .unwrap();
 

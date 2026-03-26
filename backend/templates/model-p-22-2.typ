@@ -146,7 +146,7 @@ De volgende rollen zijn mogelijk: voorzitter, plaatsvervangend voorzitter of lid
   table.header(
     ..([Lijst], [Stemmen]).enumerate().map(((idx, h)) => {
       table.cell(
-        align: bottom + if idx == 0 { left } else { right }, small_header_text(h)
+        align: bottom + if idx == 0 { left } else { right }, header_text(h)
       )
     })
   ),
@@ -158,15 +158,15 @@ De volgende rollen zijn mogelijk: voorzitter, plaatsvervangend voorzitter of lid
     )
   }.flatten(),
   table.hline(stroke: 1pt + black),
-  table.cell(small_header_text([Stemmen op kandidaten])),
-  table.cell(align: right, small_header_text([#input.summary.votes_counts.total_votes_candidates_count])),
+  table.cell(header_text([Stemmen op kandidaten])),
+  table.cell(align: right, header_text([#input.summary.votes_counts.total_votes_candidates_count])),
   table.cell(fill: luma(245), [Blanco stemmen]),
   table.cell(fill: luma(245), align: right, [#input.summary.votes_counts.blank_votes_count]),
   table.cell([Ongeldige stemmen]),
   table.cell(align: right, [#input.summary.votes_counts.invalid_votes_count]),
   table.hline(stroke: 1pt + black),
-  table.cell(small_header_text([Totaal uitgebrachte stemmen])),
-  table.cell(align: right, small_header_text([#input.summary.votes_counts.total_votes_cast_count])),
+  table.cell(header_text([Totaal uitgebrachte stemmen])),
+  table.cell(align: right, header_text([#input.summary.votes_counts.total_votes_cast_count])),
 )
 
 #pagebreak(weak: true)
@@ -204,11 +204,11 @@ Met de kiesdeler wordt de zetelverdeling bepaald. De kiesdeler is het aantal ste
   stroke: none,
   inset: (x: 4pt, y: 8pt),
   table.header(
-    table.cell(small_header_text([Geldige stemmen op kandidaten])),
+    table.cell(header_text([Geldige stemmen op kandidaten])),
     table.cell([]),
-    table.cell(align: center, small_header_text([Aantal zetels])),
+    table.cell(align: center, header_text([Aantal zetels])),
     table.cell([]),
-    table.cell(small_header_text([Kiesdeler])),
+    table.cell(header_text([Kiesdeler])),
   ),
   table.hline(stroke: 1pt + black),
   table.cell(align: right, [#input.summary.votes_counts.total_votes_candidates_count]),
@@ -233,10 +233,10 @@ Hieronder is berekend hoe vaak elke lijst qua stemmenaantal de kiesdeler heeft g
   inset: (x: 4pt, y: 8pt),
   fill: (_, y) => if y > 1 and y <= input.seat_assignment.final_standing.len() and calc.even(y) { luma(245) },
   table.header(
-    table.cell(small_header_text([Lijst])),
-    table.cell(align: right, small_header_text([Aantal stemmen])),
-    table.cell(stroke: none, align: center, small_header_text([÷ Kiesdeler =])),
-    table.cell(stroke: none, align: right, small_header_text([Volle zetels])),
+    table.cell(header_text([Lijst])),
+    table.cell(align: right, header_text([Aantal stemmen])),
+    table.cell(stroke: none, align: center, header_text([÷ Kiesdeler =])),
+    table.cell(stroke: none, align: right, header_text([Volle zetels])),
   ),
   table.hline(stroke: 1pt + black),
   ..for standing in input.seat_assignment.final_standing.sorted(key: standing => standing.total_seats, by: (l, r) => l >= r) {
@@ -249,10 +249,10 @@ Hieronder is berekend hoe vaak elke lijst qua stemmenaantal de kiesdeler heeft g
     )
   }.flatten(),
   table.hline(stroke: 1pt + black),
-  table.cell(small_header_text([Totaal])),
-  table.cell(align: right, small_header_text([#input.summary.votes_counts.total_votes_candidates_count])),
+  table.cell(header_text([Totaal])),
+  table.cell(align: right, header_text([#input.summary.votes_counts.total_votes_candidates_count])),
   table.cell(stroke: none, []),
-  table.cell(stroke: none, align: right, small_header_text([#input.seat_assignment.full_seats])),
+  table.cell(stroke: none, align: right, header_text([#input.seat_assignment.full_seats])),
 )
 
 #TODO[Voetnoten - https://typst.app/docs/reference/model/numbering/]
@@ -298,10 +298,10 @@ Na toewijzing van de volle zetels blijft een aantal te verdelen zetels over. Dit
       ),
       inset: (x: 4pt, y: 8pt),
       table.header(
-        table.cell(stroke: none, small_header_text([Lijst])),
-        table.cell(small_header_text([Aantal volle zetels])),
-        table.cell(align: right, stroke: none, small_header_text([Overschot])),
-        table.cell(align: right, small_header_text([Aantal restzetels])),
+        table.cell(stroke: none, header_text([Lijst])),
+        table.cell(header_text([Aantal volle zetels])),
+        table.cell(align: right, stroke: none, header_text([Overschot])),
+        table.cell(align: right, header_text([Aantal restzetels])),
       ),
       table.hline(stroke: 1pt + black),
       ..final_standing_pgs_meeting_threshold.map((list_seat_assignment) => {
@@ -353,10 +353,10 @@ Na toewijzing van de volle zetels blijft een aantal te verdelen zetels over. Dit
       ),
       inset: (x: 4pt, y: 8pt),
       table.header(
-        table.cell(stroke: none, small_header_text([Lijst])),
-        table.cell(align: right, small_header_text([Reeds toegewezen zetels])),
-        table.cell(align: right, stroke: none, small_header_text([Gemiddeld aantal\ stemmen per zetel bij\ toewijzing restzetels])),
-        table.cell(align: right, small_header_text([Toegekende restzetels])),
+        table.cell(stroke: none, header_text([Lijst])),
+        table.cell(align: right, header_text([Reeds toegewezen zetels])),
+        table.cell(align: right, stroke: none, header_text([Gemiddeld aantal\ stemmen per zetel bij\ toewijzing restzetels])),
+        table.cell(align: right, header_text([Toegekende restzetels])),
       ),
       table.hline(stroke: 1pt + black),
       ..input.seat_assignment.final_standing.map((list_seat_assignment) => {
@@ -409,7 +409,7 @@ De aan de lijsten toegewezen volle zetels en restzetels zijn bij elkaar opgeteld
   fill: (_, y) => if y > 1 and calc.even(y) { luma(245) },
   table.hline(stroke: none),
   table.header(
-    ..([Lijst], [Toegewezen zetels]).enumerate().map(((idx, h)) => table.cell(stroke: none, align: bottom + if idx == 0 { left } else { right }, small_header_text(h))),
+    ..([Lijst], [Toegewezen zetels]).enumerate().map(((idx, h)) => table.cell(stroke: none, align: bottom + if idx == 0 { left } else { right }, header_text(h))),
   ),
   table.hline(stroke: 1pt + black),
   
@@ -474,10 +474,10 @@ De aan de lijsten toegewezen volle zetels en restzetels zijn bij elkaar opgeteld
       ),
       inset: (x: 4pt, y: 8pt),
       table.header(
-        table.cell(stroke: none, small_header_text([Rang])),
-        table.cell(stroke: none, small_header_text([Naam])),
-        table.cell(stroke: none, small_header_text([Woonplaats])),
-        table.cell(stroke: none, align: right, small_header_text([Positie op lijst]))
+        table.cell(stroke: none, header_text([Rang])),
+        table.cell(stroke: none, header_text([Naam])),
+        table.cell(stroke: none, header_text([Woonplaats])),
+        table.cell(stroke: none, align: right, header_text([Positie op lijst]))
       ),
       table.hline(stroke: 1pt + black),
       ..unelected_candidates_ranking.enumerate().map(((idx, unelected_candidate)) => {
@@ -507,9 +507,9 @@ De aan de lijsten toegewezen volle zetels en restzetels zijn bij elkaar opgeteld
   ),
   inset: (x: 4pt, y: 8pt),
   table.header(
-    table.cell(stroke: none, small_header_text([Naam])),
-    table.cell(stroke: none, small_header_text([Woonplaats])),
-    table.cell(stroke: none, small_header_text([Lijst]))
+    table.cell(stroke: none, header_text([Naam])),
+    table.cell(stroke: none, header_text([Woonplaats])),
+    table.cell(stroke: none, header_text([Lijst]))
   ),
   table.hline(stroke: 1pt + black),
   ..input.candidate_nomination.chosen_candidates.map(((chosen_candidate)) => {

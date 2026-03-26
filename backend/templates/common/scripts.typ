@@ -44,6 +44,10 @@
 }
 
 #let small_header_text(value) = {
+  text(size: 6pt, weight: "semibold", value)
+}
+
+#let header_text(value) = {
   text(weight: "semibold", value)
 }
 
@@ -676,10 +680,10 @@
     ),
     inset: (x: 4pt, y: 8pt),
     table.header(
-      table.cell(stroke: none, small_header_text([Zetel])),
-      table.cell(stroke: none, small_header_text([Naam])),
-      table.cell(stroke: none, small_header_text([Woonplaats])),
-      if showVotes { table.cell(stroke: none, align: right, small_header_text([Aantal stemmen]))} else if showPosition { table.cell(stroke: none, align: right, small_header_text([Positie op lijst])) }
+      table.cell(stroke: none, header_text([Zetel])),
+      table.cell(stroke: none, header_text([Naam])),
+      table.cell(stroke: none, header_text([Woonplaats])),
+      if showVotes { table.cell(stroke: none, align: right, header_text([Aantal stemmen]))} else if showPosition { table.cell(stroke: none, align: right, header_text([Positie op lijst])) }
     ),
     table.hline(stroke: 1pt + black),
     ..candidateVotes.enumerate().map(((idx, chosen_candidate)) => {
@@ -711,9 +715,9 @@
     ),
     inset: (x: 4pt, y: 8pt),
     table.header(
-      table.cell(rowspan: 2, stroke: none, small_header_text([Lijst])),
-      table.cell(align: center, colspan: steps.len(), small_header_text([Restzetel])),
-      table.cell(rowspan: 2, small_header_text([Aantal\ restzetels])),
+      table.cell(rowspan: 2, stroke: none, header_text([Lijst])),
+      table.cell(align: center, colspan: steps.len(), header_text([Restzetel])),
+      table.cell(rowspan: 2, header_text([Aantal\ restzetels])),
       ..steps.enumerate().map(((idx, step)) => {
         table.cell(rowspan: 1, str(idx + 1))
       }),

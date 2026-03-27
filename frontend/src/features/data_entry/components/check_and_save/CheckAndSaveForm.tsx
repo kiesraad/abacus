@@ -13,6 +13,7 @@ import { Form } from "@/components/ui/Form/Form";
 import { KeyboardKeys } from "@/components/ui/KeyboardKeys/KeyboardKeys";
 import { StatusList } from "@/components/ui/StatusList/StatusList";
 import { useElection } from "@/hooks/election/useElection";
+import { useMessages } from "@/hooks/messages/useMessages";
 import { t, tx } from "@/i18n/translate";
 import type { FormSectionId } from "@/types/types";
 import { KeyboardKey, type MenuStatus } from "@/types/ui";
@@ -31,6 +32,7 @@ export function CheckAndSaveForm() {
   const formRef = useFormKeyboardNavigation();
 
   const navigate = useNavigate();
+  const { pushMessage } = useMessages();
   const { election } = useElection();
   const [isConfirmed, setIsConfirmed] = useState(false);
   const [isConfirmedError, setIsConfirmedError] = useState<string | null>(null);
@@ -111,12 +113,25 @@ export function CheckAndSaveForm() {
     const dataEntryStatus = await onFinaliseDataEntry();
     if (dataEntryStatus !== undefined) {
       if (dataEntryStatus.status === "entries_different") {
-        await navigate(`/elections/${election.id}/data-entry#data-entry-different`);
+        pushMessage({
+          type: "notify",
+          title: t("data_entry.entry_different"),
+          text: t("data_entry.entry_different_message"),
+        });
       } else if (dataEntryStatus.status === "first_entry_has_errors") {
-        await navigate(`/elections/${election.id}/data-entry#data-entry-errors`);
+        pushMessage({
+          type: "notify",
+          title: t("data_entry.entry_errors"),
+          text: t("data_entry.entry_errors_message"),
+        });
       } else {
-        await navigate(`/elections/${election.id}/data-entry#data-entry-${entryNumber}-saved`);
+        pushMessage({
+          type: "success",
+          title: t("data_entry.entry_saved"),
+          text: t(`data_entry.entry_saved_message_${entryNumber}`),
+        });
       }
+      await navigate(`/elections/${election.id}/data-entry#next`);
       return true;
     }
 

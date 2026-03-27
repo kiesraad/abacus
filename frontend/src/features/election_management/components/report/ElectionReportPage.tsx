@@ -9,10 +9,9 @@ import { Button } from "@/components/ui/Button/Button";
 import { DownloadButton } from "@/components/ui/DownloadButton/DownloadButton";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { Icon } from "@/components/ui/Icon/Icon";
-import { Loader } from "@/components/ui/Loader/Loader";
 import { useElection } from "@/hooks/election/useElection";
 import { useNumericParam } from "@/hooks/useNumericParam";
-import { t, tx } from "@/i18n/translate";
+import { t } from "@/i18n/translate";
 import type {
   COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY,
   COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH,
@@ -21,8 +20,9 @@ import { cn } from "@/utils/classnames";
 import { committeeSessionLabel } from "@/utils/committeeSession";
 import { formatDateTimeFull } from "@/utils/dateTime";
 
-import { useCommitteeSessionInvestigationListRequest } from "../../hooks/useCommitteeSessionInvestigationListRequest";
 import cls from "../ElectionManagement.module.css";
+import { CSBElectionReportSection } from "./CSBElectionReportSection.tsx";
+import { GSBElectionReportSection } from "./GSBElectionReportSection.tsx";
 
 // biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function ElectionReportPage() {
@@ -37,15 +37,6 @@ export function ElectionReportPage() {
   const updatePath: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/elections/${committeeSession.election_id}/committee_sessions/${committeeSession.id}/status`;
   const { update, isLoading } = useCrud({ updatePath, throwAllErrors: true });
 
-  // We have to specifically request the investigations of the committee session the page is rendered for
-  const { requestState } = useCommitteeSessionInvestigationListRequest(election.id, committeeSession.id);
-  if (requestState.status === "loading") {
-    return <Loader />;
-  }
-  if ("error" in requestState) {
-    throw requestState.error;
-  }
-
   const sessionLabel = committeeSessionLabel(election.committee_category, committeeSession.number);
 
   // Redirect to update details page if committee session details have not been filled in
@@ -58,10 +49,6 @@ export function ElectionReportPage() {
     throw new ApplicationError(t("error.forbidden_message"), "InvalidCommitteeSessionStatus");
   }
 
-  const isFirstCommitteeSession = committeeSession.number === 1;
-
-  const wasCorrected = requestState.data.investigations.some((i) => i.corrected_results);
-
   function handleResume() {
     const body: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = { status: "data_entry" };
     void update(body).then((result) => {
@@ -71,17 +58,35 @@ export function ElectionReportPage() {
     });
   }
 
+  function pageTitle() {
+    return `
+      ${election.committee_category === "CSB" ? t("election_report.report") : sessionLabel} 
+      ${t(`committee_category.${election.committee_category}.short`).replace(/(^\w|\s\w)/g, (m) => m.toLowerCase())}
+    `;
+  }
+
+  function formTitle() {
+    if (election.committee_category === "CSB") {
+      return (
+        <>
+          {t("apportionment.title")} {t("municipality").toLowerCase()} {election.location}
+        </>
+      );
+    }
+
+    return `
+        ${t("election_report.counting_results")} ${sessionLabel.toLowerCase()} 
+        ${t(`committee_category.${election.committee_category}.short`).toLowerCase()} ${t("municipality").toLowerCase()} 
+        ${election.location}
+      `;
+  }
+
   return (
     <>
-      <PageTitle title={`${t("election.title.finish_data_entry")} - Abacus`} />
+      <PageTitle title={`${pageTitle()} - Abacus`} />
       <header>
         <section>
-          <h1>
-            {sessionLabel}{" "}
-            {t(`committee_category.${election.committee_category}.short`).replace(/(^\w|\s\w)/g, (m) =>
-              m.toUpperCase(),
-            )}
-          </h1>
+          <h1>{pageTitle()}</h1>
         </section>
       </header>
       <main className={cls.reportMain}>
@@ -90,11 +95,7 @@ export function ElectionReportPage() {
             <Icon size="lg" color="default" icon={<IconCheckVerified />} />
           </div>
           <div>
-            <h2 className="form_title">
-              {t("election_report.counting_results")} {sessionLabel.toLowerCase()}{" "}
-              {t(`committee_category.${election.committee_category}.short`).toLowerCase()}{" "}
-              {t("municipality").toLowerCase()} {election.location}
-            </h2>
+            <h2 className="form_title">{formTitle()}</h2>
             <div className={cls.reportInfoSection}>
               {t("election_report.committee_session_started", {
                 date_time: committeeSession.start_date_time
@@ -102,7 +103,7 @@ export function ElectionReportPage() {
                   : "",
               })}
               .
-              {election.counting_method && (
+              {election.committee_category === "GSB" && election.counting_method && (
                 <>
                   <br />
                   {t("election_report.there_was_counting_method", {
@@ -111,10 +112,28 @@ export function ElectionReportPage() {
                   .
                 </>
               )}
+              {election.committee_category === "CSB" && (
+                // TODO #2972: update hrefs for both download buttons once backend is updated
+                <>
+                  <DownloadButton
+                    icon="download"
+                    href={`/api/elections/${election.id}/committee_sessions/${committeeSession.id}/download_zip_results`}
+                    title={t("election_management.CSB.determination_election_results.download")}
+                    subtitle={t("election_management.zip_file")}
+                  />
+                  {/* Disabled for now: https://github.com/kiesraad/abacus/issues/2967 */}
+                  {/*<DownloadButton*/}
+                  {/*  icon="download"*/}
+                  {/*  href={`/api/elections/${election.id}/committee_sessions/${committeeSession.id}/download_zip_results`}*/}
+                  {/*  title={t("election_management.CSB.p_22_2_attachment.download")}*/}
+                  {/*  subtitle={t("election_management.zip_file")}*/}
+                  {/*/>*/}
+                </>
+              )}
               <DownloadButton
                 icon="download"
                 href={`/api/elections/${election.id}/committee_sessions/${committeeSession.id}/download_zip_results`}
-                title={t("election_management.download_definitive_documents", {
+                title={t(`election_management.${election.committee_category}.download_definitive_documents`, {
                   sessionLabel: sessionLabel.toLowerCase(),
                 })}
                 subtitle={t("election_management.zip_file")}
@@ -122,27 +141,14 @@ export function ElectionReportPage() {
             </div>
             <section className={cn(cls.reportInfoSection, "sm")}>
               <h3>{t("election_management.what_now")}?</h3>
-              <p>{t("election_management.download_definitive_files")}</p>
+              <p>{t(`election_management.${election.committee_category}.download_definitive_files`)}</p>
               <section className="sm">
-                <p>
-                  {t(
-                    isFirstCommitteeSession
-                      ? "election_management.first_session.zip_file_explanation"
-                      : wasCorrected
-                        ? "election_management.next_session.with_corrections.zip_file_explanation"
-                        : "election_management.next_session.without_corrections.zip_file_explanation",
-                  )}
-                </p>
-                <ol className={cls.list}>
-                  {tx(
-                    isFirstCommitteeSession
-                      ? "election_management.first_session.documents"
-                      : wasCorrected
-                        ? "election_management.next_session.with_corrections.documents"
-                        : "election_management.next_session.without_corrections.documents",
-                  )}
-                </ol>
-                <p>{t("election_management.upload_the_zip")}</p>
+                {election.committee_category === "GSB" ? (
+                  <GSBElectionReportSection election={election} committeeSession={committeeSession} />
+                ) : (
+                  <CSBElectionReportSection election={election} />
+                )}
+                <p>{t(`election_management.${election.committee_category}.upload_the_zip`)}</p>
               </section>
             </section>
 

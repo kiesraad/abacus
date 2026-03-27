@@ -13,11 +13,13 @@ import type {
 import type { DataEntryResults, DataEntryStructure, FormSectionId, SectionValues } from "@/types/types";
 import type { ValidationResultSet } from "@/utils/ValidationResults";
 
+export type EntryNumber = 1 | 2;
+
 export interface DataEntryState {
   // state from providers
   election: ElectionWithPoliticalGroups;
   dataEntryId: DataEntryId;
-  entryNumber: number;
+  entryNumber: EntryNumber;
 
   // api error objects
   error: AnyApiError | null;

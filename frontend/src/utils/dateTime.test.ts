@@ -110,6 +110,6 @@ describe("DateTime util", () => {
   test("convert date should throw error for invalid NL date format", () => {
     expect(() => {
       convertNLDateToISODate("2025-12-31");
-    }).toThrowError("Error: 2025-12-31 has an invalid date format, should be: dd-mm-yyyy");
+    }).toThrow("Error: 2025-12-31 has an invalid date format, should be: dd-mm-yyyy");
   });
 });

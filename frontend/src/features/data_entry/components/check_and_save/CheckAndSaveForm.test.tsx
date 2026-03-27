@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
+import * as useMessages from "@/hooks/messages/useMessages";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
 import {
@@ -51,7 +52,14 @@ function renderForm() {
 }
 
 describe("Test CheckAndSaveForm", () => {
+  const pushMessage = vi.fn();
   beforeEach(() => {
+    vi.spyOn(useMessages, "useMessages").mockReturnValue({
+      hasMessages: vi.fn(),
+      popMessages: vi.fn(),
+      pushMessage,
+    });
+
     server.use(ElectionRequestHandler, DataEntryClaimHandler, DataEntrySaveHandler, DataEntryFinaliseHandler);
   });
 
@@ -68,9 +76,16 @@ describe("Test CheckAndSaveForm", () => {
     // check that the finalisation request was made
     expect(finalise).toHaveBeenCalledOnce();
 
-    // check that the user is navigated back to the data entry page
+    // check message and navigation for next data entry page
+    expect(pushMessage).toHaveBeenCalledWith({
+      type: "success",
+      title: "Je invoer is opgeslagen",
+      text:
+        "Geef het papieren proces-verbaal terug aan de coördinator.\n" +
+        "Een andere invoerder doet straks de tweede invoer.",
+    });
     expect(router.state.location.pathname).toEqual("/elections/1/data-entry");
-    expect(router.state.location.hash).toEqual("#data-entry-1-saved");
+    expect(router.state.location.hash).toEqual("#next");
   });
 
   test("Check redirect when finalising data entry that is different", async () => {
@@ -89,9 +104,16 @@ describe("Test CheckAndSaveForm", () => {
     // check that the finalisation request was made
     expect(finalise).toHaveBeenCalledOnce();
 
-    // check that the user is navigated back to the data entry page
+    // check message and navigation for next data entry page
+    expect(pushMessage).toHaveBeenCalledWith({
+      type: "notify",
+      title: "Let op: verschil met eerste invoer",
+      text:
+        "Je invoer is opgeslagen. Geef het papieren proces-verbaal terug aan de coördinator,\n" +
+        "en geef aan dat er een verschil is met de eerste invoer.",
+    });
     expect(router.state.location.pathname).toEqual("/elections/1/data-entry");
-    expect(router.state.location.hash).toEqual("#data-entry-different");
+    expect(router.state.location.hash).toEqual("#next");
   });
 
   test("Check redirect when finalising data entry with errors", async () => {
@@ -110,9 +132,16 @@ describe("Test CheckAndSaveForm", () => {
     // check that the finalisation request was made
     expect(finalise).toHaveBeenCalledOnce();
 
-    // check that the user is navigated back to the data entry page
+    // check message and navigation for next data entry page
+    expect(pushMessage).toHaveBeenCalledWith({
+      type: "notify",
+      title: "Let op: fouten in het proces-verbaal",
+      text:
+        "Je invoer is opgeslagen. Geef het papieren proces-verbaal terug aan de coördinator,\n" +
+        "en geef aan dat je daarin fouten hebt gevonden.",
+    });
     expect(router.state.location.pathname).toEqual("/elections/1/data-entry");
-    expect(router.state.location.hash).toEqual("#data-entry-errors");
+    expect(router.state.location.hash).toEqual("#next");
   });
 
   test("Shift+Enter submits form", async () => {

@@ -62,7 +62,7 @@ pdf_gen = { path = "./pdf_gen" }
 axum.workspace = true
 axum-extra.workspace = true
 chrono.workspace = true
-clap = { version = "4.5", default-features = false, features = [
+clap = { version = "4.6", default-features = false, features = [
     "derive",
     "std",
     "help",
@@ -86,8 +86,7 @@ tracing.workspace = true
 tower-http = { version = "0.6", features = ["set-header", "trace"] }
 quick-xml = { version = "0.39.2", features = ["serialize"] }
 sha2 = "0.10.9"
-argon2 = "0.5.3"
-password-hash = { version = "0.5.0", features = ["getrandom"] }
+argon2 = { version = "0.5.3", features = ["std"] }
 rand.workspace = true
 cookie = { version = "0.18.1", features = ["percent-encode"] }
 strum.workspace = true

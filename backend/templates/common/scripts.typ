@@ -707,42 +707,63 @@
   political_groups,
   result_changes
 ) = {
-  table(
-    columns: (1fr,) + steps.len() * (6em,) + (6em,),
-    stroke: (x, y) => (
-      left: if x > 0 { 0.5pt + gray },
-      top: if y > 0 { 0.5pt + gray },
-    ),
-    inset: (x: 4pt, y: 8pt),
-    table.header(
-      table.cell(rowspan: 2, stroke: none, header_text([Lijst])),
-      table.cell(align: center, colspan: steps.len(), header_text([Restzetel])),
-      table.cell(rowspan: 2, header_text([Aantal\ restzetels])),
-      ..steps.enumerate().map(((idx, step)) => {
-        table.cell(rowspan: 1, str(idx + 1))
-      }),
-    ),
-    table.hline(stroke: 1pt + black),
-    ..final_standing.map((list_seat_assignment) => {
-      let residual_seats = steps.filter(step => {
-        step.change.selected_list_number == list_seat_assignment.list_number
-      }).len()
-      let list_result_changes = result_changes.filter((change) => change.list_number == list_seat_assignment.list_number)
-      for list_result_change in list_result_changes {
-        residual_seats = residual_seats + list_result_change.increase
-      };
-      (
-        table.cell(political_group_name(political_groups.find(pg => pg.number == list_seat_assignment.list_number), with_prefix: "only_list_number")),
-        ..steps.map(step => {
-          let average = step.standings.find((standing) => standing.list_number == list_seat_assignment.list_number).next_votes_per_seat;
-          table.cell(
-          if not step.change.list_exhausted.contains(list_seat_assignment.list_number) { format_fraction(average) } else {""})
+  let steps_copy = steps
+  let slices = ()
+  if steps_copy.len() > 6 {
+    let slice = ()
+    while steps_copy.len() > 0 {
+      slice.push(steps_copy.remove(0))
+      if slice.len() == 6 {
+        slices.push(slice)
+        slice = ()
+      }
+    }
+    slices.push(slice)
+  } else {
+    slices.push(steps_copy)
+  }
+  for slice in slices {
+    table(
+      columns: (1fr,) + slice.len() * (6em,) + (6em,),
+      stroke: (x, y) => (
+        left: if x > 0 { 0.5pt + gray },
+        top: if y > 0 { 0.5pt + gray },
+      ),
+      inset: (x: 4pt, y: 8pt),
+      table.header(
+        table.cell(rowspan: 2, stroke: none, header_text([Lijst])),
+        table.cell(align: center, colspan: slice.len(), header_text([Restzetel])),
+        table.cell(rowspan: 2, header_text([Aantal\ restzetels])),
+        ..slice.map((step) => {
+          table.cell(rowspan: 1, str(step.residual_seat_number))
         }),
-        table.cell(align: right, str(residual_seats))
-      )
-    }).flatten(),
-    table.hline(stroke: 1pt + black),
-  )
+      ),
+      table.hline(stroke: 1pt + black),
+      ..final_standing.map((list_seat_assignment) => {
+        let residual_seats = steps.filter(step => {
+          step.change.selected_list_number == list_seat_assignment.list_number
+        }).len()
+        let list_result_changes = result_changes.filter((change) => change.list_number == list_seat_assignment.list_number)
+        for list_result_change in list_result_changes {
+          residual_seats = residual_seats + list_result_change.increase
+        };
+        (
+          table.cell(political_group_name(political_groups.find(pg => pg.number == list_seat_assignment.list_number), with_prefix: "only_list_number")),
+          ..slice.map(step => {
+            let average = step.standings.find((standing) => standing.list_number == list_seat_assignment.list_number).next_votes_per_seat
+            if step.change.list_options.contains(list_seat_assignment.list_number) {
+              set text(weight: "semibold")
+            }
+            table.cell(
+              if not step.change.list_exhausted.contains(list_seat_assignment.list_number) { format_fraction(average) } else { "" }
+            )
+          }),
+          table.cell(align: right, if slices.last() == slice { str(residual_seats) } else { "" })
+        )
+      }).flatten(),
+      table.hline(stroke: 1pt + black),
+    )
+  }
 }
 
 /// Display a TODO label

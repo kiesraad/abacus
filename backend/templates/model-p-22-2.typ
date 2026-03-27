@@ -329,7 +329,7 @@ Na toewijzing van de volle zetels blijft een aantal te verdelen zetels over. Dit
   
     Als meerdere lijsten gelijke gemiddelden hebben en er niet voldoende restzetels zijn voor toekenning ervan aan die lijsten, wordt geloot welke lijst de restzetel krijgt.
 
-    #TODO[move part of highest averages table to next page when > 6 residual seats?]
+    #TODO[marking of selected average does not work]
   
     #highest_averages_table(highest_averages_steps, input.seat_assignment.final_standing, input.election.political_groups, input.result_changes_residual_seats)
   ]

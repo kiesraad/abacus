@@ -1296,7 +1296,15 @@ mod tests {
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_8_csb"))))]
     async fn test_claim_data_entry_gsb_ok(pool: SqlitePool) {
         let data_entry_id = DataEntryId::from(801);
-        let response = claim(pool.clone(), data_entry_id, EntryNumber::FirstEntry).await;
+        let user = User::test_user(Role::TypistCSB, UserId::from(9));
+        let response = data_entry_claim(
+            user.clone(),
+            State(pool),
+            Path((data_entry_id, EntryNumber::FirstEntry)),
+            AuditService::new(Some(user), None),
+        )
+        .await
+        .into_response();
         assert_eq!(response.status(), StatusCode::OK);
 
         let body = response.into_body().collect().await.unwrap().to_bytes();

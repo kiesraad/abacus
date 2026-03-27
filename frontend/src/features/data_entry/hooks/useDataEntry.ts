@@ -11,7 +11,7 @@ import type {
 } from "@/types/generated/openapi";
 import type { FormSectionId } from "@/types/types";
 
-import type { DataEntryStateAndActions } from "../types/types";
+import type { DataEntryStateAndActions, EntryNumber } from "../types/types";
 import { onDiscardDataEntry, onFinaliseDataEntry, onSubmitForm, setCache, updateFormSection } from "../utils/actions";
 import dataEntryReducer, { getInitialState } from "../utils/reducer";
 import useDataEntryNavigation from "./useDataEntryNavigation";
@@ -20,7 +20,7 @@ import { useInitialDataEntryState } from "./useInitialDataEntryState";
 export default function useDataEntry(
   election: ElectionWithPoliticalGroups,
   dataEntryId: DataEntryId,
-  entryNumber: number,
+  entryNumber: EntryNumber,
   sectionId: FormSectionId | null,
 ): DataEntryStateAndActions {
   const client = useApiClient();

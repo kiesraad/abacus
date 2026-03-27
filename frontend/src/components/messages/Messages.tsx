@@ -1,4 +1,4 @@
-import { startTransition, useEffect, useRef, useState } from "react";
+import { Fragment, startTransition, useEffect, useRef, useState } from "react";
 
 import { Alert } from "@/components/ui/Alert/Alert";
 import type { Message } from "@/hooks/messages/MessagesContext";
@@ -32,7 +32,17 @@ export function Messages() {
     // biome-ignore lint/suspicious/noArrayIndexKey: we can use the index as key since there is no unique id
     <Alert key={index} type={message.type ?? "success"} onClose={closeHandler(index)}>
       {message.title && <strong className="heading-md">{message.title}</strong>}
-      {message.text && <p>{message.text}</p>}
+      {message.text && (
+        <p>
+          {message.text.split("\n").map((line, lineIndex) => (
+            // biome-ignore lint/suspicious/noArrayIndexKey: we can use the index as key since there is no unique id
+            <Fragment key={lineIndex}>
+              {line}
+              <br />
+            </Fragment>
+          ))}
+        </p>
+      )}
     </Alert>
   ));
 }

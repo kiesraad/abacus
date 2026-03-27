@@ -1,15 +1,15 @@
-import type { DataEntryState, DataEntryStateLoaded } from "@/features/data_entry/types/types";
+import type { DataEntryState, DataEntryStateLoaded, EntryNumber } from "@/features/data_entry/types/types";
 import type { DataEntryId, ElectionId } from "@/types/generated/openapi";
 import type { FormSectionId } from "@/types/types";
 
-export function getBaseUrl(electionId: ElectionId, dataEntryId: DataEntryId, entryNumber: number) {
+export function getBaseUrl(electionId: ElectionId, dataEntryId: DataEntryId, entryNumber: EntryNumber) {
   return `/elections/${electionId}/data-entry/${dataEntryId}/${entryNumber}`;
 }
 
 export function getUrlForFormSectionID(
   electionId: ElectionId,
   dataEntryId: DataEntryId,
-  entryNumber: number,
+  entryNumber: EntryNumber,
   sectionId: FormSectionId,
 ) {
   const baseUrl = getBaseUrl(electionId, dataEntryId, entryNumber);

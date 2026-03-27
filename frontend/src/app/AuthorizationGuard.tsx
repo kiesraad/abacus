@@ -1,11 +1,13 @@
-import { useEffect, useState } from "react";
 import { Navigate, useMatches } from "react-router";
+
 import { ApplicationError } from "@/api/ApiResult";
 import { useApiState } from "@/api/useApiState";
+import { EXPIRATION_DIALOG_SECONDS } from "@/app/authorizationConstants";
 import { getPostLoginPath } from "@/features/account/utils/getPostLoginPath";
+import useSessionExpiration from "@/hooks/user/useSessionExpiration";
 import { t } from "@/i18n/translate";
-import { AuthorizationDialog } from "./AuthorizationDialog";
-import { EXPIRATION_DIALOG_SECONDS } from "./authorizationConstants";
+
+import { AuthorizationDialog } from "./ExpirationDialog";
 
 interface AuthorizationGuardProps {
   children: React.ReactNode;
@@ -38,43 +40,14 @@ interface AuthorizationGuardProps {
  * children.
  */
 export function AuthorizationGuard({ children }: AuthorizationGuardProps) {
-  const { user, expiration, setUser } = useApiState();
-  const [sessionValidFor, setSessionValidFor] = useState<number | null>(null);
-  const [hideDialog, setHideDialog] = useState(false);
+  const { user, extendSession } = useApiState();
   const matches = useMatches();
+  const { showDialog, sessionValidFor, setHideDialog } = useSessionExpiration(EXPIRATION_DIALOG_SECONDS);
 
   const routeMatch = matches[matches.length - 1];
   const isAuthenticated = user !== null;
   const isPublic = routeMatch?.handle.public;
   const isAllowed = isPublic || (user?.role && routeMatch?.handle.roles.includes(user.role));
-
-  // update the current time every second when there is a session expiration
-  useEffect(() => {
-    if (expiration !== null) {
-      const update = () => {
-        const now = new Date();
-        const validFor = (expiration.getTime() - now.getTime()) / 1000;
-        setSessionValidFor(validFor);
-
-        // logout after session expiration
-        if (validFor <= 0 && user !== null) {
-          setUser(null);
-        }
-
-        // reset hide dialog state if the session is valid for more than the expiration dialog time
-        if (validFor > EXPIRATION_DIALOG_SECONDS && hideDialog) {
-          setHideDialog(false);
-        }
-      };
-
-      update();
-      const interval = setInterval(update, 1000);
-
-      return () => {
-        clearInterval(interval);
-      };
-    }
-  }, [expiration, user, setUser, hideDialog]);
 
   // if user is not allowed on this route
   if (!isAllowed) {
@@ -103,7 +76,18 @@ export function AuthorizationGuard({ children }: AuthorizationGuardProps) {
 
   return (
     <>
-      <AuthorizationDialog sessionValidFor={sessionValidFor} hideDialog={hideDialog} setHideDialog={setHideDialog} />
+      {showDialog && sessionValidFor !== null && (
+        <AuthorizationDialog
+          sessionValidFor={sessionValidFor}
+          onClose={() => {
+            setHideDialog(true);
+          }}
+          onStayLoggedIn={() => {
+            void extendSession();
+            setHideDialog(true);
+          }}
+        />
+      )}
       {children}
     </>
   );

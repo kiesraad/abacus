@@ -1,4 +1,5 @@
 import { render as rtlRender } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { type RouteObject, RouterProvider } from "react-router";
 import { within } from "storybook/test";
 import { describe, expect, test, vi } from "vitest";
@@ -6,57 +7,54 @@ import { ApiClient } from "@/api/ApiClient";
 import { ApiProviderContext, type ApiState } from "@/api/ApiProviderContext";
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { LoginForm } from "@/features/account/components/LoginForm";
-import { TestUserProvider } from "@/testing/TestUserProvider";
 import { expectForbiddenErrorPage, screen, setupTestRouter, waitFor } from "@/testing/test-utils";
 import type { LoginResponse, Role } from "@/types/generated/openapi";
 import { AuthorizationGuard } from "./AuthorizationGuard";
+import { EXPIRATION_DIALOG_SECONDS } from "./authorizationConstants";
 
 async function renderAuthorizationGuard({
   routes,
   initialPath,
   userRole = null,
+  user,
   expiration,
+  loading = false,
+  setUser = () => {},
+  extendSession = async () => {},
 }: {
   routes: RouteObject[];
   initialPath: string;
   userRole?: Role | null;
+  user?: LoginResponse | null;
   expiration?: Date;
+  loading?: boolean;
+  setUser?: ApiState["setUser"];
+  extendSession?: ApiState["extendSession"];
 }) {
   const router = setupTestRouter(routes);
   await router.navigate(initialPath);
 
-  rtlRender(
-    <TestUserProvider userRole={userRole} overrideExpiration={expiration}>
-      <RouterProvider router={router} />
-    </TestUserProvider>,
-  );
-
-  return router;
-}
-
-async function renderAuthorizationGuardWithUser({
-  routes,
-  initialPath,
-  user,
-  expiration,
-}: {
-  routes: RouteObject[];
-  initialPath: string;
-  user: LoginResponse;
-  expiration?: Date;
-}) {
-  const router = setupTestRouter(routes);
-  await router.navigate(initialPath);
+  const resolvedUser =
+    user ??
+    (userRole
+      ? {
+          user_id: 1,
+          username: "test",
+          role: userRole,
+          fullname: "Test User",
+          needs_password_change: false,
+        }
+      : null);
 
   const apiState: ApiState = {
     client: new ApiClient(),
-    user,
-    setUser: () => {},
+    user: resolvedUser,
+    setUser,
     logout: async () => Promise.reject(new Error("Not implemented in test")),
     login: async () => Promise.reject(new Error("Not implemented in test")),
-    loading: false,
+    loading,
     expiration: expiration ?? new Date(Date.now() + 1000 * 60 * 30),
-    extendSession: async () => {},
+    extendSession,
     airGapError: false,
   };
 
@@ -70,6 +68,70 @@ async function renderAuthorizationGuardWithUser({
 }
 
 describe("AuthorizationGuard", () => {
+  test("does not show the session dialog when the session is still valid", async () => {
+    await renderAuthorizationGuard({
+      initialPath: "/logs",
+      userRole: "administrator",
+      expiration: new Date(Date.now() + 1000 * (EXPIRATION_DIALOG_SECONDS + 1)),
+      routes: [
+        {
+          path: "/logs",
+          element: (
+            <AuthorizationGuard>
+              <div>Protected content</div>
+            </AuthorizationGuard>
+          ),
+          handle: { roles: ["administrator"] },
+        },
+      ],
+    });
+
+    expect(screen.queryByTestId("modal-title")).not.toBeInTheDocument();
+  });
+
+  test("shows the session dialog on short session lifetime", async () => {
+    await renderAuthorizationGuard({
+      initialPath: "/logs",
+      userRole: "administrator",
+      expiration: new Date(Date.now() + 1000 * 60),
+      routes: [
+        {
+          path: "/logs",
+          element: (
+            <AuthorizationGuard>
+              <div>Protected content</div>
+            </AuthorizationGuard>
+          ),
+          handle: { roles: ["administrator"] },
+        },
+      ],
+    });
+
+    expect(await screen.findByTestId("modal-title")).toHaveTextContent("Je wordt bijna uitgelogd");
+  });
+
+  test("does not show the session dialog when the user is not logged in", async () => {
+    await renderAuthorizationGuard({
+      initialPath: "/account/login",
+      userRole: null,
+      expiration: new Date(Date.now() + 1000 * 60),
+      routes: [
+        {
+          path: "/account/login",
+          element: (
+            <AuthorizationGuard>
+              <div>Login page</div>
+            </AuthorizationGuard>
+          ),
+          handle: { public: true },
+        },
+      ],
+    });
+
+    expect(screen.getByText("Login page")).toBeVisible();
+    expect(screen.queryByTestId("modal-title")).not.toBeInTheDocument();
+  });
+
   test("renders children for an authorized user", async () => {
     await renderAuthorizationGuard({
       initialPath: "/logs",
@@ -88,6 +150,60 @@ describe("AuthorizationGuard", () => {
     });
 
     expect(screen.getByText("Protected content")).toBeVisible();
+  });
+
+  test("closes the session dialog when the user closes it", async () => {
+    await renderAuthorizationGuard({
+      initialPath: "/logs",
+      userRole: "administrator",
+      expiration: new Date(Date.now() + 1000 * 60),
+      routes: [
+        {
+          path: "/logs",
+          element: (
+            <AuthorizationGuard>
+              <div>Protected content</div>
+            </AuthorizationGuard>
+          ),
+          handle: { roles: ["administrator"] },
+        },
+      ],
+    });
+
+    await userEvent.click(await screen.findByRole("button", { name: "Venster sluiten" }));
+
+    await waitFor(() => {
+      expect(screen.queryByTestId("modal-title")).not.toBeInTheDocument();
+    });
+  });
+
+  test("extends the session and hides the dialog when the user chooses to stay logged in", async () => {
+    const extendSession = vi.fn().mockResolvedValue(undefined);
+
+    await renderAuthorizationGuard({
+      initialPath: "/logs",
+      userRole: "administrator",
+      expiration: new Date(Date.now() + 1000 * 60),
+      extendSession,
+      routes: [
+        {
+          path: "/logs",
+          element: (
+            <AuthorizationGuard>
+              <div>Protected content</div>
+            </AuthorizationGuard>
+          ),
+          handle: { roles: ["administrator"] },
+        },
+      ],
+    });
+
+    await userEvent.click(await screen.findByRole("button", { name: "Blijf ingelogd" }));
+
+    await waitFor(() => {
+      expect(screen.queryByTestId("modal-title")).not.toBeInTheDocument();
+    });
+    expect(extendSession).toHaveBeenCalledTimes(1);
   });
 
   test("redirects an unauthenticated user to the login page", async () => {
@@ -191,7 +307,7 @@ describe("AuthorizationGuard", () => {
   });
 
   test("redirects a first-login user from the login page to /account/setup", async () => {
-    const router = await renderAuthorizationGuardWithUser({
+    const router = await renderAuthorizationGuard({
       initialPath: "/account/login",
       user: {
         user_id: 1,

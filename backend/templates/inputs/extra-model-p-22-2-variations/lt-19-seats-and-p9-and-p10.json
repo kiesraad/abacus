@@ -54,7 +54,7 @@
   },
   "election": {
     "id": 4,
-    "name": "Test Election Absolute Majority Change and List Exhaustion",
+    "name": "Test Election < 19 seats & Absolute Majority Change & List Exhaustion",
     "counting_method": "CSO",
     "committee_category": "CSB",
     "election_id": "Juinen_2026",

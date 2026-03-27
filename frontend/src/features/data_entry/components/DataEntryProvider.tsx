@@ -2,6 +2,7 @@ import { type ReactNode, useEffect } from "react";
 import { Navigate, useNavigate, useParams } from "react-router";
 
 import { ApiError, FatalApiError, NotFoundError } from "@/api/ApiResult";
+import type { EntryNumber } from "@/features/data_entry/types/types";
 import { useMessages } from "@/hooks/messages/useMessages";
 import { t } from "@/i18n/translate";
 import type { DataEntryId, ElectionWithPoliticalGroups } from "@/types/generated/openapi";
@@ -15,7 +16,7 @@ import { isStateLoaded } from "../utils/utils";
 export interface DataEntryProviderProps {
   election: ElectionWithPoliticalGroups;
   dataEntryId: DataEntryId;
-  entryNumber: number;
+  entryNumber: EntryNumber;
   children: ReactNode;
 }
 

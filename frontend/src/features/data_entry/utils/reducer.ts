@@ -2,13 +2,13 @@ import { assertStateIsLoaded } from "@/features/data_entry/utils/utils";
 import type { DataEntryId, ElectionWithPoliticalGroups } from "@/types/generated/openapi";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
-import type { ClientState, DataEntryAction, DataEntryState } from "../types/types";
+import type { ClientState, DataEntryAction, DataEntryState, EntryNumber } from "../types/types";
 import { buildFormState, getInitialFormState, getNextSectionID, updateFormStateAfterSubmit } from "./dataEntryUtils";
 
 export function getInitialState(
   election: ElectionWithPoliticalGroups,
   dataEntryId: DataEntryId,
-  entryNumber: number,
+  entryNumber: EntryNumber,
 ): DataEntryState {
   return {
     election,

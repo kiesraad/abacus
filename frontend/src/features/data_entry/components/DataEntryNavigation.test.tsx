@@ -323,8 +323,8 @@ describe("DataEntryNavigation", () => {
 
       await waitFor(() => {
         expect(router.state.location.pathname).toBe(testPath);
+        expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
       });
-      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     });
   });
 
@@ -443,8 +443,8 @@ describe("DataEntryNavigation", () => {
 
       await waitFor(() => {
         expect(router.state.location.pathname).toBe(testPath);
+        expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
       });
-      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     });
   });
 });

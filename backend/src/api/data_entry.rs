@@ -147,20 +147,20 @@ pub struct ClaimDataEntryResponse {
 pub fn router() -> OpenApiRouter<AppState> {
     use Role::*;
 
+    const TYPIST: &[Role] = &[TypistCSB, TypistGSB];
+    const COORDINATOR: &[Role] = &[CoordinatorCSB, CoordinatorGSB];
     const ALL_ROLES: &[Role] = Role::VARIANTS;
-    const COORDINATOR_GSB: &[Role] = &[CoordinatorGSB];
-    const TYPIST_GSB: &[Role] = &[TypistGSB];
 
     OpenApiRouter::default()
-        .routes(routes!(data_entry_claim).authorize(TYPIST_GSB))
-        .routes(routes!(data_entry_save).authorize(TYPIST_GSB))
-        .routes(routes!(data_entry_discard).authorize(TYPIST_GSB))
-        .routes(routes!(data_entry_finalise).authorize(TYPIST_GSB))
-        .routes(routes!(data_entry_reset).authorize(COORDINATOR_GSB))
-        .routes(routes!(data_entry_get).authorize(COORDINATOR_GSB))
-        .routes(routes!(data_entry_resolve_errors).authorize(COORDINATOR_GSB))
-        .routes(routes!(data_entry_get_differences).authorize(COORDINATOR_GSB))
-        .routes(routes!(data_entry_resolve_differences).authorize(COORDINATOR_GSB))
+        .routes(routes!(data_entry_claim).authorize(TYPIST))
+        .routes(routes!(data_entry_save).authorize(TYPIST))
+        .routes(routes!(data_entry_discard).authorize(TYPIST))
+        .routes(routes!(data_entry_finalise).authorize(TYPIST))
+        .routes(routes!(data_entry_reset).authorize(COORDINATOR))
+        .routes(routes!(data_entry_get).authorize(COORDINATOR))
+        .routes(routes!(data_entry_resolve_errors).authorize(COORDINATOR))
+        .routes(routes!(data_entry_get_differences).authorize(COORDINATOR))
+        .routes(routes!(data_entry_resolve_differences).authorize(COORDINATOR))
         .routes(routes!(election_status).authorize(ALL_ROLES))
 }
 
@@ -170,6 +170,9 @@ async fn validate_and_get_data(
     user: &User,
 ) -> Result<(DataEntrySourceContext, DataEntryStatus), APIError> {
     let context = data_entry_repo::resolve_source(conn, data_entry_id).await?;
+    user.role()
+        .is_authorized(&context.election.committee_category)?;
+
     let data_entry_status = data_entry_repo::get_status(conn, data_entry_id).await?;
 
     // Investigation check: only for polling stations in next sessions
@@ -596,6 +599,7 @@ impl ResolveErrorsAction {
     ),
 )]
 async fn data_entry_reset(
+    user: User,
     State(pool): State<SqlitePool>,
     Path(data_entry_id): Path<DataEntryId>,
     audit_service: AuditService,
@@ -603,6 +607,9 @@ async fn data_entry_reset(
     let mut tx = pool.begin_immediate().await?;
 
     let context = data_entry_repo::resolve_source(&mut tx, data_entry_id).await?;
+    user.role()
+        .is_authorized(&context.election.committee_category)?;
+
     let data_entry = data_entry_repo::get(&mut tx, data_entry_id).await?;
 
     if data_entry.state.status_name() == DataEntryStatusName::FirstEntryHasErrors
@@ -1111,6 +1118,7 @@ mod tests {
     async fn reset(pool: SqlitePool, data_entry_id: DataEntryId) -> Response {
         let user = User::test_user(Role::CoordinatorGSB, UserId::from(1));
         data_entry_reset(
+            user.clone(),
             State(pool),
             Path(data_entry_id),
             AuditService::new(Some(user), None),

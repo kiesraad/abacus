@@ -1,20 +1,23 @@
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
-use super::count::Count;
 use super::{
-    gsb_differences_counts::GSBDifferencesCounts,
-    political_group_candidate_votes::PoliticalGroupCandidateVotes, voters_counts::VotersCounts,
+    common_validation::difference_admitted_voters_count_and_votes_cast_count_above_threshold,
+    count::Count,
+    gsb_differences_counts::{validate_gsb_differences_counts, GSBDifferencesCounts},
+    political_group_candidate_votes::PoliticalGroupCandidateVotes,
+    voters_counts::VotersCounts,
     votes_counts::VotesCounts,
 };
-use crate::domain::election::ElectionWithPoliticalGroups;
-use crate::domain::results::common_validation::difference_admitted_voters_count_and_votes_cast_count_above_threshold;
-use crate::domain::results::gsb_differences_counts::validate_gsb_differences_counts;
-use crate::domain::validate::{
-    DataError, Validate, ValidationResult, ValidationResultCode, ValidationResultContext,
-    ValidationResults,
+use crate::domain::{
+    compare::Compare,
+    election::ElectionWithPoliticalGroups,
+    field_path::FieldPath,
+    validate::{
+        DataError, Validate, ValidationResult, ValidationResultCode, ValidationResultContext,
+        ValidationResults,
+    },
 };
-use crate::domain::{compare::Compare, field_path::FieldPath};
 
 /// GSBResults, following the fields in Model Na 31-2.
 ///

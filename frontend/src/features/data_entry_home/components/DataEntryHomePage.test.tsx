@@ -50,7 +50,7 @@ describe("DataEntryHomePage", () => {
     ).toBeVisible();
   });
 
-  test("Alert not visible when uncompleted", async () => {
+  test("Alert not visible when unfinished", async () => {
     renderDataEntryHomePage();
 
     // Wait for the page to be loaded

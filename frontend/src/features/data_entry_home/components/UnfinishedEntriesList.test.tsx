@@ -8,7 +8,7 @@ import { getTypistUser } from "@/testing/user-mock-data";
 const user = getTypistUser();
 
 describe("UnfinishedEntriesList component", () => {
-  test("Resume input visible when some are uncompleted", async () => {
+  test("Resume input visible when some are unfinished", async () => {
     const entries = getDataEntryWithStatusList({
       ...getElectionStatusMockData([
         { status: "first_entry_in_progress", first_entry_user_id: user.user_id },

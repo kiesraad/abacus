@@ -22,7 +22,7 @@ async function renderPicker() {
   render(
     <ElectionProvider electionId={1}>
       <ElectionStatusProvider electionId={1}>
-        <DataEntryPicker dataEntryWithStatus={entries} />,
+        <DataEntryPicker dataEntryWithStatus={entries} />
       </ElectionStatusProvider>
     </ElectionProvider>,
   );

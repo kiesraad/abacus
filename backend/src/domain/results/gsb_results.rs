@@ -4,7 +4,7 @@ use utoipa::ToSchema;
 use super::{
     common_validation::difference_admitted_voters_count_and_votes_cast_count_above_threshold,
     count::Count,
-    gsb_differences_counts::{validate_gsb_differences_counts, GSBDifferencesCounts},
+    gsb_differences_counts::{GSBDifferencesCounts, validate_gsb_differences_counts},
     political_group_candidate_votes::PoliticalGroupCandidateVotes,
     voters_counts::VotersCounts,
     votes_counts::VotesCounts,

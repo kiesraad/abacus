@@ -9,6 +9,7 @@ import type {
   SaveDataEntryResponse,
   ValidationResults,
 } from "@/types/generated/openapi";
+import type { DataEntryModel } from "@/types/types";
 import { electionMockData, politicalGroupMockData } from "./ElectionMockData";
 import { validationResultMockData } from "./ValidationResultMockData";
 
@@ -22,7 +23,7 @@ const source = (id: number): DataEntrySource => {
   return { type: "PollingStation", id, number, name };
 };
 
-export function emptyResults(model: "CSOFirstSession" | "CSONextSession" = "CSOFirstSession"): Results {
+export function emptyResults(model: DataEntryModel = "CSOFirstSession"): Results {
   const commonPollingStationResults: CommonPollingStationResults = {
     voters_counts: {
       poll_card_count: 0,

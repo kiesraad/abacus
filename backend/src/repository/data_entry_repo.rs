@@ -11,7 +11,10 @@ use crate::{
         },
         election::CommitteeCategory,
         polling_station::{PollingStation, PollingStationId},
-        results::Results,
+        results::{
+            PollingStationResults, Results,
+            common_polling_station_results::CommonPollingStationResults,
+        },
         sub_committee::{SubCommittee, SubCommitteeId},
     },
     repository::{committee_session_repo, election_repo, polling_station_repo},
@@ -333,7 +336,7 @@ pub async fn list_results_for_committee_session(
 pub async fn previous_results_for_polling_station(
     conn: &mut SqliteConnection,
     polling_station_id: PollingStationId,
-) -> Result<Results, sqlx::Error> {
+) -> Result<CommonPollingStationResults, sqlx::Error> {
     let polling_station = polling_station_repo::get(conn, polling_station_id).await?;
     let prev_data_entry_id = polling_station
         .prev_data_entry_id()
@@ -350,7 +353,11 @@ pub async fn previous_results_for_polling_station(
     .fetch_one(conn)
     .await?;
 
-    row.data.map(|d| d.0).ok_or(sqlx::Error::RowNotFound)
+    match row.data.map(|d| d.0) {
+        Some(Results::CSOFirstSession(results)) => Ok(results.as_common()),
+        Some(Results::CSONextSession(results)) => Ok(results.as_common()),
+        _ => Err(sqlx::Error::RowNotFound),
+    }
 }
 
 /// Checks if results are complete for a committee session by verifying that
@@ -1095,7 +1102,7 @@ mod tests {
         assert!(results.is_ok());
 
         let results = results.unwrap();
-        assert_eq!(results.voters_counts().proxy_certificate_count, 4);
+        assert_eq!(results.voters_counts.proxy_certificate_count, 4);
     }
 
     /// Test previous_results_for_polling_station with 4th session, non-existing polling station

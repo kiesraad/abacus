@@ -157,7 +157,7 @@ export function emptyCSOFirstSessionResults(): CSOFirstSessionResults {
   };
 }
 
-export const noRecountNoDifferencesDataEntry: Results = {
+export const noRecountNoDifferencesDataEntry: CSOFirstSessionResults & { model: "CSOFirstSession" } = {
   model: "CSOFirstSession",
   extra_investigation: {
     extra_investigation_other_reason: { yes: false, no: true },

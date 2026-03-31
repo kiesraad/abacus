@@ -2,7 +2,7 @@ import type { ApiClient } from "@/api/ApiClient";
 import { type ApiResult, isSuccess } from "@/api/ApiResult";
 import { assertStateIsLoaded } from "@/features/data_entry/utils/utils";
 import type { DataEntry, DataEntryStatusResponse, Results, SaveDataEntryResponse } from "@/types/generated/openapi";
-import type { DataEntryResults, FormSectionId, SectionValues } from "@/types/types";
+import { type DataEntryResults, dataEntryModelValues, type FormSectionId, type SectionValues } from "@/types/types";
 import { mapSectionValues } from "@/utils/dataEntryMapping";
 import { isRecord } from "@/utils/typeChecks";
 
@@ -21,8 +21,7 @@ function isResults(value: DataEntryResults): value is Results {
   }
 
   const model = value.model;
-
-  return typeof model === "string" && (model === "CSOFirstSession" || model === "CSONextSession");
+  return typeof model === "string" && dataEntryModelValues.some((v) => v === model);
 }
 
 export function setCache(dispatch: DataEntryDispatch) {

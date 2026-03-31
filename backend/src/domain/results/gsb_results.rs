@@ -2,36 +2,45 @@ use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
 use super::{
-    differences_counts::{DifferencesCounts, validate_differences_counts},
+    common_validation::difference_admitted_voters_count_and_votes_cast_count_above_threshold,
+    count::Count,
+    gsb_differences_counts::{GSBDifferencesCounts, validate_gsb_differences_counts},
     political_group_candidate_votes::PoliticalGroupCandidateVotes,
     voters_counts::VotersCounts,
     votes_counts::VotesCounts,
 };
 use crate::domain::{
+    compare::Compare,
     election::ElectionWithPoliticalGroups,
     field_path::FieldPath,
-    results::common_validation::difference_admitted_voters_count_and_votes_cast_count_above_threshold,
     validate::{
         DataError, Validate, ValidationResult, ValidationResultCode, ValidationResultContext,
         ValidationResults,
     },
 };
 
-/// CommonPollingStationResults contains the common fields for polling station results,
-#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
+/// GSBResults, following the fields in Model Na 31-2.
+///
+/// See "Model Na 31-2. Proces-verbaal van een gemeentelijk stembureau/stembureau voor het openbaar
+/// lichaam in een gemeente/openbaar lichaam waar een centrale stemopneming wordt verricht" from
+/// [Kiesraad](https://www.kiesraad.nl/documenten/2025/11/27/na-31-2-pv-gsb-cso).
+#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
-pub struct CommonPollingStationResults {
+pub struct GSBResults {
+    /// Number of voters ("Kiesgerechtigden")
+    #[schema(value_type = u32)]
+    pub number_of_voters: Count,
     /// Voters counts ("Aantal toegelaten kiezers")
     pub voters_counts: VotersCounts,
     /// Votes counts ("Aantal getelde stembiljetten")
     pub votes_counts: VotesCounts,
     /// Differences counts ("Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten")
-    pub differences_counts: DifferencesCounts,
+    pub differences_counts: GSBDifferencesCounts,
     /// Vote counts per list and candidate ("Aantal stemmen per lijst en kandidaat")
     pub political_group_votes: Vec<PoliticalGroupCandidateVotes>,
 }
 
-impl CommonPollingStationResults {
+impl GSBResults {
     fn validate_political_group_votes_errors(
         &self,
         political_group_candidate_votes: &PoliticalGroupCandidateVotes,
@@ -90,13 +99,53 @@ impl CommonPollingStationResults {
     }
 }
 
-impl Validate for CommonPollingStationResults {
+impl Compare for GSBResults {
+    fn compare(&self, first_entry: &Self, different_fields: &mut Vec<String>, path: &FieldPath) {
+        self.number_of_voters.compare(
+            &first_entry.number_of_voters,
+            different_fields,
+            &path.field("number_of_voters"),
+        );
+
+        self.voters_counts.compare(
+            &first_entry.voters_counts,
+            different_fields,
+            &path.field("voters_counts"),
+        );
+
+        self.votes_counts.compare(
+            &first_entry.votes_counts,
+            different_fields,
+            &path.field("votes_counts"),
+        );
+
+        self.differences_counts.compare(
+            &first_entry.differences_counts,
+            different_fields,
+            &path.field("differences_counts"),
+        );
+
+        self.political_group_votes.compare(
+            &first_entry.political_group_votes,
+            different_fields,
+            &path.field("political_group_votes"),
+        );
+    }
+}
+
+impl Validate for GSBResults {
     fn validate(
         &self,
         election: &ElectionWithPoliticalGroups,
         validation_results: &mut ValidationResults,
         path: &FieldPath,
     ) -> Result<(), DataError> {
+        self.number_of_voters.validate(
+            election,
+            validation_results,
+            &path.field("number_of_voters"),
+        )?;
+
         let total_votes_count = self.votes_counts.total_votes_cast_count;
 
         self.votes_counts
@@ -132,7 +181,7 @@ impl Validate for CommonPollingStationResults {
         self.differences_counts
             .validate(election, validation_results, &differences_counts_path)?;
 
-        validate_differences_counts(
+        validate_gsb_differences_counts(
             &self.differences_counts,
             total_voters_count,
             total_votes_count,
@@ -155,27 +204,6 @@ impl Validate for CommonPollingStationResults {
     }
 }
 
-#[derive(Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct CommonPollingStationResultsWithoutVotes {
-    /// Voters counts ("Aantal toegelaten kiezers")
-    pub voters_counts: VotersCounts,
-    /// Votes counts ("Aantal getelde stembiljetten")
-    pub votes_counts: VotesCounts,
-    /// Differences counts ("Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten")
-    pub differences_counts: DifferencesCounts,
-}
-
-impl From<CommonPollingStationResults> for CommonPollingStationResultsWithoutVotes {
-    fn from(value: CommonPollingStationResults) -> Self {
-        Self {
-            voters_counts: value.voters_counts,
-            votes_counts: value.votes_counts,
-            differences_counts: value.differences_counts,
-        }
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use test_log::test;
@@ -184,11 +212,11 @@ mod tests {
     use crate::domain::{
         election::{PGNumber, tests::election_fixture},
         results::political_group_total_votes::PoliticalGroupTotalVotes,
-        valid_default::ValidDefault,
     };
 
-    fn create_test_data() -> CommonPollingStationResults {
-        CommonPollingStationResults {
+    fn create_test_data() -> GSBResults {
+        GSBResults {
+            number_of_voters: 100,
             voters_counts: VotersCounts {
                 poll_card_count: 90,
                 proxy_certificate_count: 0,
@@ -210,7 +238,7 @@ mod tests {
                 invalid_votes_count: 0,
                 total_votes_cast_count: 90,
             },
-            differences_counts: ValidDefault::valid_default(),
+            differences_counts: GSBDifferencesCounts::default(),
             political_group_votes: vec![
                 PoliticalGroupCandidateVotes::from_test_data_auto(PGNumber::from(1), &[10, 20, 30]),
                 PoliticalGroupCandidateVotes::from_test_data_auto(PGNumber::from(2), &[5, 10, 15]),
@@ -218,7 +246,7 @@ mod tests {
         }
     }
 
-    fn validate(data: CommonPollingStationResults) -> Result<ValidationResults, DataError> {
+    fn validate(data: GSBResults) -> Result<ValidationResults, DataError> {
         let mut validation_results = ValidationResults::default();
 
         data.validate(
@@ -242,6 +270,19 @@ mod tests {
         let validation_results = validate(create_test_data())?;
         assert_eq!(validation_results.errors.len(), 0);
         assert_eq!(validation_results.warnings.len(), 0);
+        Ok(())
+    }
+
+    #[test]
+    fn test_too_high_count() -> Result<(), DataError> {
+        let mut data = create_test_data();
+        data.differences_counts.fewer_ballots_count = 1_000_000_000;
+        data.differences_counts.more_ballots_count = 1_000_000_000;
+
+        let result = validate(data);
+        assert!(result.is_err());
+        assert!(result.unwrap_err().message.eq("count out of range"),);
+
         Ok(())
     }
 

@@ -27,7 +27,7 @@ use crate::{
         },
         models::{ModelNa14_2Bijlage1Input, ToPdfFileModel},
         polling_station::{PollingStation, PollingStationId},
-        results::Results,
+        results::{PollingStationResults, cso_first_session_results::CSOFirstSessionResults},
         role::Role,
         votes_table::VotesTablesWithOnlyPreviousVotes,
     },
@@ -713,7 +713,7 @@ async fn polling_station_investigation_download_corrigendum_pdf(
                 }
             }
         }
-        None => Results::empty_cso_first_session(&election.political_groups),
+        None => CSOFirstSessionResults::empty(&election.political_groups).as_common(),
     };
 
     let polling_station: PollingStation = ps.into_polling_station();
@@ -725,14 +725,13 @@ async fn polling_station_investigation_download_corrigendum_pdf(
         polling_station.number
     );
 
-    let votes_tables =
-        VotesTablesWithOnlyPreviousVotes::new(&election, &previous_results.as_common())?;
+    let votes_tables = VotesTablesWithOnlyPreviousVotes::new(&election, &previous_results)?;
 
     let input = ModelNa14_2Bijlage1Input {
         votes_tables,
         election: election.into(),
         polling_station,
-        previous_results: previous_results.as_common().into(),
+        previous_results: previous_results.into(),
         investigation,
     }
     .to_pdf_file_model(name.clone());

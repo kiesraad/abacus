@@ -18,5 +18,5 @@ VALUES (1, 'admin1', 'Sanne Molenaar', 'administrator', '$argon2id$v=19$m=19456,
        (6, 'typist2', 'Aliyah van den Berg', 'typist_gsb', '$argon2id$v=19$m=19456,t=2,p=1$wQphZULq5ttINkUDRTSzow$vUVBCYFJOaEMWUYiI0kYLgtlPACYXwikuxWfj+0QM9o', false, NULL),
        (7, 'coordinator3', 'John Doe', 'coordinator_csb', '$argon2id$v=19$m=19456,t=2,p=1$xy1C66/T3FaLHuvcA9hFKg$3SYm29uxBqHDY2nJjm1vC130lIBOC/pNcid4aqF/9qs', false, NULL),
        (8, 'coordinator4', 'Jane Doe', 'coordinator_csb', '$argon2id$v=19$m=19456,t=2,p=1$RKS2dISB4DeyPS6uz+h83g$R6Q8fWkF8L2H0wmqwkT3zsAGSL3JiOyGhAp402gxp9g', false, NULL),
-       (9, 'typist3', 'Henry Smith ', 'typist_csb', '$argon2id$v=19$m=19456,t=2,p=1$C4oIGknbccexw5jrLQJfNA$V9FrzbtEnuBv+lOAV9AtiHSo/u7y/FMGfekA3PS4zNs', false, NULL),
+       (9, 'typist3', 'Henry Smith', 'typist_csb', '$argon2id$v=19$m=19456,t=2,p=1$C4oIGknbccexw5jrLQJfNA$V9FrzbtEnuBv+lOAV9AtiHSo/u7y/FMGfekA3PS4zNs', false, NULL),
        (10, 'typist4', 'Alice Smith', 'typist_csb', '$argon2id$v=19$m=19456,t=2,p=1$jQfNR2cC7cwOL9ZDaMOArw$lPfXNrk0T3bAyzkKzM28JsuE4xt+2+qXPRhswl+FrhQ', false, NULL);

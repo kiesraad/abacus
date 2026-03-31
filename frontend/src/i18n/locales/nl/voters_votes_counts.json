@@ -1,11 +1,17 @@
 {
   "admitted_voters_after_recount": "Toegelaten kiezers na hertelling door gemeentelijk stembureau",
-  "form_title": "Toegelaten kiezers en uitgebrachte stemmen",
+  "form_title": {
+    "CSOFirstSession": "Toegelaten kiezers en uitgebrachte stemmen",
+    "CSONextSession": "Toegelaten kiezers en uitgebrachte stemmen",
+    "GSB": "Kiesgerechtigden, toegelaten kiezers en uitgebrachte stemmen"
+  },
   "short_title": "Aantal kiezers en stemmen",
   "section_number": {
     "CSOFirstSession": "B1-3.1 en 3.2",
-    "CSONextSession": "B1-2.1 en 2.2"
+    "CSONextSession": "B1-2.1 en 2.2",
+    "GSB": ""
   },
+  "number_of_votes_corrigendum": "Voer je een corrigendum in, en staat het aantal kiesgerechtigden niet op het formulier? Pak dan het oorspronkelijke proces-verbaal erbij, en vul de waarde in die daar staat ingevuld.",
   "voters_counts": {
     "poll_card_count": "Stempassen",
     "proxy_certificate_count": "Volmachtbewijzen",

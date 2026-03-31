@@ -973,10 +973,7 @@ async fn election_status(
 
     let statuses =
         crate::service::election_statuses(&mut conn, &election.into(), &current_committee_session)
-            .await
-            .map_err(|e| match e {
-                crate::service::DataEntryServiceError::DatabaseError(e) => APIError::from(e),
-            })?;
+            .await?;
 
     Ok(Json(ElectionStatusResponse { statuses }))
 }

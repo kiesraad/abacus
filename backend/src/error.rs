@@ -21,7 +21,7 @@ use crate::{
         committee_session::CommitteeSessionError, role::RoleNotAuthorizedError, validate::DataError,
     },
     eml::EMLImportError,
-    repository::data_entry_repo::ResolveSourceError,
+    repository::{data_entry_repo::ResolveSourceError, polling_station_repo},
     service::{DataEntryServiceError, PollingStationServiceError, SubCommitteeServiceError},
 };
 use pdf_gen::{PdfGenError, zip::ZipResponseError};
@@ -552,6 +552,9 @@ impl From<DataEntryServiceError> for APIError {
     fn from(err: DataEntryServiceError) -> Self {
         match err {
             DataEntryServiceError::DatabaseError(e) => e.into(),
+            DataEntryServiceError::DataEntryAlreadyLinked => {
+                APIError::DataIntegrityError(String::from("Data entry is already linked"))
+            }
         }
     }
 }
@@ -591,6 +594,16 @@ impl From<ResolveSourceError> for APIError {
     }
 }
 
+impl From<polling_station_repo::CreateDataEntryError> for APIError {
+    fn from(err: polling_station_repo::CreateDataEntryError) -> Self {
+        match err {
+            polling_station_repo::CreateDataEntryError::Sqlx(e) => e.into(),
+            polling_station_repo::CreateDataEntryError::DataEntryAlreadyLinked => {
+                APIError::DataIntegrityError(String::from("Data entry is already linked"))
+            }
+        }
+    }
+}
 /// Map common internal errors to user-friendly error messages
 pub async fn map_error_response(response: Response) -> Response {
     if response.status() == StatusCode::PAYLOAD_TOO_LARGE {

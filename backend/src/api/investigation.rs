@@ -290,7 +290,7 @@ async fn polling_station_investigation_conclude(
         })?;
 
     let status = if request.corrected_results {
-        let data_entry_id = polling_station_repo::ensure_data_entry(&mut tx, polling_station_id)
+        let data_entry_id = polling_station_repo::create_data_entry(&mut tx, polling_station_id)
             .await
             .map_err(APIError::from)?;
         current.conclude_with_new_results(request.findings, data_entry_id)?
@@ -379,7 +379,7 @@ async fn apply_update(
         }
         // ConcludedWithNewResults: same-state text update
         (InvestigationStatus::ConcludedWithNewResults(_), Some(true)) => {
-            let de_id = polling_station_repo::ensure_data_entry(conn, polling_station_id)
+            let de_id = polling_station_repo::get_data_entry_id(conn, polling_station_id)
                 .await
                 .map_err(APIError::from)?;
             let findings = request.findings.unwrap_or_default();
@@ -477,7 +477,7 @@ async fn switch_to_with_new_results(
     current: InvestigationStatus,
     request: PollingStationInvestigationUpdateRequest,
 ) -> Result<InvestigationStatus, APIError> {
-    let de_id = polling_station_repo::ensure_data_entry(conn, polling_station_id)
+    let de_id = polling_station_repo::create_data_entry(conn, polling_station_id)
         .await
         .map_err(APIError::from)?;
 

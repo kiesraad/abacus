@@ -13,11 +13,23 @@ use crate::{
 #[derive(Debug)]
 pub enum DataEntryServiceError {
     DatabaseError(sqlx::Error),
+    DataEntryAlreadyLinked,
 }
 
 impl From<sqlx::Error> for DataEntryServiceError {
     fn from(err: sqlx::Error) -> Self {
         Self::DatabaseError(err)
+    }
+}
+
+impl From<polling_station_repo::CreateDataEntryError> for DataEntryServiceError {
+    fn from(err: polling_station_repo::CreateDataEntryError) -> Self {
+        match err {
+            polling_station_repo::CreateDataEntryError::Sqlx(e) => Self::DatabaseError(e),
+            polling_station_repo::CreateDataEntryError::DataEntryAlreadyLinked => {
+                Self::DataEntryAlreadyLinked
+            }
+        }
     }
 }
 
@@ -82,9 +94,7 @@ pub async fn create_definitive_data_entry(
         results: results.clone(),
     });
 
-    let data_entry_id = polling_station_repo::ensure_data_entry(conn, polling_station_id)
-        .await
-        .map_err(DataEntryServiceError::DatabaseError)?;
+    let data_entry_id = polling_station_repo::get_data_entry_id(conn, polling_station_id).await?;
     data_entry_repo::update(conn, data_entry_id, &state).await?;
     Ok(())
 }

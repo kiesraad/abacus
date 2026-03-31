@@ -830,7 +830,7 @@ mod tests {
 
             let status = if corrected_results {
                 let data_entry_id =
-                    polling_station_repo::ensure_data_entry(conn, polling_station_id)
+                    polling_station_repo::create_data_entry(conn, polling_station_id)
                         .await
                         .unwrap();
                 current
@@ -943,23 +943,23 @@ mod tests {
         async fn test_next_session_new_polling_station_with_results(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
             let committee_session_id = CommitteeSessionId::from(704);
+            let polling_station_id = PollingStationId::from(743);
 
             insert_test_polling_station(
                 &mut conn,
-                PollingStationId::from(743),
+                polling_station_id,
                 committee_session_id,
                 None,
                 123,
             )
             .await
             .unwrap();
-            create_definitive_data_entry(
-                &mut conn,
-                PollingStationId::from(743),
-                &create_test_results(10),
-            )
-            .await
-            .unwrap();
+            polling_station_repo::create_data_entry(&mut conn, polling_station_id)
+                .await
+                .unwrap();
+            create_definitive_data_entry(&mut conn, polling_station_id, &create_test_results(10))
+                .await
+                .unwrap();
 
             assert!(
                 are_results_complete_for_committee_session(&mut conn, committee_session_id)

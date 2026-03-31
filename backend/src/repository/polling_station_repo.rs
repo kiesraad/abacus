@@ -139,6 +139,18 @@ impl From<PollingStationRow> for PollingStationForSession {
     }
 }
 
+#[derive(Debug)]
+pub enum CreateDataEntryError {
+    Sqlx(sqlx::Error),
+    DataEntryAlreadyLinked,
+}
+
+impl From<sqlx::Error> for CreateDataEntryError {
+    fn from(err: sqlx::Error) -> Self {
+        Self::Sqlx(err)
+    }
+}
+
 /// Returns the committee category for the related election
 pub async fn get_committee_category(
     conn: &mut SqliteConnection,
@@ -483,22 +495,30 @@ pub async fn delete(
     Ok(rows_affected > 0)
 }
 
-/// Returns the existing `data_entry_id` for the polling station,
-/// or creates a new empty data entry, links it, and returns its id.
-pub async fn ensure_data_entry(
+/// Returns the existing `data_entry_id` for the polling station.
+/// Returns `sqlx::Error::RowNotFound` if no data entry is linked.
+pub async fn get_data_entry_id(
     conn: &mut SqliteConnection,
     polling_station_id: PollingStationId,
 ) -> Result<DataEntryId, sqlx::Error> {
-    let mut tx = conn.begin().await?;
-    let existing: Option<DataEntryId> = query_scalar!(
+    query_scalar!(
         r#"SELECT data_entry_id AS "data_entry_id: _" FROM polling_stations WHERE id = ?"#,
         polling_station_id
     )
-    .fetch_one(&mut *tx)
-    .await?;
-    if let Some(id) = existing {
-        tx.commit().await?;
-        return Ok(id);
+    .fetch_one(conn)
+    .await?
+    .ok_or(sqlx::Error::RowNotFound)
+}
+
+/// Creates a new empty data entry, links it to the polling station, and returns its id.
+/// Returns an error if a data entry is already linked.
+pub async fn create_data_entry(
+    conn: &mut SqliteConnection,
+    polling_station_id: PollingStationId,
+) -> Result<DataEntryId, CreateDataEntryError> {
+    let mut tx = conn.begin().await?;
+    if get_data_entry_id(&mut tx, polling_station_id).await.is_ok() {
+        return Err(CreateDataEntryError::DataEntryAlreadyLinked);
     }
     let data_entry = data_entry_repo::create_empty(&mut tx).await?;
     link_data_entry(&mut tx, polling_station_id, data_entry.id).await?;

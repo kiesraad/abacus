@@ -223,7 +223,7 @@ async fn polling_station_create(
 
     let ps_id = create(&mut tx, election_id, new_polling_station).await?;
     if !committee_session.is_next_session() {
-        polling_station_repo::ensure_data_entry(&mut tx, ps_id).await?;
+        polling_station_repo::create_data_entry(&mut tx, ps_id).await?;
     }
     let polling_station = polling_station_repo::get(&mut tx, ps_id).await?;
     let response: PollingStationResponse = polling_station.into_response(election_id);
@@ -490,7 +490,7 @@ pub async fn create_imported_polling_stations(
     let mut polling_station_list: Vec<_> = Vec::with_capacity(ps_ids.len());
     for id in ps_ids {
         if !committee_session.is_next_session() {
-            polling_station_repo::ensure_data_entry(&mut tx, id).await?;
+            polling_station_repo::create_data_entry(&mut tx, id).await?;
         }
         polling_station_list.push(polling_station_repo::get(&mut tx, id).await?);
     }

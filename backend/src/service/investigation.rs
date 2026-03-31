@@ -1,13 +1,29 @@
 #[cfg(test)]
+use crate::repository::polling_station_repo;
+
+#[cfg(test)]
 #[derive(Debug)]
 pub enum InvestigationServiceError {
     DatabaseError(sqlx::Error),
+    DataEntryAlreadyLinked,
 }
 
 #[cfg(test)]
 impl From<sqlx::Error> for InvestigationServiceError {
     fn from(err: sqlx::Error) -> Self {
         Self::DatabaseError(err)
+    }
+}
+
+#[cfg(test)]
+impl From<polling_station_repo::CreateDataEntryError> for InvestigationServiceError {
+    fn from(err: polling_station_repo::CreateDataEntryError) -> Self {
+        match err {
+            polling_station_repo::CreateDataEntryError::Sqlx(e) => Self::DatabaseError(e),
+            polling_station_repo::CreateDataEntryError::DataEntryAlreadyLinked => {
+                Self::DataEntryAlreadyLinked
+            }
+        }
     }
 }
 
@@ -28,9 +44,8 @@ pub async fn create_test_investigation(
             .conclude_without_new_results("Test findings".to_string(), false)
             .expect("conclude_without_new_results should succeed"),
         Some(true) => {
-            let data_entry_id = polling_station_repo::ensure_data_entry(conn, polling_station_id)
-                .await
-                .map_err(InvestigationServiceError::DatabaseError)?;
+            let data_entry_id =
+                polling_station_repo::create_data_entry(conn, polling_station_id).await?;
             InvestigationStatus::new("Test reason".to_string())
                 .conclude_with_new_results("Test findings".to_string(), data_entry_id)
                 .expect("conclude_with_new_results should succeed")

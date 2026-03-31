@@ -330,9 +330,9 @@ async fn generate_polling_stations(
         )
         .await
         .expect("Failed to create polling station");
-        let data_entry_id = polling_station_repo::ensure_data_entry(conn, ps_id)
+        let data_entry_id = polling_station_repo::create_data_entry(conn, ps_id)
             .await
-            .expect("Failed to create empty data entry");
+            .expect("Data entry should be created");
         let ps = polling_station_repo::get(conn, ps_id)
             .await
             .expect("Failed to get polling station");

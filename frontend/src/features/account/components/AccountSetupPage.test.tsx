@@ -9,7 +9,7 @@ import { AccountUpdateRequestHandler } from "@/testing/api-mocks/RequestHandlers
 import { loginResponseMockData } from "@/testing/api-mocks/UserMockData";
 import { Providers } from "@/testing/Providers";
 import { server } from "@/testing/server";
-import { expectConflictErrorPage, render, screen, setupTestRouter } from "@/testing/test-utils";
+import { expectForbiddenErrorPage, render, screen, setupTestRouter } from "@/testing/test-utils";
 import type { LoginResponse } from "@/types/generated/openapi";
 
 import { accountRoutes } from "../routes";
@@ -79,7 +79,7 @@ describe("AccountSetupPage", () => {
 
     rtlRender(<Providers router={router} />);
 
-    await expectConflictErrorPage();
+    await expectForbiddenErrorPage();
     expect(console.error).toHaveBeenCalled();
   });
 });

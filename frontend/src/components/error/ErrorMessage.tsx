@@ -25,17 +25,19 @@ export function ErrorMessage({ title, error, children }: ErrorProps) {
           <section>
             <h1>{title}</h1>
             {children}
-            <nav>
-              <Button
-                variant="secondary"
-                leftIcon={<IconArrowLeft />}
-                onClick={() => {
-                  void navigate(-1);
-                }}
-              >
-                {t("history_back")}
-              </Button>
-            </nav>
+            {window.history.length > 1 && (
+              <nav>
+                <Button
+                  variant="secondary"
+                  leftIcon={<IconArrowLeft />}
+                  onClick={() => {
+                    void navigate(-1);
+                  }}
+                >
+                  {t("history_back")}
+                </Button>
+              </nav>
+            )}
           </section>
           <aside>
             <img src={errorImage} alt={t("error.label")} />

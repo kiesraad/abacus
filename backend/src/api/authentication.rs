@@ -9,7 +9,6 @@ use cookie::{Cookie, SameSite};
 use hyper::StatusCode;
 use serde::{Deserialize, Serialize};
 use sqlx::SqlitePool;
-use strum::VariantArray;
 use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
@@ -125,12 +124,10 @@ impl AsAuditEvent for UserDeletedAuditData {
 }
 
 pub fn router() -> OpenApiRouter<AppState> {
-    const ALL_ROLES: &[Role] = Role::VARIANTS;
-
     OpenApiRouter::default()
         .routes(routes!(login).public())
-        .routes(routes!(account).authorize(ALL_ROLES))
-        .routes(routes!(account_update).allow_incomplete_user())
+        .routes(routes!(account).public())
+        .routes(routes!(account_update).require_incomplete_user())
         .routes(routes!(initialised).public())
         .routes(routes!(create_first_admin).public())
         .routes(routes!(admin_exists).public())
@@ -289,7 +286,9 @@ pub struct AccountUpdateRequest {
       (status = 500, description = "Internal server error", body = ErrorResponse),
   ),
 )]
-async fn account(user: User) -> Result<impl IntoResponse, APIError> {
+async fn account(user: Option<User>) -> Result<impl IntoResponse, APIError> {
+    let user = user.ok_or(AuthenticationError::UserNotFound)?;
+
     Ok(Json(LoginResponse::from(&user)))
 }
 

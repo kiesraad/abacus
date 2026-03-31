@@ -30,15 +30,13 @@ use crate::{
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
     repository::{
         committee_session_repo::get_election_committee_session,
-        data_entry_repo, election_repo, investigation_repo,
+        data_entry_repo, election_repo, investigation_repo, polling_station_repo,
         polling_station_repo::{
             create, create_many, delete, get_committee_category, get_for_election, has_any, update,
         },
         user_repo::User,
     },
-    service::{
-        change_committee_session_status, create_empty_data_entry, list_polling_stations_for_session,
-    },
+    service::{change_committee_session_status, list_polling_stations_for_session},
 };
 
 #[derive(Serialize)]
@@ -223,12 +221,11 @@ async fn polling_station_create(
     let committee_session = get_election_committee_session(&mut tx, election_id).await?;
     validate_user_is_allowed_to_perform_action(user, &committee_session)?;
 
-    let mut polling_station = create(&mut tx, election_id, new_polling_station).await?;
-
+    let ps_id = create(&mut tx, election_id, new_polling_station).await?;
     if !committee_session.is_next_session() {
-        polling_station = create_empty_data_entry(&mut tx, polling_station.id()).await?;
+        polling_station_repo::create_data_entry(&mut tx, ps_id).await?;
     }
-
+    let polling_station = polling_station_repo::get(&mut tx, ps_id).await?;
     let response: PollingStationResponse = polling_station.into_response(election_id);
 
     audit_service
@@ -489,12 +486,13 @@ pub async fn create_imported_polling_stations(
     let file_hash = EmlHash::from(polling_stations_request.polling_stations.as_bytes()).chunks;
 
     // Create new polling stations
-    let mut polling_station_list = create_many(&mut tx, election_id, polling_stations).await?;
-
-    if !committee_session.is_next_session() {
-        for ps in &mut polling_station_list {
-            *ps = create_empty_data_entry(&mut tx, ps.id()).await?;
+    let ps_ids = create_many(&mut tx, election_id, polling_stations).await?;
+    let mut polling_station_list: Vec<_> = Vec::with_capacity(ps_ids.len());
+    for id in ps_ids {
+        if !committee_session.is_next_session() {
+            polling_station_repo::create_data_entry(&mut tx, id).await?;
         }
+        polling_station_list.push(polling_station_repo::get(&mut tx, id).await?);
     }
 
     // Create audit event
@@ -684,7 +682,7 @@ VALUES
         };
 
         // Add a new polling station
-        let polling_station = create(&mut conn, ElectionId::from(7), data.clone())
+        let polling_station_id = create(&mut conn, ElectionId::from(7), data.clone())
             .await
             .unwrap();
 
@@ -693,7 +691,7 @@ VALUES
         let result = update(
             &mut conn,
             ElectionId::from(7),
-            polling_station.id(),
+            polling_station_id,
             data.clone(),
         )
         .await;

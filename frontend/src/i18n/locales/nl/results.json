@@ -1,6 +1,7 @@
 {
   "field": {
     "recounted": "Is er herteld?",
+    "number_of_voters": "Kiesgerechtigden",
     "voters_counts": {
       "poll_card_count": "Stempassen",
       "proxy_certificate_count": "Volmachtbewijzen",

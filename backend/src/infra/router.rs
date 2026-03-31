@@ -289,11 +289,11 @@ mod tests {
                 // Should have either a security scheme or a public tag, but not both/none
                 match (has_security_scheme, has_public_tag) {
                     (false, false) => failures.push(format!(
-                        "{} {} route should have .authorize()/.allow_incomplete_user() or .public() defined",
+                        "{} {} route should have .authorize()/.require_incomplete_user() or .public() defined",
                         method, path
                     )),
                     (true, true) => failures.push(format!(
-                        "{} {} route should not have both .authorize()/.allow_incomplete_user() and .public() defined",
+                        "{} {} route should not have both .authorize()/.require_incomplete_user() and .public() defined",
                         method, path
                     )),
                     (_, _) => {} // valid case, do nothing

@@ -718,7 +718,7 @@ mod tests {
         assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
         let body = response.into_body().collect().await.unwrap().to_bytes();
         let result: ErrorResponse = serde_json::from_slice(&body).unwrap();
-        assert_eq!(result.reference, ErrorReference::Unauthorized);
+        assert_eq!(result.reference, ErrorReference::UserNotFound);
     }
 
     #[test(sqlx::test(fixtures("../../../../fixtures/users.sql")))]
@@ -744,6 +744,6 @@ mod tests {
         assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
         let body = response.into_body().collect().await.unwrap().to_bytes();
         let result: ErrorResponse = serde_json::from_slice(&body).unwrap();
-        assert_eq!(result.reference, ErrorReference::Unauthorized);
+        assert_eq!(result.reference, ErrorReference::UserNotFound);
     }
 }

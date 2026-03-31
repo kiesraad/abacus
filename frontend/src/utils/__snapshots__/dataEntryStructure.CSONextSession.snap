@@ -1,0 +1,441 @@
+[
+  {
+    "id": "voters_votes_counts",
+    "sectionNumber": "B1-2.1 en 2.2",
+    "short_title": "Aantal kiezers en stemmen",
+    "subsections": [
+      {
+        "headers": [
+          "Veld",
+          "Geteld aantal",
+          "Omschrijving",
+        ],
+        "rows": [
+          {
+            "autoFocusInput": true,
+            "code": "A",
+            "path": "voters_counts.poll_card_count",
+            "title": "Stempassen",
+          },
+          {
+            "addSeparator": true,
+            "code": "B",
+            "path": "voters_counts.proxy_certificate_count",
+            "title": "Volmachtbewijzen",
+          },
+          {
+            "addSeparator": true,
+            "code": "D",
+            "isTotal": true,
+            "path": "voters_counts.total_admitted_voters_count",
+            "title": "Totaal toegelaten kiezers",
+          },
+          {
+            "addSeparator": false,
+            "code": "E.1",
+            "path": "votes_counts.political_group_total_votes.0.total",
+            "title": "Totaal Lijst 1 - Vurige Vleugels Partij",
+          },
+          {
+            "addSeparator": true,
+            "code": "E.2",
+            "path": "votes_counts.political_group_total_votes.1.total",
+            "title": "Totaal Lijst 2 - Wijzen van Water en Wind",
+          },
+          {
+            "code": "E",
+            "isTotal": true,
+            "path": "votes_counts.total_votes_candidates_count",
+            "title": "Totaal stemmen op kandidaten",
+          },
+          {
+            "code": "F",
+            "path": "votes_counts.blank_votes_count",
+            "title": "Blanco stemmen",
+          },
+          {
+            "addSeparator": true,
+            "code": "G",
+            "path": "votes_counts.invalid_votes_count",
+            "title": "Ongeldige stemmen",
+          },
+          {
+            "code": "H",
+            "isTotal": true,
+            "path": "votes_counts.total_votes_cast_count",
+            "title": "Totaal uitgebrachte stemmen",
+          },
+        ],
+        "type": "inputGrid",
+      },
+    ],
+    "title": "Toegelaten kiezers en uitgebrachte stemmen",
+  },
+  {
+    "id": "differences_counts",
+    "sectionNumber": "B1-2.3",
+    "short_title": "Verschillen D & H",
+    "subsections": [
+      {
+        "error_message": "Controleer of je antwoord gelijk is aan het papieren proces-verbaal",
+        "error_path": "differences_counts.compare_votes_cast_admitted_voters",
+        "options": [
+          {
+            "autoFocusInput": true,
+            "label": "D en H zijn gelijk",
+            "path": "differences_counts.compare_votes_cast_admitted_voters.admitted_voters_equal_votes_cast",
+            "short_label": "D en H zijn gelijk",
+          },
+          {
+            "label": "H is groter dan D (meer uitgebrachte stemmen dan toegelaten kiezers)",
+            "path": "differences_counts.compare_votes_cast_admitted_voters.votes_cast_greater_than_admitted_voters",
+            "short_label": "H is groter dan D",
+          },
+          {
+            "label": "H is kleiner dan D (minder uitgebrachte stemmen dan toegelaten kiezers)",
+            "path": "differences_counts.compare_votes_cast_admitted_voters.votes_cast_smaller_than_admitted_voters",
+            "short_label": "H is kleiner dan D",
+          },
+        ],
+        "short_title": "Extra onderzoek vanwege andere reden dan onverklaard verschil?",
+        "title": <React.Fragment>
+          <strong>
+            <React.Fragment>
+              <React.Fragment>
+                2.3.1
+              </React.Fragment>
+            </React.Fragment>
+          </strong>
+          <React.Fragment>
+             Vergelijk D (totaal toegelaten kiezers) en H (totaal uitgebrachte stemmen)
+          </React.Fragment>
+        </React.Fragment>,
+        "type": "checkboxes",
+      },
+      {
+        "headers": [
+          "Veld",
+          "Geteld aantal",
+          "Omschrijving",
+        ],
+        "rows": [
+          {
+            "code": "I",
+            "path": "differences_counts.more_ballots_count",
+            "title": "Aantal méér getelde stemmen",
+          },
+          {
+            "code": "J",
+            "path": "differences_counts.fewer_ballots_count",
+            "title": "Aantal minder getelde stemmen",
+          },
+        ],
+        "type": "inputGrid",
+      },
+      {
+        "error_message": "Controleer of je antwoord gelijk is aan het papieren proces-verbaal",
+        "error_path": "differences_counts.difference_completely_accounted_for",
+        "options": [
+          {
+            "label": "Ja",
+            "path": "differences_counts.difference_completely_accounted_for.yes",
+            "short_label": "Ja",
+          },
+          {
+            "label": "Nee, er is een onverklaard verschil",
+            "path": "differences_counts.difference_completely_accounted_for.no",
+            "short_label": "Nee, er is een onverklaard verschil",
+          },
+        ],
+        "short_title": "Verschil tussen D en H volledig verklaard?",
+        "title": <React.Fragment>
+          <strong>
+            <React.Fragment>
+              <React.Fragment>
+                2.3.2
+              </React.Fragment>
+            </React.Fragment>
+          </strong>
+          <React.Fragment>
+             Zijn er tijdens de stemming dingen opgeschreven die het verschil tussen D en H 
+          </React.Fragment>
+          <strong>
+            <React.Fragment>
+              <React.Fragment>
+                volledig
+              </React.Fragment>
+            </React.Fragment>
+          </strong>
+          <React.Fragment>
+             verklaren?
+          </React.Fragment>
+        </React.Fragment>,
+        "type": "checkboxes",
+      },
+    ],
+    "title": "Verschillen tussen aantal kiezers en uitgebrachte stemmen",
+  },
+  {
+    "id": "political_group_votes_1",
+    "short_title": "Lijst 1 - Vurige Vleugels Partij",
+    "subsections": [
+      {
+        "headers": [
+          "Nummer",
+          "Aantal stemmen",
+          "Kandidaat",
+        ],
+        "rows": [
+          {
+            "addSeparator": false,
+            "autoFocusInput": true,
+            "code": "1",
+            "path": "political_group_votes.0.candidate_votes.0.votes",
+            "title": "Zilverlicht, E. (Eldor)",
+          },
+          {
+            "addSeparator": false,
+            "autoFocusInput": false,
+            "code": "2",
+            "path": "political_group_votes.0.candidate_votes.1.votes",
+            "title": "Donderbrul, G. (Grom)",
+          },
+          {
+            "addSeparator": false,
+            "autoFocusInput": false,
+            "code": "3",
+            "path": "political_group_votes.0.candidate_votes.2.votes",
+            "title": "Fluisterwind, S. (Seraphina)",
+          },
+          {
+            "addSeparator": false,
+            "autoFocusInput": false,
+            "code": "4",
+            "path": "political_group_votes.0.candidate_votes.3.votes",
+            "title": "Nachtschaduw, V. (Vesper)",
+          },
+          {
+            "addSeparator": false,
+            "autoFocusInput": false,
+            "code": "5",
+            "path": "political_group_votes.0.candidate_votes.4.votes",
+            "title": "Stormvleugel, R. (Ravian)",
+          },
+          {
+            "addSeparator": false,
+            "autoFocusInput": false,
+            "code": "6",
+            "path": "political_group_votes.0.candidate_votes.5.votes",
+            "title": "Sterrenzwerver, M. (Mirella)",
+          },
+          {
+            "addSeparator": false,
+            "autoFocusInput": false,
+            "code": "7",
+            "path": "political_group_votes.0.candidate_votes.6.votes",
+            "title": "Maanfluisteraar, X. (Xander)",
+          },
+          {
+            "addSeparator": false,
+            "autoFocusInput": false,
+            "code": "8",
+            "path": "political_group_votes.0.candidate_votes.7.votes",
+            "title": "Windzanger, P. (Paxton)",
+          },
+          {
+            "addSeparator": false,
+            "autoFocusInput": false,
+            "code": "9",
+            "path": "political_group_votes.0.candidate_votes.8.votes",
+            "title": "Vuurvlinder, F. (Faelia)",
+          },
+          {
+            "addSeparator": false,
+            "autoFocusInput": false,
+            "code": "10",
+            "path": "political_group_votes.0.candidate_votes.9.votes",
+            "title": "Rotsbreker, H. (Helga)",
+          },
+          {
+            "addSeparator": false,
+            "autoFocusInput": false,
+            "code": "11",
+            "path": "political_group_votes.0.candidate_votes.10.votes",
+            "title": "Zonnewende, L. (Luna)",
+          },
+          {
+            "addSeparator": false,
+            "autoFocusInput": false,
+            "code": "12",
+            "path": "political_group_votes.0.candidate_votes.11.votes",
+            "title": "Groenhart, T. (Timo)",
+          },
+          {
+            "addSeparator": false,
+            "autoFocusInput": false,
+            "code": "13",
+            "path": "political_group_votes.0.candidate_votes.12.votes",
+            "title": "Veldbloem, N. (Naima)",
+          },
+          {
+            "addSeparator": false,
+            "autoFocusInput": false,
+            "code": "14",
+            "path": "political_group_votes.0.candidate_votes.13.votes",
+            "title": "IJzeren, V. (Vincent)",
+          },
+          {
+            "addSeparator": false,
+            "autoFocusInput": false,
+            "code": "15",
+            "path": "political_group_votes.0.candidate_votes.14.votes",
+            "title": "Blauwhof, P. (Priya)",
+          },
+          {
+            "addSeparator": false,
+            "autoFocusInput": false,
+            "code": "16",
+            "path": "political_group_votes.0.candidate_votes.15.votes",
+            "title": "Windmaker, J. (Jamal)",
+          },
+          {
+            "addSeparator": false,
+            "autoFocusInput": false,
+            "code": "17",
+            "path": "political_group_votes.0.candidate_votes.16.votes",
+            "title": "Sterrenveld, E. (Esmée)",
+          },
+          {
+            "addSeparator": false,
+            "autoFocusInput": false,
+            "code": "18",
+            "path": "political_group_votes.0.candidate_votes.17.votes",
+            "title": "Roodman, M. (Mohammed)",
+          },
+          {
+            "addSeparator": false,
+            "autoFocusInput": false,
+            "code": "19",
+            "path": "political_group_votes.0.candidate_votes.18.votes",
+            "title": "Zilverberg, C. (Chen)",
+          },
+          {
+            "addSeparator": false,
+            "autoFocusInput": false,
+            "code": "20",
+            "path": "political_group_votes.0.candidate_votes.19.votes",
+            "title": "Duinwalker, S. (Soraya)",
+          },
+          {
+            "addSeparator": false,
+            "autoFocusInput": false,
+            "code": "21",
+            "path": "political_group_votes.0.candidate_votes.20.votes",
+            "title": "Lichtveld, A. (Alex)",
+          },
+          {
+            "addSeparator": false,
+            "autoFocusInput": false,
+            "code": "22",
+            "path": "political_group_votes.0.candidate_votes.21.votes",
+            "title": "Kruidentuin, H. (Habiba)",
+          },
+          {
+            "addSeparator": false,
+            "autoFocusInput": false,
+            "code": "23",
+            "path": "political_group_votes.0.candidate_votes.22.votes",
+            "title": "Vlietstra, B. (Bram)",
+          },
+          {
+            "addSeparator": false,
+            "autoFocusInput": false,
+            "code": "24",
+            "path": "political_group_votes.0.candidate_votes.23.votes",
+            "title": "Meermin, K. (Kai)",
+          },
+          {
+            "addSeparator": true,
+            "autoFocusInput": false,
+            "code": "25",
+            "path": "political_group_votes.0.candidate_votes.24.votes",
+            "title": "Goudappel, D. (Diana)",
+          },
+          {
+            "addSeparator": false,
+            "autoFocusInput": false,
+            "code": "26",
+            "path": "political_group_votes.0.candidate_votes.25.votes",
+            "title": "Bosrank, F. (Finn)",
+          },
+          {
+            "addSeparator": false,
+            "autoFocusInput": false,
+            "code": "27",
+            "path": "political_group_votes.0.candidate_votes.26.votes",
+            "title": "Sterrenveld, J. (Julia)",
+          },
+          {
+            "addSeparator": false,
+            "autoFocusInput": false,
+            "code": "28",
+            "path": "political_group_votes.0.candidate_votes.27.votes",
+            "title": "Regenboog, G. (Giovanni)",
+          },
+          {
+            "addSeparator": false,
+            "autoFocusInput": false,
+            "code": "29",
+            "path": "political_group_votes.0.candidate_votes.28.votes",
+            "title": "Hemelrijk, M. (Milan)",
+          },
+          {
+            "isListTotal": true,
+            "path": "political_group_votes.0.total",
+            "title": "Totaal lijst 1",
+          },
+        ],
+        "type": "inputGrid",
+        "zebra": true,
+      },
+    ],
+    "title": "Lijst 1 - Vurige Vleugels Partij",
+  },
+  {
+    "id": "political_group_votes_2",
+    "short_title": "Lijst 2 - Wijzen van Water en Wind",
+    "subsections": [
+      {
+        "headers": [
+          "Nummer",
+          "Aantal stemmen",
+          "Kandidaat",
+        ],
+        "rows": [
+          {
+            "addSeparator": false,
+            "autoFocusInput": true,
+            "code": "1",
+            "path": "political_group_votes.1.candidate_votes.0.votes",
+            "title": "Foo, A. (Alice)",
+          },
+          {
+            "addSeparator": false,
+            "autoFocusInput": false,
+            "code": "2",
+            "path": "political_group_votes.1.candidate_votes.1.votes",
+            "title": "Doe, C. (Charlie)",
+          },
+          {
+            "isListTotal": true,
+            "path": "political_group_votes.1.total",
+            "title": "Totaal lijst 2",
+          },
+        ],
+        "type": "inputGrid",
+        "zebra": true,
+      },
+    ],
+    "title": "Lijst 2 - Wijzen van Water en Wind",
+  },
+]

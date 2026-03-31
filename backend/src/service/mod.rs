@@ -8,9 +8,7 @@ pub use change_committee_session_status::{
     CommitteeSessionAuditData, CommitteeSessionUpdatedAuditData, FileAuditData,
     change_committee_session_status,
 };
-pub use data_entry::{
-    DataEntryServiceError, create_empty as create_empty_data_entry, election_statuses,
-};
+pub use data_entry::{DataEntryServiceError, election_statuses};
 pub use polling_station::{
     PollingStationServiceError, list_for_session as list_polling_stations_for_session,
 };

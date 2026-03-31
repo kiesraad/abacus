@@ -27,7 +27,7 @@ use crate::{
         },
         models::{ModelNa14_2Bijlage1Input, ToPdfFileModel},
         polling_station::{PollingStation, PollingStationId},
-        results::Results,
+        results::{PollingStationResults, cso_first_session_results::CSOFirstSessionResults},
         role::Role,
         votes_table::VotesTablesWithOnlyPreviousVotes,
     },
@@ -37,7 +37,7 @@ use crate::{
         committee_session_repo, data_entry_repo::previous_results_for_polling_station,
         election_repo, investigation_repo, polling_station_repo, user_repo::User,
     },
-    service::{change_committee_session_status, create_empty_data_entry},
+    service::change_committee_session_status,
 };
 
 #[derive(Serialize)]
@@ -290,10 +290,9 @@ async fn polling_station_investigation_conclude(
         })?;
 
     let status = if request.corrected_results {
-        let ps = create_empty_data_entry(&mut tx, polling_station_id).await?;
-        let data_entry_id = ps
-            .data_entry_id()
-            .expect("create_empty_data_entry should set data_entry_id");
+        let data_entry_id = polling_station_repo::create_data_entry(&mut tx, polling_station_id)
+            .await
+            .map_err(APIError::from)?;
         current.conclude_with_new_results(request.findings, data_entry_id)?
     } else {
         let ps = polling_station_repo::get_next_session(&mut tx, polling_station_id).await?;
@@ -380,10 +379,9 @@ async fn apply_update(
         }
         // ConcludedWithNewResults: same-state text update
         (InvestigationStatus::ConcludedWithNewResults(_), Some(true)) => {
-            let ps = create_empty_data_entry(conn, polling_station_id).await?;
-            let de_id = ps
-                .data_entry_id()
-                .expect("data entry should exist after create_empty_data_entry");
+            let de_id = polling_station_repo::get_data_entry_id(conn, polling_station_id)
+                .await
+                .map_err(APIError::from)?;
             let findings = request.findings.unwrap_or_default();
             Ok(current.switch_to_with_new_results(request.reason, findings, de_id)?)
         }
@@ -479,10 +477,9 @@ async fn switch_to_with_new_results(
     current: InvestigationStatus,
     request: PollingStationInvestigationUpdateRequest,
 ) -> Result<InvestigationStatus, APIError> {
-    let ps = create_empty_data_entry(conn, polling_station_id).await?;
-    let de_id = ps
-        .data_entry_id()
-        .expect("create_empty_data_entry should set data_entry_id");
+    let de_id = polling_station_repo::create_data_entry(conn, polling_station_id)
+        .await
+        .map_err(APIError::from)?;
 
     let findings = request.findings.unwrap_or_default();
     let status = current.switch_to_with_new_results(request.reason, findings, de_id)?;
@@ -716,7 +713,7 @@ async fn polling_station_investigation_download_corrigendum_pdf(
                 }
             }
         }
-        None => Results::empty_cso_first_session(&election.political_groups),
+        None => CSOFirstSessionResults::empty(&election.political_groups).as_common(),
     };
 
     let polling_station: PollingStation = ps.into_polling_station();
@@ -728,14 +725,13 @@ async fn polling_station_investigation_download_corrigendum_pdf(
         polling_station.number
     );
 
-    let votes_tables =
-        VotesTablesWithOnlyPreviousVotes::new(&election, &previous_results.as_common())?;
+    let votes_tables = VotesTablesWithOnlyPreviousVotes::new(&election, &previous_results)?;
 
     let input = ModelNa14_2Bijlage1Input {
         votes_tables,
         election: election.into(),
         polling_station,
-        previous_results: previous_results.as_common().into(),
+        previous_results: previous_results.into(),
         investigation,
     }
     .to_pdf_file_model(name.clone());

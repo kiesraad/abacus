@@ -1,10 +1,11 @@
 #[cfg(test)]
-use super::data_entry::DataEntryServiceError;
+use crate::repository::polling_station_repo;
 
 #[cfg(test)]
 #[derive(Debug)]
 pub enum InvestigationServiceError {
     DatabaseError(sqlx::Error),
+    DataEntryAlreadyLinked,
 }
 
 #[cfg(test)]
@@ -15,10 +16,13 @@ impl From<sqlx::Error> for InvestigationServiceError {
 }
 
 #[cfg(test)]
-impl From<DataEntryServiceError> for InvestigationServiceError {
-    fn from(err: DataEntryServiceError) -> Self {
+impl From<polling_station_repo::CreateDataEntryError> for InvestigationServiceError {
+    fn from(err: polling_station_repo::CreateDataEntryError) -> Self {
         match err {
-            DataEntryServiceError::DatabaseError(e) => Self::DatabaseError(e),
+            polling_station_repo::CreateDataEntryError::Sqlx(e) => Self::DatabaseError(e),
+            polling_station_repo::CreateDataEntryError::DataEntryAlreadyLinked => {
+                Self::DataEntryAlreadyLinked
+            }
         }
     }
 }
@@ -30,8 +34,8 @@ pub async fn create_test_investigation(
     corrected_results: Option<bool>,
 ) -> Result<(), InvestigationServiceError> {
     use crate::{
-        domain::investigation::InvestigationStatus, repository::investigation_repo,
-        service::create_empty_data_entry,
+        domain::investigation::InvestigationStatus,
+        repository::{investigation_repo, polling_station_repo},
     };
 
     let status = match corrected_results {
@@ -40,10 +44,8 @@ pub async fn create_test_investigation(
             .conclude_without_new_results("Test findings".to_string(), false)
             .expect("conclude_without_new_results should succeed"),
         Some(true) => {
-            let ps = create_empty_data_entry(conn, polling_station_id).await?;
-            let data_entry_id = ps
-                .data_entry_id()
-                .expect("create_empty_data_entry should set data_entry_id");
+            let data_entry_id =
+                polling_station_repo::create_data_entry(conn, polling_station_id).await?;
             InvestigationStatus::new("Test reason".to_string())
                 .conclude_with_new_results("Test findings".to_string(), data_entry_id)
                 .expect("conclude_with_new_results should succeed")

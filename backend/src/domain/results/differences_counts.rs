@@ -970,957 +970,252 @@ mod tests {
         Ok(())
     }
 
-    /// CSO | F.304: "Vergelijk D&H": Meerdere aangevinkt of geen enkele aangevinkt
+    /// CSO | F.304 "Vergelijk D&H": Meerdere aangevinkt of geen enkele aangevinkt
     #[test]
-    fn test_f304_none_checked() -> Result<(), DataError> {
-        // Only 1 checked: D = H checked & D = H
-        let mut data = DifferencesCounts::zero();
+    fn test_f304() -> Result<(), DataError> {
+        let f304 = ValidationResult {
+            code: ValidationResultCode::F304,
+            fields: vec!["differences_counts.compare_votes_cast_admitted_voters".into()],
+            context: None,
+        };
 
-        data.compare_votes_cast_admitted_voters
-            .admitted_voters_equal_votes_cast = true;
-        data.difference_completely_accounted_for = YesNo::yes();
+        // (description, equal, greater, smaller, expect_f304)
+        let cases = vec![
+            ("none checked", false, false, false, true),
+            ("only equal", true, false, false, false),
+            ("only greater", false, true, false, false),
+            ("only smaller", false, false, true, false),
+            ("equal + greater", true, true, false, true),
+            ("equal + smaller", true, false, true, true),
+            ("greater + smaller", false, true, true, true),
+            ("all checked", true, true, true, true),
+        ];
 
-        let validation_results = validate(data, 105, 105)?;
+        for (description, equal, greater, smaller, expect_f304) in cases {
+            let mut data = DifferencesCounts::zero();
+            data.compare_votes_cast_admitted_voters
+                .admitted_voters_equal_votes_cast = equal;
+            data.compare_votes_cast_admitted_voters
+                .votes_cast_greater_than_admitted_voters = greater;
+            data.compare_votes_cast_admitted_voters
+                .votes_cast_smaller_than_admitted_voters = smaller;
 
-        assert!(validation_results.errors.is_empty());
-
-        // None checked
-        let mut data = DifferencesCounts::zero();
-
-        data.difference_completely_accounted_for = YesNo::yes();
-
-        let validation_results = validate(data, 105, 105)?;
-
-        assert_eq!(
-            validation_results.errors,
-            [ValidationResult {
-                code: ValidationResultCode::F304,
-                fields: vec!["differences_counts.compare_votes_cast_admitted_voters".into(),],
-                context: None,
-            }]
-        );
-
-        Ok(())
-    }
-
-    /// CSO | F.304: "Vergelijk D&H": Meerdere aangevinkt of geen enkele aangevinkt
-    #[test]
-    fn test_f304_multiple_checked() -> Result<(), DataError> {
-        // Multiple (not all) checked
-        let mut data = DifferencesCounts::zero();
-
-        data.compare_votes_cast_admitted_voters
-            .admitted_voters_equal_votes_cast = true;
-        data.compare_votes_cast_admitted_voters
-            .votes_cast_smaller_than_admitted_voters = true;
-        data.difference_completely_accounted_for = YesNo::yes();
-
-        let validation_results = validate(data, 105, 104)?;
-
-        assert_eq!(
-            validation_results.errors,
-            [ValidationResult {
-                code: ValidationResultCode::F301,
-                fields: vec![
-                    "differences_counts.compare_votes_cast_admitted_voters.admitted_voters_equal_votes_cast".into(),
-                ],
-                context: None,
-            }, ValidationResult {
-                code: ValidationResultCode::F304,
-                fields: vec![
-                    "differences_counts.compare_votes_cast_admitted_voters".into(),
-                ],
-                context: None,
-            },
-                ValidationResult {
-                    code: ValidationResultCode::F308,
-                    fields: vec![
-                        "differences_counts.fewer_ballots_count".into(),
-                    ],
-                    context: None,
-                }]
-        );
-
-        Ok(())
-    }
-
-    /// CSO | F.304: "Vergelijk D&H": Meerdere aangevinkt of geen enkele aangevinkt
-    #[test]
-    fn test_f304_all_checked() -> Result<(), DataError> {
-        // All checked
-        let mut data = DifferencesCounts::zero();
-
-        data.compare_votes_cast_admitted_voters
-            .admitted_voters_equal_votes_cast = true;
-        data.compare_votes_cast_admitted_voters
-            .votes_cast_greater_than_admitted_voters = true;
-        data.compare_votes_cast_admitted_voters
-            .votes_cast_smaller_than_admitted_voters = true;
-        data.difference_completely_accounted_for = YesNo::yes();
-
-        let validation_results = validate(data, 105, 104)?;
-
-        assert_eq!(
-            validation_results.errors,
-            [ValidationResult {
-                code: ValidationResultCode::F301,
-                fields: vec![
-                    "differences_counts.compare_votes_cast_admitted_voters.admitted_voters_equal_votes_cast".into(),
-                ],
-                context: None,
-            },
-                ValidationResult {
-                    code: ValidationResultCode::F302,
-                    fields: vec![
-                        "differences_counts.compare_votes_cast_admitted_voters.votes_cast_greater_than_admitted_voters".into(),
-                    ],
-                    context: None,
-                },
-                ValidationResult {
-                    code: ValidationResultCode::F304,
-                    fields: vec![
-                        "differences_counts.compare_votes_cast_admitted_voters".into(),
-                    ],
-                    context: None,
-                },
-                ValidationResult {
-                    code: ValidationResultCode::F308,
-                    fields: vec![
-                        "differences_counts.fewer_ballots_count".into(),
-                    ],
-                    context: None,
-                }]
-        );
+            let result = validate(data, 52, 52)?;
+            let has_f304 = result.errors.iter().any(|e| e == &f304);
+            assert_eq!(has_f304, expect_f304, "Failed: {description}");
+        }
 
         Ok(())
     }
 
     /// CSO | F.305 (Als D = H) I en/of J zijn ingevuld
     #[test]
-    fn test_f305_more_ballots_count() -> Result<(), DataError> {
-        // D = H & I is filled in
-        let mut data = DifferencesCounts::zero();
+    fn test_f305() -> Result<(), DataError> {
+        // (description, H=votes, D=voters, I=more_ballots, J=fewer_ballots, expect_f305, expected_fields)
+        type Case = (&'static str, u32, u32, u32, u32, bool, Vec<&'static str>);
+        #[rustfmt::skip]
+        let cases: Vec<Case> = vec![
+            ("H = D, I = 0, J = 0", 52, 52, 0, 0, false, vec![]),
+            ("H = D, I > 0, J = 0", 52, 52, 4, 0, true,  vec!["differences_counts.more_ballots_count"]),
+            ("H = D, I = 0, J > 0", 52, 52, 0, 4, true,  vec!["differences_counts.fewer_ballots_count"]),
+            ("H = D, I > 0, J > 0", 52, 52, 4, 4, true,  vec!["differences_counts.more_ballots_count", "differences_counts.fewer_ballots_count"]),
+            ("H > D, I > 0, J = 0", 72, 52, 4, 0, false, vec![]),
+            ("H > D, I = 0, J > 0", 72, 52, 0, 4, false, vec![]),
+            ("H < D, I > 0, J = 0", 52, 72, 4, 0, false, vec![]),
+            ("H < D, I = 0, J > 0", 52, 72, 0, 4, false, vec![]),
+        ];
 
-        data.more_ballots_count = 4;
-        data.compare_votes_cast_admitted_voters
-            .admitted_voters_equal_votes_cast = true;
-        data.difference_completely_accounted_for = YesNo::yes();
+        for (
+            description,
+            votes,
+            voters,
+            more_ballots,
+            fewer_ballots,
+            expect_f305,
+            expected_fields,
+        ) in cases
+        {
+            let mut data = DifferencesCounts::zero();
+            data.more_ballots_count = more_ballots;
+            data.fewer_ballots_count = fewer_ballots;
 
-        let validation_results = validate(data, 52, 52)?;
-
-        assert_eq!(
-            validation_results.errors,
-            [ValidationResult {
+            let result = validate(data, voters, votes)?;
+            let expected_f305 = ValidationResult {
                 code: ValidationResultCode::F305,
-                fields: vec!["differences_counts.more_ballots_count".into()],
+                fields: expected_fields.iter().map(|&f| f.into()).collect(),
                 context: None,
-            }]
-        );
+            };
 
-        Ok(())
-    }
-
-    /// CSO | F.305 (Als D = H) I en/of J zijn ingevuld
-    #[test]
-    fn test_f305_fewer_ballots_count() -> Result<(), DataError> {
-        // D = H & J is filled in
-        let mut data = DifferencesCounts::zero();
-
-        data.fewer_ballots_count = 4;
-        data.compare_votes_cast_admitted_voters
-            .admitted_voters_equal_votes_cast = true;
-        data.difference_completely_accounted_for = YesNo::yes();
-
-        let validation_results = validate(data, 52, 52)?;
-
-        assert_eq!(
-            validation_results.errors,
-            [ValidationResult {
-                code: ValidationResultCode::F305,
-                fields: vec!["differences_counts.fewer_ballots_count".into()],
-                context: None,
-            }]
-        );
-
-        Ok(())
-    }
-
-    /// CSO | F.305 (Als D = H) I en/of J zijn ingevuld
-    #[test]
-    fn test_f305_more_and_fewer_ballots_count_not_filled() -> Result<(), DataError> {
-        // D = H & I and J not filled in
-        let mut data = DifferencesCounts::zero();
-
-        data.compare_votes_cast_admitted_voters
-            .admitted_voters_equal_votes_cast = true;
-        data.difference_completely_accounted_for = YesNo::yes();
-
-        let validation_results = validate(data, 52, 52)?;
-
-        assert!(validation_results.errors.is_empty());
-
-        // D < H & I and J not filled in (make sure no F.305 error is triggered)
-        let mut data = DifferencesCounts::zero();
-
-        data.compare_votes_cast_admitted_voters
-            .admitted_voters_equal_votes_cast = true;
-        data.difference_completely_accounted_for = YesNo::yes();
-
-        let validation_results = validate(data, 52, 53)?;
-
-        assert_eq!(
-            validation_results.errors,
-            [
-                ValidationResult {
-                    code: ValidationResultCode::F301,
-                    fields: vec!["differences_counts.compare_votes_cast_admitted_voters.admitted_voters_equal_votes_cast".into()],
-                    context: None,
-                },
-                ValidationResult {
-                    code: ValidationResultCode::F306,
-                    fields: vec!["differences_counts.more_ballots_count".into()],
-                    context: None,
-                }
-            ]
-        );
-
-        // D > H & I and J not filled in (make sure no F.305 error is triggered)
-        let mut data = DifferencesCounts::zero();
-
-        data.compare_votes_cast_admitted_voters
-            .admitted_voters_equal_votes_cast = true;
-        data.difference_completely_accounted_for = YesNo::yes();
-
-        let validation_results = validate(data, 53, 52)?;
-
-        assert_eq!(
-            validation_results.errors,
-            [
-                ValidationResult {
-                    code: ValidationResultCode::F301,
-                    fields: vec!["differences_counts.compare_votes_cast_admitted_voters.admitted_voters_equal_votes_cast".into()],
-                    context: None,
-                },
-                ValidationResult {
-                    code: ValidationResultCode::F308,
-                    fields: vec!["differences_counts.fewer_ballots_count".into()],
-                    context: None,
-                }
-            ]
-        );
-
-        Ok(())
-    }
-
-    #[test]
-    fn test_f305_more_and_fewer_ballots_count_both_filled() -> Result<(), DataError> {
-        // D = H & I and J filled in
-        let mut data = DifferencesCounts::zero();
-
-        data.more_ballots_count = 4;
-        data.fewer_ballots_count = 4;
-        data.compare_votes_cast_admitted_voters
-            .admitted_voters_equal_votes_cast = true;
-        data.difference_completely_accounted_for = YesNo::yes();
-
-        let validation_results = validate(data, 52, 52)?;
-
-        assert_eq!(
-            validation_results.errors,
-            [ValidationResult {
-                code: ValidationResultCode::F305,
-                fields: vec![
-                    "differences_counts.more_ballots_count".into(),
-                    "differences_counts.fewer_ballots_count".into()
-                ],
-                context: None,
-            }]
-        );
+            let has_f305 = result.errors.iter().any(|e| e == &expected_f305);
+            assert_eq!(has_f305, expect_f305, "Failed: {description}");
+        }
 
         Ok(())
     }
 
     /// CSO | F.306 (Als H > D) I <> H - D
     #[test]
-    fn test_f306_votes_greater_than_voters() -> Result<(), DataError> {
-        // H > D & I = H - D
-        let mut data = DifferencesCounts::zero();
+    fn test_f306() -> Result<(), DataError> {
+        let f306 = ValidationResult {
+            code: ValidationResultCode::F306,
+            fields: vec!["differences_counts.more_ballots_count".into()],
+            context: None,
+        };
 
-        data.more_ballots_count = 20;
-        data.compare_votes_cast_admitted_voters
-            .votes_cast_greater_than_admitted_voters = true;
-        data.difference_completely_accounted_for = YesNo::yes();
+        // (description, H=votes, D=voters, I=more_ballots, expect_f306)
+        let cases = vec![
+            ("H > D, I = H - D", 72, 52, 20, false),
+            ("H > D, I < H - D", 72, 52, 4, true),
+            ("H > D, I > H - D", 72, 52, 24, true),
+            ("H = D, I = H - D", 52, 52, 0, false),
+            ("H = D, I > H - D", 52, 52, 4, false),
+            ("H < D, I > H - D", 52, 72, 42, false),
+        ];
 
-        let validation_results = validate(data, 52, 72)?;
+        for (description, votes, voters, more_ballots, expect_f306) in cases {
+            let mut data = DifferencesCounts::zero();
+            data.more_ballots_count = more_ballots;
 
-        assert!(validation_results.errors.is_empty());
-
-        Ok(())
-    }
-
-    /// CSO | F.306 (Als H > D) I <> H - D
-    #[test]
-    fn test_f306_votes_equals_voters() -> Result<(), DataError> {
-        // H = D & I < H - D
-        let mut data = DifferencesCounts::zero();
-
-        data.more_ballots_count = 10;
-        data.compare_votes_cast_admitted_voters
-            .admitted_voters_equal_votes_cast = true;
-        data.difference_completely_accounted_for = YesNo::yes();
-
-        let validation_results = validate(data, 52, 52)?;
-
-        assert_eq!(
-            validation_results.errors,
-            [ValidationResult {
-                code: ValidationResultCode::F305,
-                fields: vec!["differences_counts.more_ballots_count".into()],
-                context: None,
-            }]
-        );
-
-        // H = D & I > H - D
-        let mut data = DifferencesCounts::zero();
-
-        data.more_ballots_count = 30;
-        data.compare_votes_cast_admitted_voters
-            .admitted_voters_equal_votes_cast = true;
-        data.difference_completely_accounted_for = YesNo::yes();
-
-        let validation_results = validate(data, 52, 52)?;
-
-        assert_eq!(
-            validation_results.errors,
-            [ValidationResult {
-                code: ValidationResultCode::F305,
-                fields: vec!["differences_counts.more_ballots_count".into()],
-                context: None,
-            }]
-        );
-
-        Ok(())
-    }
-
-    /// CSO | F.306 (Als H > D) I <> H - D
-    #[test]
-    fn test_f306_votes_smaller_than_voters() -> Result<(), DataError> {
-        // H < D & I > H - D
-        let mut data = DifferencesCounts::zero();
-
-        data.more_ballots_count = 30;
-        data.compare_votes_cast_admitted_voters
-            .votes_cast_smaller_than_admitted_voters = true;
-        data.difference_completely_accounted_for = YesNo::yes();
-
-        let validation_results = validate(data, 72, 52)?;
-
-        assert_eq!(
-            validation_results.errors,
-            [
-                ValidationResult {
-                    code: ValidationResultCode::F308,
-                    fields: vec!["differences_counts.fewer_ballots_count".into()],
-                    context: None,
-                },
-                ValidationResult {
-                    code: ValidationResultCode::F309,
-                    fields: vec![
-                        "differences_counts.more_ballots_count".into(),
-                        "differences_counts.fewer_ballots_count".into()
-                    ],
-                    context: None,
-                }
-            ]
-        );
-
-        // H < D & I < H - D
-        let mut data = DifferencesCounts::zero();
-
-        data.more_ballots_count = 4;
-        data.compare_votes_cast_admitted_voters
-            .votes_cast_smaller_than_admitted_voters = true;
-        data.difference_completely_accounted_for = YesNo::yes();
-
-        let validation_results = validate(data, 72, 52)?;
-
-        assert_eq!(
-            validation_results.errors,
-            [
-                ValidationResult {
-                    code: ValidationResultCode::F308,
-                    fields: vec!["differences_counts.fewer_ballots_count".into()],
-                    context: None,
-                },
-                ValidationResult {
-                    code: ValidationResultCode::F309,
-                    fields: vec![
-                        "differences_counts.more_ballots_count".into(),
-                        "differences_counts.fewer_ballots_count".into()
-                    ],
-                    context: None,
-                }
-            ]
-        );
-
-        Ok(())
-    }
-
-    /// CSO | F.306 (Als H > D) I <> H - D
-    #[test]
-    fn test_f306_error() -> Result<(), DataError> {
-        // H > D & I < H - D
-        let mut data = DifferencesCounts::zero();
-
-        data.more_ballots_count = 4;
-        data.compare_votes_cast_admitted_voters
-            .votes_cast_greater_than_admitted_voters = true;
-        data.difference_completely_accounted_for = YesNo::yes();
-
-        let validation_results = validate(data, 52, 72)?;
-
-        assert_eq!(
-            validation_results.errors,
-            [ValidationResult {
-                code: ValidationResultCode::F306,
-                fields: vec!["differences_counts.more_ballots_count".into()],
-                context: None,
-            }]
-        );
-
-        // H > D & I > H - D
-        let mut data = DifferencesCounts::zero();
-
-        data.more_ballots_count = 24;
-        data.compare_votes_cast_admitted_voters
-            .votes_cast_greater_than_admitted_voters = true;
-        data.difference_completely_accounted_for = YesNo::yes();
-
-        let validation_results = validate(data, 52, 72)?;
-
-        assert_eq!(
-            validation_results.errors,
-            [ValidationResult {
-                code: ValidationResultCode::F306,
-                fields: vec!["differences_counts.more_ballots_count".into()],
-                context: None,
-            }]
-        );
+            let result = validate(data, voters, votes)?;
+            let has_f306 = result.errors.iter().any(|e| e == &f306);
+            assert_eq!(has_f306, expect_f306, "Failed: {description}");
+        }
 
         Ok(())
     }
 
     /// CSO | F.307 (Als H > D) J is ingevuld
     #[test]
-    fn test_f307_votes_greater_than_voters_fewer_ballots_count_zero() -> Result<(), DataError> {
-        // H > D & J == 0
-        let mut data = DifferencesCounts::zero();
+    fn test_f307() -> Result<(), DataError> {
+        let f307 = ValidationResult {
+            code: ValidationResultCode::F307,
+            fields: vec![
+                "differences_counts.more_ballots_count".into(),
+                "differences_counts.fewer_ballots_count".into(),
+            ],
+            context: None,
+        };
 
-        data.compare_votes_cast_admitted_voters
-            .votes_cast_greater_than_admitted_voters = true;
-        data.difference_completely_accounted_for = YesNo::yes();
+        // (description, H=votes, D=voters, J=fewer_ballots, expect_f307)
+        let cases = vec![
+            ("H > D, J = 0", 72, 52, 0, false),
+            ("H > D, J > 0", 72, 52, 3, true),
+            ("H = D, J = 0", 52, 52, 0, false),
+            ("H = D, J > 0", 52, 52, 3, false),
+            ("H < D, J = 0", 52, 72, 0, false),
+            ("H < D, J > 0", 52, 72, 3, false),
+        ];
 
-        let validation_results = validate(data, 52, 62)?;
+        for (description, votes, voters, fewer_ballots, expect_f307) in cases {
+            let mut data = DifferencesCounts::zero();
+            data.fewer_ballots_count = fewer_ballots;
 
-        assert_eq!(
-            validation_results.errors,
-            [ValidationResult {
-                code: ValidationResultCode::F306,
-                fields: vec!["differences_counts.more_ballots_count".into()],
-                context: None,
-            }]
-        );
-
-        Ok(())
-    }
-
-    #[test]
-    fn test_f307_votes_greater_than_voters_fewer_ballots_count_filled() -> Result<(), DataError> {
-        // H > D & J < 0
-        let mut data = DifferencesCounts::zero();
-
-        data.fewer_ballots_count = 3;
-        data.compare_votes_cast_admitted_voters
-            .votes_cast_greater_than_admitted_voters = true;
-        data.difference_completely_accounted_for = YesNo::yes();
-
-        let validation_results = validate(data, 52, 62)?;
-
-        assert_eq!(
-            validation_results.errors,
-            [
-                ValidationResult {
-                    code: ValidationResultCode::F306,
-                    fields: vec!["differences_counts.more_ballots_count".into()],
-                    context: None,
-                },
-                ValidationResult {
-                    code: ValidationResultCode::F307,
-                    fields: vec![
-                        "differences_counts.more_ballots_count".into(),
-                        "differences_counts.fewer_ballots_count".into()
-                    ],
-                    context: None,
-                }
-            ]
-        );
-
-        // H > D & J > 0
-        let mut data = DifferencesCounts::zero();
-
-        data.fewer_ballots_count = 30;
-        data.compare_votes_cast_admitted_voters
-            .votes_cast_greater_than_admitted_voters = true;
-        data.difference_completely_accounted_for = YesNo::yes();
-
-        let validation_results = validate(data, 52, 62)?;
-
-        assert_eq!(
-            validation_results.errors,
-            [
-                ValidationResult {
-                    code: ValidationResultCode::F306,
-                    fields: vec!["differences_counts.more_ballots_count".into()],
-                    context: None,
-                },
-                ValidationResult {
-                    code: ValidationResultCode::F307,
-                    fields: vec![
-                        "differences_counts.more_ballots_count".into(),
-                        "differences_counts.fewer_ballots_count".into()
-                    ],
-                    context: None,
-                }
-            ]
-        );
-
-        Ok(())
-    }
-
-    /// CSO | F.307 (Als H > D) J is ingevuld
-    #[test]
-    fn test_f307_votes_equals_voters() -> Result<(), DataError> {
-        // H = D & J < 0
-        let mut data = DifferencesCounts::zero();
-
-        data.fewer_ballots_count = 3;
-        data.compare_votes_cast_admitted_voters
-            .admitted_voters_equal_votes_cast = true;
-        data.difference_completely_accounted_for = YesNo::yes();
-
-        let validation_results = validate(data, 52, 52)?;
-
-        assert_eq!(
-            validation_results.errors,
-            [ValidationResult {
-                code: ValidationResultCode::F305,
-                fields: vec!["differences_counts.fewer_ballots_count".into()],
-                context: None,
-            }]
-        );
-
-        Ok(())
-    }
-
-    /// CSO | F.307 (Als H > D) J is ingevuld
-    #[test]
-    fn test_f307_votes_smaller_than_voters() -> Result<(), DataError> {
-        // H = D & J > 0
-        let mut data = DifferencesCounts::zero();
-
-        data.fewer_ballots_count = 3;
-        data.compare_votes_cast_admitted_voters
-            .votes_cast_smaller_than_admitted_voters = true;
-        data.difference_completely_accounted_for = YesNo::yes();
-
-        let validation_results = validate(data, 62, 52)?;
-
-        assert_eq!(
-            validation_results.errors,
-            [ValidationResult {
-                code: ValidationResultCode::F308,
-                fields: vec!["differences_counts.fewer_ballots_count".into()],
-                context: None,
-            }]
-        );
+            let result = validate(data, voters, votes)?;
+            let has_f307 = result.errors.iter().any(|e| e == &f307);
+            assert_eq!(has_f307, expect_f307, "Failed: {description}");
+        }
 
         Ok(())
     }
 
     /// CSO | F.308 (Als H < D) J <> D - H
     #[test]
-    fn test_f308_votes_smaller_than_voters() -> Result<(), DataError> {
-        // H < D & J = D - H
-        let mut data = DifferencesCounts::zero();
+    fn test_f308() -> Result<(), DataError> {
+        let f308 = ValidationResult {
+            code: ValidationResultCode::F308,
+            fields: vec!["differences_counts.fewer_ballots_count".into()],
+            context: None,
+        };
 
-        data.fewer_ballots_count = 2;
-        data.compare_votes_cast_admitted_voters
-            .votes_cast_smaller_than_admitted_voters = true;
-        data.difference_completely_accounted_for = YesNo::yes();
+        // (description, H=votes, D=voters, J=fewer_ballots, expect_f308)
+        let cases = vec![
+            ("H < D, J = D - H", 52, 72, 20, false),
+            ("H < D, J < D - H", 52, 72, 4, true),
+            ("H < D, J > D - H", 52, 72, 24, true),
+            ("H = D, J = D - H", 52, 52, 0, false),
+            ("H = D, J > D - H", 52, 52, 4, false),
+            ("H > D, J > D - H", 72, 52, 42, false),
+        ];
 
-        let validation_results = validate(data, 46, 44)?;
+        for (description, votes, voters, fewer_ballots, expect_f308) in cases {
+            let mut data = DifferencesCounts::zero();
+            data.fewer_ballots_count = fewer_ballots;
 
-        assert!(validation_results.errors.is_empty());
-
-        // H < D & J < D - H
-        let mut data = DifferencesCounts::zero();
-
-        data.fewer_ballots_count = 1;
-        data.compare_votes_cast_admitted_voters
-            .votes_cast_smaller_than_admitted_voters = true;
-        data.difference_completely_accounted_for = YesNo::yes();
-
-        let validation_results = validate(data, 46, 44)?;
-
-        assert_eq!(
-            validation_results.errors,
-            [ValidationResult {
-                code: ValidationResultCode::F308,
-                fields: vec!["differences_counts.fewer_ballots_count".into()],
-                context: None,
-            }]
-        );
-
-        // H < D & J > D - H
-        let mut data = DifferencesCounts::zero();
-
-        data.fewer_ballots_count = 5;
-        data.compare_votes_cast_admitted_voters
-            .votes_cast_smaller_than_admitted_voters = true;
-        data.difference_completely_accounted_for = YesNo::yes();
-
-        let validation_results = validate(data, 46, 44)?;
-
-        assert_eq!(
-            validation_results.errors,
-            [ValidationResult {
-                code: ValidationResultCode::F308,
-                fields: vec!["differences_counts.fewer_ballots_count".into()],
-                context: None,
-            }]
-        );
-
-        Ok(())
-    }
-
-    /// CSO | F.308 (Als H < D) J <> D - H
-    #[test]
-    fn test_f308_votes_equals_voters() -> Result<(), DataError> {
-        // H = D & J > D - H
-        let mut data = DifferencesCounts::zero();
-
-        data.fewer_ballots_count = 5;
-        data.compare_votes_cast_admitted_voters
-            .votes_cast_smaller_than_admitted_voters = true;
-        data.difference_completely_accounted_for = YesNo::yes();
-
-        let validation_results = validate(data, 44, 44)?;
-
-        assert_eq!(
-            validation_results.errors,
-            [ValidationResult {
-                code: ValidationResultCode::F303,
-                fields: vec!["differences_counts.compare_votes_cast_admitted_voters.votes_cast_smaller_than_admitted_voters".into()],
-                context: None,
-            }, ValidationResult {
-                code: ValidationResultCode::F305,
-                fields: vec!["differences_counts.fewer_ballots_count".into()],
-                context: None,
-            }]
-        );
+            let result = validate(data, voters, votes)?;
+            let has_f308 = result.errors.iter().any(|e| e == &f308);
+            assert_eq!(has_f308, expect_f308, "Failed: {description}");
+        }
 
         Ok(())
     }
 
     /// CSO | F.309 (Als H < D) I is ingevuld
     #[test]
-    fn test_f309_votes_smaller_than_voters() -> Result<(), DataError> {
-        // H < D & I = 0
-        let mut data = DifferencesCounts::zero();
+    fn test_f309() -> Result<(), DataError> {
+        let f309 = ValidationResult {
+            code: ValidationResultCode::F309,
+            fields: vec![
+                "differences_counts.more_ballots_count".into(),
+                "differences_counts.fewer_ballots_count".into(),
+            ],
+            context: None,
+        };
 
-        data.compare_votes_cast_admitted_voters
-            .votes_cast_smaller_than_admitted_voters = true;
-        data.difference_completely_accounted_for = YesNo::yes();
+        // (description, H=votes, D=voters, I=more_ballots, expect_f309)
+        let cases = vec![
+            ("H < D, I = 0", 52, 72, 0, false),
+            ("H < D, I > 0", 52, 72, 3, true),
+            ("H = D, I = 0", 52, 52, 0, false),
+            ("H = D, I > 0", 52, 52, 3, false),
+            ("H > D, I = 0", 72, 52, 0, false),
+            ("H > D, I > 0", 72, 52, 3, false),
+        ];
 
-        let validation_results = validate(data, 48, 44)?;
+        for (description, votes, voters, more_ballots, expect_f309) in cases {
+            let mut data = DifferencesCounts::zero();
+            data.more_ballots_count = more_ballots;
 
-        assert_eq!(
-            validation_results.errors,
-            [ValidationResult {
-                code: ValidationResultCode::F308,
-                fields: vec!["differences_counts.fewer_ballots_count".into(),],
-                context: None,
-            }]
-        );
-
-        // H < D & I > 0
-        let mut data = DifferencesCounts::zero();
-
-        data.more_ballots_count = 5;
-        data.compare_votes_cast_admitted_voters
-            .votes_cast_smaller_than_admitted_voters = true;
-        data.difference_completely_accounted_for = YesNo::yes();
-
-        let validation_results = validate(data, 48, 44)?;
-
-        assert_eq!(
-            validation_results.errors,
-            [
-                ValidationResult {
-                    code: ValidationResultCode::F308,
-                    fields: vec!["differences_counts.fewer_ballots_count".into(),],
-                    context: None,
-                },
-                ValidationResult {
-                    code: ValidationResultCode::F309,
-                    fields: vec![
-                        "differences_counts.more_ballots_count".into(),
-                        "differences_counts.fewer_ballots_count".into()
-                    ],
-                    context: None,
-                }
-            ]
-        );
-
-        Ok(())
-    }
-
-    /// CSO | F.309 (Als H < D) I is ingevuld
-    #[test]
-    fn test_f309_votes_equals_voters() -> Result<(), DataError> {
-        // H = D & I > 0
-        let mut data = DifferencesCounts::zero();
-
-        data.more_ballots_count = 3;
-        data.compare_votes_cast_admitted_voters
-            .votes_cast_smaller_than_admitted_voters = true;
-        data.difference_completely_accounted_for = YesNo::yes();
-
-        let validation_results = validate(data, 44, 44)?;
-
-        assert_eq!(
-            validation_results.errors,
-            [
-                ValidationResult {
-                    code: ValidationResultCode::F303,
-                    fields: vec!["differences_counts.compare_votes_cast_admitted_voters.votes_cast_smaller_than_admitted_voters".into()],
-                    context: None,
-                },
-                ValidationResult {
-                    code: ValidationResultCode::F305,
-                    fields: vec!["differences_counts.more_ballots_count".into()],
-                    context: None,
-                }
-            ]
-        );
-
-        Ok(())
-    }
-
-    /// CSO | F.309 (Als H < D) I is ingevuld
-    #[test]
-    fn test_f309_votes_greater_than_voters() -> Result<(), DataError> {
-        // H < D & I = 0
-        let mut data = DifferencesCounts::zero();
-
-        data.compare_votes_cast_admitted_voters
-            .votes_cast_smaller_than_admitted_voters = true;
-        data.difference_completely_accounted_for = YesNo::yes();
-
-        let validation_results = validate(data, 48, 44)?;
-
-        assert_eq!(
-            validation_results.errors,
-            [ValidationResult {
-                code: ValidationResultCode::F308,
-                fields: vec!["differences_counts.fewer_ballots_count".into(),],
-                context: None,
-            }]
-        );
-
-        // H < D & I > 0
-        let mut data = DifferencesCounts::zero();
-
-        data.more_ballots_count = 5;
-        data.compare_votes_cast_admitted_voters
-            .votes_cast_smaller_than_admitted_voters = true;
-        data.difference_completely_accounted_for = YesNo::yes();
-
-        let validation_results = validate(data, 48, 44)?;
-
-        assert_eq!(
-            validation_results.errors,
-            [
-                ValidationResult {
-                    code: ValidationResultCode::F308,
-                    fields: vec!["differences_counts.fewer_ballots_count".into(),],
-                    context: None,
-                },
-                ValidationResult {
-                    code: ValidationResultCode::F309,
-                    fields: vec![
-                        "differences_counts.more_ballots_count".into(),
-                        "differences_counts.fewer_ballots_count".into()
-                    ],
-                    context: None,
-                }
-            ]
-        );
+            let result = validate(data, voters, votes)?;
+            let has_f309 = result.errors.iter().any(|e| e == &f309);
+            assert_eq!(has_f309, expect_f309, "Failed: {description}");
+        }
 
         Ok(())
     }
 
     /// CSO | F.310 (Als D <> H en verklaring voor verschil niks aangevinkt of 'ja' en 'nee' aangevinkt)
     #[test]
-    fn test_f310_one_checked() -> Result<(), DataError> {
-        // D < H & difference_completely_accounted_for.yes checked
-        let mut data = DifferencesCounts::zero();
+    fn test_f310() -> Result<(), DataError> {
+        let f310 = ValidationResult {
+            code: ValidationResultCode::F310,
+            fields: vec!["differences_counts.difference_completely_accounted_for".into()],
+            context: None,
+        };
 
-        data.more_ballots_count = 4;
-        data.compare_votes_cast_admitted_voters
-            .votes_cast_greater_than_admitted_voters = true;
-        data.difference_completely_accounted_for = YesNo::yes();
+        // (description, H=votes, D=voters, accounted_for, expect_f310)
+        let cases = vec![
+            ("H > D, yes", 72, 52, YesNo::yes(), false),
+            ("H > D, no", 72, 52, YesNo::no(), false),
+            ("H > D, empty", 72, 52, YesNo::default(), true),
+            ("H > D, both", 72, 52, YesNo::both(), true),
+            ("H < D, yes", 52, 72, YesNo::yes(), false),
+            ("H < D, no", 52, 72, YesNo::no(), false),
+            ("H < D, empty", 52, 72, YesNo::default(), true),
+            ("H < D, both", 52, 72, YesNo::both(), true),
+            ("H = D, yes", 52, 52, YesNo::yes(), false),
+            ("H = D, no", 52, 52, YesNo::no(), false),
+            ("H = D, empty", 52, 52, YesNo::default(), false),
+            ("H = D, both", 52, 52, YesNo::both(), false),
+        ];
 
-        let validation_results = validate(data, 44, 48)?;
+        for (description, votes, voters, accounted_for, expect_f310) in cases {
+            let mut data = DifferencesCounts::zero();
+            data.difference_completely_accounted_for = accounted_for;
 
-        assert!(validation_results.errors.is_empty());
-
-        // D > H & difference_completely_accounted_for.yes checked
-        let mut data = DifferencesCounts::zero();
-
-        data.fewer_ballots_count = 4;
-        data.compare_votes_cast_admitted_voters
-            .votes_cast_smaller_than_admitted_voters = true;
-        data.difference_completely_accounted_for = YesNo::yes();
-
-        let validation_results = validate(data, 48, 44)?;
-
-        assert!(validation_results.errors.is_empty());
-
-        // D < H & difference_completely_accounted_for.no checked
-        let mut data = DifferencesCounts::zero();
-
-        data.more_ballots_count = 4;
-        data.compare_votes_cast_admitted_voters
-            .votes_cast_greater_than_admitted_voters = true;
-        data.difference_completely_accounted_for = YesNo::no();
-
-        let validation_results = validate(data, 44, 48)?;
-
-        assert!(validation_results.errors.is_empty());
-
-        // D > H & difference_completely_accounted_for.no checked
-        let mut data = DifferencesCounts::zero();
-
-        data.fewer_ballots_count = 4;
-        data.compare_votes_cast_admitted_voters
-            .votes_cast_smaller_than_admitted_voters = true;
-        data.difference_completely_accounted_for = YesNo::no();
-
-        let validation_results = validate(data, 48, 44)?;
-
-        assert!(validation_results.errors.is_empty());
-
-        Ok(())
-    }
-
-    /// CSO | F.310 (Als D <> H en verklaring voor verschil niks aangevinkt of 'ja' en 'nee' aangevinkt)
-    #[test]
-    fn test_f310_none_checked() -> Result<(), DataError> {
-        // D < H & difference_completely_accounted_for none checked
-        let mut data = DifferencesCounts::zero();
-
-        data.more_ballots_count = 4;
-        data.compare_votes_cast_admitted_voters
-            .votes_cast_smaller_than_admitted_voters = true;
-
-        let validation_results = validate(data, 48, 44)?;
-
-        assert_eq!(
-            validation_results.errors,
-            [
-                ValidationResult {
-                    code: ValidationResultCode::F308,
-                    fields: vec!["differences_counts.fewer_ballots_count".into(),],
-                    context: None,
-                },
-                ValidationResult {
-                    code: ValidationResultCode::F309,
-                    fields: vec![
-                        "differences_counts.more_ballots_count".into(),
-                        "differences_counts.fewer_ballots_count".into(),
-                    ],
-                    context: None,
-                },
-                ValidationResult {
-                    code: ValidationResultCode::F310,
-                    fields: vec!["differences_counts.difference_completely_accounted_for".into(),],
-                    context: None,
-                }
-            ]
-        );
-
-        // D > H & difference_completely_accounted_for none checked
-        let mut data = DifferencesCounts::zero();
-
-        data.more_ballots_count = 4;
-        data.compare_votes_cast_admitted_voters
-            .votes_cast_greater_than_admitted_voters = true;
-
-        let validation_results = validate(data, 44, 48)?;
-
-        assert_eq!(
-            validation_results.errors,
-            [ValidationResult {
-                code: ValidationResultCode::F310,
-                fields: vec!["differences_counts.difference_completely_accounted_for".into()],
-                context: None,
-            }]
-        );
-
-        Ok(())
-    }
-
-    /// CSO | F.310 (Als D <> H en verklaring voor verschil niks aangevinkt of 'ja' en 'nee' aangevinkt)
-    #[test]
-    fn test_f310_all_checked() -> Result<(), DataError> {
-        // D < H & difference_completely_accounted_for both checked
-        let mut data = DifferencesCounts::zero();
-
-        data.more_ballots_count = 4;
-        data.compare_votes_cast_admitted_voters
-            .votes_cast_greater_than_admitted_voters = true;
-        data.difference_completely_accounted_for = YesNo::both();
-
-        let validation_results = validate(data, 44, 48)?;
-
-        assert_eq!(
-            validation_results.errors,
-            [ValidationResult {
-                code: ValidationResultCode::F310,
-                fields: vec!["differences_counts.difference_completely_accounted_for".into(),],
-                context: None,
-            }]
-        );
-
-        // D > H & difference_completely_accounted_for both checked
-        let mut data = DifferencesCounts::zero();
-
-        data.fewer_ballots_count = 4;
-        data.compare_votes_cast_admitted_voters
-            .votes_cast_smaller_than_admitted_voters = true;
-        data.difference_completely_accounted_for = YesNo::both();
-
-        let validation_results = validate(data, 48, 44)?;
-
-        assert_eq!(
-            validation_results.errors,
-            [ValidationResult {
-                code: ValidationResultCode::F310,
-                fields: vec!["differences_counts.difference_completely_accounted_for".into(),],
-                context: None,
-            }]
-        );
+            let result = validate(data, voters, votes)?;
+            let has_f310 = result.errors.iter().any(|e| e == &f310);
+            assert_eq!(has_f310, expect_f310, "Failed: {description}");
+        }
 
         Ok(())
     }

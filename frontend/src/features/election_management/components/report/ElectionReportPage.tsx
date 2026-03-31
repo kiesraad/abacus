@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Navigate } from "react-router";
 import { ApplicationError, NotFoundError } from "@/api/ApiResult";
-import { useCrud } from "@/api/useCrud";
 import { Footer } from "@/components/footer/Footer";
 import { IconCheckVerified } from "@/components/generated/icons";
 import { PageTitle } from "@/components/page_title/PageTitle";
@@ -9,17 +8,16 @@ import { Button } from "@/components/ui/Button/Button";
 import { DownloadButton } from "@/components/ui/DownloadButton/DownloadButton";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { Icon } from "@/components/ui/Icon/Icon";
-import { ResumeDataEntryModal } from "@/features/election_management/components/report/ResumeDataEntryModal.tsx";
+import { ResumeDataEntryModal } from "@/features/election_management/components/report/ResumeDataEntryModal";
 import { useElection } from "@/hooks/election/useElection";
 import { useNumericParam } from "@/hooks/useNumericParam";
 import { t } from "@/i18n/translate";
-import type { COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 import { committeeSessionLabel } from "@/utils/committeeSession";
 import { formatDateTimeFull } from "@/utils/dateTime";
 import cls from "../ElectionManagement.module.css";
-import { CSBElectionReportSection } from "./CSBElectionReportSection.tsx";
-import { GSBElectionReportSection } from "./GSBElectionReportSection.tsx";
+import { CSBElectionReportSection } from "./CSBElectionReportSection";
+import { GSBElectionReportSection } from "./GSBElectionReportSection";
 
 // biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function ElectionReportPage() {
@@ -30,9 +28,6 @@ export function ElectionReportPage() {
     throw new NotFoundError("error.not_found");
   }
   const [showModal, setShowModal] = useState(false);
-
-  const updatePath: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/elections/${committeeSession.election_id}/committee_sessions/${committeeSession.id}/status`;
-  const { isLoading } = useCrud({ updatePath, throwAllErrors: true });
 
   const sessionLabel = committeeSessionLabel(election.committee_category, committeeSession.number);
 
@@ -71,10 +66,10 @@ export function ElectionReportPage() {
     }
 
     return `
-        ${t("election_report.counting_results")} ${sessionLabel.toLowerCase()} 
-        ${t(`committee_category.${election.committee_category}.short`).toLowerCase()} ${t("municipality").toLowerCase()} 
-        ${election.location}
-      `;
+      ${t("election_report.counting_results")} ${sessionLabel.toLowerCase()} 
+      ${t(`committee_category.${election.committee_category}.short`).toLowerCase()} ${t("municipality").toLowerCase()} 
+      ${election.location}
+    `;
   }
 
   return (
@@ -151,7 +146,7 @@ export function ElectionReportPage() {
             <FormLayout.Controls>
               <Button.Link to="../..">{t("back_to_overview")}</Button.Link>
               {currentCommitteeSession.id === committeeSession.id && (
-                <Button variant="secondary" onClick={handleResume} disabled={isLoading}>
+                <Button variant="secondary" onClick={handleResume}>
                   {t("election_report.resume_data_entry")}
                 </Button>
               )}

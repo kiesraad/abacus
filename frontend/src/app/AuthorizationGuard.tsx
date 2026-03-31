@@ -7,7 +7,7 @@ import { getPostLoginPath } from "@/features/account/utils/getPostLoginPath";
 import useSessionExpiration from "@/hooks/user/useSessionExpiration";
 import { t } from "@/i18n/translate";
 
-import { AuthorizationDialog } from "./ExpirationDialog";
+import { ExpirationDialog } from "./ExpirationDialog";
 
 interface AuthorizationGuardProps {
   children: React.ReactNode;
@@ -23,7 +23,7 @@ interface AuthorizationGuardProps {
  * - A non-public route is accessible only when the logged-in user's role is included in `handle.roles`.
  * - While a session expiration timestamp exists, the guard recomputes the remaining session lifetime every second.
  * - When the remaining session lifetime drops to `0` or below, the user is logged out locally via `setUser(null)`.
- * - When the session is close to expiring, `AuthorizationDialog` is shown. If the dialog was hidden earlier and the
+ * - When the session is close to expiring, `ExpirationDialog` is shown. If the dialog was hidden earlier and the
  *   session later becomes valid again for longer than `EXPIRATION_DIALOG_SECONDS`, the hidden state is reset so the
  *   warning can be shown again on a future near-expiry.
  *
@@ -77,7 +77,7 @@ export function AuthorizationGuard({ children }: AuthorizationGuardProps) {
   return (
     <>
       {showDialog && sessionValidFor !== null && (
-        <AuthorizationDialog
+        <ExpirationDialog
           sessionValidFor={sessionValidFor}
           onClose={() => {
             setHideDialog(true);

@@ -3,13 +3,13 @@ import { Modal } from "@/components/ui/Modal/Modal";
 import { t, tx } from "@/i18n/translate";
 import { formatTimeToGo } from "@/utils/dateTime";
 
-interface AuthorizationDialogProps {
+interface ExpirationDialogProps {
   sessionValidFor: number;
   onClose: () => void;
   onStayLoggedIn: () => void;
 }
 
-export function AuthorizationDialog({ sessionValidFor, onClose, onStayLoggedIn }: AuthorizationDialogProps) {
+export function ExpirationDialog({ sessionValidFor, onClose, onStayLoggedIn }: ExpirationDialogProps) {
   return (
     <Modal title={t("users.expiration_warning")} noFlex={true} onClose={onClose}>
       <p>{tx("users.expiration_warning_details", {}, { time: formatTimeToGo(sessionValidFor) })}</p>

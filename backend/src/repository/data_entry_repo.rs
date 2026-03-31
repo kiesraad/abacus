@@ -801,8 +801,11 @@ mod tests {
         use super::*;
         use crate::{
             domain::investigation::InvestigationStatus,
-            repository::{investigation_repo, polling_station_repo::insert_test_polling_station},
-            service::{create_definitive_data_entry, create_empty_data_entry},
+            repository::{
+                investigation_repo,
+                polling_station_repo::{self, insert_test_polling_station},
+            },
+            service::create_definitive_data_entry,
         };
 
         async fn create_test_investigation(
@@ -826,10 +829,10 @@ mod tests {
                 .expect("investigation should exist");
 
             let status = if corrected_results {
-                let ps = create_empty_data_entry(conn, polling_station_id)
-                    .await
-                    .unwrap();
-                let data_entry_id = ps.data_entry_id().expect("should have data_entry_id");
+                let data_entry_id =
+                    polling_station_repo::create_data_entry(conn, polling_station_id)
+                        .await
+                        .unwrap();
                 current
                     .conclude_with_new_results("Test findings".to_string(), data_entry_id)
                     .expect("conclude_with_new_results should succeed")
@@ -940,23 +943,23 @@ mod tests {
         async fn test_next_session_new_polling_station_with_results(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
             let committee_session_id = CommitteeSessionId::from(704);
+            let polling_station_id = PollingStationId::from(743);
 
             insert_test_polling_station(
                 &mut conn,
-                PollingStationId::from(743),
+                polling_station_id,
                 committee_session_id,
                 None,
                 123,
             )
             .await
             .unwrap();
-            create_definitive_data_entry(
-                &mut conn,
-                PollingStationId::from(743),
-                &create_test_results(10),
-            )
-            .await
-            .unwrap();
+            polling_station_repo::create_data_entry(&mut conn, polling_station_id)
+                .await
+                .unwrap();
+            create_definitive_data_entry(&mut conn, polling_station_id, &create_test_results(10))
+                .await
+                .unwrap();
 
             assert!(
                 are_results_complete_for_committee_session(&mut conn, committee_session_id)

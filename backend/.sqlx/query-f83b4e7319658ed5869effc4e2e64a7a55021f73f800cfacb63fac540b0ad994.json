@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT data_entry_id AS \"data_entry_id: _\" FROM polling_stations WHERE id = ?",
+  "describe": {
+    "columns": [
+      {
+        "name": "data_entry_id: _",
+        "ordinal": 0,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      true
+    ]
+  },
+  "hash": "f83b4e7319658ed5869effc4e2e64a7a55021f73f800cfacb63fac540b0ad994"
+}

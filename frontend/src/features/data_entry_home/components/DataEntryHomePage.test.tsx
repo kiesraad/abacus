@@ -1,40 +1,41 @@
 import { waitFor } from "@testing-library/react";
+import { userEvent } from "@testing-library/user-event/dist/cjs/index.js";
 import { HttpResponse, http } from "msw";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
-import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
+import * as useElectionStatus from "@/hooks/election/useElectionStatus";
 import type { Message } from "@/hooks/messages/MessagesContext";
 import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
 import * as useMessages from "@/hooks/messages/useMessages";
 import * as useUser from "@/hooks/user/useUser";
 import { electionDetailsMockResponse, getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
-import { getElectionStatusMockData } from "@/testing/api-mocks/ElectionStatusMockData";
-import {
-  ElectionListRequestHandler,
-  ElectionRequestHandler,
-  ElectionStatusRequestHandler,
-} from "@/testing/api-mocks/RequestHandlers";
+import { getElectionStatusMockData, statusResponseMock } from "@/testing/api-mocks/ElectionStatusMockData";
+import { ElectionListRequestHandler, ElectionRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
 import { renderReturningRouter, screen, within } from "@/testing/test-utils";
 import { getTypistUser } from "@/testing/user-mock-data";
-import type { ElectionDetailsResponse } from "@/types/generated/openapi";
+import type { ElectionDetailsResponse, ElectionStatusResponse } from "@/types/generated/openapi";
 import { DataEntryHomePage } from "./DataEntryHomePage";
 
-const renderDataEntryHomePage = () =>
-  renderReturningRouter(
+function renderDataEntryHomePage({ statuses }: ElectionStatusResponse = statusResponseMock) {
+  const refetch = vi.fn();
+  vi.spyOn(useElectionStatus, "useElectionStatus").mockReturnValue({ statuses, refetch });
+
+  const router = renderReturningRouter(
     <ElectionProvider electionId={1}>
-      <ElectionStatusProvider electionId={1}>
-        <MessagesProvider>
-          <DataEntryHomePage />
-        </MessagesProvider>
-      </ElectionStatusProvider>
+      <MessagesProvider>
+        <DataEntryHomePage />
+      </MessagesProvider>
     </ElectionProvider>,
   );
+
+  return { router, refetch };
+}
 
 describe("DataEntryHomePage", () => {
   beforeEach(() => {
     vi.spyOn(useUser, "useUser").mockReturnValue(getTypistUser());
-    server.use(ElectionListRequestHandler, ElectionRequestHandler, ElectionStatusRequestHandler);
+    server.use(ElectionListRequestHandler, ElectionRequestHandler);
     overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
   });
 
@@ -49,7 +50,7 @@ describe("DataEntryHomePage", () => {
     ).toBeVisible();
   });
 
-  test("Alert not visible when uncompleted", async () => {
+  test("Alert not visible when unfinished", async () => {
     renderDataEntryHomePage();
 
     // Wait for the page to be loaded
@@ -65,50 +66,8 @@ describe("DataEntryHomePage", () => {
   });
 
   test("Alert visible when completed", async () => {
-    overrideOnce(
-      "get",
-      "/api/elections/1/status",
-      200,
-      getElectionStatusMockData([{ status: "definitive" }, { status: "definitive" }]),
-    );
-
-    renderDataEntryHomePage();
-
+    renderDataEntryHomePage(getElectionStatusMockData([{ status: "definitive" }, { status: "definitive" }]));
     expect(await screen.findByText("Alle stembureaus zijn ingevoerd")).toBeVisible();
-  });
-
-  test("Resume input visible when some are uncompleted", async () => {
-    overrideOnce(
-      "get",
-      "/api/elections/1/status",
-      200,
-      getElectionStatusMockData([
-        { status: "first_entry_in_progress", first_entry_user_id: getTypistUser().user_id },
-        { status: "empty" },
-      ]),
-    );
-
-    renderDataEntryHomePage();
-
-    const alert = await screen.findByRole("alert");
-    expect(within(alert).getByRole("strong")).toHaveTextContent("Je hebt nog een openstaande invoer");
-    const dataEntries = await within(alert).findAllByRole("link");
-    expect(dataEntries.map((ps) => ps.textContent)).toEqual(["33 - Op Rolletjes"]);
-  });
-
-  test("Resume input invisible when none are unfinished", async () => {
-    overrideOnce(
-      "get",
-      "/api/elections/1/status",
-      200,
-      getElectionStatusMockData([{ status: "empty" }, { status: "definitive" }]),
-    );
-
-    renderDataEntryHomePage();
-
-    // Ensure the page is rendered before testing
-    await screen.findByText("Gemeenteraadsverkiezingen 2026");
-    expect(screen.queryByRole("alert")).toBeNull();
   });
 
   test("Messages are shown", async () => {
@@ -125,7 +84,7 @@ describe("DataEntryHomePage", () => {
   });
 
   test("Show different title for next data entry", async () => {
-    const router = renderDataEntryHomePage();
+    const { router } = renderDataEntryHomePage();
     expect(await screen.findByRole("heading", { name: "Welk stembureau ga je invoeren?" })).toBeVisible();
 
     await router.navigate({ hash: "next" });
@@ -161,5 +120,17 @@ describe("DataEntryHomePage", () => {
     );
     expect(within(pausedModal).getByRole("link", { name: "Naar startscherm" })).toBeVisible();
     expect(within(pausedModal).getByRole("link", { name: "Afmelden" })).toBeVisible();
+  });
+
+  test("Refresh statuses when the collapsed data entry list is opened", async () => {
+    const { refetch } = renderDataEntryHomePage();
+    await waitFor(() => {
+      expect(refetch).toHaveBeenCalledTimes(1);
+    });
+
+    const user = userEvent.setup();
+    const openList = await screen.findByTestId("openList");
+    await user.click(openList);
+    expect(refetch).toHaveBeenCalledTimes(2);
   });
 });

@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            INSERT INTO polling_stations (\n                committee_session_id,\n                prev_data_entry_id,\n                name,\n                number,\n                number_of_voters,\n                polling_station_type,\n                address,\n                postal_code,\n                locality\n            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)\n            RETURNING id AS \"id: _\"\n            ",
+  "describe": {
+    "columns": [
+      {
+        "name": "id: _",
+        "ordinal": 0,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 9
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "be2e80a8e4daf4ad102dd16d28c9050fd51b9029ccf3b1bb4b483288f6d83b29"
+}

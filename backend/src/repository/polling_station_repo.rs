@@ -649,12 +649,12 @@ pub async fn list_first_session_with_status(
     query!(
         r#"
         SELECT
-            de.id AS "data_entry_id!: DataEntryId",
+            de.id AS "data_entry_id: DataEntryId",
             p.id AS "id: PollingStationId",
             p.number AS "number: PollingStationNumber",
             p.name,
             p.prev_data_entry_id AS "prev_data_entry_id: DataEntryId",
-            de.state AS "state!: Json<DataEntryStatus>"
+            de.state AS "state: Json<DataEntryStatus>"
         FROM polling_stations AS p
         JOIN committee_sessions AS c ON c.id = p.committee_session_id
         JOIN data_entries AS de ON de.id = p.data_entry_id
@@ -685,12 +685,12 @@ pub async fn list_next_session_with_status(
     query!(
         r#"
         SELECT
-            de.id AS "data_entry_id!: DataEntryId",
+            de.id AS "data_entry_id: DataEntryId",
             p.id AS "id: PollingStationId",
             p.number AS "number: PollingStationNumber",
             p.name,
             p.prev_data_entry_id AS "prev_data_entry_id: DataEntryId",
-            de.state AS "state!: Json<DataEntryStatus>"
+            de.state AS "state: Json<DataEntryStatus>"
         FROM polling_stations AS p
         JOIN committee_sessions AS c ON c.id = p.committee_session_id
         JOIN data_entries AS de ON de.id = p.data_entry_id

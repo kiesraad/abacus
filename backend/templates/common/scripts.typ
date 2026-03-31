@@ -27,6 +27,22 @@
   )
 }
 
+// A box with only a bottom stroke, and optional titles, aligned horizontally
+#let textbox_only_bottom_stroke(..args) = {
+  rect(
+    width: 100%,
+    height: 5em,
+    inset: 1em,
+    stroke: (
+      bottom: 0.5pt,
+    ),
+    grid(
+      columns: args.pos().map(a => 1fr),
+      ..args
+    ),
+  )
+}
+
 /// Conditionally render the body if the condition is true, used to conditionally
 /// render cells in grids or tables. The result should always be spread using
 /// e.g. `..cell_if(condition, body)`. Can be used with either a single cell or
@@ -751,7 +767,7 @@
           table.cell(political_group_name(political_groups.find(pg => pg.number == list_seat_assignment.list_number), with_prefix: "only_list_number")),
           ..slice.map(step => {
             let average = step.standings.find((standing) => standing.list_number == list_seat_assignment.list_number).next_votes_per_seat
-            if step.change.list_options.contains(list_seat_assignment.list_number) {
+            if step.change.selected_list_number == list_seat_assignment.list_number {
               set text(weight: "semibold")
             }
             table.cell(

@@ -283,7 +283,7 @@ Na toewijzing van de volle zetels blijft een aantal te verdelen zetels over. Dit
   #if input.election.number_of_seats < LARGE_COUNCIL_THRESHOLD [
     - Het #location_type berekent hoeveel stemmen elke lijst overhoudt na toekenning van de volle zetels. Dat is het 'overschot' aan stemmen voor die lijst.
     - Het #location_type verdeelt de restzetels, in volgorde van de grootste overschotten. Elke lijst kan maar één restzetel krijgen. Alleen lijsten die ten minste 75% van de kiesdeler hebben behaald kunnen een restzetel krijgen.
-    - Als er daarna nog restzetels over zijn, verdeelt het #location_type die volgens het systeem van de grootste gemiddelden. Ook bij deze verdeling mag iedere lijst maar één restzetel krijgen
+    - Als er daarna nog restzetels over zijn, verdeelt het #location_type die volgens het systeem van de grootste gemiddelden. Ook bij deze verdeling mag iedere lijst maar één restzetel krijgen.
     - Als lijsten precies evenveel stemmen behalen en er niet voldoende restzetels zijn voor die lijsten, dan wordt geloot welke lijst de restzetel krijgt.
 
     #let final_standing_pgs_meeting_threshold = input.seat_assignment.final_standing.filter(
@@ -578,7 +578,7 @@ Zo komt het handtekeningen-blad altijd op een losse pagina, ook als het verslag 
 
 === Datum
 
-#textbox[Datum en tijd:][Plaats:]
+#textbox_only_bottom_stroke[Datum en tijd:][Plaats:]
 
 === Voorzitter van het #location_type:
 
@@ -586,7 +586,7 @@ Zo komt het handtekeningen-blad altijd op een losse pagina, ook als het verslag 
 
 === Plaatsvervangend voorzitter van het #location_type:
 
-#stack(spacing: 0.5em, ..range(0, is_municipality(2, 4)).map(_ => textbox[Naam:][Handtekening:]))
+#textbox[Naam:][Handtekening:]
 
 === De andere leden van het #location_type:
 

@@ -21,7 +21,7 @@ pub struct LimitedElectionSummary {
     pub differences_counts: SummaryDifferencesCounts,
 }
 
-/// Contains the result changes that have occurred in the apportionment
+/// Contains the result changes that have occurred in the apportionment.
 #[derive(Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct ResultChange {

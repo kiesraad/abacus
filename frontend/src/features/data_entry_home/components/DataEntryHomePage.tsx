@@ -5,6 +5,7 @@ import { Messages } from "@/components/messages/Messages";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { CollapsibleDataEntryList } from "@/features/data_entry_home/components/CollapsibleDataEntryList";
+import { DataEntryList } from "@/features/data_entry_home/components/DataEntryList";
 import { UnfinishedEntriesList } from "@/features/data_entry_home/components/UnfinishedEntriesList";
 import { useAvailableDataEntries } from "@/features/data_entry_home/hooks/useAvailableDataEntries";
 import { useElection } from "@/hooks/election/useElection";
@@ -23,8 +24,6 @@ export function DataEntryHomePage() {
   // live data polling (initial fetch + 30s interval + visibility change)
   useLiveData(refetchStatuses, true);
   useLiveData(refetchElection, true);
-
-  const anotherEntry = location.hash === "#next";
 
   return (
     <>
@@ -53,18 +52,25 @@ export function DataEntryHomePage() {
         <article>
           <fieldset>
             <legend className="mb-sm">
-              <h2>{anotherEntry ? t("data_entry_home.insert_another") : t("data_entry_home.insert_title")}</h2>
+              <h2>
+                {location.hash === "#next" ? t("data_entry_home.insert_another") : t("data_entry_home.insert_title")}
+              </h2>
             </legend>
 
             <UnfinishedEntriesList electionId={election.id} dataEntries={inProgressCurrentUser} />
 
-            <DataEntryPicker dataEntryWithStatus={dataEntryWithStatus} />
-
-            <CollapsibleDataEntryList
-              electionId={election.id}
-              availableDataEntries={availableCurrentUser}
-              onToggle={() => void refetchStatuses()}
-            />
+            {election.committee_category === "GSB" ? (
+              <>
+                <DataEntryPicker dataEntryWithStatus={dataEntryWithStatus} />
+                <CollapsibleDataEntryList
+                  electionId={election.id}
+                  availableDataEntries={availableCurrentUser}
+                  onToggle={() => void refetchStatuses()}
+                />
+              </>
+            ) : (
+              <DataEntryList electionId={election.id} dataEntries={availableCurrentUser} />
+            )}
           </fieldset>
         </article>
         <ElectionProgress />

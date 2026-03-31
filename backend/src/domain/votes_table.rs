@@ -335,6 +335,7 @@ mod tests {
         PoliticalGroup {
             number: PGNumber::from(number),
             name: format!("Partij {number}"),
+            display_name: format!("Partij {number}"),
             candidates: candidate_numbers
                 .iter()
                 .map(|&candidate_number| sample_candidate(CandidateNumber::from(candidate_number)))

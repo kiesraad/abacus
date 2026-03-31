@@ -177,6 +177,7 @@ pub struct PoliticalGroup {
     #[schema(value_type = u32)]
     pub number: PGNumber,
     pub name: String,
+    pub display_name: String,
     pub candidates: Vec<Candidate>,
 }
 
@@ -233,6 +234,7 @@ pub(crate) mod tests {
             .map(|(i, &candidates)| PoliticalGroup {
                 number: PGNumber::try_from(i + 1).unwrap(),
                 name: format!("Political group {}", i + 1),
+                display_name: format!("Political group {}", i + 1),
                 candidates: (0..candidates)
                     .map(|j| Candidate {
                         number: CandidateNumber::from(j + 1),

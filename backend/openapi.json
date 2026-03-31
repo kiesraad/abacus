@@ -6378,6 +6378,7 @@
         "required": [
           "number",
           "name",
+          "display_name",
           "candidates"
         ],
         "properties": {
@@ -6386,6 +6387,9 @@
             "items": {
               "$ref": "#/components/schemas/Candidate"
             }
+          },
+          "display_name": {
+            "type": "string"
           },
           "name": {
             "type": "string"

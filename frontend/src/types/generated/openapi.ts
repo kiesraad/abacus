@@ -1072,6 +1072,7 @@ export type PGNumber = number;
  */
 export interface PoliticalGroup {
   candidates: Candidate[];
+  display_name: string;
   name: string;
   number: number;
 }

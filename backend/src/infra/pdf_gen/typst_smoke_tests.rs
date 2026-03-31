@@ -138,6 +138,7 @@ fn random_election(
             .map(|party_index| PoliticalGroup {
                 number: PGNumber::from(party_index + 1),
                 name: random_string(rng, string_length),
+                display_name: random_string(rng, string_length),
                 candidates: (0..candidates)
                     .map(|candidate_index| {
                         let gender = random_value(

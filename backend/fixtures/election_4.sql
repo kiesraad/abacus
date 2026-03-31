@@ -4,6 +4,7 @@ VALUES (4, 'Test Election < 19 seats', 'GSB', 'CSO', 'TestLocation_2026', 'Test 
           {
             "number": 1,
             "name": "Political Group A",
+            "display_name": "Political Group A",
             "candidates": [
               {
                 "number": 1,
@@ -111,6 +112,7 @@ VALUES (4, 'Test Election < 19 seats', 'GSB', 'CSO', 'TestLocation_2026', 'Test 
           {
             "number": 2,
             "name": "Political Group B",
+            "display_name": "Political Group B",
             "candidates": [
               {
                 "number": 1,
@@ -165,6 +167,7 @@ VALUES (4, 'Test Election < 19 seats', 'GSB', 'CSO', 'TestLocation_2026', 'Test 
           }, {
             "number": 3,
             "name": "Political Group C",
+            "display_name": "Political Group C",
             "candidates": [
               {
                 "number": 1,
@@ -222,6 +225,7 @@ VALUES (4, 'Test Election < 19 seats', 'GSB', 'CSO', 'TestLocation_2026', 'Test 
           }, {
             "number": 4,
             "name": "Political Group D",
+            "display_name": "Political Group D",
             "candidates": [
               {
                 "number": 1,
@@ -267,6 +271,7 @@ VALUES (4, 'Test Election < 19 seats', 'GSB', 'CSO', 'TestLocation_2026', 'Test 
           }, {
             "number": 5,
             "name": "Political Group E",
+            "display_name": "Political Group E",
             "candidates": [
               {
                 "number": 1,
@@ -304,6 +309,7 @@ VALUES (4, 'Test Election < 19 seats', 'GSB', 'CSO', 'TestLocation_2026', 'Test 
           }, {
             "number": 6,
             "name": "Political Group F",
+            "display_name": "Political Group F",
             "candidates": [
               {
                 "number": 1,
@@ -342,6 +348,7 @@ VALUES (4, 'Test Election < 19 seats', 'GSB', 'CSO', 'TestLocation_2026', 'Test 
           }, {
             "number": 7,
             "name": "Political Group G",
+            "display_name": "Political Group G",
             "candidates": [
               {
                 "number": 1,
@@ -380,6 +387,7 @@ VALUES (4, 'Test Election < 19 seats', 'GSB', 'CSO', 'TestLocation_2026', 'Test 
           }, {
             "number": 8,
             "name": "Political Group H",
+            "display_name": "Political Group H",
             "candidates": [
               {
                 "number": 1,

@@ -72,6 +72,26 @@ async fn generate_data_entries(
     Ok(second_entries == polling_stations.len())
 }
 
+/// Generate CSB data entries and return whether data entry is completed
+async fn generate_csb_data_entries(
+    tx: &mut SqliteConnection,
+    rng: &mut StdRng,
+    args: GenerateElectionArgs,
+    committee_session: &mut CommitteeSession,
+    election: &ElectionWithPoliticalGroups,
+) -> Result<bool, Box<dyn Error>> {
+    committee_session_repo::change_status(
+        tx,
+        committee_session.id,
+        CommitteeSessionStatus::DataEntry,
+    )
+    .await?;
+
+    let (_, second_entries) =
+        generate_csb_data_entry(election, rng, tx, &args).await;
+    Ok(false)
+}
+
 /// Generate polling stations and data entries for a GSB election
 async fn generate_gsb_election_data(
     rng: &mut StdRng,
@@ -114,7 +134,9 @@ async fn generate_gsb_election_data(
 
 /// Create sub committee and set status to InPreparation for a CSB election
 async fn generate_csb_election_data(
+    rng: &mut StdRng,
     tx: &mut SqliteConnection,
+    args: GenerateElectionArgs,
     committee_session: &mut CommitteeSession,
     election: &ElectionWithPoliticalGroups,
 ) -> Result<(Vec<PollingStation>, bool), Box<dyn Error>> {
@@ -133,13 +155,27 @@ async fn generate_csb_election_data(
         .await
         .map_err(|e| format!("{e:?}"))?;
     }
+
+    let data_entry_completed = if args.with_data_entry {
+        generate_csb_data_entries(
+            tx,
+            rng,
+            args,
+            committee_session,
+            election,
+        )
+        .await?
+    } else {
+        false
+    };
+    
     *committee_session = committee_session_repo::change_status(
         tx,
         committee_session.id,
         CommitteeSessionStatus::InPreparation,
     )
     .await?;
-    Ok((Vec::new(), false))
+    Ok((Vec::new(), data_entry_completed))
 }
 
 pub async fn create_test_election(
@@ -169,7 +205,7 @@ pub async fn create_test_election(
                 .await?
         }
         CommitteeCategory::CSB => {
-            generate_csb_election_data(&mut tx, &mut committee_session, &election).await?
+            generate_csb_election_data(&mut rng, &mut tx, args, &mut committee_session, &election).await?
         }
     };
 
@@ -440,6 +476,30 @@ async fn generate_data_entry(
     (generated_first_entries, generated_second_entries)
 }
 
+/// Generate and store data entries for the given election based on arguments
+#[allow(clippy::too_many_lines)]
+async fn generate_csb_data_entry(
+    election: &ElectionWithPoliticalGroups,
+    rng: &mut impl rand::RngExt,
+    conn: &mut SqliteConnection,
+    args: &GenerateElectionArgs,
+) -> (usize, usize) {
+    info!("Generating data entries for CSB election");
+    let now = chrono::Utc::now();
+    let first_entry_chance = rng.random_range(args.first_data_entry.clone()).min(100);
+    let second_entry_chance = rng.random_range(args.second_data_entry.clone()).min(100);
+
+    let group_slope =
+        rng.random_range(args.political_group_distribution_slope.clone()) as f64 / 1000.0;
+    let group_weights =
+        distribute_power_law_weights(rng, election.political_groups.len(), group_slope);
+
+    let mut generated_first_entries = 0;
+    let mut generated_second_entries = 0;
+
+    (generated_first_entries, generated_second_entries)
+}
+
 #[allow(clippy::too_many_lines)]
 fn generate_cso_first_session_results(
     rng: &mut impl rand::RngExt,
@@ -668,6 +728,7 @@ mod tests {
             polling_stations: RandomRange(50..200),
             voters: RandomRange(100_000..200_000),
             seats: RandomRange(9..45),
+	    generate_p22_2_variants: true,
             with_data_entry: true,
             first_data_entry: RandomRange(100..101),
             second_data_entry: RandomRange(100..101),

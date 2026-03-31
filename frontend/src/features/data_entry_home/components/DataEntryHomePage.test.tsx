@@ -18,11 +18,12 @@ import { ElectionListRequestHandler, ElectionRequestHandler } from "@/testing/ap
 import { server } from "@/testing/server";
 import { renderReturningRouter, screen, within } from "@/testing/test-utils";
 import { getTypistUser } from "@/testing/user-mock-data";
-import type {
-  CommitteeCategory,
-  CommitteeSession,
-  ElectionDetailsResponse,
-  ElectionStatusResponse,
+import {
+  type CommitteeCategory,
+  type CommitteeSession,
+  committeeCategoryValues,
+  type ElectionDetailsResponse,
+  type ElectionStatusResponse,
 } from "@/types/generated/openapi";
 import { DataEntryHomePage } from "./DataEntryHomePage";
 
@@ -63,7 +64,7 @@ describe("DataEntryHomePage", () => {
     server.use(ElectionListRequestHandler, ElectionRequestHandler);
   });
 
-  test.each(["GSB", "CSB"] as const)("Alert not visible when unfinished (%s)", async (cat: CommitteeCategory) => {
+  test.each(committeeCategoryValues)("Alert not visible when unfinished (%s)", async (cat: CommitteeCategory) => {
     await renderDataEntryHomePage(cat);
 
     // Wait for the page to be loaded
@@ -78,14 +79,14 @@ describe("DataEntryHomePage", () => {
     expect(screen.queryByText("Alle stembureaus zijn ingevoerd")).not.toBeInTheDocument();
   });
 
-  test.each(["GSB", "CSB"] as const)("Alert visible when completed (%s)", async (cat: CommitteeCategory) => {
+  test.each(committeeCategoryValues)("Alert visible when completed (%s)", async (cat: CommitteeCategory) => {
     const statusResponse = getElectionStatusMockData([{ status: "definitive" }, { status: "definitive" }]);
     await renderDataEntryHomePage(cat, {}, statusResponse);
 
     expect(await screen.findByText("Alle stembureaus zijn ingevoerd")).toBeVisible();
   });
 
-  test.each(["GSB", "CSB"] as const)("Messages are shown (%s)", async (cat: CommitteeCategory) => {
+  test.each(committeeCategoryValues)("Messages are shown (%s)", async (cat: CommitteeCategory) => {
     vi.spyOn(useMessages, "useMessages").mockReturnValue({
       hasMessages: vi.fn(),
       popMessages: vi.fn(() => [{ title: "Let op: fouten in het proces-verbaal" }] as Message[]),
@@ -98,7 +99,7 @@ describe("DataEntryHomePage", () => {
     expect(within(alert).getByRole("strong")).toHaveTextContent("Let op: fouten in het proces-verbaal");
   });
 
-  test.each(["GSB", "CSB"] as const)("Show different title for next entry (%s)", async (cat: CommitteeCategory) => {
+  test.each(committeeCategoryValues)("Show different title for next entry (%s)", async (cat: CommitteeCategory) => {
     const { router } = await renderDataEntryHomePage(cat);
     expect(await screen.findByRole("heading", { name: "Welk stembureau ga je invoeren?" })).toBeVisible();
 
@@ -109,7 +110,7 @@ describe("DataEntryHomePage", () => {
     expect(await screen.findByRole("heading", { name: "Verder met een volgend stembureau?" })).toBeVisible();
   });
 
-  test.each(["GSB", "CSB"] as const)("Show alert when session is paused (%s)", async (cat: CommitteeCategory) => {
+  test.each(committeeCategoryValues)("Show alert when session is paused (%s)", async (cat: CommitteeCategory) => {
     await renderDataEntryHomePage(cat, { status: "paused" });
 
     const pausedModal = await screen.findByRole("dialog");

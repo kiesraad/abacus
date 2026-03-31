@@ -335,7 +335,7 @@ async fn data_entry_claim(
     // If there is a previous data entry with status definitive
     let previous_results: Option<CommonPollingStationResults> = match prev_data_entry_id {
         Some(prev_id) => match data_entry_repo::get_status(&mut tx, prev_id).await? {
-            // Match polling station results onl and get the common results
+            // Match polling station results only and get the common results
             DataEntryStatus::Definitive(d) => match d.results {
                 Results::CSOFirstSession(r) => Some(r.as_common()),
                 Results::CSONextSession(r) => Some(r.as_common()),

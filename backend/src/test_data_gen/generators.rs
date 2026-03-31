@@ -31,6 +31,7 @@ use crate::{
             votes_counts::VotesCounts,
             yes_no::YesNo,
         },
+        sub_committee::SubCommitteeFirstSession,
         validate::{Validate, ValidationResults},
     },
     repository::{
@@ -51,8 +52,8 @@ pub struct CreateTestElectionResult {
     pub data_entry_completed: bool,
 }
 
-/// Generate data entries and return whether data entry is completed
-async fn generate_data_entries(
+/// Generate GSB data entries and return whether data entry is completed
+async fn generate_gsb_data_entries(
     conn: &mut SqliteConnection,
     rng: &mut StdRng,
     args: GenerateElectionArgs,
@@ -68,28 +69,28 @@ async fn generate_data_entries(
     .await?;
 
     let (_, second_entries) =
-        generate_data_entry(election, polling_stations, rng, conn, &args).await;
+        generate_gsb_data_entry(election, polling_stations, rng, conn, &args).await;
     Ok(second_entries == polling_stations.len())
 }
 
 /// Generate CSB data entries and return whether data entry is completed
 async fn generate_csb_data_entries(
-    tx: &mut SqliteConnection,
+    conn: &mut SqliteConnection,
     rng: &mut StdRng,
-    args: GenerateElectionArgs,
-    committee_session: &mut CommitteeSession,
+    args: &GenerateElectionArgs,
+    sub_committee_first_session: SubCommitteeFirstSession,
     election: &ElectionWithPoliticalGroups,
 ) -> Result<bool, Box<dyn Error>> {
     committee_session_repo::change_status(
-        tx,
-        committee_session.id,
+        conn,
+        sub_committee_first_session.committee_session_id,
         CommitteeSessionStatus::DataEntry,
     )
     .await?;
 
     let (_, second_entries) =
-        generate_csb_data_entry(election, rng, tx, &args).await;
-    Ok(false)
+        generate_csb_data_entry(election, sub_committee_first_session, rng, conn, args).await;
+    Ok(second_entries > 0)
 }
 
 /// Generate polling stations and data entries for a GSB election
@@ -112,7 +113,7 @@ async fn generate_gsb_election_data(
     }
 
     let data_entry_completed = if args.with_data_entry && !polling_stations_with_ids.is_empty() {
-        generate_data_entries(
+        generate_gsb_data_entries(
             tx,
             rng,
             args,
@@ -140,42 +141,39 @@ async fn generate_csb_election_data(
     committee_session: &mut CommitteeSession,
     election: &ElectionWithPoliticalGroups,
 ) -> Result<(Vec<PollingStation>, bool), Box<dyn Error>> {
-    if election.category == ElectionCategory::Municipal {
+    let data_entry_complete = if election.category == ElectionCategory::Municipal {
         let number = election
             .domain_id
             .parse()
             .expect("domain_id should be numeric");
-        create_sub_committee(
+        let sub_committee_first_session = create_sub_committee(
             tx,
             committee_session.id,
             number,
             &election.location,
-            CommitteeCategory::GSB,
+            CommitteeCategory::CSB,
         )
         .await
         .map_err(|e| format!("{e:?}"))?;
-    }
 
-    let data_entry_completed = if args.with_data_entry {
-        generate_csb_data_entries(
-            tx,
-            rng,
-            args,
-            committee_session,
-            election,
-        )
-        .await?
+        if args.with_data_entry {
+            generate_csb_data_entries(tx, rng, &args, sub_committee_first_session, election).await?
+        } else {
+            false
+        }
     } else {
         false
     };
-    
-    *committee_session = committee_session_repo::change_status(
-        tx,
-        committee_session.id,
-        CommitteeSessionStatus::InPreparation,
-    )
-    .await?;
-    Ok((Vec::new(), data_entry_completed))
+
+    let new_status = if args.with_data_entry {
+        CommitteeSessionStatus::DataEntry
+    } else {
+        CommitteeSessionStatus::InPreparation
+    };
+
+    *committee_session =
+        committee_session_repo::change_status(tx, committee_session.id, new_status).await?;
+    Ok((Vec::new(), data_entry_complete))
 }
 
 pub async fn create_test_election(
@@ -205,7 +203,8 @@ pub async fn create_test_election(
                 .await?
         }
         CommitteeCategory::CSB => {
-            generate_csb_election_data(&mut rng, &mut tx, args, &mut committee_session, &election).await?
+            generate_csb_election_data(&mut rng, &mut tx, args, &mut committee_session, &election)
+                .await?
         }
     };
 
@@ -380,14 +379,14 @@ async fn generate_polling_stations(
 
 /// Generate and store data entries for the given election based on arguments
 #[allow(clippy::too_many_lines)]
-async fn generate_data_entry(
+async fn generate_gsb_data_entry(
     election: &ElectionWithPoliticalGroups,
     polling_stations: &[(PollingStation, DataEntryId)],
     rng: &mut impl rand::RngExt,
     conn: &mut SqliteConnection,
     args: &GenerateElectionArgs,
 ) -> (usize, usize) {
-    info!("Generating data entries for election");
+    info!("Generating data entries for GSB election");
     let now = chrono::Utc::now();
     let first_entry_chance = rng.random_range(args.first_data_entry.clone()).min(100);
     let second_entry_chance = rng.random_range(args.second_data_entry.clone()).min(100);
@@ -477,14 +476,16 @@ async fn generate_data_entry(
 }
 
 /// Generate and store data entries for the given election based on arguments
-#[allow(clippy::too_many_lines)]
+#[allow(clippy::too_many_lines, clippy::cognitive_complexity)]
 async fn generate_csb_data_entry(
     election: &ElectionWithPoliticalGroups,
+    sub_committee_first_session: SubCommitteeFirstSession,
     rng: &mut impl rand::RngExt,
     conn: &mut SqliteConnection,
     args: &GenerateElectionArgs,
 ) -> (usize, usize) {
     info!("Generating data entries for CSB election");
+
     let now = chrono::Utc::now();
     let first_entry_chance = rng.random_range(args.first_data_entry.clone()).min(100);
     let second_entry_chance = rng.random_range(args.second_data_entry.clone()).min(100);
@@ -497,6 +498,75 @@ async fn generate_csb_data_entry(
     let mut generated_first_entries = 0;
     let mut generated_second_entries = 0;
 
+    let data_entry_id = sub_committee_first_session.data_entry_id;
+
+    info!("First entry chance: {}", first_entry_chance);
+    info!("Second entry chance: {}", second_entry_chance);
+
+    if rng.random_ratio(first_entry_chance, 100) {
+        let ts = super::data::datetime_around(rng, now, TimeDelta::hours(-24));
+
+        // number of voters that actually came and voted
+        let turnout = rng.random_range(args.turnout.clone());
+        let voters_turned_out = (election.number_of_voters * turnout) / 100;
+
+        let candidate_slope =
+            rng.random_range(args.candidate_distribution_slope.clone()) as f64 / 1000.0;
+        let results = Results::CSOFirstSession(generate_cso_first_session_results(
+            rng,
+            &election.political_groups,
+            voters_turned_out,
+            &group_weights,
+            candidate_slope,
+        ));
+
+        // Validate the generated results to catch issues early
+        let mut validation_results = ValidationResults::default();
+        if let Err(e) = results.validate(
+            election,
+            &mut validation_results,
+            &FieldPath::new("data".to_string()),
+        ) {
+            panic!(
+                "Failed to validate generated results for sub committee number {}: {}",
+                sub_committee_first_session.sub_committee.number, e
+            );
+        }
+        if validation_results.has_errors() {
+            panic!(
+                "Generated invalid results for sub committee number {}: {:?}",
+                sub_committee_first_session.sub_committee.number, validation_results.errors
+            );
+        }
+
+        if rng.random_ratio(second_entry_chance, 100) {
+            // generate a definitive data entry
+            let state = DataEntryStatus::Definitive(Definitive {
+                first_entry_user_id: UserId::from(5), // first typist from users in fixtures
+                second_entry_user_id: UserId::from(6), // second typist from users in fixtures
+                finished_at: ts,
+                finalised_with_warnings: validation_results.has_warnings(),
+                results: results.clone(),
+            });
+
+            data_entry_repo::update(conn, data_entry_id, &state)
+                .await
+                .expect("Could not create definitive data entry");
+            generated_second_entries += 1;
+        } else {
+            // generate only a first data entry
+            let state = DataEntryStatus::FirstEntryFinalised(FirstEntryFinalised {
+                first_entry_user_id: UserId::from(5), // first typist from users in fixtures
+                finalised_first_entry: results.clone(),
+                first_entry_finished_at: ts,
+                finalised_with_warnings: validation_results.has_warnings(),
+            });
+            data_entry_repo::update(conn, data_entry_id, &state)
+                .await
+                .expect("Could not create first data entry");
+            generated_first_entries += 1;
+        };
+    }
     (generated_first_entries, generated_second_entries)
 }
 
@@ -728,7 +798,7 @@ mod tests {
             polling_stations: RandomRange(50..200),
             voters: RandomRange(100_000..200_000),
             seats: RandomRange(9..45),
-	    generate_p22_2_variants: true,
+            generate_p22_2_variants: false,
             with_data_entry: true,
             first_data_entry: RandomRange(100..101),
             second_data_entry: RandomRange(100..101),

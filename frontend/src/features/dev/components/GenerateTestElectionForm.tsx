@@ -36,7 +36,7 @@ type RangeFormState = Record<RangeFieldKey, string>;
 
 interface FormState extends RangeFormState {
   committee_category: CommitteeCategory;
-  generate_p22_2_variants: boolean,
+  generate_p22_2_variants: boolean;
   with_data_entry: boolean;
 }
 
@@ -77,7 +77,7 @@ export function GenerateTestElectionForm() {
       {
         committee_category,
         generate_p22_2_variants: formState.generate_p22_2_variants,
-	with_data_entry: formState.with_data_entry,
+        with_data_entry: formState.with_data_entry,
       },
     );
 

@@ -5,13 +5,11 @@ import { useApiState } from "@/api/useApiState";
 interface SessionExpirationState {
   showDialog: boolean;
   sessionValidFor: number | null;
-  setHideDialog: (hide: boolean) => void;
 }
 
 export default function useSessionExpiration(expirationDialogSeconds: number): SessionExpirationState {
   const { user, loading, expiration, setUser } = useApiState();
   const [sessionValidFor, setSessionValidFor] = useState<number | null>(null);
-  const [hideDialog, setHideDialog] = useState(false);
 
   // update the current time every second when there is a session expiration
   useEffect(() => {
@@ -25,11 +23,6 @@ export default function useSessionExpiration(expirationDialogSeconds: number): S
         if (validFor <= 0 && user !== null) {
           setUser(null);
         }
-
-        // reset hide dialog state if the session is valid for more than the expiration dialog time
-        if (validFor > expirationDialogSeconds && hideDialog) {
-          setHideDialog(false);
-        }
       };
 
       update();
@@ -39,19 +32,17 @@ export default function useSessionExpiration(expirationDialogSeconds: number): S
         clearInterval(interval);
       };
     }
-  }, [expiration, user, setUser, hideDialog, expirationDialogSeconds]);
+  }, [expiration, user, setUser]);
 
   const showDialog =
     !loading &&
     sessionValidFor !== null &&
     user !== null &&
-    !hideDialog &&
     sessionValidFor > 0 &&
     sessionValidFor < expirationDialogSeconds;
 
   return {
     showDialog,
-    setHideDialog,
     sessionValidFor,
   };
 }

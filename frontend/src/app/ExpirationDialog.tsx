@@ -5,13 +5,12 @@ import { formatTimeToGo } from "@/utils/dateTime";
 
 interface ExpirationDialogProps {
   sessionValidFor: number;
-  onClose: () => void;
   onStayLoggedIn: () => void;
 }
 
-export function ExpirationDialog({ sessionValidFor, onClose, onStayLoggedIn }: ExpirationDialogProps) {
+export function ExpirationDialog({ sessionValidFor, onStayLoggedIn }: ExpirationDialogProps) {
   return (
-    <Modal title={t("users.expiration_warning")} noFlex={true} onClose={onClose}>
+    <Modal title={t("users.expiration_warning")} noFlex={true}>
       <p>{tx("users.expiration_warning_details", {}, { time: formatTimeToGo(sessionValidFor) })}</p>
       <nav>
         <Button variant="primary" size="xl" onClick={onStayLoggedIn}>

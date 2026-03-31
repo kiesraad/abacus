@@ -1,5 +1,6 @@
 import { render as rtlRender } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { type ReactNode, useState } from "react";
 import { type RouteObject, RouterProvider } from "react-router";
 import { within } from "storybook/test";
 import { describe, expect, test, vi } from "vitest";
@@ -46,25 +47,59 @@ async function renderAuthorizationGuard({
         }
       : null);
 
-  const apiState: ApiState = {
-    client: new ApiClient(),
-    user: resolvedUser,
-    setUser,
-    logout: async () => Promise.reject(new Error("Not implemented in test")),
-    login: async () => Promise.reject(new Error("Not implemented in test")),
-    loading,
-    expiration: expiration ?? new Date(Date.now() + 1000 * 60 * 30),
-    extendSession,
-    airGapError: false,
-  };
-
   rtlRender(
-    <ApiProviderContext.Provider value={apiState}>
+    <TestApiProvider
+      expiration={expiration ?? new Date(Date.now() + 1000 * 60 * 30)}
+      extendSession={extendSession}
+      loading={loading}
+      setUser={setUser}
+      user={resolvedUser}
+    >
       <RouterProvider router={router} />
-    </ApiProviderContext.Provider>,
+    </TestApiProvider>,
   );
 
   return router;
+}
+
+function TestApiProvider({
+  children,
+  expiration,
+  extendSession,
+  loading,
+  setUser,
+  user,
+}: {
+  children: ReactNode;
+  expiration: Date;
+  extendSession: ApiState["extendSession"];
+  loading: boolean;
+  setUser: ApiState["setUser"];
+  user: LoginResponse | null;
+}) {
+  const [client] = useState(() => new ApiClient());
+  const [currentUser, setCurrentUser] = useState<LoginResponse | null>(user);
+  const [currentExpiration, setCurrentExpiration] = useState<Date | null>(expiration);
+
+  const apiState: ApiState = {
+    client,
+    user: currentUser,
+    setUser: (nextUser) => {
+      setCurrentUser(nextUser);
+      setUser(nextUser);
+    },
+    logout: async () => Promise.reject(new Error("Not implemented in test")),
+    login: async () => Promise.reject(new Error("Not implemented in test")),
+    loading,
+    expiration: currentExpiration,
+    extendSession: async () => {
+      await extendSession();
+      setCurrentExpiration(new Date(Date.now() + 1000 * 60 * 30));
+    },
+    airGapError: false,
+  };
+
+  return <ApiProviderContext.Provider value={apiState}>{children}</ApiProviderContext.Provider>;
 }
 
 describe("AuthorizationGuard", () => {
@@ -93,7 +128,7 @@ describe("AuthorizationGuard", () => {
     await renderAuthorizationGuard({
       initialPath: "/logs",
       userRole: "administrator",
-      expiration: new Date(Date.now() + 1000 * 60),
+      expiration: new Date(Date.now() + 1000 * (EXPIRATION_DIALOG_SECONDS - 1)),
       routes: [
         {
           path: "/logs",
@@ -114,7 +149,7 @@ describe("AuthorizationGuard", () => {
     await renderAuthorizationGuard({
       initialPath: "/account/login",
       userRole: null,
-      expiration: new Date(Date.now() + 1000 * 60),
+      expiration: new Date(Date.now() + 1000 * (EXPIRATION_DIALOG_SECONDS - 1)),
       routes: [
         {
           path: "/account/login",
@@ -152,38 +187,13 @@ describe("AuthorizationGuard", () => {
     expect(screen.getByText("Protected content")).toBeVisible();
   });
 
-  test("closes the session dialog when the user closes it", async () => {
-    await renderAuthorizationGuard({
-      initialPath: "/logs",
-      userRole: "administrator",
-      expiration: new Date(Date.now() + 1000 * 60),
-      routes: [
-        {
-          path: "/logs",
-          element: (
-            <AuthorizationGuard>
-              <div>Protected content</div>
-            </AuthorizationGuard>
-          ),
-          handle: { roles: ["administrator"] },
-        },
-      ],
-    });
-
-    await userEvent.click(await screen.findByRole("button", { name: "Venster sluiten" }));
-
-    await waitFor(() => {
-      expect(screen.queryByTestId("modal-title")).not.toBeInTheDocument();
-    });
-  });
-
   test("extends the session and hides the dialog when the user chooses to stay logged in", async () => {
     const extendSession = vi.fn().mockResolvedValue(undefined);
 
     await renderAuthorizationGuard({
       initialPath: "/logs",
       userRole: "administrator",
-      expiration: new Date(Date.now() + 1000 * 60),
+      expiration: new Date(Date.now() + 1000 * (EXPIRATION_DIALOG_SECONDS - 1)),
       extendSession,
       routes: [
         {
@@ -256,6 +266,8 @@ describe("AuthorizationGuard", () => {
   });
 
   test("redirects to the login page when the session has expired", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+
     const router = await renderAuthorizationGuard({
       initialPath: "/logs",
       userRole: "administrator",
@@ -281,6 +293,7 @@ describe("AuthorizationGuard", () => {
       const logoutText = within(await screen.findByRole("alert")).getByRole("strong");
       expect(logoutText).toHaveTextContent("Je bent automatisch uitgelogd");
       expect(logoutText).toBeVisible();
+      expect(console.error).toHaveBeenCalledWith("Forbidden access to route /logs for unauthenticated user");
     });
   });
 

@@ -62,6 +62,13 @@ test.describe("authentication", () => {
 });
 
 test.describe("navigation and redirects", () => {
+  test("unauthenticated user gets redirected to login page with alert", async ({ page }) => {
+    await page.goto("/elections");
+    const loginPage = new LoginPgObj(page);
+    await expect(loginPage.heading).toBeVisible();
+    await expect(loginPage.alert).toContainText("Je hebt geen toegang tot deze pagina");
+  });
+
   test("completed and logged in user gets redirected from login page to elections page", async ({ coordinatorOne }) => {
     const page = coordinatorOne.page;
 

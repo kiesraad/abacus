@@ -297,28 +297,6 @@ describe("AuthorizationGuard", () => {
     });
   });
 
-  test("redirects a logged-in user from the login page to /elections", async () => {
-    const router = await renderAuthorizationGuard({
-      initialPath: "/account/login",
-      userRole: "administrator",
-      routes: [
-        {
-          path: "/account/login",
-          element: (
-            <AuthorizationGuard>
-              <div>Login page</div>
-            </AuthorizationGuard>
-          ),
-          handle: { public: true },
-        },
-        { path: "/elections", element: <div>Elections overview</div>, handle: { public: true } },
-      ],
-    });
-
-    expect(router.state.location.pathname).toBe("/elections");
-    expect(screen.getByText("Elections overview")).toBeVisible();
-  });
-
   test("redirects a first-login user from the login page to /account/setup", async () => {
     const router = await renderAuthorizationGuard({
       initialPath: "/account/login",
@@ -407,5 +385,27 @@ describe("AuthorizationGuard", () => {
     });
 
     expect(router.state.location.pathname).toBe("/account/logout");
+  });
+
+  test("redirects a logged-in user from the login page to /elections", async () => {
+    const router = await renderAuthorizationGuard({
+      initialPath: "/account/login",
+      userRole: "administrator",
+      routes: [
+        {
+          path: "/account/login",
+          element: (
+            <AuthorizationGuard>
+              <div>Login page</div>
+            </AuthorizationGuard>
+          ),
+          handle: { public: true },
+        },
+        { path: "/elections", element: <div>Elections overview</div>, handle: { public: true } },
+      ],
+    });
+
+    expect(router.state.location.pathname).toBe("/elections");
+    expect(screen.getByText("Elections overview")).toBeVisible();
   });
 });

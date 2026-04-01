@@ -22,6 +22,7 @@ export function AuthorizationGuard({ children }: AuthorizationGuardProps) {
   const isAuthenticated = user !== null;
   const isPublic = routeMatch?.handle.public;
   const isAllowed = isPublic || (user?.role && routeMatch?.handle.roles.includes(user.role));
+  const accountRequiresSetup = isAuthenticated && (!user.fullname || user.needs_password_change);
 
   // if user is not allowed on this route
   if (!isAllowed) {
@@ -41,6 +42,11 @@ export function AuthorizationGuard({ children }: AuthorizationGuardProps) {
   // navigate to login page if the session has expired
   if (sessionValidFor !== null && sessionValidFor <= 0 && !isPublic) {
     return <Navigate to="/account/login" state={{ unauthorized: true }} />;
+  }
+
+  // restrict account that requires setup to the account setup page and logout page
+  if (accountRequiresSetup && routeMatch?.pathname !== "/account/setup" && routeMatch?.pathname !== "/account/logout") {
+    return <Navigate to={getPostLoginPath(user)} replace />;
   }
 
   // navigate to the overview if the user is logged in and tries to access the login page

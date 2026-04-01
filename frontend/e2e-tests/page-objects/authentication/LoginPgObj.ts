@@ -1,12 +1,14 @@
 import type { Locator, Page } from "@playwright/test";
 
 export class LoginPgObj {
+  readonly heading: Locator;
   readonly username: Locator;
   readonly password: Locator;
   readonly loginBtn: Locator;
   readonly alert: Locator;
 
   constructor(protected readonly page: Page) {
+    this.heading = page.getByRole("heading", { level: 1, name: "Inloggen" });
     this.username = page.getByRole("textbox", { name: "Gebruikersnaam" });
     this.password = page.getByRole("textbox", { name: "Wachtwoord" });
     this.loginBtn = page.getByRole("button", { name: "Inloggen" });

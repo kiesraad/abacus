@@ -121,7 +121,10 @@ test.describe("navigation and redirects", () => {
     await expect(accountSetupPage.heading).toBeVisible();
   });
 
-  test("incomplete logged in user gets redirected from elections page to login page", async ({ page, newTypist }) => {
+  test("incomplete logged in user gets redirected from elections page to account setup page", async ({
+    page,
+    newTypist,
+  }) => {
     const loginPage = new LoginPgObj(page);
     await page.goto("/account/setup");
     await loginPage.login(newTypist.username, FIXTURE_TYPIST_TEMP_PASSWORD);
@@ -130,8 +133,19 @@ test.describe("navigation and redirects", () => {
     await expect(accountSetupPage.heading).toBeVisible();
 
     await page.goto("/elections");
-    await expect(page.getByRole("heading", { level: 1, name: "Inloggen" })).toBeVisible();
-    // redirect should be to the account setup page instead:
-    // await expect(accountSetupPage.heading).toBeVisible();
+    await expect(accountSetupPage.heading).toBeVisible();
+  });
+
+  test("incomplete logged in user can log out", async ({ page, newTypist }) => {
+    const loginPage = new LoginPgObj(page);
+    await page.goto("/account/setup");
+    await loginPage.login(newTypist.username, FIXTURE_TYPIST_TEMP_PASSWORD);
+
+    const accountSetupPage = new AccountSetupPgObj(page);
+    await expect(accountSetupPage.heading).toBeVisible();
+
+    const userInfoTopBar = new UserInfoTopBar(page);
+    await userInfoTopBar.logout.click();
+    await expect(loginPage.heading).toBeVisible();
   });
 });

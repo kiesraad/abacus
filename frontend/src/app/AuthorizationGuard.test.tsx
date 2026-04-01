@@ -350,4 +350,62 @@ describe("AuthorizationGuard", () => {
     expect(router.state.location.pathname).toBe("/account/setup");
     expect(screen.getByText("Account setup")).toBeVisible();
   });
+
+  test("redirects a first-login user from the elections page to /account/setup", async () => {
+    const router = await renderAuthorizationGuard({
+      initialPath: "/elections",
+      user: {
+        user_id: 1,
+        username: "test",
+        role: "administrator",
+        fullname: "",
+        needs_password_change: true,
+      },
+      routes: [
+        {
+          path: "/elections",
+          element: (
+            <AuthorizationGuard>
+              <div>Elections overview page</div>
+            </AuthorizationGuard>
+          ),
+          handle: { public: true },
+        },
+        {
+          path: "/account/setup",
+          element: <div>Account setup</div>,
+          handle: { roles: ["administrator"] },
+        },
+      ],
+    });
+
+    expect(router.state.location.pathname).toBe("/account/setup");
+    expect(screen.getByText("Account setup")).toBeVisible();
+  });
+
+  test("a first-login user can access /account/logout", async () => {
+    const router = await renderAuthorizationGuard({
+      initialPath: "/account/logout",
+      user: {
+        user_id: 1,
+        username: "test",
+        role: "administrator",
+        fullname: "",
+        needs_password_change: true,
+      },
+      routes: [
+        {
+          path: "/account/logout",
+          element: (
+            <AuthorizationGuard>
+              <div>Elections overview page</div>
+            </AuthorizationGuard>
+          ),
+          handle: { public: true },
+        },
+      ],
+    });
+
+    expect(router.state.location.pathname).toBe("/account/logout");
+  });
 });

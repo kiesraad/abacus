@@ -10,4 +10,6 @@ pub mod middleware;
 pub mod polling_station;
 pub mod providers;
 pub mod report;
+#[cfg(test)]
+pub mod tests;
 pub mod user;

@@ -376,7 +376,7 @@ describe("AuthorizationGuard", () => {
           path: "/account/logout",
           element: (
             <AuthorizationGuard>
-              <div>Elections overview page</div>
+              <div>Logout page</div>
             </AuthorizationGuard>
           ),
           handle: { public: true },

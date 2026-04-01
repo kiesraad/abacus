@@ -22,7 +22,7 @@ use crate::{
         investigation::PollingStationInvestigation,
         models::{
             ModelN10_2Input, ModelNa14_2Bijlage1Input, ModelNa14_2Input, ModelNa31_2Bijlage1Input,
-            ModelNa31_2Input, ModelP2aInput, PdfFileModel, PdfModel,
+            ModelNa31_2InlegvelInput, ModelNa31_2Input, ModelP2aInput, PdfFileModel, PdfModel,
         },
         polling_station::{PollingStation, PollingStationId, PollingStationType},
         results::{
@@ -130,7 +130,7 @@ fn random_election(
         location: random_string(rng, string_length),
         domain_id: random_string(rng, string_length),
         category: ElectionCategory::Municipal,
-        number_of_seats: rng.random_range(0..5),
+        number_of_seats: rng.random_range(9..45),
         number_of_voters: rng.random_range(0..=10_000),
         election_date: random_date(rng),
         nomination_date: random_date(rng),
@@ -403,6 +403,29 @@ async fn test_pdf(model: PdfModel) {
 }
 
 #[test(tokio::test)]
+async fn test_n_10_2() {
+    let mut rng = rand::rng();
+
+    for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
+        let election = random_election(
+            &mut rng,
+            parties,
+            candidates,
+            string_length,
+            none_where_possible,
+        );
+        let polling_station = random_polling_station(&mut rng, string_length, none_where_possible);
+
+        let model = PdfModel::ModelN10_2(Box::new(ModelN10_2Input {
+            election,
+            polling_station,
+        }));
+
+        test_pdf(model).await;
+    }
+}
+
+#[test(tokio::test)]
 async fn test_na_14_2() {
     let mut rng = rand::rng();
 
@@ -539,7 +562,7 @@ async fn test_na_31_2_bijlage_1() {
 }
 
 #[test(tokio::test)]
-async fn test_n_10_2() {
+async fn test_na_31_2_inlegvel() {
     let mut rng = rand::rng();
 
     for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
@@ -550,11 +573,9 @@ async fn test_n_10_2() {
             string_length,
             none_where_possible,
         );
-        let polling_station = random_polling_station(&mut rng, string_length, none_where_possible);
 
-        let model = PdfModel::ModelN10_2(Box::new(ModelN10_2Input {
-            election,
-            polling_station,
+        let model = PdfModel::ModelNa31_2Inlegvel(Box::new(ModelNa31_2InlegvelInput {
+            election: election.into(),
         }));
 
         test_pdf(model).await;

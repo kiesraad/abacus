@@ -2,6 +2,7 @@ import { expect } from "@playwright/test";
 import { getTestPassword } from "e2e-tests/helpers-utils/e2e-test-api-helpers";
 import { AccountSetupPgObj } from "e2e-tests/page-objects/authentication/AccountSetupPgObj";
 import { LoginPgObj } from "e2e-tests/page-objects/authentication/LoginPgObj";
+import { NoAccessPgObj } from "e2e-tests/page-objects/authentication/NoAccessPgObj";
 import { ElectionsOverviewPgObj } from "e2e-tests/page-objects/election/ElectionsOverviewPgObj";
 import { UserInfoTopBar } from "e2e-tests/page-objects/nav_bar/UserInfoTopBarPgObj";
 import { FIXTURE_TYPIST_TEMP_PASSWORD, test } from "../fixtures";
@@ -57,5 +58,80 @@ test.describe("authentication", () => {
     const overviewPage = new ElectionsOverviewPgObj(page);
     await expect(userInfoTopBar.username).toHaveText(newTypist.fullname!);
     await expect(overviewPage.alertAccountSetup).toBeVisible();
+  });
+});
+
+test.describe("navigation and redirects", () => {
+  test("completed and logged in user gets redirected from login page to elections page", async ({ coordinatorOne }) => {
+    const page = coordinatorOne.page;
+
+    await page.goto("/elections");
+    const electionsPage = new ElectionsOverviewPgObj(page);
+    await expect(electionsPage.header).toBeVisible();
+
+    await page.goto("/account/login");
+    await expect(electionsPage.header).toBeVisible();
+  });
+
+  test("completed and logged in user gets redirected from account setup page to no access page", async ({
+    coordinatorOne,
+  }) => {
+    const page = coordinatorOne.page;
+
+    await page.goto("/elections");
+    const electionsPage = new ElectionsOverviewPgObj(page);
+    await expect(electionsPage.header).toBeVisible();
+
+    await page.goto("/account/setup");
+    const noAccessPage = new NoAccessPgObj(page);
+    await expect(noAccessPage.heading).toBeVisible();
+  });
+
+  test("incomplete logged in user gets redirected from login page to account setup page", async ({
+    page,
+    newTypist,
+  }) => {
+    const username = newTypist.username;
+
+    const loginPage = new LoginPgObj(page);
+    await page.goto("/account/login");
+    await loginPage.username.fill(username);
+    await loginPage.password.fill(FIXTURE_TYPIST_TEMP_PASSWORD);
+    await loginPage.loginBtn.click();
+
+    const accountSetupPage = new AccountSetupPgObj(page);
+    await expect(accountSetupPage.heading).toBeVisible();
+
+    await page.goto("/account/login");
+    await expect(accountSetupPage.heading).toBeVisible();
+  });
+
+  test("incomplete logged in user that refreshes the account setup page stays on that page", async ({
+    page,
+    newTypist,
+  }) => {
+    const loginPage = new LoginPgObj(page);
+    await page.goto("/account/setup");
+    await loginPage.login(newTypist.username, FIXTURE_TYPIST_TEMP_PASSWORD);
+
+    const accountSetupPage = new AccountSetupPgObj(page);
+    await expect(accountSetupPage.heading).toBeVisible();
+
+    await page.goto("/account/setup");
+    await expect(accountSetupPage.heading).toBeVisible();
+  });
+
+  test("incomplete logged in user gets redirected from elections page to login page", async ({ page, newTypist }) => {
+    const loginPage = new LoginPgObj(page);
+    await page.goto("/account/setup");
+    await loginPage.login(newTypist.username, FIXTURE_TYPIST_TEMP_PASSWORD);
+
+    const accountSetupPage = new AccountSetupPgObj(page);
+    await expect(accountSetupPage.heading).toBeVisible();
+
+    await page.goto("/elections");
+    await expect(page.getByRole("heading", { level: 1, name: "Inloggen" })).toBeVisible();
+    // redirect should be to the account setup page instead:
+    // await expect(accountSetupPage.heading).toBeVisible();
   });
 });

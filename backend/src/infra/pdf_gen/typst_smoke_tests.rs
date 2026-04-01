@@ -591,7 +591,7 @@ async fn test_p_2a() {
 
         let model = PdfModel::ModelP2a(Box::new(ModelP2aInput {
             committee_session,
-            election,
+            election: election.into(),
             investigations,
         }));
 

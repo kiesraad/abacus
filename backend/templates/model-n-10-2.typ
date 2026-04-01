@@ -196,7 +196,7 @@ Bijvoorbeeld als er meerdere verkiezingen tegelijk werden georganiseerd, en een 
   #sum(
     sum(
       ..input.election.political_groups.map(list => {
-        empty_letterbox([E.#list.number])[Totaal lijst #list.number - #list.name]
+        empty_letterbox([E.#list.number])[Totaal lijst #list.number - #list.display_name]
       }),
       empty_letterbox(
         "E",

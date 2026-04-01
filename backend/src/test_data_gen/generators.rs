@@ -25,6 +25,8 @@ use crate::{
                 DifferenceCountsCompareVotesCastAdmittedVoters, DifferencesCounts,
             },
             extra_investigation::ExtraInvestigation,
+            gsb_differences_counts::GSBDifferencesCounts,
+            gsb_results::GSBResults,
             political_group_candidate_votes::{CandidateVotes, PoliticalGroupCandidateVotes},
             political_group_total_votes::PoliticalGroupTotalVotes,
             voters_counts::VotersCounts,
@@ -512,9 +514,10 @@ async fn generate_csb_data_entry(
 
         let candidate_slope =
             rng.random_range(args.candidate_distribution_slope.clone()) as f64 / 1000.0;
-        let results = Results::CSOFirstSession(generate_cso_first_session_results(
+        let results = Results::GSB(generate_gsb_results(
             rng,
             &election.political_groups,
+            election.number_of_voters,
             voters_turned_out,
             &group_weights,
             candidate_slope,
@@ -542,8 +545,8 @@ async fn generate_csb_data_entry(
         if rng.random_ratio(second_entry_chance, 100) {
             // generate a definitive data entry
             let state = DataEntryStatus::Definitive(Definitive {
-                first_entry_user_id: UserId::from(5), // first typist from users in fixtures
-                second_entry_user_id: UserId::from(6), // second typist from users in fixtures
+                first_entry_user_id: UserId::from(9), // first typist from users in fixtures
+                second_entry_user_id: UserId::from(10), // second typist from users in fixtures
                 finished_at: ts,
                 finalised_with_warnings: validation_results.has_warnings(),
                 results: results.clone(),
@@ -556,7 +559,7 @@ async fn generate_csb_data_entry(
         } else {
             // generate only a first data entry
             let state = DataEntryStatus::FirstEntryFinalised(FirstEntryFinalised {
-                first_entry_user_id: UserId::from(5), // first typist from users in fixtures
+                first_entry_user_id: UserId::from(9), // first typist from users in fixtures
                 finalised_first_entry: results.clone(),
                 first_entry_finished_at: ts,
                 finalised_with_warnings: validation_results.has_warnings(),
@@ -628,10 +631,10 @@ fn generate_cso_first_session_results(
     ];
 
     let extra_investigation = extra_investigation_options
-        .choose_weighted(rng, |item| item.0)
-        .expect("Weighted random selection for extra_investigation should never fail with valid weights")
-        .1
-        .clone();
+      .choose_weighted(rng, |item| item.0)
+      .expect("Weighted random selection for extra_investigation should never fail with valid weights")
+      .1
+      .clone();
 
     CSOFirstSessionResults {
         extra_investigation,
@@ -676,6 +679,82 @@ fn generate_cso_first_session_results(
             more_ballots_count: 0,
             fewer_ballots_count: 0,
             difference_completely_accounted_for: YesNo::default(),
+        },
+        political_group_votes: political_groups
+            .iter()
+            .zip(pg_votes)
+            .map(|(pg, votes)| {
+                // distribute the votes for this group among candidates, but give the most votes to the first candidate
+                let candidate_votes = distribute_power_law(
+                    rng,
+                    votes,
+                    pg.candidates.len(),
+                    candidate_distribution_slope,
+                    true,
+                );
+                PoliticalGroupCandidateVotes {
+                    number: pg.number,
+                    total: votes,
+                    candidate_votes: pg
+                        .candidates
+                        .iter()
+                        .zip(candidate_votes)
+                        .map(|(candidate, votes)| CandidateVotes {
+                            number: candidate.number,
+                            votes,
+                        })
+                        .collect(),
+                }
+            })
+            .collect(),
+    }
+}
+
+fn generate_gsb_results(
+    rng: &mut impl rand::RngExt,
+    political_groups: &[PoliticalGroup],
+    number_of_voters: u32,
+    number_of_votes: u32,
+    group_weights: &[f64],
+    candidate_distribution_slope: f64,
+) -> GSBResults {
+    // generate a small percentage of blank votes
+    #[allow(clippy::cast_possible_truncation)]
+    let blank_votes = (number_of_votes as f64 * rng.random_range(0.0..0.02)) as u32;
+    let remaining_votes = number_of_votes - blank_votes;
+
+    // generate a small percentage of invalid votes
+    #[allow(clippy::cast_possible_truncation)]
+    let invalid_votes = (remaining_votes as f64 * rng.random_range(0.0..0.02)) as u32;
+    let remaining_votes = remaining_votes - invalid_votes;
+
+    // distribute the remaining votes for this polling station randomly according to a power law distribution
+    let pg_votes = distribute_fill_weights(rng, group_weights, remaining_votes, false);
+
+    GSBResults {
+        number_of_voters,
+        voters_counts: VotersCounts {
+            poll_card_count: number_of_votes,
+            proxy_certificate_count: 0,
+            total_admitted_voters_count: number_of_votes,
+        },
+        votes_counts: VotesCounts {
+            political_group_total_votes: political_groups
+                .iter()
+                .zip(pg_votes.clone())
+                .map(|(pg, votes)| PoliticalGroupTotalVotes {
+                    number: pg.number,
+                    total: votes,
+                })
+                .collect(),
+            total_votes_candidates_count: remaining_votes,
+            blank_votes_count: blank_votes,
+            invalid_votes_count: invalid_votes,
+            total_votes_cast_count: number_of_votes,
+        },
+        differences_counts: GSBDifferencesCounts {
+            more_ballots_count: 0,
+            fewer_ballots_count: 0,
         },
         political_group_votes: political_groups
             .iter()

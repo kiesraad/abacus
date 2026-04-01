@@ -1099,7 +1099,7 @@ export const candidate_nomination: CandidateNomination = {
       locality: "Test Location",
       gender: "Male",
       list_number: 5,
-      list_name: "",
+      list_name: "Blanco (Jacobse, F.)",
     },
     {
       number: 2,
@@ -1129,7 +1129,7 @@ export const candidate_nomination: CandidateNomination = {
       locality: "Test Location",
       gender: "Male",
       list_number: 5,
-      list_name: "",
+      list_name: "Blanco (Jacobse, F.)",
     },
     {
       number: 4,
@@ -1402,7 +1402,7 @@ export const candidate_nomination: CandidateNomination = {
     },
     {
       list_number: 5,
-      list_name: "",
+      list_name: "Blanco (Jacobse, F.)",
       list_seats: 2,
       preferential_candidate_nomination: [
         {
@@ -1574,6 +1574,7 @@ export const election: ElectionWithPoliticalGroups = {
     {
       number: 1,
       name: "Political Group A",
+      display_name: "Political Group A",
       candidates: [
         {
           number: 1,
@@ -1621,6 +1622,7 @@ export const election: ElectionWithPoliticalGroups = {
     {
       number: 2,
       name: "Political Group B",
+      display_name: "Political Group B",
       candidates: [
         {
           number: 1,
@@ -1660,6 +1662,7 @@ export const election: ElectionWithPoliticalGroups = {
     {
       number: 3,
       name: "Political Group C",
+      display_name: "Political Group C",
       candidates: [
         {
           number: 1,
@@ -1682,6 +1685,7 @@ export const election: ElectionWithPoliticalGroups = {
     {
       number: 4,
       name: "Political Group D",
+      display_name: "Political Group D",
       candidates: [
         {
           number: 1,
@@ -1704,6 +1708,7 @@ export const election: ElectionWithPoliticalGroups = {
     {
       number: 5,
       name: "",
+      display_name: "Blanco (Jacobse, F.)",
       candidates: [
         {
           number: 1,

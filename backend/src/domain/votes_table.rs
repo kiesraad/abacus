@@ -164,7 +164,7 @@ fn get_votes_for_candidate(
 pub struct VotesTable {
     /// Political group number
     number: PGNumber,
-    /// Political group name
+    /// Political group display name
     name: String,
     /// Total votes for the political group
     total: Option<Count>,
@@ -279,7 +279,7 @@ impl VotesTable {
 
         Ok(VotesTable {
             number: group.number,
-            name: group.name.clone(),
+            name: group.display_name.clone(),
             total: candidate_votes.map(|cv| cv.total),
             previous_total: previous_candidate_votes.map(|pcv| pcv.total),
             columns,

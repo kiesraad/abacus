@@ -869,6 +869,7 @@ export const election: ElectionWithPoliticalGroups = {
     {
       number: 1,
       name: "Political Group A",
+      display_name: "Political Group A",
       candidates: [
         {
           number: 1,
@@ -891,6 +892,7 @@ export const election: ElectionWithPoliticalGroups = {
     {
       number: 2,
       name: "Political Group B",
+      display_name: "Political Group B",
       candidates: [
         {
           number: 1,
@@ -912,7 +914,8 @@ export const election: ElectionWithPoliticalGroups = {
     },
     {
       number: 3,
-      name: "Political Group C",
+      name: "",
+      display_name: "Blanco (Smit, G.)",
       candidates: [
         {
           number: 1,

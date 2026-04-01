@@ -84,7 +84,8 @@ describe("Test CandidatesVotesForm", () => {
         political_groups: [
           {
             number: 1,
-            name: "Lijst 1 - Vurige Vleugels Partij",
+            name: "Vurige Vleugels Partij",
+            display_name: "Vurige Vleugels Partij",
             candidates: [
               {
                 number: 1,
@@ -111,7 +112,8 @@ describe("Test CandidatesVotesForm", () => {
         political_groups: [
           {
             number: 1,
-            name: "Lijst 1 - Vurige Vleugels Partij",
+            name: "Vurige Vleugels Partij",
+            display_name: "Vurige Vleugels Partij",
             candidates: [
               {
                 number: 1,
@@ -278,7 +280,8 @@ describe("Test CandidatesVotesForm", () => {
     test("CandidateVotesForm request body is equal to the form data", async () => {
       const politicalGroupMockData: PoliticalGroup = {
         number: 1,
-        name: "Lijst 1 - Vurige Vleugels Partij",
+        name: "Vurige Vleugels Partij",
+        display_name: "Vurige Vleugels Partij",
         candidates: [
           {
             number: 1,
@@ -315,6 +318,7 @@ describe("Test CandidatesVotesForm", () => {
           {
             number: 2,
             name: "Lijst 2 - Wijzen van Water en Wind",
+            display_name: "Lijst 2 - Wijzen van Water en Wind",
             candidates: [
               {
                 number: 1,

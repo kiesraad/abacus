@@ -10,16 +10,21 @@ describe("formatPoliticalGroupName", () => {
   });
 
   it("formats named political groups correctly", () => {
-    const politicalGroup1: PoliticalGroup = { name: "Group Name", number: 10, candidates: [] };
+    const politicalGroup1: PoliticalGroup = {
+      name: "Group Name",
+      display_name: "Group Name",
+      number: 10,
+      candidates: [],
+    };
 
     expect(formatPoliticalGroupName(politicalGroup1)).toBe("Lijst 10 - Group Name");
     expect(formatPoliticalGroupName(politicalGroup1, false)).toBe("Group Name");
   });
 
   it("formats unnamed political groups correctly", () => {
-    const politicalGroup1: PoliticalGroup = { name: "", number: 2, candidates: [] };
-    const politicalGroup2: PoliticalGroup = {
+    const politicalGroup: PoliticalGroup = {
       name: "",
+      display_name: "Blanco (de Boer, A.B.)",
       number: 123,
       candidates: [
         {
@@ -32,9 +37,7 @@ describe("formatPoliticalGroupName", () => {
       ],
     };
 
-    expect(formatPoliticalGroupName(politicalGroup1)).toBe("Lijst 2 - Blanco");
-    expect(formatPoliticalGroupName(politicalGroup1, false)).toBe("Blanco");
-    expect(formatPoliticalGroupName(politicalGroup2)).toBe("Lijst 123 - Blanco (De Boer, A.B.)");
-    expect(formatPoliticalGroupName(politicalGroup2, false)).toBe("Blanco (De Boer, A.B.)");
+    expect(formatPoliticalGroupName(politicalGroup)).toBe("Lijst 123 - Blanco (de Boer, A.B.)");
+    expect(formatPoliticalGroupName(politicalGroup, false)).toBe("Blanco (de Boer, A.B.)");
   });
 });

@@ -1063,7 +1063,7 @@ export const political_group_1_candidate_nomination: ListCandidateNomination = {
 
 export const political_group_5_candidate_nomination: ListCandidateNomination = {
   list_number: 5,
-  list_name: "",
+  list_name: "Blanco (Smit, G.)",
   list_seats: 0,
   preferential_candidate_nomination: [],
   other_candidate_nomination: [],
@@ -1578,6 +1578,7 @@ export const election_summary: ElectionSummary = {
 export const political_group_1: PoliticalGroup = {
   number: 1,
   name: "Political Group A",
+  display_name: "Political Group A",
   candidates: [
     {
       number: 1,
@@ -1711,6 +1712,7 @@ export const election: ElectionWithPoliticalGroups = {
     {
       number: 2,
       name: "Political Group B",
+      display_name: "Political Group B",
       candidates: [
         {
           number: 1,
@@ -1767,6 +1769,7 @@ export const election: ElectionWithPoliticalGroups = {
     {
       number: 3,
       name: "Political Group C",
+      display_name: "Political Group C",
       candidates: [
         {
           number: 1,
@@ -1825,6 +1828,7 @@ export const election: ElectionWithPoliticalGroups = {
     {
       number: 4,
       name: "Political Group D",
+      display_name: "Political Group D",
       candidates: [
         {
           number: 1,
@@ -1871,6 +1875,7 @@ export const election: ElectionWithPoliticalGroups = {
     {
       number: 5,
       name: "",
+      display_name: "Blanco (Smit, G.)",
       candidates: [
         {
           number: 1,
@@ -1909,6 +1914,7 @@ export const election: ElectionWithPoliticalGroups = {
     {
       number: 6,
       name: "Political Group F",
+      display_name: "Political Group F",
       candidates: [
         {
           number: 1,
@@ -1948,6 +1954,7 @@ export const election: ElectionWithPoliticalGroups = {
     {
       number: 7,
       name: "Political Group G",
+      display_name: "Political Group G",
       candidates: [
         {
           number: 1,
@@ -1987,6 +1994,7 @@ export const election: ElectionWithPoliticalGroups = {
     {
       number: 8,
       name: "Political Group H",
+      display_name: "Political Group H",
       candidates: [
         {
           number: 1,

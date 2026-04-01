@@ -110,6 +110,7 @@
       {
         "number": 1,
         "name": "Political Group A",
+        "display_name": "Political Group A",
         "candidates": [
           {
             "number": 1,
@@ -132,6 +133,7 @@
       {
         "number": 2,
         "name": "Political Group B",
+        "display_name": "Political Group B",
         "candidates": [
           {
             "number": 1,
@@ -153,7 +155,8 @@
       },
       {
         "number": 3,
-        "name": "Political Group C",
+        "name": "",
+        "display_name": "Blanco (Smit, G.)",
         "candidates": [
           {
             "number": 1,
@@ -204,7 +207,7 @@
         "locality": "Test Location",
         "gender": "Female",
         "list_number": 3,
-        "list_name": "Political Group C"
+        "list_name": "Blanco (Smit, G.)"
       },
       {
         "number": 2,
@@ -243,7 +246,7 @@
         "locality": "Test Location",
         "gender": "Male",
         "list_number": 3,
-        "list_name": "Political Group C"
+        "list_name": "Blanco (Smit, G.)"
       }
     ],
     "list_candidate_nomination": [
@@ -283,7 +286,7 @@
       },
       {
         "list_number": 3,
-        "list_name": "Political Group C",
+        "list_name": "Blanco (Smit, G.)",
         "list_seats": 2,
         "preferential_candidate_nomination": [
           {

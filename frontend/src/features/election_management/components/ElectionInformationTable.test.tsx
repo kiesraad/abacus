@@ -37,6 +37,7 @@ const renderGSBTable = (
             {
               number: 1,
               name: "Wijzen van Water en Wind",
+              display_name: "Wijzen van Water en Wind",
               candidates: [
                 {
                   number: 1,

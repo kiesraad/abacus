@@ -215,7 +215,7 @@ impl PoliticalGroup {
         Ok(PoliticalGroup {
             number: pg_number,
             name: pg_name.clone(),
-            display_name: Self::display_name(pg_name.clone(), &aff),
+            display_name: Self::display_name(pg_name.clone(), aff),
             candidates: aff
                 .candidates
                 .iter()
@@ -244,29 +244,14 @@ impl PoliticalGroup {
                 aff.candidates
                     .first()
                     .expect("At least 1 candidate should be present"),
-            )?;
+            )
+            .expect("At least 1 candidate should be present");
 
             let mut last_name = String::new();
 
-            if first_candidate.last_name_prefix.is_some() {
-                let mut last_name_prefix = String::new();
-                let last_name_prefix_value = first_candidate
-                    .last_name_prefix
-                    .expect("Last name prefix should exist");
-                let last_name_prefix_first_character = last_name_prefix_value
-                    .chars()
-                    .next()
-                    .expect("Last name prefix should contain at least one character")
-                    .to_uppercase();
-                let last_name_prefix_sliced =
-                    last_name_prefix_value.chars().nth(1).unwrap().to_string();
-                last_name_prefix.push_str(&format!(
-                    "{}{} ",
-                    last_name_prefix_first_character, last_name_prefix_sliced
-                ));
-
+            if let Some(last_name_prefix) = first_candidate.last_name_prefix {
                 last_name.push_str(&format!(
-                    "{}{}",
+                    "{} {}",
                     last_name_prefix, first_candidate.last_name
                 ));
             } else {

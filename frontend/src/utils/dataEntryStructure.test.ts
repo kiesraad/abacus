@@ -153,6 +153,7 @@ describe("createPoliticalGroupSections", () => {
         {
           number: 1,
           name: "Test Group",
+          display_name: "Test Group",
           candidates: Array.from(
             { length: 30 },
             (_, i) =>
@@ -196,6 +197,7 @@ describe("createPoliticalGroupSections", () => {
         {
           number: 1,
           name: "Empty Group",
+          display_name: "Empty Group",
           candidates: [],
         },
       ],

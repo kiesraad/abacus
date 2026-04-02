@@ -36,6 +36,7 @@
     "build:storybook": "storybook build -o dist-storybook"
   },
   "dependencies": {
+    "@vitejs/plugin-react": "^6.0.1",
     "browserslist": "4.28.1",
     "lightningcss": "1.32.0",
     "react": "19.2.4",
@@ -59,7 +60,6 @@
     "@types/react-dom": "19.2.3",
     "@typescript-eslint/eslint-plugin": "8.57.1",
     "@typescript-eslint/parser": "8.57.1",
-    "@vitejs/plugin-react-swc": "4.3.0",
     "@vitest/browser-playwright": "4.1.0",
     "@vitest/coverage-v8": "4.1.0",
     "@vitest/expect": "4.1.0",

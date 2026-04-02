@@ -55,6 +55,8 @@ Het #location_type maakt bij een verkiezing een verslag van de controlewerkzaamh
 
 #show: doc => document_numbering(doc)
 
+#show heading.where(level: 3): it => [#block(it.body)]
+
 = Verslag van de zitting
 
 == Presentielijst
@@ -171,6 +173,11 @@ De volgende rollen zijn mogelijk: voorzitter, plaatsvervangend voorzitter of lid
 
 #pagebreak(weak: true)
 
+#show heading.where(level: 3): it => [
+  #text(weight: "bold", counter(heading).display(it.numbering))
+  #it.body
+]
+
 == Verschillen tussen aantal kiezers en uitgebrachte stemmen
 
 === Is het aantal uitgebrachte stemmen en het aantal toegelaten kiezers gelijk?
@@ -235,7 +242,7 @@ Hieronder is berekend hoe vaak elke lijst qua stemmenaantal de kiesdeler heeft g
   table.header(
     table.cell(header_text([Lijst])),
     table.cell(align: right, header_text([Aantal stemmen])),
-    table.cell(stroke: none, align: center, header_text([÷ Kiesdeler =])),
+    table.cell(stroke: none, align: center, header_text([÷ Kiesdeler])),
     table.cell(stroke: none, align: right, header_text([Volle zetels])),
   ),
   table.hline(stroke: 1pt + black),
@@ -286,6 +293,8 @@ Na toewijzing van de volle zetels blijft een aantal te verdelen zetels over. Dit
     - Als er daarna nog restzetels over zijn, verdeelt het #location_type die volgens het systeem van de grootste gemiddelden. Ook bij deze verdeling mag iedere lijst maar één restzetel krijgen.
     - Als lijsten precies evenveel stemmen behalen en er niet voldoende restzetels zijn voor die lijsten, dan wordt geloot welke lijst de restzetel krijgt.
 
+    #pagebreak(weak: true)
+
     #let final_standing_pgs_meeting_threshold = input.seat_assignment.final_standing.filter(
     (list_seat_assignment) => list_seat_assignment.meets_remainder_threshold);
     #table(
@@ -329,7 +338,9 @@ Na toewijzing van de volle zetels blijft een aantal te verdelen zetels over. Dit
   
     Als meerdere lijsten gelijke gemiddelden hebben en er niet voldoende restzetels zijn voor toekenning ervan aan die lijsten, wordt geloot welke lijst de restzetel krijgt.
 
-    #TODO[marking of selected average does not work]
+    #pagebreak(weak: true)
+
+    #TODO[marking of selected average does not work yet]
   
     #highest_averages_table(highest_averages_steps, input.seat_assignment.final_standing, input.election.political_groups, input.result_changes_residual_seats)
   ]

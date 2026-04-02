@@ -166,11 +166,14 @@ pub async fn committee_session_create(
     ),
 )]
 pub async fn committee_session_delete(
+    user: User,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Path((election_id, committee_session_id)): Path<(ElectionId, CommitteeSessionId)>,
 ) -> Result<StatusCode, APIError> {
     let mut tx = pool.begin_immediate().await?;
+    user.role()
+        .is_authorized(&get_committee_category(&mut tx, committee_session_id).await?)?;
 
     let committee_session = validate_committee_session_is_current_committee_session(
         &mut tx,
@@ -364,4 +367,51 @@ pub async fn committee_session_investigations(
         .investigations();
 
     Ok(Json(InvestigationListResponse { investigations }))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use axum::response::{IntoResponse, Response};
+    use test_log::test;
+
+    use crate::{
+        api::tests::{
+            assert_committee_category_authorization_err, assert_committee_category_authorization_ok,
+        },
+        repository::user_repo::UserId,
+    };
+
+    async fn call_handlers(
+        pool: SqlitePool,
+        coordinator_role: Role,
+    ) -> Vec<(&'static str, Response)> {
+        let user = User::test_user(coordinator_role, UserId::from(1));
+        let audit = AuditService::new(Some(user.clone()), None);
+
+        let election_id = ElectionId::from(2);
+        let committee_session_id = CommitteeSessionId::from(2);
+
+        #[rustfmt::skip]
+        let results = vec![
+            ("create",         committee_session_create(user.clone(), State(pool.clone()), audit.clone(), Path(election_id)).await.into_response()),
+            ("delete",         committee_session_delete(user.clone(), State(pool.clone()), audit.clone(), Path((election_id, committee_session_id))).await.into_response()),
+            ("update",         committee_session_update(user.clone(), State(pool.clone()), audit.clone(), Path((election_id, committee_session_id)), Json(CommitteeSessionUpdateRequest { location: "Test".into(), start_date: "2026-04-01".into(), start_time: "09:30".into() })).await.into_response()),
+            ("status_change",  committee_session_status_change(user.clone(), State(pool.clone()), audit.clone(), Path((election_id, committee_session_id)), Json(CommitteeSessionStatusChangeRequest { status: CommitteeSessionStatus::DataEntry })).await.into_response()),
+            ("investigations", committee_session_investigations(user.clone(), State(pool.clone()), Path((election_id, committee_session_id))).await.into_response()),
+        ];
+        results
+    }
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
+    async fn test_committee_category_authorization_err(pool: SqlitePool) {
+        let results = call_handlers(pool, Role::CoordinatorCSB).await;
+        assert_committee_category_authorization_err(results).await;
+    }
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
+    async fn test_committee_category_authorization_ok(pool: SqlitePool) {
+        let results = call_handlers(pool, Role::CoordinatorGSB).await;
+        assert_committee_category_authorization_ok(results);
+    }
 }

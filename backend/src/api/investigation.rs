@@ -748,6 +748,7 @@ mod tests {
     use sqlx::SqlitePool;
     use test_log::test;
 
+    use super::*;
     use crate::{
         domain::polling_station::PollingStationId, repository::polling_station_repo::exists,
     };
@@ -787,5 +788,60 @@ mod tests {
         let res = super::validate_and_get_committee_session(&mut conn, polling_station_id).await;
 
         assert!(res.is_err());
+    }
+
+    mod authorization {
+        use super::*;
+        use axum::{
+            Json,
+            extract::State,
+            response::{IntoResponse, Response},
+        };
+        use test_log::test;
+
+        use crate::{
+            api::tests::{
+                assert_committee_category_authorization_err,
+                assert_committee_category_authorization_ok,
+            },
+            repository::user_repo::UserId,
+        };
+
+        async fn call_handlers(
+            pool: SqlitePool,
+            coordinator_role: Role,
+        ) -> Vec<(&'static str, Response)> {
+            let user = User::test_user(coordinator_role, UserId::from(1));
+            let audit = AuditService::new(Some(user.clone()), None);
+            let polling_station_id = PollingStationId::from(741);
+
+            #[rustfmt::skip]
+            let results = vec![
+                ("create", polling_station_investigation_create(user.clone(), State(pool.clone()), audit.clone(), CurrentSessionPollingStationId(polling_station_id), Json(PollingStationInvestigationCreateRequest { reason: "reason".into() })).await.into_response()),
+                ("conclude", polling_station_investigation_conclude(user.clone(), State(pool.clone()), audit.clone(), CurrentSessionPollingStationId(polling_station_id), Json(PollingStationInvestigationConcludeRequest { findings: "findings".into(), corrected_results: false })).await.into_response()),
+                ("update", polling_station_investigation_update(user.clone(), State(pool.clone()), audit.clone(), CurrentSessionPollingStationId(polling_station_id), Json(PollingStationInvestigationUpdateRequest { reason: "reason".into(), findings: Some("findings".into()), corrected_results: Some(false), accept_data_entry_deletion: Some(true) })).await.into_response()),
+                ("delete", polling_station_investigation_delete(user.clone(), State(pool.clone()), audit.clone(), CurrentSessionPollingStationId(polling_station_id)).await.into_response()),
+                ("download_corrigendum_pdf", polling_station_investigation_download_corrigendum_pdf(user.clone(), State(pool.clone()), CurrentSessionPollingStationId(polling_station_id)).await.into_response()),
+            ];
+            results
+        }
+
+        #[test(sqlx::test(fixtures(
+            path = "../../fixtures",
+            scripts("election_7_four_sessions")
+        )))]
+        async fn test_committee_category_authorization_err(pool: SqlitePool) {
+            let results = call_handlers(pool, Role::CoordinatorCSB).await;
+            assert_committee_category_authorization_err(results).await;
+        }
+
+        #[test(sqlx::test(fixtures(
+            path = "../../fixtures",
+            scripts("election_7_four_sessions")
+        )))]
+        async fn test_committee_category_authorization_ok(pool: SqlitePool) {
+            let results = call_handlers(pool, Role::CoordinatorGSB).await;
+            assert_committee_category_authorization_ok(results);
+        }
     }
 }

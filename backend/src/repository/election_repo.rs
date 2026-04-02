@@ -1,5 +1,5 @@
 use chrono::NaiveDate;
-use sqlx::{SqliteConnection, query, query_as, types::Json};
+use sqlx::{SqliteConnection, query_as, types::Json};
 
 use crate::domain::election::{
     CommitteeCategory, Election, ElectionCategory, ElectionId, ElectionWithPoliticalGroups,
@@ -35,12 +35,54 @@ pub async fn list(
     Ok(elections)
 }
 
-#[allow(clippy::too_many_lines)]
+/// ElectionRow
+pub struct ElectionRow {
+    pub id: ElectionId,
+    pub name: String,
+    pub committee_category: CommitteeCategory,
+    pub counting_method: Option<VoteCountingMethod>,
+    pub election_id: String,
+    pub location: String,
+    pub domain_id: String,
+    pub category: ElectionCategory,
+    pub number_of_seats: u32,
+    pub number_of_voters: u32,
+    pub election_date: NaiveDate,
+    pub nomination_date: NaiveDate,
+    pub political_groups: Json<Vec<RegisteredPoliticalGroup>>,
+}
+
+impl From<ElectionRow> for ElectionWithPoliticalGroups {
+    fn from(row: ElectionRow) -> Self {
+        Self {
+            id: row.id,
+            name: row.name,
+            committee_category: row.committee_category,
+            counting_method: row.counting_method,
+            election_id: row.election_id,
+            location: row.location,
+            domain_id: row.domain_id,
+            category: row.category,
+            number_of_seats: row.number_of_seats,
+            number_of_voters: row.number_of_voters,
+            election_date: row.election_date,
+            nomination_date: row.nomination_date,
+            political_groups: row
+                .political_groups
+                .0
+                .into_iter()
+                .map(|pg| pg.into())
+                .collect(),
+        }
+    }
+}
+
 pub async fn get(
     conn: &mut SqliteConnection,
     election_id: ElectionId,
 ) -> Result<ElectionWithPoliticalGroups, sqlx::Error> {
-    let row = query!(
+    let row = query_as!(
+        ElectionRow,
         r#"
         SELECT
             id as "id: ElectionId",
@@ -62,36 +104,17 @@ pub async fn get(
         election_id
     )
     .fetch_one(conn)
-    .await;
-    row.map(|row| ElectionWithPoliticalGroups {
-        id: row.id,
-        name: row.name,
-        committee_category: row.committee_category,
-        counting_method: row.counting_method,
-        election_id: row.election_id,
-        location: row.location,
-        domain_id: row.domain_id,
-        category: row.category,
-        number_of_seats: row.number_of_seats,
-        number_of_voters: row.number_of_voters,
-        election_date: row.election_date,
-        nomination_date: row.nomination_date,
-        political_groups: row
-            .political_groups
-            .0
-            .into_iter()
-            .map(|pg| pg.into())
-            .collect(),
-    })
+    .await?;
+    Ok(row.into())
 }
 
-#[allow(clippy::too_many_lines)]
 pub async fn create(
     conn: &mut SqliteConnection,
     election: NewElection,
 ) -> Result<ElectionWithPoliticalGroups, sqlx::Error> {
     let political_groups = Json(election.political_groups);
-    let row: Result<_, sqlx::Error> = query!(
+    let row = query_as!(
+        ElectionRow,
         r#"
         INSERT INTO elections (
             name,
@@ -136,27 +159,8 @@ pub async fn create(
         political_groups,
     )
     .fetch_one(conn)
-    .await;
-    row.map(|row| ElectionWithPoliticalGroups {
-        id: row.id,
-        name: row.name,
-        committee_category: row.committee_category,
-        counting_method: row.counting_method,
-        election_id: row.election_id,
-        location: row.location,
-        domain_id: row.domain_id,
-        category: row.category,
-        number_of_seats: row.number_of_seats,
-        number_of_voters: row.number_of_voters,
-        election_date: row.election_date,
-        nomination_date: row.nomination_date,
-        political_groups: row
-            .political_groups
-            .0
-            .into_iter()
-            .map(|pg| pg.into())
-            .collect(),
-    })
+    .await?;
+    Ok(row.into())
 }
 
 pub async fn change_number_of_voters(

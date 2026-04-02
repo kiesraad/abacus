@@ -171,7 +171,7 @@ pub enum VoteCountingMethod {
 
 id!(PGNumber);
 
-/// Political group as it is registered with its candidates
+/// Political group as it is registered with its candidates, as saved in the database
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
 pub struct RegisteredPoliticalGroup {

@@ -85,7 +85,7 @@ tracing-subscriber = { version = "0.3.23", features = ["env-filter"] }
 tracing.workspace = true
 tower-http = { version = "0.6", features = ["set-header", "trace"] }
 quick-xml = { version = "0.39.2", features = ["serialize"] }
-sha2 = "0.10.9"
+sha2 = "0.11.0"
 argon2 = { version = "0.5.3", features = ["std"] }
 rand.workspace = true
 cookie = { version = "0.18.1", features = ["percent-encode"] }

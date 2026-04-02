@@ -296,11 +296,11 @@ jobs:
       - name: Add redirect to main crate docs
         run: echo '<meta http-equiv="refresh" content="0; url=abacus/index.html">' > rustdoc/index.html
       - name: Configure GitHub Pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v6
       - name: Upload to GitHub Pages
         uses: actions/upload-pages-artifact@v4
         with:
           path: rustdoc
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5

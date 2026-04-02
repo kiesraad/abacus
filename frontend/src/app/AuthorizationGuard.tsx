@@ -3,7 +3,6 @@ import { Navigate, useMatches } from "react-router";
 import { ApplicationError } from "@/api/ApiResult";
 import { useApiState } from "@/api/useApiState";
 import { EXPIRATION_DIALOG_SECONDS } from "@/app/authorizationConstants";
-import { getPostLoginPath } from "@/features/account/utils/getPostLoginPath";
 import useSessionExpiration from "@/hooks/user/useSessionExpiration";
 import { t } from "@/i18n/translate";
 
@@ -22,6 +21,7 @@ export function AuthorizationGuard({ children }: AuthorizationGuardProps) {
   const isAuthenticated = user !== null;
   const isPublic = routeMatch?.handle.public;
   const isAllowed = isPublic || (user?.role && routeMatch?.handle.roles.includes(user.role));
+  const accountRequiresSetup = isAuthenticated && (!user.fullname || user.needs_password_change);
 
   // if user is not allowed on this route
   if (!isAllowed) {
@@ -43,9 +43,14 @@ export function AuthorizationGuard({ children }: AuthorizationGuardProps) {
     return <Navigate to="/account/login" state={{ unauthorized: true }} />;
   }
 
+  // restrict account that requires setup to the account setup page and logout page
+  if (accountRequiresSetup && routeMatch?.pathname !== "/account/setup" && routeMatch?.pathname !== "/account/logout") {
+    return <Navigate to="/account/setup" replace />;
+  }
+
   // navigate to the overview if the user is logged in and tries to access the login page
   if (routeMatch?.pathname === "/account/login" && isAuthenticated) {
-    return <Navigate to={getPostLoginPath(user)} replace />;
+    return <Navigate to="/elections" replace />;
   }
 
   return (

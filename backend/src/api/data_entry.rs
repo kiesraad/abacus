@@ -2701,4 +2701,56 @@ mod tests {
             assert!(result.validation_results.has_warnings());
         }
     }
+
+    mod authorization {
+        use super::*;
+        use test_log::test;
+
+        use crate::api::tests::{
+            assert_committee_category_authorization_err, assert_committee_category_authorization_ok,
+        };
+
+        async fn call_handlers(
+            pool: SqlitePool,
+            typist_role: Role,
+            coordinator_role: Role,
+        ) -> Vec<(&'static str, Response)> {
+            let typist_user = User::test_user(typist_role, UserId::from(1));
+            let typist_audit = AuditService::new(Some(typist_user.clone()), None);
+
+            let coordinator_user = User::test_user(coordinator_role, UserId::from(1));
+            let coordinator_audit = AuditService::new(Some(coordinator_user.clone()), None);
+
+            let data_entry_id = DataEntryId::from(201);
+            let election_id = ElectionId::from(2);
+            let entry_number = EntryNumber::FirstEntry;
+
+            #[rustfmt::skip]
+            let results = vec![
+                ("claim",               data_entry_claim(typist_user.clone(), State(pool.clone()), Path((data_entry_id, entry_number)), typist_audit.clone()).await.into_response()),
+                ("save",                data_entry_save(typist_user.clone(), State(pool.clone()), Path((data_entry_id, entry_number)), typist_audit.clone(), example_data_entry()).await.into_response()),
+                ("discard",             data_entry_discard(typist_user.clone(), State(pool.clone()), Path((data_entry_id, entry_number)), typist_audit.clone()).await.into_response()),
+                ("finalise",            data_entry_finalise(typist_user.clone(), State(pool.clone()), Path((data_entry_id, entry_number)), typist_audit.clone()).await.into_response()),
+                ("reset",               data_entry_reset(coordinator_user.clone(), State(pool.clone()), Path(data_entry_id), coordinator_audit.clone()).await.into_response()),
+                ("get",                 data_entry_get(coordinator_user.clone(), State(pool.clone()), Path(data_entry_id)).await.into_response()),
+                ("resolve_errors",      data_entry_resolve_errors(coordinator_user.clone(), State(pool.clone()), Path(data_entry_id), coordinator_audit.clone(), ResolveErrorsAction::DiscardFirstEntry).await.into_response()),
+                ("get_differences",     data_entry_get_differences(coordinator_user.clone(), State(pool.clone()), Path(data_entry_id)).await.into_response()),
+                ("resolve_differences", data_entry_resolve_differences(coordinator_user.clone(), State(pool.clone()), Path(data_entry_id), coordinator_audit.clone(), ResolveDifferencesAction::DiscardBothEntries).await.into_response()),
+                ("election_status",     election_status(coordinator_user.clone(), State(pool.clone()), Path(election_id)).await.into_response()),
+            ];
+            results
+        }
+
+        #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
+        async fn test_committee_category_authorization_err(pool: SqlitePool) {
+            let results = call_handlers(pool, Role::TypistCSB, Role::CoordinatorCSB).await;
+            assert_committee_category_authorization_err(results).await;
+        }
+
+        #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
+        async fn test_committee_category_authorization_ok(pool: SqlitePool) {
+            let results = call_handlers(pool, Role::TypistGSB, Role::CoordinatorGSB).await;
+            assert_committee_category_authorization_ok(results);
+        }
+    }
 }

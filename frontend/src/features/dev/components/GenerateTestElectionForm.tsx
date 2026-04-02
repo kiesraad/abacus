@@ -19,10 +19,10 @@ const RANGE_FIELDS = [
   { key: "polling_stations", label: "Aantal stembureaus", placeholder: "50..200" },
   { key: "voters", label: "Aantal kiezers", placeholder: "100_000..250_000" },
   { key: "seats", label: "Aantal zetels", placeholder: "9..=45" },
-  { key: "first_data_entry", label: "Percentage afgeronde eerste invoer", placeholder: "100" },
+  { key: "first_data_entry", label: "Percentage stembureaus met afgeronde eerste invoer", placeholder: "100" },
   {
     key: "second_data_entry",
-    label: "Percentage tweede invoer van de afgeronde eerste invoer",
+    label: "Percentage stembureaus met tweede invoer van de afgeronde eerste invoer",
     placeholder: "100",
   },
   { key: "turnout", label: "Opkomstpercentage", placeholder: "60..=85" },
@@ -118,7 +118,7 @@ export function GenerateTestElectionForm() {
         <Checkbox
           id="generate-p22-2-variants"
           name="generate_p22_2_variants"
-          label="Genereer meerdere verkiezingen voor P22-2 varianten"
+          label="Genereer meerdere verkiezingen voor P22-2 varianten (CSB)"
           checked={formState.generate_p22_2_variants}
           onChange={handleBooleanChange}
         />

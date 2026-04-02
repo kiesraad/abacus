@@ -106,7 +106,7 @@ impl NewElection {
                     number: PGNumber::from(
                         u32::try_from(idx + 1).or(Err(EMLImportError::TooManyPoliticalGroups))?,
                     ),
-                    name: rp.registered_appellation.clone(),
+                    registered_name: rp.registered_appellation.clone(),
                     candidates: vec![],
                 })
             })
@@ -213,7 +213,7 @@ impl RegisteredPoliticalGroup {
         let mut previous_can_number = CandidateNumber::from(0);
         Ok(RegisteredPoliticalGroup {
             number: pg_number,
-            name: pg_name.clone(),
+            registered_name: pg_name.clone(),
             candidates: aff
                 .candidates
                 .iter()

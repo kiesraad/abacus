@@ -4,7 +4,7 @@ VALUES (2, 'Municipal Election', 'GSB', 'CSO', 'GR2024_Heemdamseburg', 'Heemdams
         '[
           {
             "number": 1,
-            "name": "Political Group A",
+            "registered_name": "Political Group A",
             "candidates": [
               {
                 "number": 1,
@@ -25,7 +25,7 @@ VALUES (2, 'Municipal Election', 'GSB', 'CSO', 'GR2024_Heemdamseburg', 'Heemdams
             ]
           },{
             "number": 2,
-            "name": "Political Group B",
+            "registered_name": "Political Group B",
             "candidates": [
               {
                 "number": 1,

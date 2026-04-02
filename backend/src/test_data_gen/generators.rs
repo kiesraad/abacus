@@ -283,7 +283,7 @@ fn generate_political_party(
     }
     RegisteredPoliticalGroup {
         number: pg_number,
-        name: super::data::political_group_name(rng),
+        registered_name: super::data::political_group_name(rng),
         candidates,
     }
 }

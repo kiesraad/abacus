@@ -177,8 +177,7 @@ id!(PGNumber);
 pub struct RegisteredPoliticalGroup {
     #[schema(value_type = u32)]
     pub number: PGNumber,
-    // TODO rename to registered_name
-    pub name: String,
+    pub registered_name: String,
     pub candidates: Vec<Candidate>,
 }
 
@@ -198,8 +197,8 @@ impl From<RegisteredPoliticalGroup> for PoliticalGroup {
     fn from(row: RegisteredPoliticalGroup) -> Self {
         Self {
             number: row.number,
-            name: political_group_name(&row.name, &row.candidates),
-            registered_name: row.name,
+            name: political_group_name(&row.registered_name, &row.candidates),
+            registered_name: row.registered_name,
             candidates: row.candidates,
         }
     }

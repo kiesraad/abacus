@@ -3,7 +3,7 @@ VALUES (7, 'Test Election >= 19 seats', 'GSB', 'CSO', 'GR2026_GroteStad', 'Grote
         '[
           {
             "number": 1,
-            "name": "A",
+            "registered_name": "A",
             "candidates": [
               {
                 "number": 1,
@@ -23,7 +23,7 @@ VALUES (7, 'Test Election >= 19 seats', 'GSB', 'CSO', 'GR2026_GroteStad', 'Grote
           },
           {
             "number": 2,
-            "name": "B",
+            "registered_name": "B",
             "candidates": [
               {
                 "number": 1,

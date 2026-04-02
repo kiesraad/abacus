@@ -23,7 +23,7 @@ pub trait RouteAuthorization<S>
 where
     S: Send + Sync + Clone + 'static,
 {
-    fn allow_incomplete_user(self) -> UtoipaMethodRouter<S>;
+    fn require_incomplete_user(self) -> UtoipaMethodRouter<S>;
     fn authorize(self, roles: &[Role]) -> UtoipaMethodRouter<S>;
     fn public(self) -> UtoipaMethodRouter<S>;
 }
@@ -32,7 +32,7 @@ impl<S> RouteAuthorization<S> for UtoipaMethodRouter<S>
 where
     S: Send + Sync + Clone + 'static,
 {
-    fn allow_incomplete_user(self) -> UtoipaMethodRouter<S> {
+    fn require_incomplete_user(self) -> UtoipaMethodRouter<S> {
         authorize_impl(self, Role::VARIANTS, false)
     }
 
@@ -330,9 +330,9 @@ mod tests {
         }
 
         #[tokio::test]
-        async fn allow_incomplete_user_for_allow_incomplete_user() {
+        async fn require_incomplete_user() {
             let router = build_method_router(Some("Test endpoint"));
-            let (_, _, mut method_router) = router.allow_incomplete_user();
+            let (_, _, mut method_router) = router.require_incomplete_user();
 
             let user = User::test_user(Role::TypistGSB, 2.into()).with_needs_password_change(true);
             let mut request = Request::builder().body(Body::empty()).unwrap();

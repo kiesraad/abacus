@@ -1,0 +1,566 @@
+use serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
+
+use super::{
+    common_validation::difference_admitted_voters_count_and_votes_cast_count_above_threshold,
+    count::Count,
+    gsb_differences_counts::{GSBDifferencesCounts, validate_gsb_differences_counts},
+    political_group_candidate_votes::PoliticalGroupCandidateVotes,
+    voters_counts::VotersCounts,
+    votes_counts::VotesCounts,
+};
+use crate::domain::{
+    compare::Compare,
+    election::ElectionWithPoliticalGroups,
+    field_path::FieldPath,
+    validate::{
+        DataError, Validate, ValidationResult, ValidationResultCode, ValidationResultContext,
+        ValidationResults,
+    },
+};
+
+/// GSBResults, following the fields in Model Na 31-2.
+///
+/// See "Model Na 31-2. Proces-verbaal van een gemeentelijk stembureau/stembureau voor het openbaar
+/// lichaam in een gemeente/openbaar lichaam waar een centrale stemopneming wordt verricht" from
+/// [Kiesraad](https://www.kiesraad.nl/documenten/2025/11/27/na-31-2-pv-gsb-cso).
+#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
+#[serde(deny_unknown_fields)]
+pub struct GSBResults {
+    /// Number of voters ("Kiesgerechtigden")
+    #[schema(value_type = u32)]
+    pub number_of_voters: Count,
+    /// Voters counts ("Aantal toegelaten kiezers")
+    pub voters_counts: VotersCounts,
+    /// Votes counts ("Aantal getelde stembiljetten")
+    pub votes_counts: VotesCounts,
+    /// Differences counts ("Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten")
+    pub differences_counts: GSBDifferencesCounts,
+    /// Vote counts per list and candidate ("Aantal stemmen per lijst en kandidaat")
+    pub political_group_votes: Vec<PoliticalGroupCandidateVotes>,
+}
+
+impl GSBResults {
+    fn validate_political_group_votes_errors(
+        &self,
+        political_group_candidate_votes: &PoliticalGroupCandidateVotes,
+        validation_results: &mut ValidationResults,
+        path: &FieldPath,
+    ) -> Result<(), DataError> {
+        let political_group_total_votes = self
+            .votes_counts
+            .political_group_total_votes
+            .iter()
+            .find(|political_group_total_votes| {
+                political_group_total_votes.number == political_group_candidate_votes.number
+            })
+            .ok_or(DataError::new("political group total votes should exist"))?;
+
+        // all candidate votes, cast to u64 to avoid overflow
+        let candidate_votes_sum: u64 = political_group_candidate_votes
+            .candidate_votes
+            .iter()
+            .map(|cv| cv.votes as u64)
+            .sum::<u64>();
+
+        if (candidate_votes_sum > 0 || political_group_total_votes.total > 0)
+            && political_group_candidate_votes.total == 0
+        {
+            validation_results.errors.push(ValidationResult {
+                fields: vec![path.field("total").to_string()],
+                code: ValidationResultCode::F401,
+                context: Some(ValidationResultContext {
+                    political_group_number: Some(political_group_total_votes.number),
+                }),
+            });
+        } else {
+            if political_group_candidate_votes.total as u64 != candidate_votes_sum {
+                validation_results.errors.push(ValidationResult {
+                    fields: vec![path.to_string()],
+                    code: ValidationResultCode::F402,
+                    context: Some(ValidationResultContext {
+                        political_group_number: Some(political_group_candidate_votes.number),
+                    }),
+                });
+            }
+
+            if political_group_candidate_votes.total != political_group_total_votes.total {
+                validation_results.errors.push(ValidationResult {
+                    fields: vec![path.field("total").to_string()],
+                    code: ValidationResultCode::F403,
+                    context: Some(ValidationResultContext {
+                        political_group_number: Some(political_group_candidate_votes.number),
+                    }),
+                });
+            }
+        }
+
+        Ok(())
+    }
+}
+
+impl Compare for GSBResults {
+    fn compare(&self, first_entry: &Self, different_fields: &mut Vec<String>, path: &FieldPath) {
+        self.number_of_voters.compare(
+            &first_entry.number_of_voters,
+            different_fields,
+            &path.field("number_of_voters"),
+        );
+
+        self.voters_counts.compare(
+            &first_entry.voters_counts,
+            different_fields,
+            &path.field("voters_counts"),
+        );
+
+        self.votes_counts.compare(
+            &first_entry.votes_counts,
+            different_fields,
+            &path.field("votes_counts"),
+        );
+
+        self.differences_counts.compare(
+            &first_entry.differences_counts,
+            different_fields,
+            &path.field("differences_counts"),
+        );
+
+        self.political_group_votes.compare(
+            &first_entry.political_group_votes,
+            different_fields,
+            &path.field("political_group_votes"),
+        );
+    }
+}
+
+impl Validate for GSBResults {
+    fn validate(
+        &self,
+        election: &ElectionWithPoliticalGroups,
+        validation_results: &mut ValidationResults,
+        path: &FieldPath,
+    ) -> Result<(), DataError> {
+        self.number_of_voters.validate(
+            election,
+            validation_results,
+            &path.field("number_of_voters"),
+        )?;
+
+        let total_votes_count = self.votes_counts.total_votes_cast_count;
+
+        self.votes_counts
+            .validate(election, validation_results, &path.field("votes_counts"))?;
+
+        let votes_counts_path = path.field("votes_counts");
+        let voters_counts_path = path.field("voters_counts");
+
+        let total_voters_count = self.voters_counts.total_admitted_voters_count;
+        self.voters_counts
+            .validate(election, validation_results, &voters_counts_path)?;
+
+        if difference_admitted_voters_count_and_votes_cast_count_above_threshold(
+            total_voters_count,
+            total_votes_count,
+        ) {
+            validation_results.warnings.push(ValidationResult {
+                fields: vec![
+                    voters_counts_path
+                        .field("total_admitted_voters_count")
+                        .to_string(),
+                    votes_counts_path
+                        .field("total_votes_cast_count")
+                        .to_string(),
+                ],
+                code: ValidationResultCode::W203,
+                context: None,
+            });
+        }
+
+        let differences_counts_path = path.field("differences_counts");
+
+        self.differences_counts
+            .validate(election, validation_results, &differences_counts_path)?;
+
+        validate_gsb_differences_counts(
+            &self.differences_counts,
+            total_voters_count,
+            total_votes_count,
+            validation_results,
+            &differences_counts_path,
+        )?;
+
+        self.political_group_votes.validate(
+            election,
+            validation_results,
+            &path.field("political_group_votes"),
+        )?;
+
+        for (i, pgcv) in self.political_group_votes.iter().enumerate() {
+            let pgcv_path = path.field("political_group_votes").index(i);
+            self.validate_political_group_votes_errors(pgcv, validation_results, &pgcv_path)?;
+        }
+
+        Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use test_log::test;
+
+    use super::*;
+    use crate::domain::{
+        election::{PGNumber, tests::election_fixture},
+        results::political_group_total_votes::PoliticalGroupTotalVotes,
+    };
+
+    fn create_test_data() -> GSBResults {
+        GSBResults {
+            number_of_voters: 100,
+            voters_counts: VotersCounts {
+                poll_card_count: 90,
+                proxy_certificate_count: 0,
+                total_admitted_voters_count: 90,
+            },
+            votes_counts: VotesCounts {
+                political_group_total_votes: vec![
+                    PoliticalGroupTotalVotes {
+                        number: PGNumber::from(1),
+                        total: 60,
+                    },
+                    PoliticalGroupTotalVotes {
+                        number: PGNumber::from(2),
+                        total: 30,
+                    },
+                ],
+                total_votes_candidates_count: 90,
+                blank_votes_count: 0,
+                invalid_votes_count: 0,
+                total_votes_cast_count: 90,
+            },
+            differences_counts: GSBDifferencesCounts::default(),
+            political_group_votes: vec![
+                PoliticalGroupCandidateVotes::from_test_data_auto(PGNumber::from(1), &[10, 20, 30]),
+                PoliticalGroupCandidateVotes::from_test_data_auto(PGNumber::from(2), &[5, 10, 15]),
+            ],
+        }
+    }
+
+    fn validate(data: GSBResults) -> Result<ValidationResults, DataError> {
+        let mut validation_results = ValidationResults::default();
+
+        data.validate(
+            // Adjust election political group list to the given test data
+            &election_fixture(
+                &data
+                    .political_group_votes
+                    .iter()
+                    .map(|pg| u32::try_from(pg.candidate_votes.len()).unwrap())
+                    .collect::<Vec<_>>(),
+            ),
+            &mut validation_results,
+            &"data".into(),
+        )?;
+
+        Ok(validation_results)
+    }
+
+    #[test]
+    fn test_default() -> Result<(), DataError> {
+        let validation_results = validate(create_test_data())?;
+        assert_eq!(validation_results.errors.len(), 0);
+        assert_eq!(validation_results.warnings.len(), 0);
+        Ok(())
+    }
+
+    #[test]
+    fn test_too_high_count() -> Result<(), DataError> {
+        let mut data = create_test_data();
+        data.differences_counts.fewer_ballots_count = 1_000_000_000;
+        data.differences_counts.more_ballots_count = 1_000_000_000;
+
+        let result = validate(data);
+        assert!(result.is_err());
+        assert!(result.unwrap_err().message.eq("count out of range"),);
+
+        Ok(())
+    }
+
+    /// CSO/DSO | W.203: 'Aantal kiezers en stemmen': Verschil tussen totaal aantal toegelaten kiezers en totaal aantal uitgebrachte stemmen is groter dan of gelijk aan 2% en groter dan of gelijk aan 15
+    #[test]
+    fn test_w203() -> Result<(), DataError> {
+        let cases = [
+            (101, 100, false),   // < 2%
+            (102, 100, true),    // == 2%
+            (103, 100, true),    // > 2%
+            (1000, 1014, false), // < 15
+            (1000, 1015, true),  // == 15
+            (1000, 1016, true),  // > 15
+            (1016, 1000, true),  // > 15 (reversed)
+        ];
+
+        for (admitted_voters, votes_cast, expected) in cases {
+            let mut data = create_test_data();
+            data.voters_counts.total_admitted_voters_count = admitted_voters;
+            data.votes_counts.total_votes_cast_count = votes_cast;
+
+            let validation_results = validate(data)?;
+
+            if expected {
+                assert_eq!(
+                    validation_results.warnings,
+                    [ValidationResult {
+                        code: ValidationResultCode::W203,
+                        fields: vec![
+                            "data.voters_counts.total_admitted_voters_count".into(),
+                            "data.votes_counts.total_votes_cast_count".into(),
+                        ],
+                        context: None,
+                    }],
+                    "Warning not found for admitted_voters={admitted_voters}, votes_cast={votes_cast}",
+                );
+            } else {
+                assert!(validation_results.warnings.is_empty());
+            }
+        }
+
+        Ok(())
+    }
+
+    /// CSO | F.401 `Er zijn (stemmen op kandidaten of het lijsttotaal van corresponderende E.x is groter dan 0) en het totaal aantal stemmen op een lijst = leeg of 0`
+    #[test]
+    fn test_f401() -> Result<(), DataError> {
+        // Only F.401 is triggered.
+        // Candidate votes sum > 0 & political group candidates votes total == 0
+        let mut data = create_test_data();
+        data.political_group_votes[1].total = 0;
+
+        let validation_results = validate(data.clone())?;
+        assert_eq!(
+            validation_results.errors,
+            [ValidationResult {
+                code: ValidationResultCode::F401,
+                fields: vec!["data.political_group_votes.1.total".into()],
+                context: Some(ValidationResultContext {
+                    political_group_number: Some(PGNumber::from(2)),
+                }),
+            }]
+        );
+
+        // Only F.401 is triggered.
+        // Political group total votes > 0 & political group candidates votes total == 0
+        data.political_group_votes[1].candidate_votes[0].votes = 0;
+        data.political_group_votes[1].candidate_votes[1].votes = 0;
+        data.political_group_votes[1].candidate_votes[2].votes = 0;
+        data.political_group_votes[1].total = 0;
+
+        let validation_results = validate(data.clone())?;
+        assert_eq!(
+            validation_results.errors,
+            [ValidationResult {
+                code: ValidationResultCode::F401,
+                fields: vec!["data.political_group_votes.1.total".into()],
+                context: Some(ValidationResultContext {
+                    political_group_number: Some(PGNumber::from(2)),
+                }),
+            }]
+        );
+
+        // Expect only F.401 (F.401, F.402 and F.403 are triggered)
+        data.political_group_votes[1].candidate_votes[0].votes += 10;
+
+        let validation_results = validate(data.clone())?;
+        assert_eq!(
+            validation_results.errors,
+            [ValidationResult {
+                code: ValidationResultCode::F401,
+                fields: vec!["data.political_group_votes.1.total".into()],
+                context: Some(ValidationResultContext {
+                    political_group_number: Some(PGNumber::from(2)),
+                }),
+            }]
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_f401_multiple_errors() -> Result<(), DataError> {
+        let mut data = create_test_data();
+        // Covers multiple errors over different political groups:
+        // Following 2 tests check that F.401 is triggered for both political group votes.
+        // - Expect F.402 and F.403 for group 1.
+        // - Expect only F.401 for group 2 (F.401, F.402 and F.403 are triggered)
+        data.political_group_votes[0].candidate_votes[0].votes = 0;
+        data.political_group_votes[0].total = 30;
+        data.political_group_votes[1].candidate_votes[0].votes = 10;
+        data.political_group_votes[1].total = 0;
+
+        let validation_results = validate(data.clone())?;
+        assert_eq!(
+            validation_results.errors,
+            [
+                ValidationResult {
+                    code: ValidationResultCode::F402,
+                    fields: vec!["data.political_group_votes.0".into()],
+                    context: Some(ValidationResultContext {
+                        political_group_number: Some(PGNumber::from(1)),
+                    }),
+                },
+                ValidationResult {
+                    code: ValidationResultCode::F403,
+                    fields: vec!["data.political_group_votes.0.total".into()],
+                    context: Some(ValidationResultContext {
+                        political_group_number: Some(PGNumber::from(1)),
+                    }),
+                },
+                ValidationResult {
+                    code: ValidationResultCode::F401,
+                    fields: vec!["data.political_group_votes.1.total".into()],
+                    context: Some(ValidationResultContext {
+                        political_group_number: Some(PGNumber::from(2)),
+                    }),
+                }
+            ]
+        );
+
+        // Covers multiple errors over different political groups:
+        // - Expect only F.401 for group 1 (F.401, F.402 and F.403 are triggered)
+        // - Expect F.402 for group 2.
+        data.political_group_votes[0].candidate_votes[0].votes = 0;
+        data.political_group_votes[0].candidate_votes[1].votes = 0;
+        data.political_group_votes[0].candidate_votes[2].votes = 0;
+        data.political_group_votes[0].total = 0;
+        data.political_group_votes[1].candidate_votes[0].votes = 0;
+        data.political_group_votes[1].total = 30;
+
+        let validation_results = validate(data.clone())?;
+        assert_eq!(
+            validation_results.errors,
+            [
+                ValidationResult {
+                    code: ValidationResultCode::F401,
+                    fields: vec!["data.political_group_votes.0.total".into()],
+                    context: Some(ValidationResultContext {
+                        political_group_number: Some(PGNumber::from(1)),
+                    }),
+                },
+                ValidationResult {
+                    code: ValidationResultCode::F402,
+                    fields: vec!["data.political_group_votes.1".into()],
+                    context: Some(ValidationResultContext {
+                        political_group_number: Some(PGNumber::from(2)),
+                    }),
+                },
+            ]
+        );
+
+        Ok(())
+    }
+
+    /// CSO | F.402 (Als F.401 niet getoond wordt) `Totaal aantal stemmen op een lijst <> som van aantal stemmen op de kandidaten van die lijst`
+    #[test]
+    fn test_f402() -> Result<(), DataError> {
+        let mut data = create_test_data();
+        data.political_group_votes[1].total = 0;
+
+        // When list total is empty, don't expect F.402, but F.401
+        let validation_results = validate(data.clone())?;
+        assert_eq!(
+            validation_results.errors,
+            [ValidationResult {
+                code: ValidationResultCode::F401,
+                fields: vec!["data.political_group_votes.1.total".into()],
+                context: Some(ValidationResultContext {
+                    political_group_number: Some(PGNumber::from(2)),
+                }),
+            }]
+        );
+
+        data.political_group_votes[1].candidate_votes[0].votes = 0;
+        data.political_group_votes[1].total = 30;
+
+        // Expect F.402 when list total doesn't match candidate votes
+        let validation_results = validate(data.clone())?;
+        assert_eq!(
+            validation_results.errors,
+            [ValidationResult {
+                code: ValidationResultCode::F402,
+                fields: vec!["data.political_group_votes.1".into()],
+                context: Some(ValidationResultContext {
+                    political_group_number: Some(PGNumber::from(2)),
+                }),
+            }]
+        );
+
+        Ok(())
+    }
+
+    /// CSO | F.403 (Als F.401 niet getoond wordt) `Totaal aantal stemmen op een lijst komt niet overeen met het lijsttotaal van corresponderende E.x`
+    #[test]
+    fn test_f403() -> Result<(), DataError> {
+        let mut data = create_test_data();
+        data.political_group_votes[1].candidate_votes[0].votes += 10;
+        data.political_group_votes[1].total += 10;
+        let validation_results = validate(data.clone())?;
+        assert_eq!(
+            validation_results.errors,
+            [ValidationResult {
+                code: ValidationResultCode::F403,
+                fields: vec!["data.political_group_votes.1.total".into()],
+                context: Some(ValidationResultContext {
+                    political_group_number: Some(PGNumber::from(2)),
+                }),
+            }],
+        );
+
+        // Multiple invalid case
+        data.political_group_votes[0].candidate_votes[0].votes += 10;
+        data.political_group_votes[0].total += 10;
+        let validation_results = validate(data.clone())?;
+        assert_eq!(
+            validation_results.errors,
+            [
+                ValidationResult {
+                    code: ValidationResultCode::F403,
+                    fields: vec!["data.political_group_votes.0.total".into()],
+                    context: Some(ValidationResultContext {
+                        political_group_number: Some(PGNumber::from(1)),
+                    }),
+                },
+                ValidationResult {
+                    code: ValidationResultCode::F403,
+                    fields: vec!["data.political_group_votes.1.total".into()],
+                    context: Some(ValidationResultContext {
+                        political_group_number: Some(PGNumber::from(2)),
+                    }),
+                }
+            ],
+        );
+
+        // When list total is empty, don't expect F.403, but F.401
+        data.political_group_votes[1].total = 0;
+        let validation_results = validate(data.clone())?;
+        assert_eq!(
+            validation_results.errors,
+            [
+                ValidationResult {
+                    code: ValidationResultCode::F403,
+                    fields: vec!["data.political_group_votes.0.total".into()],
+                    context: Some(ValidationResultContext {
+                        political_group_number: Some(PGNumber::from(1)),
+                    }),
+                },
+                ValidationResult {
+                    code: ValidationResultCode::F401,
+                    fields: vec!["data.political_group_votes.1.total".into()],
+                    context: Some(ValidationResultContext {
+                        political_group_number: Some(PGNumber::from(2)),
+                    }),
+                }
+            ],
+        );
+
+        Ok(())
+    }
+}

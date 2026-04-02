@@ -76,6 +76,9 @@
   "start_data_entry": "Invoerfase starten",
   "start_data_entry_description": "De bevindingen van het onderzoek mogen pas worden ingevoerd als de zitting officieel is geopend. Is dat het geval? Start dan de invoerfase. Je kunt dan voor alle aangevraagde onderzoeken de bevindingen invoeren.",
   "start_data_entry_question": "Invoerfase starten?",
+  "resume_data_entry": "Invoer hervatten",
+  "resume_data_entry_question": "Terug naar invoerfase?",
+  "resume_data_entry_description": "Let op: het proces-verbaal en andere documenten van deze zitting worden verwijderd. Na het afronden van de invoerfase worden nieuwe versies van deze documenten gemaakt. De huidige versie kan niet meer uit Abacus worden gedownload. Deze actie kan niet worden teruggedraaid.",
   "title": "Onderzoeken",
   "you_cannot_add_another_investigation": "Je hebt voor alle stembureaus al een onderzoek toegevoegd.\nJe kan niet nog een onderzoek toevoegen.",
   "warning_completed": {

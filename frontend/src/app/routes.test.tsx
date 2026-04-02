@@ -1,22 +1,25 @@
 import { render as rtlRender } from "@testing-library/react";
+import { RouterProvider } from "react-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import * as useUser from "@/hooks/user/useUser";
 import {
   ElectionListRequestHandler,
   ElectionRequestHandler,
   ElectionStatusRequestHandler,
 } from "@/testing/api-mocks/RequestHandlers";
-import { Providers } from "@/testing/Providers";
 import { overrideOnce, server } from "@/testing/server";
+import { TestUserProvider } from "@/testing/TestUserProvider";
 import { expectErrorPage, expectNotFound, setupTestRouter } from "@/testing/test-utils";
-import { getTypistUser } from "@/testing/user-mock-data";
-import type { DATA_ENTRY_CLAIM_REQUEST_PATH, ErrorResponse } from "@/types/generated/openapi";
+import type { DATA_ENTRY_CLAIM_REQUEST_PATH, ErrorResponse, Role } from "@/types/generated/openapi";
 import { routes } from "./routes";
 
-const renderWithRouter = () => {
+const renderWithRouter = (userRole: Role | null = null) => {
   const router = setupTestRouter(routes);
-  rtlRender(<Providers router={router} />);
+  rtlRender(
+    <TestUserProvider userRole={userRole}>
+      <RouterProvider router={router} />
+    </TestUserProvider>,
+  );
   return router;
 };
 
@@ -42,18 +45,14 @@ describe("routes", () => {
   });
 
   test("Malformed election ID should result in not found page", async () => {
-    vi.spyOn(useUser, "useUser").mockReturnValue(getTypistUser());
-
-    const router = renderWithRouter();
+    const router = renderWithRouter("typist_gsb");
     await router.navigate("/elections/1asd/data-entry/");
     await expectErrorPage();
   });
 
   test("Non existing election id results in not found page", async () => {
-    vi.spyOn(useUser, "useUser").mockReturnValue(getTypistUser());
-
     // Navigate to a non-existing page
-    const router = renderWithRouter();
+    const router = renderWithRouter("typist_gsb");
     overrideOnce("get", "/api/elections/9876", 404, null);
     await router.navigate("/elections/9876/data-entry");
     expect(router.state.location.pathname).toEqual("/elections/9876/data-entry");
@@ -61,25 +60,21 @@ describe("routes", () => {
   });
 
   test("EntryNotFound API response results in not found page", async () => {
-    vi.spyOn(useUser, "useUser").mockReturnValue(getTypistUser());
     overrideOnce("post", "/api/data_entries/9876/1/claim" satisfies DATA_ENTRY_CLAIM_REQUEST_PATH, 404, {
       error: "Item not found",
       fatal: true,
       reference: "EntryNotFound",
     } satisfies ErrorResponse);
-
     // Navigate to a non-existing page
-    const router = renderWithRouter();
+    const router = renderWithRouter("typist_gsb");
     await router.navigate("/elections/1/data-entry/9876/1");
     expect(router.state.location.pathname).toEqual("/elections/1/data-entry/9876/1");
     await expectNotFound("Niet gevonden");
   });
 
   test("Non existing entry number results in not found page", async () => {
-    vi.spyOn(useUser, "useUser").mockReturnValue(getTypistUser());
-
     // Navigate to a non-existing page
-    const router = renderWithRouter();
+    const router = renderWithRouter("typist_gsb");
     await router.navigate("/elections/1/data-entry/1/3");
     expect(router.state.location.pathname).toEqual("/elections/1/data-entry/1/3");
     await expectNotFound("Het invoer nummer is ongeldig");

@@ -12,7 +12,10 @@
   "paths": {
     "/api/account": {
       "get": {
-        "summary": "Get current logged-in user endpoint (administrator, coordinator_gsb, coordinator_csb, typist_gsb, typist_csb)",
+        "tags": [
+          "public"
+        ],
+        "summary": "Get current logged-in user endpoint",
         "operationId": "account",
         "responses": {
           "200": {
@@ -45,18 +48,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "cookie_auth": [
-              "administrator",
-              "coordinator_gsb",
-              "coordinator_csb",
-              "typist_gsb",
-              "typist_csb"
-            ]
-          }
-        ]
+        }
       },
       "put": {
         "summary": "Update the user's account with a new password and optionally new fullname (administrator, coordinator_gsb, coordinator_csb, typist_gsb, typist_csb)",
@@ -1450,7 +1442,7 @@
     },
     "/api/elections/{election_id}/committee_sessions/{committee_session_id}": {
       "put": {
-        "summary": "Update a [CommitteeSession]. (coordinator_gsb)",
+        "summary": "Update a [CommitteeSession]. (coordinator_csb, coordinator_gsb)",
         "operationId": "committee_session_update",
         "parameters": [
           {
@@ -1540,6 +1532,7 @@
         "security": [
           {
             "cookie_auth": [
+              "coordinator_csb",
               "coordinator_gsb"
             ]
           }
@@ -4592,7 +4585,7 @@
       },
       "CSOFirstSessionResults": {
         "type": "object",
-        "description": "CSOFirstSessionResults, following the fields in Model Na 31-2 Bijlage 2.\n\nSee \"Model Na 31-2. Proces-verbaal van een gemeentelijk stembureau/stembureau voor het openbaar\nlichaam in een gemeente/openbaar lichaam waar een centrale stemopneming wordt verricht,\nBijlage 2: uitkomsten per stembureau\" from the\n[Kiesregeling](https://wetten.overheid.nl/BWBR0034180/2026-01-01#Bijlage1_DivisieNa31.2) or\n[Verkiezingstoolbox](https://www.rijksoverheid.nl/onderwerpen/verkiezingen/verkiezingentoolkit/modellen).",
+        "description": "CSOFirstSessionResults, following the fields in Model Na 31-2 Bijlage 1.\n\nSee \"Model Na 31-2. Proces-verbaal van een gemeentelijk stembureau/stembureau voor het openbaar\nlichaam in een gemeente/openbaar lichaam waar een centrale stemopneming wordt verricht,\nBijlage 1: Verslagen van tellingen van stembureaus\" from\n[Kiesraad](https://www.kiesraad.nl/documenten/2025/11/27/na-31-2-pv-gsb-cso).",
         "required": [
           "extra_investigation",
           "counting_differences_polling_station",
@@ -4634,7 +4627,7 @@
       },
       "CSONextSessionResults": {
         "type": "object",
-        "description": "CSONextSessionResults, following the fields in Model Na 14-2 Bijlage 1.\n\nSee \"Model Na 14-2. Corrigendum bij het proces-verbaal van een gemeentelijk stembureau/\nstembureau voor het openbaar lichaam, Bijlage 1: uitkomsten per stembureau\" from the\n[Kiesregeling](https://wetten.overheid.nl/BWBR0034180/2026-01-01#Bijlage1_DivisieNa14.2) or\n[Verkiezingstoolbox](https://www.rijksoverheid.nl/onderwerpen/verkiezingen/verkiezingentoolkit/modellen).",
+        "description": "CSONextSessionResults, following the fields in Model Na 14-2 Bijlage 1.\n\nSee \"Model Na 14-2. Corrigendum bij het proces-verbaal van een gemeentelijk stembureau/\nstembureau voor het openbaar lichaam, Bijlage 1: uitkomsten per stembureau\" from\n[Kiesraad](https://www.kiesraad.nl/documenten/2025/11/27/na-14-2-corrigendum-gsb-inclusief-bijlage-voor-cso).",
         "required": [
           "voters_counts",
           "votes_counts",
@@ -5869,6 +5862,29 @@
         "format": "int32",
         "minimum": 0
       },
+      "GSBDifferencesCounts": {
+        "type": "object",
+        "description": "Differences counts for GSB, part of the results.\n(1.4 \"Verschillen tussen aantal kiezers en uitgebrachte stemmen\")",
+        "required": [
+          "more_ballots_count",
+          "fewer_ballots_count"
+        ],
+        "properties": {
+          "fewer_ballots_count": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Number of fewer counted ballots (\"Totaal aantal minder getelde stemmen\")",
+            "minimum": 0
+          },
+          "more_ballots_count": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Number of more counted ballots (\"Totaal aantal méér getelde stemmen\")",
+            "minimum": 0
+          }
+        },
+        "additionalProperties": false
+      },
       "GSBElectionCreationRequest": {
         "type": "object",
         "required": [
@@ -5983,6 +5999,45 @@
             "items": {
               "$ref": "#/components/schemas/PollingStationRequest"
             }
+          }
+        },
+        "additionalProperties": false
+      },
+      "GSBResults": {
+        "type": "object",
+        "description": "GSBResults, following the fields in Model Na 31-2.\n\nSee \"Model Na 31-2. Proces-verbaal van een gemeentelijk stembureau/stembureau voor het openbaar\nlichaam in een gemeente/openbaar lichaam waar een centrale stemopneming wordt verricht\" from\n[Kiesraad](https://www.kiesraad.nl/documenten/2025/11/27/na-31-2-pv-gsb-cso).",
+        "required": [
+          "number_of_voters",
+          "voters_counts",
+          "votes_counts",
+          "differences_counts",
+          "political_group_votes"
+        ],
+        "properties": {
+          "differences_counts": {
+            "$ref": "#/components/schemas/GSBDifferencesCounts",
+            "description": "Differences counts (\"Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten\")"
+          },
+          "number_of_voters": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Number of voters (\"Kiesgerechtigden\")",
+            "minimum": 0
+          },
+          "political_group_votes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PoliticalGroupCandidateVotes"
+            },
+            "description": "Vote counts per list and candidate (\"Aantal stemmen per lijst en kandidaat\")"
+          },
+          "voters_counts": {
+            "$ref": "#/components/schemas/VotersCounts",
+            "description": "Voters counts (\"Aantal toegelaten kiezers\")"
+          },
+          "votes_counts": {
+            "$ref": "#/components/schemas/VotesCounts",
+            "description": "Votes counts (\"Aantal getelde stembiljetten\")"
           }
         },
         "additionalProperties": false
@@ -6802,7 +6857,7 @@
             "allOf": [
               {
                 "$ref": "#/components/schemas/CSOFirstSessionResults",
-                "description": "Results for centrally counted (CSO) elections, first election committee session.\nThis contains the data entry values from Model Na 31-2 Bijlage 2."
+                "description": "Results for centrally counted (CSO) elections, first election committee session.\nThis contains the data entry values from Model Na 31-2 Bijlage 1."
               },
               {
                 "type": "object",
@@ -6819,7 +6874,7 @@
                 }
               }
             ],
-            "description": "Results for centrally counted (CSO) elections, first election committee session.\nThis contains the data entry values from Model Na 31-2 Bijlage 2."
+            "description": "Results for centrally counted (CSO) elections, first election committee session.\nThis contains the data entry values from Model Na 31-2 Bijlage 1."
           },
           {
             "allOf": [
@@ -6843,6 +6898,29 @@
               }
             ],
             "description": "Results for centrally counted (CSO) elections, any subsequent election committee session.\nThis contains the data entry values from Model Na 14-2 Bijlage 1."
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GSBResults",
+                "description": "HSB/CSB enters GSB results\nThis contains the data entry values from Model Na 31-2."
+              },
+              {
+                "type": "object",
+                "required": [
+                  "model"
+                ],
+                "properties": {
+                  "model": {
+                    "type": "string",
+                    "enum": [
+                      "GSB"
+                    ]
+                  }
+                }
+              }
+            ],
+            "description": "HSB/CSB enters GSB results\nThis contains the data entry values from Model Na 31-2."
           }
         ],
         "description": "Results contains the results for a data entry\n\nThe exact type of results depends on the election counting method,\nelection committee category and whether this is the first or any subsequent data entry session."

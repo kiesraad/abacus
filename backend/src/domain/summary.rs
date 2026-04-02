@@ -7,10 +7,9 @@ use crate::{
         election::ElectionWithPoliticalGroups,
         polling_station::{PollingStation, PollingStationNumber},
         results::{
-            Results,
+            CommonDifferencesCounts, Results,
             count::Count,
             cso_first_session_results::CSOFirstSessionResults,
-            differences_counts::DifferencesCounts,
             political_group_candidate_votes::{CandidateVotes, PoliticalGroupCandidateVotes},
             political_group_total_votes::PoliticalGroupTotalVotes,
             voters_counts::VotersCounts,
@@ -97,7 +96,7 @@ impl ElectionSummary {
             // add any differences noted to the total
             totals
                 .differences_counts
-                .add_results(polling_station, result.differences_counts());
+                .add_results(polling_station, &result.differences_counts());
 
             // add votes for each political group to the total
             for pg in result.political_group_votes().iter() {
@@ -112,7 +111,7 @@ impl ElectionSummary {
                 pg_total.add(pg)?;
             }
 
-            if let Some(cso_first_result) = result.as_cso_first_session() {
+            if let Results::CSOFirstSession(cso_first_result) = result {
                 // add checkbox states for this polling station
                 totals
                     .polling_station_investigations
@@ -187,12 +186,12 @@ impl SummaryDifferencesCounts {
     pub fn add_results(
         &mut self,
         polling_station: &PollingStation,
-        differences_counts: &DifferencesCounts,
+        differences_counts: &CommonDifferencesCounts,
     ) {
         self.more_ballots_count
-            .add(polling_station, differences_counts.more_ballots_count);
+            .add(polling_station, *differences_counts.more_ballots_count);
         self.fewer_ballots_count
-            .add(polling_station, differences_counts.fewer_ballots_count);
+            .add(polling_station, *differences_counts.fewer_ballots_count);
     }
 }
 
@@ -301,7 +300,10 @@ mod tests {
     use crate::domain::{
         election::{PGNumber, tests::election_fixture},
         polling_station::test_helpers::polling_stations_fixture,
-        results::{extra_investigation::ExtraInvestigation, yes_no::YesNo},
+        results::{
+            differences_counts::DifferencesCounts, extra_investigation::ExtraInvestigation,
+            yes_no::YesNo,
+        },
         valid_default::ValidDefault,
     };
 
@@ -391,13 +393,9 @@ mod tests {
     #[test]
     fn test_differences_counts_addition() {
         let mut diff = SummaryDifferencesCounts::zero();
-        let diff2 = {
-            let mut tmp = DifferencesCounts::valid_default();
-            tmp.more_ballots_count = 1;
-            tmp.difference_completely_accounted_for = YesNo::yes();
-            tmp.compare_votes_cast_admitted_voters
-                .votes_cast_greater_than_admitted_voters = true;
-            tmp
+        let diff2 = CommonDifferencesCounts {
+            more_ballots_count: &1,
+            fewer_ballots_count: &0,
         };
 
         let mut ps = polling_stations_fixture(&[20, 20]);
@@ -526,15 +524,17 @@ mod tests {
         ps_results.voters_counts_mut().poll_card_count = 999_999_998;
         ps_results.voters_counts_mut().proxy_certificate_count = 0;
         ps_results.voters_counts_mut().total_admitted_voters_count = 999_999_998;
-        ps_results.differences_counts_mut().more_ballots_count = 0;
-        ps_results
-            .differences_counts_mut()
-            .compare_votes_cast_admitted_voters
-            .votes_cast_greater_than_admitted_voters = false;
-        ps_results
-            .differences_counts_mut()
-            .compare_votes_cast_admitted_voters
-            .admitted_voters_equal_votes_cast = true;
+        if let Results::CSOFirstSession(ref mut results) = ps_results {
+            results.differences_counts.more_ballots_count = 0;
+            results
+                .differences_counts
+                .compare_votes_cast_admitted_voters
+                .votes_cast_greater_than_admitted_voters = false;
+            results
+                .differences_counts
+                .compare_votes_cast_admitted_voters
+                .admitted_voters_equal_votes_cast = true;
+        }
 
         let results = ps
             .iter()

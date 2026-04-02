@@ -27,7 +27,7 @@ use crate::{
         },
         models::{ModelNa14_2Bijlage1Input, ToPdfFileModel},
         polling_station::{PollingStation, PollingStationId},
-        results::Results,
+        results::{PollingStationResults, cso_first_session_results::CSOFirstSessionResults},
         role::Role,
         votes_table::VotesTablesWithOnlyPreviousVotes,
     },
@@ -37,7 +37,7 @@ use crate::{
         committee_session_repo, data_entry_repo::previous_results_for_polling_station,
         election_repo, investigation_repo, polling_station_repo, user_repo::User,
     },
-    service::{change_committee_session_status, create_empty_data_entry},
+    service::change_committee_session_status,
 };
 
 #[derive(Serialize)]
@@ -290,10 +290,9 @@ async fn polling_station_investigation_conclude(
         })?;
 
     let status = if request.corrected_results {
-        let ps = create_empty_data_entry(&mut tx, polling_station_id).await?;
-        let data_entry_id = ps
-            .data_entry_id()
-            .expect("create_empty_data_entry should set data_entry_id");
+        let data_entry_id = polling_station_repo::create_data_entry(&mut tx, polling_station_id)
+            .await
+            .map_err(APIError::from)?;
         current.conclude_with_new_results(request.findings, data_entry_id)?
     } else {
         let ps = polling_station_repo::get_next_session(&mut tx, polling_station_id).await?;
@@ -380,10 +379,9 @@ async fn apply_update(
         }
         // ConcludedWithNewResults: same-state text update
         (InvestigationStatus::ConcludedWithNewResults(_), Some(true)) => {
-            let ps = create_empty_data_entry(conn, polling_station_id).await?;
-            let de_id = ps
-                .data_entry_id()
-                .expect("data entry should exist after create_empty_data_entry");
+            let de_id = polling_station_repo::get_data_entry_id(conn, polling_station_id)
+                .await
+                .map_err(APIError::from)?;
             let findings = request.findings.unwrap_or_default();
             Ok(current.switch_to_with_new_results(request.reason, findings, de_id)?)
         }
@@ -479,10 +477,9 @@ async fn switch_to_with_new_results(
     current: InvestigationStatus,
     request: PollingStationInvestigationUpdateRequest,
 ) -> Result<InvestigationStatus, APIError> {
-    let ps = create_empty_data_entry(conn, polling_station_id).await?;
-    let de_id = ps
-        .data_entry_id()
-        .expect("create_empty_data_entry should set data_entry_id");
+    let de_id = polling_station_repo::create_data_entry(conn, polling_station_id)
+        .await
+        .map_err(APIError::from)?;
 
     let findings = request.findings.unwrap_or_default();
     let status = current.switch_to_with_new_results(request.reason, findings, de_id)?;
@@ -716,7 +713,7 @@ async fn polling_station_investigation_download_corrigendum_pdf(
                 }
             }
         }
-        None => Results::empty_cso_first_session(&election.political_groups),
+        None => CSOFirstSessionResults::empty(&election.political_groups).as_common(),
     };
 
     let polling_station: PollingStation = ps.into_polling_station();
@@ -728,14 +725,13 @@ async fn polling_station_investigation_download_corrigendum_pdf(
         polling_station.number
     );
 
-    let votes_tables =
-        VotesTablesWithOnlyPreviousVotes::new(&election, &previous_results.as_common())?;
+    let votes_tables = VotesTablesWithOnlyPreviousVotes::new(&election, &previous_results)?;
 
     let input = ModelNa14_2Bijlage1Input {
         votes_tables,
         election: election.into(),
         polling_station,
-        previous_results: previous_results.as_common().into(),
+        previous_results: previous_results.into(),
         investigation,
     }
     .to_pdf_file_model(name.clone());
@@ -752,6 +748,7 @@ mod tests {
     use sqlx::SqlitePool;
     use test_log::test;
 
+    use super::*;
     use crate::{
         domain::polling_station::PollingStationId, repository::polling_station_repo::exists,
     };
@@ -791,5 +788,60 @@ mod tests {
         let res = super::validate_and_get_committee_session(&mut conn, polling_station_id).await;
 
         assert!(res.is_err());
+    }
+
+    mod authorization {
+        use super::*;
+        use axum::{
+            Json,
+            extract::State,
+            response::{IntoResponse, Response},
+        };
+        use test_log::test;
+
+        use crate::{
+            api::tests::{
+                assert_committee_category_authorization_err,
+                assert_committee_category_authorization_ok,
+            },
+            repository::user_repo::UserId,
+        };
+
+        async fn call_handlers(
+            pool: SqlitePool,
+            coordinator_role: Role,
+        ) -> Vec<(&'static str, Response)> {
+            let user = User::test_user(coordinator_role, UserId::from(1));
+            let audit = AuditService::new(Some(user.clone()), None);
+            let polling_station_id = PollingStationId::from(741);
+
+            #[rustfmt::skip]
+            let results = vec![
+                ("create", polling_station_investigation_create(user.clone(), State(pool.clone()), audit.clone(), CurrentSessionPollingStationId(polling_station_id), Json(PollingStationInvestigationCreateRequest { reason: "reason".into() })).await.into_response()),
+                ("conclude", polling_station_investigation_conclude(user.clone(), State(pool.clone()), audit.clone(), CurrentSessionPollingStationId(polling_station_id), Json(PollingStationInvestigationConcludeRequest { findings: "findings".into(), corrected_results: false })).await.into_response()),
+                ("update", polling_station_investigation_update(user.clone(), State(pool.clone()), audit.clone(), CurrentSessionPollingStationId(polling_station_id), Json(PollingStationInvestigationUpdateRequest { reason: "reason".into(), findings: Some("findings".into()), corrected_results: Some(false), accept_data_entry_deletion: Some(true) })).await.into_response()),
+                ("delete", polling_station_investigation_delete(user.clone(), State(pool.clone()), audit.clone(), CurrentSessionPollingStationId(polling_station_id)).await.into_response()),
+                ("download_corrigendum_pdf", polling_station_investigation_download_corrigendum_pdf(user.clone(), State(pool.clone()), CurrentSessionPollingStationId(polling_station_id)).await.into_response()),
+            ];
+            results
+        }
+
+        #[test(sqlx::test(fixtures(
+            path = "../../fixtures",
+            scripts("election_7_four_sessions")
+        )))]
+        async fn test_committee_category_authorization_err(pool: SqlitePool) {
+            let results = call_handlers(pool, Role::CoordinatorCSB).await;
+            assert_committee_category_authorization_err(results).await;
+        }
+
+        #[test(sqlx::test(fixtures(
+            path = "../../fixtures",
+            scripts("election_7_four_sessions")
+        )))]
+        async fn test_committee_category_authorization_ok(pool: SqlitePool) {
+            let results = call_handlers(pool, Role::CoordinatorGSB).await;
+            assert_committee_category_authorization_ok(results);
+        }
     }
 }

@@ -265,3 +265,49 @@ async fn election_download_na_31_2_inlegvel(
         .filename(&name)
         .content_type("application/pdf"))
 }
+
+#[cfg(test)]
+mod tests {
+    use axum::{
+        extract::{Path, State},
+        response::{IntoResponse, Response},
+    };
+    use test_log::test;
+
+    use super::*;
+    use crate::{
+        api::tests::{
+            assert_committee_category_authorization_err, assert_committee_category_authorization_ok,
+        },
+        domain::role::Role,
+        repository::user_repo::{User, UserId},
+    };
+
+    async fn call_handlers(
+        pool: SqlitePool,
+        coordinator_role: Role,
+    ) -> Vec<(&'static str, Response)> {
+        let user = User::test_user(coordinator_role, UserId::from(1));
+        let election_id = ElectionId::from(2);
+
+        #[rustfmt::skip]
+        let results = vec![
+            ("download_n_10_2", election_download_n_10_2(user.clone(), State(pool.clone()), Path(election_id)).await.into_response()),
+            ("download_na_31_2_bijlage1", election_download_na_31_2_bijlage1(user.clone(), State(pool.clone()), Path(election_id)).await.into_response()),
+            ("download_na_31_2_inlegvel", election_download_na_31_2_inlegvel(user.clone(), State(pool.clone()), Path(election_id)).await.into_response()),
+        ];
+        results
+    }
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
+    async fn test_committee_category_authorization_err(pool: SqlitePool) {
+        let results = call_handlers(pool, Role::CoordinatorCSB).await;
+        assert_committee_category_authorization_err(results).await;
+    }
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
+    async fn test_committee_category_authorization_ok(pool: SqlitePool) {
+        let results = call_handlers(pool, Role::CoordinatorGSB).await;
+        assert_committee_category_authorization_ok(results);
+    }
+}

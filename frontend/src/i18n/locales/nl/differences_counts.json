@@ -7,8 +7,16 @@
     "CSONextSession": "B1-2.3"
   },
   "differences_counts": {
-    "more_ballots_count": "Aantal méér getelde stemmen",
-    "fewer_ballots_count": "Aantal minder getelde stemmen"
+    "more_ballots_count": {
+      "CSOFirstSession": "Aantal méér getelde stemmen",
+      "CSONextSession": "Aantal méér getelde stemmen",
+      "GSB": "Totaal aantal méér getelde stemmen"
+    },
+    "fewer_ballots_count": {
+      "CSOFirstSession": "Aantal minder getelde stemmen",
+      "CSONextSession": "Aantal minder getelde stemmen",
+      "GSB": "Totaal aantal minder getelde stemmen"
+    }
   },
   "compare_votes_cast_admitted_voters": {
     "title": {

@@ -9,13 +9,12 @@ use super::{
 };
 use crate::domain::{compare::Compare, field_path::FieldPath};
 
-/// CSOFirstSessionResults, following the fields in Model Na 31-2 Bijlage 2.
+/// CSOFirstSessionResults, following the fields in Model Na 31-2 Bijlage 1.
 ///
 /// See "Model Na 31-2. Proces-verbaal van een gemeentelijk stembureau/stembureau voor het openbaar
 /// lichaam in een gemeente/openbaar lichaam waar een centrale stemopneming wordt verricht,
-/// Bijlage 2: uitkomsten per stembureau" from the
-/// [Kiesregeling](https://wetten.overheid.nl/BWBR0034180/2026-01-01#Bijlage1_DivisieNa31.2) or
-/// [Verkiezingstoolbox](https://www.rijksoverheid.nl/onderwerpen/verkiezingen/verkiezingentoolkit/modellen).
+/// Bijlage 1: Verslagen van tellingen van stembureaus" from
+/// [Kiesraad](https://www.kiesraad.nl/documenten/2025/11/27/na-31-2-pv-gsb-cso).
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
 pub struct CSOFirstSessionResults {

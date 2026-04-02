@@ -101,7 +101,9 @@ export function getDefaultDataEntryState(): DataEntryStateLoaded {
   };
 }
 
-export function getEmptyDataEntryRequest(): DATA_ENTRY_SAVE_REQUEST_BODY {
+export function getEmptyDataEntryRequest(): Omit<DATA_ENTRY_SAVE_REQUEST_BODY, "data"> & {
+  data: CSOFirstSessionResults & { model: "CSOFirstSession" };
+} {
   return {
     progress: 0,
     data: {

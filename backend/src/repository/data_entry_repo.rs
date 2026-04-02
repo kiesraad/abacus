@@ -11,7 +11,10 @@ use crate::{
         },
         election::CommitteeCategory,
         polling_station::{PollingStation, PollingStationId},
-        results::Results,
+        results::{
+            PollingStationResults, Results,
+            common_polling_station_results::CommonPollingStationResults,
+        },
         sub_committee::{SubCommittee, SubCommitteeId},
     },
     repository::{committee_session_repo, election_repo, polling_station_repo},
@@ -333,7 +336,7 @@ pub async fn list_results_for_committee_session(
 pub async fn previous_results_for_polling_station(
     conn: &mut SqliteConnection,
     polling_station_id: PollingStationId,
-) -> Result<Results, sqlx::Error> {
+) -> Result<CommonPollingStationResults, sqlx::Error> {
     let polling_station = polling_station_repo::get(conn, polling_station_id).await?;
     let prev_data_entry_id = polling_station
         .prev_data_entry_id()
@@ -350,7 +353,11 @@ pub async fn previous_results_for_polling_station(
     .fetch_one(conn)
     .await?;
 
-    row.data.map(|d| d.0).ok_or(sqlx::Error::RowNotFound)
+    match row.data.map(|d| d.0) {
+        Some(Results::CSOFirstSession(results)) => Ok(results.as_common()),
+        Some(Results::CSONextSession(results)) => Ok(results.as_common()),
+        _ => Err(sqlx::Error::RowNotFound),
+    }
 }
 
 /// Checks if results are complete for a committee session by verifying that
@@ -801,8 +808,11 @@ mod tests {
         use super::*;
         use crate::{
             domain::investigation::InvestigationStatus,
-            repository::{investigation_repo, polling_station_repo::insert_test_polling_station},
-            service::{create_definitive_data_entry, create_empty_data_entry},
+            repository::{
+                investigation_repo,
+                polling_station_repo::{self, insert_test_polling_station},
+            },
+            service::create_definitive_data_entry,
         };
 
         async fn create_test_investigation(
@@ -826,10 +836,10 @@ mod tests {
                 .expect("investigation should exist");
 
             let status = if corrected_results {
-                let ps = create_empty_data_entry(conn, polling_station_id)
-                    .await
-                    .unwrap();
-                let data_entry_id = ps.data_entry_id().expect("should have data_entry_id");
+                let data_entry_id =
+                    polling_station_repo::create_data_entry(conn, polling_station_id)
+                        .await
+                        .unwrap();
                 current
                     .conclude_with_new_results("Test findings".to_string(), data_entry_id)
                     .expect("conclude_with_new_results should succeed")
@@ -940,23 +950,23 @@ mod tests {
         async fn test_next_session_new_polling_station_with_results(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
             let committee_session_id = CommitteeSessionId::from(704);
+            let polling_station_id = PollingStationId::from(743);
 
             insert_test_polling_station(
                 &mut conn,
-                PollingStationId::from(743),
+                polling_station_id,
                 committee_session_id,
                 None,
                 123,
             )
             .await
             .unwrap();
-            create_definitive_data_entry(
-                &mut conn,
-                PollingStationId::from(743),
-                &create_test_results(10),
-            )
-            .await
-            .unwrap();
+            polling_station_repo::create_data_entry(&mut conn, polling_station_id)
+                .await
+                .unwrap();
+            create_definitive_data_entry(&mut conn, polling_station_id, &create_test_results(10))
+                .await
+                .unwrap();
 
             assert!(
                 are_results_complete_for_committee_session(&mut conn, committee_session_id)
@@ -1092,7 +1102,7 @@ mod tests {
         assert!(results.is_ok());
 
         let results = results.unwrap();
-        assert_eq!(results.voters_counts().proxy_certificate_count, 4);
+        assert_eq!(results.voters_counts.proxy_certificate_count, 4);
     }
 
     /// Test previous_results_for_polling_station with 4th session, non-existing polling station

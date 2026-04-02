@@ -38,7 +38,7 @@ use crate::domain::{
         Candidate, CandidateGender, CandidateNumber, CommitteeCategory,
         ElectionWithPoliticalGroups, NewElection, PGNumber, RegisteredPoliticalGroup,
     },
-    results::political_group_candidate_votes::PoliticalGroupCandidateVotes,
+    results::{Results, political_group_candidate_votes::PoliticalGroupCandidateVotes},
     summary::ElectionSummary,
 };
 
@@ -658,11 +658,11 @@ impl ElectionWithPoliticalGroups {
             )
             .uncounted_votes(
                 UncountedVotesReason::MoreBallotsCounted,
-                results.differences_counts().more_ballots_count,
+                *results.differences_counts().more_ballots_count,
             )
             .uncounted_votes(
                 UncountedVotesReason::FewerBallotsCounted,
-                results.differences_counts().fewer_ballots_count,
+                *results.differences_counts().fewer_ballots_count,
             );
         builder = add_reporting_unit_investigations(builder, committee_session, results);
         builder.build()
@@ -675,7 +675,7 @@ fn add_reporting_unit_investigations(
     results: &crate::domain::results::Results,
 ) -> ReportingUnitVotesBuilder {
     if !committee_session.is_next_session()
-        && let Some(first_session_result) = results.as_cso_first_session()
+        && let Results::CSOFirstSession(first_session_result) = results
     {
         if let Some(extra_investigation_other_reason) = first_session_result
             .extra_investigation

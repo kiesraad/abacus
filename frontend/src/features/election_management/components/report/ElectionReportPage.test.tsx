@@ -341,7 +341,7 @@ describe("ElectionReportPage", () => {
         }),
       ).toBeVisible();
 
-      expect(screen.getByText("In het ZIP-bestand zitten drie documenten:")).toBeInTheDocument();
+      expect(await screen.findByText("In het ZIP-bestand zitten drie documenten:")).toBeInTheDocument();
       expect(await screen.findByRole("link", { name: /Download definitieve documenten tweede zitting/ })).toBeVisible();
     });
 
@@ -379,7 +379,7 @@ describe("ElectionReportPage", () => {
         }),
       ).toBeVisible();
 
-      expect(screen.getByText("In het ZIP-bestand zit één document:")).toBeInTheDocument();
+      expect(await screen.findByText("In het ZIP-bestand zit één document:")).toBeInTheDocument();
       expect(await screen.findByRole("link", { name: /Download definitieve documenten tweede zitting/ })).toBeVisible();
     });
   });

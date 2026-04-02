@@ -746,6 +746,7 @@
         top: if y > 0 { 0.5pt + gray },
       ),
       inset: (x: 4pt, y: 8pt),
+      fill: (_, y) => if y > 1 and calc.even(y) { luma(245) },
       table.header(
         table.cell(rowspan: 2, stroke: none, header_text([Lijst])),
         table.cell(align: center, colspan: slice.len(), header_text([Restzetel])),

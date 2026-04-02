@@ -12,7 +12,6 @@ describe("formatPoliticalGroupName", () => {
   it("formats named political groups correctly", () => {
     const politicalGroup1: PoliticalGroup = {
       name: "Group Name",
-      display_name: "Group Name",
       number: 10,
       candidates: [],
     };
@@ -23,8 +22,7 @@ describe("formatPoliticalGroupName", () => {
 
   it("formats unnamed political groups correctly", () => {
     const politicalGroup: PoliticalGroup = {
-      name: "",
-      display_name: "Blanco (de Boer, A.B.)",
+      name: "Blanco (de Boer, A.B.)",
       number: 123,
       candidates: [
         {

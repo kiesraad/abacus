@@ -53,7 +53,7 @@ pub fn map_candidate_nomination(
         for candidate in &list.candidates {
             candidate_map.insert((list.number, candidate.number), candidate.clone());
         }
-        list_names.insert(list.number, list.display_name);
+        list_names.insert(list.number, list.name);
     }
 
     let mut chosen_candidates: Vec<ChosenCandidate> = cn

@@ -3,7 +3,6 @@ VALUES (8, 'Gemeenteraad 2026', 'CSB', 'CSO', 'Juinen_2024', 'Juinen', '0000', '
          {
            "number": 1,
            "name": "Lijst Hekking",
-           "display_name": "Lijst Hekking",
            "candidates": [
              {
                "number": 1,
@@ -77,7 +76,6 @@ VALUES (8, 'Gemeenteraad 2026', 'CSB', 'CSO', 'Juinen_2024', 'Juinen', '0000', '
          {
            "number": 2,
            "name": "De Tegenpartij",
-           "display_name": "De Tegenpartij",
            "candidates": [
              {
                "number": 1,
@@ -137,7 +135,6 @@ VALUES (8, 'Gemeenteraad 2026', 'CSB', 'CSO', 'Juinen_2024', 'Juinen', '0000', '
          {
            "number": 3,
            "name": "Juinen vooruit",
-           "display_name": "Juinen vooruit",
            "candidates": [
              {
                "number": 1,
@@ -392,8 +389,7 @@ VALUES (8, 'Gemeenteraad 2026', 'CSB', 'CSO', 'Juinen_2024', 'Juinen', '0000', '
          },
          {
            "number": 4,
-           "name": "",
-           "display_name": "Blanco (Bakker, T.)",
+           "name": "Blanco (Bakker, T.)",
            "candidates": [
              {
                "number": 1,

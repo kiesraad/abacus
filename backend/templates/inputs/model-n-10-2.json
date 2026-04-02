@@ -16,7 +16,7 @@
       {
         "number": 1,
         "name": "Lijst van de Kandidaten",
-        "display_name": "Lijst van de Kandidaten",
+        "registered_name": "Lijst van de Kandidaten",
         "candidates": [
           {
             "number": 1,
@@ -163,7 +163,7 @@
       {
         "number": 2,
         "name": "De Stemunie",
-        "display_name": "De Stemunie",
+        "registered_name": "De Stemunie",
         "candidates": [
           {
             "number": 1,
@@ -625,7 +625,7 @@
       {
         "number": 3,
         "name": "Unie voor Stemmen",
-        "display_name": "Unie voor Stemmen",
+        "registered_name": "Unie voor Stemmen",
         "candidates": [
           {
             "number": 1,
@@ -919,7 +919,7 @@
       {
         "number": 4,
         "name": "Kandidaten eerst!",
-        "display_name": "Kandidaten eerst!",
+        "registered_name": "Kandidaten eerst!",
         "candidates": [
           {
             "number": 1,
@@ -1338,7 +1338,7 @@
       {
         "number": 5,
         "name": "Groep van de Stemmers",
-        "display_name": "Groep van de Stemmers",
+        "registered_name": "Groep van de Stemmers",
         "candidates": [
           {
             "number": 1,
@@ -1553,7 +1553,7 @@
       {
         "number": 6,
         "name": "De Lijst",
-        "display_name": "De Lijst",
+        "registered_name": "De Lijst",
         "candidates": [
           {
             "number": 1,
@@ -1934,7 +1934,7 @@
       {
         "number": 7,
         "name": "Algemene Partij",
-        "display_name": "Algemene Partij",
+        "registered_name": "Algemene Partij",
         "candidates": [
           {
             "number": 1,
@@ -2211,8 +2211,8 @@
       },
       {
         "number": 8,
-        "name": "",
-        "display_name": "Blanco (Van Lent, J.)",
+        "name": "Blanco (Van Lent, J.)",
+        "registered_name": "",
         "candidates": [
           {
             "number": 1,
@@ -2285,7 +2285,7 @@
       {
         "number": 9,
         "name": "Stem nu!",
-        "display_name": "Stem nu!",
+        "registered_name": "Stem nu!",
         "candidates": [
           {
             "number": 1,

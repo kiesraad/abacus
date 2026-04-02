@@ -13,7 +13,8 @@ use crate::{
         data_entry::{DataEntryId, DataEntryStatus, Definitive, FirstEntryFinalised},
         election::{
             self, CandidateGender, CandidateNumber, CommitteeCategory, ElectionCategory,
-            ElectionWithPoliticalGroups, NewElection, PGNumber, PoliticalGroup, VoteCountingMethod,
+            ElectionWithPoliticalGroups, NewElection, PGNumber, PoliticalGroup,
+            RegisteredPoliticalGroup, VoteCountingMethod,
         },
         field_path::FieldPath,
         polling_station::{PollingStation, PollingStationRequest, PollingStationType},
@@ -248,7 +249,7 @@ fn generate_political_party(
     rng: &mut impl rand::RngExt,
     pg_number: PGNumber,
     args: &GenerateElectionArgs,
-) -> PoliticalGroup {
+) -> RegisteredPoliticalGroup {
     let mut candidates = vec![];
     let has_first_name = rng.random_ratio(1, 2);
 
@@ -280,10 +281,9 @@ fn generate_political_party(
             .cloned(),
         })
     }
-    PoliticalGroup {
+    RegisteredPoliticalGroup {
         number: pg_number,
         name: super::data::political_group_name(rng),
-        display_name: super::data::political_group_name(rng),
         candidates,
     }
 }

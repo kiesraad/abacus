@@ -1,7 +1,9 @@
-use sqlx::{SqliteConnection, query_as, types::Json};
+use chrono::NaiveDate;
+use sqlx::{SqliteConnection, query, query_as, types::Json};
 
 use crate::domain::election::{
-    CommitteeCategory, Election, ElectionId, ElectionWithPoliticalGroups, NewElection,
+    CommitteeCategory, Election, ElectionCategory, ElectionId, ElectionWithPoliticalGroups,
+    NewElection, RegisteredPoliticalGroup, VoteCountingMethod,
 };
 
 pub async fn list(
@@ -33,22 +35,63 @@ pub async fn list(
     Ok(elections)
 }
 
+#[allow(clippy::too_many_lines)]
 pub async fn get(
     conn: &mut SqliteConnection,
     election_id: ElectionId,
 ) -> Result<ElectionWithPoliticalGroups, sqlx::Error> {
-    let election: ElectionWithPoliticalGroups = query_as("SELECT * FROM elections WHERE id = ?")
-        .bind(election_id)
-        .fetch_one(conn)
-        .await?;
-    Ok(election)
+    let row = query!(
+        r#"
+        SELECT
+            id as "id: ElectionId",
+            name,
+            committee_category as "committee_category: CommitteeCategory",
+            counting_method as "counting_method: VoteCountingMethod",
+            election_id,
+            location,
+            domain_id,
+            category as "category: ElectionCategory",
+            number_of_seats as "number_of_seats: u32",
+            number_of_voters as "number_of_voters: u32",
+            election_date as "election_date: NaiveDate",
+            nomination_date as "nomination_date: NaiveDate",
+            political_groups as "political_groups: Json<Vec<RegisteredPoliticalGroup>>"
+        FROM elections
+        WHERE id = ?
+        "#,
+        election_id
+    )
+    .fetch_one(conn)
+    .await;
+    row.map(|row| ElectionWithPoliticalGroups {
+        id: row.id,
+        name: row.name,
+        committee_category: row.committee_category,
+        counting_method: row.counting_method,
+        election_id: row.election_id,
+        location: row.location,
+        domain_id: row.domain_id,
+        category: row.category,
+        number_of_seats: row.number_of_seats,
+        number_of_voters: row.number_of_voters,
+        election_date: row.election_date,
+        nomination_date: row.nomination_date,
+        political_groups: row
+            .political_groups
+            .0
+            .into_iter()
+            .map(|pg| pg.into())
+            .collect(),
+    })
 }
 
+#[allow(clippy::too_many_lines)]
 pub async fn create(
     conn: &mut SqliteConnection,
     election: NewElection,
 ) -> Result<ElectionWithPoliticalGroups, sqlx::Error> {
-    query_as(
+    let political_groups = Json(election.political_groups);
+    let row: Result<_, sqlx::Error> = query!(
         r#"
         INSERT INTO elections (
             name,
@@ -65,35 +108,55 @@ pub async fn create(
             political_groups
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         RETURNING
-            id,
+            id as "id: ElectionId",
             name,
-            committee_category,
-            counting_method,
+            committee_category as "committee_category: CommitteeCategory",
+            counting_method as "counting_method: VoteCountingMethod",
             election_id,
             location,
             domain_id,
-            category,
-            number_of_seats,
-            number_of_voters,
-            election_date,
-            nomination_date,
-            political_groups
+            category as "category: ElectionCategory",
+            number_of_seats as "number_of_seats: u32",
+            number_of_voters as "number_of_voters: u32",
+            election_date as "election_date: NaiveDate",
+            nomination_date as "nomination_date: NaiveDate",
+            political_groups as "political_groups: Json<Vec<RegisteredPoliticalGroup>>"
         "#,
+        election.name,
+        election.committee_category,
+        election.counting_method,
+        election.election_id,
+        election.location,
+        election.domain_id,
+        election.category,
+        election.number_of_seats,
+        election.number_of_voters,
+        election.election_date,
+        election.nomination_date,
+        political_groups,
     )
-    .bind(election.name)
-    .bind(election.committee_category)
-    .bind(election.counting_method)
-    .bind(election.election_id)
-    .bind(election.location)
-    .bind(election.domain_id)
-    .bind(election.category)
-    .bind(election.number_of_seats)
-    .bind(election.number_of_voters)
-    .bind(election.election_date)
-    .bind(election.nomination_date)
-    .bind(Json(election.political_groups))
     .fetch_one(conn)
-    .await
+    .await;
+    row.map(|row| ElectionWithPoliticalGroups {
+        id: row.id,
+        name: row.name,
+        committee_category: row.committee_category,
+        counting_method: row.counting_method,
+        election_id: row.election_id,
+        location: row.location,
+        domain_id: row.domain_id,
+        category: row.category,
+        number_of_seats: row.number_of_seats,
+        number_of_voters: row.number_of_voters,
+        election_date: row.election_date,
+        nomination_date: row.nomination_date,
+        political_groups: row
+            .political_groups
+            .0
+            .into_iter()
+            .map(|pg| pg.into())
+            .collect(),
+    })
 }
 
 pub async fn change_number_of_voters(

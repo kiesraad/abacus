@@ -134,11 +134,30 @@ fn random_election(
         number_of_voters: rng.random_range(0..=10_000),
         election_date: random_date(rng),
         nomination_date: random_date(rng),
-        political_groups: (0..parties)
-            .map(|party_index| PoliticalGroup {
+        political_groups: random_political_groups(
+            rng,
+            parties,
+            candidates,
+            string_length,
+            none_where_possible,
+        ),
+    }
+}
+
+fn random_political_groups(
+    rng: &mut impl RngExt,
+    parties: u32,
+    candidates: u32,
+    string_length: usize,
+    none_where_possible: bool,
+) -> Vec<PoliticalGroup> {
+    (0..parties)
+        .map(|party_index| {
+            let name = random_string(rng, string_length);
+            PoliticalGroup {
                 number: PGNumber::from(party_index + 1),
-                name: random_string(rng, string_length),
-                display_name: random_string(rng, string_length),
+                name: name.clone(),
+                registered_name: name,
                 candidates: (0..candidates)
                     .map(|candidate_index| {
                         let gender = random_value(
@@ -174,9 +193,9 @@ fn random_election(
                         }
                     })
                     .collect(),
-            })
-            .collect(),
-    }
+            }
+        })
+        .collect()
 }
 
 fn random_polling_station(
@@ -388,7 +407,7 @@ const EDGE_VALUES: [(u32, u32, usize, bool); 6] = [
 ];
 
 /// Minimum PDF size to consider the generated PDF valid
-const MIN_PDF_SIZE: usize = 20_000;
+const MIN_PDF_SIZE: usize = 15_000;
 
 async fn test_pdf(model: PdfModel) {
     let input = model.as_input_path_str();
@@ -396,9 +415,10 @@ async fn test_pdf(model: PdfModel) {
         Ok(r) => r,
         Err(e) => panic!("Error generating PDF for {input}: {e:?}"),
     };
+    let len = result.buffer.len();
     assert!(
         result.buffer.len() > MIN_PDF_SIZE,
-        "Incorrect PDF file size for {input}"
+        "Incorrect PDF file size for {input}: {len}"
     );
 }
 

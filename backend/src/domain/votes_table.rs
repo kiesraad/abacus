@@ -279,7 +279,7 @@ impl VotesTable {
 
         Ok(VotesTable {
             number: group.number,
-            name: group.display_name.clone(),
+            name: group.name.clone(),
             total: candidate_votes.map(|cv| cv.total),
             previous_total: previous_candidate_votes.map(|pcv| pcv.total),
             columns,
@@ -335,7 +335,7 @@ mod tests {
         PoliticalGroup {
             number: PGNumber::from(number),
             name: format!("Partij {number}"),
-            display_name: format!("Partij {number}"),
+            registered_name: format!("Partij {number}"),
             candidates: candidate_numbers
                 .iter()
                 .map(|&candidate_number| sample_candidate(CandidateNumber::from(candidate_number)))

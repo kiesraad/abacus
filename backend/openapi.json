@@ -6315,8 +6315,7 @@
           "number_of_seats",
           "number_of_voters",
           "election_date",
-          "nomination_date",
-          "political_groups"
+          "nomination_date"
         ],
         "properties": {
           "category": {
@@ -6357,12 +6356,6 @@
             "type": "integer",
             "format": "int32",
             "minimum": 0
-          },
-          "political_groups": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PoliticalGroup"
-            }
           }
         },
         "additionalProperties": false
@@ -6378,7 +6371,6 @@
         "required": [
           "number",
           "name",
-          "display_name",
           "candidates"
         ],
         "properties": {
@@ -6387,9 +6379,6 @@
             "items": {
               "$ref": "#/components/schemas/Candidate"
             }
-          },
-          "display_name": {
-            "type": "string"
           },
           "name": {
             "type": "string"

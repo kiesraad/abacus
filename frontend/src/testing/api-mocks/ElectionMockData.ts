@@ -20,7 +20,6 @@ import { pollingStationMockData } from "./PollingStationMockData";
 export const politicalGroupMockData: PoliticalGroup = {
   number: 1,
   name: "Vurige Vleugels Partij",
-  display_name: "Vurige Vleugels Partij",
   candidates: [
     {
       number: 1,
@@ -233,7 +232,6 @@ export const politicalGroupsMockData: PoliticalGroup[] = [
   {
     number: 2,
     name: "Wijzen van Water en Wind",
-    display_name: "Wijzen van Water en Wind",
     candidates: [
       {
         number: 1,

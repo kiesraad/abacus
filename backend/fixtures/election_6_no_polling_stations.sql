@@ -4,7 +4,6 @@ VALUES (6, 'Nieuwe Verkiezing', 'GSB', 'CSO','KleinDorp_2024', 'KleinDorp', '012
           {
             "number": 1,
             "name": "Political Group A",
-            "display_name": "Political Group A",
             "candidates": [
               {
                 "number": 1,
@@ -26,7 +25,6 @@ VALUES (6, 'Nieuwe Verkiezing', 'GSB', 'CSO','KleinDorp_2024', 'KleinDorp', '012
           },{
             "number": 2,
             "name": "Political Group B",
-            "display_name": "Political Group B",
             "candidates": [
               {
                 "number": 1,

@@ -107,7 +107,8 @@ pub struct NewElection {
     pub election_date: NaiveDate,
     #[schema(value_type = String, format = "date")]
     pub nomination_date: NaiveDate,
-    pub political_groups: Vec<PoliticalGroup>,
+    #[serde(skip_serializing)]
+    pub political_groups: Vec<RegisteredPoliticalGroup>,
 }
 
 /// Election number of voters change request
@@ -170,6 +171,17 @@ pub enum VoteCountingMethod {
 
 id!(PGNumber);
 
+/// Political group as it is registered with its candidates
+#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
+#[serde(deny_unknown_fields)]
+pub struct RegisteredPoliticalGroup {
+    #[schema(value_type = u32)]
+    pub number: PGNumber,
+    // TODO rename to registered_name
+    pub name: String,
+    pub candidates: Vec<Candidate>,
+}
+
 /// Political group with its candidates
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
@@ -177,8 +189,48 @@ pub struct PoliticalGroup {
     #[schema(value_type = u32)]
     pub number: PGNumber,
     pub name: String,
-    pub display_name: String,
+    #[serde(skip_serializing)]
+    pub registered_name: String,
     pub candidates: Vec<Candidate>,
+}
+
+impl From<RegisteredPoliticalGroup> for PoliticalGroup {
+    fn from(row: RegisteredPoliticalGroup) -> Self {
+        Self {
+            number: row.number,
+            name: political_group_name(&row.name, &row.candidates),
+            registered_name: row.name,
+            candidates: row.candidates,
+        }
+    }
+}
+
+fn political_group_name(registered_name: &str, candidates: &[Candidate]) -> String {
+    if registered_name.is_empty() {
+        let mut name = String::new();
+        let first_candidate = candidates
+            .first()
+            .expect("At least 1 candidate should be present");
+
+        let mut last_name = String::new();
+
+        if let Some(last_name_prefix) = &first_candidate.last_name_prefix {
+            last_name.push_str(&format!(
+                "{} {}",
+                last_name_prefix, &first_candidate.last_name
+            ));
+        } else {
+            last_name.push_str(&first_candidate.last_name.to_string());
+        }
+
+        name.push_str(&format!(
+            "Blanco ({}, {})",
+            &last_name, &first_candidate.initials
+        ));
+        name
+    } else {
+        registered_name.to_string()
+    }
 }
 
 id!(CandidateNumber);
@@ -234,7 +286,7 @@ pub(crate) mod tests {
             .map(|(i, &candidates)| PoliticalGroup {
                 number: PGNumber::try_from(i + 1).unwrap(),
                 name: format!("Political group {}", i + 1),
-                display_name: format!("Political group {}", i + 1),
+                registered_name: format!("Political group {}", i + 1),
                 candidates: (0..candidates)
                     .map(|j| Candidate {
                         number: CandidateNumber::from(j + 1),

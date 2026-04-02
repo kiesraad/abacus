@@ -110,7 +110,7 @@
       {
         "number": 1,
         "name": "Political Group A",
-        "display_name": "Political Group A",
+        "registered_name": "Political Group A",
         "candidates": [
           {
             "number": 1,
@@ -133,7 +133,7 @@
       {
         "number": 2,
         "name": "Political Group B",
-        "display_name": "Political Group B",
+        "registered_name": "Political Group B",
         "candidates": [
           {
             "number": 1,
@@ -155,8 +155,8 @@
       },
       {
         "number": 3,
-        "name": "",
-        "display_name": "Blanco (Smit, G.)",
+        "name": "Blanco (Smit, G.)",
+        "registered_name": "",
         "candidates": [
           {
             "number": 1,

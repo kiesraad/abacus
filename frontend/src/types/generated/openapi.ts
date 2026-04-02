@@ -1062,7 +1062,6 @@ export interface NewElection {
   nomination_date: string;
   number_of_seats: number;
   number_of_voters: number;
-  political_groups: PoliticalGroup[];
 }
 
 export type PGNumber = number;
@@ -1072,7 +1071,6 @@ export type PGNumber = number;
  */
 export interface PoliticalGroup {
   candidates: Candidate[];
-  display_name: string;
   name: string;
   number: number;
 }

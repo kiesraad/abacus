@@ -60,7 +60,7 @@ pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::default()
         .routes(routes!(committee_session_create).authorize(COORDINATOR_GSB))
         .routes(routes!(committee_session_delete).authorize(COORDINATOR_GSB))
-        .routes(routes!(committee_session_update).authorize(COORDINATOR_GSB))
+        .routes(routes!(committee_session_update).authorize(COORDINATOR))
         .routes(routes!(committee_session_status_change).authorize(COORDINATOR))
         .routes(routes!(committee_session_investigations).authorize(COORDINATOR_GSB))
 }

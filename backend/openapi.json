@@ -1442,7 +1442,7 @@
     },
     "/api/elections/{election_id}/committee_sessions/{committee_session_id}": {
       "put": {
-        "summary": "Update a [CommitteeSession]. (coordinator_gsb)",
+        "summary": "Update a [CommitteeSession]. (coordinator_csb, coordinator_gsb)",
         "operationId": "committee_session_update",
         "parameters": [
           {
@@ -1532,6 +1532,7 @@
         "security": [
           {
             "cookie_auth": [
+              "coordinator_csb",
               "coordinator_gsb"
             ]
           }

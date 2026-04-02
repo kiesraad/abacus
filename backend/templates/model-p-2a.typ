@@ -20,7 +20,7 @@
 #title_page(
   is_municipality[#input.election.domain_id #input.election.location][#input.election.location],
   is_municipality[Gemeentelijk stembureau][Stembureau voor het openbaar lichaam],
-  [#input.election.name #format_date(input.election.election_date)],
+  [#input.election.name - #format_date(input.election.election_date)],
   [
     Verslag en gecorrigeerde telresultaten per lijst en
     kandidaat – Model P 2a
@@ -137,9 +137,7 @@ Bijvoorbeeld een schorsing of als er meerdere verkiezingen tegelijk werden georg
 
 #set page(header: "")
 
-#show heading.where(level: 3): it =>[
-    #block(it.body)
-]
+#show heading.where(level: 3): it => [#block(it.body)]
 
 === Deze pagina is expres leeg
 Zo komt het handtekeningen-blad altijd op een losse pagina, ook als het verslag dubbelzijdig is geprint.
@@ -152,7 +150,7 @@ Zo komt het handtekeningen-blad altijd op een losse pagina, ook als het verslag 
 
 === Datum
 
-#textbox[Datum en tijd:][Plaats:]
+#textbox_only_bottom_stroke[Datum en tijd:][Plaats:]
 
 == Verplicht: voorzitter en #is_municipality[twee][vier] leden van het #location_type
 
@@ -160,7 +158,7 @@ Zo komt het handtekeningen-blad altijd op een losse pagina, ook als het verslag 
 
 #textbox[Naam:][Handtekening:]
 
-=== #is_municipality[Twee][Vier] leden van het #location_type:
+=== #is_municipality[2][4] leden van het #location_type:
 
 #stack(spacing: 0.5em, ..range(0, is_municipality(2, 4)).map(_ => textbox[Naam:][Handtekening:]))
 

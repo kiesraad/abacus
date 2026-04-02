@@ -83,7 +83,7 @@ Licht hieronder toe wat de reden van het extra onderzoek was
 === Noteer alle lijsten waar de telling door het *stembureau* afwijkt van de telling van vandaag door het *#location_type*.
 
 #empty_table(
-  columns: (auto, auto, auto, auto, 26em),
+  columns: (auto, auto, 9em, auto, 29em),
   headers: (
     [Lijstnummer met verschil],
     [Lijsttotaal vastgesteld door het stembureau],
@@ -91,11 +91,14 @@ Licht hieronder toe wat de reden van het extra onderzoek was
     [Aantal stemmen verschil],
     [
       Toelichting op het telverschil, bijvoorbeeld:
-      #set text(weight: "regular", size: 8pt)
-      #set list(spacing: 0.75em)
-      - Stembiljet was toch blanco, ongeldig of andersom
-      - Stembiljet meegeteld bij verkeerde lijst
-      - Meer of minder stembiljetten geteld dan stembureau
+      #[
+        #show list: content => block(width: 125%, content)
+        #set text(weight: "regular", size: 7pt)
+        #set list(spacing: 0.75em)
+        - Stembiljet was toch blanco, ongeldig of andersom
+        - Stembiljet meegeteld bij verkeerde lijst
+        - Meer of minder stembiljetten geteld dan stembureau
+      ]
     ],
   ),
   values: ("", "", "", "", ""),

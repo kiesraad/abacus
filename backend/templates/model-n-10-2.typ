@@ -23,7 +23,7 @@
 #title_page(
   [#input.election.location Stembureau #input.polling_station.number #input.polling_station.name],
   "",
-  [#input.election.name #format_date(input.election.election_date)],
+  [#input.election.name - #format_date(input.election.election_date)],
   [
     Verslag en telresultaten per lijst –
     Model N 10-2
@@ -245,8 +245,9 @@ Bijvoorbeeld als er meerdere verkiezingen tegelijk werden georganiseerd, en een 
 
 #set page(header: "")
 
-#emph_block[Deze pagina is expres leeg]
+#show heading.where(level: 3): it => [#block(it.body)]
 
+=== Deze pagina is expres leeg
 Zo komt het handtekeningen-blad altijd op een losse pagina, ook als het verslag dubbelzijdig is geprint.
 
 #pagebreak(weak: true)
@@ -257,7 +258,7 @@ Zo komt het handtekeningen-blad altijd op een losse pagina, ook als het verslag 
 
 === Datum
 
-#textbox[Datum en tijd:][Plaats:]
+#textbox_only_bottom_stroke[Datum en tijd:][Plaats:]
 
 == Verplicht: voorzitter en twee leden van het stembureau
 
@@ -265,7 +266,7 @@ Zo komt het handtekeningen-blad altijd op een losse pagina, ook als het verslag 
 
 #textbox[Naam:][Handtekening:]
 
-=== Twee leden van het stembureau:
+=== 2 leden van het stembureau:
 
 #stack(spacing: 0.5em, ..range(0, 2).map(_ => textbox[Naam:][Handtekening:]))
 

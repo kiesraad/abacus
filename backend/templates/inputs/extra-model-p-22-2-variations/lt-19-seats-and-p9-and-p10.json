@@ -50,108 +50,11 @@
         "count": 0,
         "polling_stations": []
       }
-    },
-    "polling_station_investigations": {
-      "admitted_voters_recounted": [],
-      "ballots_recounted": [],
-      "investigated_other_reason": []
-    },
-    "political_group_votes": [
-      {
-        "number": 1,
-        "total": 2571,
-        "candidate_votes": [
-          {
-            "number": 1,
-            "votes": 1069
-          },
-          {
-            "number": 2,
-            "votes": 403
-          },
-          {
-            "number": 3,
-            "votes": 421
-          },
-          {
-            "number": 4,
-            "votes": 310
-          },
-          {
-            "number": 5,
-            "votes": 368
-          }
-        ]
-      },
-      {
-        "number": 2,
-        "total": 977,
-        "candidate_votes": [
-          {
-            "number": 1,
-            "votes": 552
-          },
-          {
-            "number": 2,
-            "votes": 68
-          },
-          {
-            "number": 3,
-            "votes": 181
-          },
-          {
-            "number": 4,
-            "votes": 176
-          }
-        ]
-      },
-      {
-        "number": 3,
-        "total": 567,
-        "candidate_votes": [
-          {
-            "number": 1,
-            "votes": 329
-          },
-          {
-            "number": 2,
-            "votes": 238
-          }
-        ]
-      },
-      {
-        "number": 4,
-        "total": 536,
-        "candidate_votes": [
-          {
-            "number": 1,
-            "votes": 447
-          },
-          {
-            "number": 2,
-            "votes": 89
-          }
-        ]
-      },
-      {
-        "number": 5,
-        "total": 453,
-        "candidate_votes": [
-          {
-            "number": 1,
-            "votes": 266
-          },
-          {
-            "number": 2,
-            "votes": 187
-          }
-        ]
-      }
-    ]
+    }
   },
   "election": {
     "id": 4,
-    "name": "Test Election Absolute Majority Change and List Exhaustion",
+    "name": "Test Election < 19 seats & Absolute Majority Change & List Exhaustion",
     "counting_method": "CSO",
     "committee_category": "CSB",
     "election_id": "Juinen_2026",
@@ -1759,6 +1662,35 @@
       }
     ]
   },
+  "result_changes_full_seats": [
+    {
+      "list_number": 1,
+      "increase": 0,
+      "decrease": 1
+    },
+    {
+      "list_number": 1,
+      "increase": 0,
+      "decrease": 1
+    }
+  ],
+  "result_changes_residual_seats": [
+    {
+      "list_number": 1,
+      "increase": 1,
+      "decrease": 0
+    },
+    {
+      "list_number": 4,
+      "increase": 0,
+      "decrease": 1
+    },
+    {
+      "list_number": 1,
+      "increase": 0,
+      "decrease": 1
+    }
+  ],
   "hash": "dedf17b4684e1214fcabb770925dc75c624be3380bd3464729c37a80a37940ad",
   "creation_date_time": "19-03-2023 17:07:00 +02:00"
 }

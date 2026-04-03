@@ -995,6 +995,8 @@ export interface GenerateElectionArgs {
   committee_category: CommitteeCategory;
   /** Percentage of the first data entry to complete if data entry is included */
   first_data_entry: RandomRange;
+  /** Generate multiple elections, each resulting in a different P22-2 variant */
+  generate_p22_2_variants: boolean;
   political_group_distribution_slope: RandomRange;
   /** Number of political groups to create */
   political_groups: RandomRange;
@@ -1091,17 +1093,19 @@ export interface NewElection {
   nomination_date: string;
   number_of_seats: number;
   number_of_voters: number;
-  political_groups: PoliticalGroup[];
 }
 
 export type PGNumber = number;
 
 /**
- * Political group with its candidates
+ * Political group and its candidates (with name as used for display purposes)
  */
 export interface PoliticalGroup {
+  /** List of candidates of the political group */
   candidates: Candidate[];
+  /** Political group name as used for display purposes (with 'Blanco' in case of empty registered name) */
   name: string;
+  /** Political group number */
   number: number;
 }
 

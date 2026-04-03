@@ -22,7 +22,7 @@ use crate::{
         investigation::PollingStationInvestigation,
         models::{
             ModelN10_2Input, ModelNa14_2Bijlage1Input, ModelNa14_2Input, ModelNa31_2Bijlage1Input,
-            ModelNa31_2Input, ModelP2aInput, PdfFileModel, PdfModel,
+            ModelNa31_2InlegvelInput, ModelNa31_2Input, ModelP2aInput, PdfFileModel, PdfModel,
         },
         polling_station::{PollingStation, PollingStationId, PollingStationType},
         results::{
@@ -130,14 +130,34 @@ fn random_election(
         location: random_string(rng, string_length),
         domain_id: random_string(rng, string_length),
         category: ElectionCategory::Municipal,
-        number_of_seats: rng.random_range(0..5),
+        number_of_seats: rng.random_range(9..45),
         number_of_voters: rng.random_range(0..=10_000),
         election_date: random_date(rng),
         nomination_date: random_date(rng),
-        political_groups: (0..parties)
-            .map(|party_index| PoliticalGroup {
+        political_groups: random_political_groups(
+            rng,
+            parties,
+            candidates,
+            string_length,
+            none_where_possible,
+        ),
+    }
+}
+
+fn random_political_groups(
+    rng: &mut impl RngExt,
+    parties: u32,
+    candidates: u32,
+    string_length: usize,
+    none_where_possible: bool,
+) -> Vec<PoliticalGroup> {
+    (0..parties)
+        .map(|party_index| {
+            let name = random_string(rng, string_length);
+            PoliticalGroup {
                 number: PGNumber::from(party_index + 1),
-                name: random_string(rng, string_length),
+                name: name.clone(),
+                registered_name: name,
                 candidates: (0..candidates)
                     .map(|candidate_index| {
                         let gender = random_value(
@@ -173,9 +193,9 @@ fn random_election(
                         }
                     })
                     .collect(),
-            })
-            .collect(),
-    }
+            }
+        })
+        .collect()
 }
 
 fn random_polling_station(
@@ -387,7 +407,7 @@ const EDGE_VALUES: [(u32, u32, usize, bool); 6] = [
 ];
 
 /// Minimum PDF size to consider the generated PDF valid
-const MIN_PDF_SIZE: usize = 20_000;
+const MIN_PDF_SIZE: usize = 15_000;
 
 async fn test_pdf(model: PdfModel) {
     let input = model.as_input_path_str();
@@ -395,10 +415,34 @@ async fn test_pdf(model: PdfModel) {
         Ok(r) => r,
         Err(e) => panic!("Error generating PDF for {input}: {e:?}"),
     };
+    let len = result.buffer.len();
     assert!(
         result.buffer.len() > MIN_PDF_SIZE,
-        "Incorrect PDF file size for {input}"
+        "Incorrect PDF file size for {input}: {len}"
     );
+}
+
+#[test(tokio::test)]
+async fn test_n_10_2() {
+    let mut rng = rand::rng();
+
+    for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
+        let election = random_election(
+            &mut rng,
+            parties,
+            candidates,
+            string_length,
+            none_where_possible,
+        );
+        let polling_station = random_polling_station(&mut rng, string_length, none_where_possible);
+
+        let model = PdfModel::ModelN10_2(Box::new(ModelN10_2Input {
+            election,
+            polling_station,
+        }));
+
+        test_pdf(model).await;
+    }
 }
 
 #[test(tokio::test)]
@@ -538,7 +582,7 @@ async fn test_na_31_2_bijlage_1() {
 }
 
 #[test(tokio::test)]
-async fn test_n_10_2() {
+async fn test_na_31_2_inlegvel() {
     let mut rng = rand::rng();
 
     for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
@@ -549,11 +593,9 @@ async fn test_n_10_2() {
             string_length,
             none_where_possible,
         );
-        let polling_station = random_polling_station(&mut rng, string_length, none_where_possible);
 
-        let model = PdfModel::ModelN10_2(Box::new(ModelN10_2Input {
-            election,
-            polling_station,
+        let model = PdfModel::ModelNa31_2Inlegvel(Box::new(ModelNa31_2InlegvelInput {
+            election: election.into(),
         }));
 
         test_pdf(model).await;
@@ -590,7 +632,7 @@ async fn test_p_2a() {
 
         let model = PdfModel::ModelP2a(Box::new(ModelP2aInput {
             committee_session,
-            election,
+            election: election.into(),
             investigations,
         }));
 

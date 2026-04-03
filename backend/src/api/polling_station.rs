@@ -585,7 +585,7 @@ mod tests {
     use sqlx::{SqlitePool, query};
     use test_log::test;
 
-    use super::{PollingStationRequest, create, create_many, update};
+    use super::*;
     use crate::domain::{election::ElectionId, polling_station::PollingStationId};
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2", "election_3"))))]
@@ -724,5 +724,76 @@ VALUES
         data.number = Some(123);
         let result = update(&mut conn, election_id, polling_station_id, data).await;
         assert!(result.is_err());
+    }
+
+    mod authorization {
+        use super::*;
+        use axum::{
+            Json,
+            extract::{Path, State},
+            response::{IntoResponse, Response},
+        };
+        use test_log::test;
+
+        use crate::{
+            api::tests::{
+                assert_committee_category_authorization_err,
+                assert_committee_category_authorization_ok,
+            },
+            domain::role::Role,
+            repository::user_repo::{User, UserId},
+        };
+
+        async fn call_handlers(
+            pool: SqlitePool,
+            coordinator_role: Role,
+        ) -> Vec<(&'static str, Response)> {
+            let user = User::test_user(coordinator_role, UserId::from(1));
+            let audit = AuditService::new(Some(user.clone()), None);
+
+            let election_id = ElectionId::from(2);
+            let import_election_id = ElectionId::from(6);
+            let polling_station_id = PollingStationId::from(211);
+
+            let polling_station_request = PollingStationRequest {
+                name: "Test station".into(),
+                number: Some(42),
+                number_of_voters: Some(123),
+                polling_station_type: None,
+                address: "Teststraat 1".into(),
+                postal_code: "1234 AB".into(),
+                locality: "Testdorp".into(),
+            };
+
+            #[rustfmt::skip]
+            let results = vec![
+                ("list", polling_station_list(user.clone(), State(pool.clone()), Path(election_id)).await.into_response()),
+                ("create", polling_station_create(user.clone(), State(pool.clone()), Path(election_id), audit.clone(), polling_station_request.clone()).await.into_response()),
+                ("import", polling_station_import(user.clone(), State(pool.clone()), Path(import_election_id), audit.clone(), Json(PollingStationsRequest { file_name: "test.xml".into(), polling_stations: "<xml/>".into() })).await.into_response()),
+                ("validate_import", polling_station_validate_import(user.clone(), State(pool.clone()), Path(import_election_id), Json(PollingStationFileRequest { data: "<xml/>".into() })).await.into_response()),
+                ("get", polling_station_get(user.clone(), State(pool.clone()), Path((election_id, polling_station_id))).await.into_response()),
+                ("update", polling_station_update(user.clone(), State(pool.clone()), audit.clone(), Path((election_id, polling_station_id)), polling_station_request.clone()).await.into_response()),
+                ("delete", polling_station_delete(user.clone(), State(pool.clone()), audit.clone(), Path((election_id, polling_station_id))).await.into_response()),
+            ];
+            results
+        }
+
+        #[test(sqlx::test(fixtures(
+            path = "../../fixtures",
+            scripts("election_2", "election_6_no_polling_stations")
+        )))]
+        async fn test_committee_category_authorization_err(pool: SqlitePool) {
+            let results = call_handlers(pool, Role::CoordinatorCSB).await;
+            assert_committee_category_authorization_err(results).await;
+        }
+
+        #[test(sqlx::test(fixtures(
+            path = "../../fixtures",
+            scripts("election_2", "election_6_no_polling_stations")
+        )))]
+        async fn test_committee_category_authorization_ok(pool: SqlitePool) {
+            let results = call_handlers(pool, Role::CoordinatorGSB).await;
+            assert_committee_category_authorization_ok(results);
+        }
     }
 }

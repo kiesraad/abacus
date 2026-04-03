@@ -5,6 +5,7 @@ export class DataEntryHomePage {
   readonly fieldsetContinueNext: Locator;
   readonly number: Locator;
   readonly feedback: Locator;
+  readonly start: Locator;
   readonly submitFeedback: Locator;
   readonly alert: Locator;
   readonly alertDataEntrySaved: Locator;
@@ -13,8 +14,6 @@ export class DataEntryHomePage {
   readonly alertDataEntryWarning: Locator;
   readonly alertDataEntryInProgress: Locator;
   readonly allDataEntriesInProgress: Locator;
-
-  protected readonly start: Locator; // use clickStart() instead
 
   constructor(protected readonly page: Page) {
     this.fieldset = page.getByRole("group", {
@@ -39,17 +38,10 @@ export class DataEntryHomePage {
     this.allDataEntriesInProgress = this.alertDataEntryInProgress.getByRole("link");
   }
 
-  async clickStart() {
-    const button = this.page.getByRole("button", { name: "Beginnen" });
-    // click() fails on Safari because element is visible and enabled, but not stable
-    // so added timeout to make it fail fast
-    await button.click({ timeout: 2000 });
-  }
-
   async enterNumberAndClickStart(dataEntrySource: { number: number; name: string }) {
     await this.number.pressSequentially(dataEntrySource.number.toString(), { delay: 50 });
     await expect(this.feedback).toContainText(dataEntrySource.name);
-    await this.clickStart();
+    await this.start.click();
   }
 
   async clickDataEntryInProgress(dataEntrySource: { number: number; name: string }) {

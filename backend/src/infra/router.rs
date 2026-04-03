@@ -135,7 +135,7 @@ fn add_middleware(router: Router<AppState>, state: &AppState) -> Router<AppState
 #[cfg(feature = "memory-serve")]
 fn add_frontend_memory_serve(router: Router<AppState>) -> Router<AppState> {
     router.merge(
-        memory_serve::from_local_build!("frontend")
+        memory_serve::load!("frontend")
             .index_file(Some("/index.html"))
             .fallback(Some("/index.html"))
             .fallback_status(StatusCode::OK)
@@ -172,7 +172,7 @@ fn add_frontend_memory_serve(router: Router<AppState>) -> Router<AppState> {
 fn add_storybook_memory_serve(router: Router<AppState>) -> Router<AppState> {
     router.nest(
         "/storybook/",
-        memory_serve::from_local_build!("storybook")
+        memory_serve::load!("storybook")
             .index_file(Some("/index.html"))
             .into_router()
             .layer(SetResponseHeaderLayer::overriding(

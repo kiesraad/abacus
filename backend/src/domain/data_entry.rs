@@ -911,6 +911,7 @@ mod tests {
                 .map(|number| PoliticalGroup {
                     number: PGNumber::from(number),
                     name: format!("Partij {number}"),
+                    registered_name: format!("Partij {number}"),
                     candidates: (1..=2)
                         .map(|number| Candidate {
                             number: CandidateNumber::from(number),
@@ -1415,6 +1416,7 @@ mod tests {
                     political_groups: vec![PoliticalGroup {
                         number: PGNumber::from(1),
                         name: "Test group".to_string(),
+                        registered_name: "Test group".to_string(),
                         candidates: vec![Candidate {
                             number: CandidateNumber::from(1),
                             initials: "A.".to_string(),

@@ -1,6 +1,6 @@
 // A paragraph with a vertical line on the left
 #let emph_block(content) = {
-  block(width: 75%, above: 3em, below: 3em, outset: (left: 6pt, top: 3pt, bottom: 3pt), stroke: (left: 1pt), text(
+  block(width: 75%, above: 3em, below: 1.5em, outset: (left: 6pt, top: 3pt, bottom: 3pt), stroke: (left: 1pt), text(
     size: 10pt,
     content,
   ))
@@ -27,6 +27,22 @@
   )
 }
 
+// A box with only a bottom stroke, and optional titles, aligned horizontally
+#let textbox_only_bottom_stroke(..args) = {
+  rect(
+    width: 100%,
+    height: 5em,
+    inset: 1em,
+    stroke: (
+      bottom: 0.5pt,
+    ),
+    grid(
+      columns: args.pos().map(a => 1fr),
+      ..args
+    ),
+  )
+}
+
 /// Conditionally render the body if the condition is true, used to conditionally
 /// render cells in grids or tables. The result should always be spread using
 /// e.g. `..cell_if(condition, body)`. Can be used with either a single cell or
@@ -45,6 +61,14 @@
 
 #let small_header_text(value) = {
   text(size: 6pt, weight: "semibold", value)
+}
+
+#let header_text(value) = {
+  text(weight: "semibold", value)
+}
+
+#let list_heading_text(value) = {
+  text(size: 15pt, weight: "semibold", value)
 }
 
 #let prefilled_text(value) = {
@@ -93,22 +117,24 @@
   let has_content = content != none and content != ""
   let size = if checked == true or checked == none and not small { 14pt } else { 10pt }
 
-  grid(
-    columns: if has_content { (14pt, 6pt, auto) } else { (size) },
-    align: horizon + center,
-    box(
-      width: size,
-      height: size,
-      inset: 2.5pt,
-      stroke: if checked == none or checked == true { 0.5pt + black } else {
-        (thickness: 0.4pt, dash: "densely-dotted", cap: "square")
-      },
-      clip: true,
-      fill: if checked == true { black } else { white },
-      if checked == true { checkmark() },
-    ),
-    if has_content { " " },
-    if has_content { align(left, content) },
+  block(width: 75%,
+    grid(
+      columns: if has_content { (14pt, 6pt, auto) } else { (size) },
+      align: horizon + center,
+      box(
+        width: size,
+        height: size,
+        inset: 2.5pt,
+        stroke: if checked == none or checked == true { 0.5pt + black } else {
+          (thickness: 0.4pt, dash: "densely-dotted", cap: "square")
+        },
+        clip: true,
+        fill: if checked == true { black } else { white },
+        if checked == true { checkmark() },
+      ),
+      if has_content { " " },
+      if has_content { align(left, content) },
+    )
   )
 }
 
@@ -306,6 +332,13 @@
   " uur"
 }
 
+#let format_fraction(fraction) = {
+  str(fraction.integer)
+  if fraction.numerator > 0 {
+    " " + super[#fraction.numerator] + "⁄" + sub[#fraction.denominator]
+  }
+}
+
 // A title without any numbering
 #let title(value) = {
   text(size: 14pt, weight: "semibold", value)
@@ -335,7 +368,7 @@
 }
 
 // Format the name of a candidate
-#let candidate_name(election_candidate) = {
+#let candidate_name(election_candidate, with_first_name: true, with_gender: true) = {
   let name = ""
 
   if election_candidate == none {
@@ -348,11 +381,11 @@
 
   name += election_candidate.last_name + ", " + election_candidate.initials + " "
   
-  if "first_name" in election_candidate {
+  if "first_name" in election_candidate and with_first_name {
     name += "(" + election_candidate.first_name + ") "
   }
 
-  if "gender" in election_candidate {
+  if "gender" in election_candidate and with_gender {
     if election_candidate.gender == "Male" {
       name += "(m)"
     } else if election_candidate.gender == "Female" {
@@ -382,6 +415,25 @@
   }
 
   location.trim()
+}
+
+// Format the name of a political group
+#let format_political_group_name(number, name, with_prefix: none) = {
+  let formatted_name = ""
+
+  let prefix = "";
+  if (with_prefix == "with_list_prefix") {
+    prefix += "Lijst " + str(number) + " ";
+  } else if (with_prefix == "only_list_number") {
+    prefix += str(number) + " ";
+  }
+
+  formatted_name = prefix + name
+  formatted_name.trim()
+}
+
+#let political_group_name(political_group, with_prefix: none) = {
+  format_political_group_name(political_group.number, political_group.name, with_prefix: with_prefix)
 }
 
 // Default table layout
@@ -617,6 +669,109 @@
   }
 
   pagebreak(weak: true)
+}
+
+// View a table with candidate names with seat, locality and either votes or position on list
+#let candidates_with_seat_table(
+  startSeatNumber,
+  showPosition,
+  showVotes,
+  candidates,
+  candidateVotes,
+) = {
+  table(
+    columns: (4em, 1.5fr, 1fr, 10em),
+    stroke: (x, y) => (
+      left: if x > 0 { 0.5pt + gray },
+      top: if y > 0 { 0.5pt + gray },
+    ),
+    inset: (x: 4pt, y: 8pt),
+    table.header(
+      table.cell(stroke: none, header_text([Zetel])),
+      table.cell(stroke: none, header_text([Naam])),
+      table.cell(stroke: none, header_text([Woonplaats])),
+      if showVotes { table.cell(stroke: none, align: right, header_text([Aantal stemmen]))} else if showPosition { table.cell(stroke: none, align: right, header_text([Positie op lijst])) }
+    ),
+    table.hline(stroke: 1pt + black),
+    ..candidateVotes.enumerate().map(((idx, chosen_candidate)) => {
+      let candidate = candidates.find(candidate => candidate.number == chosen_candidate.number)
+      (
+        table.cell(align: right, str(startSeatNumber + idx)),
+        table.cell([#candidate_name(candidate)]),
+        table.cell([#candidate_location(candidate)]),
+        if showVotes { table.cell(align: right, [#chosen_candidate.votes])}
+        else if showPosition { table.cell(align: right, [#candidate.number])},
+      )
+    }).flatten(),
+    table.hline(stroke: 0.5pt + gray),
+  )
+}
+
+// View a table with list names with residual seat assignment and total number of residual seats
+#let highest_averages_table(
+  steps,
+  final_standing,
+  political_groups,
+  result_changes
+) = {
+  let steps_copy = steps
+  let slices = ()
+  if steps_copy.len() > 6 {
+    let slice = ()
+    while steps_copy.len() > 0 {
+      slice.push(steps_copy.remove(0))
+      if slice.len() == 6 {
+        slices.push(slice)
+        slice = ()
+      }
+    }
+    slices.push(slice)
+  } else {
+    slices.push(steps_copy)
+  }
+  for slice in slices {
+    table(
+      columns: (1fr,) + slice.len() * (6em,) + (6em,),
+      stroke: (x, y) => (
+        left: if x > 0 { 0.5pt + gray },
+        top: if y > 0 { 0.5pt + gray },
+      ),
+      inset: (x: 4pt, y: 8pt),
+      fill: (_, y) => if y > 1 and calc.even(y) { luma(245) },
+      table.header(
+        table.cell(rowspan: 2, stroke: none, header_text([Lijst])),
+        table.cell(align: center, colspan: slice.len(), header_text([Restzetel])),
+        table.cell(rowspan: 2, header_text([Aantal\ restzetels])),
+        ..slice.map((step) => {
+          table.cell(rowspan: 1, str(step.residual_seat_number))
+        }),
+      ),
+      table.hline(stroke: 1pt + black),
+      ..final_standing.map((list_seat_assignment) => {
+        let residual_seats = steps.filter(step => {
+          step.change.selected_list_number == list_seat_assignment.list_number
+        }).len()
+        let list_result_changes = result_changes.filter((change) => change.list_number == list_seat_assignment.list_number)
+        for list_result_change in list_result_changes {
+          residual_seats = residual_seats + list_result_change.increase
+        };
+        (
+          table.cell(political_group_name(political_groups.find(pg => pg.number == list_seat_assignment.list_number), with_prefix: "only_list_number")),
+          ..slice.map(step => {
+            let average = step.standings.find((standing) => standing.list_number == list_seat_assignment.list_number).next_votes_per_seat
+            if step.change.selected_list_number == list_seat_assignment.list_number {
+              set text(weight: "semibold")
+            }
+            table.cell(
+              if not step.change.list_exhausted.contains(list_seat_assignment.list_number) { format_fraction(average) } else { "" }
+            )
+          }),
+          table.cell(align: right, if slices.last() == slice { str(residual_seats) } else { "" })
+        )
+      }).flatten(),
+      table.hline(stroke: 1pt + black),
+    )
+  }
 }
 
 /// Display a TODO label

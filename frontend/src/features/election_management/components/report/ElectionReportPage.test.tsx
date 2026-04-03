@@ -1,4 +1,4 @@
-import { render as rtlRender } from "@testing-library/react";
+import { render as rtlRender, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { HttpResponse, http } from "msw";
 import type { ReactNode } from "react";
@@ -172,8 +172,17 @@ describe("ElectionReportPage", () => {
       expect(resumeButton).toBeVisible();
       await user.click(resumeButton);
 
-      expect(statusChange).toHaveBeenCalledWith({ status: "data_entry" });
-      expect(navigate).toHaveBeenCalledWith("../../status");
+      const modal = await screen.findByRole("dialog");
+      expect(modal).toBeVisible();
+      const title = within(modal).getByText("Terug naar invoerfase?");
+      expect(title).toBeVisible();
+      const saveButton = within(modal).getByRole("button", { name: "Invoer hervatten" });
+      saveButton.click();
+
+      await waitFor(() => {
+        expect(statusChange).toHaveBeenCalledWith({ status: "data_entry" });
+        expect(navigate).toHaveBeenCalledWith("../../status");
+      });
     });
 
     test("Does not show resume data entry button when not current committee session", async () => {
@@ -256,6 +265,13 @@ describe("ElectionReportPage", () => {
       expect(resumeButton).toBeVisible();
       await user.click(resumeButton);
 
+      const modal = await screen.findByRole("dialog");
+      expect(modal).toBeVisible();
+      const title = within(modal).getByText("Terug naar invoerfase?");
+      expect(title).toBeVisible();
+      const saveButton = within(modal).getByRole("button", { name: "Invoer hervatten" });
+      saveButton.click();
+
       await expectConflictErrorPage();
       expect(console.error).toHaveBeenCalled();
     });
@@ -325,7 +341,7 @@ describe("ElectionReportPage", () => {
         }),
       ).toBeVisible();
 
-      expect(screen.getByText("In het ZIP-bestand zitten drie documenten:")).toBeInTheDocument();
+      expect(await screen.findByText("In het ZIP-bestand zitten drie documenten:")).toBeInTheDocument();
       expect(await screen.findByRole("link", { name: /Download definitieve documenten tweede zitting/ })).toBeVisible();
     });
 
@@ -363,7 +379,7 @@ describe("ElectionReportPage", () => {
         }),
       ).toBeVisible();
 
-      expect(screen.getByText("In het ZIP-bestand zit één document:")).toBeInTheDocument();
+      expect(await screen.findByText("In het ZIP-bestand zit één document:")).toBeInTheDocument();
       expect(await screen.findByRole("link", { name: /Download definitieve documenten tweede zitting/ })).toBeVisible();
     });
   });
@@ -455,8 +471,17 @@ describe("ElectionReportPage", () => {
       expect(resumeButton).toBeVisible();
       await user.click(resumeButton);
 
-      expect(statusChange).toHaveBeenCalledWith({ status: "data_entry" });
-      expect(navigate).toHaveBeenCalledWith("../../status");
+      const modal = await screen.findByRole("dialog");
+      expect(modal).toBeVisible();
+      const title = within(modal).getByText("Terug naar invoerfase?");
+      expect(title).toBeVisible();
+      const saveButton = within(modal).getByRole("button", { name: "Invoer hervatten" });
+      saveButton.click();
+
+      await waitFor(() => {
+        expect(statusChange).toHaveBeenCalledWith({ status: "data_entry" });
+        expect(navigate).toHaveBeenCalledWith("../../status");
+      });
     });
 
     test("Does not show resume data entry button when not current committee session", async () => {
@@ -544,6 +569,13 @@ describe("ElectionReportPage", () => {
       const resumeButton = screen.getByRole("button", { name: "Invoer hervatten" });
       expect(resumeButton).toBeVisible();
       await user.click(resumeButton);
+
+      const modal = await screen.findByRole("dialog");
+      expect(modal).toBeVisible();
+      const title = within(modal).getByText("Terug naar invoerfase?");
+      expect(title).toBeVisible();
+      const saveButton = within(modal).getByRole("button", { name: "Invoer hervatten" });
+      saveButton.click();
 
       await expectConflictErrorPage();
       expect(console.error).toHaveBeenCalled();

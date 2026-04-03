@@ -42,56 +42,7 @@
         "count": 0,
         "polling_stations": []
       }
-    },
-    "polling_station_investigations": {
-      "admitted_voters_recounted": [],
-      "ballots_recounted": [],
-      "investigated_other_reason": []
-    },
-    "political_group_votes": [
-      {
-        "number": 1,
-        "total": 5,
-        "candidate_votes": [
-          {
-            "number": 1,
-            "votes": 3
-          },
-          {
-            "number": 2,
-            "votes": 2
-          }
-        ]
-      },
-      {
-        "number": 2,
-        "total": 5,
-        "candidate_votes": [
-          {
-            "number": 1,
-            "votes": 3
-          },
-          {
-            "number": 2,
-            "votes": 2
-          }
-        ]
-      },
-      {
-        "number": 3,
-        "total": 50,
-        "candidate_votes": [
-          {
-            "number": 1,
-            "votes": 25
-          },
-          {
-            "number": 2,
-            "votes": 25
-          }
-        ]
-      }
-    ]
+    }
   },
   "election": {
     "id": 6,
@@ -110,6 +61,7 @@
       {
         "number": 1,
         "name": "Political Group A",
+        "registered_name": "Political Group A",
         "candidates": [
           {
             "number": 1,
@@ -132,6 +84,7 @@
       {
         "number": 2,
         "name": "Political Group B",
+        "registered_name": "Political Group B",
         "candidates": [
           {
             "number": 1,
@@ -153,7 +106,8 @@
       },
       {
         "number": 3,
-        "name": "Political Group C",
+        "name": "Blanco (Smit, G.)",
+        "registered_name": "",
         "candidates": [
           {
             "number": 1,
@@ -204,7 +158,7 @@
         "locality": "Test Location",
         "gender": "Female",
         "list_number": 3,
-        "list_name": "Political Group C"
+        "list_name": "Blanco (Smit, G.)"
       },
       {
         "number": 2,
@@ -243,7 +197,7 @@
         "locality": "Test Location",
         "gender": "Male",
         "list_number": 3,
-        "list_name": "Political Group C"
+        "list_name": "Blanco (Smit, G.)"
       }
     ],
     "list_candidate_nomination": [
@@ -283,7 +237,7 @@
       },
       {
         "list_number": 3,
-        "list_name": "Political Group C",
+        "list_name": "Blanco (Smit, G.)",
         "list_seats": 2,
         "preferential_candidate_nomination": [
           {
@@ -965,6 +919,30 @@
       }
     ]
   },
+  "result_changes_full_seats": [
+    {
+      "list_number": 3,
+      "increase": 0,
+      "decrease": 1
+    },
+    {
+      "list_number": 3,
+      "increase": 0,
+      "decrease": 1
+    },
+    {
+      "list_number": 3,
+      "increase": 0,
+      "decrease": 1
+    }
+  ],
+  "result_changes_residual_seats": [
+    {
+      "list_number": 3,
+      "increase": 0,
+      "decrease": 1
+    }
+  ],
   "hash": "dedf17b4684e1214fcabb770925dc75c624be3380bd3464729c37a80a37940ad",
   "creation_date_time": "19-03-2023 17:07:00 +02:00"
 }

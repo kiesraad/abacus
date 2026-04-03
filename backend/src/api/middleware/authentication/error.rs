@@ -15,6 +15,7 @@ pub enum AuthenticationError {
     PasswordRejectionSameAsOld,
     PasswordRejectionSameAsUsername,
     PasswordRejectionTooShort,
+    RoleNotAuthorizedError,
     SessionKeyNotFound,
     Unauthenticated,
     Unauthorized,

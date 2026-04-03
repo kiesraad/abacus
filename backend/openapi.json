@@ -1442,7 +1442,7 @@
     },
     "/api/elections/{election_id}/committee_sessions/{committee_session_id}": {
       "put": {
-        "summary": "Update a [CommitteeSession]. (coordinator_gsb)",
+        "summary": "Update a [CommitteeSession]. (coordinator_csb, coordinator_gsb)",
         "operationId": "committee_session_update",
         "parameters": [
           {
@@ -1532,6 +1532,7 @@
         "security": [
           {
             "cookie_auth": [
+              "coordinator_csb",
               "coordinator_gsb"
             ]
           }
@@ -6051,6 +6052,7 @@
           "polling_stations",
           "voters",
           "seats",
+          "generate_p22_2_variants",
           "with_data_entry",
           "first_data_entry",
           "second_data_entry",
@@ -6073,6 +6075,10 @@
           "first_data_entry": {
             "$ref": "#/components/schemas/RandomRange",
             "description": "Percentage of the first data entry to complete if data entry is included"
+          },
+          "generate_p22_2_variants": {
+            "type": "boolean",
+            "description": "Generate multiple elections, each resulting in a different P22-2 variant"
           },
           "political_group_distribution_slope": {
             "$ref": "#/components/schemas/RandomRange"
@@ -6369,8 +6375,7 @@
           "number_of_seats",
           "number_of_voters",
           "election_date",
-          "nomination_date",
-          "political_groups"
+          "nomination_date"
         ],
         "properties": {
           "category": {
@@ -6411,12 +6416,6 @@
             "type": "integer",
             "format": "int32",
             "minimum": 0
-          },
-          "political_groups": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PoliticalGroup"
-            }
           }
         },
         "additionalProperties": false
@@ -6428,7 +6427,7 @@
       },
       "PoliticalGroup": {
         "type": "object",
-        "description": "Political group with its candidates",
+        "description": "Political group and its candidates (with name as used for display purposes)",
         "required": [
           "number",
           "name",
@@ -6439,14 +6438,17 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Candidate"
-            }
+            },
+            "description": "List of candidates of the political group"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "description": "Political group name as used for display purposes (with 'Blanco' in case of empty registered name)"
           },
           "number": {
             "type": "integer",
             "format": "int32",
+            "description": "Political group number",
             "minimum": 0
           }
         },

@@ -62,238 +62,7 @@
         "count": 0,
         "polling_stations": []
       }
-    },
-    "polling_station_investigations": {
-      "admitted_voters_recounted": [],
-      "ballots_recounted": [],
-      "investigated_other_reason": []
-    },
-    "political_group_votes": [
-      {
-        "number": 1,
-        "total": 808,
-        "candidate_votes": [
-          {
-            "number": 1,
-            "votes": 138
-          },
-          {
-            "number": 2,
-            "votes": 20
-          },
-          {
-            "number": 3,
-            "votes": 55
-          },
-          {
-            "number": 4,
-            "votes": 45
-          },
-          {
-            "number": 5,
-            "votes": 50
-          },
-          {
-            "number": 6,
-            "votes": 100
-          },
-          {
-            "number": 7,
-            "votes": 60
-          },
-          {
-            "number": 8,
-            "votes": 40
-          },
-          {
-            "number": 9,
-            "votes": 30
-          },
-          {
-            "number": 10,
-            "votes": 20
-          },
-          {
-            "number": 11,
-            "votes": 50
-          },
-          {
-            "number": 12,
-            "votes": 200
-          }
-        ]
-      },
-      {
-        "number": 2,
-        "total": 60,
-        "candidate_votes": [
-          {
-            "number": 1,
-            "votes": 20
-          },
-          {
-            "number": 2,
-            "votes": 15
-          },
-          {
-            "number": 3,
-            "votes": 5
-          },
-          {
-            "number": 4,
-            "votes": 3
-          },
-          {
-            "number": 5,
-            "votes": 2
-          },
-          {
-            "number": 6,
-            "votes": 15
-          }
-        ]
-      },
-      {
-        "number": 3,
-        "total": 58,
-        "candidate_votes": [
-          {
-            "number": 1,
-            "votes": 20
-          },
-          {
-            "number": 2,
-            "votes": 15
-          },
-          {
-            "number": 3,
-            "votes": 5
-          },
-          {
-            "number": 4,
-            "votes": 3
-          },
-          {
-            "number": 5,
-            "votes": 2
-          },
-          {
-            "number": 6,
-            "votes": 13
-          }
-        ]
-      },
-      {
-        "number": 4,
-        "total": 57,
-        "candidate_votes": [
-          {
-            "number": 1,
-            "votes": 20
-          },
-          {
-            "number": 2,
-            "votes": 15
-          },
-          {
-            "number": 3,
-            "votes": 5
-          },
-          {
-            "number": 4,
-            "votes": 3
-          },
-          {
-            "number": 5,
-            "votes": 14
-          }
-        ]
-      },
-      {
-        "number": 5,
-        "total": 56,
-        "candidate_votes": [
-          {
-            "number": 1,
-            "votes": 20
-          },
-          {
-            "number": 2,
-            "votes": 15
-          },
-          {
-            "number": 3,
-            "votes": 5
-          },
-          {
-            "number": 4,
-            "votes": 16
-          }
-        ]
-      },
-      {
-        "number": 6,
-        "total": 55,
-        "candidate_votes": [
-          {
-            "number": 1,
-            "votes": 20
-          },
-          {
-            "number": 2,
-            "votes": 15
-          },
-          {
-            "number": 3,
-            "votes": 5
-          },
-          {
-            "number": 4,
-            "votes": 15
-          }
-        ]
-      },
-      {
-        "number": 7,
-        "total": 54,
-        "candidate_votes": [
-          {
-            "number": 1,
-            "votes": 20
-          },
-          {
-            "number": 2,
-            "votes": 15
-          },
-          {
-            "number": 3,
-            "votes": 5
-          },
-          {
-            "number": 4,
-            "votes": 14
-          }
-        ]
-      },
-      {
-        "number": 8,
-        "total": 52,
-        "candidate_votes": [
-          {
-            "number": 1,
-            "votes": 32
-          },
-          {
-            "number": 2,
-            "votes": 15
-          },
-          {
-            "number": 3,
-            "votes": 5
-          }
-        ]
-      }
-    ]
+    }
   },
   "election": {
     "id": 3,
@@ -312,6 +81,7 @@
       {
         "number": 1,
         "name": "Political Group A",
+        "registered_name": "Political Group A",
         "candidates": [
           {
             "number": 1,
@@ -420,6 +190,7 @@
       {
         "number": 2,
         "name": "Political Group B",
+        "registered_name": "Political Group B",
         "candidates": [
           {
             "number": 1,
@@ -476,6 +247,7 @@
       {
         "number": 3,
         "name": "Political Group C",
+        "registered_name": "Political Group C",
         "candidates": [
           {
             "number": 1,
@@ -534,6 +306,7 @@
       {
         "number": 4,
         "name": "Political Group D",
+        "registered_name": "Political Group D",
         "candidates": [
           {
             "number": 1,
@@ -579,7 +352,8 @@
       },
       {
         "number": 5,
-        "name": "",
+        "name": "Blanco (Smit, G.)",
+        "registered_name": "",
         "candidates": [
           {
             "number": 1,
@@ -618,6 +392,7 @@
       {
         "number": 6,
         "name": "Political Group F",
+        "registered_name": "Political Group F",
         "candidates": [
           {
             "number": 1,
@@ -657,6 +432,7 @@
       {
         "number": 7,
         "name": "Political Group G",
+        "registered_name": "Political Group G",
         "candidates": [
           {
             "number": 1,
@@ -696,6 +472,7 @@
       {
         "number": 8,
         "name": "Political Group H",
+        "registered_name": "Political Group H",
         "candidates": [
           {
             "number": 1,
@@ -1099,7 +876,7 @@
       },
       {
         "list_number": 5,
-        "list_name": "",
+        "list_name": "Blanco (Smit, G.)",
         "list_seats": 0,
         "preferential_candidate_nomination": [],
         "other_candidate_nomination": [],
@@ -2032,6 +1809,8 @@
       }
     ]
   },
+  "result_changes_full_seats": [],
+  "result_changes_residual_seats": [],
   "hash": "dedf17b4684e1214fcabb770925dc75c624be3380bd3464729c37a80a37940ad",
   "creation_date_time": "19-03-2023 17:07:00 +02:00"
 }

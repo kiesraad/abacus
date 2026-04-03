@@ -5,12 +5,7 @@ import { ChosenCandidatesTable } from "./ChosenCandidatesTable";
 
 export const Default: StoryObj = {
   render: () => {
-    return (
-      <ChosenCandidatesTable
-        chosenCandidates={gte19Seats.candidate_nomination.chosen_candidates}
-        politicalGroups={gte19Seats.election.political_groups}
-      />
-    );
+    return <ChosenCandidatesTable chosenCandidates={gte19Seats.candidate_nomination.chosen_candidates} />;
   },
   play: async ({ canvas }) => {
     const table = canvas.getByRole("table");

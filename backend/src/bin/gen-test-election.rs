@@ -64,6 +64,10 @@ struct Args {
     #[arg(long, default_value = "9..=45", value_parser = parse_range::<u32>)]
     seats: Range<u32>,
 
+    /// Generate multiple elections, each resulting in a different P22-2 variant
+    #[arg(long)]
+    generate_p22_2_variants: bool,
+
     /// Include (part of) data entry for this election
     #[arg(long)]
     with_data_entry: bool,
@@ -100,6 +104,7 @@ impl From<Args> for GenerateElectionArgs {
             polling_stations: RandomRange(args.polling_stations),
             voters: RandomRange(args.voters),
             seats: RandomRange(args.seats),
+            generate_p22_2_variants: args.generate_p22_2_variants,
             with_data_entry: args.with_data_entry,
             first_data_entry: RandomRange(args.first_data_entry),
             second_data_entry: RandomRange(args.second_data_entry),

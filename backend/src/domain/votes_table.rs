@@ -164,7 +164,7 @@ fn get_votes_for_candidate(
 pub struct VotesTable {
     /// Political group number
     number: PGNumber,
-    /// Political group name
+    /// Political group display name
     name: String,
     /// Total votes for the political group
     total: Option<Count>,
@@ -335,6 +335,7 @@ mod tests {
         PoliticalGroup {
             number: PGNumber::from(number),
             name: format!("Partij {number}"),
+            registered_name: format!("Partij {number}"),
             candidates: candidate_numbers
                 .iter()
                 .map(|&candidate_number| sample_candidate(CandidateNumber::from(candidate_number)))

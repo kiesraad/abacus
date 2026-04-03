@@ -85,7 +85,7 @@ When manually debugging Playwright tests in developer mode, it is important to h
   ```
   Also note that the VS Code extension only works properly if you open the `../frontend` folder as project root in VS Code (otherwise the relative paths used within the tests are incorrect).
 - Run the "create test user accounts" test with the `initialisation-test` and `setup-test-users` projects enabled. The "create test user accounts" test depends on the initialisation tests, so those will also run automatically. These initialisation tests can only be run once on a clean database, if you try to run them again they will fail.
-- Now the test user has been initialized, disable the `initialisation-test` and `setup-test-users` projects, and enable one or more of the browser projects (`chrome`, `firefox`, `safari`). Now you can run any of the other browser tests!
+- Now the test user has been initialized, disable the `initialisation-test` and `setup-test-users` projects, and enable one or more of the browser projects (`chrome` or `firefox`). Now you can run any of the other browser tests!
 
 ### Component Development with Storybook
 

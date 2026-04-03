@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::domain::{
     committee_session::CommitteeSession,
-    election::ElectionWithPoliticalGroups,
+    election::Election,
     investigation::PollingStationInvestigation,
     models::{PdfFileModel, PdfModel, ToPdfFileModel},
     polling_station::PollingStation,
@@ -12,7 +12,7 @@ use crate::domain::{
 #[serde(deny_unknown_fields)]
 pub struct ModelP2aInput {
     pub committee_session: CommitteeSession,
-    pub election: ElectionWithPoliticalGroups,
+    pub election: Election,
     pub investigations: Vec<(PollingStation, PollingStationInvestigation)>,
 }
 

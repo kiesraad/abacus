@@ -71,7 +71,7 @@ clap = { version = "4.6", default-features = false, features = [
 eml-nl = { version = "0.5.0" }
 hyper = { version = "1", features = ["full"] }
 tokio.workspace = true
-memory-serve = { version = "1.2.2", optional = true, features = [
+memory-serve = { version = "2.1.0", optional = true, features = [
     "force-embed",
 ] }
 utoipa = { version = "5.4.0", features = ["axum_extras"] }
@@ -85,7 +85,7 @@ tracing-subscriber = { version = "0.3.23", features = ["env-filter"] }
 tracing.workspace = true
 tower-http = { version = "0.6", features = ["set-header", "trace"] }
 quick-xml = { version = "0.39.2", features = ["serialize"] }
-sha2 = "0.10.9"
+sha2 = "0.11.0"
 argon2 = { version = "0.5.3", features = ["std"] }
 rand.workspace = true
 cookie = { version = "0.18.1", features = ["percent-encode"] }
@@ -100,7 +100,7 @@ reqwest = { version = "0.13", default-features = false, features = ["json"] }
 test-log.workspace = true
 
 [build-dependencies]
-memory-serve = { version = "1.2.2", optional = true }
+memory-serve = { version = "2.1.0", optional = true }
 
 [lints.rust]
 unsafe_code = "forbid"

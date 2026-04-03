@@ -912,7 +912,7 @@ export const election: ElectionWithPoliticalGroups = {
     },
     {
       number: 3,
-      name: "Political Group C",
+      name: "Blanco (Smit, G.)",
       candidates: [
         {
           number: 1,

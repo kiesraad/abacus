@@ -10,7 +10,6 @@ import { InputField } from "@/components/ui/InputField/InputField";
 import type { TranslationPath } from "@/i18n/i18n.types";
 import { t, tx } from "@/i18n/translate";
 import { hasBooleanProperty } from "@/utils/typeChecks";
-import { getPostLoginPath } from "../utils/getPostLoginPath";
 
 // biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function LoginForm() {
@@ -48,7 +47,13 @@ export function LoginForm() {
       setUsername("");
       setPassword("");
 
-      void navigate(getPostLoginPath(result.data));
+      const { fullname, needs_password_change } = result.data;
+
+      if (!fullname || needs_password_change) {
+        void navigate("/account/setup");
+      } else {
+        void navigate("/elections");
+      }
     }
   }
 

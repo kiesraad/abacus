@@ -343,6 +343,10 @@ impl IntoResponse for APIError {
                             false,
                         ),
                     ),
+                    AuthenticationError::RoleNotAuthorizedError => (
+                        StatusCode::FORBIDDEN,
+                        to_error("Invalid role", ErrorReference::Forbidden, true),
+                    ),
                     AuthenticationError::OwnAccountCannotBeDeleted => (
                         StatusCode::FORBIDDEN,
                         to_error(
@@ -569,7 +573,7 @@ impl From<PollingStationServiceError> for APIError {
 
 impl From<RoleNotAuthorizedError> for APIError {
     fn from(_: RoleNotAuthorizedError) -> Self {
-        APIError::Authentication(AuthenticationError::Forbidden)
+        APIError::Authentication(AuthenticationError::RoleNotAuthorizedError)
     }
 }
 

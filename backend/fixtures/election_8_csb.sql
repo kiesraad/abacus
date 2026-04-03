@@ -2,7 +2,7 @@ INSERT INTO elections (id, name, committee_category, counting_method, election_i
 VALUES (8, 'Gemeenteraad 2026', 'CSB', 'CSO', 'Juinen_2024', 'Juinen', '0000', 'Municipal', 29, 10000, '2024-11-30', '2024-11-01', '[
          {
            "number": 1,
-           "name": "Lijst Hekking",
+           "registered_name": "Lijst Hekking",
            "candidates": [
              {
                "number": 1,
@@ -75,7 +75,7 @@ VALUES (8, 'Gemeenteraad 2026', 'CSB', 'CSO', 'Juinen_2024', 'Juinen', '0000', '
          },
          {
            "number": 2,
-           "name": "De Tegenpartij",
+           "registered_name": "De Tegenpartij",
            "candidates": [
              {
                "number": 1,
@@ -134,7 +134,7 @@ VALUES (8, 'Gemeenteraad 2026', 'CSB', 'CSO', 'Juinen_2024', 'Juinen', '0000', '
          },
          {
            "number": 3,
-           "name": "Juinen vooruit",
+           "registered_name": "Juinen vooruit",
            "candidates": [
              {
                "number": 1,
@@ -389,7 +389,7 @@ VALUES (8, 'Gemeenteraad 2026', 'CSB', 'CSO', 'Juinen_2024', 'Juinen', '0000', '
          },
          {
            "number": 4,
-           "name": "",
+           "registered_name": "",
            "candidates": [
              {
                "number": 1,

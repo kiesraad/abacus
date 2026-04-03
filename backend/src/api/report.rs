@@ -168,7 +168,7 @@ impl ResultsInput {
     fn get_p2a_pdf_file(&self, overview_filename: String) -> PdfFileModel {
         ModelP2aInput {
             committee_session: self.committee_session.clone(),
-            election: self.election.clone(),
+            election: self.election.clone().into(),
             investigations: self
                 .investigations
                 .iter()
@@ -717,6 +717,53 @@ mod tests {
             assert_eq!(overview.id, FileId::from(1));
 
             assert_eq!(list_event_names(&mut conn).await.unwrap(), ["FileCreated"]);
+        }
+    }
+
+    mod authorization {
+        use super::*;
+        use axum::{
+            extract::{Path, State},
+            response::{IntoResponse, Response},
+        };
+        use test_log::test;
+
+        use crate::{
+            api::tests::{
+                assert_committee_category_authorization_err,
+                assert_committee_category_authorization_ok,
+            },
+            domain::role::Role,
+            repository::user_repo::{User, UserId},
+        };
+
+        async fn call_handlers(
+            pool: SqlitePool,
+            coordinator_role: Role,
+        ) -> Vec<(&'static str, Response)> {
+            let user = User::test_user(coordinator_role, UserId::from(1));
+            let audit = AuditService::new(Some(user.clone()), None);
+            let election_id = ElectionId::from(5);
+            let committee_session_id = CommitteeSessionId::from(5);
+
+            #[rustfmt::skip]
+            let results = vec![
+                ("download_pdf_results", election_download_pdf_results(user.clone(), State(pool.clone()), audit.clone(), Path((election_id, committee_session_id))).await.into_response()),
+                ("download_zip_results", election_download_zip_results(user.clone(), State(pool.clone()), audit.clone(), Path((election_id, committee_session_id))).await.into_response()),
+            ];
+            results
+        }
+
+        #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
+        async fn test_committee_category_authorization_err(pool: SqlitePool) {
+            let results = call_handlers(pool, Role::CoordinatorCSB).await;
+            assert_committee_category_authorization_err(results).await;
+        }
+
+        #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
+        async fn test_committee_category_authorization_ok(pool: SqlitePool) {
+            let results = call_handlers(pool, Role::CoordinatorGSB).await;
+            assert_committee_category_authorization_ok(results);
         }
     }
 }

@@ -476,5 +476,36 @@ describe("ElectionHomePage", () => {
         ["Type stembureau", "Centraal stembureau"],
       ]);
     });
+
+    test("Does not show create new committee session button on completed committee session", async () => {
+      overrideOnce("get", "/api/elections/2/status", 200, {
+        statuses: [],
+      });
+
+      const committeeSessionData: Partial<CommitteeSession> = {
+        status: "completed",
+        location: "Den Haag",
+        start_date_time: "2026-03-18T21:36:00",
+      };
+      const electionData = getCSBElectionMockData({}, committeeSessionData);
+      electionData.committee_sessions = [getCSBCommitteeSessionMockData(committeeSessionData)];
+      server.use(
+        http.get("/api/elections/2", () =>
+          HttpResponse.json(electionData satisfies ElectionDetailsResponse, { status: 200 }),
+        ),
+      );
+
+      await renderCSBPage();
+
+      const committee_session_cards = await screen.findByTestId("committee-session-cards");
+      expect(committee_session_cards).toBeVisible();
+
+      expect(within(committee_session_cards).getByTestId("session-1")).toHaveTextContent(
+        /Zitting CSB — Invoer afgerond/,
+      );
+
+      expect(screen.queryByRole("button", { name: "Nieuwe zitting voorbereiden" })).not.toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: "Zitting verwijderen" })).not.toBeInTheDocument();
+    });
   });
 });

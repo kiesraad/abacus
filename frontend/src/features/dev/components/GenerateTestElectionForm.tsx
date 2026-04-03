@@ -19,10 +19,10 @@ const RANGE_FIELDS = [
   { key: "polling_stations", label: "Aantal stembureaus", placeholder: "50..200" },
   { key: "voters", label: "Aantal kiezers", placeholder: "100_000..250_000" },
   { key: "seats", label: "Aantal zetels", placeholder: "9..=45" },
-  { key: "first_data_entry", label: "Percentage afgeronde eerste invoer", placeholder: "100" },
+  { key: "first_data_entry", label: "Percentage stembureaus met afgeronde eerste invoer", placeholder: "100" },
   {
     key: "second_data_entry",
-    label: "Percentage tweede invoer van de afgeronde eerste invoer",
+    label: "Percentage stembureaus met tweede invoer van de afgeronde eerste invoer",
     placeholder: "100",
   },
   { key: "turnout", label: "Opkomstpercentage", placeholder: "60..=85" },
@@ -36,6 +36,7 @@ type RangeFormState = Record<RangeFieldKey, string>;
 
 interface FormState extends RangeFormState {
   committee_category: CommitteeCategory;
+  generate_p22_2_variants: boolean;
   with_data_entry: boolean;
 }
 
@@ -47,6 +48,7 @@ const INITIAL_RANGE_STATE: RangeFormState = Object.fromEntries(
 const INITIAL_FORM_STATE: FormState = {
   ...INITIAL_RANGE_STATE,
   committee_category: committeeCategoryValues[0],
+  generate_p22_2_variants: false,
   with_data_entry: true,
 };
 
@@ -61,8 +63,8 @@ export function GenerateTestElectionForm() {
   };
 
   const handleBooleanChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const { checked } = event.target;
-    setFormState((prev) => ({ ...prev, with_data_entry: checked }));
+    const { checked, name } = event.target;
+    setFormState((prev) => ({ ...prev, [name]: checked }));
   };
 
   const submitForm = async (event: SubmitEvent<HTMLFormElement>) => {
@@ -74,6 +76,7 @@ export function GenerateTestElectionForm() {
         Object.assign(acc, { [field.key]: formState[field.key] ? formState[field.key] : field.placeholder }),
       {
         committee_category,
+        generate_p22_2_variants: formState.generate_p22_2_variants,
         with_data_entry: formState.with_data_entry,
       },
     );
@@ -112,6 +115,13 @@ export function GenerateTestElectionForm() {
             />
           ))}
         </ChoiceList>
+        <Checkbox
+          id="generate-p22-2-variants"
+          name="generate_p22_2_variants"
+          label="Genereer meerdere verkiezingen voor P22-2 varianten (CSB)"
+          checked={formState.generate_p22_2_variants}
+          onChange={handleBooleanChange}
+        />
         {RANGE_FIELDS.map((field) => {
           const input = (
             <InputField

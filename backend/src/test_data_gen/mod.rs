@@ -37,6 +37,9 @@ pub struct GenerateElectionArgs {
     /// Number of seats in the election
     pub seats: RandomRange,
 
+    /// Generate multiple elections, each resulting in a different P22-2 variant
+    pub generate_p22_2_variants: bool,
+
     /// Include (part of) data entry for this election
     pub with_data_entry: bool,
 

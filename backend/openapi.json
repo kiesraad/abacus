@@ -6052,6 +6052,7 @@
           "polling_stations",
           "voters",
           "seats",
+          "generate_p22_2_variants",
           "with_data_entry",
           "first_data_entry",
           "second_data_entry",
@@ -6074,6 +6075,10 @@
           "first_data_entry": {
             "$ref": "#/components/schemas/RandomRange",
             "description": "Percentage of the first data entry to complete if data entry is included"
+          },
+          "generate_p22_2_variants": {
+            "type": "boolean",
+            "description": "Generate multiple elections, each resulting in a different P22-2 variant"
           },
           "political_group_distribution_slope": {
             "$ref": "#/components/schemas/RandomRange"

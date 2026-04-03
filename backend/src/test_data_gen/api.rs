@@ -26,6 +26,5 @@ async fn generate_election_handler(
     Json(args): Json<GenerateElectionArgs>,
 ) -> Result<StatusCode, APIError> {
     let _ = super::create_test_election(args, pool).await?;
-
     Ok(StatusCode::CREATED)
 }

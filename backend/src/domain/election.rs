@@ -171,25 +171,32 @@ pub enum VoteCountingMethod {
 
 id!(PGNumber);
 
-/// Political group as it is registered with its candidates, as saved in the database
+/// Political group with the registered name imported from the EML and its candidates
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
 pub struct RegisteredPoliticalGroup {
+    /// Political group number
     #[schema(value_type = u32)]
     pub number: PGNumber,
+    /// Registered political group name as imported from the candidate list EML (230)
     pub registered_name: String,
+    /// List of candidates of the political group
     pub candidates: Vec<Candidate>,
 }
 
-/// Political group with its candidates
+/// Political group with the name for display purposes and its candidates
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
 pub struct PoliticalGroup {
+    /// Political group number
     #[schema(value_type = u32)]
     pub number: PGNumber,
+    /// Political group name for display purposes (with 'Blanco' in case of empty registered name)
     pub name: String,
+    /// Registered political group name as imported from the candidate list EML (230)
     #[serde(skip_serializing)]
     pub registered_name: String,
+    /// List of candidates of the political group
     pub candidates: Vec<Candidate>,
 }
 

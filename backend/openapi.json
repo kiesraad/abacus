@@ -6422,7 +6422,7 @@
       },
       "PoliticalGroup": {
         "type": "object",
-        "description": "Political group with its candidates",
+        "description": "Political group with the name for display purposes and its candidates",
         "required": [
           "number",
           "name",
@@ -6433,14 +6433,17 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Candidate"
-            }
+            },
+            "description": "List of candidates of the political group"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "description": "Political group name for display purposes (with 'Blanco' in case of empty registered name)"
           },
           "number": {
             "type": "integer",
             "format": "int32",
+            "description": "Political group number",
             "minimum": 0
           }
         },

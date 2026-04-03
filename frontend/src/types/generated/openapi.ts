@@ -1096,11 +1096,14 @@ export interface NewElection {
 export type PGNumber = number;
 
 /**
- * Political group with its candidates
+ * Political group with the name for display purposes and its candidates
  */
 export interface PoliticalGroup {
+  /** List of candidates of the political group */
   candidates: Candidate[];
+  /** Political group name for display purposes (with 'Blanco' in case of empty registered name) */
   name: string;
+  /** Political group number */
   number: number;
 }
 

@@ -38,7 +38,7 @@ test.describe("full data entry flow", () => {
     await expect(dataEntryHomePage.fieldset).toBeVisible();
     await dataEntryHomePage.number.fill(pollingStation.number.toString());
     await expect(dataEntryHomePage.feedback).toContainText(pollingStation.name);
-    await dataEntryHomePage.clickStart();
+    await dataEntryHomePage.start.click();
 
     const extraInvestigationPage = new ExtraInvestigationPage(page);
     await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
@@ -538,7 +538,7 @@ test.describe("second data entry", () => {
     await expect(dataEntryHomePage.fieldset).toBeVisible();
     await dataEntryHomePage.number.fill(pollingStation.number.toString());
     await expect(dataEntryHomePage.feedback).toContainText(pollingStation.name);
-    await dataEntryHomePage.clickStart();
+    await dataEntryHomePage.start.click();
 
     await expect(page).toHaveURL(
       `/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/2/extra_investigation`,
@@ -554,7 +554,7 @@ test.describe("second data entry", () => {
     await expect(dataEntryHomePage.fieldsetContinueNext).toBeVisible();
     await dataEntryHomePage.number.fill(pollingStation.number.toString());
     await expect(dataEntryHomePage.feedback).toContainText("Stembureau 33 (Op Rolletjes) is al twee keer ingevoerd");
-    await dataEntryHomePage.clickStart();
+    await dataEntryHomePage.start.click();
     await expect(dataEntryHomePage.submitFeedback).toContainText(
       "Het stembureau dat je geselecteerd hebt kan niet meer ingevoerd worden",
     );
@@ -572,7 +572,7 @@ test.describe("second data entry", () => {
     await expect(dataEntryHomePage.fieldset).toBeVisible();
     await dataEntryHomePage.number.fill(pollingStation.number.toString());
     await expect(dataEntryHomePage.feedback).toContainText(pollingStation.name);
-    await dataEntryHomePage.clickStart();
+    await dataEntryHomePage.start.click();
 
     await expect(typistPage).toHaveURL(
       `/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/2/extra_investigation`,
@@ -649,7 +649,7 @@ test.describe("second data entry", () => {
     await expect(dataEntryHomePage.fieldset).toBeVisible();
     await dataEntryHomePage.number.fill(pollingStation.number.toString());
     await expect(dataEntryHomePage.feedback).toContainText(pollingStation.name);
-    await dataEntryHomePage.clickStart();
+    await dataEntryHomePage.start.click();
 
     await expect(typistPage).toHaveURL(
       `/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/2/extra_investigation`,

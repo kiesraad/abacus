@@ -325,7 +325,7 @@ test.describe("full flow", () => {
       await expect(dataEntryHomePage.fieldset).toBeVisible();
       await dataEntryHomePage.number.fill(station.number);
       await expect(dataEntryHomePage.feedback).toContainText(station.name);
-      await dataEntryHomePage.clickStart();
+      await dataEntryHomePage.start.click();
 
       await fillDataEntryPagesAndSave(page, noRecountNoDifferencesDataEntry);
       await expect(dataEntryHomePage.alertDataEntrySaved).toBeVisible();
@@ -348,7 +348,7 @@ test.describe("full flow", () => {
       await expect(dataEntryHomePage.fieldset).toBeVisible();
       await dataEntryHomePage.number.fill(station.number);
       await expect(dataEntryHomePage.feedback).toContainText(station.name);
-      await dataEntryHomePage.clickStart();
+      await dataEntryHomePage.start.click();
 
       await fillDataEntryPagesAndSave(page, noRecountNoDifferencesDataEntry);
       await expect(dataEntryHomePage.alertDataEntrySaved).toBeVisible();
@@ -558,7 +558,7 @@ test.describe("full flow", () => {
       await expect(dataEntryHomePage.fieldset).toBeVisible();
       await dataEntryHomePage.number.fill("1");
       await expect(dataEntryHomePage.feedback).toContainText("Stadhuis");
-      await dataEntryHomePage.clickStart();
+      await dataEntryHomePage.start.click();
 
       const extraInvestigationPage = new ExtraInvestigationPage(page);
       await extraInvestigationPage.next.click();
@@ -606,7 +606,7 @@ test.describe("full flow", () => {
       await expect(dataEntryHomePage.fieldset).toBeVisible();
       await dataEntryHomePage.number.fill("5");
       await expect(dataEntryHomePage.feedback).toContainText("Sportfondsenbad");
-      await dataEntryHomePage.clickStart();
+      await dataEntryHomePage.start.click();
 
       const votersAndVotesPage = new VotersAndVotesPage(page);
       await expect(votersAndVotesPage.fieldset).toBeVisible();

@@ -6422,7 +6422,7 @@
       },
       "PoliticalGroup": {
         "type": "object",
-        "description": "Political group with the name for display purposes and its candidates",
+        "description": "Political group and its candidates (with name as used for display purposes)",
         "required": [
           "number",
           "name",
@@ -6438,7 +6438,7 @@
           },
           "name": {
             "type": "string",
-            "description": "Political group name for display purposes (with 'Blanco' in case of empty registered name)"
+            "description": "Political group name as used for display purposes (with 'Blanco' in case of empty registered name)"
           },
           "number": {
             "type": "integer",

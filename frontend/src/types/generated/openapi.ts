@@ -1091,17 +1091,19 @@ export interface NewElection {
   nomination_date: string;
   number_of_seats: number;
   number_of_voters: number;
-  political_groups: PoliticalGroup[];
 }
 
 export type PGNumber = number;
 
 /**
- * Political group with its candidates
+ * Political group and its candidates (with name as used for display purposes)
  */
 export interface PoliticalGroup {
+  /** List of candidates of the political group */
   candidates: Candidate[];
+  /** Political group name as used for display purposes (with 'Blanco' in case of empty registered name) */
   name: string;
+  /** Political group number */
   number: number;
 }
 

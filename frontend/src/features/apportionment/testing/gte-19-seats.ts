@@ -618,7 +618,7 @@ export const candidate_nomination: CandidateNomination = {
       locality: "Test Location",
       gender: "Female",
       list_number: 5,
-      list_name: "",
+      list_name: "Blanco (Smit, G.)",
     },
     {
       number: 2,
@@ -697,7 +697,7 @@ export const candidate_nomination: CandidateNomination = {
       locality: "Test Location",
       gender: "Female",
       list_number: 5,
-      list_name: "",
+      list_name: "Blanco (Smit, G.)",
     },
     {
       number: 9,
@@ -1116,7 +1116,7 @@ export const candidate_nomination: CandidateNomination = {
     },
     {
       list_number: 5,
-      list_name: "",
+      list_name: "Blanco (Smit, G.)",
       list_seats: 2,
       preferential_candidate_nomination: [
         {
@@ -1650,7 +1650,7 @@ export const election: ElectionWithPoliticalGroups = {
     },
     {
       number: 5,
-      name: "",
+      name: "Blanco (Smit, G.)",
       candidates: [
         {
           number: 1,

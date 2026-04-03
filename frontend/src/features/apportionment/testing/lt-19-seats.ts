@@ -1063,7 +1063,7 @@ export const political_group_1_candidate_nomination: ListCandidateNomination = {
 
 export const political_group_5_candidate_nomination: ListCandidateNomination = {
   list_number: 5,
-  list_name: "",
+  list_name: "Blanco (Smit, G.)",
   list_seats: 0,
   preferential_candidate_nomination: [],
   other_candidate_nomination: [],
@@ -1870,7 +1870,7 @@ export const election: ElectionWithPoliticalGroups = {
     },
     {
       number: 5,
-      name: "",
+      name: "Blanco (Smit, G.)",
       candidates: [
         {
           number: 1,

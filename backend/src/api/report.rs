@@ -168,7 +168,7 @@ impl ResultsInput {
     fn get_p2a_pdf_file(&self, overview_filename: String) -> PdfFileModel {
         ModelP2aInput {
             committee_session: self.committee_session.clone(),
-            election: self.election.clone(),
+            election: self.election.clone().into(),
             investigations: self
                 .investigations
                 .iter()

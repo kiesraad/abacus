@@ -75,10 +75,7 @@ export function ApportionmentPage() {
                   <div>
                     <h2 className={cls.tableTitle}>{t("apportionment.chosen_candidates")}</h2>
                     <span className={cls.tableInformation}>{t("apportionment.in_alphabetical_order")}</span>
-                    <ChosenCandidatesTable
-                      chosenCandidates={candidateNomination.chosen_candidates}
-                      politicalGroups={election.political_groups}
-                    />
+                    <ChosenCandidatesTable chosenCandidates={candidateNomination.chosen_candidates} />
                   </div>
                 </div>
               </>

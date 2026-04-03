@@ -333,7 +333,7 @@ describe("ApportionmentResidualSeatsPage", () => {
     expect(largest_remainders_table).toBeVisible();
     expect(largest_remainders_table).toHaveTableContent([
       ["Lijst", "Lijstnaam", "Aantal volle zetels", "Overschot", "Aantal restzetels"],
-      ["3", "Political Group C", "1 2", "0", "", "2 0"],
+      ["3", "Blanco (Smit, G.)", "1 2", "0", "", "2 0"],
     ]);
 
     expect(
@@ -356,7 +356,7 @@ describe("ApportionmentResidualSeatsPage", () => {
       ["Lijst", "Lijstnaam", "Ronde 1", "Ronde 2", "Aantal restzetels"],
       ["1", "Political Group A", "2", "1/2", "", "", "1"],
       ["2", "Political Group B", "2", "1/2", "2", "1/2", "1"],
-      ["3", "Political Group C", "", "", "", "", "0"],
+      ["3", "Blanco (Smit, G.)", "", "", "", "", "0"],
       ["", "Restzetel toegekend aan lijst", "1", "2", ""],
     ]);
 

@@ -36,7 +36,7 @@ use crate::domain::{
     committee_session::CommitteeSession,
     election::{
         Candidate, CandidateGender, CandidateNumber, CommitteeCategory,
-        ElectionWithPoliticalGroups, NewElection, PGNumber, PoliticalGroup,
+        ElectionWithPoliticalGroups, NewElection, PGNumber, RegisteredPoliticalGroup,
     },
     results::{Results, political_group_candidate_votes::PoliticalGroupCandidateVotes},
     summary::ElectionSummary,
@@ -101,16 +101,16 @@ impl NewElection {
             .iter()
             .enumerate()
             .map(|(idx, rp)| {
-                Ok(PoliticalGroup {
+                Ok(RegisteredPoliticalGroup {
                     // temporary group number, actual group numbers will be imported from candidate list
                     number: PGNumber::from(
                         u32::try_from(idx + 1).or(Err(EMLImportError::TooManyPoliticalGroups))?,
                     ),
-                    name: rp.registered_appellation.clone(),
+                    registered_name: rp.registered_appellation.clone(),
                     candidates: vec![],
                 })
             })
-            .collect::<Result<Vec<PoliticalGroup>, EMLImportError>>()?;
+            .collect::<Result<Vec<RegisteredPoliticalGroup>, EMLImportError>>()?;
 
         Ok(Self {
             name: identifier.name.clone(),
@@ -179,7 +179,7 @@ impl NewElection {
             .affiliations
             .iter()
             .map(|aff| {
-                let pg = PoliticalGroup::from_candidates_list_affiliation(aff)?;
+                let pg = RegisteredPoliticalGroup::from_candidates_list_affiliation(aff)?;
                 if pg.number <= previous_pg_number {
                     return Err(EMLImportError::PoliticalGroupNumbersNotIncreasing {
                         expected_larger_than: previous_pg_number,
@@ -190,12 +190,12 @@ impl NewElection {
                 previous_pg_number = pg.number;
                 Ok(pg)
             })
-            .collect::<Result<Vec<PoliticalGroup>, EMLImportError>>()?;
+            .collect::<Result<Vec<RegisteredPoliticalGroup>, EMLImportError>>()?;
         Ok(())
     }
 }
 
-impl PoliticalGroup {
+impl RegisteredPoliticalGroup {
     pub fn from_candidates_list_affiliation(
         aff: &CandidateListsAffiliation,
     ) -> Result<Self, EMLImportError> {
@@ -208,10 +208,12 @@ impl PoliticalGroup {
             .map(PGNumber::from)
             .or(Err(EMLImportError::TooManyPoliticalGroups))?;
 
+        let pg_name = identifier.registered_name.clone().unwrap_or_default();
+
         let mut previous_can_number = CandidateNumber::from(0);
-        Ok(PoliticalGroup {
+        Ok(RegisteredPoliticalGroup {
             number: pg_number,
-            name: identifier.registered_name.clone().unwrap_or_default(),
+            registered_name: pg_name.clone(),
             candidates: aff
                 .candidates
                 .iter()
@@ -385,7 +387,7 @@ impl ElectionWithPoliticalGroups {
                         .map(|pg| {
                             CandidateListsAffiliation::builder()
                                 .affiliation_type(AffiliationType::StandAloneList)
-                                .registered_name(&pg.name)
+                                .registered_name(&pg.registered_name)
                                 .publish_gender(true)
                                 .id(AffiliationId::new(pg.number.as_internal_u32().to_string())?)
                                 .candidates(
@@ -433,7 +435,7 @@ impl ElectionWithPoliticalGroups {
             .registered_parties(
                 self.political_groups
                     .iter()
-                    .map(|pg| Ok(ElectionDefinitionRegisteredParty::new(&pg.name)))
+                    .map(|pg| Ok(ElectionDefinitionRegisteredParty::new(&pg.registered_name)))
                     .collect::<Result<Vec<_>, EMLError>>()?,
             )
             .build()
@@ -594,7 +596,7 @@ impl ElectionWithPoliticalGroups {
                 ElectionCountSelection::builder()
                     .affiliation(AffiliationSelection::new(
                         AffiliationId::new(pg.number.as_internal_u32().to_string())?,
-                        epg.map(|p| p.name.as_str()).unwrap_or(""),
+                        epg.map(|p| p.registered_name.as_str()).unwrap_or(""),
                     ))
                     .valid_votes(pg.total)
                     .build()?,

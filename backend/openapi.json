@@ -6370,8 +6370,7 @@
           "number_of_seats",
           "number_of_voters",
           "election_date",
-          "nomination_date",
-          "political_groups"
+          "nomination_date"
         ],
         "properties": {
           "category": {
@@ -6412,12 +6411,6 @@
             "type": "integer",
             "format": "int32",
             "minimum": 0
-          },
-          "political_groups": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PoliticalGroup"
-            }
           }
         },
         "additionalProperties": false
@@ -6429,7 +6422,7 @@
       },
       "PoliticalGroup": {
         "type": "object",
-        "description": "Political group with its candidates",
+        "description": "Political group and its candidates (with name as used for display purposes)",
         "required": [
           "number",
           "name",
@@ -6440,14 +6433,17 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Candidate"
-            }
+            },
+            "description": "List of candidates of the political group"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "description": "Political group name as used for display purposes (with 'Blanco' in case of empty registered name)"
           },
           "number": {
             "type": "integer",
             "format": "int32",
+            "description": "Political group number",
             "minimum": 0
           }
         },

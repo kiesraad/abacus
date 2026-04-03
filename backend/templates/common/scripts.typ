@@ -418,31 +418,22 @@
 }
 
 // Format the name of a political group
-#let political_group_name(election_political_group, with_prefix: none) = {
-  let name = ""
-
-  if election_political_group == none {
-    return name
-  }
+#let format_political_group_name(number, name, with_prefix: none) = {
+  let formatted_name = ""
 
   let prefix = "";
   if (with_prefix == "with_list_prefix") {
-    prefix += "Lijst " + str(election_political_group.number) + " ";
+    prefix += "Lijst " + str(number) + " ";
   } else if (with_prefix == "only_list_number") {
-    prefix += str(election_political_group.number) + " ";
+    prefix += str(number) + " ";
   }
 
-  if (election_political_group.name == "") {
-    if (election_political_group.candidates.first() != none) {
-      name = prefix + "Blanco (" + candidate_name(election_political_group.candidates.first(), with_first_name: false, with_gender: false) + ")";
-    } else {
-      name = prefix + "Blanco";
-    }
-  } else {
-    name = prefix + election_political_group.name
-  }
+  formatted_name = prefix + name
+  formatted_name.trim()
+}
 
-  name.trim()
+#let political_group_name(political_group, with_prefix: none) = {
+  format_political_group_name(political_group.number, political_group.name, with_prefix: with_prefix)
 }
 
 // Default table layout

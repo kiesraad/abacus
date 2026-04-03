@@ -1,0 +1,92 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        INSERT INTO elections (\n            name,\n            committee_category,\n            counting_method,\n            election_id,\n            location,\n            domain_id,\n            category,\n            number_of_seats,\n            number_of_voters,\n            election_date,\n            nomination_date,\n            political_groups\n        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)\n        RETURNING\n            id as \"id: ElectionId\",\n            name,\n            committee_category as \"committee_category: CommitteeCategory\",\n            counting_method as \"counting_method: VoteCountingMethod\",\n            election_id,\n            location,\n            domain_id,\n            category as \"category: ElectionCategory\",\n            number_of_seats as \"number_of_seats: u32\",\n            number_of_voters as \"number_of_voters: u32\",\n            election_date as \"election_date: NaiveDate\",\n            nomination_date as \"nomination_date: NaiveDate\",\n            political_groups as \"political_groups: Json<Vec<RegisteredPoliticalGroup>>\"\n        ",
+  "describe": {
+    "columns": [
+      {
+        "name": "id: ElectionId",
+        "ordinal": 0,
+        "type_info": "Integer"
+      },
+      {
+        "name": "name",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "committee_category: CommitteeCategory",
+        "ordinal": 2,
+        "type_info": "Text"
+      },
+      {
+        "name": "counting_method: VoteCountingMethod",
+        "ordinal": 3,
+        "type_info": "Text"
+      },
+      {
+        "name": "election_id",
+        "ordinal": 4,
+        "type_info": "Text"
+      },
+      {
+        "name": "location",
+        "ordinal": 5,
+        "type_info": "Text"
+      },
+      {
+        "name": "domain_id",
+        "ordinal": 6,
+        "type_info": "Text"
+      },
+      {
+        "name": "category: ElectionCategory",
+        "ordinal": 7,
+        "type_info": "Text"
+      },
+      {
+        "name": "number_of_seats: u32",
+        "ordinal": 8,
+        "type_info": "Integer"
+      },
+      {
+        "name": "number_of_voters: u32",
+        "ordinal": 9,
+        "type_info": "Integer"
+      },
+      {
+        "name": "election_date: NaiveDate",
+        "ordinal": 10,
+        "type_info": "Text"
+      },
+      {
+        "name": "nomination_date: NaiveDate",
+        "ordinal": 11,
+        "type_info": "Text"
+      },
+      {
+        "name": "political_groups: Json<Vec<RegisteredPoliticalGroup>>",
+        "ordinal": 12,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 12
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "05ac0059dd01865b2662cb0a8a55de56368908e64057d96c37e7b2eade166aa5"
+}

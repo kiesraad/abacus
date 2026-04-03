@@ -456,7 +456,7 @@ De aan de lijsten toegewezen volle zetels en restzetels zijn bij elkaar opgeteld
 
 #for list_candidate_nomination in input.candidate_nomination.list_candidate_nomination.filter((lcn) => lcn.list_seats > 0) {
   let pg = input.election.political_groups.find(pg => pg.number == list_candidate_nomination.list_number)
-  list_heading_text(political_group_name(pg, with_prefix: "with_list_prefix"))
+  list_heading_text(format_political_group_name(list_candidate_nomination.list_number, list_candidate_nomination.list_name, with_prefix: "with_list_prefix"))
   v(4pt)
   [Aantal zetels: #list_candidate_nomination.list_seats]
   
@@ -544,7 +544,7 @@ De aan de lijsten toegewezen volle zetels en restzetels zijn bij elkaar opgeteld
     (
       table.cell([#candidate_name(chosen_candidate)]),
       table.cell([#candidate_location(chosen_candidate)]),
-      table.cell([#political_group_name(input.election.political_groups.find(pg => pg.number == chosen_candidate.list_number), with_prefix: "only_list_number")]),
+      table.cell([#format_political_group_name(chosen_candidate.list_number, chosen_candidate.list_name, with_prefix: "only_list_number")]),
     )
   }).flatten(),
   table.hline(stroke: 0.5pt + gray),

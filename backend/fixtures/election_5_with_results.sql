@@ -3,7 +3,7 @@ VALUES (5, 'Corrigendum 2026', 'GSB', 'CSO', 'GR2026_GroteStad', 'Grote Stad', '
         '[
           {
             "number": 1,
-            "name": "Political Group A",
+            "registered_name": "Political Group A",
             "candidates": [
               {
                 "number": 1,
@@ -258,7 +258,7 @@ VALUES (5, 'Corrigendum 2026', 'GSB', 'CSO', 'GR2026_GroteStad', 'Grote Stad', '
           },
           {
             "number": 2,
-            "name": "Political Group B",
+            "registered_name": "Political Group B",
             "candidates": [
               {
                 "number": 1,
@@ -313,7 +313,7 @@ VALUES (5, 'Corrigendum 2026', 'GSB', 'CSO', 'GR2026_GroteStad', 'Grote Stad', '
             ]
           }, {
             "number": 3,
-            "name": "Political Group C",
+            "registered_name": "Political Group C",
             "candidates": [
               {
                 "number": 1,
@@ -370,7 +370,7 @@ VALUES (5, 'Corrigendum 2026', 'GSB', 'CSO', 'GR2026_GroteStad', 'Grote Stad', '
             ]
           }, {
             "number": 4,
-            "name": "Political Group D",
+            "registered_name": "Political Group D",
             "candidates": [
               {
                 "number": 1,
@@ -415,7 +415,7 @@ VALUES (5, 'Corrigendum 2026', 'GSB', 'CSO', 'GR2026_GroteStad', 'Grote Stad', '
             ]
           }, {
             "number": 5,
-            "name": "",
+            "registered_name": "",
             "candidates": [
               {
                 "number": 1,

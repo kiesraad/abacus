@@ -199,6 +199,14 @@ export function CommitteeSessionCard({
       addIf(
         {
           id: committeeSession.id,
+          label: t("election_management.view_apportionment"),
+          to: "apportionment",
+        },
+        isCurrentSession && committeeCategory === "CSB",
+      );
+      addIf(
+        {
+          id: committeeSession.id,
           label: t("election_management.view_data_entry"),
           to: "status",
         },

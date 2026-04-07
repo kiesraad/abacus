@@ -376,6 +376,7 @@ export const investigationListMockResponse: InvestigationListResponse = getInves
 export const electionDetailsMockResponse: Required<ElectionDetailsResponse> = getElectionMockData();
 export const csbElectionDetailsMockResponse: Required<ElectionDetailsResponse> = getCSBElectionMockData();
 export const electionMockData = electionDetailsMockResponse.election;
+export const csbElectionMockData = csbElectionDetailsMockResponse.election;
 export const newElectionMockData = {
   ...electionDetailsMockResponse.election,
 } satisfies NewElection;

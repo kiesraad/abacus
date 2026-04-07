@@ -256,7 +256,7 @@ async fn login(
     set_default_cookie_properties(&mut cookie);
     let updated_jar = jar.add(cookie);
 
-    // Explicitly set the x-session-expires-at header, since the middleware will not do this for the login route
+    // Explicitly set the x-session-expires-at header, since the extend_session middleware skips the login route
     let response_headers = [("x-session-expires-at", session.expires_at().to_rfc3339())];
 
     Ok((

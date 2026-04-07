@@ -143,6 +143,75 @@ mod tests {
         assert_eq!(result.username, "admin1");
     }
 
+    /// Test that logging in as a different user does not extend the existing session
+    #[test(sqlx::test(fixtures("../../../../fixtures/users.sql")))]
+    async fn test_login_does_not_extend_session(pool: SqlitePool) {
+        let app = create_app(pool.clone());
+
+        // Create a near-expiry session for admin1 so it qualifies for extension
+        let mut conn = pool.acquire().await.unwrap();
+        let admin1_session = Session::create(
+            UserId::from(1),
+            TEST_USER_AGENT,
+            TEST_IP_ADDRESS,
+            SESSION_MIN_LIFE_TIME / 2,
+        );
+        session_repo::save(&mut conn, &admin1_session)
+            .await
+            .unwrap();
+        let mut admin1_cookie = admin1_session.get_cookie();
+        set_default_cookie_properties(&mut admin1_cookie);
+
+        // Log in as admin2 while sending session cookie for admin1
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .method(Method::POST)
+                    .uri("/api/login")
+                    .header(CONTENT_TYPE, "application/json")
+                    .header(USER_AGENT, TEST_USER_AGENT)
+                    .header(COOKIE, admin1_cookie.encoded().to_string())
+                    .body(Body::from(
+                        serde_json::to_vec(&Credentials {
+                            username: "admin2".to_string(),
+                            password: "Admin2Password01".to_string(),
+                        })
+                        .unwrap(),
+                    ))
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+        assert_eq!(response.status(), StatusCode::OK);
+
+        // There should be exactly one Set-Cookie header (for admin2), not two
+        let set_cookie_headers: Vec<String> = response
+            .headers()
+            .get_all("set-cookie")
+            .iter()
+            .map(|v| v.to_str().unwrap().to_string())
+            .collect();
+        assert_eq!(
+            set_cookie_headers.len(),
+            1,
+            "Expected exactly one Set-Cookie header, got: {:?}",
+            set_cookie_headers
+        );
+
+        // Set-Cookie header should not contain session key for admin1
+        println!("admin1 session: {:?}", admin1_session);
+        assert!(
+            !set_cookie_headers[0].contains(admin1_session.session_key()),
+            "Set-Cookie should not contain session key for admin1"
+        );
+
+        // Response should say that admin2 is logged in
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let result: LoginResponse = serde_json::from_slice(&body).unwrap();
+        assert_eq!(result.user_id, UserId::from(2));
+        assert_eq!(result.username, "admin2");
+    }
+
     #[test(sqlx::test(fixtures("../../../../fixtures/users.sql")))]
     async fn test_login_error(pool: SqlitePool) {
         let app = create_app(pool.clone());

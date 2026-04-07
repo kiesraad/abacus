@@ -1,7 +1,7 @@
 use axum::{
     RequestExt,
     body::Body,
-    extract::{Request, State},
+    extract::{OriginalUri, Request, State},
     http::{HeaderMap, HeaderValue, header::SET_COOKIE},
     response::Response,
 };
@@ -68,6 +68,7 @@ pub(crate) async fn inject_user(
 #[allow(clippy::cognitive_complexity)]
 pub(crate) async fn extend_session(
     State(pool): State<SqlitePool>,
+    OriginalUri(uri): OriginalUri,
     headers: HeaderMap,
     audit_service: AuditService,
     session: Option<Session>,
@@ -78,6 +79,12 @@ pub(crate) async fn extend_session(
     let (Some(session), Some(user)) = (session, user) else {
         return response;
     };
+
+    // skip session extension for login/logout routes,
+    // because these endpoints modify the session themselves
+    if uri.path() == "/api/login" || uri.path() == "/api/logout" {
+        return response;
+    }
 
     // check for the existence of the do not extend session header
     let do_not_extend = headers.get(super::DO_NOT_EXTEND_SESSION_HEADER).is_some();
@@ -152,6 +159,10 @@ mod test {
         repository::{session_repo, user_repo::UserId},
     };
 
+    fn api_account_uri() -> OriginalUri {
+        OriginalUri("/api/account".parse().unwrap())
+    }
+
     const TEST_USER_AGENT: &str = "TestAgent/1.0";
     const TEST_IP_ADDRESS: &str = "0.0.0.0";
 
@@ -210,6 +221,7 @@ mod test {
 
         let updated_response = extend_session(
             State(pool.clone()),
+            api_account_uri(),
             HeaderMap::new(),
             audit_service.clone(),
             None,
@@ -233,6 +245,7 @@ mod test {
 
         let updated_response = extend_session(
             State(pool.clone()),
+            api_account_uri(),
             HeaderMap::new(),
             audit_service.clone(),
             Some(session.clone()),
@@ -260,6 +273,7 @@ mod test {
 
         let updated_response = extend_session(
             State(pool.clone()),
+            api_account_uri(),
             HeaderMap::new(),
             audit_service.clone(),
             Some(session.clone()),
@@ -310,6 +324,7 @@ mod test {
 
         let updated_response = extend_session(
             State(pool.clone()),
+            api_account_uri(),
             headers,
             audit_service.clone(),
             Some(session.clone()),

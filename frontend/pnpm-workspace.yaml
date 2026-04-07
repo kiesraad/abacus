@@ -6,7 +6,7 @@ allowBuilds:
 blockExoticSubdeps: true
 minimumReleaseAge: 4320
 minimumReleaseAgeExclude:
-  - brace-expansion@5.0.5
+  - vite@8.0.6
 trustPolicy: no-downgrade
 trustPolicyExclude:
   - semver@6.3.1

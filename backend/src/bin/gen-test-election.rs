@@ -141,7 +141,7 @@ async fn main() -> Result<(), AppError> {
     )
     .await?;
 
-    let test_election = create_test_election(args.clone().into(), pool).await?;
+    let test_election = create_test_election(args.clone().into(), pool, None).await?;
 
     if let Some(export_dir) = args.export_definition {
         // Export the election definition, candidate list and polling stations to a directory

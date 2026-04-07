@@ -83,6 +83,7 @@ async fn generate_csb_data_entries(
     args: &GenerateElectionArgs,
     sub_committee_first_session: SubCommitteeFirstSession,
     election: &ElectionWithPoliticalGroups,
+    votes: Option<&[u32]>
 ) -> Result<bool, Box<dyn Error>> {
     committee_session_repo::change_status(
         conn,
@@ -92,7 +93,7 @@ async fn generate_csb_data_entries(
     .await?;
 
     let (_, second_entries) =
-        generate_csb_data_entry(election, sub_committee_first_session, rng, conn, args).await;
+        generate_csb_data_entry(election, sub_committee_first_session, rng, conn, args, votes).await;
     Ok(second_entries > 0)
 }
 
@@ -143,6 +144,7 @@ async fn generate_csb_election_data(
     args: GenerateElectionArgs,
     committee_session: &mut CommitteeSession,
     election: &ElectionWithPoliticalGroups,
+    votes: Option<&[u32]>
 ) -> Result<(Vec<PollingStation>, bool), Box<dyn Error>> {
     let data_entry_complete = if election.category == ElectionCategory::Municipal {
         let number = election
@@ -160,7 +162,7 @@ async fn generate_csb_election_data(
         .map_err(|e| format!("{e:?}"))?;
 
         if args.with_data_entry {
-            generate_csb_data_entries(tx, rng, &args, sub_committee_first_session, election).await?
+            generate_csb_data_entries(tx, rng, &args, sub_committee_first_session, election, votes).await?
         } else {
             false
         }
@@ -168,12 +170,12 @@ async fn generate_csb_election_data(
         false
     };
 
-    let new_status = if args.with_data_entry {
-        CommitteeSessionStatus::DataEntry
-    } else {
-        CommitteeSessionStatus::InPreparation
+    let new_status = match (args.with_data_entry, data_entry_complete) {
+        (true, true) => CommitteeSessionStatus::Completed,
+        (true, false) => CommitteeSessionStatus::DataEntry,
+        (false, _) => CommitteeSessionStatus::InPreparation,
     };
-
+    
     *committee_session =
         committee_session_repo::change_status(tx, committee_session.id, new_status).await?;
     Ok((Vec::new(), data_entry_complete))
@@ -182,6 +184,7 @@ async fn generate_csb_election_data(
 pub async fn create_test_election(
     args: GenerateElectionArgs,
     pool: SqlitePool,
+    votes: Option<&[u32]>
 ) -> Result<CreateTestElectionResult, Box<dyn Error>> {
     let mut rng = StdRng::from_rng(&mut rand::rng());
 
@@ -206,7 +209,7 @@ pub async fn create_test_election(
                 .await?
         }
         CommitteeCategory::CSB => {
-            generate_csb_election_data(&mut rng, &mut tx, args, &mut committee_session, &election)
+            generate_csb_election_data(&mut rng, &mut tx, args, &mut committee_session, &election, votes)
                 .await?
         }
     };
@@ -290,7 +293,7 @@ fn generate_political_party(
     let mut candidates = vec![];
     let has_first_name = rng.random_ratio(1, 2);
 
-    for i in 1..rng.random_range(args.candidates_per_group.clone()) {
+    for i in 0..rng.random_range(args.candidates_per_group.clone()) {
         // sometimes first names are omitted
         let first_name = if has_first_name {
             Some(super::data::first_name(rng).to_owned())
@@ -302,7 +305,7 @@ fn generate_political_party(
         let initials = super::data::initials(rng, first_name.as_deref());
         let (prefix, last_name) = super::data::last_name(rng);
         candidates.push(election::Candidate {
-            number: CandidateNumber::from(i),
+            number: CandidateNumber::from(i + 1),
             initials,
             first_name,
             last_name_prefix: prefix.map(ToOwned::to_owned),
@@ -486,6 +489,7 @@ async fn generate_csb_data_entry(
     rng: &mut impl rand::RngExt,
     conn: &mut SqliteConnection,
     args: &GenerateElectionArgs,
+    votes: Option<&[u32]>
 ) -> (usize, usize) {
     info!("Generating data entries for CSB election");
 
@@ -510,19 +514,27 @@ async fn generate_csb_data_entry(
         let ts = super::data::datetime_around(rng, now, TimeDelta::hours(-24));
 
         // number of voters that actually came and voted
-        let turnout = rng.random_range(args.turnout.clone());
-        let voters_turned_out = (election.number_of_voters * turnout) / 100;
+        let results = if let Some(v)  = votes {
+	    Results::GSB(generate_gsb_results_from_votes(
+		&election.political_groups,
+		election.number_of_voters,
+		v
+	    ))
+	} else {
+            let turnout = rng.random_range(args.turnout.clone());
+            let voters_turned_out = (election.number_of_voters * turnout) / 100;
+	    let candidate_slope =
+		rng.random_range(args.candidate_distribution_slope.clone()) as f64 / 1000.0;
 
-        let candidate_slope =
-            rng.random_range(args.candidate_distribution_slope.clone()) as f64 / 1000.0;
-        let results = Results::GSB(generate_gsb_results(
-            rng,
-            &election.political_groups,
-            election.number_of_voters,
-            voters_turned_out,
-            &group_weights,
-            candidate_slope,
-        ));
+	    Results::GSB(generate_gsb_results(
+		rng,
+		&election.political_groups,
+		election.number_of_voters,
+		voters_turned_out,
+		&group_weights,
+		candidate_slope,
+            ))
+	};
 
         // Validate the generated results to catch issues early
         let mut validation_results = ValidationResults::default();
@@ -632,10 +644,10 @@ fn generate_cso_first_session_results(
     ];
 
     let extra_investigation = extra_investigation_options
-      .choose_weighted(rng, |item| item.0)
-      .expect("Weighted random selection for extra_investigation should never fail with valid weights")
-      .1
-      .clone();
+	.choose_weighted(rng, |item| item.0)
+	.expect("Weighted random selection for extra_investigation should never fail with valid weights")
+	.1
+	.clone();
 
     CSOFirstSessionResults {
         extra_investigation,
@@ -781,6 +793,56 @@ fn generate_gsb_results(
                             votes,
                         })
                         .collect(),
+                }
+            })
+            .collect(),
+    }
+}
+
+fn generate_gsb_results_from_votes(
+    political_groups: &[PoliticalGroup],
+    number_of_voters: u32,
+    pg_votes: &[u32],
+) -> GSBResults {
+    let number_of_votes = pg_votes.iter().sum();
+
+    GSBResults {
+        number_of_voters,
+        voters_counts: VotersCounts {
+            poll_card_count: number_of_votes,
+            proxy_certificate_count: 0,
+            total_admitted_voters_count: number_of_votes,
+        },
+        votes_counts: VotesCounts {
+            political_group_total_votes: political_groups
+                .iter()
+                .zip(pg_votes)
+                .map(|(pg, votes)| PoliticalGroupTotalVotes {
+                    number: pg.number,
+                    total: *votes,
+                })
+                .collect(),
+            total_votes_candidates_count: number_of_votes,
+            blank_votes_count: 0,
+            invalid_votes_count: 0,
+            total_votes_cast_count: number_of_votes,
+        },
+        differences_counts: GSBDifferencesCounts {
+            more_ballots_count: 0,
+            fewer_ballots_count: 0,
+        },
+        political_group_votes: political_groups
+            .iter()
+            .zip(pg_votes)
+            .map(|(pg, votes)| {
+                // Assign all votes to one candidate
+                PoliticalGroupCandidateVotes {
+                    number: pg.number,
+                    total: *votes,
+                    candidate_votes: vec![CandidateVotes {
+                            number: CandidateNumber::from(1),
+                            votes: *votes,
+                    }],
                 }
             })
             .collect(),

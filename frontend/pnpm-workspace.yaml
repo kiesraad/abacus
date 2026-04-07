@@ -6,7 +6,7 @@ allowBuilds:
 blockExoticSubdeps: true
 minimumReleaseAge: 4320
 minimumReleaseAgeExclude:
-  - brace-expansion@5.0.5
+  - vite@8.0.6
 trustPolicy: no-downgrade
 trustPolicyExclude:
   - semver@6.3.1
@@ -20,15 +20,9 @@ strictPeerDependencies: true
 overrides:
   # Storybook currently uses @vitest/expect 3.2.4 which doesn't work with our vitest.d.ts
   "@vitest/expect": "$@vitest/expect"
-  # @codecov/vite-plugin does not have official support for Vite 7, but works:
+  # @codecov/vite-plugin does not have official support for Vite 8, but works:
   # https://github.com/codecov/codecov-javascript-bundler-plugins/issues/264
   "vite": "$vite"
-  # Fix GHSA-7h2j-956f-4vf2
-  "@isaacs/brace-expansion@<=5.0.0": ">=5.0.1"
-  # Fix GHSA-mw96-cpmx-2vgc / CVE-2026-27606
-  "rollup@<4.59.0": ">=4.59.0"
-  # Fix GHSA-7r86-cg39-jmmj / CVE-2026-27903
-  minimatch@<10.2.3: ">=10.2.3"
   # Fix GHSA-2mjp-6q6p-2qxm / CVE-2026-1525
   # Fix GHSA-vrm6-8vpv-qv8q / CVE-2026-1526
   # Fix GHSA-4992-7rv2-5pvq / CVE-2026-1527
@@ -36,10 +30,3 @@ overrides:
   # Fix GHSA-v9p9-hfj2-hcw8 / CVE-2026-2229
   # Fix GHSA-phc3-fgpg-7m6h / CVE-2026-2581
   "undici@<7.24.0": ">=7.24.0"
-  # Fix GHSA-rf6f-7fwh-wjgh / CVE-2026-33228
-  flatted@<=3.4.1: '>=3.4.2'
-  # Fix GHSA-c2c7-rcm5-vvqj / CVE-2026-33671
-  # Fix GHSA-3v7f-55p6-f55p / CVE-2026-33672
-  picomatch@>=4.0.0 <4.0.4: '>=4.0.4'
-  # Fix GHSA-f886-m6hf-6m8v / CVE-2026-33750
-  brace-expansion@<5.0.5: '>=5.0.5'

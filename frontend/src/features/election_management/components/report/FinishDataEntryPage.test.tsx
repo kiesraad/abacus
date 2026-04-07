@@ -10,10 +10,13 @@ import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { electionManagementRoutes } from "@/features/election_management/routes";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
-import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
+import { getCSBElectionMockData, getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
 import {
   CommitteeSessionStatusChangeRequestHandler,
+  CSBCommitteeSessionStatusChangeRequestHandler,
+  CSBElectionRequestHandler,
+  CSBElectionStatusRequestHandler,
   ElectionRequestHandler,
   ElectionStatusRequestHandler,
 } from "@/testing/api-mocks/RequestHandlers";
@@ -28,26 +31,41 @@ import {
   spyOnHandler,
   waitFor,
 } from "@/testing/test-utils";
-import type { ElectionDetailsResponse, ErrorResponse, PollingStation } from "@/types/generated/openapi";
+import type {
+  CommitteeCategory,
+  ElectionDetailsResponse,
+  ErrorResponse,
+  PollingStation,
+} from "@/types/generated/openapi";
 
 import { FinishDataEntryPage } from "./FinishDataEntryPage";
 
 const navigate = vi.fn();
 
-const renderPage = async (sessionNumber: number) => {
+const renderPage = async (sessionNumber: number, electionId: number, committeeCategory: CommitteeCategory = "GSB") => {
   const router = renderReturningRouter(
-    <ElectionProvider electionId={1}>
-      <ElectionStatusProvider electionId={1}>
+    <ElectionProvider electionId={electionId}>
+      <ElectionStatusProvider electionId={electionId}>
         <FinishDataEntryPage />
       </ElectionStatusProvider>
     </ElectionProvider>,
   );
-  expect(
-    await screen.findByRole("heading", {
-      level: 1,
-      name: `Invoer ${sessionNumber === 1 ? "eerste" : "tweede"} zitting afronden`,
-    }),
-  ).toBeVisible();
+  if (committeeCategory === "GSB") {
+    expect(
+      await screen.findByRole("heading", {
+        level: 1,
+        name: `Invoer ${sessionNumber === 1 ? "eerste" : "tweede"} zitting afronden`,
+      }),
+    ).toBeVisible();
+  } else {
+    expect(
+      await screen.findByRole("heading", {
+        level: 1,
+        name: `Invoer afronden`,
+      }),
+    ).toBeVisible();
+  }
+
   return router;
 };
 
@@ -62,10 +80,18 @@ describe("FinishDataEntryPage", () => {
     const statusChange = spyOnHandler(CommitteeSessionStatusChangeRequestHandler);
     overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status: "data_entry" }));
 
-    await renderPage(1);
+    await renderPage(1, 1);
 
     // Wait for the page to be loaded
     expect(await screen.findByRole("heading", { level: 2, name: "Invoerfase afronden?" })).toBeVisible();
+    expect(
+      await screen.findByText(
+        "In de volgende stap kan je het proces-verbaal van deze zitting opmaken en de officiële telbestanden downloaden.",
+      ),
+    ).toBeVisible();
+    expect(
+      await screen.findByText("Zolang er geen volgende zitting is gestart, kan je nog terug naar de invoer."),
+    ).toBeVisible();
     expect(await screen.findByRole("link", { name: "In invoerfase blijven" })).toBeVisible();
 
     overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status: "completed" }));
@@ -153,7 +179,7 @@ describe("FinishDataEntryPage", () => {
     const statusChange = spyOnHandler(CommitteeSessionStatusChangeRequestHandler);
     overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status: "data_entry" }));
 
-    const router = await renderPage(1);
+    const router = await renderPage(1, 1);
 
     // Wait for the page to be loaded
     expect(await screen.findByRole("heading", { level: 2, name: "Invoerfase afronden?" })).toBeVisible();
@@ -190,7 +216,7 @@ describe("FinishDataEntryPage", () => {
       polling_stations: pollingStationMockData.slice(0, 3),
     });
 
-    await renderPage(2);
+    await renderPage(2, 1);
 
     await waitFor(() => {
       expect(navigate).toHaveBeenCalledWith("/elections/1/investigations");
@@ -209,7 +235,7 @@ describe("FinishDataEntryPage", () => {
       ] satisfies PollingStation[],
     });
 
-    await renderPage(2);
+    await renderPage(2, 1);
 
     await waitFor(() => {
       expect(navigate).toHaveBeenCalledWith("/elections/1/investigations");
@@ -219,7 +245,7 @@ describe("FinishDataEntryPage", () => {
   test("Do not redirect to investigations overview in first committee session", async () => {
     overrideOnce("get", "/api/elections/1", 200, getElectionMockData());
 
-    await renderPage(1);
+    await renderPage(1, 1);
 
     await waitFor(() => {
       expect(navigate).not.toHaveBeenCalledWith("/elections/1/investigations");
@@ -229,10 +255,45 @@ describe("FinishDataEntryPage", () => {
   test("Redirect to report download page when committee session status is already completed", async () => {
     overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status: "completed" }));
 
-    await renderPage(1);
+    await renderPage(1, 1);
 
     await waitFor(() => {
       expect(navigate).toHaveBeenCalledWith("/elections/1/report/committee-session/1/download");
+    });
+  });
+
+  describe("CSB", () => {
+    test("Shows page and click on finish data entry phase", async () => {
+      const user = userEvent.setup();
+      const statusChange = spyOnHandler(CSBCommitteeSessionStatusChangeRequestHandler);
+      server.use(
+        CSBCommitteeSessionStatusChangeRequestHandler,
+        CSBElectionRequestHandler,
+        CSBElectionStatusRequestHandler,
+      );
+      overrideOnce("get", "/api/elections/2", 200, getCSBElectionMockData({}, { status: "data_entry" }));
+
+      await renderPage(1, 2, "CSB");
+
+      // Wait for the page to be loaded
+      expect(await screen.findByRole("heading", { level: 2, name: "Invoerfase afronden?" })).toBeVisible();
+      expect(
+        await screen.findByText(
+          "In de volgende stap ga je verder met de zetelverdeling. Daarna kan je het proces-verbaal voor de zitting van het centraal stembureau opmaken en de officiële bestanden downloaden.",
+        ),
+      ).toBeVisible();
+      expect(await screen.findByRole("link", { name: "In invoerfase blijven" })).toBeVisible();
+
+      overrideOnce("get", "/api/elections/2", 200, getCSBElectionMockData({}, { status: "completed" }));
+
+      const finishButton = screen.getByRole("button", { name: "Invoerfase afronden" });
+      expect(finishButton).toBeVisible();
+      await user.click(finishButton);
+
+      expect(statusChange).toHaveBeenCalledWith({ status: "completed" });
+      await waitFor(() => {
+        expect(navigate).toHaveBeenCalledWith("/elections/2/apportionment");
+      });
     });
   });
 });

@@ -1,13 +1,13 @@
 import { describe, expect, test } from "vitest";
-
+import { hasTranslation, t, tx } from "@/i18n/translate";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMockData";
-import type { ValidationResult } from "@/types/generated/openapi";
-
+import type { Election, ValidationResult } from "@/types/generated/openapi";
 import { getDataEntryStructure } from "./dataEntryStructure";
 import {
   doesValidationResultApplyToSection,
   dottedCode,
+  getTranslations,
   getValidationResultSetForSection,
   mapValidationResultSetsToFields,
   ValidationResultSet,
@@ -18,6 +18,12 @@ describe("ValidationResultSet", () => {
     const validationResults = new ValidationResultSet([validationResultMockData.F201, validationResultMockData.F203]);
     expect(validationResults.includes("F201")).toBe(true);
     expect(validationResults.includes("F202")).toBe(false);
+  });
+
+  test("find", () => {
+    const validationResults = new ValidationResultSet([validationResultMockData.F201, validationResultMockData.F203]);
+    expect(validationResults.find("F201")).toBe(validationResultMockData.F201);
+    expect(validationResults.find("F202")).toBeUndefined();
   });
 });
 
@@ -172,5 +178,25 @@ describe("dottedCode", () => {
   test("should insert a dot in between validation result code letter and number", () => {
     expect(dottedCode("F301")).toBe("F.301");
     expect(dottedCode("W203")).toBe("W.203");
+  });
+});
+
+describe("getTranslations", () => {
+  const gsbElection = { committee_category: "GSB" } as Election;
+
+  test("should return typist translations for GSB validation result with default title", () => {
+    expect(hasTranslation("feedback_GSB.F101.typist.title")).toBeFalsy();
+    expect(getTranslations(gsbElection, validationResultMockData.F101, "typist")).toEqual({
+      code: "F.101",
+      title: t("feedback.typist_title"),
+    });
+  });
+
+  test("should return coordinator translations for GSB validation result", () => {
+    expect(getTranslations(gsbElection, validationResultMockData.F101, "coordinator")).toEqual({
+      code: "F.101",
+      title: t("feedback_GSB.F101.coordinator.title"),
+      content: tx("feedback_GSB.F101.coordinator.content"),
+    });
   });
 });

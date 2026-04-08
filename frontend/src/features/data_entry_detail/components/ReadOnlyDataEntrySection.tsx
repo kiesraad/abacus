@@ -2,20 +2,25 @@ import { DataEntrySubsections } from "@/components/data_entry/DataEntrySubsectio
 import { SectionNumber } from "@/components/ui/Badge/SectionNumber";
 import { Feedback } from "@/components/ui/Feedback/Feedback";
 import { Form } from "@/components/ui/Form/Form";
-import type { ValidationResults } from "@/types/generated/openapi";
-import type { DataEntryResults, DataEntrySection, SectionValues } from "@/types/types";
+import type { Election, Results, ValidationResults } from "@/types/generated/openapi";
+import type { DataEntrySection, SectionValues } from "@/types/types";
 import { mapResultsToSectionValues } from "@/utils/dataEntryMapping";
 import { getValidationResultSetForSection, mapValidationResultSetsToFields } from "@/utils/ValidationResults";
-
 import cls from "./ReadOnlyDataEntrySection.module.css";
 
 interface ReadOnlyDataEntrySectionProps {
+  election: Election;
   section: DataEntrySection;
-  data: DataEntryResults;
+  dataEntryResults: Results;
   validationResults: ValidationResults;
 }
 
-export function ReadOnlyDataEntrySection({ section, data: results, validationResults }: ReadOnlyDataEntrySectionProps) {
+export function ReadOnlyDataEntrySection({
+  election,
+  section,
+  dataEntryResults,
+  validationResults,
+}: ReadOnlyDataEntrySectionProps) {
   const userRole = "coordinator_gsb";
 
   // Create validation result sets from the validation results
@@ -23,7 +28,7 @@ export function ReadOnlyDataEntrySection({ section, data: results, validationRes
   const warnings = getValidationResultSetForSection(validationResults.warnings, section);
 
   // Map results to section values for display
-  const sectionValues: SectionValues = mapResultsToSectionValues(section, results);
+  const sectionValues: SectionValues = mapResultsToSectionValues(section, dataEntryResults);
 
   // Create default props for DataEntrySubsections
   const defaultProps = {
@@ -43,13 +48,21 @@ export function ReadOnlyDataEntrySection({ section, data: results, validationRes
       </legend>
       <div className={cls.formContainer}>
         {!errors.isEmpty() && (
-          <Feedback id="feedback-error" type="error" data={errors.getAll()} userRole={userRole} shouldFocus={false} />
+          <Feedback
+            id="feedback-error"
+            type="error"
+            election={election}
+            validationResults={errors.getAll()}
+            userRole={userRole}
+            shouldFocus={false}
+          />
         )}
         {!warnings.isEmpty() && (
           <Feedback
             id="feedback-warning"
             type="warning"
-            data={warnings.getAll()}
+            election={election}
+            validationResults={warnings.getAll()}
             userRole={userRole}
             shouldFocus={false}
           />

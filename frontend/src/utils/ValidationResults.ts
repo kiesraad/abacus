@@ -1,4 +1,6 @@
-import type { ValidationResult, ValidationResultCode } from "@/types/generated/openapi";
+import type { ReactNode } from "react";
+import { hasTranslation, t, tx } from "@/i18n/translate";
+import type { Election, ValidationResult, ValidationResultCode } from "@/types/generated/openapi";
 import type { DataEntrySection } from "@/types/types";
 
 /*
@@ -13,6 +15,10 @@ export class ValidationResultSet {
 
   add(entry: ValidationResult): void {
     this.entries.add(entry);
+  }
+
+  find(code: ValidationResultCode): ValidationResult | undefined {
+    return Array.from(this.entries).find((entry) => entry.code === code);
   }
 
   includes(code: ValidationResultCode): boolean {
@@ -148,4 +154,33 @@ export function getValidationResultSetForSection(
 
 export function dottedCode(code: ValidationResultCode): string {
   return `${code[0]}.${code.slice(1)}`;
+}
+
+export type ValidationResultTranslations = {
+  code: string;
+  title: string;
+  content: ReactNode | undefined;
+  actions: ReactNode | undefined;
+};
+
+/**
+ * Get the translations for showing a ValidationResult, given an election and a user role.
+ */
+export function getTranslations(
+  election: Election,
+  result: ValidationResult,
+  role: "coordinator" | "typist",
+): ValidationResultTranslations {
+  const defaultTitle = role === "typist" ? t(`feedback.typist_title`) : "";
+
+  const titlePath = `feedback_${election.committee_category}.${result.code}.${role}.title`;
+  const contentPath = `feedback_${election.committee_category}.${result.code}.${role}.content`;
+  const actionsPath = `feedback_${election.committee_category}.${result.code}.${role}.actions`;
+
+  return {
+    code: dottedCode(result.code),
+    title: hasTranslation(titlePath) ? t(titlePath, { ...result.context }) : defaultTitle,
+    content: hasTranslation(contentPath) ? tx(contentPath, undefined, { ...result.context }) : undefined,
+    actions: hasTranslation(actionsPath) ? tx(actionsPath, undefined, { ...result.context }) : undefined,
+  };
 }

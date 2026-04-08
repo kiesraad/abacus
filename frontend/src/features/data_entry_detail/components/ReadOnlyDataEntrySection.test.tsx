@@ -19,10 +19,17 @@ describe("ReadOnlyDataEntrySection", () => {
 
   const renderComponent = (
     section: DataEntrySection = votersVotesSection,
-    data: Results = resultsMockData,
+    results: Results = resultsMockData,
     validationResults: ValidationResults = { errors: [], warnings: [] },
   ) => {
-    return render(<ReadOnlyDataEntrySection section={section} data={data} validationResults={validationResults} />);
+    return render(
+      <ReadOnlyDataEntrySection
+        election={electionMockData}
+        section={section}
+        dataEntryResults={results}
+        validationResults={validationResults}
+      />,
+    );
   };
 
   test("renders section with title", async () => {

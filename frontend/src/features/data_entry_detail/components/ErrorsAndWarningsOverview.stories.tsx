@@ -14,7 +14,7 @@ const results: ValidationResults = {
 };
 
 export const ErrorsAndWarningsOverviewStory: StoryFn = () => (
-  <ErrorsAndWarningsOverview structure={structure} results={results} />
+  <ErrorsAndWarningsOverview election={electionMockData} structure={structure} validationResults={results} />
 );
 
 export default {} satisfies Meta;

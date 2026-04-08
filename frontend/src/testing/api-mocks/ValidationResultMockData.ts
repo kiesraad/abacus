@@ -42,6 +42,10 @@ export const validationResultMockData: ErrorWarningsMap<ValidationResultCode> = 
     ],
     code: "F203",
   },
+  F205: {
+    fields: ["data.number_of_voters"],
+    code: "F205",
+  },
   F301: {
     fields: ["data.differences_counts.compare_votes_cast_admitted_voters.admitted_voters_equal_votes_cast"],
     code: "F301",
@@ -78,6 +82,15 @@ export const validationResultMockData: ErrorWarningsMap<ValidationResultCode> = 
   F310: {
     fields: ["data.differences_counts.difference_completely_accounted_for"],
     code: "F310",
+  },
+  F312: {
+    fields: [
+      "data.voters_counts.total_admitted_voters_count",
+      "data.votes_counts.total_votes_cast_count",
+      "data.differences_counts.more_ballots_count",
+      "data.differences_counts.fewer_ballots_count",
+    ],
+    code: "F312",
   },
   F401: {
     fields: ["data.political_group_votes.0.total"],

@@ -3,10 +3,8 @@ use utoipa::ToSchema;
 
 use super::{
     common_validation::difference_admitted_voters_count_and_votes_cast_count_above_threshold,
-    count::Count,
-    gsb_differences_counts::{GSBDifferencesCounts, validate_gsb_differences_counts},
-    political_group_candidate_votes::PoliticalGroupCandidateVotes,
-    voters_counts::VotersCounts,
+    count::Count, gsb_differences_counts::GSBDifferencesCounts,
+    political_group_candidate_votes::PoliticalGroupCandidateVotes, voters_counts::VotersCounts,
     votes_counts::VotesCounts,
 };
 use crate::domain::{
@@ -41,6 +39,81 @@ pub struct GSBResults {
 }
 
 impl GSBResults {
+    /// F.205 Aantal kiesgerechtigden = leeg of 0
+    fn validate_number_of_voters(
+        &self,
+        validation_results: &mut ValidationResults,
+        path: &FieldPath,
+    ) {
+        if self.number_of_voters == 0 {
+            validation_results.errors.push(ValidationResult {
+                fields: vec![path.field("number_of_voters").to_string()],
+                code: ValidationResultCode::F205,
+                context: None,
+            });
+        }
+    }
+
+    /// W.203 'Aantal kiezers en stemmen':
+    ///   Verschil tussen totaal aantal toegelaten kiezers en totaal aantal uitgebrachte stemmen
+    ///   is groter dan of gelijk aan 2% en groter dan of gelijk aan 15
+    fn validate_voters_and_votes_count_difference(
+        &self,
+        validation_results: &mut ValidationResults,
+        path: &FieldPath,
+    ) {
+        if difference_admitted_voters_count_and_votes_cast_count_above_threshold(
+            self.voters_counts.total_admitted_voters_count,
+            self.votes_counts.total_votes_cast_count,
+        ) {
+            validation_results.warnings.push(ValidationResult {
+                fields: vec![
+                    path.field("voters_counts")
+                        .field("total_admitted_voters_count")
+                        .to_string(),
+                    path.field("votes_counts")
+                        .field("total_votes_cast_count")
+                        .to_string(),
+                ],
+                code: ValidationResultCode::W203,
+                context: None,
+            });
+        }
+    }
+
+    /// F312 totaal aantal kiezers =
+    ///   totaal aantal uitgebrachte stemmen - meer getelde stemmen + minder getelde stemmen
+    fn validate_total_voters_count(
+        &self,
+        validation_results: &mut ValidationResults,
+        path: &FieldPath,
+    ) {
+        if self.voters_counts.total_admitted_voters_count
+            != (self.votes_counts.total_votes_cast_count
+                - self.differences_counts.more_ballots_count
+                + self.differences_counts.fewer_ballots_count)
+        {
+            validation_results.errors.push(ValidationResult {
+                fields: vec![
+                    path.field("voters_counts")
+                        .field("total_admitted_voters_count")
+                        .to_string(),
+                    path.field("votes_counts")
+                        .field("total_votes_cast_count")
+                        .to_string(),
+                    path.field("differences_counts")
+                        .field("more_ballots_count")
+                        .to_string(),
+                    path.field("differences_counts")
+                        .field("fewer_ballots_count")
+                        .to_string(),
+                ],
+                code: ValidationResultCode::F312,
+                context: None,
+            });
+        }
+    }
+
     fn validate_political_group_votes_errors(
         &self,
         political_group_candidate_votes: &PoliticalGroupCandidateVotes,
@@ -146,48 +219,23 @@ impl Validate for GSBResults {
             &path.field("number_of_voters"),
         )?;
 
-        let total_votes_count = self.votes_counts.total_votes_cast_count;
+        self.validate_number_of_voters(validation_results, path);
+
+        self.voters_counts
+            .validate(election, validation_results, &path.field("voters_counts"))?;
 
         self.votes_counts
             .validate(election, validation_results, &path.field("votes_counts"))?;
 
-        let votes_counts_path = path.field("votes_counts");
-        let voters_counts_path = path.field("voters_counts");
+        self.validate_voters_and_votes_count_difference(validation_results, path);
 
-        let total_voters_count = self.voters_counts.total_admitted_voters_count;
-        self.voters_counts
-            .validate(election, validation_results, &voters_counts_path)?;
-
-        if difference_admitted_voters_count_and_votes_cast_count_above_threshold(
-            total_voters_count,
-            total_votes_count,
-        ) {
-            validation_results.warnings.push(ValidationResult {
-                fields: vec![
-                    voters_counts_path
-                        .field("total_admitted_voters_count")
-                        .to_string(),
-                    votes_counts_path
-                        .field("total_votes_cast_count")
-                        .to_string(),
-                ],
-                code: ValidationResultCode::W203,
-                context: None,
-            });
-        }
-
-        let differences_counts_path = path.field("differences_counts");
-
-        self.differences_counts
-            .validate(election, validation_results, &differences_counts_path)?;
-
-        validate_gsb_differences_counts(
-            &self.differences_counts,
-            total_voters_count,
-            total_votes_count,
+        self.differences_counts.validate(
+            election,
             validation_results,
-            &differences_counts_path,
+            &path.field("differences_counts"),
         )?;
+
+        self.validate_total_voters_count(validation_results, path);
 
         self.political_group_votes.validate(
             election,
@@ -286,6 +334,28 @@ mod tests {
         Ok(())
     }
 
+    /// F.205 Aantal kiesgerechtigden = leeg of 0
+    #[test]
+    fn test_f205() -> Result<(), DataError> {
+        let error = ValidationResult {
+            code: ValidationResultCode::F205,
+            fields: vec!["data.number_of_voters".into()],
+            context: None,
+        };
+
+        let mut data = create_test_data();
+
+        data.number_of_voters = 0;
+        let validation_results = validate(data.clone())?;
+        assert_eq!(validation_results.errors, [error]);
+
+        data.number_of_voters = 99;
+        let validation_results = validate(data)?;
+        assert_eq!(validation_results.errors, []);
+
+        Ok(())
+    }
+
     /// CSO/DSO | W.203: 'Aantal kiezers en stemmen': Verschil tussen totaal aantal toegelaten kiezers en totaal aantal uitgebrachte stemmen is groter dan of gelijk aan 2% en groter dan of gelijk aan 15
     #[test]
     fn test_w203() -> Result<(), DataError> {
@@ -322,6 +392,51 @@ mod tests {
             } else {
                 assert!(validation_results.warnings.is_empty());
             }
+        }
+
+        Ok(())
+    }
+
+    /// F.312 totaal aantal kiezers =
+    ///   totaal aantal uitgebrachte stemmen - meer getelde stemmen + minder getelde stemmen
+    #[test]
+    fn test_f312() -> Result<(), DataError> {
+        let validation_error = ValidationResult {
+            code: ValidationResultCode::F312,
+            fields: vec![
+                "data.voters_counts.total_admitted_voters_count".into(),
+                "data.votes_counts.total_votes_cast_count".into(),
+                "data.differences_counts.more_ballots_count".into(),
+                "data.differences_counts.fewer_ballots_count".into(),
+            ],
+            context: None,
+        };
+
+        // (D=total voters, H=total votes, I=more ballots, J=fewer ballots, expect_error)
+        let cases = vec![
+            (90, 80, 20, 30, false),
+            (92, 82, 20, 30, false),
+            (92, 80, 18, 30, false),
+            (92, 80, 20, 32, false),
+            (92, 80, 20, 30, true),
+            (90, 82, 20, 30, true),
+            (90, 80, 22, 30, true),
+            (90, 80, 20, 32, true),
+        ];
+
+        for (voters, votes, more, fewer, expect_error) in cases {
+            let mut data = create_test_data();
+            data.voters_counts.total_admitted_voters_count = voters;
+            data.votes_counts.total_votes_cast_count = votes;
+            data.differences_counts.more_ballots_count = more;
+            data.differences_counts.fewer_ballots_count = fewer;
+
+            let result = validate(data)?;
+            let has_error = result.errors.iter().any(|e| e == &validation_error);
+            assert_eq!(
+                has_error, expect_error,
+                "{voters} == {votes} - {more} + {fewer} should result in error: {expect_error}",
+            );
         }
 
         Ok(())

@@ -74,7 +74,11 @@ export function DetailIndexPage() {
         <h2>{t(`${translationPrefix}.title`)}</h2>
         <p className="md">{t(`${translationPrefix}.page_content`)}</p>
 
-        <ErrorsAndWarningsOverview structure={structure} results={dataEntry.validation_results} />
+        <ErrorsAndWarningsOverview
+          election={election}
+          structure={structure}
+          validationResults={dataEntry.validation_results}
+        />
 
         {resolveErrors && (
           // Coordinator needs to resolve the errors using the resolve errors form.

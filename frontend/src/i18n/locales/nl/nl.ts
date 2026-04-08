@@ -17,6 +17,8 @@ import election_status from "./election_status.json";
 import error from "./error.json";
 import extra_investigation from "./extra_investigation.json";
 import feedback from "./feedback.json";
+import feedback_CSB from "./feedback_CSB.json";
+import feedback_GSB from "./feedback_GSB.json";
 import form_errors from "./form_errors.json";
 import generic from "./generic.json";
 import initialise from "./initialise.json";
@@ -51,6 +53,8 @@ const nl = {
   election_status,
   error,
   feedback,
+  feedback_CSB,
+  feedback_GSB,
   form_errors,
   initialise,
   investigations,

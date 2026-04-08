@@ -14,12 +14,6 @@ import {
 } from "./ValidationResults";
 
 describe("ValidationResultSet", () => {
-  test("includes", () => {
-    const validationResults = new ValidationResultSet([validationResultMockData.F201, validationResultMockData.F203]);
-    expect(validationResults.includes("F201")).toBe(true);
-    expect(validationResults.includes("F202")).toBe(false);
-  });
-
   test("find", () => {
     const validationResults = new ValidationResultSet([validationResultMockData.F201, validationResultMockData.F203]);
     expect(validationResults.find("F201")).toBe(validationResultMockData.F201);
@@ -135,12 +129,12 @@ describe("getValidationResultSetForSection", () => {
     const resultSet = getValidationResultSetForSection(validationResults, votersVotesSection);
 
     expect(resultSet.size()).toBe(4);
-    expect(resultSet.includes("F201")).toBe(true);
-    expect(resultSet.includes("F203")).toBe(true);
-    expect(resultSet.includes("W203")).toBe(true);
-    expect(resultSet.includes("F202")).toBe(true);
-    expect(resultSet.includes("F301")).toBe(false);
-    expect(resultSet.includes("F401")).toBe(false);
+    expect(resultSet.find("F201")).toBeTruthy();
+    expect(resultSet.find("F203")).toBeTruthy();
+    expect(resultSet.find("W203")).toBeTruthy();
+    expect(resultSet.find("F202")).toBeTruthy();
+    expect(resultSet.find("F301")).toBeFalsy();
+    expect(resultSet.find("F401")).toBeFalsy();
   });
 
   test("should return empty set when no validation results match section", () => {
@@ -169,8 +163,8 @@ describe("getValidationResultSetForSection", () => {
     const resultSet = getValidationResultSetForSection(validationResults, politicalGroupSection);
 
     expect(resultSet.size()).toBe(1);
-    expect(resultSet.includes("F401")).toBe(true);
-    expect(resultSet.includes("F301")).toBe(false);
+    expect(resultSet.find("F401")).toBeTruthy();
+    expect(resultSet.find("F301")).toBeFalsy();
   });
 });
 

@@ -21,10 +21,6 @@ export class ValidationResultSet {
     return Array.from(this.entries).find((entry) => entry.code === code);
   }
 
-  includes(code: ValidationResultCode): boolean {
-    return Array.from(this.entries).some((entry) => entry.code === code);
-  }
-
   isEmpty(): boolean {
     return this.entries.size === 0;
   }

@@ -81,39 +81,6 @@ impl GSBResults {
         }
     }
 
-    /// F312 totaal aantal kiezers =
-    ///   totaal aantal uitgebrachte stemmen - meer getelde stemmen + minder getelde stemmen
-    fn validate_total_voters_count(
-        &self,
-        validation_results: &mut ValidationResults,
-        path: &FieldPath,
-    ) {
-        if self.voters_counts.total_admitted_voters_count
-            != (self.votes_counts.total_votes_cast_count
-                - self.differences_counts.more_ballots_count
-                + self.differences_counts.fewer_ballots_count)
-        {
-            validation_results.errors.push(ValidationResult {
-                fields: vec![
-                    path.field("voters_counts")
-                        .field("total_admitted_voters_count")
-                        .to_string(),
-                    path.field("votes_counts")
-                        .field("total_votes_cast_count")
-                        .to_string(),
-                    path.field("differences_counts")
-                        .field("more_ballots_count")
-                        .to_string(),
-                    path.field("differences_counts")
-                        .field("fewer_ballots_count")
-                        .to_string(),
-                ],
-                code: ValidationResultCode::F312,
-                context: None,
-            });
-        }
-    }
-
     fn validate_political_group_votes_errors(
         &self,
         political_group_candidate_votes: &PoliticalGroupCandidateVotes,
@@ -235,7 +202,12 @@ impl Validate for GSBResults {
             &path.field("differences_counts"),
         )?;
 
-        self.validate_total_voters_count(validation_results, path);
+        self.differences_counts.validate_sum(
+            self.voters_counts.total_admitted_voters_count,
+            self.votes_counts.total_votes_cast_count,
+            validation_results,
+            &path.field("differences_counts"),
+        );
 
         self.political_group_votes.validate(
             election,
@@ -392,51 +364,6 @@ mod tests {
             } else {
                 assert!(validation_results.warnings.is_empty());
             }
-        }
-
-        Ok(())
-    }
-
-    /// F.312 totaal aantal kiezers =
-    ///   totaal aantal uitgebrachte stemmen - meer getelde stemmen + minder getelde stemmen
-    #[test]
-    fn test_f312() -> Result<(), DataError> {
-        let validation_error = ValidationResult {
-            code: ValidationResultCode::F312,
-            fields: vec![
-                "data.voters_counts.total_admitted_voters_count".into(),
-                "data.votes_counts.total_votes_cast_count".into(),
-                "data.differences_counts.more_ballots_count".into(),
-                "data.differences_counts.fewer_ballots_count".into(),
-            ],
-            context: None,
-        };
-
-        // (D=total voters, H=total votes, I=more ballots, J=fewer ballots, expect_error)
-        let cases = vec![
-            (90, 80, 20, 30, false),
-            (92, 82, 20, 30, false),
-            (92, 80, 18, 30, false),
-            (92, 80, 20, 32, false),
-            (92, 80, 20, 30, true),
-            (90, 82, 20, 30, true),
-            (90, 80, 22, 30, true),
-            (90, 80, 20, 32, true),
-        ];
-
-        for (voters, votes, more, fewer, expect_error) in cases {
-            let mut data = create_test_data();
-            data.voters_counts.total_admitted_voters_count = voters;
-            data.votes_counts.total_votes_cast_count = votes;
-            data.differences_counts.more_ballots_count = more;
-            data.differences_counts.fewer_ballots_count = fewer;
-
-            let result = validate(data)?;
-            let has_error = result.errors.iter().any(|e| e == &validation_error);
-            assert_eq!(
-                has_error, expect_error,
-                "{voters} == {votes} - {more} + {fewer} should result in error: {expect_error}",
-            );
         }
 
         Ok(())

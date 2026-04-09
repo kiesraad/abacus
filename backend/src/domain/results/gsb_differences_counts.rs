@@ -6,7 +6,7 @@ use crate::domain::{
     compare::Compare,
     election::ElectionWithPoliticalGroups,
     field_path::FieldPath,
-    validate::{DataError, Validate, ValidationResults},
+    validate::{DataError, Validate, ValidationResult, ValidationResultCode, ValidationResults},
 };
 
 /// Differences counts for GSB, part of the results.
@@ -43,6 +43,27 @@ impl GSBDifferencesCounts {
         GSBDifferencesCounts {
             more_ballots_count: 0,
             fewer_ballots_count: 0,
+        }
+    }
+
+    /// F312 totaal aantal kiezers =
+    ///   totaal aantal uitgebrachte stemmen - meer getelde stemmen + minder getelde stemmen
+    pub fn validate_sum(
+        &self,
+        voters_count: Count,
+        votes_count: Count,
+        validation_results: &mut ValidationResults,
+        path: &FieldPath,
+    ) {
+        if voters_count != (votes_count - self.more_ballots_count + self.fewer_ballots_count) {
+            validation_results.errors.push(ValidationResult {
+                fields: vec![
+                    path.field("more_ballots_count").to_string(),
+                    path.field("fewer_ballots_count").to_string(),
+                ],
+                code: ValidationResultCode::F312,
+                context: None,
+            });
         }
     }
 }
@@ -435,5 +456,63 @@ mod tests {
             "results.political_group_votes.1.candidate_votes.0.votes"
         );
         assert_eq!(different_fields[4], "results.political_group_votes.1.total");
+    }
+
+    fn validate(
+        data: GSBDifferencesCounts,
+        voters_count: u32,
+        votes_count: u32,
+    ) -> Result<ValidationResults, DataError> {
+        let mut validation_results = ValidationResults::default();
+
+        data.validate_sum(
+            voters_count,
+            votes_count,
+            &mut validation_results,
+            &"differences_counts".into(),
+        );
+
+        Ok(validation_results)
+    }
+
+    /// F.312 totaal aantal kiezers =
+    ///   totaal aantal uitgebrachte stemmen - meer getelde stemmen + minder getelde stemmen
+    #[test]
+    fn test_f312() -> Result<(), DataError> {
+        let validation_error = ValidationResult {
+            code: ValidationResultCode::F312,
+            fields: vec![
+                "differences_counts.more_ballots_count".into(),
+                "differences_counts.fewer_ballots_count".into(),
+            ],
+            context: None,
+        };
+
+        // (D=total voters, H=total votes, I=more ballots, J=fewer ballots, expect_error)
+        let cases = vec![
+            (90, 80, 20, 30, false),
+            (92, 82, 20, 30, false),
+            (92, 80, 18, 30, false),
+            (92, 80, 20, 32, false),
+            (92, 80, 20, 30, true),
+            (90, 82, 20, 30, true),
+            (90, 80, 22, 30, true),
+            (90, 80, 20, 32, true),
+        ];
+
+        for (voters, votes, more, fewer, expect_error) in cases {
+            let mut data = GSBDifferencesCounts::zero();
+            data.more_ballots_count = more;
+            data.fewer_ballots_count = fewer;
+            let result = validate(data, voters, votes)?;
+
+            let has_error = result.errors.iter().any(|e| e == &validation_error);
+            assert_eq!(
+                has_error, expect_error,
+                "{voters} == {votes} - {more} + {fewer} should result in error: {expect_error}",
+            );
+        }
+
+        Ok(())
     }
 }

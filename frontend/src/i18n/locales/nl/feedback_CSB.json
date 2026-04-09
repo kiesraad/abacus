@@ -20,12 +20,6 @@
       "actions": "<ul><li>Zo ja: herstel op papier de optelfout door bij H het juiste getal in te vullen.</li><li>Zo nee: tel de stembiljetten en het aantal toegelaten kiezers opnieuw tot de fout gevonden is, of alles één keer herteld is.</li></ul>"
     }
   },
-  "F205": {
-    "coordinator": {
-      "title": "Het aantal kiesgerechtigden is niet ingevuld",
-      "content": "Je kan niet verder met dit proces-verbaal. Controleer of er iets is misgegaan bij het opmaken of overdragen van het proces-verbaal van het onderliggende niveau.\nBlijft de fout? Overleg dan met het CSB over de vervolgstappen."
-    }
-  },
   "F312": {
     "coordinator": {
       "title": "D is niet gelijk aan H min I plus J",

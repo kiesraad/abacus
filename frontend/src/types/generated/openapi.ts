@@ -1360,7 +1360,6 @@ export const validationResultCodeValues = [
   "F201",
   "F202",
   "F203",
-  "F205",
   "F301",
   "F302",
   "F303",

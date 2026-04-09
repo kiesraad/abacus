@@ -39,21 +39,6 @@ pub struct GSBResults {
 }
 
 impl GSBResults {
-    /// F.205 Aantal kiesgerechtigden = leeg of 0
-    fn validate_number_of_voters(
-        &self,
-        validation_results: &mut ValidationResults,
-        path: &FieldPath,
-    ) {
-        if self.number_of_voters == 0 {
-            validation_results.errors.push(ValidationResult {
-                fields: vec![path.field("number_of_voters").to_string()],
-                code: ValidationResultCode::F205,
-                context: None,
-            });
-        }
-    }
-
     /// W.203 'Aantal kiezers en stemmen':
     ///   Verschil tussen totaal aantal toegelaten kiezers en totaal aantal uitgebrachte stemmen
     ///   is groter dan of gelijk aan 2% en groter dan of gelijk aan 15
@@ -186,8 +171,6 @@ impl Validate for GSBResults {
             &path.field("number_of_voters"),
         )?;
 
-        self.validate_number_of_voters(validation_results, path);
-
         self.voters_counts
             .validate(election, validation_results, &path.field("voters_counts"))?;
 
@@ -302,28 +285,6 @@ mod tests {
         let result = validate(data);
         assert!(result.is_err());
         assert!(result.unwrap_err().message.eq("count out of range"),);
-
-        Ok(())
-    }
-
-    /// F.205 Aantal kiesgerechtigden = leeg of 0
-    #[test]
-    fn test_f205() -> Result<(), DataError> {
-        let error = ValidationResult {
-            code: ValidationResultCode::F205,
-            fields: vec!["data.number_of_voters".into()],
-            context: None,
-        };
-
-        let mut data = create_test_data();
-
-        data.number_of_voters = 0;
-        let validation_results = validate(data.clone())?;
-        assert_eq!(validation_results.errors, [error]);
-
-        data.number_of_voters = 99;
-        let validation_results = validate(data)?;
-        assert_eq!(validation_results.errors, []);
 
         Ok(())
     }

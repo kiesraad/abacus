@@ -1,9 +1,10 @@
 import { Link } from "react-router";
-
+import { Alert } from "@/components/ui/Alert/Alert";
+import { Button } from "@/components/ui/Button/Button";
+import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { useElection } from "@/hooks/election/useElection";
 import { t } from "@/i18n/translate";
 import { cn } from "@/utils/classnames";
-
 import { useApportionmentContext } from "../hooks/useApportionmentContext";
 import { renderTitleAndHeader } from "../utils/utils";
 import cls from "./Apportionment.module.css";
@@ -20,7 +21,7 @@ function getNumberOfSeatsAssignedSentence(seats: number, type: "residual_seat" |
 }
 
 export function ApportionmentPage() {
-  const { election } = useElection();
+  const { currentCommitteeSession, election } = useElection();
   const { seatAssignment, candidateNomination, electionSummary, error } = useApportionmentContext();
 
   return (
@@ -35,6 +36,16 @@ export function ApportionmentPage() {
             candidateNomination &&
             electionSummary && (
               <>
+                {/* TODO: Issue #3154: Conditional should be added once apportionment state machine is implemented */}
+                <FormLayout.Alert>
+                  <Alert type="success">
+                    <strong className="heading-md">{t("apportionment.all_seats_assigned")}</strong>
+                    <p>{t("apportionment.make_apportionment_definitive")}</p>
+                    <Button.Link to={`../report/committee-session/${currentCommitteeSession.id}/download`} size="md">
+                      {t("election_management.to_report")}
+                    </Button.Link>
+                  </Alert>
+                </FormLayout.Alert>
                 <div className={cn(cls.tableDiv, "mb-lg")}>
                   <div>
                     <h2 className={cls.tableTitle}>{t("apportionment.election_summary")}</h2>

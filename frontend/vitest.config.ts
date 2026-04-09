@@ -57,6 +57,7 @@ export default defineConfig((configEnv) =>
             "mockServiceWorker.js",
             "e2e-tests/**",
             "**/*.e2e.ts",
+            "**/*.json",
             ...coverageConfigDefaults.exclude,
           ],
         },

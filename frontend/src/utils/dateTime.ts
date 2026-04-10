@@ -42,6 +42,16 @@ export function formatDateTimeFull(date: Date) {
   });
 }
 
+export function formatDateTimeFullWithoutWeekday(date: Date) {
+  return date.toLocaleTimeString(t("date_locale"), {
+    hour: "numeric",
+    minute: "numeric",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+}
+
 export function formatDateTime(date: Date, relative = true) {
   const timeString = date.toLocaleTimeString(t("date_locale"), { hour: "numeric", minute: "numeric" });
 

@@ -152,7 +152,7 @@ const testCasesCSB: TestCasesCSB = {
       buttonsCurrentSession: ["Hervatten of voortgang bekijken", "Details van de zitting"],
     },
     completed: {
-      buttonsCurrentSession: ["Resultaten en documenten", "Zetelverdeling bekijken", "Invoer bekijken"],
+      buttonsCurrentSession: ["Resultaten en documenten", "Zetelverdeling", "Invoer bekijken"],
     },
   },
   administrator: {
@@ -165,7 +165,7 @@ const testCasesCSB: TestCasesCSB = {
       buttonsCurrentSession: ["Bekijk voortgang"],
     },
     completed: {
-      buttonsCurrentSession: ["Zetelverdeling bekijken", "Invoer bekijken"],
+      buttonsCurrentSession: ["Invoer bekijken"],
     },
   },
 };

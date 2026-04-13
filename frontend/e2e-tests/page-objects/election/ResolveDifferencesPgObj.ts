@@ -15,8 +15,8 @@ export class ResolveDifferencesPgObj {
     this.firstValue = this.page.getByRole("cell").nth(0);
     this.secondValue = this.page.getByRole("cell").nth(1);
     this.validationError = page.getByText(/Dit is een verplichte vraag/);
-    this.keepFirstEntry = page.getByRole("radio", { name: /De eerste invoer/ });
-    this.keepSecondEntry = page.getByRole("radio", { name: /De tweede invoer/ });
+    this.keepFirstEntry = page.getByRole("radio", { name: /Eerste invoer/ });
+    this.keepSecondEntry = page.getByRole("radio", { name: /Tweede invoer/ });
     this.discardBothEntries = page.getByRole("radio", { name: /Geen van beide/ });
     this.save = page.getByRole("button", { name: "Opslaan" });
   }

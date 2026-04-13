@@ -498,6 +498,7 @@ mod tests {
             (90, 82, 20, 30, true),
             (90, 80, 22, 30, true),
             (90, 80, 20, 32, true),
+            (90, 90, 91, 0, true), // check for subtract with overflow
         ];
 
         for (voters, votes, more, fewer, expect_error) in cases {

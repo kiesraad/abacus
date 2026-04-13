@@ -55,7 +55,10 @@ impl GSBDifferencesCounts {
         validation_results: &mut ValidationResults,
         path: &FieldPath,
     ) {
-        if voters_count != (votes_count - self.more_ballots_count + self.fewer_ballots_count) {
+        if i64::from(voters_count)
+            != (i64::from(votes_count) - i64::from(self.more_ballots_count)
+                + i64::from(self.fewer_ballots_count))
+        {
             validation_results.errors.push(ValidationResult {
                 fields: vec![
                     path.field("more_ballots_count").to_string(),

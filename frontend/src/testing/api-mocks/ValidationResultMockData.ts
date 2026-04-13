@@ -80,12 +80,7 @@ export const validationResultMockData: ErrorWarningsMap<ValidationResultCode> = 
     code: "F310",
   },
   F312: {
-    fields: [
-      "data.voters_counts.total_admitted_voters_count",
-      "data.votes_counts.total_votes_cast_count",
-      "data.differences_counts.more_ballots_count",
-      "data.differences_counts.fewer_ballots_count",
-    ],
+    fields: ["data.differences_counts.more_ballots_count", "data.differences_counts.fewer_ballots_count"],
     code: "F312",
   },
   F401: {

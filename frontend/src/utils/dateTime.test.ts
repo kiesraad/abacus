@@ -105,8 +105,9 @@ describe("DateTime util", () => {
 
   test.each([
     ["09:15", true],
-    ["9:15", false],
+    ["9:15", true],
     ["9 uur", false],
+    ["24:15", false],
     ["", false],
   ])("Time %s is valid %s", (input: string, expected: boolean) => {
     expect(isValidTime(input)).toEqual(expected);

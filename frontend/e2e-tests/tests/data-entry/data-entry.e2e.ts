@@ -127,7 +127,7 @@ test.describe("full data entry flow", () => {
 
     await expect(dataEntryHomePage.alertDataEntrySaved).toHaveText(
       [
-        "Je invoer is opgeslagen",
+        "Eerste invoer is opgeslagen",
         "Geef het papieren proces-verbaal terug aan de coördinator.",
         "Een andere invoerder doet straks de tweede invoer.",
       ].join(""),
@@ -548,7 +548,7 @@ test.describe("second data entry", () => {
 
     await expect(dataEntryHomePage.alertDataEntrySaved).toBeVisible();
     await expect(dataEntryHomePage.alertDataEntrySaved).toHaveText(
-      ["Je invoer is opgeslagen", "Geef het papieren proces-verbaal terug aan de coördinator."].join(""),
+      ["Tweede invoer is opgeslagen", "Geef het papieren proces-verbaal terug aan de coördinator."].join(""),
     );
 
     await expect(dataEntryHomePage.fieldsetContinueNext).toBeVisible();
@@ -626,7 +626,7 @@ test.describe("second data entry", () => {
 
     await expect(dataEntryHomePage.alertDataEntrySaved).toBeVisible();
     await expect(dataEntryHomePage.alertDataEntrySaved).toHaveText(
-      ["Je invoer is opgeslagen", "Geef het papieren proces-verbaal terug aan de coördinator."].join(""),
+      ["Tweede invoer is opgeslagen", "Geef het papieren proces-verbaal terug aan de coördinator."].join(""),
     );
 
     // check if data entries are marked as definitive on coordinator status page

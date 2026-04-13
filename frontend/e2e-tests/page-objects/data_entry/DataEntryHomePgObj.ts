@@ -30,7 +30,7 @@ export class DataEntryHomePage {
     this.start = page.getByRole("button", { name: "Beginnen" });
 
     this.alert = page.getByRole("alert");
-    this.alertDataEntrySaved = this.alert.filter({ hasText: "Je invoer is opgeslagen" });
+    this.alertDataEntrySaved = this.alert.filter({ hasText: /(Eerste|Tweede) invoer is opgeslagen/ });
     this.alertDataEntryDifferent = this.alert.filter({ hasText: "Let op: verschil met eerste invoer" });
     this.alertDataEntryErrors = this.alert.filter({ hasText: "Let op: fouten in het proces-verbaal" });
     this.alertDataEntryWarning = this.alert.filter({ hasText: "Je kan dit stembureau niet invoeren" });

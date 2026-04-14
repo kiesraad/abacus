@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use crate::domain::{
     apportionment::{CandidateNomination, SeatAssignment},
     committee_session::CommitteeSession,
-    election::ElectionWithPoliticalGroups,
+    election::{Election, ElectionWithPoliticalGroups},
     models::{PdfFileModel, PdfModel, ToPdfFileModel},
     results::{voters_counts::VotersCounts, votes_counts::VotesCounts},
     summary::SummaryDifferencesCounts,
@@ -54,9 +54,7 @@ impl ToPdfFileModel for ModelP22_2Input {
 #[derive(Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct ModelP22_2Bijlage1Input {
-    pub election: ElectionWithPoliticalGroups,
-    pub hash: String,
-    pub creation_date_time: String,
+    pub election: Election,
     pub votes_tables: VotesTables,
 }
 
@@ -68,8 +66,9 @@ impl ToPdfFileModel for ModelP22_2Bijlage1Input {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use std::{fs::File, io::BufReader};
+
+    use super::*;
 
     #[test]
     fn test_json_matches_struct() {

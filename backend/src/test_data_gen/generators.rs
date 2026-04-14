@@ -83,7 +83,7 @@ async fn generate_csb_data_entries(
     args: &GenerateElectionArgs,
     sub_committee_first_session: SubCommitteeFirstSession,
     election: &ElectionWithPoliticalGroups,
-    votes: Option<&[&[u32]]>,
+    votes: Option<Vec<Vec<u32>>>,
 ) -> Result<bool, Box<dyn Error>> {
     committee_session_repo::change_status(
         conn,
@@ -151,7 +151,7 @@ async fn generate_csb_election_data(
     args: GenerateElectionArgs,
     committee_session: &mut CommitteeSession,
     election: &ElectionWithPoliticalGroups,
-    votes: Option<&[&[u32]]>,
+    votes: Option<Vec<Vec<u32>>>,
 ) -> Result<(Vec<PollingStation>, bool), Box<dyn Error>> {
     let data_entry_complete = if election.category == ElectionCategory::Municipal {
         let number = election
@@ -192,7 +192,7 @@ async fn generate_csb_election_data(
 pub async fn create_test_election(
     args: GenerateElectionArgs,
     pool: SqlitePool,
-    votes: Option<&[&[u32]]>,
+    votes: Option<Vec<Vec<u32>>>,
 ) -> Result<CreateTestElectionResult, Box<dyn Error>> {
     let mut rng = StdRng::from_rng(&mut rand::rng());
 
@@ -504,7 +504,7 @@ async fn generate_csb_data_entry(
     rng: &mut impl rand::RngExt,
     conn: &mut SqliteConnection,
     args: &GenerateElectionArgs,
-    votes: Option<&[&[u32]]>,
+    votes: Option<Vec<Vec<u32>>>,
 ) -> (usize, usize) {
     info!("Generating data entries for CSB election");
 
@@ -817,9 +817,9 @@ fn generate_gsb_results(
 fn generate_gsb_results_from_votes(
     political_groups: &[PoliticalGroup],
     number_of_voters: u32,
-    pg_votes: &[&[u32]],
+    pg_votes: Vec<Vec<u32>>,
 ) -> GSBResults {
-    let number_of_votes = pg_votes.iter().copied().flatten().sum();
+    let number_of_votes = pg_votes.iter().flatten().sum();
 
     GSBResults {
         number_of_voters,
@@ -831,7 +831,7 @@ fn generate_gsb_results_from_votes(
         votes_counts: VotesCounts {
             political_group_total_votes: political_groups
                 .iter()
-                .zip(pg_votes)
+                .zip(pg_votes.clone())
                 .map(|(pg, votes)| PoliticalGroupTotalVotes {
                     number: pg.number,
                     total: votes.iter().sum(),
@@ -851,20 +851,19 @@ fn generate_gsb_results_from_votes(
             .zip(pg_votes)
             .map(|(pg, votes)| {
                 let total_votes = votes.iter().sum();
-                // Assign all votes to one candidate
                 PoliticalGroupCandidateVotes {
                     number: pg.number,
                     total: total_votes,
-                    candidate_votes: vec![
-                        CandidateVotes {
-                            number: CandidateNumber::from(1),
-                            votes: votes[0],
-                        },
-                        CandidateVotes {
-                            number: CandidateNumber::from(2),
-                            votes: votes[1],
-                        },
-                    ],
+                    candidate_votes: votes
+                        .iter()
+                        .enumerate()
+                        .map(|(index, v)| CandidateVotes {
+                            number: CandidateNumber::from(
+                                u32::try_from(index + 1).expect("index should fit in u32"),
+                            ),
+                            votes: *v,
+                        })
+                        .collect(),
                 }
             })
             .collect(),

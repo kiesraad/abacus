@@ -194,7 +194,7 @@ _(Gebruik het proces-verbaal van het stembureau #sym.arrow.r Tijdens de stemming
 
 #for political_group in input.candidates_tables {
   votes_table(
-    title: [#political_group.number #political_group.name],
+    title: [#format_political_group_name(political_group.number, political_group.name, with_prefix: "with_list_prefix")],
     headers: ("Kandidaat", "", "Stemmen"),
     total: political_group.total,
     votes_columns: political_group.columns,

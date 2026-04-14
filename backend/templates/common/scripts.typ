@@ -537,7 +537,7 @@
   let column_index = 0;
 
   box[
-    #box(inset: (bottom: 10pt), text(size: 14pt, weight: "semibold")[Lijst #title])
+    #box(inset: (bottom: 10pt), text(size: 14pt, weight: "semibold")[#title])
     #if explainer_text != none {
       box(width: 500pt, explainer_text)
     }

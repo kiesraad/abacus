@@ -146,7 +146,7 @@ ingevuld te worden in de kolom ‘gecorrigeerd'. Onder ‘oorspronkelijk’ staa
 
 #for political_group in input.votes_tables {
   votes_table(
-    title: [#political_group.number #political_group.name],
+    title: [#format_political_group_name(political_group.number, political_group.name, with_prefix: "with_list_prefix")],
     headers: ("Kandidaat", "", "Oorspronkelijk", "Gecorrigeerd"),
     corrected_cells: 1,
     total: political_group.total,

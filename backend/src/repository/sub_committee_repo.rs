@@ -1,45 +1,16 @@
-use sqlx::{FromRow, SqliteConnection, query, query_as, types::Json};
+use sqlx::{SqliteConnection, query, query_as, types::Json};
 
-use crate::domain::{
-    committee_session::CommitteeSessionId,
-    data_entry::{DataEntryId, DataEntrySource, DataEntryStatus, DataEntryStatusWithSource},
-    election::CommitteeCategory,
-    sub_committee::{SubCommittee, SubCommitteeFirstSession, SubCommitteeId, SubCommitteeNumber},
+use crate::{
+    domain::{
+        committee_session::CommitteeSessionId,
+        data_entry::{DataEntryId, DataEntrySource, DataEntryStatus, DataEntryStatusWithSource},
+        election::CommitteeCategory,
+        sub_committee::{
+            SubCommittee, SubCommitteeFirstSession, SubCommitteeId, SubCommitteeNumber,
+        },
+    },
+    repository::common::{SubCommitteeRow, SubCommitteeRowLike},
 };
-
-/// Sub electoral committee database row, matching the SQL schema
-#[derive(FromRow, Debug, Clone)]
-struct SubCommitteeRow {
-    id: SubCommitteeId,
-    committee_session_id: CommitteeSessionId,
-    data_entry_id: DataEntryId,
-    number: SubCommitteeNumber,
-    name: String,
-    category: CommitteeCategory,
-}
-
-impl From<SubCommitteeRow> for SubCommitteeFirstSession {
-    fn from(row: SubCommitteeRow) -> Self {
-        let SubCommitteeRow {
-            id,
-            committee_session_id,
-            data_entry_id,
-            number,
-            name,
-            category,
-        } = row;
-        Self {
-            committee_session_id,
-            data_entry_id,
-            sub_committee: SubCommittee {
-                id,
-                number,
-                name,
-                category,
-            },
-        }
-    }
-}
 
 /// List all sub electoral committees for a committee session
 async fn list(
@@ -73,7 +44,7 @@ pub async fn list_first_session(
     Ok(list(conn, committee_session_id)
         .await?
         .into_iter()
-        .map(SubCommitteeFirstSession::from)
+        .map(SubCommitteeRow::into_sub_committee_first_session)
         .collect())
 }
 
@@ -112,7 +83,7 @@ pub async fn create(
     )
     .fetch_one(conn)
     .await
-    .map(SubCommitteeFirstSession::from)
+    .map(SubCommitteeRow::into_sub_committee_first_session)
 }
 
 /// List all sub committees for a first committee session with their data entry status.
@@ -137,11 +108,15 @@ pub async fn list_first_session_with_status(
     )
     .map(|row| DataEntryStatusWithSource {
         data_entry_id: row.data_entry_id,
-        source: DataEntrySource::SubCommittee(SubCommittee {
-            id: row.id,
-            number: row.number,
-            name: row.name,
-            category: row.category,
+        source: DataEntrySource::SubCommittee(SubCommitteeFirstSession {
+            committee_session_id,
+            data_entry_id: row.data_entry_id,
+            sub_committee: SubCommittee {
+                id: row.id,
+                number: row.number,
+                name: row.name,
+                category: row.category,
+            },
         }),
         status: row.state.0,
     })

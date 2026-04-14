@@ -14,6 +14,7 @@ use crate::{
     domain::{
         committee_session::{CommitteeSession, CommitteeSessionId},
         committee_session_status::CommitteeSessionStatus,
+        data_entry::{DataEntryId, DataEntrySource, DataEntrySourceNumber},
         election::{
             Candidate, CandidateGender, CandidateNumber, CommitteeCategory, ElectionCategory,
             ElectionId, ElectionWithPoliticalGroups, PGNumber, PoliticalGroup, VoteCountingMethod,
@@ -24,7 +25,10 @@ use crate::{
             ModelN10_2Input, ModelNa14_2Bijlage1Input, ModelNa14_2Input, ModelNa31_2Bijlage1Input,
             ModelNa31_2InlegvelInput, ModelNa31_2Input, ModelP2aInput, PdfFileModel, PdfModel,
         },
-        polling_station::{PollingStation, PollingStationId, PollingStationType},
+        polling_station::{
+            PollingStation, PollingStationFirstSession, PollingStationForSession, PollingStationId,
+            PollingStationType,
+        },
         results::{
             common_polling_station_results::CommonPollingStationResults,
             differences_counts::{
@@ -236,6 +240,21 @@ fn random_polling_stations(
         .collect()
 }
 
+fn ps_as_first_data_entry_sources(polling_stations: &[PollingStation]) -> Vec<DataEntrySource> {
+    polling_stations
+        .iter()
+        .map(|polling_station| {
+            DataEntrySource::PollingStation(PollingStationForSession::First(
+                PollingStationFirstSession {
+                    committee_session_id: CommitteeSessionId::from(0), // dummy value
+                    polling_station: polling_station.clone(),
+                    data_entry_id: DataEntryId::from(0), // dummy value
+                },
+            ))
+        })
+        .collect()
+}
+
 fn random_committee_session(
     rng: &mut impl RngExt,
     election_id: ElectionId,
@@ -325,41 +344,58 @@ fn random_result(
     }
 }
 
-fn random_station_subset(rng: &mut impl RngExt, polling_stations: &[PollingStation]) -> Vec<u32> {
-    polling_stations
+fn random_station_subset(
+    rng: &mut impl RngExt,
+    data_sources: &[DataEntrySource],
+) -> Vec<DataEntrySourceNumber> {
+    data_sources
         .iter()
         .filter(|_| rng.random_bool(0.5))
-        .map(|station| station.number)
+        .map(|source| source.number())
         .collect()
 }
 
-fn random_sum_count(rng: &mut impl RngExt, polling_stations: &[PollingStation]) -> SumCount {
+fn random_sum_count(rng: &mut impl RngExt, data_sources: &[DataEntrySource]) -> SumCount {
     SumCount {
         count: rng.random_range(0..500),
-        polling_stations: random_station_subset(rng, polling_stations),
+        data_entry_sources: random_station_subset(rng, data_sources),
     }
 }
 
 fn random_election_summary(
     rng: &mut impl RngExt,
     election: &ElectionWithPoliticalGroups,
-    polling_stations: &[PollingStation],
+    data_sources: &[DataEntrySource],
 ) -> ElectionSummary {
     let result = random_result(rng, election);
+    let data_source_num = |n| match n {
+        DataEntrySourceNumber::PollingStation(i) => i,
+        DataEntrySourceNumber::SubCommittee(i) => i,
+    };
 
     ElectionSummary {
         voters_counts: result.voters_counts,
         votes_counts: result.votes_counts,
         differences_counts: SummaryDifferencesCounts {
-            more_ballots_count: random_sum_count(rng, polling_stations),
-            fewer_ballots_count: random_sum_count(rng, polling_stations),
+            more_ballots_count: random_sum_count(rng, data_sources),
+            fewer_ballots_count: random_sum_count(rng, data_sources),
         },
         political_group_votes: result.political_group_votes,
         polling_station_investigations: PollingStationInvestigations {
-            admitted_voters_recounted: random_station_subset(rng, polling_stations),
-            investigated_other_reason: random_station_subset(rng, polling_stations),
-            ballots_recounted: random_station_subset(rng, polling_stations),
+            admitted_voters_recounted: random_station_subset(rng, data_sources)
+                .into_iter()
+                .map(data_source_num)
+                .collect(),
+            investigated_other_reason: random_station_subset(rng, data_sources)
+                .into_iter()
+                .map(data_source_num)
+                .collect(),
+            ballots_recounted: random_station_subset(rng, data_sources)
+                .into_iter()
+                .map(data_source_num)
+                .collect(),
         },
+        number_of_voters: None,
     }
 }
 
@@ -463,8 +499,9 @@ async fn test_na_14_2() {
             random_committee_session(&mut rng, election.id, string_length, none_where_possible);
         let polling_stations =
             random_polling_stations(&mut rng, string_length, none_where_possible);
-        let previous_summary = random_election_summary(&mut rng, &election, &polling_stations);
-        let summary = random_election_summary(&mut rng, &election, &polling_stations);
+        let data_sources = ps_as_first_data_entry_sources(&polling_stations);
+        let previous_summary = random_election_summary(&mut rng, &election, &data_sources);
+        let summary = random_election_summary(&mut rng, &election, &data_sources);
 
         let hash = random_string(&mut rng, 64);
         let creation_date_time = random_date_time(&mut rng)
@@ -537,7 +574,8 @@ async fn test_na_31_2() {
             random_committee_session(&mut rng, election.id, string_length, none_where_possible);
         let polling_stations =
             random_polling_stations(&mut rng, string_length, none_where_possible);
-        let summary = random_election_summary(&mut rng, &election, &polling_stations);
+        let data_sources = ps_as_first_data_entry_sources(&polling_stations);
+        let summary = random_election_summary(&mut rng, &election, &data_sources);
         let hash = random_string(&mut rng, 64);
         let creation_date_time = random_date_time(&mut rng)
             .format(DEFAULT_DATE_TIME_FORMAT)

@@ -181,7 +181,7 @@ async fn validate_and_get_data(
     if let DataEntrySource::PollingStation(ref ps) = context.source
         && context.committee_session.is_next_session()
         && !matches!(
-            investigation_repo::get(conn, ps.id).await,
+            investigation_repo::get(conn, ps.id()).await,
             Ok(Some(InvestigationStatus::ConcludedWithNewResults(_)))
         )
     {
@@ -328,7 +328,7 @@ async fn data_entry_claim(
     let (context, state) = validate_and_get_data(&mut tx, data_entry_id, &user).await?;
 
     let prev_data_entry_id = match &context.source {
-        DataEntrySource::PollingStation(ps) => ps.prev_data_entry_id,
+        DataEntrySource::PollingStation(ps) => ps.prev_data_entry_id(),
         _ => None,
     };
 

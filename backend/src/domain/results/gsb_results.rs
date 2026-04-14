@@ -3,10 +3,8 @@ use utoipa::ToSchema;
 
 use super::{
     common_validation::difference_admitted_voters_count_and_votes_cast_count_above_threshold,
-    count::Count,
-    gsb_differences_counts::{GSBDifferencesCounts, validate_gsb_differences_counts},
-    political_group_candidate_votes::PoliticalGroupCandidateVotes,
-    voters_counts::VotersCounts,
+    count::Count, gsb_differences_counts::GSBDifferencesCounts,
+    political_group_candidate_votes::PoliticalGroupCandidateVotes, voters_counts::VotersCounts,
     votes_counts::VotesCounts,
 };
 use crate::domain::{
@@ -41,6 +39,33 @@ pub struct GSBResults {
 }
 
 impl GSBResults {
+    /// W.203 'Aantal kiezers en stemmen':
+    ///   Verschil tussen totaal aantal toegelaten kiezers en totaal aantal uitgebrachte stemmen
+    ///   is groter dan of gelijk aan 2% en groter dan of gelijk aan 15
+    fn validate_voters_and_votes_count_difference(
+        &self,
+        validation_results: &mut ValidationResults,
+        path: &FieldPath,
+    ) {
+        if difference_admitted_voters_count_and_votes_cast_count_above_threshold(
+            self.voters_counts.total_admitted_voters_count,
+            self.votes_counts.total_votes_cast_count,
+        ) {
+            validation_results.warnings.push(ValidationResult {
+                fields: vec![
+                    path.field("voters_counts")
+                        .field("total_admitted_voters_count")
+                        .to_string(),
+                    path.field("votes_counts")
+                        .field("total_votes_cast_count")
+                        .to_string(),
+                ],
+                code: ValidationResultCode::W203,
+                context: None,
+            });
+        }
+    }
+
     fn validate_political_group_votes_errors(
         &self,
         political_group_candidate_votes: &PoliticalGroupCandidateVotes,
@@ -146,48 +171,26 @@ impl Validate for GSBResults {
             &path.field("number_of_voters"),
         )?;
 
-        let total_votes_count = self.votes_counts.total_votes_cast_count;
+        self.voters_counts
+            .validate(election, validation_results, &path.field("voters_counts"))?;
 
         self.votes_counts
             .validate(election, validation_results, &path.field("votes_counts"))?;
 
-        let votes_counts_path = path.field("votes_counts");
-        let voters_counts_path = path.field("voters_counts");
+        self.validate_voters_and_votes_count_difference(validation_results, path);
 
-        let total_voters_count = self.voters_counts.total_admitted_voters_count;
-        self.voters_counts
-            .validate(election, validation_results, &voters_counts_path)?;
-
-        if difference_admitted_voters_count_and_votes_cast_count_above_threshold(
-            total_voters_count,
-            total_votes_count,
-        ) {
-            validation_results.warnings.push(ValidationResult {
-                fields: vec![
-                    voters_counts_path
-                        .field("total_admitted_voters_count")
-                        .to_string(),
-                    votes_counts_path
-                        .field("total_votes_cast_count")
-                        .to_string(),
-                ],
-                code: ValidationResultCode::W203,
-                context: None,
-            });
-        }
-
-        let differences_counts_path = path.field("differences_counts");
-
-        self.differences_counts
-            .validate(election, validation_results, &differences_counts_path)?;
-
-        validate_gsb_differences_counts(
-            &self.differences_counts,
-            total_voters_count,
-            total_votes_count,
+        self.differences_counts.validate(
+            election,
             validation_results,
-            &differences_counts_path,
+            &path.field("differences_counts"),
         )?;
+
+        self.differences_counts.validate_sum(
+            self.voters_counts.total_admitted_voters_count,
+            self.votes_counts.total_votes_cast_count,
+            validation_results,
+            &path.field("differences_counts"),
+        );
 
         self.political_group_votes.validate(
             election,

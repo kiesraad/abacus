@@ -85,6 +85,8 @@ pub enum ValidationResultCode {
     F309,
     /// CSO: (Als D <> H en verklaring voor verschil niks aangevinkt of 'ja' en 'nee' aangevinkt)
     F310,
+    /// CSB: totaal aantal kiezers != totaal aantal uitgebrachte stemmen - meer getelde stemmen + minder getelde stemmen
+    F312,
     /// CSO: 'Kandidaten en lijsttotalen': Er zijn (stemmen op kandidaten of het lijsttotaal van corresponderende E.x is groter dan 0) en het totaal aantal stemmen op een lijst = leeg of 0
     F401,
     /// CSO: 'Kandidaten en lijsttotalen': (Als F.401 niet getoond wordt) Totaal aantal stemmen op een lijst <> som van aantal stemmen op de kandidaten van die lijst

@@ -144,7 +144,7 @@ async fn generate_gsb_election_data(
     Ok((polling_stations, data_entry_completed))
 }
 
-/// Create sub committee and set status to InPreparation for a CSB election
+/// Create subcommittee and set status to InPreparation for a CSB election
 async fn generate_csb_election_data(
     rng: &mut StdRng,
     tx: &mut SqliteConnection,

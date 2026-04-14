@@ -69,7 +69,7 @@ export function GenerateTestElectionForm() {
 
   const submitForm = async (event: SubmitEvent<HTMLFormElement>) => {
     const formData = new StringFormData(event.currentTarget);
-    const committee_category = formData.getString("committee_category");
+    const committee_category = formState.generate_p22_2_variants ? "CSB" : formData.getString("committee_category");
 
     const payload = RANGE_FIELDS.reduce<Record<string, string | boolean>>(
       (acc, field) =>

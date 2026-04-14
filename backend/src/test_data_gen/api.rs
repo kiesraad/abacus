@@ -97,9 +97,9 @@ async fn create_test_election_with_votes(
     let mut args = common_args.clone();
 
     let total_votes = votes.iter().flatten().sum();
-    let policital_groups = u32::try_from(votes.len())?;
+    let political_groups = u32::try_from(votes.len())?;
     args.voters = RandomRange(total_votes..total_votes + 1);
-    args.political_groups = RandomRange(policital_groups..policital_groups + 1);
+    args.political_groups = RandomRange(political_groups..political_groups + 1);
     args.seats = RandomRange(seats..seats + 1);
     super::create_test_election(args, pool.clone(), Some(votes)).await
 }

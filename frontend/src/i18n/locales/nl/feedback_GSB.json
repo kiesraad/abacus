@@ -41,6 +41,13 @@
       "actions": "<ul><li>Zo ja: herstel op papier de optelfout door bij H het juiste getal in te vullen.</li><li>Zo nee: tel de stembiljetten en het aantal toegelaten kiezers opnieuw tot de fout gevonden is, of alles één keer herteld is.</li></ul>"
     }
   },
+  "F204": {
+    "coordinator": {
+      "title": "Het totaal aantal stemmen op kandidaten is niet ingevuld",
+      "content": "Controleer in rubriek 3.3 (eerste zitting) of 2.3 (volgende zitting) of er een onverklaard verschil opgelost wordt als de juiste getallen bij E en E.1 t/m E.n worden ingevuld.",
+      "actions": "<ul><li>Zo ja: herstel op papier de optelfout door bij E en E.1 t/m E.n de juiste getallen in te vullen.</li><li>Zo nee: tel de stembiljetten en het aantal toegelaten kiezers opnieuw tot de fout gevonden is, of alles één keer herteld is.</li></ul>"
+    }
+  },
   "F301": {
     "coordinator": {
       "title": "De getallen die zijn ingevuld bij D en H zijn niet gelijk",

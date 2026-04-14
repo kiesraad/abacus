@@ -42,6 +42,10 @@ export const validationResultMockData: ErrorWarningsMap<ValidationResultCode> = 
     ],
     code: "F203",
   },
+  F204: {
+    fields: ["data.votes_counts.total_votes_candidates_count"],
+    code: "F204",
+  },
   F301: {
     fields: ["data.differences_counts.compare_votes_cast_admitted_voters.admitted_voters_equal_votes_cast"],
     code: "F301",

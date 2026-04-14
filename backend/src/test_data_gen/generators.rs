@@ -83,7 +83,7 @@ async fn generate_csb_data_entries(
     args: &GenerateElectionArgs,
     sub_committee_first_session: SubCommitteeFirstSession,
     election: &ElectionWithPoliticalGroups,
-    votes: Option<&[Vec<u32>]>,
+    votes: Option<&[&[u32]]>,
 ) -> Result<bool, Box<dyn Error>> {
     committee_session_repo::change_status(
         conn,
@@ -151,7 +151,7 @@ async fn generate_csb_election_data(
     args: GenerateElectionArgs,
     committee_session: &mut CommitteeSession,
     election: &ElectionWithPoliticalGroups,
-    votes: Option<&[Vec<u32>]>,
+    votes: Option<&[&[u32]]>,
 ) -> Result<(Vec<PollingStation>, bool), Box<dyn Error>> {
     let data_entry_complete = if election.category == ElectionCategory::Municipal {
         let number = election
@@ -192,7 +192,7 @@ async fn generate_csb_election_data(
 pub async fn create_test_election(
     args: GenerateElectionArgs,
     pool: SqlitePool,
-    votes: Option<&[Vec<u32>]>,
+    votes: Option<&[&[u32]]>,
 ) -> Result<CreateTestElectionResult, Box<dyn Error>> {
     let mut rng = StdRng::from_rng(&mut rand::rng());
 
@@ -504,7 +504,7 @@ async fn generate_csb_data_entry(
     rng: &mut impl rand::RngExt,
     conn: &mut SqliteConnection,
     args: &GenerateElectionArgs,
-    votes: Option<&[Vec<u32>]>,
+    votes: Option<&[&[u32]]>,
 ) -> (usize, usize) {
     info!("Generating data entries for CSB election");
 
@@ -817,9 +817,9 @@ fn generate_gsb_results(
 fn generate_gsb_results_from_votes(
     political_groups: &[PoliticalGroup],
     number_of_voters: u32,
-    pg_votes: &[Vec<u32>],
+    pg_votes: &[&[u32]],
 ) -> GSBResults {
-    let number_of_votes = pg_votes.iter().flatten().sum();
+    let number_of_votes = pg_votes.iter().copied().flatten().sum();
 
     GSBResults {
         number_of_voters,

@@ -7,14 +7,14 @@ use utoipa::ToSchema;
 
 use crate::{
     domain::{
-        committee_session::CommitteeSession,
+        committee_session::{CommitteeSession, CommitteeSessionId},
         compare::Compare,
         election::ElectionWithPoliticalGroups,
         field_path::FieldPath,
         identifier::id,
-        polling_station::{PollingStationId, PollingStationNumber},
+        polling_station::{PollingStationForSession, PollingStationId, PollingStationNumber},
         results::Results,
-        sub_committee::SubCommittee,
+        sub_committee::{SubCommitteeFirstSession, SubCommitteeId, SubCommitteeNumber},
         validate::{
             DataError, Validate, ValidateRoot, ValidationResult, ValidationResultCode,
             ValidationResults,
@@ -87,19 +87,93 @@ impl From<DataEntryRow> for DataEntryStatusResponse {
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
 #[serde(tag = "type")]
 pub enum DataEntrySource {
-    PollingStation(PollingStationSource),
-    SubCommittee(SubCommittee),
+    PollingStation(PollingStationForSession),
+    SubCommittee(SubCommitteeFirstSession),
 }
 
-#[derive(Serialize, Deserialize, ToSchema, Debug)]
-pub struct PollingStationSource {
-    pub id: PollingStationId,
-    #[schema(value_type = u32)]
-    pub number: PollingStationNumber,
-    pub name: String,
-    #[serde(skip)]
-    #[schema(ignore)]
-    pub prev_data_entry_id: Option<DataEntryId>,
+impl DataEntrySource {
+    pub fn committee_session_id(&self) -> CommitteeSessionId {
+        match self {
+            DataEntrySource::PollingStation(source) => source.committee_session_id(),
+            DataEntrySource::SubCommittee(source) => source.committee_session_id,
+        }
+    }
+
+    pub fn id(&self) -> DataEntrySourceId {
+        match self {
+            DataEntrySource::PollingStation(source) => {
+                DataEntrySourceId::PollingStation(source.id())
+            }
+            DataEntrySource::SubCommittee(source) => {
+                DataEntrySourceId::SubCommittee(source.sub_committee.id)
+            }
+        }
+    }
+
+    pub fn number(&self) -> DataEntrySourceNumber {
+        match self {
+            DataEntrySource::PollingStation(source) => {
+                DataEntrySourceNumber::PollingStation(source.number())
+            }
+            DataEntrySource::SubCommittee(source) => {
+                DataEntrySourceNumber::SubCommittee(source.sub_committee.number)
+            }
+        }
+    }
+
+    pub fn eml_reporting_unit_identifier_name(&self) -> String {
+        match self {
+            DataEntrySource::PollingStation(source) => {
+                format!(
+                    "{} (postcode: {})",
+                    source.polling_station().name,
+                    source.polling_station().postal_code
+                )
+            }
+            DataEntrySource::SubCommittee(source) => source.sub_committee.name.clone(),
+        }
+    }
+
+    pub fn eml_reporting_unit_identifier_number(&self, authority_id: &str) -> String {
+        match self {
+            DataEntrySource::PollingStation(source) => {
+                format!("{authority_id}::SB{}", source.number())
+            }
+            DataEntrySource::SubCommittee(source) => source.sub_committee.number.to_string(),
+        }
+    }
+
+    pub fn eml_eligible_voter_count(&self) -> Option<u32> {
+        match self {
+            DataEntrySource::PollingStation(source) => source.polling_station().number_of_voters,
+            DataEntrySource::SubCommittee(_) => None,
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, ToSchema, Debug, Clone, Copy, PartialEq, Eq)]
+#[serde(tag = "type", content = "number", deny_unknown_fields)]
+pub enum DataEntrySourceNumber {
+    PollingStation(PollingStationNumber),
+    SubCommittee(SubCommitteeNumber),
+}
+
+impl Display for DataEntrySourceNumber {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            DataEntrySourceNumber::PollingStation(number) => {
+                write!(f, "Polling Station {}", number)
+            }
+            DataEntrySourceNumber::SubCommittee(number) => write!(f, "Sub-Committee {}", number),
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, ToSchema, Debug, Clone, Copy, PartialEq, Eq)]
+#[serde(tag = "type", content = "id", deny_unknown_fields)]
+pub enum DataEntrySourceId {
+    PollingStation(PollingStationId),
+    SubCommittee(SubCommitteeId),
 }
 
 /// Context about which entity owns a given data entry
@@ -115,8 +189,8 @@ pub struct DataEntryStatusWithSource {
     pub status: DataEntryStatus,
 }
 
-impl From<SubCommittee> for DataEntrySource {
-    fn from(sub_committee: SubCommittee) -> Self {
+impl From<SubCommitteeFirstSession> for DataEntrySource {
+    fn from(sub_committee: SubCommitteeFirstSession) -> Self {
         DataEntrySource::SubCommittee(sub_committee)
     }
 }

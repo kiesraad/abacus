@@ -1,0 +1,26 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        SELECT ps.id AS \"original_id: PollingStationId\",\n            CASE\n                WHEN json_extract(de.state, '$.status') = 'Definitive'\n                    THEN json_extract(de.state, '$.state.results')\n                WHEN json_extract(ps.investigation_state, '$.status') IS NOT 'ConcludedWithNewResults'\n                    AND json_extract(prev_de.state, '$.status') = 'Definitive'\n                    THEN json_extract(prev_de.state, '$.state.results')\n                ELSE NULL\n            END AS \"data: Json<Results>\"\n        FROM polling_stations AS ps\n        LEFT JOIN data_entries AS de ON de.id = ps.data_entry_id\n        LEFT JOIN data_entries AS prev_de ON prev_de.id = ps.prev_data_entry_id\n        WHERE ps.committee_session_id = $1 AND \"data: Json<Results>\" IS NOT NULL\n        ",
+  "describe": {
+    "columns": [
+      {
+        "name": "original_id: PollingStationId",
+        "ordinal": 0,
+        "type_info": "Integer"
+      },
+      {
+        "name": "data: Json<Results>",
+        "ordinal": 1,
+        "type_info": "Null"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      null
+    ]
+  },
+  "hash": "118d1986f6021f104fd504e98649480ea3a16b64827cb8a09af49a17a129fbb4"
+}

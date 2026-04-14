@@ -7,7 +7,7 @@ use utoipa::ToSchema;
 
 use crate::domain::{data_entry::DataEntryId, polling_station::PollingStationId};
 
-#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, ToSchema, Clone, PartialEq, Eq)]
 #[serde(deny_unknown_fields, tag = "status", content = "state")]
 pub enum InvestigationStatus {
     InProgress(InvestigationInProgress),
@@ -15,20 +15,20 @@ pub enum InvestigationStatus {
     ConcludedWithNewResults(InvestigationConcludedWithNewResults),
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, ToSchema, Clone, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
 pub struct InvestigationInProgress {
     pub reason: String,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, ToSchema, Clone, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
 pub struct InvestigationConcludedWithoutNewResults {
     pub reason: String,
     pub findings: String,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, ToSchema, Clone, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
 pub struct InvestigationConcludedWithNewResults {
     pub reason: String,

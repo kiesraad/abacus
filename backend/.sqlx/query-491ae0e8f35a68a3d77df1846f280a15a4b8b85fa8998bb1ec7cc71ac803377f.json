@@ -1,0 +1,98 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        SELECT\n            p.id AS \"id: PollingStationId\",\n            p.committee_session_id AS \"committee_session_id: CommitteeSessionId\",\n            c.number AS \"committee_session_number: u32\",\n            p.prev_data_entry_id AS \"prev_data_entry_id: DataEntryId\",\n            de.id AS \"data_entry_id: DataEntryId\",\n            p.investigation_state AS \"investigation_state: Json<InvestigationStatus>\",\n            p.name,\n            p.number AS \"number: PollingStationNumber\",\n            p.number_of_voters AS \"number_of_voters: u32\",\n            p.polling_station_type AS \"polling_station_type: PollingStationType\",\n            p.address,\n            p.postal_code,\n            p.locality,\n            de.state AS \"state: Json<DataEntryStatus>\"\n        FROM polling_stations AS p\n        JOIN committee_sessions AS c ON c.id = p.committee_session_id\n        JOIN data_entries AS de ON de.id = p.data_entry_id\n        WHERE c.id = $1 AND c.number = 1\n        ",
+  "describe": {
+    "columns": [
+      {
+        "name": "id: PollingStationId",
+        "ordinal": 0,
+        "type_info": "Integer"
+      },
+      {
+        "name": "committee_session_id: CommitteeSessionId",
+        "ordinal": 1,
+        "type_info": "Integer"
+      },
+      {
+        "name": "committee_session_number: u32",
+        "ordinal": 2,
+        "type_info": "Integer"
+      },
+      {
+        "name": "prev_data_entry_id: DataEntryId",
+        "ordinal": 3,
+        "type_info": "Integer"
+      },
+      {
+        "name": "data_entry_id: DataEntryId",
+        "ordinal": 4,
+        "type_info": "Integer"
+      },
+      {
+        "name": "investigation_state: Json<InvestigationStatus>",
+        "ordinal": 5,
+        "type_info": "Text"
+      },
+      {
+        "name": "name",
+        "ordinal": 6,
+        "type_info": "Text"
+      },
+      {
+        "name": "number: PollingStationNumber",
+        "ordinal": 7,
+        "type_info": "Integer"
+      },
+      {
+        "name": "number_of_voters: u32",
+        "ordinal": 8,
+        "type_info": "Integer"
+      },
+      {
+        "name": "polling_station_type: PollingStationType",
+        "ordinal": 9,
+        "type_info": "Text"
+      },
+      {
+        "name": "address",
+        "ordinal": 10,
+        "type_info": "Text"
+      },
+      {
+        "name": "postal_code",
+        "ordinal": 11,
+        "type_info": "Text"
+      },
+      {
+        "name": "locality",
+        "ordinal": 12,
+        "type_info": "Text"
+      },
+      {
+        "name": "state: Json<DataEntryStatus>",
+        "ordinal": 13,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      false,
+      true,
+      false,
+      false,
+      true,
+      true,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "491ae0e8f35a68a3d77df1846f280a15a4b8b85fa8998bb1ec7cc71ac803377f"
+}

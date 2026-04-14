@@ -1,0 +1,26 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        SELECT sc.id AS \"id: SubCommitteeId\", CASE WHEN json_extract(de.state, '$.status') = 'Definitive'\n            THEN json_extract(de.state, '$.state.results')\n            ELSE NULL\n        END AS \"data: Json<Results>\"\n        FROM sub_committees AS sc\n        LEFT JOIN data_entries AS de ON de.id = sc.data_entry_id\n        WHERE sc.committee_session_id = $1 AND \"data: Json<Results>\" IS NOT NULL\n    ",
+  "describe": {
+    "columns": [
+      {
+        "name": "id: SubCommitteeId",
+        "ordinal": 0,
+        "type_info": "Integer"
+      },
+      {
+        "name": "data: Json<Results>",
+        "ordinal": 1,
+        "type_info": "Null"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      null
+    ]
+  },
+  "hash": "0dfcc8f369847380251d30b83a967f1b33bd278cc2bac6c514955e23def4fd4e"
+}

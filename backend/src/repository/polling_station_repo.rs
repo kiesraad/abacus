@@ -1,12 +1,9 @@
-use sqlx::{Connection, FromRow, SqliteConnection, query, query_as, query_scalar, types::Json};
+use sqlx::{Connection, SqliteConnection, query, query_as, query_scalar, types::Json};
 
 use crate::{
     domain::{
         committee_session::CommitteeSessionId,
-        data_entry::{
-            DataEntryId, DataEntrySource, DataEntryStatus, DataEntryStatusWithSource,
-            PollingStationSource,
-        },
+        data_entry::{DataEntryId, DataEntryStatus, DataEntryStatusWithSource},
         election::{CommitteeCategory, ElectionId},
         investigation::InvestigationStatus,
         polling_station::{
@@ -15,129 +12,12 @@ use crate::{
             PollingStationType,
         },
     },
-    repository::{committee_session_repo, data_entry_repo},
+    repository::{
+        committee_session_repo,
+        common::{PollingStationRow, PollingStationRowLike},
+        data_entry_repo,
+    },
 };
-
-/// Polling station database row, matching the SQL schema
-#[derive(FromRow, Debug, Clone)]
-struct PollingStationRow {
-    id: PollingStationId,
-    committee_session_id: CommitteeSessionId,
-    committee_session_number: u32,
-    prev_data_entry_id: Option<DataEntryId>,
-    data_entry_id: Option<DataEntryId>,
-    investigation_state: Option<Json<InvestigationStatus>>,
-    name: String,
-    number: PollingStationNumber,
-    number_of_voters: Option<u32>,
-    polling_station_type: Option<PollingStationType>,
-    address: String,
-    postal_code: String,
-    locality: String,
-}
-
-impl From<PollingStationRow> for PollingStation {
-    fn from(row: PollingStationRow) -> Self {
-        Self {
-            id: row.id,
-            name: row.name,
-            number: row.number,
-            number_of_voters: row.number_of_voters,
-            polling_station_type: row.polling_station_type,
-            address: row.address,
-            postal_code: row.postal_code,
-            locality: row.locality,
-        }
-    }
-}
-
-impl From<PollingStationRow> for PollingStationFirstSession {
-    fn from(row: PollingStationRow) -> Self {
-        let PollingStationRow {
-            id,
-            committee_session_id,
-            committee_session_number: _,
-            prev_data_entry_id: _,
-            data_entry_id,
-            investigation_state: _,
-            name,
-            number,
-            number_of_voters,
-            polling_station_type,
-            address,
-            postal_code,
-            locality,
-        } = row;
-        Self {
-            committee_session_id,
-            data_entry_id: data_entry_id
-                .expect("first-session polling stations always have a data_entry_id"),
-            polling_station: PollingStation {
-                id,
-                name,
-                number,
-                number_of_voters,
-                polling_station_type,
-                address,
-                postal_code,
-                locality,
-            },
-        }
-    }
-}
-
-impl From<PollingStationRow> for PollingStationNextSession {
-    fn from(row: PollingStationRow) -> Self {
-        let PollingStationRow {
-            id,
-            committee_session_id,
-            committee_session_number: _,
-            prev_data_entry_id,
-            data_entry_id,
-            investigation_state,
-            name,
-            number,
-            number_of_voters,
-            polling_station_type,
-            address,
-            postal_code,
-            locality,
-        } = row;
-        Self {
-            committee_session_id,
-            prev_data_entry_id,
-            investigation_status: investigation_state.map(|json| {
-                let status = json.0;
-                match (&status, data_entry_id) {
-                    (InvestigationStatus::ConcludedWithNewResults(_), Some(id)) => {
-                        status.with_data_entry_id(id)
-                    }
-                    _ => status,
-                }
-            }),
-            polling_station: PollingStation {
-                id,
-                name,
-                number,
-                number_of_voters,
-                polling_station_type,
-                address,
-                postal_code,
-                locality,
-            },
-        }
-    }
-}
-
-impl From<PollingStationRow> for PollingStationForSession {
-    fn from(row: PollingStationRow) -> Self {
-        if row.committee_session_number > 1 {
-            Self::Next(PollingStationNextSession::from(row))
-        } else {
-            Self::First(PollingStationFirstSession::from(row))
-        }
-    }
-}
 
 #[derive(Debug)]
 pub enum CreateDataEntryError {
@@ -255,7 +135,7 @@ pub async fn get(
     )
     .fetch_one(conn)
     .await
-    .map(PollingStationForSession::from)
+    .map(PollingStationRow::into_polling_station_for_session)
 }
 
 /// Get a single polling station for an election
@@ -295,7 +175,7 @@ pub async fn get_for_election(
     )
     .fetch_one(&mut *conn)
     .await
-    .map(PollingStationForSession::from)
+    .map(PollingStationRow::into_polling_station_for_session)
 }
 
 /// Create a single polling station for an election, returning its id.
@@ -466,7 +346,7 @@ pub async fn update(
     .fetch_one(&mut *tx)
     .await?;
     tx.commit().await?;
-    Ok(PollingStationForSession::from(res))
+    Ok(res.into_polling_station_for_session())
 }
 
 /// Delete a single polling station for an election
@@ -558,7 +438,7 @@ pub async fn link_data_entry(
     )
     .fetch_one(conn)
     .await
-    .map(PollingStationForSession::from)
+    .map(PollingStationRow::into_polling_station_for_session)
 }
 
 /// Clear `data_entry_id` on a polling station (counterpart to `link_data_entry`).
@@ -583,7 +463,7 @@ pub async fn list_polling_stations(
     Ok(list(conn, committee_session_id)
         .await?
         .into_iter()
-        .map(PollingStation::from)
+        .map(PollingStationRow::into_polling_station)
         .collect())
 }
 
@@ -595,7 +475,7 @@ pub async fn list_first_session(
     Ok(list(conn, committee_session_id)
         .await?
         .into_iter()
-        .map(PollingStationFirstSession::from)
+        .map(PollingStationRow::into_polling_station_first_session)
         .collect())
 }
 
@@ -607,7 +487,19 @@ pub async fn list_next_session(
     Ok(list(conn, committee_session_id)
         .await?
         .into_iter()
-        .map(PollingStationNextSession::from)
+        .map(PollingStationRow::into_polling_station_next_session)
+        .collect())
+}
+
+/// List all polling stations for a committee session (including session metadata)
+pub async fn list_for_session(
+    conn: &mut SqliteConnection,
+    committee_session_id: CommitteeSessionId,
+) -> Result<Vec<PollingStationForSession>, sqlx::Error> {
+    Ok(list(conn, committee_session_id)
+        .await?
+        .into_iter()
+        .map(PollingStationRow::into_polling_station_for_session)
         .collect())
 }
 
@@ -669,11 +561,19 @@ pub async fn list_first_session_with_status(
     query!(
         r#"
         SELECT
-            de.id AS "data_entry_id: DataEntryId",
             p.id AS "id: PollingStationId",
-            p.number AS "number: PollingStationNumber",
-            p.name,
+            p.committee_session_id AS "committee_session_id: CommitteeSessionId",
+            c.number AS "committee_session_number: u32",
             p.prev_data_entry_id AS "prev_data_entry_id: DataEntryId",
+            de.id AS "data_entry_id: DataEntryId",
+            p.investigation_state AS "investigation_state: Json<InvestigationStatus>",
+            p.name,
+            p.number AS "number: PollingStationNumber",
+            p.number_of_voters AS "number_of_voters: u32",
+            p.polling_station_type AS "polling_station_type: PollingStationType",
+            p.address,
+            p.postal_code,
+            p.locality,
             de.state AS "state: Json<DataEntryStatus>"
         FROM polling_stations AS p
         JOIN committee_sessions AS c ON c.id = p.committee_session_id
@@ -684,12 +584,22 @@ pub async fn list_first_session_with_status(
     )
     .map(|row| DataEntryStatusWithSource {
         data_entry_id: row.data_entry_id,
-        source: DataEntrySource::PollingStation(PollingStationSource {
+        source: PollingStationRow {
             id: row.id,
-            number: row.number,
-            name: row.name,
+            committee_session_id: row.committee_session_id,
+            committee_session_number: row.committee_session_number,
             prev_data_entry_id: row.prev_data_entry_id,
-        }),
+            data_entry_id: Some(row.data_entry_id),
+            investigation_state: row.investigation_state,
+            name: row.name,
+            number: row.number,
+            number_of_voters: row.number_of_voters,
+            polling_station_type: row.polling_station_type,
+            address: row.address,
+            postal_code: row.postal_code,
+            locality: row.locality,
+        }
+        .into_polling_station_data_source(),
         status: row.state.0,
     })
     .fetch_all(conn)
@@ -705,11 +615,19 @@ pub async fn list_next_session_with_status(
     query!(
         r#"
         SELECT
-            de.id AS "data_entry_id: DataEntryId",
             p.id AS "id: PollingStationId",
-            p.number AS "number: PollingStationNumber",
-            p.name,
+            p.committee_session_id AS "committee_session_id: CommitteeSessionId",
+            c.number AS "committee_session_number: u32",
             p.prev_data_entry_id AS "prev_data_entry_id: DataEntryId",
+            de.id AS "data_entry_id: DataEntryId",
+            p.investigation_state AS "investigation_state: Json<InvestigationStatus>",
+            p.name,
+            p.number AS "number: PollingStationNumber",
+            p.number_of_voters AS "number_of_voters: u32",
+            p.polling_station_type AS "polling_station_type: PollingStationType",
+            p.address,
+            p.postal_code,
+            p.locality,
             de.state AS "state: Json<DataEntryStatus>"
         FROM polling_stations AS p
         JOIN committee_sessions AS c ON c.id = p.committee_session_id
@@ -720,12 +638,22 @@ pub async fn list_next_session_with_status(
     )
     .map(|row| DataEntryStatusWithSource {
         data_entry_id: row.data_entry_id,
-        source: DataEntrySource::PollingStation(PollingStationSource {
+        source: PollingStationRow {
             id: row.id,
-            number: row.number,
-            name: row.name,
+            committee_session_id: row.committee_session_id,
+            committee_session_number: row.committee_session_number,
             prev_data_entry_id: row.prev_data_entry_id,
-        }),
+            data_entry_id: Some(row.data_entry_id),
+            investigation_state: row.investigation_state,
+            name: row.name,
+            number: row.number,
+            number_of_voters: row.number_of_voters,
+            polling_station_type: row.polling_station_type,
+            address: row.address,
+            postal_code: row.postal_code,
+            locality: row.locality,
+        }
+        .into_polling_station_data_source(),
         status: row.state.0,
     })
     .fetch_all(conn)

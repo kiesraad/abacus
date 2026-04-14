@@ -10,7 +10,9 @@ use crate::{
     domain::{
         committee_session::{CommitteeSession, CommitteeSessionCreateRequest},
         committee_session_status::CommitteeSessionStatus,
-        data_entry::{DataEntryId, DataEntryStatus, Definitive, FirstEntryFinalised},
+        data_entry::{
+            DataEntryId, DataEntrySource, DataEntryStatus, Definitive, FirstEntryFinalised,
+        },
         election::{
             self, CandidateGender, CandidateNumber, CommitteeCategory, ElectionCategory,
             ElectionWithPoliticalGroups, NewElection, PGNumber, PoliticalGroup,
@@ -51,7 +53,7 @@ pub struct CreateTestElectionResult {
     pub election: ElectionWithPoliticalGroups,
     pub committee_session: CommitteeSession,
     pub polling_stations: Vec<PollingStation>,
-    pub results: Vec<(PollingStation, Results)>,
+    pub results: Vec<(DataEntrySource, Results)>,
     pub data_entry_completed: bool,
 }
 

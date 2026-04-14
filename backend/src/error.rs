@@ -21,7 +21,7 @@ use crate::{
         committee_session::CommitteeSessionError, role::RoleNotAuthorizedError, validate::DataError,
     },
     eml::EMLImportError,
-    repository::{data_entry_repo::ResolveSourceError, polling_station_repo},
+    repository::polling_station_repo,
     service::{DataEntryServiceError, PollingStationServiceError, SubCommitteeServiceError},
 };
 use pdf_gen::{PdfGenError, zip::ZipResponseError};
@@ -55,6 +55,7 @@ pub enum ErrorReference {
     InvalidJson,
     InvalidPassword,
     InvalidPoliticalGroup,
+    InvalidDataEntrySource,
     InvalidSession,
     InvalidStateTransition,
     InvalidUsernameOrPassword,
@@ -581,19 +582,6 @@ impl From<SubCommitteeServiceError> for APIError {
     fn from(err: SubCommitteeServiceError) -> Self {
         match err {
             SubCommitteeServiceError::DatabaseError(e) => e.into(),
-        }
-    }
-}
-
-impl From<ResolveSourceError> for APIError {
-    fn from(err: ResolveSourceError) -> Self {
-        match err {
-            ResolveSourceError::Sqlx(e) => e.into(),
-            ResolveSourceError::DataIntegrity(msg) => APIError::DataIntegrityError(msg),
-            ResolveSourceError::OrphanedDataEntry(id) => APIError::NotFound(
-                format!("Data entry {id} has no associated source"),
-                ErrorReference::EntryNotFound,
-            ),
         }
     }
 }

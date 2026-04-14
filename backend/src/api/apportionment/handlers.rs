@@ -19,8 +19,6 @@ use crate::{
     domain::{
         committee_session_status::CommitteeSessionStatus,
         election::{Election, ElectionId},
-        polling_station::PollingStation,
-        results::Results,
         summary::ElectionSummary,
     },
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType},
@@ -66,12 +64,11 @@ pub async fn election_apportionment(
         committee_session_repo::get_election_committee_session(&mut conn, election.id).await?;
 
     if current_committee_session.status == CommitteeSessionStatus::Completed {
-        let results: Vec<(PollingStation, Results)> =
-            data_entry_repo::list_results_for_committee_session(
-                &mut conn,
-                current_committee_session.id,
-            )
-            .await?;
+        let results = data_entry_repo::list_results_for_committee_session(
+            &mut conn,
+            current_committee_session.id,
+        )
+        .await?;
 
         let summary = ElectionSummary::from_results(&election, &results)?;
         let input = ApportionmentInputData {

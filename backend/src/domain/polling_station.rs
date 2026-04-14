@@ -23,15 +23,18 @@ id!(PollingStationId);
 
 /// Polling station base entity, linked to an election but
 /// independent of the committee session or data entry.
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, ToSchema, Debug, Clone)]
+#[schema(as = BasePollingStation)]
 #[serde(deny_unknown_fields)]
 pub struct PollingStation {
     pub id: PollingStationId,
     pub name: String,
     pub number: PollingStationNumber,
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
     pub number_of_voters: Option<u32>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
     pub polling_station_type: Option<PollingStationType>,
     pub address: String,
     pub postal_code: String,
@@ -145,20 +148,26 @@ impl From<String> for PollingStationType {
 
 /// Polling station in a first committee session.
 /// No investigations, no previous data entries.
-#[derive(Debug, Clone)]
+#[derive(Serialize, Deserialize, ToSchema, Debug, Clone)]
 pub struct PollingStationFirstSession {
     pub committee_session_id: CommitteeSessionId,
+    #[serde(flatten)]
     pub polling_station: PollingStation,
     pub data_entry_id: DataEntryId,
 }
 
 /// Polling station in a next committee session.
 /// May have previous data entries and investigation state.
-#[derive(Debug, Clone)]
+#[derive(Serialize, Deserialize, ToSchema, Debug, Clone)]
 pub struct PollingStationNextSession {
     pub committee_session_id: CommitteeSessionId,
+    #[serde(flatten)]
     pub polling_station: PollingStation,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
     pub prev_data_entry_id: Option<DataEntryId>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
     pub investigation_status: Option<InvestigationStatus>,
 }
 
@@ -211,7 +220,8 @@ impl PollingStationNextSession {
 }
 
 /// A single polling station for either a first or next committee session
-#[derive(Debug, Clone)]
+#[derive(Serialize, Deserialize, ToSchema, Debug, Clone)]
+#[serde(tag = "session_type")]
 pub enum PollingStationForSession {
     First(PollingStationFirstSession),
     Next(PollingStationNextSession),
@@ -227,6 +237,10 @@ impl PollingStationForSession {
 
     pub fn id(&self) -> PollingStationId {
         self.polling_station().id
+    }
+
+    pub fn number(&self) -> PollingStationNumber {
+        self.polling_station().number
     }
 
     pub fn committee_session_id(&self) -> CommitteeSessionId {

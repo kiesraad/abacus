@@ -64,7 +64,7 @@ struct Args {
     #[arg(long, default_value = "9..=45", value_parser = parse_range::<u32>)]
     seats: Range<u32>,
 
-    /// Generate multiple elections, each resulting in a different P22-2 variant
+    /// Generate multiple elections, each resulting in a different P 22-2 variant
     #[arg(long)]
     generate_p22_2_variants: bool,
 

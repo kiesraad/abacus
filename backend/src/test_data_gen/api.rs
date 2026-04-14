@@ -74,8 +74,13 @@ async fn generate_election_handler(
 
         // 5. Test Election < 19 seats & List Exhaustion
         //    based on test `lt_19_seats::test_with_list_exhaustion_triggering_2nd_round_highest_average_assignment_with_different_averages`
-        let _ =
-            create_test_election_with_votes(&args, &pool, 6, vec![vec![3, 3], vec![2, 2], vec![25, 25]]).await;
+        let _ = create_test_election_with_votes(
+            &args,
+            &pool,
+            6,
+            vec![vec![3, 3], vec![2, 2], vec![25, 25]],
+        )
+        .await;
     } else {
         let _ = super::create_test_election(args.clone(), pool.clone(), None).await?;
     }

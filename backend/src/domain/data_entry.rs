@@ -101,21 +101,6 @@ impl DataEntrySource {
         }
     }
 
-    pub fn as_basic(&self) -> BasicDataEntrySource {
-        match self {
-            DataEntrySource::PollingStation(source) => {
-                BasicDataEntrySource::PollingStation(BasicPollingStationSource {
-                    id: source.id(),
-                    number: source.number(),
-                    name: source.polling_station().name.clone(),
-                })
-            }
-            DataEntrySource::SubCommittee(source) => {
-                BasicDataEntrySource::SubCommittee(source.sub_committee.clone())
-            }
-        }
-    }
-
     pub fn id(&self) -> DataEntrySourceId {
         match self {
             DataEntrySource::PollingStation(source) => {
@@ -191,21 +176,6 @@ impl Display for DataEntrySourceNumber {
 pub enum DataEntrySourceId {
     PollingStation(PollingStationId),
     SubCommittee(SubCommitteeId),
-}
-
-#[derive(Serialize, Deserialize, ToSchema, Debug)]
-#[serde(tag = "type")]
-pub enum BasicDataEntrySource {
-    PollingStation(BasicPollingStationSource),
-    SubCommittee(SubCommittee),
-}
-
-#[derive(Serialize, Deserialize, ToSchema, Debug)]
-pub struct BasicPollingStationSource {
-    pub id: PollingStationId,
-    #[schema(value_type = u32)]
-    pub number: PollingStationNumber,
-    pub name: String,
 }
 
 /// Context about which entity owns a given data entry

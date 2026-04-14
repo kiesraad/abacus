@@ -1,18 +1,23 @@
 import { describe, expect, test } from "vitest";
+import { type CommitteeCategory, committeeCategoryValues } from "@/types/generated/openapi";
+import translations from "./locales/nl/nl.ts";
 
-import feedback from "./locales/nl/feedback.json";
-
-describe("feedback.json structure", () => {
-  test("validate feedback entries", () => {
-    const feedbackItems = Object.values(feedback).flatMap((item) => {
-      if (typeof item !== "object") return [];
-      return [item.typist, item.coordinator];
-    });
+describe("feedback translations structure", () => {
+  test.each(committeeCategoryValues)("validate feedback_%s.json", (cat: CommitteeCategory) => {
+    const feedback = translations[`feedback_${cat}`];
+    const feedbackItems = Object.values(feedback);
 
     for (const entry of feedbackItems) {
-      const keys = Object.keys(entry);
+      if ("typist" in entry) {
+        // No other keys than below allowed
+        for (const key of Object.keys(entry.typist)) {
+          expect(["title", "content", "actions"]).toContain(key);
+        }
+      }
 
-      // Title is mandatory
+      const keys = Object.keys(entry.coordinator);
+
+      // Coordinator title is mandatory
       expect(keys).toContain("title");
 
       // No other keys than below allowed

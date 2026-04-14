@@ -16,7 +16,7 @@ import { useUser } from "@/hooks/user/useUser";
 import { t } from "@/i18n/translate";
 import type { CommitteeCategory } from "@/types/generated/openapi.ts";
 import { KeyboardKey } from "@/types/ui";
-
+import { getTranslations } from "@/utils/ValidationResults";
 import { useDataEntryFormSection } from "../hooks/useDataEntryFormSection";
 import { DataEntryNavigation } from "./DataEntryNavigation";
 import cls from "./DataEntrySection.module.css";
@@ -29,18 +29,19 @@ export interface DataEntryProps {
 export function DataEntrySection({ committeeCategory }: DataEntryProps) {
   const user = useUser();
   const {
+    currentValues,
+    defaultProps,
+    election,
     error,
     formRef,
+    formSection,
     onSubmit,
     previousValues,
-    currentValues,
-    setValues,
-    formSection,
-    status,
-    setAcceptErrorsAndWarnings,
-    defaultProps,
-    showAcceptErrorsAndWarnings,
     section,
+    setAcceptErrorsAndWarnings,
+    setValues,
+    showAcceptErrorsAndWarnings,
+    status,
   } = useDataEntryFormSection();
   const acceptCheckboxRef = useRef<HTMLInputElement>(null);
 
@@ -52,7 +53,7 @@ export function DataEntrySection({ committeeCategory }: DataEntryProps) {
   const keyboardHintText = section.id.startsWith("political_group_votes_") ? t("candidates_votes.goto_totals") : null;
 
   // Missing totals error for political group votes form
-  const missingTotalError = formSection.errors.includes("F401");
+  const missingTotalError = formSection.errors.find("F401");
 
   // Memoize errors to prevent unnecessary focus triggers in Feedback
   const memoizedErrors = useMemo(
@@ -94,13 +95,21 @@ export function DataEntrySection({ committeeCategory }: DataEntryProps) {
         )}
         {error instanceof ApiError && <ErrorModal error={error} />}
         {formSection.isSaved && memoizedErrors.length > 0 && (
-          <Feedback id="feedback-error" type="error" data={memoizedErrors} userRole={user.role} shouldFocus={true} />
+          <Feedback
+            id="feedback-error"
+            type="error"
+            election={election}
+            validationResults={memoizedErrors}
+            userRole={user.role}
+            shouldFocus={true}
+          />
         )}
         {formSection.isSaved && memoizedWarnings.length > 0 && (
           <Feedback
             id="feedback-warning"
             type="warning"
-            data={memoizedWarnings}
+            election={election}
+            validationResults={memoizedWarnings}
             userRole={user.role}
             shouldFocus={formSection.errors.isEmpty()}
           />
@@ -113,13 +122,13 @@ export function DataEntrySection({ committeeCategory }: DataEntryProps) {
           currentValues={currentValues}
           setValues={setValues}
           defaultProps={defaultProps}
-          missingTotalError={missingTotalError}
+          missingTotalError={missingTotalError !== undefined}
         />
 
         {missingTotalError && (
           <div id="missing-total-error" className={cls.missingTotalError}>
             <Alert type="error" small>
-              <p>{t(`feedback.F401.typist.title`)}</p>
+              <p>{getTranslations(election, missingTotalError, "typist").title}</p>
             </Alert>
           </div>
         )}

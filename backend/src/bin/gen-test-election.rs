@@ -9,6 +9,7 @@ use abacus::{
     create_sqlite_pool,
     domain::{
         committee_session::CommitteeSession,
+        data_entry::DataEntrySource,
         election::{CommitteeCategory, ElectionWithPoliticalGroups},
         models::{ModelNa31_2Input, ToPdfFileModel},
         polling_station::PollingStation,
@@ -168,7 +169,7 @@ async fn export_election(
     election: &ElectionWithPoliticalGroups,
     polling_stations: &[PollingStation],
     export_results_json: bool,
-    results: Vec<(PollingStation, Results)>,
+    results: Vec<(DataEntrySource, Results)>,
 ) {
     if export_dir.exists() && !export_dir.is_dir() {
         panic!("Export directory already exists and is not a directory");

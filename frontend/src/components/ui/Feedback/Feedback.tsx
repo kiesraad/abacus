@@ -1,11 +1,11 @@
 import { type ReactNode, useEffect, useRef } from "react";
 
-import { hasTranslation, t, tx } from "@/i18n/translate";
-import type { Role, ValidationResult } from "@/types/generated/openapi";
+import { t, tx } from "@/i18n/translate";
+import type { Election, Role, ValidationResult } from "@/types/generated/openapi";
 import type { AlertType, FeedbackId } from "@/types/ui";
 import { cn } from "@/utils/classnames";
 import { isAdministrator, isCoordinator } from "@/utils/role";
-import { dottedCode } from "@/utils/ValidationResults";
+import { getTranslations } from "@/utils/ValidationResults";
 import { AlertIcon } from "../Icon/AlertIcon";
 import cls from "./Feedback.module.css";
 
@@ -19,36 +19,30 @@ interface FeedbackItem {
 interface FeedbackProps {
   id: FeedbackId;
   type: AlertType;
-  data: ValidationResult[];
+  validationResults: ValidationResult[];
+  election: Election;
   userRole: Role;
   shouldFocus?: boolean;
 }
 
-export function Feedback({ id, type, data, userRole, shouldFocus = true }: FeedbackProps) {
+export function Feedback({ id, type, election, validationResults, userRole, shouldFocus = true }: FeedbackProps) {
   const feedbackHeader = useRef<HTMLHeadingElement | null>(null);
+
   // NOTE: Administrators get the same feedback messages as the coordinator
   const role = isAdministrator(userRole) || isCoordinator(userRole) ? "coordinator" : "typist";
+
   const feedbackList: FeedbackItem[] = [];
-  for (const { code, context } of data) {
-    const title = t(`feedback.${code}.${role}.title`, { ...context });
-    const contentPath = `feedback.${code}.${role}.content`;
-    const actionsPath = `feedback.${code}.${role}.actions`;
-    const content = hasTranslation(contentPath) ? tx(contentPath, undefined, { ...context }) : undefined;
-    const actions = hasTranslation(actionsPath) ? tx(actionsPath, undefined, { ...context }) : undefined;
+  for (const result of validationResults) {
+    const { code, title, content, actions } = getTranslations(election, result, role);
 
     const identical = feedbackList.find(
       (item) => item.title === title && item.content === content && item.actions === actions,
     );
 
     if (identical) {
-      identical.codes.push(dottedCode(code));
+      identical.codes.push(code);
     } else {
-      feedbackList.push({
-        title,
-        codes: [dottedCode(code)],
-        content,
-        actions,
-      });
+      feedbackList.push({ title, codes: [code], content, actions });
     }
   }
 

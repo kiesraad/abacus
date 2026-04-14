@@ -108,7 +108,14 @@ export const ReadOnlySection: StoryObj<Props> = {
       return <div>Section not found</div>;
     }
 
-    return <ReadOnlyDataEntrySection section={selectedSection} data={results} validationResults={validationResults} />;
+    return (
+      <ReadOnlyDataEntrySection
+        election={electionMockData}
+        section={selectedSection}
+        dataEntryResults={results}
+        validationResults={validationResults}
+      />
+    );
   },
 };
 

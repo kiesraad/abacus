@@ -17,7 +17,7 @@ import { useMessages } from "@/hooks/messages/useMessages";
 import { t, tx } from "@/i18n/translate";
 import type { FormSectionId } from "@/types/types";
 import { KeyboardKey, type MenuStatus } from "@/types/ui";
-import { dottedCode } from "@/utils/ValidationResults";
+import { getTranslations } from "@/utils/ValidationResults";
 
 import { useDataEntryContext } from "../../hooks/useDataEntryContext";
 import { useFormKeyboardNavigation } from "../../hooks/useFormKeyboardNavigation";
@@ -168,21 +168,19 @@ export function CheckAndSaveForm() {
                     <Link to={getUrlForFormSection(section.id)}>{title}</Link>
                   </StatusList.Title>
                   <StatusList id={`save-form-summary-list-${section.id}`} gap="sm">
-                    {section.errors.getAll().map(({ code, context }) => {
+                    {section.errors.getAll().map((result) => {
+                      const { code, title } = getTranslations(election, result, "typist");
                       return (
-                        <StatusList.Item key={code} status="error" id={`section-error-${section.id}-${code}`}>
-                          <strong>{dottedCode(code)}</strong>
-                          &nbsp;
-                          {tx(`feedback.${code}.typist.title`, undefined, { ...context })}
+                        <StatusList.Item key={code} status="error">
+                          <strong>{code}</strong>&nbsp;{title}
                         </StatusList.Item>
                       );
                     })}
-                    {section.warnings.getAll().map(({ code, context }) => {
+                    {section.warnings.getAll().map((result) => {
+                      const { code, title } = getTranslations(election, result, "typist");
                       return (
-                        <StatusList.Item key={code} status="warning" id={`section-error-${section.id}-${code}`}>
-                          <strong>{dottedCode(code)}</strong>
-                          &nbsp;
-                          {tx(`feedback.${code}.typist.title`, undefined, { ...context })}
+                        <StatusList.Item key={code} status="warning">
+                          <strong>{code}</strong>&nbsp;{title}
                         </StatusList.Item>
                       );
                     })}

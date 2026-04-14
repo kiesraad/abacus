@@ -1,0 +1,81 @@
+{
+  "F201": {
+    "coordinator": {
+      "title": "A en B tellen niet op tot D",
+      "content": "Controleer in rubriek 3.3 (eerste zitting) of 2.3 (volgende zitting) of er een onverklaard verschil opgelost wordt als het juiste getal bij D wordt ingevuld.",
+      "actions": "<ul><li>Zo ja: herstel op papier de optelfout door bij D het juiste getal in te vullen.</li><li>Zo nee: tel de stembiljetten en het aantal toegelaten kiezers opnieuw tot de fout gevonden is, of alles één keer herteld is.</li></ul>"
+    }
+  },
+  "F202": {
+    "coordinator": {
+      "title": "De stemmen op lijsten tellen niet op tot E",
+      "content": "Controleer in rubriek 3.3 (eerste zitting) of 2.3 (volgende zitting) of er een onverklaard verschil opgelost wordt als de juiste getallen bij E en H worden ingevuld.",
+      "actions": "<ul><li>Zo ja: herstel op papier de optelfout door bij E en H de juiste getallen in te vullen.</li><li>Zo nee: tel de stembiljetten en het aantal toegelaten kiezers opnieuw tot de fout gevonden is, of alles één keer herteld is.</li></ul>"
+    }
+  },
+  "F203": {
+    "coordinator": {
+      "title": "E, F en G tellen niet op tot H",
+      "content": "Controleer in rubriek 3.3 (eerste zitting) of 2.3 (volgende zitting) of er een onverklaard verschil opgelost wordt als het juiste getal bij H wordt ingevuld.",
+      "actions": "<ul><li>Zo ja: herstel op papier de optelfout door bij H het juiste getal in te vullen.</li><li>Zo nee: tel de stembiljetten en het aantal toegelaten kiezers opnieuw tot de fout gevonden is, of alles één keer herteld is.</li></ul>"
+    }
+  },
+  "F312": {
+    "coordinator": {
+      "title": "D is niet gelijk aan H min I plus J",
+      "content": "Je kan niet verder met dit proces-verbaal. Controleer of er iets is misgegaan bij het opmaken of overdragen van het proces-verbaal van het onderliggende niveau."
+    }
+  },
+  "F401": {
+    "typist": {
+      "title": "Controleer het totaal van de lijst. Is dit veld op het papieren proces-verbaal ook leeg? Dan kan je verdergaan. (F.401)"
+    },
+    "coordinator": {
+      "title": "Het totaal van de lijst is niet ingevuld",
+      "content": "Controleer of het proces-verbaal tijdens het telproces volledig is ingevuld (controleer ook E.{political_group_number} in rubriek 3.2 (eerste zitting) of 2.2 (volgende zitting)).\nKijk of het corrigeren van de fout een onverklaard verschil wegneemt in rubriek 3.3 (eerste zitting) of 2.3 (volgende zitting).",
+      "actions": "<ul><li>Zo ja: corrigeer de optelfout op het papieren proces-verbaal.</li><li>Zo nee: onderzoek wat er fout is gegaan en tel zo nodig de stembiljetten en het aantal toegelaten kiezers opnieuw. Begin bij deze lijst, en hertel tot de fout gevonden is, of alles één keer herteld is.</li></ul>"
+    }
+  },
+  "F402": {
+    "typist": {
+      "title": "Controleer ingevoerde aantallen",
+      "content": "De opgetelde stemmen op de kandidaten en het ingevoerde totaal zijn niet gelijk."
+    },
+    "coordinator": {
+      "title": "De stemmen op kandidaten tellen niet op tot het lijsttotaal",
+      "content": "Controleer of het proces-verbaal tijdens het telproces volledig is ingevuld.\nReken de optelling in het papieren proces-verbaal na.\nKijk of het corrigeren van de fout een onverklaard verschil wegneemt in rubriek 3.3 (eerste zitting) of 2.3 (volgende zitting).",
+      "actions": "<ul><li>Zo ja: corrigeer de optelfout op het papieren proces-verbaal.</li><li>Zo nee: onderzoek wat er fout is gegaan en tel zo nodig de stembiljetten en het aantal toegelaten kiezers opnieuw. Begin bij deze lijst, en hertel tot de fout gevonden is, of alles één keer herteld is.</li></ul>"
+    }
+  },
+  "F403": {
+    "typist": {
+      "title": "Controleer het totaal van de lijst",
+      "content": "Als het totaal overeenkomt met het papieren proces-verbaal, controleer dan ook de waarde bij E.{political_group_number} bij <Link to=\"../voters_votes_counts\">Aantal kiezers en stemmen</Link>."
+    },
+    "coordinator": {
+      "title": "Controleer het totaal van de lijst en E.{political_group_number} in rubriek 3.2 (eerste zitting) of 2.2 (volgende zitting)",
+      "actions": "<ul><li>Controleer wat er fout is gegaan in rubriek 3.2 (eerste zitting) of 2.2 (volgende zitting) en herstel de fout.</li><li>Pas zo nodig rubriek 3.3.2 (eerste zitting) of 2.3.2 (volgende zitting) aan, en volg de instructies over hertellen die daar staan.</li></ul>"
+    }
+  },
+  "W001": {
+    "typist": {
+      "title": "Extra controle nodig",
+      "content": "De gemarkeerde velden zijn anders dan in de eerste invoer."
+    },
+    "coordinator": {
+      "title": "W.001 is er alleen voor invoerders",
+      "content": "Voor de coördinator hebben we het scherm 'verschillen oplossen'.",
+      "actions": ""
+    }
+  },
+  "W204": {
+    "typist": {
+      "title": "Controleer H"
+    },
+    "coordinator": {
+      "title": "Het totaal aantal uitgebrachte stemmen (H) is nul",
+      "content": "Controleer of het stembureau is opgenomen in de vóór de verkiezing gepubliceerde lijst.",
+      "actions": "<ul><li>Zo ja: verklaar in het proces-verbaal van het GSB (rubriek 1.2) waarom in dit stembureau geen stemmen zijn uitgebracht.</li><li>Zo nee: verwijder het stembureau uit Abacus. Het proces-verbaal moet niet ingevoerd worden.</li></ul>"
+    }
+  }
+}

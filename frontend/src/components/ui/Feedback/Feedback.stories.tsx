@@ -1,10 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ComponentProps } from "react";
 import { expect } from "storybook/test";
-
+import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMockData";
 import type { ValidationResultCode } from "@/types/generated/openapi";
-
 import { Feedback } from "./Feedback";
 
 const validationResultCodes = Object.keys(validationResultMockData) as ValidationResultCode[];
@@ -12,7 +11,7 @@ const validationResultCodes = Object.keys(validationResultMockData) as Validatio
 const meta = {
   component: Feedback,
   argTypes: {
-    data: {
+    validationResults: {
       options: validationResultCodes,
       control: { type: "multi-select" },
     },
@@ -24,17 +23,20 @@ const meta = {
 
 export default meta;
 
-type StoryArgs = Omit<ComponentProps<typeof Feedback>, "data"> & {
-  data: ValidationResultCode[];
+type StoryArgs = Omit<ComponentProps<typeof Feedback>, "validationResults"> & {
+  validationResults: ValidationResultCode[];
 };
 type Story = StoryObj<StoryArgs>;
 
 export const Coordinator: Story = {
-  render: (args) => <Feedback {...args} data={args.data.map((code) => validationResultMockData[code])} />,
+  render: (args) => (
+    <Feedback {...args} validationResults={args.validationResults.map((code) => validationResultMockData[code])} />
+  ),
   args: {
     id: "feedback-error",
     type: "error",
-    data: ["F201", "F202"],
+    election: electionMockData,
+    validationResults: ["F201", "F202"],
     userRole: "coordinator_gsb",
   },
   play: async ({ canvas }) => {
@@ -53,11 +55,14 @@ export const Coordinator: Story = {
 };
 
 export const Typist: Story = {
-  render: (args) => <Feedback {...args} data={args.data.map((c) => validationResultMockData[c])} />,
+  render: (args) => (
+    <Feedback {...args} validationResults={args.validationResults.map((c) => validationResultMockData[c])} />
+  ),
   args: {
     id: "feedback-error",
     type: "error",
-    data: ["F201", "F202"],
+    election: electionMockData,
+    validationResults: ["F201", "F202"],
     userRole: "typist_gsb",
   },
   play: async ({ canvas }) => {

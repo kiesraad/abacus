@@ -14,9 +14,7 @@ use crate::{
         identifier::id,
         polling_station::{PollingStationForSession, PollingStationId, PollingStationNumber},
         results::Results,
-        sub_committee::{
-            SubCommittee, SubCommitteeFirstSession, SubCommitteeId, SubCommitteeNumber,
-        },
+        sub_committee::{SubCommitteeFirstSession, SubCommitteeId, SubCommitteeNumber},
         validate::{
             DataError, Validate, ValidateRoot, ValidationResult, ValidationResultCode,
             ValidationResults,

@@ -44,7 +44,7 @@ use crate::{
         user_repo::UserId,
     },
     service::create_sub_committee,
-    test_data_gen::GenerateElectionArgs,
+    test_data_gen::{GenerateElectionArgs, RandomRange},
 };
 
 pub struct CreateTestElectionResult {
@@ -199,7 +199,8 @@ pub async fn create_test_election(
     let mut tx = pool.begin_immediate().await?;
 
     // generate and store the election
-    let election = election_repo::create(&mut tx, generate_election(&mut rng, &args)).await?;
+    let election =
+        election_repo::create(&mut tx, generate_election(&mut rng, &args, votes.clone())).await?;
 
     // generate the committee session for the election
     let mut committee_session = committee_session_repo::create(
@@ -252,14 +253,27 @@ pub async fn create_test_election(
 }
 
 /// Generate a random election using the limits from args.
-fn generate_election(rng: &mut impl rand::RngExt, args: &GenerateElectionArgs) -> NewElection {
+fn generate_election(
+    rng: &mut impl rand::RngExt,
+    args: &GenerateElectionArgs,
+    votes: Option<Vec<Vec<u32>>>,
+) -> NewElection {
     // start by generating the political groups
     let mut political_groups = vec![];
     let num_political_groups = rng.random_range(args.political_groups.clone());
     info!("Generating {num_political_groups} political groups");
 
-    for i in 1..=num_political_groups {
-        political_groups.push(generate_political_party(rng, PGNumber::from(i), args));
+    for i in 0..num_political_groups {
+        if let Some(ref v) = votes {
+            let candidates_per_group =
+                u32::try_from(v.get(i as usize).expect("should exist in votes").len())
+                    .expect("length should fit in u32");
+            let mut args = args.clone();
+            args.candidates_per_group = RandomRange(candidates_per_group..candidates_per_group + 1);
+            political_groups.push(generate_political_party(rng, PGNumber::from(i + 1), &args));
+        } else {
+            political_groups.push(generate_political_party(rng, PGNumber::from(i + 1), args));
+        }
     }
 
     // generate a nomination date, and an election date not too long afterward

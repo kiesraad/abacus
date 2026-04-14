@@ -161,7 +161,7 @@ Vul alléén de getallen in die veranderd zijn ten opzichte van een eerdere tell
 
 #for political_group in input.votes_tables {
   votes_table(
-    title: [#format_political_group_name(political_group.number, political_group.name, with_prefix: "with_list_prefix")],
+    title: [#political_group.number #political_group.name],
     headers: ("Kandidaat", "", "Oorspronkelijk", "Gecorrigeerd"),
     total: political_group.total,
     previous_total: political_group.previous_total,

@@ -496,7 +496,7 @@ impl ElectionWithPoliticalGroups {
         transaction_id: Option<u64>,
         committee_session: &CommitteeSession,
         results: &[(
-            crate::domain::polling_station::PollingStation,
+            crate::domain::data_entry::DataEntrySource,
             crate::domain::results::Results,
         )],
         summary: &ElectionSummary,
@@ -529,7 +529,7 @@ impl ElectionWithPoliticalGroups {
         &self,
         committee_session: &CommitteeSession,
         results: &[(
-            crate::domain::polling_station::PollingStation,
+            crate::domain::data_entry::DataEntrySource,
             crate::domain::results::Results,
         )],
         summary: &ElectionSummary,
@@ -571,11 +571,11 @@ impl ElectionWithPoliticalGroups {
             .reporting_unit_votes(
                 results
                     .iter()
-                    .map(|(ps, ps_res)| {
+                    .map(|(data_source, ps_res)| {
                         self.as_eml_reporting_unit_votes(
                             committee_session,
                             authority_id,
-                            ps,
+                            data_source,
                             ps_res,
                         )
                     })
@@ -619,22 +619,23 @@ impl ElectionWithPoliticalGroups {
         &self,
         committee_session: &CommitteeSession,
         authority_id: &str,
-        polling_station: &crate::domain::polling_station::PollingStation,
+        data_source: &crate::domain::data_entry::DataEntrySource,
         results: &crate::domain::results::Results,
     ) -> Result<ReportingUnitVotes, EMLError> {
         let mut builder = ReportingUnitVotes::builder()
             .identifier(ReportingUnitIdentifier::new(
-                ReportingUnitIdentifierId::new(format!(
-                    "{authority_id}::SB{}",
-                    polling_station.number
-                ))?,
-                format!(
-                    "{} (postcode: {})",
-                    polling_station.name, polling_station.postal_code
-                ),
+                ReportingUnitIdentifierId::new(
+                    data_source.eml_reporting_unit_identifier_number(authority_id),
+                )?,
+                data_source.eml_reporting_unit_identifier_name(),
             ))
             .selections(self.as_eml_count_selections(results.political_group_votes())?)
-            .eligible_voter_count(polling_station.number_of_voters.unwrap_or(0))
+            .eligible_voter_count(match results {
+                Results::GSB(gsb_results) => gsb_results.number_of_voters,
+                Results::CSOFirstSession(_) | Results::CSONextSession(_) => {
+                    data_source.eml_eligible_voter_count().unwrap_or(0)
+                }
+            })
             .candidate_votes_count(results.votes_counts().total_votes_candidates_count)
             .rejected_votes(
                 RejectedVotesReason::Blank,

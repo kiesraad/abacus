@@ -4,8 +4,9 @@ use utoipa::ToSchema;
 use crate::{
     APIError,
     domain::{
+        data_entry::{DataEntrySource, DataEntrySourceNumber},
         election::ElectionWithPoliticalGroups,
-        polling_station::{PollingStation, PollingStationNumber},
+        polling_station::PollingStationForSession,
         results::{
             CommonDifferencesCounts, Results,
             count::Count,
@@ -34,6 +35,10 @@ pub struct ElectionSummary {
     pub political_group_votes: Vec<PoliticalGroupCandidateVotes>,
     /// Polling stations where results were investigated by the GSB
     pub polling_station_investigations: PollingStationInvestigations,
+    /// The number of voters (i.e. "Kiesgerechtigden")
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    pub number_of_voters: Option<u32>,
 }
 
 impl ElectionSummary {
@@ -55,23 +60,24 @@ impl ElectionSummary {
             differences_counts: SummaryDifferencesCounts::zero(),
             polling_station_investigations: PollingStationInvestigations::default(),
             political_group_votes: vec![],
+            number_of_voters: None,
         }
     }
 
     fn process_results(
         election: &ElectionWithPoliticalGroups,
-        results: &[(PollingStation, Results)],
+        results: &[(DataEntrySource, Results)],
         totals: &mut ElectionSummary,
     ) -> Result<ElectionSummary, APIError> {
         // list of polling stations for which we processed results
-        let mut touched_polling_stations: Vec<PollingStationNumber> = vec![];
+        let mut touched_data_sources: Vec<DataEntrySourceNumber> = vec![];
 
         // loop over results and add them to the running total
-        for (polling_station, result) in results {
+        for (data_source, result) in results {
             // Check that we didn't previously touch this polling station
-            if touched_polling_stations.contains(&polling_station.number) {
+            if touched_data_sources.contains(&data_source.number()) {
                 return Err(APIError::AddError(
-                    format!("Polling station {} is repeated", polling_station.number),
+                    format!("Data entry source {} is repeated", data_source.number()),
                     ErrorReference::PollingStationRepeated,
                 ));
             }
@@ -82,8 +88,9 @@ impl ElectionSummary {
             if validation_results.has_errors() {
                 return Err(APIError::AddError(
                     format!(
-                        "Polling station {} has validation errors: {:?}",
-                        polling_station.number, validation_results
+                        "Data entry source {} has validation errors: {:?}",
+                        data_source.number(),
+                        validation_results
                     ),
                     ErrorReference::PollingStationValidationErrors,
                 ));
@@ -96,7 +103,7 @@ impl ElectionSummary {
             // add any differences noted to the total
             totals
                 .differences_counts
-                .add_results(polling_station, &result.differences_counts());
+                .add_results(data_source, &result.differences_counts());
 
             // add votes for each political group to the total
             for pg in result.political_group_votes().iter() {
@@ -111,14 +118,33 @@ impl ElectionSummary {
                 pg_total.add(pg)?;
             }
 
+            // For the first session CSO results, we need to add investigation status information to the totals
             if let Results::CSOFirstSession(cso_first_result) = result {
+                // the data source must be a polling station at this point
+                let DataEntrySource::PollingStation(polling_station_source) = data_source else {
+                    return Err(APIError::AddError(
+                        format!(
+                            "Expected polling station data entry source, got {:?}",
+                            data_source
+                        ),
+                        ErrorReference::InvalidDataEntrySource,
+                    ));
+                };
+
                 // add checkbox states for this polling station
                 totals
                     .polling_station_investigations
-                    .append_result(polling_station, cso_first_result);
+                    .append_result(polling_station_source, cso_first_result);
             }
 
-            touched_polling_stations.push(polling_station.number);
+            // GSB results contain number of voters which need to be added
+            if let Results::GSB(gsb_result) = result {
+                // this retrieves the current total number of voters, or initializes it to zero if not yet set
+                // and then adds the number of voters for this result to it
+                *totals.number_of_voters.get_or_insert(0) += gsb_result.number_of_voters;
+            }
+
+            touched_data_sources.push(data_source.number());
         }
 
         Ok(totals.clone())
@@ -128,7 +154,7 @@ impl ElectionSummary {
     /// data from the election for candidates and political groups.
     pub fn from_results(
         election: &ElectionWithPoliticalGroups,
-        results: &[(PollingStation, Results)],
+        results: &[(DataEntrySource, Results)],
     ) -> Result<ElectionSummary, APIError> {
         // running totals
         let mut totals = ElectionSummary::zero();
@@ -185,13 +211,13 @@ impl SummaryDifferencesCounts {
     /// Add the differences for a specific polling station to the total.
     pub fn add_results(
         &mut self,
-        polling_station: &PollingStation,
+        data_source: &DataEntrySource,
         differences_counts: &CommonDifferencesCounts,
     ) {
         self.more_ballots_count
-            .add(polling_station, *differences_counts.more_ballots_count);
+            .add(data_source, *differences_counts.more_ballots_count);
         self.fewer_ballots_count
-            .add(polling_station, *differences_counts.fewer_ballots_count);
+            .add(data_source, *differences_counts.fewer_ballots_count);
     }
 }
 
@@ -202,7 +228,7 @@ impl SummaryDifferencesCounts {
 pub struct SumCount {
     #[schema(value_type = u32)]
     pub count: Count,
-    pub polling_stations: Vec<u32>,
+    pub data_entry_sources: Vec<DataEntrySourceNumber>,
 }
 
 impl SumCount {
@@ -210,15 +236,15 @@ impl SumCount {
     pub fn zero() -> SumCount {
         SumCount {
             count: 0,
-            polling_stations: vec![],
+            data_entry_sources: vec![],
         }
     }
 
     /// Add the count for a specific polling station to this summary count.
-    pub fn add(&mut self, polling_station: &PollingStation, count: Count) {
+    pub fn add(&mut self, data_source: &DataEntrySource, count: Count) {
         if count > 0 {
             self.count += count;
-            self.polling_stations.push(polling_station.number);
+            self.data_entry_sources.push(data_source.number());
         }
     }
 }
@@ -242,11 +268,12 @@ pub struct PollingStationInvestigations {
 impl PollingStationInvestigations {
     pub fn append_result(
         &mut self,
-        polling_station: &PollingStation,
+        polling_station: &PollingStationForSession,
         result: &CSOFirstSessionResults,
     ) {
         if result.admitted_voters_have_been_recounted() {
-            self.admitted_voters_recounted.push(polling_station.number);
+            self.admitted_voters_recounted
+                .push(polling_station.number());
         }
 
         if let Some(true) = result
@@ -254,7 +281,8 @@ impl PollingStationInvestigations {
             .extra_investigation_other_reason
             .as_bool()
         {
-            self.investigated_other_reason.push(polling_station.number);
+            self.investigated_other_reason
+                .push(polling_station.number());
         }
 
         if let Some(true) = result
@@ -262,7 +290,7 @@ impl PollingStationInvestigations {
             .ballots_recounted_extra_investigation
             .as_bool()
         {
-            self.ballots_recounted.push(polling_station.number);
+            self.ballots_recounted.push(polling_station.number());
         }
     }
 }
@@ -298,14 +326,28 @@ mod tests {
 
     use super::*;
     use crate::domain::{
+        committee_session::CommitteeSessionId,
+        data_entry::DataEntryId,
         election::{PGNumber, tests::election_fixture},
-        polling_station::test_helpers::polling_stations_fixture,
+        polling_station::{
+            PollingStation, PollingStationFirstSession, test_helpers::polling_stations_fixture,
+        },
         results::{
             differences_counts::DifferencesCounts, extra_investigation::ExtraInvestigation,
             yes_no::YesNo,
         },
         valid_default::ValidDefault,
     };
+
+    fn test_ps_to_source(polling_station: PollingStation) -> DataEntrySource {
+        DataEntrySource::PollingStation(PollingStationForSession::First(
+            PollingStationFirstSession {
+                committee_session_id: CommitteeSessionId::from(0),
+                polling_station,
+                data_entry_id: DataEntryId::from(0),
+            },
+        ))
+    }
 
     fn results_fixture_a() -> Results {
         Results::CSOFirstSession(CSOFirstSessionResults {
@@ -401,18 +443,27 @@ mod tests {
         let mut ps = polling_stations_fixture(&[20, 20]);
         ps[0].number = 123;
 
-        diff.add_results(&ps[0], &diff2);
+        diff.add_results(&test_ps_to_source(ps[0].clone()), &diff2);
 
         assert_eq!(diff.more_ballots_count.count, 1);
-        assert_eq!(diff.more_ballots_count.polling_stations, vec![123]);
+        assert_eq!(
+            diff.more_ballots_count.data_entry_sources,
+            vec![DataEntrySourceNumber::PollingStation(123)]
+        );
         assert_eq!(diff.fewer_ballots_count.count, 0);
 
         ps[1].number = 321;
 
-        diff.add_results(&ps[1], &diff2);
+        diff.add_results(&test_ps_to_source(ps[1].clone()), &diff2);
 
         assert_eq!(diff.more_ballots_count.count, 2);
-        assert_eq!(diff.more_ballots_count.polling_stations, vec![123, 321]);
+        assert_eq!(
+            diff.more_ballots_count.data_entry_sources,
+            vec![
+                DataEntrySourceNumber::PollingStation(123),
+                DataEntrySourceNumber::PollingStation(321)
+            ]
+        );
     }
 
     #[test]
@@ -420,8 +471,8 @@ mod tests {
         let election = election_fixture(&[2, 3]);
         let ps = polling_stations_fixture(&[20, 20]);
         let results = vec![
-            (ps[0].clone(), results_fixture_a()),
-            (ps[1].clone(), results_fixture_b()),
+            (test_ps_to_source(ps[0].clone()), results_fixture_a()),
+            (test_ps_to_source(ps[1].clone()), results_fixture_b()),
         ];
         let totals = ElectionSummary::from_results(&election, &results).unwrap();
 
@@ -432,8 +483,8 @@ mod tests {
             totals
                 .differences_counts
                 .more_ballots_count
-                .polling_stations,
-            vec![31]
+                .data_entry_sources,
+            vec![DataEntrySourceNumber::PollingStation(31)]
         );
         assert_eq!(totals.differences_counts.fewer_ballots_count.count, 2);
         // should be ps2 number in here
@@ -441,8 +492,8 @@ mod tests {
             totals
                 .differences_counts
                 .fewer_ballots_count
-                .polling_stations,
-            vec![32]
+                .data_entry_sources,
+            vec![DataEntrySourceNumber::PollingStation(32)]
         );
 
         // tests for voters counts
@@ -489,7 +540,7 @@ mod tests {
         let results_ps = results_fixture_a();
         let results = ps
             .iter()
-            .map(|p| (p.clone(), results_ps.clone()))
+            .map(|p| (test_ps_to_source(p.clone()), results_ps.clone()))
             .collect::<Vec<_>>();
         let totals = ElectionSummary::from_results(&election, &results).unwrap();
 
@@ -538,7 +589,7 @@ mod tests {
 
         let results = ps
             .iter()
-            .map(|p| (p.clone(), ps_results.clone()))
+            .map(|p| (test_ps_to_source(p.clone()), ps_results.clone()))
             .collect::<Vec<_>>();
         let _totals = ElectionSummary::from_results(&election, &results);
     }
@@ -553,7 +604,10 @@ mod tests {
 
         let totals = ElectionSummary::from_results(
             &election,
-            &[(ps[0].clone(), ps_results), (ps[1].clone(), ps_results2)],
+            &[
+                (test_ps_to_source(ps[0].clone()), ps_results),
+                (test_ps_to_source(ps[1].clone()), ps_results2),
+            ],
         );
 
         assert!(totals.is_err());
@@ -566,9 +620,9 @@ mod tests {
         let totals = ElectionSummary::from_results(
             &election,
             &[
-                (ps[0].clone(), results_fixture_a()),
-                (ps[0].clone(), results_fixture_b()),
-                (ps[1].clone(), results_fixture_b()),
+                (test_ps_to_source(ps[0].clone()), results_fixture_a()),
+                (test_ps_to_source(ps[0].clone()), results_fixture_b()),
+                (test_ps_to_source(ps[1].clone()), results_fixture_b()),
             ],
         );
 
@@ -587,7 +641,10 @@ mod tests {
             .pop();
         let totals = ElectionSummary::from_results(
             &election,
-            &[(ps[0].clone(), ps1_result), (ps[1].clone(), ps2_result)],
+            &[
+                (test_ps_to_source(ps[0].clone()), ps1_result),
+                (test_ps_to_source(ps[1].clone()), ps2_result),
+            ],
         );
 
         assert!(totals.is_err());
@@ -608,7 +665,10 @@ mod tests {
             });
         let totals = ElectionSummary::from_results(
             &election,
-            &[(ps[0].clone(), ps1_result), (ps[1].clone(), ps2_result)],
+            &[
+                (test_ps_to_source(ps[0].clone()), ps1_result),
+                (test_ps_to_source(ps[1].clone()), ps2_result),
+            ],
         );
 
         assert!(totals.is_err());
@@ -627,7 +687,10 @@ mod tests {
             .push(pgvote_copy);
         let totals = ElectionSummary::from_results(
             &election,
-            &[(ps[0].clone(), ps1_result), (ps[1].clone(), ps2_result)],
+            &[
+                (test_ps_to_source(ps[0].clone()), ps1_result),
+                (test_ps_to_source(ps[1].clone()), ps2_result),
+            ],
         );
 
         assert!(totals.is_err());
@@ -645,7 +708,10 @@ mod tests {
         };
         let totals = ElectionSummary::from_results(
             &election,
-            &[(ps[0].clone(), ps1_result), (ps[1].clone(), ps2_result)],
+            &[
+                (test_ps_to_source(ps[0].clone()), ps1_result),
+                (test_ps_to_source(ps[1].clone()), ps2_result),
+            ],
         );
 
         assert!(totals.is_err());
@@ -660,7 +726,10 @@ mod tests {
         ps2_result.political_group_votes_mut().pop();
         let totals = ElectionSummary::from_results(
             &election,
-            &[(ps[0].clone(), ps1_result), (ps[1].clone(), ps2_result)],
+            &[
+                (test_ps_to_source(ps[0].clone()), ps1_result),
+                (test_ps_to_source(ps[1].clone()), ps2_result),
+            ],
         );
 
         assert!(totals.is_err());
@@ -677,7 +746,10 @@ mod tests {
         );
         let totals = ElectionSummary::from_results(
             &election,
-            &[(ps[0].clone(), ps1_result), (ps[1].clone(), ps2_result)],
+            &[
+                (test_ps_to_source(ps[0].clone()), ps1_result),
+                (test_ps_to_source(ps[1].clone()), ps2_result),
+            ],
         );
 
         assert!(totals.is_err());
@@ -695,7 +767,10 @@ mod tests {
         ps2_result.political_group_votes_mut().push(ps2_pgvote_copy);
         let totals = ElectionSummary::from_results(
             &election,
-            &[(ps[0].clone(), ps1_result), (ps[1].clone(), ps2_result)],
+            &[
+                (test_ps_to_source(ps[0].clone()), ps1_result),
+                (test_ps_to_source(ps[1].clone()), ps2_result),
+            ],
         );
 
         assert!(totals.is_err());
@@ -711,7 +786,10 @@ mod tests {
             PoliticalGroupCandidateVotes::from_test_data_auto(PGNumber::from(3), &[0]);
         let totals = ElectionSummary::from_results(
             &election,
-            &[(ps[0].clone(), ps1_result), (ps[1].clone(), ps2_result)],
+            &[
+                (test_ps_to_source(ps[0].clone()), ps1_result),
+                (test_ps_to_source(ps[1].clone()), ps2_result),
+            ],
         );
 
         assert!(totals.is_err());
@@ -728,7 +806,10 @@ mod tests {
             .pop();
         let totals = ElectionSummary::from_results(
             &election,
-            &[(ps[0].clone(), ps1_result), (ps[1].clone(), ps2_result)],
+            &[
+                (test_ps_to_source(ps[0].clone()), ps1_result),
+                (test_ps_to_source(ps[1].clone()), ps2_result),
+            ],
         );
 
         assert!(totals.is_err());
@@ -742,7 +823,10 @@ mod tests {
         let ps2_result = results_fixture_b();
         let totals = ElectionSummary::from_results(
             &election,
-            &[(ps[0].clone(), ps1_result), (ps[1].clone(), ps2_result)],
+            &[
+                (test_ps_to_source(ps[0].clone()), ps1_result),
+                (test_ps_to_source(ps[1].clone()), ps2_result),
+            ],
         )
         .unwrap();
         let investigations = totals.polling_station_investigations;

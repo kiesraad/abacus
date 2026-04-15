@@ -4510,6 +4510,47 @@
         },
         "additionalProperties": false
       },
+      "BasePollingStation": {
+        "type": "object",
+        "description": "Polling station base entity, linked to an election but\nindependent of the committee session or data entry.",
+        "required": [
+          "id",
+          "name",
+          "number",
+          "address",
+          "postal_code",
+          "locality"
+        ],
+        "properties": {
+          "address": {
+            "type": "string"
+          },
+          "id": {
+            "$ref": "#/components/schemas/PollingStationId"
+          },
+          "locality": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "number": {
+            "$ref": "#/components/schemas/u32"
+          },
+          "number_of_voters": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "polling_station_type": {
+            "$ref": "#/components/schemas/PollingStationType"
+          },
+          "postal_code": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
       "CSBElectionCreationRequest": {
         "type": "object",
         "required": [
@@ -5133,7 +5174,7 @@
           {
             "allOf": [
               {
-                "$ref": "#/components/schemas/PollingStationSource"
+                "$ref": "#/components/schemas/PollingStationForSession"
               },
               {
                 "type": "object",
@@ -5154,7 +5195,7 @@
           {
             "allOf": [
               {
-                "$ref": "#/components/schemas/SubCommittee"
+                "$ref": "#/components/schemas/SubCommitteeFirstSession"
               },
               {
                 "type": "object",
@@ -5171,6 +5212,46 @@
                 }
               }
             ]
+          }
+        ]
+      },
+      "DataEntrySourceNumber": {
+        "oneOf": [
+          {
+            "type": "object",
+            "required": [
+              "number",
+              "type"
+            ],
+            "properties": {
+              "number": {
+                "$ref": "#/components/schemas/u32"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "PollingStation"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "number",
+              "type"
+            ],
+            "properties": {
+              "number": {
+                "$ref": "#/components/schemas/u32"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "SubCommittee"
+                ]
+              }
+            }
           }
         ]
       },
@@ -5675,6 +5756,12 @@
             "$ref": "#/components/schemas/SummaryDifferencesCounts",
             "description": "The differences between voters and votes"
           },
+          "number_of_voters": {
+            "type": "integer",
+            "format": "int32",
+            "description": "The number of voters (i.e. \"Kiesgerechtigden\")",
+            "minimum": 0
+          },
           "political_group_votes": {
             "type": "array",
             "items": {
@@ -5795,6 +5882,7 @@
           "InvalidJson",
           "InvalidPassword",
           "InvalidPoliticalGroup",
+          "InvalidDataEntrySource",
           "InvalidSession",
           "InvalidStateTransition",
           "InvalidUsernameOrPassword",
@@ -6149,6 +6237,50 @@
           }
         }
       },
+      "InvestigationConcludedWithNewResults": {
+        "type": "object",
+        "required": [
+          "reason",
+          "findings"
+        ],
+        "properties": {
+          "findings": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "InvestigationConcludedWithoutNewResults": {
+        "type": "object",
+        "required": [
+          "reason",
+          "findings"
+        ],
+        "properties": {
+          "findings": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "InvestigationInProgress": {
+        "type": "object",
+        "required": [
+          "reason"
+        ],
+        "properties": {
+          "reason": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
       "InvestigationListResponse": {
         "type": "object",
         "description": "Investigation list response",
@@ -6164,6 +6296,64 @@
           }
         },
         "additionalProperties": false
+      },
+      "InvestigationStatus": {
+        "oneOf": [
+          {
+            "type": "object",
+            "required": [
+              "state",
+              "status"
+            ],
+            "properties": {
+              "state": {
+                "$ref": "#/components/schemas/InvestigationInProgress"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "InProgress"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "state",
+              "status"
+            ],
+            "properties": {
+              "state": {
+                "$ref": "#/components/schemas/InvestigationConcludedWithoutNewResults"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "ConcludedWithoutNewResults"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "state",
+              "status"
+            ],
+            "properties": {
+              "state": {
+                "$ref": "#/components/schemas/InvestigationConcludedWithNewResults"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "ConcludedWithNewResults"
+                ]
+              }
+            }
+          }
+        ]
       },
       "LargestRemainderAssignedSeat": {
         "type": "object",
@@ -6569,6 +6759,76 @@
           }
         }
       },
+      "PollingStationFirstSession": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BasePollingStation"
+          },
+          {
+            "type": "object",
+            "required": [
+              "committee_session_id",
+              "data_entry_id"
+            ],
+            "properties": {
+              "committee_session_id": {
+                "$ref": "#/components/schemas/CommitteeSessionId"
+              },
+              "data_entry_id": {
+                "$ref": "#/components/schemas/DataEntryId"
+              }
+            }
+          }
+        ],
+        "description": "Polling station in a first committee session.\nNo investigations, no previous data entries."
+      },
+      "PollingStationForSession": {
+        "oneOf": [
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PollingStationFirstSession"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "session_type"
+                ],
+                "properties": {
+                  "session_type": {
+                    "type": "string",
+                    "enum": [
+                      "First"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PollingStationNextSession"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "session_type"
+                ],
+                "properties": {
+                  "session_type": {
+                    "type": "string",
+                    "enum": [
+                      "Next"
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "description": "A single polling station for either a first or next committee session"
+      },
       "PollingStationId": {
         "type": "integer",
         "format": "int32",
@@ -6703,6 +6963,31 @@
         },
         "additionalProperties": false
       },
+      "PollingStationNextSession": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BasePollingStation"
+          },
+          {
+            "type": "object",
+            "required": [
+              "committee_session_id"
+            ],
+            "properties": {
+              "committee_session_id": {
+                "$ref": "#/components/schemas/CommitteeSessionId"
+              },
+              "investigation_status": {
+                "$ref": "#/components/schemas/InvestigationStatus"
+              },
+              "prev_data_entry_id": {
+                "$ref": "#/components/schemas/DataEntryId"
+              }
+            }
+          }
+        ],
+        "description": "Polling station in a next committee session.\nMay have previous data entries and investigation state."
+      },
       "PollingStationRequest": {
         "type": "object",
         "description": "Polling station of a certain [crate::domain::election::Election]",
@@ -6752,27 +7037,6 @@
             "items": {
               "$ref": "#/components/schemas/PollingStationRequest"
             }
-          }
-        }
-      },
-      "PollingStationSource": {
-        "type": "object",
-        "required": [
-          "id",
-          "number",
-          "name"
-        ],
-        "properties": {
-          "id": {
-            "$ref": "#/components/schemas/PollingStationId"
-          },
-          "name": {
-            "type": "string"
-          },
-          "number": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
           }
         }
       },
@@ -7158,6 +7422,29 @@
         },
         "additionalProperties": false
       },
+      "SubCommitteeFirstSession": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/SubCommittee"
+          },
+          {
+            "type": "object",
+            "required": [
+              "committee_session_id",
+              "data_entry_id"
+            ],
+            "properties": {
+              "committee_session_id": {
+                "$ref": "#/components/schemas/CommitteeSessionId"
+              },
+              "data_entry_id": {
+                "$ref": "#/components/schemas/DataEntryId"
+              }
+            }
+          }
+        ],
+        "description": "Sub electoral committee in a first committee session."
+      },
       "SubCommitteeId": {
         "type": "integer",
         "format": "int32",
@@ -7168,7 +7455,7 @@
         "description": "Contains a summary count, containing both the count and a list of polling\nstations that contributed to it.",
         "required": [
           "count",
-          "polling_stations"
+          "data_entry_sources"
         ],
         "properties": {
           "count": {
@@ -7176,12 +7463,10 @@
             "format": "int32",
             "minimum": 0
           },
-          "polling_stations": {
+          "data_entry_sources": {
             "type": "array",
             "items": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/DataEntrySourceNumber"
             }
           }
         },
@@ -7313,6 +7598,7 @@
           "F308",
           "F309",
           "F310",
+          "F312",
           "F401",
           "F402",
           "F403",
@@ -7454,6 +7740,11 @@
           }
         },
         "additionalProperties": false
+      },
+      "u32": {
+        "type": "integer",
+        "format": "int32",
+        "minimum": 0
       }
     },
     "securitySchemes": {

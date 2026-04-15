@@ -27,6 +27,12 @@
       "actions": ""
     }
   },
+  "F312": {
+    "coordinator": {
+      "title": "D is niet gelijk aan H min I plus J",
+      "content": "Je kan niet verder met dit proces-verbaal. Controleer of er iets is misgegaan bij het opmaken of overdragen van het proces-verbaal van het onderliggende niveau."
+    }
+  },
   "F401": {
     "typist": {
       "title": "Controleer het totaal van de lijst. Is dit veld op het papieren proces-verbaal ook leeg? Dan kan je verdergaan. (F.401)"

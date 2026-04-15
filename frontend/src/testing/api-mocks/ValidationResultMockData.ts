@@ -83,6 +83,10 @@ export const validationResultMockData: ErrorWarningsMap<ValidationResultCode> = 
     fields: ["data.differences_counts.difference_completely_accounted_for"],
     code: "F310",
   },
+  F312: {
+    fields: ["data.differences_counts.more_ballots_count", "data.differences_counts.fewer_ballots_count"],
+    code: "F312",
+  },
   F401: {
     fields: ["data.political_group_votes.0.total"],
     context: { political_group_number: 1 },

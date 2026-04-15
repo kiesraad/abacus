@@ -12,8 +12,19 @@ import { ReadOnlyDataEntryDelete } from "./ReadOnlyDataEntryDelete";
 function renderComponent(status: DataEntryStatusName) {
   const onDeleted = vi.fn();
   const onError = vi.fn();
-  const { data_entry_id, id, name, number } = pollingStationMockData[4]!;
-  const source: DataEntrySource = { type: "PollingStation", id, name, number };
+  const { data_entry_id, id, name, number, address, postal_code, locality } = pollingStationMockData[4]!;
+  const source: DataEntrySource = {
+    type: "PollingStation",
+    id,
+    name,
+    number,
+    committee_session_id: 1,
+    session_type: "First",
+    data_entry_id: 1,
+    address,
+    postal_code,
+    locality,
+  };
 
   render(
     <ReadOnlyDataEntryDelete

@@ -41,6 +41,12 @@ export function overrideServerClaimDataEntryResponse({
       id: pollingStationMockData[0]!.id,
       number: pollingStationMockData[0]!.number,
       name: pollingStationMockData[0]!.name,
+      committee_session_id: 1,
+      session_type: "First",
+      data_entry_id: 1,
+      locality: pollingStationMockData[0]!.locality,
+      postal_code: pollingStationMockData[0]!.postal_code,
+      address: pollingStationMockData[0]!.address,
     },
     status: "first_entry_in_progress",
   } satisfies ClaimDataEntryResponse);

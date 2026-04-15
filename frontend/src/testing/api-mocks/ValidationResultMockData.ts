@@ -110,4 +110,5 @@ export const validationResultMockData: ErrorWarningsMap<ValidationResultCode> = 
     code: "W203",
   },
   W204: { fields: ["data.votes_counts.total_votes_cast_count"], code: "W204" },
+  W206: { fields: ["data.number_of_voters"], code: "W206" },
 };

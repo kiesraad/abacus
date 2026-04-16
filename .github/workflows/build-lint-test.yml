@@ -268,12 +268,17 @@ jobs:
       - name: Cargo cache
         uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4 # v2
         with:
-          workspaces: "backend/fuzz -> target"
+          workspaces: |
+            backend/fuzz -> target
+            backend/apportionment/fuzz -> target
           shared-key: "fuzzer"
       - name: Install cargo fuzz
         run: cargo install cargo-fuzz
-      - name: Run the fuzzer
+      - name: Run the data entry fuzzer
         run: cargo fuzz run data_entry_status -- -max_total_time=60
+      - name: Run the apportionment fuzzer
+        working-directory: ./backend/apportionment
+        run: cargo fuzz run simple_apportionment -- -max_total_time=60
 
   rustdoc:
     name: Deploy rustdoc to GitHub Pages

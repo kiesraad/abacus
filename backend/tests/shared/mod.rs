@@ -2,6 +2,7 @@
 
 use std::{collections::BTreeMap, net::SocketAddr};
 
+use abacus::domain::election::CommitteeCategory;
 use axum::http::{HeaderValue, StatusCode};
 use hyper::header::CONTENT_TYPE;
 use reqwest::Response;
@@ -282,13 +283,17 @@ pub async fn update_investigation(
         .unwrap()
 }
 
-pub async fn create_any_result(addr: &SocketAddr, data_entry_id: u32, election_id: u32, csb: bool) {
+pub async fn create_any_result(
+    addr: &SocketAddr,
+    data_entry_id: u32,
+    election_id: u32,
+    committee_category: CommitteeCategory,
+) {
     let typist_cookie = login(
         addr,
-        if csb {
-            FixtureUser::TypistCSB
-        } else {
-            FixtureUser::TypistGSB
+        match committee_category {
+            CommitteeCategory::GSB => FixtureUser::TypistGSB,
+            CommitteeCategory::CSB => FixtureUser::TypistCSB,
         },
     )
     .await;
@@ -297,19 +302,17 @@ pub async fn create_any_result(addr: &SocketAddr, data_entry_id: u32, election_i
         &typist_cookie,
         data_entry_id,
         1,
-        if csb {
-            example_gsb_data_entry(None)
-        } else {
-            example_cso_data_entry(None)
+        match committee_category {
+            CommitteeCategory::GSB => example_cso_data_entry(None),
+            CommitteeCategory::CSB => example_gsb_data_entry(None),
         },
     )
     .await;
     let typist2_cookie = login(
         addr,
-        if csb {
-            FixtureUser::Typist2CSB
-        } else {
-            FixtureUser::Typist2GSB
+        match committee_category {
+            CommitteeCategory::GSB => FixtureUser::Typist2GSB,
+            CommitteeCategory::CSB => FixtureUser::Typist2CSB,
         },
     )
     .await;
@@ -318,10 +321,9 @@ pub async fn create_any_result(addr: &SocketAddr, data_entry_id: u32, election_i
         &typist2_cookie,
         data_entry_id,
         2,
-        if csb {
-            example_gsb_data_entry(None)
-        } else {
-            example_cso_data_entry(None)
+        match committee_category {
+            CommitteeCategory::GSB => example_cso_data_entry(None),
+            CommitteeCategory::CSB => example_gsb_data_entry(None),
         },
     )
     .await;
@@ -329,11 +331,11 @@ pub async fn create_any_result(addr: &SocketAddr, data_entry_id: u32, election_i
 }
 
 pub async fn create_result(addr: &SocketAddr, data_entry_id: u32, election_id: u32) {
-    create_any_result(addr, data_entry_id, election_id, false).await;
+    create_any_result(addr, data_entry_id, election_id, CommitteeCategory::GSB).await;
 }
 
 pub async fn create_gsb_result(addr: &SocketAddr, data_entry_id: u32, election_id: u32) {
-    create_any_result(addr, data_entry_id, election_id, true).await;
+    create_any_result(addr, data_entry_id, election_id, CommitteeCategory::CSB).await;
 }
 
 pub async fn create_any_result_with_non_example_data_entry(
@@ -341,24 +343,22 @@ pub async fn create_any_result_with_non_example_data_entry(
     data_entry_id: u32,
     election_id: u32,
     data_entry: serde_json::Value,
-    csb: bool,
+    committee_category: CommitteeCategory,
 ) {
     let typist_cookie = login(
         addr,
-        if csb {
-            FixtureUser::TypistCSB
-        } else {
-            FixtureUser::TypistGSB
+        match committee_category {
+            CommitteeCategory::GSB => FixtureUser::TypistGSB,
+            CommitteeCategory::CSB => FixtureUser::TypistCSB,
         },
     )
     .await;
     complete_data_entry(addr, &typist_cookie, data_entry_id, 1, data_entry.clone()).await;
     let typist2_cookie = login(
         addr,
-        if csb {
-            FixtureUser::Typist2CSB
-        } else {
-            FixtureUser::Typist2GSB
+        match committee_category {
+            CommitteeCategory::GSB => FixtureUser::Typist2GSB,
+            CommitteeCategory::CSB => FixtureUser::Typist2CSB,
         },
     )
     .await;
@@ -366,7 +366,7 @@ pub async fn create_any_result_with_non_example_data_entry(
     check_data_entry_status_is_definitive(addr, &typist2_cookie, data_entry_id, election_id).await;
 }
 
-pub async fn create_result_with_non_example_data_entry(
+pub async fn create_cso_result_with_non_example_data_entry(
     addr: &SocketAddr,
     data_entry_id: u32,
     election_id: u32,
@@ -377,7 +377,7 @@ pub async fn create_result_with_non_example_data_entry(
         data_entry_id,
         election_id,
         data_entry,
-        false,
+        CommitteeCategory::GSB,
     )
     .await;
 }
@@ -393,7 +393,7 @@ pub async fn create_gsb_result_with_non_example_data_entry(
         data_entry_id,
         election_id,
         data_entry,
-        true,
+        CommitteeCategory::CSB,
     )
     .await;
 }

@@ -1291,7 +1291,7 @@ mod tests {
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_9_csb"))))]
-    async fn test_claim_data_entry_csb_ok(pool: SqlitePool) {
+    async fn test_claim_data_entry_gsb_ok(pool: SqlitePool) {
         let data_entry_id = DataEntryId::from(901);
         let user = User::test_user(Role::TypistCSB, UserId::from(9));
         let response = data_entry_claim(

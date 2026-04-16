@@ -243,6 +243,39 @@ async fn test_error_invalid_election(pool: SqlitePool) {
     assert_eq!(body["error"], "Item not found");
 }
 
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users", "election_5_with_results"))))]
+async fn test_error_election_not_csb(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+
+    let coordinator_cookie = login(&addr, CoordinatorGSB).await;
+    shared::change_status_committee_session(&addr, &coordinator_cookie, 5, 6, "completed").await;
+
+    let url = format!("http://{addr}/api/elections/5/apportionment");
+    let response = reqwest::Client::new()
+        .post(&url)
+        .header("cookie", coordinator_cookie)
+        .send()
+        .await
+        .unwrap();
+
+    assert_eq!(response.status(), StatusCode::FORBIDDEN);
+    let body: serde_json::Value = response.json().await.unwrap();
+    assert_eq!(body["error"], "Forbidden");
+}
+
+#[test(sqlx::test(fixtures(
+    path = "../fixtures",
+    scripts("users", "election_8_csb_with_results")
+)))]
+async fn test_error_election_not_completed(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+
+    let response = get_apportionment(&addr, 8).await;
+    assert_eq!(response.status(), StatusCode::PRECONDITION_FAILED);
+    let body: serde_json::Value = response.json().await.unwrap();
+    assert_eq!(body["error"], "Committee session not completed");
+}
+
 #[test(sqlx::test(fixtures(
     path = "../fixtures",
     scripts("users", "election_8_csb_with_results")

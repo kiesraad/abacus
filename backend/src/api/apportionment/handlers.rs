@@ -94,9 +94,7 @@ pub async fn election_apportionment(
             election_summary: summary,
         }))
     } else {
-        Err(APIError::ApportionmentApi(
-            ApportionmentApiError::CommitteeSessionNotCompleted,
-        ))
+        Err(ApportionmentApiError::CommitteeSessionNotCompleted.into())
     }
 }
 

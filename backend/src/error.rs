@@ -1,6 +1,5 @@
 use std::error::Error;
 
-use apportionment::ApportionmentError;
 use axum::{
     Json,
     extract::rejection::JsonRejection,
@@ -102,8 +101,7 @@ impl IntoResponse for ErrorResponse {
 pub enum APIError {
     AddError(String, ErrorReference),
     AirgapViolation(String),
-    Apportionment(ApportionmentError),
-    ApportionmentApi(ApportionmentApiError),
+    Apportionment(ApportionmentApiError),
     Authentication(AuthenticationError),
     BadRequest(String, ErrorReference),
     CommitteeSession(CommitteeSessionError),
@@ -402,7 +400,7 @@ impl IntoResponse for APIError {
                 error!("Apportionment error: {:?}", err);
 
                 match err {
-                    ApportionmentError::AllListsExhausted => (
+                    ApportionmentApiError::AllListsExhausted => (
                         StatusCode::UNPROCESSABLE_ENTITY,
                         to_error(
                             "All lists are exhausted, not enough candidates to fill all seats",
@@ -410,7 +408,15 @@ impl IntoResponse for APIError {
                             false,
                         ),
                     ),
-                    ApportionmentError::DrawingOfLotsNotImplemented => (
+                    ApportionmentApiError::CommitteeSessionNotCompleted => (
+                        StatusCode::PRECONDITION_FAILED,
+                        to_error(
+                            "Committee session not completed",
+                            ErrorReference::ApportionmentCommitteeSessionNotCompleted,
+                            false,
+                        ),
+                    ),
+                    ApportionmentApiError::DrawingOfLotsNotImplemented => (
                         StatusCode::UNPROCESSABLE_ENTITY,
                         to_error(
                             "Drawing of lots is required",
@@ -418,25 +424,11 @@ impl IntoResponse for APIError {
                             false,
                         ),
                     ),
-                    ApportionmentError::ZeroVotesCast => (
+                    ApportionmentApiError::ZeroVotesCast => (
                         StatusCode::UNPROCESSABLE_ENTITY,
                         to_error(
                             "No votes on candidates cast",
                             ErrorReference::ApportionmentZeroVotesCast,
-                            false,
-                        ),
-                    ),
-                }
-            }
-            APIError::ApportionmentApi(err) => {
-                error!("Apportionment api error: {:?}", err);
-
-                match err {
-                    ApportionmentApiError::CommitteeSessionNotCompleted => (
-                        StatusCode::PRECONDITION_FAILED,
-                        to_error(
-                            "Committee session not completed",
-                            ErrorReference::ApportionmentCommitteeSessionNotCompleted,
                             false,
                         ),
                     ),

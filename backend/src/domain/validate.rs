@@ -105,7 +105,7 @@ pub enum ValidationResultCode {
     W203,
     /// CSO/DSO: 'Aantal kiezers en stemmen': Totaal aantal uitgebrachte stemmen leeg of 0
     W204,
-    /// CSO/DSO: 'Aantal kiezers en stemmen': Aantal kiesgerechtigden is kleiner dan aantal stempassen
+    /// CSB: 'Aantal kiezers en stemmen': Aantal kiesgerechtigden is kleiner dan aantal stempassen
     W206,
 }
 

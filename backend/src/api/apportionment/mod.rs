@@ -15,6 +15,18 @@ impl From<ApportionmentError> for APIError {
     }
 }
 
+/// Errors that can occur before apportionment
+#[derive(Debug, PartialEq)]
+pub enum ApportionmentApiError {
+    CommitteeSessionNotCompleted,
+}
+
+impl From<ApportionmentApiError> for APIError {
+    fn from(err: ApportionmentApiError) -> Self {
+        APIError::ApportionmentApi(err)
+    }
+}
+
 pub fn router() -> OpenApiRouter<AppState> {
     use Role::*;
 

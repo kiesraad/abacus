@@ -9,6 +9,7 @@ use axum::{
 };
 use eml_nl::EMLError;
 use hyper::header::InvalidHeaderValue;
+use pdf_gen::{PdfGenError, zip::ZipResponseError};
 use quick_xml::{DeError, SeError};
 use serde::{Deserialize, Serialize};
 use tracing::error;
@@ -16,7 +17,10 @@ use utoipa::ToSchema;
 
 use crate::{
     MAX_BODY_SIZE_MB,
-    api::middleware::authentication::error::AuthenticationError,
+    api::{
+        apportionment::ApportionmentApiError,
+        middleware::authentication::error::AuthenticationError,
+    },
     domain::{
         committee_session::CommitteeSessionError, role::RoleNotAuthorizedError, validate::DataError,
     },
@@ -24,7 +28,6 @@ use crate::{
     repository::polling_station_repo,
     service::{DataEntryServiceError, PollingStationServiceError, SubCommitteeServiceError},
 };
-use pdf_gen::{PdfGenError, zip::ZipResponseError};
 
 /// Error reference used to show the corresponding error message to the end-user
 #[derive(Serialize, Deserialize, Clone, Copy, ToSchema, PartialEq, Eq, Debug)]
@@ -100,6 +103,7 @@ pub enum APIError {
     AddError(String, ErrorReference),
     AirgapViolation(String),
     Apportionment(ApportionmentError),
+    ApportionmentApi(ApportionmentApiError),
     Authentication(AuthenticationError),
     BadRequest(String, ErrorReference),
     CommitteeSession(CommitteeSessionError),
@@ -406,14 +410,6 @@ impl IntoResponse for APIError {
                             false,
                         ),
                     ),
-                    ApportionmentError::CommitteeSessionNotCompleted => (
-                        StatusCode::PRECONDITION_FAILED,
-                        to_error(
-                            "Committee session not completed",
-                            ErrorReference::ApportionmentCommitteeSessionNotCompleted,
-                            false,
-                        ),
-                    ),
                     ApportionmentError::DrawingOfLotsNotImplemented => (
                         StatusCode::UNPROCESSABLE_ENTITY,
                         to_error(
@@ -427,6 +423,20 @@ impl IntoResponse for APIError {
                         to_error(
                             "No votes on candidates cast",
                             ErrorReference::ApportionmentZeroVotesCast,
+                            false,
+                        ),
+                    ),
+                }
+            }
+            APIError::ApportionmentApi(err) => {
+                error!("Apportionment api error: {:?}", err);
+
+                match err {
+                    ApportionmentApiError::CommitteeSessionNotCompleted => (
+                        StatusCode::PRECONDITION_FAILED,
+                        to_error(
+                            "Committee session not completed",
+                            ErrorReference::ApportionmentCommitteeSessionNotCompleted,
                             false,
                         ),
                     ),

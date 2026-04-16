@@ -10,21 +10,21 @@ export const apportionmentRoutes: RouteObject[] = [
   {
     Component: ApportionmentLayout,
     children: [
-      { index: true, Component: ApportionmentPage, handle: { roles: ["coordinator_gsb", "coordinator_csb"] } },
+      { index: true, Component: ApportionmentPage, handle: { roles: ["coordinator_csb"] } },
       {
         path: ":listNumber",
         Component: ApportionmentListDetailsPage,
-        handle: { roles: ["coordinator_gsb", "coordinator_csb"] },
+        handle: { roles: ["coordinator_csb"] },
       },
       {
         path: "details-residual-seats",
         Component: ApportionmentResidualSeatsPage,
-        handle: { roles: ["coordinator_gsb", "coordinator_csb"] },
+        handle: { roles: ["coordinator_csb"] },
       },
       {
         path: "details-full-seats",
         Component: ApportionmentFullSeatsPage,
-        handle: { roles: ["coordinator_gsb", "coordinator_csb"] },
+        handle: { roles: ["coordinator_csb"] },
       },
     ],
   },

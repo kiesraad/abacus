@@ -36,7 +36,11 @@ export function FinishDataEntryPage() {
 
     // Redirect to report download if committee session data entry phase is already finished
     if (currentCommitteeSession.status === "completed") {
-      void navigate(`/elections/${election.id}/report/committee-session/${currentCommitteeSession.id}/download`);
+      if (election.committee_category === "GSB") {
+        void navigate(`/elections/${election.id}/report/committee-session/${currentCommitteeSession.id}/download`);
+      } else {
+        void navigate(`/elections/${election.id}/apportionment`);
+      }
     }
   }, [currentCommitteeSession, election, incompleteInvestigations, navigate]);
 
@@ -54,7 +58,8 @@ export function FinishDataEntryPage() {
         <section>
           <h1>
             {t("election_management.data_entry")}{" "}
-            {committeeSessionLabel(election.committee_category, currentCommitteeSession.number, false, true)}{" "}
+            {election.committee_category === "GSB" &&
+              committeeSessionLabel(election.committee_category, currentCommitteeSession.number, false, true)}{" "}
             {t("complete").toLowerCase()}
           </h1>
         </section>
@@ -63,8 +68,8 @@ export function FinishDataEntryPage() {
         <article>
           <h2 className="form_title">{t("election.title.finish_data_entry")}?</h2>
           <div className={cls.reportInfoSection}>
-            {t("election_management.about_to_stop_data_entry")}
-            {tx("election_management.data_entry_finish_steps_explanation")}
+            {t("election_management.finish_data_entry.about_to_stop_data_entry")}
+            {tx(`election_management.finish_data_entry.explanation.${election.committee_category}`)}
           </div>
           <FormLayout.Controls>
             <Button type="submit" onClick={handleFinish}>

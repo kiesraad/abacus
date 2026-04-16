@@ -180,11 +180,13 @@ export function ElectionHomePage() {
                 />
               ))}
             </div>
-            {isCoordinator && currentCommitteeSession.status === "completed" && (
-              <Button variant="secondary" size="sm" onClick={toggleAddCommitteeSessionModal}>
-                {t("election_management.prepare_new_session")}
-              </Button>
-            )}
+            {isCoordinator &&
+              election.committee_category === "GSB" &&
+              currentCommitteeSession.status === "completed" && (
+                <Button variant="secondary" size="sm" onClick={toggleAddCommitteeSessionModal}>
+                  {t("election_management.prepare_new_session")}
+                </Button>
+              )}
           </div>
           <div className={cn(cls.line, "mb-xl")}></div>
           <div>

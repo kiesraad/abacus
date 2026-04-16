@@ -1,6 +1,5 @@
 {
   "about_this_election": "Over deze verkiezing",
-  "about_to_stop_data_entry": "Je staat op het punt het invoeren van stemmen te stoppen.",
   "add_polling_stations_first": "De invoerfase kan pas gestart worden als er stembureaus zijn toegevoegd.",
   "add_the_date_and_time": "Voer de datum en tijd in waarop de zitting van het gemeentelijke stembureau officieel is geopend.",
   "add_the_location": "Vul de plaatsnaam in. Bijvoorbeeld <em>Amersfoort</em>",
@@ -8,7 +7,6 @@
   "committee_session_details": "Details van de zitting",
   "custom_committee_session_details": "Details van {sessionLabel}",
   "data_entry": "Invoer",
-  "data_entry_finish_steps_explanation": "<ul><li>In de volgende stap kan je het proces-verbaal van deze zitting opmaken en de officiële telbestanden downloaden.</li><li>Zolang er geen volgende zitting is gestart, kan je nog terug naar de invoer.</li></ul>",
   "date": "Datum",
   "date_and_time_of_session_start": "Datum en tijdstip aanvang van {sessionLabel}",
   "date_error": "Vul de datum in als: dd-mm-jjjj",
@@ -22,6 +20,13 @@
   "document_na_31_2_bijlage_1": "Verslagen van tellingen van stembureau",
   "document_na_31_2_inlegvel": "Inlegvel controles en correcties",
   "document_purpose": "Doel",
+  "finish_data_entry": {
+    "about_to_stop_data_entry": "Je staat op het punt het invoeren van stemmen te stoppen.",
+    "explanation": {
+      "GSB": "<ul><li>In de volgende stap kan je het proces-verbaal van deze zitting opmaken en de officiële telbestanden downloaden.</li><li>Zolang er geen volgende zitting is gestart, kan je nog terug naar de invoer.</li></ul>",
+      "CSB": "<ul><li>In de volgende stap ga je verder met de zetelverdeling. Daarna kan je het proces-verbaal voor de zitting van het centraal stembureau opmaken en de officiële bestanden downloaden.</li></ul>"
+    }
+  },
   "GSB": {
     "download_definitive_documents": "Download definitieve documenten {sessionLabel}",
     "download_definitive_files": "Download de definitieve bestanden.",

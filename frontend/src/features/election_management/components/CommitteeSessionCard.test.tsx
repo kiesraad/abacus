@@ -21,18 +21,18 @@ import { CommitteeSessionCard } from "./CommitteeSessionCard";
 
 const navigate = vi.fn();
 
-interface buttons {
+interface Buttons {
   buttonsCurrentSession?: string[];
   buttonsNotCurrentSession?: string[];
   actionButton?: string;
 }
 
 type TestCasesGSB = {
-  [role in "administrator" | "coordinator_gsb"]: Record<CommitteeSessionStatus, buttons>[];
+  [role in "administrator" | "coordinator_gsb"]: Record<CommitteeSessionStatus, Buttons>[];
 };
 
 type TestCasesCSB = {
-  [role in "administrator" | "coordinator_csb"]: Record<CommitteeSessionStatus, buttons>;
+  [role in "administrator" | "coordinator_csb"]: Record<CommitteeSessionStatus, Buttons>;
 };
 
 /**

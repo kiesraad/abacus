@@ -10,7 +10,7 @@ use test_log::test;
 use crate::{
     shared::{
         FixtureUser::*, change_status_committee_session, claim_data_entry, complete_data_entry,
-        example_data_entry, login,
+        example_cso_data_entry, login,
     },
     utils::serve_api,
 };
@@ -19,14 +19,14 @@ pub mod shared;
 pub mod utils;
 
 pub fn data_entry_with_error() -> serde_json::Value {
-    let mut data_entry = example_data_entry(None);
+    let mut data_entry = example_cso_data_entry(None);
     // Introduce error F.203
     data_entry["data"]["votes_counts"]["invalid_votes_count"] = serde_json::Value::from(2);
     data_entry
 }
 
 pub fn different_data_entries() -> (serde_json::Value, serde_json::Value) {
-    let first_data_entry = example_data_entry(None);
+    let first_data_entry = example_cso_data_entry(None);
 
     let mut second_data_entry = first_data_entry.clone();
     let poll_card_count = second_data_entry["data"]["voters_counts"]["poll_card_count"]
@@ -151,7 +151,7 @@ async fn test_data_entry_no_errors(pool: SqlitePool) {
 
     let typist = login(&addr, TypistGSB).await;
     let data_entry_id = 201;
-    let data_entry_no_errors = example_data_entry(None);
+    let data_entry_no_errors = example_cso_data_entry(None);
     let res = complete_data_entry(&addr, &typist, data_entry_id, 1, data_entry_no_errors).await;
     let data_entry_status: serde_json::Value = res.json().await.unwrap();
     assert_eq!(data_entry_status["status"], "first_entry_finalised");
@@ -297,7 +297,7 @@ async fn test_data_entry_differences_not_found(pool: SqlitePool) {
 
     let typist = login(&addr, TypistGSB).await;
     let data_entry_id = 201;
-    let data_entry = example_data_entry(None);
+    let data_entry = example_cso_data_entry(None);
     let res = complete_data_entry(&addr, &typist, data_entry_id, 1, data_entry).await;
     let data_entry_status: serde_json::Value = res.json().await.unwrap();
     assert_eq!(data_entry_status["status"], "first_entry_finalised");
@@ -311,7 +311,7 @@ async fn test_data_entry_differences_not_found(pool: SqlitePool) {
 async fn test_data_entry_resolve_differences(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
-    let first_data_entry = example_data_entry(None);
+    let first_data_entry = example_cso_data_entry(None);
     let mut second_data_entry = first_data_entry.clone();
     second_data_entry["data"]["voters_counts"]["poll_card_count"] = serde_json::Value::from(
         first_data_entry["data"]["voters_counts"]["poll_card_count"]
@@ -354,7 +354,7 @@ async fn test_data_entry_resolve_differences(pool: SqlitePool) {
 async fn test_data_entry_resolve_differences_then_resolve_errors(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
-    let first_data_entry = example_data_entry(None);
+    let first_data_entry = example_cso_data_entry(None);
     let mut second_data_entry = first_data_entry.clone();
     second_data_entry["data"]["voters_counts"]["poll_card_count"] = serde_json::Value::from(0);
 

@@ -10,8 +10,9 @@ use test_log::test;
 use crate::{
     shared::{
         FixtureUser::*, change_status_committee_session, claim_data_entry, create_investigation,
-        create_polling_station, create_result, example_data_entry, get_election_committee_session,
-        get_election_details, get_investigations, get_statuses, login, save_data_entry,
+        create_polling_station, create_result, example_cso_data_entry,
+        get_election_committee_session, get_election_details, get_investigations, get_statuses,
+        login, save_data_entry,
     },
     utils::serve_api,
 };
@@ -885,7 +886,7 @@ async fn test_delete_with_data_entry_works(pool: SqlitePool) {
         &typist_cookie,
         data_entry_id,
         1,
-        example_data_entry(None),
+        example_cso_data_entry(None),
     )
     .await;
 

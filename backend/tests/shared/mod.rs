@@ -45,7 +45,7 @@ pub fn political_group_votes_from_test_data_auto(
 }
 
 /// Example data entry for an election with two parties with two candidates.
-pub fn example_data_entry(client_state: Option<&str>) -> serde_json::Value {
+pub fn example_cso_data_entry(client_state: Option<&str>) -> serde_json::Value {
     serde_json::json!({
         "progress": 60,
         "data": {
@@ -300,7 +300,7 @@ pub async fn create_any_result(addr: &SocketAddr, data_entry_id: u32, election_i
         if csb {
             example_gsb_data_entry(None)
         } else {
-            example_data_entry(None)
+            example_cso_data_entry(None)
         },
     )
     .await;
@@ -321,7 +321,7 @@ pub async fn create_any_result(addr: &SocketAddr, data_entry_id: u32, election_i
         if csb {
             example_gsb_data_entry(None)
         } else {
-            example_data_entry(None)
+            example_cso_data_entry(None)
         },
     )
     .await;

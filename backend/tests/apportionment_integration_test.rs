@@ -10,11 +10,12 @@ use test_log::test;
 
 use crate::{
     shared::{
-        FixtureUser::*, create_result, create_result_with_non_example_data_entry,
-        differences_counts_zero, login, political_group_votes_from_test_data_auto,
+        FixtureUser::*, create_gsb_result, create_gsb_result_with_non_example_data_entry,
+        gsb_differences_counts_zero, login, political_group_votes_from_test_data_auto,
     },
     utils::serve_api,
 };
+
 pub mod shared;
 pub mod utils;
 
@@ -28,7 +29,7 @@ fn get_total_seats_from_seat_assignment(seat_assignment: &serde_json::Value) -> 
 }
 
 async fn get_apportionment(addr: &SocketAddr, election_id: u32) -> Response {
-    let coordinator_cookie = shared::login(addr, CoordinatorGSB).await;
+    let coordinator_cookie = login(addr, CoordinatorCSB).await;
     let url = format!("http://{addr}/api/elections/{election_id}/apportionment");
     reqwest::Client::new()
         .post(&url)
@@ -38,20 +39,13 @@ async fn get_apportionment(addr: &SocketAddr, election_id: u32) -> Response {
         .unwrap()
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_4", "users"))))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_9_csb", "users"))))]
 async fn test_lt_19_seats(pool: SqlitePool) {
     let addr: SocketAddr = serve_api(pool).await;
     let request_body = json!({
         "data": {
-            "model": "CSOFirstSession",
-            "extra_investigation": {
-                "extra_investigation_other_reason": { "yes": false, "no": false },
-                "ballots_recounted_extra_investigation": { "yes": false, "no": false },
-            },
-            "counting_differences_polling_station": {
-                "unexplained_difference_ballots_voters": { "yes": false, "no": true },
-                "difference_ballots_per_list": { "yes": false, "no": true },
-            },
+            "model": "GSB",
+            "number_of_voters": 4000,
             "voters_counts": {
                 "poll_card_count": 1203,
                 "proxy_certificate_count": 2,
@@ -97,7 +91,7 @@ async fn test_lt_19_seats(pool: SqlitePool) {
                 "invalid_votes_count": 2,
                 "total_votes_cast_count": 1205
             },
-            "differences_counts": differences_counts_zero(),
+            "differences_counts": gsb_differences_counts_zero(),
             "political_group_votes": [
                 political_group_votes_from_test_data_auto(
                     1,
@@ -115,12 +109,12 @@ async fn test_lt_19_seats(pool: SqlitePool) {
         "progress": 100,
         "client_state": {}
     });
-    create_result_with_non_example_data_entry(&addr, 407, 4, request_body).await;
+    create_gsb_result_with_non_example_data_entry(&addr, 901, 9, request_body).await;
 
-    let coordinator_cookie = login(&addr, CoordinatorGSB).await;
-    shared::change_status_committee_session(&addr, &coordinator_cookie, 4, 4, "completed").await;
+    let coordinator_cookie = login(&addr, CoordinatorCSB).await;
+    shared::change_status_committee_session(&addr, &coordinator_cookie, 9, 901, "completed").await;
 
-    let response = get_apportionment(&addr, 4).await;
+    let response = get_apportionment(&addr, 9).await;
     assert_eq!(response.status(), StatusCode::OK);
     let body: serde_json::Value = response.json().await.unwrap();
     assert_eq!(body["seat_assignment"]["seats"], 15);
@@ -140,14 +134,17 @@ async fn test_lt_19_seats(pool: SqlitePool) {
     assert_eq!(total_seats, vec![12, 1, 1, 1, 0, 0, 0, 0]);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
+#[test(sqlx::test(fixtures(
+    path = "../fixtures",
+    scripts("election_8_csb_with_results", "users")
+)))]
 async fn test_gte_19_seats(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
-    let coordinator_cookie = login(&addr, CoordinatorGSB).await;
-    shared::change_status_committee_session(&addr, &coordinator_cookie, 5, 6, "completed").await;
+    let coordinator_cookie = login(&addr, CoordinatorCSB).await;
+    shared::change_status_committee_session(&addr, &coordinator_cookie, 8, 801, "completed").await;
 
-    let response = get_apportionment(&addr, 5).await;
+    let response = get_apportionment(&addr, 8).await;
     assert_eq!(response.status(), StatusCode::OK);
     let body: serde_json::Value = response.json().await.unwrap();
     assert_eq!(body["seat_assignment"]["seats"], 23);
@@ -167,16 +164,17 @@ async fn test_gte_19_seats(pool: SqlitePool) {
     assert_eq!(total_seats, vec![12, 6, 1, 2, 2]);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_3", "users"))))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_10_csb", "users"))))]
 async fn test_error_all_lists_exhausted(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
-    create_result(&addr, 303, 3).await;
+    create_gsb_result(&addr, 1001, 10).await;
 
-    let coordinator_cookie = login(&addr, CoordinatorGSB).await;
-    shared::change_status_committee_session(&addr, &coordinator_cookie, 3, 3, "completed").await;
+    let coordinator_cookie = login(&addr, CoordinatorCSB).await;
+    shared::change_status_committee_session(&addr, &coordinator_cookie, 10, 1001, "completed")
+        .await;
 
-    let response = get_apportionment(&addr, 3).await;
+    let response = get_apportionment(&addr, 10).await;
     assert_eq!(response.status(), StatusCode::UNPROCESSABLE_ENTITY);
     let body: serde_json::Value = response.json().await.unwrap();
     assert_eq!(
@@ -185,21 +183,14 @@ async fn test_error_all_lists_exhausted(pool: SqlitePool) {
     );
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_3", "users"))))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_10_csb", "users"))))]
 async fn test_error_drawing_of_lots_not_implemented(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     let request_body = json!({
         "data": {
-            "model": "CSOFirstSession",
-            "extra_investigation": {
-                "extra_investigation_other_reason": { "yes": false, "no": false },
-                "ballots_recounted_extra_investigation": { "yes": false, "no": false },
-            },
-            "counting_differences_polling_station": {
-                "unexplained_difference_ballots_voters": { "yes": false, "no": true },
-                "difference_ballots_per_list": { "yes": false, "no": true },
-            },
+            "model": "GSB",
+            "number_of_voters": 2000,
             "voters_counts": {
                 "poll_card_count": 102,
                 "proxy_certificate_count": 2,
@@ -221,7 +212,7 @@ async fn test_error_drawing_of_lots_not_implemented(pool: SqlitePool) {
                 "invalid_votes_count": 1,
                 "total_votes_cast_count": 104
             },
-            "differences_counts": differences_counts_zero(),
+            "differences_counts": gsb_differences_counts_zero(),
             "political_group_votes": [
                 political_group_votes_from_test_data_auto(1, &[30, 21]),
                 political_group_votes_from_test_data_auto(2, &[30, 21]),
@@ -230,12 +221,13 @@ async fn test_error_drawing_of_lots_not_implemented(pool: SqlitePool) {
         "progress": 100,
         "client_state": {}
     });
-    create_result_with_non_example_data_entry(&addr, 303, 3, request_body).await;
+    create_gsb_result_with_non_example_data_entry(&addr, 1001, 10, request_body).await;
 
-    let coordinator_cookie = login(&addr, CoordinatorGSB).await;
-    shared::change_status_committee_session(&addr, &coordinator_cookie, 3, 3, "completed").await;
+    let coordinator_cookie = login(&addr, CoordinatorCSB).await;
+    shared::change_status_committee_session(&addr, &coordinator_cookie, 10, 1001, "completed")
+        .await;
 
-    let response = get_apportionment(&addr, 3).await;
+    let response = get_apportionment(&addr, 10).await;
     assert_eq!(response.status(), StatusCode::UNPROCESSABLE_ENTITY);
     let body: serde_json::Value = response.json().await.unwrap();
     assert_eq!(body["error"], "Drawing of lots is required");
@@ -251,14 +243,17 @@ async fn test_error_invalid_election(pool: SqlitePool) {
     assert_eq!(body["error"], "Item not found");
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users", "election_5_with_results"))))]
+#[test(sqlx::test(fixtures(
+    path = "../fixtures",
+    scripts("users", "election_8_csb_with_results")
+)))]
 async fn test_api_output(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
-    let coordinator_cookie = login(&addr, CoordinatorGSB).await;
-    shared::change_status_committee_session(&addr, &coordinator_cookie, 5, 6, "completed").await;
+    let coordinator_cookie = login(&addr, CoordinatorCSB).await;
+    shared::change_status_committee_session(&addr, &coordinator_cookie, 8, 801, "completed").await;
 
-    let response = get_apportionment(&addr, 5).await;
+    let response = get_apportionment(&addr, 8).await;
     assert_eq!(response.status(), StatusCode::OK);
     let body: serde_json::Value = response.json().await.unwrap();
     assert_eq!(body["seat_assignment"]["seats"], 23);

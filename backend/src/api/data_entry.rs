@@ -1290,9 +1290,9 @@ mod tests {
         assert_eq!(status, DataEntryStatusName::FirstEntryInProgress);
     }
 
-    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_8_csb"))))]
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_9_csb"))))]
     async fn test_claim_data_entry_gsb_ok(pool: SqlitePool) {
-        let data_entry_id = DataEntryId::from(801);
+        let data_entry_id = DataEntryId::from(901);
         let user = User::test_user(Role::TypistCSB, UserId::from(9));
         let response = data_entry_claim(
             user.clone(),
@@ -2703,9 +2703,9 @@ mod tests {
     }
 
     mod authorization {
-        use super::*;
         use test_log::test;
 
+        use super::*;
         use crate::api::tests::{
             assert_committee_category_authorization_err, assert_committee_category_authorization_ok,
         };

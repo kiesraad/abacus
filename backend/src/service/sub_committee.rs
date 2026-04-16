@@ -56,12 +56,12 @@ mod tests {
 
     use super::*;
 
-    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_8_csb"))))]
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_8_csb_with_results"))))]
     async fn test_create_and_list(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
         let committee_session_id = CommitteeSessionId::from(801);
 
-        // Create a sub committee
+        // Create a subcommittee
         let created = create(
             &mut conn,
             committee_session_id,

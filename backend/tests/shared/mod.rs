@@ -19,6 +19,13 @@ pub fn differences_counts_zero() -> serde_json::Value {
     })
 }
 
+pub fn gsb_differences_counts_zero() -> serde_json::Value {
+    serde_json::json!({
+        "more_ballots_count": 0,
+        "fewer_ballots_count": 0,
+    })
+}
+
 pub fn political_group_votes_from_test_data_auto(
     number: u32,
     candidate_votes: &[u32],
@@ -73,6 +80,43 @@ pub fn example_data_entry(client_state: Option<&str>) -> serde_json::Value {
                 "total_votes_cast_count": 104,
             },
             "differences_counts": differences_counts_zero(),
+            "political_group_votes": [
+                political_group_votes_from_test_data_auto(1, &[40, 20]),
+                political_group_votes_from_test_data_auto(2, &[30, 12]),
+            ],
+        },
+        "client_state": client_state,
+    })
+}
+
+pub fn example_gsb_data_entry(client_state: Option<&str>) -> serde_json::Value {
+    serde_json::json!({
+        "progress": 60,
+        "data": {
+            "model": "GSB",
+            "number_of_voters": 2000,
+            "voters_counts": {
+                "poll_card_count": 102,
+                "proxy_certificate_count": 2,
+                "total_admitted_voters_count": 104,
+            },
+            "votes_counts": {
+                "political_group_total_votes": [
+                    {
+                        "number": 1,
+                        "total": 60,
+                    },
+                    {
+                        "number": 2,
+                        "total": 42,
+                    },
+                ],
+                "total_votes_candidates_count": 102,
+                "blank_votes_count": 1,
+                "invalid_votes_count": 1,
+                "total_votes_cast_count": 104,
+            },
+            "differences_counts": gsb_differences_counts_zero(),
             "political_group_votes": [
                 political_group_votes_from_test_data_auto(1, &[40, 20]),
                 political_group_votes_from_test_data_auto(2, &[30, 12]),
@@ -238,25 +282,87 @@ pub async fn update_investigation(
         .unwrap()
 }
 
-pub async fn create_result(addr: &SocketAddr, data_entry_id: u32, election_id: u32) {
-    let typist_cookie = login(addr, FixtureUser::TypistGSB).await;
+pub async fn create_any_result(addr: &SocketAddr, data_entry_id: u32, election_id: u32, csb: bool) {
+    let typist_cookie = login(
+        addr,
+        if csb {
+            FixtureUser::TypistCSB
+        } else {
+            FixtureUser::TypistGSB
+        },
+    )
+    .await;
     complete_data_entry(
         addr,
         &typist_cookie,
         data_entry_id,
         1,
-        example_data_entry(None),
+        if csb {
+            example_gsb_data_entry(None)
+        } else {
+            example_data_entry(None)
+        },
     )
     .await;
-    let typist2_cookie = login(addr, FixtureUser::Typist2GSB).await;
+    let typist2_cookie = login(
+        addr,
+        if csb {
+            FixtureUser::Typist2CSB
+        } else {
+            FixtureUser::Typist2GSB
+        },
+    )
+    .await;
     complete_data_entry(
         addr,
         &typist2_cookie,
         data_entry_id,
         2,
-        example_data_entry(None),
+        if csb {
+            example_gsb_data_entry(None)
+        } else {
+            example_data_entry(None)
+        },
     )
     .await;
+    check_data_entry_status_is_definitive(addr, &typist2_cookie, data_entry_id, election_id).await;
+}
+
+pub async fn create_result(addr: &SocketAddr, data_entry_id: u32, election_id: u32) {
+    create_any_result(addr, data_entry_id, election_id, false).await;
+}
+
+pub async fn create_gsb_result(addr: &SocketAddr, data_entry_id: u32, election_id: u32) {
+    create_any_result(addr, data_entry_id, election_id, true).await;
+}
+
+pub async fn create_any_result_with_non_example_data_entry(
+    addr: &SocketAddr,
+    data_entry_id: u32,
+    election_id: u32,
+    data_entry: serde_json::Value,
+    csb: bool,
+) {
+    let typist_cookie = login(
+        addr,
+        if csb {
+            FixtureUser::TypistCSB
+        } else {
+            FixtureUser::TypistGSB
+        },
+    )
+    .await;
+    complete_data_entry(addr, &typist_cookie, data_entry_id, 1, data_entry.clone()).await;
+    let typist2_cookie = login(
+        addr,
+        if csb {
+            FixtureUser::Typist2CSB
+        } else {
+            FixtureUser::Typist2GSB
+        },
+    )
+    .await;
+    complete_data_entry(addr, &typist2_cookie, data_entry_id, 2, data_entry).await;
     check_data_entry_status_is_definitive(addr, &typist2_cookie, data_entry_id, election_id).await;
 }
 
@@ -266,11 +372,30 @@ pub async fn create_result_with_non_example_data_entry(
     election_id: u32,
     data_entry: serde_json::Value,
 ) {
-    let typist_cookie = login(addr, FixtureUser::TypistGSB).await;
-    complete_data_entry(addr, &typist_cookie, data_entry_id, 1, data_entry.clone()).await;
-    let typist2_cookie = login(addr, FixtureUser::Typist2GSB).await;
-    complete_data_entry(addr, &typist2_cookie, data_entry_id, 2, data_entry).await;
-    check_data_entry_status_is_definitive(addr, &typist2_cookie, data_entry_id, election_id).await;
+    create_any_result_with_non_example_data_entry(
+        addr,
+        data_entry_id,
+        election_id,
+        data_entry,
+        false,
+    )
+    .await;
+}
+
+pub async fn create_gsb_result_with_non_example_data_entry(
+    addr: &SocketAddr,
+    data_entry_id: u32,
+    election_id: u32,
+    data_entry: serde_json::Value,
+) {
+    create_any_result_with_non_example_data_entry(
+        addr,
+        data_entry_id,
+        election_id,
+        data_entry,
+        true,
+    )
+    .await;
 }
 
 pub async fn get_election_details(

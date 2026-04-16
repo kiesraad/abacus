@@ -88,9 +88,9 @@ describe("ResolveDifferencesPage", () => {
       ["2", mdash, "2", "Doe, C. (Charlie)"],
     ]);
 
-    expect(await screen.findByRole("heading", { level: 3, name: "Welke invoer moet bewaard blijven?" })).toBeVisible();
-    expect(await screen.findByRole("radio", { name: "De eerste invoer (Gebruiker01)" })).toBeVisible();
-    expect(await screen.findByRole("radio", { name: "De tweede invoer (Gebruiker02)" })).toBeVisible();
+    expect(await screen.findByRole("heading", { level: 3, name: "Welke invoer klopt?" })).toBeVisible();
+    expect(await screen.findByRole("radio", { name: "Eerste invoer (Gebruiker01)" })).toBeVisible();
+    expect(await screen.findByRole("radio", { name: "Tweede invoer (Gebruiker02)" })).toBeVisible();
     expect(await screen.findByRole("radio", { name: "Geen van beide: alles opnieuw invoeren" })).toBeVisible();
   });
 
@@ -102,10 +102,10 @@ describe("ResolveDifferencesPage", () => {
     expect(firstEntry).not.toHaveClass(cls.keep!);
     expect(firstEntry).not.toHaveClass(cls.discard!);
 
-    await user.click(await screen.findByRole("radio", { name: "De eerste invoer (Gebruiker01)" }));
+    await user.click(await screen.findByRole("radio", { name: "Eerste invoer (Gebruiker01)" }));
     expect(firstEntry).toHaveClass(cls.keep!);
 
-    await user.click(await screen.findByRole("radio", { name: "De tweede invoer (Gebruiker02)" }));
+    await user.click(await screen.findByRole("radio", { name: "Tweede invoer (Gebruiker02)" }));
     expect(firstEntry).toHaveClass(cls.discard!);
 
     await user.click(await screen.findByRole("radio", { name: "Geen van beide: alles opnieuw invoeren" }));
@@ -123,7 +123,7 @@ describe("ResolveDifferencesPage", () => {
     expect(resolve).not.toHaveBeenCalled();
 
     overrideResponseStatus("first_entry_finalised");
-    await user.click(await screen.findByRole("radio", { name: "De eerste invoer (Gebruiker01)" }));
+    await user.click(await screen.findByRole("radio", { name: "Eerste invoer (Gebruiker01)" }));
     await user.click(submit);
     expect(resolve).toHaveBeenCalledWith("keep_first_entry");
     expect(navigate).toHaveBeenCalledWith("/elections/1/status");
@@ -137,7 +137,7 @@ describe("ResolveDifferencesPage", () => {
     expect(getElectionStatus).toHaveBeenCalledTimes(1);
 
     overrideResponseStatus("first_entry_finalised");
-    await user.click(await screen.findByRole("radio", { name: "De tweede invoer (Gebruiker02)" }));
+    await user.click(await screen.findByRole("radio", { name: "Tweede invoer (Gebruiker02)" }));
     await user.click(await screen.findByRole("button", { name: "Opslaan" }));
 
     expect(getElectionStatus).toHaveBeenCalledTimes(2);
@@ -149,7 +149,7 @@ describe("ResolveDifferencesPage", () => {
 
     await renderPage();
     overrideResponseStatus("first_entry_finalised");
-    await user.click(await screen.findByRole("radio", { name: "De eerste invoer (Gebruiker01)" }));
+    await user.click(await screen.findByRole("radio", { name: "Eerste invoer (Gebruiker01)" }));
     await user.click(await screen.findByRole("button", { name: "Opslaan" }));
 
     expect(pushMessage).toHaveBeenCalledWith({
@@ -166,7 +166,7 @@ describe("ResolveDifferencesPage", () => {
 
     await renderPage();
     overrideResponseStatus("first_entry_finalised");
-    await user.click(await screen.findByRole("radio", { name: "De tweede invoer (Gebruiker02)" }));
+    await user.click(await screen.findByRole("radio", { name: "Tweede invoer (Gebruiker02)" }));
     await user.click(await screen.findByRole("button", { name: "Opslaan" }));
 
     expect(pushMessage).toHaveBeenCalledWith({
@@ -200,7 +200,7 @@ describe("ResolveDifferencesPage", () => {
     await renderPage();
 
     overrideResponseStatus("first_entry_has_errors");
-    await user.click(await screen.findByRole("radio", { name: "De tweede invoer (Gebruiker02)" }));
+    await user.click(await screen.findByRole("radio", { name: "Tweede invoer (Gebruiker02)" }));
     await user.click(await screen.findByRole("button", { name: "Opslaan" }));
 
     expect(pushMessage).toHaveBeenCalledWith({

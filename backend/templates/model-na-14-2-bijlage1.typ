@@ -47,16 +47,19 @@ Geef aan *waarom* de resultaten van dit stembureau zijn onderzocht. Denk bijvoor
 Schrijf op wat de *uitkomst* van het onderzoek door het #location_type was.
 
 ==== Bevindingen
-#empty_lines(5)
+#empty_lines(10)
 
 #block(below: 1.5em)
 
-Is er een *gecorrigeerde uitslag*?
-
-#checkbox[Nee #sym.arrow.r *Neem de uitkomst van het onderzoek over in het proces-verbaal van het #location_type (nieuwe zitting). Deze bijlage hoeft verder niet ingevuld te worden.*]
-
-#checkbox[Ja #sym.arrow.r *Ga verder met B1 - #ref(<corrected_results>)*]
-
+#block(
+  breakable: false, 
+  {
+    [Is er een *gecorrigeerde uitslag*?]
+    checkbox[Nee #sym.arrow.r *Neem de uitkomst van het onderzoek over in het proces-verbaal van het #location_type (nieuwe zitting). Deze bijlage hoeft verder niet ingevuld te worden.*]
+    checkbox[Ja #sym.arrow.r *Ga verder met B1 - #ref(<corrected_results>)*]
+  }
+)
+  
 #pagebreak(weak: true)
 
 = Gecorrigeerde telresultaten <corrected_results>

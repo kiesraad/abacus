@@ -1015,7 +1015,7 @@ export interface GenerateElectionArgs {
   committee_category: CommitteeCategory;
   /** Percentage of the first data entry to complete if data entry is included */
   first_data_entry: RandomRange;
-  /** Generate multiple elections, each resulting in a different P22-2 variant */
+  /** Generate multiple elections, each resulting in a different P 22-2 variant */
   generate_p22_2_variants: boolean;
   political_group_distribution_slope: RandomRange;
   /** Number of political groups to create */
@@ -1427,6 +1427,7 @@ export const validationResultCodeValues = [
   "F201",
   "F202",
   "F203",
+  "F204",
   "F301",
   "F302",
   "F303",

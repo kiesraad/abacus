@@ -143,7 +143,7 @@ export function ElectionStatusPage() {
       statuses.every((s) => s.status === "definitive") ? (
         <Alert type="success">
           <strong className="heading-md">{t("election_status.definitive.title")}</strong>
-          <p>{t("election_status.definitive.message")}</p>
+          <p>{t(`election_status.definitive.message.${election.committee_category}`)}</p>
           <Button onClick={finishDataEntry} size="md">
             {t("election_status.definitive.finish_button")}
           </Button>

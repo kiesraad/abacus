@@ -41,6 +41,7 @@ export function ElectionReportPage() {
   }
 
   // Safeguard so users cannot circumvent the check via the browser's address bar
+  // TODO: Issue #3154: Add check for final apportionment state for CSB election
   if (committeeSession.status !== "completed") {
     throw new ApplicationError(t("error.forbidden_message"), "InvalidCommitteeSessionStatus");
   }

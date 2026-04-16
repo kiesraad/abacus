@@ -1,7 +1,11 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { getCommitteeSessionMockData } from "@/testing/api-mocks/CommitteeSessionMockData";
-import type { CommitteeCategory, CommitteeSessionStatus } from "@/types/generated/openapi";
+import {
+  type CommitteeCategory,
+  type CommitteeSessionStatus,
+  committeeCategoryValues,
+} from "@/types/generated/openapi";
 
 import { CommitteeSessionCard } from "./CommitteeSessionCard";
 
@@ -37,6 +41,7 @@ export default {
     status: "data_entry",
     startDateTime: "2025-11-08T09:15:00",
     isCurrentSession: true,
+    committeeCategory: "GSB",
   },
   argTypes: {
     number: {
@@ -52,6 +57,10 @@ export default {
     },
     isCurrentSession: {
       options: [true, false],
+      control: { type: "radio" },
+    },
+    committeeCategory: {
+      options: committeeCategoryValues,
       control: { type: "radio" },
     },
   },

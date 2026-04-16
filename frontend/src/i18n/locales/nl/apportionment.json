@@ -1,5 +1,6 @@
 {
   "absolute_majority_reassignment": "Lijst {list_assigned_seat} heeft meer dan de helft van alle uitgebrachte stemmen behaald, maar krijgt op basis van de standaard zetelverdeling niet de meerderheid van de zetels. Volgens de Kieswet (Artikel P 9 Toewijzing zetels bij volstrekte meerderheid) krijgt deze lijst één extra zetel. Deze zetel gaat ten koste van lijst {list_retracted_seat} omdat die de laatste restzetel toegewezen heeft gekregen.",
+  "all_seats_assigned": "Alle zetels zijn toegewezen",
   "already_assigned": "Reeds toegewezen",
   "article_p10": "(Kieswet, artikel P 10)",
   "assigned_number_of_seats": "Toegewezen aantal zetels",
@@ -30,6 +31,7 @@
   },
   "list_exhaustion_full_seat_removal": "Omdat lijst {list_retracted_seat} onvoldoende kandidaten heeft, is één volle zetel herverdeeld als restzetel.",
   "list_exhaustion_residual_seat_removal": "Omdat lijst {list_retracted_seat} geen kandidaat heeft voor een zetel, is deze herverdeeld naar een andere lijst.",
+  "make_apportionment_definitive": "Je kunt de zetelverdeling nu definitief maken en het proces-verbaal downloaden.",
   "minus": "min",
   "not_possible": "Zetelverdeling is niet mogelijk",
   "not_yet_available": "Zetelverdeling is nog niet beschikbaar",

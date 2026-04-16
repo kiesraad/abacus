@@ -37,6 +37,11 @@ describe("AccountSetupForm", () => {
 
     await user.type(screen.getByRole("textbox", { name: "Jouw naam (roepnaam + achternaam)" }), "First Last");
     await user.type(screen.getByLabelText("Kies nieuw wachtwoord"), "password*password");
+    expect(
+      await screen.findByText(
+        "Gebruik minimaal 13 karakters. Je hebt dit wachtwoord nodig als je na een pauze opnieuw wilt inloggen.",
+      ),
+    ).toBeVisible();
     await user.type(screen.getByLabelText("Herhaal wachtwoord"), "password*password");
 
     const submitButton = screen.getByRole("button", { name: "Opslaan" });

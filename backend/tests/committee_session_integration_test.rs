@@ -309,6 +309,32 @@ async fn test_committee_session_update_works(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+async fn test_committee_session_update_works_with_time_without_leading_zero(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    let coordinator_cookie = login(&addr, CoordinatorGSB).await;
+
+    let url = format!("http://{addr}/api/elections/2/committee_sessions/2");
+    let response = reqwest::Client::new()
+        .put(&url)
+        .header("cookie", coordinator_cookie)
+        .json(&serde_json::json!({
+            "location": "Juinen".to_string(),
+            "start_date": "2026-03-18".to_string(),
+            "start_time": "9:45".to_string(),
+        }))
+        .send()
+        .await
+        .unwrap();
+
+    // Ensure the response is what we expect
+    assert_eq!(
+        response.status(),
+        StatusCode::NO_CONTENT,
+        "Unexpected response status"
+    );
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_committee_session_update_bad_request(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = login(&addr, CoordinatorGSB).await;

@@ -112,7 +112,7 @@ test.describe("full data entry flow with gaps in party/candidate numbers", () =>
 
     await expect(dataEntryHomePage.alertDataEntrySaved).toHaveText(
       [
-        "Je invoer is opgeslagen",
+        "Eerste invoer is opgeslagen",
         "Geef het papieren proces-verbaal terug aan de coördinator.",
         "Een andere invoerder doet straks de tweede invoer.",
       ].join(""),

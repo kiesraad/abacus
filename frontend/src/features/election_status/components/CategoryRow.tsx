@@ -10,6 +10,7 @@ import { t } from "@/i18n/translate";
 import type { DataEntryStatusName, ElectionStatusResponseEntry } from "@/types/generated/openapi";
 import { formatDateTime } from "@/utils/dateTime";
 import type { StatusCategory, StatusEntryWithTypist } from "../hooks/useElectionStatus";
+import cls from "./ElectionStatus.module.css";
 
 interface CategoryRowProps {
   category: StatusCategory;
@@ -73,8 +74,10 @@ function CategoryRowContent({ category, statusEntryWithTypist, warning }: Catego
     <>
       <Table.NumberCell key={`${key}-number`}>{entry.source.number}</Table.NumberCell>
       <Table.Cell key={`${key}-name`}>
-        <span>{entry.source.name}</span>
-        {SHOW_BADGE.includes(entry.status) && <Badge type={entry.status} userRole={user.role} />}
+        <div className={cls.cellWithBadge}>
+          <span>{entry.source.name}</span>
+          {SHOW_BADGE.includes(entry.status) && <Badge type={entry.status} userRole={user.role} />}
+        </div>
       </Table.Cell>
       {(category === "in_progress" || category === "first_entry_finished") && (
         <Table.Cell key={`${key}-typist`}>{typist}</Table.Cell>

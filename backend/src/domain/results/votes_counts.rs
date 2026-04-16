@@ -137,40 +137,49 @@ impl VotesCounts {
             .iter()
             .map(|pgv| pgv.total as u64)
             .sum::<u64>();
-        if political_group_total_votes_sum != self.total_votes_candidates_count as u64 {
-            let mut fields: Vec<String> = self
-                .political_group_total_votes
-                .iter()
-                .enumerate()
-                .map(|(i, _)| {
-                    path.field("political_group_total_votes")
-                        .index(i)
-                        .field("total")
-                        .to_string()
-                })
-                .collect();
-            fields.push(path.field("total_votes_candidates_count").to_string());
 
+        if political_group_total_votes_sum != 0 && self.total_votes_candidates_count == 0 {
             validation_results.errors.push(ValidationResult {
-                fields,
-                code: ValidationResultCode::F202,
+                fields: vec![path.field("total_votes_candidates_count").to_string()],
+                code: ValidationResultCode::F204,
                 context: None,
             });
-        }
+        } else {
+            if political_group_total_votes_sum != self.total_votes_candidates_count as u64 {
+                let mut fields: Vec<String> = self
+                    .political_group_total_votes
+                    .iter()
+                    .enumerate()
+                    .map(|(i, _)| {
+                        path.field("political_group_total_votes")
+                            .index(i)
+                            .field("total")
+                            .to_string()
+                    })
+                    .collect();
+                fields.push(path.field("total_votes_candidates_count").to_string());
 
-        if self.total_votes_candidates_count + self.blank_votes_count + self.invalid_votes_count
-            != self.total_votes_cast_count
-        {
-            validation_results.errors.push(ValidationResult {
-                fields: vec![
-                    path.field("total_votes_candidates_count").to_string(),
-                    path.field("blank_votes_count").to_string(),
-                    path.field("invalid_votes_count").to_string(),
-                    path.field("total_votes_cast_count").to_string(),
-                ],
-                code: ValidationResultCode::F203,
-                context: None,
-            });
+                validation_results.errors.push(ValidationResult {
+                    fields,
+                    code: ValidationResultCode::F202,
+                    context: None,
+                });
+            }
+
+            if self.total_votes_candidates_count + self.blank_votes_count + self.invalid_votes_count
+                != self.total_votes_cast_count
+            {
+                validation_results.errors.push(ValidationResult {
+                    fields: vec![
+                        path.field("total_votes_candidates_count").to_string(),
+                        path.field("blank_votes_count").to_string(),
+                        path.field("invalid_votes_count").to_string(),
+                        path.field("total_votes_cast_count").to_string(),
+                    ],
+                    code: ValidationResultCode::F203,
+                    context: None,
+                });
+            }
         }
     }
 
@@ -425,6 +434,28 @@ mod tests {
                     "votes_counts.invalid_votes_count".into(),
                     "votes_counts.total_votes_cast_count".into(),
                 ],
+                context: None,
+            }],
+        );
+
+        Ok(())
+    }
+
+    /// GSB CSO/DSO, CSB | F.204: 'Aantal kiezers en stemmen': De som van lijsttotalen (E.1 t/m E.n) is groter dan 0 en E = leeg of 0
+    #[test]
+    fn test_f204() -> Result<(), DataError> {
+        // No error
+        let validation_results = validate(&[50, 30, 20], 100, 1, 2, 103)?;
+        assert!(validation_results.errors.is_empty());
+
+        // Error: sum of political group totals is 100, but total votes on candidates is 0
+        // F.202/F.203 errors should not be triggered, since F.204 takes precedence
+        let validation_results = validate(&[50, 30, 20], 0, 1, 2, 103)?;
+        assert_eq!(
+            validation_results.errors,
+            [ValidationResult {
+                code: ValidationResultCode::F204,
+                fields: vec!["votes_counts.total_votes_candidates_count".into()],
                 context: None,
             }],
         );

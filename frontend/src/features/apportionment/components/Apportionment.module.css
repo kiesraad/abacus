@@ -88,7 +88,7 @@ td > .footnoteNumber {
   background-color: var(--bg-gray);
 }
 
-.electionSummaryTable {
+table.electionSummaryTable {
   tr {
     th {
       color: var(--base-black);
@@ -100,7 +100,7 @@ td > .footnoteNumber {
   }
 }
 
-.fullSeatsTable {
+table.fullSeatsTable {
   tr {
     th {
       /* Signs (: and =) */
@@ -116,11 +116,11 @@ td > .footnoteNumber {
   }
 }
 
-.residualSeatsCalculationTable {
+table.residualSeatsCalculationTable {
   max-width: 34rem;
 }
 
-.highestAveragesTable {
+table.highestAveragesTable {
   max-width: calc(100vw - 10rem);
   width: fit-content;
   tr {

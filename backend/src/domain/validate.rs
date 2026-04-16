@@ -65,6 +65,8 @@ pub enum ValidationResultCode {
     F202,
     /// CSO/DSO: 'Aantal kiezers en stemmen': stemmen op kandidaten + blanco stemmen + ongeldige stemmen <> totaal aantal uitgebrachte stemmen
     F203,
+    /// GSB CSO/DSO, CSB: 'Aantal kiezers en stemmen': De som van lijsttotalen (E.1 t/m E.n) is groter dan 0 en E = leeg of 0
+    F204,
     /// CSO: "Vergelijk D&H": (checkbox D=H is aangevinkt, maar D<>H)
     F301,
     /// CSO: "Vergelijk D&H": (checkbox H>D is aangevinkt, maar H<=D)

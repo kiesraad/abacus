@@ -18,7 +18,7 @@ describe("ResolveDifferencesTables", () => {
     render(<ResolveDifferencesTables first={first} second={second} structure={structure} />);
 
     const extraInvestigationTable = await screen.findByRole("table", {
-      name: "Alleen bij extra onderzoek",
+      name: "Rubriek: Alleen bij extra onderzoek",
     });
     expect(extraInvestigationTable).toBeVisible();
     expect(extraInvestigationTable).toHaveTableContent([
@@ -28,7 +28,7 @@ describe("ResolveDifferencesTables", () => {
     ]);
 
     const votersVotesCountsTable = await screen.findByRole("table", {
-      name: "Toegelaten kiezers en uitgebrachte stemmen",
+      name: "Rubriek: Toegelaten kiezers en uitgebrachte stemmen",
     });
     expect(votersVotesCountsTable).toBeVisible();
     expect(votersVotesCountsTable).toHaveTableContent([
@@ -41,12 +41,12 @@ describe("ResolveDifferencesTables", () => {
     ]);
 
     const differencesCountsTable = screen.queryByRole("table", {
-      name: "Verschillen tussen aantal kiezers en uitgebrachte stemmen B1-3.3",
+      name: "Rubriek: Verschillen tussen aantal kiezers en uitgebrachte stemmen B1-3.3",
     });
     expect(differencesCountsTable).not.toBeInTheDocument();
 
     const fieryWingsPartyTable = await screen.findByRole("table", {
-      name: "Lijst 1 - Vurige Vleugels Partij",
+      name: "Rubriek: Lijst 1 - Vurige Vleugels Partij",
     });
     expect(fieryWingsPartyTable).toBeVisible();
     expect(fieryWingsPartyTable).toHaveTableContent([
@@ -125,7 +125,7 @@ describe("ResolveDifferencesTables", () => {
         />,
       );
 
-      const table = screen.queryByRole("table", { name: "test" });
+      const table = screen.queryByRole("table", { name: "Rubriek: test" });
       expect(table).not.toBeInTheDocument();
     });
 
@@ -140,7 +140,7 @@ describe("ResolveDifferencesTables", () => {
         />,
       );
 
-      const table = screen.queryByRole("table", { name: "test" });
+      const table = screen.queryByRole("table", { name: "Rubriek: test" });
       expect(table).toHaveTableContent([
         ["Veld", "Eerste invoer", "Tweede invoer", "Omschrijving"],
         ["", "yes", "no", "short title"],
@@ -166,7 +166,7 @@ describe("ResolveDifferencesTables", () => {
 
       render(<ResolveDifferencesTables first={firstResults} second={secondResults} structure={[checkboxSection]} />);
 
-      const table = screen.queryByRole("table", { name: "test" });
+      const table = screen.queryByRole("table", { name: "Rubriek: test" });
       expect(table).toHaveTableContent([
         ["Veld", "Eerste invoer", "Tweede invoer", "Omschrijving"],
         ["", "yes, no", "-", "short title"],
@@ -198,7 +198,7 @@ describe("ResolveDifferencesTables", () => {
         />,
       );
 
-      expect(await screen.findByRole("heading")).toHaveTextContent("Section title");
+      expect(await screen.findByRole("heading")).toHaveTextContent("Rubriek: Section title");
     });
 
     test("render heading title if a heading subsection is provided", async () => {
@@ -217,7 +217,7 @@ describe("ResolveDifferencesTables", () => {
         />,
       );
 
-      expect(await screen.findByRole("heading")).toHaveTextContent("Heading title");
+      expect(await screen.findByRole("heading")).toHaveTextContent("Rubriek: Heading title");
     });
   });
 });

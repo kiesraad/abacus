@@ -15,7 +15,7 @@ import type {
 } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 import { committeeSessionLabel } from "@/utils/committeeSession";
-import { formatDateTimeFull } from "@/utils/dateTime";
+import { formatDateTimeFullWithoutWeekday } from "@/utils/dateTime";
 
 import cls from "./CommitteeSessionCard.module.css";
 
@@ -38,7 +38,11 @@ function Card({ icon, label, status, date, button, children, ...props }: CardPro
         <p>
           <b>{label}</b> — {status}
         </p>
-        {date && <span className={cn(cls.date, "capitalize-first")}>{date}</span>}
+        {date && (
+          <span className={cls.date}>
+            {t("election_management.began_on")} {date}
+          </span>
+        )}
       </div>
       {children}
       {button}
@@ -111,7 +115,7 @@ export function CommitteeSessionCard({
   const label = committeeSessionLabel(committeeCategory, committeeSession.number);
   const status = t(`committee_session_status.coordinator.${committeeSession.status}`);
   const date = committeeSession.start_date_time
-    ? formatDateTimeFull(new Date(committeeSession.start_date_time))
+    ? formatDateTimeFullWithoutWeekday(new Date(committeeSession.start_date_time))
     : undefined;
   const buttonLinks: ButtonLink[] = [];
   let cardButton: ReactElement | undefined;

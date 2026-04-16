@@ -14,7 +14,7 @@ export class ElectionDetailsPgObj {
     this.subHeader = page.getByRole("heading", { level: 2, name: /Details van de \w zitting/ });
     this.locationInput = page.getByRole("textbox", { name: "Plaats van de zitting" });
     this.dateInput = page.getByRole("textbox", { name: "Datum" });
-    this.timeInput = page.getByRole("textbox", { name: "Tijd" });
+    this.timeInput = page.getByRole("textbox", { name: "Starttijd" });
     this.save = page.getByRole("button", { name: "Wijzigingen opslaan" });
     this.toCertifiedResults = page.getByRole("button", { name: "Naar proces-verbaal" });
   }

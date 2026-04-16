@@ -79,7 +79,7 @@ describe("Test CheckAndSaveForm", () => {
     // check message and navigation for next data entry page
     expect(pushMessage).toHaveBeenCalledWith({
       type: "success",
-      title: "Je invoer is opgeslagen",
+      title: "Eerste invoer is opgeslagen",
       text:
         "Geef het papieren proces-verbaal terug aan de coördinator.\n" +
         "Een andere invoerder doet straks de tweede invoer.",

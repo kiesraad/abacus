@@ -409,6 +409,21 @@ export interface AuditLogUser {
   username: string;
 }
 
+/**
+ * Polling station base entity, linked to an election but
+ * independent of the committee session or data entry.
+ */
+export interface BasePollingStation {
+  address: string;
+  id: PollingStationId;
+  locality: string;
+  name: string;
+  number: u32;
+  number_of_voters?: number;
+  polling_station_type?: PollingStationType;
+  postal_code: string;
+}
+
 export interface CSBElectionCreationRequest {
   candidate_data: string;
   candidate_hash: string[];
@@ -649,8 +664,10 @@ export interface DataEntryGetResponse {
 export type DataEntryId = number;
 
 export type DataEntrySource =
-  | (PollingStationSource & { type: "PollingStation" })
-  | (SubCommittee & { type: "SubCommittee" });
+  | (PollingStationForSession & { type: "PollingStation" })
+  | (SubCommitteeFirstSession & { type: "SubCommittee" });
+
+export type DataEntrySourceNumber = { number: u32; type: "PollingStation" } | { number: u32; type: "SubCommittee" };
 
 export const dataEntryStatusNameValues = [
   "empty",
@@ -819,6 +836,8 @@ export interface ElectionStatusResponseEntry {
 export interface ElectionSummary {
   /** The differences between voters and votes */
   differences_counts: SummaryDifferencesCounts;
+  /** The number of voters (i.e. "Kiesgerechtigden") */
+  number_of_voters?: number;
   /** The summary votes for each political group (and each candidate within) */
   political_group_votes: PoliticalGroupCandidateVotes[];
   /** Polling stations where results were investigated by the GSB */
@@ -877,6 +896,7 @@ export const errorReferenceValues = [
   "InvalidJson",
   "InvalidPassword",
   "InvalidPoliticalGroup",
+  "InvalidDataEntrySource",
   "InvalidSession",
   "InvalidStateTransition",
   "InvalidUsernameOrPassword",
@@ -995,7 +1015,7 @@ export interface GenerateElectionArgs {
   committee_category: CommitteeCategory;
   /** Percentage of the first data entry to complete if data entry is included */
   first_data_entry: RandomRange;
-  /** Generate multiple elections, each resulting in a different P22-2 variant */
+  /** Generate multiple elections, each resulting in a different P 22-2 variant */
   generate_p22_2_variants: boolean;
   political_group_distribution_slope: RandomRange;
   /** Number of political groups to create */
@@ -1022,12 +1042,31 @@ export interface HighestAverageAssignedSeat {
   votes_per_seat: DisplayFraction;
 }
 
+export interface InvestigationConcludedWithNewResults {
+  findings: string;
+  reason: string;
+}
+
+export interface InvestigationConcludedWithoutNewResults {
+  findings: string;
+  reason: string;
+}
+
+export interface InvestigationInProgress {
+  reason: string;
+}
+
 /**
  * Investigation list response
  */
 export interface InvestigationListResponse {
   investigations: PollingStationInvestigation[];
 }
+
+export type InvestigationStatus =
+  | { state: InvestigationInProgress; status: "InProgress" }
+  | { state: InvestigationConcludedWithoutNewResults; status: "ConcludedWithoutNewResults" }
+  | { state: InvestigationConcludedWithNewResults; status: "ConcludedWithNewResults" };
 
 export interface LargestRemainderAssignedSeat {
   list_assigned: PGNumber[];
@@ -1142,6 +1181,22 @@ export interface PollingStationFileRequest {
   data: string;
 }
 
+/**
+ * Polling station in a first committee session.
+ * No investigations, no previous data entries.
+ */
+export type PollingStationFirstSession = BasePollingStation & {
+  committee_session_id: CommitteeSessionId;
+  data_entry_id: DataEntryId;
+};
+
+/**
+ * A single polling station for either a first or next committee session
+ */
+export type PollingStationForSession =
+  | (PollingStationFirstSession & { session_type: "First" })
+  | (PollingStationNextSession & { session_type: "Next" });
+
 export type PollingStationId = number;
 
 export interface PollingStationInvestigation {
@@ -1192,6 +1247,16 @@ export interface PollingStationListResponse {
 }
 
 /**
+ * Polling station in a next committee session.
+ * May have previous data entries and investigation state.
+ */
+export type PollingStationNextSession = BasePollingStation & {
+  committee_session_id: CommitteeSessionId;
+  investigation_status?: InvestigationStatus;
+  prev_data_entry_id?: DataEntryId;
+};
+
+/**
  * Polling station of a certain [crate::domain::election::Election]
  */
 export interface PollingStationRequest {
@@ -1206,12 +1271,6 @@ export interface PollingStationRequest {
 
 export interface PollingStationRequestListResponse {
   polling_stations: PollingStationRequest[];
-}
-
-export interface PollingStationSource {
-  id: PollingStationId;
-  name: string;
-  number: number;
 }
 
 /**
@@ -1303,6 +1362,14 @@ export interface SubCommittee {
   number: number;
 }
 
+/**
+ * Sub electoral committee in a first committee session.
+ */
+export type SubCommitteeFirstSession = SubCommittee & {
+  committee_session_id: CommitteeSessionId;
+  data_entry_id: DataEntryId;
+};
+
 export type SubCommitteeId = number;
 
 /**
@@ -1311,7 +1378,7 @@ export type SubCommitteeId = number;
  */
 export interface SumCount {
   count: number;
-  polling_stations: number[];
+  data_entry_sources: DataEntrySourceNumber[];
 }
 
 /**
@@ -1360,6 +1427,7 @@ export const validationResultCodeValues = [
   "F201",
   "F202",
   "F203",
+  "F204",
   "F301",
   "F302",
   "F303",
@@ -1370,6 +1438,7 @@ export const validationResultCodeValues = [
   "F308",
   "F309",
   "F310",
+  "F312",
   "F401",
   "F402",
   "F403",
@@ -1430,3 +1499,5 @@ export interface YesNo {
   no: boolean;
   yes: boolean;
 }
+
+export type u32 = number;

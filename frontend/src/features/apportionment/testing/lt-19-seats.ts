@@ -1388,11 +1388,11 @@ export const election_summary: ElectionSummary = {
   differences_counts: {
     more_ballots_count: {
       count: 0,
-      polling_stations: [],
+      data_entry_sources: [],
     },
     fewer_ballots_count: {
       count: 0,
-      polling_stations: [],
+      data_entry_sources: [],
     },
   },
   polling_station_investigations: {

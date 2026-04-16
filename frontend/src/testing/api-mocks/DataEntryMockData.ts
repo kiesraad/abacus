@@ -19,8 +19,19 @@ export const emptyValidationResults: ValidationResults = {
 };
 
 const source = (id: number): DataEntrySource => {
-  const { number, name } = pollingStationMockData.find((p) => p.id === id)!;
-  return { type: "PollingStation", id, number, name };
+  const { number, name, address, postal_code, locality } = pollingStationMockData.find((p) => p.id === id)!;
+  return {
+    type: "PollingStation",
+    id,
+    number,
+    name,
+    session_type: "First",
+    committee_session_id: 1,
+    data_entry_id: 1,
+    address,
+    postal_code,
+    locality,
+  };
 };
 
 export function emptyResults(model: DataEntryModel = "CSOFirstSession"): Results {

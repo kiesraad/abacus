@@ -54,11 +54,11 @@
     "differences_counts": {
       "more_ballots_count": {
         "count": 0,
-        "polling_stations": []
+        "data_entry_sources": []
       },
       "fewer_ballots_count": {
         "count": 0,
-        "polling_stations": []
+        "data_entry_sources": []
       }
     },
     "polling_station_investigations": {
@@ -92,11 +92,11 @@
     "differences_counts": {
       "more_ballots_count": {
         "count": 0,
-        "polling_stations": []
+        "data_entry_sources": []
       },
       "fewer_ballots_count": {
         "count": 1,
-        "polling_stations": [1]
+        "data_entry_sources": [{"type": "PollingStation", "number": 1}]
       }
     },
     "polling_station_investigations": {

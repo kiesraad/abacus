@@ -23,9 +23,10 @@ pub struct SubCommittee {
 }
 
 /// Sub electoral committee in a first committee session.
-#[derive(Debug, Clone)]
+#[derive(Serialize, Deserialize, ToSchema, Debug, Clone)]
 pub struct SubCommitteeFirstSession {
     pub committee_session_id: CommitteeSessionId,
+    #[serde(flatten)]
     pub sub_committee: SubCommittee,
     pub data_entry_id: DataEntryId,
 }

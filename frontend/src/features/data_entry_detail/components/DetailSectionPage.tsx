@@ -30,8 +30,9 @@ export function DetailSectionPage() {
 
   return (
     <ReadOnlyDataEntrySection
+      election={election}
       section={section}
-      data={dataEntry.data}
+      dataEntryResults={dataEntry.data}
       validationResults={dataEntry.validation_results}
     />
   );

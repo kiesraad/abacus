@@ -74,11 +74,11 @@
     "differences_counts": {
       "more_ballots_count": {
         "count": 0,
-        "polling_stations": []
+        "data_entry_sources": []
       },
       "fewer_ballots_count": {
         "count": 2,
-        "polling_stations": [1, 3, 5]
+        "data_entry_sources": [{"type": "PollingStation", "number": 1}, {"type": "PollingStation", "number": 3}, {"type": "PollingStation", "number": 5}]
       }
     },
     "polling_station_investigations": {

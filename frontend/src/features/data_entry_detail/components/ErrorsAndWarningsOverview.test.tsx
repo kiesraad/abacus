@@ -40,7 +40,7 @@ describe("ErrorsAndWarningsOverview", () => {
       warnings: [validationResultMockData.W201],
     };
 
-    render(<ErrorsAndWarningsOverview structure={structure} results={results} />);
+    render(<ErrorsAndWarningsOverview election={electionMockData} structure={structure} validationResults={results} />);
 
     const extra_investigation = screen.queryByRole("region", { name: "Extra onderzoek B1-1" });
     expect(extra_investigation).toBeInTheDocument();

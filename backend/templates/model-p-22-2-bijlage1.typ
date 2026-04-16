@@ -6,15 +6,15 @@
 
 #show: doc => conf(
   doc,
-  header-left: [
-    Bijlage 1
-  ],
+  header-left: [Bijlage 1],
   header-right: [Centraal stembureau #input.election.location],
   footer: [
     Proces-verbaal van het #location_type\
     Model P 22-2
-  ],
-  margin-bottom: 3.2cm
+    
+    Datum: #input.creation_date_time - SHA-256-Hashcode: \
+    #input.hash
+  ], margin-bottom: 3.2cm
 )
 
 = Bijlage 1

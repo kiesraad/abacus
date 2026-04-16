@@ -56,6 +56,8 @@ impl ToPdfFileModel for ModelP22_2Input {
 pub struct ModelP22_2Bijlage1Input {
     pub election: Election,
     pub votes_tables: VotesTables,
+    pub hash: String,
+    pub creation_date_time: String,
 }
 
 impl ToPdfFileModel for ModelP22_2Bijlage1Input {

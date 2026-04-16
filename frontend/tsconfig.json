@@ -11,7 +11,6 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "baseUrl": ".",
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
@@ -19,7 +18,8 @@
     "noUncheckedIndexedAccess": true,
     "rootDir": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["./src/*"],
+      "e2e-tests/*": ["./e2e-tests/*"]
     },
     "types": ["node", "vite/client", "vitest/importMeta"]
   },

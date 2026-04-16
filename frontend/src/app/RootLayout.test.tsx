@@ -4,6 +4,8 @@ import { RouterProvider } from "react-router";
 import { describe, expect, test, vi } from "vitest";
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { LoginPage } from "@/features/account/components/LoginPage";
+import { InitialisedHandler } from "@/testing/api-mocks/RequestHandlers";
+import { server } from "@/testing/server";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 import { expectForbiddenErrorPage, setupTestRouter } from "@/testing/test-utils";
 import type { Role } from "@/types/generated/openapi";
@@ -36,6 +38,7 @@ describe("Route authorisation is handled", () => {
     allowed: boolean;
   }>)("$handle, ownRole=$ownRole, allowed=$allowed", async ({ handle, ownRole, allowed }) => {
     vi.spyOn(console, "error").mockImplementation(() => {});
+    server.use(InitialisedHandler);
 
     const router = render(
       [

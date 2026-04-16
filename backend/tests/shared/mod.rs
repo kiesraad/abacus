@@ -330,7 +330,7 @@ pub async fn create_any_result(
     check_data_entry_status_is_definitive(addr, &typist2_cookie, data_entry_id, election_id).await;
 }
 
-pub async fn create_result(addr: &SocketAddr, data_entry_id: u32, election_id: u32) {
+pub async fn create_cso_result(addr: &SocketAddr, data_entry_id: u32, election_id: u32) {
     create_any_result(addr, data_entry_id, election_id, CommitteeCategory::GSB).await;
 }
 

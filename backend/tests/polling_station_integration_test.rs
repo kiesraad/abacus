@@ -9,8 +9,8 @@ use test_log::test;
 
 use crate::{
     shared::{
-        FixtureUser::*, change_status_committee_session, claim_data_entry, create_investigation,
-        create_polling_station, create_result, example_cso_data_entry,
+        FixtureUser::*, change_status_committee_session, claim_data_entry, create_cso_result,
+        create_investigation, create_polling_station, example_cso_data_entry,
         get_election_committee_session, get_election_details, get_investigations, get_statuses,
         login, save_data_entry,
     },
@@ -915,7 +915,7 @@ async fn test_delete_with_result_works(pool: SqlitePool) {
     let polling_station_id = 211;
 
     let coordinator_cookie = login(&addr, CoordinatorGSB).await;
-    create_result(&addr, 201, election_id).await;
+    create_cso_result(&addr, 201, election_id).await;
     let statuses = get_statuses(&addr, &coordinator_cookie, election_id).await;
     assert_eq!(statuses.len(), 2);
 
@@ -1154,8 +1154,8 @@ async fn check_completed_to_data_entry_on<F, Fut>(
     let coordinator_cookie = login(addr, CoordinatorGSB).await;
     let election_id = 2;
 
-    create_result(addr, 201, election_id).await;
-    create_result(addr, 202, election_id).await;
+    create_cso_result(addr, 201, election_id).await;
+    create_cso_result(addr, 202, election_id).await;
 
     change_status_committee_session(addr, &coordinator_cookie, election_id, 2, "completed").await;
     let committee_session =

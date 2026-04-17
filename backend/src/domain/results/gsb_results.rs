@@ -171,16 +171,22 @@ impl Validate for GSBResults {
             &path.field("number_of_voters"),
         )?;
 
+        self.voters_counts
+            .validate(election, validation_results, &path.field("voters_counts"))?;
+
         if self.number_of_voters == 0 {
             validation_results.warnings.push(ValidationResult {
                 fields: vec![path.field("number_of_voters").to_string()],
                 code: ValidationResultCode::W205,
                 context: None,
             });
+        } else if self.number_of_voters < self.voters_counts.poll_card_count {
+            validation_results.warnings.push(ValidationResult {
+                fields: vec![path.field("number_of_voters").to_string()],
+                code: ValidationResultCode::W206,
+                context: None,
+            });
         }
-
-        self.voters_counts
-            .validate(election, validation_results, &path.field("voters_counts"))?;
 
         self.votes_counts
             .validate(election, validation_results, &path.field("votes_counts"))?;
@@ -595,6 +601,38 @@ mod tests {
                 context: None,
             }],
         );
+
+        Ok(())
+    }
+
+    /// CSB | W.206: 'Aantal kiezers en stemmen': (Als W.205 niet getoond wordt) Aantal kiesgerechtigden is kleiner dan aantal stempassen
+    #[test]
+    fn test_w206() -> Result<(), DataError> {
+        let mut data = create_test_data();
+        let expected_w206 = ValidationResult {
+            code: ValidationResultCode::W206,
+            fields: vec!["data.number_of_voters".into()],
+            context: None,
+        };
+
+        // (description, Z=number_of_voters, A=poll_card_count, expect_w206)
+        type Case = (&'static str, u32, u32, bool);
+        let cases: Vec<Case> = vec![
+            ("Z > A", 91, 90, false),
+            ("Z = A", 90, 90, false),
+            ("Z < A", 89, 90, true),
+            ("Z < A, Z=0", 0, 90, false), // W.206 should not trigger due to W.205
+        ];
+
+        for (description, number_of_voters, poll_card_count, expect_w206) in cases {
+            data.number_of_voters = number_of_voters;
+            data.voters_counts.poll_card_count = poll_card_count;
+
+            let result = validate(data.clone())?;
+
+            let has_w206 = result.warnings.iter().any(|e| e == &expected_w206);
+            assert_eq!(has_w206, expect_w206, "Failed: {description}");
+        }
 
         Ok(())
     }

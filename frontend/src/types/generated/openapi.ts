@@ -1448,6 +1448,7 @@ export const validationResultCodeValues = [
   "W203",
   "W204",
   "W205",
+  "W206",
 ] as const;
 export type ValidationResultCode = (typeof validationResultCodeValues)[number];
 

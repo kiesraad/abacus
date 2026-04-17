@@ -107,6 +107,8 @@ pub enum ValidationResultCode {
     W204,
     /// CSB: 'Aantal kiezers en stemmen': Aantal kiesgerechtigden = leeg of 0
     W205,
+    /// CSB: 'Aantal kiezers en stemmen': (Als W.205 niet getoond wordt) Aantal kiesgerechtigden is kleiner dan aantal stempassen
+    W206,
 }
 
 #[derive(Debug, Eq, PartialEq)]

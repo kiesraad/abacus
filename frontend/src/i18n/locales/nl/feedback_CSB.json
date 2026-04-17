@@ -93,5 +93,14 @@
       "title": "Het aantal kiesgerechtigden (Z) is niet ingevuld",
       "content": "Controleer of er iets is misgegaan bij het opmaken of overdragen van het proces-verbaal van het onderliggende niveau.\nBlijft de fout? Overleg dan met het CSB over de vervolgstappen."
     }
+  },
+  "W206": {
+    "typist": {
+      "title": "Controleer je antwoorden"
+    },
+    "coordinator": {
+      "title": "Het aantal kiesgerechtigden (Z) is kleiner dan het aantal stempassen (A)",
+      "content": "Controleer of er iets is misgegaan bij het opmaken of overdragen van het proces-verbaal van het onderliggende niveau.\nBlijft de fout? Overleg dan met het CSB over de vervolgstappen."
+    }
   }
 }

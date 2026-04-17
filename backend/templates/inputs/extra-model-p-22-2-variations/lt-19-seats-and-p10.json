@@ -216,7 +216,24 @@
             "votes": 2
           }
         ],
-        "updated_candidate_ranking": []
+        "updated_candidate_ranking": [
+          {
+            "number": 1,
+            "initials": "L.",
+            "first_name": "Lidewij",
+            "last_name": "Oud",
+            "locality": "Test Location",
+            "gender": "Female"
+          },
+          {
+            "number": 2,
+            "initials": "J.",
+            "first_name": "Johan",
+            "last_name": "Oud",
+            "locality": "Test Location",
+            "gender": "Male"
+          }
+        ]
       },
       {
         "list_number": 2,
@@ -233,7 +250,24 @@
             "votes": 2
           }
         ],
-        "updated_candidate_ranking": []
+        "updated_candidate_ranking": [
+          {
+            "number": 1,
+            "initials": "T.",
+            "first_name": "Tinus",
+            "last_name": "Bakker",
+            "locality": "Test Location",
+            "gender": "Male",
+            "country_code": "BE"
+          },
+          {
+            "number": 2,
+            "initials": "D.",
+            "last_name": "Po",
+            "locality": "Test Location",
+            "gender": "X"
+          }
+        ]
       },
       {
         "list_number": 3,
@@ -250,7 +284,24 @@
           }
         ],
         "other_candidate_nomination": [],
-        "updated_candidate_ranking": []
+        "updated_candidate_ranking": [
+          {
+            "number": 1,
+            "initials": "G.",
+            "first_name": "Gert",
+            "last_name": "Smit",
+            "locality": "Test Location",
+            "gender": "Male"
+          },
+          {
+            "number": 2,
+            "initials": "E.",
+            "first_name": "Eva",
+            "last_name": "Koster",
+            "locality": "Test Location",
+            "gender": "Female"
+          }
+        ]
       }
     ]
   },

@@ -537,7 +537,24 @@
           }
         ],
         "other_candidate_nomination": [],
-        "updated_candidate_ranking": []
+        "updated_candidate_ranking": [
+          {
+            "number": 1,
+            "initials": "G.",
+            "first_name": "Gert",
+            "last_name": "Smit",
+            "locality": "Test Location",
+            "gender": "Male"
+          },
+          {
+            "number": 2,
+            "initials": "E.",
+            "first_name": "Eva",
+            "last_name": "Koster",
+            "locality": "Test Location",
+            "gender": "Female"
+          }
+        ]
       },
       {
         "list_number": 4,
@@ -555,7 +572,24 @@
             "votes": 89
           }
         ],
-        "updated_candidate_ranking": []
+        "updated_candidate_ranking": [
+          {
+            "number": 1,
+            "initials": "T.",
+            "first_name": "Tjolk",
+            "last_name": "Hekking",
+            "locality": "Test Location",
+            "gender": "Male"
+          },
+          {
+            "number": 2,
+            "initials": "H.",
+            "first_name": "Henny",
+            "last_name": "Hekking",
+            "locality": "Test Location",
+            "gender": "Female"
+          }
+        ]
       },
       {
         "list_number": 5,
@@ -572,7 +606,25 @@
           }
         ],
         "other_candidate_nomination": [],
-        "updated_candidate_ranking": []
+        "updated_candidate_ranking": [
+          {
+            "number": 1,
+            "initials": "F.",
+            "first_name": "Frederik",
+            "last_name": "Jacobse",
+            "locality": "Test Location",
+            "gender": "Male"
+          },
+          {
+            "number": 2,
+            "initials": "T.J.",
+            "first_name": "Tedje Johannes",
+            "last_name_prefix": "van",
+            "last_name": "Es",
+            "locality": "Test Location",
+            "gender": "Male"
+          }
+        ]
       }
     ]
   },

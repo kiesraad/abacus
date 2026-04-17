@@ -217,6 +217,7 @@ impl ResultsInput {
             candidate_nomination: map_candidate_nomination(
                 result.candidate_nomination,
                 self.election.political_groups.clone(),
+                true,
             ),
             result_changes_full_seats: vec![],
             result_changes_residual_seats: vec![],

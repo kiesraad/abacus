@@ -489,11 +489,7 @@ De aan de lijsten toegewezen volle zetels en restzetels zijn bij elkaar opgeteld
   }
 
   emph_block[*Rangschikking van kandidaten voor opvolging*]
-  let unelected_candidates_ranking = if (list_candidate_nomination.updated_candidate_ranking.len() > 0) {
-    list_candidate_nomination.updated_candidate_ranking.slice(list_candidate_nomination.list_seats)
-  } else {
-    pg.candidates.slice(list_candidate_nomination.list_seats)
-  }
+  let unelected_candidates_ranking = list_candidate_nomination.updated_candidate_ranking.slice(list_candidate_nomination.list_seats)
 
   if unelected_candidates_ranking.len() > 0 {
     [De volgende kandidaten hebben geen zetel toegewezen gekregen. Als een zetel vrijkomt wordt deze via de onderstaande volgorde aan opvolgers toegewezen.]

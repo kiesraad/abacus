@@ -43,20 +43,12 @@ fn sort_candidates_alphabetically(mut candidates: Vec<ChosenCandidate>) -> Vec<C
     candidates
 }
 
-pub fn map_candidate_nomination(
-    cn: apportionment::CandidateNominationResult<'_, PoliticalGroupCandidateVotes>,
-    political_groups: Vec<PoliticalGroup>,
-) -> CandidateNomination {
-    let mut list_names: HashMap<PGNumber, String> = HashMap::new();
-    let mut candidate_map: HashMap<(PGNumber, CandidateNumber), Candidate> = HashMap::new();
-    for list in political_groups {
-        for candidate in &list.candidates {
-            candidate_map.insert((list.number, candidate.number), candidate.clone());
-        }
-        list_names.insert(list.number, list.name);
-    }
-
-    let mut chosen_candidates: Vec<ChosenCandidate> = cn
+fn get_sorted_chosen_candidates(
+    cn: &apportionment::CandidateNominationResult<'_, PoliticalGroupCandidateVotes>,
+    candidate_map: HashMap<(PGNumber, CandidateNumber), Candidate>,
+    list_names: HashMap<PGNumber, String>,
+) -> Vec<ChosenCandidate> {
+    let chosen_candidates = cn
         .chosen_candidates
         .iter()
         .map(|c| {
@@ -70,7 +62,25 @@ pub fn map_candidate_nomination(
             )
         })
         .collect();
-    chosen_candidates = sort_candidates_alphabetically(chosen_candidates);
+    sort_candidates_alphabetically(chosen_candidates)
+}
+
+pub fn map_candidate_nomination(
+    cn: apportionment::CandidateNominationResult<'_, PoliticalGroupCandidateVotes>,
+    political_groups: Vec<PoliticalGroup>,
+    fill_updated_candidate_ranking: bool,
+) -> CandidateNomination {
+    let mut list_names: HashMap<PGNumber, String> = HashMap::new();
+    let mut candidate_map: HashMap<(PGNumber, CandidateNumber), Candidate> = HashMap::new();
+    for list in political_groups.clone() {
+        for candidate in &list.candidates {
+            candidate_map.insert((list.number, candidate.number), candidate.clone());
+        }
+        list_names.insert(list.number, list.name);
+    }
+
+    let chosen_candidates: Vec<ChosenCandidate> =
+        get_sorted_chosen_candidates(&cn, candidate_map.clone(), list_names.clone());
 
     let list_candidate_nomination = cn
         .list_candidate_nomination
@@ -91,11 +101,22 @@ pub fn map_candidate_nomination(
                 .into_iter()
                 .copied()
                 .collect(),
-            updated_candidate_ranking: lcn
-                .updated_candidate_ranking
-                .iter()
-                .map(|num| candidate_map[&(lcn.list_number, *num)].clone())
-                .collect(),
+            updated_candidate_ranking: if fill_updated_candidate_ranking
+                && lcn.updated_candidate_ranking.is_empty()
+            {
+                political_groups
+                    .clone()
+                    .iter()
+                    .find(|p| p.number == lcn.list_number)
+                    .expect("Political group exists")
+                    .candidates
+                    .clone()
+            } else {
+                lcn.updated_candidate_ranking
+                    .iter()
+                    .map(|num| candidate_map[&(lcn.list_number, *num)].clone())
+                    .collect()
+            },
         })
         .collect();
 

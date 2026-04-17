@@ -236,6 +236,5 @@ fuzz_target!(
                     Osv2020Result::Conflict => {} // both agree
                 }
             }
-            Err(ApportionmentError::CommitteeSessionNotCompleted) => unreachable!(), // cannot happen, see #3181
         }
 });

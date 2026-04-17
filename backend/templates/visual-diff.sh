@@ -16,6 +16,7 @@ typst compile --font-path fonts model-na-31-2-inlegvel.typ model-na-31-2-inlegve
 typst compile --font-path fonts model-na-31-2.typ model-na-31-2-old.pdf
 typst compile --font-path fonts model-p-2a.typ model-p-2a-old.pdf
 typst compile --font-path fonts model-p-22-2.typ model-p-22-2-old.pdf
+typst compile --font-path fonts model-p-22-2-bijlage1.typ model-p-22-2-bijlage1-old.pdf
 
 # instruct the user to switch to the feature branch before generating the "new" PDFs
 echo "Please make sure you are on the feature branch to generate the 'new' PDFs."
@@ -29,6 +30,7 @@ typst compile --font-path fonts model-na-31-2-inlegvel.typ model-na-31-2-inlegve
 typst compile --font-path fonts model-na-31-2.typ model-na-31-2-new.pdf
 typst compile --font-path fonts model-p-2a.typ model-p-2a-new.pdf
 typst compile --font-path fonts model-p-22-2.typ model-p-22-2-new.pdf
+typst compile --font-path fonts model-p-22-2-bijlage1.typ model-p-22-2-bijlage1-new.pdf
 
 diff-pdf --view model-n-10-2-old.pdf model-n-10-2-new.pdf
 diff-pdf --view model-na-14-2-bijlage1-old.pdf model-na-14-2-bijlage1-new.pdf
@@ -38,3 +40,4 @@ diff-pdf --view model-na-31-2-inlegvel-old.pdf model-na-31-2-inlegvel-new.pdf
 diff-pdf --view model-na-31-2-old.pdf model-na-31-2-new.pdf
 diff-pdf --view model-p-2a-old.pdf model-p-2a-new.pdf
 diff-pdf --view model-p-22-2-old.pdf model-p-22-2-new.pdf
+diff-pdf --view model-p-22-2-bijlage1-old.pdf model-p-22-2-bijlage1-new.pdf

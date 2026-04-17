@@ -23,6 +23,7 @@ static MODELS: &[&str] = &[
     "model-n-10-2",
     "model-p-2a",
     "model-p-22-2",
+    "model-p-22-2-bijlage1",
 ];
 
 /// Temporary path to store generated PDFs

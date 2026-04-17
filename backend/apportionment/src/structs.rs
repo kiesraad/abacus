@@ -1,8 +1,9 @@
+use std::fmt::Debug;
+
 use super::{
     candidate_nomination::CandidateNominationResult, fraction::Fraction,
     seat_assignment::SeatAssignmentResult,
 };
-use std::fmt::Debug;
 
 pub(crate) const LARGE_COUNCIL_THRESHOLD: u32 = 19;
 
@@ -10,7 +11,6 @@ pub(crate) const LARGE_COUNCIL_THRESHOLD: u32 = 19;
 #[derive(Debug, PartialEq)]
 pub enum ApportionmentError {
     AllListsExhausted,
-    CommitteeSessionNotCompleted,
     DrawingOfLotsNotImplemented,
     ZeroVotesCast,
 }

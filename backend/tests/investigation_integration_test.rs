@@ -9,10 +9,11 @@ use test_log::test;
 
 use crate::{
     shared::{
-        FixtureUser::*, change_status_committee_session, complete_data_entry, create_investigation,
-        create_polling_station, create_result_with_non_example_data_entry, differences_counts_zero,
-        get_election_committee_session, get_election_details, get_statuses, login,
-        political_group_votes_from_test_data_auto, update_investigation,
+        FixtureUser::*, change_status_committee_session, complete_data_entry,
+        create_cso_result_with_non_example_data_entry, create_investigation,
+        create_polling_station, differences_counts_zero, get_election_committee_session,
+        get_election_details, get_statuses, login, political_group_votes_from_test_data_auto,
+        update_investigation,
     },
     utils::serve_api,
 };
@@ -349,7 +350,7 @@ async fn test_update_with_result(pool: SqlitePool) {
     let data_entry_id = u32::try_from(conclude_body["data_entry_id"].as_u64().unwrap()).unwrap();
 
     // Complete data entry
-    create_result_with_non_example_data_entry(
+    create_cso_result_with_non_example_data_entry(
         &addr,
         data_entry_id,
         election_id,

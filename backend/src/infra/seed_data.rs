@@ -26,7 +26,7 @@ macro_rules! load_fixtures {
 const FIXTURES: &[Fixture] = load_fixtures!([
     "election_1",
     "election_5_with_results",
-    "election_8_csb",
+    "election_8_csb_with_results",
     "users"
 ]);
 

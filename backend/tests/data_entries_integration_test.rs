@@ -10,7 +10,7 @@ use test_log::test;
 
 use crate::{
     shared::{
-        FixtureUser::*, claim_data_entry, complete_data_entry, example_data_entry,
+        FixtureUser::*, claim_data_entry, complete_data_entry, example_cso_data_entry,
         finalise_data_entry, get_statuses, login, save_data_entry,
     },
     utils::serve_api,
@@ -32,7 +32,7 @@ async fn test_data_entry_valid(pool: SqlitePool) {
         &typist_cookie,
         data_entry_id,
         1,
-        example_data_entry(None),
+        example_cso_data_entry(None),
     )
     .await;
     let validation_results: serde_json::Value = response.json().await.unwrap();
@@ -269,7 +269,7 @@ async fn test_data_entry_only_for_existing(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let typist_cookie = login(&addr, TypistGSB).await;
 
-    let request_body = example_data_entry(None);
+    let request_body = example_cso_data_entry(None);
     let invalid_id = 123_456_789;
 
     let url = format!("http://{addr}/api/data_entries/{invalid_id}/1");
@@ -303,7 +303,7 @@ async fn test_data_entry_claim(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let typist_cookie = login(&addr, TypistGSB).await;
 
-    let request_body = example_data_entry(None);
+    let request_body = example_cso_data_entry(None);
     let data_entry_id = 201;
 
     // claim a data entry
@@ -357,7 +357,7 @@ async fn test_data_entry_claim_finalised(pool: SqlitePool) {
         &typist_cookie,
         data_entry_id,
         1,
-        example_data_entry(None),
+        example_cso_data_entry(None),
     )
     .await;
 
@@ -376,7 +376,7 @@ async fn test_data_entry_claim_finalised(pool: SqlitePool) {
 async fn test_data_entry_deletion(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let typist_cookie = login(&addr, TypistGSB).await;
-    let request_body = example_data_entry(None);
+    let request_body = example_cso_data_entry(None);
 
     let data_entry_id = 201;
 
@@ -455,7 +455,7 @@ async fn test_election_details_status(pool: SqlitePool) {
         &typist_cookie,
         data_entry_id_1,
         1,
-        example_data_entry(None),
+        example_cso_data_entry(None),
     )
     .await;
 
@@ -466,7 +466,7 @@ async fn test_election_details_status(pool: SqlitePool) {
         &typist_cookie,
         data_entry_id_2,
         1,
-        example_data_entry(Some(r#"{"continue": true}"#)),
+        example_cso_data_entry(Some(r#"{"continue": true}"#)),
     )
     .await;
 
@@ -492,7 +492,7 @@ async fn test_election_details_status(pool: SqlitePool) {
         &typist2_cookie,
         data_entry_id_1,
         2,
-        example_data_entry(Some(r#"{"continue": true}"#)),
+        example_cso_data_entry(Some(r#"{"continue": true}"#)),
     )
     .await;
     save_data_entry(
@@ -500,7 +500,7 @@ async fn test_election_details_status(pool: SqlitePool) {
         &typist_cookie,
         data_entry_id_2,
         1,
-        example_data_entry(Some(r#"{"continue": false}"#)),
+        example_cso_data_entry(Some(r#"{"continue": false}"#)),
     )
     .await;
 
@@ -525,7 +525,7 @@ async fn test_election_details_status(pool: SqlitePool) {
         &typist2_cookie,
         data_entry_id_1,
         2,
-        example_data_entry(None),
+        example_cso_data_entry(None),
     )
     .await;
 
@@ -559,7 +559,7 @@ async fn test_election_details_status_no_other_election_statuses(pool: SqlitePoo
         &typist_cookie,
         data_entry_id_1,
         1,
-        example_data_entry(Some(r#"{"continue": true}"#)),
+        example_cso_data_entry(Some(r#"{"continue": true}"#)),
     )
     .await;
 
@@ -571,7 +571,7 @@ async fn test_election_details_status_no_other_election_statuses(pool: SqlitePoo
         &typist_cookie,
         data_entry_id_3,
         1,
-        example_data_entry(Some(r#"{"continue": true}"#)),
+        example_cso_data_entry(Some(r#"{"continue": true}"#)),
     )
     .await;
 

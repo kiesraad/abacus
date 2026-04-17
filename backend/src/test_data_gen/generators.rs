@@ -302,7 +302,11 @@ fn generate_election(
     NewElection {
         name,
         committee_category: args.committee_category,
-        counting_method: Some(VoteCountingMethod::CSO),
+        counting_method: if args.committee_category == CommitteeCategory::CSB {
+            None
+        } else {
+            Some(VoteCountingMethod::CSO)
+        },
         domain_id: super::data::domain_id(rng),
         election_id,
         location: locality,

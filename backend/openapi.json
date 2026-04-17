@@ -1258,7 +1258,7 @@
     },
     "/api/elections/{election_id}/apportionment": {
       "post": {
-        "summary": "Get the apportionment for an election (coordinator_gsb)",
+        "summary": "Get the apportionment for an election (coordinator_csb)",
         "operationId": "election_apportionment",
         "parameters": [
           {
@@ -1348,7 +1348,7 @@
         "security": [
           {
             "cookie_auth": [
-              "coordinator_gsb"
+              "coordinator_csb"
             ]
           }
         ]

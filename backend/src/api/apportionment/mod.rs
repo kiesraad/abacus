@@ -43,7 +43,7 @@ impl From<ApportionmentApiError> for APIError {
 pub fn router() -> OpenApiRouter<AppState> {
     use Role::*;
 
-    const ALLOWED_ROLES: &[Role] = &[CoordinatorGSB];
+    const ALLOWED_ROLES: &[Role] = &[CoordinatorCSB];
 
     OpenApiRouter::default()
         .routes(routes!(handlers::election_apportionment).authorize(ALLOWED_ROLES))

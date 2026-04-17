@@ -5,22 +5,9 @@ use crate::domain::{
     committee_session::CommitteeSession,
     election::{Election, ElectionWithPoliticalGroups},
     models::{PdfFileModel, PdfModel, ToPdfFileModel},
-    results::{voters_counts::VotersCounts, votes_counts::VotesCounts},
-    summary::SummaryDifferencesCounts,
+    summary::ElectionSummaryCSB,
     votes_table::VotesTables,
 };
-
-/// Contains a limited summary of the election results, added up from the votes of all polling stations.
-#[derive(Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct LimitedElectionSummary {
-    /// The total number of voters
-    pub voters_counts: VotersCounts,
-    /// The total number of votes
-    pub votes_counts: VotesCounts,
-    /// The differences between voters and votes
-    pub differences_counts: SummaryDifferencesCounts,
-}
 
 /// Contains the result changes that have occurred in the apportionment.
 #[derive(Serialize, Deserialize)]
@@ -36,7 +23,7 @@ pub struct ResultChange {
 pub struct ModelP22_2Input {
     pub committee_session: CommitteeSession,
     pub election: ElectionWithPoliticalGroups,
-    pub summary: LimitedElectionSummary,
+    pub summary: ElectionSummaryCSB,
     pub seat_assignment: SeatAssignment,
     pub candidate_nomination: CandidateNomination,
     pub result_changes_full_seats: Vec<ResultChange>,

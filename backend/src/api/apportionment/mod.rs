@@ -5,6 +5,10 @@ mod handlers;
 mod mapping;
 mod structs;
 
+pub use self::{
+    mapping::{map_candidate_nomination, map_seat_assignment},
+    structs::ApportionmentInputData,
+};
 use crate::{
     APIError, AppState, api::middleware::authentication::RouteAuthorization, domain::role::Role,
 };

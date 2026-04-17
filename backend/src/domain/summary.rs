@@ -320,6 +320,28 @@ impl From<ElectionSummary> for ElectionSummaryWithoutVotes {
     }
 }
 
+/// A version of ElectionSummary without the political group votes and investigations
+#[derive(Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct ElectionSummaryCSB {
+    /// The total number of voters
+    pub voters_counts: VotersCounts,
+    /// The total number of votes
+    pub votes_counts: VotesCounts,
+    /// The differences between voters and votes
+    pub differences_counts: SummaryDifferencesCounts,
+}
+
+impl From<ElectionSummary> for ElectionSummaryCSB {
+    fn from(summary: ElectionSummary) -> Self {
+        ElectionSummaryCSB {
+            voters_counts: summary.voters_counts,
+            votes_counts: summary.votes_counts,
+            differences_counts: summary.differences_counts,
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use test_log::test;

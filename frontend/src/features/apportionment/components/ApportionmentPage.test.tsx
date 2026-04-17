@@ -51,6 +51,15 @@ describe("ApportionmentPage", () => {
 
     expect(await screen.findByRole("heading", { level: 1, name: "Zetelverdeling" })).toBeVisible();
 
+    expect(await screen.findByText("Alle zetels zijn toegewezen")).toBeVisible();
+    expect(
+      await screen.findByText("Je kunt de zetelverdeling nu definitief maken en het proces-verbaal downloaden."),
+    ).toBeVisible();
+    expect(screen.getByRole("link", { name: "Naar proces-verbaal" })).toHaveAttribute(
+      "href",
+      "/report/committee-session/3/download",
+    );
+
     expect(await screen.findByRole("heading", { level: 2, name: "Kengetallen" })).toBeVisible();
     const election_summary_table = await screen.findByTestId("election-summary-table");
     expect(election_summary_table).toBeVisible();
@@ -143,6 +152,7 @@ describe("ApportionmentPage", () => {
         await screen.findByText("De zetelverdeling kan pas gemaakt worden als de zitting is afgerond"),
       ).toBeVisible();
 
+      expect(screen.queryByText("Alle zetels zijn toegewezen")).not.toBeInTheDocument();
       expect(screen.queryByTestId("election-summary-table")).not.toBeInTheDocument();
       expect(screen.queryByTestId("apportionment-table")).not.toBeInTheDocument();
       expect(screen.queryByTestId("chosen-candidates-table")).not.toBeInTheDocument();
@@ -166,6 +176,7 @@ describe("ApportionmentPage", () => {
         await screen.findByText("Loting is noodzakelijk, maar nog niet beschikbaar in deze versie van Abacus"),
       ).toBeVisible();
 
+      expect(screen.queryByText("Alle zetels zijn toegewezen")).not.toBeInTheDocument();
       expect(screen.queryByTestId("election-summary-table")).not.toBeInTheDocument();
       expect(screen.queryByTestId("apportionment-table")).not.toBeInTheDocument();
       expect(screen.queryByTestId("chosen-candidates-table")).not.toBeInTheDocument();
@@ -191,6 +202,7 @@ describe("ApportionmentPage", () => {
         ),
       ).toBeVisible();
 
+      expect(screen.queryByText("Alle zetels zijn toegewezen")).not.toBeInTheDocument();
       expect(screen.queryByTestId("election-summary-table")).not.toBeInTheDocument();
       expect(screen.queryByTestId("apportionment-table")).not.toBeInTheDocument();
       expect(screen.queryByTestId("chosen-candidates-table")).not.toBeInTheDocument();
@@ -216,6 +228,7 @@ describe("ApportionmentPage", () => {
         ),
       ).toBeVisible();
 
+      expect(screen.queryByText("Alle zetels zijn toegewezen")).not.toBeInTheDocument();
       expect(screen.queryByTestId("election-summary-table")).not.toBeInTheDocument();
       expect(screen.queryByTestId("apportionment-table")).not.toBeInTheDocument();
       expect(screen.queryByTestId("chosen-candidates-table")).not.toBeInTheDocument();

@@ -127,7 +127,7 @@ export function CheckAndSaveForm() {
       } else {
         pushMessage({
           type: "success",
-          title: t("data_entry.entry_saved"),
+          title: t(`data_entry.entry_saved_${entryNumber}`),
           text: t(`data_entry.entry_saved_message_${entryNumber}`),
         });
       }

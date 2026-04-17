@@ -11,6 +11,7 @@ import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { getElectionStatusMockData } from "@/testing/api-mocks/ElectionStatusMockData";
 import {
   CommitteeSessionStatusChangeRequestHandler,
+  CSBElectionRequestHandler,
   ElectionListRequestHandler,
   ElectionRequestHandler,
   ElectionStatusRequestHandler,
@@ -31,7 +32,7 @@ import { electionStatusRoutes } from "../routes";
 
 const navigate = vi.fn();
 
-async function renderPage() {
+async function renderPage(electionId: number) {
   // Set up router and navigate to the election data entry status page
   const router = setupTestRouter([
     {
@@ -48,7 +49,7 @@ async function renderPage() {
     },
   ]);
 
-  await router.navigate("/elections/1/status");
+  await router.navigate(`/elections/${electionId}/status`);
   rtlRender(<Providers router={router} />);
 
   return router;
@@ -80,7 +81,7 @@ describe("ElectionStatusPage", () => {
       ),
     );
 
-    await renderPage();
+    await renderPage(1);
 
     // Test that the data entry completed and data entry paused alerts don't exist
     expect(screen.queryByText("Alle stembureaus zijn twee keer ingevoerd")).not.toBeInTheDocument();
@@ -110,7 +111,7 @@ describe("ElectionStatusPage", () => {
       ),
     );
 
-    await renderPage();
+    await renderPage(1);
 
     // Test that the data entry completed and data entry paused alerts don't exist
     expect(screen.queryByText("Alle stembureaus zijn twee keer ingevoerd")).not.toBeInTheDocument();
@@ -138,7 +139,7 @@ describe("ElectionStatusPage", () => {
       ),
     );
 
-    await renderPage();
+    await renderPage(1);
 
     // Test that the data entry completed and data entry paused alerts don't exist
     expect(screen.queryByText("Alle stembureaus zijn twee keer ingevoerd")).not.toBeInTheDocument();
@@ -155,7 +156,7 @@ describe("ElectionStatusPage", () => {
     const user = userEvent.setup();
     const statusChange = spyOnHandler(CommitteeSessionStatusChangeRequestHandler);
 
-    await renderPage();
+    await renderPage(1);
 
     // Test that the data entry completed and data entry paused alerts don't exist
     expect(screen.queryByText("Alle stembureaus zijn twee keer ingevoerd")).not.toBeInTheDocument();
@@ -192,7 +193,7 @@ describe("ElectionStatusPage", () => {
   test("Page render when committee session status is data_entry for administrator", async () => {
     vi.spyOn(useUser, "useUser").mockReturnValue(getAdminUser());
 
-    await renderPage();
+    await renderPage(1);
 
     // Test that the data entry completed and data entry paused alerts don't exist
     expect(screen.queryByText("Alle stembureaus zijn twee keer ingevoerd")).not.toBeInTheDocument();
@@ -216,13 +217,18 @@ describe("ElectionStatusPage", () => {
       ),
     );
 
-    await renderPage();
+    await renderPage(1);
 
     // Test that the data entry paused alert doesn't exist
     expect(screen.queryByText("Het invoeren van stemmen is gepauzeerd")).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Invoer hervatten" })).not.toBeInTheDocument();
 
     expect(await screen.findByText("Alle stembureaus zijn twee keer ingevoerd")).toBeVisible();
+    expect(
+      await screen.findByText(
+        "De resultaten van alle stembureaus in jouw gemeente zijn correct ingevoerd. Je kunt de uitkomst nu definitief maken en het proces-verbaal opmaken. Doe dit alleen als er vandaag niks meer herteld hoeft te worden.",
+      ),
+    ).toBeVisible();
     const finishButton = screen.getByRole("button", { name: "Invoerfase afronden" });
     expect(finishButton).toBeVisible();
 
@@ -240,7 +246,7 @@ describe("ElectionStatusPage", () => {
       getElectionStatusMockData([{ status: "definitive" }, { status: "definitive" }]),
     );
 
-    await renderPage();
+    await renderPage(1);
 
     // Test that the data entry completed and data entry paused alerts don't exist
     expect(screen.queryByText("Alle stembureaus zijn twee keer ingevoerd")).not.toBeInTheDocument();
@@ -267,7 +273,7 @@ describe("ElectionStatusPage", () => {
       ),
     );
 
-    await renderPage();
+    await renderPage(1);
 
     expect(screen.queryByText("Het invoeren van stemmen is gepauzeerd")).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Invoer hervatten" })).not.toBeInTheDocument();
@@ -292,7 +298,7 @@ describe("ElectionStatusPage", () => {
       ),
     );
 
-    await renderPage();
+    await renderPage(1);
 
     expect(screen.queryByText("Alle stembureaus zijn twee keer ingevoerd")).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Invoerfase afronden" })).not.toBeInTheDocument();
@@ -325,7 +331,7 @@ describe("ElectionStatusPage", () => {
       ),
     );
 
-    await renderPage();
+    await renderPage(1);
 
     // Test that the data entry completed and data entry paused alerts don't exist
     expect(screen.queryByText("Alle stembureaus zijn twee keer ingevoerd")).not.toBeInTheDocument();
@@ -356,7 +362,7 @@ describe("ElectionStatusPage", () => {
       getElectionStatusMockData([{ status: "definitive" }, { status: "definitive" }]),
     );
 
-    await renderPage();
+    await renderPage(1);
 
     // Test that the data entry completed and data entry paused alerts don't exist
     expect(screen.queryByText("Alle stembureaus zijn twee keer ingevoerd")).not.toBeInTheDocument();
@@ -377,7 +383,7 @@ describe("ElectionStatusPage", () => {
       reference: "Forbidden",
     } satisfies ErrorResponse);
 
-    await renderPage();
+    await renderPage(1);
 
     await expectForbiddenErrorPage();
   });
@@ -401,7 +407,7 @@ describe("ElectionStatusPage", () => {
       reference: "InvalidCommitteeSessionStatus",
     } satisfies ErrorResponse);
 
-    await renderPage();
+    await renderPage(1);
 
     expect(await screen.findByText("Het invoeren van stemmen is gepauzeerd")).toBeVisible();
     const resumeButton = screen.getByRole("button", { name: "Invoer hervatten" });
@@ -419,7 +425,7 @@ describe("ElectionStatusPage", () => {
   test("Clicking progress status scrolls corresponding table into view via element link", async () => {
     vi.spyOn(useUser, "useUser").mockReturnValue(getCoordinatorUser());
 
-    await renderPage();
+    await renderPage(1);
 
     expect(await screen.findByRole("heading", { level: 2, name: "Statusoverzicht invoer" })).toBeVisible();
 
@@ -459,7 +465,7 @@ describe("ElectionStatusPage", () => {
 
   test("Refetches data every 30 seconds", async () => {
     vi.useFakeTimers();
-    await renderPage();
+    await renderPage(1);
 
     // Wait for the page to be loaded
     await vi.waitFor(() => {
@@ -480,5 +486,39 @@ describe("ElectionStatusPage", () => {
     }
 
     vi.useRealTimers();
+  });
+
+  describe("CSB", () => {
+    test("Finish input alert visible when data entry has completed for coordinator", async () => {
+      vi.spyOn(useUser, "useUser").mockReturnValue(getCoordinatorUser("csb"));
+      const user = userEvent.setup();
+      server.use(CSBElectionRequestHandler);
+      server.use(
+        http.get("/api/elections/2/status", () =>
+          HttpResponse.json(getElectionStatusMockData([{ status: "definitive" }, { status: "definitive" }]), {
+            status: 200,
+          }),
+        ),
+      );
+
+      await renderPage(2);
+
+      // Test that the data entry paused alert doesn't exist
+      expect(screen.queryByText("Het invoeren van stemmen is gepauzeerd")).not.toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: "Invoer hervatten" })).not.toBeInTheDocument();
+
+      expect(await screen.findByText("Alle stembureaus zijn twee keer ingevoerd")).toBeVisible();
+      expect(
+        await screen.findByText(
+          "De resultaten van het gemeentelijk stembureau zijn correct ingevoerd. Je kunt de uitkomst nu definitief maken en het proces-verbaal opmaken. Doe dit alleen als er vandaag niks meer herteld hoeft te worden.",
+        ),
+      ).toBeVisible();
+      const finishButton = screen.getByRole("button", { name: "Invoerfase afronden" });
+      expect(finishButton).toBeVisible();
+
+      await user.click(finishButton);
+
+      expect(navigate).toHaveBeenCalledWith("../report");
+    });
   });
 });

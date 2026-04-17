@@ -171,6 +171,14 @@ impl Validate for GSBResults {
             &path.field("number_of_voters"),
         )?;
 
+        if self.number_of_voters == 0 {
+            validation_results.warnings.push(ValidationResult {
+                fields: vec![path.field("number_of_voters").to_string()],
+                code: ValidationResultCode::W205,
+                context: None,
+            });
+        }
+
         self.voters_counts
             .validate(election, validation_results, &path.field("voters_counts"))?;
 
@@ -570,6 +578,30 @@ mod tests {
                     }),
                 }
             ],
+        );
+
+        Ok(())
+    }
+
+    /// CSB | W.205: 'Aantal kiezers en stemmen': Aantal kiesgerechtigden = leeg of 0
+    #[test]
+    fn test_w205() -> Result<(), DataError> {
+        let mut data = create_test_data();
+
+        // No error
+        let validation_results = validate(data.clone())?;
+        assert!(validation_results.warnings.is_empty());
+
+        // Error: number_of_voters is 0, expect W.205
+        data.number_of_voters = 0;
+        let validation_results = validate(data)?;
+        assert_eq!(
+            validation_results.warnings,
+            [ValidationResult {
+                code: ValidationResultCode::W205,
+                fields: vec!["data.number_of_voters".into()],
+                context: None,
+            }],
         );
 
         Ok(())

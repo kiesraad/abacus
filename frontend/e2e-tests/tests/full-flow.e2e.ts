@@ -277,7 +277,7 @@ test.describe("full flow", () => {
     await electionDetails.fillForm("Pannerdam", "18-03-2026", "21:34");
 
     await expect(electionHome.header).toContainText("Gemeenteraad Test 2022");
-    await expect(page.getByText("woensdag 18 maart 2026 om 21:34")).toBeVisible();
+    await expect(page.getByText("Begon op 18 maart 2026 om 21:34")).toBeVisible();
     await electionHome.startButton.click();
 
     const electionStatus = new ElectionStatus(page);

@@ -88,7 +88,7 @@ describe("CommitteeSessionDetailsPage", () => {
     expect(location).toHaveValue("");
     const date = screen.getByRole("textbox", { name: "Datum" });
     expect(date).toHaveValue("");
-    const time = screen.getByRole("textbox", { name: "Tijd" });
+    const time = screen.getByRole("textbox", { name: "Starttijd" });
     expect(time).toHaveValue("");
     const saveButton = screen.getByRole("button", { name: "Wijzigingen opslaan" });
 
@@ -105,7 +105,7 @@ describe("CommitteeSessionDetailsPage", () => {
 
     await user.type(location, "Amsterdam");
     await user.type(date, "2025-12-31");
-    await user.type(time, "9:15");
+    await user.type(time, "24:15");
 
     // Submit with invalid date and time
     await user.click(saveButton);
@@ -120,7 +120,7 @@ describe("CommitteeSessionDetailsPage", () => {
     await user.clear(date);
     await user.type(date, "31-12-2025");
     await user.clear(time);
-    await user.type(time, "09:15");
+    await user.type(time, "0:15");
 
     // Submit with valid data
     await user.click(saveButton);
@@ -166,7 +166,7 @@ describe("CommitteeSessionDetailsPage", () => {
     expect(location).toHaveValue("Den Haag");
     const date = screen.getByRole("textbox", { name: "Datum" });
     expect(date).toHaveValue("18-03-2026");
-    const time = screen.getByRole("textbox", { name: "Tijd" });
+    const time = screen.getByRole("textbox", { name: "Starttijd" });
     expect(time).toHaveValue("21:36");
   });
 
@@ -287,7 +287,7 @@ describe("CommitteeSessionDetailsPage", () => {
 
     const location = screen.getByRole("textbox", { name: "Plaats van de zitting" });
     const date = screen.getByRole("textbox", { name: "Datum" });
-    const time = screen.getByRole("textbox", { name: "Tijd" });
+    const time = screen.getByRole("textbox", { name: "Starttijd" });
 
     await user.type(location, "Amsterdam");
     await user.type(date, "13-12-2025");
@@ -330,7 +330,7 @@ describe("CommitteeSessionDetailsPage", () => {
 
     const location = screen.getByRole("textbox", { name: "Plaats van de zitting" });
     const date = screen.getByRole("textbox", { name: "Datum" });
-    const time = screen.getByRole("textbox", { name: "Tijd" });
+    const time = screen.getByRole("textbox", { name: "Starttijd" });
 
     await user.type(location, "Amsterdam");
     await user.type(date, "13-12-2025");

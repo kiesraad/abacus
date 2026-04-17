@@ -1,4 +1,5 @@
 import type { UseUserReturn } from "@/hooks/user/useUser";
+import type { CommitteeCategory } from "@/types/generated/openapi";
 
 export function getTypistUser(): NonNullable<UseUserReturn> {
   return {
@@ -9,7 +10,9 @@ export function getTypistUser(): NonNullable<UseUserReturn> {
   };
 }
 
-export function getCoordinatorUser(committeeCategory: "csb" | "gsb" = "gsb"): NonNullable<UseUserReturn> {
+export function getCoordinatorUser(
+  committeeCategory: Lowercase<CommitteeCategory> = "gsb",
+): NonNullable<UseUserReturn> {
   return {
     needs_password_change: false,
     role: `coordinator_${committeeCategory}`,

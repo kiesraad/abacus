@@ -2,7 +2,7 @@ import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test } from "vitest";
 
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
-import { ElectionRequestHandler } from "@/testing/api-mocks/RequestHandlers";
+import { CSBElectionRequestHandler, ElectionRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { server } from "@/testing/server";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 import { render, screen } from "@/testing/test-utils";
@@ -11,10 +11,10 @@ import type { Role } from "@/types/generated/openapi";
 import { NavBar } from "./NavBar";
 import { NavBarLinks } from "./NavBarLinks";
 
-async function renderNavBar(location: { pathname: string }, userRole: Role | null) {
+async function renderNavBar(location: { pathname: string }, userRole: Role | null, electionId: number) {
   render(
     <TestUserProvider userRole={userRole}>
-      <ElectionProvider electionId={1}>
+      <ElectionProvider electionId={electionId}>
         <NavBar location={location} />
       </ElectionProvider>
     </TestUserProvider>,
@@ -24,9 +24,9 @@ async function renderNavBar(location: { pathname: string }, userRole: Role | nul
   expect(await screen.findByRole("navigation", { name: "primary-navigation" })).toBeInTheDocument();
 }
 
-function renderNavBarLinks(location: { pathname: string }) {
+function renderNavBarLinks(location: { pathname: string }, electionId: number) {
   render(
-    <ElectionProvider electionId={1}>
+    <ElectionProvider electionId={electionId}>
       <NavBarLinks location={location} />
     </ElectionProvider>,
   );
@@ -44,13 +44,13 @@ describe("NavBar", () => {
     { pathname: "/elections/1" },
     { pathname: "/invalid-notfound" },
   ])("no links for $pathname", (location) => {
-    renderNavBarLinks(location);
+    renderNavBarLinks(location, 1);
 
     expect(screen.queryByRole("link")).not.toBeInTheDocument();
   });
 
   test("elections link and current election name for '/elections/1/data-entry'", async () => {
-    await renderNavBar({ pathname: "/elections/1/data-entry" }, "typist_gsb");
+    await renderNavBar({ pathname: "/elections/1/data-entry" }, "typist_gsb", 1);
 
     expect(screen.queryByRole("link", { name: "Verkiezingen" })).toBeVisible();
     expect(
@@ -69,7 +69,7 @@ describe("NavBar", () => {
     { pathname: "/elections/1/data-entry/1/1/political_group_votes_2" },
     { pathname: "/elections/1/data-entry/1/1/save" },
   ])("elections link and current election link for $pathname", async (location) => {
-    await renderNavBar(location, "typist_gsb");
+    await renderNavBar(location, "typist_gsb", 1);
 
     expect(screen.queryByRole("link", { name: "Verkiezingen" })).toBeVisible();
     expect(
@@ -87,7 +87,7 @@ describe("NavBar", () => {
     { pathname: "/logs" },
     { pathname: "/privacy-statement" },
   ])("top level management links for $pathname for administrator", async (location) => {
-    await renderNavBar(location, "administrator");
+    await renderNavBar(location, "administrator", 1);
 
     expect(screen.queryByRole("link", { name: "Verkiezingen" })).toBeVisible();
     expect(screen.queryByRole("link", { name: "Gebruikers" })).toBeVisible();
@@ -104,7 +104,7 @@ describe("NavBar", () => {
     { pathname: "/logs" },
     { pathname: "/privacy-statement" },
   ])("top level management links for $pathname for coordinator", async (location) => {
-    await renderNavBar(location, "coordinator_gsb");
+    await renderNavBar(location, "coordinator_gsb", 1);
 
     expect(screen.queryByRole("link", { name: "Verkiezingen" })).toBeVisible();
     expect(screen.queryByRole("link", { name: "Gebruikers" })).toBeVisible();
@@ -112,13 +112,13 @@ describe("NavBar", () => {
   });
 
   test("no elections link for '/privacy-statement' for typist", async () => {
-    await renderNavBar({ pathname: "/privacy-statement" }, "typist_gsb");
+    await renderNavBar({ pathname: "/privacy-statement" }, "typist_gsb", 1);
 
     expect(screen.queryByRole("link", { name: "Verkiezingen" })).not.toBeInTheDocument();
   });
 
   test("no elections link for '/privacy-statement' for not logged in user", async () => {
-    await renderNavBar({ pathname: "/privacy-statement" }, null);
+    await renderNavBar({ pathname: "/privacy-statement" }, null, 1);
 
     expect(screen.queryByRole("link", { name: "Verkiezingen" })).not.toBeInTheDocument();
   });
@@ -128,7 +128,7 @@ describe("NavBar", () => {
     { pathname: "/elections/1/status" },
     { pathname: "/elections/1/polling-stations" },
   ])("election management links for $pathname", async (location) => {
-    await renderNavBar(location, "coordinator_gsb");
+    await renderNavBar(location, "coordinator_gsb", 1);
 
     expect(screen.queryByRole("link", { name: "Verkiezingen" })).not.toBeInTheDocument();
     expect(
@@ -141,7 +141,7 @@ describe("NavBar", () => {
     { pathname: "/elections/1/status/1/detail" },
     { pathname: "/elections/1/status/1/detail/extra_investigation" },
   ])("election status links for $pathname", async (location) => {
-    await renderNavBar(location, "coordinator_gsb");
+    await renderNavBar(location, "coordinator_gsb", 1);
 
     expect(screen.queryByRole("link", { name: "Verkiezingen" })).not.toBeInTheDocument();
     expect(
@@ -154,7 +154,7 @@ describe("NavBar", () => {
     { pathname: "/elections/1/polling-stations/create" },
     { pathname: "/elections/1/polling-stations/1/update" },
   ])("polling station management links for $pathname", async (location) => {
-    await renderNavBar(location, "coordinator_gsb");
+    await renderNavBar(location, "coordinator_gsb", 1);
 
     expect(screen.queryByRole("link", { name: "Verkiezingen" })).not.toBeInTheDocument();
     expect(
@@ -171,7 +171,7 @@ describe("NavBar", () => {
     { pathname: "/elections/1/polling-stations/1/update" },
   ])("menu works for $pathname", async (location) => {
     const user = userEvent.setup();
-    await renderNavBar(location, "administrator");
+    await renderNavBar(location, "administrator", 1);
 
     const menuButton = screen.getByRole("button", { name: "Menu" });
     expect(menuButton).toBeVisible();
@@ -190,5 +190,67 @@ describe("NavBar", () => {
     // menu should hide after clicking outside it
     await user.click(document.body);
     expect(screen.queryByRole("link", { name: "Verkiezingen" })).not.toBeInTheDocument();
+  });
+
+  describe("Apportionment", () => {
+    beforeEach(() => {
+      server.use(CSBElectionRequestHandler);
+    });
+
+    test.each([
+      { pathname: "/elections/2/apportionment" },
+    ])("election management links for $pathname", async (location) => {
+      await renderNavBar(location, "coordinator_csb", 2);
+
+      expect(screen.queryByRole("link", { name: "Verkiezingen" })).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole("link", {
+          name: ["CSB 0035 Heemdamseburg", "—", "Gemeenteraadsverkiezingen 2026"].join(""),
+        }),
+      ).toBeVisible();
+    });
+
+    test.each([
+      { pathname: "/elections/2/apportionment/1" },
+      { pathname: "/elections/2/apportionment/details-full-seats" },
+      { pathname: "/elections/2/apportionment/details-residual-seats" },
+    ])("election management and apportionment links for $pathname", async (location) => {
+      await renderNavBar(location, "coordinator_csb", 2);
+
+      expect(screen.queryByRole("link", { name: "Verkiezingen" })).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole("link", {
+          name: ["CSB 0035 Heemdamseburg", "—", "Gemeenteraadsverkiezingen 2026"].join(""),
+        }),
+      ).toBeVisible();
+      expect(screen.queryByRole("link", { name: "Zetelverdeling" })).toBeVisible();
+    });
+
+    test.each([
+      { pathname: "/elections/2/apportionment/1" },
+      { pathname: "/elections/2/apportionment/details-full-seats" },
+      { pathname: "/elections/2/apportionment/details-residual-seats" },
+    ])("menu works for $pathname", async (location) => {
+      const user = userEvent.setup();
+      await renderNavBar(location, "coordinator_csb", 2);
+
+      const menuButton = screen.getByRole("button", { name: "Menu" });
+      expect(menuButton).toBeVisible();
+
+      // menu should be invisible
+      expect(screen.queryByRole("link", { name: "Verkiezingen" })).not.toBeInTheDocument();
+      expect(screen.queryByRole("link", { name: "Gebruikers" })).not.toBeInTheDocument();
+      expect(screen.queryByRole("link", { name: "Logs" })).not.toBeInTheDocument();
+
+      // menu should be visible after clicking button
+      await user.click(menuButton);
+      expect(screen.queryByRole("link", { name: "Verkiezingen" })).toBeVisible();
+      expect(screen.queryByRole("link", { name: "Gebruikers" })).toBeVisible();
+      expect(screen.queryByRole("link", { name: "Logs" })).toBeVisible();
+
+      // menu should hide after clicking outside it
+      await user.click(document.body);
+      expect(screen.queryByRole("link", { name: "Verkiezingen" })).not.toBeInTheDocument();
+    });
   });
 });

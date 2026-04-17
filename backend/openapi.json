@@ -6166,7 +6166,7 @@
           },
           "generate_p22_2_variants": {
             "type": "boolean",
-            "description": "Generate multiple elections, each resulting in a different P22-2 variant"
+            "description": "Generate multiple elections, each resulting in a different P 22-2 variant"
           },
           "political_group_distribution_slope": {
             "$ref": "#/components/schemas/RandomRange"
@@ -7607,6 +7607,7 @@
           "W202",
           "W203",
           "W204",
+          "W205",
           "W206"
         ]
       },

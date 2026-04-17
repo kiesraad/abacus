@@ -69,7 +69,7 @@ export function GenerateTestElectionForm() {
 
   const submitForm = async (event: SubmitEvent<HTMLFormElement>) => {
     const formData = new StringFormData(event.currentTarget);
-    const committee_category = formData.getString("committee_category");
+    const committee_category = formState.generate_p22_2_variants ? "CSB" : formData.getString("committee_category");
 
     const payload = RANGE_FIELDS.reduce<Record<string, string | boolean>>(
       (acc, field) =>
@@ -103,57 +103,61 @@ export function GenerateTestElectionForm() {
       }}
     >
       <FormLayout>
-        <ChoiceList>
-          {committeeCategoryValues.map((committeeCategory, index) => (
-            <ChoiceList.Radio
-              id={committeeCategory}
-              key={committeeCategory}
-              name={"committee_category"}
-              defaultChecked={index === 0}
-              defaultValue={committeeCategory}
-              label={committeeCategory}
-            />
-          ))}
-        </ChoiceList>
         <Checkbox
           id="generate-p22-2-variants"
           name="generate_p22_2_variants"
-          label="Genereer meerdere verkiezingen voor P22-2 varianten (CSB)"
+          label="Genereer meerdere verkiezingen voor P 22-2 varianten (CSB)"
           checked={formState.generate_p22_2_variants}
           onChange={handleBooleanChange}
         />
-        {RANGE_FIELDS.map((field) => {
-          const input = (
-            <InputField
-              id={field.key}
-              key={field.key}
-              name={field.key}
-              label={field.label}
-              placeholder={field.placeholder}
-              value={formState[field.key]}
-              onChange={updateRangeField(field.key)}
-              hint={RANGE_HINT}
-              fieldWidth="full"
-            />
-          );
-
-          if (field.key === "seats") {
-            return (
-              <Fragment key={field.key}>
-                {input}
-                <Checkbox
-                  id="with-data-entry"
-                  name="with_data_entry"
-                  label="Inclusief invoer"
-                  checked={formState.with_data_entry}
-                  onChange={handleBooleanChange}
+        {formState.generate_p22_2_variants || (
+          <>
+            <ChoiceList>
+              {committeeCategoryValues.map((committeeCategory, index) => (
+                <ChoiceList.Radio
+                  id={committeeCategory}
+                  key={committeeCategory}
+                  name={"committee_category"}
+                  defaultChecked={index === 0}
+                  defaultValue={committeeCategory}
+                  label={committeeCategory}
                 />
-              </Fragment>
-            );
-          }
+              ))}
+            </ChoiceList>
+            {RANGE_FIELDS.map((field) => {
+              const input = (
+                <InputField
+                  id={field.key}
+                  key={field.key}
+                  name={field.key}
+                  label={field.label}
+                  placeholder={field.placeholder}
+                  value={formState[field.key]}
+                  onChange={updateRangeField(field.key)}
+                  hint={RANGE_HINT}
+                  fieldWidth="full"
+                />
+              );
 
-          return input;
-        })}
+              if (field.key === "seats") {
+                return (
+                  <Fragment key={field.key}>
+                    {input}
+                    <Checkbox
+                      id="with-data-entry"
+                      name="with_data_entry"
+                      label="Inclusief invoer"
+                      checked={formState.with_data_entry}
+                      onChange={handleBooleanChange}
+                    />
+                  </Fragment>
+                );
+              }
+
+              return input;
+            })}
+          </>
+        )}
         <Button type="submit">Genereer verkiezing</Button>
       </FormLayout>
     </Form>

@@ -1,6 +1,5 @@
 use std::error::Error;
 
-use apportionment::ApportionmentError;
 use axum::{
     Json,
     extract::rejection::JsonRejection,
@@ -9,6 +8,7 @@ use axum::{
 };
 use eml_nl::EMLError;
 use hyper::header::InvalidHeaderValue;
+use pdf_gen::{PdfGenError, zip::ZipResponseError};
 use quick_xml::{DeError, SeError};
 use serde::{Deserialize, Serialize};
 use tracing::error;
@@ -16,7 +16,10 @@ use utoipa::ToSchema;
 
 use crate::{
     MAX_BODY_SIZE_MB,
-    api::middleware::authentication::error::AuthenticationError,
+    api::{
+        apportionment::ApportionmentApiError,
+        middleware::authentication::error::AuthenticationError,
+    },
     domain::{
         committee_session::CommitteeSessionError, role::RoleNotAuthorizedError, validate::DataError,
     },
@@ -24,7 +27,6 @@ use crate::{
     repository::polling_station_repo,
     service::{DataEntryServiceError, PollingStationServiceError, SubCommitteeServiceError},
 };
-use pdf_gen::{PdfGenError, zip::ZipResponseError};
 
 /// Error reference used to show the corresponding error message to the end-user
 #[derive(Serialize, Deserialize, Clone, Copy, ToSchema, PartialEq, Eq, Debug)]
@@ -99,7 +101,7 @@ impl IntoResponse for ErrorResponse {
 pub enum APIError {
     AddError(String, ErrorReference),
     AirgapViolation(String),
-    Apportionment(ApportionmentError),
+    Apportionment(ApportionmentApiError),
     Authentication(AuthenticationError),
     BadRequest(String, ErrorReference),
     CommitteeSession(CommitteeSessionError),
@@ -398,7 +400,7 @@ impl IntoResponse for APIError {
                 error!("Apportionment error: {:?}", err);
 
                 match err {
-                    ApportionmentError::AllListsExhausted => (
+                    ApportionmentApiError::AllListsExhausted => (
                         StatusCode::UNPROCESSABLE_ENTITY,
                         to_error(
                             "All lists are exhausted, not enough candidates to fill all seats",
@@ -406,7 +408,7 @@ impl IntoResponse for APIError {
                             false,
                         ),
                     ),
-                    ApportionmentError::CommitteeSessionNotCompleted => (
+                    ApportionmentApiError::CommitteeSessionNotCompleted => (
                         StatusCode::PRECONDITION_FAILED,
                         to_error(
                             "Committee session not completed",
@@ -414,7 +416,7 @@ impl IntoResponse for APIError {
                             false,
                         ),
                     ),
-                    ApportionmentError::DrawingOfLotsNotImplemented => (
+                    ApportionmentApiError::DrawingOfLotsNotImplemented => (
                         StatusCode::UNPROCESSABLE_ENTITY,
                         to_error(
                             "Drawing of lots is required",
@@ -422,7 +424,7 @@ impl IntoResponse for APIError {
                             false,
                         ),
                     ),
-                    ApportionmentError::ZeroVotesCast => (
+                    ApportionmentApiError::ZeroVotesCast => (
                         StatusCode::UNPROCESSABLE_ENTITY,
                         to_error(
                             "No votes on candidates cast",

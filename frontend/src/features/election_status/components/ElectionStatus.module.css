@@ -65,3 +65,16 @@
     gap: 1rem;
   }
 }
+
+.cellWithBadge {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+
+  > span {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+}

@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ComponentProps } from "react";
 import { expect } from "storybook/test";
-import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
+import { csbElectionMockData, electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMockData";
-import type { ValidationResultCode } from "@/types/generated/openapi";
+import { roleValues, type ValidationResultCode } from "@/types/generated/openapi";
 import { Feedback } from "./Feedback";
 
 const validationResultCodes = Object.keys(validationResultMockData) as ValidationResultCode[];
@@ -18,6 +18,10 @@ const meta = {
     type: {
       options: ["error", "warning"],
     },
+    userRole: {
+      options: roleValues,
+    },
+    election: { table: { disable: true } },
   },
 } satisfies Meta<typeof Feedback>;
 
@@ -28,7 +32,7 @@ type StoryArgs = Omit<ComponentProps<typeof Feedback>, "validationResults"> & {
 };
 type Story = StoryObj<StoryArgs>;
 
-export const Coordinator: Story = {
+export const GSBCoordinator: Story = {
   render: (args) => (
     <Feedback {...args} validationResults={args.validationResults.map((code) => validationResultMockData[code])} />
   ),
@@ -54,16 +58,16 @@ export const Coordinator: Story = {
   },
 };
 
-export const Typist: Story = {
+export const CSBTypist: Story = {
   render: (args) => (
     <Feedback {...args} validationResults={args.validationResults.map((c) => validationResultMockData[c])} />
   ),
   args: {
     id: "feedback-error",
     type: "error",
-    election: electionMockData,
+    election: csbElectionMockData,
     validationResults: ["F201", "F202"],
-    userRole: "typist_gsb",
+    userRole: "typist_csb",
   },
   play: async ({ canvas }) => {
     const titles = await canvas.findAllByRole("heading");

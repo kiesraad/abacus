@@ -51,7 +51,7 @@ export const AllRoutes: StoryFn = () => (
           <code>
             {location.pathname} ({location.userRole})
           </code>
-          <NavBar />
+          <NavBar location={location} />
           <br />
         </TestUserProvider>
       </Fragment>

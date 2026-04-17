@@ -1,4 +1,3 @@
-use apportionment::ApportionmentError;
 use axum::{
     Json,
     extract::{Path, State},
@@ -10,6 +9,7 @@ use crate::{
     APIError, ErrorResponse,
     api::{
         apportionment::{
+            ApportionmentApiError,
             mapping::{map_candidate_nomination, map_seat_assignment},
             structs::{ApportionmentInputData, ElectionApportionmentResponse},
         },
@@ -94,9 +94,7 @@ pub async fn election_apportionment(
             election_summary: summary,
         }))
     } else {
-        Err(APIError::Apportionment(
-            ApportionmentError::CommitteeSessionNotCompleted,
-        ))
+        Err(ApportionmentApiError::CommitteeSessionNotCompleted.into())
     }
 }
 
@@ -111,14 +109,13 @@ mod tests {
     use sqlx::SqlitePool;
     use test_log::test;
 
+    use super::*;
     use crate::{
         domain::{committee_session::CommitteeSessionId, role::Role},
         error::ErrorReference,
         repository::user_repo::{User, UserId},
         service::change_committee_session_status,
     };
-
-    use super::*;
 
     #[test(sqlx::test(fixtures(path = "../../../fixtures", scripts("election_5_with_results"))))]
     async fn test_election_apportionment(pool: SqlitePool) {
@@ -172,9 +169,9 @@ mod tests {
     }
 
     mod authorization {
-        use super::*;
         use test_log::test;
 
+        use super::*;
         use crate::api::tests::{
             assert_committee_category_authorization_err, assert_committee_category_authorization_ok,
         };

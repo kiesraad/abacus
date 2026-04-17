@@ -9,7 +9,7 @@ import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
 import { UsersProviderContext } from "@/hooks/user/UsersProviderContext";
 import { t } from "@/i18n/translate";
 import "@/styles/index.css";
-import { electionDetailsMockResponse } from "@/testing/api-mocks/ElectionMockData";
+import { electionDetailsMockResponse, mockInvestigations } from "@/testing/api-mocks/ElectionMockData";
 import { statusResponseMock } from "@/testing/api-mocks/ElectionStatusMockData";
 import { userMockData } from "@/testing/api-mocks/UserMockData";
 import { matchers } from "@/testing/matchers";
@@ -83,7 +83,7 @@ const preview: Preview = {
                 number: committeeSessionNumber,
               },
               committeeSessions: electionDetailsMockResponse.committee_sessions,
-              investigations: electionDetailsMockResponse.investigations,
+              investigations: committeeSessionNumber > 1 ? mockInvestigations : [],
               refetch: () =>
                 Promise.resolve({ status: ApiResponseStatus.Success, code: 200, data: electionDetailsMockResponse }),
             }}

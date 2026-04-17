@@ -7,6 +7,7 @@ const meta = {
   parameters: {
     needsElection: true,
     needsMessages: true,
+    committeeSessionNumber: 2,
   },
 } satisfies Meta<typeof InvestigationFindings>;
 

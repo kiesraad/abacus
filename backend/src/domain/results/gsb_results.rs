@@ -171,18 +171,16 @@ impl Validate for GSBResults {
             &path.field("number_of_voters"),
         )?;
 
+        self.voters_counts
+            .validate(election, validation_results, &path.field("voters_counts"))?;
+
         if self.number_of_voters == 0 {
             validation_results.warnings.push(ValidationResult {
                 fields: vec![path.field("number_of_voters").to_string()],
                 code: ValidationResultCode::W205,
                 context: None,
             });
-        }
-
-        self.voters_counts
-            .validate(election, validation_results, &path.field("voters_counts"))?;
-
-        if self.number_of_voters < self.voters_counts.poll_card_count {
+        } else if self.number_of_voters < self.voters_counts.poll_card_count {
             validation_results.warnings.push(ValidationResult {
                 fields: vec![path.field("number_of_voters").to_string()],
                 code: ValidationResultCode::W206,
@@ -607,7 +605,7 @@ mod tests {
         Ok(())
     }
 
-    /// CSB | W.206: 'Aantal kiezers en stemmen': Aantal kiesgerechtigden is kleiner dan aantal stempassen
+    /// CSB | W.206: 'Aantal kiezers en stemmen': (Als W.205 niet getoond wordt) Aantal kiesgerechtigden is kleiner dan aantal stempassen
     #[test]
     fn test_w206() -> Result<(), DataError> {
         let mut data = create_test_data();
@@ -623,6 +621,7 @@ mod tests {
             ("Z > A", 91, 90, false),
             ("Z = A", 90, 90, false),
             ("Z < A", 89, 90, true),
+            ("Z < A, Z=0", 0, 90, false), // W.206 should not trigger due to W.205
         ];
 
         for (description, number_of_voters, poll_card_count, expect_w206) in cases {

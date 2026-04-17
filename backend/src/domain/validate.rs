@@ -105,6 +105,8 @@ pub enum ValidationResultCode {
     W203,
     /// CSO/DSO: 'Aantal kiezers en stemmen': Totaal aantal uitgebrachte stemmen leeg of 0
     W204,
+    /// CSB: 'Aantal kiezers en stemmen': Aantal kiesgerechtigden = leeg of 0
+    W205,
 }
 
 #[derive(Debug, Eq, PartialEq)]

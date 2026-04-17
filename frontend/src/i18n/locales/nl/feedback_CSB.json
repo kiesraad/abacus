@@ -84,5 +84,14 @@
       "content": "Controleer of het stembureau is opgenomen in de vóór de verkiezing gepubliceerde lijst.",
       "actions": "<ul><li>Zo ja: verklaar in het proces-verbaal van het GSB (rubriek 1.2) waarom in dit stembureau geen stemmen zijn uitgebracht.</li><li>Zo nee: verwijder het stembureau uit Abacus. Het proces-verbaal moet niet ingevoerd worden.</li></ul>"
     }
+  },
+  "W205": {
+    "typist": {
+      "title": "Controleer je antwoorden"
+    },
+    "coordinator": {
+      "title": "Het aantal kiesgerechtigden (Z) is niet ingevuld",
+      "content": "Controleer of er iets is misgegaan bij het opmaken of overdragen van het proces-verbaal van het onderliggende niveau.\nBlijft de fout? Overleg dan met het CSB over de vervolgstappen."
+    }
   }
 }

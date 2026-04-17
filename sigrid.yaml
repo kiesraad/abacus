@@ -13,10 +13,11 @@ languages:
     test:
       include:
         - ".*/backend/apportionment/src/test_helpers.rs"
+        - ".*/backend/apportionment/fuzz/.*[.]rs"
         - ".*/gen-test-gsb-election[.]rs"
         - ".*/test_data_gen/.*[.]rs"
         - ".*/typst_tests[.]rs"
-        - ".*/backend/fuzz/.*"
+        - ".*/backend/fuzz/.*[.]rs"
 
   - name: "typescript"
     production:
@@ -47,6 +48,7 @@ dependencychecker:
     - "abacus"
     - "abacus-fuzz"
     - "apportionment"
+    - "apportionment-fuzz"
   transitive: true
 
 architecture:

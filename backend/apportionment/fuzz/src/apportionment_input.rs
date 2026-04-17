@@ -1,7 +1,7 @@
-use libfuzzer_sys::arbitrary::{Arbitrary, Result, Unstructured};
 use std::fmt;
 
 use apportionment::CandidateVotes;
+use libfuzzer_sys::arbitrary::{Arbitrary, Result, Unstructured};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct SimpleCandidateVotes {
@@ -85,7 +85,9 @@ impl<'a> Arbitrary<'a> for FuzzedApportionmentInput {
 
             // Generate votes for each candidate
             for _ in 0..candidate_count {
-                let votes: u32 = u.int_in_range(0..=999_999_999)?;
+                // Limit votes to ensure total doesn't exceed 100 million to prevent overflows
+                let max_votes_per_candidate = 100_000_000u32.saturating_sub(total_votes);
+                let votes: u32 = u.int_in_range(0..=max_votes_per_candidate)?;
                 candidate_votes.push(votes);
                 // Ensure total_votes does not overflow, which would cause a panic in the apportionment code (#3179)
                 total_votes = total_votes

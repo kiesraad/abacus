@@ -1,48 +1,15 @@
 #![no_main]
 
 use std::{
-    cell::RefCell,
     io::{BufRead, BufReader, Write},
     process::{Command, Stdio},
     sync::{Mutex, OnceLock},
 };
 
 use apportionment::{ApportionmentError, CandidateVotes, process};
-use apportionment_fuzz::{FuzzedApportionmentInput, SimpleListVotes};
+use apportionment_fuzz::{FuzzedApportionmentInput, get_total_seats, init_tracing, run_with_log};
 use libfuzzer_sys::fuzz_target;
 use serde::{Deserialize, Serialize};
-use tracing::level_filters::LevelFilter;
-use tracing_subscriber::{
-    Layer,
-    filter::Targets,
-    fmt::{self, MakeWriter},
-    layer::SubscriberExt,
-    util::SubscriberInitExt,
-};
-
-// Per-iteration buffer for Abacus tracing events.
-thread_local! {
-    static ABACUS_LOG: RefCell<Vec<u8>> = const { RefCell::new(Vec::new()) };
-}
-
-struct ThreadLocalWriter;
-
-impl Write for ThreadLocalWriter {
-    fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
-        ABACUS_LOG.with(|b| b.borrow_mut().extend_from_slice(buf));
-        Ok(buf.len())
-    }
-    fn flush(&mut self) -> std::io::Result<()> {
-        Ok(())
-    }
-}
-
-impl<'a> MakeWriter<'a> for ThreadLocalWriter {
-    type Writer = Self;
-    fn make_writer(&'a self) -> Self::Writer {
-        ThreadLocalWriter
-    }
-}
 
 #[derive(Serialize)]
 struct ApportionmentRequest {
@@ -109,14 +76,6 @@ fn osv2020_apportionment(
     }
 }
 
-fn get_total_seats(result: &apportionment::SeatAssignmentResult<SimpleListVotes>) -> Vec<u32> {
-    result
-        .final_standing
-        .iter()
-        .map(|p| p.total_seats)
-        .collect::<Vec<_>>()
-}
-
 /// Print diagnostic output for a mismatch between Abacus and OSV2020, then panic.
 fn report_mismatch(
     data: &FuzzedApportionmentInput,
@@ -160,14 +119,7 @@ fuzz_target!(
 
         OSV2020_WRAPPER.set(Mutex::new(Osv2020WrapperProcess { stdin, stdout, _child: child })).ok();
 
-        let layer = fmt::layer()
-            .with_writer(ThreadLocalWriter)
-            .without_time()
-            .with_ansi(false)
-            .with_target(true)
-            .with_level(true)
-            .with_filter(Targets::new().with_target("apportionment::seat_assignment", LevelFilter::TRACE));
-        tracing_subscriber::registry().with(layer).init();
+        init_tracing();
     },
     |data: FuzzedApportionmentInput| {
         // Skip cases where any party has zero total votes
@@ -184,11 +136,7 @@ fuzz_target!(
 
         let (osv2020_result, osv2020_log) = osv2020_apportionment(data.seats.into(), &pg_candidates, &votes);
 
-        ABACUS_LOG.with(|b| b.borrow_mut().clear());
-        let abacus_result = process(&data);
-        let abacus_log = ABACUS_LOG.with(|b| {
-            String::from_utf8(std::mem::take(&mut *b.borrow_mut())).unwrap()
-        });
+        let (abacus_result, abacus_log) = run_with_log(|| process(&data));
 
         match abacus_result {
             Ok(ref output) => {

@@ -114,6 +114,16 @@ impl apportionment::ApportionmentInput for FuzzedApportionmentInput {
     }
 }
 
+pub fn get_total_seats(
+    result: &apportionment::SeatAssignmentResult<SimpleListVotes>,
+) -> Vec<u32> {
+    result
+        .final_standing
+        .iter()
+        .map(|p| p.total_seats)
+        .collect()
+}
+
 impl fmt::Debug for FuzzedApportionmentInput {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let total_votes: u64 = self

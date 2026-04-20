@@ -1,9 +1,8 @@
-import type { Meta, StoryFn } from "@storybook/react-vite";
+import type { Meta, StoryFn, StoryObj } from "@storybook/react-vite";
 import { Fragment } from "react";
-
+import { expect } from "storybook/test";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 import type { Role } from "@/types/generated/openapi";
-
 import { NavBar } from "./NavBar";
 import cls from "./NavBar.module.css";
 import { NavBarMenu, NavBarMenuButton } from "./NavBarMenu";
@@ -14,6 +13,8 @@ const meta = {
   },
 } satisfies Meta;
 export default meta;
+
+type Story = StoryObj<typeof meta>;
 
 const locations: { pathname: string; userRole: Role }[] = [
   { pathname: "/account/login", userRole: "typist_gsb" },
@@ -43,21 +44,27 @@ const locations: { pathname: string; userRole: Role }[] = [
   { pathname: "/elections/1/apportionment/details-residual-seats", userRole: "coordinator_csb" },
 ];
 
-export const AllRoutes: StoryFn = () => (
-  <>
-    {locations.map((location) => (
-      <Fragment key={location.pathname + location.userRole}>
-        <TestUserProvider userRole={location.userRole}>
-          <code>
-            {location.pathname} ({location.userRole})
-          </code>
-          <NavBar location={location} />
-          <br />
-        </TestUserProvider>
-      </Fragment>
-    ))}
-  </>
-);
+export const AllRoutes: Story = {
+  render: () => (
+    <>
+      {locations.map((location) => (
+        <Fragment key={location.pathname + location.userRole}>
+          <TestUserProvider userRole={location.userRole}>
+            <code>
+              {location.pathname} ({location.userRole})
+            </code>
+            <NavBar location={location} />
+            <br />
+          </TestUserProvider>
+        </Fragment>
+      ))}
+    </>
+  ),
+  play: async ({ canvas }) => {
+    const links = canvas.getAllByRole("link", { name: "Afmelden" });
+    await expect(links).toHaveLength(25);
+  },
+};
 
 export const Menu: StoryFn = () => (
   <div className={cls.navBarMenuContainer}>

@@ -118,7 +118,7 @@ mod tests {
         Ok(())
     }
 
-    /// CSO | F.111: 'Verschillen met telresultaten van het stembureau': één of beide vragen zijn niet beantwoord
+    /// GSB CSO | F.111: 'Verschillen met telresultaten van het stembureau': één of beide vragen zijn niet beantwoord
     #[test]
     fn test_f111() -> Result<(), DataError> {
         let validation_results = validate(false, true, false, false)?;

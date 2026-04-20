@@ -476,7 +476,7 @@ mod tests {
         Ok(validation_results)
     }
 
-    /// CSB | F.312: totaal aantal kiezers != totaal aantal uitgebrachte stemmen - meer getelde stemmen + minder getelde stemmen
+    /// CSB | F.312: totaal aantal kiezers <> totaal aantal uitgebrachte stemmen - meer getelde stemmen + minder getelde stemmen
     #[test]
     fn test_f312() -> Result<(), DataError> {
         let validation_error = ValidationResult {

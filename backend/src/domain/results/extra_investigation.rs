@@ -117,7 +117,7 @@ pub mod tests {
         Ok(())
     }
 
-    /// CSO | F.101: 'Alleen bij extra onderzoek B1-1': één van beide vragen is beantwoord, en de andere niet
+    /// GSB CSO | F.101: 'Alleen bij extra onderzoek B1-1': één van beide vragen is beantwoord, en de andere niet
     #[test]
     fn test_f101() -> Result<(), DataError> {
         let validation_results = validate(false, true, false, false)?;
@@ -143,7 +143,7 @@ pub mod tests {
         Ok(())
     }
 
-    /// CSO | F.102: 'Alleen bij extra onderzoek B1-1': meerdere antwoorden op 1 van de vragen
+    /// GSB CSO | F.102: 'Alleen bij extra onderzoek B1-1': meerdere antwoorden op 1 van de vragen
     #[test]
     fn test_f102() -> Result<(), DataError> {
         let validation_results = validate(true, true, true, true)?;

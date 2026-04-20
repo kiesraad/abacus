@@ -141,7 +141,7 @@ mod tests {
         Ok(validation_results)
     }
 
-    /// CSO/DSO | F.201: 'Aantal kiezers en stemmen': stempassen + volmachten <> totaal toegelaten kiezers
+    /// GSB CSO, GSB DSO, CSB | F.201: 'Aantal kiezers en stemmen': stempassen + volmachten <> totaal toegelaten kiezers
     #[test]
     fn test_f201() -> Result<(), DataError> {
         let validation_results = validate(100, 50, 150)?;

@@ -303,7 +303,7 @@ mod tests {
         Ok(())
     }
 
-    /// CSO/DSO | W.203: 'Aantal kiezers en stemmen': Verschil tussen totaal aantal toegelaten kiezers en totaal aantal uitgebrachte stemmen is groter dan of gelijk aan 2% en groter dan of gelijk aan 15
+    /// GSB CSO, GSB DSO | W.203: 'Aantal kiezers en stemmen': Verschil tussen totaal aantal toegelaten kiezers en totaal aantal uitgebrachte stemmen is groter dan of gelijk aan 2% en groter dan of gelijk aan 15
     #[test]
     fn test_w203() -> Result<(), DataError> {
         let cases = [
@@ -344,7 +344,7 @@ mod tests {
         Ok(())
     }
 
-    /// CSO | F.401 `Er zijn (stemmen op kandidaten of het lijsttotaal van corresponderende E.x is groter dan 0) en het totaal aantal stemmen op een lijst = leeg of 0`
+    /// GSB CSO, GSB DSO, CSB | F.401: 'Kandidaten en lijsttotalen': Er zijn (stemmen op kandidaten of het lijsttotaal van corresponderende E.x is groter dan 0) en het totaal aantal stemmen op een lijst = leeg of 0
     #[test]
     fn test_f401() -> Result<(), DataError> {
         // Only F.401 is triggered.
@@ -475,7 +475,7 @@ mod tests {
         Ok(())
     }
 
-    /// CSO | F.402 (Als F.401 niet getoond wordt) `Totaal aantal stemmen op een lijst <> som van aantal stemmen op de kandidaten van die lijst`
+    /// GSB CSO, GSB DSO, CSB | F.402: 'Kandidaten en lijsttotalen': (Als F.401 niet getoond wordt) Totaal aantal stemmen op een lijst <> som van aantal stemmen op de kandidaten van die lijst
     #[test]
     fn test_f402() -> Result<(), DataError> {
         let mut data = create_test_data();
@@ -513,7 +513,7 @@ mod tests {
         Ok(())
     }
 
-    /// CSO | F.403 (Als F.401 niet getoond wordt) `Totaal aantal stemmen op een lijst komt niet overeen met het lijsttotaal van corresponderende E.x`
+    /// GSB CSO, GSB DSO, CSB | F.403: 'Kandidaten en lijsttotalen': (Als F.401 niet getoond wordt) Totaal aantal stemmen op een lijst komt niet overeen met het lijsttotaal van corresponderende E.x
     #[test]
     fn test_f403() -> Result<(), DataError> {
         let mut data = create_test_data();

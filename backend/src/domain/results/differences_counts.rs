@@ -805,7 +805,7 @@ mod tests {
         Ok(validation_results)
     }
 
-    /// CSO | F.301: "Vergelijk D&H": (checkbox D=H is aangevinkt, maar D<>H)
+    /// GSB CSO, GSB DSO | F.301: "Vergelijk D&H": (Als checkbox D=H is aangevinkt) D<>H
     #[test]
     fn test_f301() -> Result<(), DataError> {
         // D = H checked & D = H
@@ -846,7 +846,7 @@ mod tests {
         Ok(())
     }
 
-    /// CSO | F.302: "Vergelijk D&H": (checkbox H>D is aangevinkt, maar H<=D)
+    /// GSB CSO, GSB DSO | F.302: "Vergelijk D&H": (Als checkbox H>D is aangevinkt) H<=D
     #[test]
     fn test_f302() -> Result<(), DataError> {
         // H > D checked & H > D
@@ -907,7 +907,7 @@ mod tests {
         Ok(())
     }
 
-    /// CSO | F.303: "Vergelijk D&H": (checkbox H<D is aangevinkt, maar H>=D)
+    /// GSB CSO, GSB DSO | F.303: "Vergelijk D&H": (Als checkbox H<D is aangevinkt) H>=D
     #[test]
     fn test_f303() -> Result<(), DataError> {
         // H < D checked & H < D
@@ -970,7 +970,7 @@ mod tests {
         Ok(())
     }
 
-    /// CSO | F.304 "Vergelijk D&H": Meerdere aangevinkt of geen enkele aangevinkt
+    /// GSB CSO, GSB DSO | F.304: "Vergelijk D&H": Meerdere aangevinkt of geen enkele aangevinkt  
     #[test]
     fn test_f304() -> Result<(), DataError> {
         let f304 = ValidationResult {
@@ -1008,7 +1008,7 @@ mod tests {
         Ok(())
     }
 
-    /// CSO | F.305 (Als D = H) I en/of J zijn ingevuld
+    /// GSB CSO, GSB DSO | F.305: (Als D = H) I en/of J zijn ingevuld
     #[test]
     fn test_f305() -> Result<(), DataError> {
         // (description, H=votes, D=voters, I=more_ballots, J=fewer_ballots, expect_f305, expected_fields)
@@ -1053,7 +1053,7 @@ mod tests {
         Ok(())
     }
 
-    /// CSO | F.306 (Als H > D) I <> H - D
+    /// GSB CSO, GSB DSO | F.306: (Als H > D) I <> H - D
     #[test]
     fn test_f306() -> Result<(), DataError> {
         let f306 = ValidationResult {
@@ -1084,7 +1084,7 @@ mod tests {
         Ok(())
     }
 
-    /// CSO | F.307 (Als H > D) J is ingevuld
+    /// GSB CSO, GSB DSO | F.307: (Als H > D) J is ingevuld
     #[test]
     fn test_f307() -> Result<(), DataError> {
         let f307 = ValidationResult {
@@ -1118,7 +1118,7 @@ mod tests {
         Ok(())
     }
 
-    /// CSO | F.308 (Als H < D) J <> D - H
+    /// GSB CSO, GSB DSO | F.308: (Als H < D) J <> D - H
     #[test]
     fn test_f308() -> Result<(), DataError> {
         let f308 = ValidationResult {
@@ -1149,7 +1149,7 @@ mod tests {
         Ok(())
     }
 
-    /// CSO | F.309 (Als H < D) I is ingevuld
+    /// GSB CSO, GSB DSO | F.309: (Als H < D) I is ingevuld
     #[test]
     fn test_f309() -> Result<(), DataError> {
         let f309 = ValidationResult {
@@ -1183,7 +1183,7 @@ mod tests {
         Ok(())
     }
 
-    /// CSO | F.310 (Als D <> H en verklaring voor verschil niks aangevinkt of 'ja' en 'nee' aangevinkt)
+    /// GSB CSO, GSB DSO | F.310: (Als D <> H) Verklaring voor verschil niks aangevinkt of zowel 'ja' als 'nee' aangevinkt
     #[test]
     fn test_f310() -> Result<(), DataError> {
         let f310 = ValidationResult {

@@ -393,7 +393,7 @@ mod tests {
         Ok(validation_results)
     }
 
-    /// CSO/DSO | F.202: 'Aantal kiezers en stemmen': E.1 t/m E.n tellen niet op naar E
+    /// GSB CSO, GSB DSO, CSB | F.202: 'Aantal kiezers en stemmen': (Als F.204 niet getoond wordt) E.1 t/m E.n tellen niet op naar E
     #[test]
     fn test_f202() -> Result<(), DataError> {
         let validation_results = validate(&[50, 30, 20], 100, 0, 0, 100)?;
@@ -417,7 +417,7 @@ mod tests {
         Ok(())
     }
 
-    /// CSO/DSO | F.203: 'Aantal kiezers en stemmen': stemmen op kandidaten + blanco stemmen + ongeldige stemmen <> totaal aantal uitgebrachte stemmen
+    /// GSB CSO, GSB DSO, CSB | F.203: 'Aantal kiezers en stemmen': (Als F.204 niet getoond wordt) stemmen op kandidaten + blanco stemmen + ongeldige stemmen <> totaal aantal uitgebrachte stemmen
     #[test]
     fn test_f203() -> Result<(), DataError> {
         let validation_results = validate(&[50, 30, 20], 100, 1, 2, 103)?;
@@ -441,7 +441,7 @@ mod tests {
         Ok(())
     }
 
-    /// GSB CSO/DSO, CSB | F.204: 'Aantal kiezers en stemmen': De som van lijsttotalen (E.1 t/m E.n) is groter dan 0 en E = leeg of 0
+    /// GSB CSO, GSB DSO, CSB | F.204: 'Aantal kiezers en stemmen': De som van lijsttotalen (E.1 t/m E.n) is groter dan 0 en E = leeg of 0
     #[test]
     fn test_f204() -> Result<(), DataError> {
         // No error
@@ -463,7 +463,7 @@ mod tests {
         Ok(())
     }
 
-    /// CSO/DSO | W.201: 'Aantal kiezers en stemmen': Aantal blanco stemmen is groter dan of gelijk aan 3% van het totaal aantal uitgebrachte stemmen
+    /// GSB CSO, GSB DSO | W.201: 'Aantal kiezers en stemmen': Aantal blanco stemmen is groter dan of gelijk aan 3% van het totaal aantal uitgebrachte stemmen
     #[test]
     fn test_w201() -> Result<(), DataError> {
         // < 3% of blank votes
@@ -495,7 +495,7 @@ mod tests {
         Ok(())
     }
 
-    /// CSO/DSO | W.202: 'Aantal kiezers en stemmen': Aantal ongeldige stemmen is groter dan of gelijk aan 3% van het totaal aantal uitgebrachte stemmen
+    /// GSB CSO, GSB DSO | W.202: 'Aantal kiezers en stemmen': Aantal ongeldige stemmen is groter dan of gelijk aan 3% van het totaal aantal uitgebrachte stemmen
     #[test]
     fn test_w202() -> Result<(), DataError> {
         // < 3% of invalid votes
@@ -527,7 +527,7 @@ mod tests {
         Ok(())
     }
 
-    /// CSO/DSO | W.204: 'Aantal kiezers en stemmen': Totaal aantal uitgebrachte stemmen leeg of 0
+    /// GSB CSO, GSB DSO, CSB | W.204: 'Aantal kiezers en stemmen': Totaal aantal uitgebrachte stemmen leeg of 0
     #[test]
     fn test_w204() -> Result<(), DataError> {
         let validation_results = validate(&[50, 30, 20], 100, 0, 0, 100)?;

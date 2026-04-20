@@ -19,7 +19,6 @@ use crate::{
             Candidate, CandidateGender, CandidateNumber, CommitteeCategory, ElectionCategory,
             ElectionId, ElectionWithPoliticalGroups, PGNumber, PoliticalGroup, VoteCountingMethod,
         },
-        file::FileId,
         investigation::PollingStationInvestigation,
         models::{
             ModelN10_2Input, ModelNa14_2Bijlage1Input, ModelNa14_2Input, ModelNa31_2Bijlage1Input,
@@ -259,11 +258,7 @@ fn random_committee_session(
     rng: &mut impl RngExt,
     election_id: ElectionId,
     string_length: usize,
-    none_where_possible: bool,
 ) -> CommitteeSession {
-    let results_eml = FileId::from(rng.random_range(0..1_000));
-    let results_pdf = FileId::from(rng.random_range(0..1_000));
-
     CommitteeSession {
         id: CommitteeSessionId::from(rng.random_range(0..5)),
         number: rng.random_range(1..=2),
@@ -281,9 +276,6 @@ fn random_committee_session(
                 CommitteeSessionStatus::Completed,
             ],
         ),
-        results_eml: random_option(rng, results_eml, none_where_possible),
-        results_pdf: random_option(rng, results_pdf, none_where_possible),
-        overview_pdf: random_option(rng, results_pdf, none_where_possible),
     }
 }
 
@@ -493,10 +485,9 @@ async fn test_na_14_2() {
             string_length,
             none_where_possible,
         );
-        let committee_session =
-            random_committee_session(&mut rng, election.id, string_length, none_where_possible);
+        let committee_session = random_committee_session(&mut rng, election.id, string_length);
         let previous_committee_session =
-            random_committee_session(&mut rng, election.id, string_length, none_where_possible);
+            random_committee_session(&mut rng, election.id, string_length);
         let polling_stations =
             random_polling_stations(&mut rng, string_length, none_where_possible);
         let data_sources = ps_as_first_data_entry_sources(&polling_stations);
@@ -570,8 +561,7 @@ async fn test_na_31_2() {
             string_length,
             none_where_possible,
         );
-        let committee_session =
-            random_committee_session(&mut rng, election.id, string_length, none_where_possible);
+        let committee_session = random_committee_session(&mut rng, election.id, string_length);
         let polling_stations =
             random_polling_stations(&mut rng, string_length, none_where_possible);
         let data_sources = ps_as_first_data_entry_sources(&polling_stations);
@@ -652,8 +642,7 @@ async fn test_p_2a() {
             string_length,
             none_where_possible,
         );
-        let committee_session =
-            random_committee_session(&mut rng, election.id, string_length, none_where_possible);
+        let committee_session = random_committee_session(&mut rng, election.id, string_length);
         let polling_stations =
             random_polling_stations(&mut rng, string_length, none_where_possible);
 

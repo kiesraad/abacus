@@ -5,9 +5,7 @@ use sqlx::{Connection, SqliteConnection};
 use crate::{
     APIError,
     domain::{
-        committee_session::{
-            CommitteeSession, CommitteeSessionFilesUpdateRequest, CommitteeSessionId,
-        },
+        committee_session::{CommitteeSession, CommitteeSessionId},
         committee_session_status::CommitteeSessionStatus,
         election::ElectionId,
         file::{File, FileId},
@@ -25,12 +23,6 @@ pub struct CommitteeSessionAuditData {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub session_start_date_time: Option<NaiveDateTime>,
     pub session_status: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub session_results_eml: Option<FileId>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub session_results_pdf: Option<FileId>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub session_overview_pdf: Option<FileId>,
 }
 
 impl From<CommitteeSession> for CommitteeSessionAuditData {
@@ -42,9 +34,6 @@ impl From<CommitteeSession> for CommitteeSessionAuditData {
             session_location: value.location,
             session_start_date_time: value.start_date_time,
             session_status: value.status.to_string(),
-            session_results_eml: value.results_eml,
-            session_results_pdf: value.results_pdf,
-            session_overview_pdf: value.overview_pdf,
         }
     }
 }
@@ -120,7 +109,8 @@ pub async fn change_committee_session_status(
     if committee_session.status == CommitteeSessionStatus::Completed
         && new_status == CommitteeSessionStatus::DataEntry
     {
-        delete_committee_session_files(&mut tx, audit_service.clone(), committee_session).await?;
+        delete_committee_session_files(&mut tx, audit_service.clone(), committee_session.id)
+            .await?;
     }
 
     let committee_session =
@@ -142,37 +132,16 @@ pub async fn change_committee_session_status(
 async fn delete_committee_session_files(
     conn: &mut SqliteConnection,
     audit_service: AuditService,
-    committee_session: CommitteeSession,
+    committee_session_id: CommitteeSessionId,
 ) -> Result<(), APIError> {
-    let file_ids: Vec<FileId> = [
-        committee_session.results_eml,
-        committee_session.results_pdf,
-        committee_session.overview_pdf,
-    ]
-    .into_iter()
-    .flatten()
-    .collect();
+    let deleted_files = file_repo::delete_for_session(conn, committee_session_id).await?;
 
-    if !file_ids.is_empty() {
-        committee_session_repo::change_files(
-            conn,
-            committee_session.id,
-            CommitteeSessionFilesUpdateRequest {
-                results_eml: None,
-                results_pdf: None,
-                overview_pdf: None,
-            },
-        )
-        .await?;
-
-        for id in file_ids {
-            if let Some(file) = file_repo::delete(conn, id).await? {
-                audit_service
-                    .log(conn, &FileDeletedAuditData(file.into()), None)
-                    .await?;
-            }
-        }
+    for file in deleted_files {
+        audit_service
+            .log(conn, &FileDeletedAuditData(file.into()), None)
+            .await?;
     }
+
     Ok(())
 }
 
@@ -186,20 +155,27 @@ mod tests {
 
     use super::*;
     use crate::{
+        domain::file::FileType,
         infra::audit_log::{AuditService, list_event_names},
         repository::file_repo,
     };
 
-    async fn generate_test_file(conn: &mut SqliteConnection) -> Result<FileId, APIError> {
-        let file = file_repo::create(
+    async fn generate_test_file(
+        conn: &mut SqliteConnection,
+        committee_session_id: CommitteeSessionId,
+        file_type: FileType,
+    ) -> Result<(), APIError> {
+        file_repo::create(
             conn,
+            committee_session_id,
+            file_type,
             "filename.txt".into(),
             &[97, 98, 97, 99, 117, 115, 0],
             "text/plain".into(),
             Utc::now(),
         )
         .await?;
-        Ok(file.id)
+        Ok(())
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
@@ -257,12 +233,9 @@ mod tests {
         let session = committee_session_repo::get(&mut conn, committee_session_id).await?;
         assert_eq!(session.status, CommitteeSessionStatus::Completed);
 
-        let files_update = CommitteeSessionFilesUpdateRequest {
-            results_eml: Some(generate_test_file(&mut conn).await?),
-            results_pdf: Some(generate_test_file(&mut conn).await?),
-            overview_pdf: Some(generate_test_file(&mut conn).await?),
-        };
-        committee_session_repo::change_files(&mut conn, committee_session_id, files_update).await?;
+        generate_test_file(&mut conn, committee_session_id, FileType::GsbResultsEml).await?;
+        generate_test_file(&mut conn, committee_session_id, FileType::GsbResultsPdf).await?;
+        generate_test_file(&mut conn, committee_session_id, FileType::GsbOverviewPdf).await?;
 
         // Completed --> DataEntry
         change_committee_session_status(

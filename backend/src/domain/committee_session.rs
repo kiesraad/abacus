@@ -8,8 +8,8 @@ use sqlx::{FromRow, Type};
 use utoipa::ToSchema;
 
 use crate::domain::{
-    committee_session_status::CommitteeSessionStatus, election::ElectionId, file::FileId,
-    identifier::id, investigation::PollingStationInvestigation,
+    committee_session_status::CommitteeSessionStatus, election::ElectionId, identifier::id,
+    investigation::PollingStationInvestigation,
 };
 
 #[derive(Debug, PartialEq, Eq)]
@@ -35,15 +35,6 @@ pub struct CommitteeSession {
     #[schema(value_type = String, format = "date-time", nullable = false)]
     pub start_date_time: Option<NaiveDateTime>,
     pub status: CommitteeSessionStatus,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(nullable = false)]
-    pub results_eml: Option<FileId>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(nullable = false)]
-    pub results_pdf: Option<FileId>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(nullable = false)]
-    pub overview_pdf: Option<FileId>,
 }
 
 impl CommitteeSession {
@@ -61,9 +52,6 @@ impl CommitteeSession {
             location: "".to_string(),
             start_date_time: None,
             status: CommitteeSessionStatus::Created,
-            results_eml: None,
-            results_pdf: None,
-            overview_pdf: None,
         }
     }
 
@@ -106,15 +94,6 @@ pub struct CommitteeSessionStatusChangeRequest {
     pub status: CommitteeSessionStatus,
 }
 
-/// Committee session files update request
-#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type, FromRow)]
-#[serde(deny_unknown_fields)]
-pub struct CommitteeSessionFilesUpdateRequest {
-    pub results_eml: Option<FileId>,
-    pub results_pdf: Option<FileId>,
-    pub overview_pdf: Option<FileId>,
-}
-
 /// Investigation list response
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
 #[serde(deny_unknown_fields)]
@@ -139,8 +118,5 @@ pub fn committee_session_fixture(election_id: ElectionId) -> CommitteeSession {
         start_date_time: chrono::NaiveDate::from_ymd_opt(2025, 10, 22)
             .and_then(|d| d.and_hms_opt(9, 15, 0)),
         status: CommitteeSessionStatus::Completed,
-        results_eml: None,
-        results_pdf: None,
-        overview_pdf: None,
     }
 }

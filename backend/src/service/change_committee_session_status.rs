@@ -233,9 +233,9 @@ mod tests {
         let session = committee_session_repo::get(&mut conn, committee_session_id).await?;
         assert_eq!(session.status, CommitteeSessionStatus::Completed);
 
-        generate_test_file(&mut conn, committee_session_id, FileType::ResultsEml).await?;
-        generate_test_file(&mut conn, committee_session_id, FileType::ResultsPdf).await?;
-        generate_test_file(&mut conn, committee_session_id, FileType::OverviewPdf).await?;
+        generate_test_file(&mut conn, committee_session_id, FileType::GsbResultsEml).await?;
+        generate_test_file(&mut conn, committee_session_id, FileType::GsbResultsPdf).await?;
+        generate_test_file(&mut conn, committee_session_id, FileType::GsbOverviewPdf).await?;
 
         // Completed --> DataEntry
         change_committee_session_status(

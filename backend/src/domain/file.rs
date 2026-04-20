@@ -13,11 +13,11 @@ id!(FileId);
 #[sqlx(rename_all = "snake_case")]
 pub enum FileType {
     /// GSB results EML (510b)
-    ResultsEml,
+    GsbResultsEml,
     /// GSB results PDF (Model Na 31-2 for first session, Model Na 14-2 for next session)
-    ResultsPdf,
+    GsbResultsPdf,
     /// GSB overview PDF for next session (Model P 2a)
-    OverviewPdf,
+    GsbOverviewPdf,
 }
 
 /// File

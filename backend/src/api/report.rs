@@ -354,7 +354,7 @@ async fn generate_and_save_files(
             audit_service,
             NewFile {
                 committee_session_id: committee_session.id,
-                file_type: FileType::ResultsEml,
+                file_type: FileType::GsbResultsEml,
                 filename: xml_filename,
                 data: xml_string.into_bytes(),
                 mime_type: EML_MIME_TYPE.to_string(),
@@ -368,7 +368,7 @@ async fn generate_and_save_files(
             audit_service,
             NewFile {
                 committee_session_id: committee_session.id,
-                file_type: FileType::ResultsPdf,
+                file_type: FileType::GsbResultsPdf,
                 filename: pdf_files.results.file_name.clone(),
                 data: generate_pdf(&pdf_files.results).await?.buffer,
                 mime_type: PDF_MIME_TYPE.to_string(),
@@ -388,7 +388,7 @@ async fn generate_and_save_files(
             audit_service,
             NewFile {
                 committee_session_id: committee_session.id,
-                file_type: FileType::OverviewPdf,
+                file_type: FileType::GsbOverviewPdf,
                 filename: overview_pdf.file_name.clone(),
                 data: generate_pdf(&overview_pdf).await?.buffer,
                 mime_type: PDF_MIME_TYPE.to_string(),
@@ -430,11 +430,11 @@ async fn get_existing_files(
     committee_session_id: CommitteeSessionId,
 ) -> Result<(Option<File>, Option<File>, Option<File>, DateTime<Utc>), APIError> {
     let eml_file =
-        file_repo::get_for_session(conn, committee_session_id, FileType::ResultsEml).await?;
+        file_repo::get_for_session(conn, committee_session_id, FileType::GsbResultsEml).await?;
     let pdf_file =
-        file_repo::get_for_session(conn, committee_session_id, FileType::ResultsPdf).await?;
+        file_repo::get_for_session(conn, committee_session_id, FileType::GsbResultsPdf).await?;
     let overview_pdf_file =
-        file_repo::get_for_session(conn, committee_session_id, FileType::OverviewPdf).await?;
+        file_repo::get_for_session(conn, committee_session_id, FileType::GsbOverviewPdf).await?;
 
     let created_at = eml_file
         .as_ref()

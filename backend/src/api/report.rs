@@ -20,14 +20,11 @@ use crate::{
         middleware::authentication::RouteAuthorization,
     },
     domain::{
-        committee_session::{
-            CommitteeSession, CommitteeSessionError, CommitteeSessionFilesUpdateRequest,
-            CommitteeSessionId,
-        },
+        committee_session::{CommitteeSession, CommitteeSessionError, CommitteeSessionId},
         committee_session_status::CommitteeSessionStatus,
         data_entry::DataEntrySource,
         election::{CommitteeCategory, ElectionId, ElectionWithPoliticalGroups},
-        file::File,
+        file::{File, FileType},
         investigation::PollingStationInvestigation,
         models::{
             ModelNa14_2Input, ModelNa31_2Input, ModelP2aInput, ModelP22_2Input, PdfFileModel,
@@ -43,7 +40,7 @@ use crate::{
     error::ErrorReference,
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
     repository::{
-        committee_session_repo::{self, change_files, get_previous_session},
+        committee_session_repo::{self, get_previous_session},
         data_entry_repo::{
             are_results_complete_for_committee_session, list_results_for_committee_session,
         },
@@ -58,6 +55,15 @@ pub const DEFAULT_DATE_TIME_FORMAT: &str = "%d-%m-%Y %H:%M:%S %Z";
 
 const EML_MIME_TYPE: &str = "text/xml";
 const PDF_MIME_TYPE: &str = "application/pdf";
+
+struct NewFile {
+    committee_session_id: CommitteeSessionId,
+    file_type: FileType,
+    filename: String,
+    data: Vec<u8>,
+    mime_type: String,
+    created_at: DateTime<Utc>,
+}
 
 #[derive(Serialize)]
 pub struct FileCreatedAuditData(pub FileAuditData);
@@ -431,20 +437,28 @@ async fn generate_and_save_files_gsb_election(
         let eml = create_file(
             conn,
             audit_service,
-            xml_filename,
-            xml_string.as_bytes(),
-            EML_MIME_TYPE.to_string(),
-            created_at,
+            NewFile {
+                committee_session_id: committee_session.id,
+                file_type: FileType::GsbResultsEml,
+                filename: xml_filename,
+                data: xml_string.into_bytes(),
+                mime_type: EML_MIME_TYPE.to_string(),
+                created_at,
+            },
         )
         .await?;
 
         let pdf = create_file(
             conn,
             audit_service,
-            pdf_files.results.file_name.clone(),
-            &generate_pdf(&pdf_files.results).await?.buffer,
-            PDF_MIME_TYPE.to_string(),
-            created_at,
+            NewFile {
+                committee_session_id: committee_session.id,
+                file_type: FileType::GsbResultsPdf,
+                filename: pdf_files.results.file_name.clone(),
+                data: generate_pdf(&pdf_files.results).await?.buffer,
+                mime_type: PDF_MIME_TYPE.to_string(),
+                created_at,
+            },
         )
         .await?;
 
@@ -457,25 +471,19 @@ async fn generate_and_save_files_gsb_election(
         let overview_pdf = create_file(
             conn,
             audit_service,
-            overview_pdf.file_name.clone(),
-            &generate_pdf(&overview_pdf).await?.buffer,
-            PDF_MIME_TYPE.to_string(),
-            created_at,
+            NewFile {
+                committee_session_id: committee_session.id,
+                file_type: FileType::GsbOverviewPdf,
+                filename: overview_pdf.file_name.clone(),
+                data: generate_pdf(&overview_pdf).await?.buffer,
+                mime_type: PDF_MIME_TYPE.to_string(),
+                created_at,
+            },
         )
         .await?;
 
         overview_pdf_file = Some(overview_pdf);
     }
-    change_files(
-        conn,
-        committee_session.id,
-        CommitteeSessionFilesUpdateRequest {
-            results_eml: eml_file.as_ref().map(|eml| eml.id),
-            results_pdf: pdf_file.as_ref().map(|pdf| pdf.id),
-            overview_pdf: overview_pdf_file.as_ref().map(|overview| overview.id),
-        },
-    )
-    .await?;
 
     Ok((eml_file, pdf_file, overview_pdf_file))
 }
@@ -521,12 +529,18 @@ async fn generate_and_save_files_csb_election(
 async fn create_file(
     conn: &mut SqliteConnection,
     audit_service: &AuditService,
-    filename: String,
-    data: &[u8],
-    mime_type: String,
-    created_at: DateTime<Utc>,
+    new_file: NewFile,
 ) -> Result<File, APIError> {
-    let file = file_repo::create(conn, filename, data, mime_type, created_at).await?;
+    let file = file_repo::create(
+        conn,
+        new_file.committee_session_id,
+        new_file.file_type,
+        new_file.filename,
+        &new_file.data,
+        new_file.mime_type,
+        new_file.created_at,
+    )
+    .await?;
 
     audit_service
         .log(conn, &FileCreatedAuditData(file.clone().into()), None)
@@ -536,27 +550,22 @@ async fn create_file(
 
 async fn get_existing_files(
     conn: &mut SqliteConnection,
-    committee_session: &CommitteeSession,
+    committee_session_id: CommitteeSessionId,
 ) -> Result<(Option<File>, Option<File>, Option<File>, DateTime<Utc>), APIError> {
-    let mut created_at = Utc::now();
-    let mut eml_file: Option<File> = None;
-    let mut pdf_file: Option<File> = None;
-    let mut overview_pdf_file: Option<File> = None;
-    if let Some(eml_id) = committee_session.results_eml {
-        let file = file_repo::get(conn, eml_id).await?;
-        created_at = file.created_at;
-        eml_file = Some(file);
-    }
-    if let Some(pdf_id) = committee_session.results_pdf {
-        let file = file_repo::get(conn, pdf_id).await?;
-        created_at = file.created_at;
-        pdf_file = Some(file);
-    }
-    if let Some(overview_pdf_id) = committee_session.overview_pdf {
-        let file = file_repo::get(conn, overview_pdf_id).await?;
-        created_at = file.created_at;
-        overview_pdf_file = Some(file);
-    }
+    let eml_file =
+        file_repo::get_for_session(conn, committee_session_id, FileType::GsbResultsEml).await?;
+    let pdf_file =
+        file_repo::get_for_session(conn, committee_session_id, FileType::GsbResultsPdf).await?;
+    let overview_pdf_file =
+        file_repo::get_for_session(conn, committee_session_id, FileType::GsbOverviewPdf).await?;
+
+    let created_at = eml_file
+        .as_ref()
+        .or(pdf_file.as_ref())
+        .or(overview_pdf_file.as_ref())
+        .map(|f| f.created_at)
+        .unwrap_or_else(Utc::now);
+
     Ok((eml_file, pdf_file, overview_pdf_file, created_at))
 }
 
@@ -582,7 +591,7 @@ async fn get_files_gsb_election(
 
     // Check if files exist, if so, get files from database
     let (mut eml_file, mut pdf_file, mut overview_pdf_file, mut created_at) =
-        get_existing_files(&mut conn, &committee_session).await?;
+        get_existing_files(&mut conn, committee_session.id).await?;
     drop(conn);
 
     // Determine if we need to generate any of the files

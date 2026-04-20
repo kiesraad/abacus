@@ -565,9 +565,6 @@ export interface CommitteeSession {
   id: CommitteeSessionId;
   location: string;
   number: number;
-  overview_pdf?: FileId;
-  results_eml?: FileId;
-  results_pdf?: FileId;
   start_date_time?: string;
   status: CommitteeSessionStatus;
 }
@@ -948,8 +945,6 @@ export interface ExtraInvestigation {
 ("Heeft het gemeentelijk stembureau extra onderzoek gedaan vanwege een andere reden dan een onverklaard verschil?") */
   extra_investigation_other_reason: YesNo;
 }
-
-export type FileId = number;
 
 /**
  * Differences counts for GSB, part of the results.

@@ -5000,15 +5000,6 @@
             "format": "int32",
             "minimum": 0
           },
-          "overview_pdf": {
-            "$ref": "#/components/schemas/FileId"
-          },
-          "results_eml": {
-            "$ref": "#/components/schemas/FileId"
-          },
-          "results_pdf": {
-            "$ref": "#/components/schemas/FileId"
-          },
           "start_date_time": {
             "type": "string",
             "format": "date-time"
@@ -6041,11 +6032,6 @@
           }
         },
         "additionalProperties": false
-      },
-      "FileId": {
-        "type": "integer",
-        "format": "int32",
-        "minimum": 0
       },
       "GSBDifferencesCounts": {
         "type": "object",

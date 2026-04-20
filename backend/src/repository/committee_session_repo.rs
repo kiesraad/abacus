@@ -3,10 +3,7 @@ use sqlx::{Connection, SqliteConnection, query, query_as, query_scalar};
 
 use crate::{
     domain::{
-        committee_session::{
-            CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionFilesUpdateRequest,
-            CommitteeSessionId,
-        },
+        committee_session::{CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionId},
         committee_session_status::CommitteeSessionStatus,
         election::{CommitteeCategory, ElectionId},
     },
@@ -44,10 +41,7 @@ pub async fn get(
             election_id as "election_id: ElectionId",
             status as "status: _",
             location,
-            start_date_time as "start_date_time: _",
-            results_eml as "results_eml: _",
-            results_pdf as "results_pdf: _",
-            overview_pdf as "overview_pdf: _"
+            start_date_time as "start_date_time: _"
         FROM committee_sessions
         WHERE id = ?
         "#,
@@ -70,10 +64,7 @@ pub async fn get_previous_session(
             prev.election_id as "election_id: ElectionId",
             prev.status as "status: _",
             prev.location,
-            prev.start_date_time as "start_date_time: _",
-            prev.results_eml as "results_eml: _",
-            prev.results_pdf as "results_pdf: _",
-            prev.overview_pdf as "overview_pdf: _"
+            prev.start_date_time as "start_date_time: _"
         FROM committee_sessions AS c
         JOIN committee_sessions AS prev ON c.election_id = prev.election_id AND c.number = prev.number + 1
         WHERE c.id = ?
@@ -97,10 +88,7 @@ pub async fn get_election_committee_session_list(
             election_id as "election_id: ElectionId",
             status as "status: _",
             location,
-            start_date_time as "start_date_time: _",
-            results_eml as "results_eml: _",
-            results_pdf as "results_pdf: _",
-            overview_pdf as "overview_pdf: _"
+            start_date_time as "start_date_time: _"
         FROM committee_sessions
         WHERE election_id = ?
         ORDER BY number DESC
@@ -124,10 +112,7 @@ pub async fn get_election_committee_session(
             election_id as "election_id: ElectionId",
             status as "status: _",
             location,
-            start_date_time as "start_date_time: _",
-            results_eml as "results_eml: _",
-            results_pdf as "results_pdf: _",
-            overview_pdf as "overview_pdf: _"
+            start_date_time as "start_date_time: _"
         FROM committee_sessions
         WHERE election_id = ?
         ORDER BY number DESC
@@ -151,10 +136,7 @@ pub async fn get_committee_session_for_each_election(
             election_id as "election_id: ElectionId",
             status as "status: _",
             location,
-            start_date_time as "start_date_time: _",
-            results_eml as "results_eml: _",
-            results_pdf as "results_pdf: _",
-            overview_pdf as "overview_pdf: _"
+            start_date_time as "start_date_time: _"
         FROM (
             SELECT
             id,
@@ -163,9 +145,6 @@ pub async fn get_committee_session_for_each_election(
             status,
             location,
             start_date_time,
-            results_eml,
-            results_pdf,
-            overview_pdf,
             row_number() over (
             PARTITION BY election_id
             ORDER BY number DESC
@@ -200,10 +179,7 @@ pub async fn create(
             election_id as "election_id: ElectionId",
             status as "status: _",
             location,
-            start_date_time as "start_date_time: _",
-            results_eml as "results_eml: _",
-            results_pdf as "results_pdf: _",
-            overview_pdf as "overview_pdf: _"
+            start_date_time as "start_date_time: _"
         "#,
         committee_session.number,
         committee_session.election_id,
@@ -286,10 +262,7 @@ pub async fn update(
             election_id as "election_id: ElectionId",
             status as "status: _",
             location,
-            start_date_time as "start_date_time: _",
-            results_eml as "results_eml: _",
-            results_pdf as "results_pdf: _",
-            overview_pdf as "overview_pdf: _"
+            start_date_time as "start_date_time: _"
         "#,
         location,
         start_date_time,
@@ -316,46 +289,9 @@ pub async fn change_status(
             election_id as "election_id: ElectionId",
             status as "status: _",
             location,
-            start_date_time as "start_date_time: _",
-            results_eml as "results_eml: _",
-            results_pdf as "results_pdf: _",
-            overview_pdf as "overview_pdf: _"
+            start_date_time as "start_date_time: _"
         "#,
         committee_session_status,
-        committee_session_id,
-    )
-    .fetch_one(conn)
-    .await
-}
-
-pub async fn change_files(
-    conn: &mut SqliteConnection,
-    committee_session_id: CommitteeSessionId,
-    committee_session_files_update: CommitteeSessionFilesUpdateRequest,
-) -> Result<CommitteeSession, sqlx::Error> {
-    query_as!(
-        CommitteeSession,
-        r#"
-        UPDATE committee_sessions
-        SET
-            results_eml = ?,
-            results_pdf = ?,
-            overview_pdf = ?
-        WHERE id = ?
-        RETURNING
-            id as "id: CommitteeSessionId",
-            number as "number: u32",
-            election_id as "election_id: ElectionId",
-            status as "status: _",
-            location,
-            start_date_time as "start_date_time: _",
-            results_eml as "results_eml: _",
-            results_pdf as "results_pdf: _",
-            overview_pdf as "overview_pdf: _"
-        "#,
-        committee_session_files_update.results_eml,
-        committee_session_files_update.results_pdf,
-        committee_session_files_update.overview_pdf,
         committee_session_id,
     )
     .fetch_one(conn)

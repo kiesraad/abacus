@@ -4,6 +4,7 @@ mod model_na_14_2;
 mod model_na_31_2;
 mod model_p_22_2;
 mod model_p_2a;
+pub mod votes_table;
 
 use std::error::Error;
 

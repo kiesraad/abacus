@@ -18,4 +18,3 @@ pub mod summary;
 #[cfg(test)]
 pub mod valid_default;
 pub mod validate;
-pub mod votes_table;

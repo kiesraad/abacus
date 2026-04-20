@@ -8,10 +8,12 @@ use crate::domain::{
         CommitteeCategory, ElectionCategory, ElectionId, ElectionWithPoliticalGroups,
         VoteCountingMethod, tests::election_fixture,
     },
-    models::{ModelNa31_2Input, PdfFileModel, PdfModel, ToPdfFileModel, filter_input},
+    models::{
+        ModelNa31_2Input, PdfFileModel, PdfModel, ToPdfFileModel, filter_input,
+        votes_table::VotesTables,
+    },
     polling_station::test_helpers::polling_stations_fixture,
     summary::ElectionSummary,
-    votes_table::VotesTables,
 };
 
 #[test(tokio::test)]

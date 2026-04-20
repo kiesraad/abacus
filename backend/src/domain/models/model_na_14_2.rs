@@ -4,11 +4,13 @@ use crate::domain::{
     committee_session::CommitteeSession,
     election::Election,
     investigation::PollingStationInvestigation,
-    models::{PdfFileModel, PdfModel, ToPdfFileModel},
+    models::{
+        PdfFileModel, PdfModel, ToPdfFileModel,
+        votes_table::{VotesTablesWithOnlyPreviousVotes, VotesTablesWithPreviousVotes},
+    },
     polling_station::PollingStation,
     results::common_polling_station_results::CommonPollingStationResultsWithoutVotes,
     summary::ElectionSummaryWithoutVotes,
-    votes_table::{VotesTablesWithOnlyPreviousVotes, VotesTablesWithPreviousVotes},
 };
 
 #[derive(Serialize, Deserialize)]

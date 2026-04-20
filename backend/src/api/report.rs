@@ -32,12 +32,12 @@ use crate::{
         models::{
             ModelNa14_2Input, ModelNa31_2Input, ModelP2aInput, ModelP22_2Input, PdfFileModel,
             ToPdfFileModel,
+            votes_table::{VotesTables, VotesTablesWithPreviousVotes},
         },
         polling_station::PollingStation,
         results::Results,
         role::Role,
         summary::ElectionSummary,
-        votes_table::{VotesTables, VotesTablesWithPreviousVotes},
     },
     eml::EmlHash,
     error::ErrorReference,

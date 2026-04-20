@@ -4,9 +4,8 @@ use crate::domain::{
     apportionment::{CandidateNomination, SeatAssignment},
     committee_session::CommitteeSession,
     election::{Election, ElectionWithPoliticalGroups},
-    models::{PdfFileModel, PdfModel, ToPdfFileModel},
+    models::{PdfFileModel, PdfModel, ToPdfFileModel, votes_table::VotesTables},
     summary::ElectionSummaryCSB,
-    votes_table::VotesTables,
 };
 
 /// Contains the result changes that have occurred in the apportionment.

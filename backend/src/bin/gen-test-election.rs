@@ -11,11 +11,10 @@ use abacus::{
         committee_session::CommitteeSession,
         data_entry::DataEntrySource,
         election::{CommitteeCategory, ElectionWithPoliticalGroups},
-        models::{ModelNa31_2Input, ToPdfFileModel},
+        models::{ModelNa31_2Input, ToPdfFileModel, votes_table::VotesTables},
         polling_station::PollingStation,
         results::Results,
         summary::ElectionSummary,
-        votes_table::VotesTables,
     },
     test_data_gen::{GenerateElectionArgs, RandomRange, create_test_election, parse_range},
 };

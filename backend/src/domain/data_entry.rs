@@ -139,7 +139,7 @@ impl DataEntrySource {
             DataEntrySource::PollingStation(source) => {
                 format!("{authority_id}::SB{}", source.number())
             }
-            DataEntrySource::SubCommittee(source) => source.sub_committee.number.to_string(),
+            DataEntrySource::SubCommittee(source) => format!("{:04}", source.sub_committee.number),
         }
     }
 

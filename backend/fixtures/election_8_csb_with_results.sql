@@ -1,6 +1,6 @@
 INSERT INTO elections (id, name, committee_category, counting_method, election_id, location, domain_id, category, number_of_seats, number_of_voters, election_date, nomination_date, political_groups)
 -- CSB election for GSB election_5_with_results
-VALUES (8, 'Test Election >= 19 seats', 'CSB', NULL, 'Juinen_2024', 'Juinen', '0000', 'Municipal', 23, 15000, '2024-11-30', '2024-11-01', '[
+VALUES (8, 'Test Election >= 19 seats', 'CSB', NULL, 'GR2024_Juinen', 'Juinen', '0000', 'Municipal', 23, 15000, '2024-11-30', '2024-11-01', '[
          {
            "number": 1,
            "registered_name": "Political Group A",

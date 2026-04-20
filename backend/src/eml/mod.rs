@@ -502,8 +502,6 @@ impl ElectionWithPoliticalGroups {
         summary: &ElectionSummary,
         timestamp: DateTime<Local>,
     ) -> Result<ElectionCount, EMLError> {
-        let authority_id = self.domain_id.clone(); // TODO (post 1.0): replace with election tree when that is available
-
         ElectionCount::builder()
             .transaction_id(transaction_id.unwrap_or(1))
             .managing_authority(ManagingAuthority::new(
@@ -515,13 +513,11 @@ impl ElectionWithPoliticalGroups {
                 self.get_eml_election_identifier_builder()?
                     .build_for_count()?,
             )
-            .count_type(CountType::Municipal)
-            .contests([self.as_eml_count_contest(
-                committee_session,
-                results,
-                summary,
-                &authority_id,
-            )?])
+            .count_type(match self.committee_category {
+                CommitteeCategory::GSB => CountType::Municipal,
+                CommitteeCategory::CSB => CountType::Central,
+            })
+            .contests([self.as_eml_count_contest(committee_session, results, summary)?])
             .build()
     }
 
@@ -533,9 +529,8 @@ impl ElectionWithPoliticalGroups {
             crate::domain::results::Results,
         )],
         summary: &ElectionSummary,
-        authority_id: &str,
     ) -> Result<ElectionCountContest, EMLError> {
-        ElectionCountContest::builder()
+        let builder = ElectionCountContest::builder()
             .identifier(ContestIdentifier::geen())
             .total_eligible_voter_count(self.number_of_voters)
             .total_candidate_votes_count(summary.votes_counts.total_votes_candidates_count)
@@ -567,21 +562,23 @@ impl ElectionWithPoliticalGroups {
                 UncountedVotesReason::FewerBallotsCounted,
                 summary.differences_counts.fewer_ballots_count.count,
             )
-            .total_votes_selections(self.as_eml_count_selections(&summary.political_group_votes)?)
-            .reporting_unit_votes(
+            .total_votes_selections(self.as_eml_count_selections(&summary.political_group_votes)?);
+
+        // GSB elections include reporting unit votes in the count
+        let builder = if self.committee_category == CommitteeCategory::GSB {
+            builder.reporting_unit_votes(
                 results
                     .iter()
                     .map(|(data_source, ps_res)| {
-                        self.as_eml_reporting_unit_votes(
-                            committee_session,
-                            authority_id,
-                            data_source,
-                            ps_res,
-                        )
+                        self.as_eml_reporting_unit_votes(committee_session, data_source, ps_res)
                     })
                     .collect::<Result<Vec<_>, EMLError>>()?,
             )
-            .build()
+        } else {
+            builder
+        };
+
+        builder.build()
     }
 
     fn as_eml_count_selections(
@@ -618,10 +615,10 @@ impl ElectionWithPoliticalGroups {
     fn as_eml_reporting_unit_votes(
         &self,
         committee_session: &CommitteeSession,
-        authority_id: &str,
         data_source: &crate::domain::data_entry::DataEntrySource,
         results: &crate::domain::results::Results,
     ) -> Result<ReportingUnitVotes, EMLError> {
+        let authority_id = self.domain_id.as_str(); // TODO (post 1.0): replace with election tree when that is available
         let mut builder = ReportingUnitVotes::builder()
             .identifier(ReportingUnitIdentifier::new(
                 ReportingUnitIdentifierId::new(

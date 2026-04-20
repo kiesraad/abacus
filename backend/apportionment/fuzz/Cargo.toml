@@ -32,3 +32,38 @@ path = "fuzz_targets/differential_osv2020.rs"
 test = false
 doc = false
 bench = false
+
+[[bin]]
+name = "apportionment"
+path = "fuzz_targets/apportionment.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "anonymity"
+path = "fuzz_targets/anonymity.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "fractions"
+path = "fuzz_targets/fractions.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "house_monotonicity"
+path = "fuzz_targets/house_monotonicity.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "population_monotonicity"
+path = "fuzz_targets/population_monotonicity.rs"
+test = false
+doc = false
+bench = false

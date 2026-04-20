@@ -354,26 +354,23 @@ struct PdfModelListCSB {
     results: PdfFileModel,
 }
 
+enum ZipVariantCSB {
+    //Attachment,
+    //Count,
+    Result,
+}
+
 fn download_zip_filename(
     election: &ElectionWithPoliticalGroups,
-    committee_session: &CommitteeSession,
     created_at: DateTime<Local>,
+    base_name: &str,
 ) -> String {
     use chrono::Datelike;
     let location = election.location.to_lowercase();
     let location_without_whitespace: String = location.split_whitespace().collect();
     slugify_filename(&format!(
         "{} {}{} {} gemeente {}-{}-{}.zip",
-        match election.committee_category {
-            CommitteeCategory::GSB => {
-                if committee_session.is_next_session() {
-                    "correctie"
-                } else {
-                    "definitieve-documenten"
-                }
-            }
-            CommitteeCategory::CSB => "vaststelling-uitslag",
-        },
+        base_name,
         election.category.to_eml_code().to_lowercase(),
         election.election_date.year(),
         location_without_whitespace,
@@ -381,6 +378,22 @@ fn download_zip_filename(
         created_at.date_naive().format("%Y%m%d"),
         created_at.time().format("%H%M%S"),
     ))
+}
+
+fn zip_file_base_name_gsb(committee_session: &CommitteeSession) -> &'static str {
+    if committee_session.is_next_session() {
+        "correctie"
+    } else {
+        "definitieve-documenten"
+    }
+}
+
+fn zip_file_base_name_csb(zip_variant_csb: ZipVariantCSB) -> &'static str {
+    match zip_variant_csb {
+        //ZipVariantCSB::Attachment => "model-p22-2-bijlage",
+        //ZipVariantCSB::Count => "definitieve-documenten",
+        ZipVariantCSB::Result => "vaststelling-uitslag",
+    }
 }
 
 fn xml_zip_filename(election: &ElectionWithPoliticalGroups) -> String {
@@ -631,7 +644,6 @@ async fn get_files_csb_election(
     drop(conn);
 
     // Determine if we need to generate any of the files
-    // let generate_files = eml_file.is_none() || pdf_file.is_none();
     let generate_files = pdf_file.is_none();
 
     // If one of the files doesn't exist, generate all and save them to the database
@@ -697,8 +709,8 @@ async fn election_download_zip_results_gsb(
 
     let download_zip_filename = download_zip_filename(
         &election,
-        &committee_session,
         created_at.with_timezone(&Local),
+        zip_file_base_name_gsb(&committee_session),
     );
 
     let (zip_response, mut zip_writer) = ZipResponse::new(&download_zip_filename);
@@ -821,8 +833,8 @@ async fn election_download_zip_results_csb(
 
     let download_zip_filename = download_zip_filename(
         &election,
-        &committee_session,
         created_at.with_timezone(&Local),
+        zip_file_base_name_csb(ZipVariantCSB::Result),
     );
 
     let (zip_response, mut zip_writer) = ZipResponse::new(&download_zip_filename);

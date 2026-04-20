@@ -23,7 +23,7 @@ use crate::{
         },
         committee_session_status::CommitteeSessionStatus,
         data_entry::DataEntrySource,
-        election::{ElectionId, ElectionWithPoliticalGroups},
+        election::{CommitteeCategory, ElectionId, ElectionWithPoliticalGroups},
         file::File,
         investigation::PollingStationInvestigation,
         models::{ModelNa14_2Input, ModelNa31_2Input, ModelP2aInput, PdfFileModel, ToPdfFileModel},
@@ -142,7 +142,8 @@ impl ResultsInput {
         let location_without_whitespace: String =
             self.election.location.split_whitespace().collect();
         slugify_filename(&format!(
-            "Telling {}{} {}.eml.xml",
+            "{} {}{} {}.eml.xml",
+            xml_count_base_name(&self.election),
             self.election.category.to_eml_code(),
             self.election.election_date.year(),
             location_without_whitespace
@@ -274,6 +275,13 @@ impl ResultsInput {
     }
 }
 
+fn xml_count_base_name(election: &ElectionWithPoliticalGroups) -> &'static str {
+    match election.committee_category {
+        CommitteeCategory::GSB => "Telling",
+        CommitteeCategory::CSB => "Totaaltelling",
+    }
+}
+
 struct PdfModelList {
     results: PdfFileModel,
     overview: Option<PdfFileModel>,
@@ -307,7 +315,8 @@ fn xml_zip_filename(election: &ElectionWithPoliticalGroups) -> String {
     use chrono::Datelike;
     let location_without_whitespace: String = election.location.split_whitespace().collect();
     slugify_filename(&format!(
-        "Telling {}{} {}.zip",
+        "{} {}{} {}.zip",
+        xml_count_base_name(election),
         election.category.to_eml_code(),
         election.election_date.year(),
         location_without_whitespace

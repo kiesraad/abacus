@@ -1,0 +1,50 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        SELECT\n            id as \"id: CommitteeSessionId\",\n            number as \"number: u32\",\n            election_id as \"election_id: ElectionId\",\n            status as \"status: _\",\n            location,\n            start_date_time as \"start_date_time: _\"\n        FROM committee_sessions\n        WHERE election_id = ?\n        ORDER BY number DESC\n        ",
+  "describe": {
+    "columns": [
+      {
+        "name": "id: CommitteeSessionId",
+        "ordinal": 0,
+        "type_info": "Integer"
+      },
+      {
+        "name": "number: u32",
+        "ordinal": 1,
+        "type_info": "Integer"
+      },
+      {
+        "name": "election_id: ElectionId",
+        "ordinal": 2,
+        "type_info": "Integer"
+      },
+      {
+        "name": "status: _",
+        "ordinal": 3,
+        "type_info": "Text"
+      },
+      {
+        "name": "location",
+        "ordinal": 4,
+        "type_info": "Text"
+      },
+      {
+        "name": "start_date_time: _",
+        "ordinal": 5,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      true
+    ]
+  },
+  "hash": "f4b56f00477ceaab7643e494b1d6e5ea5e8cf5d0bb7e449c39b57d10553f83d7"
+}

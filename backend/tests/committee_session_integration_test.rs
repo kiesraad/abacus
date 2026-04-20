@@ -486,11 +486,6 @@ async fn test_committee_session_status_change_completed_to_data_entry_deletes_fi
         "Unexpected response status"
     );
 
-    let committee_session =
-        get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(committee_session["results_eml"], 1);
-    assert_eq!(committee_session["results_pdf"], 2);
-
     // Change committee session status to DataEntry
     let response = reqwest::Client::new()
         .put(&url)
@@ -510,8 +505,6 @@ async fn test_committee_session_status_change_completed_to_data_entry_deletes_fi
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
     assert_eq!(committee_session["status"], "data_entry");
-    assert!(committee_session["results_eml"].is_null());
-    assert!(committee_session["results_pdf"].is_null());
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]

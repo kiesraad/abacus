@@ -73,7 +73,7 @@
     "coordinator": {
       "title": "Controleer I en J",
       "content": "De getallen bij D en H zijn gelijk. Er zijn geen stemmen meer of minder geteld.",
-      "actions": "<ul><li>Herstel de fout door op papier I en J leeg te (laten) maken.</li></ul>"
+      "actions": "<ul><li>Herstel de fout door op papier I en/of J leeg te (laten) maken.</li></ul>"
     }
   },
   "F306": {
@@ -148,27 +148,18 @@
     }
   },
   "W201": {
-    "typist": {
-      "title": "Controleer F"
-    },
     "coordinator": {
       "title": "Het aantal blanco stemmen (F) is erg hoog",
       "actions": "<ul><li>Hertel de blanco stemmen of geef een verklaring voor het hoge aantal.</li><li>Geef in elk geval aan wat je hebt gedaan in het proces-verbaal van het GSB (rubriek 1.2).</li></ul>"
     }
   },
   "W202": {
-    "typist": {
-      "title": "Controleer G"
-    },
     "coordinator": {
       "title": "Het aantal ongeldige stemmen (G) is erg hoog",
       "actions": "<ul><li>Hertel de ongeldige stemmen of geef een verklaring voor het hoge aantal.</li><li>Geef in elk geval aan wat je hebt gedaan in het proces-verbaal van het GSB (rubriek 1.2).</li></ul>"
     }
   },
   "W203": {
-    "typist": {
-      "title": "Controleer D en H"
-    },
     "coordinator": {
       "title": "Groot verschil tussen D en H",
       "content": "Er is een groot verschil tussen het aantal toegelaten kiezers (D) en het aantal uitgebrachte stemmen (H).",
@@ -176,9 +167,6 @@
     }
   },
   "W204": {
-    "typist": {
-      "title": "Controleer H"
-    },
     "coordinator": {
       "title": "Het totaal aantal uitgebrachte stemmen (H) is nul",
       "content": "Controleer of het stembureau is opgenomen in de vóór de verkiezing gepubliceerde lijst.",

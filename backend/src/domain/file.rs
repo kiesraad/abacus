@@ -18,6 +18,8 @@ pub enum FileType {
     GsbResultsPdf,
     /// GSB overview PDF for next session (Model P 2a)
     GsbOverviewPdf,
+    /// CSB results PDF (Model P 22-2)
+    CsbResultsPdf,
 }
 
 /// File

@@ -503,25 +503,18 @@ async fn generate_and_save_files_csb_election(
     let pdf = create_file(
         conn,
         audit_service,
-        pdf_files.results.file_name.clone(),
-        &generate_pdf(&pdf_files.results).await?.buffer,
-        PDF_MIME_TYPE.to_string(),
-        created_at,
+        NewFile {
+            committee_session_id: committee_session.id,
+            file_type: FileType::CsbResultsPdf,
+            filename: pdf_files.results.file_name.clone(),
+            data: generate_pdf(&pdf_files.results).await?.buffer,
+            mime_type: PDF_MIME_TYPE.to_string(),
+            created_at,
+        },
     )
     .await?;
 
     let pdf_file: Option<File> = Some(pdf);
-
-    change_files(
-        conn,
-        committee_session.id,
-        CommitteeSessionFilesUpdateRequest {
-            results_eml: eml_file.as_ref().map(|eml| eml.id),
-            results_pdf: pdf_file.as_ref().map(|pdf| pdf.id),
-            overview_pdf: None,
-        },
-    )
-    .await?;
 
     Ok((eml_file, pdf_file))
 }
@@ -548,7 +541,7 @@ async fn create_file(
     Ok(file)
 }
 
-async fn get_existing_files(
+async fn get_existing_gsb_files(
     conn: &mut SqliteConnection,
     committee_session_id: CommitteeSessionId,
 ) -> Result<(Option<File>, Option<File>, Option<File>, DateTime<Utc>), APIError> {
@@ -567,6 +560,21 @@ async fn get_existing_files(
         .unwrap_or_else(Utc::now);
 
     Ok((eml_file, pdf_file, overview_pdf_file, created_at))
+}
+
+async fn get_existing_csb_files(
+    conn: &mut SqliteConnection,
+    committee_session_id: CommitteeSessionId,
+) -> Result<(Option<File>, DateTime<Utc>), APIError> {
+    let results_pdf_file =
+        file_repo::get_for_session(conn, committee_session_id, FileType::CsbResultsPdf).await?;
+
+    let created_at = results_pdf_file
+        .as_ref()
+        .map(|f| f.created_at)
+        .unwrap_or_else(Utc::now);
+
+    Ok((results_pdf_file, created_at))
 }
 
 async fn get_files_gsb_election(
@@ -591,7 +599,7 @@ async fn get_files_gsb_election(
 
     // Check if files exist, if so, get files from database
     let (mut eml_file, mut pdf_file, mut overview_pdf_file, mut created_at) =
-        get_existing_files(&mut conn, committee_session.id).await?;
+        get_existing_gsb_files(&mut conn, committee_session.id).await?;
     drop(conn);
 
     // Determine if we need to generate any of the files
@@ -648,12 +656,12 @@ async fn get_files_csb_election(
     }
 
     // Check if files exist, if so, get files from database
-    let (_, mut pdf_file, _, mut created_at) =
-        get_existing_files(&mut conn, &committee_session).await?;
+    let (mut results_pdf_file, mut created_at) =
+        get_existing_csb_files(&mut conn, committee_session.id).await?;
     drop(conn);
 
     // Determine if we need to generate any of the files
-    let generate_files = pdf_file.is_none();
+    let generate_files = results_pdf_file.is_none();
 
     // If one of the files doesn't exist, generate all and save them to the database
     if generate_files {
@@ -665,13 +673,13 @@ async fn get_files_csb_election(
             created_at.with_timezone(&Local),
         )
         .await?;
-        (_, pdf_file) =
+        (_, results_pdf_file) =
             generate_and_save_files_csb_election(&mut tx, &audit_service, committee_session, input)
                 .await?;
         tx.commit().await?;
     }
 
-    Ok((pdf_file, created_at))
+    Ok((results_pdf_file, created_at))
 }
 
 /// Download a zip containing a PDF for the PV and the EML with GSB election results

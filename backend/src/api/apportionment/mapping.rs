@@ -43,12 +43,20 @@ fn sort_candidates_alphabetically(mut candidates: Vec<ChosenCandidate>) -> Vec<C
     candidates
 }
 
-fn get_sorted_chosen_candidates(
-    cn: &apportionment::CandidateNominationResult<'_, PoliticalGroupCandidateVotes>,
-    candidate_map: HashMap<(PGNumber, CandidateNumber), Candidate>,
-    list_names: HashMap<PGNumber, String>,
-) -> Vec<ChosenCandidate> {
-    let chosen_candidates = cn
+pub fn map_candidate_nomination(
+    cn: apportionment::CandidateNominationResult<'_, PoliticalGroupCandidateVotes>,
+    political_groups: Vec<PoliticalGroup>,
+) -> CandidateNomination {
+    let mut list_names: HashMap<PGNumber, String> = HashMap::new();
+    let mut candidate_map: HashMap<(PGNumber, CandidateNumber), Candidate> = HashMap::new();
+    for list in political_groups {
+        for candidate in &list.candidates {
+            candidate_map.insert((list.number, candidate.number), candidate.clone());
+        }
+        list_names.insert(list.number, list.name);
+    }
+
+    let mut chosen_candidates: Vec<ChosenCandidate> = cn
         .chosen_candidates
         .iter()
         .map(|c| {
@@ -62,24 +70,7 @@ fn get_sorted_chosen_candidates(
             )
         })
         .collect();
-    sort_candidates_alphabetically(chosen_candidates)
-}
-
-pub fn map_candidate_nomination(
-    cn: apportionment::CandidateNominationResult<'_, PoliticalGroupCandidateVotes>,
-    political_groups: Vec<PoliticalGroup>,
-) -> CandidateNomination {
-    let mut list_names: HashMap<PGNumber, String> = HashMap::new();
-    let mut candidate_map: HashMap<(PGNumber, CandidateNumber), Candidate> = HashMap::new();
-    for list in political_groups.clone() {
-        for candidate in &list.candidates {
-            candidate_map.insert((list.number, candidate.number), candidate.clone());
-        }
-        list_names.insert(list.number, list.name);
-    }
-
-    let chosen_candidates: Vec<ChosenCandidate> =
-        get_sorted_chosen_candidates(&cn, candidate_map.clone(), list_names.clone());
+    chosen_candidates = sort_candidates_alphabetically(chosen_candidates);
 
     let list_candidate_nomination = cn
         .list_candidate_nomination

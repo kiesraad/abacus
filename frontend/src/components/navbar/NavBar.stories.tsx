@@ -1,11 +1,11 @@
-import type { Meta, StoryFn, StoryObj } from "@storybook/react-vite";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 import { Fragment } from "react";
-import { expect } from "storybook/test";
+import { expect, userEvent } from "storybook/test";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 import type { Role } from "@/types/generated/openapi";
 import { NavBar } from "./NavBar";
 import cls from "./NavBar.module.css";
-import { NavBarMenu, NavBarMenuButton } from "./NavBarMenu";
+import { NavBarMenuButton } from "./NavBarMenu";
 
 const meta = {
   parameters: {
@@ -152,16 +152,25 @@ export const ElectionsNavBarForCoordinator: Story = {
   },
 };
 
-export const Menu: StoryFn = () => (
-  <div className={cls.navBarMenuContainer}>
-    <NavBarMenu />
-  </div>
-);
+export const MenuButtonWithMenu: Story = {
+  render: () => (
+    <nav aria-label="primary-navigation" className={cls.navBar}>
+      <div className={cls.links}>
+        <NavBarMenuButton />
+      </div>
+    </nav>
+  ),
+  play: async ({ canvas }) => {
+    const user = userEvent.setup();
+    const menuButton = canvas.getByRole("button");
+    await expect(menuButton).toBeVisible();
+    await user.click(menuButton);
 
-export const MenuButton: StoryFn = () => (
-  <nav aria-label="primary-navigation" className={cls.navBar}>
-    <div className={cls.links}>
-      <NavBarMenuButton />
-    </div>
-  </nav>
-);
+    await expect(await canvas.findByRole("link", { name: "Verkiezingen" })).toBeVisible();
+    await expect(await canvas.findByRole("link", { name: "Gebruikers" })).toBeVisible();
+    await expect(await canvas.findByRole("link", { name: "Logs" })).toBeVisible();
+
+    await user.click(await canvas.findByLabelText("primary-navigation"));
+    await expect(canvas.queryByRole("link", { name: "Verkiezingen" })).not.toBeInTheDocument();
+  },
+};

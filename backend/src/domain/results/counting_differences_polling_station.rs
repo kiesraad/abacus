@@ -4,7 +4,7 @@ use utoipa::ToSchema;
 use super::yes_no::YesNo;
 use crate::domain::{
     compare::Compare,
-    election::ElectionWithPoliticalGroups,
+    election::{CommitteeCategory, ElectionWithPoliticalGroups},
     field_path::FieldPath,
     validate::{DataError, Validate, ValidationResult, ValidationResultCode, ValidationResults},
 };
@@ -25,28 +25,30 @@ pub struct CountingDifferencesPollingStation {
 impl Validate for CountingDifferencesPollingStation {
     fn validate(
         &self,
-        _election: &ElectionWithPoliticalGroups,
+        election: &ElectionWithPoliticalGroups,
         validation_results: &mut ValidationResults,
         path: &FieldPath,
     ) -> Result<(), DataError> {
-        if self.unexplained_difference_ballots_voters.is_empty()
-            || self.difference_ballots_per_list.is_empty()
-        {
-            validation_results.errors.push(ValidationResult {
-                fields: vec![path.to_string()],
-                code: ValidationResultCode::F111,
-                context: None,
-            });
-        }
+        if election.committee_category == CommitteeCategory::GSB {
+            if self.unexplained_difference_ballots_voters.is_empty()
+                || self.difference_ballots_per_list.is_empty()
+            {
+                validation_results.errors.push(ValidationResult {
+                    fields: vec![path.to_string()],
+                    code: ValidationResultCode::F111,
+                    context: None,
+                });
+            }
 
-        if self.unexplained_difference_ballots_voters.is_both()
-            || self.difference_ballots_per_list.is_both()
-        {
-            validation_results.errors.push(ValidationResult {
-                fields: vec![path.to_string()],
-                code: ValidationResultCode::F112,
-                context: None,
-            });
+            if self.unexplained_difference_ballots_voters.is_both()
+                || self.difference_ballots_per_list.is_both()
+            {
+                validation_results.errors.push(ValidationResult {
+                    fields: vec![path.to_string()],
+                    code: ValidationResultCode::F112,
+                    context: None,
+                });
+            }
         }
 
         Ok(())
@@ -89,19 +91,18 @@ mod tests {
     }
 
     fn validate(
-        unexplained_yes: bool,
-        unexplained_no: bool,
-        ballots_yes: bool,
-        ballots_no: bool,
+        committee_category: CommitteeCategory,
+        unexplained: YesNo,
+        ballots: YesNo,
     ) -> Result<ValidationResults, DataError> {
         let counting_differences_polling_station = CountingDifferencesPollingStation {
-            unexplained_difference_ballots_voters: YesNo::new(unexplained_yes, unexplained_no),
-            difference_ballots_per_list: YesNo::new(ballots_yes, ballots_no),
+            unexplained_difference_ballots_voters: unexplained,
+            difference_ballots_per_list: ballots,
         };
 
         let mut validation_results = ValidationResults::default();
         counting_differences_polling_station.validate(
-            &election_fixture(CommitteeCategory::GSB, &[]),
+            &election_fixture(committee_category, &[]),
             &mut validation_results,
             &"counting_differences_polling_station".into(),
         )?;
@@ -110,49 +111,34 @@ mod tests {
         Ok(validation_results)
     }
 
-    #[test]
-    fn test_no_validation_errors() -> Result<(), DataError> {
-        let validation_results = validate(false, true, false, true)?;
-        assert_eq!(validation_results.errors, []);
-
-        let validation_results = validate(true, false, true, false)?;
-        assert_eq!(validation_results.errors, []);
-
-        Ok(())
-    }
-
     /// GSB CSO | F.111: 'Verschillen met telresultaten van het stembureau': één of beide vragen zijn niet beantwoord
     #[test]
     fn test_f111() -> Result<(), DataError> {
-        let validation_results = validate(false, true, false, false)?;
-        assert_eq!(
-            validation_results.errors,
-            [ValidationResult {
-                code: ValidationResultCode::F111,
-                fields: vec!["counting_differences_polling_station".into()],
-                context: None,
-            }]
-        );
+        use CommitteeCategory::*;
 
-        let validation_results = validate(false, false, false, true)?;
-        assert_eq!(
-            validation_results.errors,
-            [ValidationResult {
-                code: ValidationResultCode::F111,
-                fields: vec!["counting_differences_polling_station".into()],
-                context: None,
-            }]
-        );
+        let f111 = ValidationResult {
+            code: ValidationResultCode::F111,
+            fields: vec!["counting_differences_polling_station".into()],
+            context: None,
+        };
 
-        let validation_results = validate(false, false, false, false)?;
-        assert_eq!(
-            validation_results.errors,
-            [ValidationResult {
-                code: ValidationResultCode::F111,
-                fields: vec!["counting_differences_polling_station".into()],
-                context: None,
-            }]
-        );
+        let cases = vec![
+            (GSB, YesNo::yes(), YesNo::yes(), false),
+            (GSB, YesNo::yes(), YesNo::no(), false),
+            (GSB, YesNo::default(), YesNo::no(), true),
+            (GSB, YesNo::yes(), YesNo::default(), true),
+            (GSB, YesNo::default(), YesNo::default(), true),
+            (CSB, YesNo::default(), YesNo::no(), false), // Not applicable for CSB
+        ];
+
+        for (committee_category, unexplained, ballots, expect_f111) in cases {
+            let result = validate(committee_category, unexplained.clone(), ballots.clone())?;
+            let has_f111 = result.errors.iter().any(|e| e == &f111);
+            assert_eq!(
+                has_f111, expect_f111,
+                "Failed: {committee_category:?}, unexplained: {unexplained:?}, ballots: {ballots:?}"
+            );
+        }
 
         Ok(())
     }
@@ -160,42 +146,38 @@ mod tests {
     // CSO | F.112: 'Verschillen met telresultaten van het stembureau': meerdere antwoorden per vraag
     #[test]
     fn test_f112() -> Result<(), DataError> {
-        let validation_results = validate(true, true, false, true)?;
-        assert_eq!(
-            validation_results.errors,
-            [ValidationResult {
-                code: ValidationResultCode::F112,
-                fields: vec!["counting_differences_polling_station".into()],
-                context: None,
-            }]
-        );
+        use CommitteeCategory::*;
 
-        let validation_results = validate(false, true, true, true)?;
-        assert_eq!(
-            validation_results.errors,
-            [ValidationResult {
-                code: ValidationResultCode::F112,
-                fields: vec!["counting_differences_polling_station".into()],
-                context: None,
-            }]
-        );
+        let f112 = ValidationResult {
+            code: ValidationResultCode::F112,
+            fields: vec!["counting_differences_polling_station".into()],
+            context: None,
+        };
 
-        let validation_results = validate(true, true, true, true)?;
-        assert_eq!(
-            validation_results.errors,
-            [ValidationResult {
-                code: ValidationResultCode::F112,
-                fields: vec!["counting_differences_polling_station".into()],
-                context: None,
-            }]
-        );
+        let cases = vec![
+            (GSB, YesNo::yes(), YesNo::yes(), false),
+            (GSB, YesNo::yes(), YesNo::no(), false),
+            (GSB, YesNo::both(), YesNo::no(), true),
+            (GSB, YesNo::yes(), YesNo::both(), true),
+            (GSB, YesNo::both(), YesNo::both(), true),
+            (CSB, YesNo::both(), YesNo::no(), false), // Not applicable for CSB
+        ];
+
+        for (committee_category, unexplained, ballots, expect_f112) in cases {
+            let result = validate(committee_category, unexplained.clone(), ballots.clone())?;
+            let has_f112 = result.errors.iter().any(|e| e == &f112);
+            assert_eq!(
+                has_f112, expect_f112,
+                "Failed: {committee_category:?}, unexplained: {unexplained:?}, ballots: {ballots:?}"
+            );
+        }
 
         Ok(())
     }
 
     #[test]
     fn test_multiple_errors() -> Result<(), DataError> {
-        let validation_results = validate(true, true, false, false)?;
+        let validation_results = validate(CommitteeCategory::GSB, YesNo::both(), YesNo::default())?;
         assert_eq!(
             validation_results.errors,
             [
@@ -212,7 +194,7 @@ mod tests {
             ]
         );
 
-        let validation_results = validate(false, false, true, true)?;
+        let validation_results = validate(CommitteeCategory::GSB, YesNo::default(), YesNo::both())?;
         assert_eq!(
             validation_results.errors,
             [

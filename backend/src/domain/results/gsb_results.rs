@@ -2,7 +2,6 @@ use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
 use super::{
-    common_validation::difference_admitted_voters_count_and_votes_cast_count_above_threshold,
     count::Count, gsb_differences_counts::GSBDifferencesCounts,
     political_group_candidate_votes::PoliticalGroupCandidateVotes, voters_counts::VotersCounts,
     votes_counts::VotesCounts,
@@ -39,33 +38,6 @@ pub struct GSBResults {
 }
 
 impl GSBResults {
-    /// W.203 'Aantal kiezers en stemmen':
-    ///   Verschil tussen totaal aantal toegelaten kiezers en totaal aantal uitgebrachte stemmen
-    ///   is groter dan of gelijk aan 2% en groter dan of gelijk aan 15
-    fn validate_voters_and_votes_count_difference(
-        &self,
-        validation_results: &mut ValidationResults,
-        path: &FieldPath,
-    ) {
-        if difference_admitted_voters_count_and_votes_cast_count_above_threshold(
-            self.voters_counts.total_admitted_voters_count,
-            self.votes_counts.total_votes_cast_count,
-        ) {
-            validation_results.warnings.push(ValidationResult {
-                fields: vec![
-                    path.field("voters_counts")
-                        .field("total_admitted_voters_count")
-                        .to_string(),
-                    path.field("votes_counts")
-                        .field("total_votes_cast_count")
-                        .to_string(),
-                ],
-                code: ValidationResultCode::W203,
-                context: None,
-            });
-        }
-    }
-
     fn validate_political_group_votes_errors(
         &self,
         political_group_candidate_votes: &PoliticalGroupCandidateVotes,
@@ -191,8 +163,6 @@ impl Validate for GSBResults {
         self.votes_counts
             .validate(election, validation_results, &path.field("votes_counts"))?;
 
-        self.validate_voters_and_votes_count_difference(validation_results, path);
-
         self.differences_counts.validate(
             election,
             validation_results,
@@ -300,47 +270,6 @@ mod tests {
         let result = validate(data);
         assert!(result.is_err());
         assert!(result.unwrap_err().message.eq("count out of range"),);
-
-        Ok(())
-    }
-
-    /// GSB CSO, GSB DSO | W.203: 'Aantal kiezers en stemmen': Verschil tussen totaal aantal toegelaten kiezers en totaal aantal uitgebrachte stemmen is groter dan of gelijk aan 2% en groter dan of gelijk aan 15
-    #[test]
-    fn test_w203() -> Result<(), DataError> {
-        let cases = [
-            (101, 100, false),   // < 2%
-            (102, 100, true),    // == 2%
-            (103, 100, true),    // > 2%
-            (1000, 1014, false), // < 15
-            (1000, 1015, true),  // == 15
-            (1000, 1016, true),  // > 15
-            (1016, 1000, true),  // > 15 (reversed)
-        ];
-
-        for (admitted_voters, votes_cast, expected) in cases {
-            let mut data = create_test_data();
-            data.voters_counts.total_admitted_voters_count = admitted_voters;
-            data.votes_counts.total_votes_cast_count = votes_cast;
-
-            let validation_results = validate(data)?;
-
-            if expected {
-                assert_eq!(
-                    validation_results.warnings,
-                    [ValidationResult {
-                        code: ValidationResultCode::W203,
-                        fields: vec![
-                            "data.voters_counts.total_admitted_voters_count".into(),
-                            "data.votes_counts.total_votes_cast_count".into(),
-                        ],
-                        context: None,
-                    }],
-                    "Warning not found for admitted_voters={admitted_voters}, votes_cast={votes_cast}",
-                );
-            } else {
-                assert!(validation_results.warnings.is_empty());
-            }
-        }
 
         Ok(())
     }

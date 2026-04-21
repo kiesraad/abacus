@@ -99,7 +99,9 @@ mod tests {
     use test_log::test;
 
     use super::*;
-    use crate::domain::election::{CommitteeCategory, tests::election_fixture};
+    use crate::domain::election::{
+        CommitteeCategory, CommitteeCategory::*, tests::election_fixture,
+    };
 
     #[test]
     fn test_voters_addition() {
@@ -121,6 +123,7 @@ mod tests {
     }
 
     fn validate(
+        committee_category: CommitteeCategory,
         poll_card_count: u32,
         proxy_certificate_count: u32,
         total_admitted_voters_count: u32,
@@ -133,7 +136,7 @@ mod tests {
 
         let mut validation_results = ValidationResults::default();
         voters_counts.validate(
-            &election_fixture(CommitteeCategory::GSB, &[]),
+            &election_fixture(committee_category, &[]),
             &mut validation_results,
             &"voters_counts".into(),
         )?;
@@ -144,22 +147,25 @@ mod tests {
     /// GSB CSO, GSB DSO, CSB | F.201: 'Aantal kiezers en stemmen': stempassen + volmachten <> totaal toegelaten kiezers
     #[test]
     fn test_f201() -> Result<(), DataError> {
-        let validation_results = validate(100, 50, 150)?;
+        let validation_results = validate(GSB, 100, 50, 150)?;
         assert!(validation_results.errors.is_empty());
 
-        let validation_results = validate(100, 150, 151)?;
-        assert_eq!(
-            validation_results.errors,
-            [ValidationResult {
-                code: ValidationResultCode::F201,
-                fields: vec![
-                    "voters_counts.poll_card_count".into(),
-                    "voters_counts.proxy_certificate_count".into(),
-                    "voters_counts.total_admitted_voters_count".into()
-                ],
-                context: None,
-            }]
-        );
+        let f201 = vec![ValidationResult {
+            code: ValidationResultCode::F201,
+            fields: vec![
+                "voters_counts.poll_card_count".into(),
+                "voters_counts.proxy_certificate_count".into(),
+                "voters_counts.total_admitted_voters_count".into(),
+            ],
+            context: None,
+        }];
+
+        let validation_results = validate(GSB, 100, 150, 151)?;
+        assert_eq!(validation_results.errors, f201);
+
+        // Also applies for CSB
+        let validation_results = validate(CSB, 100, 150, 151)?;
+        assert_eq!(validation_results.errors, f201);
 
         Ok(())
     }

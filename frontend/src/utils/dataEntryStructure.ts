@@ -179,7 +179,14 @@ export const createDifferencesSection = (model: DataEntryModel): DataEntrySectio
       id: "differences_counts",
       title: t("differences_counts.form_title"),
       short_title: t("differences_counts.short_title"),
-      subsections: [differencesInputGrid],
+      subsections: [
+        {
+          type: "message",
+          variant: "dimmed",
+          message: t("differences_counts.checkbox_message"),
+        },
+        differencesInputGrid,
+      ],
     };
   }
 

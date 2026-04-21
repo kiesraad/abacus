@@ -96,6 +96,11 @@
     "short_title": "Verschillen D & H",
     "subsections": [
       {
+        "message": "De vinkvraag op deze pagina in het proces-verbaal vul je niet in Abacus in.",
+        "type": "message",
+        "variant": "dimmed",
+      },
+      {
         "headers": [
           "Veld",
           "Geteld aantal",

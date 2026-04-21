@@ -51,6 +51,7 @@ mod tests {
     };
 
     #[test]
+    #[allow(clippy::too_many_lines)]
     fn test_apportionment_process() {
         let input = seat_assignment_fixture_with_default_50_candidates(
             15,

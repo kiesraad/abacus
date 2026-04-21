@@ -1,4 +1,8 @@
 .message {
   color: var(--gray-900);
   width: 37.5rem;
+
+  &.dimmed {
+    color: var(--gray-400);
+  }
 }

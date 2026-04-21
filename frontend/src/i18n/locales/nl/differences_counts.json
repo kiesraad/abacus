@@ -1,6 +1,7 @@
 {
   "form_title": "Verschillen tussen aantal kiezers en uitgebrachte stemmen",
   "short_title": "Verschillen D & H",
+  "checkbox_message": "De vinkvraag op deze pagina in het proces-verbaal vul je niet in Abacus in.",
   "validation_error": "Controleer of je antwoord gelijk is aan het papieren proces-verbaal",
   "section_number": {
     "CSOFirstSession": "B1-3.3",

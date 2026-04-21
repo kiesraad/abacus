@@ -15,6 +15,7 @@ export interface HeadingSubsection {
 
 export interface MessageSubsection {
   type: "message";
+  variant?: "dimmed";
   message: string;
 }
 

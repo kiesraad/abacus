@@ -307,33 +307,33 @@ test.describe("Data entry model test - warnings", () => {
           },
           votersVotesPageWarningSubmitted: async () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();
-            await expect(votersAndVotesPage.warning).toContainText("Controleer GW.202");
+            await expect(votersAndVotesPage.warning).toContainText("Controleer je antwoordenW.202");
             await expect(votersAndVotesPage.acceptErrorsAndWarnings).not.toBeChecked();
           },
           votersVotesPageChangedToWarningSubmitted: async () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();
-            await expect(votersAndVotesPage.warning).toContainText("Controleer GW.202");
+            await expect(votersAndVotesPage.warning).toContainText("Controleer je antwoordenW.202");
             await expect(votersAndVotesPage.acceptErrorsAndWarnings).not.toBeChecked();
           },
           votersVotesPageWarningAccepted: async () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();
-            await expect(votersAndVotesPage.warning).toContainText("Controleer GW.202");
+            await expect(votersAndVotesPage.warning).toContainText("Controleer je antwoordenW.202");
             await expect(votersAndVotesPage.acceptErrorsAndWarnings).toBeChecked();
           },
           votersVotesPageWarningUnaccepted: async () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();
-            await expect(votersAndVotesPage.warning).toContainText("Controleer GW.202");
+            await expect(votersAndVotesPage.warning).toContainText("Controleer je antwoordenW.202");
             await expect(votersAndVotesPage.acceptErrorsAndWarnings).not.toBeChecked();
           },
           votersVotesPageWarningReminder: async () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();
-            await expect(votersAndVotesPage.warning).toContainText("Controleer GW.202");
+            await expect(votersAndVotesPage.warning).toContainText("Controleer je antwoordenW.202");
             await expect(votersAndVotesPage.acceptErrorsAndWarnings).not.toBeChecked();
             await expect(votersAndVotesPage.acceptErrorsAndWarningsReminder).toBeVisible();
           },
           votersVotesPageWarningCorrected: async () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();
-            await expect(votersAndVotesPage.warning).toContainText("Controleer GW.202");
+            await expect(votersAndVotesPage.warning).toContainText("Controleer je antwoordenW.202");
             await expect(votersAndVotesPage.acceptErrorsAndWarnings).toBeHidden();
             const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
             expect(votersVotesFields).toStrictEqual({ voters, votes: votesValid });
@@ -364,7 +364,7 @@ test.describe("Data entry model test - warnings", () => {
           },
           votersVotesPageAfterResumeChangedToWarning: async () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();
-            await expect(votersAndVotesPage.warning).toContainText("Controleer GW.202");
+            await expect(votersAndVotesPage.warning).toContainText("Controleer je antwoordenW.202");
             await expect(votersAndVotesPage.acceptErrorsAndWarnings).not.toBeChecked();
             const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
             expect(votersVotesFields).toStrictEqual({ voters, votes: votesWarning });

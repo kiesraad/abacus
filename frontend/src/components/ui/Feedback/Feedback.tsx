@@ -4,7 +4,7 @@ import { t, tx } from "@/i18n/translate";
 import type { Election, Role, ValidationResult } from "@/types/generated/openapi";
 import type { AlertType, FeedbackId } from "@/types/ui";
 import { cn } from "@/utils/classnames";
-import { isAdministrator, isCoordinator } from "@/utils/role";
+import { isAdministrator, isCoordinator, isTypist } from "@/utils/role";
 import { getTranslations } from "@/utils/ValidationResults";
 import { AlertIcon } from "../Icon/AlertIcon";
 import cls from "./Feedback.module.css";
@@ -47,7 +47,11 @@ export function Feedback({ id, type, election, validationResults, userRole, shou
   }
 
   const actionsGrouped = role === "typist" && feedbackList.every((item) => item.actions === undefined);
-  const defaultActions = tx(`feedback.${role}_actions`);
+  // Only show default actions for typists (all feedback types, all categories) and coordinators (error, GSB only).
+  const defaultActions =
+    isTypist(userRole) || (role === "coordinator" && type === "error" && election.committee_category === "GSB")
+      ? tx(`feedback.${role}_actions`)
+      : undefined;
 
   useEffect(() => {
     if (shouldFocus) {
@@ -57,20 +61,24 @@ export function Feedback({ id, type, election, validationResults, userRole, shou
 
   return (
     <article id={id} className={cn(cls.feedback, cls[type])}>
-      {feedbackList.map((feedback, index) => (
-        <div key={`feedback-${feedback.codes.join("-")}`} className={cls.item}>
-          <header>
-            <AlertIcon type={type} />
-            <h3 tabIndex={-1} ref={index === 0 ? feedbackHeader : undefined} className="feedback-header">
-              {feedback.title}
-            </h3>
-            <span>{feedback.codes.join(", ")}</span>
-          </header>
-          {feedback.content && <div className={cls.content}>{feedback.content}</div>}
-          {!actionsGrouped && <div className={cls.actions}>{feedback.actions ?? defaultActions}</div>}
-        </div>
-      ))}
-      {actionsGrouped && (
+      {feedbackList.map((feedback, index) => {
+        const actions = feedback.actions ?? defaultActions;
+
+        return (
+          <div key={`feedback-${feedback.codes.join("-")}`} className={cls.item}>
+            <header>
+              <AlertIcon type={type} />
+              <h3 tabIndex={-1} ref={index === 0 ? feedbackHeader : undefined} className="feedback-header">
+                {feedback.title}
+              </h3>
+              <span>{feedback.codes.join(", ")}</span>
+            </header>
+            {feedback.content && <div className={cls.content}>{feedback.content}</div>}
+            {!actionsGrouped && actions !== undefined && <div className={cls.actions}>{actions}</div>}
+          </div>
+        );
+      })}
+      {actionsGrouped && defaultActions && (
         <div className={cls.actions}>
           {feedbackList.length > 1 && (
             <h3>
@@ -79,7 +87,7 @@ export function Feedback({ id, type, election, validationResults, userRole, shou
               })}
             </h3>
           )}
-          {tx(`feedback.${role}_actions`)}
+          {defaultActions}
         </div>
       )}
     </article>

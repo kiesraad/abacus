@@ -216,7 +216,6 @@ describe("Test CheckAndSaveForm", () => {
         },
       },
     };
-
     overrideServerClaimDataEntryResponse({
       formState: mockFormState,
       results: getInitialValues(),
@@ -226,11 +225,9 @@ describe("Test CheckAndSaveForm", () => {
 
     expect(await screen.findByRole("button", { name: "Afronden" })).toBeInTheDocument();
 
-    const summaryList = screen.findByTestId(`save-form-summary-list-voters_votes_counts`);
-
+    const summaryList = screen.findByTestId("save-form-summary-list-voters_votes_counts");
     expect(summaryList).toBeDefined();
-    expect(within(await summaryList).getByText("Controleer je antwoorden")).toBeInTheDocument();
-    expect(within(await summaryList).getByText("Controleer D en H")).toBeInTheDocument();
+    expect(within(await summaryList).getAllByText("Controleer je antwoorden")).toHaveLength(2);
   });
 
   describe("CheckAndSaveForm accept warnings", () => {

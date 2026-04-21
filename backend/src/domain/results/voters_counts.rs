@@ -99,7 +99,7 @@ mod tests {
     use test_log::test;
 
     use super::*;
-    use crate::domain::election::tests::election_fixture;
+    use crate::domain::election::{CommitteeCategory, tests::election_fixture};
 
     #[test]
     fn test_voters_addition() {
@@ -133,7 +133,7 @@ mod tests {
 
         let mut validation_results = ValidationResults::default();
         voters_counts.validate(
-            &election_fixture(&[]),
+            &election_fixture(CommitteeCategory::GSB, &[]),
             &mut validation_results,
             &"voters_counts".into(),
         )?;

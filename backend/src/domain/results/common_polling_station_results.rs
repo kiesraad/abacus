@@ -182,7 +182,7 @@ mod tests {
 
     use super::*;
     use crate::domain::{
-        election::{PGNumber, tests::election_fixture},
+        election::{CommitteeCategory, PGNumber, tests::election_fixture},
         results::political_group_total_votes::PoliticalGroupTotalVotes,
         valid_default::ValidDefault,
     };
@@ -224,6 +224,7 @@ mod tests {
         data.validate(
             // Adjust election political group list to the given test data
             &election_fixture(
+                CommitteeCategory::GSB,
                 &data
                     .political_group_votes
                     .iter()

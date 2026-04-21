@@ -74,7 +74,10 @@ mod tests {
     use test_log::test;
 
     use super::*;
-    use crate::domain::{election::tests::election_fixture, valid_default::ValidDefault};
+    use crate::domain::{
+        election::{CommitteeCategory, tests::election_fixture},
+        valid_default::ValidDefault,
+    };
 
     impl ValidDefault for CountingDifferencesPollingStation {
         fn valid_default() -> Self {
@@ -98,7 +101,7 @@ mod tests {
 
         let mut validation_results = ValidationResults::default();
         counting_differences_polling_station.validate(
-            &election_fixture(&[]),
+            &election_fixture(CommitteeCategory::GSB, &[]),
             &mut validation_results,
             &"counting_differences_polling_station".into(),
         )?;

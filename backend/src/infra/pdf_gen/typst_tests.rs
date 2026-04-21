@@ -95,7 +95,7 @@ async fn it_generates_a_pdf_with_unsupported_chars() {
 
 #[test(tokio::test)]
 async fn it_generates_a_pdf_with_polling_stations() {
-    let election = election_fixture(&[2, 3]);
+    let election = election_fixture(CommitteeCategory::GSB, &[2, 3]);
     let committee_session = committee_session_fixture(election.id);
     let summary = ElectionSummary::from_results(&election, &[]).unwrap();
 

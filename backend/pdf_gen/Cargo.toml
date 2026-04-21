@@ -5,6 +5,9 @@ edition.workspace = true
 license.workspace = true
 rust-version.workspace = true
 
+[lints]
+workspace = true
+
 [features]
 embed-typst = ["dep:typst", "dep:typst-pdf"]
 

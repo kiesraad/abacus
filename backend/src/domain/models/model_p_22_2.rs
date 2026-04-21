@@ -1,10 +1,13 @@
 use serde::{Deserialize, Serialize};
 
 use crate::domain::{
-    apportionment::{CandidateNomination, SeatAssignment},
+    apportionment::{ChosenCandidate, SeatAssignment},
     committee_session::CommitteeSession,
     election::{Election, ElectionWithPoliticalGroups},
-    models::{PdfFileModel, PdfModel, ToPdfFileModel, votes_table::VotesTables},
+    models::{
+        PdfFileModel, PdfModel, ToPdfFileModel,
+        enriched_candidate_nomination::EnrichedCandidateNomination, votes_table::VotesTables,
+    },
     summary::ElectionSummaryCSB,
 };
 
@@ -24,7 +27,8 @@ pub struct ModelP22_2Input {
     pub election: ElectionWithPoliticalGroups,
     pub summary: ElectionSummaryCSB,
     pub seat_assignment: SeatAssignment,
-    pub candidate_nomination: CandidateNomination,
+    pub enriched_candidate_nomination: EnrichedCandidateNomination,
+    pub chosen_candidates: Vec<ChosenCandidate>,
     pub result_changes_full_seats: Vec<ResultChange>,
     pub result_changes_residual_seats: Vec<ResultChange>,
     pub hash: String,

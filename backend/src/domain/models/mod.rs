@@ -1,3 +1,4 @@
+pub mod enriched_candidate_nomination;
 pub mod filter_input;
 mod model_n_10_2;
 mod model_na_14_2;

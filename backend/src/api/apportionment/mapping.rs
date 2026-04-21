@@ -68,7 +68,6 @@ fn get_sorted_chosen_candidates(
 pub fn map_candidate_nomination(
     cn: apportionment::CandidateNominationResult<'_, PoliticalGroupCandidateVotes>,
     political_groups: Vec<PoliticalGroup>,
-    fill_updated_candidate_ranking: bool,
 ) -> CandidateNomination {
     let mut list_names: HashMap<PGNumber, String> = HashMap::new();
     let mut candidate_map: HashMap<(PGNumber, CandidateNumber), Candidate> = HashMap::new();
@@ -101,22 +100,11 @@ pub fn map_candidate_nomination(
                 .into_iter()
                 .copied()
                 .collect(),
-            updated_candidate_ranking: if fill_updated_candidate_ranking
-                && lcn.updated_candidate_ranking.is_empty()
-            {
-                political_groups
-                    .clone()
-                    .iter()
-                    .find(|p| p.number == lcn.list_number)
-                    .expect("Political group exists")
-                    .candidates
-                    .clone()
-            } else {
-                lcn.updated_candidate_ranking
-                    .iter()
-                    .map(|num| candidate_map[&(lcn.list_number, *num)].clone())
-                    .collect()
-            },
+            updated_candidate_ranking: lcn
+                .updated_candidate_ranking
+                .iter()
+                .map(|num| candidate_map[&(lcn.list_number, *num)].clone())
+                .collect(),
         })
         .collect();
 

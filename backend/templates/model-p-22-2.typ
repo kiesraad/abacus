@@ -458,15 +458,13 @@ De aan de lijsten toegewezen volle zetels en restzetels zijn bij elkaar opgeteld
 
 == Toewijzing van zetels aan kandidaten
 
-#for list_candidate_nomination in input.candidate_nomination.list_candidate_nomination.filter((lcn) => lcn.list_seats > 0) {
-  let pg = input.election.political_groups.find(pg => pg.number == list_candidate_nomination.list_number)
-  list_heading_text(format_political_group_name(list_candidate_nomination.list_number, list_candidate_nomination.list_name, with_prefix: "with_list_prefix"))
+#for list_candidate_nomination in input.enriched_candidate_nomination.filter((lcn) => lcn.list_seats > 0) {  list_heading_text(format_political_group_name(list_candidate_nomination.list_number, list_candidate_nomination.list_name, with_prefix: "with_list_prefix"))
   v(4pt)
   [Aantal zetels: #list_candidate_nomination.list_seats]
   
   emph_block[*Met voorkeursstemmen gekozen kandidaten*]
 
-  if list_candidate_nomination.preferential_candidate_nomination.len() > 0 {
+  if list_candidate_nomination.preferential_nomination_columns.len() > 0 {
     [
       Het overzicht met de stemmen per kandidaat is te vinden in bijlage 1 bij dit proces-verbaal. 
       Deze kandidaten hebben als gevolg van het aantal voorkeursstemmen direct een zetel gekregen.
@@ -474,16 +472,16 @@ De aan de lijsten toegewezen volle zetels en restzetels zijn bij elkaar opgeteld
     v(4pt)
     [Deze kandidaten hebben meer dan #if input.election.number_of_seats < LARGE_COUNCIL_THRESHOLD [50%] else [25%] van de kiesdeler gehaald.]
   
-    candidates_with_seat_table(1, false, true, pg.candidates, list_candidate_nomination.preferential_candidate_nomination)
+    candidates_with_seat_table(false, true, list_candidate_nomination.preferential_nomination_columns)
   } else {
     [Er is geen enkele kandidaat met voorkeursstemmen gekozen.]
   }
 
   emph_block[*Kandidaten die gekozen zijn vanwege hun positie op de lijst*]
-  if list_candidate_nomination.other_candidate_nomination.len() > 0 {
+  if list_candidate_nomination.other_nomination_columns.len() > 0 {
     [Deze kandidaten hebben zelfstandig niet voldoende stemmen gehaald voor een zetel, maar hebben een zetel toegewezen vanwege hun positie op de lijst.]
 
-    candidates_with_seat_table(list_candidate_nomination.preferential_candidate_nomination.len() + 1, true, false, pg.candidates, list_candidate_nomination.other_candidate_nomination)
+    candidates_with_seat_table(true, false, list_candidate_nomination.other_nomination_columns)
   } else {
     [Geen enkele kandidaat is zonder voorkeursstemmen gekozen.]
   }
@@ -540,7 +538,7 @@ De aan de lijsten toegewezen volle zetels en restzetels zijn bij elkaar opgeteld
     table.cell(stroke: none, header_text([Lijst]))
   ),
   table.hline(stroke: 1pt + black),
-  ..input.candidate_nomination.chosen_candidates.map(((chosen_candidate)) => {
+  ..input.chosen_candidates.map(((chosen_candidate)) => {
     (
       table.cell([#candidate_name(chosen_candidate)]),
       table.cell([#candidate_location(chosen_candidate)]),

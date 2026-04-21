@@ -29,6 +29,7 @@ use crate::{
         models::{
             ModelNa14_2Input, ModelNa31_2Input, ModelP2aInput, ModelP22_2Input, PdfFileModel,
             ToPdfFileModel,
+            enriched_candidate_nomination::EnrichedCandidateNomination,
             votes_table::{VotesTables, VotesTablesWithPreviousVotes},
         },
         polling_station::PollingStation,
@@ -216,16 +217,20 @@ impl ResultsInput {
             list_votes: &self.summary.political_group_votes,
         };
         let result = apportionment::process(&apportionment_input)?;
+        let candidate_nomination = map_candidate_nomination(
+            result.candidate_nomination,
+            self.election.political_groups.clone(),
+        );
         let pdf_file: PdfFileModel = ModelP22_2Input {
             committee_session: self.committee_session.clone(),
             election: self.election.clone(),
             summary: self.summary.clone().into(),
             seat_assignment: map_seat_assignment(result.seat_assignment),
-            candidate_nomination: map_candidate_nomination(
-                result.candidate_nomination,
-                self.election.political_groups.clone(),
-                true,
-            ),
+            enriched_candidate_nomination: EnrichedCandidateNomination::new(
+                &self.election,
+                &candidate_nomination,
+            )?,
+            chosen_candidates: candidate_nomination.chosen_candidates,
             result_changes_full_seats: vec![],
             result_changes_residual_seats: vec![],
             hash,

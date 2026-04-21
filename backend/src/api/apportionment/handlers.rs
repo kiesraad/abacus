@@ -90,7 +90,6 @@ pub async fn election_apportionment(
             candidate_nomination: map_candidate_nomination(
                 result.candidate_nomination,
                 election.political_groups,
-                false,
             ),
             election_summary: summary,
         }))

@@ -481,11 +481,11 @@ mod tests {
     #[test]
     fn test_w201() -> Result<(), DataError> {
         // < 3% of blank votes
-        let validation_results = validate(GSB, &[40, 20, 11], 71, 29, 0, 100)?;
-        assert!(validation_results.errors.is_empty());
+        let validation_results = validate(GSB, &[40, 20, 11], 98, 2, 0, 100)?;
+        assert!(validation_results.warnings.is_empty());
 
         // == 3% of blank votes
-        let validation_results = validate(GSB, &[40, 20, 10], 70, 30, 0, 100)?;
+        let validation_results = validate(GSB, &[40, 20, 10], 97, 3, 0, 100)?;
         assert_eq!(
             validation_results.warnings,
             [ValidationResult {
@@ -496,7 +496,7 @@ mod tests {
         );
 
         // > 3% of blank votes
-        let validation_results = validate(GSB, &[40, 20, 9], 69, 31, 0, 100)?;
+        let validation_results = validate(GSB, &[40, 20, 9], 96, 4, 0, 100)?;
         assert_eq!(
             validation_results.warnings,
             [ValidationResult {
@@ -507,8 +507,8 @@ mod tests {
         );
 
         // Not applicable for CSB
-        let validation_results = validate(CSB, &[40, 20, 9], 69, 31, 0, 100)?;
-        assert!(validation_results.errors.is_empty());
+        let validation_results = validate(CSB, &[40, 20, 9], 96, 4, 0, 100)?;
+        assert!(validation_results.warnings.is_empty());
 
         Ok(())
     }
@@ -517,11 +517,11 @@ mod tests {
     #[test]
     fn test_w202() -> Result<(), DataError> {
         // < 3% of invalid votes
-        let validation_results = validate(GSB, &[40, 20, 11], 71, 0, 29, 100)?;
-        assert!(validation_results.errors.is_empty());
+        let validation_results = validate(GSB, &[40, 20, 11], 98, 0, 2, 100)?;
+        assert!(validation_results.warnings.is_empty());
 
         // == 3% of invalid votes
-        let validation_results = validate(GSB, &[40, 20, 10], 70, 0, 30, 100)?;
+        let validation_results = validate(GSB, &[40, 20, 10], 97, 0, 3, 100)?;
         assert_eq!(
             validation_results.warnings,
             [ValidationResult {
@@ -532,7 +532,7 @@ mod tests {
         );
 
         // > 3% of invalid votes
-        let validation_results = validate(GSB, &[40, 20, 9], 69, 0, 31, 100)?;
+        let validation_results = validate(GSB, &[40, 20, 9], 96, 0, 4, 100)?;
         assert_eq!(
             validation_results.warnings,
             [ValidationResult {
@@ -543,8 +543,8 @@ mod tests {
         );
 
         // Not applicable for CSB
-        let validation_results = validate(CSB, &[40, 20, 9], 69, 0, 31, 100)?;
-        assert!(validation_results.errors.is_empty());
+        let validation_results = validate(CSB, &[40, 20, 9], 96, 0, 4, 100)?;
+        assert!(validation_results.warnings.is_empty());
 
         Ok(())
     }
@@ -553,7 +553,7 @@ mod tests {
     #[test]
     fn test_w204() -> Result<(), DataError> {
         let validation_results = validate(GSB, &[50, 30, 20], 100, 0, 0, 100)?;
-        assert!(validation_results.errors.is_empty());
+        assert!(validation_results.warnings.is_empty());
 
         let w204 = vec![ValidationResult {
             code: ValidationResultCode::W204,

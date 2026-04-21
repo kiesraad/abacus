@@ -386,6 +386,7 @@ fn step_assign_remainder_using_highest_averages<'a, LN: Copy + Debug + Eq + 'a>(
 
 /// Assign the next residual seat, and return which group that seat was assigned to.  
 /// This assignment is done according to the rules for elections with less than 19 seats.
+#[allow(clippy::cognitive_complexity)]
 fn step_assign_remainder_using_largest_remainder<LN: Copy + Debug + Eq>(
     standings: &[ListStanding<LN>],
     residual_seats: u32,

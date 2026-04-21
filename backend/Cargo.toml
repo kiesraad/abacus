@@ -102,16 +102,19 @@ test-log.workspace = true
 [build-dependencies]
 memory-serve = { version = "2.1.0", optional = true }
 
-[lints.rust]
+[workspace.lints.rust]
 unsafe_code = "forbid"
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(fuzzing)'] }
 
-[lints.clippy]
+[workspace.lints.clippy]
 cast_possible_truncation = "deny"
 cognitive_complexity = "warn"
 too_many_lines = "warn"
 unused_async = "warn"
 unwrap_used = "warn"
+
+[lints]
+workspace = true
 
 [profile.release]
 overflow-checks = true

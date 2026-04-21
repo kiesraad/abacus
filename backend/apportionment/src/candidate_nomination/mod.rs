@@ -12,6 +12,7 @@ pub use structs::{
 };
 
 /// Candidate nomination
+#[allow(clippy::cognitive_complexity)]
 pub(crate) fn candidate_nomination<'a, L: ListVotes>(
     input: &CandidateNominationInput<'a, L>,
 ) -> Result<CandidateNominationResult<'a, L>, ApportionmentError> {

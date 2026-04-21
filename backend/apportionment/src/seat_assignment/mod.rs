@@ -19,6 +19,7 @@ pub use structs::{
 };
 
 /// Seat assignment
+#[allow(clippy::too_many_lines, clippy::cognitive_complexity)]
 pub(crate) fn seat_assignment<T: ApportionmentInput>(
     input: &T,
 ) -> Result<SeatAssignmentResult<T::List>, ApportionmentError> {

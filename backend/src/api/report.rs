@@ -365,12 +365,6 @@ struct PdfModelListCSB {
     results: PdfFileModel,
 }
 
-enum ZipVariantCSB {
-    //Attachment,
-    //Count,
-    Result,
-}
-
 fn download_zip_filename(
     election: &ElectionWithPoliticalGroups,
     created_at: DateTime<Local>,
@@ -396,14 +390,6 @@ fn zip_file_base_name_gsb(committee_session: &CommitteeSession) -> &'static str 
         "correctie"
     } else {
         "definitieve-documenten"
-    }
-}
-
-fn zip_file_base_name_csb(zip_variant_csb: ZipVariantCSB) -> &'static str {
-    match zip_variant_csb {
-        //ZipVariantCSB::Attachment => "model-p22-2-bijlage",
-        //ZipVariantCSB::Count => "definitieve-documenten",
-        ZipVariantCSB::Result => "vaststelling-uitslag",
     }
 }
 
@@ -856,7 +842,7 @@ async fn election_download_zip_results_csb(
     let download_zip_filename = download_zip_filename(
         &election,
         created_at.with_timezone(&Local),
-        zip_file_base_name_csb(ZipVariantCSB::Result),
+        "vaststelling-uitslag",
     );
 
     let (zip_response, mut zip_writer) = ZipResponse::new(&download_zip_filename);

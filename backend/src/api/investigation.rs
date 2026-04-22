@@ -25,11 +25,12 @@ use crate::{
             PollingStationInvestigationConcludeRequest, PollingStationInvestigationCreateRequest,
             PollingStationInvestigationUpdateRequest,
         },
-        models::{ModelNa14_2Bijlage1Input, ToPdfFileModel},
+        models::{
+            ModelNa14_2Bijlage1Input, ToPdfFileModel, votes_table::VotesTablesWithOnlyPreviousVotes,
+        },
         polling_station::{PollingStation, PollingStationId},
         results::{PollingStationResults, cso_first_session_results::CSOFirstSessionResults},
         role::Role,
-        votes_table::VotesTablesWithOnlyPreviousVotes,
     },
     error::ErrorReference,
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
@@ -791,7 +792,6 @@ mod tests {
     }
 
     mod authorization {
-        use super::*;
         use axum::{
             Json,
             extract::State,
@@ -799,6 +799,7 @@ mod tests {
         };
         use test_log::test;
 
+        use super::*;
         use crate::{
             api::tests::{
                 assert_committee_category_authorization_err,

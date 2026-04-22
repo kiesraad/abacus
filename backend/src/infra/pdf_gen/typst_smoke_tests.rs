@@ -23,6 +23,10 @@ use crate::{
         models::{
             ModelN10_2Input, ModelNa14_2Bijlage1Input, ModelNa14_2Input, ModelNa31_2Bijlage1Input,
             ModelNa31_2InlegvelInput, ModelNa31_2Input, ModelP2aInput, PdfFileModel, PdfModel,
+            votes_table::{
+                CandidatesTables, VotesTables, VotesTablesWithOnlyPreviousVotes,
+                VotesTablesWithPreviousVotes,
+            },
         },
         polling_station::{
             PollingStation, PollingStationFirstSession, PollingStationForSession, PollingStationId,
@@ -41,10 +45,6 @@ use crate::{
         },
         summary::{
             ElectionSummary, PollingStationInvestigations, SumCount, SummaryDifferencesCounts,
-        },
-        votes_table::{
-            CandidatesTables, VotesTables, VotesTablesWithOnlyPreviousVotes,
-            VotesTablesWithPreviousVotes,
         },
     },
 };

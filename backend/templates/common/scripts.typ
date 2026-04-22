@@ -673,11 +673,9 @@
 
 // View a table with candidate names with seat, locality and either votes or position on list
 #let candidates_with_seat_table(
-  startSeatNumber,
   showPosition,
   showVotes,
-  candidates,
-  candidateVotes,
+  columns,
 ) = {
   table(
     columns: (4em, 1.5fr, 1fr, 10em),
@@ -693,14 +691,13 @@
       if showVotes { table.cell(stroke: none, align: right, header_text([Aantal stemmen]))} else if showPosition { table.cell(stroke: none, align: right, header_text([Positie op lijst])) }
     ),
     table.hline(stroke: 1pt + black),
-    ..candidateVotes.enumerate().map(((idx, chosen_candidate)) => {
-      let candidate = candidates.find(candidate => candidate.number == chosen_candidate.number)
+    ..columns.map((column) => {
       (
-        table.cell(align: right, str(startSeatNumber + idx)),
-        table.cell([#candidate_name(candidate)]),
-        table.cell([#candidate_location(candidate)]),
-        if showVotes { table.cell(align: right, [#chosen_candidate.votes])}
-        else if showPosition { table.cell(align: right, [#candidate.number])},
+        table.cell(align: right, [#column.list_seat_number]),
+        table.cell([#candidate_name(column.candidate)]),
+        table.cell([#candidate_location(column.candidate)]),
+        if showVotes { table.cell(align: right, [#column.votes])}
+        else if showPosition { table.cell(align: right, [#column.candidate.number])},
       )
     }).flatten(),
     table.hline(stroke: 0.5pt + gray),

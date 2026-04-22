@@ -114,20 +114,28 @@ export type COMMITTEE_SESSION_DELETE_REQUEST_PATH =
   `/api/elections/${ElectionId}/committee_sessions/${CommitteeSessionId}`;
 
 // /api/elections/{election_id}/committee_sessions/{committee_session_id}/download_pdf_results
-export interface ELECTION_DOWNLOAD_PDF_RESULTS_REQUEST_PARAMS {
+export interface ELECTION_DOWNLOAD_PDF_RESULTS_GSB_REQUEST_PARAMS {
   election_id: ElectionId;
   committee_session_id: CommitteeSessionId;
 }
-export type ELECTION_DOWNLOAD_PDF_RESULTS_REQUEST_PATH =
+export type ELECTION_DOWNLOAD_PDF_RESULTS_GSB_REQUEST_PATH =
   `/api/elections/${ElectionId}/committee_sessions/${CommitteeSessionId}/download_pdf_results`;
 
 // /api/elections/{election_id}/committee_sessions/{committee_session_id}/download_zip_results
-export interface ELECTION_DOWNLOAD_ZIP_RESULTS_REQUEST_PARAMS {
+export interface ELECTION_DOWNLOAD_ZIP_RESULTS_GSB_REQUEST_PARAMS {
   election_id: ElectionId;
   committee_session_id: CommitteeSessionId;
 }
-export type ELECTION_DOWNLOAD_ZIP_RESULTS_REQUEST_PATH =
+export type ELECTION_DOWNLOAD_ZIP_RESULTS_GSB_REQUEST_PATH =
   `/api/elections/${ElectionId}/committee_sessions/${CommitteeSessionId}/download_zip_results`;
+
+// /api/elections/{election_id}/committee_sessions/{committee_session_id}/download_zip_results_csb
+export interface ELECTION_DOWNLOAD_ZIP_RESULTS_CSB_REQUEST_PARAMS {
+  election_id: ElectionId;
+  committee_session_id: CommitteeSessionId;
+}
+export type ELECTION_DOWNLOAD_ZIP_RESULTS_CSB_REQUEST_PATH =
+  `/api/elections/${ElectionId}/committee_sessions/${CommitteeSessionId}/download_zip_results_csb`;
 
 // /api/elections/{election_id}/committee_sessions/{committee_session_id}/investigations
 export interface COMMITTEE_SESSION_INVESTIGATIONS_REQUEST_PARAMS {

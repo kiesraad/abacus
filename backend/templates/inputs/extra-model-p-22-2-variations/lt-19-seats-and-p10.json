@@ -129,131 +129,220 @@
       }
     ]
   },
-  "candidate_nomination": {
-    "preference_threshold": {
-      "percentage": 50,
-      "number_of_votes": {
-        "integer": 5,
-        "numerator": 0,
-        "denominator": 600
-      }
+  "chosen_candidates": [
+    {
+      "number": 1,
+      "initials": "T.",
+      "first_name": "Tinus",
+      "last_name": "Bakker",
+      "locality": "Test Location",
+      "gender": "Male",
+      "country_code": "BE",
+      "list_number": 2,
+      "list_name": "Political Group B"
     },
-    "chosen_candidates": [
-      {
-        "number": 1,
-        "initials": "T.",
-        "first_name": "Tinus",
-        "last_name": "Bakker",
-        "locality": "Test Location",
-        "gender": "Male",
-        "country_code": "BE",
-        "list_number": 2,
-        "list_name": "Political Group B"
-      },
-      {
-        "number": 2,
-        "initials": "E.",
-        "first_name": "Eva",
-        "last_name": "Koster",
-        "locality": "Test Location",
-        "gender": "Female",
-        "list_number": 3,
-        "list_name": "Blanco (Smit, G.)"
-      },
-      {
-        "number": 2,
-        "initials": "J.",
-        "first_name": "Johan",
-        "last_name": "Oud",
-        "locality": "Test Location",
-        "gender": "Male",
-        "list_number": 1,
-        "list_name": "Political Group A"
-      },
-      {
-        "number": 1,
-        "initials": "L.",
-        "first_name": "Lidewij",
-        "last_name": "Oud",
-        "locality": "Test Location",
-        "gender": "Female",
-        "list_number": 1,
-        "list_name": "Political Group A"
-      },
-      {
-        "number": 2,
-        "initials": "D.",
-        "last_name": "Po",
-        "locality": "Test Location",
-        "gender": "X",
-        "list_number": 2,
-        "list_name": "Political Group B"
-      },
-      {
-        "number": 1,
-        "initials": "G.",
-        "first_name": "Gert",
-        "last_name": "Smit",
-        "locality": "Test Location",
-        "gender": "Male",
-        "list_number": 3,
-        "list_name": "Blanco (Smit, G.)"
-      }
-    ],
-    "list_candidate_nomination": [
-      {
-        "list_number": 1,
-        "list_name": "Political Group A",
-        "list_seats": 2,
-        "preferential_candidate_nomination": [],
-        "other_candidate_nomination": [
-          {
+    {
+      "number": 2,
+      "initials": "E.",
+      "first_name": "Eva",
+      "last_name": "Koster",
+      "locality": "Test Location",
+      "gender": "Female",
+      "list_number": 3,
+      "list_name": "Blanco (Smit, G.)"
+    },
+    {
+      "number": 2,
+      "initials": "J.",
+      "first_name": "Johan",
+      "last_name": "Oud",
+      "locality": "Test Location",
+      "gender": "Male",
+      "list_number": 1,
+      "list_name": "Political Group A"
+    },
+    {
+      "number": 1,
+      "initials": "L.",
+      "first_name": "Lidewij",
+      "last_name": "Oud",
+      "locality": "Test Location",
+      "gender": "Female",
+      "list_number": 1,
+      "list_name": "Political Group A"
+    },
+    {
+      "number": 2,
+      "initials": "D.",
+      "last_name": "Po",
+      "locality": "Test Location",
+      "gender": "X",
+      "list_number": 2,
+      "list_name": "Political Group B"
+    },
+    {
+      "number": 1,
+      "initials": "G.",
+      "first_name": "Gert",
+      "last_name": "Smit",
+      "locality": "Test Location",
+      "gender": "Male",
+      "list_number": 3,
+      "list_name": "Blanco (Smit, G.)"
+    }
+  ],
+  "enriched_candidate_nomination": [
+    {
+      "list_number": 1,
+      "list_name": "Political Group A",
+      "list_seats": 2,
+      "preferential_nomination_columns": [],
+      "other_nomination_columns": [
+        {
+          "list_seat_number": 1,
+          "candidate": {
             "number": 1,
-            "votes": 3
+            "initials": "L.",
+            "first_name": "Lidewij",
+            "last_name": "Oud",
+            "locality": "Test Location",
+            "gender": "Female"
           },
-          {
+          "votes": 3
+        },
+        {
+          "list_seat_number": 2,
+          "candidate": {
             "number": 2,
-            "votes": 2
-          }
-        ],
-        "updated_candidate_ranking": []
-      },
-      {
-        "list_number": 2,
-        "list_name": "Political Group B",
-        "list_seats": 2,
-        "preferential_candidate_nomination": [],
-        "other_candidate_nomination": [
-          {
+            "initials": "J.",
+            "first_name": "Johan",
+            "last_name": "Oud",
+            "locality": "Test Location",
+            "gender": "Male"
+          },
+          "votes": 2
+        }
+      ],
+      "updated_candidate_ranking": [
+        {
+          "number": 1,
+          "initials": "L.",
+          "first_name": "Lidewij",
+          "last_name": "Oud",
+          "locality": "Test Location",
+          "gender": "Female"
+        },
+        {
+          "number": 2,
+          "initials": "J.",
+          "first_name": "Johan",
+          "last_name": "Oud",
+          "locality": "Test Location",
+          "gender": "Male"
+        }
+      ]
+    },
+    {
+      "list_number": 2,
+      "list_name": "Political Group B",
+      "list_seats": 2,
+      "preferential_nomination_columns": [],
+      "other_nomination_columns": [
+        {
+          "list_seat_number": 1,
+          "candidate": {
             "number": 1,
-            "votes": 3
+            "initials": "T.",
+            "first_name": "Tinus",
+            "last_name": "Bakker",
+            "locality": "Test Location",
+            "gender": "Male",
+            "country_code": "BE"
           },
-          {
+          "votes": 3
+        },
+        {
+          "list_seat_number": 2,
+          "candidate": {
             "number": 2,
-            "votes": 2
-          }
-        ],
-        "updated_candidate_ranking": []
-      },
-      {
-        "list_number": 3,
-        "list_name": "Blanco (Smit, G.)",
-        "list_seats": 2,
-        "preferential_candidate_nomination": [
-          {
+            "initials": "D.",
+            "last_name": "Po",
+            "locality": "Test Location",
+            "gender": "X"
+          },
+          "votes": 2
+        }
+      ],
+      "updated_candidate_ranking": [
+        {
+          "number": 1,
+          "initials": "T.",
+          "first_name": "Tinus",
+          "last_name": "Bakker",
+          "locality": "Test Location",
+          "gender": "Male",
+          "country_code": "BE"
+        },
+        {
+          "number": 2,
+          "initials": "D.",
+          "last_name": "Po",
+          "locality": "Test Location",
+          "gender": "X"
+        }
+      ]
+    },
+    {
+      "list_number": 3,
+      "list_name": "Blanco (Smit, G.)",
+      "list_seats": 2,
+      "preferential_nomination_columns": [
+        {
+          "list_seat_number": 1,
+          "candidate": {
             "number": 1,
-            "votes": 25
+            "initials": "G.",
+            "first_name": "Gert",
+            "last_name": "Smit",
+            "locality": "Test Location",
+            "gender": "Male"
           },
-          {
+          "votes": 25
+        },
+        {
+          "list_seat_number": 2,
+          "candidate": {
             "number": 2,
-            "votes": 25
-          }
-        ],
-        "other_candidate_nomination": [],
-        "updated_candidate_ranking": []
-      }
-    ]
-  },
+            "initials": "E.",
+            "first_name": "Eva",
+            "last_name": "Koster",
+            "locality": "Test Location",
+            "gender": "Female"
+          },
+          "votes": 25
+        }
+      ],
+      "other_nomination_columns": [],
+      "updated_candidate_ranking": [
+        {
+          "number": 1,
+          "initials": "G.",
+          "first_name": "Gert",
+          "last_name": "Smit",
+          "locality": "Test Location",
+          "gender": "Male"
+        },
+        {
+          "number": 2,
+          "initials": "E.",
+          "first_name": "Eva",
+          "last_name": "Koster",
+          "locality": "Test Location",
+          "gender": "Female"
+        }
+      ]
+    }
+  ],
   "seat_assignment": {
     "seats": 6,
     "full_seats": 2,

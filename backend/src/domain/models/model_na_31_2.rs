@@ -3,10 +3,12 @@ use serde::{Deserialize, Serialize};
 use crate::domain::{
     committee_session::CommitteeSession,
     election::Election,
-    models::{PdfFileModel, PdfModel, ToPdfFileModel},
+    models::{
+        PdfFileModel, PdfModel, ToPdfFileModel,
+        votes_table::{CandidatesTables, VotesTables},
+    },
     polling_station::PollingStation,
     summary::ElectionSummaryWithoutVotes,
-    votes_table::{CandidatesTables, VotesTables},
 };
 
 #[derive(Serialize, Deserialize)]

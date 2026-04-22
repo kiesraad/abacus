@@ -109,7 +109,7 @@ export function ElectionReportPage() {
                 <>
                   <DownloadButton
                     icon="download"
-                    href={`/api/elections/${election.id}/committee_sessions/${committeeSession.id}/download_zip_results`}
+                    href={`/api/elections/${election.id}/committee_sessions/${committeeSession.id}/download_zip_results_csb`}
                     title={t("election_management.CSB.determination_election_results.download")}
                     subtitle={t("election_management.zip_file")}
                   />

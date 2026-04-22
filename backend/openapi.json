@@ -1627,8 +1627,8 @@
     },
     "/api/elections/{election_id}/committee_sessions/{committee_session_id}/download_pdf_results": {
       "get": {
-        "summary": "Download a generated PDF with election results (coordinator_csb, coordinator_gsb)",
-        "operationId": "election_download_pdf_results",
+        "summary": "Download a generated PDF with GSB election results (coordinator_gsb)",
+        "operationId": "election_download_pdf_results_gsb",
         "parameters": [
           {
             "name": "election_id",
@@ -1718,7 +1718,6 @@
         "security": [
           {
             "cookie_auth": [
-              "coordinator_csb",
               "coordinator_gsb"
             ]
           }
@@ -1727,8 +1726,8 @@
     },
     "/api/elections/{election_id}/committee_sessions/{committee_session_id}/download_zip_results": {
       "get": {
-        "summary": "Download a zip containing a PDF for the PV and the EML with election results (coordinator_csb, coordinator_gsb)",
-        "operationId": "election_download_zip_results",
+        "summary": "Download a zip containing a PDF for the PV and the EML with GSB election results (coordinator_gsb)",
+        "operationId": "election_download_zip_results_gsb",
         "parameters": [
           {
             "name": "election_id",
@@ -1818,8 +1817,106 @@
         "security": [
           {
             "cookie_auth": [
-              "coordinator_csb",
               "coordinator_gsb"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/elections/{election_id}/committee_sessions/{committee_session_id}/download_zip_results_csb": {
+      "get": {
+        "summary": "Download a zip containing a PDF for the PV and the EML with CSB election results (coordinator_csb)",
+        "operationId": "election_download_zip_results_csb",
+        "parameters": [
+          {
+            "name": "election_id",
+            "in": "path",
+            "description": "Election database id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ElectionId"
+            }
+          },
+          {
+            "name": "committee_session_id",
+            "in": "path",
+            "description": "Committee session database id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/CommitteeSessionId"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ZIP",
+            "headers": {
+              "Content-Disposition": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "attachment; filename=\"filename.zip\""
+              }
+            },
+            "content": {
+              "application/zip": {}
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Request cannot be completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "coordinator_csb"
             ]
           }
         ]

@@ -16,9 +16,9 @@ use crate::{
         election::{CommitteeCategory, ElectionId},
         models::{
             ModelN10_2Input, ModelNa31_2Bijlage1Input, ModelNa31_2InlegvelInput, ToPdfFileModel,
+            votes_table::CandidatesTables,
         },
         role::Role,
-        votes_table::CandidatesTables,
     },
     error::ErrorReference,
     repository::{committee_session_repo, election_repo, user_repo::User},

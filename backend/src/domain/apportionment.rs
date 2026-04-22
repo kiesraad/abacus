@@ -174,7 +174,7 @@ impl From<apportionment::SeatChangeStep<PGNumber>> for SeatChangeStep {
 }
 
 /// Fraction with the integer part split out for display purposes
-#[derive(Debug, Serialize, Deserialize, ToSchema)]
+#[derive(Clone, Debug, Serialize, Deserialize, ToSchema)]
 pub struct DisplayFraction {
     pub integer: u64,
     pub numerator: u64,

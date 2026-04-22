@@ -224,9 +224,9 @@ Met de kiesdeler wordt de zetelverdeling bepaald. De kiesdeler is het aantal ste
   table.hline(stroke: 1pt + black),
   table.cell(align: right, [#input.summary.votes_counts.total_votes_candidates_count]),
   table.cell(align: center, [÷]),
-  table.cell(align: center, [#input.seat_assignment.seats]),
+  table.cell(align: center, [#input.election.number_of_seats]),
   table.cell(align: center, [=]),
-  table.cell(format_fraction(input.seat_assignment.quota)),
+  table.cell(format_fraction(input.initial_full_seats_table.quota)),
 )
 
 #pagebreak(weak: true)
@@ -242,7 +242,7 @@ Hieronder is berekend hoe vaak elke lijst qua stemmenaantal de kiesdeler heeft g
     top: if y > 0 { 0.5pt + gray },
   ),
   inset: (x: 4pt, y: 8pt),
-  fill: (_, y) => if y > 1 and y <= input.seat_assignment.final_standing.len() and calc.even(y) { luma(245) },
+  fill: (_, y) => if y > 1 and y <= input.initial_full_seats_table.list_initial_full_seats_columns.len() and calc.even(y) { luma(245) },
   table.header(
     table.cell(header_text([Lijst])),
     table.cell(align: right, header_text([Aantal stemmen])),
@@ -250,20 +250,19 @@ Hieronder is berekend hoe vaak elke lijst qua stemmenaantal de kiesdeler heeft g
     table.cell(stroke: none, align: right, header_text([Volle zetels])),
   ),
   table.hline(stroke: 1pt + black),
-  ..for standing in input.seat_assignment.final_standing.sorted(key: standing => standing.total_seats, by: (l, r) => l >= r) {
-    let list_result_changes = input.result_changes_full_seats.filter((change) => change.list_number == standing.list_number)
+  ..for column in input.initial_full_seats_table.list_initial_full_seats_columns {
     (
-      table.cell(political_group_name(input.election.political_groups.find(pg => pg.number == standing.list_number), with_prefix: "only_list_number")),
-      table.cell(align: right, [#standing.votes_cast]),
-      table.cell(align: center, [÷ #format_fraction(input.seat_assignment.quota) =]),
-      table.cell(align: right, [#str(standing.full_seats + list_result_changes.len())])
+      table.cell(format_political_group_name(column.number, column.name, with_prefix: "only_list_number")),
+      table.cell(align: right, [#column.total]),
+      table.cell(align: center, [÷ #format_fraction(input.initial_full_seats_table.quota) =]),
+      table.cell(align: right, [#column.initial_full_seats])
     )
   }.flatten(),
   table.hline(stroke: 1pt + black),
   table.cell(header_text([Totaal])),
   table.cell(align: right, header_text([#input.summary.votes_counts.total_votes_candidates_count])),
   table.cell(stroke: none, []),
-  table.cell(stroke: none, align: right, header_text([#str(input.seat_assignment.full_seats + input.result_changes_full_seats.len())])),
+  table.cell(stroke: none, align: right, header_text([#input.initial_full_seats_table.initial_total_full_seats])),
 )
 
 #pagebreak(weak: true)
@@ -274,23 +273,24 @@ Hieronder is berekend hoe vaak elke lijst qua stemmenaantal de kiesdeler heeft g
 
 Na toewijzing van de volle zetels blijft een aantal te verdelen zetels over. Dit zijn de restzetels.
 
+#let initial_residual_seats = input.election.number_of_seats - input.initial_full_seats_table.initial_total_full_seats
 #sum(
   operator_label: "- Verschil",
   number_box(
-    value: input.seat_assignment.seats,
+    value: input.election.number_of_seats,
   )[Totaal aantal te verdelen zetels],
   number_box(
-    value: str(input.seat_assignment.full_seats + input.result_changes_full_seats.len()),
+    value: input.initial_full_seats_table.initial_total_full_seats,
   )[Toegewezen volle zetels],
   number_box(
-    value: str(input.seat_assignment.residual_seats - input.result_changes_full_seats.len()),
+    value: initial_residual_seats,
   )[*Aantal restzetels*],
 )
 
 === Verdeling van de restzetels
 
 #let highest_averages_steps = input.seat_assignment.steps.filter(step => step.change.changed_by == "HighestAverageAssignment")
-#if input.seat_assignment.residual_seats > 0 [
+#if initial_residual_seats > 0 [
   #if input.election.number_of_seats < LARGE_COUNCIL_THRESHOLD [
     - Het #location_type berekent hoeveel stemmen elke lijst overhoudt na toekenning van de volle zetels. Dat is het 'overschot' aan stemmen voor die lijst.
     - Het #location_type verdeelt de restzetels, in volgorde van de grootste overschotten. Elke lijst kan maar één restzetel krijgen. Alleen lijsten die ten minste 75% van de kiesdeler hebben behaald kunnen een restzetel krijgen.

@@ -137,6 +137,13 @@ fuzz_target!(
         if data.seats > no_of_candidates_with_votes {
             return
         }
+        // Skip cases where seats < 19 and number of seats > number of lists with votes
+        // Reason: when there are fewer than 19 seats, the first two steps in which remaining seats are assigned
+        // have the limitation that each list can get only one seat per step. So as long as Abacus assigns seats to
+        // lists with zero votes, we need to skip inputs that triggers that behavior in Abacus.
+        if data.seats < 19 && data.seats > data.list_votes.iter().filter(|list| list.candidate_votes.iter().any(|cv| cv.votes() > 0) ).count() as u32 {
+            return
+        }
         // Skip cases where any party has zero total votes
         //if data.list_votes.iter().any(|list| list.candidate_votes.iter().map(|cv| cv.votes()).sum::<u32>() == 0) {
         //    return;

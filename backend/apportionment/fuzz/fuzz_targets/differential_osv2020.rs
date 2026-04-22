@@ -126,6 +126,11 @@ fuzz_target!(
         if data.list_votes.iter().map(|list| list.candidate_votes.iter().map(|cv| cv.votes()).sum::<u32>()).sum::<u32>() == 0 {
             return
         }
+        // Skip cases where number of seats > number of candidates
+        let no_of_candidates = data.list_votes.iter().map(|x| x.candidate_votes.len() as u32).sum::<u32>();
+        if data.seats > no_of_candidates {
+            return
+        }
         // Skip cases where any party has zero total votes
         //if data.list_votes.iter().any(|list| list.candidate_votes.iter().map(|cv| cv.votes()).sum::<u32>() == 0) {
         //    return;

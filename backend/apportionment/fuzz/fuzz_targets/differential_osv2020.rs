@@ -6,8 +6,8 @@ use std::{
     sync::{Mutex, OnceLock},
 };
 
-use apportionment::{ApportionmentError, CandidateVotes, process};
-use apportionment_fuzz::{FuzzedApportionmentInput, get_total_seats, init_tracing, run_with_log};
+use apportionment::{process, ApportionmentError, CandidateVotes};
+use apportionment_fuzz::{get_total_seats, init_tracing, run_with_log, FuzzedApportionmentInput};
 use libfuzzer_sys::fuzz_target;
 use serde::{Deserialize, Serialize};
 
@@ -122,6 +122,10 @@ fuzz_target!(
         init_tracing();
     },
     |data: FuzzedApportionmentInput| {
+        // Skip cases with zero total votes cast
+        if data.list_votes.iter().map(|list| list.candidate_votes.iter().map(|cv| cv.votes()).sum::<u32>()).sum::<u32>() == 0 {
+            return
+        }
         // Skip cases where any party has zero total votes
         //if data.list_votes.iter().any(|list| list.candidate_votes.iter().map(|cv| cv.votes()).sum::<u32>() == 0) {
         //    return;

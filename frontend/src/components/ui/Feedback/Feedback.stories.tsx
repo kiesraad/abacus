@@ -15,13 +15,19 @@ const meta = {
       options: validationResultCodes,
       control: { type: "multi-select" },
     },
+    election: {
+      options: ["GSB", "CSB"],
+      mapping: {
+        GSB: electionMockData,
+        CSB: csbElectionMockData,
+      },
+    },
     type: {
       options: ["error", "warning"],
     },
     userRole: {
       options: roleValues,
     },
-    election: { table: { disable: true } },
   },
 } satisfies Meta<typeof Feedback>;
 

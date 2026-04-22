@@ -51,59 +51,63 @@ pub struct ValidationResultContext {
 #[derive(Serialize, Deserialize, ToSchema, Debug, PartialEq, Eq, PartialOrd, Ord)]
 #[serde(deny_unknown_fields)]
 pub enum ValidationResultCode {
-    /// CSO: 'Alleen bij extra onderzoek B1-1': één van beide vragen is beantwoord, en de andere niet
+    /// GSB CSO: 'Alleen bij extra onderzoek B1-1': één van beide vragen is beantwoord, en de andere niet
     F101,
-    /// CSO: 'Alleen bij extra onderzoek B1-1': meerdere antwoorden op 1 van de vragen
+    /// GSB CSO: 'Alleen bij extra onderzoek B1-1': meerdere antwoorden op 1 van de vragen
     F102,
-    /// CSO: 'Verschillen met telresultaten van het stembureau': één of beide vragen zijn niet beantwoord
+    /// GSB CSO: 'Verschillen met telresultaten van het stembureau': één of beide vragen zijn niet beantwoord
     F111,
-    /// CSO: 'Verschillen met telresultaten van het stembureau': meerdere antwoorden per vraag
+    /// GSB CSO: 'Verschillen met telresultaten van het stembureau': meerdere antwoorden per vraag
     F112,
-    /// CSO/DSO: 'Aantal kiezers en stemmen': stempassen + volmachten <> totaal toegelaten kiezers
+
+    /// GSB CSO, GSB DSO, CSB: 'Aantal kiezers en stemmen': stempassen + volmachten <> totaal toegelaten kiezers
     F201,
-    /// CSO/DSO: 'Aantal kiezers en stemmen': E.1 t/m E.n tellen niet op naar E
+    /// GSB CSO, GSB DSO, CSB: 'Aantal kiezers en stemmen': (Als F.204 niet getoond wordt) E.1 t/m E.n tellen niet op naar E
     F202,
-    /// CSO/DSO: 'Aantal kiezers en stemmen': stemmen op kandidaten + blanco stemmen + ongeldige stemmen <> totaal aantal uitgebrachte stemmen
+    /// GSB CSO, GSB DSO, CSB: 'Aantal kiezers en stemmen': (Als F.204 niet getoond wordt) stemmen op kandidaten + blanco stemmen + ongeldige stemmen <> totaal aantal uitgebrachte stemmen
     F203,
-    /// GSB CSO/DSO, CSB: 'Aantal kiezers en stemmen': De som van lijsttotalen (E.1 t/m E.n) is groter dan 0 en E = leeg of 0
+    /// GSB CSO, GSB DSO, CSB: 'Aantal kiezers en stemmen': De som van lijsttotalen (E.1 t/m E.n) is groter dan 0 en E = leeg of 0
     F204,
-    /// CSO: "Vergelijk D&H": (checkbox D=H is aangevinkt, maar D<>H)
+
+    /// GSB CSO, GSB DSO: "Vergelijk D&H": (Als checkbox D=H is aangevinkt) D<>H
     F301,
-    /// CSO: "Vergelijk D&H": (checkbox H>D is aangevinkt, maar H<=D)
+    /// GSB CSO, GSB DSO: "Vergelijk D&H": (Als checkbox H>D is aangevinkt) H<=D
     F302,
-    /// CSO: "Vergelijk D&H": (checkbox H<D is aangevinkt, maar H>=D)
+    /// GSB CSO, GSB DSO: "Vergelijk D&H": (Als checkbox H<D is aangevinkt) H>=D
     F303,
-    /// CSO: "Vergelijk D&H": Meerdere aangevinkt of geen enkele aangevinkt
+    /// GSB CSO, GSB DSO: "Vergelijk D&H": Meerdere aangevinkt of geen enkele aangevinkt  
     F304,
-    /// CSO: (Als D = H) I en/of J zijn ingevuld
+    /// GSB CSO, GSB DSO: (Als D = H) I en/of J zijn ingevuld
     F305,
-    /// CSO: (Als H > D) I <> H - D
+    /// GSB CSO, GSB DSO: (Als H > D) I <> H - D
     F306,
-    /// CSO: (Als H > D) J is ingevuld
+    /// GSB CSO, GSB DSO: (Als H > D) J is ingevuld
     F307,
-    /// CSO: (Als H < D) J <> D - H
+    /// GSB CSO, GSB DSO: (Als H < D) J <> D - H
     F308,
-    /// CSO: (Als H < D) I is ingevuld
+    /// GSB CSO, GSB DSO: (Als H < D) I is ingevuld
     F309,
-    /// CSO: (Als D <> H en verklaring voor verschil niks aangevinkt of 'ja' en 'nee' aangevinkt)
+    /// GSB CSO, GSB DSO: (Als D <> H) Verklaring voor verschil niks aangevinkt of zowel 'ja' als 'nee' aangevinkt
     F310,
-    /// CSB: totaal aantal kiezers != totaal aantal uitgebrachte stemmen - meer getelde stemmen + minder getelde stemmen
+    /// CSB: totaal aantal kiezers <> totaal aantal uitgebrachte stemmen - meer getelde stemmen + minder getelde stemmen
     F312,
-    /// CSO: 'Kandidaten en lijsttotalen': Er zijn (stemmen op kandidaten of het lijsttotaal van corresponderende E.x is groter dan 0) en het totaal aantal stemmen op een lijst = leeg of 0
+
+    /// GSB CSO, GSB DSO, CSB: 'Kandidaten en lijsttotalen': Er zijn (stemmen op kandidaten of het lijsttotaal van corresponderende E.x is groter dan 0) en het totaal aantal stemmen op een lijst = leeg of 0
     F401,
-    /// CSO: 'Kandidaten en lijsttotalen': (Als F.401 niet getoond wordt) Totaal aantal stemmen op een lijst <> som van aantal stemmen op de kandidaten van die lijst
+    /// GSB CSO, GSB DSO, CSB: 'Kandidaten en lijsttotalen': (Als F.401 niet getoond wordt) Totaal aantal stemmen op een lijst <> som van aantal stemmen op de kandidaten van die lijst
     F402,
-    /// CSO: 'Kandidaten en lijsttotalen': (Als F.401 niet getoond wordt) Totaal aantal stemmen op een lijst komt niet overeen met het lijsttotaal van corresponderende E.x
+    /// GSB CSO, GSB DSO, CSB: 'Kandidaten en lijsttotalen': (Als F.401 niet getoond wordt) Totaal aantal stemmen op een lijst komt niet overeen met het lijsttotaal van corresponderende E.x
     F403,
 
+    /// GSB CSO, GSB DSO, CSB: (Bij tweede invoer) Niet alle ingevoerde waardes van de tweede invoer zijn gelijk aan die van de eerste invoer
     W001,
-    /// CSO/DSO: 'Aantal kiezers en stemmen': Aantal blanco stemmen is groter dan of gelijk aan 3% van het totaal aantal uitgebrachte stemmen
+    /// GSB CSO, GSB DSO: 'Aantal kiezers en stemmen': Aantal blanco stemmen is groter dan of gelijk aan 3% van het totaal aantal uitgebrachte stemmen
     W201,
-    /// CSO/DSO: 'Aantal kiezers en stemmen': Aantal ongeldige stemmen is groter dan of gelijk aan 3% van het totaal aantal uitgebrachte stemmen
+    /// GSB CSO, GSB DSO: 'Aantal kiezers en stemmen': Aantal ongeldige stemmen is groter dan of gelijk aan 3% van het totaal aantal uitgebrachte stemmen
     W202,
-    /// CSO/DSO: 'Aantal kiezers en stemmen': Verschil tussen totaal aantal toegelaten kiezers en totaal aantal uitgebrachte stemmen is groter dan of gelijk aan 2% en groter dan of gelijk aan 15
+    /// GSB CSO, GSB DSO: 'Aantal kiezers en stemmen': Verschil tussen totaal aantal toegelaten kiezers en totaal aantal uitgebrachte stemmen is groter dan of gelijk aan 2% en groter dan of gelijk aan 15
     W203,
-    /// CSO/DSO: 'Aantal kiezers en stemmen': Totaal aantal uitgebrachte stemmen leeg of 0
+    /// GSB CSO, GSB DSO, CSB: 'Aantal kiezers en stemmen': Totaal aantal uitgebrachte stemmen leeg of 0
     W204,
     /// CSB: 'Aantal kiezers en stemmen': Aantal kiesgerechtigden = leeg of 0
     W205,

@@ -4,7 +4,7 @@ use utoipa::ToSchema;
 use super::yes_no::YesNo;
 use crate::domain::{
     compare::Compare,
-    election::ElectionWithPoliticalGroups,
+    election::{CommitteeCategory, ElectionWithPoliticalGroups},
     field_path::FieldPath,
     validate::{DataError, Validate, ValidationResult, ValidationResultCode, ValidationResults},
 };
@@ -40,28 +40,30 @@ impl Compare for ExtraInvestigation {
 impl Validate for ExtraInvestigation {
     fn validate(
         &self,
-        _election: &ElectionWithPoliticalGroups,
+        election: &ElectionWithPoliticalGroups,
         validation_results: &mut ValidationResults,
         path: &FieldPath,
     ) -> Result<(), DataError> {
-        if self.extra_investigation_other_reason.is_empty()
-            != self.ballots_recounted_extra_investigation.is_empty()
-        {
-            validation_results.errors.push(ValidationResult {
-                fields: vec![path.to_string()],
-                code: ValidationResultCode::F101,
-                context: None,
-            });
-        }
+        if election.committee_category == CommitteeCategory::GSB {
+            if self.extra_investigation_other_reason.is_empty()
+                != self.ballots_recounted_extra_investigation.is_empty()
+            {
+                validation_results.errors.push(ValidationResult {
+                    fields: vec![path.to_string()],
+                    code: ValidationResultCode::F101,
+                    context: None,
+                });
+            }
 
-        if self.extra_investigation_other_reason.is_both()
-            || self.ballots_recounted_extra_investigation.is_both()
-        {
-            validation_results.errors.push(ValidationResult {
-                fields: vec![path.to_string()],
-                code: ValidationResultCode::F102,
-                context: None,
-            });
+            if self.extra_investigation_other_reason.is_both()
+                || self.ballots_recounted_extra_investigation.is_both()
+            {
+                validation_results.errors.push(ValidationResult {
+                    fields: vec![path.to_string()],
+                    code: ValidationResultCode::F102,
+                    context: None,
+                });
+            }
         }
 
         Ok(())
@@ -85,19 +87,18 @@ pub mod tests {
     }
 
     fn validate(
-        investigation_yes: bool,
-        investigation_no: bool,
-        recounted_yes: bool,
-        recounted_no: bool,
+        committee_category: CommitteeCategory,
+        investigation: YesNo,
+        recounted: YesNo,
     ) -> Result<ValidationResults, DataError> {
         let extra_investigation = ExtraInvestigation {
-            extra_investigation_other_reason: YesNo::new(investigation_yes, investigation_no),
-            ballots_recounted_extra_investigation: YesNo::new(recounted_yes, recounted_no),
+            extra_investigation_other_reason: investigation,
+            ballots_recounted_extra_investigation: recounted,
         };
 
         let mut validation_results = ValidationResults::default();
         extra_investigation.validate(
-            &election_fixture(&[]),
+            &election_fixture(committee_category, &[]),
             &mut validation_results,
             &"extra_investigation".into(),
         )?;
@@ -106,62 +107,75 @@ pub mod tests {
         Ok(validation_results)
     }
 
-    #[test]
-    fn test_no_validation_errors() -> Result<(), DataError> {
-        let validation_results = validate(false, false, false, false)?;
-        assert_eq!(validation_results.errors, []);
-
-        let validation_results = validate(true, false, false, true)?;
-        assert_eq!(validation_results.errors, []);
-
-        Ok(())
-    }
-
-    /// CSO | F.101: 'Alleen bij extra onderzoek B1-1': één van beide vragen is beantwoord, en de andere niet
+    /// GSB CSO | F.101: 'Alleen bij extra onderzoek B1-1': één van beide vragen is beantwoord, en de andere niet
     #[test]
     fn test_f101() -> Result<(), DataError> {
-        let validation_results = validate(false, true, false, false)?;
-        assert_eq!(
-            validation_results.errors,
-            [ValidationResult {
-                code: ValidationResultCode::F101,
-                fields: vec!["extra_investigation".into()],
-                context: None,
-            }]
-        );
+        use CommitteeCategory::*;
 
-        let validation_results = validate(false, false, false, true)?;
-        assert_eq!(
-            validation_results.errors,
-            [ValidationResult {
-                code: ValidationResultCode::F101,
-                fields: vec!["extra_investigation".into()],
-                context: None,
-            }]
-        );
+        let f101 = ValidationResult {
+            code: ValidationResultCode::F101,
+            fields: vec!["extra_investigation".into()],
+            context: None,
+        };
+
+        let cases = vec![
+            (GSB, YesNo::default(), YesNo::default(), false),
+            (GSB, YesNo::yes(), YesNo::yes(), false),
+            (GSB, YesNo::no(), YesNo::no(), false),
+            (GSB, YesNo::yes(), YesNo::no(), false),
+            (GSB, YesNo::yes(), YesNo::default(), true),
+            (GSB, YesNo::default(), YesNo::no(), true),
+            (CSB, YesNo::default(), YesNo::no(), false), // Not applicable for CSB
+        ];
+
+        for (committee_category, investigation, recounted, expect_f101) in cases {
+            let result = validate(committee_category, investigation.clone(), recounted.clone())?;
+            let has_f101 = result.errors.iter().any(|e| e == &f101);
+            assert_eq!(
+                has_f101, expect_f101,
+                "Failed: {committee_category:?}, investigated: {investigation:?}, recounted: {recounted:?}"
+            );
+        }
 
         Ok(())
     }
 
-    /// CSO | F.102: 'Alleen bij extra onderzoek B1-1': meerdere antwoorden op 1 van de vragen
+    /// GSB CSO | F.102: 'Alleen bij extra onderzoek B1-1': meerdere antwoorden op 1 van de vragen
     #[test]
     fn test_f102() -> Result<(), DataError> {
-        let validation_results = validate(true, true, true, true)?;
-        assert_eq!(
-            validation_results.errors,
-            [ValidationResult {
-                code: ValidationResultCode::F102,
-                fields: vec!["extra_investigation".into()],
-                context: None,
-            }]
-        );
+        use CommitteeCategory::*;
+
+        let f102 = ValidationResult {
+            code: ValidationResultCode::F102,
+            fields: vec!["extra_investigation".into()],
+            context: None,
+        };
+
+        let cases = vec![
+            (GSB, YesNo::default(), YesNo::default(), false),
+            (GSB, YesNo::yes(), YesNo::yes(), false),
+            (GSB, YesNo::yes(), YesNo::no(), false),
+            (GSB, YesNo::both(), YesNo::default(), true),
+            (GSB, YesNo::default(), YesNo::both(), true),
+            (GSB, YesNo::both(), YesNo::both(), true),
+            (CSB, YesNo::default(), YesNo::both(), false), // Not applicable for CSB
+        ];
+
+        for (committee_category, investigation, recounted, expect_f102) in cases {
+            let result = validate(committee_category, investigation.clone(), recounted.clone())?;
+            let has_f102 = result.errors.iter().any(|e| e == &f102);
+            assert_eq!(
+                has_f102, expect_f102,
+                "Failed: {committee_category:?}, investigated: {investigation:?}, recounted: {recounted:?}"
+            );
+        }
 
         Ok(())
     }
 
     #[test]
     fn test_multiple_errors() -> Result<(), DataError> {
-        let validation_results = validate(true, true, false, false)?;
+        let validation_results = validate(CommitteeCategory::GSB, YesNo::both(), YesNo::default())?;
         assert_eq!(
             validation_results.errors,
             [
@@ -178,7 +192,7 @@ pub mod tests {
             ]
         );
 
-        let validation_results = validate(false, false, true, true)?;
+        let validation_results = validate(CommitteeCategory::GSB, YesNo::default(), YesNo::both())?;
         assert_eq!(
             validation_results.errors,
             [

@@ -37,13 +37,17 @@ impl Validate for Count {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::domain::election::tests::election_fixture;
+    use crate::domain::election::{CommitteeCategory, tests::election_fixture};
     #[test]
     fn test_count_err_out_of_range() {
         let mut validation_results = ValidationResults::default();
         let count: Count = 1_000_000_000;
 
-        let result = count.validate(&election_fixture(&[]), &mut validation_results, &"".into());
+        let result = count.validate(
+            &election_fixture(CommitteeCategory::GSB, &[]),
+            &mut validation_results,
+            &"".into(),
+        );
 
         assert!(result.is_err());
         assert!(result.unwrap_err().message.eq("count out of range"),);

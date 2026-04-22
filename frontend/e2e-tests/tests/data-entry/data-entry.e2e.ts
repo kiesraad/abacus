@@ -235,7 +235,7 @@ test.describe("full data entry flow", () => {
 
     await expect(votersAndVotesPage.feedbackHeader).toBeFocused();
     await expect(votersAndVotesPage.warning).toContainText("W.203");
-    await expect(votersAndVotesPage.warning).toContainText("Controleer D en H");
+    await expect(votersAndVotesPage.warning).toContainText("Controleer je antwoorden");
     await votersAndVotesPage.checkAcceptErrorsAndWarnings();
     await votersAndVotesPage.next.click();
 
@@ -312,7 +312,7 @@ test.describe("full data entry flow", () => {
 
     await expect(votersAndVotesPage.feedbackHeader).toBeFocused();
     await expect(votersAndVotesPage.warning).toContainText("W.203");
-    await expect(votersAndVotesPage.warning).toContainText("Controleer D en H");
+    await expect(votersAndVotesPage.warning).toContainText("Controleer je antwoorden");
     await votersAndVotesPage.checkAcceptErrorsAndWarnings();
     await votersAndVotesPage.next.click();
 
@@ -381,7 +381,7 @@ test.describe("full data entry flow", () => {
     await expect(votersAndVotesPage.fieldset).toBeVisible();
     await expect(votersAndVotesPage.feedbackHeader).toBeFocused();
     await expect(votersAndVotesPage.warning).toContainText("W.201");
-    await expect(votersAndVotesPage.warning).toContainText("Controleer F");
+    await expect(votersAndVotesPage.warning).toContainText("Controleer je antwoorden");
 
     // accept the warning
     await votersAndVotesPage.checkAcceptErrorsAndWarnings();
@@ -505,7 +505,7 @@ test.describe("full data entry flow", () => {
     await expect(checkAndSavePage.summaryListItemVotersAndVotes).toHaveText([
       "F.202 Controleer je antwoorden",
       "F.203 Controleer je antwoorden",
-      "W.203 Controleer D en H",
+      "W.203 Controleer je antwoorden",
     ]);
     await expect(checkAndSavePage.summaryListItemPoliticalGroupCandidateVotes1).toHaveText([
       "F.402 Controleer ingevoerde aantallen",
@@ -800,7 +800,7 @@ test.describe("errors and warnings", () => {
     await expect(votersAndVotesPage.fieldset).toBeVisible();
     await expect(votersAndVotesPage.feedbackHeader).toBeFocused();
     await expect(votersAndVotesPage.warning).toContainText("W.203");
-    await expect(votersAndVotesPage.warning).toContainText("Controleer D en H");
+    await expect(votersAndVotesPage.warning).toContainText("Controleer je antwoorden");
     await expect(votersAndVotesPage.error).toBeHidden();
     await expect(votersAndVotesPage.acceptErrorsAndWarnings).toBeVisible();
 
@@ -857,7 +857,7 @@ test.describe("errors and warnings", () => {
     await expect(votersAndVotesPage.fieldset).toBeVisible();
     await expect(votersAndVotesPage.feedbackHeader).toBeFocused();
     await expect(votersAndVotesPage.warning).toContainText("W.203");
-    await expect(votersAndVotesPage.warning).toContainText("Controleer D en H");
+    await expect(votersAndVotesPage.warning).toContainText("Controleer je antwoorden");
 
     await expect(votersAndVotesPage.acceptErrorsAndWarnings).toBeVisible();
 
@@ -867,7 +867,7 @@ test.describe("errors and warnings", () => {
     await votersAndVotesPage.proxyCertificateCount.press("Tab");
     await expect(votersAndVotesPage.fieldset).toBeVisible();
     await expect(votersAndVotesPage.warning).toContainText("W.203");
-    await expect(votersAndVotesPage.warning).toContainText("Controleer D en H");
+    await expect(votersAndVotesPage.warning).toContainText("Controleer je antwoorden");
 
     await expect(votersAndVotesPage.acceptErrorsAndWarnings).toBeHidden();
   });

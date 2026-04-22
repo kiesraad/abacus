@@ -347,7 +347,7 @@ test.describe("Data entry model test - errors", () => {
             const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
             expect(votersVotesFields).toStrictEqual({ voters, votes: votesWarning });
             await expect(votersAndVotesPage.warning).toContainText("W.201");
-            await expect(votersAndVotesPage.warning).toContainText("Controleer F");
+            await expect(votersAndVotesPage.warning).toContainText("Controleer je antwoorden");
           },
           unsavedChangesModalChangedToError: async () => {
             await expect(votersAndVotesPage.unsavedChangesModal.heading).toBeVisible();

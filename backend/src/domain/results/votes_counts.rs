@@ -8,7 +8,7 @@ use crate::{
     APIError,
     domain::{
         compare::Compare,
-        election::ElectionWithPoliticalGroups,
+        election::{CommitteeCategory, ElectionWithPoliticalGroups},
         field_path::FieldPath,
         validate::{
             DataError, Validate, ValidationResult, ValidationResultCode, ValidationResults,
@@ -185,23 +185,27 @@ impl VotesCounts {
 
     fn validate_votes_counts_warnings(
         &self,
+        election: &ElectionWithPoliticalGroups,
         validation_results: &mut ValidationResults,
         path: &FieldPath,
     ) {
-        if above_percentage_threshold(self.blank_votes_count, self.total_votes_cast_count, 3) {
-            validation_results.warnings.push(ValidationResult {
-                fields: vec![path.field("blank_votes_count").to_string()],
-                code: ValidationResultCode::W201,
-                context: None,
-            });
-        }
+        if election.committee_category == CommitteeCategory::GSB {
+            if above_percentage_threshold(self.blank_votes_count, self.total_votes_cast_count, 3) {
+                validation_results.warnings.push(ValidationResult {
+                    fields: vec![path.field("blank_votes_count").to_string()],
+                    code: ValidationResultCode::W201,
+                    context: None,
+                });
+            }
 
-        if above_percentage_threshold(self.invalid_votes_count, self.total_votes_cast_count, 3) {
-            validation_results.warnings.push(ValidationResult {
-                fields: vec![path.field("invalid_votes_count").to_string()],
-                code: ValidationResultCode::W202,
-                context: None,
-            });
+            if above_percentage_threshold(self.invalid_votes_count, self.total_votes_cast_count, 3)
+            {
+                validation_results.warnings.push(ValidationResult {
+                    fields: vec![path.field("invalid_votes_count").to_string()],
+                    code: ValidationResultCode::W202,
+                    context: None,
+                });
+            }
         }
 
         if self.total_votes_cast_count == 0 {
@@ -263,7 +267,7 @@ impl Validate for VotesCounts {
 
         self.validate_votes_counts_errors(validation_results, path);
 
-        self.validate_votes_counts_warnings(validation_results, path);
+        self.validate_votes_counts_warnings(election, validation_results, path);
 
         Ok(())
     }
@@ -274,7 +278,7 @@ mod tests {
     use test_log::test;
 
     use super::*;
-    use crate::domain::election::{PGNumber, tests::election_fixture};
+    use crate::domain::election::{CommitteeCategory::*, PGNumber, tests::election_fixture};
 
     #[test]
     fn test_votes_addition() {
@@ -362,6 +366,7 @@ mod tests {
     }
 
     fn validate(
+        committee_category: CommitteeCategory,
         political_group_total_votes: &[u32],
         total_votes_candidates_count: u32,
         blank_votes_count: u32,
@@ -385,7 +390,7 @@ mod tests {
 
         let mut validation_results = ValidationResults::default();
         votes_counts.validate(
-            &election_fixture(&[1, 1, 1]),
+            &election_fixture(committee_category, &[1, 1, 1]),
             &mut validation_results,
             &"votes_counts".into(),
         )?;
@@ -393,85 +398,94 @@ mod tests {
         Ok(validation_results)
     }
 
-    /// CSO/DSO | F.202: 'Aantal kiezers en stemmen': E.1 t/m E.n tellen niet op naar E
+    /// GSB CSO, GSB DSO, CSB | F.202: 'Aantal kiezers en stemmen': (Als F.204 niet getoond wordt) E.1 t/m E.n tellen niet op naar E
     #[test]
     fn test_f202() -> Result<(), DataError> {
-        let validation_results = validate(&[50, 30, 20], 100, 0, 0, 100)?;
+        let validation_results = validate(GSB, &[50, 30, 20], 100, 0, 0, 100)?;
         assert!(validation_results.errors.is_empty());
 
-        let validation_results = validate(&[49, 30, 20], 100, 0, 0, 100)?;
-        assert_eq!(
-            validation_results.errors,
-            [ValidationResult {
-                code: ValidationResultCode::F202,
-                fields: vec![
-                    "votes_counts.political_group_total_votes.0.total".into(),
-                    "votes_counts.political_group_total_votes.1.total".into(),
-                    "votes_counts.political_group_total_votes.2.total".into(),
-                    "votes_counts.total_votes_candidates_count".into(),
-                ],
-                context: None,
-            }]
-        );
+        let f202 = vec![ValidationResult {
+            code: ValidationResultCode::F202,
+            fields: vec![
+                "votes_counts.political_group_total_votes.0.total".into(),
+                "votes_counts.political_group_total_votes.1.total".into(),
+                "votes_counts.political_group_total_votes.2.total".into(),
+                "votes_counts.total_votes_candidates_count".into(),
+            ],
+            context: None,
+        }];
+
+        let validation_results = validate(GSB, &[49, 30, 20], 100, 0, 0, 100)?;
+        assert_eq!(validation_results.errors, f202);
+
+        // Also applies for CSB
+        let validation_results = validate(CSB, &[49, 30, 20], 100, 0, 0, 100)?;
+        assert_eq!(validation_results.errors, f202);
 
         Ok(())
     }
 
-    /// CSO/DSO | F.203: 'Aantal kiezers en stemmen': stemmen op kandidaten + blanco stemmen + ongeldige stemmen <> totaal aantal uitgebrachte stemmen
+    /// GSB CSO, GSB DSO, CSB | F.203: 'Aantal kiezers en stemmen': (Als F.204 niet getoond wordt) stemmen op kandidaten + blanco stemmen + ongeldige stemmen <> totaal aantal uitgebrachte stemmen
     #[test]
     fn test_f203() -> Result<(), DataError> {
-        let validation_results = validate(&[50, 30, 20], 100, 1, 2, 103)?;
+        let validation_results = validate(GSB, &[50, 30, 20], 100, 1, 2, 103)?;
         assert!(validation_results.errors.is_empty());
 
-        let validation_results = validate(&[50, 30, 20], 100, 1, 2, 104)?;
-        assert_eq!(
-            validation_results.errors,
-            [ValidationResult {
-                code: ValidationResultCode::F203,
-                fields: vec![
-                    "votes_counts.total_votes_candidates_count".into(),
-                    "votes_counts.blank_votes_count".into(),
-                    "votes_counts.invalid_votes_count".into(),
-                    "votes_counts.total_votes_cast_count".into(),
-                ],
-                context: None,
-            }],
-        );
+        let f203 = vec![ValidationResult {
+            code: ValidationResultCode::F203,
+            fields: vec![
+                "votes_counts.total_votes_candidates_count".into(),
+                "votes_counts.blank_votes_count".into(),
+                "votes_counts.invalid_votes_count".into(),
+                "votes_counts.total_votes_cast_count".into(),
+            ],
+            context: None,
+        }];
+
+        let validation_results = validate(GSB, &[50, 30, 20], 100, 1, 2, 104)?;
+        assert_eq!(validation_results.errors, f203);
+
+        // Also applies for CSB
+        let validation_results = validate(CSB, &[50, 30, 20], 100, 1, 2, 104)?;
+        assert_eq!(validation_results.errors, f203);
 
         Ok(())
     }
 
-    /// GSB CSO/DSO, CSB | F.204: 'Aantal kiezers en stemmen': De som van lijsttotalen (E.1 t/m E.n) is groter dan 0 en E = leeg of 0
+    /// GSB CSO, GSB DSO, CSB | F.204: 'Aantal kiezers en stemmen': De som van lijsttotalen (E.1 t/m E.n) is groter dan 0 en E = leeg of 0
     #[test]
     fn test_f204() -> Result<(), DataError> {
         // No error
-        let validation_results = validate(&[50, 30, 20], 100, 1, 2, 103)?;
+        let validation_results = validate(GSB, &[50, 30, 20], 100, 1, 2, 103)?;
         assert!(validation_results.errors.is_empty());
+
+        let f204 = vec![ValidationResult {
+            code: ValidationResultCode::F204,
+            fields: vec!["votes_counts.total_votes_candidates_count".into()],
+            context: None,
+        }];
 
         // Error: sum of political group totals is 100, but total votes on candidates is 0
         // F.202/F.203 errors should not be triggered, since F.204 takes precedence
-        let validation_results = validate(&[50, 30, 20], 0, 1, 2, 103)?;
-        assert_eq!(
-            validation_results.errors,
-            [ValidationResult {
-                code: ValidationResultCode::F204,
-                fields: vec!["votes_counts.total_votes_candidates_count".into()],
-                context: None,
-            }],
-        );
+        let validation_results = validate(GSB, &[50, 30, 20], 0, 1, 2, 103)?;
+        assert_eq!(validation_results.errors, f204);
+
+        // Also applies for CSB
+        let validation_results = validate(CSB, &[50, 30, 20], 0, 1, 2, 103)?;
+        assert_eq!(validation_results.errors, f204);
 
         Ok(())
     }
 
-    /// CSO/DSO | W.201: 'Aantal kiezers en stemmen': Aantal blanco stemmen is groter dan of gelijk aan 3% van het totaal aantal uitgebrachte stemmen
+    /// GSB CSO, GSB DSO | W.201: 'Aantal kiezers en stemmen': Aantal blanco stemmen is groter dan of gelijk aan 3% van het totaal aantal uitgebrachte stemmen
     #[test]
     fn test_w201() -> Result<(), DataError> {
         // < 3% of blank votes
-        let validation_results = validate(&[40, 20, 11], 71, 29, 0, 100)?;
-        assert!(validation_results.errors.is_empty());
+        let validation_results = validate(GSB, &[40, 20, 11], 98, 2, 0, 100)?;
+        assert!(validation_results.warnings.is_empty());
 
         // == 3% of blank votes
-        let validation_results = validate(&[40, 20, 10], 70, 30, 0, 100)?;
+        let validation_results = validate(GSB, &[40, 20, 10], 97, 3, 0, 100)?;
         assert_eq!(
             validation_results.warnings,
             [ValidationResult {
@@ -482,7 +496,7 @@ mod tests {
         );
 
         // > 3% of blank votes
-        let validation_results = validate(&[40, 20, 9], 69, 31, 0, 100)?;
+        let validation_results = validate(GSB, &[40, 20, 9], 96, 4, 0, 100)?;
         assert_eq!(
             validation_results.warnings,
             [ValidationResult {
@@ -492,18 +506,22 @@ mod tests {
             }],
         );
 
+        // Not applicable for CSB
+        let validation_results = validate(CSB, &[40, 20, 9], 96, 4, 0, 100)?;
+        assert!(validation_results.warnings.is_empty());
+
         Ok(())
     }
 
-    /// CSO/DSO | W.202: 'Aantal kiezers en stemmen': Aantal ongeldige stemmen is groter dan of gelijk aan 3% van het totaal aantal uitgebrachte stemmen
+    /// GSB CSO, GSB DSO | W.202: 'Aantal kiezers en stemmen': Aantal ongeldige stemmen is groter dan of gelijk aan 3% van het totaal aantal uitgebrachte stemmen
     #[test]
     fn test_w202() -> Result<(), DataError> {
         // < 3% of invalid votes
-        let validation_results = validate(&[40, 20, 11], 71, 0, 29, 100)?;
-        assert!(validation_results.errors.is_empty());
+        let validation_results = validate(GSB, &[40, 20, 11], 98, 0, 2, 100)?;
+        assert!(validation_results.warnings.is_empty());
 
         // == 3% of invalid votes
-        let validation_results = validate(&[40, 20, 10], 70, 0, 30, 100)?;
+        let validation_results = validate(GSB, &[40, 20, 10], 97, 0, 3, 100)?;
         assert_eq!(
             validation_results.warnings,
             [ValidationResult {
@@ -514,7 +532,7 @@ mod tests {
         );
 
         // > 3% of invalid votes
-        let validation_results = validate(&[40, 20, 9], 69, 0, 31, 100)?;
+        let validation_results = validate(GSB, &[40, 20, 9], 96, 0, 4, 100)?;
         assert_eq!(
             validation_results.warnings,
             [ValidationResult {
@@ -524,56 +542,62 @@ mod tests {
             }],
         );
 
+        // Not applicable for CSB
+        let validation_results = validate(CSB, &[40, 20, 9], 96, 0, 4, 100)?;
+        assert!(validation_results.warnings.is_empty());
+
         Ok(())
     }
 
-    /// CSO/DSO | W.204: 'Aantal kiezers en stemmen': Totaal aantal uitgebrachte stemmen leeg of 0
+    /// GSB CSO, GSB DSO, CSB | W.204: 'Aantal kiezers en stemmen': Totaal aantal uitgebrachte stemmen leeg of 0
     #[test]
     fn test_w204() -> Result<(), DataError> {
-        let validation_results = validate(&[50, 30, 20], 100, 0, 0, 100)?;
-        assert!(validation_results.errors.is_empty());
+        let validation_results = validate(GSB, &[50, 30, 20], 100, 0, 0, 100)?;
+        assert!(validation_results.warnings.is_empty());
 
-        let validation_results = validate(&[0, 0, 0], 0, 0, 0, 0)?;
-        assert_eq!(
-            validation_results.warnings,
-            [ValidationResult {
-                code: ValidationResultCode::W204,
-                fields: vec!["votes_counts.total_votes_cast_count".into()],
-                context: None,
-            }],
-        );
+        let w204 = vec![ValidationResult {
+            code: ValidationResultCode::W204,
+            fields: vec!["votes_counts.total_votes_cast_count".into()],
+            context: None,
+        }];
+
+        let validation_results = validate(GSB, &[0, 0, 0], 0, 0, 0, 0)?;
+        assert_eq!(validation_results.warnings, w204);
+
+        // Also applies for CSB
+        let validation_results = validate(CSB, &[0, 0, 0], 0, 0, 0, 0)?;
+        assert_eq!(validation_results.warnings, w204);
 
         Ok(())
     }
 
     #[test]
     fn test_multiple() -> Result<(), DataError> {
-        let validation_results = validate(&[50, 30, 20], 99, 10, 10, 0)?;
-        assert_eq!(
-            validation_results.errors,
-            [
-                ValidationResult {
-                    code: ValidationResultCode::F202,
-                    fields: vec![
-                        "votes_counts.political_group_total_votes.0.total".into(),
-                        "votes_counts.political_group_total_votes.1.total".into(),
-                        "votes_counts.political_group_total_votes.2.total".into(),
-                        "votes_counts.total_votes_candidates_count".into(),
-                    ],
-                    context: None,
-                },
-                ValidationResult {
-                    code: ValidationResultCode::F203,
-                    fields: vec![
-                        "votes_counts.total_votes_candidates_count".into(),
-                        "votes_counts.blank_votes_count".into(),
-                        "votes_counts.invalid_votes_count".into(),
-                        "votes_counts.total_votes_cast_count".into(),
-                    ],
-                    context: None,
-                }
-            ],
-        );
+        let expect_errors = vec![
+            ValidationResult {
+                code: ValidationResultCode::F202,
+                fields: vec![
+                    "votes_counts.political_group_total_votes.0.total".into(),
+                    "votes_counts.political_group_total_votes.1.total".into(),
+                    "votes_counts.political_group_total_votes.2.total".into(),
+                    "votes_counts.total_votes_candidates_count".into(),
+                ],
+                context: None,
+            },
+            ValidationResult {
+                code: ValidationResultCode::F203,
+                fields: vec![
+                    "votes_counts.total_votes_candidates_count".into(),
+                    "votes_counts.blank_votes_count".into(),
+                    "votes_counts.invalid_votes_count".into(),
+                    "votes_counts.total_votes_cast_count".into(),
+                ],
+                context: None,
+            },
+        ];
+
+        let validation_results = validate(GSB, &[50, 30, 20], 99, 10, 10, 0)?;
+        assert_eq!(validation_results.errors, expect_errors);
         assert_eq!(
             validation_results.warnings,
             [
@@ -593,6 +617,18 @@ mod tests {
                     context: None,
                 }
             ],
+        );
+
+        // CSB does not have W.201/W.202 warnings
+        let validation_results = validate(CSB, &[50, 30, 20], 99, 10, 10, 0)?;
+        assert_eq!(validation_results.errors, expect_errors);
+        assert_eq!(
+            validation_results.warnings,
+            [ValidationResult {
+                code: ValidationResultCode::W204,
+                fields: vec!["votes_counts.total_votes_cast_count".into()],
+                context: None,
+            }],
         );
 
         Ok(())

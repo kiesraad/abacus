@@ -405,7 +405,7 @@ describe("Test VotersAndVotesForm", () => {
       await user.click(submitButton);
 
       const feedbackMessage = [
-        "Controleer F",
+        "Controleer je antwoorden",
         "W.201",
         "Heb je iets niet goed overgenomen? Herstel de fout en ga verder.",
         "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
@@ -496,7 +496,7 @@ describe("Test VotersAndVotesForm", () => {
       await user.click(submitButton);
 
       const feedbackMessage = [
-        "Controleer F",
+        "Controleer je antwoorden",
         "W.201",
         "Heb je iets niet goed overgenomen? Herstel de fout en ga verder.",
         "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
@@ -538,7 +538,7 @@ describe("Test VotersAndVotesForm", () => {
       await user.click(submitButton);
 
       const feedbackMessage = [
-        "Controleer G",
+        "Controleer je antwoorden",
         "W.202",
         "Heb je iets niet goed overgenomen? Herstel de fout en ga verder.",
         "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
@@ -577,7 +577,7 @@ describe("Test VotersAndVotesForm", () => {
       await user.click(submitButton);
 
       const feedbackMessage = [
-        "Controleer D en H",
+        "Controleer je antwoorden",
         "W.203",
         "Heb je iets niet goed overgenomen? Herstel de fout en ga verder.",
         "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
@@ -615,7 +615,7 @@ describe("Test VotersAndVotesForm", () => {
       await user.click(submitButton);
 
       const feedbackMessage = [
-        "Controleer H",
+        "Controleer je antwoorden",
         "W.204",
         "Heb je iets niet goed overgenomen? Herstel de fout en ga verder.",
         "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
@@ -739,7 +739,7 @@ describe("Test VotersAndVotesForm", () => {
       ].join("");
 
       const warningFeedbackMessage = [
-        "Controleer F",
+        "Controleer je antwoorden",
         "W.201",
         "Heb je iets niet goed overgenomen? Herstel de fout en ga verder.",
         "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",

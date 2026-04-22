@@ -2,7 +2,6 @@ use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
 use super::{
-    common_validation::difference_admitted_voters_count_and_votes_cast_count_above_threshold,
     count::Count, gsb_differences_counts::GSBDifferencesCounts,
     political_group_candidate_votes::PoliticalGroupCandidateVotes, voters_counts::VotersCounts,
     votes_counts::VotesCounts,
@@ -39,33 +38,6 @@ pub struct GSBResults {
 }
 
 impl GSBResults {
-    /// W.203 'Aantal kiezers en stemmen':
-    ///   Verschil tussen totaal aantal toegelaten kiezers en totaal aantal uitgebrachte stemmen
-    ///   is groter dan of gelijk aan 2% en groter dan of gelijk aan 15
-    fn validate_voters_and_votes_count_difference(
-        &self,
-        validation_results: &mut ValidationResults,
-        path: &FieldPath,
-    ) {
-        if difference_admitted_voters_count_and_votes_cast_count_above_threshold(
-            self.voters_counts.total_admitted_voters_count,
-            self.votes_counts.total_votes_cast_count,
-        ) {
-            validation_results.warnings.push(ValidationResult {
-                fields: vec![
-                    path.field("voters_counts")
-                        .field("total_admitted_voters_count")
-                        .to_string(),
-                    path.field("votes_counts")
-                        .field("total_votes_cast_count")
-                        .to_string(),
-                ],
-                code: ValidationResultCode::W203,
-                context: None,
-            });
-        }
-    }
-
     fn validate_political_group_votes_errors(
         &self,
         political_group_candidate_votes: &PoliticalGroupCandidateVotes,
@@ -191,8 +163,6 @@ impl Validate for GSBResults {
         self.votes_counts
             .validate(election, validation_results, &path.field("votes_counts"))?;
 
-        self.validate_voters_and_votes_count_difference(validation_results, path);
-
         self.differences_counts.validate(
             election,
             validation_results,
@@ -227,7 +197,7 @@ mod tests {
 
     use super::*;
     use crate::domain::{
-        election::{PGNumber, tests::election_fixture},
+        election::{CommitteeCategory, PGNumber, tests::election_fixture},
         results::political_group_total_votes::PoliticalGroupTotalVotes,
     };
 
@@ -269,6 +239,7 @@ mod tests {
         data.validate(
             // Adjust election political group list to the given test data
             &election_fixture(
+                CommitteeCategory::GSB,
                 &data
                     .political_group_votes
                     .iter()
@@ -303,48 +274,7 @@ mod tests {
         Ok(())
     }
 
-    /// CSO/DSO | W.203: 'Aantal kiezers en stemmen': Verschil tussen totaal aantal toegelaten kiezers en totaal aantal uitgebrachte stemmen is groter dan of gelijk aan 2% en groter dan of gelijk aan 15
-    #[test]
-    fn test_w203() -> Result<(), DataError> {
-        let cases = [
-            (101, 100, false),   // < 2%
-            (102, 100, true),    // == 2%
-            (103, 100, true),    // > 2%
-            (1000, 1014, false), // < 15
-            (1000, 1015, true),  // == 15
-            (1000, 1016, true),  // > 15
-            (1016, 1000, true),  // > 15 (reversed)
-        ];
-
-        for (admitted_voters, votes_cast, expected) in cases {
-            let mut data = create_test_data();
-            data.voters_counts.total_admitted_voters_count = admitted_voters;
-            data.votes_counts.total_votes_cast_count = votes_cast;
-
-            let validation_results = validate(data)?;
-
-            if expected {
-                assert_eq!(
-                    validation_results.warnings,
-                    [ValidationResult {
-                        code: ValidationResultCode::W203,
-                        fields: vec![
-                            "data.voters_counts.total_admitted_voters_count".into(),
-                            "data.votes_counts.total_votes_cast_count".into(),
-                        ],
-                        context: None,
-                    }],
-                    "Warning not found for admitted_voters={admitted_voters}, votes_cast={votes_cast}",
-                );
-            } else {
-                assert!(validation_results.warnings.is_empty());
-            }
-        }
-
-        Ok(())
-    }
-
-    /// CSO | F.401 `Er zijn (stemmen op kandidaten of het lijsttotaal van corresponderende E.x is groter dan 0) en het totaal aantal stemmen op een lijst = leeg of 0`
+    /// GSB CSO, GSB DSO, CSB | F.401: 'Kandidaten en lijsttotalen': Er zijn (stemmen op kandidaten of het lijsttotaal van corresponderende E.x is groter dan 0) en het totaal aantal stemmen op een lijst = leeg of 0
     #[test]
     fn test_f401() -> Result<(), DataError> {
         // Only F.401 is triggered.
@@ -475,7 +405,7 @@ mod tests {
         Ok(())
     }
 
-    /// CSO | F.402 (Als F.401 niet getoond wordt) `Totaal aantal stemmen op een lijst <> som van aantal stemmen op de kandidaten van die lijst`
+    /// GSB CSO, GSB DSO, CSB | F.402: 'Kandidaten en lijsttotalen': (Als F.401 niet getoond wordt) Totaal aantal stemmen op een lijst <> som van aantal stemmen op de kandidaten van die lijst
     #[test]
     fn test_f402() -> Result<(), DataError> {
         let mut data = create_test_data();
@@ -513,7 +443,7 @@ mod tests {
         Ok(())
     }
 
-    /// CSO | F.403 (Als F.401 niet getoond wordt) `Totaal aantal stemmen op een lijst komt niet overeen met het lijsttotaal van corresponderende E.x`
+    /// GSB CSO, GSB DSO, CSB | F.403: 'Kandidaten en lijsttotalen': (Als F.401 niet getoond wordt) Totaal aantal stemmen op een lijst komt niet overeen met het lijsttotaal van corresponderende E.x
     #[test]
     fn test_f403() -> Result<(), DataError> {
         let mut data = create_test_data();

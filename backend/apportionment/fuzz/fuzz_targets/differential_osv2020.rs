@@ -127,13 +127,13 @@ fuzz_target!(
             return
         }
         // Skip cases where number of seats > number of candidates
-        let no_of_candidates = data.list_votes.iter().map(|x| x.candidate_votes.len() as u32).sum::<u32>();
+        let no_of_candidates = data.list_votes.iter().map(|lv| lv.candidate_votes.len() as u32).sum::<u32>();
         if data.seats > no_of_candidates {
             return
         }
         // Skip cases where number of seats > number of candidates with votes
         let no_of_candidates_with_votes = data.list_votes.iter().
-            map(|x| x.candidate_votes.iter().filter(|y| *y.get_votes() > 0).count() as u32).sum::<u32>();
+            map(|lv| lv.candidate_votes.iter().filter(|cv| *cv.get_votes() > 0).count() as u32).sum::<u32>();
         if data.seats > no_of_candidates_with_votes {
             return
         }

@@ -3,7 +3,10 @@ use std::collections::HashSet;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
-use super::{count::Count, political_group_total_votes::PoliticalGroupTotalVotes};
+use super::{
+    count::Count,
+    political_group_total_votes::{EnrichedPoliticalGroupTotalVotes, PoliticalGroupTotalVotes},
+};
 use crate::{
     APIError,
     domain::{
@@ -24,6 +27,28 @@ use crate::{
 pub struct VotesCounts {
     /// Total votes per list
     pub political_group_total_votes: Vec<PoliticalGroupTotalVotes>,
+    /// Total number of valid votes on candidates
+    /// ("Totaal stemmen op kandidaten")
+    #[schema(value_type = u32)]
+    pub total_votes_candidates_count: Count,
+    /// Number of blank votes ("Blanco stembiljetten")
+    #[schema(value_type = u32)]
+    pub blank_votes_count: Count,
+    /// Number of invalid votes ("Ongeldige stembiljetten")
+    #[schema(value_type = u32)]
+    pub invalid_votes_count: Count,
+    /// Total number of votes cast ("Totaal uitgebrachte stemmen")
+    #[schema(value_type = u32)]
+    pub total_votes_cast_count: Count,
+}
+
+/// Enriched votes counts, part of the results.
+/// Following the fields in Model CSO Na 31-2 Bijlage 1.
+#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
+#[serde(deny_unknown_fields)]
+pub struct EnrichedVotesCounts {
+    /// Total votes per list
+    pub political_group_total_votes: Vec<EnrichedPoliticalGroupTotalVotes>,
     /// Total number of valid votes on candidates
     /// ("Totaal stemmen op kandidaten")
     #[schema(value_type = u32)]

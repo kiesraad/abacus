@@ -17,22 +17,27 @@
       "political_group_total_votes": [
         {
           "number": 1,
+          "name": "Political Group A",
           "total": 600
         },
         {
           "number": 2,
+          "name": "Political Group B",
           "total": 302
         },
         {
           "number": 3,
+          "name": "Political Group C",
           "total": 98
         },
         {
           "number": 4,
+          "name": "Political Group D",
           "total": 99
         },
         {
           "number": 5,
+          "name": "Blanco (Smit, G.)",
           "total": 101
         }
       ],

@@ -18,6 +18,16 @@ pub struct PoliticalGroupTotalVotes {
     pub total: Count,
 }
 
+#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
+#[serde(deny_unknown_fields)]
+pub struct EnrichedPoliticalGroupTotalVotes {
+    #[schema(value_type = u32)]
+    pub number: PGNumber,
+    pub name: String,
+    #[schema(value_type = u32)]
+    pub total: Count,
+}
+
 impl Compare for Vec<PoliticalGroupTotalVotes> {
     fn compare(&self, first_entry: &Self, different_fields: &mut Vec<String>, path: &FieldPath) {
         // compare total of each political group

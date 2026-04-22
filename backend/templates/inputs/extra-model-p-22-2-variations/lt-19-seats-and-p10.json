@@ -17,14 +17,17 @@
       "political_group_total_votes": [
         {
           "number": 1,
+          "name": "Political Group A",
           "total": 5
         },
         {
           "number": 2,
+          "name": "Political Group B",
           "total": 5
         },
         {
           "number": 3,
+          "name": "Blanco (Smit, G.)",
           "total": 50
         }
       ],

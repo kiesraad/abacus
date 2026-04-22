@@ -5,16 +5,18 @@ use crate::{
     APIError,
     domain::{
         data_entry::{DataEntrySource, DataEntrySourceNumber},
-        election::ElectionWithPoliticalGroups,
+        election::{ElectionWithPoliticalGroups, PoliticalGroup},
         polling_station::PollingStationForSession,
         results::{
             CommonDifferencesCounts, Results,
             count::Count,
             cso_first_session_results::CSOFirstSessionResults,
             political_group_candidate_votes::{CandidateVotes, PoliticalGroupCandidateVotes},
-            political_group_total_votes::PoliticalGroupTotalVotes,
+            political_group_total_votes::{
+                EnrichedPoliticalGroupTotalVotes, PoliticalGroupTotalVotes,
+            },
             voters_counts::VotersCounts,
-            votes_counts::VotesCounts,
+            votes_counts::{EnrichedVotesCounts, VotesCounts},
         },
         validate::{Validate, ValidationResults},
     },
@@ -327,17 +329,37 @@ pub struct ElectionSummaryCSB {
     /// The total number of voters
     pub voters_counts: VotersCounts,
     /// The total number of votes
-    pub votes_counts: VotesCounts,
+    pub votes_counts: EnrichedVotesCounts,
     /// The differences between voters and votes
     pub differences_counts: SummaryDifferencesCounts,
 }
 
-impl From<ElectionSummary> for ElectionSummaryCSB {
-    fn from(summary: ElectionSummary) -> Self {
+impl ElectionSummaryCSB {
+    pub fn new(summary: &ElectionSummary, political_groups: &[PoliticalGroup]) -> Self {
         ElectionSummaryCSB {
-            voters_counts: summary.voters_counts,
-            votes_counts: summary.votes_counts,
-            differences_counts: summary.differences_counts,
+            voters_counts: summary.voters_counts.clone(),
+            votes_counts: EnrichedVotesCounts {
+                political_group_total_votes: summary
+                    .votes_counts
+                    .political_group_total_votes
+                    .iter()
+                    .map(|pg_votes| EnrichedPoliticalGroupTotalVotes {
+                        number: pg_votes.number,
+                        name: political_groups
+                            .iter()
+                            .find(|pg| pg.number == pg_votes.number)
+                            .expect("Political group should exist")
+                            .name
+                            .clone(),
+                        total: pg_votes.total,
+                    })
+                    .collect(),
+                total_votes_candidates_count: summary.votes_counts.total_votes_candidates_count,
+                blank_votes_count: summary.votes_counts.blank_votes_count,
+                invalid_votes_count: summary.votes_counts.invalid_votes_count,
+                total_votes_cast_count: summary.votes_counts.total_votes_cast_count,
+            },
+            differences_counts: summary.differences_counts.clone(),
         }
     }
 }

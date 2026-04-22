@@ -17,22 +17,27 @@
       "political_group_total_votes": [
         {
           "number": 1,
+          "name": "Political Group A",
           "total": 2571
         },
         {
           "number": 2,
+          "name": "Political Group B",
           "total": 977
         },
         {
           "number": 3,
+          "name": "Political Group C",
           "total": 567
         },
         {
           "number": 4,
+          "name": "Political Group D",
           "total": 536
         },
         {
           "number": 5,
+          "name": "Blanco (Jacobse, F.)",
           "total": 453
         }
       ],

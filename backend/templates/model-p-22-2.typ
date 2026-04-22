@@ -127,7 +127,7 @@ De volgende rollen zijn mogelijk: voorzitter, plaatsvervangend voorzitter of lid
     letterbox(
       "B",
       value: input.summary.voters_counts.proxy_certificate_count,
-    )[Volmachtbewijzen (schriftelijk of via ingevulde stempas)],
+    )[Volmachtbewijzen (schriftelijk of via ingevulde stempas of kiezerspas)],
     letterbox("C", value: input.summary.voters_counts.voter_card_count)[Kiezerspassen],
     letterbox(
       "D",
@@ -148,7 +148,7 @@ De volgende rollen zijn mogelijk: voorzitter, plaatsvervangend voorzitter of lid
     top: if y > 0 { 0.5pt + gray },
   ),
   inset: (x: 4pt, y: 8pt),
-  fill: (_, y) => if y > 1 and y <= input.seat_assignment.final_standing.len() and calc.even(y) { luma(245) },
+  fill: (_, y) => if y > 1 and y <= input.summary.votes_counts.political_group_total_votes.len() and calc.even(y) { luma(245) },
   table.header(
     ..([Lijst], [Stemmen]).enumerate().map(((idx, h)) => {
       table.cell(
@@ -157,10 +157,10 @@ De volgende rollen zijn mogelijk: voorzitter, plaatsvervangend voorzitter of lid
     })
   ),
   table.hline(stroke: 1pt + black),
-  ..for standing in input.seat_assignment.final_standing.sorted(key: standing => standing.total_seats, by: (l, r) => l >= r) {
+  ..for pg_votes in input.summary.votes_counts.political_group_total_votes {
     (
-      table.cell(political_group_name(input.election.political_groups.find(pg => pg.number == standing.list_number), with_prefix: "only_list_number")),
-      table.cell(align: right, [#standing.votes_cast])
+      table.cell(format_political_group_name(pg_votes.number, pg_votes.name, with_prefix: "only_list_number")),
+      table.cell(align: right, [#pg_votes.total])
     )
   }.flatten(),
   table.hline(stroke: 1pt + black),

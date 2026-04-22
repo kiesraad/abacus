@@ -35,7 +35,7 @@ use crate::{
         polling_station::PollingStation,
         results::Results,
         role::Role,
-        summary::ElectionSummary,
+        summary::{ElectionSummary, ElectionSummaryCSB},
     },
     eml::EmlHash,
     error::ErrorReference,
@@ -224,7 +224,7 @@ impl ResultsInput {
         let pdf_file: PdfFileModel = ModelP22_2Input {
             committee_session: self.committee_session.clone(),
             election: self.election.clone(),
-            summary: self.summary.clone().into(),
+            summary: ElectionSummaryCSB::new(&self.summary, &self.election.political_groups),
             seat_assignment: map_seat_assignment(result.seat_assignment),
             enriched_candidate_nomination: EnrichedCandidateNomination::new(
                 &self.election,

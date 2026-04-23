@@ -42,7 +42,7 @@ export const DefaultGrid: StoryObj<Props> = {
             id="input1"
             field="A"
             title="Input field 1"
-            value={1000}
+            value={1}
             errorsAndWarnings={errorsAndWarnings}
           />
           <InputGridRow
@@ -50,7 +50,7 @@ export const DefaultGrid: StoryObj<Props> = {
             id="input2"
             field="B"
             title="Input field 2 (Error)"
-            value={2000}
+            value={200}
             errorsAndWarnings={errorsAndWarnings}
             addSeparator={addSeparator}
           />
@@ -114,7 +114,7 @@ export const DefaultGridReadOnly: StoryObj<Props> = {
             id="input1"
             field="A"
             title="Input field 1"
-            value={1000}
+            value={1}
             errorsAndWarnings={errorsAndWarnings}
           />
           <InputGridRow
@@ -122,7 +122,7 @@ export const DefaultGridReadOnly: StoryObj<Props> = {
             id="input2"
             field="B"
             title="Input field 2 (Error)"
-            value={2000}
+            value={200}
             errorsAndWarnings={errorsAndWarnings}
             addSeparator={addSeparator}
           />
@@ -183,7 +183,7 @@ export const CandidatesGrid: StoryObj<Props> = {
             id="zebra1"
             field="1"
             title="Jacobse, F."
-            value={1000}
+            value={1}
             errorsAndWarnings={errorsAndWarnings}
           />
           <InputGridRow
@@ -191,7 +191,7 @@ export const CandidatesGrid: StoryObj<Props> = {
             id="zebra2"
             field="2"
             title="Van Es, T.J. (Error)"
-            value={2000}
+            value={200}
             errorsAndWarnings={errorsAndWarnings}
           />
           <InputGridRow

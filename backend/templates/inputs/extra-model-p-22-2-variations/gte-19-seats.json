@@ -1274,6 +1274,35 @@
     ],
     "initial_total_full_seats": 19
   },
+  "total_seats_table": {
+    "total_seats_columns": [
+      {
+        "number": 1,
+        "name": "Political Group A",
+        "total_seats": 12
+      },
+      {
+        "number": 2,
+        "name": "Political Group B",
+        "total_seats": 6
+      },
+      {
+        "number": 4,
+        "name": "Political Group D",
+        "total_seats": 2
+      },
+      {
+        "number": 5,
+        "name": "Blanco (Smit, G.)",
+        "total_seats": 2
+      },
+      {
+        "number": 3,
+        "name": "Political Group C",
+        "total_seats": 1
+      }
+    ]
+  },
   "seat_assignment": {
     "seats": 23,
     "full_seats": 19,

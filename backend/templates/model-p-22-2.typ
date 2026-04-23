@@ -445,10 +445,10 @@ De aan de lijsten toegewezen volle zetels en restzetels zijn bij elkaar opgeteld
   ),
   table.hline(stroke: 1pt + black),
   
-  ..for standing in input.seat_assignment.final_standing.sorted(key: standing => standing.total_seats, by: (l, r) => l >= r) {
+  ..for column in input.total_seats_table.total_seats_columns {
     (
-      table.cell(political_group_name(input.election.political_groups.find(pg => pg.number == standing.list_number), with_prefix: "only_list_number")),
-      table.cell(align: right, [#standing.total_seats])
+      table.cell(column.name),
+      table.cell(align: right, [#column.total_seats])
     )
   }.flatten(),
   table.hline(stroke: 1pt + black),

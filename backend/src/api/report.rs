@@ -30,7 +30,7 @@ use crate::{
             ModelNa14_2Input, ModelNa31_2Input, ModelP2aInput, ModelP22_2Input, PdfFileModel,
             ToPdfFileModel,
             enriched_candidate_nomination::EnrichedCandidateNomination,
-            seats_table::InitialFullSeatsTable,
+            seats_table::{InitialFullSeatsTable, TotalSeatsTable},
             votes_table::{VotesTables, VotesTablesWithPreviousVotes},
         },
         polling_station::PollingStation,
@@ -221,6 +221,8 @@ impl ResultsInput {
         let summary = ElectionSummaryCSB::new(&self.summary, &self.election.political_groups);
         let seat_assignment = map_seat_assignment(result.seat_assignment);
         let initial_full_seats_table = InitialFullSeatsTable::new(&summary, &seat_assignment)?;
+        let total_seats_table =
+            TotalSeatsTable::new(&seat_assignment, &self.election.political_groups)?;
         let candidate_nomination = map_candidate_nomination(
             result.candidate_nomination,
             self.election.political_groups.clone(),
@@ -233,6 +235,7 @@ impl ResultsInput {
             summary,
             seat_assignment,
             initial_full_seats_table,
+            total_seats_table,
             enriched_candidate_nomination,
             chosen_candidates: candidate_nomination.chosen_candidates,
             result_changes_full_seats: vec![],

@@ -4,7 +4,7 @@ use crate::{
     APIError,
     domain::{
         apportionment::{DisplayFraction, SeatAssignment},
-        election::PGNumber,
+        election::{PGNumber, PoliticalGroup},
         summary::ElectionSummaryCSB,
     },
 };
@@ -79,4 +79,55 @@ pub struct InitialFullSeatsColumn {
     total: u32,
     /// Political group initial full seats
     initial_full_seats: u32,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct TotalSeatsTable {
+    total_seats_columns: Vec<TotalSeatsColumn>,
+}
+
+impl TotalSeatsTable {
+    fn get_total_seats_columns(
+        seat_assignment: &SeatAssignment,
+        political_groups: &[PoliticalGroup],
+    ) -> Result<Vec<TotalSeatsColumn>, APIError> {
+        let mut columns = Vec::new();
+
+        for standing in seat_assignment.final_standing.iter() {
+            let pg = political_groups
+                .iter()
+                .find(|pg| pg.number == standing.list_number)
+                .ok_or(APIError::DataIntegrityError(format!(
+                    "No political group found for political group number {} in political groups",
+                    standing.list_number
+                )))?;
+            columns.push(TotalSeatsColumn {
+                number: pg.number,
+                name: pg.name.clone(),
+                total_seats: standing.total_seats,
+            })
+        }
+        Ok(columns)
+    }
+
+    pub fn new(
+        seat_assignment: &SeatAssignment,
+        political_groups: &[PoliticalGroup],
+    ) -> Result<Self, APIError> {
+        let mut columns = Self::get_total_seats_columns(seat_assignment, political_groups)?;
+        columns.sort_by_key(|a| std::cmp::Reverse(a.total_seats));
+        Ok(TotalSeatsTable {
+            total_seats_columns: columns,
+        })
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct TotalSeatsColumn {
+    /// Political group number
+    number: PGNumber,
+    /// Political group display name
+    name: String,
+    /// Total seats for the political group
+    total_seats: u32,
 }

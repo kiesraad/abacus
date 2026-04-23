@@ -50,7 +50,7 @@ export const DefaultGrid: StoryObj<Props> = {
             id="input2"
             field="B"
             title="Input field 2 (Error)"
-            value={2}
+            value={200}
             errorsAndWarnings={errorsAndWarnings}
             addSeparator={addSeparator}
           />
@@ -59,7 +59,7 @@ export const DefaultGrid: StoryObj<Props> = {
             id="input3"
             field="C"
             title="Input field 3 (Warning)"
-            value={3}
+            value={3000}
             errorsAndWarnings={errorsAndWarnings}
           />
           <InputGridRow
@@ -67,7 +67,7 @@ export const DefaultGrid: StoryObj<Props> = {
             id="total"
             field="D"
             title="Total of all inputs"
-            value={6}
+            value={6000}
             isTotal={isTotal}
             errorsAndWarnings={errorsAndWarnings}
           />
@@ -84,10 +84,84 @@ export const DefaultGrid: StoryObj<Props> = {
     );
   },
 
-  play: async ({ canvasElement }) => {
+  play: async ({ canvas, canvasElement }) => {
     // Test that the grid table is visible - table has role="none" so use querySelector
     const grid = canvasElement.querySelector("table");
     await expect(grid).toBeVisible();
+    const input3 = canvas.getByTestId("input3");
+    await expect(input3).toHaveValue("3000");
+    const input3Overlay = canvas.getByTestId("input3-formatted-overlay");
+    await expect(input3Overlay).toHaveTextContent("3.000");
+  },
+};
+
+export const DefaultGridReadOnly: StoryObj<Props> = {
+  args: {
+    readOnly: true,
+    zebra: false,
+    addSeparator: false,
+    isTotal: true,
+  },
+  render: ({ readOnly, zebra, addSeparator, isTotal }) => {
+    const errorsAndWarnings = createErrorsAndWarnings();
+
+    return (
+      <InputGrid zebra={zebra}>
+        <InputGrid.Header field="Veld" value="Geteld aantal" title="Omschrijving" />
+        <InputGrid.Body>
+          <InputGridRow
+            readOnly={readOnly}
+            id="input1"
+            field="A"
+            title="Input field 1"
+            value={1}
+            errorsAndWarnings={errorsAndWarnings}
+          />
+          <InputGridRow
+            readOnly={readOnly}
+            id="input2"
+            field="B"
+            title="Input field 2 (Error)"
+            value={200}
+            errorsAndWarnings={errorsAndWarnings}
+            addSeparator={addSeparator}
+          />
+          <InputGridRow
+            readOnly={readOnly}
+            id="input3"
+            field="C"
+            title="Input field 3 (Warning)"
+            value={3000}
+            errorsAndWarnings={errorsAndWarnings}
+          />
+          <InputGridRow
+            readOnly={readOnly}
+            id="total"
+            field="D"
+            title="Total of all inputs"
+            value={6000}
+            isTotal={isTotal}
+            errorsAndWarnings={errorsAndWarnings}
+          />
+          <InputGrid.Separator />
+          <InputGridRow
+            readOnly={readOnly}
+            id="input4"
+            field="E"
+            title="Input field 4"
+            errorsAndWarnings={errorsAndWarnings}
+          />
+        </InputGrid.Body>
+      </InputGrid>
+    );
+  },
+
+  play: async ({ canvas, canvasElement }) => {
+    // Test that the grid table is visible - table has role="none" so use querySelector
+    const grid = canvasElement.querySelector("table");
+    await expect(grid).toBeVisible();
+    const input3 = canvas.getByTestId("value-input3");
+    await expect(input3).toHaveTextContent("3.000");
   },
 };
 
@@ -117,7 +191,7 @@ export const CandidatesGrid: StoryObj<Props> = {
             id="zebra2"
             field="2"
             title="Van Es, T.J. (Error)"
-            value={2}
+            value={200}
             errorsAndWarnings={errorsAndWarnings}
           />
           <InputGridRow
@@ -125,7 +199,7 @@ export const CandidatesGrid: StoryObj<Props> = {
             id="zebra3"
             field="3"
             title="Van Es, K."
-            value={3}
+            value={3000}
             errorsAndWarnings={errorsAndWarnings}
           />
           <InputGridRow
@@ -133,7 +207,7 @@ export const CandidatesGrid: StoryObj<Props> = {
             id="zebra4"
             field="4"
             title="Van Yvonne, T. (Warning)"
-            value={4}
+            value={4000}
             errorsAndWarnings={errorsAndWarnings}
           />
           <InputGridRow
@@ -141,7 +215,7 @@ export const CandidatesGrid: StoryObj<Props> = {
             id="zebra5"
             field="5"
             title="Van Yvonne, W. (Error)"
-            value={5}
+            value={5000}
             errorsAndWarnings={errorsAndWarnings}
           />
           <InputGridRow
@@ -149,7 +223,7 @@ export const CandidatesGrid: StoryObj<Props> = {
             id="zebra-list-total"
             field=""
             title="List Total"
-            value={15}
+            value={15000}
             isListTotal={isListTotal}
             errorsAndWarnings={errorsAndWarnings}
           />
@@ -216,10 +290,16 @@ export const GridWithPreviousValues: StoryObj<Props> = {
     );
   },
 
-  play: async ({ canvasElement }) => {
+  play: async ({ canvas, canvasElement }) => {
     // Test that the grid table is visible - table has role="none" so use querySelector
     const grid = canvasElement.querySelector("table");
     await expect(grid).toBeVisible();
+    const previousInput1 = canvas.getByTestId("previous-input1");
+    await expect(previousInput1).toHaveTextContent("1.111");
+    const input3 = canvas.getByTestId("input3");
+    await expect(input3).toHaveValue("1010");
+    const input3Overlay = canvas.getByTestId("input3-formatted-overlay");
+    await expect(input3Overlay).toHaveTextContent("1.010");
   },
 };
 

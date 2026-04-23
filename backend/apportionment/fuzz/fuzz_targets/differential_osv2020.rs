@@ -185,11 +185,10 @@ fuzz_target!(
                         // 2. list exhaustion is applied
                         // In most (all?) cases the difference under these circumstances is caused by the fact that OSV and Abacus handle list exhaustion differently.
                         let last_osv2020_log_line = osv2020_log.last().unwrap();
-                        if last_osv2020_log_line.contains(&String::from("Conflict: Auslosung bezüglich P7.")) &&
-                        osv2020_log.iter().any(|line| line.contains("Erschöpfte Listen")) &&
-                        abacus_log.contains("assigned to another list in accordance with Article P 10 Kieswet")
-                        { }
-                        else {
+                        if last_osv2020_log_line.contains(&String::from("Conflict: Auslosung bezüglich P7."))
+                            && osv2020_log.iter().any(|line| line.contains("Erschöpfte Listen"))
+                            && abacus_log.contains("assigned to another list in accordance with Article P 10 Kieswet") {
+                        } else {
                         report_mismatch(
                             &data,
                             &format!("seats: {:?}\n{:#?}", abacus_seats, output.seat_assignment),

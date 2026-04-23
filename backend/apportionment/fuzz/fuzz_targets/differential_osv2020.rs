@@ -99,6 +99,8 @@ fn report_mismatch(
     for line in osv2020_log {
         eprintln!("[osv2020] {line}");
     }
+    eprintln!("\n=== Conclusion ===");
+    eprintln!("{message}");
     panic!("{message}");
 }
 

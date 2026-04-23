@@ -81,7 +81,7 @@ export function InputGridRow({
       >
         <FormField hasError={!!errorMessageId || hasError} hasWarning={hasWarning}>
           {readOnly ? (
-            <span className="font-number">{value}</span>
+            <span className="font-number">{formatNumber(value)}</span>
           ) : (
             <NumberInput
               key={id}

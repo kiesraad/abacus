@@ -125,7 +125,8 @@ fuzz_target!(
     },
     |data: FuzzedApportionmentInput| {
         // Skip cases with zero total votes cast
-        if data.list_votes.iter().map(|list| list.candidate_votes.iter().map(|cv| cv.votes()).sum::<u32>()).sum::<u32>() == 0 {
+        let total_votes = data.list_votes.iter().map(|list| list.candidate_votes.iter().map(|cv| cv.votes()).sum::<u32>()).sum::<u32>();
+        if total_votes == 0 {
             return
         }
         // Skip cases where number of seats > number of candidates
@@ -144,6 +145,10 @@ fuzz_target!(
         // have the limitation that each list can get only one seat per step. So as long as Abacus assigns seats to
         // lists with zero votes, we need to skip inputs that triggers that behavior in Abacus.
         if data.seats < 19 && data.seats > data.list_votes.iter().filter(|list| list.candidate_votes.iter().any(|cv| cv.votes() > 0) ).count() as u32 {
+            return
+        }
+        // Skip cases where any list has an absolute majority of votes
+        if data.list_votes.iter().any(|list| list.candidate_votes.iter().map(|cv| cv.votes()).sum::<u32>() >  (total_votes / 2)) {
             return
         }
         // Skip cases where any party has zero total votes

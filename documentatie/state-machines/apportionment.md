@@ -9,6 +9,7 @@ stateDiagram-v2
 
   Uninitialised --> RegisteringDeceasedCandidates : register_deceased_candidates
   RegisteringDeceasedCandidates --> RegisteringDeceasedCandidates : add_deceased_candidate
+  RegisteringDeceasedCandidates --> RegisteringDeceasedCandidates : delete_deceased_candidate
 
   state is_drawing_lots_required <<choice>>
   Uninitialised --> is_drawing_lots_required : skip_deceased_candidates
@@ -18,6 +19,9 @@ stateDiagram-v2
 
   DrawingLots --> is_drawing_lots_required : save_drawing_lots_result
 
+  RegisteringDeceasedCandidates --> Uninitialised : reset
+  DrawingLots --> Uninitialised : reset
   Finalised --> Uninitialised : reset
+  
   Finalised --> [*]
 ```

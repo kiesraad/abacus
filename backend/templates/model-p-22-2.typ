@@ -226,7 +226,7 @@ Met de kiesdeler wordt de zetelverdeling bepaald. De kiesdeler is het aantal ste
   table.cell(align: center, [÷]),
   table.cell(align: center, [#input.election.number_of_seats]),
   table.cell(align: center, [=]),
-  table.cell(format_fraction(input.initial_full_seats_table.quota)),
+  table.cell(format_fraction(input.initial_seats_table.quota)),
 )
 
 #pagebreak(weak: true)
@@ -242,7 +242,7 @@ Hieronder is berekend hoe vaak elke lijst qua stemmenaantal de kiesdeler heeft g
     top: if y > 0 { 0.5pt + gray },
   ),
   inset: (x: 4pt, y: 8pt),
-  fill: (_, y) => if y > 1 and y <= input.initial_full_seats_table.list_initial_full_seats_columns.len() and calc.even(y) { luma(245) },
+  fill: (_, y) => if y > 1 and y <= input.initial_seats_table.list_initial_full_seats_columns.len() and calc.even(y) { luma(245) },
   table.header(
     table.cell(header_text([Lijst])),
     table.cell(align: right, header_text([Aantal stemmen])),
@@ -250,11 +250,11 @@ Hieronder is berekend hoe vaak elke lijst qua stemmenaantal de kiesdeler heeft g
     table.cell(stroke: none, align: right, header_text([Volle zetels])),
   ),
   table.hline(stroke: 1pt + black),
-  ..for column in input.initial_full_seats_table.list_initial_full_seats_columns {
+  ..for column in input.initial_seats_table.list_initial_full_seats_columns {
     (
       table.cell(format_political_group_name(column.number, column.name, with_prefix: "only_list_number")),
       table.cell(align: right, [#column.total]),
-      table.cell(align: center, [÷ #format_fraction(input.initial_full_seats_table.quota) =]),
+      table.cell(align: center, [÷ #format_fraction(input.initial_seats_table.quota) =]),
       table.cell(align: right, [#column.initial_full_seats])
     )
   }.flatten(),
@@ -262,7 +262,7 @@ Hieronder is berekend hoe vaak elke lijst qua stemmenaantal de kiesdeler heeft g
   table.cell(header_text([Totaal])),
   table.cell(align: right, header_text([#input.summary.votes_counts.total_votes_candidates_count])),
   table.cell(stroke: none, []),
-  table.cell(stroke: none, align: right, header_text([#input.initial_full_seats_table.initial_total_full_seats])),
+  table.cell(stroke: none, align: right, header_text([#input.initial_seats_table.initial_total_full_seats])),
 )
 
 #pagebreak(weak: true)
@@ -273,24 +273,23 @@ Hieronder is berekend hoe vaak elke lijst qua stemmenaantal de kiesdeler heeft g
 
 Na toewijzing van de volle zetels blijft een aantal te verdelen zetels over. Dit zijn de restzetels.
 
-#let initial_residual_seats = input.election.number_of_seats - input.initial_full_seats_table.initial_total_full_seats
 #sum(
   operator_label: "- Verschil",
   number_box(
     value: input.election.number_of_seats,
   )[Totaal aantal te verdelen zetels],
   number_box(
-    value: input.initial_full_seats_table.initial_total_full_seats,
+    value: input.initial_seats_table.initial_total_full_seats,
   )[Toegewezen volle zetels],
   number_box(
-    value: initial_residual_seats,
+    value: input.initial_seats_table.initial_total_residual_seats,
   )[*Aantal restzetels*],
 )
 
 === Verdeling van de restzetels
 
 #let highest_averages_steps = input.seat_assignment.steps.filter(step => step.change.changed_by == "HighestAverageAssignment")
-#if initial_residual_seats > 0 [
+#if input.initial_seats_table.initial_total_residual_seats > 0 [
   #if input.election.number_of_seats < LARGE_COUNCIL_THRESHOLD [
     - Het #location_type berekent hoeveel stemmen elke lijst overhoudt na toekenning van de volle zetels. Dat is het 'overschot' aan stemmen voor die lijst.
     - Het #location_type verdeelt de restzetels, in volgorde van de grootste overschotten. Elke lijst kan maar één restzetel krijgen. Alleen lijsten die ten minste 75% van de kiesdeler hebben behaald kunnen een restzetel krijgen.

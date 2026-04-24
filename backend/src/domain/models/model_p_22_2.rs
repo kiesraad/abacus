@@ -7,7 +7,7 @@ use crate::domain::{
     models::{
         PdfFileModel, PdfModel, ToPdfFileModel,
         enriched_candidate_nomination::EnrichedCandidateNomination,
-        seats_table::{InitialFullSeatsTable, TotalSeatsTable},
+        seats_table::{InitialSeatsTable, TotalSeatsTable},
         votes_table::VotesTables,
     },
     summary::ElectionSummaryCSB,
@@ -29,7 +29,7 @@ pub struct ModelP22_2Input {
     pub election: ElectionWithPoliticalGroups,
     pub summary: ElectionSummaryCSB,
     pub seat_assignment: SeatAssignment,
-    pub initial_full_seats_table: InitialFullSeatsTable,
+    pub initial_seats_table: InitialSeatsTable,
     pub total_seats_table: TotalSeatsTable,
     pub enriched_candidate_nomination: EnrichedCandidateNomination,
     pub chosen_candidates: Vec<ChosenCandidate>,

@@ -1234,7 +1234,7 @@
       ]
     }
   ],
-  "initial_full_seats_table": {
+  "initial_seats_table": {
     "quota": {
       "integer": 52,
       "numerator": 4,
@@ -1272,7 +1272,8 @@
         "initial_full_seats": 1
       }
     ],
-    "initial_total_full_seats": 19
+    "initial_total_full_seats": 19,
+    "initial_total_residual_seats": 4
   },
   "total_seats_table": {
     "total_seats_columns": [

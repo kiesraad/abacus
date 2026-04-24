@@ -10,13 +10,14 @@ use crate::{
 };
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct InitialFullSeatsTable {
+pub struct InitialSeatsTable {
     quota: DisplayFraction,
     list_initial_full_seats_columns: Vec<InitialFullSeatsColumn>,
     initial_total_full_seats: u32,
+    initial_total_residual_seats: u32,
 }
 
-impl InitialFullSeatsTable {
+impl InitialSeatsTable {
     fn get_list_initial_full_seats_columns(
         summary: &ElectionSummaryCSB,
         seat_assignment: &SeatAssignment,
@@ -56,15 +57,17 @@ impl InitialFullSeatsTable {
     }
 
     pub fn new(
+        number_of_seats: u32,
         summary: &ElectionSummaryCSB,
         seat_assignment: &SeatAssignment,
     ) -> Result<Self, APIError> {
         let (initial_total_full_seats, columns) =
             Self::get_list_initial_full_seats_columns(summary, seat_assignment)?;
-        Ok(InitialFullSeatsTable {
+        Ok(InitialSeatsTable {
             quota: seat_assignment.quota.clone(),
             list_initial_full_seats_columns: columns,
             initial_total_full_seats,
+            initial_total_residual_seats: number_of_seats - initial_total_full_seats,
         })
     }
 }

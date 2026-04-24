@@ -17,34 +17,42 @@
       "political_group_total_votes": [
         {
           "number": 1,
+          "name": "Political Group A",
           "total": 808
         },
         {
           "number": 2,
+          "name": "Political Group B",
           "total": 60
         },
         {
           "number": 3,
+          "name": "Political Group C",
           "total": 58
         },
         {
           "number": 4,
+          "name": "Political Group D",
           "total": 57
         },
         {
           "number": 5,
+          "name": "Blanco (Smit, G.)",
           "total": 56
         },
         {
           "number": 6,
+          "name": "Political Group F",
           "total": 55
         },
         {
           "number": 7,
+          "name": "Political Group G",
           "total": 54
         },
         {
           "number": 8,
+          "name": "Political Group H",
           "total": 52
         }
       ],
@@ -1299,6 +1307,108 @@
       ]
     }
   ],
+  "initial_full_seats_table": {
+    "quota": {
+      "integer": 625,
+      "numerator": 1,
+      "denominator": 24
+    },
+    "list_initial_full_seats_columns": [
+      {
+        "number": 1,
+        "name": "Political Group A",
+        "total": 808,
+        "initial_full_seats": 10
+      },
+      {
+        "number": 2,
+        "name": "Political Group B",
+        "total": 60,
+        "initial_full_seats": 0
+      },
+      {
+        "number": 3,
+        "name": "Political Group C",
+        "total": 58,
+        "initial_full_seats": 0
+      },
+      {
+        "number": 4,
+        "name": "Political Group D",
+        "total": 57,
+        "initial_full_seats": 0
+      },
+      {
+        "number": 5,
+        "name": "Blanco (Smit, G.)",
+        "total": 56,
+        "initial_full_seats": 0
+      },
+      {
+        "number": 6,
+        "name": "Political Group F",
+        "total": 55,
+        "initial_full_seats": 0
+      },
+      {
+        "number": 7,
+        "name": "Political Group G",
+        "total": 54,
+        "initial_full_seats": 0
+      },
+      {
+        "number": 8,
+        "name": "Political Group H",
+        "total": 52,
+        "initial_full_seats": 0
+      }
+    ],
+    "initial_total_full_seats": 10
+  },
+  "total_seats_table": {
+    "total_seats_columns": [
+      {
+        "number": 1,
+        "name": "Political Group A",
+        "total_seats": 12
+      },
+      {
+        "number": 2,
+        "name": "Political Group B",
+        "total_seats": 1
+      },
+      {
+        "number": 3,
+        "name": "Political Group C",
+        "total_seats": 1
+      },
+      {
+        "number": 4,
+        "name": "Political Group D",
+        "total_seats": 1
+      },
+      {
+        "number": 5,
+        "name": "Blanco (Smit, G.)",
+        "total_seats": 0
+      },
+      {
+        "number": 6,
+        "name": "Political Group F",
+        "total_seats": 0
+      },
+      {
+        "number": 7,
+        "name": "Political Group G",
+        "total_seats": 0
+      },
+      {
+        "number": 8,
+        "name": "Political Group H",
+        "total_seats": 0
+      }
+    ]
+  },
   "seat_assignment": {
     "seats": 15,
     "full_seats": 10,

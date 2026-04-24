@@ -444,10 +444,10 @@ De aan de lijsten toegewezen volle zetels en restzetels zijn bij elkaar opgeteld
   ),
   table.hline(stroke: 1pt + black),
   
-  ..for column in input.total_seats_table.total_seats_columns {
+  ..for column in input.enriched_candidate_nomination.sorted(key: column => column.list_seats, by: (l, r) => l >= r) {
     (
-      table.cell(column.name),
-      table.cell(align: right, [#column.total_seats])
+      table.cell(column.list_name),
+      table.cell(align: right, [#column.list_seats])
     )
   }.flatten(),
   table.hline(stroke: 1pt + black),

@@ -787,35 +787,6 @@
     "initial_total_full_seats": 12,
     "initial_total_residual_seats": 3
   },
-  "total_seats_table": {
-    "total_seats_columns": [
-      {
-        "number": 1,
-        "name": "Political Group A",
-        "total_seats": 5
-      },
-      {
-        "number": 2,
-        "name": "Political Group B",
-        "total_seats": 4
-      },
-      {
-        "number": 3,
-        "name": "Political Group C",
-        "total_seats": 2
-      },
-      {
-        "number": 4,
-        "name": "Political Group D",
-        "total_seats": 2
-      },
-      {
-        "number": 5,
-        "name": "Blanco (Jacobse, F.)",
-        "total_seats": 2
-      }
-    ]
-  },
   "seat_assignment": {
     "seats": 15,
     "full_seats": 10,

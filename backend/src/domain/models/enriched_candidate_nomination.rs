@@ -3,34 +3,38 @@ use serde::{Deserialize, Serialize};
 use crate::{
     APIError,
     domain::{
-        apportionment::{CandidateNomination, ListCandidateNomination},
+        apportionment::{CandidateNomination, ChosenCandidate, ListCandidateNomination},
         election::{Candidate, ElectionWithPoliticalGroups, PGNumber, PoliticalGroup},
         results::{count::Count, political_group_candidate_votes::CandidateVotes},
     },
 };
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct EnrichedCandidateNomination(Vec<EnrichedListCandidateNomination>);
+pub struct EnrichedCandidateNomination {
+    list_candidate_nomination: Vec<EnrichedListCandidateNomination>,
+    chosen_candidates: Vec<ChosenCandidate>,
+}
 
 impl EnrichedCandidateNomination {
     pub fn new(
         election: &ElectionWithPoliticalGroups,
         candidate_nomination: &CandidateNomination,
     ) -> Result<Self, APIError> {
-        Ok(EnrichedCandidateNomination(
-            election
-                .political_groups
-                .iter()
-                .map(|pg| {
-                    EnrichedListCandidateNomination::new(
-                        pg.clone(),
-                        candidate_nomination.list_candidate_nomination.iter().find(|cn| cn.list_number == pg.number).ok_or(APIError::DataIntegrityError(format!(
-                            "No list candidate nomination found for political group number {} in candidate nomination", pg.number
-                        )))?,
-                    )
-                })
-                .collect::<Result<Vec<_>, _>>()?,
-        ))
+        Ok(EnrichedCandidateNomination {
+            chosen_candidates: candidate_nomination.chosen_candidates.clone(),
+            list_candidate_nomination: election
+              .political_groups
+              .iter()
+              .map(|pg| {
+                  EnrichedListCandidateNomination::new(
+                      pg.clone(),
+                      candidate_nomination.list_candidate_nomination.iter().find(|cn| cn.list_number == pg.number).ok_or(APIError::DataIntegrityError(format!(
+                          "No list candidate nomination found for political group number {} in candidate nomination", pg.number
+                      )))?,
+                  )
+              })
+              .collect::<Result<Vec<_>, _>>()?,
+        })
     }
 }
 

@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 use crate::domain::{
-    apportionment::{ChosenCandidate, SeatAssignment},
+    apportionment::SeatAssignment,
     committee_session::CommitteeSession,
     election::{Election, ElectionWithPoliticalGroups},
     models::{
@@ -29,8 +29,7 @@ pub struct ModelP22_2Input {
     pub summary: ElectionSummaryCSB,
     pub seat_assignment: SeatAssignment,
     pub initial_seats_table: InitialSeatsTable,
-    pub enriched_candidate_nomination: EnrichedCandidateNomination,
-    pub chosen_candidates: Vec<ChosenCandidate>,
+    pub candidate_nomination: EnrichedCandidateNomination,
     pub result_changes_full_seats: Vec<ResultChange>,
     pub result_changes_residual_seats: Vec<ResultChange>,
     pub hash: String,

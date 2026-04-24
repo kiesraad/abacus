@@ -444,10 +444,10 @@ De aan de lijsten toegewezen volle zetels en restzetels zijn bij elkaar opgeteld
   ),
   table.hline(stroke: 1pt + black),
   
-  ..for column in input.enriched_candidate_nomination.sorted(key: column => column.list_seats, by: (l, r) => l >= r) {
+  ..for list_candidate_nomination in input.candidate_nomination.list_candidate_nomination.sorted(key: lcn => lcn.list_seats, by: (l, r) => l >= r) {
     (
-      table.cell(column.list_name),
-      table.cell(align: right, [#column.list_seats])
+      table.cell(list_candidate_nomination.list_name),
+      table.cell(align: right, [#list_candidate_nomination.list_seats])
     )
   }.flatten(),
   table.hline(stroke: 1pt + black),
@@ -457,7 +457,7 @@ De aan de lijsten toegewezen volle zetels en restzetels zijn bij elkaar opgeteld
 
 == Toewijzing van zetels aan kandidaten
 
-#for list_candidate_nomination in input.enriched_candidate_nomination.filter((lcn) => lcn.list_seats > 0) {  list_heading_text(format_political_group_name(list_candidate_nomination.list_number, list_candidate_nomination.list_name, with_prefix: "with_list_prefix"))
+#for list_candidate_nomination in input.candidate_nomination.list_candidate_nomination.filter((lcn) => lcn.list_seats > 0) {  list_heading_text(format_political_group_name(list_candidate_nomination.list_number, list_candidate_nomination.list_name, with_prefix: "with_list_prefix"))
   v(4pt)
   [Aantal zetels: #list_candidate_nomination.list_seats]
   
@@ -537,7 +537,7 @@ De aan de lijsten toegewezen volle zetels en restzetels zijn bij elkaar opgeteld
     table.cell(stroke: none, header_text([Lijst]))
   ),
   table.hline(stroke: 1pt + black),
-  ..input.chosen_candidates.map(((chosen_candidate)) => {
+  ..input.candidate_nomination.chosen_candidates.map(((chosen_candidate)) => {
     (
       table.cell([#candidate_name(chosen_candidate)]),
       table.cell([#candidate_location(chosen_candidate)]),

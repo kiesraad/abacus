@@ -24,7 +24,8 @@ stateDiagram-v2
   DrawingLotsCandidates --> is_drawing_lots_required_for_candidates : save_candidates_drawing_lots_result
 
   RegisteringDeceasedCandidates --> Uninitialised : reset
-  DrawingLots --> Uninitialised : reset
+  DrawingLotsSeats --> Uninitialised : reset
+  DrawingLotsCandidates --> Uninitialised : reset
   Finalised --> Uninitialised : reset
   
   Finalised --> [*]

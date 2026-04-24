@@ -1309,24 +1309,40 @@
       }
     ]
   },
-  "initial_seats_table": {
+  "enriched_seat_assignment": {
     "quota": {
       "integer": 625,
       "numerator": 1,
       "denominator": 24
     },
-    "list_initial_full_seats_columns": [
+    "list_seat_assignment": [
       {
         "number": 1,
         "name": "Political Group A",
         "total": 808,
-        "initial_full_seats": 10
+        "initial_full_seats": 10,
+        "largest_remainder_column": {
+          "remainder_votes": {
+            "integer": 8,
+            "numerator": 0,
+            "denominator": 15
+          },
+          "residual_seats": 1
+        }
       },
       {
         "number": 2,
         "name": "Political Group B",
         "total": 60,
-        "initial_full_seats": 0
+        "initial_full_seats": 0,
+        "largest_remainder_column": {
+          "remainder_votes": {
+            "integer": 60,
+            "numerator": 0,
+            "denominator": 15
+          },
+          "residual_seats": 1
+        }
       },
       {
         "number": 3,

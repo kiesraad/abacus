@@ -6,8 +6,8 @@ use crate::domain::{
     election::{Election, ElectionWithPoliticalGroups},
     models::{
         PdfFileModel, PdfModel, ToPdfFileModel,
-        enriched_candidate_nomination::EnrichedCandidateNomination, seats_table::InitialSeatsTable,
-        votes_table::VotesTables,
+        enriched_candidate_nomination::EnrichedCandidateNomination,
+        enriched_seat_assignment::EnrichedSeatAssignment, votes_table::VotesTables,
     },
     summary::ElectionSummaryCSB,
 };
@@ -28,7 +28,7 @@ pub struct ModelP22_2Input {
     pub election: ElectionWithPoliticalGroups,
     pub summary: ElectionSummaryCSB,
     pub seat_assignment: SeatAssignment,
-    pub initial_seats_table: InitialSeatsTable,
+    pub enriched_seat_assignment: EnrichedSeatAssignment,
     pub candidate_nomination: EnrichedCandidateNomination,
     pub result_changes_full_seats: Vec<ResultChange>,
     pub result_changes_residual_seats: Vec<ResultChange>,

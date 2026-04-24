@@ -1236,13 +1236,13 @@
       }
     ]
   },
-  "initial_seats_table": {
+  "enriched_seat_assignment": {
     "quota": {
       "integer": 52,
       "numerator": 4,
       "denominator": 23
     },
-    "list_initial_full_seats_columns": [
+    "list_seat_assignment": [
       {
         "number": 1,
         "name": "Political Group A",

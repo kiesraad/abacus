@@ -748,42 +748,82 @@
       }
     ]
   },
-  "initial_seats_table": {
+  "enriched_seat_assignment": {
     "quota": {
       "integer": 340,
       "numerator": 4,
       "denominator": 15
     },
-    "list_initial_full_seats_columns": [
+    "list_seat_assignment": [
       {
         "number": 1,
         "name": "Political Group A",
         "total": 2571,
-        "initial_full_seats": 7
+        "initial_full_seats": 7,
+        "largest_remainder_column": {
+          "remainder_votes": {
+            "integer": 189,
+            "numerator": 2,
+            "denominator": 15
+          },
+          "residual_seats": 0
+        }
       },
       {
         "number": 2,
         "name": "Political Group B",
         "total": 977,
-        "initial_full_seats": 2
+        "initial_full_seats": 2,
+        "largest_remainder_column": {
+          "remainder_votes": {
+            "integer": 296,
+            "numerator": 7,
+            "denominator": 15
+          },
+          "residual_seats": 1
+        }
       },
       {
         "number": 3,
         "name": "Political Group C",
         "total": 567,
-        "initial_full_seats": 1
+        "initial_full_seats": 1,
+        "largest_remainder_column": {
+          "remainder_votes": {
+            "integer": 226,
+            "numerator": 11,
+            "denominator": 15
+          },
+          "residual_seats": 1
+        }
       },
       {
         "number": 4,
         "name": "Political Group D",
         "total": 536,
-        "initial_full_seats": 1
+        "initial_full_seats": 1,
+        "largest_remainder_column": {
+          "remainder_votes": {
+            "integer": 195,
+            "numerator": 11,
+            "denominator": 15
+          },
+          "residual_seats": 1
+        }
       },
       {
         "number": 5,
         "name": "Blanco (Jacobse, F.)",
         "total": 453,
-        "initial_full_seats": 1
+        "initial_full_seats": 1,
+        "largest_remainder_column": {
+          "remainder_votes": {
+            "integer": 112,
+            "numerator": 11,
+            "denominator": 15
+          },
+          "residual_seats": 0
+        }
       }
     ],
     "initial_total_full_seats": 12,

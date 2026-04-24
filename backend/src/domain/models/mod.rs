@@ -1,11 +1,11 @@
 pub mod enriched_candidate_nomination;
+pub mod enriched_seat_assignment;
 pub mod filter_input;
 mod model_n_10_2;
 mod model_na_14_2;
 mod model_na_31_2;
 mod model_p_22_2;
 mod model_p_2a;
-pub mod seats_table;
 pub mod votes_table;
 
 use std::error::Error;

@@ -348,13 +348,13 @@
       }
     ]
   },
-  "initial_seats_table": {
+  "enriched_seat_assignment": {
     "quota": {
       "integer": 10,
       "numerator": 0,
       "denominator": 6
     },
-    "list_initial_full_seats_columns": [
+    "list_seat_assignment": [
       {
         "number": 1,
         "name": "Political Group A",
@@ -371,7 +371,15 @@
         "number": 3,
         "name": "Blanco (Smit, G.)",
         "total": 50,
-        "initial_full_seats": 5
+        "initial_full_seats": 5,
+        "largest_remainder_column": {
+          "remainder_votes": {
+            "integer": 0,
+            "numerator": 0,
+            "denominator": 6
+          },
+          "residual_seats": 1
+        }
       }
     ],
     "initial_total_full_seats": 5,

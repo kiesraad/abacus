@@ -95,17 +95,28 @@ export function ElectionReportPage() {
                   : "",
               })}
               .
-              {election.committee_category === "GSB" && election.counting_method && (
+              {election.committee_category === "GSB" && (
                 <>
-                  <br />
-                  {t("election_report.there_was_counting_method", {
-                    method: t(election.counting_method).toLowerCase(),
-                  })}
-                  .
+                  {election.counting_method && (
+                    <>
+                      <br />
+                      {t("election_report.there_was_counting_method", {
+                        method: t(election.counting_method).toLowerCase(),
+                      })}
+                      .
+                    </>
+                  )}
+                  <DownloadButton
+                    icon="download"
+                    href={`/api/elections/${election.id}/committee_sessions/${committeeSession.id}/download_zip_results`}
+                    title={t(`election_management.${election.committee_category}.download_definitive_documents`, {
+                      sessionLabel: sessionLabel.toLowerCase(),
+                    })}
+                    subtitle={t("election_management.zip_file")}
+                  />
                 </>
               )}
               {election.committee_category === "CSB" && (
-                // TODO #2972: update hrefs for both download buttons once backend is updated
                 <>
                   <DownloadButton
                     icon="download"
@@ -120,16 +131,16 @@ export function ElectionReportPage() {
                   {/*  title={t("election_management.CSB.p_22_2_attachment.download")}*/}
                   {/*  subtitle={t("election_management.zip_file")}*/}
                   {/*/>*/}
+                  <DownloadButton
+                    icon="download"
+                    href={`/api/elections/${election.id}/committee_sessions/${committeeSession.id}/download_zip_total_counts_csb`}
+                    title={t(`election_management.${election.committee_category}.download_definitive_documents`, {
+                      sessionLabel: sessionLabel.toLowerCase(),
+                    })}
+                    subtitle={t("election_management.zip_file")}
+                  />
                 </>
               )}
-              <DownloadButton
-                icon="download"
-                href={`/api/elections/${election.id}/committee_sessions/${committeeSession.id}/download_zip_results`}
-                title={t(`election_management.${election.committee_category}.download_definitive_documents`, {
-                  sessionLabel: sessionLabel.toLowerCase(),
-                })}
-                subtitle={t("election_management.zip_file")}
-              />
             </div>
             <section className={cn(cls.reportInfoSection, "sm")}>
               <h3>{t("election_management.what_now")}?</h3>

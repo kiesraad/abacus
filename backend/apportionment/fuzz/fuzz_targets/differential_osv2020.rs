@@ -148,9 +148,12 @@ fuzz_target!(
         // have the limitation that each list can get only one seat per step. So as long as Abacus assigns seats to
         // lists with zero votes, we need to skip inputs that triggers that behavior in Abacus.
         // related issue: #3212
-        if data.seats < 19 && data.seats > data.list_votes.iter().filter(|list| list.candidate_votes.iter().any(|cv| cv.votes() > 0) ).count() as u32 {
+        let no_of_lists_with_votes = data.list_votes.iter().
+            filter(|list| list.candidate_votes.iter().any(|cv| cv.votes() > 0) ).count() as u32;
+        if data.seats < 19 && data.seats > no_of_lists_with_votes {
             return
         }
+        // }
         // Skip cases where any list has an absolute majority of votes
         // related issue: #3219
         if data.list_votes.iter().any(|list| list.candidate_votes.iter().map(|cv| cv.votes()).sum::<u32>() >  (total_votes / 2)) {

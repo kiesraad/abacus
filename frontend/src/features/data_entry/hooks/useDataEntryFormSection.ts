@@ -49,12 +49,16 @@ export function useDataEntryFormSection() {
   if (!formSection) {
     throw new Error(`Form section ${sectionId} not found in form state`);
   }
-  const { errors, warnings, isSaved, acceptErrorsAndWarnings, hasChanges } = formSection;
+  const { errors, warnings, isSaved, isSubmitted, acceptErrorsAndWarnings, hasChanges } = formSection;
   const defaultProps = {
     errorsAndWarnings: isSaved ? mapValidationResultSetsToFields(errors, warnings) : undefined,
     errorsAndWarningsAccepted: acceptErrorsAndWarnings,
   };
 
+  // Find error code that is shown on the bottom of the form
+  const trailingError = errors.find("F401");
+
+  // Whether to show the accept errors and warnings checkbox
   const showAcceptErrorsAndWarnings = (!formSection.warnings.isEmpty() || !formSection.errors.isEmpty()) && !hasChanges;
 
   // register changes when fields change
@@ -85,27 +89,28 @@ export function useDataEntryFormSection() {
     return await onSubmitForm(sectionId, currentValues, { ...options, showAcceptErrorsAndWarnings });
   };
 
-  // scroll to top when saved
+  // scroll to top when submitted
   useEffect(() => {
-    if (isSaved || error) {
+    // If isSubmitted=true and hasChanges=false, the form was just submitted successfully
+    const formSubmitted = isSubmitted && !hasChanges;
+
+    if (!trailingError && (formSubmitted || error)) {
       window.scrollTo(0, 0);
     }
-  }, [isSaved, error]);
+  }, [isSubmitted, error, hasChanges, trailingError]);
 
   return {
     error,
     formRef,
     onSubmit,
     previousValues,
-    results,
     currentValues,
-    dataEntryStructure,
     formSection,
     setValues,
-    status,
     setAcceptErrorsAndWarnings,
     defaultProps,
     showAcceptErrorsAndWarnings,
+    trailingError,
     isSaving: status === "saving",
     election,
     section,

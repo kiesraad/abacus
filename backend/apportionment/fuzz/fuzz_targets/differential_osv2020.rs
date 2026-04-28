@@ -137,7 +137,7 @@ fuzz_target!(
             return
         }
         // Skip cases where number of seats > number of candidates with votes
-        // related issue: #3212
+        // related issue: #3211
         let no_of_candidates_with_votes = data.list_votes.iter().
             map(|lv| lv.candidate_votes.iter().filter(|cv| *cv.get_votes() > 0).count() as u32).sum::<u32>();
         if data.seats > no_of_candidates_with_votes {

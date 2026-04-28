@@ -485,13 +485,15 @@ async fn generate_and_save_files_csb_election(
     audit_service: &AuditService,
     committee_session: CommitteeSession,
     input: ResultsInput,
-) -> Result<(Option<File>, Option<File>), APIError> {
+) -> Result<(Option<File>, Option<File>, Option<File>), APIError> {
     let eml_file: Option<File> = None;
     let created_at = input.created_at.with_timezone(&Utc);
     // TODO: Add EML file type to 520 in issue #3110
 
-    let pdf_files = input.into_pdf_file_models_csb()?;
+    let xml_string = input.as_xml()?.write_eml_root_str(true, true)?;
+    let xml_filename = input.xml_filename();
 
+    let pdf_files = input.into_pdf_file_models_csb()?;
     let pdf = create_file(
         conn,
         audit_service,
@@ -506,25 +508,7 @@ async fn generate_and_save_files_csb_election(
     )
     .await?;
 
-    let pdf_file: Option<File> = Some(pdf);
-
-    Ok((eml_file, pdf_file))
-}
-
-async fn generate_and_save_files_csb_total_counts_election(
-    conn: &mut SqliteConnection,
-    audit_service: &AuditService,
-    committee_session: CommitteeSession,
-    input: ResultsInput,
-) -> Result<(Option<File>, Option<File>), APIError> {
-    // TODO: Add CSV file in epic #3053
-    let csv_file: Option<File> = None;
-    let created_at = input.created_at.with_timezone(&Utc);
-
-    let xml_string = input.as_xml()?.write_eml_root_str(true, true)?;
-    let xml_filename = input.xml_filename();
-
-    let eml = create_file(
+    let total_counts_eml = create_file(
         conn,
         audit_service,
         NewFile {
@@ -538,9 +522,10 @@ async fn generate_and_save_files_csb_total_counts_election(
     )
     .await?;
 
-    let eml_file = Some(eml);
+    let pdf_file: Option<File> = Some(pdf);
+    let total_counts_eml_file: Option<File> = Some(total_counts_eml);
 
-    Ok((eml_file, csv_file))
+    Ok((eml_file, pdf_file, total_counts_eml_file))
 }
 
 async fn create_file(
@@ -589,31 +574,19 @@ async fn get_existing_gsb_files(
 async fn get_existing_csb_files(
     conn: &mut SqliteConnection,
     committee_session_id: CommitteeSessionId,
-) -> Result<(Option<File>, DateTime<Utc>), APIError> {
+) -> Result<(Option<File>, Option<File>, DateTime<Utc>), APIError> {
     let results_pdf_file =
         file_repo::get_for_session(conn, committee_session_id, FileType::CsbResultsPdf).await?;
-
-    let created_at = results_pdf_file
-        .as_ref()
-        .map(|f| f.created_at)
-        .unwrap_or_else(Utc::now);
-
-    Ok((results_pdf_file, created_at))
-}
-
-async fn get_existing_csb_total_counts_files(
-    conn: &mut SqliteConnection,
-    committee_session_id: CommitteeSessionId,
-) -> Result<(Option<File>, DateTime<Utc>), APIError> {
     let total_counts_eml_file =
         file_repo::get_for_session(conn, committee_session_id, FileType::CsbTotalCountsEml).await?;
 
-    let created_at = total_counts_eml_file
+    let created_at = results_pdf_file
         .as_ref()
+        .or(total_counts_eml_file.as_ref())
         .map(|f| f.created_at)
         .unwrap_or_else(Utc::now);
 
-    Ok((total_counts_eml_file, created_at))
+    Ok((results_pdf_file, total_counts_eml_file, created_at))
 }
 
 async fn get_files_gsb_election(
@@ -680,7 +653,7 @@ async fn get_files_csb_election(
     pool: &SqlitePool,
     audit_service: AuditService,
     committee_session_id: CommitteeSessionId,
-) -> Result<(Option<File>, DateTime<Utc>), APIError> {
+) -> Result<(Option<File>, Option<File>, DateTime<Utc>), APIError> {
     let mut conn = pool.acquire().await?;
     let committee_session = committee_session_repo::get(&mut conn, committee_session_id).await?;
 
@@ -695,12 +668,12 @@ async fn get_files_csb_election(
     }
 
     // Check if files exist, if so, get files from database
-    let (mut results_pdf_file, mut created_at) =
+    let (mut results_pdf_file, mut total_counts_eml_file, mut created_at) =
         get_existing_csb_files(&mut conn, committee_session.id).await?;
     drop(conn);
 
     // Determine if we need to generate any of the files
-    let generate_files = results_pdf_file.is_none();
+    let generate_files = results_pdf_file.is_none() || total_counts_eml_file.is_none();
 
     // If one of the files doesn't exist, generate all and save them to the database
     if generate_files {
@@ -712,62 +685,13 @@ async fn get_files_csb_election(
             created_at.with_timezone(&Local),
         )
         .await?;
-        (_, results_pdf_file) =
+        (_, results_pdf_file, total_counts_eml_file) =
             generate_and_save_files_csb_election(&mut tx, &audit_service, committee_session, input)
                 .await?;
         tx.commit().await?;
     }
 
-    Ok((results_pdf_file, created_at))
-}
-
-async fn get_files_csb_election_total_counts(
-    pool: &SqlitePool,
-    audit_service: AuditService,
-    committee_session_id: CommitteeSessionId,
-) -> Result<(Option<File>, DateTime<Utc>), APIError> {
-    let mut conn = pool.acquire().await?;
-    let committee_session = committee_session_repo::get(&mut conn, committee_session_id).await?;
-
-    // Only generate files if the committee session is completed and has all the data needed
-    if committee_session.status != CommitteeSessionStatus::Completed
-        || committee_session.start_date_time.is_none()
-        || !are_results_complete_for_committee_session(&mut conn, committee_session.id).await?
-    {
-        return Err(APIError::CommitteeSession(
-            CommitteeSessionError::InvalidCommitteeSessionStatus,
-        ));
-    }
-
-    // Check if files exist, if so, get files from database
-    let (mut eml_file, mut created_at) =
-        get_existing_csb_total_counts_files(&mut conn, committee_session.id).await?;
-    drop(conn);
-
-    // Determine if we need to generate any of the files
-    let generate_files = eml_file.is_none();
-
-    // If one of the files doesn't exist, generate all and save them to the database
-    if generate_files {
-        created_at = Utc::now();
-        let mut tx = pool.begin_immediate().await?;
-        let input = ResultsInput::new(
-            &mut tx,
-            committee_session.id,
-            created_at.with_timezone(&Local),
-        )
-        .await?;
-        (eml_file, _) = generate_and_save_files_csb_total_counts_election(
-            &mut tx,
-            &audit_service,
-            committee_session,
-            input,
-        )
-        .await?;
-        tx.commit().await?;
-    }
-
-    Ok((eml_file, created_at))
+    Ok((results_pdf_file, total_counts_eml_file, created_at))
 }
 
 /// Download a zip containing a PDF for the PV and the EML with GSB election results
@@ -932,7 +856,7 @@ async fn election_download_zip_results_csb(
 
     let election = election_repo::get(&mut conn, election_id).await?;
     let committee_session = committee_session_repo::get(&mut conn, committee_session_id).await?;
-    let (pdf_file, created_at) =
+    let (pdf_file, _, created_at) =
         get_files_csb_election(&pool, audit_service, committee_session.id).await?;
     drop(conn);
 
@@ -995,8 +919,8 @@ async fn election_download_zip_total_counts_csb(
 
     let election = election_repo::get(&mut conn, election_id).await?;
     let committee_session = committee_session_repo::get(&mut conn, committee_session_id).await?;
-    let (eml_file, created_at) =
-        get_files_csb_election_total_counts(&pool, audit_service, committee_session.id).await?;
+    let (_, total_counts_eml_file, created_at) =
+        get_files_csb_election(&pool, audit_service, committee_session.id).await?;
     drop(conn);
 
     let download_zip_filename = download_zip_filename(
@@ -1008,9 +932,10 @@ async fn election_download_zip_total_counts_csb(
     let (zip_response, mut zip_writer) = ZipResponse::new(&download_zip_filename);
 
     tokio::spawn(async move {
-        if let Some(eml_file) = eml_file {
+        if let Some(total_counts_eml_file) = total_counts_eml_file {
             let xml_zip_filename = xml_zip_filename(&election);
-            let xml_zip = zip_single_file(&eml_file.name, &eml_file.data).await?;
+            let xml_zip =
+                zip_single_file(&total_counts_eml_file.name, &total_counts_eml_file.data).await?;
             zip_writer.add_file(&xml_zip_filename, &xml_zip).await?;
         }
 
@@ -1239,16 +1164,24 @@ mod tests {
 
         // Files should be generated exactly once
         for _ in 1..=2 {
-            let (pdf, _) =
+            let (pdf, eml_total_counts, _) =
                 get_files_csb_election(&pool, audit_service.clone(), CommitteeSessionId::from(801))
                     .await
                     .expect("should return files");
             let pdf = pdf.expect("should have generated pdf");
+            let eml_total_counts =
+                eml_total_counts.expect("should have generated total counts eml");
 
             assert_eq!(pdf.name, "Model_P22-2.pdf");
             assert_eq!(pdf.id, FileId::from(1));
 
-            assert_eq!(list_event_names(&mut conn).await.unwrap(), ["FileCreated"]);
+            assert_eq!(eml_total_counts.name, "Totaaltelling_GR2024_Juinen.eml.xml");
+            assert_eq!(eml_total_counts.id, FileId::from(2));
+
+            assert_eq!(
+                list_event_names(&mut conn).await.unwrap(),
+                ["FileCreated", "FileCreated"]
+            );
         }
     }
 

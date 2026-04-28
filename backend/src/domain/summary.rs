@@ -372,14 +372,19 @@ mod tests {
     use crate::domain::{
         committee_session::CommitteeSessionId,
         data_entry::DataEntryId,
-        election::{CommitteeCategory::*, PGNumber, tests::election_fixture},
+        election::{
+            CommitteeCategory::{self, *},
+            PGNumber,
+            tests::election_fixture,
+        },
         polling_station::{
             PollingStation, PollingStationFirstSession, test_helpers::polling_stations_fixture,
         },
         results::{
             differences_counts::DifferencesCounts, extra_investigation::ExtraInvestigation,
-            yes_no::YesNo,
+            gsb_differences_counts::GSBDifferencesCounts, gsb_results::GSBResults, yes_no::YesNo,
         },
+        sub_committee::{SubCommittee, SubCommitteeFirstSession, SubCommitteeId},
         valid_default::ValidDefault,
     };
 
@@ -473,6 +478,76 @@ mod tests {
                 PoliticalGroupCandidateVotes::from_test_data_auto(PGNumber::from(1), &[17, 7]),
                 PoliticalGroupCandidateVotes::from_test_data_auto(PGNumber::from(2), &[12, 15, 5]),
             ],
+        })
+    }
+
+    fn gsb_results_fixture_a() -> Results {
+        Results::GSB(GSBResults {
+            voters_counts: VotersCounts {
+                poll_card_count: 30,
+                proxy_certificate_count: 4,
+                total_admitted_voters_count: 34,
+            },
+            votes_counts: VotesCounts {
+                political_group_total_votes: vec![
+                    PoliticalGroupTotalVotes {
+                        number: PGNumber::from(1),
+                        total: 20,
+                    },
+                    PoliticalGroupTotalVotes {
+                        number: PGNumber::from(2),
+                        total: 10,
+                    },
+                ],
+                total_votes_candidates_count: 30,
+                blank_votes_count: 2,
+                invalid_votes_count: 3,
+                total_votes_cast_count: 35,
+            },
+            differences_counts: GSBDifferencesCounts {
+                more_ballots_count: 1,
+                fewer_ballots_count: 0,
+            },
+            political_group_votes: vec![
+                PoliticalGroupCandidateVotes::from_test_data_auto(PGNumber::from(1), &[18, 2]),
+                PoliticalGroupCandidateVotes::from_test_data_auto(PGNumber::from(2), &[4, 4, 2]),
+            ],
+            number_of_voters: 90,
+        })
+    }
+
+    fn gsb_results_fixture_b() -> Results {
+        Results::GSB(GSBResults {
+            voters_counts: VotersCounts {
+                poll_card_count: 59,
+                proxy_certificate_count: 1,
+                total_admitted_voters_count: 60,
+            },
+            votes_counts: VotesCounts {
+                political_group_total_votes: vec![
+                    PoliticalGroupTotalVotes {
+                        number: PGNumber::from(1),
+                        total: 24,
+                    },
+                    PoliticalGroupTotalVotes {
+                        number: PGNumber::from(2),
+                        total: 32,
+                    },
+                ],
+                total_votes_candidates_count: 56,
+                blank_votes_count: 2,
+                invalid_votes_count: 0,
+                total_votes_cast_count: 58,
+            },
+            differences_counts: GSBDifferencesCounts {
+                more_ballots_count: 0,
+                fewer_ballots_count: 2,
+            },
+            political_group_votes: vec![
+                PoliticalGroupCandidateVotes::from_test_data_auto(PGNumber::from(1), &[17, 7]),
+                PoliticalGroupCandidateVotes::from_test_data_auto(PGNumber::from(2), &[12, 15, 5]),
+            ],
+            number_of_voters: 100,
         })
     }
 
@@ -877,5 +952,47 @@ mod tests {
         assert_eq!(investigations.admitted_voters_recounted, vec![32]);
         assert_eq!(investigations.investigated_other_reason, vec![32]);
         assert!(investigations.ballots_recounted.is_empty());
+    }
+
+    #[test]
+    fn test_gsb_number_of_voters() {
+        let election = election_fixture(CSB, &[2, 3]);
+        let gsb1_result = gsb_results_fixture_a();
+        let gsb2_result = gsb_results_fixture_b();
+
+        let totals = ElectionSummary::from_results(
+            &election,
+            &[
+                (
+                    DataEntrySource::SubCommittee(SubCommitteeFirstSession {
+                        committee_session_id: CommitteeSessionId::from(0),
+                        sub_committee: SubCommittee {
+                            id: SubCommitteeId::from(1),
+                            number: 1,
+                            name: "A".to_string(),
+                            category: CommitteeCategory::GSB,
+                        },
+                        data_entry_id: DataEntryId::from(0),
+                    }),
+                    gsb1_result,
+                ),
+                (
+                    DataEntrySource::SubCommittee(SubCommitteeFirstSession {
+                        committee_session_id: CommitteeSessionId::from(0),
+                        sub_committee: SubCommittee {
+                            id: SubCommitteeId::from(2),
+                            number: 2,
+                            name: "B".to_string(),
+                            category: CommitteeCategory::GSB,
+                        },
+                        data_entry_id: DataEntryId::from(1),
+                    }),
+                    gsb2_result,
+                ),
+            ],
+        )
+        .unwrap();
+
+        assert_eq!(totals.number_of_voters, Some(190));
     }
 }

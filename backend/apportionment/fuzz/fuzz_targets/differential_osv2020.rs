@@ -6,8 +6,8 @@ use std::{
     sync::{Mutex, OnceLock},
 };
 
-use apportionment::{process, ApportionmentError, CandidateVotes};
-use apportionment_fuzz::{get_total_seats, init_tracing, run_with_log, FuzzedApportionmentInput};
+use apportionment::{ApportionmentError, CandidateVotes, process};
+use apportionment_fuzz::{FuzzedApportionmentInput, get_total_seats, init_tracing, run_with_log};
 use libfuzzer_sys::fuzz_target;
 use serde::{Deserialize, Serialize};
 
@@ -104,106 +104,160 @@ fn report_mismatch(
     panic!("{message}");
 }
 
-fuzz_target!(
-    init: {
-        let osv2020_wrapper_bin = std::env::var("OSV2020_WRAPPER_BIN")
-            .expect("OSV2020_WRAPPER_BIN environment variable must point to the apportionment-wrapper launcher script");
+fn init() {
+    let osv2020_wrapper_bin = std::env::var("OSV2020_WRAPPER_BIN")
+        .expect("OSV2020_WRAPPER_BIN environment variable must point to the apportionment-wrapper launcher script");
 
-        let mut child = Command::new(&osv2020_wrapper_bin)
-            .stdin(Stdio::piped())
-            .stdout(Stdio::piped())
-            .stderr(Stdio::inherit())
-            .spawn()
-            .unwrap_or_else(|e| panic!("Failed to spawn OSV2020 wrapper process at {osv2020_wrapper_bin}: {e}"));
+    let mut child = Command::new(&osv2020_wrapper_bin)
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::inherit())
+        .spawn()
+        .unwrap_or_else(|e| {
+            panic!("Failed to spawn OSV2020 wrapper process at {osv2020_wrapper_bin}: {e}")
+        });
 
-        let stdin = child.stdin.take().unwrap();
-        let stdout = BufReader::new(child.stdout.take().unwrap());
+    let stdin = child.stdin.take().unwrap();
+    let stdout = BufReader::new(child.stdout.take().unwrap());
 
-        OSV2020_WRAPPER.set(Mutex::new(Osv2020WrapperProcess { stdin, stdout, _child: child })).ok();
+    OSV2020_WRAPPER
+        .set(Mutex::new(Osv2020WrapperProcess {
+            stdin,
+            stdout,
+            _child: child,
+        }))
+        .ok();
 
-        init_tracing();
-    },
-    |data: FuzzedApportionmentInput| {
-        // Skip cases with zero total votes cast
-        // related issue: #3210
-        let total_votes = data.list_votes.iter().map(|list| list.candidate_votes.iter().map(|cv| cv.votes()).sum::<u32>()).sum::<u32>();
-        if total_votes == 0 {
-            return
-        }
-        // Skip cases where number of seats > number of candidates
-        // related issue: #3211
-        let no_of_candidates = data.list_votes.iter().map(|lv| lv.candidate_votes.len() as u32).sum::<u32>();
-        if data.seats > no_of_candidates {
-            return
-        }
-        // Skip cases where number of seats > number of candidates on lists with votes
-        // related issue: #3212
-        let no_of_candidates_on_lists_with_votes = data.list_votes.iter().
-                    filter(|list| list.candidate_votes.iter().any(|cv| cv.votes() > 0)).
-                    map(|list| list.candidate_votes.len() as u32).sum::<u32>();
-        if data.seats > no_of_candidates_on_lists_with_votes {
-            return
-        }
-        // Skip cases where seats < 19 and number of seats > number of lists with votes
-        // Reason: when there are fewer than 19 seats, the first two steps in which remaining seats are assigned
-        // have the limitation that each list can get only one seat per step. So as long as Abacus assigns seats to
-        // lists with zero votes, we need to skip inputs that triggers that behavior in Abacus.
-        // related issue: #3212
-        let no_of_lists_with_votes = data.list_votes.iter().
-            filter(|list| list.candidate_votes.iter().any(|cv| cv.votes() > 0) ).count() as u32;
-        if data.seats < 19 && data.seats > no_of_lists_with_votes {
-            return
-        }
-        // }
-        // Skip cases where any list has an absolute majority of votes
-        // related issue: #3219
-        if data.list_votes.iter().any(|list| list.candidate_votes.iter().map(|cv| cv.votes()).sum::<u32>() >  (total_votes / 2)) {
-            return
-        }
-        // Skip cases where any party has zero total votes
-        //if data.list_votes.iter().any(|list| list.candidate_votes.iter().map(|cv| cv.votes()).sum::<u32>() == 0) {
-        //    return;
-        //}
+    init_tracing();
+}
 
-        // Convert current data structure to OSV2020 wrapper format
-        let pg_candidates: Vec<i64> = data.list_votes.iter().map(|x| x.candidate_votes.len() as i64).collect();
-        let votes: Vec<i64> = data.list_votes.iter()
-            .flat_map(|list| list.candidate_votes.iter())
-            .map(|cv| cv.votes() as i64)
-            .collect();
+fn fuzz(data: FuzzedApportionmentInput) {
+    // Skip cases with zero total votes cast
+    // related issue: #3210
+    let total_votes = data
+        .list_votes
+        .iter()
+        .map(|list| {
+            list.candidate_votes
+                .iter()
+                .map(|cv| cv.votes())
+                .sum::<u32>()
+        })
+        .sum::<u32>();
 
-        let (osv2020_result, osv2020_log) = osv2020_apportionment(data.seats.into(), &pg_candidates, &votes);
+    if total_votes == 0 {
+        return;
+    }
+    // Skip cases where number of seats > number of candidates
+    // related issue: #3211
+    let no_of_candidates = data
+        .list_votes
+        .iter()
+        .map(|lv| lv.candidate_votes.len() as u32)
+        .sum::<u32>();
 
-        let (abacus_result, abacus_log) = run_with_log(|| process(&data));
+    if data.seats > no_of_candidates {
+        return;
+    }
+    // Skip cases where number of seats > number of candidates on lists with votes
+    // related issue: #3212
+    let no_of_candidates_on_lists_with_votes = data
+        .list_votes
+        .iter()
+        .filter(|list| list.candidate_votes.iter().any(|cv| cv.votes() > 0))
+        .map(|list| list.candidate_votes.len() as u32)
+        .sum::<u32>();
 
-        match abacus_result {
-            Ok(ref output) => {
-                let abacus_seats = get_total_seats(&output.seat_assignment);
+    if data.seats > no_of_candidates_on_lists_with_votes {
+        return;
+    }
+    // Skip cases where seats < 19 and number of seats > number of lists with votes
+    // Reason: when there are fewer than 19 seats, the first two steps in which remaining seats are assigned
+    // have the limitation that each list can get only one seat per step. So as long as Abacus assigns seats to
+    // lists with zero votes, we need to skip inputs that triggers that behavior in Abacus.
+    // related issue: #3212
+    let no_of_lists_with_votes = data
+        .list_votes
+        .iter()
+        .filter(|list| list.candidate_votes.iter().any(|cv| cv.votes() > 0))
+        .count() as u32;
 
-                match osv2020_result {
-                    Osv2020Result::Allocated(osv2020_seats) => {
-                        if abacus_seats != osv2020_seats {
-                            report_mismatch(
-                                &data,
-                                &format!("seats: {:?}\n{:#?}", abacus_seats, output.seat_assignment),
-                                &abacus_log,
-                                &format!("seats: {:?}", osv2020_seats),
-                                &osv2020_log,
-                                "seat allocation mismatch",
-                            );
-                        }
+    if data.seats < 19 && data.seats > no_of_lists_with_votes {
+        return;
+    }
+
+    // Skip cases where any list has an absolute majority of votes
+    // related issue: #3219
+    if data.list_votes.iter().any(|list| {
+        list.candidate_votes
+            .iter()
+            .map(|cv| cv.votes())
+            .sum::<u32>()
+            > (total_votes / 2)
+    }) {
+        return;
+    }
+
+    // Skip cases where any party has zero total votes
+    //if data.list_votes.iter().any(|list| list.candidate_votes.iter().map(|cv| cv.votes()).sum::<u32>() == 0) {
+    //    return;
+    //}
+
+    // Convert current data structure to OSV2020 wrapper format
+    let pg_candidates: Vec<i64> = data
+        .list_votes
+        .iter()
+        .map(|x| x.candidate_votes.len() as i64)
+        .collect();
+
+    let votes: Vec<i64> = data
+        .list_votes
+        .iter()
+        .flat_map(|list| list.candidate_votes.iter())
+        .map(|cv| cv.votes() as i64)
+        .collect();
+
+    let (osv2020_result, osv2020_log) =
+        osv2020_apportionment(data.seats.into(), &pg_candidates, &votes);
+
+    let (abacus_result, abacus_log) = run_with_log(|| process(&data));
+
+    match abacus_result {
+        Ok(ref output) => {
+            let abacus_seats = get_total_seats(&output.seat_assignment);
+
+            match osv2020_result {
+                Osv2020Result::Allocated(osv2020_seats) => {
+                    if abacus_seats != osv2020_seats {
+                        report_mismatch(
+                            &data,
+                            &format!("seats: {:?}\n{:#?}", abacus_seats, output.seat_assignment),
+                            &abacus_log,
+                            &format!("seats: {:?}", osv2020_seats),
+                            &osv2020_log,
+                            "seat allocation mismatch",
+                        );
                     }
-                    Osv2020Result::Conflict => {
-                        // Accept case where OSV does drawing of lots and Abacus has allocation, when
-                        // 1. greatest averages is applied (art. P7)
-                        // 2. list exhaustion is applied
-                        // In most (all?) cases the difference under these circumstances is caused by the fact that OSV and Abacus handle list exhaustion differently.
-                        // related issue: #3214
-                        let last_osv2020_log_line = osv2020_log.last().unwrap();
-                        if last_osv2020_log_line.contains(&String::from("Conflict: Auslosung bezüglich P7."))
-                            && osv2020_log.iter().any(|line| line.contains("Erschöpfte Listen"))
-                            && abacus_log.contains("assigned to another list in accordance with Article P 10 Kieswet") {
-                        } else {
+                }
+                Osv2020Result::Conflict => {
+                    // Accept case where OSV does drawing of lots and Abacus has allocation, when
+                    // 1. greatest averages is applied (art. P7)
+                    // 2. list exhaustion is applied
+                    // In most (all?) cases the difference under these circumstances is caused by the fact that OSV and Abacus handle list exhaustion differently.
+                    // related issue: #3214
+                    if osv2020_log
+                        .last()
+                        .unwrap()
+                        .contains(&String::from("Conflict: Auslosung bezüglich P7."))
+                        && osv2020_log
+                            .iter()
+                            .any(|line| line.contains("Erschöpfte Listen"))
+                        && abacus_log.contains(
+                            "assigned to another list in accordance with Article P 10 Kieswet",
+                        )
+                    {
+                        //do nothing, continue
+                    } else {
                         report_mismatch(
                             &data,
                             &format!("seats: {:?}\n{:#?}", abacus_seats, output.seat_assignment),
@@ -212,26 +266,37 @@ fuzz_target!(
                             &osv2020_log,
                             "OSV2020 has conflict where Abacus has allocation",
                         );
-                        }
                     }
-                }
-            }
-            Err(e @ (ApportionmentError::DrawingOfLotsNotImplemented
-                   | ApportionmentError::AllListsExhausted
-                   | ApportionmentError::ZeroVotesCast)) => {
-                match osv2020_result {
-                    Osv2020Result::Allocated(osv2020_seats) => {
-                        report_mismatch(
-                            &data,
-                            &format!("Err({e:?})"),
-                            &abacus_log,
-                            &format!("seats: {:?}", osv2020_seats),
-                            &osv2020_log,
-                            &format!("OSV2020 has allocation where Abacus has {e:?}"),
-                        );
-                    }
-                    Osv2020Result::Conflict => {} // both agree
                 }
             }
         }
-});
+        Err(
+            e @ (ApportionmentError::DrawingOfLotsNotImplemented
+            | ApportionmentError::AllListsExhausted
+            | ApportionmentError::ZeroVotesCast),
+        ) => {
+            match osv2020_result {
+                Osv2020Result::Allocated(osv2020_seats) => {
+                    report_mismatch(
+                        &data,
+                        &format!("Err({e:?})"),
+                        &abacus_log,
+                        &format!("seats: {:?}", osv2020_seats),
+                        &osv2020_log,
+                        &format!("OSV2020 has allocation where Abacus has {e:?}"),
+                    );
+                }
+                Osv2020Result::Conflict => {} // both agree
+            }
+        }
+    }
+}
+
+fuzz_target!(
+    init: {
+        init()
+    },
+    |data: FuzzedApportionmentInput| {
+        fuzz(data)
+    }
+);

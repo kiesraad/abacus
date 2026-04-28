@@ -125,16 +125,19 @@ fuzz_target!(
     },
     |data: FuzzedApportionmentInput| {
         // Skip cases with zero total votes cast
+        // related issue: #3210
         let total_votes = data.list_votes.iter().map(|list| list.candidate_votes.iter().map(|cv| cv.votes()).sum::<u32>()).sum::<u32>();
         if total_votes == 0 {
             return
         }
         // Skip cases where number of seats > number of candidates
+        // related issue: #3211
         let no_of_candidates = data.list_votes.iter().map(|lv| lv.candidate_votes.len() as u32).sum::<u32>();
         if data.seats > no_of_candidates {
             return
         }
         // Skip cases where number of seats > number of candidates with votes
+        // related issue: #3212
         let no_of_candidates_with_votes = data.list_votes.iter().
             map(|lv| lv.candidate_votes.iter().filter(|cv| *cv.get_votes() > 0).count() as u32).sum::<u32>();
         if data.seats > no_of_candidates_with_votes {
@@ -144,10 +147,12 @@ fuzz_target!(
         // Reason: when there are fewer than 19 seats, the first two steps in which remaining seats are assigned
         // have the limitation that each list can get only one seat per step. So as long as Abacus assigns seats to
         // lists with zero votes, we need to skip inputs that triggers that behavior in Abacus.
+        // related issue: #3212
         if data.seats < 19 && data.seats > data.list_votes.iter().filter(|list| list.candidate_votes.iter().any(|cv| cv.votes() > 0) ).count() as u32 {
             return
         }
         // Skip cases where any list has an absolute majority of votes
+        // related issue: #3219
         if data.list_votes.iter().any(|list| list.candidate_votes.iter().map(|cv| cv.votes()).sum::<u32>() >  (total_votes / 2)) {
             return
         }
@@ -189,6 +194,7 @@ fuzz_target!(
                         // 1. greatest averages is applied (art. P7)
                         // 2. list exhaustion is applied
                         // In most (all?) cases the difference under these circumstances is caused by the fact that OSV and Abacus handle list exhaustion differently.
+                        // related issue: #3214
                         let last_osv2020_log_line = osv2020_log.last().unwrap();
                         if last_osv2020_log_line.contains(&String::from("Conflict: Auslosung bezüglich P7."))
                             && osv2020_log.iter().any(|line| line.contains("Erschöpfte Listen"))

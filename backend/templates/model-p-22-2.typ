@@ -316,14 +316,14 @@ Na toewijzing van de volle zetels blijft een aantal te verdelen zetels over. Dit
         table.cell(align: right, header_text([Aantal restzetels])),
       ),
       table.hline(stroke: 1pt + black),
-      ..pgs_meeting_threshold.map((list_seat_assignment) => {
+      ..pgs_meeting_threshold.map((list_seat_assignment) => 
         (
           table.cell(format_political_group_name(list_seat_assignment.number, list_seat_assignment.name, with_prefix: "only_list_number")),
           table.cell(align: right, [#list_seat_assignment.initial_full_seats]),
           table.cell(align: right, format_fraction(list_seat_assignment.largest_remainder_column.remainder_votes)),
           table.cell(align: right, [#list_seat_assignment.largest_remainder_column.residual_seats])
         )
-      }).flatten(),
+      ).flatten(),
       table.hline(stroke: 1pt + black),
     )
   ] else [
@@ -361,8 +361,10 @@ Na toewijzing van de volle zetels blijft een aantal te verdelen zetels over. Dit
     [+ #political_group_name(pg, with_prefix: "with_list_prefix") heeft niet voldoende kandidaten beschikbaar om de haar toegewezen zetels te bezetten. De 'overtollige' zetels gaan over op andere lijsten door toepassing van het systeem van de grootste #if input.election.number_of_seats < LARGE_COUNCIL_THRESHOLD { [overschotten] } else { [gemiddelden] }.]
   }
   
-  #let unique_highest_averages_steps = input.seat_assignment.steps.filter(step => step.change.changed_by == "UniqueHighestAverageAssignment")
-  #if input.election.number_of_seats < LARGE_COUNCIL_THRESHOLD and unique_highest_averages_steps.len() > 0 [
+  #let list_seat_assignment_with_unique_highest_average = input.enriched_seat_assignment.list_seat_assignment.filter(
+    (list_seat_assignment) => 
+    list_seat_assignment.keys().contains("unique_highest_average_column"))
+  #if input.election.number_of_seats < LARGE_COUNCIL_THRESHOLD and list_seat_assignment_with_unique_highest_average.len() > 0 [
     #pagebreak(weak: true)
     
     === Verdeling van de restzetels 
@@ -383,23 +385,15 @@ Na toewijzing van de volle zetels blijft een aantal te verdelen zetels over. Dit
         table.cell(align: right, header_text([Toegekende restzetels])),
       ),
       table.hline(stroke: 1pt + black),
-      ..input.seat_assignment.final_standing.map((list_seat_assignment) => {
-        if unique_highest_averages_steps.first().change.list_exhausted.contains(list_seat_assignment.list_number) {
-          ()
-        } else {
-          let residual_seats_already_assigned = input.seat_assignment.steps.filter(step => step.change.changed_by == "LargestRemainderAssignment").filter(step => {
-          step.change.selected_list_number == list_seat_assignment.list_number
-        }).len()
-          let average = unique_highest_averages_steps.first().standings.find((standing) => standing.list_number == list_seat_assignment.list_number).next_votes_per_seat
-          let list_seat_assignment_steps = unique_highest_averages_steps.filter((step) => {step.change.selected_list_number == list_seat_assignment.list_number})
+      ..list_seat_assignment_with_unique_highest_average.map((list_seat_assignment) => {
           (
-            table.cell(political_group_name(input.election.political_groups.find(pg => pg.number == list_seat_assignment.list_number), with_prefix: "only_list_number")),
-            table.cell(align: right, str(list_seat_assignment.full_seats + residual_seats_already_assigned)),
-            table.cell(align: right, format_fraction(list_seat_assignment.remainder_votes)),
-            table.cell(align: right, str(list_seat_assignment_steps.len()))
+            table.cell(format_political_group_name(list_seat_assignment.number, list_seat_assignment.name, with_prefix: "only_list_number")),
+            table.cell(align: right, str(list_seat_assignment.unique_highest_average_column.already_assigned_seats)),
+            table.cell(align: right, format_fraction(list_seat_assignment.unique_highest_average_column.next_votes_per_seat)),
+            table.cell(align: right, [#list_seat_assignment.unique_highest_average_column.residual_seats])
           )
         }
-      }).flatten(),
+      ).flatten(),
       table.hline(stroke: 1pt + black),
     )
     

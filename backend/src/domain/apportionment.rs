@@ -51,6 +51,16 @@ impl SeatChange {
         matches!(self, Self::UniqueHighestAverageAssignment(_))
     }
 
+    /// Returns true if the seat was changed through the absolute majority reassignment
+    pub fn is_changed_by_absolute_majority_reassignment(&self) -> bool {
+        matches!(self, Self::AbsoluteMajorityReassignment(_))
+    }
+
+    /// Returns true if the seat was changed through the list exhaustion removal
+    pub fn is_changed_by_list_exhaustion_removal(&self) -> bool {
+        matches!(self, Self::ListExhaustionRemoval(_))
+    }
+
     pub fn list_number_assigned(&self) -> PGNumber {
         match self {
             Self::HighestAverageAssignment(highest_average_assigned_seat) => {

@@ -137,6 +137,14 @@ export interface ELECTION_DOWNLOAD_ZIP_RESULTS_CSB_REQUEST_PARAMS {
 export type ELECTION_DOWNLOAD_ZIP_RESULTS_CSB_REQUEST_PATH =
   `/api/elections/${ElectionId}/committee_sessions/${CommitteeSessionId}/download_zip_results_csb`;
 
+// /api/elections/{election_id}/committee_sessions/{committee_session_id}/download_zip_total_counts_csb
+export interface ELECTION_DOWNLOAD_ZIP_TOTAL_COUNTS_CSB_REQUEST_PARAMS {
+  election_id: ElectionId;
+  committee_session_id: CommitteeSessionId;
+}
+export type ELECTION_DOWNLOAD_ZIP_TOTAL_COUNTS_CSB_REQUEST_PATH =
+  `/api/elections/${ElectionId}/committee_sessions/${CommitteeSessionId}/download_zip_total_counts_csb`;
+
 // /api/elections/{election_id}/committee_sessions/{committee_session_id}/investigations
 export interface COMMITTEE_SESSION_INVESTIGATIONS_REQUEST_PARAMS {
   election_id: ElectionId;

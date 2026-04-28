@@ -16,8 +16,6 @@ impl SimpleCandidateVotes {
             votes,
         }
     }
-
-    pub fn get_votes(&self) -> &u32 { &self.votes }
 }
 
 impl apportionment::CandidateVotes for SimpleCandidateVotes {

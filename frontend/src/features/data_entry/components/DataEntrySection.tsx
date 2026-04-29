@@ -35,13 +35,14 @@ export function DataEntrySection({ committeeCategory }: DataEntryProps) {
     error,
     formRef,
     formSection,
+    isSaving,
     onSubmit,
     previousValues,
     section,
     setAcceptErrorsAndWarnings,
     setValues,
+    trailingError,
     showAcceptErrorsAndWarnings,
-    status,
   } = useDataEntryFormSection();
   const acceptCheckboxRef = useRef<HTMLInputElement>(null);
 
@@ -51,9 +52,6 @@ export function DataEntrySection({ committeeCategory }: DataEntryProps) {
   const bottomBarType = lastSubsection?.type === "inputGrid" ? "inputGrid" : "form";
 
   const keyboardHintText = section.id.startsWith("political_group_votes_") ? t("candidates_votes.goto_totals") : null;
-
-  // Missing totals error for political group votes form
-  const missingTotalError = formSection.errors.find("F401");
 
   // Memoize errors to prevent unnecessary focus triggers in Feedback
   const memoizedErrors = useMemo(
@@ -122,13 +120,13 @@ export function DataEntrySection({ committeeCategory }: DataEntryProps) {
           currentValues={currentValues}
           setValues={setValues}
           defaultProps={defaultProps}
-          missingTotalError={missingTotalError !== undefined}
+          missingTotalError={trailingError !== undefined}
         />
 
-        {missingTotalError && (
+        {trailingError && (
           <div id="missing-total-error" className={cls.missingTotalError}>
             <Alert type="error" small>
-              <p>{getTranslations(election, missingTotalError, "typist").title}</p>
+              <p>{getTranslations(election, trailingError, "typist").title}</p>
             </Alert>
           </div>
         )}
@@ -164,7 +162,7 @@ export function DataEntrySection({ committeeCategory }: DataEntryProps) {
           </BottomBar.Row>
         )}
         <BottomBar.Row>
-          <Button type="submit" disabled={status === "saving"}>
+          <Button type="submit" disabled={isSaving}>
             {t("next")}
           </Button>
           <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Enter]} />

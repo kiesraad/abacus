@@ -85,22 +85,20 @@ fn report_mismatch(
     osv2020_log: &[String],
     message: &str,
 ) -> ! {
-    eprintln!("=== Conclusion ===");
-    eprintln!("{message}");
-    eprintln!("=== Input ===");
-    eprintln!("{:#?}", data);
-    eprintln!("=== Abacus ===");
+    eprintln!("\n=== Abacus ===");
     eprintln!("{abacus}");
     for line in abacus_log.lines() {
         eprintln!("[abacus] {line}");
     }
-    eprintln!("=== OSV2020 ===");
+    eprintln!("\n=== OSV2020 ===");
     eprintln!("{osv2020}");
     for line in osv2020_log {
         eprintln!("[osv2020] {line}");
     }
     eprintln!("\n=== Conclusion ===");
     eprintln!("{message}");
+    eprintln!("=== Input ===");
+    eprintln!("{:#?}", data);
     panic!("{message}");
 }
 

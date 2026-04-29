@@ -13,6 +13,8 @@ The Abacus apportionment crate has several fuzz targets that check our implement
 Basic commands:
 - Installation: `cargo install cargo-fuzz`
 - Listing fuzz targets: `cargo fuzz list`
-- Running a fuzz target: `cargo fuzz run <target name>`
+- Running a fuzz target: `cargo fuzz run [--jobs=8] <target name>`
 
 More documentation can be found in the [Rust Fuzz Book](https://rust-fuzz.github.io/book/cargo-fuzz.html).
+
+To check the fuzz test coverage, see the [instructions in our `fuzz` package](../../fuzz/README.md#checking-the-fuzz-test-coverage).

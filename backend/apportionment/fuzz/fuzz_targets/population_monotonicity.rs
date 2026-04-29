@@ -1,7 +1,9 @@
 #![no_main]
 
 use apportionment::{CandidateVotes, process};
-use apportionment_fuzz::{FuzzedApportionmentInput, SimpleCandidateVotes, SimpleListVotes, init_tracing, run_with_log};
+use apportionment_fuzz::{
+    FuzzedApportionmentInput, SimpleCandidateVotes, SimpleListVotes, init_tracing, run_with_log,
+};
 use libfuzzer_sys::fuzz_target;
 
 fuzz_target!(

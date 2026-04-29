@@ -59,7 +59,6 @@ where
 {
     ABACUS_LOG.with(|b| b.borrow_mut().clear());
     let result = f();
-    let log = ABACUS_LOG
-        .with(|b| String::from_utf8(std::mem::take(&mut *b.borrow_mut())).unwrap());
+    let log = ABACUS_LOG.with(|b| String::from_utf8(std::mem::take(&mut *b.borrow_mut())).unwrap());
     (result, log)
 }

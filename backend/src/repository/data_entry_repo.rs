@@ -860,7 +860,7 @@ mod tests {
         #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_9_csb"))))]
         async fn test_csb_incomplete_committee_session_results(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
-            let committee_session_id = CommitteeSessionId::from(801);
+            let committee_session_id = CommitteeSessionId::from(901);
 
             let results = list_results_for_committee_session(&mut conn, committee_session_id).await;
             assert!(results.is_err());

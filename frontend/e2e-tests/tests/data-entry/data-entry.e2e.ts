@@ -906,6 +906,7 @@ test.describe("errors and warnings", () => {
     await expect(votersAndVotesPage.warning).toBeInViewport();
     await expect(votersAndVotesPage.acceptErrorsAndWarnings).toBeVisible();
     await expect(votersAndVotesPage.acceptErrorsAndWarnings).not.toBeInViewport();
+    expect(await page.evaluate(() => window.scrollY)).toBe(0);
 
     // Change input, solving the warning
     await votersAndVotesPage.totalVotesCastCount.fill("100");
@@ -922,12 +923,14 @@ test.describe("errors and warnings", () => {
     await expect(votersAndVotesPage.warning).toBeHidden();
     await expect(votersAndVotesPage.acceptErrorsAndWarnings).toBeVisible();
     await expect(votersAndVotesPage.acceptErrorsAndWarnings).not.toBeInViewport();
+    expect(await page.evaluate(() => window.scrollY)).toBe(0);
 
     // When clicking next again without changing input, should scroll to accept errors and warnings checkbox
     await votersAndVotesPage.next.click();
     await expect(votersAndVotesPage.error).not.toBeInViewport();
     await expect(votersAndVotesPage.warning).toBeHidden();
     await expect(votersAndVotesPage.acceptErrorsAndWarnings).toBeInViewport();
+    expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
 
     // Solve errors and continue to next page
     await votersAndVotesPage.pollCardCount.fill("100");
@@ -947,8 +950,7 @@ test.describe("errors and warnings", () => {
     // That should be in viewport and browser should not scroll to top
     await candidatesListPage_1.next.click();
     await expect(candidatesListPage_1.missingTotalError).toBeInViewport();
-    const scrollPosition = await page.evaluate(() => window.scrollY);
-    expect(scrollPosition).toBeGreaterThan(0);
+    expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
   });
 
   test("user can accept errors", async ({ page, pollingStation }) => {

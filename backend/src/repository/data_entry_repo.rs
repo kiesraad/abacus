@@ -836,6 +836,36 @@ mod tests {
             );
             assert_eq!(results[2].1.voters_counts().proxy_certificate_count, 10);
         }
+
+        #[test(sqlx::test(fixtures(
+            path = "../../fixtures",
+            scripts("election_8_csb_with_results")
+        )))]
+        async fn test_csb_committee_session_results(pool: SqlitePool) {
+            let mut conn = pool.acquire().await.unwrap();
+            let committee_session_id = CommitteeSessionId::from(801);
+
+            let results = list_results_for_committee_session(&mut conn, committee_session_id)
+                .await
+                .unwrap();
+            assert_eq!(results.len(), 1);
+
+            assert_eq!(
+                results[0].0.id(),
+                DataEntrySourceId::SubCommittee(SubCommitteeId::from(811))
+            );
+            assert_eq!(results[0].1.voters_counts().proxy_certificate_count, 4);
+        }
+
+        #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_9_csb"))))]
+        async fn test_csb_incomplete_committee_session_results(pool: SqlitePool) {
+            let mut conn = pool.acquire().await.unwrap();
+            let committee_session_id = CommitteeSessionId::from(901);
+
+            let results = list_results_for_committee_session(&mut conn, committee_session_id).await;
+            assert!(results.is_err());
+            assert!(matches!(results.unwrap_err(), sqlx::Error::RowNotFound));
+        }
     }
 
     mod are_results_complete_for_committee_session {

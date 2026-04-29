@@ -135,12 +135,8 @@ fn fuzz(data: FuzzedApportionmentInput) {
     let total_votes = data
         .list_votes
         .iter()
-        .map(|list| {
-            list.candidate_votes
-                .iter()
-                .map(|cv| cv.votes())
-                .sum::<u32>()
-        })
+        .flat_map(|list| list.candidate_votes.iter())
+        .map(|cv| cv.votes())
         .sum::<u32>();
 
     if total_votes == 0 {

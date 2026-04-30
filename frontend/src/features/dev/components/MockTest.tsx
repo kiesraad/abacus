@@ -5,9 +5,7 @@ interface PongResponse {
 }
 
 function isPongResponse(data: unknown): data is PongResponse {
-  return (
-    typeof data === "object" && data !== null && "pong" in data && typeof (data as { pong: unknown }).pong === "string"
-  );
+  return typeof data === "object" && data !== null && "pong" in data && typeof data.pong === "string";
 }
 
 export function MockTest() {

@@ -93,7 +93,7 @@ export function parse(input: string, allowed = DEFAULT_ALLOWED_TAGS): AST {
     }
 
     if (input[i] === "\n") {
-      ast.push({ tag: "br", children: [] } as Element);
+      ast.push({ tag: "br", children: [] });
       continue;
     }
 

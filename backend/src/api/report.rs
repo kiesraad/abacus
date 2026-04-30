@@ -28,8 +28,8 @@ use crate::{
         file::{File, FileType},
         investigation::PollingStationInvestigation,
         models::{
-            ModelNa14_2Input, ModelNa31_2Input, ModelP2aInput, ModelP22_2Input, PdfFileModel,
-            ToPdfFileModel,
+            ModelNa14_2Input, ModelNa31_2Input, ModelP2aInput, ModelP22_2Bijlage1Input,
+            ModelP22_2Input, PdfFileModel, ToPdfFileModel,
             enriched_candidate_nomination::EnrichedCandidateNomination,
             enriched_seat_assignment::EnrichedSeatAssignment,
             votes_table::{VotesTables, VotesTablesWithPreviousVotes},
@@ -82,6 +82,7 @@ pub fn router() -> OpenApiRouter<AppState> {
         .routes(routes!(election_download_zip_results_gsb).authorize(&[CoordinatorGSB]))
         .routes(routes!(election_download_pdf_results_gsb).authorize(&[CoordinatorGSB]))
         .routes(routes!(election_download_zip_results_csb).authorize(&[CoordinatorCSB]))
+        .routes(routes!(election_download_zip_attachment_csb).authorize(&[CoordinatorCSB]))
         .routes(routes!(election_download_zip_total_counts_csb).authorize(&[CoordinatorCSB]))
 }
 
@@ -256,6 +257,23 @@ impl ResultsInput {
         Ok(pdf_file)
     }
 
+    fn get_p22_2_attachment_1_pdf_file(
+        &self,
+        hash: String,
+        creation_date_time: String,
+        filename: String,
+    ) -> Result<PdfFileModel, APIError> {
+        let votes_tables = VotesTables::new(&self.election, &self.summary)?;
+        let pdf_file: PdfFileModel = ModelP22_2Bijlage1Input {
+            election: self.election.clone().into(),
+            votes_tables,
+            hash,
+            creation_date_time,
+        }
+        .to_pdf_file_model(filename);
+        Ok(pdf_file)
+    }
+
     fn get_na14_2_pdf_file(
         &self,
         previous_summary: &ElectionSummary,
@@ -350,18 +368,27 @@ impl ResultsInput {
         apportionment_result: &ApportionmentOutput<'_, PoliticalGroupCandidateVotes>,
         xml_hash: impl Into<String>,
     ) -> Result<PdfModelListCSB, APIError> {
+        let hash = xml_hash.into();
         let creation_date_time = self.created_at.format(DEFAULT_DATE_TIME_FORMAT).to_string();
 
         let results_pdf_filename = self.results_pdf_filename();
         let results_pdf = self.get_p22_2_pdf_file(
             apportionment_result,
-            xml_hash.into(),
-            creation_date_time,
+            hash.clone(),
+            creation_date_time.clone(),
             results_pdf_filename,
+        )?;
+
+        let attachment_pdf_filename = "Model_P22-2_bijlage.pdf".to_string();
+        let attachment_pdf = self.get_p22_2_attachment_1_pdf_file(
+            hash,
+            creation_date_time,
+            attachment_pdf_filename,
         )?;
 
         Ok(PdfModelListCSB {
             results: results_pdf,
+            attachment: attachment_pdf,
         })
     }
 }
@@ -380,6 +407,7 @@ struct PdfModelListGSB {
 
 struct PdfModelListCSB {
     results: PdfFileModel,
+    attachment: PdfFileModel,
 }
 
 fn download_zip_filename(
@@ -520,7 +548,7 @@ async fn generate_and_save_files_csb_election(
     audit_service: &AuditService,
     committee_session: CommitteeSession,
     input: ResultsInput,
-) -> Result<(Option<File>, Option<File>, Option<File>), APIError> {
+) -> Result<(Option<File>, Option<File>, Option<File>, Option<File>), APIError> {
     if input.election.committee_category != CommitteeCategory::CSB {
         return Err(APIError::DataIntegrityError(
             "Generating CSB files can only be done for CSB elections".to_string(),
@@ -577,6 +605,20 @@ async fn generate_and_save_files_csb_election(
     )
     .await?;
 
+    let attachment_pdf = create_file(
+        conn,
+        audit_service,
+        NewFile {
+            committee_session_id: committee_session.id,
+            file_type: FileType::CsbAttachmentPdf,
+            filename: pdf_files.attachment.file_name.clone(),
+            data: generate_pdf(&pdf_files.attachment).await?.buffer,
+            mime_type: PDF_MIME_TYPE.to_string(),
+            created_at,
+        },
+    )
+    .await?;
+
     let total_counts_eml = create_file(
         conn,
         audit_service,
@@ -591,11 +633,17 @@ async fn generate_and_save_files_csb_election(
     )
     .await?;
 
-    let pdf_file: Option<File> = Some(pdf);
-    let eml_results_file: Option<File> = Some(eml_results);
+    let pdf_file = Some(pdf);
+    let attachment_pdf_file = Some(attachment_pdf);
+    let eml_results_file = Some(eml_results);
     let eml_counts_file = Some(total_counts_eml);
 
-    Ok((eml_results_file, pdf_file, eml_counts_file))
+    Ok((
+        eml_results_file,
+        pdf_file,
+        attachment_pdf_file,
+        eml_counts_file,
+    ))
 }
 
 async fn create_file(
@@ -644,17 +692,29 @@ async fn get_existing_gsb_files(
 async fn get_existing_csb_files(
     conn: &mut SqliteConnection,
     committee_session_id: CommitteeSessionId,
-) -> Result<(Option<File>, Option<File>, Option<File>, DateTime<Utc>), APIError> {
+) -> Result<
+    (
+        Option<File>,
+        Option<File>,
+        Option<File>,
+        Option<File>,
+        DateTime<Utc>,
+    ),
+    APIError,
+> {
     let results_eml_file =
         file_repo::get_for_session(conn, committee_session_id, FileType::CsbResultsEml).await?;
     let results_pdf_file =
         file_repo::get_for_session(conn, committee_session_id, FileType::CsbResultsPdf).await?;
+    let attachment_pdf_file =
+        file_repo::get_for_session(conn, committee_session_id, FileType::CsbAttachmentPdf).await?;
     let total_counts_eml_file =
         file_repo::get_for_session(conn, committee_session_id, FileType::CsbTotalCountsEml).await?;
 
-    let created_at = results_pdf_file
+    let created_at = results_eml_file
         .as_ref()
-        .or(results_eml_file.as_ref())
+        .or(results_pdf_file.as_ref())
+        .or(attachment_pdf_file.as_ref())
         .or(total_counts_eml_file.as_ref())
         .map(|f| f.created_at)
         .unwrap_or_else(Utc::now);
@@ -662,6 +722,7 @@ async fn get_existing_csb_files(
     Ok((
         results_eml_file,
         results_pdf_file,
+        attachment_pdf_file,
         total_counts_eml_file,
         created_at,
     ))
@@ -731,7 +792,16 @@ async fn get_files_csb_election(
     pool: &SqlitePool,
     audit_service: AuditService,
     committee_session_id: CommitteeSessionId,
-) -> Result<(Option<File>, Option<File>, Option<File>, DateTime<Utc>), APIError> {
+) -> Result<
+    (
+        Option<File>,
+        Option<File>,
+        Option<File>,
+        Option<File>,
+        DateTime<Utc>,
+    ),
+    APIError,
+> {
     let mut conn = pool.acquire().await?;
     let committee_session = committee_session_repo::get(&mut conn, committee_session_id).await?;
 
@@ -746,13 +816,20 @@ async fn get_files_csb_election(
     }
 
     // Check if files exist, if so, get files from database
-    let (mut results_eml_file, mut results_pdf_file, mut total_counts_eml_file, mut created_at) =
-        get_existing_csb_files(&mut conn, committee_session.id).await?;
+    let (
+        mut results_eml_file,
+        mut results_pdf_file,
+        mut attachment_pdf_file,
+        mut total_counts_eml_file,
+        mut created_at,
+    ) = get_existing_csb_files(&mut conn, committee_session.id).await?;
     drop(conn);
 
     // Determine if we need to generate any of the files
-    let generate_files =
-        results_eml_file.is_none() || results_pdf_file.is_none() || total_counts_eml_file.is_none();
+    let generate_files = results_eml_file.is_none()
+        || results_pdf_file.is_none()
+        || attachment_pdf_file.is_none()
+        || total_counts_eml_file.is_none();
 
     // If one of the files doesn't exist, generate all and save them to the database
     if generate_files {
@@ -764,15 +841,20 @@ async fn get_files_csb_election(
             created_at.with_timezone(&Local),
         )
         .await?;
-        (results_eml_file, results_pdf_file, total_counts_eml_file) =
-            generate_and_save_files_csb_election(&mut tx, &audit_service, committee_session, input)
-                .await?;
+        (
+            results_eml_file,
+            results_pdf_file,
+            attachment_pdf_file,
+            total_counts_eml_file,
+        ) = generate_and_save_files_csb_election(&mut tx, &audit_service, committee_session, input)
+            .await?;
         tx.commit().await?;
     }
 
     Ok((
         results_eml_file,
         results_pdf_file,
+        attachment_pdf_file,
         total_counts_eml_file,
         created_at,
     ))
@@ -940,7 +1022,7 @@ async fn election_download_zip_results_csb(
 
     let election = election_repo::get(&mut conn, election_id).await?;
     let committee_session = committee_session_repo::get(&mut conn, committee_session_id).await?;
-    let (eml_results_file, pdf_file, _, created_at) =
+    let (eml_results_file, pdf_file, _, _, created_at) =
         get_files_csb_election(&pool, audit_service, committee_session.id).await?;
     drop(conn);
 
@@ -961,6 +1043,71 @@ async fn election_download_zip_results_csb(
             let xml_zip_filename = xml_results_zip_filename(&election);
             let xml_zip = zip_single_file(&eml_results_file.name, &eml_results_file.data).await?;
             zip_writer.add_file(&xml_zip_filename, &xml_zip).await?;
+        }
+
+        zip_writer.finish().await?;
+
+        Ok::<(), ZipResponseError>(())
+    });
+
+    Ok(zip_response)
+}
+
+/// Download a zip containing a PDF with model P 22-2 Bijlage 1 for CSB
+#[utoipa::path(
+    get,
+    path = "/api/elections/{election_id}/committee_sessions/{committee_session_id}/download_zip_attachment_csb",
+    responses(
+        (
+            status = 200,
+            description = "ZIP",
+            content_type = "application/zip",
+            headers(
+                ("Content-Disposition", description = "attachment; filename=\"filename.zip\"")
+            )
+        ),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
+        (status = 404, description = "Not found", body = ErrorResponse),
+        (status = 409, description = "Request cannot be completed", body = ErrorResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+    params(
+        ("election_id" = ElectionId, description = "Election database id"),
+        ("committee_session_id" = CommitteeSessionId, description = "Committee session database id"),
+    ),
+)]
+async fn election_download_zip_attachment_csb(
+    user: User,
+    State(pool): State<SqlitePool>,
+    audit_service: AuditService,
+    Path((election_id, committee_session_id)): Path<(ElectionId, CommitteeSessionId)>,
+) -> Result<impl IntoResponse, APIError> {
+    let mut conn = pool.acquire().await?;
+
+    let committee_category =
+        committee_session_repo::get_committee_category(&mut conn, committee_session_id).await?;
+    user.role().is_authorized(&committee_category)?;
+
+    let election = election_repo::get(&mut conn, election_id).await?;
+    let committee_session = committee_session_repo::get(&mut conn, committee_session_id).await?;
+    let (_, _, attachment_pdf_file, _, created_at) =
+        get_files_csb_election(&pool, audit_service, committee_session.id).await?;
+    drop(conn);
+
+    let download_zip_filename = download_zip_filename(
+        &election,
+        created_at.with_timezone(&Local),
+        "model-p22-2-bijlage",
+    );
+
+    let (zip_response, mut zip_writer) = ZipResponse::new(&download_zip_filename);
+
+    tokio::spawn(async move {
+        if let Some(attachment_pdf_file) = attachment_pdf_file {
+            zip_writer
+                .add_file(&attachment_pdf_file.name, &attachment_pdf_file.data)
+                .await?;
         }
 
         zip_writer.finish().await?;
@@ -1009,7 +1156,7 @@ async fn election_download_zip_total_counts_csb(
 
     let election = election_repo::get(&mut conn, election_id).await?;
     let committee_session = committee_session_repo::get(&mut conn, committee_session_id).await?;
-    let (_, _, total_counts_eml_file, created_at) =
+    let (_, _, _, total_counts_eml_file, created_at) =
         get_files_csb_election(&pool, audit_service, committee_session.id).await?;
     drop(conn);
 
@@ -1254,11 +1401,12 @@ mod tests {
 
         // Files should be generated exactly once
         for _ in 1..=2 {
-            let (eml_results, pdf, eml_total_counts, _) =
+            let (eml_results, pdf, attachment_pdf, eml_total_counts, _) =
                 get_files_csb_election(&pool, audit_service.clone(), CommitteeSessionId::from(801))
                     .await
                     .expect("should return files");
             let pdf = pdf.expect("should have generated pdf");
+            let attachment_pdf = attachment_pdf.expect("should have generated attachment pdf");
             let eml_total_counts =
                 eml_total_counts.expect("should have generated total counts eml");
             let eml_results = eml_results.expect("should have generated results eml");
@@ -1269,12 +1417,15 @@ mod tests {
             assert_eq!(pdf.name, "Model_P22-2.pdf");
             assert_eq!(pdf.id, FileId::from(2));
 
+            assert_eq!(attachment_pdf.name, "Model_P22-2_bijlage.pdf");
+            assert_eq!(attachment_pdf.id, FileId::from(3));
+
             assert_eq!(eml_total_counts.name, "Totaaltelling_GR2024_Juinen.eml.xml");
-            assert_eq!(eml_total_counts.id, FileId::from(3));
+            assert_eq!(eml_total_counts.id, FileId::from(4));
 
             assert_eq!(
                 list_event_names(&mut conn).await.unwrap(),
-                ["FileCreated", "FileCreated", "FileCreated"]
+                ["FileCreated", "FileCreated", "FileCreated", "FileCreated"]
             );
         }
     }
@@ -1345,6 +1496,7 @@ mod tests {
             #[rustfmt::skip]
             let results = vec![
                 ("download_zip_results_csb", election_download_zip_results_csb(user.clone(), State(pool.clone()), audit.clone(), Path((election_id, committee_session_id))).await.into_response()),
+                ("download_zip_attachment_csb", election_download_zip_attachment_csb(user.clone(), State(pool.clone()), audit.clone(), Path((election_id, committee_session_id))).await.into_response()),
                 ("download_zip_total_counts_csb", election_download_zip_total_counts_csb(user.clone(), State(pool.clone()), audit.clone(), Path((election_id, committee_session_id))).await.into_response()),
             ];
             results

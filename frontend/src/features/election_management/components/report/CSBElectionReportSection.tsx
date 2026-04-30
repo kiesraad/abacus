@@ -14,7 +14,6 @@ export function CSBElectionReportSection({ election }: CSBElectionReportSectionP
           {t("election_management.CSB.determination_election_results.download", {
             electionName: election.name,
           })}
-          :
         </strong>
       </p>
       <ul>{tx("election_management.CSB.determination_election_results.explanation_text")}</ul>

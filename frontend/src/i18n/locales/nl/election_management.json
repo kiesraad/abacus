@@ -48,19 +48,19 @@
   },
   "CSB": {
     "download_definitive_documents": "Definitieve documenten",
-    "download_definitive_files": "Download de zip bestanden.",
+    "download_definitive_files": "Download de ZIP-bestanden.",
     "download_explanation": "Hierin zitten de volgende documenten:",
     "determination_election_results": {
       "download": "Vaststelling uitslag",
-      "explanation_text": "<li>Proces-verbaal model P 22-2.</li><li>EML_NL telbestand 520 met zetelverdeling.</li>"
+      "explanation_text": "<li>Proces-verbaal model P 22-2</li><li>EML_NL-telbestand 520 met zetelverdeling</li>"
     },
     "p_22_2_attachment": {
       "download": "Model P 22-2 Bijlage 1",
-      "explanation_text": "<li>Bijlage 1 van proces-verbaal P 22-2 met tellingen per lijst en kandidaat.</li>"
+      "explanation_text": "<li>Bijlage 1 van proces-verbaal P 22-2 met tellingen per lijst en kandidaat</li>"
     },
     "definitive_documents": {
-      "download": "Definitieve documenten:",
-      "explanation_text": "<li>EML_NL telbestand 510d met totaaltelling van de gemeente.</li>"
+      "download": "Definitieve documenten",
+      "explanation_text": "<li>EML_NL-telbestand 510d met totaaltelling van de gemeente</li>"
     },
     "upload_the_zip": "Upload alle ZIP-bestanden naar het overdrachtsplatform."
   },

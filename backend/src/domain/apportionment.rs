@@ -35,6 +35,51 @@ pub enum SeatChange {
     ListExhaustionRemoval(ListExhaustionRemovedSeat),
 }
 
+impl SeatChange {
+    /// Returns true if the seat was changed through the largest remainder assignment
+    pub fn is_changed_by_largest_remainder_assignment(&self) -> bool {
+        matches!(self, Self::LargestRemainderAssignment(_))
+    }
+
+    /// Returns true if the seat was changed through the highest average assignment
+    pub fn is_changed_by_highest_average_assignment(&self) -> bool {
+        matches!(self, Self::HighestAverageAssignment(_))
+    }
+
+    /// Returns true if the seat was changed through the unique highest average assignment
+    pub fn is_changed_by_unique_highest_average_assignment(&self) -> bool {
+        matches!(self, Self::UniqueHighestAverageAssignment(_))
+    }
+
+    /// Returns true if the seat was changed through the absolute majority reassignment
+    pub fn is_changed_by_absolute_majority_reassignment(&self) -> bool {
+        matches!(self, Self::AbsoluteMajorityReassignment(_))
+    }
+
+    /// Returns true if the seat was changed through the list exhaustion removal
+    pub fn is_changed_by_list_exhaustion_removal(&self) -> bool {
+        matches!(self, Self::ListExhaustionRemoval(_))
+    }
+
+    pub fn list_number_assigned(&self) -> PGNumber {
+        match self {
+            Self::HighestAverageAssignment(highest_average_assigned_seat) => {
+                highest_average_assigned_seat.selected_list_number
+            }
+            Self::UniqueHighestAverageAssignment(unique_highest_average_assigned_seat) => {
+                unique_highest_average_assigned_seat.selected_list_number
+            }
+            Self::LargestRemainderAssignment(largest_remainder_assigned_seat) => {
+                largest_remainder_assigned_seat.selected_list_number
+            }
+            Self::AbsoluteMajorityReassignment(absolute_majority_reassigned_seat) => {
+                absolute_majority_reassigned_seat.list_assigned_seat
+            }
+            Self::ListExhaustionRemoval(_) => unimplemented!(),
+        }
+    }
+}
+
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct HighestAverageAssignedSeat {
     pub selected_list_number: PGNumber,
@@ -193,7 +238,7 @@ impl From<apportionment::Fraction> for DisplayFraction {
 }
 
 /// Chosen candidate
-#[derive(Debug, Serialize, Deserialize, ToSchema)]
+#[derive(Clone, Debug, Serialize, Deserialize, ToSchema)]
 #[serde(deny_unknown_fields)]
 pub struct ChosenCandidate {
     #[schema(value_type = u32)]

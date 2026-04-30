@@ -10,17 +10,17 @@ use crate::domain::{
 };
 
 pub fn map_seat_assignment(
-    sa: apportionment::SeatAssignmentResult<PoliticalGroupCandidateVotes>,
+    sa: &apportionment::SeatAssignmentResult<PoliticalGroupCandidateVotes>,
 ) -> SeatAssignment {
     SeatAssignment {
         seats: sa.seats,
         full_seats: sa.full_seats,
         residual_seats: sa.residual_seats,
         quota: DisplayFraction::from(sa.quota),
-        steps: sa.steps.into_iter().map(Into::into).collect(),
+        steps: sa.steps.iter().map(Into::into).collect(),
         final_standing: sa
             .final_standing
-            .into_iter()
+            .iter()
             .map(|standing| ListSeatAssignment {
                 list_number: standing.list_number,
                 votes_cast: standing.votes_cast,
@@ -44,7 +44,7 @@ fn sort_candidates_alphabetically(mut candidates: Vec<ChosenCandidate>) -> Vec<C
 }
 
 pub fn map_candidate_nomination(
-    cn: apportionment::CandidateNominationResult<'_, PoliticalGroupCandidateVotes>,
+    cn: &apportionment::CandidateNominationResult<'_, PoliticalGroupCandidateVotes>,
     political_groups: Vec<PoliticalGroup>,
 ) -> CandidateNomination {
     let mut list_names: HashMap<PGNumber, String> = HashMap::new();
@@ -74,7 +74,7 @@ pub fn map_candidate_nomination(
 
     let list_candidate_nomination = cn
         .list_candidate_nomination
-        .into_iter()
+        .iter()
         .map(|lcn| ListCandidateNomination {
             list_number: lcn.list_number,
             list_name: list_names
@@ -83,13 +83,13 @@ pub fn map_candidate_nomination(
             list_seats: lcn.list_seats,
             preferential_candidate_nomination: lcn
                 .preferential_candidate_nomination
-                .into_iter()
-                .copied()
+                .iter()
+                .map(|&&cv| cv)
                 .collect(),
             other_candidate_nomination: lcn
                 .other_candidate_nomination
-                .into_iter()
-                .copied()
+                .iter()
+                .map(|&&cv| cv)
                 .collect(),
             updated_candidate_ranking: lcn
                 .updated_candidate_ranking

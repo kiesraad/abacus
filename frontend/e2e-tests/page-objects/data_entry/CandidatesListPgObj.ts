@@ -10,6 +10,7 @@ export class CandidatesListPage extends DataEntryBasePage {
   readonly next: Locator;
   readonly total: Locator;
 
+  readonly missingTotalError: Locator;
   readonly acceptErrorsAndWarnings: Locator;
   readonly acceptErrorsAndWarningsReminder: Locator;
 
@@ -22,6 +23,10 @@ export class CandidatesListPage extends DataEntryBasePage {
     this.total = page.getByRole("textbox", { name: "Totaal" });
     this.next = page.getByRole("button", { name: "Volgende" });
 
+    this.missingTotalError = page.getByRole("alert").filter({
+      hasText:
+        "Controleer het totaal van de lijst. Is dit veld op het papieren proces-verbaal ook leeg? Dan kan je verdergaan. (F.401)",
+    });
     this.acceptErrorsAndWarnings = page.getByRole("checkbox", {
       name: "Ik heb mijn invoer gecontroleerd met het papier en correct overgenomen.",
     });

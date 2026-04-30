@@ -872,6 +872,87 @@ test.describe("errors and warnings", () => {
     await expect(votersAndVotesPage.acceptErrorsAndWarnings).toBeHidden();
   });
 
+  test("scroll to top when warning/errors, unless accept checkbox or trailing error is visible", async ({
+    page,
+    pollingStation,
+  }) => {
+    await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1`);
+
+    // Fill sections without errors or warnings
+    const extraInvestigationPage = new ExtraInvestigationPage(page);
+    await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
+
+    const countingDifferencesPollingStationPage = new CountingDifferencesPollingStationPage(page);
+    await countingDifferencesPollingStationPage.fillAndClickNext(noDifferences);
+
+    // Fill form with data that results in errors and a warning
+    const votersAndVotesPage = new VotersAndVotesPage(page);
+    const voters = {
+      poll_card_count: 90,
+      proxy_certificate_count: 0,
+      total_admitted_voters_count: 100,
+    };
+    const votes = {
+      political_group_total_votes: [{ number: 1, total: 100 }],
+      total_votes_candidates_count: 100,
+      blank_votes_count: 0,
+      invalid_votes_count: 0,
+      total_votes_cast_count: 50,
+    };
+    await votersAndVotesPage.fillInPageAndClickNext(voters, votes);
+
+    // Expect errors and a warning, should scroll up
+    await expect(votersAndVotesPage.error).toBeInViewport();
+    await expect(votersAndVotesPage.warning).toBeInViewport();
+    await expect(votersAndVotesPage.acceptErrorsAndWarnings).toBeVisible();
+    await expect(votersAndVotesPage.acceptErrorsAndWarnings).not.toBeInViewport();
+    expect(await page.evaluate(() => window.scrollY)).toBe(0);
+
+    // Change input, solving the warning
+    await votersAndVotesPage.totalVotesCastCount.fill("100");
+    // Tab press needed for page to register change after Playwright's fill()
+    await votersAndVotesPage.totalVotesCastCount.press("Tab");
+
+    // Accept errors and warnings checkbox should disappear after input change
+    await expect(votersAndVotesPage.acceptErrorsAndWarnings).toBeHidden();
+
+    await votersAndVotesPage.next.click();
+
+    // Expect only errors, should scroll up again
+    await expect(votersAndVotesPage.error).toBeInViewport();
+    await expect(votersAndVotesPage.warning).toBeHidden();
+    await expect(votersAndVotesPage.acceptErrorsAndWarnings).toBeVisible();
+    await expect(votersAndVotesPage.acceptErrorsAndWarnings).not.toBeInViewport();
+    expect(await page.evaluate(() => window.scrollY)).toBe(0);
+
+    // When clicking next again without changing input, should scroll to accept errors and warnings checkbox
+    await votersAndVotesPage.next.click();
+    await expect(votersAndVotesPage.error).not.toBeInViewport();
+    await expect(votersAndVotesPage.warning).toBeHidden();
+    await expect(votersAndVotesPage.acceptErrorsAndWarnings).toBeInViewport();
+    expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
+
+    // Solve errors and continue to next page
+    await votersAndVotesPage.pollCardCount.fill("100");
+    // Tab press needed for page to register change after Playwright's fill()
+    await votersAndVotesPage.pollCardCount.press("Tab");
+    await votersAndVotesPage.next.click();
+
+    // Fill without errors
+    const differencesPage = new DifferencesPage(page);
+    await differencesPage.fillInPageAndClickNext(noRecountNoDifferencesDataEntry.differences_counts);
+
+    // Trigger error F401
+    const candidatesListPage_1 = new CandidatesListPage(page, 0, "Partijdige Partij");
+    await expect(candidatesListPage_1.fieldset).toBeVisible();
+
+    // Pressing next without entering total should show error F401
+    // That should be in viewport and browser should not scroll to top
+    await candidatesListPage_1.next.click();
+    await expect(candidatesListPage_1.missingTotalError).toBeInViewport();
+    expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
+  });
+
   test("user can accept errors", async ({ page, pollingStation }) => {
     await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1`);
 

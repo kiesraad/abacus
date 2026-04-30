@@ -438,6 +438,7 @@ fn xml_results_zip_filename(election: &ElectionWithPoliticalGroups) -> String {
     ))
 }
 
+#[expect(clippy::too_many_lines)]
 async fn generate_and_save_files_gsb_election(
     conn: &mut SqliteConnection,
     audit_service: &AuditService,
@@ -445,6 +446,12 @@ async fn generate_and_save_files_gsb_election(
     corrections: bool,
     input: ResultsInput,
 ) -> Result<(Option<File>, Option<File>, Option<File>), APIError> {
+    if input.election.committee_category != CommitteeCategory::GSB {
+        return Err(APIError::DataIntegrityError(
+            "Generating GSB files can only be done for GSB elections".to_string(),
+        ));
+    }
+
     let mut eml_file: Option<File> = None;
     let mut pdf_file: Option<File> = None;
     let mut overview_pdf_file: Option<File> = None;
@@ -1258,7 +1265,7 @@ mod tests {
             let pdf = pdf.expect("should have generated pdf");
             let eml_total_counts =
                 eml_total_counts.expect("should have generated total counts eml");
-            let eml_results = eml_results.expect("should have generated eml");
+            let eml_results = eml_results.expect("should have generated results eml");
 
             assert_eq!(eml_results.name, "Resultaat_GR2024_Juinen.eml.xml");
             assert_eq!(eml_results.id, FileId::from(1));

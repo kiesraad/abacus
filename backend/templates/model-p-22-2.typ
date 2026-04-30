@@ -300,7 +300,7 @@ Na toewijzing van de volle zetels blijft een aantal te verdelen zetels over. Dit
 
     #let pgs_meeting_threshold = input.enriched_seat_assignment.list_seat_assignment.filter(
     (list_seat_assignment) => 
-    list_seat_assignment.keys().contains("largest_remainder_column"));
+    list_seat_assignment.keys().contains("largest_remainder_row"));
     #table(
       columns: (1fr, 10em, 8em, 10em),
       stroke: (x, y) => (
@@ -320,8 +320,8 @@ Na toewijzing van de volle zetels blijft een aantal te verdelen zetels over. Dit
         (
           table.cell(format_political_group_name(list_seat_assignment.number, list_seat_assignment.name, with_prefix: "only_list_number")),
           table.cell(align: right, [#list_seat_assignment.initial_full_seats]),
-          table.cell(align: right, format_fraction(list_seat_assignment.largest_remainder_column.remainder_votes)),
-          table.cell(align: right, [#list_seat_assignment.largest_remainder_column.residual_seats])
+          table.cell(align: right, format_fraction(list_seat_assignment.largest_remainder_row.remainder_votes)),
+          table.cell(align: right, [#list_seat_assignment.largest_remainder_row.residual_seats])
         )
       ).flatten(),
       table.hline(stroke: 1pt + black),
@@ -363,7 +363,7 @@ Na toewijzing van de volle zetels blijft een aantal te verdelen zetels over. Dit
   
   #let list_seat_assignment_with_unique_highest_average = input.enriched_seat_assignment.list_seat_assignment.filter(
     (list_seat_assignment) => 
-    list_seat_assignment.keys().contains("unique_highest_average_column"))
+    list_seat_assignment.keys().contains("unique_highest_average_row"))
   #if input.election.number_of_seats < LARGE_COUNCIL_THRESHOLD and list_seat_assignment_with_unique_highest_average.len() > 0 [
     #pagebreak(weak: true)
     
@@ -388,9 +388,9 @@ Na toewijzing van de volle zetels blijft een aantal te verdelen zetels over. Dit
       ..list_seat_assignment_with_unique_highest_average.map((list_seat_assignment) => {
           (
             table.cell(format_political_group_name(list_seat_assignment.number, list_seat_assignment.name, with_prefix: "only_list_number")),
-            table.cell(align: right, str(list_seat_assignment.unique_highest_average_column.already_assigned_seats)),
-            table.cell(align: right, format_fraction(list_seat_assignment.unique_highest_average_column.next_votes_per_seat)),
-            table.cell(align: right, [#list_seat_assignment.unique_highest_average_column.residual_seats])
+            table.cell(align: right, str(list_seat_assignment.unique_highest_average_row.already_assigned_seats)),
+            table.cell(align: right, format_fraction(list_seat_assignment.unique_highest_average_row.next_votes_per_seat)),
+            table.cell(align: right, [#list_seat_assignment.unique_highest_average_row.residual_seats])
           )
         }
       ).flatten(),

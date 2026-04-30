@@ -760,7 +760,7 @@
         "name": "Political Group A",
         "total": 2571,
         "initial_full_seats": 7,
-        "largest_remainder_column": {
+        "largest_remainder_row": {
           "remainder_votes": {
             "integer": 189,
             "numerator": 2,
@@ -774,7 +774,7 @@
         "name": "Political Group B",
         "total": 977,
         "initial_full_seats": 2,
-        "largest_remainder_column": {
+        "largest_remainder_row": {
           "remainder_votes": {
             "integer": 296,
             "numerator": 7,
@@ -788,7 +788,7 @@
         "name": "Political Group C",
         "total": 567,
         "initial_full_seats": 1,
-        "largest_remainder_column": {
+        "largest_remainder_row": {
           "remainder_votes": {
             "integer": 226,
             "numerator": 11,
@@ -802,7 +802,7 @@
         "name": "Political Group D",
         "total": 536,
         "initial_full_seats": 1,
-        "largest_remainder_column": {
+        "largest_remainder_row": {
           "remainder_votes": {
             "integer": 195,
             "numerator": 11,
@@ -816,7 +816,7 @@
         "name": "Blanco (Jacobse, F.)",
         "total": 453,
         "initial_full_seats": 1,
-        "largest_remainder_column": {
+        "largest_remainder_row": {
           "remainder_votes": {
             "integer": 112,
             "numerator": 11,

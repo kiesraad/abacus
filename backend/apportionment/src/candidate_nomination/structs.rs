@@ -17,7 +17,7 @@ pub struct ListCandidateNomination<'a, T: ListVotes> {
 }
 
 /// Contains the preference threshold as a percentage and as a fraction of the number of votes.
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub struct PreferenceThreshold {
     /// Preference threshold as a percentage (0 to 100)
     pub percentage: u64,
@@ -25,8 +25,8 @@ pub struct PreferenceThreshold {
     pub number_of_votes: Fraction,
 }
 
-/// The result of the candidate nomination procedure.  
-/// This contains the preference threshold and percentage that was used.  
+/// The result of the candidate nomination procedure.
+/// This contains the preference threshold and percentage that was used.
 /// It contains a list of all chosen candidates.
 /// It also contains the preferential nomination of candidates, the remaining
 /// nomination of candidates and the final ranking of candidates for each list.

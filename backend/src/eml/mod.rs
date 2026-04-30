@@ -3,6 +3,7 @@ use std::num::NonZeroU64;
 mod error;
 pub mod hash;
 
+use apportionment::CandidateNominationResult;
 use chrono::{DateTime, Local, Utc};
 use eml_nl::{
     EMLError,
@@ -21,6 +22,9 @@ use eml_nl::{
             ReportingUnitVotesBuilder, UncountedVotesReason,
         },
         election_definition::{ElectionDefinition, ElectionDefinitionRegisteredParty},
+        election_result::{
+            ElectionResult, ElectionResultContest, ElectionResultSelection, RankingType, YesNoType,
+        },
         polling_stations::{PollingPlace, PollingStations, PollingStationsContest},
     },
     io::{EMLParsingMode, EMLRead as _},
@@ -665,6 +669,118 @@ impl ElectionWithPoliticalGroups {
         builder = add_reporting_unit_investigations(builder, committee_session, results);
         builder.build()
     }
+
+    pub fn as_result_eml(
+        &self,
+        transaction_id: Option<u64>,
+        timestamp: DateTime<Utc>,
+        nominations: &CandidateNominationResult<PoliticalGroupCandidateVotes>,
+    ) -> Result<ElectionResult, EMLError> {
+        ElectionResult::builder()
+            .transaction_id(transaction_id.unwrap_or(1))
+            .managing_authority(ManagingAuthority::new(
+                AuthorityIdentifier::new(AuthorityId::new(&self.domain_id)?)
+                    .with_name(&self.location),
+            ))
+            .creation_date_time(timestamp)
+            .election_identifier(
+                self.get_eml_election_identifier_builder()?
+                    .build_for_result()?,
+            )
+            .contests([self.as_eml_result_contest(nominations)?])
+            .build()
+    }
+
+    fn as_eml_result_contest(
+        &self,
+        nominations: &CandidateNominationResult<PoliticalGroupCandidateVotes>,
+    ) -> Result<ElectionResultContest, EMLError> {
+        let mut selections = vec![];
+        for pg in &self.political_groups {
+            let pg_nominations = nominations
+                .list_candidate_nomination
+                .iter()
+                .find(|lcn| lcn.list_number == pg.number && lcn.list_seats > 0);
+
+            if let Some(pg_nominations) = pg_nominations {
+                selections.push(
+                    ElectionResultSelection::builder()
+                        .affiliation(
+                            eml_nl::documents::election_result::AffiliationSelection::new(
+                                AffiliationId::new(pg.number.as_internal_u32().to_string())?,
+                                &pg.registered_name,
+                            ),
+                        )
+                        .elected(YesNoType::new(true))
+                        .ranking(RankingType::First)
+                        .build()?,
+                );
+
+                for can in &pg.candidates {
+                    let non_preferentially_selected = pg_nominations
+                        .other_candidate_nomination
+                        .iter()
+                        .any(|&cv| cv.number == can.number);
+                    let preferentially_selected = pg_nominations
+                        .preferential_candidate_nomination
+                        .iter()
+                        .any(|&cv| cv.number == can.number);
+                    let can_selected = non_preferentially_selected || preferentially_selected;
+
+                    if can_selected {
+                        selections.push(build_candidate_result(can, preferentially_selected)?);
+                    }
+                }
+            }
+        }
+        Ok(ElectionResultContest::new(
+            ContestIdentifier::geen(),
+            selections,
+        ))
+    }
+}
+
+fn build_candidate_result(
+    can: &Candidate,
+    preferentially_selected: bool,
+) -> Result<ElectionResultSelection, EMLError> {
+    ElectionResultSelection::builder()
+        .candidate({
+            let mut builder = eml_nl::documents::election_result::CandidateSelection::builder()
+                .identifier(CandidateId::new(can.number.as_internal_u32().to_string())?)
+                .name(
+                    PersonName::new(&can.last_name)
+                        .with_first_name_option(can.first_name.clone())
+                        .with_initials_option(if can.initials.is_empty() {
+                            None
+                        } else {
+                            Some(can.initials.clone())
+                        })
+                        .with_name_prefix_option(can.last_name_prefix.clone()),
+                );
+
+            if let Some(gender) = can.gender {
+                builder = builder.gender(match gender {
+                    CandidateGender::Female => Gender::Female,
+                    CandidateGender::Male => Gender::Male,
+                    CandidateGender::X => Gender::Unknown,
+                });
+            }
+
+            builder = builder.locality_name(can.locality.clone());
+            if let Some(country_code) = &can.country_code {
+                builder = builder.country_name_code(country_code.clone());
+            }
+
+            builder.build()?
+        })
+        .elected(YesNoType::new(true))
+        .ranking(if preferentially_selected {
+            RankingType::First
+        } else {
+            RankingType::Second
+        })
+        .build()
 }
 
 fn add_reporting_unit_investigations(

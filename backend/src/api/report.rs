@@ -1,3 +1,4 @@
+use apportionment::ApportionmentOutput;
 use axum::{
     extract::{Path, State},
     response::IntoResponse,
@@ -34,7 +35,7 @@ use crate::{
             votes_table::{VotesTables, VotesTablesWithPreviousVotes},
         },
         polling_station::PollingStation,
-        results::Results,
+        results::{Results, political_group_candidate_votes::PoliticalGroupCandidateVotes},
         role::Role,
         summary::{ElectionSummary, ElectionSummaryCSB},
     },
@@ -128,10 +129,12 @@ impl ResultsInput {
             None
         };
 
+        let summary = ElectionSummary::from_results(&election, &results)?;
+
         Ok(ResultsInput {
             committee_session,
             previous_summary,
-            summary: ElectionSummary::from_results(&election, &results)?,
+            summary,
             created_at,
             election,
             polling_stations,
@@ -158,6 +161,18 @@ impl ResultsInput {
         slugify_filename(&format!(
             "{} {}{} {}.eml.xml",
             xml_count_base_name(&self.election),
+            self.election.category.to_eml_code(),
+            self.election.election_date.year(),
+            location_without_whitespace
+        ))
+    }
+
+    fn xml_results_filename(&self) -> String {
+        use chrono::Datelike;
+        let location_without_whitespace: String =
+            self.election.location.split_whitespace().collect();
+        slugify_filename(&format!(
+            "Resultaat {}{} {}.eml.xml",
             self.election.category.to_eml_code(),
             self.election.election_date.year(),
             location_without_whitespace
@@ -210,24 +225,21 @@ impl ResultsInput {
 
     fn get_p22_2_pdf_file(
         &self,
+        apportionment_result: &ApportionmentOutput<'_, PoliticalGroupCandidateVotes>,
         hash: String,
         creation_date_time: String,
         filename: String,
     ) -> Result<PdfFileModel, APIError> {
-        let apportionment_input = ApportionmentInputData {
-            number_of_seats: self.election.number_of_seats,
-            list_votes: &self.summary.political_group_votes,
-        };
-        let result = apportionment::process(&apportionment_input)?;
         let summary = ElectionSummaryCSB::new(&self.summary, &self.election.political_groups);
-        let seat_assignment = map_seat_assignment(result.seat_assignment);
+        let seat_assignment = map_seat_assignment(&apportionment_result.seat_assignment);
         let initial_full_seats_table = InitialFullSeatsTable::new(&summary, &seat_assignment)?;
         let total_seats_table =
             TotalSeatsTable::new(&seat_assignment, &self.election.political_groups)?;
         let candidate_nomination = map_candidate_nomination(
-            result.candidate_nomination,
+            &apportionment_result.candidate_nomination,
             self.election.political_groups.clone(),
         );
+
         let enriched_candidate_nomination =
             EnrichedCandidateNomination::new(&self.election, &candidate_nomination)?;
         let pdf_file: PdfFileModel = ModelP22_2Input {
@@ -275,17 +287,17 @@ impl ResultsInput {
     }
 
     fn get_na31_2_pdf_file(
-        self,
+        &self,
         hash: String,
         creation_date_time: String,
         results_pdf_filename: String,
     ) -> Result<PdfFileModel, APIError> {
         let pdf_file: PdfFileModel = ModelNa31_2Input {
             votes_tables: VotesTables::new(&self.election, &self.summary)?,
-            committee_session: self.committee_session,
-            polling_stations: self.polling_stations,
-            summary: self.summary.into(),
-            election: self.election.into(),
+            committee_session: self.committee_session.clone(),
+            polling_stations: self.polling_stations.clone(),
+            summary: self.summary.clone().into(),
+            election: self.election.clone().into(),
             hash,
             creation_date_time,
         }
@@ -293,8 +305,8 @@ impl ResultsInput {
         Ok(pdf_file)
     }
 
-    fn into_pdf_file_models_gsb(
-        self,
+    fn as_pdf_file_models_gsb(
+        &self,
         xml_hash: impl Into<String>,
     ) -> Result<PdfModelListGSB, APIError> {
         let hash = xml_hash.into();
@@ -337,16 +349,18 @@ impl ResultsInput {
         })
     }
 
-    fn into_pdf_file_models_csb(
-        self,
-        // xml_hash: impl Into<String>,
+    fn as_pdf_file_models_csb(
+        &self,
+        apportionment_result: &ApportionmentOutput<'_, PoliticalGroupCandidateVotes>,
+        xml_hash: impl Into<String>,
     ) -> Result<PdfModelListCSB, APIError> {
         // let hash = xml_hash.into();
         let creation_date_time = self.created_at.format(DEFAULT_DATE_TIME_FORMAT).to_string();
 
         let results_pdf_filename = self.results_pdf_filename();
         let results_pdf = self.get_p22_2_pdf_file(
-            "TODO: hash string".to_string(),
+            apportionment_result,
+            xml_hash.into(),
             creation_date_time,
             results_pdf_filename,
         )?;
@@ -413,6 +427,17 @@ fn xml_zip_filename(election: &ElectionWithPoliticalGroups) -> String {
     ))
 }
 
+fn xml_results_zip_filename(election: &ElectionWithPoliticalGroups) -> String {
+    use chrono::Datelike;
+    let location_without_whitespace: String = election.location.split_whitespace().collect();
+    slugify_filename(&format!(
+        "Resultaat {}{} {}.zip",
+        election.category.to_eml_code(),
+        election.election_date.year(),
+        location_without_whitespace
+    ))
+}
+
 async fn generate_and_save_files_gsb_election(
     conn: &mut SqliteConnection,
     audit_service: &AuditService,
@@ -428,7 +453,7 @@ async fn generate_and_save_files_gsb_election(
 
     let xml_hash = EmlHash::from(xml_string.as_bytes());
     let xml_filename = input.xml_filename();
-    let pdf_files = input.into_pdf_file_models_gsb(xml_hash)?;
+    let pdf_files = input.as_pdf_file_models_gsb(xml_hash)?;
 
     // For the first session, or if there are corrections, we also store the EML and count PDF
     // For next sessions without corrections, we don't store these
@@ -487,20 +512,55 @@ async fn generate_and_save_files_gsb_election(
     Ok((eml_file, pdf_file, overview_pdf_file))
 }
 
+#[expect(clippy::too_many_lines)]
 async fn generate_and_save_files_csb_election(
     conn: &mut SqliteConnection,
     audit_service: &AuditService,
     committee_session: CommitteeSession,
     input: ResultsInput,
 ) -> Result<(Option<File>, Option<File>, Option<File>), APIError> {
-    let eml_file: Option<File> = None;
+    if input.election.committee_category != CommitteeCategory::CSB {
+        return Err(APIError::DataIntegrityError(
+            "Generating CSB files can only be done for CSB elections".to_string(),
+        ));
+    }
+
     let created_at = input.created_at.with_timezone(&Utc);
-    // TODO: Add EML file type to 520 in issue #3110
 
-    let xml_string = input.as_xml()?.write_eml_root_str(true, true)?;
-    let xml_filename = input.xml_filename();
+    let xml_counts_string = input.as_xml()?.write_eml_root_str(true, true)?;
+    let xml_counts_filename = input.xml_filename();
 
-    let pdf_files = input.into_pdf_file_models_csb()?;
+    let apportionment_input = ApportionmentInputData {
+        number_of_seats: input.election.number_of_seats,
+        list_votes: &input.summary.political_group_votes,
+    };
+    let apportionment_result = apportionment::process(&apportionment_input)?;
+
+    let eml_results_data = input.election.as_result_eml(
+        None,
+        created_at,
+        &apportionment_result.candidate_nomination,
+    )?;
+    let xml_results_string = eml_results_data.write_eml_root_str(true, true)?;
+    let xml_results_hash = EmlHash::from(xml_results_string.as_bytes());
+    let xml_results_filename = input.xml_results_filename();
+
+    let pdf_files = input.as_pdf_file_models_csb(&apportionment_result, xml_results_hash)?;
+
+    let eml_results = create_file(
+        conn,
+        audit_service,
+        NewFile {
+            committee_session_id: committee_session.id,
+            file_type: FileType::CsbResultsEml,
+            filename: xml_results_filename,
+            data: xml_results_string.into_bytes(),
+            mime_type: EML_MIME_TYPE.to_string(),
+            created_at,
+        },
+    )
+    .await?;
+
     let pdf = create_file(
         conn,
         audit_service,
@@ -521,8 +581,8 @@ async fn generate_and_save_files_csb_election(
         NewFile {
             committee_session_id: committee_session.id,
             file_type: FileType::CsbTotalCountsEml,
-            filename: xml_filename,
-            data: xml_string.into_bytes(),
+            filename: xml_counts_filename,
+            data: xml_counts_string.into_bytes(),
             mime_type: EML_MIME_TYPE.to_string(),
             created_at,
         },
@@ -530,9 +590,10 @@ async fn generate_and_save_files_csb_election(
     .await?;
 
     let pdf_file: Option<File> = Some(pdf);
-    let total_counts_eml_file: Option<File> = Some(total_counts_eml);
+    let eml_results_file: Option<File> = Some(eml_results);
+    let eml_counts_file = Some(total_counts_eml);
 
-    Ok((eml_file, pdf_file, total_counts_eml_file))
+    Ok((eml_results_file, pdf_file, eml_counts_file))
 }
 
 async fn create_file(
@@ -581,7 +642,9 @@ async fn get_existing_gsb_files(
 async fn get_existing_csb_files(
     conn: &mut SqliteConnection,
     committee_session_id: CommitteeSessionId,
-) -> Result<(Option<File>, Option<File>, DateTime<Utc>), APIError> {
+) -> Result<(Option<File>, Option<File>, Option<File>, DateTime<Utc>), APIError> {
+    let results_eml_file =
+        file_repo::get_for_session(conn, committee_session_id, FileType::CsbResultsEml).await?;
     let results_pdf_file =
         file_repo::get_for_session(conn, committee_session_id, FileType::CsbResultsPdf).await?;
     let total_counts_eml_file =
@@ -593,7 +656,12 @@ async fn get_existing_csb_files(
         .map(|f| f.created_at)
         .unwrap_or_else(Utc::now);
 
-    Ok((results_pdf_file, total_counts_eml_file, created_at))
+    Ok((
+        results_eml_file,
+        results_pdf_file,
+        total_counts_eml_file,
+        created_at,
+    ))
 }
 
 async fn get_files_gsb_election(
@@ -660,7 +728,7 @@ async fn get_files_csb_election(
     pool: &SqlitePool,
     audit_service: AuditService,
     committee_session_id: CommitteeSessionId,
-) -> Result<(Option<File>, Option<File>, DateTime<Utc>), APIError> {
+) -> Result<(Option<File>, Option<File>, Option<File>, DateTime<Utc>), APIError> {
     let mut conn = pool.acquire().await?;
     let committee_session = committee_session_repo::get(&mut conn, committee_session_id).await?;
 
@@ -675,12 +743,13 @@ async fn get_files_csb_election(
     }
 
     // Check if files exist, if so, get files from database
-    let (mut results_pdf_file, mut total_counts_eml_file, mut created_at) =
+    let (mut results_eml_file, mut results_pdf_file, mut total_counts_eml_file, mut created_at) =
         get_existing_csb_files(&mut conn, committee_session.id).await?;
     drop(conn);
 
     // Determine if we need to generate any of the files
-    let generate_files = results_pdf_file.is_none() || total_counts_eml_file.is_none();
+    let generate_files =
+        results_eml_file.is_none() || results_pdf_file.is_none() || total_counts_eml_file.is_none();
 
     // If one of the files doesn't exist, generate all and save them to the database
     if generate_files {
@@ -692,13 +761,18 @@ async fn get_files_csb_election(
             created_at.with_timezone(&Local),
         )
         .await?;
-        (_, results_pdf_file, total_counts_eml_file) =
+        (results_eml_file, results_pdf_file, total_counts_eml_file) =
             generate_and_save_files_csb_election(&mut tx, &audit_service, committee_session, input)
                 .await?;
         tx.commit().await?;
     }
 
-    Ok((results_pdf_file, total_counts_eml_file, created_at))
+    Ok((
+        results_eml_file,
+        results_pdf_file,
+        total_counts_eml_file,
+        created_at,
+    ))
 }
 
 /// Download a zip containing a PDF for the PV and the EML with GSB election results
@@ -863,7 +937,7 @@ async fn election_download_zip_results_csb(
 
     let election = election_repo::get(&mut conn, election_id).await?;
     let committee_session = committee_session_repo::get(&mut conn, committee_session_id).await?;
-    let (pdf_file, _, created_at) =
+    let (eml_results_file, pdf_file, _, created_at) =
         get_files_csb_election(&pool, audit_service, committee_session.id).await?;
     drop(conn);
 
@@ -878,6 +952,12 @@ async fn election_download_zip_results_csb(
     tokio::spawn(async move {
         if let Some(pdf_file) = pdf_file {
             zip_writer.add_file(&pdf_file.name, &pdf_file.data).await?;
+        }
+
+        if let Some(eml_results_file) = eml_results_file {
+            let xml_zip_filename = xml_results_zip_filename(&election);
+            let xml_zip = zip_single_file(&eml_results_file.name, &eml_results_file.data).await?;
+            zip_writer.add_file(&xml_zip_filename, &xml_zip).await?;
         }
 
         zip_writer.finish().await?;
@@ -926,7 +1006,7 @@ async fn election_download_zip_total_counts_csb(
 
     let election = election_repo::get(&mut conn, election_id).await?;
     let committee_session = committee_session_repo::get(&mut conn, committee_session_id).await?;
-    let (_, total_counts_eml_file, created_at) =
+    let (_, _, total_counts_eml_file, created_at) =
         get_files_csb_election(&pool, audit_service, committee_session.id).await?;
     drop(conn);
 
@@ -1171,23 +1251,27 @@ mod tests {
 
         // Files should be generated exactly once
         for _ in 1..=2 {
-            let (pdf, eml_total_counts, _) =
+            let (eml_results, pdf, eml_total_counts, _) =
                 get_files_csb_election(&pool, audit_service.clone(), CommitteeSessionId::from(801))
                     .await
                     .expect("should return files");
             let pdf = pdf.expect("should have generated pdf");
             let eml_total_counts =
                 eml_total_counts.expect("should have generated total counts eml");
+            let eml_results = eml_results.expect("should have generated eml");
+
+            assert_eq!(eml_results.name, "Resultaat_GR2024_Juinen.eml.xml");
+            assert_eq!(eml_results.id, FileId::from(1));
 
             assert_eq!(pdf.name, "Model_P22-2.pdf");
-            assert_eq!(pdf.id, FileId::from(1));
+            assert_eq!(pdf.id, FileId::from(2));
 
             assert_eq!(eml_total_counts.name, "Totaaltelling_GR2024_Juinen.eml.xml");
-            assert_eq!(eml_total_counts.id, FileId::from(2));
+            assert_eq!(eml_total_counts.id, FileId::from(3));
 
             assert_eq!(
                 list_event_names(&mut conn).await.unwrap(),
-                ["FileCreated", "FileCreated"]
+                ["FileCreated", "FileCreated", "FileCreated"]
             );
         }
     }

@@ -22,6 +22,8 @@ pub enum FileType {
     CsbResultsPdf,
     /// CSB total counts EML (510d)
     CsbTotalCountsEml,
+    /// CSB results EML (520)
+    CsbResultsEml,
 }
 
 /// File

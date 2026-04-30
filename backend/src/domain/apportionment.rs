@@ -109,16 +109,16 @@ pub struct ListCandidateNomination {
     pub updated_candidate_ranking: Vec<Candidate>,
 }
 
-impl From<apportionment::SeatChange<PGNumber>> for SeatChange {
-    fn from(change: apportionment::SeatChange<PGNumber>) -> Self {
+impl From<&apportionment::SeatChange<PGNumber>> for SeatChange {
+    fn from(change: &apportionment::SeatChange<PGNumber>) -> Self {
         use apportionment::SeatChange::*;
 
         let as_highest_avg =
-            |c: apportionment::HighestAverageAssignedSeat<PGNumber>| HighestAverageAssignedSeat {
+            |c: &apportionment::HighestAverageAssignedSeat<PGNumber>| HighestAverageAssignedSeat {
                 selected_list_number: c.selected_list_number,
-                list_options: c.list_options,
-                list_assigned: c.list_assigned,
-                list_exhausted: c.list_exhausted,
+                list_options: c.list_options.clone(),
+                list_assigned: c.list_assigned.clone(),
+                list_exhausted: c.list_exhausted.clone(),
                 votes_per_seat: DisplayFraction::from(c.votes_per_seat),
             };
 
@@ -130,8 +130,8 @@ impl From<apportionment::SeatChange<PGNumber>> for SeatChange {
             LargestRemainderAssignment(c) => {
                 SeatChange::LargestRemainderAssignment(LargestRemainderAssignedSeat {
                     selected_list_number: c.selected_list_number,
-                    list_options: c.list_options,
-                    list_assigned: c.list_assigned,
+                    list_options: c.list_options.clone(),
+                    list_assigned: c.list_assigned.clone(),
                     remainder_votes: DisplayFraction::from(c.remainder_votes),
                 })
             }
@@ -151,14 +151,14 @@ impl From<apportionment::SeatChange<PGNumber>> for SeatChange {
     }
 }
 
-impl From<apportionment::SeatChangeStep<PGNumber>> for SeatChangeStep {
-    fn from(step: apportionment::SeatChangeStep<PGNumber>) -> Self {
+impl From<&apportionment::SeatChangeStep<PGNumber>> for SeatChangeStep {
+    fn from(step: &apportionment::SeatChangeStep<PGNumber>) -> Self {
         SeatChangeStep {
             residual_seat_number: step.residual_seat_number,
-            change: step.change.into(),
+            change: (&step.change).into(),
             standings: step
                 .standings
-                .into_iter()
+                .iter()
                 .map(|standing| ListStanding {
                     list_number: standing.list_number,
                     votes_cast: standing.votes_cast,

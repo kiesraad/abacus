@@ -86,9 +86,9 @@ pub async fn election_apportionment(
             .await?;
 
         Ok(Json(ElectionApportionmentResponse {
-            seat_assignment: map_seat_assignment(result.seat_assignment),
+            seat_assignment: map_seat_assignment(&result.seat_assignment),
             candidate_nomination: map_candidate_nomination(
-                result.candidate_nomination,
+                &result.candidate_nomination,
                 election.political_groups,
             ),
             election_summary: summary,

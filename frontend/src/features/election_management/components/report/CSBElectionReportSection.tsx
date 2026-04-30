@@ -22,7 +22,6 @@ export function CSBElectionReportSection({ election }: CSBElectionReportSectionP
           {t("election_management.CSB.p_22_2_attachment.download", {
             electionName: election.name,
           })}
-          :
         </strong>
       </p>
       <ul>{tx("election_management.CSB.p_22_2_attachment.explanation_text")}</ul>

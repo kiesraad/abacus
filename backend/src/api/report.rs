@@ -354,7 +354,6 @@ impl ResultsInput {
         apportionment_result: &ApportionmentOutput<'_, PoliticalGroupCandidateVotes>,
         xml_hash: impl Into<String>,
     ) -> Result<PdfModelListCSB, APIError> {
-        // let hash = xml_hash.into();
         let creation_date_time = self.created_at.format(DEFAULT_DATE_TIME_FORMAT).to_string();
 
         let results_pdf_filename = self.results_pdf_filename();
@@ -659,6 +658,7 @@ async fn get_existing_csb_files(
 
     let created_at = results_pdf_file
         .as_ref()
+        .or(results_eml_file.as_ref())
         .or(total_counts_eml_file.as_ref())
         .map(|f| f.created_at)
         .unwrap_or_else(Utc::now);

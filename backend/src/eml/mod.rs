@@ -776,9 +776,9 @@ fn build_candidate_result(
         })
         .elected(YesNoType::new(true))
         .ranking(if preferentially_selected {
-            RankingType::Second
-        } else {
             RankingType::First
+        } else {
+            RankingType::Second
         })
         .build()
 }

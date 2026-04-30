@@ -21,7 +21,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: Setup Node
-        uses: actions/setup-node@v6.3.0
+        uses: actions/setup-node@v6.4.0
         with:
           node-version: 24
           package-manager-cache: false
@@ -98,7 +98,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: Setup Node
-        uses: actions/setup-node@v6.3.0
+        uses: actions/setup-node@v6.4.0
         with:
           node-version: 24
           package-manager-cache: false

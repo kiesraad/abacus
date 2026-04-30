@@ -372,7 +372,7 @@
         "name": "Blanco (Smit, G.)",
         "total": 50,
         "initial_full_seats": 5,
-        "largest_remainder_row": {
+        "largest_remainder": {
           "remainder_votes": {
             "integer": 0,
             "numerator": 0,

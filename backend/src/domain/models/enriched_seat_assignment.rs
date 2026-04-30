@@ -80,35 +80,35 @@ impl EnrichedSeatAssignment {
         }
     }
 
-    fn get_largest_remainder_rows(
+    fn get_largest_remainders(
         seat_assignment: &SeatAssignment,
         initial_largest_remainder_steps: &[&SeatChangeStep],
-    ) -> Vec<(PGNumber, LargestRemainderRow)> {
+    ) -> Vec<(PGNumber, LargestRemainder)> {
         let final_standing_pgs_meeting_threshold: Vec<&ListSeatAssignment> = seat_assignment
             .final_standing
             .iter()
             .filter(|list_seat_assignment| list_seat_assignment.meets_remainder_threshold)
             .collect();
-        let mut columns = Vec::new();
+        let mut largest_remainders = Vec::new();
         for standing in final_standing_pgs_meeting_threshold.iter() {
             let assigned_seat = initial_largest_remainder_steps
                 .iter()
                 .find(|step| step.change.list_number_assigned() == standing.list_number);
-            let largest_remainder_row = LargestRemainderRow {
+            let largest_remainder = LargestRemainder {
                 remainder_votes: standing.remainder_votes.clone(),
                 residual_seats: if assigned_seat.is_some() { 1 } else { 0 },
             };
-            columns.push((standing.list_number, largest_remainder_row));
+            largest_remainders.push((standing.list_number, largest_remainder));
         }
-        columns
+        largest_remainders
     }
 
-    fn get_unique_highest_average_row(
+    fn get_unique_highest_average(
         list_number: PGNumber,
         initial_full_seats: u32,
-        largest_remainder_row: &Option<LargestRemainderRow>,
+        largest_remainder: &Option<LargestRemainder>,
         initial_unique_highest_average_steps: &[&SeatChangeStep],
-    ) -> Option<UniqueHighestAverageRow> {
+    ) -> Option<UniqueHighestAverage> {
         if !initial_unique_highest_average_steps.is_empty() {
             let assigned_seat = initial_unique_highest_average_steps
                 .iter()
@@ -122,15 +122,15 @@ impl EnrichedSeatAssignment {
                 .expect("Standing exists for each list")
                 .next_votes_per_seat;
             let mut already_assigned_seats = initial_full_seats;
-            if let Some(column) = largest_remainder_row.clone() {
-                already_assigned_seats += column.residual_seats
+            if let Some(largest_remainder_details) = largest_remainder.clone() {
+                already_assigned_seats += largest_remainder_details.residual_seats
             };
-            let unique_highest_average_row = UniqueHighestAverageRow {
+            let unique_highest_average = UniqueHighestAverage {
                 already_assigned_seats,
                 next_votes_per_seat: average.clone(),
                 residual_seats: u32::from(assigned_seat.is_some()),
             };
-            Some(unique_highest_average_row)
+            Some(unique_highest_average)
         } else {
             None
         }
@@ -140,39 +140,39 @@ impl EnrichedSeatAssignment {
         summary: &ElectionSummaryCSB,
         seat_assignment: &SeatAssignment,
     ) -> Result<(u32, Vec<EnrichedListSeatAssignment>), APIError> {
-        let mut columns = Vec::new();
+        let mut enriched_list_seat_assignments = Vec::new();
         let mut initial_total_full_seats = 0;
 
         let initial_steps = get_initial_steps(seat_assignment);
-        let largest_remainder_rows = Self::get_largest_remainder_rows(
+        let largest_remainders = Self::get_largest_remainders(
             seat_assignment,
             &initial_steps.initial_largest_remainder_steps,
         );
 
         for pg_votes in summary.votes_counts.political_group_total_votes.iter() {
             let initial_full_seats = Self::get_initial_full_seats(seat_assignment, pg_votes.number);
-            let largest_remainder_row = largest_remainder_rows
+            let largest_remainder = largest_remainders
                 .iter()
                 .find(|(pg_number, _)| *pg_number == pg_votes.number)
-                .map(|(_, column)| column.clone());
-            let unique_highest_average_row = Self::get_unique_highest_average_row(
+                .map(|(_, largest_remainder)| largest_remainder.clone());
+            let unique_highest_average = Self::get_unique_highest_average(
                 pg_votes.number,
                 initial_full_seats,
-                &largest_remainder_row,
+                &largest_remainder,
                 &initial_steps.initial_unique_highest_average_steps,
             );
             initial_total_full_seats += initial_full_seats;
 
-            columns.push(EnrichedListSeatAssignment {
+            enriched_list_seat_assignments.push(EnrichedListSeatAssignment {
                 number: pg_votes.number,
                 name: pg_votes.name.clone(),
                 total: pg_votes.total,
                 initial_full_seats,
-                largest_remainder_row,
-                unique_highest_average_row,
+                largest_remainder,
+                unique_highest_average,
             })
         }
-        Ok((initial_total_full_seats, columns))
+        Ok((initial_total_full_seats, enriched_list_seat_assignments))
     }
 
     pub fn new(
@@ -180,11 +180,11 @@ impl EnrichedSeatAssignment {
         summary: &ElectionSummaryCSB,
         seat_assignment: &SeatAssignment,
     ) -> Result<Self, APIError> {
-        let (initial_total_full_seats, columns) =
+        let (initial_total_full_seats, enriched_list_seat_assignments) =
             Self::get_list_seat_assignment(summary, seat_assignment)?;
         Ok(EnrichedSeatAssignment {
             quota: seat_assignment.quota.clone(),
-            list_seat_assignment: columns,
+            list_seat_assignment: enriched_list_seat_assignments,
             initial_total_full_seats,
             initial_total_residual_seats: number_of_seats - initial_total_full_seats,
         })
@@ -201,16 +201,16 @@ pub struct EnrichedListSeatAssignment {
     total: u32,
     /// Political group initial full seats
     initial_full_seats: u32,
-    /// Political group largest remainder row if threshold was met
+    /// Political group largest remainder details if threshold was met
     #[serde(skip_serializing_if = "Option::is_none")]
-    largest_remainder_row: Option<LargestRemainderRow>,
-    /// Political group unique highest average row
+    largest_remainder: Option<LargestRemainder>,
+    /// Political group unique highest average details
     #[serde(skip_serializing_if = "Option::is_none")]
-    unique_highest_average_row: Option<UniqueHighestAverageRow>,
+    unique_highest_average: Option<UniqueHighestAverage>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct LargestRemainderRow {
+pub struct LargestRemainder {
     /// The remainder of votes that was not used to get full seats
     remainder_votes: DisplayFraction,
     /// Political group assigned residual seats
@@ -218,7 +218,7 @@ pub struct LargestRemainderRow {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct UniqueHighestAverageRow {
+pub struct UniqueHighestAverage {
     /// Political group already assigned seats
     already_assigned_seats: u32,
     /// The number of votes per seat if a new seat would be added to the current residual seats

@@ -1321,7 +1321,7 @@
         "name": "Political Group A",
         "total": 808,
         "initial_full_seats": 10,
-        "largest_remainder_row": {
+        "largest_remainder": {
           "remainder_votes": {
             "integer": 8,
             "numerator": 0,
@@ -1329,7 +1329,7 @@
           },
           "residual_seats": 1
         },
-        "unique_highest_average_row": {
+        "unique_highest_average": {
           "already_assigned_seats": 11,
           "next_votes_per_seat": {
             "integer": 67,
@@ -1344,7 +1344,7 @@
         "name": "Political Group B",
         "total": 60,
         "initial_full_seats": 0,
-        "largest_remainder_row": {
+        "largest_remainder": {
           "remainder_votes": {
             "integer": 60,
             "numerator": 0,
@@ -1352,7 +1352,7 @@
           },
           "residual_seats": 1
         },
-        "unique_highest_average_row": {
+        "unique_highest_average": {
           "already_assigned_seats": 1,
           "next_votes_per_seat": {
             "integer": 30,
@@ -1367,7 +1367,7 @@
         "name": "Political Group C",
         "total": 58,
         "initial_full_seats": 0,
-        "unique_highest_average_row": {
+        "unique_highest_average": {
           "already_assigned_seats": 0,
           "next_votes_per_seat": {
             "integer": 58,
@@ -1382,7 +1382,7 @@
         "name": "Political Group D",
         "total": 57,
         "initial_full_seats": 0,
-        "unique_highest_average_row": {
+        "unique_highest_average": {
           "already_assigned_seats": 0,
           "next_votes_per_seat": {
             "integer": 57,
@@ -1397,7 +1397,7 @@
         "name": "Blanco (Smit, G.)",
         "total": 56,
         "initial_full_seats": 0,
-        "unique_highest_average_row": {
+        "unique_highest_average": {
           "already_assigned_seats": 0,
           "next_votes_per_seat": {
             "integer": 56,
@@ -1412,7 +1412,7 @@
         "name": "Political Group F",
         "total": 55,
         "initial_full_seats": 0,
-        "unique_highest_average_row": {
+        "unique_highest_average": {
           "already_assigned_seats": 0,
           "next_votes_per_seat": {
             "integer": 55,
@@ -1427,7 +1427,7 @@
         "name": "Political Group G",
         "total": 54,
         "initial_full_seats": 0,
-        "unique_highest_average_row": {
+        "unique_highest_average": {
           "already_assigned_seats": 0,
           "next_votes_per_seat": {
             "integer": 54,
@@ -1442,7 +1442,7 @@
         "name": "Political Group H",
         "total": 52,
         "initial_full_seats": 0,
-        "unique_highest_average_row": {
+        "unique_highest_average": {
           "already_assigned_seats": 0,
           "next_votes_per_seat": {
             "integer": 52,

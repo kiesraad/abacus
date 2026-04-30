@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import { useSearchParams } from "react-router";
 
 import { useInitialApiGet } from "@/api/useInitialApiGet";
-import type { AUDIT_LOG_LIST_REQUEST_PATH, AuditLogEvent, AuditLogListResponse } from "@/types/generated/openapi";
+import type { AUDIT_LOG_LIST_REQUEST_PATH, AuditLogListResponse } from "@/types/generated/openapi";
 
 import { clearEmptySince, getLogFilterOptionsFromSearchParams, hasLogFilters } from "../utils/searchParamFilter";
 import type { LogFilterName } from "./useLogFilterOptions";
@@ -22,16 +22,11 @@ export interface LogFilterState {
 export function useAuditLog() {
   const path: AUDIT_LOG_LIST_REQUEST_PATH = "/api/log";
   const [searchParams, setSearchParams] = useSearchParams();
-  const [pagination, setPagination] = useState<Pagination | null>(null);
-  const [events, setEvents] = useState<AuditLogEvent[]>([]);
   const { requestState } = useInitialApiGet<AuditLogListResponse>(`${path}?${searchParams}`);
   const [showFilter, setShowFilter] = useState(hasLogFilters(searchParams));
-  const [filterState, setFilterState] = useState<LogFilterState>(getLogFilterOptionsFromSearchParams(searchParams));
 
-  // Set the filter state based on the search params
-  useEffect(() => {
-    setFilterState(getLogFilterOptionsFromSearchParams(searchParams));
-  }, [searchParams]);
+  // Get filter options based on the search params
+  const filterState = useMemo(() => getLogFilterOptionsFromSearchParams(searchParams), [searchParams]);
 
   // Set the "since" date time filter
   const setSince = (since: string) => {
@@ -48,16 +43,13 @@ export function useAuditLog() {
     setSearchParams({ ...newFilterState });
   };
 
-  // Assign current state based on request result
-  useEffect(() => {
-    if (requestState.status === "success") {
-      setEvents(requestState.data.events);
-      setPagination({
-        page: requestState.data.page,
-        totalPages: requestState.data.pages,
-      });
-    }
-  }, [requestState]);
+  // Get events and pagination info
+  const events = requestState.status === "success" ? requestState.data.events : [];
+  const pagination = useMemo<Pagination | null>(
+    () =>
+      requestState.status === "success" ? { page: requestState.data.page, totalPages: requestState.data.pages } : null,
+    [requestState],
+  );
 
   // Paginate and keep filter values
   const onPageChange = (page: number) => {

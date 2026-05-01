@@ -59,78 +59,7 @@
     "number_of_seats": 6,
     "election_date": "2026-03-18",
     "nomination_date": "2026-02-02",
-    "number_of_voters": 100,
-    "political_groups": [
-      {
-        "number": 1,
-        "name": "Political Group A",
-        "registered_name": "Political Group A",
-        "candidates": [
-          {
-            "number": 1,
-            "initials": "L.",
-            "first_name": "Lidewij",
-            "last_name": "Oud",
-            "locality": "Test Location",
-            "gender": "Female"
-          },
-          {
-            "number": 2,
-            "initials": "J.",
-            "first_name": "Johan",
-            "last_name": "Oud",
-            "locality": "Test Location",
-            "gender": "Male"
-          }
-        ]
-      },
-      {
-        "number": 2,
-        "name": "Political Group B",
-        "registered_name": "Political Group B",
-        "candidates": [
-          {
-            "number": 1,
-            "initials": "T.",
-            "first_name": "Tinus",
-            "last_name": "Bakker",
-            "locality": "Test Location",
-            "gender": "Male",
-            "country_code": "BE"
-          },
-          {
-            "number": 2,
-            "initials": "D.",
-            "last_name": "Po",
-            "locality": "Test Location",
-            "gender": "X"
-          }
-        ]
-      },
-      {
-        "number": 3,
-        "name": "Blanco (Smit, G.)",
-        "registered_name": "",
-        "candidates": [
-          {
-            "number": 1,
-            "initials": "G.",
-            "first_name": "Gert",
-            "last_name": "Smit",
-            "locality": "Test Location",
-            "gender": "Male"
-          },
-          {
-            "number": 2,
-            "initials": "E.",
-            "first_name": "Eva",
-            "last_name": "Koster",
-            "locality": "Test Location",
-            "gender": "Female"
-          }
-        ]
-      }
-    ]
+    "number_of_voters": 100
   },
   "candidate_nomination": {
     "chosen_candidates": [

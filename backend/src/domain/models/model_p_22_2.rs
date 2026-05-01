@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::domain::{
     committee_session::CommitteeSession,
-    election::{Election, ElectionWithPoliticalGroups},
+    election::Election,
     models::{
         PdfFileModel, PdfModel, ToPdfFileModel,
         enriched_candidate_nomination::EnrichedCandidateNomination,
@@ -25,7 +25,7 @@ pub struct ResultChange {
 #[serde(deny_unknown_fields)]
 pub struct ModelP22_2Input {
     pub committee_session: CommitteeSession,
-    pub election: ElectionWithPoliticalGroups,
+    pub election: Election,
     pub summary: ElectionSummaryCSB,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub footnotes: Option<Footnotes>,

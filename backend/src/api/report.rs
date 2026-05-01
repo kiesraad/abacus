@@ -244,7 +244,7 @@ impl ResultsInput {
         let footnotes = Footnotes::new(&self.election.political_groups, &seat_assignment)?;
         let pdf_file: PdfFileModel = ModelP22_2Input {
             committee_session: self.committee_session.clone(),
-            election: self.election.clone(),
+            election: self.election.clone().into(),
             summary,
             footnotes,
             enriched_seat_assignment,

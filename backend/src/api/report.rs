@@ -247,11 +247,8 @@ impl ResultsInput {
             election: self.election.clone(),
             summary,
             footnotes,
-            seat_assignment,
             enriched_seat_assignment,
             candidate_nomination: enriched_candidate_nomination,
-            result_changes_full_seats: vec![],
-            result_changes_residual_seats: vec![],
             hash,
             creation_date_time,
         }

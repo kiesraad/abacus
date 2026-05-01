@@ -267,9 +267,7 @@ pub async fn election_number_of_voters_change(
     } else {
         tx.rollback().await?;
 
-        Err(APIError::CommitteeSession(
-            CommitteeSessionError::InvalidCommitteeSessionStatus,
-        ))
+        Err(CommitteeSessionError::InvalidCommitteeSessionStatus.into())
     }
 }
 

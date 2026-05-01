@@ -1,15 +1,20 @@
 use axum::{
     Json,
+    http::StatusCode,
     response::{IntoResponse, Response},
 };
 use chrono::NaiveDateTime;
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, Type};
+use tracing::error;
 use utoipa::ToSchema;
 
-use crate::domain::{
-    committee_session_status::CommitteeSessionStatus, election::ElectionId, identifier::id,
-    investigation::PollingStationInvestigation,
+use crate::{
+    domain::{
+        committee_session_status::CommitteeSessionStatus, election::ElectionId, identifier::id,
+        investigation::PollingStationInvestigation,
+    },
+    error::{ApiErrorResponse, ErrorReference, ErrorResponse, error_response},
 };
 
 #[derive(Debug, PartialEq, Eq)]
@@ -19,6 +24,49 @@ pub enum CommitteeSessionError {
     InvalidDetails,
     InvalidStatusTransition,
     ProviderError,
+}
+
+impl ApiErrorResponse for CommitteeSessionError {
+    fn log(&self) {
+        error!("Committee session status error: {:?}", self);
+    }
+
+    fn to_response_parts(&self) -> (StatusCode, ErrorResponse) {
+        match self {
+            CommitteeSessionError::CommitteeSessionPaused => (
+                StatusCode::CONFLICT,
+                error_response(
+                    "Committee session data entry is paused",
+                    ErrorReference::CommitteeSessionPaused,
+                    true,
+                ),
+            ),
+            CommitteeSessionError::InvalidCommitteeSessionStatus => (
+                StatusCode::CONFLICT,
+                error_response(
+                    "Invalid committee session status",
+                    ErrorReference::InvalidCommitteeSessionStatus,
+                    true,
+                ),
+            ),
+            CommitteeSessionError::InvalidDetails => (
+                StatusCode::BAD_REQUEST,
+                error_response("Invalid details", ErrorReference::InvalidData, false),
+            ),
+            CommitteeSessionError::InvalidStatusTransition => (
+                StatusCode::CONFLICT,
+                error_response(
+                    "Invalid committee session state transition",
+                    ErrorReference::InvalidStateTransition,
+                    true,
+                ),
+            ),
+            CommitteeSessionError::ProviderError => (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                error_response("Internal server error", ErrorReference::DatabaseError, true),
+            ),
+        }
+    }
 }
 
 id!(CommitteeSessionId);

@@ -29,7 +29,7 @@ use crate::{
 
 impl From<AuthenticationError> for APIError {
     fn from(err: AuthenticationError) -> Self {
-        APIError::Authentication(err)
+        APIError::Delegated(Box::new(err))
     }
 }
 #[derive(Serialize)]
@@ -537,12 +537,12 @@ mod tests {
     async fn test_initialised(pool: SqlitePool) {
         let result = initialised(State(pool.clone())).await;
 
-        assert!(matches!(
-            result,
-            Err(APIError::Authentication(
-                AuthenticationError::NotInitialised
-            ))
-        ));
+        let Err(api_error) = result else {
+            panic!("expected NotInitialised error");
+        };
+        let response = api_error.into_response();
+        let error_response = response.extensions().get::<ErrorResponse>().unwrap();
+        assert_eq!(error_response.reference, ErrorReference::NotInitialised);
 
         // Create an admin user to mark the application as initialised
         let mut conn = pool.acquire().await.unwrap();

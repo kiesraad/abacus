@@ -142,9 +142,7 @@ pub async fn committee_session_create(
         Ok((StatusCode::CREATED, next_committee_session))
     } else {
         tx.rollback().await?;
-        Err(APIError::CommitteeSession(
-            CommitteeSessionError::InvalidCommitteeSessionStatus,
-        ))
+        Err(CommitteeSessionError::InvalidCommitteeSessionStatus.into())
     }
 }
 
@@ -213,9 +211,7 @@ pub async fn committee_session_delete(
     } else {
         tx.rollback().await?;
 
-        Err(APIError::CommitteeSession(
-            CommitteeSessionError::InvalidCommitteeSessionStatus,
-        ))
+        Err(CommitteeSessionError::InvalidCommitteeSessionStatus.into())
     }
 }
 
@@ -249,18 +245,14 @@ pub async fn committee_session_update(
         .is_authorized(&get_committee_category(&mut tx, committee_session_id).await?)?;
 
     if request.location.is_empty() {
-        return Err(APIError::CommitteeSession(
-            CommitteeSessionError::InvalidDetails,
-        ));
+        return Err(CommitteeSessionError::InvalidDetails.into());
     }
 
     let date_time_str = format!("{}T{}", &request.start_date, &request.start_time);
     let date_time = match NaiveDateTime::parse_from_str(&date_time_str, "%Y-%m-%dT%H:%M") {
         Ok(date) => date,
         Err(_) => {
-            return Err(APIError::CommitteeSession(
-                CommitteeSessionError::InvalidDetails,
-            ));
+            return Err(CommitteeSessionError::InvalidDetails.into());
         }
     };
 

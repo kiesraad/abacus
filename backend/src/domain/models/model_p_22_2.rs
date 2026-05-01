@@ -29,7 +29,7 @@ pub struct ModelP22_2Input {
     pub summary: ElectionSummaryCSB,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub footnotes: Option<Footnotes>,
-    pub enriched_seat_assignment: EnrichedSeatAssignment,
+    pub seat_assignment: EnrichedSeatAssignment,
     pub candidate_nomination: EnrichedCandidateNomination,
     pub hash: String,
     pub creation_date_time: String,

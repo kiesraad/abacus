@@ -247,7 +247,7 @@ impl ResultsInput {
             election: self.election.clone().into(),
             summary,
             footnotes,
-            enriched_seat_assignment,
+            seat_assignment: enriched_seat_assignment,
             candidate_nomination: enriched_candidate_nomination,
             hash,
             creation_date_time,

@@ -226,7 +226,7 @@ Met de kiesdeler wordt de zetelverdeling bepaald. De kiesdeler is het aantal ste
   table.cell(align: center, [÷]),
   table.cell(align: center, [#input.election.number_of_seats]),
   table.cell(align: center, [=]),
-  table.cell(format_fraction(input.enriched_seat_assignment.quota)),
+  table.cell(format_fraction(input.seat_assignment.quota)),
 )
 
 #pagebreak(weak: true)
@@ -242,7 +242,7 @@ Hieronder is berekend hoe vaak elke lijst qua stemmenaantal de kiesdeler heeft g
     top: if y > 0 { 0.5pt + gray },
   ),
   inset: (x: 4pt, y: 8pt),
-  fill: (_, y) => if y > 1 and y <= input.enriched_seat_assignment.list_seat_assignment.len() and calc.even(y) { luma(245) },
+  fill: (_, y) => if y > 1 and y <= input.seat_assignment.list_seat_assignment.len() and calc.even(y) { luma(245) },
   table.header(
     table.cell(header_text([Lijst])),
     table.cell(align: right, header_text([Aantal stemmen])),
@@ -250,11 +250,11 @@ Hieronder is berekend hoe vaak elke lijst qua stemmenaantal de kiesdeler heeft g
     table.cell(stroke: none, align: right, header_text([Volle zetels])),
   ),
   table.hline(stroke: 1pt + black),
-  ..for column in input.enriched_seat_assignment.list_seat_assignment {
+  ..for column in input.seat_assignment.list_seat_assignment {
     (
       table.cell(format_political_group_name(column.number, column.name, with_prefix: "only_list_number")),
       table.cell(align: right, [#column.total]),
-      table.cell(align: center, [÷ #format_fraction(input.enriched_seat_assignment.quota) =]),
+      table.cell(align: center, [÷ #format_fraction(input.seat_assignment.quota) =]),
       table.cell(align: right, [#column.initial_full_seats])
     )
   }.flatten(),
@@ -262,7 +262,7 @@ Hieronder is berekend hoe vaak elke lijst qua stemmenaantal de kiesdeler heeft g
   table.cell(header_text([Totaal])),
   table.cell(align: right, header_text([#input.summary.votes_counts.total_votes_candidates_count])),
   table.cell(stroke: none, []),
-  table.cell(stroke: none, align: right, header_text([#input.enriched_seat_assignment.initial_total_full_seats])),
+  table.cell(stroke: none, align: right, header_text([#input.seat_assignment.initial_total_full_seats])),
 )
 
 #pagebreak(weak: true)
@@ -279,17 +279,17 @@ Na toewijzing van de volle zetels blijft een aantal te verdelen zetels over. Dit
     value: input.election.number_of_seats,
   )[Totaal aantal te verdelen zetels],
   number_box(
-    value: input.enriched_seat_assignment.initial_total_full_seats,
+    value: input.seat_assignment.initial_total_full_seats,
   )[Toegewezen volle zetels],
   number_box(
-    value: input.enriched_seat_assignment.initial_total_residual_seats,
+    value: input.seat_assignment.initial_total_residual_seats,
   )[*Aantal restzetels*],
 )
 
 === Verdeling van de restzetels
 
-#let initial_highest_average_steps = if input.enriched_seat_assignment.keys().contains("initial_highest_average_steps") { input.enriched_seat_assignment.initial_highest_average_steps } else { () };
-#if input.enriched_seat_assignment.initial_total_residual_seats > 0 [
+#let initial_highest_average_steps = if input.seat_assignment.keys().contains("initial_highest_average_steps") { input.seat_assignment.initial_highest_average_steps } else { () };
+#if input.seat_assignment.initial_total_residual_seats > 0 [
   #if input.election.number_of_seats < LARGE_COUNCIL_THRESHOLD [
     - Het #location_type berekent hoeveel stemmen elke lijst overhoudt na toekenning van de volle zetels. Dat is het 'overschot' aan stemmen voor die lijst.
     - Het #location_type verdeelt de restzetels, in volgorde van de grootste overschotten. Elke lijst kan maar één restzetel krijgen. Alleen lijsten die ten minste 75% van de kiesdeler hebben behaald kunnen een restzetel krijgen.
@@ -298,7 +298,7 @@ Na toewijzing van de volle zetels blijft een aantal te verdelen zetels over. Dit
 
     #pagebreak(weak: true)
 
-    #let pgs_meeting_threshold = input.enriched_seat_assignment.list_seat_assignment.filter(
+    #let pgs_meeting_threshold = input.seat_assignment.list_seat_assignment.filter(
     (list_seat_assignment) => 
     list_seat_assignment.keys().contains("largest_remainder"));
     #table(
@@ -337,7 +337,7 @@ Na toewijzing van de volle zetels blijft een aantal te verdelen zetels over. Dit
 
     #pagebreak(weak: true)
   
-    #highest_averages_table(initial_highest_average_steps, input.enriched_seat_assignment.list_seat_assignment)
+    #highest_averages_table(initial_highest_average_steps, input.seat_assignment.list_seat_assignment)
   ]
 
   #v(15pt)
@@ -356,7 +356,7 @@ Na toewijzing van de volle zetels blijft een aantal te verdelen zetels over. Dit
     }
   }
   
-  #let list_seat_assignment_with_unique_highest_average = input.enriched_seat_assignment.list_seat_assignment.filter(
+  #let list_seat_assignment_with_unique_highest_average = input.seat_assignment.list_seat_assignment.filter(
     (list_seat_assignment) => 
     list_seat_assignment.keys().contains("unique_highest_average"))
   #if input.election.number_of_seats < LARGE_COUNCIL_THRESHOLD and list_seat_assignment_with_unique_highest_average.len() > 0 [
@@ -399,7 +399,7 @@ Na toewijzing van de volle zetels blijft een aantal te verdelen zetels over. Dit
       } else {
         [Hierna waren er nog #initial_highest_average_steps.len() restzetels te verdelen. Deze zetels zijn toegewezen aan de lijsten die met een zetel erbij het grootste gemiddelde aantal stemmen per zetel zouden hebben.]
       }
-      #highest_averages_table(initial_highest_average_steps, input.enriched_seat_assignment.list_seat_assignment)
+      #highest_averages_table(initial_highest_average_steps, input.seat_assignment.list_seat_assignment)
     ]
   ]
 ] else [

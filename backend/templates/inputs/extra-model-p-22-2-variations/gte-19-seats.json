@@ -924,7 +924,7 @@
       }
     ]
   },
-  "enriched_seat_assignment": {
+  "seat_assignment": {
     "quota": {
       "integer": 52,
       "numerator": 4,

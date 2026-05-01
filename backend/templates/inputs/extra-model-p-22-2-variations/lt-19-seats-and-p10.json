@@ -277,7 +277,7 @@
       }
     ]
   },
-  "enriched_seat_assignment": {
+  "seat_assignment": {
     "quota": {
       "integer": 10,
       "numerator": 0,

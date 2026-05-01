@@ -75,15 +75,15 @@ impl SeatChange {
             Self::AbsoluteMajorityReassignment(absolute_majority_reassigned_seat) => {
                 absolute_majority_reassigned_seat.list_assigned_seat
             }
-            Self::ListExhaustionRemoval(_) => unimplemented!(),
+            Self::ListExhaustionRemoval(_) => unreachable!(),
         }
     }
 
     pub fn list_number_retracted(&self) -> PGNumber {
         match self {
-            Self::HighestAverageAssignment(_) => unimplemented!(),
-            Self::UniqueHighestAverageAssignment(_) => unimplemented!(),
-            Self::LargestRemainderAssignment(_) => unimplemented!(),
+            Self::HighestAverageAssignment(_) => unreachable!(),
+            Self::UniqueHighestAverageAssignment(_) => unreachable!(),
+            Self::LargestRemainderAssignment(_) => unreachable!(),
             Self::AbsoluteMajorityReassignment(absolute_majority_reassigned_seat) => {
                 absolute_majority_reassigned_seat.list_retracted_seat
             }

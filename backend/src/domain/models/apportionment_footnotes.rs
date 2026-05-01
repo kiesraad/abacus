@@ -1,3 +1,5 @@
+use std::collections::BTreeSet;
+
 use serde::{Deserialize, Serialize};
 
 use crate::{
@@ -64,27 +66,23 @@ impl ApportionmentFootnotes {
         list_exhaustion_steps: Vec<&SeatChangeStep>,
         political_groups: &[PoliticalGroup],
     ) -> Option<Vec<ExhaustedList>> {
-        let mut unique_exhausted_list_numbers = Vec::new();
-        let mut exhausted_lists = Vec::new();
+        let mut exhausted_lists = BTreeSet::new();
         for step in list_exhaustion_steps {
             let pg_number = step.change.list_number_retracted();
-            if !unique_exhausted_list_numbers.contains(&pg_number) {
-                unique_exhausted_list_numbers.push(pg_number);
-                exhausted_lists.push(ExhaustedList {
-                    number: pg_number,
-                    name: political_groups
-                        .iter()
-                        .find(|pg| pg.number == pg_number)
-                        .expect("political group should exist")
-                        .name
-                        .clone(),
-                })
-            }
+            exhausted_lists.insert(ExhaustedList {
+                number: pg_number,
+                name: political_groups
+                    .iter()
+                    .find(|pg| pg.number == pg_number)
+                    .expect("political group should exist")
+                    .name
+                    .clone(),
+            });
         }
         if exhausted_lists.is_empty() {
             None
         } else {
-            Some(exhausted_lists)
+            Some(Vec::from_iter(exhausted_lists))
         }
     }
 
@@ -118,7 +116,7 @@ pub struct AbsoluteMajority {
     name: String,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Eq, PartialEq, Ord, PartialOrd)]
 pub struct ExhaustedList {
     /// Political group number
     number: PGNumber,

@@ -196,9 +196,14 @@ impl EnrichedSeatAssignment {
         Ok(EnrichedSeatAssignment {
             quota: seat_assignment.quota.clone(),
             list_seat_assignment: list_seat_assignments.enriched_list_seat_assignments,
-            initial_highest_average_steps: Some(
-                list_seat_assignments.initial_highest_average_steps,
-            ),
+            initial_highest_average_steps: if list_seat_assignments
+                .initial_highest_average_steps
+                .is_empty()
+            {
+                None
+            } else {
+                Some(list_seat_assignments.initial_highest_average_steps)
+            },
             initial_total_full_seats: list_seat_assignments.initial_total_full_seats,
             initial_total_residual_seats: number_of_seats
                 - list_seat_assignments.initial_total_full_seats,

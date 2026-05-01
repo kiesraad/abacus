@@ -20,6 +20,8 @@ pub enum FileType {
     GsbOverviewPdf,
     /// CSB results PDF (Model P 22-2)
     CsbResultsPdf,
+    /// CSB attachment PDF (Model P 22-2 Bijlage 1)
+    CsbAttachmentPdf,
     /// CSB total counts EML (510d)
     CsbTotalCountsEml,
     /// CSB results EML (520)

@@ -288,7 +288,7 @@ Na toewijzing van de volle zetels blijft een aantal te verdelen zetels over. Dit
 
 === Verdeling van de restzetels
 
-#let highest_averages_steps = input.seat_assignment.steps.filter(step => step.change.changed_by == "HighestAverageAssignment")
+#let initial_highest_average_steps = if input.enriched_seat_assignment.keys().contains("initial_highest_average_steps") { input.enriched_seat_assignment.initial_highest_average_steps } else { () };
 #if input.enriched_seat_assignment.initial_total_residual_seats > 0 [
   #if input.election.number_of_seats < LARGE_COUNCIL_THRESHOLD [
     - Het #location_type berekent hoeveel stemmen elke lijst overhoudt na toekenning van de volle zetels. Dat is het 'overschot' aan stemmen voor die lijst.
@@ -336,10 +336,8 @@ Na toewijzing van de volle zetels blijft een aantal te verdelen zetels over. Dit
     Als meerdere lijsten gelijke gemiddelden hebben en er niet voldoende restzetels zijn voor toekenning ervan aan die lijsten, wordt geloot welke lijst de restzetel krijgt.
 
     #pagebreak(weak: true)
-
-    #TODO[marking of selected average does not work yet]
   
-    #highest_averages_table(highest_averages_steps, input.seat_assignment.final_standing, input.election.political_groups, input.result_changes_residual_seats)
+    #highest_averages_table(initial_highest_average_steps, input.enriched_seat_assignment.list_seat_assignment)
   ]
 
   #v(15pt)
@@ -397,14 +395,14 @@ Na toewijzing van de volle zetels blijft een aantal te verdelen zetels over. Dit
       table.hline(stroke: 1pt + black),
     )
     
-    #if highest_averages_steps.len() > 0 [
+    #if initial_highest_average_steps.len() > 0 [
       #v(8pt)
-      #if highest_averages_steps.len() == 1 {
-        [Hierna was er nog #highest_averages_steps.len() restzetel te verdelen. Deze zetel is toegewezen aan de lijst die met een zetel erbij het grootste gemiddelde aantal stemmen per zetel zou hebben.]
+      #if initial_highest_average_steps.len() == 1 {
+        [Hierna was er nog #initial_highest_average_steps.len() restzetel te verdelen. Deze zetel is toegewezen aan de lijst die met een zetel erbij het grootste gemiddelde aantal stemmen per zetel zou hebben.]
       } else {
-        [Hierna waren er nog #highest_averages_steps.len() restzetels te verdelen. Deze zetels zijn toegewezen aan de lijsten die met een zetel erbij het grootste gemiddelde aantal stemmen per zetel zouden hebben.]
+        [Hierna waren er nog #initial_highest_average_steps.len() restzetels te verdelen. Deze zetels zijn toegewezen aan de lijsten die met een zetel erbij het grootste gemiddelde aantal stemmen per zetel zouden hebben.]
       }
-      #highest_averages_table(highest_averages_steps, input.seat_assignment.final_standing, input.election.political_groups, ())
+      #highest_averages_table(initial_highest_average_steps, input.enriched_seat_assignment.list_seat_assignment)
     ]
   ]
 ] else [

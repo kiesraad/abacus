@@ -12,7 +12,7 @@ use crate::{
 struct InitialSteps<'a> {
     initial_largest_remainder_steps: Vec<&'a SeatChangeStep>,
     initial_unique_highest_average_steps: Vec<&'a SeatChangeStep>,
-    //initial_highest_average_assigned_seats: Vec<&'a SeatChangeStep>,
+    initial_highest_average_steps: Vec<SeatChangeStep>,
 }
 
 /// Retrieves [SeatChangeStep]s of type LargestRemainderAssignment/UniqueHighestAverageAssignment
@@ -20,7 +20,7 @@ struct InitialSteps<'a> {
 fn get_initial_steps(seat_assignment: &SeatAssignment) -> InitialSteps<'_> {
     let mut initial_largest_remainder_steps = vec![];
     let mut initial_unique_highest_average_steps = vec![];
-    //let mut initial_highest_average_assigned_seats = vec![];
+    let mut initial_highest_average_steps = vec![];
     for step in &seat_assignment.steps {
         if step.change.is_changed_by_largest_remainder_assignment() {
             initial_largest_remainder_steps.push(step);
@@ -31,9 +31,9 @@ fn get_initial_steps(seat_assignment: &SeatAssignment) -> InitialSteps<'_> {
         {
             initial_unique_highest_average_steps.push(step);
         }
-        // if step.change.is_changed_by_highest_average_assignment() {
-        //     initial_highest_average_assigned_seats.push(step);
-        // }
+        if step.change.is_changed_by_highest_average_assignment() {
+            initial_highest_average_steps.push(step.clone());
+        }
         // We stop when an absolute majority reassignment or list exhaustion removal step is found,
         // since this means all initial residual seat assignment steps are found
         if step.change.is_changed_by_absolute_majority_reassignment()
@@ -45,7 +45,7 @@ fn get_initial_steps(seat_assignment: &SeatAssignment) -> InitialSteps<'_> {
     InitialSteps {
         initial_largest_remainder_steps,
         initial_unique_highest_average_steps,
-        //initial_highest_average_assigned_seats,
+        initial_highest_average_steps,
     }
 }
 
@@ -53,8 +53,16 @@ fn get_initial_steps(seat_assignment: &SeatAssignment) -> InitialSteps<'_> {
 pub struct EnrichedSeatAssignment {
     quota: DisplayFraction,
     list_seat_assignment: Vec<EnrichedListSeatAssignment>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    initial_highest_average_steps: Option<Vec<SeatChangeStep>>,
     initial_total_full_seats: u32,
     initial_total_residual_seats: u32,
+}
+
+struct ListSeatAssignments {
+    initial_total_full_seats: u32,
+    enriched_list_seat_assignments: Vec<EnrichedListSeatAssignment>,
+    initial_highest_average_steps: Vec<SeatChangeStep>,
 }
 
 impl EnrichedSeatAssignment {
@@ -136,10 +144,10 @@ impl EnrichedSeatAssignment {
         }
     }
 
-    fn get_list_seat_assignment(
+    fn get_list_seat_assignments(
         summary: &ElectionSummaryCSB,
         seat_assignment: &SeatAssignment,
-    ) -> Result<(u32, Vec<EnrichedListSeatAssignment>), APIError> {
+    ) -> Result<ListSeatAssignments, APIError> {
         let mut enriched_list_seat_assignments = Vec::new();
         let mut initial_total_full_seats = 0;
 
@@ -172,7 +180,11 @@ impl EnrichedSeatAssignment {
                 unique_highest_average,
             })
         }
-        Ok((initial_total_full_seats, enriched_list_seat_assignments))
+        Ok(ListSeatAssignments {
+            initial_total_full_seats,
+            enriched_list_seat_assignments,
+            initial_highest_average_steps: initial_steps.initial_highest_average_steps,
+        })
     }
 
     pub fn new(
@@ -180,13 +192,16 @@ impl EnrichedSeatAssignment {
         summary: &ElectionSummaryCSB,
         seat_assignment: &SeatAssignment,
     ) -> Result<Self, APIError> {
-        let (initial_total_full_seats, enriched_list_seat_assignments) =
-            Self::get_list_seat_assignment(summary, seat_assignment)?;
+        let list_seat_assignments = Self::get_list_seat_assignments(summary, seat_assignment)?;
         Ok(EnrichedSeatAssignment {
             quota: seat_assignment.quota.clone(),
-            list_seat_assignment: enriched_list_seat_assignments,
-            initial_total_full_seats,
-            initial_total_residual_seats: number_of_seats - initial_total_full_seats,
+            list_seat_assignment: list_seat_assignments.enriched_list_seat_assignments,
+            initial_highest_average_steps: Some(
+                list_seat_assignments.initial_highest_average_steps,
+            ),
+            initial_total_full_seats: list_seat_assignments.initial_total_full_seats,
+            initial_total_residual_seats: number_of_seats
+                - list_seat_assignments.initial_total_full_seats,
         })
     }
 }

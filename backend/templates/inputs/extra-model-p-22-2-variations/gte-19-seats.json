@@ -1274,6 +1274,432 @@
         "initial_full_seats": 1
       }
     ],
+    "initial_highest_average_steps": [
+      {
+        "residual_seat_number": 1,
+        "change": {
+          "changed_by": "HighestAverageAssignment",
+          "selected_list_number": 5,
+          "list_options": [
+            5
+          ],
+          "list_assigned": [
+            5
+          ],
+          "list_exhausted": [],
+          "votes_per_seat": {
+            "integer": 50,
+            "numerator": 1,
+            "denominator": 2
+          }
+        },
+        "standings": [
+          {
+            "list_number": 1,
+            "votes_cast": 600,
+            "remainder_votes": {
+              "integer": 26,
+              "numerator": 2,
+              "denominator": 23
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 50,
+              "numerator": 0,
+              "denominator": 12
+            },
+            "full_seats": 11,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 2,
+            "votes_cast": 302,
+            "remainder_votes": {
+              "integer": 41,
+              "numerator": 3,
+              "denominator": 23
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 50,
+              "numerator": 2,
+              "denominator": 6
+            },
+            "full_seats": 5,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 3,
+            "votes_cast": 98,
+            "remainder_votes": {
+              "integer": 45,
+              "numerator": 19,
+              "denominator": 23
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 49,
+              "numerator": 0,
+              "denominator": 2
+            },
+            "full_seats": 1,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 4,
+            "votes_cast": 99,
+            "remainder_votes": {
+              "integer": 46,
+              "numerator": 19,
+              "denominator": 23
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 49,
+              "numerator": 1,
+              "denominator": 2
+            },
+            "full_seats": 1,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 5,
+            "votes_cast": 101,
+            "remainder_votes": {
+              "integer": 48,
+              "numerator": 19,
+              "denominator": 23
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 50,
+              "numerator": 1,
+              "denominator": 2
+            },
+            "full_seats": 1,
+            "residual_seats": 0
+          }
+        ]
+      },
+      {
+        "residual_seat_number": 2,
+        "change": {
+          "changed_by": "HighestAverageAssignment",
+          "selected_list_number": 2,
+          "list_options": [
+            2
+          ],
+          "list_assigned": [
+            2
+          ],
+          "list_exhausted": [],
+          "votes_per_seat": {
+            "integer": 50,
+            "numerator": 2,
+            "denominator": 6
+          }
+        },
+        "standings": [
+          {
+            "list_number": 1,
+            "votes_cast": 600,
+            "remainder_votes": {
+              "integer": 26,
+              "numerator": 2,
+              "denominator": 23
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 50,
+              "numerator": 0,
+              "denominator": 12
+            },
+            "full_seats": 11,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 2,
+            "votes_cast": 302,
+            "remainder_votes": {
+              "integer": 41,
+              "numerator": 3,
+              "denominator": 23
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 50,
+              "numerator": 2,
+              "denominator": 6
+            },
+            "full_seats": 5,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 3,
+            "votes_cast": 98,
+            "remainder_votes": {
+              "integer": 45,
+              "numerator": 19,
+              "denominator": 23
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 49,
+              "numerator": 0,
+              "denominator": 2
+            },
+            "full_seats": 1,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 4,
+            "votes_cast": 99,
+            "remainder_votes": {
+              "integer": 46,
+              "numerator": 19,
+              "denominator": 23
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 49,
+              "numerator": 1,
+              "denominator": 2
+            },
+            "full_seats": 1,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 5,
+            "votes_cast": 101,
+            "remainder_votes": {
+              "integer": 48,
+              "numerator": 19,
+              "denominator": 23
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 33,
+              "numerator": 2,
+              "denominator": 3
+            },
+            "full_seats": 1,
+            "residual_seats": 1
+          }
+        ]
+      },
+      {
+        "residual_seat_number": 3,
+        "change": {
+          "changed_by": "HighestAverageAssignment",
+          "selected_list_number": 1,
+          "list_options": [
+            1
+          ],
+          "list_assigned": [
+            1
+          ],
+          "list_exhausted": [],
+          "votes_per_seat": {
+            "integer": 50,
+            "numerator": 0,
+            "denominator": 12
+          }
+        },
+        "standings": [
+          {
+            "list_number": 1,
+            "votes_cast": 600,
+            "remainder_votes": {
+              "integer": 26,
+              "numerator": 2,
+              "denominator": 23
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 50,
+              "numerator": 0,
+              "denominator": 12
+            },
+            "full_seats": 11,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 2,
+            "votes_cast": 302,
+            "remainder_votes": {
+              "integer": 41,
+              "numerator": 3,
+              "denominator": 23
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 43,
+              "numerator": 1,
+              "denominator": 7
+            },
+            "full_seats": 5,
+            "residual_seats": 1
+          },
+          {
+            "list_number": 3,
+            "votes_cast": 98,
+            "remainder_votes": {
+              "integer": 45,
+              "numerator": 19,
+              "denominator": 23
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 49,
+              "numerator": 0,
+              "denominator": 2
+            },
+            "full_seats": 1,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 4,
+            "votes_cast": 99,
+            "remainder_votes": {
+              "integer": 46,
+              "numerator": 19,
+              "denominator": 23
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 49,
+              "numerator": 1,
+              "denominator": 2
+            },
+            "full_seats": 1,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 5,
+            "votes_cast": 101,
+            "remainder_votes": {
+              "integer": 48,
+              "numerator": 19,
+              "denominator": 23
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 33,
+              "numerator": 2,
+              "denominator": 3
+            },
+            "full_seats": 1,
+            "residual_seats": 1
+          }
+        ]
+      },
+      {
+        "residual_seat_number": 4,
+        "change": {
+          "changed_by": "HighestAverageAssignment",
+          "selected_list_number": 4,
+          "list_options": [
+            4
+          ],
+          "list_assigned": [
+            4
+          ],
+          "list_exhausted": [],
+          "votes_per_seat": {
+            "integer": 49,
+            "numerator": 1,
+            "denominator": 2
+          }
+        },
+        "standings": [
+          {
+            "list_number": 1,
+            "votes_cast": 600,
+            "remainder_votes": {
+              "integer": 26,
+              "numerator": 2,
+              "denominator": 23
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 46,
+              "numerator": 2,
+              "denominator": 13
+            },
+            "full_seats": 11,
+            "residual_seats": 1
+          },
+          {
+            "list_number": 2,
+            "votes_cast": 302,
+            "remainder_votes": {
+              "integer": 41,
+              "numerator": 3,
+              "denominator": 23
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 43,
+              "numerator": 1,
+              "denominator": 7
+            },
+            "full_seats": 5,
+            "residual_seats": 1
+          },
+          {
+            "list_number": 3,
+            "votes_cast": 98,
+            "remainder_votes": {
+              "integer": 45,
+              "numerator": 19,
+              "denominator": 23
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 49,
+              "numerator": 0,
+              "denominator": 2
+            },
+            "full_seats": 1,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 4,
+            "votes_cast": 99,
+            "remainder_votes": {
+              "integer": 46,
+              "numerator": 19,
+              "denominator": 23
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 49,
+              "numerator": 1,
+              "denominator": 2
+            },
+            "full_seats": 1,
+            "residual_seats": 0
+          },
+          {
+            "list_number": 5,
+            "votes_cast": 101,
+            "remainder_votes": {
+              "integer": 48,
+              "numerator": 19,
+              "denominator": 23
+            },
+            "meets_remainder_threshold": true,
+            "next_votes_per_seat": {
+              "integer": 33,
+              "numerator": 2,
+              "denominator": 3
+            },
+            "full_seats": 1,
+            "residual_seats": 1
+          }
+        ]
+      }
+    ],
     "initial_total_full_seats": 19,
     "initial_total_residual_seats": 4
   },

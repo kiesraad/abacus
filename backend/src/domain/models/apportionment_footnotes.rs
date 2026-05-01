@@ -9,7 +9,7 @@ use crate::{
 };
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct Footnotes {
+pub struct ApportionmentFootnotes {
     #[serde(skip_serializing_if = "Option::is_none")]
     absolute_majority: Option<AbsoluteMajority>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -39,7 +39,7 @@ fn get_footnote_steps(seat_assignment: &SeatAssignment) -> FootnoteSteps<'_> {
     }
 }
 
-impl Footnotes {
+impl ApportionmentFootnotes {
     pub fn get_absolute_majority(
         absolute_majority_reassignment: Option<&SeatChangeStep>,
         political_groups: &[PoliticalGroup],
@@ -100,7 +100,7 @@ impl Footnotes {
         let exhausted_lists =
             Self::get_exhausted_lists(footnote_steps.list_exhaustion_steps, political_groups);
         if absolute_majority.is_some() || exhausted_lists.is_some() {
-            Ok(Some(Footnotes {
+            Ok(Some(ApportionmentFootnotes {
                 absolute_majority,
                 exhausted_lists,
             }))

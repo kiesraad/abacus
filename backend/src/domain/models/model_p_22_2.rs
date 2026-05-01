@@ -4,10 +4,9 @@ use crate::domain::{
     committee_session::CommitteeSession,
     election::Election,
     models::{
-        PdfFileModel, PdfModel, ToPdfFileModel,
+        PdfFileModel, PdfModel, ToPdfFileModel, apportionment_footnotes::ApportionmentFootnotes,
         enriched_candidate_nomination::EnrichedCandidateNomination,
-        enriched_seat_assignment::EnrichedSeatAssignment, footnotes::Footnotes,
-        votes_table::VotesTables,
+        enriched_seat_assignment::EnrichedSeatAssignment, votes_table::VotesTables,
     },
     summary::ElectionSummaryCSB,
 };
@@ -28,7 +27,7 @@ pub struct ModelP22_2Input {
     pub election: Election,
     pub summary: ElectionSummaryCSB,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub footnotes: Option<Footnotes>,
+    pub footnotes: Option<ApportionmentFootnotes>,
     pub seat_assignment: EnrichedSeatAssignment,
     pub candidate_nomination: EnrichedCandidateNomination,
     pub hash: String,

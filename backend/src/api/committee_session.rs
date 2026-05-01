@@ -6,10 +6,11 @@ use axum::{
 use chrono::NaiveDateTime;
 use serde::Serialize;
 use sqlx::{SqliteConnection, SqlitePool};
+use tracing::error;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
-    APIError, AppState, ErrorResponse, SqlitePoolExt,
+    APIError, AppState, SqlitePoolExt,
     api::middleware::authentication::RouteAuthorization,
     domain::{
         committee_session::{
@@ -22,7 +23,7 @@ use crate::{
         role::Role,
         validate::DataError,
     },
-    error::ErrorReference,
+    error::{ApiErrorResponse, ErrorReference, ErrorResponse, error_response},
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
     repository::{
         committee_session_repo::{
@@ -36,6 +37,49 @@ use crate::{
         change_committee_session_status, list_polling_stations_for_session,
     },
 };
+
+impl ApiErrorResponse for CommitteeSessionError {
+    fn log(&self) {
+        error!("Committee session status error: {:?}", self);
+    }
+
+    fn to_response_parts(&self) -> (StatusCode, ErrorResponse) {
+        match self {
+            CommitteeSessionError::CommitteeSessionPaused => (
+                StatusCode::CONFLICT,
+                error_response(
+                    "Committee session data entry is paused",
+                    ErrorReference::CommitteeSessionPaused,
+                    true,
+                ),
+            ),
+            CommitteeSessionError::InvalidCommitteeSessionStatus => (
+                StatusCode::CONFLICT,
+                error_response(
+                    "Invalid committee session status",
+                    ErrorReference::InvalidCommitteeSessionStatus,
+                    true,
+                ),
+            ),
+            CommitteeSessionError::InvalidDetails => (
+                StatusCode::BAD_REQUEST,
+                error_response("Invalid details", ErrorReference::InvalidData, false),
+            ),
+            CommitteeSessionError::InvalidStatusTransition => (
+                StatusCode::CONFLICT,
+                error_response(
+                    "Invalid committee session state transition",
+                    ErrorReference::InvalidStateTransition,
+                    true,
+                ),
+            ),
+            CommitteeSessionError::ProviderError => (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                error_response("Internal server error", ErrorReference::DatabaseError, true),
+            ),
+        }
+    }
+}
 
 #[derive(Serialize)]
 pub struct CommitteeSessionCreatedAuditData(pub CommitteeSessionAuditData);

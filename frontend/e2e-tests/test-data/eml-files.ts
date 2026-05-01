@@ -100,3 +100,29 @@ export const eml230b_with_gaps: Eml230b = {
     "ce26",
   ],
 };
+
+export const eml230b_more_than_45_candidates: Eml230b = {
+  filename: "eml230b_test_more_than_45_candidates.eml.xml",
+  path: "../backend/src/eml/tests/eml230b_test_more_than_45_candidates.eml.xml",
+  electionDate: "woensdag 16 maart 2022",
+  hashInput1: "6c76",
+  hashInput2: "56c2",
+  fullHash: [
+    "af6a",
+    "9c2e",
+    "610c",
+    "af55",
+    "6c76",
+    "ce3a",
+    "2bb7",
+    "efd7",
+    "b8fe",
+    "8122",
+    "2db6",
+    "8592",
+    "4cbe",
+    "56c2",
+    "1aa6",
+    "ddbc",
+  ],
+};

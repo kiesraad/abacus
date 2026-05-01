@@ -35,7 +35,11 @@ export function DataEntryList({ electionId, dataEntries }: DataEntryListProps) {
             {dataEntries.map((dataEntry) => {
               const source = dataEntry.statusEntry.source;
               return (
-                <Table.Row key={source.number} to={getUrlForDataEntry(electionId, dataEntry.statusEntry)}>
+                <Table.Row
+                  id={`data-entry-row-${source.number}`}
+                  key={source.number}
+                  to={getUrlForDataEntry(electionId, dataEntry.statusEntry)}
+                >
                   <Table.NumberCell>{source.number}</Table.NumberCell>
                   <Table.Cell>
                     <span>{source.name}</span>

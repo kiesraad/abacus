@@ -7,6 +7,7 @@ export class DataEntryHomePage {
   readonly feedback: Locator;
   readonly start: Locator;
   readonly submitFeedback: Locator;
+  readonly pollingStations: Locator;
   readonly alert: Locator;
   readonly alertDataEntrySaved: Locator;
   readonly alertDataEntryDifferent: Locator;
@@ -29,6 +30,8 @@ export class DataEntryHomePage {
     this.submitFeedback = page.getByTestId("submitFeedback");
     this.start = page.getByRole("button", { name: "Beginnen" });
 
+    this.pollingStations = page.getByTestId("data_entry_list").locator("tbody").getByRole("row");
+
     this.alert = page.getByRole("alert");
     this.alertDataEntrySaved = this.alert.filter({ hasText: /(Eerste|Tweede) invoer is opgeslagen/ });
     this.alertDataEntryDifferent = this.alert.filter({ hasText: "Let op: verschil met eerste invoer" });
@@ -42,6 +45,10 @@ export class DataEntryHomePage {
     await this.number.pressSequentially(dataEntrySource.number.toString(), { delay: 50 });
     await expect(this.feedback).toContainText(dataEntrySource.name);
     await this.start.click();
+  }
+
+  async clickPollingStationFromList(number: number) {
+    await this.page.getByTestId(`data-entry-row-${number}`).click();
   }
 
   async clickDataEntryInProgress(dataEntrySource: { number: number; name: string }) {

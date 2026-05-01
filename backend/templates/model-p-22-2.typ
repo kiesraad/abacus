@@ -341,22 +341,19 @@ Na toewijzing van de volle zetels blijft een aantal te verdelen zetels over. Dit
   ]
 
   #v(15pt)
-  #let absolute_majority_reassignment = input.seat_assignment.steps.filter(step => step.change.changed_by == "AbsoluteMajorityReassignment")
-  #let list_exhaustion_removal_steps = input.seat_assignment.steps.filter(step => step.change.changed_by == "ListExhaustionRemoval")
-  #let unique_exhausted_list_numbers = ()
-  #for step in list_exhaustion_removal_steps {
-    if not unique_exhausted_list_numbers.contains(step.change.list_retracted_seat) {
-      unique_exhausted_list_numbers.push(step.change.list_retracted_seat)
+  #let footnotes = if input.keys().contains("footnotes") { input.footnotes } else { () }
+  
+  #if footnotes.len() > 0 {
+    let absolute_majority = if footnotes.keys().contains("absolute_majority") { footnotes.absolute_majority } else { none };
+    let exhausted_lists = if footnotes.keys().contains("exhausted_lists") { footnotes.exhausted_lists } else { () };
+
+    set enum(spacing: 12pt, numbering: numbering("I", 1))
+    if absolute_majority != none {
+      [+ #format_political_group_name(absolute_majority.number, absolute_majority.name, with_prefix: "with_list_prefix") heeft meer dan de helft van de stemmen behaald en heeft daardoor een volstrekte meerderheid. Omdat de lijst op basis van de zetelverdeling niet meer dan de helft van de zetels heeft gekregen, heeft de lijst via de restzetelverdeling een extra (rest)zetel gekregen.]
     }
-  }
-  #set enum(spacing: 12pt, numbering: numbering("I", 1))
-  #if absolute_majority_reassignment.len() == 1 {
-    let pg = input.election.political_groups.find(pg => pg.number == absolute_majority_reassignment.first().change.list_assigned_seat)
-    [+ #political_group_name(pg, with_prefix: "with_list_prefix") heeft meer dan de helft van de stemmen behaald en heeft daardoor een volstrekte meerderheid. Omdat de lijst op basis van de zetelverdeling niet meer dan de helft van de zetels heeft gekregen, heeft de lijst via de restzetelverdeling een extra (rest)zetel gekregen.]
-  }
-  #for list_number in unique_exhausted_list_numbers {
-    let pg = input.election.political_groups.find(pg => pg.number == list_number)
-    [+ #political_group_name(pg, with_prefix: "with_list_prefix") heeft niet voldoende kandidaten beschikbaar om de haar toegewezen zetels te bezetten. De 'overtollige' zetels gaan over op andere lijsten door toepassing van het systeem van de grootste #if input.election.number_of_seats < LARGE_COUNCIL_THRESHOLD { [overschotten] } else { [gemiddelden] }.]
+    for exhausted_list in exhausted_lists {
+      [+ #format_political_group_name(exhausted_list.number, exhausted_list.name, with_prefix: "with_list_prefix") heeft niet voldoende kandidaten beschikbaar om de haar toegewezen zetels te bezetten. De 'overtollige' zetels gaan over op andere lijsten door toepassing van het systeem van de grootste #if input.election.number_of_seats < LARGE_COUNCIL_THRESHOLD { [overschotten en/of gemiddelden] } else { [gemiddelden] }.]
+    }
   }
   
   #let list_seat_assignment_with_unique_highest_average = input.enriched_seat_assignment.list_seat_assignment.filter(

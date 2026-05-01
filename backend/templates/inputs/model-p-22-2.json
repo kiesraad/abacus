@@ -829,6 +829,18 @@
     "initial_total_full_seats": 12,
     "initial_total_residual_seats": 3
   },
+  "footnotes": {
+    "absolute_majority": {
+      "number": 1,
+      "name": "Political Group A"
+    },
+    "exhausted_lists": [
+      {
+        "number": 1,
+        "name": "Political Group A"
+      }
+    ]
+  },
   "seat_assignment": {
     "seats": 15,
     "full_seats": 10,

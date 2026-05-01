@@ -385,6 +385,14 @@
     "initial_total_full_seats": 5,
     "initial_total_residual_seats": 1
   },
+  "footnotes": {
+    "exhausted_lists": [
+      {
+        "number": 3,
+        "name": "Blanco (Smit, G.)"
+      }
+    ]
+  },
   "seat_assignment": {
     "seats": 6,
     "full_seats": 2,

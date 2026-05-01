@@ -32,6 +32,7 @@ use crate::{
             ToPdfFileModel,
             enriched_candidate_nomination::EnrichedCandidateNomination,
             enriched_seat_assignment::EnrichedSeatAssignment,
+            footnotes::Footnotes,
             votes_table::{VotesTables, VotesTablesWithPreviousVotes},
         },
         polling_station::PollingStation,
@@ -240,10 +241,12 @@ impl ResultsInput {
         );
         let enriched_candidate_nomination =
             EnrichedCandidateNomination::new(&self.election, &candidate_nomination)?;
+        let footnotes = Footnotes::new(&self.election.political_groups, &seat_assignment)?;
         let pdf_file: PdfFileModel = ModelP22_2Input {
             committee_session: self.committee_session.clone(),
             election: self.election.clone(),
             summary,
+            footnotes,
             seat_assignment,
             enriched_seat_assignment,
             candidate_nomination: enriched_candidate_nomination,

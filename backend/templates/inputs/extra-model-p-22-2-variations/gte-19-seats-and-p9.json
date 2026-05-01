@@ -2358,6 +2358,12 @@
     "initial_total_full_seats": 18,
     "initial_total_residual_seats": 6
   },
+  "footnotes": {
+    "absolute_majority": {
+      "number": 1,
+      "name": "Political Group A"
+    }
+  },
   "seat_assignment": {
     "seats": 24,
     "full_seats": 18,

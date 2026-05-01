@@ -117,7 +117,6 @@ pub enum APIError {
     InvalidData(DataError),
     InvalidHeaderValue,
     InvalidHashError,
-    InvalidResultsType,
     JsonRejection(JsonRejection),
     NotFound(String, ErrorReference),
     PdfGenError(PdfGenError),
@@ -289,14 +288,6 @@ impl APIError {
                     error_response("EML error", ErrorReference::EmlError, false),
                 )
             }
-            APIError::InvalidResultsType => (
-                StatusCode::BAD_REQUEST,
-                error_response(
-                    "Internal server error",
-                    ErrorReference::InternalServerError,
-                    true,
-                ),
-            ),
         }
     }
 }

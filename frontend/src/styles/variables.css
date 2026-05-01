@@ -16,8 +16,8 @@
   font-weight: 100 900;
 }
 
+/* FONTS */
 :root {
-  /* FONTS */
   --font-header: "SpaceGrotesk";
   --font-header-body: "DMSans";
   --font-text: "DMSans";
@@ -27,18 +27,24 @@
   --font-size-sm: 0.875rem;
   --font-size-md: 1rem;
   --font-size-lg: 1.125rem;
+}
 
-  /* SPACING */
+/* SPACING */
+:root {
   --space-sm: 0.5rem;
   --space-md: 1rem;
   --space-md-lg: 1.5rem;
   --space-lg: 2rem;
   --space-xl: 2.5rem;
+}
 
-  /* CORNERS */
+/* CORNER RADIUS */
+:root {
   --rounded-default: 0.5rem;
+}
 
-  /* COLORS */
+/* GRAY */
+:root {
   --gray-900: #101828;
   --gray-800: #1d2939;
   --gray-700: #344054;
@@ -50,7 +56,10 @@
   --gray-100: #f2f4f7;
   --gray-50: #f9fafb;
   --gray-25: #fcfcfd;
+}
 
+/* BLUE */
+:root {
   --blue-900: #00305b;
   --blue-800: #254b89;
   --blue-700: #2e5eaa;
@@ -61,7 +70,10 @@
   --blue-200: #c5d6f1;
   --blue-100: #e7eef9;
   --blue-50: #f8fafd;
+}
 
+/* GREEN */
+:root {
   --green-900: #113b26;
   --green-800: #195738;
   --green-700: #206c46;
@@ -72,7 +84,10 @@
   --green-200: #b8ddca;
   --green-100: #e7f3ee;
   --green-50: #f6fbf9;
+}
 
+/* YELLOW */
+:root {
   --yellow-900: #402d0d;
   --yellow-800: #644714;
   --yellow-700: #7c5919;
@@ -83,7 +98,10 @@
   --yellow-200: #f5de89;
   --yellow-100: #fff4d6;
   --yellow-50: #fdfaf2;
+}
 
+/* ORANGE */
+:root {
   --orange-900: #521f09;
   --orange-800: #7a2e0e;
   --orange-700: #b54708;
@@ -94,7 +112,10 @@
   --orange-200: #fedf89;
   --orange-100: #fef4d7;
   --orange-50: #fdfaf2;
+}
 
+/* RED */
+:root {
   --red-900: #661a27;
   --red-800: #8e2437;
   --red-700: #b02d45;
@@ -105,22 +126,37 @@
   --red-200: #f6cad2;
   --red-100: #fbe9ed;
   --red-50: #fef9fa;
+}
 
+/* PURPLE */
+:root {
   --purple-700: #9f1ab1;
+}
 
+/* BASE COLORS */
+:root {
   --base-black: #000000;
   --base-blue: var(--blue-900);
   --base-accent: #4a75ba;
   --base-white: #ffffff;
+}
 
+/* INTERACTIVE COLORS */
+:root {
   --interactive-default: #155eef;
   --interactive-hover: #004eeb;
   --interactive-active: #0040c1;
   --interactive-visited: #6927da;
+}
 
+/* TEXT COLORS */
+:root {
   --text-color-header: var(--gray-900);
   --text-color-body: var(--gray-900);
+}
 
+/* BUTTON COLORS */
+:root {
   --button-color-primary: var(--blue-900);
   --button-color-primary-hover: var(--blue-800);
   --button-color-primary-focus: var(--blue-900);
@@ -142,11 +178,17 @@
   --button-color-focus-shadow: var(--blue-100);
   --button-color-disabled: #b3b3b3;
   --button-color-bg-disabled: #f2f2f2;
+}
 
+/* BUTTON ICON COLORS */
+:root {
   --button-icon-tertiary-color-bg-active: var(--gray-100);
   --button-icon-tertiary-color-border-active: var(--gray-500);
   --button-icon-tertiary-color-bg-hover: var(--gray-100);
+}
 
+/* CHECKBOX/RADIO COLORS AND SIZES */
+:root {
   --checkbox-radio-color-border: var(--gray-400);
   --checkbox-radio-color-bg-default: var(--base-white);
   --checkbox-radio-color-bg-active: var(--bg-gray);
@@ -159,11 +201,17 @@
   --checkbox-radio-color-bg-disabled-checked: var(--checkbox-radio-color-border);
   --checkbox-radio-size: 1.25rem;
   --checkbox-radio-svg-size: 0.875rem;
+}
 
+/* BORDER AND SHADOW COLORS */
+:root {
   --shadow-color-focus: #d1e0ff;
   --border-color-default: var(--bg-gray-darkest);
   --border-color-focus: var(--interactive-default);
+}
 
+/* ERROR/WARNING/NOTIFY/SUCCESS/HELP COLORS */
+:root {
   --color-error: var(--red-500);
   --color-error-darker: var(--red-600);
   --color-error-darkest: var(--red-700);
@@ -185,19 +233,28 @@
 
   --color-help-text: var(--gray-600);
   --color-hover: var(--gray-200);
+}
 
+/* BACKGROUND COLORS */
+:root {
   --bg-gray: var(--gray-50);
   --bg-gray-darker: var(--gray-100);
   --bg-gray-darkest: var(--gray-300);
   --bg-highlight: #eff4ff;
+}
 
+/* MENU COLORS */
+:root {
   --menu-empty: var(--gray-500);
   --menu-unsaved: var(--color-notify);
   --menu-active: var(--text-color-header);
   --menu-accept: var(--color-success);
   --menu-warning: var(--color-warning);
   --menu-error: var(--color-error-darker);
+}
 
+/* BADGE COLORS */
+:root {
   --badge-first-entry: var(--green-700);
   --badge-first-entry-border: var(--green-200);
   --badge-first-entry-bg: var(--green-100);
@@ -217,7 +274,10 @@
   --badge-typist-busy-bg: var(--blue-100);
   --badge-definitive: var(--base-white);
   --badge-definitive-bg: var(--base-blue);
+}
 
+/* PROGRESS BAR COLORS */
+:root {
   --progress-bar-default: var(--blue-600);
   --progress-bar-errors-and-warnings: var(--color-error-darker);
   --progress-bar-unfinished: var(--color-warning);

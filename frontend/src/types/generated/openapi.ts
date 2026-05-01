@@ -121,6 +121,14 @@ export interface ELECTION_DOWNLOAD_PDF_RESULTS_GSB_REQUEST_PARAMS {
 export type ELECTION_DOWNLOAD_PDF_RESULTS_GSB_REQUEST_PATH =
   `/api/elections/${ElectionId}/committee_sessions/${CommitteeSessionId}/download_pdf_results`;
 
+// /api/elections/{election_id}/committee_sessions/{committee_session_id}/download_zip_attachment_csb
+export interface ELECTION_DOWNLOAD_ZIP_ATTACHMENT_CSB_REQUEST_PARAMS {
+  election_id: ElectionId;
+  committee_session_id: CommitteeSessionId;
+}
+export type ELECTION_DOWNLOAD_ZIP_ATTACHMENT_CSB_REQUEST_PATH =
+  `/api/elections/${ElectionId}/committee_sessions/${CommitteeSessionId}/download_zip_attachment_csb`;
+
 // /api/elections/{election_id}/committee_sessions/{committee_session_id}/download_zip_results
 export interface ELECTION_DOWNLOAD_ZIP_RESULTS_GSB_REQUEST_PARAMS {
   election_id: ElectionId;

@@ -452,6 +452,32 @@ pub async fn get_election_committee_session(
     body["current_committee_session"].clone()
 }
 
+pub async fn update_committee_session_details(
+    addr: &SocketAddr,
+    cookie: &HeaderValue,
+    election_id: u32,
+    committee_session_id: u32,
+    location: &str,
+    start_date: &str,
+    start_time: &str,
+) {
+    let url = format!(
+        "http://{addr}/api/elections/{election_id}/committee_sessions/{committee_session_id}"
+    );
+    let response = reqwest::Client::new()
+        .put(&url)
+        .header("cookie", cookie)
+        .json(&serde_json::json!({
+            "location": location,
+            "start_date": start_date,
+            "start_time": start_time,
+        }))
+        .send()
+        .await
+        .unwrap();
+    assert_eq!(response.status(), StatusCode::NO_CONTENT);
+}
+
 pub async fn change_status_committee_session(
     addr: &SocketAddr,
     cookie: &HeaderValue,

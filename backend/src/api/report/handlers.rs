@@ -10,10 +10,7 @@ use crate::{
     APIError, ErrorResponse,
     api::report::{
         files::{get_files_csb_election, get_files_gsb_election},
-        naming::{
-            download_zip_filename, xml_results_zip_filename, xml_zip_filename,
-            zip_file_base_name_gsb,
-        },
+        naming,
     },
     domain::{committee_session::CommitteeSessionId, election::ElectionId},
     infra::audit_log::AuditService,
@@ -65,10 +62,11 @@ pub async fn election_download_zip_results_gsb(
     let files = get_files_gsb_election(&pool, audit_service, committee_session.id).await?;
     drop(conn);
 
-    let download_zip_filename = download_zip_filename(
+    let download_zip_filename = naming::download_zip_filename(
+        naming::ZipDownloadType::GsbResults,
         &election,
+        committee_session.is_next_session(),
         files.created_at().with_timezone(&Local),
-        zip_file_base_name_gsb(&committee_session),
     );
 
     let (zip_response, mut zip_writer) = ZipResponse::new(&download_zip_filename);
@@ -79,7 +77,7 @@ pub async fn election_download_zip_results_gsb(
         }
 
         if let Some(eml_file) = files.results_eml {
-            let xml_zip_filename = xml_zip_filename(&election);
+            let xml_zip_filename = naming::with_zip_extension(&eml_file.name);
             let xml_zip = zip_single_file(&eml_file.name, &eml_file.data).await?;
             zip_writer.add_file(&xml_zip_filename, &xml_zip).await?;
         }
@@ -139,10 +137,11 @@ pub async fn election_download_zip_results_csb(
     let files = get_files_csb_election(&pool, audit_service, committee_session.id).await?;
     drop(conn);
 
-    let download_zip_filename = download_zip_filename(
+    let download_zip_filename = naming::download_zip_filename(
+        naming::ZipDownloadType::CsbResults,
         &election,
+        false,
         files.created_at().with_timezone(&Local),
-        "vaststelling-uitslag",
     );
 
     let (zip_response, mut zip_writer) = ZipResponse::new(&download_zip_filename);
@@ -153,7 +152,7 @@ pub async fn election_download_zip_results_csb(
         }
 
         if let Some(eml_results_file) = files.results_eml {
-            let xml_zip_filename = xml_results_zip_filename(&election);
+            let xml_zip_filename = naming::with_zip_extension(&eml_results_file.name);
             let xml_zip = zip_single_file(&eml_results_file.name, &eml_results_file.data).await?;
             zip_writer.add_file(&xml_zip_filename, &xml_zip).await?;
         }
@@ -207,10 +206,11 @@ pub async fn election_download_zip_attachment_csb(
     let files = get_files_csb_election(&pool, audit_service, committee_session.id).await?;
     drop(conn);
 
-    let download_zip_filename = download_zip_filename(
+    let download_zip_filename = naming::download_zip_filename(
+        naming::ZipDownloadType::CsbAttachment,
         &election,
+        false,
         files.created_at().with_timezone(&Local),
-        "model-p22-2-bijlage",
     );
 
     let (zip_response, mut zip_writer) = ZipResponse::new(&download_zip_filename);
@@ -271,17 +271,18 @@ pub async fn election_download_zip_total_counts_csb(
     let files = get_files_csb_election(&pool, audit_service, committee_session.id).await?;
     drop(conn);
 
-    let download_zip_filename = download_zip_filename(
+    let download_zip_filename = naming::download_zip_filename(
+        naming::ZipDownloadType::CsbTotalCounts,
         &election,
+        false,
         files.created_at().with_timezone(&Local),
-        "definitieve-documenten",
     );
 
     let (zip_response, mut zip_writer) = ZipResponse::new(&download_zip_filename);
 
     tokio::spawn(async move {
         if let Some(total_counts_eml_file) = files.total_counts_eml {
-            let xml_zip_filename = xml_zip_filename(&election);
+            let xml_zip_filename = naming::with_zip_extension(&total_counts_eml_file.name);
             let xml_zip =
                 zip_single_file(&total_counts_eml_file.name, &total_counts_eml_file.data).await?;
             zip_writer.add_file(&xml_zip_filename, &xml_zip).await?;

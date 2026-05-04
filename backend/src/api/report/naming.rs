@@ -1,16 +1,36 @@
 use chrono::{DateTime, Datelike, Local};
 use pdf_gen::zip::slugify_filename;
 
-use crate::domain::{
-    committee_session::CommitteeSession,
-    election::{CommitteeCategory, ElectionWithPoliticalGroups},
-};
+use crate::domain::{election::ElectionWithPoliticalGroups, file::FileType};
+
+pub enum ZipDownloadType {
+    GsbResults,
+    CsbResults,
+    CsbAttachment,
+    CsbTotalCounts,
+}
 
 pub fn download_zip_filename(
+    kind: ZipDownloadType,
     election: &ElectionWithPoliticalGroups,
+    is_next_session: bool,
     created_at: DateTime<Local>,
-    base_name: &str,
 ) -> String {
+    use ZipDownloadType::*;
+
+    let base_name = match kind {
+        GsbResults => {
+            if is_next_session {
+                "correctie"
+            } else {
+                "definitieve-documenten"
+            }
+        }
+        CsbResults => "vaststelling-uitslag",
+        CsbAttachment => "model-p22-2-bijlage",
+        CsbTotalCounts => "definitieve-documenten",
+    };
+
     let location = election.location.to_lowercase();
     let location_without_whitespace: String = location.split_whitespace().collect();
     slugify_filename(&format!(
@@ -25,40 +45,47 @@ pub fn download_zip_filename(
     ))
 }
 
-pub fn xml_count_base_name(election: &ElectionWithPoliticalGroups) -> &'static str {
-    match election.committee_category {
-        CommitteeCategory::GSB => "Telling",
-        CommitteeCategory::CSB => "Totaaltelling",
-    }
-}
-
-pub fn zip_file_base_name_gsb(committee_session: &CommitteeSession) -> &'static str {
-    if committee_session.is_next_session() {
-        "correctie"
-    } else {
-        "definitieve-documenten"
-    }
-}
-
-pub fn xml_zip_filename(election: &ElectionWithPoliticalGroups) -> String {
-    use chrono::Datelike;
+/// Generates aa filename for the given election and file extension
+/// E.g. "{base}_GR2026_GemeenteNaam.{ext}"
+fn election_filename(election: &ElectionWithPoliticalGroups, base: &str, ext: &str) -> String {
     let location_without_whitespace: String = election.location.split_whitespace().collect();
-    slugify_filename(&format!(
-        "{} {}{} {}.zip",
-        xml_count_base_name(election),
+
+    format!(
+        "{base} {}{} {}.{ext}",
         election.category.to_eml_code(),
         election.election_date.year(),
-        location_without_whitespace
-    ))
+        location_without_whitespace,
+    )
 }
 
-pub fn xml_results_zip_filename(election: &ElectionWithPoliticalGroups) -> String {
-    use chrono::Datelike;
-    let location_without_whitespace: String = election.location.split_whitespace().collect();
-    slugify_filename(&format!(
-        "Resultaat {}{} {}.zip",
-        election.category.to_eml_code(),
-        election.election_date.year(),
-        location_without_whitespace
-    ))
+pub fn filename_for(
+    file_type: FileType,
+    election: &ElectionWithPoliticalGroups,
+    is_next_session: bool,
+) -> String {
+    use FileType::*;
+
+    let filename = match file_type {
+        GsbResultsEml => election_filename(election, "Telling", "eml.xml"),
+        GsbResultsPdf => {
+            if is_next_session {
+                "Model Na14-2.pdf".to_string()
+            } else {
+                "Model Na31-2.pdf".to_string()
+            }
+        }
+        GsbOverviewPdf => "Leeg Model P2a.pdf".to_string(),
+        CsbResultsEml => election_filename(election, "Resultaat", "eml.xml"),
+        CsbTotalCountsEml => election_filename(election, "Totaaltelling", "eml.xml"),
+        CsbResultsPdf => "Model P22-2.pdf".to_string(),
+        CsbAttachmentPdf => "Model P22-2 bijlage.pdf".to_string(),
+    };
+
+    slugify_filename(&filename)
+}
+
+/// Replaces the extension of the given filename with .zip
+pub fn with_zip_extension(filename: &str) -> String {
+    let base = filename.split('.').next().unwrap_or("Noname");
+    format!("{}.zip", base)
 }

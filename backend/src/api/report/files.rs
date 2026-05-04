@@ -7,7 +7,10 @@ use crate::{
     APIError, SqlitePoolExt,
     api::{
         apportionment::ApportionmentInputData,
-        report::structs::{CsbFiles, FileCreatedAuditData, GsbFiles, NewFile, ResultsInput},
+        report::{
+            naming,
+            structs::{CsbFiles, FileCreatedAuditData, GsbFiles, NewFile, ResultsInput},
+        },
     },
     domain::{
         committee_session::{CommitteeSession, CommitteeSessionError, CommitteeSessionId},
@@ -52,7 +55,11 @@ async fn generate_and_save_files_gsb_election(
     let xml_string = input.as_xml()?.write_eml_root_str(true, true)?;
 
     let xml_hash = EmlHash::from(xml_string.as_bytes());
-    let xml_filename = input.xml_filename();
+    let xml_filename = naming::filename_for(
+        FileType::GsbResultsEml,
+        &input.election,
+        committee_session.is_next_session(),
+    );
     let pdf_files = input.as_pdf_file_models_gsb(xml_hash)?;
 
     // For the first session, or if there are corrections, we also store the EML and count PDF
@@ -129,7 +136,8 @@ async fn generate_and_save_files_csb_election(
     let created_at = input.created_at.with_timezone(&Utc);
 
     let xml_counts_string = input.as_xml()?.write_eml_root_str(true, true)?;
-    let xml_counts_filename = input.xml_filename();
+    let xml_counts_filename =
+        naming::filename_for(FileType::CsbTotalCountsEml, &input.election, false);
 
     let apportionment_input = ApportionmentInputData {
         number_of_seats: input.election.number_of_seats,
@@ -144,7 +152,8 @@ async fn generate_and_save_files_csb_election(
     )?;
     let xml_results_string = eml_results_data.write_eml_root_str(true, true)?;
     let xml_results_hash = EmlHash::from(xml_results_string.as_bytes());
-    let xml_results_filename = input.xml_results_filename();
+    let xml_results_filename =
+        naming::filename_for(FileType::CsbResultsEml, &input.election, false);
 
     let pdf_files = input.as_pdf_file_models_csb(&apportionment_result, xml_results_hash)?;
 

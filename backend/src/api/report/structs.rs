@@ -1,7 +1,6 @@
 use apportionment::ApportionmentOutput;
 use chrono::{DateTime, Local, Utc};
 use eml_nl::{EMLError, documents::election_count::ElectionCount};
-use pdf_gen::zip::slugify_filename;
 use serde::Serialize;
 use sqlx::SqliteConnection;
 
@@ -9,12 +8,12 @@ use crate::{
     APIError,
     api::{
         apportionment::{map_candidate_nomination, map_seat_assignment},
-        report::{DEFAULT_DATE_TIME_FORMAT, naming::xml_count_base_name},
+        report::{DEFAULT_DATE_TIME_FORMAT, naming},
     },
     domain::{
         committee_session::{CommitteeSession, CommitteeSessionId},
         data_entry::DataEntrySource,
-        election::{CommitteeCategory, ElectionWithPoliticalGroups},
+        election::ElectionWithPoliticalGroups,
         file::{File, FileType},
         investigation::PollingStationInvestigation,
         models::{
@@ -193,54 +192,6 @@ impl ResultsInput {
         )
     }
 
-    pub fn xml_filename(&self) -> String {
-        use chrono::Datelike;
-        let location_without_whitespace: String =
-            self.election.location.split_whitespace().collect();
-        slugify_filename(&format!(
-            "{} {}{} {}.eml.xml",
-            xml_count_base_name(&self.election),
-            self.election.category.to_eml_code(),
-            self.election.election_date.year(),
-            location_without_whitespace
-        ))
-    }
-
-    pub fn xml_results_filename(&self) -> String {
-        use chrono::Datelike;
-        let location_without_whitespace: String =
-            self.election.location.split_whitespace().collect();
-        slugify_filename(&format!(
-            "Resultaat {}{} {}.eml.xml",
-            self.election.category.to_eml_code(),
-            self.election.election_date.year(),
-            location_without_whitespace
-        ))
-    }
-
-    fn results_pdf_filename(&self) -> String {
-        let name = match self.election.committee_category {
-            CommitteeCategory::GSB => {
-                if self.committee_session.is_next_session() {
-                    "Model Na14-2.pdf"
-                } else {
-                    "Model Na31-2.pdf"
-                }
-            }
-            CommitteeCategory::CSB => "Model P22-2.pdf",
-        };
-        slugify_filename(name)
-    }
-
-    // Used for CommitteeCategory::GSB only
-    fn overview_pdf_filename(&self) -> Option<String> {
-        if self.committee_session.is_next_session() {
-            Some(slugify_filename("Leeg Model P2a.pdf"))
-        } else {
-            None
-        }
-    }
-
     fn get_p2a_pdf_file(&self, overview_filename: String) -> PdfFileModel {
         ModelP2aInput {
             committee_session: self.committee_session.clone(),
@@ -279,7 +230,7 @@ impl ResultsInput {
         );
         let enriched_candidate_nomination =
             EnrichedCandidateNomination::new(&self.election, &candidate_nomination)?;
-        let pdf_file: PdfFileModel = ModelP22_2Input {
+        let pdf_file = ModelP22_2Input {
             committee_session: self.committee_session.clone(),
             election: self.election.clone(),
             summary,
@@ -302,7 +253,7 @@ impl ResultsInput {
         filename: String,
     ) -> Result<PdfFileModel, APIError> {
         let votes_tables = VotesTables::new(&self.election, &self.summary)?;
-        let pdf_file: PdfFileModel = ModelP22_2Bijlage1Input {
+        let pdf_file = ModelP22_2Bijlage1Input {
             election: self.election.clone().into(),
             votes_tables,
             hash,
@@ -320,7 +271,7 @@ impl ResultsInput {
         creation_date_time: String,
         results_pdf_filename: String,
     ) -> Result<PdfFileModel, APIError> {
-        let pdf_file: PdfFileModel = ModelNa14_2Input {
+        let pdf_file = ModelNa14_2Input {
             votes_tables: VotesTablesWithPreviousVotes::new(
                 &self.election,
                 &self.summary,
@@ -344,7 +295,7 @@ impl ResultsInput {
         creation_date_time: String,
         results_pdf_filename: String,
     ) -> Result<PdfFileModel, APIError> {
-        let pdf_file: PdfFileModel = ModelNa31_2Input {
+        let pdf_file = ModelNa31_2Input {
             votes_tables: VotesTables::new(&self.election, &self.summary)?,
             committee_session: self.committee_session.clone(),
             polling_stations: self.polling_stations.clone(),
@@ -364,11 +315,21 @@ impl ResultsInput {
         let hash = xml_hash.into();
         let creation_date_time = self.created_at.format(DEFAULT_DATE_TIME_FORMAT).to_string();
 
-        let overview_pdf = self
-            .overview_pdf_filename()
-            .map(|overview_filename| self.get_p2a_pdf_file(overview_filename));
+        let overview_pdf = if self.committee_session.is_next_session() {
+            Some(self.get_p2a_pdf_file(naming::filename_for(
+                FileType::GsbOverviewPdf,
+                &self.election,
+                self.committee_session.is_next_session(),
+            )))
+        } else {
+            None
+        };
 
-        let results_pdf_filename = self.results_pdf_filename();
+        let results_pdf_filename = naming::filename_for(
+            FileType::GsbResultsPdf,
+            &self.election,
+            self.committee_session.is_next_session(),
+        );
         let results_pdf = if self.committee_session.is_next_session() {
             let Some(previous_summary) = &self.previous_summary else {
                 return Err(APIError::DataIntegrityError(
@@ -409,7 +370,8 @@ impl ResultsInput {
         let hash = xml_hash.into();
         let creation_date_time = self.created_at.format(DEFAULT_DATE_TIME_FORMAT).to_string();
 
-        let results_pdf_filename = self.results_pdf_filename();
+        let results_pdf_filename =
+            naming::filename_for(FileType::CsbResultsPdf, &self.election, false);
         let results_pdf = self.get_p22_2_pdf_file(
             apportionment_result,
             hash.clone(),
@@ -417,7 +379,8 @@ impl ResultsInput {
             results_pdf_filename,
         )?;
 
-        let attachment_pdf_filename = "Model_P22-2_bijlage.pdf".to_string();
+        let attachment_pdf_filename =
+            naming::filename_for(FileType::CsbAttachmentPdf, &self.election, false);
         let attachment_pdf = self.get_p22_2_attachment_1_pdf_file(
             hash,
             creation_date_time,

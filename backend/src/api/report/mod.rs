@@ -14,7 +14,6 @@ pub fn router() -> OpenApiRouter<AppState> {
 
     OpenApiRouter::default()
         .routes(routes!(handlers::election_download_zip_results_gsb).authorize(&[CoordinatorGSB]))
-        .routes(routes!(handlers::election_download_pdf_results_gsb).authorize(&[CoordinatorGSB]))
         .routes(routes!(handlers::election_download_zip_results_csb).authorize(&[CoordinatorCSB]))
         .routes(
             routes!(handlers::election_download_zip_attachment_csb).authorize(&[CoordinatorCSB]),

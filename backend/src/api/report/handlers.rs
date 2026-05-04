@@ -2,7 +2,6 @@ use axum::{
     extract::{Path, State},
     response::IntoResponse,
 };
-use axum_extra::response::Attachment;
 use chrono::Local;
 use pdf_gen::zip::{ZipResponse, ZipResponseError, zip_single_file};
 use sqlx::SqlitePool;
@@ -14,7 +13,6 @@ use crate::{
         xml_results_zip_filename, xml_zip_filename, zip_file_base_name_gsb,
     },
     domain::{committee_session::CommitteeSessionId, election::ElectionId},
-    error::ErrorReference,
     infra::audit_log::AuditService,
     repository::{
         committee_session_repo::{self},
@@ -95,54 +93,6 @@ pub async fn election_download_zip_results_gsb(
     });
 
     Ok(zip_response)
-}
-
-/// Download a generated PDF with GSB election results
-#[utoipa::path(
-    get,
-    path = "/api/elections/{election_id}/committee_sessions/{committee_session_id}/download_pdf_results",
-    responses(
-        (
-            status = 200,
-            description = "PDF",
-            content_type = "application/pdf",
-            headers(
-                ("Content-Disposition", description = "attachment; filename=\"filename.pdf\"")
-            )
-        ),
-        (status = 401, description = "Unauthorized", body = ErrorResponse),
-        (status = 403, description = "Forbidden", body = ErrorResponse),
-        (status = 404, description = "Not found", body = ErrorResponse),
-        (status = 409, description = "Request cannot be completed", body = ErrorResponse),
-        (status = 500, description = "Internal server error", body = ErrorResponse),
-    ),
-    params(
-        ("election_id" = ElectionId, description = "Election database id"),
-        ("committee_session_id" = CommitteeSessionId, description = "Committee session database id"),
-    ),
-)]
-pub async fn election_download_pdf_results_gsb(
-    user: User,
-    State(pool): State<SqlitePool>,
-    audit_service: AuditService,
-    Path((_election_id, committee_session_id)): Path<(ElectionId, CommitteeSessionId)>,
-) -> Result<Attachment<Vec<u8>>, APIError> {
-    let mut conn = pool.acquire().await?;
-
-    let committee_category =
-        committee_session_repo::get_committee_category(&mut conn, committee_session_id).await?;
-    user.role().is_authorized(&committee_category)?;
-
-    let files = get_files_gsb_election(&pool, audit_service, committee_session_id).await?;
-
-    let pdf_file = files.results_pdf.ok_or(APIError::BadRequest(
-        "PDF results are not generated".to_string(),
-        ErrorReference::PdfGenerationError,
-    ))?;
-
-    Ok(Attachment::new(pdf_file.data)
-        .filename(pdf_file.name)
-        .content_type(pdf_file.mime_type))
 }
 
 /// Download a zip containing a PDF for the PV and the EML with CSB election results
@@ -375,7 +325,6 @@ mod tests {
 
         #[rustfmt::skip]
             let results = vec![
-                ("download_pdf_results", election_download_pdf_results_gsb(user.clone(), State(pool.clone()), audit.clone(), Path((election_id, committee_session_id))).await.into_response()),
                 ("download_zip_results", election_download_zip_results_gsb(user.clone(), State(pool.clone()), audit.clone(), Path((election_id, committee_session_id))).await.into_response()),
             ];
         results

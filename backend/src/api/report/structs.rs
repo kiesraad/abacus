@@ -43,15 +43,6 @@ impl AsAuditEvent for FileCreatedAuditData {
     const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Success;
 }
 
-pub struct NewFile {
-    pub committee_session_id: CommitteeSessionId,
-    pub file_type: FileType,
-    pub filename: String,
-    pub data: Vec<u8>,
-    pub mime_type: String,
-    pub created_at: DateTime<Utc>,
-}
-
 pub struct GsbFiles {
     pub results_eml: Option<File>,
     pub results_pdf: Option<File>,
@@ -89,9 +80,9 @@ impl GsbFiles {
 
 pub struct CsbFiles {
     pub results_eml: Option<File>,
+    pub total_counts_eml: Option<File>,
     pub results_pdf: Option<File>,
     pub attachment_pdf: Option<File>,
-    pub total_counts_eml: Option<File>,
 }
 
 impl CsbFiles {
@@ -107,9 +98,9 @@ impl CsbFiles {
 
     pub fn needs_generation(&self) -> bool {
         self.results_eml.is_none()
+            || self.total_counts_eml.is_none()
             || self.results_pdf.is_none()
             || self.attachment_pdf.is_none()
-            || self.total_counts_eml.is_none()
     }
 }
 

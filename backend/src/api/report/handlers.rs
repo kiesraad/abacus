@@ -329,7 +329,7 @@ mod tests {
 
         #[rustfmt::skip]
             let results = vec![
-                ("download_zip_results", election_download_zip_results_gsb(user.clone(), State(pool.clone()), audit.clone(), Path((election_id, committee_session_id))).await.into_response()),
+                ("download_zip_results_gsb", election_download_zip_results_gsb(user.clone(), State(pool.clone()), audit.clone(), Path((election_id, committee_session_id))).await.into_response()),
             ];
         results
     }

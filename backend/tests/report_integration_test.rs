@@ -104,18 +104,22 @@ async fn test_gsb_election_first_session_zip_download_works(pool: SqlitePool) {
 
     let bytes = download_zip_assert(&cookie, &url, prefix).await;
     let archive = ZipFileReader::new(bytes).await.unwrap();
+    assert_eq!(archive.file().entries().len(), 2);
     let pdf_hash1 = sha2::Sha256::digest(read_zip_entry(&archive, 0, "Model_Na31-2.pdf").await);
     let xml_zip = read_zip_entry(&archive, 1, "Telling_GR2024_Heemdamseburg.zip").await;
     let xml_archive = ZipFileReader::new(xml_zip).await.unwrap();
+    assert_eq!(xml_archive.file().entries().len(), 1);
     let eml_hash1 = sha2::Sha256::digest(
         read_zip_entry(&xml_archive, 0, "Telling_GR2024_Heemdamseburg.eml.xml").await,
     );
 
     let bytes2 = download_zip_assert(&cookie, &url, prefix).await;
     let archive2 = ZipFileReader::new(bytes2).await.unwrap();
+    assert_eq!(archive2.file().entries().len(), 2);
     let pdf_hash2 = sha2::Sha256::digest(read_zip_entry(&archive2, 0, "Model_Na31-2.pdf").await);
     let xml_zip2 = read_zip_entry(&archive2, 1, "Telling_GR2024_Heemdamseburg.zip").await;
     let xml_archive2 = ZipFileReader::new(xml_zip2).await.unwrap();
+    assert_eq!(xml_archive2.file().entries().len(), 1);
     let eml_hash2 = sha2::Sha256::digest(
         read_zip_entry(&xml_archive2, 0, "Telling_GR2024_Heemdamseburg.eml.xml").await,
     );
@@ -150,24 +154,36 @@ async fn test_gsb_election_next_session_zip_download_works(pool: SqlitePool) {
 
     let bytes = download_zip_assert(&cookie, &url, prefix).await;
     let archive = ZipFileReader::new(bytes).await.unwrap();
+    assert_eq!(archive.file().entries().len(), 3);
     let pdf_hash1 = sha2::Sha256::digest(read_zip_entry(&archive, 0, "Model_Na14-2.pdf").await);
     let xml_zip = read_zip_entry(&archive, 1, "Telling_GR2026_GroteStad.zip").await;
     let xml_archive = ZipFileReader::new(xml_zip).await.unwrap();
+    assert_eq!(xml_archive.file().entries().len(), 1);
     let eml_hash1 = sha2::Sha256::digest(
         read_zip_entry(&xml_archive, 0, "Telling_GR2026_GroteStad.eml.xml").await,
     );
+    let pdf_overview_hash1 =
+        sha2::Sha256::digest(read_zip_entry(&archive, 2, "Leeg_Model_P2a.pdf").await);
 
     let bytes2 = download_zip_assert(&cookie, &url, prefix).await;
     let archive2 = ZipFileReader::new(bytes2).await.unwrap();
+    assert_eq!(archive2.file().entries().len(), 3);
     let pdf_hash2 = sha2::Sha256::digest(read_zip_entry(&archive2, 0, "Model_Na14-2.pdf").await);
     let xml_zip2 = read_zip_entry(&archive2, 1, "Telling_GR2026_GroteStad.zip").await;
     let xml_archive2 = ZipFileReader::new(xml_zip2).await.unwrap();
+    assert_eq!(xml_archive2.file().entries().len(), 1);
     let eml_hash2 = sha2::Sha256::digest(
         read_zip_entry(&xml_archive2, 0, "Telling_GR2026_GroteStad.eml.xml").await,
     );
+    let pdf_overview_hash2 =
+        sha2::Sha256::digest(read_zip_entry(&archive2, 2, "Leeg_Model_P2a.pdf").await);
 
     assert_eq!(pdf_hash1, pdf_hash2, "PDF files should have the same hash");
     assert_eq!(eml_hash1, eml_hash2, "EML files should have the same hash");
+    assert_eq!(
+        pdf_overview_hash1, pdf_overview_hash2,
+        "PDF overview files should have the same hash"
+    );
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
@@ -210,13 +226,28 @@ async fn test_csb_election_zip_download_results_works(pool: SqlitePool) {
 
     let bytes = download_zip_assert(&cookie, &url, prefix).await;
     let archive = ZipFileReader::new(bytes).await.unwrap();
+    assert_eq!(archive.file().entries().len(), 2);
     let pdf_hash1 = sha2::Sha256::digest(read_zip_entry(&archive, 0, "Model_P22-2.pdf").await);
+    let xml_zip = read_zip_entry(&archive, 1, "Resultaat_GR2024_Juinen.zip").await;
+    let xml_archive = ZipFileReader::new(xml_zip).await.unwrap();
+    assert_eq!(xml_archive.file().entries().len(), 1);
+    let eml_hash1 = sha2::Sha256::digest(
+        read_zip_entry(&xml_archive, 0, "Resultaat_GR2024_Juinen.eml.xml").await,
+    );
 
     let bytes2 = download_zip_assert(&cookie, &url, prefix).await;
     let archive2 = ZipFileReader::new(bytes2).await.unwrap();
+    assert_eq!(archive2.file().entries().len(), 2);
     let pdf_hash2 = sha2::Sha256::digest(read_zip_entry(&archive2, 0, "Model_P22-2.pdf").await);
+    let xml_zip2 = read_zip_entry(&archive2, 1, "Resultaat_GR2024_Juinen.zip").await;
+    let xml_archive2 = ZipFileReader::new(xml_zip2).await.unwrap();
+    assert_eq!(xml_archive2.file().entries().len(), 1);
+    let eml_hash2 = sha2::Sha256::digest(
+        read_zip_entry(&xml_archive2, 0, "Resultaat_GR2024_Juinen.eml.xml").await,
+    );
 
     assert_eq!(pdf_hash1, pdf_hash2, "PDF files should have the same hash");
+    assert_eq!(eml_hash1, eml_hash2, "EML files should have the same hash");
 }
 
 #[test(sqlx::test(fixtures(
@@ -263,11 +294,13 @@ async fn test_csb_election_zip_download_attachment_works(pool: SqlitePool) {
 
     let bytes = download_zip_assert(&cookie, &url, prefix).await;
     let archive = ZipFileReader::new(bytes).await.unwrap();
+    assert_eq!(archive.file().entries().len(), 1);
     let pdf_hash1 =
         sha2::Sha256::digest(read_zip_entry(&archive, 0, "Model_P22-2_bijlage.pdf").await);
 
     let bytes2 = download_zip_assert(&cookie, &url, prefix).await;
     let archive2 = ZipFileReader::new(bytes2).await.unwrap();
+    assert_eq!(archive2.file().entries().len(), 1);
     let pdf_hash2 =
         sha2::Sha256::digest(read_zip_entry(&archive2, 0, "Model_P22-2_bijlage.pdf").await);
 
@@ -320,16 +353,20 @@ async fn test_csb_election_zip_download_total_counts_works(pool: SqlitePool) {
 
     let bytes = download_zip_assert(&cookie, &url, prefix).await;
     let archive = ZipFileReader::new(bytes).await.unwrap();
+    assert_eq!(archive.file().entries().len(), 1);
     let xml_zip = read_zip_entry(&archive, 0, "Totaaltelling_GR2024_Juinen.zip").await;
     let xml_archive = ZipFileReader::new(xml_zip).await.unwrap();
+    assert_eq!(xml_archive.file().entries().len(), 1);
     let eml_hash1 = sha2::Sha256::digest(
         read_zip_entry(&xml_archive, 0, "Totaaltelling_GR2024_Juinen.eml.xml").await,
     );
 
     let bytes2 = download_zip_assert(&cookie, &url, prefix).await;
     let archive2 = ZipFileReader::new(bytes2).await.unwrap();
+    assert_eq!(archive2.file().entries().len(), 1);
     let xml_zip2 = read_zip_entry(&archive2, 0, "Totaaltelling_GR2024_Juinen.zip").await;
     let xml_archive2 = ZipFileReader::new(xml_zip2).await.unwrap();
+    assert_eq!(xml_archive2.file().entries().len(), 1);
     let eml_hash2 = sha2::Sha256::digest(
         read_zip_entry(&xml_archive2, 0, "Totaaltelling_GR2024_Juinen.eml.xml").await,
     );

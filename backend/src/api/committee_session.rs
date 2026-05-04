@@ -23,7 +23,7 @@ use crate::{
         role::Role,
         validate::DataError,
     },
-    error::{ApiErrorResponse, ErrorReference, ErrorResponse, error_response},
+    error::{ApiErrorResponse, ErrorReference, ErrorResponse},
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
     repository::{
         committee_session_repo::{
@@ -47,35 +47,43 @@ impl ApiErrorResponse for CommitteeSessionError {
         match self {
             CommitteeSessionError::CommitteeSessionPaused => (
                 StatusCode::CONFLICT,
-                error_response(
-                    "Committee session data entry is paused",
+                ErrorResponse::new(
+                    String::from("Committee session data entry is paused"),
                     ErrorReference::CommitteeSessionPaused,
                     true,
                 ),
             ),
             CommitteeSessionError::InvalidCommitteeSessionStatus => (
                 StatusCode::CONFLICT,
-                error_response(
-                    "Invalid committee session status",
+                ErrorResponse::new(
+                    String::from("Invalid committee session status"),
                     ErrorReference::InvalidCommitteeSessionStatus,
                     true,
                 ),
             ),
             CommitteeSessionError::InvalidDetails => (
                 StatusCode::BAD_REQUEST,
-                error_response("Invalid details", ErrorReference::InvalidData, false),
+                ErrorResponse::new(
+                    String::from("Invalid details"),
+                    ErrorReference::InvalidData,
+                    false,
+                ),
             ),
             CommitteeSessionError::InvalidStatusTransition => (
                 StatusCode::CONFLICT,
-                error_response(
-                    "Invalid committee session state transition",
+                ErrorResponse::new(
+                    String::from("Invalid committee session state transition"),
                     ErrorReference::InvalidStateTransition,
                     true,
                 ),
             ),
             CommitteeSessionError::ProviderError => (
                 StatusCode::INTERNAL_SERVER_ERROR,
-                error_response("Internal server error", ErrorReference::DatabaseError, true),
+                ErrorResponse::new(
+                    String::from("Internal server error"),
+                    ErrorReference::DatabaseError,
+                    true,
+                ),
             ),
         }
     }

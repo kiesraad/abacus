@@ -15,7 +15,7 @@ use crate::{
     APIError, AppState,
     api::middleware::authentication::RouteAuthorization,
     domain::role::Role,
-    error::{ApiErrorResponse, ErrorReference, ErrorResponse, error_response},
+    error::{ApiErrorResponse, ErrorReference, ErrorResponse},
 };
 
 /// Errors that can occur before apportionment
@@ -36,32 +36,34 @@ impl ApiErrorResponse for ApportionmentApiError {
         match self {
             ApportionmentApiError::AllListsExhausted => (
                 StatusCode::UNPROCESSABLE_ENTITY,
-                error_response(
-                    "All lists are exhausted, not enough candidates to fill all seats",
+                ErrorResponse::new(
+                    String::from(
+                        "All lists are exhausted, not enough candidates to fill all seats",
+                    ),
                     ErrorReference::ApportionmentAllListsExhausted,
                     false,
                 ),
             ),
             ApportionmentApiError::CommitteeSessionNotCompleted => (
                 StatusCode::PRECONDITION_FAILED,
-                error_response(
-                    "Committee session not completed",
+                ErrorResponse::new(
+                    String::from("Committee session not completed"),
                     ErrorReference::ApportionmentCommitteeSessionNotCompleted,
                     false,
                 ),
             ),
             ApportionmentApiError::DrawingOfLotsNotImplemented => (
                 StatusCode::UNPROCESSABLE_ENTITY,
-                error_response(
-                    "Drawing of lots is required",
+                ErrorResponse::new(
+                    String::from("Drawing of lots is required"),
                     ErrorReference::ApportionmentDrawingOfLotsRequired,
                     false,
                 ),
             ),
             ApportionmentApiError::ZeroVotesCast => (
                 StatusCode::UNPROCESSABLE_ENTITY,
-                error_response(
-                    "No votes on candidates cast",
+                ErrorResponse::new(
+                    String::from("No votes on candidates cast"),
                     ErrorReference::ApportionmentZeroVotesCast,
                     false,
                 ),

@@ -9,7 +9,7 @@ use crate::{
     APIError,
     api::{
         apportionment::{map_candidate_nomination, map_seat_assignment},
-        report::{DEFAULT_DATE_TIME_FORMAT, files::xml_count_base_name},
+        report::{DEFAULT_DATE_TIME_FORMAT, naming::xml_count_base_name},
     },
     domain::{
         committee_session::{CommitteeSession, CommitteeSessionId},

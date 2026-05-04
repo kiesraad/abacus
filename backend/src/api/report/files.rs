@@ -1,6 +1,6 @@
-use chrono::{DateTime, Local, Utc};
+use chrono::{Local, Utc};
 use eml_nl::io::EMLWrite;
-use pdf_gen::{generate_pdf, zip::slugify_filename};
+use pdf_gen::generate_pdf;
 use sqlx::{SqliteConnection, SqlitePool};
 
 use crate::{
@@ -12,7 +12,7 @@ use crate::{
     domain::{
         committee_session::{CommitteeSession, CommitteeSessionError, CommitteeSessionId},
         committee_session_status::CommitteeSessionStatus,
-        election::{CommitteeCategory, ElectionWithPoliticalGroups},
+        election::CommitteeCategory,
         file::{File, FileType},
     },
     eml::EmlHash,
@@ -27,64 +27,6 @@ use crate::{
 
 const EML_MIME_TYPE: &str = "text/xml";
 const PDF_MIME_TYPE: &str = "application/pdf";
-
-pub fn xml_count_base_name(election: &ElectionWithPoliticalGroups) -> &'static str {
-    match election.committee_category {
-        CommitteeCategory::GSB => "Telling",
-        CommitteeCategory::CSB => "Totaaltelling",
-    }
-}
-
-pub fn download_zip_filename(
-    election: &ElectionWithPoliticalGroups,
-    created_at: DateTime<Local>,
-    base_name: &str,
-) -> String {
-    use chrono::Datelike;
-    let location = election.location.to_lowercase();
-    let location_without_whitespace: String = location.split_whitespace().collect();
-    slugify_filename(&format!(
-        "{} {}{} {} gemeente {}-{}-{}.zip",
-        base_name,
-        election.category.to_eml_code().to_lowercase(),
-        election.election_date.year(),
-        location_without_whitespace,
-        location.replace(" ", "-"),
-        created_at.date_naive().format("%Y%m%d"),
-        created_at.time().format("%H%M%S"),
-    ))
-}
-
-pub fn zip_file_base_name_gsb(committee_session: &CommitteeSession) -> &'static str {
-    if committee_session.is_next_session() {
-        "correctie"
-    } else {
-        "definitieve-documenten"
-    }
-}
-
-pub fn xml_zip_filename(election: &ElectionWithPoliticalGroups) -> String {
-    use chrono::Datelike;
-    let location_without_whitespace: String = election.location.split_whitespace().collect();
-    slugify_filename(&format!(
-        "{} {}{} {}.zip",
-        xml_count_base_name(election),
-        election.category.to_eml_code(),
-        election.election_date.year(),
-        location_without_whitespace
-    ))
-}
-
-pub fn xml_results_zip_filename(election: &ElectionWithPoliticalGroups) -> String {
-    use chrono::Datelike;
-    let location_without_whitespace: String = election.location.split_whitespace().collect();
-    slugify_filename(&format!(
-        "Resultaat {}{} {}.zip",
-        election.category.to_eml_code(),
-        election.election_date.year(),
-        location_without_whitespace
-    ))
-}
 
 #[expect(clippy::too_many_lines)]
 async fn generate_and_save_files_gsb_election(

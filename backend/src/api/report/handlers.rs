@@ -8,9 +8,12 @@ use sqlx::SqlitePool;
 
 use crate::{
     APIError, ErrorResponse,
-    api::report::files::{
-        download_zip_filename, get_files_csb_election, get_files_gsb_election,
-        xml_results_zip_filename, xml_zip_filename, zip_file_base_name_gsb,
+    api::report::{
+        files::{get_files_csb_election, get_files_gsb_election},
+        naming::{
+            download_zip_filename, xml_results_zip_filename, xml_zip_filename,
+            zip_file_base_name_gsb,
+        },
     },
     domain::{committee_session::CommitteeSessionId, election::ElectionId},
     infra::audit_log::AuditService,

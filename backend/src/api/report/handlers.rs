@@ -62,12 +62,13 @@ pub async fn election_download_zip_results_gsb(
     let files = get_files_gsb_election(&pool, audit_service, committee_session.id).await?;
     drop(conn);
 
-    let download_zip_filename = naming::download_zip_filename(
-        naming::ZipDownloadType::GsbResults,
-        &election,
-        committee_session.is_next_session(),
-        files.created_at().with_timezone(&Local),
-    );
+    let base_name = if committee_session.is_next_session() {
+        "correctie"
+    } else {
+        "definitieve-documenten"
+    };
+    let created_at = files.created_at().with_timezone(&Local);
+    let download_zip_filename = naming::download_zip_filename(base_name, &election, created_at);
 
     let (zip_response, mut zip_writer) = ZipResponse::new(&download_zip_filename);
 
@@ -137,12 +138,9 @@ pub async fn election_download_zip_results_csb(
     let files = get_files_csb_election(&pool, audit_service, committee_session.id).await?;
     drop(conn);
 
-    let download_zip_filename = naming::download_zip_filename(
-        naming::ZipDownloadType::CsbResults,
-        &election,
-        false,
-        files.created_at().with_timezone(&Local),
-    );
+    let created_at = files.created_at().with_timezone(&Local);
+    let download_zip_filename =
+        naming::download_zip_filename("vaststelling-uitslag", &election, created_at);
 
     let (zip_response, mut zip_writer) = ZipResponse::new(&download_zip_filename);
 
@@ -206,12 +204,9 @@ pub async fn election_download_zip_attachment_csb(
     let files = get_files_csb_election(&pool, audit_service, committee_session.id).await?;
     drop(conn);
 
-    let download_zip_filename = naming::download_zip_filename(
-        naming::ZipDownloadType::CsbAttachment,
-        &election,
-        false,
-        files.created_at().with_timezone(&Local),
-    );
+    let created_at = files.created_at().with_timezone(&Local);
+    let download_zip_filename =
+        naming::download_zip_filename("model-p22-2-bijlage", &election, created_at);
 
     let (zip_response, mut zip_writer) = ZipResponse::new(&download_zip_filename);
 
@@ -271,12 +266,9 @@ pub async fn election_download_zip_total_counts_csb(
     let files = get_files_csb_election(&pool, audit_service, committee_session.id).await?;
     drop(conn);
 
-    let download_zip_filename = naming::download_zip_filename(
-        naming::ZipDownloadType::CsbTotalCounts,
-        &election,
-        false,
-        files.created_at().with_timezone(&Local),
-    );
+    let created_at = files.created_at().with_timezone(&Local);
+    let download_zip_filename =
+        naming::download_zip_filename("definitieve-documenten", &election, created_at);
 
     let (zip_response, mut zip_writer) = ZipResponse::new(&download_zip_filename);
 

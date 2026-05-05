@@ -3,39 +3,16 @@ use pdf_gen::zip::slugify_filename;
 
 use crate::domain::{election::ElectionWithPoliticalGroups, file::FileType};
 
-pub enum ZipDownloadType {
-    GsbResults,
-    CsbResults,
-    CsbAttachment,
-    CsbTotalCounts,
-}
-
 pub fn download_zip_filename(
-    kind: ZipDownloadType,
+    base: &str,
     election: &ElectionWithPoliticalGroups,
-    is_next_session: bool,
     created_at: DateTime<Local>,
 ) -> String {
-    use ZipDownloadType::*;
-
-    let base_name = match kind {
-        GsbResults => {
-            if is_next_session {
-                "correctie"
-            } else {
-                "definitieve-documenten"
-            }
-        }
-        CsbResults => "vaststelling-uitslag",
-        CsbAttachment => "model-p22-2-bijlage",
-        CsbTotalCounts => "definitieve-documenten",
-    };
-
     let location = election.location.to_lowercase();
     let location_without_whitespace: String = location.split_whitespace().collect();
     slugify_filename(&format!(
         "{} {}{} {} gemeente {}-{}-{}.zip",
-        base_name,
+        base,
         election.category.to_eml_code().to_lowercase(),
         election.election_date.year(),
         location_without_whitespace,

@@ -42,7 +42,7 @@ impl ApiErrorResponse for AuthenticationError {
             AuthenticationError::InvalidUsernameOrPassword => (
                 StatusCode::UNAUTHORIZED,
                 ErrorResponse::new(
-                    String::from("Invalid username and/or password"),
+                    "Invalid username and/or password",
                     ErrorReference::InvalidUsernameOrPassword,
                     false,
                 ),
@@ -50,7 +50,7 @@ impl ApiErrorResponse for AuthenticationError {
             AuthenticationError::UsernameAlreadyExists => (
                 StatusCode::CONFLICT,
                 ErrorResponse::new(
-                    String::from("Username already exists"),
+                    "Username already exists",
                     ErrorReference::UsernameNotUnique,
                     false,
                 ),
@@ -58,7 +58,7 @@ impl ApiErrorResponse for AuthenticationError {
             AuthenticationError::NotInitialised => (
                 StatusCode::IM_A_TEAPOT,
                 ErrorResponse::new(
-                    String::from("Application not initialised"),
+                    "Application not initialised",
                     ErrorReference::NotInitialised,
                     false,
                 ),
@@ -66,59 +66,43 @@ impl ApiErrorResponse for AuthenticationError {
             AuthenticationError::AlreadyInitialised => (
                 StatusCode::FORBIDDEN,
                 ErrorResponse::new(
-                    String::from("Application already initialised"),
+                    "Application already initialised",
                     ErrorReference::AlreadyInitialised,
                     false,
                 ),
             ),
             AuthenticationError::UserNotFound => (
                 StatusCode::UNAUTHORIZED,
-                ErrorResponse::new(
-                    String::from("User not found"),
-                    ErrorReference::UserNotFound,
-                    false,
-                ),
+                ErrorResponse::new("User not found", ErrorReference::UserNotFound, false),
             ),
             AuthenticationError::UserAlreadySetup => (
                 StatusCode::CONFLICT,
-                ErrorResponse::new(
-                    String::from("Invalid user state"),
-                    ErrorReference::Forbidden,
-                    false,
-                ),
+                ErrorResponse::new("Invalid user state", ErrorReference::Forbidden, false),
             ),
             AuthenticationError::InvalidPassword => (
                 StatusCode::UNAUTHORIZED,
                 ErrorResponse::new(
-                    String::from("Invalid password provided"),
+                    "Invalid password provided",
                     ErrorReference::InvalidPassword,
                     false,
                 ),
             ),
             AuthenticationError::SessionKeyNotFound | AuthenticationError::NoSessionCookie => (
                 StatusCode::UNAUTHORIZED,
-                ErrorResponse::new(
-                    String::from("Invalid session"),
-                    ErrorReference::InvalidSession,
-                    false,
-                ),
+                ErrorResponse::new("Invalid session", ErrorReference::InvalidSession, false),
             ),
             AuthenticationError::Unauthorized | AuthenticationError::Unauthenticated => (
                 StatusCode::UNAUTHORIZED,
-                ErrorResponse::new(
-                    String::from("Unauthorized"),
-                    ErrorReference::Unauthorized,
-                    false,
-                ),
+                ErrorResponse::new("Unauthorized", ErrorReference::Unauthorized, false),
             ),
             AuthenticationError::Forbidden => (
                 StatusCode::FORBIDDEN,
-                ErrorResponse::new(String::from("Forbidden"), ErrorReference::Forbidden, true),
+                ErrorResponse::new("Forbidden", ErrorReference::Forbidden, true),
             ),
             AuthenticationError::PasswordRejectionSameAsOld => (
                 StatusCode::BAD_REQUEST,
                 ErrorResponse::new(
-                    String::from("Invalid password"),
+                    "Invalid password",
                     ErrorReference::PasswordRejectionSameAsOld,
                     false,
                 ),
@@ -126,7 +110,7 @@ impl ApiErrorResponse for AuthenticationError {
             AuthenticationError::PasswordRejectionSameAsUsername => (
                 StatusCode::BAD_REQUEST,
                 ErrorResponse::new(
-                    String::from("Invalid password"),
+                    "Invalid password",
                     ErrorReference::PasswordRejectionSameAsUsername,
                     false,
                 ),
@@ -134,23 +118,19 @@ impl ApiErrorResponse for AuthenticationError {
             AuthenticationError::PasswordRejectionTooShort => (
                 StatusCode::BAD_REQUEST,
                 ErrorResponse::new(
-                    String::from("Invalid password"),
+                    "Invalid password",
                     ErrorReference::PasswordRejectionTooShort,
                     false,
                 ),
             ),
             AuthenticationError::RoleNotAuthorizedError => (
                 StatusCode::FORBIDDEN,
-                ErrorResponse::new(
-                    String::from("Invalid role"),
-                    ErrorReference::Forbidden,
-                    true,
-                ),
+                ErrorResponse::new("Invalid role", ErrorReference::Forbidden, true),
             ),
             AuthenticationError::OwnAccountCannotBeDeleted => (
                 StatusCode::FORBIDDEN,
                 ErrorResponse::new(
-                    String::from("Cannot delete your own account"),
+                    "Cannot delete your own account",
                     ErrorReference::OwnAccountCannotBeDeleted,
                     false,
                 ),
@@ -160,7 +140,7 @@ impl ApiErrorResponse for AuthenticationError {
             | AuthenticationError::InvalidSessionDuration => (
                 StatusCode::INTERNAL_SERVER_ERROR,
                 ErrorResponse::new(
-                    String::from("Internal server error"),
+                    "Internal server error",
                     ErrorReference::InternalServerError,
                     false,
                 ),

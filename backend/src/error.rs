@@ -96,9 +96,9 @@ pub struct ErrorResponse {
 }
 
 impl ErrorResponse {
-    pub fn new(error: String, reference: ErrorReference, fatal: bool) -> Self {
+    pub fn new(error: impl ToString, reference: ErrorReference, fatal: bool) -> Self {
         Self {
-            error,
+            error: error.to_string(),
             reference,
             fatal,
         }
@@ -149,30 +149,30 @@ impl APIError {
             }
             APIError::AirgapViolation(message) => (
                 StatusCode::SERVICE_UNAVAILABLE,
-                ErrorResponse::new(message.to_string(), ErrorReference::AirgapViolation, true),
+                ErrorResponse::new(message, ErrorReference::AirgapViolation, true),
             ),
             APIError::BadRequest(message, reference) => (
                 StatusCode::BAD_REQUEST,
-                ErrorResponse::new(message.to_string(), reference, true),
+                ErrorResponse::new(message, reference, true),
             ),
             APIError::ContentTooLarge(message, reference) => (
                 StatusCode::PAYLOAD_TOO_LARGE,
-                ErrorResponse::new(message.to_string(), reference, false),
+                ErrorResponse::new(message, reference, false),
             ),
             APIError::NotFound(message, reference) => (
                 StatusCode::NOT_FOUND,
-                ErrorResponse::new(message.to_string(), reference, true),
+                ErrorResponse::new(message, reference, true),
             ),
             APIError::Conflict(message, reference) => (
                 StatusCode::CONFLICT,
-                ErrorResponse::new(message.to_string(), reference, false),
+                ErrorResponse::new(message, reference, false),
             ),
             APIError::DataIntegrityError(message) => {
                 error!("Data integrity error: {}", message);
                 (
                     StatusCode::INTERNAL_SERVER_ERROR,
                     ErrorResponse::new(
-                        String::from("Internal server error"),
+                        "Internal server error",
                         ErrorReference::DatabaseError,
                         true,
                     ),
@@ -182,46 +182,30 @@ impl APIError {
                 error!("Invalid data error: {}", err);
                 (
                     StatusCode::UNPROCESSABLE_ENTITY,
-                    ErrorResponse::new(
-                        String::from("Invalid data"),
-                        ErrorReference::InvalidData,
-                        false,
-                    ),
+                    ErrorResponse::new("Invalid data", ErrorReference::InvalidData, false),
                 )
             }
             APIError::JsonRejection(rejection) => (
                 StatusCode::UNPROCESSABLE_ENTITY,
-                ErrorResponse::new(
-                    rejection.body_text().to_string(),
-                    ErrorReference::InvalidJson,
-                    true,
-                ),
+                ErrorResponse::new(rejection.body_text(), ErrorReference::InvalidJson, true),
             ),
             APIError::SerdeJsonError(err) => {
                 error!("Serde JSON error: {:?}", err);
                 (
                     StatusCode::INTERNAL_SERVER_ERROR,
-                    ErrorResponse::new(
-                        String::from("Internal server error"),
-                        ErrorReference::InvalidJson,
-                        true,
-                    ),
+                    ErrorResponse::new("Internal server error", ErrorReference::InvalidJson, true),
                 )
             }
             APIError::SqlxError(sqlx::Error::RowNotFound) => (
                 StatusCode::NOT_FOUND,
-                ErrorResponse::new(
-                    String::from("Resource not found"),
-                    ErrorReference::EntryNotFound,
-                    true,
-                ),
+                ErrorResponse::new("Resource not found", ErrorReference::EntryNotFound, true),
             ),
             APIError::SqlxError(err) => {
                 error!("SQLx error: {:?}", err);
                 (
                     StatusCode::INTERNAL_SERVER_ERROR,
                     ErrorResponse::new(
-                        String::from("Internal server error"),
+                        "Internal server error",
                         ErrorReference::DatabaseError,
                         true,
                     ),
@@ -230,7 +214,7 @@ impl APIError {
             APIError::InvalidHeaderValue => (
                 StatusCode::INTERNAL_SERVER_ERROR,
                 ErrorResponse::new(
-                    String::from("Internal server error"),
+                    "Internal server error",
                     ErrorReference::InternalServerError,
                     true,
                 ),
@@ -240,7 +224,7 @@ impl APIError {
                 (
                     StatusCode::INTERNAL_SERVER_ERROR,
                     ErrorResponse::new(
-                        String::from("Internal server error"),
+                        "Internal server error",
                         ErrorReference::PdfGenerationError,
                         false,
                     ),
@@ -251,7 +235,7 @@ impl APIError {
                 (
                     StatusCode::INTERNAL_SERVER_ERROR,
                     ErrorResponse::new(
-                        String::from("Internal server error"),
+                        "Internal server error",
                         ErrorReference::InternalServerError,
                         true,
                     ),
@@ -261,18 +245,14 @@ impl APIError {
                 error!("Error while adding totals: {:?}", err);
                 (
                     StatusCode::INTERNAL_SERVER_ERROR,
-                    ErrorResponse::new(String::from("Internal server error"), reference, false),
+                    ErrorResponse::new("Internal server error", reference, false),
                 )
             }
             APIError::InvalidHashError => {
                 error!("Invalid hash");
                 (
                     StatusCode::BAD_REQUEST,
-                    ErrorResponse::new(
-                        String::from("Invalid hash"),
-                        ErrorReference::InvalidHash,
-                        false,
-                    ),
+                    ErrorResponse::new("Invalid hash", ErrorReference::InvalidHash, false),
                 )
             }
             APIError::XmlError(err) => {
@@ -280,7 +260,7 @@ impl APIError {
                 (
                     StatusCode::INTERNAL_SERVER_ERROR,
                     ErrorResponse::new(
-                        String::from("Internal server error"),
+                        "Internal server error",
                         ErrorReference::InternalServerError,
                         false,
                     ),
@@ -290,11 +270,7 @@ impl APIError {
                 error!("Could not deserialize XML: {:?}", err);
                 (
                     StatusCode::BAD_REQUEST,
-                    ErrorResponse::new(
-                        String::from("Invalid XML"),
-                        ErrorReference::InvalidXml,
-                        false,
-                    ),
+                    ErrorResponse::new("Invalid XML", ErrorReference::InvalidXml, false),
                 )
             }
             APIError::ZipError(err) => {
@@ -302,7 +278,7 @@ impl APIError {
                 (
                     StatusCode::INTERNAL_SERVER_ERROR,
                     ErrorResponse::new(
-                        String::from("Internal server error"),
+                        "Internal server error",
                         ErrorReference::InternalServerError,
                         false,
                     ),
@@ -312,18 +288,14 @@ impl APIError {
                 error!("Error importing EML file: {:?}", err);
                 (
                     StatusCode::BAD_REQUEST,
-                    ErrorResponse::new(
-                        String::from("EML import error"),
-                        ErrorReference::EmlImportError,
-                        false,
-                    ),
+                    ErrorResponse::new("EML import error", ErrorReference::EmlImportError, false),
                 )
             }
             APIError::EmlError(err) => {
                 error!("Error with EML file: {:?}", err);
                 (
                     StatusCode::BAD_REQUEST,
-                    ErrorResponse::new(String::from("EML error"), ErrorReference::EmlError, false),
+                    ErrorResponse::new("EML error", ErrorReference::EmlError, false),
                 )
             }
         }

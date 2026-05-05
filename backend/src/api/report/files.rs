@@ -243,9 +243,7 @@ pub async fn get_files_gsb_election(
         || committee_session.start_date_time.is_none()
         || !are_results_complete_for_committee_session(&mut conn, committee_session.id).await?
     {
-        return Err(APIError::CommitteeSession(
-            CommitteeSessionError::InvalidCommitteeSessionStatus,
-        ));
+        return Err(CommitteeSessionError::InvalidCommitteeSessionStatus.into());
     }
 
     // Check if files exist, if so, get files from database
@@ -283,9 +281,7 @@ pub async fn get_files_csb_election(
         || committee_session.start_date_time.is_none()
         || !are_results_complete_for_committee_session(&mut conn, committee_session.id).await?
     {
-        return Err(APIError::CommitteeSession(
-            CommitteeSessionError::InvalidCommitteeSessionStatus,
-        ));
+        return Err(CommitteeSessionError::InvalidCommitteeSessionStatus.into());
     }
 
     // Check if files exist, if so, get files from database

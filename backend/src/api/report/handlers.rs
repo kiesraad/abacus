@@ -2,17 +2,17 @@ use axum::{
     extract::{Path, State},
     response::IntoResponse,
 };
-use chrono::Local;
-use pdf_gen::zip::{ZipResponse, ZipResponseError, zip_single_file};
+use chrono::{DateTime, Datelike, Local};
+use pdf_gen::zip::{ZipResponse, ZipResponseError, slugify_filename, zip_single_file};
 use sqlx::SqlitePool;
 
 use crate::{
     APIError, ErrorResponse,
-    api::report::{
-        files::{get_files_csb_election, get_files_gsb_election},
-        naming,
+    api::report::files::{get_files_csb_election, get_files_gsb_election},
+    domain::{
+        committee_session::CommitteeSessionId,
+        election::{ElectionId, ElectionWithPoliticalGroups},
     },
-    domain::{committee_session::CommitteeSessionId, election::ElectionId},
     infra::audit_log::AuditService,
     repository::{
         committee_session_repo::{self},
@@ -20,6 +20,31 @@ use crate::{
         user_repo::User,
     },
 };
+
+pub fn download_zip_filename(
+    base: &str,
+    election: &ElectionWithPoliticalGroups,
+    created_at: DateTime<Local>,
+) -> String {
+    let location = election.location.to_lowercase();
+    let location_without_whitespace: String = location.split_whitespace().collect();
+    slugify_filename(&format!(
+        "{} {}{} {} gemeente {}-{}-{}.zip",
+        base,
+        election.category.to_eml_code().to_lowercase(),
+        election.election_date.year(),
+        location_without_whitespace,
+        location.replace(" ", "-"),
+        created_at.date_naive().format("%Y%m%d"),
+        created_at.time().format("%H%M%S"),
+    ))
+}
+
+/// Replaces the extension of the given filename with .zip
+pub fn with_zip_extension(filename: &str) -> String {
+    let base = filename.split('.').next().unwrap_or("Noname");
+    format!("{}.zip", base)
+}
 
 /// Download a zip containing a PDF for the PV and the EML with GSB election results
 #[utoipa::path(
@@ -68,7 +93,7 @@ pub async fn election_download_zip_results_gsb(
         "definitieve-documenten"
     };
     let created_at = files.created_at().with_timezone(&Local);
-    let download_zip_filename = naming::download_zip_filename(base_name, &election, created_at);
+    let download_zip_filename = download_zip_filename(base_name, &election, created_at);
 
     let (zip_response, mut zip_writer) = ZipResponse::new(&download_zip_filename);
 
@@ -78,7 +103,7 @@ pub async fn election_download_zip_results_gsb(
         }
 
         if let Some(eml_file) = files.results_eml {
-            let xml_zip_filename = naming::with_zip_extension(&eml_file.name);
+            let xml_zip_filename = with_zip_extension(&eml_file.name);
             let xml_zip = zip_single_file(&eml_file.name, &eml_file.data).await?;
             zip_writer.add_file(&xml_zip_filename, &xml_zip).await?;
         }
@@ -140,7 +165,7 @@ pub async fn election_download_zip_results_csb(
 
     let created_at = files.created_at().with_timezone(&Local);
     let download_zip_filename =
-        naming::download_zip_filename("vaststelling-uitslag", &election, created_at);
+        download_zip_filename("vaststelling-uitslag", &election, created_at);
 
     let (zip_response, mut zip_writer) = ZipResponse::new(&download_zip_filename);
 
@@ -150,7 +175,7 @@ pub async fn election_download_zip_results_csb(
         }
 
         if let Some(eml_results_file) = files.results_eml {
-            let xml_zip_filename = naming::with_zip_extension(&eml_results_file.name);
+            let xml_zip_filename = with_zip_extension(&eml_results_file.name);
             let xml_zip = zip_single_file(&eml_results_file.name, &eml_results_file.data).await?;
             zip_writer.add_file(&xml_zip_filename, &xml_zip).await?;
         }
@@ -205,8 +230,7 @@ pub async fn election_download_zip_attachment_csb(
     drop(conn);
 
     let created_at = files.created_at().with_timezone(&Local);
-    let download_zip_filename =
-        naming::download_zip_filename("model-p22-2-bijlage", &election, created_at);
+    let download_zip_filename = download_zip_filename("model-p22-2-bijlage", &election, created_at);
 
     let (zip_response, mut zip_writer) = ZipResponse::new(&download_zip_filename);
 
@@ -268,13 +292,13 @@ pub async fn election_download_zip_total_counts_csb(
 
     let created_at = files.created_at().with_timezone(&Local);
     let download_zip_filename =
-        naming::download_zip_filename("definitieve-documenten", &election, created_at);
+        download_zip_filename("definitieve-documenten", &election, created_at);
 
     let (zip_response, mut zip_writer) = ZipResponse::new(&download_zip_filename);
 
     tokio::spawn(async move {
         if let Some(total_counts_eml_file) = files.total_counts_eml {
-            let xml_zip_filename = naming::with_zip_extension(&total_counts_eml_file.name);
+            let xml_zip_filename = with_zip_extension(&total_counts_eml_file.name);
             let xml_zip =
                 zip_single_file(&total_counts_eml_file.name, &total_counts_eml_file.data).await?;
             zip_writer.add_file(&xml_zip_filename, &xml_zip).await?;

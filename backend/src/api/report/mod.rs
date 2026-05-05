@@ -4,7 +4,6 @@ use crate::{AppState, api::middleware::authentication::RouteAuthorization, domai
 
 mod files;
 mod handlers;
-mod naming;
 mod structs;
 
 /// Default date time format for reports

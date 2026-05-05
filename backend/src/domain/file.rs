@@ -28,6 +28,17 @@ pub enum FileType {
     CsbAttachmentPdf,
 }
 
+impl FileType {
+    pub fn mime_type(&self) -> &'static str {
+        use FileType::*;
+
+        match self {
+            GsbResultsEml | CsbResultsEml | CsbTotalCountsEml => "text/xml",
+            GsbResultsPdf | GsbOverviewPdf | CsbResultsPdf | CsbAttachmentPdf => "application/pdf",
+        }
+    }
+}
+
 /// File
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type, FromRow)]
 #[serde(deny_unknown_fields)]

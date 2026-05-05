@@ -1,25 +1,18 @@
 use chrono::{Local, Utc};
-use eml_nl::io::EMLWrite;
-use pdf_gen::generate_pdf;
 use sqlx::{SqliteConnection, SqlitePool};
 
 use crate::{
     APIError, SqlitePoolExt,
     api::{
         apportionment::ApportionmentInputData,
-        report::{
-            naming,
-            structs::{CsbFiles, FileCreatedAuditData, GsbFiles, ResultsInput},
-        },
+        report::structs::{CsbFiles, FileCreatedAuditData, GeneratedFile, GsbFiles, ResultsInput},
     },
     domain::{
         committee_session::{CommitteeSession, CommitteeSessionError, CommitteeSessionId},
         committee_session_status::CommitteeSessionStatus,
         election::CommitteeCategory,
         file::{File, FileType},
-        models::PdfFileModel,
     },
-    eml::EmlHash,
     infra::audit_log::AuditService,
     repository::{
         committee_session_repo::{self},
@@ -29,9 +22,6 @@ use crate::{
     service::list_polling_stations_for_session,
 };
 
-const EML_MIME_TYPE: &str = "text/xml";
-const PDF_MIME_TYPE: &str = "application/pdf";
-
 struct FileSaver<'a> {
     conn: &'a mut SqliteConnection,
     audit_service: &'a AuditService,
@@ -39,40 +29,14 @@ struct FileSaver<'a> {
 }
 
 impl FileSaver<'_> {
-    async fn save_eml(&mut self, file_type: FileType, data: Vec<u8>) -> Result<File, APIError> {
-        let filename = naming::filename_for(
-            file_type,
-            &self.input.election,
-            self.input.committee_session.is_next_session(),
-        );
-
-        self.save(file_type, filename, EML_MIME_TYPE, data).await
-    }
-
-    async fn save_pdf(
-        &mut self,
-        file_type: FileType,
-        pdf_file: &PdfFileModel,
-    ) -> Result<File, APIError> {
-        let data = generate_pdf(pdf_file).await?.buffer;
-        let filename = pdf_file.file_name.clone();
-        self.save(file_type, filename, PDF_MIME_TYPE, data).await
-    }
-
-    async fn save(
-        &mut self,
-        file_type: FileType,
-        filename: String,
-        mime_type: &str,
-        data: Vec<u8>,
-    ) -> Result<File, APIError> {
+    async fn save(&mut self, generated_file: GeneratedFile) -> Result<File, APIError> {
         let file = file_repo::create(
             self.conn,
             self.input.committee_session.id,
-            file_type,
-            filename,
-            &data,
-            mime_type.to_string(),
+            generated_file.file_type,
+            generated_file.filename,
+            &generated_file.content,
+            generated_file.file_type.mime_type().into(),
             self.input.created_at.with_timezone(&Utc),
         )
         .await?;
@@ -89,8 +53,8 @@ async fn generate_and_save_files_gsb_election(
     audit_service: &AuditService,
     committee_session: CommitteeSession,
     corrections: bool,
-    input: ResultsInput,
 ) -> Result<GsbFiles, APIError> {
+    let input = ResultsInput::new(conn, committee_session.id, Local::now()).await?;
     if input.election.committee_category != CommitteeCategory::GSB {
         return Err(APIError::DataIntegrityError(
             "Generating GSB files can only be done for GSB elections".to_string(),
@@ -109,33 +73,19 @@ async fn generate_and_save_files_gsb_election(
         overview_pdf: None,
     };
 
-    let xml_string = input.as_xml()?.write_eml_root_str(true, true)?;
-    let xml_hash = EmlHash::from(xml_string.as_bytes());
-    let pdf_files = input.as_pdf_file_models_gsb(xml_hash)?;
+    let generated_files = input.generate_gsb_files().await?;
 
     // For the first session, or if there are corrections, we also store the EML and count PDF
     // For next sessions without corrections, we don't store these
     if !committee_session.is_next_session() || corrections {
-        files.results_eml = Some(
-            saver
-                .save_eml(FileType::GsbResultsEml, xml_string.into_bytes())
-                .await?,
-        );
+        files.results_eml = Some(saver.save(generated_files.results_eml).await?);
 
-        files.results_pdf = Some(
-            saver
-                .save_pdf(FileType::GsbResultsPdf, &pdf_files.results)
-                .await?,
-        );
+        files.results_pdf = Some(saver.save(generated_files.results_pdf).await?);
     }
 
     // Store the overview PDF for next sessions
-    if let Some(overview_pdf) = pdf_files.overview {
-        files.overview_pdf = Some(
-            saver
-                .save_pdf(FileType::GsbOverviewPdf, &overview_pdf)
-                .await?,
-        )
+    if let Some(overview_pdf) = generated_files.overview_pdf {
+        files.overview_pdf = Some(saver.save(overview_pdf).await?)
     }
 
     Ok(files)
@@ -144,8 +94,9 @@ async fn generate_and_save_files_gsb_election(
 async fn generate_and_save_files_csb_election(
     conn: &mut SqliteConnection,
     audit_service: &AuditService,
-    input: ResultsInput,
+    committee_session_id: CommitteeSessionId,
 ) -> Result<CsbFiles, APIError> {
+    let input = ResultsInput::new(conn, committee_session_id, Local::now()).await?;
     if input.election.committee_category != CommitteeCategory::CSB {
         return Err(APIError::DataIntegrityError(
             "Generating CSB files can only be done for CSB elections".to_string(),
@@ -164,33 +115,12 @@ async fn generate_and_save_files_csb_election(
     };
     let apportionment_result = apportionment::process(&apportionment_input)?;
 
-    let eml_results_data = input.election.as_result_eml(
-        None,
-        input.created_at.with_timezone(&Utc),
-        &apportionment_result.candidate_nomination,
-    )?;
-    let xml_results_string = eml_results_data.write_eml_root_str(true, true)?;
-    let xml_results_hash = EmlHash::from(xml_results_string.as_bytes());
+    let generated_files = input.generate_csb_files(&apportionment_result).await?;
 
-    let xml_counts_string = input.as_xml()?.write_eml_root_str(true, true)?;
-
-    let pdf_files = input.as_pdf_file_models_csb(&apportionment_result, xml_results_hash)?;
-
-    let results_eml = saver
-        .save_eml(FileType::CsbResultsEml, xml_results_string.into_bytes())
-        .await?;
-
-    let total_counts_eml = saver
-        .save_eml(FileType::CsbTotalCountsEml, xml_counts_string.into_bytes())
-        .await?;
-
-    let results_pdf = saver
-        .save_pdf(FileType::CsbResultsPdf, &pdf_files.results)
-        .await?;
-
-    let attachment_pdf = saver
-        .save_pdf(FileType::CsbAttachmentPdf, &pdf_files.attachment)
-        .await?;
+    let results_eml = saver.save(generated_files.results_eml).await?;
+    let total_counts_eml = saver.save(generated_files.total_counts_eml).await?;
+    let results_pdf = saver.save(generated_files.results_pdf).await?;
+    let attachment_pdf = saver.save(generated_files.attachment_pdf).await?;
 
     Ok(CsbFiles {
         results_eml: Some(results_eml),
@@ -253,13 +183,11 @@ pub async fn get_files_gsb_election(
     // If one of the files doesn't exist, generate all and save them to the database
     if files.needs_generation(&committee_session, corrections) {
         let mut tx = pool.begin_immediate().await?;
-        let input = ResultsInput::new(&mut tx, committee_session.id, Local::now()).await?;
         files = generate_and_save_files_gsb_election(
             &mut tx,
             &audit_service,
             committee_session,
             corrections,
-            input,
         )
         .await?;
         tx.commit().await?;
@@ -291,8 +219,8 @@ pub async fn get_files_csb_election(
     // If one of the files doesn't exist, generate all and save them to the database
     if files.needs_generation() {
         let mut tx = pool.begin_immediate().await?;
-        let input = ResultsInput::new(&mut tx, committee_session.id, Local::now()).await?;
-        files = generate_and_save_files_csb_election(&mut tx, &audit_service, input).await?;
+        files = generate_and_save_files_csb_election(&mut tx, &audit_service, committee_session.id)
+            .await?;
         tx.commit().await?;
     }
 

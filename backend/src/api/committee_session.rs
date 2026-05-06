@@ -48,7 +48,7 @@ impl ApiErrorResponse for CommitteeSessionError {
             CommitteeSessionError::CommitteeSessionPaused => (
                 StatusCode::CONFLICT,
                 ErrorResponse::new(
-                    String::from("Committee session data entry is paused"),
+                    "Committee session data entry is paused",
                     ErrorReference::CommitteeSessionPaused,
                     true,
                 ),
@@ -56,34 +56,26 @@ impl ApiErrorResponse for CommitteeSessionError {
             CommitteeSessionError::InvalidCommitteeSessionStatus => (
                 StatusCode::CONFLICT,
                 ErrorResponse::new(
-                    String::from("Invalid committee session status"),
+                    "Invalid committee session status",
                     ErrorReference::InvalidCommitteeSessionStatus,
                     true,
                 ),
             ),
             CommitteeSessionError::InvalidDetails => (
                 StatusCode::BAD_REQUEST,
-                ErrorResponse::new(
-                    String::from("Invalid details"),
-                    ErrorReference::InvalidData,
-                    false,
-                ),
+                ErrorResponse::new("Invalid details", ErrorReference::InvalidData, false),
             ),
             CommitteeSessionError::InvalidStatusTransition => (
                 StatusCode::CONFLICT,
                 ErrorResponse::new(
-                    String::from("Invalid committee session state transition"),
+                    "Invalid committee session state transition",
                     ErrorReference::InvalidStateTransition,
                     true,
                 ),
             ),
             CommitteeSessionError::ProviderError => (
                 StatusCode::INTERNAL_SERVER_ERROR,
-                ErrorResponse::new(
-                    String::from("Internal server error"),
-                    ErrorReference::DatabaseError,
-                    true,
-                ),
+                ErrorResponse::new("Internal server error", ErrorReference::DatabaseError, true),
             ),
         }
     }

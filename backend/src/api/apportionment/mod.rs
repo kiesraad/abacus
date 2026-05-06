@@ -37,9 +37,7 @@ impl ApiErrorResponse for ApportionmentApiError {
             ApportionmentApiError::AllListsExhausted => (
                 StatusCode::UNPROCESSABLE_ENTITY,
                 ErrorResponse::new(
-                    String::from(
-                        "All lists are exhausted, not enough candidates to fill all seats",
-                    ),
+                    "All lists are exhausted, not enough candidates to fill all seats",
                     ErrorReference::ApportionmentAllListsExhausted,
                     false,
                 ),
@@ -47,7 +45,7 @@ impl ApiErrorResponse for ApportionmentApiError {
             ApportionmentApiError::CommitteeSessionNotCompleted => (
                 StatusCode::PRECONDITION_FAILED,
                 ErrorResponse::new(
-                    String::from("Committee session not completed"),
+                    "Committee session not completed",
                     ErrorReference::ApportionmentCommitteeSessionNotCompleted,
                     false,
                 ),
@@ -55,7 +53,7 @@ impl ApiErrorResponse for ApportionmentApiError {
             ApportionmentApiError::DrawingOfLotsNotImplemented => (
                 StatusCode::UNPROCESSABLE_ENTITY,
                 ErrorResponse::new(
-                    String::from("Drawing of lots is required"),
+                    "Drawing of lots is required",
                     ErrorReference::ApportionmentDrawingOfLotsRequired,
                     false,
                 ),
@@ -63,7 +61,7 @@ impl ApiErrorResponse for ApportionmentApiError {
             ApportionmentApiError::ZeroVotesCast => (
                 StatusCode::UNPROCESSABLE_ENTITY,
                 ErrorResponse::new(
-                    String::from("No votes on candidates cast"),
+                    "No votes on candidates cast",
                     ErrorReference::ApportionmentZeroVotesCast,
                     false,
                 ),

@@ -532,7 +532,10 @@ impl ElectionWithPoliticalGroups {
     ) -> Result<ElectionCountContest, EMLError> {
         let builder = ElectionCountContest::builder()
             .identifier(ContestIdentifier::geen())
-            .total_eligible_voter_count(self.number_of_voters)
+            .total_eligible_voter_count(match summary.number_of_voters {
+                Some(n) => n,
+                None => self.number_of_voters,
+            })
             .total_candidate_votes_count(summary.votes_counts.total_votes_candidates_count)
             .total_rejected_votes(
                 RejectedVotesReason::Blank,

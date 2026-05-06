@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 
 import { type AnyApiError, isSuccess } from "@/api/ApiResult";
 import { useApiClient } from "@/api/useApiClient";
-import type { ELECTION_APPORTIONMENT_REQUEST_PATH, ElectionApportionmentResponse } from "@/types/generated/openapi";
+import type { ElectionApportionmentResponse, PROCESS_APPORTIONMENT_REQUEST_PATH } from "@/types/generated/openapi";
 
 export function useApportionmentRequest(electionId: number) {
-  const path: ELECTION_APPORTIONMENT_REQUEST_PATH = `/api/elections/${electionId}/apportionment`;
+  const path: PROCESS_APPORTIONMENT_REQUEST_PATH = `/api/elections/${electionId}/apportionment`;
   const [data, setData] = useState<ElectionApportionmentResponse>();
   const [error, setError] = useState<AnyApiError>();
   const client = useApiClient();

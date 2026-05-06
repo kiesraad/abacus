@@ -49,7 +49,7 @@ impl AsAuditEvent for ApportionmentProcessed {
         ("election_id" = ElectionId, description = "Election database id"),
     ),
 )]
-pub async fn election_apportionment(
+pub async fn process_apportionment(
     user: User,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
@@ -137,7 +137,7 @@ mod tests {
         .unwrap();
 
         let response =
-            election_apportionment(user, State(pool), audit_service, Path(ElectionId::from(5)))
+            process_apportionment(user, State(pool), audit_service, Path(ElectionId::from(5)))
                 .await
                 .into_response();
 
@@ -150,7 +150,7 @@ mod tests {
         let audit_service = AuditService::new(Some(user.clone()), None);
 
         let response =
-            election_apportionment(user, State(pool), audit_service, Path(ElectionId::from(4)))
+            process_apportionment(user, State(pool), audit_service, Path(ElectionId::from(4)))
                 .await
                 .into_response();
 
@@ -180,7 +180,7 @@ mod tests {
 
             #[rustfmt::skip]
             let results = vec![
-                ("apportionment", election_apportionment(user.clone(), State(pool.clone()), audit.clone(), Path(ElectionId::from(5))).await.into_response()),
+                ("apportionment", process_apportionment(user.clone(), State(pool.clone()), audit.clone(), Path(ElectionId::from(5))).await.into_response()),
             ];
             results
         }

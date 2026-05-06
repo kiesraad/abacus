@@ -1259,7 +1259,7 @@
     "/api/elections/{election_id}/apportionment": {
       "post": {
         "summary": "Get the apportionment for an election (coordinator_csb)",
-        "operationId": "election_apportionment",
+        "operationId": "process_apportionment",
         "parameters": [
           {
             "name": "election_id",

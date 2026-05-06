@@ -108,7 +108,7 @@ pub fn router() -> OpenApiRouter<AppState> {
                 .authorize(ALLOWED_ROLES),
         )
         .routes(routes!(get_state::get_state).authorize(ALLOWED_ROLES))
-        .routes(routes!(process_apportionment::election_apportionment).authorize(ALLOWED_ROLES))
+        .routes(routes!(process_apportionment::process_apportionment).authorize(ALLOWED_ROLES))
         .routes(
             routes!(register_deceased_candidates::register_deceased_candidates)
                 .authorize(ALLOWED_ROLES),

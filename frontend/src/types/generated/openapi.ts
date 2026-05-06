@@ -87,10 +87,10 @@ export interface ELECTION_DETAILS_REQUEST_PARAMS {
 export type ELECTION_DETAILS_REQUEST_PATH = `/api/elections/${ElectionId}`;
 
 // /api/elections/{election_id}/apportionment
-export interface ELECTION_APPORTIONMENT_REQUEST_PARAMS {
+export interface PROCESS_APPORTIONMENT_REQUEST_PARAMS {
   election_id: ElectionId;
 }
-export type ELECTION_APPORTIONMENT_REQUEST_PATH = `/api/elections/${ElectionId}/apportionment`;
+export type PROCESS_APPORTIONMENT_REQUEST_PATH = `/api/elections/${ElectionId}/apportionment`;
 
 // /api/elections/{election_id}/apportionment/add_deceased_candidate
 export interface ADD_DECEASED_CANDIDATE_REQUEST_PARAMS {

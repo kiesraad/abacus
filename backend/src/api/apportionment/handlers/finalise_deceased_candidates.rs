@@ -1,9 +1,15 @@
-use axum::extract::{Path, State};
+use axum::{
+    Json,
+    extract::{Path, State},
+};
 use sqlx::SqlitePool;
 
 use crate::{
-    APIError, ErrorResponse, domain::election::ElectionId, infra::audit_log::AuditService,
-    repository::user_repo::User, service::update_apportionment_state,
+    APIError, ErrorResponse, SqlitePoolExt,
+    domain::{apportionment_state::ApportionmentState, election::ElectionId},
+    infra::audit_log::AuditService,
+    repository::user_repo::User,
+    service::update_apportionment_state,
 };
 
 /// Finalise deceased candidates
@@ -11,7 +17,7 @@ use crate::{
     post,
     path = "/api/elections/{election_id}/apportionment/finalise_deceased_candidates",
     responses(
-        (status = 200, description = "Finalised deceased candidates"),
+        (status = 200, description = "Finalised deceased candidates", body = ApportionmentState),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
@@ -27,15 +33,16 @@ pub async fn finalise_deceased_candidates(
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Path(election_id): Path<ElectionId>,
-) -> Result<(), APIError> {
-    let mut conn = pool.acquire().await?;
+) -> Result<Json<ApportionmentState>, APIError> {
+    let mut tx = pool.begin_immediate().await?;
 
-    update_apportionment_state(&mut conn, audit_service, user, election_id, |state| {
+    let state = update_apportionment_state(&mut tx, audit_service, user, election_id, |state| {
         state.finalise_deceased_candidates()
     })
     .await?;
 
-    Ok(())
+    tx.commit().await?;
+    Ok(Json(state))
 }
 
 #[cfg(test)]
@@ -78,17 +85,17 @@ mod tests {
         .await
         .expect("should upsert initial state");
 
-        finalise_deceased_candidates(user, State(pool), audit_service, Path(ElectionId::from(5)))
-            .await
-            .expect("should call the handler successfully");
-
-        let state = apportionment_state_repo::get(&mut conn, id)
-            .await
-            .expect("should succeed")
-            .expect("should be the database");
+        let state = finalise_deceased_candidates(
+            user,
+            State(pool),
+            audit_service,
+            Path(ElectionId::from(5)),
+        )
+        .await
+        .expect("should call the handler successfully");
 
         assert_eq!(
-            state,
+            state.0,
             ApportionmentState::Finalised {
                 deceased_candidates: vec![(PGNumber::from(4), CandidateNumber::from(4))],
             }

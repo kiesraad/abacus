@@ -5,8 +5,11 @@ use axum::{
 use sqlx::SqlitePool;
 
 use crate::{
-    APIError, ErrorResponse, api::apportionment::structs::DeceasedCandidate,
-    domain::election::ElectionId, infra::audit_log::AuditService, repository::user_repo::User,
+    APIError, ErrorResponse, SqlitePoolExt,
+    api::apportionment::structs::DeceasedCandidate,
+    domain::{apportionment_state::ApportionmentState, election::ElectionId},
+    infra::audit_log::AuditService,
+    repository::user_repo::User,
     service::update_apportionment_state,
 };
 
@@ -16,7 +19,7 @@ use crate::{
     path = "/api/elections/{election_id}/apportionment/add_deceased_candidate",
     request_body = DeceasedCandidate,
     responses(
-        (status = 200, description = "Added deceased candidate"),
+        (status = 200, description = "Added deceased candidate", body = ApportionmentState),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
@@ -33,13 +36,16 @@ pub async fn add_deceased_candidate(
     audit_service: AuditService,
     Path(election_id): Path<ElectionId>,
     Json(candidate): Json<DeceasedCandidate>,
-) -> Result<(), APIError> {
-    let mut conn = pool.acquire().await?;
+) -> Result<Json<ApportionmentState>, APIError> {
+    let mut tx = pool.begin_immediate().await?;
 
-    update_apportionment_state(&mut conn, audit_service, user, election_id, |state| {
+    let state = update_apportionment_state(&mut tx, audit_service, user, election_id, |state| {
         state.add_deceased_candidate(candidate.pg_number, candidate.candidate_number)
     })
-    .await
+    .await?;
+
+    tx.commit().await?;
+    Ok(Json(state))
 }
 
 #[cfg(test)]
@@ -84,7 +90,7 @@ mod tests {
 
         let pg_number = PGNumber::from(4);
         let candidate_number = CandidateNumber::from(4);
-        add_deceased_candidate(
+        let state = add_deceased_candidate(
             user,
             State(pool),
             audit_service,
@@ -97,13 +103,8 @@ mod tests {
         .await
         .expect("should call the handler successfully");
 
-        let state = apportionment_state_repo::get(&mut conn, id)
-            .await
-            .expect("should succeed")
-            .expect("should be the database");
-
         assert_eq!(
-            state,
+            state.0,
             ApportionmentState::RegisteringDeceasedCandidates {
                 deceased_candidates: vec!((pg_number, candidate_number))
             }

@@ -1383,7 +1383,14 @@
         },
         "responses": {
           "200": {
-            "description": "Added deceased candidate"
+            "description": "Added deceased candidate",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApportionmentState"
+                }
+              }
+            }
           },
           "401": {
             "description": "Unauthorized",
@@ -1474,7 +1481,14 @@
         },
         "responses": {
           "200": {
-            "description": "Deleted deceased candidate"
+            "description": "Deleted deceased candidate",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApportionmentState"
+                }
+              }
+            }
           },
           "401": {
             "description": "Unauthorized",
@@ -1555,7 +1569,14 @@
         ],
         "responses": {
           "200": {
-            "description": "Finalised deceased candidates"
+            "description": "Finalised deceased candidates",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApportionmentState"
+                }
+              }
+            }
           },
           "401": {
             "description": "Unauthorized",
@@ -1636,7 +1657,14 @@
         ],
         "responses": {
           "200": {
-            "description": "Started registering deceased candidates"
+            "description": "Started registering deceased candidates",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApportionmentState"
+                }
+              }
+            }
           },
           "401": {
             "description": "Unauthorized",
@@ -1717,7 +1745,14 @@
         ],
         "responses": {
           "200": {
-            "description": "Skipped registering deceased candidates"
+            "description": "Skipped registering deceased candidates",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApportionmentState"
+                }
+              }
+            }
           },
           "401": {
             "description": "Unauthorized",

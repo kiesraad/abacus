@@ -66,7 +66,7 @@ pub async fn update_state(
     user: User,
     election_id: ElectionId,
     update_fn: impl FnOnce(ApportionmentState) -> Result<ApportionmentState, ApportionmentStateError>,
-) -> Result<(), APIError> {
+) -> Result<ApportionmentState, APIError> {
     let (id, state) = get_state(conn, user, election_id).await?;
 
     let state = update_fn(state).map_err(|err| APIError::Delegated(Box::new(err)))?;
@@ -76,12 +76,15 @@ pub async fn update_state(
     audit_service
         .log(
             conn,
-            &ApportionmentStateChangeEvent(ApportionmentStateChange { election_id, state }),
+            &ApportionmentStateChangeEvent(ApportionmentStateChange {
+                election_id,
+                state: state.clone(),
+            }),
             None,
         )
         .await?;
 
-    Ok(())
+    Ok(state)
 }
 
 #[cfg(test)]
@@ -249,7 +252,7 @@ mod tests {
         )
         .await;
 
-        let result = update_state(
+        let returned_state = update_state(
             &mut conn,
             AuditService::new(None, None),
             User::test_user(Role::CoordinatorGSB, UserId::from(1)),
@@ -261,23 +264,24 @@ mod tests {
                 })
             },
         )
-        .await;
+        .await
+        .expect("should update state");
 
-        assert!(matches!(result, Ok(())), "Unexpected result {result:?}");
+        let expected_state = ApportionmentState::RegisteringDeceasedCandidates {
+            deceased_candidates: vec![(PGNumber::from(4), CandidateNumber::from(4))],
+        };
 
-        let new_state = apportionment_state_repo::get(
+        assert_eq!(returned_state, expected_state);
+
+        let stored_state = apportionment_state_repo::get(
             &mut conn,
             CommitteeSessionId::from(COMMITTEE_SESSION_ID),
         )
         .await
-        .expect("should get apportionment state");
+        .expect("should get apportionment state")
+        .expect("should be stored");
 
-        assert_eq!(
-            new_state,
-            Some(ApportionmentState::RegisteringDeceasedCandidates {
-                deceased_candidates: vec![(PGNumber::from(4), CandidateNumber::from(4))]
-            })
-        );
+        assert_eq!(stored_state, expected_state);
 
         assert_last_event(
             &mut conn,

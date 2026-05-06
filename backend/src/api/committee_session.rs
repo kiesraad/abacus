@@ -23,7 +23,7 @@ use crate::{
         role::Role,
         validate::DataError,
     },
-    error::{ApiErrorResponse, ErrorReference, ErrorResponse, error_response},
+    error::{ApiErrorResponse, ErrorReference, ErrorResponse},
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
     repository::{
         committee_session_repo::{
@@ -47,7 +47,7 @@ impl ApiErrorResponse for CommitteeSessionError {
         match self {
             CommitteeSessionError::CommitteeSessionPaused => (
                 StatusCode::CONFLICT,
-                error_response(
+                ErrorResponse::new(
                     "Committee session data entry is paused",
                     ErrorReference::CommitteeSessionPaused,
                     true,
@@ -55,7 +55,7 @@ impl ApiErrorResponse for CommitteeSessionError {
             ),
             CommitteeSessionError::InvalidCommitteeSessionStatus => (
                 StatusCode::CONFLICT,
-                error_response(
+                ErrorResponse::new(
                     "Invalid committee session status",
                     ErrorReference::InvalidCommitteeSessionStatus,
                     true,
@@ -63,11 +63,11 @@ impl ApiErrorResponse for CommitteeSessionError {
             ),
             CommitteeSessionError::InvalidDetails => (
                 StatusCode::BAD_REQUEST,
-                error_response("Invalid details", ErrorReference::InvalidData, false),
+                ErrorResponse::new("Invalid details", ErrorReference::InvalidData, false),
             ),
             CommitteeSessionError::InvalidStatusTransition => (
                 StatusCode::CONFLICT,
-                error_response(
+                ErrorResponse::new(
                     "Invalid committee session state transition",
                     ErrorReference::InvalidStateTransition,
                     true,
@@ -75,7 +75,7 @@ impl ApiErrorResponse for CommitteeSessionError {
             ),
             CommitteeSessionError::ProviderError => (
                 StatusCode::INTERNAL_SERVER_ERROR,
-                error_response("Internal server error", ErrorReference::DatabaseError, true),
+                ErrorResponse::new("Internal server error", ErrorReference::DatabaseError, true),
             ),
         }
     }

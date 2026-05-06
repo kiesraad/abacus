@@ -88,49 +88,51 @@ export type ELECTION_DETAILS_REQUEST_PATH = `/api/elections/${ElectionId}`;
 
 // /api/elections/{election_id}/apportionment
 export interface ELECTION_APPORTIONMENT_REQUEST_PARAMS {
-  election_id: number;
+  election_id: ElectionId;
 }
-export type ELECTION_APPORTIONMENT_REQUEST_PATH = `/api/elections/${number}/apportionment`;
+export type ELECTION_APPORTIONMENT_REQUEST_PATH = `/api/elections/${ElectionId}/apportionment`;
 
 // /api/elections/{election_id}/apportionment/add_deceased_candidate
 export interface ADD_DECEASED_CANDIDATE_REQUEST_PARAMS {
-  election_id: number;
+  election_id: ElectionId;
 }
-export type ADD_DECEASED_CANDIDATE_REQUEST_PATH = `/api/elections/${number}/apportionment/add_deceased_candidate`;
+export type ADD_DECEASED_CANDIDATE_REQUEST_PATH = `/api/elections/${ElectionId}/apportionment/add_deceased_candidate`;
 export type ADD_DECEASED_CANDIDATE_REQUEST_BODY = DeceasedCandidate;
 
 // /api/elections/{election_id}/apportionment/delete_deceased_candidate
 export interface DELETE_DECEASED_CANDIDATE_REQUEST_PARAMS {
-  election_id: number;
+  election_id: ElectionId;
 }
-export type DELETE_DECEASED_CANDIDATE_REQUEST_PATH = `/api/elections/${number}/apportionment/delete_deceased_candidate`;
+export type DELETE_DECEASED_CANDIDATE_REQUEST_PATH =
+  `/api/elections/${ElectionId}/apportionment/delete_deceased_candidate`;
 export type DELETE_DECEASED_CANDIDATE_REQUEST_BODY = DeceasedCandidate;
 
 // /api/elections/{election_id}/apportionment/finalise_deceased_candidates
 export interface FINALISE_DECEASED_CANDIDATES_REQUEST_PARAMS {
-  election_id: number;
+  election_id: ElectionId;
 }
 export type FINALISE_DECEASED_CANDIDATES_REQUEST_PATH =
-  `/api/elections/${number}/apportionment/finalise_deceased_candidates`;
+  `/api/elections/${ElectionId}/apportionment/finalise_deceased_candidates`;
 
 // /api/elections/{election_id}/apportionment/register_deceased_candidates
 export interface REGISTER_DECEASED_CANDIDATES_REQUEST_PARAMS {
-  election_id: number;
+  election_id: ElectionId;
 }
 export type REGISTER_DECEASED_CANDIDATES_REQUEST_PATH =
-  `/api/elections/${number}/apportionment/register_deceased_candidates`;
+  `/api/elections/${ElectionId}/apportionment/register_deceased_candidates`;
 
 // /api/elections/{election_id}/apportionment/skip_deceased_candidates
 export interface SKIP_DECEASED_CANDIDATES_REQUEST_PARAMS {
-  election_id: number;
+  election_id: ElectionId;
 }
-export type SKIP_DECEASED_CANDIDATES_REQUEST_PATH = `/api/elections/${number}/apportionment/skip_deceased_candidates`;
+export type SKIP_DECEASED_CANDIDATES_REQUEST_PATH =
+  `/api/elections/${ElectionId}/apportionment/skip_deceased_candidates`;
 
 // /api/elections/{election_id}/apportionment/state
 export interface GET_STATE_REQUEST_PARAMS {
-  election_id: number;
+  election_id: ElectionId;
 }
-export type GET_STATE_REQUEST_PATH = `/api/elections/${number}/apportionment/state`;
+export type GET_STATE_REQUEST_PATH = `/api/elections/${ElectionId}/apportionment/state`;
 
 // /api/elections/{election_id}/committee_sessions
 export interface COMMITTEE_SESSION_CREATE_REQUEST_PARAMS {

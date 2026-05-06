@@ -46,7 +46,7 @@ impl AsAuditEvent for ApportionmentProcessed {
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
-        ("election_id" = u32, description = "Election database id"),
+        ("election_id" = ElectionId, description = "Election database id"),
     ),
 )]
 pub async fn election_apportionment(

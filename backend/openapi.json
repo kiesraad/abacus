@@ -1267,9 +1267,7 @@
             "description": "Election database id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/ElectionId"
             }
           }
         ],
@@ -1365,9 +1363,7 @@
             "description": "Election database id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/ElectionId"
             }
           }
         ],
@@ -1463,9 +1459,7 @@
             "description": "Election database id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/ElectionId"
             }
           }
         ],
@@ -1561,9 +1555,7 @@
             "description": "Election database id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/ElectionId"
             }
           }
         ],
@@ -1649,9 +1641,7 @@
             "description": "Election database id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/ElectionId"
             }
           }
         ],
@@ -1737,9 +1727,7 @@
             "description": "Election database id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/ElectionId"
             }
           }
         ],
@@ -1825,9 +1813,7 @@
             "description": "Election database id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/ElectionId"
             }
           }
         ],

@@ -117,7 +117,10 @@ mod tests {
         service::change_committee_session_status,
     };
 
-    #[test(sqlx::test(fixtures(path = "../../../fixtures", scripts("election_5_with_results"))))]
+    #[test(sqlx::test(fixtures(
+        path = "../../../../fixtures",
+        scripts("election_5_with_results")
+    )))]
     async fn test_election_apportionment(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
 
@@ -133,31 +136,23 @@ mod tests {
         .await
         .unwrap();
 
-        let response = super::election_apportionment(
-            user,
-            State(pool),
-            audit_service,
-            Path(ElectionId::from(5)),
-        )
-        .await
-        .into_response();
+        let response =
+            election_apportionment(user, State(pool), audit_service, Path(ElectionId::from(5)))
+                .await
+                .into_response();
 
         assert_eq!(response.status(), StatusCode::OK);
     }
 
-    #[test(sqlx::test(fixtures(path = "../../../fixtures", scripts("election_4"))))]
+    #[test(sqlx::test(fixtures(path = "../../../../fixtures", scripts("election_4"))))]
     async fn test_election_apportionment_not_complete(pool: SqlitePool) {
         let user = User::test_user(Role::CoordinatorGSB, UserId::from(1));
         let audit_service = AuditService::new(Some(user.clone()), None);
 
-        let response = super::election_apportionment(
-            user,
-            State(pool),
-            audit_service,
-            Path(ElectionId::from(4)),
-        )
-        .await
-        .into_response();
+        let response =
+            election_apportionment(user, State(pool), audit_service, Path(ElectionId::from(4)))
+                .await
+                .into_response();
 
         assert_eq!(response.status(), StatusCode::PRECONDITION_FAILED);
         let body = response.into_body().collect().await.unwrap().to_bytes();
@@ -191,7 +186,7 @@ mod tests {
         }
 
         #[test(sqlx::test(fixtures(
-            path = "../../../fixtures",
+            path = "../../../../fixtures",
             scripts("election_5_with_results")
         )))]
         async fn test_committee_category_authorization_err(pool: SqlitePool) {
@@ -200,7 +195,7 @@ mod tests {
         }
 
         #[test(sqlx::test(fixtures(
-            path = "../../../fixtures",
+            path = "../../../../fixtures",
             scripts("election_5_with_results")
         )))]
         async fn test_committee_category_authorization_ok(pool: SqlitePool) {

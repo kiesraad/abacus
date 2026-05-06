@@ -1354,6 +1354,519 @@
         ]
       }
     },
+    "/api/elections/{election_id}/apportionment/add_deceased_candidate": {
+      "post": {
+        "summary": "Add deceased candidate (coordinator_csb)",
+        "operationId": "add_deceased_candidate",
+        "parameters": [
+          {
+            "name": "election_id",
+            "in": "path",
+            "description": "Election database id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeceasedCandidate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Added deceased candidate"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Invalid state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "coordinator_csb"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/elections/{election_id}/apportionment/delete_deceased_candidate": {
+      "post": {
+        "summary": "Delete deceased candidate (coordinator_csb)",
+        "operationId": "delete_deceased_candidate",
+        "parameters": [
+          {
+            "name": "election_id",
+            "in": "path",
+            "description": "Election database id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeceasedCandidate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Deleted deceased candidate"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Invalid state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "coordinator_csb"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/elections/{election_id}/apportionment/finalise_deceased_candidates": {
+      "post": {
+        "summary": "Finalise deceased candidates (coordinator_csb)",
+        "operationId": "finalise_deceased_candidates",
+        "parameters": [
+          {
+            "name": "election_id",
+            "in": "path",
+            "description": "Election database id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Finalised deceased candidates"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Invalid state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "coordinator_csb"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/elections/{election_id}/apportionment/register_deceased_candidates": {
+      "post": {
+        "summary": "Start registering deceased candidates (coordinator_csb)",
+        "operationId": "register_deceased_candidates",
+        "parameters": [
+          {
+            "name": "election_id",
+            "in": "path",
+            "description": "Election database id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Started registering deceased candidates"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Invalid state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "coordinator_csb"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/elections/{election_id}/apportionment/skip_deceased_candidates": {
+      "post": {
+        "summary": "Skip registering deceased candidates (coordinator_csb)",
+        "operationId": "skip_deceased_candidates",
+        "parameters": [
+          {
+            "name": "election_id",
+            "in": "path",
+            "description": "Election database id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Skipped registering deceased candidates"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Invalid state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "coordinator_csb"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/elections/{election_id}/apportionment/state": {
+      "get": {
+        "summary": "Get the current apportionment state (coordinator_csb)",
+        "operationId": "get_state",
+        "parameters": [
+          {
+            "name": "election_id",
+            "in": "path",
+            "description": "Election database id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns apportionment state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApportionmentState"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Invalid state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "coordinator_csb"
+            ]
+          }
+        ]
+      }
+    },
     "/api/elections/{election_id}/committee_sessions": {
       "post": {
         "summary": "Create a new [CommitteeSession]. (coordinator_gsb)",
@@ -4642,6 +5155,86 @@
         },
         "additionalProperties": false
       },
+      "ApportionmentState": {
+        "oneOf": [
+          {
+            "type": "string",
+            "enum": [
+              "Uninitialised"
+            ]
+          },
+          {
+            "type": "object",
+            "required": [
+              "RegisteringDeceasedCandidates"
+            ],
+            "properties": {
+              "RegisteringDeceasedCandidates": {
+                "type": "object",
+                "required": [
+                  "deceased_candidates"
+                ],
+                "properties": {
+                  "deceased_candidates": {
+                    "type": "array",
+                    "items": {
+                      "type": "array",
+                      "items": false,
+                      "prefixItems": [
+                        {
+                          "type": "integer",
+                          "format": "int32",
+                          "minimum": 0
+                        },
+                        {
+                          "type": "integer",
+                          "format": "int32",
+                          "minimum": 0
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "Finalised"
+            ],
+            "properties": {
+              "Finalised": {
+                "type": "object",
+                "required": [
+                  "deceased_candidates"
+                ],
+                "properties": {
+                  "deceased_candidates": {
+                    "type": "array",
+                    "items": {
+                      "type": "array",
+                      "items": false,
+                      "prefixItems": [
+                        {
+                          "type": "integer",
+                          "format": "int32",
+                          "minimum": 0
+                        },
+                        {
+                          "type": "integer",
+                          "format": "int32",
+                          "minimum": 0
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
       "AuditEventLevel": {
         "type": "string",
         "enum": [
@@ -4670,6 +5263,7 @@
           "FileCreated",
           "FileDeleted",
           "ApportionmentProcessed",
+          "ApportionmentStateUpdated",
           "InvestigationCreated",
           "InvestigationConcluded",
           "InvestigationUpdated",
@@ -5065,6 +5659,11 @@
             "$ref": "#/components/schemas/PreferenceThreshold"
           }
         }
+      },
+      "CandidateNumber": {
+        "type": "integer",
+        "format": "int32",
+        "minimum": 0
       },
       "CandidateVotes": {
         "type": "object",
@@ -5564,6 +6163,21 @@
           }
         },
         "additionalProperties": false
+      },
+      "DeceasedCandidate": {
+        "type": "object",
+        "required": [
+          "pg_number",
+          "candidate_number"
+        ],
+        "properties": {
+          "candidate_number": {
+            "$ref": "#/components/schemas/CandidateNumber"
+          },
+          "pg_number": {
+            "$ref": "#/components/schemas/PGNumber"
+          }
+        }
       },
       "DifferenceCountsCompareVotesCastAdmittedVoters": {
         "type": "object",

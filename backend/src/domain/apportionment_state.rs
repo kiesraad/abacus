@@ -150,6 +150,10 @@ impl ApportionmentState {
             _ => Err(ApportionmentStateError::InvalidState),
         }
     }
+
+    pub fn reset(self) -> Result<Self, ApportionmentStateError> {
+        Ok(Self::Uninitialised)
+    }
 }
 
 #[cfg(test)]
@@ -217,6 +221,20 @@ mod tests {
                     expected,
                     "from {from:?}"
                 )
+            }
+        }
+
+        #[test]
+        fn reset() {
+            #[rustfmt::skip]
+            let scenarios = vec![
+                Uninitialised,
+                RegisteringDeceasedCandidates { deceased_candidates: Vec::new() },
+                Finalised {deceased_candidates: Vec::new()},
+            ];
+
+            for state in scenarios {
+                assert_eq!(state.clone().reset(), Ok(Uninitialised), "from {state:?}")
             }
         }
 

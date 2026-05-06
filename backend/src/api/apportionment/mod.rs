@@ -113,6 +113,7 @@ pub fn router() -> OpenApiRouter<AppState> {
             routes!(register_deceased_candidates::register_deceased_candidates)
                 .authorize(ALLOWED_ROLES),
         )
+        .routes(routes!(reset::reset).authorize(ALLOWED_ROLES))
         .routes(
             routes!(skip_deceased_candidates::skip_deceased_candidates).authorize(ALLOWED_ROLES),
         )

@@ -155,14 +155,6 @@ export interface COMMITTEE_SESSION_DELETE_REQUEST_PARAMS {
 export type COMMITTEE_SESSION_DELETE_REQUEST_PATH =
   `/api/elections/${ElectionId}/committee_sessions/${CommitteeSessionId}`;
 
-// /api/elections/{election_id}/committee_sessions/{committee_session_id}/download_pdf_results
-export interface ELECTION_DOWNLOAD_PDF_RESULTS_GSB_REQUEST_PARAMS {
-  election_id: ElectionId;
-  committee_session_id: CommitteeSessionId;
-}
-export type ELECTION_DOWNLOAD_PDF_RESULTS_GSB_REQUEST_PATH =
-  `/api/elections/${ElectionId}/committee_sessions/${CommitteeSessionId}/download_pdf_results`;
-
 // /api/elections/{election_id}/committee_sessions/{committee_session_id}/download_zip_attachment_csb
 export interface ELECTION_DOWNLOAD_ZIP_ATTACHMENT_CSB_REQUEST_PARAMS {
   election_id: ElectionId;

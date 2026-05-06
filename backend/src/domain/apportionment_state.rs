@@ -5,7 +5,7 @@ use utoipa::ToSchema;
 use crate::{
     ErrorResponse,
     domain::election::{CandidateNumber, PGNumber},
-    error::{ApiErrorResponse, ErrorReference, error_response},
+    error::{ApiErrorResponse, ErrorReference},
 };
 
 #[derive(Debug, PartialEq)]
@@ -20,11 +20,11 @@ impl ApiErrorResponse for ApportionmentStateError {
         match self {
             ApportionmentStateError::CandidateNotFound => (
                 StatusCode::CONFLICT,
-                error_response("Candidate not found", ErrorReference::EntryNotFound, false),
+                ErrorResponse::new("Candidate not found", ErrorReference::EntryNotFound, false),
             ),
             ApportionmentStateError::CandidateNotUnique => (
                 StatusCode::CONFLICT,
-                error_response(
+                ErrorResponse::new(
                     "Candidate not unique",
                     ErrorReference::EntryNotUnique,
                     false,
@@ -32,7 +32,7 @@ impl ApiErrorResponse for ApportionmentStateError {
             ),
             ApportionmentStateError::InvalidState => (
                 StatusCode::CONFLICT,
-                error_response(
+                ErrorResponse::new(
                     "Invalid state",
                     ErrorReference::InvalidStateTransition,
                     false,

@@ -407,10 +407,10 @@ pub async fn committee_session_investigations(
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use axum::response::{IntoResponse, Response};
     use test_log::test;
 
+    use super::*;
     use crate::{
         api::tests::{
             assert_committee_category_authorization_err, assert_committee_category_authorization_ok,

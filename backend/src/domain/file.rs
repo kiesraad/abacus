@@ -18,14 +18,25 @@ pub enum FileType {
     GsbResultsPdf,
     /// GSB overview PDF for next session (Model P 2a)
     GsbOverviewPdf,
+    /// CSB results EML (520)
+    CsbResultsEml,
+    /// CSB total counts EML (510d)
+    CsbTotalCountsEml,
     /// CSB results PDF (Model P 22-2)
     CsbResultsPdf,
     /// CSB attachment PDF (Model P 22-2 Bijlage 1)
     CsbAttachmentPdf,
-    /// CSB total counts EML (510d)
-    CsbTotalCountsEml,
-    /// CSB results EML (520)
-    CsbResultsEml,
+}
+
+impl FileType {
+    pub fn mime_type(&self) -> &'static str {
+        use FileType::*;
+
+        match self {
+            GsbResultsEml | CsbResultsEml | CsbTotalCountsEml => "text/xml",
+            GsbResultsPdf | GsbOverviewPdf | CsbResultsPdf | CsbAttachmentPdf => "application/pdf",
+        }
+    }
 }
 
 /// File

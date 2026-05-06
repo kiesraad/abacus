@@ -1,19 +1,13 @@
 use apportionment::{self};
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use utoipa::ToSchema;
 
 use crate::domain::{
     apportionment::{CandidateNomination, SeatAssignment},
-    election::{self, CandidateNumber, PGNumber},
+    election::{self, PGNumber},
     results::political_group_candidate_votes::{CandidateVotes, PoliticalGroupCandidateVotes},
     summary::ElectionSummary,
 };
-
-#[derive(Deserialize, Serialize, ToSchema)]
-pub struct DeceasedCandidate {
-    pub pg_number: PGNumber,
-    pub candidate_number: CandidateNumber,
-}
 
 #[derive(Clone, Debug)]
 pub struct ApportionmentInputData<'a> {

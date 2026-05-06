@@ -42,17 +42,32 @@ impl ApiErrorResponse for ApportionmentStateError {
     }
 }
 
-#[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize, ToSchema)]
+#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize, ToSchema)]
+pub struct DeceasedCandidate {
+    pub pg_number: PGNumber,
+    pub candidate_number: CandidateNumber,
+}
 
+#[cfg(test)]
+impl DeceasedCandidate {
+    pub fn from(pg_number: u32, candidate_number: u32) -> Self {
+        Self {
+            pg_number: PGNumber::from(pg_number),
+            candidate_number: CandidateNumber::from(candidate_number),
+        }
+    }
+}
+
+#[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize, ToSchema)]
 pub enum ApportionmentState {
     #[default]
     Uninitialised,
     RegisteringDeceasedCandidates {
-        deceased_candidates: Vec<(PGNumber, CandidateNumber)>,
+        deceased_candidates: Vec<DeceasedCandidate>,
     },
     // TODO add new states in https://github.com/kiesraad/abacus/issues/788
     Finalised {
-        deceased_candidates: Vec<(PGNumber, CandidateNumber)>,
+        deceased_candidates: Vec<DeceasedCandidate>,
     },
 }
 
@@ -94,18 +109,17 @@ impl ApportionmentState {
 
     pub fn add_deceased_candidate(
         self,
-        pg_number: PGNumber,
-        candidate_number: CandidateNumber,
+        candidate: DeceasedCandidate,
     ) -> Result<Self, ApportionmentStateError> {
         match self {
             Self::RegisteringDeceasedCandidates {
                 mut deceased_candidates,
             } => {
-                if deceased_candidates.contains(&(pg_number, candidate_number)) {
+                if deceased_candidates.contains(&candidate) {
                     return Err(ApportionmentStateError::CandidateNotUnique);
                 }
 
-                deceased_candidates.push((pg_number, candidate_number));
+                deceased_candidates.push(candidate);
 
                 Ok(Self::RegisteringDeceasedCandidates {
                     deceased_candidates,
@@ -117,18 +131,17 @@ impl ApportionmentState {
 
     pub fn delete_deceased_candidate(
         self,
-        pg_number: PGNumber,
-        candidate_number: CandidateNumber,
+        candidate: DeceasedCandidate,
     ) -> Result<Self, ApportionmentStateError> {
         match self {
             Self::RegisteringDeceasedCandidates {
                 mut deceased_candidates,
             } => {
-                if !deceased_candidates.contains(&(pg_number, candidate_number)) {
+                if !deceased_candidates.contains(&candidate) {
                     return Err(ApportionmentStateError::CandidateNotFound);
                 }
 
-                deceased_candidates.retain(|(p, c)| *p != pg_number || *c != candidate_number);
+                deceased_candidates.retain(|c| *c != candidate);
 
                 Ok(Self::RegisteringDeceasedCandidates {
                     deceased_candidates,
@@ -189,12 +202,12 @@ mod tests {
 
         #[test]
         fn finalise_deceased_candidates() {
-            let dc = || vec![(PGNumber::from(3), CandidateNumber::from(5))];
+            let candidate = DeceasedCandidate::from(4, 4);
 
             #[rustfmt::skip]
             let scenarios = vec![
                 (Uninitialised, Err(InvalidState)),
-                (RegisteringDeceasedCandidates { deceased_candidates: dc() }, Ok(Finalised { deceased_candidates: dc() })),
+                (RegisteringDeceasedCandidates { deceased_candidates: vec![candidate] }, Ok(Finalised { deceased_candidates: vec![candidate] })),
                 (Finalised {deceased_candidates: Vec::new()}, Err(InvalidState)),
             ];
 
@@ -214,26 +227,25 @@ mod tests {
 
             #[test]
             fn invalid_state() {
-                let pg_4: PGNumber = PGNumber::from(4);
-                let candidate_4: CandidateNumber = CandidateNumber::from(4);
-                let candidate_13: CandidateNumber = CandidateNumber::from(13);
+                let candidate_4 = DeceasedCandidate::from(4, 4);
+                let candidate_13 = DeceasedCandidate::from(4, 13);
 
                 let invalid_states = vec![
                     Uninitialised,
                     Finalised {
-                        deceased_candidates: vec![(pg_4, candidate_4)],
+                        deceased_candidates: vec![candidate_4],
                     },
                 ];
 
                 for state in invalid_states {
                     assert_eq!(
-                        state.clone().add_deceased_candidate(pg_4, candidate_13),
+                        state.clone().add_deceased_candidate(candidate_13),
                         Err(InvalidState),
                         "from {state:?}"
                     );
 
                     assert_eq!(
-                        state.clone().delete_deceased_candidate(pg_4, candidate_4),
+                        state.clone().delete_deceased_candidate(candidate_4),
                         Err(InvalidState),
                         "from {state:?}"
                     );
@@ -242,9 +254,8 @@ mod tests {
 
             #[test]
             fn add_deceased_candidate() {
-                let pg_4: PGNumber = PGNumber::from(4);
-                let candidate_4: CandidateNumber = CandidateNumber::from(4);
-                let candidate_13: CandidateNumber = CandidateNumber::from(13);
+                let candidate_4 = DeceasedCandidate::from(4, 4);
+                let candidate_13 = DeceasedCandidate::from(4, 13);
 
                 // Start with empty list
                 let status = RegisteringDeceasedCandidates {
@@ -252,45 +263,44 @@ mod tests {
                 };
 
                 // Add successfully
-                let status = status.add_deceased_candidate(pg_4, candidate_4).unwrap();
+                let status = status.add_deceased_candidate(candidate_4).unwrap();
                 assert_eq!(
                     status,
                     RegisteringDeceasedCandidates {
-                        deceased_candidates: vec![(pg_4, candidate_4)]
+                        deceased_candidates: vec![candidate_4]
                     }
                 );
 
                 // Add another successfully
-                let status = status.add_deceased_candidate(pg_4, candidate_13).unwrap();
+                let status = status.add_deceased_candidate(candidate_13).unwrap();
                 assert_eq!(
                     status,
                     RegisteringDeceasedCandidates {
-                        deceased_candidates: vec![(pg_4, candidate_4), (pg_4, candidate_13)]
+                        deceased_candidates: vec![candidate_4, candidate_13]
                     }
                 );
 
                 // Try to add again will return an error and do nothing
-                let result = status.add_deceased_candidate(pg_4, candidate_13);
+                let result = status.add_deceased_candidate(candidate_13);
                 assert_eq!(result, Err(CandidateNotUnique));
             }
 
             #[test]
             fn delete_deceased_candidate() {
-                let pg_4: PGNumber = PGNumber::from(4);
-                let candidate_4: CandidateNumber = CandidateNumber::from(4);
-                let candidate_13: CandidateNumber = CandidateNumber::from(13);
+                let candidate_4 = DeceasedCandidate::from(4, 4);
+                let candidate_13 = DeceasedCandidate::from(4, 13);
 
                 // Start with one candidate
                 let status = RegisteringDeceasedCandidates {
-                    deceased_candidates: vec![(pg_4, candidate_4)],
+                    deceased_candidates: vec![candidate_4],
                 };
 
                 // Try to delete a different candidate will return an error and do nothing
-                let result = status.clone().delete_deceased_candidate(pg_4, candidate_13);
+                let result = status.clone().delete_deceased_candidate(candidate_13);
                 assert_eq!(result, Err(CandidateNotFound));
 
                 // Delete successfully
-                let status = status.delete_deceased_candidate(pg_4, candidate_4).unwrap();
+                let status = status.delete_deceased_candidate(candidate_4).unwrap();
                 assert_eq!(
                     status,
                     RegisteringDeceasedCandidates {
@@ -299,7 +309,7 @@ mod tests {
                 );
 
                 // Try to delete again will return an error
-                let result = status.delete_deceased_candidate(pg_4, candidate_4);
+                let result = status.delete_deceased_candidate(candidate_4);
                 assert_eq!(result, Err(CandidateNotFound));
             }
         }

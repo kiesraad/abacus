@@ -5199,20 +5199,7 @@
                   "deceased_candidates": {
                     "type": "array",
                     "items": {
-                      "type": "array",
-                      "items": false,
-                      "prefixItems": [
-                        {
-                          "type": "integer",
-                          "format": "int32",
-                          "minimum": 0
-                        },
-                        {
-                          "type": "integer",
-                          "format": "int32",
-                          "minimum": 0
-                        }
-                      ]
+                      "$ref": "#/components/schemas/DeceasedCandidate"
                     }
                   }
                 }
@@ -5234,20 +5221,7 @@
                   "deceased_candidates": {
                     "type": "array",
                     "items": {
-                      "type": "array",
-                      "items": false,
-                      "prefixItems": [
-                        {
-                          "type": "integer",
-                          "format": "int32",
-                          "minimum": 0
-                        },
-                        {
-                          "type": "integer",
-                          "format": "int32",
-                          "minimum": 0
-                        }
-                      ]
+                      "$ref": "#/components/schemas/DeceasedCandidate"
                     }
                   }
                 }

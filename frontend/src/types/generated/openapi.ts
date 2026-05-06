@@ -400,8 +400,8 @@ export interface AccountUpdateRequest {
 
 export type ApportionmentState =
   | "Uninitialised"
-  | { RegisteringDeceasedCandidates: { deceased_candidates: unknown[][] } }
-  | { Finalised: { deceased_candidates: unknown[][] } };
+  | { RegisteringDeceasedCandidates: { deceased_candidates: DeceasedCandidate[] } }
+  | { Finalised: { deceased_candidates: DeceasedCandidate[] } };
 
 export const auditEventLevelValues = ["info", "success", "warning", "error"] as const;
 export type AuditEventLevel = (typeof auditEventLevelValues)[number];

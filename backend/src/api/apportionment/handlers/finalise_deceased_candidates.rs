@@ -52,10 +52,9 @@ mod tests {
     use super::*;
     use crate::{
         domain::{
-            apportionment_state::ApportionmentState,
+            apportionment_state::{ApportionmentState, DeceasedCandidate},
             committee_session::CommitteeSessionId,
             committee_session_status::CommitteeSessionStatus,
-            election::{CandidateNumber, PGNumber},
             role::Role,
         },
         repository::{apportionment_state_repo, committee_session_repo, user_repo::UserId},
@@ -75,11 +74,12 @@ mod tests {
             .await
             .expect("should change committee session status");
 
+        let candidate = DeceasedCandidate::from(4, 4);
         apportionment_state_repo::upsert(
             &mut conn,
             id,
             &ApportionmentState::RegisteringDeceasedCandidates {
-                deceased_candidates: vec![(PGNumber::from(4), CandidateNumber::from(4))],
+                deceased_candidates: vec![candidate],
             },
         )
         .await
@@ -97,7 +97,7 @@ mod tests {
         assert_eq!(
             state.0,
             ApportionmentState::Finalised {
-                deceased_candidates: vec![(PGNumber::from(4), CandidateNumber::from(4))],
+                deceased_candidates: vec![candidate],
             }
         );
     }

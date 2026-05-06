@@ -6,8 +6,10 @@ use sqlx::SqlitePool;
 
 use crate::{
     APIError, ErrorResponse, SqlitePoolExt,
-    api::apportionment::structs::DeceasedCandidate,
-    domain::{apportionment_state::ApportionmentState, election::ElectionId},
+    domain::{
+        apportionment_state::{ApportionmentState, DeceasedCandidate},
+        election::ElectionId,
+    },
     infra::audit_log::AuditService,
     repository::user_repo::User,
     service::update_apportionment_state,
@@ -40,7 +42,7 @@ pub async fn add_deceased_candidate(
     let mut tx = pool.begin_immediate().await?;
 
     let state = update_apportionment_state(&mut tx, audit_service, user, election_id, |state| {
-        state.add_deceased_candidate(candidate.pg_number, candidate.candidate_number)
+        state.add_deceased_candidate(candidate)
     })
     .await?;
 
@@ -55,11 +57,8 @@ mod tests {
     use super::*;
     use crate::{
         domain::{
-            apportionment_state::ApportionmentState,
-            committee_session::CommitteeSessionId,
-            committee_session_status::CommitteeSessionStatus,
-            election::{CandidateNumber, PGNumber},
-            role::Role,
+            apportionment_state::ApportionmentState, committee_session::CommitteeSessionId,
+            committee_session_status::CommitteeSessionStatus, role::Role,
         },
         repository::{apportionment_state_repo, committee_session_repo, user_repo::UserId},
     };
@@ -88,17 +87,13 @@ mod tests {
         .await
         .expect("should upsert initial state");
 
-        let pg_number = PGNumber::from(4);
-        let candidate_number = CandidateNumber::from(4);
+        let candidate = DeceasedCandidate::from(4, 4);
         let state = add_deceased_candidate(
             user,
             State(pool),
             audit_service,
             Path(ElectionId::from(5)),
-            Json::from(DeceasedCandidate {
-                pg_number,
-                candidate_number,
-            }),
+            Json::from(candidate),
         )
         .await
         .expect("should call the handler successfully");
@@ -106,7 +101,7 @@ mod tests {
         assert_eq!(
             state.0,
             ApportionmentState::RegisteringDeceasedCandidates {
-                deceased_candidates: vec!((pg_number, candidate_number))
+                deceased_candidates: vec![candidate]
             }
         );
     }

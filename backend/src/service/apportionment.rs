@@ -96,8 +96,7 @@ mod tests {
     use crate::{
         api::middleware::authentication::error::AuthenticationError,
         domain::{
-            committee_session::CommitteeSessionId,
-            election::{CandidateNumber, PGNumber},
+            apportionment_state::DeceasedCandidate, committee_session::CommitteeSessionId,
             role::Role,
         },
         infra::audit_log::assert_last_event,
@@ -260,7 +259,7 @@ mod tests {
             |state| {
                 assert_eq!(state, ApportionmentState::Uninitialised);
                 Ok(ApportionmentState::RegisteringDeceasedCandidates {
-                    deceased_candidates: vec![(PGNumber::from(4), CandidateNumber::from(4))],
+                    deceased_candidates: vec![DeceasedCandidate::from(4, 4)],
                 })
             },
         )
@@ -268,7 +267,7 @@ mod tests {
         .expect("should update state");
 
         let expected_state = ApportionmentState::RegisteringDeceasedCandidates {
-            deceased_candidates: vec![(PGNumber::from(4), CandidateNumber::from(4))],
+            deceased_candidates: vec![DeceasedCandidate::from(4, 4)],
         };
 
         assert_eq!(returned_state, expected_state);
@@ -289,7 +288,9 @@ mod tests {
             AuditEventLevel::Success,
             serde_json::json!({
                 "election_id": ELECTION_ID,
-                "RegisteringDeceasedCandidates": { "deceased_candidates": [[4, 4]] }
+                "RegisteringDeceasedCandidates": {"deceased_candidates": [
+                    {"pg_number": 4, "candidate_number": 4}
+                ]}
             }),
         )
         .await;

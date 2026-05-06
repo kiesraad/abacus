@@ -53,13 +53,12 @@ mod tests {
     use test_log::test;
 
     use super::*;
-    use crate::domain::election::{CandidateNumber, PGNumber};
+    use crate::domain::apportionment_state::DeceasedCandidate;
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_1"))))]
     async fn test_upsert_get(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
         let committee_session_id = CommitteeSessionId::from(1);
-        let dc = || vec![(PGNumber::from(4), CandidateNumber::from(4))];
 
         let state = get(&mut conn, committee_session_id)
             .await
@@ -67,11 +66,14 @@ mod tests {
 
         assert!(state.is_none());
 
-        #[rustfmt::skip]
         let scenarios = [
             ApportionmentState::Uninitialised,
-            ApportionmentState::RegisteringDeceasedCandidates { deceased_candidates: dc() },
-            ApportionmentState::Finalised { deceased_candidates: dc() },
+            ApportionmentState::RegisteringDeceasedCandidates {
+                deceased_candidates: vec![DeceasedCandidate::from(4, 4)],
+            },
+            ApportionmentState::Finalised {
+                deceased_candidates: vec![DeceasedCandidate::from(4, 4)],
+            },
         ];
 
         for state in scenarios {

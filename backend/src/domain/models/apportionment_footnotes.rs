@@ -84,11 +84,8 @@ impl ApportionmentFootnotes {
         } else {
             Some(
                 exhausted_lists
-                    .iter()
-                    .map(|exhausted_list| FootnotePoliticalGroup {
-                        number: *exhausted_list.0,
-                        name: exhausted_list.1.clone(),
-                    })
+                    .into_iter()
+                    .map(|(number, name)| FootnotePoliticalGroup { number, name })
                     .collect(),
             )
         }

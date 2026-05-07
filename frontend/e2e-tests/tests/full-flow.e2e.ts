@@ -12,6 +12,9 @@ import {
   uploadElectionAndInputHash,
   uploadPollingStations,
 } from "e2e-tests/helpers-utils/e2e-test-browser-helpers";
+import { ApportionmentFullSeats } from "e2e-tests/page-objects/apportionment/ApportionmentFullSeatsPgObj";
+import { Apportionment } from "e2e-tests/page-objects/apportionment/ApportionmentPgObj";
+import { ApportionmentResidualSeats } from "e2e-tests/page-objects/apportionment/ApportionmentResidualSeatsPgObj";
 import { AccountSetupPgObj } from "e2e-tests/page-objects/authentication/AccountSetupPgObj";
 import { LoginPgObj } from "e2e-tests/page-objects/authentication/LoginPgObj";
 import { CandidatesListPage } from "e2e-tests/page-objects/data_entry/CandidatesListPgObj";
@@ -928,31 +931,49 @@ test.describe("full flow CSB", () => {
     const finishDataEntryPage = new FinishDataEntry(page);
     await finishDataEntryPage.finishDataEntry.click();
 
-    // TODO: Add ApportionmentPage
+    const apportionmentPage = new Apportionment(page);
+    await expect(apportionmentPage.header).toBeVisible();
+
+    await expect(apportionmentPage.fullSeatInformation).toBeVisible();
+    await apportionmentPage.fullSeatsPageLink.click();
+    const apportionmentFullSeatsPage = new ApportionmentFullSeats(page);
+    await expect(apportionmentFullSeatsPage.header).toBeVisible();
+
+    await page.goBack();
+    await expect(apportionmentPage.residualSeatInformation).toBeVisible();
+    await apportionmentPage.residualSeatsPageLink.click();
+    const apportionmentResidualSeatsPage = new ApportionmentResidualSeats(page);
+    await expect(apportionmentResidualSeatsPage.header).toBeVisible();
+
+    await page.goBack();
+    await expect(apportionmentPage.allSeatsAssignedAlert).toBeVisible();
+    await apportionmentPage.toReport.click();
 
     const electionReportPage = new ElectionReport(page);
-    const downloadPromise = page.waitForEvent("download");
 
+    const resultsDownloadPromise = page.waitForEvent("download");
     await electionReportPage.downloadCSBResultsZip.click();
-    const results_download = await downloadPromise;
-    expect(results_download.suggestedFilename()).toMatch(
+    const resultsDownload = await resultsDownloadPromise;
+    expect(resultsDownload.suggestedFilename()).toMatch(
       /vaststelling-uitslag_gr2022_test_gemeente_test-\d{8}-\d{6}.zip/,
     );
-    expect((await stat(await results_download.path())).size).toBeGreaterThan(1024);
+    expect((await stat(await resultsDownload.path())).size).toBeGreaterThan(1024);
 
+    const attachmentDownloadPromise = page.waitForEvent("download");
     await electionReportPage.downloadCSBAttachmentZip.click();
-    const attachment_download = await downloadPromise;
-    expect(attachment_download.suggestedFilename()).toMatch(
+    const attachmentDownload = await attachmentDownloadPromise;
+    expect(attachmentDownload.suggestedFilename()).toMatch(
       /model-p22-2-bijlage_gr2022_test_gemeente_test-\d{8}-\d{6}.zip/,
     );
-    expect((await stat(await attachment_download.path())).size).toBeGreaterThan(1024);
+    expect((await stat(await attachmentDownload.path())).size).toBeGreaterThan(1024);
 
+    const countsDownloadPromise = page.waitForEvent("download");
     await electionReportPage.downloadCSBCountsZip.click();
-    const counts_download = await downloadPromise;
-    expect(counts_download.suggestedFilename()).toMatch(
+    const countsDownload = await countsDownloadPromise;
+    expect(countsDownload.suggestedFilename()).toMatch(
       /definitieve-documenten_gr2022_test_gemeente_test-\d{8}-\d{6}.zip/,
     );
-    expect((await stat(await counts_download.path())).size).toBeGreaterThan(1024);
+    expect((await stat(await countsDownload.path())).size).toBeGreaterThan(1024);
 
     await logout(page);
   });

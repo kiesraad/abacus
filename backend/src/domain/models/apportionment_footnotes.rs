@@ -1,4 +1,4 @@
-use std::collections::BTreeSet;
+use std::collections::BTreeMap;
 
 use serde::{Deserialize, Serialize};
 
@@ -13,9 +13,9 @@ use crate::{
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ApportionmentFootnotes {
     #[serde(skip_serializing_if = "Option::is_none")]
-    absolute_majority: Option<AbsoluteMajority>,
+    absolute_majority: Option<FootnotePoliticalGroup>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    exhausted_lists: Option<Vec<ExhaustedList>>,
+    exhausted_lists: Option<Vec<FootnotePoliticalGroup>>,
 }
 
 struct FootnoteSteps<'a> {
@@ -45,10 +45,10 @@ impl ApportionmentFootnotes {
     pub fn get_absolute_majority(
         absolute_majority_reassignment: Option<&SeatChangeStep>,
         political_groups: &[PoliticalGroup],
-    ) -> Option<AbsoluteMajority> {
+    ) -> Option<FootnotePoliticalGroup> {
         if let Some(absolute_majority) = absolute_majority_reassignment {
             let pg_number = absolute_majority.change.list_number_assigned();
-            Some(AbsoluteMajority {
+            Some(FootnotePoliticalGroup {
                 number: pg_number,
                 name: political_groups
                     .iter()
@@ -65,24 +65,32 @@ impl ApportionmentFootnotes {
     pub fn get_exhausted_lists(
         list_exhaustion_steps: Vec<&SeatChangeStep>,
         political_groups: &[PoliticalGroup],
-    ) -> Option<Vec<ExhaustedList>> {
-        let mut exhausted_lists = BTreeSet::new();
+    ) -> Option<Vec<FootnotePoliticalGroup>> {
+        let mut exhausted_lists = BTreeMap::new();
         for step in list_exhaustion_steps {
             let pg_number = step.change.list_number_retracted();
-            exhausted_lists.insert(ExhaustedList {
-                number: pg_number,
-                name: political_groups
+            exhausted_lists.insert(
+                pg_number,
+                political_groups
                     .iter()
                     .find(|pg| pg.number == pg_number)
                     .expect("political group should exist")
                     .name
                     .clone(),
-            });
+            );
         }
         if exhausted_lists.is_empty() {
             None
         } else {
-            Some(Vec::from_iter(exhausted_lists))
+            Some(
+                exhausted_lists
+                    .iter()
+                    .map(|exhausted_list| FootnotePoliticalGroup {
+                        number: *exhausted_list.0,
+                        name: exhausted_list.1.clone(),
+                    })
+                    .collect(),
+            )
         }
     }
 
@@ -109,15 +117,7 @@ impl ApportionmentFootnotes {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct AbsoluteMajority {
-    /// Political group number
-    number: PGNumber,
-    /// Political group display name
-    name: String,
-}
-
-#[derive(Debug, Serialize, Deserialize, Eq, PartialEq, Ord, PartialOrd)]
-pub struct ExhaustedList {
+pub struct FootnotePoliticalGroup {
     /// Political group number
     number: PGNumber,
     /// Political group display name

@@ -76,27 +76,52 @@ const investigations = [
 const randomSuffix = Date.now();
 
 const adminUser: TestUser = {
-  username: `admin-${randomSuffix}`,
-  fullname: `full flow admin`,
+  username: `admin1-${randomSuffix}`,
+  fullname: `full flow admin GSB`,
   role: "administrator",
 };
 
 const coordinatorUser: TestUser = {
-  username: `coordinator-${randomSuffix}`,
-  fullname: `full flow coordinator`,
+  username: `coordinator2-${randomSuffix}`,
+  fullname: `full flow coordinator GSB`,
   role: "coordinator_gsb",
 };
 
 const typistUsers: TestUser[] = [
   {
     username: `typist3-${randomSuffix}`,
-    fullname: `full flow typist3`,
+    fullname: `full flow typist3 GSB`,
     role: "typist_gsb",
   },
   {
     username: `typist4-${randomSuffix}`,
-    fullname: `full flow typist4`,
+    fullname: `full flow typist4 GSB`,
     role: "typist_gsb",
+  },
+];
+
+const adminUserCSB: TestUser = {
+  username: `admin5-${randomSuffix}`,
+  fullname: `full flow admin CSB`,
+  role: "administrator",
+};
+
+const coordinatorUserCSB: TestUser = {
+  username: `coordinator6-${randomSuffix}`,
+  fullname: `full flow coordinator CSB`,
+  role: "coordinator_csb",
+};
+
+const typistUsersCSB: TestUser[] = [
+  {
+    username: `typist7-${randomSuffix}`,
+    fullname: `full flow typist7 CSB`,
+    role: "typist_csb",
+  },
+  {
+    username: `typist8-${randomSuffix}`,
+    fullname: `full flow typist8 CSB`,
+    role: "typist_csb",
   },
 ];
 
@@ -685,10 +710,10 @@ test.describe("full flow CSB", () => {
   test("create and complete admin user account", async ({ adminOne }) => {
     const { request: adminOneContext } = adminOne;
 
-    await createUser(adminOneContext, adminUser);
+    await createUser(adminOneContext, adminUserCSB);
 
     const newAdminContext = await request.newContext();
-    await firstLogin(newAdminContext, adminUser);
+    await firstLogin(newAdminContext, adminUserCSB);
     const logoutResponse = await apiLogout(newAdminContext);
     expect(logoutResponse.status()).toBe(204);
   });
@@ -697,7 +722,7 @@ test.describe("full flow CSB", () => {
     await page.goto("/account/login");
 
     const loginPage = new LoginPgObj(page);
-    await loginPage.login(adminUser.username, getTestPassword(adminUser.username));
+    await loginPage.login(adminUserCSB.username, getTestPassword(adminUserCSB.username));
 
     const electionsOverviewPage = new ElectionsOverviewPgObj(page);
     await electionsOverviewPage.create.click();
@@ -735,10 +760,10 @@ test.describe("full flow CSB", () => {
     await page.goto("/account/login");
 
     const loginPage = new LoginPgObj(page);
-    await loginPage.login(adminUser.username, getTestPassword(adminUser.username));
+    await loginPage.login(adminUserCSB.username, getTestPassword(adminUserCSB.username));
 
     const userInfoTopBar = new UserInfoTopBar(page);
-    await expect(userInfoTopBar.username).toHaveText(adminUser.fullname);
+    await expect(userInfoTopBar.username).toHaveText(adminUserCSB.fullname);
 
     const adminNavBar = new AdminNavBar(page);
     await adminNavBar.users.click();
@@ -756,12 +781,14 @@ test.describe("full flow CSB", () => {
 
     const userCreateDetailsPgObj = new UserCreateDetailsPgObj(page);
     await userCreateDetailsPgObj.createNamedUser(
-      coordinatorUser.username,
-      coordinatorUser.fullname,
-      getTestPassword(coordinatorUser.username, "Temp"),
+      coordinatorUserCSB.username,
+      coordinatorUserCSB.fullname,
+      getTestPassword(coordinatorUserCSB.username, "Temp"),
     );
 
-    await expect(userListPgObj.alert).toContainText(`${coordinatorUser.username} is toegevoegd met de rol Coördinator`);
+    await expect(userListPgObj.alert).toContainText(
+      `${coordinatorUserCSB.username} is toegevoegd met de rol Coördinator`,
+    );
 
     await logout(page);
   });
@@ -769,9 +796,9 @@ test.describe("full flow CSB", () => {
   test("complete coordinator user account", async ({ page }) => {
     await page.goto("/account/login");
     const loginPage = new LoginPgObj(page);
-    await loginPage.login(coordinatorUser.username, getTestPassword(coordinatorUser.username, "Temp"));
+    await loginPage.login(coordinatorUserCSB.username, getTestPassword(coordinatorUserCSB.username, "Temp"));
 
-    const password = getTestPassword(coordinatorUser.username);
+    const password = getTestPassword(coordinatorUserCSB.username);
     const accountSetupPage = new AccountSetupPgObj(page);
     await accountSetupPage.password.fill(password);
     await accountSetupPage.passwordRepeat.fill(password);
@@ -787,13 +814,13 @@ test.describe("full flow CSB", () => {
     await page.goto("/account/login");
 
     const loginPage = new LoginPgObj(page);
-    await loginPage.login(adminUser.username, getTestPassword(adminUser.username));
+    await loginPage.login(adminUserCSB.username, getTestPassword(adminUserCSB.username));
 
     const userInfoTopBar = new UserInfoTopBar(page);
-    await expect(userInfoTopBar.username).toHaveText(adminUser.fullname);
+    await expect(userInfoTopBar.username).toHaveText(adminUserCSB.fullname);
 
     // Create browser-specific typists
-    for (const typist of typistUsers) {
+    for (const typist of typistUsersCSB) {
       const adminNavBar = new AdminNavBar(page);
       await adminNavBar.users.click();
 
@@ -822,7 +849,7 @@ test.describe("full flow CSB", () => {
     await page.goto("/account/login");
 
     const loginPage = new LoginPgObj(page);
-    await loginPage.login(coordinatorUser.username, getTestPassword(coordinatorUser.username));
+    await loginPage.login(coordinatorUserCSB.username, getTestPassword(coordinatorUserCSB.username));
 
     const overviewPage = new ElectionsOverviewPgObj(page);
     await expect(overviewPage.header).toBeVisible();
@@ -847,7 +874,7 @@ test.describe("full flow CSB", () => {
     await logout(page);
   });
 
-  for (const typist of typistUsers) {
+  for (const typist of typistUsersCSB) {
     test(`complete user account for ${typist.fullname}`, async ({ page }) => {
       await page.goto("/account/login");
       const loginPage = new LoginPgObj(page);
@@ -869,7 +896,7 @@ test.describe("full flow CSB", () => {
   test("first data entry", async ({ page }) => {
     await page.goto("/account/login");
 
-    const firstTypist = typistUsers[0]!;
+    const firstTypist = typistUsersCSB[0]!;
     const loginPage = new LoginPgObj(page);
     const password = getTestPassword(firstTypist.username);
     await loginPage.login(firstTypist.username, password);
@@ -892,7 +919,7 @@ test.describe("full flow CSB", () => {
   test("second data entry", async ({ page }) => {
     await page.goto("/account/login");
 
-    const secondTypist = typistUsers[1]!;
+    const secondTypist = typistUsersCSB[1]!;
     const loginPage = new LoginPgObj(page);
     await loginPage.login(secondTypist.username, getTestPassword(secondTypist.username));
 
@@ -915,7 +942,7 @@ test.describe("full flow CSB", () => {
     await page.goto("/account/login");
 
     const loginPage = new LoginPgObj(page);
-    await loginPage.login(coordinatorUser.username, getTestPassword(coordinatorUser.username));
+    await loginPage.login(coordinatorUserCSB.username, getTestPassword(coordinatorUserCSB.username));
 
     const overviewPage = new ElectionsOverviewPgObj(page);
     await expect(overviewPage.header).toBeVisible();

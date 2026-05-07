@@ -2,7 +2,7 @@ use argon2::password_hash;
 use axum::http::StatusCode;
 use tracing::error;
 
-use crate::error::{ApiErrorResponse, ErrorReference, ErrorResponse, error_response};
+use crate::error::{ApiErrorResponse, ErrorReference, ErrorResponse};
 
 #[derive(Debug)]
 pub enum AuthenticationError {
@@ -41,7 +41,7 @@ impl ApiErrorResponse for AuthenticationError {
         match self {
             AuthenticationError::InvalidUsernameOrPassword => (
                 StatusCode::UNAUTHORIZED,
-                error_response(
+                ErrorResponse::new(
                     "Invalid username and/or password",
                     ErrorReference::InvalidUsernameOrPassword,
                     false,
@@ -49,7 +49,7 @@ impl ApiErrorResponse for AuthenticationError {
             ),
             AuthenticationError::UsernameAlreadyExists => (
                 StatusCode::CONFLICT,
-                error_response(
+                ErrorResponse::new(
                     "Username already exists",
                     ErrorReference::UsernameNotUnique,
                     false,
@@ -57,7 +57,7 @@ impl ApiErrorResponse for AuthenticationError {
             ),
             AuthenticationError::NotInitialised => (
                 StatusCode::IM_A_TEAPOT,
-                error_response(
+                ErrorResponse::new(
                     "Application not initialised",
                     ErrorReference::NotInitialised,
                     false,
@@ -65,7 +65,7 @@ impl ApiErrorResponse for AuthenticationError {
             ),
             AuthenticationError::AlreadyInitialised => (
                 StatusCode::FORBIDDEN,
-                error_response(
+                ErrorResponse::new(
                     "Application already initialised",
                     ErrorReference::AlreadyInitialised,
                     false,
@@ -73,15 +73,15 @@ impl ApiErrorResponse for AuthenticationError {
             ),
             AuthenticationError::UserNotFound => (
                 StatusCode::UNAUTHORIZED,
-                error_response("User not found", ErrorReference::UserNotFound, false),
+                ErrorResponse::new("User not found", ErrorReference::UserNotFound, false),
             ),
             AuthenticationError::UserAlreadySetup => (
                 StatusCode::CONFLICT,
-                error_response("Invalid user state", ErrorReference::Forbidden, false),
+                ErrorResponse::new("Invalid user state", ErrorReference::Forbidden, false),
             ),
             AuthenticationError::InvalidPassword => (
                 StatusCode::UNAUTHORIZED,
-                error_response(
+                ErrorResponse::new(
                     "Invalid password provided",
                     ErrorReference::InvalidPassword,
                     false,
@@ -89,19 +89,19 @@ impl ApiErrorResponse for AuthenticationError {
             ),
             AuthenticationError::SessionKeyNotFound | AuthenticationError::NoSessionCookie => (
                 StatusCode::UNAUTHORIZED,
-                error_response("Invalid session", ErrorReference::InvalidSession, false),
+                ErrorResponse::new("Invalid session", ErrorReference::InvalidSession, false),
             ),
             AuthenticationError::Unauthorized | AuthenticationError::Unauthenticated => (
                 StatusCode::UNAUTHORIZED,
-                error_response("Unauthorized", ErrorReference::Unauthorized, false),
+                ErrorResponse::new("Unauthorized", ErrorReference::Unauthorized, false),
             ),
             AuthenticationError::Forbidden => (
                 StatusCode::FORBIDDEN,
-                error_response("Forbidden", ErrorReference::Forbidden, true),
+                ErrorResponse::new("Forbidden", ErrorReference::Forbidden, true),
             ),
             AuthenticationError::PasswordRejectionSameAsOld => (
                 StatusCode::BAD_REQUEST,
-                error_response(
+                ErrorResponse::new(
                     "Invalid password",
                     ErrorReference::PasswordRejectionSameAsOld,
                     false,
@@ -109,7 +109,7 @@ impl ApiErrorResponse for AuthenticationError {
             ),
             AuthenticationError::PasswordRejectionSameAsUsername => (
                 StatusCode::BAD_REQUEST,
-                error_response(
+                ErrorResponse::new(
                     "Invalid password",
                     ErrorReference::PasswordRejectionSameAsUsername,
                     false,
@@ -117,7 +117,7 @@ impl ApiErrorResponse for AuthenticationError {
             ),
             AuthenticationError::PasswordRejectionTooShort => (
                 StatusCode::BAD_REQUEST,
-                error_response(
+                ErrorResponse::new(
                     "Invalid password",
                     ErrorReference::PasswordRejectionTooShort,
                     false,
@@ -125,11 +125,11 @@ impl ApiErrorResponse for AuthenticationError {
             ),
             AuthenticationError::RoleNotAuthorizedError => (
                 StatusCode::FORBIDDEN,
-                error_response("Invalid role", ErrorReference::Forbidden, true),
+                ErrorResponse::new("Invalid role", ErrorReference::Forbidden, true),
             ),
             AuthenticationError::OwnAccountCannotBeDeleted => (
                 StatusCode::FORBIDDEN,
-                error_response(
+                ErrorResponse::new(
                     "Cannot delete your own account",
                     ErrorReference::OwnAccountCannotBeDeleted,
                     false,
@@ -139,7 +139,7 @@ impl ApiErrorResponse for AuthenticationError {
             | AuthenticationError::HashPassword(_)
             | AuthenticationError::InvalidSessionDuration => (
                 StatusCode::INTERNAL_SERVER_ERROR,
-                error_response(
+                ErrorResponse::new(
                     "Internal server error",
                     ErrorReference::InternalServerError,
                     false,

@@ -27,6 +27,7 @@ use crate::{
             ModelN10_2Input, ModelNa14_2Bijlage1Input, ModelNa14_2Input, ModelNa31_2Bijlage1Input,
             ModelNa31_2InlegvelInput, ModelNa31_2Input, ModelP2aInput, ModelP22_2Bijlage1Input,
             ModelP22_2Input, PdfFileModel, PdfModel,
+            apportionment_footnotes::ApportionmentFootnotes,
             enriched_candidate_nomination::EnrichedCandidateNomination,
             enriched_seat_assignment::EnrichedSeatAssignment,
             votes_table::{
@@ -768,6 +769,8 @@ async fn test_p_22_2() {
     );
     let enriched_candidate_nomination =
         EnrichedCandidateNomination::new(&election, &candidate_nomination).unwrap();
+    let footnotes =
+        ApportionmentFootnotes::new(&election.political_groups, &seat_assignment).unwrap();
 
     let hash = random_string(&mut rng, 64);
     let creation_date_time = random_date_time(&mut rng)
@@ -776,13 +779,11 @@ async fn test_p_22_2() {
 
     let model = PdfModel::ModelP22_2(Box::new(ModelP22_2Input {
         committee_session,
-        election,
+        election: election.into(),
         summary,
-        seat_assignment,
-        enriched_seat_assignment,
+        footnotes,
+        seat_assignment: enriched_seat_assignment,
         candidate_nomination: enriched_candidate_nomination,
-        result_changes_full_seats: vec![],
-        result_changes_residual_seats: vec![],
         hash,
         creation_date_time,
     }));

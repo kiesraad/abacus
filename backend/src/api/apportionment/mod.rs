@@ -94,9 +94,27 @@ impl From<ApportionmentApiError> for APIError {
 
 pub fn router() -> OpenApiRouter<AppState> {
     use Role::*;
+    use handlers::*;
 
     const ALLOWED_ROLES: &[Role] = &[CoordinatorCSB];
 
     OpenApiRouter::default()
-        .routes(routes!(handlers::election_apportionment).authorize(ALLOWED_ROLES))
+        .routes(routes!(add_deceased_candidate::add_deceased_candidate).authorize(ALLOWED_ROLES))
+        .routes(
+            routes!(delete_deceased_candidate::delete_deceased_candidate).authorize(ALLOWED_ROLES),
+        )
+        .routes(
+            routes!(finalise_deceased_candidates::finalise_deceased_candidates)
+                .authorize(ALLOWED_ROLES),
+        )
+        .routes(routes!(get_state::get_state).authorize(ALLOWED_ROLES))
+        .routes(routes!(process_apportionment::process_apportionment).authorize(ALLOWED_ROLES))
+        .routes(
+            routes!(register_deceased_candidates::register_deceased_candidates)
+                .authorize(ALLOWED_ROLES),
+        )
+        .routes(routes!(reset::reset).authorize(ALLOWED_ROLES))
+        .routes(
+            routes!(skip_deceased_candidates::skip_deceased_candidates).authorize(ALLOWED_ROLES),
+        )
 }

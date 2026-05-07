@@ -228,6 +228,20 @@ pub async fn list_all(conn: &mut SqliteConnection) -> Result<Vec<AuditLogEvent>,
 }
 
 #[cfg(test)]
+pub async fn assert_last_event(
+    conn: &mut SqliteConnection,
+    event_type: AuditEventType,
+    event_level: AuditEventLevel,
+    event: serde_json::Value,
+) -> () {
+    let events = list_all(conn).await.expect("should be able to list events");
+    let last_event = events.last().expect("should have at least one event");
+    assert_eq!(*last_event.event_name(), event_type);
+    assert_eq!(*last_event.event_level(), event_level);
+    assert_eq!(*last_event.event(), event);
+}
+
+#[cfg(test)]
 pub async fn list_event_names(conn: &mut SqliteConnection) -> Result<Vec<String>, APIError> {
     sqlx::query_scalar!(r#"SELECT event_name FROM audit_log ORDER BY ROWID ASC"#)
         .fetch_all(conn)

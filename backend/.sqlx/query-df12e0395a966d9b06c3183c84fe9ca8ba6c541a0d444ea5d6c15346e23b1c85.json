@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            SELECT state AS \"state: Json<ApportionmentState>\"\n            FROM apportionment\n            WHERE committee_session_id = $1\n        ",
+  "describe": {
+    "columns": [
+      {
+        "name": "state: Json<ApportionmentState>",
+        "ordinal": 0,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "df12e0395a966d9b06c3183c84fe9ca8ba6c541a0d444ea5d6c15346e23b1c85"
+}

@@ -11,6 +11,7 @@
     "ApiWarning": "API waarschuwing",
     "ApplicationStarted": "Abacus is gestart",
     "ApportionmentProcessed": "Zetelverdeling verwerkt",
+    "ApportionmentStateUpdated": "Zetelverdeling status bijgewerkt",
     "CommitteeSessionCreated": "Zitting aangemaakt",
     "CommitteeSessionDeleted": "Zitting verwijderd",
     "CommitteeSessionUpdated": "Zitting bijgewerkt",

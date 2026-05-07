@@ -81,9 +81,9 @@ impl SeatChange {
 
     pub fn list_number_retracted(&self) -> PGNumber {
         match self {
-            Self::HighestAverageAssignment(_) => unreachable!(),
-            Self::UniqueHighestAverageAssignment(_) => unreachable!(),
-            Self::LargestRemainderAssignment(_) => unreachable!(),
+            Self::HighestAverageAssignment(_)
+            | Self::UniqueHighestAverageAssignment(_)
+            | Self::LargestRemainderAssignment(_) => unreachable!(),
             Self::AbsoluteMajorityReassignment(absolute_majority_reassigned_seat) => {
                 absolute_majority_reassigned_seat.list_retracted_seat
             }

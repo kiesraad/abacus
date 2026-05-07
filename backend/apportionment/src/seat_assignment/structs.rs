@@ -161,9 +161,9 @@ impl<LN: Copy> SeatChange<LN> {
     /// Get the list number for the list this step has retracted a seat from
     pub fn list_number_retracted(&self) -> LN {
         match self {
-            Self::HighestAverageAssignment(_) => unreachable!(),
-            Self::UniqueHighestAverageAssignment(_) => unreachable!(),
-            Self::LargestRemainderAssignment(_) => unreachable!(),
+            Self::HighestAverageAssignment(_)
+            | Self::UniqueHighestAverageAssignment(_)
+            | Self::LargestRemainderAssignment(_) => unreachable!(),
             Self::AbsoluteMajorityReassignment(absolute_majority_reassigned_seat) => {
                 absolute_majority_reassigned_seat.list_retracted_seat
             }
@@ -185,8 +185,9 @@ impl<LN: Copy> SeatChange<LN> {
             Self::LargestRemainderAssignment(largest_remainder_assigned_seat) => {
                 largest_remainder_assigned_seat.list_options.clone()
             }
-            Self::AbsoluteMajorityReassignment(_) => unreachable!(),
-            Self::ListExhaustionRemoval(_) => unreachable!(),
+            Self::AbsoluteMajorityReassignment(_) | Self::ListExhaustionRemoval(_) => {
+                unreachable!()
+            }
         }
     }
 
@@ -202,8 +203,9 @@ impl<LN: Copy> SeatChange<LN> {
             Self::LargestRemainderAssignment(largest_remainder_assigned_seat) => {
                 largest_remainder_assigned_seat.list_assigned.clone()
             }
-            Self::AbsoluteMajorityReassignment(_) => unreachable!(),
-            Self::ListExhaustionRemoval(_) => unreachable!(),
+            Self::AbsoluteMajorityReassignment(_) | Self::ListExhaustionRemoval(_) => {
+                unreachable!()
+            }
         }
     }
 

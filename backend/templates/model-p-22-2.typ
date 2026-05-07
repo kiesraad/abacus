@@ -226,7 +226,7 @@ Met de kiesdeler wordt de zetelverdeling bepaald. De kiesdeler is het aantal ste
   table.cell(align: center, [÷]),
   table.cell(align: center, [#input.election.number_of_seats]),
   table.cell(align: center, [=]),
-  table.cell(format_fraction(input.enriched_seat_assignment.quota)),
+  table.cell(format_fraction(input.seat_assignment.quota)),
 )
 
 #pagebreak(weak: true)
@@ -242,7 +242,7 @@ Hieronder is berekend hoe vaak elke lijst qua stemmenaantal de kiesdeler heeft g
     top: if y > 0 { 0.5pt + gray },
   ),
   inset: (x: 4pt, y: 8pt),
-  fill: (_, y) => if y > 1 and y <= input.enriched_seat_assignment.list_seat_assignment.len() and calc.even(y) { luma(245) },
+  fill: (_, y) => if y > 1 and y <= input.seat_assignment.list_seat_assignment.len() and calc.even(y) { luma(245) },
   table.header(
     table.cell(header_text([Lijst])),
     table.cell(align: right, header_text([Aantal stemmen])),
@@ -250,11 +250,11 @@ Hieronder is berekend hoe vaak elke lijst qua stemmenaantal de kiesdeler heeft g
     table.cell(stroke: none, align: right, header_text([Volle zetels])),
   ),
   table.hline(stroke: 1pt + black),
-  ..for column in input.enriched_seat_assignment.list_seat_assignment {
+  ..for column in input.seat_assignment.list_seat_assignment {
     (
       table.cell(format_political_group_name(column.number, column.name, with_prefix: "only_list_number")),
       table.cell(align: right, [#column.total]),
-      table.cell(align: center, [÷ #format_fraction(input.enriched_seat_assignment.quota) =]),
+      table.cell(align: center, [÷ #format_fraction(input.seat_assignment.quota) =]),
       table.cell(align: right, [#column.initial_full_seats])
     )
   }.flatten(),
@@ -262,7 +262,7 @@ Hieronder is berekend hoe vaak elke lijst qua stemmenaantal de kiesdeler heeft g
   table.cell(header_text([Totaal])),
   table.cell(align: right, header_text([#input.summary.votes_counts.total_votes_candidates_count])),
   table.cell(stroke: none, []),
-  table.cell(stroke: none, align: right, header_text([#input.enriched_seat_assignment.initial_total_full_seats])),
+  table.cell(stroke: none, align: right, header_text([#input.seat_assignment.initial_total_full_seats])),
 )
 
 #pagebreak(weak: true)
@@ -279,17 +279,17 @@ Na toewijzing van de volle zetels blijft een aantal te verdelen zetels over. Dit
     value: input.election.number_of_seats,
   )[Totaal aantal te verdelen zetels],
   number_box(
-    value: input.enriched_seat_assignment.initial_total_full_seats,
+    value: input.seat_assignment.initial_total_full_seats,
   )[Toegewezen volle zetels],
   number_box(
-    value: input.enriched_seat_assignment.initial_total_residual_seats,
+    value: input.seat_assignment.initial_total_residual_seats,
   )[*Aantal restzetels*],
 )
 
 === Verdeling van de restzetels
 
-#let highest_averages_steps = input.seat_assignment.steps.filter(step => step.change.changed_by == "HighestAverageAssignment")
-#if input.enriched_seat_assignment.initial_total_residual_seats > 0 [
+#let initial_highest_average_steps = if input.seat_assignment.keys().contains("initial_highest_average_steps") { input.seat_assignment.initial_highest_average_steps } else { () };
+#if input.seat_assignment.initial_total_residual_seats > 0 [
   #if input.election.number_of_seats < LARGE_COUNCIL_THRESHOLD [
     - Het #location_type berekent hoeveel stemmen elke lijst overhoudt na toekenning van de volle zetels. Dat is het 'overschot' aan stemmen voor die lijst.
     - Het #location_type verdeelt de restzetels, in volgorde van de grootste overschotten. Elke lijst kan maar één restzetel krijgen. Alleen lijsten die ten minste 75% van de kiesdeler hebben behaald kunnen een restzetel krijgen.
@@ -298,7 +298,7 @@ Na toewijzing van de volle zetels blijft een aantal te verdelen zetels over. Dit
 
     #pagebreak(weak: true)
 
-    #let pgs_meeting_threshold = input.enriched_seat_assignment.list_seat_assignment.filter(
+    #let pgs_meeting_threshold = input.seat_assignment.list_seat_assignment.filter(
     (list_seat_assignment) => 
     list_seat_assignment.keys().contains("largest_remainder"));
     #table(
@@ -336,32 +336,27 @@ Na toewijzing van de volle zetels blijft een aantal te verdelen zetels over. Dit
     Als meerdere lijsten gelijke gemiddelden hebben en er niet voldoende restzetels zijn voor toekenning ervan aan die lijsten, wordt geloot welke lijst de restzetel krijgt.
 
     #pagebreak(weak: true)
-
-    #TODO[marking of selected average does not work yet]
   
-    #highest_averages_table(highest_averages_steps, input.seat_assignment.final_standing, input.election.political_groups, input.result_changes_residual_seats)
+    #highest_averages_table(initial_highest_average_steps, input.seat_assignment.list_seat_assignment)
   ]
 
   #v(15pt)
-  #let absolute_majority_reassignment = input.seat_assignment.steps.filter(step => step.change.changed_by == "AbsoluteMajorityReassignment")
-  #let list_exhaustion_removal_steps = input.seat_assignment.steps.filter(step => step.change.changed_by == "ListExhaustionRemoval")
-  #let unique_exhausted_list_numbers = ()
-  #for step in list_exhaustion_removal_steps {
-    if not unique_exhausted_list_numbers.contains(step.change.list_retracted_seat) {
-      unique_exhausted_list_numbers.push(step.change.list_retracted_seat)
+  #let footnotes = if input.keys().contains("footnotes") { input.footnotes } else { () }
+  
+  #if footnotes.len() > 0 {
+    let absolute_majority = if footnotes.keys().contains("absolute_majority") { footnotes.absolute_majority } else { none };
+    let exhausted_lists = if footnotes.keys().contains("exhausted_lists") { footnotes.exhausted_lists } else { () };
+
+    set enum(spacing: 12pt, numbering: numbering("I", 1))
+    if absolute_majority != none {
+      [+ #format_political_group_name(absolute_majority.number, absolute_majority.name, with_prefix: "with_list_prefix") heeft meer dan de helft van de stemmen behaald en heeft daardoor een volstrekte meerderheid. Omdat de lijst op basis van de zetelverdeling niet meer dan de helft van de zetels heeft gekregen, heeft de lijst via de restzetelverdeling een extra (rest)zetel gekregen.]
+    }
+    for exhausted_list in exhausted_lists {
+      [+ #format_political_group_name(exhausted_list.number, exhausted_list.name, with_prefix: "with_list_prefix") heeft niet voldoende kandidaten beschikbaar om de haar toegewezen zetels te bezetten. De 'overtollige' zetels gaan over op andere lijsten door toepassing van het systeem van de grootste #if input.election.number_of_seats < LARGE_COUNCIL_THRESHOLD { [overschotten en/of gemiddelden] } else { [gemiddelden] }.]
     }
   }
-  #set enum(spacing: 12pt, numbering: numbering("I", 1))
-  #if absolute_majority_reassignment.len() == 1 {
-    let pg = input.election.political_groups.find(pg => pg.number == absolute_majority_reassignment.first().change.list_assigned_seat)
-    [+ #political_group_name(pg, with_prefix: "with_list_prefix") heeft meer dan de helft van de stemmen behaald en heeft daardoor een volstrekte meerderheid. Omdat de lijst op basis van de zetelverdeling niet meer dan de helft van de zetels heeft gekregen, heeft de lijst via de restzetelverdeling een extra (rest)zetel gekregen.]
-  }
-  #for list_number in unique_exhausted_list_numbers {
-    let pg = input.election.political_groups.find(pg => pg.number == list_number)
-    [+ #political_group_name(pg, with_prefix: "with_list_prefix") heeft niet voldoende kandidaten beschikbaar om de haar toegewezen zetels te bezetten. De 'overtollige' zetels gaan over op andere lijsten door toepassing van het systeem van de grootste #if input.election.number_of_seats < LARGE_COUNCIL_THRESHOLD { [overschotten] } else { [gemiddelden] }.]
-  }
   
-  #let list_seat_assignment_with_unique_highest_average = input.enriched_seat_assignment.list_seat_assignment.filter(
+  #let list_seat_assignment_with_unique_highest_average = input.seat_assignment.list_seat_assignment.filter(
     (list_seat_assignment) => 
     list_seat_assignment.keys().contains("unique_highest_average"))
   #if input.election.number_of_seats < LARGE_COUNCIL_THRESHOLD and list_seat_assignment_with_unique_highest_average.len() > 0 [
@@ -397,14 +392,14 @@ Na toewijzing van de volle zetels blijft een aantal te verdelen zetels over. Dit
       table.hline(stroke: 1pt + black),
     )
     
-    #if highest_averages_steps.len() > 0 [
+    #if initial_highest_average_steps.len() > 0 [
       #v(8pt)
-      #if highest_averages_steps.len() == 1 {
-        [Hierna was er nog #highest_averages_steps.len() restzetel te verdelen. Deze zetel is toegewezen aan de lijst die met een zetel erbij het grootste gemiddelde aantal stemmen per zetel zou hebben.]
+      #if initial_highest_average_steps.len() == 1 {
+        [Hierna was er nog #initial_highest_average_steps.len() restzetel te verdelen. Deze zetel is toegewezen aan de lijst die met een zetel erbij het grootste gemiddelde aantal stemmen per zetel zou hebben.]
       } else {
-        [Hierna waren er nog #highest_averages_steps.len() restzetels te verdelen. Deze zetels zijn toegewezen aan de lijsten die met een zetel erbij het grootste gemiddelde aantal stemmen per zetel zouden hebben.]
+        [Hierna waren er nog #initial_highest_average_steps.len() restzetels te verdelen. Deze zetels zijn toegewezen aan de lijsten die met een zetel erbij het grootste gemiddelde aantal stemmen per zetel zouden hebben.]
       }
-      #highest_averages_table(highest_averages_steps, input.seat_assignment.final_standing, input.election.political_groups, ())
+      #highest_averages_table(initial_highest_average_steps, input.seat_assignment.list_seat_assignment)
     ]
   ]
 ] else [

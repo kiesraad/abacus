@@ -20,6 +20,7 @@ use crate::{
         models::{
             ModelNa14_2Input, ModelNa31_2Input, ModelP2aInput, ModelP22_2Bijlage1Input,
             ModelP22_2Input, PdfFileModel, ToPdfFileModel,
+            apportionment_footnotes::ApportionmentFootnotes,
             enriched_candidate_nomination::EnrichedCandidateNomination,
             enriched_seat_assignment::EnrichedSeatAssignment,
             votes_table::{VotesTables, VotesTablesWithPreviousVotes},
@@ -276,15 +277,15 @@ impl ResultsInput {
         );
         let enriched_candidate_nomination =
             EnrichedCandidateNomination::new(&self.election, &candidate_nomination)?;
-        let pdf_file = ModelP22_2Input {
+        let footnotes =
+            ApportionmentFootnotes::new(&self.election.political_groups, &seat_assignment)?;
+        let pdf_file: PdfFileModel = ModelP22_2Input {
             committee_session: self.committee_session.clone(),
-            election: self.election.clone(),
+            election: self.election.clone().into(),
             summary,
-            seat_assignment,
-            enriched_seat_assignment,
+            footnotes,
+            seat_assignment: enriched_seat_assignment,
             candidate_nomination: enriched_candidate_nomination,
-            result_changes_full_seats: vec![],
-            result_changes_residual_seats: vec![],
             hash,
             creation_date_time,
         }

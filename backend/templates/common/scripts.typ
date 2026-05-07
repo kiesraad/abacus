@@ -707,9 +707,7 @@
 // View a table with list names with residual seat assignment and total number of residual seats
 #let highest_averages_table(
   steps,
-  final_standing,
-  political_groups,
-  result_changes
+  list_seat_assignments,
 ) = {
   let steps_copy = steps
   let slices = ()
@@ -744,24 +742,22 @@
         }),
       ),
       table.hline(stroke: 1pt + black),
-      ..final_standing.map((list_seat_assignment) => {
+      ..list_seat_assignments.map((list_seat_assignment) => {
         let residual_seats = steps.filter(step => {
-          step.change.selected_list_number == list_seat_assignment.list_number
+          step.change.selected_list_number == list_seat_assignment.number
         }).len()
-        let list_result_changes = result_changes.filter((change) => change.list_number == list_seat_assignment.list_number)
-        for list_result_change in list_result_changes {
-          residual_seats = residual_seats + list_result_change.increase
-        };
         (
-          table.cell(political_group_name(political_groups.find(pg => pg.number == list_seat_assignment.list_number), with_prefix: "only_list_number")),
+          table.cell(format_political_group_name(list_seat_assignment.number, list_seat_assignment.name, with_prefix: "only_list_number")),
           ..slice.map(step => {
-            let average = step.standings.find((standing) => standing.list_number == list_seat_assignment.list_number).next_votes_per_seat
-            if step.change.selected_list_number == list_seat_assignment.list_number {
-              set text(weight: "semibold")
-            }
-            table.cell(
-              if not step.change.list_exhausted.contains(list_seat_assignment.list_number) { format_fraction(average) } else { "" }
-            )
+            let average = step.standings.find((standing) => standing.list_number == list_seat_assignment.number).next_votes_per_seat
+            let value = if not step.change.list_exhausted.contains(list_seat_assignment.number) { format_fraction(average) } else { "" }
+            table.cell({
+              if step.change.selected_list_number == list_seat_assignment.number {
+                text(weight: "semibold")[#value]
+              } else {
+                value
+              }
+            })
           }),
           table.cell(align: right, if slices.last() == slice { str(residual_seats) } else { "" })
         )

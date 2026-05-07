@@ -1,11 +1,10 @@
 use serde::{Deserialize, Serialize};
 
 use crate::domain::{
-    apportionment::SeatAssignment,
     committee_session::CommitteeSession,
-    election::{Election, ElectionWithPoliticalGroups},
+    election::Election,
     models::{
-        PdfFileModel, PdfModel, ToPdfFileModel,
+        PdfFileModel, PdfModel, ToPdfFileModel, apportionment_footnotes::ApportionmentFootnotes,
         enriched_candidate_nomination::EnrichedCandidateNomination,
         enriched_seat_assignment::EnrichedSeatAssignment, votes_table::VotesTables,
     },
@@ -25,13 +24,12 @@ pub struct ResultChange {
 #[serde(deny_unknown_fields)]
 pub struct ModelP22_2Input {
     pub committee_session: CommitteeSession,
-    pub election: ElectionWithPoliticalGroups,
+    pub election: Election,
     pub summary: ElectionSummaryCSB,
-    pub seat_assignment: SeatAssignment,
-    pub enriched_seat_assignment: EnrichedSeatAssignment,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub footnotes: Option<ApportionmentFootnotes>,
+    pub seat_assignment: EnrichedSeatAssignment,
     pub candidate_nomination: EnrichedCandidateNomination,
-    pub result_changes_full_seats: Vec<ResultChange>,
-    pub result_changes_residual_seats: Vec<ResultChange>,
     pub hash: String,
     pub creation_date_time: String,
 }

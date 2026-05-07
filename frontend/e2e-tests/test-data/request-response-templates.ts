@@ -1,6 +1,7 @@
 import type {
   CSOFirstSessionResults,
   DataEntry,
+  GSBResults,
   PollingStationRequest,
   Results,
   SaveDataEntryResponse,
@@ -281,6 +282,309 @@ export const noRecountNoDifferencesDataEntry: CSOFirstSessionResults & { model: 
         {
           number: 2,
           votes: 0,
+        },
+      ],
+    },
+  ],
+};
+
+export const noRecountNoDifferencesDataEntryGSB: GSBResults & { model: "GSB" } = {
+  model: "GSB",
+  number_of_voters: 612694,
+  voters_counts: {
+    poll_card_count: 300000,
+    proxy_certificate_count: 1500,
+    total_admitted_voters_count: 301500,
+  },
+  votes_counts: {
+    political_group_total_votes: [
+      { number: 1, total: 80000 },
+      { number: 2, total: 14000 },
+      { number: 3, total: 6000 },
+      { number: 4, total: 80000 },
+      { number: 5, total: 14000 },
+      { number: 6, total: 6000 },
+      { number: 7, total: 80000 },
+      { number: 8, total: 14000 },
+      { number: 9, total: 6000 },
+    ],
+    total_votes_candidates_count: 300000,
+    blank_votes_count: 1000,
+    invalid_votes_count: 500,
+    total_votes_cast_count: 301500,
+  },
+  differences_counts: {
+    more_ballots_count: 0,
+    fewer_ballots_count: 0,
+  },
+  political_group_votes: [
+    {
+      number: 1,
+      total: 80000,
+      candidate_votes: [
+        {
+          number: 1,
+          votes: 40000,
+        },
+        {
+          number: 2,
+          votes: 20000,
+        },
+        {
+          number: 3,
+          votes: 5000,
+        },
+        {
+          number: 4,
+          votes: 900,
+        },
+        {
+          number: 5,
+          votes: 800,
+        },
+        {
+          number: 6,
+          votes: 700,
+        },
+        {
+          number: 7,
+          votes: 600,
+        },
+        {
+          number: 8,
+          votes: 500,
+        },
+        {
+          number: 9,
+          votes: 400,
+        },
+        {
+          number: 10,
+          votes: 300,
+        },
+        {
+          number: 11,
+          votes: 200,
+        },
+        {
+          number: 12,
+          votes: 10600,
+        },
+      ],
+    },
+    {
+      number: 2,
+      total: 14000,
+      candidate_votes: [
+        {
+          number: 1,
+          votes: 8000,
+        },
+        {
+          number: 2,
+          votes: 2000,
+        },
+        {
+          number: 3,
+          votes: 1500,
+        },
+        {
+          number: 4,
+          votes: 2500,
+        },
+      ],
+    },
+    {
+      number: 3,
+      total: 6000,
+      candidate_votes: [
+        {
+          number: 1,
+          votes: 4000,
+        },
+        {
+          number: 2,
+          votes: 2000,
+        },
+      ],
+    },
+    {
+      number: 4,
+      total: 80000,
+      candidate_votes: [
+        {
+          number: 1,
+          votes: 40000,
+        },
+        {
+          number: 2,
+          votes: 20000,
+        },
+        {
+          number: 3,
+          votes: 5000,
+        },
+        {
+          number: 4,
+          votes: 900,
+        },
+        {
+          number: 5,
+          votes: 800,
+        },
+        {
+          number: 6,
+          votes: 700,
+        },
+        {
+          number: 7,
+          votes: 600,
+        },
+        {
+          number: 8,
+          votes: 500,
+        },
+        {
+          number: 9,
+          votes: 400,
+        },
+        {
+          number: 10,
+          votes: 300,
+        },
+        {
+          number: 11,
+          votes: 200,
+        },
+        {
+          number: 12,
+          votes: 10600,
+        },
+      ],
+    },
+    {
+      number: 5,
+      total: 14000,
+      candidate_votes: [
+        {
+          number: 1,
+          votes: 8000,
+        },
+        {
+          number: 2,
+          votes: 2000,
+        },
+        {
+          number: 3,
+          votes: 1500,
+        },
+        {
+          number: 4,
+          votes: 2500,
+        },
+      ],
+    },
+    {
+      number: 6,
+      total: 6000,
+      candidate_votes: [
+        {
+          number: 1,
+          votes: 4000,
+        },
+        {
+          number: 2,
+          votes: 2000,
+        },
+      ],
+    },
+    {
+      number: 7,
+      total: 80000,
+      candidate_votes: [
+        {
+          number: 1,
+          votes: 40000,
+        },
+        {
+          number: 2,
+          votes: 20000,
+        },
+        {
+          number: 3,
+          votes: 5000,
+        },
+        {
+          number: 4,
+          votes: 900,
+        },
+        {
+          number: 5,
+          votes: 800,
+        },
+        {
+          number: 6,
+          votes: 700,
+        },
+        {
+          number: 7,
+          votes: 600,
+        },
+        {
+          number: 8,
+          votes: 500,
+        },
+        {
+          number: 9,
+          votes: 400,
+        },
+        {
+          number: 10,
+          votes: 300,
+        },
+        {
+          number: 11,
+          votes: 200,
+        },
+        {
+          number: 12,
+          votes: 10600,
+        },
+      ],
+    },
+    {
+      number: 8,
+      total: 14000,
+      candidate_votes: [
+        {
+          number: 1,
+          votes: 8000,
+        },
+        {
+          number: 2,
+          votes: 2000,
+        },
+        {
+          number: 3,
+          votes: 1500,
+        },
+        {
+          number: 4,
+          votes: 2500,
+        },
+      ],
+    },
+    {
+      number: 9,
+      total: 6000,
+      candidate_votes: [
+        {
+          number: 1,
+          votes: 4000,
+        },
+        {
+          number: 2,
+          votes: 2000,
         },
       ],
     },

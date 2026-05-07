@@ -21,7 +21,7 @@ import { InvestigationPrintCorrigendumPgObj } from "e2e-tests/page-objects/inves
 import { InvestigationReasonPgObj } from "e2e-tests/page-objects/investigations/InvestigationReasonPgObj";
 import { UserInfoTopBar } from "e2e-tests/page-objects/nav_bar/UserInfoTopBarPgObj";
 import type { Results } from "@/types/generated/openapi";
-import { eml110a, eml110b, eml230b } from "../test-data/eml-files";
+import { eml110a, eml110b, eml230b, eml230b_more_than_45_candidates } from "../test-data/eml-files";
 
 export async function fillDataEntryPages(page: Page, results: Results) {
   if (results.model === "CSOFirstSession") {
@@ -34,7 +34,11 @@ export async function fillDataEntryPages(page: Page, results: Results) {
 
   const votersAndVotesPage = new VotersAndVotesPage(page);
   await expect(votersAndVotesPage.fieldset).toBeVisible();
-  await votersAndVotesPage.fillInPageAndClickNext(results.voters_counts, results.votes_counts);
+  if (results.model === "GSB") {
+    await votersAndVotesPage.fillInPageAndClickNextForModelGSB(results);
+  } else {
+    await votersAndVotesPage.fillInPageAndClickNext(results.voters_counts, results.votes_counts);
+  }
 
   switch (results.model) {
     case "CSOFirstSession":
@@ -119,6 +123,21 @@ export async function uploadCandidatesAndInputHash(page: Page) {
   const checkCandidateDefinitionPage = new CheckCandidateDefinitionPgObj(page);
   await expect(checkCandidateDefinitionPage.header).toBeVisible();
   await checkCandidateDefinitionPage.inputHash(eml230b.hashInput1, eml230b.hashInput2);
+}
+
+export async function uploadCandidatesAndInputHashCSBElection(page: Page) {
+  const uploadCandidateDefinitionPage = new UploadCandidateDefinitionPgObj(page);
+  await expect(uploadCandidateDefinitionPage.header).toBeVisible();
+  await uploadCandidateDefinitionPage.uploadFile(eml230b_more_than_45_candidates.path);
+  await expect(uploadCandidateDefinitionPage.main).toContainText(eml230b_more_than_45_candidates.filename);
+  await expect(uploadCandidateDefinitionPage.main).toContainText(eml230b_more_than_45_candidates.electionDate);
+
+  const checkCandidateDefinitionPage = new CheckCandidateDefinitionPgObj(page);
+  await expect(checkCandidateDefinitionPage.header).toBeVisible();
+  await checkCandidateDefinitionPage.inputHash(
+    eml230b_more_than_45_candidates.hashInput1,
+    eml230b_more_than_45_candidates.hashInput2,
+  );
 }
 
 export async function uploadPollingStations(page: Page, eml = eml110b) {

@@ -10,7 +10,10 @@ use rand::{RngExt, seq::IndexedRandom};
 use test_log::test;
 
 use crate::{
-    api::report::DEFAULT_DATE_TIME_FORMAT,
+    api::{
+        apportionment::{ApportionmentInputData, map_candidate_nomination, map_seat_assignment},
+        report::DEFAULT_DATE_TIME_FORMAT,
+    },
     domain::{
         committee_session::{CommitteeSession, CommitteeSessionId},
         committee_session_status::CommitteeSessionStatus,
@@ -23,7 +26,9 @@ use crate::{
         models::{
             ModelN10_2Input, ModelNa14_2Bijlage1Input, ModelNa14_2Input, ModelNa31_2Bijlage1Input,
             ModelNa31_2InlegvelInput, ModelNa31_2Input, ModelP2aInput, ModelP22_2Bijlage1Input,
-            PdfFileModel, PdfModel,
+            ModelP22_2Input, PdfFileModel, PdfModel,
+            enriched_candidate_nomination::EnrichedCandidateNomination,
+            enriched_seat_assignment::EnrichedSeatAssignment,
             votes_table::{
                 CandidatesTables, VotesTables, VotesTablesWithOnlyPreviousVotes,
                 VotesTablesWithPreviousVotes,
@@ -39,13 +44,16 @@ use crate::{
                 DifferenceCountsCompareVotesCastAdmittedVoters, DifferencesCounts,
             },
             political_group_candidate_votes::{CandidateVotes, PoliticalGroupCandidateVotes},
-            political_group_total_votes::PoliticalGroupTotalVotes,
+            political_group_total_votes::{
+                EnrichedPoliticalGroupTotalVotes, PoliticalGroupTotalVotes,
+            },
             voters_counts::VotersCounts,
-            votes_counts::VotesCounts,
+            votes_counts::{EnrichedVotesCounts, VotesCounts},
             yes_no::YesNo,
         },
         summary::{
-            ElectionSummary, PollingStationInvestigations, SumCount, SummaryDifferencesCounts,
+            ElectionSummary, ElectionSummaryCSB, PollingStationInvestigations, SumCount,
+            SummaryDifferencesCounts,
         },
     },
 };
@@ -337,6 +345,46 @@ fn random_result(
     }
 }
 
+fn random_csb_result(
+    rng: &mut impl RngExt,
+    election: &ElectionWithPoliticalGroups,
+    data_sources: &[DataEntrySource],
+    string_length: usize,
+) -> ElectionSummaryCSB {
+    ElectionSummaryCSB {
+        voters_counts: VotersCounts {
+            poll_card_count: rng.random_range(0..500),
+            proxy_certificate_count: rng.random_range(0..500),
+            total_admitted_voters_count: rng.random_range(0..500),
+        },
+        votes_counts: EnrichedVotesCounts {
+            political_group_total_votes: election
+                .political_groups
+                .iter()
+                .map(|group| EnrichedPoliticalGroupTotalVotes {
+                    name: random_string(rng, string_length),
+                    number: group.number,
+                    total: rng.random_range(0..500),
+                })
+                .collect(),
+            total_votes_candidates_count: rng.random_range(0..500),
+            blank_votes_count: rng.random_range(0..500),
+            invalid_votes_count: rng.random_range(0..500),
+            total_votes_cast_count: rng.random_range(0..500),
+        },
+        differences_counts: SummaryDifferencesCounts {
+            more_ballots_count: SumCount {
+                count: rng.random_range(0..500),
+                data_entry_sources: random_station_subset(rng, data_sources),
+            },
+            fewer_ballots_count: SumCount {
+                count: rng.random_range(0..500),
+                data_entry_sources: random_station_subset(rng, data_sources),
+            },
+        },
+    }
+}
+
 fn random_station_subset(
     rng: &mut impl RngExt,
     data_sources: &[DataEntrySource],
@@ -388,7 +436,24 @@ fn random_election_summary(
                 .map(data_source_num)
                 .collect(),
         },
-        number_of_voters: None,
+        number_of_voters: Some(100),
+    }
+}
+
+fn random_election_summary_csb(
+    rng: &mut impl RngExt,
+    election: &ElectionWithPoliticalGroups,
+    data_sources: &[DataEntrySource],
+    string_length: usize,
+) -> ElectionSummaryCSB {
+    let result = random_csb_result(rng, election, data_sources, string_length);
+    ElectionSummaryCSB {
+        voters_counts: result.voters_counts,
+        votes_counts: result.votes_counts,
+        differences_counts: SummaryDifferencesCounts {
+            more_ballots_count: random_sum_count(rng, data_sources),
+            fewer_ballots_count: random_sum_count(rng, data_sources),
+        },
     }
 }
 
@@ -666,6 +731,63 @@ async fn test_p_2a() {
 
         test_pdf(model).await;
     }
+}
+
+#[test(tokio::test)]
+async fn test_p_22_2() {
+    let mut rng = rand::rng();
+
+    // We only test with values that have a possible apportionment outcome
+    let (parties, candidates, string_length, none_where_possible) = (10, 10, 10, false);
+
+    let election = random_election(
+        &mut rng,
+        parties,
+        candidates,
+        string_length,
+        none_where_possible,
+    );
+    let committee_session = random_committee_session(&mut rng, election.id, string_length);
+    let polling_stations = random_polling_stations(&mut rng, string_length, none_where_possible);
+    let data_sources = ps_as_first_data_entry_sources(&polling_stations);
+    let summary_gsb = random_election_summary(&mut rng, &election, &data_sources);
+    let summary = random_election_summary_csb(&mut rng, &election, &data_sources, string_length);
+
+    let apportionment_input = ApportionmentInputData {
+        number_of_seats: election.number_of_seats,
+        list_votes: &summary_gsb.political_group_votes,
+    };
+    let apportionment_result =
+        apportionment::process(&apportionment_input).expect("apportionment failed");
+    let seat_assignment = map_seat_assignment(&apportionment_result.seat_assignment);
+    let enriched_seat_assignment =
+        EnrichedSeatAssignment::new(election.number_of_seats, &summary, &seat_assignment).unwrap();
+    let candidate_nomination = map_candidate_nomination(
+        &apportionment_result.candidate_nomination,
+        election.political_groups.clone(),
+    );
+    let enriched_candidate_nomination =
+        EnrichedCandidateNomination::new(&election, &candidate_nomination).unwrap();
+
+    let hash = random_string(&mut rng, 64);
+    let creation_date_time = random_date_time(&mut rng)
+        .format(DEFAULT_DATE_TIME_FORMAT)
+        .to_string();
+
+    let model = PdfModel::ModelP22_2(Box::new(ModelP22_2Input {
+        committee_session,
+        election,
+        summary,
+        seat_assignment,
+        enriched_seat_assignment,
+        candidate_nomination: enriched_candidate_nomination,
+        result_changes_full_seats: vec![],
+        result_changes_residual_seats: vec![],
+        hash,
+        creation_date_time,
+    }));
+
+    test_pdf(model).await;
 }
 
 #[test(tokio::test)]

@@ -1,4 +1,6 @@
 use apportionment::ApportionmentError;
+use axum::http::StatusCode;
+use tracing::error;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 mod handlers;
@@ -10,7 +12,10 @@ pub use self::{
     structs::ApportionmentInputData,
 };
 use crate::{
-    APIError, AppState, api::middleware::authentication::RouteAuthorization, domain::role::Role,
+    APIError, AppState,
+    api::middleware::authentication::RouteAuthorization,
+    domain::role::Role,
+    error::{ApiErrorResponse, ErrorReference, ErrorResponse},
 };
 
 /// Errors that can occur before apportionment
@@ -20,6 +25,49 @@ pub enum ApportionmentApiError {
     CommitteeSessionNotCompleted,
     DrawingOfLotsNotImplemented,
     ZeroVotesCast,
+}
+
+impl ApiErrorResponse for ApportionmentApiError {
+    fn log(&self) {
+        error!("Apportionment error: {:?}", self);
+    }
+
+    fn to_response_parts(&self) -> (StatusCode, ErrorResponse) {
+        match self {
+            ApportionmentApiError::AllListsExhausted => (
+                StatusCode::UNPROCESSABLE_ENTITY,
+                ErrorResponse::new(
+                    "All lists are exhausted, not enough candidates to fill all seats",
+                    ErrorReference::ApportionmentAllListsExhausted,
+                    false,
+                ),
+            ),
+            ApportionmentApiError::CommitteeSessionNotCompleted => (
+                StatusCode::PRECONDITION_FAILED,
+                ErrorResponse::new(
+                    "Committee session not completed",
+                    ErrorReference::ApportionmentCommitteeSessionNotCompleted,
+                    false,
+                ),
+            ),
+            ApportionmentApiError::DrawingOfLotsNotImplemented => (
+                StatusCode::UNPROCESSABLE_ENTITY,
+                ErrorResponse::new(
+                    "Drawing of lots is required",
+                    ErrorReference::ApportionmentDrawingOfLotsRequired,
+                    false,
+                ),
+            ),
+            ApportionmentApiError::ZeroVotesCast => (
+                StatusCode::UNPROCESSABLE_ENTITY,
+                ErrorResponse::new(
+                    "No votes on candidates cast",
+                    ErrorReference::ApportionmentZeroVotesCast,
+                    false,
+                ),
+            ),
+        }
+    }
 }
 
 impl From<ApportionmentError> for ApportionmentApiError {
@@ -34,13 +82,13 @@ impl From<ApportionmentError> for ApportionmentApiError {
 
 impl From<ApportionmentError> for APIError {
     fn from(err: ApportionmentError) -> Self {
-        APIError::Apportionment(err.into())
+        ApportionmentApiError::from(err).into()
     }
 }
 
 impl From<ApportionmentApiError> for APIError {
     fn from(err: ApportionmentApiError) -> Self {
-        APIError::Apportionment(err)
+        APIError::Delegated(Box::new(err))
     }
 }
 

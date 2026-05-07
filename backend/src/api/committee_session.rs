@@ -6,10 +6,11 @@ use axum::{
 use chrono::NaiveDateTime;
 use serde::Serialize;
 use sqlx::{SqliteConnection, SqlitePool};
+use tracing::error;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
-    APIError, AppState, ErrorResponse, SqlitePoolExt,
+    APIError, AppState, SqlitePoolExt,
     api::middleware::authentication::RouteAuthorization,
     domain::{
         committee_session::{
@@ -22,7 +23,7 @@ use crate::{
         role::Role,
         validate::DataError,
     },
-    error::ErrorReference,
+    error::{ApiErrorResponse, ErrorReference, ErrorResponse},
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
     repository::{
         committee_session_repo::{
@@ -36,6 +37,49 @@ use crate::{
         change_committee_session_status, list_polling_stations_for_session,
     },
 };
+
+impl ApiErrorResponse for CommitteeSessionError {
+    fn log(&self) {
+        error!("Committee session status error: {:?}", self);
+    }
+
+    fn to_response_parts(&self) -> (StatusCode, ErrorResponse) {
+        match self {
+            CommitteeSessionError::CommitteeSessionPaused => (
+                StatusCode::CONFLICT,
+                ErrorResponse::new(
+                    "Committee session data entry is paused",
+                    ErrorReference::CommitteeSessionPaused,
+                    true,
+                ),
+            ),
+            CommitteeSessionError::InvalidCommitteeSessionStatus => (
+                StatusCode::CONFLICT,
+                ErrorResponse::new(
+                    "Invalid committee session status",
+                    ErrorReference::InvalidCommitteeSessionStatus,
+                    true,
+                ),
+            ),
+            CommitteeSessionError::InvalidDetails => (
+                StatusCode::BAD_REQUEST,
+                ErrorResponse::new("Invalid details", ErrorReference::InvalidData, false),
+            ),
+            CommitteeSessionError::InvalidStatusTransition => (
+                StatusCode::CONFLICT,
+                ErrorResponse::new(
+                    "Invalid committee session state transition",
+                    ErrorReference::InvalidStateTransition,
+                    true,
+                ),
+            ),
+            CommitteeSessionError::ProviderError => (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                ErrorResponse::new("Internal server error", ErrorReference::DatabaseError, true),
+            ),
+        }
+    }
+}
 
 #[derive(Serialize)]
 pub struct CommitteeSessionCreatedAuditData(pub CommitteeSessionAuditData);
@@ -142,9 +186,7 @@ pub async fn committee_session_create(
         Ok((StatusCode::CREATED, next_committee_session))
     } else {
         tx.rollback().await?;
-        Err(APIError::CommitteeSession(
-            CommitteeSessionError::InvalidCommitteeSessionStatus,
-        ))
+        Err(CommitteeSessionError::InvalidCommitteeSessionStatus.into())
     }
 }
 
@@ -213,9 +255,7 @@ pub async fn committee_session_delete(
     } else {
         tx.rollback().await?;
 
-        Err(APIError::CommitteeSession(
-            CommitteeSessionError::InvalidCommitteeSessionStatus,
-        ))
+        Err(CommitteeSessionError::InvalidCommitteeSessionStatus.into())
     }
 }
 
@@ -249,18 +289,14 @@ pub async fn committee_session_update(
         .is_authorized(&get_committee_category(&mut tx, committee_session_id).await?)?;
 
     if request.location.is_empty() {
-        return Err(APIError::CommitteeSession(
-            CommitteeSessionError::InvalidDetails,
-        ));
+        return Err(CommitteeSessionError::InvalidDetails.into());
     }
 
     let date_time_str = format!("{}T{}", &request.start_date, &request.start_time);
     let date_time = match NaiveDateTime::parse_from_str(&date_time_str, "%Y-%m-%dT%H:%M") {
         Ok(date) => date,
         Err(_) => {
-            return Err(APIError::CommitteeSession(
-                CommitteeSessionError::InvalidDetails,
-            ));
+            return Err(CommitteeSessionError::InvalidDetails.into());
         }
     };
 
@@ -371,10 +407,10 @@ pub async fn committee_session_investigations(
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use axum::response::{IntoResponse, Response};
     use test_log::test;
 
+    use super::*;
     use crate::{
         api::tests::{
             assert_committee_category_authorization_err, assert_committee_category_authorization_ok,

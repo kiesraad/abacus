@@ -1,12 +1,10 @@
 use serde::{Deserialize, Serialize};
 
-use crate::{
-    APIError,
-    domain::{
-        apportionment::{CandidateNomination, ChosenCandidate, ListCandidateNomination},
-        election::{Candidate, ElectionWithPoliticalGroups, PGNumber, PoliticalGroup},
-        results::{count::Count, political_group_candidate_votes::CandidateVotes},
-    },
+use crate::domain::{
+    apportionment::{CandidateNomination, ChosenCandidate, ListCandidateNomination},
+    election::{Candidate, ElectionWithPoliticalGroups, PGNumber, PoliticalGroup},
+    models::error::ModelsError,
+    results::{count::Count, political_group_candidate_votes::CandidateVotes},
 };
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -19,7 +17,7 @@ impl EnrichedCandidateNomination {
     pub fn new(
         election: &ElectionWithPoliticalGroups,
         candidate_nomination: &CandidateNomination,
-    ) -> Result<Self, APIError> {
+    ) -> Result<Self, ModelsError> {
         Ok(EnrichedCandidateNomination {
             chosen_candidates: candidate_nomination.chosen_candidates.clone(),
             list_candidate_nomination: election
@@ -28,7 +26,7 @@ impl EnrichedCandidateNomination {
               .map(|pg| {
                   EnrichedListCandidateNomination::new(
                       pg.clone(),
-                      candidate_nomination.list_candidate_nomination.iter().find(|cn| cn.list_number == pg.number).ok_or(APIError::DataIntegrityError(format!(
+                      candidate_nomination.list_candidate_nomination.iter().find(|cn| cn.list_number == pg.number).ok_or(ModelsError::DataIntegrityError(format!(
                           "No list candidate nomination found for political group number {} in candidate nomination", pg.number
                       )))?,
                   )
@@ -59,14 +57,14 @@ impl EnrichedListCandidateNomination {
         list_candidates: &[Candidate],
         candidate_votes: &[CandidateVotes],
         start_seat_number: usize,
-    ) -> Result<Vec<CandidateWithSeatTableColumn>, APIError> {
+    ) -> Result<Vec<CandidateWithSeatTableColumn>, ModelsError> {
         let mut columns = Vec::new();
 
         for (idx, chosen_candidate) in candidate_votes.iter().enumerate() {
             let candidate = list_candidates
                 .iter()
                 .find(|candidate| candidate.number == chosen_candidate.number)
-                .ok_or(APIError::DataIntegrityError(format!(
+                .ok_or(ModelsError::DataIntegrityError(format!(
                     "No candidate found for candidate number {} in political group candidates",
                     chosen_candidate.number
                 )))?;
@@ -82,7 +80,7 @@ impl EnrichedListCandidateNomination {
     pub fn new(
         group: PoliticalGroup,
         list_candidate_nomination: &ListCandidateNomination,
-    ) -> Result<Self, APIError> {
+    ) -> Result<Self, ModelsError> {
         let preferential_nomination_columns = Self::get_candidate_with_seat_table_columns(
             &group.candidates,
             &list_candidate_nomination.preferential_candidate_nomination,

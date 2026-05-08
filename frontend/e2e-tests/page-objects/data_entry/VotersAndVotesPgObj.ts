@@ -1,6 +1,6 @@
 import type { Locator, Page } from "@playwright/test";
 
-import type { Results, VotersCounts, VotesCounts } from "@/types/generated/openapi";
+import type { GSBResults, VotersCounts, VotesCounts } from "@/types/generated/openapi";
 
 import { DataEntryBasePage } from "./DataEntryBasePgObj";
 
@@ -32,7 +32,7 @@ export class VotersAndVotesPage extends DataEntryBasePage {
       name: "Toegelaten kiezers na hertelling door gemeentelijk stembureau",
     });
 
-    // number of voters
+    // number of voters (CSB only)
     this.numberOfVoters = page.getByRole("textbox", { name: "Z Kiesgerechtigden" });
 
     // voters counts
@@ -113,13 +113,9 @@ export class VotersAndVotesPage extends DataEntryBasePage {
     await this.next.click();
   }
 
-  async fillInPageAndClickNextForModelGSB(results: Results) {
-    if (results.model === "GSB") {
-      await this.numberOfVoters.fill(results.number_of_voters.toString());
-    }
-    await this.inputVotersCounts(results.voters_counts);
-    await this.inputVotesCounts(results.votes_counts);
-    await this.next.click();
+  async fillInPageAndClickNextForModelGSB(results: GSBResults) {
+    await this.numberOfVoters.fill(results.number_of_voters.toString());
+    await this.fillInPageAndClickNext(results.voters_counts, results.votes_counts);
   }
 
   async checkAcceptErrorsAndWarnings() {

@@ -42,7 +42,7 @@ import { UserCreateElectionPgObj } from "e2e-tests/page-objects/users/UserCreate
 import { UserCreateRolePgObj } from "e2e-tests/page-objects/users/UserCreateRolePgObj";
 import { UserCreateTypePgObj } from "e2e-tests/page-objects/users/UserCreateTypePgObj";
 import { UserListPgObj } from "e2e-tests/page-objects/users/UserListPgObj";
-import { eml110b_single } from "e2e-tests/test-data/eml-files";
+import { eml110b_single, eml230b } from "e2e-tests/test-data/eml-files";
 import { noRecountNoDifferencesDataEntry } from "e2e-tests/test-data/request-response-templates";
 import type { TestUser } from "e2e-tests/test-data/users";
 
@@ -70,25 +70,25 @@ const randomSuffix = Date.now();
 
 const adminUser: TestUser = {
   username: `1-admin-${randomSuffix}`,
-  fullname: `full flow admin GSB`,
+  fullname: `full flow admin`,
   role: "administrator",
 };
 
 const coordinatorUser: TestUser = {
   username: `2-coordinator-${randomSuffix}`,
-  fullname: `full flow coordinator GSB`,
+  fullname: `full flow coordinator`,
   role: "coordinator_gsb",
 };
 
 const typistUsers: TestUser[] = [
   {
     username: `3-typist-${randomSuffix}`,
-    fullname: `full flow 3-typist GSB`,
+    fullname: `full flow 3-typist`,
     role: "typist_gsb",
   },
   {
     username: `4-typist-${randomSuffix}`,
-    fullname: `full flow 4-typist GSB`,
+    fullname: `full flow 4-typist`,
     role: "typist_gsb",
   },
 ];
@@ -125,7 +125,7 @@ test.describe("full flow GSB", () => {
     await expect(committeeCategoryPage.gsb).toBeChecked();
     await committeeCategoryPage.next.click();
 
-    await uploadCandidatesAndInputHash(page);
+    await uploadCandidatesAndInputHash(page, eml230b);
 
     await uploadPollingStations(page, eml110b_single);
 

@@ -25,6 +25,7 @@ export class DataEntryHomePage {
       name: "Verder met een volgend stembureau?",
     });
 
+    // GSB only
     this.number = page.getByRole("textbox", { name: "Voer het nummer in: " });
     this.feedback = page.getByTestId("inputFeedback");
     this.submitFeedback = page.getByTestId("submitFeedback");

@@ -5,7 +5,7 @@ import { apiLogout, createUser, firstLogin, getTestPassword } from "e2e-tests/he
 import {
   fillDataEntryPagesAndSave,
   logout,
-  uploadCandidatesAndInputHashCSBElection,
+  uploadCandidatesAndInputHash,
   uploadElectionAndInputHash,
 } from "e2e-tests/helpers-utils/e2e-test-browser-helpers";
 import { ApportionmentFullSeats } from "e2e-tests/page-objects/apportionment/ApportionmentFullSeatsPgObj";
@@ -29,6 +29,7 @@ import { UserCreateElectionPgObj } from "e2e-tests/page-objects/users/UserCreate
 import { UserCreateRolePgObj } from "e2e-tests/page-objects/users/UserCreateRolePgObj";
 import { UserCreateTypePgObj } from "e2e-tests/page-objects/users/UserCreateTypePgObj";
 import { UserListPgObj } from "e2e-tests/page-objects/users/UserListPgObj";
+import { eml230b_more_than_45_candidates } from "e2e-tests/test-data/eml-files";
 import { noRecountNoDifferencesDataEntryGSB } from "e2e-tests/test-data/request-response-templates";
 import type { TestUser } from "e2e-tests/test-data/users";
 
@@ -94,7 +95,7 @@ test.describe("full flow CSB", () => {
     await expect(committeeCategoryPage.csb).toBeChecked();
     await committeeCategoryPage.next.click();
 
-    await uploadCandidatesAndInputHashCSBElection(page);
+    await uploadCandidatesAndInputHash(page, eml230b_more_than_45_candidates);
 
     const checkAndSavePage = new CheckAndSavePgObj(page);
     await expect(checkAndSavePage.header).toBeVisible();

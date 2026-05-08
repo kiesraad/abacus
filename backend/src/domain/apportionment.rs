@@ -16,7 +16,7 @@ pub struct SeatAssignment {
     pub final_standing: Vec<ListSeatAssignment>,
 }
 
-#[derive(Debug, Serialize, Deserialize, ToSchema)]
+#[derive(Clone, Debug, Serialize, Deserialize, ToSchema)]
 pub struct SeatChangeStep {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
@@ -25,7 +25,7 @@ pub struct SeatChangeStep {
     pub standings: Vec<ListStanding>,
 }
 
-#[derive(Debug, Serialize, Deserialize, ToSchema)]
+#[derive(Clone, Debug, Serialize, Deserialize, ToSchema)]
 #[serde(deny_unknown_fields, tag = "changed_by")]
 pub enum SeatChange {
     HighestAverageAssignment(HighestAverageAssignedSeat),
@@ -75,12 +75,26 @@ impl SeatChange {
             Self::AbsoluteMajorityReassignment(absolute_majority_reassigned_seat) => {
                 absolute_majority_reassigned_seat.list_assigned_seat
             }
-            Self::ListExhaustionRemoval(_) => unimplemented!(),
+            Self::ListExhaustionRemoval(_) => unreachable!(),
+        }
+    }
+
+    pub fn list_number_retracted(&self) -> PGNumber {
+        match self {
+            Self::HighestAverageAssignment(_)
+            | Self::UniqueHighestAverageAssignment(_)
+            | Self::LargestRemainderAssignment(_) => unreachable!(),
+            Self::AbsoluteMajorityReassignment(absolute_majority_reassigned_seat) => {
+                absolute_majority_reassigned_seat.list_retracted_seat
+            }
+            Self::ListExhaustionRemoval(list_exhaustion_removed_seat) => {
+                list_exhaustion_removed_seat.list_retracted_seat
+            }
         }
     }
 }
 
-#[derive(Debug, Serialize, Deserialize, ToSchema)]
+#[derive(Clone, Debug, Serialize, Deserialize, ToSchema)]
 pub struct HighestAverageAssignedSeat {
     pub selected_list_number: PGNumber,
     pub list_options: Vec<PGNumber>,
@@ -89,7 +103,7 @@ pub struct HighestAverageAssignedSeat {
     pub votes_per_seat: DisplayFraction,
 }
 
-#[derive(Debug, Serialize, Deserialize, ToSchema)]
+#[derive(Clone, Debug, Serialize, Deserialize, ToSchema)]
 pub struct LargestRemainderAssignedSeat {
     pub selected_list_number: PGNumber,
     pub list_options: Vec<PGNumber>,
@@ -97,19 +111,19 @@ pub struct LargestRemainderAssignedSeat {
     pub remainder_votes: DisplayFraction,
 }
 
-#[derive(Debug, Serialize, Deserialize, ToSchema)]
+#[derive(Clone, Debug, Serialize, Deserialize, ToSchema)]
 pub struct AbsoluteMajorityReassignedSeat {
     pub list_retracted_seat: PGNumber,
     pub list_assigned_seat: PGNumber,
 }
 
-#[derive(Debug, Serialize, Deserialize, ToSchema)]
+#[derive(Clone, Debug, Serialize, Deserialize, ToSchema)]
 pub struct ListExhaustionRemovedSeat {
     pub list_retracted_seat: PGNumber,
     pub full_seat: bool,
 }
 
-#[derive(Debug, Serialize, Deserialize, ToSchema)]
+#[derive(Clone, Debug, Serialize, Deserialize, ToSchema)]
 pub struct ListStanding {
     pub list_number: PGNumber,
     pub votes_cast: u64,

@@ -1,3 +1,4 @@
+pub mod apportionment_footnotes;
 pub mod enriched_candidate_nomination;
 pub mod enriched_seat_assignment;
 pub mod filter_input;

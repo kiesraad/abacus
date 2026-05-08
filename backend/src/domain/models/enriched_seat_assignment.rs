@@ -1,12 +1,10 @@
 use serde::{Deserialize, Serialize};
 
-use crate::{
-    APIError,
-    domain::{
-        apportionment::{DisplayFraction, ListSeatAssignment, SeatAssignment, SeatChangeStep},
-        election::PGNumber,
-        summary::ElectionSummaryCSB,
-    },
+use crate::domain::{
+    apportionment::{DisplayFraction, ListSeatAssignment, SeatAssignment, SeatChangeStep},
+    election::PGNumber,
+    models::error::ModelsError,
+    summary::ElectionSummaryCSB,
 };
 
 struct InitialSteps<'a> {
@@ -147,7 +145,7 @@ impl EnrichedSeatAssignment {
     fn get_list_seat_assignments(
         summary: &ElectionSummaryCSB,
         seat_assignment: &SeatAssignment,
-    ) -> Result<ListSeatAssignments, APIError> {
+    ) -> Result<ListSeatAssignments, ModelsError> {
         let mut enriched_list_seat_assignments = Vec::new();
         let mut initial_total_full_seats = 0;
 
@@ -191,7 +189,7 @@ impl EnrichedSeatAssignment {
         number_of_seats: u32,
         summary: &ElectionSummaryCSB,
         seat_assignment: &SeatAssignment,
-    ) -> Result<Self, APIError> {
+    ) -> Result<Self, ModelsError> {
         let list_seat_assignments = Self::get_list_seat_assignments(summary, seat_assignment)?;
         Ok(EnrichedSeatAssignment {
             quota: seat_assignment.quota.clone(),

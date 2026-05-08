@@ -18,7 +18,8 @@ use crate::{
     MAX_BODY_SIZE_MB,
     api::middleware::authentication::error::AuthenticationError,
     domain::{
-        committee_session::CommitteeSessionError, role::RoleNotAuthorizedError, validate::DataError,
+        committee_session::CommitteeSessionError, models::error::ModelsError,
+        role::RoleNotAuthorizedError, validate::DataError,
     },
     eml::EMLImportError,
     repository::polling_station_repo,
@@ -385,6 +386,11 @@ impl From<DataEntryServiceError> for APIError {
                 APIError::DataIntegrityError(String::from("Data entry is already linked"))
             }
         }
+    }
+}
+impl From<ModelsError> for APIError {
+    fn from(err: ModelsError) -> Self {
+        APIError::Delegated(Box::new(err))
     }
 }
 

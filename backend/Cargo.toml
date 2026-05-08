@@ -37,7 +37,6 @@ default-run = "abacus"
 default = ["openapi", "dev-database"]
 openapi = ["dep:utoipa-swagger-ui"]
 memory-serve = ["dep:memory-serve"]
-embed-typst = ["pdf_gen/embed-typst"]
 dev-database = []
 airgap-detection = []
 storybook = ["dep:memory-serve"]
@@ -52,7 +51,6 @@ required-features = ["dev-database"]
 
 [[bin]]
 name = "gen-pdf"
-required-features = ["embed-typst"]
 
 # Note: if you add a dependency here, please update the README.md for the backend as well.
 

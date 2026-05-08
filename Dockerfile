@@ -13,7 +13,7 @@ WORKDIR /build
 COPY ./backend ./backend
 COPY --from=frontend-builder /build/frontend/dist ./frontend/dist
 WORKDIR /build/backend
-RUN cargo build --release --features memory-serve,embed-typst
+RUN cargo build --release --features memory-serve
 
 FROM debian:bookworm-slim
 WORKDIR /abacus

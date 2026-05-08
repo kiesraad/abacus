@@ -32,19 +32,6 @@ sqlx database setup
 cargo run --features memory-serve
 ```
 
-By default Abacus will use an external typst binary which should be available on
-your `$PATH` in order to generate PDF output. You can download typst for your
-platform on the [typst releases page] or by running `cargo install typst-cli`.
-You can also build Abacus to include typst in the binary itself. To do this, you
-can simply enable the `embed-typst` feature. This can be combined with the
-memory-serve feature as well, e.g.:
-
-```shell
-cargo build --features memory-serve,embed-typst
-```
-
-[typst releases page]: https://github.com/typst/typst/releases
-
 ### Linting
 
 Use `cargo clippy --all-targets --all-features -- -D warnings` to lint the project. Warnings are treated as errors in the GitHub Actions workflow.
@@ -52,8 +39,6 @@ Use `cargo clippy --all-targets --all-features -- -D warnings` to lint the proje
 ### Testing
 
 Use `cargo test` to run the tests. The tests are also run in a GitHub Actions workflow.
-
-Typst needs to be installed on your machine, see [Running](#running) for more details.
 
 ### Air gap detection
 
@@ -89,13 +74,13 @@ pnpm build
 cd ..
 
 # build for ARMv6 32-bit Linux (like the Raspberry Pi 1/2/Zero)
-cross build --release --features memory-serve,embed-typst,airgap-detection --manifest-path backend/Cargo.toml --target arm-unknown-linux-gnueabihf
+cross build --release --features memory-serve,airgap-detection --manifest-path backend/Cargo.toml --target arm-unknown-linux-gnueabihf
 
 # build for ARMv7-A 32-bit Linux (like the Raspberry Pi 3/4/5)
-cross build --release --features memory-serve,embed-typst,airgap-detection --manifest-path backend/Cargo.toml --target armv7-unknown-linux-gnueabihf
+cross build --release --features memory-serve,airgap-detection --manifest-path backend/Cargo.toml --target armv7-unknown-linux-gnueabihf
 
 # build for AArch64 64-bit Linux (Apple silicon)
-cross build --release --features memory-serve,embed-typst,airgap-detection  --manifest-path backend/Cargo.toml --target aarch64-unknown-linux-gnu
+cross build --release --features memory-serve,airgap-detection  --manifest-path backend/Cargo.toml --target aarch64-unknown-linux-gnu
 ```
 
 To use `cross` on Apple silicon, set the `CROSS_CONTAINER_OPTS` environment variable to `--platform linux/amd64` when running the command.

@@ -8,9 +8,6 @@ rust-version.workspace = true
 [lints]
 workspace = true
 
-[features]
-embed-typst = ["dep:typst", "dep:typst-pdf"]
-
 [dependencies]
 async_zip.workspace = true
 axum-extra.workspace = true
@@ -21,8 +18,8 @@ strum.workspace = true
 tokio-util = { version = "0.7.18", features = ["io"] }
 tokio.workspace = true
 tracing.workspace = true
-typst = { version = "0.14.2", optional = true }
-typst-pdf = { version = "0.14.2", optional = true }
+typst = "0.14.2"
+typst-pdf = "0.14.2"
 
 [dev-dependencies]
 http-body-util.workspace = true

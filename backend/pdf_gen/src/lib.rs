@@ -1,15 +1,8 @@
-#[cfg(feature = "embed-typst")]
 mod embedded;
-
-#[cfg(not(feature = "embed-typst"))]
-mod external;
 
 pub mod zip;
 
-#[cfg(feature = "embed-typst")]
 pub use embedded::{PdfGenError, generate_pdf, generate_pdfs};
-#[cfg(not(feature = "embed-typst"))]
-pub use external::{PdfGenError, generate_pdf, generate_pdfs};
 
 /// A source file for Typst compilation
 pub struct SourceFile {

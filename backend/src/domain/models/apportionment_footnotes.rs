@@ -120,3 +120,87 @@ pub struct FootnotePoliticalGroup {
     /// Political group display name
     name: String,
 }
+
+#[cfg(test)]
+mod tests {
+    use test_log::test;
+
+    use super::*;
+    use crate::{
+        api::apportionment::{ApportionmentInputData, map_seat_assignment},
+        domain::{
+            election::{
+                CommitteeCategory, PoliticalGroup,
+                tests::election_fixture_with_given_number_of_seats,
+            },
+            models::apportionment_footnotes::ApportionmentFootnotes,
+            results::political_group_candidate_votes::{
+                CandidateVotes, PoliticalGroupCandidateVotes,
+            },
+        },
+    };
+
+    /// Create a value for `political_group_votes` (type `Vec<PoliticalGroup>`)
+    /// for the given political groups, with given candidate votes per list.
+    pub fn create_political_group_votes(
+        political_groups: &[PoliticalGroup],
+        candidate_votes: Vec<Vec<u32>>,
+    ) -> Vec<PoliticalGroupCandidateVotes> {
+        political_groups
+            .iter()
+            .enumerate()
+            .map(|(list_index, pg)| PoliticalGroupCandidateVotes {
+                number: pg.number,
+                total: candidate_votes[list_index].iter().sum(),
+                candidate_votes: pg
+                    .candidates
+                    .iter()
+                    .enumerate()
+                    .map(|(candidate_index, c)| CandidateVotes {
+                        number: c.number,
+                        votes: candidate_votes[list_index][candidate_index],
+                    })
+                    .collect(),
+            })
+            .collect()
+    }
+
+    #[test]
+    fn test_apportionment_footnotes_absolute_majority() {
+        let candidate_votes = vec![
+            vec![1069, 303, 321, 210, 36, 101, 79, 121, 150, 149, 15, 17],
+            vec![
+                452, 39, 81, 76, 35, 109, 29, 25, 17, 6, 18, 9, 25, 30, 5, 18, 3,
+            ],
+            vec![229, 63, 65, 9, 10, 58, 29, 50, 6, 11, 37],
+            vec![347, 33, 14, 82, 30, 30],
+            vec![266, 36, 39, 36, 38, 38],
+        ];
+        let election = election_fixture_with_given_number_of_seats(
+            CommitteeCategory::CSB,
+            candidate_votes
+                .iter()
+                .map(|cv| u32::try_from(cv.len()).expect("Should fit in u32"))
+                .collect::<Vec<u32>>()
+                .as_slice(),
+            15,
+        );
+        let list_votes = create_political_group_votes(&election.political_groups, candidate_votes);
+        let apportionment_input = ApportionmentInputData {
+            number_of_seats: election.number_of_seats,
+            list_votes: list_votes.as_slice(),
+        };
+        let apportionment_result =
+            apportionment::process(&apportionment_input).expect("apportionment failed");
+        let seat_assignment = map_seat_assignment(&apportionment_result.seat_assignment);
+        let result = ApportionmentFootnotes::new(&election.political_groups, &seat_assignment)
+            .expect("ApportionmentFootnotes::new should succeed");
+        assert!(result.is_some());
+        let footnotes = result.unwrap();
+        assert!(footnotes.exhausted_lists.is_none());
+        assert!(footnotes.absolute_majority.is_some());
+        let absolute_majority = footnotes.absolute_majority.unwrap();
+        assert_eq!(absolute_majority.number, PGNumber::from(1),);
+        assert_eq!(absolute_majority.name, "Political group 1".to_string());
+    }
+}

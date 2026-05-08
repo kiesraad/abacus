@@ -282,7 +282,7 @@ pub(crate) mod tests {
     /// Create a test election with some political groups and a given number of seats.
     /// The number of political groups is the length of the `political_groups_candidates` slice.
     /// The number of candidates in each political group is equal to the value in the slice at that index.
-    fn election_fixture_with_given_number_of_seats(
+    pub fn election_fixture_with_given_number_of_seats(
         committee_category: CommitteeCategory,
         political_groups_candidates: &[u32],
         number_of_seats: u32,

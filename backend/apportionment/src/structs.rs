@@ -5,7 +5,7 @@ use super::{
     seat_assignment::SeatAssignmentResult,
 };
 
-pub(crate) const LARGE_COUNCIL_THRESHOLD: u32 = 19;
+pub const LARGE_COUNCIL_THRESHOLD: u32 = 19;
 
 /// Errors that can occur during apportionment
 #[derive(Debug, PartialEq)]

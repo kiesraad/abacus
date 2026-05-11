@@ -166,7 +166,7 @@ mod tests {
             political_groups.clone(),
         );
         let result = EnrichedCandidateNomination::new(&election, &candidate_nomination)
-            .expect("ApportionmentFootnotes::new should succeed");
+            .expect("EnrichedCandidateNomination::new should succeed");
         assert_eq!(
             result.chosen_candidates,
             candidate_nomination.chosen_candidates

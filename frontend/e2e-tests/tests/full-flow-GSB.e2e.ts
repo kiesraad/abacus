@@ -69,26 +69,26 @@ const investigations = [
 const randomSuffix = Date.now();
 
 const adminUser: TestUser = {
-  username: `1-admin-${randomSuffix}`,
-  fullname: `full flow admin`,
+  username: `admin1-${randomSuffix}`,
+  fullname: `full flow admin1 GSB`,
   role: "administrator",
 };
 
 const coordinatorUser: TestUser = {
-  username: `2-coordinator-${randomSuffix}`,
-  fullname: `full flow coordinator`,
+  username: `coordinator1-${randomSuffix}`,
+  fullname: `full flow coordinator1 GSB`,
   role: "coordinator_gsb",
 };
 
 const typistUsers: TestUser[] = [
   {
-    username: `3-typist-${randomSuffix}`,
-    fullname: `full flow 3-typist`,
+    username: `typist1-${randomSuffix}`,
+    fullname: `full flow typist1 GSB`,
     role: "typist_gsb",
   },
   {
-    username: `4-typist-${randomSuffix}`,
-    fullname: `full flow 4-typist`,
+    username: `typist2-${randomSuffix}`,
+    fullname: `full flow typist2 GSB`,
     role: "typist_gsb",
   },
 ];
@@ -231,7 +231,6 @@ test.describe("full flow GSB", () => {
     const userInfoTopBar = new UserInfoTopBar(page);
     await expect(userInfoTopBar.username).toHaveText(adminUser.fullname);
 
-    // Create browser-specific typists
     for (const typist of typistUsers) {
       const adminNavBar = new AdminNavBar(page);
       await adminNavBar.users.click();

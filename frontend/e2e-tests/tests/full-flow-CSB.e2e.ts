@@ -38,26 +38,26 @@ import type { TestUser } from "e2e-tests/test-data/users";
 const randomSuffix = Date.now();
 
 const adminUser: TestUser = {
-  username: `1-admin-${randomSuffix}`,
-  fullname: `full flow admin`,
+  username: `admin1-${randomSuffix}`,
+  fullname: `full flow admin1 CSB`,
   role: "administrator",
 };
 
 const coordinatorUser: TestUser = {
-  username: `2-coordinator-${randomSuffix}`,
-  fullname: `full flow coordinator`,
+  username: `coordinator1-${randomSuffix}`,
+  fullname: `full flow coordinator1 CSB`,
   role: "coordinator_csb",
 };
 
 const typistUsers: TestUser[] = [
   {
-    username: `3-typist-${randomSuffix}`,
-    fullname: `full flow 3-typist`,
+    username: `typist1-${randomSuffix}`,
+    fullname: `full flow typist1 CSB`,
     role: "typist_csb",
   },
   {
-    username: `4-typist-${randomSuffix}`,
-    fullname: `full flow 4-typist`,
+    username: `typist2-${randomSuffix}`,
+    fullname: `full flow typist2 CSB`,
     role: "typist_csb",
   },
 ];
@@ -177,7 +177,6 @@ test.describe("full flow CSB", () => {
     const userInfoTopBar = new UserInfoTopBar(page);
     await expect(userInfoTopBar.username).toHaveText(adminUser.fullname);
 
-    // Create browser-specific typists
     for (const typist of typistUsers) {
       const adminNavBar = new AdminNavBar(page);
       await adminNavBar.users.click();
@@ -308,6 +307,8 @@ test.describe("full flow CSB", () => {
 
     const electionHomePage = new ElectionHome(page);
     await expect(electionHomePage.header).toHaveText("Gemeenteraad Test 2022");
+    const sessionCard = electionHomePage.getCommitteeSessionCard(1);
+    await expect(sessionCard).toContainText("Zitting CSB — Invoer bezig");
     await electionHomePage.statusButton.click();
 
     const electionStatusPage = new ElectionStatus(page);

@@ -111,6 +111,7 @@
     "session_results_pdf": "Bestandsgrootte PDF",
     "session_start_date_time": "Datum en tijdstip aanvang van de zitting",
     "session_status": "Zitting status",
+    "state": "Status",
     "user_agent": "User agent",
     "user_id": "Gebruikers-ID",
     "username": "Gebruikersnaam",

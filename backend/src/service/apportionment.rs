@@ -26,8 +26,7 @@ impl AsAuditEvent for ApportionmentStateChangeEvent {
 #[derive(Serialize)]
 struct ApportionmentStateChange {
     election_id: ElectionId,
-    #[serde(flatten)]
-    state: ApportionmentState,
+    state: String,
 }
 
 /// Checks preconditions for getting the apportionment state and returns stored state,
@@ -78,7 +77,7 @@ pub async fn update_state(
             conn,
             &ApportionmentStateChangeEvent(ApportionmentStateChange {
                 election_id,
-                state: state.clone(),
+                state: state.to_string(),
             }),
             None,
         )
@@ -288,9 +287,7 @@ mod tests {
             AuditEventLevel::Success,
             serde_json::json!({
                 "election_id": ELECTION_ID,
-                "RegisteringDeceasedCandidates": {"deceased_candidates": [
-                    {"pg_number": 4, "candidate_number": 4}
-                ]}
+                "state": "RegisteringDeceasedCandidates",
             }),
         )
         .await;

@@ -397,9 +397,9 @@ export interface AccountUpdateRequest {
 }
 
 export type ApportionmentState =
-  | "Uninitialised"
-  | { RegisteringDeceasedCandidates: { deceased_candidates: DeceasedCandidate[] } }
-  | { Finalised: { deceased_candidates: DeceasedCandidate[] } };
+  | { type: "Uninitialised" }
+  | { deceased_candidates: DeceasedCandidate[]; type: "RegisteringDeceasedCandidates" }
+  | { deceased_candidates: DeceasedCandidate[]; type: "Finalised" };
 
 export const auditEventLevelValues = ["info", "success", "warning", "error"] as const;
 export type AuditEventLevel = (typeof auditEventLevelValues)[number];

@@ -58,7 +58,8 @@ impl DeceasedCandidate {
     }
 }
 
-#[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize, ToSchema)]
+#[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize, ToSchema, strum::Display)]
+#[serde(tag = "type")]
 pub enum ApportionmentState {
     #[default]
     Uninitialised,

@@ -5166,52 +5166,58 @@
       "ApportionmentState": {
         "oneOf": [
           {
-            "type": "string",
-            "enum": [
-              "Uninitialised"
-            ]
-          },
-          {
             "type": "object",
             "required": [
-              "RegisteringDeceasedCandidates"
+              "type"
             ],
             "properties": {
-              "RegisteringDeceasedCandidates": {
-                "type": "object",
-                "required": [
-                  "deceased_candidates"
-                ],
-                "properties": {
-                  "deceased_candidates": {
-                    "type": "array",
-                    "items": {
-                      "$ref": "#/components/schemas/DeceasedCandidate"
-                    }
-                  }
-                }
+              "type": {
+                "type": "string",
+                "enum": [
+                  "Uninitialised"
+                ]
               }
             }
           },
           {
             "type": "object",
             "required": [
-              "Finalised"
+              "deceased_candidates",
+              "type"
             ],
             "properties": {
-              "Finalised": {
-                "type": "object",
-                "required": [
-                  "deceased_candidates"
-                ],
-                "properties": {
-                  "deceased_candidates": {
-                    "type": "array",
-                    "items": {
-                      "$ref": "#/components/schemas/DeceasedCandidate"
-                    }
-                  }
+              "deceased_candidates": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/DeceasedCandidate"
                 }
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "RegisteringDeceasedCandidates"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "deceased_candidates",
+              "type"
+            ],
+            "properties": {
+              "deceased_candidates": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/DeceasedCandidate"
+                }
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "Finalised"
+                ]
               }
             }
           }

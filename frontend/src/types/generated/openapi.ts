@@ -135,10 +135,10 @@ export type SKIP_DECEASED_CANDIDATES_REQUEST_PATH =
   `/api/elections/${ElectionId}/apportionment/skip_deceased_candidates`;
 
 // /api/elections/{election_id}/apportionment/state
-export interface GET_STATE_REQUEST_PARAMS {
+export interface GET_APPORTIONMENT_STATE_REQUEST_PARAMS {
   election_id: ElectionId;
 }
-export type GET_STATE_REQUEST_PATH = `/api/elections/${ElectionId}/apportionment/state`;
+export type GET_APPORTIONMENT_STATE_REQUEST_PATH = `/api/elections/${ElectionId}/apportionment/state`;
 
 // /api/elections/{election_id}/committee_sessions
 export interface COMMITTEE_SESSION_CREATE_REQUEST_PARAMS {

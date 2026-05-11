@@ -8,7 +8,7 @@ use crate::{
     APIError, ErrorResponse,
     domain::{apportionment_state::ApportionmentState, election::ElectionId},
     repository::user_repo::User,
-    service::get_apportionment_state,
+    service,
 };
 
 /// Get the current apportionment state
@@ -27,14 +27,14 @@ use crate::{
         ("election_id" = ElectionId, description = "Election database id"),
     ),
 )]
-pub async fn get_state(
+pub async fn get_apportionment_state(
     user: User,
     State(pool): State<SqlitePool>,
     Path(election_id): Path<ElectionId>,
 ) -> Result<Json<ApportionmentState>, APIError> {
     let mut conn = pool.acquire().await?;
 
-    let (_, state) = get_apportionment_state(&mut conn, user, election_id).await?;
+    let (_, state) = service::get_apportionment_state(&mut conn, user, election_id).await?;
 
     Ok(Json(state))
 }
@@ -65,7 +65,7 @@ mod tests {
             .await
             .expect("should change committee session status");
 
-        let state = get_state(user, State(pool), Path(ElectionId::from(5)))
+        let state = get_apportionment_state(user, State(pool), Path(ElectionId::from(5)))
             .await
             .expect("should call the handler successfully")
             .0;

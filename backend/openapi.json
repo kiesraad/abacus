@@ -1891,7 +1891,7 @@
     "/api/elections/{election_id}/apportionment/state": {
       "get": {
         "summary": "Get the current apportionment state (coordinator_csb)",
-        "operationId": "get_state",
+        "operationId": "get_apportionment_state",
         "parameters": [
           {
             "name": "election_id",

@@ -1,4 +1,4 @@
-use std::error::Error;
+use std::{any::Any, error::Error, fmt::Debug};
 
 use axum::{
     Json,
@@ -26,7 +26,7 @@ use crate::{
 };
 
 /// Trait for error types that can be converted to HTTP response parts
-pub trait ApiErrorResponse: std::fmt::Debug {
+pub trait ApiErrorResponse: Debug + Any {
     /// Returns the HTTP status code and error response body for this error
     fn to_response_parts(&self) -> (StatusCode, ErrorResponse);
 
@@ -432,4 +432,19 @@ pub async fn map_error_response(response: Response) -> Response {
     } else {
         response
     }
+}
+
+/// Assert that the `APIError::Delegated` contains the expected boxed `ApiErrorResponse`
+#[cfg(test)]
+pub fn assert_delegated<T: ApiErrorResponse + PartialEq>(api_error: APIError, expected: &T) {
+    let APIError::Delegated(boxed) = api_error else {
+        panic!("Unexpected APIError variant {api_error:?}");
+    };
+
+    let boxed_any: Box<dyn Any> = boxed;
+    let actual = boxed_any
+        .downcast_ref::<T>()
+        .expect("should downcast to type T");
+
+    assert_eq!(actual, expected);
 }

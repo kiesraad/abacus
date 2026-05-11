@@ -98,9 +98,9 @@ mod tests {
             apportionment_state::DeceasedCandidate, committee_session::CommitteeSessionId,
             role::Role,
         },
+        error::assert_delegated,
         infra::audit_log::assert_last_event,
         repository::user_repo::UserId,
-        tests::assert_fmt,
     };
 
     const ELECTION_ID: u32 = 5;
@@ -151,21 +151,17 @@ mod tests {
 
         let not_authorized = User::test_user(Role::CoordinatorCSB, UserId::from(1));
 
-        let result = update_state(
+        let err = update_state(
             &mut conn,
             AuditService::new(None, None),
             not_authorized,
             ElectionId::from(ELECTION_ID),
             |_| panic!("should not call callback"),
         )
-        .await;
+        .await
+        .expect_err("should return an error");
 
-        assert_fmt(
-            result,
-            Err(APIError::Delegated(Box::new(
-                AuthenticationError::RoleNotAuthorizedError,
-            ))),
-        );
+        assert_delegated(err, &AuthenticationError::RoleNotAuthorizedError);
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
@@ -174,21 +170,17 @@ mod tests {
 
         set_states(&mut conn, CommitteeSessionStatus::DataEntry, None).await;
 
-        let result = update_state(
+        let err = update_state(
             &mut conn,
             AuditService::new(None, None),
             User::test_user(Role::CoordinatorGSB, UserId::from(1)),
             ElectionId::from(ELECTION_ID),
             |_| panic!("should not call callback"),
         )
-        .await;
+        .await
+        .expect_err("should return an error");
 
-        assert_fmt(
-            result,
-            Err(APIError::Delegated(Box::new(
-                ApportionmentApiError::CommitteeSessionNotCompleted,
-            ))),
-        );
+        assert_delegated(err, &ApportionmentApiError::CommitteeSessionNotCompleted);
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]

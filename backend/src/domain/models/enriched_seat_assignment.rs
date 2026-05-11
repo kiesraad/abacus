@@ -152,35 +152,38 @@ impl EnrichedSeatAssignment {
         let mut initial_total_full_seats = 0;
 
         let initial_steps = get_initial_steps(seat_assignment);
-        let largest_remainders = if number_of_seats >= LARGE_COUNCIL_THRESHOLD {
-            vec![]
-        } else {
-            Self::get_largest_remainders(
-                seat_assignment,
-                &initial_steps.initial_largest_remainder_steps,
-            )
-        };
+        let largest_remainders =
+            if number_of_seats >= LARGE_COUNCIL_THRESHOLD || seat_assignment.steps.is_empty() {
+                vec![]
+            } else {
+                Self::get_largest_remainders(
+                    seat_assignment,
+                    &initial_steps.initial_largest_remainder_steps,
+                )
+            };
 
         for pg_votes in summary.votes_counts.political_group_total_votes.iter() {
             let initial_full_seats = Self::get_initial_full_seats(seat_assignment, pg_votes.number);
-            let largest_remainder = if number_of_seats >= LARGE_COUNCIL_THRESHOLD {
-                None
-            } else {
-                largest_remainders
-                    .iter()
-                    .find(|(pg_number, _)| *pg_number == pg_votes.number)
-                    .map(|(_, largest_remainder)| largest_remainder.clone())
-            };
-            let unique_highest_average = if number_of_seats >= LARGE_COUNCIL_THRESHOLD {
-                None
-            } else {
-                Self::get_unique_highest_average(
-                    pg_votes.number,
-                    initial_full_seats,
-                    &largest_remainder,
-                    &initial_steps.initial_unique_highest_average_steps,
-                )
-            };
+            let largest_remainder =
+                if number_of_seats >= LARGE_COUNCIL_THRESHOLD || seat_assignment.steps.is_empty() {
+                    None
+                } else {
+                    largest_remainders
+                        .iter()
+                        .find(|(pg_number, _)| *pg_number == pg_votes.number)
+                        .map(|(_, largest_remainder)| largest_remainder.clone())
+                };
+            let unique_highest_average =
+                if number_of_seats >= LARGE_COUNCIL_THRESHOLD || seat_assignment.steps.is_empty() {
+                    None
+                } else {
+                    Self::get_unique_highest_average(
+                        pg_votes.number,
+                        initial_full_seats,
+                        &largest_remainder,
+                        &initial_steps.initial_unique_highest_average_steps,
+                    )
+                };
             initial_total_full_seats += initial_full_seats;
 
             enriched_list_seat_assignments.push(EnrichedListSeatAssignment {
@@ -521,5 +524,79 @@ mod tests {
         assert_eq!(lsa[7].initial_full_seats, 0);
         assert!(lsa[7].largest_remainder.is_none());
         assert!(lsa[7].unique_highest_average.is_none());
+    }
+
+    #[test]
+    fn test_enriched_seat_assignment_no_residual_seats() {
+        let candidate_votes = vec![
+            vec![200, 60, 40, 55, 45, 42, 38],
+            vec![100, 40, 20],
+            vec![90, 50, 20],
+            vec![80, 45, 35],
+            vec![70, 10],
+            vec![60, 20],
+            vec![50, 30],
+        ];
+        let election = election_fixture_with_given_number_of_seats(
+            CommitteeCategory::CSB,
+            candidate_votes
+                .iter()
+                .map(|cv| u32::try_from(cv.len()).expect("Should fit in u32"))
+                .collect::<Vec<u32>>()
+                .as_slice(),
+            15,
+        );
+        let political_groups = &election.political_groups;
+        let summary = get_election_summary(&election, candidate_votes);
+        let summary_csb = ElectionSummaryCSB::new(&summary, political_groups);
+        let apportionment_input = ApportionmentInputData {
+            number_of_seats: election.number_of_seats,
+            list_votes: summary.political_group_votes.as_slice(),
+        };
+        let apportionment_result =
+            apportionment::process(&apportionment_input).expect("apportionment failed");
+        let seat_assignment = map_seat_assignment(&apportionment_result.seat_assignment);
+        let result =
+            EnrichedSeatAssignment::new(election.number_of_seats, &summary_csb, &seat_assignment)
+                .expect("EnrichedSeatAssignment::new should succeed");
+        assert!(result.initial_highest_average_steps.is_none());
+        assert_eq!(result.initial_total_full_seats, 15);
+        assert_eq!(result.initial_total_residual_seats, 0);
+
+        let lsa = result.list_seat_assignment;
+        assert_eq!(lsa[0].number, election.political_groups[0].number);
+        assert_eq!(lsa[0].initial_full_seats, 6);
+        assert!(lsa[0].largest_remainder.is_none());
+        assert!(lsa[0].unique_highest_average.is_none());
+
+        assert_eq!(lsa[1].number, election.political_groups[1].number);
+        assert_eq!(lsa[1].initial_full_seats, 2);
+        assert!(lsa[1].largest_remainder.is_none());
+        assert!(lsa[1].unique_highest_average.is_none());
+
+        assert_eq!(lsa[2].number, election.political_groups[2].number);
+        assert_eq!(lsa[2].initial_full_seats, 2);
+        assert!(lsa[2].largest_remainder.is_none());
+        assert!(lsa[2].unique_highest_average.is_none());
+
+        assert_eq!(lsa[3].number, election.political_groups[3].number);
+        assert_eq!(lsa[3].initial_full_seats, 2);
+        assert!(lsa[3].largest_remainder.is_none());
+        assert!(lsa[3].unique_highest_average.is_none());
+
+        assert_eq!(lsa[4].number, election.political_groups[4].number);
+        assert_eq!(lsa[4].initial_full_seats, 1);
+        assert!(lsa[4].largest_remainder.is_none());
+        assert!(lsa[4].unique_highest_average.is_none());
+
+        assert_eq!(lsa[5].number, election.political_groups[5].number);
+        assert_eq!(lsa[5].initial_full_seats, 1);
+        assert!(lsa[5].largest_remainder.is_none());
+        assert!(lsa[5].unique_highest_average.is_none());
+
+        assert_eq!(lsa[6].number, election.political_groups[6].number);
+        assert_eq!(lsa[6].initial_full_seats, 1);
+        assert!(lsa[6].largest_remainder.is_none());
+        assert!(lsa[6].unique_highest_average.is_none());
     }
 }

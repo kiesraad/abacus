@@ -1,8 +1,9 @@
 use std::fmt::Debug;
 
+use tracing::{debug, info};
+
 use super::{ApportionmentError, Fraction};
 use crate::ListVotes;
-use tracing::{debug, info};
 
 /// The result of the seat assignment procedure. This contains the number of seats and the quota
 /// that was used. It then contains the initial standing after full seats were assigned,
@@ -153,16 +154,16 @@ impl<LN: Copy> SeatChange<LN> {
             Self::AbsoluteMajorityReassignment(absolute_majority_reassigned_seat) => {
                 absolute_majority_reassigned_seat.list_assigned_seat
             }
-            Self::ListExhaustionRemoval(_) => unimplemented!(),
+            Self::ListExhaustionRemoval(_) => unreachable!(),
         }
     }
 
     /// Get the list number for the list this step has retracted a seat from
     pub fn list_number_retracted(&self) -> LN {
         match self {
-            Self::HighestAverageAssignment(_) => unimplemented!(),
-            Self::UniqueHighestAverageAssignment(_) => unimplemented!(),
-            Self::LargestRemainderAssignment(_) => unimplemented!(),
+            Self::HighestAverageAssignment(_)
+            | Self::UniqueHighestAverageAssignment(_)
+            | Self::LargestRemainderAssignment(_) => unreachable!(),
             Self::AbsoluteMajorityReassignment(absolute_majority_reassigned_seat) => {
                 absolute_majority_reassigned_seat.list_retracted_seat
             }
@@ -184,8 +185,9 @@ impl<LN: Copy> SeatChange<LN> {
             Self::LargestRemainderAssignment(largest_remainder_assigned_seat) => {
                 largest_remainder_assigned_seat.list_options.clone()
             }
-            Self::AbsoluteMajorityReassignment(_) => unimplemented!(),
-            Self::ListExhaustionRemoval(_) => unimplemented!(),
+            Self::AbsoluteMajorityReassignment(_) | Self::ListExhaustionRemoval(_) => {
+                unreachable!()
+            }
         }
     }
 
@@ -201,8 +203,9 @@ impl<LN: Copy> SeatChange<LN> {
             Self::LargestRemainderAssignment(largest_remainder_assigned_seat) => {
                 largest_remainder_assigned_seat.list_assigned.clone()
             }
-            Self::AbsoluteMajorityReassignment(_) => unimplemented!(),
-            Self::ListExhaustionRemoval(_) => unimplemented!(),
+            Self::AbsoluteMajorityReassignment(_) | Self::ListExhaustionRemoval(_) => {
+                unreachable!()
+            }
         }
     }
 

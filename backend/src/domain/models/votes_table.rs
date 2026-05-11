@@ -2,18 +2,14 @@ use std::slice::Iter;
 
 use serde::{Deserialize, Serialize};
 
-use crate::{
-    APIError,
-    domain::{
-        election::{
-            Candidate, CandidateNumber, ElectionWithPoliticalGroups, PGNumber, PoliticalGroup,
-        },
-        results::{
-            common_polling_station_results::CommonPollingStationResults, count::Count,
-            political_group_candidate_votes::PoliticalGroupCandidateVotes,
-        },
-        summary::ElectionSummary,
+use crate::domain::{
+    election::{Candidate, CandidateNumber, ElectionWithPoliticalGroups, PGNumber, PoliticalGroup},
+    models::error::ModelsError,
+    results::{
+        common_polling_station_results::CommonPollingStationResults, count::Count,
+        political_group_candidate_votes::PoliticalGroupCandidateVotes,
     },
+    summary::ElectionSummary,
 };
 
 const DEFAULT_CANDIDATES_PER_COLUMN: [usize; 4] = [25, 25, 15, 15];
@@ -23,7 +19,7 @@ const JUSTIFIED_CANDIDATES_PER_COLUMN: [usize; 4] = [20, 20, 20, 20];
 pub struct CandidatesTables(Vec<VotesTable>);
 
 impl CandidatesTables {
-    pub fn new(election: &ElectionWithPoliticalGroups) -> Result<Self, APIError> {
+    pub fn new(election: &ElectionWithPoliticalGroups) -> Result<Self, ModelsError> {
         Ok(CandidatesTables(
             election
                 .political_groups
@@ -41,7 +37,7 @@ impl VotesTables {
     pub fn new(
         election: &ElectionWithPoliticalGroups,
         summary: &ElectionSummary,
-    ) -> Result<Self, APIError> {
+    ) -> Result<Self, ModelsError> {
         Ok(VotesTables(
             election
                 .political_groups
@@ -71,7 +67,7 @@ impl VotesTablesWithPreviousVotes {
         election: &ElectionWithPoliticalGroups,
         summary: &ElectionSummary,
         previous_summary: &ElectionSummary,
-    ) -> Result<Self, APIError> {
+    ) -> Result<Self, ModelsError> {
         Ok(VotesTablesWithPreviousVotes(
             election
                 .political_groups
@@ -104,7 +100,7 @@ impl VotesTablesWithOnlyPreviousVotes {
     pub fn new(
         election: &ElectionWithPoliticalGroups,
         previous: &CommonPollingStationResults,
-    ) -> Result<Self, APIError> {
+    ) -> Result<Self, ModelsError> {
         Ok(VotesTablesWithOnlyPreviousVotes(
             election
                 .political_groups
@@ -129,11 +125,11 @@ impl VotesTablesWithOnlyPreviousVotes {
 fn get_votes_for_political_party(
     political_group_number: PGNumber,
     political_group_votes: &[PoliticalGroupCandidateVotes],
-) -> Result<&PoliticalGroupCandidateVotes, APIError> {
+) -> Result<&PoliticalGroupCandidateVotes, ModelsError> {
     political_group_votes
         .iter()
         .find(|pg_votes| pg_votes.number == political_group_number)
-        .ok_or(APIError::DataIntegrityError(format!(
+        .ok_or(ModelsError::DataIntegrityError(format!(
             "No votes found for political group number {political_group_number} in summary",
         )))
 }
@@ -141,7 +137,7 @@ fn get_votes_for_political_party(
 fn get_votes_for_candidate(
     candidate_number: CandidateNumber,
     candidate_votes: Option<&PoliticalGroupCandidateVotes>,
-) -> Result<Option<Count>, APIError> {
+) -> Result<Option<Count>, ModelsError> {
     let Some(candidate_votes) = candidate_votes else {
         return Ok(None);
     };
@@ -151,7 +147,7 @@ fn get_votes_for_candidate(
         .iter()
         .find(|cv| cv.number == candidate_number)
     else {
-        return Err(APIError::DataIntegrityError(format!(
+        return Err(ModelsError::DataIntegrityError(format!(
             "No votes found for candidate number {candidate_number} in political group {}",
             candidate_votes.number,
         )));
@@ -180,7 +176,7 @@ impl VotesTable {
         candidate_votes: Option<&PoliticalGroupCandidateVotes>,
         previous_candidate_votes: Option<&PoliticalGroupCandidateVotes>,
         column_sizes: [usize; 4],
-    ) -> Result<Vec<VotesTableColumn>, APIError> {
+    ) -> Result<Vec<VotesTableColumn>, ModelsError> {
         let mut columns = Vec::new();
 
         for max_per_column in &column_sizes {
@@ -232,7 +228,7 @@ impl VotesTable {
         candidate_votes: Option<&PoliticalGroupCandidateVotes>,
         previous_candidate_votes: Option<&PoliticalGroupCandidateVotes>,
         column_sizes: [usize; 4],
-    ) -> Result<Self, APIError> {
+    ) -> Result<Self, ModelsError> {
         let mut candidate_iterator = group.candidates.iter();
         let columns = Self::get_votes_table_columns(
             &mut candidate_iterator,
@@ -243,7 +239,7 @@ impl VotesTable {
 
         // sanity check: there should not be more candidates than expected in political group
         if candidate_iterator.next().is_some() {
-            return Err(APIError::DataIntegrityError(format!(
+            return Err(ModelsError::DataIntegrityError(format!(
                 "More candidates than expected in political group {}",
                 group.number
             )));
@@ -256,7 +252,7 @@ impl VotesTable {
                 .map(|col| col.column_total.unwrap_or_default())
                 .sum();
             if pg_votes.total < columns_total {
-                return Err(APIError::DataIntegrityError(format!(
+                return Err(ModelsError::DataIntegrityError(format!(
                     "Sum of column totals ({columns_total}) exceeds total votes ({}) for political group {}",
                     pg_votes.total, pg_votes.number,
                 )));
@@ -270,7 +266,7 @@ impl VotesTable {
                 .map(|col| col.previous_column_total.unwrap_or_default())
                 .sum();
             if prev_pg_votes.total < previous_columns_total {
-                return Err(APIError::DataIntegrityError(format!(
+                return Err(ModelsError::DataIntegrityError(format!(
                     "Sum of previous column totals ({previous_columns_total}) exceeds previous total votes ({}) for political group {}",
                     prev_pg_votes.total, prev_pg_votes.number,
                 )));
@@ -388,13 +384,12 @@ mod tests {
         let err = VotesTables::new(&election, &summary).unwrap_err();
 
         match err {
-            APIError::DataIntegrityError(message) => {
+            ModelsError::DataIntegrityError(message) => {
                 assert_eq!(
                     message,
                     "No votes found for political group number 1 in summary"
                 );
             }
-            other => panic!("expected DataIntegrityError, got {other:?}"),
         }
     }
 
@@ -412,13 +407,12 @@ mod tests {
         .unwrap_err();
 
         match err {
-            APIError::DataIntegrityError(message) => {
+            ModelsError::DataIntegrityError(message) => {
                 assert_eq!(
                     message,
                     "No votes found for candidate number 1 in political group 1"
                 );
             }
-            other => panic!("expected DataIntegrityError, got {other:?}"),
         }
     }
 
@@ -463,13 +457,12 @@ mod tests {
         let err = VotesTable::new(&group, None, None, [1, 0, 0, 0]).unwrap_err();
 
         match err {
-            APIError::DataIntegrityError(message) => {
+            ModelsError::DataIntegrityError(message) => {
                 assert_eq!(
                     message,
                     "More candidates than expected in political group 1"
                 );
             }
-            other => panic!("expected DataIntegrityError, got {other:?}"),
         }
     }
 
@@ -487,13 +480,12 @@ mod tests {
         .unwrap_err();
 
         match err {
-            APIError::DataIntegrityError(message) => {
+            ModelsError::DataIntegrityError(message) => {
                 assert_eq!(
                     message,
                     "Sum of column totals (27) exceeds total votes (20) for political group 1"
                 );
             }
-            other => panic!("expected DataIntegrityError, got {other:?}"),
         }
     }
 
@@ -511,13 +503,12 @@ mod tests {
         .unwrap_err();
 
         match err {
-            APIError::DataIntegrityError(message) => {
+            ModelsError::DataIntegrityError(message) => {
                 assert_eq!(
                     message,
                     "Sum of previous column totals (27) exceeds previous total votes (20) for political group 1"
                 );
             }
-            other => panic!("expected DataIntegrityError, got {other:?}"),
         }
     }
 }

@@ -1,5 +1,7 @@
+pub mod apportionment_footnotes;
 pub mod enriched_candidate_nomination;
 pub mod enriched_seat_assignment;
+pub mod error;
 pub mod filter_input;
 mod model_n_10_2;
 mod model_na_14_2;

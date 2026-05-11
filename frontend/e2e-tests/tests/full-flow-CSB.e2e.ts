@@ -38,25 +38,25 @@ import type { TestUser } from "e2e-tests/test-data/users";
 const randomSuffix = Date.now();
 
 const adminUser: TestUser = {
-  username: `admin1-${randomSuffix}`,
+  username: `admin1-CSB-${randomSuffix}`,
   fullname: `full flow admin1 CSB`,
   role: "administrator",
 };
 
 const coordinatorUser: TestUser = {
-  username: `coordinator1-${randomSuffix}`,
+  username: `coordinator1-CSB-${randomSuffix}`,
   fullname: `full flow coordinator1 CSB`,
   role: "coordinator_csb",
 };
 
 const typistUsers: TestUser[] = [
   {
-    username: `typist1-${randomSuffix}`,
+    username: `typist1-CSB-${randomSuffix}`,
     fullname: `full flow typist1 CSB`,
     role: "typist_csb",
   },
   {
-    username: `typist2-${randomSuffix}`,
+    username: `typist2-CSB-${randomSuffix}`,
     fullname: `full flow typist2 CSB`,
     role: "typist_csb",
   },

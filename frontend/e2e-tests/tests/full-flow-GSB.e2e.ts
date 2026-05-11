@@ -69,25 +69,25 @@ const investigations = [
 const randomSuffix = Date.now();
 
 const adminUser: TestUser = {
-  username: `admin1-${randomSuffix}`,
+  username: `admin1-GSB-${randomSuffix}`,
   fullname: `full flow admin1 GSB`,
   role: "administrator",
 };
 
 const coordinatorUser: TestUser = {
-  username: `coordinator1-${randomSuffix}`,
+  username: `coordinator1-GSB-${randomSuffix}`,
   fullname: `full flow coordinator1 GSB`,
   role: "coordinator_gsb",
 };
 
 const typistUsers: TestUser[] = [
   {
-    username: `typist1-${randomSuffix}`,
+    username: `typist1-GSB-${randomSuffix}`,
     fullname: `full flow typist1 GSB`,
     role: "typist_gsb",
   },
   {
-    username: `typist2-${randomSuffix}`,
+    username: `typist2-GSB-${randomSuffix}`,
     fullname: `full flow typist2 GSB`,
     role: "typist_gsb",
   },

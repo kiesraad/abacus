@@ -252,7 +252,7 @@ impl From<apportionment::Fraction> for DisplayFraction {
 }
 
 /// Chosen candidate
-#[derive(Clone, Debug, Serialize, Deserialize, ToSchema)]
+#[derive(Clone, Debug, Serialize, Deserialize, ToSchema, PartialEq)]
 #[serde(deny_unknown_fields)]
 pub struct ChosenCandidate {
     #[schema(value_type = u32)]

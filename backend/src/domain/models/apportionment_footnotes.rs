@@ -125,45 +125,16 @@ pub struct FootnotePoliticalGroup {
 mod tests {
     use test_log::test;
 
-    use super::*;
     use crate::{
         api::apportionment::{ApportionmentInputData, map_seat_assignment},
         domain::{
-            election::{
-                CommitteeCategory, PoliticalGroup,
-                tests::election_fixture_with_given_number_of_seats,
-            },
-            models::apportionment_footnotes::ApportionmentFootnotes,
-            results::political_group_candidate_votes::{
-                CandidateVotes, PoliticalGroupCandidateVotes,
+            election::{CommitteeCategory, tests::election_fixture_with_given_number_of_seats},
+            models::{
+                apportionment_footnotes::ApportionmentFootnotes,
+                tests::create_political_group_votes,
             },
         },
     };
-
-    /// Create a value for `political_group_votes` (type `Vec<PoliticalGroup>`)
-    /// for the given political groups, with given candidate votes per list.
-    pub fn create_political_group_votes(
-        political_groups: &[PoliticalGroup],
-        candidate_votes: Vec<Vec<u32>>,
-    ) -> Vec<PoliticalGroupCandidateVotes> {
-        political_groups
-            .iter()
-            .enumerate()
-            .map(|(list_index, pg)| PoliticalGroupCandidateVotes {
-                number: pg.number,
-                total: candidate_votes[list_index].iter().sum(),
-                candidate_votes: pg
-                    .candidates
-                    .iter()
-                    .enumerate()
-                    .map(|(candidate_index, c)| CandidateVotes {
-                        number: c.number,
-                        votes: candidate_votes[list_index][candidate_index],
-                    })
-                    .collect(),
-            })
-            .collect()
-    }
 
     #[test]
     fn test_apportionment_footnotes_none() {
@@ -231,8 +202,11 @@ mod tests {
         assert!(footnotes.exhausted_lists.is_none());
         assert!(footnotes.absolute_majority.is_some());
         let absolute_majority = footnotes.absolute_majority.unwrap();
-        assert_eq!(absolute_majority.number, PGNumber::from(1),);
-        assert_eq!(absolute_majority.name, "Political group 1".to_string());
+        assert_eq!(
+            absolute_majority.number,
+            election.political_groups[0].number
+        );
+        assert_eq!(absolute_majority.name, election.political_groups[0].name);
     }
 
     #[test]
@@ -269,9 +243,15 @@ mod tests {
         assert!(footnotes.absolute_majority.is_none());
         let exhausted_lists = footnotes.exhausted_lists.unwrap();
         assert_eq!(exhausted_lists.len(), 2);
-        assert_eq!(exhausted_lists[0].number, PGNumber::from(1));
-        assert_eq!(exhausted_lists[0].name, "Political group 1".to_string());
-        assert_eq!(exhausted_lists[1].number, PGNumber::from(2));
-        assert_eq!(exhausted_lists[1].name, "Political group 2".to_string());
+        assert_eq!(
+            exhausted_lists[0].number,
+            election.political_groups[0].number
+        );
+        assert_eq!(exhausted_lists[0].name, election.political_groups[0].name);
+        assert_eq!(
+            exhausted_lists[1].number,
+            election.political_groups[1].number
+        );
+        assert_eq!(exhausted_lists[1].name, election.political_groups[1].name);
     }
 }

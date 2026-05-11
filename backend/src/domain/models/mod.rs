@@ -153,3 +153,36 @@ impl PdfModel {
         }
     }
 }
+
+#[cfg(test)]
+pub mod tests {
+    use crate::domain::{
+        election::PoliticalGroup,
+        results::political_group_candidate_votes::{CandidateVotes, PoliticalGroupCandidateVotes},
+    };
+
+    /// Create a value for `political_group_votes` (type `Vec<PoliticalGroup>`)
+    /// for the given political groups, with given candidate votes per list.
+    pub fn create_political_group_votes(
+        political_groups: &[PoliticalGroup],
+        candidate_votes: Vec<Vec<u32>>,
+    ) -> Vec<PoliticalGroupCandidateVotes> {
+        political_groups
+            .iter()
+            .enumerate()
+            .map(|(list_index, pg)| PoliticalGroupCandidateVotes {
+                number: pg.number,
+                total: candidate_votes[list_index].iter().sum(),
+                candidate_votes: pg
+                    .candidates
+                    .iter()
+                    .enumerate()
+                    .map(|(candidate_index, c)| CandidateVotes {
+                        number: c.number,
+                        votes: candidate_votes[list_index][candidate_index],
+                    })
+                    .collect(),
+            })
+            .collect()
+    }
+}

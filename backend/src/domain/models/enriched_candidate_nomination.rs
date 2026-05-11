@@ -119,3 +119,158 @@ pub struct CandidateWithSeatTableColumn {
     /// Number of votes
     votes: Count,
 }
+
+#[cfg(test)]
+mod tests {
+    use test_log::test;
+
+    use crate::{
+        api::apportionment::{ApportionmentInputData, map_candidate_nomination},
+        domain::{
+            election::{CommitteeCategory, tests::election_fixture_with_given_number_of_seats},
+            models::{
+                enriched_candidate_nomination::EnrichedCandidateNomination,
+                tests::create_political_group_votes,
+            },
+        },
+    };
+
+    #[test]
+    fn test_enriched_candidate_nomination() {
+        let candidate_votes = vec![
+            vec![1069, 303, 321, 210, 36, 101, 79, 121, 150, 181],
+            vec![452, 39, 81, 274, 131],
+            vec![229, 147, 191],
+            vec![347, 100],
+            vec![266, 187],
+        ];
+        let election = election_fixture_with_given_number_of_seats(
+            CommitteeCategory::CSB,
+            candidate_votes
+                .iter()
+                .map(|cv| u32::try_from(cv.len()).expect("Should fit in u32"))
+                .collect::<Vec<u32>>()
+                .as_slice(),
+            15,
+        );
+        let political_groups = &election.political_groups;
+        let list_votes = create_political_group_votes(political_groups, candidate_votes);
+        let apportionment_input = ApportionmentInputData {
+            number_of_seats: election.number_of_seats,
+            list_votes: list_votes.as_slice(),
+        };
+        let apportionment_result =
+            apportionment::process(&apportionment_input).expect("apportionment failed");
+        let candidate_nomination = map_candidate_nomination(
+            &apportionment_result.candidate_nomination,
+            political_groups.clone(),
+        );
+        let result = EnrichedCandidateNomination::new(&election, &candidate_nomination)
+            .expect("ApportionmentFootnotes::new should succeed");
+        assert_eq!(
+            result.chosen_candidates,
+            candidate_nomination.chosen_candidates
+        );
+
+        let lcn = result.list_candidate_nomination;
+        assert_eq!(
+            lcn[0].updated_candidate_ranking,
+            candidate_nomination.list_candidate_nomination[0].updated_candidate_ranking
+        );
+        // Check preferential nomination columns of list 1
+        let lcn_0_pnc = &lcn[0].preferential_nomination_columns;
+        assert_eq!(lcn_0_pnc.len(), 5);
+        assert_eq!(lcn_0_pnc[0].candidate, political_groups[0].candidates[0]);
+        assert_eq!(lcn_0_pnc[0].votes, 1069);
+        assert_eq!(lcn_0_pnc[0].list_seat_number, 1);
+        assert_eq!(lcn_0_pnc[1].candidate, political_groups[0].candidates[2]);
+        assert_eq!(lcn_0_pnc[1].votes, 321);
+        assert_eq!(lcn_0_pnc[1].list_seat_number, 2);
+        assert_eq!(lcn_0_pnc[2].candidate, political_groups[0].candidates[1]);
+        assert_eq!(lcn_0_pnc[2].votes, 303);
+        assert_eq!(lcn_0_pnc[2].list_seat_number, 3);
+        assert_eq!(lcn_0_pnc[3].candidate, political_groups[0].candidates[3]);
+        assert_eq!(lcn_0_pnc[3].votes, 210);
+        assert_eq!(lcn_0_pnc[3].list_seat_number, 4);
+        assert_eq!(lcn_0_pnc[4].candidate, political_groups[0].candidates[9]);
+        assert_eq!(lcn_0_pnc[4].votes, 181);
+        assert_eq!(lcn_0_pnc[4].list_seat_number, 5);
+        // Check other nomination columns of list 1
+        let lcn_0_onc = &lcn[0].other_nomination_columns;
+        assert_eq!(lcn_0_onc.len(), 3);
+        assert_eq!(lcn_0_onc[0].candidate, political_groups[0].candidates[4]);
+        assert_eq!(lcn_0_onc[0].votes, 36);
+        assert_eq!(lcn_0_onc[0].list_seat_number, 6);
+        assert_eq!(lcn_0_onc[1].candidate, political_groups[0].candidates[5]);
+        assert_eq!(lcn_0_onc[1].votes, 101);
+        assert_eq!(lcn_0_onc[1].list_seat_number, 7);
+        assert_eq!(lcn_0_onc[2].candidate, political_groups[0].candidates[6]);
+        assert_eq!(lcn_0_onc[2].votes, 79);
+        assert_eq!(lcn_0_onc[2].list_seat_number, 8);
+
+        assert_eq!(
+            lcn[1].updated_candidate_ranking,
+            candidate_nomination.list_candidate_nomination[1].updated_candidate_ranking
+        );
+        // Check preferential nomination columns of list 2
+        let lcn_1_pnc = &lcn[1].preferential_nomination_columns;
+        assert_eq!(lcn_1_pnc.len(), 2);
+        assert_eq!(lcn_1_pnc[0].candidate, political_groups[1].candidates[0]);
+        assert_eq!(lcn_1_pnc[0].votes, 452);
+        assert_eq!(lcn_1_pnc[0].list_seat_number, 1);
+        assert_eq!(lcn_1_pnc[1].candidate, political_groups[1].candidates[3]);
+        assert_eq!(lcn_1_pnc[1].votes, 274);
+        assert_eq!(lcn_1_pnc[1].list_seat_number, 2);
+        // Check other nomination columns of list 2
+        let lcn_1_onc = &lcn[1].other_nomination_columns;
+        assert_eq!(lcn_1_onc.len(), 1);
+        assert_eq!(lcn_1_onc[0].candidate, political_groups[1].candidates[1]);
+        assert_eq!(lcn_1_onc[0].votes, 39);
+        assert_eq!(lcn_1_onc[0].list_seat_number, 3);
+
+        assert_eq!(
+            lcn[2].updated_candidate_ranking,
+            candidate_nomination.list_candidate_nomination[2].updated_candidate_ranking
+        );
+        // Check preferential nomination columns of list 3
+        let lcn_2_pnc = &lcn[2].preferential_nomination_columns;
+        assert_eq!(lcn_2_pnc.len(), 2);
+        assert_eq!(lcn_2_pnc[0].candidate, political_groups[2].candidates[0]);
+        assert_eq!(lcn_2_pnc[0].votes, 229);
+        assert_eq!(lcn_2_pnc[0].list_seat_number, 1);
+        assert_eq!(lcn_2_pnc[1].candidate, political_groups[2].candidates[2]);
+        assert_eq!(lcn_2_pnc[1].votes, 191);
+        assert_eq!(lcn_2_pnc[1].list_seat_number, 2);
+        // Check other nomination columns of list 3
+        let lcn_2_onc = &lcn[2].other_nomination_columns;
+        assert_eq!(lcn_2_onc.len(), 0);
+
+        assert_eq!(
+            lcn[3].updated_candidate_ranking,
+            political_groups[3].candidates
+        );
+        // Check preferential nomination columns of list 4
+        let lcn_3_pnc = &lcn[3].preferential_nomination_columns;
+        assert_eq!(lcn_3_pnc.len(), 1);
+        assert_eq!(lcn_3_pnc[0].candidate, political_groups[3].candidates[0]);
+        assert_eq!(lcn_3_pnc[0].votes, 347);
+        assert_eq!(lcn_3_pnc[0].list_seat_number, 1);
+        // Check other nomination columns of list 4
+        let lcn_3_onc = &lcn[3].other_nomination_columns;
+        assert_eq!(lcn_3_onc.len(), 0);
+
+        assert_eq!(
+            lcn[4].updated_candidate_ranking,
+            political_groups[4].candidates
+        );
+        // Check preferential nomination columns of list 5
+        let lcn_4_pnc = &lcn[4].preferential_nomination_columns;
+        assert_eq!(lcn_4_pnc.len(), 1);
+        assert_eq!(lcn_4_pnc[0].candidate, political_groups[4].candidates[0]);
+        assert_eq!(lcn_4_pnc[0].votes, 266);
+        assert_eq!(lcn_4_pnc[0].list_seat_number, 1);
+        // Check other nomination columns of list 5
+        let lcn_4_onc = &lcn[4].other_nomination_columns;
+        assert_eq!(lcn_4_onc.len(), 0);
+    }
+}

@@ -118,6 +118,7 @@ pub enum AuditEventType {
     FileDeleted,
     // apportionment
     ApportionmentProcessed,
+    ApportionmentStateUpdated,
     // investigation events
     InvestigationCreated,
     InvestigationConcluded,

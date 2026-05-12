@@ -34,7 +34,7 @@ sqlx database setup
 cargo run -- --seed-data
 ```
 
-This will create the database, run the migrations and seed the database with 
+This will create the database, run the migrations, and seed the database with 
 test data. The API server will now be available at http://localhost:8080. For
 more detailed instructions please read the rest of this README.
 

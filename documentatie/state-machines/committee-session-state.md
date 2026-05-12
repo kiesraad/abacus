@@ -17,8 +17,8 @@ For every next committee session, use `investigation` (ignore `polling station` 
 
 ```mermaid
 flowchart
-  flow_start@{ shape: sm-circ }
-  flow_end@{ shape: sm-circ }
+  flow_start((Start))
+  flow_end(((End)))
 
   created(Created)
   in_preparation(InPreparation)

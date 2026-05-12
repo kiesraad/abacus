@@ -16,7 +16,7 @@ pub struct SeatAssignment {
     pub final_standing: Vec<ListSeatAssignment>,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize, ToSchema)]
+#[derive(Clone, Debug, Serialize, Deserialize, ToSchema, PartialEq)]
 pub struct SeatChangeStep {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
@@ -25,7 +25,7 @@ pub struct SeatChangeStep {
     pub standings: Vec<ListStanding>,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize, ToSchema)]
+#[derive(Clone, Debug, Serialize, Deserialize, ToSchema, PartialEq)]
 #[serde(deny_unknown_fields, tag = "changed_by")]
 pub enum SeatChange {
     HighestAverageAssignment(HighestAverageAssignedSeat),
@@ -94,7 +94,7 @@ impl SeatChange {
     }
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize, ToSchema)]
+#[derive(Clone, Debug, Serialize, Deserialize, ToSchema, PartialEq)]
 pub struct HighestAverageAssignedSeat {
     pub selected_list_number: PGNumber,
     pub list_options: Vec<PGNumber>,
@@ -103,7 +103,7 @@ pub struct HighestAverageAssignedSeat {
     pub votes_per_seat: DisplayFraction,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize, ToSchema)]
+#[derive(Clone, Debug, Serialize, Deserialize, ToSchema, PartialEq)]
 pub struct LargestRemainderAssignedSeat {
     pub selected_list_number: PGNumber,
     pub list_options: Vec<PGNumber>,
@@ -111,19 +111,19 @@ pub struct LargestRemainderAssignedSeat {
     pub remainder_votes: DisplayFraction,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize, ToSchema)]
+#[derive(Clone, Debug, Serialize, Deserialize, ToSchema, PartialEq)]
 pub struct AbsoluteMajorityReassignedSeat {
     pub list_retracted_seat: PGNumber,
     pub list_assigned_seat: PGNumber,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize, ToSchema)]
+#[derive(Clone, Debug, Serialize, Deserialize, ToSchema, PartialEq)]
 pub struct ListExhaustionRemovedSeat {
     pub list_retracted_seat: PGNumber,
     pub full_seat: bool,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize, ToSchema)]
+#[derive(Clone, Debug, Serialize, Deserialize, ToSchema, PartialEq)]
 pub struct ListStanding {
     pub list_number: PGNumber,
     pub votes_cast: u64,
@@ -233,7 +233,7 @@ impl From<&apportionment::SeatChangeStep<PGNumber>> for SeatChangeStep {
 }
 
 /// Fraction with the integer part split out for display purposes
-#[derive(Clone, Debug, Serialize, Deserialize, ToSchema)]
+#[derive(Clone, Debug, Serialize, Deserialize, ToSchema, PartialEq)]
 pub struct DisplayFraction {
     pub integer: u64,
     pub numerator: u64,
@@ -252,7 +252,7 @@ impl From<apportionment::Fraction> for DisplayFraction {
 }
 
 /// Chosen candidate
-#[derive(Clone, Debug, Serialize, Deserialize, ToSchema)]
+#[derive(Clone, Debug, Serialize, Deserialize, ToSchema, PartialEq)]
 #[serde(deny_unknown_fields)]
 pub struct ChosenCandidate {
     #[schema(value_type = u32)]

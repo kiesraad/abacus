@@ -21,7 +21,7 @@ import { InvestigationPrintCorrigendumPgObj } from "e2e-tests/page-objects/inves
 import { InvestigationReasonPgObj } from "e2e-tests/page-objects/investigations/InvestigationReasonPgObj";
 import { UserInfoTopBar } from "e2e-tests/page-objects/nav_bar/UserInfoTopBarPgObj";
 import type { Results } from "@/types/generated/openapi";
-import { eml110a, eml110b, eml230b } from "../test-data/eml-files";
+import { type Eml230b, eml110a, eml110b } from "../test-data/eml-files";
 
 export async function fillDataEntryPages(page: Page, results: Results) {
   if (results.model === "CSOFirstSession") {
@@ -34,7 +34,11 @@ export async function fillDataEntryPages(page: Page, results: Results) {
 
   const votersAndVotesPage = new VotersAndVotesPage(page);
   await expect(votersAndVotesPage.fieldset).toBeVisible();
-  await votersAndVotesPage.fillInPageAndClickNext(results.voters_counts, results.votes_counts);
+  if (results.model === "GSB") {
+    await votersAndVotesPage.fillInPageAndClickNextForModelGSB(results);
+  } else {
+    await votersAndVotesPage.fillInPageAndClickNext(results.voters_counts, results.votes_counts);
+  }
 
   switch (results.model) {
     case "CSOFirstSession":
@@ -109,16 +113,16 @@ export async function uploadElectionAndInputHash(page: Page) {
   await checkDefinitionPage.inputHash(eml110a.hashInput1, eml110a.hashInput2);
 }
 
-export async function uploadCandidatesAndInputHash(page: Page) {
+export async function uploadCandidatesAndInputHash(page: Page, eml: Eml230b) {
   const uploadCandidateDefinitionPage = new UploadCandidateDefinitionPgObj(page);
   await expect(uploadCandidateDefinitionPage.header).toBeVisible();
-  await uploadCandidateDefinitionPage.uploadFile(eml230b.path);
-  await expect(uploadCandidateDefinitionPage.main).toContainText(eml230b.filename);
-  await expect(uploadCandidateDefinitionPage.main).toContainText(eml230b.electionDate);
+  await uploadCandidateDefinitionPage.uploadFile(eml.path);
+  await expect(uploadCandidateDefinitionPage.main).toContainText(eml.filename);
+  await expect(uploadCandidateDefinitionPage.main).toContainText(eml.electionDate);
 
   const checkCandidateDefinitionPage = new CheckCandidateDefinitionPgObj(page);
   await expect(checkCandidateDefinitionPage.header).toBeVisible();
-  await checkCandidateDefinitionPage.inputHash(eml230b.hashInput1, eml230b.hashInput2);
+  await checkCandidateDefinitionPage.inputHash(eml.hashInput1, eml.hashInput2);
 }
 
 export async function uploadPollingStations(page: Page, eml = eml110b) {

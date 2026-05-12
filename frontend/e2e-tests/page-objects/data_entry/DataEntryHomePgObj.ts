@@ -7,6 +7,7 @@ export class DataEntryHomePage {
   readonly feedback: Locator;
   readonly start: Locator;
   readonly submitFeedback: Locator;
+  readonly pollingStations: Locator;
   readonly alert: Locator;
   readonly alertDataEntrySaved: Locator;
   readonly alertDataEntryDifferent: Locator;
@@ -24,10 +25,13 @@ export class DataEntryHomePage {
       name: "Verder met een volgend stembureau?",
     });
 
+    // GSB only
     this.number = page.getByRole("textbox", { name: "Voer het nummer in: " });
     this.feedback = page.getByTestId("inputFeedback");
     this.submitFeedback = page.getByTestId("submitFeedback");
     this.start = page.getByRole("button", { name: "Beginnen" });
+
+    this.pollingStations = page.getByTestId("data_entry_list").locator("tbody").getByRole("row");
 
     this.alert = page.getByRole("alert");
     this.alertDataEntrySaved = this.alert.filter({ hasText: /(Eerste|Tweede) invoer is opgeslagen/ });
@@ -42,6 +46,10 @@ export class DataEntryHomePage {
     await this.number.pressSequentially(dataEntrySource.number.toString(), { delay: 50 });
     await expect(this.feedback).toContainText(dataEntrySource.name);
     await this.start.click();
+  }
+
+  async clickPollingStationFromList(number: number) {
+    await this.page.getByTestId(`data-entry-row-${number}`).click();
   }
 
   async clickDataEntryInProgress(dataEntrySource: { number: number; name: string }) {

@@ -1,12 +1,13 @@
 import type { Locator, Page } from "@playwright/test";
 
-import type { VotersCounts, VotesCounts } from "@/types/generated/openapi";
+import type { GSBResults, VotersCounts, VotesCounts } from "@/types/generated/openapi";
 
 import { DataEntryBasePage } from "./DataEntryBasePgObj";
 
 export class VotersAndVotesPage extends DataEntryBasePage {
   readonly fieldset: Locator;
   readonly headingRecount: Locator;
+  readonly numberOfVoters: Locator;
   readonly pollCardCount: Locator;
   readonly proxyCertificateCount: Locator;
   readonly totalAdmittedVotersCount: Locator;
@@ -30,6 +31,9 @@ export class VotersAndVotesPage extends DataEntryBasePage {
       level: 2,
       name: "Toegelaten kiezers na hertelling door gemeentelijk stembureau",
     });
+
+    // number of voters (CSB only)
+    this.numberOfVoters = page.getByRole("textbox", { name: "Z Kiesgerechtigden" });
 
     // voters counts
     this.pollCardCount = page.getByRole("textbox", { name: "A Stempassen" });
@@ -107,6 +111,11 @@ export class VotersAndVotesPage extends DataEntryBasePage {
     await this.inputVotersCounts(votersCounts);
     await this.inputVotesCounts(votesCounts);
     await this.next.click();
+  }
+
+  async fillInPageAndClickNextForModelGSB(results: GSBResults) {
+    await this.numberOfVoters.fill(results.number_of_voters.toString());
+    await this.fillInPageAndClickNext(results.voters_counts, results.votes_counts);
   }
 
   async checkAcceptErrorsAndWarnings() {

@@ -736,7 +736,9 @@ async fn test_p_2a() {
 
 #[test(tokio::test)]
 async fn test_p_22_2() {
-    let mut rng = rand::rng();
+    use rand::SeedableRng;
+    // Seed determined by a fair dice roll on random.org
+    let mut rng = rand::rngs::StdRng::seed_from_u64(791397299);
 
     // We only test with values that have a possible apportionment outcome
     let (parties, candidates, string_length, none_where_possible) = (10, 10, 10, false);

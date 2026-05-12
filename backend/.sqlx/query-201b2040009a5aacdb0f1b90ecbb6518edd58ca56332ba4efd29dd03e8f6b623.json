@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            INSERT INTO apportionment (committee_session_id, state)\n            VALUES($1, $2)\n            ON CONFLICT (committee_session_id) DO UPDATE\n            SET state = $2\n            WHERE committee_session_id = $1\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "201b2040009a5aacdb0f1b90ecbb6518edd58ca56332ba4efd29dd03e8f6b623"
+}

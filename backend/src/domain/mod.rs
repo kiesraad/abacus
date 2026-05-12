@@ -1,4 +1,5 @@
 pub mod apportionment;
+pub mod apportionment_state;
 pub mod committee_session;
 pub mod committee_session_status;
 pub mod compare;

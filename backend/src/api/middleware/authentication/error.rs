@@ -28,6 +28,12 @@ pub enum AuthenticationError {
     UserNotFound,
 }
 
+impl PartialEq for AuthenticationError {
+    fn eq(&self, other: &Self) -> bool {
+        std::mem::discriminant(self) == std::mem::discriminant(other)
+    }
+}
+
 impl ApiErrorResponse for AuthenticationError {
     fn log(&self) {
         // note that we don't log the UserNotFound error, as it is triggered for every account call

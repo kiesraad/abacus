@@ -42,7 +42,7 @@ import { UserCreateElectionPgObj } from "e2e-tests/page-objects/users/UserCreate
 import { UserCreateRolePgObj } from "e2e-tests/page-objects/users/UserCreateRolePgObj";
 import { UserCreateTypePgObj } from "e2e-tests/page-objects/users/UserCreateTypePgObj";
 import { UserListPgObj } from "e2e-tests/page-objects/users/UserListPgObj";
-import { eml110b_single } from "e2e-tests/test-data/eml-files";
+import { eml110b_single, eml230b } from "e2e-tests/test-data/eml-files";
 import { noRecountNoDifferencesDataEntry } from "e2e-tests/test-data/request-response-templates";
 import type { TestUser } from "e2e-tests/test-data/users";
 
@@ -69,33 +69,33 @@ const investigations = [
 const randomSuffix = Date.now();
 
 const adminUser: TestUser = {
-  username: `admin-${randomSuffix}`,
-  fullname: `full flow admin`,
+  username: `admin1-GSB-${randomSuffix}`,
+  fullname: `full flow admin1 GSB`,
   role: "administrator",
 };
 
 const coordinatorUser: TestUser = {
-  username: `coordinator-${randomSuffix}`,
-  fullname: `full flow coordinator`,
+  username: `coordinator1-GSB-${randomSuffix}`,
+  fullname: `full flow coordinator1 GSB`,
   role: "coordinator_gsb",
 };
 
 const typistUsers: TestUser[] = [
   {
-    username: `typist3-${randomSuffix}`,
-    fullname: `full flow typist3`,
+    username: `typist1-GSB-${randomSuffix}`,
+    fullname: `full flow typist1 GSB`,
     role: "typist_gsb",
   },
   {
-    username: `typist4-${randomSuffix}`,
-    fullname: `full flow typist4`,
+    username: `typist2-GSB-${randomSuffix}`,
+    fullname: `full flow typist2 GSB`,
     role: "typist_gsb",
   },
 ];
 
 test.describe.configure({ mode: "serial" });
 
-test.describe("full flow", () => {
+test.describe("full flow GSB", () => {
   let electionId: number | null = null;
 
   test("create and complete admin user account", async ({ adminOne }) => {
@@ -125,7 +125,7 @@ test.describe("full flow", () => {
     await expect(committeeCategoryPage.gsb).toBeChecked();
     await committeeCategoryPage.next.click();
 
-    await uploadCandidatesAndInputHash(page);
+    await uploadCandidatesAndInputHash(page, eml230b);
 
     await uploadPollingStations(page, eml110b_single);
 
@@ -231,7 +231,6 @@ test.describe("full flow", () => {
     const userInfoTopBar = new UserInfoTopBar(page);
     await expect(userInfoTopBar.username).toHaveText(adminUser.fullname);
 
-    // Create browser-specific typists
     for (const typist of typistUsers) {
       const adminNavBar = new AdminNavBar(page);
       await adminNavBar.users.click();

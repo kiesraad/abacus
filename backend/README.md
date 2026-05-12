@@ -7,9 +7,9 @@ generating PDF and EML output files, computing summaries and apportionments, and
 much more. 
 
 During development the frontend assets are typically served by the 
-frontend dev server, and we typically use an external typst CLI binary for PDF
+frontend dev server, and we typically use an external Typst CLI binary for PDF
 generation. During production we serve the frontend assets directly from the
-abacus binary and also include an embedded version of typst for PDF generation.
+Abacus binary and also include an embedded version of Typst for PDF generation.
 This results in production builds of Abacus that are completely self-contained.
 
 ## Usage
@@ -20,8 +20,8 @@ You will need to install the following prerequisites before you can build and ru
 the backend:
 
 - [Rust (stable) and Cargo](https://www.rust-lang.org/tools/install)
-- [sqlx-cli](https://docs.rs/crate/sqlx-cli/latest): `cargo install sqlx-cli`
-- typst-cli: `cargo install typst-cli` (when not using the `embed-typst` feature)
+- [SQLx CLI](https://docs.rs/crate/sqlx-cli/latest): `cargo install sqlx-cli`
+- Typst CLI: `cargo install typst-cli` (when not using the `embed-typst` feature)
 
 ### Quickstart
 

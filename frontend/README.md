@@ -3,7 +3,7 @@
 This frontend directory contains the code for the Abacus frontend application,
 i.e. the user interface that runs in the browser and communicates with the
 backend API server located in the `../backend` directory. The frontend is a
-React application built with vite written in TypeScript. In order to run the 
+React application built with Vite written in TypeScript. In order to run the 
 frontend, you will need to have a backend API server running. For instructions 
 on running the backend see the [README of the backend](../backend/README.md).
 

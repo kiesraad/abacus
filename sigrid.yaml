@@ -40,7 +40,6 @@ exclude:
   - ".*/backend/src/bin/gen-.*[.]rs"
   - ".*/documentatie/.*"
   - ".*/frontend/scripts/.*"
-  - ".*/docker-compose[.]yml"
   - ".*/packaging/.*"
 
 dependencychecker:

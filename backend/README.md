@@ -1,16 +1,47 @@
 # Backend
 
+This directory contains the backend API server for Abacus, implemented in Rust.
+The backend is responsible for responding to API requests from the frontend,
+managing the database and completing requested user actions, including
+generating PDF and EML output files, computing summaries and apportionments, and
+much more. 
+
+During development the frontend assets are typically served by the 
+frontend dev server, and we typically use an external typst CLI binary for PDF
+generation. During production we serve the frontend assets directly from the
+abacus binary and also include an embedded version of typst for PDF generation.
+This results in production builds of Abacus that are completely self-contained.
+
 ## Usage
 
-### Build dependencies
+### Prerequisites
+
+You will need to install the following prerequisites before you can build and run
+the backend:
 
 - [Rust (stable) and Cargo](https://www.rust-lang.org/tools/install)
 - [sqlx-cli](https://docs.rs/crate/sqlx-cli/latest): `cargo install sqlx-cli`
+- typst-cli: `cargo install typst-cli` (when not using the `embed-typst` feature)
+
+### Quickstart
+
+After having installed these prerequisites and having cloned the repository, you
+can quickly get started by running the following commands:
+
+```shell
+cd backend
+sqlx database setup
+cargo run -- --seed-data
+```
+
+This will create the database, run the migrations and seed the database with 
+test data. The API server will now be available at http://localhost:8080. For
+more detailed instructions please read the rest of this README.
 
 ### Building
 
-First run `sqlx database setup` to create the SQLite database.
-Then use `cargo build` to build the project.
+First run `sqlx database setup` to create the SQLite database. Then use 
+`cargo build` to build the project.
 
 To make a release build, use `cargo build --release`.
 The built binary will be located in `target/release/`.

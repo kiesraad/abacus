@@ -1,11 +1,37 @@
-# Electoral Council election results management system - Frontend
+# Frontend
+
+This frontend directory contains the code for the Abacus frontend application,
+i.e. the user interface that runs in the browser and communicates with the
+backend API server located in the `../backend` directory. The frontend is a
+React application built with vite written in TypeScript. In order to run the 
+frontend, you will need to have a backend API server running. For instructions 
+on running the backend see the [README of the backend](../backend/README.md).
 
 ## Development
 
 ### Prerequisites
 
 - [Node](https://nodejs.org) v24
-- [pnpm](https://pnpm.io/) v10
+- [pnpm](https://pnpm.io/) v10+
+
+### Quickstart
+
+After having installed these prerequisites and having cloned the repository, you
+can quickly get started by following the quickstart instructions from the
+[README of the backend](../backend/README.md) and running the following commands
+after that (make sure to keep the backend API server running in the background):
+
+```shell
+cd frontend
+pnpm install
+pnpm dev
+```
+
+Once started, you should be able to access the frontend application in your
+browser at http://localhost:3000. To get started quickly, you can visit the
+http://localhost:3000/dev page to quickly login to specific users and quickly 
+jump to specific parts of the application. For more detailed instructions, make 
+sure to read the rest of this README.
 
 ### Building
 

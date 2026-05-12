@@ -7,7 +7,7 @@ Dank je wel dat je wilt bijdragen aan Abacus! We ontwikkelen Abacus open source 
 - een bug of beveiligingslek melden;
 - verbeteringen en/of uitbreidingen toevoegen aan de code en documentatie.
 
-Voor de duidelijkheid: de Kiesraad heeft concrete plannen en doelstellingen met Abacus, en die zijn leidend. Hierdoor is het goed mogelijk dat een waardevolle bijdrage uit de community toch niet kan worden meegenomen, omdat we anders beloofde dingen niet op tijd waar kunnen maken. Als je iets wil bijdragen aan de software en zeker wil zijn dat je bijdrage aansluit bij onze plannen, neem dan vooraf contact op via e-mail: abacus[@]kiesraad.nl of open een issue.
+Voor de duidelijkheid: de Kiesraad heeft concrete plannen en doelstellingen met Abacus, en die zijn leidend. Hierdoor is het goed mogelijk dat een waardevolle bijdrage uit de community toch niet kan worden meegenomen, omdat we anders beloofde dingen niet op tijd waar kunnen maken. Als je iets wil bijdragen aan de software en zeker wil zijn dat je bijdrage aansluit bij onze plannen, neem dan vooraf contact op via e-mail: abacus[@]kiesraad.nl of open een issue op GitHub.
 
 Het team werkt met een planning en epics zoals opgenomen in het projectbord. Voor meer informatie over onze werkwijze ga je naar:
 

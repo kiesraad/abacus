@@ -20,8 +20,7 @@ pub use self::{
         HighestAverageAssignedSeat, SeatAssignmentResult, SeatChange, SeatChangeStep,
     },
     structs::{
-        ApportionmentError, ApportionmentInput, ApportionmentOutput, CandidateVotes,
-        LARGE_COUNCIL_THRESHOLD, ListVotes,
+        ApportionmentError, ApportionmentInput, ApportionmentOutput, CandidateVotes, ListVotes,
     },
 };
 
@@ -42,10 +41,10 @@ pub fn process<T: ApportionmentInput>(
 #[cfg(test)]
 mod tests {
     use super::process;
+    use crate::test_helpers::{check_chosen_candidates, check_list_candidate_nomination};
     use crate::{
         Fraction,
         test_helpers::{
-            check_chosen_candidates, check_list_candidate_nomination,
             get_total_seats_from_apportionment_result,
             seat_assignment_fixture_with_default_50_candidates,
         },

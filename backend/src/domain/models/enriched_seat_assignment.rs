@@ -1,4 +1,3 @@
-use apportionment::LARGE_COUNCIL_THRESHOLD;
 use serde::{Deserialize, Serialize};
 
 use crate::domain::{
@@ -144,7 +143,6 @@ impl EnrichedSeatAssignment {
     }
 
     fn get_list_seat_assignments(
-        number_of_seats: u32,
         summary: &ElectionSummaryCSB,
         seat_assignment: &SeatAssignment,
     ) -> Result<ListSeatAssignments, ModelsError> {
@@ -152,38 +150,31 @@ impl EnrichedSeatAssignment {
         let mut initial_total_full_seats = 0;
 
         let initial_steps = get_initial_steps(seat_assignment);
-        let largest_remainders =
-            if number_of_seats >= LARGE_COUNCIL_THRESHOLD || seat_assignment.steps.is_empty() {
-                vec![]
-            } else {
-                Self::get_largest_remainders(
-                    seat_assignment,
-                    &initial_steps.initial_largest_remainder_steps,
-                )
-            };
+        let largest_remainders = if initial_steps.initial_largest_remainder_steps.is_empty() {
+            vec![]
+        } else {
+            Self::get_largest_remainders(
+                seat_assignment,
+                &initial_steps.initial_largest_remainder_steps,
+            )
+        };
 
         for pg_votes in summary.votes_counts.political_group_total_votes.iter() {
             let initial_full_seats = Self::get_initial_full_seats(seat_assignment, pg_votes.number);
-            let largest_remainder =
-                if number_of_seats >= LARGE_COUNCIL_THRESHOLD || seat_assignment.steps.is_empty() {
-                    None
-                } else {
-                    largest_remainders
-                        .iter()
-                        .find(|(pg_number, _)| *pg_number == pg_votes.number)
-                        .map(|(_, largest_remainder)| largest_remainder.clone())
-                };
-            let unique_highest_average =
-                if number_of_seats >= LARGE_COUNCIL_THRESHOLD || seat_assignment.steps.is_empty() {
-                    None
-                } else {
-                    Self::get_unique_highest_average(
-                        pg_votes.number,
-                        initial_full_seats,
-                        &largest_remainder,
-                        &initial_steps.initial_unique_highest_average_steps,
-                    )
-                };
+            let largest_remainder = if initial_steps.initial_largest_remainder_steps.is_empty() {
+                None
+            } else {
+                largest_remainders
+                    .iter()
+                    .find(|(pg_number, _)| *pg_number == pg_votes.number)
+                    .map(|(_, largest_remainder)| largest_remainder.clone())
+            };
+            let unique_highest_average = Self::get_unique_highest_average(
+                pg_votes.number,
+                initial_full_seats,
+                &largest_remainder,
+                &initial_steps.initial_unique_highest_average_steps,
+            );
             initial_total_full_seats += initial_full_seats;
 
             enriched_list_seat_assignments.push(EnrichedListSeatAssignment {
@@ -207,8 +198,7 @@ impl EnrichedSeatAssignment {
         summary: &ElectionSummaryCSB,
         seat_assignment: &SeatAssignment,
     ) -> Result<Self, ModelsError> {
-        let list_seat_assignments =
-            Self::get_list_seat_assignments(number_of_seats, summary, seat_assignment)?;
+        let list_seat_assignments = Self::get_list_seat_assignments(summary, seat_assignment)?;
         Ok(EnrichedSeatAssignment {
             quota: seat_assignment.quota.clone(),
             list_seat_assignment: list_seat_assignments.enriched_list_seat_assignments,

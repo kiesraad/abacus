@@ -42,7 +42,7 @@ fn get_footnote_steps(seat_assignment: &SeatAssignment) -> FootnoteSteps<'_> {
 }
 
 impl ApportionmentFootnotes {
-    pub fn get_absolute_majority(
+    fn get_absolute_majority(
         absolute_majority_reassignment: Option<&SeatChangeStep>,
         political_groups: &[PoliticalGroup],
     ) -> Option<FootnotePoliticalGroup> {
@@ -62,7 +62,7 @@ impl ApportionmentFootnotes {
         }
     }
 
-    pub fn get_exhausted_lists(
+    fn get_exhausted_lists(
         list_exhaustion_steps: Vec<&SeatChangeStep>,
         political_groups: &[PoliticalGroup],
     ) -> Option<Vec<FootnotePoliticalGroup>> {

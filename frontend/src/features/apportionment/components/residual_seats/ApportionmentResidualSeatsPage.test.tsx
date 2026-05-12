@@ -1,5 +1,5 @@
 import { render as rtlRender } from "@testing-library/react";
-import { describe, expect, test, vi } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
@@ -7,7 +7,7 @@ import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { Providers } from "@/testing/Providers";
 import { overrideOnce } from "@/testing/server";
 import { expectErrorPage, render, screen, setupTestRouter } from "@/testing/test-utils";
-import type { ElectionApportionmentResponse, ErrorResponse } from "@/types/generated/openapi";
+import type { ApportionmentState, ElectionApportionmentResponse, ErrorResponse } from "@/types/generated/openapi";
 import { apportionmentRoutes } from "../../routes";
 import * as gte19Seats from "../../testing/gte-19-seats";
 import * as gte19SeatsAndP9 from "../../testing/gte-19-seats-and-p9";
@@ -27,6 +27,13 @@ const renderApportionmentResidualSeatsPage = () =>
   );
 
 describe("ApportionmentResidualSeatsPage", () => {
+  beforeEach(() => {
+    overrideOnce("get", "/api/elections/1/apportionment/state", 200, {
+      deceased_candidates: [],
+      type: "Finalised",
+    } satisfies ApportionmentState);
+  });
+
   test("Residual seats assignment highest averages table visible", async () => {
     overrideOnce("get", "/api/elections/1", 200, getElectionMockData(gte19Seats.election));
     overrideOnce("post", "/api/elections/1/apportionment", 200, {

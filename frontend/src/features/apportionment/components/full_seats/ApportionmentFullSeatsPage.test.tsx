@@ -1,5 +1,5 @@
 import { render as rtlRender } from "@testing-library/react";
-import { describe, expect, test, vi } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
@@ -7,7 +7,7 @@ import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { Providers } from "@/testing/Providers";
 import { overrideOnce } from "@/testing/server";
 import { expectErrorPage, render, screen, setupTestRouter } from "@/testing/test-utils";
-import type { ElectionApportionmentResponse, ErrorResponse } from "@/types/generated/openapi";
+import type { ApportionmentState, ElectionApportionmentResponse, ErrorResponse } from "@/types/generated/openapi";
 import { apportionmentRoutes } from "../../routes";
 import * as lt19Seats from "../../testing/lt-19-seats";
 import * as lt19SeatsAndP9AndP10 from "../../testing/lt-19-seats-and-p9-and-p10";
@@ -24,6 +24,13 @@ const renderApportionmentFullSeatsPage = () =>
   );
 
 describe("ApportionmentFullSeatsPage", () => {
+  beforeEach(() => {
+    overrideOnce("get", "/api/elections/1/apportionment/state", 200, {
+      deceased_candidates: [],
+      type: "Finalised",
+    } satisfies ApportionmentState);
+  });
+
   test("Full seats assignment and residual seats calculation tables visible", async () => {
     overrideOnce("get", "/api/elections/1", 200, getElectionMockData(lt19Seats.election));
     overrideOnce("post", "/api/elections/1/apportionment", 200, {
@@ -31,6 +38,10 @@ describe("ApportionmentFullSeatsPage", () => {
       candidate_nomination: lt19Seats.candidate_nomination,
       election_summary: lt19Seats.election_summary,
     } satisfies ElectionApportionmentResponse);
+    overrideOnce("get", "/api/elections/2/apportionment/state", 200, {
+      deceased_candidates: [],
+      type: "Finalised",
+    } satisfies ApportionmentState);
 
     renderApportionmentFullSeatsPage();
 

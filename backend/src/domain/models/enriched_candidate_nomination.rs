@@ -128,10 +128,8 @@ mod tests {
         api::apportionment::{ApportionmentInputData, map_candidate_nomination},
         domain::{
             election::{CommitteeCategory, tests::election_fixture_with_given_number_of_seats},
-            models::{
-                enriched_candidate_nomination::EnrichedCandidateNomination,
-                tests::create_political_group_votes,
-            },
+            models::enriched_candidate_nomination::EnrichedCandidateNomination,
+            results::political_group_candidate_votes::create_political_group_candidate_votes,
         },
     };
 
@@ -154,7 +152,7 @@ mod tests {
             15,
         );
         let political_groups = &election.political_groups;
-        let list_votes = create_political_group_votes(political_groups, candidate_votes);
+        let list_votes = create_political_group_candidate_votes(political_groups, candidate_votes);
         let apportionment_input = ApportionmentInputData {
             number_of_seats: election.number_of_seats,
             list_votes: list_votes.as_slice(),

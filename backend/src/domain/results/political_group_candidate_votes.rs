@@ -2,6 +2,8 @@ use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
 use super::count::Count;
+#[cfg(test)]
+use crate::domain::election::PoliticalGroup;
 use crate::{
     APIError,
     domain::{
@@ -199,4 +201,23 @@ impl Validate for CandidateVotes {
         self.votes
             .validate(election, validation_results, &path.field("votes"))
     }
+}
+
+/// Create a value for `political_group_candidate_votes`
+/// for the given political groups, with given candidate votes per list.
+#[cfg(test)]
+pub fn create_political_group_candidate_votes(
+    political_groups: &[PoliticalGroup],
+    candidate_votes: Vec<Vec<u32>>,
+) -> Vec<PoliticalGroupCandidateVotes> {
+    political_groups
+        .iter()
+        .enumerate()
+        .map(|(list_index, pg)| {
+            PoliticalGroupCandidateVotes::from_test_data_auto(
+                pg.number,
+                &candidate_votes[list_index],
+            )
+        })
+        .collect()
 }

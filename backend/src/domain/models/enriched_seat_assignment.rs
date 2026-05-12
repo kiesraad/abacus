@@ -264,11 +264,9 @@ mod tests {
                 CommitteeCategory, ElectionWithPoliticalGroups,
                 tests::election_fixture_with_given_number_of_seats,
             },
-            models::{
-                enriched_seat_assignment::EnrichedSeatAssignment,
-                tests::create_political_group_votes,
-            },
+            models::enriched_seat_assignment::EnrichedSeatAssignment,
             results::{
+                political_group_candidate_votes::create_political_group_candidate_votes,
                 political_group_total_votes::PoliticalGroupTotalVotes, voters_counts::VotersCounts,
                 votes_counts::VotesCounts,
             },
@@ -282,7 +280,7 @@ mod tests {
     ) -> ElectionSummary {
         let total_votes_candidates_count = candidate_votes.iter().flatten().sum::<u32>();
         let political_group_votes =
-            create_political_group_votes(&election.political_groups, candidate_votes);
+            create_political_group_candidate_votes(&election.political_groups, candidate_votes);
         let political_group_total_votes = political_group_votes
             .iter()
             .map(|pg_votes| PoliticalGroupTotalVotes {

@@ -129,10 +129,8 @@ mod tests {
         api::apportionment::{ApportionmentInputData, map_seat_assignment},
         domain::{
             election::{CommitteeCategory, tests::election_fixture_with_given_number_of_seats},
-            models::{
-                apportionment_footnotes::ApportionmentFootnotes,
-                tests::create_political_group_votes,
-            },
+            models::apportionment_footnotes::ApportionmentFootnotes,
+            results::political_group_candidate_votes::create_political_group_candidate_votes,
         },
     };
 
@@ -147,14 +145,14 @@ mod tests {
         ];
         let election = election_fixture_with_given_number_of_seats(
             CommitteeCategory::CSB,
-            candidate_votes
+            &candidate_votes
                 .iter()
                 .map(|cv| u32::try_from(cv.len()).expect("Should fit in u32"))
-                .collect::<Vec<u32>>()
-                .as_slice(),
+                .collect::<Vec<u32>>(),
             15,
         );
-        let list_votes = create_political_group_votes(&election.political_groups, candidate_votes);
+        let list_votes =
+            create_political_group_candidate_votes(&election.political_groups, candidate_votes);
         let apportionment_input = ApportionmentInputData {
             number_of_seats: election.number_of_seats,
             list_votes: list_votes.as_slice(),
@@ -187,7 +185,8 @@ mod tests {
                 .as_slice(),
             15,
         );
-        let list_votes = create_political_group_votes(&election.political_groups, candidate_votes);
+        let list_votes =
+            create_political_group_candidate_votes(&election.political_groups, candidate_votes);
         let apportionment_input = ApportionmentInputData {
             number_of_seats: election.number_of_seats,
             list_votes: list_votes.as_slice(),
@@ -227,7 +226,8 @@ mod tests {
                 .as_slice(),
             19,
         );
-        let list_votes = create_political_group_votes(&election.political_groups, candidate_votes);
+        let list_votes =
+            create_political_group_candidate_votes(&election.political_groups, candidate_votes);
         let apportionment_input = ApportionmentInputData {
             number_of_seats: election.number_of_seats,
             list_votes: list_votes.as_slice(),

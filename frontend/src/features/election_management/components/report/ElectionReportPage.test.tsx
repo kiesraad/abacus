@@ -36,6 +36,7 @@ import {
   waitFor,
 } from "@/testing/test-utils";
 import type {
+  ApportionmentState,
   CommitteeCategory,
   CommitteeSession,
   ElectionDetailsResponse,
@@ -391,6 +392,10 @@ describe("ElectionReportPage", () => {
         CSBElectionRequestHandler,
         CSBElectionStatusRequestHandler,
       );
+      overrideOnce("get", "/api/elections/2/apportionment/state", 200, {
+        deceased_candidates: [],
+        type: "Finalised",
+      } satisfies ApportionmentState);
       vi.spyOn(ReactRouter, "useParams").mockReturnValue({ committeeSessionId: "2" });
     });
 
@@ -602,6 +607,44 @@ describe("ElectionReportPage", () => {
           { status: "data_entry", location: "Den Haag", start_date_time: "2026-03-18T21:36:00" },
         ),
       );
+
+      await router.navigate("/elections/2/report/committee-session/2/download");
+
+      rtlRender(<Providers committeeCategory={"CSB"} router={router} />);
+
+      await expectConflictErrorPage();
+      expect(console.error).toHaveBeenCalled();
+    });
+
+    test("Error when apportionment state is not Finalised", async () => {
+      // error is expected
+      vi.spyOn(console, "error").mockImplementation(() => {});
+      const router = setupTestRouter([
+        {
+          Component: null,
+          errorElement: <ErrorBoundary />,
+          children: [
+            {
+              path: "elections/:electionId",
+              children: electionManagementRoutes,
+            },
+          ],
+        },
+      ]);
+
+      overrideOnce(
+        "get",
+        "/api/elections/2",
+        200,
+        getCSBElectionMockData(
+          {},
+          { status: "completed", location: "Den Haag", start_date_time: "2026-03-18T21:36:00" },
+        ),
+      );
+      overrideOnce("get", "/api/elections/2/apportionment/state", 200, {
+        type: "RegisteringDeceasedCandidates",
+        deceased_candidates: [],
+      } satisfies ApportionmentState);
 
       await router.navigate("/elections/2/report/committee-session/2/download");
 

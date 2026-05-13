@@ -1,6 +1,6 @@
 import { render as rtlRender } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
-import { describe, expect, test, vi } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
@@ -9,7 +9,7 @@ import { Providers } from "@/testing/Providers";
 import type { Router } from "@/testing/router";
 import { overrideOnce } from "@/testing/server";
 import { expectErrorPage, render, renderReturningRouter, screen, setupTestRouter, within } from "@/testing/test-utils";
-import type { ElectionApportionmentResponse, ErrorResponse } from "@/types/generated/openapi";
+import type { ApportionmentState, ElectionApportionmentResponse, ErrorResponse } from "@/types/generated/openapi";
 
 import { apportionmentRoutes } from "../routes";
 import {
@@ -38,6 +38,48 @@ const renderApportionmentPage = (withRouter: boolean) => {
 };
 
 describe("ApportionmentPage", () => {
+  test.each(
+    Object.values({
+      Uninitialised: {
+        state: { type: "Uninitialised" },
+        expectAlert: false,
+      },
+      RegisteringDeceasedCandidates: {
+        state: { deceased_candidates: [], type: "RegisteringDeceasedCandidates" },
+        expectAlert: false,
+      },
+      Finalised: {
+        state: { deceased_candidates: [], type: "Finalised" },
+        expectAlert: true,
+      },
+    } satisfies Record<ApportionmentState["type"], { state: ApportionmentState; expectAlert: boolean }>),
+  )("Renders all seats assigned message only for finalised state ($state.type)", async ({ state, expectAlert }) => {
+    overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election, committee_session));
+    overrideOnce("post", "/api/elections/1/apportionment", 200, {
+      seat_assignment: seat_assignment,
+      candidate_nomination: candidate_nomination,
+      election_summary: election_summary,
+    } satisfies ElectionApportionmentResponse);
+    overrideOnce("get", "/api/elections/1/apportionment/state", 200, state);
+
+    renderApportionmentPage(false);
+    expect(await screen.findByTestId("election-summary-table")).toBeVisible();
+
+    if (expectAlert) {
+      const alert = await screen.findByRole("alert");
+      expect(alert).toHaveTextContent("Alle zetels zijn toegewezen");
+      expect(alert).toHaveTextContent(
+        "Je kunt de zetelverdeling nu definitief maken en het proces-verbaal downloaden.",
+      );
+      expect(within(alert).getByRole("link", { name: "Naar proces-verbaal" })).toHaveAttribute(
+        "href",
+        "/report/committee-session/3/download",
+      );
+    } else {
+      expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    }
+  });
+
   test("Election summary and apportionment tables visible", async () => {
     const user = userEvent.setup();
     overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election, committee_session));
@@ -46,6 +88,10 @@ describe("ApportionmentPage", () => {
       candidate_nomination: candidate_nomination,
       election_summary: election_summary,
     } satisfies ElectionApportionmentResponse);
+    overrideOnce("get", "/api/elections/1/apportionment/state", 200, {
+      deceased_candidates: [],
+      type: "Finalised",
+    } satisfies ApportionmentState);
 
     const router = renderApportionmentPage(true) as Router;
 
@@ -134,8 +180,14 @@ describe("ApportionmentPage", () => {
   });
 
   describe("Apportionment not yet available", () => {
-    test("Not available until committee session is completed", async () => {
+    beforeEach(() => {
       overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election, committee_session));
+      overrideOnce("get", "/api/elections/1/apportionment/state", 200, {
+        type: "Uninitialised",
+      } satisfies ApportionmentState);
+    });
+
+    test("Not available until committee session is completed", async () => {
       overrideOnce("post", "/api/elections/1/apportionment", 412, {
         error: "Committee session not completed",
         fatal: false,
@@ -159,7 +211,6 @@ describe("ApportionmentPage", () => {
     });
 
     test("Not possible because drawing of lots is not implemented yet", async () => {
-      overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election, committee_session));
       overrideOnce("post", "/api/elections/1/apportionment", 422, {
         error: "Drawing of lots is required",
         fatal: false,
@@ -183,7 +234,6 @@ describe("ApportionmentPage", () => {
     });
 
     test("Not possible because all lists are exhausted", async () => {
-      overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election, committee_session));
       overrideOnce("post", "/api/elections/1/apportionment", 422, {
         error: "All lists are exhausted, not enough candidates to fill all seats",
         fatal: false,
@@ -209,7 +259,6 @@ describe("ApportionmentPage", () => {
     });
 
     test("Not possible because no votes on candidates cast", async () => {
-      overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election, committee_session));
       overrideOnce("post", "/api/elections/1/apportionment", 422, {
         error: "No votes on candidates cast",
         fatal: false,
@@ -250,7 +299,6 @@ describe("ApportionmentPage", () => {
         },
       ]);
 
-      overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election, committee_session));
       overrideOnce("post", "/api/elections/1/apportionment", 500, {
         error: "Internal Server Error",
         fatal: true,

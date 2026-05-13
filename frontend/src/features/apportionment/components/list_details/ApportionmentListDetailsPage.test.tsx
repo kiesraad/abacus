@@ -1,6 +1,6 @@
 import { render as rtlRender } from "@testing-library/react";
 import * as ReactRouter from "react-router";
-import { describe, expect, test, vi } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
@@ -8,7 +8,7 @@ import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { Providers } from "@/testing/Providers";
 import { overrideOnce } from "@/testing/server";
 import { expectErrorPage, render, screen, setupTestRouter } from "@/testing/test-utils";
-import type { ElectionApportionmentResponse, ErrorResponse } from "@/types/generated/openapi";
+import type { ApportionmentState, ElectionApportionmentResponse, ErrorResponse } from "@/types/generated/openapi";
 
 import { apportionmentRoutes } from "../../routes";
 import { candidate_nomination, election, election_summary, seat_assignment } from "../../testing/lt-19-seats";
@@ -25,6 +25,13 @@ const renderApportionmentPage = () =>
   );
 
 describe("ApportionmentListDetailsPage", () => {
+  beforeEach(() => {
+    overrideOnce("get", "/api/elections/1/apportionment/state", 200, {
+      deceased_candidates: [],
+      type: "Finalised",
+    } satisfies ApportionmentState);
+  });
+
   test("All tables visible", async () => {
     vi.spyOn(ReactRouter, "useParams").mockReturnValue({ listNumber: "1" });
     overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election));

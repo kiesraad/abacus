@@ -1,12 +1,18 @@
 import { createContext } from "react";
 
 import type { ApiError } from "@/api/ApiResult";
-import type { CandidateNomination, ElectionSummary, SeatAssignment } from "@/types/generated/openapi";
+import type {
+  ApportionmentState,
+  CandidateNomination,
+  ElectionSummary,
+  SeatAssignment,
+} from "@/types/generated/openapi";
 
 export interface iElectionApportionmentProviderContext {
   seatAssignment?: SeatAssignment;
   candidateNomination?: CandidateNomination;
   electionSummary?: ElectionSummary;
+  state?: ApportionmentState;
   error?: ApiError;
 }
 

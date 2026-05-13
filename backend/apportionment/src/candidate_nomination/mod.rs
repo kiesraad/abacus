@@ -165,7 +165,7 @@ fn candidate_votes_meeting_preference_threshold<T: CandidateVotes>(
 ) -> Vec<&T> {
     let mut candidates_meeting_preference_threshold: Vec<&T> = candidate_votes
         .iter()
-        .filter(|candidate_votes| Fraction::from(candidate_votes.votes()) >= preference_threshold)
+        .filter(|candidate_votes| Fraction::from(candidate_votes.votes()) > preference_threshold)
         .collect();
     candidates_meeting_preference_threshold.sort_by_key(|b| std::cmp::Reverse(b.votes()));
     candidates_meeting_preference_threshold
@@ -253,7 +253,7 @@ fn update_candidate_ranking<T: CandidateVotes>(
     // Add the remaining candidates in the order of the original candidate list
     for candidate_votes in candidate_votes
         .iter()
-        .filter(|candidate_votes| Fraction::from(candidate_votes.votes()) < preference_threshold)
+        .filter(|candidate_votes| Fraction::from(candidate_votes.votes()) <= preference_threshold)
     {
         updated_candidate_ranking.push(candidate_votes.number());
     }
@@ -845,6 +845,34 @@ mod tests {
             &list_4_chosen_candidates,
             &list_4_not_chosen_candidates,
         );
+    }
+
+    /// Candidate nomination where a candidate has votes exactly equal to the preference threshold.
+    ///
+    /// A candidate must have strictly more votes than the threshold to qualify for preferential nomination.
+    ///
+    /// - 2 total seats, 200 total votes, quota is 100 votes, preference threshold is 50% so 50 votes
+    /// - List seats: [2]
+    /// - List 1: Preferential candidate nomination of candidate 1 (60 votes > threshold) only,
+    ///           candidate 2 (50 votes == threshold) is nominated via the 'other' route
+    #[test]
+    fn test_lt_19_seats_candidate_votes_equals_threshold() {
+        let quota = Fraction::new(100, 1);
+        let seat_assignment_input =
+            seat_assignment_fixture_with_given_candidate_votes(5, vec![vec![60, 50, 40, 30, 20]]);
+        let input = candidate_nomination_fixture_with_given_number_of_seats(
+            quota,
+            &seat_assignment_input,
+            vec![2],
+        );
+        let result = candidate_nomination(&input).unwrap();
+
+        assert_eq!(result.preference_threshold.percentage, 50);
+        assert_eq!(
+            result.preference_threshold.number_of_votes,
+            quota * Fraction::new(result.preference_threshold.percentage, 100)
+        );
+        check_list_candidate_nomination(&result.list_candidate_nomination[0], &[1], &[2], &[]);
     }
 
     /// Candidate nomination with more candidates eligible for preferential nomination than seats

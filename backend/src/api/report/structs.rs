@@ -366,7 +366,7 @@ impl ResultsInput {
 
         let overview_pdf = if self.committee_session.is_next_session() {
             let pdf_model = self.get_p2a_pdf_file(self.filename_for(FileType::GsbOverviewPdf));
-            let content: Vec<u8> = generate_pdf(&pdf_model).await?.buffer;
+            let content: Vec<u8> = generate_pdf(pdf_model).await?.buffer;
             Some(self.generated_file(FileType::GsbOverviewPdf, content))
         } else {
             None
@@ -402,7 +402,7 @@ impl ResultsInput {
                 self.filename_for(results_pdf_file_type),
             )?
         };
-        let results_pdf_content = generate_pdf(&results_pdf_model).await?.buffer;
+        let results_pdf_content = generate_pdf(results_pdf_model).await?.buffer;
         let results_pdf = self.generated_file(results_pdf_file_type, results_pdf_content);
 
         Ok(GsbGeneratedFiles {
@@ -441,7 +441,7 @@ impl ResultsInput {
             creation_date_time.clone(),
             self.filename_for(FileType::CsbResultsPdf),
         )?;
-        let results_pdf_content = generate_pdf(&results_pdf_model).await?.buffer;
+        let results_pdf_content = generate_pdf(results_pdf_model).await?.buffer;
         let results_pdf = self.generated_file(FileType::CsbResultsPdf, results_pdf_content);
 
         let attachment_pdf_model = self.get_p22_2_attachment_1_pdf_file(
@@ -449,7 +449,7 @@ impl ResultsInput {
             creation_date_time,
             self.filename_for(FileType::CsbAttachmentPdf),
         )?;
-        let attachment_pdf_content = generate_pdf(&attachment_pdf_model).await?.buffer;
+        let attachment_pdf_content = generate_pdf(attachment_pdf_model).await?.buffer;
         let attachment_pdf =
             self.generated_file(FileType::CsbAttachmentPdf, attachment_pdf_content);
 

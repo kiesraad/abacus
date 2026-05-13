@@ -35,7 +35,7 @@ async fn it_generates_a_pdf() {
     };
 
     let content = generate_pdf(
-        &ModelNa31_2Input {
+        ModelNa31_2Input {
             summary: ElectionSummary::zero().into(),
             votes_tables: VotesTables::new(&election, &ElectionSummary::zero()).unwrap(),
             committee_session: committee_session_fixture(ElectionId::from(1)),
@@ -73,7 +73,7 @@ async fn the_default_font_supports_teletex_chars() {
 
 #[test(tokio::test)]
 async fn it_generates_a_pdf_with_teletex_chars() {
-    let content = generate_pdf(&PdfFileModel {
+    let content = generate_pdf(PdfFileModel {
         file_name: "file.pdf".into(),
         model: PdfModel::TestTeletexCharset(),
     })
@@ -85,7 +85,7 @@ async fn it_generates_a_pdf_with_teletex_chars() {
 
 #[test(tokio::test)]
 async fn it_generates_a_pdf_with_unsupported_chars() {
-    let content = generate_pdf(&PdfFileModel {
+    let content = generate_pdf(PdfFileModel {
         file_name: "file.pdf".into(),
         model: PdfModel::TestUnsupportedChars(),
     })
@@ -102,7 +102,7 @@ async fn it_generates_a_pdf_with_polling_stations() {
     let summary = ElectionSummary::from_results(&election, &[]).unwrap();
 
     let content = generate_pdf(
-        &ModelNa31_2Input {
+        ModelNa31_2Input {
             votes_tables: VotesTables::new(&election, &summary).unwrap(),
             summary: summary.into(),
             polling_stations: polling_stations_fixture(&[100, 200, 300]),

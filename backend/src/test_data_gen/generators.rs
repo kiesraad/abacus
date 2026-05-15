@@ -165,7 +165,7 @@ async fn generate_csb_election_data(
             committee_session.id,
             number,
             &election.location,
-            CommitteeCategory::CSB,
+            CommitteeCategory::GSB,
         )
         .await
         .map_err(|e| format!("{e:?}"))?;

@@ -1,3 +1,4 @@
+import { stat } from "node:fs/promises";
 import { expect, request } from "@playwright/test";
 import { test } from "e2e-tests/fixtures";
 import { apiLogout, createUser, firstLogin, getTestPassword } from "e2e-tests/helpers-utils/e2e-test-api-helpers";
@@ -17,6 +18,7 @@ import { CheckAndSavePgObj } from "e2e-tests/page-objects/election/create/CheckA
 import { CommitteeCategoryPgObj } from "e2e-tests/page-objects/election/create/CommitteeCategoryPgObj.ts";
 import { ElectionDetailsPgObj } from "e2e-tests/page-objects/election/ElectionDetailsPgObj";
 import { ElectionHome } from "e2e-tests/page-objects/election/ElectionHomePgObj";
+import { ElectionReport } from "e2e-tests/page-objects/election/ElectionReportPgObj";
 import { ElectionStatus } from "e2e-tests/page-objects/election/ElectionStatusPgObj";
 import { ElectionsOverviewPgObj } from "e2e-tests/page-objects/election/ElectionsOverviewPgObj";
 import { FinishDataEntry } from "e2e-tests/page-objects/election/FinishDataEntryPgObj";
@@ -293,7 +295,9 @@ test.describe("full flow CSB", () => {
     await logout(page);
   });
 
-  test("finish session, check apportionment and download results", async ({ page }) => {
+  // eslint-disable-next-line playwright/no-skipped-test
+  test.skip("finish session, check apportionment and download results", async ({ page }) => {
+    // TODO: #3160 unskip test when apportionment deceased candidate flow is implemented
     await page.goto("/account/login");
 
     const loginPage = new LoginPgObj(page);
@@ -330,36 +334,36 @@ test.describe("full flow CSB", () => {
     await expect(apportionmentResidualSeatsPage.header).toBeVisible();
 
     await page.goBack();
-    // TODO: #3160 adjust when apportionment deceased candidate flow is implemented
-    // await expect(apportionmentPage.allSeatsAssignedAlert).toBeVisible();
-    // await apportionmentPage.toReport.click();
 
-    // const electionReportPage = new ElectionReport(page);
+    await expect(apportionmentPage.allSeatsAssignedAlert).toBeVisible();
+    await apportionmentPage.toReport.click();
 
-    // const resultsDownloadPromise = page.waitForEvent("download");
-    // await electionReportPage.downloadCSBResultsZip.click();
-    // const resultsDownload = await resultsDownloadPromise;
-    // expect(resultsDownload.suggestedFilename()).toMatch(
-    //   /vaststelling-uitslag_gr2022_test_gemeente_test-\d{8}-\d{6}.zip/,
-    // );
-    // expect((await stat(await resultsDownload.path())).size).toBeGreaterThan(1024);
+    const electionReportPage = new ElectionReport(page);
 
-    // const attachmentDownloadPromise = page.waitForEvent("download");
-    // await electionReportPage.downloadCSBAttachmentZip.click();
-    // const attachmentDownload = await attachmentDownloadPromise;
-    // expect(attachmentDownload.suggestedFilename()).toMatch(
-    //   /model-p22-2-bijlage_gr2022_test_gemeente_test-\d{8}-\d{6}.zip/,
-    // );
-    // expect((await stat(await attachmentDownload.path())).size).toBeGreaterThan(1024);
+    const resultsDownloadPromise = page.waitForEvent("download");
+    await electionReportPage.downloadCSBResultsZip.click();
+    const resultsDownload = await resultsDownloadPromise;
+    expect(resultsDownload.suggestedFilename()).toMatch(
+      /vaststelling-uitslag_gr2022_test_gemeente_test-\d{8}-\d{6}.zip/,
+    );
+    expect((await stat(await resultsDownload.path())).size).toBeGreaterThan(1024);
 
-    // const countsDownloadPromise = page.waitForEvent("download");
-    // await electionReportPage.downloadCSBCountsZip.click();
-    // const countsDownload = await countsDownloadPromise;
-    // expect(countsDownload.suggestedFilename()).toMatch(
-    //   /definitieve-documenten_gr2022_test_gemeente_test-\d{8}-\d{6}.zip/,
-    // );
-    // expect((await stat(await countsDownload.path())).size).toBeGreaterThan(1024);
+    const attachmentDownloadPromise = page.waitForEvent("download");
+    await electionReportPage.downloadCSBAttachmentZip.click();
+    const attachmentDownload = await attachmentDownloadPromise;
+    expect(attachmentDownload.suggestedFilename()).toMatch(
+      /model-p22-2-bijlage_gr2022_test_gemeente_test-\d{8}-\d{6}.zip/,
+    );
+    expect((await stat(await attachmentDownload.path())).size).toBeGreaterThan(1024);
 
-    // await logout(page);
+    const countsDownloadPromise = page.waitForEvent("download");
+    await electionReportPage.downloadCSBCountsZip.click();
+    const countsDownload = await countsDownloadPromise;
+    expect(countsDownload.suggestedFilename()).toMatch(
+      /definitieve-documenten_gr2022_test_gemeente_test-\d{8}-\d{6}.zip/,
+    );
+    expect((await stat(await countsDownload.path())).size).toBeGreaterThan(1024);
+
+    await logout(page);
   });
 });

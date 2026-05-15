@@ -83,9 +83,9 @@ mod tests {
             .unwrap();
 
         assert_eq!(list.len(), 2);
-        assert_eq!(list[1].sub_committee.id, created.sub_committee.id);
-        assert_eq!(list[1].sub_committee.name, "Test GSB");
-        assert_eq!(list[1].sub_committee.category, CommitteeCategory::GSB);
-        assert_eq!(list[1].data_entry_id, created.data_entry_id);
+        assert_eq!(list[0].sub_committee.id, created.sub_committee.id);
+        assert_eq!(list[0].sub_committee.name, "Test GSB");
+        assert_eq!(list[0].sub_committee.category, CommitteeCategory::GSB);
+        assert_eq!(list[0].data_entry_id, created.data_entry_id);
     }
 }

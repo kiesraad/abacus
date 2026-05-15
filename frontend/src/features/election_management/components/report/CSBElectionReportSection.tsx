@@ -16,15 +16,17 @@ interface CSBElectionReportSectionProps {
 }
 
 export function CSBElectionReportSection({ election, committeeSession, sessionLabel }: CSBElectionReportSectionProps) {
-  const { error, data: apportionmentState } = useApportionmentStateRequest(election.id);
+  const { requestState } = useApportionmentStateRequest(election.id);
 
-  if (error) {
-    throw error;
+  if ("error" in requestState) {
+    throw requestState.error;
   }
-  if (!apportionmentState) {
+
+  if (requestState.status === "loading") {
     return <Loader />;
   }
-  if (apportionmentState.type !== "Finalised") {
+
+  if (requestState.data.type !== "Finalised") {
     throw new ApplicationError(t("error.forbidden_message"), "InvalidCommitteeSessionStatus");
   }
 

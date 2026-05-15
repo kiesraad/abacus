@@ -1,0 +1,17 @@
+.container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.section {
+  display: flex;
+  flex-direction: row;
+  gap: 2rem;
+
+  nav {
+    padding: 0;
+    flex: 0 0 19.5rem;
+  }
+}

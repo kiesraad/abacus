@@ -3,6 +3,10 @@
     "singular": "Kandidaat",
     "plural": "Kandidaten"
   },
+  "deceased": {
+    "singular": "Overleden kandidaat",
+    "plural": "Overleden kandidaten"
+  },
   "Female": "v",
   "list": {
     "plural": "Kandidatenlijsten",

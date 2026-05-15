@@ -1,4 +1,4 @@
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
@@ -21,8 +21,15 @@ function getNumberOfSeatsAssignedSentence(seats: number, type: "residual_seat" |
 }
 
 export function ApportionmentPage() {
+  const navigate = useNavigate();
   const { currentCommitteeSession, election } = useElection();
   const { seatAssignment, candidateNomination, electionSummary, state, error } = useApportionmentContext();
+
+  if (state.type === "Uninitialised") {
+    void navigate(`/elections/${election.id}/apportionment/include-all-candidates`);
+  } else if (state.type === "RegisteringDeceasedCandidates") {
+    void navigate(`/elections/${election.id}/apportionment/deceased-candidates`);
+  }
 
   return (
     <>
@@ -36,7 +43,7 @@ export function ApportionmentPage() {
             candidateNomination &&
             electionSummary && (
               <>
-                {state?.type === "Finalised" && (
+                {state.type === "Finalised" && (
                   <FormLayout.Alert>
                     <Alert type="success">
                       <strong className="heading-md">{t("apportionment.all_seats_assigned")}</strong>

@@ -6,6 +6,7 @@
   "assigned_number_of_seats": "Toegewezen aantal zetels",
   "average": "Gemiddelde",
   "chosen_candidates": "Gekozen kandidaten",
+  "data_entry_finished": "Invoerfase afgerond",
   "details_residual_seats": "Verdeling van de restzetels",
   "details_full_seats": "Verdeling van de volle zetels",
   "election_summary": "Kengetallen",
@@ -23,6 +24,14 @@
   "how_many_residual_seats": "Hoeveel restzetels zijn er te verdelen?",
   "how_often_is_quota_met": "Hoe vaak haalde elke partij de kiesdeler?",
   "in_alphabetical_order": "In alfabetische volgorde",
+  "include_all_candidates": {
+    "description": "Voordat de zetelverdeling kan worden uitgevoerd, is het belangrijk dat de kandidatenlijst volledig en correct is. In de uitzonderlijke situatie dat een kandidaat is overleden, wordt deze buiten beschouwing gelaten bij het verdelen van de zetels.\n\nStemmen op de overleden kandidaat tellen wel mee als stemmen op zijn of haar partij. Dat staat zo in de Kieswet.",
+    "mandatory_question": "Deze vraag is verplicht",
+    "no": "Nee. Eén of meerdere kandidaten zijn overleden.",
+    "title": "Kunnen alle kandidaten worden meegenomen?",
+    "yes": "Ja. Er zijn geen kandidaten overleden."
+  },
+  "indicate_deceased_candidate": "Geef aan welke kandidaat of kandidaten als gevolg van overlijden bij de zetelverdeling buiten beschouwing moeten worden gelaten.",
   "information_highest_averages": "Er zijn 19 of meer zetels. Daarom worden restzetels toegewezen volgens het <strong>systeem van de grootste gemiddelden</strong>. De partij die na toewijzing van een restzetel het hoogste aantal stemmen per zetel heeft, krijgt de restzetel.\nIn de tabel is het gemiddeld aantal stemmen per zetel te vinden dat elke lijst zou krijgen als een restzetel zou worden toegekend.",
   "information_largest_remainders": "Er zijn minder dan 19 zetels. Daarom worden restzetels toegewezen volgens het <strong>systeem van de grootste overschotten</strong>. De restzetels zijn één voor één toegewezen aan de lijsten die na verdeling van de zetels het grootste overschot aan stemmen hebben. Lijsten die minder dan 75% van de kiesdeler hebben gehaald, komen niet in aanmerking voor een restzetel.",
   "list_assigned_nr_seats": {

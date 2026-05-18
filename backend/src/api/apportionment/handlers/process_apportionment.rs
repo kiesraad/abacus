@@ -71,7 +71,7 @@ pub async fn process_apportionment(
         )
         .await?;
 
-        let (_, state) = service::get_apportionment_state(&mut conn, user, election.id).await?;
+        let (_, state) = service::get_apportionment_state(&mut conn, election.id).await?;
         let summary = ElectionSummary::from_results(&election, &results)?;
         let input = ApportionmentInputData::new(
             election.number_of_seats,

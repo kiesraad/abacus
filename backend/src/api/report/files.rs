@@ -103,13 +103,13 @@ async fn generate_and_save_files_csb_election(
         ));
     }
 
+    let (_, state) = get_apportionment_state(conn, input.election.id).await?;
+
     let mut saver = FileSaver {
         conn,
         audit_service,
         input: &input,
     };
-
-    let (_, state) = get_apportionment_state(&mut conn, user, input.election.id).await?;
     let apportionment_input = ApportionmentInputData::new(
         input.election.number_of_seats,
         &input.summary.political_group_votes,

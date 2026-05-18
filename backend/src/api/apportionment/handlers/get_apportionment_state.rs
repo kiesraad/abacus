@@ -7,7 +7,7 @@ use sqlx::SqlitePool;
 use crate::{
     APIError, ErrorResponse,
     domain::{apportionment_state::ApportionmentState, election::ElectionId},
-    repository::user_repo::User,
+    repository::{election_repo, user_repo::User},
     service,
 };
 
@@ -34,7 +34,10 @@ pub async fn get_apportionment_state(
 ) -> Result<Json<ApportionmentState>, APIError> {
     let mut conn = pool.acquire().await?;
 
-    let (_, state) = service::get_apportionment_state(&mut conn, user, election_id).await?;
+    let election = election_repo::get(&mut conn, election_id).await?;
+    user.role().is_authorized(&election.committee_category)?;
+
+    let (_, state) = service::get_apportionment_state(&mut conn, election_id).await?;
 
     Ok(Json(state))
 }

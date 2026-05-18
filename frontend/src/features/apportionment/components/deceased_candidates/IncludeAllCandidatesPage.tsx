@@ -19,6 +19,47 @@ import { useApportionmentContext } from "../../hooks/useApportionmentContext";
 import { renderTitleAndHeader } from "../../utils/utils";
 import { ApportionmentError } from "../ApportionmentError";
 
+function renderForm(radioError: boolean, handleSubmit: (e: SubmitEvent<HTMLFormElement>) => void) {
+  return (
+    <Form
+      onSubmit={(e) => {
+        handleSubmit(e);
+      }}
+    >
+      <FormLayout>
+        <FormLayout.Section>
+          <div>
+            <h2>{t("apportionment.include_all_candidates.title")}</h2>
+            <p>{tx("apportionment.include_all_candidates.description")}</p>
+          </div>
+          <ChoiceList>
+            {radioError && (
+              <ChoiceList.Error id="include_all_candidates_error">
+                {t("apportionment.include_all_candidates.mandatory_question")}
+              </ChoiceList.Error>
+            )}
+            <ChoiceList.Radio
+              id="yes"
+              name="include_all_candidates"
+              label={t("apportionment.include_all_candidates.yes")}
+              value="yes"
+            />
+            <ChoiceList.Radio
+              id="no"
+              name="include_all_candidates"
+              label={t("apportionment.include_all_candidates.no")}
+              value="no"
+            />
+          </ChoiceList>
+        </FormLayout.Section>
+        <FormLayout.Controls>
+          <Button type="submit">{t("next")}</Button>
+        </FormLayout.Controls>
+      </FormLayout>
+    </Form>
+  );
+}
+
 export function IncludeAllCandidatesPage() {
   const navigate = useNavigate();
   const { election } = useElection();
@@ -33,7 +74,11 @@ export function IncludeAllCandidatesPage() {
 
   useEffect(() => {
     if (state.type === "RegisteringDeceasedCandidates") {
-      void navigate(`/elections/${election.id}/apportionment/deceased-candidates`);
+      if (state.deceased_candidates.length === 0) {
+        void navigate(`/elections/${election.id}/apportionment/deceased-candidates/add`);
+      } else {
+        void navigate(`/elections/${election.id}/apportionment/deceased-candidates`);
+      }
     } else if (state.type === "Finalised") {
       void navigate(`/elections/${election.id}/apportionment`);
     }
@@ -78,42 +123,9 @@ export function IncludeAllCandidatesPage() {
                     <p>{t("apportionment.make_apportionment_definitive")}</p>
                   </Alert>
                 </FormLayout.Alert>
-                <Form
-                  onSubmit={(e) => {
-                    void handleSubmit(e);
-                  }}
-                >
-                  <FormLayout>
-                    <FormLayout.Section>
-                      <div>
-                        <h2>{t("apportionment.include_all_candidates.title")}</h2>
-                        <p>{tx("apportionment.include_all_candidates.description")}</p>
-                      </div>
-                      <ChoiceList>
-                        {radioError && (
-                          <ChoiceList.Error id="include_all_candidates_error">
-                            {t("apportionment.include_all_candidates.mandatory_question")}
-                          </ChoiceList.Error>
-                        )}
-                        <ChoiceList.Radio
-                          id="yes"
-                          name="include_all_candidates"
-                          label={t("apportionment.include_all_candidates.yes")}
-                          value="yes"
-                        />
-                        <ChoiceList.Radio
-                          id="no"
-                          name="include_all_candidates"
-                          label={t("apportionment.include_all_candidates.no")}
-                          value="no"
-                        />
-                      </ChoiceList>
-                    </FormLayout.Section>
-                    <FormLayout.Controls>
-                      <Button type="submit">{t("next")}</Button>
-                    </FormLayout.Controls>
-                  </FormLayout>
-                </Form>
+                {renderForm(radioError, (e: SubmitEvent<HTMLFormElement>) => {
+                  void handleSubmit(e);
+                })}
               </>
             )
           )}

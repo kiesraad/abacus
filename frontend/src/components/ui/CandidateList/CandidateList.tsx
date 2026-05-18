@@ -13,12 +13,11 @@ interface CandidateListRowContentProps {
 function CandidateListRowContent({ candidate, isDeceased }: CandidateListRowContentProps): ReactNode {
   const name = getCandidateFullName(candidate);
   return (
-    // TODO: Fix superscript dagger
     <>
       <Table.NumberCell className="bold">{candidate.number}</Table.NumberCell>
       <Table.Cell className={isDeceased ? "bold" : ""}>
         {name}
-        {isDeceased && <sup>&nbsp;&dagger;</sup>}
+        {isDeceased && <span className="superscript">&nbsp;&nbsp;&dagger;</span>}
       </Table.Cell>
     </>
   );

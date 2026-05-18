@@ -19,8 +19,8 @@ export function AuthorizationGuard({ children }: AuthorizationGuardProps) {
 
   const routeMatch = matches[matches.length - 1];
   const isAuthenticated = user !== null;
-  const isPublic = routeMatch?.handle.public;
-  const isAllowed = isPublic || (user?.role && routeMatch?.handle.roles.includes(user.role));
+  const isPublic = routeMatch?.handle?.public;
+  const isAllowed = isPublic || (user?.role && routeMatch?.handle?.roles.includes(user.role));
   const accountRequiresSetup = isAuthenticated && (!user.fullname || user.needs_password_change);
 
   // if user is not allowed on this route

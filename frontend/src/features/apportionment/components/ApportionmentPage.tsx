@@ -22,7 +22,7 @@ function getNumberOfSeatsAssignedSentence(seats: number, type: "residual_seat" |
 
 export function ApportionmentPage() {
   const { currentCommitteeSession, election } = useElection();
-  const { seatAssignment, candidateNomination, electionSummary, state, error } = useApportionmentContext();
+  const { seatAssignment, candidateNomination, electionSummary, error } = useApportionmentContext();
 
   return (
     <>
@@ -36,8 +36,9 @@ export function ApportionmentPage() {
             candidateNomination &&
             electionSummary && (
               <>
-                {state?.type === "Finalised" && (
-                  <FormLayout.Alert>
+                {
+                  // TODO: #3160 enable this check when apportionment deceased candidate flow is implemented
+                  /* state?.type === "Finalised" && */ <FormLayout.Alert>
                     <Alert type="success">
                       <strong className="heading-md">{t("apportionment.all_seats_assigned")}</strong>
                       <p>{t("apportionment.make_apportionment_definitive")}</p>
@@ -46,7 +47,7 @@ export function ApportionmentPage() {
                       </Button.Link>
                     </Alert>
                   </FormLayout.Alert>
-                )}
+                }
                 <div className={cn(cls.tableDiv, "mb-lg")}>
                   <div>
                     <h2 className={cls.tableTitle}>{t("apportionment.election_summary")}</h2>

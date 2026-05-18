@@ -295,9 +295,7 @@ test.describe("full flow CSB", () => {
     await logout(page);
   });
 
-  // eslint-disable-next-line playwright/no-skipped-test
-  test.skip("finish session, check apportionment and download results", async ({ page }) => {
-    // TODO: #3160 unskip test when apportionment deceased candidate flow is implemented
+  test("finish session, check apportionment and download results", async ({ page }) => {
     await page.goto("/account/login");
 
     const loginPage = new LoginPgObj(page);

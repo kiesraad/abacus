@@ -88,7 +88,7 @@ function get_detailed_deceased_candidates(
           candidate: candidate,
           list_number: pg.number,
           list_name: pg.name,
-        } as DetailedDeceasedCandidate);
+        } satisfies DetailedDeceasedCandidate);
       }
     }
   });
@@ -144,7 +144,7 @@ export function DeceasedCandidatesPage() {
 
   return (
     <>
-      {renderTitleAndHeader(t("apportionment.title"))}
+      {renderTitleAndHeader(t("candidate.deceased.plural"))}
       <main>
         <article>
           {error ? (

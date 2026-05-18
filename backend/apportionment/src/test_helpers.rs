@@ -1,13 +1,15 @@
+use std::collections::{HashMap, HashSet};
+
+use super::{ListVotes, fraction::Fraction, structs::CandidateNominationInput};
 use crate::{
     ApportionmentInput, CandidateVotes, SeatAssignmentResult,
     candidate_nomination::{Candidate, ListCandidateNomination, candidate_votes_numbers},
 };
 
-use super::{ListVotes, fraction::Fraction, structs::CandidateNominationInput};
-
 pub struct ApportionmentInputMock {
     pub number_of_seats: u32,
     pub list_votes: Vec<ListVotesMock>,
+    pub deceased_candidates: HashMap<u32, HashSet<u32>>,
 }
 
 impl ApportionmentInput for ApportionmentInputMock {
@@ -19,6 +21,10 @@ impl ApportionmentInput for ApportionmentInputMock {
 
     fn list_votes(&self) -> &[Self::List] {
         &self.list_votes
+    }
+
+    fn deceased_candidates(&self) -> &HashMap<u32, HashSet<u32>> {
+        &self.deceased_candidates
     }
 }
 
@@ -164,6 +170,7 @@ pub fn candidate_nomination_fixture_with_given_number_of_seats(
     CandidateNominationInput {
         number_of_seats: seat_assignment_input.number_of_seats,
         list_votes: &seat_assignment_input.list_votes,
+        deceased_candidates: &seat_assignment_input.deceased_candidates,
         quota,
         total_seats_per_list: total_seats_per_list
             .into_iter()
@@ -183,6 +190,7 @@ pub fn candidate_nomination_fixture_with_given_list_numbers_and_number_of_seats(
     CandidateNominationInput {
         number_of_seats: seat_assignment_input.number_of_seats,
         list_votes: &seat_assignment_input.list_votes,
+        deceased_candidates: &seat_assignment_input.deceased_candidates,
         quota,
         total_seats_per_list: total_seats_per_list_number,
     }
@@ -209,6 +217,7 @@ pub fn seat_assignment_fixture_with_default_50_candidates(
     ApportionmentInputMock {
         number_of_seats,
         list_votes,
+        deceased_candidates: HashMap::new(),
     }
 }
 
@@ -228,6 +237,7 @@ pub fn seat_assignment_fixture_with_given_list_numbers_and_candidate_votes(
     ApportionmentInputMock {
         number_of_seats,
         list_votes,
+        deceased_candidates: HashMap::new(),
     }
 }
 
@@ -249,6 +259,7 @@ pub fn seat_assignment_fixture_with_given_candidate_votes(
     ApportionmentInputMock {
         number_of_seats,
         list_votes,
+        deceased_candidates: HashMap::new(),
     }
 }
 
@@ -276,5 +287,6 @@ pub fn seat_assignment_fixture_with_given_list_numbers_candidate_numbers_and_vot
     ApportionmentInputMock {
         number_of_seats,
         list_votes,
+        deceased_candidates: HashMap::new(),
     }
 }

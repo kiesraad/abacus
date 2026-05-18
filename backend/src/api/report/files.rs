@@ -19,7 +19,7 @@ use crate::{
         data_entry_repo::are_results_complete_for_committee_session,
         file_repo,
     },
-    service::list_polling_stations_for_session,
+    service::{get_apportionment_state, list_polling_stations_for_session},
 };
 
 struct FileSaver<'a> {
@@ -109,10 +109,12 @@ async fn generate_and_save_files_csb_election(
         input: &input,
     };
 
-    let apportionment_input = ApportionmentInputData {
-        number_of_seats: input.election.number_of_seats,
-        list_votes: &input.summary.political_group_votes,
-    };
+    let (_, state) = get_apportionment_state(&mut conn, user, input.election.id).await?;
+    let apportionment_input = ApportionmentInputData::new(
+        input.election.number_of_seats,
+        &input.summary.political_group_votes,
+        state.get_deceased_candidates(),
+    );
     let apportionment_result = apportionment::process(&apportionment_input)?;
 
     let generated_files = input.generate_csb_files(&apportionment_result).await?;

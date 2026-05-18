@@ -25,7 +25,7 @@
   "how_often_is_quota_met": "Hoe vaak haalde elke partij de kiesdeler?",
   "in_alphabetical_order": "In alfabetische volgorde",
   "include_all_candidates": {
-    "description": "Voordat de zetelverdeling kan worden uitgevoerd, is het belangrijk dat de kandidatenlijst volledig en correct is. In de uitzonderlijke situatie dat een kandidaat is overleden, wordt deze buiten beschouwing gelaten bij het verdelen van de zetels.\n\nStemmen op de overleden kandidaat tellen wel mee als stemmen op zijn of haar partij. Dat staat zo in de Kieswet.",
+    "description": "Voordat de zetelverdeling kan worden uitgevoerd, is het belangrijk dat de kandidatenlijst volledig en correct is. In de uitzonderlijke situatie dat een kandidaat is overleden, wordt deze buiten beschouwing gelaten bij het verdelen van de zetels.\n\nStemmen op de overleden kandidaat tellen wel mee als stemmen op diens partij. Dat staat zo in de Kieswet.",
     "mandatory_question": "Deze vraag is verplicht",
     "no": "Nee. Eén of meerdere kandidaten zijn overleden.",
     "title": "Kunnen alle kandidaten worden meegenomen?",

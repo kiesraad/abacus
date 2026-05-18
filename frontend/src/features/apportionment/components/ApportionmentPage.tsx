@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Link, useNavigate } from "react-router";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
@@ -25,11 +26,13 @@ export function ApportionmentPage() {
   const { currentCommitteeSession, election } = useElection();
   const { seatAssignment, candidateNomination, electionSummary, state, error } = useApportionmentContext();
 
-  if (state.type === "Uninitialised") {
-    void navigate(`/elections/${election.id}/apportionment/include-all-candidates`);
-  } else if (state.type === "RegisteringDeceasedCandidates") {
-    void navigate(`/elections/${election.id}/apportionment/deceased-candidates`);
-  }
+  useEffect(() => {
+    if (state.type === "Uninitialised") {
+      void navigate(`/elections/${election.id}/apportionment/include-all-candidates`);
+    } else if (state.type === "RegisteringDeceasedCandidates") {
+      void navigate(`/elections/${election.id}/apportionment/deceased-candidates`);
+    }
+  });
 
   return (
     <>

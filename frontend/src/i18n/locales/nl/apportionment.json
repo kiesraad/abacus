@@ -89,6 +89,7 @@
     "plural": "{num_seat} zetels werden als {type_seat} toegewezen"
   },
   "title": "Zetelverdeling",
+  "to_apportionment": "Naar zetelverdeling",
   "total": "Totaal",
   "total_number_assigned_full_seats": "Totaal aantal toegewezen volle zetels",
   "total_number_seats": "Totaal aantal zetels",
@@ -97,5 +98,6 @@
   "total_votes_cast_count": "Getelde stembiljetten",
   "turnout": "Opkomst",
   "view_details": "bekijk details",
-  "voters": "Kiesgerechtigden"
+  "voters": "Kiesgerechtigden",
+  "which_candidates_are_deceased": "Geef aan welke kandidaat of kandidaten als gevolg van overlijden bij de zetelverdeling buiten beschouwing moeten worden gelaten."
 }

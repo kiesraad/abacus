@@ -14,7 +14,7 @@ export interface iElectionApportionmentProviderContext {
   electionSummary?: ElectionSummary;
   state: ApportionmentState;
   error?: ApiError;
-  refetch: (controller?: AbortController) => Promise<ApiResult<ApportionmentState>>;
+  refetchState: (controller?: AbortController) => Promise<ApiResult<ApportionmentState>>;
 }
 
 export const ApportionmentProviderContext = createContext<iElectionApportionmentProviderContext | undefined>(undefined);

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 import { type AnyApiError, type ApiResult, isSuccess } from "@/api/ApiResult";
 import { useApiClient } from "@/api/useApiClient";
@@ -23,7 +23,7 @@ import cls from "./DeceasedCandidates.module.css";
 export function AddDeceasedCandidatePage() {
   const navigate = useNavigate();
   const { election } = useElection();
-  const { state, error, refetch } = useApportionmentContext();
+  const { state, error, refetchState } = useApportionmentContext();
   const [apiError, setApiError] = useState<AnyApiError>();
   const client = useApiClient();
   const params = useParams<{ listNumber: string }>();
@@ -36,11 +36,13 @@ export function AddDeceasedCandidatePage() {
     throw apiError;
   }
 
-  if (state.type === "Uninitialised") {
-    void navigate(`/elections/${election.id}/apportionment/include-all-candidates`);
-  } else if (state.type === "Finalised") {
-    void navigate(`/elections/${election.id}/apportionment`);
-  }
+  useEffect(() => {
+    if (state.type === "Uninitialised") {
+      void navigate(`/elections/${election.id}/apportionment/include-all-candidates`);
+    } else if (state.type === "Finalised") {
+      void navigate(`/elections/${election.id}/apportionment`);
+    }
+  });
 
   let deceasedCandidates: DeceasedCandidate[] | undefined;
   if (state.type !== "Uninitialised" && selectedList) {
@@ -53,7 +55,7 @@ export function AddDeceasedCandidatePage() {
     const response: ApiResult<ApportionmentState> = await client.postRequest(path, body);
 
     if (isSuccess(response)) {
-      void refetch();
+      void refetchState();
       void navigate(`/elections/${election.id}/apportionment/deceased-candidates`);
     } else {
       setApiError(response);

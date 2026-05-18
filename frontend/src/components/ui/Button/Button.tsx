@@ -8,6 +8,7 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   isDisabled?: boolean;
   isLoading?: boolean;
   variant?: ButtonVariant;
+  className?: string;
   size?: Size;
   type?: "submit" | "reset" | "button";
   leftIcon?: ReactNode;
@@ -19,6 +20,7 @@ export function Button({
   isDisabled,
   isLoading,
   variant = "primary",
+  className = "",
   size = "lg",
   type = "button",
   leftIcon,
@@ -28,7 +30,7 @@ export function Button({
 }: ButtonProps) {
   return (
     <button
-      className={`${cls.button || ""} ${cls[variant] || ""} ${cls[size] || ""}`}
+      className={`${cls.button || ""} ${cls[variant] || ""} ${cls[size] || ""} ${className}`}
       disabled={isDisabled || isLoading}
       type={type}
       {...htmlButtonProps}
@@ -43,13 +45,21 @@ export function Button({
 export interface ButtonLinkProps extends LinkProps {
   disabled?: boolean;
   variant?: ButtonVariant;
+  className?: string;
   size?: Size;
 }
 
-function ButtonLink({ disabled, variant = "primary", size = "md", children, ...linkProps }: ButtonLinkProps) {
-  const className = cn(cls.button, cls[variant], cls[size], "button", disabled ? cls.disabled : undefined);
+function ButtonLink({
+  disabled,
+  variant = "primary",
+  className = "",
+  size = "md",
+  children,
+  ...linkProps
+}: ButtonLinkProps) {
+  const classNames = cn(cls.button, cls[variant], cls[size], "button", disabled ? cls.disabled : undefined, className);
   return (
-    <Link className={className} {...linkProps}>
+    <Link className={classNames} {...linkProps}>
       {children}
     </Link>
   );
@@ -60,6 +70,7 @@ Button.Link = ButtonLink;
 export interface ButtonLabelProps extends LabelHTMLAttributes<HTMLLabelElement> {
   disabled?: boolean;
   variant?: ButtonVariant;
+  className?: string;
   size?: Size;
   htmlFor: string;
   children: ReactNode;
@@ -68,14 +79,15 @@ export interface ButtonLabelProps extends LabelHTMLAttributes<HTMLLabelElement> 
 function ButtonLabel({
   disabled,
   variant = "primary",
+  className = "",
   size = "md",
   htmlFor,
   children,
   ...labelProps
 }: ButtonLabelProps) {
-  const className = cn(cls.button, cls[variant], cls[size], disabled ? cls.disabled : undefined);
+  const classNames = cn(cls.button, cls[variant], cls[size], disabled ? cls.disabled : undefined, className);
   return (
-    <label className={className} htmlFor={htmlFor} {...labelProps}>
+    <label className={classNames} htmlFor={htmlFor} {...labelProps}>
       {children}
     </label>
   );

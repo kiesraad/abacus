@@ -1,4 +1,4 @@
-import { type SubmitEvent, useState } from "react";
+import { type SubmitEvent, useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { type AnyApiError, type ApiResult, isSuccess } from "@/api/ApiResult";
 import { useApiClient } from "@/api/useApiClient";
@@ -22,7 +22,7 @@ import { ApportionmentError } from "../ApportionmentError";
 export function IncludeAllCandidatesPage() {
   const navigate = useNavigate();
   const { election } = useElection();
-  const { state, error, refetch } = useApportionmentContext();
+  const { state, error, refetchState } = useApportionmentContext();
   const [apiError, setApiError] = useState<AnyApiError>();
   const [radioError, setRadioError] = useState(false);
   const client = useApiClient();
@@ -31,11 +31,13 @@ export function IncludeAllCandidatesPage() {
     throw apiError;
   }
 
-  if (state.type === "RegisteringDeceasedCandidates") {
-    void navigate(`/elections/${election.id}/apportionment/deceased-candidates/add`);
-  } else if (state.type === "Finalised") {
-    void navigate(`/elections/${election.id}/apportionment`);
-  }
+  useEffect(() => {
+    if (state.type === "RegisteringDeceasedCandidates") {
+      void navigate(`/elections/${election.id}/apportionment/deceased-candidates`);
+    } else if (state.type === "Finalised") {
+      void navigate(`/elections/${election.id}/apportionment`);
+    }
+  });
 
   async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -54,7 +56,7 @@ export function IncludeAllCandidatesPage() {
     const response: ApiResult<ApportionmentState> = await client.postRequest(path);
 
     if (isSuccess(response)) {
-      void refetch();
+      void refetchState();
     } else {
       setApiError(response);
     }

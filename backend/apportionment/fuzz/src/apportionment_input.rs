@@ -1,4 +1,7 @@
-use std::fmt;
+use std::{
+    collections::{HashMap, HashSet},
+    fmt,
+};
 
 use apportionment::CandidateVotes;
 use libfuzzer_sys::arbitrary::{Arbitrary, Result, Unstructured};
@@ -66,6 +69,7 @@ impl apportionment::ListVotes for SimpleListVotes {
 pub struct FuzzedApportionmentInput {
     pub seats: u32,
     pub list_votes: Vec<SimpleListVotes>,
+    pub deceased_candidates: HashMap<u32, HashSet<u32>>,
 }
 
 impl<'a> Arbitrary<'a> for FuzzedApportionmentInput {
@@ -98,7 +102,11 @@ impl<'a> Arbitrary<'a> for FuzzedApportionmentInput {
             list_votes.push(SimpleListVotes::new((list_idx + 1) as u32, candidate_votes));
         }
 
-        Ok(FuzzedApportionmentInput { seats, list_votes })
+        Ok(FuzzedApportionmentInput {
+            seats,
+            list_votes,
+            deceased_candidates: HashMap::new(),
+        })
     }
 }
 
@@ -111,6 +119,10 @@ impl apportionment::ApportionmentInput for FuzzedApportionmentInput {
 
     fn list_votes(&self) -> &[Self::List] {
         &self.list_votes
+    }
+
+    fn deceased_candidates(&self) -> &HashMap<u32, HashSet<u32>> {
+        &self.deceased_candidates
     }
 }
 

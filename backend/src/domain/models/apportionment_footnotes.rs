@@ -153,10 +153,8 @@ mod tests {
         );
         let list_votes =
             create_political_group_candidate_votes(&election.political_groups, &candidate_votes);
-        let apportionment_input = ApportionmentInputData {
-            number_of_seats: election.number_of_seats,
-            list_votes: list_votes.as_slice(),
-        };
+        let apportionment_input =
+            ApportionmentInputData::new(election.number_of_seats, list_votes.as_slice(), &[]);
         let apportionment_result =
             apportionment::process(&apportionment_input).expect("apportionment failed");
         let seat_assignment = map_seat_assignment(&apportionment_result.seat_assignment);
@@ -187,10 +185,8 @@ mod tests {
         );
         let list_votes =
             create_political_group_candidate_votes(&election.political_groups, &candidate_votes);
-        let apportionment_input = ApportionmentInputData {
-            number_of_seats: election.number_of_seats,
-            list_votes: list_votes.as_slice(),
-        };
+        let apportionment_input =
+            ApportionmentInputData::new(election.number_of_seats, list_votes.as_slice(), &[]);
         let apportionment_result =
             apportionment::process(&apportionment_input).expect("apportionment failed");
         let seat_assignment = map_seat_assignment(&apportionment_result.seat_assignment);
@@ -228,10 +224,8 @@ mod tests {
         );
         let list_votes =
             create_political_group_candidate_votes(&election.political_groups, &candidate_votes);
-        let apportionment_input = ApportionmentInputData {
-            number_of_seats: election.number_of_seats,
-            list_votes: list_votes.as_slice(),
-        };
+        let apportionment_input =
+            ApportionmentInputData::new(election.number_of_seats, list_votes.as_slice(), &[]);
         let apportionment_result =
             apportionment::process(&apportionment_input).expect("apportionment failed");
         let seat_assignment = map_seat_assignment(&apportionment_result.seat_assignment);

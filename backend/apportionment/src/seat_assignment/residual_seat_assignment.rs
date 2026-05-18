@@ -1,7 +1,11 @@
+use std::{cmp::Ordering, fmt::Debug};
+
+use tracing::{debug, info};
+
 use super::{
     super::{
         fraction::Fraction,
-        structs::{LARGE_COUNCIL_THRESHOLD, ListVotes},
+        structs::{DeceasedCandidates, LARGE_COUNCIL_THRESHOLD, ListVotes},
     },
     ApportionmentError, get_number_of_candidates, list_numbers,
     structs::{
@@ -9,8 +13,6 @@ use super::{
         RemainderAssignmentResult, SeatChange, SeatChangeStep,
     },
 };
-use std::{cmp::Ordering, fmt::Debug};
-use tracing::{debug, info};
 
 /// This function assigns the residual seats that remain after full seat assignment is finished.
 /// These residual seats are assigned through two different procedures,
@@ -21,7 +23,7 @@ pub fn assign_remainder<T: ListVotes>(
     total_residual_seats: u32,
     current_residual_seat_number: u32,
     previous_steps: &[SeatChangeStep<T::ListNumber>],
-    exclude_exhausted_lists: Option<&[T]>,
+    exclude_exhausted_lists: Option<(&[T], &DeceasedCandidates<T>)>,
 ) -> RemainderAssignmentResult<T::ListNumber> {
     let mut steps: Vec<SeatChangeStep<T::ListNumber>> = previous_steps.to_vec();
     let mut residual_seat_number = current_residual_seat_number;
@@ -30,9 +32,9 @@ pub fn assign_remainder<T: ListVotes>(
     while residual_seat_number != total_residual_seats {
         let residual_seats = total_residual_seats - residual_seat_number;
         residual_seat_number += 1;
-        let exhausted_list_numbers: Vec<T::ListNumber> = exclude_exhausted_lists
-            .map_or_else(Vec::new, |list_votes| {
-                list_numbers_without_empty_seats(current_standings.iter(), list_votes)
+        let exhausted_list_numbers: Vec<T::ListNumber> =
+            exclude_exhausted_lists.map_or_else(Vec::new, |(list_votes, deceased)| {
+                list_numbers_without_empty_seats(current_standings.iter(), list_votes, deceased)
             });
 
         let change = if seats >= LARGE_COUNCIL_THRESHOLD {
@@ -123,12 +125,14 @@ fn list_largest_remainder_assigned_seats<LN: Copy + Eq>(
 fn list_numbers_without_empty_seats<'a, T: ListVotes>(
     standings: impl Iterator<Item = &'a ListStanding<T::ListNumber>>,
     input_list_votes: &[T],
+    deceased_candidates: &DeceasedCandidates<T>,
 ) -> Vec<T::ListNumber>
 where
     T::ListNumber: 'a,
 {
     standings.fold(vec![], |mut list_numbers_without_empty_seats, s| {
-        let number_of_candidates = get_number_of_candidates(input_list_votes, s.list_number);
+        let number_of_candidates =
+            get_number_of_candidates(input_list_votes, s.list_number, deceased_candidates);
         if number_of_candidates.cmp(&s.total_seats()) == Ordering::Equal {
             list_numbers_without_empty_seats.push(s.list_number)
         }

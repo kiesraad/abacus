@@ -212,11 +212,12 @@ mod tests {
 
         // List 1: candidate 1 is deceased, so nobody meets the preference threshold.
         // The 7 nominated "other" candidates are the next 7 alive candidates by number.
+        // Expect updated ranking
         check_list_candidate_nomination(
             &result.candidate_nomination.list_candidate_nomination[0],
             &[],
             &[2, 3, 4, 5, 6, 7, 8],
-            &[],
+            &(2..=49).collect::<Vec<_>>(),
         );
         // Lists 2–8 unchanged.
         check_list_candidate_nomination(

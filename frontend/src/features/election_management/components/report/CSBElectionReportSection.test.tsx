@@ -51,7 +51,8 @@ describe("CSBElectionReportSection", () => {
     vi.spyOn(ReactRouter, "useParams").mockReturnValue({ committeeSessionId: "2" });
   });
 
-  test("Error when apportionment state is not Finalised", async () => {
+  // TODO: #3160 enable this test when check is enabled again
+  test.skip("Error when apportionment state is not Finalised", async () => {
     // error is expected
     vi.spyOn(console, "error").mockImplementation(() => {});
     const router = setupTestRouter([

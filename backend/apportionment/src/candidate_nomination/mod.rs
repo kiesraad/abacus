@@ -178,13 +178,14 @@ fn candidate_nomination_per_list<'a, T: ListVotes>(
 }
 
 /// List and sort the candidate votes whose votes meet the preference threshold
-fn candidate_votes_meeting_preference_threshold<T: CandidateVotes>(
+fn candidate_votes_meeting_preference_threshold<'a, T: CandidateVotes>(
     preference_threshold: Fraction,
-    candidate_votes: &[T],
-) -> Vec<&T> {
-    let mut candidates_meeting_preference_threshold: Vec<&T> = candidate_votes
+    candidate_votes: &[&'a T],
+) -> Vec<&'a T> {
+    let mut candidates_meeting_preference_threshold: Vec<&'a T> = candidate_votes
         .iter()
         .filter(|candidate_votes| Fraction::from(candidate_votes.votes()) > preference_threshold)
+        .copied()
         .collect();
     candidates_meeting_preference_threshold.sort_by_key(|b| std::cmp::Reverse(b.votes()));
     candidates_meeting_preference_threshold
@@ -212,7 +213,8 @@ fn other_candidate_nomination<'a, T: CandidateVotes>(
 
     candidate_votes
         .iter()
-        .filter_map(|&cv| (!preferential_candidate_nomination.contains(&cv)).then_some(cv))
+        .filter(|candidate_votes| !preferential_candidate_nomination.contains(candidate_votes))
+        .copied()
         .take(non_assigned_seats)
         .collect()
 }
@@ -516,7 +518,7 @@ mod tests {
 
     /// Candidate nomination with ranking change due to preferential candidate nomination and deceased candidates
     ///
-    /// Actual case from GR2022  
+    /// Actual case from GR2022 (excluding the deceased candidates)
     /// List seats: [8, 3, 2, 1, 1]  
     /// List 1: Preferential candidate nominations of candidates 1, 3, 2 and 4 and other candidate nominations of candidates 5, 6, 7 and 8  
     /// List 2: Preferential candidate nomination of candidate 1 and other candidate nomination of candidates 2 and 3  

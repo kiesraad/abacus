@@ -153,9 +153,15 @@ export function ApportionmentListDetailsPage() {
     return <ApportionmentErrorPage sectionTitle={listName} error={error} />;
   }
   if (seatAssignment && candidateNomination && electionSummary) {
-    const listTotalSeats = seatAssignment.final_standing[list.number - 1]?.total_seats;
-    const candidateVotesList = electionSummary.political_group_votes[list.number - 1]?.candidate_votes;
-    const listCandidateNomination = candidateNomination.list_candidate_nomination[list.number - 1];
+    const listTotalSeats = seatAssignment.final_standing.find(
+      (standing) => standing.list_number === list.number,
+    )?.total_seats;
+    const candidateVotesList = electionSummary.political_group_votes.find(
+      (pgv) => pgv.number === list.number,
+    )?.candidate_votes;
+    const listCandidateNomination = candidateNomination.list_candidate_nomination.find(
+      (lcn) => lcn.list_number === list.number,
+    );
 
     if (listTotalSeats !== undefined && candidateVotesList && listCandidateNomination) {
       let unelectedCandidatesRanking: Candidate[];

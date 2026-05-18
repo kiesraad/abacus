@@ -139,8 +139,9 @@ fn candidate_nomination_per_list<'a, T: ListVotes>(
         );
 
         // [Artikel P 19 Kieswet](https://wetten.overheid.nl/BWBR0004627/2026-01-01/#AfdelingII_HoofdstukP_Paragraaf3_ArtikelP19)
-        let updated_candidate_ranking = if candidate_votes_meeting_preference_threshold.is_empty()
-            || (input.number_of_seats >= LARGE_COUNCIL_THRESHOLD && list_seats == 0)
+        let updated_candidate_ranking = if input.deceased_candidates.get(&list.number()).is_none()
+            && (candidate_votes_meeting_preference_threshold.is_empty()
+                || (input.number_of_seats >= LARGE_COUNCIL_THRESHOLD && list_seats == 0))
         {
             vec![]
         } else {
@@ -152,7 +153,7 @@ fn candidate_nomination_per_list<'a, T: ListVotes>(
 
             // If the updated candidate ranking is the same as the original candidate list,
             // return an empty list, otherwise return the updated list
-            // TODO: Should we take this from list.candidate_votes()? It will always result into updated ranking if deceased candidates
+            // Note: we base this on the original list, so if there are deceased candidates, the ranking is always updated
             let original_ranking = list
                 .candidate_votes()
                 .iter()
@@ -513,6 +514,101 @@ mod tests {
         );
     }
 
+    /// Candidate nomination with ranking change due to preferential candidate nomination and deceased candidates
+    ///
+    /// Actual case from GR2022  
+    /// List seats: [8, 3, 2, 1, 1]  
+    /// List 1: Preferential candidate nominations of candidates 1, 3, 2 and 4 and other candidate nominations of candidates 5, 6, 7 and 8  
+    /// List 2: Preferential candidate nomination of candidate 1 and other candidate nomination of candidates 2 and 3  
+    /// List 3: Preferential candidate nomination of candidate 1 and other candidate nomination of candidate 2  
+    /// List 4: Preferential candidate nomination of candidate 1 and no other candidate nominations  
+    /// List 5: Preferential candidate nomination of candidate 1 and no other candidate nominations
+    #[test]
+    fn test_with_lt_19_seats_and_preferential_candidate_nomination_and_deceased_candidates() {
+        let quota = Fraction::new(5104, 15);
+        let mut seat_assignment_input = seat_assignment_fixture_with_given_candidate_votes(
+            15,
+            vec![
+                vec![1069, 303, 321, 210, 36, 101, 79, 121, 150, 149, 15, 17],
+                vec![
+                    452, 39, 81, 76, 35, 109, 29, 25, 17, 6, 18, 9, 25, 30, 5, 18, 3,
+                ],
+                vec![229, 63, 65, 9, 10, 58, 29, 50, 6, 11, 37],
+                vec![347, 33, 14, 82, 30, 30],
+                vec![266, 36, 39, 36, 38, 38],
+            ],
+        );
+        seat_assignment_input
+            .deceased_candidates
+            .insert(2, HashSet::from([3]));
+        let input = candidate_nomination_fixture_with_given_number_of_seats(
+            quota,
+            &seat_assignment_input,
+            vec![8, 3, 2, 1, 1],
+        );
+        let result = candidate_nomination(&input).unwrap();
+
+        assert_eq!(result.preference_threshold.percentage, 50);
+        assert_eq!(
+            result.preference_threshold.number_of_votes,
+            quota * Fraction::new(result.preference_threshold.percentage, 100)
+        );
+        check_list_candidate_nomination(
+            &result.list_candidate_nomination[0],
+            &[1, 3, 2, 4],
+            &[5, 6, 7, 8],
+            &[1, 3, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+        );
+        check_list_candidate_nomination(
+            &result.list_candidate_nomination[1],
+            &[1],
+            &[2, 4], // Instead of [2, 3]
+            &[1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
+        );
+        check_list_candidate_nomination(&result.list_candidate_nomination[2], &[1], &[2], &[]);
+        check_list_candidate_nomination(&result.list_candidate_nomination[3], &[1], &[], &[]);
+        check_list_candidate_nomination(&result.list_candidate_nomination[4], &[1], &[], &[]);
+
+        check_chosen_candidates(
+            &result.chosen_candidates,
+            input.list_votes[0].number,
+            &input.list_votes[0].candidate_votes[..8],
+            &input.list_votes[0].candidate_votes[9..],
+        );
+        check_chosen_candidates(
+            &result.chosen_candidates,
+            input.list_votes[1].number,
+            &[
+                &input.list_votes[1].candidate_votes[..2],
+                &input.list_votes[1].candidate_votes[3..4],
+            ]
+            .concat(),
+            &[
+                &input.list_votes[1].candidate_votes[2..3],
+                &input.list_votes[1].candidate_votes[4..],
+            ]
+            .concat(),
+        );
+        check_chosen_candidates(
+            &result.chosen_candidates,
+            input.list_votes[2].number,
+            &input.list_votes[2].candidate_votes[..2],
+            &input.list_votes[2].candidate_votes[3..],
+        );
+        check_chosen_candidates(
+            &result.chosen_candidates,
+            input.list_votes[3].number,
+            &input.list_votes[3].candidate_votes[..1],
+            &input.list_votes[3].candidate_votes[2..],
+        );
+        check_chosen_candidates(
+            &result.chosen_candidates,
+            input.list_votes[4].number,
+            &input.list_votes[4].candidate_votes[..1],
+            &input.list_votes[4].candidate_votes[2..],
+        );
+    }
+
     /// Candidate nomination with no preferential candidate nomination
     ///
     /// List seats: [1, 1, 1, 1, 1]  
@@ -557,6 +653,90 @@ mod tests {
             input.list_votes[0].number,
             &input.list_votes[0].candidate_votes[..1],
             &input.list_votes[0].candidate_votes[2..],
+        );
+        check_chosen_candidates(
+            &result.chosen_candidates,
+            input.list_votes[1].number,
+            &input.list_votes[1].candidate_votes[..1],
+            &input.list_votes[1].candidate_votes[2..],
+        );
+        check_chosen_candidates(
+            &result.chosen_candidates,
+            input.list_votes[2].number,
+            &input.list_votes[2].candidate_votes[..1],
+            &input.list_votes[2].candidate_votes[2..],
+        );
+        check_chosen_candidates(
+            &result.chosen_candidates,
+            input.list_votes[3].number,
+            &input.list_votes[3].candidate_votes[..1],
+            &input.list_votes[3].candidate_votes[2..],
+        );
+        check_chosen_candidates(
+            &result.chosen_candidates,
+            input.list_votes[4].number,
+            &input.list_votes[4].candidate_votes[..1],
+            &input.list_votes[4].candidate_votes[2..],
+        );
+    }
+
+    /// Candidate nomination with no preferential candidate nomination and deceased candidates
+    ///
+    /// List seats: [1, 1, 1, 1, 1]  
+    /// List 1: No preferential candidate nominations and other candidate nomination of candidate 1  
+    /// List 2: No preferential candidate nominations and other candidate nomination of candidate 1  
+    /// List 3: No preferential candidate nominations and other candidate nomination of candidate 1  
+    /// List 4: No preferential candidate nominations and other candidate nomination of candidate 1  
+    /// List 5: No preferential candidate nominations and other candidate nomination of candidate 1
+    #[test]
+    fn test_with_lt_19_seats_and_no_preferential_candidate_nomination_and_deceased_candidates() {
+        let quota = Fraction::new(105, 5);
+        let mut seat_assignment_input = seat_assignment_fixture_with_given_candidate_votes(
+            5,
+            vec![
+                vec![5, 4, 4, 4, 4],
+                vec![4, 5, 4, 4, 4],
+                vec![4, 4, 5, 4, 4],
+                vec![4, 4, 4, 5, 4],
+                vec![4, 4, 4, 4, 5],
+            ],
+        );
+        seat_assignment_input
+            .deceased_candidates
+            .insert(1, HashSet::from([1]));
+
+        let input = candidate_nomination_fixture_with_given_number_of_seats(
+            quota,
+            &seat_assignment_input,
+            vec![1, 1, 1, 1, 1],
+        );
+        let result = candidate_nomination(&input).unwrap();
+
+        assert_eq!(result.preference_threshold.percentage, 50);
+        assert_eq!(
+            result.preference_threshold.number_of_votes,
+            quota * Fraction::new(result.preference_threshold.percentage, 100)
+        );
+        check_list_candidate_nomination(
+            &result.list_candidate_nomination[0],
+            &[],
+            &[2],
+            &[2, 3, 4, 5],
+        );
+        check_list_candidate_nomination(&result.list_candidate_nomination[1], &[], &[1], &[]);
+        check_list_candidate_nomination(&result.list_candidate_nomination[2], &[], &[1], &[]);
+        check_list_candidate_nomination(&result.list_candidate_nomination[3], &[], &[1], &[]);
+        check_list_candidate_nomination(&result.list_candidate_nomination[4], &[], &[1], &[]);
+
+        check_chosen_candidates(
+            &result.chosen_candidates,
+            input.list_votes[0].number,
+            &input.list_votes[0].candidate_votes[1..2],
+            &[
+                &input.list_votes[0].candidate_votes[0..1],
+                &input.list_votes[0].candidate_votes[2..],
+            ]
+            .concat(),
         );
         check_chosen_candidates(
             &result.chosen_candidates,

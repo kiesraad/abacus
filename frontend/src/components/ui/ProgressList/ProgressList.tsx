@@ -31,6 +31,7 @@ export type ProgressListItemProps = {
   id?: string;
   scrollIntoView?: boolean;
   addSpace?: boolean;
+  onClick?: () => void;
 };
 
 ProgressList.Item = function ProgressListItem({
@@ -41,6 +42,7 @@ ProgressList.Item = function ProgressListItem({
   id,
   scrollIntoView,
   addSpace = false,
+  onClick,
 }: ProgressListItemProps) {
   const liRef = useRef<HTMLLIElement>(null);
 
@@ -54,8 +56,17 @@ ProgressList.Item = function ProgressListItem({
     <li
       ref={liRef}
       id={id}
-      className={cn(cls.item, { active: active }, status, { disabled: disabled }, addSpace && cls.addSpace)}
+      className={cn(
+        cls.item,
+        { active: active },
+        status,
+        { disabled: disabled },
+        addSpace && cls.addSpace,
+        onClick && cls.pointer,
+      )}
       aria-current={active ? "step" : false}
+      onClick={onClick}
+      onKeyDown={onClick} // TODO: Is this fine? Biome said "Enforce to have the onClick mouse event with the onKeyUp, the onKeyDown, or the onKeyPress keyboard event."
     >
       <aside>
         <StatusIcon status={active ? "active" : status} />

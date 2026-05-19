@@ -40,11 +40,6 @@ export const apportionmentRoutes: RouteObject[] = [
         handle: { roles: ["coordinator_csb"] },
       },
       {
-        path: "deceased-candidates/add/:listNumber",
-        Component: AddDeceasedCandidatePage,
-        handle: { roles: ["coordinator_csb"] },
-      },
-      {
         path: "deceased-candidates",
         Component: DeceasedCandidatesPage,
         handle: { roles: ["coordinator_csb"] },

@@ -33,6 +33,10 @@
 
     &.item:hover {
       background-color: var(--color-hover);
+      &.pointer {
+        cursor: pointer;
+      }
+
       &:has(div > a:focus),
       &:has(div > a:focus-visible) {
         background-color: var(--bg-gray);

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router";
+import { useNavigate } from "react-router";
 import { type AnyApiError, type ApiResult, isSuccess } from "@/api/ApiResult";
 import { useApiClient } from "@/api/useApiClient";
 import { StickyNav } from "@/components/ui/AppLayout/StickyNav";
@@ -12,9 +12,9 @@ import type {
   ADD_DECEASED_CANDIDATE_REQUEST_PATH,
   ApportionmentState,
   DeceasedCandidate,
+  PoliticalGroup,
 } from "@/types/generated/openapi";
 import { formatPoliticalGroupName } from "@/utils/politicalGroup";
-import { parseIntStrict } from "@/utils/strings";
 import { useApportionmentContext } from "../../hooks/useApportionmentContext";
 import { renderTitleAndHeader } from "../../utils/utils";
 import { ApportionmentError } from "../ApportionmentError";
@@ -25,12 +25,8 @@ export function AddDeceasedCandidatePage() {
   const { election } = useElection();
   const { state, error, refetchState } = useApportionmentContext();
   const [apiError, setApiError] = useState<AnyApiError>();
+  const [selectedList, setSelectedList] = useState<PoliticalGroup | undefined>(election.political_groups.at(0));
   const client = useApiClient();
-  const params = useParams<{ listNumber: string }>();
-  const listNumber = params.listNumber;
-  const selectedList = listNumber
-    ? election.political_groups.find((pg) => pg.number === parseIntStrict(listNumber))
-    : undefined;
 
   if (apiError) {
     throw apiError;
@@ -81,10 +77,11 @@ export function AddDeceasedCandidatePage() {
                           key={group.number}
                           status={"idle"}
                           active={group.number === selectedList?.number}
+                          onClick={() => {
+                            setSelectedList(group);
+                          }}
                         >
-                          <Link to={`/elections/${election.id}/apportionment/deceased-candidates/add/${group.number}`}>
-                            <span>{formatPoliticalGroupName(group)}</span>
-                          </Link>
+                          <span>{formatPoliticalGroupName(group)}</span>
                         </ProgressList.Item>
                       ))}
                     </ProgressList.Fixed>

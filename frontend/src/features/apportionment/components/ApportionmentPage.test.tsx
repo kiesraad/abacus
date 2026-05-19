@@ -38,8 +38,7 @@ const renderApportionmentPage = (withRouter: boolean) => {
 };
 
 describe("ApportionmentPage", () => {
-  // TODO: #3160 enable this test when alert check is enabled again
-  test.skip.each(
+  test.each(
     Object.values({
       Uninitialised: {
         state: { type: "Uninitialised" },

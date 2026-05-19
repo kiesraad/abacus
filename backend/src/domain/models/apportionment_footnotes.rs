@@ -154,7 +154,7 @@ mod tests {
         let list_votes =
             create_political_group_candidate_votes(&election.political_groups, candidate_votes);
         let apportionment_input =
-            ApportionmentInputData::new(election.number_of_seats, list_votes.as_slice(), &[]);
+            ApportionmentInputData::new(election.number_of_seats, &list_votes, &[]);
         let apportionment_result =
             apportionment::process(&apportionment_input).expect("apportionment failed");
         let seat_assignment = map_seat_assignment(&apportionment_result.seat_assignment);
@@ -176,17 +176,16 @@ mod tests {
         ];
         let election = election_fixture_with_given_number_of_seats(
             CommitteeCategory::CSB,
-            candidate_votes
+            &candidate_votes
                 .iter()
                 .map(|cv| u32::try_from(cv.len()).expect("Should fit in u32"))
-                .collect::<Vec<u32>>()
-                .as_slice(),
+                .collect::<Vec<u32>>(),
             15,
         );
         let list_votes =
             create_political_group_candidate_votes(&election.political_groups, candidate_votes);
         let apportionment_input =
-            ApportionmentInputData::new(election.number_of_seats, list_votes.as_slice(), &[]);
+            ApportionmentInputData::new(election.number_of_seats, &list_votes, &[]);
         let apportionment_result =
             apportionment::process(&apportionment_input).expect("apportionment failed");
         let seat_assignment = map_seat_assignment(&apportionment_result.seat_assignment);
@@ -215,17 +214,16 @@ mod tests {
         ];
         let election = election_fixture_with_given_number_of_seats(
             CommitteeCategory::CSB,
-            candidate_votes
+            &candidate_votes
                 .iter()
                 .map(|cv| u32::try_from(cv.len()).expect("Should fit in u32"))
-                .collect::<Vec<u32>>()
-                .as_slice(),
+                .collect::<Vec<u32>>(),
             19,
         );
         let list_votes =
             create_political_group_candidate_votes(&election.political_groups, candidate_votes);
         let apportionment_input =
-            ApportionmentInputData::new(election.number_of_seats, list_votes.as_slice(), &[]);
+            ApportionmentInputData::new(election.number_of_seats, &list_votes, &[]);
         let apportionment_result =
             apportionment::process(&apportionment_input).expect("apportionment failed");
         let seat_assignment = map_seat_assignment(&apportionment_result.seat_assignment);

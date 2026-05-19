@@ -28,12 +28,26 @@ pub fn assign_remainder<T: ListVotes>(
     let mut current_standings = initial_standings.to_vec();
 
     while residual_seat_number != total_residual_seats {
-        let residual_seats = total_residual_seats - residual_seat_number;
-        residual_seat_number += 1;
         let exhausted_list_numbers: Vec<T::ListNumber> = exclude_exhausted_lists
             .map_or_else(Vec::new, |list_votes| {
                 list_numbers_without_empty_seats(current_standings.iter(), list_votes)
             });
+
+        // Stop assigning when no list is eligible, either when every non-exhausted list has zero
+        // votes or every list is exhausted. Any remaining seats will be reported as unassigned.
+        let any_eligible = current_standings
+            .iter()
+            .any(|s| s.votes_cast > 0 && !exhausted_list_numbers.contains(&s.list_number));
+        if !any_eligible {
+            info!(
+                "No eligible lists remain, {} seat(s) left unassigned",
+                total_residual_seats - residual_seat_number
+            );
+            break;
+        }
+
+        let residual_seats = total_residual_seats - residual_seat_number;
+        residual_seat_number += 1;
 
         let change = if seats >= LARGE_COUNCIL_THRESHOLD {
             debug!("Assign residual seat using highest averages method");
@@ -180,14 +194,16 @@ fn list_qualifies_for_extra_seat<LN: Copy + Eq>(
 /// previously get a seat assigned are allowed to still get a seat through the remainder process,
 /// except when a seat was retracted.
 /// Additionally only lists that met the threshold are considered for this process.
-/// This also removes groups that do not have more candidates to be assigned seats.
+/// This also removes lists that do not have more candidates to be assigned seats,
+/// and lists with zero votes cast.
 fn list_standings_qualifying_for_largest_remainder<'a, LN: Copy + Eq>(
     standings: &'a [ListStanding<LN>],
     previous_steps: &'a [SeatChangeStep<LN>],
     exhausted_list_numbers: &[LN],
 ) -> impl Iterator<Item = &'a ListStanding<LN>> {
     standings.iter().filter(|&s| {
-        s.meets_remainder_threshold
+        s.votes_cast > 0
+            && s.meets_remainder_threshold
             && !exhausted_list_numbers.contains(&s.list_number)
             && list_qualifies_for_extra_seat(
                 list_largest_remainder_assigned_seats(previous_steps, s.list_number),
@@ -201,14 +217,15 @@ fn list_standings_qualifying_for_largest_remainder<'a, LN: Copy + Eq>(
 /// Get an iterator that lists all the lists that qualify for unique highest average.
 /// This checks the previously assigned seats to make sure that every list that already
 /// got a residual seat through the highest average procedure does not qualify
-/// except when a seat was retracted.
+/// except when a seat was retracted. Lists with zero votes cast are excluded.
 fn list_standings_qualifying_for_unique_highest_average<'a, LN: Copy + Eq>(
     standings: &'a [ListStanding<LN>],
     previous_steps: &'a [SeatChangeStep<LN>],
     exhausted_list_numbers: &[LN],
 ) -> impl Iterator<Item = &'a ListStanding<LN>> {
     standings.iter().filter(|&s| {
-        !exhausted_list_numbers.contains(&s.list_number)
+        s.votes_cast > 0
+            && !exhausted_list_numbers.contains(&s.list_number)
             && list_qualifies_for_extra_seat(
                 list_largest_remainder_assigned_seats(previous_steps, s.list_number),
                 Some(list_unique_highest_average_assigned_seats(
@@ -348,10 +365,11 @@ fn step_assign_remainder_using_highest_averages<'a, LN: Copy + Debug + Eq + 'a>(
     exhausted_list_numbers: &[LN],
     unique: bool,
 ) -> Result<SeatChange<LN>, ApportionmentError> {
-    // Get an iterator that lists all the list standings without exhausted lists.
+    // Get an iterator that lists all the list standings without exhausted lists
+    // and without lists that have zero votes cast.
     let mut qualifying_for_highest_average = standings
         .into_iter()
-        .filter(|&s| !exhausted_list_numbers.contains(&s.list_number))
+        .filter(|&s| s.votes_cast > 0 && !exhausted_list_numbers.contains(&s.list_number))
         .peekable();
 
     if qualifying_for_highest_average.peek().is_some() {
@@ -379,8 +397,8 @@ fn step_assign_remainder_using_highest_averages<'a, LN: Copy + Debug + Eq + 'a>(
             Ok(SeatChange::HighestAverageAssignment(assigned_seat))
         }
     } else {
-        info!("Seat cannot be (re)assigned because all lists are exhausted");
-        Err(ApportionmentError::AllListsExhausted)
+        // Unreachable: `assign_remainder` breaks the loop before this can be reached
+        unreachable!("step_assign_remainder_using_highest_averages called with no eligible lists")
     }
 }
 

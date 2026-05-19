@@ -23,6 +23,9 @@ function getNumberOfSeatsAssignedSentence(seats: number, type: "residual_seat" |
 export function ApportionmentPage() {
   const { currentCommitteeSession, election } = useElection();
   const { seatAssignment, candidateNomination, electionSummary, error } = useApportionmentContext();
+  const unassignedSeats = seatAssignment
+    ? seatAssignment.seats - seatAssignment.full_seats - seatAssignment.residual_seats
+    : 0;
 
   return (
     <>
@@ -39,8 +42,14 @@ export function ApportionmentPage() {
                 {
                   // TODO: #3160 enable this check when apportionment deceased candidate flow is implemented
                   /* state?.type === "Finalised" && */ <FormLayout.Alert>
-                    <Alert type="success">
-                      <strong className="heading-md">{t("apportionment.all_seats_assigned")}</strong>
+                    <Alert type={unassignedSeats > 0 ? "warning" : "success"}>
+                      <strong className="heading-md">
+                        {t(
+                          unassignedSeats > 0
+                            ? "apportionment.not_all_seats_assigned"
+                            : "apportionment.all_seats_assigned",
+                        )}
+                      </strong>
                       <p>{t("apportionment.make_apportionment_definitive")}</p>
                       <Button.Link to={`../report/committee-session/${currentCommitteeSession.id}/download`} size="md">
                         {t("election_management.to_report")}

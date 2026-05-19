@@ -10,9 +10,7 @@ pub(crate) const LARGE_COUNCIL_THRESHOLD: u32 = 19;
 /// Errors that can occur during apportionment
 #[derive(Debug, PartialEq)]
 pub enum ApportionmentError {
-    AllListsExhausted,
     DrawingOfLotsNotImplemented,
-    ZeroVotesCast,
 }
 
 pub trait ApportionmentInput {

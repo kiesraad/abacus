@@ -647,10 +647,10 @@ pub(crate) mod tests {
                 test_helpers::seat_assignment_fixture_with_given_candidate_votes,
             };
 
-            /// Apportionment with no residual seats
+            /// Apportionment with no residual seats  
             /// This test triggers Kieswet Article P 10
             ///
-            /// Full seats: [5, 4, 3, 2, 1] - Remainder seats: 0
+            /// Full seats: [5, 4, 3, 2, 1] - Remainder seats: 0  
             /// 1 - Seat first assigned to list 1 has been removed and
             ///     will be assigned to another list in accordance with Article P 10 Kieswet  
             /// Remainders: [0/15, 0/15, 0/15, 0/15, 0/15]  
@@ -694,7 +694,7 @@ pub(crate) mod tests {
             /// 5 - largest remainder: seat assigned to list 1  
             /// 6 - largest remainder: seat assigned to list 4  
             /// 7 - Seat first assigned to list 10 has been removed and
-            ///     will be assigned to another list in accordance with Article P 10 Kieswet    
+            ///     will be assigned to another list in accordance with Article P 10 Kieswet  
             /// 8 - largest remainder: seat assigned to list 6
             #[test]
             fn test_with_list_exhaustion_during_residual_seats_assignment_with_largest_remainders_method()
@@ -960,7 +960,7 @@ pub(crate) mod tests {
             /// Full seats: [3, 4, 0] - Remainder seats: 1  
             /// Remainders: [2, 1, 7], only votes of lists [1, 2] meet the threshold of 75% of the quota  
             /// 1 - largest remainder: seat assigned to list 1  
-            /// 2 - Seat first assigned to list 1 has been re-assigned to list 2 in accordance with Article P 9 Kieswet    
+            /// 2 - Seat first assigned to list 1 has been re-assigned to list 2 in accordance with Article P 9 Kieswet  
             /// 3 - Seat first assigned to list 2 has been removed and
             ///     will be assigned to another list in accordance with Article P 10 Kieswet  
             /// 4 - Seat first assigned to list 2 has been removed and
@@ -1011,7 +1011,7 @@ pub(crate) mod tests {
             /// Full seats: [2, 1, 5] - Remainder seats: 1  
             /// Remainders: [50 4/8, 10, 61 1/8], only votes of lists [1, 3] meet the threshold of 75% of the quota  
             /// 1 - largest remainder: seat assigned to list 3  
-            /// 2 - Seat first assigned to list 3 has been re-assigned to list 1 in accordance with Article P 9 Kieswet    
+            /// 2 - Seat first assigned to list 3 has been re-assigned to list 1 in accordance with Article P 9 Kieswet  
             /// 3 - Seat first assigned to list 1 has been removed and
             ///     will be assigned to another list in accordance with Article P 10 Kieswet  
             /// 4 - Seat first assigned to list 1 has been removed and
@@ -1119,18 +1119,18 @@ pub(crate) mod tests {
 
             /// Apportionment where deceased candidates cause a list to be exhausted.
             ///
-            /// 15 seats, quota = 1500 / 15 = 100.
-            /// Votes: list 1 = 610, list 2 = 520, list 3 = 370.
-            /// Full seats: [6, 5, 3] - Remainder seats: 1
+            /// 15 seats, quota = 1500 / 15 = 100.  
+            /// Votes: list 1 = 610, list 2 = 520, list 3 = 370.  
+            /// Full seats: [6, 5, 3] - Remainder seats: 1  
             /// Remainders: [10, 20, 70], all lists meet the 3/4 quota threshold.
             ///
-            /// 1 - largest remainder: seat assigned to list 3 (remainder 70).
+            /// 1 - largest remainder: seat assigned to list 3 (remainder 70).  
             /// Initial distribution: [6, 5, 4].
             ///
             /// Marking candidate 6 of list 1 as deceased leaves 5 alive for 6 assigned
-            /// seats, triggering article P 10:
+            /// seats, triggering article P 10:  
             /// 2 - list 1 has one seat retracted (was a full seat, since list 1 has no
-            ///     residual seats).
+            ///     residual seats).  
             /// 3 - largest remainder reassigns to list 2 (list 3 already got a LR
             ///     seat in step 1, so it no longer qualifies).
             ///
@@ -1390,7 +1390,7 @@ pub(crate) mod tests {
                 test_helpers::seat_assignment_fixture_with_given_candidate_votes,
             };
 
-            /// Apportionment with no residual seats
+            /// Apportionment with no residual seats  
             /// This test triggers Kieswet Article P 10
             ///
             /// Full seats: [5, 5, 4, 4, 2] - Remainder seats: 0  
@@ -1569,19 +1569,19 @@ pub(crate) mod tests {
             /// Apportionment where deceased candidates cause a list to be exhausted
             /// in a council with >=19 seats (residual assignment via highest averages).
             ///
-            /// 20 seats, quota = 2000 / 20 = 100.
-            /// Votes: list 1 = 810, list 2 = 620, list 3 = 570.
-            /// Full seats: [8, 6, 5] - Remainder seats: 1
+            /// 20 seats, quota = 2000 / 20 = 100.  
+            /// Votes: list 1 = 810, list 2 = 620, list 3 = 570.  
+            /// Full seats: [8, 6, 5] - Remainder seats: 1  
             /// Next averages: list 1 = 810/9 = 90, list 2 = 620/7 ≈ 88.57,
             /// list 3 = 570/6 = 95.
             ///
-            /// 1 - highest average: seat assigned to list 3 (95).
+            /// 1 - highest average: seat assigned to list 3 (95).  
             /// Initial distribution: [8, 6, 6].
             ///
             /// Marking candidate 8 of list 1 as deceased leaves 7 alive for 8 assigned
-            /// seats, triggering article P 10:
+            /// seats, triggering article P 10:  
             /// 2 - list 1 has one seat retracted (was a full seat, since list 1 has no
-            ///     residual seats).
+            ///     residual seats).  
             /// 3 - highest average reassigns to list 2 (list 1 is exhausted; list 3's
             ///     next average is now 570/7 ≈ 81.43, list 2's is 620/7 ≈ 88.57).
             ///

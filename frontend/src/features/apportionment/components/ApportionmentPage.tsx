@@ -7,7 +7,7 @@ import { useElection } from "@/hooks/election/useElection";
 import { t } from "@/i18n/translate";
 import { cn } from "@/utils/classnames";
 import { useApportionmentContext } from "../hooks/useApportionmentContext";
-import { renderTitleAndHeader } from "../utils/utils";
+import { checkStateAndRedirect, renderTitleAndHeader } from "../utils/utils";
 import cls from "./Apportionment.module.css";
 import { ApportionmentError } from "./ApportionmentError";
 import { ApportionmentTable } from "./ApportionmentTable";
@@ -27,11 +27,7 @@ export function ApportionmentPage() {
   const { seatAssignment, candidateNomination, electionSummary, state, error } = useApportionmentContext();
 
   useEffect(() => {
-    if (state.type === "Uninitialised") {
-      void navigate(`/elections/${election.id}/apportionment/include-all-candidates`);
-    } else if (state.type === "RegisteringDeceasedCandidates") {
-      void navigate(`/elections/${election.id}/apportionment/deceased-candidates`);
-    }
+    checkStateAndRedirect(state, election.id, navigate);
   });
 
   return (

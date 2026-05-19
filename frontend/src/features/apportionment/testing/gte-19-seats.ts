@@ -1,5 +1,6 @@
 import type {
   CandidateNomination,
+  CommitteeSession,
   ElectionSummary,
   ElectionWithPoliticalGroups,
   SeatAssignment,
@@ -1365,6 +1366,15 @@ export const election_summary: ElectionSummary = {
       ],
     },
   ],
+};
+
+export const committee_session: CommitteeSession = {
+  id: 2,
+  number: 1,
+  election_id: 2,
+  status: "completed",
+  location: "",
+  start_date_time: "",
 };
 
 export const election: ElectionWithPoliticalGroups = {

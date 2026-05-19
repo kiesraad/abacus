@@ -18,7 +18,6 @@ import type {
   PoliticalGroup,
 } from "@/types/generated/openapi";
 import { getCandidateFullName } from "@/utils/candidate";
-import { cn } from "@/utils/classnames";
 import { getPoliticalGroupName } from "@/utils/politicalGroup";
 import { useApportionmentContext } from "../../hooks/useApportionmentContext";
 import { renderTitleAndHeader } from "../../utils/utils";
@@ -159,18 +158,21 @@ export function DeceasedCandidatesPage() {
                       deceasedCandidates,
                       (candidateNumber, pgNumber) => void handleDeleteDeceasedCandidate(candidateNumber, pgNumber),
                     )}
-                  <Button.Link
-                    variant="underlined"
-                    className={cn(cls.addLink)}
-                    size="md"
-                    to={`/elections/${election.id}/apportionment/deceased-candidates/add`}
-                  >
-                    {`+ ${t("candidate.add")}`}
-                  </Button.Link>
+                  <div className="ml-md-lg">
+                    <Button.Link
+                      variant="underlined"
+                      size="md"
+                      to={`/elections/${election.id}/apportionment/deceased-candidates/add`}
+                    >
+                      {`+ ${t("candidate.add")}`}
+                    </Button.Link>
+                  </div>
                 </div>
-                <Button className="mt-md" onClick={() => void handleFinaliseDeceasedCandidates()}>
-                  {t("apportionment.to_apportionment")}
-                </Button>
+                <div className="mt-md">
+                  <Button onClick={() => void handleFinaliseDeceasedCandidates()}>
+                    {t("apportionment.to_apportionment")}
+                  </Button>
+                </div>
               </div>
             )
           )}

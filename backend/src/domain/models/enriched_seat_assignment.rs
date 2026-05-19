@@ -323,11 +323,10 @@ mod tests {
         ];
         let election = election_fixture_with_given_number_of_seats(
             CommitteeCategory::CSB,
-            candidate_votes
+            &candidate_votes
                 .iter()
                 .map(|cv| u32::try_from(cv.len()).expect("Should fit in u32"))
-                .collect::<Vec<u32>>()
-                .as_slice(),
+                .collect::<Vec<u32>>(),
             10,
         );
         let political_groups = &election.political_groups;
@@ -335,7 +334,7 @@ mod tests {
         let summary_csb = ElectionSummaryCSB::new(&summary, political_groups);
         let apportionment_input = ApportionmentInputData::new(
             election.number_of_seats,
-            summary.political_group_votes.as_slice(),
+            &summary.political_group_votes,
             &[],
         );
         let apportionment_result =
@@ -442,11 +441,10 @@ mod tests {
         ];
         let election = election_fixture_with_given_number_of_seats(
             CommitteeCategory::CSB,
-            candidate_votes
+            &candidate_votes
                 .iter()
                 .map(|cv| u32::try_from(cv.len()).expect("Should fit in u32"))
-                .collect::<Vec<u32>>()
-                .as_slice(),
+                .collect::<Vec<u32>>(),
             24,
         );
         let political_groups = &election.political_groups;
@@ -454,7 +452,7 @@ mod tests {
         let summary_csb = ElectionSummaryCSB::new(&summary, political_groups);
         let apportionment_input = ApportionmentInputData::new(
             election.number_of_seats,
-            summary.political_group_votes.as_slice(),
+            &summary.political_group_votes,
             &[],
         );
         let apportionment_result =
@@ -529,11 +527,10 @@ mod tests {
         ];
         let election = election_fixture_with_given_number_of_seats(
             CommitteeCategory::CSB,
-            candidate_votes
+            &candidate_votes
                 .iter()
                 .map(|cv| u32::try_from(cv.len()).expect("Should fit in u32"))
-                .collect::<Vec<u32>>()
-                .as_slice(),
+                .collect::<Vec<u32>>(),
             15,
         );
         let political_groups = &election.political_groups;
@@ -541,7 +538,7 @@ mod tests {
         let summary_csb = ElectionSummaryCSB::new(&summary, political_groups);
         let apportionment_input = ApportionmentInputData::new(
             election.number_of_seats,
-            summary.political_group_votes.as_slice(),
+            &summary.political_group_votes,
             &[],
         );
         let apportionment_result =

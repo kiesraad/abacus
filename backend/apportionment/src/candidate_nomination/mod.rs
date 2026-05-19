@@ -518,7 +518,7 @@ mod tests {
 
     /// Candidate nomination with ranking change due to preferential candidate nomination and deceased candidates
     ///
-    /// Actual case from GR2022 (excluding the deceased candidates)
+    /// Actual case from GR2022 (excluding the deceased candidates)  
     /// List seats: [8, 3, 2, 1, 1]  
     /// List 1: Preferential candidate nominations of candidates 1, 3, 2 and 4 and other candidate nominations of candidates 5, 6, 7 and 8  
     /// List 2: Preferential candidate nomination of candidate 1 and other candidate nomination of candidates 2 and 3  

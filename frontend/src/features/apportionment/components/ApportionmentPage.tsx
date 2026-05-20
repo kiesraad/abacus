@@ -55,7 +55,7 @@ export function ApportionmentPage() {
                       votesCounts={electionSummary.votes_counts}
                       seats={seatAssignment.seats}
                       quota={seatAssignment.quota}
-                      numberOfVoters={election.number_of_voters}
+                      numberOfVoters={electionSummary.number_of_voters}
                       preferenceThreshold={candidateNomination.preference_threshold}
                     />
                   </div>

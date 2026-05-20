@@ -108,6 +108,18 @@ impl ApportionmentState {
         }
     }
 
+    pub fn get_deceased_candidates(&self) -> &[DeceasedCandidate] {
+        match self {
+            Self::Uninitialised => &[],
+            Self::RegisteringDeceasedCandidates {
+                deceased_candidates,
+            } => deceased_candidates,
+            Self::Finalised {
+                deceased_candidates,
+            } => deceased_candidates,
+        }
+    }
+
     pub fn add_deceased_candidate(
         self,
         candidate: DeceasedCandidate,

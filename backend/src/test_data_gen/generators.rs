@@ -471,24 +471,24 @@ async fn generate_gsb_data_entry(
             ));
 
             // Validate the generated results to catch issues early
-            let finalised_with_warnings: bool;
-            match results.validate(election, &FieldPath::new("data".to_string())) {
-                Ok(vr) => {
-                    if vr.has_errors() {
+            let finalised_with_warnings =
+                match results.validate(election, &FieldPath::new("data".to_string())) {
+                    Ok(vr) => {
+                        if vr.has_errors() {
+                            panic!(
+                                "Generated invalid results for polling station {}: {:?}",
+                                ps.number, vr.errors
+                            );
+                        }
+                        vr.has_warnings()
+                    }
+                    Err(e) => {
                         panic!(
-                            "Generated invalid results for polling station {}: {:?}",
-                            ps.number, vr.errors
+                            "Failed to validate generated results for polling station {}: {}",
+                            ps.number, e
                         );
                     }
-                    finalised_with_warnings = vr.has_warnings();
-                }
-                Err(e) => {
-                    panic!(
-                        "Failed to validate generated results for polling station {}: {}",
-                        ps.number, e
-                    );
-                }
-            }
+                };
 
             if rng.random_ratio(second_entry_chance, 100) {
                 // generate a definitive data entry
@@ -578,24 +578,24 @@ async fn generate_csb_data_entry(
         };
 
         // Validate the generated results to catch issues early
-        let finalised_with_warnings: bool;
-        match results.validate(election, &FieldPath::new("data".to_string())) {
-            Ok(vr) => {
-                if vr.has_errors() {
+        let finalised_with_warnings =
+            match results.validate(election, &FieldPath::new("data".to_string())) {
+                Ok(vr) => {
+                    if vr.has_errors() {
+                        panic!(
+                            "Generated invalid results for sub committee number {}: {:?}",
+                            sub_committee_first_session.sub_committee.number, vr.errors
+                        );
+                    }
+                    vr.has_warnings()
+                }
+                Err(e) => {
                     panic!(
-                        "Generated invalid results for sub committee number {}: {:?}",
-                        sub_committee_first_session.sub_committee.number, vr.errors
+                        "Failed to validate generated results for sub committee number {}: {}",
+                        sub_committee_first_session.sub_committee.number, e
                     );
                 }
-                finalised_with_warnings = vr.has_warnings();
-            }
-            Err(e) => {
-                panic!(
-                    "Failed to validate generated results for sub committee number {}: {}",
-                    sub_committee_first_session.sub_committee.number, e
-                );
-            }
-        }
+            };
 
         if rng.random_ratio(second_entry_chance, 100) {
             // generate a definitive data entry

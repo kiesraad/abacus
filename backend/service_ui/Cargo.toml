@@ -1,0 +1,15 @@
+[package]
+name = "service_ui"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+eframe = "0.34.2"
+systemctl = "0.5.0"
+windows-service = "0.8.1"
+windows-sys = { version = "0.61.2", default-features = false }
+
+[lints]
+workspace = true

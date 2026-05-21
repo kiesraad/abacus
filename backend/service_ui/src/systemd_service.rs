@@ -1,3 +1,5 @@
+use std::process::Command;
+
 use crate::common_service::{Service, ServiceError, ServiceState};
 use systemctl;
 pub struct SystemdService {

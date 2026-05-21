@@ -947,10 +947,8 @@ export interface ElectionWithPoliticalGroups {
 export const errorReferenceValues = [
   "AirgapViolation",
   "AlreadyInitialised",
-  "ApportionmentAllListsExhausted",
   "ApportionmentCommitteeSessionNotCompleted",
   "ApportionmentDrawingOfLotsRequired",
-  "ApportionmentZeroVotesCast",
   "CommitteeSessionPaused",
   "DatabaseError",
   "DataEntryAlreadyClaimed",

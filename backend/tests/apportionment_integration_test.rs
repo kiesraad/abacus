@@ -165,7 +165,7 @@ async fn test_gte_19_seats(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_10_csb", "users"))))]
-async fn test_error_all_lists_exhausted(pool: SqlitePool) {
+async fn test_unassigned_seats(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     create_gsb_result(&addr, 1001, 10).await;
@@ -175,12 +175,13 @@ async fn test_error_all_lists_exhausted(pool: SqlitePool) {
         .await;
 
     let response = get_apportionment(&addr, 10).await;
-    assert_eq!(response.status(), StatusCode::UNPROCESSABLE_ENTITY);
+    assert_eq!(response.status(), StatusCode::OK);
     let body: serde_json::Value = response.json().await.unwrap();
-    assert_eq!(
-        body["error"],
-        "All lists are exhausted, not enough candidates to fill all seats"
-    );
+    assert_eq!(body["seat_assignment"]["seats"], 29);
+    assert_eq!(body["seat_assignment"]["full_seats"], 4);
+    assert_eq!(body["seat_assignment"]["residual_seats"], 0);
+    let total_seats = get_total_seats_from_seat_assignment(&body["seat_assignment"]);
+    assert_eq!(total_seats, vec![2, 2]);
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_10_csb", "users"))))]

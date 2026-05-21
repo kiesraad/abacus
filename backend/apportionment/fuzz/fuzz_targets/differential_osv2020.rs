@@ -130,58 +130,15 @@ fn init() {
 }
 
 fn fuzz(data: FuzzedApportionmentInput) {
-    // Skip cases with zero total votes cast
-    // related issue: #3210
+    // Skip cases where any list has an absolute majority of votes
+    // related issue: #3219
     let total_votes = data
         .list_votes
         .iter()
         .flat_map(|list| list.candidate_votes.iter())
         .map(|cv| cv.votes())
         .sum::<u32>();
-
-    if total_votes == 0 {
-        return;
-    }
-    // Skip cases where number of seats > number of candidates
-    // related issue: #3211
-    let no_of_candidates = data
-        .list_votes
-        .iter()
-        .map(|lv| lv.candidate_votes.len() as u32)
-        .sum::<u32>();
-
-    if data.seats > no_of_candidates {
-        return;
-    }
-    // Skip cases where number of seats > number of candidates on lists with votes
-    // related issue: #3212
-    let no_of_candidates_on_lists_with_votes = data
-        .list_votes
-        .iter()
-        .filter(|list| list.candidate_votes.iter().any(|cv| cv.votes() > 0))
-        .map(|list| list.candidate_votes.len() as u32)
-        .sum::<u32>();
-
-    if data.seats > no_of_candidates_on_lists_with_votes {
-        return;
-    }
-    // Skip cases where seats < 19 and number of seats > number of lists with votes
-    // Reason: when there are fewer than 19 seats, the first two steps in which remaining seats are assigned
-    // have the limitation that each list can get only one seat per step. So as long as Abacus assigns seats to
-    // lists with zero votes, we need to skip inputs that triggers that behavior in Abacus.
-    // related issue: #3212
-    let no_of_lists_with_votes = data
-        .list_votes
-        .iter()
-        .filter(|list| list.candidate_votes.iter().any(|cv| cv.votes() > 0))
-        .count() as u32;
-
-    if data.seats < 19 && data.seats > no_of_lists_with_votes {
-        return;
-    }
-
-    // Skip cases where any list has an absolute majority of votes
-    // related issue: #3219
+    
     if data.list_votes.iter().any(|list| {
         list.candidate_votes
             .iter()
@@ -191,11 +148,6 @@ fn fuzz(data: FuzzedApportionmentInput) {
     }) {
         return;
     }
-
-    // Skip cases where any party has zero total votes
-    //if data.list_votes.iter().any(|list| list.candidate_votes.iter().map(|cv| cv.votes()).sum::<u32>() == 0) {
-    //    return;
-    //}
 
     // Convert current data structure to OSV2020 wrapper format
     let pg_candidates: Vec<i64> = data
@@ -264,11 +216,7 @@ fn fuzz(data: FuzzedApportionmentInput) {
                 }
             }
         }
-        Err(
-            e @ (ApportionmentError::DrawingOfLotsNotImplemented
-            | ApportionmentError::AllListsExhausted
-            | ApportionmentError::ZeroVotesCast),
-        ) => {
+        Err(e @ ApportionmentError::DrawingOfLotsNotImplemented) => {
             match osv2020_result {
                 Osv2020Result::Allocated(osv2020_seats) => {
                     report_mismatch(

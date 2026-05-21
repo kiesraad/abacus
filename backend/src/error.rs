@@ -41,10 +41,8 @@ pub trait ApiErrorResponse: Debug + Any {
 pub enum ErrorReference {
     AirgapViolation,
     AlreadyInitialised,
-    ApportionmentAllListsExhausted,
     ApportionmentCommitteeSessionNotCompleted,
     ApportionmentDrawingOfLotsRequired,
-    ApportionmentZeroVotesCast,
     CommitteeSessionPaused,
     DatabaseError,
     DataEntryAlreadyClaimed,

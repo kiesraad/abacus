@@ -392,6 +392,26 @@ dependencies = [
 ]
 
 [[package]]
+name = "bindgen"
+version = "0.69.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "271383c67ccabffb7381723dea0672a673f292304fcb45c01cc648c7a8d58088"
+dependencies = [
+ "bitflags 2.10.0",
+ "cexpr",
+ "clang-sys",
+ "itertools",
+ "lazy_static",
+ "lazycell",
+ "proc-macro2",
+ "quote",
+ "regex",
+ "rustc-hash 1.1.0",
+ "shlex",
+ "syn",
+]
+
+[[package]]
 name = "bit-set"
 version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -530,6 +550,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "cexpr"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6fac387a98bb7c37292057cffc56d62ecb629900026402633ae9160df93a8766"
+dependencies = [
+ "nom",
+]
+
+[[package]]
 name = "cfg-if"
 version = "1.0.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -616,6 +645,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "clang-sys"
+version = "1.8.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0b023947811758c97c59bf9d1c188fd619ad4718dcaa767947df1cadb14f39f4"
+dependencies = [
+ "glob",
+ "libc",
+ "libloading",
+]
+
+[[package]]
 name = "clap"
 version = "4.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -688,7 +728,7 @@ checksum = "3c963350b2b08aa4b725d7802593245380ab53dacfedcaa971385fc33306c0d4"
 dependencies = [
  "comemo-macros",
  "parking_lot",
- "rustc-hash",
+ "rustc-hash 2.1.2",
  "siphasher",
  "slab",
 ]
@@ -1063,7 +1103,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "39cab71617ae0d63f51a36d69f866391735b51691dbda63cf6f96d042b63efeb"
 dependencies = [
  "libc",
- "windows-sys 0.61.2",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -1371,23 +1411,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f2e102e6eb644d3e0b186fc161e4460417880a0a0b87d235f2e5b8fb30f2e9e0"
 
 [[package]]
-name = "h2"
-version = "0.4.13"
+name = "glob"
+version = "0.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2f44da3a8150a6703ed5d34e164b875fd14c2cdab9af1252a9a1020bde2bdc54"
-dependencies = [
- "atomic-waker",
- "bytes",
- "fnv",
- "futures-core",
- "futures-sink",
- "http",
- "indexmap",
- "slab",
- "tokio",
- "tokio-util",
- "tracing",
-]
+checksum = "0cc23270f6e1808e30a928bdc84dea0b9b4136a8bc82338574f23baf47bbd280"
 
 [[package]]
 name = "half"
@@ -1482,7 +1509,7 @@ dependencies = [
  "log",
  "moxcms 0.7.11",
  "phf",
- "rustc-hash",
+ "rustc-hash 2.1.2",
  "siphasher",
  "skrifa",
  "smallvec",
@@ -1512,7 +1539,7 @@ dependencies = [
  "flate2",
  "kurbo 0.12.0",
  "log",
- "rustc-hash",
+ "rustc-hash 2.1.2",
  "smallvec",
  "zune-jpeg 0.4.21",
 ]
@@ -1656,7 +1683,6 @@ dependencies = [
  "bytes",
  "futures-channel",
  "futures-core",
- "h2",
  "http",
  "http-body",
  "httparse",
@@ -2059,6 +2085,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a6cb138bb79a146c1bd460005623e142ef0181e3d0219cb493e02f7d08a35695"
 
 [[package]]
+name = "itertools"
+version = "0.12.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ba291022dbbd398a455acf126c1e341954079855bc60dfdda641363bd6922569"
+dependencies = [
+ "either",
+]
+
+[[package]]
 name = "itoa"
 version = "1.0.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2103,7 +2138,7 @@ dependencies = [
  "pdf-writer",
  "png 0.17.16",
  "rayon",
- "rustc-hash",
+ "rustc-hash 2.1.2",
  "rustybuzz",
  "siphasher",
  "skrifa",
@@ -2162,6 +2197,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "lazycell"
+version = "1.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "830d08ce1d1d941e6b30645f1a0eb5643013d835ce3779a5fc208261dbe10f55"
+
+[[package]]
 name = "leb128fmt"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2172,6 +2213,16 @@ name = "libc"
 version = "0.2.184"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "48f5d2a454e16a5ea0f4ced81bd44e4cfc7bd3a507b61887c99fd3538b28e4af"
+
+[[package]]
+name = "libloading"
+version = "0.8.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d7c4b02199fee7c5d21a5ae7d8cfa79a6ef5bb2fc834d6e9058e89c825efdc55"
+dependencies = [
+ "cfg-if",
+ "windows-link",
+]
 
 [[package]]
 name = "libm"
@@ -2197,7 +2248,7 @@ version = "0.30.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2e99fb7a497b1e3339bc746195567ed8d3e24945ecd636e3619d20b9de9e9149"
 dependencies = [
- "cc",
+ "bindgen",
  "pkg-config",
  "vcpkg",
 ]
@@ -2321,6 +2372,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "minimal-lexical"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "68354c5c6bd36d73ff3feceb05efa59b6acb7626617f4962be322a825e61f79a"
+
+[[package]]
 name = "miniz_oxide"
 version = "0.8.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2366,6 +2423,16 @@ name = "mutate_once"
 version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "13d2233c9842d08cfe13f9eac96e207ca6a2ea10b80259ebe8ad0268be27d2af"
+
+[[package]]
+name = "nom"
+version = "7.1.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d273983c5a657a70a3e8f2a01329822f3b8c8172b73826411a55751e404a0a4a"
+dependencies = [
+ "memchr",
+ "minimal-lexical",
+]
 
 [[package]]
 name = "nu-ansi-term"
@@ -3111,6 +3178,12 @@ dependencies = [
 
 [[package]]
 name = "rustc-hash"
+version = "1.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "08d43f7aa6b08d49f382cde6a7982047c3426db949b1424bc4b7ec9ae12c6ce2"
+
+[[package]]
+name = "rustc-hash"
 version = "2.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "94300abf3f1ae2e2b8ffb7b58043de3d399c73fa6f4b73826402a5c457614dbe"
@@ -3712,7 +3785,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cb6895a12ac5599bb6057362f00e8a3cf1daab4df33f553a55690a44e4fed8d0"
 dependencies = [
  "kurbo 0.12.0",
- "rustc-hash",
+ "rustc-hash 2.1.2",
  "skrifa",
  "write-fonts",
 ]
@@ -3945,7 +4018,6 @@ dependencies = [
  "bytes",
  "libc",
  "mio",
- "parking_lot",
  "pin-project-lite",
  "signal-hook-registry",
  "socket2",
@@ -4132,7 +4204,6 @@ dependencies = [
  "once_cell",
  "regex-automata",
  "sharded-slab",
- "smallvec",
  "thread_local",
  "tracing",
  "tracing-core",
@@ -4185,7 +4256,7 @@ checksum = "1f6511ee598476f4f322b4d13891083d96dbacb8f9c2b908604c7094ba390653"
 dependencies = [
  "comemo",
  "ecow",
- "rustc-hash",
+ "rustc-hash 2.1.2",
  "typst-eval",
  "typst-html",
  "typst-layout",
@@ -4212,7 +4283,7 @@ dependencies = [
  "comemo",
  "ecow",
  "indexmap",
- "rustc-hash",
+ "rustc-hash 2.1.2",
  "stacker",
  "toml",
  "typst-library",
@@ -4233,7 +4304,7 @@ dependencies = [
  "comemo",
  "ecow",
  "palette",
- "rustc-hash",
+ "rustc-hash 2.1.2",
  "time",
  "typst-assets",
  "typst-library",
@@ -4264,7 +4335,7 @@ dependencies = [
  "icu_segmenter",
  "kurbo 0.12.0",
  "memchr",
- "rustc-hash",
+ "rustc-hash 2.1.2",
  "rustybuzz",
  "smallvec",
  "ttf-parser",
@@ -4318,7 +4389,7 @@ dependencies = [
  "regex-syntax",
  "roxmltree",
  "rust_decimal",
- "rustc-hash",
+ "rustc-hash 2.1.2",
  "rustybuzz",
  "serde",
  "serde_json",
@@ -4373,7 +4444,7 @@ dependencies = [
  "infer",
  "krilla",
  "krilla-svg",
- "rustc-hash",
+ "rustc-hash 2.1.2",
  "serde",
  "smallvec",
  "typst-assets",
@@ -4415,7 +4486,7 @@ dependencies = [
  "hayro",
  "hayro-svg",
  "image",
- "rustc-hash",
+ "rustc-hash 2.1.2",
  "ttf-parser",
  "typst-assets",
  "typst-library",
@@ -4433,7 +4504,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a95d9192060e23b1e491b0b94dff676acddc92a4d672aeb8ca3890a5a734e879"
 dependencies = [
  "ecow",
- "rustc-hash",
+ "rustc-hash 2.1.2",
  "serde",
  "toml",
  "typst-timing",
@@ -4465,7 +4536,7 @@ dependencies = [
  "once_cell",
  "portable-atomic",
  "rayon",
- "rustc-hash",
+ "rustc-hash 2.1.2",
  "siphasher",
  "thin-vec",
  "unicode-math-class",

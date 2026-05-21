@@ -259,18 +259,24 @@ fn reassign_residual_seats_for_exhausted_lists<T: ListVotes>(
     for (list_number, seats) in exhausted_lists {
         seats_to_reassign += seats;
 
+        let standing_idx = current_standings
+            .iter()
+            .enumerate()
+            .find(|(_, standing)| standing.list_number == list_number)
+            .map(|(idx, _)| idx)
+            .expect("The corresponding list_standing should exist");
+
         for _ in 1..=seats {
             let mut full_seat: bool = false;
-            for list_standing in current_standings.iter_mut() {
-                if list_standing.list_number == list_number {
-                    if list_standing.residual_seats > 0 {
-                        list_standing.residual_seats -= 1;
-                    } else {
-                        list_standing.full_seats -= 1;
-                        full_seat = true;
-                    }
-                }
+
+            let standing_to_modify = &mut current_standings[standing_idx];
+            if standing_to_modify.residual_seats > 0 {
+                standing_to_modify.residual_seats -= 1;
+            } else {
+                standing_to_modify.full_seats -= 1;
+                full_seat = true;
             }
+
             info!(
                 "Seat first assigned to list {:?} has been removed and will be assigned to another list in accordance with Article P 10 Kieswet",
                 list_number

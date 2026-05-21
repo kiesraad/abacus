@@ -60,14 +60,14 @@ async fn the_default_font_supports_teletex_chars() {
         .map(|codepoint| char::from_u32(codepoint).unwrap())
         .collect::<String>();
 
-    let filtered_input = filter_input::replace_unsupported_glyphs(input.clone());
+    let filtered_input = filter_input::replace_unsupported_glyphs(&input);
     assert_eq!(input, filtered_input);
 
     let input = (161..383)
         .map(|codepoint| char::from_u32(codepoint).unwrap())
         .collect::<String>();
 
-    let filtered_input = filter_input::replace_unsupported_glyphs(input.clone());
+    let filtered_input = filter_input::replace_unsupported_glyphs(&input);
     assert_eq!(input, filtered_input);
 }
 

@@ -17,7 +17,7 @@ pub async fn log_error(
 ) -> Response {
     if let Some(error_response) = response.extensions_mut().remove::<ErrorResponse>()
         && let Some(error_details) =
-            ErrorDetails::from_error_response(&error_response, original_uri)
+            ErrorDetails::from_error_response(&error_response, &original_uri)
         && audit_service.has_user()
     {
         match pool.acquire().await {

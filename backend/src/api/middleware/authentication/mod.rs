@@ -65,7 +65,7 @@ mod tests {
     const TEST_USER_AGENT: &str = "TestAgent/1.0";
     const TEST_IP_ADDRESS: &str = "0.0.0.0";
 
-    fn create_app(pool: SqlitePool) -> Router {
+    fn create_app(pool: &SqlitePool) -> Router {
         let state = AppState {
             pool: pool.clone(),
             airgap_detection: AirgapDetection::nop(),
@@ -112,7 +112,7 @@ mod tests {
 
     #[test(sqlx::test(fixtures("../../../../fixtures/users.sql")))]
     async fn test_login_success(pool: SqlitePool) {
-        let app = create_app(pool);
+        let app = create_app(&pool);
 
         let response = app
             .oneshot(
@@ -146,7 +146,7 @@ mod tests {
     /// Test that logging in as a different user does not extend the existing session
     #[test(sqlx::test(fixtures("../../../../fixtures/users.sql")))]
     async fn test_login_does_not_extend_session(pool: SqlitePool) {
-        let app = create_app(pool.clone());
+        let app = create_app(&pool);
 
         // Create a near-expiry session for admin1 so it qualifies for extension
         let mut conn = pool.acquire().await.unwrap();
@@ -214,7 +214,7 @@ mod tests {
 
     #[test(sqlx::test(fixtures("../../../../fixtures/users.sql")))]
     async fn test_login_error(pool: SqlitePool) {
-        let app = create_app(pool.clone());
+        let app = create_app(&pool);
 
         let response = app
             .oneshot(
@@ -260,7 +260,7 @@ mod tests {
 
     #[test(sqlx::test(fixtures("../../../../fixtures/users.sql")))]
     async fn test_logout(pool: SqlitePool) {
-        let app = create_app(pool);
+        let app = create_app(&pool);
 
         let cookie = login_as_admin(app.clone()).await;
 
@@ -316,7 +316,7 @@ mod tests {
 
     #[test(sqlx::test(fixtures("../../../../fixtures/users.sql")))]
     async fn test_account(pool: SqlitePool) {
-        let app = create_app(pool);
+        let app = create_app(&pool);
 
         let cookie = login_as_admin(app.clone()).await;
 
@@ -393,7 +393,7 @@ mod tests {
 
     #[test(sqlx::test(fixtures("../../../../fixtures/users.sql")))]
     async fn test_update_password(pool: SqlitePool) {
-        let app = create_app(pool.clone());
+        let app = create_app(&pool);
         let mut conn = pool.acquire().await.unwrap();
 
         // Set admin as incomplete user
@@ -456,7 +456,7 @@ mod tests {
 
     #[test(sqlx::test(fixtures("../../../../fixtures/users.sql")))]
     async fn test_update_password_fail_same_password(pool: SqlitePool) {
-        let app = create_app(pool.clone());
+        let app = create_app(&pool);
         let mut conn = pool.acquire().await.unwrap();
 
         // Set admin as incomplete user
@@ -494,7 +494,7 @@ mod tests {
 
     #[test(sqlx::test(fixtures("../../../../fixtures/users.sql")))]
     async fn test_update_password_fail_wrong_username(pool: SqlitePool) {
-        let app = create_app(pool.clone());
+        let app = create_app(&pool);
         let mut conn = pool.acquire().await.unwrap();
 
         // Set admin as incomplete user
@@ -532,7 +532,7 @@ mod tests {
 
     #[test(sqlx::test(fixtures("../../../../fixtures/users.sql")))]
     async fn test_update_password_fail_complete_user(pool: SqlitePool) {
-        let app = create_app(pool);
+        let app = create_app(&pool);
 
         let cookie = login_as_admin(app.clone()).await;
 
@@ -564,7 +564,7 @@ mod tests {
 
     #[test(sqlx::test(fixtures("../../../../fixtures/users.sql")))]
     async fn test_list(pool: SqlitePool) {
-        let app = create_app(pool.clone());
+        let app = create_app(&pool);
         let mut conn = pool.acquire().await.unwrap();
         let session = Session::create(
             UserId::from(1),
@@ -597,7 +597,7 @@ mod tests {
 
     #[test(sqlx::test(fixtures("../../../../fixtures/users.sql")))]
     async fn test_extend_session(pool: SqlitePool) {
-        let app = create_app(pool.clone());
+        let app = create_app(&pool);
 
         // with a normal long-valid session the user should not get a new cookie
         let mut conn = pool.acquire().await.unwrap();
@@ -665,7 +665,7 @@ mod tests {
 
     #[test(sqlx::test(fixtures("../../../../fixtures/users.sql")))]
     async fn test_create(pool: SqlitePool) {
-        let app = create_app(pool.clone());
+        let app = create_app(&pool);
         let cookie = login_as_admin(app.clone()).await;
         let response = app
             .clone()
@@ -700,7 +700,7 @@ mod tests {
 
     #[test(sqlx::test(fixtures("../../../../fixtures/users.sql")))]
     async fn test_update_user(pool: SqlitePool) {
-        let app = create_app(pool.clone());
+        let app = create_app(&pool);
         let cookie = login_as_admin(app.clone()).await;
         let response = app
             .clone()
@@ -733,7 +733,7 @@ mod tests {
 
     #[test(sqlx::test(fixtures("../../../../fixtures/users.sql")))]
     async fn test_forbidden_on_wrong_user_role(pool: SqlitePool) {
-        let app = create_app(pool.clone());
+        let app = create_app(&pool);
         // user id 5 is a typist
         let mut conn = pool.acquire().await.unwrap();
         let session = Session::create(
@@ -767,7 +767,7 @@ mod tests {
 
     #[test(sqlx::test(fixtures("../../../../fixtures/users.sql")))]
     async fn test_denied_on_different_user_agent(pool: SqlitePool) {
-        let app = create_app(pool.clone());
+        let app = create_app(&pool);
         let cookie = login_as_admin(app.clone()).await;
 
         let response = app
@@ -792,7 +792,7 @@ mod tests {
 
     #[test(sqlx::test(fixtures("../../../../fixtures/users.sql")))]
     async fn test_denied_on_different_client_ip(pool: SqlitePool) {
-        let app = create_app(pool.clone());
+        let app = create_app(&pool);
         let cookie = login_as_admin(app.clone()).await;
 
         let mut request = Request::builder()

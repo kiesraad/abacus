@@ -202,7 +202,7 @@ pub async fn create_test_election(
 
     // generate and store the election
     let election =
-        election_repo::create(&mut tx, generate_election(&mut rng, &args, votes.clone())).await?;
+        election_repo::create(&mut tx, generate_election(&mut rng, &args, votes.as_ref())).await?;
 
     // generate the committee session for the election
     let mut committee_session = committee_session_repo::create(
@@ -258,7 +258,7 @@ pub async fn create_test_election(
 fn generate_election(
     rng: &mut impl rand::RngExt,
     args: &GenerateElectionArgs,
-    votes: Option<Vec<Vec<u32>>>,
+    votes: Option<&Vec<Vec<u32>>>,
 ) -> NewElection {
     // start by generating the political groups
     let mut political_groups = vec![];

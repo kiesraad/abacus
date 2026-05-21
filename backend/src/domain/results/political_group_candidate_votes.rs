@@ -208,7 +208,7 @@ impl Validate for CandidateVotes {
 #[cfg(test)]
 pub fn create_political_group_candidate_votes(
     political_groups: &[PoliticalGroup],
-    candidate_votes: Vec<Vec<u32>>,
+    candidate_votes: &[Vec<u32>],
 ) -> Vec<PoliticalGroupCandidateVotes> {
     political_groups
         .iter()

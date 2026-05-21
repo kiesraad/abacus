@@ -333,21 +333,16 @@ impl Validate for DifferencesCounts {
     fn validate(
         &self,
         election: &ElectionWithPoliticalGroups,
-        validation_results: &mut ValidationResults,
         path: &FieldPath,
-    ) -> Result<(), DataError> {
+    ) -> Result<ValidationResults, DataError> {
         // validate all counts
-        self.more_ballots_count.validate(
-            election,
-            validation_results,
-            &path.field("more_ballots_count"),
-        )?;
-        self.fewer_ballots_count.validate(
-            election,
-            validation_results,
-            &path.field("fewer_ballots_count"),
-        )?;
-        Ok(())
+        Ok(self
+            .more_ballots_count
+            .validate(election, &path.field("more_ballots_count"))?
+            .merge(
+                self.fewer_ballots_count
+                    .validate(election, &path.field("fewer_ballots_count"))?,
+            ))
     }
 }
 

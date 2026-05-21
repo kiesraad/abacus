@@ -170,12 +170,11 @@ fn list_numbers_with_exhausted_seats<T: ListVotes>(
 ) -> Vec<(T::ListNumber, u32)> {
     standings
         .iter()
-        .filter(|s| {
-            let number_of_candidates = get_number_of_candidates(input_list_votes, s.list_number);
+        .map(|s| (s, get_number_of_candidates(input_list_votes, s.list_number)))
+        .filter(|(s, number_of_candidates)| {
             number_of_candidates.cmp(&s.total_seats()) == Ordering::Less
         })
-        .map(|s| {
-            let number_of_candidates = get_number_of_candidates(input_list_votes, s.list_number);
+        .map(|(s, number_of_candidates)| {
             (
                 s.list_number,
                 number_of_candidates.abs_diff(s.total_seats()),

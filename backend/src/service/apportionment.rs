@@ -38,7 +38,7 @@ pub async fn get_state(
     election_id: ElectionId,
 ) -> Result<(CommitteeSessionId, ApportionmentState), APIError> {
     let election = election_repo::get(conn, election_id).await?;
-    user.role().is_authorized(&election.committee_category)?;
+    user.role().is_authorized(election.committee_category)?;
 
     let committee_session =
         committee_session_repo::get_election_committee_session(conn, election.id).await?;

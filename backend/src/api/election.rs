@@ -184,7 +184,7 @@ pub async fn election_details(
 ) -> Result<Json<ElectionDetailsResponse>, APIError> {
     let mut conn = pool.acquire().await?;
     let election = election_repo::get(&mut conn, election_id).await?;
-    user.role().is_authorized(&election.committee_category)?;
+    user.role().is_authorized(election.committee_category)?;
 
     let committee_sessions =
         committee_session_repo::get_election_committee_session_list(&mut conn, election_id).await?;
@@ -233,7 +233,7 @@ pub async fn election_number_of_voters_change(
     let mut tx = pool.begin_immediate().await?;
 
     let election = election_repo::get(&mut tx, election_id).await?;
-    user.role().is_authorized(&election.committee_category)?;
+    user.role().is_authorized(election.committee_category)?;
 
     // Only allow number of voters change for GSB elections
     // For other categories that is a sum of the number of voters of sub committees

@@ -1,5 +1,3 @@
-use std::cmp::Ordering;
-
 mod residual_seat_assignment;
 mod structs;
 use tracing::info;
@@ -57,11 +55,11 @@ pub(crate) fn seat_assignment<T: ApportionmentInput>(
 
     let (mut steps, current_standings) = if residual_seats > 0 {
         assign_remainder::<T::List>(
-            &initial_standing,
+            initial_standing,
             input.number_of_seats(),
             residual_seats,
             0,
-            &[],
+            vec![],
             None,
         )?
     } else {
@@ -167,19 +165,12 @@ fn get_number_of_candidates<T: ListVotes>(
 fn list_numbers_with_exhausted_seats<T: ListVotes>(
     standings: &[ListStanding<T::ListNumber>],
     input_list_votes: &[T],
-) -> Vec<(T::ListNumber, u32)> {
+) -> impl Iterator<Item = (T::ListNumber, u32)> {
     standings
         .iter()
-        .fold(vec![], |mut exhausted_list_numbers_and_seats, s| {
-            let number_of_candidates = get_number_of_candidates(input_list_votes, s.list_number);
-            if number_of_candidates.cmp(&s.total_seats()) == Ordering::Less {
-                exhausted_list_numbers_and_seats.push((
-                    s.list_number,
-                    number_of_candidates.abs_diff(s.total_seats()),
-                ))
-            }
-            exhausted_list_numbers_and_seats
-        })
+        .map(|s| (s, get_number_of_candidates(input_list_votes, s.list_number)))
+        .filter(|(s, number_of_candidates)| number_of_candidates < &s.total_seats())
+        .map(|(s, number_of_candidates)| (s.list_number, s.total_seats() - number_of_candidates))
 }
 
 /// If a list got the absolute majority of votes but not the absolute majority of seats,
@@ -257,59 +248,59 @@ fn reassign_residual_seats_for_exhausted_lists<T: ListVotes>(
     seats: u32,
     list_votes: &[T],
     assigned_residual_seats: u32,
-    previous_steps: Vec<SeatChangeStep<T::ListNumber>>,
+    mut current_steps: Vec<SeatChangeStep<T::ListNumber>>,
 ) -> RemainderAssignmentResult<T::ListNumber> {
     let exhausted_lists = list_numbers_with_exhausted_seats(&previous_standings, list_votes);
-    if !exhausted_lists.is_empty() {
-        let mut current_standings = previous_standings.clone();
-        let mut seats_to_reassign = 0;
-        let mut list_exhaustion_steps: Vec<SeatChangeStep<T::ListNumber>> = vec![];
 
-        // Remove excess seats from exhausted lists
-        for (list_number, seats) in exhausted_lists {
-            seats_to_reassign += seats;
-            let mut full_seat: bool = false;
-            for _ in 1..=seats {
-                for list_standing in current_standings.iter_mut() {
-                    if list_standing.list_number == list_number {
-                        if list_standing.residual_seats > 0 {
-                            list_standing.residual_seats -= 1;
-                        } else {
-                            list_standing.full_seats -= 1;
-                            full_seat = true;
-                        }
-                    }
-                }
-                info!(
-                    "Seat first assigned to list {:?} has been removed and will be assigned to another list in accordance with Article P 10 Kieswet",
-                    list_number
-                );
-                list_exhaustion_steps.push(SeatChangeStep {
-                    standings: current_standings.clone(),
-                    residual_seat_number: None,
-                    change: SeatChange::ListExhaustionRemoval(ListExhaustionRemovedSeat {
-                        list_retracted_seat: list_number,
-                        full_seat,
-                    }),
-                });
-            }
+    let mut current_standings = previous_standings.clone();
+    let mut seats_to_reassign = 0;
+
+    // Remove excess seats from exhausted lists
+    for (list_number, seats) in exhausted_lists {
+        seats_to_reassign += seats;
+
+        let standing_idx = current_standings
+            .iter()
+            .enumerate()
+            .find(|(_, standing)| standing.list_number == list_number)
+            .map(|(idx, _)| idx)
+            .expect("The corresponding list_standing should exist");
+
+        for _ in 1..=seats {
+            let standing_to_modify = &mut current_standings[standing_idx];
+            let full_seat = if standing_to_modify.residual_seats > 0 {
+                standing_to_modify.residual_seats -= 1;
+                false
+            } else {
+                standing_to_modify.full_seats -= 1;
+                true
+            };
+
+            info!(
+                "Seat first assigned to list {:?} has been removed and will be assigned to another list in accordance with Article P 10 Kieswet",
+                list_number
+            );
+            current_steps.push(SeatChangeStep {
+                standings: current_standings.clone(),
+                residual_seat_number: None,
+                change: SeatChange::ListExhaustionRemoval(ListExhaustionRemovedSeat {
+                    list_retracted_seat: list_number,
+                    full_seat,
+                }),
+            });
         }
-        let mut current_steps = previous_steps.to_owned();
-        current_steps.extend(list_exhaustion_steps);
-
-        // Reassign removed seats to non-exhausted lists
-        (current_steps, current_standings) = assign_remainder(
-            &current_standings,
-            seats,
-            assigned_residual_seats + seats_to_reassign,
-            assigned_residual_seats,
-            &current_steps,
-            Some(list_votes),
-        )?;
-        Ok((current_steps, current_standings))
-    } else {
-        Ok((previous_steps, previous_standings))
     }
+
+    // Reassign removed seats to non-exhausted lists
+    (current_steps, current_standings) = assign_remainder(
+        current_standings,
+        seats,
+        assigned_residual_seats + seats_to_reassign,
+        assigned_residual_seats,
+        current_steps,
+        Some(list_votes),
+    )?;
+    Ok((current_steps, current_standings))
 }
 
 #[cfg(test)]

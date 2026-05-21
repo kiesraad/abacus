@@ -16,20 +16,19 @@ use tracing::{debug, info};
 /// These residual seats are assigned through two different procedures,
 /// depending on how many total seats are available in the election.
 pub fn assign_remainder<T: ListVotes>(
-    initial_standings: &[ListStanding<T::ListNumber>],
+    mut current_standings: Vec<ListStanding<T::ListNumber>>,
     seats: u32,
     total_residual_seats: u32,
     current_residual_seat_number: u32,
-    previous_steps: &[SeatChangeStep<T::ListNumber>],
+    mut steps: Vec<SeatChangeStep<T::ListNumber>>,
     exclude_exhausted_lists: Option<&[T]>,
 ) -> RemainderAssignmentResult<T::ListNumber> {
-    let mut steps: Vec<SeatChangeStep<T::ListNumber>> = previous_steps.to_vec();
-    let mut residual_seat_number = current_residual_seat_number;
-    let mut current_standings = initial_standings.to_vec();
+    for residual_seat_number in current_residual_seat_number + 1..=total_residual_seats {
+        // Do the + 1 to accound for the fact both numbers are 1-based
+        // I.e., if total_residual_seats = 10 and residual_seat_number = 6, then - including seat no 6 -
+        // there are still 5 residual seats to assign (seats 6, 7, 8, 9, 10), even though 10 - 6 = 4
+        let residual_seats = total_residual_seats - residual_seat_number + 1;
 
-    while residual_seat_number != total_residual_seats {
-        let residual_seats = total_residual_seats - residual_seat_number;
-        residual_seat_number += 1;
         let exhausted_list_numbers: Vec<T::ListNumber> = exclude_exhausted_lists
             .map_or_else(Vec::new, |list_votes| {
                 list_numbers_without_empty_seats(current_standings.iter(), list_votes)

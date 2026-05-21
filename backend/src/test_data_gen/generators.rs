@@ -919,7 +919,7 @@ fn distribute_power_law_weights(
 
     // Normalize weights to sum to 1
     let sum: f64 = weights.iter().sum();
-    for w in weights.iter_mut() {
+    for w in &mut weights {
         *w /= sum;
     }
 

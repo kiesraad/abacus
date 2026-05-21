@@ -173,7 +173,7 @@ async fn polling_station_list(
 }
 
 pub fn validate_user_is_allowed_to_perform_action(
-    user: User,
+    user: &User,
     committee_session: &CommitteeSession,
 ) -> Result<(), APIError> {
     // Check if the user is allowed to perform the action in this committee session status,
@@ -219,7 +219,7 @@ async fn polling_station_create(
     authorize_user_and_gsb_election(&user, &election.committee_category)?;
 
     let committee_session = get_election_committee_session(&mut tx, election_id).await?;
-    validate_user_is_allowed_to_perform_action(user, &committee_session)?;
+    validate_user_is_allowed_to_perform_action(&user, &committee_session)?;
 
     let ps_id = create(&mut tx, election_id, new_polling_station).await?;
     if !committee_session.is_next_session() {
@@ -320,7 +320,7 @@ async fn polling_station_update(
     authorize_user_and_gsb_election(&user, &committee_category)?;
 
     let committee_session = get_election_committee_session(&mut tx, election_id).await?;
-    validate_user_is_allowed_to_perform_action(user, &committee_session)?;
+    validate_user_is_allowed_to_perform_action(&user, &committee_session)?;
 
     let polling_station = update(
         &mut tx,
@@ -384,7 +384,7 @@ async fn polling_station_delete(
     authorize_user_and_gsb_election(&user, &committee_category)?;
 
     let committee_session = get_election_committee_session(&mut tx, election_id).await?;
-    validate_user_is_allowed_to_perform_action(user, &committee_session)?;
+    validate_user_is_allowed_to_perform_action(&user, &committee_session)?;
 
     let polling_station = get_for_election(&mut tx, election_id, polling_station_id).await?;
 

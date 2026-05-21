@@ -372,14 +372,14 @@ pub async fn election_import_validate(
     Json(request): Json<ElectionCreationValidateRequest>,
 ) -> Result<Json<ElectionDefinitionValidateResponse>, APIError> {
     match request {
-        ElectionCreationValidateRequest::GSB(edu) => validate_gsb_election(edu),
-        ElectionCreationValidateRequest::CSB(edu) => validate_csb_election(edu),
+        ElectionCreationValidateRequest::GSB(edu) => validate_gsb_election(&edu),
+        ElectionCreationValidateRequest::CSB(edu) => validate_csb_election(&edu),
     }
 }
 
 /// Validate a GSB election
 fn validate_gsb_election(
-    edu: GSBElectionCreationValidateRequest,
+    edu: &GSBElectionCreationValidateRequest,
 ) -> Result<Json<ElectionDefinitionValidateResponse>, APIError> {
     check_hash(edu.election_data.as_bytes(), edu.election_hash.as_ref())?;
     if let Some(ref data) = edu.candidate_data {
@@ -402,12 +402,12 @@ fn validate_gsb_election(
     let polling_stations;
     let mut polling_station_definition_matches_election = None;
     let mut number_of_voters = 0;
-    if let Some(data) = edu.polling_station_data {
+    if let Some(data) = &edu.polling_station_data {
         if edu.polling_station_file_name.is_none() {
             return Err(APIError::EmlImportError(EMLImportError::MissingFileName));
         }
 
-        let eml = parse_polling_stations_eml_str(&data)?;
+        let eml = parse_polling_stations_eml_str(data)?;
         polling_stations = Some(polling_stations_from_eml(&eml)?);
         number_of_voters = number_of_voters_from_polling_stations_eml(&eml)?;
         polling_station_definition_matches_election =
@@ -432,7 +432,7 @@ fn validate_gsb_election(
 }
 
 fn validate_csb_election(
-    edu: CSBElectionCreationValidateRequest,
+    edu: &CSBElectionCreationValidateRequest,
 ) -> Result<Json<ElectionDefinitionValidateResponse>, APIError> {
     check_hash(edu.election_data.as_bytes(), edu.election_hash.as_ref())?;
     if let Some(ref data) = edu.candidate_data {

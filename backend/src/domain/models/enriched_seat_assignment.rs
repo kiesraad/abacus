@@ -276,11 +276,11 @@ mod tests {
 
     fn get_election_summary(
         election: &ElectionWithPoliticalGroups,
-        candidate_votes: Vec<Vec<u32>>,
+        candidate_votes: &[Vec<u32>],
     ) -> ElectionSummary {
         let total_votes_candidates_count = candidate_votes.iter().flatten().sum::<u32>();
         let political_group_votes =
-            create_political_group_candidate_votes(&election.political_groups, candidate_votes);
+            create_political_group_candidate_votes(&election.political_groups, &candidate_votes);
         let political_group_total_votes = political_group_votes
             .iter()
             .map(|pg_votes| PoliticalGroupTotalVotes {
@@ -331,7 +331,7 @@ mod tests {
             10,
         );
         let political_groups = &election.political_groups;
-        let summary = get_election_summary(&election, candidate_votes);
+        let summary = get_election_summary(&election, &candidate_votes);
         let summary_csb = ElectionSummaryCSB::new(&summary, political_groups);
         let apportionment_input = ApportionmentInputData {
             number_of_seats: election.number_of_seats,
@@ -449,7 +449,7 @@ mod tests {
             24,
         );
         let political_groups = &election.political_groups;
-        let summary = get_election_summary(&election, candidate_votes);
+        let summary = get_election_summary(&election, &candidate_votes);
         let summary_csb = ElectionSummaryCSB::new(&summary, political_groups);
         let apportionment_input = ApportionmentInputData {
             number_of_seats: election.number_of_seats,
@@ -535,7 +535,7 @@ mod tests {
             15,
         );
         let political_groups = &election.political_groups;
-        let summary = get_election_summary(&election, candidate_votes);
+        let summary = get_election_summary(&election, &candidate_votes);
         let summary_csb = ElectionSummaryCSB::new(&summary, political_groups);
         let apportionment_input = ApportionmentInputData {
             number_of_seats: election.number_of_seats,

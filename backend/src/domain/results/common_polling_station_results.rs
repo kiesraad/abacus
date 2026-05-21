@@ -220,7 +220,7 @@ mod tests {
         }
     }
 
-    fn validate(data: CommonPollingStationResults) -> Result<ValidationResults, DataError> {
+    fn validate(data: &CommonPollingStationResults) -> Result<ValidationResults, DataError> {
         data.validate(
             // Adjust election political group list to the given test data
             &election_fixture(
@@ -237,7 +237,7 @@ mod tests {
 
     #[test]
     fn test_default() -> Result<(), DataError> {
-        let validation_results = validate(create_test_data())?;
+        let validation_results = validate(&create_test_data())?;
         assert_eq!(validation_results.errors.len(), 0);
         assert_eq!(validation_results.warnings.len(), 0);
         Ok(())
@@ -261,7 +261,7 @@ mod tests {
             data.voters_counts.total_admitted_voters_count = admitted_voters;
             data.votes_counts.total_votes_cast_count = votes_cast;
 
-            let validation_results = validate(data)?;
+            let validation_results = validate(&data)?;
 
             if expected {
                 assert_eq!(
@@ -292,7 +292,7 @@ mod tests {
         let mut data = create_test_data();
         data.political_group_votes[1].total = 0;
 
-        let validation_results = validate(data.clone())?;
+        let validation_results = validate(&data)?;
         assert_eq!(
             validation_results.errors,
             [ValidationResult {
@@ -311,7 +311,7 @@ mod tests {
         data.political_group_votes[1].candidate_votes[2].votes = 0;
         data.political_group_votes[1].total = 0;
 
-        let validation_results = validate(data.clone())?;
+        let validation_results = validate(&data)?;
         assert_eq!(
             validation_results.errors,
             [ValidationResult {
@@ -326,7 +326,7 @@ mod tests {
         // Expect only F.401 (F.401, F.402 and F.403 are triggered)
         data.political_group_votes[1].candidate_votes[0].votes += 10;
 
-        let validation_results = validate(data.clone())?;
+        let validation_results = validate(&data)?;
         assert_eq!(
             validation_results.errors,
             [ValidationResult {
@@ -353,7 +353,7 @@ mod tests {
         data.political_group_votes[1].candidate_votes[0].votes = 10;
         data.political_group_votes[1].total = 0;
 
-        let validation_results = validate(data.clone())?;
+        let validation_results = validate(&data)?;
         assert_eq!(
             validation_results.errors,
             [
@@ -391,7 +391,7 @@ mod tests {
         data.political_group_votes[1].candidate_votes[0].votes = 0;
         data.political_group_votes[1].total = 30;
 
-        let validation_results = validate(data.clone())?;
+        let validation_results = validate(&data)?;
         assert_eq!(
             validation_results.errors,
             [
@@ -422,7 +422,7 @@ mod tests {
         data.political_group_votes[1].total = 0;
 
         // When list total is empty, don't expect F.402, but F.401
-        let validation_results = validate(data.clone())?;
+        let validation_results = validate(&data)?;
         assert_eq!(
             validation_results.errors,
             [ValidationResult {
@@ -438,7 +438,7 @@ mod tests {
         data.political_group_votes[1].total = 30;
 
         // Expect F.402 when list total doesn't match candidate votes
-        let validation_results = validate(data.clone())?;
+        let validation_results = validate(&data)?;
         assert_eq!(
             validation_results.errors,
             [ValidationResult {
@@ -459,7 +459,7 @@ mod tests {
         let mut data = create_test_data();
         data.political_group_votes[1].candidate_votes[0].votes += 10;
         data.political_group_votes[1].total += 10;
-        let validation_results = validate(data.clone())?;
+        let validation_results = validate(&data)?;
         assert_eq!(
             validation_results.errors,
             [ValidationResult {
@@ -474,7 +474,7 @@ mod tests {
         // Multiple invalid case
         data.political_group_votes[0].candidate_votes[0].votes += 10;
         data.political_group_votes[0].total += 10;
-        let validation_results = validate(data.clone())?;
+        let validation_results = validate(&data)?;
         assert_eq!(
             validation_results.errors,
             [
@@ -497,7 +497,7 @@ mod tests {
 
         // When list total is empty, don't expect F.403, but F.401
         data.political_group_votes[1].total = 0;
-        let validation_results = validate(data.clone())?;
+        let validation_results = validate(&data)?;
         assert_eq!(
             validation_results.errors,
             [

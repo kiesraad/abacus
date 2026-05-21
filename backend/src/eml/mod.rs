@@ -911,10 +911,10 @@ pub fn polling_stations_eml_matches_election(
 
 #[cfg(test)]
 mod tests {
-    use eml_nl::utils::StringValue;
     use super::*;
     use crate::domain::election::{ElectionCategory, ElectionWithPoliticalGroups};
     use crate::domain::summary::{SumCount, SummaryDifferencesCounts};
+    use eml_nl::utils::StringValue;
 
     #[test]
     fn test_election_validate_missing_election_domain() {
@@ -959,45 +959,81 @@ mod tests {
             nomination_date: Default::default(),
             political_groups: vec![],
         };
-        let result_gsb = candidate.as_eml_count_contest(&CommitteeSession {
-            id: Default::default(),
-            number: 0,
-            election_id: Default::default(),
-            location: "".to_string(),
-            start_date_time: None,
-            status: Default::default(),
-        }, &[], &ElectionSummary {
-            voters_counts: Default::default(),
-            votes_counts: Default::default(),
-            differences_counts: SummaryDifferencesCounts { more_ballots_count: SumCount { count: 0, data_entry_sources: vec![] }, fewer_ballots_count: SumCount {count: 0, data_entry_sources: vec![] } },
-            political_group_votes: vec![PoliticalGroupCandidateVotes {
-                number: 1.into(),
-                total: 0,
-                candidate_votes: vec![],
-            }],
-            polling_station_investigations: Default::default(),
-            number_of_voters: Some(5),
-        }).unwrap();
-        let result_csb = candidate.as_eml_count_contest(&CommitteeSession {
-            id: Default::default(),
-            number: 0,
-            election_id: Default::default(),
-            location: "".to_string(),
-            start_date_time: None,
-            status: Default::default(),
-        }, &[], &ElectionSummary {
-            voters_counts: Default::default(),
-            votes_counts: Default::default(),
-            differences_counts: SummaryDifferencesCounts { more_ballots_count: SumCount { count: 0, data_entry_sources: vec![] }, fewer_ballots_count: SumCount {count: 0, data_entry_sources: vec![] } },
-            political_group_votes: vec![PoliticalGroupCandidateVotes {
-                number: 1.into(),
-                total: 0,
-                candidate_votes: vec![],
-            }],
-            polling_station_investigations: Default::default(),
-            number_of_voters: None,
-        }).unwrap();
-        assert_eq!(result_gsb.total_votes.unwrap().eligible_voter_count, StringValue::from_value(5u64));
-        assert_eq!(result_csb.total_votes.unwrap().eligible_voter_count, StringValue::from_value(6u64));
+        let result_gsb = candidate
+            .as_eml_count_contest(
+                &CommitteeSession {
+                    id: Default::default(),
+                    number: 0,
+                    election_id: Default::default(),
+                    location: "".to_string(),
+                    start_date_time: None,
+                    status: Default::default(),
+                },
+                &[],
+                &ElectionSummary {
+                    voters_counts: Default::default(),
+                    votes_counts: Default::default(),
+                    differences_counts: SummaryDifferencesCounts {
+                        more_ballots_count: SumCount {
+                            count: 0,
+                            data_entry_sources: vec![],
+                        },
+                        fewer_ballots_count: SumCount {
+                            count: 0,
+                            data_entry_sources: vec![],
+                        },
+                    },
+                    political_group_votes: vec![PoliticalGroupCandidateVotes {
+                        number: 1.into(),
+                        total: 0,
+                        candidate_votes: vec![],
+                    }],
+                    polling_station_investigations: Default::default(),
+                    number_of_voters: Some(5),
+                },
+            )
+            .unwrap();
+        let result_csb = candidate
+            .as_eml_count_contest(
+                &CommitteeSession {
+                    id: Default::default(),
+                    number: 0,
+                    election_id: Default::default(),
+                    location: "".to_string(),
+                    start_date_time: None,
+                    status: Default::default(),
+                },
+                &[],
+                &ElectionSummary {
+                    voters_counts: Default::default(),
+                    votes_counts: Default::default(),
+                    differences_counts: SummaryDifferencesCounts {
+                        more_ballots_count: SumCount {
+                            count: 0,
+                            data_entry_sources: vec![],
+                        },
+                        fewer_ballots_count: SumCount {
+                            count: 0,
+                            data_entry_sources: vec![],
+                        },
+                    },
+                    political_group_votes: vec![PoliticalGroupCandidateVotes {
+                        number: 1.into(),
+                        total: 0,
+                        candidate_votes: vec![],
+                    }],
+                    polling_station_investigations: Default::default(),
+                    number_of_voters: None,
+                },
+            )
+            .unwrap();
+        assert_eq!(
+            result_gsb.total_votes.unwrap().eligible_voter_count,
+            StringValue::from_value(5u64)
+        );
+        assert_eq!(
+            result_csb.total_votes.unwrap().eligible_voter_count,
+            StringValue::from_value(6u64)
+        );
     }
 }

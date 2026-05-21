@@ -147,7 +147,6 @@ async fn delete_committee_session_files(
 
 #[cfg(test)]
 mod tests {
-    use std::net::Ipv4Addr;
 
     use chrono::Utc;
     use sqlx::{SqliteConnection, SqlitePool};
@@ -158,6 +157,7 @@ mod tests {
         domain::file::FileType,
         infra::audit_log::{AuditService, list_event_names},
         repository::file_repo,
+        test_support::TEST_IP_V4_ADDR,
     };
 
     async fn generate_test_file(
@@ -181,7 +181,7 @@ mod tests {
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
     async fn test_delete_files_on_resume_no_files(pool: SqlitePool) -> Result<(), APIError> {
         let mut conn = pool.acquire().await?;
-        let audit_service = AuditService::new(None, Some(Ipv4Addr::new(203, 0, 113, 0).into()));
+        let audit_service = AuditService::new(None, Some(TEST_IP_V4_ADDR.into()));
 
         let committee_session_id = CommitteeSessionId::from(6);
 
@@ -218,7 +218,7 @@ mod tests {
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
     async fn test_delete_files_on_resume_with_files(pool: SqlitePool) -> Result<(), APIError> {
         let mut conn = pool.acquire().await?;
-        let audit_service = AuditService::new(None, Some(Ipv4Addr::new(203, 0, 113, 0).into()));
+        let audit_service = AuditService::new(None, Some(TEST_IP_V4_ADDR.into()));
 
         let committee_session_id = CommitteeSessionId::from(6);
 

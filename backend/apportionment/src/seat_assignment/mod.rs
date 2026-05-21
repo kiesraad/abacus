@@ -1,5 +1,3 @@
-use std::cmp::Ordering;
-
 mod residual_seat_assignment;
 mod structs;
 use tracing::info;
@@ -171,9 +169,7 @@ fn list_numbers_with_exhausted_seats<T: ListVotes>(
     standings
         .iter()
         .map(|s| (s, get_number_of_candidates(input_list_votes, s.list_number)))
-        .filter(|(s, number_of_candidates)| {
-            number_of_candidates.cmp(&s.total_seats()) == Ordering::Less
-        })
+        .filter(|(s, number_of_candidates)| number_of_candidates < &s.total_seats())
         .map(|(s, number_of_candidates)| {
             (
                 s.list_number,

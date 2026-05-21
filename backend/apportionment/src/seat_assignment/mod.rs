@@ -255,8 +255,7 @@ fn reassign_residual_seats_for_exhausted_lists<T: ListVotes>(
     assigned_residual_seats: u32,
     previous_steps: Vec<SeatChangeStep<T::ListNumber>>,
 ) -> RemainderAssignmentResult<T::ListNumber> {
-    let exhausted_lists: Vec<_> =
-        list_numbers_with_exhausted_seats(&previous_standings, list_votes).collect();
+    let exhausted_lists = list_numbers_with_exhausted_seats(&previous_standings, list_votes);
 
     let mut current_standings = previous_standings.clone();
     let mut seats_to_reassign = 0;

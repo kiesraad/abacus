@@ -3353,6 +3353,8 @@ name = "service_ui"
 version = "1.1.0"
 dependencies = [
  "systemctl",
+ "windows-service",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]

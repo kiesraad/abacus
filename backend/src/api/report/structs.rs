@@ -238,51 +238,6 @@ impl ResultsInputData {
 
         slugify_filename(&filename)
     }
-
-    fn get_na14_2_pdf_file(
-        &self,
-        previous_summary: &ElectionSummary,
-        previous_committee_session: &CommitteeSession,
-        hash: String,
-        creation_date_time: String,
-        results_pdf_filename: String,
-    ) -> Result<PdfFileModel, APIError> {
-        let pdf_file = ModelNa14_2Input {
-            votes_tables: VotesTablesWithPreviousVotes::new(
-                &self.election,
-                &self.summary,
-                previous_summary,
-            )?,
-            committee_session: self.committee_session.clone(),
-            election: self.election.clone().into(),
-            summary: self.summary.clone().into(),
-            previous_summary: previous_summary.clone().into(),
-            previous_committee_session: previous_committee_session.clone(),
-            hash,
-            creation_date_time,
-        }
-        .to_pdf_file_model(results_pdf_filename);
-        Ok(pdf_file)
-    }
-
-    fn get_na31_2_pdf_file(
-        &self,
-        hash: String,
-        creation_date_time: String,
-        results_pdf_filename: String,
-    ) -> Result<PdfFileModel, APIError> {
-        let pdf_file = ModelNa31_2Input {
-            votes_tables: VotesTables::new(&self.election, &self.summary)?,
-            committee_session: self.committee_session.clone(),
-            polling_stations: self.polling_stations.clone(),
-            summary: self.summary.clone().into(),
-            election: self.election.clone().into(),
-            hash,
-            creation_date_time,
-        }
-        .to_pdf_file_model(results_pdf_filename);
-        Ok(pdf_file)
-    }
 }
 
 #[derive(Debug)]
@@ -466,7 +421,7 @@ impl ResultsInputGSB {
             ));
             };
 
-            data.get_na14_2_pdf_file(
+            self.get_na14_2_pdf_file(
                 previous_summary,
                 previous_committee_session,
                 xml_hash,
@@ -474,7 +429,7 @@ impl ResultsInputGSB {
                 data.filename_for(results_pdf_file_type),
             )?
         } else {
-            data.get_na31_2_pdf_file(
+            self.get_na31_2_pdf_file(
                 xml_hash,
                 creation_date_time,
                 data.filename_for(results_pdf_file_type),
@@ -488,6 +443,55 @@ impl ResultsInputGSB {
             results_pdf,
             overview_pdf,
         })
+    }
+
+    fn get_na14_2_pdf_file(
+        &self,
+        previous_summary: &ElectionSummary,
+        previous_committee_session: &CommitteeSession,
+        hash: String,
+        creation_date_time: String,
+        results_pdf_filename: String,
+    ) -> Result<PdfFileModel, APIError> {
+        let data = &self.data;
+
+        let pdf_file = ModelNa14_2Input {
+            votes_tables: VotesTablesWithPreviousVotes::new(
+                &data.election,
+                &data.summary,
+                previous_summary,
+            )?,
+            committee_session: data.committee_session.clone(),
+            election: data.election.clone().into(),
+            summary: data.summary.clone().into(),
+            previous_summary: previous_summary.clone().into(),
+            previous_committee_session: previous_committee_session.clone(),
+            hash,
+            creation_date_time,
+        }
+        .to_pdf_file_model(results_pdf_filename);
+        Ok(pdf_file)
+    }
+
+    fn get_na31_2_pdf_file(
+        &self,
+        hash: String,
+        creation_date_time: String,
+        results_pdf_filename: String,
+    ) -> Result<PdfFileModel, APIError> {
+        let data = &self.data;
+
+        let pdf_file = ModelNa31_2Input {
+            votes_tables: VotesTables::new(&data.election, &data.summary)?,
+            committee_session: data.committee_session.clone(),
+            polling_stations: data.polling_stations.clone(),
+            summary: data.summary.clone().into(),
+            election: data.election.clone().into(),
+            hash,
+            creation_date_time,
+        }
+        .to_pdf_file_model(results_pdf_filename);
+        Ok(pdf_file)
     }
 
     fn get_p2a_pdf_file(&self, overview_filename: String) -> PdfFileModel {

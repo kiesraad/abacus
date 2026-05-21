@@ -1,0 +1,86 @@
+publiccodeYmlVersion: "0.5.0"
+
+name: Abacus
+url: "https://github.com/kiesraad/abacus"
+landingURL: "https://kiesraad.github.io/abacus-documentatie/"
+softwareType: standalone/web
+developmentStatus: stable
+
+platforms:
+  - web
+
+categories:
+  - data-collection
+  - data-analytics
+
+description:
+  nl:
+    shortDescription: >-
+      Software voor het optellen van verkiezingsuitslagen en berekenen van de zetelverdeling.
+    longDescription: |
+      Abacus is de nieuwe software van de Kiesraad voor de berekening van de
+      uitslag van de verkiezingen in Nederland. Het programma telt uitslagen
+      bij elkaar op en berekent de zetelverdeling.
+
+      Abacus vervangt de module Uitslagvaststelling van het programma
+      Ondersteunende Software Verkiezingen (OSV2020) en zal ingezet worden bij
+      alle verkiezingen in Nederland. De eerste versie is ingezet bij de
+      gemeenteraadsverkiezingen 2026 (GR26).
+
+      De software draait als een stand-alone binary die in een lokaal netwerk
+      via een webbrowser benaderbaar is. De backend is geschreven in Rust, de
+      frontend in TypeScript/React.
+
+      Uitgangspunten bij het ontwerp zijn gebruiksvriendelijkheid en eenvoud. 
+      Voor de software zijn de waarden integriteit, transparantie en 
+      controleerbaarheid het belangrijkste.
+    features:
+      - Invoer van stembureau-uitslagen volgens het vier-ogenprincipe
+      - Optelling van alle ingevoerde stembureau-uitslagen
+      - Berekening van de zetelverdeling
+      - Genereren van het proces-verbaal met de resultaten
+  en:
+    shortDescription: >-
+      Software for tallying election results and calculating seat allocation.
+    longDescription: |
+      Abacus is the new software developed by the Dutch Electoral Council
+      (Kiesraad) for calculating election results in the Netherlands. It tallies
+      polling station results and computes the seat allocation.
+
+      Abacus replaces the result-consolidation module of the current election
+      software OSV2020 and will be used for all Dutch elections. The first
+      version targets the 2026 municipal council elections (GR26).
+
+      The software runs as a standalone binary accessible via a web browser on a
+      local network. The backend is written in Rust, the frontend in
+      TypeScript/React.
+
+      Key design principles are ease-of-use and simplicity. For the software the 
+      values integrity, transparency and verifiability are most important.
+    features:
+      - Entry of polling station results using the four-eyes principle
+      - Aggregation of all entered polling station results
+      - Calculation of seat allocation
+      - Generation of the official record (proces-verbaal) with results
+
+legal:
+  license: EUPL-1.2
+  mainCopyrightOwner: Kiesraad
+
+intendedAudience:
+  countries:
+    - NL
+  scope:
+    - government
+
+localisation:
+  localisationReady: true
+  availableLanguages:
+    - nl
+
+maintenance:
+  type: internal
+  contacts:
+    - name: Kiesraad
+      email: abacus@kiesraad.nl
+      affiliation: Kiesraad

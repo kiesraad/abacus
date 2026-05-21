@@ -90,6 +90,7 @@ export function LoginForm() {
             name="username"
             label={t("account.username")}
             hint={t("account.username_login_hint")}
+            autoComplete="username"
             readOnly={loading}
             required={true}
             value={username}
@@ -103,6 +104,7 @@ export function LoginForm() {
             label={t("account.password")}
             hint={t("account.password_login_hint")}
             type="password"
+            autoComplete="current-password"
             readOnly={loading}
             required={true}
             value={password}

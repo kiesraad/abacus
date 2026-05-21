@@ -821,8 +821,6 @@ dependencies = [
 ]
 
 [[package]]
-<<<<<<< HEAD
-=======
 name = "block2"
 version = "0.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -854,7 +852,6 @@ dependencies = [
 ]
 
 [[package]]
->>>>>>> 1d4f51a73052e9022139da36a9981413b48a1f89
 name = "bon"
 version = "2.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1470,15 +1467,12 @@ dependencies = [
 ]
 
 [[package]]
-<<<<<<< HEAD
-=======
 name = "cursor-icon"
 version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f27ae1dd37df86211c42e150270f82743308803d90a6f6e6651cd730d5e1732f"
 
 [[package]]
->>>>>>> 1d4f51a73052e9022139da36a9981413b48a1f89
 name = "darling"
 version = "0.20.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5174,10 +5168,7 @@ dependencies = [
 name = "service_ui"
 version = "1.1.0"
 dependencies = [
-<<<<<<< HEAD
-=======
  "eframe",
->>>>>>> 1d4f51a73052e9022139da36a9981413b48a1f89
  "systemctl",
  "windows-service",
  "windows-sys 0.61.2",
@@ -5852,8 +5843,6 @@ dependencies = [
 ]
 
 [[package]]
-<<<<<<< HEAD
-=======
 name = "tempfile"
 version = "3.27.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5876,7 +5865,6 @@ dependencies = [
 ]
 
 [[package]]
->>>>>>> 1d4f51a73052e9022139da36a9981413b48a1f89
 name = "test-log"
 version = "0.2.19"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -7696,17 +7684,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "56e6c93f3a0c3b36176cb1327a4958a0353d5d166c2a35cb268ace15e91d3b57"
 dependencies = [
  "windows-link 0.1.3",
-]
-
-[[package]]
-name = "windows-service"
-version = "0.8.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "857224b3b211c6f3616921f081ee54721ee3ad2ace2fac6a6337e032f7b4dcf2"
-dependencies = [
- "bitflags 2.10.0",
- "widestring",
- "windows-sys 0.61.2",
 ]
 
 [[package]]

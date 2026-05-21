@@ -253,13 +253,12 @@ fn reassign_residual_seats_for_exhausted_lists<T: ListVotes>(
     seats: u32,
     list_votes: &[T],
     assigned_residual_seats: u32,
-    previous_steps: Vec<SeatChangeStep<T::ListNumber>>,
+    mut current_steps: Vec<SeatChangeStep<T::ListNumber>>,
 ) -> RemainderAssignmentResult<T::ListNumber> {
     let exhausted_lists = list_numbers_with_exhausted_seats(&previous_standings, list_votes);
 
     let mut current_standings = previous_standings.clone();
     let mut seats_to_reassign = 0;
-    let mut current_steps = previous_steps.to_owned();
 
     // Remove excess seats from exhausted lists
     for (list_number, seats) in exhausted_lists {

@@ -806,7 +806,7 @@ mod tests {
         // manually set a different IP address
         request
             .extensions_mut()
-            .insert(ConnectInfo(SocketAddr::from(([1, 2, 3, 4], 1234))));
+            .insert(ConnectInfo(SocketAddr::from(([203, 0, 113, 0], 49152))));
 
         let response = app.clone().oneshot(request).await.unwrap();
 

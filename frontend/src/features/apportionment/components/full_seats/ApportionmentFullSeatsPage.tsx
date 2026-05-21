@@ -1,4 +1,5 @@
-import { Link } from "react-router";
+import { useEffect } from "react";
+import { Link, useNavigate } from "react-router";
 
 import { useElection } from "@/hooks/election/useElection";
 import { t, tx } from "@/i18n/translate";
@@ -7,7 +8,7 @@ import { cn } from "@/utils/classnames";
 import { useApportionmentContext } from "../../hooks/useApportionmentContext";
 import type { ResultChange } from "../../utils/seat-change";
 import { getRemovalSteps } from "../../utils/steps";
-import { renderTitleAndHeader } from "../../utils/utils";
+import { checkStateAndRedirect, renderTitleAndHeader } from "../../utils/utils";
 import cls from "../Apportionment.module.css";
 import { ApportionmentErrorPage } from "../ApportionmentError";
 import { Footnotes } from "./Footnotes";
@@ -15,8 +16,13 @@ import { FullSeatsTable } from "./FullSeatsTable";
 import { ResidualSeatsCalculationTable } from "./ResidualSeatsCalculationTable";
 
 export function ApportionmentFullSeatsPage() {
+  const navigate = useNavigate();
   const { election } = useElection();
-  const { seatAssignment, error } = useApportionmentContext();
+  const { seatAssignment, error, state } = useApportionmentContext();
+
+  useEffect(() => {
+    checkStateAndRedirect(state, election.id, navigate);
+  });
 
   if (error) {
     return <ApportionmentErrorPage sectionTitle={t("apportionment.details_full_seats")} error={error} />;

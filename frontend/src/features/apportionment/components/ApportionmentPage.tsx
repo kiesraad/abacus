@@ -1,4 +1,5 @@
-import { Link } from "react-router";
+import { useEffect } from "react";
+import { Link, useNavigate } from "react-router";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
@@ -6,7 +7,7 @@ import { useElection } from "@/hooks/election/useElection";
 import { t } from "@/i18n/translate";
 import { cn } from "@/utils/classnames";
 import { useApportionmentContext } from "../hooks/useApportionmentContext";
-import { renderTitleAndHeader } from "../utils/utils";
+import { checkStateAndRedirect, renderTitleAndHeader } from "../utils/utils";
 import cls from "./Apportionment.module.css";
 import { ApportionmentError } from "./ApportionmentError";
 import { ApportionmentTable } from "./ApportionmentTable";
@@ -21,8 +22,13 @@ function getNumberOfSeatsAssignedSentence(seats: number, type: "residual_seat" |
 }
 
 export function ApportionmentPage() {
+  const navigate = useNavigate();
   const { currentCommitteeSession, election } = useElection();
-  const { seatAssignment, candidateNomination, electionSummary, error } = useApportionmentContext();
+  const { seatAssignment, candidateNomination, electionSummary, state, error } = useApportionmentContext();
+
+  useEffect(() => {
+    checkStateAndRedirect(state, election.id, navigate);
+  });
 
   return (
     <>
@@ -36,9 +42,8 @@ export function ApportionmentPage() {
             candidateNomination &&
             electionSummary && (
               <>
-                {
-                  // TODO: #3160 enable this check when apportionment deceased candidate flow is implemented
-                  /* state?.type === "Finalised" && */ <FormLayout.Alert>
+                {state.type === "Finalised" && (
+                  <FormLayout.Alert>
                     <Alert type="success">
                       <strong className="heading-md">{t("apportionment.all_seats_assigned")}</strong>
                       <p>{t("apportionment.make_apportionment_definitive")}</p>
@@ -47,7 +52,7 @@ export function ApportionmentPage() {
                       </Button.Link>
                     </Alert>
                   </FormLayout.Alert>
-                }
+                )}
                 <div className={cn(cls.tableDiv, "mb-lg")}>
                   <div>
                     <h2 className={cls.tableTitle}>{t("apportionment.election_summary")}</h2>

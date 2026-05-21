@@ -1,5 +1,6 @@
 import { render as rtlRender } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
+import * as ReactRouter from "react-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
@@ -8,7 +9,15 @@ import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { Providers } from "@/testing/Providers";
 import type { Router } from "@/testing/router";
 import { overrideOnce } from "@/testing/server";
-import { expectErrorPage, render, renderReturningRouter, screen, setupTestRouter, within } from "@/testing/test-utils";
+import {
+  expectErrorPage,
+  render,
+  renderReturningRouter,
+  screen,
+  setupTestRouter,
+  waitFor,
+  within,
+} from "@/testing/test-utils";
 import type { ApportionmentState, ElectionApportionmentResponse, ErrorResponse } from "@/types/generated/openapi";
 
 import { apportionmentRoutes } from "../routes";
@@ -22,10 +31,12 @@ import {
 import { ApportionmentPage } from "./ApportionmentPage";
 import { ApportionmentProvider } from "./ApportionmentProvider";
 
-const renderApportionmentPage = (withRouter: boolean) => {
+const navigate = vi.fn();
+
+const renderApportionmentPage = (electionId: number, withRouter: boolean) => {
   const component = (
-    <ElectionProvider electionId={1}>
-      <ApportionmentProvider electionId={1}>
+    <ElectionProvider electionId={electionId}>
+      <ApportionmentProvider electionId={electionId}>
         <ApportionmentPage />
       </ApportionmentProvider>
     </ElectionProvider>
@@ -38,33 +49,43 @@ const renderApportionmentPage = (withRouter: boolean) => {
 };
 
 describe("ApportionmentPage", () => {
-  // TODO: #3160 enable this test when alert check is enabled again
-  test.skip.each(
+  test.each(
     Object.values({
       Uninitialised: {
         state: { type: "Uninitialised" },
         expectAlert: false,
+        expectRedirectTo: "/elections/3/apportionment/include-all-candidates",
       },
       RegisteringDeceasedCandidates: {
         state: { deceased_candidates: [], type: "RegisteringDeceasedCandidates" },
         expectAlert: false,
+        expectRedirectTo: "/elections/3/apportionment/deceased-candidates",
       },
       Finalised: {
         state: { deceased_candidates: [], type: "Finalised" },
         expectAlert: true,
+        expectRedirectTo: undefined,
       },
-    } satisfies Record<ApportionmentState["type"], { state: ApportionmentState; expectAlert: boolean }>),
-  )("Renders all seats assigned message only for finalised state ($state.type)", async ({ state, expectAlert }) => {
-    overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election, committee_session));
-    overrideOnce("post", "/api/elections/1/apportionment", 200, {
+    } satisfies Record<
+      ApportionmentState["type"],
+      { state: ApportionmentState; expectAlert: boolean; expectRedirectTo: string | undefined }
+    >),
+  )("Renders all seats assigned message and does not redirect only for finalised state ($state.type)", async ({
+    state,
+    expectAlert,
+    expectRedirectTo,
+  }) => {
+    vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
+    overrideOnce("get", "/api/elections/3", 200, getElectionMockData(election, committee_session));
+    overrideOnce("post", "/api/elections/3/apportionment", 200, {
       seat_assignment: seat_assignment,
       candidate_nomination: candidate_nomination,
       election_summary: election_summary,
     } satisfies ElectionApportionmentResponse);
-    overrideOnce("get", "/api/elections/1/apportionment/state", 200, state);
+    overrideOnce("get", "/api/elections/3/apportionment/state", 200, state);
 
-    renderApportionmentPage(false);
-    expect(await screen.findByTestId("election-summary-table")).toBeVisible();
+    renderApportionmentPage(3, false);
+    expect(await screen.findByRole("heading", { level: 1, name: "Zetelverdeling" })).toBeVisible();
 
     if (expectAlert) {
       const alert = await screen.findByRole("alert");
@@ -79,22 +100,30 @@ describe("ApportionmentPage", () => {
     } else {
       expect(screen.queryByRole("alert")).not.toBeInTheDocument();
     }
+
+    if (expectRedirectTo) {
+      await waitFor(() => {
+        expect(navigate).toHaveBeenCalledWith(expectRedirectTo);
+      });
+    } else {
+      expect(navigate).not.toHaveBeenCalled();
+    }
   });
 
   test("Election summary and apportionment tables visible", async () => {
     const user = userEvent.setup();
-    overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election, committee_session));
-    overrideOnce("post", "/api/elections/1/apportionment", 200, {
+    overrideOnce("get", "/api/elections/3", 200, getElectionMockData(election, committee_session));
+    overrideOnce("post", "/api/elections/3/apportionment", 200, {
       seat_assignment: seat_assignment,
       candidate_nomination: candidate_nomination,
       election_summary: election_summary,
     } satisfies ElectionApportionmentResponse);
-    overrideOnce("get", "/api/elections/1/apportionment/state", 200, {
+    overrideOnce("get", "/api/elections/3/apportionment/state", 200, {
       deceased_candidates: [],
       type: "Finalised",
     } satisfies ApportionmentState);
 
-    const router = renderApportionmentPage(true) as Router;
+    const router = renderApportionmentPage(3, true) as Router;
 
     expect(await screen.findByRole("heading", { level: 1, name: "Zetelverdeling" })).toBeVisible();
 
@@ -182,20 +211,20 @@ describe("ApportionmentPage", () => {
 
   describe("Apportionment not yet available", () => {
     beforeEach(() => {
-      overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election, committee_session));
-      overrideOnce("get", "/api/elections/1/apportionment/state", 200, {
+      overrideOnce("get", "/api/elections/3", 200, getElectionMockData(election, committee_session));
+      overrideOnce("get", "/api/elections/3/apportionment/state", 200, {
         type: "Uninitialised",
       } satisfies ApportionmentState);
     });
 
     test("Not available until committee session is completed", async () => {
-      overrideOnce("post", "/api/elections/1/apportionment", 412, {
+      overrideOnce("post", "/api/elections/3/apportionment", 412, {
         error: "Committee session not completed",
         fatal: false,
         reference: "ApportionmentCommitteeSessionNotCompleted",
       } satisfies ErrorResponse);
 
-      renderApportionmentPage(false);
+      renderApportionmentPage(3, false);
 
       // Wait for the page to be loaded
       expect(await screen.findByRole("heading", { level: 1, name: "Zetelverdeling" })).toBeVisible();
@@ -212,13 +241,13 @@ describe("ApportionmentPage", () => {
     });
 
     test("Not possible because drawing of lots is not implemented yet", async () => {
-      overrideOnce("post", "/api/elections/1/apportionment", 422, {
+      overrideOnce("post", "/api/elections/3/apportionment", 422, {
         error: "Drawing of lots is required",
         fatal: false,
         reference: "ApportionmentDrawingOfLotsRequired",
       } satisfies ErrorResponse);
 
-      renderApportionmentPage(false);
+      renderApportionmentPage(3, false);
 
       // Wait for the page to be loaded
       expect(await screen.findByRole("heading", { level: 1, name: "Zetelverdeling" })).toBeVisible();
@@ -235,13 +264,13 @@ describe("ApportionmentPage", () => {
     });
 
     test("Not possible because all lists are exhausted", async () => {
-      overrideOnce("post", "/api/elections/1/apportionment", 422, {
+      overrideOnce("post", "/api/elections/3/apportionment", 422, {
         error: "All lists are exhausted, not enough candidates to fill all seats",
         fatal: false,
         reference: "ApportionmentAllListsExhausted",
       } satisfies ErrorResponse);
 
-      renderApportionmentPage(false);
+      renderApportionmentPage(3, false);
 
       // Wait for the page to be loaded
       expect(await screen.findByRole("heading", { level: 1, name: "Zetelverdeling" })).toBeVisible();
@@ -260,13 +289,13 @@ describe("ApportionmentPage", () => {
     });
 
     test("Not possible because no votes on candidates cast", async () => {
-      overrideOnce("post", "/api/elections/1/apportionment", 422, {
+      overrideOnce("post", "/api/elections/3/apportionment", 422, {
         error: "No votes on candidates cast",
         fatal: false,
         reference: "ApportionmentZeroVotesCast",
       } satisfies ErrorResponse);
 
-      renderApportionmentPage(false);
+      renderApportionmentPage(3, false);
 
       // Wait for the page to be loaded
       expect(await screen.findByRole("heading", { level: 1, name: "Zetelverdeling" })).toBeVisible();
@@ -300,13 +329,13 @@ describe("ApportionmentPage", () => {
         },
       ]);
 
-      overrideOnce("post", "/api/elections/1/apportionment", 500, {
+      overrideOnce("post", "/api/elections/3/apportionment", 500, {
         error: "Internal Server Error",
         fatal: true,
         reference: "InternalServerError",
       });
 
-      await router.navigate("/elections/1/apportionment");
+      await router.navigate("/elections/3/apportionment");
 
       rtlRender(<Providers router={router} />);
 

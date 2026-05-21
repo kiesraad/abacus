@@ -40,6 +40,7 @@ export function InputField({
   disabled = false,
   margin = "mb-0",
   autoFocus,
+  autoComplete = "off",
   numberInput,
   hideErrorMessage,
   ...inputFieldProps
@@ -51,7 +52,7 @@ export function InputField({
     value,
     autoFocus,
     defaultValue,
-    autoComplete: "off",
+    autoComplete,
     "aria-invalid": !!error,
     "aria-errormessage": error ? `${name}-hint_or_error` : undefined,
   };

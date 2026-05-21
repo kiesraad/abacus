@@ -258,8 +258,9 @@ fn reassign_residual_seats_for_exhausted_lists<T: ListVotes>(
     // Remove excess seats from exhausted lists
     for (list_number, seats) in exhausted_lists {
         seats_to_reassign += seats;
-        let mut full_seat: bool = false;
+
         for _ in 1..=seats {
+            let mut full_seat: bool = false;
             for list_standing in current_standings.iter_mut() {
                 if list_standing.list_number == list_number {
                     if list_standing.residual_seats > 0 {

@@ -259,7 +259,7 @@ fn reassign_residual_seats_for_exhausted_lists<T: ListVotes>(
 
     let mut current_standings = previous_standings.clone();
     let mut seats_to_reassign = 0;
-    let mut list_exhaustion_steps: Vec<SeatChangeStep<T::ListNumber>> = vec![];
+    let mut current_steps = previous_steps.to_owned();
 
     // Remove excess seats from exhausted lists
     for (list_number, seats) in exhausted_lists {
@@ -280,7 +280,7 @@ fn reassign_residual_seats_for_exhausted_lists<T: ListVotes>(
                 "Seat first assigned to list {:?} has been removed and will be assigned to another list in accordance with Article P 10 Kieswet",
                 list_number
             );
-            list_exhaustion_steps.push(SeatChangeStep {
+            current_steps.push(SeatChangeStep {
                 standings: current_standings.clone(),
                 residual_seat_number: None,
                 change: SeatChange::ListExhaustionRemoval(ListExhaustionRemovedSeat {
@@ -290,8 +290,6 @@ fn reassign_residual_seats_for_exhausted_lists<T: ListVotes>(
             });
         }
     }
-    let mut current_steps = previous_steps.to_owned();
-    current_steps.extend(list_exhaustion_steps);
 
     // Reassign removed seats to non-exhausted lists
     (current_steps, current_standings) = assign_remainder(

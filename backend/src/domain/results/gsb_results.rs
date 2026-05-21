@@ -233,7 +233,7 @@ mod tests {
         }
     }
 
-    fn validate(data: GSBResults) -> Result<ValidationResults, DataError> {
+    fn validate(data: &GSBResults) -> Result<ValidationResults, DataError> {
         let mut validation_results = ValidationResults::default();
 
         data.validate(
@@ -255,7 +255,7 @@ mod tests {
 
     #[test]
     fn test_default() -> Result<(), DataError> {
-        let validation_results = validate(create_test_data())?;
+        let validation_results = validate(&create_test_data())?;
         assert_eq!(validation_results.errors.len(), 0);
         assert_eq!(validation_results.warnings.len(), 0);
         Ok(())
@@ -267,7 +267,7 @@ mod tests {
         data.differences_counts.fewer_ballots_count = 1_000_000_000;
         data.differences_counts.more_ballots_count = 1_000_000_000;
 
-        let result = validate(data);
+        let result = validate(&data);
         assert!(result.is_err());
         assert!(result.unwrap_err().message.eq("count out of range"),);
 
@@ -282,7 +282,7 @@ mod tests {
         let mut data = create_test_data();
         data.political_group_votes[1].total = 0;
 
-        let validation_results = validate(data.clone())?;
+        let validation_results = validate(&data)?;
         assert_eq!(
             validation_results.errors,
             [ValidationResult {
@@ -301,7 +301,7 @@ mod tests {
         data.political_group_votes[1].candidate_votes[2].votes = 0;
         data.political_group_votes[1].total = 0;
 
-        let validation_results = validate(data.clone())?;
+        let validation_results = validate(&data)?;
         assert_eq!(
             validation_results.errors,
             [ValidationResult {
@@ -316,7 +316,7 @@ mod tests {
         // Expect only F.401 (F.401, F.402 and F.403 are triggered)
         data.political_group_votes[1].candidate_votes[0].votes += 10;
 
-        let validation_results = validate(data.clone())?;
+        let validation_results = validate(&data)?;
         assert_eq!(
             validation_results.errors,
             [ValidationResult {
@@ -343,7 +343,7 @@ mod tests {
         data.political_group_votes[1].candidate_votes[0].votes = 10;
         data.political_group_votes[1].total = 0;
 
-        let validation_results = validate(data.clone())?;
+        let validation_results = validate(&data)?;
         assert_eq!(
             validation_results.errors,
             [
@@ -381,7 +381,7 @@ mod tests {
         data.political_group_votes[1].candidate_votes[0].votes = 0;
         data.political_group_votes[1].total = 30;
 
-        let validation_results = validate(data.clone())?;
+        let validation_results = validate(&data)?;
         assert_eq!(
             validation_results.errors,
             [
@@ -412,7 +412,7 @@ mod tests {
         data.political_group_votes[1].total = 0;
 
         // When list total is empty, don't expect F.402, but F.401
-        let validation_results = validate(data.clone())?;
+        let validation_results = validate(&data)?;
         assert_eq!(
             validation_results.errors,
             [ValidationResult {
@@ -428,7 +428,7 @@ mod tests {
         data.political_group_votes[1].total = 30;
 
         // Expect F.402 when list total doesn't match candidate votes
-        let validation_results = validate(data.clone())?;
+        let validation_results = validate(&data)?;
         assert_eq!(
             validation_results.errors,
             [ValidationResult {
@@ -449,7 +449,7 @@ mod tests {
         let mut data = create_test_data();
         data.political_group_votes[1].candidate_votes[0].votes += 10;
         data.political_group_votes[1].total += 10;
-        let validation_results = validate(data.clone())?;
+        let validation_results = validate(&data)?;
         assert_eq!(
             validation_results.errors,
             [ValidationResult {
@@ -464,7 +464,7 @@ mod tests {
         // Multiple invalid case
         data.political_group_votes[0].candidate_votes[0].votes += 10;
         data.political_group_votes[0].total += 10;
-        let validation_results = validate(data.clone())?;
+        let validation_results = validate(&data)?;
         assert_eq!(
             validation_results.errors,
             [
@@ -487,7 +487,7 @@ mod tests {
 
         // When list total is empty, don't expect F.403, but F.401
         data.political_group_votes[1].total = 0;
-        let validation_results = validate(data.clone())?;
+        let validation_results = validate(&data)?;
         assert_eq!(
             validation_results.errors,
             [
@@ -517,12 +517,12 @@ mod tests {
         let mut data = create_test_data();
 
         // No error
-        let validation_results = validate(data.clone())?;
+        let validation_results = validate(&data)?;
         assert!(validation_results.warnings.is_empty());
 
         // Error: number_of_voters is 0, expect W.205
         data.number_of_voters = 0;
-        let validation_results = validate(data)?;
+        let validation_results = validate(&data)?;
         assert_eq!(
             validation_results.warnings,
             [ValidationResult {
@@ -558,7 +558,7 @@ mod tests {
             data.number_of_voters = number_of_voters;
             data.voters_counts.poll_card_count = poll_card_count;
 
-            let result = validate(data.clone())?;
+            let result = validate(&data)?;
 
             let has_w206 = result.warnings.iter().any(|e| e == &expected_w206);
             assert_eq!(has_w206, expect_w206, "Failed: {description}");

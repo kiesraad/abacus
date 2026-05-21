@@ -258,7 +258,7 @@ impl Validate for DataEntryStatus {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize, strum::Display, Clone, PartialEq, Eq, ToSchema)]
+#[derive(Debug, Serialize, Deserialize, strum::Display, Clone, Copy, PartialEq, Eq, ToSchema)]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 #[strum(serialize_all = "snake_case")]
 pub enum DataEntryStatusName {

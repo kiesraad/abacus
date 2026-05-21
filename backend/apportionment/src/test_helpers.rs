@@ -218,7 +218,7 @@ pub fn seat_assignment_fixture_with_given_list_numbers_and_candidate_votes(
     list_candidate_votes: Vec<(u32, Vec<u32>)>,
 ) -> ApportionmentInputMock {
     let mut list_votes: Vec<ListVotesMock> = vec![];
-    for (list_number, list_candidate_votes) in list_candidate_votes.into_iter() {
+    for (list_number, list_candidate_votes) in list_candidate_votes {
         list_votes.push(ListVotesMock::from_test_data_auto(
             list_number,
             list_candidate_votes,
@@ -260,7 +260,7 @@ pub fn seat_assignment_fixture_with_given_list_numbers_candidate_numbers_and_vot
     list_number_candidate_votes: Vec<(u32, Vec<(u32, u32)>)>,
 ) -> ApportionmentInputMock {
     let mut list_votes: Vec<ListVotesMock> = vec![];
-    for (list_number, list_candidate_votes) in list_number_candidate_votes.into_iter() {
+    for (list_number, list_candidate_votes) in list_number_candidate_votes {
         list_votes.push(ListVotesMock {
             number: list_number,
             candidate_votes: list_candidate_votes

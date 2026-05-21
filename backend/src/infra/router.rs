@@ -276,7 +276,7 @@ mod tests {
             ];
 
             // Loop through all the operations for each path
-            for (method, operation) in operations.into_iter() {
+            for (method, operation) in operations {
                 // Skip if no operation defined
                 let Some(operation) = operation else { continue };
 

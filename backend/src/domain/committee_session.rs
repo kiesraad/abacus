@@ -12,7 +12,7 @@ use crate::domain::{
     investigation::PollingStationInvestigation,
 };
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CommitteeSessionError {
     CommitteeSessionPaused,
     InvalidCommitteeSessionStatus,

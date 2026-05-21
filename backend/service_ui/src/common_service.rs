@@ -16,6 +16,7 @@ pub fn new_service(name: &'static str) -> Result<Box<dyn Service>, std::io::Erro
                 Err(err) => Err(err),
             };
         }
+        #[cfg(windows)]
         "windows" => Ok(Box::new(windows_service::new(name))),
         _ => {
             panic!("Only Windows and Linux supported.")

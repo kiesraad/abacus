@@ -170,12 +170,7 @@ fn list_numbers_with_exhausted_seats<T: ListVotes>(
         .iter()
         .map(|s| (s, get_number_of_candidates(input_list_votes, s.list_number)))
         .filter(|(s, number_of_candidates)| number_of_candidates < &s.total_seats())
-        .map(|(s, number_of_candidates)| {
-            (
-                s.list_number,
-                number_of_candidates.abs_diff(s.total_seats()),
-            )
-        })
+        .map(|(s, number_of_candidates)| (s.list_number, s.total_seats() - number_of_candidates))
 }
 
 /// If a list got the absolute majority of votes but not the absolute majority of seats,

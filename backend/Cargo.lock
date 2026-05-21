@@ -3268,6 +3268,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "service_ui"
+version = "1.1.0"
+
+[[package]]
 name = "sha1"
 version = "0.10.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5125,6 +5129,10 @@ name = "windows_i686_msvc"
 version = "0.52.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "240948bc05c5e7c6dabba28bf89d89ffce3e303022809e73deaefe4f6ec56c66"
+
+[[package]]
+name = "windows_service"
+version = "1.1.0"
 
 [[package]]
 name = "windows_x86_64_gnu"

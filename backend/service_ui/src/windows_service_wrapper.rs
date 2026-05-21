@@ -9,7 +9,7 @@ pub struct WindowsService {
     service: windows_service::service::Service,
 }
 
-const SERVICE_NAME: &'static str = "abacus_service";
+const SERVICE_NAME: &'static str = "abacus_windows_service";
 
 #[cfg(windows)]
 pub fn new() -> Result<WindowsService, ServiceError> {
@@ -24,7 +24,8 @@ pub fn new() -> Result<WindowsService, ServiceError> {
         ServiceAccess::PAUSE_CONTINUE
             | ServiceAccess::START
             | ServiceAccess::STOP
-            | ServiceAccess::INTERROGATE,
+            | ServiceAccess::INTERROGATE
+            | ServiceAccess::QUERY_STATUS,
     ) {
         Ok(service) => service,
         Err(err) => return Err(ServiceError::WindowsError(err)),

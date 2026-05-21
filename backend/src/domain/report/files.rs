@@ -3,17 +3,15 @@ use sqlx::{SqliteConnection, SqlitePool};
 
 use crate::{
     APIError, SqlitePoolExt,
-    api::{
-        apportionment::ApportionmentInputData,
-        report::structs::{
-            CsbFiles, FileCreatedAuditData, GeneratedFile, GsbFiles, ResultsInputCSB,
-            ResultsInputData, ResultsInputGSB,
-        },
-    },
+    api::apportionment::ApportionmentInputData,
     domain::{
         committee_session::{CommitteeSession, CommitteeSessionError, CommitteeSessionId},
         committee_session_status::CommitteeSessionStatus,
         file::{File, FileType},
+        report::structs::{
+            CsbFiles, FileCreatedAuditData, GeneratedFile, GsbFiles, ResultsInputCSB,
+            ResultsInputData, ResultsInputGSB,
+        },
     },
     infra::audit_log::AuditService,
     repository::{

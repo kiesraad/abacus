@@ -96,7 +96,7 @@ impl EnrichedSeatAssignment {
             .filter(|list_seat_assignment| list_seat_assignment.meets_remainder_threshold)
             .collect();
         let mut largest_remainders = Vec::new();
-        for standing in final_standing_pgs_meeting_threshold.iter() {
+        for standing in &final_standing_pgs_meeting_threshold {
             let assigned_seat = initial_largest_remainder_steps
                 .iter()
                 .find(|step| step.change.list_number_assigned() == standing.list_number);
@@ -159,7 +159,7 @@ impl EnrichedSeatAssignment {
             )
         };
 
-        for pg_votes in summary.votes_counts.political_group_total_votes.iter() {
+        for pg_votes in &summary.votes_counts.political_group_total_votes {
             let initial_full_seats = Self::get_initial_full_seats(seat_assignment, pg_votes.number);
             let largest_remainder = if initial_steps.initial_largest_remainder_steps.is_empty() {
                 None

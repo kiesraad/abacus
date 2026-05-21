@@ -39,7 +39,7 @@ impl PoliticalGroupCandidateVotes {
 
         self.total += other.total;
 
-        for cv in other.candidate_votes.iter() {
+        for cv in &other.candidate_votes {
             let Some(found_can) = self
                 .candidate_votes
                 .iter_mut()

@@ -221,7 +221,7 @@ fn reassign_residual_seat_for_absolute_majority<T: ListVotes>(
 
         // Reassign the seat
         let mut standing = standings.clone();
-        for list_standing in standing.iter_mut() {
+        for list_standing in &mut standing {
             if list_standing.list_number == lists_last_residual_seat[0] {
                 list_standing.residual_seats -= 1
             }
@@ -270,7 +270,7 @@ fn reassign_residual_seats_for_exhausted_lists<T: ListVotes>(
             seats_to_reassign += seats;
             let mut full_seat: bool = false;
             for _ in 1..=seats {
-                for list_standing in current_standings.iter_mut() {
+                for list_standing in &mut current_standings {
                     if list_standing.list_number == list_number {
                         if list_standing.residual_seats > 0 {
                             list_standing.residual_seats -= 1;

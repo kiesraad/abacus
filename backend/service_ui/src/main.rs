@@ -1,12 +1,12 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
-use crate::common_service::Service;
+use crate::common_service::{Service, ServiceError};
 use eframe::egui;
 
 mod common_service;
 mod systemd_service;
-mod windows_service;
+mod windows_service_wrapper;
 
-const SERVICE_NAME: &'static str = "abacus.service";
+// const SERVICE_NAME: &'static str = "abacus.service";
 
 fn main() -> eframe::Result {
     let options = eframe::NativeOptions {
@@ -42,15 +42,12 @@ impl eframe::App for AbacusApp {
             if ui.button("Stop").clicked() {
                 self.service.stop();
             }
-            let status = match self.service.is_running() {
-                true => "Running",
-                false => "Stopped",
-            };
-            ui.label(format!("Status: {}", status));
+            let status = self.service.is_running();
+            ui.label(format!("Status: {:?}", status));
         });
     }
 }
-fn detect_service() -> std::io::Result<Box<dyn Service>> {
-    let service = common_service::new_service(SERVICE_NAME)?;
+fn detect_service() -> Result<Box<dyn Service>, ServiceError> {
+    let service = common_service::new_service()?;
     Ok(service)
 }

@@ -1,26 +1,5 @@
 #[cfg(windows)]
 fn main() {
-    std::panic::set_hook(Box::new(|info| {
-        // TODO: clean up
-
-        use std::io::Write;
-        use std::time::SystemTime;
-
-        let timestamp = SystemTime::now()
-            .duration_since(SystemTime::UNIX_EPOCH)
-            .expect("current time should be after unix epoch")
-            .as_secs();
-
-        let mut out_file = std::fs::File::create(
-            std::env::current_exe()
-                .unwrap()
-                .with_added_extension(format!("{timestamp}.crash.log")),
-        )
-        .expect("crash file should be openable");
-
-        writeln!(out_file, "{info}").unwrap();
-    }));
-
     abacus_service::run()
 }
 
@@ -51,24 +30,32 @@ mod abacus_service {
     const SERVICE_NAME: &str = "abacus_service";
     const SERVICE_TYPE: ServiceType = ServiceType::OWN_PROCESS;
 
+    fn log_crash_to_file(text: &str) {
+        // TODO: clean up?
+        let timestamp = SystemTime::now()
+            .duration_since(SystemTime::UNIX_EPOCH)
+            .expect("current time should be after unix epoch")
+            .as_secs();
+
+        let mut out_file = std::fs::File::create(
+            std::env::current_exe()
+                .unwrap()
+                .with_added_extension(format!("{timestamp}.crash.log")),
+        )
+        .expect("crash file should be openable");
+
+        writeln!(out_file, "{text}").unwrap();
+    }
+
     pub fn run() {
+        std::panic::set_hook(Box::new(|info| {
+            log_crash_to_file(&format!("{info}"));
+        }));
+
         // Register generated `ffi_service_main` with the system and start the service, blocking
         // this thread until the service is stopped.
         if let Err(error) = service_dispatcher::start(SERVICE_NAME, ffi_service_main) {
-            // TODO: clean up
-            let timestamp = SystemTime::now()
-                .duration_since(SystemTime::UNIX_EPOCH)
-                .expect("current time should be after unix epoch")
-                .as_secs();
-
-            let mut out_file = std::fs::File::create(
-                std::env::current_exe()
-                    .unwrap()
-                    .with_added_extension(format!("{timestamp}.crash.log")),
-            )
-            .expect("crash file should be openable");
-
-            writeln!(out_file, "{error:#?}").unwrap();
+            log_crash_to_file(&format!("{error:#?}"));
         }
     }
 
@@ -83,20 +70,7 @@ mod abacus_service {
     // output to file if needed.
     pub fn my_service_main(_arguments: Vec<OsString>) {
         if let Err(error) = run_service() {
-            // TODO: clean up
-            let timestamp = SystemTime::now()
-                .duration_since(SystemTime::UNIX_EPOCH)
-                .expect("current time should be after unix epoch")
-                .as_secs();
-
-            let mut out_file = std::fs::File::create(
-                std::env::current_exe()
-                    .unwrap()
-                    .with_added_extension(format!("{timestamp}.crash.log")),
-            )
-            .expect("crash file should be openable");
-
-            writeln!(out_file, "{error:#?}").unwrap();
+            log_crash_to_file(&format!("{error:#?}"));
         }
     }
 

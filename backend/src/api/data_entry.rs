@@ -173,7 +173,7 @@ async fn validate_and_get_data(
 ) -> Result<(DataEntrySourceContext, DataEntryStatus), APIError> {
     let context = data_entry_repo::resolve_source(conn, data_entry_id).await?;
     user.role()
-        .is_authorized(&context.election.committee_category)?;
+        .is_authorized(context.election.committee_category)?;
 
     let data_entry_status = data_entry_repo::get_status(conn, data_entry_id).await?;
 
@@ -243,7 +243,7 @@ pub async fn delete_data_entry_for_polling_station(
 
 fn initial_current_data_entry(
     user_id: UserId,
-    committee_category: &CommitteeCategory,
+    committee_category: CommitteeCategory,
     political_groups: &[PoliticalGroup],
     committee_session: &CommitteeSession,
     previous_results: Option<&CommonPollingStationResults>,
@@ -348,7 +348,7 @@ async fn data_entry_claim(
 
     let new_data_entry = initial_current_data_entry(
         user.id(),
-        &context.election.committee_category,
+        context.election.committee_category,
         &context.election.political_groups,
         &context.committee_session,
         previous_results.as_ref(),
@@ -622,7 +622,7 @@ async fn data_entry_reset(
 
     let context = data_entry_repo::resolve_source(&mut tx, data_entry_id).await?;
     user.role()
-        .is_authorized(&context.election.committee_category)?;
+        .is_authorized(context.election.committee_category)?;
 
     let data_entry = data_entry_repo::get(&mut tx, data_entry_id).await?;
 
@@ -980,7 +980,7 @@ async fn election_status(
     let mut conn = pool.acquire().await?;
 
     let election = election_repo::get(&mut conn, election_id).await?;
-    user.role().is_authorized(&election.committee_category)?;
+    user.role().is_authorized(election.committee_category)?;
 
     let current_committee_session =
         committee_session_repo::get_election_committee_session(&mut conn, election_id).await?;

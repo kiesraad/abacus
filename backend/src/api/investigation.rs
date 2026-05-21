@@ -201,7 +201,7 @@ async fn polling_station_investigation_create(
 
     let committee_category =
         polling_station_repo::get_committee_category(&mut tx, polling_station_id).await?;
-    user.role().is_authorized(&committee_category)?;
+    user.role().is_authorized(committee_category)?;
 
     let committee_session = validate_and_get_committee_session(&mut tx, polling_station_id).await?;
 
@@ -277,7 +277,7 @@ async fn polling_station_investigation_conclude(
 
     let committee_category =
         polling_station_repo::get_committee_category(&mut tx, polling_station_id).await?;
-    user.role().is_authorized(&committee_category)?;
+    user.role().is_authorized(committee_category)?;
 
     let committee_session = validate_and_get_committee_session(&mut tx, polling_station_id).await?;
 
@@ -515,7 +515,7 @@ async fn polling_station_investigation_update(
 
     let committee_category =
         polling_station_repo::get_committee_category(&mut tx, polling_station_id).await?;
-    user.role().is_authorized(&committee_category)?;
+    user.role().is_authorized(committee_category)?;
 
     let committee_session = validate_and_get_committee_session(&mut tx, polling_station_id).await?;
 
@@ -597,7 +597,7 @@ async fn polling_station_investigation_delete(
 
     let committee_category =
         polling_station_repo::get_committee_category(&mut tx, polling_station_id).await?;
-    user.role().is_authorized(&committee_category)?;
+    user.role().is_authorized(committee_category)?;
 
     let committee_session = validate_and_get_committee_session(&mut tx, polling_station_id).await?;
 
@@ -685,7 +685,7 @@ async fn polling_station_investigation_download_corrigendum_pdf(
 
     let committee_category =
         polling_station_repo::get_committee_category(&mut conn, polling_station_id).await?;
-    user.role().is_authorized(&committee_category)?;
+    user.role().is_authorized(committee_category)?;
 
     let status = investigation_repo::get(&mut conn, polling_station_id)
         .await?

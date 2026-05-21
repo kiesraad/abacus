@@ -942,6 +942,7 @@ mod tests {
         assert!(matches!(res, EMLImportError::OnlyMunicipalSupported));
     }
 
+    #[allow(clippy::too_many_lines)]
     #[test]
     fn test_as_eml_count_contest() {
         let candidate = ElectionWithPoliticalGroups {

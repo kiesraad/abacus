@@ -1,20 +1,27 @@
-// Ping service example.
-//
-// You can install and uninstall this service using other example programs.
-// All commands mentioned below shall be executed in Command Prompt with Administrator privileges.
-//
-// Service installation: `install_service.exe`
-// Service uninstallation: `uninstall_service.exe`
-//
-// Start the service: `net start ping_service`
-// Stop the service: `net stop ping_service`
-//
-// Ping server sends a text message to local UDP port 1234 once a second.
-// You can verify that service works by running netcat, i.e: `ncat -ul 1234`.
-
 #[cfg(windows)]
-fn main() -> windows_service::Result<()> {
-    ping_service::run()
+fn main() {
+    std::panic::set_hook(Box::new(|info| {
+        // TODO: clean up
+
+        use std::io::Write;
+        use std::time::SystemTime;
+
+        let timestamp = SystemTime::now()
+            .duration_since(SystemTime::UNIX_EPOCH)
+            .expect("current time should be after unix epoch")
+            .as_secs();
+
+        let mut out_file = std::fs::File::create(
+            std::env::current_exe()
+                .unwrap()
+                .with_added_extension(format!("{timestamp}.crash.log")),
+        )
+        .expect("crash file should be openable");
+
+        writeln!(out_file, "{info}").unwrap();
+    }));
+
+    abacus_service::run()
 }
 
 #[cfg(not(windows))]
@@ -23,34 +30,46 @@ fn main() {
 }
 
 #[cfg(windows)]
-mod ping_service {
+mod abacus_service {
     use std::{
         ffi::OsString,
-        net::{IpAddr, SocketAddr, UdpSocket},
+        io::Write,
+        process::{Command, Stdio},
         sync::mpsc,
-        time::Duration,
+        time::{Duration, SystemTime},
     };
     use windows_service::{
-        define_windows_service,
+        Result, define_windows_service,
         service::{
             ServiceControl, ServiceControlAccept, ServiceExitCode, ServiceState, ServiceStatus,
             ServiceType,
         },
         service_control_handler::{self, ServiceControlHandlerResult},
-        service_dispatcher, Result,
+        service_dispatcher,
     };
 
     const SERVICE_NAME: &str = "abacus_service";
     const SERVICE_TYPE: ServiceType = ServiceType::OWN_PROCESS;
 
-    const LOOPBACK_ADDR: [u8; 4] = [127, 0, 0, 1];
-    const RECEIVER_PORT: u16 = 1234;
-    const PING_MESSAGE: &str = "ping\n";
-
-    pub fn run() -> Result<()> {
+    pub fn run() {
         // Register generated `ffi_service_main` with the system and start the service, blocking
         // this thread until the service is stopped.
-        service_dispatcher::start(SERVICE_NAME, ffi_service_main)
+        if let Err(error) = service_dispatcher::start(SERVICE_NAME, ffi_service_main) {
+            // TODO: clean up
+            let timestamp = SystemTime::now()
+                .duration_since(SystemTime::UNIX_EPOCH)
+                .expect("current time should be after unix epoch")
+                .as_secs();
+
+            let mut out_file = std::fs::File::create(
+                std::env::current_exe()
+                    .unwrap()
+                    .with_added_extension(format!("{timestamp}.crash.log")),
+            )
+            .expect("crash file should be openable");
+
+            writeln!(out_file, "{error:#?}").unwrap();
+        }
     }
 
     // Generate the windows service boilerplate.
@@ -63,8 +82,21 @@ mod ping_service {
     // parameters. There is no stdout or stderr at this point so make sure to configure the log
     // output to file if needed.
     pub fn my_service_main(_arguments: Vec<OsString>) {
-        if let Err(_e) = run_service() {
-            // Handle the error, by logging or something.
+        if let Err(error) = run_service() {
+            // TODO: clean up
+            let timestamp = SystemTime::now()
+                .duration_since(SystemTime::UNIX_EPOCH)
+                .expect("current time should be after unix epoch")
+                .as_secs();
+
+            let mut out_file = std::fs::File::create(
+                std::env::current_exe()
+                    .unwrap()
+                    .with_added_extension(format!("{timestamp}.crash.log")),
+            )
+            .expect("crash file should be openable");
+
+            writeln!(out_file, "{error:#?}").unwrap();
         }
     }
 
@@ -101,6 +133,14 @@ mod ping_service {
         // The returned status handle should be used to report service status changes to the system.
         let status_handle = service_control_handler::register(SERVICE_NAME, event_handler)?;
 
+        let current_exe = std::env::current_exe().unwrap();
+        let mut command = Command::new(current_exe.with_file_name("abacus.exe"))
+            .stdin(Stdio::inherit())
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped())
+            .spawn()
+            .expect("ls command failed to start");
+
         // Tell the system that service is running
         status_handle.set_service_status(ServiceStatus {
             service_type: SERVICE_TYPE,
@@ -112,25 +152,43 @@ mod ping_service {
             process_id: None,
         })?;
 
-        // For demo purposes this service sends a UDP packet once a second.
-        let loopback_ip = IpAddr::from(LOOPBACK_ADDR);
-        let sender_addr = SocketAddr::new(loopback_ip, 0);
-        let receiver_addr = SocketAddr::new(loopback_ip, RECEIVER_PORT);
-        let msg = PING_MESSAGE.as_bytes();
-        let socket = UdpSocket::bind(sender_addr).unwrap();
+        let mut stdout = command.stdout.take().expect("handle present");
+        let stdout_thread = std::thread::spawn({
+            let current_exe = current_exe.clone();
+
+            move || {
+                let mut out_file =
+                    std::fs::File::create(current_exe.with_added_extension("out.log"))
+                        .expect("out.log can be created");
+
+                std::io::copy(&mut stdout, &mut out_file).unwrap();
+
+                out_file.flush().unwrap();
+            }
+        });
+
+        let mut stderr = command.stderr.take().expect("handle present");
+        let stderr_thread = std::thread::spawn(move || {
+            let mut out_file = std::fs::File::create(current_exe.with_added_extension("err.log"))
+                .expect("out.log can be created");
+
+            std::io::copy(&mut stderr, &mut out_file).unwrap();
+
+            out_file.flush().unwrap();
+        });
 
         loop {
-            let _ = socket.send_to(msg, receiver_addr);
-
             // Poll shutdown event.
-            match shutdown_rx.recv_timeout(Duration::from_secs(1)) {
+            match shutdown_rx.recv() {
                 // Break the loop either upon stop or channel disconnect
-                Ok(_) | Err(mpsc::RecvTimeoutError::Disconnected) => break,
-
-                // Continue work if no events were received within the timeout
-                Err(mpsc::RecvTimeoutError::Timeout) => (),
+                Ok(_) | Err(mpsc::RecvError) => break,
             };
         }
+
+        // Kill the underlying process
+        command.kill().unwrap();
+        stdout_thread.join().unwrap();
+        stderr_thread.join().unwrap();
 
         // Tell the system that service has stopped.
         status_handle.set_service_status(ServiceStatus {

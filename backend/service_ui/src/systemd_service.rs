@@ -26,14 +26,14 @@ impl Service for SystemdService {
     }
 
     fn start(&self) {
-        self.handler.start(&self.name);
+        self.handler.start(&self.name).unwrap();
     }
 
     fn restart(&self) {
-        self.handler.restart(&self.name);
+        self.handler.restart(&self.name).unwrap();
     }
 
     fn stop(&self) {
-        self.handler.stop(&self.name);
+        self.handler.stop(&self.name).unwrap();
     }
 }

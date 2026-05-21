@@ -5,13 +5,16 @@ use axum::{
 use chrono::{DateTime, Datelike, Local};
 use pdf_gen::zip::{ZipResponse, ZipResponseError, slugify_filename, zip_single_file};
 use sqlx::SqlitePool;
+use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
-    APIError, ErrorResponse,
-    api::report::files::{get_files_csb_election, get_files_gsb_election},
+    APIError, AppState, ErrorResponse,
+    api::middleware::authentication::RouteAuthorization,
     domain::{
         committee_session::CommitteeSessionId,
         election::{ElectionId, ElectionWithPoliticalGroups},
+        report::files::{get_files_csb_election, get_files_gsb_election},
+        role::Role,
     },
     infra::audit_log::AuditService,
     repository::{
@@ -20,6 +23,19 @@ use crate::{
         user_repo::User,
     },
 };
+
+/// Default date time format for reports
+pub const DEFAULT_DATE_TIME_FORMAT: &str = "%d-%m-%Y %H:%M:%S %Z";
+
+pub fn router() -> OpenApiRouter<AppState> {
+    use Role::*;
+
+    OpenApiRouter::default()
+        .routes(routes!(election_download_zip_results_gsb).authorize(&[CoordinatorGSB]))
+        .routes(routes!(election_download_zip_results_csb).authorize(&[CoordinatorCSB]))
+        .routes(routes!(election_download_zip_attachment_csb).authorize(&[CoordinatorCSB]))
+        .routes(routes!(election_download_zip_total_counts_csb).authorize(&[CoordinatorCSB]))
+}
 
 pub fn download_zip_filename(
     base: &str,
@@ -394,31 +410,25 @@ mod tests {
         results
     }
 
-    #[test(sqlx::test(fixtures(path = "../../../fixtures", scripts("election_5_with_results"))))]
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
     async fn test_gsb_election_committee_category_authorization_err(pool: SqlitePool) {
         let results = call_handlers_gsb(pool, Role::CoordinatorCSB).await;
         assert_committee_category_authorization_err(results).await;
     }
 
-    #[test(sqlx::test(fixtures(path = "../../../fixtures", scripts("election_5_with_results"))))]
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
     async fn test_gsb_election_committee_category_authorization_ok(pool: SqlitePool) {
         let results = call_handlers_gsb(pool, Role::CoordinatorGSB).await;
         assert_committee_category_authorization_ok(results);
     }
 
-    #[test(sqlx::test(fixtures(
-        path = "../../../fixtures",
-        scripts("election_8_csb_with_results")
-    )))]
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_8_csb_with_results"))))]
     async fn test_csb_election_committee_category_authorization_err(pool: SqlitePool) {
         let results = call_handlers_csb(pool, Role::CoordinatorGSB).await;
         assert_committee_category_authorization_err(results).await;
     }
 
-    #[test(sqlx::test(fixtures(
-        path = "../../../fixtures",
-        scripts("election_8_csb_with_results")
-    )))]
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_8_csb_with_results"))))]
     async fn test_csb_election_committee_category_authorization_ok(pool: SqlitePool) {
         let results = call_handlers_csb(pool, Role::CoordinatorCSB).await;
         assert_committee_category_authorization_ok(results);

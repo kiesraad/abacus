@@ -12,6 +12,7 @@ pub mod identifier;
 pub mod investigation;
 pub mod models;
 pub mod polling_station;
+pub mod report;
 pub mod results;
 pub mod role;
 pub mod sub_committee;

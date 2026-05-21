@@ -18,7 +18,7 @@ axum.workspace = true
 chrono.workspace = true
 rand.workspace = true
 strum.workspace = true
-tokio-util = { version = "0.7.18", features = ["io"] }
+tokio-util = "0.7.18"
 tokio.workspace = true
 tracing.workspace = true
 typst = { version = "0.14.2", optional = true }

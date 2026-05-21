@@ -10,7 +10,7 @@ rust-version = "1.89"
 
 [workspace.dependencies]
 async_zip = { version = "0.0.18", features = ["chrono", "deflate", "tokio"] }
-axum = { version = "0.8", features = ["http1", "macros", "original-uri", "tokio"], default-features = false }
+axum = { version = "0.8", features = ["http1", "macros", "original-uri", "tokio", "json"], default-features = false }
 axum-extra = { version = "0.12", default-features = false, features = ["attachment", "cookie", "query", "typed-header"] }
 chrono = { version = "0.4", features = ["serde"], default-features = false }
 http-body-util = "0.1.3"

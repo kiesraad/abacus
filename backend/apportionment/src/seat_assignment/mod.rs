@@ -57,7 +57,7 @@ pub(crate) fn seat_assignment<T: ApportionmentInput>(
 
     let (mut steps, current_standings) = if residual_seats > 0 {
         assign_remainder::<T::List>(
-            &initial_standing,
+            initial_standing,
             input.number_of_seats(),
             residual_seats,
             0,
@@ -303,7 +303,7 @@ fn reassign_residual_seats_for_exhausted_lists<T: ListVotes>(
 
     // Reassign removed seats to non-exhausted lists
     (current_steps, current_standings) = assign_remainder(
-        &current_standings,
+        current_standings,
         seats,
         assigned_residual_seats + seats_to_reassign,
         assigned_residual_seats,

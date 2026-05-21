@@ -16,7 +16,7 @@ use tracing::{debug, info};
 /// These residual seats are assigned through two different procedures,
 /// depending on how many total seats are available in the election.
 pub fn assign_remainder<T: ListVotes>(
-    initial_standings: &[ListStanding<T::ListNumber>],
+    mut current_standings: Vec<ListStanding<T::ListNumber>>,
     seats: u32,
     total_residual_seats: u32,
     current_residual_seat_number: u32,
@@ -25,7 +25,6 @@ pub fn assign_remainder<T: ListVotes>(
 ) -> RemainderAssignmentResult<T::ListNumber> {
     let mut steps: Vec<SeatChangeStep<T::ListNumber>> = previous_steps.to_vec();
     let mut residual_seat_number = current_residual_seat_number;
-    let mut current_standings = initial_standings.to_vec();
 
     while residual_seat_number != total_residual_seats {
         let residual_seats = total_residual_seats - residual_seat_number;

@@ -1,0 +1,51 @@
+{
+  "publiccodeYmlVersion": "0.5",
+  "name": "Abacus",
+  "url": "https://github.com/kiesraad/abacus",
+  "softwareType": "standalone/web",
+  "platforms": [
+    "web"
+  ],
+  "categories": [
+    "data-analytics",
+    "data-collection"
+  ],
+  "developmentStatus": "stable",
+  "description": {
+    "nl": {
+      "longDescription": "De Kiesraad ontwikkelt nieuwe software voor de berekening van de uitslag van de verkiezingen: Abacus, software voor verkiezingsuitslagen en zetelverdeling. Abacus wordt gebruikt om de papieren processen-verbaal te digitaliseren en de tellingen te controleren.",
+      "shortDescription": "Abacus, software voor verkiezingsuitslagen en zetelverdeling",
+      "features": [
+        "Handmatige invoer processen-verbaal van stembureaus",
+        "Validatie resultaten",
+        "Digitale handtekening van voorzitter",
+        "Export naar EML_NL en PDF"
+      ]
+    }
+  },
+  "legal": {
+    "license": "EUPL-1.2",
+    "mainCopyrightOwner": "Kiesraad"
+  },
+  "intendedAudience": {
+    "countries": [
+      "NL"
+    ],
+    "scope": [
+      "government"
+    ]
+  },
+  "localisation": {
+    "availableLanguages": [
+      "NL"
+    ],
+    "localisationReady": true
+  },
+  "maintenance": {
+    "type": "internal"
+  },
+  "organisation": {
+    "name": "Kiesraad",
+    "uri": "https://www.kiesraad.nl/"
+  }
+}

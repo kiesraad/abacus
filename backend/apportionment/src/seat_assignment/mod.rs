@@ -61,7 +61,7 @@ pub(crate) fn seat_assignment<T: ApportionmentInput>(
             input.number_of_seats(),
             residual_seats,
             0,
-            &[],
+            vec![],
             None,
         )?
     } else {
@@ -307,7 +307,7 @@ fn reassign_residual_seats_for_exhausted_lists<T: ListVotes>(
         seats,
         assigned_residual_seats + seats_to_reassign,
         assigned_residual_seats,
-        &current_steps,
+        current_steps,
         Some(list_votes),
     )?;
     Ok((current_steps, current_standings))

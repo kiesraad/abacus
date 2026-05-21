@@ -20,10 +20,9 @@ pub fn assign_remainder<T: ListVotes>(
     seats: u32,
     total_residual_seats: u32,
     current_residual_seat_number: u32,
-    previous_steps: &[SeatChangeStep<T::ListNumber>],
+    mut steps: Vec<SeatChangeStep<T::ListNumber>>,
     exclude_exhausted_lists: Option<&[T]>,
 ) -> RemainderAssignmentResult<T::ListNumber> {
-    let mut steps: Vec<SeatChangeStep<T::ListNumber>> = previous_steps.to_vec();
     let mut residual_seat_number = current_residual_seat_number;
 
     while residual_seat_number != total_residual_seats {

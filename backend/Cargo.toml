@@ -1,6 +1,6 @@
 [workspace]
 resolver = "3"
-members = [".", "apportionment", "pdf_gen"]
+members = [".", "apportionment", "pdf_gen", "service_ui", "windows_service"]
 
 [workspace.package]
 version = "1.1.0"

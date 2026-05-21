@@ -134,17 +134,16 @@ impl Validate for GSBResults {
     fn validate(
         &self,
         election: &ElectionWithPoliticalGroups,
-        validation_results: &mut ValidationResults,
         path: &FieldPath,
-    ) -> Result<(), DataError> {
-        self.number_of_voters.validate(
-            election,
-            validation_results,
-            &path.field("number_of_voters"),
-        )?;
+    ) -> Result<ValidationResults, DataError> {
+        let mut validation_results = self
+            .number_of_voters
+            .validate(election, &path.field("number_of_voters"))?;
 
-        self.voters_counts
-            .validate(election, validation_results, &path.field("voters_counts"))?;
+        validation_results.join(
+            self.voters_counts
+                .validate(election, &path.field("voters_counts"))?,
+        );
 
         if self.number_of_voters == 0 {
             validation_results.warnings.push(ValidationResult {
@@ -160,34 +159,34 @@ impl Validate for GSBResults {
             });
         }
 
-        self.votes_counts
-            .validate(election, validation_results, &path.field("votes_counts"))?;
+        validation_results.join(
+            self.votes_counts
+                .validate(election, &path.field("votes_counts"))?,
+        );
 
-        self.differences_counts.validate(
-            election,
-            validation_results,
-            &path.field("differences_counts"),
-        )?;
+        validation_results.join(
+            self.differences_counts
+                .validate(election, &path.field("differences_counts"))?,
+        );
 
         self.differences_counts.validate_sum(
             self.voters_counts.total_admitted_voters_count,
             self.votes_counts.total_votes_cast_count,
-            validation_results,
+            &mut validation_results,
             &path.field("differences_counts"),
         );
 
-        self.political_group_votes.validate(
-            election,
-            validation_results,
-            &path.field("political_group_votes"),
-        )?;
+        validation_results.join(
+            self.political_group_votes
+                .validate(election, &path.field("political_group_votes"))?,
+        );
 
         for (i, pgcv) in self.political_group_votes.iter().enumerate() {
             let pgcv_path = path.field("political_group_votes").index(i);
-            self.validate_political_group_votes_errors(pgcv, validation_results, &pgcv_path)?;
+            self.validate_political_group_votes_errors(pgcv, &mut validation_results, &pgcv_path)?;
         }
 
-        Ok(())
+        Ok(validation_results)
     }
 }
 
@@ -234,8 +233,6 @@ mod tests {
     }
 
     fn validate(data: GSBResults) -> Result<ValidationResults, DataError> {
-        let mut validation_results = ValidationResults::default();
-
         data.validate(
             // Adjust election political group list to the given test data
             &election_fixture(
@@ -246,11 +243,8 @@ mod tests {
                     .map(|pg| u32::try_from(pg.candidate_votes.len()).unwrap())
                     .collect::<Vec<_>>(),
             ),
-            &mut validation_results,
             &"data".into(),
-        )?;
-
-        Ok(validation_results)
+        )
     }
 
     #[test]

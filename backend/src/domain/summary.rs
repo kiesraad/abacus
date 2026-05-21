@@ -18,7 +18,7 @@ use crate::{
             voters_counts::VotersCounts,
             votes_counts::{EnrichedVotesCounts, VotesCounts},
         },
-        validate::{Validate, ValidationResults},
+        validate::Validate,
     },
     error::ErrorReference,
 };
@@ -85,8 +85,7 @@ impl ElectionSummary {
             }
 
             // validate result and make sure that there are no errors
-            let mut validation_results = ValidationResults::default();
-            result.validate(election, &mut validation_results, &"data".into())?;
+            let validation_results = result.validate(election, &"data".into())?;
             if validation_results.has_errors() {
                 return Err(APIError::AddError(
                     format!(

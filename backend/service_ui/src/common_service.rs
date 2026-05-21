@@ -1,6 +1,7 @@
 use crate::systemd_service;
+use crate::windows_service_wrapper;
 pub trait Service {
-    fn is_running(&self) -> bool;
+    fn status(&self) -> ServiceState;
     fn start(&self);
 
     fn restart(&self);
@@ -8,16 +9,39 @@ pub trait Service {
     fn stop(&self);
 }
 
-pub fn new_service(name: &'static str) -> Result<Box<dyn Service>, std::io::Error> {
+#[derive(Debug)]
+pub enum ServiceError {
+    #[cfg(windows)]
+    WindowsError(windows_service::Error),
+    LinuxError(std::io::Error),
+}
+
+#[derive(Debug)]
+pub enum ServiceState {
+    Stopped,
+    StartPending,
+    StopPending,
+    Running,
+    ContinuePending,
+    PausePending,
+    Paused,
+}
+
+pub fn new_service() -> Result<Box<dyn Service>, ServiceError> {
     return match std::env::consts::OS {
         "linux" => {
-            return match systemd_service::SystemdService::new(name) {
+            return match systemd_service::SystemdService::new() {
                 Ok(service) => Ok(Box::new(service)),
                 Err(err) => Err(err),
             };
         }
         #[cfg(windows)]
-        "windows" => Ok(Box::new(windows_service::new(name))),
+        "windows" => {
+            return match windows_service_wrapper::new() {
+                Ok(service) => Ok(Box::new(service)),
+                Err(err) => Err(err),
+            };
+        }
         _ => {
             panic!("Only Windows and Linux supported.")
         }

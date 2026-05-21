@@ -1,28 +1,33 @@
-use crate::common_service::Service;
+use crate::common_service::{Service, ServiceError, ServiceState};
 use systemctl;
 pub struct SystemdService {
     name: String,
     handler: systemctl::SystemCtl,
 }
 
+const SERVICE_NAME: &'static str = "abacus.service";
+
 impl SystemdService {
-    pub fn new(name: &'static str) -> Result<SystemdService, std::io::Error> {
+    pub fn new() -> Result<SystemdService, ServiceError> {
         let sctl = systemctl::SystemCtl::builder()
             .path("/run/current-system/sw/bin/systemctl".into())
             .additional_args(Vec::new())
             .build();
 
         Ok(SystemdService {
-            name: name.to_string(),
+            name: SERVICE_NAME.to_string(),
             handler: sctl,
         })
     }
 }
 
 impl Service for SystemdService {
-    fn is_running(&self) -> bool {
+    fn status(&self) -> ServiceState {
         let unit = self.handler.create_unit(&self.name).unwrap();
-        return unit.active;
+        return match unit.active {
+            true => ServiceState::Running,
+            false => ServiceState::Stopped,
+        };
     }
 
     fn start(&self) {

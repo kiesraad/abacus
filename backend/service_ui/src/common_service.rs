@@ -1,7 +1,7 @@
 use crate::systemd_service;
 use crate::windows_service_wrapper;
 pub trait Service {
-    fn is_running(&self) -> ServiceState;
+    fn status(&self) -> ServiceState;
     fn start(&self);
 
     fn restart(&self);

@@ -22,7 +22,7 @@ impl SystemdService {
 }
 
 impl Service for SystemdService {
-    fn is_running(&self) -> ServiceState {
+    fn status(&self) -> ServiceState {
         let unit = self.handler.create_unit(&self.name).unwrap();
         return match unit.active {
             true => ServiceState::Running,
@@ -31,14 +31,14 @@ impl Service for SystemdService {
     }
 
     fn start(&self) {
-        self.handler.start(&self.name);
+        self.handler.start(&self.name).unwrap();
     }
 
     fn restart(&self) {
-        self.handler.restart(&self.name);
+        self.handler.restart(&self.name).unwrap();
     }
 
     fn stop(&self) {
-        self.handler.stop(&self.name);
+        self.handler.stop(&self.name).unwrap();
     }
 }

@@ -11,11 +11,13 @@ fn main() -> windows_service::Result<()> {
     };
     use windows_sys::Win32::Foundation::ERROR_SERVICE_DOES_NOT_EXIST;
 
-    let manager_access = ServiceManagerAccess::CONNECT;
-    let service_manager = ServiceManager::local_computer(None::<&str>, manager_access)?;
+    let service_manager =
+        ServiceManager::local_computer(None::<&str>, ServiceManagerAccess::CONNECT)?;
 
-    let service_access = ServiceAccess::QUERY_STATUS | ServiceAccess::STOP | ServiceAccess::DELETE;
-    let service = service_manager.open_service("abacus_service", service_access)?;
+    let service = service_manager.open_service(
+        "abacus_windows_service",
+        ServiceAccess::QUERY_STATUS | ServiceAccess::STOP | ServiceAccess::DELETE,
+    )?;
 
     // The service will be marked for deletion as long as this function call succeeds.
     // However, it will not be deleted from the database until it is stopped and all open handles to it are closed.
@@ -34,16 +36,16 @@ fn main() -> windows_service::Result<()> {
     let timeout = Duration::from_secs(5);
     while start.elapsed() < timeout {
         if let Err(windows_service::Error::Winapi(e)) =
-            service_manager.open_service("ping_service", ServiceAccess::QUERY_STATUS)
+            service_manager.open_service("abacus_windows_service", ServiceAccess::QUERY_STATUS)
         {
             if e.raw_os_error() == Some(ERROR_SERVICE_DOES_NOT_EXIST as i32) {
-                println!("ping_service is deleted.");
+                println!("abacus_windows_service is deleted.");
                 return Ok(());
             }
         }
         sleep(Duration::from_secs(1));
     }
-    println!("ping_service is marked for deletion.");
+    println!("abacus_windows_service is marked for deletion.");
 
     Ok(())
 }

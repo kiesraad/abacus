@@ -35,7 +35,7 @@ pub fn new() -> Result<WindowsService, ServiceError> {
 
 #[cfg(windows)]
 impl Service for WindowsService {
-    fn is_running(&self) -> ServiceState {
+    fn status(&self) -> ServiceState {
         let status_query = match self.service.query_status() {
             Ok(query) => query,
             Err(_) => return ServiceState::Stopped,

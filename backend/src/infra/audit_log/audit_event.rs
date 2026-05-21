@@ -83,6 +83,7 @@ impl AsAuditEvent for ErrorDetails {
 
 #[derive(
     Clone,
+    Copy,
     Serialize,
     Deserialize,
     strum::Display,

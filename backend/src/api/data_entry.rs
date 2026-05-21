@@ -281,7 +281,7 @@ fn initial_current_data_entry(
     }
 }
 
-#[derive(Debug, Serialize, Deserialize, ToSchema, FromRequest)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, ToSchema, FromRequest)]
 #[from_request(via(axum::Json), rejection(APIError))]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub enum ResolveDifferencesAction {
@@ -579,7 +579,7 @@ async fn data_entry_finalise(
     Ok(Json(data_entry.into()))
 }
 
-#[derive(Debug, Serialize, Deserialize, ToSchema, FromRequest)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, ToSchema, FromRequest)]
 #[from_request(via(axum::Json), rejection(APIError))]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub enum ResolveErrorsAction {

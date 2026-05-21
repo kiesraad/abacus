@@ -61,7 +61,7 @@ pub struct ValidationResultContext {
     pub political_group_number: Option<PGNumber>,
 }
 
-#[derive(Serialize, Deserialize, ToSchema, Debug, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Serialize, Deserialize, ToSchema, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 #[serde(deny_unknown_fields)]
 pub enum ValidationResultCode {
     /// GSB CSO: 'Alleen bij extra onderzoek B1-1': één van beide vragen is beantwoord, en de andere niet

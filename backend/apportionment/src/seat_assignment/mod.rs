@@ -170,16 +170,18 @@ fn list_numbers_with_exhausted_seats<T: ListVotes>(
 ) -> Vec<(T::ListNumber, u32)> {
     standings
         .iter()
-        .fold(vec![], |mut exhausted_list_numbers_and_seats, s| {
+        .filter(|s| {
             let number_of_candidates = get_number_of_candidates(input_list_votes, s.list_number);
-            if number_of_candidates.cmp(&s.total_seats()) == Ordering::Less {
-                exhausted_list_numbers_and_seats.push((
-                    s.list_number,
-                    number_of_candidates.abs_diff(s.total_seats()),
-                ))
-            }
-            exhausted_list_numbers_and_seats
+            number_of_candidates.cmp(&s.total_seats()) == Ordering::Less
         })
+        .map(|s| {
+            let number_of_candidates = get_number_of_candidates(input_list_votes, s.list_number);
+            (
+                s.list_number,
+                number_of_candidates.abs_diff(s.total_seats()),
+            )
+        })
+        .collect()
 }
 
 /// If a list got the absolute majority of votes but not the absolute majority of seats,

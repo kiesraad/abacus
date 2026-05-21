@@ -23,7 +23,7 @@ pub struct PdfWorld {
 
 impl PdfWorld {
     /// Create a new context for rendering PDFs from a [`PdfGenInput`].
-    pub fn new(input: &impl PdfGenInput) -> Result<PdfWorld, PdfGenError> {
+    pub fn new(input: &dyn PdfGenInput) -> Result<PdfWorld, PdfGenError> {
         let sources: Vec<Source> = input
             .sources()
             .iter()

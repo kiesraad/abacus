@@ -737,7 +737,7 @@ async fn polling_station_investigation_download_corrigendum_pdf(
     }
     .to_pdf_file_model(name.clone());
 
-    let content = generate_pdf(&input).await?;
+    let content = generate_pdf(input).await?;
 
     Ok(Attachment::new(content.buffer)
         .filename(&name)

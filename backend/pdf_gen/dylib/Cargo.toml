@@ -1,0 +1,13 @@
+[package]
+name = "pdf_gen_dylib"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+pdf_gen_impl.workspace = true
+pdf_gen_types.workspace = true
+
+[lib]
+crate-type = ["dylib"]

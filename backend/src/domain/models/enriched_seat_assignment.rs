@@ -280,7 +280,7 @@ mod tests {
     ) -> ElectionSummary {
         let total_votes_candidates_count = candidate_votes.iter().flatten().sum::<u32>();
         let political_group_votes =
-            create_political_group_candidate_votes(&election.political_groups, &candidate_votes);
+            create_political_group_candidate_votes(&election.political_groups, candidate_votes);
         let political_group_total_votes = political_group_votes
             .iter()
             .map(|pg_votes| PoliticalGroupTotalVotes {

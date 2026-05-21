@@ -795,7 +795,7 @@ mod tests {
         let mut validation_results = ValidationResults::default();
 
         validate_differences_counts(
-            &data,
+            data,
             total_voters_counts,
             total_votes_counts,
             &mut validation_results,

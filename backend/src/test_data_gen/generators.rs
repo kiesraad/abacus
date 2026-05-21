@@ -266,7 +266,7 @@ fn generate_election(
     info!("Generating {num_political_groups} political groups");
 
     for i in 0..num_political_groups {
-        if let Some(ref v) = votes {
+        if let Some(v) = votes {
             let candidates_per_group =
                 u32::try_from(v.get(i as usize).expect("should exist in votes").len())
                     .expect("length should fit in u32");

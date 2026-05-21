@@ -1,6 +1,28 @@
+use axum::{
+    extract::{Path, State},
+    response::IntoResponse,
+};
+use chrono::{DateTime, Datelike, Local};
+use pdf_gen::zip::{ZipResponse, ZipResponseError, slugify_filename, zip_single_file};
+use sqlx::SqlitePool;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
-use crate::{AppState, api::middleware::authentication::RouteAuthorization, domain::role::Role};
+use crate::{
+    APIError, AppState, ErrorResponse,
+    api::middleware::authentication::RouteAuthorization,
+    domain::{
+        committee_session::CommitteeSessionId,
+        election::{ElectionId, ElectionWithPoliticalGroups},
+        report::files::{get_files_csb_election, get_files_gsb_election},
+        role::Role,
+    },
+    infra::audit_log::AuditService,
+    repository::{
+        committee_session_repo::{self},
+        election_repo,
+        user_repo::User,
+    },
+};
 
 /// Default date time format for reports
 pub const DEFAULT_DATE_TIME_FORMAT: &str = "%d-%m-%Y %H:%M:%S %Z";
@@ -14,29 +36,6 @@ pub fn router() -> OpenApiRouter<AppState> {
         .routes(routes!(election_download_zip_attachment_csb).authorize(&[CoordinatorCSB]))
         .routes(routes!(election_download_zip_total_counts_csb).authorize(&[CoordinatorCSB]))
 }
-
-use axum::{
-    extract::{Path, State},
-    response::IntoResponse,
-};
-use chrono::{DateTime, Datelike, Local};
-use pdf_gen::zip::{ZipResponse, ZipResponseError, slugify_filename, zip_single_file};
-use sqlx::SqlitePool;
-
-use crate::{
-    APIError, ErrorResponse,
-    domain::{
-        committee_session::CommitteeSessionId,
-        election::{ElectionId, ElectionWithPoliticalGroups},
-        report::files::{get_files_csb_election, get_files_gsb_election},
-    },
-    infra::audit_log::AuditService,
-    repository::{
-        committee_session_repo::{self},
-        election_repo,
-        user_repo::User,
-    },
-};
 
 pub fn download_zip_filename(
     base: &str,

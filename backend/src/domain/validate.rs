@@ -148,12 +148,8 @@ pub trait ValidateRoot: Validate {
     ) -> Result<ValidationResults, DataError> {
         let mut validation_results = ValidationResults::default();
         self.validate(election, &mut validation_results, &"data".into())?;
-        validation_results
-            .errors
-            .sort_by(|a, b| a.code.cmp(&b.code));
-        validation_results
-            .warnings
-            .sort_by(|a, b| a.code.cmp(&b.code));
+        validation_results.errors.sort_by_key(|a| a.code);
+        validation_results.warnings.sort_by_key(|a| a.code);
         Ok(validation_results)
     }
 }

@@ -12,15 +12,20 @@ interface AuthorizationGuardProps {
   children: React.ReactNode;
 }
 
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: splitting the function doesn't make it more readable
 export function AuthorizationGuard({ children }: AuthorizationGuardProps) {
   const { user, extendSession } = useApiState();
   const matches = useMatches();
   const { showDialog, sessionValidFor } = useSessionExpiration(EXPIRATION_DIALOG_SECONDS);
 
   const routeMatch = matches[matches.length - 1];
+
   const isAuthenticated = user !== null;
-  const isPublic = routeMatch?.handle.public;
-  const isAllowed = isPublic || (user?.role && routeMatch?.handle.roles.includes(user.role));
+  const isPublic = routeMatch?.handle.public ? routeMatch.handle.public : false;
+
+  const roles = routeMatch?.handle.roles ? routeMatch.handle.roles : [];
+  const isAllowed = isPublic || (user?.role && roles.includes(user.role));
+
   const accountRequiresSetup = isAuthenticated && (!user.fullname || user.needs_password_change);
 
   // if user is not allowed on this route

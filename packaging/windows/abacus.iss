@@ -21,6 +21,7 @@
 #define MyServiceInstaller "install-service.exe"
 #define MyServiceUninstaller "uninstall-service.exe"
 #define MyService "abacus-windows-service.exe"
+#define MyServiceName "abacus_windows_service"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application. Do not use the same AppId value in installers for other applications.
@@ -93,6 +94,7 @@ Filename: "http://localhost"; Description: "Open Abacus Interface"; Flags: shell
 
 [UninstallRun]
 Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall delete rule name=""Abacus server"" "; Flags: runhidden; RunOnceId: "RemoveFirewallExc"
+Filename: "{sys}\sc.exe"; Parameters: "stop ""{#MyServiceName}"""; Flags: runhidden; RunOnceId: "StopService"
 Filename: "{app}\{#MyServiceUninstaller}"; Flags: runhidden; RunOnceId: "RemoveAbacusService"
 
 [Messages]

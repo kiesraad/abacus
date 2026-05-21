@@ -165,7 +165,7 @@ fn get_number_of_candidates<T: ListVotes>(
 fn list_numbers_with_exhausted_seats<T: ListVotes>(
     standings: &[ListStanding<T::ListNumber>],
     input_list_votes: &[T],
-) -> Vec<(T::ListNumber, u32)> {
+) -> impl Iterator<Item = (T::ListNumber, u32)> {
     standings
         .iter()
         .map(|s| (s, get_number_of_candidates(input_list_votes, s.list_number)))
@@ -176,7 +176,6 @@ fn list_numbers_with_exhausted_seats<T: ListVotes>(
                 number_of_candidates.abs_diff(s.total_seats()),
             )
         })
-        .collect()
 }
 
 /// If a list got the absolute majority of votes but not the absolute majority of seats,
@@ -256,7 +255,8 @@ fn reassign_residual_seats_for_exhausted_lists<T: ListVotes>(
     assigned_residual_seats: u32,
     previous_steps: Vec<SeatChangeStep<T::ListNumber>>,
 ) -> RemainderAssignmentResult<T::ListNumber> {
-    let exhausted_lists = list_numbers_with_exhausted_seats(&previous_standings, list_votes);
+    let exhausted_lists: Vec<_> =
+        list_numbers_with_exhausted_seats(&previous_standings, list_votes).collect();
 
     if exhausted_lists.is_empty() {
         return Ok((previous_steps, previous_standings));

@@ -11,11 +11,7 @@ const SERVICE_NAME: &'static str = "abacus.service";
 
 impl SystemdService {
     pub fn new() -> Result<SystemdService, ServiceError> {
-        let sctl = systemctl::SystemCtl::builder()
-            .path("/run/current-system/sw/bin/systemctl".into())
-            .additional_args(Vec::new())
-            .build();
-
+        let sctl = systemctl::SystemCtl::default();
         Ok(SystemdService {
             name: SERVICE_NAME.to_string(),
             handler: sctl,

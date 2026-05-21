@@ -358,7 +358,7 @@ fn generate_political_party(
                 CandidateGender::X,
             ]
             .choose(rng)
-            .cloned(),
+            .copied(),
         })
     }
     RegisteredPoliticalGroup {

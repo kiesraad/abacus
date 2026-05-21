@@ -89,7 +89,7 @@ impl From<DataEntryRow> for DataEntryAuditData {
             data_entry_id: value.id,
             data_entry_status: state.status_name().to_string(),
             data_entry_progress: format!("{}%", state.get_progress()),
-            finished_at: state.finished_at().cloned(),
+            finished_at: state.finished_at().copied(),
             first_entry_user_id: state.get_first_entry_user_id(),
             second_entry_user_id: state.get_second_entry_user_id(),
         }

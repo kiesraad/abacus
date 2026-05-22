@@ -24,7 +24,7 @@ pub fn assign_remainder<T: ListVotes>(
     exclude_exhausted_lists: Option<&[T]>,
 ) -> RemainderAssignmentResult<T::ListNumber> {
     for residual_seat_number in current_residual_seat_number + 1..=total_residual_seats {
-        // Do the + 1 to accound for the fact both numbers are 1-based
+        // Do the + 1 to account for the fact both numbers are 1-based
         // I.e., if total_residual_seats = 10 and residual_seat_number = 6, then - including seat no 6 -
         // there are still 5 residual seats to assign (seats 6, 7, 8, 9, 10), even though 10 - 6 = 4
         let residual_seats = total_residual_seats - residual_seat_number + 1;

@@ -106,15 +106,15 @@ export function DeceasedCandidatesPage() {
   }
 
   useEffect(() => {
-    if (state.type === "Uninitialised") {
+    if (state?.type === "Uninitialised") {
       void navigate(`/elections/${election.id}/apportionment/include-all-candidates`);
-    } else if (state.type === "Finalised") {
+    } else if (state?.type === "Finalised") {
       void navigate(`/elections/${election.id}/apportionment`);
     }
   });
 
   let deceasedCandidates: DetailedDeceasedCandidate[] = [];
-  if (state.type !== "Uninitialised") {
+  if (state && state.type !== "Uninitialised") {
     deceasedCandidates = get_detailed_deceased_candidates(state.deceased_candidates, election.political_groups);
   }
 
@@ -149,7 +149,7 @@ export function DeceasedCandidatesPage() {
           {error ? (
             <ApportionmentError error={error} />
           ) : (
-            state.type === "RegisteringDeceasedCandidates" && (
+            state?.type === "RegisteringDeceasedCandidates" && (
               <div className={cls.container}>
                 <div className="w-39">{t("apportionment.which_candidates_are_deceased")}</div>
                 <div className={cls.tableContainer}>

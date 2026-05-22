@@ -8,6 +8,7 @@ import type {
   ACCOUNT_UPDATE_REQUEST_PATH,
   ADMIN_EXISTS_REQUEST_PARAMS,
   ADMIN_EXISTS_REQUEST_PATH,
+  ApportionmentState,
   AUDIT_LOG_LIST_REQUEST_PARAMS,
   AUDIT_LOG_LIST_REQUEST_PATH,
   AUDIT_LOG_LIST_USERS_REQUEST_PARAMS,
@@ -75,6 +76,8 @@ import type {
   ElectionStatusResponse,
   ElectionWithPoliticalGroups,
   ErrorResponse,
+  GET_APPORTIONMENT_STATE_REQUEST_PARAMS,
+  GET_APPORTIONMENT_STATE_REQUEST_PATH,
   INITIALISED_REQUEST_PARAMS,
   INITIALISED_REQUEST_PATH,
   InvestigationListResponse,
@@ -107,7 +110,11 @@ import type {
   PollingStation,
   PollingStationInvestigation,
   PollingStationListResponse,
+  REGISTER_DECEASED_CANDIDATES_REQUEST_PARAMS,
+  REGISTER_DECEASED_CANDIDATES_REQUEST_PATH,
   SaveDataEntryResponse,
+  SKIP_DECEASED_CANDIDATES_REQUEST_PARAMS,
+  SKIP_DECEASED_CANDIDATES_REQUEST_PATH,
   USER_CREATE_REQUEST_BODY,
   USER_CREATE_REQUEST_PARAMS,
   USER_CREATE_REQUEST_PATH,
@@ -526,6 +533,29 @@ export const UserDeleteRequestHandler = http.delete<ParamsToString<USER_DELETE_R
   () => new HttpResponse(null, { status: 200 }),
 );
 
+export const GetApportionmentStateRequestHandler = http.get<ParamsToString<GET_APPORTIONMENT_STATE_REQUEST_PARAMS>>(
+  "/api/elections/3/apportionment/state" satisfies GET_APPORTIONMENT_STATE_REQUEST_PATH,
+  () =>
+    HttpResponse.json({ type: "Uninitialised" } satisfies ApportionmentState, {
+      status: 200,
+    }),
+);
+
+export const RegisterDeceasedCandidatesRequestHandler = http.post<
+  ParamsToString<REGISTER_DECEASED_CANDIDATES_REQUEST_PARAMS>
+>(
+  "/api/elections/3/apportionment/register_deceased_candidates" satisfies REGISTER_DECEASED_CANDIDATES_REQUEST_PATH,
+  () =>
+    HttpResponse.json({ deceased_candidates: [], type: "RegisteringDeceasedCandidates" } satisfies ApportionmentState, {
+      status: 200,
+    }),
+);
+
+export const SkipDeceasedCandidatesRequestHandler = http.post<ParamsToString<SKIP_DECEASED_CANDIDATES_REQUEST_PARAMS>>(
+  "/api/elections/3/apportionment/skip_deceased_candidates" satisfies SKIP_DECEASED_CANDIDATES_REQUEST_PATH,
+  () => HttpResponse.json({ deceased_candidates: [], type: "Finalised" } satisfies ApportionmentState, { status: 200 }),
+);
+
 export const handlers: HttpHandler[] = [
   pingHandler,
   AccountRequestHandler,
@@ -573,4 +603,7 @@ export const handlers: HttpHandler[] = [
   UserListRequestHandler,
   UserUpdateRequestHandler,
   UserDeleteRequestHandler,
+  GetApportionmentStateRequestHandler,
+  RegisterDeceasedCandidatesRequestHandler,
+  SkipDeceasedCandidatesRequestHandler,
 ];

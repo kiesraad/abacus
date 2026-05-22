@@ -12,7 +12,7 @@ export interface iElectionApportionmentProviderContext {
   seatAssignment?: SeatAssignment;
   candidateNomination?: CandidateNomination;
   electionSummary?: ElectionSummary;
-  state: ApportionmentState;
+  state?: ApportionmentState;
   error?: ApiError;
   refetchState: (controller?: AbortController) => Promise<ApiResult<ApportionmentState>>;
 }

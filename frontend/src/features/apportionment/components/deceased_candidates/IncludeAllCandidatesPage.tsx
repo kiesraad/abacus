@@ -73,13 +73,13 @@ export function IncludeAllCandidatesPage() {
   }
 
   useEffect(() => {
-    if (state.type === "RegisteringDeceasedCandidates") {
+    if (state?.type === "RegisteringDeceasedCandidates") {
       if (state.deceased_candidates.length === 0) {
         void navigate(`/elections/${election.id}/apportionment/deceased-candidates/add`);
       } else {
         void navigate(`/elections/${election.id}/apportionment/deceased-candidates`);
       }
-    } else if (state.type === "Finalised") {
+    } else if (state?.type === "Finalised") {
       void navigate(`/elections/${election.id}/apportionment`);
     }
   });
@@ -115,7 +115,7 @@ export function IncludeAllCandidatesPage() {
           {error ? (
             <ApportionmentError error={error} />
           ) : (
-            state.type === "Uninitialised" && (
+            state?.type === "Uninitialised" && (
               <>
                 <FormLayout.Alert>
                   <Alert type="success">

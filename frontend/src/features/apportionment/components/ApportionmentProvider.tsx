@@ -1,8 +1,8 @@
 import type * as React from "react";
 
 import { ApiError } from "@/api/ApiResult";
-import RequestStateHandler from "@/api/RequestStateHandler";
 import { useApportionmentStateRequest } from "@/hooks/apportionment/useApportionmentStateRequest";
+import type { ApportionmentState } from "@/types/generated/openapi";
 import { ApportionmentProviderContext } from "../hooks/ApportionmentProviderContext";
 import { useApportionmentRequest } from "../hooks/useApportionmentRequest";
 
@@ -14,30 +14,29 @@ export interface ElectionApportionmentProviderProps {
 export function ApportionmentProvider({ children, electionId }: ElectionApportionmentProviderProps) {
   const { error: apportionmentError, data } = useApportionmentRequest(electionId);
   const { requestState, refetch } = useApportionmentStateRequest(electionId);
-  // TODO: Check if this is now correct, it does work now
-  const error = apportionmentError;
+  let error = apportionmentError;
+  let state: ApportionmentState | undefined;
+  if (requestState.status === "success") {
+    state = requestState.data;
+  } else if (requestState.status === "api-error") {
+    error = requestState.error;
+  }
   if (error && !(error instanceof ApiError)) {
     throw error;
   }
 
   return (
-    <RequestStateHandler
-      requestState={requestState}
-      notFoundMessage="error.not_found"
-      renderOnSuccess={(state) => (
-        <ApportionmentProviderContext.Provider
-          value={{
-            seatAssignment: data?.seat_assignment,
-            candidateNomination: data?.candidate_nomination,
-            electionSummary: data?.election_summary,
-            state,
-            error,
-            refetchState: refetch,
-          }}
-        >
-          {children}
-        </ApportionmentProviderContext.Provider>
-      )}
-    />
+    <ApportionmentProviderContext.Provider
+      value={{
+        seatAssignment: data?.seat_assignment,
+        candidateNomination: data?.candidate_nomination,
+        electionSummary: data?.election_summary,
+        state,
+        error,
+        refetchState: refetch,
+      }}
+    >
+      {children}
+    </ApportionmentProviderContext.Provider>
   );
 }

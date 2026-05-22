@@ -33,15 +33,15 @@ export function AddDeceasedCandidatePage() {
   }
 
   useEffect(() => {
-    if (state.type === "Uninitialised") {
+    if (state?.type === "Uninitialised") {
       void navigate(`/elections/${election.id}/apportionment/include-all-candidates`);
-    } else if (state.type === "Finalised") {
+    } else if (state?.type === "Finalised") {
       void navigate(`/elections/${election.id}/apportionment`);
     }
   });
 
   let deceasedCandidates: DeceasedCandidate[] | undefined;
-  if (state.type !== "Uninitialised" && selectedList) {
+  if (state && state.type !== "Uninitialised" && selectedList) {
     deceasedCandidates = state.deceased_candidates.filter((dc) => dc.pg_number === selectedList.number);
   }
 
@@ -65,7 +65,7 @@ export function AddDeceasedCandidatePage() {
         {error ? (
           <ApportionmentError error={error} />
         ) : (
-          state.type === "RegisteringDeceasedCandidates" && (
+          state?.type === "RegisteringDeceasedCandidates" && (
             <div className={cls.container}>
               <div className="w-39">{t("apportionment.indicate_deceased_candidate")}</div>
               <div className={cls.section}>

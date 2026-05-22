@@ -42,7 +42,7 @@ export function ApportionmentPage() {
             candidateNomination &&
             electionSummary && (
               <>
-                {state.type === "Finalised" && (
+                {state?.type === "Finalised" && (
                   <FormLayout.Alert>
                     <Alert type="success">
                       <strong className="heading-md">{t("apportionment.all_seats_assigned")}</strong>

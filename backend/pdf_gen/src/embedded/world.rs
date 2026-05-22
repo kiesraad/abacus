@@ -35,15 +35,6 @@ impl PdfWorld {
             })
             .collect();
 
-        // let (fontbook, fonts) = input
-        //     .fonts()
-        //     .iter()
-        //     .map(|font_data| {
-        //         let font = Font::new(Bytes::new(font_data.0), 0).expect("Error reading font file");
-        //         (font.info().clone(), font)
-        //     })
-        //     .unzip();
-
         let mut fonts = vec![];
         let mut fontbook = FontBook::new();
         for font_data in input.fonts() {

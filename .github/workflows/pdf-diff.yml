@@ -13,6 +13,7 @@ env:
 
 jobs:
   diff:
+    if: "!github.event.pull_request.head.repo.fork"
     name: Diff PDFs
     runs-on: ubuntu-latest
     defaults:

@@ -94,7 +94,7 @@ export function formatTimeToGo(seconds: number) {
     secondsFormatted = t("seconds", { seconds: remainingSeconds });
   }
 
-  let minutesFormatted = "";
+  let minutesFormatted: string;
 
   if (remainingMinutes === 1) {
     minutesFormatted = t("one_minute");

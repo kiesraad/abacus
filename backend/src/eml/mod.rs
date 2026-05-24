@@ -913,8 +913,8 @@ pub fn polling_stations_eml_matches_election(
 mod tests {
     use super::*;
     use crate::domain::{
-      election::{ElectionCategory, ElectionWithPoliticalGroups};
-      summary::{SumCount, SummaryDifferencesCounts}
+        election::{ElectionCategory, ElectionWithPoliticalGroups},
+        summary::{SumCount, SummaryDifferencesCounts},
     };
     use eml_nl::utils::StringValue;
 

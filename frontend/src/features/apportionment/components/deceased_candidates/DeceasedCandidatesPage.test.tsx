@@ -6,13 +6,23 @@ import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import {
+  DeleteDeceasedCandidateRequestHandler,
+  FinaliseDeceasedCandidatesRequestHandler,
   GetApportionmentStateRequestHandler,
-  RegisterDeceasedCandidatesRequestHandler,
-  SkipDeceasedCandidatesRequestHandler,
 } from "@/testing/api-mocks/RequestHandlers";
 import { Providers } from "@/testing/Providers";
+import type { Router } from "@/testing/router";
 import { overrideOnce, server } from "@/testing/server";
-import { expectErrorPage, render, screen, setupTestRouter, spyOnHandler, waitFor } from "@/testing/test-utils";
+import {
+  expectErrorPage,
+  render,
+  renderReturningRouter,
+  screen,
+  setupTestRouter,
+  spyOnHandler,
+  waitFor,
+  within,
+} from "@/testing/test-utils";
 import type { ApportionmentState, ElectionApportionmentResponse, ErrorResponse } from "@/types/generated/openapi";
 import { apportionmentRoutes } from "../../routes";
 import {
@@ -23,20 +33,26 @@ import {
   seat_assignment,
 } from "../../testing/lt-19-seats";
 import { ApportionmentProvider } from "../ApportionmentProvider";
-import { IncludeAllCandidatesPage } from "./IncludeAllCandidatesPage";
+import { DeceasedCandidatesPage } from "./DeceasedCandidatesPage";
 
 const navigate = vi.fn();
 
-const renderIncludeAllCandidatesPage = (electionId: number) =>
-  render(
+const renderDeceasedCandidatesPage = (electionId: number, withRouter: boolean) => {
+  const component = (
     <ElectionProvider electionId={electionId}>
       <ApportionmentProvider electionId={electionId}>
-        <IncludeAllCandidatesPage />
+        <DeceasedCandidatesPage />
       </ApportionmentProvider>
-    </ElectionProvider>,
+    </ElectionProvider>
   );
+  if (withRouter) {
+    return renderReturningRouter(component);
+  } else {
+    return render(component);
+  }
+};
 
-describe("IncludeAllCandidatesPage", () => {
+describe("DeceasedCandidatesPage", () => {
   beforeEach(() => {
     overrideOnce("get", "/api/elections/3", 200, getElectionMockData(election, committee_session));
     overrideOnce("post", "/api/elections/3/apportionment", 200, {
@@ -45,17 +61,21 @@ describe("IncludeAllCandidatesPage", () => {
       election_summary: election_summary,
     } satisfies ElectionApportionmentResponse);
     server.use(GetApportionmentStateRequestHandler);
+    overrideOnce("get", "/api/elections/3/apportionment/state", 200, {
+      deceased_candidates: [{ pg_number: 1, candidate_number: 1 }],
+      type: "RegisteringDeceasedCandidates",
+    });
   });
 
   test.each(
     Object.values({
       Uninitialised: {
         state: { type: "Uninitialised" },
-        expectRedirectTo: undefined,
+        expectRedirectTo: "/elections/3/apportionment/include-all-candidates",
       },
       RegisteringDeceasedCandidates: {
         state: { deceased_candidates: [], type: "RegisteringDeceasedCandidates" },
-        expectRedirectTo: "/elections/3/apportionment/deceased-candidates/add",
+        expectRedirectTo: undefined,
       },
       Finalised: {
         state: { deceased_candidates: [], type: "Finalised" },
@@ -69,8 +89,8 @@ describe("IncludeAllCandidatesPage", () => {
     vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
     overrideOnce("get", "/api/elections/3/apportionment/state", 200, state);
 
-    renderIncludeAllCandidatesPage(3);
-    expect(await screen.findByRole("heading", { level: 1, name: "Zetelverdeling" }));
+    renderDeceasedCandidatesPage(3, false);
+    expect(await screen.findByRole("heading", { level: 1, name: "Overleden kandidaten" }));
 
     if (expectRedirectTo) {
       await waitFor(() => {
@@ -81,81 +101,88 @@ describe("IncludeAllCandidatesPage", () => {
     }
   });
 
-  test("Redirects to DeceasedCandidatesPage when state RegisteringDeceasedCandidates and any deceased candidates", async () => {
+  test("Renders table and clicking delete on a deceased candidate works", async () => {
     vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
-    overrideOnce("get", "/api/elections/3/apportionment/state", 200, {
-      deceased_candidates: [{ pg_number: 1, candidate_number: 1 }],
-      type: "RegisteringDeceasedCandidates",
-    });
-
-    renderIncludeAllCandidatesPage(3);
-    expect(await screen.findByRole("heading", { level: 1, name: "Zetelverdeling" }));
-
-    await waitFor(() => {
-      expect(navigate).toHaveBeenCalledWith("/elections/3/apportionment/deceased-candidates");
-    });
-  });
-
-  test("Renders form and shows error when submitting without selecting yes or no", async () => {
-    vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
-    server.use(SkipDeceasedCandidatesRequestHandler);
-    server.use(RegisterDeceasedCandidatesRequestHandler);
-    const skipDeceasedCandidates = spyOnHandler(SkipDeceasedCandidatesRequestHandler);
-    const registerDeceasedCandidates = spyOnHandler(RegisterDeceasedCandidatesRequestHandler);
+    server.use(DeleteDeceasedCandidateRequestHandler);
+    const deleteDeceasedCandidate = spyOnHandler(DeleteDeceasedCandidateRequestHandler);
     const user = userEvent.setup();
 
-    renderIncludeAllCandidatesPage(3);
-    expect(await screen.findByRole("heading", { level: 1, name: "Zetelverdeling" }));
+    renderDeceasedCandidatesPage(3, false);
+    expect(await screen.findByRole("heading", { level: 1, name: "Overleden kandidaten" }));
 
-    const yes = await screen.findByRole("radio", { name: "Ja. Er zijn geen kandidaten overleden." });
-    const no = await screen.findByRole("radio", { name: "Nee. Eén of meerdere kandidaten zijn overleden." });
-    expect(yes).toBeVisible();
-    expect(yes).not.toBeChecked();
-    expect(no).toBeVisible();
-    expect(no).not.toBeChecked();
-    await user.click(screen.getByRole("button", { name: "Volgende" }));
+    const table = await screen.findByRole("table");
+    expect(table).toBeVisible();
+    expect(table).toHaveTableContent([
+      ["Overleden kandidaat", "Lijst", "Positie op lijst", ""],
+      ["Oud, L. (Lidewij) †", "Lijst 1 - Political Group A", "1", "Verwijderen"],
+    ]);
 
-    expect(await screen.findByText("Deze vraag is verplicht")).toBeVisible();
-
-    expect(skipDeceasedCandidates).not.toHaveBeenCalled();
-    expect(registerDeceasedCandidates).not.toHaveBeenCalled();
+    // Check if the delete link works
+    const rows = within(table).getAllByRole("row");
+    if (rows[1]) {
+      const deleteLink = await within(rows[1]).findByRole("button", { name: "Verwijderen" });
+      await user.click(deleteLink);
+      expect(deleteDeceasedCandidate).toHaveBeenCalledWith({ pg_number: 1, candidate_number: 1 });
+    }
   });
 
-  test("Submits and redirects to ApportionmentPage when selecting yes", async () => {
+  test("Renders add button and clicking it redirects to AddDeceasedCandidatePage", async () => {
     vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
-    server.use(SkipDeceasedCandidatesRequestHandler);
-    const skipDeceasedCandidates = spyOnHandler(SkipDeceasedCandidatesRequestHandler);
+    const user = userEvent.setup();
+
+    const router = renderDeceasedCandidatesPage(3, true) as Router;
+    expect(await screen.findByRole("heading", { level: 1, name: "Overleden kandidaten" }));
+
+    expect(await screen.findByRole("table")).toBeVisible();
+
+    const addDeceasedCandidate = await screen.findByRole("link", { name: "+ Kandidaat toevoegen" });
+    expect(addDeceasedCandidate).toBeVisible();
+    await user.click(addDeceasedCandidate);
+
+    expect(router.state.location.pathname).toEqual("/elections/3/apportionment/deceased-candidates/add");
+  });
+
+  test("Clicking To apportionment button finalises deceased candidates and redirects to ApportionmentPage", async () => {
+    vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
+    server.use(FinaliseDeceasedCandidatesRequestHandler);
+    const finaliseDeceasedCandidates = spyOnHandler(FinaliseDeceasedCandidatesRequestHandler);
     const getApportionmentState = spyOnHandler(GetApportionmentStateRequestHandler);
     const user = userEvent.setup();
 
-    renderIncludeAllCandidatesPage(3);
-    expect(await screen.findByRole("heading", { level: 1, name: "Zetelverdeling" }));
+    renderDeceasedCandidatesPage(3, false);
+    expect(await screen.findByRole("heading", { level: 1, name: "Overleden kandidaten" }));
 
-    const yes = await screen.findByRole("radio", { name: "Ja. Er zijn geen kandidaten overleden." });
-    expect(yes).toBeVisible();
-    await user.click(yes);
-    await user.click(screen.getByRole("button", { name: "Volgende" }));
+    expect(await screen.findByRole("table")).toBeVisible();
 
-    expect(skipDeceasedCandidates).toHaveBeenCalled();
+    const finaliseButton = await screen.findByRole("button", { name: "Naar zetelverdeling" });
+    expect(finaliseButton).toBeVisible();
+    await user.click(finaliseButton);
+
+    expect(finaliseDeceasedCandidates).toHaveBeenCalled();
     expect(getApportionmentState).toHaveBeenCalled();
   });
 
-  test("Submits and redirects to AddDeceasedCandidatePage when selecting no", async () => {
+  test("Clicking To apportionment button when no deceased candidates, finalises deceased candidates and redirects to ApportionmentPage", async () => {
     vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
-    server.use(RegisterDeceasedCandidatesRequestHandler);
-    const registerDeceasedCandidates = spyOnHandler(RegisterDeceasedCandidatesRequestHandler);
+    server.use(FinaliseDeceasedCandidatesRequestHandler);
+    const finaliseDeceasedCandidates = spyOnHandler(FinaliseDeceasedCandidatesRequestHandler);
     const getApportionmentState = spyOnHandler(GetApportionmentStateRequestHandler);
+    overrideOnce("get", "/api/elections/3/apportionment/state", 200, {
+      deceased_candidates: [],
+      type: "RegisteringDeceasedCandidates",
+    });
     const user = userEvent.setup();
 
-    renderIncludeAllCandidatesPage(3);
-    expect(await screen.findByRole("heading", { level: 1, name: "Zetelverdeling" }));
+    renderDeceasedCandidatesPage(3, false);
+    expect(await screen.findByRole("heading", { level: 1, name: "Overleden kandidaten" }));
 
-    const no = await screen.findByRole("radio", { name: "Nee. Eén of meerdere kandidaten zijn overleden." });
-    expect(no).toBeVisible();
-    await user.click(no);
-    await user.click(screen.getByRole("button", { name: "Volgende" }));
+    expect(screen.queryByRole("table")).not.toBeInTheDocument();
 
-    expect(registerDeceasedCandidates).toHaveBeenCalled();
+    const finaliseButton = await screen.findByRole("button", { name: "Naar zetelverdeling" });
+    expect(finaliseButton).toBeVisible();
+    await user.click(finaliseButton);
+
+    expect(finaliseDeceasedCandidates).toHaveBeenCalled();
     expect(getApportionmentState).toHaveBeenCalled();
   });
 
@@ -172,10 +199,10 @@ describe("IncludeAllCandidatesPage", () => {
         reference: "ApportionmentCommitteeSessionNotCompleted",
       } satisfies ErrorResponse);
 
-      renderIncludeAllCandidatesPage(3);
+      renderDeceasedCandidatesPage(3, false);
 
       // Wait for the page to be loaded
-      expect(await screen.findByRole("heading", { level: 1, name: "Zetelverdeling" })).toBeVisible();
+      expect(await screen.findByRole("heading", { level: 1, name: "Overleden kandidaten" }));
 
       expect(await screen.findByText("Zetelverdeling is nog niet beschikbaar")).toBeVisible();
       expect(
@@ -210,7 +237,7 @@ describe("IncludeAllCandidatesPage", () => {
         reference: "InternalServerError",
       });
 
-      await router.navigate("/elections/3/apportionment/include-all-candidates");
+      await router.navigate("/elections/3/apportionment/deceased-candidates");
 
       rtlRender(<Providers router={router} />);
 

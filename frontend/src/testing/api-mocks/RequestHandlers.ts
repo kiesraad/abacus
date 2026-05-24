@@ -55,6 +55,9 @@ import type {
   DataEntryGetDifferencesResponse,
   DataEntryGetResponse,
   DataEntryStatusResponse,
+  DELETE_DECEASED_CANDIDATE_REQUEST_BODY,
+  DELETE_DECEASED_CANDIDATE_REQUEST_PARAMS,
+  DELETE_DECEASED_CANDIDATE_REQUEST_PATH,
   ELECTION_DETAILS_REQUEST_PARAMS,
   ELECTION_DETAILS_REQUEST_PATH,
   ELECTION_IMPORT_REQUEST_BODY,
@@ -76,6 +79,8 @@ import type {
   ElectionStatusResponse,
   ElectionWithPoliticalGroups,
   ErrorResponse,
+  FINALISE_DECEASED_CANDIDATES_REQUEST_PARAMS,
+  FINALISE_DECEASED_CANDIDATES_REQUEST_PATH,
   GET_APPORTIONMENT_STATE_REQUEST_PARAMS,
   GET_APPORTIONMENT_STATE_REQUEST_PATH,
   INITIALISED_REQUEST_PARAMS,
@@ -556,6 +561,22 @@ export const SkipDeceasedCandidatesRequestHandler = http.post<ParamsToString<SKI
   () => HttpResponse.json({ deceased_candidates: [], type: "Finalised" } satisfies ApportionmentState, { status: 200 }),
 );
 
+export const DeleteDeceasedCandidateRequestHandler = http.post<
+  ParamsToString<DELETE_DECEASED_CANDIDATE_REQUEST_PARAMS>,
+  DELETE_DECEASED_CANDIDATE_REQUEST_BODY
+>("/api/elections/3/apportionment/delete_deceased_candidate" satisfies DELETE_DECEASED_CANDIDATE_REQUEST_PATH, () =>
+  HttpResponse.json({ deceased_candidates: [], type: "RegisteringDeceasedCandidates" } satisfies ApportionmentState, {
+    status: 200,
+  }),
+);
+
+export const FinaliseDeceasedCandidatesRequestHandler = http.post<
+  ParamsToString<FINALISE_DECEASED_CANDIDATES_REQUEST_PARAMS>
+>(
+  "/api/elections/3/apportionment/finalise_deceased_candidates" satisfies FINALISE_DECEASED_CANDIDATES_REQUEST_PATH,
+  () => HttpResponse.json({ deceased_candidates: [], type: "Finalised" } satisfies ApportionmentState, { status: 200 }),
+);
+
 export const handlers: HttpHandler[] = [
   pingHandler,
   AccountRequestHandler,
@@ -606,4 +627,6 @@ export const handlers: HttpHandler[] = [
   GetApportionmentStateRequestHandler,
   RegisterDeceasedCandidatesRequestHandler,
   SkipDeceasedCandidatesRequestHandler,
+  DeleteDeceasedCandidateRequestHandler,
+  FinaliseDeceasedCandidatesRequestHandler,
 ];

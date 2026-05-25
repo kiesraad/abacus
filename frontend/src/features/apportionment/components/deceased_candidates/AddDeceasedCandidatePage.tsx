@@ -75,6 +75,7 @@ export function AddDeceasedCandidatePage() {
                       {election.political_groups.map((group) => (
                         <ProgressList.Item
                           key={group.number}
+                          id={`list-item-group-${group.number}`}
                           status={"idle"}
                           active={group.number === selectedList?.number}
                           onClick={() => {

@@ -106,11 +106,13 @@ pub async fn change_committee_session_status(
     };
 
     // If resuming committee session, delete all files from committee session and files tables
+    // and reset apportionment state
     if committee_session.status == CommitteeSessionStatus::Completed
         && new_status == CommitteeSessionStatus::DataEntry
     {
         delete_committee_session_files(&mut tx, audit_service.clone(), committee_session.id)
             .await?;
+        // TODO: Reset apportionment state!
     }
 
     let committee_session =

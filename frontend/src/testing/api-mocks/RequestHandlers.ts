@@ -6,6 +6,9 @@ import type {
   ACCOUNT_UPDATE_REQUEST_BODY,
   ACCOUNT_UPDATE_REQUEST_PARAMS,
   ACCOUNT_UPDATE_REQUEST_PATH,
+  ADD_DECEASED_CANDIDATE_REQUEST_BODY,
+  ADD_DECEASED_CANDIDATE_REQUEST_PARAMS,
+  ADD_DECEASED_CANDIDATE_REQUEST_PATH,
   ADMIN_EXISTS_REQUEST_PARAMS,
   ADMIN_EXISTS_REQUEST_PATH,
   ApportionmentState,
@@ -561,6 +564,24 @@ export const SkipDeceasedCandidatesRequestHandler = http.post<ParamsToString<SKI
   () => HttpResponse.json({ deceased_candidates: [], type: "Finalised" } satisfies ApportionmentState, { status: 200 }),
 );
 
+export const AddDeceasedCandidateRequestHandler = http.post<
+  ParamsToString<ADD_DECEASED_CANDIDATE_REQUEST_PARAMS>,
+  ADD_DECEASED_CANDIDATE_REQUEST_BODY
+>("/api/elections/3/apportionment/add_deceased_candidate" satisfies ADD_DECEASED_CANDIDATE_REQUEST_PATH, () =>
+  HttpResponse.json(
+    {
+      deceased_candidates: [
+        { pg_number: 1, candidate_number: 1 },
+        { pg_number: 1, candidate_number: 2 },
+      ],
+      type: "RegisteringDeceasedCandidates",
+    } satisfies ApportionmentState,
+    {
+      status: 200,
+    },
+  ),
+);
+
 export const DeleteDeceasedCandidateRequestHandler = http.post<
   ParamsToString<DELETE_DECEASED_CANDIDATE_REQUEST_PARAMS>,
   DELETE_DECEASED_CANDIDATE_REQUEST_BODY
@@ -627,6 +648,7 @@ export const handlers: HttpHandler[] = [
   GetApportionmentStateRequestHandler,
   RegisterDeceasedCandidatesRequestHandler,
   SkipDeceasedCandidatesRequestHandler,
+  AddDeceasedCandidateRequestHandler,
   DeleteDeceasedCandidateRequestHandler,
   FinaliseDeceasedCandidatesRequestHandler,
 ];

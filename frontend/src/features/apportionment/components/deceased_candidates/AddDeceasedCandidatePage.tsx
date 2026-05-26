@@ -15,6 +15,7 @@ import type {
   PoliticalGroup,
 } from "@/types/generated/openapi";
 import { formatPoliticalGroupName } from "@/utils/politicalGroup";
+import { Loader } from "../../../../components/ui/Loader/Loader";
 import { useApportionmentContext } from "../../hooks/useApportionmentContext";
 import { renderTitleAndHeader } from "../../utils/utils";
 import { ApportionmentError } from "../ApportionmentError";
@@ -23,7 +24,7 @@ import cls from "./DeceasedCandidates.module.css";
 export function AddDeceasedCandidatePage() {
   const navigate = useNavigate();
   const { election } = useElection();
-  const { state, error, refetchState } = useApportionmentContext();
+  const { state, error, isLoading, refetchState } = useApportionmentContext();
   const [apiError, setApiError] = useState<AnyApiError>();
   const [selectedList, setSelectedList] = useState<PoliticalGroup | undefined>(election.political_groups.at(0));
   const client = useApiClient();
@@ -39,6 +40,10 @@ export function AddDeceasedCandidatePage() {
       void navigate(`/elections/${election.id}/apportionment`);
     }
   });
+
+  if (isLoading) {
+    return <Loader />;
+  }
 
   let deceasedCandidates: DeceasedCandidate[] | undefined;
   if (state && state.type !== "Uninitialised" && selectedList) {

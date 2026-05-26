@@ -15,6 +15,7 @@ import type {
   SKIP_DECEASED_CANDIDATES_REQUEST_PATH,
 } from "@/types/generated/openapi";
 import { StringFormData } from "@/utils/stringFormData";
+import { Loader } from "../../../../components/ui/Loader/Loader";
 import { useApportionmentContext } from "../../hooks/useApportionmentContext";
 import { renderTitleAndHeader } from "../../utils/utils";
 import { ApportionmentError } from "../ApportionmentError";
@@ -63,7 +64,7 @@ function renderForm(radioError: boolean, handleSubmit: (e: SubmitEvent<HTMLFormE
 export function IncludeAllCandidatesPage() {
   const navigate = useNavigate();
   const { election } = useElection();
-  const { state, error, refetchState } = useApportionmentContext();
+  const { state, error, isLoading, refetchState } = useApportionmentContext();
   const [apiError, setApiError] = useState<AnyApiError>();
   const [radioError, setRadioError] = useState(false);
   const client = useApiClient();
@@ -83,6 +84,10 @@ export function IncludeAllCandidatesPage() {
       void navigate(`/elections/${election.id}/apportionment`);
     }
   });
+
+  if (isLoading) {
+    return <Loader />;
+  }
 
   async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();

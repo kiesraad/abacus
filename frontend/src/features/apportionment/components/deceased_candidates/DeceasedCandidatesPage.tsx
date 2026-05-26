@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import { type AnyApiError, type ApiResult, isSuccess } from "@/api/ApiResult";
 import { useApiClient } from "@/api/useApiClient";
 import { Button } from "@/components/ui/Button/Button";
+import { Loader } from "@/components/ui/Loader/Loader";
 import { Table } from "@/components/ui/Table/Table";
 import { useElection } from "@/hooks/election/useElection";
 import { t } from "@/i18n/translate";
@@ -97,7 +98,7 @@ function get_detailed_deceased_candidates(
 export function DeceasedCandidatesPage() {
   const navigate = useNavigate();
   const { election } = useElection();
-  const { state, error, refetchState } = useApportionmentContext();
+  const { state, error, isLoading, refetchState } = useApportionmentContext();
   const [apiError, setApiError] = useState<AnyApiError>();
   const client = useApiClient();
 
@@ -112,6 +113,10 @@ export function DeceasedCandidatesPage() {
       void navigate(`/elections/${election.id}/apportionment`);
     }
   });
+
+  if (isLoading) {
+    return <Loader />;
+  }
 
   let deceasedCandidates: DetailedDeceasedCandidate[] = [];
   if (state && state.type !== "Uninitialised") {

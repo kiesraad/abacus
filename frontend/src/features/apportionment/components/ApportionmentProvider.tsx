@@ -33,6 +33,7 @@ export function ApportionmentProvider({ children, electionId }: ElectionApportio
         electionSummary: data?.election_summary,
         state,
         error,
+        isLoading: requestState.status === "loading",
         refetchState: refetch,
       }}
     >

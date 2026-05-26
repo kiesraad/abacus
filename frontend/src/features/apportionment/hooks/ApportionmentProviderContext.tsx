@@ -14,6 +14,7 @@ export interface iElectionApportionmentProviderContext {
   electionSummary?: ElectionSummary;
   state?: ApportionmentState;
   error?: ApiError;
+  isLoading: boolean;
   refetchState: (controller?: AbortController) => Promise<ApiResult<ApportionmentState>>;
 }
 

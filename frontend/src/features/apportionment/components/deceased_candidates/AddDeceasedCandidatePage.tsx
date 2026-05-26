@@ -56,7 +56,7 @@ export function AddDeceasedCandidatePage() {
     const response: ApiResult<ApportionmentState> = await client.postRequest(path, body);
 
     if (isSuccess(response)) {
-      void refetchState();
+      await refetchState();
       void navigate(`/elections/${election.id}/apportionment/deceased-candidates`);
     } else {
       setApiError(response);

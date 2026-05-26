@@ -841,7 +841,7 @@
         "list_seats": 2,
         "preferential_nomination_columns": [
           {
-            "list_seat_number": 4,
+            "list_seat_number": 1,
             "candidate": {
               "number": 4,
               "initials": "T.J.",

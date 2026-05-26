@@ -93,6 +93,9 @@ table.electionSummaryTable {
     th {
       color: var(--base-black);
     }
+    td:first-of-type {
+      width: fit-content;
+    }
     /* Description or extra information */
     td:last-of-type {
       color: var(--color-help-text);

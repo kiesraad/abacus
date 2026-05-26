@@ -90,6 +90,11 @@ impl ApportionmentState {
             Self::Uninitialised => Ok(Self::RegisteringDeceasedCandidates {
                 deceased_candidates: Vec::new(),
             }),
+            Self::Finalised {
+                deceased_candidates,
+            } => Ok(Self::RegisteringDeceasedCandidates {
+                deceased_candidates,
+            }),
             _ => Err(ApportionmentStateError::InvalidState),
         }
     }
@@ -209,7 +214,7 @@ mod tests {
             let scenarios = vec![
                 (Uninitialised, Ok(RegisteringDeceasedCandidates { deceased_candidates: vec![] })),
                 (RegisteringDeceasedCandidates { deceased_candidates: vec![] }, Err(InvalidState)),
-                (Finalised { deceased_candidates: vec![] }, Err(InvalidState)),
+                (Finalised { deceased_candidates: vec![] }, Ok(RegisteringDeceasedCandidates { deceased_candidates: vec![] })),
             ];
 
             for (from, expected) in scenarios {

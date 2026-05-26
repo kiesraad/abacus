@@ -2,24 +2,27 @@ import { render as rtlRender } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import * as ReactRouter from "react-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
-
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
+import {
+  GetApportionmentStateRequestHandler,
+  RegisterDeceasedCandidatesRequestHandler,
+} from "@/testing/api-mocks/RequestHandlers";
 import { Providers } from "@/testing/Providers";
 import type { Router } from "@/testing/router";
-import { overrideOnce } from "@/testing/server";
+import { overrideOnce, server } from "@/testing/server";
 import {
   expectErrorPage,
   render,
   renderReturningRouter,
   screen,
   setupTestRouter,
+  spyOnHandler,
   waitFor,
   within,
 } from "@/testing/test-utils";
 import type { ApportionmentState, ElectionApportionmentResponse, ErrorResponse } from "@/types/generated/openapi";
-
 import { apportionmentRoutes } from "../routes";
 import {
   candidate_nomination,
@@ -110,6 +113,61 @@ describe("ApportionmentPage", () => {
     }
   });
 
+  test("Renders number of deceased candidates and redirects on clicking manage deceased candidates", async () => {
+    const user = userEvent.setup();
+    overrideOnce("get", "/api/elections/3", 200, getElectionMockData(election, committee_session));
+    overrideOnce("post", "/api/elections/3/apportionment", 200, {
+      seat_assignment: seat_assignment,
+      candidate_nomination: candidate_nomination,
+      election_summary: election_summary,
+    } satisfies ElectionApportionmentResponse);
+    server.use(GetApportionmentStateRequestHandler);
+    server.use(RegisterDeceasedCandidatesRequestHandler);
+    overrideOnce("get", "/api/elections/3/apportionment/state", 200, {
+      deceased_candidates: [{ pg_number: 1, candidate_number: 1 }],
+      type: "Finalised",
+    } satisfies ApportionmentState);
+    const registerDeceasedCandidates = spyOnHandler(RegisterDeceasedCandidatesRequestHandler);
+    const getApportionmentState = spyOnHandler(GetApportionmentStateRequestHandler);
+
+    renderApportionmentPage(3, false);
+
+    expect(await screen.findByRole("heading", { level: 1, name: "Zetelverdeling" })).toBeVisible();
+
+    expect(await screen.findByText("Alle zetels zijn toegewezen")).toBeVisible();
+    expect(
+      await screen.findByText("Je kunt de zetelverdeling nu definitief maken en het proces-verbaal downloaden."),
+    ).toBeVisible();
+    expect(screen.getByRole("link", { name: "Naar proces-verbaal" })).toHaveAttribute(
+      "href",
+      "/report/committee-session/3/download",
+    );
+
+    expect(await screen.findByRole("heading", { level: 2, name: "Kengetallen" })).toBeVisible();
+    const election_summary_table = await screen.findByTestId("election-summary-table");
+    expect(election_summary_table).toBeVisible();
+    expect(election_summary_table).toHaveTableContent([
+      ["Kiesgerechtigden", "2.000", ""],
+      ["Getelde stembiljetten", "1.205", "Opkomst: 60.25%"],
+      ["Blanco stemmen", "3", "0.25%"],
+      ["Ongeldige stemmen", "2", "0.17%"],
+      ["Totaal stemmen op kandidaten", "1.200", ""],
+      ["Aantal raadszetels", "15", ""],
+      ["Kiesdeler", "80", "Benodigde stemmen per volle zetel"],
+      ["Voorkeursdrempel", "40", "50% van de kiesdeler"],
+      ["Kandidaten voor zetelverdeling", "44 - 1 † = 43", "Beheer overleden kandidaten"],
+    ]);
+
+    // Check if the link to the deceased candidates page works
+    const rows = within(election_summary_table).getAllByRole("row");
+    if (rows[8]) {
+      const manageLink = await within(rows[8]).findByRole("button", { name: "Beheer overleden kandidaten" });
+      await user.click(manageLink);
+      expect(registerDeceasedCandidates).toHaveBeenCalled();
+      expect(getApportionmentState).toHaveBeenCalled();
+    }
+  });
+
   test("Election summary and apportionment tables visible", async () => {
     const user = userEvent.setup();
     overrideOnce("get", "/api/elections/3", 200, getElectionMockData(election, committee_session));
@@ -148,6 +206,7 @@ describe("ApportionmentPage", () => {
       ["Aantal raadszetels", "15", ""],
       ["Kiesdeler", "80", "Benodigde stemmen per volle zetel"],
       ["Voorkeursdrempel", "40", "50% van de kiesdeler"],
+      ["Kandidaten voor zetelverdeling", "44 - 0 † = 44", "Beheer overleden kandidaten"],
     ]);
 
     expect(await screen.findByRole("heading", { level: 2, name: "Zetelverdeling" })).toBeVisible();

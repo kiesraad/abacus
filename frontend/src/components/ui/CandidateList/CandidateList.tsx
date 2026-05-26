@@ -34,6 +34,7 @@ function CandidateListRow({ candidate, pgNumber, isDeceased, onClick }: Candidat
   if (onClick && !isDeceased) {
     return (
       <Table.ClickRow
+        id={`candidate-${candidate.number}`}
         onClick={() => {
           onClick(candidate.number, pgNumber);
         }}
@@ -43,7 +44,7 @@ function CandidateListRow({ candidate, pgNumber, isDeceased, onClick }: Candidat
     );
   } else {
     return (
-      <Table.Row>
+      <Table.Row id={`candidate-${candidate.number}`}>
         <CandidateListRowContent candidate={candidate} isDeceased={isDeceased} />
       </Table.Row>
     );
@@ -58,7 +59,7 @@ interface CandidateListTableProps {
 
 function CandidateListTable({ politicalGroup, deceasedCandidates, onClick }: CandidateListTableProps): ReactNode {
   return (
-    <Table>
+    <Table id="candidates">
       <Table.Header>
         <Table.HeaderCell className="text-align-r">{t("number")}</Table.HeaderCell>
         <Table.HeaderCell>{t("candidate.title.singular")}</Table.HeaderCell>

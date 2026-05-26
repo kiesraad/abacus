@@ -50,7 +50,7 @@ function renderDeceasedCandidatesTable(
   withDeleteLink: boolean,
 ) {
   return (
-    <Table className={cls.deceasedCandidatesTable}>
+    <Table id="deceased-candidates" className={cls.deceasedCandidatesTable}>
       <Table.Header>
         <Table.HeaderCell>{t("candidate.deceased.singular")}</Table.HeaderCell>
         <Table.HeaderCell>{t("list")}</Table.HeaderCell>

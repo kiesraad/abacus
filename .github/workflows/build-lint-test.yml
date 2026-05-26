@@ -71,7 +71,7 @@ jobs:
         with:
           workspaces: "backend -> target"
       - name: Build
-        run: cargo --verbose --locked build --target=x86_64-unknown-linux-musl --features memory-serve,embed-typst,storybook --bin abacus
+        run: cargo --verbose --locked build --target=x86_64-unknown-linux-musl --no-default-features --features openapi,dev-database,memory-serve,embed-typst,storybook --bin abacus
       - uses: actions/upload-artifact@v7
         with:
           name: abacus
@@ -131,7 +131,7 @@ jobs:
       - name: Install Nextest
         run: cargo binstall cargo-nextest
       - name: Run tests
-        run: cargo --verbose --locked nextest run --target=x86_64-unknown-linux-musl --workspace --features embed-typst
+        run: cargo --verbose --locked nextest run --target=x86_64-unknown-linux-musl --workspace --exclude pdf_gen_dylib --no-default-features --features openapi,dev-database,embed-typst
       - name: Build documentation
         run: cargo doc --workspace --no-deps --all-features
         env:

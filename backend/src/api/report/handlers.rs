@@ -158,8 +158,6 @@ pub async fn election_download_zip_results_csb(
         committee_session_repo::get_committee_category(&mut conn, committee_session_id).await?;
     user.role().is_authorized(committee_category)?;
 
-    // TODO: #3160 check if apportionment state is finalised
-
     let election = election_repo::get(&mut conn, election_id).await?;
     let committee_session = committee_session_repo::get(&mut conn, committee_session_id).await?;
     let files = get_files_csb_election(&pool, audit_service, committee_session.id).await?;
@@ -226,8 +224,6 @@ pub async fn election_download_zip_attachment_csb(
         committee_session_repo::get_committee_category(&mut conn, committee_session_id).await?;
     user.role().is_authorized(committee_category)?;
 
-    // TODO: #3160 check if apportionment state is finalised
-
     let election = election_repo::get(&mut conn, election_id).await?;
     let committee_session = committee_session_repo::get(&mut conn, committee_session_id).await?;
     let files = get_files_csb_election(&pool, audit_service, committee_session.id).await?;
@@ -288,8 +284,6 @@ pub async fn election_download_zip_total_counts_csb(
     let committee_category =
         committee_session_repo::get_committee_category(&mut conn, committee_session_id).await?;
     user.role().is_authorized(committee_category)?;
-
-    // TODO: #3160 check if apportionment state is finalised
 
     let election = election_repo::get(&mut conn, election_id).await?;
     let committee_session = committee_session_repo::get(&mut conn, committee_session_id).await?;

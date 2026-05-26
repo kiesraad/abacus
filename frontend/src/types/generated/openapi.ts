@@ -962,6 +962,7 @@ export const errorReferenceValues = [
   "EntryNotUnique",
   "Forbidden",
   "InternalServerError",
+  "InvalidApportionmentState",
   "InvalidCommitteeSessionStatus",
   "InvalidData",
   "InvalidHash",

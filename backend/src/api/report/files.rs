@@ -5,7 +5,10 @@ use crate::{
     APIError, SqlitePoolExt,
     api::{
         apportionment::ApportionmentInputData,
-        report::structs::{CsbFiles, FileCreatedAuditData, GeneratedFile, GsbFiles, ResultsInput},
+        report::{
+            ReportApiError,
+            structs::{CsbFiles, FileCreatedAuditData, GeneratedFile, GsbFiles, ResultsInput},
+        },
     },
     domain::{
         committee_session::{CommitteeSession, CommitteeSessionError, CommitteeSessionId},
@@ -214,6 +217,11 @@ pub async fn get_files_csb_election(
         return Err(CommitteeSessionError::InvalidCommitteeSessionStatus.into());
     }
 
+    let (_, state) = get_apportionment_state(&mut conn, committee_session.election_id).await?;
+    if !state.is_finalised() {
+        return Err(ReportApiError::ApportionmentStateNotFinalised.into());
+    }
+
     // Check if files exist, if so, get files from database
     let mut files = get_existing_csb_files(&mut conn, committee_session.id).await?;
     drop(conn);
@@ -237,6 +245,7 @@ mod tests {
     use super::*;
     use crate::{
         domain::{
+            election::ElectionId,
             file::FileId,
             investigation::{InvestigationConcludedWithoutNewResults, InvestigationStatus},
             polling_station::PollingStationId,
@@ -246,6 +255,7 @@ mod tests {
             committee_session_repo::{self, change_status},
             investigation_repo,
         },
+        service::update_apportionment_state,
     };
 
     #[test(sqlx::test(fixtures(path = "../../../fixtures", scripts("election_5_with_results"))))]
@@ -384,10 +394,11 @@ mod tests {
         path = "../../../fixtures",
         scripts("election_8_csb_with_results")
     )))]
-    async fn test_error_get_files_csb_election_not_completed(pool: SqlitePool) {
+    async fn test_error_get_files_csb_election_not_in_valid_state(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
         let audit_service = AuditService::new(None, None);
 
+        // Error because committee session is not completed
         let result =
             get_files_csb_election(&pool, audit_service.clone(), CommitteeSessionId::from(801))
                 .await;
@@ -413,6 +424,22 @@ mod tests {
             CommitteeSessionId::from(801),
             "Juinen".to_string(),
             NaiveDateTime::parse_from_str("2026-03-19T09:15", "%Y-%m-%dT%H:%M").unwrap(),
+        )
+        .await
+        .unwrap();
+
+        // Error because apportionment state is not finalised
+        let result =
+            get_files_csb_election(&pool, audit_service.clone(), CommitteeSessionId::from(801))
+                .await;
+        assert!(result.is_err());
+
+        // Finalise apportionment state
+        update_apportionment_state(
+            &mut conn,
+            audit_service.clone(),
+            ElectionId::from(8),
+            |state| state.skip_deceased_candidates(),
         )
         .await
         .unwrap();
@@ -450,6 +477,16 @@ mod tests {
         .await
         .unwrap();
 
+        // Finalise apportionment state
+        update_apportionment_state(
+            &mut conn,
+            audit_service.clone(),
+            ElectionId::from(8),
+            |state| state.skip_deceased_candidates(),
+        )
+        .await
+        .unwrap();
+
         // Files should be generated exactly once
         for _ in 1..=2 {
             let files =
@@ -481,7 +518,13 @@ mod tests {
 
             assert_eq!(
                 list_event_names(&mut conn).await.unwrap(),
-                ["FileCreated", "FileCreated", "FileCreated", "FileCreated"]
+                [
+                    "ApportionmentStateUpdated",
+                    "FileCreated",
+                    "FileCreated",
+                    "FileCreated",
+                    "FileCreated"
+                ]
             );
         }
     }

@@ -6762,6 +6762,7 @@
           "EntryNotUnique",
           "Forbidden",
           "InternalServerError",
+          "InvalidApportionmentState",
           "InvalidCommitteeSessionStatus",
           "InvalidData",
           "InvalidHash",

@@ -1,6 +1,6 @@
 use axum::{Json, extract::State};
 use axum_extra::extract::Query;
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Deserializer, Serialize, de};
 use sqlx::SqlitePool;
 use utoipa::{IntoParams, ToSchema};
 use utoipa_axum::{router::OpenApiRouter, routes};
@@ -36,6 +36,14 @@ fn default_page() -> u32 {
     1
 }
 
+fn deserialize_page<'de, D: Deserializer<'de>>(d: D) -> Result<u32, D::Error> {
+    let v = u32::deserialize(d)?;
+    if v == 0 {
+        return Err(de::Error::custom("page must be >= 1"));
+    }
+    Ok(v)
+}
+
 /// Number of items per page
 fn default_per_page() -> u32 {
     200
@@ -46,7 +54,7 @@ fn default_per_page() -> u32 {
 #[into_params(parameter_in = Query)]
 pub struct LogFilterQuery {
     /// Page number, default 1
-    #[serde(default = "default_page")]
+    #[serde(default = "default_page", deserialize_with = "deserialize_page")]
     pub page: u32,
     /// Number of items per page
     #[serde(default = "default_per_page")]

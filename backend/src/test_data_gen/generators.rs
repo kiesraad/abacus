@@ -165,7 +165,7 @@ async fn generate_csb_election_data(
             committee_session.id,
             number,
             &election.location,
-            CommitteeCategory::CSB,
+            CommitteeCategory::GSB,
         )
         .await
         .map_err(|e| format!("{e:?}"))?;
@@ -302,17 +302,22 @@ fn generate_election(
     NewElection {
         name,
         committee_category: args.committee_category,
-        counting_method: if args.committee_category == CommitteeCategory::CSB {
-            None
-        } else {
+        counting_method: if args.committee_category == CommitteeCategory::GSB {
             Some(VoteCountingMethod::CSO)
+        } else {
+            None
         },
         domain_id: super::data::domain_id(rng),
         election_id,
         location: locality,
         category: ElectionCategory::Municipal,
         number_of_seats: rng.random_range(args.seats.clone()),
-        number_of_voters: rng.random_range(args.voters.clone()),
+        number_of_voters: if args.committee_category == CommitteeCategory::GSB {
+            rng.random_range(args.voters.clone())
+        } else {
+            // only relevant for GSB, so set to default value for MaxVotes in EML_NL
+            1
+        },
         election_date,
         nomination_date,
         political_groups,

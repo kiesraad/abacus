@@ -11,15 +11,6 @@ use crate::domain::{
     summary::ElectionSummaryCSB,
 };
 
-/// Contains the result changes that have occurred in the apportionment.
-#[derive(Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct ResultChange {
-    pub list_number: u32,
-    pub increase: u32,
-    pub decrease: u32,
-}
-
 #[derive(Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct ModelP22_2Input {

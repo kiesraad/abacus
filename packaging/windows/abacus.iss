@@ -18,6 +18,11 @@
 #define MyAppIcon "abacus.ico"
 #define MyDatabaseFile = "db.sqlite"
 
+#define MyServiceInstaller "install-service.exe"
+#define MyServiceUninstaller "uninstall-service.exe"
+#define MyService "abacus-windows-service.exe"
+#define MyServiceName "abacus_windows_service"
+
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application. Do not use the same AppId value in installers for other applications.
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
@@ -71,6 +76,10 @@ Name: "dutch"; MessagesFile: "compiler:Languages\Dutch.isl"
 Source: ".\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion sign
 Source: ".\VC_redist.x64.exe"; DestDir: "{tmp}"; Flags: deleteafterinstall
 Source: ".\{#MyAppIcon}"; DestDir: "{app}"
+; Move service binaries into app folder
+Source: ".\{#MyServiceInstaller}"; DestDir: "{app}";
+Source: ".\{#MyServiceUninstaller}"; DestDir: "{app}";
+Source: ".\{#MyService}"; DestDir: "{app}";
 
 [Icons]
 Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; IconFilename: "{app}\{#MyAppIcon}"
@@ -80,11 +89,13 @@ Name: "{autodesktop}\{#MyAppName} database map"; Filename: "{app}"; IconFilename
 
 [Run]
 Filename: "{tmp}\VC_redist.x64.exe"; Parameters: "/install /passive /norestart"; StatusMsg: "Visual C++ Redistributable installeren..."
-Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\{#MyServiceInstaller}";
 Filename: "http://localhost"; Description: "Open Abacus Interface"; Flags: shellexec postinstall skipifsilent
 
 [UninstallRun]
 Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall delete rule name=""Abacus server"" "; Flags: runhidden; RunOnceId: "RemoveFirewallExc"
+Filename: "{sys}\sc.exe"; Parameters: "stop ""{#MyServiceName}"""; Flags: runhidden; RunOnceId: "StopService"
+Filename: "{app}\{#MyServiceUninstaller}"; Flags: runhidden; RunOnceId: "RemoveAbacusService"
 
 [Messages]
 WizardReady=Klaar om [name] te installeren

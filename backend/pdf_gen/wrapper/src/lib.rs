@@ -25,10 +25,11 @@ pub fn lib() -> &'static libloading::Library {
 pub async fn generate_pdf(input: impl PdfGenInput) -> Result<PdfGenResult, PdfGenError> {
     use libloading::Symbol;
 
+    type PdfGenFn = fn(Box<dyn PdfGenInput>) -> Result<PdfGenResult, PdfGenError>;
+
     let lib = lib();
-    let func: Symbol<fn(Box<dyn PdfGenInput>) -> Result<PdfGenResult, PdfGenError>> =
-        unsafe { lib.get(b"pdf_gen_dyn_generate_pdf\0") }
-            .expect("symbol 'pdf_gen_dyn_generate_pdf' not found");
+    let func: Symbol<PdfGenFn> = unsafe { lib.get(b"pdf_gen_dyn_generate_pdf\0") }
+        .expect("symbol 'pdf_gen_dyn_generate_pdf' not found");
 
     let input = Box::new(input);
     tokio::task::spawn_blocking(move || func(input)).await?

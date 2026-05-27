@@ -9,11 +9,11 @@ use typst_pdf::{PdfOptions, PdfStandard, PdfStandards, Timestamp};
 mod world;
 
 /// Generates a PDF using the embedded typst library.
-pub fn generate_pdf(input: Box<dyn PdfGenInput>) -> Result<PdfGenResult, PdfGenError> {
-    let world = world::PdfWorld::new(input.as_ref())?;
+pub fn generate_pdf(input: &dyn PdfGenInput) -> Result<PdfGenResult, PdfGenError> {
+    let world = world::PdfWorld::new(input)?;
 
     // Do not short-circuit error here because we always want to do the cache cleanup
-    let result = compile_pdf(world);
+    let result = compile_pdf(&world);
 
     // Evict the cache to free up memory + speed up next compile
     comemo::evict(0);
@@ -27,7 +27,7 @@ fn get_pdf_options() -> PdfOptions<'static> {
         // https://github.com/typst/typst/blob/96dd67e011bb317cf78683bcf1edfdfca5e7b6b3/crates/typst-cli/src/compile.rs#L280
         timestamp: {
             let local_datetime = chrono::Local::now();
-            convert_datetime(local_datetime).and_then(|datetime| {
+            convert_datetime(&local_datetime).and_then(|datetime| {
                 Timestamp::new_local(datetime, local_datetime.offset().local_minus_utc() / 60)
             })
         },
@@ -37,7 +37,7 @@ fn get_pdf_options() -> PdfOptions<'static> {
 
 /// Convert [`chrono::DateTime`] to [`Datetime`]
 /// From https://github.com/typst/typst/blob/96dd67e011bb317cf78683bcf1edfdfca5e7b6b3/crates/typst-cli/src/compile.rs#L305
-fn convert_datetime<Tz: chrono::TimeZone>(date_time: chrono::DateTime<Tz>) -> Option<Datetime> {
+fn convert_datetime<Tz: chrono::TimeZone>(date_time: &chrono::DateTime<Tz>) -> Option<Datetime> {
     Datetime::from_ymd_hms(
         date_time.year(),
         date_time.month().try_into().ok()?,
@@ -49,7 +49,7 @@ fn convert_datetime<Tz: chrono::TimeZone>(date_time: chrono::DateTime<Tz>) -> Op
 }
 
 #[allow(clippy::cognitive_complexity)]
-fn compile_pdf(world: world::PdfWorld) -> Result<PdfGenResult, PdfGenError> {
+fn compile_pdf(world: &world::PdfWorld) -> Result<PdfGenResult, PdfGenError> {
     debug!(
         "Starting Typst compilation for {:?}",
         world.main().vpath().as_rootless_path()
@@ -57,7 +57,7 @@ fn compile_pdf(world: world::PdfWorld) -> Result<PdfGenResult, PdfGenError> {
 
     let compile_start = Instant::now();
 
-    let result = typst::compile(&world);
+    let result = typst::compile(world);
     info!(
         "Compile took {} ms, {} warnings",
         compile_start.elapsed().as_millis(),

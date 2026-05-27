@@ -39,7 +39,7 @@ impl PoliticalGroupCandidateVotes {
 
         self.total += other.total;
 
-        for cv in other.candidate_votes.iter() {
+        for cv in &other.candidate_votes {
             let Some(found_can) = self
                 .candidate_votes
                 .iter_mut()
@@ -107,9 +107,8 @@ impl Validate for Vec<PoliticalGroupCandidateVotes> {
     fn validate(
         &self,
         election: &ElectionWithPoliticalGroups,
-        validation_results: &mut ValidationResults,
         path: &FieldPath,
-    ) -> Result<(), DataError> {
+    ) -> Result<ValidationResults, DataError> {
         // check if the list of political groups has the correct length
         if election.political_groups.len() != self.len() {
             return Err(DataError::new(
@@ -119,6 +118,7 @@ impl Validate for Vec<PoliticalGroupCandidateVotes> {
 
         // check each political group
         let mut previous_number = PGNumber::from(0);
+        let mut validation_results = ValidationResults::default();
         for (i, pgv) in self.iter().enumerate() {
             let number = pgv.number;
             if number <= previous_number {
@@ -126,9 +126,9 @@ impl Validate for Vec<PoliticalGroupCandidateVotes> {
             }
             previous_number = number;
 
-            pgv.validate(election, validation_results, &path.index(i))?;
+            validation_results.join(pgv.validate(election, &path.index(i))?);
         }
-        Ok(())
+        Ok(validation_results)
     }
 }
 
@@ -136,9 +136,8 @@ impl Validate for PoliticalGroupCandidateVotes {
     fn validate(
         &self,
         election: &ElectionWithPoliticalGroups,
-        validation_results: &mut ValidationResults,
         path: &FieldPath,
-    ) -> Result<(), DataError> {
+    ) -> Result<ValidationResults, DataError> {
         // check if the list of candidates has the correct length
         let pg = election
             .political_groups
@@ -153,6 +152,7 @@ impl Validate for PoliticalGroupCandidateVotes {
 
         // validate all candidates
         let mut prev_number = CandidateNumber::from(0);
+        let mut validation_results = ValidationResults::default();
         for (i, cv) in self.candidate_votes.iter().enumerate() {
             let number = cv.number;
             if number <= prev_number {
@@ -160,18 +160,14 @@ impl Validate for PoliticalGroupCandidateVotes {
             }
             prev_number = number;
 
-            cv.validate(
-                election,
-                validation_results,
-                &path.field("candidate_votes").index(i),
-            )?;
+            validation_results
+                .join(cv.validate(election, &path.field("candidate_votes").index(i))?);
         }
 
         // validate the total number of votes
-        self.total
-            .validate(election, validation_results, &path.field("total"))?;
+        validation_results.join(self.total.validate(election, &path.field("total"))?);
 
-        Ok(())
+        Ok(validation_results)
     }
 }
 
@@ -195,11 +191,9 @@ impl Validate for CandidateVotes {
     fn validate(
         &self,
         election: &ElectionWithPoliticalGroups,
-        validation_results: &mut ValidationResults,
         path: &FieldPath,
-    ) -> Result<(), DataError> {
-        self.votes
-            .validate(election, validation_results, &path.field("votes"))
+    ) -> Result<ValidationResults, DataError> {
+        self.votes.validate(election, &path.field("votes"))
     }
 }
 
@@ -208,7 +202,7 @@ impl Validate for CandidateVotes {
 #[cfg(test)]
 pub fn create_political_group_candidate_votes(
     political_groups: &[PoliticalGroup],
-    candidate_votes: Vec<Vec<u32>>,
+    candidate_votes: &[Vec<u32>],
 ) -> Vec<PoliticalGroupCandidateVotes> {
     political_groups
         .iter()

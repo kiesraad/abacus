@@ -96,7 +96,7 @@ impl EnrichedSeatAssignment {
             .filter(|list_seat_assignment| list_seat_assignment.meets_remainder_threshold)
             .collect();
         let mut largest_remainders = Vec::new();
-        for standing in final_standing_pgs_meeting_threshold.iter() {
+        for standing in &final_standing_pgs_meeting_threshold {
             let assigned_seat = initial_largest_remainder_steps
                 .iter()
                 .find(|step| step.change.list_number_assigned() == standing.list_number);
@@ -159,7 +159,7 @@ impl EnrichedSeatAssignment {
             )
         };
 
-        for pg_votes in summary.votes_counts.political_group_total_votes.iter() {
+        for pg_votes in &summary.votes_counts.political_group_total_votes {
             let initial_full_seats = Self::get_initial_full_seats(seat_assignment, pg_votes.number);
             let largest_remainder = if initial_steps.initial_largest_remainder_steps.is_empty() {
                 None
@@ -276,7 +276,7 @@ mod tests {
 
     fn get_election_summary(
         election: &ElectionWithPoliticalGroups,
-        candidate_votes: Vec<Vec<u32>>,
+        candidate_votes: &[Vec<u32>],
     ) -> ElectionSummary {
         let total_votes_candidates_count = candidate_votes.iter().flatten().sum::<u32>();
         let political_group_votes =
@@ -331,7 +331,7 @@ mod tests {
             10,
         );
         let political_groups = &election.political_groups;
-        let summary = get_election_summary(&election, candidate_votes);
+        let summary = get_election_summary(&election, &candidate_votes);
         let summary_csb = ElectionSummaryCSB::new(&summary, political_groups);
         let apportionment_input = ApportionmentInputData {
             number_of_seats: election.number_of_seats,
@@ -449,7 +449,7 @@ mod tests {
             24,
         );
         let political_groups = &election.political_groups;
-        let summary = get_election_summary(&election, candidate_votes);
+        let summary = get_election_summary(&election, &candidate_votes);
         let summary_csb = ElectionSummaryCSB::new(&summary, political_groups);
         let apportionment_input = ApportionmentInputData {
             number_of_seats: election.number_of_seats,
@@ -535,7 +535,7 @@ mod tests {
             15,
         );
         let political_groups = &election.political_groups;
-        let summary = get_election_summary(&election, candidate_votes);
+        let summary = get_election_summary(&election, &candidate_votes);
         let summary_csb = ElectionSummaryCSB::new(&summary, political_groups);
         let apportionment_input = ApportionmentInputData {
             number_of_seats: election.number_of_seats,

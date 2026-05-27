@@ -11,7 +11,7 @@ pub async fn generate_pdf(_input: impl PdfGenInput) -> Result<PdfGenResult, PdfG
 
 #[cfg(feature = "static")]
 pub async fn generate_pdf(input: impl PdfGenInput) -> Result<PdfGenResult, PdfGenError> {
-    tokio::task::spawn_blocking(move || pdf_gen_impl::generate_pdf(Box::new(input))).await?
+    tokio::task::spawn_blocking(move || pdf_gen_impl::generate_pdf(&input)).await?
 }
 
 #[cfg(all(not(feature = "static"), feature = "dev"))]

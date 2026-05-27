@@ -152,7 +152,7 @@ mod tests {
             15,
         );
         let list_votes =
-            create_political_group_candidate_votes(&election.political_groups, candidate_votes);
+            create_political_group_candidate_votes(&election.political_groups, &candidate_votes);
         let apportionment_input = ApportionmentInputData {
             number_of_seats: election.number_of_seats,
             list_votes: list_votes.as_slice(),
@@ -186,7 +186,7 @@ mod tests {
             15,
         );
         let list_votes =
-            create_political_group_candidate_votes(&election.political_groups, candidate_votes);
+            create_political_group_candidate_votes(&election.political_groups, &candidate_votes);
         let apportionment_input = ApportionmentInputData {
             number_of_seats: election.number_of_seats,
             list_votes: list_votes.as_slice(),
@@ -227,7 +227,7 @@ mod tests {
             19,
         );
         let list_votes =
-            create_political_group_candidate_votes(&election.political_groups, candidate_votes);
+            create_political_group_candidate_votes(&election.political_groups, &candidate_votes);
         let apportionment_input = ApportionmentInputData {
             number_of_seats: election.number_of_seats,
             list_votes: list_votes.as_slice(),

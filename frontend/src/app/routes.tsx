@@ -35,7 +35,6 @@ export const routes: RouteObject[] = [
     children: [
       {
         index: true,
-        path: "/",
         element: showDevPage ? <Navigate to="/dev" replace /> : <Navigate to="/elections" replace />,
         handle: { public: true },
       },

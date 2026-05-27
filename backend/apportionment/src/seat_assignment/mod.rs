@@ -1526,7 +1526,7 @@ pub(crate) mod tests {
             /// 3 - highest average: [333 2/6, 333 2/6, 320, 320, 266 2/3] seat assigned to list 5  
             /// 4 - All lists are exhausted, seat is left unassigned
             #[test]
-            fn test_with_2_exhausted_lists_leaves_seat_un() {
+            fn test_with_2_exhausted_lists_leaves_seat_unassigned() {
                 let input = seat_assignment_fixture_with_given_candidate_votes(
                     20,
                     vec![

@@ -1,4 +1,3 @@
-import { ApplicationError } from "@/api/ApiResult";
 import { DownloadButton } from "@/components/ui/DownloadButton/DownloadButton";
 import { Loader } from "@/components/ui/Loader/Loader";
 import { useApportionmentStateRequest } from "@/hooks/apportionment/useApportionmentStateRequest";
@@ -24,9 +23,10 @@ export function CSBElectionReportSection({ election, committeeSession, sessionLa
   if (!apportionmentState) {
     return <Loader />;
   }
-  if (apportionmentState.type !== "Finalised") {
-    throw new ApplicationError(t("error.forbidden_message"), "InvalidCommitteeSessionStatus");
-  }
+  // TODO: #3160 enable this check when apportionment deceased candidate flow is implemented
+  // if (apportionmentState.type !== "Finalised") {
+  //   throw new ApplicationError(t("error.forbidden_message"), "InvalidCommitteeSessionStatus");
+  // }
 
   return (
     <>

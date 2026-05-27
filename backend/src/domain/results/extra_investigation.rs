@@ -41,9 +41,9 @@ impl Validate for ExtraInvestigation {
     fn validate(
         &self,
         election: &ElectionWithPoliticalGroups,
-        validation_results: &mut ValidationResults,
         path: &FieldPath,
-    ) -> Result<(), DataError> {
+    ) -> Result<ValidationResults, DataError> {
+        let mut validation_results = ValidationResults::default();
         if election.committee_category == CommitteeCategory::GSB {
             if self.extra_investigation_other_reason.is_empty()
                 != self.ballots_recounted_extra_investigation.is_empty()
@@ -66,7 +66,7 @@ impl Validate for ExtraInvestigation {
             }
         }
 
-        Ok(())
+        Ok(validation_results)
     }
 }
 
@@ -96,10 +96,8 @@ pub mod tests {
             ballots_recounted_extra_investigation: recounted,
         };
 
-        let mut validation_results = ValidationResults::default();
-        extra_investigation.validate(
+        let validation_results = extra_investigation.validate(
             &election_fixture(committee_category, &[]),
-            &mut validation_results,
             &"extra_investigation".into(),
         )?;
 

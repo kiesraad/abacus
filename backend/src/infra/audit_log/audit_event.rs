@@ -46,7 +46,7 @@ pub struct ErrorDetails {
 }
 
 impl ErrorDetails {
-    pub fn from_error_response(error_response: &ErrorResponse, original_uri: Uri) -> Option<Self> {
+    pub fn from_error_response(error_response: &ErrorResponse, original_uri: &Uri) -> Option<Self> {
         match error_response.reference {
             // ignore common user errors
             ErrorReference::InvalidSession | ErrorReference::UserNotFound => None,
@@ -83,6 +83,7 @@ impl AsAuditEvent for ErrorDetails {
 
 #[derive(
     Clone,
+    Copy,
     Serialize,
     Deserialize,
     strum::Display,

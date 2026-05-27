@@ -536,10 +536,7 @@ impl ElectionWithPoliticalGroups {
     ) -> Result<ElectionCountContest, EMLError> {
         let builder = ElectionCountContest::builder()
             .identifier(ContestIdentifier::geen())
-            .total_eligible_voter_count(match summary.number_of_voters {
-                Some(n) => n,
-                None => self.number_of_voters,
-            })
+            .total_eligible_voter_count(self.get_eligible_voter_count(summary))
             .total_candidate_votes_count(summary.votes_counts.total_votes_candidates_count)
             .total_rejected_votes(
                 RejectedVotesReason::Blank,
@@ -586,6 +583,13 @@ impl ElectionWithPoliticalGroups {
         };
 
         builder.build()
+    }
+
+    /// Depending on the context of the summary coming from GSB or from CSB, the number of voters source is different.
+    /// In case of a GSB summary, the number of voters there should be the valid source.
+    /// Otherwise, it is the given number of voters.
+    fn get_eligible_voter_count(&self, summary: &ElectionSummary) -> u32 {
+        summary.number_of_voters.unwrap_or(self.number_of_voters)
     }
 
     fn as_eml_count_selections(
@@ -907,7 +911,12 @@ pub fn polling_stations_eml_matches_election(
 
 #[cfg(test)]
 mod tests {
+    use eml_nl::utils::StringValue;
+
     use super::*;
+    use crate::domain::{
+        committee_session::committee_session_fixture, election::tests::election_fixture,
+    };
 
     #[test]
     fn test_election_validate_missing_election_domain() {
@@ -933,5 +942,31 @@ mod tests {
         let res = NewElection::from_eml_str(data).unwrap_err();
         dbg!(&res);
         assert!(matches!(res, EMLImportError::OnlyMunicipalSupported));
+    }
+
+    #[test]
+    fn test_as_eml_count_contest() {
+        // Default number_of_voters=1000
+        let mut election = election_fixture(CommitteeCategory::CSB, &[0]);
+        let committee_session = committee_session_fixture(election.id);
+        let mut summary = ElectionSummary::from_results(&election, &[]).unwrap();
+
+        let result_csb = election
+            .as_eml_count_contest(&committee_session, &[], &summary)
+            .unwrap();
+        assert_eq!(
+            result_csb.total_votes.unwrap().eligible_voter_count,
+            StringValue::from_value(1000u64)
+        );
+
+        election.committee_category = CommitteeCategory::GSB;
+        summary.number_of_voters = Some(1001);
+        let result_gsb = election
+            .as_eml_count_contest(&committee_session, &[], &summary)
+            .unwrap();
+        assert_eq!(
+            result_gsb.total_votes.unwrap().eligible_voter_count,
+            StringValue::from_value(1001u64)
+        );
     }
 }

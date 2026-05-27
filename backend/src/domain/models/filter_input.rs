@@ -12,7 +12,7 @@ fn get_font() -> &'static Face<'static> {
 }
 
 /// Replace unsupported glyphs in the input string with a placeholder character.
-pub fn replace_unsupported_glyphs(input: String) -> String {
+pub fn replace_unsupported_glyphs(input: &str) -> String {
     let face: &'static Face<'static> = get_font();
     input
         .chars()

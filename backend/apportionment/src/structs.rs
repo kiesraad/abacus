@@ -8,7 +8,7 @@ use super::{
 pub(crate) const LARGE_COUNCIL_THRESHOLD: u32 = 19;
 
 /// Errors that can occur during apportionment
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum ApportionmentError {
     DrawingOfLotsNotImplemented,
 }

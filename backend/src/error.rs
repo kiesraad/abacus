@@ -95,9 +95,9 @@ pub struct ErrorResponse {
 }
 
 impl ErrorResponse {
-    pub fn new(error: impl ToString, reference: ErrorReference, fatal: bool) -> Self {
+    pub fn new(error: impl Into<String>, reference: ErrorReference, fatal: bool) -> Self {
         Self {
-            error: error.to_string(),
+            error: error.into(),
             reference,
             fatal,
         }

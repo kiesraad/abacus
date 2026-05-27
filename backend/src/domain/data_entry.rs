@@ -215,9 +215,8 @@ impl Validate for DataEntryStatus {
     fn validate(
         &self,
         election: &ElectionWithPoliticalGroups,
-        validation_results: &mut ValidationResults,
         path: &FieldPath,
-    ) -> Result<(), DataError> {
+    ) -> Result<ValidationResults, DataError> {
         match self {
             DataEntryStatus::FirstEntryInProgress(FirstEntryInProgress {
                 first_entry: entry,
@@ -230,14 +229,10 @@ impl Validate for DataEntryStatus {
             | DataEntryStatus::FirstEntryFinalised(FirstEntryFinalised {
                 finalised_first_entry: entry,
                 ..
-            }) => {
-                entry.validate(election, validation_results, &"data".into())?;
-                Ok(())
-            }
+            }) => entry.validate(election, &"data".into()),
             DataEntryStatus::SecondEntryInProgress(state) => {
-                state
-                    .second_entry
-                    .validate(election, validation_results, &"data".into())?;
+                let mut validation_results =
+                    state.second_entry.validate(election, &"data".into())?;
                 let mut different_fields: Vec<String> = vec![];
                 state.second_entry.compare(
                     &state.finalised_first_entry,
@@ -251,14 +246,14 @@ impl Validate for DataEntryStatus {
                         context: None,
                     });
                 }
-                Ok(())
+                Ok(validation_results)
             }
-            _ => Ok(()),
+            _ => Ok(ValidationResults::default()),
         }
     }
 }
 
-#[derive(Debug, Serialize, Deserialize, strum::Display, Clone, PartialEq, Eq, ToSchema)]
+#[derive(Debug, Serialize, Deserialize, strum::Display, Clone, Copy, PartialEq, Eq, ToSchema)]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 #[strum(serialize_all = "snake_case")]
 pub enum DataEntryStatusName {

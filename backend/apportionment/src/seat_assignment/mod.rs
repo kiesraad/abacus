@@ -223,7 +223,7 @@ fn reassign_residual_seat_for_absolute_majority<T: ListVotes>(
 
         // Reassign the seat
         let mut standing = standings.clone();
-        for list_standing in standing.iter_mut() {
+        for list_standing in &mut standing {
             if list_standing.list_number == lists_last_residual_seat[0] {
                 list_standing.residual_seats -= 1
             }
@@ -272,7 +272,7 @@ fn reassign_residual_seats_for_exhausted_lists<T: ListVotes>(
             seats_to_reassign += seats;
             let mut full_seat: bool = false;
             for _ in 1..=seats {
-                for list_standing in current_standings.iter_mut() {
+                for list_standing in &mut current_standings {
                     if list_standing.list_number == list_number {
                         if list_standing.residual_seats > 0 {
                             list_standing.residual_seats -= 1;
@@ -335,7 +335,7 @@ pub(crate) mod tests {
 
     fn check_total_seats_per_list<T: ListVotes>(
         result: &SeatAssignmentResult<T>,
-        expected_total_seats_per_list: Vec<(T::ListNumber, u32)>,
+        expected_total_seats_per_list: &[(T::ListNumber, u32)],
     ) {
         let total_seats_per_list_number =
             get_total_seats_per_list_number_from_apportionment_result(result);
@@ -1190,7 +1190,7 @@ pub(crate) mod tests {
             assert_eq!(result.steps[1].change.list_number_assigned(), 3);
             assert_eq!(result.steps[2].change.list_number_assigned(), 1);
             assert_eq!(result.steps[3].change.list_number_assigned(), 6);
-            check_total_seats_per_list(&result, vec![(1, 12), (3, 6), (4, 1), (6, 2), (7, 2)]);
+            check_total_seats_per_list(&result, &[(1, 12), (3, 6), (4, 1), (6, 2), (7, 2)]);
         }
 
         /// Apportionment with residual seats assigned with highest averages method

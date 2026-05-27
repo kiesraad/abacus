@@ -65,7 +65,7 @@ impl From<String> for HashedPassword {
 
 /// Hash a string password with Argon2id v19 and return the string representation of the hash/salt/params
 pub(crate) fn hash_password(
-    password: ValidatedPassword,
+    password: &ValidatedPassword,
 ) -> Result<HashedPassword, AuthenticationError> {
     let salt = SaltString::generate(&mut OsRng);
 
@@ -102,7 +102,7 @@ mod tests {
     #[test]
     fn test_hash_password_and_verify() {
         let password = "password";
-        let hash = hash_password(ValidatedPassword(password)).unwrap();
+        let hash = hash_password(&ValidatedPassword(password)).unwrap();
 
         assert!(verify_password(password, &hash));
         assert!(!verify_password("wrong_password", &hash));
@@ -115,7 +115,7 @@ mod tests {
     #[test]
     fn test_password_hash_format() {
         let password = ValidatedPassword("CoordinatorPassword01");
-        let hash = hash_password(password).unwrap();
+        let hash = hash_password(&password).unwrap();
 
         dbg!(&hash);
 
@@ -130,7 +130,7 @@ mod tests {
     #[test]
     fn test_password_same_error() {
         let unhashed = "TotallyValidP4ssW0rd";
-        let hashed = hash_password(ValidatedPassword(unhashed)).unwrap();
+        let hashed = hash_password(&ValidatedPassword(unhashed)).unwrap();
         assert!(ValidatedPassword::new("test_user", unhashed, Some(&hashed)).is_err());
     }
 
@@ -141,7 +141,7 @@ mod tests {
 
     #[test]
     fn test_password_not_same_valid() {
-        let old_password = hash_password(ValidatedPassword("TotallyValidP4ssW0rd")).unwrap();
+        let old_password = hash_password(&ValidatedPassword("TotallyValidP4ssW0rd")).unwrap();
         assert!(
             ValidatedPassword::new("test_user", "TotallyValidNewP4ssW0rd", Some(&old_password))
                 .is_ok()
@@ -150,7 +150,7 @@ mod tests {
 
     #[test]
     fn test_password_same_as_username_error() {
-        let old_password = hash_password(ValidatedPassword("TotallyValidP4ssW0rd")).unwrap();
+        let old_password = hash_password(&ValidatedPassword("TotallyValidP4ssW0rd")).unwrap();
         assert!(
             ValidatedPassword::new(
                 "UsernameButAlsoValidPassword01",

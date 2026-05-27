@@ -455,7 +455,7 @@ mod tests {
     }
 
     fn validate(
-        data: GSBDifferencesCounts,
+        data: &GSBDifferencesCounts,
         voters_count: u32,
         votes_count: u32,
     ) -> Result<ValidationResults, DataError> {
@@ -500,7 +500,7 @@ mod tests {
             let mut data = GSBDifferencesCounts::zero();
             data.more_ballots_count = more;
             data.fewer_ballots_count = fewer;
-            let result = validate(data, voters, votes)?;
+            let result = validate(&data, voters, votes)?;
 
             let has_error = result.errors.iter().any(|e| e == &validation_error);
             assert_eq!(

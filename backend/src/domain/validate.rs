@@ -61,7 +61,7 @@ pub struct ValidationResultContext {
     pub political_group_number: Option<PGNumber>,
 }
 
-#[derive(Serialize, Deserialize, ToSchema, Debug, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Serialize, Deserialize, ToSchema, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 #[serde(deny_unknown_fields)]
 pub enum ValidationResultCode {
     /// GSB CSO: 'Alleen bij extra onderzoek B1-1': één van beide vragen is beantwoord, en de andere niet
@@ -159,12 +159,8 @@ pub trait ValidateRoot: Validate {
         election: &ElectionWithPoliticalGroups,
     ) -> Result<ValidationResults, DataError> {
         let mut validation_results = self.validate(election, &"data".into())?;
-        validation_results
-            .errors
-            .sort_by(|a, b| a.code.cmp(&b.code));
-        validation_results
-            .warnings
-            .sort_by(|a, b| a.code.cmp(&b.code));
+        validation_results.errors.sort_by_key(|a| a.code);
+        validation_results.warnings.sort_by_key(|a| a.code);
         Ok(validation_results)
     }
 }

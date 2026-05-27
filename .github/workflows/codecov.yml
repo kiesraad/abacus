@@ -25,6 +25,7 @@ jobs:
     env:
       CARGO_TERM_COLOR: always
       SQLX_OFFLINE: "true"
+      BINSTALL_DISABLE_TELEMETRY: "true"
     steps:
       # Free up runner disk space, so that our job has enough space to run
       # https://dev.to/mathio/squeezing-disk-space-from-github-actions-runners-an-engineers-guide-3pjg

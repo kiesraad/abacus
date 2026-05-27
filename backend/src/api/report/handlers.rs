@@ -80,7 +80,7 @@ pub async fn election_download_zip_results_gsb(
 
     let committee_category =
         committee_session_repo::get_committee_category(&mut conn, committee_session_id).await?;
-    user.role().is_authorized(&committee_category)?;
+    user.role().is_authorized(committee_category)?;
 
     let election = election_repo::get(&mut conn, election_id).await?;
     let committee_session = committee_session_repo::get(&mut conn, committee_session_id).await?;
@@ -156,7 +156,7 @@ pub async fn election_download_zip_results_csb(
 
     let committee_category =
         committee_session_repo::get_committee_category(&mut conn, committee_session_id).await?;
-    user.role().is_authorized(&committee_category)?;
+    user.role().is_authorized(committee_category)?;
 
     // TODO: #3160 check if apportionment state is finalised
 
@@ -224,7 +224,7 @@ pub async fn election_download_zip_attachment_csb(
 
     let committee_category =
         committee_session_repo::get_committee_category(&mut conn, committee_session_id).await?;
-    user.role().is_authorized(&committee_category)?;
+    user.role().is_authorized(committee_category)?;
 
     // TODO: #3160 check if apportionment state is finalised
 
@@ -287,7 +287,7 @@ pub async fn election_download_zip_total_counts_csb(
 
     let committee_category =
         committee_session_repo::get_committee_category(&mut conn, committee_session_id).await?;
-    user.role().is_authorized(&committee_category)?;
+    user.role().is_authorized(committee_category)?;
 
     // TODO: #3160 check if apportionment state is finalised
 

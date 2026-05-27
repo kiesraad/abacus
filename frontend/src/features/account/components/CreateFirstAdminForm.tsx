@@ -101,6 +101,7 @@ export function CreateFirstAdminForm({ next }: CreateFirstAdminFormProps) {
                   label={t("account.fullname")}
                   subtext={t("account.fullname_subtext")}
                   hint={t("initialise.fullname_hint")}
+                  autoComplete="name"
                   error={validationErrors?.fullname}
                 />
                 <InputField
@@ -108,6 +109,7 @@ export function CreateFirstAdminForm({ next }: CreateFirstAdminFormProps) {
                   name="username"
                   label={t("initialise.username")}
                   hint={t("initialise.username_hint")}
+                  autoComplete="username"
                   error={validationErrors?.username}
                 />
                 <InputField
@@ -116,6 +118,7 @@ export function CreateFirstAdminForm({ next }: CreateFirstAdminFormProps) {
                   label={t("initialise.password")}
                   hint={t("initialise.password_hint")}
                   type="password"
+                  autoComplete="new-password"
                   error={validationErrors?.password}
                 />
                 <InputField
@@ -123,6 +126,7 @@ export function CreateFirstAdminForm({ next }: CreateFirstAdminFormProps) {
                   name="password_repeat"
                   label={t("account.password_repeat")}
                   type="password"
+                  autoComplete="new-password"
                   error={validationErrors?.password_repeat}
                 />
               </FormLayout.Section>

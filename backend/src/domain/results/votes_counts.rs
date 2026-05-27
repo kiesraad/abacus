@@ -260,41 +260,36 @@ impl Validate for VotesCounts {
     fn validate(
         &self,
         election: &ElectionWithPoliticalGroups,
-        validation_results: &mut ValidationResults,
         path: &FieldPath,
-    ) -> Result<(), DataError> {
+    ) -> Result<ValidationResults, DataError> {
+        let mut validation_results = ValidationResults::default();
         // validate all counts
-        self.political_group_total_votes.validate(
-            election,
-            validation_results,
-            &path.field("political_group_total_votes"),
-        )?;
-        self.total_votes_candidates_count.validate(
-            election,
-            validation_results,
-            &path.field("total_votes_candidates_count"),
-        )?;
-        self.blank_votes_count.validate(
-            election,
-            validation_results,
-            &path.field("blank_votes_count"),
-        )?;
-        self.invalid_votes_count.validate(
-            election,
-            validation_results,
-            &path.field("invalid_votes_count"),
-        )?;
-        self.total_votes_cast_count.validate(
-            election,
-            validation_results,
-            &path.field("total_votes_cast_count"),
-        )?;
+        validation_results.join(
+            self.political_group_total_votes
+                .validate(election, &path.field("political_group_total_votes"))?,
+        );
+        validation_results.join(
+            self.total_votes_candidates_count
+                .validate(election, &path.field("total_votes_candidates_count"))?,
+        );
+        validation_results.join(
+            self.blank_votes_count
+                .validate(election, &path.field("blank_votes_count"))?,
+        );
+        validation_results.join(
+            self.invalid_votes_count
+                .validate(election, &path.field("invalid_votes_count"))?,
+        );
+        validation_results.join(
+            self.total_votes_cast_count
+                .validate(election, &path.field("total_votes_cast_count"))?,
+        );
 
-        self.validate_votes_counts_errors(validation_results, path);
+        self.validate_votes_counts_errors(&mut validation_results, path);
 
-        self.validate_votes_counts_warnings(election, validation_results, path);
+        self.validate_votes_counts_warnings(election, &mut validation_results, path);
 
-        Ok(())
+        Ok(validation_results)
     }
 }
 
@@ -413,14 +408,10 @@ mod tests {
             total_votes_cast_count,
         };
 
-        let mut validation_results = ValidationResults::default();
         votes_counts.validate(
             &election_fixture(committee_category, &[1, 1, 1]),
-            &mut validation_results,
             &"votes_counts".into(),
-        )?;
-
-        Ok(validation_results)
+        )
     }
 
     /// GSB CSO, GSB DSO, CSB | F.202: 'Aantal kiezers en stemmen': (Als F.204 niet getoond wordt) E.1 t/m E.n tellen niet op naar E

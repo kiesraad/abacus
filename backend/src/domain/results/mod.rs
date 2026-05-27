@@ -303,33 +303,22 @@ impl Validate for Results {
     fn validate(
         &self,
         election: &ElectionWithPoliticalGroups,
-        validation_results: &mut ValidationResults,
         path: &FieldPath,
-    ) -> Result<(), DataError> {
+    ) -> Result<ValidationResults, DataError> {
         match self {
             Results::CSOFirstSession(results) => {
-                results.extra_investigation.validate(
+                let mut validation_results = results
+                    .extra_investigation
+                    .validate(election, &path.field("extra_investigation"))?;
+                validation_results.join(results.counting_differences_polling_station.validate(
                     election,
-                    validation_results,
-                    &path.field("extra_investigation"),
-                )?;
-
-                results.counting_differences_polling_station.validate(
-                    election,
-                    validation_results,
                     &path.field("counting_differences_polling_station"),
-                )?;
-
-                results
-                    .as_common()
-                    .validate(election, validation_results, path)
+                )?);
+                validation_results.join(results.as_common().validate(election, path)?);
+                Ok(validation_results)
             }
-            Results::CSONextSession(results) => {
-                results
-                    .as_common()
-                    .validate(election, validation_results, path)
-            }
-            Results::GSB(results) => results.validate(election, validation_results, path),
+            Results::CSONextSession(results) => results.as_common().validate(election, path),
+            Results::GSB(results) => results.validate(election, path),
         }
     }
 }

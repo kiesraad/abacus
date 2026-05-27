@@ -37,15 +37,15 @@ pub enum Role {
 pub struct RoleNotAuthorizedError;
 
 impl Role {
-    pub(crate) fn is_administrator(&self) -> bool {
+    pub(crate) fn is_administrator(self) -> bool {
         matches!(self, Self::Administrator)
     }
 
-    pub(crate) fn is_coordinator(&self) -> bool {
+    pub(crate) fn is_coordinator(self) -> bool {
         matches!(self, Self::CoordinatorGSB | Self::CoordinatorCSB)
     }
 
-    pub(crate) fn is_typist(&self) -> bool {
+    pub(crate) fn is_typist(self) -> bool {
         matches!(self, Self::TypistGSB | Self::TypistCSB)
     }
 
@@ -58,10 +58,7 @@ impl Role {
         )
     }
 
-    pub fn is_authorized(
-        &self,
-        category: &CommitteeCategory,
-    ) -> Result<(), RoleNotAuthorizedError> {
+    pub fn is_authorized(&self, category: CommitteeCategory) -> Result<(), RoleNotAuthorizedError> {
         (self.is_administrator()
             || match category {
                 CommitteeCategory::GSB => matches!(self, Self::CoordinatorGSB | Self::TypistGSB),
@@ -145,7 +142,7 @@ mod tests {
     fn admin_is_authorized_for_all_categories() {
         let categories = CommitteeCategory::VARIANTS
             .iter()
-            .filter(|category| Role::Administrator.is_authorized(category).is_ok())
+            .filter(|category| Role::Administrator.is_authorized(**category).is_ok())
             .collect::<Vec<_>>();
         assert_eq!(categories.len(), CommitteeCategory::VARIANTS.len());
     }
@@ -158,7 +155,7 @@ mod tests {
         for role in roles {
             let categories = CommitteeCategory::VARIANTS
                 .iter()
-                .filter(|category| role.is_authorized(category).is_ok())
+                .filter(|category| role.is_authorized(**category).is_ok())
                 .collect::<Vec<_>>();
 
             assert_eq!(

@@ -24,13 +24,12 @@ impl Validate for Count {
     fn validate(
         &self,
         _election: &ElectionWithPoliticalGroups,
-        _validation_results: &mut ValidationResults,
-        _field_name: &FieldPath,
-    ) -> Result<(), DataError> {
+        _path: &FieldPath,
+    ) -> Result<ValidationResults, DataError> {
         if self > &999_999_999 {
             return Err(DataError::new("count out of range"));
         }
-        Ok(())
+        Ok(ValidationResults::default())
     }
 }
 
@@ -40,14 +39,9 @@ mod tests {
     use crate::domain::election::{CommitteeCategory, tests::election_fixture};
     #[test]
     fn test_count_err_out_of_range() {
-        let mut validation_results = ValidationResults::default();
         let count: Count = 1_000_000_000;
 
-        let result = count.validate(
-            &election_fixture(CommitteeCategory::GSB, &[]),
-            &mut validation_results,
-            &"".into(),
-        );
+        let result = count.validate(&election_fixture(CommitteeCategory::GSB, &[]), &"".into());
 
         assert!(result.is_err());
         assert!(result.unwrap_err().message.eq("count out of range"),);

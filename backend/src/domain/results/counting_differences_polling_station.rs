@@ -26,9 +26,9 @@ impl Validate for CountingDifferencesPollingStation {
     fn validate(
         &self,
         election: &ElectionWithPoliticalGroups,
-        validation_results: &mut ValidationResults,
         path: &FieldPath,
-    ) -> Result<(), DataError> {
+    ) -> Result<ValidationResults, DataError> {
+        let mut validation_results = ValidationResults::default();
         if election.committee_category == CommitteeCategory::GSB {
             if self.unexplained_difference_ballots_voters.is_empty()
                 || self.difference_ballots_per_list.is_empty()
@@ -51,7 +51,7 @@ impl Validate for CountingDifferencesPollingStation {
             }
         }
 
-        Ok(())
+        Ok(validation_results)
     }
 }
 
@@ -100,10 +100,8 @@ mod tests {
             difference_ballots_per_list: ballots,
         };
 
-        let mut validation_results = ValidationResults::default();
-        counting_differences_polling_station.validate(
+        let validation_results = counting_differences_polling_station.validate(
             &election_fixture(committee_category, &[]),
-            &mut validation_results,
             &"counting_differences_polling_station".into(),
         )?;
 

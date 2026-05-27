@@ -59,25 +59,22 @@ impl Validate for VotersCounts {
     fn validate(
         &self,
         election: &ElectionWithPoliticalGroups,
-        validation_results: &mut ValidationResults,
         path: &FieldPath,
-    ) -> Result<(), DataError> {
+    ) -> Result<ValidationResults, DataError> {
+        let mut validation_results = ValidationResults::default();
         // validate all counts
-        self.poll_card_count.validate(
-            election,
-            validation_results,
-            &path.field("poll_card_count"),
-        )?;
-        self.proxy_certificate_count.validate(
-            election,
-            validation_results,
-            &path.field("proxy_certificate_count"),
-        )?;
-        self.total_admitted_voters_count.validate(
-            election,
-            validation_results,
-            &path.field("total_admitted_voters_count"),
-        )?;
+        validation_results.join(
+            self.poll_card_count
+                .validate(election, &path.field("poll_card_count"))?,
+        );
+        validation_results.join(
+            self.proxy_certificate_count
+                .validate(election, &path.field("proxy_certificate_count"))?,
+        );
+        validation_results.join(
+            self.total_admitted_voters_count
+                .validate(election, &path.field("total_admitted_voters_count"))?,
+        );
 
         if self.poll_card_count + self.proxy_certificate_count != self.total_admitted_voters_count {
             validation_results.errors.push(ValidationResult {
@@ -90,7 +87,7 @@ impl Validate for VotersCounts {
                 context: None,
             });
         }
-        Ok(())
+        Ok(validation_results)
     }
 }
 
@@ -134,14 +131,10 @@ mod tests {
             total_admitted_voters_count,
         };
 
-        let mut validation_results = ValidationResults::default();
         voters_counts.validate(
             &election_fixture(committee_category, &[]),
-            &mut validation_results,
             &"voters_counts".into(),
-        )?;
-
-        Ok(validation_results)
+        )
     }
 
     /// GSB CSO, GSB DSO, CSB | F.201: 'Aantal kiezers en stemmen': stempassen + volmachten <> totaal toegelaten kiezers

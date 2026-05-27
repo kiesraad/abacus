@@ -1,20 +1,15 @@
-use crate::common_service::{self, Service, ServiceError, ServiceState};
+use crate::common_service::{self, Service, ServiceState};
 use eframe::egui::{self, Color32, RichText, Window};
+
 pub struct AbacusApp {
     service: Box<dyn Service>,
     is_waiting_for_confirmation: bool,
 }
 
-impl AbacusApp {
-    fn status(&self) -> ServiceState {
-        self.service.status()
-    }
-}
-
 impl Default for AbacusApp {
     fn default() -> Self {
         Self {
-            service: detect_service().unwrap(),
+            service: { common_service::new_service().unwrap() },
             is_waiting_for_confirmation: false,
         }
     }
@@ -24,7 +19,7 @@ impl eframe::App for AbacusApp {
     fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
         egui::CentralPanel::default().show_inside(ui, |ui| {
             ui.vertical_centered(|ui| {
-                let status = self.status();
+                let status = self.service.status().unwrap();
                 ui.heading("Abacus Server Monitor");
 
                 let button_content = match status {
@@ -37,7 +32,7 @@ impl eframe::App for AbacusApp {
                         ServiceState::Running => {
                             self.is_waiting_for_confirmation = true;
                         }
-                        ServiceState::Stopped => self.service.start(),
+                        ServiceState::Stopped => self.service.start().unwrap(),
                         _ => {}
                     }
                 }
@@ -50,7 +45,7 @@ impl eframe::App for AbacusApp {
 
                         ui.horizontal(|ui| {
                             if ui.button("Yes, Stop").clicked() {
-                                self.service.stop();
+                                self.service.stop().unwrap();
                                 self.is_waiting_for_confirmation = false;
                             }
 
@@ -61,7 +56,6 @@ impl eframe::App for AbacusApp {
                     });
                 }
 
-                let status = self.status();
                 let color = color_from_status(&status);
                 ui.horizontal(|ui| {
                     ui.label(RichText::new("Status: ").size(30.));
@@ -81,11 +75,6 @@ impl eframe::App for AbacusApp {
             });
         });
     }
-}
-
-fn detect_service() -> Result<Box<dyn Service>, ServiceError> {
-    let service = common_service::new_service()?;
-    Ok(service)
 }
 
 fn color_from_status(status: &ServiceState) -> Color32 {

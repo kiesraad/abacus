@@ -1,12 +1,9 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
+
 use eframe::egui;
 
 mod app;
 mod common_service;
-mod systemd_service;
-mod windows_service_wrapper;
-
-// const SERVICE_NAME: &'static str = "abacus.service";
 
 fn main() -> eframe::Result {
     let options = eframe::NativeOptions {
@@ -16,6 +13,6 @@ fn main() -> eframe::Result {
     eframe::run_native(
         "Abacus Server Monitor",
         options,
-        Box::new(|_| Ok(Box::<app::AbacusApp>::default())),
+        Box::new(|_| Ok(Box::new(app::AbacusApp::default()))),
     )
 }

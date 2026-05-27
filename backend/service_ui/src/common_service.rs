@@ -1,49 +1,35 @@
-use crate::systemd_service;
-use crate::windows_service_wrapper;
+use std::error::Error;
+
+#[cfg(unix)]
+mod systemd;
+#[cfg(windows)]
+mod windows;
+
 pub trait Service {
-    fn status(&self) -> ServiceState;
-    fn start(&self);
-
-    fn restart(&self);
-
-    fn stop(&self);
+    fn status(&self) -> Result<ServiceState, Box<dyn Error>>;
+    fn start(&self) -> Result<(), Box<dyn Error>>;
+    fn stop(&self) -> Result<(), Box<dyn Error>>;
 }
 
 #[derive(Debug)]
-pub enum ServiceError {
-    #[cfg(windows)]
-    WindowsError(windows_service::Error),
-    LinuxError(std::io::Error),
-}
-
-#[derive(Debug)]
+#[cfg_attr(unix, expect(unused))]
 pub enum ServiceState {
     Stopped,
+
     StartPending,
     StopPending,
+
     Running,
+
     ContinuePending,
     PausePending,
     Paused,
 }
 
-pub fn new_service() -> Result<Box<dyn Service>, ServiceError> {
-    return match std::env::consts::OS {
-        "linux" => {
-            return match systemd_service::SystemdService::new() {
-                Ok(service) => Ok(Box::new(service)),
-                Err(err) => Err(err),
-            };
-        }
-        #[cfg(windows)]
-        "windows" => {
-            return match windows_service_wrapper::new() {
-                Ok(service) => Ok(Box::new(service)),
-                Err(err) => Err(err),
-            };
-        }
-        _ => {
-            panic!("Only Windows and Linux supported.")
-        }
-    };
+pub fn new_service() -> Result<Box<dyn Service>, Box<dyn Error>> {
+    Ok(cfg_select! {
+        unix => Box::new(systemd::SystemdService::new()),
+        windows => Box::new(windows::WindowsService::new()?),
+        _ => compiler_error!("Only Windows and Linux supported.")
+    })
 }

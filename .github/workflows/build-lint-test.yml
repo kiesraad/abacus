@@ -117,6 +117,7 @@ jobs:
         uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4 # v2
         with:
           workspaces: "backend -> target"
+          cache-bin: "false"
       - name: Install Binstall
         uses: cargo-bins/cargo-binstall@aaa84a43aec4955a42c5ffc65d258961e39f276e # main
       - name: Create empty frontend build dir for memory-serve

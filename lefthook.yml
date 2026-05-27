@@ -9,7 +9,7 @@ pre-commit:
       run: >
         cargo sqlx database reset -y -D sqlite://sqlx-cache-tmp.sqlite &&
         cargo sqlx prepare -D sqlite://sqlx-cache-tmp.sqlite -- --all-targets &&
-        git add .sqlx &&
+        env -u GIT_DIR -u GIT_INDEX_FILE git add .sqlx &&
         rm sqlx-cache-tmp.sqlite
     backend-formatter:
       root: "backend/"
@@ -25,10 +25,10 @@ pre-commit:
       glob: "*.rs"
       run: >
         cargo run --package abacus --bin gen-openapi &&
-        git add openapi.json &&
+        env -u GIT_DIR -u GIT_INDEX_FILE git add openapi.json &&
         cd ../frontend &&
         pnpm gen:openapi &&
-        git add src/types/generated/openapi.ts
+        env -u GIT_DIR -u GIT_INDEX_FILE git add src/types/generated/openapi.ts
     frontend-formatter:
       root: "frontend/"
       run: pnpm format --staged --no-errors-on-unmatched --colors=off

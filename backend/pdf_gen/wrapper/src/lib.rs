@@ -1,8 +1,13 @@
 pub use pdf_gen_types::*;
 use tracing::error;
 
-#[cfg(not(any(feature = "dev", feature = "static")))]
-compile_error!("either `dev` or `static` feature must be enabled");
+#[cfg(not(any(feature = "dev", feature = "static", feature = "stub")))]
+compile_error!("either `dev`, `static`, or `stub` feature must be enabled");
+
+#[cfg(all(not(feature = "dev"), not(feature = "static"), feature = "stub"))]
+pub async fn generate_pdf(_input: impl PdfGenInput) -> Result<PdfGenResult, PdfGenError> {
+    unimplemented!("pdf_gen wrapper built with `stub` feature; PDF generation is unavailable")
+}
 
 #[cfg(feature = "static")]
 pub async fn generate_pdf(input: impl PdfGenInput) -> Result<PdfGenResult, PdfGenError> {

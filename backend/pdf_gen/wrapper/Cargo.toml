@@ -9,6 +9,7 @@ rust-version.workspace = true
 default = []
 static = ["dep:pdf_gen_impl"]
 dev = ["dep:pdf_gen_dylib", "dep:libloading"]
+stub = []
 
 [dependencies]
 pdf_gen_impl = { workspace = true, optional = true }

@@ -9,9 +9,9 @@ import {
   DeleteDeceasedCandidateRequestHandler,
   FinaliseDeceasedCandidatesRequestHandler,
   GetApportionmentStateRequestHandler,
+  RegisterDeceasedCandidatesRequestHandler,
 } from "@/testing/api-mocks/RequestHandlers";
 import { Providers } from "@/testing/Providers";
-import type { Router } from "@/testing/router";
 import { overrideOnce, server } from "@/testing/server";
 import {
   expectErrorPage,
@@ -79,7 +79,7 @@ describe("DeceasedCandidatesPage", () => {
       },
       Finalised: {
         state: { deceased_candidates: [], type: "Finalised" },
-        expectRedirectTo: "/elections/3/apportionment",
+        expectRedirectTo: undefined,
       },
     } satisfies Record<
       ApportionmentState["type"],
@@ -126,20 +126,81 @@ describe("DeceasedCandidatesPage", () => {
     }
   });
 
+  test("Renders table and clicking delete on a deceased candidate works for state Finalised", async () => {
+    vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
+    server.use(RegisterDeceasedCandidatesRequestHandler);
+    const registerDeceasedCandidates = spyOnHandler(RegisterDeceasedCandidatesRequestHandler);
+    server.use(DeleteDeceasedCandidateRequestHandler);
+    const deleteDeceasedCandidate = spyOnHandler(DeleteDeceasedCandidateRequestHandler);
+    const getApportionmentState = spyOnHandler(GetApportionmentStateRequestHandler);
+    overrideOnce("get", "/api/elections/3/apportionment/state", 200, {
+      deceased_candidates: [{ pg_number: 1, candidate_number: 1 }],
+      type: "Finalised",
+    });
+    const user = userEvent.setup();
+
+    renderDeceasedCandidatesPage(3, false);
+    expect(await screen.findByRole("heading", { level: 1, name: "Overleden kandidaten" }));
+
+    const table = await screen.findByRole("table");
+    expect(table).toBeVisible();
+    expect(table).toHaveTableContent([
+      ["Overleden kandidaat", "Lijst", "Positie op lijst", ""],
+      ["Oud, L. (Lidewij) †", "Lijst 1 - Political Group A", "1", "Verwijderen"],
+    ]);
+
+    // Check if the delete link works
+    const rows = within(table).getAllByRole("row");
+    if (rows[1]) {
+      const deleteLink = await within(rows[1]).findByRole("button", { name: "Verwijderen" });
+      await user.click(deleteLink);
+      expect(registerDeceasedCandidates).toHaveBeenCalled();
+      expect(getApportionmentState).toHaveBeenCalled();
+      expect(deleteDeceasedCandidate).toHaveBeenCalledWith({ pg_number: 1, candidate_number: 1 });
+    }
+  });
+
   test("Renders add button and clicking it redirects to AddDeceasedCandidatePage", async () => {
     vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
     const user = userEvent.setup();
 
-    const router = renderDeceasedCandidatesPage(3, true) as Router;
+    renderDeceasedCandidatesPage(3, false);
     expect(await screen.findByRole("heading", { level: 1, name: "Overleden kandidaten" }));
 
     expect(await screen.findByRole("table")).toBeVisible();
 
-    const addDeceasedCandidate = await screen.findByRole("link", { name: "+ Kandidaat toevoegen" });
+    const addDeceasedCandidate = await screen.findByRole("button", { name: "+ Kandidaat toevoegen" });
     expect(addDeceasedCandidate).toBeVisible();
     await user.click(addDeceasedCandidate);
+    await waitFor(() => {
+      expect(navigate).toHaveBeenCalledWith("/elections/3/apportionment/deceased-candidates/add");
+    });
+  });
 
-    expect(router.state.location.pathname).toEqual("/elections/3/apportionment/deceased-candidates/add");
+  test("Renders add button and clicking it redirects to AddDeceasedCandidatePage for state Finalised", async () => {
+    vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
+    const user = userEvent.setup();
+    server.use(RegisterDeceasedCandidatesRequestHandler);
+    const registerDeceasedCandidates = spyOnHandler(RegisterDeceasedCandidatesRequestHandler);
+    const getApportionmentState = spyOnHandler(GetApportionmentStateRequestHandler);
+    overrideOnce("get", "/api/elections/3/apportionment/state", 200, {
+      deceased_candidates: [{ pg_number: 1, candidate_number: 1 }],
+      type: "Finalised",
+    });
+
+    renderDeceasedCandidatesPage(3, false);
+    expect(await screen.findByRole("heading", { level: 1, name: "Overleden kandidaten" }));
+
+    expect(await screen.findByRole("table")).toBeVisible();
+
+    const addDeceasedCandidate = await screen.findByRole("button", { name: "+ Kandidaat toevoegen" });
+    expect(addDeceasedCandidate).toBeVisible();
+    await user.click(addDeceasedCandidate);
+    await waitFor(() => {
+      expect(registerDeceasedCandidates).toHaveBeenCalled();
+      expect(getApportionmentState).toHaveBeenCalled();
+      expect(navigate).toHaveBeenCalledWith("/elections/3/apportionment/deceased-candidates/add");
+    });
   });
 
   test("Clicking To apportionment button finalises deceased candidates and redirects to ApportionmentPage", async () => {

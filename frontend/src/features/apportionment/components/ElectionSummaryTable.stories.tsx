@@ -1,5 +1,5 @@
 import type { StoryObj } from "@storybook/react-vite";
-import { expect, fn } from "storybook/test";
+import { expect } from "storybook/test";
 import { getNumberOfCandidates } from "@/utils/politicalGroups";
 import * as gte19Seats from "../testing/gte-19-seats";
 import { type DeceasedCandidatesInfo, ElectionSummaryTable } from "./ElectionSummaryTable";
@@ -17,7 +17,7 @@ export const DefaultWithNumberOfVoters: StoryObj = {
           {
             numberOfCandidates: getNumberOfCandidates(gte19Seats.election.political_groups),
             numberOfDeceasedCandidates: 3,
-            registerDeceasedCandidates: fn(),
+            deceasedCandidatesLink: "",
           } satisfies DeceasedCandidatesInfo
         }
       />
@@ -53,7 +53,7 @@ export const DefaultWithoutNumberOfVoters: StoryObj = {
           {
             numberOfCandidates: getNumberOfCandidates(gte19Seats.election.political_groups),
             numberOfDeceasedCandidates: 0,
-            registerDeceasedCandidates: fn(),
+            deceasedCandidatesLink: "",
           } satisfies DeceasedCandidatesInfo
         }
       />

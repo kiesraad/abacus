@@ -1,3 +1,4 @@
+import type { To } from "react-router";
 import { Button } from "@/components/ui/Button/Button";
 import { DisplayFraction } from "@/components/ui/DisplayFraction/DisplayFraction";
 import { Table } from "@/components/ui/Table/Table";
@@ -14,7 +15,7 @@ import cls from "./Apportionment.module.css";
 export interface DeceasedCandidatesInfo {
   numberOfCandidates: number;
   numberOfDeceasedCandidates: number;
-  registerDeceasedCandidates: () => void;
+  deceasedCandidatesLink: To;
 }
 
 interface ElectionSummaryTableProps {
@@ -119,15 +120,9 @@ export function ElectionSummaryTable({
             {deceasedCandidatesInfo.numberOfCandidates - deceasedCandidatesInfo.numberOfDeceasedCandidates}
           </Table.NumberCell>
           <Table.Cell className="fs-sm">
-            <Button
-              variant="underlined"
-              size="md"
-              onClick={() => {
-                deceasedCandidatesInfo.registerDeceasedCandidates();
-              }}
-            >
+            <Button.Link variant="underlined" size="md" to={deceasedCandidatesInfo.deceasedCandidatesLink}>
               {t("apportionment.manage_deceased_candidates")}
-            </Button>
+            </Button.Link>
           </Table.Cell>
         </Table.Row>
       </Table.Body>

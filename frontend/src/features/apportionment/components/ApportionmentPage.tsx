@@ -1,13 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Link, useNavigate } from "react-router";
-import { type AnyApiError, type ApiResult, isSuccess } from "@/api/ApiResult";
-import { useApiClient } from "@/api/useApiClient";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { useElection } from "@/hooks/election/useElection";
 import { t } from "@/i18n/translate";
-import type { ApportionmentState, REGISTER_DECEASED_CANDIDATES_REQUEST_PATH } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 import { getNumberOfCandidates } from "@/utils/politicalGroups";
 import { useApportionmentContext } from "../hooks/useApportionmentContext";
@@ -25,18 +22,10 @@ function getNumberOfSeatsAssignedSentence(seats: number, type: "residual_seat" |
   });
 }
 
-// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO: Can this be shortened?
 export function ApportionmentPage() {
   const navigate = useNavigate();
   const { currentCommitteeSession, election } = useElection();
-  const { seatAssignment, candidateNomination, electionSummary, state, error, refetchState } =
-    useApportionmentContext();
-  const [apiError, setApiError] = useState<AnyApiError>();
-  const client = useApiClient();
-
-  if (apiError) {
-    throw apiError;
-  }
+  const { seatAssignment, candidateNomination, electionSummary, state, error } = useApportionmentContext();
 
   useEffect(() => {
     apportionmentCheckStateAndRedirect(state, election.id, navigate);
@@ -45,17 +34,6 @@ export function ApportionmentPage() {
   const unassignedSeats = seatAssignment
     ? seatAssignment.seats - seatAssignment.full_seats - seatAssignment.residual_seats
     : 0;
-
-  async function RegisterDeceasedCandidates() {
-    const path: REGISTER_DECEASED_CANDIDATES_REQUEST_PATH = `/api/elections/${election.id}/apportionment/register_deceased_candidates`;
-    const response: ApiResult<ApportionmentState> = await client.postRequest(path);
-
-    if (isSuccess(response)) {
-      void refetchState();
-    } else {
-      setApiError(response);
-    }
-  }
 
   return (
     <>
@@ -98,7 +76,7 @@ export function ApportionmentPage() {
                         {
                           numberOfCandidates: getNumberOfCandidates(election.political_groups),
                           numberOfDeceasedCandidates: state.deceased_candidates.length,
-                          registerDeceasedCandidates: () => void RegisterDeceasedCandidates(),
+                          deceasedCandidatesLink: `/elections/${election.id}/apportionment/deceased-candidates`,
                         } satisfies DeceasedCandidatesInfo
                       }
                     />

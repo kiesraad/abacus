@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router";
+import { type To, useNavigate } from "react-router";
 import { type AnyApiError, type ApiResult, isSuccess } from "@/api/ApiResult";
 import { useApiClient } from "@/api/useApiClient";
 import { Button } from "@/components/ui/Button/Button";
@@ -17,11 +17,12 @@ import type {
   FINALISE_DECEASED_CANDIDATES_REQUEST_PATH,
   PGNumber,
   PoliticalGroup,
+  REGISTER_DECEASED_CANDIDATES_REQUEST_PATH,
 } from "@/types/generated/openapi";
 import { getCandidateFullName } from "@/utils/candidate";
 import { getPoliticalGroupName } from "@/utils/politicalGroup";
 import { useApportionmentContext } from "../../hooks/useApportionmentContext";
-import { deceasedCandidatesCheckStateAndRedirect, renderTitleAndHeader } from "../../utils/utils";
+import { renderTitleAndHeader } from "../../utils/utils";
 import { ApportionmentError } from "../ApportionmentError";
 import cls from "./DeceasedCandidates.module.css";
 
@@ -95,6 +96,7 @@ function get_detailed_deceased_candidates(
   return detailedDeceasedCandidates;
 }
 
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO: Is there any way to make this shorter?
 export function DeceasedCandidatesPage() {
   const navigate = useNavigate();
   const { election } = useElection();
@@ -107,7 +109,9 @@ export function DeceasedCandidatesPage() {
   }
 
   useEffect(() => {
-    deceasedCandidatesCheckStateAndRedirect(state, election.id, navigate);
+    if (state?.type === "Uninitialised") {
+      void navigate(`/elections/${election.id}/apportionment/include-all-candidates`);
+    }
   });
 
   if (isLoading) {
@@ -119,7 +123,24 @@ export function DeceasedCandidatesPage() {
     deceasedCandidates = get_detailed_deceased_candidates(state.deceased_candidates, election.political_groups);
   }
 
+  async function registerDeceasedCandidates(navigateTo?: To) {
+    if (state?.type !== "RegisteringDeceasedCandidates") {
+      const path: REGISTER_DECEASED_CANDIDATES_REQUEST_PATH = `/api/elections/${election.id}/apportionment/register_deceased_candidates`;
+      const response: ApiResult<ApportionmentState> = await client.postRequest(path);
+
+      if (isSuccess(response)) {
+        await refetchState();
+      } else {
+        setApiError(response);
+      }
+    }
+    if (navigateTo) {
+      void navigate(navigateTo);
+    }
+  }
+
   async function handleDeleteDeceasedCandidate(candidateNumber: number, pgNumber: number) {
+    await registerDeceasedCandidates();
     const path: DELETE_DECEASED_CANDIDATE_REQUEST_PATH = `/api/elections/${election.id}/apportionment/delete_deceased_candidate`;
     const body: DELETE_DECEASED_CANDIDATE_REQUEST_BODY = { candidate_number: candidateNumber, pg_number: pgNumber };
     const response: ApiResult<ApportionmentState> = await client.postRequest(path, body);
@@ -136,7 +157,8 @@ export function DeceasedCandidatesPage() {
     const response: ApiResult<ApportionmentState> = await client.postRequest(path);
 
     if (isSuccess(response)) {
-      void refetchState();
+      await refetchState();
+      void navigate(`/elections/${election.id}/apportionment`);
     } else {
       setApiError(response);
     }
@@ -150,7 +172,7 @@ export function DeceasedCandidatesPage() {
           {error ? (
             <ApportionmentError error={error} />
           ) : (
-            state?.type === "RegisteringDeceasedCandidates" && (
+            (state?.type === "RegisteringDeceasedCandidates" || state?.type === "Finalised") && (
               <div className={cls.container}>
                 <div className="w-39">{t("apportionment.which_candidates_are_deceased")}</div>
                 <div className={cls.tableContainer}>
@@ -160,13 +182,17 @@ export function DeceasedCandidatesPage() {
                       (candidateNumber, pgNumber) => void handleDeleteDeceasedCandidate(candidateNumber, pgNumber),
                     )}
                   <div className="ml-md-lg">
-                    <Button.Link
+                    <Button
                       variant="underlined"
                       size="md"
-                      to={`/elections/${election.id}/apportionment/deceased-candidates/add`}
+                      onClick={() =>
+                        void registerDeceasedCandidates(
+                          `/elections/${election.id}/apportionment/deceased-candidates/add`,
+                        )
+                      }
                     >
                       {`+ ${t("candidate.add")}`}
-                    </Button.Link>
+                    </Button>
                   </div>
                 </div>
                 <div className="mt-md">

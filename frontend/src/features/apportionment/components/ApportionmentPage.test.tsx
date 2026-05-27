@@ -18,7 +18,6 @@ import {
   renderReturningRouter,
   screen,
   setupTestRouter,
-  spyOnHandler,
   waitFor,
   within,
 } from "@/testing/test-utils";
@@ -127,10 +126,8 @@ describe("ApportionmentPage", () => {
       deceased_candidates: [{ pg_number: 1, candidate_number: 1 }],
       type: "Finalised",
     } satisfies ApportionmentState);
-    const registerDeceasedCandidates = spyOnHandler(RegisterDeceasedCandidatesRequestHandler);
-    const getApportionmentState = spyOnHandler(GetApportionmentStateRequestHandler);
 
-    renderApportionmentPage(3, false);
+    const router = renderApportionmentPage(3, true) as Router;
 
     expect(await screen.findByRole("heading", { level: 1, name: "Zetelverdeling" })).toBeVisible();
 
@@ -161,10 +158,9 @@ describe("ApportionmentPage", () => {
     // Check if the link to the deceased candidates page works
     const rows = within(election_summary_table).getAllByRole("row");
     if (rows[8]) {
-      const manageLink = await within(rows[8]).findByRole("button", { name: "Beheer overleden kandidaten" });
+      const manageLink = await within(rows[8]).findByRole("link", { name: "Beheer overleden kandidaten" });
       await user.click(manageLink);
-      expect(registerDeceasedCandidates).toHaveBeenCalled();
-      expect(getApportionmentState).toHaveBeenCalled();
+      expect(router.state.location.pathname).toEqual("/elections/3/apportionment/deceased-candidates");
     }
   });
 

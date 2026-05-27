@@ -23,5 +23,5 @@ declare module "react-router" {
         children: RouteObject[];
       });
 
-  function useMatches(): UIMatch<unknown, Handle>[];
+  function useMatches(): UIMatch<unknown, Handle | undefined>[];
 }

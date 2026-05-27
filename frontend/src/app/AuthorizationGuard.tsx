@@ -1,6 +1,6 @@
 import { Navigate, useMatches } from "react-router";
 
-import { ApplicationError } from "@/api/ApiResult";
+import { ApplicationError, NotFoundError } from "@/api/ApiResult";
 import { useApiState } from "@/api/useApiState";
 import { EXPIRATION_DIALOG_SECONDS } from "@/app/authorizationConstants";
 import useSessionExpiration from "@/hooks/user/useSessionExpiration";
@@ -19,18 +19,20 @@ export function AuthorizationGuard({ children }: AuthorizationGuardProps) {
   const { showDialog, sessionValidFor } = useSessionExpiration(EXPIRATION_DIALOG_SECONDS);
 
   const routeMatch = matches[matches.length - 1];
+  if (routeMatch?.handle === undefined) {
+    // No match or handle means that this route has not been defined in our routes
+    throw new NotFoundError();
+  }
 
   const isAuthenticated = user !== null;
-  const isPublic = routeMatch?.handle.public ? routeMatch.handle.public : false;
-
-  const roles = routeMatch?.handle.roles ? routeMatch.handle.roles : [];
-  const isAllowed = isPublic || (user?.role && roles.includes(user.role));
+  const isPublic = routeMatch.handle.public;
+  const isAllowed = isPublic || (user?.role && routeMatch.handle.roles.includes(user.role));
 
   const accountRequiresSetup = isAuthenticated && (!user.fullname || user.needs_password_change);
 
   // if user is not allowed on this route
   if (!isAllowed) {
-    const route = routeMatch?.pathname || "unknown";
+    const route = routeMatch.pathname || "unknown";
 
     // redirect to login page if not authenticated
     if (!isAuthenticated) {
@@ -49,12 +51,12 @@ export function AuthorizationGuard({ children }: AuthorizationGuardProps) {
   }
 
   // restrict account that requires setup to the account setup page and logout page
-  if (accountRequiresSetup && routeMatch?.pathname !== "/account/setup" && routeMatch?.pathname !== "/account/logout") {
+  if (accountRequiresSetup && routeMatch.pathname !== "/account/setup" && routeMatch.pathname !== "/account/logout") {
     return <Navigate to="/account/setup" replace />;
   }
 
   // navigate to the overview if the user is logged in and tries to access the login page
-  if (routeMatch?.pathname === "/account/login" && isAuthenticated) {
+  if (routeMatch.pathname === "/account/login" && isAuthenticated) {
     return <Navigate to="/elections" replace />;
   }
 

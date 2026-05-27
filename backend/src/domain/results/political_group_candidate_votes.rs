@@ -39,7 +39,7 @@ impl PoliticalGroupCandidateVotes {
 
         self.total += other.total;
 
-        for cv in other.candidate_votes.iter() {
+        for cv in &other.candidate_votes {
             let Some(found_can) = self
                 .candidate_votes
                 .iter_mut()
@@ -202,7 +202,7 @@ impl Validate for CandidateVotes {
 #[cfg(test)]
 pub fn create_political_group_candidate_votes(
     political_groups: &[PoliticalGroup],
-    candidate_votes: Vec<Vec<u32>>,
+    candidate_votes: &[Vec<u32>],
 ) -> Vec<PoliticalGroupCandidateVotes> {
     political_groups
         .iter()

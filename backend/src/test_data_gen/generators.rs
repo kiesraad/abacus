@@ -202,7 +202,7 @@ pub async fn create_test_election(
 
     // generate and store the election
     let election =
-        election_repo::create(&mut tx, generate_election(&mut rng, &args, votes.clone())).await?;
+        election_repo::create(&mut tx, generate_election(&mut rng, &args, votes.as_ref())).await?;
 
     // generate the committee session for the election
     let mut committee_session = committee_session_repo::create(
@@ -258,7 +258,7 @@ pub async fn create_test_election(
 fn generate_election(
     rng: &mut impl rand::RngExt,
     args: &GenerateElectionArgs,
-    votes: Option<Vec<Vec<u32>>>,
+    votes: Option<&Vec<Vec<u32>>>,
 ) -> NewElection {
     // start by generating the political groups
     let mut political_groups = vec![];
@@ -266,7 +266,7 @@ fn generate_election(
     info!("Generating {num_political_groups} political groups");
 
     for i in 0..num_political_groups {
-        if let Some(ref v) = votes {
+        if let Some(v) = votes {
             let candidates_per_group =
                 u32::try_from(v.get(i as usize).expect("should exist in votes").len())
                     .expect("length should fit in u32");
@@ -358,7 +358,7 @@ fn generate_political_party(
                 CandidateGender::X,
             ]
             .choose(rng)
-            .cloned(),
+            .copied(),
         })
     }
     RegisteredPoliticalGroup {
@@ -919,7 +919,7 @@ fn distribute_power_law_weights(
 
     // Normalize weights to sum to 1
     let sum: f64 = weights.iter().sum();
-    for w in weights.iter_mut() {
+    for w in &mut weights {
         *w /= sum;
     }
 

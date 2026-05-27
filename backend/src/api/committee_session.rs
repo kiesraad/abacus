@@ -168,7 +168,7 @@ pub async fn committee_session_create(
     let mut tx = pool.begin_immediate().await?;
 
     let election = election_repo::get(&mut tx, election_id).await?;
-    user.role().is_authorized(&election.committee_category)?;
+    user.role().is_authorized(election.committee_category)?;
 
     let current_committee_session = get_election_committee_session(&mut tx, election_id).await?;
 
@@ -215,7 +215,7 @@ pub async fn committee_session_delete(
 ) -> Result<StatusCode, APIError> {
     let mut tx = pool.begin_immediate().await?;
     user.role()
-        .is_authorized(&get_committee_category(&mut tx, committee_session_id).await?)?;
+        .is_authorized(get_committee_category(&mut tx, committee_session_id).await?)?;
 
     let committee_session = validate_committee_session_is_current_committee_session(
         &mut tx,
@@ -286,7 +286,7 @@ pub async fn committee_session_update(
 ) -> Result<StatusCode, APIError> {
     let mut tx = pool.begin_immediate().await?;
     user.role()
-        .is_authorized(&get_committee_category(&mut tx, committee_session_id).await?)?;
+        .is_authorized(get_committee_category(&mut tx, committee_session_id).await?)?;
 
     if request.location.is_empty() {
         return Err(CommitteeSessionError::InvalidDetails.into());
@@ -350,7 +350,7 @@ pub async fn committee_session_status_change(
 ) -> Result<StatusCode, APIError> {
     let mut tx = pool.begin_immediate().await?;
     user.role()
-        .is_authorized(&get_committee_category(&mut tx, committee_session_id).await?)?;
+        .is_authorized(get_committee_category(&mut tx, committee_session_id).await?)?;
 
     validate_committee_session_is_current_committee_session(
         &mut tx,
@@ -394,7 +394,7 @@ pub async fn committee_session_investigations(
 ) -> Result<Json<InvestigationListResponse>, APIError> {
     let mut conn = pool.acquire().await?;
     user.role()
-        .is_authorized(&get_committee_category(&mut conn, committee_session_id).await?)?;
+        .is_authorized(get_committee_category(&mut conn, committee_session_id).await?)?;
 
     let committee_session = get(&mut conn, committee_session_id).await?;
 

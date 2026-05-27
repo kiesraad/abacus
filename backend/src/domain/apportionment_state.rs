@@ -8,7 +8,7 @@ use crate::{
     error::{ApiErrorResponse, ErrorReference},
 };
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum ApportionmentStateError {
     CandidateNotFound,
     CandidateNotUnique,

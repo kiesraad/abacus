@@ -526,6 +526,7 @@ pub async fn get_statuses(
         })
 }
 
+#[derive(Clone, Copy)]
 pub enum FixtureUser {
     Admin,
     CoordinatorGSB,
@@ -537,7 +538,7 @@ pub enum FixtureUser {
 }
 
 impl FixtureUser {
-    fn credentials(&self) -> (&'static str, &'static str) {
+    fn credentials(self) -> (&'static str, &'static str) {
         match self {
             Self::Admin => ("admin1", "Admin1Password01"),
             Self::CoordinatorGSB => ("coordinator1", "Coordinator1Password01"),

@@ -19,7 +19,7 @@ use crate::{
 };
 
 /// Errors that can occur before apportionment
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum ApportionmentApiError {
     AllListsExhausted,
     CommitteeSessionNotCompleted,

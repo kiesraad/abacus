@@ -1,7 +1,9 @@
 use crate::common_service::{Service, ServiceError, ServiceState};
 #[cfg(windows)]
 use windows_service::{
-    Error, service::{ServiceAccess, ServiceState as WindowsServiceState}, service_manager::{ServiceManager, ServiceManagerAccess}
+    Error,
+    service::{ServiceAccess, ServiceState as WindowsServiceState},
+    service_manager::{ServiceManager, ServiceManagerAccess},
 };
 #[cfg(windows)]
 pub struct WindowsService {
@@ -31,7 +33,10 @@ pub fn new() -> Result<WindowsService, ServiceError> {
         Err(err) => return Err(ServiceError::WindowsError(err)),
     };
 
-    Ok(WindowsService { name: SERVICE_NAME.to_string(), service: service })
+    Ok(WindowsService {
+        name: SERVICE_NAME.to_string(),
+        service: service,
+    })
 }
 
 #[cfg(windows)]
@@ -49,7 +54,7 @@ impl Service for WindowsService {
             WindowsServiceState::ContinuePending => ServiceState::ContinuePending,
             WindowsServiceState::PausePending => ServiceState::PausePending,
             WindowsServiceState::Paused => ServiceState::Paused,
-        }
+        };
     }
 
     fn start(&self) {

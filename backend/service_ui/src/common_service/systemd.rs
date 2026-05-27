@@ -8,7 +8,7 @@ pub struct SystemdService {
     handler: SystemCtl,
 }
 
-const SERVICE_NAME: &'static str = "abacus.service";
+const SERVICE_NAME: &str = "abacus.service";
 
 impl SystemdService {
     pub fn new() -> SystemdService {

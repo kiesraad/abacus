@@ -26,10 +26,10 @@ pub enum ServiceState {
     Paused,
 }
 
-pub fn new_service() -> Result<Box<dyn Service>, Box<dyn Error>> {
-    Ok(cfg_select! {
+pub fn new_service() -> Box<dyn Service> {
+    cfg_select! {
         unix => Box::new(systemd::SystemdService::new()),
-        windows => Box::new(windows::WindowsService::new()?),
+        windows => Box::new(windows::WindowsService::new().expect("windows service host should connect")),
         _ => compiler_error!("Only Windows and Linux supported.")
-    })
+    }
 }

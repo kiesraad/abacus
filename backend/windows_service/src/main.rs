@@ -39,12 +39,12 @@ mod abacus_service {
 
         let mut out_file = std::fs::File::create(
             std::env::current_exe()
-                .unwrap()
+                .expect("the executable should be able to determine its path")
                 .with_added_extension(format!("{timestamp}.crash.log")),
         )
         .expect("crash file should be openable");
 
-        writeln!(out_file, "{text}").unwrap();
+        writeln!(out_file, "{text}").expect("the crash file should be writable");
     }
 
     pub fn run() {
@@ -87,14 +87,17 @@ mod abacus_service {
 
                 // Handle stop
                 ServiceControl::Stop => {
-                    shutdown_tx.send(()).unwrap();
+                    // If the reciever is closed, that means the process has already stopped
+                    let _ = shutdown_tx.send(());
+
                     ServiceControlHandlerResult::NoError
                 }
 
                 // treat the UserEvent as a stop request
                 ServiceControl::UserEvent(code) => {
                     if code.to_raw() == 130 {
-                        shutdown_tx.send(()).unwrap();
+                        // If the reciever is closed, that means the process has already stopped
+                        let _ = shutdown_tx.send(());
                     }
                     ServiceControlHandlerResult::NoError
                 }
@@ -107,7 +110,8 @@ mod abacus_service {
         // The returned status handle should be used to report service status changes to the system.
         let status_handle = service_control_handler::register(SERVICE_NAME, event_handler)?;
 
-        let current_exe = std::env::current_exe().unwrap();
+        let current_exe =
+            std::env::current_exe().expect("the executable should be able to determine its path");
         let mut command = Command::new(current_exe.with_file_name("abacus.exe"))
             .stdin(Stdio::inherit())
             .stdout(Stdio::piped())
@@ -135,9 +139,10 @@ mod abacus_service {
                     std::fs::File::create(current_exe.with_added_extension("out.log"))
                         .expect("out.log can be created");
 
-                std::io::copy(&mut stdout, &mut out_file).unwrap();
+                std::io::copy(&mut stdout, &mut out_file)
+                    .expect("stdout log file should be writable");
 
-                out_file.flush().unwrap();
+                out_file.flush().expect("out.log file should be writable");
             }
         });
 
@@ -146,23 +151,21 @@ mod abacus_service {
             let mut out_file = std::fs::File::create(current_exe.with_added_extension("err.log"))
                 .expect("out.log can be created");
 
-            std::io::copy(&mut stderr, &mut out_file).unwrap();
+            std::io::copy(&mut stderr, &mut out_file).expect("stderr log file should be writable");
 
-            out_file.flush().unwrap();
+            out_file.flush().expect("out.log should be writable");
         });
 
-        loop {
-            // Poll shutdown event.
-            match shutdown_rx.recv() {
-                // Break the loop either upon stop or channel disconnect
-                Ok(_) | Err(mpsc::RecvError) => break,
-            };
-        }
+        // Continue either upon stop or channel disconnect
+        let (Ok(_) | Err(mpsc::RecvError)) = shutdown_rx.recv();
 
         // Kill the underlying process
-        command.kill().unwrap();
-        stdout_thread.join().unwrap();
-        stderr_thread.join().unwrap();
+        command
+            .kill()
+            .expect("abacus should be killed successfully");
+        command.wait().expect("abacus should be shut down");
+        stdout_thread.join().expect("io thread should not panic");
+        stderr_thread.join().expect("io thread should not panic");
 
         // Tell the system that service has stopped.
         status_handle.set_service_status(ServiceStatus {

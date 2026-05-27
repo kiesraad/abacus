@@ -9,7 +9,7 @@ pub struct AbacusApp {
 impl Default for AbacusApp {
     fn default() -> Self {
         Self {
-            service: { common_service::new_service().unwrap() },
+            service: { common_service::new_service() },
             is_waiting_for_confirmation: false,
         }
     }
@@ -19,7 +19,10 @@ impl eframe::App for AbacusApp {
     fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
         egui::CentralPanel::default().show_inside(ui, |ui| {
             ui.vertical_centered(|ui| {
-                let status = self.service.status().unwrap();
+                let status = self
+                    .service
+                    .status()
+                    .expect("service status should be reported");
                 ui.heading("Abacus Server Monitor");
 
                 let button_content = match status {
@@ -32,7 +35,9 @@ impl eframe::App for AbacusApp {
                         ServiceState::Running => {
                             self.is_waiting_for_confirmation = true;
                         }
-                        ServiceState::Stopped => self.service.start().unwrap(),
+                        ServiceState::Stopped => {
+                            self.service.start().expect("service should be started")
+                        }
                         _ => {}
                     }
                 }
@@ -45,7 +50,7 @@ impl eframe::App for AbacusApp {
 
                         ui.horizontal(|ui| {
                             if ui.button("Yes, Stop").clicked() {
-                                self.service.stop().unwrap();
+                                self.service.stop().expect("service should be stopped");
                                 self.is_waiting_for_confirmation = false;
                             }
 
@@ -78,7 +83,7 @@ impl eframe::App for AbacusApp {
 }
 
 fn color_from_status(status: &ServiceState) -> Color32 {
-    return match status {
+    match status {
         ServiceState::Stopped => Color32::RED,
         ServiceState::StartPending => Color32::RED,
         ServiceState::StopPending => Color32::GREEN,
@@ -86,5 +91,5 @@ fn color_from_status(status: &ServiceState) -> Color32 {
         ServiceState::ContinuePending => Color32::RED,
         ServiceState::PausePending => Color32::GREEN,
         ServiceState::Paused => Color32::BLUE,
-    };
+    }
 }

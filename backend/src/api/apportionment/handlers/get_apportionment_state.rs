@@ -35,7 +35,7 @@ pub async fn get_apportionment_state(
     let mut conn = pool.acquire().await?;
 
     let election = election_repo::get(&mut conn, election_id).await?;
-    user.role().is_authorized(&election.committee_category)?;
+    user.role().is_authorized(election.committee_category)?;
 
     let (_, state) = service::get_apportionment_state(&mut conn, election_id).await?;
 

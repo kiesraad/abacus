@@ -94,7 +94,7 @@ pub(crate) fn seat_assignment<T: ApportionmentInput>(
     }
 
     // [Artikel P 19a Kieswet](https://wetten.overheid.nl/BWBR0004627/2026-01-01/#AfdelingII_HoofdstukP_Paragraaf3_ArtikelP19a)
-    for (list_number, list_deceased) in input.deceased_candidates().iter() {
+    for (list_number, list_deceased) in input.deceased_candidates() {
         info!(
             "Following deceased candidates will be taken into account for list {:?}: {}",
             list_number,

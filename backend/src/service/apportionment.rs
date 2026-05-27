@@ -36,8 +36,6 @@ pub async fn get_state(
     conn: &mut SqliteConnection,
     election_id: ElectionId,
 ) -> Result<(CommitteeSessionId, ApportionmentState), APIError> {
-    let election = election_repo::get(conn, election_id).await?;
-    user.role().is_authorized(election.committee_category)?;
     let committee_session =
         committee_session_repo::get_election_committee_session(conn, election_id).await?;
 
@@ -65,7 +63,7 @@ pub async fn update_state(
     update_fn: impl FnOnce(ApportionmentState) -> Result<ApportionmentState, ApportionmentStateError>,
 ) -> Result<ApportionmentState, APIError> {
     let election = election_repo::get(conn, election_id).await?;
-    user.role().is_authorized(&election.committee_category)?;
+    user.role().is_authorized(election.committee_category)?;
 
     let (id, state) = get_state(conn, election_id).await?;
 

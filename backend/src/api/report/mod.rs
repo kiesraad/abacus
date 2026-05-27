@@ -29,7 +29,7 @@ impl ApiErrorResponse for ReportApiError {
     fn to_response_parts(&self) -> (StatusCode, ErrorResponse) {
         match self {
             ReportApiError::ApportionmentStateNotFinalised => (
-                StatusCode::PRECONDITION_FAILED,
+                StatusCode::CONFLICT,
                 ErrorResponse::new(
                     "Apportionment state not finalised",
                     ErrorReference::InvalidApportionmentState,

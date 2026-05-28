@@ -145,7 +145,7 @@ pub(crate) async fn extend_session(
 
 #[cfg(test)]
 mod test {
-    use std::{net::Ipv4Addr, str::FromStr};
+    use std::str::FromStr;
 
     use axum::http::header::{COOKIE, USER_AGENT};
     use chrono::TimeDelta;
@@ -157,14 +157,12 @@ mod test {
         api::middleware::authentication::{DO_NOT_EXTEND_SESSION_HEADER, SESSION_LIFE_TIME},
         domain::role::Role,
         repository::{session_repo, user_repo::UserId},
+        test_support::{TEST_IP_V4_ADDR, TEST_UNSPECIFIED_IP_ADDRESS, TEST_USER_AGENT},
     };
 
     fn api_account_uri() -> OriginalUri {
         OriginalUri("/api/account".parse().unwrap())
     }
-
-    const TEST_USER_AGENT: &str = "TestAgent/1.0";
-    const TEST_IP_ADDRESS: &str = "0.0.0.0";
 
     #[test(sqlx::test(fixtures("../../../../fixtures/users.sql")))]
     async fn test_inject_user(pool: SqlitePool) {
@@ -180,7 +178,7 @@ mod test {
         let session = Session::create(
             user.id(),
             TEST_USER_AGENT,
-            TEST_IP_ADDRESS,
+            TEST_UNSPECIFIED_IP_ADDRESS,
             SESSION_LIFE_TIME,
         );
         session_repo::save(&mut conn, &session).await.unwrap();
@@ -214,10 +212,7 @@ mod test {
     async fn test_extend_session(pool: SqlitePool) {
         let user = User::test_user(Role::Administrator, UserId::from(1));
 
-        let audit_service = AuditService::new(
-            Some(user.clone()),
-            Some(Ipv4Addr::new(203, 0, 113, 0).into()),
-        );
+        let audit_service = AuditService::new(Some(user.clone()), Some(TEST_IP_V4_ADDR.into()));
 
         let updated_response = extend_session(
             State(pool.clone()),
@@ -240,7 +235,12 @@ mod test {
 
         let life_time = SESSION_MIN_LIFE_TIME + TimeDelta::seconds(30); // min life time + 30 seconds
         let mut conn = pool.acquire().await.unwrap();
-        let session = Session::create(user.id(), TEST_USER_AGENT, TEST_IP_ADDRESS, life_time);
+        let session = Session::create(
+            user.id(),
+            TEST_USER_AGENT,
+            TEST_UNSPECIFIED_IP_ADDRESS,
+            life_time,
+        );
         session_repo::save(&mut conn, &session).await.unwrap();
 
         let updated_response = extend_session(
@@ -268,7 +268,12 @@ mod test {
         );
 
         let life_time = SESSION_MIN_LIFE_TIME - TimeDelta::seconds(30); // min life time - 30 seconds
-        let session = Session::create(user.id(), TEST_USER_AGENT, TEST_IP_ADDRESS, life_time);
+        let session = Session::create(
+            user.id(),
+            TEST_USER_AGENT,
+            TEST_UNSPECIFIED_IP_ADDRESS,
+            life_time,
+        );
         session_repo::save(&mut conn, &session).await.unwrap();
 
         let updated_response = extend_session(
@@ -306,14 +311,16 @@ mod test {
     async fn test_extend_session_do_not_extend_header(pool: SqlitePool) {
         let user = User::test_user(Role::Administrator, UserId::from(1));
 
-        let audit_service = AuditService::new(
-            Some(user.clone()),
-            Some(Ipv4Addr::new(203, 0, 113, 0).into()),
-        );
+        let audit_service = AuditService::new(Some(user.clone()), Some(TEST_IP_V4_ADDR.into()));
 
         let life_time = SESSION_MIN_LIFE_TIME - TimeDelta::seconds(30); // min life time - 30 seconds
         let mut conn = pool.acquire().await.unwrap();
-        let session = Session::create(user.id(), TEST_USER_AGENT, TEST_IP_ADDRESS, life_time);
+        let session = Session::create(
+            user.id(),
+            TEST_USER_AGENT,
+            TEST_UNSPECIFIED_IP_ADDRESS,
+            life_time,
+        );
         session_repo::save(&mut conn, &session).await.unwrap();
 
         let mut headers = HeaderMap::new();

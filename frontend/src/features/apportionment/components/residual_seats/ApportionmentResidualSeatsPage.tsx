@@ -1,5 +1,5 @@
-import type { ReactElement } from "react";
-import { Link } from "react-router";
+import { type ReactElement, useEffect } from "react";
+import { Link, useNavigate } from "react-router";
 import { useElection } from "@/hooks/election/useElection";
 import { t, tx } from "@/i18n/translate";
 import type { PoliticalGroup, SeatAssignment } from "@/types/generated/openapi";
@@ -13,7 +13,7 @@ import {
   type LargestRemainderAssignmentStep,
   type UniqueHighestAverageAssignmentStep,
 } from "../../utils/steps";
-import { renderTitleAndHeader } from "../../utils/utils";
+import { apportionmentCheckStateAndRedirect, renderTitleAndHeader } from "../../utils/utils";
 import cls from "../Apportionment.module.css";
 import { ApportionmentErrorPage } from "../ApportionmentError";
 import { Footnotes } from "./Footnotes";
@@ -208,8 +208,13 @@ function SmallCouncilSection({
 }
 
 export function ApportionmentResidualSeatsPage() {
+  const navigate = useNavigate();
   const { election } = useElection();
-  const { seatAssignment, error } = useApportionmentContext();
+  const { seatAssignment, error, state } = useApportionmentContext();
+
+  useEffect(() => {
+    apportionmentCheckStateAndRedirect(state, election.id, navigate);
+  });
 
   if (error) {
     return <ApportionmentErrorPage sectionTitle={t("apportionment.details_residual_seats")} error={error} />;

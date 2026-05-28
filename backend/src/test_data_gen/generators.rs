@@ -563,14 +563,15 @@ async fn generate_csb_data_entry(
             ))
         } else {
             let turnout = rng.random_range(args.turnout.clone());
-            let voters_turned_out = (election.number_of_voters * turnout) / 100;
+            let number_of_eligible_voters = rng.random_range(args.voters.clone());
+            let voters_turned_out = (number_of_eligible_voters * turnout) / 100;
             let candidate_slope =
                 rng.random_range(args.candidate_distribution_slope.clone()) as f64 / 1000.0;
 
             Results::GSB(generate_gsb_results(
                 rng,
                 &election.political_groups,
-                election.number_of_voters,
+                number_of_eligible_voters,
                 voters_turned_out,
                 &group_weights,
                 candidate_slope,

@@ -72,7 +72,6 @@ impl AuditService {
 // write some tests
 #[cfg(test)]
 mod test {
-    use std::net::Ipv4Addr;
 
     use serde_json::json;
     use sqlx::SqlitePool;
@@ -84,13 +83,14 @@ mod test {
         api::authentication::UserLoggedInAuditData,
         infra::audit_log::AuditEventLevel,
         repository::user_repo::{self, UserId},
+        test_support::TEST_IP_V4_ADDR,
     };
 
     #[test(sqlx::test(fixtures("../../../fixtures/users.sql")))]
     async fn test_log_event(pool: SqlitePool) {
         let mut tx = pool.begin_immediate().await.unwrap();
         let service = AuditService {
-            ip: Some(IpAddr::V4(Ipv4Addr::new(203, 0, 113, 0))),
+            ip: Some(IpAddr::V4(TEST_IP_V4_ADDR)),
             user: user_repo::get_by_username(&mut tx, "admin1").await.unwrap(),
         };
 
@@ -120,6 +120,6 @@ mod test {
         assert_eq!(event.message(), Some(&"User logged in".to_string()));
         assert_eq!(event.user_id(), Some(UserId::from(1)));
         assert_eq!(event.username(), Some("admin1"));
-        assert_eq!(event.ip(), Some(IpAddr::V4(Ipv4Addr::new(203, 0, 113, 0))));
+        assert_eq!(event.ip(), Some(IpAddr::V4(TEST_IP_V4_ADDR)));
     }
 }

@@ -102,6 +102,7 @@ export function AccountSetupForm({ user, onSaved }: AccountSetupFormProps) {
               label={t("account.fullname")}
               subtext={t("account.fullname_subtext")}
               hint={t("account.fullname_hint")}
+              autoComplete="name"
               error={validationErrors?.fullname}
               defaultValue={user.fullname}
             />
@@ -110,6 +111,7 @@ export function AccountSetupForm({ user, onSaved }: AccountSetupFormProps) {
               name="username"
               label={t("account.username")}
               hint={t("account.username_hint")}
+              autoComplete="username"
               value={user.username}
               disabled
             />
@@ -119,6 +121,7 @@ export function AccountSetupForm({ user, onSaved }: AccountSetupFormProps) {
               label={t("account.password_new")}
               hint={t("account.password_hint")}
               type="password"
+              autoComplete="new-password"
               error={validationErrors?.password}
             />
             <InputField
@@ -126,6 +129,7 @@ export function AccountSetupForm({ user, onSaved }: AccountSetupFormProps) {
               name="password_repeat"
               label={t("account.password_repeat")}
               type="password"
+              autoComplete="new-password"
               error={validationErrors?.password_repeat}
             />
           </FormLayout.Section>

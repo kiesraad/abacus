@@ -754,10 +754,11 @@ async fn test_p_22_2() {
     let summary_gsb = random_election_summary(&mut rng, &election, &data_sources);
     let summary = random_election_summary_csb(&mut rng, &election, &data_sources, string_length);
 
-    let apportionment_input = ApportionmentInputData {
-        number_of_seats: election.number_of_seats,
-        list_votes: &summary_gsb.political_group_votes,
-    };
+    let apportionment_input = ApportionmentInputData::new(
+        election.number_of_seats,
+        &summary_gsb.political_group_votes,
+        &[],
+    );
     let apportionment_result =
         apportionment::process(&apportionment_input).expect("apportionment failed");
     let seat_assignment = map_seat_assignment(&apportionment_result.seat_assignment);

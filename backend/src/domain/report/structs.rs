@@ -7,10 +7,7 @@ use sqlx::SqliteConnection;
 
 use crate::{
     APIError,
-    api::{
-        apportionment::{map_candidate_nomination, map_seat_assignment},
-        report::DEFAULT_DATE_TIME_FORMAT,
-    },
+    api::apportionment::{map_candidate_nomination, map_seat_assignment},
     domain::{
         committee_session::{CommitteeSession, CommitteeSessionId},
         data_entry::DataEntrySource,
@@ -26,6 +23,7 @@ use crate::{
             votes_table::{VotesTables, VotesTablesWithPreviousVotes},
         },
         polling_station::PollingStation,
+        report::DEFAULT_DATE_TIME_FORMAT,
         results::{Results, political_group_candidate_votes::PoliticalGroupCandidateVotes},
         summary::{ElectionSummary, ElectionSummaryCSB},
     },

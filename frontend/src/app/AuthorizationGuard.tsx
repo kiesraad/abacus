@@ -5,6 +5,7 @@ import { useApiState } from "@/api/useApiState";
 import { EXPIRATION_DIALOG_SECONDS } from "@/app/authorizationConstants";
 import useSessionExpiration from "@/hooks/user/useSessionExpiration";
 import { t } from "@/i18n/translate";
+import type { LoginResponse } from "@/types/generated/openapi";
 
 import { ExpirationDialog } from "./ExpirationDialog";
 
@@ -12,27 +13,21 @@ interface AuthorizationGuardProps {
   children: React.ReactNode;
 }
 
-// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: splitting the function doesn't make it more readable
-export function AuthorizationGuard({ children }: AuthorizationGuardProps) {
-  const { user, extendSession } = useApiState();
-  const matches = useMatches();
-  const { showDialog, sessionValidFor } = useSessionExpiration(EXPIRATION_DIALOG_SECONDS);
+type RouteHandle = NonNullable<ReturnType<typeof useMatches>[number]["handle"]>;
 
-  const routeMatch = matches[matches.length - 1];
-  if (routeMatch?.handle === undefined) {
-    // No match or handle means that this route has not been defined in our routes
-    throw new NotFoundError();
-  }
-
+function resolveAuthorizationRedirect(
+  handle: RouteHandle,
+  pathname: string,
+  user: LoginResponse | null,
+  sessionValidFor: number | null,
+): React.ReactElement | null {
   const isAuthenticated = user !== null;
-  const isPublic = routeMatch.handle.public;
-  const isAllowed = isPublic || (user?.role && routeMatch.handle.roles.includes(user.role));
-
-  const accountRequiresSetup = isAuthenticated && (!user.fullname || user.needs_password_change);
+  const isPublic = handle.public;
+  const isAllowed = isPublic || (user?.role && handle.roles.includes(user.role));
 
   // if user is not allowed on this route
   if (!isAllowed) {
-    const route = routeMatch.pathname || "unknown";
+    const route = pathname || "unknown";
 
     // redirect to login page if not authenticated
     if (!isAuthenticated) {
@@ -51,13 +46,33 @@ export function AuthorizationGuard({ children }: AuthorizationGuardProps) {
   }
 
   // restrict account that requires setup to the account setup page and logout page
-  if (accountRequiresSetup && routeMatch.pathname !== "/account/setup" && routeMatch.pathname !== "/account/logout") {
+  const accountRequiresSetup = isAuthenticated && (!user.fullname || user.needs_password_change);
+  if (accountRequiresSetup && pathname !== "/account/setup" && pathname !== "/account/logout") {
     return <Navigate to="/account/setup" replace />;
   }
 
   // navigate to the overview if the user is logged in and tries to access the login page
-  if (routeMatch.pathname === "/account/login" && isAuthenticated) {
+  if (pathname === "/account/login" && isAuthenticated) {
     return <Navigate to="/elections" replace />;
+  }
+
+  return null;
+}
+
+export function AuthorizationGuard({ children }: AuthorizationGuardProps) {
+  const { user, extendSession } = useApiState();
+  const matches = useMatches();
+  const { showDialog, sessionValidFor } = useSessionExpiration(EXPIRATION_DIALOG_SECONDS);
+
+  const routeMatch = matches[matches.length - 1];
+  if (routeMatch?.handle === undefined) {
+    // No match or handle means that this route has not been defined in our routes
+    throw new NotFoundError();
+  }
+
+  const redirect = resolveAuthorizationRedirect(routeMatch.handle, routeMatch.pathname, user, sessionValidFor);
+  if (redirect) {
+    return redirect;
   }
 
   return (

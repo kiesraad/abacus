@@ -58,7 +58,7 @@ pub async fn process_apportionment(
     let mut conn = pool.acquire().await?;
 
     let election = election_repo::get(&mut conn, id).await?;
-    user.role().is_authorized(&election.committee_category)?;
+    user.role().is_authorized(election.committee_category)?;
 
     let current_committee_session =
         committee_session_repo::get_election_committee_session(&mut conn, election.id).await?;

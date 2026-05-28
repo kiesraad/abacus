@@ -10,6 +10,7 @@ use crate::domain::{
 
 #[derive(Serialize, Deserialize, ToSchema, Debug, Default, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
+#[must_use = "The validation results may contain error information."]
 pub struct ValidationResults {
     pub errors: Vec<ValidationResult>,
     pub warnings: Vec<ValidationResult>,
@@ -19,6 +20,18 @@ impl ValidationResults {
     pub fn append(&mut self, other: &mut Self) {
         self.errors.append(&mut other.errors);
         self.warnings.append(&mut other.warnings);
+    }
+
+    /// essentially a variant of append, that consumes the source result
+    pub fn join(&mut self, mut other: Self) -> &Self {
+        self.append(&mut other);
+        self
+    }
+
+    /// essentially a variant of append, that consumes the source result
+    pub fn merge(mut self, mut other: Self) -> Self {
+        self.append(&mut other);
+        self
     }
 
     pub fn has_errors(&self) -> bool {
@@ -48,7 +61,7 @@ pub struct ValidationResultContext {
     pub political_group_number: Option<PGNumber>,
 }
 
-#[derive(Serialize, Deserialize, ToSchema, Debug, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Serialize, Deserialize, ToSchema, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 #[serde(deny_unknown_fields)]
 pub enum ValidationResultCode {
     /// GSB CSO: 'Alleen bij extra onderzoek B1-1': één van beide vragen is beantwoord, en de andere niet
@@ -136,9 +149,8 @@ pub trait Validate {
     fn validate(
         &self,
         election: &ElectionWithPoliticalGroups,
-        validation_results: &mut ValidationResults,
         path: &FieldPath,
-    ) -> Result<(), DataError>;
+    ) -> Result<ValidationResults, DataError>;
 }
 
 pub trait ValidateRoot: Validate {
@@ -146,14 +158,9 @@ pub trait ValidateRoot: Validate {
         &self,
         election: &ElectionWithPoliticalGroups,
     ) -> Result<ValidationResults, DataError> {
-        let mut validation_results = ValidationResults::default();
-        self.validate(election, &mut validation_results, &"data".into())?;
-        validation_results
-            .errors
-            .sort_by(|a, b| a.code.cmp(&b.code));
-        validation_results
-            .warnings
-            .sort_by(|a, b| a.code.cmp(&b.code));
+        let mut validation_results = self.validate(election, &"data".into())?;
+        validation_results.errors.sort_by_key(|a| a.code);
+        validation_results.warnings.sort_by_key(|a| a.code);
         Ok(validation_results)
     }
 }

@@ -44,7 +44,7 @@ pub enum InvestigationStatusName {
     ConcludedWithNewResults,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum InvestigationTransitionError {
     Invalid,
     RequiresCorrectedResults,

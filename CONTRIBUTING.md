@@ -17,7 +17,7 @@ Het team werkt met een planning en epics zoals opgenomen in het projectbord. Voo
 
 ## Contributor Licence Agreement (CLA)
 
-Als je een bijdrage aan de broncode wilt leveren vragen we je om vooraf een Contributor Licence Agreement (CLA) te tekenen, met name om het gebruiksrecht op je bijdrage eenduidig te regelen. Dit hoef je maar één keer te doen. Stuur de getekende CLA naar abacus[@]kiesraad.nl. Dank alvast!
+Als je een bijdrage aan de broncode wilt leveren vragen we je om vooraf een [Contributor Licence Agreement (CLA)](https://github.com/kiesraad/abacus/blob/main/CLA.md) te tekenen, met name om het gebruiksrecht op je bijdrage eenduidig te regelen. Dit hoef je maar één keer te doen. Stuur de getekende CLA naar abacus[@]kiesraad.nl. Dank alvast!
 
 ## Hoe kun je bijdragen?
 

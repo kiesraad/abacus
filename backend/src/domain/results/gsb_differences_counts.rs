@@ -73,21 +73,16 @@ impl Validate for GSBDifferencesCounts {
     fn validate(
         &self,
         election: &ElectionWithPoliticalGroups,
-        validation_results: &mut ValidationResults,
         path: &FieldPath,
-    ) -> Result<(), DataError> {
+    ) -> Result<ValidationResults, DataError> {
         // validate all counts
-        self.more_ballots_count.validate(
-            election,
-            validation_results,
-            &path.field("more_ballots_count"),
-        )?;
-        self.fewer_ballots_count.validate(
-            election,
-            validation_results,
-            &path.field("fewer_ballots_count"),
-        )?;
-        Ok(())
+        Ok(self
+            .more_ballots_count
+            .validate(election, &path.field("more_ballots_count"))?
+            .merge(
+                self.fewer_ballots_count
+                    .validate(election, &path.field("fewer_ballots_count"))?,
+            ))
     }
 }
 
@@ -460,7 +455,7 @@ mod tests {
     }
 
     fn validate(
-        data: GSBDifferencesCounts,
+        data: &GSBDifferencesCounts,
         voters_count: u32,
         votes_count: u32,
     ) -> Result<ValidationResults, DataError> {
@@ -505,7 +500,7 @@ mod tests {
             let mut data = GSBDifferencesCounts::zero();
             data.more_ballots_count = more;
             data.fewer_ballots_count = fewer;
-            let result = validate(data, voters, votes)?;
+            let result = validate(&data, voters, votes)?;
 
             let has_error = result.errors.iter().any(|e| e == &validation_error);
             assert_eq!(

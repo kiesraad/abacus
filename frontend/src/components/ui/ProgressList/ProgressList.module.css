@@ -33,10 +33,6 @@
 
     &.item:hover {
       background-color: var(--color-hover);
-      &.pointer {
-        cursor: pointer;
-      }
-
       &:has(div > a:focus),
       &:has(div > a:focus-visible) {
         background-color: var(--bg-gray);
@@ -70,11 +66,19 @@
       line-height: 1.5rem;
       margin-left: -2.5rem;
       max-height: 2.75rem;
+      button {
+        all: unset;
+        cursor: pointer;
+        width: calc(100% - 3.25rem); /* To make sure button:focus doesn't get wider than the li */
+      }
       a {
+        width: 100%;
+      }
+      a,
+      button {
         text-decoration: none;
         color: inherit;
         display: inline-block;
-        width: 100%;
         padding: 0.625rem 0.75rem 0.625rem 2.5rem;
         vertical-align: middle;
         text-overflow: ellipsis;

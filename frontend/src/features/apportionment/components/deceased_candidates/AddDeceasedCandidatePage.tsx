@@ -4,6 +4,7 @@ import { type AnyApiError, type ApiResult, isSuccess } from "@/api/ApiResult";
 import { useApiClient } from "@/api/useApiClient";
 import { StickyNav } from "@/components/ui/AppLayout/StickyNav";
 import { CandidateList } from "@/components/ui/CandidateList/CandidateList";
+import { Loader } from "@/components/ui/Loader/Loader";
 import { ProgressList } from "@/components/ui/ProgressList/ProgressList";
 import { useElection } from "@/hooks/election/useElection";
 import { t } from "@/i18n/translate";
@@ -15,9 +16,8 @@ import type {
   PoliticalGroup,
 } from "@/types/generated/openapi";
 import { formatPoliticalGroupName } from "@/utils/politicalGroup";
-import { Loader } from "../../../../components/ui/Loader/Loader";
 import { useApportionmentContext } from "../../hooks/useApportionmentContext";
-import { renderTitleAndHeader } from "../../utils/utils";
+import { deceasedCandidatesCheckStateAndRedirect, renderTitleAndHeader } from "../../utils/utils";
 import { ApportionmentError } from "../ApportionmentError";
 import cls from "./DeceasedCandidates.module.css";
 
@@ -34,11 +34,7 @@ export function AddDeceasedCandidatePage() {
   }
 
   useEffect(() => {
-    if (state?.type === "Uninitialised") {
-      void navigate(`/elections/${election.id}/apportionment/include-all-candidates`);
-    } else if (state?.type === "Finalised") {
-      void navigate(`/elections/${election.id}/apportionment`);
-    }
+    deceasedCandidatesCheckStateAndRedirect(state, election.id, navigate);
   });
 
   if (isLoading) {
@@ -83,11 +79,15 @@ export function AddDeceasedCandidatePage() {
                           id={`list-item-group-${group.number}`}
                           status={"idle"}
                           active={group.number === selectedList?.number}
-                          onClick={() => {
-                            setSelectedList(group);
-                          }}
                         >
-                          <span>{formatPoliticalGroupName(group)}</span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedList(group);
+                            }}
+                          >
+                            {formatPoliticalGroupName(group)}
+                          </button>
                         </ProgressList.Item>
                       ))}
                     </ProgressList.Fixed>

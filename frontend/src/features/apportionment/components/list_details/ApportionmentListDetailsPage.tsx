@@ -8,7 +8,7 @@ import type { Candidate, CandidateVotes } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 import { formatPoliticalGroupName } from "@/utils/politicalGroup";
 import { useApportionmentContext } from "../../hooks/useApportionmentContext";
-import { checkStateAndRedirect, renderTitleAndHeader } from "../../utils/utils";
+import { apportionmentCheckStateAndRedirect, renderTitleAndHeader } from "../../utils/utils";
 import cls from "../Apportionment.module.css";
 import { ApportionmentErrorPage } from "../ApportionmentError";
 import { CandidatesRankingTable } from "./CandidatesRankingTable";
@@ -145,7 +145,7 @@ export function ApportionmentListDetailsPage() {
   const listNumber = useNumericParam("listNumber");
 
   useEffect(() => {
-    checkStateAndRedirect(state, election.id, navigate);
+    apportionmentCheckStateAndRedirect(state, election.id, navigate);
   });
 
   const list = election.political_groups.find((group) => group.number === listNumber);

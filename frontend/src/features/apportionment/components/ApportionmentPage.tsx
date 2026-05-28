@@ -7,7 +7,7 @@ import { useElection } from "@/hooks/election/useElection";
 import { t } from "@/i18n/translate";
 import { cn } from "@/utils/classnames";
 import { useApportionmentContext } from "../hooks/useApportionmentContext";
-import { checkStateAndRedirect, renderTitleAndHeader } from "../utils/utils";
+import { apportionmentCheckStateAndRedirect, renderTitleAndHeader } from "../utils/utils";
 import cls from "./Apportionment.module.css";
 import { ApportionmentError } from "./ApportionmentError";
 import { ApportionmentTable } from "./ApportionmentTable";
@@ -27,7 +27,7 @@ export function ApportionmentPage() {
   const { seatAssignment, candidateNomination, electionSummary, state, error } = useApportionmentContext();
 
   useEffect(() => {
-    checkStateAndRedirect(state, election.id, navigate);
+    apportionmentCheckStateAndRedirect(state, election.id, navigate);
   });
 
   const unassignedSeats = seatAssignment

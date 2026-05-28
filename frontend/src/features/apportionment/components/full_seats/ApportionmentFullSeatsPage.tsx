@@ -8,7 +8,7 @@ import { cn } from "@/utils/classnames";
 import { useApportionmentContext } from "../../hooks/useApportionmentContext";
 import type { ResultChange } from "../../utils/seat-change";
 import { getRemovalSteps } from "../../utils/steps";
-import { checkStateAndRedirect, renderTitleAndHeader } from "../../utils/utils";
+import { apportionmentCheckStateAndRedirect, renderTitleAndHeader } from "../../utils/utils";
 import cls from "../Apportionment.module.css";
 import { ApportionmentErrorPage } from "../ApportionmentError";
 import { Footnotes } from "./Footnotes";
@@ -21,7 +21,7 @@ export function ApportionmentFullSeatsPage() {
   const { seatAssignment, error, state } = useApportionmentContext();
 
   useEffect(() => {
-    checkStateAndRedirect(state, election.id, navigate);
+    apportionmentCheckStateAndRedirect(state, election.id, navigate);
   });
 
   if (error) {

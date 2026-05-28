@@ -181,7 +181,7 @@ describe("AddDeceasedCandidatesPage", () => {
 
     expect(await screen.findByRole("heading", { level: 3, name: "Lijst 1 - Political Group A" }));
 
-    await user.click(group2);
+    await user.click(within(group2).getByRole("button"));
 
     expect(group1).toHaveClass("idle");
     expect(group1).toHaveAttribute("aria-current", "false");

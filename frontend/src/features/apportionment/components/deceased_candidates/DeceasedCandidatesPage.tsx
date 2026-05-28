@@ -21,7 +21,7 @@ import type {
 import { getCandidateFullName } from "@/utils/candidate";
 import { getPoliticalGroupName } from "@/utils/politicalGroup";
 import { useApportionmentContext } from "../../hooks/useApportionmentContext";
-import { renderTitleAndHeader } from "../../utils/utils";
+import { deceasedCandidatesCheckStateAndRedirect, renderTitleAndHeader } from "../../utils/utils";
 import { ApportionmentError } from "../ApportionmentError";
 import cls from "./DeceasedCandidates.module.css";
 
@@ -107,11 +107,7 @@ export function DeceasedCandidatesPage() {
   }
 
   useEffect(() => {
-    if (state?.type === "Uninitialised") {
-      void navigate(`/elections/${election.id}/apportionment/include-all-candidates`);
-    } else if (state?.type === "Finalised") {
-      void navigate(`/elections/${election.id}/apportionment`);
-    }
+    deceasedCandidatesCheckStateAndRedirect(state, election.id, navigate);
   });
 
   if (isLoading) {

@@ -13,7 +13,7 @@ import {
   type LargestRemainderAssignmentStep,
   type UniqueHighestAverageAssignmentStep,
 } from "../../utils/steps";
-import { checkStateAndRedirect, renderTitleAndHeader } from "../../utils/utils";
+import { apportionmentCheckStateAndRedirect, renderTitleAndHeader } from "../../utils/utils";
 import cls from "../Apportionment.module.css";
 import { ApportionmentErrorPage } from "../ApportionmentError";
 import { Footnotes } from "./Footnotes";
@@ -213,7 +213,7 @@ export function ApportionmentResidualSeatsPage() {
   const { seatAssignment, error, state } = useApportionmentContext();
 
   useEffect(() => {
-    checkStateAndRedirect(state, election.id, navigate);
+    apportionmentCheckStateAndRedirect(state, election.id, navigate);
   });
 
   if (error) {

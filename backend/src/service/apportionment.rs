@@ -34,14 +34,10 @@ struct ApportionmentStateChange {
 /// and the committee session id to which this state belongs.
 pub async fn get_state(
     conn: &mut SqliteConnection,
-    user: User,
     election_id: ElectionId,
 ) -> Result<(CommitteeSessionId, ApportionmentState), APIError> {
-    let election = election_repo::get(conn, election_id).await?;
-    user.role().is_authorized(election.committee_category)?;
-
     let committee_session =
-        committee_session_repo::get_election_committee_session(conn, election.id).await?;
+        committee_session_repo::get_election_committee_session(conn, election_id).await?;
 
     if committee_session.status != CommitteeSessionStatus::Completed {
         return Err(ApportionmentApiError::CommitteeSessionNotCompleted.into());
@@ -66,7 +62,10 @@ pub async fn update_state(
     election_id: ElectionId,
     update_fn: impl FnOnce(ApportionmentState) -> Result<ApportionmentState, ApportionmentStateError>,
 ) -> Result<ApportionmentState, APIError> {
-    let (id, state) = get_state(conn, user, election_id).await?;
+    let election = election_repo::get(conn, election_id).await?;
+    user.role().is_authorized(election.committee_category)?;
+
+    let (id, state) = get_state(conn, election_id).await?;
 
     let state = update_fn(state).map_err(|err| APIError::Delegated(Box::new(err)))?;
 
@@ -191,13 +190,9 @@ mod tests {
         set_states(&mut conn, CommitteeSessionStatus::Completed, None).await;
 
         // Returns a new ApportionmentState::Uninitialised
-        let (id, state) = get_state(
-            &mut conn,
-            User::test_user(Role::CoordinatorGSB, UserId::from(1)),
-            ElectionId::from(ELECTION_ID),
-        )
-        .await
-        .expect("should get state");
+        let (id, state) = get_state(&mut conn, ElectionId::from(ELECTION_ID))
+            .await
+            .expect("should get state");
 
         assert_eq!(id, CommitteeSessionId::from(COMMITTEE_SESSION_ID));
         assert_eq!(state, ApportionmentState::Uninitialised);

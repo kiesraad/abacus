@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+import { useNavigate } from "react-router";
 import { NotFoundError } from "@/api/ApiResult";
 import { useElection } from "@/hooks/election/useElection";
 import { useNumericParam } from "@/hooks/useNumericParam";
@@ -6,7 +8,7 @@ import type { Candidate, CandidateVotes } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 import { formatPoliticalGroupName } from "@/utils/politicalGroup";
 import { useApportionmentContext } from "../../hooks/useApportionmentContext";
-import { renderTitleAndHeader } from "../../utils/utils";
+import { apportionmentCheckStateAndRedirect, renderTitleAndHeader } from "../../utils/utils";
 import cls from "../Apportionment.module.css";
 import { ApportionmentErrorPage } from "../ApportionmentError";
 import { CandidatesRankingTable } from "./CandidatesRankingTable";
@@ -137,9 +139,14 @@ function TotalVotesPerCandidateSection({ candidateVotesList, candidates }: Total
 }
 
 export function ApportionmentListDetailsPage() {
+  const navigate = useNavigate();
   const { election } = useElection();
-  const { seatAssignment, candidateNomination, electionSummary, error } = useApportionmentContext();
+  const { seatAssignment, candidateNomination, electionSummary, error, state } = useApportionmentContext();
   const listNumber = useNumericParam("listNumber");
+
+  useEffect(() => {
+    apportionmentCheckStateAndRedirect(state, election.id, navigate);
+  });
 
   const list = election.political_groups.find((group) => group.number === listNumber);
 

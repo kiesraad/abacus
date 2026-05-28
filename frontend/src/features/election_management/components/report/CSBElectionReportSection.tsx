@@ -1,3 +1,4 @@
+import { ApplicationError } from "@/api/ApiResult";
 import { DownloadButton } from "@/components/ui/DownloadButton/DownloadButton";
 import { Loader } from "@/components/ui/Loader/Loader";
 import { useApportionmentStateRequest } from "@/hooks/apportionment/useApportionmentStateRequest";
@@ -15,18 +16,19 @@ interface CSBElectionReportSectionProps {
 }
 
 export function CSBElectionReportSection({ election, committeeSession, sessionLabel }: CSBElectionReportSectionProps) {
-  const { error, data: apportionmentState } = useApportionmentStateRequest(election.id);
+  const { requestState } = useApportionmentStateRequest(election.id);
 
-  if (error) {
-    throw error;
+  if ("error" in requestState) {
+    throw requestState.error;
   }
-  if (!apportionmentState) {
+
+  if (requestState.status === "loading") {
     return <Loader />;
   }
-  // TODO: #3160 enable this check when apportionment deceased candidate flow is implemented
-  // if (apportionmentState.type !== "Finalised") {
-  //   throw new ApplicationError(t("error.forbidden_message"), "InvalidCommitteeSessionStatus");
-  // }
+
+  if (requestState.data.type !== "Finalised") {
+    throw new ApplicationError(t("error.forbidden_message"), "InvalidCommitteeSessionStatus");
+  }
 
   return (
     <>

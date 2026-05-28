@@ -47,6 +47,10 @@
   margin-bottom: var(--space-xl);
 }
 
+.ml-md-lg {
+  margin-left: var(--space-md-lg);
+}
+
 /* Color */
 .bg-gray {
   background-color: var(--bg-gray);

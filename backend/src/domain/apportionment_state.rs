@@ -164,6 +164,10 @@ impl ApportionmentState {
         }
     }
 
+    pub fn is_finalised(&self) -> bool {
+        matches!(self, Self::Finalised { .. })
+    }
+
     pub fn reset(self) -> Result<Self, ApportionmentStateError> {
         Ok(Self::Uninitialised)
     }

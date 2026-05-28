@@ -23,6 +23,7 @@
     "EntryNotUnique": "Deze invoer bestaat al",
     "Forbidden": "Je hebt niet de juiste rechten",
     "InternalServerError": "Er is een interne fout opgetreden",
+    "InvalidApportionmentState": "De zetelverdeling is niet in de juiste status voor deze actie",
     "InvalidCommitteeSessionStatus": "De zitting is niet in de juiste status voor deze actie",
     "InvalidData": "De invoer is niet geldig",
     "InvalidHash": "De hash is niet geldig",

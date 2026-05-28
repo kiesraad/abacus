@@ -156,7 +156,6 @@ async fn delete_committee_session_files(
 
 #[cfg(test)]
 mod tests {
-
     use chrono::Utc;
     use sqlx::{SqliteConnection, SqlitePool};
     use test_log::test;
@@ -279,7 +278,7 @@ mod tests {
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
     async fn test_reset_apportionment_state_on_resume(pool: SqlitePool) -> Result<(), APIError> {
         let mut conn = pool.acquire().await?;
-        let audit_service = AuditService::new(None, Some(Ipv4Addr::new(203, 0, 113, 0).into()));
+        let audit_service = AuditService::new(None, Some(TEST_IP_V4_ADDR.into()));
 
         let committee_session_id = CommitteeSessionId::from(6);
 

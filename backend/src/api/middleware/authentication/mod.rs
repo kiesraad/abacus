@@ -60,10 +60,10 @@ mod tests {
             session_repo::{self, Session},
             user_repo::{self, User, UserId},
         },
+        test_support::{
+            TEST_EPHEMERAL_PORT, TEST_IP_V4_ADDR, TEST_UNSPECIFIED_IP_ADDRESS, TEST_USER_AGENT,
+        },
     };
-
-    const TEST_USER_AGENT: &str = "TestAgent/1.0";
-    const TEST_IP_ADDRESS: &str = "0.0.0.0";
 
     fn create_app(pool: &SqlitePool) -> Router {
         let state = AppState {
@@ -153,7 +153,7 @@ mod tests {
         let admin1_session = Session::create(
             UserId::from(1),
             TEST_USER_AGENT,
-            TEST_IP_ADDRESS,
+            TEST_UNSPECIFIED_IP_ADDRESS,
             SESSION_MIN_LIFE_TIME / 2,
         );
         session_repo::save(&mut conn, &admin1_session)
@@ -569,7 +569,7 @@ mod tests {
         let session = Session::create(
             UserId::from(1),
             TEST_USER_AGENT,
-            TEST_IP_ADDRESS,
+            TEST_UNSPECIFIED_IP_ADDRESS,
             SESSION_LIFE_TIME,
         );
         session_repo::save(&mut conn, &session).await.unwrap();
@@ -604,7 +604,7 @@ mod tests {
         let session = Session::create(
             UserId::from(1),
             TEST_USER_AGENT,
-            TEST_IP_ADDRESS,
+            TEST_UNSPECIFIED_IP_ADDRESS,
             SESSION_LIFE_TIME,
         );
         session_repo::save(&mut conn, &session).await.unwrap();
@@ -632,7 +632,7 @@ mod tests {
         let session = Session::create(
             UserId::from(1),
             TEST_USER_AGENT,
-            TEST_IP_ADDRESS,
+            TEST_UNSPECIFIED_IP_ADDRESS,
             SESSION_MIN_LIFE_TIME / 2,
         );
         session_repo::save(&mut conn, &session).await.unwrap();
@@ -739,7 +739,7 @@ mod tests {
         let session = Session::create(
             UserId::from(5),
             TEST_USER_AGENT,
-            TEST_IP_ADDRESS,
+            TEST_UNSPECIFIED_IP_ADDRESS,
             SESSION_LIFE_TIME,
         );
         session_repo::save(&mut conn, &session).await.unwrap();
@@ -806,7 +806,10 @@ mod tests {
         // manually set a different IP address
         request
             .extensions_mut()
-            .insert(ConnectInfo(SocketAddr::from(([1, 2, 3, 4], 1234))));
+            .insert(ConnectInfo(SocketAddr::from((
+                TEST_IP_V4_ADDR,
+                TEST_EPHEMERAL_PORT,
+            ))));
 
         let response = app.clone().oneshot(request).await.unwrap();
 

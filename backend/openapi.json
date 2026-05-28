@@ -1719,7 +1719,7 @@
     "/api/elections/{election_id}/apportionment/reset": {
       "post": {
         "summary": "Reset apportionment state (coordinator_csb)",
-        "operationId": "reset",
+        "operationId": "reset_apportionment_state",
         "parameters": [
           {
             "name": "election_id",

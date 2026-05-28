@@ -122,10 +122,10 @@ export type REGISTER_DECEASED_CANDIDATES_REQUEST_PATH =
   `/api/elections/${ElectionId}/apportionment/register_deceased_candidates`;
 
 // /api/elections/{election_id}/apportionment/reset
-export interface RESET_REQUEST_PARAMS {
+export interface RESET_APPORTIONMENT_STATE_REQUEST_PARAMS {
   election_id: ElectionId;
 }
-export type RESET_REQUEST_PATH = `/api/elections/${ElectionId}/apportionment/reset`;
+export type RESET_APPORTIONMENT_STATE_REQUEST_PATH = `/api/elections/${ElectionId}/apportionment/reset`;
 
 // /api/elections/{election_id}/apportionment/skip_deceased_candidates
 export interface SKIP_DECEASED_CANDIDATES_REQUEST_PARAMS {

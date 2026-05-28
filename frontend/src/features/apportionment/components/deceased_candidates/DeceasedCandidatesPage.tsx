@@ -19,7 +19,7 @@ import type {
   FINALISE_DECEASED_CANDIDATES_REQUEST_PATH,
   PGNumber,
   PoliticalGroup,
-  RESET_REQUEST_PATH,
+  RESET_APPORTIONMENT_STATE_REQUEST_PATH,
 } from "@/types/generated/openapi";
 import { getCandidateFullName } from "@/utils/candidate";
 import { getPoliticalGroupName } from "@/utils/politicalGroup";
@@ -153,7 +153,7 @@ export function DeceasedCandidatesPage() {
   }
 
   async function handleResetApportionmentState() {
-    const path: RESET_REQUEST_PATH = `/api/elections/${election.id}/apportionment/reset`;
+    const path: RESET_APPORTIONMENT_STATE_REQUEST_PATH = `/api/elections/${election.id}/apportionment/reset`;
     const response: ApiResult<ApportionmentState> = await client.postRequest(path);
 
     if (isSuccess(response)) {

@@ -120,8 +120,8 @@ import type {
   PollingStationListResponse,
   REGISTER_DECEASED_CANDIDATES_REQUEST_PARAMS,
   REGISTER_DECEASED_CANDIDATES_REQUEST_PATH,
-  RESET_REQUEST_PARAMS,
-  RESET_REQUEST_PATH,
+  RESET_APPORTIONMENT_STATE_REQUEST_PARAMS,
+  RESET_APPORTIONMENT_STATE_REQUEST_PATH,
   SaveDataEntryResponse,
   SKIP_DECEASED_CANDIDATES_REQUEST_PARAMS,
   SKIP_DECEASED_CANDIDATES_REQUEST_PATH,
@@ -551,12 +551,12 @@ export const GetApportionmentStateRequestHandler = http.get<ParamsToString<GET_A
     }),
 );
 
-export const ResetApportionmentStateRequestHandler = http.post<ParamsToString<RESET_REQUEST_PARAMS>>(
-  "/api/elections/3/apportionment/reset" satisfies RESET_REQUEST_PATH,
-  () =>
-    HttpResponse.json({ type: "Uninitialised" } satisfies ApportionmentState, {
-      status: 200,
-    }),
+export const ResetApportionmentStateRequestHandler = http.post<
+  ParamsToString<RESET_APPORTIONMENT_STATE_REQUEST_PARAMS>
+>("/api/elections/3/apportionment/reset" satisfies RESET_APPORTIONMENT_STATE_REQUEST_PATH, () =>
+  HttpResponse.json({ type: "Uninitialised" } satisfies ApportionmentState, {
+    status: 200,
+  }),
 );
 
 export const RegisterDeceasedCandidatesRequestHandler = http.post<

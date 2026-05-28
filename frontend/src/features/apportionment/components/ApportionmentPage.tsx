@@ -30,6 +30,10 @@ export function ApportionmentPage() {
     checkStateAndRedirect(state, election.id, navigate);
   });
 
+  const unassignedSeats = seatAssignment
+    ? seatAssignment.seats - seatAssignment.full_seats - seatAssignment.residual_seats
+    : 0;
+
   return (
     <>
       {renderTitleAndHeader(t("apportionment.title"))}
@@ -44,8 +48,14 @@ export function ApportionmentPage() {
               <>
                 {state?.type === "Finalised" && (
                   <FormLayout.Alert>
-                    <Alert type="success">
-                      <strong className="heading-md">{t("apportionment.all_seats_assigned")}</strong>
+                    <Alert type={unassignedSeats > 0 ? "warning" : "success"}>
+                      <strong className="heading-md">
+                        {t(
+                          unassignedSeats > 0
+                            ? "apportionment.not_all_seats_assigned"
+                            : "apportionment.all_seats_assigned",
+                        )}
+                      </strong>
                       <p>{t("apportionment.make_apportionment_definitive")}</p>
                       <Button.Link to={`../report/committee-session/${currentCommitteeSession.id}/download`} size="md">
                         {t("election_management.to_report")}

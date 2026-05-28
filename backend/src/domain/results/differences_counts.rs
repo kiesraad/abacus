@@ -783,14 +783,14 @@ mod tests {
     }
 
     fn validate(
-        data: DifferencesCounts,
+        data: &DifferencesCounts,
         total_voters_counts: u32,
         total_votes_counts: u32,
     ) -> Result<ValidationResults, DataError> {
         let mut validation_results = ValidationResults::default();
 
         validate_differences_counts(
-            &data,
+            data,
             total_voters_counts,
             total_votes_counts,
             &mut validation_results,
@@ -809,7 +809,7 @@ mod tests {
             .admitted_voters_equal_votes_cast = true;
         data.difference_completely_accounted_for = YesNo::yes();
 
-        let validation_results = validate(data, 105, 105)?;
+        let validation_results = validate(&data, 105, 105)?;
 
         assert!(validation_results.errors.is_empty());
 
@@ -819,7 +819,7 @@ mod tests {
             .admitted_voters_equal_votes_cast = true;
         data.difference_completely_accounted_for = YesNo::yes();
 
-        let validation_results = validate(data, 105, 104)?;
+        let validation_results = validate(&data, 105, 104)?;
 
         assert_eq!(
             validation_results.errors,
@@ -851,7 +851,7 @@ mod tests {
             .votes_cast_greater_than_admitted_voters = true;
         data.difference_completely_accounted_for = YesNo::yes();
 
-        let validation_results = validate(data, 104, 105)?;
+        let validation_results = validate(&data, 104, 105)?;
 
         assert!(validation_results.errors.is_empty());
 
@@ -861,7 +861,7 @@ mod tests {
             .votes_cast_greater_than_admitted_voters = true;
         data.difference_completely_accounted_for = YesNo::yes();
 
-        let validation_results = validate(data, 105, 104)?;
+        let validation_results = validate(&data, 105, 104)?;
 
         assert_eq!(
             validation_results.errors,
@@ -886,7 +886,7 @@ mod tests {
             .votes_cast_greater_than_admitted_voters = true;
         data.difference_completely_accounted_for = YesNo::yes();
 
-        let validation_results = validate(data, 105, 105)?;
+        let validation_results = validate(&data, 105, 105)?;
 
         assert_eq!(
             validation_results.errors,
@@ -913,7 +913,7 @@ mod tests {
             .votes_cast_smaller_than_admitted_voters = true;
         data.difference_completely_accounted_for = YesNo::yes();
 
-        let validation_results = validate(data, 104, 103)?;
+        let validation_results = validate(&data, 104, 103)?;
 
         assert!(validation_results.errors.is_empty());
 
@@ -924,7 +924,7 @@ mod tests {
             .votes_cast_smaller_than_admitted_voters = true;
         data.difference_completely_accounted_for = YesNo::yes();
 
-        let validation_results = validate(data, 103, 104)?;
+        let validation_results = validate(&data, 103, 104)?;
 
         assert_eq!(
             validation_results.errors,
@@ -949,7 +949,7 @@ mod tests {
             .votes_cast_smaller_than_admitted_voters = true;
         data.difference_completely_accounted_for = YesNo::yes();
 
-        let validation_results = validate(data, 103, 103)?;
+        let validation_results = validate(&data, 103, 103)?;
 
         assert_eq!(
             validation_results.errors,
@@ -995,7 +995,7 @@ mod tests {
             data.compare_votes_cast_admitted_voters
                 .votes_cast_smaller_than_admitted_voters = smaller;
 
-            let result = validate(data, 52, 52)?;
+            let result = validate(&data, 52, 52)?;
             let has_f304 = result.errors.iter().any(|e| e == &f304);
             assert_eq!(has_f304, expect_f304, "Failed: {description}");
         }
@@ -1034,7 +1034,7 @@ mod tests {
             data.more_ballots_count = more_ballots;
             data.fewer_ballots_count = fewer_ballots;
 
-            let result = validate(data, voters, votes)?;
+            let result = validate(&data, voters, votes)?;
             let expected_f305 = ValidationResult {
                 code: ValidationResultCode::F305,
                 fields: expected_fields.iter().map(|&f| f.into()).collect(),
@@ -1071,7 +1071,7 @@ mod tests {
             let mut data = DifferencesCounts::zero();
             data.more_ballots_count = more_ballots;
 
-            let result = validate(data, voters, votes)?;
+            let result = validate(&data, voters, votes)?;
             let has_f306 = result.errors.iter().any(|e| e == &f306);
             assert_eq!(has_f306, expect_f306, "Failed: {description}");
         }
@@ -1105,7 +1105,7 @@ mod tests {
             let mut data = DifferencesCounts::zero();
             data.fewer_ballots_count = fewer_ballots;
 
-            let result = validate(data, voters, votes)?;
+            let result = validate(&data, voters, votes)?;
             let has_f307 = result.errors.iter().any(|e| e == &f307);
             assert_eq!(has_f307, expect_f307, "Failed: {description}");
         }
@@ -1136,7 +1136,7 @@ mod tests {
             let mut data = DifferencesCounts::zero();
             data.fewer_ballots_count = fewer_ballots;
 
-            let result = validate(data, voters, votes)?;
+            let result = validate(&data, voters, votes)?;
             let has_f308 = result.errors.iter().any(|e| e == &f308);
             assert_eq!(has_f308, expect_f308, "Failed: {description}");
         }
@@ -1170,7 +1170,7 @@ mod tests {
             let mut data = DifferencesCounts::zero();
             data.more_ballots_count = more_ballots;
 
-            let result = validate(data, voters, votes)?;
+            let result = validate(&data, voters, votes)?;
             let has_f309 = result.errors.iter().any(|e| e == &f309);
             assert_eq!(has_f309, expect_f309, "Failed: {description}");
         }
@@ -1207,7 +1207,7 @@ mod tests {
             let mut data = DifferencesCounts::zero();
             data.difference_completely_accounted_for = accounted_for;
 
-            let result = validate(data, voters, votes)?;
+            let result = validate(&data, voters, votes)?;
             let has_f310 = result.errors.iter().any(|e| e == &f310);
             assert_eq!(has_f310, expect_f310, "Failed: {description}");
         }

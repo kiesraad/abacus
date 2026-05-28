@@ -88,6 +88,7 @@ export function FirstLoginForm({ prev }: FirstLoginFormProps) {
                   name="username"
                   label={t("account.username")}
                   hint={t("initialise.username_login_hint")}
+                  autoComplete="username"
                   required={true}
                   value={username}
                   readOnly={loading}
@@ -101,6 +102,7 @@ export function FirstLoginForm({ prev }: FirstLoginFormProps) {
                   label={t("account.password")}
                   hint={t("initialise.password_login_hint")}
                   type="password"
+                  autoComplete="current-password"
                   required={true}
                   value={password}
                   readOnly={loading}

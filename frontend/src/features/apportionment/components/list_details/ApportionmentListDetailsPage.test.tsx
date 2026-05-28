@@ -275,32 +275,6 @@ describe("ApportionmentListDetailsPage", () => {
       expect(screen.queryByTestId("total-votes-per-candidate-table")).not.toBeInTheDocument();
     });
 
-    test("Not possible because all lists are exhausted", async () => {
-      vi.spyOn(ReactRouter, "useParams").mockReturnValue({ listNumber: "1" });
-      overrideOnce("post", "/api/elections/3/apportionment", 422, {
-        error: "All lists are exhausted, not enough candidates to fill all seats",
-        fatal: false,
-        reference: "ApportionmentAllListsExhausted",
-      } satisfies ErrorResponse);
-
-      renderApportionmentListDetailsPage(3);
-
-      // Wait for the page to be loaded
-      expect(await screen.findByRole("heading", { level: 1, name: "Lijst 1 - Political Group A" })).toBeVisible();
-
-      expect(await screen.findByText("Zetelverdeling is niet mogelijk")).toBeVisible();
-      expect(
-        await screen.findByText(
-          "Er zijn te weinig kandidaten om alle aan lijsten toegewezen zetels te vullen. Abacus kan daarom geen zetelverdeling berekenen. Neem contact op met de Kiesraad.",
-        ),
-      ).toBeVisible();
-
-      expect(screen.queryByTestId("preferentially-chosen-candidates-table")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("other-chosen-candidates-table")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("candidates-ranking-table")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("total-votes-per-candidate-table")).not.toBeInTheDocument();
-    });
-
     test("Internal Server Error renders error page", async () => {
       vi.spyOn(ReactRouter, "useParams").mockReturnValue({ listNumber: "1" });
       // error is expected

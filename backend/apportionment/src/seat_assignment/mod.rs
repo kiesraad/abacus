@@ -2,6 +2,10 @@ use std::cmp::Ordering;
 
 mod residual_seat_assignment;
 mod structs;
+pub use structs::{
+    AbsoluteMajorityReassignedSeat, HighestAverageAssignedSeat, ListExhaustionRemovedSeat,
+    ListStanding, SeatAssignmentResult, SeatChange, SeatChangeStep,
+};
 use tracing::info;
 
 use self::{
@@ -11,11 +15,10 @@ use self::{
 use super::{
     ApportionmentInput, ListVotes,
     fraction::Fraction,
-    structs::{ApportionmentError, CandidateNominationInput, CandidateNominationInputType},
-};
-pub use structs::{
-    AbsoluteMajorityReassignedSeat, HighestAverageAssignedSeat, ListExhaustionRemovedSeat,
-    ListStanding, SeatAssignmentResult, SeatChange, SeatChangeStep,
+    structs::{
+        ApportionmentError, CandidateNominationInput, CandidateNominationInputType,
+        DeceasedCandidates,
+    },
 };
 
 /// Seat assignment
@@ -28,14 +31,13 @@ pub(crate) fn seat_assignment<T: ApportionmentInput>(
 
     // [Artikel P 5 Kieswet](https://wetten.overheid.nl/BWBR0004627/2026-01-01/#AfdelingII_HoofdstukP_Paragraaf2_ArtikelP5)
     // Sum the votes cast on candidates for each list
-    let total_votes_cast = input
+    let total_votes_cast: u32 = input
         .list_votes()
         .iter()
         .map(|list_votes| list_votes.total_votes())
         .sum();
     if total_votes_cast == 0 {
-        info!("No votes on candidates cast");
-        return Err(ApportionmentError::ZeroVotesCast);
+        info!("No votes on candidates cast; all seats will be left unassigned");
     }
 
     // Calculate electoral quota (kiesdeler) as a proper fraction
@@ -90,14 +92,25 @@ pub(crate) fn seat_assignment<T: ApportionmentInput>(
         });
     }
 
-    // TODO: #797 [Artikel P 19a Kieswet](https://wetten.overheid.nl/BWBR0004627/2026-01-01/#AfdelingII_HoofdstukP_Paragraaf3_ArtikelP19a)
-    //  Mark deceased candidates
+    // [Artikel P 19a Kieswet](https://wetten.overheid.nl/BWBR0004627/2026-01-01/#AfdelingII_HoofdstukP_Paragraaf3_ArtikelP19a)
+    for (list_number, list_deceased) in input.deceased_candidates() {
+        info!(
+            "Following deceased candidates will be taken into account for list {:?}: {}",
+            list_number,
+            list_deceased
+                .iter()
+                .map(|c| format!("{:?}", c))
+                .collect::<Vec<_>>()
+                .join(", ")
+        );
+    }
 
     // [Artikel P 10 Kieswet](https://wetten.overheid.nl/BWBR0004627/2026-01-01/#AfdelingII_HoofdstukP_Paragraaf2_ArtikelP10)
     let (final_steps, final_standing) = reassign_residual_seats_for_exhausted_lists(
         cumulative_standings,
         input.number_of_seats(),
         input.list_votes(),
+        input.deceased_candidates(),
         residual_seats,
         steps,
     )?;
@@ -106,7 +119,10 @@ pub(crate) fn seat_assignment<T: ApportionmentInput>(
         .iter()
         .map(|list| list.full_seats)
         .sum::<u32>();
-    let final_residual_seats = input.number_of_seats() - final_full_seats;
+    let final_residual_seats = final_standing
+        .iter()
+        .map(|list| list.residual_seats)
+        .sum::<u32>();
 
     Ok(SeatAssignmentResult {
         seats: input.number_of_seats(),
@@ -138,6 +154,7 @@ pub fn as_candidate_nomination_input<'a, T: ApportionmentInput>(
     CandidateNominationInput {
         number_of_seats: input.number_of_seats(),
         list_votes: input.list_votes(),
+        deceased_candidates: input.deceased_candidates(),
         quota: seat_assignment.quota,
         total_seats_per_list: get_total_seats_per_list_number_from_apportionment_result(
             seat_assignment,
@@ -154,12 +171,16 @@ fn list_numbers<LN: Copy>(standing: &[&ListStanding<LN>]) -> Vec<LN> {
 fn get_number_of_candidates<T: ListVotes>(
     input_list_votes: &[T],
     list_number: T::ListNumber,
+    deceased_candidates: &DeceasedCandidates<T>,
 ) -> u32 {
     let list_votes = input_list_votes
         .iter()
         .find(|list_votes| list_votes.number() == list_number)
         .expect("List votes exists");
-    u32::try_from(list_votes.candidate_votes().len()).expect("Number of candidates fits in u32")
+
+    let deceased_count = deceased_candidates.get(&list_number).map_or(0, |v| v.len());
+    u32::try_from(list_votes.candidate_votes().len() - deceased_count)
+        .expect("Number of candidates fits in u32")
 }
 
 /// Returns a vector with tuples of list numbers and how many more seats it was assigned
@@ -167,11 +188,13 @@ fn get_number_of_candidates<T: ListVotes>(
 fn list_numbers_with_exhausted_seats<T: ListVotes>(
     standings: &[ListStanding<T::ListNumber>],
     input_list_votes: &[T],
+    deceased_candidates: &DeceasedCandidates<T>,
 ) -> Vec<(T::ListNumber, u32)> {
     standings
         .iter()
         .fold(vec![], |mut exhausted_list_numbers_and_seats, s| {
-            let number_of_candidates = get_number_of_candidates(input_list_votes, s.list_number);
+            let number_of_candidates =
+                get_number_of_candidates(input_list_votes, s.list_number, deceased_candidates);
             if number_of_candidates.cmp(&s.total_seats()) == Ordering::Less {
                 exhausted_list_numbers_and_seats.push((
                     s.list_number,
@@ -221,7 +244,7 @@ fn reassign_residual_seat_for_absolute_majority<T: ListVotes>(
 
         // Reassign the seat
         let mut standing = standings.clone();
-        for list_standing in standing.iter_mut() {
+        for list_standing in &mut standing {
             if list_standing.list_number == lists_last_residual_seat[0] {
                 list_standing.residual_seats -= 1
             }
@@ -256,10 +279,12 @@ fn reassign_residual_seats_for_exhausted_lists<T: ListVotes>(
     previous_standings: Vec<ListStanding<T::ListNumber>>,
     seats: u32,
     list_votes: &[T],
+    deceased_candidates: &DeceasedCandidates<T>,
     assigned_residual_seats: u32,
     previous_steps: Vec<SeatChangeStep<T::ListNumber>>,
 ) -> RemainderAssignmentResult<T::ListNumber> {
-    let exhausted_lists = list_numbers_with_exhausted_seats(&previous_standings, list_votes);
+    let exhausted_lists =
+        list_numbers_with_exhausted_seats(&previous_standings, list_votes, deceased_candidates);
     if !exhausted_lists.is_empty() {
         let mut current_standings = previous_standings.clone();
         let mut seats_to_reassign = 0;
@@ -270,7 +295,7 @@ fn reassign_residual_seats_for_exhausted_lists<T: ListVotes>(
             seats_to_reassign += seats;
             let mut full_seat: bool = false;
             for _ in 1..=seats {
-                for list_standing in current_standings.iter_mut() {
+                for list_standing in &mut current_standings {
                     if list_standing.list_number == list_number {
                         if list_standing.residual_seats > 0 {
                             list_standing.residual_seats -= 1;
@@ -304,7 +329,7 @@ fn reassign_residual_seats_for_exhausted_lists<T: ListVotes>(
             assigned_residual_seats + seats_to_reassign,
             assigned_residual_seats,
             &current_steps,
-            Some(list_votes),
+            Some((list_votes, deceased_candidates)),
         )?;
         Ok((current_steps, current_standings))
     } else {
@@ -314,6 +339,8 @@ fn reassign_residual_seats_for_exhausted_lists<T: ListVotes>(
 
 #[cfg(test)]
 pub(crate) mod tests {
+    use test_log::test;
+
     use crate::{
         ListVotes, SeatAssignmentResult,
         fraction::Fraction,
@@ -322,7 +349,6 @@ pub(crate) mod tests {
             list_numbers,
         },
     };
-    use test_log::test;
 
     impl SeatChange<u32> {
         /// Returns true if the seat was changed through the list exhaustion removal
@@ -333,7 +359,7 @@ pub(crate) mod tests {
 
     fn check_total_seats_per_list<T: ListVotes>(
         result: &SeatAssignmentResult<T>,
-        expected_total_seats_per_list: Vec<(T::ListNumber, u32)>,
+        expected_total_seats_per_list: &[(T::ListNumber, u32)],
     ) {
         let total_seats_per_list_number =
             get_total_seats_per_list_number_from_apportionment_result(result);
@@ -362,7 +388,6 @@ pub(crate) mod tests {
         use test_log::test;
 
         use crate::{
-            ApportionmentError,
             seat_assignment::seat_assignment,
             test_helpers::{
                 get_total_seats_from_apportionment_result,
@@ -512,12 +537,17 @@ pub(crate) mod tests {
 
         /// Apportionment with 0 votes on candidates
         ///
-        /// No votes on candidates cast
+        /// No votes on candidates cast, all seats are left unassigned
         #[test]
         fn test_with_0_votes() {
             let input = seat_assignment_fixture_with_default_50_candidates(10, vec![0, 0, 0, 0, 0]);
-            let result = seat_assignment(&input);
-            assert_eq!(result, Err(ApportionmentError::ZeroVotesCast));
+            let result = seat_assignment(&input).unwrap();
+            assert_eq!(result.seats, 10);
+            assert_eq!(result.full_seats, 0);
+            assert_eq!(result.residual_seats, 0);
+            assert_eq!(result.steps.len(), 0);
+            let total_seats = get_total_seats_from_apportionment_result(&result);
+            assert_eq!(total_seats, vec![0, 0, 0, 0, 0]);
         }
 
         /// Apportionment with residual seats assigned with largest remainders method  
@@ -613,11 +643,13 @@ pub(crate) mod tests {
         }
 
         mod list_exhaustion {
+            use std::collections::{HashMap, HashSet};
+
             use test_log::test;
 
             use super::get_total_seats_from_apportionment_result;
             use crate::{
-                ApportionmentError, seat_assignment::seat_assignment,
+                seat_assignment::seat_assignment,
                 test_helpers::seat_assignment_fixture_with_given_candidate_votes,
             };
 
@@ -668,7 +700,7 @@ pub(crate) mod tests {
             /// 5 - largest remainder: seat assigned to list 1  
             /// 6 - largest remainder: seat assigned to list 4  
             /// 7 - Seat first assigned to list 10 has been removed and
-            ///     will be assigned to another list in accordance with Article P 10 Kieswet    
+            ///     will be assigned to another list in accordance with Article P 10 Kieswet  
             /// 8 - largest remainder: seat assigned to list 6
             #[test]
             fn test_with_list_exhaustion_during_residual_seats_assignment_with_largest_remainders_method()
@@ -934,7 +966,7 @@ pub(crate) mod tests {
             /// Full seats: [3, 4, 0] - Remainder seats: 1  
             /// Remainders: [2, 1, 7], only votes of lists [1, 2] meet the threshold of 75% of the quota  
             /// 1 - largest remainder: seat assigned to list 1  
-            /// 2 - Seat first assigned to list 1 has been re-assigned to list 2 in accordance with Article P 9 Kieswet    
+            /// 2 - Seat first assigned to list 1 has been re-assigned to list 2 in accordance with Article P 9 Kieswet  
             /// 3 - Seat first assigned to list 2 has been removed and
             ///     will be assigned to another list in accordance with Article P 10 Kieswet  
             /// 4 - Seat first assigned to list 2 has been removed and
@@ -985,7 +1017,7 @@ pub(crate) mod tests {
             /// Full seats: [2, 1, 5] - Remainder seats: 1  
             /// Remainders: [50 4/8, 10, 61 1/8], only votes of lists [1, 3] meet the threshold of 75% of the quota  
             /// 1 - largest remainder: seat assigned to list 3  
-            /// 2 - Seat first assigned to list 3 has been re-assigned to list 1 in accordance with Article P 9 Kieswet    
+            /// 2 - Seat first assigned to list 3 has been re-assigned to list 1 in accordance with Article P 9 Kieswet  
             /// 3 - Seat first assigned to list 1 has been removed and
             ///     will be assigned to another list in accordance with Article P 10 Kieswet  
             /// 4 - Seat first assigned to list 1 has been removed and
@@ -1046,10 +1078,9 @@ pub(crate) mod tests {
             /// Full seats: [5, 4, 3, 2, 1] - Remainder seats: 0  
             /// 1 - Seat first assigned to list 1 has been removed and
             ///     will be assigned to another list in accordance with Article P 10 Kieswet  
-            /// Remainders: [0/15, 0/15, 0/15, 0/15, 0/15]  
-            /// 2 - Seat cannot be (re)assigned because all lists are exhausted
+            /// 2 - No eligible list remains: the freed seat is left unassigned
             #[test]
-            fn test_with_all_lists_exhausted_error() {
+            fn test_with_all_lists_exhausted_leaves_seat_empty() {
                 let input = seat_assignment_fixture_with_given_candidate_votes(
                     15,
                     vec![
@@ -1060,8 +1091,19 @@ pub(crate) mod tests {
                         vec![400],
                     ],
                 );
-                let result = seat_assignment(&input);
-                assert_eq!(result, Err(ApportionmentError::AllListsExhausted));
+                let result = seat_assignment(&input).unwrap();
+                assert_eq!(result.seats, 15);
+                assert_eq!(result.full_seats, 14);
+                assert_eq!(result.residual_seats, 0);
+                assert_eq!(result.steps.len(), 1);
+                assert!(
+                    result.steps[0]
+                        .change
+                        .is_changed_by_list_exhaustion_removal()
+                );
+                assert_eq!(result.steps[0].change.list_number_retracted(), 1);
+                let total_seats = get_total_seats_from_apportionment_result(&result);
+                assert_eq!(total_seats, vec![4, 4, 3, 2, 1]);
             }
 
             /// Apportionment with no residual seats  
@@ -1074,9 +1116,9 @@ pub(crate) mod tests {
             ///     will be assigned to another list in accordance with Article P 10 Kieswet  
             /// Remainders: [0/15, 0/15, 0/15, 0/15, 0/15]  
             /// 3 - largest remainder: seat assigned to list 4  
-            /// 4 - Seat cannot be (re)assigned because all lists are exhausted
+            /// 4 - All lists are exhausted, seat is left unassigned
             #[test]
-            fn test_with_2_exhausted_lists_and_all_lists_exhausted_error() {
+            fn test_with_2_exhausted_lists_leaves_seat_unassigned() {
                 let input = seat_assignment_fixture_with_given_candidate_votes(
                     15,
                     vec![
@@ -1087,8 +1129,82 @@ pub(crate) mod tests {
                         vec![400],
                     ],
                 );
-                let result = seat_assignment(&input);
-                assert_eq!(result, Err(ApportionmentError::AllListsExhausted));
+                let result = seat_assignment(&input).unwrap();
+                assert_eq!(result.seats, 15);
+                assert_eq!(result.full_seats, 13);
+                assert_eq!(result.residual_seats, 1);
+                assert_eq!(result.steps.len(), 3);
+                assert!(
+                    result.steps[0]
+                        .change
+                        .is_changed_by_list_exhaustion_removal()
+                );
+                assert_eq!(result.steps[0].change.list_number_retracted(), 1);
+                assert!(
+                    result.steps[1]
+                        .change
+                        .is_changed_by_list_exhaustion_removal()
+                );
+                assert_eq!(result.steps[1].change.list_number_retracted(), 2);
+                assert!(
+                    result.steps[2]
+                        .change
+                        .is_changed_by_largest_remainder_assignment()
+                );
+                assert_eq!(result.steps[2].change.list_number_assigned(), 4);
+                let total_seats = get_total_seats_from_apportionment_result(&result);
+                assert_eq!(total_seats, vec![4, 4, 3, 2, 1]);
+            }
+
+            /// Apportionment where deceased candidates cause a list to be exhausted.
+            ///
+            /// 15 seats, quota = 1500 / 15 = 100.  
+            /// Votes: list 1 = 610, list 2 = 520, list 3 = 370.  
+            /// Full seats: [6, 5, 3] - Remainder seats: 1  
+            /// Remainders: [10, 20, 70], all lists meet the 3/4 quota threshold.
+            ///
+            /// 1 - largest remainder: seat assigned to list 3 (remainder 70).  
+            /// Initial distribution: [6, 5, 4].
+            ///
+            /// Marking candidate 6 of list 1 as deceased leaves 5 alive for 6 assigned
+            /// seats, triggering article P 10:  
+            /// 2 - list 1 has one seat retracted (was a full seat, since list 1 has no
+            ///     residual seats).  
+            /// 3 - largest remainder reassigns to list 2 (list 3 already got a LR
+            ///     seat in step 1, so it no longer qualifies).
+            ///
+            /// Final distribution: [5, 6, 4].
+            #[test]
+            fn test_with_list_exhaustion_due_to_deceased_candidates() {
+                let mut input = seat_assignment_fixture_with_given_candidate_votes(
+                    15,
+                    vec![
+                        vec![610, 0, 0, 0, 0, 0],
+                        vec![520, 0, 0, 0, 0, 0, 0],
+                        vec![370, 0, 0, 0, 0],
+                    ],
+                );
+                input.deceased_candidates = HashMap::from([(1, HashSet::from([6]))]);
+
+                let result = seat_assignment(&input).unwrap();
+                assert_eq!(result.full_seats, 13);
+                assert_eq!(result.residual_seats, 2);
+                assert_eq!(result.steps.len(), 3);
+                assert_eq!(result.steps[0].change.list_number_assigned(), 3);
+                assert!(
+                    result.steps[1]
+                        .change
+                        .is_changed_by_list_exhaustion_removal()
+                );
+                assert_eq!(result.steps[1].change.list_number_retracted(), 1);
+                assert!(
+                    result.steps[2]
+                        .change
+                        .is_changed_by_largest_remainder_assignment()
+                );
+                assert_eq!(result.steps[2].change.list_number_assigned(), 2);
+                let total_seats = get_total_seats_from_apportionment_result(&result);
+                assert_eq!(total_seats, vec![5, 6, 4]);
             }
         }
     }
@@ -1099,7 +1215,6 @@ pub(crate) mod tests {
 
         use super::check_total_seats_per_list;
         use crate::{
-            ApportionmentError,
             seat_assignment::seat_assignment,
             test_helpers::{
                 get_total_seats_from_apportionment_result,
@@ -1152,7 +1267,7 @@ pub(crate) mod tests {
             assert_eq!(result.steps[1].change.list_number_assigned(), 3);
             assert_eq!(result.steps[2].change.list_number_assigned(), 1);
             assert_eq!(result.steps[3].change.list_number_assigned(), 6);
-            check_total_seats_per_list(&result, vec![(1, 12), (3, 6), (4, 1), (6, 2), (7, 2)]);
+            check_total_seats_per_list(&result, &[(1, 12), (3, 6), (4, 1), (6, 2), (7, 2)]);
         }
 
         /// Apportionment with residual seats assigned with highest averages method
@@ -1211,12 +1326,17 @@ pub(crate) mod tests {
 
         /// Apportionment with 0 votes on candidates
         ///
-        /// No votes on candidates cast
+        /// No votes on candidates cast, all seats are left unassigned
         #[test]
         fn test_with_0_votes() {
             let input = seat_assignment_fixture_with_default_50_candidates(19, vec![0]);
-            let result = seat_assignment(&input);
-            assert_eq!(result, Err(ApportionmentError::ZeroVotesCast));
+            let result = seat_assignment(&input).unwrap();
+            assert_eq!(result.seats, 19);
+            assert_eq!(result.full_seats, 0);
+            assert_eq!(result.residual_seats, 0);
+            assert_eq!(result.steps.len(), 0);
+            let total_seats = get_total_seats_from_apportionment_result(&result);
+            assert_eq!(total_seats, vec![0]);
         }
 
         /// Apportionment with residual seats assigned with highest averages method  
@@ -1303,11 +1423,13 @@ pub(crate) mod tests {
         }
 
         mod list_exhaustion {
+            use std::collections::{HashMap, HashSet};
+
             use test_log::test;
 
             use super::get_total_seats_from_apportionment_result;
             use crate::{
-                ApportionmentError, seat_assignment::seat_assignment,
+                seat_assignment::seat_assignment,
                 test_helpers::seat_assignment_fixture_with_given_candidate_votes,
             };
 
@@ -1444,9 +1566,9 @@ pub(crate) mod tests {
             /// Full seats: [5, 5, 4, 4, 2] - Remainder seats: 0  
             /// 1 - Seat first assigned to list 1 has been removed and
             ///     will be assigned to another list in accordance with Article P 10 Kieswet  
-            /// 2 - Seat cannot be (re)assigned because all lists are exhausted
+            /// 2 - All lists are exhausted, seat is left unassigned
             #[test]
-            fn test_with_all_lists_exhausted_error() {
+            fn test_with_all_lists_exhausted_leaves_seat_unassigned() {
                 let input = seat_assignment_fixture_with_given_candidate_votes(
                     20,
                     vec![
@@ -1457,8 +1579,19 @@ pub(crate) mod tests {
                         vec![400, 400],
                     ],
                 );
-                let result = seat_assignment(&input);
-                assert_eq!(result, Err(ApportionmentError::AllListsExhausted));
+                let result = seat_assignment(&input).unwrap();
+                assert_eq!(result.seats, 20);
+                assert_eq!(result.full_seats, 19);
+                assert_eq!(result.residual_seats, 0);
+                assert_eq!(result.steps.len(), 1);
+                assert!(
+                    result.steps[0]
+                        .change
+                        .is_changed_by_list_exhaustion_removal()
+                );
+                assert_eq!(result.steps[0].change.list_number_retracted(), 1);
+                let total_seats = get_total_seats_from_apportionment_result(&result);
+                assert_eq!(total_seats, vec![4, 5, 4, 4, 2]);
             }
 
             /// Apportionment with no residual seats  
@@ -1470,9 +1603,9 @@ pub(crate) mod tests {
             /// 2 - Seat first assigned to list 2 has been removed and
             ///     will be assigned to another list in accordance with Article P 10 Kieswet  
             /// 3 - highest average: [333 2/6, 333 2/6, 320, 320, 266 2/3] seat assigned to list 5  
-            /// 4 - Seat cannot be (re)assigned because all lists are exhausted
+            /// 4 - All lists are exhausted, seat is left unassigned
             #[test]
-            fn test_with_2_exhausted_lists_and_all_lists_exhausted_error() {
+            fn test_with_2_exhausted_lists_leaves_seat_unassigned() {
                 let input = seat_assignment_fixture_with_given_candidate_votes(
                     20,
                     vec![
@@ -1483,8 +1616,112 @@ pub(crate) mod tests {
                         vec![400, 400, 0],
                     ],
                 );
-                let result = seat_assignment(&input);
-                assert_eq!(result, Err(ApportionmentError::AllListsExhausted));
+                let result = seat_assignment(&input).unwrap();
+                assert_eq!(result.seats, 20);
+                assert_eq!(result.full_seats, 18);
+                assert_eq!(result.residual_seats, 1);
+                assert_eq!(result.steps.len(), 3);
+                assert!(
+                    result.steps[0]
+                        .change
+                        .is_changed_by_list_exhaustion_removal()
+                );
+                assert_eq!(result.steps[0].change.list_number_retracted(), 1);
+                assert!(
+                    result.steps[1]
+                        .change
+                        .is_changed_by_list_exhaustion_removal()
+                );
+                assert_eq!(result.steps[1].change.list_number_retracted(), 2);
+                assert!(
+                    result.steps[2]
+                        .change
+                        .is_changed_by_highest_average_assignment()
+                );
+                assert_eq!(result.steps[2].change.list_number_assigned(), 5);
+                let total_seats = get_total_seats_from_apportionment_result(&result);
+                assert_eq!(total_seats, vec![4, 4, 4, 4, 3]);
+            }
+
+            /// Apportionment with lists with zero votes that should not be assigned seats
+            ///
+            /// Full seats: [5, 0, 0, 0, 0] - Remainder seats: 0
+            /// * 1-5 - Seat first assigned to list 1 has been removed and
+            ///         will be assigned to another list in accordance with Article P 10 Kieswet
+            /// * 6   - All lists are exhausted, seat is left unassigned
+            #[test]
+            fn test_lists_with_zero_vote_not_assigned_seats() {
+                let input = seat_assignment_fixture_with_given_candidate_votes(
+                    10,
+                    vec![vec![500, 0, 0, 0, 0], vec![0], vec![0], vec![0], vec![0]],
+                );
+                let result = seat_assignment(&input).unwrap();
+                assert_eq!(result.seats, 10);
+                assert_eq!(result.full_seats, 5);
+                assert_eq!(result.residual_seats, 0);
+                assert_eq!(result.steps.len(), 5);
+                for step in &result.steps {
+                    assert!(step.change.is_changed_by_list_exhaustion_removal());
+                    assert_eq!(step.change.list_number_retracted(), 1);
+                }
+                let total_seats = get_total_seats_from_apportionment_result(&result);
+                assert_eq!(total_seats, vec![5, 0, 0, 0, 0]);
+            }
+
+            /// Apportionment where deceased candidates cause a list to be exhausted
+            /// in a council with >=19 seats (residual assignment via highest averages).
+            ///
+            /// 20 seats, quota = 2000 / 20 = 100.  
+            /// Votes: list 1 = 810, list 2 = 620, list 3 = 570.  
+            /// Full seats: [8, 6, 5] - Remainder seats: 1  
+            /// Next averages: list 1 = 810/9 = 90, list 2 = 620/7 ≈ 88.57,
+            /// list 3 = 570/6 = 95.
+            ///
+            /// 1 - highest average: seat assigned to list 3 (95).  
+            /// Initial distribution: [8, 6, 6].
+            ///
+            /// Marking candidate 8 of list 1 as deceased leaves 7 alive for 8 assigned
+            /// seats, triggering article P 10:  
+            /// 2 - list 1 has one seat retracted (was a full seat, since list 1 has no
+            ///     residual seats).  
+            /// 3 - highest average reassigns to list 2 (list 1 is exhausted; list 3's
+            ///     next average is now 570/7 ≈ 81.43, list 2's is 620/7 ≈ 88.57).
+            ///
+            /// Final distribution: [7, 7, 6].
+            #[test]
+            fn test_with_list_exhaustion_due_to_deceased_candidates() {
+                let mut input = seat_assignment_fixture_with_given_candidate_votes(
+                    20,
+                    vec![
+                        vec![810, 0, 0, 0, 0, 0, 0, 0],
+                        vec![620, 0, 0, 0, 0, 0, 0],
+                        vec![570, 0, 0, 0, 0, 0, 0],
+                    ],
+                );
+                input.deceased_candidates = HashMap::from([(1, HashSet::from([8]))]);
+
+                let result = seat_assignment(&input).unwrap();
+                assert_eq!(result.steps.len(), 3);
+                assert!(
+                    result.steps[0]
+                        .change
+                        .is_changed_by_highest_average_assignment()
+                );
+                assert_eq!(result.steps[0].change.list_number_assigned(), 3);
+                assert!(
+                    result.steps[1]
+                        .change
+                        .is_changed_by_list_exhaustion_removal()
+                );
+                assert_eq!(result.steps[1].change.list_number_retracted(), 1);
+                assert!(
+                    result.steps[2]
+                        .change
+                        .is_changed_by_highest_average_assignment()
+                );
+                assert_eq!(result.steps[2].change.list_number_assigned(), 2);
+                let total_seats = get_total_seats_from_apportionment_result(&result);
+                assert_eq!(total_seats, vec![7, 7, 6]);
             }
         }
     }

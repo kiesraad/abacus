@@ -209,6 +209,31 @@ describe("ApportionmentPage", () => {
     expect(router.state.location.pathname).toEqual("/1");
   });
 
+  test("Renders yellow warning when finalised but not all seats assigned", async () => {
+    overrideOnce("get", "/api/elections/3", 200, getElectionMockData(election, committee_session));
+    overrideOnce("post", "/api/elections/3/apportionment", 200, {
+      seat_assignment: { ...seat_assignment, residual_seats: seat_assignment.residual_seats - 2 },
+      candidate_nomination: candidate_nomination,
+      election_summary: election_summary,
+    } satisfies ElectionApportionmentResponse);
+    overrideOnce("get", "/api/elections/3/apportionment/state", 200, {
+      deceased_candidates: [],
+      type: "Finalised",
+    } satisfies ApportionmentState);
+
+    renderApportionmentPage(3, false);
+    expect(await screen.findByTestId("election-summary-table")).toBeVisible();
+
+    const alert = await screen.findByRole("alert");
+    expect(alert).toHaveTextContent("Niet alle zetels zijn toegewezen");
+    expect(alert).not.toHaveTextContent("Alle zetels zijn toegewezen");
+    expect(alert).toHaveTextContent("Je kunt de zetelverdeling nu definitief maken en het proces-verbaal downloaden.");
+    expect(within(alert).getByRole("link", { name: "Naar proces-verbaal" })).toHaveAttribute(
+      "href",
+      "/report/committee-session/3/download",
+    );
+  });
+
   describe("Apportionment not yet available", () => {
     beforeEach(() => {
       overrideOnce("get", "/api/elections/3", 200, getElectionMockData(election, committee_session));
@@ -255,56 +280,6 @@ describe("ApportionmentPage", () => {
       expect(await screen.findByText("Zetelverdeling is niet mogelijk")).toBeVisible();
       expect(
         await screen.findByText("Loting is noodzakelijk, maar nog niet beschikbaar in deze versie van Abacus"),
-      ).toBeVisible();
-
-      expect(screen.queryByText("Alle zetels zijn toegewezen")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("election-summary-table")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("apportionment-table")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("chosen-candidates-table")).not.toBeInTheDocument();
-    });
-
-    test("Not possible because all lists are exhausted", async () => {
-      overrideOnce("post", "/api/elections/3/apportionment", 422, {
-        error: "All lists are exhausted, not enough candidates to fill all seats",
-        fatal: false,
-        reference: "ApportionmentAllListsExhausted",
-      } satisfies ErrorResponse);
-
-      renderApportionmentPage(3, false);
-
-      // Wait for the page to be loaded
-      expect(await screen.findByRole("heading", { level: 1, name: "Zetelverdeling" })).toBeVisible();
-
-      expect(await screen.findByText("Zetelverdeling is niet mogelijk")).toBeVisible();
-      expect(
-        await screen.findByText(
-          "Er zijn te weinig kandidaten om alle aan lijsten toegewezen zetels te vullen. Abacus kan daarom geen zetelverdeling berekenen. Neem contact op met de Kiesraad.",
-        ),
-      ).toBeVisible();
-
-      expect(screen.queryByText("Alle zetels zijn toegewezen")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("election-summary-table")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("apportionment-table")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("chosen-candidates-table")).not.toBeInTheDocument();
-    });
-
-    test("Not possible because no votes on candidates cast", async () => {
-      overrideOnce("post", "/api/elections/3/apportionment", 422, {
-        error: "No votes on candidates cast",
-        fatal: false,
-        reference: "ApportionmentZeroVotesCast",
-      } satisfies ErrorResponse);
-
-      renderApportionmentPage(3, false);
-
-      // Wait for the page to be loaded
-      expect(await screen.findByRole("heading", { level: 1, name: "Zetelverdeling" })).toBeVisible();
-
-      expect(await screen.findByText("Zetelverdeling is niet mogelijk")).toBeVisible();
-      expect(
-        await screen.findByText(
-          "Er zijn geen stemmen op kandidaten uitgebracht. Abacus kan daarom geen zetelverdeling berekenen. Neem contact op met de Kiesraad.",
-        ),
       ).toBeVisible();
 
       expect(screen.queryByText("Alle zetels zijn toegewezen")).not.toBeInTheDocument();

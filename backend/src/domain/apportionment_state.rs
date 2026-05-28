@@ -8,7 +8,7 @@ use crate::{
     error::{ApiErrorResponse, ErrorReference},
 };
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum ApportionmentStateError {
     CandidateNotFound,
     CandidateNotUnique,
@@ -105,6 +105,18 @@ impl ApportionmentState {
                 })
             }
             _ => Err(ApportionmentStateError::InvalidState),
+        }
+    }
+
+    pub fn get_deceased_candidates(&self) -> &[DeceasedCandidate] {
+        match self {
+            Self::Uninitialised => &[],
+            Self::RegisteringDeceasedCandidates {
+                deceased_candidates,
+            } => deceased_candidates,
+            Self::Finalised {
+                deceased_candidates,
+            } => deceased_candidates,
         }
     }
 

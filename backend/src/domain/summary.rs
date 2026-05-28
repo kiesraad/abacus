@@ -107,7 +107,7 @@ impl ElectionSummary {
                 .add_results(data_source, &result.differences_counts());
 
             // add votes for each political group to the total
-            for pg in result.political_group_votes().iter() {
+            for pg in result.political_group_votes() {
                 let pg_total = totals
                     .political_group_votes
                     .iter_mut()
@@ -161,7 +161,7 @@ impl ElectionSummary {
         let mut totals = ElectionSummary::zero();
 
         // initialize political group votes to zero
-        for group in election.political_groups.iter() {
+        for group in &election.political_groups {
             totals
                 .votes_counts
                 .political_group_total_votes

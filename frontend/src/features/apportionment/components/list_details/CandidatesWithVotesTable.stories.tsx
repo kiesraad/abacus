@@ -10,7 +10,7 @@ export const Default: StoryObj = {
         id="test-table"
         candidateList={lt19Seats.political_group_1.candidates}
         candidateVotesList={lt19Seats.political_group_1_candidate_nomination.preferential_candidate_nomination}
-        deceasedCandidatesList={[{ pg_number: 1, candidate_number: 3 }]}
+        deceasedCandidateNumbersList={[3]}
       />
     );
   },

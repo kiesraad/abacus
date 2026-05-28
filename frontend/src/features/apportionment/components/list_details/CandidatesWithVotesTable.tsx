@@ -1,6 +1,6 @@
 import { Table } from "@/components/ui/Table/Table";
 import { t } from "@/i18n/translate";
-import type { Candidate, CandidateVotes, DeceasedCandidate } from "@/types/generated/openapi";
+import type { Candidate, CandidateVotes } from "@/types/generated/openapi";
 import { getCandidateFullNameWithGender, getCandidateLocalityWithCountryCode } from "@/utils/candidate";
 import { cn } from "@/utils/classnames";
 
@@ -10,14 +10,14 @@ interface CandidatesWithVotesTableProps {
   id: string;
   candidateList: Candidate[];
   candidateVotesList: CandidateVotes[];
-  deceasedCandidatesList: DeceasedCandidate[];
+  deceasedCandidateNumbersList: number[];
 }
 
 export function CandidatesWithVotesTable({
   id,
   candidateList,
   candidateVotesList,
-  deceasedCandidatesList,
+  deceasedCandidateNumbersList,
 }: CandidatesWithVotesTableProps) {
   const candidateWithVotesList = candidateVotesList.map((candidateVotes) =>
     Object.assign({}, candidateVotes, candidateList[candidateVotes.number - 1]),
@@ -36,7 +36,7 @@ export function CandidatesWithVotesTable({
             <Table.Cell className="text-align-r">{candidate.number}</Table.Cell>
             <Table.Cell>
               {getCandidateFullNameWithGender(candidate)}
-              {deceasedCandidatesList.find((dc) => candidate.number === dc.candidate_number) !== undefined && (
+              {deceasedCandidateNumbersList.find((dc_number) => candidate.number === dc_number) !== undefined && (
                 <span className="superscript">&nbsp;&nbsp;&dagger;</span>
               )}
             </Table.Cell>

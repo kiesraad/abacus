@@ -96,6 +96,10 @@ describe("ApportionmentListDetailsPage", () => {
     expect(await screen.findByTestId("text-list-assigned-nr-seats")).toHaveTextContent(
       "Lijst 1 - Political Group A heeft 12 zetels toegewezen gekregen.",
     );
+    const deceasedCandidatesAlert = await screen.findByRole("alert");
+    expect(deceasedCandidatesAlert).toHaveTextContent(
+      "Kandidaten 12 en 5 zijn buiten beschouwing gelaten bij het verdelen van de zetels vanwege overlijden.Stemmen op overleden kandidaten zijn wel meegeteld als stemmen op diens lijst.",
+    );
 
     expect(
       await screen.findByRole("heading", { level: 2, name: "Met voorkeursstemmen gekozen kandidaten" }),
@@ -175,6 +179,10 @@ describe("ApportionmentListDetailsPage", () => {
     expect(await screen.findByTestId("text-list-assigned-nr-seats")).toHaveTextContent(
       "Lijst 2 - Political Group B heeft 1 zetel toegewezen gekregen.",
     );
+    const deceasedCandidatesAlert = await screen.findByRole("alert");
+    expect(deceasedCandidatesAlert).toHaveTextContent(
+      "Kandidaat 3 is buiten beschouwing gelaten bij het verdelen van de zetels vanwege overlijden.Stemmen op overleden kandidaten zijn wel meegeteld als stemmen op diens lijst.",
+    );
 
     expect(
       await screen.findByRole("heading", { level: 2, name: "Met voorkeursstemmen gekozen kandidaten" }),
@@ -242,6 +250,7 @@ describe("ApportionmentListDetailsPage", () => {
     expect(await screen.findByTestId("text-list-assigned-nr-seats")).toHaveTextContent(
       "Lijst 5 - Blanco (Smit, G.) heeft 0 zetels toegewezen gekregen.",
     );
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
 
     expect(
       await screen.findByRole("heading", { level: 2, name: "Met voorkeursstemmen gekozen kandidaten" }),

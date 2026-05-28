@@ -12,7 +12,7 @@
 }
 
 .tableTitle {
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
 }
 
 .tableInformation {
@@ -141,6 +141,17 @@ table.highestAveragesTable {
     td:last-child,
     th:last-child {
       right: 0;
+    }
+  }
+}
+
+/* Styling for the deceased candidates alert */
+.deceasedCandidatesAlert {
+  div:global(.small) {
+    align-items: flex-start;
+
+    section {
+      max-width: 100%;
     }
   }
 }

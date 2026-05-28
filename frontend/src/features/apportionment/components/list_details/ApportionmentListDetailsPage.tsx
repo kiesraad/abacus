@@ -1,12 +1,14 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router";
 import { NotFoundError } from "@/api/ApiResult";
+import { Alert } from "@/components/ui/Alert/Alert";
 import { useElection } from "@/hooks/election/useElection";
 import { useNumericParam } from "@/hooks/useNumericParam";
 import { t, tx } from "@/i18n/translate";
-import type { Candidate, CandidateVotes, DeceasedCandidate } from "@/types/generated/openapi";
+import type { Candidate, CandidateVotes } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 import { formatPoliticalGroupName } from "@/utils/politicalGroup";
+import { formatList } from "@/utils/strings";
 import { useApportionmentContext } from "../../hooks/useApportionmentContext";
 import { apportionmentCheckStateAndRedirect, renderTitleAndHeader } from "../../utils/utils";
 import cls from "../Apportionment.module.css";
@@ -14,6 +16,24 @@ import { ApportionmentErrorPage } from "../ApportionmentError";
 import { CandidatesRankingTable } from "./CandidatesRankingTable";
 import { CandidatesWithSeatTable } from "./CandidatesWithSeatTable";
 import { CandidatesWithVotesTable } from "./CandidatesWithVotesTable";
+
+function renderDeceasedCandidatesAlert(listDeceasedCandidateNumbers: number[]) {
+  return (
+    <Alert type="notify" small>
+      <p>
+        {listDeceasedCandidateNumbers.length === 1
+          ? tx("apportionment.list_details_alert.deceased_candidate", undefined, {
+              nr: formatList(listDeceasedCandidateNumbers, t("and")),
+            })
+          : tx("apportionment.list_details_alert.deceased_candidates", undefined, {
+              nrs: formatList(listDeceasedCandidateNumbers, t("and")),
+            })}
+        <br />
+        {t("apportionment.list_details_alert.votes_have_been_counted_on_the_list")}
+      </p>
+    </Alert>
+  );
+}
 
 interface PreferentiallyChosenCandidatesSectionProps {
   preferentialCandidateNomination: CandidateVotes[];
@@ -121,13 +141,13 @@ function UnelectedCandidatesRankingSection({ unelectedCandidatesRanking }: Unele
 interface TotalVotesPerCandidateSectionProps {
   candidateVotesList: CandidateVotes[];
   candidates: Candidate[];
-  deceasedCandidates: DeceasedCandidate[];
+  deceasedCandidateNumbers: number[];
 }
 
 function TotalVotesPerCandidateSection({
   candidateVotesList,
   candidates,
-  deceasedCandidates,
+  deceasedCandidateNumbers,
 }: TotalVotesPerCandidateSectionProps) {
   return (
     <div className={cn(cls.tableDiv, "mb-lg")}>
@@ -137,13 +157,14 @@ function TotalVotesPerCandidateSection({
           id="total-votes-per-candidate-table"
           candidateList={candidates}
           candidateVotesList={candidateVotesList}
-          deceasedCandidatesList={deceasedCandidates}
+          deceasedCandidateNumbersList={deceasedCandidateNumbers}
         />
       </div>
     </div>
   );
 }
 
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO: Is there any way to make this shorter?
 export function ApportionmentListDetailsPage() {
   const navigate = useNavigate();
   const { election } = useElection();
@@ -161,9 +182,11 @@ export function ApportionmentListDetailsPage() {
   }
 
   const listName = formatPoliticalGroupName(list);
-  let listDeceasedCandidates: DeceasedCandidate[] = [];
+  let listDeceasedCandidateNumbers: number[] = [];
   if (state?.type === "Finalised") {
-    listDeceasedCandidates = state.deceased_candidates.filter((dc) => list.number === dc.pg_number);
+    listDeceasedCandidateNumbers = state.deceased_candidates
+      .filter((dc) => list.number === dc.pg_number)
+      .map((dc) => dc.candidate_number);
   }
 
   if (error) {
@@ -194,17 +217,24 @@ export function ApportionmentListDetailsPage() {
             <article className={cls.article}>
               <div className={cn(cls.tableDiv, "mb-lg")}>
                 <div>
-                  <h2 className={cls.tableTitle}>{t("apportionment.assigned_number_of_seats")}</h2>
-                  <span id="text-list-assigned-nr-seats">
-                    {tx(
-                      `apportionment.list_assigned_nr_seats.${listTotalSeats === 1 ? "singular" : "plural"}`,
-                      {},
-                      {
-                        list_name: listName,
-                        num_seats: listTotalSeats,
-                      },
-                    )}
-                  </span>
+                  <div>
+                    <h2 className={cls.tableTitle}>{t("apportionment.assigned_number_of_seats")}</h2>
+                    <span id="text-list-assigned-nr-seats">
+                      {tx(
+                        `apportionment.list_assigned_nr_seats.${listTotalSeats === 1 ? "singular" : "plural"}`,
+                        {},
+                        {
+                          list_name: listName,
+                          num_seats: listTotalSeats,
+                        },
+                      )}
+                    </span>
+                  </div>
+                  {listDeceasedCandidateNumbers.length > 0 && (
+                    <div className={cn("mt-md-lg", cls.deceasedCandidatesAlert)}>
+                      {renderDeceasedCandidatesAlert(listDeceasedCandidateNumbers)}
+                    </div>
+                  )}
                 </div>
               </div>
               <PreferentiallyChosenCandidatesSection
@@ -221,7 +251,7 @@ export function ApportionmentListDetailsPage() {
               <TotalVotesPerCandidateSection
                 candidates={list.candidates}
                 candidateVotesList={candidateVotesList}
-                deceasedCandidates={listDeceasedCandidates}
+                deceasedCandidateNumbers={listDeceasedCandidateNumbers}
               />
             </article>
           </main>

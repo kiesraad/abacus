@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            UPDATE users\n            SET is_logged_in = EXISTS (\n                SELECT 1\n                FROM sessions\n                WHERE sessions.user_id = users.id\n            )\n            WHERE users.id = ?\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": []
+  },
+  "hash": "cedbd3d814cfc310aa294eece50aa6c35e3a61a34ff0e6baa85a9d25b1cff6fb"
+}

@@ -32,6 +32,7 @@ pub struct User {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(value_type = String)]
     last_activity_at: Option<DateTime<Utc>>,
+    is_logged_in: bool,
     #[schema(value_type = String)]
     updated_at: DateTime<Utc>,
     #[schema(value_type = String)]
@@ -89,6 +90,20 @@ impl User {
         self.needs_password_change
     }
 
+    pub fn is_logged_in(&self) -> bool {
+        self.is_logged_in
+    }
+
+    /// Updates `is_logged_in` field.
+    pub async fn update_is_logged_in(
+        &self,
+        conn: &mut SqliteConnection,
+    ) -> Result<(), sqlx::Error> {
+        update_is_logged_in(conn, self.id()).await?;
+
+        Ok(())
+    }
+
     #[cfg(test)]
     pub fn test_user(role: Role, user_id: UserId) -> Self {
         Self {
@@ -102,6 +117,7 @@ impl User {
             )
             .unwrap(),
             last_activity_at: None,
+            is_logged_in: false,
             updated_at: Utc::now(),
             created_at: Utc::now(),
         }
@@ -159,6 +175,7 @@ pub async fn create(
             needs_password_change as "needs_password_change: bool",
             role as "role: _",
             last_activity_at as "last_activity_at: _",
+            is_logged_in as "is_logged_in: bool",
             updated_at as "updated_at: _",
             created_at as "created_at: _"
         "#,
@@ -279,6 +296,7 @@ pub async fn get_by_username(
             password_hash,
             needs_password_change as "needs_password_change: bool",
             last_activity_at as "last_activity_at: _",
+            is_logged_in as "is_logged_in: bool",
             updated_at as "updated_at: _",
             created_at as "created_at: _"
         FROM users WHERE username = ? COLLATE NOCASE
@@ -307,6 +325,7 @@ pub async fn get_by_id(
             password_hash,
             needs_password_change as "needs_password_change: bool",
             last_activity_at as "last_activity_at: _",
+            is_logged_in as "is_logged_in: bool",
             updated_at as "updated_at: _",
             created_at as "created_at: _"
         FROM users WHERE id = ?
@@ -333,6 +352,7 @@ pub async fn list(
             needs_password_change as "needs_password_change: bool",
             role as "role: _",
             last_activity_at as "last_activity_at: _",
+            is_logged_in as "is_logged_in: bool",
             updated_at as "updated_at: _",
             created_at as "created_at: _"
         FROM users
@@ -385,6 +405,27 @@ pub async fn update_last_activity_at(
 ) -> Result<(), sqlx::Error> {
     query!(
         r#"UPDATE users SET last_activity_at = CURRENT_TIMESTAMP WHERE id = ?"#,
+        user_id,
+    )
+    .fetch_all(conn)
+    .await?;
+    Ok(())
+}
+
+pub async fn update_is_logged_in(
+    conn: &mut SqliteConnection,
+    user_id: UserId,
+) -> Result<(), sqlx::Error> {
+    query!(
+        r#"
+            UPDATE users
+            SET is_logged_in = EXISTS (
+                SELECT 1
+                FROM sessions
+                WHERE sessions.user_id = users.id
+            )
+            WHERE users.id = ?
+        "#,
         user_id,
     )
     .fetch_all(conn)
@@ -631,6 +672,7 @@ mod tests {
             )
             .unwrap(),
             last_activity_at: None,
+            is_logged_in: false,
             updated_at: chrono::Utc::now(),
             created_at: chrono::Utc::now(),
         };

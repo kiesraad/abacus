@@ -235,6 +235,9 @@ async fn login(
     let session = Session::create(user.id(), &user_agent, &ip, SESSION_LIFE_TIME);
     session_repo::save(&mut tx, &session).await?;
 
+    // Update the user's online status
+    user.update_is_logged_in(&mut tx).await?;
+
     // Log the login event
     let logged_in_users_count = session_repo::count(&mut tx).await?;
     audit_service
@@ -480,11 +483,11 @@ async fn logout(
     // Log audit event when a valid session exists
     let mut tx = pool.begin_immediate().await?;
 
-    if let Some(session) = session_repo::get_by_key(&mut tx, session_key)
+    let session = session_repo::get_by_key(&mut tx, session_key)
         .await
         .ok()
-        .flatten()
-    {
+        .flatten();
+    if let Some(session) = &session {
         // Log the logout event
         audit_service
             .log(
@@ -499,6 +502,14 @@ async fn logout(
 
     // Remove session from the database
     session_repo::delete(&mut tx, session_key).await?;
+
+    // Update the user's online status
+    if let Some(session) = &session {
+        let user = user_repo::get_by_id(&mut tx, session.user_id())
+            .await?
+            .ok_or(sqlx::Error::RowNotFound)?;
+        user.update_is_logged_in(&mut tx).await?;
+    }
 
     // Commit the transaction
     tx.commit().await?;

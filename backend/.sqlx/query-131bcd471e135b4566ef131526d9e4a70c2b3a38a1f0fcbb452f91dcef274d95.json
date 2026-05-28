@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "INSERT INTO users (username, fullname, password_hash, needs_password_change, role)\n        VALUES (?, ?, ?, ?, ?)\n        RETURNING\n            id as \"id: UserId\",\n            username,\n            fullname,\n            password_hash,\n            needs_password_change as \"needs_password_change: bool\",\n            role as \"role: _\",\n            last_activity_at as \"last_activity_at: _\",\n            updated_at as \"updated_at: _\",\n            created_at as \"created_at: _\"\n        ",
+  "query": "INSERT INTO users (username, fullname, password_hash, needs_password_change, role)\n        VALUES (?, ?, ?, ?, ?)\n        RETURNING\n            id as \"id: UserId\",\n            username,\n            fullname,\n            password_hash,\n            needs_password_change as \"needs_password_change: bool\",\n            role as \"role: _\",\n            last_activity_at as \"last_activity_at: _\",\n            is_logged_in as \"is_logged_in: bool\",\n            updated_at as \"updated_at: _\",\n            created_at as \"created_at: _\"\n        ",
   "describe": {
     "columns": [
       {
@@ -39,13 +39,18 @@
         "type_info": "Text"
       },
       {
-        "name": "updated_at: _",
+        "name": "is_logged_in: bool",
         "ordinal": 7,
+        "type_info": "Integer"
+      },
+      {
+        "name": "updated_at: _",
+        "ordinal": 8,
         "type_info": "Text"
       },
       {
         "name": "created_at: _",
-        "ordinal": 8,
+        "ordinal": 9,
         "type_info": "Text"
       }
     ],
@@ -61,8 +66,9 @@
       false,
       true,
       false,
+      false,
       false
     ]
   },
-  "hash": "4c24c34e45c02ec3f069e00a3bd9a469ef7f7c4be2bad496517f350a40fbd446"
+  "hash": "131bcd471e135b4566ef131526d9e4a70c2b3a38a1f0fcbb452f91dcef274d95"
 }

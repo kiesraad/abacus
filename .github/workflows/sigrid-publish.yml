@@ -23,6 +23,7 @@ jobs:
           customer: kiesraad
           system: abacus
           convert: rust
+          capability: maintainability,osh,security
           publishonly: true
         env:
           SIGRID_CI_TOKEN: "${{ secrets.SIGRID_CI_TOKEN }}"

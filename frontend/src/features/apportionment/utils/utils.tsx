@@ -27,15 +27,3 @@ export function apportionmentCheckStateAndRedirect(
     void navigate(`/elections/${electionId}/apportionment/deceased-candidates`);
   }
 }
-
-export function deceasedCandidatesCheckStateAndRedirect(
-  state: ApportionmentState | undefined,
-  electionId: number,
-  navigate: NavigateFunction,
-) {
-  if (state?.type === "Uninitialised") {
-    void navigate(`/elections/${electionId}/apportionment/include-all-candidates`);
-  } else if (state?.type === "Finalised") {
-    void navigate(`/elections/${electionId}/apportionment`);
-  }
-}

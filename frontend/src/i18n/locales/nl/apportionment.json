@@ -6,6 +6,7 @@
   "article_p10": "(Kieswet, artikel P 10)",
   "assigned_number_of_seats": "Toegewezen aantal zetels",
   "average": "Gemiddelde",
+  "below_candidates_are_deceased": "Onderstaande kandidaten worden als gevolg van overlijden bij de zetelverdeling buiten beschouwing gelaten. De zetelverdeling is al berekend.",
   "candidates_for_apportionment": "Kandidaten voor zetelverdeling",
   "chosen_candidates": "Gekozen kandidaten",
   "data_entry_finished": "Invoerfase afgerond",
@@ -64,6 +65,7 @@
   "ranking_candidates": "Rangschikking van kandidaten voor opvolging",
   "ranking_candidates_empty": "Geen enkele kandidaat is niet gekozen.",
   "ranking_candidates_info": "De volgende kandidaten hebben geen zetel toegewezen gekregen. Als een zetel vrijkomt wordt deze via de onderstaande volgorde aan opvolgers toegewezen.",
+  "redo_apportionment": "Doe dan de zetelverdeling opnieuw",
   "remainder": "Overschot",
   "remaining_residual_seats_assignment": "Verdeling overige restzetels",
   "remaining_residual_seats_amount_and_information": {
@@ -102,5 +104,6 @@
   "turnout": "Opkomst",
   "view_details": "bekijk details",
   "voters": "Kiesgerechtigden",
+  "want_to_make_changes": "Wil je wijzigingen aanbrengen in de buiten beschouwing gelaten kandidaten?",
   "which_candidates_are_deceased": "Geef aan welke kandidaat of kandidaten als gevolg van overlijden bij de zetelverdeling buiten beschouwing moeten worden gelaten."
 }

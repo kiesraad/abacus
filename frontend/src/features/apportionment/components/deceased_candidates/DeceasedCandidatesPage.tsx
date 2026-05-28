@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
-import { type To, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 import { type AnyApiError, type ApiResult, isSuccess } from "@/api/ApiResult";
 import { useApiClient } from "@/api/useApiClient";
+import { IconArrowRight } from "@/components/generated/icons";
 import { Button } from "@/components/ui/Button/Button";
+import { Icon } from "@/components/ui/Icon/Icon";
 import { Loader } from "@/components/ui/Loader/Loader";
 import { Table } from "@/components/ui/Table/Table";
 import { useElection } from "@/hooks/election/useElection";
@@ -17,7 +19,7 @@ import type {
   FINALISE_DECEASED_CANDIDATES_REQUEST_PATH,
   PGNumber,
   PoliticalGroup,
-  REGISTER_DECEASED_CANDIDATES_REQUEST_PATH,
+  RESET_REQUEST_PATH,
 } from "@/types/generated/openapi";
 import { getCandidateFullName } from "@/utils/candidate";
 import { getPoliticalGroupName } from "@/utils/politicalGroup";
@@ -35,6 +37,7 @@ interface DetailedDeceasedCandidate {
 function renderDeceasedCandidatesTable(
   deceasedCandidates: DetailedDeceasedCandidate[],
   handleDeleteDeceasedCandidate: (candidateNumber: CandidateNumber, pgNumber: PGNumber) => void,
+  withDeleteLink: boolean,
 ) {
   return (
     <Table className={cls.deceasedCandidatesTable}>
@@ -42,7 +45,7 @@ function renderDeceasedCandidatesTable(
         <Table.HeaderCell>{t("candidate.deceased.singular")}</Table.HeaderCell>
         <Table.HeaderCell>{t("list")}</Table.HeaderCell>
         <Table.HeaderCell>{t("apportionment.position_on_list")}</Table.HeaderCell>
-        <Table.HeaderCell />
+        {withDeleteLink && <Table.HeaderCell />}
       </Table.Header>
       <Table.Body>
         {deceasedCandidates.map((deceasedCandidate) => {
@@ -56,17 +59,19 @@ function renderDeceasedCandidatesTable(
                 {getPoliticalGroupName(deceasedCandidate.list_number, deceasedCandidate.list_name)}
               </Table.Cell>
               <Table.Cell>{deceasedCandidate.candidate.number}</Table.Cell>
-              <Table.Cell>
-                <Button
-                  variant="underlined"
-                  size="md"
-                  onClick={() => {
-                    handleDeleteDeceasedCandidate(deceasedCandidate.candidate.number, deceasedCandidate.list_number);
-                  }}
-                >
-                  {t("delete")}
-                </Button>
-              </Table.Cell>
+              {withDeleteLink && (
+                <Table.Cell>
+                  <Button
+                    variant="underlined"
+                    size="md"
+                    onClick={() => {
+                      handleDeleteDeceasedCandidate(deceasedCandidate.candidate.number, deceasedCandidate.list_number);
+                    }}
+                  >
+                    {t("delete")}
+                  </Button>
+                </Table.Cell>
+              )}
             </Table.Row>
           );
         })}
@@ -123,24 +128,7 @@ export function DeceasedCandidatesPage() {
     deceasedCandidates = get_detailed_deceased_candidates(state.deceased_candidates, election.political_groups);
   }
 
-  async function registerDeceasedCandidates(navigateTo?: To) {
-    if (state?.type !== "RegisteringDeceasedCandidates") {
-      const path: REGISTER_DECEASED_CANDIDATES_REQUEST_PATH = `/api/elections/${election.id}/apportionment/register_deceased_candidates`;
-      const response: ApiResult<ApportionmentState> = await client.postRequest(path);
-
-      if (isSuccess(response)) {
-        await refetchState();
-      } else {
-        setApiError(response);
-      }
-    }
-    if (navigateTo) {
-      void navigate(navigateTo);
-    }
-  }
-
   async function handleDeleteDeceasedCandidate(candidateNumber: number, pgNumber: number) {
-    await registerDeceasedCandidates();
     const path: DELETE_DECEASED_CANDIDATE_REQUEST_PATH = `/api/elections/${election.id}/apportionment/delete_deceased_candidate`;
     const body: DELETE_DECEASED_CANDIDATE_REQUEST_BODY = { candidate_number: candidateNumber, pg_number: pgNumber };
     const response: ApiResult<ApportionmentState> = await client.postRequest(path, body);
@@ -164,6 +152,17 @@ export function DeceasedCandidatesPage() {
     }
   }
 
+  async function handleResetApportionmentState() {
+    const path: RESET_REQUEST_PATH = `/api/elections/${election.id}/apportionment/reset`;
+    const response: ApiResult<ApportionmentState> = await client.postRequest(path);
+
+    if (isSuccess(response)) {
+      await refetchState();
+    } else {
+      setApiError(response);
+    }
+  }
+
   return (
     <>
       {renderTitleAndHeader(t("candidate.deceased.plural"))}
@@ -174,32 +173,49 @@ export function DeceasedCandidatesPage() {
           ) : (
             (state?.type === "RegisteringDeceasedCandidates" || state?.type === "Finalised") && (
               <div className={cls.container}>
-                <div className="w-39">{t("apportionment.which_candidates_are_deceased")}</div>
-                <div className={cls.tableContainer}>
-                  {deceasedCandidates.length > 0 &&
-                    renderDeceasedCandidatesTable(
+                <div className="w-39">
+                  {/* TODO: Add different text when Finalised and no deceased candidates */}
+                  {state.type === "RegisteringDeceasedCandidates"
+                    ? t("apportionment.which_candidates_are_deceased")
+                    : t("apportionment.below_candidates_are_deceased")}
+                </div>
+                {deceasedCandidates.length > 0 && (
+                  <div className="mt-sm">
+                    {renderDeceasedCandidatesTable(
                       deceasedCandidates,
                       (candidateNumber, pgNumber) => void handleDeleteDeceasedCandidate(candidateNumber, pgNumber),
+                      state.type === "RegisteringDeceasedCandidates",
                     )}
+                  </div>
+                )}
+                {state.type === "RegisteringDeceasedCandidates" && (
                   <div className="ml-md-lg">
-                    <Button
+                    <Button.Link
                       variant="underlined"
                       size="md"
-                      onClick={() =>
-                        void registerDeceasedCandidates(
-                          `/elections/${election.id}/apportionment/deceased-candidates/add`,
-                        )
-                      }
+                      to={`/elections/${election.id}/apportionment/deceased-candidates/add`}
                     >
                       {`+ ${t("candidate.add")}`}
+                    </Button.Link>
+                  </div>
+                )}
+                {state.type === "RegisteringDeceasedCandidates" ? (
+                  <div className="mt-md-lg">
+                    <Button onClick={() => void handleFinaliseDeceasedCandidates()}>
+                      {t("apportionment.to_apportionment")}
                     </Button>
                   </div>
-                </div>
-                <div className="mt-md">
-                  <Button onClick={() => void handleFinaliseDeceasedCandidates()}>
-                    {t("apportionment.to_apportionment")}
-                  </Button>
-                </div>
+                ) : (
+                  <div className="mt-md-lg">
+                    {t("apportionment.want_to_make_changes")}
+                    <div className={cls.resetSection}>
+                      <Icon size="xs" icon={<IconArrowRight />} />
+                      <Button variant="not-underlined" size="md" onClick={() => void handleResetApportionmentState()}>
+                        {t("apportionment.redo_apportionment")}
+                      </Button>
+                    </div>
+                  </div>
+                )}
               </div>
             )
           )}

@@ -10,6 +10,7 @@ export const Default: StoryObj = {
         id="test-table"
         candidateList={lt19Seats.political_group_1.candidates}
         candidateVotesList={lt19Seats.political_group_1_candidate_nomination.preferential_candidate_nomination}
+        deceasedCandidatesList={[{ pg_number: 1, candidate_number: 3 }]}
       />
     );
   },
@@ -22,7 +23,7 @@ export const Default: StoryObj = {
       ["1", "Oud, L. (Lidewij) (v)", "Test Location", "138"],
       ["6", "Van der Weijden, B. (Berta) (v)", "Test Location (BE)", "100"],
       ["7", "Oud, K. (Klaas) (m)", "Test Location", "60"],
-      ["3", "Oud, M. (Marijke) (v)", "Test Location", "55"],
+      ["3", "Oud, M. (Marijke) (v) †", "Test Location", "55"],
       ["5", "Van der Weijden, H. (Henk) (m)", "Test Location", "50"],
       ["11", "De Jong, R. (Rolf) (m)", "Test Location", "50"],
       ["4", "Jansen, A. (Arie) (m)", "Test Location", "45"],

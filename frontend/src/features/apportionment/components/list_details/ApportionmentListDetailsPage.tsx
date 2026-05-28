@@ -4,7 +4,7 @@ import { NotFoundError } from "@/api/ApiResult";
 import { useElection } from "@/hooks/election/useElection";
 import { useNumericParam } from "@/hooks/useNumericParam";
 import { t, tx } from "@/i18n/translate";
-import type { Candidate, CandidateVotes } from "@/types/generated/openapi";
+import type { Candidate, CandidateVotes, DeceasedCandidate } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 import { formatPoliticalGroupName } from "@/utils/politicalGroup";
 import { useApportionmentContext } from "../../hooks/useApportionmentContext";
@@ -121,9 +121,14 @@ function UnelectedCandidatesRankingSection({ unelectedCandidatesRanking }: Unele
 interface TotalVotesPerCandidateSectionProps {
   candidateVotesList: CandidateVotes[];
   candidates: Candidate[];
+  deceasedCandidates: DeceasedCandidate[];
 }
 
-function TotalVotesPerCandidateSection({ candidateVotesList, candidates }: TotalVotesPerCandidateSectionProps) {
+function TotalVotesPerCandidateSection({
+  candidateVotesList,
+  candidates,
+  deceasedCandidates,
+}: TotalVotesPerCandidateSectionProps) {
   return (
     <div className={cn(cls.tableDiv, "mb-lg")}>
       <div>
@@ -132,6 +137,7 @@ function TotalVotesPerCandidateSection({ candidateVotesList, candidates }: Total
           id="total-votes-per-candidate-table"
           candidateList={candidates}
           candidateVotesList={candidateVotesList}
+          deceasedCandidatesList={deceasedCandidates}
         />
       </div>
     </div>
@@ -155,6 +161,10 @@ export function ApportionmentListDetailsPage() {
   }
 
   const listName = formatPoliticalGroupName(list);
+  let listDeceasedCandidates: DeceasedCandidate[] = [];
+  if (state?.type === "Finalised") {
+    listDeceasedCandidates = state.deceased_candidates.filter((dc) => list.number === dc.pg_number);
+  }
 
   if (error) {
     return <ApportionmentErrorPage sectionTitle={listName} error={error} />;
@@ -208,7 +218,11 @@ export function ApportionmentListDetailsPage() {
                 startSeatNumber={listCandidateNomination.preferential_candidate_nomination.length + 1}
               />
               <UnelectedCandidatesRankingSection unelectedCandidatesRanking={unelectedCandidatesRanking} />
-              <TotalVotesPerCandidateSection candidates={list.candidates} candidateVotesList={candidateVotesList} />
+              <TotalVotesPerCandidateSection
+                candidates={list.candidates}
+                candidateVotesList={candidateVotesList}
+                deceasedCandidates={listDeceasedCandidates}
+              />
             </article>
           </main>
         </>

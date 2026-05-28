@@ -100,6 +100,7 @@ pub struct CsbGeneratedFiles {
     pub attachment_pdf: GeneratedFile,
 }
 
+#[derive(Debug)]
 pub struct CsbFiles {
     pub results_eml: Option<File>,
     pub total_counts_eml: Option<File>,

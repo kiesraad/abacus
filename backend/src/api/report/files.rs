@@ -250,6 +250,7 @@ mod tests {
             investigation::{InvestigationConcludedWithoutNewResults, InvestigationStatus},
             polling_station::PollingStationId,
         },
+        error::assert_delegated,
         infra::audit_log::list_event_names,
         repository::{
             committee_session_repo::{self, change_status},
@@ -398,11 +399,11 @@ mod tests {
         let mut conn = pool.acquire().await.unwrap();
         let audit_service = AuditService::new(None, None);
 
-        // Error because committee session is not completed
-        let result =
+        let error =
             get_files_csb_election(&pool, audit_service.clone(), CommitteeSessionId::from(801))
-                .await;
-        assert!(result.is_err());
+                .await
+                .expect_err("committee session should not be completed");
+        assert_delegated(error, &CommitteeSessionError::InvalidCommitteeSessionStatus);
 
         // Change committee session status to completed
         change_status(
@@ -413,10 +414,11 @@ mod tests {
         .await
         .unwrap();
 
-        let result =
+        let error =
             get_files_csb_election(&pool, audit_service.clone(), CommitteeSessionId::from(801))
-                .await;
-        assert!(result.is_err());
+                .await
+                .expect_err("committee session details should be missing");
+        assert_delegated(error, &CommitteeSessionError::InvalidCommitteeSessionStatus);
 
         // Change committee session details
         committee_session_repo::update(
@@ -428,11 +430,11 @@ mod tests {
         .await
         .unwrap();
 
-        // Error because apportionment state is not finalised
-        let result =
+        let error =
             get_files_csb_election(&pool, audit_service.clone(), CommitteeSessionId::from(801))
-                .await;
-        assert!(result.is_err());
+                .await
+                .expect_err("apportionment state should not be finalised");
+        assert_delegated(error, &ReportApiError::ApportionmentStateNotFinalised);
 
         // Finalise apportionment state
         update_apportionment_state(

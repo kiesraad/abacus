@@ -149,7 +149,7 @@ describe("DeceasedCandidatesPage", () => {
 
     expect(
       await screen.findByText(
-        "Onderstaande kandidaten worden als gevolg van overlijden bij de zetelverdeling buiten beschouwing gelaten. De zetelverdeling is al berekend.",
+        "De zetelverdeling is al berekend. Onderstaande kandidaten zijn als gevolg van overlijden bij de zetelverdeling buiten beschouwing gelaten.",
       ),
     ).toBeVisible();
 
@@ -160,6 +160,41 @@ describe("DeceasedCandidatesPage", () => {
       ["Oud, L. (Lidewij) †", "Lijst 1 - Political Group A", "1"],
     ]);
 
+    expect(screen.queryByRole("button", { name: "+ Kandidaat toevoegen" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Naar zetelverdeling" })).not.toBeInTheDocument();
+
+    expect(
+      await screen.findByText("Wil je wijzigingen aanbrengen in de buiten beschouwing gelaten kandidaten?"),
+    ).toBeVisible();
+    const resetButton = await screen.findByRole("button", { name: "Doe dan de zetelverdeling opnieuw" });
+    expect(resetButton).toBeVisible();
+    await user.click(resetButton);
+
+    expect(resetApportionmentState).toHaveBeenCalled();
+    expect(getApportionmentState).toHaveBeenCalled();
+  });
+
+  test("Renders no table for state Finalised and no deceased candidates and resets on clicking redo apportionment", async () => {
+    vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
+    server.use(ResetApportionmentStateRequestHandler);
+    const resetApportionmentState = spyOnHandler(ResetApportionmentStateRequestHandler);
+    const getApportionmentState = spyOnHandler(GetApportionmentStateRequestHandler);
+    overrideOnce("get", "/api/elections/3/apportionment/state", 200, {
+      deceased_candidates: [],
+      type: "Finalised",
+    });
+    const user = userEvent.setup();
+
+    renderDeceasedCandidatesPage(3, false);
+    expect(await screen.findByRole("heading", { level: 1, name: "Overleden kandidaten" }));
+
+    expect(
+      await screen.findByText(
+        "De zetelverdeling is al berekend. Alle kandidaten zijn meegenomen bij het verdelen van de zetels. Er zijn geen kandidaten buiten beschouwing gelaten vanwege overlijden.",
+      ),
+    ).toBeVisible();
+
+    expect(screen.queryByRole("table")).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "+ Kandidaat toevoegen" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Naar zetelverdeling" })).not.toBeInTheDocument();
 

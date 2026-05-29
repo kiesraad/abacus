@@ -5,7 +5,7 @@ import { Alert } from "@/components/ui/Alert/Alert";
 import { useElection } from "@/hooks/election/useElection";
 import { useNumericParam } from "@/hooks/useNumericParam";
 import { t, tx } from "@/i18n/translate";
-import type { Candidate, CandidateVotes } from "@/types/generated/openapi";
+import type { Candidate, CandidateVotes, ListCandidateNomination, PoliticalGroup } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 import { formatPoliticalGroupName } from "@/utils/politicalGroup";
 import { formatList } from "@/utils/strings";
@@ -164,7 +164,18 @@ function TotalVotesPerCandidateSection({
   );
 }
 
-// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO: Is there any way to make this shorter?
+function getUnelectedCandidatesRanking(
+  listCandidateNomination: ListCandidateNomination,
+  listTotalSeats: number,
+  list: PoliticalGroup,
+): Candidate[] {
+  if (listCandidateNomination.updated_candidate_ranking.length > 0) {
+    return listCandidateNomination.updated_candidate_ranking.slice(listTotalSeats);
+  } else {
+    return list.candidates.slice(listTotalSeats);
+  }
+}
+
 export function ApportionmentListDetailsPage() {
   const navigate = useNavigate();
   const { election } = useElection();
@@ -204,12 +215,7 @@ export function ApportionmentListDetailsPage() {
     );
 
     if (listTotalSeats !== undefined && candidateVotesList && listCandidateNomination) {
-      let unelectedCandidatesRanking: Candidate[];
-      if (listCandidateNomination.updated_candidate_ranking.length > 0) {
-        unelectedCandidatesRanking = listCandidateNomination.updated_candidate_ranking.slice(listTotalSeats);
-      } else {
-        unelectedCandidatesRanking = list.candidates.slice(listTotalSeats);
-      }
+      const unelectedCandidatesRanking = getUnelectedCandidatesRanking(listCandidateNomination, listTotalSeats, list);
       return (
         <>
           {renderTitleAndHeader(listName)}

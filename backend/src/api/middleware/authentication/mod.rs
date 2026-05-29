@@ -259,6 +259,59 @@ mod tests {
     }
 
     #[test(sqlx::test(fixtures("../../../../fixtures/users.sql")))]
+    async fn test_user_online_status_before_login(pool: SqlitePool) {
+        let app = create_app(&pool);
+
+        let cookie = login_as_admin(app.clone()).await;
+
+        // Get the a second user that hasn't logged in
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .method(Method::GET)
+                    .uri("/api/users/2")
+                    .header(CONTENT_TYPE, "application/json")
+                    .header(USER_AGENT, TEST_USER_AGENT)
+                    .header(COOKIE, &cookie)
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let result: User = serde_json::from_slice(&body).unwrap();
+        assert!(!result.is_logged_in());
+    }
+
+    #[test(sqlx::test(fixtures("../../../../fixtures/users.sql")))]
+    async fn test_user_online_status_after_login(pool: SqlitePool) {
+        let app = create_app(&pool);
+
+        let cookie = login_as_admin(app.clone()).await;
+
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method(Method::GET)
+                    .uri("/api/users/1")
+                    .header(CONTENT_TYPE, "application/json")
+                    .header(USER_AGENT, TEST_USER_AGENT)
+                    .header(COOKIE, &cookie)
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let result: User = serde_json::from_slice(&body).unwrap();
+
+        assert!(result.is_logged_in());
+    }
+
+    #[test(sqlx::test(fixtures("../../../../fixtures/users.sql")))]
     async fn test_logout(pool: SqlitePool) {
         let app = create_app(&pool);
 
@@ -312,6 +365,91 @@ mod tests {
             response.headers()["clear-site-data"],
             r#""cookies","storage""#
         );
+    }
+
+    #[test(sqlx::test(fixtures("../../../../fixtures/users.sql")))]
+    async fn test_user_online_status_after_logout(pool: SqlitePool) {
+        let app = create_app(&pool);
+
+        let cookie_admin_1 = login_as_admin(app.clone()).await;
+
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method(Method::POST)
+                    .uri("/api/login")
+                    .header(CONTENT_TYPE, "application/json")
+                    .header(USER_AGENT, TEST_USER_AGENT)
+                    .body(Body::from(
+                        serde_json::to_vec(&Credentials {
+                            username: "admin2".to_string(),
+                            password: "Admin2Password01".to_string(),
+                        })
+                        .unwrap(),
+                    ))
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        let cookie_admin_2 = response.headers().get("set-cookie").unwrap().clone();
+
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method(Method::GET)
+                    .uri("/api/users/2")
+                    .header(CONTENT_TYPE, "application/json")
+                    .header(USER_AGENT, TEST_USER_AGENT)
+                    .header(COOKIE, &cookie_admin_1)
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let result: User = serde_json::from_slice(&body).unwrap();
+
+        // User 2 is currently logged in
+        assert!(result.is_logged_in());
+
+        // Logout user 2
+        let _ = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method(Method::POST)
+                    .uri("/api/logout")
+                    .header(COOKIE, &cookie_admin_2)
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method(Method::GET)
+                    .uri("/api/users/2")
+                    .header(CONTENT_TYPE, "application/json")
+                    .header(USER_AGENT, TEST_USER_AGENT)
+                    .header(COOKIE, &cookie_admin_1)
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let result: User = serde_json::from_slice(&body).unwrap();
+
+        // User 2 is currently logged out
+        assert!(!result.is_logged_in());
     }
 
     #[test(sqlx::test(fixtures("../../../../fixtures/users.sql")))]

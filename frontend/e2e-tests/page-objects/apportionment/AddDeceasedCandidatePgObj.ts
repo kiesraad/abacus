@@ -12,6 +12,10 @@ export class AddDeceasedCandidate {
     this.candidates = page.getByTestId("candidates").locator("tbody").getByRole("row");
   }
 
+  async clickList(listNumber: number) {
+    await this.page.getByTestId(`list-item-group-${listNumber}`).click();
+  }
+
   async clickCandidateFromList(candidateNumber: number) {
     await this.page.getByTestId(`candidate-${candidateNumber}`).click();
   }

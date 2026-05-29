@@ -60,7 +60,10 @@ function renderDeceasedCandidatesTable(
       <Table.Body>
         {deceasedCandidates.map((deceasedCandidate) => {
           return (
-            <Table.Row key={`${deceasedCandidate.list_number}-${deceasedCandidate.candidate.number}`}>
+            <Table.Row
+              key={`${deceasedCandidate.list_number}-${deceasedCandidate.candidate.number}`}
+              id={`list-${deceasedCandidate.list_number}-candidate-${deceasedCandidate.candidate.number}`}
+            >
               <Table.Cell className={"bold"}>
                 {getCandidateFullName(deceasedCandidate.candidate)}
                 {<span className="superscript">&nbsp;&nbsp;&dagger;</span>}

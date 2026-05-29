@@ -8,15 +8,15 @@ import { ErrorModalPgObj } from "e2e-tests/page-objects/ErrorModalPgObj";
 import { test } from "../../fixtures";
 
 test.use({
-  storageState: "e2e-tests/state/typist1.json",
+  storageState: "e2e-tests/state/typist1-GSB.json",
 });
 
 test.describe("data entry - api error responses", () => {
   test("UI Warning: Trying to load a data entry that was already claimed", async ({
-    typistTwo,
+    typistTwoGSB,
     dataEntryGSBFirstEntryClaimed,
   }) => {
-    const { page } = typistTwo;
+    const { page } = typistTwoGSB;
     await page.goto(
       `/elections/${dataEntryGSBFirstEntryClaimed.election_id}/data-entry/${dataEntryGSBFirstEntryClaimed.id}/1`,
     );

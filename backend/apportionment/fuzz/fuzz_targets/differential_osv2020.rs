@@ -130,25 +130,6 @@ fn init() {
 }
 
 fn fuzz(data: FuzzedApportionmentInput) {
-    // Skip cases where any list has an absolute majority of votes
-    // related issue: #3219
-    let total_votes = data
-        .list_votes
-        .iter()
-        .flat_map(|list| list.candidate_votes.iter())
-        .map(|cv| cv.votes())
-        .sum::<u32>();
-    
-    if data.list_votes.iter().any(|list| {
-        list.candidate_votes
-            .iter()
-            .map(|cv| cv.votes())
-            .sum::<u32>()
-            > (total_votes / 2)
-    }) {
-        return;
-    }
-
     // Convert current data structure to OSV2020 wrapper format
     let pg_candidates: Vec<i64> = data
         .list_votes
@@ -167,6 +148,26 @@ fn fuzz(data: FuzzedApportionmentInput) {
         osv2020_apportionment(data.seats.into(), &pg_candidates, &votes);
 
     let (abacus_result, abacus_log) = run_with_log(|| process(&data));
+
+    // Skip cases where there are fewer than 19 seats and both art. P 9 (absolute majority) and art. P 10 (list exhaustion) are applied.
+    // Reason is that Abacus does not include the P 9-seat for the max. one seat requirement when assiging residual seats.
+    // related issue: #3219
+    if data.seats < 19
+        && osv2020_log
+            .iter()
+            .any(|line| line.contains("Absolute Mehrheit"))
+        && osv2020_log
+            .iter()
+            .any(|line| line.contains("Erschöpfte Listen"))
+        && abacus_log.contains(
+            "in accordance with Article P 9 Kieswet"
+        )
+        && abacus_log.contains(
+            "assigned to another list in accordance with Article P 10 Kieswet"
+        )
+    {
+        return;
+    }
 
     match abacus_result {
         Ok(ref output) => {
@@ -199,7 +200,7 @@ fn fuzz(data: FuzzedApportionmentInput) {
                             .iter()
                             .any(|line| line.contains("Erschöpfte Listen"))
                         && abacus_log.contains(
-                            "assigned to another list in accordance with Article P 10 Kieswet",
+                            "assigned to another list in accordance with Article P 10 Kieswet"
                         )
                     {
                         //do nothing, continue

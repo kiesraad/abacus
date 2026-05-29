@@ -34,6 +34,16 @@ interface DetailedDeceasedCandidate {
   list_name: string;
 }
 
+function renderPageDescription(state: ApportionmentState, deceasedCandidates: DetailedDeceasedCandidate[]) {
+  return (
+    <>
+      {state.type === "RegisteringDeceasedCandidates"
+        ? t("apportionment.which_candidates_are_deceased")
+        : `${t("apportionment.apportionment_already_calculated")} ${deceasedCandidates.length === 0 ? t("apportionment.no_candidates_are_deceased") : t("apportionment.below_candidates_are_deceased")}`}
+    </>
+  );
+}
+
 function renderDeceasedCandidatesTable(
   deceasedCandidates: DetailedDeceasedCandidate[],
   handleDeleteDeceasedCandidate: (candidateNumber: CandidateNumber, pgNumber: PGNumber) => void,
@@ -173,11 +183,7 @@ export function DeceasedCandidatesPage() {
           ) : (
             (state?.type === "RegisteringDeceasedCandidates" || state?.type === "Finalised") && (
               <div className={cls.container}>
-                <div className="w-39">
-                  {state.type === "RegisteringDeceasedCandidates"
-                    ? t("apportionment.which_candidates_are_deceased")
-                    : `${t("apportionment.apportionment_already_calculated")} ${deceasedCandidates.length === 0 ? t("apportionment.no_candidates_are_deceased") : t("apportionment.below_candidates_are_deceased")}`}
-                </div>
+                <div className="w-39">{renderPageDescription(state, deceasedCandidates)}</div>
                 {deceasedCandidates.length > 0 && (
                   <div className="mt-sm">
                     {renderDeceasedCandidatesTable(

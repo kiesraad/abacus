@@ -155,3 +155,9 @@ table.highestAveragesTable {
     }
   }
 }
+
+/* Styling for the apportionment finalised alert buttons */
+.alertButtons {
+  display: flex;
+  gap: 1rem;
+}

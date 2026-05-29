@@ -73,6 +73,7 @@
   "ranking_candidates_empty": "Geen enkele kandidaat is niet gekozen.",
   "ranking_candidates_info": "De volgende kandidaten hebben geen zetel toegewezen gekregen. Als een zetel vrijkomt wordt deze via de onderstaande volgorde aan opvolgers toegewezen.",
   "redo_apportionment": "Doe dan de zetelverdeling opnieuw",
+  "redo_apportionment_button": "Zetelverdeling opnieuw doen",
   "remainder": "Overschot",
   "remaining_residual_seats_assignment": "Verdeling overige restzetels",
   "remaining_residual_seats_amount_and_information": {

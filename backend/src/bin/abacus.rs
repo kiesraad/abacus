@@ -4,10 +4,14 @@ use std::{
     process,
 };
 
-use abacus::{AppError, create_sqlite_pool, infra::backup::BackupConfig, start_server};
+use abacus::{
+    AppError, create_sqlite_pool,
+    infra::backup::{BackupConfig, create_local_backup},
+    start_server,
+};
 use clap::Parser;
 use socket2::{Domain, Protocol, Socket, Type};
-use tokio::net::TcpListener;
+use tokio::{net::TcpListener, time::Duration};
 use tracing::{error, level_filters::LevelFilter};
 use tracing_subscriber::EnvFilter;
 
@@ -110,7 +114,17 @@ async fn run() -> Result<(), AppError> {
 
     let listener = TcpListener::from_std(socket.into())?;
 
-    //let backupconfig = BackupConfig {};
+    let backup_config = BackupConfig::new().expect("Failed to setup backup directory");
+    let backup_pool = pool.clone();
+    tokio::spawn(async move {
+        let mut interval = tokio::time::interval(Duration::from_mins(5));
+        loop {
+            interval.tick().await;
+            if let Err(e) = create_local_backup(&backup_pool, &backup_config).await {
+                tracing::error!("Backup failed: {e:?}");
+            }
+        }
+    });
 
     start_server(pool, listener, enable_airgap_detection).await
 }

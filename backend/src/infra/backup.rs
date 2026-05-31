@@ -2,8 +2,22 @@ use chrono::Local;
 use sqlx::SqlitePool;
 use std::path::{Path, PathBuf};
 
+#[derive(Clone)]
 pub struct BackupConfig {
     pub directory: PathBuf,
+}
+
+impl BackupConfig {
+    pub fn new() -> Result<Self, BackupError> {
+        let executable_path = std::env::current_exe()?;
+        let executable_directory = executable_path
+            .parent()
+            .ok_or(BackupError::NoExecutableDirectory)?;
+        let backup_directory = executable_directory.join("database_backups");
+        Ok(BackupConfig {
+            directory: backup_directory,
+        })
+    }
 }
 
 #[derive(Debug)]
@@ -44,20 +58,11 @@ fn create_backup_directory(backupconfig: &BackupConfig) -> Result<(), BackupErro
     Ok(())
 }
 
-pub fn store_backup_directory_path(backupconfig: &mut BackupConfig) -> Result<(), BackupError> {
-    let executable_path = std::env::current_exe()?;
-    let executable_directory = executable_path
-        .parent()
-        .ok_or(BackupError::NoExecutableDirectory)?;
-    let backup_directory = executable_directory.join("database_backups");
-    backupconfig.directory = backup_directory;
-    Ok(())
-}
-
 pub async fn create_local_backup(
     pool: &SqlitePool,
     backupconfig: &BackupConfig,
 ) -> Result<(), BackupError> {
+    create_backup_directory(&backupconfig)?;
     let filename = format!("backup_{}.db", Local::now().format("%Y-%m-%d_%H-%M-%S"));
     let backup_path = backupconfig.directory.join(filename);
     backup_database(pool, &backup_path).await?;
@@ -103,11 +108,8 @@ mod tests {
 
     #[test]
     fn backup_path_ends_with_correct_directory_name() {
-        let mut config = BackupConfig {
-            directory: PathBuf::new(),
-        };
-        store_backup_directory_path(&mut config).unwrap();
-        assert!(config.directory.ends_with("database_backups"));
+        let backup_config = BackupConfig::new().unwrap();
+        assert!(backup_config.directory.ends_with("database_backups"));
     }
 
     #[sqlx::test]

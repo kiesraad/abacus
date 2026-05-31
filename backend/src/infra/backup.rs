@@ -1,16 +1,35 @@
 use chrono::Local;
 use sqlx::SqlitePool;
-use std::error::Error;
 use std::path::{Path, PathBuf};
 
 pub struct BackupConfig {
     pub directory: PathBuf,
 }
 
-async fn backup_database(pool: &SqlitePool, destination: &Path) -> Result<(), Box<dyn Error>> {
+#[derive(Debug)]
+pub enum BackupError {
+    InvalidPath,
+    NoExecutableDirectory,
+    Io(std::io::Error),
+    Database(sqlx::Error),
+}
+
+impl From<std::io::Error> for BackupError {
+    fn from(error: std::io::Error) -> Self {
+        BackupError::Io(error)
+    }
+}
+
+impl From<sqlx::Error> for BackupError {
+    fn from(err: sqlx::Error) -> Self {
+        BackupError::Database(err)
+    }
+}
+
+async fn backup_database(pool: &SqlitePool, destination: &Path) -> Result<(), BackupError> {
     let destination = destination
         .to_str()
-        .ok_or("error formatting string")?
+        .ok_or(BackupError::InvalidPath)?
         .to_string();
     let mut connection = pool.acquire().await?;
     sqlx::query("VACUUM INTO ?")
@@ -20,14 +39,16 @@ async fn backup_database(pool: &SqlitePool, destination: &Path) -> Result<(), Bo
     Ok(())
 }
 
-fn create_backup_directory(backupconfig: &BackupConfig) -> Result<(), Box<dyn Error>> {
+fn create_backup_directory(backupconfig: &BackupConfig) -> Result<(), BackupError> {
     std::fs::create_dir_all(&backupconfig.directory)?;
     Ok(())
 }
 
-pub fn store_backup_directory_path(backupconfig: &mut BackupConfig) -> Result<(), Box<dyn Error>> {
+pub fn store_backup_directory_path(backupconfig: &mut BackupConfig) -> Result<(), BackupError> {
     let executable_path = std::env::current_exe()?;
-    let executable_directory = executable_path.parent().ok_or("parent does not exist")?;
+    let executable_directory = executable_path
+        .parent()
+        .ok_or(BackupError::NoExecutableDirectory)?;
     let backup_directory = executable_directory.join("database_backups");
     backupconfig.directory = backup_directory;
     Ok(())
@@ -36,7 +57,7 @@ pub fn store_backup_directory_path(backupconfig: &mut BackupConfig) -> Result<()
 pub async fn create_local_backup(
     pool: &SqlitePool,
     backupconfig: &BackupConfig,
-) -> Result<(), Box<dyn Error>> {
+) -> Result<(), BackupError> {
     let filename = format!("backup_{}.db", Local::now().format("%Y-%m-%d_%H-%M-%S"));
     let backup_path = backupconfig.directory.join(filename);
     backup_database(pool, &backup_path).await?;

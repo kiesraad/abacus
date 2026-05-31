@@ -1,4 +1,5 @@
 import { render as rtlRender } from "@testing-library/react";
+import * as ReactRouter from "react-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
@@ -6,7 +7,7 @@ import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { Providers } from "@/testing/Providers";
 import { overrideOnce } from "@/testing/server";
-import { expectErrorPage, render, screen, setupTestRouter } from "@/testing/test-utils";
+import { expectErrorPage, render, screen, setupTestRouter, waitFor } from "@/testing/test-utils";
 import type { ApportionmentState, ElectionApportionmentResponse, ErrorResponse } from "@/types/generated/openapi";
 import { apportionmentRoutes } from "../../routes";
 import * as gte19Seats from "../../testing/gte-19-seats";
@@ -17,32 +18,76 @@ import * as lt19SeatsAndP10 from "../../testing/lt-19-seats-and-p10";
 import { ApportionmentProvider } from "../ApportionmentProvider";
 import { ApportionmentResidualSeatsPage } from "./ApportionmentResidualSeatsPage";
 
-const renderApportionmentResidualSeatsPage = () =>
+const navigate = vi.fn();
+
+const renderApportionmentResidualSeatsPage = (electionId: number) =>
   render(
-    <ElectionProvider electionId={1}>
-      <ApportionmentProvider electionId={1}>
+    <ElectionProvider electionId={electionId}>
+      <ApportionmentProvider electionId={electionId}>
         <ApportionmentResidualSeatsPage />
       </ApportionmentProvider>
     </ElectionProvider>,
   );
 
 describe("ApportionmentResidualSeatsPage", () => {
-  beforeEach(() => {
-    overrideOnce("get", "/api/elections/1/apportionment/state", 200, {
-      deceased_candidates: [],
-      type: "Finalised",
-    } satisfies ApportionmentState);
+  test.each(
+    Object.values({
+      Uninitialised: {
+        state: { type: "Uninitialised" },
+        expectRedirectTo: "/elections/3/apportionment/include-all-candidates",
+      },
+      RegisteringDeceasedCandidates: {
+        state: { deceased_candidates: [], type: "RegisteringDeceasedCandidates" },
+        expectRedirectTo: "/elections/3/apportionment/deceased-candidates",
+      },
+      Finalised: {
+        state: { deceased_candidates: [], type: "Finalised" },
+        expectRedirectTo: undefined,
+      },
+    } satisfies Record<
+      ApportionmentState["type"],
+      { state: ApportionmentState; expectRedirectTo: string | undefined }
+    >),
+  )("Does not redirect only for finalised state ($state.type)", async ({ state, expectRedirectTo }) => {
+    vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
+    overrideOnce("get", "/api/elections/3", 200, getElectionMockData(lt19Seats.election, lt19Seats.committee_session));
+    overrideOnce("post", "/api/elections/3/apportionment", 200, {
+      seat_assignment: lt19Seats.seat_assignment,
+      candidate_nomination: lt19Seats.candidate_nomination,
+      election_summary: lt19Seats.election_summary,
+    } satisfies ElectionApportionmentResponse);
+    overrideOnce("get", "/api/elections/3/apportionment/state", 200, state);
+
+    renderApportionmentResidualSeatsPage(3);
+    expect(await screen.findByRole("heading", { level: 1, name: "Verdeling van de restzetels" })).toBeVisible();
+
+    if (expectRedirectTo) {
+      await waitFor(() => {
+        expect(navigate).toHaveBeenCalledWith(expectRedirectTo);
+      });
+    } else {
+      expect(navigate).not.toHaveBeenCalled();
+    }
   });
 
   test("Residual seats assignment highest averages table visible", async () => {
-    overrideOnce("get", "/api/elections/1", 200, getElectionMockData(gte19Seats.election));
-    overrideOnce("post", "/api/elections/1/apportionment", 200, {
+    overrideOnce(
+      "get",
+      "/api/elections/2",
+      200,
+      getElectionMockData(gte19Seats.election, gte19Seats.committee_session),
+    );
+    overrideOnce("post", "/api/elections/2/apportionment", 200, {
       seat_assignment: gte19Seats.seat_assignment,
       candidate_nomination: gte19Seats.candidate_nomination,
       election_summary: gte19Seats.election_summary,
     } satisfies ElectionApportionmentResponse);
+    overrideOnce("get", "/api/elections/2/apportionment/state", 200, {
+      deceased_candidates: [],
+      type: "Finalised",
+    } satisfies ApportionmentState);
 
-    renderApportionmentResidualSeatsPage();
+    renderApportionmentResidualSeatsPage(2);
 
     expect(await screen.findByRole("heading", { level: 1, name: "Verdeling van de restzetels" })).toBeVisible();
 
@@ -70,14 +115,23 @@ describe("ApportionmentResidualSeatsPage", () => {
   });
 
   test("Residual seats assignment highest averages table with footnotes and absolute majority change information visible", async () => {
-    overrideOnce("get", "/api/elections/1", 200, getElectionMockData(gte19SeatsAndP9.election));
-    overrideOnce("post", "/api/elections/1/apportionment", 200, {
+    overrideOnce(
+      "get",
+      "/api/elections/5",
+      200,
+      getElectionMockData(gte19SeatsAndP9.election, gte19SeatsAndP9.committee_session),
+    );
+    overrideOnce("post", "/api/elections/5/apportionment", 200, {
       seat_assignment: gte19SeatsAndP9.seat_assignment,
       candidate_nomination: gte19SeatsAndP9.candidate_nomination,
       election_summary: gte19SeatsAndP9.election_summary,
     } satisfies ElectionApportionmentResponse);
+    overrideOnce("get", "/api/elections/5/apportionment/state", 200, {
+      deceased_candidates: [],
+      type: "Finalised",
+    } satisfies ApportionmentState);
 
-    renderApportionmentResidualSeatsPage();
+    renderApportionmentResidualSeatsPage(5);
 
     expect(await screen.findByRole("heading", { level: 1, name: "Verdeling van de restzetels" }));
 
@@ -191,14 +245,18 @@ describe("ApportionmentResidualSeatsPage", () => {
   });
 
   test("Residual seats assignment largest remainders and unique highest averages tables visible", async () => {
-    overrideOnce("get", "/api/elections/1", 200, getElectionMockData(lt19Seats.election));
-    overrideOnce("post", "/api/elections/1/apportionment", 200, {
+    overrideOnce("get", "/api/elections/3", 200, getElectionMockData(lt19Seats.election, lt19Seats.committee_session));
+    overrideOnce("post", "/api/elections/3/apportionment", 200, {
       seat_assignment: lt19Seats.seat_assignment,
       candidate_nomination: lt19Seats.candidate_nomination,
       election_summary: lt19Seats.election_summary,
     } satisfies ElectionApportionmentResponse);
+    overrideOnce("get", "/api/elections/3/apportionment/state", 200, {
+      deceased_candidates: [],
+      type: "Finalised",
+    } satisfies ApportionmentState);
 
-    renderApportionmentResidualSeatsPage();
+    renderApportionmentResidualSeatsPage(3);
 
     expect(await screen.findByRole("heading", { level: 1, name: "Verdeling van de restzetels" })).toBeVisible();
 
@@ -236,8 +294,8 @@ describe("ApportionmentResidualSeatsPage", () => {
   });
 
   test("Residual seats assignment only largest remainders table visible", async () => {
-    overrideOnce("get", "/api/elections/1", 200, getElectionMockData(lt19Seats.election));
-    overrideOnce("post", "/api/elections/1/apportionment", 200, {
+    overrideOnce("get", "/api/elections/3", 200, getElectionMockData(lt19Seats.election, lt19Seats.committee_session));
+    overrideOnce("post", "/api/elections/3/apportionment", 200, {
       seat_assignment: {
         ...lt19Seats.seat_assignment,
         steps: lt19Seats.largest_remainder_steps,
@@ -245,8 +303,12 @@ describe("ApportionmentResidualSeatsPage", () => {
       candidate_nomination: lt19Seats.candidate_nomination,
       election_summary: lt19Seats.election_summary,
     } satisfies ElectionApportionmentResponse);
+    overrideOnce("get", "/api/elections/3/apportionment/state", 200, {
+      deceased_candidates: [],
+      type: "Finalised",
+    } satisfies ApportionmentState);
 
-    renderApportionmentResidualSeatsPage();
+    renderApportionmentResidualSeatsPage(3);
 
     expect(await screen.findByRole("heading", { level: 1, name: "Verdeling van de restzetels" })).toBeVisible();
 
@@ -270,14 +332,23 @@ describe("ApportionmentResidualSeatsPage", () => {
   });
 
   test("Residual seats assignment largest remainders table with footnotes and unique highest averages table and absolute majority change and list exhaustion information visible", async () => {
-    overrideOnce("get", "/api/elections/1", 200, getElectionMockData(lt19SeatsAndP9AndP10.election));
-    overrideOnce("post", "/api/elections/1/apportionment", 200, {
+    overrideOnce(
+      "get",
+      "/api/elections/4",
+      200,
+      getElectionMockData(lt19SeatsAndP9AndP10.election, lt19SeatsAndP9AndP10.committee_session),
+    );
+    overrideOnce("post", "/api/elections/4/apportionment", 200, {
       seat_assignment: lt19SeatsAndP9AndP10.seat_assignment,
       candidate_nomination: lt19SeatsAndP9AndP10.candidate_nomination,
       election_summary: lt19SeatsAndP9AndP10.election_summary,
     } satisfies ElectionApportionmentResponse);
+    overrideOnce("get", "/api/elections/4/apportionment/state", 200, {
+      deceased_candidates: [],
+      type: "Finalised",
+    } satisfies ApportionmentState);
 
-    renderApportionmentResidualSeatsPage();
+    renderApportionmentResidualSeatsPage(4);
 
     expect(await screen.findByRole("heading", { level: 1, name: "Verdeling van de restzetels" })).toBeVisible();
 
@@ -319,14 +390,23 @@ describe("ApportionmentResidualSeatsPage", () => {
   });
 
   test("Residual seats assignment largest remainders table with footnotes and unique highest averages and highest averages tables and list exhaustion information visible", async () => {
-    overrideOnce("get", "/api/elections/1", 200, getElectionMockData(lt19SeatsAndP10.election));
-    overrideOnce("post", "/api/elections/1/apportionment", 200, {
+    overrideOnce(
+      "get",
+      "/api/elections/6",
+      200,
+      getElectionMockData(lt19SeatsAndP10.election, lt19SeatsAndP10.committee_session),
+    );
+    overrideOnce("post", "/api/elections/6/apportionment", 200, {
       seat_assignment: lt19SeatsAndP10.seat_assignment,
       candidate_nomination: lt19SeatsAndP10.candidate_nomination,
       election_summary: lt19SeatsAndP10.election_summary,
     } satisfies ElectionApportionmentResponse);
+    overrideOnce("get", "/api/elections/6/apportionment/state", 200, {
+      deceased_candidates: [],
+      type: "Finalised",
+    } satisfies ApportionmentState);
 
-    renderApportionmentResidualSeatsPage();
+    renderApportionmentResidualSeatsPage(6);
 
     expect(await screen.findByRole("heading", { level: 1, name: "Verdeling van de restzetels" }));
 
@@ -373,15 +453,26 @@ describe("ApportionmentResidualSeatsPage", () => {
   });
 
   describe("Apportionment not yet available", () => {
+    beforeEach(() => {
+      overrideOnce(
+        "get",
+        "/api/elections/3",
+        200,
+        getElectionMockData(lt19Seats.election, lt19Seats.committee_session),
+      );
+      overrideOnce("get", "/api/elections/3/apportionment/state", 200, {
+        type: "Uninitialised",
+      } satisfies ApportionmentState);
+    });
+
     test("Not available until committee session is completed", async () => {
-      overrideOnce("get", "/api/elections/1", 200, getElectionMockData(lt19Seats.election));
-      overrideOnce("post", "/api/elections/1/apportionment", 412, {
+      overrideOnce("post", "/api/elections/3/apportionment", 412, {
         error: "Committee session not completed",
         fatal: false,
         reference: "ApportionmentCommitteeSessionNotCompleted",
       } satisfies ErrorResponse);
 
-      renderApportionmentResidualSeatsPage();
+      renderApportionmentResidualSeatsPage(3);
 
       // Wait for the page to be loaded
       expect(await screen.findByRole("heading", { level: 1, name: "Verdeling van de restzetels" })).toBeVisible();
@@ -398,14 +489,13 @@ describe("ApportionmentResidualSeatsPage", () => {
     });
 
     test("Not possible because drawing of lots is not implemented yet", async () => {
-      overrideOnce("get", "/api/elections/1", 200, getElectionMockData(lt19Seats.election));
-      overrideOnce("post", "/api/elections/1/apportionment", 422, {
+      overrideOnce("post", "/api/elections/3/apportionment", 422, {
         error: "Drawing of lots is required",
         fatal: false,
         reference: "ApportionmentDrawingOfLotsRequired",
       } satisfies ErrorResponse);
 
-      renderApportionmentResidualSeatsPage();
+      renderApportionmentResidualSeatsPage(3);
 
       // Wait for the page to be loaded
       expect(await screen.findByRole("heading", { level: 1, name: "Verdeling van de restzetels" })).toBeVisible();
@@ -413,58 +503,6 @@ describe("ApportionmentResidualSeatsPage", () => {
       expect(await screen.findByText("Zetelverdeling is niet mogelijk")).toBeVisible();
       expect(
         await screen.findByText("Loting is noodzakelijk, maar nog niet beschikbaar in deze versie van Abacus"),
-      ).toBeVisible();
-
-      expect(screen.queryByTestId("highest-averages-table")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("largest-remainders-table")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("unique-highest-averages-table")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("footnotes-list")).not.toBeInTheDocument();
-    });
-
-    test("Not possible because all lists are exhausted", async () => {
-      overrideOnce("get", "/api/elections/1", 200, getElectionMockData(lt19Seats.election));
-      overrideOnce("post", "/api/elections/1/apportionment", 422, {
-        error: "All lists are exhausted, not enough candidates to fill all seats",
-        fatal: false,
-        reference: "ApportionmentAllListsExhausted",
-      } satisfies ErrorResponse);
-
-      renderApportionmentResidualSeatsPage();
-
-      // Wait for the page to be loaded
-      expect(await screen.findByRole("heading", { level: 1, name: "Verdeling van de restzetels" })).toBeVisible();
-
-      expect(await screen.findByText("Zetelverdeling is niet mogelijk")).toBeVisible();
-      expect(
-        await screen.findByText(
-          "Er zijn te weinig kandidaten om alle aan lijsten toegewezen zetels te vullen. Abacus kan daarom geen zetelverdeling berekenen. Neem contact op met de Kiesraad.",
-        ),
-      ).toBeVisible();
-
-      expect(screen.queryByTestId("highest-averages-table")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("largest-remainders-table")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("unique-highest-averages-table")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("footnotes-list")).not.toBeInTheDocument();
-    });
-
-    test("Not possible because no votes on candidates cast", async () => {
-      overrideOnce("get", "/api/elections/1", 200, getElectionMockData(lt19Seats.election));
-      overrideOnce("post", "/api/elections/1/apportionment", 422, {
-        error: "No votes on candidates cast",
-        fatal: false,
-        reference: "ApportionmentZeroVotesCast",
-      } satisfies ErrorResponse);
-
-      renderApportionmentResidualSeatsPage();
-
-      // Wait for the page to be loaded
-      expect(await screen.findByRole("heading", { level: 1, name: "Verdeling van de restzetels" }));
-
-      expect(await screen.findByText("Zetelverdeling is niet mogelijk")).toBeVisible();
-      expect(
-        await screen.findByText(
-          "Er zijn geen stemmen op kandidaten uitgebracht. Abacus kan daarom geen zetelverdeling berekenen. Neem contact op met de Kiesraad.",
-        ),
       ).toBeVisible();
 
       expect(screen.queryByTestId("highest-averages-table")).not.toBeInTheDocument();
@@ -489,14 +527,13 @@ describe("ApportionmentResidualSeatsPage", () => {
         },
       ]);
 
-      overrideOnce("get", "/api/elections/1", 200, getElectionMockData(lt19Seats.election));
-      overrideOnce("post", "/api/elections/1/apportionment", 500, {
+      overrideOnce("post", "/api/elections/3/apportionment", 500, {
         error: "Internal Server Error",
         fatal: true,
         reference: "InternalServerError",
       });
 
-      await router.navigate("/elections/1/apportionment/details-residual-seats");
+      await router.navigate("/elections/3/apportionment/details-residual-seats");
 
       rtlRender(<Providers router={router} />);
 

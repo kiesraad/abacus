@@ -11,9 +11,7 @@ use crate::{
         election::ElectionId,
     },
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
-    repository::{
-        apportionment_state_repo, committee_session_repo, election_repo, user_repo::User,
-    },
+    repository::{apportionment_state_repo, committee_session_repo},
 };
 
 #[derive(Serialize)]
@@ -34,14 +32,10 @@ struct ApportionmentStateChange {
 /// and the committee session id to which this state belongs.
 pub async fn get_state(
     conn: &mut SqliteConnection,
-    user: User,
     election_id: ElectionId,
 ) -> Result<(CommitteeSessionId, ApportionmentState), APIError> {
-    let election = election_repo::get(conn, election_id).await?;
-    user.role().is_authorized(election.committee_category)?;
-
     let committee_session =
-        committee_session_repo::get_election_committee_session(conn, election.id).await?;
+        committee_session_repo::get_election_committee_session(conn, election_id).await?;
 
     if committee_session.status != CommitteeSessionStatus::Completed {
         return Err(ApportionmentApiError::CommitteeSessionNotCompleted.into());
@@ -62,11 +56,10 @@ pub async fn get_state(
 pub async fn update_state(
     conn: &mut SqliteConnection,
     audit_service: AuditService,
-    user: User,
     election_id: ElectionId,
     update_fn: impl FnOnce(ApportionmentState) -> Result<ApportionmentState, ApportionmentStateError>,
 ) -> Result<ApportionmentState, APIError> {
-    let (id, state) = get_state(conn, user, election_id).await?;
+    let (id, state) = get_state(conn, election_id).await?;
 
     let state = update_fn(state).map_err(|err| APIError::Delegated(Box::new(err)))?;
 
@@ -93,14 +86,9 @@ mod tests {
 
     use super::*;
     use crate::{
-        api::middleware::authentication::error::AuthenticationError,
-        domain::{
-            apportionment_state::DeceasedCandidate, committee_session::CommitteeSessionId,
-            role::Role,
-        },
+        domain::{apportionment_state::DeceasedCandidate, committee_session::CommitteeSessionId},
         error::assert_delegated,
         infra::audit_log::assert_last_event,
-        repository::user_repo::UserId,
     };
 
     const ELECTION_ID: u32 = 5;
@@ -133,7 +121,6 @@ mod tests {
         let result = update_state(
             &mut conn,
             AuditService::new(None, None),
-            User::test_user(Role::CoordinatorGSB, UserId::from(1)),
             unknown_election,
             |_| panic!("should not call callback"),
         )
@@ -146,25 +133,6 @@ mod tests {
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
-    async fn test_not_authorized(pool: SqlitePool) {
-        let mut conn = pool.acquire().await.unwrap();
-
-        let not_authorized = User::test_user(Role::CoordinatorCSB, UserId::from(1));
-
-        let err = update_state(
-            &mut conn,
-            AuditService::new(None, None),
-            not_authorized,
-            ElectionId::from(ELECTION_ID),
-            |_| panic!("should not call callback"),
-        )
-        .await
-        .expect_err("should return an error");
-
-        assert_delegated(err, &AuthenticationError::RoleNotAuthorizedError);
-    }
-
-    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
     async fn test_invalid_committee_session_status(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
 
@@ -173,7 +141,6 @@ mod tests {
         let err = update_state(
             &mut conn,
             AuditService::new(None, None),
-            User::test_user(Role::CoordinatorGSB, UserId::from(1)),
             ElectionId::from(ELECTION_ID),
             |_| panic!("should not call callback"),
         )
@@ -191,13 +158,9 @@ mod tests {
         set_states(&mut conn, CommitteeSessionStatus::Completed, None).await;
 
         // Returns a new ApportionmentState::Uninitialised
-        let (id, state) = get_state(
-            &mut conn,
-            User::test_user(Role::CoordinatorGSB, UserId::from(1)),
-            ElectionId::from(ELECTION_ID),
-        )
-        .await
-        .expect("should get state");
+        let (id, state) = get_state(&mut conn, ElectionId::from(ELECTION_ID))
+            .await
+            .expect("should get state");
 
         assert_eq!(id, CommitteeSessionId::from(COMMITTEE_SESSION_ID));
         assert_eq!(state, ApportionmentState::Uninitialised);
@@ -214,7 +177,6 @@ mod tests {
         update_state(
             &mut conn,
             AuditService::new(None, None),
-            User::test_user(Role::CoordinatorGSB, UserId::from(1)),
             ElectionId::from(ELECTION_ID),
             Ok,
         )
@@ -245,7 +207,6 @@ mod tests {
         let returned_state = update_state(
             &mut conn,
             AuditService::new(None, None),
-            User::test_user(Role::CoordinatorGSB, UserId::from(1)),
             ElectionId::from(ELECTION_ID),
             |state| {
                 assert_eq!(state, ApportionmentState::Uninitialised);

@@ -7,18 +7,26 @@ import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { Providers } from "@/testing/Providers";
 import { overrideOnce } from "@/testing/server";
-import { expectErrorPage, render, screen, setupTestRouter } from "@/testing/test-utils";
+import { expectErrorPage, render, screen, setupTestRouter, waitFor } from "@/testing/test-utils";
 import type { ApportionmentState, ElectionApportionmentResponse, ErrorResponse } from "@/types/generated/openapi";
 
 import { apportionmentRoutes } from "../../routes";
-import { candidate_nomination, election, election_summary, seat_assignment } from "../../testing/lt-19-seats";
+import {
+  candidate_nomination,
+  committee_session,
+  election,
+  election_summary,
+  seat_assignment,
+} from "../../testing/lt-19-seats";
 import { ApportionmentProvider } from "../ApportionmentProvider";
 import { ApportionmentListDetailsPage } from "./ApportionmentListDetailsPage";
 
-const renderApportionmentPage = () =>
+const navigate = vi.fn();
+
+const renderApportionmentListDetailsPage = (electionId: number) =>
   render(
-    <ElectionProvider electionId={1}>
-      <ApportionmentProvider electionId={1}>
+    <ElectionProvider electionId={electionId}>
+      <ApportionmentProvider electionId={electionId}>
         <ApportionmentListDetailsPage />
       </ApportionmentProvider>
     </ElectionProvider>,
@@ -26,22 +34,57 @@ const renderApportionmentPage = () =>
 
 describe("ApportionmentListDetailsPage", () => {
   beforeEach(() => {
-    overrideOnce("get", "/api/elections/1/apportionment/state", 200, {
+    overrideOnce("get", "/api/elections/3", 200, getElectionMockData(election, committee_session));
+    overrideOnce("get", "/api/elections/3/apportionment/state", 200, {
       deceased_candidates: [],
       type: "Finalised",
     } satisfies ApportionmentState);
-  });
-
-  test("All tables visible", async () => {
-    vi.spyOn(ReactRouter, "useParams").mockReturnValue({ listNumber: "1" });
-    overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election));
-    overrideOnce("post", "/api/elections/1/apportionment", 200, {
+    overrideOnce("post", "/api/elections/3/apportionment", 200, {
       seat_assignment: seat_assignment,
       candidate_nomination: candidate_nomination,
       election_summary: election_summary,
     } satisfies ElectionApportionmentResponse);
+  });
 
-    renderApportionmentPage();
+  test.each(
+    Object.values({
+      Uninitialised: {
+        state: { type: "Uninitialised" },
+        expectRedirectTo: "/elections/3/apportionment/include-all-candidates",
+      },
+      RegisteringDeceasedCandidates: {
+        state: { deceased_candidates: [], type: "RegisteringDeceasedCandidates" },
+        expectRedirectTo: "/elections/3/apportionment/deceased-candidates",
+      },
+      Finalised: {
+        state: { deceased_candidates: [], type: "Finalised" },
+        expectRedirectTo: undefined,
+      },
+    } satisfies Record<
+      ApportionmentState["type"],
+      { state: ApportionmentState; expectRedirectTo: string | undefined }
+    >),
+  )("Does not redirect only for finalised state ($state.type)", async ({ state, expectRedirectTo }) => {
+    vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
+    vi.spyOn(ReactRouter, "useParams").mockReturnValue({ listNumber: "1" });
+    overrideOnce("get", "/api/elections/3/apportionment/state", 200, state);
+
+    renderApportionmentListDetailsPage(3);
+    expect(await screen.findByRole("heading", { level: 1, name: "Lijst 1 - Political Group A" })).toBeVisible();
+
+    if (expectRedirectTo) {
+      await waitFor(() => {
+        expect(navigate).toHaveBeenCalledWith(expectRedirectTo);
+      });
+    } else {
+      expect(navigate).not.toHaveBeenCalled();
+    }
+  });
+
+  test("All tables visible", async () => {
+    vi.spyOn(ReactRouter, "useParams").mockReturnValue({ listNumber: "1" });
+
+    renderApportionmentListDetailsPage(3);
 
     expect(await screen.findByRole("heading", { level: 1, name: "Lijst 1 - Political Group A" })).toBeVisible();
 
@@ -119,14 +162,8 @@ describe("ApportionmentListDetailsPage", () => {
 
   test("No elected candidates tables visible because 0 seats assigned", async () => {
     vi.spyOn(ReactRouter, "useParams").mockReturnValue({ listNumber: "5" });
-    overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election));
-    overrideOnce("post", "/api/elections/1/apportionment", 200, {
-      seat_assignment: seat_assignment,
-      candidate_nomination: candidate_nomination,
-      election_summary: election_summary,
-    } satisfies ElectionApportionmentResponse);
 
-    renderApportionmentPage();
+    renderApportionmentListDetailsPage(3);
 
     expect(await screen.findByRole("heading", { level: 1, name: "Lijst 5 - Blanco (Smit, G.)" })).toBeVisible();
 
@@ -183,16 +220,22 @@ describe("ApportionmentListDetailsPage", () => {
   });
 
   describe("Apportionment not yet available", () => {
+    beforeEach(() => {
+      overrideOnce("get", "/api/elections/3", 200, getElectionMockData(election, committee_session));
+      overrideOnce("get", "/api/elections/3/apportionment/state", 200, {
+        type: "Uninitialised",
+      } satisfies ApportionmentState);
+    });
+
     test("Not available until committee session is completed", async () => {
       vi.spyOn(ReactRouter, "useParams").mockReturnValue({ listNumber: "1" });
-      overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election));
-      overrideOnce("post", "/api/elections/1/apportionment", 412, {
+      overrideOnce("post", "/api/elections/3/apportionment", 412, {
         error: "Committee session not completed",
         fatal: false,
         reference: "ApportionmentCommitteeSessionNotCompleted",
       } satisfies ErrorResponse);
 
-      renderApportionmentPage();
+      renderApportionmentListDetailsPage(3);
 
       // Wait for the page to be loaded
       expect(await screen.findByRole("heading", { level: 1, name: "Lijst 1 - Political Group A" })).toBeVisible();
@@ -210,14 +253,13 @@ describe("ApportionmentListDetailsPage", () => {
 
     test("Not possible because drawing of lots is not implemented yet", async () => {
       vi.spyOn(ReactRouter, "useParams").mockReturnValue({ listNumber: "1" });
-      overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election));
-      overrideOnce("post", "/api/elections/1/apportionment", 422, {
+      overrideOnce("post", "/api/elections/3/apportionment", 422, {
         error: "Drawing of lots is required",
         fatal: false,
         reference: "ApportionmentDrawingOfLotsRequired",
       } satisfies ErrorResponse);
 
-      renderApportionmentPage();
+      renderApportionmentListDetailsPage(3);
 
       // Wait for the page to be loaded
       expect(await screen.findByRole("heading", { level: 1, name: "Lijst 1 - Political Group A" })).toBeVisible();
@@ -225,33 +267,6 @@ describe("ApportionmentListDetailsPage", () => {
       expect(await screen.findByText("Zetelverdeling is niet mogelijk")).toBeVisible();
       expect(
         await screen.findByText("Loting is noodzakelijk, maar nog niet beschikbaar in deze versie van Abacus"),
-      ).toBeVisible();
-
-      expect(screen.queryByTestId("preferentially-chosen-candidates-table")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("other-chosen-candidates-table")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("candidates-ranking-table")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("total-votes-per-candidate-table")).not.toBeInTheDocument();
-    });
-
-    test("Not possible because all lists are exhausted", async () => {
-      vi.spyOn(ReactRouter, "useParams").mockReturnValue({ listNumber: "1" });
-      overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election));
-      overrideOnce("post", "/api/elections/1/apportionment", 422, {
-        error: "All lists are exhausted, not enough candidates to fill all seats",
-        fatal: false,
-        reference: "ApportionmentAllListsExhausted",
-      } satisfies ErrorResponse);
-
-      renderApportionmentPage();
-
-      // Wait for the page to be loaded
-      expect(await screen.findByRole("heading", { level: 1, name: "Lijst 1 - Political Group A" })).toBeVisible();
-
-      expect(await screen.findByText("Zetelverdeling is niet mogelijk")).toBeVisible();
-      expect(
-        await screen.findByText(
-          "Er zijn te weinig kandidaten om alle aan lijsten toegewezen zetels te vullen. Abacus kan daarom geen zetelverdeling berekenen. Neem contact op met de Kiesraad.",
-        ),
       ).toBeVisible();
 
       expect(screen.queryByTestId("preferentially-chosen-candidates-table")).not.toBeInTheDocument();
@@ -277,14 +292,13 @@ describe("ApportionmentListDetailsPage", () => {
         },
       ]);
 
-      overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election));
-      overrideOnce("post", "/api/elections/1/apportionment", 500, {
+      overrideOnce("post", "/api/elections/3/apportionment", 500, {
         error: "Internal Server Error",
         fatal: true,
         reference: "InternalServerError",
       });
 
-      await router.navigate("/elections/1/apportionment/1");
+      await router.navigate("/elections/3/apportionment/1");
 
       rtlRender(<Providers router={router} />);
 

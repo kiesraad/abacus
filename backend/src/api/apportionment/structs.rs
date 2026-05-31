@@ -1,9 +1,12 @@
+use std::collections::{HashMap, HashSet};
+
 use apportionment::{self};
 use serde::Serialize;
 use utoipa::ToSchema;
 
 use crate::domain::{
     apportionment::{CandidateNomination, SeatAssignment},
+    apportionment_state::DeceasedCandidate,
     election::{self, PGNumber},
     results::political_group_candidate_votes::{CandidateVotes, PoliticalGroupCandidateVotes},
     summary::ElectionSummary,
@@ -13,6 +16,30 @@ use crate::domain::{
 pub struct ApportionmentInputData<'a> {
     pub number_of_seats: u32,
     pub list_votes: &'a [PoliticalGroupCandidateVotes],
+    pub deceased_candidates: HashMap<PGNumber, HashSet<election::CandidateNumber>>,
+}
+
+impl<'a> ApportionmentInputData<'a> {
+    pub fn new(
+        number_of_seats: u32,
+        list_votes: &'a [PoliticalGroupCandidateVotes],
+        deceased_candidates: &[DeceasedCandidate],
+    ) -> Self {
+        let mut grouped: HashMap<PGNumber, HashSet<election::CandidateNumber>> = HashMap::new();
+
+        for dc in deceased_candidates {
+            grouped
+                .entry(dc.pg_number)
+                .or_default()
+                .insert(dc.candidate_number);
+        }
+
+        Self {
+            number_of_seats,
+            list_votes,
+            deceased_candidates: grouped,
+        }
+    }
 }
 
 impl<'a> apportionment::ApportionmentInput for ApportionmentInputData<'a> {
@@ -24,6 +51,10 @@ impl<'a> apportionment::ApportionmentInput for ApportionmentInputData<'a> {
 
     fn list_votes(&self) -> &[Self::List] {
         self.list_votes
+    }
+
+    fn deceased_candidates(&self) -> &HashMap<PGNumber, HashSet<election::CandidateNumber>> {
+        &self.deceased_candidates
     }
 }
 

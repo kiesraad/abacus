@@ -21,10 +21,8 @@ use crate::{
 /// Errors that can occur before apportionment
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum ApportionmentApiError {
-    AllListsExhausted,
     CommitteeSessionNotCompleted,
     DrawingOfLotsNotImplemented,
-    ZeroVotesCast,
 }
 
 impl ApiErrorResponse for ApportionmentApiError {
@@ -34,14 +32,6 @@ impl ApiErrorResponse for ApportionmentApiError {
 
     fn to_response_parts(&self) -> (StatusCode, ErrorResponse) {
         match self {
-            ApportionmentApiError::AllListsExhausted => (
-                StatusCode::UNPROCESSABLE_ENTITY,
-                ErrorResponse::new(
-                    "All lists are exhausted, not enough candidates to fill all seats",
-                    ErrorReference::ApportionmentAllListsExhausted,
-                    false,
-                ),
-            ),
             ApportionmentApiError::CommitteeSessionNotCompleted => (
                 StatusCode::PRECONDITION_FAILED,
                 ErrorResponse::new(
@@ -58,14 +48,6 @@ impl ApiErrorResponse for ApportionmentApiError {
                     false,
                 ),
             ),
-            ApportionmentApiError::ZeroVotesCast => (
-                StatusCode::UNPROCESSABLE_ENTITY,
-                ErrorResponse::new(
-                    "No votes on candidates cast",
-                    ErrorReference::ApportionmentZeroVotesCast,
-                    false,
-                ),
-            ),
         }
     }
 }
@@ -73,9 +55,7 @@ impl ApiErrorResponse for ApportionmentApiError {
 impl From<ApportionmentError> for ApportionmentApiError {
     fn from(err: ApportionmentError) -> Self {
         match err {
-            ApportionmentError::AllListsExhausted => Self::AllListsExhausted,
             ApportionmentError::DrawingOfLotsNotImplemented => Self::DrawingOfLotsNotImplemented,
-            ApportionmentError::ZeroVotesCast => Self::ZeroVotesCast,
         }
     }
 }
@@ -113,7 +93,9 @@ pub fn router() -> OpenApiRouter<AppState> {
             routes!(register_deceased_candidates::register_deceased_candidates)
                 .authorize(ALLOWED_ROLES),
         )
-        .routes(routes!(reset::reset).authorize(ALLOWED_ROLES))
+        .routes(
+            routes!(reset_apportionment_state::reset_apportionment_state).authorize(ALLOWED_ROLES),
+        )
         .routes(
             routes!(skip_deceased_candidates::skip_deceased_candidates).authorize(ALLOWED_ROLES),
         )

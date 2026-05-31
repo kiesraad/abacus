@@ -6,7 +6,6 @@ import { InitialiseApplicationPage } from "./components/InitialiseApplicationPag
 import { LoginLayout } from "./components/LoginLayout";
 import { LoginPage } from "./components/LoginPage";
 import { Logout } from "./components/Logout";
-import { UserHomePage } from "./components/UserHomePage";
 
 const allRoles = [...roleValues];
 
@@ -15,7 +14,6 @@ export const accountRoutes: RouteObject[] = [
   {
     Component: LoginLayout,
     children: [
-      { index: true, Component: UserHomePage, handle: { roles: allRoles } },
       { path: "login", Component: LoginPage, handle: { public: true } },
       { path: "logout", Component: Logout, handle: { roles: allRoles } },
       {

@@ -1,7 +1,8 @@
 {
-  "title": {
-    "singular": "Kandidaat",
-    "plural": "Kandidaten"
+  "add": "Kandidaat toevoegen",
+  "deceased": {
+    "singular": "Overleden kandidaat",
+    "plural": "Overleden kandidaten"
   },
   "Female": "v",
   "list": {
@@ -10,5 +11,9 @@
   },
   "locality": "Woonplaats",
   "Male": "m",
+  "title": {
+    "singular": "Kandidaat",
+    "plural": "Kandidaten"
+  },
   "X": "x"
 }

@@ -8,7 +8,7 @@ use crate::{
     APIError, ErrorResponse, SqlitePoolExt,
     domain::{apportionment_state::ApportionmentState, election::ElectionId},
     infra::audit_log::AuditService,
-    repository::user_repo::User,
+    repository::{election_repo, user_repo::User},
     service::update_apportionment_state,
 };
 
@@ -28,7 +28,7 @@ use crate::{
         ("election_id" = ElectionId, description = "Election database id"),
     ),
 )]
-pub async fn reset(
+pub async fn reset_apportionment_state(
     user: User,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
@@ -36,10 +36,12 @@ pub async fn reset(
 ) -> Result<Json<ApportionmentState>, APIError> {
     let mut tx = pool.begin_immediate().await?;
 
-    let state = update_apportionment_state(&mut tx, audit_service, user, election_id, |state| {
-        state.reset()
-    })
-    .await?;
+    let election = election_repo::get(&mut tx, election_id).await?;
+    user.role().is_authorized(election.committee_category)?;
+
+    let state =
+        update_apportionment_state(&mut tx, audit_service, election_id, |state| state.reset())
+            .await?;
 
     tx.commit().await?;
     Ok(Json(state))
@@ -62,7 +64,7 @@ mod tests {
         path = "../../../../fixtures",
         scripts("election_5_with_results")
     )))]
-    async fn test_reset(pool: SqlitePool) {
+    async fn test_reset_apportionment_state(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
         let user = User::test_user(Role::CoordinatorGSB, UserId::from(1));
         let audit_service = AuditService::new(Some(user.clone()), None);
@@ -82,9 +84,10 @@ mod tests {
         .await
         .expect("should upsert initial state");
 
-        let state = reset(user, State(pool), audit_service, Path(ElectionId::from(5)))
-            .await
-            .expect("should call the handler successfully");
+        let state =
+            reset_apportionment_state(user, State(pool), audit_service, Path(ElectionId::from(5)))
+                .await
+                .expect("should call the handler successfully");
 
         assert_eq!(state.0, ApportionmentState::Uninitialised);
     }

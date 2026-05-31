@@ -1,6 +1,6 @@
 import { createContext } from "react";
 
-import type { ApiError } from "@/api/ApiResult";
+import type { ApiError, ApiResult } from "@/api/ApiResult";
 import type {
   ApportionmentState,
   CandidateNomination,
@@ -14,6 +14,8 @@ export interface iElectionApportionmentProviderContext {
   electionSummary?: ElectionSummary;
   state?: ApportionmentState;
   error?: ApiError;
+  isLoading: boolean;
+  refetchState: (controller?: AbortController) => Promise<ApiResult<ApportionmentState>>;
 }
 
 export const ApportionmentProviderContext = createContext<iElectionApportionmentProviderContext | undefined>(undefined);

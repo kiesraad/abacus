@@ -144,19 +144,16 @@ mod tests {
         ];
         let election = election_fixture_with_given_number_of_seats(
             CommitteeCategory::CSB,
-            candidate_votes
+            &candidate_votes
                 .iter()
                 .map(|cv| u32::try_from(cv.len()).expect("Should fit in u32"))
-                .collect::<Vec<u32>>()
-                .as_slice(),
+                .collect::<Vec<u32>>(),
             15,
         );
         let political_groups = &election.political_groups;
         let list_votes = create_political_group_candidate_votes(political_groups, &candidate_votes);
-        let apportionment_input = ApportionmentInputData {
-            number_of_seats: election.number_of_seats,
-            list_votes: list_votes.as_slice(),
-        };
+        let apportionment_input =
+            ApportionmentInputData::new(election.number_of_seats, &list_votes, &[]);
         let apportionment_result =
             apportionment::process(&apportionment_input).expect("apportionment failed");
         let candidate_nomination = map_candidate_nomination(

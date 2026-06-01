@@ -282,10 +282,10 @@ jobs:
       - name: Install cargo fuzz
         run: cargo install cargo-fuzz
       - name: Check Clippy for ./backend/fuzz
-        run: cargo --verbose --locked clippy
+        run: cargo --verbose --locked clippy -- -D warnings
         working-directory: ./backend/fuzz
       - name: Check Clippy for ./backend/apportionment/fuzz
-        run: cargo --verbose --locked clippy
+        run: cargo --verbose --locked clippy -- -D warnings
         working-directory: ./backend/apportionment/fuzz
       - name: Run data entry fuzzer
         run: cargo fuzz run data_entry_status -- -max_total_time=60

@@ -280,9 +280,15 @@ jobs:
           shared-key: "fuzzer"
       - name: Install cargo fuzz
         run: cargo install cargo-fuzz
-      - name: Run the data entry fuzzer
+      - name: Check Clippy for ./backend/fuzz
+        run: cargo --verbose --locked clippy
+        working-directory: ./backend/fuzz
+      - name: Check Clippy for ./backend/apportionment/fuzz
+        run: cargo --verbose --locked clippy
+        working-directory: ./backend/apportionment/fuzz
+      - name: Run data entry fuzzer
         run: cargo fuzz run data_entry_status -- -max_total_time=60
-      - name: Run the apportionment fuzzer
+      - name: Run simple apportionment fuzzer
         working-directory: ./backend/apportionment
         run: cargo fuzz run simple_apportionment -- -max_total_time=60
 

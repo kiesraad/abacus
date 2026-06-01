@@ -18,17 +18,24 @@ import type {
   CommitteeSession,
   ELECTION_DETAILS_REQUEST_PATH,
   ELECTION_IMPORT_REQUEST_PATH,
+  ELECTION_STATUS_REQUEST_PATH,
   Election,
   ElectionDetailsResponse,
+  ElectionStatusResponse,
   POLLING_STATION_CREATE_REQUEST_PATH,
-  POLLING_STATION_GET_REQUEST_PATH,
-  PollingStation,
   USER_CREATE_REQUEST_BODY,
   USER_CREATE_REQUEST_PATH,
   User,
 } from "@/types/generated/openapi";
 
 export const FIXTURE_TYPIST_TEMP_PASSWORD: string = "temp_password_9876";
+
+export interface DataEntry {
+  election_id: number;
+  id: number;
+  name: string;
+  number: string;
+}
 
 // Regular fixtures need to be passed into the test's arguments.
 type Fixtures = {
@@ -45,21 +52,21 @@ type Fixtures = {
   emptyElection: Election;
   // Election with two polling stations
   election: ElectionDetailsResponse;
-  // First polling station of the election
-  pollingStation: PollingStation;
-  // First polling station of the election with entry claimed by typist one
-  pollingStationFirstEntryClaimed: PollingStation;
-  // First polling station of the election with first data entry done
-  pollingStationFirstEntryDone: PollingStation;
-  // First polling station of the election with first data entry with errors
-  pollingStationFirstEntryHasErrors: PollingStation;
-  // First polling station of the election with first and second data entries done
-  pollingStationDefinitive: PollingStation;
-  // First polling station of the election with differences between the first and second data entry
-  pollingStationEntriesDifferent: PollingStation;
-  // First polling station of the election with second data entry that has errors and is therefore different
-  pollingStationEntriesDifferentWithErrors: PollingStation;
-  // Election with polling stations and two completed data entries for each
+  // First data entry of the election
+  dataEntryGSB: DataEntry;
+  // First data entry of the election with entry claimed by typist one
+  dataEntryGSBFirstEntryClaimed: DataEntry;
+  // First data entry of the election with first data entry done
+  dataEntryGSBFirstEntryDone: DataEntry;
+  // First data entry of the election with first data entry with errors
+  dataEntryGSBFirstEntryHasErrors: DataEntry;
+  // First data entry of the election with first and second data entries done
+  dataEntryGSBDefinitive: DataEntry;
+  // First data entry of the election with differences between the first and second data entry
+  dataEntryGSBEntriesDifferent: DataEntry;
+  // First data entry of the election with second data entry that has errors and is therefore different
+  dataEntryGSBEntriesDifferentWithErrors: DataEntry;
+  // Election with two completed data entries for each polling station
   completedElection: Election;
   // The current committee session for the election
   currentCommitteeSession: CommitteeSession;
@@ -91,12 +98,6 @@ export const test = base.extend<Fixtures>({
     const page = await context.newPage();
     await use({ page: page, request: context.request });
     await context.close();
-  },
-  pollingStationFirstEntryClaimed: async ({ typistOne, pollingStation }, use) => {
-    const { request } = typistOne;
-    const firstDataEntry = new DataEntryApiClient(request, pollingStation.data_entry_id!, 1);
-    await firstDataEntry.claim();
-    await use(pollingStation);
   },
   eml230b: [eml230b, { option: true }],
   emptyElection: async ({ adminOne, eml230b }, use) => {
@@ -152,60 +153,72 @@ export const test = base.extend<Fixtures>({
 
     await use(response);
   },
-  pollingStation: async ({ adminOne, election }, use) => {
+  dataEntryGSB: async ({ adminOne, election }, use) => {
     const { request } = adminOne;
     // get the first polling station of the existing election
-    const url: POLLING_STATION_GET_REQUEST_PATH = `/api/elections/${election.election.id}/polling_stations/${election.polling_stations[0]?.id ?? 0}`;
+    const url: ELECTION_STATUS_REQUEST_PATH = `/api/elections/${election.election.id}/status`;
     const response = await request.get(url);
     expect(response.ok()).toBeTruthy();
-    const pollingStation = (await response.json()) as PollingStation;
+    const electionStatuses = (await response.json()) as ElectionStatusResponse;
+    const electionStatus = electionStatuses.statuses[0]!;
 
-    await use(pollingStation);
+    await use({
+      election_id: election.election.id,
+      id: electionStatus.data_entry_id,
+      name: electionStatus.source.name,
+      number: electionStatus.source.number.toString(),
+    });
   },
-  pollingStationFirstEntryDone: async ({ pollingStation, typistOne }, use) => {
+  dataEntryGSBFirstEntryClaimed: async ({ typistOne, dataEntryGSB }, use) => {
     const { request } = typistOne;
-    const firstDataEntry = new DataEntryApiClient(request, pollingStation.data_entry_id!, 1);
+    const firstDataEntry = new DataEntryApiClient(request, dataEntryGSB.id, 1);
+    await firstDataEntry.claim();
+    await use(dataEntryGSB);
+  },
+  dataEntryGSBFirstEntryDone: async ({ dataEntryGSB, typistOne }, use) => {
+    const { request } = typistOne;
+    const firstDataEntry = new DataEntryApiClient(request, dataEntryGSB.id, 1);
     await firstDataEntry.claim();
     await firstDataEntry.save(dataEntryRequest);
     await firstDataEntry.finalise();
 
-    await use(pollingStation);
+    await use(dataEntryGSB);
   },
-  pollingStationFirstEntryHasErrors: async ({ pollingStation, typistOne }, use) => {
+  dataEntryGSBFirstEntryHasErrors: async ({ dataEntryGSB, typistOne }, use) => {
     const { request } = typistOne;
-    const firstDataEntry = new DataEntryApiClient(request, pollingStation.data_entry_id!, 1);
+    const firstDataEntry = new DataEntryApiClient(request, dataEntryGSB.id, 1);
     await firstDataEntry.claim();
     await firstDataEntry.save(dataEntryWithErrorRequest);
     await firstDataEntry.finalise();
 
-    await use(pollingStation);
+    await use(dataEntryGSB);
   },
-  pollingStationDefinitive: async ({ pollingStation, typistOne, typistTwo }, use) => {
-    await completePollingStationDataEntries(pollingStation.data_entry_id!, typistOne.request, typistTwo.request);
+  dataEntryGSBDefinitive: async ({ dataEntryGSB, typistOne, typistTwo }, use) => {
+    await completePollingStationDataEntries(dataEntryGSB.id, typistOne.request, typistTwo.request);
 
-    await use(pollingStation);
+    await use(dataEntryGSB);
   },
-  pollingStationEntriesDifferent: async ({ pollingStation, typistOne, typistTwo }, use) => {
+  dataEntryGSBEntriesDifferent: async ({ dataEntryGSB, typistOne, typistTwo }, use) => {
     await completePollingStationDataEntries(
-      pollingStation.data_entry_id!,
+      dataEntryGSB.id,
       typistOne.request,
       typistTwo.request,
       dataEntryRequest,
       dataEntryWithDifferencesRequest,
     );
 
-    await use(pollingStation);
+    await use(dataEntryGSB);
   },
-  pollingStationEntriesDifferentWithErrors: async ({ pollingStation, typistOne, typistTwo }, use) => {
+  dataEntryGSBEntriesDifferentWithErrors: async ({ dataEntryGSB, typistOne, typistTwo }, use) => {
     await completePollingStationDataEntries(
-      pollingStation.data_entry_id!,
+      dataEntryGSB.id,
       typistOne.request,
       typistTwo.request,
       dataEntryRequest,
       dataEntryWithErrorRequest,
     );
 
-    await use(pollingStation);
+    await use(dataEntryGSB);
   },
   completedElection: async ({ election, typistOne, typistTwo }, use) => {
     // finalise both data entries for all polling stations

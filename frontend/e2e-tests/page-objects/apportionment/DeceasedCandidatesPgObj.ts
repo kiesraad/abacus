@@ -5,6 +5,7 @@ export class DeceasedCandidates {
   readonly deceasedCandidates: Locator;
   readonly addCandidate: Locator;
   readonly toApportionment: Locator;
+  readonly resetApportionmentState: Locator;
 
   constructor(protected readonly page: Page) {
     this.header = page.getByRole("heading", { level: 1, name: "Overleden kandidaten" });
@@ -14,6 +15,8 @@ export class DeceasedCandidates {
     this.addCandidate = page.getByRole("link", { name: "+ Kandidaat toevoegen" });
 
     this.toApportionment = page.getByRole("button", { name: "Naar zetelverdeling" });
+
+    this.resetApportionmentState = page.getByRole("button", { name: "Doe dan de zetelverdeling opnieuw" });
   }
 
   findCandidate(listNumber: number, candidateNumber: number) {

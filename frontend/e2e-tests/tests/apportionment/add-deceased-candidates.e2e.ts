@@ -1,6 +1,7 @@
 import { expect } from "@playwright/test";
 import { AddDeceasedCandidate } from "e2e-tests/page-objects/apportionment/AddDeceasedCandidatePgObj";
 import { ApportionmentFullSeats } from "e2e-tests/page-objects/apportionment/ApportionmentFullSeatsPgObj";
+import { ApportionmentListDetails } from "e2e-tests/page-objects/apportionment/ApportionmentListDetailsPgObj";
 import { Apportionment } from "e2e-tests/page-objects/apportionment/ApportionmentPgObj";
 import { ApportionmentResidualSeats } from "e2e-tests/page-objects/apportionment/ApportionmentResidualSeatsPgObj";
 import { DeceasedCandidates } from "e2e-tests/page-objects/apportionment/DeceasedCandidatesPgObj";
@@ -61,20 +62,45 @@ test.describe("CSB election apportionment", () => {
     await expect(apportionmentPage.header).toBeVisible();
     await expect(apportionmentPage.allSeatsAssignedAlert).toBeVisible();
 
-    // TODO: Click "beheer overleden kandidaten" and check read only DeceasedCandidatesPage
-
     await expect(apportionmentPage.fullSeatInformation).toBeVisible();
     await apportionmentPage.fullSeatsPageLink.click();
     const apportionmentFullSeatsPage = new ApportionmentFullSeats(page);
     await expect(apportionmentFullSeatsPage.header).toBeVisible();
 
     await page.goBack();
+
     await expect(apportionmentPage.residualSeatInformation).toBeVisible();
     await apportionmentPage.residualSeatsPageLink.click();
     const apportionmentResidualSeatsPage = new ApportionmentResidualSeats(page);
     await expect(apportionmentResidualSeatsPage.header).toBeVisible();
 
     await page.goBack();
-    // TODO: Check ApportionmentListDetails of list 1, check for deceased candidate alert
+
+    await expect(apportionmentPage.apportionmentTable).toBeVisible();
+    await apportionmentPage.clickList(1);
+
+    const listDetailsPage = new ApportionmentListDetails(page);
+    await expect(listDetailsPage.header).toBeVisible();
+    await expect(listDetailsPage.header).toContainText("Lijst 1 - Partijdige Partij");
+    await expect(listDetailsPage.alert).toBeVisible();
+    await expect(listDetailsPage.alert).toContainText(
+      "Kandidaat 5 is buiten beschouwing gelaten bij het verdelen van de zetels vanwege overlijden.Stemmen op overleden kandidaten zijn wel meegeteld als stemmen op diens lijst.",
+    );
+
+    await page.goBack();
+
+    await expect(apportionmentPage.manageDeceasedCandidates).toBeVisible();
+    await apportionmentPage.manageDeceasedCandidates.click();
+
+    await expect(deceasedCandidatesPage.header).toBeVisible();
+    await expect(deceasedCandidatesPage.findCandidate(1, 5)).toBeVisible();
+    await expect(deceasedCandidatesPage.findCandidate(5, 3)).toBeHidden();
+    await expect(deceasedCandidatesPage.addCandidate).toBeHidden();
+    await expect(deceasedCandidatesPage.resetApportionmentState).toBeVisible();
+    await deceasedCandidatesPage.resetApportionmentState.click();
+
+    await expect(includeAllCandidatesPage.header).toBeVisible();
+    await expect(includeAllCandidatesPage.dataEntryFinishedAlert).toBeVisible();
+    await expect(includeAllCandidatesPage.title).toBeVisible();
   });
 });

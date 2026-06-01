@@ -270,7 +270,8 @@ jobs:
         shell: bash
         run: >
           rustup update nightly &&
-          rustup default nightly
+          rustup default nightly &&
+          rustup component add clippy
       - name: Cargo cache
         uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4 # v2
         with:

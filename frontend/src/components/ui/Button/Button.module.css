@@ -145,8 +145,7 @@ label.button {
     min-width: 13rem;
   }
 
-  &.underlined,
-  &.not-underlined {
+  &.underlined {
     font-weight: 400;
     background-color: transparent;
     border: none;
@@ -154,12 +153,10 @@ label.button {
     cursor: pointer;
     padding: 0;
     box-shadow: none;
+    text-decoration: underline;
 
     &:focus {
       box-shadow: 0 0 0 4px var(--shadow-color-focus);
     }
-  }
-  &.underlined {
-    text-decoration: underline;
   }
 }

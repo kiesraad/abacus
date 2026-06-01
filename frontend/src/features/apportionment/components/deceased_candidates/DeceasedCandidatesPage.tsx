@@ -194,28 +194,29 @@ export function DeceasedCandidatesPage() {
                   </div>
                 )}
                 {state.type === "RegisteringDeceasedCandidates" && (
-                  <div className="ml-md-lg">
-                    <Button.Link
-                      variant="underlined"
-                      size="md"
-                      to={`/elections/${election.id}/apportionment/deceased-candidates/add`}
-                    >
-                      {`+ ${t("candidate.add")}`}
-                    </Button.Link>
-                  </div>
+                  <>
+                    <div className="ml-md-lg">
+                      <Button.Link
+                        variant="underlined"
+                        size="md"
+                        to={`/elections/${election.id}/apportionment/deceased-candidates/add`}
+                      >
+                        {`+ ${t("candidate.add")}`}
+                      </Button.Link>
+                    </div>
+                    <div className="mt-md-lg">
+                      <Button onClick={() => void handleFinaliseDeceasedCandidates()}>
+                        {t("apportionment.to_apportionment")}
+                      </Button>
+                    </div>
+                  </>
                 )}
-                {state.type === "RegisteringDeceasedCandidates" ? (
-                  <div className="mt-md-lg">
-                    <Button onClick={() => void handleFinaliseDeceasedCandidates()}>
-                      {t("apportionment.to_apportionment")}
-                    </Button>
-                  </div>
-                ) : (
+                {state.type === "Finalised" && (
                   <div className="mt-md-lg">
                     {t("apportionment.want_to_make_changes")}
                     <div className={cls.resetSection}>
                       <Icon size="xs" icon={<IconArrowRight />} />
-                      <Button variant="not-underlined" size="md" onClick={() => void handleResetApportionmentState()}>
+                      <Button variant="underlined" size="md" onClick={() => void handleResetApportionmentState()}>
                         {t("apportionment.redo_apportionment")}
                       </Button>
                     </div>

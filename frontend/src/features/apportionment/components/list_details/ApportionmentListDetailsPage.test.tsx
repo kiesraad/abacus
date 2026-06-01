@@ -98,7 +98,7 @@ describe("ApportionmentListDetailsPage", () => {
     );
     const deceasedCandidatesAlert = await screen.findByRole("alert");
     expect(deceasedCandidatesAlert).toHaveTextContent(
-      "Kandidaten 12 en 5 zijn buiten beschouwing gelaten bij het verdelen van de zetels vanwege overlijden.Stemmen op overleden kandidaten zijn wel meegeteld als stemmen op diens lijst.",
+      "Kandidaten 5 en 12 zijn buiten beschouwing gelaten bij het verdelen van de zetels vanwege overlijden.Stemmen op overleden kandidaten zijn wel meegeteld als stemmen op diens lijst.",
     );
 
     expect(

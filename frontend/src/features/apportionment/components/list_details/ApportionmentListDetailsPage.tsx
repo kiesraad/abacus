@@ -238,7 +238,7 @@ export function ApportionmentListDetailsPage() {
                   </div>
                   {listDeceasedCandidateNumbers.length > 0 && (
                     <div className={cn("mt-md-lg", cls.deceasedCandidatesAlert)}>
-                      {renderDeceasedCandidatesAlert(listDeceasedCandidateNumbers)}
+                      {renderDeceasedCandidatesAlert(listDeceasedCandidateNumbers.sort((a, b) => a - b))}
                     </div>
                   )}
                 </div>

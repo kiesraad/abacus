@@ -210,7 +210,7 @@ test.describe("Data entry model test - errors", () => {
   createTestModel(machine)
     .getSimplePaths()
     .forEach((path) => {
-      test(path.description, async ({ page, pollingStation, election }) => {
+      test(path.description, async ({ page, dataEntryGSB, election }) => {
         const dataEntryHomePage = new DataEntryHomePage(page);
         const extraInvestigationPage = new ExtraInvestigationPage(page);
         const countingDifferencesPage = new CountingDifferencesPollingStationPage(page);
@@ -219,8 +219,8 @@ test.describe("Data entry model test - errors", () => {
         const abortModal = new AbortInputModal(page);
         const navBar = new TypistNavBar(page);
 
-        await page.goto(`/elections/${pollingStation.election_id}/data-entry`);
-        await dataEntryHomePage.enterNumberAndClickStart(pollingStation);
+        await page.goto(`/elections/${dataEntryGSB.election_id}/data-entry`);
+        await dataEntryHomePage.enterNumberAndClickStart(dataEntryGSB);
         await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
         await countingDifferencesPage.fillAndClickNext(noDifferences);
 
@@ -228,13 +228,13 @@ test.describe("Data entry model test - errors", () => {
           dataEntryHomePageErrorSaved: async () => {
             await expect(dataEntryHomePage.fieldset).toBeVisible();
             await expect(dataEntryHomePage.allDataEntriesInProgress).toHaveText([
-              `${pollingStation.number} - ${pollingStation.name}`,
+              `${dataEntryGSB.number} - ${dataEntryGSB.name}`,
             ]);
           },
           dataEntryHomePageChangedToErrorSaved: async () => {
             await expect(dataEntryHomePage.fieldset).toBeVisible();
             await expect(dataEntryHomePage.allDataEntriesInProgress).toHaveText([
-              `${pollingStation.number} - ${pollingStation.name}`,
+              `${dataEntryGSB.number} - ${dataEntryGSB.name}`,
             ]);
           },
           dataEntryHomePageDiscarded: async () => {
@@ -244,7 +244,7 @@ test.describe("Data entry model test - errors", () => {
         };
         const dataEntryHomePageEvents = {
           RESUME_DATA_ENTRY: async () => {
-            await dataEntryHomePage.clickDataEntryInProgress(pollingStation);
+            await dataEntryHomePage.clickDataEntryInProgress(dataEntryGSB);
           },
         };
 

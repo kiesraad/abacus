@@ -1,11 +1,9 @@
-import { render as rtlRender } from "@testing-library/react";
+import { render as rtlRender, waitFor } from "@testing-library/react";
 import type { ReactNode } from "react";
 import * as ReactRouter from "react-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { ApiProvider } from "@/api/ApiProvider";
-import { ErrorBoundary } from "@/components/error/ErrorBoundary";
-import { electionManagementRoutes } from "@/features/election_management/routes";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
 import { getCSBElectionMockData } from "@/testing/api-mocks/ElectionMockData";
@@ -13,8 +11,9 @@ import { CSBElectionRequestHandler, CSBElectionStatusRequestHandler } from "@/te
 import { getRouter, type Router } from "@/testing/router";
 import { overrideOnce, server } from "@/testing/server";
 import { TestUserProvider } from "@/testing/TestUserProvider";
-import { expectConflictErrorPage, setupTestRouter } from "@/testing/test-utils";
+import { renderReturningRouter } from "@/testing/test-utils";
 import type { ApportionmentState } from "@/types/generated/openapi";
+import { ElectionReportPage } from "./ElectionReportPage";
 
 const navigate = vi.fn();
 
@@ -40,6 +39,16 @@ const Providers = ({
   );
 };
 
+const renderPage = () => {
+  return renderReturningRouter(
+    <ElectionProvider electionId={2}>
+      <ElectionStatusProvider electionId={2}>
+        <ElectionReportPage />
+      </ElectionStatusProvider>
+    </ElectionProvider>,
+  );
+};
+
 describe("CSBElectionReportSection", () => {
   beforeEach(() => {
     vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
@@ -51,22 +60,7 @@ describe("CSBElectionReportSection", () => {
     vi.spyOn(ReactRouter, "useParams").mockReturnValue({ committeeSessionId: "2" });
   });
 
-  test("Error when apportionment state is not Finalised", async () => {
-    // error is expected
-    vi.spyOn(console, "error").mockImplementation(() => {});
-    const router = setupTestRouter([
-      {
-        Component: null,
-        errorElement: <ErrorBoundary />,
-        children: [
-          {
-            path: "elections/:electionId",
-            children: electionManagementRoutes,
-          },
-        ],
-      },
-    ]);
-
+  test("Redirect when apportionment state is not Finalised", async () => {
     overrideOnce(
       "get",
       "/api/elections/2",
@@ -78,11 +72,14 @@ describe("CSBElectionReportSection", () => {
       deceased_candidates: [],
     } satisfies ApportionmentState);
 
+    const router = renderPage();
+
     await router.navigate("/elections/2/report/committee-session/2/download");
 
     rtlRender(<Providers router={router} />);
 
-    await expectConflictErrorPage();
-    expect(console.error).toHaveBeenCalled();
+    await waitFor(() => {
+      expect(navigate).toHaveBeenCalledWith("/elections/2/apportionment");
+    });
   });
 });

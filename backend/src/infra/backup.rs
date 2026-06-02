@@ -62,7 +62,7 @@ pub async fn create_local_backup(
     pool: &SqlitePool,
     backupconfig: &BackupConfig,
 ) -> Result<(), BackupError> {
-    create_backup_directory(&backupconfig)?;
+    create_backup_directory(backupconfig)?;
     let filename = format!("backup_{}.db", Local::now().format("%Y-%m-%d_%H-%M-%S"));
     let backup_path = backupconfig.directory.join(filename);
     backup_database(pool, &backup_path).await?;
@@ -72,17 +72,16 @@ pub async fn create_local_backup(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::sync::Mutex;
+    use tokio::sync::Mutex;
 
-    static TEST_LOCK: Mutex<()> = Mutex::new(());
+    static TEST_LOCK: Mutex<()> = Mutex::const_new(());
 
     fn setup_backup_config() -> BackupConfig {
         let parent_directory = std::env::temp_dir();
         let backup_directory = parent_directory.join("database_backups");
-        let backup_config = BackupConfig {
+        BackupConfig {
             directory: backup_directory,
-        };
-        backup_config
+        }
     }
 
     fn delete_backup_directory(backup_config: &BackupConfig) {

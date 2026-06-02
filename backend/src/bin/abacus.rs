@@ -15,6 +15,7 @@ use tokio::{net::TcpListener, time::Duration};
 use tracing::{error, level_filters::LevelFilter};
 use tracing_subscriber::EnvFilter;
 
+const BACKUP_INTERVAL: int32 = 5;
 /// Get the default port for the server, 8080 in debug builds and 80 for release builds
 fn get_default_port() -> u16 {
     #[cfg(debug_assertions)]

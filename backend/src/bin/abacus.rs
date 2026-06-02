@@ -15,7 +15,8 @@ use tokio::{net::TcpListener, time::Duration};
 use tracing::{error, level_filters::LevelFilter};
 use tracing_subscriber::EnvFilter;
 
-const BACKUP_INTERVAL: int32 = 5;
+const BACKUP_INTERVAL: u64 = 5;
+
 /// Get the default port for the server, 8080 in debug builds and 80 for release builds
 fn get_default_port() -> u16 {
     #[cfg(debug_assertions)]
@@ -118,7 +119,7 @@ async fn run() -> Result<(), AppError> {
     let backup_config = BackupConfig::new().expect("Failed to setup backup directory");
     let backup_pool = pool.clone();
     tokio::spawn(async move {
-        let mut interval = tokio::time::interval(Duration::from_mins(5));
+        let mut interval = tokio::time::interval(Duration::from_mins(BACKUP_INTERVAL));
         loop {
             interval.tick().await;
             if let Err(e) = create_local_backup(&backup_pool, &backup_config).await {

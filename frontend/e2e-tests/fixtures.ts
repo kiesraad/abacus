@@ -84,8 +84,6 @@ type Fixtures = {
   completedElectionCSB: Election;
   // The current committee session for the GSB election
   currentCommitteeSessionElectionGSB: CommitteeSession;
-  // The current committee session for the CSB election
-  currentCommitteeSessionElectionCSB: CommitteeSession;
   // Newly created GSB User
   newTypistGSB: User;
 };
@@ -329,9 +327,6 @@ export const test = base.extend<Fixtures>({
   },
   currentCommitteeSessionElectionGSB: async ({ electionGSB }, use) => {
     await use(electionGSB.current_committee_session);
-  },
-  currentCommitteeSessionElectionCSB: async ({ electionCSB }, use) => {
-    await use(electionCSB.current_committee_session);
   },
   newTypistGSB: async ({ adminOne }, use) => {
     const { request } = adminOne;

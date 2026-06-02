@@ -324,7 +324,7 @@ test.describe("full flow CSB", () => {
     await expect(includeAllCandidatesPage.title).toBeVisible();
     await expect(includeAllCandidatesPage.yes).toBeVisible();
     await expect(includeAllCandidatesPage.no).toBeVisible();
-    await includeAllCandidatesPage.yes.click();
+    await includeAllCandidatesPage.yes.check();
     await includeAllCandidatesPage.next.click();
 
     const apportionmentPage = new Apportionment(page);

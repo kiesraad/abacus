@@ -10,12 +10,9 @@ import { ElectionStatus } from "e2e-tests/page-objects/election/ElectionStatusPg
 import { FinishDataEntry } from "e2e-tests/page-objects/election/FinishDataEntryPgObj";
 import { test } from "../../fixtures";
 
-test.use({
-  storageState: "e2e-tests/state/coordinator1-CSB.json",
-});
-
 test.describe("CSB election apportionment", () => {
-  test("is calculated after adding deceased candidates", async ({ page, completedElectionCSB }) => {
+  test("is calculated after adding deceased candidates", async ({ coordinatorOneCSB, completedElectionCSB }) => {
+    const page = coordinatorOneCSB.page;
     await page.goto(`/elections/${completedElectionCSB.id}/status`);
 
     const electionStatusPage = new ElectionStatus(page);
@@ -30,7 +27,7 @@ test.describe("CSB election apportionment", () => {
     await expect(includeAllCandidatesPage.title).toBeVisible();
     await expect(includeAllCandidatesPage.yes).toBeVisible();
     await expect(includeAllCandidatesPage.no).toBeVisible();
-    await includeAllCandidatesPage.no.click();
+    await includeAllCandidatesPage.no.check();
     await includeAllCandidatesPage.next.click();
 
     const addDeceasedCandidatesPage = new AddDeceasedCandidate(page);
@@ -41,7 +38,6 @@ test.describe("CSB election apportionment", () => {
     const deceasedCandidatesPage = new DeceasedCandidates(page);
     await expect(deceasedCandidatesPage.header).toBeVisible();
     await expect(deceasedCandidatesPage.findCandidate(1, 5)).toBeVisible();
-    await expect(deceasedCandidatesPage.addCandidate).toBeVisible();
     await deceasedCandidatesPage.addCandidate.click();
 
     await expect(addDeceasedCandidatesPage.header).toBeVisible();

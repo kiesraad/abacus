@@ -1,4 +1,4 @@
-import { ApplicationError } from "@/api/ApiResult";
+import { Navigate } from "react-router";
 import { DownloadButton } from "@/components/ui/DownloadButton/DownloadButton";
 import { Loader } from "@/components/ui/Loader/Loader";
 import { useApportionmentStateRequest } from "@/hooks/apportionment/useApportionmentStateRequest";
@@ -6,7 +6,6 @@ import { t, tx } from "@/i18n/translate";
 import type { CommitteeSession, Election } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 import { formatDateTimeFull } from "@/utils/dateTime";
-
 import cls from "../ElectionManagement.module.css";
 
 interface CSBElectionReportSectionProps {
@@ -26,8 +25,9 @@ export function CSBElectionReportSection({ election, committeeSession, sessionLa
     return <Loader />;
   }
 
+  // TODO: To be refactored in issue #3352 to prevent partial loading of ElectionReportPage before redirecting
   if (requestState.data.type !== "Finalised") {
-    throw new ApplicationError(t("error.forbidden_message"), "InvalidCommitteeSessionStatus");
+    return <Navigate to={`/elections/${election.id}/apportionment`} />;
   }
 
   return (

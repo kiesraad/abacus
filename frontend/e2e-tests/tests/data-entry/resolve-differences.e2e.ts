@@ -9,22 +9,22 @@ test.use({
 });
 
 test.describe("resolve differences", () => {
-  test("do not proceed when no action is chosen", async ({ page, pollingStationEntriesDifferent: pollingStation }) => {
-    await page.goto(`/elections/${pollingStation.election_id}/status`);
+  test("do not proceed when no action is chosen", async ({ page, dataEntryGSBEntriesDifferent }) => {
+    await page.goto(`/elections/${dataEntryGSBEntriesDifferent.election_id}/status`);
 
     const electionStatusPage = new ElectionStatus(page);
-    await electionStatusPage.errorsAndWarnings.getByRole("row", { name: pollingStation.name }).click();
+    await electionStatusPage.errorsAndWarnings.getByRole("row", { name: dataEntryGSBEntriesDifferent.name }).click();
 
     const resolveDifferencesPage = new ResolveDifferencesPgObj(page);
     await resolveDifferencesPage.save.click();
     await expect(resolveDifferencesPage.validationError).toBeVisible();
   });
 
-  test("keep first entry", async ({ page, pollingStationEntriesDifferent: pollingStation }) => {
-    await page.goto(`/elections/${pollingStation.election_id}/status`);
+  test("keep first entry", async ({ page, dataEntryGSBEntriesDifferent }) => {
+    await page.goto(`/elections/${dataEntryGSBEntriesDifferent.election_id}/status`);
 
     const electionStatusPage = new ElectionStatus(page);
-    await electionStatusPage.errorsAndWarnings.getByRole("row", { name: pollingStation.name }).click();
+    await electionStatusPage.errorsAndWarnings.getByRole("row", { name: dataEntryGSBEntriesDifferent.name }).click();
 
     const resolveDifferencesPage = new ResolveDifferencesPgObj(page);
     await resolveDifferencesPage.keepFirstEntry.click();
@@ -32,18 +32,20 @@ test.describe("resolve differences", () => {
     await expect(resolveDifferencesPage.secondValue).toHaveClass(/discard/);
     await resolveDifferencesPage.save.click();
 
-    await expect(electionStatusPage.firstEntryFinished).toContainText(`${pollingStation.name}Sam Kuijpers`);
+    await expect(electionStatusPage.firstEntryFinished).toContainText(
+      `${dataEntryGSBEntriesDifferent.name}Sam Kuijpers`,
+    );
     await expect(electionStatusPage.alertDifferencesResolved).toBeVisible();
     await expect(electionStatusPage.alertDifferencesResolved).toContainText(
       "Omdat er nog maar één invoer over is, moet er een nieuwe tweede invoer gedaan worden. Kies hiervoor een andere invoerder dan Sam Kuijpers.",
     );
   });
 
-  test("keep second entry", async ({ page, pollingStationEntriesDifferent: pollingStation }) => {
-    await page.goto(`/elections/${pollingStation.election_id}/status`);
+  test("keep second entry", async ({ page, dataEntryGSBEntriesDifferent }) => {
+    await page.goto(`/elections/${dataEntryGSBEntriesDifferent.election_id}/status`);
 
     const electionStatusPage = new ElectionStatus(page);
-    await electionStatusPage.errorsAndWarnings.getByRole("row", { name: pollingStation.name }).click();
+    await electionStatusPage.errorsAndWarnings.getByRole("row", { name: dataEntryGSBEntriesDifferent.name }).click();
 
     const resolveDifferencesPage = new ResolveDifferencesPgObj(page);
     await resolveDifferencesPage.keepSecondEntry.click();
@@ -51,18 +53,20 @@ test.describe("resolve differences", () => {
     await expect(resolveDifferencesPage.secondValue).toHaveClass(/keep/);
     await resolveDifferencesPage.save.click();
 
-    await expect(electionStatusPage.firstEntryFinished).toContainText(`${pollingStation.name}Aliyah van den Berg`);
+    await expect(electionStatusPage.firstEntryFinished).toContainText(
+      `${dataEntryGSBEntriesDifferent.name}Aliyah van den Berg`,
+    );
     await expect(electionStatusPage.alertDifferencesResolved).toBeVisible();
     await expect(electionStatusPage.alertDifferencesResolved).toContainText(
       "Omdat er nog maar één invoer over is, moet er een nieuwe tweede invoer gedaan worden. Kies hiervoor een andere invoerder dan Aliyah van den Berg.",
     );
   });
 
-  test("discard both", async ({ page, pollingStationEntriesDifferent: pollingStation }) => {
-    await page.goto(`/elections/${pollingStation.election_id}/status`);
+  test("discard both", async ({ page, dataEntryGSBEntriesDifferent }) => {
+    await page.goto(`/elections/${dataEntryGSBEntriesDifferent.election_id}/status`);
 
     const electionStatusPage = new ElectionStatus(page);
-    await electionStatusPage.errorsAndWarnings.getByRole("row", { name: pollingStation.name }).click();
+    await electionStatusPage.errorsAndWarnings.getByRole("row", { name: dataEntryGSBEntriesDifferent.name }).click();
 
     const resolveDifferencesPage = new ResolveDifferencesPgObj(page);
     await resolveDifferencesPage.discardBothEntries.click();
@@ -70,7 +74,7 @@ test.describe("resolve differences", () => {
     await expect(resolveDifferencesPage.secondValue).toHaveClass(/discard/);
     await resolveDifferencesPage.save.click();
 
-    await expect(electionStatusPage.notStarted).toContainText(pollingStation.name);
+    await expect(electionStatusPage.notStarted).toContainText(dataEntryGSBEntriesDifferent.name);
     await expect(electionStatusPage.alertDifferencesResolved).toBeVisible();
     await expect(electionStatusPage.alertDifferencesResolved).toContainText(
       "Omdat beide invoeren zijn verwijderd, moet stembureau 33 twee keer opnieuw ingevoerd worden.",
@@ -81,12 +85,14 @@ test.describe("resolve differences", () => {
 test.describe("resolve differences then errors", () => {
   test("keep second entry with errors then resolve errors", async ({
     page,
-    pollingStationEntriesDifferentWithErrors: pollingStation,
+    dataEntryGSBEntriesDifferentWithErrors,
   }) => {
-    await page.goto(`/elections/${pollingStation.election_id}/status`);
+    await page.goto(`/elections/${dataEntryGSBEntriesDifferentWithErrors.election_id}/status`);
 
     const electionStatusPage = new ElectionStatus(page);
-    await electionStatusPage.errorsAndWarnings.getByRole("row", { name: pollingStation.name }).click();
+    await electionStatusPage.errorsAndWarnings
+      .getByRole("row", { name: dataEntryGSBEntriesDifferentWithErrors.name })
+      .click();
 
     const resolveDifferencesPage = new ResolveDifferencesPgObj(page);
     await expect(resolveDifferencesPage.title).toBeVisible();
@@ -99,7 +105,7 @@ test.describe("resolve differences then errors", () => {
     await resolveErrorsPage.resumeFirstEntry.click();
     await resolveErrorsPage.save.click();
 
-    await expect(electionStatusPage.inProgress).toContainText(pollingStation.name);
+    await expect(electionStatusPage.inProgress).toContainText(dataEntryGSBEntriesDifferentWithErrors.name);
     await expect(electionStatusPage.alertFirstDataEntryResumed).toBeVisible();
   });
 });

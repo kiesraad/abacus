@@ -270,7 +270,8 @@ jobs:
         shell: bash
         run: >
           rustup update nightly &&
-          rustup default nightly
+          rustup default nightly &&
+          rustup component add clippy
       - name: Cargo cache
         uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4 # v2
         with:
@@ -280,9 +281,15 @@ jobs:
           shared-key: "fuzzer"
       - name: Install cargo fuzz
         run: cargo install cargo-fuzz
-      - name: Run the data entry fuzzer
+      - name: Check Clippy for ./backend/fuzz
+        run: cargo --verbose --locked clippy -- -D warnings
+        working-directory: ./backend/fuzz
+      - name: Check Clippy for ./backend/apportionment/fuzz
+        run: cargo --verbose --locked clippy -- -D warnings
+        working-directory: ./backend/apportionment/fuzz
+      - name: Run data entry fuzzer
         run: cargo fuzz run data_entry_status -- -max_total_time=60
-      - name: Run the apportionment fuzzer
+      - name: Run simple apportionment fuzzer
         working-directory: ./backend/apportionment
         run: cargo fuzz run simple_apportionment -- -max_total_time=60
 

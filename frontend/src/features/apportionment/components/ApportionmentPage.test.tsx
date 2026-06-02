@@ -2,24 +2,28 @@ import { render as rtlRender } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import * as ReactRouter from "react-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
-
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
+import {
+  GetApportionmentStateRequestHandler,
+  RegisterDeceasedCandidatesRequestHandler,
+  ResetApportionmentStateRequestHandler,
+} from "@/testing/api-mocks/RequestHandlers";
 import { Providers } from "@/testing/Providers";
 import type { Router } from "@/testing/router";
-import { overrideOnce } from "@/testing/server";
+import { overrideOnce, server } from "@/testing/server";
 import {
   expectErrorPage,
   render,
   renderReturningRouter,
   screen,
   setupTestRouter,
+  spyOnHandler,
   waitFor,
   within,
 } from "@/testing/test-utils";
 import type { ApportionmentState, ElectionApportionmentResponse, ErrorResponse } from "@/types/generated/openapi";
-
 import { apportionmentRoutes } from "../routes";
 import {
   candidate_nomination,
@@ -97,6 +101,7 @@ describe("ApportionmentPage", () => {
         "href",
         "/report/committee-session/3/download",
       );
+      expect(within(alert).getByRole("button", { name: "Zetelverdeling opnieuw doen" })).toBeVisible();
     } else {
       expect(screen.queryByRole("alert")).not.toBeInTheDocument();
     }
@@ -107,6 +112,58 @@ describe("ApportionmentPage", () => {
       });
     } else {
       expect(navigate).not.toHaveBeenCalled();
+    }
+  });
+
+  test("Renders number of deceased candidates and redirects on clicking manage deceased candidates", async () => {
+    const user = userEvent.setup();
+    overrideOnce("get", "/api/elections/3", 200, getElectionMockData(election, committee_session));
+    overrideOnce("post", "/api/elections/3/apportionment", 200, {
+      seat_assignment: seat_assignment,
+      candidate_nomination: candidate_nomination,
+      election_summary: election_summary,
+    } satisfies ElectionApportionmentResponse);
+    server.use(GetApportionmentStateRequestHandler);
+    server.use(RegisterDeceasedCandidatesRequestHandler);
+    overrideOnce("get", "/api/elections/3/apportionment/state", 200, {
+      deceased_candidates: [{ pg_number: 1, candidate_number: 1 }],
+      type: "Finalised",
+    } satisfies ApportionmentState);
+
+    const router = renderApportionmentPage(3, true) as Router;
+
+    expect(await screen.findByRole("heading", { level: 1, name: "Zetelverdeling" })).toBeVisible();
+
+    const alert = await screen.findByRole("alert");
+    expect(alert).toHaveTextContent("Alle zetels zijn toegewezen");
+    expect(alert).toHaveTextContent("Je kunt de zetelverdeling nu definitief maken en het proces-verbaal downloaden.");
+    expect(within(alert).getByRole("link", { name: "Naar proces-verbaal" })).toHaveAttribute(
+      "href",
+      "/report/committee-session/3/download",
+    );
+    expect(within(alert).getByRole("button", { name: "Zetelverdeling opnieuw doen" })).toBeVisible();
+
+    expect(await screen.findByRole("heading", { level: 2, name: "Kengetallen" })).toBeVisible();
+    const election_summary_table = await screen.findByTestId("election-summary-table");
+    expect(election_summary_table).toBeVisible();
+    expect(election_summary_table).toHaveTableContent([
+      ["Kiesgerechtigden", "2.000", ""],
+      ["Getelde stembiljetten", "1.205", "Opkomst: 60.25%"],
+      ["Blanco stemmen", "3", "0.25%"],
+      ["Ongeldige stemmen", "2", "0.17%"],
+      ["Totaal stemmen op kandidaten", "1.200", ""],
+      ["Aantal raadszetels", "15", ""],
+      ["Kiesdeler", "80", "Benodigde stemmen per volle zetel"],
+      ["Voorkeursdrempel", "40", "50% van de kiesdeler"],
+      ["Kandidaten voor zetelverdeling", "44 - 1 † = 43", "Beheer overleden kandidaten"],
+    ]);
+
+    // Check if the link to the deceased candidates page works
+    const rows = within(election_summary_table).getAllByRole("row");
+    if (rows[8]) {
+      const manageLink = await within(rows[8]).findByRole("link", { name: "Beheer overleden kandidaten" });
+      await user.click(manageLink);
+      expect(router.state.location.pathname).toEqual("/elections/3/apportionment/deceased-candidates");
     }
   });
 
@@ -127,14 +184,14 @@ describe("ApportionmentPage", () => {
 
     expect(await screen.findByRole("heading", { level: 1, name: "Zetelverdeling" })).toBeVisible();
 
-    expect(await screen.findByText("Alle zetels zijn toegewezen")).toBeVisible();
-    expect(
-      await screen.findByText("Je kunt de zetelverdeling nu definitief maken en het proces-verbaal downloaden."),
-    ).toBeVisible();
-    expect(screen.getByRole("link", { name: "Naar proces-verbaal" })).toHaveAttribute(
+    const alert = await screen.findByRole("alert");
+    expect(alert).toHaveTextContent("Alle zetels zijn toegewezen");
+    expect(alert).toHaveTextContent("Je kunt de zetelverdeling nu definitief maken en het proces-verbaal downloaden.");
+    expect(within(alert).getByRole("link", { name: "Naar proces-verbaal" })).toHaveAttribute(
       "href",
       "/report/committee-session/3/download",
     );
+    expect(within(alert).getByRole("button", { name: "Zetelverdeling opnieuw doen" })).toBeVisible();
 
     expect(await screen.findByRole("heading", { level: 2, name: "Kengetallen" })).toBeVisible();
     const election_summary_table = await screen.findByTestId("election-summary-table");
@@ -148,6 +205,7 @@ describe("ApportionmentPage", () => {
       ["Aantal raadszetels", "15", ""],
       ["Kiesdeler", "80", "Benodigde stemmen per volle zetel"],
       ["Voorkeursdrempel", "40", "50% van de kiesdeler"],
+      ["Kandidaten voor zetelverdeling", "44 - 0 † = 44", "Beheer overleden kandidaten"],
     ]);
 
     expect(await screen.findByRole("heading", { level: 2, name: "Zetelverdeling" })).toBeVisible();
@@ -209,7 +267,12 @@ describe("ApportionmentPage", () => {
     expect(router.state.location.pathname).toEqual("/1");
   });
 
-  test("Renders yellow warning when finalised but not all seats assigned", async () => {
+  test("Renders yellow warning when finalised but not all seats assigned and clicks reset button", async () => {
+    const user = userEvent.setup();
+    server.use(GetApportionmentStateRequestHandler);
+    server.use(ResetApportionmentStateRequestHandler);
+    const resetApportionmentState = spyOnHandler(ResetApportionmentStateRequestHandler);
+    const getApportionmentState = spyOnHandler(GetApportionmentStateRequestHandler);
     overrideOnce("get", "/api/elections/3", 200, getElectionMockData(election, committee_session));
     overrideOnce("post", "/api/elections/3/apportionment", 200, {
       seat_assignment: { ...seat_assignment, residual_seats: seat_assignment.residual_seats - 2 },
@@ -232,6 +295,12 @@ describe("ApportionmentPage", () => {
       "href",
       "/report/committee-session/3/download",
     );
+    const resetButton = within(alert).getByRole("button", { name: "Zetelverdeling opnieuw doen" });
+    expect(resetButton).toBeVisible();
+    await user.click(resetButton);
+
+    expect(resetApportionmentState).toHaveBeenCalled();
+    expect(getApportionmentState).toHaveBeenCalled();
   });
 
   describe("Apportionment not yet available", () => {

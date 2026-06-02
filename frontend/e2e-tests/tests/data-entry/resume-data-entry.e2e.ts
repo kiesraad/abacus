@@ -14,16 +14,16 @@ import {
 } from "e2e-tests/page-objects/data_entry/ExtraInvestigationPgObj";
 import { VotersAndVotesPage } from "e2e-tests/page-objects/data_entry/VotersAndVotesPgObj";
 import { emptyCSOFirstSessionResults } from "e2e-tests/test-data/request-response-templates";
-import type { ClaimDataEntryResponse, PollingStation, VotersCounts, VotesCounts } from "@/types/generated/openapi";
-import { test } from "../../fixtures";
+import type { ClaimDataEntryResponse, VotersCounts, VotesCounts } from "@/types/generated/openapi";
+import { type DataEntry, test } from "../../fixtures";
 
 test.use({
   storageState: "e2e-tests/state/typist1.json",
 });
 
 test.describe("resume data entry flow", () => {
-  const fillFirstTwoPagesAndAbort = async (page: Page, pollingStation: PollingStation) => {
-    await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1`);
+  const fillFirstTwoPagesAndAbort = async (page: Page, dataEntry: DataEntry) => {
+    await page.goto(`/elections/${dataEntry.election_id}/data-entry/${dataEntry.id}/1`);
 
     const extraInvestigationPage = new ExtraInvestigationPage(page);
     await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
@@ -55,8 +55,8 @@ test.describe("resume data entry flow", () => {
     return new AbortInputModal(page);
   };
 
-  test("Closing abort modal with X only closes the modal", async ({ page, pollingStation }) => {
-    await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1`);
+  test("Closing abort modal with X only closes the modal", async ({ page, dataEntryGSB }) => {
+    await page.goto(`/elections/${dataEntryGSB.election_id}/data-entry/${dataEntryGSB.id}/1`);
     const extraInvestigationPage = new ExtraInvestigationPage(page);
     await extraInvestigationPage.abortInput.click();
 
@@ -77,15 +77,15 @@ test.describe("resume data entry flow", () => {
   });
 
   test.describe("resume after saving", () => {
-    test("resuming data entry shows previous data", async ({ page, pollingStation }) => {
-      const abortInputModal = await fillFirstTwoPagesAndAbort(page, pollingStation);
+    test("resuming data entry shows previous data", async ({ page, dataEntryGSB }) => {
+      const abortInputModal = await fillFirstTwoPagesAndAbort(page, dataEntryGSB);
       await expect(abortInputModal.heading).toBeFocused();
       await abortInputModal.saveInput.click();
 
       const dataEntryHomePage = new DataEntryHomePage(page);
       await expect(dataEntryHomePage.fieldset).toBeVisible();
 
-      await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1`);
+      await page.goto(`/elections/${dataEntryGSB.election_id}/data-entry/${dataEntryGSB.id}/1`);
 
       const differencesPage = new DifferencesPage(page);
       await expect(differencesPage.fieldset).toBeVisible();
@@ -107,14 +107,14 @@ test.describe("resume data entry flow", () => {
 
     // Reproduce issue where navigating between sections is blocked by modal, even though there are no changes.
     // https://github.com/kiesraad/abacus/pull/417#pullrequestreview-2347886699
-    test("navigation works after resuming data entry", async ({ page, pollingStation }) => {
-      const abortInputModal = await fillFirstTwoPagesAndAbort(page, pollingStation);
+    test("navigation works after resuming data entry", async ({ page, dataEntryGSB }) => {
+      const abortInputModal = await fillFirstTwoPagesAndAbort(page, dataEntryGSB);
       await abortInputModal.saveInput.click();
 
       const dataEntryHomePage = new DataEntryHomePage(page);
       await expect(dataEntryHomePage.fieldset).toBeVisible();
 
-      await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1`);
+      await page.goto(`/elections/${dataEntryGSB.election_id}/data-entry/${dataEntryGSB.id}/1`);
 
       const differencesPage = new DifferencesPage(page);
       await differencesPage.admittedVotersEqualsVotesCastCheckbox.check();
@@ -133,8 +133,8 @@ test.describe("resume data entry flow", () => {
       await expect(candidatesListPage_1.fieldset).toBeVisible();
     });
 
-    test("save input from voters and votes page with error", async ({ page, request, pollingStation }) => {
-      await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1`);
+    test("save input from voters and votes page with error", async ({ page, request, dataEntryGSB }) => {
+      await page.goto(`/elections/${dataEntryGSB.election_id}/data-entry/${dataEntryGSB.id}/1`);
 
       const extraInvestigationPage = new ExtraInvestigationPage(page);
       await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
@@ -160,7 +160,7 @@ test.describe("resume data entry flow", () => {
       await expect(dataEntryHomePage.fieldset).toBeVisible();
       await expect(dataEntryHomePage.alertDataEntryInProgress).toBeVisible();
 
-      const dataEntryResponse = await request.post(`/api/data_entries/${pollingStation.data_entry_id!}/1/claim`);
+      const dataEntryResponse = await request.post(`/api/data_entries/${dataEntryGSB.id}/1/claim`);
       expect(dataEntryResponse.status()).toBe(200);
       expect(await dataEntryResponse.json()).toMatchObject({
         data: {
@@ -197,12 +197,12 @@ test.describe("resume data entry flow", () => {
         },
       });
 
-      await dataEntryHomePage.enterNumberAndClickStart(pollingStation);
+      await dataEntryHomePage.enterNumberAndClickStart(dataEntryGSB);
       await expect(votersAndVotesPage.fieldset).toBeVisible();
     });
 
-    test("save input from voters and votes page with warning", async ({ page, request, pollingStation }) => {
-      await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1`);
+    test("save input from voters and votes page with warning", async ({ page, request, dataEntryGSB }) => {
+      await page.goto(`/elections/${dataEntryGSB.election_id}/data-entry/${dataEntryGSB.id}/1`);
 
       const extraInvestigationPage = new ExtraInvestigationPage(page);
       await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
@@ -242,7 +242,7 @@ test.describe("resume data entry flow", () => {
       const dataEntryHomePage = new DataEntryHomePage(page);
       await expect(dataEntryHomePage.fieldset).toBeVisible();
 
-      const dataEntryResponse = await request.post(`/api/data_entries/${pollingStation.data_entry_id!}/1/claim`);
+      const dataEntryResponse = await request.post(`/api/data_entries/${dataEntryGSB.id}/1/claim`);
       expect(dataEntryResponse.status()).toBe(200);
       expect(await dataEntryResponse.json()).toMatchObject({
         data: {
@@ -287,12 +287,12 @@ test.describe("resume data entry flow", () => {
         },
       } satisfies Partial<ClaimDataEntryResponse>);
 
-      await dataEntryHomePage.enterNumberAndClickStart(pollingStation);
+      await dataEntryHomePage.enterNumberAndClickStart(dataEntryGSB);
       await expect(votersAndVotesPage.fieldset).toBeVisible();
     });
 
-    test("resuming with unsubmitted input (cached data) shows that data", async ({ page, pollingStation }) => {
-      await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1`);
+    test("resuming with unsubmitted input (cached data) shows that data", async ({ page, dataEntryGSB }) => {
+      await page.goto(`/elections/${dataEntryGSB.election_id}/data-entry/${dataEntryGSB.id}/1`);
 
       const extraInvestigationPage = new ExtraInvestigationPage(page);
       await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
@@ -314,7 +314,7 @@ test.describe("resume data entry flow", () => {
       await abortInputModal.saveInput.click();
 
       const dataEntryHomePage = new DataEntryHomePage(page);
-      await dataEntryHomePage.enterNumberAndClickStart(pollingStation);
+      await dataEntryHomePage.enterNumberAndClickStart(dataEntryGSB);
 
       await expect(votersAndVotesPage.fieldset).toBeVisible();
       await expect(votersAndVotesPage.pollCardCount).toHaveValue("42");
@@ -322,8 +322,8 @@ test.describe("resume data entry flow", () => {
       await expect(votersAndVotesPage.totalAdmittedVotersCount).toHaveValue("42");
     });
 
-    test("save unsubmitted input when changing voters data works", async ({ page, pollingStation }) => {
-      await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1`);
+    test("save unsubmitted input when changing voters data works", async ({ page, dataEntryGSB }) => {
+      await page.goto(`/elections/${dataEntryGSB.election_id}/data-entry/${dataEntryGSB.id}/1`);
 
       const extraInvestigationPage = new ExtraInvestigationPage(page);
       await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
@@ -352,10 +352,10 @@ test.describe("resume data entry flow", () => {
       await expect(dataEntryHomePage.fieldset).toBeVisible();
     });
 
-    test("save input from check and save page", async ({ typistOne, pollingStation }) => {
+    test("save input from check and save page", async ({ typistOne, dataEntryGSB }) => {
       const { page } = typistOne;
 
-      await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1`);
+      await page.goto(`/elections/${dataEntryGSB.election_id}/data-entry/${dataEntryGSB.id}/1`);
 
       const extraInvestigationPage = new ExtraInvestigationPage(page);
       await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
@@ -423,15 +423,15 @@ test.describe("resume data entry flow", () => {
   });
 
   test.describe("resume after deleting", () => {
-    test("deleting data entry doesn't show previous data", async ({ page, pollingStation }) => {
-      const abortInputModal = await fillFirstTwoPagesAndAbort(page, pollingStation);
+    test("deleting data entry doesn't show previous data", async ({ page, dataEntryGSB }) => {
+      const abortInputModal = await fillFirstTwoPagesAndAbort(page, dataEntryGSB);
       await expect(abortInputModal.heading).toBeFocused();
       await abortInputModal.discardInput.click();
 
       const dataEntryHomePage = new DataEntryHomePage(page);
       await expect(dataEntryHomePage.fieldset).toBeVisible();
 
-      await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1`);
+      await page.goto(`/elections/${dataEntryGSB.election_id}/data-entry/${dataEntryGSB.id}/1`);
 
       // extra investigation section should be empty
       const extraInvestigationPage = new ExtraInvestigationPage(page);
@@ -457,10 +457,10 @@ test.describe("resume data entry flow", () => {
       await expect(votersAndVotesPage.proxyCertificateCount).toBeEmpty();
     });
 
-    test("discard input from voters and votes page with error", async ({ typistOne, pollingStation }) => {
+    test("discard input from voters and votes page with error", async ({ typistOne, dataEntryGSB }) => {
       const { page, request } = typistOne;
 
-      await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1`);
+      await page.goto(`/elections/${dataEntryGSB.election_id}/data-entry/${dataEntryGSB.id}/1`);
 
       const extraInvestigationPage = new ExtraInvestigationPage(page);
       await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
@@ -484,15 +484,15 @@ test.describe("resume data entry flow", () => {
       const dataEntryHomePage = new DataEntryHomePage(page);
       await expect(dataEntryHomePage.fieldset).toBeVisible();
 
-      const claimResponse = await request.post(`/api/data_entries/${pollingStation.data_entry_id!}/1/claim`);
+      const claimResponse = await request.post(`/api/data_entries/${dataEntryGSB.id}/1/claim`);
       expect(claimResponse.status()).toBe(200);
       expect(await claimResponse.json()).toMatchObject({ data: emptyCSOFirstSessionResults() });
     });
 
-    test("discard input from voters and votes page with warning", async ({ typistOne, pollingStation }) => {
+    test("discard input from voters and votes page with warning", async ({ typistOne, dataEntryGSB }) => {
       const { page, request } = typistOne;
 
-      await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1`);
+      await page.goto(`/elections/${dataEntryGSB.election_id}/data-entry/${dataEntryGSB.id}/1`);
 
       const extraInvestigationPage = new ExtraInvestigationPage(page);
       await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
@@ -532,15 +532,15 @@ test.describe("resume data entry flow", () => {
       const dataEntryHomePage = new DataEntryHomePage(page);
       await expect(dataEntryHomePage.fieldset).toBeVisible();
 
-      const claimResponse = await request.post(`/api/data_entries/${pollingStation.data_entry_id!}/1/claim`);
+      const claimResponse = await request.post(`/api/data_entries/${dataEntryGSB.id}/1/claim`);
       expect(claimResponse.status()).toBe(200);
       expect(await claimResponse.json()).toMatchObject({ data: emptyCSOFirstSessionResults() });
     });
 
-    test("discard input from check and save page", async ({ typistOne, pollingStation }) => {
+    test("discard input from check and save page", async ({ typistOne, dataEntryGSB }) => {
       const { page, request } = typistOne;
 
-      await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1`);
+      await page.goto(`/elections/${dataEntryGSB.election_id}/data-entry/${dataEntryGSB.id}/1`);
 
       const extraInvestigationPage = new ExtraInvestigationPage(page);
       await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
@@ -595,7 +595,7 @@ test.describe("resume data entry flow", () => {
       const dataEntryHomePage = new DataEntryHomePage(page);
       await expect(dataEntryHomePage.fieldset).toBeVisible();
 
-      const claimResponse = await request.post(`/api/data_entries/${pollingStation.data_entry_id!}/1/claim`);
+      const claimResponse = await request.post(`/api/data_entries/${dataEntryGSB.id}/1/claim`);
       expect(claimResponse.status()).toBe(200);
       expect(await claimResponse.json()).toMatchObject({ data: emptyCSOFirstSessionResults() });
     });

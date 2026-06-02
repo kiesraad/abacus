@@ -2,7 +2,9 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { type AnyApiError, type ApiResult, isSuccess } from "@/api/ApiResult";
 import { useApiClient } from "@/api/useApiClient";
+import { IconArrowRight } from "@/components/generated/icons";
 import { Button } from "@/components/ui/Button/Button";
+import { Icon } from "@/components/ui/Icon/Icon";
 import { Loader } from "@/components/ui/Loader/Loader";
 import { Table } from "@/components/ui/Table/Table";
 import { useElection } from "@/hooks/election/useElection";
@@ -17,11 +19,12 @@ import type {
   FINALISE_DECEASED_CANDIDATES_REQUEST_PATH,
   PGNumber,
   PoliticalGroup,
+  RESET_APPORTIONMENT_STATE_REQUEST_PATH,
 } from "@/types/generated/openapi";
 import { getCandidateFullName } from "@/utils/candidate";
 import { getPoliticalGroupName } from "@/utils/politicalGroup";
 import { useApportionmentContext } from "../../hooks/useApportionmentContext";
-import { deceasedCandidatesCheckStateAndRedirect, renderTitleAndHeader } from "../../utils/utils";
+import { renderTitleAndHeader } from "../../utils/utils";
 import { ApportionmentError } from "../ApportionmentError";
 import cls from "./DeceasedCandidates.module.css";
 
@@ -31,9 +34,20 @@ interface DetailedDeceasedCandidate {
   list_name: string;
 }
 
+function renderPageDescription(state: ApportionmentState, deceasedCandidates: DetailedDeceasedCandidate[]) {
+  return (
+    <>
+      {state.type === "RegisteringDeceasedCandidates"
+        ? t("apportionment.which_candidates_are_deceased")
+        : `${t("apportionment.apportionment_already_calculated")} ${deceasedCandidates.length === 0 ? t("apportionment.no_candidates_are_deceased") : t("apportionment.below_candidates_are_deceased")}`}
+    </>
+  );
+}
+
 function renderDeceasedCandidatesTable(
   deceasedCandidates: DetailedDeceasedCandidate[],
   handleDeleteDeceasedCandidate: (candidateNumber: CandidateNumber, pgNumber: PGNumber) => void,
+  withDeleteLink: boolean,
 ) {
   return (
     <Table className={cls.deceasedCandidatesTable}>
@@ -41,7 +55,7 @@ function renderDeceasedCandidatesTable(
         <Table.HeaderCell>{t("candidate.deceased.singular")}</Table.HeaderCell>
         <Table.HeaderCell>{t("list")}</Table.HeaderCell>
         <Table.HeaderCell>{t("apportionment.position_on_list")}</Table.HeaderCell>
-        <Table.HeaderCell />
+        {withDeleteLink && <Table.HeaderCell />}
       </Table.Header>
       <Table.Body>
         {deceasedCandidates.map((deceasedCandidate) => {
@@ -55,17 +69,19 @@ function renderDeceasedCandidatesTable(
                 {getPoliticalGroupName(deceasedCandidate.list_number, deceasedCandidate.list_name)}
               </Table.Cell>
               <Table.Cell>{deceasedCandidate.candidate.number}</Table.Cell>
-              <Table.Cell>
-                <Button
-                  variant="underlined"
-                  size="md"
-                  onClick={() => {
-                    handleDeleteDeceasedCandidate(deceasedCandidate.candidate.number, deceasedCandidate.list_number);
-                  }}
-                >
-                  {t("delete")}
-                </Button>
-              </Table.Cell>
+              {withDeleteLink && (
+                <Table.Cell>
+                  <Button
+                    variant="underlined"
+                    size="md"
+                    onClick={() => {
+                      handleDeleteDeceasedCandidate(deceasedCandidate.candidate.number, deceasedCandidate.list_number);
+                    }}
+                  >
+                    {t("delete")}
+                  </Button>
+                </Table.Cell>
+              )}
             </Table.Row>
           );
         })}
@@ -95,6 +111,7 @@ function get_detailed_deceased_candidates(
   return detailedDeceasedCandidates;
 }
 
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO: Is there any way to make this shorter?
 export function DeceasedCandidatesPage() {
   const navigate = useNavigate();
   const { election } = useElection();
@@ -107,7 +124,9 @@ export function DeceasedCandidatesPage() {
   }
 
   useEffect(() => {
-    deceasedCandidatesCheckStateAndRedirect(state, election.id, navigate);
+    if (state?.type === "Uninitialised") {
+      void navigate(`/elections/${election.id}/apportionment/include-all-candidates`);
+    }
   });
 
   if (isLoading) {
@@ -136,7 +155,19 @@ export function DeceasedCandidatesPage() {
     const response: ApiResult<ApportionmentState> = await client.postRequest(path);
 
     if (isSuccess(response)) {
-      void refetchState();
+      await refetchState();
+      void navigate(`/elections/${election.id}/apportionment`);
+    } else {
+      setApiError(response);
+    }
+  }
+
+  async function handleResetApportionmentState() {
+    const path: RESET_APPORTIONMENT_STATE_REQUEST_PATH = `/api/elections/${election.id}/apportionment/reset`;
+    const response: ApiResult<ApportionmentState> = await client.postRequest(path);
+
+    if (isSuccess(response)) {
+      await refetchState();
     } else {
       setApiError(response);
     }
@@ -150,30 +181,47 @@ export function DeceasedCandidatesPage() {
           {error ? (
             <ApportionmentError error={error} />
           ) : (
-            state?.type === "RegisteringDeceasedCandidates" && (
+            (state?.type === "RegisteringDeceasedCandidates" || state?.type === "Finalised") && (
               <div className={cls.container}>
-                <div className="w-39">{t("apportionment.which_candidates_are_deceased")}</div>
-                <div className={cls.tableContainer}>
-                  {deceasedCandidates.length > 0 &&
-                    renderDeceasedCandidatesTable(
+                <div className="w-39">{renderPageDescription(state, deceasedCandidates)}</div>
+                {deceasedCandidates.length > 0 && (
+                  <div className="mt-sm">
+                    {renderDeceasedCandidatesTable(
                       deceasedCandidates,
                       (candidateNumber, pgNumber) => void handleDeleteDeceasedCandidate(candidateNumber, pgNumber),
+                      state.type === "RegisteringDeceasedCandidates",
                     )}
-                  <div className="ml-md-lg">
-                    <Button.Link
-                      variant="underlined"
-                      size="md"
-                      to={`/elections/${election.id}/apportionment/deceased-candidates/add`}
-                    >
-                      {`+ ${t("candidate.add")}`}
-                    </Button.Link>
                   </div>
-                </div>
-                <div className="mt-md">
-                  <Button onClick={() => void handleFinaliseDeceasedCandidates()}>
-                    {t("apportionment.to_apportionment")}
-                  </Button>
-                </div>
+                )}
+                {state.type === "RegisteringDeceasedCandidates" && (
+                  <>
+                    <div className="ml-md-lg">
+                      <Button.Link
+                        variant="underlined"
+                        size="md"
+                        to={`/elections/${election.id}/apportionment/deceased-candidates/add`}
+                      >
+                        {`+ ${t("candidate.add")}`}
+                      </Button.Link>
+                    </div>
+                    <div className="mt-md-lg">
+                      <Button onClick={() => void handleFinaliseDeceasedCandidates()}>
+                        {t("apportionment.to_apportionment")}
+                      </Button>
+                    </div>
+                  </>
+                )}
+                {state.type === "Finalised" && (
+                  <div className="mt-md-lg">
+                    {t("apportionment.want_to_make_changes")}
+                    <div className={cls.resetSection}>
+                      <Icon size="xs" icon={<IconArrowRight />} />
+                      <Button variant="underlined" size="md" onClick={() => void handleResetApportionmentState()}>
+                        {t("apportionment.redo_apportionment")}
+                      </Button>
+                    </div>
+                  </div>
+                )}
               </div>
             )
           )}

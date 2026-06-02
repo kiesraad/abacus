@@ -191,7 +191,7 @@ test.describe("Data entry model test - valid data", () => {
   createTestModel(machine)
     .getSimplePaths()
     .forEach((path) => {
-      test(path.description, async ({ page, pollingStation, election }) => {
+      test(path.description, async ({ page, dataEntryGSB, election }) => {
         const dataEntryHomePage = new DataEntryHomePage(page);
         const extraInvestigationPage = new ExtraInvestigationPage(page);
         const countingDifferencesPollingStationPage = new CountingDifferencesPollingStationPage(page);
@@ -200,8 +200,8 @@ test.describe("Data entry model test - valid data", () => {
         const abortModal = new AbortInputModal(page);
         const navBar = new TypistNavBar(page);
 
-        await page.goto(`/elections/${pollingStation.election_id}/data-entry`);
-        await dataEntryHomePage.enterNumberAndClickStart(pollingStation);
+        await page.goto(`/elections/${dataEntryGSB.election_id}/data-entry`);
+        await dataEntryHomePage.enterNumberAndClickStart(dataEntryGSB);
         await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
         await countingDifferencesPollingStationPage.fillAndClickNext(noDifferences);
 
@@ -213,26 +213,26 @@ test.describe("Data entry model test - valid data", () => {
           dataEntryHomePageEmptySaved: async () => {
             await expect(dataEntryHomePage.fieldset).toBeVisible();
             await expect(dataEntryHomePage.allDataEntriesInProgress).toHaveText([
-              `${pollingStation.number} - ${pollingStation.name}`,
+              `${dataEntryGSB.number} - ${dataEntryGSB.name}`,
             ]);
           },
           dataEntryHomePageFilledSaved: async () => {
             await expect(dataEntryHomePage.fieldset).toBeVisible();
             await expect(dataEntryHomePage.allDataEntriesInProgress).toHaveText([
-              `${pollingStation.number} - ${pollingStation.name}`,
+              `${dataEntryGSB.number} - ${dataEntryGSB.name}`,
             ]);
           },
           dataEntryHomePageChangedSaved: async () => {
             await expect(dataEntryHomePage.fieldset).toBeVisible();
             await expect(dataEntryHomePage.allDataEntriesInProgress).toHaveText([
-              `${pollingStation.number} - ${pollingStation.name}`,
+              `${dataEntryGSB.number} - ${dataEntryGSB.name}`,
             ]);
           },
         };
 
         const dataEntryHomePageEvents = {
           RESUME_DATA_ENTRY: async () => {
-            await dataEntryHomePage.clickDataEntryInProgress(pollingStation);
+            await dataEntryHomePage.clickDataEntryInProgress(dataEntryGSB);
           },
         };
 

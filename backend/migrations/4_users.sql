@@ -7,6 +7,7 @@ CREATE TABLE users
     password_hash          TEXT            NOT NULL,
     needs_password_change  INTEGER         NOT NULL DEFAULT TRUE,
     last_activity_at       TEXT            ,
+    is_logged_in           INTEGER         NOT NULL DEFAULT 0,
     updated_at             TEXT            NOT NULL DEFAULT CURRENT_TIMESTAMP,
     created_at             TEXT            NOT NULL DEFAULT CURRENT_TIMESTAMP,
 

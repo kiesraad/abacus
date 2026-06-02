@@ -88,17 +88,17 @@ mod tests {
         std::fs::remove_dir_all(&backup_config.directory).unwrap();
     }
 
-    #[test]
-    fn backup_directory_is_created_succesfully() {
-        let _lock = TEST_LOCK.lock().unwrap();
+    #[tokio::test]
+    async fn backup_directory_is_created_succesfully() {
+        let _lock = TEST_LOCK.lock().await;
         let backup_config = setup_backup_config();
         create_backup_directory(&backup_config).unwrap();
         delete_backup_directory(&backup_config);
     }
 
-    #[test]
-    fn backup_directory_creation_is_idempotent() {
-        let _lock = TEST_LOCK.lock().unwrap();
+    #[tokio::test]
+    async fn backup_directory_creation_is_idempotent() {
+        let _lock = TEST_LOCK.lock().await;
         let backup_config = setup_backup_config();
         create_backup_directory(&backup_config).unwrap();
         create_backup_directory(&backup_config).unwrap();
@@ -113,7 +113,7 @@ mod tests {
 
     #[sqlx::test]
     async fn local_backup_is_succesfull(pool: SqlitePool) {
-        let _lock = TEST_LOCK.lock().unwrap();
+        let _lock = TEST_LOCK.lock().await;
         let backup_config = setup_backup_config();
         create_backup_directory(&backup_config).unwrap();
         create_local_backup(&pool, &backup_config).await.unwrap();

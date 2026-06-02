@@ -100,7 +100,7 @@ De volgende rollen zijn mogelijk: voorzitter, plaatsvervangend voorzitter of lid
 
 == Aantal kiesgerechtigden
 
-#letterbox("Z", value: input.election.number_of_voters)[Kiesgerechtigden]
+#letterbox("Z", value: input.summary.number_of_voters)[Kiesgerechtigden]
 
 == Toegelaten kiezers
 

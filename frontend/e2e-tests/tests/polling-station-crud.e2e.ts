@@ -5,15 +5,15 @@ import { PollingStationListPgObj } from "e2e-tests/page-objects/polling_station/
 import { test } from "../fixtures";
 
 test.use({
-  storageState: "e2e-tests/state/coordinator1.json",
+  storageState: "e2e-tests/state/coordinator1-GSB.json",
 });
 
 test.describe("Polling station CRUD", () => {
   test("it redirects correctly after successful create of first polling station of an election", async ({
     page,
-    emptyElection,
+    emptyElectionGSB,
   }) => {
-    await page.goto(`/elections/${emptyElection.id}/polling-stations`);
+    await page.goto(`/elections/${emptyElectionGSB.id}/polling-stations`);
 
     const pollingStationListEmptyPage = new PollingStationListEmptyPgObj(page);
     await pollingStationListEmptyPage.createPollingStation.click();
@@ -31,8 +31,8 @@ test.describe("Polling station CRUD", () => {
     expect(await pollingStationListPage.alert.textContent()).toContain("Stembureau 42 (test42) toegevoegd");
   });
 
-  test("it redirects correctly after successful create of another polling station", async ({ page, election }) => {
-    await page.goto(`/elections/${election.election.id}/polling-stations`);
+  test("it redirects correctly after successful create of another polling station", async ({ page, electionGSB }) => {
+    await page.goto(`/elections/${electionGSB.election.id}/polling-stations`);
 
     const pollingStationListPage = new PollingStationListPgObj(page);
     await pollingStationListPage.createPollingStation.click();

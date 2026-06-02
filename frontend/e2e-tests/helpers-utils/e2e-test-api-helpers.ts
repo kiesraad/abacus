@@ -1,6 +1,6 @@
 import { type APIRequestContext, expect } from "@playwright/test";
+import { dataEntryRequest } from "e2e-tests/test-data/request-response-templates";
 import type { TestUser } from "e2e-tests/test-data/users";
-import { dataEntryRequest } from "../test-data/request-response-templates";
 import { DataEntryApiClient } from "./api-clients";
 
 export function getTestPassword(username: string, prefix = ""): string {
@@ -22,7 +22,7 @@ export async function apiLogout(request: APIRequestContext) {
   return await request.post("/api/logout");
 }
 
-export async function completePollingStationDataEntries(
+export async function completeDataEntries(
   dataEntryId: number,
   typistOneRequest: APIRequestContext,
   typistTwoRequest: APIRequestContext,

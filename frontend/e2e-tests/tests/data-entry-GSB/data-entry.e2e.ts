@@ -27,7 +27,7 @@ import type { VotersCounts, VotesCounts } from "@/types/generated/openapi";
 import { test } from "../../fixtures";
 
 test.use({
-  storageState: "e2e-tests/state/typist1.json",
+  storageState: "e2e-tests/state/typist1-GSB.json",
 });
 
 test.describe("full data entry flow", () => {
@@ -524,8 +524,8 @@ test.describe("full data entry flow", () => {
 });
 
 test.describe("second data entry", () => {
-  test("equal second data entry after first data entry", async ({ typistTwo, dataEntryGSBFirstEntryDone }) => {
-    const { page } = typistTwo;
+  test("equal second data entry after first data entry", async ({ typistTwoGSB, dataEntryGSBFirstEntryDone }) => {
+    const { page } = typistTwoGSB;
     await page.goto(`/elections/${dataEntryGSBFirstEntryDone.election_id}/data-entry`);
 
     const dataEntryHomePage = new DataEntryHomePage(page);
@@ -555,11 +555,11 @@ test.describe("second data entry", () => {
   });
 
   test("different second data entry after first data entry but correct warnings", async ({
-    typistTwo,
-    coordinatorOne,
+    typistTwoGSB,
+    coordinatorOneGSB,
     dataEntryGSBFirstEntryDone,
   }) => {
-    const typistPage = typistTwo.page;
+    const typistPage = typistTwoGSB.page;
     await typistPage.goto(`/elections/${dataEntryGSBFirstEntryDone.election_id}/data-entry`);
 
     const dataEntryHomePage = new DataEntryHomePage(typistPage);
@@ -624,7 +624,7 @@ test.describe("second data entry", () => {
     );
 
     // check if data entries are marked as definitive on coordinator status page
-    const coordinatorPage = coordinatorOne.page;
+    const coordinatorPage = coordinatorOneGSB.page;
     await coordinatorPage.goto(`/elections/${dataEntryGSBFirstEntryDone.election_id}/status`);
 
     const electionStatusPage = new ElectionStatus(coordinatorPage);
@@ -632,11 +632,11 @@ test.describe("second data entry", () => {
   });
 
   test("different second data entry after first data entry", async ({
-    typistTwo,
-    coordinatorOne,
+    typistTwoGSB,
+    coordinatorOneGSB,
     dataEntryGSBFirstEntryDone,
   }) => {
-    const typistPage = typistTwo.page;
+    const typistPage = typistTwoGSB.page;
     await typistPage.goto(`/elections/${dataEntryGSBFirstEntryDone.election_id}/data-entry`);
 
     const dataEntryHomePage = new DataEntryHomePage(typistPage);
@@ -706,7 +706,7 @@ test.describe("second data entry", () => {
     );
 
     // check if data entries are marked as different on coordinator status page
-    const coordinatorPage = coordinatorOne.page;
+    const coordinatorPage = coordinatorOneGSB.page;
     await coordinatorPage.goto(`/elections/${dataEntryGSBFirstEntryDone.election_id}/status`);
 
     const electionStatusPage = new ElectionStatus(coordinatorPage);

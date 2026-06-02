@@ -4,7 +4,7 @@ import { ResolveErrorsPgObj } from "e2e-tests/page-objects/election/ResolveError
 import { test } from "../../fixtures";
 
 test.use({
-  storageState: "e2e-tests/state/coordinator1.json",
+  storageState: "e2e-tests/state/coordinator1-GSB.json",
 });
 
 test.describe("resolve errors", () => {

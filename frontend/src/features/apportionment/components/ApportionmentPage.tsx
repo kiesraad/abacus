@@ -9,6 +9,7 @@ import { useElection } from "@/hooks/election/useElection";
 import { t } from "@/i18n/translate";
 import type {
   ApportionmentState,
+  ApportionmentWarning,
   RESET_APPORTIONMENT_STATE_REQUEST_PATH,
   SeatAssignment,
 } from "@/types/generated/openapi";
@@ -29,17 +30,41 @@ function getNumberOfSeatsAssignedSentence(seats: number, type: "residual_seat" |
   });
 }
 
+function renderApportionmentWarning(warning: ApportionmentWarning) {
+  switch (warning) {
+    case "AbsoluteMajorityAndListExhaustion":
+      return (
+        <Alert key={warning} type="warning" variant="no-icon">
+          <p>{t("apportionment.warning.absolute_majority_and_list_exhaustion")}</p>
+        </Alert>
+      );
+    case "NotAllSeatsAssigned":
+      return (
+        <Alert key={warning} type="warning" variant="no-icon">
+          <p>{t("apportionment.warning.not_all_seats_assigned")}</p>
+        </Alert>
+      );
+  }
+}
+
+function renderApportionmentWarnings(warnings: ApportionmentWarning[]) {
+  if (warnings.length === 0) {
+    return null;
+  }
+  return <FormLayout.Alert>{warnings.map(renderApportionmentWarning)}</FormLayout.Alert>;
+}
+
 function renderFinalisedAlert(
-  unassignedSeats: number,
+  warnings: ApportionmentWarning[],
   currentCommitteeSessionId: number,
   handleResetApportionmentState: () => void,
 ) {
+  const notAllAssigned = warnings.some((w) => w === "NotAllSeatsAssigned");
+  const hasWarnings = warnings.length > 0;
   return (
     <FormLayout.Alert>
-      <Alert type={unassignedSeats > 0 ? "warning" : "success"}>
-        <strong className="heading-md">
-          {t(unassignedSeats > 0 ? "apportionment.not_all_seats_assigned" : "apportionment.all_seats_assigned")}
-        </strong>
+      <Alert type={hasWarnings ? "notify" : "success"}>
+        {!notAllAssigned && <strong className="heading-md">{t("apportionment.all_seats_assigned")}</strong>}
         <p>{t("apportionment.make_apportionment_definitive")}</p>
         <div className={cls.alertButtons}>
           <Button.Link size="md" to={`../report/committee-session/${currentCommitteeSessionId}/download`}>
@@ -72,7 +97,7 @@ function renderLinksToSeatAssignmentPages(seatAssignment: SeatAssignment) {
 export function ApportionmentPage() {
   const navigate = useNavigate();
   const { currentCommitteeSession, election } = useElection();
-  const { seatAssignment, candidateNomination, electionSummary, state, error, refetchState } =
+  const { seatAssignment, candidateNomination, electionSummary, warnings, state, error, refetchState } =
     useApportionmentContext();
   const [apiError, setApiError] = useState<AnyApiError>();
   const client = useApiClient();
@@ -85,9 +110,6 @@ export function ApportionmentPage() {
     apportionmentCheckStateAndRedirect(state, election.id, navigate);
   });
 
-  const unassignedSeats = seatAssignment
-    ? seatAssignment.seats - seatAssignment.full_seats - seatAssignment.residual_seats
-    : 0;
   const renderTables = seatAssignment && candidateNomination && electionSummary && state?.type === "Finalised";
 
   async function handleResetApportionmentState() {
@@ -111,11 +133,8 @@ export function ApportionmentPage() {
           ) : (
             renderTables && (
               <>
-                {renderFinalisedAlert(
-                  unassignedSeats,
-                  currentCommitteeSession.id,
-                  () => void handleResetApportionmentState(),
-                )}
+                {renderApportionmentWarnings(warnings)}
+                {renderFinalisedAlert(warnings, currentCommitteeSession.id, () => void handleResetApportionmentState())}
                 <div className={cn(cls.tableDiv, "mb-lg")}>
                   <div>
                     <h2 className={cls.tableTitle}>{t("apportionment.election_summary")}</h2>

@@ -47,6 +47,7 @@ describe("ApportionmentListDetailsPage", () => {
       seat_assignment: seat_assignment,
       candidate_nomination: candidate_nomination,
       election_summary: election_summary,
+      warnings: [],
     } satisfies ElectionApportionmentResponse);
   });
 

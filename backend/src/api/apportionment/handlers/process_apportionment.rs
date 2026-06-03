@@ -17,6 +17,7 @@ use crate::{
     },
     audit_log::AuditService,
     domain::{
+        apportionment::ApportionmentWarning,
         committee_session_status::CommitteeSessionStatus,
         election::{Election, ElectionId},
         summary::ElectionSummary,
@@ -88,13 +89,20 @@ pub async fn process_apportionment(
             )
             .await?;
 
+        let seat_assignment = map_seat_assignment(&result.seat_assignment);
+        let candidate_nomination =
+            map_candidate_nomination(&result.candidate_nomination, election.political_groups);
+        let warnings = result
+            .seat_assignment
+            .warnings()
+            .into_iter()
+            .map(ApportionmentWarning::from)
+            .collect();
         Ok(Json(ElectionApportionmentResponse {
-            seat_assignment: map_seat_assignment(&result.seat_assignment),
-            candidate_nomination: map_candidate_nomination(
-                &result.candidate_nomination,
-                election.political_groups,
-            ),
+            seat_assignment,
+            candidate_nomination,
             election_summary: summary,
+            warnings,
         }))
     } else {
         Err(ApportionmentApiError::CommitteeSessionNotCompleted.into())

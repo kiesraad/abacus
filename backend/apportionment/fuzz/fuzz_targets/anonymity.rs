@@ -36,7 +36,9 @@ fuzz_target!(
                 )
             })
             .collect(),
-        deceased_candidates: HashMap::new()
+        deceased_candidates: HashMap::new(),
+        lists_drawn: Vec::new(),
+        candidates_drawn: Vec::new(),
     };
 
     let (new_alloc, log2) = run_with_log(|| process(&reordered_input));

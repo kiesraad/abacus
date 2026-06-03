@@ -100,7 +100,7 @@ pub(crate) struct SessionIdentifier {
 
 /// Get a session by its key and validate user agent and IP address and expiry.
 /// If no valid session was found, returns `Ok(None)`.
-pub(crate) async fn get_by_identifier(
+pub(crate) async fn get_by_identifier_if_valid(
     conn: &mut SqliteConnection,
     session: &SessionIdentifier,
 ) -> Result<Option<Session>, sqlx::Error> {

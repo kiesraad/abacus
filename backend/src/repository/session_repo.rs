@@ -98,7 +98,8 @@ pub(crate) struct SessionIdentifier {
     pub ip_address: String,
 }
 
-/// Get a session by its key and validate user agent and IP address
+/// Get a session by its key and validate user agent and IP address and expiry.
+/// If no valid session was found, returns `Ok(None)`.
 pub(crate) async fn get_by_identifier(
     conn: &mut SqliteConnection,
     session: &SessionIdentifier,

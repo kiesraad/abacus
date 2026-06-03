@@ -292,3 +292,23 @@ impl ChosenCandidate {
         }
     }
 }
+
+#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize, ToSchema)]
+pub enum ListDrawingLotsVariant {
+    HighestAverageResidualSeat,
+    LargestRemainderResidualSeat,
+    AbsoluteMajority,
+}
+
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize, ToSchema)]
+pub struct ListDrawn {
+    pub variant: ListDrawingLotsVariant,
+    pub options: Vec<PGNumber>,
+    pub drawn: PGNumber,
+}
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize, ToSchema)]
+pub struct CandidateDrawn {
+    pub list: PGNumber,
+    pub options: Vec<CandidateNumber>,
+    pub drawn: CandidateNumber,
+}

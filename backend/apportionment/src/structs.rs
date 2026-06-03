@@ -11,23 +11,79 @@ use super::{
 
 pub(crate) const LARGE_COUNCIL_THRESHOLD: u32 = 19;
 
+pub type ListNumber<LV> = <LV as ListVotes>::ListNumber;
+pub type CandidateNumber<LV> = <<LV as ListVotes>::Cv as CandidateVotes>::CandidateNumber;
+
 /// Errors that can occur during apportionment
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub enum ApportionmentError {
-    DrawingOfLotsNotImplemented,
+#[derive(Debug, PartialEq)]
+pub enum ApportionmentError<LN, CN> {
+    ListDrawingLotsRequired(ListDrawingLotsRequired<LN>),
+    CandidateDrawingLotsRequired(CandidateDrawingLotsRequired<LN, CN>),
 }
 
-pub type DeceasedCandidates<T> = HashMap<
-    <T as ListVotes>::ListNumber,
-    HashSet<<<T as ListVotes>::Cv as CandidateVotes>::CandidateNumber>,
->;
+/// Used as an [Err] to indicate that drawing lots for a list is needed,
+/// containing all the information needed to do the drawing
+#[derive(Debug, PartialEq)]
+pub struct ListDrawingLotsRequired<LN> {
+    pub variant: ListDrawingLotsVariant,
+    pub options: Vec<LN>,
+}
+
+impl<LN, CN> From<ListDrawingLotsRequired<LN>> for ApportionmentError<LN, CN> {
+    fn from(value: ListDrawingLotsRequired<LN>) -> Self {
+        ApportionmentError::ListDrawingLotsRequired(value)
+    }
+}
+
+/// Used as an [Err] to indicate that drawing lots for a candidate is needed,
+/// containing all the information needed to do the drawing
+#[derive(Debug, PartialEq)]
+pub struct CandidateDrawingLotsRequired<LN, CN> {
+    pub list: LN,
+    pub options: Vec<CN>,
+}
+
+impl<LN, CN> From<CandidateDrawingLotsRequired<LN, CN>> for ApportionmentError<LN, CN> {
+    fn from(value: CandidateDrawingLotsRequired<LN, CN>) -> Self {
+        ApportionmentError::CandidateDrawingLotsRequired(value)
+    }
+}
+
+#[derive(Copy, Clone, Debug, PartialEq)]
+pub enum ListDrawingLotsVariant {
+    HighestAverageResidualSeat,
+    LargestRemainderResidualSeat,
+    AbsoluteMajority,
+}
+
+/// The list that has been drawn plus information to assert the correct drawing
+pub trait ListDrawn<LN> {
+    fn variant(&self) -> ListDrawingLotsVariant;
+    fn options(&self) -> &[LN];
+    fn drawn(&self) -> &LN;
+}
+
+/// The candidate that has been drawn plus information to assert the correct drawing
+pub trait CandidateDrawn<LN, CN> {
+    fn list(&self) -> &LN;
+    fn options(&self) -> &[CN];
+    fn drawn(&self) -> &CN;
+}
+
+/// [HashMap] of a list number to a [HashSet] of candidate numbers that are deceased,
+/// to enforce that they are unique and easily retrievable.
+pub type DeceasedCandidates<LV> = HashMap<ListNumber<LV>, HashSet<CandidateNumber<LV>>>;
 
 pub trait ApportionmentInput {
     type List: ListVotes;
+    type ListDrawn: ListDrawn<ListNumber<Self::List>>;
+    type CandidateDrawn: CandidateDrawn<ListNumber<Self::List>, CandidateNumber<Self::List>>;
 
     fn number_of_seats(&self) -> u32;
     fn list_votes(&self) -> &[Self::List];
     fn deceased_candidates(&self) -> &DeceasedCandidates<Self::List>;
+    fn lists_drawn(&self) -> impl Iterator<Item = &Self::ListDrawn>;
+    fn candidates_drawn(&self) -> impl Iterator<Item = &Self::CandidateDrawn>;
 }
 
 pub struct ApportionmentOutput<'a, T: ListVotes> {

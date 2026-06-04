@@ -7,12 +7,16 @@ use sqlx::SqlitePool;
 
 use crate::{
     APIError, ErrorResponse,
-    api::{apportionment::structs::ElectionApportionmentResponse, election::ElectionAuditData},
+    api::{
+        apportionment::{ApportionmentApiError, structs::ElectionApportionmentResponse},
+        election::ElectionAuditData,
+    },
     audit_log::AuditService,
     domain::election::{Election, ElectionId},
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType},
     repository::{election_repo, user_repo::User},
     service,
+    service::ApportionmentResult,
 };
 
 #[derive(Serialize)]
@@ -50,7 +54,12 @@ pub async fn process_apportionment(
     let election = election_repo::get(&mut conn, id).await?;
     user.role().is_authorized(election.committee_category)?;
 
-    let apportionment_output = service::process_apportionment(&mut conn, &election).await?;
+    let apportionment_result = service::process_apportionment(&mut conn, &election).await?;
+    let ApportionmentResult::Ok(apportionment_output) = apportionment_result else {
+        Err(APIError::Delegated(Box::new(
+            ApportionmentApiError::DrawingLotsRequired,
+        )))?
+    };
 
     audit_service
         .log(

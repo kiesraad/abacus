@@ -55,7 +55,9 @@ mod tests {
     use super::*;
     use crate::domain::{
         apportionment::{CandidateDrawn, ListDrawingLotsVariant, ListDrawn},
-        apportionment_state::DeceasedCandidate,
+        apportionment_state::{
+            ApportionmentStateDrawing, DeceasedCandidate, ListDrawingLotsRequired,
+        },
         election::{CandidateNumber, PGNumber},
     };
 
@@ -77,6 +79,12 @@ mod tests {
                 deceased_candidates: vec![DeceasedCandidate::from(4, 4)],
             },
             ApportionmentState::DrawingLots {
+                drawing: ApportionmentStateDrawing::ListDrawingLotsRequired(
+                    ListDrawingLotsRequired {
+                        variant: ListDrawingLotsVariant::HighestAverageResidualSeat,
+                        options: PGNumber::from_values(vec![1, 2, 3]),
+                    },
+                ),
                 deceased_candidates: vec![DeceasedCandidate::from(4, 4)],
                 lists_drawn: vec![ListDrawn {
                     variant: ListDrawingLotsVariant::AbsoluteMajority,

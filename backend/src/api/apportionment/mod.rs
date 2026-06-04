@@ -11,6 +11,9 @@ pub use self::{
     mapping::{map_candidate_nomination, map_seat_assignment},
     structs::{ApportionmentInputData, ElectionApportionmentResponse},
 };
+pub use crate::domain::apportionment_state::{
+    CandidateDrawingLotsRequired, ListDrawingLotsRequired,
+};
 use crate::{
     APIError, AppState,
     api::middleware::authentication::RouteAuthorization,
@@ -25,7 +28,7 @@ use crate::{
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum ApportionmentApiError {
     CommitteeSessionNotCompleted,
-    DrawingOfLotsNotImplemented,
+    DrawingLotsRequired,
 }
 
 impl ApiErrorResponse for ApportionmentApiError {
@@ -43,7 +46,7 @@ impl ApiErrorResponse for ApportionmentApiError {
                     false,
                 ),
             ),
-            ApportionmentApiError::DrawingOfLotsNotImplemented => (
+            ApportionmentApiError::DrawingLotsRequired => (
                 StatusCode::UNPROCESSABLE_ENTITY,
                 ErrorResponse::new(
                     "Drawing of lots is required",
@@ -57,7 +60,7 @@ impl ApiErrorResponse for ApportionmentApiError {
 
 impl From<ApportionmentError<PGNumber, CandidateNumber>> for ApportionmentApiError {
     fn from(_err: ApportionmentError<PGNumber, CandidateNumber>) -> Self {
-        Self::DrawingOfLotsNotImplemented
+        Self::DrawingLotsRequired
     }
 }
 

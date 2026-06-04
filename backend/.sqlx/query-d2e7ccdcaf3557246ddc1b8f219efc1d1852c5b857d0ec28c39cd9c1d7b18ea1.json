@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "INSERT INTO users (username, fullname, password_hash, needs_password_change, role)\n        VALUES (?, ?, ?, ?, ?)\n        RETURNING\n            id as \"id: UserId\",\n            username,\n            fullname,\n            password_hash,\n            needs_password_change as \"needs_password_change: bool\",\n            role as \"role: _\",\n            last_activity_at as \"last_activity_at: _\",\n            is_logged_in as \"is_logged_in: bool\",\n            updated_at as \"updated_at: _\",\n            created_at as \"created_at: _\"\n        ",
+  "query": "\n        SELECT\n            u.id as \"id: UserId\",\n            u.username,\n            u.fullname,\n            u.role as \"role: _\",\n            u.password_hash,\n            u.needs_password_change as \"needs_password_change: bool\",\n            u.last_activity_at as \"last_activity_at: _\",\n            (\n                SELECT COUNT(*)\n                FROM sessions s\n                WHERE s.user_id = u.id\n                    AND s.expires_at > datetime($1)\n            ) > 0 as \"is_logged_in: bool\",\n            u.updated_at as \"updated_at: _\",\n            u.created_at as \"created_at: _\"\n        FROM users u WHERE u.id = $2\n        ",
   "describe": {
     "columns": [
       {
@@ -19,19 +19,19 @@
         "type_info": "Text"
       },
       {
-        "name": "password_hash",
+        "name": "role: _",
         "ordinal": 3,
         "type_info": "Text"
       },
       {
-        "name": "needs_password_change: bool",
+        "name": "password_hash",
         "ordinal": 4,
-        "type_info": "Integer"
+        "type_info": "Text"
       },
       {
-        "name": "role: _",
+        "name": "needs_password_change: bool",
         "ordinal": 5,
-        "type_info": "Text"
+        "type_info": "Integer"
       },
       {
         "name": "last_activity_at: _",
@@ -55,7 +55,7 @@
       }
     ],
     "parameters": {
-      "Right": 5
+      "Right": 2
     },
     "nullable": [
       false,
@@ -70,5 +70,5 @@
       false
     ]
   },
-  "hash": "131bcd471e135b4566ef131526d9e4a70c2b3a38a1f0fcbb452f91dcef274d95"
+  "hash": "d2e7ccdcaf3557246ddc1b8f219efc1d1852c5b857d0ec28c39cd9c1d7b18ea1"
 }

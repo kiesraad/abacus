@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n        SELECT\n            id as \"id: UserId\",\n            username,\n            fullname,\n            role as \"role: _\",\n            password_hash,\n            needs_password_change as \"needs_password_change: bool\",\n            last_activity_at as \"last_activity_at: _\",\n            is_logged_in as \"is_logged_in: bool\",\n            updated_at as \"updated_at: _\",\n            created_at as \"created_at: _\"\n        FROM users WHERE id = ?\n        ",
+  "query": "\n        SELECT\n            u.id as \"id: UserId\",\n            u.username,\n            u.fullname,\n            u.role as \"role: _\",\n            u.password_hash,\n            u.needs_password_change as \"needs_password_change: bool\",\n            u.last_activity_at as \"last_activity_at: _\",\n            (\n                SELECT COUNT(*)\n                FROM sessions s\n                WHERE s.user_id = u.id\n                    AND s.expires_at > datetime($1)\n            ) > 0 as \"is_logged_in: bool\",\n            u.updated_at as \"updated_at: _\",\n            u.created_at as \"created_at: _\"\n        FROM users u WHERE LOWER(u.username) = LOWER($2)\n        ",
   "describe": {
     "columns": [
       {
@@ -55,7 +55,7 @@
       }
     ],
     "parameters": {
-      "Right": 1
+      "Right": 2
     },
     "nullable": [
       false,
@@ -70,5 +70,5 @@
       false
     ]
   },
-  "hash": "8b869f4c19c89486cf372a226b2253c864e35b59deec0fa1554714c68c204aca"
+  "hash": "91bb5d0e7d8779b2459cd42114f2102f0bf8daf792cdcf7d2bb7e8b44f14eabc"
 }

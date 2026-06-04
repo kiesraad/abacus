@@ -53,7 +53,7 @@ jobs:
           &&
           df -h
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6.0.2
         with:
           fetch-depth: 0
       # Branch coverage requires Rust nightly: https://github.com/taiki-e/cargo-llvm-cov/issues/8
@@ -94,7 +94,7 @@ jobs:
         working-directory: frontend
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6.0.2
         with:
           fetch-depth: 0
       - name: Setup Node

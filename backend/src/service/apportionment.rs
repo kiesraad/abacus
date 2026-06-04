@@ -3,15 +3,20 @@ use sqlx::SqliteConnection;
 
 use crate::{
     APIError,
-    api::apportionment::ApportionmentApiError,
+    api::apportionment::{
+        ApportionmentApiError, ApportionmentInputData, ElectionApportionmentResponse,
+        map_candidate_nomination, map_seat_assignment,
+    },
     domain::{
         apportionment_state::{ApportionmentState, ApportionmentStateError},
         committee_session::CommitteeSessionId,
         committee_session_status::CommitteeSessionStatus,
-        election::ElectionId,
+        election::{ElectionId, ElectionWithPoliticalGroups},
+        summary::ElectionSummary,
     },
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
-    repository::{apportionment_state_repo, committee_session_repo},
+    repository::{apportionment_state_repo, committee_session_repo, data_entry_repo},
+    service,
 };
 
 #[derive(Serialize)]
@@ -77,6 +82,34 @@ pub async fn update_state(
         .await?;
 
     Ok(state)
+}
+
+pub async fn process(
+    conn: &mut SqliteConnection,
+    election: &ElectionWithPoliticalGroups,
+) -> Result<ElectionApportionmentResponse, APIError> {
+    let (committee_session_id, state) = service::get_apportionment_state(conn, election.id).await?;
+
+    let results =
+        data_entry_repo::list_results_for_committee_session(conn, committee_session_id).await?;
+
+    let election_summary = ElectionSummary::from_results(election, &results)?;
+    let input = ApportionmentInputData::new(
+        election.number_of_seats,
+        &election_summary.political_group_votes,
+        state.get_deceased_candidates(),
+    );
+
+    let result = apportionment::process(&input)?;
+
+    Ok(ElectionApportionmentResponse {
+        seat_assignment: map_seat_assignment(&result.seat_assignment),
+        candidate_nomination: map_candidate_nomination(
+            &result.candidate_nomination,
+            &election.political_groups,
+        ),
+        election_summary,
+    })
 }
 
 #[cfg(test)]

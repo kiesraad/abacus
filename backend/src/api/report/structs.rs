@@ -274,7 +274,7 @@ impl ResultsInput {
             EnrichedSeatAssignment::new(self.election.number_of_seats, &summary, &seat_assignment)?;
         let candidate_nomination = map_candidate_nomination(
             &apportionment_result.candidate_nomination,
-            self.election.political_groups.clone(),
+            &self.election.political_groups,
         );
         let enriched_candidate_nomination =
             EnrichedCandidateNomination::new(&self.election, &candidate_nomination)?;

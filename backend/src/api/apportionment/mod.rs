@@ -9,7 +9,7 @@ mod structs;
 
 pub use self::{
     mapping::{map_candidate_nomination, map_seat_assignment},
-    structs::ApportionmentInputData,
+    structs::{ApportionmentInputData, ElectionApportionmentResponse},
 };
 use crate::{
     APIError, AppState,

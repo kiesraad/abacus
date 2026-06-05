@@ -14,7 +14,7 @@ use crate::{
     },
 };
 
-// Defines a CandidateNominationError, for more details, check [CandidateDrawingLotsRequired]
+/// Defines a CandidateNominationError, for more details, check [CandidateDrawingLotsRequired]
 type CandidateNominationErr<LV> = CandidateDrawingLotsRequired<ListNumber<LV>, CandidateNumber<LV>>;
 
 /// Candidate nomination

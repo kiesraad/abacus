@@ -55,6 +55,7 @@ describe("ApportionmentResidualSeatsPage", () => {
       seat_assignment: lt19Seats.seat_assignment,
       candidate_nomination: lt19Seats.candidate_nomination,
       election_summary: lt19Seats.election_summary,
+      warnings: [],
     } satisfies ElectionApportionmentResponse);
     overrideOnce("get", "/api/elections/3/apportionment/state", 200, state);
 
@@ -81,6 +82,7 @@ describe("ApportionmentResidualSeatsPage", () => {
       seat_assignment: gte19Seats.seat_assignment,
       candidate_nomination: gte19Seats.candidate_nomination,
       election_summary: gte19Seats.election_summary,
+      warnings: [],
     } satisfies ElectionApportionmentResponse);
     overrideOnce("get", "/api/elections/2/apportionment/state", 200, {
       deceased_candidates: [],
@@ -125,6 +127,7 @@ describe("ApportionmentResidualSeatsPage", () => {
       seat_assignment: gte19SeatsAndP9.seat_assignment,
       candidate_nomination: gte19SeatsAndP9.candidate_nomination,
       election_summary: gte19SeatsAndP9.election_summary,
+      warnings: [],
     } satisfies ElectionApportionmentResponse);
     overrideOnce("get", "/api/elections/5/apportionment/state", 200, {
       deceased_candidates: [],
@@ -250,6 +253,7 @@ describe("ApportionmentResidualSeatsPage", () => {
       seat_assignment: lt19Seats.seat_assignment,
       candidate_nomination: lt19Seats.candidate_nomination,
       election_summary: lt19Seats.election_summary,
+      warnings: [],
     } satisfies ElectionApportionmentResponse);
     overrideOnce("get", "/api/elections/3/apportionment/state", 200, {
       deceased_candidates: [],
@@ -302,6 +306,7 @@ describe("ApportionmentResidualSeatsPage", () => {
       },
       candidate_nomination: lt19Seats.candidate_nomination,
       election_summary: lt19Seats.election_summary,
+      warnings: [],
     } satisfies ElectionApportionmentResponse);
     overrideOnce("get", "/api/elections/3/apportionment/state", 200, {
       deceased_candidates: [],
@@ -342,6 +347,7 @@ describe("ApportionmentResidualSeatsPage", () => {
       seat_assignment: lt19SeatsAndP9AndP10.seat_assignment,
       candidate_nomination: lt19SeatsAndP9AndP10.candidate_nomination,
       election_summary: lt19SeatsAndP9AndP10.election_summary,
+      warnings: [],
     } satisfies ElectionApportionmentResponse);
     overrideOnce("get", "/api/elections/4/apportionment/state", 200, {
       deceased_candidates: [],
@@ -400,6 +406,7 @@ describe("ApportionmentResidualSeatsPage", () => {
       seat_assignment: lt19SeatsAndP10.seat_assignment,
       candidate_nomination: lt19SeatsAndP10.candidate_nomination,
       election_summary: lt19SeatsAndP10.election_summary,
+      warnings: [],
     } satisfies ElectionApportionmentResponse);
     overrideOnce("get", "/api/elections/6/apportionment/state", 200, {
       deceased_candidates: [],

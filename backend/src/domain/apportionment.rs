@@ -6,6 +6,23 @@ use crate::domain::{
     results::political_group_candidate_votes::CandidateVotes,
 };
 
+#[derive(Clone, Copy, Debug, Serialize, Deserialize, ToSchema, PartialEq, Eq)]
+pub enum ApportionmentWarning {
+    AbsoluteMajorityAndListExhaustion,
+    NotAllSeatsAssigned,
+}
+
+impl From<apportionment::ApportionmentWarning> for ApportionmentWarning {
+    fn from(w: apportionment::ApportionmentWarning) -> Self {
+        match w {
+            apportionment::ApportionmentWarning::AbsoluteMajorityAndListExhaustion => {
+                Self::AbsoluteMajorityAndListExhaustion
+            }
+            apportionment::ApportionmentWarning::NotAllSeatsAssigned => Self::NotAllSeatsAssigned,
+        }
+    }
+}
+
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct SeatAssignment {
     pub seats: u32,

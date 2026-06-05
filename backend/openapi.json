@@ -5223,6 +5223,13 @@
           }
         ]
       },
+      "ApportionmentWarning": {
+        "type": "string",
+        "enum": [
+          "AbsoluteMajorityAndListExhaustion",
+          "NotAllSeatsAssigned"
+        ]
+      },
       "AuditEventLevel": {
         "type": "string",
         "enum": [
@@ -6317,7 +6324,8 @@
         "required": [
           "seat_assignment",
           "candidate_nomination",
-          "election_summary"
+          "election_summary",
+          "warnings"
         ],
         "properties": {
           "candidate_nomination": {
@@ -6328,6 +6336,12 @@
           },
           "seat_assignment": {
             "$ref": "#/components/schemas/SeatAssignment"
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApportionmentWarning"
+            }
           }
         }
       },

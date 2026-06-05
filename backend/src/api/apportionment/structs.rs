@@ -6,7 +6,8 @@ use utoipa::ToSchema;
 
 use crate::domain::{
     apportionment::{
-        CandidateDrawn, CandidateNomination, ListDrawingLotsVariant, ListDrawn, SeatAssignment,
+        ApportionmentWarning, CandidateDrawn, CandidateNomination, ListDrawingLotsVariant,
+        ListDrawn, SeatAssignment,
     },
     apportionment_state::DeceasedCandidate,
     election::{CandidateNumber, PGNumber},
@@ -144,4 +145,5 @@ pub struct ElectionApportionmentResponse {
     pub seat_assignment: SeatAssignment,
     pub candidate_nomination: CandidateNomination,
     pub election_summary: ElectionSummary,
+    pub warnings: Vec<ApportionmentWarning>,
 }

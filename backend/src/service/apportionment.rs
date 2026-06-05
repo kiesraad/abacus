@@ -1,4 +1,4 @@
-use apportionment;
+use apportionment::{self};
 use serde::Serialize;
 use sqlx::SqliteConnection;
 
@@ -9,7 +9,7 @@ use crate::{
         map_candidate_nomination, map_seat_assignment,
     },
     domain::{
-        apportionment::ListDrawingLotsVariant,
+        apportionment::{ApportionmentWarning, ListDrawingLotsVariant},
         apportionment_state::{
             ApportionmentState, ApportionmentStateError, CandidateDrawingLotsRequired,
             ListDrawingLotsRequired,
@@ -160,7 +160,13 @@ pub async fn process(
                 &output.candidate_nomination,
                 &election.political_groups,
             ),
-            election_summary,
+            election_summary: election_summary.clone(),
+            warnings: output
+                .seat_assignment
+                .warnings()
+                .into_iter()
+                .map(ApportionmentWarning::from)
+                .collect(),
         }),
         Err(ApportionmentError::ListDrawingLotsRequired(r)) => {
             ApportionmentResult::ListDrawingLotsRequired(r.into())

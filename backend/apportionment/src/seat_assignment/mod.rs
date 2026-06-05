@@ -12,12 +12,12 @@ use self::{
     residual_seat_assignment::assign_remainder,
     structs::{AbsoluteMajorityResult, RemainderAssignmentResult},
 };
-use super::{
+use crate::{
     ApportionmentInput, ListVotes,
     fraction::Fraction,
     structs::{
-        ApportionmentError, CandidateNominationInput, CandidateNominationInputType,
-        DeceasedCandidates,
+        CandidateNominationInput, CandidateNominationInputType, DeceasedCandidates,
+        ListDrawingLotsRequired, ListDrawingLotsVariant, ListNumber,
     },
 };
 
@@ -25,7 +25,7 @@ use super::{
 #[allow(clippy::too_many_lines, clippy::cognitive_complexity)]
 pub(crate) fn seat_assignment<T: ApportionmentInput>(
     input: &T,
-) -> Result<SeatAssignmentResult<T::List>, ApportionmentError> {
+) -> Result<SeatAssignmentResult<T::List>, ListDrawingLotsRequired<ListNumber<T::List>>> {
     info!("Seat assignment");
     info!("Seats: {}", input.number_of_seats());
 
@@ -239,7 +239,10 @@ fn reassign_residual_seat_for_absolute_majority<T: ListVotes>(
                 "Drawing of lots is required for lists: {:?} to pick a list which the residual seat gets retracted from",
                 lists_last_residual_seat
             );
-            return Err(ApportionmentError::DrawingOfLotsNotImplemented);
+            return Err(ListDrawingLotsRequired {
+                variant: ListDrawingLotsVariant::AbsoluteMajority,
+                options: lists_last_residual_seat.to_vec(),
+            });
         }
 
         // Reassign the seat
@@ -580,7 +583,8 @@ pub(crate) mod tests {
             use test_log::test;
 
             use crate::{
-                ApportionmentError, seat_assignment,
+                seat_assignment,
+                structs::{ListDrawingLotsRequired, ListDrawingLotsVariant},
                 test_helpers::seat_assignment_fixture_with_default_50_candidates,
             };
 
@@ -600,7 +604,13 @@ pub(crate) mod tests {
                     vec![2552, 511, 511, 511, 509, 509],
                 );
                 let result = seat_assignment(&input);
-                assert_eq!(result, Err(ApportionmentError::DrawingOfLotsNotImplemented));
+                assert_eq!(
+                    result,
+                    Err(ListDrawingLotsRequired {
+                        variant: ListDrawingLotsVariant::AbsoluteMajority,
+                        options: vec![2, 3, 4]
+                    })
+                );
             }
 
             /// Apportionment with residual seats assigned with largest remainders method
@@ -616,7 +626,13 @@ pub(crate) mod tests {
                     vec![540, 160, 160, 80, 80, 80, 55, 45],
                 );
                 let result = seat_assignment(&input);
-                assert_eq!(result, Err(ApportionmentError::DrawingOfLotsNotImplemented));
+                assert_eq!(
+                    result,
+                    Err(ListDrawingLotsRequired {
+                        variant: ListDrawingLotsVariant::LargestRemainderResidualSeat,
+                        options: vec![2, 3, 4, 5, 6]
+                    })
+                );
             }
 
             /// Apportionment with residual seats assigned with largest remainders method
@@ -631,7 +647,13 @@ pub(crate) mod tests {
                     vec![500, 140, 140, 140, 140, 140],
                 );
                 let result = seat_assignment(&input);
-                assert_eq!(result, Err(ApportionmentError::DrawingOfLotsNotImplemented));
+                assert_eq!(
+                    result,
+                    Err(ListDrawingLotsRequired {
+                        variant: ListDrawingLotsVariant::LargestRemainderResidualSeat,
+                        options: vec![2, 3, 4, 5, 6]
+                    })
+                );
             }
         }
 
@@ -1397,11 +1419,13 @@ pub(crate) mod tests {
             use test_log::test;
 
             use crate::{
-                ApportionmentError, seat_assignment::seat_assignment,
+                seat_assignment::seat_assignment,
+                structs::{ListDrawingLotsRequired, ListDrawingLotsVariant},
                 test_helpers::seat_assignment_fixture_with_default_50_candidates,
             };
 
-            /// Apportionment with residual seats assigned with highest averages method  
+            /// Apportionment with residual seats assigned with highest averages method
+            ///
             /// This test triggers Kieswet Article P 9
             ///
             /// Full seats: [12, 1, 1, 1, 1, 1, 1, 0] - Remainder seats: 6  
@@ -1419,7 +1443,13 @@ pub(crate) mod tests {
                     vec![7501, 1249, 1249, 1249, 1249, 1248, 1248, 8],
                 );
                 let result = seat_assignment(&input);
-                assert_eq!(result, Err(ApportionmentError::DrawingOfLotsNotImplemented));
+                assert_eq!(
+                    result,
+                    Err(ListDrawingLotsRequired {
+                        variant: ListDrawingLotsVariant::AbsoluteMajority,
+                        options: vec![6, 7]
+                    })
+                );
             }
 
             /// Apportionment with residual seats assigned with highest averages method
@@ -1434,7 +1464,13 @@ pub(crate) mod tests {
                     vec![500, 140, 140, 140, 140, 140],
                 );
                 let result = seat_assignment(&input);
-                assert_eq!(result, Err(ApportionmentError::DrawingOfLotsNotImplemented));
+                assert_eq!(
+                    result,
+                    Err(ListDrawingLotsRequired {
+                        variant: ListDrawingLotsVariant::HighestAverageResidualSeat,
+                        options: vec![2, 3, 4, 5, 6]
+                    })
+                );
             }
         }
 

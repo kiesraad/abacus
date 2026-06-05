@@ -159,12 +159,8 @@ fn fuzz(data: FuzzedApportionmentInput) {
         && osv2020_log
             .iter()
             .any(|line| line.contains("Erschöpfte Listen"))
-        && abacus_log.contains(
-            "in accordance with Article P 9 Kieswet"
-        )
-        && abacus_log.contains(
-            "assigned to another list in accordance with Article P 10 Kieswet"
-        )
+        && abacus_log.contains("in accordance with Article P 9 Kieswet")
+        && abacus_log.contains("assigned to another list in accordance with Article P 10 Kieswet")
     {
         return;
     }
@@ -200,7 +196,7 @@ fn fuzz(data: FuzzedApportionmentInput) {
                             .iter()
                             .any(|line| line.contains("Erschöpfte Listen"))
                         && abacus_log.contains(
-                            "assigned to another list in accordance with Article P 10 Kieswet"
+                            "assigned to another list in accordance with Article P 10 Kieswet",
                         )
                     {
                         //do nothing, continue
@@ -217,7 +213,10 @@ fn fuzz(data: FuzzedApportionmentInput) {
                 }
             }
         }
-        Err(e @ ApportionmentError::DrawingOfLotsNotImplemented) => {
+        Err(
+            e @ ApportionmentError::ListDrawingLotsRequired(_)
+            | e @ ApportionmentError::CandidateDrawingLotsRequired(_),
+        ) => {
             match osv2020_result {
                 Osv2020Result::Allocated(osv2020_seats) => {
                     report_mismatch(

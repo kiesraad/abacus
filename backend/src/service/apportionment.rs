@@ -1,4 +1,4 @@
-use apportionment::{self};
+use apportionment;
 use serde::Serialize;
 use sqlx::SqliteConnection;
 

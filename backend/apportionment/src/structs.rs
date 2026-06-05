@@ -57,13 +57,13 @@ pub enum ListDrawingLotsVariant {
     HighestAverageResidualSeat,
     /// Draw lots for assigning a largest remainder residual seat
     LargestRemainderResidualSeat,
-    /// Draw lots for removing a seat to be reassigned because of absolute majority (P9)
+    /// Draw lots for retracting a seat to be reassigned because of absolute majority (P9)
     AbsoluteMajority,
 }
 
 /// The list that has been drawn plus information to assert the correct drawing
 pub trait ListDrawn<LN> {
-    /// The type of seat assignment or removal that lots need to be drawn for
+    /// The type of seat assignment or retraction that lots need to be drawn for
     fn variant(&self) -> ListDrawingLotsVariant;
     /// The lists that lots are drawn for
     fn options(&self) -> &[LN];
@@ -73,7 +73,7 @@ pub trait ListDrawn<LN> {
 
 /// The candidate that has been drawn plus information to assert the correct drawing
 pub trait CandidateDrawn<LN, CN> {
-    /// The list the candidate need to be drawn from
+    /// The list the candidate needs to be drawn from
     fn list(&self) -> &LN;
     /// The candidates that lots are drawn for
     fn options(&self) -> &[CN];

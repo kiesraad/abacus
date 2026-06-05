@@ -75,8 +75,8 @@ pub struct ListDrawingLotsRequired {
 }
 
 impl From<ListDrawingLotsRequired> for DrawingLotsDetails {
-    fn from(drawing: ListDrawingLotsRequired) -> Self {
-        Self::ListDrawingLotsRequired(drawing)
+    fn from(drawing_lots_details: ListDrawingLotsRequired) -> Self {
+        Self::ListDrawingLotsRequired(drawing_lots_details)
     }
 }
 
@@ -87,8 +87,8 @@ pub struct CandidateDrawingLotsRequired {
 }
 
 impl From<CandidateDrawingLotsRequired> for DrawingLotsDetails {
-    fn from(drawing: CandidateDrawingLotsRequired) -> Self {
-        Self::CandidateDrawingLotsRequired(drawing)
+    fn from(drawing_lots_details: CandidateDrawingLotsRequired) -> Self {
+        Self::CandidateDrawingLotsRequired(drawing_lots_details)
     }
 }
 
@@ -100,7 +100,6 @@ pub enum ApportionmentState {
     RegisteringDeceasedCandidates {
         deceased_candidates: Vec<DeceasedCandidate>,
     },
-    #[serde(skip)] // TODO remove in next PR
     DrawingLots {
         drawing_lots_details: DrawingLotsDetails,
         deceased_candidates: Vec<DeceasedCandidate>,
@@ -109,9 +108,7 @@ pub enum ApportionmentState {
     },
     Finalised {
         deceased_candidates: Vec<DeceasedCandidate>,
-        #[serde(skip)] // TODO remove in next PR
         lists_drawn: Vec<ListDrawn>,
-        #[serde(skip)] // TODO remove in next PR
         candidates_drawn: Vec<CandidateDrawn>,
     },
 }

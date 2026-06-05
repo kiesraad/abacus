@@ -59,7 +59,6 @@ mod tests {
         election::{CandidateNumber, PGNumber},
     };
 
-    #[ignore] // TODO remove when #[serde(skip)] is removed in next PR
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_1"))))]
     async fn test_upsert_get(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();

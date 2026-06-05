@@ -234,7 +234,7 @@ fn fuzz(data: FuzzedApportionmentInput) {
                     // 
                     // This is because OSV2020 does not enforce list exhaustion (P 10) during
                     // its residual seat assignment, it only retracts seats after assigning.
-                    // Abacus takes will not assign a residual seat to a list that is already
+                    // Abacus will not assign a residual seat to a list that is already
                     // exhausted, so it never sees the same drawing lots.
                     //
                     // Related issues: #3214, #3219

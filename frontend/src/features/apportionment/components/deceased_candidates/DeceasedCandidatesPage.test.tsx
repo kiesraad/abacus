@@ -60,6 +60,7 @@ describe("DeceasedCandidatesPage", () => {
       seat_assignment: seat_assignment,
       candidate_nomination: candidate_nomination,
       election_summary: election_summary,
+      warnings: [],
     } satisfies ElectionApportionmentResponse);
     server.use(GetApportionmentStateRequestHandler);
     overrideOnce("get", "/api/elections/3/apportionment/state", 200, {

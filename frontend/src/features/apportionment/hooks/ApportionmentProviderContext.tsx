@@ -3,6 +3,7 @@ import { createContext } from "react";
 import type { ApiError, ApiResult } from "@/api/ApiResult";
 import type {
   ApportionmentState,
+  ApportionmentWarning,
   CandidateNomination,
   ElectionSummary,
   SeatAssignment,
@@ -12,6 +13,7 @@ export interface iElectionApportionmentProviderContext {
   seatAssignment?: SeatAssignment;
   candidateNomination?: CandidateNomination;
   electionSummary?: ElectionSummary;
+  warnings: ApportionmentWarning[];
   state?: ApportionmentState;
   error?: ApiError;
   isLoading: boolean;

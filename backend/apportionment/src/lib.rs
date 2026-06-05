@@ -17,7 +17,8 @@ pub use self::{
     candidate_nomination::{CandidateNominationResult, PreferenceThreshold},
     fraction::Fraction,
     seat_assignment::{
-        HighestAverageAssignedSeat, SeatAssignmentResult, SeatChange, SeatChangeStep,
+        ApportionmentWarning, HighestAverageAssignedSeat, SeatAssignmentResult, SeatChange,
+        SeatChangeStep,
     },
     structs::{
         ApportionmentError, ApportionmentInput, ApportionmentOutput, CandidateVotes, ListVotes,

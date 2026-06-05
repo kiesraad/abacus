@@ -52,7 +52,6 @@
   "manage_deceased_candidates": "Beheer overleden kandidaten",
   "minus": "min",
   "no_candidates_are_deceased": "Alle kandidaten zijn meegenomen bij het verdelen van de zetels. Er zijn geen kandidaten buiten beschouwing gelaten vanwege overlijden.",
-  "not_all_seats_assigned": "Niet alle zetels zijn toegewezen",
   "not_possible": "Zetelverdeling is niet mogelijk",
   "not_yet_available": "Zetelverdeling is nog niet beschikbaar",
   "no_residual_seats_to_assign": "Er zijn geen restzetels te verdelen.",
@@ -113,5 +112,9 @@
   "view_details": "bekijk details",
   "voters": "Kiesgerechtigden",
   "want_to_make_changes": "Wil je wijzigingen aanbrengen in de buiten beschouwing gelaten kandidaten?",
+  "warning": {
+    "absolute_majority_and_list_exhaustion": "Zowel art. P 9 (volstrekte meerderheid) als art. P 10 (lijstuitputting) van de Kieswet zijn toegepast tijdens het berekenen van de zetelverdeling. Neem contact op met de Kiesraad om te overleggen of er extra controles nodig zijn.",
+    "not_all_seats_assigned": "Niet alle zetels zijn toegewezen."
+  },
   "which_candidates_are_deceased": "Geef aan welke kandidaat of kandidaten als gevolg van overlijden bij de zetelverdeling buiten beschouwing moeten worden gelaten."
 }

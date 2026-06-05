@@ -5,7 +5,7 @@ use serde::Serialize;
 use utoipa::ToSchema;
 
 use crate::domain::{
-    apportionment::{CandidateNomination, SeatAssignment},
+    apportionment::{ApportionmentWarning, CandidateNomination, SeatAssignment},
     apportionment_state::DeceasedCandidate,
     election::{self, PGNumber},
     results::political_group_candidate_votes::{CandidateVotes, PoliticalGroupCandidateVotes},
@@ -88,4 +88,5 @@ pub struct ElectionApportionmentResponse {
     pub seat_assignment: SeatAssignment,
     pub candidate_nomination: CandidateNomination,
     pub election_summary: ElectionSummary,
+    pub warnings: Vec<ApportionmentWarning>,
 }

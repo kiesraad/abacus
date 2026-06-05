@@ -256,7 +256,10 @@ fn fuzz(data: FuzzedApportionmentInput) {
                 }
             }
         }
-        Err(e @ ApportionmentError::DrawingOfLotsNotImplemented) => {
+        Err(
+            e @ ApportionmentError::ListDrawingLotsRequired(_)
+            | e @ ApportionmentError::CandidateDrawingLotsRequired(_),
+        ) => {
             match osv2020_result {
                 Osv2020Result::Allocated(osv2020_seats) => {
                     report_mismatch(

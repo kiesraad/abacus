@@ -3,14 +3,17 @@ use std::{cmp::Ordering, fmt::Debug};
 use tracing::{debug, info};
 
 use super::{
-    super::{
-        fraction::Fraction,
-        structs::{DeceasedCandidates, LARGE_COUNCIL_THRESHOLD, ListVotes},
-    },
-    ApportionmentError, get_number_of_candidates, list_numbers,
+    get_number_of_candidates, list_numbers,
     structs::{
         HighestAverageAssignedSeat, LargestRemainderAssignedSeat, ListStanding,
         RemainderAssignmentResult, SeatChange, SeatChangeStep,
+    },
+};
+use crate::{
+    fraction::Fraction,
+    structs::{
+        DeceasedCandidates, LARGE_COUNCIL_THRESHOLD, ListDrawingLotsRequired,
+        ListDrawingLotsVariant, ListVotes,
     },
 };
 
@@ -271,7 +274,7 @@ fn list_unique_highest_average_assigned_seats<LN: Copy + Eq>(
 fn lists_with_highest_average<'a, LN: Copy + Debug>(
     standings: impl Iterator<Item = &'a ListStanding<LN>>,
     residual_seats: u32,
-) -> Result<Vec<&'a ListStanding<LN>>, ApportionmentError> {
+) -> Result<Vec<&'a ListStanding<LN>>, ListDrawingLotsRequired<LN>> {
     // We are now going to find the lists that have the highest average
     // votes per seat if we would were to add one additional seat to them
     let (max_average, lists) = standings.fold(
@@ -306,7 +309,10 @@ fn lists_with_highest_average<'a, LN: Copy + Debug>(
             "Drawing of lots is required for lists: {:?}, only {residual_seats} seat(s) available",
             list_numbers(&lists)
         );
-        Err(ApportionmentError::DrawingOfLotsNotImplemented)
+        Err(ListDrawingLotsRequired {
+            variant: ListDrawingLotsVariant::HighestAverageResidualSeat,
+            options: list_numbers(&lists),
+        })
     } else {
         Ok(lists)
     }
@@ -322,7 +328,7 @@ fn lists_with_highest_average<'a, LN: Copy + Debug>(
 fn lists_with_largest_remainder<'a, LN: Copy + Debug>(
     standings: impl Iterator<Item = &'a ListStanding<LN>>,
     residual_seats: u32,
-) -> Result<Vec<&'a ListStanding<LN>>, ApportionmentError> {
+) -> Result<Vec<&'a ListStanding<LN>>, ListDrawingLotsRequired<LN>> {
     // We are now going to find the lists that have the largest remainder
     let (max_remainder, lists) = standings.fold(
         (Fraction::ZERO, vec![]),
@@ -356,7 +362,10 @@ fn lists_with_largest_remainder<'a, LN: Copy + Debug>(
             "Drawing of lots is required for lists: {:?}, only {residual_seats} seat(s) available",
             list_numbers(&lists)
         );
-        Err(ApportionmentError::DrawingOfLotsNotImplemented)
+        Err(ListDrawingLotsRequired {
+            variant: ListDrawingLotsVariant::LargestRemainderResidualSeat,
+            options: list_numbers(&lists),
+        })
     } else {
         Ok(lists)
     }
@@ -372,7 +381,7 @@ fn step_assign_residual_seat<LN: Copy + Debug + Eq>(
     residual_seat_number: u32,
     previous_steps: &[SeatChangeStep<LN>],
     exhausted_list_numbers: &[LN],
-) -> Result<SeatChange<LN>, ApportionmentError> {
+) -> Result<SeatChange<LN>, ListDrawingLotsRequired<LN>> {
     if seats >= LARGE_COUNCIL_THRESHOLD {
         debug!("Assigning residual seat {residual_seat_number} using highest averages method");
         // [Artikel P 7 Kieswet](https://wetten.overheid.nl/BWBR0004627/2026-01-01/#AfdelingII_HoofdstukP_Paragraaf2_ArtikelP7)
@@ -402,7 +411,7 @@ fn step_assign_remainder_using_highest_averages<'a, LN: Copy + Debug + Eq + 'a>(
     previous_steps: &[SeatChangeStep<LN>],
     exhausted_list_numbers: &[LN],
     unique: bool,
-) -> Result<SeatChange<LN>, ApportionmentError> {
+) -> Result<SeatChange<LN>, ListDrawingLotsRequired<LN>> {
     // Get an iterator that lists all the list standings without exhausted lists
     // and without lists that have zero votes cast.
     let mut qualifying_for_highest_average = standings
@@ -448,7 +457,7 @@ fn step_assign_remainder_using_largest_remainder<LN: Copy + Debug + Eq>(
     residual_seats: u32,
     previous_steps: &[SeatChangeStep<LN>],
     exhausted_list_numbers: &[LN],
-) -> Result<SeatChange<LN>, ApportionmentError> {
+) -> Result<SeatChange<LN>, ListDrawingLotsRequired<LN>> {
     // first we check if there are any lists that still qualify for a largest remainder assigned seat
     let mut qualifying_for_remainder = list_standings_qualifying_for_largest_remainder(
         standings,

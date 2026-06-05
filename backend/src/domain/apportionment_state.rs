@@ -4,7 +4,10 @@ use utoipa::ToSchema;
 
 use crate::{
     ErrorResponse,
-    domain::election::{CandidateNumber, PGNumber},
+    domain::{
+        apportionment::{CandidateDrawn, ListDrawn},
+        election::{CandidateNumber, PGNumber},
+    },
     error::{ApiErrorResponse, ErrorReference},
 };
 
@@ -66,9 +69,18 @@ pub enum ApportionmentState {
     RegisteringDeceasedCandidates {
         deceased_candidates: Vec<DeceasedCandidate>,
     },
-    // TODO add new states in https://github.com/kiesraad/abacus/issues/788
+    #[serde(skip)] // TODO remove in next PR
+    DrawingLots {
+        deceased_candidates: Vec<DeceasedCandidate>,
+        lists_drawn: Vec<ListDrawn>,
+        candidates_drawn: Vec<CandidateDrawn>,
+    },
     Finalised {
         deceased_candidates: Vec<DeceasedCandidate>,
+        #[serde(skip)] // TODO remove in next PR
+        lists_drawn: Vec<ListDrawn>,
+        #[serde(skip)] // TODO remove in next PR
+        candidates_drawn: Vec<CandidateDrawn>,
     },
 }
 
@@ -79,6 +91,8 @@ impl ApportionmentState {
                 // TODO go to correct state in https://github.com/kiesraad/abacus/issues/788
                 Ok(Self::Finalised {
                     deceased_candidates: Vec::new(),
+                    lists_drawn: Vec::new(),
+                    candidates_drawn: Vec::new(),
                 })
             }
             _ => Err(ApportionmentStateError::InvalidState),
@@ -102,6 +116,8 @@ impl ApportionmentState {
                 // TODO go to correct state in https://github.com/kiesraad/abacus/issues/788
                 Ok(Self::Finalised {
                     deceased_candidates,
+                    lists_drawn: Vec::new(),
+                    candidates_drawn: Vec::new(),
                 })
             }
             _ => Err(ApportionmentStateError::InvalidState),
@@ -113,9 +129,14 @@ impl ApportionmentState {
             Self::Uninitialised => &[],
             Self::RegisteringDeceasedCandidates {
                 deceased_candidates,
-            } => deceased_candidates,
-            Self::Finalised {
+            }
+            | Self::Finalised {
                 deceased_candidates,
+                ..
+            }
+            | Self::DrawingLots {
+                deceased_candidates,
+                ..
             } => deceased_candidates,
         }
     }
@@ -189,9 +210,10 @@ mod tests {
         fn skip_deceased_candidates() {
             #[rustfmt::skip]
             let scenarios = vec![
-                (Uninitialised, Ok(Finalised { deceased_candidates: vec![] })),
+                (Uninitialised, Ok(Finalised { deceased_candidates: vec![], lists_drawn: vec![],candidates_drawn: vec![]})),
                 (RegisteringDeceasedCandidates { deceased_candidates: vec![] }, Err(InvalidState)),
-                (Finalised { deceased_candidates: vec![] }, Err(InvalidState)),
+                (DrawingLots { deceased_candidates: vec![], lists_drawn: vec![],candidates_drawn: vec![]}, Err(InvalidState)),
+                (Finalised { deceased_candidates: vec![], lists_drawn: vec![],candidates_drawn: vec![]}, Err(InvalidState)),
             ];
 
             for (from, expected) in scenarios {
@@ -209,7 +231,8 @@ mod tests {
             let scenarios = vec![
                 (Uninitialised, Ok(RegisteringDeceasedCandidates { deceased_candidates: vec![] })),
                 (RegisteringDeceasedCandidates { deceased_candidates: vec![] }, Err(InvalidState)),
-                (Finalised { deceased_candidates: vec![] }, Err(InvalidState)),
+                (DrawingLots { deceased_candidates: vec![], lists_drawn: vec![],candidates_drawn: vec![]}, Err(InvalidState)),
+                (Finalised { deceased_candidates: vec![], lists_drawn: vec![],candidates_drawn: vec![]}, Err(InvalidState)),
             ];
 
             for (from, expected) in scenarios {
@@ -228,8 +251,9 @@ mod tests {
             #[rustfmt::skip]
             let scenarios = vec![
                 (Uninitialised, Err(InvalidState)),
-                (RegisteringDeceasedCandidates { deceased_candidates: vec![candidate] }, Ok(Finalised { deceased_candidates: vec![candidate] })),
-                (Finalised {deceased_candidates: Vec::new()}, Err(InvalidState)),
+                (RegisteringDeceasedCandidates { deceased_candidates: vec![candidate] }, Ok(Finalised { deceased_candidates: vec![candidate], lists_drawn: vec![], candidates_drawn: vec![] })),
+                (DrawingLots { deceased_candidates: vec![candidate], lists_drawn: vec![], candidates_drawn: vec![] }, Err(InvalidState)),
+                (Finalised { deceased_candidates: vec![], lists_drawn: vec![], candidates_drawn: vec![] }, Err(InvalidState)),
             ];
 
             for (from, expected) in scenarios {
@@ -247,7 +271,8 @@ mod tests {
             let scenarios = vec![
                 Uninitialised,
                 RegisteringDeceasedCandidates { deceased_candidates: Vec::new() },
-                Finalised {deceased_candidates: Vec::new()},
+                DrawingLots { deceased_candidates: vec![], lists_drawn: vec![], candidates_drawn: vec![]},
+                Finalised {deceased_candidates: vec![], lists_drawn: vec![], candidates_drawn: vec![]},
             ];
 
             for state in scenarios {
@@ -267,8 +292,15 @@ mod tests {
 
                 let invalid_states = vec![
                     Uninitialised,
+                    DrawingLots {
+                        deceased_candidates: vec![],
+                        lists_drawn: vec![],
+                        candidates_drawn: vec![],
+                    },
                     Finalised {
                         deceased_candidates: vec![candidate_4],
+                        lists_drawn: vec![],
+                        candidates_drawn: vec![],
                     },
                 ];
 

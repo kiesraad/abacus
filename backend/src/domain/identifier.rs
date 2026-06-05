@@ -43,6 +43,11 @@ macro_rules! id {
             pub fn as_internal_u32(&self) -> u32 {
                 self.0
             }
+
+            #[cfg(test)]
+            pub fn from_values(values: impl IntoIterator<Item = u32>) -> Vec<Self> {
+                values.into_iter().map(Self::from).collect()
+            }
         }
     };
 }

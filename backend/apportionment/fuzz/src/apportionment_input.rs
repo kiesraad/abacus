@@ -65,6 +65,7 @@ impl apportionment::ListVotes for SimpleListVotes {
     }
 }
 
+// Used when drawing lots for lists is needed
 pub struct SimpleListDrawn {
     variant: apportionment::ListDrawingLotsVariant,
     options: Vec<u32>,
@@ -85,6 +86,7 @@ impl apportionment::ListDrawn<u32> for SimpleListDrawn {
     }
 }
 
+// Used when drawing lots for candidates is needed
 pub struct SimpleCandidateDrawn {
     list: u32,
     options: Vec<u32>,

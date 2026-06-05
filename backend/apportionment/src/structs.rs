@@ -11,7 +11,9 @@ use super::{
 
 pub(crate) const LARGE_COUNCIL_THRESHOLD: u32 = 19;
 
+// Type alias for the ListNumber in the ListVotes trait
 pub type ListNumber<LV> = <LV as ListVotes>::ListNumber;
+// Type alias for the CandidateNumber in the CandidateVotes trait
 pub type CandidateNumber<LV> = <<LV as ListVotes>::Cv as CandidateVotes>::CandidateNumber;
 
 /// Errors that can occur during apportionment
@@ -21,7 +23,7 @@ pub enum ApportionmentError<LN, CN> {
     CandidateDrawingLotsRequired(CandidateDrawingLotsRequired<LN, CN>),
 }
 
-/// Used as an [Err] to indicate that drawing lots for a list is needed,
+/// Used in [ApportionmentError] to indicate that drawing lots for a list is needed,
 /// containing all the information needed to do the drawing
 #[derive(Debug, PartialEq)]
 pub struct ListDrawingLotsRequired<LN> {
@@ -35,7 +37,7 @@ impl<LN, CN> From<ListDrawingLotsRequired<LN>> for ApportionmentError<LN, CN> {
     }
 }
 
-/// Used as an [Err] to indicate that drawing lots for a candidate is needed,
+/// Used in [ApportionmentError] to indicate that drawing lots for a candidate is needed,
 /// containing all the information needed to do the drawing
 #[derive(Debug, PartialEq)]
 pub struct CandidateDrawingLotsRequired<LN, CN> {
@@ -51,22 +53,31 @@ impl<LN, CN> From<CandidateDrawingLotsRequired<LN, CN>> for ApportionmentError<L
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub enum ListDrawingLotsVariant {
+    // Draw lots for assigning a highest average residual seat
     HighestAverageResidualSeat,
+    // Draw lots for assigning a largest remainder residual seat
     LargestRemainderResidualSeat,
+    // Draw lots for removing a seat to be reassigned because of absolute majority (P9)
     AbsoluteMajority,
 }
 
 /// The list that has been drawn plus information to assert the correct drawing
 pub trait ListDrawn<LN> {
+    // The type of seat assignment or removal that lots need to be drawn for
     fn variant(&self) -> ListDrawingLotsVariant;
+    // The lists that lots are drawn for
     fn options(&self) -> &[LN];
+    // The list that the lot was drawn for
     fn drawn(&self) -> &LN;
 }
 
 /// The candidate that has been drawn plus information to assert the correct drawing
 pub trait CandidateDrawn<LN, CN> {
+    // The list the candidate need to be drawn from
     fn list(&self) -> &LN;
+    // The candidates that lots are drawn for
     fn options(&self) -> &[CN];
+    // The candidate that the lot was drawn for
     fn drawn(&self) -> &CN;
 }
 

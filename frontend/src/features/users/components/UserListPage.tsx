@@ -69,7 +69,10 @@ export function UserListPage() {
                   </Table.Cell>
                   <Table.Cell>{user.fullname || <span className="text-muted">{t("users.not_used")}</span>}</Table.Cell>
                   <Table.Cell>
-                    {user.last_activity_at ? formatDateTime(new Date(user.last_activity_at)) : "–"}
+                    <div className={cls.activityCell}>
+                      <span>{user.last_activity_at ? formatDateTime(new Date(user.last_activity_at)) : "–"}</span>
+                      {user.is_logged_in && <span className={cls.onlineDot} title={t("users.online")} />}
+                    </div>
                   </Table.Cell>
                 </Table.Row>
               ))}

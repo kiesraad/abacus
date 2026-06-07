@@ -297,6 +297,12 @@ pub async fn election_download_zip_total_counts_csb(
     let (zip_response, mut zip_writer) = ZipResponse::new(&download_zip_filename);
 
     tokio::spawn(async move {
+        if let Some(csv_counts) = files.csv_counts {
+            zip_writer
+                .add_file(&csv_counts.name, &csv_counts.data)
+                .await?;
+        }
+
         if let Some(total_counts_eml_file) = files.total_counts_eml {
             let xml_zip_filename = with_zip_extension(&total_counts_eml_file.name);
             let xml_zip =

@@ -5,17 +5,23 @@ pub use structs::{
 };
 use tracing::{debug, info};
 
-use super::{
-    ApportionmentError, CandidateVotes, ListVotes,
+use crate::{
+    CandidateVotes, ListVotes,
     fraction::Fraction,
-    structs::{CandidateNominationInput, DeceasedCandidates, LARGE_COUNCIL_THRESHOLD},
+    structs::{
+        CandidateDrawingLotsRequired, CandidateNominationInput, CandidateNumber,
+        DeceasedCandidates, LARGE_COUNCIL_THRESHOLD, ListNumber,
+    },
 };
+
+/// Defines a CandidateNominationError, for more details, check [CandidateDrawingLotsRequired]
+type CandidateNominationErr<LV> = CandidateDrawingLotsRequired<ListNumber<LV>, CandidateNumber<LV>>;
 
 /// Candidate nomination
 #[allow(clippy::cognitive_complexity)]
 pub(crate) fn candidate_nomination<'a, L: ListVotes>(
     input: &CandidateNominationInput<'a, L>,
-) -> Result<CandidateNominationResult<'a, L>, ApportionmentError> {
+) -> Result<CandidateNominationResult<'a, L>, CandidateNominationErr<L>> {
     info!("Candidate nomination");
 
     // [Artikel P 15 Kieswet](https://wetten.overheid.nl/BWBR0004627/2026-01-01/#AfdelingII_HoofdstukP_Paragraaf3_ArtikelP15)
@@ -105,7 +111,7 @@ fn filter_out_deceased_candidates<'a, T: ListVotes>(
 fn candidate_nomination_per_list<'a, T: ListVotes>(
     input: &CandidateNominationInput<'a, T>,
     preference_threshold: Fraction,
-) -> Result<Vec<ListCandidateNomination<'a, T>>, ApportionmentError> {
+) -> Result<Vec<ListCandidateNomination<'a, T>>, CandidateNominationErr<T>> {
     let mut list_candidate_nomination: Vec<ListCandidateNomination<T>> = vec![];
     for list in input.list_votes {
         let (list_number, list_seats) = input
@@ -125,7 +131,8 @@ fn candidate_nomination_per_list<'a, T: ListVotes>(
 
         let candidate_votes_meeting_preference_threshold =
             candidate_votes_meeting_preference_threshold(preference_threshold, candidate_votes);
-        let preferential_candidate_nomination = preferential_candidate_nomination::<T::Cv>(
+        let preferential_candidate_nomination = preferential_candidate_nomination::<T>(
+            list.number(),
             &candidate_votes_meeting_preference_threshold,
             list_seats,
         )?;
@@ -220,18 +227,19 @@ fn other_candidate_nomination<'a, T: CandidateVotes>(
 }
 
 /// List the candidates nominated with preferential votes
-fn preferential_candidate_nomination<'a, T: CandidateVotes>(
-    candidates_meeting_preference_threshold: &[&'a T],
+fn preferential_candidate_nomination<'a, LV: ListVotes>(
+    list: LV::ListNumber,
+    candidates_meeting_preference_threshold: &[&'a LV::Cv],
     list_seats: u32,
-) -> Result<Vec<&'a T>, ApportionmentError> {
-    let mut preferential_candidate_nomination: Vec<&T> = vec![];
+) -> Result<Vec<&'a LV::Cv>, CandidateNominationErr<LV>> {
+    let mut preferential_candidate_nomination: Vec<&LV::Cv> = vec![];
     if candidates_meeting_preference_threshold.len() <= list_seats as usize {
         preferential_candidate_nomination.extend(candidates_meeting_preference_threshold);
     } else {
         // Loop over non-assigned seats
         for (index, non_assigned_seats) in (1..=list_seats).rev().enumerate() {
             // List all candidates with the same number of votes that have not been nominated yet
-            let same_votes_candidates: Vec<&T> = candidates_meeting_preference_threshold
+            let same_votes_candidates: Vec<&LV::Cv> = candidates_meeting_preference_threshold
                 .iter()
                 .copied()
                 .filter(|candidate_votes| {
@@ -247,7 +255,10 @@ fn preferential_candidate_nomination<'a, T: CandidateVotes>(
                     "Drawing of lots is required for candidates: {:?}, only {non_assigned_seats} seat(s) available",
                     candidate_votes_numbers(&same_votes_candidates)
                 );
-                return Err(ApportionmentError::DrawingOfLotsNotImplemented);
+                return Err(CandidateDrawingLotsRequired {
+                    list,
+                    options: candidate_votes_numbers(&same_votes_candidates),
+                });
             } else {
                 // Nominate candidate to seat
                 preferential_candidate_nomination
@@ -289,10 +300,10 @@ mod tests {
     use test_log::test;
 
     use crate::{
-        ApportionmentError, ListVotes,
+        ListVotes,
         candidate_nomination::candidate_nomination,
         fraction::Fraction,
-        structs::DeceasedCandidates,
+        structs::{CandidateDrawingLotsRequired, DeceasedCandidates},
         test_helpers::{
             ListVotesMock,
             candidate_nomination_fixture_with_given_list_numbers_and_number_of_seats,
@@ -1121,6 +1132,12 @@ mod tests {
         );
         let result = candidate_nomination(&input);
 
-        assert_eq!(result, Err(ApportionmentError::DrawingOfLotsNotImplemented));
+        assert_eq!(
+            result,
+            Err(CandidateDrawingLotsRequired {
+                list: 2,
+                options: vec![1, 2, 3, 4, 5, 6]
+            })
+        );
     }
 }

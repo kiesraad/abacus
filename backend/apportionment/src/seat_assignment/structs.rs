@@ -2,8 +2,8 @@ use std::fmt::Debug;
 
 use tracing::{debug, info};
 
-use super::{ApportionmentError, Fraction};
-use crate::ListVotes;
+use super::Fraction;
+use crate::{ListVotes, structs::ListDrawingLotsRequired};
 
 /// The result of the seat assignment procedure. This contains the number of seats and the quota
 /// that was used. It then contains the initial standing after full seats were assigned,
@@ -17,6 +17,37 @@ pub struct SeatAssignmentResult<T: ListVotes> {
     pub quota: Fraction,
     pub steps: Vec<SeatChangeStep<T::ListNumber>>,
     pub final_standing: Vec<ListSeatAssignment<T::ListNumber>>,
+}
+
+impl<T: ListVotes> SeatAssignmentResult<T> {
+    pub fn warnings(&self) -> Vec<ApportionmentWarning> {
+        let mut warnings = Vec::new();
+        let has_p9 = self
+            .steps
+            .iter()
+            .any(|s| s.change.is_changed_by_absolute_majority_reassignment());
+        let has_p10 = self
+            .steps
+            .iter()
+            .any(|s| s.change.is_changed_by_list_exhaustion_removal());
+        if has_p9 && has_p10 {
+            warnings.push(ApportionmentWarning::AbsoluteMajorityAndListExhaustion);
+        }
+        if self.full_seats + self.residual_seats < self.seats {
+            warnings.push(ApportionmentWarning::NotAllSeatsAssigned);
+        }
+        warnings
+    }
+}
+
+/// Warnings derived from a completed seat assignment
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum ApportionmentWarning {
+    /// Both an absolute-majority reassignment (P9) and a list-exhaustion
+    /// removal (P10) occurred in the same apportionment.
+    AbsoluteMajorityAndListExhaustion,
+    /// Not all seats could be assigned (e.g. all eligible lists exhausted).
+    NotAllSeatsAssigned,
 }
 
 /// Contains information about the final assignment of seats for a specific list.
@@ -228,6 +259,11 @@ impl<LN: Copy> SeatChange<LN> {
     pub fn is_changed_by_absolute_majority_reassignment(&self) -> bool {
         matches!(self, Self::AbsoluteMajorityReassignment(_))
     }
+
+    /// Whether the seat was changed through the list exhaustion removal
+    pub fn is_changed_by_list_exhaustion_removal(&self) -> bool {
+        matches!(self, Self::ListExhaustionRemoval(_))
+    }
 }
 
 /// Contains the details for an assigned seat, assigned through the highest average method.
@@ -278,8 +314,8 @@ pub struct ListExhaustionRemovedSeat<LN> {
 
 /// Result type for residual seat (re)assignment: steps taken and final standings.
 pub type RemainderAssignmentResult<LN> =
-    Result<(Vec<SeatChangeStep<LN>>, Vec<ListStanding<LN>>), ApportionmentError>;
+    Result<(Vec<SeatChangeStep<LN>>, Vec<ListStanding<LN>>), ListDrawingLotsRequired<LN>>;
 
 /// Result type for absolute majority reassignment: updated standings and optional seat change.
 pub type AbsoluteMajorityResult<LN> =
-    Result<(Vec<ListStanding<LN>>, Option<SeatChange<LN>>), ApportionmentError>;
+    Result<(Vec<ListStanding<LN>>, Option<SeatChange<LN>>), ListDrawingLotsRequired<LN>>;

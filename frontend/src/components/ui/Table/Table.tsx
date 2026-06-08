@@ -83,12 +83,14 @@ function Row({ id, children, to, className }: { id?: string; children: ReactNode
 }
 
 function ClickRow({
+  id,
   children,
   onClick,
   downloadIcon,
   active,
   className,
 }: {
+  id?: string;
   children: ReactNode;
   onClick: () => void;
   downloadIcon?: boolean;
@@ -97,6 +99,7 @@ function ClickRow({
 }) {
   return (
     <tr
+      id={id}
       className={cn(cls.rowLink, downloadIcon && cls.downloadIcon, active && cls.active, className)}
       onClick={onClick}
     >

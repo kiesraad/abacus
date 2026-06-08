@@ -3,6 +3,7 @@ import { userEvent } from "@testing-library/user-event";
 import * as ReactRouter from "react-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
+import alertCls from "@/components/ui/Alert/Alert.module.css";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import {
@@ -85,6 +86,7 @@ describe("ApportionmentPage", () => {
       seat_assignment: seat_assignment,
       candidate_nomination: candidate_nomination,
       election_summary: election_summary,
+      warnings: [],
     } satisfies ElectionApportionmentResponse);
     overrideOnce("get", "/api/elections/3/apportionment/state", 200, state);
 
@@ -122,6 +124,7 @@ describe("ApportionmentPage", () => {
       seat_assignment: seat_assignment,
       candidate_nomination: candidate_nomination,
       election_summary: election_summary,
+      warnings: [],
     } satisfies ElectionApportionmentResponse);
     server.use(GetApportionmentStateRequestHandler);
     server.use(RegisterDeceasedCandidatesRequestHandler);
@@ -137,6 +140,8 @@ describe("ApportionmentPage", () => {
     const alert = await screen.findByRole("alert");
     expect(alert).toHaveTextContent("Alle zetels zijn toegewezen");
     expect(alert).toHaveTextContent("Je kunt de zetelverdeling nu definitief maken en het proces-verbaal downloaden.");
+    // No warnings, so the finalised alert should be a success alert
+    expect(alert).toHaveClass(alertCls.success!);
     expect(within(alert).getByRole("link", { name: "Naar proces-verbaal" })).toHaveAttribute(
       "href",
       "/report/committee-session/3/download",
@@ -174,6 +179,7 @@ describe("ApportionmentPage", () => {
       seat_assignment: seat_assignment,
       candidate_nomination: candidate_nomination,
       election_summary: election_summary,
+      warnings: [],
     } satisfies ElectionApportionmentResponse);
     overrideOnce("get", "/api/elections/3/apportionment/state", 200, {
       deceased_candidates: [],
@@ -187,6 +193,8 @@ describe("ApportionmentPage", () => {
     const alert = await screen.findByRole("alert");
     expect(alert).toHaveTextContent("Alle zetels zijn toegewezen");
     expect(alert).toHaveTextContent("Je kunt de zetelverdeling nu definitief maken en het proces-verbaal downloaden.");
+    // No warnings, so the finalised alert should be a success alert
+    expect(alert).toHaveClass(alertCls.success!);
     expect(within(alert).getByRole("link", { name: "Naar proces-verbaal" })).toHaveAttribute(
       "href",
       "/report/committee-session/3/download",
@@ -275,9 +283,38 @@ describe("ApportionmentPage", () => {
     const getApportionmentState = spyOnHandler(GetApportionmentStateRequestHandler);
     overrideOnce("get", "/api/elections/3", 200, getElectionMockData(election, committee_session));
     overrideOnce("post", "/api/elections/3/apportionment", 200, {
-      seat_assignment: { ...seat_assignment, residual_seats: seat_assignment.residual_seats - 2 },
+      seat_assignment: seat_assignment,
       candidate_nomination: candidate_nomination,
       election_summary: election_summary,
+      warnings: ["NotAllSeatsAssigned"],
+    } satisfies ElectionApportionmentResponse);
+    overrideOnce("get", "/api/elections/3/apportionment/state", 200, {
+      deceased_candidates: [],
+      type: "Finalised",
+    } satisfies ApportionmentState);
+
+    renderApportionmentPage(3, false);
+
+    const alerts = await screen.findAllByRole("alert");
+    expect(alerts).toHaveLength(2);
+    expect(alerts[0]).toHaveTextContent("Niet alle zetels zijn toegewezen");
+    alerts.forEach((alert) => {
+      expect(alert).not.toHaveTextContent("Alle zetels zijn toegewezen");
+    });
+
+    const finalisedAlert = alerts[1] as HTMLElement;
+    await user.click(within(finalisedAlert).getByRole("button", { name: "Zetelverdeling opnieuw doen" }));
+    expect(resetApportionmentState).toHaveBeenCalled();
+    expect(getApportionmentState).toHaveBeenCalled();
+  });
+
+  test("Renders P9+P10 warning when both articles were applied", async () => {
+    overrideOnce("get", "/api/elections/3", 200, getElectionMockData(election, committee_session));
+    overrideOnce("post", "/api/elections/3/apportionment", 200, {
+      seat_assignment: seat_assignment,
+      candidate_nomination: candidate_nomination,
+      election_summary: election_summary,
+      warnings: ["AbsoluteMajorityAndListExhaustion"],
     } satisfies ElectionApportionmentResponse);
     overrideOnce("get", "/api/elections/3/apportionment/state", 200, {
       deceased_candidates: [],
@@ -287,20 +324,15 @@ describe("ApportionmentPage", () => {
     renderApportionmentPage(3, false);
     expect(await screen.findByTestId("election-summary-table")).toBeVisible();
 
-    const alert = await screen.findByRole("alert");
-    expect(alert).toHaveTextContent("Niet alle zetels zijn toegewezen");
-    expect(alert).not.toHaveTextContent("Alle zetels zijn toegewezen");
-    expect(alert).toHaveTextContent("Je kunt de zetelverdeling nu definitief maken en het proces-verbaal downloaden.");
-    expect(within(alert).getByRole("link", { name: "Naar proces-verbaal" })).toHaveAttribute(
-      "href",
-      "/report/committee-session/3/download",
+    const alerts = await screen.findAllByRole("alert");
+    expect(alerts).toHaveLength(2);
+    expect(alerts[0]).toHaveTextContent(
+      "Zowel art. P 9 (volstrekte meerderheid) als art. P 10 (lijstuitputting) van de Kieswet zijn toegepast tijdens het berekenen van de zetelverdeling. Neem contact op met de Kiesraad om te overleggen of er extra controles nodig zijn.",
     );
-    const resetButton = within(alert).getByRole("button", { name: "Zetelverdeling opnieuw doen" });
-    expect(resetButton).toBeVisible();
-    await user.click(resetButton);
-
-    expect(resetApportionmentState).toHaveBeenCalled();
-    expect(getApportionmentState).toHaveBeenCalled();
+    expect(alerts[1]).toHaveTextContent("Alle zetels zijn toegewezen");
+    // Finalised alert should be neutral (not success) because there is a warning
+    expect(alerts[1]).toHaveClass(alertCls.notify!);
+    expect(alerts[1]).not.toHaveClass(alertCls.success!);
   });
 
   describe("Apportionment not yet available", () => {

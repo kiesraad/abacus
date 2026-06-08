@@ -1,13 +1,16 @@
 use std::collections::{HashMap, HashSet};
 
-use apportionment::{self};
+use apportionment;
 use serde::Serialize;
 use utoipa::ToSchema;
 
 use crate::domain::{
-    apportionment::{CandidateNomination, SeatAssignment},
+    apportionment::{
+        ApportionmentWarning, CandidateDrawn, CandidateNomination, ListDrawingLotsVariant,
+        ListDrawn, SeatAssignment,
+    },
     apportionment_state::DeceasedCandidate,
-    election::{self, PGNumber},
+    election::{CandidateNumber, PGNumber},
     results::political_group_candidate_votes::{CandidateVotes, PoliticalGroupCandidateVotes},
     summary::ElectionSummary,
 };
@@ -16,7 +19,7 @@ use crate::domain::{
 pub struct ApportionmentInputData<'a> {
     pub number_of_seats: u32,
     pub list_votes: &'a [PoliticalGroupCandidateVotes],
-    pub deceased_candidates: HashMap<PGNumber, HashSet<election::CandidateNumber>>,
+    pub deceased_candidates: HashMap<PGNumber, HashSet<CandidateNumber>>,
 }
 
 impl<'a> ApportionmentInputData<'a> {
@@ -25,7 +28,7 @@ impl<'a> ApportionmentInputData<'a> {
         list_votes: &'a [PoliticalGroupCandidateVotes],
         deceased_candidates: &[DeceasedCandidate],
     ) -> Self {
-        let mut grouped: HashMap<PGNumber, HashSet<election::CandidateNumber>> = HashMap::new();
+        let mut grouped: HashMap<PGNumber, HashSet<CandidateNumber>> = HashMap::new();
 
         for dc in deceased_candidates {
             grouped
@@ -44,6 +47,8 @@ impl<'a> ApportionmentInputData<'a> {
 
 impl<'a> apportionment::ApportionmentInput for ApportionmentInputData<'a> {
     type List = PoliticalGroupCandidateVotes;
+    type ListDrawn = ListDrawn;
+    type CandidateDrawn = CandidateDrawn;
 
     fn number_of_seats(&self) -> u32 {
         self.number_of_seats
@@ -53,8 +58,16 @@ impl<'a> apportionment::ApportionmentInput for ApportionmentInputData<'a> {
         self.list_votes
     }
 
-    fn deceased_candidates(&self) -> &HashMap<PGNumber, HashSet<election::CandidateNumber>> {
+    fn deceased_candidates(&self) -> &HashMap<PGNumber, HashSet<CandidateNumber>> {
         &self.deceased_candidates
+    }
+
+    fn lists_drawn(&self) -> impl Iterator<Item = &ListDrawn> {
+        std::iter::empty()
+    }
+
+    fn candidates_drawn(&self) -> impl Iterator<Item = &CandidateDrawn> {
+        std::iter::empty()
     }
 }
 
@@ -72,7 +85,7 @@ impl apportionment::ListVotes for PoliticalGroupCandidateVotes {
 }
 
 impl apportionment::CandidateVotes for CandidateVotes {
-    type CandidateNumber = election::CandidateNumber;
+    type CandidateNumber = CandidateNumber;
 
     fn number(&self) -> Self::CandidateNumber {
         self.number
@@ -83,9 +96,54 @@ impl apportionment::CandidateVotes for CandidateVotes {
     }
 }
 
+impl From<ListDrawingLotsVariant> for apportionment::ListDrawingLotsVariant {
+    fn from(value: ListDrawingLotsVariant) -> Self {
+        match value {
+            ListDrawingLotsVariant::HighestAverageResidualSeat => {
+                apportionment::ListDrawingLotsVariant::HighestAverageResidualSeat
+            }
+            ListDrawingLotsVariant::LargestRemainderResidualSeat => {
+                apportionment::ListDrawingLotsVariant::LargestRemainderResidualSeat
+            }
+            ListDrawingLotsVariant::AbsoluteMajority => {
+                apportionment::ListDrawingLotsVariant::AbsoluteMajority
+            }
+        }
+    }
+}
+
+impl apportionment::ListDrawn<PGNumber> for ListDrawn {
+    fn variant(&self) -> apportionment::ListDrawingLotsVariant {
+        self.variant.into()
+    }
+
+    fn options(&self) -> &[PGNumber] {
+        &self.options
+    }
+
+    fn drawn(&self) -> &PGNumber {
+        &self.drawn
+    }
+}
+
+impl apportionment::CandidateDrawn<PGNumber, CandidateNumber> for CandidateDrawn {
+    fn list(&self) -> &PGNumber {
+        &self.list
+    }
+
+    fn options(&self) -> &[CandidateNumber] {
+        &self.options
+    }
+
+    fn drawn(&self) -> &CandidateNumber {
+        &self.drawn
+    }
+}
+
 #[derive(Debug, Serialize, ToSchema)]
 pub struct ElectionApportionmentResponse {
     pub seat_assignment: SeatAssignment,
     pub candidate_nomination: CandidateNomination,
     pub election_summary: ElectionSummary,
+    pub warnings: Vec<ApportionmentWarning>,
 }

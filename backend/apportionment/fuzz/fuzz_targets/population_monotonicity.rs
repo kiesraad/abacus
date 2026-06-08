@@ -32,7 +32,9 @@ fuzz_target!(
                 )
             })
             .collect(),
-        deceased_candidates: HashMap::new()
+        deceased_candidates: HashMap::new(),
+        lists_drawn: Vec::new(),
+        candidates_drawn: Vec::new(),
     };
 
     if let Some(first_list) = new_data.list_votes.first_mut()

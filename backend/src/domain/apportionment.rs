@@ -6,6 +6,23 @@ use crate::domain::{
     results::political_group_candidate_votes::CandidateVotes,
 };
 
+#[derive(Clone, Copy, Debug, Serialize, Deserialize, ToSchema, PartialEq, Eq)]
+pub enum ApportionmentWarning {
+    AbsoluteMajorityAndListExhaustion,
+    NotAllSeatsAssigned,
+}
+
+impl From<apportionment::ApportionmentWarning> for ApportionmentWarning {
+    fn from(w: apportionment::ApportionmentWarning) -> Self {
+        match w {
+            apportionment::ApportionmentWarning::AbsoluteMajorityAndListExhaustion => {
+                Self::AbsoluteMajorityAndListExhaustion
+            }
+            apportionment::ApportionmentWarning::NotAllSeatsAssigned => Self::NotAllSeatsAssigned,
+        }
+    }
+}
+
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct SeatAssignment {
     pub seats: u32,
@@ -291,4 +308,36 @@ impl ChosenCandidate {
             list_name,
         }
     }
+}
+
+#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize, ToSchema)]
+pub enum ListDrawingLotsVariant {
+    /// Draw lots for assigning a highest average residual seat
+    HighestAverageResidualSeat,
+    /// Draw lots for assigning a largest remainder residual seat
+    LargestRemainderResidualSeat,
+    /// Draw lots for retracting a seat to be reassigned because of absolute majority (P9)
+    AbsoluteMajority,
+}
+
+/// The list that has been drawn plus information to assert the correct drawing
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize, ToSchema)]
+pub struct ListDrawn {
+    /// The type of seat assignment or retraction that lots need to be drawn for
+    pub variant: ListDrawingLotsVariant,
+    /// The lists that lots are drawn for
+    pub options: Vec<PGNumber>,
+    /// The list that the lot was drawn for
+    pub drawn: PGNumber,
+}
+
+/// The candidate that has been drawn plus information to assert the correct drawing
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize, ToSchema)]
+pub struct CandidateDrawn {
+    /// The list the candidate needs to be drawn from
+    pub list: PGNumber,
+    /// The candidates that lots are drawn for
+    pub options: Vec<CandidateNumber>,
+    /// The candidate that the lot was drawn for
+    pub drawn: CandidateNumber,
 }

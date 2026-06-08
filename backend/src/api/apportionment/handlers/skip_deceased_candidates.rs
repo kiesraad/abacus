@@ -40,6 +40,7 @@ pub async fn skip_deceased_candidates(
     user.role().is_authorized(election.committee_category)?;
 
     let state = update_apportionment_state(&mut tx, audit_service, election_id, |state| {
+        // TODO in next PR, call apportionment process and determine next state
         state.skip_deceased_candidates()
     })
     .await?;
@@ -83,7 +84,9 @@ mod tests {
         assert_eq!(
             state.0,
             ApportionmentState::Finalised {
-                deceased_candidates: Vec::new()
+                deceased_candidates: Vec::new(),
+                lists_drawn: vec![],
+                candidates_drawn: vec![],
             }
         );
     }

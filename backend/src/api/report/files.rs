@@ -126,12 +126,14 @@ async fn generate_and_save_files_csb_election(
     let total_counts_eml = saver.save(generated_files.total_counts_eml).await?;
     let results_pdf = saver.save(generated_files.results_pdf).await?;
     let attachment_pdf = saver.save(generated_files.attachment_pdf).await?;
+    let csv_counts = saver.save(generated_files.csv_counts).await?;
 
     Ok(CsbFiles {
         results_eml: Some(results_eml),
         results_pdf: Some(results_pdf),
         attachment_pdf: Some(attachment_pdf),
         total_counts_eml: Some(total_counts_eml),
+        csv_counts: Some(csv_counts),
     })
 }
 
@@ -160,6 +162,7 @@ async fn get_existing_csb_files(
             .await?,
         total_counts_eml: file_repo::get_for_session(conn, committee_session_id, CsbTotalCountsEml)
             .await?,
+        csv_counts: file_repo::get_for_session(conn, committee_session_id, CsbCsvCounts).await?,
     })
 }
 
@@ -505,6 +508,7 @@ mod tests {
             let attachment_pdf = files
                 .attachment_pdf
                 .expect("should have generated attachment pdf");
+            let csv_counts = files.csv_counts.expect("should have generated csv counts");
 
             assert_eq!(eml_results.name, "Resultaat_GR2024_Juinen.eml.xml");
             assert_eq!(eml_results.id, FileId::from(1));
@@ -518,10 +522,14 @@ mod tests {
             assert_eq!(attachment_pdf.name, "Model_P22-2_bijlage.pdf");
             assert_eq!(attachment_pdf.id, FileId::from(4));
 
+            assert_eq!(csv_counts.name, "osv4-3_telling_gr2024_juinen.csv");
+            assert_eq!(csv_counts.id, FileId::from(5));
+
             assert_eq!(
                 list_event_names(&mut conn).await.unwrap(),
                 [
                     "ApportionmentStateUpdated",
+                    "FileCreated",
                     "FileCreated",
                     "FileCreated",
                     "FileCreated",

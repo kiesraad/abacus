@@ -18,7 +18,7 @@ import type { ClaimDataEntryResponse, VotersCounts, VotesCounts } from "@/types/
 import { type DataEntry, test } from "../../fixtures";
 
 test.use({
-  storageState: "e2e-tests/state/typist1.json",
+  storageState: "e2e-tests/state/typist1-GSB.json",
 });
 
 test.describe("resume data entry flow", () => {
@@ -352,8 +352,8 @@ test.describe("resume data entry flow", () => {
       await expect(dataEntryHomePage.fieldset).toBeVisible();
     });
 
-    test("save input from check and save page", async ({ typistOne, dataEntryGSB }) => {
-      const { page } = typistOne;
+    test("save input from check and save page", async ({ typistOneGSB, dataEntryGSB }) => {
+      const { page } = typistOneGSB;
 
       await page.goto(`/elections/${dataEntryGSB.election_id}/data-entry/${dataEntryGSB.id}/1`);
 
@@ -457,8 +457,8 @@ test.describe("resume data entry flow", () => {
       await expect(votersAndVotesPage.proxyCertificateCount).toBeEmpty();
     });
 
-    test("discard input from voters and votes page with error", async ({ typistOne, dataEntryGSB }) => {
-      const { page, request } = typistOne;
+    test("discard input from voters and votes page with error", async ({ typistOneGSB, dataEntryGSB }) => {
+      const { page, request } = typistOneGSB;
 
       await page.goto(`/elections/${dataEntryGSB.election_id}/data-entry/${dataEntryGSB.id}/1`);
 
@@ -489,8 +489,8 @@ test.describe("resume data entry flow", () => {
       expect(await claimResponse.json()).toMatchObject({ data: emptyCSOFirstSessionResults() });
     });
 
-    test("discard input from voters and votes page with warning", async ({ typistOne, dataEntryGSB }) => {
-      const { page, request } = typistOne;
+    test("discard input from voters and votes page with warning", async ({ typistOneGSB, dataEntryGSB }) => {
+      const { page, request } = typistOneGSB;
 
       await page.goto(`/elections/${dataEntryGSB.election_id}/data-entry/${dataEntryGSB.id}/1`);
 
@@ -537,8 +537,8 @@ test.describe("resume data entry flow", () => {
       expect(await claimResponse.json()).toMatchObject({ data: emptyCSOFirstSessionResults() });
     });
 
-    test("discard input from check and save page", async ({ typistOne, dataEntryGSB }) => {
-      const { page, request } = typistOne;
+    test("discard input from check and save page", async ({ typistOneGSB, dataEntryGSB }) => {
+      const { page, request } = typistOneGSB;
 
       await page.goto(`/elections/${dataEntryGSB.election_id}/data-entry/${dataEntryGSB.id}/1`);
 

@@ -1,11 +1,12 @@
 import { readFile } from "node:fs/promises";
 import { type APIRequestContext, test as base, expect, type Page } from "@playwright/test";
 import { DataEntryApiClient } from "e2e-tests/helpers-utils/api-clients";
-import { completePollingStationDataEntries } from "e2e-tests/helpers-utils/e2e-test-api-helpers";
+import { completeDataEntries } from "e2e-tests/helpers-utils/e2e-test-api-helpers";
 import { createRandomUsername } from "e2e-tests/helpers-utils/e2e-test-utils";
-import { type Eml230b, eml110a, eml230b } from "e2e-tests/test-data/eml-files";
+import { type Eml230b, eml110a, eml230b, eml230b_more_than_45_candidates } from "e2e-tests/test-data/eml-files";
 import {
   dataEntryRequest,
+  dataEntryRequestGSB,
   dataEntryWithDifferencesRequest,
   dataEntryWithErrorRequest,
   pollingStationRequests,
@@ -41,37 +42,50 @@ export interface DataEntry {
 type Fixtures = {
   // page and request fixture for admin
   adminOne: { page: Page; request: APIRequestContext };
-  // page and request fixture for coordinator
-  coordinatorOne: { page: Page; request: APIRequestContext };
-  // page and request fixture for typist one
-  typistOne: { page: Page; request: APIRequestContext };
-  // page and request fixture for typist two
-  typistTwo: { page: Page; request: APIRequestContext };
+  // page and request fixture for GSB coordinator
+  coordinatorOneGSB: { page: Page; request: APIRequestContext };
+  // page and request fixture for GSB typist one
+  typistOneGSB: { page: Page; request: APIRequestContext };
+  // page and request fixture for GSB typist two
+  typistTwoGSB: { page: Page; request: APIRequestContext };
+  // page and request fixture for CSB coordinator
+  coordinatorOneCSB: { page: Page; request: APIRequestContext };
+  // page and request fixture for CSB typist one
+  typistOneCSB: { page: Page; request: APIRequestContext };
+  // page and request fixture for CSB typist two
+  typistTwoCSB: { page: Page; request: APIRequestContext };
   eml230b: Eml230b;
-  // Election without polling stations
-  emptyElection: Election;
-  // Election with two polling stations
-  election: ElectionDetailsResponse;
-  // First data entry of the election
+  eml230b_more_than_45_candidates: Eml230b;
+  // GSB election without polling stations
+  emptyElectionGSB: Election;
+  // CSB election
+  emptyElectionCSB: Election;
+  // GSB election with two polling stations
+  electionGSB: ElectionDetailsResponse;
+  // CSB election with one subcommittee
+  electionCSB: ElectionDetailsResponse;
+  // First data entry of the GSB election
   dataEntryGSB: DataEntry;
-  // First data entry of the election with entry claimed by typist one
+  // First data entry of the GSB election with entry claimed by typist one
   dataEntryGSBFirstEntryClaimed: DataEntry;
-  // First data entry of the election with first data entry done
+  // First data entry of the GSB election with first data entry done
   dataEntryGSBFirstEntryDone: DataEntry;
-  // First data entry of the election with first data entry with errors
+  // First data entry of the GSB election with first data entry with errors
   dataEntryGSBFirstEntryHasErrors: DataEntry;
-  // First data entry of the election with first and second data entries done
+  // First data entry of the GSB election with first and second data entries done
   dataEntryGSBDefinitive: DataEntry;
-  // First data entry of the election with differences between the first and second data entry
+  // First data entry of the GSB election with differences between the first and second data entry
   dataEntryGSBEntriesDifferent: DataEntry;
-  // First data entry of the election with second data entry that has errors and is therefore different
+  // First data entry of the GSB election with second data entry that has errors and is therefore different
   dataEntryGSBEntriesDifferentWithErrors: DataEntry;
-  // Election with two completed data entries for each polling station
-  completedElection: Election;
-  // The current committee session for the election
-  currentCommitteeSession: CommitteeSession;
-  // Newly created User
-  newTypist: User;
+  // GSB election with polling stations and two completed data entries for each
+  completedElectionGSB: Election;
+  // CSB election with subcommittee and two completed data entries
+  completedElectionCSB: Election;
+  // The current committee session for the GSB election
+  currentCommitteeSessionElectionGSB: CommitteeSession;
+  // Newly created GSB User
+  newTypistGSB: User;
 };
 
 export const test = base.extend<Fixtures>({
@@ -81,26 +95,45 @@ export const test = base.extend<Fixtures>({
     await use({ page: page, request: context.request });
     await context.close();
   },
-  coordinatorOne: async ({ browser }, use) => {
-    const context = await browser.newContext({ storageState: "e2e-tests/state/coordinator1.json" });
+  coordinatorOneGSB: async ({ browser }, use) => {
+    const context = await browser.newContext({ storageState: "e2e-tests/state/coordinator1-GSB.json" });
     const page = await context.newPage();
     await use({ page: page, request: context.request });
     await context.close();
   },
-  typistOne: async ({ browser }, use) => {
-    const context = await browser.newContext({ storageState: "e2e-tests/state/typist1.json" });
+  typistOneGSB: async ({ browser }, use) => {
+    const context = await browser.newContext({ storageState: "e2e-tests/state/typist1-GSB.json" });
     const page = await context.newPage();
     await use({ page: page, request: context.request });
     await context.close();
   },
-  typistTwo: async ({ browser }, use) => {
-    const context = await browser.newContext({ storageState: "e2e-tests/state/typist2.json" });
+  typistTwoGSB: async ({ browser }, use) => {
+    const context = await browser.newContext({ storageState: "e2e-tests/state/typist2-GSB.json" });
+    const page = await context.newPage();
+    await use({ page: page, request: context.request });
+    await context.close();
+  },
+  coordinatorOneCSB: async ({ browser }, use) => {
+    const context = await browser.newContext({ storageState: "e2e-tests/state/coordinator1-CSB.json" });
+    const page = await context.newPage();
+    await use({ page: page, request: context.request });
+    await context.close();
+  },
+  typistOneCSB: async ({ browser }, use) => {
+    const context = await browser.newContext({ storageState: "e2e-tests/state/typist1-CSB.json" });
+    const page = await context.newPage();
+    await use({ page: page, request: context.request });
+    await context.close();
+  },
+  typistTwoCSB: async ({ browser }, use) => {
+    const context = await browser.newContext({ storageState: "e2e-tests/state/typist2-CSB.json" });
     const page = await context.newPage();
     await use({ page: page, request: context.request });
     await context.close();
   },
   eml230b: [eml230b, { option: true }],
-  emptyElection: async ({ adminOne, eml230b }, use) => {
+  eml230b_more_than_45_candidates: [eml230b_more_than_45_candidates, { option: true }],
+  emptyElectionGSB: async ({ adminOne, eml230b }, use) => {
     const { request } = adminOne;
     const url: ELECTION_IMPORT_REQUEST_PATH = `/api/elections/import`;
     const election_data = await readFile(eml110a.path, "utf8");
@@ -121,16 +154,35 @@ export const test = base.extend<Fixtures>({
 
     await use(election);
   },
-  election: async ({ adminOne, coordinatorOne, emptyElection }, use) => {
+  emptyElectionCSB: async ({ adminOne, eml230b_more_than_45_candidates }, use) => {
+    const { request } = adminOne;
+    const url: ELECTION_IMPORT_REQUEST_PATH = `/api/elections/import`;
+    const election_data = await readFile(eml110a.path, "utf8");
+    const candidate_data = await readFile(eml230b_more_than_45_candidates.path, "utf8");
+    const electionResponse = await request.post(url, {
+      data: {
+        committee_category: "CSB",
+        election_data,
+        election_hash: eml110a.fullHash,
+        candidate_data,
+        candidate_hash: eml230b_more_than_45_candidates.fullHash,
+      },
+    });
+    expect(electionResponse.ok()).toBeTruthy();
+    const election = (await electionResponse.json()) as Election;
+
+    await use(election);
+  },
+  electionGSB: async ({ adminOne, coordinatorOneGSB, emptyElectionGSB }, use) => {
     // create polling stations in the existing emptyElection
-    const url: POLLING_STATION_CREATE_REQUEST_PATH = `/api/elections/${emptyElection.id}/polling_stations`;
+    const url: POLLING_STATION_CREATE_REQUEST_PATH = `/api/elections/${emptyElectionGSB.id}/polling_stations`;
     for (const pollingStationRequest of pollingStationRequests) {
       const pollingStationResponse = await adminOne.request.post(url, { data: pollingStationRequest });
       expect(pollingStationResponse.ok()).toBeTruthy();
     }
 
     // get election details
-    const electionUrl: ELECTION_DETAILS_REQUEST_PATH = `/api/elections/${emptyElection.id}`;
+    const electionUrl: ELECTION_DETAILS_REQUEST_PATH = `/api/elections/${emptyElectionGSB.id}`;
     const electionResponse = await adminOne.request.get(electionUrl);
     expect(electionResponse.ok()).toBeTruthy();
     const response = (await electionResponse.json()) as ElectionDetailsResponse;
@@ -138,7 +190,7 @@ export const test = base.extend<Fixtures>({
     // Set committee session status to DataEntry
     const statusChangeUrl: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/elections/${response.current_committee_session.election_id}/committee_sessions/${response.current_committee_session.id}/status`;
     const statusChangeData: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = { status: "data_entry" };
-    const statusChangeResponse = await coordinatorOne.request.put(statusChangeUrl, { data: statusChangeData });
+    const statusChangeResponse = await coordinatorOneGSB.request.put(statusChangeUrl, { data: statusChangeData });
     expect(statusChangeResponse.ok()).toBeTruthy();
 
     // Fill in committee session details
@@ -148,35 +200,60 @@ export const test = base.extend<Fixtures>({
       start_date: "2026-03-18",
       start_time: "21:45",
     };
-    const detailsUpdateResponse = await coordinatorOne.request.put(detailsUpdateUrl, { data: detailsUpdateData });
+    const detailsUpdateResponse = await coordinatorOneGSB.request.put(detailsUpdateUrl, { data: detailsUpdateData });
     expect(detailsUpdateResponse.ok()).toBeTruthy();
 
     await use(response);
   },
-  dataEntryGSB: async ({ adminOne, election }, use) => {
+  electionCSB: async ({ adminOne, coordinatorOneCSB, emptyElectionCSB }, use) => {
+    // get election details
+    const electionUrl: ELECTION_DETAILS_REQUEST_PATH = `/api/elections/${emptyElectionCSB.id}`;
+    const electionResponse = await adminOne.request.get(electionUrl);
+    expect(electionResponse.ok()).toBeTruthy();
+    const response = (await electionResponse.json()) as ElectionDetailsResponse;
+
+    // Set committee session status to DataEntry
+    const statusChangeUrl: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/elections/${response.current_committee_session.election_id}/committee_sessions/${response.current_committee_session.id}/status`;
+    const statusChangeData: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = { status: "data_entry" };
+    const statusChangeResponse = await coordinatorOneCSB.request.put(statusChangeUrl, { data: statusChangeData });
+    expect(statusChangeResponse.ok()).toBeTruthy();
+
+    // Fill in committee session details
+    const detailsUpdateUrl: COMMITTEE_SESSION_UPDATE_REQUEST_PATH = `/api/elections/${response.current_committee_session.election_id}/committee_sessions/${response.current_committee_session.id}`;
+    const detailsUpdateData: COMMITTEE_SESSION_UPDATE_REQUEST_BODY = {
+      location: "Den Haag",
+      start_date: "2026-03-18",
+      start_time: "21:45",
+    };
+    const detailsUpdateResponse = await coordinatorOneCSB.request.put(detailsUpdateUrl, { data: detailsUpdateData });
+    expect(detailsUpdateResponse.ok()).toBeTruthy();
+
+    await use(response);
+  },
+  dataEntryGSB: async ({ adminOne, electionGSB }, use) => {
     const { request } = adminOne;
     // get the first polling station of the existing election
-    const url: ELECTION_STATUS_REQUEST_PATH = `/api/elections/${election.election.id}/status`;
+    const url: ELECTION_STATUS_REQUEST_PATH = `/api/elections/${electionGSB.election.id}/status`;
     const response = await request.get(url);
     expect(response.ok()).toBeTruthy();
     const electionStatuses = (await response.json()) as ElectionStatusResponse;
     const electionStatus = electionStatuses.statuses[0]!;
 
     await use({
-      election_id: election.election.id,
+      election_id: electionGSB.election.id,
       id: electionStatus.data_entry_id,
       name: electionStatus.source.name,
       number: electionStatus.source.number.toString(),
     });
   },
-  dataEntryGSBFirstEntryClaimed: async ({ typistOne, dataEntryGSB }, use) => {
-    const { request } = typistOne;
+  dataEntryGSBFirstEntryClaimed: async ({ typistOneGSB, dataEntryGSB }, use) => {
+    const { request } = typistOneGSB;
     const firstDataEntry = new DataEntryApiClient(request, dataEntryGSB.id, 1);
     await firstDataEntry.claim();
     await use(dataEntryGSB);
   },
-  dataEntryGSBFirstEntryDone: async ({ dataEntryGSB, typistOne }, use) => {
-    const { request } = typistOne;
+  dataEntryGSBFirstEntryDone: async ({ dataEntryGSB, typistOneGSB }, use) => {
+    const { request } = typistOneGSB;
     const firstDataEntry = new DataEntryApiClient(request, dataEntryGSB.id, 1);
     await firstDataEntry.claim();
     await firstDataEntry.save(dataEntryRequest);
@@ -184,8 +261,8 @@ export const test = base.extend<Fixtures>({
 
     await use(dataEntryGSB);
   },
-  dataEntryGSBFirstEntryHasErrors: async ({ dataEntryGSB, typistOne }, use) => {
-    const { request } = typistOne;
+  dataEntryGSBFirstEntryHasErrors: async ({ dataEntryGSB, typistOneGSB }, use) => {
+    const { request } = typistOneGSB;
     const firstDataEntry = new DataEntryApiClient(request, dataEntryGSB.id, 1);
     await firstDataEntry.claim();
     await firstDataEntry.save(dataEntryWithErrorRequest);
@@ -193,45 +270,65 @@ export const test = base.extend<Fixtures>({
 
     await use(dataEntryGSB);
   },
-  dataEntryGSBDefinitive: async ({ dataEntryGSB, typistOne, typistTwo }, use) => {
-    await completePollingStationDataEntries(dataEntryGSB.id, typistOne.request, typistTwo.request);
+  dataEntryGSBDefinitive: async ({ dataEntryGSB, typistOneGSB, typistTwoGSB }, use) => {
+    await completeDataEntries(dataEntryGSB.id, typistOneGSB.request, typistTwoGSB.request);
 
     await use(dataEntryGSB);
   },
-  dataEntryGSBEntriesDifferent: async ({ dataEntryGSB, typistOne, typistTwo }, use) => {
-    await completePollingStationDataEntries(
+  dataEntryGSBEntriesDifferent: async ({ dataEntryGSB, typistOneGSB, typistTwoGSB }, use) => {
+    await completeDataEntries(
       dataEntryGSB.id,
-      typistOne.request,
-      typistTwo.request,
+      typistOneGSB.request,
+      typistTwoGSB.request,
       dataEntryRequest,
       dataEntryWithDifferencesRequest,
     );
 
     await use(dataEntryGSB);
   },
-  dataEntryGSBEntriesDifferentWithErrors: async ({ dataEntryGSB, typistOne, typistTwo }, use) => {
-    await completePollingStationDataEntries(
+  dataEntryGSBEntriesDifferentWithErrors: async ({ dataEntryGSB, typistOneGSB, typistTwoGSB }, use) => {
+    await completeDataEntries(
       dataEntryGSB.id,
-      typistOne.request,
-      typistTwo.request,
+      typistOneGSB.request,
+      typistTwoGSB.request,
       dataEntryRequest,
       dataEntryWithErrorRequest,
     );
 
     await use(dataEntryGSB);
   },
-  completedElection: async ({ election, typistOne, typistTwo }, use) => {
+  completedElectionGSB: async ({ electionGSB, typistOneGSB, typistTwoGSB }, use) => {
     // finalise both data entries for all polling stations
-    for (const ps of election.polling_stations) {
-      await completePollingStationDataEntries(ps.data_entry_id!, typistOne.request, typistTwo.request);
+    for (const ps of electionGSB.polling_stations) {
+      await completeDataEntries(ps.data_entry_id!, typistOneGSB.request, typistTwoGSB.request);
     }
 
-    await use(election.election);
+    await use(electionGSB.election);
   },
-  currentCommitteeSession: async ({ election }, use) => {
-    await use(election.current_committee_session);
+  completedElectionCSB: async ({ electionCSB, typistOneCSB, typistTwoCSB }, use) => {
+    const { request } = typistOneCSB;
+    // get the existing election statuses
+    const url: ELECTION_STATUS_REQUEST_PATH = `/api/elections/${electionCSB.election.id}/status`;
+    const response = await request.get(url);
+    expect(response.ok()).toBeTruthy();
+    const electionStatus = (await response.json()) as ElectionStatusResponse;
+    const dataEntryId = electionStatus.statuses[0]!.data_entry_id;
+
+    // finalise both data entries for the subcommittee
+    await completeDataEntries(
+      dataEntryId,
+      typistOneCSB.request,
+      typistTwoCSB.request,
+      dataEntryRequestGSB,
+      dataEntryRequestGSB,
+    );
+
+    await use(electionCSB.election);
   },
-  newTypist: async ({ adminOne }, use) => {
+  currentCommitteeSessionElectionGSB: async ({ electionGSB }, use) => {
+    await use(electionGSB.current_committee_session);
+  },
+  newTypistGSB: async ({ adminOne }, use) => {
     const { request } = adminOne;
     // create a new user
     const url: USER_CREATE_REQUEST_PATH = "/api/users";

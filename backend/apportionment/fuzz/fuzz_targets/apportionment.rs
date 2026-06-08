@@ -157,7 +157,7 @@ fuzz_target!(
                 }
             }
         }
-        Err(ApportionmentError::DrawingOfLotsNotImplemented) => {
+        Err(ApportionmentError::ListDrawingLotsRequired(_) | ApportionmentError::CandidateDrawingLotsRequired(_)) => {
             // Expected error: drawing of lots is not yet implemented.
         }
     }

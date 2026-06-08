@@ -6,12 +6,12 @@ import { eml110a, eml110b } from "e2e-tests/test-data/eml-files";
 import { test } from "../fixtures";
 
 test.use({
-  storageState: "e2e-tests/state/coordinator1.json",
+  storageState: "e2e-tests/state/coordinator1-GSB.json",
 });
 
 test.describe("Polling station import", () => {
-  test("As coordinator import polling stations from a file", async ({ page, emptyElection }) => {
-    await page.goto(`/elections/${emptyElection.id}/polling-stations`);
+  test("As coordinator import polling stations from a file", async ({ page, emptyElectionGSB }) => {
+    await page.goto(`/elections/${emptyElectionGSB.id}/polling-stations`);
 
     // Click file import button
     const emptyListPage = new PollingStationListEmptyPgObj(page);

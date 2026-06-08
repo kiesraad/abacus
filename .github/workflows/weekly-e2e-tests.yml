@@ -19,7 +19,7 @@ jobs:
     env:
       SHOW_DEV_PAGE: false
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6.0.2
       - name: Setup Node
         uses: actions/setup-node@v6.4.0
         with:
@@ -60,7 +60,7 @@ jobs:
       CARGO_TERM_COLOR: always
       SQLX_OFFLINE: "true"
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6.0.2
       - name: Download Abacus Frontend
         uses: actions/download-artifact@v8
         with:
@@ -96,7 +96,7 @@ jobs:
     env:
       RELEASE_BUILD: true
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6.0.2
       - name: Setup Node
         uses: actions/setup-node@v6.4.0
         with:

@@ -353,6 +353,7 @@ fn random_csb_result(
     string_length: usize,
 ) -> ElectionSummaryCSB {
     ElectionSummaryCSB {
+        number_of_voters: rng.random_range(3000..5000),
         voters_counts: VotersCounts {
             poll_card_count: rng.random_range(0..500),
             proxy_certificate_count: rng.random_range(0..500),
@@ -449,6 +450,7 @@ fn random_election_summary_csb(
 ) -> ElectionSummaryCSB {
     let result = random_csb_result(rng, election, data_sources, string_length);
     ElectionSummaryCSB {
+        number_of_voters: result.number_of_voters,
         voters_counts: result.voters_counts,
         votes_counts: result.votes_counts,
         differences_counts: SummaryDifferencesCounts {

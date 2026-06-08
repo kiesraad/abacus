@@ -14,7 +14,10 @@ pub use self::{
 use crate::{
     APIError, AppState,
     api::middleware::authentication::RouteAuthorization,
-    domain::role::Role,
+    domain::{
+        election::{CandidateNumber, PGNumber},
+        role::Role,
+    },
     error::{ApiErrorResponse, ErrorReference, ErrorResponse},
 };
 
@@ -52,16 +55,14 @@ impl ApiErrorResponse for ApportionmentApiError {
     }
 }
 
-impl From<ApportionmentError> for ApportionmentApiError {
-    fn from(err: ApportionmentError) -> Self {
-        match err {
-            ApportionmentError::DrawingOfLotsNotImplemented => Self::DrawingOfLotsNotImplemented,
-        }
+impl From<ApportionmentError<PGNumber, CandidateNumber>> for ApportionmentApiError {
+    fn from(_err: ApportionmentError<PGNumber, CandidateNumber>) -> Self {
+        Self::DrawingOfLotsNotImplemented
     }
 }
 
-impl From<ApportionmentError> for APIError {
-    fn from(err: ApportionmentError) -> Self {
+impl From<ApportionmentError<PGNumber, CandidateNumber>> for APIError {
+    fn from(err: ApportionmentError<PGNumber, CandidateNumber>) -> Self {
         ApportionmentApiError::from(err).into()
     }
 }

@@ -173,6 +173,8 @@ pub async fn process(
         election.number_of_seats,
         &election_summary.political_group_votes,
         state.get_deceased_candidates(),
+        state.get_lists_drawn(),
+        state.get_candidates_drawn(),
     );
 
     let apportionment_result = match apportionment::process(&input) {

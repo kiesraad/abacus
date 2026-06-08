@@ -154,7 +154,7 @@ mod tests {
         let list_votes =
             create_political_group_candidate_votes(&election.political_groups, &candidate_votes);
         let apportionment_input =
-            ApportionmentInputData::new(election.number_of_seats, &list_votes, &[]);
+            ApportionmentInputData::new(election.number_of_seats, &list_votes, &[], &[], &[]);
         let apportionment_result =
             apportionment::process(&apportionment_input).expect("apportionment failed");
         let seat_assignment = map_seat_assignment(&apportionment_result.seat_assignment);
@@ -185,7 +185,7 @@ mod tests {
         let list_votes =
             create_political_group_candidate_votes(&election.political_groups, &candidate_votes);
         let apportionment_input =
-            ApportionmentInputData::new(election.number_of_seats, &list_votes, &[]);
+            ApportionmentInputData::new(election.number_of_seats, &list_votes, &[], &[], &[]);
         let apportionment_result =
             apportionment::process(&apportionment_input).expect("apportionment failed");
         let seat_assignment = map_seat_assignment(&apportionment_result.seat_assignment);
@@ -223,7 +223,7 @@ mod tests {
         let list_votes =
             create_political_group_candidate_votes(&election.political_groups, &candidate_votes);
         let apportionment_input =
-            ApportionmentInputData::new(election.number_of_seats, &list_votes, &[]);
+            ApportionmentInputData::new(election.number_of_seats, &list_votes, &[], &[], &[]);
         let apportionment_result =
             apportionment::process(&apportionment_input).expect("apportionment failed");
         let seat_assignment = map_seat_assignment(&apportionment_result.seat_assignment);

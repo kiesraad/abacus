@@ -336,6 +336,8 @@ mod tests {
             election.number_of_seats,
             &summary.political_group_votes,
             &[],
+            &[],
+            &[],
         );
         let apportionment_result =
             apportionment::process(&apportionment_input).expect("apportionment failed");
@@ -454,6 +456,8 @@ mod tests {
             election.number_of_seats,
             &summary.political_group_votes,
             &[],
+            &[],
+            &[],
         );
         let apportionment_result =
             apportionment::process(&apportionment_input).expect("apportionment failed");
@@ -539,6 +543,8 @@ mod tests {
         let apportionment_input = ApportionmentInputData::new(
             election.number_of_seats,
             &summary.political_group_votes,
+            &[],
+            &[],
             &[],
         );
         let apportionment_result =

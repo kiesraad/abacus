@@ -117,6 +117,8 @@ async fn generate_and_save_files_csb_election(
         input.election.number_of_seats,
         &input.summary.political_group_votes,
         state.get_deceased_candidates(),
+        state.get_lists_drawn(),
+        state.get_candidates_drawn(),
     );
     let apportionment_result = apportionment::process(&apportionment_input)?;
 

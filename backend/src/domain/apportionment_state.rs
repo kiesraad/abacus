@@ -177,6 +177,15 @@ impl ApportionmentState {
         }
     }
 
+    pub fn get_lists_drawn(&self) -> &[ListDrawn] {
+        match self {
+            ApportionmentState::Uninitialised
+            | ApportionmentState::RegisteringDeceasedCandidates { .. } => &[],
+            ApportionmentState::DrawingLots { lists_drawn, .. }
+            | ApportionmentState::Finalised { lists_drawn, .. } => lists_drawn,
+        }
+    }
+
     pub fn add_candidate_drawn(
         self,
         candidate_drawn: CandidateDrawn,
@@ -197,6 +206,19 @@ impl ApportionmentState {
                 },
             }),
             _ => Err(ApportionmentStateError::InvalidState),
+        }
+    }
+
+    pub fn get_candidates_drawn(&self) -> &[CandidateDrawn] {
+        match self {
+            ApportionmentState::Uninitialised
+            | ApportionmentState::RegisteringDeceasedCandidates { .. } => &[],
+            ApportionmentState::DrawingLots {
+                candidates_drawn, ..
+            }
+            | ApportionmentState::Finalised {
+                candidates_drawn, ..
+            } => candidates_drawn,
         }
     }
 

@@ -108,6 +108,10 @@ pub async fn election_download_zip_results_gsb(
             zip_writer.add_file(&xml_zip_filename, &xml_zip).await?;
         }
 
+        if let Some(csv_file) = files.results_csv {
+            zip_writer.add_file(&csv_file.name, &csv_file.data).await?;
+        }
+
         if let Some(overview_file) = files.overview_pdf {
             zip_writer
                 .add_file(&overview_file.name, &overview_file.data)

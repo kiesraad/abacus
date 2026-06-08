@@ -571,7 +571,16 @@ export const RegisterDeceasedCandidatesRequestHandler = http.post<
 
 export const SkipDeceasedCandidatesRequestHandler = http.post<ParamsToString<SKIP_DECEASED_CANDIDATES_REQUEST_PARAMS>>(
   "/api/elections/3/apportionment/skip_deceased_candidates" satisfies SKIP_DECEASED_CANDIDATES_REQUEST_PATH,
-  () => HttpResponse.json({ deceased_candidates: [], type: "Finalised" } satisfies ApportionmentState, { status: 200 }),
+  () =>
+    HttpResponse.json(
+      {
+        deceased_candidates: [],
+        lists_drawn: [],
+        candidates_drawn: [],
+        type: "Finalised",
+      } satisfies ApportionmentState,
+      { status: 200 },
+    ),
 );
 
 export const AddDeceasedCandidateRequestHandler = http.post<
@@ -605,7 +614,16 @@ export const FinaliseDeceasedCandidatesRequestHandler = http.post<
   ParamsToString<FINALISE_DECEASED_CANDIDATES_REQUEST_PARAMS>
 >(
   "/api/elections/3/apportionment/finalise_deceased_candidates" satisfies FINALISE_DECEASED_CANDIDATES_REQUEST_PATH,
-  () => HttpResponse.json({ deceased_candidates: [], type: "Finalised" } satisfies ApportionmentState, { status: 200 }),
+  () =>
+    HttpResponse.json(
+      {
+        deceased_candidates: [],
+        lists_drawn: [],
+        candidates_drawn: [],
+        type: "Finalised",
+      } satisfies ApportionmentState,
+      { status: 200 },
+    ),
 );
 
 export const handlers: HttpHandler[] = [

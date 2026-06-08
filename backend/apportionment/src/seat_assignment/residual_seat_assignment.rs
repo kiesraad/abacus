@@ -304,7 +304,6 @@ fn lists_with_highest_average<'a, LN: Copy + Debug>(
 
     // Check if we can actually assign all these lists a seat, otherwise we would need to draw lots
     if lists.len() > residual_seats as usize {
-        // TODO: #788 if multiple lists have the same highest average and not enough residual seats are available, use drawing of lots
         info!(
             "Drawing of lots is required for lists: {:?}, only {residual_seats} seat(s) available",
             list_numbers(&lists)
@@ -357,7 +356,6 @@ fn lists_with_largest_remainder<'a, LN: Copy + Debug>(
 
     // Check if we can actually assign all these lists
     if lists.len() > residual_seats as usize {
-        // TODO: #788 if multiple lists have the same largest remainder and not enough residual seats are available, use drawing of lots
         info!(
             "Drawing of lots is required for lists: {:?}, only {residual_seats} seat(s) available",
             list_numbers(&lists)

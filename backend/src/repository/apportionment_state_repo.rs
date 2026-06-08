@@ -55,11 +55,10 @@ mod tests {
     use super::*;
     use crate::domain::{
         apportionment::{CandidateDrawn, ListDrawingLotsVariant, ListDrawn},
-        apportionment_state::DeceasedCandidate,
+        apportionment_state::{DeceasedCandidate, DrawingLotsDetails, ListDrawingLotsRequired},
         election::{CandidateNumber, PGNumber},
     };
 
-    #[ignore] // TODO remove when #[serde(skip)] is removed in next PR
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_1"))))]
     async fn test_upsert_get(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
@@ -77,6 +76,12 @@ mod tests {
                 deceased_candidates: vec![DeceasedCandidate::from(4, 4)],
             },
             ApportionmentState::DrawingLots {
+                drawing_lots_details: DrawingLotsDetails::ListDrawingLotsRequired(
+                    ListDrawingLotsRequired {
+                        variant: ListDrawingLotsVariant::HighestAverageResidualSeat,
+                        options: PGNumber::from_values(vec![1, 2, 3]),
+                    },
+                ),
                 deceased_candidates: vec![DeceasedCandidate::from(4, 4)],
                 lists_drawn: vec![ListDrawn {
                     variant: ListDrawingLotsVariant::AbsoluteMajority,

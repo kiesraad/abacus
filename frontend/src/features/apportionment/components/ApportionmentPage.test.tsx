@@ -66,8 +66,19 @@ describe("ApportionmentPage", () => {
         expectAlert: false,
         expectRedirectTo: "/elections/3/apportionment/deceased-candidates",
       },
+      DrawingLots: {
+        state: {
+          deceased_candidates: [],
+          drawing_lots_details: { variant: "AbsoluteMajority", options: [1, 2], type: "ListDrawingLotsRequired" },
+          candidates_drawn: [],
+          lists_drawn: [],
+          type: "DrawingLots",
+        },
+        expectAlert: false,
+        expectRedirectTo: undefined,
+      },
       Finalised: {
-        state: { deceased_candidates: [], type: "Finalised" },
+        state: { deceased_candidates: [], lists_drawn: [], candidates_drawn: [], type: "Finalised" },
         expectAlert: true,
         expectRedirectTo: undefined,
       },
@@ -130,6 +141,8 @@ describe("ApportionmentPage", () => {
     server.use(RegisterDeceasedCandidatesRequestHandler);
     overrideOnce("get", "/api/elections/3/apportionment/state", 200, {
       deceased_candidates: [{ pg_number: 1, candidate_number: 1 }],
+      lists_drawn: [],
+      candidates_drawn: [],
       type: "Finalised",
     } satisfies ApportionmentState);
 
@@ -183,6 +196,8 @@ describe("ApportionmentPage", () => {
     } satisfies ElectionApportionmentResponse);
     overrideOnce("get", "/api/elections/3/apportionment/state", 200, {
       deceased_candidates: [],
+      lists_drawn: [],
+      candidates_drawn: [],
       type: "Finalised",
     } satisfies ApportionmentState);
 
@@ -290,6 +305,8 @@ describe("ApportionmentPage", () => {
     } satisfies ElectionApportionmentResponse);
     overrideOnce("get", "/api/elections/3/apportionment/state", 200, {
       deceased_candidates: [],
+      lists_drawn: [],
+      candidates_drawn: [],
       type: "Finalised",
     } satisfies ApportionmentState);
 
@@ -318,6 +335,8 @@ describe("ApportionmentPage", () => {
     } satisfies ElectionApportionmentResponse);
     overrideOnce("get", "/api/elections/3/apportionment/state", 200, {
       deceased_candidates: [],
+      lists_drawn: [],
+      candidates_drawn: [],
       type: "Finalised",
     } satisfies ApportionmentState);
 

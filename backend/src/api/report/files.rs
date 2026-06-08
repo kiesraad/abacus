@@ -444,7 +444,7 @@ mod tests {
             &mut conn,
             audit_service.clone(),
             ElectionId::from(8),
-            |state| state.skip_deceased_candidates(),
+            |state| state.finalise(),
         )
         .await
         .unwrap();
@@ -487,7 +487,7 @@ mod tests {
             &mut conn,
             audit_service.clone(),
             ElectionId::from(8),
-            |state| state.skip_deceased_candidates(),
+            |state| state.finalise(),
         )
         .await
         .unwrap();

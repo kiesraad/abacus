@@ -770,7 +770,7 @@ async fn test_p_22_2() {
         EnrichedSeatAssignment::new(election.number_of_seats, &summary, &seat_assignment).unwrap();
     let candidate_nomination = map_candidate_nomination(
         &apportionment_result.candidate_nomination,
-        election.political_groups.clone(),
+        &election.political_groups,
     );
     let enriched_candidate_nomination =
         EnrichedCandidateNomination::new(&election, &candidate_nomination).unwrap();

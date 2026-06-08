@@ -409,8 +409,10 @@ async fn test_csb_election_zip_download_total_counts_works(pool: SqlitePool) {
 
     let bytes = download_zip_assert(&cookie, &url, prefix).await;
     let archive = ZipFileReader::new(bytes).await.unwrap();
-    assert_eq!(archive.file().entries().len(), 1);
-    let xml_zip = read_zip_entry(&archive, 0, "Totaaltelling_GR2024_Juinen.zip").await;
+    assert_eq!(archive.file().entries().len(), 2);
+    let csv_count = read_zip_entry(&archive, 0, "osv4-3_telling_gr2024_juinen.csv").await;
+    assert!(csv_count.len() > 1024);
+    let xml_zip = read_zip_entry(&archive, 1, "Totaaltelling_GR2024_Juinen.zip").await;
     let xml_archive = ZipFileReader::new(xml_zip).await.unwrap();
     assert_eq!(xml_archive.file().entries().len(), 1);
     let eml_hash1 = sha2::Sha256::digest(
@@ -419,8 +421,10 @@ async fn test_csb_election_zip_download_total_counts_works(pool: SqlitePool) {
 
     let bytes2 = download_zip_assert(&cookie, &url, prefix).await;
     let archive2 = ZipFileReader::new(bytes2).await.unwrap();
-    assert_eq!(archive2.file().entries().len(), 1);
-    let xml_zip2 = read_zip_entry(&archive2, 0, "Totaaltelling_GR2024_Juinen.zip").await;
+    assert_eq!(archive2.file().entries().len(), 2);
+    let csv_count2 = read_zip_entry(&archive2, 0, "osv4-3_telling_gr2024_juinen.csv").await;
+    assert_eq!(csv_count, csv_count2, "CSV count files should be the same");
+    let xml_zip2 = read_zip_entry(&archive2, 1, "Totaaltelling_GR2024_Juinen.zip").await;
     let xml_archive2 = ZipFileReader::new(xml_zip2).await.unwrap();
     assert_eq!(xml_archive2.file().entries().len(), 1);
     let eml_hash2 = sha2::Sha256::digest(

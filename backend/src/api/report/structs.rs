@@ -98,6 +98,7 @@ pub struct CsbGeneratedFiles {
     pub total_counts_eml: GeneratedFile,
     pub results_pdf: GeneratedFile,
     pub attachment_pdf: GeneratedFile,
+    pub csv_counts: GeneratedFile,
 }
 
 #[derive(Debug)]
@@ -106,6 +107,7 @@ pub struct CsbFiles {
     pub total_counts_eml: Option<File>,
     pub results_pdf: Option<File>,
     pub attachment_pdf: Option<File>,
+    pub csv_counts: Option<File>,
 }
 
 impl CsbFiles {
@@ -115,6 +117,7 @@ impl CsbFiles {
             .or(self.results_pdf.as_ref())
             .or(self.attachment_pdf.as_ref())
             .or(self.total_counts_eml.as_ref())
+            .or(self.csv_counts.as_ref())
             .map(|f| f.created_at)
             .expect("At least one file should be present")
     }
@@ -124,6 +127,7 @@ impl CsbFiles {
             || self.total_counts_eml.is_none()
             || self.results_pdf.is_none()
             || self.attachment_pdf.is_none()
+            || self.csv_counts.is_none()
     }
 }
 
@@ -210,6 +214,19 @@ impl ResultsInput {
         )
     }
 
+    fn csv_filename(&self) -> String {
+        format!(
+            "osv4-3_telling_{}{}_{}.csv",
+            self.election.category.to_eml_code().to_lowercase(),
+            self.election.election_date.year(),
+            self.election
+                .location
+                .split_whitespace()
+                .collect::<String>()
+                .to_lowercase(),
+        )
+    }
+
     fn generated_file(&self, file_type: FileType, content: Vec<u8>) -> GeneratedFile {
         GeneratedFile {
             file_type,
@@ -235,6 +252,7 @@ impl ResultsInput {
             CsbTotalCountsEml => self.election_filename("Totaaltelling", "eml.xml"),
             CsbResultsPdf => "Model P22-2.pdf".to_string(),
             CsbAttachmentPdf => "Model P22-2 bijlage.pdf".to_string(),
+            CsbCsvCounts => self.csv_filename(),
         };
 
         slugify_filename(&filename)
@@ -430,8 +448,15 @@ impl ResultsInput {
 
         let results_eml = self.generated_file(FileType::CsbResultsEml, xml_results_bytes.to_vec());
 
-        let xml_counts_string = self.as_xml()?.write_eml_root_str(true, true)?;
+        let xml_counts = self.as_xml()?;
+        let xml_counts_string = xml_counts.write_eml_root_str(true, true)?;
         let xml_counts_bytes = xml_counts_string.as_bytes();
+
+        let csv_counts_string = xml_counts.as_osv4_3_csv(&self.election, true, false)?;
+        let csv_counts = self.generated_file(
+            FileType::CsbCsvCounts,
+            csv_counts_string.as_bytes().to_vec(),
+        );
 
         let total_counts_eml =
             self.generated_file(FileType::CsbTotalCountsEml, xml_counts_bytes.to_vec());
@@ -459,6 +484,7 @@ impl ResultsInput {
             total_counts_eml,
             results_pdf,
             attachment_pdf,
+            csv_counts,
         })
     }
 }

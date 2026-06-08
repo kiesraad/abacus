@@ -45,7 +45,7 @@ impl From<sqlx::Error> for BackupError {
 }
 
 pub async fn run_backup_scheduler(backup_pool: SqlitePool, backup_config: BackupConfig) {
-    let mut interval = tokio::time::interval(Duration::from_mins(BACKUP_INTERVAL_IN_MINUTES));
+    let mut interval = tokio::time::interval(Duration::from_secs(BACKUP_INTERVAL_IN_MINUTES * 60));
     loop {
         interval.tick().await;
         if let Err(e) = create_local_backup(&backup_pool, &backup_config).await {

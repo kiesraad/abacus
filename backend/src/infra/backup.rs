@@ -60,10 +60,10 @@ async fn create_local_backup(
 ) -> Result<(), BackupError> {
     create_backup_directory(backup_config)?;
     let filename = format!("backup_{}.db", Local::now().format("%Y-%m-%d_%H-%M-%S"));
-    let backup_path = &backup_config.directory.join(filename);
+    let backup_path = backup_config.directory.join(filename);
     backup_database(pool, &backup_path).await?;
-    if count_backups(&backup_config)? > AMOUNT_OF_BACKUP_FILES_ALLOWED {
-        remove_oldest_backup(&backup_config)?;
+    if count_backups(backup_config)? > AMOUNT_OF_BACKUP_FILES_ALLOWED {
+        remove_oldest_backup(backup_config)?;
     }
     Ok(())
 }
@@ -88,7 +88,7 @@ async fn backup_database(pool: &SqlitePool, destination: &Path) -> Result<(), Ba
 
 fn count_backups(backup_config: &BackupConfig) -> Result<usize, BackupError> {
     let directory_entries = std::fs::read_dir(&backup_config.directory)?;
-    let count = directory_entries.filter_map(|f| Some(f.ok()?)).count();
+    let count = directory_entries.filter_map(|f| f.ok()).count();
     Ok(count)
 }
 

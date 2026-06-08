@@ -3,6 +3,7 @@ use axum::{
     response::{IntoResponse, Response},
 };
 use chrono::NaiveDate;
+use eml_nl::csv::NameResolver;
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, Type};
 use utoipa::ToSchema;
@@ -85,6 +86,55 @@ impl IntoResponse for Election {
 impl IntoResponse for ElectionWithPoliticalGroups {
     fn into_response(self) -> Response {
         Json(self).into_response()
+    }
+}
+
+impl NameResolver for ElectionWithPoliticalGroups {
+    fn resolve_affiliation_name(
+        &self,
+        affiliation_id: eml_nl::utils::AffiliationId,
+    ) -> Option<String> {
+        let aff_id: u32 = affiliation_id.value().get().try_into().ok()?;
+        let aff_id = PGNumber::from(aff_id);
+
+        self.political_groups
+            .iter()
+            .find(|pg| pg.number == aff_id)
+            .map(|pg| pg.registered_name.clone())
+    }
+
+    fn resolve_candidate_name(
+        &self,
+        affiliation_id: eml_nl::utils::AffiliationId,
+        candidate_id: eml_nl::utils::CandidateId,
+    ) -> Option<String> {
+        let aff_id: u32 = affiliation_id.value().get().try_into().ok()?;
+        let aff_id = PGNumber::from(aff_id);
+
+        let cand_id: u32 = candidate_id.value().get().try_into().ok()?;
+        let cand_id = CandidateNumber::from(cand_id);
+
+        self.political_groups
+            .iter()
+            .find(|pg| pg.number == aff_id)
+            .and_then(|pg| pg.candidates.iter().find(|c| c.number == cand_id))
+            .map(|c| {
+                let last = &c.last_name;
+                let prefix = c.last_name_prefix.as_deref();
+                let initials = &c.initials;
+
+                let last_part = if let Some(prefix) = prefix {
+                    format!("{} {}", prefix, last)
+                } else {
+                    last.to_string()
+                };
+
+                if !initials.is_empty() {
+                    format!("{}, {}", last_part, initials)
+                } else {
+                    last_part
+                }
+            })
     }
 }
 

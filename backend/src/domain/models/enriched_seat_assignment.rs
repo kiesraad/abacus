@@ -101,7 +101,7 @@ impl EnrichedSeatAssignment {
                 .iter()
                 .find(|step| step.change.list_number_assigned() == standing.list_number);
             let largest_remainder = LargestRemainder {
-                remainder_votes: standing.remainder_votes.clone(),
+                remainder_votes: standing.remainder_votes,
                 residual_seats: if assigned_seat.is_some() { 1 } else { 0 },
             };
             largest_remainders.push((standing.list_number, largest_remainder));
@@ -119,7 +119,7 @@ impl EnrichedSeatAssignment {
             let assigned_seat = initial_unique_highest_average_steps
                 .iter()
                 .find(|step| step.change.list_number_assigned() == list_number);
-            let average = &initial_unique_highest_average_steps
+            let average = initial_unique_highest_average_steps
                 .first()
                 .expect("There should be at least one step since is_empty is checked")
                 .standings
@@ -133,7 +133,7 @@ impl EnrichedSeatAssignment {
             };
             let unique_highest_average = UniqueHighestAverage {
                 already_assigned_seats,
-                next_votes_per_seat: average.clone(),
+                next_votes_per_seat: average,
                 residual_seats: u32::from(assigned_seat.is_some()),
             };
             Some(unique_highest_average)
@@ -200,7 +200,7 @@ impl EnrichedSeatAssignment {
     ) -> Result<Self, ModelsError> {
         let list_seat_assignments = Self::get_list_seat_assignments(summary, seat_assignment)?;
         Ok(EnrichedSeatAssignment {
-            quota: seat_assignment.quota.clone(),
+            quota: seat_assignment.quota,
             list_seat_assignment: list_seat_assignments.enriched_list_seat_assignments,
             initial_highest_average_steps: if list_seat_assignments
                 .initial_highest_average_steps

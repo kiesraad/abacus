@@ -222,7 +222,7 @@ impl<LN: Copy> SeatChange<LN> {
         }
     }
 
-    /// Get the list of lists with the same average, that have been assigned a seat
+    /// Get the list of lists with the same average or remainder, that have been assigned a seat
     pub fn list_assigned(&self) -> Vec<LN> {
         match self {
             Self::HighestAverageAssignment(highest_average_assigned_seat) => {

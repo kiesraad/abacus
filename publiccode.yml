@@ -32,7 +32,7 @@ description:
       frontend in TypeScript/React.
 
       Uitgangspunten bij het ontwerp zijn gebruiksvriendelijkheid en eenvoud. 
-      Voor de software zijn de waarden integriteit, transparantie en 
+      Uit het rapport [Stemmen met vertrouwen](https://www.kiesraad.nl/documenten/2007/09/27/eindrapport-commissie-korthals-altes-stemmen-met-vertrouwen) zijn de waarborgen integriteit, transparantie en 
       controleerbaarheid het belangrijkste.
     features:
       - Invoer van stembureau-uitslagen volgens het vier-ogenprincipe
@@ -55,7 +55,8 @@ description:
       local network. The backend is written in Rust, the frontend in
       TypeScript/React.
 
-      Key design principles are ease-of-use and simplicity. For the software the 
+      Key design principles are ease-of-use and simplicity. 
+      From the (dutch) report [Stemmen met vertrouwen](https://www.kiesraad.nl/documenten/2007/09/27/eindrapport-commissie-korthals-altes-stemmen-met-vertrouwen) the 
       values integrity, transparency and verifiability are most important.
     features:
       - Entry of polling station results using the four-eyes principle

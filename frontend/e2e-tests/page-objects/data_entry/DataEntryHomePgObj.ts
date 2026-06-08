@@ -42,9 +42,9 @@ export class DataEntryHomePage {
     this.allDataEntriesInProgress = this.alertDataEntryInProgress.getByRole("link");
   }
 
-  async enterNumberAndClickStart(dataEntrySource: { number: number; name: string }) {
-    await this.number.pressSequentially(dataEntrySource.number.toString(), { delay: 50 });
-    await expect(this.feedback).toContainText(dataEntrySource.name);
+  async enterNumberAndClickStart(dataEntry: { number: string; name: string }) {
+    await this.number.pressSequentially(dataEntry.number, { delay: 50 });
+    await expect(this.feedback).toContainText(dataEntry.name);
     await this.start.click();
   }
 
@@ -52,9 +52,9 @@ export class DataEntryHomePage {
     await this.page.getByTestId(`data-entry-row-${number}`).click();
   }
 
-  async clickDataEntryInProgress(dataEntrySource: { number: number; name: string }) {
+  async clickDataEntryInProgress(dataEntry: { number: string; name: string }) {
     const dataEntryLink = this.alertDataEntryInProgress.getByRole("link", {
-      name: `${dataEntrySource.number} - ${dataEntrySource.name}`,
+      name: `${dataEntry.number} - ${dataEntry.name}`,
     });
     await dataEntryLink.click();
   }

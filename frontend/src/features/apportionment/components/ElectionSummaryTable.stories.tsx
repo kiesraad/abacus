@@ -1,7 +1,8 @@
 import type { StoryObj } from "@storybook/react-vite";
 import { expect } from "storybook/test";
+import { getNumberOfCandidates } from "@/utils/politicalGroups";
 import * as gte19Seats from "../testing/gte-19-seats";
-import { ElectionSummaryTable } from "./ElectionSummaryTable";
+import { type DeceasedCandidatesInfo, ElectionSummaryTable } from "./ElectionSummaryTable";
 
 export const DefaultWithNumberOfVoters: StoryObj = {
   render: () => {
@@ -10,8 +11,15 @@ export const DefaultWithNumberOfVoters: StoryObj = {
         votesCounts={gte19Seats.election_summary.votes_counts}
         seats={gte19Seats.seat_assignment.seats}
         quota={gte19Seats.seat_assignment.quota}
-        numberOfVoters={gte19Seats.election.number_of_voters}
+        numberOfVoters={gte19Seats.election_summary.number_of_voters}
         preferenceThreshold={gte19Seats.candidate_nomination.preference_threshold}
+        deceasedCandidatesInfo={
+          {
+            numberOfCandidates: getNumberOfCandidates(gte19Seats.election.political_groups),
+            numberOfDeceasedCandidates: 3,
+            deceasedCandidatesLink: "",
+          } satisfies DeceasedCandidatesInfo
+        }
       />
     );
   },
@@ -27,6 +35,7 @@ export const DefaultWithNumberOfVoters: StoryObj = {
       ["Aantal raadszetels", "23", ""],
       ["Kiesdeler", "52 4/23", "Benodigde stemmen per volle zetel"],
       ["Voorkeursdrempel", "13 100/2300", "25% van de kiesdeler"],
+      ["Kandidaten voor zetelverdeling", "33 - 3 † = 30", "Beheer overleden kandidaten"],
     ]);
   },
 };
@@ -40,6 +49,13 @@ export const DefaultWithoutNumberOfVoters: StoryObj = {
         quota={gte19Seats.seat_assignment.quota}
         numberOfVoters={undefined}
         preferenceThreshold={gte19Seats.candidate_nomination.preference_threshold}
+        deceasedCandidatesInfo={
+          {
+            numberOfCandidates: getNumberOfCandidates(gte19Seats.election.political_groups),
+            numberOfDeceasedCandidates: 0,
+            deceasedCandidatesLink: "",
+          } satisfies DeceasedCandidatesInfo
+        }
       />
     );
   },
@@ -55,6 +71,7 @@ export const DefaultWithoutNumberOfVoters: StoryObj = {
       ["Aantal raadszetels", "23", ""],
       ["Kiesdeler", "52 4/23", "Benodigde stemmen per volle zetel"],
       ["Voorkeursdrempel", "13 100/2300", "25% van de kiesdeler"],
+      ["Kandidaten voor zetelverdeling", "33 - 0 † = 33", "Beheer overleden kandidaten"],
     ]);
   },
 };

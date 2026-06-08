@@ -6,12 +6,16 @@ import { FinishDataEntry } from "e2e-tests/page-objects/election/FinishDataEntry
 import { test } from "../fixtures";
 
 test.use({
-  storageState: "e2e-tests/state/coordinator1.json",
+  storageState: "e2e-tests/state/coordinator1-GSB.json",
 });
 
-test.describe("election results zip", () => {
-  test("it downloads a zip", async ({ page, completedElection, currentCommitteeSession }) => {
-    await page.goto(`/elections/${completedElection.id}/status`);
+test.describe("GSB election results zip", () => {
+  test("it downloads the GSB election results zip", async ({
+    page,
+    completedElectionGSB,
+    currentCommitteeSessionElectionGSB,
+  }) => {
+    await page.goto(`/elections/${completedElectionGSB.id}/status`);
 
     const electionStatusPage = new ElectionStatus(page);
     await electionStatusPage.finish.click();
@@ -21,7 +25,7 @@ test.describe("election results zip", () => {
 
     const electionReportPage = new ElectionReport(page);
     const responsePromise = page.waitForResponse(
-      `/api/elections/${completedElection.id}/committee_sessions/${currentCommitteeSession.id}/download_zip_results`,
+      `/api/elections/${completedElectionGSB.id}/committee_sessions/${currentCommitteeSessionElectionGSB.id}/download_zip_results`,
     );
     const downloadPromise = page.waitForEvent("download");
     await electionReportPage.downloadFirstSessionZip.click();

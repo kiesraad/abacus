@@ -27,17 +27,17 @@ import type { VotersCounts, VotesCounts } from "@/types/generated/openapi";
 import { test } from "../../fixtures";
 
 test.use({
-  storageState: "e2e-tests/state/typist1.json",
+  storageState: "e2e-tests/state/typist1-GSB.json",
 });
 
 test.describe("full data entry flow", () => {
-  test("no recount, no differences", async ({ page, pollingStation }) => {
-    await page.goto(`/elections/${pollingStation.election_id}/data-entry`);
+  test("no recount, no differences", async ({ page, dataEntryGSB }) => {
+    await page.goto(`/elections/${dataEntryGSB.election_id}/data-entry`);
 
     const dataEntryHomePage = new DataEntryHomePage(page);
     await expect(dataEntryHomePage.fieldset).toBeVisible();
-    await dataEntryHomePage.number.fill(pollingStation.number.toString());
-    await expect(dataEntryHomePage.feedback).toContainText(pollingStation.name);
+    await dataEntryHomePage.number.fill(dataEntryGSB.number);
+    await expect(dataEntryHomePage.feedback).toContainText(dataEntryGSB.name);
     await dataEntryHomePage.start.click();
 
     const extraInvestigationPage = new ExtraInvestigationPage(page);
@@ -134,12 +134,12 @@ test.describe("full data entry flow", () => {
     );
   });
 
-  test("no differences", async ({ page, pollingStation }) => {
-    await page.goto(`/elections/${pollingStation.election_id}/data-entry`);
+  test("no differences", async ({ page, dataEntryGSB }) => {
+    await page.goto(`/elections/${dataEntryGSB.election_id}/data-entry`);
 
     const dataEntryHomePage = new DataEntryHomePage(page);
     await expect(dataEntryHomePage.fieldset).toBeVisible();
-    await dataEntryHomePage.enterNumberAndClickStart(pollingStation);
+    await dataEntryHomePage.enterNumberAndClickStart(dataEntryGSB);
 
     const extraInvestigationPage = new ExtraInvestigationPage(page);
     await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
@@ -197,12 +197,12 @@ test.describe("full data entry flow", () => {
     await expect(dataEntryHomePage.alertDataEntrySaved).toBeVisible();
   });
 
-  test("difference of more ballots counted", async ({ page, pollingStation }) => {
-    await page.goto(`/elections/${pollingStation.election_id}/data-entry`);
+  test("difference of more ballots counted", async ({ page, dataEntryGSB }) => {
+    await page.goto(`/elections/${dataEntryGSB.election_id}/data-entry`);
 
     const dataEntryHomePage = new DataEntryHomePage(page);
     await expect(dataEntryHomePage.fieldset).toBeVisible();
-    await dataEntryHomePage.enterNumberAndClickStart(pollingStation);
+    await dataEntryHomePage.enterNumberAndClickStart(dataEntryGSB);
 
     const extraInvestigationPage = new ExtraInvestigationPage(page);
     await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
@@ -273,12 +273,12 @@ test.describe("full data entry flow", () => {
     await expect(dataEntryHomePage.alertDataEntrySaved).toBeVisible();
   });
 
-  test("difference of fewer ballots counted", async ({ page, pollingStation }) => {
-    await page.goto(`/elections/${pollingStation.election_id}/data-entry`);
+  test("difference of fewer ballots counted", async ({ page, dataEntryGSB }) => {
+    await page.goto(`/elections/${dataEntryGSB.election_id}/data-entry`);
 
     const dataEntryHomePage = new DataEntryHomePage(page);
     await expect(dataEntryHomePage.fieldset).toBeVisible();
-    await dataEntryHomePage.enterNumberAndClickStart(pollingStation);
+    await dataEntryHomePage.enterNumberAndClickStart(dataEntryGSB);
 
     const extraInvestigationPage = new ExtraInvestigationPage(page);
     await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
@@ -349,8 +349,8 @@ test.describe("full data entry flow", () => {
     await expect(dataEntryHomePage.alertDataEntrySaved).toBeVisible();
   });
 
-  test("submit with accepted warning on voters and votes page", async ({ page, pollingStation }) => {
-    await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1`);
+  test("submit with accepted warning on voters and votes page", async ({ page, dataEntryGSB }) => {
+    await page.goto(`/elections/${dataEntryGSB.election_id}/data-entry/${dataEntryGSB.id}/1`);
 
     const extraInvestigationPage = new ExtraInvestigationPage(page);
     await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
@@ -441,11 +441,8 @@ test.describe("full data entry flow", () => {
     await expect(dataEntryHomePage.alertDataEntrySaved).toBeVisible();
   });
 
-  test("submit with accepted errors on voters and votes and candidate votes pages", async ({
-    page,
-    pollingStation,
-  }) => {
-    await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1`);
+  test("submit with accepted errors on voters and votes and candidate votes pages", async ({ page, dataEntryGSB }) => {
+    await page.goto(`/elections/${dataEntryGSB.election_id}/data-entry/${dataEntryGSB.id}/1`);
 
     const extraInvestigationPage = new ExtraInvestigationPage(page);
     await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
@@ -527,21 +524,18 @@ test.describe("full data entry flow", () => {
 });
 
 test.describe("second data entry", () => {
-  test("equal second data entry after first data entry", async ({
-    typistTwo,
-    pollingStationFirstEntryDone: pollingStation,
-  }) => {
-    const { page } = typistTwo;
-    await page.goto(`/elections/${pollingStation.election_id}/data-entry`);
+  test("equal second data entry after first data entry", async ({ typistTwoGSB, dataEntryGSBFirstEntryDone }) => {
+    const { page } = typistTwoGSB;
+    await page.goto(`/elections/${dataEntryGSBFirstEntryDone.election_id}/data-entry`);
 
     const dataEntryHomePage = new DataEntryHomePage(page);
     await expect(dataEntryHomePage.fieldset).toBeVisible();
-    await dataEntryHomePage.number.fill(pollingStation.number.toString());
-    await expect(dataEntryHomePage.feedback).toContainText(pollingStation.name);
+    await dataEntryHomePage.number.fill(dataEntryGSBFirstEntryDone.number);
+    await expect(dataEntryHomePage.feedback).toContainText(dataEntryGSBFirstEntryDone.name);
     await dataEntryHomePage.start.click();
 
     await expect(page).toHaveURL(
-      `/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/2/extra_investigation`,
+      `/elections/${dataEntryGSBFirstEntryDone.election_id}/data-entry/${dataEntryGSBFirstEntryDone.id}/2/extra_investigation`,
     );
 
     await fillDataEntryPagesAndSave(page, noRecountNoDifferencesDataEntry);
@@ -552,7 +546,7 @@ test.describe("second data entry", () => {
     );
 
     await expect(dataEntryHomePage.fieldsetContinueNext).toBeVisible();
-    await dataEntryHomePage.number.fill(pollingStation.number.toString());
+    await dataEntryHomePage.number.fill(dataEntryGSBFirstEntryDone.number);
     await expect(dataEntryHomePage.feedback).toContainText("Stembureau 33 (Op Rolletjes) is al twee keer ingevoerd");
     await dataEntryHomePage.start.click();
     await expect(dataEntryHomePage.submitFeedback).toContainText(
@@ -561,21 +555,21 @@ test.describe("second data entry", () => {
   });
 
   test("different second data entry after first data entry but correct warnings", async ({
-    typistTwo,
-    coordinatorOne,
-    pollingStationFirstEntryDone: pollingStation,
+    typistTwoGSB,
+    coordinatorOneGSB,
+    dataEntryGSBFirstEntryDone,
   }) => {
-    const typistPage = typistTwo.page;
-    await typistPage.goto(`/elections/${pollingStation.election_id}/data-entry`);
+    const typistPage = typistTwoGSB.page;
+    await typistPage.goto(`/elections/${dataEntryGSBFirstEntryDone.election_id}/data-entry`);
 
     const dataEntryHomePage = new DataEntryHomePage(typistPage);
     await expect(dataEntryHomePage.fieldset).toBeVisible();
-    await dataEntryHomePage.number.fill(pollingStation.number.toString());
-    await expect(dataEntryHomePage.feedback).toContainText(pollingStation.name);
+    await dataEntryHomePage.number.fill(dataEntryGSBFirstEntryDone.number);
+    await expect(dataEntryHomePage.feedback).toContainText(dataEntryGSBFirstEntryDone.name);
     await dataEntryHomePage.start.click();
 
     await expect(typistPage).toHaveURL(
-      `/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/2/extra_investigation`,
+      `/elections/${dataEntryGSBFirstEntryDone.election_id}/data-entry/${dataEntryGSBFirstEntryDone.id}/2/extra_investigation`,
     );
 
     // fill first section equal to first data entry
@@ -630,29 +624,29 @@ test.describe("second data entry", () => {
     );
 
     // check if data entries are marked as definitive on coordinator status page
-    const coordinatorPage = coordinatorOne.page;
-    await coordinatorPage.goto(`/elections/${pollingStation.election_id}/status`);
+    const coordinatorPage = coordinatorOneGSB.page;
+    await coordinatorPage.goto(`/elections/${dataEntryGSBFirstEntryDone.election_id}/status`);
 
     const electionStatusPage = new ElectionStatus(coordinatorPage);
-    await expect(electionStatusPage.definitive).toContainText(pollingStation.name);
+    await expect(electionStatusPage.definitive).toContainText(dataEntryGSBFirstEntryDone.name);
   });
 
   test("different second data entry after first data entry", async ({
-    typistTwo,
-    coordinatorOne,
-    pollingStationFirstEntryDone: pollingStation,
+    typistTwoGSB,
+    coordinatorOneGSB,
+    dataEntryGSBFirstEntryDone,
   }) => {
-    const typistPage = typistTwo.page;
-    await typistPage.goto(`/elections/${pollingStation.election_id}/data-entry`);
+    const typistPage = typistTwoGSB.page;
+    await typistPage.goto(`/elections/${dataEntryGSBFirstEntryDone.election_id}/data-entry`);
 
     const dataEntryHomePage = new DataEntryHomePage(typistPage);
     await expect(dataEntryHomePage.fieldset).toBeVisible();
-    await dataEntryHomePage.number.fill(pollingStation.number.toString());
-    await expect(dataEntryHomePage.feedback).toContainText(pollingStation.name);
+    await dataEntryHomePage.number.fill(dataEntryGSBFirstEntryDone.number);
+    await expect(dataEntryHomePage.feedback).toContainText(dataEntryGSBFirstEntryDone.name);
     await dataEntryHomePage.start.click();
 
     await expect(typistPage).toHaveURL(
-      `/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/2/extra_investigation`,
+      `/elections/${dataEntryGSBFirstEntryDone.election_id}/data-entry/${dataEntryGSBFirstEntryDone.id}/2/extra_investigation`,
     );
 
     // fill first section equal to first data entry
@@ -712,17 +706,17 @@ test.describe("second data entry", () => {
     );
 
     // check if data entries are marked as different on coordinator status page
-    const coordinatorPage = coordinatorOne.page;
-    await coordinatorPage.goto(`/elections/${pollingStation.election_id}/status`);
+    const coordinatorPage = coordinatorOneGSB.page;
+    await coordinatorPage.goto(`/elections/${dataEntryGSBFirstEntryDone.election_id}/status`);
 
     const electionStatusPage = new ElectionStatus(coordinatorPage);
-    await expect(electionStatusPage.errorsAndWarnings).toContainText(pollingStation.name);
+    await expect(electionStatusPage.errorsAndWarnings).toContainText(dataEntryGSBFirstEntryDone.name);
   });
 });
 
 test.describe("errors and warnings", () => {
-  test("correct error on voters and votes page", async ({ page, pollingStation }) => {
-    await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1`);
+  test("correct error on voters and votes page", async ({ page, dataEntryGSB }) => {
+    await page.goto(`/elections/${dataEntryGSB.election_id}/data-entry/${dataEntryGSB.id}/1`);
 
     // fill first section without errors or warnings
     const extraInvestigationPage = new ExtraInvestigationPage(page);
@@ -771,8 +765,8 @@ test.describe("errors and warnings", () => {
     await expect(differencesPage.progressList.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
   });
 
-  test("correct warning on voters and votes page", async ({ page, pollingStation }) => {
-    await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1`);
+  test("correct warning on voters and votes page", async ({ page, dataEntryGSB }) => {
+    await page.goto(`/elections/${dataEntryGSB.election_id}/data-entry/${dataEntryGSB.id}/1`);
 
     // fill extra investigation section without errors or warnings
     const extraInvestigationPage = new ExtraInvestigationPage(page);
@@ -827,9 +821,9 @@ test.describe("errors and warnings", () => {
 
   test("remove option to accept warning on voters and votes page after input change", async ({
     page,
-    pollingStation,
+    dataEntryGSB,
   }) => {
-    await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1`);
+    await page.goto(`/elections/${dataEntryGSB.election_id}/data-entry/${dataEntryGSB.id}/1`);
 
     // fill extra investigation section without errors or warnings
     const extraInvestigationPage = new ExtraInvestigationPage(page);
@@ -874,9 +868,9 @@ test.describe("errors and warnings", () => {
 
   test("scroll to top when warning/errors, unless accept checkbox or trailing error is visible", async ({
     page,
-    pollingStation,
+    dataEntryGSB,
   }) => {
-    await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1`);
+    await page.goto(`/elections/${dataEntryGSB.election_id}/data-entry/${dataEntryGSB.id}/1`);
 
     // Fill sections without errors or warnings
     const extraInvestigationPage = new ExtraInvestigationPage(page);
@@ -953,8 +947,8 @@ test.describe("errors and warnings", () => {
     expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
   });
 
-  test("user can accept errors", async ({ page, pollingStation }) => {
-    await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1`);
+  test("user can accept errors", async ({ page, dataEntryGSB }) => {
+    await page.goto(`/elections/${dataEntryGSB.election_id}/data-entry/${dataEntryGSB.id}/1`);
 
     // fill extra investigation section without errors or warnings
     const extraInvestigationPage = new ExtraInvestigationPage(page);
@@ -993,8 +987,8 @@ test.describe("errors and warnings", () => {
 });
 
 test.describe("navigation", () => {
-  test("navigate away from Differences page without saving", async ({ page, pollingStation }) => {
-    await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1`);
+  test("navigate away from Differences page without saving", async ({ page, dataEntryGSB }) => {
+    await page.goto(`/elections/${dataEntryGSB.election_id}/data-entry/${dataEntryGSB.id}/1`);
 
     // fill extra investigation section without errors or warnings
     const extraInvestigationPage = new ExtraInvestigationPage(page);
@@ -1039,8 +1033,8 @@ test.describe("navigation", () => {
     await expect(votersAndVotesPage.pollCardCount).toHaveValue("95");
   });
 
-  test("navigate away from Differences page with saving", async ({ page, pollingStation }) => {
-    await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1`);
+  test("navigate away from Differences page with saving", async ({ page, dataEntryGSB }) => {
+    await page.goto(`/elections/${dataEntryGSB.election_id}/data-entry/${dataEntryGSB.id}/1`);
 
     // fill extra investigation section without errors or warnings
     const extraInvestigationPage = new ExtraInvestigationPage(page);
@@ -1086,11 +1080,8 @@ test.describe("navigation", () => {
   });
 
   test.describe("progress list icons", () => {
-    test("check icons for accept, active, empty, error, warning, unsaved statuses", async ({
-      page,
-      pollingStation,
-    }) => {
-      await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1`);
+    test("check icons for accept, active, empty, error, warning, unsaved statuses", async ({ page, dataEntryGSB }) => {
+      await page.goto(`/elections/${dataEntryGSB.election_id}/data-entry/${dataEntryGSB.id}/1`);
 
       const extraInvestigationPage = new ExtraInvestigationPage(page);
       await expect(extraInvestigationPage.progressList.extraInvestigationIcon).toHaveAccessibleName("je bent hier");

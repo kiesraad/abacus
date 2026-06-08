@@ -18,18 +18,18 @@ import type { VotersCounts, VotesCounts } from "@/types/generated/openapi";
 import { test } from "../../fixtures";
 
 test.use({
-  storageState: "e2e-tests/state/typist1.json",
+  storageState: "e2e-tests/state/typist1-GSB.json",
   eml230b: eml230b_with_gaps,
 });
 
 test.describe("full data entry flow with gaps in party/candidate numbers", () => {
-  test("no recount, no differences", async ({ page, pollingStation }) => {
-    await page.goto(`/elections/${pollingStation.election_id}/data-entry`);
+  test("no recount, no differences", async ({ page, dataEntryGSB }) => {
+    await page.goto(`/elections/${dataEntryGSB.election_id}/data-entry`);
 
     const dataEntryHomePage = new DataEntryHomePage(page);
     await expect(dataEntryHomePage.fieldset).toBeVisible();
-    await dataEntryHomePage.number.fill(pollingStation.number.toString());
-    await expect(dataEntryHomePage.feedback).toContainText(pollingStation.name);
+    await dataEntryHomePage.number.fill(dataEntryGSB.number);
+    await expect(dataEntryHomePage.feedback).toContainText(dataEntryGSB.name);
     await dataEntryHomePage.start.click();
 
     const extraInvestigationPage = new ExtraInvestigationPage(page);

@@ -34,9 +34,9 @@ test.describe("authentication", () => {
     await expect(loginPage.alert).toContainText("De gebruikersnaam of het wachtwoord is onjuist");
   });
 
-  test("first login", async ({ newTypist, page }) => {
+  test("first login", async ({ newTypistGSB, page }) => {
     // Login as a newly created user
-    const username = newTypist.username;
+    const username = newTypistGSB.username;
 
     const loginPage = new LoginPgObj(page);
     await page.goto("/account/login");
@@ -47,16 +47,16 @@ test.describe("authentication", () => {
     // Fill out the account setup page
     const password = "Sterk wachtwoord";
     const accountSetupPage = new AccountSetupPgObj(page);
-    await accountSetupPage.fullname.fill(newTypist.fullname!);
+    await accountSetupPage.fullname.fill(newTypistGSB.fullname!);
     await accountSetupPage.password.fill(password);
     await accountSetupPage.passwordRepeat.fill(password);
     await accountSetupPage.saveBtn.click();
 
     const userInfoTopBar = new UserInfoTopBar(page);
-    await expect(userInfoTopBar.username).toHaveText(newTypist.fullname!);
+    await expect(userInfoTopBar.username).toHaveText(newTypistGSB.fullname!);
 
     const overviewPage = new ElectionsOverviewPgObj(page);
-    await expect(userInfoTopBar.username).toHaveText(newTypist.fullname!);
+    await expect(userInfoTopBar.username).toHaveText(newTypistGSB.fullname!);
     await expect(overviewPage.alertAccountSetup).toBeVisible();
   });
 });
@@ -69,8 +69,10 @@ test.describe("navigation and redirects", () => {
     await expect(loginPage.alert).toContainText("Je hebt geen toegang tot deze pagina");
   });
 
-  test("completed and logged in user gets redirected from login page to elections page", async ({ coordinatorOne }) => {
-    const page = coordinatorOne.page;
+  test("completed and logged in user gets redirected from login page to elections page", async ({
+    coordinatorOneGSB,
+  }) => {
+    const page = coordinatorOneGSB.page;
 
     await page.goto("/elections");
     const electionsPage = new ElectionsOverviewPgObj(page);
@@ -81,9 +83,9 @@ test.describe("navigation and redirects", () => {
   });
 
   test("completed and logged in user gets redirected from account setup page to no access page", async ({
-    coordinatorOne,
+    coordinatorOneGSB,
   }) => {
-    const page = coordinatorOne.page;
+    const page = coordinatorOneGSB.page;
 
     await page.goto("/elections");
     const electionsPage = new ElectionsOverviewPgObj(page);
@@ -96,9 +98,9 @@ test.describe("navigation and redirects", () => {
 
   test("incomplete logged in user gets redirected from login page to account setup page", async ({
     page,
-    newTypist,
+    newTypistGSB,
   }) => {
-    const username = newTypist.username;
+    const username = newTypistGSB.username;
 
     const loginPage = new LoginPgObj(page);
     await page.goto("/account/login");
@@ -115,11 +117,11 @@ test.describe("navigation and redirects", () => {
 
   test("incomplete logged in user that refreshes the account setup page stays on that page", async ({
     page,
-    newTypist,
+    newTypistGSB,
   }) => {
     const loginPage = new LoginPgObj(page);
     await page.goto("/account/setup");
-    await loginPage.login(newTypist.username, FIXTURE_TYPIST_TEMP_PASSWORD);
+    await loginPage.login(newTypistGSB.username, FIXTURE_TYPIST_TEMP_PASSWORD);
 
     const accountSetupPage = new AccountSetupPgObj(page);
     await expect(accountSetupPage.heading).toBeVisible();
@@ -130,11 +132,11 @@ test.describe("navigation and redirects", () => {
 
   test("incomplete logged in user gets redirected from elections page to account setup page", async ({
     page,
-    newTypist,
+    newTypistGSB,
   }) => {
     const loginPage = new LoginPgObj(page);
     await page.goto("/account/setup");
-    await loginPage.login(newTypist.username, FIXTURE_TYPIST_TEMP_PASSWORD);
+    await loginPage.login(newTypistGSB.username, FIXTURE_TYPIST_TEMP_PASSWORD);
 
     const accountSetupPage = new AccountSetupPgObj(page);
     await expect(accountSetupPage.heading).toBeVisible();
@@ -143,10 +145,10 @@ test.describe("navigation and redirects", () => {
     await expect(accountSetupPage.heading).toBeVisible();
   });
 
-  test("incomplete logged in user can log out", async ({ page, newTypist }) => {
+  test("incomplete logged in user can log out", async ({ page, newTypistGSB }) => {
     const loginPage = new LoginPgObj(page);
     await page.goto("/account/setup");
-    await loginPage.login(newTypist.username, FIXTURE_TYPIST_TEMP_PASSWORD);
+    await loginPage.login(newTypistGSB.username, FIXTURE_TYPIST_TEMP_PASSWORD);
 
     const accountSetupPage = new AccountSetupPgObj(page);
     await expect(accountSetupPage.heading).toBeVisible();

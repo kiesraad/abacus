@@ -401,6 +401,9 @@ export type ApportionmentState =
   | { deceased_candidates: DeceasedCandidate[]; type: "RegisteringDeceasedCandidates" }
   | { deceased_candidates: DeceasedCandidate[]; type: "Finalised" };
 
+export const apportionmentWarningValues = ["AbsoluteMajorityAndListExhaustion", "NotAllSeatsAssigned"] as const;
+export type ApportionmentWarning = (typeof apportionmentWarningValues)[number];
+
 export const auditEventLevelValues = ["info", "success", "warning", "error"] as const;
 export type AuditEventLevel = (typeof auditEventLevelValues)[number];
 
@@ -821,6 +824,7 @@ export interface ElectionApportionmentResponse {
   candidate_nomination: CandidateNomination;
   election_summary: ElectionSummary;
   seat_assignment: SeatAssignment;
+  warnings: ApportionmentWarning[];
 }
 
 /**

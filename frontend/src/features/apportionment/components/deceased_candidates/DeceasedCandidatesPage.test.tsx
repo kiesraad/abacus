@@ -9,6 +9,7 @@ import {
   DeleteDeceasedCandidateRequestHandler,
   FinaliseDeceasedCandidatesRequestHandler,
   GetApportionmentStateRequestHandler,
+  ResetApportionmentStateRequestHandler,
 } from "@/testing/api-mocks/RequestHandlers";
 import { Providers } from "@/testing/Providers";
 import type { Router } from "@/testing/router";
@@ -59,6 +60,7 @@ describe("DeceasedCandidatesPage", () => {
       seat_assignment: seat_assignment,
       candidate_nomination: candidate_nomination,
       election_summary: election_summary,
+      warnings: [],
     } satisfies ElectionApportionmentResponse);
     server.use(GetApportionmentStateRequestHandler);
     overrideOnce("get", "/api/elections/3/apportionment/state", 200, {
@@ -79,7 +81,7 @@ describe("DeceasedCandidatesPage", () => {
       },
       Finalised: {
         state: { deceased_candidates: [], type: "Finalised" },
-        expectRedirectTo: "/elections/3/apportionment",
+        expectRedirectTo: undefined,
       },
     } satisfies Record<
       ApportionmentState["type"],
@@ -110,6 +112,12 @@ describe("DeceasedCandidatesPage", () => {
     renderDeceasedCandidatesPage(3, false);
     expect(await screen.findByRole("heading", { level: 1, name: "Overleden kandidaten" }));
 
+    expect(
+      await screen.findByText(
+        "Geef aan welke kandidaat of kandidaten als gevolg van overlijden bij de zetelverdeling buiten beschouwing moeten worden gelaten.",
+      ),
+    ).toBeVisible();
+
     const table = await screen.findByRole("table");
     expect(table).toBeVisible();
     expect(table).toHaveTableContent([
@@ -126,6 +134,82 @@ describe("DeceasedCandidatesPage", () => {
     }
   });
 
+  test("Renders read-only table for state Finalised and resets on clicking redo apportionment", async () => {
+    vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
+    server.use(ResetApportionmentStateRequestHandler);
+    const resetApportionmentState = spyOnHandler(ResetApportionmentStateRequestHandler);
+    const getApportionmentState = spyOnHandler(GetApportionmentStateRequestHandler);
+    overrideOnce("get", "/api/elections/3/apportionment/state", 200, {
+      deceased_candidates: [{ pg_number: 1, candidate_number: 1 }],
+      type: "Finalised",
+    });
+    const user = userEvent.setup();
+
+    renderDeceasedCandidatesPage(3, false);
+    expect(await screen.findByRole("heading", { level: 1, name: "Overleden kandidaten" }));
+
+    expect(
+      await screen.findByText(
+        "De zetelverdeling is al berekend. Onderstaande kandidaten zijn als gevolg van overlijden bij de zetelverdeling buiten beschouwing gelaten.",
+      ),
+    ).toBeVisible();
+
+    const table = await screen.findByRole("table");
+    expect(table).toBeVisible();
+    expect(table).toHaveTableContent([
+      ["Overleden kandidaat", "Lijst", "Positie op lijst"],
+      ["Oud, L. (Lidewij) †", "Lijst 1 - Political Group A", "1"],
+    ]);
+
+    expect(screen.queryByRole("button", { name: "+ Kandidaat toevoegen" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Naar zetelverdeling" })).not.toBeInTheDocument();
+
+    expect(
+      await screen.findByText("Wil je wijzigingen aanbrengen in de buiten beschouwing gelaten kandidaten?"),
+    ).toBeVisible();
+    const resetButton = await screen.findByRole("button", { name: "Doe dan de zetelverdeling opnieuw" });
+    expect(resetButton).toBeVisible();
+    await user.click(resetButton);
+
+    expect(resetApportionmentState).toHaveBeenCalled();
+    expect(getApportionmentState).toHaveBeenCalled();
+  });
+
+  test("Renders no table for state Finalised and no deceased candidates and resets on clicking redo apportionment", async () => {
+    vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
+    server.use(ResetApportionmentStateRequestHandler);
+    const resetApportionmentState = spyOnHandler(ResetApportionmentStateRequestHandler);
+    const getApportionmentState = spyOnHandler(GetApportionmentStateRequestHandler);
+    overrideOnce("get", "/api/elections/3/apportionment/state", 200, {
+      deceased_candidates: [],
+      type: "Finalised",
+    });
+    const user = userEvent.setup();
+
+    renderDeceasedCandidatesPage(3, false);
+    expect(await screen.findByRole("heading", { level: 1, name: "Overleden kandidaten" }));
+
+    expect(
+      await screen.findByText(
+        "De zetelverdeling is al berekend. Alle kandidaten zijn meegenomen bij het verdelen van de zetels. Er zijn geen kandidaten buiten beschouwing gelaten vanwege overlijden.",
+      ),
+    ).toBeVisible();
+
+    expect(screen.queryByRole("table")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "+ Kandidaat toevoegen" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Naar zetelverdeling" })).not.toBeInTheDocument();
+
+    expect(
+      await screen.findByText("Wil je wijzigingen aanbrengen in de buiten beschouwing gelaten kandidaten?"),
+    ).toBeVisible();
+    const resetButton = await screen.findByRole("button", { name: "Doe dan de zetelverdeling opnieuw" });
+    expect(resetButton).toBeVisible();
+    await user.click(resetButton);
+
+    expect(resetApportionmentState).toHaveBeenCalled();
+    expect(getApportionmentState).toHaveBeenCalled();
+  });
+
   test("Renders add button and clicking it redirects to AddDeceasedCandidatePage", async () => {
     vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
     const user = userEvent.setup();
@@ -138,7 +222,6 @@ describe("DeceasedCandidatesPage", () => {
     const addDeceasedCandidate = await screen.findByRole("link", { name: "+ Kandidaat toevoegen" });
     expect(addDeceasedCandidate).toBeVisible();
     await user.click(addDeceasedCandidate);
-
     expect(router.state.location.pathname).toEqual("/elections/3/apportionment/deceased-candidates/add");
   });
 

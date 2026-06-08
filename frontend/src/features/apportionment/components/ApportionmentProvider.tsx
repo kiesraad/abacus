@@ -31,6 +31,7 @@ export function ApportionmentProvider({ children, electionId }: ElectionApportio
         seatAssignment: data?.seat_assignment,
         candidateNomination: data?.candidate_nomination,
         electionSummary: data?.election_summary,
+        warnings: data?.warnings ?? [],
         state,
         error,
         isLoading: requestState.status === "loading",

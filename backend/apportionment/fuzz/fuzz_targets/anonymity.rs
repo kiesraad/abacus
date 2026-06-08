@@ -1,5 +1,7 @@
 #![no_main]
 
+use std::collections::HashMap;
+
 use apportionment::{CandidateVotes, process};
 use apportionment_fuzz::{FuzzedApportionmentInput, SimpleListVotes, init_tracing, run_with_log};
 use libfuzzer_sys::fuzz_target;
@@ -34,6 +36,9 @@ fuzz_target!(
                 )
             })
             .collect(),
+        deceased_candidates: HashMap::new(),
+        lists_drawn: Vec::new(),
+        candidates_drawn: Vec::new(),
     };
 
     let (new_alloc, log2) = run_with_log(|| process(&reordered_input));

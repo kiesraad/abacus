@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router";
+import { type NavigateFunction, useNavigate } from "react-router";
 import { type AnyApiError, type ApiResult, isSuccess } from "@/api/ApiResult";
 import { useApiClient } from "@/api/useApiClient";
 import { StickyNav } from "@/components/ui/AppLayout/StickyNav";
@@ -17,9 +17,17 @@ import type {
 } from "@/types/generated/openapi";
 import { formatPoliticalGroupName } from "@/utils/politicalGroup";
 import { useApportionmentContext } from "../../hooks/useApportionmentContext";
-import { deceasedCandidatesCheckStateAndRedirect, renderTitleAndHeader } from "../../utils/utils";
+import { renderTitleAndHeader } from "../../utils/utils";
 import { ApportionmentError } from "../ApportionmentError";
 import cls from "./DeceasedCandidates.module.css";
+
+function checkStateAndRedirect(state: ApportionmentState | undefined, electionId: number, navigate: NavigateFunction) {
+  if (state?.type === "Uninitialised") {
+    void navigate(`/elections/${electionId}/apportionment/include-all-candidates`);
+  } else if (state?.type === "Finalised") {
+    void navigate(`/elections/${electionId}/apportionment`);
+  }
+}
 
 export function AddDeceasedCandidatePage() {
   const navigate = useNavigate();
@@ -34,7 +42,7 @@ export function AddDeceasedCandidatePage() {
   }
 
   useEffect(() => {
-    deceasedCandidatesCheckStateAndRedirect(state, election.id, navigate);
+    checkStateAndRedirect(state, election.id, navigate);
   });
 
   if (isLoading) {

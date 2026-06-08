@@ -325,6 +325,8 @@ impl From<ElectionSummary> for ElectionSummaryWithoutVotes {
 #[derive(Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct ElectionSummaryCSB {
+    /// The number of voters (i.e. "Kiesgerechtigden")
+    pub number_of_voters: u32,
     /// The total number of voters
     pub voters_counts: VotersCounts,
     /// The total number of votes
@@ -336,6 +338,9 @@ pub struct ElectionSummaryCSB {
 impl ElectionSummaryCSB {
     pub fn new(summary: &ElectionSummary, political_groups: &[PoliticalGroup]) -> Self {
         ElectionSummaryCSB {
+            number_of_voters: summary
+                .number_of_voters
+                .expect("Number of voters needs to be filled in for CSB"),
             voters_counts: summary.voters_counts.clone(),
             votes_counts: EnrichedVotesCounts {
                 political_group_total_votes: summary

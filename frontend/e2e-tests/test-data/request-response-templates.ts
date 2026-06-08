@@ -602,6 +602,17 @@ export const dataEntryRequest: DataEntry = {
   },
 };
 
+export const dataEntryRequestGSB: DataEntry = {
+  progress: 88,
+  data: noRecountNoDifferencesDataEntryGSB,
+  client_state: {
+    furthest: "political_group_votes_9",
+    current: "political_group_votes_9",
+    acceptedErrorsAndWarnings: [],
+    continue: true,
+  },
+};
+
 export const dataEntryWithErrorRequest: DataEntry = {
   progress: 86,
   data: {

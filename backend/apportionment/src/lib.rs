@@ -9,6 +9,8 @@ mod structs;
 #[cfg(test)]
 mod test_helpers;
 
+use structs::{CandidateNumber, ListNumber};
+
 use self::{
     candidate_nomination::candidate_nomination,
     seat_assignment::{as_candidate_nomination_input, seat_assignment},
@@ -17,17 +19,21 @@ pub use self::{
     candidate_nomination::{CandidateNominationResult, PreferenceThreshold},
     fraction::Fraction,
     seat_assignment::{
-        HighestAverageAssignedSeat, SeatAssignmentResult, SeatChange, SeatChangeStep,
+        ApportionmentWarning, HighestAverageAssignedSeat, SeatAssignmentResult, SeatChange,
+        SeatChangeStep,
     },
     structs::{
-        ApportionmentError, ApportionmentInput, ApportionmentOutput, CandidateVotes, ListVotes,
+        ApportionmentError, ApportionmentInput, ApportionmentOutput, CandidateDrawn,
+        CandidateVotes, ListDrawingLotsVariant, ListDrawn, ListVotes,
     },
 };
+
+type ProcessApportionmentError<LV> = ApportionmentError<ListNumber<LV>, CandidateNumber<LV>>;
 
 /// Perform seat assignment and candidate nomination on apportionment input.
 pub fn process<T: ApportionmentInput>(
     input: &T,
-) -> Result<ApportionmentOutput<'_, T::List>, ApportionmentError> {
+) -> Result<ApportionmentOutput<'_, T::List>, ProcessApportionmentError<T::List>> {
     let seat_assignment = seat_assignment(input)?;
     let candidate_nomination_input = as_candidate_nomination_input(input, &seat_assignment);
     let candidate_nomination = candidate_nomination(&candidate_nomination_input)?;

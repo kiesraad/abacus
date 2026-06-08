@@ -18,3 +18,4 @@ Basic commands:
 More documentation can be found in the [Rust Fuzz Book](https://rust-fuzz.github.io/book/cargo-fuzz.html).
 
 To check the fuzz test coverage, see the [instructions in our `fuzz` package](../../fuzz/README.md#checking-the-fuzz-test-coverage).
+The `coverage_differential_osv2020.sh` script can be used as a starting point depending on your system configuration.

@@ -83,7 +83,9 @@ pub fn router() -> OpenApiRouter<AppState> {
     const ALLOWED_ROLES: &[Role] = &[CoordinatorCSB];
 
     OpenApiRouter::default()
+        .routes(routes!(add_candidate_drawn::add_candidate_drawn).authorize(ALLOWED_ROLES))
         .routes(routes!(add_deceased_candidate::add_deceased_candidate).authorize(ALLOWED_ROLES))
+        .routes(routes!(add_list_drawn::add_list_drawn).authorize(ALLOWED_ROLES))
         .routes(
             routes!(delete_deceased_candidate::delete_deceased_candidate).authorize(ALLOWED_ROLES),
         )

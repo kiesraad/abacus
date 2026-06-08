@@ -157,6 +157,49 @@ impl ApportionmentState {
         }
     }
 
+    pub fn add_list_drawn(self, list_drawn: ListDrawn) -> Result<Self, ApportionmentStateError> {
+        match self {
+            Self::DrawingLots {
+                drawing_lots_details,
+                deceased_candidates,
+                mut lists_drawn,
+                candidates_drawn,
+            } => Ok(Self::DrawingLots {
+                drawing_lots_details,
+                deceased_candidates,
+                lists_drawn: {
+                    lists_drawn.push(list_drawn);
+                    lists_drawn
+                },
+                candidates_drawn,
+            }),
+            _ => Err(ApportionmentStateError::InvalidState),
+        }
+    }
+
+    pub fn add_candidate_drawn(
+        self,
+        candidate_drawn: CandidateDrawn,
+    ) -> Result<Self, ApportionmentStateError> {
+        match self {
+            Self::DrawingLots {
+                drawing_lots_details,
+                deceased_candidates,
+                lists_drawn,
+                mut candidates_drawn,
+            } => Ok(Self::DrawingLots {
+                drawing_lots_details,
+                deceased_candidates,
+                lists_drawn,
+                candidates_drawn: {
+                    candidates_drawn.push(candidate_drawn);
+                    candidates_drawn
+                },
+            }),
+            _ => Err(ApportionmentStateError::InvalidState),
+        }
+    }
+
     pub fn finalise(self) -> Result<Self, ApportionmentStateError> {
         match self {
             Self::Uninitialised => Ok(Self::Finalised {
@@ -271,12 +314,28 @@ mod tests {
         .into()
     }
 
+    fn list_drawn() -> ListDrawn {
+        ListDrawn {
+            variant: ListDrawingLotsVariant::AbsoluteMajority,
+            options: PGNumber::from_values(vec![8, 9]),
+            drawn: PGNumber::from(8),
+        }
+    }
+
     fn candidate_drawing_lots_details() -> DrawingLotsDetails {
         CandidateDrawingLotsRequired {
             list: PGNumber::from(1),
             options: CandidateNumber::from_values(vec![3, 4, 5]),
         }
         .into()
+    }
+
+    fn candidate_drawn() -> CandidateDrawn {
+        CandidateDrawn {
+            list: PGNumber::from(1),
+            options: CandidateNumber::from_values(vec![3, 4, 5]),
+            drawn: CandidateNumber::from(4),
+        }
     }
 
     mod state_transitions {
@@ -299,6 +358,90 @@ mod tests {
                     from.clone().draw_lots(candidate_drawing_lots_details()),
                     expected,
                     "from state {from:?}"
+                );
+            }
+        }
+
+        #[test]
+        fn add_list_drawn() {
+            let state = DrawingLots {
+                drawing_lots_details: list_drawing_lots_details(),
+                deceased_candidates: vec![],
+                lists_drawn: vec![],
+                candidates_drawn: vec![],
+            };
+
+            assert_eq!(
+                state
+                    .add_list_drawn(list_drawn())
+                    .expect("add_list_drawn should succeed"),
+                DrawingLots {
+                    drawing_lots_details: list_drawing_lots_details(),
+                    deceased_candidates: vec![],
+                    lists_drawn: vec![list_drawn()],
+                    candidates_drawn: vec![],
+                }
+            );
+        }
+
+        #[test]
+        fn add_list_drawn_invalid() {
+            #[rustfmt::skip]
+            let invalid_states = vec![
+                Uninitialised,
+                RegisteringDeceasedCandidates {deceased_candidates: Vec::new() },
+                Finalised {deceased_candidates: vec![],lists_drawn: vec![],candidates_drawn: vec![] },
+            ];
+
+            for state in invalid_states {
+                assert_eq!(
+                    state.clone().add_list_drawn(list_drawn()),
+                    Err(InvalidState),
+                    "from {state:?}"
+                );
+            }
+        }
+
+        #[test]
+        fn add_candidate_drawn() {
+            let state = DrawingLots {
+                drawing_lots_details: candidate_drawing_lots_details(),
+                deceased_candidates: vec![],
+                lists_drawn: vec![],
+                candidates_drawn: vec![],
+            };
+
+            assert_eq!(
+                state
+                    .add_candidate_drawn(candidate_drawn())
+                    .expect("add_candidate_drawn should succeed"),
+                DrawingLots {
+                    drawing_lots_details: candidate_drawing_lots_details(),
+                    deceased_candidates: vec![],
+                    lists_drawn: vec![],
+                    candidates_drawn: vec![candidate_drawn()],
+                }
+            );
+        }
+
+        #[test]
+        fn add_candidate_drawn_invalid() {
+            #[rustfmt::skip]
+            let invalid_states = vec![
+                Uninitialised,
+                RegisteringDeceasedCandidates {deceased_candidates: Vec::new() },
+                Finalised {deceased_candidates: vec![],lists_drawn: vec![],candidates_drawn: vec![] },
+            ];
+
+            for state in invalid_states {
+                assert_eq!(
+                    state.clone().add_candidate_drawn(CandidateDrawn {
+                        list: PGNumber::from(1),
+                        options: CandidateNumber::from_values(vec![3, 4, 5]),
+                        drawn: CandidateNumber::from(4),
+                    }),
+                    Err(InvalidState),
+                    "from {state:?}"
                 );
             }
         }

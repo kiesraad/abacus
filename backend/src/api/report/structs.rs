@@ -117,6 +117,7 @@ impl CsbFiles {
             .or(self.results_pdf.as_ref())
             .or(self.attachment_pdf.as_ref())
             .or(self.total_counts_eml.as_ref())
+            .or(self.csv_counts.as_ref())
             .map(|f| f.created_at)
             .expect("At least one file should be present")
     }
@@ -126,6 +127,7 @@ impl CsbFiles {
             || self.total_counts_eml.is_none()
             || self.results_pdf.is_none()
             || self.attachment_pdf.is_none()
+            || self.csv_counts.is_none()
     }
 }
 

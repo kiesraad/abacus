@@ -6,11 +6,10 @@ use sqlx::SqlitePool;
 
 use crate::{
     APIError, ErrorResponse, SqlitePoolExt,
-    api::apportionment::handlers::helpers::update_apportionment_state_helper,
     domain::{apportionment_state::ApportionmentState, election::ElectionId},
     infra::audit_log::AuditService,
     repository::{election_repo, user_repo::User},
-    service,
+    service::next_apportionment_state,
 };
 
 /// Finalise deceased candidates
@@ -40,15 +39,7 @@ pub async fn finalise_deceased_candidates(
     let election = election_repo::get(&mut tx, election_id).await?;
     user.role().is_authorized(election.committee_category)?;
 
-    let apportionment_result = service::process_apportionment(&mut tx, &election).await?;
-
-    let state = update_apportionment_state_helper(
-        &mut tx,
-        audit_service,
-        election.id,
-        apportionment_result,
-    )
-    .await?;
+    let state = next_apportionment_state(&mut tx, audit_service, &election).await?;
 
     tx.commit().await?;
     Ok(Json(state))

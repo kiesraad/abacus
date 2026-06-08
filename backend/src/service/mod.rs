@@ -6,7 +6,8 @@ mod polling_station;
 mod sub_committee;
 
 pub use apportionment::{
-    ApportionmentResult, get_state as get_apportionment_state, process as process_apportionment,
+    ApportionmentResult, get_state as get_apportionment_state,
+    next_state as next_apportionment_state, process as process_apportionment,
     update_state as update_apportionment_state,
 };
 pub use change_committee_session_status::{

@@ -89,6 +89,28 @@ pub async fn update_state(
     Ok(state)
 }
 
+/// Determine the next apportionment state and update the database.
+/// - call apportionment [process] to determine if any drawing lots have to be done
+/// - use [update_state] to go to the appropriate state and persist that
+pub async fn next_state(
+    tx: &mut SqliteConnection,
+    audit_service: AuditService,
+    election: &ElectionWithPoliticalGroups,
+) -> Result<ApportionmentState, APIError> {
+    let result = process(tx, election).await?;
+
+    update_state(tx, audit_service, election.id, |state| match result {
+        ApportionmentResult::Ok(_) => state.finalise(),
+        ApportionmentResult::ListDrawingLotsRequired(drawing_lots_details) => {
+            state.draw_lots(drawing_lots_details.into())
+        }
+        ApportionmentResult::CandidateDrawingLotsRequired(drawing_lots_details) => {
+            state.draw_lots(drawing_lots_details.into())
+        }
+    })
+    .await
+}
+
 #[allow(clippy::large_enum_variant)]
 pub enum ApportionmentResult {
     Ok(ElectionApportionmentResponse),

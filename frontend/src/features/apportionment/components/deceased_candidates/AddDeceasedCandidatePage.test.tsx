@@ -65,7 +65,7 @@ describe("AddDeceasedCandidatesPage", () => {
       DrawingLots: {
         state: {
           deceased_candidates: [],
-          drawing_lots_details: { variant: "AbsoluteMajority", options: [1, 2], type: "ListDrawingLotsRequired" },
+          drawing_lots_required: { variant: "AbsoluteMajority", options: [1, 2], type: "ListDrawingLotsRequired" },
           candidates_drawn: [],
           lists_drawn: [],
           type: "DrawingLots",

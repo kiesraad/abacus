@@ -92,7 +92,7 @@ impl GsbFiles {
                 self.overview_pdf.is_none()
             }
         } else {
-            self.results_eml.is_none() || self.results_pdf.is_none()
+            self.results_eml.is_none() || self.results_pdf.is_none() || self.results_csv.is_none()
         }
     }
 }
@@ -389,7 +389,7 @@ impl ResultsInput {
         let csv_string = xml.as_osv4_3_csv(&self.election, true, false)?;
 
         let results_eml = self.generated_file(FileType::GsbResultsEml, xml_bytes.to_vec());
-        let results_csv = self.generated_file(FileType::GsbCsvCounts, svg_string.into_bytes());
+        let results_csv = self.generated_file(FileType::GsbCsvCounts, csv_string.into_bytes());
 
         let overview_pdf = if self.committee_session.is_next_session() {
             let pdf_model = self.get_p2a_pdf_file(self.filename_for(FileType::GsbOverviewPdf));

@@ -762,6 +762,8 @@ async fn test_p_22_2() {
         election.number_of_seats,
         &summary_gsb.political_group_votes,
         &[],
+        &[],
+        &[],
     );
     let apportionment_result =
         apportionment::process(&apportionment_input).expect("apportionment failed");

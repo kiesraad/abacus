@@ -40,16 +40,16 @@ function renderForm(radioError: boolean, handleSubmit: (e: SubmitEvent<HTMLFormE
               </ChoiceList.Error>
             )}
             <ChoiceList.Radio
-              id="yes"
+              id="no_deceased"
               name="include_all_candidates"
-              label={t("apportionment.include_all_candidates.yes")}
-              value="yes"
+              label={t("apportionment.include_all_candidates.no_deceased")}
+              value="no_deceased"
             />
             <ChoiceList.Radio
-              id="no"
+              id="has_deceased"
               name="include_all_candidates"
-              label={t("apportionment.include_all_candidates.no")}
-              value="no"
+              label={t("apportionment.include_all_candidates.has_deceased")}
+              value="has_deceased"
             />
           </ChoiceList>
         </FormLayout.Section>
@@ -102,7 +102,7 @@ export function IncludeAllCandidatesPage() {
     }
 
     const path: REGISTER_DECEASED_CANDIDATES_REQUEST_PATH | SKIP_DECEASED_CANDIDATES_REQUEST_PATH =
-      `/api/elections/${election.id}/apportionment/${includeAllCandidatesChoice === "yes" ? "skip_deceased_candidates" : "register_deceased_candidates"}`;
+      `/api/elections/${election.id}/apportionment/${includeAllCandidatesChoice === "no_deceased" ? "skip_deceased_candidates" : "register_deceased_candidates"}`;
     const response: ApiResult<ApportionmentState> = await client.postRequest(path);
 
     if (isSuccess(response)) {

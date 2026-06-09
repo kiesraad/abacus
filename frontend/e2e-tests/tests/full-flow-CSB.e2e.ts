@@ -322,9 +322,9 @@ test.describe("full flow CSB", () => {
     await expect(includeAllCandidatesPage.header).toBeVisible();
     await expect(includeAllCandidatesPage.dataEntryFinishedAlert).toBeVisible();
     await expect(includeAllCandidatesPage.title).toBeVisible();
-    await expect(includeAllCandidatesPage.yes).toBeVisible();
-    await expect(includeAllCandidatesPage.no).toBeVisible();
-    await includeAllCandidatesPage.yes.check();
+    await expect(includeAllCandidatesPage.noDeceased).toBeVisible();
+    await expect(includeAllCandidatesPage.hasDeceased).toBeVisible();
+    await includeAllCandidatesPage.noDeceased.check();
     await includeAllCandidatesPage.next.click();
 
     const apportionmentPage = new Apportionment(page);

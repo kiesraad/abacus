@@ -6,7 +6,7 @@ members = [".", "apportionment", "pdf_gen"]
 version = "1.1.0"
 edition = "2024"
 license = "EUPL-1.2"
-rust-version = "1.89"
+rust-version = "1.95"
 
 [workspace.dependencies]
 async_zip = { version = "0.0.18", features = ["tokio", "deflate", "chrono"] }

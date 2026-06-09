@@ -56,12 +56,14 @@ pub struct GsbGeneratedFiles {
     pub results_eml: GeneratedFile,
     pub results_pdf: GeneratedFile,
     pub overview_pdf: Option<GeneratedFile>,
+    pub results_csv: GeneratedFile,
 }
 
 pub struct GsbFiles {
     pub results_eml: Option<File>,
     pub results_pdf: Option<File>,
     pub overview_pdf: Option<File>,
+    pub results_csv: Option<File>,
 }
 
 impl GsbFiles {
@@ -70,6 +72,7 @@ impl GsbFiles {
             .as_ref()
             .or(self.results_pdf.as_ref())
             .or(self.overview_pdf.as_ref())
+            .or(self.results_csv.as_ref())
             .map(|f| f.created_at)
             .expect("At least one file should be present")
     }
@@ -84,11 +87,12 @@ impl GsbFiles {
                 self.results_eml.is_none()
                     || self.results_pdf.is_none()
                     || self.overview_pdf.is_none()
+                    || self.results_csv.is_none()
             } else {
                 self.overview_pdf.is_none()
             }
         } else {
-            self.results_eml.is_none() || self.results_pdf.is_none()
+            self.results_eml.is_none() || self.results_pdf.is_none() || self.results_csv.is_none()
         }
     }
 }
@@ -253,6 +257,7 @@ impl ResultsInput {
             CsbResultsPdf => "Model P22-2.pdf".to_string(),
             CsbAttachmentPdf => "Model P22-2 bijlage.pdf".to_string(),
             CsbCsvCounts => self.csv_filename(),
+            GsbCsvCounts => self.csv_filename(),
         };
 
         slugify_filename(&filename)
@@ -377,11 +382,14 @@ impl ResultsInput {
     pub async fn generate_gsb_files(&self) -> Result<GsbGeneratedFiles, APIError> {
         let creation_date_time = self.created_at.format(DEFAULT_DATE_TIME_FORMAT).to_string();
 
-        let xml_string = self.as_xml()?.write_eml_root_str(true, true)?;
+        let xml = self.as_xml()?;
+        let xml_string = xml.write_eml_root_str(true, true)?;
         let xml_bytes = xml_string.as_bytes();
         let xml_hash = EmlHash::from(xml_bytes).into();
+        let csv_string = xml.as_osv4_3_csv(&self.election, true, false)?;
 
         let results_eml = self.generated_file(FileType::GsbResultsEml, xml_bytes.to_vec());
+        let results_csv = self.generated_file(FileType::GsbCsvCounts, csv_string.into_bytes());
 
         let overview_pdf = if self.committee_session.is_next_session() {
             let pdf_model = self.get_p2a_pdf_file(self.filename_for(FileType::GsbOverviewPdf));
@@ -428,6 +436,7 @@ impl ResultsInput {
             results_eml,
             results_pdf,
             overview_pdf,
+            results_csv,
         })
     }
 

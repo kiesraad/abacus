@@ -62,8 +62,18 @@ describe("AddDeceasedCandidatesPage", () => {
         state: { deceased_candidates: [], type: "RegisteringDeceasedCandidates" },
         expectRedirectTo: undefined,
       },
+      DrawingLots: {
+        state: {
+          deceased_candidates: [],
+          drawing_lots_details: { variant: "AbsoluteMajority", options: [1, 2], type: "ListDrawingLotsRequired" },
+          candidates_drawn: [],
+          lists_drawn: [],
+          type: "DrawingLots",
+        },
+        expectRedirectTo: "/elections/3/apportionment",
+      },
       Finalised: {
-        state: { deceased_candidates: [], type: "Finalised" },
+        state: { deceased_candidates: [], lists_drawn: [], candidates_drawn: [], type: "Finalised" },
         expectRedirectTo: "/elections/3/apportionment",
       },
     } satisfies Record<

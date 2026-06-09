@@ -41,6 +41,8 @@ describe("ApportionmentListDetailsPage", () => {
         { pg_number: 2, candidate_number: 3 },
         { pg_number: 1, candidate_number: 5 },
       ],
+      lists_drawn: [],
+      candidates_drawn: [],
       type: "Finalised",
     } satisfies ApportionmentState);
     overrideOnce("post", "/api/elections/3/apportionment", 200, {
@@ -61,8 +63,18 @@ describe("ApportionmentListDetailsPage", () => {
         state: { deceased_candidates: [], type: "RegisteringDeceasedCandidates" },
         expectRedirectTo: "/elections/3/apportionment/deceased-candidates",
       },
+      DrawingLots: {
+        state: {
+          deceased_candidates: [],
+          drawing_lots_details: { variant: "AbsoluteMajority", options: [1, 2], type: "ListDrawingLotsRequired" },
+          candidates_drawn: [],
+          lists_drawn: [],
+          type: "DrawingLots",
+        },
+        expectRedirectTo: undefined,
+      },
       Finalised: {
-        state: { deceased_candidates: [], type: "Finalised" },
+        state: { deceased_candidates: [], lists_drawn: [], candidates_drawn: [], type: "Finalised" },
         expectRedirectTo: undefined,
       },
     } satisfies Record<

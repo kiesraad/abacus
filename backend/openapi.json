@@ -5203,14 +5203,67 @@
           {
             "type": "object",
             "required": [
+              "drawing_lots_details",
               "deceased_candidates",
+              "lists_drawn",
+              "candidates_drawn",
               "type"
             ],
             "properties": {
+              "candidates_drawn": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/CandidateDrawn"
+                }
+              },
               "deceased_candidates": {
                 "type": "array",
                 "items": {
                   "$ref": "#/components/schemas/DeceasedCandidate"
+                }
+              },
+              "drawing_lots_details": {
+                "$ref": "#/components/schemas/DrawingLotsDetails"
+              },
+              "lists_drawn": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ListDrawn"
+                }
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "DrawingLots"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "deceased_candidates",
+              "lists_drawn",
+              "candidates_drawn",
+              "type"
+            ],
+            "properties": {
+              "candidates_drawn": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/CandidateDrawn"
+                }
+              },
+              "deceased_candidates": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/DeceasedCandidate"
+                }
+              },
+              "lists_drawn": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ListDrawn"
                 }
               },
               "type": {
@@ -5620,6 +5673,50 @@
           }
         },
         "additionalProperties": false
+      },
+      "CandidateDrawingLotsRequired": {
+        "type": "object",
+        "required": [
+          "list",
+          "options"
+        ],
+        "properties": {
+          "list": {
+            "$ref": "#/components/schemas/PGNumber"
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CandidateNumber"
+            }
+          }
+        }
+      },
+      "CandidateDrawn": {
+        "type": "object",
+        "description": "The candidate that has been drawn plus information to assert the correct drawing",
+        "required": [
+          "list",
+          "options",
+          "drawn"
+        ],
+        "properties": {
+          "drawn": {
+            "$ref": "#/components/schemas/CandidateNumber",
+            "description": "The candidate that the lot was drawn for"
+          },
+          "list": {
+            "$ref": "#/components/schemas/PGNumber",
+            "description": "The list the candidate needs to be drawn from"
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CandidateNumber"
+            },
+            "description": "The candidates that lots are drawn for"
+          }
+        }
       },
       "CandidateGender": {
         "type": "string",
@@ -6256,6 +6353,52 @@
             "minimum": 0
           }
         }
+      },
+      "DrawingLotsDetails": {
+        "oneOf": [
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ListDrawingLotsRequired"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "type"
+                ],
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "ListDrawingLotsRequired"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CandidateDrawingLotsRequired"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "type"
+                ],
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "CandidateDrawingLotsRequired"
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        ]
       },
       "Election": {
         "type": "object",
@@ -7319,6 +7462,58 @@
             "items": {
               "$ref": "#/components/schemas/Candidate"
             }
+          }
+        }
+      },
+      "ListDrawingLotsRequired": {
+        "type": "object",
+        "required": [
+          "variant",
+          "options"
+        ],
+        "properties": {
+          "options": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PGNumber"
+            }
+          },
+          "variant": {
+            "$ref": "#/components/schemas/ListDrawingLotsVariant"
+          }
+        }
+      },
+      "ListDrawingLotsVariant": {
+        "type": "string",
+        "enum": [
+          "HighestAverageResidualSeat",
+          "LargestRemainderResidualSeat",
+          "AbsoluteMajority"
+        ]
+      },
+      "ListDrawn": {
+        "type": "object",
+        "description": "The list that has been drawn plus information to assert the correct drawing",
+        "required": [
+          "variant",
+          "options",
+          "drawn"
+        ],
+        "properties": {
+          "drawn": {
+            "$ref": "#/components/schemas/PGNumber",
+            "description": "The list that the lot was drawn for"
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PGNumber"
+            },
+            "description": "The lists that lots are drawn for"
+          },
+          "variant": {
+            "$ref": "#/components/schemas/ListDrawingLotsVariant",
+            "description": "The type of seat assignment or retraction that lots need to be drawn for"
           }
         }
       },

@@ -33,10 +33,8 @@ pub fn assign_remainder<T: ListVotes>(
     let mut current_standings = initial_standings.to_vec();
 
     while residual_seat_number != total_residual_seats {
-        let exhausted_list_numbers: Vec<T::ListNumber> =
-            exclude_exhausted_lists.map_or_else(Vec::new, |(list_votes, deceased)| {
-                list_numbers_without_empty_seats(current_standings.iter(), list_votes, deceased)
-            });
+        let exhausted_list_numbers =
+            exhausted_list_numbers(&current_standings, exclude_exhausted_lists);
 
         // Stop assigning when no list is eligible, either when every non-exhausted list has zero
         // votes or every list is exhausted. Any remaining seats will be reported as unassigned.
@@ -54,25 +52,14 @@ pub fn assign_remainder<T: ListVotes>(
         let residual_seats = total_residual_seats - residual_seat_number;
         residual_seat_number += 1;
 
-        let change = if seats >= LARGE_COUNCIL_THRESHOLD {
-            debug!("Assign residual seat using highest averages method");
-            // [Artikel P 7 Kieswet](https://wetten.overheid.nl/BWBR0004627/2026-01-01/#AfdelingII_HoofdstukP_Paragraaf2_ArtikelP7)
-            step_assign_remainder_using_highest_averages(
-                current_standings.iter(),
-                residual_seats,
-                &steps,
-                &exhausted_list_numbers,
-                false,
-            )?
-        } else {
-            // [Artikel P 8 Kieswet](https://wetten.overheid.nl/BWBR0004627/2026-01-01/#AfdelingII_HoofdstukP_Paragraaf2_ArtikelP8)
-            step_assign_remainder_using_largest_remainder(
-                &current_standings,
-                residual_seats,
-                &steps,
-                &exhausted_list_numbers,
-            )?
-        };
+        let change = step_assign_residual_seat(
+            &current_standings,
+            seats,
+            residual_seats,
+            residual_seat_number,
+            &steps,
+            &exhausted_list_numbers,
+        )?;
 
         let standings = current_standings.clone();
 
@@ -155,6 +142,21 @@ where
         }
         list_numbers_without_empty_seats
     })
+}
+
+/// Determine which lists are exhausted (have no empty seats left) under
+/// Artikel P 10 Kieswet.
+fn exhausted_list_numbers<T: ListVotes>(
+    standings: &[ListStanding<T::ListNumber>],
+    exclude_exhausted_lists: Option<(&[T], &DeceasedCandidates<T>)>,
+) -> Vec<T::ListNumber> {
+    let exhausted = exclude_exhausted_lists.map_or_else(Vec::new, |(list_votes, deceased)| {
+        list_numbers_without_empty_seats(standings.iter(), list_votes, deceased)
+    });
+    if !exhausted.is_empty() {
+        debug!("Exhausted lists in accordance with Article P 10 Kieswet: {exhausted:?}");
+    }
+    exhausted
 }
 
 /// Returns if a list qualifies for an extra seat.
@@ -302,7 +304,6 @@ fn lists_with_highest_average<'a, LN: Copy + Debug>(
 
     // Check if we can actually assign all these lists a seat, otherwise we would need to draw lots
     if lists.len() > residual_seats as usize {
-        // TODO: #788 if multiple lists have the same highest average and not enough residual seats are available, use drawing of lots
         info!(
             "Drawing of lots is required for lists: {:?}, only {residual_seats} seat(s) available",
             list_numbers(&lists)
@@ -355,7 +356,6 @@ fn lists_with_largest_remainder<'a, LN: Copy + Debug>(
 
     // Check if we can actually assign all these lists
     if lists.len() > residual_seats as usize {
-        // TODO: #788 if multiple lists have the same largest remainder and not enough residual seats are available, use drawing of lots
         info!(
             "Drawing of lots is required for lists: {:?}, only {residual_seats} seat(s) available",
             list_numbers(&lists)
@@ -366,6 +366,38 @@ fn lists_with_largest_remainder<'a, LN: Copy + Debug>(
         })
     } else {
         Ok(lists)
+    }
+}
+
+/// Assign the next residual seat using the procedure for the council size:
+/// highest averages for large councils (Artikel P 7 Kieswet), largest
+/// remainder otherwise (Artikel P 8 Kieswet).
+fn step_assign_residual_seat<LN: Copy + Debug + Eq>(
+    standings: &[ListStanding<LN>],
+    seats: u32,
+    residual_seats: u32,
+    residual_seat_number: u32,
+    previous_steps: &[SeatChangeStep<LN>],
+    exhausted_list_numbers: &[LN],
+) -> Result<SeatChange<LN>, ListDrawingLotsRequired<LN>> {
+    if seats >= LARGE_COUNCIL_THRESHOLD {
+        debug!("Assigning residual seat {residual_seat_number} using highest averages method");
+        // [Artikel P 7 Kieswet](https://wetten.overheid.nl/BWBR0004627/2026-01-01/#AfdelingII_HoofdstukP_Paragraaf2_ArtikelP7)
+        step_assign_remainder_using_highest_averages(
+            standings.iter(),
+            residual_seats,
+            previous_steps,
+            exhausted_list_numbers,
+            false,
+        )
+    } else {
+        // [Artikel P 8 Kieswet](https://wetten.overheid.nl/BWBR0004627/2026-01-01/#AfdelingII_HoofdstukP_Paragraaf2_ArtikelP8)
+        step_assign_remainder_using_largest_remainder(
+            standings,
+            residual_seats,
+            previous_steps,
+            exhausted_list_numbers,
+        )
     }
 }
 

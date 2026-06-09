@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/Button/Button";
 import { ChoiceList } from "@/components/ui/CheckboxAndRadio/ChoiceList";
 import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
+import { Loader } from "@/components/ui/Loader/Loader";
 import { useElection } from "@/hooks/election/useElection";
 import { t, tx } from "@/i18n/translate";
 import type {
@@ -15,7 +16,6 @@ import type {
   SKIP_DECEASED_CANDIDATES_REQUEST_PATH,
 } from "@/types/generated/openapi";
 import { StringFormData } from "@/utils/stringFormData";
-import { Loader } from "../../../../components/ui/Loader/Loader";
 import { useApportionmentContext } from "../../hooks/useApportionmentContext";
 import { renderTitleAndHeader } from "../../utils/utils";
 import { ApportionmentError } from "../ApportionmentError";
@@ -80,7 +80,7 @@ export function IncludeAllCandidatesPage() {
       } else {
         void navigate(`/elections/${election.id}/apportionment/deceased-candidates`);
       }
-    } else if (state?.type === "Finalised") {
+    } else if (state?.type === "DrawingLots" || state?.type === "Finalised") {
       void navigate(`/elections/${election.id}/apportionment`);
     }
   });

@@ -296,7 +296,7 @@ mod tests {
             &mut conn,
             audit_service.clone(),
             ElectionId::from(5),
-            |state| state.skip_deceased_candidates(),
+            |state| state.finalise(),
         )
         .await?;
         let (_, state) = get_apportionment_state(&mut conn, ElectionId::from(5)).await?;

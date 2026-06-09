@@ -156,10 +156,8 @@ mod tests {
             ApportionmentInputData::new(election.number_of_seats, &list_votes, &[]);
         let apportionment_result =
             apportionment::process(&apportionment_input).expect("apportionment failed");
-        let candidate_nomination = map_candidate_nomination(
-            &apportionment_result.candidate_nomination,
-            political_groups.clone(),
-        );
+        let candidate_nomination =
+            map_candidate_nomination(&apportionment_result.candidate_nomination, political_groups);
         let result = EnrichedCandidateNomination::new(&election, &candidate_nomination)
             .expect("EnrichedCandidateNomination::new should succeed");
         assert_eq!(

@@ -250,7 +250,6 @@ fn preferential_candidate_nomination<'a, LV: ListVotes>(
                 .collect();
             // Check if we can actually nominate all these candidates, otherwise we would need to draw lots
             if same_votes_candidates.len() > non_assigned_seats as usize {
-                // TODO: #788 if multiple lists have the same largest remainder and not enough residual seats are available, use drawing of lots
                 info!(
                     "Drawing of lots is required for candidates: {:?}, only {non_assigned_seats} seat(s) available",
                     candidate_votes_numbers(&same_votes_candidates)

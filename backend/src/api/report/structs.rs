@@ -386,7 +386,7 @@ impl ResultsInput {
         let xml_string = xml.write_eml_root_str(true, true)?;
         let xml_bytes = xml_string.as_bytes();
         let xml_hash = EmlHash::from(xml_bytes).into();
-        let svg_string = xml.as_osv4_3_csv(&self.election, true, false)?;
+        let csv_string = xml.as_osv4_3_csv(&self.election, true, false)?;
 
         let results_eml = self.generated_file(FileType::GsbResultsEml, xml_bytes.to_vec());
         let results_csv = self.generated_file(FileType::GsbCsvCounts, svg_string.into_bytes());

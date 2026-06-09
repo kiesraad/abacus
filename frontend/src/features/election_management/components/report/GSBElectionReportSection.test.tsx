@@ -107,7 +107,7 @@ describe("GSBElectionReportSection", () => {
     expect(
       await screen.findByText("Het corrigendum van het gemeentelijk stembureau (Na 14-2). Dit is een PDF-document."),
     ).toBeInTheDocument();
-    expect(await screen.findByText("EML en CSV bestanden met digitale telresultaten.")).toBeInTheDocument();
+    expect(await screen.findByText("EML- en CSV-bestanden met digitale telresultaten.")).toBeInTheDocument();
     expect(await screen.findByRole("link", { name: /Download definitieve documenten tweede zitting/ })).toBeVisible();
   });
 

@@ -32,16 +32,13 @@
     "download_definitive_files": "Download de definitieve bestanden.",
     "first_session": {
       "documents": "<li><strong>PDF-document met het proces verbaal.</strong> Dit wordt tijdens de zitting van het gemeentelijk stembureau vastgesteld en ondertekend.</li><li><strong>EML-bestand met digitale telresultaten.</strong></li>",
-      "zip_file_explanation": "In het ZIP-bestand zitten twee documenten:"
     },
     "next_session": {
       "with_corrections": {
         "documents": "<li><strong>Het proces verbaal van het gemeentelijk stembureau (P 2a). Dit is een PDF-document.</strong> Dit wordt tijdens de zitting van het gemeentelijk stembureau vastgesteld en ondertekend.</li><li><strong>Het corrigendum van het gemeentelijk stembureau (Na 14-2). Dit is een PDF-document.</strong> Bevat de gecorrigeerde telresultaten van de gemeente.</li><li><strong>EML-bestand met digitale telresultaten.</strong></li>",
-        "zip_file_explanation": "In het ZIP-bestand zitten drie documenten:"
       },
       "without_corrections": {
         "documents": "<li><strong>Het proces verbaal van het gemeentelijk stembureau (P 2a). Dit is een PDF-document.</strong> Dit wordt tijdens de zitting van het gemeentelijk stembureau vastgesteld en ondertekend.</li>",
-        "zip_file_explanation": "In het ZIP-bestand zit één document:"
       }
     },
     "upload_the_zip": "Upload het volledige ZIP-bestand naar het overdrachtsplatform."
@@ -96,4 +93,6 @@
   "yes_add_session": "Ja, zitting toevoegen",
   "yes_delete_session": "Verwijder zitting",
   "zip_file": "ZIP-bestand"
+  "zip_file": "ZIP-bestand",
+  "zip_file_explanation": "In het ZIP-bestand zitten de volgende documenten:"
 }

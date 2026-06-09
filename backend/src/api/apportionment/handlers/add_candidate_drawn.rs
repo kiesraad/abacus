@@ -19,8 +19,9 @@ use crate::{
 #[utoipa::path(
     post,
     path = "/api/elections/{election_id}/apportionment/add_candidate_drawn",
+    request_body = CandidateDrawn,
     responses(
-        (status = 200, description = "Add candidate to drawing lots", body = CandidateDrawn),
+        (status = 200, description = "Add candidate to drawing lots", body = ApportionmentState),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),

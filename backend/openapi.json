@@ -1383,7 +1383,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CandidateDrawn"
+                  "$ref": "#/components/schemas/ApportionmentState"
                 }
               }
             }
@@ -1575,7 +1575,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ListDrawn"
+                  "$ref": "#/components/schemas/ApportionmentState"
                 }
               }
             }

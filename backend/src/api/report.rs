@@ -1,10 +1,12 @@
 use axum::{
     extract::{Path, State},
+    http::StatusCode,
     response::IntoResponse,
 };
 use chrono::{DateTime, Datelike, Local};
 use pdf_gen::zip::{ZipResponse, ZipResponseError, slugify_filename, zip_single_file};
 use sqlx::SqlitePool;
+use tracing::error;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
@@ -16,6 +18,7 @@ use crate::{
         report::files::{get_files_csb_election, get_files_gsb_election},
         role::Role,
     },
+    error::{ApiErrorResponse, ErrorReference},
     infra::audit_log::AuditService,
     repository::{
         committee_session_repo::{self},
@@ -23,6 +26,36 @@ use crate::{
         user_repo::User,
     },
 };
+
+#[derive(Debug, PartialEq)]
+pub enum ReportApiError {
+    ApportionmentStateNotFinalised,
+}
+
+impl ApiErrorResponse for ReportApiError {
+    fn log(&self) {
+        error!("Report error: {:?}", self);
+    }
+
+    fn to_response_parts(&self) -> (StatusCode, ErrorResponse) {
+        match self {
+            ReportApiError::ApportionmentStateNotFinalised => (
+                StatusCode::CONFLICT,
+                ErrorResponse::new(
+                    "Apportionment state not finalised",
+                    ErrorReference::InvalidApportionmentState,
+                    false,
+                ),
+            ),
+        }
+    }
+}
+
+impl From<ReportApiError> for APIError {
+    fn from(err: ReportApiError) -> Self {
+        APIError::Delegated(Box::new(err))
+    }
+}
 
 pub fn router() -> OpenApiRouter<AppState> {
     use Role::*;
@@ -171,8 +204,6 @@ pub async fn election_download_zip_results_csb(
         committee_session_repo::get_committee_category(&mut conn, committee_session_id).await?;
     user.role().is_authorized(committee_category)?;
 
-    // TODO: #3160 check if apportionment state is finalised
-
     let election = election_repo::get(&mut conn, election_id).await?;
     let committee_session = committee_session_repo::get(&mut conn, committee_session_id).await?;
     let files = get_files_csb_election(&pool, audit_service, committee_session.id).await?;
@@ -239,8 +270,6 @@ pub async fn election_download_zip_attachment_csb(
         committee_session_repo::get_committee_category(&mut conn, committee_session_id).await?;
     user.role().is_authorized(committee_category)?;
 
-    // TODO: #3160 check if apportionment state is finalised
-
     let election = election_repo::get(&mut conn, election_id).await?;
     let committee_session = committee_session_repo::get(&mut conn, committee_session_id).await?;
     let files = get_files_csb_election(&pool, audit_service, committee_session.id).await?;
@@ -302,8 +331,6 @@ pub async fn election_download_zip_total_counts_csb(
         committee_session_repo::get_committee_category(&mut conn, committee_session_id).await?;
     user.role().is_authorized(committee_category)?;
 
-    // TODO: #3160 check if apportionment state is finalised
-
     let election = election_repo::get(&mut conn, election_id).await?;
     let committee_session = committee_session_repo::get(&mut conn, committee_session_id).await?;
     let files = get_files_csb_election(&pool, audit_service, committee_session.id).await?;
@@ -316,6 +343,12 @@ pub async fn election_download_zip_total_counts_csb(
     let (zip_response, mut zip_writer) = ZipResponse::new(&download_zip_filename);
 
     tokio::spawn(async move {
+        if let Some(csv_counts) = files.csv_counts {
+            zip_writer
+                .add_file(&csv_counts.name, &csv_counts.data)
+                .await?;
+        }
+
         if let Some(total_counts_eml_file) = files.total_counts_eml {
             let xml_zip_filename = with_zip_extension(&total_counts_eml_file.name);
             let xml_zip =

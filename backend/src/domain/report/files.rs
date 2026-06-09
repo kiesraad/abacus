@@ -3,7 +3,7 @@ use sqlx::{SqliteConnection, SqlitePool};
 
 use crate::{
     APIError, SqlitePoolExt,
-    api::apportionment::ApportionmentInputData,
+    api::{apportionment::ApportionmentInputData, report::ReportApiError},
     domain::{
         committee_session::{CommitteeSession, CommitteeSessionError, CommitteeSessionId},
         committee_session_status::CommitteeSessionStatus,
@@ -107,6 +107,8 @@ async fn generate_and_save_files_csb_election(
         input_data.election.number_of_seats,
         &input_data.summary.political_group_votes,
         state.get_deceased_candidates(),
+        state.get_lists_drawn(),
+        state.get_candidates_drawn(),
     );
     let apportionment_result = apportionment::process(&apportionment_input)?;
 
@@ -116,12 +118,14 @@ async fn generate_and_save_files_csb_election(
     let total_counts_eml = saver.save(generated_files.total_counts_eml).await?;
     let results_pdf = saver.save(generated_files.results_pdf).await?;
     let attachment_pdf = saver.save(generated_files.attachment_pdf).await?;
+    let csv_counts = saver.save(generated_files.csv_counts).await?;
 
     Ok(CsbFiles {
         results_eml: Some(results_eml),
         results_pdf: Some(results_pdf),
         attachment_pdf: Some(attachment_pdf),
         total_counts_eml: Some(total_counts_eml),
+        csv_counts: Some(csv_counts),
     })
 }
 
@@ -150,6 +154,7 @@ async fn get_existing_csb_files(
             .await?,
         total_counts_eml: file_repo::get_for_session(conn, committee_session_id, CsbTotalCountsEml)
             .await?,
+        csv_counts: file_repo::get_for_session(conn, committee_session_id, CsbCsvCounts).await?,
     })
 }
 
@@ -207,6 +212,11 @@ pub async fn get_files_csb_election(
         return Err(CommitteeSessionError::InvalidCommitteeSessionStatus.into());
     }
 
+    let (_, state) = get_apportionment_state(&mut conn, committee_session.election_id).await?;
+    if !state.is_finalised() {
+        return Err(ReportApiError::ApportionmentStateNotFinalised.into());
+    }
+
     // Check if files exist, if so, get files from database
     let mut files = get_existing_csb_files(&mut conn, committee_session.id).await?;
     drop(conn);
@@ -230,15 +240,18 @@ mod tests {
     use super::*;
     use crate::{
         domain::{
+            election::ElectionId,
             file::FileId,
             investigation::{InvestigationConcludedWithoutNewResults, InvestigationStatus},
             polling_station::PollingStationId,
         },
+        error::assert_delegated,
         infra::audit_log::list_event_names,
         repository::{
             committee_session_repo::{self, change_status},
             investigation_repo,
         },
+        service::update_apportionment_state,
     };
 
     #[test(sqlx::test(fixtures(path = "../../../fixtures", scripts("election_5_with_results"))))]
@@ -377,14 +390,15 @@ mod tests {
         path = "../../../fixtures",
         scripts("election_8_csb_with_results")
     )))]
-    async fn test_error_get_files_csb_election_not_completed(pool: SqlitePool) {
+    async fn test_error_get_files_csb_election_not_in_valid_state(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
         let audit_service = AuditService::new(None, None);
 
-        let result =
+        let error =
             get_files_csb_election(&pool, audit_service.clone(), CommitteeSessionId::from(801))
-                .await;
-        assert!(result.is_err());
+                .await
+                .expect_err("committee session should not be completed");
+        assert_delegated(error, &CommitteeSessionError::InvalidCommitteeSessionStatus);
 
         // Change committee session status to completed
         change_status(
@@ -395,10 +409,11 @@ mod tests {
         .await
         .unwrap();
 
-        let result =
+        let error =
             get_files_csb_election(&pool, audit_service.clone(), CommitteeSessionId::from(801))
-                .await;
-        assert!(result.is_err());
+                .await
+                .expect_err("committee session details should be missing");
+        assert_delegated(error, &CommitteeSessionError::InvalidCommitteeSessionStatus);
 
         // Change committee session details
         committee_session_repo::update(
@@ -406,6 +421,22 @@ mod tests {
             CommitteeSessionId::from(801),
             "Juinen".to_string(),
             NaiveDateTime::parse_from_str("2026-03-19T09:15", "%Y-%m-%dT%H:%M").unwrap(),
+        )
+        .await
+        .unwrap();
+
+        let error =
+            get_files_csb_election(&pool, audit_service.clone(), CommitteeSessionId::from(801))
+                .await
+                .expect_err("apportionment state should not be finalised");
+        assert_delegated(error, &ReportApiError::ApportionmentStateNotFinalised);
+
+        // Finalise apportionment state
+        update_apportionment_state(
+            &mut conn,
+            audit_service.clone(),
+            ElectionId::from(8),
+            |state| state.finalise(),
         )
         .await
         .unwrap();
@@ -443,6 +474,16 @@ mod tests {
         .await
         .unwrap();
 
+        // Finalise apportionment state
+        update_apportionment_state(
+            &mut conn,
+            audit_service.clone(),
+            ElectionId::from(8),
+            |state| state.finalise(),
+        )
+        .await
+        .unwrap();
+
         // Files should be generated exactly once
         for _ in 1..=2 {
             let files =
@@ -459,6 +500,7 @@ mod tests {
             let attachment_pdf = files
                 .attachment_pdf
                 .expect("should have generated attachment pdf");
+            let csv_counts = files.csv_counts.expect("should have generated csv counts");
 
             assert_eq!(eml_results.name, "Resultaat_GR2024_Juinen.eml.xml");
             assert_eq!(eml_results.id, FileId::from(1));
@@ -472,9 +514,19 @@ mod tests {
             assert_eq!(attachment_pdf.name, "Model_P22-2_bijlage.pdf");
             assert_eq!(attachment_pdf.id, FileId::from(4));
 
+            assert_eq!(csv_counts.name, "osv4-3_telling_gr2024_juinen.csv");
+            assert_eq!(csv_counts.id, FileId::from(5));
+
             assert_eq!(
                 list_event_names(&mut conn).await.unwrap(),
-                ["FileCreated", "FileCreated", "FileCreated", "FileCreated"]
+                [
+                    "ApportionmentStateUpdated",
+                    "FileCreated",
+                    "FileCreated",
+                    "FileCreated",
+                    "FileCreated",
+                    "FileCreated"
+                ]
             );
         }
     }

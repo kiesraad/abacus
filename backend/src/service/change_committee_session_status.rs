@@ -12,6 +12,7 @@ use crate::{
     },
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
     repository::{committee_session_repo, file_repo},
+    service::update_apportionment_state,
 };
 
 #[derive(Serialize)]
@@ -106,11 +107,19 @@ pub async fn change_committee_session_status(
     };
 
     // If resuming committee session, delete all files from committee session and files tables
+    // and reset apportionment state
     if committee_session.status == CommitteeSessionStatus::Completed
         && new_status == CommitteeSessionStatus::DataEntry
     {
         delete_committee_session_files(&mut tx, audit_service.clone(), committee_session.id)
             .await?;
+        update_apportionment_state(
+            &mut tx,
+            audit_service.clone(),
+            committee_session.election_id,
+            |state| state.reset(),
+        )
+        .await?;
     }
 
     let committee_session =
@@ -147,17 +156,17 @@ async fn delete_committee_session_files(
 
 #[cfg(test)]
 mod tests {
-    use std::net::Ipv4Addr;
-
     use chrono::Utc;
     use sqlx::{SqliteConnection, SqlitePool};
     use test_log::test;
 
     use super::*;
     use crate::{
-        domain::file::FileType,
+        domain::{apportionment_state::ApportionmentState, file::FileType},
         infra::audit_log::{AuditService, list_event_names},
-        repository::file_repo,
+        repository::{apportionment_state_repo, file_repo},
+        service::get_apportionment_state,
+        test_support::TEST_IP_V4_ADDR,
     };
 
     async fn generate_test_file(
@@ -181,7 +190,7 @@ mod tests {
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
     async fn test_delete_files_on_resume_no_files(pool: SqlitePool) -> Result<(), APIError> {
         let mut conn = pool.acquire().await?;
-        let audit_service = AuditService::new(None, Some(Ipv4Addr::new(203, 0, 113, 0).into()));
+        let audit_service = AuditService::new(None, Some(TEST_IP_V4_ADDR.into()));
 
         let committee_session_id = CommitteeSessionId::from(6);
 
@@ -210,7 +219,11 @@ mod tests {
         // No FileDeleted events should be logged
         assert_eq!(
             list_event_names(&mut conn).await?,
-            ["CommitteeSessionUpdated", "CommitteeSessionUpdated"]
+            [
+                "CommitteeSessionUpdated",
+                "ApportionmentStateUpdated",
+                "CommitteeSessionUpdated"
+            ]
         );
         Ok(())
     }
@@ -218,7 +231,7 @@ mod tests {
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
     async fn test_delete_files_on_resume_with_files(pool: SqlitePool) -> Result<(), APIError> {
         let mut conn = pool.acquire().await?;
-        let audit_service = AuditService::new(None, Some(Ipv4Addr::new(203, 0, 113, 0).into()));
+        let audit_service = AuditService::new(None, Some(TEST_IP_V4_ADDR.into()));
 
         let committee_session_id = CommitteeSessionId::from(6);
 
@@ -255,9 +268,58 @@ mod tests {
                 "FileDeleted",
                 "FileDeleted",
                 "FileDeleted",
+                "ApportionmentStateUpdated",
                 "CommitteeSessionUpdated",
             ]
         );
+        Ok(())
+    }
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
+    async fn test_reset_apportionment_state_on_resume(pool: SqlitePool) -> Result<(), APIError> {
+        let mut conn = pool.acquire().await?;
+        let audit_service = AuditService::new(None, Some(TEST_IP_V4_ADDR.into()));
+
+        let committee_session_id = CommitteeSessionId::from(6);
+
+        // DataEntry --> Completed
+        change_committee_session_status(
+            &mut conn,
+            committee_session_id,
+            CommitteeSessionStatus::Completed,
+            audit_service.clone(),
+        )
+        .await?;
+
+        // Finalise apportionment state
+        update_apportionment_state(
+            &mut conn,
+            audit_service.clone(),
+            ElectionId::from(5),
+            |state| state.finalise(),
+        )
+        .await?;
+        let (_, state) = get_apportionment_state(&mut conn, ElectionId::from(5)).await?;
+        assert!(state.is_finalised());
+
+        // Completed --> DataEntry
+        change_committee_session_status(
+            &mut conn,
+            committee_session_id,
+            CommitteeSessionStatus::DataEntry,
+            audit_service,
+        )
+        .await?;
+        let state_result = get_apportionment_state(&mut conn, ElectionId::from(5)).await;
+        // Expect error, because apportionment state can only be retrieved when committee session is in Completed status
+        assert!(state_result.is_err());
+
+        // Check status directly
+        let apportionment_state = apportionment_state_repo::get(&mut conn, committee_session_id)
+            .await?
+            .unwrap();
+        assert_eq!(apportionment_state, ApportionmentState::Uninitialised);
+
         Ok(())
     }
 }

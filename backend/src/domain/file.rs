@@ -26,6 +26,8 @@ pub enum FileType {
     CsbResultsPdf,
     /// CSB attachment PDF (Model P 22-2 Bijlage 1)
     CsbAttachmentPdf,
+    /// CSB CSV counts file (OSV4-3)
+    CsbCsvCounts,
 }
 
 impl FileType {
@@ -33,6 +35,7 @@ impl FileType {
         use FileType::*;
 
         match self {
+            CsbCsvCounts => "text/csv",
             GsbResultsEml | CsbResultsEml | CsbTotalCountsEml => "text/xml",
             GsbResultsPdf | GsbOverviewPdf | CsbResultsPdf | CsbAttachmentPdf => "application/pdf",
         }

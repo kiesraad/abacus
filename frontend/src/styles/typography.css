@@ -177,3 +177,9 @@ a {
 .font-number-slashed-0 {
   font-family: var(--font-number);
 }
+
+/* Superscript in table */
+td > span.superscript {
+  vertical-align: super;
+  font-size: x-small;
+}

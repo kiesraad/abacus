@@ -1421,6 +1421,7 @@ export const candidate_nomination: CandidateNomination = {
 };
 
 export const election_summary: ElectionSummary = {
+  number_of_voters: 6000,
   voters_counts: {
     poll_card_count: 5104,
     proxy_certificate_count: 1,
@@ -1569,7 +1570,7 @@ export const election: ElectionWithPoliticalGroups = {
   number_of_seats: 15,
   election_date: "2026-03-18",
   nomination_date: "2026-02-02",
-  number_of_voters: 6000,
+  number_of_voters: 1,
   political_groups: [
     {
       number: 1,

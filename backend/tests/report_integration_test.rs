@@ -10,8 +10,9 @@ use test_log::test;
 
 use crate::{
     shared::{
-        FixtureUser::*, change_status_committee_session, create_cso_result,
-        get_election_committee_session, login, update_committee_session_details,
+        ApportionmentAction, FixtureUser::*, apportionment_state_action,
+        change_status_committee_session, create_cso_result, get_election_committee_session, login,
+        update_committee_session_details,
     },
     utils::serve_api,
 };
@@ -218,6 +219,13 @@ async fn test_csb_election_zip_download_results_works(pool: SqlitePool) {
         "10:45",
     )
     .await;
+    apportionment_state_action(
+        &addr,
+        &cookie,
+        election_id,
+        ApportionmentAction::SkipDeceasedCandidates,
+    )
+    .await;
 
     let url = format!(
         "http://{addr}/api/elections/{election_id}/committee_sessions/{committee_session_id}/download_zip_results_csb"
@@ -254,14 +262,32 @@ async fn test_csb_election_zip_download_results_works(pool: SqlitePool) {
     path = "../fixtures",
     scripts("election_8_csb_with_results", "users")
 )))]
-async fn test_csb_election_zip_download_results_invalid_committee_session_state(pool: SqlitePool) {
+async fn test_csb_election_zip_download_results_invalid_state(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let cookie = login(&addr, CoordinatorCSB).await;
     let election_id = 8;
+    let committee_session_id = 801;
 
     let url = format!(
-        "http://{addr}/api/elections/{election_id}/committee_sessions/801/download_zip_results_csb"
+        "http://{addr}/api/elections/{election_id}/committee_sessions/{committee_session_id}/download_zip_results_csb"
     );
+
+    // Committee session is not completed
+    assert_zip_download_conflict(&cookie, &url).await;
+
+    complete_committee_session(&addr, &cookie, election_id, committee_session_id).await;
+    update_committee_session_details(
+        &addr,
+        &cookie,
+        election_id,
+        committee_session_id,
+        "Juinen",
+        "2026-03-18",
+        "10:45",
+    )
+    .await;
+
+    // Apportionment state is not finalised
     assert_zip_download_conflict(&cookie, &url).await;
 }
 
@@ -284,6 +310,13 @@ async fn test_csb_election_zip_download_attachment_works(pool: SqlitePool) {
         "Juinen",
         "2026-03-18",
         "10:45",
+    )
+    .await;
+    apportionment_state_action(
+        &addr,
+        &cookie,
+        election_id,
+        ApportionmentAction::SkipDeceasedCandidates,
     )
     .await;
 
@@ -311,16 +344,32 @@ async fn test_csb_election_zip_download_attachment_works(pool: SqlitePool) {
     path = "../fixtures",
     scripts("election_8_csb_with_results", "users")
 )))]
-async fn test_csb_election_zip_download_attachment_invalid_committee_session_state(
-    pool: SqlitePool,
-) {
+async fn test_csb_election_zip_download_attachment_invalid_state(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let cookie = login(&addr, CoordinatorCSB).await;
     let election_id = 8;
+    let committee_session_id = 801;
 
     let url = format!(
-        "http://{addr}/api/elections/{election_id}/committee_sessions/801/download_zip_attachment_csb"
+        "http://{addr}/api/elections/{election_id}/committee_sessions/{committee_session_id}/download_zip_attachment_csb"
     );
+
+    // Committee session is not completed
+    assert_zip_download_conflict(&cookie, &url).await;
+
+    complete_committee_session(&addr, &cookie, election_id, committee_session_id).await;
+    update_committee_session_details(
+        &addr,
+        &cookie,
+        election_id,
+        committee_session_id,
+        "Juinen",
+        "2026-03-18",
+        "10:45",
+    )
+    .await;
+
+    // Apportionment state is not finalised
     assert_zip_download_conflict(&cookie, &url).await;
 }
 
@@ -345,6 +394,13 @@ async fn test_csb_election_zip_download_total_counts_works(pool: SqlitePool) {
         "10:45",
     )
     .await;
+    apportionment_state_action(
+        &addr,
+        &cookie,
+        election_id,
+        ApportionmentAction::SkipDeceasedCandidates,
+    )
+    .await;
 
     let url = format!(
         "http://{addr}/api/elections/{election_id}/committee_sessions/{committee_session_id}/download_zip_total_counts_csb"
@@ -353,8 +409,10 @@ async fn test_csb_election_zip_download_total_counts_works(pool: SqlitePool) {
 
     let bytes = download_zip_assert(&cookie, &url, prefix).await;
     let archive = ZipFileReader::new(bytes).await.unwrap();
-    assert_eq!(archive.file().entries().len(), 1);
-    let xml_zip = read_zip_entry(&archive, 0, "Totaaltelling_GR2024_Juinen.zip").await;
+    assert_eq!(archive.file().entries().len(), 2);
+    let csv_count = read_zip_entry(&archive, 0, "osv4-3_telling_gr2024_juinen.csv").await;
+    assert!(csv_count.len() > 1024);
+    let xml_zip = read_zip_entry(&archive, 1, "Totaaltelling_GR2024_Juinen.zip").await;
     let xml_archive = ZipFileReader::new(xml_zip).await.unwrap();
     assert_eq!(xml_archive.file().entries().len(), 1);
     let eml_hash1 = sha2::Sha256::digest(
@@ -363,8 +421,10 @@ async fn test_csb_election_zip_download_total_counts_works(pool: SqlitePool) {
 
     let bytes2 = download_zip_assert(&cookie, &url, prefix).await;
     let archive2 = ZipFileReader::new(bytes2).await.unwrap();
-    assert_eq!(archive2.file().entries().len(), 1);
-    let xml_zip2 = read_zip_entry(&archive2, 0, "Totaaltelling_GR2024_Juinen.zip").await;
+    assert_eq!(archive2.file().entries().len(), 2);
+    let csv_count2 = read_zip_entry(&archive2, 0, "osv4-3_telling_gr2024_juinen.csv").await;
+    assert_eq!(csv_count, csv_count2, "CSV count files should be the same");
+    let xml_zip2 = read_zip_entry(&archive2, 1, "Totaaltelling_GR2024_Juinen.zip").await;
     let xml_archive2 = ZipFileReader::new(xml_zip2).await.unwrap();
     assert_eq!(xml_archive2.file().entries().len(), 1);
     let eml_hash2 = sha2::Sha256::digest(
@@ -378,15 +438,31 @@ async fn test_csb_election_zip_download_total_counts_works(pool: SqlitePool) {
     path = "../fixtures",
     scripts("election_8_csb_with_results", "users")
 )))]
-async fn test_csb_election_zip_download_total_counts_invalid_committee_session_state(
-    pool: SqlitePool,
-) {
+async fn test_csb_election_zip_download_total_counts_invalid_state(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let cookie = login(&addr, CoordinatorCSB).await;
     let election_id = 8;
+    let committee_session_id = 801;
 
     let url = format!(
-        "http://{addr}/api/elections/{election_id}/committee_sessions/801/download_zip_total_counts_csb"
+        "http://{addr}/api/elections/{election_id}/committee_sessions/{committee_session_id}/download_zip_total_counts_csb"
     );
+
+    // Committee session is not completed
+    assert_zip_download_conflict(&cookie, &url).await;
+
+    complete_committee_session(&addr, &cookie, election_id, committee_session_id).await;
+    update_committee_session_details(
+        &addr,
+        &cookie,
+        election_id,
+        committee_session_id,
+        "Juinen",
+        "2026-03-18",
+        "10:45",
+    )
+    .await;
+
+    // Apportionment state is not finalised
     assert_zip_download_conflict(&cookie, &url).await;
 }

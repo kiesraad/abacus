@@ -9,6 +9,8 @@ declare module "react-router" {
     // Replace handle for routes with index=true
     | (Omit<IndexRouteObject, "handle"> & {
         handle: Handle;
+        // Paths should not be combined with index: true
+        path?: never;
       })
     // Require handle when children are not defined
     | (Omit<NonIndexRouteObject, "handle" | "children"> & {
@@ -21,5 +23,5 @@ declare module "react-router" {
         children: RouteObject[];
       });
 
-  function useMatches(): UIMatch<unknown, Handle>[];
+  function useMatches(): UIMatch<unknown, Handle | undefined>[];
 }

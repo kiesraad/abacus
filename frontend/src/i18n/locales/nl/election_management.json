@@ -60,7 +60,7 @@
     },
     "definitive_documents": {
       "download": "Definitieve documenten",
-      "explanation_text": "<li>EML_NL-telbestand 510d met totaaltelling van de gemeente</li>"
+      "explanation_text": "<li>EML_NL-telbestand 510d met totaaltelling van de gemeente</li><li>CSV met totaaltelling</li>"
     },
     "upload_the_zip": "Upload alle ZIP-bestanden naar het overdrachtsplatform."
   },

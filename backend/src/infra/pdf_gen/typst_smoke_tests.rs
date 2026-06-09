@@ -351,6 +351,7 @@ fn random_csb_result(
     string_length: usize,
 ) -> ElectionSummaryCSB {
     ElectionSummaryCSB {
+        number_of_voters: rng.random_range(3000..5000),
         voters_counts: VotersCounts {
             poll_card_count: rng.random_range(0..500),
             proxy_certificate_count: rng.random_range(0..500),
@@ -447,6 +448,7 @@ fn random_election_summary_csb(
 ) -> ElectionSummaryCSB {
     let result = random_csb_result(rng, election, data_sources, string_length);
     ElectionSummaryCSB {
+        number_of_voters: result.number_of_voters,
         voters_counts: result.voters_counts,
         votes_counts: result.votes_counts,
         differences_counts: SummaryDifferencesCounts {
@@ -758,6 +760,8 @@ async fn test_p_22_2() {
         election.number_of_seats,
         &summary_gsb.political_group_votes,
         &[],
+        &[],
+        &[],
     );
     let apportionment_result =
         apportionment::process(&apportionment_input).expect("apportionment failed");
@@ -766,7 +770,7 @@ async fn test_p_22_2() {
         EnrichedSeatAssignment::new(election.number_of_seats, &summary, &seat_assignment).unwrap();
     let candidate_nomination = map_candidate_nomination(
         &apportionment_result.candidate_nomination,
-        election.political_groups.clone(),
+        &election.political_groups,
     );
     let enriched_candidate_nomination =
         EnrichedCandidateNomination::new(&election, &candidate_nomination).unwrap();

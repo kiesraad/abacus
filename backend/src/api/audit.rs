@@ -140,7 +140,6 @@ async fn audit_log_list_users(
 
 #[cfg(test)]
 mod tests {
-    use std::net::Ipv4Addr;
 
     use axum::{extract::State, response::IntoResponse};
     use axum_extra::extract::Query;
@@ -155,10 +154,11 @@ mod tests {
         },
         infra::audit_log::{AuditLogListResponse, AuditLogUser, AuditService},
         repository::user_repo::{self, User},
+        test_support::TEST_IP_V4_ADDR,
     };
 
     fn new_test_audit_service(user: Option<User>) -> AuditService {
-        AuditService::new(user, Some(Ipv4Addr::new(203, 0, 113, 0).into()))
+        AuditService::new(user, Some(TEST_IP_V4_ADDR.into()))
     }
 
     async fn create_log_entries(pool: SqlitePool) {

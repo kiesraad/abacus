@@ -11,7 +11,7 @@ use crate::{
         election::ElectionId,
     },
     infra::audit_log::AuditService,
-    repository::user_repo::User,
+    repository::{election_repo, user_repo::User},
     service::update_apportionment_state,
 };
 
@@ -41,7 +41,10 @@ pub async fn delete_deceased_candidate(
 ) -> Result<Json<ApportionmentState>, APIError> {
     let mut tx = pool.begin_immediate().await?;
 
-    let state = update_apportionment_state(&mut tx, audit_service, user, election_id, |state| {
+    let election = election_repo::get(&mut tx, election_id).await?;
+    user.role().is_authorized(election.committee_category)?;
+
+    let state = update_apportionment_state(&mut tx, audit_service, election_id, |state| {
         state.delete_deceased_candidate(candidate)
     })
     .await?;

@@ -100,7 +100,7 @@ describe("GSBElectionReportSection", () => {
       }),
     ).toBeVisible();
 
-    expect(await screen.findByText("In het Zip bestand zitten de volgende documenten:")).toBeInTheDocument();
+    expect(await screen.findByText("In het ZIP-bestand zitten de volgende documenten:")).toBeInTheDocument();
     expect(
       await screen.findByText("Het proces-verbaal van het gemeentelijk stembureau (P 2a). Dit is een PDF-document."),
     ).toBeInTheDocument();
@@ -145,7 +145,7 @@ describe("GSBElectionReportSection", () => {
       }),
     ).toBeVisible();
 
-    expect(await screen.findByText("In het Zip bestand zitten de volgende documenten:")).toBeInTheDocument();
+    expect(await screen.findByText("In het ZIP-bestand zitten de volgende documenten:")).toBeInTheDocument();
     expect(
       await screen.findByText("Het proces-verbaal van het gemeentelijk stembureau (P 2a). Dit is een PDF-document."),
     ).toBeInTheDocument();

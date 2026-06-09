@@ -64,15 +64,7 @@ export function GSBElectionReportSection({ election, committeeSession, sessionLa
         <h3>{t("election_management.what_now")}?</h3>
         <p>{t(`election_management.GSB.download_definitive_files`)}</p>
         <section className="sm">
-          <p>
-            {t(
-              isFirstCommitteeSession
-                ? "election_management.GSB.first_session.zip_file_explanation"
-                : wasCorrected
-                  ? "election_management.GSB.next_session.with_corrections.zip_file_explanation"
-                  : "election_management.GSB.next_session.without_corrections.zip_file_explanation",
-            )}
-          </p>
+          <p>{t("election_management.zip_file_explanation")}</p>
           <ol>
             {tx(
               isFirstCommitteeSession

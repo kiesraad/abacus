@@ -100,7 +100,14 @@ describe("GSBElectionReportSection", () => {
       }),
     ).toBeVisible();
 
-    expect(await screen.findByText("In het ZIP-bestand zitten drie documenten:")).toBeInTheDocument();
+    expect(await screen.findByText("In het Zip bestand zitten de volgende documenten:")).toBeInTheDocument();
+    expect(
+      await screen.findByText("Het proces-verbaal van het gemeentelijk stembureau (P 2a). Dit is een PDF-document."),
+    ).toBeInTheDocument();
+    expect(
+      await screen.findByText("Het corrigendum van het gemeentelijk stembureau (Na 14-2). Dit is een PDF-document."),
+    ).toBeInTheDocument();
+    expect(await screen.findByText("EML en CSV bestanden met digitale telresultaten.")).toBeInTheDocument();
     expect(await screen.findByRole("link", { name: /Download definitieve documenten tweede zitting/ })).toBeVisible();
   });
 
@@ -138,7 +145,11 @@ describe("GSBElectionReportSection", () => {
       }),
     ).toBeVisible();
 
-    expect(await screen.findByText("In het ZIP-bestand zit één document:")).toBeInTheDocument();
+    expect(await screen.findByText("In het Zip bestand zitten de volgende documenten:")).toBeInTheDocument();
+    expect(
+      await screen.findByText("Het proces-verbaal van het gemeentelijk stembureau (P 2a). Dit is een PDF-document."),
+    ).toBeInTheDocument();
+    expect(await screen.findByText("EML en CSV bestanden met digitale telresultaten.")).toBeInTheDocument();
     expect(await screen.findByRole("link", { name: /Download definitieve documenten tweede zitting/ })).toBeVisible();
   });
 });

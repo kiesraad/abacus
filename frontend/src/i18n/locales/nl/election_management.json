@@ -31,7 +31,7 @@
     "download_definitive_documents": "Download definitieve documenten {sessionLabel}",
     "download_definitive_files": "Download de definitieve bestanden.",
     "first_session": {
-      "documents": "<li><strong>PDF-document met het proces verbaal.</strong> Dit wordt tijdens de zitting van het gemeentelijk stembureau vastgesteld en ondertekend.</li><li><strong>EML-bestand met digitale telresultaten.</strong></li><li><strong>CSV-bestand met telling.</strong></li>"
+      "documents": "<li><strong>PDF-document met het proces-verbaal.</strong> Dit wordt tijdens de zitting van het gemeentelijk stembureau vastgesteld en ondertekend.</li><li><strong>EML-bestand met digitale telresultaten.</strong></li><li><strong>CSV-bestand met telling.</strong></li>"
     },
     "next_session": {
       "with_corrections": {

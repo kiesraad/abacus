@@ -25,9 +25,9 @@ test.describe("CSB election apportionment", () => {
     await expect(includeAllCandidatesPage.header).toBeVisible();
     await expect(includeAllCandidatesPage.dataEntryFinishedAlert).toBeVisible();
     await expect(includeAllCandidatesPage.title).toBeVisible();
-    await expect(includeAllCandidatesPage.yes).toBeVisible();
-    await expect(includeAllCandidatesPage.no).toBeVisible();
-    await includeAllCandidatesPage.no.check();
+    await expect(includeAllCandidatesPage.noDeceased).toBeVisible();
+    await expect(includeAllCandidatesPage.hasDeceased).toBeVisible();
+    await includeAllCandidatesPage.hasDeceased.check();
     await includeAllCandidatesPage.next.click();
 
     const addDeceasedCandidatesPage = new AddDeceasedCandidate(page);

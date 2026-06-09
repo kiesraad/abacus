@@ -5,8 +5,8 @@ export class IncludeAllCandidates {
   readonly dataEntryFinished: Locator;
   readonly dataEntryFinishedAlert: Locator;
   readonly title: Locator;
-  readonly yes: Locator;
-  readonly no: Locator;
+  readonly noDeceased: Locator;
+  readonly hasDeceased: Locator;
   readonly next: Locator;
 
   constructor(protected readonly page: Page) {
@@ -17,10 +17,10 @@ export class IncludeAllCandidates {
     });
     this.dataEntryFinishedAlert = page.getByRole("alert").filter({ has: this.dataEntryFinished });
 
-    this.title = page.getByRole("heading", { level: 2, name: "Kunnen alle kandidaten worden meegenomen?" });
+    this.title = page.getByRole("heading", { level: 2, name: "Zijn er overleden kandidaten?" });
 
-    this.yes = page.getByRole("radio", { name: "Ja. Er zijn geen kandidaten overleden." });
-    this.no = page.getByRole("radio", { name: "Nee. Eén of meerdere kandidaten zijn overleden." });
+    this.noDeceased = page.getByRole("radio", { name: "Er zijn geen overleden kandidaten" });
+    this.hasDeceased = page.getByRole("radio", { name: "Eén of meerdere kandidaten zijn overleden" });
     this.next = page.getByRole("button", { name: "Volgende" });
   }
 }

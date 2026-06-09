@@ -45,7 +45,7 @@ impl From<sqlx::Error> for BackupError {
 }
 
 pub async fn run_backup_scheduler(backup_pool: SqlitePool, backup_config: BackupConfig) {
-    let mut interval = tokio::time::interval(Duration::from_secs(BACKUP_INTERVAL_IN_MINUTES * 60));
+    let mut interval = tokio::time::interval(Duration::from_mins(BACKUP_INTERVAL_IN_MINUTES));
     loop {
         interval.tick().await;
         if let Err(e) = create_local_backup(&backup_pool, &backup_config).await {
@@ -104,14 +104,15 @@ fn remove_oldest_backup(backup_config: &BackupConfig) -> Result<(), BackupError>
 #[cfg(test)]
 mod tests {
     use super::*;
-    use tokio::time::Duration;
-    use tokio::{sync::Mutex, time::sleep};
+    use std::sync::atomic::{AtomicU32, Ordering};
+    use tokio::time::{Duration, sleep};
 
-    static TEST_LOCK: Mutex<()> = Mutex::const_new(());
+    static TEST_ID: AtomicU32 = AtomicU32::new(0);
 
     fn setup_backup_config() -> BackupConfig {
-        let parent_directory = std::env::temp_dir();
-        let backup_directory = parent_directory.join("database_backups");
+        let id = TEST_ID.fetch_add(1, Ordering::Relaxed);
+        let backup_directory =
+            std::env::temp_dir().join(format!("database_backups_{}_{}", std::process::id(), id));
         BackupConfig {
             directory: backup_directory,
         }
@@ -123,7 +124,6 @@ mod tests {
 
     #[tokio::test]
     async fn backup_directory_is_created_succesfully() {
-        let _lock = TEST_LOCK.lock().await;
         let backup_config = setup_backup_config();
         create_backup_directory(&backup_config).unwrap();
         delete_backup_directory(&backup_config);
@@ -131,7 +131,6 @@ mod tests {
 
     #[tokio::test]
     async fn backup_directory_creation_is_idempotent() {
-        let _lock = TEST_LOCK.lock().await;
         let backup_config = setup_backup_config();
         create_backup_directory(&backup_config).unwrap();
         create_backup_directory(&backup_config).unwrap();
@@ -146,7 +145,6 @@ mod tests {
 
     #[sqlx::test]
     async fn local_backup_is_succesfull(pool: SqlitePool) {
-        let _lock = TEST_LOCK.lock().await;
         let backup_config = setup_backup_config();
         create_backup_directory(&backup_config).unwrap();
         create_local_backup(&pool, &backup_config).await.unwrap();
@@ -156,7 +154,6 @@ mod tests {
 
     #[sqlx::test]
     async fn local_backup_count_is_correct(pool: SqlitePool) {
-        let _lock = TEST_LOCK.lock().await;
         let backup_config = setup_backup_config();
         create_backup_directory(&backup_config).unwrap();
         create_local_backup(&pool, &backup_config).await.unwrap();
@@ -166,7 +163,6 @@ mod tests {
 
     #[sqlx::test]
     async fn oldest_backup_is_removed_when_limit_is_exceeded(pool: SqlitePool) {
-        let _lock = TEST_LOCK.lock().await;
         let backup_config = setup_backup_config();
         create_backup_directory(&backup_config).unwrap();
         for _ in 0..6 {
@@ -179,7 +175,6 @@ mod tests {
 
     #[sqlx::test]
     async fn local_backup_deletion_is_succesfull(pool: SqlitePool) {
-        let _lock = TEST_LOCK.lock().await;
         let backup_config = setup_backup_config();
         create_backup_directory(&backup_config).unwrap();
         create_local_backup(&pool, &backup_config).await.unwrap();

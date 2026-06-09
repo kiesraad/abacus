@@ -9,13 +9,13 @@ use crate::{
     CandidateVotes, ListVotes,
     fraction::Fraction,
     structs::{
-        CandidateDrawingLotsRequired, CandidateNominationInput, CandidateNumber,
-        DeceasedCandidates, LARGE_COUNCIL_THRESHOLD, ListNumber,
+        CandidateDrawingLotsError, CandidateDrawingLotsVariant, CandidateNominationInput,
+        CandidateNumber, DeceasedCandidates, LARGE_COUNCIL_THRESHOLD, ListNumber,
     },
 };
 
-/// Defines a CandidateNominationError, for more details, check [CandidateDrawingLotsRequired]
-type CandidateNominationErr<LV> = CandidateDrawingLotsRequired<ListNumber<LV>, CandidateNumber<LV>>;
+/// Defines a CandidateNominationErr, for more details, check [CandidateDrawingLotsError]
+type CandidateNominationErr<LV> = CandidateDrawingLotsError<ListNumber<LV>, CandidateNumber<LV>>;
 
 /// Candidate nomination
 #[allow(clippy::cognitive_complexity)]
@@ -254,10 +254,12 @@ fn preferential_candidate_nomination<'a, LV: ListVotes>(
                     "Drawing of lots is required for candidates: {:?}, only {non_assigned_seats} seat(s) available",
                     candidate_votes_numbers(&same_votes_candidates)
                 );
-                return Err(CandidateDrawingLotsRequired {
-                    list,
-                    options: candidate_votes_numbers(&same_votes_candidates),
-                });
+                return Err(CandidateDrawingLotsError::DrawingLotsRequired(
+                    CandidateDrawingLotsVariant {
+                        list,
+                        options: candidate_votes_numbers(&same_votes_candidates),
+                    },
+                ));
             } else {
                 // Nominate candidate to seat
                 preferential_candidate_nomination
@@ -302,7 +304,7 @@ mod tests {
         ListVotes,
         candidate_nomination::candidate_nomination,
         fraction::Fraction,
-        structs::{CandidateDrawingLotsRequired, DeceasedCandidates},
+        structs::{CandidateDrawingLotsError, CandidateDrawingLotsVariant, DeceasedCandidates},
         test_helpers::{
             ListVotesMock,
             candidate_nomination_fixture_with_given_list_numbers_and_number_of_seats,
@@ -1133,10 +1135,12 @@ mod tests {
 
         assert_eq!(
             result,
-            Err(CandidateDrawingLotsRequired {
-                list: 2,
-                options: vec![1, 2, 3, 4, 5, 6]
-            })
+            Err(CandidateDrawingLotsError::DrawingLotsRequired(
+                CandidateDrawingLotsVariant {
+                    list: 2,
+                    options: vec![1, 2, 3, 4, 5, 6]
+                }
+            ))
         );
     }
 }

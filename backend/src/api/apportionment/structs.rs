@@ -6,8 +6,9 @@ use utoipa::ToSchema;
 
 use crate::domain::{
     apportionment::{
-        ApportionmentWarning, CandidateDrawn, CandidateNomination, ListDrawingLotsVariant,
-        ListDrawn, SeatAssignment,
+        AbsoluteMajorityDrawingLots, ApportionmentWarning, CandidateDrawingLotsVariant,
+        CandidateDrawn, CandidateNomination, HighestAverageResidualSeatDrawingLots,
+        LargestRemainderResidualSeatDrawingLots, ListDrawingLotsVariant, ListDrawn, SeatAssignment,
     },
     apportionment_state::DeceasedCandidate,
     election::{CandidateNumber, PGNumber},
@@ -102,29 +103,45 @@ impl apportionment::CandidateVotes for CandidateVotes {
     }
 }
 
-impl From<ListDrawingLotsVariant> for apportionment::ListDrawingLotsVariant {
+impl From<ListDrawingLotsVariant> for apportionment::ListDrawingLotsVariant<PGNumber> {
     fn from(value: ListDrawingLotsVariant) -> Self {
         match value {
-            ListDrawingLotsVariant::HighestAverageResidualSeat => {
-                apportionment::ListDrawingLotsVariant::HighestAverageResidualSeat
-            }
-            ListDrawingLotsVariant::LargestRemainderResidualSeat => {
-                apportionment::ListDrawingLotsVariant::LargestRemainderResidualSeat
-            }
-            ListDrawingLotsVariant::AbsoluteMajority => {
-                apportionment::ListDrawingLotsVariant::AbsoluteMajority
+            ListDrawingLotsVariant::HighestAverageResidualSeat(
+                HighestAverageResidualSeatDrawingLots {
+                    average,
+                    residual_seat_numbers,
+                    options,
+                },
+            ) => Self::HighestAverageResidualSeat(
+                apportionment::HighestAverageResidualSeatDrawingLots {
+                    average: average.into(),
+                    residual_seat_numbers,
+                    options,
+                },
+            ),
+            ListDrawingLotsVariant::LargestRemainderResidualSeat(
+                LargestRemainderResidualSeatDrawingLots {
+                    remainder,
+                    residual_seat_numbers,
+                    options,
+                },
+            ) => Self::LargestRemainderResidualSeat(
+                apportionment::LargestRemainderResidualSeatDrawingLots {
+                    remainder: remainder.into(),
+                    residual_seat_numbers,
+                    options,
+                },
+            ),
+            ListDrawingLotsVariant::AbsoluteMajority(AbsoluteMajorityDrawingLots { options }) => {
+                Self::AbsoluteMajority(apportionment::AbsoluteMajorityDrawingLots { options })
             }
         }
     }
 }
 
 impl apportionment::ListDrawn<PGNumber> for ListDrawn {
-    fn variant(&self) -> apportionment::ListDrawingLotsVariant {
-        self.variant.into()
-    }
-
-    fn options(&self) -> &[PGNumber] {
-        &self.options
+    fn variant(&self) -> apportionment::ListDrawingLotsVariant<PGNumber> {
+        self.variant.clone().into()
     }
 
     fn drawn(&self) -> &PGNumber {
@@ -132,13 +149,17 @@ impl apportionment::ListDrawn<PGNumber> for ListDrawn {
     }
 }
 
-impl apportionment::CandidateDrawn<PGNumber, CandidateNumber> for CandidateDrawn {
-    fn list(&self) -> &PGNumber {
-        &self.list
+impl From<CandidateDrawingLotsVariant>
+    for apportionment::CandidateDrawingLotsVariant<PGNumber, CandidateNumber>
+{
+    fn from(CandidateDrawingLotsVariant { list, options }: CandidateDrawingLotsVariant) -> Self {
+        Self { list, options }
     }
+}
 
-    fn options(&self) -> &[CandidateNumber] {
-        &self.options
+impl apportionment::CandidateDrawn<PGNumber, CandidateNumber> for CandidateDrawn {
+    fn variant(&self) -> apportionment::CandidateDrawingLotsVariant<PGNumber, CandidateNumber> {
+        self.variant.clone().into()
     }
 
     fn drawn(&self) -> &CandidateNumber {

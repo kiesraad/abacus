@@ -60,9 +60,8 @@ mod tests {
     use super::*;
     use crate::{
         domain::{
-            apportionment_state::{
-                ApportionmentState, CandidateDrawingLotsRequired, DrawingLotsDetails,
-            },
+            apportionment::CandidateDrawingLotsVariant,
+            apportionment_state::{ApportionmentState, DrawingLotsRequired},
             committee_session::CommitteeSessionId,
             committee_session_status::CommitteeSessionStatus,
             election::{CandidateNumber, PGNumber},
@@ -85,17 +84,17 @@ mod tests {
             .await
             .expect("should change committee session status");
 
-        let drawing_lots_details: DrawingLotsDetails = CandidateDrawingLotsRequired {
-            list: PGNumber::from(3),
-            options: CandidateNumber::from_values(vec![1, 2]),
-        }
-        .into();
+        let drawing_lots_required =
+            DrawingLotsRequired::CandidateDrawingLotsRequired(CandidateDrawingLotsVariant {
+                list: PGNumber::from(3),
+                options: CandidateNumber::from_values(vec![1, 2]),
+            });
 
         apportionment_state_repo::upsert(
             &mut conn,
             id,
             &ApportionmentState::DrawingLots {
-                drawing_lots_details: drawing_lots_details.clone(),
+                drawing_lots_required: drawing_lots_required.clone(),
                 deceased_candidates: vec![],
                 lists_drawn: vec![],
                 candidates_drawn: vec![],
@@ -105,8 +104,10 @@ mod tests {
         .expect("should upsert initial state");
 
         let candidate_drawn = CandidateDrawn {
-            list: PGNumber::from(3),
-            options: CandidateNumber::from_values(vec![1, 2]),
+            variant: CandidateDrawingLotsVariant {
+                list: PGNumber::from(3),
+                options: CandidateNumber::from_values(vec![1, 2]),
+            },
             drawn: CandidateNumber::from(2),
         };
 
@@ -123,7 +124,7 @@ mod tests {
         assert_eq!(
             state.0,
             ApportionmentState::DrawingLots {
-                drawing_lots_details,
+                drawing_lots_required,
                 deceased_candidates: vec![],
                 lists_drawn: vec![],
                 candidates_drawn: vec![candidate_drawn],

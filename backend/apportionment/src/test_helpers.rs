@@ -1,6 +1,8 @@
 use std::collections::{HashMap, HashSet};
 
-use super::{ListVotes, fraction::Fraction, structs::CandidateNominationInput};
+use super::{
+    CandidateDrawingLotsVariant, ListVotes, fraction::Fraction, structs::CandidateNominationInput,
+};
 use crate::{
     ApportionmentInput, CandidateVotes, SeatAssignmentResult,
     candidate_nomination::{Candidate, ListCandidateNomination, candidate_votes_numbers},
@@ -95,18 +97,13 @@ impl ListVotesMock {
 }
 
 pub struct ListDrawnMock {
-    variant: ListDrawingLotsVariant,
-    options: Vec<u32>,
+    variant: ListDrawingLotsVariant<u32>,
     drawn: u32,
 }
 
 impl ListDrawn<u32> for ListDrawnMock {
-    fn variant(&self) -> ListDrawingLotsVariant {
-        self.variant
-    }
-
-    fn options(&self) -> &[u32] {
-        &self.options
+    fn variant(&self) -> ListDrawingLotsVariant<u32> {
+        self.variant.clone()
     }
 
     fn drawn(&self) -> &u32 {
@@ -115,18 +112,13 @@ impl ListDrawn<u32> for ListDrawnMock {
 }
 
 pub struct CandidateDrawnMock {
-    list: u32,
-    options: Vec<u32>,
+    variant: CandidateDrawingLotsVariant<u32, u32>,
     drawn: u32,
 }
 
 impl CandidateDrawn<u32, u32> for CandidateDrawnMock {
-    fn list(&self) -> &u32 {
-        &self.list
-    }
-
-    fn options(&self) -> &[u32] {
-        &self.options
+    fn variant(&self) -> CandidateDrawingLotsVariant<u32, u32> {
+        self.variant.clone()
     }
 
     fn drawn(&self) -> &u32 {

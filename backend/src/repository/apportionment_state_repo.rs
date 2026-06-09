@@ -54,8 +54,12 @@ mod tests {
 
     use super::*;
     use crate::domain::{
-        apportionment::{CandidateDrawn, ListDrawingLotsVariant, ListDrawn},
-        apportionment_state::{DeceasedCandidate, DrawingLotsDetails, ListDrawingLotsRequired},
+        apportionment::{
+            AbsoluteMajorityDrawingLots, CandidateDrawingLotsVariant, CandidateDrawn,
+            DisplayFraction, HighestAverageResidualSeatDrawingLots, ListDrawingLotsVariant,
+            ListDrawn,
+        },
+        apportionment_state::{DeceasedCandidate, DrawingLotsRequired},
         election::{CandidateNumber, PGNumber},
     };
 
@@ -76,16 +80,26 @@ mod tests {
                 deceased_candidates: vec![DeceasedCandidate::from(4, 4)],
             },
             ApportionmentState::DrawingLots {
-                drawing_lots_details: DrawingLotsDetails::ListDrawingLotsRequired(
-                    ListDrawingLotsRequired {
-                        variant: ListDrawingLotsVariant::HighestAverageResidualSeat,
-                        options: PGNumber::from_values(vec![1, 2, 3]),
-                    },
+                drawing_lots_required: DrawingLotsRequired::ListDrawingLotsRequired(
+                    ListDrawingLotsVariant::HighestAverageResidualSeat(
+                        HighestAverageResidualSeatDrawingLots {
+                            average: DisplayFraction {
+                                integer: 0,
+                                numerator: 0,
+                                denominator: 0,
+                            },
+                            residual_seat_numbers: vec![],
+                            options: PGNumber::from_values(vec![1, 2, 3]),
+                        },
+                    ),
                 ),
                 deceased_candidates: vec![DeceasedCandidate::from(4, 4)],
                 lists_drawn: vec![ListDrawn {
-                    variant: ListDrawingLotsVariant::AbsoluteMajority,
-                    options: PGNumber::from_values(vec![2, 3, 4]),
+                    variant: ListDrawingLotsVariant::AbsoluteMajority(
+                        AbsoluteMajorityDrawingLots {
+                            options: PGNumber::from_values(vec![2, 3, 4]),
+                        },
+                    ),
                     drawn: PGNumber::from(2),
                 }],
                 candidates_drawn: vec![],
@@ -94,8 +108,10 @@ mod tests {
                 deceased_candidates: vec![DeceasedCandidate::from(4, 4)],
                 lists_drawn: vec![],
                 candidates_drawn: vec![CandidateDrawn {
-                    list: PGNumber::from(1),
-                    options: CandidateNumber::from_values(vec![2, 3, 4]),
+                    variant: CandidateDrawingLotsVariant {
+                        list: PGNumber::from(1),
+                        options: CandidateNumber::from_values(vec![2, 3, 4]),
+                    },
                     drawn: CandidateNumber::from(1),
                 }],
             },

@@ -149,7 +149,7 @@ describe("GSBElectionReportSection", () => {
     expect(
       await screen.findByText("Het proces-verbaal van het gemeentelijk stembureau (P 2a). Dit is een PDF-document."),
     ).toBeInTheDocument();
-    expect(await screen.findByText("EML en CSV bestanden met digitale telresultaten.")).toBeInTheDocument();
+    expect(await screen.findByText("EML- en CSV-bestanden met digitale telresultaten.")).toBeInTheDocument();
     expect(await screen.findByRole("link", { name: /Download definitieve documenten tweede zitting/ })).toBeVisible();
   });
 });

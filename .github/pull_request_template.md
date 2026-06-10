@@ -1,7 +1,21 @@
+## What & why
+
+<!-- What does this change do, and why is it needed? Link the issue(s). -->
+
+## How to test
+
+<!-- Setup needed, specific steps to trigger edge cases, the expected result. -->
+
+## Reviewer notes
+
+<!-- Suggested review order, non-obvious parts, anything that needs context. -->
+
 <!--
-- What's the scope of the changes?
-- What did you test? Which edge cases did you explicitly take into account?
-- Are there things you want reviewers to definitely take a look at?
-- Are there specific people you want feedback from?
-- Do you have tips on how to test? (For example: data setup, triggering specific errors, etc.)
+## Checklist
+
+- [ ] Single, focused change: unrelated changes split into separate PRs
+- [ ] I've self-reviewed the diff
+- [ ] Formatter and linter pass locally
+- [ ] Tests added/updated and passing
+- [ ] Description explains how to test
 -->

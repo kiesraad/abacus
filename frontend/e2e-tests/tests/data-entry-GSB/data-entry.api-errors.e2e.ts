@@ -8,17 +8,18 @@ import { ErrorModalPgObj } from "e2e-tests/page-objects/ErrorModalPgObj";
 import { test } from "../../fixtures";
 
 test.use({
-  storageState: "e2e-tests/state/typist1.json",
+  storageState: "e2e-tests/state/typist1-GSB.json",
 });
 
 test.describe("data entry - api error responses", () => {
   test("UI Warning: Trying to load a data entry that was already claimed", async ({
-    typistTwo,
-    pollingStationFirstEntryClaimed,
+    typistTwoGSB,
+    dataEntryGSBFirstEntryClaimed,
   }) => {
-    const { page } = typistTwo;
-    const pollingStation = pollingStationFirstEntryClaimed;
-    await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1`);
+    const { page } = typistTwoGSB;
+    await page.goto(
+      `/elections/${dataEntryGSBFirstEntryClaimed.election_id}/data-entry/${dataEntryGSBFirstEntryClaimed.id}/1`,
+    );
 
     const dataEntryHomePage = new DataEntryHomePage(page);
     await expect(dataEntryHomePage.fieldset).toBeVisible();
@@ -31,10 +32,10 @@ test.describe("data entry - api error responses", () => {
 
   test("UI Warning: Trying to load the same finalised data entry again", async ({
     page,
-    pollingStationFirstEntryDone,
+    dataEntryGSBFirstEntryDone,
   }) => {
     await page.goto(
-      `/elections/${pollingStationFirstEntryDone.election_id}/data-entry/${pollingStationFirstEntryDone.id}/1`,
+      `/elections/${dataEntryGSBFirstEntryDone.election_id}/data-entry/${dataEntryGSBFirstEntryDone.id}/1`,
     );
 
     const dataEntryHomePage = new DataEntryHomePage(page);
@@ -46,9 +47,9 @@ test.describe("data entry - api error responses", () => {
 
   test("UI Warning: Trying to load a data entry for a polling station with status definitive", async ({
     page,
-    pollingStationDefinitive,
+    dataEntryGSBDefinitive,
   }) => {
-    await page.goto(`/elections/${pollingStationDefinitive.election_id}/data-entry/${pollingStationDefinitive.id}/1`);
+    await page.goto(`/elections/${dataEntryGSBDefinitive.election_id}/data-entry/${dataEntryGSBDefinitive.id}/1`);
 
     const dataEntryHomePage = new DataEntryHomePage(page);
     await expect(dataEntryHomePage.fieldset).toBeVisible();
@@ -59,11 +60,11 @@ test.describe("data entry - api error responses", () => {
 
   test("UI Warning: Trying to load a second data entry when the first is in progress", async ({
     page,
-    pollingStationFirstEntryClaimed,
+    dataEntryGSBFirstEntryClaimed,
   }) => {
-    const pollingStation = pollingStationFirstEntryClaimed;
-
-    await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/2`);
+    await page.goto(
+      `/elections/${dataEntryGSBFirstEntryClaimed.election_id}/data-entry/${dataEntryGSBFirstEntryClaimed.id}/2`,
+    );
 
     const dataEntryHomePage = new DataEntryHomePage(page);
     await expect(dataEntryHomePage.fieldset).toBeVisible();
@@ -74,20 +75,20 @@ test.describe("data entry - api error responses", () => {
 
   test("UI Warning: Second data entry user must be different from first entry", async ({
     page,
-    pollingStationFirstEntryDone,
+    dataEntryGSBFirstEntryDone,
   }) => {
-    await page.goto(`/elections/${pollingStationFirstEntryDone.election_id}/data-entry`);
+    await page.goto(`/elections/${dataEntryGSBFirstEntryDone.election_id}/data-entry`);
     const dataEntryHomePage = new DataEntryHomePage(page);
 
-    await dataEntryHomePage.number.fill(pollingStationFirstEntryDone.number.toString());
+    await dataEntryHomePage.number.fill(dataEntryGSBFirstEntryDone.number);
 
     await expect(dataEntryHomePage.feedback).toContainText(
-      `Je mag stembureau ${pollingStationFirstEntryDone.number} niet nog een keer invoeren`,
+      `Je mag stembureau ${dataEntryGSBFirstEntryDone.number} niet nog een keer invoeren`,
     );
   });
 
-  test("4xx non-fatal response results in error shown", async ({ page, pollingStation }) => {
-    await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1`);
+  test("4xx non-fatal response results in error shown", async ({ page, dataEntryGSB }) => {
+    await page.goto(`/elections/${dataEntryGSB.election_id}/data-entry/${dataEntryGSB.id}/1`);
 
     const extraInvestigationPage = new ExtraInvestigationPage(page);
     await expect(extraInvestigationPage.fieldset).toBeVisible();
@@ -114,8 +115,8 @@ test.describe("data entry - api error responses", () => {
     await expect(extraInvestigationPage.fieldset).toBeVisible();
   });
 
-  test("5xx fatal response results in error shown", async ({ page, pollingStation }) => {
-    await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1`);
+  test("5xx fatal response results in error shown", async ({ page, dataEntryGSB }) => {
+    await page.goto(`/elections/${dataEntryGSB.election_id}/data-entry/${dataEntryGSB.id}/1`);
 
     await page.route(`*/**/api/data_entries/*/1`, async (route) => {
       await route.fulfill({

@@ -1,8 +1,8 @@
 import type * as React from "react";
 
 import { ApiError } from "@/api/ApiResult";
-
-import { useApportionmentStateRequest } from "../../../hooks/apportionment/useApportionmentStateRequest";
+import { useApportionmentStateRequest } from "@/hooks/apportionment/useApportionmentStateRequest";
+import type { ApportionmentState } from "@/types/generated/openapi";
 import { ApportionmentProviderContext } from "../hooks/ApportionmentProviderContext";
 import { useApportionmentRequest } from "../hooks/useApportionmentRequest";
 
@@ -13,9 +13,14 @@ export interface ElectionApportionmentProviderProps {
 
 export function ApportionmentProvider({ children, electionId }: ElectionApportionmentProviderProps) {
   const { error: apportionmentError, data } = useApportionmentRequest(electionId);
-  const { error: stateError, data: state } = useApportionmentStateRequest(electionId);
-
-  const error = apportionmentError || stateError;
+  const { requestState, refetch } = useApportionmentStateRequest(electionId);
+  let error = apportionmentError;
+  let state: ApportionmentState | undefined;
+  if (requestState.status === "success") {
+    state = requestState.data;
+  } else if (requestState.status === "api-error") {
+    error = requestState.error;
+  }
   if (error && !(error instanceof ApiError)) {
     throw error;
   }
@@ -26,8 +31,11 @@ export function ApportionmentProvider({ children, electionId }: ElectionApportio
         seatAssignment: data?.seat_assignment,
         candidateNomination: data?.candidate_nomination,
         electionSummary: data?.election_summary,
+        warnings: data?.warnings ?? [],
         state,
         error,
+        isLoading: requestState.status === "loading",
+        refetchState: refetch,
       }}
     >
       {children}

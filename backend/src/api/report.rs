@@ -1,18 +1,24 @@
 use axum::{
     extract::{Path, State},
+    http::StatusCode,
     response::IntoResponse,
 };
 use chrono::{DateTime, Datelike, Local};
 use pdf_gen::zip::{ZipResponse, ZipResponseError, slugify_filename, zip_single_file};
 use sqlx::SqlitePool;
+use tracing::error;
+use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
-    APIError, ErrorResponse,
-    api::report::files::{get_files_csb_election, get_files_gsb_election},
+    APIError, AppState, ErrorResponse,
+    api::middleware::authentication::RouteAuthorization,
     domain::{
         committee_session::CommitteeSessionId,
         election::{ElectionId, ElectionWithPoliticalGroups},
+        report::files::{get_files_csb_election, get_files_gsb_election},
+        role::Role,
     },
+    error::{ApiErrorResponse, ErrorReference},
     infra::audit_log::AuditService,
     repository::{
         committee_session_repo::{self},
@@ -20,6 +26,46 @@ use crate::{
         user_repo::User,
     },
 };
+
+#[derive(Debug, PartialEq)]
+pub enum ReportApiError {
+    ApportionmentStateNotFinalised,
+}
+
+impl ApiErrorResponse for ReportApiError {
+    fn log(&self) {
+        error!("Report error: {:?}", self);
+    }
+
+    fn to_response_parts(&self) -> (StatusCode, ErrorResponse) {
+        match self {
+            ReportApiError::ApportionmentStateNotFinalised => (
+                StatusCode::CONFLICT,
+                ErrorResponse::new(
+                    "Apportionment state not finalised",
+                    ErrorReference::InvalidApportionmentState,
+                    false,
+                ),
+            ),
+        }
+    }
+}
+
+impl From<ReportApiError> for APIError {
+    fn from(err: ReportApiError) -> Self {
+        APIError::Delegated(Box::new(err))
+    }
+}
+
+pub fn router() -> OpenApiRouter<AppState> {
+    use Role::*;
+
+    OpenApiRouter::default()
+        .routes(routes!(election_download_zip_results_gsb).authorize(&[CoordinatorGSB]))
+        .routes(routes!(election_download_zip_results_csb).authorize(&[CoordinatorCSB]))
+        .routes(routes!(election_download_zip_attachment_csb).authorize(&[CoordinatorCSB]))
+        .routes(routes!(election_download_zip_total_counts_csb).authorize(&[CoordinatorCSB]))
+}
 
 pub fn download_zip_filename(
     base: &str,
@@ -108,6 +154,10 @@ pub async fn election_download_zip_results_gsb(
             zip_writer.add_file(&xml_zip_filename, &xml_zip).await?;
         }
 
+        if let Some(csv_file) = files.results_csv {
+            zip_writer.add_file(&csv_file.name, &csv_file.data).await?;
+        }
+
         if let Some(overview_file) = files.overview_pdf {
             zip_writer
                 .add_file(&overview_file.name, &overview_file.data)
@@ -157,8 +207,6 @@ pub async fn election_download_zip_results_csb(
     let committee_category =
         committee_session_repo::get_committee_category(&mut conn, committee_session_id).await?;
     user.role().is_authorized(committee_category)?;
-
-    // TODO: #3160 check if apportionment state is finalised
 
     let election = election_repo::get(&mut conn, election_id).await?;
     let committee_session = committee_session_repo::get(&mut conn, committee_session_id).await?;
@@ -226,8 +274,6 @@ pub async fn election_download_zip_attachment_csb(
         committee_session_repo::get_committee_category(&mut conn, committee_session_id).await?;
     user.role().is_authorized(committee_category)?;
 
-    // TODO: #3160 check if apportionment state is finalised
-
     let election = election_repo::get(&mut conn, election_id).await?;
     let committee_session = committee_session_repo::get(&mut conn, committee_session_id).await?;
     let files = get_files_csb_election(&pool, audit_service, committee_session.id).await?;
@@ -289,8 +335,6 @@ pub async fn election_download_zip_total_counts_csb(
         committee_session_repo::get_committee_category(&mut conn, committee_session_id).await?;
     user.role().is_authorized(committee_category)?;
 
-    // TODO: #3160 check if apportionment state is finalised
-
     let election = election_repo::get(&mut conn, election_id).await?;
     let committee_session = committee_session_repo::get(&mut conn, committee_session_id).await?;
     let files = get_files_csb_election(&pool, audit_service, committee_session.id).await?;
@@ -303,6 +347,12 @@ pub async fn election_download_zip_total_counts_csb(
     let (zip_response, mut zip_writer) = ZipResponse::new(&download_zip_filename);
 
     tokio::spawn(async move {
+        if let Some(csv_counts) = files.csv_counts {
+            zip_writer
+                .add_file(&csv_counts.name, &csv_counts.data)
+                .await?;
+        }
+
         if let Some(total_counts_eml_file) = files.total_counts_eml {
             let xml_zip_filename = with_zip_extension(&total_counts_eml_file.name);
             let xml_zip =
@@ -394,31 +444,25 @@ mod tests {
         results
     }
 
-    #[test(sqlx::test(fixtures(path = "../../../fixtures", scripts("election_5_with_results"))))]
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
     async fn test_gsb_election_committee_category_authorization_err(pool: SqlitePool) {
         let results = call_handlers_gsb(pool, Role::CoordinatorCSB).await;
         assert_committee_category_authorization_err(results).await;
     }
 
-    #[test(sqlx::test(fixtures(path = "../../../fixtures", scripts("election_5_with_results"))))]
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
     async fn test_gsb_election_committee_category_authorization_ok(pool: SqlitePool) {
         let results = call_handlers_gsb(pool, Role::CoordinatorGSB).await;
         assert_committee_category_authorization_ok(results);
     }
 
-    #[test(sqlx::test(fixtures(
-        path = "../../../fixtures",
-        scripts("election_8_csb_with_results")
-    )))]
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_8_csb_with_results"))))]
     async fn test_csb_election_committee_category_authorization_err(pool: SqlitePool) {
         let results = call_handlers_csb(pool, Role::CoordinatorGSB).await;
         assert_committee_category_authorization_err(results).await;
     }
 
-    #[test(sqlx::test(fixtures(
-        path = "../../../fixtures",
-        scripts("election_8_csb_with_results")
-    )))]
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_8_csb_with_results"))))]
     async fn test_csb_election_committee_category_authorization_ok(pool: SqlitePool) {
         let results = call_handlers_csb(pool, Role::CoordinatorCSB).await;
         assert_committee_category_authorization_ok(results);

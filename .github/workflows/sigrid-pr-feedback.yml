@@ -17,15 +17,16 @@ jobs:
       pull-requests: write
     steps:
       - name: Check out repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6.0.2
         with:
           fetch-depth: 0
       - name: Sigrid CI
-        uses: Software-Improvement-Group/sigridci@dd8eb23fcc26d16c5e7a08c4ddbe33eccc91dddf # main
+        uses: Software-Improvement-Group/sigridci@cd626265e851be84ac41ee64bbeb2c986d37b493 # main
         with:
           customer: kiesraad
           system: abacus
           convert: rust
+          capability: maintainability,osh,security
         env:
           SIGRID_CI_TOKEN: "${{ secrets.SIGRID_CI_TOKEN }}"
       - name: "Sigrid PR feedback"
@@ -33,4 +34,4 @@ jobs:
         if: always()
         with:
           message-id: sigrid
-          message-path: sigrid-ci-output/feedback.md
+          message-path: sigrid-ci-output/*feedback.md

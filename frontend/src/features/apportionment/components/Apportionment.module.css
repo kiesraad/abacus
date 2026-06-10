@@ -12,7 +12,7 @@
 }
 
 .tableTitle {
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
 }
 
 .tableInformation {
@@ -93,6 +93,9 @@ table.electionSummaryTable {
     th {
       color: var(--base-black);
     }
+    td:first-of-type {
+      width: fit-content;
+    }
     /* Description or extra information */
     td:last-of-type {
       color: var(--color-help-text);
@@ -140,4 +143,21 @@ table.highestAveragesTable {
       right: 0;
     }
   }
+}
+
+/* Styling for the deceased candidates alert */
+.deceasedCandidatesAlert {
+  div:global(.small) {
+    align-items: flex-start;
+
+    section {
+      max-width: 100%;
+    }
+  }
+}
+
+/* Styling for the apportionment finalised alert buttons */
+.alertButtons {
+  display: flex;
+  gap: 1rem;
 }

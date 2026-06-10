@@ -1,4 +1,7 @@
-use std::fmt;
+use std::{
+    collections::{HashMap, HashSet},
+    fmt,
+};
 
 use apportionment::CandidateVotes;
 use libfuzzer_sys::arbitrary::{Arbitrary, Result, Unstructured};
@@ -62,10 +65,55 @@ impl apportionment::ListVotes for SimpleListVotes {
     }
 }
 
+/// Used when drawing lots for lists is needed
+pub struct SimpleListDrawn {
+    variant: apportionment::ListDrawingLotsVariant,
+    options: Vec<u32>,
+    drawn: u32,
+}
+
+impl apportionment::ListDrawn<u32> for SimpleListDrawn {
+    fn variant(&self) -> apportionment::ListDrawingLotsVariant {
+        self.variant
+    }
+
+    fn options(&self) -> &[u32] {
+        &self.options
+    }
+
+    fn drawn(&self) -> &u32 {
+        &self.drawn
+    }
+}
+
+/// Used when drawing lots for candidates is needed
+pub struct SimpleCandidateDrawn {
+    list: u32,
+    options: Vec<u32>,
+    drawn: u32,
+}
+
+impl apportionment::CandidateDrawn<u32, u32> for SimpleCandidateDrawn {
+    fn list(&self) -> &u32 {
+        &self.list
+    }
+
+    fn options(&self) -> &[u32] {
+        &self.options
+    }
+
+    fn drawn(&self) -> &u32 {
+        &self.drawn
+    }
+}
+
 /// Fuzzed apportionment input that generates random election data
 pub struct FuzzedApportionmentInput {
     pub seats: u32,
     pub list_votes: Vec<SimpleListVotes>,
+    pub deceased_candidates: HashMap<u32, HashSet<u32>>,
+    pub lists_drawn: Vec<SimpleListDrawn>,
+    pub candidates_drawn: Vec<SimpleCandidateDrawn>,
 }
 
 impl<'a> Arbitrary<'a> for FuzzedApportionmentInput {
@@ -98,12 +146,20 @@ impl<'a> Arbitrary<'a> for FuzzedApportionmentInput {
             list_votes.push(SimpleListVotes::new((list_idx + 1) as u32, candidate_votes));
         }
 
-        Ok(FuzzedApportionmentInput { seats, list_votes })
+        Ok(FuzzedApportionmentInput {
+            seats,
+            list_votes,
+            deceased_candidates: HashMap::new(),
+            lists_drawn: Vec::new(),
+            candidates_drawn: Vec::new(),
+        })
     }
 }
 
 impl apportionment::ApportionmentInput for FuzzedApportionmentInput {
     type List = SimpleListVotes;
+    type ListDrawn = SimpleListDrawn;
+    type CandidateDrawn = SimpleCandidateDrawn;
 
     fn number_of_seats(&self) -> u32 {
         self.seats
@@ -111,6 +167,18 @@ impl apportionment::ApportionmentInput for FuzzedApportionmentInput {
 
     fn list_votes(&self) -> &[Self::List] {
         &self.list_votes
+    }
+
+    fn deceased_candidates(&self) -> &HashMap<u32, HashSet<u32>> {
+        &self.deceased_candidates
+    }
+
+    fn lists_drawn(&self) -> impl Iterator<Item = &Self::ListDrawn> {
+        self.lists_drawn.iter()
+    }
+
+    fn candidates_drawn(&self) -> impl Iterator<Item = &Self::CandidateDrawn> {
+        self.candidates_drawn.iter()
     }
 }
 

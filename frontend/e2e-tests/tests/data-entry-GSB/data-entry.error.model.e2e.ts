@@ -203,14 +203,14 @@ const votesEmpty: VotesCounts = {
 };
 
 test.use({
-  storageState: "e2e-tests/state/typist1.json",
+  storageState: "e2e-tests/state/typist1-GSB.json",
 });
 
 test.describe("Data entry model test - errors", () => {
   createTestModel(machine)
     .getSimplePaths()
     .forEach((path) => {
-      test(path.description, async ({ page, pollingStation, election }) => {
+      test(path.description, async ({ page, dataEntryGSB, electionGSB }) => {
         const dataEntryHomePage = new DataEntryHomePage(page);
         const extraInvestigationPage = new ExtraInvestigationPage(page);
         const countingDifferencesPage = new CountingDifferencesPollingStationPage(page);
@@ -219,8 +219,8 @@ test.describe("Data entry model test - errors", () => {
         const abortModal = new AbortInputModal(page);
         const navBar = new TypistNavBar(page);
 
-        await page.goto(`/elections/${pollingStation.election_id}/data-entry`);
-        await dataEntryHomePage.enterNumberAndClickStart(pollingStation);
+        await page.goto(`/elections/${dataEntryGSB.election_id}/data-entry`);
+        await dataEntryHomePage.enterNumberAndClickStart(dataEntryGSB);
         await extraInvestigationPage.fillAndClickNext(noExtraInvestigation);
         await countingDifferencesPage.fillAndClickNext(noDifferences);
 
@@ -228,13 +228,13 @@ test.describe("Data entry model test - errors", () => {
           dataEntryHomePageErrorSaved: async () => {
             await expect(dataEntryHomePage.fieldset).toBeVisible();
             await expect(dataEntryHomePage.allDataEntriesInProgress).toHaveText([
-              `${pollingStation.number} - ${pollingStation.name}`,
+              `${dataEntryGSB.number} - ${dataEntryGSB.name}`,
             ]);
           },
           dataEntryHomePageChangedToErrorSaved: async () => {
             await expect(dataEntryHomePage.fieldset).toBeVisible();
             await expect(dataEntryHomePage.allDataEntriesInProgress).toHaveText([
-              `${pollingStation.number} - ${pollingStation.name}`,
+              `${dataEntryGSB.number} - ${dataEntryGSB.name}`,
             ]);
           },
           dataEntryHomePageDiscarded: async () => {
@@ -244,7 +244,7 @@ test.describe("Data entry model test - errors", () => {
         };
         const dataEntryHomePageEvents = {
           RESUME_DATA_ENTRY: async () => {
-            await dataEntryHomePage.clickDataEntryInProgress(pollingStation);
+            await dataEntryHomePage.clickDataEntryInProgress(dataEntryGSB);
           },
         };
 
@@ -380,7 +380,7 @@ test.describe("Data entry model test - errors", () => {
             await votersAndVotesPage.abortInput.click();
           },
           NAV_TO_HOME_PAGE: async () => {
-            await navBar.clickElection(election.election.location, election.election.name);
+            await navBar.clickElection(electionGSB.election.location, electionGSB.election.name);
           },
           GO_TO_PREVIOUS_PAGE: async () => {
             await votersAndVotesPage.progressList.countingDifferencesPollingStation.click();

@@ -53,7 +53,11 @@ mod tests {
     use test_log::test;
 
     use super::*;
-    use crate::domain::apportionment_state::DeceasedCandidate;
+    use crate::domain::{
+        apportionment::{CandidateDrawn, ListDrawingLotsVariant, ListDrawn},
+        apportionment_state::{DeceasedCandidate, DrawingLotsDetails, ListDrawingLotsRequired},
+        election::{CandidateNumber, PGNumber},
+    };
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_1"))))]
     async fn test_upsert_get(pool: SqlitePool) {
@@ -71,8 +75,29 @@ mod tests {
             ApportionmentState::RegisteringDeceasedCandidates {
                 deceased_candidates: vec![DeceasedCandidate::from(4, 4)],
             },
+            ApportionmentState::DrawingLots {
+                drawing_lots_details: DrawingLotsDetails::ListDrawingLotsRequired(
+                    ListDrawingLotsRequired {
+                        variant: ListDrawingLotsVariant::HighestAverageResidualSeat,
+                        options: PGNumber::from_values(vec![1, 2, 3]),
+                    },
+                ),
+                deceased_candidates: vec![DeceasedCandidate::from(4, 4)],
+                lists_drawn: vec![ListDrawn {
+                    variant: ListDrawingLotsVariant::AbsoluteMajority,
+                    options: PGNumber::from_values(vec![2, 3, 4]),
+                    drawn: PGNumber::from(2),
+                }],
+                candidates_drawn: vec![],
+            },
             ApportionmentState::Finalised {
                 deceased_candidates: vec![DeceasedCandidate::from(4, 4)],
+                lists_drawn: vec![],
+                candidates_drawn: vec![CandidateDrawn {
+                    list: PGNumber::from(1),
+                    options: CandidateNumber::from_values(vec![2, 3, 4]),
+                    drawn: CandidateNumber::from(1),
+                }],
             },
         ];
 

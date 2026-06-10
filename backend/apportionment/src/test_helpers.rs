@@ -1,17 +1,24 @@
+use std::collections::{HashMap, HashSet};
+
+use super::{ListVotes, fraction::Fraction, structs::CandidateNominationInput};
 use crate::{
     ApportionmentInput, CandidateVotes, SeatAssignmentResult,
     candidate_nomination::{Candidate, ListCandidateNomination, candidate_votes_numbers},
+    structs::{CandidateDrawn, ListDrawingLotsVariant, ListDrawn},
 };
-
-use super::{ListVotes, fraction::Fraction, structs::CandidateNominationInput};
 
 pub struct ApportionmentInputMock {
     pub number_of_seats: u32,
     pub list_votes: Vec<ListVotesMock>,
+    pub deceased_candidates: HashMap<u32, HashSet<u32>>,
+    pub lists_drawn: Vec<ListDrawnMock>,
+    pub candidates_drawn: Vec<CandidateDrawnMock>,
 }
 
 impl ApportionmentInput for ApportionmentInputMock {
     type List = ListVotesMock;
+    type ListDrawn = ListDrawnMock;
+    type CandidateDrawn = CandidateDrawnMock;
 
     fn number_of_seats(&self) -> u32 {
         self.number_of_seats
@@ -19,6 +26,18 @@ impl ApportionmentInput for ApportionmentInputMock {
 
     fn list_votes(&self) -> &[Self::List] {
         &self.list_votes
+    }
+
+    fn deceased_candidates(&self) -> &HashMap<u32, HashSet<u32>> {
+        &self.deceased_candidates
+    }
+
+    fn lists_drawn(&self) -> impl Iterator<Item = &Self::ListDrawn> {
+        self.lists_drawn.iter()
+    }
+
+    fn candidates_drawn(&self) -> impl Iterator<Item = &Self::CandidateDrawn> {
+        self.candidates_drawn.iter()
     }
 }
 
@@ -72,6 +91,46 @@ impl ListVotesMock {
                 })
                 .collect(),
         }
+    }
+}
+
+pub struct ListDrawnMock {
+    variant: ListDrawingLotsVariant,
+    options: Vec<u32>,
+    drawn: u32,
+}
+
+impl ListDrawn<u32> for ListDrawnMock {
+    fn variant(&self) -> ListDrawingLotsVariant {
+        self.variant
+    }
+
+    fn options(&self) -> &[u32] {
+        &self.options
+    }
+
+    fn drawn(&self) -> &u32 {
+        &self.drawn
+    }
+}
+
+pub struct CandidateDrawnMock {
+    list: u32,
+    options: Vec<u32>,
+    drawn: u32,
+}
+
+impl CandidateDrawn<u32, u32> for CandidateDrawnMock {
+    fn list(&self) -> &u32 {
+        &self.list
+    }
+
+    fn options(&self) -> &[u32] {
+        &self.options
+    }
+
+    fn drawn(&self) -> &u32 {
+        &self.drawn
     }
 }
 
@@ -164,6 +223,7 @@ pub fn candidate_nomination_fixture_with_given_number_of_seats(
     CandidateNominationInput {
         number_of_seats: seat_assignment_input.number_of_seats,
         list_votes: &seat_assignment_input.list_votes,
+        deceased_candidates: &seat_assignment_input.deceased_candidates,
         quota,
         total_seats_per_list: total_seats_per_list
             .into_iter()
@@ -183,6 +243,7 @@ pub fn candidate_nomination_fixture_with_given_list_numbers_and_number_of_seats(
     CandidateNominationInput {
         number_of_seats: seat_assignment_input.number_of_seats,
         list_votes: &seat_assignment_input.list_votes,
+        deceased_candidates: &seat_assignment_input.deceased_candidates,
         quota,
         total_seats_per_list: total_seats_per_list_number,
     }
@@ -209,6 +270,9 @@ pub fn seat_assignment_fixture_with_default_50_candidates(
     ApportionmentInputMock {
         number_of_seats,
         list_votes,
+        deceased_candidates: HashMap::new(),
+        lists_drawn: Vec::new(),
+        candidates_drawn: Vec::new(),
     }
 }
 
@@ -228,6 +292,9 @@ pub fn seat_assignment_fixture_with_given_list_numbers_and_candidate_votes(
     ApportionmentInputMock {
         number_of_seats,
         list_votes,
+        deceased_candidates: HashMap::new(),
+        lists_drawn: Vec::new(),
+        candidates_drawn: Vec::new(),
     }
 }
 
@@ -249,6 +316,9 @@ pub fn seat_assignment_fixture_with_given_candidate_votes(
     ApportionmentInputMock {
         number_of_seats,
         list_votes,
+        deceased_candidates: HashMap::new(),
+        lists_drawn: Vec::new(),
+        candidates_drawn: Vec::new(),
     }
 }
 
@@ -276,5 +346,8 @@ pub fn seat_assignment_fixture_with_given_list_numbers_candidate_numbers_and_vot
     ApportionmentInputMock {
         number_of_seats,
         list_votes,
+        deceased_candidates: HashMap::new(),
+        lists_drawn: Vec::new(),
+        candidates_drawn: Vec::new(),
     }
 }

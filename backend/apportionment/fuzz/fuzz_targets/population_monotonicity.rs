@@ -1,5 +1,7 @@
 #![no_main]
 
+use std::collections::HashMap;
+
 use apportionment::{CandidateVotes, process};
 use apportionment_fuzz::{
     FuzzedApportionmentInput, SimpleCandidateVotes, SimpleListVotes, init_tracing, run_with_log,
@@ -30,6 +32,9 @@ fuzz_target!(
                 )
             })
             .collect(),
+        deceased_candidates: HashMap::new(),
+        lists_drawn: Vec::new(),
+        candidates_drawn: Vec::new(),
     };
 
     if let Some(first_list) = new_data.list_votes.first_mut()

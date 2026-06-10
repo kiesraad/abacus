@@ -14,7 +14,6 @@ export const investigationRoutes: RouteObject[] = [
     children: [
       { index: true, Component: InvestigationsOverviewPage, handle: { roles: ["administrator", "coordinator_gsb"] } },
       {
-        index: true,
         path: "add",
         Component: AddInvestigationPage,
         handle: { roles: ["coordinator_gsb"] },
@@ -24,7 +23,6 @@ export const investigationRoutes: RouteObject[] = [
         Component: AddInvestigationLayout,
         children: [
           {
-            index: true,
             path: "reason",
             Component: InvestigationReasonPage,
             handle: { roles: ["coordinator_gsb"] },

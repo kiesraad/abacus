@@ -10,10 +10,7 @@ use rand::{RngExt, seq::IndexedRandom};
 use test_log::test;
 
 use crate::{
-    api::{
-        apportionment::{ApportionmentInputData, map_candidate_nomination, map_seat_assignment},
-        report::DEFAULT_DATE_TIME_FORMAT,
-    },
+    api::apportionment::{ApportionmentInputData, map_candidate_nomination, map_seat_assignment},
     domain::{
         committee_session::{CommitteeSession, CommitteeSessionId},
         committee_session_status::CommitteeSessionStatus,
@@ -39,6 +36,7 @@ use crate::{
             PollingStation, PollingStationFirstSession, PollingStationForSession, PollingStationId,
             PollingStationType,
         },
+        report::DEFAULT_DATE_TIME_FORMAT,
         results::{
             common_polling_station_results::CommonPollingStationResults,
             differences_counts::{

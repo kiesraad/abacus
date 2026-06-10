@@ -1,18 +1,24 @@
 use axum::{
     extract::{Path, State},
+    http::StatusCode,
     response::IntoResponse,
 };
 use chrono::{DateTime, Datelike, Local};
 use pdf_gen::zip::{ZipResponse, ZipResponseError, slugify_filename, zip_single_file};
 use sqlx::SqlitePool;
+use tracing::error;
+use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
-    APIError, ErrorResponse,
-    api::report::files::{get_files_csb_election, get_files_gsb_election},
+    APIError, AppState, ErrorResponse,
+    api::middleware::authentication::RouteAuthorization,
     domain::{
         committee_session::CommitteeSessionId,
         election::{ElectionId, ElectionWithPoliticalGroups},
+        report::files::{get_files_csb_election, get_files_gsb_election},
+        role::Role,
     },
+    error::{ApiErrorResponse, ErrorReference},
     infra::audit_log::AuditService,
     repository::{
         committee_session_repo::{self},
@@ -20,6 +26,46 @@ use crate::{
         user_repo::User,
     },
 };
+
+#[derive(Debug, PartialEq)]
+pub enum ReportApiError {
+    ApportionmentStateNotFinalised,
+}
+
+impl ApiErrorResponse for ReportApiError {
+    fn log(&self) {
+        error!("Report error: {:?}", self);
+    }
+
+    fn to_response_parts(&self) -> (StatusCode, ErrorResponse) {
+        match self {
+            ReportApiError::ApportionmentStateNotFinalised => (
+                StatusCode::CONFLICT,
+                ErrorResponse::new(
+                    "Apportionment state not finalised",
+                    ErrorReference::InvalidApportionmentState,
+                    false,
+                ),
+            ),
+        }
+    }
+}
+
+impl From<ReportApiError> for APIError {
+    fn from(err: ReportApiError) -> Self {
+        APIError::Delegated(Box::new(err))
+    }
+}
+
+pub fn router() -> OpenApiRouter<AppState> {
+    use Role::*;
+
+    OpenApiRouter::default()
+        .routes(routes!(election_download_zip_results_gsb).authorize(&[CoordinatorGSB]))
+        .routes(routes!(election_download_zip_results_csb).authorize(&[CoordinatorCSB]))
+        .routes(routes!(election_download_zip_attachment_csb).authorize(&[CoordinatorCSB]))
+        .routes(routes!(election_download_zip_total_counts_csb).authorize(&[CoordinatorCSB]))
+}
 
 pub fn download_zip_filename(
     base: &str,
@@ -398,31 +444,25 @@ mod tests {
         results
     }
 
-    #[test(sqlx::test(fixtures(path = "../../../fixtures", scripts("election_5_with_results"))))]
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
     async fn test_gsb_election_committee_category_authorization_err(pool: SqlitePool) {
         let results = call_handlers_gsb(pool, Role::CoordinatorCSB).await;
         assert_committee_category_authorization_err(results).await;
     }
 
-    #[test(sqlx::test(fixtures(path = "../../../fixtures", scripts("election_5_with_results"))))]
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
     async fn test_gsb_election_committee_category_authorization_ok(pool: SqlitePool) {
         let results = call_handlers_gsb(pool, Role::CoordinatorGSB).await;
         assert_committee_category_authorization_ok(results);
     }
 
-    #[test(sqlx::test(fixtures(
-        path = "../../../fixtures",
-        scripts("election_8_csb_with_results")
-    )))]
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_8_csb_with_results"))))]
     async fn test_csb_election_committee_category_authorization_err(pool: SqlitePool) {
         let results = call_handlers_csb(pool, Role::CoordinatorGSB).await;
         assert_committee_category_authorization_err(results).await;
     }
 
-    #[test(sqlx::test(fixtures(
-        path = "../../../fixtures",
-        scripts("election_8_csb_with_results")
-    )))]
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_8_csb_with_results"))))]
     async fn test_csb_election_committee_category_authorization_ok(pool: SqlitePool) {
         let results = call_handlers_csb(pool, Role::CoordinatorCSB).await;
         assert_committee_category_authorization_ok(results);

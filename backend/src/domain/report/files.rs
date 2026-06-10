@@ -3,18 +3,15 @@ use sqlx::{SqliteConnection, SqlitePool};
 
 use crate::{
     APIError, SqlitePoolExt,
-    api::{
-        apportionment::ApportionmentInputData,
-        report::{
-            ReportApiError,
-            structs::{CsbFiles, FileCreatedAuditData, GeneratedFile, GsbFiles, ResultsInput},
-        },
-    },
+    api::{apportionment::ApportionmentInputData, report::ReportApiError},
     domain::{
         committee_session::{CommitteeSession, CommitteeSessionError, CommitteeSessionId},
         committee_session_status::CommitteeSessionStatus,
-        election::CommitteeCategory,
         file::{File, FileType},
+        report::structs::{
+            CsbFiles, FileCreatedAuditData, GeneratedFile, GsbFiles, ResultsInputCSB,
+            ResultsInputData, ResultsInputGSB,
+        },
     },
     infra::audit_log::AuditService,
     repository::{
@@ -28,7 +25,7 @@ use crate::{
 struct FileSaver<'a> {
     conn: &'a mut SqliteConnection,
     audit_service: &'a AuditService,
-    input: &'a ResultsInput,
+    input: &'a ResultsInputData,
 }
 
 impl FileSaver<'_> {
@@ -57,17 +54,13 @@ async fn generate_and_save_files_gsb_election(
     committee_session: CommitteeSession,
     corrections: bool,
 ) -> Result<GsbFiles, APIError> {
-    let input = ResultsInput::new(conn, committee_session.id, Local::now()).await?;
-    if input.election.committee_category != CommitteeCategory::GSB {
-        return Err(APIError::DataIntegrityError(
-            "Generating GSB files can only be done for GSB elections".to_string(),
-        ));
-    }
+    let gsb_input = ResultsInputGSB::new(conn, committee_session.id, Local::now()).await?;
+    let input_data = &gsb_input.data;
 
     let mut saver = FileSaver {
         conn,
         audit_service,
-        input: &input,
+        input: input_data,
     };
 
     let mut files = GsbFiles {
@@ -77,7 +70,7 @@ async fn generate_and_save_files_gsb_election(
         results_csv: None,
     };
 
-    let generated_files = input.generate_gsb_files().await?;
+    let generated_files = gsb_input.generate_gsb_files().await?;
 
     // For the first session, or if there are corrections, we also store the EML and count PDF
     // For next sessions without corrections, we don't store these
@@ -101,30 +94,27 @@ async fn generate_and_save_files_csb_election(
     audit_service: &AuditService,
     committee_session_id: CommitteeSessionId,
 ) -> Result<CsbFiles, APIError> {
-    let input = ResultsInput::new(conn, committee_session_id, Local::now()).await?;
-    if input.election.committee_category != CommitteeCategory::CSB {
-        return Err(APIError::DataIntegrityError(
-            "Generating CSB files can only be done for CSB elections".to_string(),
-        ));
-    }
+    let csb_input = ResultsInputCSB::new(conn, committee_session_id, Local::now()).await?;
+    let input_data = &csb_input.data;
 
-    let (_, state) = get_apportionment_state(conn, input.election.id).await?;
+    let (_, state) = get_apportionment_state(conn, input_data.election.id).await?;
 
     let mut saver = FileSaver {
         conn,
         audit_service,
-        input: &input,
+        input: input_data,
     };
+
     let apportionment_input = ApportionmentInputData::new(
-        input.election.number_of_seats,
-        &input.summary.political_group_votes,
+        input_data.election.number_of_seats,
+        &input_data.summary.political_group_votes,
         state.get_deceased_candidates(),
         state.get_lists_drawn(),
         state.get_candidates_drawn(),
     );
     let apportionment_result = apportionment::process(&apportionment_input)?;
 
-    let generated_files = input.generate_csb_files(&apportionment_result).await?;
+    let generated_files = csb_input.generate_csb_files(&apportionment_result).await?;
 
     let results_eml = saver.save(generated_files.results_eml).await?;
     let total_counts_eml = saver.save(generated_files.total_counts_eml).await?;

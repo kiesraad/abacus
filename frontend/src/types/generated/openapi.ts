@@ -1004,6 +1004,7 @@ export const errorReferenceValues = [
   "AlreadyInitialised",
   "ApportionmentCommitteeSessionNotCompleted",
   "ApportionmentDrawingOfLotsRequired",
+  "ApportionmentInvalidLotDrawing",
   "CommitteeSessionPaused",
   "DatabaseError",
   "DataEntryAlreadyClaimed",

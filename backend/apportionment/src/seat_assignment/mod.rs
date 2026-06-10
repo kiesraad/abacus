@@ -13,7 +13,7 @@ use self::{
     structs::{AbsoluteMajorityResult, RemainderAssignmentResult},
 };
 use crate::{
-    ApportionmentInput, ListVotes,
+    ApportionmentInput, ListDrawn, ListVotes,
     fraction::Fraction,
     structs::{
         AbsoluteMajorityDrawingLots, CandidateNominationInput, CandidateNominationInputType,
@@ -65,6 +65,7 @@ pub(crate) fn seat_assignment<T: ApportionmentInput>(
             0,
             &[],
             None,
+            &mut input.lists_drawn(),
         )?
     } else {
         info!("All seats have been assigned without any residual seats");
@@ -113,6 +114,7 @@ pub(crate) fn seat_assignment<T: ApportionmentInput>(
         input.deceased_candidates(),
         residual_seats,
         steps,
+        &mut input.lists_drawn(),
     )?;
 
     let final_full_seats = final_standing
@@ -279,13 +281,14 @@ fn reassign_residual_seat_for_absolute_majority<T: ListVotes>(
 /// If lists got more seats than candidates on their lists,
 /// re-assign those excess seats to other lists without exhausted lists.  
 /// This re-assignment is done according to article P 10 of the Kieswet.
-fn reassign_residual_seats_for_exhausted_lists<T: ListVotes>(
+fn reassign_residual_seats_for_exhausted_lists<'a, T: ListVotes>(
     previous_standings: Vec<ListStanding<T::ListNumber>>,
     seats: u32,
     list_votes: &[T],
     deceased_candidates: &DeceasedCandidates<T>,
     assigned_residual_seats: u32,
     previous_steps: Vec<SeatChangeStep<T::ListNumber>>,
+    lists_drawn: &mut impl Iterator<Item = &'a (impl ListDrawn<T::ListNumber> + 'a)>,
 ) -> RemainderAssignmentResult<T::ListNumber> {
     let exhausted_lists =
         list_numbers_with_exhausted_seats(&previous_standings, list_votes, deceased_candidates);
@@ -334,6 +337,7 @@ fn reassign_residual_seats_for_exhausted_lists<T: ListVotes>(
             assigned_residual_seats,
             &current_steps,
             Some((list_votes, deceased_candidates)),
+            lists_drawn,
         )?;
         Ok((current_steps, current_standings))
     } else {
@@ -584,12 +588,16 @@ pub(crate) mod tests {
             use test_log::test;
 
             use crate::{
-                Fraction, seat_assignment,
+                Fraction, SeatChange, seat_assignment,
+                seat_assignment::structs::LargestRemainderAssignedSeat,
                 structs::{
                     AbsoluteMajorityDrawingLots, LargestRemainderResidualSeatDrawingLots,
                     ListDrawingLotsError, ListDrawingLotsVariant,
                 },
-                test_helpers::seat_assignment_fixture_with_default_50_candidates,
+                test_helpers::{
+                    ListDrawnMock, get_total_seats_from_apportionment_result,
+                    seat_assignment_fixture_with_default_50_candidates,
+                },
             };
 
             /// Apportionment with residual seats assigned with largest remainders method
@@ -648,27 +656,108 @@ pub(crate) mod tests {
 
             /// Apportionment with residual seats assigned with largest remainders method
             ///
-            /// Full seats: [6, 1, 1, 1, 1, 1] - Remainder seats: 4  
-            /// Remainders: [20, 60, 60, 60, 60, 60]  
-            /// 1 - Drawing of lots is required for lists: [2, 3, 4, 5, 6], only 4 seats available
+            /// Full seats: [6, 2, 2, 1, 1, 1, 0, 0] - Remainder seats: 2
+            /// Remainders: [60, 0/15, 0/15, 0/15, 0/15, 0/15, 55, 45]
+            /// 1 - largest remainder: seat assigned to list 1
+            /// 2 - Drawing of lots is required for lists: [2, 3, 4, 5, 6], only 1 seat available
             #[test]
-            fn test_with_drawing_of_lots_error() {
-                let input = seat_assignment_fixture_with_default_50_candidates(
+            fn test_with_0_remainders_drawing_of_lots_error_copy() {
+                let mut input = seat_assignment_fixture_with_default_50_candidates(
                     15,
-                    vec![500, 140, 140, 140, 140, 140],
+                    vec![540, 160, 160, 80, 80, 80, 55, 45],
                 );
-                let result = seat_assignment(&input);
+                let err = seat_assignment(&input).expect_err("should require drawing lots");
                 assert_eq!(
-                    result,
-                    Err(ListDrawingLotsError::DrawingLotsRequired(
+                    err,
+                    ListDrawingLotsError::DrawingLotsRequired(
                         ListDrawingLotsVariant::LargestRemainderResidualSeat(
                             LargestRemainderResidualSeatDrawingLots {
-                                remainder: Fraction::new(60, 1),
+                                remainder: Fraction::new(0, 15),
                                 residual_seat_numbers: vec![],
                                 options: vec![2, 3, 4, 5, 6]
                             }
                         )
-                    ))
+                    )
+                );
+
+                // Lot drawn is 6
+
+                let ListDrawingLotsError::DrawingLotsRequired(variant) = err else {
+                    panic!("should be DrawingLotsRequired");
+                };
+
+                input.lists_drawn.push(ListDrawnMock { variant, drawn: 6 });
+                let result = seat_assignment(&input).expect("should be successful");
+
+                let total_seats = get_total_seats_from_apportionment_result(&result);
+                assert_eq!(total_seats, vec![7, 2, 2, 1, 1, 2, 0, 0]);
+
+                assert_eq!(result.steps.len(), 2);
+                assert_eq!(
+                    result.steps[0].change,
+                    SeatChange::LargestRemainderAssignment(LargestRemainderAssignedSeat {
+                        selected_list_number: 1,
+                        list_options: vec![1],
+                        list_assigned: vec![1],
+                        remainder_votes: Fraction::new(900, 15),
+                    })
+                );
+                assert_eq!(
+                    result.steps[1].change,
+                    SeatChange::LargestRemainderAssignment(LargestRemainderAssignedSeat {
+                        selected_list_number: 6,
+                        list_options: vec![6],
+                        list_assigned: vec![6],
+                        remainder_votes: Fraction::new(0, 15),
+                    })
+                );
+            }
+
+            /// Apportionment with residual seats assigned with largest remainders method
+            ///
+            /// Full seats: [6, 1, 1, 1, 1, 1] - Remainder seats: 4  
+            /// Remainders: [20, 60, 60, 60, 60, 60]  
+            /// 1 - Drawing of lots is required for lists: [2, 3, 4, 5, 6], only 4 seats available
+            /// 2 - Drawing of lots is required for lists: [2, 3, 5, 6], only 3 seats available
+            #[test]
+            fn test_with_drawing_of_lots_error() {
+                let mut input = seat_assignment_fixture_with_default_50_candidates(
+                    15,
+                    vec![500, 140, 140, 140, 140, 140],
+                );
+                let err = seat_assignment(&input).expect_err("should require drawing lots");
+                assert_eq!(
+                    err,
+                    ListDrawingLotsError::DrawingLotsRequired(
+                        ListDrawingLotsVariant::LargestRemainderResidualSeat(
+                            LargestRemainderResidualSeatDrawingLots {
+                                remainder: Fraction::new(900, 15),
+                                residual_seat_numbers: vec![],
+                                options: vec![2, 3, 4, 5, 6]
+                            }
+                        )
+                    )
+                );
+
+                // Drawing lots results in list 4
+
+                let ListDrawingLotsError::DrawingLotsRequired(variant) = err else {
+                    panic!("should be DrawingLotsRequired");
+                };
+
+                input.lists_drawn.push(ListDrawnMock { variant, drawn: 4 });
+                let err = seat_assignment(&input).expect_err("should require drawing lots");
+                assert_eq!(
+                    err,
+                    ListDrawingLotsError::DrawingLotsRequired(
+                        ListDrawingLotsVariant::LargestRemainderResidualSeat(
+                            LargestRemainderResidualSeatDrawingLots {
+                                remainder: Fraction::new(900, 15),
+                                residual_seat_numbers: Vec::new(),
+                                options: vec![2, 3, 5, 6]
+                            }
+                        )
+                    )
                 );
             }
         }
@@ -1435,13 +1524,16 @@ pub(crate) mod tests {
             use test_log::test;
 
             use crate::{
-                Fraction,
+                Fraction, HighestAverageAssignedSeat, SeatChange,
                 seat_assignment::seat_assignment,
                 structs::{
                     AbsoluteMajorityDrawingLots, HighestAverageResidualSeatDrawingLots,
                     ListDrawingLotsError, ListDrawingLotsVariant,
                 },
-                test_helpers::seat_assignment_fixture_with_default_50_candidates,
+                test_helpers::{
+                    ListDrawnMock, get_total_seats_from_apportionment_result,
+                    seat_assignment_fixture_with_default_50_candidates,
+                },
             };
 
             /// Apportionment with residual seats assigned with highest averages method
@@ -1478,16 +1570,18 @@ pub(crate) mod tests {
             /// Full seats: [9, 2, 2, 2, 2, 2] - Remainder seats: 4  
             /// 1 - highest average: [50, 46 2/3, 46 2/3, 46 2/3, 46 2/3, 46 2/3] seat assigned to list 1  
             /// 2 - Drawing of lots is required for lists: [2, 3, 4, 5, 6], only 3 seats available
+            /// 3 - Drawing of lots is required for lists: [2, 3, 5, 6], only 2 seats available
             #[test]
-            fn test_with_drawing_of_lots_error() {
-                let input = seat_assignment_fixture_with_default_50_candidates(
+            fn test_with_drawing_of_lots_required() {
+                let mut input = seat_assignment_fixture_with_default_50_candidates(
                     23,
                     vec![500, 140, 140, 140, 140, 140],
                 );
-                let result = seat_assignment(&input);
+                let err = seat_assignment(&input).expect_err("should require drawing lots");
+
                 assert_eq!(
-                    result,
-                    Err(ListDrawingLotsError::DrawingLotsRequired(
+                    err,
+                    ListDrawingLotsError::DrawingLotsRequired(
                         ListDrawingLotsVariant::HighestAverageResidualSeat(
                             HighestAverageResidualSeatDrawingLots {
                                 average: Fraction::new(140, 3),
@@ -1495,7 +1589,90 @@ pub(crate) mod tests {
                                 options: vec![2, 3, 4, 5, 6]
                             }
                         )
-                    ))
+                    )
+                );
+
+                // Drawing lots results in list 4
+
+                let ListDrawingLotsError::DrawingLotsRequired(variant) = err else {
+                    panic!("should be DrawingLotsRequired");
+                };
+
+                input.lists_drawn.push(ListDrawnMock { variant, drawn: 4 });
+
+                let err = seat_assignment(&input).expect_err("should require drawing lots");
+                assert_eq!(
+                    err,
+                    ListDrawingLotsError::DrawingLotsRequired(
+                        ListDrawingLotsVariant::HighestAverageResidualSeat(
+                            HighestAverageResidualSeatDrawingLots {
+                                average: Fraction::new(140, 3),
+                                residual_seat_numbers: vec![],
+                                options: vec![2, 3, 5, 6]
+                            }
+                        )
+                    )
+                );
+            }
+
+            /// Apportionment with residual seats assigned with highest averages method
+            ///
+            /// Full seats: [13, 3, 3, 3] - Remainder seats: 4
+            /// 1 - highest average: [35 5/7, 35, 35, 35] seat assigned to list 1
+            /// 2 - Drawing of lots is required for lists: [2, 3, 4], only 1 seat available
+            #[test]
+            fn test_with_drawing_of_lots_one_list_drawn() {
+                let mut input = seat_assignment_fixture_with_default_50_candidates(
+                    24,
+                    vec![500, 140, 140, 140],
+                );
+
+                let err = seat_assignment(&input).expect_err("should require drawing lots");
+                assert_eq!(
+                    err,
+                    ListDrawingLotsError::DrawingLotsRequired(
+                        ListDrawingLotsVariant::HighestAverageResidualSeat(
+                            HighestAverageResidualSeatDrawingLots {
+                                average: Fraction::new(140, 4),
+                                residual_seat_numbers: vec![],
+                                options: vec![2, 3, 4],
+                            },
+                        )
+                    )
+                );
+
+                // List 3 is drawn, add it to the input's lists_drawn and process again
+
+                let ListDrawingLotsError::DrawingLotsRequired(variant) = err else {
+                    panic!("should be DrawingLotsRequired");
+                };
+
+                input.lists_drawn.push(ListDrawnMock { variant, drawn: 3 });
+                let result = seat_assignment(&input).expect("should be successful");
+
+                let total_seats = get_total_seats_from_apportionment_result(&result);
+                assert_eq!(total_seats, vec![14, 3, 4, 3]);
+
+                assert_eq!(result.steps.len(), 2);
+                assert_eq!(
+                    result.steps[0].change,
+                    SeatChange::HighestAverageAssignment(HighestAverageAssignedSeat {
+                        selected_list_number: 1,
+                        list_options: vec![1],
+                        list_assigned: vec![1],
+                        list_exhausted: vec![],
+                        votes_per_seat: Fraction::new(500, 14),
+                    })
+                );
+                assert_eq!(
+                    result.steps[1].change,
+                    SeatChange::HighestAverageAssignment(HighestAverageAssignedSeat {
+                        selected_list_number: 3,
+                        list_options: vec![3],
+                        list_assigned: vec![3],
+                        list_exhausted: vec![],
+                        votes_per_seat: Fraction::new(140, 4),
+                    })
                 );
             }
         }

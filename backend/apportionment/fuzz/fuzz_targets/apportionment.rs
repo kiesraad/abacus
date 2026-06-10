@@ -160,5 +160,8 @@ fuzz_target!(
         Err(ApportionmentError::ListDrawingLotsRequired(_) | ApportionmentError::CandidateDrawingLotsRequired(_)) => {
             // Expected error: drawing of lots is not yet implemented.
         }
+        Err(ApportionmentError::InvalidLotDrawing(message)) => {
+            panic!("Invalid lot drawing: {}", message)
+        }
     }
 });

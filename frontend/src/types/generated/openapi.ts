@@ -399,6 +399,10 @@ export type USER_DELETE_REQUEST_PATH = `/api/users/${UserId}`;
 
 /** TYPES **/
 
+export interface AbsoluteMajorityDrawingLots {
+  options: PGNumber[];
+}
+
 export interface AbsoluteMajorityReassignedSeat {
   list_assigned_seat: PGNumber;
   list_retracted_seat: PGNumber;
@@ -416,7 +420,7 @@ export type ApportionmentState =
   | {
       candidates_drawn: CandidateDrawn[];
       deceased_candidates: DeceasedCandidate[];
-      drawing_lots_details: DrawingLotsDetails;
+      drawing_lots_required: DrawingLotsRequired;
       lists_drawn: ListDrawn[];
       type: "DrawingLots";
     }
@@ -597,8 +601,10 @@ export interface Candidate {
   number: number;
 }
 
-export interface CandidateDrawingLotsRequired {
+export interface CandidateDrawingLotsVariant {
+  /** The list the candidate needs to be drawn from */
   list: PGNumber;
+  /** The candidates that lots are drawn for */
   options: CandidateNumber[];
 }
 
@@ -608,10 +614,8 @@ export interface CandidateDrawingLotsRequired {
 export interface CandidateDrawn {
   /** The candidate that the lot was drawn for */
   drawn: CandidateNumber;
-  /** The list the candidate needs to be drawn from */
-  list: PGNumber;
-  /** The candidates that lots are drawn for */
-  options: CandidateNumber[];
+  /** The type and information for drawing lots */
+  variant: CandidateDrawingLotsVariant;
 }
 
 /**
@@ -845,9 +849,9 @@ export interface DisplayFraction {
   numerator: number;
 }
 
-export type DrawingLotsDetails =
-  | (ListDrawingLotsRequired & { type: "ListDrawingLotsRequired" })
-  | (CandidateDrawingLotsRequired & { type: "CandidateDrawingLotsRequired" });
+export type DrawingLotsRequired =
+  | (ListDrawingLotsVariant & { type: "ListDrawingLotsRequired" })
+  | (CandidateDrawingLotsVariant & { type: "CandidateDrawingLotsRequired" });
 
 /**
  * Election without political groups
@@ -1164,6 +1168,12 @@ export interface HighestAverageAssignedSeat {
   votes_per_seat: DisplayFraction;
 }
 
+export interface HighestAverageResidualSeatDrawingLots {
+  average: DisplayFraction;
+  options: PGNumber[];
+  residual_seat_numbers: number[];
+}
+
 export interface InvestigationConcludedWithNewResults {
   findings: string;
   reason: string;
@@ -1197,6 +1207,12 @@ export interface LargestRemainderAssignedSeat {
   selected_list_number: PGNumber;
 }
 
+export interface LargestRemainderResidualSeatDrawingLots {
+  options: PGNumber[];
+  remainder: DisplayFraction;
+  residual_seat_numbers: number[];
+}
+
 export interface ListCandidateNomination {
   list_name: string;
   list_number: PGNumber;
@@ -1206,17 +1222,10 @@ export interface ListCandidateNomination {
   updated_candidate_ranking: Candidate[];
 }
 
-export interface ListDrawingLotsRequired {
-  options: PGNumber[];
-  variant: ListDrawingLotsVariant;
-}
-
-export const listDrawingLotsVariantValues = [
-  "HighestAverageResidualSeat",
-  "LargestRemainderResidualSeat",
-  "AbsoluteMajority",
-] as const;
-export type ListDrawingLotsVariant = (typeof listDrawingLotsVariantValues)[number];
+export type ListDrawingLotsVariant =
+  | (HighestAverageResidualSeatDrawingLots & { variant: "HighestAverageResidualSeat" })
+  | (LargestRemainderResidualSeatDrawingLots & { variant: "LargestRemainderResidualSeat" })
+  | (AbsoluteMajorityDrawingLots & { variant: "AbsoluteMajority" });
 
 /**
  * The list that has been drawn plus information to assert the correct drawing
@@ -1224,8 +1233,6 @@ export type ListDrawingLotsVariant = (typeof listDrawingLotsVariantValues)[numbe
 export interface ListDrawn {
   /** The list that the lot was drawn for */
   drawn: PGNumber;
-  /** The lists that lots are drawn for */
-  options: PGNumber[];
   /** The type of seat assignment or retraction that lots need to be drawn for */
   variant: ListDrawingLotsVariant;
 }

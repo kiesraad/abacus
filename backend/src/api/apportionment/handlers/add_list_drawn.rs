@@ -58,10 +58,9 @@ mod tests {
 
     use super::*;
     use crate::{
-        api::apportionment::ListDrawingLotsRequired,
         domain::{
-            apportionment::ListDrawingLotsVariant,
-            apportionment_state::{ApportionmentState, DrawingLotsDetails},
+            apportionment::{AbsoluteMajorityDrawingLots, ListDrawingLotsVariant},
+            apportionment_state::{ApportionmentState, DrawingLotsRequired},
             committee_session::CommitteeSessionId,
             committee_session_status::CommitteeSessionStatus,
             election::PGNumber,
@@ -84,17 +83,17 @@ mod tests {
             .await
             .expect("should change committee session status");
 
-        let drawing_lots_details: DrawingLotsDetails = ListDrawingLotsRequired {
-            variant: ListDrawingLotsVariant::AbsoluteMajority,
-            options: PGNumber::from_values(vec![8, 9]),
-        }
-        .into();
+        let drawing_lots_required = DrawingLotsRequired::ListDrawingLotsRequired(
+            ListDrawingLotsVariant::AbsoluteMajority(AbsoluteMajorityDrawingLots {
+                options: PGNumber::from_values(vec![8, 9]),
+            }),
+        );
 
         apportionment_state_repo::upsert(
             &mut conn,
             id,
             &ApportionmentState::DrawingLots {
-                drawing_lots_details: drawing_lots_details.clone(),
+                drawing_lots_required: drawing_lots_required.clone(),
                 deceased_candidates: vec![],
                 lists_drawn: vec![],
                 candidates_drawn: vec![],
@@ -104,8 +103,9 @@ mod tests {
         .expect("should upsert initial state");
 
         let list_drawn = ListDrawn {
-            variant: ListDrawingLotsVariant::AbsoluteMajority,
-            options: PGNumber::from_values(vec![8, 9]),
+            variant: ListDrawingLotsVariant::AbsoluteMajority(AbsoluteMajorityDrawingLots {
+                options: PGNumber::from_values(vec![8, 9]),
+            }),
             drawn: PGNumber::from(8),
         };
 
@@ -122,7 +122,7 @@ mod tests {
         assert_eq!(
             state.0,
             ApportionmentState::DrawingLots {
-                drawing_lots_details,
+                drawing_lots_required,
                 deceased_candidates: vec![],
                 lists_drawn: vec![list_drawn],
                 candidates_drawn: vec![],

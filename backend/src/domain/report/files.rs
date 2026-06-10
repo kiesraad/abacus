@@ -441,12 +441,9 @@ mod tests {
         assert_delegated(error, &ReportApiError::ApportionmentStateNotFinalised);
 
         // Finalise apportionment state
-        update_apportionment_state(
-            &mut conn,
-            audit_service.clone(),
-            ElectionId::from(8),
-            |state| state.finalise(),
-        )
+        update_apportionment_state(&mut conn, &audit_service, ElectionId::from(8), |state| {
+            state.finalise()
+        })
         .await
         .unwrap();
 
@@ -484,12 +481,9 @@ mod tests {
         .unwrap();
 
         // Finalise apportionment state
-        update_apportionment_state(
-            &mut conn,
-            audit_service.clone(),
-            ElectionId::from(8),
-            |state| state.finalise(),
-        )
+        update_apportionment_state(&mut conn, &audit_service, ElectionId::from(8), |state| {
+            state.finalise()
+        })
         .await
         .unwrap();
 

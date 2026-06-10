@@ -39,7 +39,7 @@ pub async fn register_deceased_candidates(
     let election = election_repo::get(&mut tx, election_id).await?;
     user.role().is_authorized(election.committee_category)?;
 
-    let state = update_apportionment_state(&mut tx, audit_service, election_id, |state| {
+    let state = update_apportionment_state(&mut tx, &audit_service, election_id, |state| {
         state.register_deceased_candidates()
     })
     .await?;

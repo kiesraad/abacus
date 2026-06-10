@@ -12,7 +12,7 @@ use crate::{
     },
     infra::audit_log::AuditService,
     repository::{election_repo, user_repo::User},
-    service::update_apportionment_state,
+    service::{next_apportionment_state, update_apportionment_state},
 };
 
 /// Add candidate to drawing lots
@@ -44,10 +44,12 @@ pub async fn add_candidate_drawn(
     let election = election_repo::get(&mut tx, election_id).await?;
     user.role().is_authorized(election.committee_category)?;
 
-    let state = update_apportionment_state(&mut tx, audit_service, election_id, |state| {
+    update_apportionment_state(&mut tx, &audit_service, election_id, |state| {
         state.add_candidate_drawn(candidate_drawn)
     })
     .await?;
+
+    let state = next_apportionment_state(&mut tx, &audit_service, &election).await?;
 
     tx.commit().await?;
     Ok(Json(state))
@@ -67,6 +69,7 @@ mod tests {
             election::{CandidateNumber, PGNumber},
             role::Role,
         },
+        infra::audit_log::list_event_names,
         repository::{apportionment_state_repo, committee_session_repo, user_repo::UserId},
     };
 
@@ -123,12 +126,16 @@ mod tests {
 
         assert_eq!(
             state.0,
-            ApportionmentState::DrawingLots {
-                drawing_lots_required,
+            ApportionmentState::Finalised {
                 deceased_candidates: vec![],
                 lists_drawn: vec![],
                 candidates_drawn: vec![candidate_drawn],
             }
+        );
+
+        assert_eq!(
+            list_event_names(&mut conn).await.unwrap(),
+            ["ApportionmentStateUpdated", "ApportionmentStateUpdated"]
         );
     }
 }

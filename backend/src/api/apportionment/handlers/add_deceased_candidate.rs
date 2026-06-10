@@ -44,7 +44,7 @@ pub async fn add_deceased_candidate(
     let election = election_repo::get(&mut tx, election_id).await?;
     user.role().is_authorized(election.committee_category)?;
 
-    let state = update_apportionment_state(&mut tx, audit_service, election_id, |state| {
+    let state = update_apportionment_state(&mut tx, &audit_service, election_id, |state| {
         state.add_deceased_candidate(candidate)
     })
     .await?;

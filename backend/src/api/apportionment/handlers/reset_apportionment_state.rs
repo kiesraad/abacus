@@ -40,7 +40,7 @@ pub async fn reset_apportionment_state(
     user.role().is_authorized(election.committee_category)?;
 
     let state =
-        update_apportionment_state(&mut tx, audit_service, election_id, |state| state.reset())
+        update_apportionment_state(&mut tx, &audit_service, election_id, |state| state.reset())
             .await?;
 
     tx.commit().await?;

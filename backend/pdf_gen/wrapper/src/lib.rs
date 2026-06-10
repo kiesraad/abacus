@@ -15,29 +15,9 @@ pub async fn generate_pdf(input: impl PdfGenInput) -> Result<PdfGenResult, PdfGe
 }
 
 #[cfg(all(not(feature = "static"), feature = "dev"))]
-pub fn lib() -> &'static libloading::Library {
-    use libloading::{Library, library_filename};
-    use std::sync::OnceLock;
-
-    static LIB: OnceLock<Library> = OnceLock::new();
-
-    LIB.get_or_init(|| unsafe {
-        Library::new(library_filename("pdf_gen_dylib")).expect("failed to load dylib")
-    })
-}
-
-#[cfg(all(not(feature = "static"), feature = "dev"))]
 pub async fn generate_pdf(input: impl PdfGenInput) -> Result<PdfGenResult, PdfGenError> {
-    use libloading::Symbol;
-
-    type PdfGenFn = fn(Box<dyn PdfGenInput>) -> Result<PdfGenResult, PdfGenError>;
-
-    let lib = lib();
-    let func: Symbol<PdfGenFn> = unsafe { lib.get(b"pdf_gen_dyn_generate_pdf\0") }
-        .expect("symbol 'pdf_gen_dyn_generate_pdf' not found");
-
-    let input = Box::new(input);
-    tokio::task::spawn_blocking(move || func(input)).await?
+    tokio::task::spawn_blocking(move || pdf_gen_dylib::pdf_gen_dyn_generate_pdf(Box::new(input)))
+        .await?
 }
 
 /// Generates a ZIP file containing the PDFs for the provided inputs.

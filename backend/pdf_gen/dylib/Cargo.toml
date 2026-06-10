@@ -5,6 +5,9 @@ edition.workspace = true
 license.workspace = true
 rust-version.workspace = true
 
+[lints]
+workspace = true
+
 [dependencies]
 pdf_gen_impl.workspace = true
 pdf_gen_types.workspace = true

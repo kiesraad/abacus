@@ -16,8 +16,7 @@ pub async fn generate_pdf(input: impl PdfGenInput) -> Result<PdfGenResult, PdfGe
 
 #[cfg(all(not(feature = "static"), feature = "dev"))]
 pub async fn generate_pdf(input: impl PdfGenInput) -> Result<PdfGenResult, PdfGenError> {
-    tokio::task::spawn_blocking(move || pdf_gen_dylib::pdf_gen_dyn_generate_pdf(Box::new(input)))
-        .await?
+    tokio::task::spawn_blocking(move || pdf_gen_dylib::pdf_gen_dyn_generate_pdf(&input)).await?
 }
 
 /// Generates a ZIP file containing the PDFs for the provided inputs.
@@ -26,7 +25,7 @@ pub async fn generate_pdfs(
     inputs: Vec<impl PdfGenInput>,
     mut zip_writer: zip::ZipResponseWriter,
 ) -> Result<(), PdfGenError> {
-    for input in inputs.into_iter() {
+    for input in inputs {
         let file_name = input.output_file_name().to_string();
 
         let content = match generate_pdf(input).await {

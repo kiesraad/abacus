@@ -10,10 +10,7 @@ use rand::{RngExt, seq::IndexedRandom};
 use test_log::test;
 
 use crate::{
-    api::{
-        apportionment::{ApportionmentInputData, map_candidate_nomination, map_seat_assignment},
-        report::DEFAULT_DATE_TIME_FORMAT,
-    },
+    api::apportionment::{ApportionmentInputData, map_candidate_nomination, map_seat_assignment},
     domain::{
         committee_session::{CommitteeSession, CommitteeSessionId},
         committee_session_status::CommitteeSessionStatus,
@@ -39,6 +36,7 @@ use crate::{
             PollingStation, PollingStationFirstSession, PollingStationForSession, PollingStationId,
             PollingStationType,
         },
+        report::DEFAULT_DATE_TIME_FORMAT,
         results::{
             common_polling_station_results::CommonPollingStationResults,
             differences_counts::{
@@ -761,6 +759,8 @@ async fn test_p_22_2() {
     let apportionment_input = ApportionmentInputData::new(
         election.number_of_seats,
         &summary_gsb.political_group_votes,
+        &[],
+        &[],
         &[],
     );
     let apportionment_result =

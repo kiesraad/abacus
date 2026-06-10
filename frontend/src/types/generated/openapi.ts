@@ -92,12 +92,26 @@ export interface PROCESS_APPORTIONMENT_REQUEST_PARAMS {
 }
 export type PROCESS_APPORTIONMENT_REQUEST_PATH = `/api/elections/${ElectionId}/apportionment`;
 
+// /api/elections/{election_id}/apportionment/add_candidate_drawn
+export interface ADD_CANDIDATE_DRAWN_REQUEST_PARAMS {
+  election_id: ElectionId;
+}
+export type ADD_CANDIDATE_DRAWN_REQUEST_PATH = `/api/elections/${ElectionId}/apportionment/add_candidate_drawn`;
+export type ADD_CANDIDATE_DRAWN_REQUEST_BODY = CandidateDrawn;
+
 // /api/elections/{election_id}/apportionment/add_deceased_candidate
 export interface ADD_DECEASED_CANDIDATE_REQUEST_PARAMS {
   election_id: ElectionId;
 }
 export type ADD_DECEASED_CANDIDATE_REQUEST_PATH = `/api/elections/${ElectionId}/apportionment/add_deceased_candidate`;
 export type ADD_DECEASED_CANDIDATE_REQUEST_BODY = DeceasedCandidate;
+
+// /api/elections/{election_id}/apportionment/add_list_drawn
+export interface ADD_LIST_DRAWN_REQUEST_PARAMS {
+  election_id: ElectionId;
+}
+export type ADD_LIST_DRAWN_REQUEST_PATH = `/api/elections/${ElectionId}/apportionment/add_list_drawn`;
+export type ADD_LIST_DRAWN_REQUEST_BODY = ListDrawn;
 
 // /api/elections/{election_id}/apportionment/delete_deceased_candidate
 export interface DELETE_DECEASED_CANDIDATE_REQUEST_PARAMS {

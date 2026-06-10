@@ -49,6 +49,9 @@ dependencychecker:
     - "apportionment"
     - "apportionment-fuzz"
   transitive: true
+  exclude:
+    # Marvin Attack on RSA crate, which we do not use (Cargo weak dependency, https://github.com/rust-lang/cargo/issues/10801)
+    - vulnerability: "CVE-2023-49092"
 
 architecture:
   enabled: true

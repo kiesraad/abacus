@@ -20,6 +20,8 @@ pub struct ApportionmentInputData<'a> {
     pub number_of_seats: u32,
     pub list_votes: &'a [PoliticalGroupCandidateVotes],
     pub deceased_candidates: HashMap<PGNumber, HashSet<CandidateNumber>>,
+    pub lists_drawn: &'a [ListDrawn],
+    pub candidates_drawn: &'a [CandidateDrawn],
 }
 
 impl<'a> ApportionmentInputData<'a> {
@@ -27,6 +29,8 @@ impl<'a> ApportionmentInputData<'a> {
         number_of_seats: u32,
         list_votes: &'a [PoliticalGroupCandidateVotes],
         deceased_candidates: &[DeceasedCandidate],
+        lists_drawn: &'a [ListDrawn],
+        candidates_drawn: &'a [CandidateDrawn],
     ) -> Self {
         let mut grouped: HashMap<PGNumber, HashSet<CandidateNumber>> = HashMap::new();
 
@@ -41,6 +45,8 @@ impl<'a> ApportionmentInputData<'a> {
             number_of_seats,
             list_votes,
             deceased_candidates: grouped,
+            lists_drawn,
+            candidates_drawn,
         }
     }
 }
@@ -63,11 +69,11 @@ impl<'a> apportionment::ApportionmentInput for ApportionmentInputData<'a> {
     }
 
     fn lists_drawn(&self) -> impl Iterator<Item = &ListDrawn> {
-        std::iter::empty()
+        self.lists_drawn.iter()
     }
 
     fn candidates_drawn(&self) -> impl Iterator<Item = &CandidateDrawn> {
-        std::iter::empty()
+        self.candidates_drawn.iter()
     }
 }
 

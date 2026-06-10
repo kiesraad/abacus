@@ -3,18 +3,15 @@ use sqlx::{SqliteConnection, SqlitePool};
 
 use crate::{
     APIError, SqlitePoolExt,
-    api::{
-        apportionment::ApportionmentInputData,
-        report::{
-            ReportApiError,
-            structs::{CsbFiles, FileCreatedAuditData, GeneratedFile, GsbFiles, ResultsInput},
-        },
-    },
+    api::{apportionment::ApportionmentInputData, report::ReportApiError},
     domain::{
         committee_session::{CommitteeSession, CommitteeSessionError, CommitteeSessionId},
         committee_session_status::CommitteeSessionStatus,
-        election::CommitteeCategory,
         file::{File, FileType},
+        report::structs::{
+            CsbFiles, FileCreatedAuditData, GeneratedFile, GsbFiles, ResultsInputCSB,
+            ResultsInputData, ResultsInputGSB,
+        },
     },
     infra::audit_log::AuditService,
     repository::{
@@ -28,7 +25,7 @@ use crate::{
 struct FileSaver<'a> {
     conn: &'a mut SqliteConnection,
     audit_service: &'a AuditService,
-    input: &'a ResultsInput,
+    input: &'a ResultsInputData,
 }
 
 impl FileSaver<'_> {
@@ -57,31 +54,29 @@ async fn generate_and_save_files_gsb_election(
     committee_session: CommitteeSession,
     corrections: bool,
 ) -> Result<GsbFiles, APIError> {
-    let input = ResultsInput::new(conn, committee_session.id, Local::now()).await?;
-    if input.election.committee_category != CommitteeCategory::GSB {
-        return Err(APIError::DataIntegrityError(
-            "Generating GSB files can only be done for GSB elections".to_string(),
-        ));
-    }
+    let gsb_input = ResultsInputGSB::new(conn, committee_session.id, Local::now()).await?;
+    let input_data = &gsb_input.data;
 
     let mut saver = FileSaver {
         conn,
         audit_service,
-        input: &input,
+        input: input_data,
     };
 
     let mut files = GsbFiles {
         results_eml: None,
         results_pdf: None,
         overview_pdf: None,
+        results_csv: None,
     };
 
-    let generated_files = input.generate_gsb_files().await?;
+    let generated_files = gsb_input.generate_gsb_files().await?;
 
     // For the first session, or if there are corrections, we also store the EML and count PDF
     // For next sessions without corrections, we don't store these
     if !committee_session.is_next_session() || corrections {
         files.results_eml = Some(saver.save(generated_files.results_eml).await?);
+        files.results_csv = Some(saver.save(generated_files.results_csv).await?);
 
         files.results_pdf = Some(saver.save(generated_files.results_pdf).await?);
     }
@@ -99,28 +94,27 @@ async fn generate_and_save_files_csb_election(
     audit_service: &AuditService,
     committee_session_id: CommitteeSessionId,
 ) -> Result<CsbFiles, APIError> {
-    let input = ResultsInput::new(conn, committee_session_id, Local::now()).await?;
-    if input.election.committee_category != CommitteeCategory::CSB {
-        return Err(APIError::DataIntegrityError(
-            "Generating CSB files can only be done for CSB elections".to_string(),
-        ));
-    }
+    let csb_input = ResultsInputCSB::new(conn, committee_session_id, Local::now()).await?;
+    let input_data = &csb_input.data;
 
-    let (_, state) = get_apportionment_state(conn, input.election.id).await?;
+    let (_, state) = get_apportionment_state(conn, input_data.election.id).await?;
 
     let mut saver = FileSaver {
         conn,
         audit_service,
-        input: &input,
+        input: input_data,
     };
+
     let apportionment_input = ApportionmentInputData::new(
-        input.election.number_of_seats,
-        &input.summary.political_group_votes,
+        input_data.election.number_of_seats,
+        &input_data.summary.political_group_votes,
         state.get_deceased_candidates(),
+        state.get_lists_drawn(),
+        state.get_candidates_drawn(),
     );
     let apportionment_result = apportionment::process(&apportionment_input)?;
 
-    let generated_files = input.generate_csb_files(&apportionment_result).await?;
+    let generated_files = csb_input.generate_csb_files(&apportionment_result).await?;
 
     let results_eml = saver.save(generated_files.results_eml).await?;
     let total_counts_eml = saver.save(generated_files.total_counts_eml).await?;
@@ -147,6 +141,7 @@ async fn get_existing_gsb_files(
         results_pdf: file_repo::get_for_session(conn, committee_session_id, GsbResultsPdf).await?,
         overview_pdf: file_repo::get_for_session(conn, committee_session_id, GsbOverviewPdf)
             .await?,
+        results_csv: file_repo::get_for_session(conn, committee_session_id, GsbCsvCounts).await?,
     })
 }
 
@@ -311,17 +306,20 @@ mod tests {
                     .await
                     .expect("should return files");
             let eml = files.results_eml.expect("should have generated eml");
+            let csv = files.results_csv.expect("should have generated csv");
             let pdf = files.results_pdf.expect("should have generated pdf");
 
             assert_eq!(eml.name, "Telling_GR2026_GroteStad.eml.xml");
             assert_eq!(eml.id, FileId::from(1));
+            assert_eq!(csv.name, "osv4-3_telling_gr2026_grotestad.csv");
+            assert_eq!(csv.id, FileId::from(2));
             assert_eq!(pdf.name, "Model_Na31-2.pdf");
-            assert_eq!(pdf.id, FileId::from(2));
+            assert_eq!(pdf.id, FileId::from(3));
             assert!(files.overview_pdf.is_none());
 
             assert_eq!(
                 list_event_names(&mut conn).await.unwrap(),
-                ["FileCreated", "FileCreated"]
+                ["FileCreated", "FileCreated", "FileCreated"]
             );
         }
     }
@@ -339,19 +337,22 @@ mod tests {
                     .expect("should return files");
 
             let eml = files.results_eml.expect("should have generated eml");
+            let csv = files.results_csv.expect("should have generated csv");
             let pdf = files.results_pdf.expect("should have generated pdf");
             let overview = files.overview_pdf.expect("should have generated overview");
 
             assert_eq!(eml.name, "Telling_GR2026_GroteStad.eml.xml");
             assert_eq!(eml.id, FileId::from(1));
+            assert_eq!(csv.name, "osv4-3_telling_gr2026_grotestad.csv");
+            assert_eq!(csv.id, FileId::from(2));
             assert_eq!(pdf.name, "Model_Na14-2.pdf");
-            assert_eq!(pdf.id, FileId::from(2));
+            assert_eq!(pdf.id, FileId::from(3));
             assert_eq!(overview.name, "Leeg_Model_P2a.pdf");
-            assert_eq!(overview.id, FileId::from(3));
+            assert_eq!(overview.id, FileId::from(4));
 
             assert_eq!(
                 list_event_names(&mut conn).await.unwrap(),
-                ["FileCreated", "FileCreated", "FileCreated"]
+                ["FileCreated", "FileCreated", "FileCreated", "FileCreated"]
             );
         }
     }

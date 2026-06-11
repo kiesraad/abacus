@@ -131,7 +131,7 @@ pub trait ApportionmentInput {
 }
 
 pub struct ApportionmentOutput<'a, T: ListVotes> {
-    pub seat_assignment: SeatAssignmentResult<T>,
+    pub seat_assignment: SeatAssignmentResult<ListNumber<T>>,
     pub candidate_nomination: CandidateNominationResult<'a, T>,
 }
 

@@ -10,16 +10,16 @@ use crate::{ListVotes, structs::ListDrawingLotsError};
 /// and each of the changes and intermediate standings. The final standing contains the
 /// number of seats per list that was assigned after all seats were assigned.
 #[derive(Debug, PartialEq)]
-pub struct SeatAssignmentResult<T: ListVotes> {
+pub struct SeatAssignmentResult<LN> {
     pub seats: u32,
     pub full_seats: u32,
     pub residual_seats: u32,
     pub quota: Fraction,
-    pub steps: Vec<SeatChangeStep<T::ListNumber>>,
-    pub final_standing: Vec<ListSeatAssignment<T::ListNumber>>,
+    pub steps: Vec<SeatChangeStep<LN>>,
+    pub final_standing: Vec<ListSeatAssignment<LN>>,
 }
 
-impl<T: ListVotes> SeatAssignmentResult<T> {
+impl<LN: Copy> SeatAssignmentResult<LN> {
     pub fn warnings(&self) -> Vec<ApportionmentWarning> {
         let mut warnings = Vec::new();
         let has_p9 = self

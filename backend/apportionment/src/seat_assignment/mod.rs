@@ -21,11 +21,14 @@ use crate::{
     },
 };
 
+type SeatAssignmentResultType<T> = Result<
+    SeatAssignmentResult<ListNumber<<T as ApportionmentInput>::List>>,
+    ListDrawingLotsError<ListNumber<<T as ApportionmentInput>::List>>,
+>;
+
 /// Seat assignment
 #[allow(clippy::too_many_lines, clippy::cognitive_complexity)]
-pub(crate) fn seat_assignment<T: ApportionmentInput>(
-    input: &T,
-) -> Result<SeatAssignmentResult<T::List>, ListDrawingLotsError<ListNumber<T::List>>> {
+pub(crate) fn seat_assignment<T: ApportionmentInput>(input: &T) -> SeatAssignmentResultType<T> {
     info!("Seat assignment");
     info!("Seats: {}", input.number_of_seats());
 
@@ -139,9 +142,9 @@ pub(crate) fn seat_assignment<T: ApportionmentInput>(
 }
 
 /// Returns the total number of seats each list number received in the apportionment result.
-pub fn get_total_seats_per_list_number_from_apportionment_result<T: ListVotes>(
-    result: &SeatAssignmentResult<T>,
-) -> Vec<(T::ListNumber, u32)> {
+pub fn get_total_seats_per_list_number_from_apportionment_result<LN: Copy>(
+    result: &SeatAssignmentResult<LN>,
+) -> Vec<(LN, u32)> {
     result
         .final_standing
         .iter()
@@ -153,7 +156,7 @@ pub fn get_total_seats_per_list_number_from_apportionment_result<T: ListVotes>(
 /// and the seat assignment result.
 pub fn as_candidate_nomination_input<'a, T: ApportionmentInput>(
     input: &'a T,
-    seat_assignment: &SeatAssignmentResult<T::List>,
+    seat_assignment: &SeatAssignmentResult<ListNumber<T::List>>,
 ) -> CandidateNominationInputType<'a, T> {
     CandidateNominationInput {
         number_of_seats: input.number_of_seats(),
@@ -349,19 +352,21 @@ fn reassign_residual_seats_for_exhausted_lists<'a, T: ListVotes>(
 
 #[cfg(test)]
 pub(crate) mod tests {
+    use std::fmt::Debug;
+
     use test_log::test;
 
     use crate::{
-        ListVotes, SeatAssignmentResult,
+        SeatAssignmentResult,
         fraction::Fraction,
         seat_assignment::{
             ListStanding, get_total_seats_per_list_number_from_apportionment_result, list_numbers,
         },
     };
 
-    fn check_total_seats_per_list<T: ListVotes>(
-        result: &SeatAssignmentResult<T>,
-        expected_total_seats_per_list: &[(T::ListNumber, u32)],
+    fn check_total_seats_per_list<LN: Copy + Debug + PartialEq>(
+        result: &SeatAssignmentResult<LN>,
+        expected_total_seats_per_list: &[(LN, u32)],
     ) {
         let total_seats_per_list_number =
             get_total_seats_per_list_number_from_apportionment_result(result);

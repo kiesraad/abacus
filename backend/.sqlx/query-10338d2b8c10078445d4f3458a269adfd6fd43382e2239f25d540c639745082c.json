@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "INSERT INTO users (username, fullname, password_hash, needs_password_change, role)\n        VALUES (?, ?, ?, ?, ?)\n        RETURNING\n            id as \"id: UserId\",\n            username,\n            fullname,\n            password_hash,\n            needs_password_change as \"needs_password_change: bool\",\n            role as \"role: _\",\n            last_activity_at as \"last_activity_at: _\",\n            updated_at as \"updated_at: _\",\n            created_at as \"created_at: _\"\n        ",
+  "query": "SELECT\n            u.id as \"id: UserId\",\n            u.username,\n            u.fullname,\n            u.password_hash,\n            u.needs_password_change as \"needs_password_change: bool\",\n            u.role as \"role: _\",\n            u.last_activity_at as \"last_activity_at: _\",\n            (\n                SELECT COUNT(*)\n                FROM sessions s\n                WHERE s.user_id = u.id\n                    AND s.expires_at > datetime($1)\n            ) > 0 as \"is_logged_in: bool\",\n            u.updated_at as \"updated_at: _\",\n            u.created_at as \"created_at: _\"\n        FROM users u\n        WHERE ($2 IS NULL OR u.role = $2)\n        ",
   "describe": {
     "columns": [
       {
@@ -39,18 +39,23 @@
         "type_info": "Text"
       },
       {
-        "name": "updated_at: _",
+        "name": "is_logged_in: bool",
         "ordinal": 7,
+        "type_info": "Integer"
+      },
+      {
+        "name": "updated_at: _",
+        "ordinal": 8,
         "type_info": "Text"
       },
       {
         "name": "created_at: _",
-        "ordinal": 8,
+        "ordinal": 9,
         "type_info": "Text"
       }
     ],
     "parameters": {
-      "Right": 5
+      "Right": 2
     },
     "nullable": [
       false,
@@ -61,8 +66,9 @@
       false,
       true,
       false,
+      false,
       false
     ]
   },
-  "hash": "4c24c34e45c02ec3f069e00a3bd9a469ef7f7c4be2bad496517f350a40fbd446"
+  "hash": "10338d2b8c10078445d4f3458a269adfd6fd43382e2239f25d540c639745082c"
 }

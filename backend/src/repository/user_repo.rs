@@ -32,6 +32,7 @@ pub struct User {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(value_type = String)]
     last_activity_at: Option<DateTime<Utc>>,
+    is_logged_in: bool,
     #[schema(value_type = String)]
     updated_at: DateTime<Utc>,
     #[schema(value_type = String)]
@@ -89,6 +90,10 @@ impl User {
         self.needs_password_change
     }
 
+    pub fn is_logged_in(&self) -> bool {
+        self.is_logged_in
+    }
+
     #[cfg(test)]
     pub fn test_user(role: Role, user_id: UserId) -> Self {
         Self {
@@ -102,6 +107,7 @@ impl User {
             )
             .unwrap(),
             last_activity_at: None,
+            is_logged_in: false,
             updated_at: Utc::now(),
             created_at: Utc::now(),
         }
@@ -159,6 +165,7 @@ pub async fn create(
             needs_password_change as "needs_password_change: bool",
             role as "role: _",
             last_activity_at as "last_activity_at: _",
+            0 as "is_logged_in: bool", -- New users are never logged in
             updated_at as "updated_at: _",
             created_at as "created_at: _"
         "#,
@@ -268,21 +275,30 @@ pub async fn get_by_username(
     conn: &mut SqliteConnection,
     username: &str,
 ) -> Result<Option<User>, AuthenticationError> {
+    let now = Utc::now();
+
     let user = sqlx::query_as!(
         User,
         r#"
         SELECT
-            id as "id: UserId",
-            username,
-            fullname,
-            role as "role: _",
-            password_hash,
-            needs_password_change as "needs_password_change: bool",
-            last_activity_at as "last_activity_at: _",
-            updated_at as "updated_at: _",
-            created_at as "created_at: _"
-        FROM users WHERE username = ? COLLATE NOCASE
+            u.id as "id: UserId",
+            u.username,
+            u.fullname,
+            u.role as "role: _",
+            u.password_hash,
+            u.needs_password_change as "needs_password_change: bool",
+            u.last_activity_at as "last_activity_at: _",
+            (
+                SELECT COUNT(*)
+                FROM sessions s
+                WHERE s.user_id = u.id
+                    AND s.expires_at > datetime($1)
+            ) > 0 as "is_logged_in: bool",
+            u.updated_at as "updated_at: _",
+            u.created_at as "created_at: _"
+        FROM users u WHERE LOWER(u.username) = LOWER($2)
         "#,
+        now,
         username
     )
     .fetch_optional(conn)
@@ -296,21 +312,30 @@ pub async fn get_by_id(
     conn: &mut SqliteConnection,
     user_id: UserId,
 ) -> Result<Option<User>, AuthenticationError> {
+    let now = Utc::now().to_rfc3339();
+
     let user = sqlx::query_as!(
         User,
         r#"
         SELECT
-            id as "id: UserId",
-            username,
-            fullname,
-            role as "role: _",
-            password_hash,
-            needs_password_change as "needs_password_change: bool",
-            last_activity_at as "last_activity_at: _",
-            updated_at as "updated_at: _",
-            created_at as "created_at: _"
-        FROM users WHERE id = ?
+            u.id as "id: UserId",
+            u.username,
+            u.fullname,
+            u.role as "role: _",
+            u.password_hash,
+            u.needs_password_change as "needs_password_change: bool",
+            u.last_activity_at as "last_activity_at: _",
+            (
+                SELECT COUNT(*)
+                FROM sessions s
+                WHERE s.user_id = u.id
+                    AND s.expires_at > datetime($1)
+            ) > 0 as "is_logged_in: bool",
+            u.updated_at as "updated_at: _",
+            u.created_at as "created_at: _"
+        FROM users u WHERE u.id = $2
         "#,
+        now,
         user_id
     )
     .fetch_optional(conn)
@@ -323,21 +348,30 @@ pub async fn list(
     conn: &mut SqliteConnection,
     filter_role: Option<Role>,
 ) -> Result<Vec<User>, sqlx::Error> {
+    let now = Utc::now().to_rfc3339();
+
     let users = query_as!(
         User,
         r#"SELECT
-            id as "id: UserId",
-            username,
-            fullname,
-            password_hash,
-            needs_password_change as "needs_password_change: bool",
-            role as "role: _",
-            last_activity_at as "last_activity_at: _",
-            updated_at as "updated_at: _",
-            created_at as "created_at: _"
-        FROM users
-        WHERE ($1 IS NULL OR role = $1)
+            u.id as "id: UserId",
+            u.username,
+            u.fullname,
+            u.password_hash,
+            u.needs_password_change as "needs_password_change: bool",
+            u.role as "role: _",
+            u.last_activity_at as "last_activity_at: _",
+            (
+                SELECT COUNT(*)
+                FROM sessions s
+                WHERE s.user_id = u.id
+                    AND s.expires_at > datetime($1)
+            ) > 0 as "is_logged_in: bool",
+            u.updated_at as "updated_at: _",
+            u.created_at as "created_at: _"
+        FROM users u
+        WHERE ($2 IS NULL OR u.role = $2)
         "#,
+        now,
         filter_role,
     )
     .fetch_all(conn)
@@ -631,6 +665,7 @@ mod tests {
             )
             .unwrap(),
             last_activity_at: None,
+            is_logged_in: false,
             updated_at: chrono::Utc::now(),
             created_at: chrono::Utc::now(),
         };

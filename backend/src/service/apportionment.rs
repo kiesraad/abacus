@@ -12,7 +12,7 @@ use crate::{
         apportionment::{
             AbsoluteMajorityDrawingLots, ApportionmentWarning, CandidateDrawingLotsVariant,
             HighestAverageResidualSeatDrawingLots, LargestRemainderResidualSeatDrawingLots,
-            ListDrawingLotsVariant,
+            ListDrawingLotsVariant, SeatAssignment,
         },
         apportionment_state::{ApportionmentState, ApportionmentStateError, DrawingLotsRequired},
         committee_session::CommitteeSessionId,
@@ -103,10 +103,10 @@ pub async fn next_state(
 
     update_state(tx, audit_service, election.id, |state| match result {
         ApportionmentResult::Ok(_) => state.finalise(),
-        ApportionmentResult::ListDrawingLotsRequired(variant) => {
+        ApportionmentResult::ListDrawingLotsRequired(variant, ..) => {
             state.draw_lots(DrawingLotsRequired::ListDrawingLotsRequired(variant))
         }
-        ApportionmentResult::CandidateDrawingLotsRequired(variant) => {
+        ApportionmentResult::CandidateDrawingLotsRequired(variant, ..) => {
             state.draw_lots(DrawingLotsRequired::CandidateDrawingLotsRequired(variant))
         }
     })
@@ -116,8 +116,8 @@ pub async fn next_state(
 #[allow(clippy::large_enum_variant)]
 pub enum ApportionmentResult {
     Ok(ElectionApportionmentResponse),
-    ListDrawingLotsRequired(ListDrawingLotsVariant),
-    CandidateDrawingLotsRequired(CandidateDrawingLotsVariant),
+    ListDrawingLotsRequired(ListDrawingLotsVariant, ElectionSummary, SeatAssignment),
+    CandidateDrawingLotsRequired(CandidateDrawingLotsVariant, ElectionSummary, SeatAssignment),
 }
 
 impl From<apportionment::CandidateDrawingLotsVariant<PGNumber, CandidateNumber>>
@@ -171,7 +171,7 @@ type ApportionmentError = apportionment::ApportionmentError<PGNumber, CandidateN
 
 /// - Collect data for the [ApportionmentInputData] from the database and make sure that the
 ///   committee session status is completed.
-/// - Call the apportionment process funtion
+/// - Call the apportionment process function
 /// - Map the Result from the apportionment into an [ApportionmentResult]
 pub async fn process(
     conn: &mut SqliteConnection,
@@ -206,11 +206,19 @@ pub async fn process(
                 .map(ApportionmentWarning::from)
                 .collect(),
         }),
-        Err(ApportionmentError::ListDrawingLotsRequired(r)) => {
-            ApportionmentResult::ListDrawingLotsRequired(r.into())
+        Err(ApportionmentError::ListDrawingLotsRequired(variant, preliminary_seat_assignment)) => {
+            ApportionmentResult::ListDrawingLotsRequired(
+                variant.into(),
+                election_summary.clone(),
+                map_seat_assignment(&preliminary_seat_assignment),
+            )
         }
-        Err(ApportionmentError::CandidateDrawingLotsRequired(r)) => {
-            ApportionmentResult::CandidateDrawingLotsRequired(r.into())
+        Err(ApportionmentError::CandidateDrawingLotsRequired(variant, seat_assignment)) => {
+            ApportionmentResult::CandidateDrawingLotsRequired(
+                variant.into(),
+                election_summary.clone(),
+                map_seat_assignment(&seat_assignment),
+            )
         }
         Err(ApportionmentError::InvalidLotDrawing(message)) => {
             return Err(APIError::Conflict(

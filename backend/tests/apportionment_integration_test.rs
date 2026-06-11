@@ -185,7 +185,7 @@ async fn test_unassigned_seats(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_10_csb", "users"))))]
-async fn test_error_drawing_of_lots_required(pool: SqlitePool) {
+async fn test_drawing_of_lots_required(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     let request_body = json!({
@@ -229,9 +229,9 @@ async fn test_error_drawing_of_lots_required(pool: SqlitePool) {
         .await;
 
     let response = get_apportionment(&addr, 10).await;
-    assert_eq!(response.status(), StatusCode::UNPROCESSABLE_ENTITY);
+    assert_eq!(response.status(), StatusCode::OK);
     let body: serde_json::Value = response.json().await.unwrap();
-    assert_eq!(body["error"], "Drawing of lots is required");
+    assert_eq!(body["status"], "DrawingLotsRequired".to_string());
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]

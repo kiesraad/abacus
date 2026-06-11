@@ -5,8 +5,11 @@ use std::{
 };
 
 use super::{
-    candidate_nomination::CandidateNominationResult, fraction::Fraction,
+    SeatChangeStep, candidate_nomination::CandidateNominationResult, fraction::Fraction,
     seat_assignment::SeatAssignmentResult,
+};
+pub(crate) use crate::seat_assignment::{
+    AssignRemainderDrawingLotsError, ResidualSeatDrawingLotsError,
 };
 
 pub(crate) const LARGE_COUNCIL_THRESHOLD: u32 = 19;
@@ -19,8 +22,11 @@ pub type CandidateNumber<LV> = <<LV as ListVotes>::Cv as CandidateVotes>::Candid
 /// Errors that can occur during apportionment
 #[derive(Debug, PartialEq)]
 pub enum ApportionmentError<LN, CN> {
-    ListDrawingLotsRequired(ListDrawingLotsVariant<LN>),
-    CandidateDrawingLotsRequired(CandidateDrawingLotsVariant<LN, CN>),
+    ListDrawingLotsRequired(ListDrawingLotsVariant<LN>, SeatAssignmentResult<LN>),
+    CandidateDrawingLotsRequired(
+        CandidateDrawingLotsVariant<LN, CN>,
+        SeatAssignmentResult<LN>,
+    ),
     InvalidLotDrawing(String),
 }
 
@@ -28,18 +34,50 @@ pub enum ApportionmentError<LN, CN> {
 /// containing all the information needed to do the drawing
 #[derive(Debug, PartialEq)]
 pub enum ListDrawingLotsError<LN> {
-    DrawingLotsRequired(ListDrawingLotsVariant<LN>),
+    DrawingLotsRequired(ListDrawingLotsVariant<LN>, SeatAssignmentResult<LN>),
     InvalidLotDrawing(String),
 }
 
 impl<LN, CN> From<ListDrawingLotsError<LN>> for ApportionmentError<LN, CN> {
     fn from(value: ListDrawingLotsError<LN>) -> Self {
         match value {
-            ListDrawingLotsError::DrawingLotsRequired(variant) => {
-                ApportionmentError::ListDrawingLotsRequired(variant)
+            ListDrawingLotsError::DrawingLotsRequired(variant, preliminary_result) => {
+                ApportionmentError::ListDrawingLotsRequired(variant, preliminary_result)
             }
             ListDrawingLotsError::InvalidLotDrawing(message) => {
                 ApportionmentError::InvalidLotDrawing(message)
+            }
+        }
+    }
+}
+
+impl<LN> ListDrawingLotsError<LN> {
+    pub(crate) fn new(
+        err: ResidualSeatDrawingLotsError<LN>,
+        preliminary_result: SeatAssignmentResult<LN>,
+    ) -> Self {
+        match err {
+            ResidualSeatDrawingLotsError::DrawingLotsRequired(variant) => {
+                ListDrawingLotsError::DrawingLotsRequired(variant, preliminary_result)
+            }
+            ResidualSeatDrawingLotsError::InvalidLotDrawing(message) => {
+                ListDrawingLotsError::InvalidLotDrawing(message)
+            }
+        }
+    }
+}
+
+impl<LN> AssignRemainderDrawingLotsError<LN> {
+    pub(crate) fn new(
+        err: ResidualSeatDrawingLotsError<LN>,
+        steps: Vec<SeatChangeStep<LN>>,
+    ) -> Self {
+        match err {
+            ResidualSeatDrawingLotsError::DrawingLotsRequired(variant) => {
+                AssignRemainderDrawingLotsError::DrawingLotsRequired(variant, steps)
+            }
+            ResidualSeatDrawingLotsError::InvalidLotDrawing(message) => {
+                AssignRemainderDrawingLotsError::InvalidLotDrawing(message)
             }
         }
     }
@@ -49,16 +87,6 @@ impl<LN, CN> From<ListDrawingLotsError<LN>> for ApportionmentError<LN, CN> {
 #[derive(Debug, PartialEq)]
 pub enum CandidateDrawingLotsError<LN, CN> {
     DrawingLotsRequired(CandidateDrawingLotsVariant<LN, CN>),
-}
-
-impl<LN, CN> From<CandidateDrawingLotsError<LN, CN>> for ApportionmentError<LN, CN> {
-    fn from(value: CandidateDrawingLotsError<LN, CN>) -> Self {
-        match value {
-            CandidateDrawingLotsError::DrawingLotsRequired(variant) => {
-                ApportionmentError::CandidateDrawingLotsRequired(variant)
-            }
-        }
-    }
 }
 
 /// Different variants of drawing lots for lists, with all the information needed to do the drawing

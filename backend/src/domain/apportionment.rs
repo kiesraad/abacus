@@ -23,7 +23,7 @@ impl From<apportionment::ApportionmentWarning> for ApportionmentWarning {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize, ToSchema)]
+#[derive(Debug, Serialize, Deserialize, ToSchema, Clone, PartialEq)]
 pub struct SeatAssignment {
     pub seats: u32,
     pub full_seats: u32,
@@ -151,7 +151,7 @@ pub struct ListStanding {
     pub residual_seats: u32,
 }
 
-#[derive(Debug, Serialize, Deserialize, ToSchema)]
+#[derive(Clone, Debug, Serialize, Deserialize, ToSchema, PartialEq)]
 pub struct ListSeatAssignment {
     pub list_number: PGNumber,
     pub votes_cast: u64,
@@ -162,20 +162,20 @@ pub struct ListSeatAssignment {
     pub total_seats: u32,
 }
 
-#[derive(Debug, Serialize, Deserialize, ToSchema)]
+#[derive(Debug, Serialize, Deserialize, ToSchema, PartialEq)]
 pub struct CandidateNomination {
     pub preference_threshold: PreferenceThreshold,
     pub chosen_candidates: Vec<ChosenCandidate>,
     pub list_candidate_nomination: Vec<ListCandidateNomination>,
 }
 
-#[derive(Debug, Serialize, Deserialize, ToSchema)]
+#[derive(Debug, Serialize, Deserialize, ToSchema, PartialEq)]
 pub struct PreferenceThreshold {
     pub percentage: u64,
     pub number_of_votes: DisplayFraction,
 }
 
-#[derive(Debug, Serialize, Deserialize, ToSchema)]
+#[derive(Debug, Serialize, Deserialize, ToSchema, PartialEq)]
 pub struct ListCandidateNomination {
     pub list_number: PGNumber,
     pub list_name: String,
@@ -379,7 +379,6 @@ pub struct CandidateDrawn {
 
 #[cfg(test)]
 mod tests {
-
     use super::*;
 
     #[test]

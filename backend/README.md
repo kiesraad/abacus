@@ -6,11 +6,10 @@ managing the database and completing requested user actions, including
 generating PDF and EML output files, computing summaries and apportionments, and
 much more. 
 
-During development the frontend assets are typically served by the 
-frontend dev server, and we typically use an external Typst CLI binary for PDF
-generation. During production we serve the frontend assets directly from the
-Abacus binary and also include an embedded version of Typst for PDF generation.
-This results in production builds of Abacus that are completely self-contained.
+During development the frontend assets are typically served by the frontend dev 
+server. During production we serve the frontend assets directly from the Abacus 
+binary. This results in production builds of Abacus that are completely 
+self-contained.
 
 ## Usage
 
@@ -21,7 +20,6 @@ the backend:
 
 - [Rust (stable) and Cargo](https://www.rust-lang.org/tools/install)
 - [SQLx CLI](https://docs.rs/crate/sqlx-cli/latest): `cargo install sqlx-cli`
-- Typst CLI: `cargo install typst-cli` (when not using the `embed-typst` feature)
 
 ### Quickstart
 
@@ -63,18 +61,15 @@ sqlx database setup
 cargo run --features memory-serve
 ```
 
-By default Abacus will use an external typst binary which should be available on
-your `$PATH` in order to generate PDF output. You can download typst for your
-platform on the [typst releases page] or by running `cargo install typst-cli`.
-You can also build Abacus to include typst in the binary itself. To do this, you
-can simply enable the `embed-typst` feature. This can be combined with the
-memory-serve feature as well, e.g.:
+By default (for compilation efficiency) Abacus will use Typst from a Rust dylib.
+Rust dylibs are not stable, so should not be used in production. If you want to
+switch to the statically linked Typst (as is done with production builds of
+Abacus) you can simply enable the `embed-typst` feature. This can be combined 
+with the memory-serve feature as well, e.g.:
 
 ```shell
 cargo build --features memory-serve,embed-typst
 ```
-
-[typst releases page]: https://github.com/typst/typst/releases
 
 ### Linting
 
@@ -83,8 +78,6 @@ Use `cargo clippy --all-targets --all-features -- -D warnings` to lint the proje
 ### Testing
 
 Use `cargo test` to run the tests. The tests are also run in a GitHub Actions workflow.
-
-Typst needs to be installed on your machine, see [Running](#running) for more details.
 
 ### Air gap detection
 

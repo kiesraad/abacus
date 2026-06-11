@@ -1,0 +1,22 @@
+[package]
+name = "pdf_gen"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[lints]
+workspace = true
+
+[features]
+default = []
+static = ["dep:pdf_gen_impl"]
+dev = ["dep:pdf_gen_dylib"]
+stub = []
+
+[dependencies]
+pdf_gen_impl = { workspace = true, optional = true }
+pdf_gen_types.workspace = true
+pdf_gen_dylib = { workspace = true, optional = true }
+tokio.workspace = true
+tracing.workspace = true

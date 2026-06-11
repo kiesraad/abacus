@@ -115,7 +115,7 @@ pub async fn change_committee_session_status(
             .await?;
         update_apportionment_state(
             &mut tx,
-            audit_service.clone(),
+            &audit_service,
             committee_session.election_id,
             |state| state.reset(),
         )
@@ -292,12 +292,9 @@ mod tests {
         .await?;
 
         // Finalise apportionment state
-        update_apportionment_state(
-            &mut conn,
-            audit_service.clone(),
-            ElectionId::from(5),
-            |state| state.finalise(),
-        )
+        update_apportionment_state(&mut conn, &audit_service, ElectionId::from(5), |state| {
+            state.finalise()
+        })
         .await?;
         let (_, state) = get_apportionment_state(&mut conn, ElectionId::from(5)).await?;
         assert!(state.is_finalised());

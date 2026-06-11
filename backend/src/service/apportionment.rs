@@ -66,7 +66,7 @@ pub async fn get_state(
 /// - log new state to audit log
 pub async fn update_state(
     conn: &mut SqliteConnection,
-    audit_service: AuditService,
+    audit_service: &AuditService,
     election_id: ElectionId,
     update_fn: impl FnOnce(ApportionmentState) -> Result<ApportionmentState, ApportionmentStateError>,
 ) -> Result<ApportionmentState, APIError> {
@@ -95,7 +95,7 @@ pub async fn update_state(
 /// - use [update_state] to go to the appropriate state and persist that
 pub async fn next_state(
     tx: &mut SqliteConnection,
-    audit_service: AuditService,
+    audit_service: &AuditService,
     election: &ElectionWithPoliticalGroups,
 ) -> Result<ApportionmentState, APIError> {
     let result = process(tx, election).await?;
@@ -257,7 +257,7 @@ mod tests {
 
         let result = update_state(
             &mut conn,
-            AuditService::new(None, None),
+            &AuditService::new(None, None),
             unknown_election,
             |_| panic!("should not call callback"),
         )
@@ -277,7 +277,7 @@ mod tests {
 
         let err = update_state(
             &mut conn,
-            AuditService::new(None, None),
+            &AuditService::new(None, None),
             ElectionId::from(ELECTION_ID),
             |_| panic!("should not call callback"),
         )
@@ -313,7 +313,7 @@ mod tests {
         // Creates a new entry in the database
         update_state(
             &mut conn,
-            AuditService::new(None, None),
+            &AuditService::new(None, None),
             ElectionId::from(ELECTION_ID),
             Ok,
         )
@@ -343,7 +343,7 @@ mod tests {
 
         let returned_state = update_state(
             &mut conn,
-            AuditService::new(None, None),
+            &AuditService::new(None, None),
             ElectionId::from(ELECTION_ID),
             |state| {
                 assert_eq!(state, ApportionmentState::Uninitialised);

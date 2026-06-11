@@ -21,6 +21,7 @@ pub type CandidateNumber<LV> = <<LV as ListVotes>::Cv as CandidateVotes>::Candid
 pub enum ApportionmentError<LN, CN> {
     ListDrawingLotsRequired(ListDrawingLotsVariant<LN>),
     CandidateDrawingLotsRequired(CandidateDrawingLotsVariant<LN, CN>),
+    InvalidLotDrawing(String),
 }
 
 /// Used in [ApportionmentError] to indicate that drawing lots for a list is needed,
@@ -28,6 +29,7 @@ pub enum ApportionmentError<LN, CN> {
 #[derive(Debug, PartialEq)]
 pub enum ListDrawingLotsError<LN> {
     DrawingLotsRequired(ListDrawingLotsVariant<LN>),
+    InvalidLotDrawing(String),
 }
 
 impl<LN, CN> From<ListDrawingLotsError<LN>> for ApportionmentError<LN, CN> {
@@ -35,6 +37,9 @@ impl<LN, CN> From<ListDrawingLotsError<LN>> for ApportionmentError<LN, CN> {
         match value {
             ListDrawingLotsError::DrawingLotsRequired(variant) => {
                 ApportionmentError::ListDrawingLotsRequired(variant)
+            }
+            ListDrawingLotsError::InvalidLotDrawing(message) => {
+                ApportionmentError::InvalidLotDrawing(message)
             }
         }
     }

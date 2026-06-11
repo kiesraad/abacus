@@ -185,7 +185,7 @@ async fn test_unassigned_seats(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_10_csb", "users"))))]
-async fn test_error_drawing_of_lots_not_implemented(pool: SqlitePool) {
+async fn test_error_drawing_of_lots_required(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     let request_body = json!({

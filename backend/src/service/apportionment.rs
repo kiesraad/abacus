@@ -20,6 +20,7 @@ use crate::{
         election::{CandidateNumber, ElectionId, ElectionWithPoliticalGroups, PGNumber},
         summary::ElectionSummary,
     },
+    error::ErrorReference,
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
     repository::{apportionment_state_repo, committee_session_repo, data_entry_repo},
     service,
@@ -210,6 +211,12 @@ pub async fn process(
         }
         Err(ApportionmentError::CandidateDrawingLotsRequired(r)) => {
             ApportionmentResult::CandidateDrawingLotsRequired(r.into())
+        }
+        Err(ApportionmentError::InvalidLotDrawing(message)) => {
+            return Err(APIError::Conflict(
+                message,
+                ErrorReference::ApportionmentInvalidLotDrawing,
+            ));
         }
     };
 

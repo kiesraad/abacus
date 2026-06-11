@@ -97,8 +97,8 @@ impl ListVotesMock {
 }
 
 pub struct ListDrawnMock {
-    variant: ListDrawingLotsVariant<u32>,
-    drawn: u32,
+    pub variant: ListDrawingLotsVariant<u32>,
+    pub drawn: u32,
 }
 
 impl ListDrawn<u32> for ListDrawnMock {

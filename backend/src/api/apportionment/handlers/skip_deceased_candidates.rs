@@ -9,7 +9,7 @@ use crate::{
     domain::{apportionment_state::ApportionmentState, election::ElectionId},
     infra::audit_log::AuditService,
     repository::{election_repo, user_repo::User},
-    service::update_apportionment_state,
+    service::next_apportionment_state,
 };
 
 /// Skip registering deceased candidates
@@ -39,11 +39,7 @@ pub async fn skip_deceased_candidates(
     let election = election_repo::get(&mut tx, election_id).await?;
     user.role().is_authorized(election.committee_category)?;
 
-    let state = update_apportionment_state(&mut tx, audit_service, election_id, |state| {
-        // TODO in next PR, call apportionment process and determine next state
-        state.skip_deceased_candidates()
-    })
-    .await?;
+    let state = next_apportionment_state(&mut tx, &audit_service, &election).await?;
 
     tx.commit().await?;
     Ok(Json(state))

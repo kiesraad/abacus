@@ -153,13 +153,11 @@ mod tests {
         let political_groups = &election.political_groups;
         let list_votes = create_political_group_candidate_votes(political_groups, &candidate_votes);
         let apportionment_input =
-            ApportionmentInputData::new(election.number_of_seats, &list_votes, &[]);
+            ApportionmentInputData::new(election.number_of_seats, &list_votes, &[], &[], &[]);
         let apportionment_result =
             apportionment::process(&apportionment_input).expect("apportionment failed");
-        let candidate_nomination = map_candidate_nomination(
-            &apportionment_result.candidate_nomination,
-            political_groups.clone(),
-        );
+        let candidate_nomination =
+            map_candidate_nomination(&apportionment_result.candidate_nomination, political_groups);
         let result = EnrichedCandidateNomination::new(&election, &candidate_nomination)
             .expect("EnrichedCandidateNomination::new should succeed");
         assert_eq!(

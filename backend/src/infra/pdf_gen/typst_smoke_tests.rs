@@ -10,10 +10,7 @@ use rand::{RngExt, seq::IndexedRandom};
 use test_log::test;
 
 use crate::{
-    api::{
-        apportionment::{ApportionmentInputData, map_candidate_nomination, map_seat_assignment},
-        report::DEFAULT_DATE_TIME_FORMAT,
-    },
+    api::apportionment::{ApportionmentInputData, map_candidate_nomination, map_seat_assignment},
     domain::{
         committee_session::{CommitteeSession, CommitteeSessionId},
         committee_session_status::CommitteeSessionStatus,
@@ -39,6 +36,7 @@ use crate::{
             PollingStation, PollingStationFirstSession, PollingStationForSession, PollingStationId,
             PollingStationType,
         },
+        report::DEFAULT_DATE_TIME_FORMAT,
         results::{
             common_polling_station_results::CommonPollingStationResults,
             differences_counts::{
@@ -508,7 +506,7 @@ const MIN_PDF_SIZE: usize = 15_000;
 
 async fn test_pdf(model: PdfModel) {
     let input = model.as_input_path_str();
-    let result = match generate_pdf(&PdfFileModel::new("file.pdf".to_string(), model)).await {
+    let result = match generate_pdf(PdfFileModel::new("file.pdf".to_string(), model)).await {
         Ok(r) => r,
         Err(e) => panic!("Error generating PDF for {input}: {e:?}"),
     };
@@ -762,6 +760,8 @@ async fn test_p_22_2() {
         election.number_of_seats,
         &summary_gsb.political_group_votes,
         &[],
+        &[],
+        &[],
     );
     let apportionment_result =
         apportionment::process(&apportionment_input).expect("apportionment failed");
@@ -770,7 +770,7 @@ async fn test_p_22_2() {
         EnrichedSeatAssignment::new(election.number_of_seats, &summary, &seat_assignment).unwrap();
     let candidate_nomination = map_candidate_nomination(
         &apportionment_result.candidate_nomination,
-        election.political_groups.clone(),
+        &election.political_groups,
     );
     let enriched_candidate_nomination =
         EnrichedCandidateNomination::new(&election, &candidate_nomination).unwrap();

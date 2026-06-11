@@ -1,15 +1,6 @@
-#[cfg(feature = "embed-typst")]
-mod embedded;
-
-#[cfg(not(feature = "embed-typst"))]
-mod external;
+use strum::Display;
 
 pub mod zip;
-
-#[cfg(feature = "embed-typst")]
-pub use embedded::{PdfGenError, generate_pdf, generate_pdfs};
-#[cfg(not(feature = "embed-typst"))]
-pub use external::{PdfGenError, generate_pdf, generate_pdfs};
 
 /// A source file for Typst compilation
 pub struct SourceFile {
@@ -21,7 +12,7 @@ pub struct SourceFile {
 pub struct FontData(pub &'static [u8]);
 
 /// Configuration for a single PDF generation
-pub trait PdfGenInput: Send + Sync {
+pub trait PdfGenInput: Send + Sync + 'static {
     /// Typst source files (templates)
     fn sources(&self) -> &[SourceFile];
     /// Font data
@@ -36,6 +27,29 @@ pub trait PdfGenInput: Send + Sync {
     fn output_file_name(&self) -> &str;
 }
 
+/// Result of PDF generation
 pub struct PdfGenResult {
     pub buffer: Vec<u8>,
+}
+
+#[derive(Debug, Display)]
+pub enum PdfGenError {
+    Typst(String),
+    Join(tokio::task::JoinError),
+    TemplateNotFound(String),
+    ZipError(zip::ZipResponseError),
+}
+
+impl std::error::Error for PdfGenError {}
+
+impl From<tokio::task::JoinError> for PdfGenError {
+    fn from(err: tokio::task::JoinError) -> Self {
+        PdfGenError::Join(err)
+    }
+}
+
+impl From<zip::ZipResponseError> for PdfGenError {
+    fn from(err: zip::ZipResponseError) -> Self {
+        PdfGenError::ZipError(err)
+    }
 }

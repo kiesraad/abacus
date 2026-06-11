@@ -67,18 +67,13 @@ impl apportionment::ListVotes for SimpleListVotes {
 
 /// Used when drawing lots for lists is needed
 pub struct SimpleListDrawn {
-    variant: apportionment::ListDrawingLotsVariant,
-    options: Vec<u32>,
+    variant: apportionment::ListDrawingLotsVariant<u32>,
     drawn: u32,
 }
 
 impl apportionment::ListDrawn<u32> for SimpleListDrawn {
-    fn variant(&self) -> apportionment::ListDrawingLotsVariant {
-        self.variant
-    }
-
-    fn options(&self) -> &[u32] {
-        &self.options
+    fn variant(&self) -> apportionment::ListDrawingLotsVariant<u32> {
+        self.variant.clone()
     }
 
     fn drawn(&self) -> &u32 {
@@ -88,18 +83,13 @@ impl apportionment::ListDrawn<u32> for SimpleListDrawn {
 
 /// Used when drawing lots for candidates is needed
 pub struct SimpleCandidateDrawn {
-    list: u32,
-    options: Vec<u32>,
+    variant: apportionment::CandidateDrawingLotsVariant<u32, u32>,
     drawn: u32,
 }
 
 impl apportionment::CandidateDrawn<u32, u32> for SimpleCandidateDrawn {
-    fn list(&self) -> &u32 {
-        &self.list
-    }
-
-    fn options(&self) -> &[u32] {
-        &self.options
+    fn variant(&self) -> apportionment::CandidateDrawingLotsVariant<u32, u32> {
+        self.variant.clone()
     }
 
     fn drawn(&self) -> &u32 {

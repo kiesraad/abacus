@@ -3,7 +3,7 @@ use std::fmt::Debug;
 use tracing::{debug, info};
 
 use super::Fraction;
-use crate::{ListVotes, structs::ListDrawingLotsRequired};
+use crate::{ListVotes, structs::ListDrawingLotsError};
 
 /// The result of the seat assignment procedure. This contains the number of seats and the quota
 /// that was used. It then contains the initial standing after full seats were assigned,
@@ -314,8 +314,8 @@ pub struct ListExhaustionRemovedSeat<LN> {
 
 /// Result type for residual seat (re)assignment: steps taken and final standings.
 pub type RemainderAssignmentResult<LN> =
-    Result<(Vec<SeatChangeStep<LN>>, Vec<ListStanding<LN>>), ListDrawingLotsRequired<LN>>;
+    Result<(Vec<SeatChangeStep<LN>>, Vec<ListStanding<LN>>), ListDrawingLotsError<LN>>;
 
 /// Result type for absolute majority reassignment: updated standings and optional seat change.
 pub type AbsoluteMajorityResult<LN> =
-    Result<(Vec<ListStanding<LN>>, Option<SeatChange<LN>>), ListDrawingLotsRequired<LN>>;
+    Result<(Vec<ListStanding<LN>>, Option<SeatChange<LN>>), ListDrawingLotsError<LN>>;

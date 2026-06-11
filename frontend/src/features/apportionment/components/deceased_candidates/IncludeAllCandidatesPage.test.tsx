@@ -58,8 +58,18 @@ describe("IncludeAllCandidatesPage", () => {
         state: { deceased_candidates: [], type: "RegisteringDeceasedCandidates" },
         expectRedirectTo: "/elections/3/apportionment/deceased-candidates/add",
       },
+      DrawingLots: {
+        state: {
+          deceased_candidates: [],
+          drawing_lots_required: { variant: "AbsoluteMajority", options: [1, 2], type: "ListDrawingLotsRequired" },
+          candidates_drawn: [],
+          lists_drawn: [],
+          type: "DrawingLots",
+        },
+        expectRedirectTo: "/elections/3/apportionment",
+      },
       Finalised: {
-        state: { deceased_candidates: [], type: "Finalised" },
+        state: { deceased_candidates: [], lists_drawn: [], candidates_drawn: [], type: "Finalised" },
         expectRedirectTo: "/elections/3/apportionment",
       },
     } satisfies Record<
@@ -108,12 +118,12 @@ describe("IncludeAllCandidatesPage", () => {
     renderIncludeAllCandidatesPage(3);
     expect(await screen.findByRole("heading", { level: 1, name: "Zetelverdeling" }));
 
-    const yes = await screen.findByRole("radio", { name: "Ja. Er zijn geen kandidaten overleden." });
-    const no = await screen.findByRole("radio", { name: "Nee. Eén of meerdere kandidaten zijn overleden." });
-    expect(yes).toBeVisible();
-    expect(yes).not.toBeChecked();
-    expect(no).toBeVisible();
-    expect(no).not.toBeChecked();
+    const noDeceased = await screen.findByRole("radio", { name: "Er zijn geen overleden kandidaten" });
+    const hasDeceased = await screen.findByRole("radio", { name: "Eén of meerdere kandidaten zijn overleden" });
+    expect(noDeceased).toBeVisible();
+    expect(noDeceased).not.toBeChecked();
+    expect(hasDeceased).toBeVisible();
+    expect(hasDeceased).not.toBeChecked();
     await user.click(screen.getByRole("button", { name: "Volgende" }));
 
     expect(await screen.findByText("Deze vraag is verplicht")).toBeVisible();
@@ -132,9 +142,9 @@ describe("IncludeAllCandidatesPage", () => {
     renderIncludeAllCandidatesPage(3);
     expect(await screen.findByRole("heading", { level: 1, name: "Zetelverdeling" }));
 
-    const yes = await screen.findByRole("radio", { name: "Ja. Er zijn geen kandidaten overleden." });
-    expect(yes).toBeVisible();
-    await user.click(yes);
+    const noDeceased = await screen.findByRole("radio", { name: "Er zijn geen overleden kandidaten" });
+    expect(noDeceased).toBeVisible();
+    await user.click(noDeceased);
     await user.click(screen.getByRole("button", { name: "Volgende" }));
 
     expect(skipDeceasedCandidates).toHaveBeenCalled();
@@ -151,9 +161,9 @@ describe("IncludeAllCandidatesPage", () => {
     renderIncludeAllCandidatesPage(3);
     expect(await screen.findByRole("heading", { level: 1, name: "Zetelverdeling" }));
 
-    const no = await screen.findByRole("radio", { name: "Nee. Eén of meerdere kandidaten zijn overleden." });
-    expect(no).toBeVisible();
-    await user.click(no);
+    const hasDeceased = await screen.findByRole("radio", { name: "Eén of meerdere kandidaten zijn overleden" });
+    expect(hasDeceased).toBeVisible();
+    await user.click(hasDeceased);
     await user.click(screen.getByRole("button", { name: "Volgende" }));
 
     expect(registerDeceasedCandidates).toHaveBeenCalled();

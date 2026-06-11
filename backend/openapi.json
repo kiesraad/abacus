@@ -1352,6 +1352,102 @@
         ]
       }
     },
+    "/api/elections/{election_id}/apportionment/add_candidate_drawn": {
+      "post": {
+        "summary": "Add candidate to drawing lots (coordinator_csb)",
+        "operationId": "add_candidate_drawn",
+        "parameters": [
+          {
+            "name": "election_id",
+            "in": "path",
+            "description": "Election database id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ElectionId"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CandidateDrawn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Add candidate to drawing lots",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApportionmentState"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Invalid state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "coordinator_csb"
+            ]
+          }
+        ]
+      }
+    },
     "/api/elections/{election_id}/apportionment/add_deceased_candidate": {
       "post": {
         "summary": "Add deceased candidate (coordinator_csb)",
@@ -1380,6 +1476,102 @@
         "responses": {
           "200": {
             "description": "Added deceased candidate",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApportionmentState"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Invalid state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "coordinator_csb"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/elections/{election_id}/apportionment/add_list_drawn": {
+      "post": {
+        "summary": "Add list to drawing lots (coordinator_csb)",
+        "operationId": "add_list_drawn",
+        "parameters": [
+          {
+            "name": "election_id",
+            "in": "path",
+            "description": "Election database id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ElectionId"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ListDrawn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Add list to drawing lots",
             "content": {
               "application/json": {
                 "schema": {
@@ -5129,6 +5321,20 @@
   },
   "components": {
     "schemas": {
+      "AbsoluteMajorityDrawingLots": {
+        "type": "object",
+        "required": [
+          "options"
+        ],
+        "properties": {
+          "options": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PGNumber"
+            }
+          }
+        }
+      },
       "AbsoluteMajorityReassignedSeat": {
         "type": "object",
         "required": [
@@ -5203,14 +5409,67 @@
           {
             "type": "object",
             "required": [
+              "drawing_lots_required",
               "deceased_candidates",
+              "lists_drawn",
+              "candidates_drawn",
               "type"
             ],
             "properties": {
+              "candidates_drawn": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/CandidateDrawn"
+                }
+              },
               "deceased_candidates": {
                 "type": "array",
                 "items": {
                   "$ref": "#/components/schemas/DeceasedCandidate"
+                }
+              },
+              "drawing_lots_required": {
+                "$ref": "#/components/schemas/DrawingLotsRequired"
+              },
+              "lists_drawn": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ListDrawn"
+                }
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "DrawingLots"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "deceased_candidates",
+              "lists_drawn",
+              "candidates_drawn",
+              "type"
+            ],
+            "properties": {
+              "candidates_drawn": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/CandidateDrawn"
+                }
+              },
+              "deceased_candidates": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/DeceasedCandidate"
+                }
+              },
+              "lists_drawn": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ListDrawn"
                 }
               },
               "type": {
@@ -5620,6 +5879,44 @@
           }
         },
         "additionalProperties": false
+      },
+      "CandidateDrawingLotsVariant": {
+        "type": "object",
+        "required": [
+          "list",
+          "options"
+        ],
+        "properties": {
+          "list": {
+            "$ref": "#/components/schemas/PGNumber",
+            "description": "The list the candidate needs to be drawn from"
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CandidateNumber"
+            },
+            "description": "The candidates that lots are drawn for"
+          }
+        }
+      },
+      "CandidateDrawn": {
+        "type": "object",
+        "description": "The candidate that has been drawn plus information to assert the correct drawing",
+        "required": [
+          "variant",
+          "drawn"
+        ],
+        "properties": {
+          "drawn": {
+            "$ref": "#/components/schemas/CandidateNumber",
+            "description": "The candidate that the lot was drawn for"
+          },
+          "variant": {
+            "$ref": "#/components/schemas/CandidateDrawingLotsVariant",
+            "description": "The type and information for drawing lots"
+          }
+        }
       },
       "CandidateGender": {
         "type": "string",
@@ -6257,6 +6554,52 @@
           }
         }
       },
+      "DrawingLotsRequired": {
+        "oneOf": [
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ListDrawingLotsVariant"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "type"
+                ],
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "ListDrawingLotsRequired"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CandidateDrawingLotsVariant"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "type"
+                ],
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "CandidateDrawingLotsRequired"
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
       "Election": {
         "type": "object",
         "description": "Election without political groups",
@@ -6763,6 +7106,7 @@
           "AlreadyInitialised",
           "ApportionmentCommitteeSessionNotCompleted",
           "ApportionmentDrawingOfLotsRequired",
+          "ApportionmentInvalidLotDrawing",
           "CommitteeSessionPaused",
           "DatabaseError",
           "DataEntryAlreadyClaimed",
@@ -7133,6 +7477,33 @@
           }
         }
       },
+      "HighestAverageResidualSeatDrawingLots": {
+        "type": "object",
+        "required": [
+          "average",
+          "residual_seat_numbers",
+          "options"
+        ],
+        "properties": {
+          "average": {
+            "$ref": "#/components/schemas/DisplayFraction"
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PGNumber"
+            }
+          },
+          "residual_seat_numbers": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        }
+      },
       "InvestigationConcludedWithNewResults": {
         "type": "object",
         "required": [
@@ -7280,6 +7651,33 @@
           }
         }
       },
+      "LargestRemainderResidualSeatDrawingLots": {
+        "type": "object",
+        "required": [
+          "remainder",
+          "residual_seat_numbers",
+          "options"
+        ],
+        "properties": {
+          "options": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PGNumber"
+            }
+          },
+          "remainder": {
+            "$ref": "#/components/schemas/DisplayFraction"
+          },
+          "residual_seat_numbers": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        }
+      },
       "ListCandidateNomination": {
         "type": "object",
         "required": [
@@ -7319,6 +7717,97 @@
             "items": {
               "$ref": "#/components/schemas/Candidate"
             }
+          }
+        }
+      },
+      "ListDrawingLotsVariant": {
+        "oneOf": [
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/HighestAverageResidualSeatDrawingLots",
+                "description": "Draw lots for assigning a highest average residual seat"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "variant"
+                ],
+                "properties": {
+                  "variant": {
+                    "type": "string",
+                    "enum": [
+                      "HighestAverageResidualSeat"
+                    ]
+                  }
+                }
+              }
+            ],
+            "description": "Draw lots for assigning a highest average residual seat"
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/LargestRemainderResidualSeatDrawingLots",
+                "description": "Draw lots for assigning a largest remainder residual seat"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "variant"
+                ],
+                "properties": {
+                  "variant": {
+                    "type": "string",
+                    "enum": [
+                      "LargestRemainderResidualSeat"
+                    ]
+                  }
+                }
+              }
+            ],
+            "description": "Draw lots for assigning a largest remainder residual seat"
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AbsoluteMajorityDrawingLots",
+                "description": "Draw lots for retracting a seat to be reassigned because of absolute majority (P9)"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "variant"
+                ],
+                "properties": {
+                  "variant": {
+                    "type": "string",
+                    "enum": [
+                      "AbsoluteMajority"
+                    ]
+                  }
+                }
+              }
+            ],
+            "description": "Draw lots for retracting a seat to be reassigned because of absolute majority (P9)"
+          }
+        ]
+      },
+      "ListDrawn": {
+        "type": "object",
+        "description": "The list that has been drawn plus information to assert the correct drawing",
+        "required": [
+          "variant",
+          "drawn"
+        ],
+        "properties": {
+          "drawn": {
+            "$ref": "#/components/schemas/PGNumber",
+            "description": "The list that the lot was drawn for"
+          },
+          "variant": {
+            "$ref": "#/components/schemas/ListDrawingLotsVariant",
+            "description": "The type of seat assignment or retraction that lots need to be drawn for"
           }
         }
       },

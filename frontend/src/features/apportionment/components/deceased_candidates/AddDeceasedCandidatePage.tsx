@@ -24,7 +24,7 @@ import cls from "./DeceasedCandidates.module.css";
 function checkStateAndRedirect(state: ApportionmentState | undefined, electionId: number, navigate: NavigateFunction) {
   if (state?.type === "Uninitialised") {
     void navigate(`/elections/${electionId}/apportionment/include-all-candidates`);
-  } else if (state?.type === "Finalised") {
+  } else if (state?.type === "DrawingLots" || state?.type === "Finalised") {
     void navigate(`/elections/${electionId}/apportionment`);
   }
 }

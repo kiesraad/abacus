@@ -23,8 +23,10 @@ pub use self::{
         SeatChangeStep,
     },
     structs::{
-        ApportionmentError, ApportionmentInput, ApportionmentOutput, CandidateDrawn,
-        CandidateVotes, ListDrawingLotsVariant, ListDrawn, ListVotes,
+        AbsoluteMajorityDrawingLots, ApportionmentError, ApportionmentInput, ApportionmentOutput,
+        CandidateDrawingLotsVariant, CandidateDrawn, CandidateVotes,
+        HighestAverageResidualSeatDrawingLots, LargestRemainderResidualSeatDrawingLots,
+        ListDrawingLotsError, ListDrawingLotsVariant, ListDrawn, ListVotes,
     },
 };
 

@@ -92,12 +92,26 @@ export interface PROCESS_APPORTIONMENT_REQUEST_PARAMS {
 }
 export type PROCESS_APPORTIONMENT_REQUEST_PATH = `/api/elections/${ElectionId}/apportionment`;
 
+// /api/elections/{election_id}/apportionment/add_candidate_drawn
+export interface ADD_CANDIDATE_DRAWN_REQUEST_PARAMS {
+  election_id: ElectionId;
+}
+export type ADD_CANDIDATE_DRAWN_REQUEST_PATH = `/api/elections/${ElectionId}/apportionment/add_candidate_drawn`;
+export type ADD_CANDIDATE_DRAWN_REQUEST_BODY = CandidateDrawn;
+
 // /api/elections/{election_id}/apportionment/add_deceased_candidate
 export interface ADD_DECEASED_CANDIDATE_REQUEST_PARAMS {
   election_id: ElectionId;
 }
 export type ADD_DECEASED_CANDIDATE_REQUEST_PATH = `/api/elections/${ElectionId}/apportionment/add_deceased_candidate`;
 export type ADD_DECEASED_CANDIDATE_REQUEST_BODY = DeceasedCandidate;
+
+// /api/elections/{election_id}/apportionment/add_list_drawn
+export interface ADD_LIST_DRAWN_REQUEST_PARAMS {
+  election_id: ElectionId;
+}
+export type ADD_LIST_DRAWN_REQUEST_PATH = `/api/elections/${ElectionId}/apportionment/add_list_drawn`;
+export type ADD_LIST_DRAWN_REQUEST_BODY = ListDrawn;
 
 // /api/elections/{election_id}/apportionment/delete_deceased_candidate
 export interface DELETE_DECEASED_CANDIDATE_REQUEST_PARAMS {
@@ -385,6 +399,10 @@ export type USER_DELETE_REQUEST_PATH = `/api/users/${UserId}`;
 
 /** TYPES **/
 
+export interface AbsoluteMajorityDrawingLots {
+  options: PGNumber[];
+}
+
 export interface AbsoluteMajorityReassignedSeat {
   list_assigned_seat: PGNumber;
   list_retracted_seat: PGNumber;
@@ -399,7 +417,19 @@ export interface AccountUpdateRequest {
 export type ApportionmentState =
   | { type: "Uninitialised" }
   | { deceased_candidates: DeceasedCandidate[]; type: "RegisteringDeceasedCandidates" }
-  | { deceased_candidates: DeceasedCandidate[]; type: "Finalised" };
+  | {
+      candidates_drawn: CandidateDrawn[];
+      deceased_candidates: DeceasedCandidate[];
+      drawing_lots_required: DrawingLotsRequired;
+      lists_drawn: ListDrawn[];
+      type: "DrawingLots";
+    }
+  | {
+      candidates_drawn: CandidateDrawn[];
+      deceased_candidates: DeceasedCandidate[];
+      lists_drawn: ListDrawn[];
+      type: "Finalised";
+    };
 
 export const apportionmentWarningValues = ["AbsoluteMajorityAndListExhaustion", "NotAllSeatsAssigned"] as const;
 export type ApportionmentWarning = (typeof apportionmentWarningValues)[number];
@@ -569,6 +599,23 @@ export interface Candidate {
   last_name_prefix?: string;
   locality: string;
   number: number;
+}
+
+export interface CandidateDrawingLotsVariant {
+  /** The list the candidate needs to be drawn from */
+  list: PGNumber;
+  /** The candidates that lots are drawn for */
+  options: CandidateNumber[];
+}
+
+/**
+ * The candidate that has been drawn plus information to assert the correct drawing
+ */
+export interface CandidateDrawn {
+  /** The candidate that the lot was drawn for */
+  drawn: CandidateNumber;
+  /** The type and information for drawing lots */
+  variant: CandidateDrawingLotsVariant;
 }
 
 /**
@@ -802,6 +849,10 @@ export interface DisplayFraction {
   numerator: number;
 }
 
+export type DrawingLotsRequired =
+  | (ListDrawingLotsVariant & { type: "ListDrawingLotsRequired" })
+  | (CandidateDrawingLotsVariant & { type: "CandidateDrawingLotsRequired" });
+
 /**
  * Election without political groups
  */
@@ -953,6 +1004,7 @@ export const errorReferenceValues = [
   "AlreadyInitialised",
   "ApportionmentCommitteeSessionNotCompleted",
   "ApportionmentDrawingOfLotsRequired",
+  "ApportionmentInvalidLotDrawing",
   "CommitteeSessionPaused",
   "DatabaseError",
   "DataEntryAlreadyClaimed",
@@ -1117,6 +1169,12 @@ export interface HighestAverageAssignedSeat {
   votes_per_seat: DisplayFraction;
 }
 
+export interface HighestAverageResidualSeatDrawingLots {
+  average: DisplayFraction;
+  options: PGNumber[];
+  residual_seat_numbers: number[];
+}
+
 export interface InvestigationConcludedWithNewResults {
   findings: string;
   reason: string;
@@ -1150,6 +1208,12 @@ export interface LargestRemainderAssignedSeat {
   selected_list_number: PGNumber;
 }
 
+export interface LargestRemainderResidualSeatDrawingLots {
+  options: PGNumber[];
+  remainder: DisplayFraction;
+  residual_seat_numbers: number[];
+}
+
 export interface ListCandidateNomination {
   list_name: string;
   list_number: PGNumber;
@@ -1157,6 +1221,21 @@ export interface ListCandidateNomination {
   other_candidate_nomination: CandidateVotes[];
   preferential_candidate_nomination: CandidateVotes[];
   updated_candidate_ranking: Candidate[];
+}
+
+export type ListDrawingLotsVariant =
+  | (HighestAverageResidualSeatDrawingLots & { variant: "HighestAverageResidualSeat" })
+  | (LargestRemainderResidualSeatDrawingLots & { variant: "LargestRemainderResidualSeat" })
+  | (AbsoluteMajorityDrawingLots & { variant: "AbsoluteMajority" });
+
+/**
+ * The list that has been drawn plus information to assert the correct drawing
+ */
+export interface ListDrawn {
+  /** The list that the lot was drawn for */
+  drawn: PGNumber;
+  /** The type of seat assignment or retraction that lots need to be drawn for */
+  variant: ListDrawingLotsVariant;
 }
 
 export interface ListExhaustionRemovedSeat {

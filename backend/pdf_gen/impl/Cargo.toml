@@ -1,0 +1,16 @@
+[package]
+name = "pdf_gen_impl"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+pdf_gen_types.workspace = true
+typst = "0.14.2"
+typst-pdf = "0.14.2"
+chrono.workspace = true
+tracing.workspace = true

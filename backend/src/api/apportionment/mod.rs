@@ -9,7 +9,7 @@ mod structs;
 
 pub use self::{
     mapping::{map_candidate_nomination, map_seat_assignment},
-    structs::ApportionmentInputData,
+    structs::{ApportionmentInputData, ElectionApportionmentResponse},
 };
 use crate::{
     APIError, AppState,
@@ -25,7 +25,7 @@ use crate::{
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum ApportionmentApiError {
     CommitteeSessionNotCompleted,
-    DrawingOfLotsNotImplemented,
+    DrawingLotsRequired,
 }
 
 impl ApiErrorResponse for ApportionmentApiError {
@@ -43,7 +43,7 @@ impl ApiErrorResponse for ApportionmentApiError {
                     false,
                 ),
             ),
-            ApportionmentApiError::DrawingOfLotsNotImplemented => (
+            ApportionmentApiError::DrawingLotsRequired => (
                 StatusCode::UNPROCESSABLE_ENTITY,
                 ErrorResponse::new(
                     "Drawing of lots is required",
@@ -57,7 +57,7 @@ impl ApiErrorResponse for ApportionmentApiError {
 
 impl From<ApportionmentError<PGNumber, CandidateNumber>> for ApportionmentApiError {
     fn from(_err: ApportionmentError<PGNumber, CandidateNumber>) -> Self {
-        Self::DrawingOfLotsNotImplemented
+        Self::DrawingLotsRequired
     }
 }
 
@@ -80,7 +80,9 @@ pub fn router() -> OpenApiRouter<AppState> {
     const ALLOWED_ROLES: &[Role] = &[CoordinatorCSB];
 
     OpenApiRouter::default()
+        .routes(routes!(add_candidate_drawn::add_candidate_drawn).authorize(ALLOWED_ROLES))
         .routes(routes!(add_deceased_candidate::add_deceased_candidate).authorize(ALLOWED_ROLES))
+        .routes(routes!(add_list_drawn::add_list_drawn).authorize(ALLOWED_ROLES))
         .routes(
             routes!(delete_deceased_candidate::delete_deceased_candidate).authorize(ALLOWED_ROLES),
         )

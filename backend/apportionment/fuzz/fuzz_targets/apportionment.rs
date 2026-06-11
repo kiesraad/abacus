@@ -158,7 +158,7 @@ fuzz_target!(
             }
         }
         Err(ApportionmentError::ListDrawingLotsRequired(_) | ApportionmentError::CandidateDrawingLotsRequired(_)) => {
-            // Expected error: drawing of lots is not yet implemented.
+            // Accepted error in this fuzzer
         }
         Err(ApportionmentError::InvalidLotDrawing(message)) => {
             panic!("Invalid lot drawing: {}", message)

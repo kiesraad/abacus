@@ -629,39 +629,12 @@ pub(crate) mod tests {
 
             /// Apportionment with residual seats assigned with largest remainders method
             ///
-            /// Full seats: [6, 2, 2, 1, 1, 1, 0, 0] - Remainder seats: 2  
-            /// Remainders: [60, 0/15, 0/15, 0/15, 0/15, 0/15, 55, 45]  
-            /// 1 - largest remainder: seat assigned to list 1  
-            /// 2 - Drawing of lots is required for lists: [2, 3, 4, 5, 6], only 1 seat available
-            #[test]
-            fn test_with_0_remainders_drawing_of_lots_error() {
-                let input = seat_assignment_fixture_with_default_50_candidates(
-                    15,
-                    vec![540, 160, 160, 80, 80, 80, 55, 45],
-                );
-                let result = seat_assignment(&input);
-                assert_eq!(
-                    result,
-                    Err(ListDrawingLotsError::DrawingLotsRequired(
-                        ListDrawingLotsVariant::LargestRemainderResidualSeat(
-                            LargestRemainderResidualSeatDrawingLots {
-                                remainder: Fraction::new(0, 15),
-                                residual_seat_numbers: vec![],
-                                options: vec![2, 3, 4, 5, 6]
-                            }
-                        )
-                    ))
-                );
-            }
-
-            /// Apportionment with residual seats assigned with largest remainders method
-            ///
             /// Full seats: [6, 2, 2, 1, 1, 1, 0, 0] - Remainder seats: 2
             /// Remainders: [60, 0/15, 0/15, 0/15, 0/15, 0/15, 55, 45]
             /// 1 - largest remainder: seat assigned to list 1
             /// 2 - Drawing of lots is required for lists: [2, 3, 4, 5, 6], only 1 seat available
             #[test]
-            fn test_with_0_remainders_drawing_of_lots_error_copy() {
+            fn test_with_0_remainders_drawing_of_lots_error() {
                 let mut input = seat_assignment_fixture_with_default_50_candidates(
                     15,
                     vec![540, 160, 160, 80, 80, 80, 55, 45],
@@ -1617,7 +1590,7 @@ pub(crate) mod tests {
 
             /// Apportionment with residual seats assigned with highest averages method
             ///
-            /// Full seats: [13, 3, 3, 3] - Remainder seats: 4
+            /// Full seats: [13, 3, 3, 3] - Remainder seats: 2
             /// 1 - highest average: [35 5/7, 35, 35, 35] seat assigned to list 1
             /// 2 - Drawing of lots is required for lists: [2, 3, 4], only 1 seat available
             #[test]

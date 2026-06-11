@@ -275,7 +275,7 @@ pub async fn get_by_username(
     conn: &mut SqliteConnection,
     username: &str,
 ) -> Result<Option<User>, AuthenticationError> {
-    let now = Utc::now().to_rfc3339();
+    let now = Utc::now();
 
     let user = sqlx::query_as!(
         User,

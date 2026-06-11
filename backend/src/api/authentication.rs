@@ -480,11 +480,11 @@ async fn logout(
     // Log audit event when a valid session exists
     let mut tx = pool.begin_immediate().await?;
 
-    let session = session_repo::get_by_key(&mut tx, session_key)
+    if let Some(session) = session_repo::get_by_key(&mut tx, session_key)
         .await
         .ok()
-        .flatten();
-    if let Some(session) = &session {
+        .flatten()
+    {
         // Log the logout event
         audit_service
             .log(

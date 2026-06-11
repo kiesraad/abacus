@@ -57,6 +57,8 @@ pub(crate) fn seat_assignment<T: ApportionmentInput>(
         .sum::<u32>();
     let residual_seats = input.number_of_seats() - full_seats;
 
+    let mut lists_drawn = input.lists_drawn();
+
     let (mut steps, current_standings) = if residual_seats > 0 {
         assign_remainder::<T::List>(
             &initial_standing,
@@ -65,7 +67,7 @@ pub(crate) fn seat_assignment<T: ApportionmentInput>(
             0,
             &[],
             None,
-            &mut input.lists_drawn(),
+            &mut lists_drawn,
         )?
     } else {
         info!("All seats have been assigned without any residual seats");
@@ -114,7 +116,7 @@ pub(crate) fn seat_assignment<T: ApportionmentInput>(
         input.deceased_candidates(),
         residual_seats,
         steps,
-        &mut input.lists_drawn(),
+        &mut lists_drawn,
     )?;
 
     let final_full_seats = final_standing

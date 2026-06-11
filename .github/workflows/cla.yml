@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - id: check
-        uses: kiesraad/cla-bot@99048d3d89305bee35b3903b124878e5864855e8 # main
+        uses: kiesraad/cla-bot@40435ce736a10b83ace6f708a8e3d364052fd8e7 # main
         with:
           contributors-repository-owner: kiesraad
           contributors-repository-name: abacus

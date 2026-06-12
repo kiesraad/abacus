@@ -34,6 +34,11 @@ struct Args {
     #[arg(short, long, default_value = "db.sqlite", env = "ABACUS_DATABASE")]
     database: String,
 
+    /// Location of the TLS directory (CA certificate and key), will be created if it doesn't exist
+    #[cfg(feature = "tls")]
+    #[arg(long, default_value = "tls", env = "ABACUS_TLS_DIR")]
+    tls_dir: std::path::PathBuf,
+
     /// Seed the database with initial data using the fixtures
     #[cfg(feature = "dev-database")]
     #[arg(short, long, env = "ABACUS_SEED_DATA")]
@@ -109,6 +114,11 @@ async fn run() -> Result<(), AppError> {
     socket.listen(1024)?;
 
     let listener = TcpListener::from_std(socket.into())?;
+
+    // For TLS: load or generate the local CA and create a leaf certificate
+    // Actual HTTPS serving will be implemented in #3411.
+    #[cfg(feature = "tls")]
+    abacus::infra::tls::load_or_generate(&args.tls_dir)?;
 
     start_server(pool, listener, enable_airgap_detection).await
 }

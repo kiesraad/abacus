@@ -10,6 +10,7 @@ pub enum AppError {
     // server specific
     PortAlreadyInUse(u16),
     PermissionDeniedToBindPort(u16),
+    Tls(String),
     // sqlite specific
     DatabaseBusy(String),
     DatabaseReadOnly(String),
@@ -153,6 +154,7 @@ impl std::fmt::Display for AppError {
                 )
             }
             AppError::StdError(e) => write!(f, "{}", e),
+            AppError::Tls(e) => write!(f, "TLS error: {}", e),
         }
     }
 }

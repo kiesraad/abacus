@@ -160,11 +160,17 @@ The following dependencies (crates) are used:
 - `utoipa-swagger-ui`: Swagger UI for the OpenAPI specification.
 - `utoipa`: library for documenting REST APIs using OpenAPI.
 
+For TLS (HTTPS) support, when the `tls` feature is enabled, the following dependencies are used:
+- `rcgen`: X.509 certificate/DER generation (`aws-lc-rs` backend)
+- `rustls-pki-types`: shared certificate and private-key types, and PEM decoding.
+- `if-addrs`: enumerating LAN IP addresses for the TLS certificate subject.
+
 Additionally, the following development dependencies are used:
 
 - `test-log`: show tracing messages while running tests
 - `reqwest`: HTTP client for testing the API.
 - `http-body-util`: trait used to extract a response body in some tests.
+- `tempfile`: to create temporary directories for TLS certificate tests.
 
 ### Database
 
@@ -215,6 +221,7 @@ The abacus binary supports a few arguments, which can be passed on the command l
 Options:
   -p, --port <PORT>          Server port, optional [env: ABACUS_PORT=] [default: 8080]
   -d, --database <DATABASE>  Location of the database file, will be created if it doesn't exist [env: ABACUS_DATABASE=] [default: db.sqlite]
+      --tls-dir <TLS_DIR>    Location of the TLS directory (CA certificate and key), will be created if it doesn't exist [env: ABACUS_TLS_DIR=] [default: tls]
   -a, --airgap-detection     Enable airgap detection [env: ABACUS_AIRGAP_DETECTION=]
   -V, --version              Show version
   -h, --help                 Print help

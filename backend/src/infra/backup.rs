@@ -3,8 +3,8 @@ use sqlx::SqlitePool;
 use std::path::{Path, PathBuf};
 use tokio::time::Duration;
 
-pub(crate) const AMOUNT_OF_BACKUP_FILES_ALLOWED: usize = 5;
-pub(crate) const BACKUP_INTERVAL_IN_MINUTES: u64 = 5;
+const AMOUNT_OF_BACKUP_FILES_ALLOWED: usize = 5;
+const BACKUP_INTERVAL_IN_MINUTES: u64 = 5;
 
 /// Configuration for the local database backup system.
 #[derive(Clone)]
@@ -50,7 +50,7 @@ impl From<sqlx::Error> for BackupError {
 }
 
 /// Runs the periodic backup scheduler, creating a local backup every
-/// [`BACKUP_INTERVAL_IN_MINUTES`] minutes. Runs indefinitely, intended to be
+/// BACKUP_INTERVAL_IN_MINUTES minutes. Runs indefinitely, intended to be
 /// spawned as a background task. Backup errors are logged but do not stop the loop.
 pub async fn run_backup_scheduler(backup_pool: SqlitePool, backup_config: BackupConfig) {
     let mut interval = tokio::time::interval(Duration::from_mins(BACKUP_INTERVAL_IN_MINUTES));

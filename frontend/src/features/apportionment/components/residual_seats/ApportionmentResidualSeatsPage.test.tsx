@@ -58,7 +58,10 @@ describe("ApportionmentResidualSeatsPage", () => {
       ApportionmentState["type"],
       { state: ApportionmentState; expectRedirectTo: string | undefined }
     >),
-  )("Does not redirect only for finalised state ($state.type)", async ({ state, expectRedirectTo }) => {
+  )("Does not redirect only for drawing lots and finalised state ($state.type)", async ({
+    state,
+    expectRedirectTo,
+  }) => {
     vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
     overrideOnce("get", "/api/elections/3", 200, getElectionMockData(lt19Seats.election, lt19Seats.committee_session));
     overrideOnce("post", "/api/elections/3/apportionment", 200, {

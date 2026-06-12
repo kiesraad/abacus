@@ -8,7 +8,7 @@ import { cn } from "@/utils/classnames";
 import { useApportionmentContext } from "../../hooks/useApportionmentContext";
 import type { ResultChange } from "../../utils/seat-change";
 import { getRemovalSteps } from "../../utils/steps";
-import { apportionmentCheckStateAndRedirect, renderTitleAndHeader } from "../../utils/utils";
+import { apportionmentCheckStateAndRedirect, getFinalStanding, renderTitleAndHeader } from "../../utils/utils";
 import cls from "../Apportionment.module.css";
 import { ApportionmentErrorPage } from "../ApportionmentError";
 import { Footnotes } from "./Footnotes";
@@ -50,7 +50,7 @@ export function ApportionmentFullSeatsPage() {
                 <h2 className={cls.tableTitle}>{t("apportionment.how_often_is_quota_met")}</h2>
                 <span className={cls.tableInformation}>{t("apportionment.full_seats_information")}</span>
                 <FullSeatsTable
-                  finalStanding={seatAssignment.final_standing}
+                  finalStanding={getFinalStanding(seatAssignment)}
                   politicalGroups={election.political_groups}
                   quota={seatAssignment.quota}
                   resultChanges={resultChanges}

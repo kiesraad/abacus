@@ -86,7 +86,7 @@ describe("ApportionmentPage", () => {
       ApportionmentState["type"],
       { state: ApportionmentState; expectAlert: boolean; expectRedirectTo: string | undefined }
     >),
-  )("Renders all seats assigned message and does not redirect only for finalised state ($state.type)", async ({
+  )("Renders all seats assigned message only for finalised state and does not redirect for drawing lots and finalised state ($state.type)", async ({
     state,
     expectAlert,
     expectRedirectTo,

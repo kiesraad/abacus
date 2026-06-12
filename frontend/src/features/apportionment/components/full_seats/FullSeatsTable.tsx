@@ -1,13 +1,13 @@
 import { Table } from "@/components/ui/Table/Table";
 import { t } from "@/i18n/translate";
-import type { DisplayFraction, ListSeatAssignment, PoliticalGroup } from "@/types/generated/openapi";
+import type { DisplayFraction, ListSeatAssignment, ListStanding, PoliticalGroup } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 import { formatPoliticalGroupName } from "@/utils/politicalGroup";
 import { getFootnotesFromResultChanges, type ResultChange } from "../../utils/seat-change";
 import cls from "../Apportionment.module.css";
 
 interface FullSeatsTableProps {
-  finalStanding: ListSeatAssignment[];
+  finalStanding: ListSeatAssignment[] | ListStanding[] | undefined;
   politicalGroups: PoliticalGroup[];
   quota: DisplayFraction;
   resultChanges: ResultChange[];
@@ -28,7 +28,7 @@ export function FullSeatsTable({ finalStanding, politicalGroups, quota, resultCh
         <Table.HeaderCell className="text-align-r">{t("apportionment.full_seats_count")}</Table.HeaderCell>
       </Table.Header>
       <Table.Body>
-        {finalStanding.map((standing: ListSeatAssignment) => {
+        {finalStanding?.map((standing) => {
           const listResultChanges = resultChanges.filter((change) => change.listNumber === standing.list_number);
           return (
             <Table.Row key={standing.list_number}>

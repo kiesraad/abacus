@@ -77,6 +77,12 @@ td > .footnoteNumber {
   border-top: 1px solid var(--bg-gray-darkest);
 }
 
+.rowWithoutLink {
+  td:last-of-type {
+    padding-right: 4.5rem;
+  }
+}
+
 .scrollable {
   width: calc(100vw - 10rem);
   overflow-x: auto;
@@ -153,6 +159,13 @@ table.highestAveragesTable {
     section {
       max-width: 100%;
     }
+  }
+}
+
+.notAssignedSeatsAlert {
+  div:global(.small) {
+    max-width: 52rem;
+    width: 100%;
   }
 }
 

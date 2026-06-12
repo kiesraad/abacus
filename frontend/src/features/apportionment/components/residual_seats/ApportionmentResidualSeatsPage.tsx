@@ -1,5 +1,7 @@
 import { type ReactElement, useEffect } from "react";
 import { Link, useNavigate } from "react-router";
+import { Alert } from "@/components/ui/Alert/Alert";
+import { Button } from "@/components/ui/Button/Button";
 import { useElection } from "@/hooks/election/useElection";
 import { t, tx } from "@/i18n/translate";
 import type { PoliticalGroup, SeatAssignment } from "@/types/generated/openapi";
@@ -13,7 +15,14 @@ import {
   type LargestRemainderAssignmentStep,
   type UniqueHighestAverageAssignmentStep,
 } from "../../utils/steps";
-import { apportionmentCheckStateAndRedirect, renderTitleAndHeader } from "../../utils/utils";
+import {
+  apportionmentCheckStateAndRedirect,
+  getFinalStanding,
+  getNotAssignedSeats,
+  getNotAssignedSeatsText,
+  renderNotAssignedSeatsAlert,
+  renderTitleAndHeader,
+} from "../../utils/utils";
 import cls from "../Apportionment.module.css";
 import { ApportionmentErrorPage } from "../ApportionmentError";
 import { Footnotes } from "./Footnotes";
@@ -46,6 +55,7 @@ interface LargeCouncilSectionProps {
   politicalGroups: PoliticalGroup[];
   resultChanges: ResultChange[];
   footNotes?: ReactElement;
+  notAssignedSeats: number;
 }
 
 function LargeCouncilSection({
@@ -54,16 +64,24 @@ function LargeCouncilSection({
   politicalGroups,
   resultChanges,
   footNotes,
+  notAssignedSeats,
 }: LargeCouncilSectionProps) {
   return (
     <div className={cn(cls.tableDiv, "mb-lg")}>
       <div>
         <h2 className={cls.tableTitle}>{t("apportionment.residual_seats_highest_averages")}</h2>
         {renderInformation(seatAssignment.seats, seatAssignment.residual_seats)}
+        <h3 className={cls.tableTitle}>{t("apportionment.averages_per_list")}:</h3>
+        {notAssignedSeats > 0 && (
+          <div className={cn(cls.notAssignedSeatsAlert, "mb-md-lg")}>
+            {/* TODO: Update link to drawing lots page! */}
+            {renderNotAssignedSeatsAlert(notAssignedSeats, ".", t("apportionment.go_to_drawing_lots"))}
+          </div>
+        )}
         {highestAverageSteps.length > 0 && (
           <HighestAveragesTable
             steps={highestAverageSteps}
-            finalStanding={seatAssignment.final_standing}
+            finalStanding={getFinalStanding(seatAssignment)}
             politicalGroups={politicalGroups}
             resultChanges={resultChanges}
           />
@@ -173,6 +191,7 @@ interface SmallCouncilSectionProps {
   politicalGroups: PoliticalGroup[];
   resultChanges: ResultChange[];
   footNotes?: ReactElement;
+  notAssignedSeats: number;
 }
 
 function SmallCouncilSection({
@@ -183,9 +202,16 @@ function SmallCouncilSection({
   politicalGroups,
   resultChanges,
   footNotes,
+  notAssignedSeats,
 }: SmallCouncilSectionProps) {
   return (
     <>
+      {notAssignedSeats > 0 && (
+        <Alert type="notify">
+          <strong className="heading-md">{getNotAssignedSeatsText(notAssignedSeats)}</strong>
+          <Button.Link to=".">{t("apportionment.go_to_drawing_lots")}</Button.Link>
+        </Alert>
+      )}
       <LargestRemaindersSection
         seatAssignment={seatAssignment}
         largestRemainderSteps={largestRemainderSteps}
@@ -207,6 +233,7 @@ function SmallCouncilSection({
   );
 }
 
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO: Is there any way to make this shorter?
 export function ApportionmentResidualSeatsPage() {
   const navigate = useNavigate();
   const { election } = useElection();
@@ -254,6 +281,7 @@ export function ApportionmentResidualSeatsPage() {
                   politicalGroups={election.political_groups}
                   resultChanges={resultChanges}
                   footNotes={resultChanges.length > 0 ? renderFootnotes() : undefined}
+                  notAssignedSeats={getNotAssignedSeats(state)}
                 />
               ) : (
                 <SmallCouncilSection
@@ -264,6 +292,7 @@ export function ApportionmentResidualSeatsPage() {
                   politicalGroups={election.political_groups}
                   resultChanges={resultChanges}
                   footNotes={renderFootnotes()}
+                  notAssignedSeats={getNotAssignedSeats(state)}
                 />
               )
             ) : (

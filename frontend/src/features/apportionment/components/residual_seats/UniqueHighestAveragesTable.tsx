@@ -1,6 +1,6 @@
 import { Table } from "@/components/ui/Table/Table";
 import { t } from "@/i18n/translate";
-import type { ListSeatAssignment, PoliticalGroup } from "@/types/generated/openapi";
+import type { ListSeatAssignment, ListStanding, PoliticalGroup } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 import { formatPoliticalGroupName } from "@/utils/politicalGroup";
 import type { LargestRemainderAssignmentStep, UniqueHighestAverageAssignmentStep } from "../../utils/steps";
@@ -9,7 +9,7 @@ import cls from "../Apportionment.module.css";
 interface UniqueHighestAveragesTableProps {
   steps: UniqueHighestAverageAssignmentStep[];
   largestRemainderSteps: LargestRemainderAssignmentStep[];
-  finalStanding: ListSeatAssignment[];
+  finalStanding: ListSeatAssignment[] | ListStanding[] | undefined;
   politicalGroups: PoliticalGroup[];
 }
 
@@ -31,7 +31,7 @@ export function UniqueHighestAveragesTable({
         <Table.HeaderCell className="text-align-r">{t("apportionment.residual_seats_count")}</Table.HeaderCell>
       </Table.Header>
       <Table.Body>
-        {finalStanding.map((listSeatAssignment) => {
+        {finalStanding?.map((listSeatAssignment) => {
           if (steps[0]?.change.list_exhausted.includes(listSeatAssignment.list_number)) {
             return null;
           } else {

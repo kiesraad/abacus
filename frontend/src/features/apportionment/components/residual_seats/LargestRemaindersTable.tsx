@@ -1,6 +1,6 @@
 import { Table } from "@/components/ui/Table/Table";
 import { t } from "@/i18n/translate";
-import type { ListSeatAssignment, PoliticalGroup } from "@/types/generated/openapi";
+import type { ListSeatAssignment, ListStanding, PoliticalGroup } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 import { formatPoliticalGroupName } from "@/utils/politicalGroup";
 import { getFootnotesFromResultChanges, type ResultChange } from "../../utils/seat-change";
@@ -9,7 +9,7 @@ import cls from "../Apportionment.module.css";
 
 interface LargestRemaindersTableProps {
   steps: LargestRemainderAssignmentStep[];
-  finalStanding: ListSeatAssignment[];
+  finalStanding: ListSeatAssignment[] | ListStanding[] | undefined;
   politicalGroups: PoliticalGroup[];
   resultChanges: ResultChange[];
 }
@@ -20,7 +20,7 @@ export function LargestRemaindersTable({
   politicalGroups,
   resultChanges,
 }: LargestRemaindersTableProps) {
-  const finalStandingPgsMeetingThreshold = finalStanding.filter(
+  const finalStandingPgsMeetingThreshold = finalStanding?.filter(
     (listSeatAssignment) => listSeatAssignment.meets_remainder_threshold,
   );
   return (
@@ -35,7 +35,7 @@ export function LargestRemaindersTable({
         <Table.HeaderCell className="text-align-r">{t("apportionment.residual_seats_count")}</Table.HeaderCell>
       </Table.Header>
       <Table.Body>
-        {finalStandingPgsMeetingThreshold.map((listSeatAssignment) => {
+        {finalStandingPgsMeetingThreshold?.map((listSeatAssignment) => {
           let residualSeats = steps.filter((step) => {
             return step.change.selected_list_number === listSeatAssignment.list_number;
           }).length;

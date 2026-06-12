@@ -24,7 +24,7 @@ export function ApportionmentFullSeatsPage() {
     apportionmentCheckStateAndRedirect(state, election.id, navigate);
   });
 
-  if (error) {
+  if (error && error.reference === "ApportionmentCommitteeSessionNotCompleted") {
     return <ApportionmentErrorPage sectionTitle={t("apportionment.details_full_seats")} error={error} />;
   }
   if (seatAssignment) {

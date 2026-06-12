@@ -94,6 +94,7 @@ function renderLinksToSeatAssignmentPages(seatAssignment: SeatAssignment) {
   );
 }
 
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO: Is there any way to make this shorter?
 export function ApportionmentPage() {
   const navigate = useNavigate();
   const { currentCommitteeSession, election } = useElection();
@@ -110,7 +111,15 @@ export function ApportionmentPage() {
     apportionmentCheckStateAndRedirect(state, election.id, navigate);
   });
 
-  const renderTables = seatAssignment && candidateNomination && electionSummary && state?.type === "Finalised";
+  const renderTables =
+    electionSummary && seatAssignment && (state?.type === "DrawingLots" || state?.type === "Finalised");
+  const notAssignedSeats =
+    state?.type === "DrawingLots" &&
+    state.drawing_lots_required.type === "ListDrawingLotsRequired" &&
+    (state.drawing_lots_required.variant === "HighestAverageResidualSeat" ||
+      state.drawing_lots_required.variant === "LargestRemainderResidualSeat")
+      ? state.drawing_lots_required.residual_seat_numbers.length
+      : 0;
 
   async function handleResetApportionmentState() {
     const path: RESET_APPORTIONMENT_STATE_REQUEST_PATH = `/api/elections/${election.id}/apportionment/reset`;
@@ -128,13 +137,18 @@ export function ApportionmentPage() {
       {renderTitleAndHeader(t("apportionment.title"))}
       <main>
         <article className={cls.article}>
-          {error ? (
+          {error && error.reference === "ApportionmentCommitteeSessionNotCompleted" ? (
             <ApportionmentError error={error} />
           ) : (
             renderTables && (
               <>
                 {renderApportionmentWarnings(warnings)}
-                {renderFinalisedAlert(warnings, currentCommitteeSession.id, () => void handleResetApportionmentState())}
+                {state.type === "Finalised" &&
+                  renderFinalisedAlert(
+                    warnings,
+                    currentCommitteeSession.id,
+                    () => void handleResetApportionmentState(),
+                  )}
                 <div className={cn(cls.tableDiv, "mb-lg")}>
                   <div>
                     <h2 className={cls.tableTitle}>{t("apportionment.election_summary")}</h2>
@@ -143,7 +157,7 @@ export function ApportionmentPage() {
                       seats={seatAssignment.seats}
                       quota={seatAssignment.quota}
                       numberOfVoters={electionSummary.number_of_voters}
-                      preferenceThreshold={candidateNomination.preference_threshold}
+                      preferenceThreshold={candidateNomination?.preference_threshold}
                       deceasedCandidatesInfo={
                         {
                           numberOfCandidates: getNumberOfCandidates(election.political_groups),
@@ -156,24 +170,29 @@ export function ApportionmentPage() {
                 </div>
                 <div className={cn(cls.tableDiv, "mb-lg")}>
                   <div>
-                    <h2 className={cls.tableTitle}>{t("apportionment.title")}</h2>
+                    <h2 className={cls.tableTitle}>
+                      {state.type === "DrawingLots" ? t("apportionment.preliminary_result") : t("apportionment.title")}
+                    </h2>
                     <ApportionmentTable
                       standings={seatAssignment.standings}
                       politicalGroups={election.political_groups}
                       fullSeats={seatAssignment.full_seats}
                       residualSeats={seatAssignment.residual_seats}
                       seats={seatAssignment.seats}
+                      notAssignedSeats={notAssignedSeats}
                     />
                     <div className={cls.footnoteDiv}>{renderLinksToSeatAssignmentPages(seatAssignment)}</div>
                   </div>
                 </div>
-                <div className={cn(cls.tableDiv, "mb-lg")}>
-                  <div>
-                    <h2 className={cls.tableTitle}>{t("apportionment.chosen_candidates")}</h2>
-                    <span className={cls.tableInformation}>{t("apportionment.in_alphabetical_order")}</span>
-                    <ChosenCandidatesTable chosenCandidates={candidateNomination.chosen_candidates} />
+                {candidateNomination?.chosen_candidates && (
+                  <div className={cn(cls.tableDiv, "mb-lg")}>
+                    <div>
+                      <h2 className={cls.tableTitle}>{t("apportionment.chosen_candidates")}</h2>
+                      <span className={cls.tableInformation}>{t("apportionment.in_alphabetical_order")}</span>
+                      <ChosenCandidatesTable chosenCandidates={candidateNomination.chosen_candidates} />
+                    </div>
                   </div>
-                </div>
+                )}
               </>
             )
           )}

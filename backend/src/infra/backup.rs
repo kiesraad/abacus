@@ -6,12 +6,16 @@ use tokio::time::Duration;
 const AMOUNT_OF_BACKUP_FILES_ALLOWED: usize = 5;
 const BACKUP_INTERVAL_IN_MINUTES: u64 = 5;
 
+/// Configuration for the local database backup system.
 #[derive(Clone)]
 pub struct BackupConfig {
+    /// Directory where backup files are stored.
     pub directory: PathBuf,
 }
 
 impl BackupConfig {
+    /// Creates a new `BackupConfig` using a `database_backups` directory
+    /// adjacent to the running executable.
     pub fn new() -> Result<Self, BackupError> {
         let executable_path = std::env::current_exe()?;
         let executable_directory = executable_path
@@ -24,6 +28,7 @@ impl BackupConfig {
     }
 }
 
+/// Errors that can occur during backup operations.
 #[derive(Debug)]
 pub enum BackupError {
     InvalidPath,
@@ -44,6 +49,9 @@ impl From<sqlx::Error> for BackupError {
     }
 }
 
+/// Runs the periodic backup scheduler, creating a local backup every
+/// [`BACKUP_INTERVAL_IN_MINUTES`] minutes. Runs indefinitely, intended to be
+/// spawned as a background task. Backup errors are logged but do not stop the loop.
 pub async fn run_backup_scheduler(backup_pool: SqlitePool, backup_config: BackupConfig) {
     let mut interval = tokio::time::interval(Duration::from_mins(BACKUP_INTERVAL_IN_MINUTES));
     loop {

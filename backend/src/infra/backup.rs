@@ -3,8 +3,8 @@ use sqlx::SqlitePool;
 use std::path::{Path, PathBuf};
 use tokio::time::Duration;
 
-const AMOUNT_OF_BACKUP_FILES_ALLOWED: usize = 5;
-const BACKUP_INTERVAL_IN_MINUTES: u64 = 5;
+pub(crate) const AMOUNT_OF_BACKUP_FILES_ALLOWED: usize = 5;
+pub(crate) const BACKUP_INTERVAL_IN_MINUTES: u64 = 5;
 
 /// Configuration for the local database backup system.
 #[derive(Clone)]

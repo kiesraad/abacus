@@ -9,16 +9,18 @@ use crate::{
         map_candidate_nomination, map_seat_assignment,
     },
     domain::{
-        apportionment::{ApportionmentWarning, ListDrawingLotsVariant},
-        apportionment_state::{
-            ApportionmentState, ApportionmentStateError, CandidateDrawingLotsRequired,
-            ListDrawingLotsRequired,
+        apportionment::{
+            AbsoluteMajorityDrawingLots, ApportionmentWarning, CandidateDrawingLotsVariant,
+            HighestAverageResidualSeatDrawingLots, LargestRemainderResidualSeatDrawingLots,
+            ListDrawingLotsVariant,
         },
+        apportionment_state::{ApportionmentState, ApportionmentStateError, DrawingLotsRequired},
         committee_session::CommitteeSessionId,
         committee_session_status::CommitteeSessionStatus,
         election::{CandidateNumber, ElectionId, ElectionWithPoliticalGroups, PGNumber},
         summary::ElectionSummary,
     },
+    error::ErrorReference,
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
     repository::{apportionment_state_repo, committee_session_repo, data_entry_repo},
     service,
@@ -65,7 +67,7 @@ pub async fn get_state(
 /// - log new state to audit log
 pub async fn update_state(
     conn: &mut SqliteConnection,
-    audit_service: AuditService,
+    audit_service: &AuditService,
     election_id: ElectionId,
     update_fn: impl FnOnce(ApportionmentState) -> Result<ApportionmentState, ApportionmentStateError>,
 ) -> Result<ApportionmentState, APIError> {
@@ -94,18 +96,18 @@ pub async fn update_state(
 /// - use [update_state] to go to the appropriate state and persist that
 pub async fn next_state(
     tx: &mut SqliteConnection,
-    audit_service: AuditService,
+    audit_service: &AuditService,
     election: &ElectionWithPoliticalGroups,
 ) -> Result<ApportionmentState, APIError> {
     let result = process(tx, election).await?;
 
     update_state(tx, audit_service, election.id, |state| match result {
         ApportionmentResult::Ok(_) => state.finalise(),
-        ApportionmentResult::ListDrawingLotsRequired(drawing_lots_details) => {
-            state.draw_lots(drawing_lots_details.into())
+        ApportionmentResult::ListDrawingLotsRequired(variant) => {
+            state.draw_lots(DrawingLotsRequired::ListDrawingLotsRequired(variant))
         }
-        ApportionmentResult::CandidateDrawingLotsRequired(drawing_lots_details) => {
-            state.draw_lots(drawing_lots_details.into())
+        ApportionmentResult::CandidateDrawingLotsRequired(variant) => {
+            state.draw_lots(DrawingLotsRequired::CandidateDrawingLotsRequired(variant))
         }
     })
     .await
@@ -114,41 +116,53 @@ pub async fn next_state(
 #[allow(clippy::large_enum_variant)]
 pub enum ApportionmentResult {
     Ok(ElectionApportionmentResponse),
-    ListDrawingLotsRequired(ListDrawingLotsRequired),
-    CandidateDrawingLotsRequired(CandidateDrawingLotsRequired),
+    ListDrawingLotsRequired(ListDrawingLotsVariant),
+    CandidateDrawingLotsRequired(CandidateDrawingLotsVariant),
 }
 
-impl From<apportionment::ListDrawingLotsRequired<PGNumber>> for ListDrawingLotsRequired {
-    fn from(value: apportionment::ListDrawingLotsRequired<PGNumber>) -> Self {
-        ListDrawingLotsRequired {
-            variant: value.variant.into(),
-            options: value.options,
-        }
-    }
-}
-impl From<apportionment::CandidateDrawingLotsRequired<PGNumber, CandidateNumber>>
-    for CandidateDrawingLotsRequired
+impl From<apportionment::CandidateDrawingLotsVariant<PGNumber, CandidateNumber>>
+    for CandidateDrawingLotsVariant
 {
-    fn from(value: apportionment::CandidateDrawingLotsRequired<PGNumber, CandidateNumber>) -> Self {
-        CandidateDrawingLotsRequired {
+    fn from(value: apportionment::CandidateDrawingLotsVariant<PGNumber, CandidateNumber>) -> Self {
+        CandidateDrawingLotsVariant {
             list: value.list,
             options: value.options,
         }
     }
 }
 
-impl From<apportionment::ListDrawingLotsVariant> for ListDrawingLotsVariant {
-    fn from(value: apportionment::ListDrawingLotsVariant) -> Self {
+impl From<apportionment::ListDrawingLotsVariant<PGNumber>> for ListDrawingLotsVariant {
+    fn from(value: apportionment::ListDrawingLotsVariant<PGNumber>) -> Self {
         match value {
-            apportionment::ListDrawingLotsVariant::HighestAverageResidualSeat => {
-                ListDrawingLotsVariant::HighestAverageResidualSeat
-            }
-            apportionment::ListDrawingLotsVariant::LargestRemainderResidualSeat => {
-                ListDrawingLotsVariant::LargestRemainderResidualSeat
-            }
-            apportionment::ListDrawingLotsVariant::AbsoluteMajority => {
-                ListDrawingLotsVariant::AbsoluteMajority
-            }
+            apportionment::ListDrawingLotsVariant::HighestAverageResidualSeat(
+                apportionment::HighestAverageResidualSeatDrawingLots {
+                    average,
+                    residual_seat_numbers,
+                    options,
+                },
+            ) => ListDrawingLotsVariant::HighestAverageResidualSeat(
+                HighestAverageResidualSeatDrawingLots {
+                    average: average.into(),
+                    residual_seat_numbers,
+                    options,
+                },
+            ),
+            apportionment::ListDrawingLotsVariant::LargestRemainderResidualSeat(
+                apportionment::LargestRemainderResidualSeatDrawingLots {
+                    remainder,
+                    residual_seat_numbers,
+                    options,
+                },
+            ) => ListDrawingLotsVariant::LargestRemainderResidualSeat(
+                LargestRemainderResidualSeatDrawingLots {
+                    remainder: remainder.into(),
+                    residual_seat_numbers,
+                    options,
+                },
+            ),
+            apportionment::ListDrawingLotsVariant::AbsoluteMajority(
+                apportionment::AbsoluteMajorityDrawingLots { options },
+            ) => ListDrawingLotsVariant::AbsoluteMajority(AbsoluteMajorityDrawingLots { options }),
         }
     }
 }
@@ -198,6 +212,12 @@ pub async fn process(
         Err(ApportionmentError::CandidateDrawingLotsRequired(r)) => {
             ApportionmentResult::CandidateDrawingLotsRequired(r.into())
         }
+        Err(ApportionmentError::InvalidLotDrawing(message)) => {
+            return Err(APIError::Conflict(
+                message,
+                ErrorReference::ApportionmentInvalidLotDrawing,
+            ));
+        }
     };
 
     Ok(apportionment_result)
@@ -244,7 +264,7 @@ mod tests {
 
         let result = update_state(
             &mut conn,
-            AuditService::new(None, None),
+            &AuditService::new(None, None),
             unknown_election,
             |_| panic!("should not call callback"),
         )
@@ -264,7 +284,7 @@ mod tests {
 
         let err = update_state(
             &mut conn,
-            AuditService::new(None, None),
+            &AuditService::new(None, None),
             ElectionId::from(ELECTION_ID),
             |_| panic!("should not call callback"),
         )
@@ -300,7 +320,7 @@ mod tests {
         // Creates a new entry in the database
         update_state(
             &mut conn,
-            AuditService::new(None, None),
+            &AuditService::new(None, None),
             ElectionId::from(ELECTION_ID),
             Ok,
         )
@@ -330,7 +350,7 @@ mod tests {
 
         let returned_state = update_state(
             &mut conn,
-            AuditService::new(None, None),
+            &AuditService::new(None, None),
             ElectionId::from(ELECTION_ID),
             |state| {
                 assert_eq!(state, ApportionmentState::Uninitialised);

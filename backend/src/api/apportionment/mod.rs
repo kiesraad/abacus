@@ -11,9 +11,6 @@ pub use self::{
     mapping::{map_candidate_nomination, map_seat_assignment},
     structs::{ApportionmentInputData, ElectionApportionmentResponse},
 };
-pub use crate::domain::apportionment_state::{
-    CandidateDrawingLotsRequired, ListDrawingLotsRequired,
-};
 use crate::{
     APIError, AppState,
     api::middleware::authentication::RouteAuthorization,

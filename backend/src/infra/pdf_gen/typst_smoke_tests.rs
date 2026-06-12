@@ -506,7 +506,7 @@ const MIN_PDF_SIZE: usize = 15_000;
 
 async fn test_pdf(model: PdfModel) {
     let input = model.as_input_path_str();
-    let result = match generate_pdf(&PdfFileModel::new("file.pdf".to_string(), model)).await {
+    let result = match generate_pdf(PdfFileModel::new("file.pdf".to_string(), model)).await {
         Ok(r) => r,
         Err(e) => panic!("Error generating PDF for {input}: {e:?}"),
     };

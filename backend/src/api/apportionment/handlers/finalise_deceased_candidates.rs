@@ -39,7 +39,7 @@ pub async fn finalise_deceased_candidates(
     let election = election_repo::get(&mut tx, election_id).await?;
     user.role().is_authorized(election.committee_category)?;
 
-    let state = next_apportionment_state(&mut tx, audit_service, &election).await?;
+    let state = next_apportionment_state(&mut tx, &audit_service, &election).await?;
 
     tx.commit().await?;
     Ok(Json(state))

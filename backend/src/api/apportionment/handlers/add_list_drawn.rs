@@ -11,7 +11,7 @@ use crate::{
     },
     infra::audit_log::AuditService,
     repository::{election_repo, user_repo::User},
-    service::update_apportionment_state,
+    service::{next_apportionment_state, update_apportionment_state},
 };
 
 /// Add list to drawing lots
@@ -43,10 +43,12 @@ pub async fn add_list_drawn(
     let election = election_repo::get(&mut tx, election_id).await?;
     user.role().is_authorized(election.committee_category)?;
 
-    let state = update_apportionment_state(&mut tx, audit_service, election_id, |state| {
+    update_apportionment_state(&mut tx, &audit_service, election_id, |state| {
         state.add_list_drawn(list_drawn)
     })
     .await?;
+
+    let state = next_apportionment_state(&mut tx, &audit_service, &election).await?;
 
     tx.commit().await?;
     Ok(Json(state))
@@ -58,15 +60,15 @@ mod tests {
 
     use super::*;
     use crate::{
-        api::apportionment::ListDrawingLotsRequired,
         domain::{
-            apportionment::ListDrawingLotsVariant,
-            apportionment_state::{ApportionmentState, DrawingLotsDetails},
+            apportionment::{AbsoluteMajorityDrawingLots, ListDrawingLotsVariant},
+            apportionment_state::{ApportionmentState, DrawingLotsRequired},
             committee_session::CommitteeSessionId,
             committee_session_status::CommitteeSessionStatus,
             election::PGNumber,
             role::Role,
         },
+        infra::audit_log::list_event_names,
         repository::{apportionment_state_repo, committee_session_repo, user_repo::UserId},
     };
 
@@ -84,17 +86,17 @@ mod tests {
             .await
             .expect("should change committee session status");
 
-        let drawing_lots_details: DrawingLotsDetails = ListDrawingLotsRequired {
-            variant: ListDrawingLotsVariant::AbsoluteMajority,
-            options: PGNumber::from_values(vec![8, 9]),
-        }
-        .into();
+        let drawing_lots_required = DrawingLotsRequired::ListDrawingLotsRequired(
+            ListDrawingLotsVariant::AbsoluteMajority(AbsoluteMajorityDrawingLots {
+                options: PGNumber::from_values(vec![8, 9]),
+            }),
+        );
 
         apportionment_state_repo::upsert(
             &mut conn,
             id,
             &ApportionmentState::DrawingLots {
-                drawing_lots_details: drawing_lots_details.clone(),
+                drawing_lots_required: drawing_lots_required.clone(),
                 deceased_candidates: vec![],
                 lists_drawn: vec![],
                 candidates_drawn: vec![],
@@ -104,8 +106,9 @@ mod tests {
         .expect("should upsert initial state");
 
         let list_drawn = ListDrawn {
-            variant: ListDrawingLotsVariant::AbsoluteMajority,
-            options: PGNumber::from_values(vec![8, 9]),
+            variant: ListDrawingLotsVariant::AbsoluteMajority(AbsoluteMajorityDrawingLots {
+                options: PGNumber::from_values(vec![8, 9]),
+            }),
             drawn: PGNumber::from(8),
         };
 
@@ -121,12 +124,16 @@ mod tests {
 
         assert_eq!(
             state.0,
-            ApportionmentState::DrawingLots {
-                drawing_lots_details,
+            ApportionmentState::Finalised {
                 deceased_candidates: vec![],
                 lists_drawn: vec![list_drawn],
                 candidates_drawn: vec![],
             }
+        );
+
+        assert_eq!(
+            list_event_names(&mut conn).await.unwrap(),
+            ["ApportionmentStateUpdated", "ApportionmentStateUpdated"]
         );
     }
 }

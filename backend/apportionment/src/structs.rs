@@ -19,64 +19,97 @@ pub type CandidateNumber<LV> = <<LV as ListVotes>::Cv as CandidateVotes>::Candid
 /// Errors that can occur during apportionment
 #[derive(Debug, PartialEq)]
 pub enum ApportionmentError<LN, CN> {
-    ListDrawingLotsRequired(ListDrawingLotsRequired<LN>),
-    CandidateDrawingLotsRequired(CandidateDrawingLotsRequired<LN, CN>),
+    ListDrawingLotsRequired(ListDrawingLotsVariant<LN>),
+    CandidateDrawingLotsRequired(CandidateDrawingLotsVariant<LN, CN>),
+    InvalidLotDrawing(String),
 }
 
 /// Used in [ApportionmentError] to indicate that drawing lots for a list is needed,
 /// containing all the information needed to do the drawing
 #[derive(Debug, PartialEq)]
-pub struct ListDrawingLotsRequired<LN> {
-    pub variant: ListDrawingLotsVariant,
+pub enum ListDrawingLotsError<LN> {
+    DrawingLotsRequired(ListDrawingLotsVariant<LN>),
+    InvalidLotDrawing(String),
+}
+
+impl<LN, CN> From<ListDrawingLotsError<LN>> for ApportionmentError<LN, CN> {
+    fn from(value: ListDrawingLotsError<LN>) -> Self {
+        match value {
+            ListDrawingLotsError::DrawingLotsRequired(variant) => {
+                ApportionmentError::ListDrawingLotsRequired(variant)
+            }
+            ListDrawingLotsError::InvalidLotDrawing(message) => {
+                ApportionmentError::InvalidLotDrawing(message)
+            }
+        }
+    }
+}
+
+/// Errors that can occur when drawing lots for a candidate  is needed during apportionment
+#[derive(Debug, PartialEq)]
+pub enum CandidateDrawingLotsError<LN, CN> {
+    DrawingLotsRequired(CandidateDrawingLotsVariant<LN, CN>),
+}
+
+impl<LN, CN> From<CandidateDrawingLotsError<LN, CN>> for ApportionmentError<LN, CN> {
+    fn from(value: CandidateDrawingLotsError<LN, CN>) -> Self {
+        match value {
+            CandidateDrawingLotsError::DrawingLotsRequired(variant) => {
+                ApportionmentError::CandidateDrawingLotsRequired(variant)
+            }
+        }
+    }
+}
+
+/// Different variants of drawing lots for lists, with all the information needed to do the drawing
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub enum ListDrawingLotsVariant<LN> {
+    /// Draw lots for assigning a highest average residual seat
+    HighestAverageResidualSeat(HighestAverageResidualSeatDrawingLots<LN>),
+    /// Draw lots for assigning a largest remainder residual seat
+    LargestRemainderResidualSeat(LargestRemainderResidualSeatDrawingLots<LN>),
+    /// Draw lots for retracting a seat to be reassigned because of absolute majority (P9)
+    AbsoluteMajority(AbsoluteMajorityDrawingLots<LN>),
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct HighestAverageResidualSeatDrawingLots<LN> {
+    pub average: Fraction,
+    pub residual_seat_numbers: Vec<u32>,
     pub options: Vec<LN>,
 }
 
-impl<LN, CN> From<ListDrawingLotsRequired<LN>> for ApportionmentError<LN, CN> {
-    fn from(value: ListDrawingLotsRequired<LN>) -> Self {
-        ApportionmentError::ListDrawingLotsRequired(value)
-    }
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct LargestRemainderResidualSeatDrawingLots<LN> {
+    pub remainder: Fraction,
+    pub residual_seat_numbers: Vec<u32>,
+    pub options: Vec<LN>,
 }
 
-/// Used in [ApportionmentError] to indicate that drawing lots for a candidate is needed,
-/// containing all the information needed to do the drawing
-#[derive(Debug, PartialEq)]
-pub struct CandidateDrawingLotsRequired<LN, CN> {
-    pub list: LN,
-    pub options: Vec<CN>,
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct AbsoluteMajorityDrawingLots<LN> {
+    pub options: Vec<LN>,
 }
 
-impl<LN, CN> From<CandidateDrawingLotsRequired<LN, CN>> for ApportionmentError<LN, CN> {
-    fn from(value: CandidateDrawingLotsRequired<LN, CN>) -> Self {
-        ApportionmentError::CandidateDrawingLotsRequired(value)
-    }
-}
-
-#[derive(Copy, Clone, Debug, PartialEq)]
-pub enum ListDrawingLotsVariant {
-    /// Draw lots for assigning a highest average residual seat
-    HighestAverageResidualSeat,
-    /// Draw lots for assigning a largest remainder residual seat
-    LargestRemainderResidualSeat,
-    /// Draw lots for retracting a seat to be reassigned because of absolute majority (P9)
-    AbsoluteMajority,
-}
-
-/// The list that has been drawn plus information to assert the correct drawing
+/// The list that has been drawn and the variant with all information about the drawing
 pub trait ListDrawn<LN> {
     /// The type of seat assignment or retraction that lots need to be drawn for
-    fn variant(&self) -> ListDrawingLotsVariant;
-    /// The lists that lots are drawn for
-    fn options(&self) -> &[LN];
+    fn variant(&self) -> ListDrawingLotsVariant<LN>;
     /// The list that the lot was drawn for
     fn drawn(&self) -> &LN;
 }
 
-/// The candidate that has been drawn plus information to assert the correct drawing
+/// Variant of drawing lots for candidates, with all the information needed to do the drawing
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct CandidateDrawingLotsVariant<LN, CN> {
+    pub list: LN,
+    pub options: Vec<CN>,
+}
+
+/// The candidate that has been drawn and the variant with all information about the drawing
 pub trait CandidateDrawn<LN, CN> {
-    /// The list the candidate needs to be drawn from
-    fn list(&self) -> &LN;
-    /// The candidates that lots are drawn for
-    fn options(&self) -> &[CN];
+    /// The type and information for drawing lots
+    fn variant(&self) -> CandidateDrawingLotsVariant<LN, CN>;
     /// The candidate that the lot was drawn for
     fn drawn(&self) -> &CN;
 }

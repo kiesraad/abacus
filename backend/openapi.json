@@ -5321,6 +5321,20 @@
   },
   "components": {
     "schemas": {
+      "AbsoluteMajorityDrawingLots": {
+        "type": "object",
+        "required": [
+          "options"
+        ],
+        "properties": {
+          "options": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PGNumber"
+            }
+          }
+        }
+      },
       "AbsoluteMajorityReassignedSeat": {
         "type": "object",
         "required": [
@@ -5395,7 +5409,7 @@
           {
             "type": "object",
             "required": [
-              "drawing_lots_details",
+              "drawing_lots_required",
               "deceased_candidates",
               "lists_drawn",
               "candidates_drawn",
@@ -5414,8 +5428,8 @@
                   "$ref": "#/components/schemas/DeceasedCandidate"
                 }
               },
-              "drawing_lots_details": {
-                "$ref": "#/components/schemas/DrawingLotsDetails"
+              "drawing_lots_required": {
+                "$ref": "#/components/schemas/DrawingLotsRequired"
               },
               "lists_drawn": {
                 "type": "array",
@@ -5866,37 +5880,13 @@
         },
         "additionalProperties": false
       },
-      "CandidateDrawingLotsRequired": {
+      "CandidateDrawingLotsVariant": {
         "type": "object",
         "required": [
           "list",
           "options"
         ],
         "properties": {
-          "list": {
-            "$ref": "#/components/schemas/PGNumber"
-          },
-          "options": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CandidateNumber"
-            }
-          }
-        }
-      },
-      "CandidateDrawn": {
-        "type": "object",
-        "description": "The candidate that has been drawn plus information to assert the correct drawing",
-        "required": [
-          "list",
-          "options",
-          "drawn"
-        ],
-        "properties": {
-          "drawn": {
-            "$ref": "#/components/schemas/CandidateNumber",
-            "description": "The candidate that the lot was drawn for"
-          },
           "list": {
             "$ref": "#/components/schemas/PGNumber",
             "description": "The list the candidate needs to be drawn from"
@@ -5907,6 +5897,24 @@
               "$ref": "#/components/schemas/CandidateNumber"
             },
             "description": "The candidates that lots are drawn for"
+          }
+        }
+      },
+      "CandidateDrawn": {
+        "type": "object",
+        "description": "The candidate that has been drawn plus information to assert the correct drawing",
+        "required": [
+          "variant",
+          "drawn"
+        ],
+        "properties": {
+          "drawn": {
+            "$ref": "#/components/schemas/CandidateNumber",
+            "description": "The candidate that the lot was drawn for"
+          },
+          "variant": {
+            "$ref": "#/components/schemas/CandidateDrawingLotsVariant",
+            "description": "The type and information for drawing lots"
           }
         }
       },
@@ -6546,12 +6554,12 @@
           }
         }
       },
-      "DrawingLotsDetails": {
+      "DrawingLotsRequired": {
         "oneOf": [
           {
             "allOf": [
               {
-                "$ref": "#/components/schemas/ListDrawingLotsRequired"
+                "$ref": "#/components/schemas/ListDrawingLotsVariant"
               },
               {
                 "type": "object",
@@ -6572,7 +6580,7 @@
           {
             "allOf": [
               {
-                "$ref": "#/components/schemas/CandidateDrawingLotsRequired"
+                "$ref": "#/components/schemas/CandidateDrawingLotsVariant"
               },
               {
                 "type": "object",
@@ -7098,6 +7106,7 @@
           "AlreadyInitialised",
           "ApportionmentCommitteeSessionNotCompleted",
           "ApportionmentDrawingOfLotsRequired",
+          "ApportionmentInvalidLotDrawing",
           "CommitteeSessionPaused",
           "DatabaseError",
           "DataEntryAlreadyClaimed",
@@ -7468,6 +7477,33 @@
           }
         }
       },
+      "HighestAverageResidualSeatDrawingLots": {
+        "type": "object",
+        "required": [
+          "average",
+          "residual_seat_numbers",
+          "options"
+        ],
+        "properties": {
+          "average": {
+            "$ref": "#/components/schemas/DisplayFraction"
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PGNumber"
+            }
+          },
+          "residual_seat_numbers": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        }
+      },
       "InvestigationConcludedWithNewResults": {
         "type": "object",
         "required": [
@@ -7615,6 +7651,33 @@
           }
         }
       },
+      "LargestRemainderResidualSeatDrawingLots": {
+        "type": "object",
+        "required": [
+          "remainder",
+          "residual_seat_numbers",
+          "options"
+        ],
+        "properties": {
+          "options": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PGNumber"
+            }
+          },
+          "remainder": {
+            "$ref": "#/components/schemas/DisplayFraction"
+          },
+          "residual_seat_numbers": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        }
+      },
       "ListCandidateNomination": {
         "type": "object",
         "required": [
@@ -7657,30 +7720,77 @@
           }
         }
       },
-      "ListDrawingLotsRequired": {
-        "type": "object",
-        "required": [
-          "variant",
-          "options"
-        ],
-        "properties": {
-          "options": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PGNumber"
-            }
-          },
-          "variant": {
-            "$ref": "#/components/schemas/ListDrawingLotsVariant"
-          }
-        }
-      },
       "ListDrawingLotsVariant": {
-        "type": "string",
-        "enum": [
-          "HighestAverageResidualSeat",
-          "LargestRemainderResidualSeat",
-          "AbsoluteMajority"
+        "oneOf": [
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/HighestAverageResidualSeatDrawingLots",
+                "description": "Draw lots for assigning a highest average residual seat"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "variant"
+                ],
+                "properties": {
+                  "variant": {
+                    "type": "string",
+                    "enum": [
+                      "HighestAverageResidualSeat"
+                    ]
+                  }
+                }
+              }
+            ],
+            "description": "Draw lots for assigning a highest average residual seat"
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/LargestRemainderResidualSeatDrawingLots",
+                "description": "Draw lots for assigning a largest remainder residual seat"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "variant"
+                ],
+                "properties": {
+                  "variant": {
+                    "type": "string",
+                    "enum": [
+                      "LargestRemainderResidualSeat"
+                    ]
+                  }
+                }
+              }
+            ],
+            "description": "Draw lots for assigning a largest remainder residual seat"
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AbsoluteMajorityDrawingLots",
+                "description": "Draw lots for retracting a seat to be reassigned because of absolute majority (P9)"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "variant"
+                ],
+                "properties": {
+                  "variant": {
+                    "type": "string",
+                    "enum": [
+                      "AbsoluteMajority"
+                    ]
+                  }
+                }
+              }
+            ],
+            "description": "Draw lots for retracting a seat to be reassigned because of absolute majority (P9)"
+          }
         ]
       },
       "ListDrawn": {
@@ -7688,20 +7798,12 @@
         "description": "The list that has been drawn plus information to assert the correct drawing",
         "required": [
           "variant",
-          "options",
           "drawn"
         ],
         "properties": {
           "drawn": {
             "$ref": "#/components/schemas/PGNumber",
             "description": "The list that the lot was drawn for"
-          },
-          "options": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PGNumber"
-            },
-            "description": "The lists that lots are drawn for"
           },
           "variant": {
             "$ref": "#/components/schemas/ListDrawingLotsVariant",

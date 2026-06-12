@@ -231,7 +231,7 @@ fn fuzz(data: FuzzedApportionmentInput) {
                 Osv2020Result::Conflict => {
                     // OSV2020 can require a drawing lots (P 7) for a residual seat while
                     // Abacus assigns it directly.
-                    // 
+                    //
                     // This is because OSV2020 does not enforce list exhaustion (P 10) during
                     // its residual seat assignment, it only retracts seats after assigning.
                     // Abacus will not assign a residual seat to a list that is already
@@ -274,7 +274,7 @@ fn fuzz(data: FuzzedApportionmentInput) {
                 Osv2020Result::Conflict => {
                     // OSV2020 assigns residual seats to exhausted lists via drawing of lots,
                     // so accept if Abacus also applied list exhaustion.
-                    // 
+                    //
                     // Related issues: #3214, #3367
                     if abacus_applied_list_exhaustion(&abacus_log) {
                         // accept, do nothing
@@ -285,9 +285,7 @@ fn fuzz(data: FuzzedApportionmentInput) {
                         if abacus_options != osv2020_options {
                             report_mismatch(
                                 &data,
-                                &format!(
-                                    "Err({e:?}) Abacus lots options: {abacus_options:?}"
-                                ),
+                                &format!("Err({e:?}) Abacus lots options: {abacus_options:?}"),
                                 &abacus_log,
                                 &format!("OSV2020 lots options: {osv2020_options:?}"),
                                 &osv2020_log,
@@ -297,6 +295,9 @@ fn fuzz(data: FuzzedApportionmentInput) {
                     }
                 }
             }
+        }
+        Err(ApportionmentError::InvalidLotDrawing(message)) => {
+            panic!("Invalid lot drawing: {}", message)
         }
     }
 }

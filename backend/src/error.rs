@@ -43,6 +43,7 @@ pub enum ErrorReference {
     AlreadyInitialised,
     ApportionmentCommitteeSessionNotCompleted,
     ApportionmentDrawingOfLotsRequired,
+    ApportionmentInvalidLotDrawing,
     CommitteeSessionPaused,
     DatabaseError,
     DataEntryAlreadyClaimed,

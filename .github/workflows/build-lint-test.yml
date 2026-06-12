@@ -32,7 +32,7 @@ jobs:
       CARGO_TERM_COLOR: always
       SQLX_OFFLINE: "true"
     steps:
-      - uses: actions/checkout@v6.0.2
+      - uses: actions/checkout@v6.0.3
         with:
           fetch-depth: 0
       # Build frontend+Storybook for embedding in the backend binary
@@ -71,7 +71,7 @@ jobs:
         with:
           workspaces: "backend -> target"
       - name: Build
-        run: cargo --verbose --locked build --target=x86_64-unknown-linux-musl --features memory-serve,embed-typst,storybook --bin abacus
+        run: cargo --verbose --locked build --target=x86_64-unknown-linux-musl --no-default-features --features openapi,dev-database,memory-serve,embed-typst,storybook --bin abacus
       - uses: actions/upload-artifact@v7
         with:
           name: abacus
@@ -103,7 +103,7 @@ jobs:
           /usr/share/swift
           &&
           df -h
-      - uses: actions/checkout@v6.0.2
+      - uses: actions/checkout@v6.0.3
       # Test backend
       - name: Install musl
         run: sudo apt-get update && sudo apt-get install -y musl-tools
@@ -126,14 +126,14 @@ jobs:
         working-directory: ./frontend
       - name: Check rustfmt
         run: cargo --verbose --locked fmt --all -- --check
+      - name: Check Clippy with default features
+        run: cargo --verbose --locked clippy --workspace --all-targets -- -D warnings
       - name: Check Clippy with all features
         run: cargo --verbose --locked clippy --target=x86_64-unknown-linux-musl --workspace --all-targets --all-features -- -D warnings
-      - name: Check Clippy without default features
-        run: cargo --verbose --locked clippy --target=x86_64-unknown-linux-musl --workspace --all-targets --no-default-features -- -D warnings
       - name: Install Nextest
         run: cargo binstall cargo-nextest
       - name: Run tests
-        run: cargo --verbose --locked nextest run --target=x86_64-unknown-linux-musl --workspace --features embed-typst
+        run: cargo --verbose --locked nextest run --target=x86_64-unknown-linux-musl --workspace --exclude pdf_gen_dylib --no-default-features --features openapi,dev-database,embed-typst
       - name: Build documentation
         run: cargo doc --workspace --no-deps --all-features
         env:
@@ -152,7 +152,7 @@ jobs:
       run:
         working-directory: frontend
     steps:
-      - uses: actions/checkout@v6.0.2
+      - uses: actions/checkout@v6.0.3
       - name: Setup Node
         uses: actions/setup-node@v6.4.0
         with:
@@ -195,7 +195,7 @@ jobs:
       run:
         working-directory: frontend
     steps:
-      - uses: actions/checkout@v6.0.2
+      - uses: actions/checkout@v6.0.3
       - name: Setup Node
         uses: actions/setup-node@v6.4.0
         with:
@@ -265,7 +265,7 @@ jobs:
       CARGO_TERM_COLOR: always
       SQLX_OFFLINE: "true"
     steps:
-      - uses: actions/checkout@v6.0.2
+      - uses: actions/checkout@v6.0.3
       - name: Setup Rust Nightly
         shell: bash
         run: >

@@ -4,7 +4,11 @@ use std::{
     process,
 };
 
-use abacus::{AppError, create_sqlite_pool, start_server};
+use abacus::{
+    AppError, create_sqlite_pool,
+    infra::backup::{BackupConfig, run_backup_scheduler},
+    start_server,
+};
 use clap::Parser;
 use socket2::{Domain, Protocol, Socket, Type};
 use tokio::net::TcpListener;
@@ -109,6 +113,10 @@ async fn run() -> Result<(), AppError> {
     socket.listen(1024)?;
 
     let listener = TcpListener::from_std(socket.into())?;
+
+    let backup_pool = pool.clone();
+    let backup_config = BackupConfig::new().expect("Failed to setup backup directory");
+    tokio::spawn(run_backup_scheduler(backup_pool, backup_config));
 
     start_server(pool, listener, enable_airgap_detection).await
 }

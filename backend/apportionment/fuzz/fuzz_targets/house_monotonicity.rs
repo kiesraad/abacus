@@ -14,10 +14,12 @@ fuzz_target!(
     let new_seats = seats + u32::from(added_seats);
 
     data.seats = seats;
+    #[allow(clippy::result_large_err)]
     let (alloc, log1) = run_with_log(|| process(&data));
     let alloc = alloc.map(|r| get_total_seats(&r.seat_assignment));
 
     data.seats = new_seats;
+    #[allow(clippy::result_large_err)]
     let (new_alloc, log2) = run_with_log(|| process(&data));
     let new_alloc = new_alloc.map(|r| get_total_seats(&r.seat_assignment));
 

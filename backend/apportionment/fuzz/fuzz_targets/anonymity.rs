@@ -12,6 +12,7 @@ fuzz_target!(
     },
     |data: (FuzzedApportionmentInput, Vec::<usize>)| {
     let (data, mut random_order) = data;
+    #[allow(clippy::result_large_err)]
     let (alloc, log1) = run_with_log(|| process(&data));
 
     if random_order.is_empty() {
@@ -41,6 +42,7 @@ fuzz_target!(
         candidates_drawn: Vec::new(),
     };
 
+    #[allow(clippy::result_large_err)]
     let (new_alloc, log2) = run_with_log(|| process(&reordered_input));
 
     if let (Ok(alloc), Ok(new_alloc)) = (alloc, new_alloc) {

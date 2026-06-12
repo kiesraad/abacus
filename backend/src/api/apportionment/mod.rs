@@ -1,4 +1,4 @@
-use apportionment::ApportionmentError;
+use apportionment;
 use axum::http::StatusCode;
 use tracing::error;
 use utoipa_axum::{router::OpenApiRouter, routes};
@@ -22,10 +22,11 @@ use crate::{
 };
 
 /// Errors that can occur before apportionment
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum ApportionmentApiError {
+    ApportionmentNotCompleted,
     CommitteeSessionNotCompleted,
-    DrawingLotsRequired,
+    InvalidLotDrawing,
 }
 
 impl ApiErrorResponse for ApportionmentApiError {
@@ -35,6 +36,14 @@ impl ApiErrorResponse for ApportionmentApiError {
 
     fn to_response_parts(&self) -> (StatusCode, ErrorResponse) {
         match self {
+            ApportionmentApiError::ApportionmentNotCompleted => (
+                StatusCode::UNPROCESSABLE_ENTITY,
+                ErrorResponse::new(
+                    "Apportionment not completed",
+                    ErrorReference::ApportionmentNotCompleted,
+                    false,
+                ),
+            ),
             ApportionmentApiError::CommitteeSessionNotCompleted => (
                 StatusCode::PRECONDITION_FAILED,
                 ErrorResponse::new(
@@ -43,27 +52,22 @@ impl ApiErrorResponse for ApportionmentApiError {
                     false,
                 ),
             ),
-            ApportionmentApiError::DrawingLotsRequired => (
-                StatusCode::UNPROCESSABLE_ENTITY,
+            ApportionmentApiError::InvalidLotDrawing => (
+                StatusCode::CONFLICT,
                 ErrorResponse::new(
-                    "Drawing of lots is required",
-                    ErrorReference::ApportionmentDrawingOfLotsRequired,
-                    false,
+                    "Drawn lot is invalid",
+                    ErrorReference::ApportionmentInvalidLotDrawing,
+                    true,
                 ),
             ),
         }
     }
 }
 
-impl From<ApportionmentError<PGNumber, CandidateNumber>> for ApportionmentApiError {
-    fn from(_err: ApportionmentError<PGNumber, CandidateNumber>) -> Self {
-        Self::DrawingLotsRequired
-    }
-}
-
-impl From<ApportionmentError<PGNumber, CandidateNumber>> for APIError {
-    fn from(err: ApportionmentError<PGNumber, CandidateNumber>) -> Self {
-        ApportionmentApiError::from(err).into()
+// Needed for report generation
+impl From<apportionment::ApportionmentError<PGNumber, CandidateNumber>> for APIError {
+    fn from(_err: apportionment::ApportionmentError<PGNumber, CandidateNumber>) -> Self {
+        ApportionmentApiError::ApportionmentNotCompleted.into()
     }
 }
 

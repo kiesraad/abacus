@@ -126,9 +126,7 @@ impl CandidateDrawn<u32, u32> for CandidateDrawnMock {
     }
 }
 
-pub fn get_total_seats_from_apportionment_result(
-    result: &SeatAssignmentResult<ListVotesMock>,
-) -> Vec<u32> {
+pub fn get_total_seats_from_apportionment_result(result: &SeatAssignmentResult<u32>) -> Vec<u32> {
     result
         .final_standing
         .iter()

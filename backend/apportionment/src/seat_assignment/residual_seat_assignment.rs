@@ -3,7 +3,7 @@ use std::{cmp::Ordering, fmt::Debug};
 use tracing::{debug, info};
 
 use super::{
-    get_number_of_candidates, list_numbers,
+    AssignRemainderDrawingLotsError, get_number_of_candidates, list_numbers,
     structs::{
         HighestAverageAssignedSeat, LargestRemainderAssignedSeat, ListStanding,
         RemainderAssignmentResult, SeatChange, SeatChangeStep,
@@ -12,16 +12,17 @@ use super::{
 use crate::{
     ListDrawn,
     fraction::Fraction,
+    seat_assignment::structs::ResidualSeatDrawingLotsError,
     structs::{
         DeceasedCandidates, HighestAverageResidualSeatDrawingLots, LARGE_COUNCIL_THRESHOLD,
-        LargestRemainderResidualSeatDrawingLots, ListDrawingLotsError, ListDrawingLotsVariant,
-        ListVotes,
+        LargestRemainderResidualSeatDrawingLots, ListDrawingLotsVariant, ListVotes,
     },
 };
 
 /// This function assigns the residual seats that remain after full seat assignment is finished.
 /// These residual seats are assigned through two different procedures,
 /// depending on how many total seats are available in the election.
+#[allow(clippy::too_many_arguments, clippy::result_large_err)]
 pub fn assign_remainder<'b, T: ListVotes>(
     initial_standings: &[ListStanding<T::ListNumber>],
     seats: u32,
@@ -63,7 +64,8 @@ pub fn assign_remainder<'b, T: ListVotes>(
             &steps,
             &exhausted_list_numbers,
             lists_drawn,
-        )?;
+        )
+        .map_err(|err| AssignRemainderDrawingLotsError::new(err, steps.clone()))?;
 
         let standings = current_standings.clone();
 
@@ -278,9 +280,10 @@ fn list_unique_highest_average_assigned_seats<LN: Copy + Eq>(
 /// This function will always return at least one group.
 fn lists_with_highest_average<'a, 'b, LN: Copy + Debug + Eq>(
     standings: impl Iterator<Item = &'a ListStanding<LN>>,
-    residual_seats: u32,
+    available_residual_seats: u32,
+    residual_seat_number: u32,
     lists_drawn: &mut impl Iterator<Item = &'b (impl ListDrawn<LN> + 'b)>,
-) -> Result<Vec<&'a ListStanding<LN>>, ListDrawingLotsError<LN>> {
+) -> Result<Vec<&'a ListStanding<LN>>, ResidualSeatDrawingLotsError<LN>> {
     // We are now going to find the lists that have the highest average
     // votes per seat if we would were to add one additional seat to them
     let (max_average, lists) = standings.fold(
@@ -309,29 +312,30 @@ fn lists_with_highest_average<'a, 'b, LN: Copy + Debug + Eq>(
     );
 
     // Check if we can actually assign all these lists a seat, otherwise we would need to draw lots
-    if lists.len() > residual_seats as usize {
+    if lists.len() > available_residual_seats as usize {
         info!(
-            "Drawing of lots is required for lists: {:?}, only {residual_seats} seat(s) available",
+            "Drawing of lots is required for lists: {:?}, only {available_residual_seats} seat(s) available",
             list_numbers(&lists)
         );
 
         let variant = ListDrawingLotsVariant::HighestAverageResidualSeat(
             HighestAverageResidualSeatDrawingLots {
                 average: max_average,
-                // TODO set actual residual_seat_numbers in #1264
-                residual_seat_numbers: Vec::new(),
+                residual_seat_numbers: (residual_seat_number
+                    ..residual_seat_number + available_residual_seats)
+                    .collect(),
                 options: list_numbers(&lists),
             },
         );
 
         // Get a list from the lists_drawn
         let Some(list_drawn) = lists_drawn.next() else {
-            return Err(ListDrawingLotsError::DrawingLotsRequired(variant));
+            return Err(ResidualSeatDrawingLotsError::DrawingLotsRequired(variant));
         };
 
         // Assert the required variant including all data
         if list_drawn.variant() != variant {
-            return Err(ListDrawingLotsError::InvalidLotDrawing(
+            return Err(ResidualSeatDrawingLotsError::InvalidLotDrawing(
                 "Variant mismatch".to_string(),
             ));
         }
@@ -339,7 +343,7 @@ fn lists_with_highest_average<'a, 'b, LN: Copy + Debug + Eq>(
         let list = lists
             .iter()
             .find(|list| list.list_number == *list_drawn.drawn())
-            .ok_or(ListDrawingLotsError::InvalidLotDrawing(
+            .ok_or(ResidualSeatDrawingLotsError::InvalidLotDrawing(
                 "Unknown list number".to_string(),
             ))?;
 
@@ -358,9 +362,10 @@ fn lists_with_highest_average<'a, 'b, LN: Copy + Debug + Eq>(
 /// This function will always return at least one group.
 fn lists_with_largest_remainder<'a, 'b, LN: Copy + Debug + Eq>(
     standings: impl Iterator<Item = &'a ListStanding<LN>>,
-    residual_seats: u32,
+    available_residual_seats: u32,
+    residual_seat_number: u32,
     lists_drawn: &mut impl Iterator<Item = &'b (impl ListDrawn<LN> + 'b)>,
-) -> Result<Vec<&'a ListStanding<LN>>, ListDrawingLotsError<LN>> {
+) -> Result<Vec<&'a ListStanding<LN>>, ResidualSeatDrawingLotsError<LN>> {
     // We are now going to find the lists that have the largest remainder
     let (max_remainder, lists) = standings.fold(
         (Fraction::ZERO, vec![]),
@@ -388,29 +393,30 @@ fn lists_with_largest_remainder<'a, 'b, LN: Copy + Debug + Eq>(
     );
 
     // Check if we can actually assign all these lists
-    if lists.len() > residual_seats as usize {
+    if lists.len() > available_residual_seats as usize {
         info!(
-            "Drawing of lots is required for lists: {:?}, only {residual_seats} seat(s) available",
+            "Drawing of lots is required for lists: {:?}, only {available_residual_seats} seat(s) available",
             list_numbers(&lists)
         );
 
         let variant = ListDrawingLotsVariant::LargestRemainderResidualSeat(
             LargestRemainderResidualSeatDrawingLots {
                 remainder: max_remainder,
-                // TODO set actual residual_seat_numbers in #1264
-                residual_seat_numbers: Vec::new(),
+                residual_seat_numbers: (residual_seat_number
+                    ..residual_seat_number + available_residual_seats)
+                    .collect(),
                 options: list_numbers(&lists),
             },
         );
 
         // Get a list from the lists_drawn
         let Some(list_drawn) = lists_drawn.next() else {
-            return Err(ListDrawingLotsError::DrawingLotsRequired(variant));
+            return Err(ResidualSeatDrawingLotsError::DrawingLotsRequired(variant));
         };
 
         // Assert the required variant including all data
         if list_drawn.variant() != variant {
-            return Err(ListDrawingLotsError::InvalidLotDrawing(
+            return Err(ResidualSeatDrawingLotsError::InvalidLotDrawing(
                 "Variant mismatch".to_string(),
             ));
         }
@@ -418,7 +424,7 @@ fn lists_with_largest_remainder<'a, 'b, LN: Copy + Debug + Eq>(
         let list = lists
             .iter()
             .find(|list| list.list_number == *list_drawn.drawn())
-            .ok_or(ListDrawingLotsError::InvalidLotDrawing(
+            .ok_or(ResidualSeatDrawingLotsError::InvalidLotDrawing(
                 "Unknown list number".to_string(),
             ))?;
 
@@ -439,7 +445,7 @@ fn step_assign_residual_seat<'a, 'b, LN: Copy + Debug + Eq>(
     previous_steps: &[SeatChangeStep<LN>],
     exhausted_list_numbers: &[LN],
     lists_drawn: &mut impl Iterator<Item = &'b (impl ListDrawn<LN> + 'b)>,
-) -> Result<SeatChange<LN>, ListDrawingLotsError<LN>> {
+) -> Result<SeatChange<LN>, ResidualSeatDrawingLotsError<LN>> {
     if seats >= LARGE_COUNCIL_THRESHOLD {
         debug!("Assigning residual seat {residual_seat_number} using highest averages method");
         // [Artikel P 7 Kieswet](https://wetten.overheid.nl/BWBR0004627/2026-01-01/#AfdelingII_HoofdstukP_Paragraaf2_ArtikelP7)
@@ -449,6 +455,7 @@ fn step_assign_residual_seat<'a, 'b, LN: Copy + Debug + Eq>(
             previous_steps,
             exhausted_list_numbers,
             false,
+            residual_seat_number,
             lists_drawn,
         )
     } else {
@@ -458,6 +465,7 @@ fn step_assign_residual_seat<'a, 'b, LN: Copy + Debug + Eq>(
             residual_seats,
             previous_steps,
             exhausted_list_numbers,
+            residual_seat_number,
             lists_drawn,
         )
     }
@@ -471,8 +479,9 @@ fn step_assign_remainder_using_highest_averages<'a, 'b, LN: Copy + Debug + Eq + 
     previous_steps: &[SeatChangeStep<LN>],
     exhausted_list_numbers: &[LN],
     unique: bool,
+    residual_seat_number: u32,
     lists_drawn: &mut impl Iterator<Item = &'b (impl ListDrawn<LN> + 'b)>,
-) -> Result<SeatChange<LN>, ListDrawingLotsError<LN>> {
+) -> Result<SeatChange<LN>, ResidualSeatDrawingLotsError<LN>> {
     // Get an iterator that lists all the list standings without exhausted lists
     // and without lists that have zero votes cast.
     let mut qualifying_for_highest_average = standings
@@ -484,6 +493,7 @@ fn step_assign_remainder_using_highest_averages<'a, 'b, LN: Copy + Debug + Eq + 
         let selected_lists = lists_with_highest_average(
             qualifying_for_highest_average,
             residual_seats,
+            residual_seat_number,
             lists_drawn,
         )?;
         let selected_list = selected_lists[0];
@@ -521,8 +531,9 @@ fn step_assign_remainder_using_largest_remainder<'a, 'b, LN: Copy + Debug + Eq>(
     residual_seats: u32,
     previous_steps: &[SeatChangeStep<LN>],
     exhausted_list_numbers: &[LN],
+    residual_seat_number: u32,
     lists_drawn: &mut impl Iterator<Item = &'b (impl ListDrawn<LN> + 'b)>,
-) -> Result<SeatChange<LN>, ListDrawingLotsError<LN>> {
+) -> Result<SeatChange<LN>, ResidualSeatDrawingLotsError<LN>> {
     // first we check if there are any lists that still qualify for a largest remainder assigned seat
     let mut qualifying_for_remainder = list_standings_qualifying_for_largest_remainder(
         standings,
@@ -534,8 +545,12 @@ fn step_assign_remainder_using_largest_remainder<'a, 'b, LN: Copy + Debug + Eq>(
     // If there is at least one element in the iterator, we know we can still do a largest remainder assignment
     if qualifying_for_remainder.peek().is_some() {
         debug!("Assign residual seat using largest remainders method");
-        let selected_lists =
-            lists_with_largest_remainder(qualifying_for_remainder, residual_seats, lists_drawn)?;
+        let selected_lists = lists_with_largest_remainder(
+            qualifying_for_remainder,
+            residual_seats,
+            residual_seat_number,
+            lists_drawn,
+        )?;
         let selected_list = selected_lists[0];
         Ok(SeatChange::LargestRemainderAssignment(
             LargestRemainderAssignedSeat {
@@ -568,6 +583,7 @@ fn step_assign_remainder_using_largest_remainder<'a, 'b, LN: Copy + Debug + Eq>(
                 previous_steps,
                 exhausted_list_numbers,
                 true,
+                residual_seat_number,
                 lists_drawn,
             )
         } else {
@@ -582,6 +598,7 @@ fn step_assign_remainder_using_largest_remainder<'a, 'b, LN: Copy + Debug + Eq>(
                 previous_steps,
                 exhausted_list_numbers,
                 false,
+                residual_seat_number,
                 lists_drawn,
             )
         }

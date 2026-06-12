@@ -517,11 +517,11 @@ describe("ApportionmentResidualSeatsPage", () => {
       expect(screen.queryByTestId("footnotes-list")).not.toBeInTheDocument();
     });
 
-    test("Not possible because drawing of lots is not implemented yet", async () => {
-      overrideOnce("post", "/api/elections/3/apportionment", 422, {
-        error: "Drawing of lots is required",
+    test("Not possible because committee session is not completed yet", async () => {
+      overrideOnce("post", "/api/elections/3/apportionment", 412, {
+        error: "Committee session not completed",
         fatal: false,
-        reference: "ApportionmentDrawingOfLotsRequired",
+        reference: "ApportionmentCommitteeSessionNotCompleted",
       } satisfies ErrorResponse);
 
       renderApportionmentResidualSeatsPage(3);
@@ -529,9 +529,9 @@ describe("ApportionmentResidualSeatsPage", () => {
       // Wait for the page to be loaded
       expect(await screen.findByRole("heading", { level: 1, name: "Verdeling van de restzetels" })).toBeVisible();
 
-      expect(await screen.findByText("Zetelverdeling is niet mogelijk")).toBeVisible();
+      expect(await screen.findByText("Zetelverdeling is nog niet beschikbaar")).toBeVisible();
       expect(
-        await screen.findByText("Loting is noodzakelijk, maar nog niet beschikbaar in deze versie van Abacus"),
+        await screen.findByText("De zetelverdeling kan pas gemaakt worden als de zitting is afgerond"),
       ).toBeVisible();
 
       expect(screen.queryByTestId("highest-averages-table")).not.toBeInTheDocument();

@@ -4,15 +4,17 @@ use axum::{
 };
 use serde::Serialize;
 use sqlx::SqlitePool;
+use utoipa::ToSchema;
 
 use crate::{
     APIError, ErrorResponse,
-    api::{
-        apportionment::{ApportionmentApiError, structs::ElectionApportionmentResponse},
-        election::ElectionAuditData,
-    },
+    api::{apportionment::structs::ElectionApportionmentResponse, election::ElectionAuditData},
     audit_log::AuditService,
-    domain::election::{Election, ElectionId},
+    domain::{
+        apportionment::SeatAssignment,
+        election::{Election, ElectionId},
+        summary::ElectionSummary,
+    },
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType},
     repository::{election_repo, user_repo::User},
     service,
@@ -26,12 +28,23 @@ impl AsAuditEvent for ApportionmentProcessed {
     const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Success;
 }
 
+#[derive(Debug, PartialEq, Serialize, ToSchema)]
+#[serde(tag = "status")]
+#[allow(clippy::large_enum_variant)]
+pub enum ProcessApportionmentResponse {
+    Finalised(ElectionApportionmentResponse),
+    DrawingLotsRequired {
+        election_summary: ElectionSummary,
+        seat_assignment: SeatAssignment,
+    },
+}
+
 /// Get the apportionment for an election
 #[utoipa::path(
     post,
     path = "/api/elections/{election_id}/apportionment",
     responses(
-        (status = 200, description = "Election Apportionment", body = ElectionApportionmentResponse),
+        (status = 200, description = "Election Apportionment", body = ProcessApportionmentResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
@@ -48,17 +61,23 @@ pub async fn process_apportionment(
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Path(id): Path<ElectionId>,
-) -> Result<Json<ElectionApportionmentResponse>, APIError> {
+) -> Result<Json<ProcessApportionmentResponse>, APIError> {
+    use ProcessApportionmentResponse::*;
     let mut conn = pool.acquire().await?;
 
     let election = election_repo::get(&mut conn, id).await?;
     user.role().is_authorized(election.committee_category)?;
 
     let apportionment_result = service::process_apportionment(&mut conn, &election).await?;
-    let ApportionmentResult::Ok(apportionment_output) = apportionment_result else {
-        Err(APIError::Delegated(Box::new(
-            ApportionmentApiError::DrawingLotsRequired,
-        )))?
+    let apportionment_output = match apportionment_result {
+        ApportionmentResult::Ok(apportionment_output) => Finalised(apportionment_output),
+        ApportionmentResult::ListDrawingLotsRequired(_, election_summary, seat_assignment)
+        | ApportionmentResult::CandidateDrawingLotsRequired(_, election_summary, seat_assignment) => {
+            DrawingLotsRequired {
+                election_summary,
+                seat_assignment,
+            }
+        }
     };
 
     audit_service

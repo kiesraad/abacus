@@ -9,9 +9,7 @@ use crate::domain::{
     results::political_group_candidate_votes::PoliticalGroupCandidateVotes,
 };
 
-pub fn map_seat_assignment(
-    sa: &apportionment::SeatAssignmentResult<PoliticalGroupCandidateVotes>,
-) -> SeatAssignment {
+pub fn map_seat_assignment(sa: &apportionment::SeatAssignmentResult<PGNumber>) -> SeatAssignment {
     SeatAssignment {
         seats: sa.seats,
         full_seats: sa.full_seats,

@@ -1,3 +1,5 @@
+import type { To } from "react-router";
+import { Button } from "@/components/ui/Button/Button";
 import { DisplayFraction } from "@/components/ui/DisplayFraction/DisplayFraction";
 import { Table } from "@/components/ui/Table/Table";
 import { t } from "@/i18n/translate";
@@ -8,8 +10,13 @@ import type {
 } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 import { formatNumber } from "@/utils/number";
-
 import cls from "./Apportionment.module.css";
+
+export interface DeceasedCandidatesInfo {
+  numberOfCandidates: number;
+  numberOfDeceasedCandidates: number;
+  deceasedCandidatesLink: To;
+}
 
 interface ElectionSummaryTableProps {
   votesCounts: VotesCounts;
@@ -17,6 +24,7 @@ interface ElectionSummaryTableProps {
   quota: DisplayFractionType;
   numberOfVoters: number | undefined;
   preferenceThreshold: PreferenceThreshold;
+  deceasedCandidatesInfo: DeceasedCandidatesInfo;
 }
 
 export function ElectionSummaryTable({
@@ -25,6 +33,7 @@ export function ElectionSummaryTable({
   quota,
   numberOfVoters,
   preferenceThreshold,
+  deceasedCandidatesInfo,
 }: ElectionSummaryTableProps) {
   return (
     <Table id="election-summary-table" className={cn(cls.table, cls.electionSummaryTable)}>
@@ -99,6 +108,21 @@ export function ElectionSummaryTable({
           </Table.NumberCell>
           <Table.Cell className="fs-sm">
             {t("apportionment.preference_threshold_description", { percentage: preferenceThreshold.percentage })}
+          </Table.Cell>
+        </Table.Row>
+        <Table.Row>
+          <Table.HeaderCell scope="row" className="normal">
+            {t("apportionment.candidates_for_apportionment")}
+          </Table.HeaderCell>
+          <Table.NumberCell>
+            {deceasedCandidatesInfo.numberOfCandidates} - {deceasedCandidatesInfo.numberOfDeceasedCandidates}
+            <span className="superscript">&nbsp;&dagger;</span> ={" "}
+            {deceasedCandidatesInfo.numberOfCandidates - deceasedCandidatesInfo.numberOfDeceasedCandidates}
+          </Table.NumberCell>
+          <Table.Cell className="fs-sm">
+            <Button.Link variant="underlined" size="md" to={deceasedCandidatesInfo.deceasedCandidatesLink}>
+              {t("apportionment.manage_deceased_candidates")}
+            </Button.Link>
           </Table.Cell>
         </Table.Row>
       </Table.Body>

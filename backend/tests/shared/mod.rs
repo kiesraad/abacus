@@ -6,6 +6,7 @@ use abacus::domain::election::CommitteeCategory;
 use axum::http::{HeaderValue, StatusCode};
 use hyper::header::CONTENT_TYPE;
 use reqwest::Response;
+use serde::Serialize;
 
 pub fn differences_counts_zero() -> serde_json::Value {
     serde_json::json!({
@@ -526,6 +527,42 @@ pub async fn get_statuses(
         })
 }
 
+#[derive(Serialize, strum::IntoStaticStr)]
+#[serde(untagged)]
+#[strum(serialize_all = "snake_case")]
+pub enum ApportionmentAction {
+    SkipDeceasedCandidates,
+    RegisterDeceasedCandidates,
+    AddDeceasedCandidate {
+        pg_number: u32,
+        candidate_number: u32,
+    },
+    DeleteDeceasedCandidate {
+        pg_number: u32,
+        candidate_number: u32,
+    },
+    FinaliseDeceasedCandidates,
+    Reset,
+}
+
+pub async fn apportionment_state_action(
+    addr: &SocketAddr,
+    cookie: &HeaderValue,
+    election_id: u32,
+    action: ApportionmentAction,
+) {
+    let path: &'static str = (&action).into();
+    let body = serde_json::to_value(&action).unwrap();
+    let url = format!("http://{addr}/api/elections/{election_id}/apportionment/{path}");
+    let mut request = reqwest::Client::new().post(&url).header("cookie", cookie);
+    if !body.is_null() {
+        request = request.json(&body);
+    }
+    let response = request.send().await.unwrap();
+    assert_eq!(response.status(), StatusCode::OK);
+}
+
+#[derive(Clone, Copy)]
 pub enum FixtureUser {
     Admin,
     CoordinatorGSB,
@@ -537,7 +574,7 @@ pub enum FixtureUser {
 }
 
 impl FixtureUser {
-    fn credentials(&self) -> (&'static str, &'static str) {
+    fn credentials(self) -> (&'static str, &'static str) {
         match self {
             Self::Admin => ("admin1", "Admin1Password01"),
             Self::CoordinatorGSB => ("coordinator1", "Coordinator1Password01"),

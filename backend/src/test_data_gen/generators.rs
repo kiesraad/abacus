@@ -37,7 +37,7 @@ use crate::{
             yes_no::YesNo,
         },
         sub_committee::SubCommitteeFirstSession,
-        validate::{Validate, ValidationResults},
+        validate::Validate,
     },
     repository::{
         committee_session_repo,
@@ -202,7 +202,7 @@ pub async fn create_test_election(
 
     // generate and store the election
     let election =
-        election_repo::create(&mut tx, generate_election(&mut rng, &args, votes.clone())).await?;
+        election_repo::create(&mut tx, generate_election(&mut rng, &args, votes.as_ref())).await?;
 
     // generate the committee session for the election
     let mut committee_session = committee_session_repo::create(
@@ -258,7 +258,7 @@ pub async fn create_test_election(
 fn generate_election(
     rng: &mut impl rand::RngExt,
     args: &GenerateElectionArgs,
-    votes: Option<Vec<Vec<u32>>>,
+    votes: Option<&Vec<Vec<u32>>>,
 ) -> NewElection {
     // start by generating the political groups
     let mut political_groups = vec![];
@@ -266,7 +266,7 @@ fn generate_election(
     info!("Generating {num_political_groups} political groups");
 
     for i in 0..num_political_groups {
-        if let Some(ref v) = votes {
+        if let Some(v) = votes {
             let candidates_per_group =
                 u32::try_from(v.get(i as usize).expect("should exist in votes").len())
                     .expect("length should fit in u32");
@@ -358,7 +358,7 @@ fn generate_political_party(
                 CandidateGender::X,
             ]
             .choose(rng)
-            .cloned(),
+            .copied(),
         })
     }
     RegisteredPoliticalGroup {
@@ -471,23 +471,24 @@ async fn generate_gsb_data_entry(
             ));
 
             // Validate the generated results to catch issues early
-            let mut validation_results = ValidationResults::default();
-            if let Err(e) = results.validate(
-                election,
-                &mut validation_results,
-                &FieldPath::new("data".to_string()),
-            ) {
-                panic!(
-                    "Failed to validate generated results for polling station {}: {}",
-                    ps.number, e
-                );
-            }
-            if validation_results.has_errors() {
-                panic!(
-                    "Generated invalid results for polling station {}: {:?}",
-                    ps.number, validation_results.errors
-                );
-            }
+            let finalised_with_warnings =
+                match results.validate(election, &FieldPath::new("data".to_string())) {
+                    Ok(vr) => {
+                        if vr.has_errors() {
+                            panic!(
+                                "Generated invalid results for polling station {}: {:?}",
+                                ps.number, vr.errors
+                            );
+                        }
+                        vr.has_warnings()
+                    }
+                    Err(e) => {
+                        panic!(
+                            "Failed to validate generated results for polling station {}: {}",
+                            ps.number, e
+                        );
+                    }
+                };
 
             if rng.random_ratio(second_entry_chance, 100) {
                 // generate a definitive data entry
@@ -495,7 +496,7 @@ async fn generate_gsb_data_entry(
                     first_entry_user_id: UserId::from(5), // first typist from users in fixtures
                     second_entry_user_id: UserId::from(6), // second typist from users in fixtures
                     finished_at: ts,
-                    finalised_with_warnings: validation_results.has_warnings(),
+                    finalised_with_warnings,
                     results: results.clone(),
                 });
 
@@ -509,7 +510,7 @@ async fn generate_gsb_data_entry(
                     first_entry_user_id: UserId::from(5), // first typist from users in fixtures
                     finalised_first_entry: results.clone(),
                     first_entry_finished_at: ts,
-                    finalised_with_warnings: validation_results.has_warnings(),
+                    finalised_with_warnings,
                 });
                 data_entry_repo::update(conn, *data_entry_id, &state)
                     .await
@@ -562,14 +563,15 @@ async fn generate_csb_data_entry(
             ))
         } else {
             let turnout = rng.random_range(args.turnout.clone());
-            let voters_turned_out = (election.number_of_voters * turnout) / 100;
+            let number_of_eligible_voters = rng.random_range(args.voters.clone());
+            let voters_turned_out = (number_of_eligible_voters * turnout) / 100;
             let candidate_slope =
                 rng.random_range(args.candidate_distribution_slope.clone()) as f64 / 1000.0;
 
             Results::GSB(generate_gsb_results(
                 rng,
                 &election.political_groups,
-                election.number_of_voters,
+                number_of_eligible_voters,
                 voters_turned_out,
                 &group_weights,
                 candidate_slope,
@@ -577,23 +579,24 @@ async fn generate_csb_data_entry(
         };
 
         // Validate the generated results to catch issues early
-        let mut validation_results = ValidationResults::default();
-        if let Err(e) = results.validate(
-            election,
-            &mut validation_results,
-            &FieldPath::new("data".to_string()),
-        ) {
-            panic!(
-                "Failed to validate generated results for sub committee number {}: {}",
-                sub_committee_first_session.sub_committee.number, e
-            );
-        }
-        if validation_results.has_errors() {
-            panic!(
-                "Generated invalid results for sub committee number {}: {:?}",
-                sub_committee_first_session.sub_committee.number, validation_results.errors
-            );
-        }
+        let finalised_with_warnings =
+            match results.validate(election, &FieldPath::new("data".to_string())) {
+                Ok(vr) => {
+                    if vr.has_errors() {
+                        panic!(
+                            "Generated invalid results for sub committee number {}: {:?}",
+                            sub_committee_first_session.sub_committee.number, vr.errors
+                        );
+                    }
+                    vr.has_warnings()
+                }
+                Err(e) => {
+                    panic!(
+                        "Failed to validate generated results for sub committee number {}: {}",
+                        sub_committee_first_session.sub_committee.number, e
+                    );
+                }
+            };
 
         if rng.random_ratio(second_entry_chance, 100) {
             // generate a definitive data entry
@@ -601,7 +604,7 @@ async fn generate_csb_data_entry(
                 first_entry_user_id: UserId::from(9), // first typist from users in fixtures
                 second_entry_user_id: UserId::from(10), // second typist from users in fixtures
                 finished_at: ts,
-                finalised_with_warnings: validation_results.has_warnings(),
+                finalised_with_warnings,
                 results: results.clone(),
             });
 
@@ -615,7 +618,7 @@ async fn generate_csb_data_entry(
                 first_entry_user_id: UserId::from(9), // first typist from users in fixtures
                 finalised_first_entry: results.clone(),
                 first_entry_finished_at: ts,
-                finalised_with_warnings: validation_results.has_warnings(),
+                finalised_with_warnings,
             });
             data_entry_repo::update(conn, data_entry_id, &state)
                 .await
@@ -917,7 +920,7 @@ fn distribute_power_law_weights(
 
     // Normalize weights to sum to 1
     let sum: f64 = weights.iter().sum();
-    for w in weights.iter_mut() {
+    for w in &mut weights {
         *w /= sum;
     }
 

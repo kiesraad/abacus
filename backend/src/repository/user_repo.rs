@@ -98,7 +98,7 @@ impl User {
             role,
             needs_password_change: false,
             password_hash: hash_password(
-                ValidatedPassword::new("test_user_1", "TotallyValidP4ssW0rd", None).unwrap(),
+                &ValidatedPassword::new("test_user_1", "TotallyValidP4ssW0rd", None).unwrap(),
             )
             .unwrap(),
             last_activity_at: None,
@@ -145,7 +145,7 @@ pub async fn create(
     role: Role,
 ) -> Result<User, AuthenticationError> {
     let password_hash: HashedPassword =
-        hash_password(ValidatedPassword::new(username, password, None)?)?;
+        hash_password(&ValidatedPassword::new(username, password, None)?)?;
 
     let user = sqlx::query_as!(
         User,
@@ -210,7 +210,7 @@ pub async fn update_password(
         .password_hash
         .into();
 
-    let password_hash = hash_password(ValidatedPassword::new(
+    let password_hash = hash_password(&ValidatedPassword::new(
         username,
         new_password,
         Some(&old_password),
@@ -251,7 +251,7 @@ pub async fn set_temporary_password(
     temp_password: &str,
 ) -> Result<(), AuthenticationError> {
     let username = username_by_id(conn, user_id).await?;
-    let password_hash = hash_password(ValidatedPassword::new(&username, temp_password, None)?)?;
+    let password_hash = hash_password(&ValidatedPassword::new(&username, temp_password, None)?)?;
     sqlx::query!(
         r#"UPDATE users SET password_hash = ?, needs_password_change = TRUE WHERE id = ?"#,
         password_hash,
@@ -626,7 +626,7 @@ mod tests {
             role: Role::TypistGSB,
             needs_password_change: false,
             password_hash: password::hash_password(
-                password::ValidatedPassword::new("test_user_1", "TotallyValidP4ssW0rd", None)
+                &password::ValidatedPassword::new("test_user_1", "TotallyValidP4ssW0rd", None)
                     .unwrap(),
             )
             .unwrap(),

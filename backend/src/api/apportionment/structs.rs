@@ -1,10 +1,17 @@
-use apportionment::{self};
+use std::collections::{HashMap, HashSet};
+
+use apportionment;
 use serde::Serialize;
 use utoipa::ToSchema;
 
 use crate::domain::{
-    apportionment::{CandidateNomination, SeatAssignment},
-    election::{self, PGNumber},
+    apportionment::{
+        AbsoluteMajorityDrawingLots, ApportionmentWarning, CandidateDrawingLotsVariant,
+        CandidateDrawn, CandidateNomination, HighestAverageResidualSeatDrawingLots,
+        LargestRemainderResidualSeatDrawingLots, ListDrawingLotsVariant, ListDrawn, SeatAssignment,
+    },
+    apportionment_state::DeceasedCandidate,
+    election::{CandidateNumber, PGNumber},
     results::political_group_candidate_votes::{CandidateVotes, PoliticalGroupCandidateVotes},
     summary::ElectionSummary,
 };
@@ -13,10 +20,42 @@ use crate::domain::{
 pub struct ApportionmentInputData<'a> {
     pub number_of_seats: u32,
     pub list_votes: &'a [PoliticalGroupCandidateVotes],
+    pub deceased_candidates: HashMap<PGNumber, HashSet<CandidateNumber>>,
+    pub lists_drawn: &'a [ListDrawn],
+    pub candidates_drawn: &'a [CandidateDrawn],
+}
+
+impl<'a> ApportionmentInputData<'a> {
+    pub fn new(
+        number_of_seats: u32,
+        list_votes: &'a [PoliticalGroupCandidateVotes],
+        deceased_candidates: &[DeceasedCandidate],
+        lists_drawn: &'a [ListDrawn],
+        candidates_drawn: &'a [CandidateDrawn],
+    ) -> Self {
+        let mut grouped: HashMap<PGNumber, HashSet<CandidateNumber>> = HashMap::new();
+
+        for dc in deceased_candidates {
+            grouped
+                .entry(dc.pg_number)
+                .or_default()
+                .insert(dc.candidate_number);
+        }
+
+        Self {
+            number_of_seats,
+            list_votes,
+            deceased_candidates: grouped,
+            lists_drawn,
+            candidates_drawn,
+        }
+    }
 }
 
 impl<'a> apportionment::ApportionmentInput for ApportionmentInputData<'a> {
     type List = PoliticalGroupCandidateVotes;
+    type ListDrawn = ListDrawn;
+    type CandidateDrawn = CandidateDrawn;
 
     fn number_of_seats(&self) -> u32 {
         self.number_of_seats
@@ -24,6 +63,18 @@ impl<'a> apportionment::ApportionmentInput for ApportionmentInputData<'a> {
 
     fn list_votes(&self) -> &[Self::List] {
         self.list_votes
+    }
+
+    fn deceased_candidates(&self) -> &HashMap<PGNumber, HashSet<CandidateNumber>> {
+        &self.deceased_candidates
+    }
+
+    fn lists_drawn(&self) -> impl Iterator<Item = &ListDrawn> {
+        self.lists_drawn.iter()
+    }
+
+    fn candidates_drawn(&self) -> impl Iterator<Item = &CandidateDrawn> {
+        self.candidates_drawn.iter()
     }
 }
 
@@ -41,7 +92,7 @@ impl apportionment::ListVotes for PoliticalGroupCandidateVotes {
 }
 
 impl apportionment::CandidateVotes for CandidateVotes {
-    type CandidateNumber = election::CandidateNumber;
+    type CandidateNumber = CandidateNumber;
 
     fn number(&self) -> Self::CandidateNumber {
         self.number
@@ -52,9 +103,74 @@ impl apportionment::CandidateVotes for CandidateVotes {
     }
 }
 
+impl From<ListDrawingLotsVariant> for apportionment::ListDrawingLotsVariant<PGNumber> {
+    fn from(value: ListDrawingLotsVariant) -> Self {
+        match value {
+            ListDrawingLotsVariant::HighestAverageResidualSeat(
+                HighestAverageResidualSeatDrawingLots {
+                    average,
+                    residual_seat_numbers,
+                    options,
+                },
+            ) => Self::HighestAverageResidualSeat(
+                apportionment::HighestAverageResidualSeatDrawingLots {
+                    average: average.into(),
+                    residual_seat_numbers,
+                    options,
+                },
+            ),
+            ListDrawingLotsVariant::LargestRemainderResidualSeat(
+                LargestRemainderResidualSeatDrawingLots {
+                    remainder,
+                    residual_seat_numbers,
+                    options,
+                },
+            ) => Self::LargestRemainderResidualSeat(
+                apportionment::LargestRemainderResidualSeatDrawingLots {
+                    remainder: remainder.into(),
+                    residual_seat_numbers,
+                    options,
+                },
+            ),
+            ListDrawingLotsVariant::AbsoluteMajority(AbsoluteMajorityDrawingLots { options }) => {
+                Self::AbsoluteMajority(apportionment::AbsoluteMajorityDrawingLots { options })
+            }
+        }
+    }
+}
+
+impl apportionment::ListDrawn<PGNumber> for ListDrawn {
+    fn variant(&self) -> apportionment::ListDrawingLotsVariant<PGNumber> {
+        self.variant.clone().into()
+    }
+
+    fn drawn(&self) -> &PGNumber {
+        &self.drawn
+    }
+}
+
+impl From<CandidateDrawingLotsVariant>
+    for apportionment::CandidateDrawingLotsVariant<PGNumber, CandidateNumber>
+{
+    fn from(CandidateDrawingLotsVariant { list, options }: CandidateDrawingLotsVariant) -> Self {
+        Self { list, options }
+    }
+}
+
+impl apportionment::CandidateDrawn<PGNumber, CandidateNumber> for CandidateDrawn {
+    fn variant(&self) -> apportionment::CandidateDrawingLotsVariant<PGNumber, CandidateNumber> {
+        self.variant.clone().into()
+    }
+
+    fn drawn(&self) -> &CandidateNumber {
+        &self.drawn
+    }
+}
+
 #[derive(Debug, Serialize, ToSchema)]
 pub struct ElectionApportionmentResponse {
     pub seat_assignment: SeatAssignment,
     pub candidate_nomination: CandidateNomination,
     pub election_summary: ElectionSummary,
+    pub warnings: Vec<ApportionmentWarning>,
 }

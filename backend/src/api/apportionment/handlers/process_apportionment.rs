@@ -8,21 +8,15 @@ use sqlx::SqlitePool;
 use crate::{
     APIError, ErrorResponse,
     api::{
-        apportionment::{
-            ApportionmentApiError,
-            mapping::{map_candidate_nomination, map_seat_assignment},
-            structs::{ApportionmentInputData, ElectionApportionmentResponse},
-        },
+        apportionment::{ApportionmentApiError, structs::ElectionApportionmentResponse},
         election::ElectionAuditData,
     },
     audit_log::AuditService,
-    domain::{
-        committee_session_status::CommitteeSessionStatus,
-        election::{Election, ElectionId},
-        summary::ElectionSummary,
-    },
+    domain::election::{Election, ElectionId},
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType},
-    repository::{committee_session_repo, data_entry_repo, election_repo, user_repo::User},
+    repository::{election_repo, user_repo::User},
+    service,
+    service::ApportionmentResult,
 };
 
 #[derive(Serialize)]
@@ -58,44 +52,24 @@ pub async fn process_apportionment(
     let mut conn = pool.acquire().await?;
 
     let election = election_repo::get(&mut conn, id).await?;
-    user.role().is_authorized(&election.committee_category)?;
+    user.role().is_authorized(election.committee_category)?;
 
-    let current_committee_session =
-        committee_session_repo::get_election_committee_session(&mut conn, election.id).await?;
+    let apportionment_result = service::process_apportionment(&mut conn, &election).await?;
+    let ApportionmentResult::Ok(apportionment_output) = apportionment_result else {
+        Err(APIError::Delegated(Box::new(
+            ApportionmentApiError::DrawingLotsRequired,
+        )))?
+    };
 
-    if current_committee_session.status == CommitteeSessionStatus::Completed {
-        let results = data_entry_repo::list_results_for_committee_session(
+    audit_service
+        .log(
             &mut conn,
-            current_committee_session.id,
+            &ApportionmentProcessed(Election::from(election).into()),
+            None,
         )
         .await?;
 
-        let summary = ElectionSummary::from_results(&election, &results)?;
-        let input = ApportionmentInputData {
-            number_of_seats: election.number_of_seats,
-            list_votes: &summary.political_group_votes,
-        };
-        let result = apportionment::process(&input)?;
-
-        audit_service
-            .log(
-                &mut conn,
-                &ApportionmentProcessed(Election::from(election.clone()).into()),
-                None,
-            )
-            .await?;
-
-        Ok(Json(ElectionApportionmentResponse {
-            seat_assignment: map_seat_assignment(&result.seat_assignment),
-            candidate_nomination: map_candidate_nomination(
-                &result.candidate_nomination,
-                election.political_groups,
-            ),
-            election_summary: summary,
-        }))
-    } else {
-        Err(ApportionmentApiError::CommitteeSessionNotCompleted.into())
-    }
+    Ok(Json(apportionment_output))
 }
 
 #[cfg(test)]
@@ -111,7 +85,10 @@ mod tests {
 
     use super::*;
     use crate::{
-        domain::{committee_session::CommitteeSessionId, role::Role},
+        domain::{
+            committee_session::CommitteeSessionId,
+            committee_session_status::CommitteeSessionStatus, role::Role,
+        },
         error::ErrorReference,
         repository::user_repo::{User, UserId},
         service::change_committee_session_status,

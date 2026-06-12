@@ -8,8 +8,8 @@ use crate::{
     APIError, ErrorResponse, SqlitePoolExt,
     domain::{apportionment_state::ApportionmentState, election::ElectionId},
     infra::audit_log::AuditService,
-    repository::user_repo::User,
-    service::update_apportionment_state,
+    repository::{election_repo, user_repo::User},
+    service::next_apportionment_state,
 };
 
 /// Finalise deceased candidates
@@ -36,10 +36,10 @@ pub async fn finalise_deceased_candidates(
 ) -> Result<Json<ApportionmentState>, APIError> {
     let mut tx = pool.begin_immediate().await?;
 
-    let state = update_apportionment_state(&mut tx, audit_service, user, election_id, |state| {
-        state.finalise_deceased_candidates()
-    })
-    .await?;
+    let election = election_repo::get(&mut tx, election_id).await?;
+    user.role().is_authorized(election.committee_category)?;
+
+    let state = next_apportionment_state(&mut tx, &audit_service, &election).await?;
 
     tx.commit().await?;
     Ok(Json(state))
@@ -98,6 +98,8 @@ mod tests {
             state.0,
             ApportionmentState::Finalised {
                 deceased_candidates: vec![candidate],
+                lists_drawn: vec![],
+                candidates_drawn: vec![],
             }
         );
     }

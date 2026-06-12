@@ -1,19 +1,29 @@
+use apportionment;
 use serde::Serialize;
 use sqlx::SqliteConnection;
 
 use crate::{
     APIError,
-    api::apportionment::ApportionmentApiError,
+    api::apportionment::{
+        ApportionmentApiError, ApportionmentInputData, ElectionApportionmentResponse,
+        map_candidate_nomination, map_seat_assignment,
+    },
     domain::{
-        apportionment_state::{ApportionmentState, ApportionmentStateError},
+        apportionment::{
+            AbsoluteMajorityDrawingLots, ApportionmentWarning, CandidateDrawingLotsVariant,
+            HighestAverageResidualSeatDrawingLots, LargestRemainderResidualSeatDrawingLots,
+            ListDrawingLotsVariant,
+        },
+        apportionment_state::{ApportionmentState, ApportionmentStateError, DrawingLotsRequired},
         committee_session::CommitteeSessionId,
         committee_session_status::CommitteeSessionStatus,
-        election::ElectionId,
+        election::{CandidateNumber, ElectionId, ElectionWithPoliticalGroups, PGNumber},
+        summary::ElectionSummary,
     },
+    error::ErrorReference,
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
-    repository::{
-        apportionment_state_repo, committee_session_repo, election_repo, user_repo::User,
-    },
+    repository::{apportionment_state_repo, committee_session_repo, data_entry_repo},
+    service,
 };
 
 #[derive(Serialize)]
@@ -34,14 +44,10 @@ struct ApportionmentStateChange {
 /// and the committee session id to which this state belongs.
 pub async fn get_state(
     conn: &mut SqliteConnection,
-    user: User,
     election_id: ElectionId,
 ) -> Result<(CommitteeSessionId, ApportionmentState), APIError> {
-    let election = election_repo::get(conn, election_id).await?;
-    user.role().is_authorized(&election.committee_category)?;
-
     let committee_session =
-        committee_session_repo::get_election_committee_session(conn, election.id).await?;
+        committee_session_repo::get_election_committee_session(conn, election_id).await?;
 
     if committee_session.status != CommitteeSessionStatus::Completed {
         return Err(ApportionmentApiError::CommitteeSessionNotCompleted.into());
@@ -61,12 +67,11 @@ pub async fn get_state(
 /// - log new state to audit log
 pub async fn update_state(
     conn: &mut SqliteConnection,
-    audit_service: AuditService,
-    user: User,
+    audit_service: &AuditService,
     election_id: ElectionId,
     update_fn: impl FnOnce(ApportionmentState) -> Result<ApportionmentState, ApportionmentStateError>,
 ) -> Result<ApportionmentState, APIError> {
-    let (id, state) = get_state(conn, user, election_id).await?;
+    let (id, state) = get_state(conn, election_id).await?;
 
     let state = update_fn(state).map_err(|err| APIError::Delegated(Box::new(err)))?;
 
@@ -86,6 +91,138 @@ pub async fn update_state(
     Ok(state)
 }
 
+/// Determine the next apportionment state and update the database.
+/// - call apportionment [process] to determine if any drawing lots have to be done
+/// - use [update_state] to go to the appropriate state and persist that
+pub async fn next_state(
+    tx: &mut SqliteConnection,
+    audit_service: &AuditService,
+    election: &ElectionWithPoliticalGroups,
+) -> Result<ApportionmentState, APIError> {
+    let result = process(tx, election).await?;
+
+    update_state(tx, audit_service, election.id, |state| match result {
+        ApportionmentResult::Ok(_) => state.finalise(),
+        ApportionmentResult::ListDrawingLotsRequired(variant) => {
+            state.draw_lots(DrawingLotsRequired::ListDrawingLotsRequired(variant))
+        }
+        ApportionmentResult::CandidateDrawingLotsRequired(variant) => {
+            state.draw_lots(DrawingLotsRequired::CandidateDrawingLotsRequired(variant))
+        }
+    })
+    .await
+}
+
+#[allow(clippy::large_enum_variant)]
+pub enum ApportionmentResult {
+    Ok(ElectionApportionmentResponse),
+    ListDrawingLotsRequired(ListDrawingLotsVariant),
+    CandidateDrawingLotsRequired(CandidateDrawingLotsVariant),
+}
+
+impl From<apportionment::CandidateDrawingLotsVariant<PGNumber, CandidateNumber>>
+    for CandidateDrawingLotsVariant
+{
+    fn from(value: apportionment::CandidateDrawingLotsVariant<PGNumber, CandidateNumber>) -> Self {
+        CandidateDrawingLotsVariant {
+            list: value.list,
+            options: value.options,
+        }
+    }
+}
+
+impl From<apportionment::ListDrawingLotsVariant<PGNumber>> for ListDrawingLotsVariant {
+    fn from(value: apportionment::ListDrawingLotsVariant<PGNumber>) -> Self {
+        match value {
+            apportionment::ListDrawingLotsVariant::HighestAverageResidualSeat(
+                apportionment::HighestAverageResidualSeatDrawingLots {
+                    average,
+                    residual_seat_numbers,
+                    options,
+                },
+            ) => ListDrawingLotsVariant::HighestAverageResidualSeat(
+                HighestAverageResidualSeatDrawingLots {
+                    average: average.into(),
+                    residual_seat_numbers,
+                    options,
+                },
+            ),
+            apportionment::ListDrawingLotsVariant::LargestRemainderResidualSeat(
+                apportionment::LargestRemainderResidualSeatDrawingLots {
+                    remainder,
+                    residual_seat_numbers,
+                    options,
+                },
+            ) => ListDrawingLotsVariant::LargestRemainderResidualSeat(
+                LargestRemainderResidualSeatDrawingLots {
+                    remainder: remainder.into(),
+                    residual_seat_numbers,
+                    options,
+                },
+            ),
+            apportionment::ListDrawingLotsVariant::AbsoluteMajority(
+                apportionment::AbsoluteMajorityDrawingLots { options },
+            ) => ListDrawingLotsVariant::AbsoluteMajority(AbsoluteMajorityDrawingLots { options }),
+        }
+    }
+}
+
+type ApportionmentError = apportionment::ApportionmentError<PGNumber, CandidateNumber>;
+
+/// - Collect data for the [ApportionmentInputData] from the database and make sure that the
+///   committee session status is completed.
+/// - Call the apportionment process funtion
+/// - Map the Result from the apportionment into an [ApportionmentResult]
+pub async fn process(
+    conn: &mut SqliteConnection,
+    election: &ElectionWithPoliticalGroups,
+) -> Result<ApportionmentResult, APIError> {
+    let (committee_session_id, state) = service::get_apportionment_state(conn, election.id).await?;
+
+    let data_entry_results =
+        data_entry_repo::list_results_for_committee_session(conn, committee_session_id).await?;
+    let election_summary = ElectionSummary::from_results(election, &data_entry_results)?;
+
+    let input = ApportionmentInputData::new(
+        election.number_of_seats,
+        &election_summary.political_group_votes,
+        state.get_deceased_candidates(),
+        state.get_lists_drawn(),
+        state.get_candidates_drawn(),
+    );
+
+    let apportionment_result = match apportionment::process(&input) {
+        Ok(output) => ApportionmentResult::Ok(ElectionApportionmentResponse {
+            seat_assignment: map_seat_assignment(&output.seat_assignment),
+            candidate_nomination: map_candidate_nomination(
+                &output.candidate_nomination,
+                &election.political_groups,
+            ),
+            election_summary: election_summary.clone(),
+            warnings: output
+                .seat_assignment
+                .warnings()
+                .into_iter()
+                .map(ApportionmentWarning::from)
+                .collect(),
+        }),
+        Err(ApportionmentError::ListDrawingLotsRequired(r)) => {
+            ApportionmentResult::ListDrawingLotsRequired(r.into())
+        }
+        Err(ApportionmentError::CandidateDrawingLotsRequired(r)) => {
+            ApportionmentResult::CandidateDrawingLotsRequired(r.into())
+        }
+        Err(ApportionmentError::InvalidLotDrawing(message)) => {
+            return Err(APIError::Conflict(
+                message,
+                ErrorReference::ApportionmentInvalidLotDrawing,
+            ));
+        }
+    };
+
+    Ok(apportionment_result)
+}
+
 #[cfg(test)]
 mod tests {
     use sqlx::SqlitePool;
@@ -93,14 +230,9 @@ mod tests {
 
     use super::*;
     use crate::{
-        api::middleware::authentication::error::AuthenticationError,
-        domain::{
-            apportionment_state::DeceasedCandidate, committee_session::CommitteeSessionId,
-            role::Role,
-        },
+        domain::{apportionment_state::DeceasedCandidate, committee_session::CommitteeSessionId},
         error::assert_delegated,
         infra::audit_log::assert_last_event,
-        repository::user_repo::UserId,
     };
 
     const ELECTION_ID: u32 = 5;
@@ -132,8 +264,7 @@ mod tests {
 
         let result = update_state(
             &mut conn,
-            AuditService::new(None, None),
-            User::test_user(Role::CoordinatorGSB, UserId::from(1)),
+            &AuditService::new(None, None),
             unknown_election,
             |_| panic!("should not call callback"),
         )
@@ -146,25 +277,6 @@ mod tests {
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
-    async fn test_not_authorized(pool: SqlitePool) {
-        let mut conn = pool.acquire().await.unwrap();
-
-        let not_authorized = User::test_user(Role::CoordinatorCSB, UserId::from(1));
-
-        let err = update_state(
-            &mut conn,
-            AuditService::new(None, None),
-            not_authorized,
-            ElectionId::from(ELECTION_ID),
-            |_| panic!("should not call callback"),
-        )
-        .await
-        .expect_err("should return an error");
-
-        assert_delegated(err, &AuthenticationError::RoleNotAuthorizedError);
-    }
-
-    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
     async fn test_invalid_committee_session_status(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
 
@@ -172,8 +284,7 @@ mod tests {
 
         let err = update_state(
             &mut conn,
-            AuditService::new(None, None),
-            User::test_user(Role::CoordinatorGSB, UserId::from(1)),
+            &AuditService::new(None, None),
             ElectionId::from(ELECTION_ID),
             |_| panic!("should not call callback"),
         )
@@ -191,13 +302,9 @@ mod tests {
         set_states(&mut conn, CommitteeSessionStatus::Completed, None).await;
 
         // Returns a new ApportionmentState::Uninitialised
-        let (id, state) = get_state(
-            &mut conn,
-            User::test_user(Role::CoordinatorGSB, UserId::from(1)),
-            ElectionId::from(ELECTION_ID),
-        )
-        .await
-        .expect("should get state");
+        let (id, state) = get_state(&mut conn, ElectionId::from(ELECTION_ID))
+            .await
+            .expect("should get state");
 
         assert_eq!(id, CommitteeSessionId::from(COMMITTEE_SESSION_ID));
         assert_eq!(state, ApportionmentState::Uninitialised);
@@ -213,8 +320,7 @@ mod tests {
         // Creates a new entry in the database
         update_state(
             &mut conn,
-            AuditService::new(None, None),
-            User::test_user(Role::CoordinatorGSB, UserId::from(1)),
+            &AuditService::new(None, None),
             ElectionId::from(ELECTION_ID),
             Ok,
         )
@@ -244,8 +350,7 @@ mod tests {
 
         let returned_state = update_state(
             &mut conn,
-            AuditService::new(None, None),
-            User::test_user(Role::CoordinatorGSB, UserId::from(1)),
+            &AuditService::new(None, None),
             ElectionId::from(ELECTION_ID),
             |state| {
                 assert_eq!(state, ApportionmentState::Uninitialised);

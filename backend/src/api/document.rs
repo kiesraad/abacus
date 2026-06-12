@@ -65,7 +65,7 @@ async fn election_download_n_10_2(
 ) -> Result<impl IntoResponse, APIError> {
     let mut conn = pool.acquire().await?;
     let election = election_repo::get(&mut conn, election_id).await?;
-    user.role().is_authorized(&election.committee_category)?;
+    user.role().is_authorized(election.committee_category)?;
 
     if election.committee_category != CommitteeCategory::GSB {
         return Err(APIError::NotFound(
@@ -116,7 +116,7 @@ async fn election_download_n_10_2(
     let (zip_response, zip_writer) = ZipResponse::new(&zip_filename);
 
     tokio::spawn(async move {
-        if let Err(e) = generate_pdfs(&models, zip_writer).await {
+        if let Err(e) = generate_pdfs(models, zip_writer).await {
             error!("Failed to generate PDFs: {e:?}");
         }
     });
@@ -153,7 +153,7 @@ async fn election_download_na_31_2_bijlage1(
 ) -> Result<impl IntoResponse, APIError> {
     let mut conn = pool.acquire().await?;
     let election = election_repo::get(&mut conn, election_id).await?;
-    user.role().is_authorized(&election.committee_category)?;
+    user.role().is_authorized(election.committee_category)?;
 
     if election.committee_category != CommitteeCategory::GSB {
         return Err(APIError::NotFound(
@@ -205,7 +205,7 @@ async fn election_download_na_31_2_bijlage1(
     let (zip_response, zip_writer) = ZipResponse::new(&zip_filename);
 
     tokio::spawn(async move {
-        if let Err(e) = generate_pdfs(&models, zip_writer).await {
+        if let Err(e) = generate_pdfs(models, zip_writer).await {
             error!("Failed to generate PDFs: {e:?}");
         }
     });
@@ -244,7 +244,7 @@ async fn election_download_na_31_2_inlegvel(
     let election = election_repo::get(&mut conn, election_id).await?;
     drop(conn);
 
-    user.role().is_authorized(&election.committee_category)?;
+    user.role().is_authorized(election.committee_category)?;
     if election.committee_category != CommitteeCategory::GSB {
         return Err(APIError::NotFound(
             "Na 31-2 Inlegvel is only available for GSB elections".into(),
@@ -259,7 +259,7 @@ async fn election_download_na_31_2_inlegvel(
     }
     .to_pdf_file_model(name.clone());
 
-    let content = generate_pdf(&input).await?;
+    let content = generate_pdf(input).await?;
 
     Ok(Attachment::new(content.buffer)
         .filename(&name)

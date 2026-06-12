@@ -1,11 +1,14 @@
-use crate::{CandidateVotes, Fraction, ListVotes};
+use crate::{
+    Fraction, ListVotes,
+    structs::{CandidateNumber, ListNumber},
+};
 
 /// Contains information about the chosen candidates and
 /// the candidate list ranking for a specific list.
 #[derive(Debug, PartialEq)]
 pub struct ListCandidateNomination<'a, T: ListVotes> {
     /// List number for which this nomination applies
-    pub list_number: T::ListNumber,
+    pub list_number: ListNumber<T>,
     /// The number of seats assigned to this group
     pub list_seats: u32,
     /// The list of chosen candidates via preferential votes, can be empty
@@ -13,7 +16,7 @@ pub struct ListCandidateNomination<'a, T: ListVotes> {
     /// The list of other chosen candidates, can be empty
     pub other_candidate_nomination: Vec<&'a T::Cv>,
     /// The updated ranking of the whole candidate list, can be empty
-    pub updated_candidate_ranking: Vec<<T::Cv as CandidateVotes>::CandidateNumber>,
+    pub updated_candidate_ranking: Vec<CandidateNumber<T>>,
 }
 
 /// Contains the preference threshold as a percentage and as a fraction of the number of votes.
@@ -43,6 +46,6 @@ pub struct CandidateNominationResult<'a, T: ListVotes> {
 /// Contains the list number the candidate is listed on and the candidate number on that list.
 #[derive(Debug, PartialEq)]
 pub struct Candidate<T: ListVotes> {
-    pub list_number: T::ListNumber,
-    pub candidate_number: <T::Cv as CandidateVotes>::CandidateNumber,
+    pub list_number: ListNumber<T>,
+    pub candidate_number: CandidateNumber<T>,
 }

@@ -38,7 +38,7 @@ export function ApportionmentTable({
       </Table.Header>
       <Table.Body>
         {finalStanding.map((standing: ListSeatAssignment) => (
-          <Table.Row key={standing.list_number} to={`./${standing.list_number}`}>
+          <Table.Row key={standing.list_number} id={`list-${standing.list_number}`} to={`./${standing.list_number}`}>
             <Table.Cell className={cn(cls.listNumberColumn, "text-align-r", "font-number")}>
               {standing.list_number}
             </Table.Cell>

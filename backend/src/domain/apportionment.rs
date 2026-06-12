@@ -6,6 +6,23 @@ use crate::domain::{
     results::political_group_candidate_votes::CandidateVotes,
 };
 
+#[derive(Clone, Copy, Debug, Serialize, Deserialize, ToSchema, PartialEq, Eq)]
+pub enum ApportionmentWarning {
+    AbsoluteMajorityAndListExhaustion,
+    NotAllSeatsAssigned,
+}
+
+impl From<apportionment::ApportionmentWarning> for ApportionmentWarning {
+    fn from(w: apportionment::ApportionmentWarning) -> Self {
+        match w {
+            apportionment::ApportionmentWarning::AbsoluteMajorityAndListExhaustion => {
+                Self::AbsoluteMajorityAndListExhaustion
+            }
+            apportionment::ApportionmentWarning::NotAllSeatsAssigned => Self::NotAllSeatsAssigned,
+        }
+    }
+}
+
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct SeatAssignment {
     pub seats: u32,
@@ -251,6 +268,17 @@ impl From<apportionment::Fraction> for DisplayFraction {
     }
 }
 
+impl From<DisplayFraction> for apportionment::Fraction {
+    fn from(display_fraction: DisplayFraction) -> Self {
+        let numerator =
+            display_fraction.integer * display_fraction.denominator + display_fraction.numerator;
+        Self {
+            numerator,
+            denominator: display_fraction.denominator,
+        }
+    }
+}
+
 /// Chosen candidate
 #[derive(Clone, Debug, Serialize, Deserialize, ToSchema, PartialEq)]
 #[serde(deny_unknown_fields)]
@@ -290,5 +318,103 @@ impl ChosenCandidate {
             list_number,
             list_name,
         }
+    }
+}
+
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize, ToSchema)]
+#[serde(tag = "variant")]
+pub enum ListDrawingLotsVariant {
+    /// Draw lots for assigning a highest average residual seat
+    HighestAverageResidualSeat(HighestAverageResidualSeatDrawingLots),
+    /// Draw lots for assigning a largest remainder residual seat
+    LargestRemainderResidualSeat(LargestRemainderResidualSeatDrawingLots),
+    /// Draw lots for retracting a seat to be reassigned because of absolute majority (P9)
+    AbsoluteMajority(AbsoluteMajorityDrawingLots),
+}
+
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize, ToSchema)]
+pub struct HighestAverageResidualSeatDrawingLots {
+    pub average: DisplayFraction,
+    pub residual_seat_numbers: Vec<u32>,
+    pub options: Vec<PGNumber>,
+}
+
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize, ToSchema)]
+pub struct LargestRemainderResidualSeatDrawingLots {
+    pub remainder: DisplayFraction,
+    pub residual_seat_numbers: Vec<u32>,
+    pub options: Vec<PGNumber>,
+}
+
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize, ToSchema)]
+pub struct AbsoluteMajorityDrawingLots {
+    pub options: Vec<PGNumber>,
+}
+
+/// The list that has been drawn plus information to assert the correct drawing
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize, ToSchema)]
+pub struct ListDrawn {
+    /// The type of seat assignment or retraction that lots need to be drawn for
+    pub variant: ListDrawingLotsVariant,
+    /// The list that the lot was drawn for
+    pub drawn: PGNumber,
+}
+
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize, ToSchema)]
+pub struct CandidateDrawingLotsVariant {
+    /// The list the candidate needs to be drawn from
+    pub list: PGNumber,
+    /// The candidates that lots are drawn for
+    pub options: Vec<CandidateNumber>,
+}
+
+/// The candidate that has been drawn plus information to assert the correct drawing
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize, ToSchema)]
+pub struct CandidateDrawn {
+    /// The type and information for drawing lots
+    pub variant: CandidateDrawingLotsVariant,
+    /// The candidate that the lot was drawn for
+    pub drawn: CandidateNumber,
+}
+
+#[cfg(test)]
+mod tests {
+
+    use super::*;
+
+    #[test]
+    fn test_from_display_fraction_for_fraction() {
+        let fraction: apportionment::Fraction = DisplayFraction {
+            integer: 1,
+            numerator: 2,
+            denominator: 3,
+        }
+        .into();
+
+        assert_eq!(
+            fraction,
+            apportionment::Fraction {
+                numerator: 5,
+                denominator: 3,
+            }
+        )
+    }
+
+    #[test]
+    fn test_from_fraction_for_display_fraction() {
+        let display_fraction: DisplayFraction = apportionment::Fraction {
+            numerator: 5,
+            denominator: 3,
+        }
+        .into();
+
+        assert_eq!(
+            display_fraction,
+            DisplayFraction {
+                integer: 1,
+                numerator: 2,
+                denominator: 3,
+            }
+        )
     }
 }

@@ -35,7 +35,7 @@ async fn it_generates_a_pdf() {
     };
 
     let content = generate_pdf(
-        &ModelNa31_2Input {
+        ModelNa31_2Input {
             summary: ElectionSummary::zero().into(),
             votes_tables: VotesTables::new(&election, &ElectionSummary::zero()).unwrap(),
             committee_session: committee_session_fixture(ElectionId::from(1)),
@@ -60,20 +60,20 @@ async fn the_default_font_supports_teletex_chars() {
         .map(|codepoint| char::from_u32(codepoint).unwrap())
         .collect::<String>();
 
-    let filtered_input = filter_input::replace_unsupported_glyphs(input.clone());
+    let filtered_input = filter_input::replace_unsupported_glyphs(&input);
     assert_eq!(input, filtered_input);
 
     let input = (161..383)
         .map(|codepoint| char::from_u32(codepoint).unwrap())
         .collect::<String>();
 
-    let filtered_input = filter_input::replace_unsupported_glyphs(input.clone());
+    let filtered_input = filter_input::replace_unsupported_glyphs(&input);
     assert_eq!(input, filtered_input);
 }
 
 #[test(tokio::test)]
 async fn it_generates_a_pdf_with_teletex_chars() {
-    let content = generate_pdf(&PdfFileModel {
+    let content = generate_pdf(PdfFileModel {
         file_name: "file.pdf".into(),
         model: PdfModel::TestTeletexCharset(),
     })
@@ -85,7 +85,7 @@ async fn it_generates_a_pdf_with_teletex_chars() {
 
 #[test(tokio::test)]
 async fn it_generates_a_pdf_with_unsupported_chars() {
-    let content = generate_pdf(&PdfFileModel {
+    let content = generate_pdf(PdfFileModel {
         file_name: "file.pdf".into(),
         model: PdfModel::TestUnsupportedChars(),
     })
@@ -102,7 +102,7 @@ async fn it_generates_a_pdf_with_polling_stations() {
     let summary = ElectionSummary::from_results(&election, &[]).unwrap();
 
     let content = generate_pdf(
-        &ModelNa31_2Input {
+        ModelNa31_2Input {
             votes_tables: VotesTables::new(&election, &summary).unwrap(),
             summary: summary.into(),
             polling_stations: polling_stations_fixture(&[100, 200, 300]),

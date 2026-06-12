@@ -1,4 +1,4 @@
-use std::num::NonZeroU64;
+use std::{num::NonZeroU64, str::FromStr as _};
 
 mod error;
 pub mod hash;
@@ -110,18 +110,18 @@ impl NewElection {
                     number: PGNumber::from(
                         u32::try_from(idx + 1).or(Err(EMLImportError::TooManyPoliticalGroups))?,
                     ),
-                    registered_name: rp.registered_appellation.clone(),
+                    registered_name: rp.registered_appellation.to_string(),
                     candidates: vec![],
                 })
             })
             .collect::<Result<Vec<RegisteredPoliticalGroup>, EMLImportError>>()?;
 
         Ok(Self {
-            name: identifier.name.clone(),
+            name: identifier.name.to_string(),
             committee_category: CommitteeCategory::GSB,
             counting_method: None,
             election_id: identifier.id.raw().into_owned(),
-            location: domain.name.clone(),
+            location: domain.name.to_string(),
             domain_id: domain_id.raw().into_owned(),
             category: crate::domain::election::ElectionCategory::Municipal,
             number_of_seats,
@@ -160,7 +160,7 @@ impl NewElection {
             .ok_or(EMLImportError::MissingElectionDomain)?
             .cloned_value()?;
 
-        if self.election_id != election_id.to_raw_value() {
+        if self.election_id != election_id.to_raw_value().as_ref() {
             return Err(EMLImportError::MismatchElection);
         }
 
@@ -206,10 +206,11 @@ impl RegisteredPoliticalGroup {
         let identifier = &aff.identifier;
         let pg_number = identifier
             .id
-            .value()?
+            .copied_value()?
             .value()
-            .parse::<u32>()
-            .map(PGNumber::from)
+            .get()
+            .try_into()
+            .map(|v: u32| PGNumber::from(v))
             .or(Err(EMLImportError::TooManyPoliticalGroups))?;
 
         let pg_name = identifier.registered_name.clone().unwrap_or_default();
@@ -217,7 +218,7 @@ impl RegisteredPoliticalGroup {
         let mut previous_can_number = CandidateNumber::from(0);
         Ok(RegisteredPoliticalGroup {
             number: pg_number,
-            registered_name: pg_name.clone(),
+            registered_name: pg_name.to_string(),
             candidates: aff
                 .candidates
                 .iter()
@@ -248,10 +249,11 @@ impl Candidate {
             number: can
                 .identifier
                 .id
-                .value()?
+                .copied_value()?
                 .value()
-                .parse::<u32>()
-                .map(CandidateNumber::from)
+                .get()
+                .try_into()
+                .map(|v: u32| CandidateNumber::from(v))
                 .or(Err(EMLImportError::InvalidCandidate))?,
             initials: can
                 .full_name
@@ -279,7 +281,7 @@ impl Candidate {
                 .qualifying_address
                 .as_ref()
                 .and_then(|qa| qa.country_name_code())
-                .map(|code| code.value.clone()),
+                .map(|code| code.value.to_string()),
             gender: match &can.gender {
                 None => None,
                 Some(gender) => {
@@ -296,16 +298,18 @@ impl Candidate {
 
     fn as_candidate_lists_candidate(&self) -> Result<CandidateListsCandidate, EMLError> {
         CandidateListsCandidate::builder()
-            .identifier(CandidateId::new(self.number.as_internal_u32().to_string())?)
+            .identifier(CandidateId::from_str(
+                &self.number.as_internal_u32().to_string(),
+            )?)
             .full_name(
-                PersonName::new(&self.last_name)
-                    .with_first_name_option(self.first_name.as_ref())
+                PersonName::new(self.last_name.clone())
+                    .with_first_name_option(self.first_name.clone())
                     .with_initials_option(if self.initials.is_empty() {
                         None
                     } else {
-                        Some(&self.initials)
+                        Some(self.initials.clone())
                     })
-                    .with_name_prefix_option(self.last_name_prefix.as_ref()),
+                    .with_name_prefix_option(self.last_name_prefix.clone()),
             )
             .qualifying_address(QualifyingAddress::new(
                 &self.locality[..],
@@ -353,14 +357,14 @@ impl ElectionWithPoliticalGroups {
     ) -> Result<eml_nl::documents::ElectionIdentifierBuilder, EMLError> {
         Ok(eml_nl::documents::ElectionIdentifierBuilder::new()
             .id(ElectionId::new(&self.election_id)?)
-            .name(&self.name)
+            .name(self.name.clone())
             .election_date(self.election_date)
             .nomination_date(self.nomination_date)
             .category(self.get_eml_category())
             .subcategory(self.get_eml_subcategory())
             .domain(ElectionDomain::new(
                 Some(ElectionDomainId::new(&self.domain_id)?),
-                &self.location,
+                self.location.clone(),
             )))
     }
 
@@ -375,7 +379,7 @@ impl ElectionWithPoliticalGroups {
             .transaction_id(transaction_id.unwrap_or(1))
             .managing_authority(ManagingAuthority::new(
                 AuthorityIdentifier::new(AuthorityId::new(&self.domain_id)?)
-                    .with_name(&self.location),
+                    .with_name(self.location.clone()),
             ))
             .issue_date(timestamp.date_naive())
             .creation_date_time(timestamp)
@@ -391,9 +395,11 @@ impl ElectionWithPoliticalGroups {
                         .map(|pg| {
                             CandidateListsAffiliation::builder()
                                 .affiliation_type(AffiliationType::StandAloneList)
-                                .registered_name(&pg.registered_name)
+                                .registered_name(pg.registered_name.clone())
                                 .publish_gender(true)
-                                .id(AffiliationId::new(pg.number.as_internal_u32().to_string())?)
+                                .id(AffiliationId::from_str(
+                                    &pg.number.as_internal_u32().to_string(),
+                                )?)
                                 .candidates(
                                     pg.candidates
                                         .iter()
@@ -419,7 +425,7 @@ impl ElectionWithPoliticalGroups {
             .transaction_id(transaction_id.unwrap_or(1))
             .managing_authority(ManagingAuthority::new(
                 AuthorityIdentifier::new(AuthorityId::new(&self.domain_id)?)
-                    .with_name(&self.location),
+                    .with_name(self.location.clone()),
             ))
             .issue_date(timestamp.date_naive())
             .creation_date_time(timestamp)
@@ -439,7 +445,11 @@ impl ElectionWithPoliticalGroups {
             .registered_parties(
                 self.political_groups
                     .iter()
-                    .map(|pg| Ok(ElectionDefinitionRegisteredParty::new(&pg.registered_name)))
+                    .map(|pg| {
+                        Ok(ElectionDefinitionRegisteredParty::new(
+                            pg.registered_name.clone(),
+                        ))
+                    })
                     .collect::<Result<Vec<_>, EMLError>>()?,
             )
             .build()
@@ -457,7 +467,7 @@ impl ElectionWithPoliticalGroups {
             .transaction_id(transaction_id.unwrap_or(1))
             .managing_authority(ManagingAuthority::new(
                 AuthorityIdentifier::new(AuthorityId::new(&self.domain_id)?)
-                    .with_name(&self.location),
+                    .with_name(self.location.clone()),
             ))
             .issue_date(timestamp.date_naive())
             .creation_date_time(timestamp)
@@ -473,7 +483,7 @@ impl ElectionWithPoliticalGroups {
                 .voting_method(VotingMethod::SPV)
                 .reporting_unit(ReportingUnitIdentifier::new(
                     ReportingUnitIdentifierId::new(&self.domain_id)?,
-                    &self.location,
+                    self.location.clone(),
                 ))
                 .polling_places(
                     polling_stations
@@ -510,7 +520,7 @@ impl ElectionWithPoliticalGroups {
             .transaction_id(transaction_id.unwrap_or(1))
             .managing_authority(ManagingAuthority::new(
                 AuthorityIdentifier::new(AuthorityId::new(&self.domain_id)?)
-                    .with_name(&self.location),
+                    .with_name(self.location.clone()),
             ))
             .creation_date_time(timestamp)
             .election_identifier(
@@ -536,10 +546,7 @@ impl ElectionWithPoliticalGroups {
     ) -> Result<ElectionCountContest, EMLError> {
         let builder = ElectionCountContest::builder()
             .identifier(ContestIdentifier::geen())
-            .total_eligible_voter_count(match summary.number_of_voters {
-                Some(n) => n,
-                None => self.number_of_voters,
-            })
+            .total_eligible_voter_count(self.get_eligible_voter_count(summary))
             .total_candidate_votes_count(summary.votes_counts.total_votes_candidates_count)
             .total_rejected_votes(
                 RejectedVotesReason::Blank,
@@ -588,6 +595,13 @@ impl ElectionWithPoliticalGroups {
         builder.build()
     }
 
+    /// Depending on the context of the summary coming from GSB or from CSB, the number of voters source is different.
+    /// In case of a GSB summary, the number of voters there should be the valid source.
+    /// Otherwise, it is the given number of voters.
+    fn get_eligible_voter_count(&self, summary: &ElectionSummary) -> u32 {
+        summary.number_of_voters.unwrap_or(self.number_of_voters)
+    }
+
     fn as_eml_count_selections(
         &self,
         votes: &[PoliticalGroupCandidateVotes],
@@ -599,7 +613,7 @@ impl ElectionWithPoliticalGroups {
             selections.push(
                 ElectionCountSelection::builder()
                     .affiliation(AffiliationSelection::new(
-                        AffiliationId::new(pg.number.as_internal_u32().to_string())?,
+                        AffiliationId::from_str(&pg.number.as_internal_u32().to_string())?,
                         epg.map(|p| p.registered_name.as_str()).unwrap_or(""),
                     ))
                     .valid_votes(pg.total)
@@ -609,7 +623,9 @@ impl ElectionWithPoliticalGroups {
             for can in &pg.candidate_votes {
                 selections.push(
                     ElectionCountSelection::builder()
-                        .candidate(CandidateId::new(can.number.as_internal_u32().to_string())?)
+                        .candidate(CandidateId::from_str(
+                            &can.number.as_internal_u32().to_string(),
+                        )?)
                         .valid_votes(can.votes)
                         .build()?,
                 );
@@ -683,7 +699,7 @@ impl ElectionWithPoliticalGroups {
             .transaction_id(transaction_id.unwrap_or(1))
             .managing_authority(ManagingAuthority::new(
                 AuthorityIdentifier::new(AuthorityId::new(&self.domain_id)?)
-                    .with_name(&self.location),
+                    .with_name(self.location.clone()),
             ))
             .creation_date_time(timestamp)
             .election_identifier(
@@ -710,8 +726,8 @@ impl ElectionWithPoliticalGroups {
                     ElectionResultSelection::builder()
                         .affiliation(
                             eml_nl::documents::election_result::AffiliationSelection::new(
-                                AffiliationId::new(pg.number.as_internal_u32().to_string())?,
-                                &pg.registered_name,
+                                AffiliationId::from_str(&pg.number.as_internal_u32().to_string())?,
+                                pg.registered_name.clone(),
                             ),
                         )
                         .elected(YesNoType::new(true))
@@ -750,9 +766,11 @@ fn build_candidate_result(
     ElectionResultSelection::builder()
         .candidate({
             let mut builder = eml_nl::documents::election_result::CandidateSelection::builder()
-                .identifier(CandidateId::new(can.number.as_internal_u32().to_string())?)
+                .identifier(CandidateId::from_str(
+                    &can.number.as_internal_u32().to_string(),
+                )?)
                 .name(
-                    PersonName::new(&can.last_name)
+                    PersonName::new(can.last_name.clone())
                         .with_first_name_option(can.first_name.clone())
                         .with_initials_option(if can.initials.is_empty() {
                             None
@@ -853,7 +871,7 @@ pub fn polling_stations_from_eml(
         let pspl = &physical_location.polling_station;
         let locality = &physical_location.address.locality;
         result.push(crate::domain::polling_station::PollingStationRequest {
-            name: locality.locality_name.name.clone(),
+            name: locality.locality_name.name.to_string(),
             number: Some(
                 pspl.id
                     .copied_value()?
@@ -901,13 +919,18 @@ pub fn polling_stations_eml_matches_election(
     let identifier = &polling_stations.election_event.election.identifier;
     let election_id = identifier.id.cloned_value()?;
     let election_date = identifier.election_date.copied_value()?.date;
-    Ok(election_id.to_raw_value() == election.election_id
+    Ok(election_id.to_raw_value().as_ref() == election.election_id
         && election_date == election.election_date)
 }
 
 #[cfg(test)]
 mod tests {
+    use eml_nl::utils::StringValue;
+
     use super::*;
+    use crate::domain::{
+        committee_session::committee_session_fixture, election::tests::election_fixture,
+    };
 
     #[test]
     fn test_election_validate_missing_election_domain() {
@@ -933,5 +956,31 @@ mod tests {
         let res = NewElection::from_eml_str(data).unwrap_err();
         dbg!(&res);
         assert!(matches!(res, EMLImportError::OnlyMunicipalSupported));
+    }
+
+    #[test]
+    fn test_as_eml_count_contest() {
+        // Default number_of_voters=1000
+        let mut election = election_fixture(CommitteeCategory::CSB, &[0]);
+        let committee_session = committee_session_fixture(election.id);
+        let mut summary = ElectionSummary::from_results(&election, &[]).unwrap();
+
+        let result_csb = election
+            .as_eml_count_contest(&committee_session, &[], &summary)
+            .unwrap();
+        assert_eq!(
+            result_csb.total_votes.unwrap().eligible_voter_count,
+            StringValue::from_value(1000u64)
+        );
+
+        election.committee_category = CommitteeCategory::GSB;
+        summary.number_of_voters = Some(1001);
+        let result_gsb = election
+            .as_eml_count_contest(&committee_session, &[], &summary)
+            .unwrap();
+        assert_eq!(
+            result_gsb.total_votes.unwrap().eligible_voter_count,
+            StringValue::from_value(1001u64)
+        );
     }
 }

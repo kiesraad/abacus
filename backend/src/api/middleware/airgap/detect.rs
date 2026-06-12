@@ -417,7 +417,7 @@ mod tests {
         let addr = serve_api_with_airgap_detection(pool).await;
 
         // loop through all the paths in the openapi spec
-        for (path, item) in openapi.paths.paths.iter() {
+        for (path, item) in &openapi.paths.paths {
             let operations = [
                 (Method::GET, &item.get),
                 (Method::POST, &item.post),
@@ -427,13 +427,13 @@ mod tests {
             ];
 
             // loop through all the operations for each path
-            for (method, operation) in operations.into_iter() {
+            for (method, operation) in operations {
                 if let Some(operation) = operation {
                     let mut path = path.to_string();
 
                     // replace path parameters with (dummy) values
                     if let Some(parameters) = operation.parameters.as_ref() {
-                        for param in parameters.iter() {
+                        for param in parameters {
                             path = path.replace(&format!("{{{}}}", &param.name), "1");
                         }
                     }

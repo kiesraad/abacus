@@ -1,16 +1,30 @@
 import { render as rtlRender } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
+import * as ReactRouter from "react-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
-
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
+import alertCls from "@/components/ui/Alert/Alert.module.css";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
+import {
+  GetApportionmentStateRequestHandler,
+  RegisterDeceasedCandidatesRequestHandler,
+  ResetApportionmentStateRequestHandler,
+} from "@/testing/api-mocks/RequestHandlers";
 import { Providers } from "@/testing/Providers";
 import type { Router } from "@/testing/router";
-import { overrideOnce } from "@/testing/server";
-import { expectErrorPage, render, renderReturningRouter, screen, setupTestRouter, within } from "@/testing/test-utils";
+import { overrideOnce, server } from "@/testing/server";
+import {
+  expectErrorPage,
+  render,
+  renderReturningRouter,
+  screen,
+  setupTestRouter,
+  spyOnHandler,
+  waitFor,
+  within,
+} from "@/testing/test-utils";
 import type { ApportionmentState, ElectionApportionmentResponse, ErrorResponse } from "@/types/generated/openapi";
-
 import { apportionmentRoutes } from "../routes";
 import {
   candidate_nomination,
@@ -22,10 +36,12 @@ import {
 import { ApportionmentPage } from "./ApportionmentPage";
 import { ApportionmentProvider } from "./ApportionmentProvider";
 
-const renderApportionmentPage = (withRouter: boolean) => {
+const navigate = vi.fn();
+
+const renderApportionmentPage = (electionId: number, withRouter: boolean) => {
   const component = (
-    <ElectionProvider electionId={1}>
-      <ApportionmentProvider electionId={1}>
+    <ElectionProvider electionId={electionId}>
+      <ApportionmentProvider electionId={electionId}>
         <ApportionmentPage />
       </ApportionmentProvider>
     </ElectionProvider>
@@ -38,33 +54,55 @@ const renderApportionmentPage = (withRouter: boolean) => {
 };
 
 describe("ApportionmentPage", () => {
-  // TODO: #3160 enable this test when alert check is enabled again
-  test.skip.each(
+  test.each(
     Object.values({
       Uninitialised: {
         state: { type: "Uninitialised" },
         expectAlert: false,
+        expectRedirectTo: "/elections/3/apportionment/include-all-candidates",
       },
       RegisteringDeceasedCandidates: {
         state: { deceased_candidates: [], type: "RegisteringDeceasedCandidates" },
         expectAlert: false,
+        expectRedirectTo: "/elections/3/apportionment/deceased-candidates",
+      },
+      DrawingLots: {
+        state: {
+          deceased_candidates: [],
+          drawing_lots_required: { variant: "AbsoluteMajority", options: [1, 2], type: "ListDrawingLotsRequired" },
+          candidates_drawn: [],
+          lists_drawn: [],
+          type: "DrawingLots",
+        },
+        expectAlert: false,
+        expectRedirectTo: undefined,
       },
       Finalised: {
-        state: { deceased_candidates: [], type: "Finalised" },
+        state: { deceased_candidates: [], lists_drawn: [], candidates_drawn: [], type: "Finalised" },
         expectAlert: true,
+        expectRedirectTo: undefined,
       },
-    } satisfies Record<ApportionmentState["type"], { state: ApportionmentState; expectAlert: boolean }>),
-  )("Renders all seats assigned message only for finalised state ($state.type)", async ({ state, expectAlert }) => {
-    overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election, committee_session));
-    overrideOnce("post", "/api/elections/1/apportionment", 200, {
+    } satisfies Record<
+      ApportionmentState["type"],
+      { state: ApportionmentState; expectAlert: boolean; expectRedirectTo: string | undefined }
+    >),
+  )("Renders all seats assigned message and does not redirect only for finalised state ($state.type)", async ({
+    state,
+    expectAlert,
+    expectRedirectTo,
+  }) => {
+    vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
+    overrideOnce("get", "/api/elections/3", 200, getElectionMockData(election, committee_session));
+    overrideOnce("post", "/api/elections/3/apportionment", 200, {
       seat_assignment: seat_assignment,
       candidate_nomination: candidate_nomination,
       election_summary: election_summary,
+      warnings: [],
     } satisfies ElectionApportionmentResponse);
-    overrideOnce("get", "/api/elections/1/apportionment/state", 200, state);
+    overrideOnce("get", "/api/elections/3/apportionment/state", 200, state);
 
-    renderApportionmentPage(false);
-    expect(await screen.findByTestId("election-summary-table")).toBeVisible();
+    renderApportionmentPage(3, false);
+    expect(await screen.findByRole("heading", { level: 1, name: "Zetelverdeling" })).toBeVisible();
 
     if (expectAlert) {
       const alert = await screen.findByRole("alert");
@@ -76,36 +114,52 @@ describe("ApportionmentPage", () => {
         "href",
         "/report/committee-session/3/download",
       );
+      expect(within(alert).getByRole("button", { name: "Zetelverdeling opnieuw doen" })).toBeVisible();
     } else {
       expect(screen.queryByRole("alert")).not.toBeInTheDocument();
     }
+
+    if (expectRedirectTo) {
+      await waitFor(() => {
+        expect(navigate).toHaveBeenCalledWith(expectRedirectTo);
+      });
+    } else {
+      expect(navigate).not.toHaveBeenCalled();
+    }
   });
 
-  test("Election summary and apportionment tables visible", async () => {
+  test("Renders number of deceased candidates and redirects on clicking manage deceased candidates", async () => {
     const user = userEvent.setup();
-    overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election, committee_session));
-    overrideOnce("post", "/api/elections/1/apportionment", 200, {
+    overrideOnce("get", "/api/elections/3", 200, getElectionMockData(election, committee_session));
+    overrideOnce("post", "/api/elections/3/apportionment", 200, {
       seat_assignment: seat_assignment,
       candidate_nomination: candidate_nomination,
       election_summary: election_summary,
+      warnings: [],
     } satisfies ElectionApportionmentResponse);
-    overrideOnce("get", "/api/elections/1/apportionment/state", 200, {
-      deceased_candidates: [],
+    server.use(GetApportionmentStateRequestHandler);
+    server.use(RegisterDeceasedCandidatesRequestHandler);
+    overrideOnce("get", "/api/elections/3/apportionment/state", 200, {
+      deceased_candidates: [{ pg_number: 1, candidate_number: 1 }],
+      lists_drawn: [],
+      candidates_drawn: [],
       type: "Finalised",
     } satisfies ApportionmentState);
 
-    const router = renderApportionmentPage(true) as Router;
+    const router = renderApportionmentPage(3, true) as Router;
 
     expect(await screen.findByRole("heading", { level: 1, name: "Zetelverdeling" })).toBeVisible();
 
-    expect(await screen.findByText("Alle zetels zijn toegewezen")).toBeVisible();
-    expect(
-      await screen.findByText("Je kunt de zetelverdeling nu definitief maken en het proces-verbaal downloaden."),
-    ).toBeVisible();
-    expect(screen.getByRole("link", { name: "Naar proces-verbaal" })).toHaveAttribute(
+    const alert = await screen.findByRole("alert");
+    expect(alert).toHaveTextContent("Alle zetels zijn toegewezen");
+    expect(alert).toHaveTextContent("Je kunt de zetelverdeling nu definitief maken en het proces-verbaal downloaden.");
+    // No warnings, so the finalised alert should be a success alert
+    expect(alert).toHaveClass(alertCls.success!);
+    expect(within(alert).getByRole("link", { name: "Naar proces-verbaal" })).toHaveAttribute(
       "href",
       "/report/committee-session/3/download",
     );
+    expect(within(alert).getByRole("button", { name: "Zetelverdeling opnieuw doen" })).toBeVisible();
 
     expect(await screen.findByRole("heading", { level: 2, name: "Kengetallen" })).toBeVisible();
     const election_summary_table = await screen.findByTestId("election-summary-table");
@@ -119,6 +173,62 @@ describe("ApportionmentPage", () => {
       ["Aantal raadszetels", "15", ""],
       ["Kiesdeler", "80", "Benodigde stemmen per volle zetel"],
       ["Voorkeursdrempel", "40", "50% van de kiesdeler"],
+      ["Kandidaten voor zetelverdeling", "44 - 1 † = 43", "Beheer overleden kandidaten"],
+    ]);
+
+    // Check if the link to the deceased candidates page works
+    const rows = within(election_summary_table).getAllByRole("row");
+    if (rows[8]) {
+      const manageLink = await within(rows[8]).findByRole("link", { name: "Beheer overleden kandidaten" });
+      await user.click(manageLink);
+      expect(router.state.location.pathname).toEqual("/elections/3/apportionment/deceased-candidates");
+    }
+  });
+
+  test("Election summary and apportionment tables visible", async () => {
+    const user = userEvent.setup();
+    overrideOnce("get", "/api/elections/3", 200, getElectionMockData(election, committee_session));
+    overrideOnce("post", "/api/elections/3/apportionment", 200, {
+      seat_assignment: seat_assignment,
+      candidate_nomination: candidate_nomination,
+      election_summary: election_summary,
+      warnings: [],
+    } satisfies ElectionApportionmentResponse);
+    overrideOnce("get", "/api/elections/3/apportionment/state", 200, {
+      deceased_candidates: [],
+      lists_drawn: [],
+      candidates_drawn: [],
+      type: "Finalised",
+    } satisfies ApportionmentState);
+
+    const router = renderApportionmentPage(3, true) as Router;
+
+    expect(await screen.findByRole("heading", { level: 1, name: "Zetelverdeling" })).toBeVisible();
+
+    const alert = await screen.findByRole("alert");
+    expect(alert).toHaveTextContent("Alle zetels zijn toegewezen");
+    expect(alert).toHaveTextContent("Je kunt de zetelverdeling nu definitief maken en het proces-verbaal downloaden.");
+    // No warnings, so the finalised alert should be a success alert
+    expect(alert).toHaveClass(alertCls.success!);
+    expect(within(alert).getByRole("link", { name: "Naar proces-verbaal" })).toHaveAttribute(
+      "href",
+      "/report/committee-session/3/download",
+    );
+    expect(within(alert).getByRole("button", { name: "Zetelverdeling opnieuw doen" })).toBeVisible();
+
+    expect(await screen.findByRole("heading", { level: 2, name: "Kengetallen" })).toBeVisible();
+    const election_summary_table = await screen.findByTestId("election-summary-table");
+    expect(election_summary_table).toBeVisible();
+    expect(election_summary_table).toHaveTableContent([
+      ["Kiesgerechtigden", "2.000", ""],
+      ["Getelde stembiljetten", "1.205", "Opkomst: 60.25%"],
+      ["Blanco stemmen", "3", "0.25%"],
+      ["Ongeldige stemmen", "2", "0.17%"],
+      ["Totaal stemmen op kandidaten", "1.200", ""],
+      ["Aantal raadszetels", "15", ""],
+      ["Kiesdeler", "80", "Benodigde stemmen per volle zetel"],
+      ["Voorkeursdrempel", "40", "50% van de kiesdeler"],
+      ["Kandidaten voor zetelverdeling", "44 - 0 † = 44", "Beheer overleden kandidaten"],
     ]);
 
     expect(await screen.findByRole("heading", { level: 2, name: "Zetelverdeling" })).toBeVisible();
@@ -180,22 +290,86 @@ describe("ApportionmentPage", () => {
     expect(router.state.location.pathname).toEqual("/1");
   });
 
+  test("Renders yellow warning when finalised but not all seats assigned and clicks reset button", async () => {
+    const user = userEvent.setup();
+    server.use(GetApportionmentStateRequestHandler);
+    server.use(ResetApportionmentStateRequestHandler);
+    const resetApportionmentState = spyOnHandler(ResetApportionmentStateRequestHandler);
+    const getApportionmentState = spyOnHandler(GetApportionmentStateRequestHandler);
+    overrideOnce("get", "/api/elections/3", 200, getElectionMockData(election, committee_session));
+    overrideOnce("post", "/api/elections/3/apportionment", 200, {
+      seat_assignment: seat_assignment,
+      candidate_nomination: candidate_nomination,
+      election_summary: election_summary,
+      warnings: ["NotAllSeatsAssigned"],
+    } satisfies ElectionApportionmentResponse);
+    overrideOnce("get", "/api/elections/3/apportionment/state", 200, {
+      deceased_candidates: [],
+      lists_drawn: [],
+      candidates_drawn: [],
+      type: "Finalised",
+    } satisfies ApportionmentState);
+
+    renderApportionmentPage(3, false);
+
+    const alerts = await screen.findAllByRole("alert");
+    expect(alerts).toHaveLength(2);
+    expect(alerts[0]).toHaveTextContent("Niet alle zetels zijn toegewezen");
+    alerts.forEach((alert) => {
+      expect(alert).not.toHaveTextContent("Alle zetels zijn toegewezen");
+    });
+
+    const finalisedAlert = alerts[1] as HTMLElement;
+    await user.click(within(finalisedAlert).getByRole("button", { name: "Zetelverdeling opnieuw doen" }));
+    expect(resetApportionmentState).toHaveBeenCalled();
+    expect(getApportionmentState).toHaveBeenCalled();
+  });
+
+  test("Renders P9+P10 warning when both articles were applied", async () => {
+    overrideOnce("get", "/api/elections/3", 200, getElectionMockData(election, committee_session));
+    overrideOnce("post", "/api/elections/3/apportionment", 200, {
+      seat_assignment: seat_assignment,
+      candidate_nomination: candidate_nomination,
+      election_summary: election_summary,
+      warnings: ["AbsoluteMajorityAndListExhaustion"],
+    } satisfies ElectionApportionmentResponse);
+    overrideOnce("get", "/api/elections/3/apportionment/state", 200, {
+      deceased_candidates: [],
+      lists_drawn: [],
+      candidates_drawn: [],
+      type: "Finalised",
+    } satisfies ApportionmentState);
+
+    renderApportionmentPage(3, false);
+    expect(await screen.findByTestId("election-summary-table")).toBeVisible();
+
+    const alerts = await screen.findAllByRole("alert");
+    expect(alerts).toHaveLength(2);
+    expect(alerts[0]).toHaveTextContent(
+      "Zowel art. P 9 (volstrekte meerderheid) als art. P 10 (lijstuitputting) van de Kieswet zijn toegepast tijdens het berekenen van de zetelverdeling. Neem contact op met de Kiesraad om te overleggen of er extra controles nodig zijn.",
+    );
+    expect(alerts[1]).toHaveTextContent("Alle zetels zijn toegewezen");
+    // Finalised alert should be neutral (not success) because there is a warning
+    expect(alerts[1]).toHaveClass(alertCls.notify!);
+    expect(alerts[1]).not.toHaveClass(alertCls.success!);
+  });
+
   describe("Apportionment not yet available", () => {
     beforeEach(() => {
-      overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election, committee_session));
-      overrideOnce("get", "/api/elections/1/apportionment/state", 200, {
+      overrideOnce("get", "/api/elections/3", 200, getElectionMockData(election, committee_session));
+      overrideOnce("get", "/api/elections/3/apportionment/state", 200, {
         type: "Uninitialised",
       } satisfies ApportionmentState);
     });
 
     test("Not available until committee session is completed", async () => {
-      overrideOnce("post", "/api/elections/1/apportionment", 412, {
+      overrideOnce("post", "/api/elections/3/apportionment", 412, {
         error: "Committee session not completed",
         fatal: false,
         reference: "ApportionmentCommitteeSessionNotCompleted",
       } satisfies ErrorResponse);
 
-      renderApportionmentPage(false);
+      renderApportionmentPage(3, false);
 
       // Wait for the page to be loaded
       expect(await screen.findByRole("heading", { level: 1, name: "Zetelverdeling" })).toBeVisible();
@@ -212,13 +386,13 @@ describe("ApportionmentPage", () => {
     });
 
     test("Not possible because drawing of lots is not implemented yet", async () => {
-      overrideOnce("post", "/api/elections/1/apportionment", 422, {
+      overrideOnce("post", "/api/elections/3/apportionment", 422, {
         error: "Drawing of lots is required",
         fatal: false,
         reference: "ApportionmentDrawingOfLotsRequired",
       } satisfies ErrorResponse);
 
-      renderApportionmentPage(false);
+      renderApportionmentPage(3, false);
 
       // Wait for the page to be loaded
       expect(await screen.findByRole("heading", { level: 1, name: "Zetelverdeling" })).toBeVisible();
@@ -226,56 +400,6 @@ describe("ApportionmentPage", () => {
       expect(await screen.findByText("Zetelverdeling is niet mogelijk")).toBeVisible();
       expect(
         await screen.findByText("Loting is noodzakelijk, maar nog niet beschikbaar in deze versie van Abacus"),
-      ).toBeVisible();
-
-      expect(screen.queryByText("Alle zetels zijn toegewezen")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("election-summary-table")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("apportionment-table")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("chosen-candidates-table")).not.toBeInTheDocument();
-    });
-
-    test("Not possible because all lists are exhausted", async () => {
-      overrideOnce("post", "/api/elections/1/apportionment", 422, {
-        error: "All lists are exhausted, not enough candidates to fill all seats",
-        fatal: false,
-        reference: "ApportionmentAllListsExhausted",
-      } satisfies ErrorResponse);
-
-      renderApportionmentPage(false);
-
-      // Wait for the page to be loaded
-      expect(await screen.findByRole("heading", { level: 1, name: "Zetelverdeling" })).toBeVisible();
-
-      expect(await screen.findByText("Zetelverdeling is niet mogelijk")).toBeVisible();
-      expect(
-        await screen.findByText(
-          "Er zijn te weinig kandidaten om alle aan lijsten toegewezen zetels te vullen. Abacus kan daarom geen zetelverdeling berekenen. Neem contact op met de Kiesraad.",
-        ),
-      ).toBeVisible();
-
-      expect(screen.queryByText("Alle zetels zijn toegewezen")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("election-summary-table")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("apportionment-table")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("chosen-candidates-table")).not.toBeInTheDocument();
-    });
-
-    test("Not possible because no votes on candidates cast", async () => {
-      overrideOnce("post", "/api/elections/1/apportionment", 422, {
-        error: "No votes on candidates cast",
-        fatal: false,
-        reference: "ApportionmentZeroVotesCast",
-      } satisfies ErrorResponse);
-
-      renderApportionmentPage(false);
-
-      // Wait for the page to be loaded
-      expect(await screen.findByRole("heading", { level: 1, name: "Zetelverdeling" })).toBeVisible();
-
-      expect(await screen.findByText("Zetelverdeling is niet mogelijk")).toBeVisible();
-      expect(
-        await screen.findByText(
-          "Er zijn geen stemmen op kandidaten uitgebracht. Abacus kan daarom geen zetelverdeling berekenen. Neem contact op met de Kiesraad.",
-        ),
       ).toBeVisible();
 
       expect(screen.queryByText("Alle zetels zijn toegewezen")).not.toBeInTheDocument();
@@ -300,13 +424,13 @@ describe("ApportionmentPage", () => {
         },
       ]);
 
-      overrideOnce("post", "/api/elections/1/apportionment", 500, {
+      overrideOnce("post", "/api/elections/3/apportionment", 500, {
         error: "Internal Server Error",
         fatal: true,
         reference: "InternalServerError",
       });
 
-      await router.navigate("/elections/1/apportionment");
+      await router.navigate("/elections/3/apportionment");
 
       rtlRender(<Providers router={router} />);
 

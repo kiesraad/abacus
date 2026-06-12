@@ -11,6 +11,7 @@ import {
 import { ApportionmentFullSeats } from "e2e-tests/page-objects/apportionment/ApportionmentFullSeatsPgObj";
 import { Apportionment } from "e2e-tests/page-objects/apportionment/ApportionmentPgObj";
 import { ApportionmentResidualSeats } from "e2e-tests/page-objects/apportionment/ApportionmentResidualSeatsPgObj";
+import { IncludeAllCandidates } from "e2e-tests/page-objects/apportionment/IncludeAllCandidatesPgObj";
 import { AccountSetupPgObj } from "e2e-tests/page-objects/authentication/AccountSetupPgObj";
 import { LoginPgObj } from "e2e-tests/page-objects/authentication/LoginPgObj";
 import { DataEntryHomePage } from "e2e-tests/page-objects/data_entry/DataEntryHomePgObj";
@@ -317,8 +318,18 @@ test.describe("full flow CSB", () => {
     const finishDataEntryPage = new FinishDataEntry(page);
     await finishDataEntryPage.finishDataEntry.click();
 
+    const includeAllCandidatesPage = new IncludeAllCandidates(page);
+    await expect(includeAllCandidatesPage.header).toBeVisible();
+    await expect(includeAllCandidatesPage.dataEntryFinishedAlert).toBeVisible();
+    await expect(includeAllCandidatesPage.title).toBeVisible();
+    await expect(includeAllCandidatesPage.noDeceased).toBeVisible();
+    await expect(includeAllCandidatesPage.hasDeceased).toBeVisible();
+    await includeAllCandidatesPage.noDeceased.check();
+    await includeAllCandidatesPage.next.click();
+
     const apportionmentPage = new Apportionment(page);
     await expect(apportionmentPage.header).toBeVisible();
+    await expect(apportionmentPage.allSeatsAssignedAlert).toBeVisible();
 
     await expect(apportionmentPage.fullSeatInformation).toBeVisible();
     await apportionmentPage.fullSeatsPageLink.click();
@@ -333,7 +344,6 @@ test.describe("full flow CSB", () => {
 
     await page.goBack();
 
-    await expect(apportionmentPage.allSeatsAssignedAlert).toBeVisible();
     await apportionmentPage.toReport.click();
 
     const electionReportPage = new ElectionReport(page);

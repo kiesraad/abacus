@@ -318,6 +318,8 @@ describe("ElectionReportPage", () => {
     vi.spyOn(ReactRouter, "useParams").mockReturnValue({ committeeSessionId: "2" });
     overrideOnce("get", "/api/elections/2/apportionment/state", 200, {
       deceased_candidates: [],
+      lists_drawn: [],
+      candidates_drawn: [],
       type: "Finalised",
     } satisfies ApportionmentState);
     overrideOnce(

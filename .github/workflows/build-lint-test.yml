@@ -32,7 +32,7 @@ jobs:
       CARGO_TERM_COLOR: always
       SQLX_OFFLINE: "true"
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6.0.3
         with:
           fetch-depth: 0
       # Build frontend+Storybook for embedding in the backend binary
@@ -71,7 +71,7 @@ jobs:
         with:
           workspaces: "backend -> target"
       - name: Build
-        run: cargo --verbose --locked build --target=x86_64-unknown-linux-musl --features memory-serve,embed-typst,storybook --bin abacus
+        run: cargo --verbose --locked build --target=x86_64-unknown-linux-musl --no-default-features --features openapi,dev-database,memory-serve,embed-typst,storybook --bin abacus
       - uses: actions/upload-artifact@v7
         with:
           name: abacus
@@ -86,6 +86,7 @@ jobs:
     env:
       CARGO_TERM_COLOR: always
       SQLX_OFFLINE: "true"
+      BINSTALL_DISABLE_TELEMETRY: "true"
     steps:
       # Free up runner disk space, so that our job has enough space to run
       # https://dev.to/mathio/squeezing-disk-space-from-github-actions-runners-an-engineers-guide-3pjg
@@ -102,7 +103,7 @@ jobs:
           /usr/share/swift
           &&
           df -h
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6.0.3
       # Test backend
       - name: Install musl
         run: sudo apt-get update && sudo apt-get install -y musl-tools
@@ -117,17 +118,22 @@ jobs:
         uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4 # v2
         with:
           workspaces: "backend -> target"
+          cache-bin: "false"
+      - name: Install Binstall
+        uses: cargo-bins/cargo-binstall@aaa84a43aec4955a42c5ffc65d258961e39f276e # main
       - name: Create empty frontend build dir for memory-serve
         run: mkdir -p dist dist-storybook
         working-directory: ./frontend
       - name: Check rustfmt
         run: cargo --verbose --locked fmt --all -- --check
+      - name: Check Clippy with default features
+        run: cargo --verbose --locked clippy --workspace --all-targets -- -D warnings
       - name: Check Clippy with all features
         run: cargo --verbose --locked clippy --target=x86_64-unknown-linux-musl --workspace --all-targets --all-features -- -D warnings
-      - name: Check Clippy without default features
-        run: cargo --verbose --locked clippy --target=x86_64-unknown-linux-musl --workspace --all-targets --no-default-features -- -D warnings
+      - name: Install Nextest
+        run: cargo binstall cargo-nextest
       - name: Run tests
-        run: cargo --verbose --locked test --target=x86_64-unknown-linux-musl --workspace --features embed-typst -- --nocapture
+        run: cargo --verbose --locked nextest run --target=x86_64-unknown-linux-musl --workspace --exclude pdf_gen_dylib --no-default-features --features openapi,dev-database,embed-typst
       - name: Build documentation
         run: cargo doc --workspace --no-deps --all-features
         env:
@@ -146,7 +152,7 @@ jobs:
       run:
         working-directory: frontend
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6.0.3
       - name: Setup Node
         uses: actions/setup-node@v6.4.0
         with:
@@ -189,7 +195,7 @@ jobs:
       run:
         working-directory: frontend
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6.0.3
       - name: Setup Node
         uses: actions/setup-node@v6.4.0
         with:
@@ -259,12 +265,13 @@ jobs:
       CARGO_TERM_COLOR: always
       SQLX_OFFLINE: "true"
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6.0.3
       - name: Setup Rust Nightly
         shell: bash
         run: >
           rustup update nightly &&
-          rustup default nightly
+          rustup default nightly &&
+          rustup component add clippy
       - name: Cargo cache
         uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4 # v2
         with:
@@ -274,9 +281,15 @@ jobs:
           shared-key: "fuzzer"
       - name: Install cargo fuzz
         run: cargo install cargo-fuzz
-      - name: Run the data entry fuzzer
+      - name: Check Clippy for ./backend/fuzz
+        run: cargo --verbose --locked clippy -- -D warnings
+        working-directory: ./backend/fuzz
+      - name: Check Clippy for ./backend/apportionment/fuzz
+        run: cargo --verbose --locked clippy -- -D warnings
+        working-directory: ./backend/apportionment/fuzz
+      - name: Run data entry fuzzer
         run: cargo fuzz run data_entry_status -- -max_total_time=60
-      - name: Run the apportionment fuzzer
+      - name: Run simple apportionment fuzzer
         working-directory: ./backend/apportionment
         run: cargo fuzz run simple_apportionment -- -max_total_time=60
 

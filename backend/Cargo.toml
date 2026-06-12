@@ -1,14 +1,25 @@
 [workspace]
 resolver = "3"
-members = [".", "apportionment", "pdf_gen"]
+members = [
+    ".",
+    "apportionment",
+    "pdf_gen/types",
+    "pdf_gen/impl",
+    "pdf_gen/dylib",
+    "pdf_gen/wrapper",
+]
 
 [workspace.package]
 version = "1.1.0"
 edition = "2024"
 license = "EUPL-1.2"
-rust-version = "1.89"
+rust-version = "1.95"
 
 [workspace.dependencies]
+pdf_gen = { path = "./pdf_gen/wrapper" }
+pdf_gen_impl = { path = "./pdf_gen/impl" }
+pdf_gen_types = { path = "./pdf_gen/types" }
+pdf_gen_dylib = { path = "./pdf_gen/dylib" }
 async_zip = { version = "0.0.18", features = ["tokio", "deflate", "chrono"] }
 axum = { version = "0.8", features = ["macros", "tracing", "tokio"] }
 axum-extra = { version = "0.12", default-features = false, features = [
@@ -34,10 +45,11 @@ rust-version.workspace = true
 default-run = "abacus"
 
 [features]
-default = ["openapi", "dev-database"]
+default = ["openapi", "dev-database", "pdf_gen/dev"]
 openapi = ["dep:utoipa-swagger-ui"]
 memory-serve = ["dep:memory-serve"]
-embed-typst = ["pdf_gen/embed-typst"]
+embed-typst = ["pdf_gen/static"]
+pdf-gen-stub = ["pdf_gen/stub"]
 dev-database = []
 airgap-detection = []
 storybook = ["dep:memory-serve"]
@@ -52,28 +64,20 @@ required-features = ["dev-database"]
 
 [[bin]]
 name = "gen-pdf"
-required-features = ["embed-typst"]
 
 # Note: if you add a dependency here, please update the README.md for the backend as well.
 
 [dependencies]
 apportionment = { path = "./apportionment" }
-pdf_gen = { path = "./pdf_gen" }
+pdf_gen.workspace = true
 axum.workspace = true
 axum-extra.workspace = true
 chrono.workspace = true
-clap = { version = "4.6", default-features = false, features = [
-    "derive",
-    "std",
-    "help",
-    "env",
-] }
-eml-nl = { version = "0.5.0" }
+clap = { version = "4.6", default-features = false, features = ["derive", "std", "help", "env"] }
+eml-nl = { version = "0.6.0" }
 hyper = { version = "1", features = ["full"] }
 tokio.workspace = true
-memory-serve = { version = "2.1.0", optional = true, features = [
-    "force-embed",
-] }
+memory-serve = { version = "2.1.0", optional = true, features = ["force-embed"] }
 utoipa = { version = "5.4.0", features = ["axum_extras"] }
 utoipa-axum = "0.2.0"
 utoipa-swagger-ui = { version = "9.0.2", features = ["axum"], optional = true }
@@ -108,8 +112,15 @@ unexpected_cfgs = { level = "warn", check-cfg = ['cfg(fuzzing)'] }
 
 [workspace.lints.clippy]
 cast_possible_truncation = "deny"
+cloned_instead_of_copied = "warn"
 cognitive_complexity = "warn"
+explicit_deref_methods = "warn"
+explicit_into_iter_loop = "warn"
+explicit_iter_loop = "warn"
+needless_pass_by_value = "warn"
+redundant_allocation = "warn"
 too_many_lines = "warn"
+trivially_copy_pass_by_ref = "warn"
 unused_async = "warn"
 unwrap_used = "warn"
 

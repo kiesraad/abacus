@@ -420,10 +420,10 @@ fuzz_target!(|transitions: Vec<Transition>| {
         ) {
             panic!(
                 "Prev: {:?}\n\nNext: {:?}\n\nInvalid transition: {} --{:?}--> {}\nfirst_entry_correct: {}\n",
-                &prev_state,
-                &next_state,
+                prev_state,
+                next_state,
                 prev_state.status_name(),
-                &transition,
+                transition,
                 next_state
                     .as_ref()
                     .map(|s| s.status_name().to_string())

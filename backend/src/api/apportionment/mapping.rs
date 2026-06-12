@@ -45,7 +45,7 @@ fn sort_candidates_alphabetically(mut candidates: Vec<ChosenCandidate>) -> Vec<C
 
 pub fn map_candidate_nomination(
     cn: &apportionment::CandidateNominationResult<'_, PoliticalGroupCandidateVotes>,
-    political_groups: Vec<PoliticalGroup>,
+    political_groups: &[PoliticalGroup],
 ) -> CandidateNomination {
     let mut list_names: HashMap<PGNumber, String> = HashMap::new();
     let mut candidate_map: HashMap<(PGNumber, CandidateNumber), Candidate> = HashMap::new();
@@ -53,7 +53,7 @@ pub fn map_candidate_nomination(
         for candidate in &list.candidates {
             candidate_map.insert((list.number, candidate.number), candidate.clone());
         }
-        list_names.insert(list.number, list.name);
+        list_names.insert(list.number, list.name.clone());
     }
 
     let mut chosen_candidates: Vec<ChosenCandidate> = cn

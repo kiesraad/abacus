@@ -19,7 +19,7 @@ jobs:
     env:
       SHOW_DEV_PAGE: false
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6.0.3
       - name: Setup Node
         uses: actions/setup-node@v6.4.0
         with:
@@ -66,7 +66,7 @@ jobs:
       CARGO_TERM_COLOR: always
       SQLX_OFFLINE: "true"
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6.0.3
       - name: Download Abacus Frontend
         uses: actions/download-artifact@v8
         with:
@@ -116,7 +116,7 @@ jobs:
     env:
       RELEASE_BUILD: true
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6.0.3
       - name: Setup Node
         uses: actions/setup-node@v6.4.0
         with:
@@ -160,7 +160,7 @@ jobs:
       # https://docs.github.com/en/rest/releases/releases?apiVersion=2022-11-28#create-a-release
       contents: write
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6.0.3
       - name: Get build date
         run: |
           BUILD_DATE=$(date -u +'%Y-%m-%d')

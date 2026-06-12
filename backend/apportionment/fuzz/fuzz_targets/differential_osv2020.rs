@@ -1,6 +1,7 @@
 #![no_main]
 
 use std::{
+    collections::BTreeSet,
     io::{BufRead, BufReader, Write},
     process::{Command, Stdio},
     sync::{Mutex, OnceLock},
@@ -102,6 +103,51 @@ fn report_mismatch(
     panic!("{message}");
 }
 
+/// Parse a bracketed list of numbers (e.g. `[1, 2, 3]`) that follows `prefix`.
+/// Returns None when the prefix or no valid list is not found.
+fn parse_last_bracketed_list_numbers(log: &str, prefix: &str) -> Option<BTreeSet<u32>> {
+    let line = log.lines().rev().find(|l| l.contains(prefix))?;
+    let start = line.find(prefix)? + prefix.len();
+    let lists = &line[start..line[start..].find(']')? + start];
+    lists
+        .split(',')
+        .map(|s| s.trim().parse::<u32>())
+        .collect::<Result<BTreeSet<u32>, _>>()
+        .ok()
+}
+
+/// Parse the list numbers from Abacus's
+/// "Drawing of lots is required for lists: [..]" log line.
+/// Returns None when there is no drawing of lots for lists.
+fn parse_abacus_lots_options(abacus_log: &str) -> Option<BTreeSet<u32>> {
+    parse_last_bracketed_list_numbers(abacus_log, "Drawing of lots is required for lists: [")
+}
+
+/// Parse the list numbers from OSV2020's
+/// "... Alternativen: List2, List3." log line
+/// Returns None when there is no drawing of lots for lists.
+fn parse_osv2020_lots_options(osv2020_log: &[String]) -> Option<BTreeSet<u32>> {
+    let prefix = "Alternativen: ";
+    let line = osv2020_log.iter().rev().find(|l| l.contains(prefix))?;
+    let start = line.find(prefix)? + prefix.len();
+    let lists = line[start..]
+        .trim()
+        .strip_suffix('.')
+        .unwrap_or(line[start..].trim());
+    lists
+        .split(", ")
+        .map(|name| {
+            name.strip_prefix("List")
+                .and_then(|n| n.parse::<u32>().ok())
+        })
+        .collect::<Option<BTreeSet<u32>>>()
+}
+
+/// Whether Abacus hit Article P 10 (list exhaustion) during seat assignment.
+fn abacus_applied_list_exhaustion(abacus_log: &str) -> bool {
+    abacus_log.contains("Exhausted lists in accordance with Article P 10 Kieswet")
+}
+
 fn init() {
     let osv2020_wrapper_bin = std::env::var("OSV2020_WRAPPER_BIN")
         .expect("OSV2020_WRAPPER_BIN environment variable must point to the apportionment-wrapper launcher script");
@@ -130,73 +176,6 @@ fn init() {
 }
 
 fn fuzz(data: FuzzedApportionmentInput) {
-    // Skip cases with zero total votes cast
-    // related issue: #3210
-    let total_votes = data
-        .list_votes
-        .iter()
-        .flat_map(|list| list.candidate_votes.iter())
-        .map(|cv| cv.votes())
-        .sum::<u32>();
-
-    if total_votes == 0 {
-        return;
-    }
-    // Skip cases where number of seats > number of candidates
-    // related issue: #3211
-    let no_of_candidates = data
-        .list_votes
-        .iter()
-        .map(|lv| lv.candidate_votes.len() as u32)
-        .sum::<u32>();
-
-    if data.seats > no_of_candidates {
-        return;
-    }
-    // Skip cases where number of seats > number of candidates on lists with votes
-    // related issue: #3212
-    let no_of_candidates_on_lists_with_votes = data
-        .list_votes
-        .iter()
-        .filter(|list| list.candidate_votes.iter().any(|cv| cv.votes() > 0))
-        .map(|list| list.candidate_votes.len() as u32)
-        .sum::<u32>();
-
-    if data.seats > no_of_candidates_on_lists_with_votes {
-        return;
-    }
-    // Skip cases where seats < 19 and number of seats > number of lists with votes
-    // Reason: when there are fewer than 19 seats, the first two steps in which remaining seats are assigned
-    // have the limitation that each list can get only one seat per step. So as long as Abacus assigns seats to
-    // lists with zero votes, we need to skip inputs that triggers that behavior in Abacus.
-    // related issue: #3212
-    let no_of_lists_with_votes = data
-        .list_votes
-        .iter()
-        .filter(|list| list.candidate_votes.iter().any(|cv| cv.votes() > 0))
-        .count() as u32;
-
-    if data.seats < 19 && data.seats > no_of_lists_with_votes {
-        return;
-    }
-
-    // Skip cases where any list has an absolute majority of votes
-    // related issue: #3219
-    if data.list_votes.iter().any(|list| {
-        list.candidate_votes
-            .iter()
-            .map(|cv| cv.votes())
-            .sum::<u32>()
-            > (total_votes / 2)
-    }) {
-        return;
-    }
-
-    // Skip cases where any party has zero total votes
-    //if data.list_votes.iter().any(|list| list.candidate_votes.iter().map(|cv| cv.votes()).sum::<u32>() == 0) {
-    //    return;
-    //}
-
     // Convert current data structure to OSV2020 wrapper format
     let pg_candidates: Vec<i64> = data
         .list_votes
@@ -216,6 +195,22 @@ fn fuzz(data: FuzzedApportionmentInput) {
 
     let (abacus_result, abacus_log) = run_with_log(|| process(&data));
 
+    // Skip cases where there are fewer than 19 seats and both art. P 9 (absolute majority) and art. P 10 (list exhaustion) are applied.
+    // Reason is that Abacus does not include the P 9-seat for the max. one seat requirement when assiging residual seats.
+    // related issue: #3219
+    if data.seats < 19
+        && osv2020_log
+            .iter()
+            .any(|line| line.contains("Absolute Mehrheit"))
+        && osv2020_log
+            .iter()
+            .any(|line| line.contains("Erschöpfte Listen"))
+        && abacus_log.contains("in accordance with Article P 9 Kieswet")
+        && abacus_log.contains("assigned to another list in accordance with Article P 10 Kieswet")
+    {
+        return;
+    }
+
     match abacus_result {
         Ok(ref output) => {
             let abacus_seats = get_total_seats(&output.seat_assignment);
@@ -234,23 +229,20 @@ fn fuzz(data: FuzzedApportionmentInput) {
                     }
                 }
                 Osv2020Result::Conflict => {
-                    // Accept case where OSV does drawing of lots and Abacus has allocation, when
-                    // 1. greatest averages is applied (art. P7)
-                    // 2. list exhaustion is applied
-                    // In most (all?) cases the difference under these circumstances is caused by the fact that OSV and Abacus handle list exhaustion differently.
-                    // related issue: #3214
-                    if osv2020_log
+                    // OSV2020 can require a drawing lots (P 7) for a residual seat while
+                    // Abacus assigns it directly.
+                    //
+                    // This is because OSV2020 does not enforce list exhaustion (P 10) during
+                    // its residual seat assignment, it only retracts seats after assigning.
+                    // Abacus will not assign a residual seat to a list that is already
+                    // exhausted, so it never sees the same drawing lots.
+                    //
+                    // Related issues: #3214, #3219
+                    let osv_p7_conflict = osv2020_log
                         .last()
-                        .unwrap()
-                        .contains(&String::from("Conflict: Auslosung bezüglich P7."))
-                        && osv2020_log
-                            .iter()
-                            .any(|line| line.contains("Erschöpfte Listen"))
-                        && abacus_log.contains(
-                            "assigned to another list in accordance with Article P 10 Kieswet",
-                        )
-                    {
-                        //do nothing, continue
+                        .is_some_and(|l| l.contains("Conflict: Auslosung bezüglich P7."));
+                    if osv_p7_conflict && abacus_applied_list_exhaustion(&abacus_log) {
+                        // accept, do nothing
                     } else {
                         report_mismatch(
                             &data,
@@ -265,9 +257,8 @@ fn fuzz(data: FuzzedApportionmentInput) {
             }
         }
         Err(
-            e @ (ApportionmentError::DrawingOfLotsNotImplemented
-            | ApportionmentError::AllListsExhausted
-            | ApportionmentError::ZeroVotesCast),
+            e @ ApportionmentError::ListDrawingLotsRequired(_)
+            | e @ ApportionmentError::CandidateDrawingLotsRequired(_),
         ) => {
             match osv2020_result {
                 Osv2020Result::Allocated(osv2020_seats) => {
@@ -280,8 +271,33 @@ fn fuzz(data: FuzzedApportionmentInput) {
                         &format!("OSV2020 has allocation where Abacus has {e:?}"),
                     );
                 }
-                Osv2020Result::Conflict => {} // both agree
+                Osv2020Result::Conflict => {
+                    // OSV2020 assigns residual seats to exhausted lists via drawing of lots,
+                    // so accept if Abacus also applied list exhaustion.
+                    //
+                    // Related issues: #3214, #3367
+                    if abacus_applied_list_exhaustion(&abacus_log) {
+                        // accept, do nothing
+                    } else {
+                        // No exhaustion: the options for drawing lots must match.
+                        let abacus_options = parse_abacus_lots_options(&abacus_log);
+                        let osv2020_options = parse_osv2020_lots_options(&osv2020_log);
+                        if abacus_options != osv2020_options {
+                            report_mismatch(
+                                &data,
+                                &format!("Err({e:?}) Abacus lots options: {abacus_options:?}"),
+                                &abacus_log,
+                                &format!("OSV2020 lots options: {osv2020_options:?}"),
+                                &osv2020_log,
+                                "OSV2020 and Abacus require drawing lots, but the options do not match",
+                            );
+                        }
+                    }
+                }
             }
+        }
+        Err(ApportionmentError::InvalidLotDrawing(message)) => {
+            panic!("Invalid lot drawing: {}", message)
         }
     }
 }

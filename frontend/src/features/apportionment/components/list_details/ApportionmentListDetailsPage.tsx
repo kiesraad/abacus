@@ -1,17 +1,39 @@
+import { useEffect } from "react";
+import { useNavigate } from "react-router";
 import { NotFoundError } from "@/api/ApiResult";
+import { Alert } from "@/components/ui/Alert/Alert";
 import { useElection } from "@/hooks/election/useElection";
 import { useNumericParam } from "@/hooks/useNumericParam";
 import { t, tx } from "@/i18n/translate";
-import type { Candidate, CandidateVotes } from "@/types/generated/openapi";
+import type { Candidate, CandidateVotes, ListCandidateNomination, PoliticalGroup } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 import { formatPoliticalGroupName } from "@/utils/politicalGroup";
+import { formatList } from "@/utils/strings";
 import { useApportionmentContext } from "../../hooks/useApportionmentContext";
-import { renderTitleAndHeader } from "../../utils/utils";
+import { apportionmentCheckStateAndRedirect, renderTitleAndHeader } from "../../utils/utils";
 import cls from "../Apportionment.module.css";
 import { ApportionmentErrorPage } from "../ApportionmentError";
 import { CandidatesRankingTable } from "./CandidatesRankingTable";
 import { CandidatesWithSeatTable } from "./CandidatesWithSeatTable";
 import { CandidatesWithVotesTable } from "./CandidatesWithVotesTable";
+
+function renderDeceasedCandidatesAlert(listDeceasedCandidateNumbers: number[]) {
+  return (
+    <Alert type="notify" small>
+      <p>
+        {listDeceasedCandidateNumbers.length === 1
+          ? tx("apportionment.list_details_alert.deceased_candidate", undefined, {
+              nr: formatList(listDeceasedCandidateNumbers, t("and")),
+            })
+          : tx("apportionment.list_details_alert.deceased_candidates", undefined, {
+              nrs: formatList(listDeceasedCandidateNumbers, t("and")),
+            })}
+        <br />
+        {t("apportionment.list_details_alert.votes_have_been_counted_on_the_list")}
+      </p>
+    </Alert>
+  );
+}
 
 interface PreferentiallyChosenCandidatesSectionProps {
   preferentialCandidateNomination: CandidateVotes[];
@@ -119,9 +141,14 @@ function UnelectedCandidatesRankingSection({ unelectedCandidatesRanking }: Unele
 interface TotalVotesPerCandidateSectionProps {
   candidateVotesList: CandidateVotes[];
   candidates: Candidate[];
+  deceasedCandidateNumbers: number[];
 }
 
-function TotalVotesPerCandidateSection({ candidateVotesList, candidates }: TotalVotesPerCandidateSectionProps) {
+function TotalVotesPerCandidateSection({
+  candidateVotesList,
+  candidates,
+  deceasedCandidateNumbers,
+}: TotalVotesPerCandidateSectionProps) {
   return (
     <div className={cn(cls.tableDiv, "mb-lg")}>
       <div>
@@ -130,16 +157,34 @@ function TotalVotesPerCandidateSection({ candidateVotesList, candidates }: Total
           id="total-votes-per-candidate-table"
           candidateList={candidates}
           candidateVotesList={candidateVotesList}
+          deceasedCandidateNumbersList={deceasedCandidateNumbers}
         />
       </div>
     </div>
   );
 }
 
+function getUnelectedCandidatesRanking(
+  listCandidateNomination: ListCandidateNomination,
+  listTotalSeats: number,
+  list: PoliticalGroup,
+): Candidate[] {
+  if (listCandidateNomination.updated_candidate_ranking.length > 0) {
+    return listCandidateNomination.updated_candidate_ranking.slice(listTotalSeats);
+  } else {
+    return list.candidates.slice(listTotalSeats);
+  }
+}
+
 export function ApportionmentListDetailsPage() {
+  const navigate = useNavigate();
   const { election } = useElection();
-  const { seatAssignment, candidateNomination, electionSummary, error } = useApportionmentContext();
+  const { seatAssignment, candidateNomination, electionSummary, error, state } = useApportionmentContext();
   const listNumber = useNumericParam("listNumber");
+
+  useEffect(() => {
+    apportionmentCheckStateAndRedirect(state, election.id, navigate);
+  });
 
   const list = election.political_groups.find((group) => group.number === listNumber);
 
@@ -148,22 +193,29 @@ export function ApportionmentListDetailsPage() {
   }
 
   const listName = formatPoliticalGroupName(list);
+  let listDeceasedCandidateNumbers: number[] = [];
+  if (state?.type === "Finalised") {
+    listDeceasedCandidateNumbers = state.deceased_candidates
+      .filter((dc) => list.number === dc.pg_number)
+      .map((dc) => dc.candidate_number);
+  }
 
   if (error) {
     return <ApportionmentErrorPage sectionTitle={listName} error={error} />;
   }
   if (seatAssignment && candidateNomination && electionSummary) {
-    const listTotalSeats = seatAssignment.final_standing[list.number - 1]?.total_seats;
-    const candidateVotesList = electionSummary.political_group_votes[list.number - 1]?.candidate_votes;
-    const listCandidateNomination = candidateNomination.list_candidate_nomination[list.number - 1];
+    const listTotalSeats = seatAssignment.final_standing.find(
+      (standing) => standing.list_number === list.number,
+    )?.total_seats;
+    const candidateVotesList = electionSummary.political_group_votes.find(
+      (pgv) => pgv.number === list.number,
+    )?.candidate_votes;
+    const listCandidateNomination = candidateNomination.list_candidate_nomination.find(
+      (lcn) => lcn.list_number === list.number,
+    );
 
     if (listTotalSeats !== undefined && candidateVotesList && listCandidateNomination) {
-      let unelectedCandidatesRanking: Candidate[];
-      if (listCandidateNomination.updated_candidate_ranking.length > 0) {
-        unelectedCandidatesRanking = listCandidateNomination.updated_candidate_ranking.slice(listTotalSeats);
-      } else {
-        unelectedCandidatesRanking = list.candidates.slice(listTotalSeats);
-      }
+      const unelectedCandidatesRanking = getUnelectedCandidatesRanking(listCandidateNomination, listTotalSeats, list);
       return (
         <>
           {renderTitleAndHeader(listName)}
@@ -171,17 +223,24 @@ export function ApportionmentListDetailsPage() {
             <article className={cls.article}>
               <div className={cn(cls.tableDiv, "mb-lg")}>
                 <div>
-                  <h2 className={cls.tableTitle}>{t("apportionment.assigned_number_of_seats")}</h2>
-                  <span id="text-list-assigned-nr-seats">
-                    {tx(
-                      `apportionment.list_assigned_nr_seats.${listTotalSeats === 1 ? "singular" : "plural"}`,
-                      {},
-                      {
-                        list_name: listName,
-                        num_seats: listTotalSeats,
-                      },
-                    )}
-                  </span>
+                  <div>
+                    <h2 className={cls.tableTitle}>{t("apportionment.assigned_number_of_seats")}</h2>
+                    <span id="text-list-assigned-nr-seats">
+                      {tx(
+                        `apportionment.list_assigned_nr_seats.${listTotalSeats === 1 ? "singular" : "plural"}`,
+                        {},
+                        {
+                          list_name: listName,
+                          num_seats: listTotalSeats,
+                        },
+                      )}
+                    </span>
+                  </div>
+                  {listDeceasedCandidateNumbers.length > 0 && (
+                    <div className={cn("mt-md-lg", cls.deceasedCandidatesAlert)}>
+                      {renderDeceasedCandidatesAlert(listDeceasedCandidateNumbers.sort((a, b) => a - b))}
+                    </div>
+                  )}
                 </div>
               </div>
               <PreferentiallyChosenCandidatesSection
@@ -195,7 +254,11 @@ export function ApportionmentListDetailsPage() {
                 startSeatNumber={listCandidateNomination.preferential_candidate_nomination.length + 1}
               />
               <UnelectedCandidatesRankingSection unelectedCandidatesRanking={unelectedCandidatesRanking} />
-              <TotalVotesPerCandidateSection candidates={list.candidates} candidateVotesList={candidateVotesList} />
+              <TotalVotesPerCandidateSection
+                candidates={list.candidates}
+                candidateVotesList={candidateVotesList}
+                deceasedCandidateNumbers={listDeceasedCandidateNumbers}
+              />
             </article>
           </main>
         </>

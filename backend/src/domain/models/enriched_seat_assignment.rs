@@ -96,7 +96,7 @@ impl EnrichedSeatAssignment {
             .filter(|list_seat_assignment| list_seat_assignment.meets_remainder_threshold)
             .collect();
         let mut largest_remainders = Vec::new();
-        for standing in final_standing_pgs_meeting_threshold.iter() {
+        for standing in &final_standing_pgs_meeting_threshold {
             let assigned_seat = initial_largest_remainder_steps
                 .iter()
                 .find(|step| step.change.list_number_assigned() == standing.list_number);
@@ -159,7 +159,7 @@ impl EnrichedSeatAssignment {
             )
         };
 
-        for pg_votes in summary.votes_counts.political_group_total_votes.iter() {
+        for pg_votes in &summary.votes_counts.political_group_total_votes {
             let initial_full_seats = Self::get_initial_full_seats(seat_assignment, pg_votes.number);
             let largest_remainder = if initial_steps.initial_largest_remainder_steps.is_empty() {
                 None
@@ -276,7 +276,7 @@ mod tests {
 
     fn get_election_summary(
         election: &ElectionWithPoliticalGroups,
-        candidate_votes: Vec<Vec<u32>>,
+        candidate_votes: &[Vec<u32>],
     ) -> ElectionSummary {
         let total_votes_candidates_count = candidate_votes.iter().flatten().sum::<u32>();
         let political_group_votes =
@@ -323,20 +323,22 @@ mod tests {
         ];
         let election = election_fixture_with_given_number_of_seats(
             CommitteeCategory::CSB,
-            candidate_votes
+            &candidate_votes
                 .iter()
                 .map(|cv| u32::try_from(cv.len()).expect("Should fit in u32"))
-                .collect::<Vec<u32>>()
-                .as_slice(),
+                .collect::<Vec<u32>>(),
             10,
         );
         let political_groups = &election.political_groups;
-        let summary = get_election_summary(&election, candidate_votes);
+        let summary = get_election_summary(&election, &candidate_votes);
         let summary_csb = ElectionSummaryCSB::new(&summary, political_groups);
-        let apportionment_input = ApportionmentInputData {
-            number_of_seats: election.number_of_seats,
-            list_votes: summary.political_group_votes.as_slice(),
-        };
+        let apportionment_input = ApportionmentInputData::new(
+            election.number_of_seats,
+            &summary.political_group_votes,
+            &[],
+            &[],
+            &[],
+        );
         let apportionment_result =
             apportionment::process(&apportionment_input).expect("apportionment failed");
         let seat_assignment = map_seat_assignment(&apportionment_result.seat_assignment);
@@ -441,20 +443,22 @@ mod tests {
         ];
         let election = election_fixture_with_given_number_of_seats(
             CommitteeCategory::CSB,
-            candidate_votes
+            &candidate_votes
                 .iter()
                 .map(|cv| u32::try_from(cv.len()).expect("Should fit in u32"))
-                .collect::<Vec<u32>>()
-                .as_slice(),
+                .collect::<Vec<u32>>(),
             24,
         );
         let political_groups = &election.political_groups;
-        let summary = get_election_summary(&election, candidate_votes);
+        let summary = get_election_summary(&election, &candidate_votes);
         let summary_csb = ElectionSummaryCSB::new(&summary, political_groups);
-        let apportionment_input = ApportionmentInputData {
-            number_of_seats: election.number_of_seats,
-            list_votes: summary.political_group_votes.as_slice(),
-        };
+        let apportionment_input = ApportionmentInputData::new(
+            election.number_of_seats,
+            &summary.political_group_votes,
+            &[],
+            &[],
+            &[],
+        );
         let apportionment_result =
             apportionment::process(&apportionment_input).expect("apportionment failed");
         let seat_assignment = map_seat_assignment(&apportionment_result.seat_assignment);
@@ -527,20 +531,22 @@ mod tests {
         ];
         let election = election_fixture_with_given_number_of_seats(
             CommitteeCategory::CSB,
-            candidate_votes
+            &candidate_votes
                 .iter()
                 .map(|cv| u32::try_from(cv.len()).expect("Should fit in u32"))
-                .collect::<Vec<u32>>()
-                .as_slice(),
+                .collect::<Vec<u32>>(),
             15,
         );
         let political_groups = &election.political_groups;
-        let summary = get_election_summary(&election, candidate_votes);
+        let summary = get_election_summary(&election, &candidate_votes);
         let summary_csb = ElectionSummaryCSB::new(&summary, political_groups);
-        let apportionment_input = ApportionmentInputData {
-            number_of_seats: election.number_of_seats,
-            list_votes: summary.political_group_votes.as_slice(),
-        };
+        let apportionment_input = ApportionmentInputData::new(
+            election.number_of_seats,
+            &summary.political_group_votes,
+            &[],
+            &[],
+            &[],
+        );
         let apportionment_result =
             apportionment::process(&apportionment_input).expect("apportionment failed");
         let seat_assignment = map_seat_assignment(&apportionment_result.seat_assignment);

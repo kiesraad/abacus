@@ -18,7 +18,7 @@ use crate::{
             voters_counts::VotersCounts,
             votes_counts::{EnrichedVotesCounts, VotesCounts},
         },
-        validate::{Validate, ValidationResults},
+        validate::Validate,
     },
     error::ErrorReference,
 };
@@ -85,8 +85,7 @@ impl ElectionSummary {
             }
 
             // validate result and make sure that there are no errors
-            let mut validation_results = ValidationResults::default();
-            result.validate(election, &mut validation_results, &"data".into())?;
+            let validation_results = result.validate(election, &"data".into())?;
             if validation_results.has_errors() {
                 return Err(APIError::AddError(
                     format!(
@@ -108,7 +107,7 @@ impl ElectionSummary {
                 .add_results(data_source, &result.differences_counts());
 
             // add votes for each political group to the total
-            for pg in result.political_group_votes().iter() {
+            for pg in result.political_group_votes() {
                 let pg_total = totals
                     .political_group_votes
                     .iter_mut()
@@ -162,7 +161,7 @@ impl ElectionSummary {
         let mut totals = ElectionSummary::zero();
 
         // initialize political group votes to zero
-        for group in election.political_groups.iter() {
+        for group in &election.political_groups {
             totals
                 .votes_counts
                 .political_group_total_votes
@@ -326,6 +325,8 @@ impl From<ElectionSummary> for ElectionSummaryWithoutVotes {
 #[derive(Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct ElectionSummaryCSB {
+    /// The number of voters (i.e. "Kiesgerechtigden")
+    pub number_of_voters: u32,
     /// The total number of voters
     pub voters_counts: VotersCounts,
     /// The total number of votes
@@ -337,6 +338,9 @@ pub struct ElectionSummaryCSB {
 impl ElectionSummaryCSB {
     pub fn new(summary: &ElectionSummary, political_groups: &[PoliticalGroup]) -> Self {
         ElectionSummaryCSB {
+            number_of_voters: summary
+                .number_of_voters
+                .expect("Number of voters needs to be filled in for CSB"),
             voters_counts: summary.voters_counts.clone(),
             votes_counts: EnrichedVotesCounts {
                 political_group_total_votes: summary

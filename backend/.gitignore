@@ -2,6 +2,7 @@
 /target
 /target-docker/
 *.sqlite*
+/tls/
 /templates/**/*.pdf
 /tmp-pdf-gen
 cobertura.xml

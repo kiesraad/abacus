@@ -1,16 +1,17 @@
 import { Table } from "@/components/ui/Table/Table";
 import { t } from "@/i18n/translate";
-import type { ListSeatAssignment, PoliticalGroup } from "@/types/generated/openapi";
+import type { ListSeatAssignment, ListStanding, PoliticalGroup } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 import { formatPoliticalGroupName } from "@/utils/politicalGroup";
 import cls from "./Apportionment.module.css";
 
 interface ApportionmentTableProps {
-  finalStanding: ListSeatAssignment[];
+  finalStanding: ListSeatAssignment[] | ListStanding[] | undefined;
   politicalGroups: PoliticalGroup[];
   fullSeats: number;
   residualSeats: number;
   seats: number;
+  notAssignedSeats: number;
 }
 
 function convertZeroToDash(number: number): string {
@@ -26,6 +27,7 @@ export function ApportionmentTable({
   fullSeats,
   residualSeats,
   seats,
+  notAssignedSeats,
 }: ApportionmentTableProps) {
   return (
     <Table id="apportionment-table" className={cls.table}>
@@ -37,7 +39,16 @@ export function ApportionmentTable({
         <Table.HeaderCell className="text-align-r link-cell-padding">{t("apportionment.total_seats")}</Table.HeaderCell>
       </Table.Header>
       <Table.Body>
-        {finalStanding.map((standing: ListSeatAssignment) => (
+        {notAssignedSeats > 0 && (
+          <Table.Row id="not-assigned-seats" to={"."}>
+            <Table.Cell></Table.Cell>
+            <Table.Cell className="bold">{t("apportionment.not_yet_assigned")}</Table.Cell>
+            <Table.NumberCell>{convertZeroToDash(0)}</Table.NumberCell>
+            <Table.NumberCell>{notAssignedSeats}</Table.NumberCell>
+            <Table.NumberCell className="bold">{notAssignedSeats}</Table.NumberCell>
+          </Table.Row>
+        )}
+        {finalStanding?.map((standing) => (
           <Table.Row key={standing.list_number} id={`list-${standing.list_number}`} to={`./${standing.list_number}`}>
             <Table.Cell className={cn(cls.listNumberColumn, "text-align-r", "font-number")}>
               {standing.list_number}
@@ -50,7 +61,11 @@ export function ApportionmentTable({
             </Table.Cell>
             <Table.NumberCell>{convertZeroToDash(standing.full_seats)}</Table.NumberCell>
             <Table.NumberCell>{convertZeroToDash(standing.residual_seats)}</Table.NumberCell>
-            <Table.NumberCell className="bold">{convertZeroToDash(standing.total_seats)}</Table.NumberCell>
+            <Table.NumberCell className="bold">
+              {convertZeroToDash(
+                "total_seats" in standing ? standing.total_seats : standing.full_seats + standing.residual_seats,
+              )}
+            </Table.NumberCell>
           </Table.Row>
         ))}
         <Table.TotalRow>

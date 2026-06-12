@@ -12,6 +12,7 @@ export const Default: StoryObj = {
         fullSeats={gte19Seats.seat_assignment.full_seats}
         residualSeats={gte19Seats.seat_assignment.residual_seats}
         seats={gte19Seats.seat_assignment.seats}
+        notAssignedSeats={0}
       />
     );
   },

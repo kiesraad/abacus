@@ -200,7 +200,7 @@ export function ApportionmentListDetailsPage() {
       .map((dc) => dc.candidate_number);
   }
 
-  if (error) {
+  if (error && error.reference === "ApportionmentCommitteeSessionNotCompleted") {
     return <ApportionmentErrorPage sectionTitle={listName} error={error} />;
   }
   if (seatAssignment && candidateNomination && electionSummary) {

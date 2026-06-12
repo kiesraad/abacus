@@ -17,6 +17,7 @@ use crate::AppError;
 const CA_CERT_PEM: &str = "ca.pem";
 const CA_CERT_DER: &str = "ca.cer";
 const CA_KEY_DER: &str = "ca-key.der";
+const LEAF_CERT_PEM: &str = "leaf.pem";
 
 fn tls_err<E: core::fmt::Debug>(e: E) -> AppError {
     AppError::Tls(format!("{e:?}"))
@@ -46,7 +47,7 @@ pub fn load_or_generate(tls_dir: &Path) -> Result<TlsCertificates, AppError> {
     }
 
     let (issuer, ca) = load_or_generate_ca(tls_dir)?;
-    let (leaf_cert, leaf_key) = create_leaf(&issuer, &get_subjects())?;
+    let (leaf_cert, leaf_key) = create_leaf(tls_dir, &issuer, &get_subjects())?;
     Ok(TlsCertificates {
         ca,
         leaf_cert,
@@ -134,6 +135,7 @@ fn get_ca_params() -> Result<CertificateParams, AppError> {
 
 /// Create a fresh server (leaf) certificate signed by the CA
 fn create_leaf(
+    tls_dir: &Path,
     issuer: &Issuer<'_, KeyPair>,
     subjects: &[String],
 ) -> Result<(CertificateDer<'static>, PrivateKeyDer<'static>), AppError> {
@@ -153,6 +155,10 @@ fn create_leaf(
 
     let cert = params.signed_by(&leaf_key, issuer).map_err(tls_err)?;
     let cert_der = cert.der().clone();
+
+    // TODO: for now persist the leaf to disk so the certificate can be inspected - remove in #3411
+    write_file(&tls_dir.join(LEAF_CERT_PEM), cert.pem().as_bytes(), 0o644)?;
+
     tracing::info!(
         "Created a new server certificate (SHA-256 fingerprint {})",
         fingerprint(&cert_der),

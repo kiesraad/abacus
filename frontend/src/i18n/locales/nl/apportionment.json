@@ -6,6 +6,7 @@
   "article_p10": "(Kieswet, artikel P 10)",
   "assigned_number_of_seats": "Toegewezen aantal zetels",
   "average": "Gemiddelde",
+  "averages_per_list": "Gemiddelden per lijst (na toekennen restzetel)",
   "below_candidates_are_deceased": "Onderstaande kandidaten zijn als gevolg van overlijden bij de zetelverdeling buiten beschouwing gelaten.",
   "candidates_for_apportionment": "Kandidaten voor zetelverdeling",
   "chosen_candidates": "Gekozen kandidaten",
@@ -24,6 +25,7 @@
     "singular": "Na het <link>verdelen van de volle zetels</link> is er nog {num_residual_seats} restzetel.",
     "plural": "Na het <link>verdelen van de volle zetels</link> zijn er nog {num_residual_seats} restzetels."
   },
+  "go_to_drawing_lots": "Ga naar loting",
   "how_many_residual_seats": "Hoeveel restzetels zijn er te verdelen?",
   "how_often_is_quota_met": "Hoe vaak haalde elke partij de kiesdeler?",
   "in_alphabetical_order": "In alfabetische volgorde",
@@ -102,6 +104,10 @@
     "singular": "{num_seat} zetel werd als {type_seat} toegewezen",
     "plural": "{num_seat} zetels werden als {type_seat} toegewezen"
   },
+  "seats_left_to_assign": {
+    "singular": "Er is nog {num_seat} restzetel te verdelen.",
+    "plural": "Er zijn nog {num_seat} restzetels te verdelen."
+  },
   "title": "Zetelverdeling",
   "to_apportionment": "Naar zetelverdeling",
   "total": "Totaal",
@@ -111,7 +117,7 @@
   "total_seats": "Totaal zetels",
   "total_votes_cast_count": "Getelde stembiljetten",
   "turnout": "Opkomst",
-  "view_details": "bekijk details",
+  "view_details": "Bekijk details",
   "voters": "Kiesgerechtigden",
   "want_to_make_changes": "Wil je wijzigingen aanbrengen in de buiten beschouwing gelaten kandidaten?",
   "warning": {

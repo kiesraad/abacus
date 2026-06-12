@@ -76,7 +76,7 @@ describe("ApportionmentListDetailsPage", () => {
           lists_drawn: [],
           type: "DrawingLots",
         },
-        expectRedirectTo: undefined,
+        expectRedirectTo: "/elections/3/apportionment",
       },
       Finalised: {
         state: { deceased_candidates: [], lists_drawn: [], candidates_drawn: [], type: "Finalised" },

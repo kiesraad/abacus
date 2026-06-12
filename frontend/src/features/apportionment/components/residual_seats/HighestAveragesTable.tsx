@@ -1,11 +1,20 @@
 import { Table } from "@/components/ui/Table/Table";
 import { t } from "@/i18n/translate";
-import type { ListSeatAssignment, PoliticalGroup } from "@/types/generated/openapi";
+import type { ListSeatAssignment, PGNumber, PoliticalGroup } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 import { formatPoliticalGroupName } from "@/utils/politicalGroup";
 import { getFootnotesFromResultChanges, type ResultChange } from "../../utils/seat-change";
 import type { HighestAverageAssignmentStep } from "../../utils/steps";
 import cls from "../Apportionment.module.css";
+
+function getCellClassName(step: HighestAverageAssignmentStep, listNumber: PGNumber) {
+  if (step.change.selected_list_number === listNumber) {
+    return "bg-yellow bold";
+  } else if (step.change.list_options.includes(listNumber)) {
+    return "bg-highlight";
+  }
+  return undefined;
+}
 
 interface HighestAveragesTableProps {
   steps: HighestAverageAssignmentStep[];
@@ -59,9 +68,7 @@ export function HighestAveragesTable({ steps, standings, politicalGroups, result
                   return (
                     <Table.DisplayFractionCells
                       key={`${listSeatAssignment.list_number}-${step.residual_seat_number}`}
-                      className={
-                        step.change.list_options.includes(listSeatAssignment.list_number) ? "bg-yellow bold" : undefined
-                      }
+                      className={getCellClassName(step, listSeatAssignment.list_number)}
                     >
                       {!step.change.list_exhausted.includes(listSeatAssignment.list_number) ? average : undefined}
                     </Table.DisplayFractionCells>

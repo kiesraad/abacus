@@ -49,7 +49,12 @@ export function ApportionmentTable({
           </Table.Row>
         )}
         {standings.map((standing: ListSeatAssignment) => (
-          <Table.Row key={standing.list_number} id={`list-${standing.list_number}`} to={`./${standing.list_number}`}>
+          <Table.Row
+            key={standing.list_number}
+            id={`list-${standing.list_number}`}
+            className={notAssignedSeats > 0 ? cls.rowWithoutLink : undefined}
+            to={notAssignedSeats === 0 ? `./${standing.list_number}` : undefined}
+          >
             <Table.Cell className={cn(cls.listNumberColumn, "text-align-r", "font-number")}>
               {standing.list_number}
             </Table.Cell>

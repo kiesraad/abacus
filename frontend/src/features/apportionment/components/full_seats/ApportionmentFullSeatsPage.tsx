@@ -25,7 +25,7 @@ export function ApportionmentFullSeatsPage() {
   });
 
   if (error && error.reference === "ApportionmentCommitteeSessionNotCompleted") {
-    return <ApportionmentErrorPage sectionTitle={t("apportionment.details_full_seats")} error={error} />;
+    return <ApportionmentErrorPage sectionTitle={t("apportionment.allocation_of_full_seats")} error={error} />;
   }
   if (seatAssignment) {
     const { fullSeatRemovalSteps } = getRemovalSteps(seatAssignment);
@@ -42,7 +42,7 @@ export function ApportionmentFullSeatsPage() {
     });
     return (
       <>
-        {renderTitleAndHeader(t("apportionment.details_full_seats"))}
+        {renderTitleAndHeader(t("apportionment.allocation_of_full_seats"))}
         <main>
           <article className={cls.article}>
             <div className={cn(cls.tableDiv, "mb-lg")}>

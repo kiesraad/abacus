@@ -243,7 +243,7 @@ export function ApportionmentResidualSeatsPage() {
   });
 
   if (error) {
-    return <ApportionmentErrorPage sectionTitle={t("apportionment.details_residual_seats")} error={error} />;
+    return <ApportionmentErrorPage sectionTitle={t("apportionment.allocation_of_residual_seats")} error={error} />;
   }
   if (seatAssignment) {
     const { largestRemainderSteps, uniqueHighestAverageSteps, highestAverageSteps, absoluteMajorityReassignment } =
@@ -269,7 +269,7 @@ export function ApportionmentResidualSeatsPage() {
 
     return (
       <>
-        {renderTitleAndHeader(t("apportionment.details_residual_seats"))}
+        {renderTitleAndHeader(t("apportionment.allocation_of_residual_seats"))}
         <main>
           <article className={cls.article}>
             {seatAssignment.residual_seats > 0 ? (

@@ -6,7 +6,7 @@ import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { useElection } from "@/hooks/election/useElection";
-import { t } from "@/i18n/translate";
+import { t, tx } from "@/i18n/translate";
 import type {
   ApportionmentState,
   ApportionmentWarning,
@@ -19,6 +19,7 @@ import type {
 } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 import { getNumberOfCandidates } from "@/utils/politicalGroups";
+import { formatList } from "@/utils/strings";
 import { useApportionmentContext } from "../hooks/useApportionmentContext";
 import {
   apportionmentCheckStateAndRedirect,
@@ -82,6 +83,40 @@ function renderFinalisedAlert(
           <Button variant="secondary" size="md" onClick={handleResetApportionmentState}>
             {t("apportionment.redo_apportionment_button")}
           </Button>
+        </div>
+      </Alert>
+    </FormLayout.Alert>
+  );
+}
+
+function renderHighestAverageOrLargestRemainderDrawingLotsAlert(
+  residualSeatNumbers: number[],
+  variant: "HighestAverageResidualSeat" | "LargestRemainderResidualSeat",
+) {
+  return (
+    <FormLayout.Alert>
+      <Alert type="warning">
+        <strong className="heading-md">
+          {t("apportionment.drawing_lots_required_alert.title")}
+          {residualSeatNumbers.length > 1 && "s"} {formatList(residualSeatNumbers, t("and"))}
+        </strong>
+        <p>
+          {tx("apportionment.drawing_lots_required_alert.description", undefined, {
+            variant:
+              variant === "HighestAverageResidualSeat"
+                ? t("apportionment.average_number")
+                : t("apportionment.remainder_of"),
+          })}
+          {tx("apportionment.drawing_lots_required_alert.list")}
+        </p>
+        <div className={cls.alertButtons}>
+          {/* TODO: Update link to drawing lots page! */}
+          <Button.Link size="md" to=".">
+            {t("apportionment.to_drawing_lots")}
+          </Button.Link>
+          <Button.Link variant="secondary" size="md" to="./details-residual-seats">
+            {t("apportionment.details_residual_seats_allocation")}
+          </Button.Link>
         </div>
       </Alert>
     </FormLayout.Alert>
@@ -191,6 +226,7 @@ function ChosenCandidatesTableSection({ chosenCandidates }: { chosenCandidates: 
   );
 }
 
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO: Is there any way to make this shorter?
 export function ApportionmentPage() {
   const navigate = useNavigate();
   const { currentCommitteeSession, election } = useElection();
@@ -233,12 +269,18 @@ export function ApportionmentPage() {
             renderTables && (
               <>
                 {renderApportionmentWarnings(warnings)}
-                {state.type === "Finalised" &&
-                  renderFinalisedAlert(
-                    warnings,
-                    currentCommitteeSession.id,
-                    () => void handleResetApportionmentState(),
-                  )}
+                {state.type === "Finalised"
+                  ? renderFinalisedAlert(
+                      warnings,
+                      currentCommitteeSession.id,
+                      () => void handleResetApportionmentState(),
+                    )
+                  : state.drawing_lots_required.type === "ListDrawingLotsRequired" &&
+                    state.drawing_lots_required.variant !== "AbsoluteMajority" &&
+                    renderHighestAverageOrLargestRemainderDrawingLotsAlert(
+                      state.drawing_lots_required.residual_seat_numbers,
+                      state.drawing_lots_required.variant,
+                    )}
                 <ElectionSummaryTableSection
                   electionSummary={electionSummary}
                   seatAssignment={seatAssignment}

@@ -1,18 +1,25 @@
 {
   "absolute_majority_reassignment": "Lijst {list_assigned_seat} heeft meer dan de helft van alle uitgebrachte stemmen behaald, maar krijgt op basis van de standaard zetelverdeling niet de meerderheid van de zetels. Volgens de Kieswet (Artikel P 9 Toewijzing zetels bij volstrekte meerderheid) krijgt deze lijst één extra zetel. Deze zetel gaat ten koste van lijst {list_retracted_seat} omdat die de laatste restzetel toegewezen heeft gekregen.",
+  "allocation_of_full_seats": "Verdeling van de volle zetels",
+  "allocation_of_residual_seats": "Verdeling van de restzetels",
   "all_seats_assigned": "Alle zetels zijn toegewezen",
   "already_assigned": "Reeds toegewezen",
   "apportionment_already_calculated": "De zetelverdeling is al berekend.",
   "article_p10": "(Kieswet, artikel P 10)",
   "assigned_number_of_seats": "Toegewezen aantal zetels",
   "average": "Gemiddelde",
+  "average_number": "gemiddeld aantal",
   "averages_per_list": "Gemiddelden per lijst (na toekennen restzetel)",
   "below_candidates_are_deceased": "Onderstaande kandidaten zijn als gevolg van overlijden bij de zetelverdeling buiten beschouwing gelaten.",
   "candidates_for_apportionment": "Kandidaten voor zetelverdeling",
   "chosen_candidates": "Gekozen kandidaten",
   "data_entry_finished": "Invoerfase afgerond",
-  "details_residual_seats": "Verdeling van de restzetels",
-  "details_full_seats": "Verdeling van de volle zetels",
+  "details_residual_seats_allocation": "Details restzetelverdeling",
+  "drawing_lots_required_alert": {
+    "title": "Loting noodzakelijk voor toekennen restzetel",
+    "description": "Er is een restzetel te verdelen. In de wet staat dat de partij met het hoogste {variant} stemmen per toegewezen zetel deze krijgt.",
+    "list": "<ul><li>Er zijn meerdere partijen die na het toewijzen van de tweede restzetel precies hetzelfde hoogste gemiddelde krijgen.</li><li>Hierdoor kan de restzetel niet automatisch worden toegewezen. Het centraal stembureau moet een loting uitvoeren om de restzetel toe te wijzen.</li></ul>"
+  },
   "election_summary": "Kengetallen",
   "full_seat": {
     "singular": "Volle zetel",
@@ -78,6 +85,7 @@
   "redo_apportionment": "Doe dan de zetelverdeling opnieuw",
   "redo_apportionment_button": "Zetelverdeling opnieuw doen",
   "remainder": "Overschot",
+  "remainder_of": "overschot aan",
   "remaining_residual_seats_assignment": "Verdeling overige restzetels",
   "remaining_residual_seats_amount_and_information": {
     "singular": "Hierna was er nog {num_seats} restzetel te verdelen. Deze zetel is toegewezen aan de lijst die met een zetel erbij het grootste gemiddelde aantal stemmen per zetel zou hebben.",
@@ -110,6 +118,7 @@
   },
   "title": "Zetelverdeling",
   "to_apportionment": "Naar zetelverdeling",
+  "to_drawing_lots": "Naar loting",
   "total": "Totaal",
   "total_number_assigned_full_seats": "Totaal aantal toegewezen volle zetels",
   "total_number_seats": "Totaal aantal zetels",

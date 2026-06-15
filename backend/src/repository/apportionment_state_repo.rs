@@ -85,10 +85,10 @@ mod tests {
                         HighestAverageResidualSeatDrawingLots {
                             average: DisplayFraction {
                                 integer: 0,
-                                numerator: 0,
-                                denominator: 0,
+                                numerator: 1,
+                                denominator: 2,
                             },
-                            residual_seat_numbers: vec![],
+                            residual_seat_numbers: vec![1],
                             options: PGNumber::from_values(vec![1, 2, 3]),
                         },
                     ),

@@ -344,12 +344,12 @@ describe("ApportionmentListDetailsPage", () => {
       expect(screen.queryByTestId("total-votes-per-candidate-table")).not.toBeInTheDocument();
     });
 
-    test("Not possible because drawing of lots is not implemented yet", async () => {
+    test("Not possible because committee session is not completed yet", async () => {
       vi.spyOn(ReactRouter, "useParams").mockReturnValue({ listNumber: "1" });
-      overrideOnce("post", "/api/elections/3/apportionment", 422, {
-        error: "Drawing of lots is required",
+      overrideOnce("post", "/api/elections/3/apportionment", 412, {
+        error: "Committee session not completed",
         fatal: false,
-        reference: "ApportionmentDrawingOfLotsRequired",
+        reference: "ApportionmentCommitteeSessionNotCompleted",
       } satisfies ErrorResponse);
 
       renderApportionmentListDetailsPage(3);
@@ -357,9 +357,9 @@ describe("ApportionmentListDetailsPage", () => {
       // Wait for the page to be loaded
       expect(await screen.findByRole("heading", { level: 1, name: "Lijst 1 - Political Group A" })).toBeVisible();
 
-      expect(await screen.findByText("Zetelverdeling is niet mogelijk")).toBeVisible();
+      expect(await screen.findByText("Zetelverdeling is nog niet beschikbaar")).toBeVisible();
       expect(
-        await screen.findByText("Loting is noodzakelijk, maar nog niet beschikbaar in deze versie van Abacus"),
+        await screen.findByText("De zetelverdeling kan pas gemaakt worden als de zitting is afgerond"),
       ).toBeVisible();
 
       expect(screen.queryByTestId("preferentially-chosen-candidates-table")).not.toBeInTheDocument();

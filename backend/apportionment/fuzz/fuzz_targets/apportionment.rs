@@ -34,6 +34,7 @@ fuzz_target!(
         })
         .collect();
 
+    #[allow(clippy::result_large_err)]
     let (result, log) = run_with_log(|| process(&data));
 
     match result {
@@ -157,7 +158,7 @@ fuzz_target!(
                 }
             }
         }
-        Err(ApportionmentError::ListDrawingLotsRequired(_) | ApportionmentError::CandidateDrawingLotsRequired(_)) => {
+        Err(ApportionmentError::ListDrawingLotsRequired(..) | ApportionmentError::CandidateDrawingLotsRequired(..)) => {
             // Accepted error in this fuzzer
         }
         Err(ApportionmentError::InvalidLotDrawing(message)) => {

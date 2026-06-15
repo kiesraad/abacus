@@ -167,7 +167,7 @@ impl apportionment::CandidateDrawn<PGNumber, CandidateNumber> for CandidateDrawn
     }
 }
 
-#[derive(Debug, Serialize, ToSchema)]
+#[derive(Debug, Serialize, ToSchema, PartialEq)]
 pub struct ElectionApportionmentResponse {
     pub seat_assignment: SeatAssignment,
     pub candidate_nomination: CandidateNomination,

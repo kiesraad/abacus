@@ -1,10 +1,10 @@
 {
   "db_name": "SQLite",
-  "query": "\n            UPDATE data_entries\n            SET state = ?, updated_at = CURRENT_TIMESTAMP\n            WHERE id = ?\n            RETURNING\n                id AS \"id: _\",\n                state AS \"state: _\",\n                updated_at AS \"updated_at: _\"\n        ",
+  "query": "\n            DELETE FROM data_entries\n            WHERE id = ?\n            RETURNING\n                id AS \"id!: _\",\n                state AS \"state: _\",\n                updated_at AS \"updated_at: _\"\n        ",
   "describe": {
     "columns": [
       {
-        "name": "id: _",
+        "name": "id!: _",
         "ordinal": 0,
         "type_info": "Integer",
         "origin": {
@@ -38,13 +38,13 @@
       }
     ],
     "parameters": {
-      "Right": 2
+      "Right": 1
     },
     "nullable": [
-      false,
+      null,
       false,
       false
     ]
   },
-  "hash": "d4a1eb2f418e0846018ea1a79de25673b676ac056dddfed0d12752d70e28712c"
+  "hash": "92e477991702fa73f1d72b9054c87d14ca405e9f2da3707c2b085fcd55990c13"
 }

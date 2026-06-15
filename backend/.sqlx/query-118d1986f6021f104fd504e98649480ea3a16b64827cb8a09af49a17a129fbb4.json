@@ -6,12 +6,19 @@
       {
         "name": "original_id: PollingStationId",
         "ordinal": 0,
-        "type_info": "Integer"
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "polling_stations",
+            "name": "id"
+          }
+        }
       },
       {
         "name": "data: Json<Results>",
         "ordinal": 1,
-        "type_info": "Null"
+        "type_info": "Null",
+        "origin": "Expression"
       }
     ],
     "parameters": {
@@ -19,7 +26,7 @@
     },
     "nullable": [
       false,
-      null
+      true
     ]
   },
   "hash": "118d1986f6021f104fd504e98649480ea3a16b64827cb8a09af49a17a129fbb4"

@@ -174,7 +174,7 @@ pub async fn create(
             location
         ) VALUES (?, ?, ?)
         RETURNING
-            id as "id: CommitteeSessionId",
+            id as "id!: CommitteeSessionId",
             number as "number: u32",
             election_id as "election_id: ElectionId",
             status as "status: _",

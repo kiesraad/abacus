@@ -1,10 +1,10 @@
 {
   "db_name": "SQLite",
-  "query": "\n        SELECT\n            id AS \"id: FileId\",\n            data,\n            name,\n            mime_type,\n            created_at AS \"created_at: _\",\n            committee_session_id AS \"committee_session_id: _\",\n            file_type AS \"file_type: _\"\n        FROM files\n        WHERE id = $1\n        ",
+  "query": "\n        INSERT INTO files (\n            data,\n            name,\n            mime_type,\n            created_at,\n            committee_session_id,\n            file_type\n        ) VALUES (?, ?, ?, ?, ?, ?)\n        RETURNING\n            id AS \"id!: FileId\",\n            data,\n            name,\n            mime_type,\n            created_at AS \"created_at: _\",\n            committee_session_id AS \"committee_session_id: _\",\n            file_type AS \"file_type: _\"\n        ",
   "describe": {
     "columns": [
       {
-        "name": "id: FileId",
+        "name": "id!: FileId",
         "ordinal": 0,
         "type_info": "Integer",
         "origin": {
@@ -82,10 +82,10 @@
       }
     ],
     "parameters": {
-      "Right": 1
+      "Right": 6
     },
     "nullable": [
-      false,
+      null,
       false,
       false,
       false,
@@ -94,5 +94,5 @@
       false
     ]
   },
-  "hash": "1de90b620baa6cb62e79519b799485c5b0b25c699fb22115e3ee9b1d7232a7a3"
+  "hash": "40fbb95cb47d49691b97ea0e031df1b648529b9c75c18019b47c07df021aa50d"
 }

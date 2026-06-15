@@ -68,7 +68,7 @@ pub async fn create(
             category
         ) VALUES (?, ?, ?, ?, ?)
         RETURNING
-            id AS "id: _",
+            id AS "id!: _",
             committee_session_id AS "committee_session_id: _",
             data_entry_id AS "data_entry_id!: _",
             number AS "number: SubCommitteeNumber",

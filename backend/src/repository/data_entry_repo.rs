@@ -180,7 +180,7 @@ pub async fn delete(
             DELETE FROM data_entries
             WHERE id = ?
             RETURNING
-                id AS "id: _",
+                id AS "id!: _",
                 state AS "state: _",
                 updated_at AS "updated_at: _"
         "#,

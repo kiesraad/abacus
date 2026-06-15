@@ -42,7 +42,7 @@ impl<'de> Deserialize<'de> for EntryNumber {
 impl<'q> sqlx::Encode<'q, Sqlite> for EntryNumber {
     fn encode_by_ref(
         &self,
-        buf: &mut <Sqlite as sqlx::Database>::ArgumentBuffer<'q>,
+        buf: &mut <Sqlite as sqlx::Database>::ArgumentBuffer,
     ) -> Result<sqlx::encode::IsNull, sqlx::error::BoxDynError> {
         let n: u8 = match self {
             EntryNumber::FirstEntry => 1,

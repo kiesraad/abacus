@@ -6,7 +6,13 @@
       {
         "name": "id: CommitteeSessionId",
         "ordinal": 0,
-        "type_info": "Integer"
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "committee_sessions",
+            "name": "id"
+          }
+        }
       }
     ],
     "parameters": {

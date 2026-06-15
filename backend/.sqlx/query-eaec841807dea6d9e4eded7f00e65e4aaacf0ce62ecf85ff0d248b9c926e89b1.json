@@ -6,12 +6,24 @@
       {
         "name": "investigation_state: Json<InvestigationStatus>",
         "ordinal": 0,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "polling_stations",
+            "name": "investigation_state"
+          }
+        }
       },
       {
         "name": "data_entry_id: DataEntryId",
         "ordinal": 1,
-        "type_info": "Integer"
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "polling_stations",
+            "name": "data_entry_id"
+          }
+        }
       }
     ],
     "parameters": {

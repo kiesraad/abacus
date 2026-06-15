@@ -6,7 +6,13 @@
       {
         "name": "data_entry_id: _",
         "ordinal": 0,
-        "type_info": "Integer"
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "polling_stations",
+            "name": "data_entry_id"
+          }
+        }
       }
     ],
     "parameters": {

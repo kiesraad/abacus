@@ -193,6 +193,7 @@ fn fuzz(data: FuzzedApportionmentInput) {
     let (osv2020_result, osv2020_log) =
         osv2020_apportionment(data.seats.into(), &pg_candidates, &votes);
 
+    #[allow(clippy::result_large_err)]
     let (abacus_result, abacus_log) = run_with_log(|| process(&data));
 
     // Skip cases where there are fewer than 19 seats and both art. P 9 (absolute majority) and art. P 10 (list exhaustion) are applied.
@@ -257,8 +258,8 @@ fn fuzz(data: FuzzedApportionmentInput) {
             }
         }
         Err(
-            e @ ApportionmentError::ListDrawingLotsRequired(_)
-            | e @ ApportionmentError::CandidateDrawingLotsRequired(_),
+            e @ ApportionmentError::ListDrawingLotsRequired(..)
+            | e @ ApportionmentError::CandidateDrawingLotsRequired(..),
         ) => {
             match osv2020_result {
                 Osv2020Result::Allocated(osv2020_seats) => {

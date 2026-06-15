@@ -77,7 +77,7 @@ pub async fn create(
             file_type
         ) VALUES (?, ?, ?, ?, ?, ?)
         RETURNING
-            id AS "id: FileId",
+            id AS "id!: FileId",
             data,
             name,
             mime_type,

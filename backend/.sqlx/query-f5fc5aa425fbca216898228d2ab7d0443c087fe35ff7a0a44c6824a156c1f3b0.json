@@ -6,67 +6,145 @@
       {
         "name": "id: _",
         "ordinal": 0,
-        "type_info": "Integer"
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "polling_stations",
+            "name": "id"
+          }
+        }
       },
       {
         "name": "committee_session_id: _",
         "ordinal": 1,
-        "type_info": "Integer"
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "polling_stations",
+            "name": "committee_session_id"
+          }
+        }
       },
       {
         "name": "committee_session_number!: u32",
         "ordinal": 2,
-        "type_info": "Integer"
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "committee_sessions",
+            "name": "number"
+          }
+        }
       },
       {
         "name": "prev_data_entry_id: _",
         "ordinal": 3,
-        "type_info": "Integer"
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "polling_stations",
+            "name": "prev_data_entry_id"
+          }
+        }
       },
       {
         "name": "data_entry_id: _",
         "ordinal": 4,
-        "type_info": "Integer"
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "polling_stations",
+            "name": "data_entry_id"
+          }
+        }
       },
       {
         "name": "investigation_state: Json<InvestigationStatus>",
         "ordinal": 5,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "polling_stations",
+            "name": "investigation_state"
+          }
+        }
       },
       {
         "name": "name",
         "ordinal": 6,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "polling_stations",
+            "name": "name"
+          }
+        }
       },
       {
         "name": "number: u32",
         "ordinal": 7,
-        "type_info": "Integer"
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "polling_stations",
+            "name": "number"
+          }
+        }
       },
       {
         "name": "number_of_voters: _",
         "ordinal": 8,
-        "type_info": "Integer"
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "polling_stations",
+            "name": "number_of_voters"
+          }
+        }
       },
       {
         "name": "polling_station_type: _",
         "ordinal": 9,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "polling_stations",
+            "name": "polling_station_type"
+          }
+        }
       },
       {
         "name": "address",
         "ordinal": 10,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "polling_stations",
+            "name": "address"
+          }
+        }
       },
       {
         "name": "postal_code",
         "ordinal": 11,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "polling_stations",
+            "name": "postal_code"
+          }
+        }
       },
       {
         "name": "locality",
         "ordinal": 12,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "polling_stations",
+            "name": "locality"
+          }
+        }
       }
     ],
     "parameters": {

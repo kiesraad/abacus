@@ -1277,7 +1277,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ElectionApportionmentResponse"
+                  "$ref": "#/components/schemas/ProcessApportionmentResponse"
                 }
               }
             }
@@ -7104,8 +7104,8 @@
         "enum": [
           "AirgapViolation",
           "AlreadyInitialised",
+          "ApportionmentNotCompleted",
           "ApportionmentCommitteeSessionNotCompleted",
-          "ApportionmentDrawingOfLotsRequired",
           "ApportionmentInvalidLotDrawing",
           "CommitteeSessionPaused",
           "DatabaseError",
@@ -8465,6 +8465,53 @@
             "minimum": 0
           }
         }
+      },
+      "ProcessApportionmentResponse": {
+        "oneOf": [
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ElectionApportionmentResponse"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "status"
+                ],
+                "properties": {
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "Finalised"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "type": "object",
+            "required": [
+              "election_summary",
+              "seat_assignment",
+              "status"
+            ],
+            "properties": {
+              "election_summary": {
+                "$ref": "#/components/schemas/ElectionSummary"
+              },
+              "seat_assignment": {
+                "$ref": "#/components/schemas/SeatAssignment"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "DrawingLotsRequired"
+                ]
+              }
+            }
+          }
+        ]
       },
       "RandomRange": {
         "type": "string"

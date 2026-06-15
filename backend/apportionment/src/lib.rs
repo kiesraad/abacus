@@ -24,7 +24,7 @@ pub use self::{
     },
     structs::{
         AbsoluteMajorityDrawingLots, ApportionmentError, ApportionmentInput, ApportionmentOutput,
-        CandidateDrawingLotsVariant, CandidateDrawn, CandidateVotes,
+        CandidateDrawingLotsError, CandidateDrawingLotsVariant, CandidateDrawn, CandidateVotes,
         HighestAverageResidualSeatDrawingLots, LargestRemainderResidualSeatDrawingLots,
         ListDrawingLotsError, ListDrawingLotsVariant, ListDrawn, ListVotes,
     },
@@ -33,12 +33,18 @@ pub use self::{
 type ProcessApportionmentError<LV> = ApportionmentError<ListNumber<LV>, CandidateNumber<LV>>;
 
 /// Perform seat assignment and candidate nomination on apportionment input.
+#[allow(clippy::result_large_err)]
 pub fn process<T: ApportionmentInput>(
     input: &T,
 ) -> Result<ApportionmentOutput<'_, T::List>, ProcessApportionmentError<T::List>> {
     let seat_assignment = seat_assignment(input)?;
     let candidate_nomination_input = as_candidate_nomination_input(input, &seat_assignment);
-    let candidate_nomination = candidate_nomination(&candidate_nomination_input)?;
+    let candidate_nomination =
+        candidate_nomination(&candidate_nomination_input).map_err(|err| match err {
+            CandidateDrawingLotsError::DrawingLotsRequired(variant) => {
+                ApportionmentError::CandidateDrawingLotsRequired(variant, seat_assignment.clone())
+            }
+        })?;
 
     Ok(ApportionmentOutput {
         seat_assignment,

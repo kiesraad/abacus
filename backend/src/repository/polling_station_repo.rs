@@ -210,7 +210,7 @@ pub async fn create(
             postal_code,
             locality
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        RETURNING id AS "id: _"
+        RETURNING id AS "id!: _"
         "#,
         committee_session_id,
         None::<u32> as _,
@@ -263,7 +263,7 @@ pub async fn create_many(
                 postal_code,
                 locality
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-            RETURNING id AS "id: _"
+            RETURNING id AS "id!: _"
             "#,
             committee_session_id,
             None::<u32> as _,

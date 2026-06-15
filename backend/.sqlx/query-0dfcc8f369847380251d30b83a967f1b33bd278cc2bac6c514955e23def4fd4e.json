@@ -6,12 +6,19 @@
       {
         "name": "id: SubCommitteeId",
         "ordinal": 0,
-        "type_info": "Integer"
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "sub_committees",
+            "name": "id"
+          }
+        }
       },
       {
         "name": "data: Json<Results>",
         "ordinal": 1,
-        "type_info": "Null"
+        "type_info": "Null",
+        "origin": "Expression"
       }
     ],
     "parameters": {
@@ -19,7 +26,7 @@
     },
     "nullable": [
       false,
-      null
+      true
     ]
   },
   "hash": "0dfcc8f369847380251d30b83a967f1b33bd278cc2bac6c514955e23def4fd4e"

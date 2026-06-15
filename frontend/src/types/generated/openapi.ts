@@ -1002,8 +1002,8 @@ export interface ElectionWithPoliticalGroups {
 export const errorReferenceValues = [
   "AirgapViolation",
   "AlreadyInitialised",
+  "ApportionmentNotCompleted",
   "ApportionmentCommitteeSessionNotCompleted",
-  "ApportionmentDrawingOfLotsRequired",
   "ApportionmentInvalidLotDrawing",
   "CommitteeSessionPaused",
   "DatabaseError",
@@ -1442,6 +1442,10 @@ export interface PreferenceThreshold {
   number_of_votes: DisplayFraction;
   percentage: number;
 }
+
+export type ProcessApportionmentResponse =
+  | (ElectionApportionmentResponse & { status: "Finalised" })
+  | { election_summary: ElectionSummary; seat_assignment: SeatAssignment; status: "DrawingLotsRequired" };
 
 export type RandomRange = string;
 

@@ -19,3 +19,5 @@ overrides:
   # @codecov/vite-plugin does not have official support for Vite 8, but works:
   # https://github.com/codecov/codecov-javascript-bundler-plugins/issues/264
   "vite": "$vite"
+  # Fix GHSA-4x5r-pxfx-6jf8
+  "@babel/core@<=7.29.0": ">=7.29.6"

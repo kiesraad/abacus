@@ -1,4 +1,4 @@
-use apportionment::ApportionmentOutput;
+use apportionment::ApportionmentDetails;
 use chrono::{DateTime, Datelike, Local, Utc};
 use eml_nl::{EMLError, documents::election_count::ElectionCount, io::EMLWrite};
 use pdf_gen::{generate_pdf, zip::slugify_filename};
@@ -285,7 +285,7 @@ impl ResultsInputCSB {
 
     pub async fn generate_csb_files(
         &self,
-        apportionment_result: &ApportionmentOutput<'_, PoliticalGroupCandidateVotes>,
+        apportionment_result: &ApportionmentDetails<'_, PoliticalGroupCandidateVotes>,
     ) -> Result<CsbGeneratedFiles, APIError> {
         let data = &self.data;
         let creation_date_time = data.created_at.format(DEFAULT_DATE_TIME_FORMAT).to_string();
@@ -343,7 +343,7 @@ impl ResultsInputCSB {
 
     fn get_p22_2_pdf_file(
         &self,
-        apportionment_result: &ApportionmentOutput<'_, PoliticalGroupCandidateVotes>,
+        apportionment_result: &ApportionmentDetails<'_, PoliticalGroupCandidateVotes>,
         hash: String,
         creation_date_time: String,
         filename: String,

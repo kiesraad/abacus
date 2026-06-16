@@ -3,7 +3,7 @@ use std::{num::NonZeroU64, str::FromStr as _};
 mod error;
 pub mod hash;
 
-use apportionment::CandidateNominationResult;
+use apportionment::CandidateNominationDetails;
 use chrono::{DateTime, Local, Utc};
 use eml_nl::{
     EMLError,
@@ -693,7 +693,7 @@ impl ElectionWithPoliticalGroups {
         &self,
         transaction_id: Option<u64>,
         timestamp: DateTime<Utc>,
-        nominations: &CandidateNominationResult<PoliticalGroupCandidateVotes>,
+        nominations: &CandidateNominationDetails<PoliticalGroupCandidateVotes>,
     ) -> Result<ElectionResult, EMLError> {
         ElectionResult::builder()
             .transaction_id(transaction_id.unwrap_or(1))
@@ -712,7 +712,7 @@ impl ElectionWithPoliticalGroups {
 
     fn as_eml_result_contest(
         &self,
-        nominations: &CandidateNominationResult<PoliticalGroupCandidateVotes>,
+        nominations: &CandidateNominationDetails<PoliticalGroupCandidateVotes>,
     ) -> Result<ElectionResultContest, EMLError> {
         let mut selections = vec![];
         for pg in &self.political_groups {

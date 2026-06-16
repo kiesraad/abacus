@@ -5,11 +5,8 @@ use std::{
 };
 
 use super::{
-    SeatChangeStep, candidate_nomination::CandidateNominationResult, fraction::Fraction,
-    seat_assignment::SeatAssignmentResult,
-};
-pub(crate) use crate::seat_assignment::{
-    AssignRemainderDrawingLotsError, ResidualSeatDrawingLotsError,
+    candidate_nomination::CandidateNominationDetails, fraction::Fraction,
+    seat_assignment::SeatAssignmentDetails,
 };
 
 pub(crate) const LARGE_COUNCIL_THRESHOLD: u32 = 19;
@@ -21,72 +18,8 @@ pub type CandidateNumber<LV> = <<LV as ListVotes>::Cv as CandidateVotes>::Candid
 
 /// Errors that can occur during apportionment
 #[derive(Debug, PartialEq)]
-pub enum ApportionmentError<LN, CN> {
-    ListDrawingLotsRequired(ListDrawingLotsVariant<LN>, SeatAssignmentResult<LN>),
-    CandidateDrawingLotsRequired(
-        CandidateDrawingLotsVariant<LN, CN>,
-        SeatAssignmentResult<LN>,
-    ),
+pub enum ApportionmentError {
     InvalidLotDrawing(String),
-}
-
-/// Used in [ApportionmentError] to indicate that drawing lots for a list is needed,
-/// containing all the information needed to do the drawing
-#[derive(Debug, PartialEq)]
-pub enum ListDrawingLotsError<LN> {
-    DrawingLotsRequired(ListDrawingLotsVariant<LN>, SeatAssignmentResult<LN>),
-    InvalidLotDrawing(String),
-}
-
-impl<LN, CN> From<ListDrawingLotsError<LN>> for ApportionmentError<LN, CN> {
-    fn from(value: ListDrawingLotsError<LN>) -> Self {
-        match value {
-            ListDrawingLotsError::DrawingLotsRequired(variant, preliminary_result) => {
-                ApportionmentError::ListDrawingLotsRequired(variant, preliminary_result)
-            }
-            ListDrawingLotsError::InvalidLotDrawing(message) => {
-                ApportionmentError::InvalidLotDrawing(message)
-            }
-        }
-    }
-}
-
-impl<LN> ListDrawingLotsError<LN> {
-    pub(crate) fn new(
-        err: ResidualSeatDrawingLotsError<LN>,
-        preliminary_result: SeatAssignmentResult<LN>,
-    ) -> Self {
-        match err {
-            ResidualSeatDrawingLotsError::DrawingLotsRequired(variant) => {
-                ListDrawingLotsError::DrawingLotsRequired(variant, preliminary_result)
-            }
-            ResidualSeatDrawingLotsError::InvalidLotDrawing(message) => {
-                ListDrawingLotsError::InvalidLotDrawing(message)
-            }
-        }
-    }
-}
-
-impl<LN> AssignRemainderDrawingLotsError<LN> {
-    pub(crate) fn new(
-        err: ResidualSeatDrawingLotsError<LN>,
-        steps: Vec<SeatChangeStep<LN>>,
-    ) -> Self {
-        match err {
-            ResidualSeatDrawingLotsError::DrawingLotsRequired(variant) => {
-                AssignRemainderDrawingLotsError::DrawingLotsRequired(variant, steps)
-            }
-            ResidualSeatDrawingLotsError::InvalidLotDrawing(message) => {
-                AssignRemainderDrawingLotsError::InvalidLotDrawing(message)
-            }
-        }
-    }
-}
-
-/// Errors that can occur when drawing lots for a candidate  is needed during apportionment
-#[derive(Debug, PartialEq)]
-pub enum CandidateDrawingLotsError<LN, CN> {
-    DrawingLotsRequired(CandidateDrawingLotsVariant<LN, CN>),
 }
 
 /// Different variants of drawing lots for lists, with all the information needed to do the drawing
@@ -158,9 +91,10 @@ pub trait ApportionmentInput {
     fn candidates_drawn(&self) -> impl Iterator<Item = &Self::CandidateDrawn>;
 }
 
-pub struct ApportionmentOutput<'a, T: ListVotes> {
-    pub seat_assignment: SeatAssignmentResult<ListNumber<T>>,
-    pub candidate_nomination: CandidateNominationResult<'a, T>,
+#[derive(Debug, PartialEq)]
+pub struct ApportionmentDetails<'a, T: ListVotes> {
+    pub seat_assignment: SeatAssignmentDetails<ListNumber<T>>,
+    pub candidate_nomination: CandidateNominationDetails<'a, T>,
 }
 
 pub trait ListVotes: PartialEq + Debug {

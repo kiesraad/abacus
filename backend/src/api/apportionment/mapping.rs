@@ -9,7 +9,7 @@ use crate::domain::{
     results::political_group_candidate_votes::PoliticalGroupCandidateVotes,
 };
 
-pub fn map_seat_assignment(sa: &apportionment::SeatAssignmentResult<PGNumber>) -> SeatAssignment {
+pub fn map_seat_assignment(sa: &apportionment::SeatAssignmentDetails<PGNumber>) -> SeatAssignment {
     SeatAssignment {
         seats: sa.seats,
         full_seats: sa.full_seats,
@@ -42,7 +42,7 @@ fn sort_candidates_alphabetically(mut candidates: Vec<ChosenCandidate>) -> Vec<C
 }
 
 pub fn map_candidate_nomination(
-    cn: &apportionment::CandidateNominationResult<'_, PoliticalGroupCandidateVotes>,
+    cn: &apportionment::CandidateNominationDetails<'_, PoliticalGroupCandidateVotes>,
     political_groups: &[PoliticalGroup],
 ) -> CandidateNomination {
     let mut list_names: HashMap<PGNumber, String> = HashMap::new();

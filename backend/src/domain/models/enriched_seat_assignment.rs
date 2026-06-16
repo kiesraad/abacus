@@ -255,6 +255,7 @@ pub struct UniqueHighestAverage {
 
 #[cfg(test)]
 mod tests {
+    use apportionment::ApportionmentOutput;
     use test_log::test;
 
     use crate::{
@@ -339,9 +340,12 @@ mod tests {
             &[],
             &[],
         );
-        let apportionment_result =
-            apportionment::process(&apportionment_input).expect("apportionment failed");
-        let seat_assignment = map_seat_assignment(&apportionment_result.seat_assignment);
+        let apportionment_result = apportionment::process(&apportionment_input);
+        let Ok(ApportionmentOutput::Completed(apportionment)) = apportionment_result else {
+            panic!("should be Completed");
+        };
+
+        let seat_assignment = map_seat_assignment(&apportionment.seat_assignment);
         let result =
             EnrichedSeatAssignment::new(election.number_of_seats, &summary_csb, &seat_assignment)
                 .expect("EnrichedSeatAssignment::new should succeed");
@@ -459,9 +463,12 @@ mod tests {
             &[],
             &[],
         );
-        let apportionment_result =
-            apportionment::process(&apportionment_input).expect("apportionment failed");
-        let seat_assignment = map_seat_assignment(&apportionment_result.seat_assignment);
+        let apportionment_result = apportionment::process(&apportionment_input);
+        let Ok(ApportionmentOutput::Completed(apportionment)) = apportionment_result else {
+            panic!("should be Completed");
+        };
+
+        let seat_assignment = map_seat_assignment(&apportionment.seat_assignment);
         let result =
             EnrichedSeatAssignment::new(election.number_of_seats, &summary_csb, &seat_assignment)
                 .expect("EnrichedSeatAssignment::new should succeed");
@@ -547,9 +554,12 @@ mod tests {
             &[],
             &[],
         );
-        let apportionment_result =
-            apportionment::process(&apportionment_input).expect("apportionment failed");
-        let seat_assignment = map_seat_assignment(&apportionment_result.seat_assignment);
+        let apportionment_result = apportionment::process(&apportionment_input);
+        let Ok(ApportionmentOutput::Completed(apportionment)) = apportionment_result else {
+            panic!("should be Completed");
+        };
+
+        let seat_assignment = map_seat_assignment(&apportionment.seat_assignment);
         let result =
             EnrichedSeatAssignment::new(election.number_of_seats, &summary_csb, &seat_assignment)
                 .expect("EnrichedSeatAssignment::new should succeed");

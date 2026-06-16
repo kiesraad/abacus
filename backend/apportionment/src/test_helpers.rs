@@ -4,7 +4,7 @@ use super::{
     CandidateDrawingLotsVariant, ListVotes, fraction::Fraction, structs::CandidateNominationInput,
 };
 use crate::{
-    ApportionmentInput, CandidateVotes, SeatAssignmentResult,
+    ApportionmentInput, CandidateVotes, SeatAssignmentDetails,
     candidate_nomination::{Candidate, ListCandidateNomination, candidate_votes_numbers},
     structs::{CandidateDrawn, ListDrawingLotsVariant, ListDrawn},
 };
@@ -126,7 +126,7 @@ impl CandidateDrawn<u32, u32> for CandidateDrawnMock {
     }
 }
 
-pub fn get_total_seats_from_apportionment_result(result: &SeatAssignmentResult<u32>) -> Vec<u32> {
+pub fn get_total_seats_from_apportionment_result(result: &SeatAssignmentDetails<u32>) -> Vec<u32> {
     result
         .final_standing
         .iter()

@@ -1,27 +1,30 @@
 mod structs;
 
 pub use structs::{
-    Candidate, CandidateNominationResult, ListCandidateNomination, PreferenceThreshold,
+    Candidate, CandidateNominationDetails, ListCandidateNomination, PreferenceThreshold,
 };
 use tracing::{debug, info};
 
 use crate::{
-    CandidateVotes, ListVotes,
+    ApportionmentError, CandidateVotes, ListVotes,
     fraction::Fraction,
     structs::{
-        CandidateDrawingLotsError, CandidateDrawingLotsVariant, CandidateNominationInput,
-        CandidateNumber, DeceasedCandidates, LARGE_COUNCIL_THRESHOLD, ListNumber,
+        CandidateDrawingLotsVariant, CandidateNominationInput, CandidateNumber, DeceasedCandidates,
+        LARGE_COUNCIL_THRESHOLD, ListNumber,
     },
 };
 
-/// Defines a CandidateNominationErr, for more details, check [CandidateDrawingLotsError]
-type CandidateNominationErr<LV> = CandidateDrawingLotsError<ListNumber<LV>, CandidateNumber<LV>>;
+#[derive(Debug, PartialEq)]
+pub enum CandidateNomination<'a, LV: ListVotes> {
+    Completed(CandidateNominationDetails<'a, LV>),
+    DrawingLotsRequired(CandidateDrawingLotsVariant<ListNumber<LV>, CandidateNumber<LV>>),
+}
 
 /// Candidate nomination
-#[allow(clippy::cognitive_complexity)]
+#[expect(clippy::cognitive_complexity)]
 pub(crate) fn candidate_nomination<'a, L: ListVotes>(
     input: &CandidateNominationInput<'a, L>,
-) -> Result<CandidateNominationResult<'a, L>, CandidateNominationErr<L>> {
+) -> Result<CandidateNomination<'a, L>, ApportionmentError> {
     info!("Candidate nomination");
 
     // [Artikel P 15 Kieswet](https://wetten.overheid.nl/BWBR0004627/2026-01-01/#AfdelingII_HoofdstukP_Paragraaf3_ArtikelP15)
@@ -38,7 +41,13 @@ pub(crate) fn candidate_nomination<'a, L: ListVotes>(
     );
     info!("Preference threshold: {}", preference_threshold);
 
-    let list_candidate_nomination = candidate_nomination_per_list(input, preference_threshold)?;
+    let list_candidate_nomination =
+        match candidate_nomination_per_list(input, preference_threshold)? {
+            ListCandidateNominations::Completed(list) => list,
+            ListCandidateNominations::DrawingLotsRequired(variant) => {
+                return Ok(CandidateNomination::DrawingLotsRequired(variant));
+            }
+        };
     debug!(
         "List candidate nomination: {:#?}",
         list_candidate_nomination
@@ -48,14 +57,14 @@ pub(crate) fn candidate_nomination<'a, L: ListVotes>(
     let chosen_candidates = all_chosen_candidates(input.list_votes, &list_candidate_nomination);
     debug!("Chosen candidates: {:#?}", chosen_candidates);
 
-    Ok(CandidateNominationResult {
+    Ok(CandidateNomination::Completed(CandidateNominationDetails {
         preference_threshold: PreferenceThreshold {
             percentage: preference_threshold_percentage,
             number_of_votes: preference_threshold,
         },
         chosen_candidates,
         list_candidate_nomination,
-    })
+    }))
 }
 
 /// Collect all chosen candidates via nomination with preferential votes and
@@ -105,14 +114,20 @@ fn filter_out_deceased_candidates<'a, T: ListVotes>(
         .collect()
 }
 
+enum ListCandidateNominations<'a, LV: ListVotes> {
+    Completed(Vec<ListCandidateNomination<'a, LV>>),
+    DrawingLotsRequired(CandidateDrawingLotsVariant<ListNumber<LV>, CandidateNumber<LV>>),
+}
+
 /// This function nominates candidates for the seats each list has been assigned.  
 /// The candidate nomination is first done based on preferential votes and then the other
 /// candidates are nominated.
-fn candidate_nomination_per_list<'a, T: ListVotes>(
-    input: &CandidateNominationInput<'a, T>,
+#[expect(clippy::too_many_lines)]
+fn candidate_nomination_per_list<'a, LV: ListVotes>(
+    input: &CandidateNominationInput<'a, LV>,
     preference_threshold: Fraction,
-) -> Result<Vec<ListCandidateNomination<'a, T>>, CandidateNominationErr<T>> {
-    let mut list_candidate_nomination: Vec<ListCandidateNomination<T>> = vec![];
+) -> Result<ListCandidateNominations<'a, LV>, ApportionmentError> {
+    let mut list_candidate_nomination: Vec<ListCandidateNomination<LV>> = vec![];
     for list in input.list_votes {
         let (list_number, list_seats) = input
             .total_seats_per_list
@@ -131,11 +146,16 @@ fn candidate_nomination_per_list<'a, T: ListVotes>(
 
         let candidate_votes_meeting_preference_threshold =
             candidate_votes_meeting_preference_threshold(preference_threshold, candidate_votes);
-        let preferential_candidate_nomination = preferential_candidate_nomination::<T>(
+        let preferential_candidate_nomination = match preferential_candidate_nomination::<LV>(
             list.number(),
             &candidate_votes_meeting_preference_threshold,
             list_seats,
-        )?;
+        )? {
+            PreferentialCandidateNomination::Completed(nomination) => nomination,
+            PreferentialCandidateNomination::DrawingLotsRequired(variant) => {
+                return Ok(ListCandidateNominations::DrawingLotsRequired(variant));
+            }
+        };
         let non_assigned_seats = list_seats as usize - preferential_candidate_nomination.len();
 
         // [Artikel P 17 Kieswet](https://wetten.overheid.nl/BWBR0004627/2026-01-01/#AfdelingII_HoofdstukP_Paragraaf3_ArtikelP17)
@@ -181,7 +201,9 @@ fn candidate_nomination_per_list<'a, T: ListVotes>(
             updated_candidate_ranking,
         });
     }
-    Ok(list_candidate_nomination)
+    Ok(ListCandidateNominations::Completed(
+        list_candidate_nomination,
+    ))
 }
 
 /// List and sort the candidate votes whose votes meet the preference threshold
@@ -226,12 +248,17 @@ fn other_candidate_nomination<'a, T: CandidateVotes>(
         .collect()
 }
 
+enum PreferentialCandidateNomination<'a, LV: ListVotes> {
+    Completed(Vec<&'a LV::Cv>),
+    DrawingLotsRequired(CandidateDrawingLotsVariant<ListNumber<LV>, CandidateNumber<LV>>),
+}
+
 /// List the candidates nominated with preferential votes
 fn preferential_candidate_nomination<'a, LV: ListVotes>(
     list: LV::ListNumber,
     candidates_meeting_preference_threshold: &[&'a LV::Cv],
     list_seats: u32,
-) -> Result<Vec<&'a LV::Cv>, CandidateNominationErr<LV>> {
+) -> Result<PreferentialCandidateNomination<'a, LV>, ApportionmentError> {
     let mut preferential_candidate_nomination: Vec<&LV::Cv> = vec![];
     if candidates_meeting_preference_threshold.len() <= list_seats as usize {
         preferential_candidate_nomination.extend(candidates_meeting_preference_threshold);
@@ -254,7 +281,7 @@ fn preferential_candidate_nomination<'a, LV: ListVotes>(
                     "Drawing of lots is required for candidates: {:?}, only {non_assigned_seats} seat(s) available",
                     candidate_votes_numbers(&same_votes_candidates)
                 );
-                return Err(CandidateDrawingLotsError::DrawingLotsRequired(
+                return Ok(PreferentialCandidateNomination::DrawingLotsRequired(
                     CandidateDrawingLotsVariant {
                         list,
                         options: candidate_votes_numbers(&same_votes_candidates),
@@ -267,7 +294,9 @@ fn preferential_candidate_nomination<'a, LV: ListVotes>(
             }
         }
     }
-    Ok(preferential_candidate_nomination)
+    Ok(PreferentialCandidateNomination::Completed(
+        preferential_candidate_nomination,
+    ))
 }
 
 /// Update the candidate list, moving the candidates meeting the preference threshold
@@ -302,9 +331,9 @@ mod tests {
 
     use crate::{
         ListVotes,
-        candidate_nomination::candidate_nomination,
+        candidate_nomination::{CandidateNomination, candidate_nomination},
         fraction::Fraction,
-        structs::{CandidateDrawingLotsError, CandidateDrawingLotsVariant, DeceasedCandidates},
+        structs::{CandidateDrawingLotsVariant, DeceasedCandidates},
         test_helpers::{
             ListVotesMock,
             candidate_nomination_fixture_with_given_list_numbers_and_number_of_seats,
@@ -373,7 +402,9 @@ mod tests {
             &seat_assignment_input,
             vec![(1, 8), (2, 3), (4, 2), (5, 1), (7, 1)],
         );
-        let result = candidate_nomination(&input).unwrap();
+        let Ok(CandidateNomination::Completed(result)) = candidate_nomination(&input) else {
+            panic!("should be completed");
+        };
 
         assert_eq!(result.preference_threshold.percentage, 50);
         assert_eq!(
@@ -478,7 +509,9 @@ mod tests {
             &seat_assignment_input,
             vec![8, 3, 2, 1, 1],
         );
-        let result = candidate_nomination(&input).unwrap();
+        let Ok(CandidateNomination::Completed(result)) = candidate_nomination(&input) else {
+            panic!("should be completed");
+        };
 
         assert_eq!(result.preference_threshold.percentage, 50);
         assert_eq!(
@@ -560,7 +593,9 @@ mod tests {
             &seat_assignment_input,
             vec![8, 3, 2, 1, 1],
         );
-        let result = candidate_nomination(&input).unwrap();
+        let Ok(CandidateNomination::Completed(result)) = candidate_nomination(&input) else {
+            panic!("should be completed");
+        };
 
         assert_eq!(result.preference_threshold.percentage, 50);
         assert_eq!(
@@ -649,7 +684,9 @@ mod tests {
             &seat_assignment_input,
             vec![1, 1, 1, 1, 1],
         );
-        let result = candidate_nomination(&input).unwrap();
+        let Ok(CandidateNomination::Completed(result)) = candidate_nomination(&input) else {
+            panic!("should be completed");
+        };
 
         assert_eq!(result.preference_threshold.percentage, 50);
         assert_eq!(
@@ -724,7 +761,9 @@ mod tests {
             &seat_assignment_input,
             vec![1, 1, 1, 1, 1],
         );
-        let result = candidate_nomination(&input).unwrap();
+        let Ok(CandidateNomination::Completed(result)) = candidate_nomination(&input) else {
+            panic!("should be completed");
+        };
 
         assert_eq!(result.preference_threshold.percentage, 50);
         assert_eq!(
@@ -800,7 +839,9 @@ mod tests {
             &seat_assignment_input,
             vec![11, 7, 0],
         );
-        let result = candidate_nomination(&input).unwrap();
+        let Ok(CandidateNomination::Completed(result)) = candidate_nomination(&input) else {
+            panic!("should be completed");
+        };
 
         assert_eq!(result.preference_threshold.percentage, 50);
         assert_eq!(
@@ -872,7 +913,9 @@ mod tests {
             &seat_assignment_input,
             vec![6, 6, 5, 2, 0],
         );
-        let result = candidate_nomination(&input).unwrap();
+        let Ok(CandidateNomination::Completed(result)) = candidate_nomination(&input) else {
+            panic!("should be completed");
+        };
 
         assert_eq!(result.preference_threshold.percentage, 25);
         assert_eq!(
@@ -962,7 +1005,9 @@ mod tests {
             &seat_assignment_input,
             vec![6, 5, 4, 2, 2],
         );
-        let result = candidate_nomination(&input).unwrap();
+        let Ok(CandidateNomination::Completed(result)) = candidate_nomination(&input) else {
+            panic!("should be completed");
+        };
 
         assert_eq!(result.preference_threshold.percentage, 25);
         assert_eq!(
@@ -1098,7 +1143,9 @@ mod tests {
             &seat_assignment_input,
             vec![2],
         );
-        let result = candidate_nomination(&input).unwrap();
+        let Ok(CandidateNomination::Completed(result)) = candidate_nomination(&input) else {
+            panic!("should be completed");
+        };
 
         assert_eq!(result.preference_threshold.percentage, 50);
         assert_eq!(
@@ -1135,7 +1182,7 @@ mod tests {
 
         assert_eq!(
             result,
-            Err(CandidateDrawingLotsError::DrawingLotsRequired(
+            Ok(CandidateNomination::DrawingLotsRequired(
                 CandidateDrawingLotsVariant {
                     list: 2,
                     options: vec![1, 2, 3, 4, 5, 6]

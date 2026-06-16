@@ -7,7 +7,7 @@ use std::{
     sync::{Mutex, OnceLock},
 };
 
-use apportionment::{ApportionmentError, CandidateVotes, process};
+use apportionment::{ApportionmentError, ApportionmentOutput, CandidateVotes, process};
 use apportionment_fuzz::{FuzzedApportionmentInput, get_total_seats, init_tracing, run_with_log};
 use libfuzzer_sys::fuzz_target;
 use serde::{Deserialize, Serialize};
@@ -193,7 +193,6 @@ fn fuzz(data: FuzzedApportionmentInput) {
     let (osv2020_result, osv2020_log) =
         osv2020_apportionment(data.seats.into(), &pg_candidates, &votes);
 
-    #[allow(clippy::result_large_err)]
     let (abacus_result, abacus_log) = run_with_log(|| process(&data));
 
     // Skip cases where there are fewer than 19 seats and both art. P 9 (absolute majority) and art. P 10 (list exhaustion) are applied.
@@ -213,7 +212,7 @@ fn fuzz(data: FuzzedApportionmentInput) {
     }
 
     match abacus_result {
-        Ok(ref output) => {
+        Ok(ApportionmentOutput::Completed(ref output)) => {
             let abacus_seats = get_total_seats(&output.seat_assignment);
 
             match osv2020_result {
@@ -257,9 +256,9 @@ fn fuzz(data: FuzzedApportionmentInput) {
                 }
             }
         }
-        Err(
-            e @ ApportionmentError::ListDrawingLotsRequired(..)
-            | e @ ApportionmentError::CandidateDrawingLotsRequired(..),
+        Ok(
+            e @ ApportionmentOutput::ListDrawingLotsRequired(..)
+            | e @ ApportionmentOutput::CandidateDrawingLotsRequired(..),
         ) => {
             match osv2020_result {
                 Osv2020Result::Allocated(osv2020_seats) => {

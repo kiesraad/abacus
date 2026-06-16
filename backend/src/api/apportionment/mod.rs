@@ -14,10 +14,7 @@ pub use self::{
 use crate::{
     APIError, AppState,
     api::middleware::authentication::RouteAuthorization,
-    domain::{
-        election::{CandidateNumber, PGNumber},
-        role::Role,
-    },
+    domain::role::Role,
     error::{ApiErrorResponse, ErrorReference, ErrorResponse},
 };
 
@@ -64,10 +61,9 @@ impl ApiErrorResponse for ApportionmentApiError {
     }
 }
 
-// Needed for report generation
-impl From<apportionment::ApportionmentError<PGNumber, CandidateNumber>> for APIError {
-    fn from(_err: apportionment::ApportionmentError<PGNumber, CandidateNumber>) -> Self {
-        ApportionmentApiError::ApportionmentNotCompleted.into()
+impl From<apportionment::ApportionmentError> for APIError {
+    fn from(_err: apportionment::ApportionmentError) -> Self {
+        ApportionmentApiError::InvalidLotDrawing.into()
     }
 }
 

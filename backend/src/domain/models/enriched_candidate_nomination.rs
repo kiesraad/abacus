@@ -122,6 +122,7 @@ pub struct CandidateWithSeatTableColumn {
 
 #[cfg(test)]
 mod tests {
+    use apportionment::ApportionmentOutput;
     use test_log::test;
 
     use crate::{
@@ -154,10 +155,13 @@ mod tests {
         let list_votes = create_political_group_candidate_votes(political_groups, &candidate_votes);
         let apportionment_input =
             ApportionmentInputData::new(election.number_of_seats, &list_votes, &[], &[], &[]);
-        let apportionment_result =
-            apportionment::process(&apportionment_input).expect("apportionment failed");
+        let apportionment_result = apportionment::process(&apportionment_input);
+        let Ok(ApportionmentOutput::Completed(apportionment)) = apportionment_result else {
+            panic!("should be Completed");
+        };
+
         let candidate_nomination =
-            map_candidate_nomination(&apportionment_result.candidate_nomination, political_groups);
+            map_candidate_nomination(&apportionment.candidate_nomination, political_groups);
         let result = EnrichedCandidateNomination::new(&election, &candidate_nomination)
             .expect("EnrichedCandidateNomination::new should succeed");
         assert_eq!(

@@ -2,7 +2,7 @@
 
 use std::collections::HashMap;
 
-use apportionment::{CandidateVotes, process};
+use apportionment::{ApportionmentOutput, CandidateVotes, process};
 use apportionment_fuzz::{FuzzedApportionmentInput, SimpleListVotes, init_tracing, run_with_log};
 use libfuzzer_sys::fuzz_target;
 
@@ -12,7 +12,6 @@ fuzz_target!(
     },
     |data: (FuzzedApportionmentInput, Vec::<usize>)| {
     let (data, mut random_order) = data;
-    #[allow(clippy::result_large_err)]
     let (alloc, log1) = run_with_log(|| process(&data));
 
     if random_order.is_empty() {
@@ -42,10 +41,9 @@ fuzz_target!(
         candidates_drawn: Vec::new(),
     };
 
-    #[allow(clippy::result_large_err)]
     let (new_alloc, log2) = run_with_log(|| process(&reordered_input));
 
-    if let (Ok(alloc), Ok(new_alloc)) = (alloc, new_alloc) {
+    if let (Ok(ApportionmentOutput::Completed(alloc)), Ok(ApportionmentOutput::Completed(new_alloc))) = (alloc, new_alloc) {
         let seats_per_party: Vec<u32> = alloc
             .seat_assignment
             .final_standing

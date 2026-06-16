@@ -1,6 +1,6 @@
 #![no_main]
 
-use apportionment::{ApportionmentError, CandidateVotes, process};
+use apportionment::{ApportionmentError, ApportionmentOutput, CandidateVotes, process};
 use apportionment_fuzz::{
     FuzzedApportionmentInput, SimpleCandidateVotes, SimpleListVotes, init_tracing, run_with_log,
 };
@@ -34,11 +34,10 @@ fuzz_target!(
         })
         .collect();
 
-    #[allow(clippy::result_large_err)]
     let (result, log) = run_with_log(|| process(&data));
 
     match result {
-        Ok(result) => {
+        Ok(ApportionmentOutput::Completed(result)) => {
             let total_seats = data.seats;
 
             // Validate total votes calculation
@@ -158,7 +157,7 @@ fuzz_target!(
                 }
             }
         }
-        Err(ApportionmentError::ListDrawingLotsRequired(..) | ApportionmentError::CandidateDrawingLotsRequired(..)) => {
+        Ok(ApportionmentOutput::ListDrawingLotsRequired(..) | ApportionmentOutput::CandidateDrawingLotsRequired(..)) => {
             // Accepted error in this fuzzer
         }
         Err(ApportionmentError::InvalidLotDrawing(message)) => {

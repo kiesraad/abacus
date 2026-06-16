@@ -3,14 +3,14 @@ use std::fmt::Debug;
 use tracing::{debug, info};
 
 use super::Fraction;
-use crate::{ListDrawingLotsVariant, ListVotes};
+use crate::{ApportionmentError, ListDrawingLotsVariant, ListVotes};
 
 /// The result of the seat assignment procedure. This contains the number of seats and the quota
 /// that was used. It then contains the initial standing after full seats were assigned,
 /// and each of the changes and intermediate standings. The final standing contains the
 /// number of seats per list that was assigned after all seats were assigned.
-#[derive(Clone, Debug, PartialEq)]
-pub struct SeatAssignmentResult<LN> {
+#[derive(Debug, PartialEq)]
+pub struct SeatAssignmentDetails<LN> {
     pub seats: u32,
     pub full_seats: u32,
     pub residual_seats: u32,
@@ -19,7 +19,7 @@ pub struct SeatAssignmentResult<LN> {
     pub final_standing: Vec<ListSeatAssignment<LN>>,
 }
 
-impl<LN: Copy> SeatAssignmentResult<LN> {
+impl<LN: Copy> SeatAssignmentDetails<LN> {
     pub fn warnings(&self) -> Vec<ApportionmentWarning> {
         let mut warnings = Vec::new();
         let has_p9 = self
@@ -51,21 +51,21 @@ pub enum ApportionmentWarning {
 }
 
 /// Contains information about the final assignment of seats for a specific list.
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Debug, PartialEq)]
 pub struct ListSeatAssignment<LN> {
     /// List number for which this assignment applies
     pub list_number: LN,
-    /// The number of votes cast for this group
+    /// The number of votes cast for this list
     pub votes_cast: u64,
     /// The remainder votes that were not used to get full seats assigned to this list
     pub remainder_votes: Fraction,
-    /// Whether this group met the threshold for largest remainder seat assignment
+    /// Whether this list met the threshold for largest remainder seat assignment
     pub meets_remainder_threshold: bool,
-    /// The number of full seats assigned to this group
+    /// The number of full seats assigned to this list
     pub full_seats: u32,
-    /// The number of residual seats assigned to this group
+    /// The number of residual seats assigned to this list
     pub residual_seats: u32,
-    /// The total number of seats assigned to this group
+    /// The total number of seats assigned to this list
     pub total_seats: u32,
 }
 
@@ -90,7 +90,7 @@ impl<LN: Copy + Debug> From<ListStanding<LN>> for ListSeatAssignment<LN> {
 pub struct ListStanding<LN> {
     /// List number for which this standing applies
     pub list_number: LN,
-    /// The number of votes cast for this group
+    /// The number of votes cast for this list
     pub votes_cast: u64,
     /// The remainder of votes that was not used to get full seats (does not have to be a whole number of votes)
     pub remainder_votes: Fraction,
@@ -312,26 +312,18 @@ pub struct ListExhaustionRemovedSeat<LN> {
     pub full_seat: bool,
 }
 
-/// Used to indicate that drawing lots for a residual seat is needed,
-/// containing all the information needed to do the drawing and the current seat change steps
-#[derive(Debug, PartialEq)]
-pub enum AssignRemainderDrawingLotsError<LN> {
-    DrawingLotsRequired(ListDrawingLotsVariant<LN>, Vec<SeatChangeStep<LN>>),
-    InvalidLotDrawing(String),
-}
-
-/// Used to indicate that drawing lots for a residual seat is needed,
-/// containing all the information needed to do the drawing
-#[derive(Debug, PartialEq)]
-pub enum ResidualSeatDrawingLotsError<LN> {
-    DrawingLotsRequired(ListDrawingLotsVariant<LN>),
-    InvalidLotDrawing(String),
-}
-
 /// Result type for residual seat (re)assignment: steps taken and final standings.
-pub type RemainderAssignmentResult<LN> =
-    Result<(Vec<SeatChangeStep<LN>>, Vec<ListStanding<LN>>), AssignRemainderDrawingLotsError<LN>>;
+pub type RemainderAssignmentResult<LN> = Result<RemainderAssignment<LN>, ApportionmentError>;
+
+pub enum RemainderAssignment<LN> {
+    Completed(Vec<SeatChangeStep<LN>>, Vec<ListStanding<LN>>),
+    DrawingLotsRequired(ListDrawingLotsVariant<LN>, Vec<SeatChangeStep<LN>>),
+}
 
 /// Result type for absolute majority reassignment: updated standings and optional seat change.
-pub type AbsoluteMajorityResult<LN> =
-    Result<(Vec<ListStanding<LN>>, Option<SeatChange<LN>>), ResidualSeatDrawingLotsError<LN>>;
+pub type AbsoluteMajorityResult<LN> = Result<AbsoluteMajority<LN>, ApportionmentError>;
+
+pub enum AbsoluteMajority<LN> {
+    Completed(Vec<ListStanding<LN>>, Option<SeatChange<LN>>),
+    DrawingLotsRequired(ListDrawingLotsVariant<LN>),
+}

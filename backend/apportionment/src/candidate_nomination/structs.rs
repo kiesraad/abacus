@@ -34,7 +34,7 @@ pub struct PreferenceThreshold {
 /// It also contains the preferential nomination of candidates, the remaining
 /// nomination of candidates and the final ranking of candidates for each list.
 #[derive(Debug, PartialEq)]
-pub struct CandidateNominationResult<'a, T: ListVotes> {
+pub struct CandidateNominationDetails<'a, T: ListVotes> {
     /// Preference threshold percentage and number of votes
     pub preference_threshold: PreferenceThreshold,
     /// List of chosen candidates

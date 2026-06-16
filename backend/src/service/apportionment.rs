@@ -1,4 +1,4 @@
-use apportionment;
+use apportionment::{self, ApportionmentOutput};
 use serde::Serialize;
 use sqlx::SqliteConnection;
 
@@ -20,7 +20,6 @@ use crate::{
         election::{CandidateNumber, ElectionId, ElectionWithPoliticalGroups, PGNumber},
         summary::ElectionSummary,
     },
-    error::ErrorReference,
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
     repository::{apportionment_state_repo, committee_session_repo, data_entry_repo},
     service,
@@ -167,8 +166,6 @@ impl From<apportionment::ListDrawingLotsVariant<PGNumber>> for ListDrawingLotsVa
     }
 }
 
-type ApportionmentError = apportionment::ApportionmentError<PGNumber, CandidateNumber>;
-
 /// - Collect data for the [ApportionmentInputData] from the database and make sure that the
 ///   committee session status is completed.
 /// - Call the apportionment process function
@@ -191,40 +188,36 @@ pub async fn process(
         state.get_candidates_drawn(),
     );
 
-    let apportionment_result = match apportionment::process(&input) {
-        Ok(output) => ApportionmentResult::Ok(ElectionApportionmentResponse {
-            seat_assignment: map_seat_assignment(&output.seat_assignment),
-            candidate_nomination: map_candidate_nomination(
-                &output.candidate_nomination,
-                &election.political_groups,
-            ),
-            election_summary: election_summary.clone(),
-            warnings: output
-                .seat_assignment
-                .warnings()
-                .into_iter()
-                .map(ApportionmentWarning::from)
-                .collect(),
-        }),
-        Err(ApportionmentError::ListDrawingLotsRequired(variant, preliminary_seat_assignment)) => {
+    let apportionment_result = match apportionment::process(&input)? {
+        ApportionmentOutput::Completed(output) => {
+            ApportionmentResult::Ok(ElectionApportionmentResponse {
+                seat_assignment: map_seat_assignment(&output.seat_assignment),
+                candidate_nomination: map_candidate_nomination(
+                    &output.candidate_nomination,
+                    &election.political_groups,
+                ),
+                election_summary: election_summary.clone(),
+                warnings: output
+                    .seat_assignment
+                    .warnings()
+                    .into_iter()
+                    .map(ApportionmentWarning::from)
+                    .collect(),
+            })
+        }
+        ApportionmentOutput::ListDrawingLotsRequired(variant, preliminary_seat_assignment) => {
             ApportionmentResult::ListDrawingLotsRequired(
                 variant.into(),
                 election_summary.clone(),
                 map_seat_assignment(&preliminary_seat_assignment),
             )
         }
-        Err(ApportionmentError::CandidateDrawingLotsRequired(variant, seat_assignment)) => {
+        ApportionmentOutput::CandidateDrawingLotsRequired(variant, seat_assignment) => {
             ApportionmentResult::CandidateDrawingLotsRequired(
                 variant.into(),
                 election_summary.clone(),
                 map_seat_assignment(&seat_assignment),
             )
-        }
-        Err(ApportionmentError::InvalidLotDrawing(message)) => {
-            return Err(APIError::Conflict(
-                message,
-                ErrorReference::ApportionmentInvalidLotDrawing,
-            ));
         }
     };
 

@@ -4,6 +4,7 @@
 /// The generated PDFs are checked to a minimum size to ensure that the generation was successful.
 /// The tests cover various edge cases by varying the number of parties, candidates,
 /// string lengths, and the presence of optional fields.
+use apportionment::ApportionmentOutput;
 use chrono::{DateTime, Local, NaiveDate, NaiveDateTime, Utc};
 use pdf_gen::generate_pdf;
 use rand::{RngExt, seq::IndexedRandom};
@@ -763,13 +764,16 @@ async fn test_p_22_2() {
         &[],
         &[],
     );
-    let apportionment_result =
-        apportionment::process(&apportionment_input).expect("apportionment failed");
-    let seat_assignment = map_seat_assignment(&apportionment_result.seat_assignment);
+    let apportionment_result = apportionment::process(&apportionment_input);
+    let Ok(ApportionmentOutput::Completed(apportionment)) = apportionment_result else {
+        panic!("should be Completed");
+    };
+
+    let seat_assignment = map_seat_assignment(&apportionment.seat_assignment);
     let enriched_seat_assignment =
         EnrichedSeatAssignment::new(election.number_of_seats, &summary, &seat_assignment).unwrap();
     let candidate_nomination = map_candidate_nomination(
-        &apportionment_result.candidate_nomination,
+        &apportionment.candidate_nomination,
         &election.political_groups,
     );
     let enriched_candidate_nomination =

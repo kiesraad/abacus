@@ -324,6 +324,7 @@ mod tests {
     /// List 3: 80 -> 0 full seats, 1 residual (largest remainder = 80, threshold 72)
     /// Initial distribution: [3, 1, 1].
     #[test]
+    #[allow(clippy::too_many_lines, reason = "Written out cases take many lines")]
     fn test_apportionment_process_with_deceased_scenarios() {
         struct Case {
             name: &'static str,

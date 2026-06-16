@@ -6,6 +6,8 @@ allowBuilds:
 blockExoticSubdeps: true
 minimumReleaseAge: 4320
 trustPolicy: no-downgrade
+trustPolicyExclude:
+  - semver@6.3.1
 engineStrict: true
 packageManagerStrict: true
 packageManagerStrictVersion: true
@@ -17,3 +19,7 @@ overrides:
   # @codecov/vite-plugin does not have official support for Vite 8, but works:
   # https://github.com/codecov/codecov-javascript-bundler-plugins/issues/264
   "vite": "$vite"
+  # Fix GHSA-4x5r-pxfx-6jf8
+  "@babel/core@<=7.29.0": ">=7.29.6"
+  # Fix GHSA-gv7w-rqvm-qjhr, GHSA-g7r4-m6w7-qqqr
+  esbuild@>=0.17.0 <0.28.1: ">=0.28.1"

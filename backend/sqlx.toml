@@ -1,0 +1,74 @@
+[macros.table-overrides.'elections']
+'id' = "crate::domain::election::ElectionId"
+'committee_category' = "crate::domain::election::CommitteeCategory"
+'counting_method' = "crate::domain::election::VoteCountingMethod"
+'category' = "crate::domain::election::ElectionCategory"
+'number_of_seats' = "u32"
+'number_of_voters' = "u32"
+'election_date' = "chrono::NaiveDate"
+'nomination_date' = "chrono::NaiveDate"
+'political_groups' = "sqlx::types::Json<Vec<crate::domain::election::RegisteredPoliticalGroup>>"
+
+[macros.table-overrides.'polling_stations']
+'id' = "crate::domain::polling_station::PollingStationId"
+'committee_session_id' = "crate::domain::committee_session::CommitteeSessionId"
+'committee_session_number' = "u32"
+'prev_data_entry_id' = "crate::domain::data_entry::DataEntryId"
+'data_entry_id' = "crate::domain::data_entry::DataEntryId"
+'investigation_state' = "sqlx::types::Json<crate::domain::investigation::InvestigationStatus>"
+'number' = "crate::domain::polling_station::PollingStationNumber"
+'number_of_voters' = "u32"
+'polling_station_type' = "crate::domain::polling_station::PollingStationType"
+
+[macros.table-overrides.'data_entries']
+'id' = "crate::domain::data_entry::DataEntryId"
+'state' = "sqlx::types::Json<crate::domain::data_entry::DataEntryStatus>"
+'updated_at' = "chrono::DateTime<chrono::Utc>"
+
+[macros.table-overrides.'users']
+'id' = "crate::repository::user_repo::UserId"
+'role' = "crate::domain::role::Role"
+'needs_password_change' = "bool"
+'password_hash' = "crate::api::middleware::authentication::password::HashedPassword"
+'last_activity_at' = "chrono::DateTime<chrono::Utc>"
+'updated_at' = "chrono::DateTime<chrono::Utc>"
+'created_at' = "chrono::DateTime<chrono::Utc>"
+
+[macros.table-overrides.'sessions']
+'user_id' = "crate::repository::user_repo::UserId"
+'expires_at' = "chrono::DateTime<chrono::Utc>"
+'created_at' = "chrono::DateTime<chrono::Utc>"
+
+[macros.table-overrides.'audit_log']
+'id' = "crate::infra::audit_log::audit_log_events::AuditLogEventId"
+'time' = "chrono::DateTime<chrono::Utc>"
+'event' = "sqlx::types::Json"
+'event_name' = "crate::infra::audit_log::audit_log_events::AuditEventType"
+'event_level' = "crate::infra::audit_log::audit_log_events::AuditEventLevel"
+'user_id' = "crate::repository::user_repo::UserId"
+'user_role' = "crate::domain::role::Role"
+'ip' = "String"
+
+[macros.table-overrides.'committee_sessions']
+'id' = "crate::domain::committee_session::CommitteeSessionId"
+'number' = "u32"
+'election_id' = "crate::domain::election::ElectionId"
+'start_date_time' = "chrono::NaiveDateTime"
+'status' = "crate::domain::committee_session_status::CommitteeSessionStatus"
+
+[macros.table-overrides.'files']
+'id' = "crate::domain::file::FileId"
+'created_at' = "chrono::DateTime<chrono::Utc>"
+'committee_session_id' = "crate::domain::committee_session::CommitteeSessionId"
+'file_type' = "crate::domain::file::FileType"
+
+[macros.table-overrides.'sub_committees']
+'id' = "crate::domain::sub_committee::SubCommitteeId"
+'committee_session_id' = "crate::domain::committee_session::CommitteeSessionId"
+'data_entry_id' = "crate::domain::data_entry::DataEntryId"
+'number' = "crate::domain::sub_committee::SubCommitteeNumber"
+'category' = "crate::domain::election::CommitteeCategory"
+
+[macros.table-overrides.'apportionment']
+'committee_session_id' = "crate::domain::committee_session::CommitteeSessionId"
+'state' = "sqlx::types::Json<crate::domain::apportionment_state::ApportionmentState>"

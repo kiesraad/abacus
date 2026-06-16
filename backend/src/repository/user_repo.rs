@@ -152,15 +152,15 @@ pub async fn create(
         r#"INSERT INTO users (username, fullname, password_hash, needs_password_change, role)
         VALUES (?, ?, ?, ?, ?)
         RETURNING
-            id as "id: UserId",
+            id,
             username,
             fullname,
             password_hash,
-            needs_password_change as "needs_password_change: bool",
-            role as "role: _",
-            last_activity_at as "last_activity_at: _",
-            updated_at as "updated_at: _",
-            created_at as "created_at: _"
+            needs_password_change,
+            role,
+            last_activity_at,
+            updated_at,
+            created_at
         "#,
         username,
         fullname,
@@ -207,8 +207,7 @@ pub async fn update_password(
     let old_password = sqlx::query!("SELECT password_hash FROM users WHERE id = ?", user_id)
         .fetch_one(&mut *conn)
         .await?
-        .password_hash
-        .into();
+        .password_hash;
 
     let password_hash = hash_password(&ValidatedPassword::new(
         username,
@@ -272,15 +271,15 @@ pub async fn get_by_username(
         User,
         r#"
         SELECT
-            id as "id: UserId",
+            id,
             username,
             fullname,
-            role as "role: _",
+            role,
             password_hash,
-            needs_password_change as "needs_password_change: bool",
-            last_activity_at as "last_activity_at: _",
-            updated_at as "updated_at: _",
-            created_at as "created_at: _"
+            needs_password_change,
+            last_activity_at,
+            updated_at,
+            created_at
         FROM users WHERE username = ? COLLATE NOCASE
         "#,
         username
@@ -300,15 +299,15 @@ pub async fn get_by_id(
         User,
         r#"
         SELECT
-            id as "id: UserId",
+            id,
             username,
             fullname,
-            role as "role: _",
+            role,
             password_hash,
-            needs_password_change as "needs_password_change: bool",
-            last_activity_at as "last_activity_at: _",
-            updated_at as "updated_at: _",
-            created_at as "created_at: _"
+            needs_password_change,
+            last_activity_at,
+            updated_at,
+            created_at
         FROM users WHERE id = ?
         "#,
         user_id
@@ -326,15 +325,15 @@ pub async fn list(
     let users = query_as!(
         User,
         r#"SELECT
-            id as "id: UserId",
+            id,
             username,
             fullname,
             password_hash,
-            needs_password_change as "needs_password_change: bool",
-            role as "role: _",
-            last_activity_at as "last_activity_at: _",
-            updated_at as "updated_at: _",
-            created_at as "created_at: _"
+            needs_password_change,
+            role,
+            last_activity_at,
+            updated_at,
+            created_at
         FROM users
         WHERE ($1 IS NULL OR role = $1)
         "#,

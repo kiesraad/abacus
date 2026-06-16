@@ -1,0 +1,86 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        SELECT\n            de.id AS data_entry_id,\n            sc.id,\n            sc.number,\n            sc.name,\n            sc.category,\n            de.state AS \"state!: Json<DataEntryStatus>\"\n        FROM sub_committees AS sc\n        JOIN data_entries AS de ON de.id = sc.data_entry_id\n        WHERE sc.committee_session_id = $1\n        ",
+  "describe": {
+    "columns": [
+      {
+        "name": "data_entry_id",
+        "ordinal": 0,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "data_entries",
+            "name": "id"
+          }
+        }
+      },
+      {
+        "name": "id",
+        "ordinal": 1,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "sub_committees",
+            "name": "id"
+          }
+        }
+      },
+      {
+        "name": "number",
+        "ordinal": 2,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "sub_committees",
+            "name": "number"
+          }
+        }
+      },
+      {
+        "name": "name",
+        "ordinal": 3,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "sub_committees",
+            "name": "name"
+          }
+        }
+      },
+      {
+        "name": "category",
+        "ordinal": 4,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "sub_committees",
+            "name": "category"
+          }
+        }
+      },
+      {
+        "name": "state!: Json<DataEntryStatus>",
+        "ordinal": 5,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "data_entries",
+            "name": "state"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "87e20682265077fd0c9135612f03b79a08da36c5f4e766e29c621013944dca4d"
+}

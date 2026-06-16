@@ -243,7 +243,7 @@ pub async fn assert_last_event(
 
 #[cfg(test)]
 pub async fn list_event_names(conn: &mut SqliteConnection) -> Result<Vec<String>, APIError> {
-    sqlx::query_scalar!(r#"SELECT event_name FROM audit_log ORDER BY ROWID ASC"#)
+    sqlx::query_scalar::<_, String>(r#"SELECT event_name FROM audit_log ORDER BY ROWID ASC"#)
         .fetch_all(conn)
         .await
         .map_err(APIError::from)
@@ -259,17 +259,17 @@ pub async fn list(
     let events = sqlx::query_as!(
         AuditLogEvent,
         r#"SELECT
-            audit_log.id as "id: AuditLogEventId",
-            time as "time: _",
+            audit_log.id,
+            time,
             json(event) as "event!: serde_json::Value",
-            event_name as "event_name: AuditEventType",
-            event_level as "event_level: _",
+            event_name,
+            event_level,
             message,
-            ip as "ip: String",
-            user_id as "user_id: UserId",
+            ip,
+            user_id,
             audit_log.username,
             user_fullname,
-            user_role as "user_role: Role"
+            user_role
         FROM audit_log
         WHERE (json_array_length($1) = 0 OR event_level IN (SELECT value FROM json_each($1)))
             AND (json_array_length($2) = 0 OR event_name IN (SELECT value FROM json_each($2)))

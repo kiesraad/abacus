@@ -1897,6 +1897,7 @@ pub(crate) mod tests {
             };
 
             /// Apportionment with no residual seats
+            ///
             /// This test triggers Kieswet Article P 10
             ///
             /// Full seats: [5, 5, 4, 4, 2] - Remainder seats: 0  

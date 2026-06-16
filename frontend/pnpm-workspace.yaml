@@ -9,8 +9,6 @@ trustPolicy: no-downgrade
 trustPolicyExclude:
   - semver@6.3.1
 engineStrict: true
-packageManagerStrict: true
-packageManagerStrictVersion: true
 strictDepBuilds: true
 strictPeerDependencies: true
 overrides:
@@ -23,3 +21,5 @@ overrides:
   "@babel/core@<=7.29.0": ">=7.29.6"
   # Fix GHSA-gv7w-rqvm-qjhr, GHSA-g7r4-m6w7-qqqr
   esbuild@>=0.17.0 <0.28.1: ">=0.28.1"
+strictPeerDeps: true
+pmOnFail: error

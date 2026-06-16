@@ -130,7 +130,7 @@ Storybook runs on [http://localhost:6006](http://localhost:6006) and provides an
 Prerequisites:
 
 - [Node](https://nodejs.org) v24
-- [pnpm](https://pnpm.io/) v10
+- [pnpm](https://pnpm.io/) v11
 
 Install npm dependencies, skipping development dependencies:
 

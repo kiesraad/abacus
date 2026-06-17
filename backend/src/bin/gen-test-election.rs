@@ -25,6 +25,9 @@ use tracing_subscriber::EnvFilter;
 /// Abacus API and asset server
 #[derive(Parser, Debug, Clone)]
 struct Args {
+    /// Custom election name
+    pub custom_name: Option<String>,
+
     /// The committee category
     #[arg(value_enum)]
     committee_category: CommitteeCategory,
@@ -67,6 +70,10 @@ struct Args {
     #[arg(long)]
     generate_p22_2_variants: bool,
 
+    /// Generate multiple elections, each resulting in drawing lots
+    #[arg(long)]
+    generate_drawing_lots: bool,
+
     /// Include (part of) data entry for this election
     #[arg(long)]
     with_data_entry: bool,
@@ -97,6 +104,7 @@ struct Args {
 impl From<Args> for GenerateElectionArgs {
     fn from(args: Args) -> Self {
         GenerateElectionArgs {
+            custom_name: args.custom_name,
             committee_category: args.committee_category,
             political_groups: RandomRange(args.political_groups),
             candidates_per_group: RandomRange(args.candidates_per_group),
@@ -104,6 +112,7 @@ impl From<Args> for GenerateElectionArgs {
             voters: RandomRange(args.voters),
             seats: RandomRange(args.seats),
             generate_p22_2_variants: args.generate_p22_2_variants,
+            generate_drawing_lots: args.generate_drawing_lots,
             with_data_entry: args.with_data_entry,
             first_data_entry: RandomRange(args.first_data_entry),
             second_data_entry: RandomRange(args.second_data_entry),

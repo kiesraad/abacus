@@ -292,7 +292,11 @@ fn generate_election(
     let locality = super::data::locality(rng).to_owned();
 
     // use the previous data to generate some identifiers and names
-    let name = format!("Gemeenteraad {locality} {year}");
+    let name: String = args
+        .custom_name
+        .clone()
+        .unwrap_or(format!("Gemeenteraad {locality} {year}"));
+
     let cleaned_up_locality = locality.replace(" ", "_").replace("'", "");
     let election_id = format!("GR{year}_{cleaned_up_locality}");
 
@@ -983,6 +987,7 @@ mod tests {
     #[sqlx::test]
     async fn test_create_test_election(pool: SqlitePool) {
         let args = GenerateElectionArgs {
+            custom_name: None,
             committee_category: CommitteeCategory::GSB,
             political_groups: RandomRange(20..50),
             candidates_per_group: RandomRange(10..50),
@@ -990,6 +995,7 @@ mod tests {
             voters: RandomRange(100_000..200_000),
             seats: RandomRange(9..45),
             generate_p22_2_variants: false,
+            generate_drawing_lots: false,
             with_data_entry: true,
             first_data_entry: RandomRange(100..101),
             second_data_entry: RandomRange(100..101),

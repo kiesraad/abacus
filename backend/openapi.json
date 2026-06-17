@@ -7381,6 +7381,7 @@
           "voters",
           "seats",
           "generate_p22_2_variants",
+          "generate_drawing_lots",
           "with_data_entry",
           "first_data_entry",
           "second_data_entry",
@@ -7400,9 +7401,17 @@
             "$ref": "#/components/schemas/CommitteeCategory",
             "description": "GSB or CSB"
           },
+          "custom_name": {
+            "type": "string",
+            "description": "Custom election name"
+          },
           "first_data_entry": {
             "$ref": "#/components/schemas/RandomRange",
             "description": "Percentage of the first data entry to complete if data entry is included"
+          },
+          "generate_drawing_lots": {
+            "type": "boolean",
+            "description": "Generate multiple elections, each resulting in drawing lots"
           },
           "generate_p22_2_variants": {
             "type": "boolean",

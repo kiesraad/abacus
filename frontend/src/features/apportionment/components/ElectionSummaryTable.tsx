@@ -115,9 +115,12 @@ export function ElectionSummaryTable({
             {t("apportionment.candidates_for_apportionment")}
           </Table.HeaderCell>
           <Table.NumberCell>
-            {deceasedCandidatesInfo.numberOfCandidates} - {deceasedCandidatesInfo.numberOfDeceasedCandidates}
+            {formatNumber(deceasedCandidatesInfo.numberOfCandidates)} -{" "}
+            {deceasedCandidatesInfo.numberOfDeceasedCandidates}
             <span className="superscript">&nbsp;&dagger;</span> ={" "}
-            {deceasedCandidatesInfo.numberOfCandidates - deceasedCandidatesInfo.numberOfDeceasedCandidates}
+            {formatNumber(
+              deceasedCandidatesInfo.numberOfCandidates - deceasedCandidatesInfo.numberOfDeceasedCandidates,
+            )}
           </Table.NumberCell>
           <Table.Cell className="fs-sm">
             <Button.Link variant="underlined" size="md" to={deceasedCandidatesInfo.deceasedCandidatesLink}>

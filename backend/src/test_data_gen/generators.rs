@@ -61,7 +61,7 @@ pub struct CreateTestElectionResult {
 async fn generate_gsb_data_entries(
     conn: &mut SqliteConnection,
     rng: &mut StdRng,
-    args: GenerateElectionArgs,
+    args: &GenerateElectionArgs,
     committee_session: &CommitteeSession,
     election: &ElectionWithPoliticalGroups,
     polling_stations: &[(PollingStation, DataEntryId)],
@@ -74,7 +74,7 @@ async fn generate_gsb_data_entries(
     .await?;
 
     let (_, second_entries) =
-        generate_gsb_data_entry(election, polling_stations, rng, conn, &args).await;
+        generate_gsb_data_entry(election, polling_stations, rng, conn, args).await;
     Ok(second_entries == polling_stations.len())
 }
 
@@ -110,11 +110,11 @@ async fn generate_csb_data_entries(
 async fn generate_gsb_election_data(
     rng: &mut StdRng,
     tx: &mut SqliteConnection,
-    args: GenerateElectionArgs,
+    args: &GenerateElectionArgs,
     committee_session: &mut CommitteeSession,
     election: &ElectionWithPoliticalGroups,
 ) -> Result<(Vec<PollingStation>, bool), Box<dyn Error>> {
-    let polling_stations_with_ids = generate_polling_stations(rng, election, tx, &args).await;
+    let polling_stations_with_ids = generate_polling_stations(rng, election, tx, args).await;
 
     if !polling_stations_with_ids.is_empty() {
         *committee_session = committee_session_repo::change_status(
@@ -150,7 +150,7 @@ async fn generate_gsb_election_data(
 async fn generate_csb_election_data(
     rng: &mut StdRng,
     tx: &mut SqliteConnection,
-    args: GenerateElectionArgs,
+    args: &GenerateElectionArgs,
     committee_session: &mut CommitteeSession,
     election: &ElectionWithPoliticalGroups,
     votes: Option<Vec<Vec<u32>>>,
@@ -171,7 +171,7 @@ async fn generate_csb_election_data(
         .map_err(|e| format!("{e:?}"))?;
 
         if args.with_data_entry {
-            generate_csb_data_entries(tx, rng, &args, sub_committee_first_session, election, votes)
+            generate_csb_data_entries(tx, rng, args, sub_committee_first_session, election, votes)
                 .await?
         } else {
             false
@@ -192,8 +192,8 @@ async fn generate_csb_election_data(
 }
 
 pub async fn create_test_election(
-    args: GenerateElectionArgs,
-    pool: SqlitePool,
+    args: &GenerateElectionArgs,
+    pool: &SqlitePool,
     votes: Option<Vec<Vec<u32>>>,
 ) -> Result<CreateTestElectionResult, Box<dyn Error>> {
     let mut rng = StdRng::from_rng(&mut rand::rng());
@@ -202,7 +202,7 @@ pub async fn create_test_election(
 
     // generate and store the election
     let election =
-        election_repo::create(&mut tx, generate_election(&mut rng, &args, votes.as_ref())).await?;
+        election_repo::create(&mut tx, generate_election(&mut rng, args, votes.as_ref())).await?;
 
     // generate the committee session for the election
     let mut committee_session = committee_session_repo::create(
@@ -1004,9 +1004,7 @@ mod tests {
             political_group_distribution_slope: RandomRange(1100..1101),
         };
 
-        create_test_election(args, pool.clone(), None)
-            .await
-            .unwrap();
+        create_test_election(&args, &pool, None).await.unwrap();
 
         let mut conn = pool.acquire().await.unwrap();
         let elections = election_repo::list(&mut conn, None).await.unwrap();

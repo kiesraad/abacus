@@ -25,21 +25,25 @@ async fn generate_election_handler(
     State(pool): State<SqlitePool>,
     Json(args): Json<GenerateElectionArgs>,
 ) -> Result<StatusCode, APIError> {
-    match (args.generate_p22_2_variants, args.generate_drawing_lots) {
-        (true, _) => generate_p22_2_variants(args, pool).await,
-        (_, true) => generate_drawing_lots(args, pool).await,
-        (false, false) => _ = super::create_test_election(args, pool, None).await?,
+    if args.generate_p22_2_variants {
+        generate_p22_2_variants(&args, &pool).await
+    }
+    if args.generate_drawing_lots {
+        generate_drawing_lots(&args, &pool).await
+    }
+    if !args.generate_p22_2_variants && !args.generate_drawing_lots {
+        _ = super::create_test_election(&args, &pool, None).await?
     }
 
     Ok(StatusCode::CREATED)
 }
 
-async fn generate_p22_2_variants(args: GenerateElectionArgs, pool: SqlitePool) {
+async fn generate_p22_2_variants(args: &GenerateElectionArgs, pool: &SqlitePool) {
     // 1. Test Election >= 19 seats
     //    based on test `gte_19_seats::test_with_remainder_seats`
     let _ = create_test_election_with_votes(
-        &args,
-        &pool,
+        args,
+        pool,
         23,
         default_50_candidates(&[600, 302, 98, 99, 101]),
     )
@@ -48,8 +52,8 @@ async fn generate_p22_2_variants(args: GenerateElectionArgs, pool: SqlitePool) {
     // 2. Test Election >= 19 seats & Absolute Majority Change
     //    based on test `gte_19_seats::test_with_absolute_majority_of_votes_but_not_seats`
     let _ = create_test_election_with_votes(
-        &args,
-        &pool,
+        args,
+        pool,
         24,
         default_50_candidates(&[7501, 1249, 1249, 1249, 1249, 1249, 1248, 7]),
     )
@@ -58,8 +62,8 @@ async fn generate_p22_2_variants(args: GenerateElectionArgs, pool: SqlitePool) {
     // 3. Test Election < 19 seats
     //    based on test `lt_19_seats::test_with_1_list_that_meets_threshold`
     let _ = create_test_election_with_votes(
-        &args,
-        &pool,
+        args,
+        pool,
         15,
         default_50_candidates(&[808, 59, 58, 57, 56, 55, 54, 53]),
     )
@@ -68,8 +72,8 @@ async fn generate_p22_2_variants(args: GenerateElectionArgs, pool: SqlitePool) {
     // 4. Test Election < 19 seats & Absolute Majority Change & List Exhaustion
     //    based on test `lt_19_seats::test_with_absolute_majority_of_votes_but_not_seats_and_list_exhaustion`
     let _ = create_test_election_with_votes(
-        &args,
-        &pool,
+        args,
+        pool,
         15,
         vec![
             vec![2571, 0, 0, 0, 0, 0, 0],
@@ -83,20 +87,18 @@ async fn generate_p22_2_variants(args: GenerateElectionArgs, pool: SqlitePool) {
 
     // 5. Test Election < 19 seats & List Exhaustion
     //    based on test `lt_19_seats::test_with_list_exhaustion_triggering_2nd_round_highest_average_assignment_with_different_averages`
-    let _ = create_test_election_with_votes(
-        &args,
-        &pool,
-        6,
-        vec![vec![3, 3], vec![2, 2], vec![25, 25]],
-    )
-    .await;
+    let _ =
+        create_test_election_with_votes(args, pool, 6, vec![vec![3, 3], vec![2, 2], vec![25, 25]])
+            .await;
 }
 
-async fn generate_drawing_lots(mut args: GenerateElectionArgs, pool: SqlitePool) {
+async fn generate_drawing_lots(args: &GenerateElectionArgs, pool: &SqlitePool) {
+    let mut args = args.clone();
+
     args.custom_name = Some("Drawing lots >= 19 seats, AbsoluteMajority".to_string());
     let _ = create_test_election_with_votes(
         &args,
-        &pool,
+        pool,
         24,
         default_50_candidates(&[7501, 1249, 1249, 1249, 1249, 1248, 1248, 8]),
     )
@@ -105,7 +107,7 @@ async fn generate_drawing_lots(mut args: GenerateElectionArgs, pool: SqlitePool)
     args.custom_name = Some("Drawing lots >= 19 seats, HighestAverageResidualSeat".to_string());
     let _ = create_test_election_with_votes(
         &args,
-        &pool,
+        pool,
         23,
         default_50_candidates(&[500, 140, 140, 140, 140, 140]),
     )
@@ -114,7 +116,7 @@ async fn generate_drawing_lots(mut args: GenerateElectionArgs, pool: SqlitePool)
     args.custom_name = Some("Drawing lots < 19 seats, AbsoluteMajority".to_string());
     let _ = create_test_election_with_votes(
         &args,
-        &pool,
+        pool,
         15,
         default_50_candidates(&[2552, 511, 511, 511, 509, 509]),
     )
@@ -123,7 +125,7 @@ async fn generate_drawing_lots(mut args: GenerateElectionArgs, pool: SqlitePool)
     args.custom_name = Some("Drawing lots < 19 seats, LargestRemainderResidualSeat".to_string());
     let _ = create_test_election_with_votes(
         &args,
-        &pool,
+        pool,
         15,
         default_50_candidates(&[540, 160, 160, 80, 80, 80, 55, 45]),
     )
@@ -132,7 +134,7 @@ async fn generate_drawing_lots(mut args: GenerateElectionArgs, pool: SqlitePool)
     args.custom_name = Some("Drawing lots, Candidate".to_string());
     let _ = create_test_election_with_votes(
         &args,
-        &pool,
+        pool,
         15,
         vec![
             vec![500, 500, 500, 500, 500, 500],
@@ -158,7 +160,7 @@ async fn create_test_election_with_votes(
     args.voters = RandomRange(total_votes..total_votes + 1);
     args.political_groups = RandomRange(political_groups..political_groups + 1);
     args.seats = RandomRange(seats..seats + 1);
-    super::create_test_election(args, pool.clone(), Some(votes)).await
+    super::create_test_election(&args, pool, Some(votes)).await
 }
 
 /// Fill a `Vec` with political groups of 50 candidates. The first candidate gets the specified votes

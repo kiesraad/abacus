@@ -700,7 +700,7 @@
         table.cell(align: right, [#column.list_seat_number]),
         table.cell([#candidate_name(column.candidate)]),
         table.cell([#candidate_location(column.candidate)]),
-        if showVotes { table.cell(align: right, [#column.votes])}
+        if showVotes { table.cell(align: right, fmt-number(column.votes, zero: "0"))}
         else if showPosition { table.cell(align: right, [#column.candidate.number])},
       )
     }).flatten(),

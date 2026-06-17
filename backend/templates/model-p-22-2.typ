@@ -253,14 +253,14 @@ Hieronder is berekend hoe vaak elke lijst qua stemmenaantal de kiesdeler heeft g
   ..for column in input.seat_assignment.list_seat_assignment {
     (
       table.cell(format_political_group_name(column.number, column.name, with_prefix: "only_list_number")),
-      table.cell(align: right, [#column.total]),
+      table.cell(align: right, fmt-number(column.total, zero: "0")),
       table.cell(align: center, [÷ #format_fraction(input.seat_assignment.quota) =]),
       table.cell(align: right, [#column.initial_full_seats])
     )
   }.flatten(),
   table.hline(stroke: 1pt + black),
   table.cell(header_text([Totaal])),
-  table.cell(align: right, header_text([#input.summary.votes_counts.total_votes_candidates_count])),
+  table.cell(align: right, header_text(fmt-number(input.summary.votes_counts.total_votes_candidates_count, zero: "0"))),
   table.cell(stroke: none, []),
   table.cell(stroke: none, align: right, header_text([#input.seat_assignment.initial_total_full_seats])),
 )

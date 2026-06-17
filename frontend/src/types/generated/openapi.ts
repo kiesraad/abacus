@@ -443,6 +443,7 @@ export const auditEventTypeValues = [
   "UserLoggedOut",
   "UserAccountUpdated",
   "UserSessionExtended",
+  "UserSessionExpired",
   "UserCreated",
   "UserUpdated",
   "UserDeleted",

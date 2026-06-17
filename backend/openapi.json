@@ -5506,6 +5506,7 @@
           "UserLoggedOut",
           "UserAccountUpdated",
           "UserSessionExtended",
+          "UserSessionExpired",
           "UserCreated",
           "UserUpdated",
           "UserDeleted",

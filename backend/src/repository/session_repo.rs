@@ -53,9 +53,11 @@ impl Session {
     }
 
     /// Get the age of a session
+    ///
+    /// The age maxes out at the expiry time.
     pub(crate) fn duration(&self) -> Duration {
-        Utc::now()
-            .signed_duration_since(self.created_at)
+        let end = Utc::now().min(self.expires_at());
+        end.signed_duration_since(self.created_at)
             .to_std()
             .unwrap_or_default()
     }
@@ -185,16 +187,28 @@ pub(crate) async fn delete_user_session(
     Ok(())
 }
 
-/// Delete all sessions that have expired
+/// Delete all sessions that have expired.  *Only call via `expire_sessions`* since the
+/// expired sessions need to be logged.
+// This function is needed in this module since `Session` has private fields.
 pub(crate) async fn delete_expired_sessions(
-    conn: &mut SqliteConnection,
-) -> Result<(), sqlx::Error> {
-    sqlx::query("DELETE FROM sessions WHERE expires_at <= ?")
-        .bind(Utc::now())
-        .execute(conn)
-        .await?;
-
-    Ok(())
+    tx: &mut sqlx::Transaction<'_, sqlx::Sqlite>,
+) -> Result<Vec<Session>, sqlx::Error> {
+    let now = Utc::now();
+    sqlx::query_as!(
+        Session,
+        r#"
+                         DELETE FROM sessions WHERE expires_at <= ?
+                         RETURNING user_id AS "user_id: _",
+                                   session_key AS "session_key: _",
+                                   user_agent AS "user_agent: _",
+                                   ip_address AS "ip_address: _",
+                                   expires_at AS "expires_at: _",
+                                   created_at AS "created_at: _"
+                        "#,
+        now
+    )
+    .fetch_all(tx.as_mut())
+    .await
 }
 
 /// Count the number of active sessions
@@ -243,7 +257,7 @@ pub(crate) async fn extend_session(
 #[cfg(test)]
 mod tests {
     use chrono::TimeDelta;
-    use sqlx::SqlitePool;
+    use sqlx::{Connection, Sqlite, SqlitePool, pool::PoolConnection};
     use test_log::test;
 
     use super::*;
@@ -300,18 +314,20 @@ mod tests {
 
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
     async fn test_delete_old_sessions(pool: SqlitePool) {
-        let mut conn = pool.acquire().await.unwrap();
+        let mut conn: PoolConnection<Sqlite> = pool.acquire().await.unwrap();
+        let mut tx = conn.begin().await.unwrap();
         let session = Session::create(
             UserId::from(1),
             TEST_USER_AGENT,
             TEST_IP_ADDRESS,
             TimeDelta::seconds(0),
         );
-        save(&mut conn, &session).await.unwrap();
+        save(&mut tx, &session).await.unwrap();
 
-        delete_expired_sessions(&mut conn).await.unwrap();
+        let deleted = delete_expired_sessions(&mut tx).await.unwrap();
+        assert_eq!(deleted, std::slice::from_ref(&session));
 
-        let session_from_db = super::get_by_key(&mut conn, session.session_key())
+        let session_from_db = super::get_by_key(&mut tx, session.session_key())
             .await
             .unwrap();
 

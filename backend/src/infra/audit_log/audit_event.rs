@@ -103,6 +103,7 @@ pub enum AuditEventType {
     UserLoggedOut,
     UserAccountUpdated,
     UserSessionExtended,
+    UserSessionExpired,
     // user management events
     UserCreated,
     UserUpdated,

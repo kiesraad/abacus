@@ -8,7 +8,7 @@ use axum_extra::{TypedHeader, extract::CookieJar, headers::UserAgent};
 use cookie::{Cookie, SameSite};
 use hyper::StatusCode;
 use serde::{Deserialize, Serialize};
-use sqlx::SqlitePool;
+use sqlx::{Connection, SqliteConnection, SqlitePool};
 use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
@@ -22,8 +22,8 @@ use crate::{
     error::ErrorReference,
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
     repository::{
-        session_repo::{self, Session},
-        user_repo::{self, User, UserId},
+        session_repo::{self, Session, delete_expired_sessions},
+        user_repo::{self, User, UserId, get_by_id},
     },
 };
 
@@ -43,13 +43,29 @@ impl AsAuditEvent for UserLoggedInAuditData {
     const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Success;
 }
 
+/// No need to store the session id as only one session is allowed at the same
+/// time.
 #[derive(Serialize)]
 pub struct UserLoggedOutAuditData {
+    /// in seconds
     pub session_duration: u64,
 }
 
 impl AsAuditEvent for UserLoggedOutAuditData {
     const EVENT_TYPE: AuditEventType = AuditEventType::UserLoggedOut;
+    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Success;
+}
+
+/// No need to store the session id as only one session is allowed at the same
+/// time.
+#[derive(Serialize)]
+pub struct UserSessionExpiredAuditData {
+    /// in seconds
+    pub session_duration: u64,
+}
+
+impl AsAuditEvent for UserSessionExpiredAuditData {
+    const EVENT_TYPE: AuditEventType = AuditEventType::UserSessionExpired;
     const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Success;
 }
 
@@ -173,6 +189,32 @@ pub(crate) fn set_default_cookie_properties(cookie: &mut Cookie) {
     cookie.set_same_site(SameSite::Strict);
 }
 
+/// Delete all sessions that have expired
+pub(crate) async fn expire_sessions(conn: &mut SqliteConnection) -> Result<(), APIError> {
+    let mut tx = conn.begin().await?;
+    let removed_sessions: Vec<Session> = delete_expired_sessions(&mut tx).await?;
+
+    for session in removed_sessions {
+        let user = get_by_id(&mut tx, session.user_id())
+            .await?
+            .expect("user must exist since session for this user exists");
+
+        AuditService::new_anon()
+            .with_user(user)
+            .log(
+                &mut tx,
+                &UserSessionExpiredAuditData {
+                    session_duration: session.duration().as_secs(),
+                },
+                None,
+            )
+            .await?;
+    }
+
+    tx.commit().await?;
+    Ok(())
+}
+
 /// Login endpoint, authenticates a user and creates a new session + session cookie
 #[utoipa::path(
     post,
@@ -220,7 +262,7 @@ async fn login(
     let mut tx = pool.begin_immediate().await?;
 
     // Remove expired sessions, we do this after a login to prevent the necessity of periodical cleanup jobs
-    session_repo::delete_expired_sessions(&mut tx).await?;
+    expire_sessions(&mut tx).await?;
 
     // Remove possible old session for this user
     session_repo::delete_user_session(&mut tx, user.id()).await?;

@@ -276,6 +276,7 @@ fn list_unique_highest_average_assigned_seats<LN: Copy + Eq>(
 
 enum ListStandings<'a, LN> {
     Completed(Vec<&'a ListStanding<LN>>),
+    CompletedWithDrawingLots(Vec<&'a ListStanding<LN>>, ListDrawingLotsVariant<LN>),
     DrawingLotsRequired(ListDrawingLotsVariant<LN>),
 }
 
@@ -289,6 +290,7 @@ enum ListStandings<'a, LN> {
 /// a drawing of lots is required.
 ///
 /// This function will always return at least one group.
+#[expect(clippy::cognitive_complexity)]
 fn lists_with_highest_average<'a, 'b, LN: Copy + Debug + Eq>(
     standings: impl Iterator<Item = &'a ListStanding<LN>>,
     available_residual_seats: u32,
@@ -358,7 +360,12 @@ fn lists_with_highest_average<'a, 'b, LN: Copy + Debug + Eq>(
                 "Unknown list number".to_string(),
             ))?;
 
-        Ok(ListStandings::Completed(vec![list]))
+        debug!(
+            "Assigned seat to list {:?} after drawing of lots",
+            list.list_number
+        );
+
+        Ok(ListStandings::CompletedWithDrawingLots(vec![list], variant))
     } else {
         Ok(ListStandings::Completed(lists))
     }
@@ -371,6 +378,7 @@ fn lists_with_highest_average<'a, 'b, LN: Copy + Debug + Eq>(
 /// a drawing of lots is required.
 ///
 /// This function will always return at least one group.
+#[expect(clippy::cognitive_complexity)]
 fn lists_with_largest_remainder<'a, 'b, LN: Copy + Debug + Eq>(
     standings: impl Iterator<Item = &'a ListStanding<LN>>,
     available_residual_seats: u32,
@@ -439,7 +447,12 @@ fn lists_with_largest_remainder<'a, 'b, LN: Copy + Debug + Eq>(
                 "Unknown list number".to_string(),
             ))?;
 
-        Ok(ListStandings::Completed(vec![list]))
+        debug!(
+            "Assigned seat to list {:?} after drawing of lots",
+            list.list_number
+        );
+
+        Ok(ListStandings::CompletedWithDrawingLots(vec![list], variant))
     } else {
         Ok(ListStandings::Completed(lists))
     }
@@ -507,19 +520,28 @@ fn step_assign_remainder_using_highest_averages<'a, 'b, LN: Copy + Debug + Eq + 
         .peekable();
 
     if qualifying_for_highest_average.peek().is_some() {
-        let selected_lists = match lists_with_highest_average(
+        let (selected_list, list_options) = match lists_with_highest_average(
             qualifying_for_highest_average,
             residual_seats,
             residual_seat_number,
             lists_drawn,
         )? {
-            ListStandings::Completed(lists) => lists,
+            ListStandings::Completed(lists) => {
+                let list_options = lists.iter().map(|list| list.list_number).collect();
+                (lists[0], list_options)
+            }
+            ListStandings::CompletedWithDrawingLots(lists, variant) => {
+                let list_options = match variant {
+                    ListDrawingLotsVariant::HighestAverageResidualSeat(variant) => variant.options,
+                    _ => unreachable!("unexpected list drawing lots variant for highest average"),
+                };
+                (lists[0], list_options)
+            }
             ListStandings::DrawingLotsRequired(variant) => {
                 return Ok(ResidualSeat::DrawingLotsRequired(variant));
             }
         };
 
-        let selected_list = selected_lists[0];
         let assigned_seat = HighestAverageAssignedSeat {
             selected_list_number: selected_list.list_number,
             list_assigned: list_assigned_from_previous_step(
@@ -531,7 +553,7 @@ fn step_assign_remainder_using_highest_averages<'a, 'b, LN: Copy + Debug + Eq + 
                     SeatChange::is_changed_by_highest_average_assignment
                 },
             ),
-            list_options: selected_lists.iter().map(|list| list.list_number).collect(),
+            list_options,
             list_exhausted: exhausted_list_numbers.to_vec(),
             votes_per_seat: selected_list.next_votes_per_seat,
         };
@@ -572,19 +594,30 @@ fn step_assign_remainder_using_largest_remainder<'a, 'b, LN: Copy + Debug + Eq>(
     // If there is at least one element in the iterator, we know we can still do a largest remainder assignment
     if qualifying_for_remainder.peek().is_some() {
         debug!("Assign residual seat using largest remainders method");
-        let selected_lists = match lists_with_largest_remainder(
+        let (selected_list, list_options) = match lists_with_largest_remainder(
             qualifying_for_remainder,
             residual_seats,
             residual_seat_number,
             lists_drawn,
         )? {
-            ListStandings::Completed(lists) => lists,
+            ListStandings::Completed(lists) => {
+                let list_options = lists.iter().map(|list| list.list_number).collect();
+                (lists[0], list_options)
+            }
+            ListStandings::CompletedWithDrawingLots(lists, variant) => {
+                let list_options = match variant {
+                    ListDrawingLotsVariant::LargestRemainderResidualSeat(variant) => {
+                        variant.options
+                    }
+                    _ => unreachable!("unexpected list drawing lots variant for largest remainder"),
+                };
+                (lists[0], list_options)
+            }
             ListStandings::DrawingLotsRequired(variant) => {
                 return Ok(ResidualSeat::DrawingLotsRequired(variant));
             }
         };
 
-        let selected_list = selected_lists[0];
         Ok(ResidualSeat::SeatChange(
             SeatChange::LargestRemainderAssignment(LargestRemainderAssignedSeat {
                 selected_list_number: selected_list.list_number,
@@ -593,7 +626,7 @@ fn step_assign_remainder_using_largest_remainder<'a, 'b, LN: Copy + Debug + Eq>(
                     previous_steps,
                     SeatChange::is_changed_by_largest_remainder_assignment,
                 ),
-                list_options: selected_lists.iter().map(|list| list.list_number).collect(),
+                list_options,
                 remainder_votes: selected_list.remainder_votes,
             }),
         ))

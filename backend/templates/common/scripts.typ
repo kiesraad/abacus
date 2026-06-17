@@ -759,7 +759,7 @@
               if step.change.selected_list_number == list_seat_assignment.number {
                 text(weight: "semibold")[fmt-number(value, zero: "0")]
               } else {
-                fmt-number(value, zero: "0")
+                [fmt-number(value, zero: "0")]
               }
             })
           }),

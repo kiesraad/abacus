@@ -175,16 +175,31 @@ pub(crate) async fn delete(
     Ok(())
 }
 
-/// Delete a session for a certain user
+/// Delete the single user session of the given user. *Only call via
+/// `remove_user_session`* since the removed session needs to be logged.
+// This function is needed in this module since `Session` has private fields.
 pub(crate) async fn delete_user_session(
     conn: &mut SqliteConnection,
     user_id: UserId,
-) -> Result<(), sqlx::Error> {
-    sqlx::query!("DELETE FROM sessions WHERE user_id = ?", user_id)
-        .execute(conn)
-        .await?;
-
-    Ok(())
+) -> Result<Option<Session>, sqlx::Error> {
+    let mut sessions = sqlx::query_as!(
+        Session,
+        r#"
+                         DELETE FROM sessions WHERE user_id = ?
+                         RETURNING user_id AS "user_id: _",
+                                   session_key AS "session_key: _",
+                                   user_agent AS "user_agent: _",
+                                   ip_address AS "ip_address: _",
+                                   expires_at AS "expires_at: _",
+                                   created_at AS "created_at: _"
+                        "#,
+        user_id
+    )
+    .fetch_all(conn)
+    .await?;
+    let opt_session = sessions.pop();
+    assert!(sessions.is_empty());
+    Ok(opt_session)
 }
 
 /// Delete all sessions that have expired.  *Only call via `expire_sessions`* since the

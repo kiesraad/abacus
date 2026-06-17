@@ -222,7 +222,7 @@ Met de kiesdeler wordt de zetelverdeling bepaald. De kiesdeler is het aantal ste
     table.cell(header_text([Kiesdeler])),
   ),
   table.hline(stroke: 1pt + black),
-  table.cell(align: right, [#input.summary.votes_counts.total_votes_candidates_count]),
+  table.cell(align: right, fmt-number(input.summary.votes_counts.total_votes_candidates_count, zero: "0")),
   table.cell(align: center, [÷]),
   table.cell(align: center, [#input.election.number_of_seats]),
   table.cell(align: center, [=]),

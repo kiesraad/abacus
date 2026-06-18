@@ -3,7 +3,7 @@
 //! Self-signed certificate authority for serving Abacus over HTTPS.
 //! Certificates are generated with rcgen with the aws-lc-rs backend.
 
-use std::{fs, path::Path};
+use std::{fs, path::Path, sync::Arc};
 
 use chrono::{DateTime, Datelike, Duration, Utc};
 use rcgen::{
@@ -34,6 +34,20 @@ pub struct TlsCertificates {
     pub ca: CaCertificate,
     pub leaf_cert: CertificateDer<'static>,
     pub leaf_key: PrivateKeyDer<'static>,
+}
+
+impl TlsCertificates {
+    /// Build the rustls server config with the leaf certificate.
+    pub fn server_config(&self) -> Result<Arc<rustls::ServerConfig>, AppError> {
+        let provider = Arc::new(rustls::crypto::aws_lc_rs::default_provider());
+        let config = rustls::ServerConfig::builder_with_provider(provider)
+            .with_safe_default_protocol_versions()
+            .map_err(tls_err)?
+            .with_no_client_auth()
+            .with_single_cert(vec![self.leaf_cert.clone()], self.leaf_key.clone_key())
+            .map_err(tls_err)?;
+        Ok(Arc::new(config))
+    }
 }
 
 /// Load or generate the CA and create a new leaf certificate
@@ -154,7 +168,7 @@ fn create_leaf(
     let cert = params.signed_by(&leaf_key, issuer).map_err(tls_err)?;
     let cert_der = cert.der().clone();
     tracing::info!(
-        "Created a new server certificate (SHA-256 fingerprint {})",
+        "Created a new server certificate for {subjects:?} (SHA-256 fingerprint {})",
         fingerprint(&cert_der),
     );
     let key_der = PrivateKeyDer::Pkcs8(PrivatePkcs8KeyDer::from(pkcs8));
@@ -249,6 +263,11 @@ mod tests {
             PrivateKeyDer::Pkcs8(_),
             "leaf key should be PKCS#8"
         );
+
+        // the leaf certificate and key build a valid rustls server config
+        first
+            .server_config()
+            .expect("server config should build from the leaf certificate");
 
         // check that ca.cer is equal to the returned DER
         assert_eq!(fs::read(tls_dir.join(CA_CERT_DER)).unwrap(), first.ca.der);

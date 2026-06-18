@@ -99,6 +99,23 @@ Using a binary:
 abacus --airgap-detection
 ```
 
+### TLS (HTTPS)
+
+Production builds are compiled with the `tls` feature, which makes Abacus serve
+HTTPS only.
+
+On startup Abacus loads (or, on first run, generates) a local certificate
+authority under the directory given by `--tls-dir` (defaults to `tls`). A fresh
+server (leaf) certificate is created in memory on every start, signed by the CA
+and covering `localhost`, `abacus.local`, and all routable LAN addresses.
+
+To trust the server, import the CA into the client trust store: `ca.pem` on
+Linux/macOS/Firefox, `ca.cer` (DER) on Windows.
+
+With the `tls` feature enabled, the default port is 8443 in debug builds and 443
+in release builds. Binding to 443 requires elevated privileges (e.g. the
+`CAP_NET_BIND_SERVICE` capability on Linux).
+
 ### Building for various platforms
 
 You can use [`cross`](https://github.com/cross-rs/cross) to compile for different architectures.
@@ -164,6 +181,8 @@ For TLS (HTTPS) support, when the `tls` feature is enabled, the following depend
 - `rcgen`: X.509 certificate/DER generation (`aws-lc-rs` backend)
 - `rustls-pki-types`: shared certificate and private-key types, and PEM decoding.
 - `if-addrs`: enumerating LAN IP addresses for the TLS certificate subject.
+- `rustls`: TLS implementation, on the audited `aws-lc-rs` provider.
+- `axum-server`: HTTPS serving for `axum`, with graceful shutdown.
 
 Additionally, the following development dependencies are used:
 
@@ -228,7 +247,7 @@ Options:
 ```
 
 Note that airgap-detection is forced in our (pre-)releases.
-For release builds the default port number is 80.
+For release builds the default port number is 80, or 443 when TLS is enabled.
 
 A development build also supports the following arguments:
 

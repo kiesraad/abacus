@@ -59,26 +59,40 @@ pub struct AppState {
     airgap_detection: AirgapDetection,
 }
 
+/// Start airgap detection if enabled, logging which path was taken.
+fn setup_airgap_detection(pool: &SqlitePool, enable: bool) -> AirgapDetection {
+    if enable {
+        info!("Airgap detection is enabled, starting airgap detection task...");
+        AirgapDetection::start(pool.clone())
+    } else {
+        warn!("Airgap detection is disabled, this is not allowed in production.");
+        AirgapDetection::nop()
+    }
+}
+
+/// Log startup, start airgap detection, and build the router shared by the
+/// HTTP and HTTPS servers.
+fn build_app(pool: &SqlitePool, enable_airgap_detection: bool) -> Result<axum::Router, AppError> {
+    info!("Starting Abacus (version {})", env!("ABACUS_GIT_VERSION"));
+    let airgap_detection = setup_airgap_detection(pool, enable_airgap_detection);
+    router::create_router(pool.clone(), airgap_detection)
+}
+
+/// Close the database pool (flushing SQLite WAL/shm) and log a clean shutdown.
+async fn close_and_log(pool: SqlitePool) {
+    pool.close().await;
+    info!("Abacus has shut down gracefully.");
+}
+
 /// Start the API server on the given port, using the given database pool.
-#[allow(clippy::cognitive_complexity)]
 pub async fn start_server(
     pool: SqlitePool,
     listener: TcpListener,
     enable_airgap_detection: bool,
 ) -> Result<(), AppError> {
-    info!("Starting Abacus (version {})", env!("ABACUS_GIT_VERSION"));
-    let airgap_detection = if enable_airgap_detection {
-        info!("Airgap detection is enabled, starting airgap detection task...");
+    let app = build_app(&pool, enable_airgap_detection)?;
 
-        AirgapDetection::start(pool.clone())
-    } else {
-        warn!("Airgap detection is disabled, this is not allowed in production.");
-
-        AirgapDetection::nop()
-    };
-
-    let app = router::create_router(pool.clone(), airgap_detection)?;
-
+    warn!("TLS is disabled, serving Abacus over plain HTTP. This is not allowed in production.");
     info!("Starting Abacus on http://{}", listener.local_addr()?);
     let listener = listener.tap_io(|tcp_stream| {
         if let Err(err) = tcp_stream.set_nodelay(true) {
@@ -93,15 +107,55 @@ pub async fn start_server(
     .with_graceful_shutdown(shutdown_signal())
     .await?;
 
-    // close the database, this will flush the shm and wal files for sqlite
-    pool.close().await;
-
-    info!("Abacus has shut down gracefully.");
+    close_and_log(pool).await;
 
     Ok(())
 }
 
-/// Graceful shutdown, useful for Docker containers.
+/// Start the API server over HTTPS using axum-server/rustls.
+#[cfg(feature = "tls")]
+#[allow(clippy::cognitive_complexity)]
+pub async fn start_server_tls(
+    pool: SqlitePool,
+    listener: TcpListener,
+    enable_airgap_detection: bool,
+    tls_config: std::sync::Arc<rustls::ServerConfig>,
+) -> Result<(), AppError> {
+    use std::time::Duration;
+
+    use axum_server::{
+        accept::NoDelayAcceptor,
+        tls_rustls::{RustlsAcceptor, RustlsConfig},
+    };
+
+    let app = build_app(&pool, enable_airgap_detection)?;
+
+    info!("Starting Abacus on https://{}", listener.local_addr()?);
+
+    // Set up graceful shutdown from the existing signal handler
+    let handle = axum_server::Handle::new();
+    let shutdown_handle = handle.clone();
+    tokio::spawn(async move {
+        shutdown_signal().await;
+        shutdown_handle.graceful_shutdown(Some(Duration::from_secs(10)));
+    });
+
+    // Serve Abacus using the axum-server/rustls acceptor
+    let acceptor =
+        RustlsAcceptor::new(RustlsConfig::from_config(tls_config)).acceptor(NoDelayAcceptor::new());
+    let std_listener = listener.into_std()?;
+    axum_server::from_tcp(std_listener)?
+        .acceptor(acceptor)
+        .handle(handle)
+        .serve(app.into_make_service_with_connect_info::<SocketAddr>())
+        .await?;
+
+    close_and_log(pool).await;
+
+    Ok(())
+}
+
+/// Graceful shutdown signal handler.
 ///
 /// Copied from the
 /// [axum graceful-shutdown example](https://github.com/tokio-rs/axum/blob/6318b57fda6b524b4d3c7909e07946e2b246ebd2/examples/graceful-shutdown/src/main.rs)
@@ -399,5 +453,130 @@ mod test {
         .await;
 
         assert!(matches!(result, Err(AppError::DatabaseReadOnly(_))));
+    }
+
+    /// TLS tests
+    #[cfg(feature = "tls")]
+    mod tls {
+        use std::net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr};
+
+        use reqwest::StatusCode;
+        use sqlx::SqlitePool;
+        use test_log::test;
+        use tokio::{net::TcpListener, task::JoinHandle};
+
+        use crate::{infra::audit_log, infra::tls::load_or_generate, start_server_tls};
+
+        /// Helper to start an HTTPS server on `bind_addr` with a new CA+leaf certificate
+        async fn spawn_https_server(
+            pool: SqlitePool,
+            bind_addr: &str,
+        ) -> (SocketAddr, String, JoinHandle<()>) {
+            let dir = tempfile::tempdir().unwrap();
+            let certificates = load_or_generate(&dir.path().join("tls")).unwrap();
+            let ca_pem = certificates.ca.pem.clone();
+            let server_config = certificates.server_config().unwrap();
+
+            let listener = TcpListener::bind(bind_addr).await.unwrap();
+            let addr = listener.local_addr().unwrap();
+            let task = tokio::spawn(async move {
+                start_server_tls(pool, listener, false, server_config)
+                    .await
+                    .unwrap();
+            });
+            (addr, ca_pem, task)
+        }
+
+        /// A reqwest client that trusts only the given CA (no system roots).
+        fn client_trusting(ca_pem: &str) -> reqwest::Client {
+            let ca = reqwest::Certificate::from_pem(ca_pem.as_bytes()).unwrap();
+            reqwest::Client::builder()
+                .tls_certs_only([ca])
+                .build()
+                .unwrap()
+        }
+
+        /// Assert that an HTTPS server is reachable and a login succeeds
+        async fn assert_login_works(pool: SqlitePool, bind_addr: &str, expected_ip: IpAddr) {
+            let (addr, ca_pem, task) = spawn_https_server(pool.clone(), bind_addr).await;
+            let base = format!("https://{addr}");
+            let client = client_trusting(&ca_pem);
+
+            // account endpoint can be loaded without TLS error
+            let account = client
+                .get(format!("{base}/api/account"))
+                .send()
+                .await
+                .unwrap();
+            assert_eq!(
+                account.status(),
+                StatusCode::UNAUTHORIZED,
+                "leaf must chain to the trusted CA"
+            );
+
+            // A valid login over HTTPS succeeds
+            let login = client
+                .post(format!("{base}/api/login"))
+                .json(&serde_json::json!({"username": "admin1", "password": "Admin1Password01"}))
+                .send()
+                .await
+                .unwrap();
+            assert_eq!(
+                login.status(),
+                StatusCode::OK,
+                "login over HTTPS should succeed"
+            );
+
+            // Login audit event records correct client IP
+            let mut conn = pool.acquire().await.unwrap();
+            let events = audit_log::list_all(&mut conn).await.unwrap();
+            let last = events.last().expect("there should be an audit event");
+            assert_eq!(
+                last.ip(),
+                Some(expected_ip),
+                "the real client IP should reach the audit log"
+            );
+            assert_eq!(last.username(), Some("admin1"));
+
+            task.abort();
+            let _ = task.await;
+        }
+
+        #[test(sqlx::test(fixtures("../fixtures/users.sql")))]
+        async fn test_login_ipv4(pool: SqlitePool) {
+            assert_login_works(pool, "127.0.0.1:0", IpAddr::V4(Ipv4Addr::LOCALHOST)).await;
+        }
+
+        #[test(sqlx::test(fixtures("../fixtures/users.sql")))]
+        async fn test_login_ipv6(pool: SqlitePool) {
+            assert_login_works(pool, "[::1]:0", IpAddr::V6(Ipv6Addr::LOCALHOST)).await;
+        }
+
+        /// A client that has not imported the local CA must fail the TLS handshake.
+        #[test(sqlx::test(fixtures("../fixtures/users.sql")))]
+        async fn test_https_client_fails_without_ca(pool: SqlitePool) {
+            let (addr, _ca_pem, task) = spawn_https_server(pool, "127.0.0.1:0").await;
+
+            // Default client does not trust our local test CA
+            let client = reqwest::Client::new();
+            let err = client
+                .get(format!("https://{addr}/api/account"))
+                .send()
+                .await
+                .expect_err("a client that does not trust the local CA must fail the handshake");
+
+            // Connection should fail during the TLS handshake
+            assert!(
+                err.is_connect(),
+                "expected a connect-phase error, got: {err:?}"
+            );
+            assert!(
+                format!("{err:?}").contains("UnknownIssuer"),
+                "expected an untrusted-issuer certificate error, got: {err:?}"
+            );
+
+            task.abort();
+            let _ = task.await;
+        }
     }
 }

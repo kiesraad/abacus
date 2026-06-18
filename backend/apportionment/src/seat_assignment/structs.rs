@@ -101,7 +101,7 @@ pub struct ListStanding<LN> {
     /// The number of full seats this list got assigned
     full_seats: u32,
     /// The current number of residual seats this list got assigned
-    pub residual_seats: u32,
+    residual_seats: u32,
 }
 
 impl<LN: Debug> ListStanding<LN> {

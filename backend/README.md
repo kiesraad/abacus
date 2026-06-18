@@ -98,24 +98,15 @@ Using a binary:
 ```shell
 abacus --airgap-detection
 ```
-### TLS
 
-In production, Abacus must be built with TLS enabled. To do this, enable the feature `tls`:
+### TLS (HTTPS)
+
+In production, Abacus must be built with TLS enabled, which makes Abacus serve
+HTTPS only. To do this, enable the `tls` feature:
 
 ```shell
 cargo build --release --features tls
 ```
-
-On Windows, AWS Libcrypto has some [build requirements](https://aws.github.io/aws-lc-rs/requirements/windows.html):
-- C/C++ Compiler: these build tools have likely been installed during installation of Rust
-- NASM, two options:
-  - Use the installer
-  - Or, use prebuilt NASM objects: `set AWS_LC_SYS_PREBUILT_NASM=1`
-
-### TLS (HTTPS)
-
-Production builds are compiled with the `tls` feature, which makes Abacus serve
-HTTPS only.
 
 On startup Abacus loads (or, on first run, generates) a local certificate
 authority under the directory given by `--tls-dir` (defaults to `tls`). A fresh
@@ -128,6 +119,14 @@ Linux/macOS/Firefox, `ca.cer` (DER) on Windows.
 With the `tls` feature enabled, the default port is 8443 in debug builds and 443
 in release builds. Binding to 443 requires elevated privileges (e.g. the
 `CAP_NET_BIND_SERVICE` capability on Linux).
+
+#### Building with TLS enabled on Windows
+
+On Windows, AWS Libcrypto has some [build requirements](https://aws.github.io/aws-lc-rs/requirements/windows.html):
+- C/C++ Compiler: these build tools have likely been installed during installation of Rust
+- NASM, two options:
+  - Use the installer
+  - Or, use prebuilt NASM objects: `set AWS_LC_SYS_PREBUILT_NASM=1`
 
 ### Building for various platforms
 

@@ -107,8 +107,8 @@ function renderHighestAverageOrLargestRemainderDrawingLotsAlert(
                 ? t("apportionment.average_number")
                 : t("apportionment.remainder_of"),
           })}
-          {tx("apportionment.drawing_lots_required_alert.list")}
         </p>
+        {tx("apportionment.drawing_lots_required_alert.list")}
         <div className={cls.alertButtons}>
           {/* TODO: Update link to drawing lots page! */}
           <Button.Link size="md" to=".">

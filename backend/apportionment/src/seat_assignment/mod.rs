@@ -671,17 +671,12 @@ pub(crate) mod tests {
         }
 
 
-        /// Total votest = 1000, quota = 1000/7 = 101 ??
-        /// list 1: floor(500/101) = 4 full seats
-        /// list 2: floor(310/101) = 3 full seats
-        /// list 3: floor(200/101) = 1 full seats
-        /// total full seats = 8, residual seats = 10 - 8 = 2
-        /// One party needs exactly 50% of the votes. while still having residual seats to give after assignment.
+        /// Article P 9 Kieswet requires a strict majority of votes (> 50%), so exactly 50% should not trigger it.
         #[test]
         fn test_exactly_half_of_votes_should_not_trigger_absolute_majority_reassignment() {
             let input = seat_assignment_fixture_with_default_50_candidates(
                 7,
-                vec![500, 300, 200], // Need to figure out proper 50% split here that does residual seats as well
+                vec![500, 300, 200],
             );
             let SeatAssignment::Completed(result) = seat_assignment(&input).unwrap() else {
                 panic!("should be Completed");

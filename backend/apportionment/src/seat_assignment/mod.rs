@@ -670,6 +670,25 @@ pub(crate) mod tests {
             assert!(result.warnings().is_empty());
         }
 
+
+        /// Total votest = 1000, quota = 1000/7 = 101 ??
+        /// list 1: floor(500/101) = 4 full seats
+        /// list 2: floor(310/101) = 3 full seats
+        /// list 3: floor(200/101) = 1 full seats
+        /// total full seats = 8, residual seats = 10 - 8 = 2
+        /// One party needs exactly 50% of the votes. while still having residual seats to give after assignment.
+        #[test]
+        fn test_exactly_half_of_votes_should_not_trigger_absolute_majority_reassignment() {
+            let input = seat_assignment_fixture_with_default_50_candidates(
+                7,
+                vec![500, 300, 200], // Need to figure out proper 50% split here that does residual seats as well
+            );
+            let SeatAssignment::Completed(result) = seat_assignment(&input).unwrap() else {
+                panic!("should be Completed");
+            };
+            assert!(!result.steps.iter().any(|step| step.change.is_changed_by_absolute_majority_reassignment()));
+        }
+
         mod drawing_of_lots {
             use test_log::test;
 

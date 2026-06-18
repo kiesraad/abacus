@@ -61,7 +61,7 @@ pub(crate) fn seat_assignment<T: ApportionmentInput>(input: &T) -> SeatAssignmen
 
     let full_seats = initial_standing
         .iter()
-        .map(|list| list.full_seats)
+        .map(|list| list.full_seats())
         .sum::<u32>();
     let residual_seats = input.number_of_seats() - full_seats;
 
@@ -104,7 +104,7 @@ pub(crate) fn seat_assignment<T: ApportionmentInput>(input: &T) -> SeatAssignmen
             total_votes_cast,
             input.list_votes(),
             &last_step.change.list_assigned(),
-            current_standings,
+            current_standings.clone(),
         )? {
             AbsoluteMajority::Completed(cumulative_standings, assigned_seat) => {
                 (cumulative_standings, assigned_seat)
@@ -124,12 +124,12 @@ pub(crate) fn seat_assignment<T: ApportionmentInput>(input: &T) -> SeatAssignmen
             }
         }
     } else {
-        (current_standings, None)
+        (current_standings.clone(), None)
     };
     if let Some(assigned_seat) = assigned_seat {
         // add the absolute majority change to the remainder assignment steps
         steps.push(SeatChangeStep {
-            standings: cumulative_standings.clone(),
+            standings: current_standings,
             residual_seat_number: None,
             change: assigned_seat,
         });
@@ -178,11 +178,11 @@ pub(crate) fn seat_assignment<T: ApportionmentInput>(input: &T) -> SeatAssignmen
 
     let final_full_seats = final_standing
         .iter()
-        .map(|list| list.full_seats)
+        .map(|list| list.full_seats())
         .sum::<u32>();
     let final_residual_seats = final_standing
         .iter()
-        .map(|list| list.residual_seats)
+        .map(|list| list.residual_seats())
         .sum::<u32>();
 
     Ok(SeatAssignment::Completed(SeatAssignmentDetails {
@@ -225,7 +225,7 @@ pub fn as_candidate_nomination_input<'a, T: ApportionmentInput>(
 
 /// Returns a vector containing just the list numbers from an iterator of the current standing
 fn list_numbers<LN: Copy>(standing: &[&ListStanding<LN>]) -> Vec<LN> {
-    standing.iter().map(|s| s.list_number).collect()
+    standing.iter().map(|s| s.list_number()).collect()
 }
 
 /// Returns the number of candidates of a list.
@@ -255,10 +255,10 @@ fn list_numbers_with_exhausted_seats<T: ListVotes>(
         .iter()
         .fold(vec![], |mut exhausted_list_numbers_and_seats, s| {
             let number_of_candidates =
-                get_number_of_candidates(input_list_votes, s.list_number, deceased_candidates);
+                get_number_of_candidates(input_list_votes, s.list_number(), deceased_candidates);
             if number_of_candidates.cmp(&s.total_seats()) == Ordering::Less {
                 exhausted_list_numbers_and_seats.push((
-                    s.list_number,
+                    s.list_number(),
                     number_of_candidates.abs_diff(s.total_seats()),
                 ))
             }
@@ -274,7 +274,7 @@ fn reassign_residual_seat_for_absolute_majority<T: ListVotes>(
     total_votes_cast: u32,
     list_votes: &[T],
     lists_last_residual_seat: &[T::ListNumber],
-    standings: Vec<ListStanding<T::ListNumber>>,
+    previous_standings: Vec<ListStanding<T::ListNumber>>,
 ) -> AbsoluteMajorityResult<T::ListNumber> {
     let half_of_votes_count = Fraction::from(total_votes_cast) * Fraction::new(1, 2);
 
@@ -283,13 +283,13 @@ fn reassign_residual_seat_for_absolute_majority<T: ListVotes>(
         .iter()
         .find(|list| Fraction::from(list.total_votes()) > half_of_votes_count)
     else {
-        return Ok(AbsoluteMajority::Completed(standings, None));
+        return Ok(AbsoluteMajority::Completed(previous_standings, None));
     };
 
     let half_of_seats_count = Fraction::from(seats) * Fraction::new(1, 2);
-    let standing_of_list_with_majority_votes = standings
+    let standing_of_list_with_majority_votes = previous_standings
         .iter()
-        .find(|list_standing| list_standing.list_number == majority_list_votes.number())
+        .find(|list_standing| list_standing.list_number() == majority_list_votes.number())
         .expect("Standing exists");
 
     let list_seats = Fraction::from(standing_of_list_with_majority_votes.total_seats());
@@ -308,15 +308,19 @@ fn reassign_residual_seat_for_absolute_majority<T: ListVotes>(
         }
 
         // Reassign the seat
-        let mut standing = standings.clone();
-        for list_standing in &mut standing {
-            if list_standing.list_number == lists_last_residual_seat[0] {
-                list_standing.residual_seats -= 1
-            }
-            if list_standing.list_number == majority_list_votes.number() {
-                list_standing.residual_seats += 1
-            }
-        }
+        let mut current_standings = previous_standings.clone();
+
+        let from_list_standing = current_standings
+            .iter_mut()
+            .find(|list_standing| list_standing.list_number() == lists_last_residual_seat[0])
+            .expect("standing to remove residual seat from should exist");
+        from_list_standing.remove_residual_seat();
+
+        let to_list_standing = current_standings
+            .iter_mut()
+            .find(|list_standing| list_standing.list_number() == majority_list_votes.number())
+            .expect("standing to add residual seat to should exist");
+        to_list_standing.add_residual_seat();
 
         info!(
             "Seat first assigned to list {:?} has been reassigned to list {:?} in accordance with Article P 9 Kieswet",
@@ -324,7 +328,7 @@ fn reassign_residual_seat_for_absolute_majority<T: ListVotes>(
             majority_list_votes.number()
         );
         Ok(AbsoluteMajority::Completed(
-            standing,
+            current_standings,
             Some(SeatChange::AbsoluteMajorityReassignment(
                 AbsoluteMajorityReassignedSeat {
                     list_retracted_seat: lists_last_residual_seat[0],
@@ -333,7 +337,7 @@ fn reassign_residual_seat_for_absolute_majority<T: ListVotes>(
             )),
         ))
     } else {
-        Ok(AbsoluteMajority::Completed(standings, None))
+        Ok(AbsoluteMajority::Completed(previous_standings, None))
     }
 }
 
@@ -361,16 +365,18 @@ fn reassign_residual_seats_for_exhausted_lists<'a, T: ListVotes>(
             seats_to_reassign += seats;
             let mut full_seat: bool = false;
             for _ in 1..=seats {
-                for list_standing in &mut current_standings {
-                    if list_standing.list_number == list_number {
-                        if list_standing.residual_seats > 0 {
-                            list_standing.residual_seats -= 1;
-                        } else {
-                            list_standing.full_seats -= 1;
-                            full_seat = true;
-                        }
-                    }
+                let list_standing = current_standings
+                    .iter_mut()
+                    .find(|list_standing| list_standing.list_number() == list_number)
+                    .expect("list standing should exist");
+
+                if list_standing.residual_seats() > 0 {
+                    list_standing.remove_residual_seat();
+                } else {
+                    list_standing.remove_full_seat();
+                    full_seat = true;
                 }
+
                 info!(
                     "Seat first assigned to list {:?} has been removed and will be assigned to another list in accordance with Article P 10 Kieswet",
                     list_number
@@ -418,6 +424,7 @@ pub(crate) mod tests {
         seat_assignment::{
             ListStanding, get_total_seats_per_list_number_from_apportionment_result, list_numbers,
         },
+        test_helpers::{CandidateVotesMock, ListVotesMock},
     };
 
     fn check_total_seats_per_list<LN: Copy + Debug + PartialEq>(
@@ -432,14 +439,17 @@ pub(crate) mod tests {
     #[test]
     fn test_list_numbers() {
         let standings: Vec<ListStanding<u32>> = (2..=6)
-            .map(|n| ListStanding {
-                list_number: n,
-                votes_cast: 1249,
-                remainder_votes: Fraction::new(14975, 24),
-                meets_remainder_threshold: true,
-                next_votes_per_seat: Fraction::new(1249, 2),
-                full_seats: 1,
-                residual_seats: 0,
+            .map(|n| {
+                ListStanding::new(
+                    &ListVotesMock {
+                        number: n,
+                        candidate_votes: vec![CandidateVotesMock {
+                            number: 1,
+                            votes: 1249,
+                        }],
+                    },
+                    Fraction::new(100, 1),
+                )
             })
             .collect();
         let standing: Vec<_> = standings.iter().collect();

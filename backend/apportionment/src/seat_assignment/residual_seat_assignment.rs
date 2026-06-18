@@ -43,7 +43,7 @@ pub fn assign_remainder<'b, T: ListVotes>(
         // votes or every list is exhausted. Any remaining seats will be reported as unassigned.
         let any_eligible = current_standings
             .iter()
-            .any(|s| s.votes_cast > 0 && !exhausted_list_numbers.contains(&s.list_number));
+            .any(|s| s.votes_cast() > 0 && !exhausted_list_numbers.contains(&s.list_number()));
         if !any_eligible {
             info!(
                 "No eligible lists remain, {} seat(s) left unassigned",
@@ -77,16 +77,12 @@ pub fn assign_remainder<'b, T: ListVotes>(
 
         // update the current standing by finding the selected group and
         // adding the residual seat to their tally
-        current_standings = current_standings
-            .into_iter()
-            .map(|s| {
-                if s.list_number == change.list_number_assigned() {
-                    s.add_residual_seat()
-                } else {
-                    s
-                }
-            })
-            .collect();
+        let list_standing = current_standings
+            .iter_mut()
+            .find(|s| s.list_number() == change.list_number_assigned())
+            .expect("should be able to find list standing");
+
+        list_standing.add_residual_seat();
 
         // add the update to the remainder assignment steps
         steps.push(SeatChangeStep {
@@ -114,11 +110,11 @@ fn list_assigned_from_previous_step<LN: Copy + Eq>(
         && previous_step
             .change
             .list_options()
-            .contains(&selected_list.list_number)
+            .contains(&selected_list.list_number())
     {
         list_assigned = previous_step.change.list_assigned()
     }
-    list_assigned.push(selected_list.list_number);
+    list_assigned.push(selected_list.list_number());
     list_assigned
 }
 
@@ -148,9 +144,9 @@ where
 {
     standings.fold(vec![], |mut list_numbers_without_empty_seats, s| {
         let number_of_candidates =
-            get_number_of_candidates(input_list_votes, s.list_number, deceased_candidates);
+            get_number_of_candidates(input_list_votes, s.list_number(), deceased_candidates);
         if number_of_candidates.cmp(&s.total_seats()) == Ordering::Equal {
-            list_numbers_without_empty_seats.push(s.list_number)
+            list_numbers_without_empty_seats.push(s.list_number())
         }
         list_numbers_without_empty_seats
     })
@@ -223,14 +219,14 @@ fn list_standings_qualifying_for_largest_remainder<'a, LN: Copy + Eq>(
     exhausted_list_numbers: &[LN],
 ) -> impl Iterator<Item = &'a ListStanding<LN>> {
     standings.iter().filter(|&s| {
-        s.votes_cast > 0
-            && s.meets_remainder_threshold
-            && !exhausted_list_numbers.contains(&s.list_number)
+        s.votes_cast() > 0
+            && s.meets_remainder_threshold()
+            && !exhausted_list_numbers.contains(&s.list_number())
             && list_qualifies_for_extra_seat(
-                list_largest_remainder_assigned_seats(previous_steps, s.list_number),
+                list_largest_remainder_assigned_seats(previous_steps, s.list_number()),
                 None,
                 previous_steps,
-                s.list_number,
+                s.list_number(),
             )
     })
 }
@@ -245,16 +241,16 @@ fn list_standings_qualifying_for_unique_highest_average<'a, LN: Copy + Eq>(
     exhausted_list_numbers: &[LN],
 ) -> impl Iterator<Item = &'a ListStanding<LN>> {
     standings.iter().filter(|&s| {
-        s.votes_cast > 0
-            && !exhausted_list_numbers.contains(&s.list_number)
+        s.votes_cast() > 0
+            && !exhausted_list_numbers.contains(&s.list_number())
             && list_qualifies_for_extra_seat(
-                list_largest_remainder_assigned_seats(previous_steps, s.list_number),
+                list_largest_remainder_assigned_seats(previous_steps, s.list_number()),
                 Some(list_unique_highest_average_assigned_seats(
                     previous_steps,
-                    s.list_number,
+                    s.list_number(),
                 )),
                 previous_steps,
-                s.list_number,
+                s.list_number(),
             )
     })
 }
@@ -301,12 +297,12 @@ fn lists_with_highest_average<'a, 'b, LN: Copy + Debug + Eq>(
         (Fraction::ZERO, vec![]),
         |(current_max, mut max_groups), s| {
             // If this average is higher than any previously seen, we reset the list of groups matching
-            if s.next_votes_per_seat > current_max {
-                (s.next_votes_per_seat, vec![s])
+            if s.next_votes_per_seat() > current_max {
+                (s.next_votes_per_seat(), vec![s])
             } else {
                 // If the next average seats for this list is the same as the
                 // max we add it to the list of groups that have that current maximum
-                if s.next_votes_per_seat == current_max {
+                if s.next_votes_per_seat() == current_max {
                     max_groups.push(s);
                 }
                 (current_max, max_groups)
@@ -353,7 +349,7 @@ fn lists_with_highest_average<'a, 'b, LN: Copy + Debug + Eq>(
 
         let list = lists
             .iter()
-            .find(|list| list.list_number == *list_drawn.drawn())
+            .find(|list| list.list_number() == *list_drawn.drawn())
             .ok_or(ApportionmentError::InvalidLotDrawing(
                 "Unknown list number".to_string(),
             ))?;
@@ -382,12 +378,12 @@ fn lists_with_largest_remainder<'a, 'b, LN: Copy + Debug + Eq>(
         (Fraction::ZERO, vec![]),
         |(current_max, mut max_groups), s| {
             // If this remainder is higher than any previously seen, we reset the list of groups matching
-            if s.remainder_votes > current_max {
-                (s.remainder_votes, vec![s])
+            if s.remainder_votes() > current_max {
+                (s.remainder_votes(), vec![s])
             } else {
                 // If the remainder for this list is the same as the
                 // max we add it to the list of groups that have that current maximum
-                if s.remainder_votes == current_max {
+                if s.remainder_votes() == current_max {
                     max_groups.push(s);
                 }
                 (current_max, max_groups)
@@ -434,7 +430,7 @@ fn lists_with_largest_remainder<'a, 'b, LN: Copy + Debug + Eq>(
 
         let list = lists
             .iter()
-            .find(|list| list.list_number == *list_drawn.drawn())
+            .find(|list| list.list_number() == *list_drawn.drawn())
             .ok_or(ApportionmentError::InvalidLotDrawing(
                 "Unknown list number".to_string(),
             ))?;
@@ -503,7 +499,7 @@ fn step_assign_remainder_using_highest_averages<'a, 'b, LN: Copy + Debug + Eq + 
     // and without lists that have zero votes cast.
     let mut qualifying_for_highest_average = standings
         .into_iter()
-        .filter(|&s| s.votes_cast > 0 && !exhausted_list_numbers.contains(&s.list_number))
+        .filter(|&s| s.votes_cast() > 0 && !exhausted_list_numbers.contains(&s.list_number()))
         .peekable();
 
     if qualifying_for_highest_average.peek().is_some() {
@@ -521,7 +517,7 @@ fn step_assign_remainder_using_highest_averages<'a, 'b, LN: Copy + Debug + Eq + 
 
         let selected_list = selected_lists[0];
         let assigned_seat = HighestAverageAssignedSeat {
-            selected_list_number: selected_list.list_number,
+            selected_list_number: selected_list.list_number(),
             list_assigned: list_assigned_from_previous_step(
                 selected_list,
                 previous_steps,
@@ -531,9 +527,12 @@ fn step_assign_remainder_using_highest_averages<'a, 'b, LN: Copy + Debug + Eq + 
                     SeatChange::is_changed_by_highest_average_assignment
                 },
             ),
-            list_options: selected_lists.iter().map(|list| list.list_number).collect(),
+            list_options: selected_lists
+                .iter()
+                .map(|list| list.list_number())
+                .collect(),
             list_exhausted: exhausted_list_numbers.to_vec(),
-            votes_per_seat: selected_list.next_votes_per_seat,
+            votes_per_seat: selected_list.next_votes_per_seat(),
         };
         if unique {
             Ok(ResidualSeat::SeatChange(
@@ -587,14 +586,17 @@ fn step_assign_remainder_using_largest_remainder<'a, 'b, LN: Copy + Debug + Eq>(
         let selected_list = selected_lists[0];
         Ok(ResidualSeat::SeatChange(
             SeatChange::LargestRemainderAssignment(LargestRemainderAssignedSeat {
-                selected_list_number: selected_list.list_number,
+                selected_list_number: selected_list.list_number(),
                 list_assigned: list_assigned_from_previous_step(
                     selected_list,
                     previous_steps,
                     SeatChange::is_changed_by_largest_remainder_assignment,
                 ),
-                list_options: selected_lists.iter().map(|list| list.list_number).collect(),
-                remainder_votes: selected_list.remainder_votes,
+                list_options: selected_lists
+                    .iter()
+                    .map(|list| list.list_number())
+                    .collect(),
+                remainder_votes: selected_list.remainder_votes(),
             }),
         ))
     } else {

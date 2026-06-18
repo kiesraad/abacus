@@ -236,13 +236,13 @@ impl From<&apportionment::SeatChangeStep<PGNumber>> for SeatChangeStep {
                 .standings
                 .iter()
                 .map(|standing| ListStanding {
-                    list_number: standing.list_number,
-                    votes_cast: standing.votes_cast,
-                    remainder_votes: DisplayFraction::from(standing.remainder_votes),
-                    meets_remainder_threshold: standing.meets_remainder_threshold,
-                    next_votes_per_seat: DisplayFraction::from(standing.next_votes_per_seat),
-                    full_seats: standing.full_seats,
-                    residual_seats: standing.residual_seats,
+                    list_number: standing.list_number(),
+                    votes_cast: standing.votes_cast(),
+                    remainder_votes: DisplayFraction::from(standing.remainder_votes()),
+                    meets_remainder_threshold: standing.meets_remainder_threshold(),
+                    next_votes_per_seat: DisplayFraction::from(standing.next_votes_per_seat()),
+                    full_seats: standing.full_seats(),
+                    residual_seats: standing.residual_seats(),
                 })
                 .collect(),
         }

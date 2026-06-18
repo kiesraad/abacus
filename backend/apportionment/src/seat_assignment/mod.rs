@@ -78,7 +78,7 @@ pub(crate) fn seat_assignment<T: ApportionmentInput>(input: &T) -> SeatAssignmen
             &mut lists_drawn,
         )? {
             RemainderAssignment::Completed(steps, current_standings) => (steps, current_standings),
-            RemainderAssignment::DrawingLotsRequired(variant, steps) => {
+            RemainderAssignment::DrawingLotsRequired(variant, steps, standings) => {
                 return Ok(SeatAssignment::DrawingLotsRequired(
                     variant,
                     SeatAssignmentDetails {
@@ -87,7 +87,7 @@ pub(crate) fn seat_assignment<T: ApportionmentInput>(input: &T) -> SeatAssignmen
                         residual_seats,
                         quota,
                         steps,
-                        standings: Vec::new(),
+                        standings: standings.into_iter().map(Into::into).collect(),
                     },
                 ));
             }
@@ -104,7 +104,7 @@ pub(crate) fn seat_assignment<T: ApportionmentInput>(input: &T) -> SeatAssignmen
             total_votes_cast,
             input.list_votes(),
             &last_step.change.list_assigned(),
-            current_standings,
+            current_standings.clone(),
         )? {
             AbsoluteMajority::Completed(cumulative_standings, assigned_seat) => {
                 (cumulative_standings, assigned_seat)
@@ -118,7 +118,7 @@ pub(crate) fn seat_assignment<T: ApportionmentInput>(input: &T) -> SeatAssignmen
                         residual_seats,
                         quota,
                         steps: steps.clone(),
-                        standings: Vec::new(),
+                        standings: current_standings.into_iter().map(Into::into).collect(),
                     },
                 ));
             }
@@ -161,7 +161,7 @@ pub(crate) fn seat_assignment<T: ApportionmentInput>(input: &T) -> SeatAssignmen
         RemainderAssignment::Completed(final_steps, final_standing) => {
             (final_steps, final_standing)
         }
-        RemainderAssignment::DrawingLotsRequired(variant, steps) => {
+        RemainderAssignment::DrawingLotsRequired(variant, steps, standings) => {
             return Ok(SeatAssignment::DrawingLotsRequired(
                 variant,
                 SeatAssignmentDetails {
@@ -170,8 +170,7 @@ pub(crate) fn seat_assignment<T: ApportionmentInput>(input: &T) -> SeatAssignmen
                     residual_seats,
                     quota,
                     steps: steps.clone(),
-                    // TODO preliminary standings
-                    standings: Vec::new(),
+                    standings: standings.into_iter().map(Into::into).collect(),
                 },
             ));
         }
@@ -682,7 +681,8 @@ pub(crate) mod tests {
                     ListDrawingLotsVariant,
                 },
                 test_helpers::{
-                    ListDrawnMock, get_total_seats_from_apportionment_result,
+                    ListDrawnMock, get_standings_residual_seats,
+                    get_total_seats_from_apportionment_result,
                     seat_assignment_fixture_with_default_50_candidates,
                 },
             };
@@ -725,7 +725,10 @@ pub(crate) mod tests {
                     }
                 );
                 assert_eq!(preliminary_result.steps.len(), 3);
-                assert_eq!(preliminary_result.standings, vec![]);
+                assert_eq!(
+                    get_standings_residual_seats(&preliminary_result),
+                    vec![0, 1, 1, 1, 0, 0]
+                );
             }
 
             /// Apportionment with residual seats assigned with largest remainders method
@@ -766,7 +769,10 @@ pub(crate) mod tests {
                     }
                 );
                 assert_eq!(preliminary_result.steps.len(), 1);
-                assert_eq!(preliminary_result.standings, vec![]);
+                assert_eq!(
+                    get_standings_residual_seats(&preliminary_result),
+                    vec![1, 0, 0, 0, 0, 0, 0, 0]
+                );
 
                 // Lot drawn is 6
                 input.lists_drawn.push(ListDrawnMock { variant, drawn: 6 });
@@ -776,6 +782,11 @@ pub(crate) mod tests {
 
                 let total_seats = get_total_seats_from_apportionment_result(&result);
                 assert_eq!(total_seats, vec![7, 2, 2, 1, 1, 2, 0, 0]);
+
+                assert_eq!(
+                    get_standings_residual_seats(&result),
+                    vec![1, 0, 0, 0, 0, 1, 0, 0]
+                );
 
                 assert_eq!(result.steps.len(), 2);
                 assert_eq!(
@@ -836,7 +847,10 @@ pub(crate) mod tests {
                     }
                 );
                 assert_eq!(preliminary_result.steps.len(), 0);
-                assert_eq!(preliminary_result.standings, vec![]);
+                assert_eq!(
+                    get_standings_residual_seats(&preliminary_result),
+                    vec![0, 0, 0, 0, 0, 0]
+                );
 
                 // Drawing lots results in list 4
                 input.lists_drawn.push(ListDrawnMock { variant, drawn: 4 });
@@ -866,7 +880,10 @@ pub(crate) mod tests {
                     }
                 );
                 assert_eq!(preliminary_result.steps.len(), 1);
-                assert_eq!(preliminary_result.standings, vec![]);
+                assert_eq!(
+                    get_standings_residual_seats(&preliminary_result),
+                    vec![0, 0, 0, 1, 0, 0]
+                );
             }
         }
 
@@ -1692,7 +1709,8 @@ pub(crate) mod tests {
                     ListDrawingLotsVariant,
                 },
                 test_helpers::{
-                    ListDrawnMock, get_total_seats_from_apportionment_result,
+                    ListDrawnMock, get_standings_residual_seats,
+                    get_total_seats_from_apportionment_result,
                     seat_assignment_fixture_with_default_50_candidates,
                 },
             };
@@ -1737,7 +1755,10 @@ pub(crate) mod tests {
                     }
                 );
                 assert_eq!(preliminary_result.steps.len(), 6);
-                assert_eq!(preliminary_result.standings, vec![]);
+                assert_eq!(
+                    get_standings_residual_seats(&preliminary_result),
+                    vec![0, 1, 1, 1, 1, 1, 1, 0]
+                );
             }
 
             /// Apportionment with residual seats assigned with highest averages method
@@ -1778,7 +1799,10 @@ pub(crate) mod tests {
                     }
                 );
                 assert_eq!(preliminary_result.steps.len(), 1);
-                assert_eq!(preliminary_result.standings, vec![]);
+                assert_eq!(
+                    get_standings_residual_seats(&preliminary_result),
+                    vec![1, 0, 0, 0, 0, 0]
+                );
 
                 // Drawing lots results in list 4
                 input.lists_drawn.push(ListDrawnMock { variant, drawn: 4 });
@@ -1809,7 +1833,10 @@ pub(crate) mod tests {
                     }
                 );
                 assert_eq!(preliminary_result.steps.len(), 2);
-                assert_eq!(preliminary_result.standings, vec![]);
+                assert_eq!(
+                    get_standings_residual_seats(&preliminary_result),
+                    vec![1, 0, 0, 1, 0, 0]
+                );
             }
 
             /// Apportionment with residual seats assigned with highest averages method
@@ -1850,7 +1877,10 @@ pub(crate) mod tests {
                     }
                 );
                 assert_eq!(preliminary_result.steps.len(), 1);
-                assert_eq!(preliminary_result.standings, vec![]);
+                assert_eq!(
+                    get_standings_residual_seats(&preliminary_result),
+                    vec![1, 0, 0, 0]
+                );
 
                 // List 3 is drawn, add it to the input's lists_drawn and process again
                 input.lists_drawn.push(ListDrawnMock { variant, drawn: 3 });

@@ -317,7 +317,11 @@ pub type RemainderAssignmentResult<LN> = Result<RemainderAssignment<LN>, Apporti
 
 pub enum RemainderAssignment<LN> {
     Completed(Vec<SeatChangeStep<LN>>, Vec<ListStanding<LN>>),
-    DrawingLotsRequired(ListDrawingLotsVariant<LN>, Vec<SeatChangeStep<LN>>),
+    DrawingLotsRequired(
+        ListDrawingLotsVariant<LN>,
+        Vec<SeatChangeStep<LN>>,
+        Vec<ListStanding<LN>>,
+    ),
 }
 
 /// Result type for absolute majority reassignment: updated standings and optional seat change.

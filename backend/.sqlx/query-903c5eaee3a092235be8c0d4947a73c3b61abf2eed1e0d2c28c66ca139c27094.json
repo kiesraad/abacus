@@ -1,0 +1,50 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            UPDATE data_entries\n            SET state = ?, updated_at = CURRENT_TIMESTAMP\n            WHERE id = ?\n            RETURNING\n                id,\n                state,\n                updated_at\n        ",
+  "describe": {
+    "columns": [
+      {
+        "name": "id",
+        "ordinal": 0,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "data_entries",
+            "name": "id"
+          }
+        }
+      },
+      {
+        "name": "state",
+        "ordinal": 1,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "data_entries",
+            "name": "state"
+          }
+        }
+      },
+      {
+        "name": "updated_at",
+        "ordinal": 2,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "data_entries",
+            "name": "updated_at"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": [
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "903c5eaee3a092235be8c0d4947a73c3b61abf2eed1e0d2c28c66ca139c27094"
+}

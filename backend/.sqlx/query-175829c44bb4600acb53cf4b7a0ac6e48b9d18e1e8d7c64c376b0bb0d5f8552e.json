@@ -1,0 +1,86 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        SELECT\n            prev.id,\n            prev.number,\n            prev.election_id,\n            prev.status,\n            prev.location,\n            prev.start_date_time\n        FROM committee_sessions AS c\n        JOIN committee_sessions AS prev ON c.election_id = prev.election_id AND c.number = prev.number + 1\n        WHERE c.id = ?\n        ",
+  "describe": {
+    "columns": [
+      {
+        "name": "id",
+        "ordinal": 0,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "committee_sessions",
+            "name": "id"
+          }
+        }
+      },
+      {
+        "name": "number",
+        "ordinal": 1,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "committee_sessions",
+            "name": "number"
+          }
+        }
+      },
+      {
+        "name": "election_id",
+        "ordinal": 2,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "committee_sessions",
+            "name": "election_id"
+          }
+        }
+      },
+      {
+        "name": "status",
+        "ordinal": 3,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "committee_sessions",
+            "name": "status"
+          }
+        }
+      },
+      {
+        "name": "location",
+        "ordinal": 4,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "committee_sessions",
+            "name": "location"
+          }
+        }
+      },
+      {
+        "name": "start_date_time",
+        "ordinal": 5,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "committee_sessions",
+            "name": "start_date_time"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      true
+    ]
+  },
+  "hash": "175829c44bb4600acb53cf4b7a0ac6e48b9d18e1e8d7c64c376b0bb0d5f8552e"
+}

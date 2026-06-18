@@ -1,0 +1,182 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        SELECT\n            p.id,\n            p.committee_session_id,\n            c.number AS committee_session_number,\n            p.prev_data_entry_id,\n            de.id AS data_entry_id,\n            p.investigation_state,\n            p.name,\n            p.number,\n            p.number_of_voters,\n            p.polling_station_type,\n            p.address,\n            p.postal_code,\n            p.locality,\n            de.state\n        FROM polling_stations AS p\n        JOIN committee_sessions AS c ON c.id = p.committee_session_id\n        JOIN data_entries AS de ON de.id = p.data_entry_id\n        WHERE c.id = $1 AND c.number > 1 AND json_extract(p.investigation_state, '$.status') = 'ConcludedWithNewResults'\n        ",
+  "describe": {
+    "columns": [
+      {
+        "name": "id",
+        "ordinal": 0,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "polling_stations",
+            "name": "id"
+          }
+        }
+      },
+      {
+        "name": "committee_session_id",
+        "ordinal": 1,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "polling_stations",
+            "name": "committee_session_id"
+          }
+        }
+      },
+      {
+        "name": "committee_session_number",
+        "ordinal": 2,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "committee_sessions",
+            "name": "number"
+          }
+        }
+      },
+      {
+        "name": "prev_data_entry_id",
+        "ordinal": 3,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "polling_stations",
+            "name": "prev_data_entry_id"
+          }
+        }
+      },
+      {
+        "name": "data_entry_id",
+        "ordinal": 4,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "data_entries",
+            "name": "id"
+          }
+        }
+      },
+      {
+        "name": "investigation_state",
+        "ordinal": 5,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "polling_stations",
+            "name": "investigation_state"
+          }
+        }
+      },
+      {
+        "name": "name",
+        "ordinal": 6,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "polling_stations",
+            "name": "name"
+          }
+        }
+      },
+      {
+        "name": "number",
+        "ordinal": 7,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "polling_stations",
+            "name": "number"
+          }
+        }
+      },
+      {
+        "name": "number_of_voters",
+        "ordinal": 8,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "polling_stations",
+            "name": "number_of_voters"
+          }
+        }
+      },
+      {
+        "name": "polling_station_type",
+        "ordinal": 9,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "polling_stations",
+            "name": "polling_station_type"
+          }
+        }
+      },
+      {
+        "name": "address",
+        "ordinal": 10,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "polling_stations",
+            "name": "address"
+          }
+        }
+      },
+      {
+        "name": "postal_code",
+        "ordinal": 11,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "polling_stations",
+            "name": "postal_code"
+          }
+        }
+      },
+      {
+        "name": "locality",
+        "ordinal": 12,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "polling_stations",
+            "name": "locality"
+          }
+        }
+      },
+      {
+        "name": "state",
+        "ordinal": 13,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "data_entries",
+            "name": "state"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      false,
+      true,
+      false,
+      false,
+      true,
+      true,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "cd8bf9265226a1ad05e3df019a289affa06cda71a96ffb4d767d3368fc716729"
+}

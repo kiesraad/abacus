@@ -1,0 +1,170 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        UPDATE polling_stations\n        SET\n            name = ?,\n            number = COALESCE(?, number),\n            number_of_voters = ?,\n            polling_station_type = ?,\n            address = ?,\n            postal_code = ?,\n            locality = ?\n        WHERE\n            id = ? AND committee_session_id = ?\n        RETURNING\n            id,\n            committee_session_id,\n            (SELECT c.number FROM committee_sessions AS c WHERE c.id = committee_session_id) AS \"committee_session_number!: u32\",\n            prev_data_entry_id,\n            data_entry_id,\n            investigation_state,\n            name,\n            number,\n            number_of_voters,\n            polling_station_type,\n            address,\n            postal_code,\n            locality\n        ",
+  "describe": {
+    "columns": [
+      {
+        "name": "id",
+        "ordinal": 0,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "polling_stations",
+            "name": "id"
+          }
+        }
+      },
+      {
+        "name": "committee_session_id",
+        "ordinal": 1,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "polling_stations",
+            "name": "committee_session_id"
+          }
+        }
+      },
+      {
+        "name": "committee_session_number!: u32",
+        "ordinal": 2,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "committee_sessions",
+            "name": "number"
+          }
+        }
+      },
+      {
+        "name": "prev_data_entry_id",
+        "ordinal": 3,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "polling_stations",
+            "name": "prev_data_entry_id"
+          }
+        }
+      },
+      {
+        "name": "data_entry_id",
+        "ordinal": 4,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "polling_stations",
+            "name": "data_entry_id"
+          }
+        }
+      },
+      {
+        "name": "investigation_state",
+        "ordinal": 5,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "polling_stations",
+            "name": "investigation_state"
+          }
+        }
+      },
+      {
+        "name": "name",
+        "ordinal": 6,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "polling_stations",
+            "name": "name"
+          }
+        }
+      },
+      {
+        "name": "number",
+        "ordinal": 7,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "polling_stations",
+            "name": "number"
+          }
+        }
+      },
+      {
+        "name": "number_of_voters",
+        "ordinal": 8,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "polling_stations",
+            "name": "number_of_voters"
+          }
+        }
+      },
+      {
+        "name": "polling_station_type",
+        "ordinal": 9,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "polling_stations",
+            "name": "polling_station_type"
+          }
+        }
+      },
+      {
+        "name": "address",
+        "ordinal": 10,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "polling_stations",
+            "name": "address"
+          }
+        }
+      },
+      {
+        "name": "postal_code",
+        "ordinal": 11,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "polling_stations",
+            "name": "postal_code"
+          }
+        }
+      },
+      {
+        "name": "locality",
+        "ordinal": 12,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "polling_stations",
+            "name": "locality"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 9
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      false,
+      false,
+      true,
+      true,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "e1b94c09d4af26a99e7783035991f2eb9d50c71c42a37e0ce0e123edde3fc24b"
+}

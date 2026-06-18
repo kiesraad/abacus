@@ -133,10 +133,10 @@ impl<LN: Debug> ListStanding<LN> {
         }
     }
 
-    /// Remove a full seat to the list
+    /// Remove a full seat from the list
     pub fn remove_full_seat(&mut self) {
         assert!(self.full_seats > 0);
-        info!("Removing full seat to list {:?}", self.list_number);
+        info!("Removing full seat from list {:?}", self.list_number);
         self.full_seats -= 1;
         self.next_votes_per_seat =
             Fraction::from(self.votes_cast) / Fraction::from(self.total_seats() + 1);
@@ -151,10 +151,10 @@ impl<LN: Debug> ListStanding<LN> {
             Fraction::from(self.votes_cast) / Fraction::from(self.total_seats() + 1);
     }
 
-    /// Remove a residual seat to the list
+    /// Remove a residual seat from the list
     pub fn remove_residual_seat(&mut self) {
         assert!(self.residual_seats > 0);
-        info!("Removing residual seat to list {:?}", self.list_number);
+        info!("Removing residual seat from list {:?}", self.list_number);
         self.residual_seats -= 1;
         self.next_votes_per_seat =
             Fraction::from(self.votes_cast) / Fraction::from(self.total_seats() + 1);

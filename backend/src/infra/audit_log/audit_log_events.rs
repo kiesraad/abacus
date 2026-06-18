@@ -243,10 +243,12 @@ pub async fn assert_last_event(
 
 #[cfg(test)]
 pub async fn list_event_names(conn: &mut SqliteConnection) -> Result<Vec<String>, APIError> {
-    sqlx::query_scalar::<_, String>(r#"SELECT event_name FROM audit_log ORDER BY ROWID ASC"#)
-        .fetch_all(conn)
-        .await
-        .map_err(APIError::from)
+    sqlx::query_scalar!(
+        r#"SELECT event_name as "event_name: String" FROM audit_log ORDER BY ROWID ASC"#,
+    )
+    .fetch_all(conn)
+    .await
+    .map_err(APIError::from)
 }
 
 pub async fn list(

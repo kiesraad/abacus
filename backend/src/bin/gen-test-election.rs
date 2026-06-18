@@ -25,9 +25,6 @@ use tracing_subscriber::EnvFilter;
 /// Abacus API and asset server
 #[derive(Parser, Debug, Clone)]
 struct Args {
-    /// Custom election name
-    pub custom_name: Option<String>,
-
     /// The committee category
     #[arg(value_enum)]
     committee_category: CommitteeCategory,
@@ -45,6 +42,10 @@ struct Args {
     #[cfg(feature = "dev-database")]
     #[arg(short, long)]
     reset_database: bool,
+
+    #[arg(long)]
+    /// Custom election name
+    pub custom_name: Option<String>,
 
     /// Number of political groups to create
     #[arg(long, default_value = "20..50", value_parser = parse_range::<u32>)]

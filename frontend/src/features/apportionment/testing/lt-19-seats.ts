@@ -791,7 +791,7 @@ export const seat_assignment: SeatAssignment = {
     denominator: 15,
   },
   steps: (largest_remainder_steps as SeatChangeStep[]).concat(highest_average_steps),
-  final_standing: [
+  standings: [
     {
       list_number: 1,
       votes_cast: 808,

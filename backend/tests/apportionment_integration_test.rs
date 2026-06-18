@@ -20,7 +20,7 @@ pub mod shared;
 pub mod utils;
 
 fn get_total_seats_from_seat_assignment(seat_assignment: &serde_json::Value) -> Vec<u64> {
-    seat_assignment["final_standing"]
+    seat_assignment["standings"]
         .as_array()
         .unwrap()
         .iter()
@@ -344,14 +344,14 @@ async fn test_api_output(pool: SqlitePool) {
     );
 
     assert_eq!(
-        body["seat_assignment"]["final_standing"]
+        body["seat_assignment"]["standings"]
             .as_array()
             .unwrap()
             .len(),
         5
     );
     assert_eq!(
-        body["seat_assignment"]["final_standing"][0],
+        body["seat_assignment"]["standings"][0],
         json!({
             "list_number": 1,
             "votes_cast": 1200,

@@ -8,7 +8,7 @@ export const Default: StoryObj = {
     return (
       <HighestAveragesTable
         steps={gte19Seats.steps}
-        finalStanding={gte19Seats.seat_assignment.final_standing}
+        standings={gte19Seats.seat_assignment.standings}
         politicalGroups={gte19Seats.election.political_groups}
         resultChanges={[]}
       />

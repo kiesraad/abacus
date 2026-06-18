@@ -16,8 +16,8 @@ pub fn map_seat_assignment(sa: &apportionment::SeatAssignmentDetails<PGNumber>) 
         residual_seats: sa.residual_seats,
         quota: DisplayFraction::from(sa.quota),
         steps: sa.steps.iter().map(Into::into).collect(),
-        final_standing: sa
-            .final_standing
+        standings: sa
+            .standings
             .iter()
             .map(|standing| ListSeatAssignment {
                 list_number: standing.list_number,

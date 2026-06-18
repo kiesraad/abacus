@@ -6,7 +6,7 @@ import { formatPoliticalGroupName } from "@/utils/politicalGroup";
 import cls from "./Apportionment.module.css";
 
 interface ApportionmentTableProps {
-  finalStanding: ListSeatAssignment[];
+  standings: ListSeatAssignment[];
   politicalGroups: PoliticalGroup[];
   fullSeats: number;
   residualSeats: number;
@@ -21,7 +21,7 @@ function convertZeroToDash(number: number): string {
 }
 
 export function ApportionmentTable({
-  finalStanding,
+  standings,
   politicalGroups,
   fullSeats,
   residualSeats,
@@ -37,7 +37,7 @@ export function ApportionmentTable({
         <Table.HeaderCell className="text-align-r link-cell-padding">{t("apportionment.total_seats")}</Table.HeaderCell>
       </Table.Header>
       <Table.Body>
-        {finalStanding.map((standing: ListSeatAssignment) => (
+        {standings.map((standing: ListSeatAssignment) => (
           <Table.Row key={standing.list_number} id={`list-${standing.list_number}`} to={`./${standing.list_number}`}>
             <Table.Cell className={cn(cls.listNumberColumn, "text-align-r", "font-number")}>
               {standing.list_number}

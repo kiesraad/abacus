@@ -128,7 +128,7 @@ impl CandidateDrawn<u32, u32> for CandidateDrawnMock {
 
 pub fn get_total_seats_from_apportionment_result(result: &SeatAssignmentDetails<u32>) -> Vec<u32> {
     result
-        .final_standing
+        .standings
         .iter()
         .map(|p| p.total_seats)
         .collect::<Vec<_>>()

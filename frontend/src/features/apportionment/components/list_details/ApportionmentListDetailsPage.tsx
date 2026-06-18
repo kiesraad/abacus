@@ -204,7 +204,7 @@ export function ApportionmentListDetailsPage() {
     return <ApportionmentErrorPage sectionTitle={listName} error={error} />;
   }
   if (seatAssignment && candidateNomination && electionSummary) {
-    const listTotalSeats = seatAssignment.final_standing.find(
+    const listTotalSeats = seatAssignment.standings.find(
       (standing) => standing.list_number === list.number,
     )?.total_seats;
     const candidateVotesList = electionSummary.political_group_votes.find(

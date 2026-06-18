@@ -8660,15 +8660,9 @@
           "residual_seats",
           "quota",
           "steps",
-          "final_standing"
+          "standings"
         ],
         "properties": {
-          "final_standing": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ListSeatAssignment"
-            }
-          },
           "full_seats": {
             "type": "integer",
             "format": "int32",
@@ -8686,6 +8680,12 @@
             "type": "integer",
             "format": "int32",
             "minimum": 0
+          },
+          "standings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ListSeatAssignment"
+            }
           },
           "steps": {
             "type": "array",

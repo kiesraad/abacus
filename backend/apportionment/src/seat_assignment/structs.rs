@@ -16,7 +16,7 @@ pub struct SeatAssignmentDetails<LN> {
     pub residual_seats: u32,
     pub quota: Fraction,
     pub steps: Vec<SeatChangeStep<LN>>,
-    pub final_standing: Vec<ListSeatAssignment<LN>>,
+    pub standings: Vec<ListSeatAssignment<LN>>,
 }
 
 impl<LN: Copy> SeatAssignmentDetails<LN> {

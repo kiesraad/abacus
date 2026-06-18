@@ -87,7 +87,7 @@ pub(crate) fn seat_assignment<T: ApportionmentInput>(input: &T) -> SeatAssignmen
                         residual_seats,
                         quota,
                         steps,
-                        final_standing: Vec::new(),
+                        standings: Vec::new(),
                     },
                 ));
             }
@@ -118,7 +118,7 @@ pub(crate) fn seat_assignment<T: ApportionmentInput>(input: &T) -> SeatAssignmen
                         residual_seats,
                         quota,
                         steps: steps.clone(),
-                        final_standing: Vec::new(),
+                        standings: Vec::new(),
                     },
                 ));
             }
@@ -170,7 +170,8 @@ pub(crate) fn seat_assignment<T: ApportionmentInput>(input: &T) -> SeatAssignmen
                     residual_seats,
                     quota,
                     steps: steps.clone(),
-                    final_standing: Vec::new(),
+                    // TODO preliminary standings
+                    standings: Vec::new(),
                 },
             ));
         }
@@ -191,7 +192,7 @@ pub(crate) fn seat_assignment<T: ApportionmentInput>(input: &T) -> SeatAssignmen
         residual_seats: final_residual_seats,
         quota,
         steps: final_steps,
-        final_standing: final_standing.into_iter().map(Into::into).collect(),
+        standings: final_standing.into_iter().map(Into::into).collect(),
     }))
 }
 
@@ -200,7 +201,7 @@ pub fn get_total_seats_per_list_number_from_apportionment_result<LN: Copy>(
     result: &SeatAssignmentDetails<LN>,
 ) -> Vec<(LN, u32)> {
     result
-        .final_standing
+        .standings
         .iter()
         .map(|p| (p.list_number, p.total_seats))
         .collect::<Vec<_>>()
@@ -724,7 +725,7 @@ pub(crate) mod tests {
                     }
                 );
                 assert_eq!(preliminary_result.steps.len(), 3);
-                assert_eq!(preliminary_result.final_standing, vec![]);
+                assert_eq!(preliminary_result.standings, vec![]);
             }
 
             /// Apportionment with residual seats assigned with largest remainders method
@@ -765,7 +766,7 @@ pub(crate) mod tests {
                     }
                 );
                 assert_eq!(preliminary_result.steps.len(), 1);
-                assert_eq!(preliminary_result.final_standing, vec![]);
+                assert_eq!(preliminary_result.standings, vec![]);
 
                 // Lot drawn is 6
                 input.lists_drawn.push(ListDrawnMock { variant, drawn: 6 });
@@ -835,7 +836,7 @@ pub(crate) mod tests {
                     }
                 );
                 assert_eq!(preliminary_result.steps.len(), 0);
-                assert_eq!(preliminary_result.final_standing, vec![]);
+                assert_eq!(preliminary_result.standings, vec![]);
 
                 // Drawing lots results in list 4
                 input.lists_drawn.push(ListDrawnMock { variant, drawn: 4 });
@@ -865,7 +866,7 @@ pub(crate) mod tests {
                     }
                 );
                 assert_eq!(preliminary_result.steps.len(), 1);
-                assert_eq!(preliminary_result.final_standing, vec![]);
+                assert_eq!(preliminary_result.standings, vec![]);
             }
         }
 
@@ -1736,7 +1737,7 @@ pub(crate) mod tests {
                     }
                 );
                 assert_eq!(preliminary_result.steps.len(), 6);
-                assert_eq!(preliminary_result.final_standing, vec![]);
+                assert_eq!(preliminary_result.standings, vec![]);
             }
 
             /// Apportionment with residual seats assigned with highest averages method
@@ -1777,7 +1778,7 @@ pub(crate) mod tests {
                     }
                 );
                 assert_eq!(preliminary_result.steps.len(), 1);
-                assert_eq!(preliminary_result.final_standing, vec![]);
+                assert_eq!(preliminary_result.standings, vec![]);
 
                 // Drawing lots results in list 4
                 input.lists_drawn.push(ListDrawnMock { variant, drawn: 4 });
@@ -1808,7 +1809,7 @@ pub(crate) mod tests {
                     }
                 );
                 assert_eq!(preliminary_result.steps.len(), 2);
-                assert_eq!(preliminary_result.final_standing, vec![]);
+                assert_eq!(preliminary_result.standings, vec![]);
             }
 
             /// Apportionment with residual seats assigned with highest averages method
@@ -1849,7 +1850,7 @@ pub(crate) mod tests {
                     }
                 );
                 assert_eq!(preliminary_result.steps.len(), 1);
-                assert_eq!(preliminary_result.final_standing, vec![]);
+                assert_eq!(preliminary_result.standings, vec![]);
 
                 // List 3 is drawn, add it to the input's lists_drawn and process again
                 input.lists_drawn.push(ListDrawnMock { variant, drawn: 3 });

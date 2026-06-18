@@ -50,7 +50,7 @@ export function ApportionmentFullSeatsPage() {
                 <h2 className={cls.tableTitle}>{t("apportionment.how_often_is_quota_met")}</h2>
                 <span className={cls.tableInformation}>{t("apportionment.full_seats_information")}</span>
                 <FullSeatsTable
-                  finalStanding={seatAssignment.final_standing}
+                  standings={seatAssignment.standings}
                   politicalGroups={election.political_groups}
                   quota={seatAssignment.quota}
                   resultChanges={resultChanges}

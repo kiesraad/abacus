@@ -63,7 +63,7 @@ function LargeCouncilSection({
         {highestAverageSteps.length > 0 && (
           <HighestAveragesTable
             steps={highestAverageSteps}
-            finalStanding={seatAssignment.final_standing}
+            standings={seatAssignment.standings}
             politicalGroups={politicalGroups}
             resultChanges={resultChanges}
           />
@@ -97,7 +97,7 @@ function LargestRemaindersSection({
         {largestRemainderSteps.length > 0 && (
           <LargestRemaindersTable
             steps={largestRemainderSteps}
-            finalStanding={seatAssignment.final_standing}
+            standings={seatAssignment.standings}
             politicalGroups={politicalGroups}
             resultChanges={resultChanges}
           />
@@ -138,7 +138,7 @@ function HighestAveragesSection({
         <UniqueHighestAveragesTable
           steps={uniqueHighestAverageSteps}
           largestRemainderSteps={largestRemainderSteps}
-          finalStanding={seatAssignment.final_standing}
+          standings={seatAssignment.standings}
           politicalGroups={politicalGroups}
         />
         {highestAverageSteps.length > 0 && (
@@ -152,7 +152,7 @@ function HighestAveragesSection({
             {
               <HighestAveragesTable
                 steps={highestAverageSteps}
-                finalStanding={seatAssignment.final_standing}
+                standings={seatAssignment.standings}
                 politicalGroups={politicalGroups}
                 resultChanges={[]}
               />

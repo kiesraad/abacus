@@ -98,6 +98,19 @@ Using a binary:
 ```shell
 abacus --airgap-detection
 ```
+### TLS
+
+In production, Abacus must be built with TLS enabled. To do this, enable the feature `tls`:
+
+```shell
+cargo build --release --features tls
+```
+
+On Windows, AWS Libcrypto has some [build requirements](https://aws.github.io/aws-lc-rs/requirements/windows.html):
+- C/C++ Compiler: these build tools have likely been installed during installation of Rust
+- NASM, two options:
+  - Use the installer
+  - Or, use prebuilt NASM objects: `set AWS_LC_SYS_PREBUILT_NASM=1`
 
 ### Building for various platforms
 

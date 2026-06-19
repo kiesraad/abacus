@@ -89,19 +89,19 @@ impl<LN: Copy + Debug> From<ListStanding<LN>> for ListSeatAssignment<LN> {
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct ListStanding<LN> {
     /// List number for which this standing applies
-    pub list_number: LN,
+    list_number: LN,
     /// The number of votes cast for this list
-    pub votes_cast: u64,
+    votes_cast: u64,
     /// The remainder of votes that was not used to get full seats (does not have to be a whole number of votes)
-    pub remainder_votes: Fraction,
+    remainder_votes: Fraction,
     /// Whether the remainder votes meet the threshold to be applicable for largest remainder seat assignment
-    pub meets_remainder_threshold: bool,
+    meets_remainder_threshold: bool,
     /// The number of votes per seat if a new seat would be added to the current residual seats
-    pub next_votes_per_seat: Fraction,
+    next_votes_per_seat: Fraction,
     /// The number of full seats this list got assigned
-    pub full_seats: u32,
+    full_seats: u32,
     /// The current number of residual seats this list got assigned
-    pub residual_seats: u32,
+    residual_seats: u32,
 }
 
 impl<LN: Debug> ListStanding<LN> {
@@ -133,20 +133,60 @@ impl<LN: Debug> ListStanding<LN> {
         }
     }
 
-    /// Add a residual seat to the list and return the updated instance
-    pub fn add_residual_seat(self) -> Self {
+    /// Remove a full seat from the list
+    pub fn remove_full_seat(&mut self) {
+        assert!(self.full_seats > 0);
+        info!("Removing full seat from list {:?}", self.list_number);
+        self.full_seats -= 1;
+        self.next_votes_per_seat =
+            Fraction::from(self.votes_cast) / Fraction::from(self.total_seats() + 1);
+        // NB: remainder_votes is not updated!
+    }
+
+    /// Add a residual seat to the list
+    pub fn add_residual_seat(&mut self) {
         info!("Adding residual seat to list {:?}", self.list_number);
-        ListStanding {
-            residual_seats: self.residual_seats + 1,
-            next_votes_per_seat: Fraction::from(self.votes_cast)
-                / Fraction::from(self.total_seats() + 2),
-            ..self
-        }
+        self.residual_seats += 1;
+        self.next_votes_per_seat =
+            Fraction::from(self.votes_cast) / Fraction::from(self.total_seats() + 1);
+    }
+
+    /// Remove a residual seat from the list
+    pub fn remove_residual_seat(&mut self) {
+        assert!(self.residual_seats > 0);
+        info!("Removing residual seat from list {:?}", self.list_number);
+        self.residual_seats -= 1;
+        self.next_votes_per_seat =
+            Fraction::from(self.votes_cast) / Fraction::from(self.total_seats() + 1);
     }
 
     /// Returns the total number of seats assigned to this list
     pub fn total_seats(&self) -> u32 {
         self.full_seats + self.residual_seats
+    }
+}
+
+impl<LN> ListStanding<LN> {
+    pub fn list_number(self) -> LN {
+        self.list_number
+    }
+    pub fn votes_cast(self) -> u64 {
+        self.votes_cast
+    }
+    pub fn remainder_votes(self) -> Fraction {
+        self.remainder_votes
+    }
+    pub fn meets_remainder_threshold(self) -> bool {
+        self.meets_remainder_threshold
+    }
+    pub fn next_votes_per_seat(self) -> Fraction {
+        self.next_votes_per_seat
+    }
+    pub fn full_seats(self) -> u32 {
+        self.full_seats
+    }
+    pub fn residual_seats(self) -> u32 {
+        self.residual_seats
     }
 }
 

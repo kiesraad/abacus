@@ -691,3 +691,133 @@ fn step_assign_remainder_using_largest_remainder<'a, 'b, LN: Copy + Debug + Eq>(
         )
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::test_helpers::{CandidateVotesMock, ListVotesMock};
+
+    use super::*;
+
+    fn standing(list_number: u32, votes_cast: u32) -> ListStanding<u32> {
+        ListStanding::new(
+            &ListVotesMock {
+                number: list_number,
+                candidate_votes: vec![CandidateVotesMock {
+                    number: 1,
+                    votes: votes_cast,
+                }],
+            },
+            Fraction::new(100, 1),
+        )
+    }
+
+    fn unique_highest_average_step(list_number: u32) -> SeatChangeStep<u32> {
+        SeatChangeStep {
+            residual_seat_number: None,
+            standings: vec![],
+            change: SeatChange::UniqueHighestAverageAssignment(HighestAverageAssignedSeat {
+                selected_list_number: list_number,
+                list_options: vec![list_number],
+                list_assigned: vec![list_number],
+                list_exhausted: vec![],
+                votes_per_seat: Fraction::ZERO,
+            }),
+        }
+    }
+
+    #[test]
+    fn test_lists_qualifying_for_highest_average() {
+        // Lists 1-3 have votes, list 4 has none (and should never qualify).
+        let standings = [
+            standing(1, 100),
+            standing(2, 80),
+            standing(3, 80),
+            standing(4, 0),
+        ];
+
+        struct Case {
+            description: &'static str,
+            check_for_unique: bool,
+            exhausted: Vec<u32>,
+            previous_steps: Vec<SeatChangeStep<u32>>,
+            expected_unique: bool,
+            expected_lists: Vec<u32>,
+        }
+
+        let cases = vec![
+            Case {
+                description: "regular method qualifies every list with votes",
+                check_for_unique: false,
+                exhausted: vec![],
+                previous_steps: vec![],
+                expected_unique: false,
+                expected_lists: vec![1, 2, 3],
+            },
+            Case {
+                description: "regular method excludes exhausted lists",
+                check_for_unique: false,
+                exhausted: vec![2],
+                previous_steps: vec![],
+                expected_unique: false,
+                expected_lists: vec![1, 3],
+            },
+            Case {
+                description: "unique method qualifies every list with votes when none got a seat",
+                check_for_unique: true,
+                exhausted: vec![],
+                previous_steps: vec![],
+                expected_unique: true,
+                expected_lists: vec![1, 2, 3],
+            },
+            Case {
+                description: "unique method excludes lists that already got a unique seat",
+                check_for_unique: true,
+                exhausted: vec![],
+                previous_steps: vec![unique_highest_average_step(1)],
+                expected_unique: true,
+                expected_lists: vec![2, 3],
+            },
+            Case {
+                description: "unique method also excludes exhausted lists",
+                check_for_unique: true,
+                exhausted: vec![3],
+                previous_steps: vec![unique_highest_average_step(1)],
+                expected_unique: true,
+                expected_lists: vec![2],
+            },
+            Case {
+                description: "falls back to regular method when every list got a unique seat",
+                check_for_unique: true,
+                exhausted: vec![],
+                previous_steps: vec![
+                    unique_highest_average_step(1),
+                    unique_highest_average_step(2),
+                    unique_highest_average_step(3),
+                ],
+                expected_unique: false,
+                expected_lists: vec![1, 2, 3],
+            },
+        ];
+
+        for case in cases {
+            let (unique, qualifying) = lists_qualifying_for_highest_average(
+                &standings,
+                &case.previous_steps,
+                &case.exhausted,
+                case.check_for_unique,
+            );
+
+            assert_eq!(
+                unique, case.expected_unique,
+                "unique flag: {}",
+                case.description
+            );
+            assert_eq!(
+                list_numbers(&qualifying),
+                case.expected_lists,
+                "qualifying lists: {}",
+                case.description
+            );
+        }
+    }
+}

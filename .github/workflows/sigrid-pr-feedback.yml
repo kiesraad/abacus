@@ -28,4 +28,8 @@ jobs:
           SIGRID_CI_TOKEN: "${{ secrets.SIGRID_CI_TOKEN }}"
       - name: "Sigrid feedback to job summary"
         if: always()
-        run: cat sigrid-ci-output/*feedback.md >> "$GITHUB_STEP_SUMMARY"
+        run: |
+          for feedback in sigrid-ci-output/*feedback.md; do
+            cat "$feedback" >> "$GITHUB_STEP_SUMMARY"
+            echo >> "$GITHUB_STEP_SUMMARY"
+          done

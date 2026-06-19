@@ -43,6 +43,10 @@ struct Args {
     #[arg(short, long)]
     reset_database: bool,
 
+    #[arg(long)]
+    /// Custom election name
+    pub custom_name: Option<String>,
+
     /// Number of political groups to create
     #[arg(long, default_value = "20..50", value_parser = parse_range::<u32>)]
     political_groups: Range<u32>,
@@ -66,6 +70,10 @@ struct Args {
     /// Generate multiple elections, each resulting in a different P 22-2 variant
     #[arg(long)]
     generate_p22_2_variants: bool,
+
+    /// Generate multiple elections, each resulting in drawing lots
+    #[arg(long)]
+    generate_drawing_lots: bool,
 
     /// Include (part of) data entry for this election
     #[arg(long)]
@@ -97,6 +105,7 @@ struct Args {
 impl From<Args> for GenerateElectionArgs {
     fn from(args: Args) -> Self {
         GenerateElectionArgs {
+            custom_name: args.custom_name,
             committee_category: args.committee_category,
             political_groups: RandomRange(args.political_groups),
             candidates_per_group: RandomRange(args.candidates_per_group),
@@ -104,6 +113,7 @@ impl From<Args> for GenerateElectionArgs {
             voters: RandomRange(args.voters),
             seats: RandomRange(args.seats),
             generate_p22_2_variants: args.generate_p22_2_variants,
+            generate_drawing_lots: args.generate_drawing_lots,
             with_data_entry: args.with_data_entry,
             first_data_entry: RandomRange(args.first_data_entry),
             second_data_entry: RandomRange(args.second_data_entry),
@@ -140,7 +150,7 @@ async fn main() -> Result<(), AppError> {
     )
     .await?;
 
-    let test_election = create_test_election(args.clone().into(), pool, None).await?;
+    let test_election = create_test_election(&args.clone().into(), &pool, None).await?;
 
     if let Some(export_dir) = args.export_definition {
         // Export the election definition, candidate list and polling stations to a directory

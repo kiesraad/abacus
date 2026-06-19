@@ -6,14 +6,12 @@ on:
 
 permissions:
   contents: read
-  pull-requests: write
 
 env:
   TZ: "Europe/Amsterdam"
 
 jobs:
   diff:
-    if: "!github.event.pull_request.head.repo.fork"
     name: Diff PDFs
     runs-on: ubuntu-latest
     defaults:
@@ -58,12 +56,8 @@ jobs:
         with:
           name: pdf-diffs
           path: backend/tmp-pdf-gen/diffs/
-      - name: Comment on PR with PDF diff summary and link to artifact
-        if: ${{ github.event_name == 'pull_request' }}
-        uses: marocchino/sticky-pull-request-comment@0ea0beb66eb9baf113663a64ec522f60e49231c0 #v3.0.4
-        env:
-          DOWNLOAD_LINK: "[Download ZIP file containing PDF files with the visual differences](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ steps.artifact-upload.outputs['artifact-id'] }})"
-        with:
-          message: |
-            ${{ steps.diff_summary.outputs.table }}
-            ${{ steps.artifact-upload.outputs['artifact-id'] && env.DOWNLOAD_LINK }}
+      - name: Add diff download link to job summary
+        if: ${{ steps.diff_summary.outputs.diff_found == '1' }}
+        run: |
+          url="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ steps.artifact-upload.outputs.artifact-id }}"
+          echo "[Download ZIP file containing PDF files with the visual differences]($url)" >> "$GITHUB_STEP_SUMMARY"

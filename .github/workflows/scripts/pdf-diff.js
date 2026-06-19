@@ -52,6 +52,7 @@ exports.pdfDiff = ({ core }) => {
   };
 
   let diffFound = false;
+  const changedFiles = [];
 
   // Iterate through every PDF present in either ref, run diff-pdf where applicable, and capture the status
   for (const relativePath of allFiles) {
@@ -99,10 +100,35 @@ exports.pdfDiff = ({ core }) => {
     }
 
     rows.push(`| ${relativePath} | ${status} |`);
+    if (status !== statusLabels.identical) {
+      changedFiles.push({ relativePath, status });
+    }
   }
 
   rows.push("");
 
-  core.setOutput("table", rows.join("\n"));
+  // Report the diff table via the workflow job summary
+  if (process.env.GITHUB_STEP_SUMMARY) {
+    fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, `${rows.join("\n")}\n`);
+  }
+
+  // Add a yellow warning annotation for every changed PDF
+  for (const { relativePath, status } of changedFiles) {
+    const template = path.join(
+      "backend",
+      "templates",
+      `${relativePath.replace(/\.pdf$/i, "")}.typ`,
+    );
+    const annotation = { title: "PDF output changed" };
+    if (fs.existsSync(template)) {
+      annotation.file = template;
+      annotation.startLine = 1;
+    }
+    core.warning(
+      `${relativePath}: ${status}, see the job summary for the visual diff.`,
+      annotation,
+    );
+  }
+
   core.setOutput("diff_found", diffFound ? "1" : "0");
 };

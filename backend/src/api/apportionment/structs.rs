@@ -8,7 +8,8 @@ use crate::domain::{
     apportionment::{
         AbsoluteMajorityDrawingLots, ApportionmentWarning, CandidateDrawingLotsVariant,
         CandidateDrawn, CandidateNomination, HighestAverageResidualSeatDrawingLots,
-        LargestRemainderResidualSeatDrawingLots, ListDrawingLotsVariant, ListDrawn, SeatAssignment,
+        LargestRemainderResidualSeatDrawingLots, ListAverage, ListDrawingLotsVariant, ListDrawn,
+        ListRemainder, SeatAssignment,
     },
     apportionment_state::DeceasedCandidate,
     election::{CandidateNumber, PGNumber},
@@ -118,7 +119,7 @@ impl From<ListDrawingLotsVariant> for apportionment::ListDrawingLotsVariant<PGNu
                     options,
                     list_averages: list_averages
                         .into_iter()
-                        .map(|(ln, avg)| (ln, avg.into()))
+                        .map(|ListAverage { pg_number, average }| (pg_number, average.into()))
                         .collect(),
                 },
             ),
@@ -134,7 +135,12 @@ impl From<ListDrawingLotsVariant> for apportionment::ListDrawingLotsVariant<PGNu
                     options,
                     list_remainders: list_remainders
                         .into_iter()
-                        .map(|(ln, rem)| (ln, rem.into()))
+                        .map(
+                            |ListRemainder {
+                                 pg_number,
+                                 remainder,
+                             }| (pg_number, remainder.into()),
+                        )
                         .collect(),
                 },
             ),

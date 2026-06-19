@@ -7497,41 +7497,7 @@
           "list_averages": {
             "type": "array",
             "items": {
-              "type": "array",
-              "items": false,
-              "prefixItems": [
-                {
-                  "type": "integer",
-                  "format": "int32",
-                  "minimum": 0
-                },
-                {
-                  "type": "object",
-                  "description": "Fraction with the integer part split out for display purposes",
-                  "required": [
-                    "integer",
-                    "numerator",
-                    "denominator"
-                  ],
-                  "properties": {
-                    "denominator": {
-                      "type": "integer",
-                      "format": "int64",
-                      "minimum": 0
-                    },
-                    "integer": {
-                      "type": "integer",
-                      "format": "int64",
-                      "minimum": 0
-                    },
-                    "numerator": {
-                      "type": "integer",
-                      "format": "int64",
-                      "minimum": 0
-                    }
-                  }
-                }
-              ]
+              "$ref": "#/components/schemas/ListAverage"
             }
           },
           "options": {
@@ -7708,41 +7674,7 @@
           "list_remainders": {
             "type": "array",
             "items": {
-              "type": "array",
-              "items": false,
-              "prefixItems": [
-                {
-                  "type": "integer",
-                  "format": "int32",
-                  "minimum": 0
-                },
-                {
-                  "type": "object",
-                  "description": "Fraction with the integer part split out for display purposes",
-                  "required": [
-                    "integer",
-                    "numerator",
-                    "denominator"
-                  ],
-                  "properties": {
-                    "denominator": {
-                      "type": "integer",
-                      "format": "int64",
-                      "minimum": 0
-                    },
-                    "integer": {
-                      "type": "integer",
-                      "format": "int64",
-                      "minimum": 0
-                    },
-                    "numerator": {
-                      "type": "integer",
-                      "format": "int64",
-                      "minimum": 0
-                    }
-                  }
-                }
-              ]
+              "$ref": "#/components/schemas/ListRemainder"
             }
           },
           "options": {
@@ -7758,6 +7690,21 @@
               "format": "int32",
               "minimum": 0
             }
+          }
+        }
+      },
+      "ListAverage": {
+        "type": "object",
+        "required": [
+          "pg_number",
+          "average"
+        ],
+        "properties": {
+          "average": {
+            "$ref": "#/components/schemas/DisplayFraction"
+          },
+          "pg_number": {
+            "$ref": "#/components/schemas/PGNumber"
           }
         }
       },
@@ -7906,6 +7853,21 @@
           },
           "list_retracted_seat": {
             "$ref": "#/components/schemas/PGNumber"
+          }
+        }
+      },
+      "ListRemainder": {
+        "type": "object",
+        "required": [
+          "pg_number",
+          "remainder"
+        ],
+        "properties": {
+          "pg_number": {
+            "$ref": "#/components/schemas/PGNumber"
+          },
+          "remainder": {
+            "$ref": "#/components/schemas/DisplayFraction"
           }
         }
       },

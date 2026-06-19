@@ -12,7 +12,7 @@ use crate::{
         apportionment::{
             AbsoluteMajorityDrawingLots, ApportionmentWarning, CandidateDrawingLotsVariant,
             HighestAverageResidualSeatDrawingLots, LargestRemainderResidualSeatDrawingLots,
-            ListDrawingLotsVariant, SeatAssignment,
+            ListAverage, ListDrawingLotsVariant, ListRemainder, SeatAssignment,
         },
         apportionment_state::{ApportionmentState, ApportionmentStateError, DrawingLotsRequired},
         committee_session::CommitteeSessionId,
@@ -145,7 +145,10 @@ impl From<apportionment::ListDrawingLotsVariant<PGNumber>> for ListDrawingLotsVa
                     options,
                     list_averages: list_averages
                         .into_iter()
-                        .map(|(ln, avg)| (ln, avg.into()))
+                        .map(|(ln, avg)| ListAverage {
+                            pg_number: ln,
+                            average: avg.into(),
+                        })
                         .collect(),
                 },
             ),
@@ -161,7 +164,10 @@ impl From<apportionment::ListDrawingLotsVariant<PGNumber>> for ListDrawingLotsVa
                     options,
                     list_remainders: list_remainders
                         .into_iter()
-                        .map(|(ln, rem)| (ln, rem.into()))
+                        .map(|(ln, rem)| ListRemainder {
+                            pg_number: ln,
+                            remainder: rem.into(),
+                        })
                         .collect(),
                 },
             ),

@@ -106,7 +106,7 @@ jobs:
         run: >
           npm install --global corepack@latest &&
           corepack enable &&
-          corepack prepare pnpm@latest-10 --activate
+          corepack prepare pnpm@latest-11 --activate
       - name: Install dependencies
         run: pnpm install
       - name: Run Vite build to report bundle size

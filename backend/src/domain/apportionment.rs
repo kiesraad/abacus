@@ -334,16 +334,16 @@ pub enum ListDrawingLotsVariant {
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize, ToSchema)]
 pub struct HighestAverageResidualSeatDrawingLots {
-    pub average: DisplayFraction,
     pub residual_seat_numbers: Vec<u32>,
     pub options: Vec<PGNumber>,
+    pub list_averages: Vec<(PGNumber, DisplayFraction)>,
 }
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize, ToSchema)]
 pub struct LargestRemainderResidualSeatDrawingLots {
-    pub remainder: DisplayFraction,
     pub residual_seat_numbers: Vec<u32>,
     pub options: Vec<PGNumber>,
+    pub list_remainders: Vec<(PGNumber, DisplayFraction)>,
 }
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize, ToSchema)]

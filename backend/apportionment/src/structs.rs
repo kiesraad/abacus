@@ -35,16 +35,16 @@ pub enum ListDrawingLotsVariant<LN> {
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct HighestAverageResidualSeatDrawingLots<LN> {
-    pub average: Fraction,
     pub residual_seat_numbers: Vec<u32>,
     pub options: Vec<LN>,
+    pub list_averages: Vec<(LN, Fraction)>,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct LargestRemainderResidualSeatDrawingLots<LN> {
-    pub remainder: Fraction,
     pub residual_seat_numbers: Vec<u32>,
     pub options: Vec<LN>,
+    pub list_remainders: Vec<(LN, Fraction)>,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]

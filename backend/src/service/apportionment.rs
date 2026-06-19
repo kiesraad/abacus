@@ -135,28 +135,34 @@ impl From<apportionment::ListDrawingLotsVariant<PGNumber>> for ListDrawingLotsVa
         match value {
             apportionment::ListDrawingLotsVariant::HighestAverageResidualSeat(
                 apportionment::HighestAverageResidualSeatDrawingLots {
-                    average,
                     residual_seat_numbers,
                     options,
+                    list_averages,
                 },
             ) => ListDrawingLotsVariant::HighestAverageResidualSeat(
                 HighestAverageResidualSeatDrawingLots {
-                    average: average.into(),
                     residual_seat_numbers,
                     options,
+                    list_averages: list_averages
+                        .into_iter()
+                        .map(|(ln, avg)| (ln, avg.into()))
+                        .collect(),
                 },
             ),
             apportionment::ListDrawingLotsVariant::LargestRemainderResidualSeat(
                 apportionment::LargestRemainderResidualSeatDrawingLots {
-                    remainder,
                     residual_seat_numbers,
                     options,
+                    list_remainders,
                 },
             ) => ListDrawingLotsVariant::LargestRemainderResidualSeat(
                 LargestRemainderResidualSeatDrawingLots {
-                    remainder: remainder.into(),
                     residual_seat_numbers,
                     options,
+                    list_remainders: list_remainders
+                        .into_iter()
+                        .map(|(ln, rem)| (ln, rem.into()))
+                        .collect(),
                 },
             ),
             apportionment::ListDrawingLotsVariant::AbsoluteMajority(

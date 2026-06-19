@@ -7489,13 +7489,50 @@
       "HighestAverageResidualSeatDrawingLots": {
         "type": "object",
         "required": [
-          "average",
           "residual_seat_numbers",
-          "options"
+          "options",
+          "list_averages"
         ],
         "properties": {
-          "average": {
-            "$ref": "#/components/schemas/DisplayFraction"
+          "list_averages": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": false,
+              "prefixItems": [
+                {
+                  "type": "integer",
+                  "format": "int32",
+                  "minimum": 0
+                },
+                {
+                  "type": "object",
+                  "description": "Fraction with the integer part split out for display purposes",
+                  "required": [
+                    "integer",
+                    "numerator",
+                    "denominator"
+                  ],
+                  "properties": {
+                    "denominator": {
+                      "type": "integer",
+                      "format": "int64",
+                      "minimum": 0
+                    },
+                    "integer": {
+                      "type": "integer",
+                      "format": "int64",
+                      "minimum": 0
+                    },
+                    "numerator": {
+                      "type": "integer",
+                      "format": "int64",
+                      "minimum": 0
+                    }
+                  }
+                }
+              ]
+            }
           },
           "options": {
             "type": "array",
@@ -7663,19 +7700,56 @@
       "LargestRemainderResidualSeatDrawingLots": {
         "type": "object",
         "required": [
-          "remainder",
           "residual_seat_numbers",
-          "options"
+          "options",
+          "list_remainders"
         ],
         "properties": {
+          "list_remainders": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": false,
+              "prefixItems": [
+                {
+                  "type": "integer",
+                  "format": "int32",
+                  "minimum": 0
+                },
+                {
+                  "type": "object",
+                  "description": "Fraction with the integer part split out for display purposes",
+                  "required": [
+                    "integer",
+                    "numerator",
+                    "denominator"
+                  ],
+                  "properties": {
+                    "denominator": {
+                      "type": "integer",
+                      "format": "int64",
+                      "minimum": 0
+                    },
+                    "integer": {
+                      "type": "integer",
+                      "format": "int64",
+                      "minimum": 0
+                    },
+                    "numerator": {
+                      "type": "integer",
+                      "format": "int64",
+                      "minimum": 0
+                    }
+                  }
+                }
+              ]
+            }
+          },
           "options": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/PGNumber"
             }
-          },
-          "remainder": {
-            "$ref": "#/components/schemas/DisplayFraction"
           },
           "residual_seat_numbers": {
             "type": "array",

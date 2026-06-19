@@ -1174,7 +1174,7 @@ export interface HighestAverageAssignedSeat {
 }
 
 export interface HighestAverageResidualSeatDrawingLots {
-  average: DisplayFraction;
+  list_averages: unknown[][];
   options: PGNumber[];
   residual_seat_numbers: number[];
 }
@@ -1213,8 +1213,8 @@ export interface LargestRemainderAssignedSeat {
 }
 
 export interface LargestRemainderResidualSeatDrawingLots {
+  list_remainders: unknown[][];
   options: PGNumber[];
-  remainder: DisplayFraction;
   residual_seat_numbers: number[];
 }
 

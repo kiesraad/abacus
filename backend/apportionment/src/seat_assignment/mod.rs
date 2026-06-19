@@ -779,7 +779,7 @@ pub(crate) mod tests {
                         LargestRemainderResidualSeatDrawingLots {
                             remainder: Fraction::new(0, 1),
                             residual_seat_numbers: vec![2],
-                            options: vec![2, 3, 4, 5, 6]
+                            options: vec![2, 3, 4, 5, 6],
                         }
                     ),
                 );

@@ -680,6 +680,21 @@ pub(crate) mod tests {
             assert!(result.warnings().is_empty());
         }
 
+        /// Article P 9 Kieswet requires a strict majority of votes (> 50%), so exactly 50% should not trigger it.
+        #[test]
+        fn test_exactly_half_of_votes_should_not_trigger_absolute_majority_reassignment() {
+            let input = seat_assignment_fixture_with_default_50_candidates(7, vec![500, 300, 200]);
+            let SeatAssignment::Completed(result) = seat_assignment(&input).unwrap() else {
+                panic!("should be Completed");
+            };
+            assert!(
+                !result
+                    .steps
+                    .iter()
+                    .any(|step| step.change.is_changed_by_absolute_majority_reassignment())
+            );
+        }
+
         mod drawing_of_lots {
             use test_log::test;
 

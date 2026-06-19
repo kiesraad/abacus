@@ -331,6 +331,7 @@ fn lists_with_highest_average<'a, 'b, LN: Copy + Debug + Eq>(
 
         let variant = ListDrawingLotsVariant::HighestAverageResidualSeat(
             HighestAverageResidualSeatDrawingLots {
+                max_average,
                 residual_seat_numbers: (residual_seat_number
                     ..residual_seat_number + available_residual_seats)
                     .collect(),
@@ -419,6 +420,7 @@ fn lists_with_largest_remainder<'a, 'b, LN: Copy + Debug + Eq>(
 
         let variant = ListDrawingLotsVariant::LargestRemainderResidualSeat(
             LargestRemainderResidualSeatDrawingLots {
+                max_remainder,
                 residual_seat_numbers: (residual_seat_number
                     ..residual_seat_number + available_residual_seats)
                     .collect(),
@@ -720,6 +722,7 @@ mod tests {
     }
 
     #[test]
+    #[expect(clippy::too_many_lines)]
     fn test_lists_qualifying_for_highest_average() {
         // Lists 1-3 have votes, list 4 has none (and should never qualify).
         let standings = [

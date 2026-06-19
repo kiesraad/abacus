@@ -135,12 +135,14 @@ impl From<apportionment::ListDrawingLotsVariant<PGNumber>> for ListDrawingLotsVa
         match value {
             apportionment::ListDrawingLotsVariant::HighestAverageResidualSeat(
                 apportionment::HighestAverageResidualSeatDrawingLots {
+                    max_average,
                     residual_seat_numbers,
                     options,
                     list_averages,
                 },
             ) => ListDrawingLotsVariant::HighestAverageResidualSeat(
                 HighestAverageResidualSeatDrawingLots {
+                    max_average: max_average.into(),
                     residual_seat_numbers,
                     options,
                     list_averages: list_averages
@@ -154,12 +156,14 @@ impl From<apportionment::ListDrawingLotsVariant<PGNumber>> for ListDrawingLotsVa
             ),
             apportionment::ListDrawingLotsVariant::LargestRemainderResidualSeat(
                 apportionment::LargestRemainderResidualSeatDrawingLots {
+                    max_remainder,
                     residual_seat_numbers,
                     options,
                     list_remainders,
                 },
             ) => ListDrawingLotsVariant::LargestRemainderResidualSeat(
                 LargestRemainderResidualSeatDrawingLots {
+                    max_remainder: max_remainder.into(),
                     residual_seat_numbers,
                     options,
                     list_remainders: list_remainders

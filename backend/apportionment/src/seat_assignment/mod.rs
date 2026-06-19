@@ -777,15 +777,16 @@ pub(crate) mod tests {
                     variant,
                     ListDrawingLotsVariant::LargestRemainderResidualSeat(
                         LargestRemainderResidualSeatDrawingLots {
+                            max_remainder: Fraction::new(0, 1),
                             residual_seat_numbers: vec![2],
                             options: vec![2, 3, 4, 5, 6],
                             list_remainders: vec![
                                 (1, Fraction::new(60, 1)),
-                                (2, Fraction::new(0, 15)),
-                                (3, Fraction::new(0, 15)),
-                                (4, Fraction::new(0, 15)),
-                                (5, Fraction::new(0, 15)),
-                                (6, Fraction::new(0, 15)),
+                                (2, Fraction::new(0, 1)),
+                                (3, Fraction::new(0, 1)),
+                                (4, Fraction::new(0, 1)),
+                                (5, Fraction::new(0, 1)),
+                                (6, Fraction::new(0, 1)),
                                 (7, Fraction::new(55, 1)),
                                 (8, Fraction::new(45, 1)),
                             ],
@@ -864,6 +865,7 @@ pub(crate) mod tests {
                     variant,
                     ListDrawingLotsVariant::LargestRemainderResidualSeat(
                         LargestRemainderResidualSeatDrawingLots {
+                            max_remainder: Fraction::new(420, 7),
                             residual_seat_numbers: vec![1, 2, 3, 4],
                             options: vec![2, 3, 4, 5, 6],
                             list_remainders: vec![
@@ -904,6 +906,7 @@ pub(crate) mod tests {
                     variant,
                     ListDrawingLotsVariant::LargestRemainderResidualSeat(
                         LargestRemainderResidualSeatDrawingLots {
+                            max_remainder: Fraction::new(420, 7),
                             residual_seat_numbers: vec![2, 3, 4],
                             options: vec![2, 3, 5, 6],
                             list_remainders: vec![
@@ -1830,6 +1833,7 @@ pub(crate) mod tests {
                     variant,
                     ListDrawingLotsVariant::HighestAverageResidualSeat(
                         HighestAverageResidualSeatDrawingLots {
+                            max_average: Fraction::new(140, 3),
                             residual_seat_numbers: vec![2, 3, 4],
                             options: vec![2, 3, 4, 5, 6],
                             list_averages: vec![
@@ -1871,6 +1875,7 @@ pub(crate) mod tests {
                     variant,
                     ListDrawingLotsVariant::HighestAverageResidualSeat(
                         HighestAverageResidualSeatDrawingLots {
+                            max_average: Fraction::new(140, 3),
                             residual_seat_numbers: vec![3, 4],
                             options: vec![2, 3, 5, 6],
                             list_averages: vec![
@@ -1922,6 +1927,7 @@ pub(crate) mod tests {
                     variant,
                     ListDrawingLotsVariant::HighestAverageResidualSeat(
                         HighestAverageResidualSeatDrawingLots {
+                            max_average: Fraction::new(140, 4),
                             residual_seat_numbers: vec![2],
                             options: vec![2, 3, 4],
                             list_averages: vec![

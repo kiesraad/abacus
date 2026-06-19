@@ -108,7 +108,14 @@ function renderHighestAverageOrLargestRemainderDrawingLotsAlert(
                 : t("apportionment.remainder_of"),
           })}
         </p>
-        {tx("apportionment.drawing_lots_required_alert.list")}
+        <ul>
+          <li>
+            {t(
+              `apportionment.drawing_lots_required_alert.${variant === "HighestAverageResidualSeat" ? "same_averages" : "same_remainders"}`,
+            )}
+          </li>
+          <li>{t("apportionment.drawing_lots_required_alert.drawing_lots_needed")}</li>
+        </ul>
         <div className={cls.alertButtons}>
           {/* TODO: Update link to drawing lots page! */}
           <Button.Link size="md" to=".">

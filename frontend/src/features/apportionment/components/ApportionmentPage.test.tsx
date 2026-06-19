@@ -521,12 +521,16 @@ describe("ApportionmentPage", () => {
       expect(alerts).toHaveLength(2);
 
       const expectedVotes = variant === "HighestAverageResidualSeat" ? "gemiddeld aantal" : "overschot aan";
+      const expectedExplanation =
+        variant === "HighestAverageResidualSeat"
+          ? "Er zijn meerdere partijen die na het toewijzen van de volgende restzetel precies hetzelfde hoogste gemiddelde krijgen."
+          : "Er zijn meerdere partijen die hetzelfde grootste overschot hebben.";
       expect(alerts[0]).toHaveClass(alertCls.warning!);
       expect(alerts[0]).toHaveTextContent(
         [
           "Loting noodzakelijk voor toekennen restzetels 2, 3 en 4",
-          `Er is een restzetel te verdelen. In de wet staat dat de partij met het hoogste ${expectedVotes} stemmen per toegewezen zetel deze krijgt.`,
-          "Er zijn meerdere partijen die na het toewijzen van de tweede restzetel precies hetzelfde hoogste gemiddelde krijgen.",
+          `Er is een restzetel te verdelen. In de wet staat dat de partij met het grootste ${expectedVotes} stemmen per toegewezen zetel deze krijgt.`,
+          expectedExplanation,
           "Hierdoor kan de restzetel niet automatisch worden toegewezen. Het centraal stembureau moet een loting uitvoeren om de restzetel toe te wijzen.",
           "Naar loting",
           "Details restzetelverdeling",

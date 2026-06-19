@@ -17,8 +17,10 @@
   "details_residual_seats_allocation": "Details restzetelverdeling",
   "drawing_lots_required_alert": {
     "title": "Loting noodzakelijk voor toekennen restzetel",
-    "description": "Er is een restzetel te verdelen. In de wet staat dat de partij met het hoogste {variant} stemmen per toegewezen zetel deze krijgt.",
-    "list": "<ul><li>Er zijn meerdere partijen die na het toewijzen van de tweede restzetel precies hetzelfde hoogste gemiddelde krijgen.</li><li>Hierdoor kan de restzetel niet automatisch worden toegewezen. Het centraal stembureau moet een loting uitvoeren om de restzetel toe te wijzen.</li></ul>"
+    "description": "Er is een restzetel te verdelen. In de wet staat dat de partij met het grootste {variant} stemmen per toegewezen zetel deze krijgt.",
+    "drawing_lots_needed": "Hierdoor kan de restzetel niet automatisch worden toegewezen. Het centraal stembureau moet een loting uitvoeren om de restzetel toe te wijzen.",
+    "same_averages": "Er zijn meerdere partijen die na het toewijzen van de volgende restzetel precies hetzelfde hoogste gemiddelde krijgen.",
+    "same_remainders": "Er zijn meerdere partijen die hetzelfde grootste overschot hebben."
   },
   "election_summary": "Kengetallen",
   "full_seat": {

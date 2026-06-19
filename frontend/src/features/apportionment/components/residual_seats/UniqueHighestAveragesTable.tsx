@@ -9,14 +9,14 @@ import cls from "../Apportionment.module.css";
 interface UniqueHighestAveragesTableProps {
   steps: UniqueHighestAverageAssignmentStep[];
   largestRemainderSteps: LargestRemainderAssignmentStep[];
-  finalStanding: ListSeatAssignment[];
+  standings: ListSeatAssignment[];
   politicalGroups: PoliticalGroup[];
 }
 
 export function UniqueHighestAveragesTable({
   steps,
   largestRemainderSteps,
-  finalStanding,
+  standings,
   politicalGroups,
 }: UniqueHighestAveragesTableProps) {
   return (
@@ -31,7 +31,7 @@ export function UniqueHighestAveragesTable({
         <Table.HeaderCell className="text-align-r">{t("apportionment.residual_seats_count")}</Table.HeaderCell>
       </Table.Header>
       <Table.Body>
-        {finalStanding.map((listSeatAssignment) => {
+        {standings.map((listSeatAssignment) => {
           if (steps[0]?.change.list_exhausted.includes(listSeatAssignment.list_number)) {
             return null;
           } else {

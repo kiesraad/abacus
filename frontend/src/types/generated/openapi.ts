@@ -1488,11 +1488,11 @@ export interface SaveDataEntryResponse {
 }
 
 export interface SeatAssignment {
-  final_standing: ListSeatAssignment[];
   full_seats: number;
   quota: DisplayFraction;
   residual_seats: number;
   seats: number;
+  standings: ListSeatAssignment[];
   steps: SeatChangeStep[];
 }
 

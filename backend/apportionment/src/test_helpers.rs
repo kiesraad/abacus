@@ -127,11 +127,11 @@ impl CandidateDrawn<u32, u32> for CandidateDrawnMock {
 }
 
 pub fn get_total_seats_from_apportionment_result(result: &SeatAssignmentDetails<u32>) -> Vec<u32> {
-    result
-        .final_standing
-        .iter()
-        .map(|p| p.total_seats)
-        .collect::<Vec<_>>()
+    result.standings.iter().map(|p| p.total_seats).collect()
+}
+
+pub fn get_standings_residual_seats(result: &SeatAssignmentDetails<u32>) -> Vec<u32> {
+    result.standings.iter().map(|p| p.residual_seats).collect()
 }
 
 pub fn check_list_candidate_nomination(

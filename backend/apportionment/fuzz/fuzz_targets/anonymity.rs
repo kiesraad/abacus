@@ -46,7 +46,7 @@ fuzz_target!(
     if let (Ok(ApportionmentOutput::Completed(alloc)), Ok(ApportionmentOutput::Completed(new_alloc))) = (alloc, new_alloc) {
         let seats_per_party: Vec<u32> = alloc
             .seat_assignment
-            .final_standing
+            .standings
             .iter()
             .map(|p| p.total_seats)
             .collect();
@@ -59,7 +59,7 @@ fuzz_target!(
 
         let new_seats_per_party: Vec<u32> = new_alloc
             .seat_assignment
-            .final_standing
+            .standings
             .iter()
             .map(|p| p.total_seats)
             .collect();

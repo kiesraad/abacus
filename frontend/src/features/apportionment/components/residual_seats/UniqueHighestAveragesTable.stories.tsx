@@ -9,7 +9,7 @@ export const Default: StoryObj = {
       <UniqueHighestAveragesTable
         steps={lt19Seats.highest_average_steps}
         largestRemainderSteps={lt19Seats.largest_remainder_steps}
-        finalStanding={lt19Seats.seat_assignment.final_standing}
+        standings={lt19Seats.seat_assignment.standings}
         politicalGroups={lt19Seats.election.political_groups}
       />
     );

@@ -48,7 +48,7 @@ fuzz_target!(
             // so the assigned total can be less than seats.
             let seats_per_list: Vec<u32> = result
                 .seat_assignment
-                .final_standing
+                .standings
                 .iter()
                 .map(|standing| standing.total_seats)
                 .collect();

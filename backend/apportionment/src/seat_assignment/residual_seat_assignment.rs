@@ -69,6 +69,7 @@ pub fn assign_remainder<'b, T: ListVotes>(
                 return Ok(RemainderAssignment::DrawingLotsRequired(
                     variant,
                     steps.clone(),
+                    current_standings,
                 ));
             }
         };

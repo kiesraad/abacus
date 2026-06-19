@@ -30,7 +30,7 @@ pub struct SeatAssignment {
     pub residual_seats: u32,
     pub quota: DisplayFraction,
     pub steps: Vec<SeatChangeStep>,
-    pub final_standing: Vec<ListSeatAssignment>,
+    pub standings: Vec<ListSeatAssignment>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, ToSchema, PartialEq)]

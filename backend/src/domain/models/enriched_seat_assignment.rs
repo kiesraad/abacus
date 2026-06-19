@@ -78,7 +78,7 @@ impl EnrichedSeatAssignment {
             // Otherwise take the full seats from the final standing
             // since it will be equal to the initial standing
             seat_assignment
-                .final_standing
+                .standings
                 .iter()
                 .find(|standing| standing.list_number == list_number)
                 .expect("Standing exists for each political group")
@@ -90,13 +90,13 @@ impl EnrichedSeatAssignment {
         seat_assignment: &SeatAssignment,
         initial_largest_remainder_steps: &[&SeatChangeStep],
     ) -> Vec<(PGNumber, LargestRemainder)> {
-        let final_standing_pgs_meeting_threshold: Vec<&ListSeatAssignment> = seat_assignment
-            .final_standing
+        let standings_pgs_meeting_threshold: Vec<&ListSeatAssignment> = seat_assignment
+            .standings
             .iter()
             .filter(|list_seat_assignment| list_seat_assignment.meets_remainder_threshold)
             .collect();
         let mut largest_remainders = Vec::new();
-        for standing in &final_standing_pgs_meeting_threshold {
+        for standing in &standings_pgs_meeting_threshold {
             let assigned_seat = initial_largest_remainder_steps
                 .iter()
                 .find(|step| step.change.list_number_assigned() == standing.list_number);

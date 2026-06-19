@@ -800,7 +800,7 @@ pub(crate) mod tests {
                     result.steps[1].change,
                     SeatChange::LargestRemainderAssignment(LargestRemainderAssignedSeat {
                         selected_list_number: 6,
-                        list_options: vec![6],
+                        list_options: vec![2, 3, 4, 5, 6],
                         list_assigned: vec![6],
                         remainder_votes: Fraction::new(0, 15),
                     })
@@ -1885,7 +1885,7 @@ pub(crate) mod tests {
                     result.steps[1].change,
                     SeatChange::HighestAverageAssignment(HighestAverageAssignedSeat {
                         selected_list_number: 3,
-                        list_options: vec![3],
+                        list_options: vec![2, 3, 4],
                         list_assigned: vec![3],
                         list_exhausted: vec![],
                         votes_per_seat: Fraction::new(140, 4),

@@ -345,12 +345,8 @@
   " uur"
 }
 
-#let format_fraction(fraction, format_integer: true) = {
-  if format_integer {
-    fmt-number-str(fraction.integer)
-  } else {
-    str(fraction.integer)
-  }
+#let format_fraction(fraction) = {
+  fmt-number-str(fraction.integer)
   if fraction.numerator > 0 {
     " " + super[#fraction.numerator] + "⁄" + sub[#fraction.denominator]
   }

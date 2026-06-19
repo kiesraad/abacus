@@ -56,8 +56,7 @@ mod tests {
     use crate::domain::{
         apportionment::{
             AbsoluteMajorityDrawingLots, CandidateDrawingLotsVariant, CandidateDrawn,
-            DisplayFraction, HighestAverageResidualSeatDrawingLots, ListDrawingLotsVariant,
-            ListDrawn,
+            HighestAverageResidualSeatDrawingLots, ListDrawingLotsVariant, ListDrawn,
         },
         apportionment_state::{DeceasedCandidate, DrawingLotsRequired},
         election::{CandidateNumber, PGNumber},
@@ -83,13 +82,9 @@ mod tests {
                 drawing_lots_required: DrawingLotsRequired::ListDrawingLotsRequired(
                     ListDrawingLotsVariant::HighestAverageResidualSeat(
                         HighestAverageResidualSeatDrawingLots {
-                            average: DisplayFraction {
-                                integer: 0,
-                                numerator: 1,
-                                denominator: 2,
-                            },
                             residual_seat_numbers: vec![1],
                             options: PGNumber::from_values(vec![1, 2, 3]),
+                            list_averages: vec![],
                         },
                     ),
                 ),

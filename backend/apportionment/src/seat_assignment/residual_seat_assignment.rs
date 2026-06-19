@@ -571,10 +571,7 @@ fn step_assign_remainder_using_highest_averages<'a, 'b, LN: Copy + Debug + Eq + 
         residual_seat_number,
         lists_drawn,
     )? {
-        ListStandings::Completed(lists) => {
-            let list_options = lists.iter().map(|list| list.list_number()).collect();
-            (lists[0], list_options)
-        }
+        ListStandings::Completed(lists) => (lists[0], list_numbers(&lists)),
         ListStandings::CompletedWithDrawingLots(lists, variant) => {
             let list_options = match variant {
                 ListDrawingLotsVariant::HighestAverageResidualSeat(variant) => variant.options,
@@ -644,10 +641,7 @@ fn step_assign_remainder_using_largest_remainder<'a, 'b, LN: Copy + Debug + Eq>(
             residual_seat_number,
             lists_drawn,
         )? {
-            ListStandings::Completed(lists) => {
-                let list_options = list_numbers(&lists);
-                (lists[0], list_options)
-            }
+            ListStandings::Completed(lists) => (lists[0], list_numbers(&lists)),
             ListStandings::CompletedWithDrawingLots(lists, variant) => {
                 let list_options = match variant {
                     ListDrawingLotsVariant::LargestRemainderResidualSeat(variant) => {

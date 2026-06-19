@@ -8,7 +8,7 @@
     "pnpm": "^11",
     "npm": "please-use-pnpm"
   },
-  "packageManager": "pnpm@11.6.0",
+  "packageManager": "pnpm@11.7.0",
   "scripts": {
     "dev": "pnpm check-server && vite",
     "dev:msw": "cross-env API_MODE=mock vite",

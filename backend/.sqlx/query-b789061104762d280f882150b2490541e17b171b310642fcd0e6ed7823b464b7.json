@@ -1,0 +1,38 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT\n            investigation_state,\n            data_entry_id\n           FROM polling_stations WHERE id = ?",
+  "describe": {
+    "columns": [
+      {
+        "name": "investigation_state",
+        "ordinal": 0,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "polling_stations",
+            "name": "investigation_state"
+          }
+        }
+      },
+      {
+        "name": "data_entry_id",
+        "ordinal": 1,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "polling_stations",
+            "name": "data_entry_id"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      true,
+      true
+    ]
+  },
+  "hash": "b789061104762d280f882150b2490541e17b171b310642fcd0e6ed7823b464b7"
+}

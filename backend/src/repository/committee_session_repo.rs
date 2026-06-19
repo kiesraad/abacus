@@ -17,7 +17,7 @@ pub async fn get_committee_category(
 ) -> Result<CommitteeCategory, sqlx::Error> {
     query_scalar!(
         r#"
-        SELECT e.committee_category as "committee_category: _"
+        SELECT e.committee_category
         FROM committee_sessions AS c
         JOIN elections AS e ON c.election_id = e.id
         WHERE c.id = ?
@@ -36,12 +36,12 @@ pub async fn get(
         CommitteeSession,
         r#"
         SELECT
-            id as "id: CommitteeSessionId",
-            number as "number: u32",
-            election_id as "election_id: ElectionId",
-            status as "status: _",
+            id,
+            number,
+            election_id,
+            status,
             location,
-            start_date_time as "start_date_time: _"
+            start_date_time
         FROM committee_sessions
         WHERE id = ?
         "#,
@@ -59,12 +59,12 @@ pub async fn get_previous_session(
         CommitteeSession,
         r#"
         SELECT
-            prev.id as "id: CommitteeSessionId",
-            prev.number as "number: u32",
-            prev.election_id as "election_id: ElectionId",
-            prev.status as "status: _",
+            prev.id,
+            prev.number,
+            prev.election_id,
+            prev.status,
             prev.location,
-            prev.start_date_time as "start_date_time: _"
+            prev.start_date_time
         FROM committee_sessions AS c
         JOIN committee_sessions AS prev ON c.election_id = prev.election_id AND c.number = prev.number + 1
         WHERE c.id = ?
@@ -83,12 +83,12 @@ pub async fn get_election_committee_session_list(
         CommitteeSession,
         r#"
         SELECT
-            id as "id: CommitteeSessionId",
-            number as "number: u32",
-            election_id as "election_id: ElectionId",
-            status as "status: _",
+            id,
+            number,
+            election_id,
+            status,
             location,
-            start_date_time as "start_date_time: _"
+            start_date_time
         FROM committee_sessions
         WHERE election_id = ?
         ORDER BY number DESC
@@ -107,12 +107,12 @@ pub async fn get_election_committee_session(
         CommitteeSession,
         r#"
         SELECT
-            id as "id: CommitteeSessionId",
-            number as "number: u32",
-            election_id as "election_id: ElectionId",
-            status as "status: _",
+            id,
+            number,
+            election_id,
+            status,
             location,
-            start_date_time as "start_date_time: _"
+            start_date_time
         FROM committee_sessions
         WHERE election_id = ?
         ORDER BY number DESC
@@ -131,12 +131,12 @@ pub async fn get_committee_session_for_each_election(
         CommitteeSession,
         r#"
         SELECT
-            id as "id: CommitteeSessionId",
-            number as "number: u32",
-            election_id as "election_id: ElectionId",
-            status as "status: _",
+            id,
+            number,
+            election_id,
+            status,
             location,
-            start_date_time as "start_date_time: _"
+            start_date_time
         FROM (
             SELECT
             id,
@@ -175,11 +175,11 @@ pub async fn create(
         ) VALUES (?, ?, ?)
         RETURNING
             id as "id!: CommitteeSessionId",
-            number as "number: u32",
-            election_id as "election_id: ElectionId",
-            status as "status: _",
+            number,
+            election_id,
+            status,
             location,
-            start_date_time as "start_date_time: _"
+            start_date_time
         "#,
         committee_session.number,
         committee_session.election_id,
@@ -257,12 +257,12 @@ pub async fn update(
             start_date_time = ?
         WHERE id = ?
         RETURNING
-            id as "id: CommitteeSessionId",
-            number as "number: u32",
-            election_id as "election_id: ElectionId",
-            status as "status: _",
+            id,
+            number,
+            election_id,
+            status,
             location,
-            start_date_time as "start_date_time: _"
+            start_date_time
         "#,
         location,
         start_date_time,
@@ -284,12 +284,12 @@ pub async fn change_status(
         SET status = ?
         WHERE id = ?
         RETURNING
-            id as "id: CommitteeSessionId",
-            number as "number: u32",
-            election_id as "election_id: ElectionId",
-            status as "status: _",
+            id,
+            number,
+            election_id,
+            status,
             location,
-            start_date_time as "start_date_time: _"
+            start_date_time
         "#,
         committee_session_status,
         committee_session_id,
@@ -304,7 +304,7 @@ pub async fn get_current_id_for_election(
 ) -> Result<Option<CommitteeSessionId>, sqlx::Error> {
     query!(
         r#"
-        SELECT id AS "id: CommitteeSessionId"
+        SELECT id
         FROM committee_sessions
         WHERE election_id = ?
         ORDER BY number DESC

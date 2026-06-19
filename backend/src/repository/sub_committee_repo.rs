@@ -5,9 +5,7 @@ use crate::{
         committee_session::CommitteeSessionId,
         data_entry::{DataEntryId, DataEntrySource, DataEntryStatus, DataEntryStatusWithSource},
         election::CommitteeCategory,
-        sub_committee::{
-            SubCommittee, SubCommitteeFirstSession, SubCommitteeId, SubCommitteeNumber,
-        },
+        sub_committee::{SubCommittee, SubCommitteeFirstSession, SubCommitteeNumber},
     },
     repository::common::{SubCommitteeRow, SubCommitteeRowLike},
 };
@@ -21,12 +19,12 @@ async fn list(
         SubCommitteeRow,
         r#"
         SELECT
-            id AS "id: _",
-            committee_session_id AS "committee_session_id: _",
+            id,
+            committee_session_id,
             data_entry_id AS "data_entry_id!: _",
-            number AS "number: SubCommitteeNumber",
+            number,
             name,
-            category AS "category: _"
+            category
         FROM sub_committees
         WHERE committee_session_id = $1
         "#,
@@ -69,11 +67,11 @@ pub async fn create(
         ) VALUES (?, ?, ?, ?, ?)
         RETURNING
             id AS "id!: _",
-            committee_session_id AS "committee_session_id: _",
+            committee_session_id,
             data_entry_id AS "data_entry_id!: _",
-            number AS "number: SubCommitteeNumber",
+            number,
             name,
-            category AS "category: _"
+            category
         "#,
         committee_session_id,
         data_entry_id,
@@ -94,11 +92,11 @@ pub async fn list_first_session_with_status(
     query!(
         r#"
         SELECT
-            de.id AS "data_entry_id: DataEntryId",
-            sc.id AS "id: SubCommitteeId",
-            sc.number AS "number: SubCommitteeNumber",
+            de.id AS data_entry_id,
+            sc.id,
+            sc.number,
             sc.name,
-            sc.category AS "category: CommitteeCategory",
+            sc.category,
             de.state AS "state!: Json<DataEntryStatus>"
         FROM sub_committees AS sc
         JOIN data_entries AS de ON de.id = sc.data_entry_id

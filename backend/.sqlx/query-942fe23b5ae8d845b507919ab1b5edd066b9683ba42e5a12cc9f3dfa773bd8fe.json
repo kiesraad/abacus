@@ -1,0 +1,86 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        INSERT INTO sub_committees (\n            committee_session_id,\n            data_entry_id,\n            number,\n            name,\n            category\n        ) VALUES (?, ?, ?, ?, ?)\n        RETURNING\n            id AS \"id!: _\",\n            committee_session_id,\n            data_entry_id AS \"data_entry_id!: _\",\n            number,\n            name,\n            category\n        ",
+  "describe": {
+    "columns": [
+      {
+        "name": "id!: _",
+        "ordinal": 0,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "sub_committees",
+            "name": "id"
+          }
+        }
+      },
+      {
+        "name": "committee_session_id",
+        "ordinal": 1,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "sub_committees",
+            "name": "committee_session_id"
+          }
+        }
+      },
+      {
+        "name": "data_entry_id!: _",
+        "ordinal": 2,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "sub_committees",
+            "name": "data_entry_id"
+          }
+        }
+      },
+      {
+        "name": "number",
+        "ordinal": 3,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "sub_committees",
+            "name": "number"
+          }
+        }
+      },
+      {
+        "name": "name",
+        "ordinal": 4,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "sub_committees",
+            "name": "name"
+          }
+        }
+      },
+      {
+        "name": "category",
+        "ordinal": 5,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "sub_committees",
+            "name": "category"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 5
+    },
+    "nullable": [
+      null,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "942fe23b5ae8d845b507919ab1b5edd066b9683ba42e5a12cc9f3dfa773bd8fe"
+}

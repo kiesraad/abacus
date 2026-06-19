@@ -35,7 +35,7 @@ pub async fn get(
 ) -> Result<Option<ApportionmentState>, sqlx::Error> {
     let row = query!(
         r#"
-            SELECT state AS "state: Json<ApportionmentState>"
+            SELECT state
             FROM apportionment
             WHERE committee_session_id = $1
         "#,

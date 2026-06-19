@@ -72,11 +72,11 @@ pub(crate) async fn save(
         VALUES (?, ?, ?, ?, ?, ?)
         RETURNING
             session_key,
-            user_id as "user_id: UserId",
+            user_id,
             user_agent,
             ip_address,
-            expires_at as "expires_at: _",
-            created_at as "created_at: _"
+            expires_at,
+            created_at
         "#,
         session.session_key,
         session.user_id,
@@ -110,11 +110,11 @@ pub(crate) async fn get_by_identifier(
         r#"
         SELECT
             session_key,
-            user_id as "user_id: UserId",
+            user_id,
             user_agent,
             ip_address,
-            expires_at as "expires_at: _",
-            created_at as "created_at: _"
+            expires_at,
+            created_at
         FROM sessions
         WHERE session_key = ?
         AND user_agent = ?
@@ -143,11 +143,11 @@ pub(crate) async fn get_by_key(
         r#"
         SELECT
             session_key,
-            user_id as "user_id: UserId",
+            user_id,
             user_agent,
             ip_address,
-            expires_at as "expires_at: _",
-            created_at as "created_at: _"
+            expires_at,
+            created_at
         FROM sessions
         WHERE session_key = ?
         AND expires_at > ?
@@ -225,11 +225,11 @@ pub(crate) async fn extend_session(
         WHERE session_key = ?
         RETURNING
             session_key,
-            user_id as "user_id: UserId",
+            user_id,
             user_agent,
             ip_address,
-            expires_at as "expires_at: _",
-            created_at as "created_at: _"
+            expires_at,
+            created_at
         "#,
         expires_at,
         session_key

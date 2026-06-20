@@ -667,3 +667,25 @@ fn step_assign_remainder_using_largest_remainder<'a, 'b, LN: Copy + Debug + Eq>(
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_list_qualifies_for_extra_seat() {
+        use crate::seat_assignment::AbsoluteMajorityReassignedSeat;
+
+        let previous_steps = SeatChangeStep {
+            residual_seat_number: None,
+            change: SeatChange::AbsoluteMajorityReassignment(AbsoluteMajorityReassignedSeat {
+                list_retracted_seat: 1,
+                list_assigned_seat: 2,
+            }),
+            standings: vec![],
+        };
+
+        let boolean = list_qualifies_for_extra_seat(0, Some(1), &[previous_steps], 1u32);
+        assert_eq!(boolean, true);
+    }
+}

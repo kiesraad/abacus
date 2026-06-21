@@ -676,14 +676,14 @@ mod tests {
     /// A list whose seat was retracted via absolute majority reassignment should still qualify for reassignment.
     #[test]
     fn test_reassignment_allowed_after_seat_was_retracted() {
-        const LIST_UNDER_TEST: u32 = 1;
-        const OTHER_LIST: u32 = 2;
+        const RETRACTED_LIST: u32 = 1;
+        const ASSIGNED_LIST: u32 = 2;
 
         let previous_steps = SeatChangeStep {
             residual_seat_number: None,
             change: SeatChange::AbsoluteMajorityReassignment(AbsoluteMajorityReassignedSeat {
-                list_retracted_seat: LIST_UNDER_TEST,
-                list_assigned_seat: OTHER_LIST,
+                list_retracted_seat: RETRACTED_LIST,
+                list_assigned_seat: ASSIGNED_LIST,
             }),
             standings: vec![],
         };

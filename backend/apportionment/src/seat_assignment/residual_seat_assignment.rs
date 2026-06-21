@@ -692,7 +692,7 @@ mod tests {
             0,
             Some(1),
             &[previous_steps],
-            1u32
+            RETRACTED_LIST
         ))
     }
 }

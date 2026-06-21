@@ -685,7 +685,6 @@ mod tests {
             standings: vec![],
         };
 
-        let boolean = list_qualifies_for_extra_seat(0, Some(1), &[previous_steps], 1u32);
-        assert_eq!(boolean, true);
+        assert!(list_qualifies_for_extra_seat(0, Some(1), &[previous_steps], 1u32));
     }
 }

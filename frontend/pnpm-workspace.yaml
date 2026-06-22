@@ -9,16 +9,18 @@ trustPolicy: no-downgrade
 trustPolicyExclude:
   - semver@6.3.1
 engineStrict: true
-packageManagerStrict: true
-packageManagerStrictVersion: true
+pmOnFail: error
 strictDepBuilds: true
 strictPeerDependencies: true
+catalog:
+  vite: 8.0.16
+  "@vitest/expect": 4.1.8
 overrides:
   # Storybook currently uses @vitest/expect 3.2.4 which doesn't work with our vitest.d.ts
-  "@vitest/expect": "$@vitest/expect"
+  "@vitest/expect": "catalog:"
   # @codecov/vite-plugin does not have official support for Vite 8, but works:
   # https://github.com/codecov/codecov-javascript-bundler-plugins/issues/264
-  "vite": "$vite"
+  "vite": "catalog:"
   # Fix GHSA-4x5r-pxfx-6jf8
   "@babel/core@<=7.29.0": ">=7.29.6"
   # Fix GHSA-gv7w-rqvm-qjhr, GHSA-g7r4-m6w7-qqqr

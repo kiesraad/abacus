@@ -1140,8 +1140,12 @@ export interface GenerateElectionArgs {
   candidates_per_group: RandomRange;
   /** GSB or CSB */
   committee_category: CommitteeCategory;
+  /** Custom election name */
+  custom_name?: string;
   /** Percentage of the first data entry to complete if data entry is included */
   first_data_entry: RandomRange;
+  /** Generate multiple elections, each resulting in drawing lots */
+  generate_drawing_lots: boolean;
   /** Generate multiple elections, each resulting in a different P 22-2 variant */
   generate_p22_2_variants: boolean;
   political_group_distribution_slope: RandomRange;

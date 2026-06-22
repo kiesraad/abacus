@@ -3,7 +3,7 @@
 //! Self-signed certificate authority for serving Abacus over HTTPS.
 //! Certificates are generated with rcgen with the aws-lc-rs backend.
 
-use std::{fs, path::Path};
+use std::{fs, path::Path, sync::Arc};
 
 use chrono::{DateTime, Datelike, Duration, Utc};
 use rcgen::{
@@ -17,7 +17,6 @@ use crate::AppError;
 const CA_CERT_PEM: &str = "ca.pem";
 const CA_CERT_DER: &str = "ca.cer";
 const CA_KEY_DER: &str = "ca-key.der";
-const LEAF_CERT_PEM: &str = "leaf.pem";
 
 fn tls_err<E: core::fmt::Debug>(e: E) -> AppError {
     AppError::Tls(format!("{e:?}"))
@@ -37,6 +36,20 @@ pub struct TlsCertificates {
     pub leaf_key: PrivateKeyDer<'static>,
 }
 
+impl TlsCertificates {
+    /// Build the rustls server config with the leaf certificate.
+    pub fn server_config(&self) -> Result<Arc<rustls::ServerConfig>, AppError> {
+        let provider = Arc::new(rustls::crypto::aws_lc_rs::default_provider());
+        let config = rustls::ServerConfig::builder_with_provider(provider)
+            .with_safe_default_protocol_versions()
+            .map_err(tls_err)?
+            .with_no_client_auth()
+            .with_single_cert(vec![self.leaf_cert.clone()], self.leaf_key.clone_key())
+            .map_err(tls_err)?;
+        Ok(Arc::new(config))
+    }
+}
+
 /// Load or generate the CA and create a new leaf certificate
 pub fn load_or_generate(tls_dir: &Path) -> Result<TlsCertificates, AppError> {
     fs::create_dir_all(tls_dir)?;
@@ -47,7 +60,7 @@ pub fn load_or_generate(tls_dir: &Path) -> Result<TlsCertificates, AppError> {
     }
 
     let (issuer, ca) = load_or_generate_ca(tls_dir)?;
-    let (leaf_cert, leaf_key) = create_leaf(tls_dir, &issuer, &get_subjects())?;
+    let (leaf_cert, leaf_key) = create_leaf(&issuer, &get_subjects())?;
     Ok(TlsCertificates {
         ca,
         leaf_cert,
@@ -135,7 +148,6 @@ fn get_ca_params() -> Result<CertificateParams, AppError> {
 
 /// Create a fresh server (leaf) certificate signed by the CA
 fn create_leaf(
-    tls_dir: &Path,
     issuer: &Issuer<'_, KeyPair>,
     subjects: &[String],
 ) -> Result<(CertificateDer<'static>, PrivateKeyDer<'static>), AppError> {
@@ -155,12 +167,8 @@ fn create_leaf(
 
     let cert = params.signed_by(&leaf_key, issuer).map_err(tls_err)?;
     let cert_der = cert.der().clone();
-
-    // TODO: for now persist the leaf to disk so the certificate can be inspected - remove in #3411
-    write_file(&tls_dir.join(LEAF_CERT_PEM), cert.pem().as_bytes(), 0o644)?;
-
     tracing::info!(
-        "Created a new server certificate (SHA-256 fingerprint {})",
+        "Created a new server certificate for {subjects:?} (SHA-256 fingerprint {})",
         fingerprint(&cert_der),
     );
     let key_der = PrivateKeyDer::Pkcs8(PrivatePkcs8KeyDer::from(pkcs8));
@@ -255,6 +263,11 @@ mod tests {
             PrivateKeyDer::Pkcs8(_),
             "leaf key should be PKCS#8"
         );
+
+        // the leaf certificate and key build a valid rustls server config
+        first
+            .server_config()
+            .expect("server config should build from the leaf certificate");
 
         // check that ca.cer is equal to the returned DER
         assert_eq!(fs::read(tls_dir.join(CA_CERT_DER)).unwrap(), first.ca.der);

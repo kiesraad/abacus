@@ -37,6 +37,7 @@ type RangeFormState = Record<RangeFieldKey, string>;
 interface FormState extends RangeFormState {
   committee_category: CommitteeCategory;
   generate_p22_2_variants: boolean;
+  generate_drawing_lots: boolean;
   with_data_entry: boolean;
 }
 
@@ -49,6 +50,7 @@ const INITIAL_FORM_STATE: FormState = {
   ...INITIAL_RANGE_STATE,
   committee_category: committeeCategoryValues[0],
   generate_p22_2_variants: false,
+  generate_drawing_lots: false,
   with_data_entry: true,
 };
 
@@ -69,7 +71,10 @@ export function GenerateTestElectionForm() {
 
   const submitForm = async (event: SubmitEvent<HTMLFormElement>) => {
     const formData = new StringFormData(event.currentTarget);
-    const committee_category = formState.generate_p22_2_variants ? "CSB" : formData.getString("committee_category");
+    const committee_category =
+      formState.generate_p22_2_variants || formState.generate_drawing_lots
+        ? "CSB"
+        : formData.getString("committee_category");
 
     const payload = RANGE_FIELDS.reduce<Record<string, string | boolean>>(
       (acc, field) =>
@@ -77,6 +82,7 @@ export function GenerateTestElectionForm() {
       {
         committee_category,
         generate_p22_2_variants: formState.generate_p22_2_variants,
+        generate_drawing_lots: formState.generate_drawing_lots,
         with_data_entry: formState.with_data_entry,
       },
     );
@@ -110,7 +116,14 @@ export function GenerateTestElectionForm() {
           checked={formState.generate_p22_2_variants}
           onChange={handleBooleanChange}
         />
-        {formState.generate_p22_2_variants || (
+        <Checkbox
+          id="generate-drawing-lots"
+          name="generate_drawing_lots"
+          label="Genereer meerdere verkiezingen met verschillende vormen van loting"
+          checked={formState.generate_drawing_lots}
+          onChange={handleBooleanChange}
+        />
+        {formState.generate_p22_2_variants || formState.generate_drawing_lots || (
           <>
             <ChoiceList>
               {committeeCategoryValues.map((committeeCategory, index) => (

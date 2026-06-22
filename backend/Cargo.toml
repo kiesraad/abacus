@@ -38,6 +38,8 @@ tracing = "0.1.44"
 rcgen = { version = "0.14", default-features = false, features = ["aws_lc_rs", "pem", "x509-parser"] }
 rustls-pki-types = "1"
 if-addrs = "0.15"
+rustls = "0.23"
+axum-server = { version = "0.8", default-features = false, features = ["tls-rustls-no-provider"] }
 
 [package]
 name = "abacus"
@@ -56,7 +58,7 @@ pdf-gen-stub = ["pdf_gen/stub"]
 dev-database = []
 airgap-detection = []
 storybook = ["dep:memory-serve"]
-tls = ["dep:rcgen", "dep:rustls-pki-types", "dep:if-addrs"]
+tls = ["dep:rcgen", "dep:rustls-pki-types", "dep:if-addrs", "dep:rustls", "dep:axum-server", "reqwest/rustls"]
 
 [[bin]]
 name = "gen-openapi"
@@ -104,6 +106,8 @@ ttf-parser = "0.25.1"
 rcgen = { workspace = true, optional = true }
 rustls-pki-types = { workspace = true, optional = true }
 if-addrs = { workspace = true, optional = true }
+rustls = { workspace = true, optional = true }
+axum-server = { workspace = true, optional = true }
 
 [dev-dependencies]
 async_zip.workspace = true

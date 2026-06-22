@@ -133,7 +133,7 @@ jobs:
       - name: Install Nextest
         run: cargo binstall cargo-nextest
       - name: Run tests
-        run: cargo --verbose --locked nextest run --target=x86_64-unknown-linux-musl --workspace --exclude pdf_gen_dylib --no-default-features --features openapi,dev-database,embed-typst
+        run: cargo --verbose --locked nextest run --target=x86_64-unknown-linux-musl --workspace --exclude pdf_gen_dylib --no-default-features --features openapi,dev-database,embed-typst,tls
       - name: Build documentation
         run: cargo doc --workspace --no-deps --all-features
         env:

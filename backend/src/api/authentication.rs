@@ -529,7 +529,8 @@ mod tests {
 
         assert_eq!(cookie.path().unwrap(), "/");
         assert!(cookie.http_only().unwrap());
-        assert_eq!(cookie.secure().unwrap(), SECURE_COOKIES);
+        // Secure flag is set when serving over HTTPS (`tls` feature)
+        assert_eq!(cookie.secure().unwrap(), cfg!(feature = "tls"));
         assert_eq!(cookie.same_site().unwrap(), SameSite::Strict);
     }
 

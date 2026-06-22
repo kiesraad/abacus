@@ -22,8 +22,8 @@ pub const SECURITY_SCHEME_NAME: &str = "cookie_auth";
 /// Session cookie name
 pub const SESSION_COOKIE_NAME: &str = "ABACUS_SESSION";
 
-/// Only send cookies over a secure (https) connection
-pub const SECURE_COOKIES: bool = false;
+/// Only send cookies over a secure (HTTPS) connection when the `tls` feature is enabled
+pub const SECURE_COOKIES: bool = cfg!(feature = "tls");
 
 /// Do not extend session header, only its existence is checked, not the value
 pub const DO_NOT_EXTEND_SESSION_HEADER: &str = "x-do-not-extend-session";
@@ -105,9 +105,22 @@ mod tests {
             .unwrap();
 
         assert_eq!(response.status(), StatusCode::OK);
-        assert!(response.headers().get("set-cookie").is_some());
 
-        response.headers().get("set-cookie").unwrap().clone()
+        let set_cookie = response.headers().get("set-cookie").unwrap().clone();
+        let value = set_cookie.to_str().unwrap();
+        // Secure flag is set when serving over HTTPS (`tls` feature)
+        #[cfg(feature = "tls")]
+        assert!(
+            value.contains("Secure"),
+            "Set-Cookie missing Secure: {value}"
+        );
+        #[cfg(not(feature = "tls"))]
+        assert!(
+            !value.contains("Secure"),
+            "Set-Cookie unexpectedly Secure: {value}"
+        );
+
+        set_cookie
     }
 
     #[test(sqlx::test(fixtures("../../../../fixtures/users.sql")))]

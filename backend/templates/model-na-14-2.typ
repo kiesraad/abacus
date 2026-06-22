@@ -32,7 +32,7 @@
 
 #input.committee_session.location #format_date_time(input.committee_session.start_date_time)
 
-== Corrigendum
+== Corrigendum met een verschil
 
 #is_municipality[Elke gemeente][Elk openbaar lichaam] maakt bij een verkiezing een verslag: het proces-verbaal. Hierin staat hoe het tellen van de stemmen is verlopen en wat de uitslag van de stemming was. In dat proces-verbaal kunnen fouten staan. Het corrigendum
 corrigeert de fouten in het proces-verbaal. De aantallen in het corrigendum vervangen

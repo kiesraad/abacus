@@ -25,20 +25,11 @@ import {
   waitFor,
   within,
 } from "@/testing/test-utils";
-import type {
-  ApportionmentState,
-  ElectionApportionmentResponse,
-  ErrorResponse,
-  ListDrawingLotsVariant,
-} from "@/types/generated/openapi";
+import type { ApportionmentState, ElectionApportionmentResponse, ErrorResponse } from "@/types/generated/openapi";
 import { apportionmentRoutes } from "../routes";
-import {
-  candidate_nomination,
-  committee_session,
-  election,
-  election_summary,
-  seat_assignment,
-} from "../testing/lt-19-seats";
+import * as gte19SeatsAndP7 from "../testing/gte-19-seats-and-p7";
+import * as lt19Seats from "../testing/lt-19-seats";
+import * as lt19SeatsAndP7 from "../testing/lt-19-seats-and-p7";
 import { ApportionmentPage } from "./ApportionmentPage";
 import { ApportionmentProvider } from "./ApportionmentProvider";
 
@@ -103,11 +94,11 @@ describe("ApportionmentPage", () => {
     expectRedirectTo,
   }) => {
     vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
-    overrideOnce("get", "/api/elections/3", 200, getElectionMockData(election, committee_session));
+    overrideOnce("get", "/api/elections/3", 200, getElectionMockData(lt19Seats.election, lt19Seats.committee_session));
     overrideOnce("post", "/api/elections/3/apportionment", 200, {
-      seat_assignment: seat_assignment,
-      candidate_nomination: candidate_nomination,
-      election_summary: election_summary,
+      seat_assignment: lt19Seats.seat_assignment,
+      candidate_nomination: lt19Seats.candidate_nomination,
+      election_summary: lt19Seats.election_summary,
       warnings: [],
     } satisfies ElectionApportionmentResponse);
     overrideOnce("get", "/api/elections/3/apportionment/state", 200, state);
@@ -141,11 +132,11 @@ describe("ApportionmentPage", () => {
 
   test("Renders number of deceased candidates and redirects on clicking manage deceased candidates", async () => {
     const user = userEvent.setup();
-    overrideOnce("get", "/api/elections/3", 200, getElectionMockData(election, committee_session));
+    overrideOnce("get", "/api/elections/3", 200, getElectionMockData(lt19Seats.election, lt19Seats.committee_session));
     overrideOnce("post", "/api/elections/3/apportionment", 200, {
-      seat_assignment: seat_assignment,
-      candidate_nomination: candidate_nomination,
-      election_summary: election_summary,
+      seat_assignment: lt19Seats.seat_assignment,
+      candidate_nomination: lt19Seats.candidate_nomination,
+      election_summary: lt19Seats.election_summary,
       warnings: [],
     } satisfies ElectionApportionmentResponse);
     server.use(GetApportionmentStateRequestHandler);
@@ -198,11 +189,11 @@ describe("ApportionmentPage", () => {
 
   test("Election summary and apportionment tables visible", async () => {
     const user = userEvent.setup();
-    overrideOnce("get", "/api/elections/3", 200, getElectionMockData(election, committee_session));
+    overrideOnce("get", "/api/elections/3", 200, getElectionMockData(lt19Seats.election, lt19Seats.committee_session));
     overrideOnce("post", "/api/elections/3/apportionment", 200, {
-      seat_assignment: seat_assignment,
-      candidate_nomination: candidate_nomination,
-      election_summary: election_summary,
+      seat_assignment: lt19Seats.seat_assignment,
+      candidate_nomination: lt19Seats.candidate_nomination,
+      election_summary: lt19Seats.election_summary,
       warnings: [],
     } satisfies ElectionApportionmentResponse);
     overrideOnce("get", "/api/elections/3/apportionment/state", 200, {
@@ -307,14 +298,14 @@ describe("ApportionmentPage", () => {
     server.use(ResetApportionmentStateRequestHandler);
     const resetApportionmentState = spyOnHandler(ResetApportionmentStateRequestHandler);
     const getApportionmentState = spyOnHandler(GetApportionmentStateRequestHandler);
-    overrideOnce("get", "/api/elections/3", 200, getElectionMockData(election, committee_session));
+    overrideOnce("get", "/api/elections/3", 200, getElectionMockData(lt19Seats.election, lt19Seats.committee_session));
     server.use(
       http.post("/api/elections/3/apportionment", () =>
         HttpResponse.json(
           {
-            seat_assignment: seat_assignment,
-            candidate_nomination: candidate_nomination,
-            election_summary: election_summary,
+            seat_assignment: lt19Seats.seat_assignment,
+            candidate_nomination: lt19Seats.candidate_nomination,
+            election_summary: lt19Seats.election_summary,
             warnings: ["NotAllSeatsAssigned"],
           } satisfies ElectionApportionmentResponse,
           { status: 200 },
@@ -344,11 +335,11 @@ describe("ApportionmentPage", () => {
   });
 
   test("Renders P9+P10 warning when both articles were applied", async () => {
-    overrideOnce("get", "/api/elections/3", 200, getElectionMockData(election, committee_session));
+    overrideOnce("get", "/api/elections/3", 200, getElectionMockData(lt19Seats.election, lt19Seats.committee_session));
     overrideOnce("post", "/api/elections/3/apportionment", 200, {
-      seat_assignment: seat_assignment,
-      candidate_nomination: candidate_nomination,
-      election_summary: election_summary,
+      seat_assignment: lt19Seats.seat_assignment,
+      candidate_nomination: lt19Seats.candidate_nomination,
+      election_summary: lt19Seats.election_summary,
       warnings: ["AbsoluteMajorityAndListExhaustion"],
     } satisfies ElectionApportionmentResponse);
     overrideOnce("get", "/api/elections/3/apportionment/state", 200, {
@@ -374,7 +365,12 @@ describe("ApportionmentPage", () => {
 
   describe("Apportionment not yet available", () => {
     beforeEach(() => {
-      overrideOnce("get", "/api/elections/3", 200, getElectionMockData(election, committee_session));
+      overrideOnce(
+        "get",
+        "/api/elections/3",
+        200,
+        getElectionMockData(lt19Seats.election, lt19Seats.committee_session),
+      );
       overrideOnce("get", "/api/elections/3/apportionment/state", 200, {
         type: "Uninitialised",
       } satisfies ApportionmentState);
@@ -457,80 +453,31 @@ describe("ApportionmentPage", () => {
   });
 
   describe("Drawing lots residual seats", () => {
-    type Variant = ListDrawingLotsVariant["variant"];
-    const state: Record<Variant, ApportionmentState> = {
-      HighestAverageResidualSeat: {
-        type: "DrawingLots",
-        deceased_candidates: [],
-        lists_drawn: [],
-        candidates_drawn: [],
-        drawing_lots_required: {
-          type: "ListDrawingLotsRequired",
-          variant: "HighestAverageResidualSeat",
-          average: { integer: 46, denominator: 1, numerator: 3 },
-          residual_seat_numbers: [2, 3, 4],
-          options: [2, 3, 4, 5, 6],
-        },
-      },
-      LargestRemainderResidualSeat: {
-        type: "DrawingLots",
-        deceased_candidates: [],
-        lists_drawn: [],
-        candidates_drawn: [],
-        drawing_lots_required: {
-          type: "ListDrawingLotsRequired",
-          variant: "LargestRemainderResidualSeat",
-          remainder: { integer: 0, numerator: 0, denominator: 1 },
-          residual_seat_numbers: [2, 3, 4],
-          options: [2, 3, 4, 5, 6],
-        },
-      },
-      AbsoluteMajority: {
-        type: "DrawingLots",
-        deceased_candidates: [],
-        lists_drawn: [],
-        candidates_drawn: [],
-        drawing_lots_required: {
-          type: "ListDrawingLotsRequired",
-          variant: "AbsoluteMajority",
-          options: [2, 3, 4, 5, 6],
-        },
-      },
-    };
+    test("Render alert drawing lots required and table for HighestAverageResidualSeat", async () => {
+      overrideOnce(
+        "get",
+        "/api/elections/7",
+        200,
+        getElectionMockData(lt19SeatsAndP7.election, lt19SeatsAndP7.committee_session),
+      );
+      overrideOnce("post", "/api/elections/7/apportionment", 200, {
+        seat_assignment: lt19SeatsAndP7.seat_assignment,
+        election_summary: lt19SeatsAndP7.election_summary,
+      });
+      overrideOnce("get", "/api/elections/7/apportionment/state", 200, lt19SeatsAndP7.state);
 
-    beforeEach(() => {
-      overrideOnce("get", "/api/elections/3", 200, getElectionMockData(election, committee_session));
-      overrideOnce("post", "/api/elections/3/apportionment", 200, {
-        seat_assignment,
-        candidate_nomination,
-        election_summary,
-        warnings: [],
-      } satisfies ElectionApportionmentResponse);
-    });
-
-    test.each([
-      "HighestAverageResidualSeat",
-      "LargestRemainderResidualSeat",
-    ] satisfies Variant[])("Render alerts drawing lots required for %s", async (variant) => {
-      overrideOnce("get", "/api/elections/3/apportionment/state", 200, state[variant]);
-
-      renderApportionmentPage(3, false);
+      renderApportionmentPage(7, false);
       expect(await screen.findByRole("heading", { level: 1, name: "Zetelverdeling" })).toBeVisible();
 
       const alerts = await screen.findAllByRole("alert");
       expect(alerts).toHaveLength(2);
 
-      const expectedVotes = variant === "HighestAverageResidualSeat" ? "gemiddeld aantal" : "overschot aan";
-      const expectedExplanation =
-        variant === "HighestAverageResidualSeat"
-          ? "Er zijn meerdere partijen die na het toewijzen van de volgende restzetel precies hetzelfde hoogste gemiddelde krijgen."
-          : "Er zijn meerdere partijen die hetzelfde grootste overschot hebben.";
       expect(alerts[0]).toHaveClass(alertCls.warning!);
       expect(alerts[0]).toHaveTextContent(
         [
-          "Loting noodzakelijk voor toekennen restzetels 2, 3 en 4",
-          `Er is een restzetel te verdelen. In de wet staat dat de partij met het grootste ${expectedVotes} stemmen per toegewezen zetel deze krijgt.`,
-          expectedExplanation,
+          "Loting noodzakelijk voor toekennen restzetel 2",
+          `Er is een restzetel te verdelen. In de wet staat dat de partij met het grootste overschot aan stemmen per toegewezen zetel deze krijgt.`,
+          "Er zijn meerdere partijen die hetzelfde grootste overschot hebben.",
           "Hierdoor kan de restzetel niet automatisch worden toegewezen. Het centraal stembureau moet een loting uitvoeren om de restzetel toe te wijzen.",
           "Naar loting",
           "Details restzetelverdeling",
@@ -538,34 +485,72 @@ describe("ApportionmentPage", () => {
       );
 
       expect(alerts[1]).toHaveClass(alertCls.notify!);
-      expect(alerts[1]).toHaveTextContent("Er zijn nog 3 restzetels te verdelen. Bekijk details");
-    });
+      expect(alerts[1]).toHaveTextContent("Er is nog 1 restzetel te verdelen. Bekijk details");
 
-    test.each([
-      "HighestAverageResidualSeat",
-      "LargestRemainderResidualSeat",
-    ] satisfies Variant[])("Apportionment table contains not yet assigned for %s", async (variant) => {
-      overrideOnce("get", "/api/elections/3/apportionment/state", 200, state[variant]);
-
-      renderApportionmentPage(3, false);
-      expect(await screen.findByRole("heading", { level: 1, name: "Zetelverdeling" })).toBeVisible();
       const apportionment_table = await screen.findByTestId("apportionment-table");
-
       expect(apportionment_table).toBeVisible();
       expect(apportionment_table).toHaveTableContent([
         ["Lijst", "Lijstnaam", "Volle zetels", "Restzetels", "Totaal zetels"],
-        ["", "Nog niet toegewezen", "-", "3", "3"],
-        ["1", "Political Group A", "10", "2", "12"],
-        ["2", "Political Group B", "-", "1", "1"],
-        ["3", "Political Group C", "-", "1", "1"],
-        ["4", "Political Group D", "-", "1", "1"],
-        ["5", "Blanco (Smit, G.)", "-", "-", "-"],
-        ["6", "Political Group F", "-", "-", "-"],
-        ["7", "Political Group G", "-", "-", "-"],
-        ["8", "Political Group H", "-", "-", "-"],
-        // TODO totals don't total?
-        ["", "Totaal", "10", "5", "15"],
+        ["", "Nog niet toegewezen", "-", "1", "1"],
+        ["1", "Stemmersgroep", "6", "1", "7"],
+        ["2", "Politieke Groep der Kandidaten", "2", "-", "2"],
+        ["3", "Stemalliantie", "2", "-", "2"],
+        ["4", "Stem voor de Partij", "1", "-", "1"],
+        ["5", "Alliantie van Partijen", "1", "-", "1"],
+        ["6", "Unie voor Stemmen", "1", "-", "1"],
+        ["7", "Stem nu!", "-", "-", "-"],
+        ["8", "Politieke Groep de Partij", "-", "-", "-"],
+        ["", "Totaal", "13", "2", "15"],
       ]);
     });
+  });
+
+  test("Render alert drawing lots required and table for LargestRemainderResidualSeat", async () => {
+    overrideOnce(
+      "get",
+      "/api/elections/8",
+      200,
+      getElectionMockData(gte19SeatsAndP7.election, gte19SeatsAndP7.committee_session),
+    );
+    overrideOnce("post", "/api/elections/8/apportionment", 200, {
+      seat_assignment: gte19SeatsAndP7.seat_assignment,
+      election_summary: gte19SeatsAndP7.election_summary,
+    });
+    overrideOnce("get", "/api/elections/8/apportionment/state", 200, gte19SeatsAndP7.state);
+
+    renderApportionmentPage(8, false);
+    expect(await screen.findByRole("heading", { level: 1, name: "Zetelverdeling" })).toBeVisible();
+
+    const alerts = await screen.findAllByRole("alert");
+    expect(alerts).toHaveLength(2);
+
+    expect(alerts[0]).toHaveClass(alertCls.warning!);
+    expect(alerts[0]).toHaveTextContent(
+      [
+        "Loting noodzakelijk voor toekennen restzetels 2, 3 en 4",
+        `Er is een restzetel te verdelen. In de wet staat dat de partij met het grootste gemiddeld aantal stemmen per toegewezen zetel deze krijgt.`,
+        "Er zijn meerdere partijen die na het toewijzen van de volgende restzetel precies hetzelfde hoogste gemiddelde krijgen.",
+        "Hierdoor kan de restzetel niet automatisch worden toegewezen. Het centraal stembureau moet een loting uitvoeren om de restzetel toe te wijzen.",
+        "Naar loting",
+        "Details restzetelverdeling",
+      ].join(""),
+    );
+
+    expect(alerts[1]).toHaveClass(alertCls.notify!);
+    expect(alerts[1]).toHaveTextContent("Er zijn nog 3 restzetels te verdelen. Bekijk details");
+
+    const apportionment_table = await screen.findByTestId("apportionment-table");
+    expect(apportionment_table).toBeVisible();
+    expect(apportionment_table).toHaveTableContent([
+      ["Lijst", "Lijstnaam", "Volle zetels", "Restzetels", "Totaal zetels"],
+      ["", "Nog niet toegewezen", "-", "3", "3"],
+      ["1", "Partij voor de Stemmer", "9", "1", "10"],
+      ["2", "Algemene Partij", "2", "-", "2"],
+      ["3", "KEUS", "2", "-", "2"],
+      ["4", "Algemene Lijst", "2", "-", "2"],
+      ["5", "Unie van kandidaten", "2", "-", "2"],
+      ["6", "Lijst van stemmers", "2", "-", "2"],
+      ["", "Totaal", "19", "4", "23"],
+    ]);
   });
 });

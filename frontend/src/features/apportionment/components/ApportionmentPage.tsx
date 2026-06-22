@@ -283,7 +283,8 @@ export function ApportionmentPage() {
                       () => void handleResetApportionmentState(),
                     )
                   : state.drawing_lots_required.type === "ListDrawingLotsRequired" &&
-                    state.drawing_lots_required.variant !== "AbsoluteMajority" &&
+                    state.drawing_lots_required.variant !== "AbsoluteMajorityHighestAverage" &&
+                    state.drawing_lots_required.variant !== "AbsoluteMajorityLargestRemainder" &&
                     renderHighestAverageOrLargestRemainderDrawingLotsAlert(
                       state.drawing_lots_required.residual_seat_numbers,
                       state.drawing_lots_required.variant,

@@ -766,9 +766,9 @@
             let value = if not step.change.list_exhausted.contains(list_seat_assignment.number) { format_fraction(average) } else { "" }
             table.cell({
               if step.change.selected_list_number == list_seat_assignment.number {
-                text(weight: "semibold")[fmt-number-str(value)]
+                text(weight: "semibold")[#value]
               } else {
-                [fmt-number-str(value)]
+                value
               }
             })
           }),

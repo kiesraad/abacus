@@ -9002,6 +9002,7 @@
           "id",
           "username",
           "role",
+          "is_logged_in",
           "updated_at",
           "created_at"
         ],
@@ -9014,6 +9015,9 @@
           },
           "id": {
             "$ref": "#/components/schemas/UserId"
+          },
+          "is_logged_in": {
+            "type": "boolean"
           },
           "last_activity_at": {
             "type": "string"

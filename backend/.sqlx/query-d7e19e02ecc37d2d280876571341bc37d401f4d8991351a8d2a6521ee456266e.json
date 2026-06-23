@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "SELECT\n            id,\n            username,\n            fullname,\n            password_hash,\n            needs_password_change,\n            role,\n            last_activity_at,\n            updated_at,\n            created_at\n        FROM users\n        WHERE ($1 IS NULL OR role = $1)\n        ",
+  "query": "INSERT INTO users (username, fullname, password_hash, needs_password_change, role)\n        VALUES (?, ?, ?, ?, ?)\n        RETURNING\n            id,\n            username,\n            fullname,\n            password_hash,\n            needs_password_change,\n            role,\n            last_activity_at,\n            0 as \"is_logged_in: bool\", -- New users are never logged in\n            updated_at,\n            created_at\n        ",
   "describe": {
     "columns": [
       {
@@ -81,8 +81,14 @@
         }
       },
       {
-        "name": "updated_at",
+        "name": "is_logged_in: bool",
         "ordinal": 7,
+        "type_info": "Integer",
+        "origin": "Expression"
+      },
+      {
+        "name": "updated_at",
+        "ordinal": 8,
         "type_info": "Text",
         "origin": {
           "Table": {
@@ -93,7 +99,7 @@
       },
       {
         "name": "created_at",
-        "ordinal": 8,
+        "ordinal": 9,
         "type_info": "Text",
         "origin": {
           "Table": {
@@ -104,7 +110,7 @@
       }
     ],
     "parameters": {
-      "Right": 1
+      "Right": 5
     },
     "nullable": [
       false,
@@ -115,8 +121,9 @@
       false,
       true,
       false,
+      false,
       false
     ]
   },
-  "hash": "de52a67986f2dc60d0fe3d4b5c034fb848adf648757beb202501bb245fd42e21"
+  "hash": "d7e19e02ecc37d2d280876571341bc37d401f4d8991351a8d2a6521ee456266e"
 }

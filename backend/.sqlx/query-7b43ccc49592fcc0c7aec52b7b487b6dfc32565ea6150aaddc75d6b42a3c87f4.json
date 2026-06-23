@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n        SELECT\n            id,\n            username,\n            fullname,\n            role,\n            password_hash,\n            needs_password_change,\n            last_activity_at,\n            updated_at,\n            created_at\n        FROM users WHERE id = ?\n        ",
+  "query": "\n        SELECT\n            u.id,\n            u.username,\n            u.fullname,\n            u.role,\n            u.password_hash,\n            u.needs_password_change,\n            u.last_activity_at,\n            (\n                SELECT COUNT(*)\n                FROM sessions s\n                WHERE s.user_id = u.id\n                    AND s.expires_at > datetime($1)\n            ) > 0 as \"is_logged_in: bool\",\n            u.updated_at,\n            u.created_at\n        FROM users u WHERE u.id = $2\n        ",
   "describe": {
     "columns": [
       {
@@ -81,8 +81,14 @@
         }
       },
       {
-        "name": "updated_at",
+        "name": "is_logged_in: bool",
         "ordinal": 7,
+        "type_info": "Integer",
+        "origin": "Expression"
+      },
+      {
+        "name": "updated_at",
+        "ordinal": 8,
         "type_info": "Text",
         "origin": {
           "Table": {
@@ -93,7 +99,7 @@
       },
       {
         "name": "created_at",
-        "ordinal": 8,
+        "ordinal": 9,
         "type_info": "Text",
         "origin": {
           "Table": {
@@ -104,7 +110,7 @@
       }
     ],
     "parameters": {
-      "Right": 1
+      "Right": 2
     },
     "nullable": [
       false,
@@ -115,8 +121,9 @@
       false,
       true,
       false,
+      false,
       false
     ]
   },
-  "hash": "58d15e5e4ab40ba070d149624aec6556f4576b31d1abdd1204c7b013e81d9818"
+  "hash": "7b43ccc49592fcc0c7aec52b7b487b6dfc32565ea6150aaddc75d6b42a3c87f4"
 }

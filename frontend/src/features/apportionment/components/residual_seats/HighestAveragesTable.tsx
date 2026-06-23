@@ -137,7 +137,7 @@ export function HighestAveragesTable({
             ))}
             {addDrawingLotsRound && (
               <Table.Cell className={cn(cls.sticky, "text-align-r")} colSpan={2}>
-                <Button.Link variant="underlined" className="bold" to=".">
+                <Button.Link variant="underlined" className="bold" to="../drawing-lots">
                   {t("apportionment.drawing_lots_needed")}
                 </Button.Link>
               </Table.Cell>

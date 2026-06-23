@@ -65,7 +65,7 @@ function ElectionManagementLinks({ location }: NavBarLinksProps) {
         </>
       )}
       {location.pathname.match(
-        /^\/elections\/\d+\/apportionment\/(\d+|details-full-seats|details-residual-seats)$/,
+        /^\/elections\/\d+\/apportionment\/(\d+|details-full-seats|details-residual-seats|drawing-lots)$/,
       ) && (
         <>
           <IconChevronRight />

@@ -74,8 +74,7 @@ function LargeCouncilSection({
         <h3 className={cls.tableTitle}>{t("apportionment.averages_per_list")}:</h3>
         {notAssignedSeats > 0 && (
           <div className={cn(cls.notAssignedSeatsAlert, "mb-md-lg")}>
-            {/* TODO: Update link to drawing lots page! */}
-            {renderNotAssignedSeatsAlert(notAssignedSeats, ".", t("apportionment.go_to_drawing_lots"))}
+            {renderNotAssignedSeatsAlert(notAssignedSeats, "../drawing-lots", t("apportionment.go_to_drawing_lots"))}
           </div>
         )}
         {highestAverageSteps.length > 0 && (
@@ -214,7 +213,7 @@ function SmallCouncilSection({
       {notAssignedSeats > 0 && (
         <Alert type="notify">
           <strong className="heading-md">{getNotAssignedSeatsText(notAssignedSeats)}</strong>
-          <Button.Link to=".">{t("apportionment.go_to_drawing_lots")}</Button.Link>
+          <Button.Link to="../drawing-lots">{t("apportionment.go_to_drawing_lots")}</Button.Link>
         </Alert>
       )}
       <LargestRemaindersSection

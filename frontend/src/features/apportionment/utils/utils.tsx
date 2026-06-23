@@ -1,10 +1,11 @@
+import type { ReactElement } from "react";
 import { Link, type NavigateFunction } from "react-router";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { t, tx } from "@/i18n/translate";
 import type { ApportionmentState } from "@/types/generated/openapi";
 
-export function renderTitleAndHeader(sectionTitle: string) {
+export function renderTitleAndHeader(sectionTitle: string | ReactElement) {
   return (
     <>
       <PageTitle title={`${t("apportionment.title")} - Abacus`} />

@@ -8,7 +8,8 @@ use crate::domain::{
     apportionment::{
         AbsoluteMajorityDrawingLots, ApportionmentWarning, CandidateDrawingLotsVariant,
         CandidateDrawn, CandidateNomination, HighestAverageResidualSeatDrawingLots,
-        LargestRemainderResidualSeatDrawingLots, ListDrawingLotsVariant, ListDrawn, SeatAssignment,
+        LargestRemainderResidualSeatDrawingLots, ListAverage, ListDrawingLotsVariant, ListDrawn,
+        ListRemainder, SeatAssignment,
     },
     apportionment_state::DeceasedCandidate,
     election::{CandidateNumber, PGNumber},
@@ -108,28 +109,43 @@ impl From<ListDrawingLotsVariant> for apportionment::ListDrawingLotsVariant<PGNu
         match value {
             ListDrawingLotsVariant::HighestAverageResidualSeat(
                 HighestAverageResidualSeatDrawingLots {
-                    average,
+                    max_average,
                     residual_seat_numbers,
                     options,
+                    list_averages,
                 },
             ) => Self::HighestAverageResidualSeat(
                 apportionment::HighestAverageResidualSeatDrawingLots {
-                    average: average.into(),
+                    max_average: max_average.into(),
                     residual_seat_numbers,
                     options,
+                    list_averages: list_averages
+                        .into_iter()
+                        .map(|ListAverage { pg_number, average }| (pg_number, average.into()))
+                        .collect(),
                 },
             ),
             ListDrawingLotsVariant::LargestRemainderResidualSeat(
                 LargestRemainderResidualSeatDrawingLots {
-                    remainder,
+                    max_remainder,
                     residual_seat_numbers,
                     options,
+                    list_remainders,
                 },
             ) => Self::LargestRemainderResidualSeat(
                 apportionment::LargestRemainderResidualSeatDrawingLots {
-                    remainder: remainder.into(),
+                    max_remainder: max_remainder.into(),
                     residual_seat_numbers,
                     options,
+                    list_remainders: list_remainders
+                        .into_iter()
+                        .map(
+                            |ListRemainder {
+                                 pg_number,
+                                 remainder,
+                             }| (pg_number, remainder.into()),
+                        )
+                        .collect(),
                 },
             ),
             ListDrawingLotsVariant::AbsoluteMajority(AbsoluteMajorityDrawingLots { options }) => {

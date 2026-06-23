@@ -453,7 +453,8 @@ describe("ApportionmentPage", () => {
   });
 
   describe("Drawing lots residual seats", () => {
-    test("Render alert drawing lots required and table for HighestAverageResidualSeat", async () => {
+    test("Render alert drawing lots required and table for LargestRemainderResidualSeat", async () => {
+      const user = userEvent.setup();
       overrideOnce(
         "get",
         "/api/elections/7",
@@ -466,7 +467,7 @@ describe("ApportionmentPage", () => {
       });
       overrideOnce("get", "/api/elections/7/apportionment/state", 200, lt19SeatsAndP7.state);
 
-      renderApportionmentPage(7, false);
+      const router = renderApportionmentPage(7, true) as Router;
       expect(await screen.findByRole("heading", { level: 1, name: "Zetelverdeling" })).toBeVisible();
 
       const alerts = await screen.findAllByRole("alert");
@@ -502,55 +503,82 @@ describe("ApportionmentPage", () => {
         ["8", "Politieke Groep de Partij", "-", "-", "-"],
         ["", "Totaal", "13", "2", "15"],
       ]);
+
+      // Check that there are no links to the list details pages
+      const rows = within(apportionment_table).getAllByRole("row");
+      if (rows[2]) {
+        await user.click(rows[2]);
+      }
+      expect(router.state.location.pathname).toEqual("/");
+
+      // Check that the first row links to the residual seat page
+      if (rows[1]) {
+        await user.click(rows[1]);
+      }
+      expect(router.state.location.pathname).toEqual("/details-residual-seats");
     });
-  });
 
-  test("Render alert drawing lots required and table for LargestRemainderResidualSeat", async () => {
-    overrideOnce(
-      "get",
-      "/api/elections/8",
-      200,
-      getElectionMockData(gte19SeatsAndP7.election, gte19SeatsAndP7.committee_session),
-    );
-    overrideOnce("post", "/api/elections/8/apportionment", 200, {
-      seat_assignment: gte19SeatsAndP7.seat_assignment,
-      election_summary: gte19SeatsAndP7.election_summary,
+    test("Render alert drawing lots required and table for HighestAverageResidualSeat", async () => {
+      const user = userEvent.setup();
+      overrideOnce(
+        "get",
+        "/api/elections/8",
+        200,
+        getElectionMockData(gte19SeatsAndP7.election, gte19SeatsAndP7.committee_session),
+      );
+      overrideOnce("post", "/api/elections/8/apportionment", 200, {
+        seat_assignment: gte19SeatsAndP7.seat_assignment,
+        election_summary: gte19SeatsAndP7.election_summary,
+      });
+      overrideOnce("get", "/api/elections/8/apportionment/state", 200, gte19SeatsAndP7.state);
+
+      const router = renderApportionmentPage(8, true) as Router;
+      expect(await screen.findByRole("heading", { level: 1, name: "Zetelverdeling" })).toBeVisible();
+
+      const alerts = await screen.findAllByRole("alert");
+      expect(alerts).toHaveLength(2);
+
+      expect(alerts[0]).toHaveClass(alertCls.warning!);
+      expect(alerts[0]).toHaveTextContent(
+        [
+          "Loting noodzakelijk voor toekennen restzetels 2, 3 en 4",
+          `Er is een restzetel te verdelen. In de wet staat dat de partij met het grootste gemiddeld aantal stemmen per toegewezen zetel deze krijgt.`,
+          "Er zijn meerdere partijen die na het toewijzen van de volgende restzetel precies hetzelfde hoogste gemiddelde krijgen.",
+          "Hierdoor kan de restzetel niet automatisch worden toegewezen. Het centraal stembureau moet een loting uitvoeren om de restzetel toe te wijzen.",
+          "Naar loting",
+          "Details restzetelverdeling",
+        ].join(""),
+      );
+
+      expect(alerts[1]).toHaveClass(alertCls.notify!);
+      expect(alerts[1]).toHaveTextContent("Er zijn nog 3 restzetels te verdelen. Bekijk details");
+
+      const apportionment_table = await screen.findByTestId("apportionment-table");
+      expect(apportionment_table).toBeVisible();
+      expect(apportionment_table).toHaveTableContent([
+        ["Lijst", "Lijstnaam", "Volle zetels", "Restzetels", "Totaal zetels"],
+        ["", "Nog niet toegewezen", "-", "3", "3"],
+        ["1", "Partij voor de Stemmer", "9", "1", "10"],
+        ["2", "Algemene Partij", "2", "-", "2"],
+        ["3", "KEUS", "2", "-", "2"],
+        ["4", "Algemene Lijst", "2", "-", "2"],
+        ["5", "Unie van kandidaten", "2", "-", "2"],
+        ["6", "Lijst van stemmers", "2", "-", "2"],
+        ["", "Totaal", "19", "4", "23"],
+      ]);
+
+      // Check that there are no links to the list details pages
+      const rows = within(apportionment_table).getAllByRole("row");
+      if (rows[2]) {
+        await user.click(rows[2]);
+      }
+      expect(router.state.location.pathname).toEqual("/");
+
+      // Check that the first row links to the residual seat page
+      if (rows[1]) {
+        await user.click(rows[1]);
+      }
+      expect(router.state.location.pathname).toEqual("/details-residual-seats");
     });
-    overrideOnce("get", "/api/elections/8/apportionment/state", 200, gte19SeatsAndP7.state);
-
-    renderApportionmentPage(8, false);
-    expect(await screen.findByRole("heading", { level: 1, name: "Zetelverdeling" })).toBeVisible();
-
-    const alerts = await screen.findAllByRole("alert");
-    expect(alerts).toHaveLength(2);
-
-    expect(alerts[0]).toHaveClass(alertCls.warning!);
-    expect(alerts[0]).toHaveTextContent(
-      [
-        "Loting noodzakelijk voor toekennen restzetels 2, 3 en 4",
-        `Er is een restzetel te verdelen. In de wet staat dat de partij met het grootste gemiddeld aantal stemmen per toegewezen zetel deze krijgt.`,
-        "Er zijn meerdere partijen die na het toewijzen van de volgende restzetel precies hetzelfde hoogste gemiddelde krijgen.",
-        "Hierdoor kan de restzetel niet automatisch worden toegewezen. Het centraal stembureau moet een loting uitvoeren om de restzetel toe te wijzen.",
-        "Naar loting",
-        "Details restzetelverdeling",
-      ].join(""),
-    );
-
-    expect(alerts[1]).toHaveClass(alertCls.notify!);
-    expect(alerts[1]).toHaveTextContent("Er zijn nog 3 restzetels te verdelen. Bekijk details");
-
-    const apportionment_table = await screen.findByTestId("apportionment-table");
-    expect(apportionment_table).toBeVisible();
-    expect(apportionment_table).toHaveTableContent([
-      ["Lijst", "Lijstnaam", "Volle zetels", "Restzetels", "Totaal zetels"],
-      ["", "Nog niet toegewezen", "-", "3", "3"],
-      ["1", "Partij voor de Stemmer", "9", "1", "10"],
-      ["2", "Algemene Partij", "2", "-", "2"],
-      ["3", "KEUS", "2", "-", "2"],
-      ["4", "Algemene Lijst", "2", "-", "2"],
-      ["5", "Unie van kandidaten", "2", "-", "2"],
-      ["6", "Lijst van stemmers", "2", "-", "2"],
-      ["", "Totaal", "19", "4", "23"],
-    ]);
   });
 });

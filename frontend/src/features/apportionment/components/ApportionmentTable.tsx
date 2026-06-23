@@ -40,7 +40,7 @@ export function ApportionmentTable({
       </Table.Header>
       <Table.Body>
         {notAssignedSeats > 0 && (
-          <Table.Row id="not-assigned-seats" to={"."}>
+          <Table.Row id="not-assigned-seats" to="./details-residual-seats">
             <Table.Cell></Table.Cell>
             <Table.Cell className="bold">{t("apportionment.not_yet_assigned")}</Table.Cell>
             <Table.NumberCell>{convertZeroToDash(0)}</Table.NumberCell>

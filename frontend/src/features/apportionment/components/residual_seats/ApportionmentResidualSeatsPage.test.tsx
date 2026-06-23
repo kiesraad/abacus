@@ -3,6 +3,7 @@ import * as ReactRouter from "react-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
+import alertCls from "@/components/ui/Alert/Alert.module.css";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { Providers } from "@/testing/Providers";
@@ -11,8 +12,10 @@ import { expectErrorPage, render, screen, setupTestRouter, waitFor } from "@/tes
 import type { ApportionmentState, ElectionApportionmentResponse, ErrorResponse } from "@/types/generated/openapi";
 import { apportionmentRoutes } from "../../routes";
 import * as gte19Seats from "../../testing/gte-19-seats";
+import * as gte19SeatsAndP7 from "../../testing/gte-19-seats-and-p7";
 import * as gte19SeatsAndP9 from "../../testing/gte-19-seats-and-p9";
 import * as lt19Seats from "../../testing/lt-19-seats";
+import * as lt19SeatsAndP7 from "../../testing/lt-19-seats-and-p7";
 import * as lt19SeatsAndP9AndP10 from "../../testing/lt-19-seats-and-p9-and-p10";
 import * as lt19SeatsAndP10 from "../../testing/lt-19-seats-and-p10";
 import { ApportionmentProvider } from "../ApportionmentProvider";
@@ -575,6 +578,99 @@ describe("ApportionmentResidualSeatsPage", () => {
       rtlRender(<Providers router={router} />);
 
       await expectErrorPage();
+    });
+  });
+
+  describe("Drawing lots residual seats", () => {
+    test("Render alert drawing lots required and table for LargestRemainderResidualSeat", async () => {
+      overrideOnce(
+        "get",
+        "/api/elections/7",
+        200,
+        getElectionMockData(lt19SeatsAndP7.election, lt19SeatsAndP7.committee_session),
+      );
+      overrideOnce("post", "/api/elections/7/apportionment", 200, {
+        seat_assignment: lt19SeatsAndP7.seat_assignment,
+        election_summary: lt19SeatsAndP7.election_summary,
+      });
+      overrideOnce("get", "/api/elections/7/apportionment/state", 200, lt19SeatsAndP7.state);
+
+      renderApportionmentResidualSeatsPage(7);
+      expect(await screen.findByRole("heading", { level: 1, name: "Verdeling van de restzetels" }));
+
+      const alerts = await screen.findAllByRole("alert");
+      expect(alerts).toHaveLength(1);
+
+      expect(alerts[0]).toHaveClass(alertCls.notify!);
+      expect(alerts[0]).toHaveTextContent("Er is nog 1 restzetel te verdelen.Ga naar loting");
+
+      expect(
+        await screen.findByRole("heading", {
+          level: 2,
+          name: "De restzetels gaan naar de partijen met de grootste overschotten",
+        }),
+      );
+      const largest_remainders_table = await screen.findByTestId("largest-remainders-table");
+      expect(largest_remainders_table).toBeVisible();
+      expect(largest_remainders_table).toHaveTableContent([
+        ["Lijst", "Lijstnaam", "Aantal volle zetels", "Overschot", "Aantal restzetels"],
+        ["1", "Stemmersgroep", "6", "60", "", "1"],
+        ["2", "Politieke Groep der Kandidaten", "2", "0", "", "0"],
+        ["3", "Stemalliantie", "2", "0", "", "0"],
+        ["4", "Stem voor de Partij", "1", "0", "", "0"],
+        ["5", "Alliantie van Partijen", "1", "0", "", "0"],
+        ["6", "Unie voor Stemmen", "1", "0", "", "0"],
+      ]);
+
+      expect(screen.queryByTestId("unique-highest-averages-table")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("highest-averages-table")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("footnotes-list")).not.toBeInTheDocument();
+    });
+
+    test("Render alert drawing lots required and table for HighestAverageResidualSeat", async () => {
+      overrideOnce(
+        "get",
+        "/api/elections/8",
+        200,
+        getElectionMockData(gte19SeatsAndP7.election, gte19SeatsAndP7.committee_session),
+      );
+      overrideOnce("post", "/api/elections/8/apportionment", 200, {
+        seat_assignment: gte19SeatsAndP7.seat_assignment,
+        election_summary: gte19SeatsAndP7.election_summary,
+      });
+      overrideOnce("get", "/api/elections/8/apportionment/state", 200, gte19SeatsAndP7.state);
+
+      renderApportionmentResidualSeatsPage(8);
+      expect(await screen.findByRole("heading", { level: 1, name: "Verdeling van de restzetels" })).toBeVisible();
+
+      const alerts = await screen.findAllByRole("alert");
+      expect(alerts).toHaveLength(1);
+
+      expect(alerts[0]).toHaveClass(alertCls.notify!);
+      expect(alerts[0]).toHaveTextContent("Er zijn nog 3 restzetels te verdelen. Ga naar loting");
+
+      expect(
+        await screen.findByRole("heading", {
+          level: 2,
+          name: "De restzetels gaan naar de partijen met de grootste gemiddelden",
+        }),
+      ).toBeVisible();
+      const highest_averages_table = await screen.findByTestId("highest-averages-table");
+      expect(highest_averages_table).toBeVisible();
+      expect(highest_averages_table).toHaveTableContent([
+        ["Lijst", "Lijstnaam", "Ronde 1", "Aantal restzetels"],
+        ["1", "Partij voor de Stemmer", "50", "", "1"],
+        ["2", "Algemene Partij", "46", "2/3", "0"],
+        ["3", "KEUS", "46", "2/3", "0"],
+        ["4", "Algemene Lijst", "46", "2/3", "0"],
+        ["5", "Unie van kandidaten", "46", "2/3", "0"],
+        ["6", "Lijst van stemmers", "46", "2/3", "0"],
+        ["", "Restzetel toegekend aan lijst", "1", ""],
+      ]);
+
+      expect(screen.queryByTestId("largest-remainders-table")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("unique-highest-averages-table")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("footnotes-list")).not.toBeInTheDocument();
     });
   });
 });

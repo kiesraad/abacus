@@ -4,7 +4,7 @@ import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
 import { useElection } from "@/hooks/election/useElection";
 import { t, tx } from "@/i18n/translate";
-import type { PoliticalGroup, SeatAssignment } from "@/types/generated/openapi";
+import type { ApportionmentState, PoliticalGroup, SeatAssignment } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 import { useApportionmentContext } from "../../hooks/useApportionmentContext";
 import { getResultChanges, type ResultChange } from "../../utils/seat-change";
@@ -54,7 +54,7 @@ interface LargeCouncilSectionProps {
   politicalGroups: PoliticalGroup[];
   resultChanges: ResultChange[];
   footNotes?: ReactElement;
-  notAssignedSeats: number;
+  state: ApportionmentState;
 }
 
 function LargeCouncilSection({
@@ -63,8 +63,9 @@ function LargeCouncilSection({
   politicalGroups,
   resultChanges,
   footNotes,
-  notAssignedSeats,
+  state,
 }: LargeCouncilSectionProps) {
+  const notAssignedSeats = getNotAssignedSeats(state);
   return (
     <div className={cn(cls.tableDiv, "mb-lg")}>
       <div>
@@ -83,6 +84,7 @@ function LargeCouncilSection({
             standings={seatAssignment.standings}
             politicalGroups={politicalGroups}
             resultChanges={resultChanges}
+            state={state}
           />
         )}
       </div>
@@ -132,6 +134,7 @@ interface HighestAveragesSectionProps {
   highestAverageSteps: HighestAverageAssignmentStep[];
   politicalGroups: PoliticalGroup[];
   footNotes?: ReactElement;
+  state: ApportionmentState;
 }
 
 function HighestAveragesSection({
@@ -141,6 +144,7 @@ function HighestAveragesSection({
   highestAverageSteps,
   politicalGroups,
   footNotes,
+  state,
 }: HighestAveragesSectionProps) {
   return (
     <div className={cn(cls.tableDiv, "mb-lg")}>
@@ -172,6 +176,7 @@ function HighestAveragesSection({
                 standings={seatAssignment.standings}
                 politicalGroups={politicalGroups}
                 resultChanges={[]}
+                state={state}
               />
             }
           </>
@@ -190,7 +195,7 @@ interface SmallCouncilSectionProps {
   politicalGroups: PoliticalGroup[];
   resultChanges: ResultChange[];
   footNotes?: ReactElement;
-  notAssignedSeats: number;
+  state: ApportionmentState;
 }
 
 function SmallCouncilSection({
@@ -201,8 +206,9 @@ function SmallCouncilSection({
   politicalGroups,
   resultChanges,
   footNotes,
-  notAssignedSeats,
+  state,
 }: SmallCouncilSectionProps) {
+  const notAssignedSeats = getNotAssignedSeats(state);
   return (
     <>
       {notAssignedSeats > 0 && (
@@ -226,6 +232,7 @@ function SmallCouncilSection({
           highestAverageSteps={highestAverageSteps}
           politicalGroups={politicalGroups}
           footNotes={resultChanges.length > 0 ? footNotes : undefined}
+          state={state}
         />
       )}
     </>
@@ -245,7 +252,7 @@ export function ApportionmentResidualSeatsPage() {
   if (error) {
     return <ApportionmentErrorPage sectionTitle={t("apportionment.allocation_of_residual_seats")} error={error} />;
   }
-  if (seatAssignment) {
+  if (seatAssignment && state) {
     const { largestRemainderSteps, uniqueHighestAverageSteps, highestAverageSteps, absoluteMajorityReassignment } =
       getAssignmentSteps(seatAssignment);
     const { residualSeatRemovalSteps, uniquePgNumbersWithFullSeatsRemoved } = getRemovalSteps(seatAssignment);
@@ -280,7 +287,7 @@ export function ApportionmentResidualSeatsPage() {
                   politicalGroups={election.political_groups}
                   resultChanges={resultChanges}
                   footNotes={resultChanges.length > 0 ? renderFootnotes() : undefined}
-                  notAssignedSeats={getNotAssignedSeats(state)}
+                  state={state}
                 />
               ) : (
                 <SmallCouncilSection
@@ -291,7 +298,7 @@ export function ApportionmentResidualSeatsPage() {
                   politicalGroups={election.political_groups}
                   resultChanges={resultChanges}
                   footNotes={renderFootnotes()}
-                  notAssignedSeats={getNotAssignedSeats(state)}
+                  state={state}
                 />
               )
             ) : (

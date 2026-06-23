@@ -11,13 +11,79 @@ export const state: ApportionmentState = {
   drawing_lots_required: {
     type: "ListDrawingLotsRequired",
     variant: "LargestRemainderResidualSeat",
-    remainder: {
+    max_remainder: {
       integer: 0,
       numerator: 0,
       denominator: 1,
     },
     residual_seat_numbers: [2],
     options: [2, 3, 4, 5, 6],
+    list_remainders: [
+      {
+        pg_number: 1,
+        remainder: {
+          integer: 60,
+          numerator: 0,
+          denominator: 15,
+        },
+      },
+      {
+        pg_number: 2,
+        remainder: {
+          integer: 0,
+          numerator: 0,
+          denominator: 15,
+        },
+      },
+      {
+        pg_number: 3,
+        remainder: {
+          integer: 0,
+          numerator: 0,
+          denominator: 15,
+        },
+      },
+      {
+        pg_number: 4,
+        remainder: {
+          integer: 0,
+          numerator: 0,
+          denominator: 15,
+        },
+      },
+      {
+        pg_number: 5,
+        remainder: {
+          integer: 0,
+          numerator: 0,
+          denominator: 15,
+        },
+      },
+      {
+        pg_number: 6,
+        remainder: {
+          integer: 0,
+          numerator: 0,
+          denominator: 15,
+        },
+      },
+      {
+        pg_number: 7,
+        remainder: {
+          integer: 55,
+          numerator: 0,
+          denominator: 15,
+        },
+      },
+      {
+        pg_number: 8,
+        remainder: {
+          integer: 45,
+          numerator: 0,
+          denominator: 15,
+        },
+      },
+    ],
   },
   deceased_candidates: [],
   lists_drawn: [],

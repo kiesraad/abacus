@@ -1,6 +1,7 @@
+import { Button } from "@/components/ui/Button/Button";
 import { Table } from "@/components/ui/Table/Table";
 import { t } from "@/i18n/translate";
-import type { ListSeatAssignment, PGNumber, PoliticalGroup } from "@/types/generated/openapi";
+import type { ApportionmentState, ListSeatAssignment, PGNumber, PoliticalGroup } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 import { formatPoliticalGroupName } from "@/utils/politicalGroup";
 import { getFootnotesFromResultChanges, type ResultChange } from "../../utils/seat-change";
@@ -16,14 +17,40 @@ function getCellClassName(step: HighestAverageAssignmentStep, listNumber: PGNumb
   return undefined;
 }
 
+function getListDrawingLotsInformation(state: ApportionmentState, list_number: number) {
+  if (
+    state.type === "DrawingLots" &&
+    state.drawing_lots_required.type === "ListDrawingLotsRequired" &&
+    state.drawing_lots_required.variant === "HighestAverageResidualSeat"
+  ) {
+    const list_drawing_lots_average = state.drawing_lots_required.list_averages.find(
+      (list_average) => list_average.pg_number === list_number,
+    )?.average;
+    const mark_list_drawing_lots_average = state.drawing_lots_required.options.includes(list_number);
+    return { list_drawing_lots_average, mark_list_drawing_lots_average };
+  }
+  return { list_drawing_lots_average: undefined, mark_list_drawing_lots_average: false };
+}
+
 interface HighestAveragesTableProps {
   steps: HighestAverageAssignmentStep[];
   standings: ListSeatAssignment[];
   politicalGroups: PoliticalGroup[];
   resultChanges: ResultChange[];
+  state: ApportionmentState;
 }
 
-export function HighestAveragesTable({ steps, standings, politicalGroups, resultChanges }: HighestAveragesTableProps) {
+export function HighestAveragesTable({
+  steps,
+  standings,
+  politicalGroups,
+  resultChanges,
+  state,
+}: HighestAveragesTableProps) {
+  const addDrawingLotsRound =
+    state.type === "DrawingLots" &&
+    state.drawing_lots_required.type === "ListDrawingLotsRequired" &&
+    state.drawing_lots_required.variant === "HighestAverageResidualSeat";
   return (
     <div className={cls.scrollable}>
       <Table id="highest-averages-table" className={cn(cls.table, cls.highestAveragesTable)}>
@@ -35,6 +62,11 @@ export function HighestAveragesTable({ steps, standings, politicalGroups, result
               {t("apportionment.round")} {index + 1}
             </Table.HeaderCell>
           ))}
+          {addDrawingLotsRound && (
+            <Table.HeaderCell key={steps.length + 1} className="text-align-r" span={2}>
+              {t("apportionment.round")} {steps.length + 1}
+            </Table.HeaderCell>
+          )}
           <Table.HeaderCell className={cn(cls.sticky, "text-align-r")}>
             {t("apportionment.residual_seats_count")}
           </Table.HeaderCell>
@@ -50,6 +82,11 @@ export function HighestAveragesTable({ steps, standings, politicalGroups, result
             listResultChanges.forEach((listResultChange) => {
               residualSeats = residualSeats + listResultChange.increase - listResultChange.decrease;
             });
+            const { list_drawing_lots_average, mark_list_drawing_lots_average } = getListDrawingLotsInformation(
+              state,
+              listSeatAssignment.list_number,
+            );
+
             return (
               <Table.Row key={listSeatAssignment.list_number}>
                 <Table.Cell className={cn(cls.listNumberColumn, cls.sticky, "text-align-r", "font-number")}>
@@ -74,6 +111,14 @@ export function HighestAveragesTable({ steps, standings, politicalGroups, result
                     </Table.DisplayFractionCells>
                   );
                 })}
+                {list_drawing_lots_average && (
+                  <Table.DisplayFractionCells
+                    key={`${listSeatAssignment.list_number}-${steps.length + 1}`}
+                    className={mark_list_drawing_lots_average ? "bg-yellow bold" : undefined}
+                  >
+                    {list_drawing_lots_average}
+                  </Table.DisplayFractionCells>
+                )}
                 <Table.NumberCell className={cn(cls.sticky, "bold")}>
                   {getFootnotesFromResultChanges(listResultChanges)} {residualSeats}
                 </Table.NumberCell>
@@ -90,6 +135,13 @@ export function HighestAveragesTable({ steps, standings, politicalGroups, result
                 {step.change.selected_list_number}
               </Table.NumberCell>
             ))}
+            {addDrawingLotsRound && (
+              <Table.Cell className={cn(cls.sticky, "text-align-r")} colSpan={2}>
+                <Button.Link variant="underlined" className="bold" to=".">
+                  {t("apportionment.drawing_lots_needed")}
+                </Button.Link>
+              </Table.Cell>
+            )}
             <Table.Cell className={cls.sticky} />
           </Table.TotalRow>
         </Table.Body>

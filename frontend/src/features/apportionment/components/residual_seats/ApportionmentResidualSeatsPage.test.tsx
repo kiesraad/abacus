@@ -658,14 +658,14 @@ describe("ApportionmentResidualSeatsPage", () => {
       const highest_averages_table = await screen.findByTestId("highest-averages-table");
       expect(highest_averages_table).toBeVisible();
       expect(highest_averages_table).toHaveTableContent([
-        ["Lijst", "Lijstnaam", "Ronde 1", "Aantal restzetels"],
-        ["1", "Partij voor de Stemmer", "50", "", "1"],
-        ["2", "Algemene Partij", "46", "2/3", "0"],
-        ["3", "KEUS", "46", "2/3", "0"],
-        ["4", "Algemene Lijst", "46", "2/3", "0"],
-        ["5", "Unie van kandidaten", "46", "2/3", "0"],
-        ["6", "Lijst van stemmers", "46", "2/3", "0"],
-        ["", "Restzetel toegekend aan lijst", "1", ""],
+        ["Lijst", "Lijstnaam", "Ronde 1", "Ronde 2", "Aantal restzetels"],
+        ["1", "Partij voor de Stemmer", "50", "", "45", "5/11", "1"],
+        ["2", "Algemene Partij", "46", "2/3", "46", "2/3", "0"],
+        ["3", "KEUS", "46", "2/3", "46", "2/3", "0"],
+        ["4", "Algemene Lijst", "46", "2/3", "46", "2/3", "0"],
+        ["5", "Unie van kandidaten", "46", "2/3", "46", "2/3", "0"],
+        ["6", "Lijst van stemmers", "46", "2/3", "46", "2/3", "0"],
+        ["", "Restzetel toegekend aan lijst", "1", "Loting nodig", ""],
       ]);
 
       expect(screen.queryByTestId("largest-remainders-table")).not.toBeInTheDocument();

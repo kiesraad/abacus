@@ -34,7 +34,7 @@ export function DrawingLotsPage() {
     }
   });
 
-  if (error && error.reference === "ApportionmentCommitteeSessionNotCompleted") {
+  if (error) {
     return <ApportionmentErrorPage sectionTitle={t("apportionment.drawing_lots")} error={error} />;
   }
 

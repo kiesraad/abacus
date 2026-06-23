@@ -71,7 +71,7 @@ export function AddDeceasedCandidatePage() {
     <>
       {renderTitleAndHeader(t("candidate.deceased.singular"))}
       <main>
-        {error && error.reference === "ApportionmentCommitteeSessionNotCompleted" ? (
+        {error ? (
           <ApportionmentError error={error} />
         ) : (
           state?.type === "RegisteringDeceasedCandidates" && (

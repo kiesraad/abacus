@@ -117,7 +117,7 @@ export function IncludeAllCandidatesPage() {
       {renderTitleAndHeader(t("apportionment.title"))}
       <main>
         <article>
-          {error && error.reference === "ApportionmentCommitteeSessionNotCompleted" ? (
+          {error ? (
             <ApportionmentError error={error} />
           ) : (
             state?.type === "Uninitialised" && (

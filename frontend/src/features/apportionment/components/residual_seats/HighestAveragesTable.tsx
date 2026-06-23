@@ -63,7 +63,7 @@ export function HighestAveragesTable({
             </Table.HeaderCell>
           ))}
           {addDrawingLotsRound && (
-            <Table.HeaderCell key={steps.length + 1} className="text-align-r" span={2}>
+            <Table.HeaderCell className="text-align-r" span={2}>
               {t("apportionment.round")} {steps.length + 1}
             </Table.HeaderCell>
           )}
@@ -112,10 +112,7 @@ export function HighestAveragesTable({
                   );
                 })}
                 {list_drawing_lots_average && (
-                  <Table.DisplayFractionCells
-                    key={`${listSeatAssignment.list_number}-${steps.length + 1}`}
-                    className={mark_list_drawing_lots_average ? "bg-yellow bold" : undefined}
-                  >
+                  <Table.DisplayFractionCells className={mark_list_drawing_lots_average ? "bg-yellow bold" : undefined}>
                     {list_drawing_lots_average}
                   </Table.DisplayFractionCells>
                 )}

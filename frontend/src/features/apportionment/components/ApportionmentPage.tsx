@@ -269,7 +269,7 @@ export function ApportionmentPage() {
       {renderTitleAndHeader(t("apportionment.title"))}
       <main>
         <article className={cls.article}>
-          {error && error.reference === "ApportionmentCommitteeSessionNotCompleted" ? (
+          {error ? (
             <ApportionmentError error={error} />
           ) : (
             renderTables && (

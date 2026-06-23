@@ -181,7 +181,7 @@ export function DeceasedCandidatesPage() {
       {renderTitleAndHeader(t("candidate.deceased.plural"))}
       <main>
         <article>
-          {error && error.reference === "ApportionmentCommitteeSessionNotCompleted" ? (
+          {error ? (
             <ApportionmentError error={error} />
           ) : (
             (state?.type === "RegisteringDeceasedCandidates" || state?.type === "Finalised") && (

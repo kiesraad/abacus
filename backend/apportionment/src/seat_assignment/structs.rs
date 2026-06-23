@@ -319,6 +319,8 @@ pub struct HighestAverageAssignedSeat<LN> {
     pub list_exhausted: Vec<LN>,
     /// This is the votes per seat achieved by the selected list
     pub votes_per_seat: Fraction,
+    /// Details for drawing lots if required
+    pub drawing_lots: Option<ListDrawingLotsVariant<LN>>,
 }
 
 /// Contains the details for an assigned seat, assigned through the largest remainder method.
@@ -332,6 +334,8 @@ pub struct LargestRemainderAssignedSeat<LN> {
     pub list_assigned: Vec<LN>,
     /// The number of remainder votes achieved by the selected list
     pub remainder_votes: Fraction,
+    /// Details for drawing lots if required
+    pub drawing_lots: Option<ListDrawingLotsVariant<LN>>,
 }
 
 /// Contains information about the enactment of article P 9 of the Kieswet.
@@ -341,6 +345,8 @@ pub struct AbsoluteMajorityReassignedSeat<LN> {
     pub list_retracted_seat: LN,
     /// List number which the residual seat is assigned to
     pub list_assigned_seat: LN,
+    // Details for drawing lots if required
+    pub drawing_lots: Option<ListDrawingLotsVariant<LN>>,
 }
 
 /// Contains information about the enactment of article P 10 of the Kieswet.

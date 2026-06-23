@@ -33,6 +33,17 @@ pub enum ListDrawingLotsVariant<LN> {
     AbsoluteMajority(AbsoluteMajorityDrawingLots<LN>),
 }
 
+impl<LN> ListDrawingLotsVariant<LN> {
+    /// The list numbers that are options for drawing lots
+    pub fn options(&self) -> &[LN] {
+        match self {
+            Self::HighestAverageResidualSeat(v) => &v.options,
+            Self::LargestRemainderResidualSeat(v) => &v.options,
+            Self::AbsoluteMajority(v) => &v.options,
+        }
+    }
+}
+
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct HighestAverageResidualSeatDrawingLots<LN> {
     pub max_average: Fraction,

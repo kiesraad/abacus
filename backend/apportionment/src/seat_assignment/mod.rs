@@ -295,16 +295,15 @@ fn reassign_residual_seat_for_absolute_majority<T: ListVotes>(
     let list_seats = Fraction::from(standing_of_list_with_majority_votes.total_seats());
 
     if list_seats <= half_of_seats_count {
+        let variant = ListDrawingLotsVariant::AbsoluteMajority(AbsoluteMajorityDrawingLots {
+            options: lists_last_residual_seat.to_vec(),
+        });
         if lists_last_residual_seat.len() > 1 {
             info!(
                 "Drawing of lots is required for lists: {:?} to pick a list which the residual seat gets retracted from",
                 lists_last_residual_seat
             );
-            return Ok(AbsoluteMajority::DrawingLotsRequired(
-                ListDrawingLotsVariant::AbsoluteMajority(AbsoluteMajorityDrawingLots {
-                    options: lists_last_residual_seat.to_vec(),
-                }),
-            ));
+            return Ok(AbsoluteMajority::DrawingLotsRequired(variant));
         }
 
         // Reassign the seat
@@ -333,6 +332,7 @@ fn reassign_residual_seat_for_absolute_majority<T: ListVotes>(
                 AbsoluteMajorityReassignedSeat {
                     list_retracted_seat: lists_last_residual_seat[0],
                     list_assigned_seat: majority_list_votes.number(),
+                    drawing_lots: Some(variant),
                 },
             )),
         ))

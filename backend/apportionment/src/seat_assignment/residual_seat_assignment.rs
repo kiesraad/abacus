@@ -566,20 +566,16 @@ fn step_assign_remainder_using_highest_averages<'a, 'b, LN: Copy + Debug + Eq + 
         .iter()
         .map(|s| (s.list_number(), s.next_votes_per_seat()))
         .collect();
-    let (selected_list, list_options) = match lists_with_highest_average(
+    let (selected_list, list_options, drawing_lots) = match lists_with_highest_average(
         qualifying_for_highest_average,
         list_averages,
         residual_seats,
         residual_seat_number,
         lists_drawn,
     )? {
-        ListStandings::Completed(lists) => (lists[0], list_numbers(&lists)),
+        ListStandings::Completed(lists) => (lists[0], list_numbers(&lists), None),
         ListStandings::CompletedWithDrawingLots(lists, variant) => {
-            let list_options = match variant {
-                ListDrawingLotsVariant::HighestAverageResidualSeat(variant) => variant.options,
-                _ => unreachable!("unexpected list drawing lots variant for highest average"),
-            };
-            (lists[0], list_options)
+            (lists[0], variant.options().to_vec(), Some(variant))
         }
         ListStandings::DrawingLotsRequired(variant) => {
             return Ok(ResidualSeat::DrawingLotsRequired(variant));
@@ -600,6 +596,7 @@ fn step_assign_remainder_using_highest_averages<'a, 'b, LN: Copy + Debug + Eq + 
         list_options,
         list_exhausted: exhausted_list_numbers.to_vec(),
         votes_per_seat: selected_list.next_votes_per_seat(),
+        drawing_lots,
     };
 
     let change = if unique {
@@ -636,22 +633,16 @@ fn step_assign_remainder_using_largest_remainder<'a, 'b, LN: Copy + Debug + Eq>(
             .iter()
             .map(|s| (s.list_number(), s.remainder_votes()))
             .collect();
-        let (selected_list, list_options) = match lists_with_largest_remainder(
+        let (selected_list, list_options, drawing_lots) = match lists_with_largest_remainder(
             qualifying_for_remainder,
             list_remainders,
             residual_seats,
             residual_seat_number,
             lists_drawn,
         )? {
-            ListStandings::Completed(lists) => (lists[0], list_numbers(&lists)),
+            ListStandings::Completed(lists) => (lists[0], list_numbers(&lists), None),
             ListStandings::CompletedWithDrawingLots(lists, variant) => {
-                let list_options = match variant {
-                    ListDrawingLotsVariant::LargestRemainderResidualSeat(variant) => {
-                        variant.options
-                    }
-                    _ => unreachable!("unexpected list drawing lots variant for largest remainder"),
-                };
-                (lists[0], list_options)
+                (lists[0], variant.options().to_vec(), Some(variant))
             }
             ListStandings::DrawingLotsRequired(variant) => {
                 return Ok(ResidualSeat::DrawingLotsRequired(variant));
@@ -668,6 +659,7 @@ fn step_assign_remainder_using_largest_remainder<'a, 'b, LN: Copy + Debug + Eq>(
                 ),
                 list_options,
                 remainder_votes: selected_list.remainder_votes(),
+                drawing_lots,
             }),
         ))
     } else {
@@ -690,9 +682,8 @@ fn step_assign_remainder_using_largest_remainder<'a, 'b, LN: Copy + Debug + Eq>(
 
 #[cfg(test)]
 mod tests {
-    use crate::test_helpers::{CandidateVotesMock, ListVotesMock};
-
     use super::*;
+    use crate::test_helpers::{CandidateVotesMock, ListVotesMock};
 
     fn standing(list_number: u32, votes_cast: u32) -> ListStanding<u32> {
         ListStanding::new(

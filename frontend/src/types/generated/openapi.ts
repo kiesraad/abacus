@@ -400,6 +400,9 @@ export type USER_DELETE_REQUEST_PATH = `/api/users/${UserId}`;
 /** TYPES **/
 
 export interface AbsoluteMajorityDrawingLots {
+  /** The list where the reassigned residual seat will go to */
+  assign_to: PGNumber;
+  /** The list options where the residual seat should come from */
   options: PGNumber[];
 }
 
@@ -1237,7 +1240,8 @@ export interface ListCandidateNomination {
 export type ListDrawingLotsVariant =
   | (HighestAverageResidualSeatDrawingLots & { variant: "HighestAverageResidualSeat" })
   | (LargestRemainderResidualSeatDrawingLots & { variant: "LargestRemainderResidualSeat" })
-  | (AbsoluteMajorityDrawingLots & { variant: "AbsoluteMajority" });
+  | (AbsoluteMajorityDrawingLots & { variant: "AbsoluteMajorityHighestAverage" })
+  | (AbsoluteMajorityDrawingLots & { variant: "AbsoluteMajorityLargestRemainder" });
 
 /**
  * The list that has been drawn plus information to assert the correct drawing

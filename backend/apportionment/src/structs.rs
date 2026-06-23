@@ -5,7 +5,7 @@ use std::{
 };
 
 use super::{
-    candidate_nomination::CandidateNominationDetails, fraction::Fraction,
+    SeatChange, candidate_nomination::CandidateNominationDetails, fraction::Fraction,
     seat_assignment::SeatAssignmentDetails,
 };
 
@@ -20,6 +20,7 @@ pub type CandidateNumber<LV> = <<LV as ListVotes>::Cv as CandidateVotes>::Candid
 #[derive(Debug, PartialEq)]
 pub enum ApportionmentError {
     InvalidLotDrawing(String),
+    InvalidState(String),
 }
 
 /// Different variants of drawing lots for lists, with all the information needed to do the drawing
@@ -29,8 +30,47 @@ pub enum ListDrawingLotsVariant<LN> {
     HighestAverageResidualSeat(HighestAverageResidualSeatDrawingLots<LN>),
     /// Draw lots for assigning a largest remainder residual seat
     LargestRemainderResidualSeat(LargestRemainderResidualSeatDrawingLots<LN>),
-    /// Draw lots for retracting a seat to be reassigned because of absolute majority (P9)
-    AbsoluteMajority(AbsoluteMajorityDrawingLots<LN>),
+    /// Draw lots for retracting a seat to be reassigned because of absolute majority (P9),
+    /// retracted seat was from a highest average assignment
+    AbsoluteMajorityHighestAverage(AbsoluteMajorityDrawingLots<LN>),
+    /// Draw lots for retracting a seat to be reassigned because of absolute majority (P9),
+    /// retracted seat was from a largest remainder assignment
+    AbsoluteMajorityLargestRemainder(AbsoluteMajorityDrawingLots<LN>),
+}
+
+impl<LN: Debug + PartialEq> ListDrawingLotsVariant<LN> {
+    /// Return the absolute majority ListDrawingLotsVariant variant that corresponds
+    /// with the seat change given.
+    pub fn absolute_majority_for_seat_change(
+        seat_change: &SeatChange<LN>,
+        drawing_lots_details: AbsoluteMajorityDrawingLots<LN>,
+    ) -> Result<ListDrawingLotsVariant<LN>, ApportionmentError> {
+        match seat_change {
+            SeatChange::HighestAverageAssignment(_)
+            | SeatChange::UniqueHighestAverageAssignment(_) => Ok(
+                ListDrawingLotsVariant::AbsoluteMajorityHighestAverage(drawing_lots_details),
+            ),
+            SeatChange::LargestRemainderAssignment(_) => Ok(
+                ListDrawingLotsVariant::AbsoluteMajorityLargestRemainder(drawing_lots_details),
+            ),
+            _ => Err(ApportionmentError::InvalidState(format!(
+                "Expected seat change highest average or largest remainder but got {:?}",
+                seat_change
+            ))),
+        }
+    }
+
+    /// Ensure that this variant is the same as the other variant.
+    /// Return [[ApportionmentError::InvalidLotDrawing]] when they are different.
+    pub fn ensure_eq(&self, other: &Self) -> Result<(), ApportionmentError> {
+        if self != other {
+            Err(ApportionmentError::InvalidLotDrawing(
+                "Variant mismatch".to_string(),
+            ))
+        } else {
+            Ok(())
+        }
+    }
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -51,6 +91,9 @@ pub struct LargestRemainderResidualSeatDrawingLots<LN> {
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct AbsoluteMajorityDrawingLots<LN> {
+    /// The list where the reassigned residual seat will go to
+    pub assign_to: LN,
+    /// The list options where the residual seat should come from
     pub options: Vec<LN>,
 }
 

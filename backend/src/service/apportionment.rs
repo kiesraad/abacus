@@ -175,9 +175,16 @@ impl From<apportionment::ListDrawingLotsVariant<PGNumber>> for ListDrawingLotsVa
                         .collect(),
                 },
             ),
-            apportionment::ListDrawingLotsVariant::AbsoluteMajority(
-                apportionment::AbsoluteMajorityDrawingLots { options },
-            ) => ListDrawingLotsVariant::AbsoluteMajority(AbsoluteMajorityDrawingLots { options }),
+            apportionment::ListDrawingLotsVariant::AbsoluteMajorityHighestAverage(
+                apportionment::AbsoluteMajorityDrawingLots { assign_to, options },
+            ) => ListDrawingLotsVariant::AbsoluteMajorityHighestAverage(
+                AbsoluteMajorityDrawingLots { assign_to, options },
+            ),
+            apportionment::ListDrawingLotsVariant::AbsoluteMajorityLargestRemainder(
+                apportionment::AbsoluteMajorityDrawingLots { assign_to, options },
+            ) => ListDrawingLotsVariant::AbsoluteMajorityLargestRemainder(
+                AbsoluteMajorityDrawingLots { assign_to, options },
+            ),
         }
     }
 }

@@ -160,19 +160,19 @@ De volgende rollen zijn mogelijk: voorzitter, plaatsvervangend voorzitter of lid
   ..for pg_votes in input.summary.votes_counts.political_group_total_votes {
     (
       table.cell(format_political_group_name(pg_votes.number, pg_votes.name, with_prefix: "only_list_number")),
-      table.cell(align: right, [#pg_votes.total])
+      table.cell(align: right, fmt-number-str(pg_votes.total))
     )
   }.flatten(),
   table.hline(stroke: 1pt + black),
   table.cell(header_text([Stemmen op kandidaten])),
-  table.cell(align: right, header_text([#input.summary.votes_counts.total_votes_candidates_count])),
+  table.cell(align: right, header_text(fmt-number-str(input.summary.votes_counts.total_votes_candidates_count))),
   table.cell(fill: luma(245), [Blanco stemmen]),
-  table.cell(fill: luma(245), align: right, [#input.summary.votes_counts.blank_votes_count]),
+  table.cell(fill: luma(245), align: right, fmt-number-str(input.summary.votes_counts.blank_votes_count)),
   table.cell([Ongeldige stemmen]),
-  table.cell(align: right, [#input.summary.votes_counts.invalid_votes_count]),
+  table.cell(align: right, fmt-number-str(input.summary.votes_counts.invalid_votes_count)),
   table.hline(stroke: 1pt + black),
   table.cell(header_text([Totaal uitgebrachte stemmen])),
-  table.cell(align: right, header_text([#input.summary.votes_counts.total_votes_cast_count])),
+  table.cell(align: right, header_text(fmt-number-str(input.summary.votes_counts.total_votes_cast_count))),
 )
 
 #pagebreak(weak: true)
@@ -222,7 +222,7 @@ Met de kiesdeler wordt de zetelverdeling bepaald. De kiesdeler is het aantal ste
     table.cell(header_text([Kiesdeler])),
   ),
   table.hline(stroke: 1pt + black),
-  table.cell(align: right, [#input.summary.votes_counts.total_votes_candidates_count]),
+  table.cell(align: right, fmt-number-str(input.summary.votes_counts.total_votes_candidates_count)),
   table.cell(align: center, [÷]),
   table.cell(align: center, [#input.election.number_of_seats]),
   table.cell(align: center, [=]),
@@ -253,14 +253,14 @@ Hieronder is berekend hoe vaak elke lijst qua stemmenaantal de kiesdeler heeft g
   ..for column in input.seat_assignment.list_seat_assignment {
     (
       table.cell(format_political_group_name(column.number, column.name, with_prefix: "only_list_number")),
-      table.cell(align: right, [#column.total]),
+      table.cell(align: right, fmt-number-str(column.total)),
       table.cell(align: center, [÷ #format_fraction(input.seat_assignment.quota) =]),
       table.cell(align: right, [#column.initial_full_seats])
     )
   }.flatten(),
   table.hline(stroke: 1pt + black),
   table.cell(header_text([Totaal])),
-  table.cell(align: right, header_text([#input.summary.votes_counts.total_votes_candidates_count])),
+  table.cell(align: right, header_text(fmt-number-str(input.summary.votes_counts.total_votes_candidates_count))),
   table.cell(stroke: none, []),
   table.cell(stroke: none, align: right, header_text([#input.seat_assignment.initial_total_full_seats])),
 )

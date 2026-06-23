@@ -1,11 +1,10 @@
-import type { ReactElement } from "react";
 import { Link, type NavigateFunction } from "react-router";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { Alert } from "@/components/ui/Alert/Alert";
-import { t, tx } from "@/i18n/translate";
+import { t } from "@/i18n/translate";
 import type { ApportionmentState } from "@/types/generated/openapi";
 
-export function renderTitleAndHeader(sectionTitle: string | ReactElement) {
+export function renderTitleAndHeader(sectionTitle: string) {
   return (
     <>
       <PageTitle title={`${t("apportionment.title")} - Abacus`} />
@@ -19,7 +18,7 @@ export function renderTitleAndHeader(sectionTitle: string | ReactElement) {
 }
 
 export function getNotAssignedSeatsText(notAssignedSeats: number) {
-  return tx(`apportionment.seats_left_to_assign.${notAssignedSeats === 1 ? "singular" : "plural"}`, undefined, {
+  return t(`apportionment.seats_left_to_assign.${notAssignedSeats === 1 ? "singular" : "plural"}`, {
     num_seat: notAssignedSeats,
   });
 }

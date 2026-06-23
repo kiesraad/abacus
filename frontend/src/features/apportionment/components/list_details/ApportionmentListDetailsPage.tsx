@@ -33,10 +33,10 @@ function renderDeceasedCandidatesAlert(listDeceasedCandidateNumbers: number[]) {
     <Alert type="notify" small>
       <p>
         {listDeceasedCandidateNumbers.length === 1
-          ? tx("apportionment.list_details_alert.deceased_candidate", undefined, {
+          ? t("apportionment.list_details_alert.deceased_candidate", {
               nr: formatList(listDeceasedCandidateNumbers, t("and")),
             })
-          : tx("apportionment.list_details_alert.deceased_candidates", undefined, {
+          : t("apportionment.list_details_alert.deceased_candidates", {
               nrs: formatList(listDeceasedCandidateNumbers, t("and")),
             })}
         <br />

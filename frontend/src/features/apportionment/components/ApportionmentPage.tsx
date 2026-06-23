@@ -6,7 +6,7 @@ import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { useElection } from "@/hooks/election/useElection";
-import { t, tx } from "@/i18n/translate";
+import { t } from "@/i18n/translate";
 import type {
   ApportionmentState,
   ApportionmentWarning,
@@ -101,7 +101,7 @@ function renderHighestAverageOrLargestRemainderDrawingLotsAlert(
           {residualSeatNumbers.length > 1 && "s"} {formatList(residualSeatNumbers, t("and"))}
         </strong>
         <p>
-          {tx("apportionment.drawing_lots_required_alert.description", undefined, {
+          {t("apportionment.drawing_lots_required_alert.description", {
             variant:
               variant === "HighestAverageResidualSeat"
                 ? t("apportionment.average_number")

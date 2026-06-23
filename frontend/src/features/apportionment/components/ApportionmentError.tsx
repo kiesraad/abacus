@@ -1,4 +1,3 @@
-import type { ReactElement } from "react";
 import type { ApiError } from "@/api/ApiResult";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
@@ -24,7 +23,7 @@ export function ApportionmentError({ error }: ApportionmentErrorProps) {
 }
 
 interface ApportionmentErrorPageProps {
-  sectionTitle: string | ReactElement;
+  sectionTitle: string;
   error: ApiError;
 }
 

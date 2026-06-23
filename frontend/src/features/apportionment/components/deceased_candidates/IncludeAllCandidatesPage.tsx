@@ -9,7 +9,7 @@ import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { Loader } from "@/components/ui/Loader/Loader";
 import { useElection } from "@/hooks/election/useElection";
-import { t, tx } from "@/i18n/translate";
+import { t } from "@/i18n/translate";
 import type {
   ApportionmentState,
   REGISTER_DECEASED_CANDIDATES_REQUEST_PATH,
@@ -31,7 +31,7 @@ function renderForm(radioError: boolean, handleSubmit: (e: SubmitEvent<HTMLFormE
         <FormLayout.Section>
           <div>
             <h2>{t("apportionment.include_all_candidates.title")}</h2>
-            <p>{tx("apportionment.include_all_candidates.description")}</p>
+            <p>{t("apportionment.include_all_candidates.description")}</p>
           </div>
           <ChoiceList>
             {radioError && (

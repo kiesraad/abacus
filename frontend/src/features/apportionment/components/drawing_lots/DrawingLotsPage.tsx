@@ -1,13 +1,26 @@
-import { type ReactElement, useEffect } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router";
 
 import { useElection } from "@/hooks/election/useElection";
-import { tx } from "@/i18n/translate";
-
+import { t } from "@/i18n/translate";
+import type { ApportionmentState } from "@/types/generated/openapi";
 import { useApportionmentContext } from "../../hooks/useApportionmentContext";
 import { apportionmentCheckStateAndRedirect, renderTitleAndHeader } from "../../utils/utils";
 import cls from "../Apportionment.module.css";
 import { ApportionmentErrorPage } from "../ApportionmentError";
+
+function getPageTitle(state: ApportionmentState) {
+  if (state.type === "DrawingLots") {
+    if (state.drawing_lots_required.type === "ListDrawingLotsRequired") {
+      if (state.drawing_lots_required.variant !== "AbsoluteMajority") {
+        return t("apportionment.drawing_lots_for_seat", {
+          number: state.drawing_lots_required.residual_seat_numbers[0] || "",
+        });
+      }
+    }
+  }
+  return t("apportionment.drawing_lots");
+}
 
 export function DrawingLotsPage() {
   const navigate = useNavigate();
@@ -21,23 +34,14 @@ export function DrawingLotsPage() {
     }
   });
 
-  let pageTitle: ReactElement = <></>;
+  if (error && error.reference === "ApportionmentCommitteeSessionNotCompleted") {
+    return <ApportionmentErrorPage sectionTitle={t("apportionment.drawing_lots")} error={error} />;
+  }
+
   if (state && state.type === "DrawingLots") {
-    if (state.drawing_lots_required.type === "ListDrawingLotsRequired") {
-      if (state.drawing_lots_required.variant !== "AbsoluteMajority") {
-        pageTitle = tx("apportionment.drawing_lots_for_seat", undefined, {
-          number: state.drawing_lots_required.residual_seat_numbers[0] || "",
-        });
-      }
-    }
-
-    if (error && error.reference === "ApportionmentCommitteeSessionNotCompleted") {
-      return <ApportionmentErrorPage sectionTitle={pageTitle} error={error} />;
-    }
-
     return (
       <>
-        {renderTitleAndHeader(pageTitle)}
+        {renderTitleAndHeader(getPageTitle(state))}
         <main>
           <article className={cls.article}></article>
         </main>

@@ -684,7 +684,6 @@ fn step_assign_remainder_using_largest_remainder<'a, 'b, LN: Copy + Debug + Eq>(
 mod tests {
     use super::*;
     use crate::test_helpers::{CandidateVotesMock, ListVotesMock};
-
     fn standing(list_number: u32, votes_cast: u32) -> ListStanding<u32> {
         ListStanding::new(
             &ListVotesMock {
@@ -708,6 +707,7 @@ mod tests {
                 list_assigned: vec![list_number],
                 list_exhausted: vec![],
                 votes_per_seat: Fraction::ZERO,
+                drawing_lots: None,
             }),
         }
     }

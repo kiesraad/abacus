@@ -641,6 +641,11 @@ mod tests {
         assert_eq!(response.status(), StatusCode::OK);
         assert_eq!(response.headers().get("set-cookie"), None);
 
+        // remove the previous session before creating a new one for the same user
+        session_repo::delete(&mut conn, session.session_key())
+            .await
+            .unwrap();
+
         // with a session that is about to expire the user should get a new cookie, and the session lifetime should be extended
         let session = Session::create(
             UserId::from(1),

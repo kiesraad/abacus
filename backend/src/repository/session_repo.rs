@@ -242,6 +242,8 @@ pub(crate) async fn extend_session(
 
 #[cfg(test)]
 mod tests {
+    use std::assert_matches;
+
     use chrono::TimeDelta;
     use sqlx::SqlitePool;
     use test_log::test;
@@ -299,6 +301,33 @@ mod tests {
     }
 
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
+    async fn test_session_user_id_is_unique(pool: SqlitePool) {
+        let mut conn = pool.acquire().await.unwrap();
+        let session = Session::create(
+            UserId::from(1),
+            TEST_USER_AGENT,
+            TEST_IP_ADDRESS,
+            TimeDelta::seconds(60),
+        );
+        save(&mut conn, &session).await.unwrap();
+
+        // A second session for the same user violates the UNIQUE constraint on user_id
+        let other_session = Session::create(
+            UserId::from(1),
+            TEST_USER_AGENT,
+            TEST_IP_ADDRESS,
+            TimeDelta::seconds(60),
+        );
+        let result = save(&mut conn, &other_session).await;
+
+        assert_matches!(
+            result,
+            Err(sqlx::Error::Database(e)) if e.is_unique_violation(),
+            "expected a unique constraint violation on sessions.user_id"
+        );
+    }
+
+    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
     async fn test_delete_old_sessions(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
         let session = Session::create(
@@ -338,7 +367,7 @@ mod tests {
         save(&mut conn, &active_session2).await.unwrap();
 
         let expired_session = Session::create(
-            UserId::from(2),
+            UserId::from(3),
             TEST_USER_AGENT,
             TEST_IP_ADDRESS,
             TimeDelta::seconds(0),

@@ -190,8 +190,8 @@ impl<LN> ListStanding<LN> {
     }
 }
 
-/// Records the change for a specific seat, and how the standing is once
-/// that seat was assigned or removed
+/// Records the change for a specific seat and how the standing were
+/// before that change was applied
 #[derive(Clone, Debug, PartialEq)]
 pub struct SeatChangeStep<LN> {
     pub residual_seat_number: Option<u32>,

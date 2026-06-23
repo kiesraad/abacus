@@ -147,17 +147,30 @@
   items.map(str).join(", ")
 }
 
-/// Format a number with thousands separator
-#let fmt-number(
+/// Format a number with thousands separator, return as str
+#let fmt-number-str(
   integer,
   thousands-sep: ".",
-  zero: "-",
+  zero: "0"
 ) = {
   if (integer == 0 or integer == none) {
     return zero
   }
 
-  let formatted = str(integer).clusters().rev().chunks(3).map(c => c.join("")).join(thousands-sep).rev()
+  str(integer).clusters().rev().chunks(3).map(c => c.join("")).join(thousands-sep).rev()
+}
+
+/// Format a number with thousands separator, return as text object
+#let fmt-number(
+  integer,
+  thousands-sep: ".",
+  zero: "-",
+) = {
+  let formatted = fmt-number-str(integer, thousands-sep: thousands-sep, zero: zero)
+
+  if formatted == zero {
+    return zero
+  }
 
   text(
     number-width: "tabular",
@@ -333,7 +346,7 @@
 }
 
 #let format_fraction(fraction) = {
-  str(fraction.integer)
+  fmt-number-str(fraction.integer)
   if fraction.numerator > 0 {
     " " + super[#fraction.numerator] + "⁄" + sub[#fraction.denominator]
   }
@@ -380,7 +393,7 @@
   }
 
   name += election_candidate.last_name + ", " + election_candidate.initials + " "
-  
+
   if "first_name" in election_candidate and with_first_name {
     name += "(" + election_candidate.first_name + ") "
   }
@@ -696,7 +709,7 @@
         table.cell(align: right, [#column.list_seat_number]),
         table.cell([#candidate_name(column.candidate)]),
         table.cell([#candidate_location(column.candidate)]),
-        if showVotes { table.cell(align: right, [#column.votes])}
+        if showVotes { table.cell(align: right, fmt-number-str(column.votes))}
         else if showPosition { table.cell(align: right, [#column.candidate.number])},
       )
     }).flatten(),
@@ -753,9 +766,9 @@
             let value = if not step.change.list_exhausted.contains(list_seat_assignment.number) { format_fraction(average) } else { "" }
             table.cell({
               if step.change.selected_list_number == list_seat_assignment.number {
-                text(weight: "semibold")[#value]
+                text(weight: "semibold")[fmt-number-str(value)]
               } else {
-                value
+                [fmt-number-str(value)]
               }
             })
           }),

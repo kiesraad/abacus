@@ -12,7 +12,7 @@ use crate::{
         apportionment::{
             AbsoluteMajorityDrawingLots, ApportionmentWarning, CandidateDrawingLotsVariant,
             HighestAverageResidualSeatDrawingLots, LargestRemainderResidualSeatDrawingLots,
-            ListDrawingLotsVariant, SeatAssignment,
+            ListAverage, ListDrawingLotsVariant, ListRemainder, SeatAssignment,
         },
         apportionment_state::{ApportionmentState, ApportionmentStateError, DrawingLotsRequired},
         committee_session::CommitteeSessionId,
@@ -135,28 +135,44 @@ impl From<apportionment::ListDrawingLotsVariant<PGNumber>> for ListDrawingLotsVa
         match value {
             apportionment::ListDrawingLotsVariant::HighestAverageResidualSeat(
                 apportionment::HighestAverageResidualSeatDrawingLots {
-                    average,
+                    max_average,
                     residual_seat_numbers,
                     options,
+                    list_averages,
                 },
             ) => ListDrawingLotsVariant::HighestAverageResidualSeat(
                 HighestAverageResidualSeatDrawingLots {
-                    average: average.into(),
+                    max_average: max_average.into(),
                     residual_seat_numbers,
                     options,
+                    list_averages: list_averages
+                        .into_iter()
+                        .map(|(ln, avg)| ListAverage {
+                            pg_number: ln,
+                            average: avg.into(),
+                        })
+                        .collect(),
                 },
             ),
             apportionment::ListDrawingLotsVariant::LargestRemainderResidualSeat(
                 apportionment::LargestRemainderResidualSeatDrawingLots {
-                    remainder,
+                    max_remainder,
                     residual_seat_numbers,
                     options,
+                    list_remainders,
                 },
             ) => ListDrawingLotsVariant::LargestRemainderResidualSeat(
                 LargestRemainderResidualSeatDrawingLots {
-                    remainder: remainder.into(),
+                    max_remainder: max_remainder.into(),
                     residual_seat_numbers,
                     options,
+                    list_remainders: list_remainders
+                        .into_iter()
+                        .map(|(ln, rem)| ListRemainder {
+                            pg_number: ln,
+                            remainder: rem.into(),
+                        })
+                        .collect(),
                 },
             ),
             apportionment::ListDrawingLotsVariant::AbsoluteMajority(

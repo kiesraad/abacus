@@ -7489,12 +7489,19 @@
       "HighestAverageResidualSeatDrawingLots": {
         "type": "object",
         "required": [
-          "average",
+          "max_average",
           "residual_seat_numbers",
-          "options"
+          "options",
+          "list_averages"
         ],
         "properties": {
-          "average": {
+          "list_averages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ListAverage"
+            }
+          },
+          "max_average": {
             "$ref": "#/components/schemas/DisplayFraction"
           },
           "options": {
@@ -7663,19 +7670,26 @@
       "LargestRemainderResidualSeatDrawingLots": {
         "type": "object",
         "required": [
-          "remainder",
+          "max_remainder",
           "residual_seat_numbers",
-          "options"
+          "options",
+          "list_remainders"
         ],
         "properties": {
+          "list_remainders": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ListRemainder"
+            }
+          },
+          "max_remainder": {
+            "$ref": "#/components/schemas/DisplayFraction"
+          },
           "options": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/PGNumber"
             }
-          },
-          "remainder": {
-            "$ref": "#/components/schemas/DisplayFraction"
           },
           "residual_seat_numbers": {
             "type": "array",
@@ -7684,6 +7698,21 @@
               "format": "int32",
               "minimum": 0
             }
+          }
+        }
+      },
+      "ListAverage": {
+        "type": "object",
+        "required": [
+          "pg_number",
+          "average"
+        ],
+        "properties": {
+          "average": {
+            "$ref": "#/components/schemas/DisplayFraction"
+          },
+          "pg_number": {
+            "$ref": "#/components/schemas/PGNumber"
           }
         }
       },
@@ -7832,6 +7861,21 @@
           },
           "list_retracted_seat": {
             "$ref": "#/components/schemas/PGNumber"
+          }
+        }
+      },
+      "ListRemainder": {
+        "type": "object",
+        "required": [
+          "pg_number",
+          "remainder"
+        ],
+        "properties": {
+          "pg_number": {
+            "$ref": "#/components/schemas/PGNumber"
+          },
+          "remainder": {
+            "$ref": "#/components/schemas/DisplayFraction"
           }
         }
       },

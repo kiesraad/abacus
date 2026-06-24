@@ -1,8 +1,6 @@
 import { describe, expect, test } from "vitest";
 import { calculateProgressPercentage } from "./progressPercentage";
 
-// froms: 0.5, 0
-
 describe("progressPercentage util", () => {
   test.each([
     [5, 0, 0, 1, 0], // total of 0 returns 0

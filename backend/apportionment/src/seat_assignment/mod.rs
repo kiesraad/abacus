@@ -295,16 +295,15 @@ fn reassign_residual_seat_for_absolute_majority<T: ListVotes>(
     let list_seats = Fraction::from(standing_of_list_with_majority_votes.total_seats());
 
     if list_seats <= half_of_seats_count {
+        let variant = ListDrawingLotsVariant::AbsoluteMajority(AbsoluteMajorityDrawingLots {
+            options: lists_last_residual_seat.to_vec(),
+        });
         if lists_last_residual_seat.len() > 1 {
             info!(
                 "Drawing of lots is required for lists: {:?} to pick a list which the residual seat gets retracted from",
                 lists_last_residual_seat
             );
-            return Ok(AbsoluteMajority::DrawingLotsRequired(
-                ListDrawingLotsVariant::AbsoluteMajority(AbsoluteMajorityDrawingLots {
-                    options: lists_last_residual_seat.to_vec(),
-                }),
-            ));
+            return Ok(AbsoluteMajority::DrawingLotsRequired(variant));
         }
 
         // Reassign the seat
@@ -333,6 +332,7 @@ fn reassign_residual_seat_for_absolute_majority<T: ListVotes>(
                 AbsoluteMajorityReassignedSeat {
                     list_retracted_seat: lists_last_residual_seat[0],
                     list_assigned_seat: majority_list_votes.number(),
+                    drawing_lots: Some(variant),
                 },
             )),
         ))
@@ -831,6 +831,7 @@ pub(crate) mod tests {
                         list_options: vec![1],
                         list_assigned: vec![1],
                         remainder_votes: Fraction::new(900, 15),
+                        drawing_lots: None,
                     })
                 );
                 assert_eq!(
@@ -840,6 +841,23 @@ pub(crate) mod tests {
                         list_options: vec![2, 3, 4, 5, 6],
                         list_assigned: vec![6],
                         remainder_votes: Fraction::new(0, 15),
+                        drawing_lots: Some(ListDrawingLotsVariant::LargestRemainderResidualSeat(
+                            LargestRemainderResidualSeatDrawingLots {
+                                max_remainder: Fraction::new(0, 1),
+                                residual_seat_numbers: vec![2],
+                                options: vec![2, 3, 4, 5, 6],
+                                list_remainders: vec![
+                                    (1, Fraction::new(60, 1)),
+                                    (2, Fraction::new(0, 1)),
+                                    (3, Fraction::new(0, 1)),
+                                    (4, Fraction::new(0, 1)),
+                                    (5, Fraction::new(0, 1)),
+                                    (6, Fraction::new(0, 1)),
+                                    (7, Fraction::new(55, 1)),
+                                    (8, Fraction::new(45, 1)),
+                                ]
+                            }
+                        )),
                     })
                 );
             }
@@ -1973,6 +1991,7 @@ pub(crate) mod tests {
                         list_assigned: vec![1],
                         list_exhausted: vec![],
                         votes_per_seat: Fraction::new(500, 14),
+                        drawing_lots: None,
                     })
                 );
                 assert_eq!(
@@ -1983,6 +2002,19 @@ pub(crate) mod tests {
                         list_assigned: vec![3],
                         list_exhausted: vec![],
                         votes_per_seat: Fraction::new(140, 4),
+                        drawing_lots: Some(ListDrawingLotsVariant::HighestAverageResidualSeat(
+                            HighestAverageResidualSeatDrawingLots {
+                                max_average: Fraction::new(35, 1),
+                                residual_seat_numbers: vec![2],
+                                options: vec![2, 3, 4],
+                                list_averages: vec![
+                                    (1, Fraction::new(500, 15)),
+                                    (2, Fraction::new(140, 4)),
+                                    (3, Fraction::new(140, 4)),
+                                    (4, Fraction::new(140, 4)),
+                                ]
+                            }
+                        )),
                     })
                 );
             }

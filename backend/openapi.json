@@ -5342,6 +5342,9 @@
           "list_assigned_seat"
         ],
         "properties": {
+          "drawing_lots": {
+            "$ref": "#/components/schemas/ListDrawingLotsVariant"
+          },
           "list_assigned_seat": {
             "$ref": "#/components/schemas/PGNumber"
           },
@@ -7460,6 +7463,9 @@
           "votes_per_seat"
         ],
         "properties": {
+          "drawing_lots": {
+            "$ref": "#/components/schemas/ListDrawingLotsVariant"
+          },
           "list_assigned": {
             "type": "array",
             "items": {
@@ -7647,6 +7653,9 @@
           "remainder_votes"
         ],
         "properties": {
+          "drawing_lots": {
+            "$ref": "#/components/schemas/ListDrawingLotsVariant"
+          },
           "list_assigned": {
             "type": "array",
             "items": {

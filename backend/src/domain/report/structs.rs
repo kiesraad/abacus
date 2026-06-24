@@ -361,7 +361,7 @@ impl ResultsInputCSB {
         let enriched_candidate_nomination =
             EnrichedCandidateNomination::new(&data.election, &candidate_nomination)?;
         let footnotes =
-            ApportionmentFootnotes::new(&data.election.political_groups, &seat_assignment)?;
+            ApportionmentFootnotes::new(&data.election.political_groups, &seat_assignment.steps)?;
         let pdf_file: PdfFileModel = ModelP22_2Input {
             committee_session: data.committee_session.clone(),
             election: data.election.clone().into(),

@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 use crate::{
     APIError,
     domain::{
-        apportionment::{ListDrawingLotsVariant, SeatAssignment, SeatChangeStep},
+        apportionment::{ListDrawingLotsVariant, SeatChangeStep},
         election::{PGNumber, PoliticalGroup},
     },
 };
@@ -42,11 +42,11 @@ struct FootnoteSteps<'a> {
 }
 
 /// Retrieves [SeatChangeStep]s of type AbsoluteMajorityReassignment/ListExhaustionRemoval
-fn get_footnote_steps(seat_assignment: &SeatAssignment) -> FootnoteSteps<'_> {
+fn get_footnote_steps(steps: &[SeatChangeStep]) -> FootnoteSteps<'_> {
     let mut absolute_majority_reassignment = None;
     let mut drawn_lots_steps = vec![];
     let mut list_exhaustion_steps = vec![];
-    for step in &seat_assignment.steps {
+    for step in steps {
         if step.change.is_changed_by_absolute_majority_reassignment() {
             absolute_majority_reassignment = Some(step);
         }
@@ -164,9 +164,9 @@ impl ApportionmentFootnotes {
 
     pub fn new(
         political_groups: &[PoliticalGroup],
-        seat_assignment: &SeatAssignment,
+        steps: &[SeatChangeStep],
     ) -> Result<Option<Self>, APIError> {
-        let footnote_steps = get_footnote_steps(seat_assignment);
+        let footnote_steps = get_footnote_steps(steps);
         let absolute_majority = Self::get_absolute_majority(
             footnote_steps.absolute_majority_reassignment,
             political_groups,

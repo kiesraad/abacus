@@ -2,6 +2,8 @@ use std::cmp::Ordering;
 
 mod residual_seat_assignment;
 mod structs;
+#[cfg(test)]
+pub use structs::LargestRemainderAssignedSeat;
 pub use structs::{
     AbsoluteMajorityReassignedSeat, ApportionmentWarning, HighestAverageAssignedSeat,
     ListExhaustionRemovedSeat, ListStanding, SeatAssignmentDetails, SeatChange, SeatChangeStep,

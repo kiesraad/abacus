@@ -340,8 +340,12 @@ pub enum ListDrawingLotsVariant {
     HighestAverageResidualSeat(HighestAverageResidualSeatDrawingLots),
     /// Draw lots for assigning a largest remainder residual seat
     LargestRemainderResidualSeat(LargestRemainderResidualSeatDrawingLots),
-    /// Draw lots for retracting a seat to be reassigned because of absolute majority (P9)
-    AbsoluteMajority(AbsoluteMajorityDrawingLots),
+    /// Draw lots for retracting a seat to be reassigned because of absolute majority (P9),
+    /// retracted seat was from a highest average assignment
+    AbsoluteMajorityHighestAverage(AbsoluteMajorityDrawingLots),
+    /// Draw lots for retracting a seat to be reassigned because of absolute majority (P9),
+    /// retracted seat was from a largest remainder assignment
+    AbsoluteMajorityLargestRemainder(AbsoluteMajorityDrawingLots),
 }
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize, ToSchema)]
@@ -374,6 +378,9 @@ pub struct ListRemainder {
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize, ToSchema)]
 pub struct AbsoluteMajorityDrawingLots {
+    /// The list where the reassigned residual seat will go to
+    pub assign_to: PGNumber,
+    /// The list options where the residual seat should come from
     pub options: Vec<PGNumber>,
 }
 

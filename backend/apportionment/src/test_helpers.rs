@@ -101,6 +101,15 @@ pub struct ListDrawnMock {
     pub drawn: u32,
 }
 
+impl ListDrawnMock {
+    pub fn new(variant: &ListDrawingLotsVariant<u32>, drawn: u32) -> Self {
+        Self {
+            variant: variant.clone(),
+            drawn,
+        }
+    }
+}
+
 impl ListDrawn<u32> for ListDrawnMock {
     fn variant(&self) -> ListDrawingLotsVariant<u32> {
         self.variant.clone()

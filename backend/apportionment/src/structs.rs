@@ -60,16 +60,24 @@ impl<LN: Debug + PartialEq> ListDrawingLotsVariant<LN> {
         }
     }
 
-    /// Ensure that this variant is the same as the other variant.
-    /// Return [[ApportionmentError::InvalidLotDrawing]] when they are different.
-    pub fn ensure_eq(&self, other: &Self) -> Result<(), ApportionmentError> {
-        if self != other {
-            Err(ApportionmentError::InvalidLotDrawing(
+    /// Validate the list drawn against this variant.
+    ///
+    /// Return [[ApportionmentError::InvalidLotDrawing]] if the variant is different
+    /// or the list drawn is not one of the options.
+    pub fn validate(&self, list_drawn: &impl ListDrawn<LN>) -> Result<(), ApportionmentError> {
+        if list_drawn.variant() != *self {
+            return Err(ApportionmentError::InvalidLotDrawing(
                 "Variant mismatch".to_string(),
-            ))
-        } else {
-            Ok(())
+            ));
         }
+
+        if !self.options().contains(list_drawn.drawn()) {
+            return Err(ApportionmentError::InvalidLotDrawing(
+                "Invalid number drawn".to_string(),
+            ));
+        }
+
+        Ok(())
     }
 }
 
@@ -192,7 +200,10 @@ mod tests {
     use std::assert_matches;
 
     use super::*;
-    use crate::seat_assignment::{LargestRemainderAssignedSeat, ListExhaustionRemovedSeat};
+    use crate::{
+        seat_assignment::{LargestRemainderAssignedSeat, ListExhaustionRemovedSeat},
+        test_helpers::ListDrawnMock,
+    };
 
     #[test]
     fn test_absolute_majority_for_seat_change_ok() {
@@ -239,26 +250,33 @@ mod tests {
     }
 
     #[test]
-    fn test_list_variant_ensure_eq_ok() {
+    fn test_list_drawing_lots_variant_validate() {
         let variant =
             ListDrawingLotsVariant::AbsoluteMajorityHighestAverage(AbsoluteMajorityDrawingLots {
                 assign_to: 1,
-                options: vec![1, 2],
+                options: vec![2, 3],
             });
-
-        assert_eq!(variant.clone().ensure_eq(&variant), Ok(()));
 
         let another_variant =
             ListDrawingLotsVariant::AbsoluteMajorityHighestAverage(AbsoluteMajorityDrawingLots {
-                assign_to: 2,
-                options: vec![1, 2],
+                assign_to: 4,
+                options: vec![2, 3],
             });
 
         assert_eq!(
-            variant.clone().ensure_eq(&another_variant),
+            variant.validate(&ListDrawnMock::new(&another_variant, 3)),
             Err(ApportionmentError::InvalidLotDrawing(
-                "Variant mismatch".to_string(),
+                "Variant mismatch".to_string()
             ))
         );
+
+        assert_eq!(
+            variant.validate(&ListDrawnMock::new(&variant, 9)),
+            Err(ApportionmentError::InvalidLotDrawing(
+                "Invalid number drawn".to_string()
+            ))
+        );
+
+        assert_eq!(variant.validate(&ListDrawnMock::new(&variant, 2)), Ok(()));
     }
 }

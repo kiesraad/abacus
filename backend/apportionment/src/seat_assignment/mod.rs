@@ -322,8 +322,7 @@ fn reassign_residual_seat_for_absolute_majority<'a, T: ListVotes>(
                 return Ok(AbsoluteMajority::DrawingLotsRequired(variant));
             };
 
-            // Assert the required variant including all data
-            list_drawn.variant().ensure_eq(&variant)?;
+            variant.validate(list_drawn)?;
 
             (*list_drawn.drawn(), Some(variant))
         };

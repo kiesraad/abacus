@@ -2,7 +2,6 @@ import type { ValidationResult, ValidationResults } from "@/types/generated/open
 import type { DataEntryResults, DataEntryStructure, FormSectionId } from "@/types/types";
 import { extractFieldInfoFromSection, getValueAtPath } from "@/utils/dataEntryMapping";
 import { doesValidationResultApplyToSection, ValidationResultSet } from "@/utils/ValidationResults";
-
 import type { ClientState, FormSection, FormState } from "../types/types";
 
 export function formSectionComplete(section: FormSection): boolean {

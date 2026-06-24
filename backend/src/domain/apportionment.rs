@@ -78,6 +78,24 @@ impl SeatChange {
         matches!(self, Self::ListExhaustionRemoval(_))
     }
 
+    pub fn drawn_lots(&self) -> Option<&ListDrawingLotsVariant> {
+        match self {
+            Self::HighestAverageAssignment(highest_average_assigned_seat) => {
+                highest_average_assigned_seat.drawing_lots.as_ref()
+            }
+            Self::UniqueHighestAverageAssignment(unique_highest_average_assigned_seat) => {
+                unique_highest_average_assigned_seat.drawing_lots.as_ref()
+            }
+            Self::LargestRemainderAssignment(largest_remainder_assigned_seat) => {
+                largest_remainder_assigned_seat.drawing_lots.as_ref()
+            }
+            Self::AbsoluteMajorityReassignment(absolute_majority_reassigned_seat) => {
+                absolute_majority_reassigned_seat.drawing_lots.as_ref()
+            }
+            Self::ListExhaustionRemoval(_) => None,
+        }
+    }
+
     pub fn list_number_assigned(&self) -> PGNumber {
         match self {
             Self::HighestAverageAssignment(highest_average_assigned_seat) => {

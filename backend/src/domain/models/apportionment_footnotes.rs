@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 use crate::{
     APIError,
     domain::{
-        apportionment::{SeatAssignment, SeatChangeStep},
+        apportionment::{ListDrawingLotsVariant, SeatAssignment, SeatChangeStep},
         election::{PGNumber, PoliticalGroup},
     },
 };
@@ -15,27 +15,50 @@ pub struct ApportionmentFootnotes {
     #[serde(skip_serializing_if = "Option::is_none")]
     absolute_majority: Option<FootnotePoliticalGroup>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    drawn_lots: Option<Vec<FootnoteDrawnLots>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     exhausted_lists: Option<Vec<FootnotePoliticalGroup>>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(tag = "variant")]
+pub enum FootnoteDrawnLots {
+    HighestAverageResidualSeat { lists: Vec<FootnotePoliticalGroup> },
+    LargestRemainderResidualSeat { lists: Vec<FootnotePoliticalGroup> },
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct FootnotePoliticalGroup {
+    /// Political group number
+    number: PGNumber,
+    /// Political group display name
+    name: String,
 }
 
 struct FootnoteSteps<'a> {
     absolute_majority_reassignment: Option<&'a SeatChangeStep>,
+    drawn_lots_steps: Vec<&'a SeatChangeStep>,
     list_exhaustion_steps: Vec<&'a SeatChangeStep>,
 }
 
 /// Retrieves [SeatChangeStep]s of type AbsoluteMajorityReassignment/ListExhaustionRemoval
 fn get_footnote_steps(seat_assignment: &SeatAssignment) -> FootnoteSteps<'_> {
     let mut absolute_majority_reassignment = None;
+    let mut drawn_lots_steps = vec![];
     let mut list_exhaustion_steps = vec![];
     for step in &seat_assignment.steps {
         if step.change.is_changed_by_absolute_majority_reassignment() {
             absolute_majority_reassignment = Some(step);
+        }
+        if step.change.drawn_lots().is_some() {
+            drawn_lots_steps.push(step);
         }
         if step.change.is_changed_by_list_exhaustion_removal() {
             list_exhaustion_steps.push(step);
         }
     }
     FootnoteSteps {
+        drawn_lots_steps,
         absolute_majority_reassignment,
         list_exhaustion_steps,
     }
@@ -59,6 +82,54 @@ impl ApportionmentFootnotes {
             })
         } else {
             None
+        }
+    }
+
+    fn get_drawn_lots(
+        drawn_lots_steps: Vec<&SeatChangeStep>,
+        political_groups: &[PoliticalGroup],
+    ) -> Option<Vec<FootnoteDrawnLots>> {
+        let footnote_groups = |options: &[PGNumber]| -> Vec<FootnotePoliticalGroup> {
+            options
+                .iter()
+                .map(|&number| FootnotePoliticalGroup {
+                    number,
+                    name: political_groups
+                        .iter()
+                        .find(|pg| pg.number == number)
+                        .expect("political group should exist")
+                        .name
+                        .clone(),
+                })
+                .collect()
+        };
+
+        let mut drawn_lots = vec![];
+        for step in drawn_lots_steps {
+            let footnote = match step.change.drawn_lots() {
+                Some(ListDrawingLotsVariant::HighestAverageResidualSeat(lots)) => {
+                    FootnoteDrawnLots::HighestAverageResidualSeat {
+                        lists: footnote_groups(&lots.options),
+                    }
+                }
+                Some(ListDrawingLotsVariant::LargestRemainderResidualSeat(lots)) => {
+                    FootnoteDrawnLots::LargestRemainderResidualSeat {
+                        lists: footnote_groups(&lots.options),
+                    }
+                }
+                // Absolute majority drawing of lots is reported by the absolute majority footnote
+                Some(ListDrawingLotsVariant::AbsoluteMajorityHighestAverage(_))
+                | Some(ListDrawingLotsVariant::AbsoluteMajorityLargestRemainder(_))
+                | None => continue,
+            };
+
+            drawn_lots.push(footnote);
+        }
+
+        if drawn_lots.is_empty() {
+            None
+        } else {
+            Some(drawn_lots)
         }
     }
 
@@ -100,10 +171,12 @@ impl ApportionmentFootnotes {
             footnote_steps.absolute_majority_reassignment,
             political_groups,
         );
+        let drawn_lots = Self::get_drawn_lots(footnote_steps.drawn_lots_steps, political_groups);
         let exhausted_lists =
             Self::get_exhausted_lists(footnote_steps.list_exhaustion_steps, political_groups);
-        if absolute_majority.is_some() || exhausted_lists.is_some() {
+        if drawn_lots.is_some() || absolute_majority.is_some() || exhausted_lists.is_some() {
             Ok(Some(ApportionmentFootnotes {
+                drawn_lots,
                 absolute_majority,
                 exhausted_lists,
             }))
@@ -111,14 +184,6 @@ impl ApportionmentFootnotes {
             Ok(None)
         }
     }
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct FootnotePoliticalGroup {
-    /// Political group number
-    number: PGNumber,
-    /// Political group display name
-    name: String,
 }
 
 #[cfg(test)]

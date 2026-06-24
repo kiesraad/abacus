@@ -87,7 +87,8 @@ mod tests {
             .expect("should change committee session status");
 
         let drawing_lots_required = DrawingLotsRequired::ListDrawingLotsRequired(
-            ListDrawingLotsVariant::AbsoluteMajority(AbsoluteMajorityDrawingLots {
+            ListDrawingLotsVariant::AbsoluteMajorityHighestAverage(AbsoluteMajorityDrawingLots {
+                assign_to: PGNumber::from(1),
                 options: PGNumber::from_values(vec![8, 9]),
             }),
         );
@@ -106,9 +107,12 @@ mod tests {
         .expect("should upsert initial state");
 
         let list_drawn = ListDrawn {
-            variant: ListDrawingLotsVariant::AbsoluteMajority(AbsoluteMajorityDrawingLots {
-                options: PGNumber::from_values(vec![8, 9]),
-            }),
+            variant: ListDrawingLotsVariant::AbsoluteMajorityHighestAverage(
+                AbsoluteMajorityDrawingLots {
+                    assign_to: PGNumber::from(1),
+                    options: PGNumber::from_values(vec![8, 9]),
+                },
+            ),
             drawn: PGNumber::from(8),
         };
 

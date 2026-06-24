@@ -5324,14 +5324,20 @@
       "AbsoluteMajorityDrawingLots": {
         "type": "object",
         "required": [
+          "assign_to",
           "options"
         ],
         "properties": {
+          "assign_to": {
+            "$ref": "#/components/schemas/PGNumber",
+            "description": "The list where the reassigned residual seat will go to"
+          },
           "options": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/PGNumber"
-            }
+            },
+            "description": "The list options where the residual seat should come from"
           }
         }
       },
@@ -7819,7 +7825,7 @@
             "allOf": [
               {
                 "$ref": "#/components/schemas/AbsoluteMajorityDrawingLots",
-                "description": "Draw lots for retracting a seat to be reassigned because of absolute majority (P9)"
+                "description": "Draw lots for retracting a seat to be reassigned because of absolute majority (P9),\nretracted seat was from a highest average assignment"
               },
               {
                 "type": "object",
@@ -7830,13 +7836,36 @@
                   "variant": {
                     "type": "string",
                     "enum": [
-                      "AbsoluteMajority"
+                      "AbsoluteMajorityHighestAverage"
                     ]
                   }
                 }
               }
             ],
-            "description": "Draw lots for retracting a seat to be reassigned because of absolute majority (P9)"
+            "description": "Draw lots for retracting a seat to be reassigned because of absolute majority (P9),\nretracted seat was from a highest average assignment"
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AbsoluteMajorityDrawingLots",
+                "description": "Draw lots for retracting a seat to be reassigned because of absolute majority (P9),\nretracted seat was from a largest remainder assignment"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "variant"
+                ],
+                "properties": {
+                  "variant": {
+                    "type": "string",
+                    "enum": [
+                      "AbsoluteMajorityLargestRemainder"
+                    ]
+                  }
+                }
+              }
+            ],
+            "description": "Draw lots for retracting a seat to be reassigned because of absolute majority (P9),\nretracted seat was from a largest remainder assignment"
           }
         ]
       },

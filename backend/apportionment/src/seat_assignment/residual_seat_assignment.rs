@@ -345,12 +345,7 @@ fn lists_with_highest_average<'a, 'b, LN: Copy + Debug + Eq>(
             return Ok(ListStandings::DrawingLotsRequired(variant));
         };
 
-        // Assert the required variant including all data
-        if list_drawn.variant() != variant {
-            return Err(ApportionmentError::InvalidLotDrawing(
-                "Variant mismatch".to_string(),
-            ));
-        }
+        variant.validate(list_drawn)?;
 
         let list = lists
             .iter()
@@ -434,12 +429,7 @@ fn lists_with_largest_remainder<'a, 'b, LN: Copy + Debug + Eq>(
             return Ok(ListStandings::DrawingLotsRequired(variant));
         };
 
-        // Assert the required variant including all data
-        if list_drawn.variant() != variant {
-            return Err(ApportionmentError::InvalidLotDrawing(
-                "Variant mismatch".to_string(),
-            ));
-        }
+        variant.validate(list_drawn)?;
 
         let list = lists
             .iter()

@@ -7,7 +7,7 @@ use std::{
     sync::{Mutex, OnceLock},
 };
 
-use apportionment::{ApportionmentError, ApportionmentOutput, CandidateVotes, process};
+use apportionment::{ApportionmentOutput, CandidateVotes, process};
 use apportionment_fuzz::{FuzzedApportionmentInput, get_total_seats, init_tracing, run_with_log};
 use libfuzzer_sys::fuzz_target;
 use serde::{Deserialize, Serialize};
@@ -296,8 +296,8 @@ fn fuzz(data: FuzzedApportionmentInput) {
                 }
             }
         }
-        Err(ApportionmentError::InvalidLotDrawing(message)) => {
-            panic!("Invalid lot drawing: {}", message)
+        Err(e) => {
+            panic!("Apportionment error: {:?}", e)
         }
     }
 }

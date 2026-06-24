@@ -96,8 +96,9 @@ mod tests {
                 ),
                 deceased_candidates: vec![DeceasedCandidate::from(4, 4)],
                 lists_drawn: vec![ListDrawn {
-                    variant: ListDrawingLotsVariant::AbsoluteMajority(
+                    variant: ListDrawingLotsVariant::AbsoluteMajorityHighestAverage(
                         AbsoluteMajorityDrawingLots {
+                            assign_to: PGNumber::from(1),
                             options: PGNumber::from_values(vec![2, 3, 4]),
                         },
                     ),

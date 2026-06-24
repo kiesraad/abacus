@@ -138,7 +138,7 @@ export function calculateDataEntryProgress(formState: FormState) {
     return 0;
   }
 
-  return Math.round(((furthestSection.index + 1) / totalSections) * 100);
+  return Math.floor(((furthestSection.index + 1) / totalSections) * 100);
 }
 
 export function buildFormState(

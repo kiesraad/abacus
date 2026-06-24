@@ -806,13 +806,9 @@ mod tests {
                 "qualifying lists: {}",
                 case.description
             );
+            
         }
     }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
     use crate::seat_assignment::AbsoluteMajorityReassignedSeat;
 
     /// A list whose seat was retracted via absolute majority reassignment should still qualify for reassignment.
@@ -826,6 +822,7 @@ mod tests {
             change: SeatChange::AbsoluteMajorityReassignment(AbsoluteMajorityReassignedSeat {
                 list_retracted_seat: RETRACTED_LIST,
                 list_assigned_seat: ASSIGNED_LIST,
+                drawing_lots: None,
             }),
             standings: vec![],
         };

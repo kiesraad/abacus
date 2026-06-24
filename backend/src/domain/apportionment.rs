@@ -130,6 +130,7 @@ impl SeatChange {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, ToSchema, PartialEq)]
+#[cfg_attr(test, derive(Default))]
 pub struct HighestAverageAssignedSeat {
     pub selected_list_number: PGNumber,
     pub list_options: Vec<PGNumber>,
@@ -142,6 +143,7 @@ pub struct HighestAverageAssignedSeat {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, ToSchema, PartialEq)]
+#[cfg_attr(test, derive(Default))]
 pub struct LargestRemainderAssignedSeat {
     pub selected_list_number: PGNumber,
     pub list_options: Vec<PGNumber>,
@@ -281,6 +283,7 @@ impl From<&apportionment::SeatChangeStep<PGNumber>> for SeatChangeStep {
 
 /// Fraction with the integer part split out for display purposes
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, ToSchema, PartialEq)]
+#[cfg_attr(test, derive(Default))]
 pub struct DisplayFraction {
     pub integer: u64,
     pub numerator: u64,
@@ -367,6 +370,7 @@ pub enum ListDrawingLotsVariant {
 }
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize, ToSchema)]
+#[cfg_attr(test, derive(Default))]
 pub struct HighestAverageResidualSeatDrawingLots {
     pub max_average: DisplayFraction,
     pub residual_seat_numbers: Vec<u32>,
@@ -381,6 +385,7 @@ pub struct ListAverage {
 }
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize, ToSchema)]
+#[cfg_attr(test, derive(Default))]
 pub struct LargestRemainderResidualSeatDrawingLots {
     pub max_remainder: DisplayFraction,
     pub residual_seat_numbers: Vec<u32>,
@@ -395,6 +400,7 @@ pub struct ListRemainder {
 }
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize, ToSchema)]
+#[cfg_attr(test, derive(Default))]
 pub struct AbsoluteMajorityDrawingLots {
     /// The list where the reassigned residual seat will go to
     pub assign_to: PGNumber,

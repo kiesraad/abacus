@@ -188,137 +188,330 @@ impl ApportionmentFootnotes {
 
 #[cfg(test)]
 mod tests {
-    use apportionment::ApportionmentOutput;
     use test_log::test;
 
-    use crate::{
-        api::apportionment::{ApportionmentInputData, map_seat_assignment},
-        domain::{
-            election::{CommitteeCategory, tests::election_fixture_with_given_number_of_seats},
-            models::apportionment_footnotes::ApportionmentFootnotes,
-            results::political_group_candidate_votes::create_political_group_candidate_votes,
+    use super::*;
+    use crate::domain::{
+        apportionment::{
+            AbsoluteMajorityDrawingLots, AbsoluteMajorityReassignedSeat,
+            HighestAverageAssignedSeat, HighestAverageResidualSeatDrawingLots,
+            LargestRemainderAssignedSeat, LargestRemainderResidualSeatDrawingLots,
+            ListExhaustionRemovedSeat, SeatChange,
         },
+        election::tests::political_groups_with_candidates,
     };
 
-    #[test]
-    fn test_apportionment_footnotes_none() {
-        let candidate_votes = vec![
-            vec![1069, 303, 321, 210, 36, 101, 79, 121, 150, 181],
-            vec![452, 39, 81, 274, 131],
-            vec![229, 147, 191],
-            vec![347, 100],
-            vec![266, 187],
-        ];
-        let election = election_fixture_with_given_number_of_seats(
-            CommitteeCategory::CSB,
-            &candidate_votes
-                .iter()
-                .map(|cv| u32::try_from(cv.len()).expect("Should fit in u32"))
-                .collect::<Vec<u32>>(),
-            15,
-        );
-        let list_votes =
-            create_political_group_candidate_votes(&election.political_groups, &candidate_votes);
-        let apportionment_input =
-            ApportionmentInputData::new(election.number_of_seats, &list_votes, &[], &[], &[]);
-        let apportionment_result = apportionment::process(&apportionment_input);
-        let Ok(ApportionmentOutput::Completed(apportionment)) = apportionment_result else {
-            panic!("should be Completed");
-        };
+    fn change_step(change: SeatChange) -> SeatChangeStep {
+        SeatChangeStep {
+            residual_seat_number: None,
+            change,
+            standings: vec![],
+        }
+    }
 
-        let seat_assignment = map_seat_assignment(&apportionment.seat_assignment);
-        let result = ApportionmentFootnotes::new(&election.political_groups, &seat_assignment)
-            .expect("ApportionmentFootnotes::new should succeed");
-        assert!(result.is_none());
+    /// * `seat_variant` - Can be HighestAverageAssignment/UniqueHighestAverageAssignment
+    fn highest_average_step(
+        seat_variant: impl FnOnce(HighestAverageAssignedSeat) -> SeatChange,
+        selected: u32,
+        options: &[u32],
+    ) -> SeatChangeStep {
+        let drawing_lots = (!options.is_empty()).then(|| {
+            ListDrawingLotsVariant::HighestAverageResidualSeat(
+                HighestAverageResidualSeatDrawingLots {
+                    options: PGNumber::from_values(options.iter().copied()),
+                    ..Default::default()
+                },
+            )
+        });
+
+        change_step(seat_variant(HighestAverageAssignedSeat {
+            selected_list_number: PGNumber::from(selected),
+            drawing_lots,
+            ..Default::default()
+        }))
+    }
+
+    fn largest_remainder_step(selected: u32, options: &[u32]) -> SeatChangeStep {
+        let drawing_lots = (!options.is_empty()).then(|| {
+            ListDrawingLotsVariant::LargestRemainderResidualSeat(
+                LargestRemainderResidualSeatDrawingLots {
+                    options: PGNumber::from_values(options.iter().copied()),
+                    ..Default::default()
+                },
+            )
+        });
+
+        change_step(SeatChange::LargestRemainderAssignment(
+            LargestRemainderAssignedSeat {
+                selected_list_number: PGNumber::from(selected),
+                drawing_lots,
+                ..Default::default()
+            },
+        ))
+    }
+
+    /// * `lot_variant` - Can be AbsoluteMajorityHighestAverage/AbsoluteMajorityLargestRemainder
+    fn absolute_majority_step(
+        lot_variant: impl FnOnce(AbsoluteMajorityDrawingLots) -> ListDrawingLotsVariant,
+        retracted: u32,
+        assigned: u32,
+        options: &[u32],
+    ) -> SeatChangeStep {
+        let drawing_lots = (!options.is_empty()).then(|| {
+            lot_variant(AbsoluteMajorityDrawingLots {
+                options: PGNumber::from_values(options.iter().copied()),
+                ..Default::default()
+            })
+        });
+
+        change_step(SeatChange::AbsoluteMajorityReassignment(
+            AbsoluteMajorityReassignedSeat {
+                list_retracted_seat: PGNumber::from(retracted),
+                list_assigned_seat: PGNumber::from(assigned),
+                drawing_lots,
+            },
+        ))
+    }
+
+    fn exhaustion_step(retracted: u32) -> SeatChangeStep {
+        change_step(SeatChange::ListExhaustionRemoval(
+            ListExhaustionRemovedSeat {
+                list_retracted_seat: PGNumber::from(retracted),
+                full_seat: true,
+            },
+        ))
+    }
+
+    fn get_footnotes(steps: &[SeatChangeStep]) -> Option<ApportionmentFootnotes> {
+        let political_groups = political_groups_with_candidates(&[1, 1, 1, 1, 1]);
+        ApportionmentFootnotes::new(&political_groups, steps)
+            .expect("ApportionmentFootnotes::new should succeed")
     }
 
     #[test]
-    fn test_apportionment_footnotes_absolute_majority() {
-        let candidate_votes = vec![
-            vec![1069, 303, 321, 210, 36, 101, 79, 121, 150, 149, 15, 17],
-            vec![
-                452, 39, 81, 76, 35, 109, 29, 25, 17, 6, 18, 9, 25, 30, 5, 18, 3,
-            ],
-            vec![229, 63, 65, 9, 10, 58, 29, 50, 6, 11, 37],
-            vec![347, 33, 14, 82, 30, 30],
-            vec![266, 36, 39, 36, 38, 38],
-        ];
-        let election = election_fixture_with_given_number_of_seats(
-            CommitteeCategory::CSB,
-            &candidate_votes
-                .iter()
-                .map(|cv| u32::try_from(cv.len()).expect("Should fit in u32"))
-                .collect::<Vec<u32>>(),
-            15,
-        );
-        let list_votes =
-            create_political_group_candidate_votes(&election.political_groups, &candidate_votes);
-        let apportionment_input =
-            ApportionmentInputData::new(election.number_of_seats, &list_votes, &[], &[], &[]);
-        let apportionment_result = apportionment::process(&apportionment_input);
-        let Ok(ApportionmentOutput::Completed(apportionment)) = apportionment_result else {
-            panic!("should be Completed");
-        };
-
-        let seat_assignment = map_seat_assignment(&apportionment.seat_assignment);
-        let result = ApportionmentFootnotes::new(&election.political_groups, &seat_assignment)
-            .expect("ApportionmentFootnotes::new should succeed");
-        assert!(result.is_some());
-        let footnotes = result.unwrap();
-        assert!(footnotes.exhausted_lists.is_none());
-        assert!(footnotes.absolute_majority.is_some());
-        let absolute_majority = footnotes.absolute_majority.unwrap();
-        assert_eq!(
-            absolute_majority.number,
-            election.political_groups[0].number
-        );
-        assert_eq!(absolute_majority.name, election.political_groups[0].name);
+    fn test_none_for_empty_steps() {
+        assert!(get_footnotes(&[]).is_none());
     }
 
     #[test]
-    fn test_apportionment_footnotes_exhausted_lists() {
-        let candidate_votes = vec![
-            vec![80, 70, 60, 50, 40],
-            vec![80, 70, 60, 50, 5],
-            vec![80, 70, 60, 50, 0],
-            vec![80, 40, 0, 0],
-            vec![0, 0, 0, 0, 15],
-        ];
-        let election = election_fixture_with_given_number_of_seats(
-            CommitteeCategory::CSB,
-            &candidate_votes
-                .iter()
-                .map(|cv| u32::try_from(cv.len()).expect("Should fit in u32"))
-                .collect::<Vec<u32>>(),
-            19,
-        );
-        let list_votes =
-            create_political_group_candidate_votes(&election.political_groups, &candidate_votes);
-        let apportionment_input =
-            ApportionmentInputData::new(election.number_of_seats, &list_votes, &[], &[], &[]);
-        let apportionment_result = apportionment::process(&apportionment_input);
-        let Ok(ApportionmentOutput::Completed(apportionment)) = apportionment_result else {
-            panic!("should be Completed");
-        };
+    fn test_none_for_non_footnote_steps() {
+        // A step which is not drawing lots, exhaustion or absolute majority.
+        let steps = vec![highest_average_step(
+            SeatChange::HighestAverageAssignment,
+            1,
+            &[],
+        )];
+        assert!(get_footnotes(&steps).is_none());
+    }
 
-        let seat_assignment = map_seat_assignment(&apportionment.seat_assignment);
-        let result = ApportionmentFootnotes::new(&election.political_groups, &seat_assignment)
-            .expect("ApportionmentFootnotes::new should succeed");
-        assert!(result.is_some());
-        let footnotes = result.unwrap();
-        assert!(footnotes.exhausted_lists.is_some());
+    #[test]
+    fn test_majority_highest_average_footnote() {
+        let variants = vec![
+            ListDrawingLotsVariant::AbsoluteMajorityHighestAverage,
+            ListDrawingLotsVariant::AbsoluteMajorityLargestRemainder,
+        ];
+
+        for variant in variants {
+            let steps = vec![absolute_majority_step(variant, 3, 1, &[])];
+            let footnotes = get_footnotes(&steps).expect("footnotes should be present");
+
+            assert!(footnotes.drawn_lots.is_none());
+            assert!(footnotes.exhausted_lists.is_none());
+            let absolute_majority = footnotes
+                .absolute_majority
+                .expect("absolute majority footnote should be present");
+            assert_eq!(absolute_majority.number, PGNumber::from(1));
+            assert_eq!(absolute_majority.name, "Political group 1");
+        }
+    }
+
+    #[test]
+    fn test_drawn_lots_averages() {
+        let steps = vec![highest_average_step(
+            SeatChange::HighestAverageAssignment,
+            1,
+            &[1, 2],
+        )];
+        let footnotes = get_footnotes(&steps).expect("footnotes should be present");
+
         assert!(footnotes.absolute_majority.is_none());
-        let exhausted_lists = footnotes.exhausted_lists.unwrap();
+        assert!(footnotes.exhausted_lists.is_none());
+        let drawn_lots = footnotes
+            .drawn_lots
+            .expect("drawn lots footnote should be present");
+        assert_eq!(drawn_lots.len(), 1);
+
+        let FootnoteDrawnLots::HighestAverageResidualSeat { lists } = &drawn_lots[0] else {
+            panic!("expected HighestAverageResidualSeat variant");
+        };
+        assert_eq!(lists.len(), 2);
+        assert_eq!(lists[0].number, PGNumber::from(1));
+        assert_eq!(lists[0].name, "Political group 1");
+        assert_eq!(lists[1].number, PGNumber::from(2));
+        assert_eq!(lists[1].name, "Political group 2");
+    }
+
+    #[test]
+    fn test_drawn_lots_remainders() {
+        let steps = vec![largest_remainder_step(2, &[2, 3])];
+        let footnotes = get_footnotes(&steps).expect("footnotes should be present");
+
+        assert!(footnotes.absolute_majority.is_none());
+        assert!(footnotes.exhausted_lists.is_none());
+        let drawn_lots = footnotes
+            .drawn_lots
+            .expect("drawn lots footnote should be present");
+        assert_eq!(drawn_lots.len(), 1);
+
+        let FootnoteDrawnLots::LargestRemainderResidualSeat { lists } = &drawn_lots[0] else {
+            panic!("expected LargestRemainderResidualSeat variant");
+        };
+        assert_eq!(lists[0].number, PGNumber::from(2));
+        assert_eq!(lists[0].name, "Political group 2");
+        assert_eq!(lists[1].number, PGNumber::from(3));
+        assert_eq!(lists[1].name, "Political group 3");
+    }
+
+    #[test]
+    fn test_drawn_lots_unique_highest_average() {
+        let steps = vec![highest_average_step(
+            SeatChange::UniqueHighestAverageAssignment,
+            1,
+            &[1, 2],
+        )];
+        let footnotes = get_footnotes(&steps).expect("footnotes should be present");
+
+        let drawn_lots = footnotes
+            .drawn_lots
+            .expect("drawn lots footnote should be present");
+        assert_eq!(drawn_lots.len(), 1);
+        assert!(matches!(
+            &drawn_lots[0],
+            FootnoteDrawnLots::HighestAverageResidualSeat { .. }
+        ));
+    }
+
+    #[test]
+    fn test_drawn_lots_absolute_majority_variant_skipped() {
+        // The absolute majority variant is skipped, but the absolute majority
+        // footnote should be present.
+        let steps = vec![absolute_majority_step(
+            ListDrawingLotsVariant::AbsoluteMajorityHighestAverage,
+            3,
+            1,
+            &[1, 3],
+        )];
+        let footnotes = get_footnotes(&steps).expect("footnotes should be present");
+
+        assert!(footnotes.drawn_lots.is_none());
+        let absolute_majority = footnotes
+            .absolute_majority
+            .expect("absolute majority footnote should be present");
+        assert_eq!(absolute_majority.number, PGNumber::from(1));
+    }
+
+    #[test]
+    fn test_drawn_lots_preserve_step_order() {
+        let steps = vec![
+            highest_average_step(SeatChange::HighestAverageAssignment, 3, &[3, 4]),
+            highest_average_step(SeatChange::HighestAverageAssignment, 1, &[1, 2]),
+            highest_average_step(SeatChange::HighestAverageAssignment, 2, &[2, 3]),
+        ];
+        let footnotes = get_footnotes(&steps).expect("footnotes should be present");
+
+        let drawn_lots = footnotes
+            .drawn_lots
+            .expect("drawn lots footnote should be present");
+        assert_eq!(drawn_lots.len(), 3);
+        assert!(matches!(
+            &drawn_lots[0],
+            FootnoteDrawnLots::HighestAverageResidualSeat { lists }
+                if lists[0].number == PGNumber::from(3)
+        ));
+        assert!(matches!(
+            &drawn_lots[1],
+            FootnoteDrawnLots::HighestAverageResidualSeat { lists }
+                if lists[0].number == PGNumber::from(1)
+        ));
+        assert!(matches!(
+            &drawn_lots[2],
+            FootnoteDrawnLots::HighestAverageResidualSeat { lists }
+                if lists[0].number == PGNumber::from(2)
+        ));
+    }
+
+    #[test]
+    fn test_drawn_lots_not_deduplicated() {
+        // Two steps with drawing lots assigning the same list each produce their own footnote entry.
+        let steps = vec![
+            highest_average_step(SeatChange::HighestAverageAssignment, 1, &[1, 2]),
+            largest_remainder_step(1, &[1, 3]),
+        ];
+        let footnotes = get_footnotes(&steps).expect("footnotes should be present");
+
+        let drawn_lots = footnotes
+            .drawn_lots
+            .expect("drawn lots footnote should be present");
+        assert_eq!(drawn_lots.len(), 2);
+        assert!(matches!(
+            &drawn_lots[0],
+            FootnoteDrawnLots::HighestAverageResidualSeat { .. }
+        ));
+        assert!(matches!(
+            &drawn_lots[1],
+            FootnoteDrawnLots::LargestRemainderResidualSeat { .. }
+        ));
+    }
+
+    #[test]
+    fn test_exhausted_lists() {
+        let steps = vec![exhaustion_step(1), exhaustion_step(2)];
+        let footnotes = get_footnotes(&steps).expect("footnotes should be present");
+
+        assert!(footnotes.absolute_majority.is_none());
+        assert!(footnotes.drawn_lots.is_none());
+        let exhausted_lists = footnotes
+            .exhausted_lists
+            .expect("exhausted lists footnote should be present");
         assert_eq!(exhausted_lists.len(), 2);
-        assert_eq!(
-            exhausted_lists[0].number,
-            election.political_groups[0].number
-        );
-        assert_eq!(exhausted_lists[0].name, election.political_groups[0].name);
-        assert_eq!(
-            exhausted_lists[1].number,
-            election.political_groups[1].number
-        );
-        assert_eq!(exhausted_lists[1].name, election.political_groups[1].name);
+        assert_eq!(exhausted_lists[0].number, PGNumber::from(1));
+        assert_eq!(exhausted_lists[0].name, "Political group 1");
+        assert_eq!(exhausted_lists[1].number, PGNumber::from(2));
+        assert_eq!(exhausted_lists[1].name, "Political group 2");
+    }
+
+    #[test]
+    fn test_exhausted_lists_sorted_and_deduplicated() {
+        // The BTreeMap sorts ascending and deduplicates.
+        let steps = vec![exhaustion_step(3), exhaustion_step(1), exhaustion_step(3)];
+        let footnotes = get_footnotes(&steps).expect("footnotes should be present");
+
+        let exhausted_lists = footnotes
+            .exhausted_lists
+            .expect("exhausted lists footnote should be present");
+        assert_eq!(exhausted_lists.len(), 2);
+        assert_eq!(exhausted_lists[0].number, PGNumber::from(1));
+        assert_eq!(exhausted_lists[0].name, "Political group 1");
+        assert_eq!(exhausted_lists[1].number, PGNumber::from(3));
+        assert_eq!(exhausted_lists[1].name, "Political group 3");
+    }
+
+    #[test]
+    fn test_all_footnotes() {
+        let steps = vec![
+            absolute_majority_step(
+                ListDrawingLotsVariant::AbsoluteMajorityHighestAverage,
+                4,
+                1,
+                &[],
+            ),
+            highest_average_step(SeatChange::HighestAverageAssignment, 2, &[2, 3]),
+            exhaustion_step(5),
+        ];
+        let footnotes = get_footnotes(&steps).expect("footnotes should be present");
+
+        assert!(footnotes.absolute_majority.is_some());
+        assert!(footnotes.drawn_lots.is_some());
+        assert!(footnotes.exhausted_lists.is_some());
     }
 }

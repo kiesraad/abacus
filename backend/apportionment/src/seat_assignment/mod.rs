@@ -2,6 +2,8 @@ use std::cmp::Ordering;
 
 mod residual_seat_assignment;
 mod structs;
+#[cfg(test)]
+pub use structs::LargestRemainderAssignedSeat;
 pub use structs::{
     AbsoluteMajorityReassignedSeat, ApportionmentWarning, HighestAverageAssignedSeat,
     ListExhaustionRemovedSeat, ListStanding, SeatAssignmentDetails, SeatChange, SeatChangeStep,
@@ -12,7 +14,9 @@ use self::{residual_seat_assignment::assign_remainder, structs::RemainderAssignm
 use crate::{
     ApportionmentError, ApportionmentInput, ListDrawn, ListVotes,
     fraction::Fraction,
-    seat_assignment::structs::{AbsoluteMajority, AbsoluteMajorityResult, RemainderAssignment},
+    seat_assignment::structs::{
+        AbsoluteMajority, AbsoluteMajorityResult, GetListStandingByNumber, RemainderAssignment,
+    },
     structs::{
         AbsoluteMajorityDrawingLots, CandidateNominationInput, CandidateNominationInputType,
         DeceasedCandidates, ListDrawingLotsVariant, ListNumber,
@@ -103,8 +107,9 @@ pub(crate) fn seat_assignment<T: ApportionmentInput>(input: &T) -> SeatAssignmen
             input.number_of_seats(),
             total_votes_cast,
             input.list_votes(),
-            &last_step.change.list_assigned(),
+            &last_step.change,
             current_standings.clone(),
+            &mut lists_drawn,
         )? {
             AbsoluteMajority::Completed(cumulative_standings, assigned_seat) => {
                 (cumulative_standings, assigned_seat)
@@ -269,12 +274,13 @@ fn list_numbers_with_exhausted_seats<T: ListVotes>(
 /// If a list got the absolute majority of votes but not the absolute majority of seats,
 /// re-assign the last residual seat to the list with the absolute majority.  
 /// This re-assignment is done according to article P 9 of the Kieswet.
-fn reassign_residual_seat_for_absolute_majority<T: ListVotes>(
+fn reassign_residual_seat_for_absolute_majority<'a, T: ListVotes>(
     seats: u32,
     total_votes_cast: u32,
     list_votes: &[T],
-    lists_last_residual_seat: &[T::ListNumber],
+    last_seat_change: &SeatChange<T::ListNumber>,
     previous_standings: Vec<ListStanding<T::ListNumber>>,
+    lists_drawn: &mut impl Iterator<Item = &'a (impl ListDrawn<T::ListNumber> + 'a)>,
 ) -> AbsoluteMajorityResult<T::ListNumber> {
     let half_of_votes_count = Fraction::from(total_votes_cast) * Fraction::new(1, 2);
 
@@ -287,52 +293,63 @@ fn reassign_residual_seat_for_absolute_majority<T: ListVotes>(
     };
 
     let half_of_seats_count = Fraction::from(seats) * Fraction::new(1, 2);
-    let standing_of_list_with_majority_votes = previous_standings
-        .iter()
-        .find(|list_standing| list_standing.list_number() == majority_list_votes.number())
-        .expect("Standing exists");
 
-    let list_seats = Fraction::from(standing_of_list_with_majority_votes.total_seats());
+    let list_seats: Fraction = previous_standings
+        .get_by_number(majority_list_votes.number())
+        .total_seats()
+        .into();
 
     if list_seats <= half_of_seats_count {
-        let variant = ListDrawingLotsVariant::AbsoluteMajority(AbsoluteMajorityDrawingLots {
-            options: lists_last_residual_seat.to_vec(),
-        });
-        if lists_last_residual_seat.len() > 1 {
+        let lists_last_residual_seat = last_seat_change.list_assigned();
+        let (list_retracted_seat, drawing_lots) = if lists_last_residual_seat.len() == 1 {
+            (lists_last_residual_seat[0], None)
+        } else {
             info!(
                 "Drawing of lots is required for lists: {:?} to pick a list which the residual seat gets retracted from",
                 lists_last_residual_seat
             );
-            return Ok(AbsoluteMajority::DrawingLotsRequired(variant));
-        }
+
+            let variant = ListDrawingLotsVariant::absolute_majority_for_seat_change(
+                last_seat_change,
+                AbsoluteMajorityDrawingLots {
+                    assign_to: majority_list_votes.number(),
+                    options: lists_last_residual_seat,
+                },
+            )?;
+
+            // Get a list from the lists_drawn
+            let Some(list_drawn) = lists_drawn.next() else {
+                return Ok(AbsoluteMajority::DrawingLotsRequired(variant));
+            };
+
+            variant.validate(list_drawn)?;
+
+            (*list_drawn.drawn(), Some(variant))
+        };
 
         // Reassign the seat
         let mut current_standings = previous_standings.clone();
 
-        let from_list_standing = current_standings
-            .iter_mut()
-            .find(|list_standing| list_standing.list_number() == lists_last_residual_seat[0])
-            .expect("standing to remove residual seat from should exist");
-        from_list_standing.remove_residual_seat();
+        current_standings
+            .get_by_number_mut(list_retracted_seat)
+            .remove_residual_seat();
 
-        let to_list_standing = current_standings
-            .iter_mut()
-            .find(|list_standing| list_standing.list_number() == majority_list_votes.number())
-            .expect("standing to add residual seat to should exist");
-        to_list_standing.add_residual_seat();
+        current_standings
+            .get_by_number_mut(majority_list_votes.number())
+            .add_residual_seat();
 
         info!(
             "Seat first assigned to list {:?} has been reassigned to list {:?} in accordance with Article P 9 Kieswet",
-            lists_last_residual_seat[0],
+            list_retracted_seat,
             majority_list_votes.number()
         );
         Ok(AbsoluteMajority::Completed(
             current_standings,
             Some(SeatChange::AbsoluteMajorityReassignment(
                 AbsoluteMajorityReassignedSeat {
-                    list_retracted_seat: lists_last_residual_seat[0],
+                    list_retracted_seat,
                     list_assigned_seat: majority_list_votes.number(),
-                    drawing_lots: Some(variant),
+                    drawing_lots,
                 },
             )),
         ))
@@ -700,7 +717,10 @@ pub(crate) mod tests {
 
             use crate::{
                 Fraction, SeatChange, seat_assignment,
-                seat_assignment::{SeatAssignment, structs::LargestRemainderAssignedSeat},
+                seat_assignment::{
+                    AbsoluteMajorityReassignedSeat, SeatAssignment,
+                    structs::LargestRemainderAssignedSeat,
+                },
                 structs::{
                     AbsoluteMajorityDrawingLots, LargestRemainderResidualSeatDrawingLots,
                     ListDrawingLotsVariant,
@@ -724,7 +744,7 @@ pub(crate) mod tests {
             /// 4 - Drawing of lots is required for lists: [2, 3, 4] to pick a list which the residual seat gets retracted from
             #[test]
             fn test_with_absolute_majority_of_votes_but_not_seats_with_drawing_of_lots_error() {
-                let input = seat_assignment_fixture_with_default_50_candidates(
+                let mut input = seat_assignment_fixture_with_default_50_candidates(
                     15,
                     vec![2552, 511, 511, 511, 509, 509],
                 );
@@ -735,24 +755,50 @@ pub(crate) mod tests {
                 };
                 assert_eq!(
                     variant,
-                    ListDrawingLotsVariant::AbsoluteMajority(AbsoluteMajorityDrawingLots {
-                        options: vec![2, 3, 4]
-                    }),
+                    ListDrawingLotsVariant::AbsoluteMajorityLargestRemainder(
+                        AbsoluteMajorityDrawingLots {
+                            assign_to: 1,
+                            options: vec![2, 3, 4],
+                        }
+                    ),
                 );
                 assert_eq!(preliminary_result.seats, 15);
                 assert_eq!(preliminary_result.full_seats, 12);
                 assert_eq!(preliminary_result.residual_seats, 3);
-                assert_eq!(
-                    preliminary_result.quota,
-                    Fraction {
-                        numerator: 5103,
-                        denominator: 15
-                    }
-                );
+                assert_eq!(preliminary_result.quota, Fraction::new(5103, 15));
                 assert_eq!(preliminary_result.steps.len(), 3);
                 assert_eq!(
                     get_standings_residual_seats(&preliminary_result),
                     vec![0, 1, 1, 1, 0, 0]
+                );
+
+                // Draw list 3
+                input.lists_drawn.push(ListDrawnMock {
+                    variant: variant.clone(),
+                    drawn: 3,
+                });
+                let Ok(SeatAssignment::Completed(result)) = seat_assignment(&input) else {
+                    panic!("should be Completed");
+                };
+
+                assert_eq!(result.seats, 15);
+                assert_eq!(result.full_seats, 12);
+                assert_eq!(result.residual_seats, 3);
+                assert_eq!(result.quota, Fraction::new(5103, 15));
+
+                assert_eq!(
+                    get_standings_residual_seats(&result),
+                    vec![1, 1, 0, 1, 0, 0]
+                );
+
+                assert_eq!(result.steps.len(), 4);
+                assert_eq!(
+                    result.steps[3].change,
+                    SeatChange::AbsoluteMajorityReassignment(AbsoluteMajorityReassignedSeat {
+                        list_retracted_seat: 3,
+                        list_assigned_seat: 1,
+                        drawing_lots: Some(variant),
+                    })
                 );
             }
 
@@ -1772,7 +1818,9 @@ pub(crate) mod tests {
 
             use crate::{
                 Fraction, HighestAverageAssignedSeat, SeatChange,
-                seat_assignment::{SeatAssignment, seat_assignment},
+                seat_assignment::{
+                    AbsoluteMajorityReassignedSeat, SeatAssignment, seat_assignment,
+                },
                 structs::{
                     AbsoluteMajorityDrawingLots, HighestAverageResidualSeatDrawingLots,
                     ListDrawingLotsVariant,
@@ -1798,7 +1846,7 @@ pub(crate) mod tests {
             /// 7 - Drawing of lots is required for lists: [6, 7] to pick a list which the residual seat gets retracted from
             #[test]
             fn test_with_absolute_majority_of_votes_but_not_seats_with_drawing_of_lots_error() {
-                let input = seat_assignment_fixture_with_default_50_candidates(
+                let mut input = seat_assignment_fixture_with_default_50_candidates(
                     24,
                     vec![7501, 1249, 1249, 1249, 1249, 1248, 1248, 8],
                 );
@@ -1809,24 +1857,50 @@ pub(crate) mod tests {
                 };
                 assert_eq!(
                     variant,
-                    ListDrawingLotsVariant::AbsoluteMajority(AbsoluteMajorityDrawingLots {
-                        options: vec![6, 7]
-                    })
+                    ListDrawingLotsVariant::AbsoluteMajorityHighestAverage(
+                        AbsoluteMajorityDrawingLots {
+                            assign_to: 1,
+                            options: vec![6, 7],
+                        }
+                    )
                 );
                 assert_eq!(preliminary_result.seats, 24);
                 assert_eq!(preliminary_result.full_seats, 18);
                 assert_eq!(preliminary_result.residual_seats, 6);
-                assert_eq!(
-                    preliminary_result.quota,
-                    Fraction {
-                        numerator: 15001,
-                        denominator: 24
-                    }
-                );
+                assert_eq!(preliminary_result.quota, Fraction::new(15001, 24));
                 assert_eq!(preliminary_result.steps.len(), 6);
                 assert_eq!(
                     get_standings_residual_seats(&preliminary_result),
                     vec![0, 1, 1, 1, 1, 1, 1, 0]
+                );
+
+                // Draw lot 6
+                input.lists_drawn.push(ListDrawnMock {
+                    variant: variant.clone(),
+                    drawn: 6,
+                });
+                let Ok(SeatAssignment::Completed(result)) = seat_assignment(&input) else {
+                    panic!("should be Completed");
+                };
+
+                assert_eq!(
+                    get_standings_residual_seats(&result),
+                    vec![1, 1, 1, 1, 1, 0, 1, 0]
+                );
+
+                assert_eq!(result.seats, 24);
+                assert_eq!(result.full_seats, 18);
+                assert_eq!(result.residual_seats, 6);
+                assert_eq!(result.quota, Fraction::new(15001, 24));
+
+                assert_eq!(result.steps.len(), 7);
+                assert_eq!(
+                    result.steps[6].change,
+                    SeatChange::AbsoluteMajorityReassignment(AbsoluteMajorityReassignedSeat {
+                        list_retracted_seat: 6,
+                        list_assigned_seat: 1,
+                        drawing_lots: Some(variant),
+                    })
                 );
             }
 

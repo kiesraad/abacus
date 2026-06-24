@@ -166,7 +166,7 @@ impl<LN: Debug> ListStanding<LN> {
     }
 }
 
-impl<LN> ListStanding<LN> {
+impl<LN: Copy> ListStanding<LN> {
     pub fn list_number(self) -> LN {
         self.list_number
     }
@@ -187,6 +187,36 @@ impl<LN> ListStanding<LN> {
     }
     pub fn residual_seats(self) -> u32 {
         self.residual_seats
+    }
+}
+
+pub trait GetListStandingByNumber {
+    type ListNumber;
+
+    fn get_by_number(&self, number: Self::ListNumber) -> &ListStanding<Self::ListNumber>;
+
+    fn get_by_number_mut(
+        &mut self,
+        number: Self::ListNumber,
+    ) -> &mut ListStanding<Self::ListNumber>;
+}
+
+impl<LN: Copy + PartialEq> GetListStandingByNumber for [ListStanding<LN>] {
+    type ListNumber = LN;
+
+    fn get_by_number(&self, number: Self::ListNumber) -> &ListStanding<Self::ListNumber> {
+        self.iter()
+            .find(|s| s.list_number() == number)
+            .expect("ListStanding should exist")
+    }
+
+    fn get_by_number_mut(
+        &mut self,
+        number: Self::ListNumber,
+    ) -> &mut ListStanding<Self::ListNumber> {
+        self.iter_mut()
+            .find(|s| s.list_number() == number)
+            .expect("ListStanding should exist")
     }
 }
 

@@ -1,6 +1,6 @@
 #![no_main]
 
-use apportionment::{ApportionmentError, ApportionmentOutput, CandidateVotes, process};
+use apportionment::{ApportionmentOutput, CandidateVotes, process};
 use apportionment_fuzz::{
     FuzzedApportionmentInput, SimpleCandidateVotes, SimpleListVotes, init_tracing, run_with_log,
 };
@@ -160,8 +160,8 @@ fuzz_target!(
         Ok(ApportionmentOutput::ListDrawingLotsRequired(..) | ApportionmentOutput::CandidateDrawingLotsRequired(..)) => {
             // Accepted error in this fuzzer
         }
-        Err(ApportionmentError::InvalidLotDrawing(message)) => {
-            panic!("Invalid lot drawing: {}", message)
+        Err(e) => {
+            panic!("Apportionment error: {:?}", e)
         }
     }
 });

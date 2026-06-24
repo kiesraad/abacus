@@ -806,7 +806,6 @@ mod tests {
                 "qualifying lists: {}",
                 case.description
             );
-            
         }
     }
     use crate::seat_assignment::AbsoluteMajorityReassignedSeat;

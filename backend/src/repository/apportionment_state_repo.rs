@@ -35,7 +35,7 @@ pub async fn get(
 ) -> Result<Option<ApportionmentState>, sqlx::Error> {
     let row = query!(
         r#"
-            SELECT state AS "state: Json<ApportionmentState>"
+            SELECT state
             FROM apportionment
             WHERE committee_session_id = $1
         "#,
@@ -83,13 +83,14 @@ mod tests {
                 drawing_lots_required: DrawingLotsRequired::ListDrawingLotsRequired(
                     ListDrawingLotsVariant::HighestAverageResidualSeat(
                         HighestAverageResidualSeatDrawingLots {
-                            average: DisplayFraction {
+                            max_average: DisplayFraction {
                                 integer: 0,
-                                numerator: 0,
-                                denominator: 0,
+                                numerator: 1,
+                                denominator: 2,
                             },
-                            residual_seat_numbers: vec![],
+                            residual_seat_numbers: vec![1],
                             options: PGNumber::from_values(vec![1, 2, 3]),
+                            list_averages: vec![],
                         },
                     ),
                 ),

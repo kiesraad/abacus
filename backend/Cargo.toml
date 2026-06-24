@@ -35,6 +35,11 @@ strum = { version = "0.28", features = ["derive"] }
 test-log = "0.2.19"
 tokio = { version = "1", features = ["full"] }
 tracing = "0.1.44"
+rcgen = { version = "0.14", default-features = false, features = ["aws_lc_rs", "pem", "x509-parser"] }
+rustls-pki-types = "1"
+if-addrs = "0.15"
+rustls = "0.23"
+axum-server = { version = "0.8", default-features = false, features = ["tls-rustls-no-provider"] }
 
 [package]
 name = "abacus"
@@ -53,6 +58,7 @@ pdf-gen-stub = ["pdf_gen/stub"]
 dev-database = []
 airgap-detection = []
 storybook = ["dep:memory-serve"]
+tls = ["dep:rcgen", "dep:rustls-pki-types", "dep:if-addrs", "dep:rustls", "dep:axum-server", "reqwest/rustls"]
 
 [[bin]]
 name = "gen-openapi"
@@ -83,7 +89,7 @@ utoipa-axum = "0.2.0"
 utoipa-swagger-ui = { version = "9.0.2", features = ["axum"], optional = true }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-sqlx = { version = "0.8", features = ["runtime-tokio", "sqlite", "chrono"] }
+sqlx = { version = "0.9.0", features = ["runtime-tokio", "sqlite", "chrono", "sqlx-toml"] }
 tower = "0.5"
 tracing-subscriber = { version = "0.3.23", features = ["env-filter"] }
 tracing.workspace = true
@@ -96,12 +102,19 @@ cookie = { version = "0.18.1", features = ["percent-encode"] }
 strum.workspace = true
 socket2 = "0.6.3"
 ttf-parser = "0.25.1"
+# TLS (enabled by the `tls` feature)
+rcgen = { workspace = true, optional = true }
+rustls-pki-types = { workspace = true, optional = true }
+if-addrs = { workspace = true, optional = true }
+rustls = { workspace = true, optional = true }
+axum-server = { workspace = true, optional = true }
 
 [dev-dependencies]
 async_zip.workspace = true
 http-body-util.workspace = true
 reqwest = { version = "0.13", default-features = false, features = ["json"] }
 test-log.workspace = true
+tempfile = "3"
 
 [build-dependencies]
 memory-serve = { version = "2.1.0", optional = true }

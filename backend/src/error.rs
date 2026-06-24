@@ -41,8 +41,8 @@ pub trait ApiErrorResponse: Debug + Any {
 pub enum ErrorReference {
     AirgapViolation,
     AlreadyInitialised,
+    ApportionmentNotCompleted,
     ApportionmentCommitteeSessionNotCompleted,
-    ApportionmentDrawingOfLotsRequired,
     ApportionmentInvalidLotDrawing,
     CommitteeSessionPaused,
     DatabaseError,

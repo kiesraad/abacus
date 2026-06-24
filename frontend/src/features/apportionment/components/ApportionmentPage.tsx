@@ -158,7 +158,7 @@ export function ApportionmentPage() {
                   <div>
                     <h2 className={cls.tableTitle}>{t("apportionment.title")}</h2>
                     <ApportionmentTable
-                      finalStanding={seatAssignment.final_standing}
+                      standings={seatAssignment.standings}
                       politicalGroups={election.political_groups}
                       fullSeats={seatAssignment.full_seats}
                       residualSeats={seatAssignment.residual_seats}

@@ -9,17 +9,12 @@ import cls from "../Apportionment.module.css";
 
 interface HighestAveragesTableProps {
   steps: HighestAverageAssignmentStep[];
-  finalStanding: ListSeatAssignment[];
+  standings: ListSeatAssignment[];
   politicalGroups: PoliticalGroup[];
   resultChanges: ResultChange[];
 }
 
-export function HighestAveragesTable({
-  steps,
-  finalStanding,
-  politicalGroups,
-  resultChanges,
-}: HighestAveragesTableProps) {
+export function HighestAveragesTable({ steps, standings, politicalGroups, resultChanges }: HighestAveragesTableProps) {
   return (
     <div className={cls.scrollable}>
       <Table id="highest-averages-table" className={cn(cls.table, cls.highestAveragesTable)}>
@@ -36,7 +31,7 @@ export function HighestAveragesTable({
           </Table.HeaderCell>
         </Table.Header>
         <Table.Body>
-          {finalStanding.map((listSeatAssignment: ListSeatAssignment) => {
+          {standings.map((listSeatAssignment: ListSeatAssignment) => {
             let residualSeats = steps.filter((step) => {
               return step.change.selected_list_number === listSeatAssignment.list_number;
             }).length;

@@ -2,7 +2,7 @@
 
 use std::collections::HashMap;
 
-use apportionment::{CandidateVotes, process};
+use apportionment::{ApportionmentOutput, CandidateVotes, process};
 use apportionment_fuzz::{
     FuzzedApportionmentInput, SimpleCandidateVotes, SimpleListVotes, init_tracing, run_with_log,
 };
@@ -14,6 +14,7 @@ fuzz_target!(
     },
     |data: (FuzzedApportionmentInput, u16)| {
     let (data, added_votes) = data;
+
     let (alloc, log1) = run_with_log(|| process(&data));
 
     // Add some votes to the first candidate of the first party
@@ -45,16 +46,16 @@ fuzz_target!(
 
     let (new_alloc, log2) = run_with_log(|| process(&new_data));
 
-    if let (Ok(alloc), Ok(new_alloc)) = (alloc, new_alloc) {
+    if let (Ok(ApportionmentOutput::Completed(alloc)), Ok(ApportionmentOutput::Completed(new_alloc))) = (alloc, new_alloc) {
         let seats_per_party: Vec<u32> = alloc
             .seat_assignment
-            .final_standing
+            .standings
             .iter()
             .map(|p| p.total_seats)
             .collect();
         let new_seats_per_party: Vec<u32> = new_alloc
             .seat_assignment
-            .final_standing
+            .standings
             .iter()
             .map(|p| p.total_seats)
             .collect();

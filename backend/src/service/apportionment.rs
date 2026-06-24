@@ -1,4 +1,4 @@
-use apportionment;
+use apportionment::{self, ApportionmentOutput};
 use serde::Serialize;
 use sqlx::SqliteConnection;
 
@@ -12,7 +12,7 @@ use crate::{
         apportionment::{
             AbsoluteMajorityDrawingLots, ApportionmentWarning, CandidateDrawingLotsVariant,
             HighestAverageResidualSeatDrawingLots, LargestRemainderResidualSeatDrawingLots,
-            ListDrawingLotsVariant,
+            ListAverage, ListDrawingLotsVariant, ListRemainder, SeatAssignment,
         },
         apportionment_state::{ApportionmentState, ApportionmentStateError, DrawingLotsRequired},
         committee_session::CommitteeSessionId,
@@ -20,7 +20,6 @@ use crate::{
         election::{CandidateNumber, ElectionId, ElectionWithPoliticalGroups, PGNumber},
         summary::ElectionSummary,
     },
-    error::ErrorReference,
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
     repository::{apportionment_state_repo, committee_session_repo, data_entry_repo},
     service,
@@ -103,10 +102,10 @@ pub async fn next_state(
 
     update_state(tx, audit_service, election.id, |state| match result {
         ApportionmentResult::Ok(_) => state.finalise(),
-        ApportionmentResult::ListDrawingLotsRequired(variant) => {
+        ApportionmentResult::ListDrawingLotsRequired(variant, ..) => {
             state.draw_lots(DrawingLotsRequired::ListDrawingLotsRequired(variant))
         }
-        ApportionmentResult::CandidateDrawingLotsRequired(variant) => {
+        ApportionmentResult::CandidateDrawingLotsRequired(variant, ..) => {
             state.draw_lots(DrawingLotsRequired::CandidateDrawingLotsRequired(variant))
         }
     })
@@ -116,8 +115,8 @@ pub async fn next_state(
 #[allow(clippy::large_enum_variant)]
 pub enum ApportionmentResult {
     Ok(ElectionApportionmentResponse),
-    ListDrawingLotsRequired(ListDrawingLotsVariant),
-    CandidateDrawingLotsRequired(CandidateDrawingLotsVariant),
+    ListDrawingLotsRequired(ListDrawingLotsVariant, ElectionSummary, SeatAssignment),
+    CandidateDrawingLotsRequired(CandidateDrawingLotsVariant, ElectionSummary, SeatAssignment),
 }
 
 impl From<apportionment::CandidateDrawingLotsVariant<PGNumber, CandidateNumber>>
@@ -136,28 +135,44 @@ impl From<apportionment::ListDrawingLotsVariant<PGNumber>> for ListDrawingLotsVa
         match value {
             apportionment::ListDrawingLotsVariant::HighestAverageResidualSeat(
                 apportionment::HighestAverageResidualSeatDrawingLots {
-                    average,
+                    max_average,
                     residual_seat_numbers,
                     options,
+                    list_averages,
                 },
             ) => ListDrawingLotsVariant::HighestAverageResidualSeat(
                 HighestAverageResidualSeatDrawingLots {
-                    average: average.into(),
+                    max_average: max_average.into(),
                     residual_seat_numbers,
                     options,
+                    list_averages: list_averages
+                        .into_iter()
+                        .map(|(ln, avg)| ListAverage {
+                            pg_number: ln,
+                            average: avg.into(),
+                        })
+                        .collect(),
                 },
             ),
             apportionment::ListDrawingLotsVariant::LargestRemainderResidualSeat(
                 apportionment::LargestRemainderResidualSeatDrawingLots {
-                    remainder,
+                    max_remainder,
                     residual_seat_numbers,
                     options,
+                    list_remainders,
                 },
             ) => ListDrawingLotsVariant::LargestRemainderResidualSeat(
                 LargestRemainderResidualSeatDrawingLots {
-                    remainder: remainder.into(),
+                    max_remainder: max_remainder.into(),
                     residual_seat_numbers,
                     options,
+                    list_remainders: list_remainders
+                        .into_iter()
+                        .map(|(ln, rem)| ListRemainder {
+                            pg_number: ln,
+                            remainder: rem.into(),
+                        })
+                        .collect(),
                 },
             ),
             apportionment::ListDrawingLotsVariant::AbsoluteMajority(
@@ -167,11 +182,9 @@ impl From<apportionment::ListDrawingLotsVariant<PGNumber>> for ListDrawingLotsVa
     }
 }
 
-type ApportionmentError = apportionment::ApportionmentError<PGNumber, CandidateNumber>;
-
 /// - Collect data for the [ApportionmentInputData] from the database and make sure that the
 ///   committee session status is completed.
-/// - Call the apportionment process funtion
+/// - Call the apportionment process function
 /// - Map the Result from the apportionment into an [ApportionmentResult]
 pub async fn process(
     conn: &mut SqliteConnection,
@@ -191,32 +204,36 @@ pub async fn process(
         state.get_candidates_drawn(),
     );
 
-    let apportionment_result = match apportionment::process(&input) {
-        Ok(output) => ApportionmentResult::Ok(ElectionApportionmentResponse {
-            seat_assignment: map_seat_assignment(&output.seat_assignment),
-            candidate_nomination: map_candidate_nomination(
-                &output.candidate_nomination,
-                &election.political_groups,
-            ),
-            election_summary: election_summary.clone(),
-            warnings: output
-                .seat_assignment
-                .warnings()
-                .into_iter()
-                .map(ApportionmentWarning::from)
-                .collect(),
-        }),
-        Err(ApportionmentError::ListDrawingLotsRequired(r)) => {
-            ApportionmentResult::ListDrawingLotsRequired(r.into())
+    let apportionment_result = match apportionment::process(&input)? {
+        ApportionmentOutput::Completed(output) => {
+            ApportionmentResult::Ok(ElectionApportionmentResponse {
+                seat_assignment: map_seat_assignment(&output.seat_assignment),
+                candidate_nomination: map_candidate_nomination(
+                    &output.candidate_nomination,
+                    &election.political_groups,
+                ),
+                election_summary: election_summary.clone(),
+                warnings: output
+                    .seat_assignment
+                    .warnings()
+                    .into_iter()
+                    .map(ApportionmentWarning::from)
+                    .collect(),
+            })
         }
-        Err(ApportionmentError::CandidateDrawingLotsRequired(r)) => {
-            ApportionmentResult::CandidateDrawingLotsRequired(r.into())
+        ApportionmentOutput::ListDrawingLotsRequired(variant, preliminary_seat_assignment) => {
+            ApportionmentResult::ListDrawingLotsRequired(
+                variant.into(),
+                election_summary.clone(),
+                map_seat_assignment(&preliminary_seat_assignment),
+            )
         }
-        Err(ApportionmentError::InvalidLotDrawing(message)) => {
-            return Err(APIError::Conflict(
-                message,
-                ErrorReference::ApportionmentInvalidLotDrawing,
-            ));
+        ApportionmentOutput::CandidateDrawingLotsRequired(variant, seat_assignment) => {
+            ApportionmentResult::CandidateDrawingLotsRequired(
+                variant.into(),
+                election_summary.clone(),
+                map_seat_assignment(&seat_assignment),
+            )
         }
     };
 

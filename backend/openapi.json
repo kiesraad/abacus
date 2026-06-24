@@ -1277,7 +1277,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ElectionApportionmentResponse"
+                  "$ref": "#/components/schemas/ProcessApportionmentResponse"
                 }
               }
             }
@@ -5342,6 +5342,9 @@
           "list_assigned_seat"
         ],
         "properties": {
+          "drawing_lots": {
+            "$ref": "#/components/schemas/ListDrawingLotsVariant"
+          },
           "list_assigned_seat": {
             "$ref": "#/components/schemas/PGNumber"
           },
@@ -7104,8 +7107,8 @@
         "enum": [
           "AirgapViolation",
           "AlreadyInitialised",
+          "ApportionmentNotCompleted",
           "ApportionmentCommitteeSessionNotCompleted",
-          "ApportionmentDrawingOfLotsRequired",
           "ApportionmentInvalidLotDrawing",
           "CommitteeSessionPaused",
           "DatabaseError",
@@ -7381,6 +7384,7 @@
           "voters",
           "seats",
           "generate_p22_2_variants",
+          "generate_drawing_lots",
           "with_data_entry",
           "first_data_entry",
           "second_data_entry",
@@ -7400,9 +7404,17 @@
             "$ref": "#/components/schemas/CommitteeCategory",
             "description": "GSB or CSB"
           },
+          "custom_name": {
+            "type": "string",
+            "description": "Custom election name"
+          },
           "first_data_entry": {
             "$ref": "#/components/schemas/RandomRange",
             "description": "Percentage of the first data entry to complete if data entry is included"
+          },
+          "generate_drawing_lots": {
+            "type": "boolean",
+            "description": "Generate multiple elections, each resulting in drawing lots"
           },
           "generate_p22_2_variants": {
             "type": "boolean",
@@ -7451,6 +7463,9 @@
           "votes_per_seat"
         ],
         "properties": {
+          "drawing_lots": {
+            "$ref": "#/components/schemas/ListDrawingLotsVariant"
+          },
           "list_assigned": {
             "type": "array",
             "items": {
@@ -7480,12 +7495,19 @@
       "HighestAverageResidualSeatDrawingLots": {
         "type": "object",
         "required": [
-          "average",
+          "max_average",
           "residual_seat_numbers",
-          "options"
+          "options",
+          "list_averages"
         ],
         "properties": {
-          "average": {
+          "list_averages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ListAverage"
+            }
+          },
+          "max_average": {
             "$ref": "#/components/schemas/DisplayFraction"
           },
           "options": {
@@ -7631,6 +7653,9 @@
           "remainder_votes"
         ],
         "properties": {
+          "drawing_lots": {
+            "$ref": "#/components/schemas/ListDrawingLotsVariant"
+          },
           "list_assigned": {
             "type": "array",
             "items": {
@@ -7654,19 +7679,26 @@
       "LargestRemainderResidualSeatDrawingLots": {
         "type": "object",
         "required": [
-          "remainder",
+          "max_remainder",
           "residual_seat_numbers",
-          "options"
+          "options",
+          "list_remainders"
         ],
         "properties": {
+          "list_remainders": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ListRemainder"
+            }
+          },
+          "max_remainder": {
+            "$ref": "#/components/schemas/DisplayFraction"
+          },
           "options": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/PGNumber"
             }
-          },
-          "remainder": {
-            "$ref": "#/components/schemas/DisplayFraction"
           },
           "residual_seat_numbers": {
             "type": "array",
@@ -7675,6 +7707,21 @@
               "format": "int32",
               "minimum": 0
             }
+          }
+        }
+      },
+      "ListAverage": {
+        "type": "object",
+        "required": [
+          "pg_number",
+          "average"
+        ],
+        "properties": {
+          "average": {
+            "$ref": "#/components/schemas/DisplayFraction"
+          },
+          "pg_number": {
+            "$ref": "#/components/schemas/PGNumber"
           }
         }
       },
@@ -7823,6 +7870,21 @@
           },
           "list_retracted_seat": {
             "$ref": "#/components/schemas/PGNumber"
+          }
+        }
+      },
+      "ListRemainder": {
+        "type": "object",
+        "required": [
+          "pg_number",
+          "remainder"
+        ],
+        "properties": {
+          "pg_number": {
+            "$ref": "#/components/schemas/PGNumber"
+          },
+          "remainder": {
+            "$ref": "#/components/schemas/DisplayFraction"
           }
         }
       },
@@ -8466,6 +8528,53 @@
           }
         }
       },
+      "ProcessApportionmentResponse": {
+        "oneOf": [
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ElectionApportionmentResponse"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "status"
+                ],
+                "properties": {
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "Finalised"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "type": "object",
+            "required": [
+              "election_summary",
+              "seat_assignment",
+              "status"
+            ],
+            "properties": {
+              "election_summary": {
+                "$ref": "#/components/schemas/ElectionSummary"
+              },
+              "seat_assignment": {
+                "$ref": "#/components/schemas/SeatAssignment"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "DrawingLotsRequired"
+                ]
+              }
+            }
+          }
+        ]
+      },
       "RandomRange": {
         "type": "string"
       },
@@ -8613,15 +8722,9 @@
           "residual_seats",
           "quota",
           "steps",
-          "final_standing"
+          "standings"
         ],
         "properties": {
-          "final_standing": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ListSeatAssignment"
-            }
-          },
           "full_seats": {
             "type": "integer",
             "format": "int32",
@@ -8639,6 +8742,12 @@
             "type": "integer",
             "format": "int32",
             "minimum": 0
+          },
+          "standings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ListSeatAssignment"
+            }
           },
           "steps": {
             "type": "array",

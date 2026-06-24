@@ -78,7 +78,7 @@ impl EnrichedSeatAssignment {
             // Otherwise take the full seats from the final standing
             // since it will be equal to the initial standing
             seat_assignment
-                .final_standing
+                .standings
                 .iter()
                 .find(|standing| standing.list_number == list_number)
                 .expect("Standing exists for each political group")
@@ -90,18 +90,18 @@ impl EnrichedSeatAssignment {
         seat_assignment: &SeatAssignment,
         initial_largest_remainder_steps: &[&SeatChangeStep],
     ) -> Vec<(PGNumber, LargestRemainder)> {
-        let final_standing_pgs_meeting_threshold: Vec<&ListSeatAssignment> = seat_assignment
-            .final_standing
+        let standings_pgs_meeting_threshold: Vec<&ListSeatAssignment> = seat_assignment
+            .standings
             .iter()
             .filter(|list_seat_assignment| list_seat_assignment.meets_remainder_threshold)
             .collect();
         let mut largest_remainders = Vec::new();
-        for standing in &final_standing_pgs_meeting_threshold {
+        for standing in &standings_pgs_meeting_threshold {
             let assigned_seat = initial_largest_remainder_steps
                 .iter()
                 .find(|step| step.change.list_number_assigned() == standing.list_number);
             let largest_remainder = LargestRemainder {
-                remainder_votes: standing.remainder_votes.clone(),
+                remainder_votes: standing.remainder_votes,
                 residual_seats: if assigned_seat.is_some() { 1 } else { 0 },
             };
             largest_remainders.push((standing.list_number, largest_remainder));
@@ -119,7 +119,7 @@ impl EnrichedSeatAssignment {
             let assigned_seat = initial_unique_highest_average_steps
                 .iter()
                 .find(|step| step.change.list_number_assigned() == list_number);
-            let average = &initial_unique_highest_average_steps
+            let average = initial_unique_highest_average_steps
                 .first()
                 .expect("There should be at least one step since is_empty is checked")
                 .standings
@@ -133,7 +133,7 @@ impl EnrichedSeatAssignment {
             };
             let unique_highest_average = UniqueHighestAverage {
                 already_assigned_seats,
-                next_votes_per_seat: average.clone(),
+                next_votes_per_seat: average,
                 residual_seats: u32::from(assigned_seat.is_some()),
             };
             Some(unique_highest_average)
@@ -200,7 +200,7 @@ impl EnrichedSeatAssignment {
     ) -> Result<Self, ModelsError> {
         let list_seat_assignments = Self::get_list_seat_assignments(summary, seat_assignment)?;
         Ok(EnrichedSeatAssignment {
-            quota: seat_assignment.quota.clone(),
+            quota: seat_assignment.quota,
             list_seat_assignment: list_seat_assignments.enriched_list_seat_assignments,
             initial_highest_average_steps: if list_seat_assignments
                 .initial_highest_average_steps
@@ -255,6 +255,7 @@ pub struct UniqueHighestAverage {
 
 #[cfg(test)]
 mod tests {
+    use apportionment::ApportionmentOutput;
     use test_log::test;
 
     use crate::{
@@ -339,9 +340,12 @@ mod tests {
             &[],
             &[],
         );
-        let apportionment_result =
-            apportionment::process(&apportionment_input).expect("apportionment failed");
-        let seat_assignment = map_seat_assignment(&apportionment_result.seat_assignment);
+        let apportionment_result = apportionment::process(&apportionment_input);
+        let Ok(ApportionmentOutput::Completed(apportionment)) = apportionment_result else {
+            panic!("should be Completed");
+        };
+
+        let seat_assignment = map_seat_assignment(&apportionment.seat_assignment);
         let result =
             EnrichedSeatAssignment::new(election.number_of_seats, &summary_csb, &seat_assignment)
                 .expect("EnrichedSeatAssignment::new should succeed");
@@ -459,9 +463,12 @@ mod tests {
             &[],
             &[],
         );
-        let apportionment_result =
-            apportionment::process(&apportionment_input).expect("apportionment failed");
-        let seat_assignment = map_seat_assignment(&apportionment_result.seat_assignment);
+        let apportionment_result = apportionment::process(&apportionment_input);
+        let Ok(ApportionmentOutput::Completed(apportionment)) = apportionment_result else {
+            panic!("should be Completed");
+        };
+
+        let seat_assignment = map_seat_assignment(&apportionment.seat_assignment);
         let result =
             EnrichedSeatAssignment::new(election.number_of_seats, &summary_csb, &seat_assignment)
                 .expect("EnrichedSeatAssignment::new should succeed");
@@ -547,9 +554,12 @@ mod tests {
             &[],
             &[],
         );
-        let apportionment_result =
-            apportionment::process(&apportionment_input).expect("apportionment failed");
-        let seat_assignment = map_seat_assignment(&apportionment_result.seat_assignment);
+        let apportionment_result = apportionment::process(&apportionment_input);
+        let Ok(ApportionmentOutput::Completed(apportionment)) = apportionment_result else {
+            panic!("should be Completed");
+        };
+
+        let seat_assignment = map_seat_assignment(&apportionment.seat_assignment);
         let result =
             EnrichedSeatAssignment::new(election.number_of_seats, &summary_csb, &seat_assignment)
                 .expect("EnrichedSeatAssignment::new should succeed");

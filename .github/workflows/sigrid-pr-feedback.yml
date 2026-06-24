@@ -7,21 +7,18 @@ on:
 
 permissions:
   contents: read
-  pull-requests: write
 
 jobs:
   sigridci:
     if: "!github.event.pull_request.head.repo.fork"
     runs-on: ubuntu-latest
-    permissions:
-      pull-requests: write
     steps:
       - name: Check out repository
         uses: actions/checkout@v6.0.3
         with:
           fetch-depth: 0
       - name: Sigrid CI
-        uses: Software-Improvement-Group/sigridci@299e232e03a10a2f5db48bc0c9a3bc5b5dc6f52d # main
+        uses: Software-Improvement-Group/sigridci@b475df83e9b6cc4e45ad1df8c3236e896e6c995a # main
         with:
           customer: kiesraad
           system: abacus
@@ -29,9 +26,10 @@ jobs:
           capability: maintainability,osh,security
         env:
           SIGRID_CI_TOKEN: "${{ secrets.SIGRID_CI_TOKEN }}"
-      - name: "Sigrid PR feedback"
-        uses: mshick/add-pr-comment@8e4927817251f1ff60c001f04568532b38e0b4a0 # v3.11.0
+      - name: "Sigrid feedback to job summary"
         if: always()
-        with:
-          message-id: sigrid
-          message-path: sigrid-ci-output/*feedback.md
+        run: |
+          for feedback in sigrid-ci-output/*feedback.md; do
+            cat "$feedback" >> "$GITHUB_STEP_SUMMARY"
+            echo >> "$GITHUB_STEP_SUMMARY"
+          done

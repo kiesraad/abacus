@@ -1,15 +1,13 @@
-use sqlx::{Connection, SqliteConnection, query, query_as, query_scalar, types::Json};
+use sqlx::{Connection, SqliteConnection, query, query_as, query_scalar};
 
 use crate::{
     domain::{
         committee_session::CommitteeSessionId,
-        data_entry::{DataEntryId, DataEntryStatus, DataEntryStatusWithSource},
+        data_entry::{DataEntryId, DataEntryStatusWithSource},
         election::{CommitteeCategory, ElectionId},
-        investigation::InvestigationStatus,
         polling_station::{
             PollingStation, PollingStationFirstSession, PollingStationForSession, PollingStationId,
-            PollingStationNextSession, PollingStationNumber, PollingStationRequest,
-            PollingStationType,
+            PollingStationNextSession, PollingStationRequest,
         },
     },
     repository::{
@@ -38,7 +36,7 @@ pub async fn get_committee_category(
 ) -> Result<CommitteeCategory, sqlx::Error> {
     query_scalar!(
         r#"
-        SELECT e.committee_category as "committee_category: _"
+        SELECT e.committee_category
         FROM polling_stations AS p
         JOIN committee_sessions AS c ON c.id = p.committee_session_id
         JOIN elections AS e ON c.election_id = e.id
@@ -78,16 +76,16 @@ async fn list(
         PollingStationRow,
         r#"
         SELECT
-            p.id AS "id: _",
-            p.committee_session_id AS "committee_session_id: _",
-            c.number AS "committee_session_number: u32",
-            p.prev_data_entry_id AS "prev_data_entry_id: _",
-            p.data_entry_id AS "data_entry_id: _",
-            p.investigation_state AS "investigation_state: Json<InvestigationStatus>",
+            p.id,
+            p.committee_session_id,
+            c.number AS committee_session_number,
+            p.prev_data_entry_id,
+            p.data_entry_id,
+            p.investigation_state,
             p.name,
-            p.number AS "number: u32",
-            p.number_of_voters AS "number_of_voters: _",
-            p.polling_station_type AS "polling_station_type: _",
+            p.number,
+            p.number_of_voters,
+            p.polling_station_type,
             p.address,
             p.postal_code,
             p.locality
@@ -110,16 +108,16 @@ pub async fn get(
         PollingStationRow,
         r#"
         SELECT
-            p.id AS "id: _",
-            p.committee_session_id AS "committee_session_id: _",
-            c.number AS "committee_session_number: u32",
-            p.prev_data_entry_id AS "prev_data_entry_id: _",
-            p.data_entry_id AS "data_entry_id: _",
-            p.investigation_state AS "investigation_state: Json<InvestigationStatus>",
+            p.id,
+            p.committee_session_id,
+            c.number AS committee_session_number,
+            p.prev_data_entry_id,
+            p.data_entry_id,
+            p.investigation_state,
             p.name,
-            p.number AS "number: u32",
-            p.number_of_voters AS "number_of_voters: _",
-            p.polling_station_type AS "polling_station_type: _",
+            p.number,
+            p.number_of_voters,
+            p.polling_station_type,
             p.address,
             p.postal_code,
             p.locality
@@ -153,16 +151,16 @@ pub async fn get_for_election(
         PollingStationRow,
         r#"
         SELECT
-            p.id AS "id: _",
-            p.committee_session_id AS "committee_session_id: _",
-            c.number AS "committee_session_number: u32",
-            p.prev_data_entry_id AS "prev_data_entry_id: _",
-            p.data_entry_id AS "data_entry_id: _",
-            p.investigation_state AS "investigation_state: Json<InvestigationStatus>",
+            p.id,
+            p.committee_session_id,
+            c.number AS committee_session_number,
+            p.prev_data_entry_id,
+            p.data_entry_id,
+            p.investigation_state,
             p.name,
-            p.number AS "number: u32",
-            p.number_of_voters AS "number_of_voters: _",
-            p.polling_station_type AS "polling_station_type: _",
+            p.number,
+            p.number_of_voters,
+            p.polling_station_type,
             p.address,
             p.postal_code,
             p.locality
@@ -210,7 +208,7 @@ pub async fn create(
             postal_code,
             locality
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        RETURNING id AS "id: _"
+        RETURNING id AS "id!: _"
         "#,
         committee_session_id,
         None::<u32> as _,
@@ -263,7 +261,7 @@ pub async fn create_many(
                 postal_code,
                 locality
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-            RETURNING id AS "id: _"
+            RETURNING id AS "id!: _"
             "#,
             committee_session_id,
             None::<u32> as _,
@@ -319,16 +317,16 @@ pub async fn update(
         WHERE
             id = ? AND committee_session_id = ?
         RETURNING
-            id AS "id: _",
-            committee_session_id AS "committee_session_id: _",
+            id,
+            committee_session_id,
             (SELECT c.number FROM committee_sessions AS c WHERE c.id = committee_session_id) AS "committee_session_number!: u32",
-            prev_data_entry_id AS "prev_data_entry_id: _",
-            data_entry_id AS "data_entry_id: _",
-            investigation_state AS "investigation_state: Json<InvestigationStatus>",
+            prev_data_entry_id,
+            data_entry_id,
+            investigation_state,
             name,
-            number AS "number: u32",
-            number_of_voters AS "number_of_voters: _",
-            polling_station_type AS "polling_station_type: _",
+            number,
+            number_of_voters,
+            polling_station_type,
             address,
             postal_code,
             locality
@@ -382,7 +380,7 @@ pub async fn get_data_entry_id(
     polling_station_id: PollingStationId,
 ) -> Result<DataEntryId, sqlx::Error> {
     query_scalar!(
-        r#"SELECT data_entry_id AS "data_entry_id: _" FROM polling_stations WHERE id = ?"#,
+        r#"SELECT data_entry_id FROM polling_stations WHERE id = ?"#,
         polling_station_id
     )
     .fetch_one(conn)
@@ -419,16 +417,16 @@ pub async fn link_data_entry(
             SET data_entry_id = ?
             WHERE id = ?
             RETURNING
-                id AS "id: _",
-                committee_session_id AS "committee_session_id: _",
+                id,
+                committee_session_id,
                 (SELECT c.number FROM committee_sessions AS c WHERE c.id = committee_session_id) AS "committee_session_number!: u32",
-                prev_data_entry_id AS "prev_data_entry_id: _",
-                data_entry_id AS "data_entry_id: _",
-                investigation_state AS "investigation_state: Json<InvestigationStatus>",
+                prev_data_entry_id,
+                data_entry_id,
+                investigation_state,
                 name,
-                number AS "number: u32",
-                number_of_voters AS "number_of_voters: _",
-                polling_station_type AS "polling_station_type: _",
+                number,
+                number_of_voters,
+                polling_station_type,
                 address,
                 postal_code,
                 locality
@@ -561,20 +559,20 @@ pub async fn list_first_session_with_status(
     query!(
         r#"
         SELECT
-            p.id AS "id: PollingStationId",
-            p.committee_session_id AS "committee_session_id: CommitteeSessionId",
-            c.number AS "committee_session_number: u32",
-            p.prev_data_entry_id AS "prev_data_entry_id: DataEntryId",
-            de.id AS "data_entry_id: DataEntryId",
-            p.investigation_state AS "investigation_state: Json<InvestigationStatus>",
+            p.id,
+            p.committee_session_id,
+            c.number AS committee_session_number,
+            p.prev_data_entry_id,
+            de.id AS data_entry_id,
+            p.investigation_state,
             p.name,
-            p.number AS "number: PollingStationNumber",
-            p.number_of_voters AS "number_of_voters: u32",
-            p.polling_station_type AS "polling_station_type: PollingStationType",
+            p.number,
+            p.number_of_voters,
+            p.polling_station_type,
             p.address,
             p.postal_code,
             p.locality,
-            de.state AS "state: Json<DataEntryStatus>"
+            de.state
         FROM polling_stations AS p
         JOIN committee_sessions AS c ON c.id = p.committee_session_id
         JOIN data_entries AS de ON de.id = p.data_entry_id
@@ -615,20 +613,20 @@ pub async fn list_next_session_with_status(
     query!(
         r#"
         SELECT
-            p.id AS "id: PollingStationId",
-            p.committee_session_id AS "committee_session_id: CommitteeSessionId",
-            c.number AS "committee_session_number: u32",
-            p.prev_data_entry_id AS "prev_data_entry_id: DataEntryId",
-            de.id AS "data_entry_id: DataEntryId",
-            p.investigation_state AS "investigation_state: Json<InvestigationStatus>",
+            p.id,
+            p.committee_session_id,
+            c.number AS committee_session_number,
+            p.prev_data_entry_id,
+            de.id AS data_entry_id,
+            p.investigation_state,
             p.name,
-            p.number AS "number: PollingStationNumber",
-            p.number_of_voters AS "number_of_voters: u32",
-            p.polling_station_type AS "polling_station_type: PollingStationType",
+            p.number,
+            p.number_of_voters,
+            p.polling_station_type,
             p.address,
             p.postal_code,
             p.locality,
-            de.state AS "state: Json<DataEntryStatus>"
+            de.state
         FROM polling_stations AS p
         JOIN committee_sessions AS c ON c.id = p.committee_session_id
         JOIN data_entries AS de ON de.id = p.data_entry_id

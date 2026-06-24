@@ -123,6 +123,7 @@ pub struct FootnotePoliticalGroup {
 
 #[cfg(test)]
 mod tests {
+    use apportionment::ApportionmentOutput;
     use test_log::test;
 
     use crate::{
@@ -155,9 +156,12 @@ mod tests {
             create_political_group_candidate_votes(&election.political_groups, &candidate_votes);
         let apportionment_input =
             ApportionmentInputData::new(election.number_of_seats, &list_votes, &[], &[], &[]);
-        let apportionment_result =
-            apportionment::process(&apportionment_input).expect("apportionment failed");
-        let seat_assignment = map_seat_assignment(&apportionment_result.seat_assignment);
+        let apportionment_result = apportionment::process(&apportionment_input);
+        let Ok(ApportionmentOutput::Completed(apportionment)) = apportionment_result else {
+            panic!("should be Completed");
+        };
+
+        let seat_assignment = map_seat_assignment(&apportionment.seat_assignment);
         let result = ApportionmentFootnotes::new(&election.political_groups, &seat_assignment)
             .expect("ApportionmentFootnotes::new should succeed");
         assert!(result.is_none());
@@ -186,9 +190,12 @@ mod tests {
             create_political_group_candidate_votes(&election.political_groups, &candidate_votes);
         let apportionment_input =
             ApportionmentInputData::new(election.number_of_seats, &list_votes, &[], &[], &[]);
-        let apportionment_result =
-            apportionment::process(&apportionment_input).expect("apportionment failed");
-        let seat_assignment = map_seat_assignment(&apportionment_result.seat_assignment);
+        let apportionment_result = apportionment::process(&apportionment_input);
+        let Ok(ApportionmentOutput::Completed(apportionment)) = apportionment_result else {
+            panic!("should be Completed");
+        };
+
+        let seat_assignment = map_seat_assignment(&apportionment.seat_assignment);
         let result = ApportionmentFootnotes::new(&election.political_groups, &seat_assignment)
             .expect("ApportionmentFootnotes::new should succeed");
         assert!(result.is_some());
@@ -224,9 +231,12 @@ mod tests {
             create_political_group_candidate_votes(&election.political_groups, &candidate_votes);
         let apportionment_input =
             ApportionmentInputData::new(election.number_of_seats, &list_votes, &[], &[], &[]);
-        let apportionment_result =
-            apportionment::process(&apportionment_input).expect("apportionment failed");
-        let seat_assignment = map_seat_assignment(&apportionment_result.seat_assignment);
+        let apportionment_result = apportionment::process(&apportionment_input);
+        let Ok(ApportionmentOutput::Completed(apportionment)) = apportionment_result else {
+            panic!("should be Completed");
+        };
+
+        let seat_assignment = map_seat_assignment(&apportionment.seat_assignment);
         let result = ApportionmentFootnotes::new(&election.political_groups, &seat_assignment)
             .expect("ApportionmentFootnotes::new should succeed");
         assert!(result.is_some());

@@ -7,7 +7,7 @@ export const Default: StoryObj = {
   render: () => {
     return (
       <FullSeatsTable
-        finalStanding={gte19Seats.seat_assignment.final_standing}
+        standings={gte19Seats.seat_assignment.standings}
         politicalGroups={gte19Seats.election.political_groups}
         quota={gte19Seats.seat_assignment.quota}
         resultChanges={[]}

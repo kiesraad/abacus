@@ -1,0 +1,26 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        SELECT e.committee_category\n        FROM committee_sessions AS c\n        JOIN elections AS e ON c.election_id = e.id\n        WHERE c.id = ?\n        ",
+  "describe": {
+    "columns": [
+      {
+        "name": "committee_category",
+        "ordinal": 0,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "elections",
+            "name": "committee_category"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "261dae0ced47c6eb28a339147061b2e6263a1532d4673f945a37794436645afe"
+}

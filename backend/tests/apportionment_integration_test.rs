@@ -20,7 +20,7 @@ pub mod shared;
 pub mod utils;
 
 fn get_total_seats_from_seat_assignment(seat_assignment: &serde_json::Value) -> Vec<u64> {
-    seat_assignment["final_standing"]
+    seat_assignment["standings"]
         .as_array()
         .unwrap()
         .iter()
@@ -185,7 +185,7 @@ async fn test_unassigned_seats(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_10_csb", "users"))))]
-async fn test_error_drawing_of_lots_required(pool: SqlitePool) {
+async fn test_drawing_of_lots_required(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     let request_body = json!({
@@ -229,9 +229,9 @@ async fn test_error_drawing_of_lots_required(pool: SqlitePool) {
         .await;
 
     let response = get_apportionment(&addr, 10).await;
-    assert_eq!(response.status(), StatusCode::UNPROCESSABLE_ENTITY);
+    assert_eq!(response.status(), StatusCode::OK);
     let body: serde_json::Value = response.json().await.unwrap();
-    assert_eq!(body["error"], "Drawing of lots is required");
+    assert_eq!(body["status"], "DrawingLotsRequired".to_string());
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
@@ -344,14 +344,14 @@ async fn test_api_output(pool: SqlitePool) {
     );
 
     assert_eq!(
-        body["seat_assignment"]["final_standing"]
+        body["seat_assignment"]["standings"]
             .as_array()
             .unwrap()
             .len(),
         5
     );
     assert_eq!(
-        body["seat_assignment"]["final_standing"][0],
+        body["seat_assignment"]["standings"][0],
         json!({
             "list_number": 1,
             "votes_cast": 1200,

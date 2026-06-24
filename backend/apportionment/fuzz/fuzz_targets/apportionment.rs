@@ -1,6 +1,6 @@
 #![no_main]
 
-use apportionment::{ApportionmentError, CandidateVotes, process};
+use apportionment::{ApportionmentError, ApportionmentOutput, CandidateVotes, process};
 use apportionment_fuzz::{
     FuzzedApportionmentInput, SimpleCandidateVotes, SimpleListVotes, init_tracing, run_with_log,
 };
@@ -37,7 +37,7 @@ fuzz_target!(
     let (result, log) = run_with_log(|| process(&data));
 
     match result {
-        Ok(result) => {
+        Ok(ApportionmentOutput::Completed(result)) => {
             let total_seats = data.seats;
 
             // Validate total votes calculation
@@ -48,7 +48,7 @@ fuzz_target!(
             // so the assigned total can be less than seats.
             let seats_per_list: Vec<u32> = result
                 .seat_assignment
-                .final_standing
+                .standings
                 .iter()
                 .map(|standing| standing.total_seats)
                 .collect();
@@ -157,7 +157,7 @@ fuzz_target!(
                 }
             }
         }
-        Err(ApportionmentError::ListDrawingLotsRequired(_) | ApportionmentError::CandidateDrawingLotsRequired(_)) => {
+        Ok(ApportionmentOutput::ListDrawingLotsRequired(..) | ApportionmentOutput::CandidateDrawingLotsRequired(..)) => {
             // Accepted error in this fuzzer
         }
         Err(ApportionmentError::InvalidLotDrawing(message)) => {

@@ -13,18 +13,18 @@ pub async fn list(
     let elections = query_as!(
         Election,
         r#"SELECT
-            id as "id: ElectionId",
+            id,
             name, 
-            committee_category as "committee_category: _",
-            counting_method as "counting_method: _",
+            committee_category,
+            counting_method,
             election_id, 
             location, 
             domain_id, 
-            category as "category: _",
-            number_of_seats as "number_of_seats: u32",
-            number_of_voters as "number_of_voters: u32",
-            election_date as "election_date: _",
-            nomination_date as "nomination_date: _"
+            category,
+            number_of_seats,
+            number_of_voters,
+            election_date,
+            nomination_date
         FROM elections 
         WHERE ($1 IS NULL OR committee_category = $1)
         "#,
@@ -85,19 +85,19 @@ pub async fn get(
         ElectionRow,
         r#"
         SELECT
-            id as "id: ElectionId",
+            id,
             name,
-            committee_category as "committee_category: CommitteeCategory",
-            counting_method as "counting_method: VoteCountingMethod",
+            committee_category,
+            counting_method,
             election_id,
             location,
             domain_id,
-            category as "category: ElectionCategory",
-            number_of_seats as "number_of_seats: u32",
-            number_of_voters as "number_of_voters: u32",
-            election_date as "election_date: NaiveDate",
-            nomination_date as "nomination_date: NaiveDate",
-            political_groups as "political_groups: Json<Vec<RegisteredPoliticalGroup>>"
+            category,
+            number_of_seats,
+            number_of_voters,
+            election_date,
+            nomination_date,
+            political_groups
         FROM elections
         WHERE id = ?
         "#,
@@ -131,19 +131,19 @@ pub async fn create(
             political_groups
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         RETURNING
-            id as "id: ElectionId",
+            id,
             name,
-            committee_category as "committee_category: CommitteeCategory",
-            counting_method as "counting_method: VoteCountingMethod",
+            committee_category,
+            counting_method,
             election_id,
             location,
             domain_id,
-            category as "category: ElectionCategory",
-            number_of_seats as "number_of_seats: u32",
-            number_of_voters as "number_of_voters: u32",
-            election_date as "election_date: NaiveDate",
-            nomination_date as "nomination_date: NaiveDate",
-            political_groups as "political_groups: Json<Vec<RegisteredPoliticalGroup>>"
+            category,
+            number_of_seats,
+            number_of_voters,
+            election_date,
+            nomination_date,
+            political_groups
         "#,
         election.name,
         election.committee_category,
@@ -175,18 +175,18 @@ pub async fn change_number_of_voters(
         SET number_of_voters = ?
         WHERE id = ?
         RETURNING
-            id as "id: ElectionId",
+            id,
             name,
-            committee_category as "committee_category: _",
-            counting_method as "counting_method: _", 
+            committee_category,
+            counting_method, 
             election_id,
             location,
             domain_id,
-            category as "category: _",
-            number_of_seats as "number_of_seats: u32",
-            number_of_voters as "number_of_voters: u32",
-            election_date as "election_date: _",
-            nomination_date as "nomination_date: _"
+            category,
+            number_of_seats,
+            number_of_voters,
+            election_date,
+            nomination_date
         "#,
         number_of_voters,
         election_id,

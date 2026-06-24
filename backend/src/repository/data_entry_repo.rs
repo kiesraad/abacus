@@ -9,13 +9,11 @@ use crate::{
             DataEntryId, DataEntryRow, DataEntrySource, DataEntrySourceContext, DataEntryStatus,
         },
         election::CommitteeCategory,
-        investigation::InvestigationStatus,
         polling_station::PollingStationId,
         results::{
             PollingStationResults, Results,
             common_polling_station_results::CommonPollingStationResults,
         },
-        sub_committee::{SubCommitteeId, SubCommitteeNumber},
     },
     repository::{
         committee_session_repo,
@@ -34,9 +32,9 @@ pub async fn create_empty(conn: &mut SqliteConnection) -> Result<DataEntryRow, s
             INSERT INTO data_entries (state)
             VALUES (?)
             RETURNING
-                id AS "id: _",
-                state AS "state: _",
-                updated_at AS "updated_at: _"
+                id,
+                state,
+                updated_at
         "#,
         state
     )
@@ -53,9 +51,9 @@ pub async fn get(
         DataEntryRow,
         r#"
             SELECT
-                id AS "id: _",
-                state AS "state: _",
-                updated_at AS "updated_at: _"
+                id,
+                state,
+                updated_at
             FROM data_entries
             WHERE id = ?
         "#,
@@ -88,9 +86,9 @@ pub async fn update(
             SET state = ?, updated_at = CURRENT_TIMESTAMP
             WHERE id = ?
             RETURNING
-                id AS "id: _",
-                state AS "state: _",
-                updated_at AS "updated_at: _"
+                id,
+                state,
+                updated_at
         "#,
         state,
         data_entry_id
@@ -111,16 +109,16 @@ pub async fn resolve_source(
         PollingStationRow,
         r#"
         SELECT
-            p.id AS "id: _",
-            p.committee_session_id AS "committee_session_id: _",
-            c.number AS "committee_session_number: u32",
-            p.prev_data_entry_id AS "prev_data_entry_id: _",
-            p.data_entry_id AS "data_entry_id: _",
-            p.investigation_state AS "investigation_state: Json<InvestigationStatus>",
+            p.id,
+            p.committee_session_id,
+            c.number AS committee_session_number,
+            p.prev_data_entry_id,
+            p.data_entry_id,
+            p.investigation_state,
             p.name,
-            p.number AS "number: u32",
-            p.number_of_voters AS "number_of_voters: _",
-            p.polling_station_type AS "polling_station_type: _",
+            p.number,
+            p.number_of_voters,
+            p.polling_station_type,
             p.address,
             p.postal_code,
             p.locality
@@ -141,12 +139,12 @@ pub async fn resolve_source(
             SubCommitteeRow,
             r#"
             SELECT
-                id AS "id: _",
-                committee_session_id AS "committee_session_id: _",
-                data_entry_id AS "data_entry_id!: _",
-                number AS "number: SubCommitteeNumber",
+                id,
+                committee_session_id,
+                data_entry_id,
+                number,
                 name,
-                category AS "category: _"
+                category
             FROM sub_committees
             WHERE data_entry_id = $1
         "#,
@@ -180,9 +178,9 @@ pub async fn delete(
             DELETE FROM data_entries
             WHERE id = ?
             RETURNING
-                id AS "id: _",
-                state AS "state: _",
-                updated_at AS "updated_at: _"
+                id AS "id!: _",
+                state,
+                updated_at
         "#,
         data_entry_id,
     )
@@ -282,7 +280,7 @@ async fn list_results_for_csb_committee_session(
 
     let results = query!(
         r#"
-        SELECT sc.id AS "id: SubCommitteeId", CASE WHEN json_extract(de.state, '$.status') = 'Definitive'
+        SELECT sc.id, CASE WHEN json_extract(de.state, '$.status') = 'Definitive'
             THEN json_extract(de.state, '$.state.results')
             ELSE NULL
         END AS "data: Json<Results>"
@@ -456,7 +454,10 @@ mod tests {
 
         use super::*;
         use crate::{
-            domain::data_entry::{self, DataEntrySourceId},
+            domain::{
+                data_entry::{self, DataEntrySourceId},
+                sub_committee::SubCommitteeId,
+            },
             repository::{
                 polling_station_repo::{self, insert_test_polling_station},
                 user_repo::UserId,

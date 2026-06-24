@@ -7,13 +7,13 @@ import { getFootnotesFromResultChanges, type ResultChange } from "../../utils/se
 import cls from "../Apportionment.module.css";
 
 interface FullSeatsTableProps {
-  finalStanding: ListSeatAssignment[];
+  standings: ListSeatAssignment[];
   politicalGroups: PoliticalGroup[];
   quota: DisplayFraction;
   resultChanges: ResultChange[];
 }
 
-export function FullSeatsTable({ finalStanding, politicalGroups, quota, resultChanges }: FullSeatsTableProps) {
+export function FullSeatsTable({ standings, politicalGroups, quota, resultChanges }: FullSeatsTableProps) {
   return (
     <Table id="full-seats-table" className={cn(cls.table, cls.fullSeatsTable)}>
       <Table.Header>
@@ -28,7 +28,7 @@ export function FullSeatsTable({ finalStanding, politicalGroups, quota, resultCh
         <Table.HeaderCell className="text-align-r">{t("apportionment.full_seats_count")}</Table.HeaderCell>
       </Table.Header>
       <Table.Body>
-        {finalStanding.map((standing: ListSeatAssignment) => {
+        {standings.map((standing: ListSeatAssignment) => {
           const listResultChanges = resultChanges.filter((change) => change.listNumber === standing.list_number);
           return (
             <Table.Row key={standing.list_number}>

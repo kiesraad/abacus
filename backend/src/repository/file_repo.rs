@@ -12,13 +12,13 @@ pub async fn get(conn: &mut SqliteConnection, id: FileId) -> Result<File, sqlx::
         File,
         r#"
         SELECT
-            id AS "id: FileId",
+            id,
             data,
             name,
             mime_type,
-            created_at AS "created_at: _",
-            committee_session_id AS "committee_session_id: _",
-            file_type AS "file_type: _"
+            created_at,
+            committee_session_id,
+            file_type
         FROM files
         WHERE id = $1
         "#,
@@ -38,13 +38,13 @@ pub async fn get_for_session(
         File,
         r#"
         SELECT
-            id AS "id: FileId",
+            id,
             data,
             name,
             mime_type,
-            created_at AS "created_at: _",
-            committee_session_id AS "committee_session_id: _",
-            file_type AS "file_type: _"
+            created_at,
+            committee_session_id,
+            file_type
         FROM files
         WHERE committee_session_id = ? AND file_type = ?
         "#,
@@ -77,13 +77,13 @@ pub async fn create(
             file_type
         ) VALUES (?, ?, ?, ?, ?, ?)
         RETURNING
-            id AS "id: FileId",
+            id AS "id!: FileId",
             data,
             name,
             mime_type,
-            created_at AS "created_at: _",
-            committee_session_id AS "committee_session_id: _",
-            file_type AS "file_type: _"
+            created_at,
+            committee_session_id,
+            file_type
         "#,
         data,
         filename,
@@ -107,13 +107,13 @@ pub async fn delete_for_session(
         DELETE FROM files
         WHERE committee_session_id = ?
         RETURNING
-            id AS "id: FileId",
+            id,
             data,
             name,
             mime_type,
-            created_at AS "created_at: _",
-            committee_session_id AS "committee_session_id: _",
-            file_type AS "file_type: _"
+            created_at,
+            committee_session_id,
+            file_type
         "#,
         committee_session_id
     )

@@ -1000,7 +1000,7 @@ export const seat_assignment: SeatAssignment = {
       ],
     },
   ],
-  final_standing: [
+  standings: [
     {
       list_number: 1,
       votes_cast: 2571,

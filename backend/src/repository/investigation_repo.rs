@@ -1,8 +1,8 @@
 use sqlx::{SqliteConnection, query, types::Json};
 
 use crate::domain::{
-    committee_session::CommitteeSessionId, data_entry::DataEntryId,
-    investigation::InvestigationStatus, polling_station::PollingStationId,
+    committee_session::CommitteeSessionId, investigation::InvestigationStatus,
+    polling_station::PollingStationId,
 };
 
 pub async fn save(
@@ -55,8 +55,8 @@ pub async fn get(
 ) -> Result<Option<InvestigationStatus>, sqlx::Error> {
     let row = query!(
         r#"SELECT
-            investigation_state AS "investigation_state: Json<InvestigationStatus>",
-            data_entry_id AS "data_entry_id: DataEntryId"
+            investigation_state,
+            data_entry_id
            FROM polling_stations WHERE id = ?"#,
         polling_station_id,
     )
@@ -82,8 +82,8 @@ pub async fn delete(
 ) -> Result<Option<InvestigationStatus>, sqlx::Error> {
     let row = query!(
         r#"SELECT
-            investigation_state AS "investigation_state: Json<InvestigationStatus>",
-            data_entry_id AS "data_entry_id: DataEntryId"
+            investigation_state,
+            data_entry_id
            FROM polling_stations WHERE id = ?"#,
         polling_station_id,
     )

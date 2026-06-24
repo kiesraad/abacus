@@ -19,6 +19,11 @@ pub struct RandomRange(pub Range<u32>);
 /// Abacus API and asset server
 #[derive(Debug, Deserialize, ToSchema, Clone)]
 pub struct GenerateElectionArgs {
+    /// Custom election name
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    pub custom_name: Option<String>,
+
     /// GSB or CSB
     pub committee_category: CommitteeCategory,
 
@@ -39,6 +44,9 @@ pub struct GenerateElectionArgs {
 
     /// Generate multiple elections, each resulting in a different P 22-2 variant
     pub generate_p22_2_variants: bool,
+
+    /// Generate multiple elections, each resulting in drawing lots
+    pub generate_drawing_lots: bool,
 
     /// Include (part of) data entry for this election
     pub with_data_entry: bool,

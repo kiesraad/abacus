@@ -1,0 +1,86 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        INSERT INTO committee_sessions (\n            number,\n            election_id,\n            location\n        ) VALUES (?, ?, ?)\n        RETURNING\n            id as \"id!: CommitteeSessionId\",\n            number,\n            election_id,\n            status,\n            location,\n            start_date_time\n        ",
+  "describe": {
+    "columns": [
+      {
+        "name": "id!: CommitteeSessionId",
+        "ordinal": 0,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "committee_sessions",
+            "name": "id"
+          }
+        }
+      },
+      {
+        "name": "number",
+        "ordinal": 1,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "committee_sessions",
+            "name": "number"
+          }
+        }
+      },
+      {
+        "name": "election_id",
+        "ordinal": 2,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "committee_sessions",
+            "name": "election_id"
+          }
+        }
+      },
+      {
+        "name": "status",
+        "ordinal": 3,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "committee_sessions",
+            "name": "status"
+          }
+        }
+      },
+      {
+        "name": "location",
+        "ordinal": 4,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "committee_sessions",
+            "name": "location"
+          }
+        }
+      },
+      {
+        "name": "start_date_time",
+        "ordinal": 5,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "committee_sessions",
+            "name": "start_date_time"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 3
+    },
+    "nullable": [
+      null,
+      false,
+      false,
+      false,
+      false,
+      true
+    ]
+  },
+  "hash": "e29245357cfc3d68794368aabc0d730e281131759387310dcb7506dde17e61b6"
+}

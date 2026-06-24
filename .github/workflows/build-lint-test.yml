@@ -45,7 +45,7 @@ jobs:
         run: >
           npm install --global corepack@latest &&
           corepack enable &&
-          corepack prepare pnpm@latest-10 --activate
+          corepack prepare pnpm@latest-11 --activate
       - name: Install frontend dependencies
         run: pnpm install
         working-directory: ./frontend
@@ -120,7 +120,7 @@ jobs:
           workspaces: "backend -> target"
           cache-bin: "false"
       - name: Install Binstall
-        uses: cargo-bins/cargo-binstall@aaa84a43aec4955a42c5ffc65d258961e39f276e # main
+        uses: cargo-bins/cargo-binstall@30b5ca8b54e1dcffd9548bc87ede1531310fdc67 # main
       - name: Create empty frontend build dir for memory-serve
         run: mkdir -p dist dist-storybook
         working-directory: ./frontend
@@ -133,7 +133,7 @@ jobs:
       - name: Install Nextest
         run: cargo binstall cargo-nextest
       - name: Run tests
-        run: cargo --verbose --locked nextest run --target=x86_64-unknown-linux-musl --workspace --exclude pdf_gen_dylib --no-default-features --features openapi,dev-database,embed-typst
+        run: cargo --verbose --locked nextest run --target=x86_64-unknown-linux-musl --workspace --exclude pdf_gen_dylib --no-default-features --features openapi,dev-database,embed-typst,tls
       - name: Build documentation
         run: cargo doc --workspace --no-deps --all-features
         env:
@@ -162,7 +162,7 @@ jobs:
         run: >
           npm install --global corepack@latest &&
           corepack enable &&
-          corepack prepare pnpm@latest-10 --activate
+          corepack prepare pnpm@latest-11 --activate
       - name: Install dependencies
         run: pnpm install
       - name: Run Biome
@@ -205,7 +205,7 @@ jobs:
         run: >
           npm install --global corepack@latest &&
           corepack enable &&
-          corepack prepare pnpm@latest-10 --activate
+          corepack prepare pnpm@latest-11 --activate
       - name: Install dependencies
         run: pnpm install
       - name: Download Abacus

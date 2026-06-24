@@ -99,6 +99,35 @@ Using a binary:
 abacus --airgap-detection
 ```
 
+### TLS (HTTPS)
+
+In production, Abacus must be built with TLS enabled, which makes Abacus serve
+HTTPS only. To do this, enable the `tls` feature:
+
+```shell
+cargo build --release --features tls
+```
+
+On startup Abacus loads (or, on first run, generates) a local certificate
+authority under the directory given by `--tls-dir` (defaults to `tls`). A fresh
+server (leaf) certificate is created in memory on every start, signed by the CA
+and covering `localhost`, `abacus.local`, and all routable LAN addresses.
+
+To trust the server, import the CA into the client trust store: `ca.pem` on
+Linux/macOS/Firefox, `ca.cer` (DER) on Windows.
+
+With the `tls` feature enabled, the default port is 8443 in debug builds and 443
+in release builds. Binding to 443 requires elevated privileges (e.g. the
+`CAP_NET_BIND_SERVICE` capability on Linux).
+
+#### Building with TLS enabled on Windows
+
+On Windows, AWS Libcrypto has some [build requirements](https://aws.github.io/aws-lc-rs/requirements/windows.html):
+- C/C++ Compiler: these build tools have likely been installed during installation of Rust
+- NASM, two options:
+  - Use the installer
+  - Or, use prebuilt NASM objects: `set AWS_LC_SYS_PREBUILT_NASM=1`
+
 ### Building for various platforms
 
 You can use [`cross`](https://github.com/cross-rs/cross) to compile for different architectures.
@@ -160,11 +189,19 @@ The following dependencies (crates) are used:
 - `utoipa-swagger-ui`: Swagger UI for the OpenAPI specification.
 - `utoipa`: library for documenting REST APIs using OpenAPI.
 
+For TLS (HTTPS) support, when the `tls` feature is enabled, the following dependencies are used:
+- `rcgen`: X.509 certificate/DER generation (`aws-lc-rs` backend)
+- `rustls-pki-types`: shared certificate and private-key types, and PEM decoding.
+- `if-addrs`: enumerating LAN IP addresses for the TLS certificate subject.
+- `rustls`: TLS implementation, on the audited `aws-lc-rs` provider.
+- `axum-server`: HTTPS serving for `axum`, with graceful shutdown.
+
 Additionally, the following development dependencies are used:
 
 - `test-log`: show tracing messages while running tests
 - `reqwest`: HTTP client for testing the API.
 - `http-body-util`: trait used to extract a response body in some tests.
+- `tempfile`: to create temporary directories for TLS certificate tests.
 
 ### Database
 
@@ -215,13 +252,14 @@ The abacus binary supports a few arguments, which can be passed on the command l
 Options:
   -p, --port <PORT>          Server port, optional [env: ABACUS_PORT=] [default: 8080]
   -d, --database <DATABASE>  Location of the database file, will be created if it doesn't exist [env: ABACUS_DATABASE=] [default: db.sqlite]
+      --tls-dir <TLS_DIR>    Location of the TLS directory (CA certificate and key), will be created if it doesn't exist [env: ABACUS_TLS_DIR=] [default: tls]
   -a, --airgap-detection     Enable airgap detection [env: ABACUS_AIRGAP_DETECTION=]
   -V, --version              Show version
   -h, --help                 Print help
 ```
 
 Note that airgap-detection is forced in our (pre-)releases.
-For release builds the default port number is 80.
+For release builds the default port number is 80, or 443 when TLS is enabled.
 
 A development build also supports the following arguments:
 

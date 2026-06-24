@@ -404,6 +404,7 @@ export interface AbsoluteMajorityDrawingLots {
 }
 
 export interface AbsoluteMajorityReassignedSeat {
+  drawing_lots?: ListDrawingLotsVariant;
   list_assigned_seat: PGNumber;
   list_retracted_seat: PGNumber;
 }
@@ -1002,8 +1003,8 @@ export interface ElectionWithPoliticalGroups {
 export const errorReferenceValues = [
   "AirgapViolation",
   "AlreadyInitialised",
+  "ApportionmentNotCompleted",
   "ApportionmentCommitteeSessionNotCompleted",
-  "ApportionmentDrawingOfLotsRequired",
   "ApportionmentInvalidLotDrawing",
   "CommitteeSessionPaused",
   "DatabaseError",
@@ -1140,8 +1141,12 @@ export interface GenerateElectionArgs {
   candidates_per_group: RandomRange;
   /** GSB or CSB */
   committee_category: CommitteeCategory;
+  /** Custom election name */
+  custom_name?: string;
   /** Percentage of the first data entry to complete if data entry is included */
   first_data_entry: RandomRange;
+  /** Generate multiple elections, each resulting in drawing lots */
+  generate_drawing_lots: boolean;
   /** Generate multiple elections, each resulting in a different P 22-2 variant */
   generate_p22_2_variants: boolean;
   political_group_distribution_slope: RandomRange;
@@ -1162,6 +1167,7 @@ export interface GenerateElectionArgs {
 }
 
 export interface HighestAverageAssignedSeat {
+  drawing_lots?: ListDrawingLotsVariant;
   list_assigned: PGNumber[];
   list_exhausted: PGNumber[];
   list_options: PGNumber[];
@@ -1170,7 +1176,8 @@ export interface HighestAverageAssignedSeat {
 }
 
 export interface HighestAverageResidualSeatDrawingLots {
-  average: DisplayFraction;
+  list_averages: ListAverage[];
+  max_average: DisplayFraction;
   options: PGNumber[];
   residual_seat_numbers: number[];
 }
@@ -1202,6 +1209,7 @@ export type InvestigationStatus =
   | { state: InvestigationConcludedWithNewResults; status: "ConcludedWithNewResults" };
 
 export interface LargestRemainderAssignedSeat {
+  drawing_lots?: ListDrawingLotsVariant;
   list_assigned: PGNumber[];
   list_options: PGNumber[];
   remainder_votes: DisplayFraction;
@@ -1209,9 +1217,15 @@ export interface LargestRemainderAssignedSeat {
 }
 
 export interface LargestRemainderResidualSeatDrawingLots {
+  list_remainders: ListRemainder[];
+  max_remainder: DisplayFraction;
   options: PGNumber[];
-  remainder: DisplayFraction;
   residual_seat_numbers: number[];
+}
+
+export interface ListAverage {
+  average: DisplayFraction;
+  pg_number: PGNumber;
 }
 
 export interface ListCandidateNomination {
@@ -1241,6 +1255,11 @@ export interface ListDrawn {
 export interface ListExhaustionRemovedSeat {
   full_seat: boolean;
   list_retracted_seat: PGNumber;
+}
+
+export interface ListRemainder {
+  pg_number: PGNumber;
+  remainder: DisplayFraction;
 }
 
 export interface ListSeatAssignment {
@@ -1443,6 +1462,10 @@ export interface PreferenceThreshold {
   percentage: number;
 }
 
+export type ProcessApportionmentResponse =
+  | (ElectionApportionmentResponse & { status: "Finalised" })
+  | { election_summary: ElectionSummary; seat_assignment: SeatAssignment; status: "DrawingLotsRequired" };
+
 export type RandomRange = string;
 
 export interface RedactedEmlHash {
@@ -1484,11 +1507,11 @@ export interface SaveDataEntryResponse {
 }
 
 export interface SeatAssignment {
-  final_standing: ListSeatAssignment[];
   full_seats: number;
   quota: DisplayFraction;
   residual_seats: number;
   seats: number;
+  standings: ListSeatAssignment[];
   steps: SeatChangeStep[];
 }
 

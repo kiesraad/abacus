@@ -16,41 +16,69 @@ use self::{
     seat_assignment::{as_candidate_nomination_input, seat_assignment},
 };
 pub use self::{
-    candidate_nomination::{CandidateNominationResult, PreferenceThreshold},
+    candidate_nomination::{CandidateNomination, CandidateNominationDetails, PreferenceThreshold},
     fraction::Fraction,
     seat_assignment::{
-        ApportionmentWarning, HighestAverageAssignedSeat, SeatAssignmentResult, SeatChange,
-        SeatChangeStep,
+        ApportionmentWarning, HighestAverageAssignedSeat, SeatAssignment, SeatAssignmentDetails,
+        SeatChange, SeatChangeStep,
     },
     structs::{
-        AbsoluteMajorityDrawingLots, ApportionmentError, ApportionmentInput, ApportionmentOutput,
+        AbsoluteMajorityDrawingLots, ApportionmentDetails, ApportionmentError, ApportionmentInput,
         CandidateDrawingLotsVariant, CandidateDrawn, CandidateVotes,
         HighestAverageResidualSeatDrawingLots, LargestRemainderResidualSeatDrawingLots,
-        ListDrawingLotsError, ListDrawingLotsVariant, ListDrawn, ListVotes,
+        ListDrawingLotsVariant, ListDrawn, ListVotes,
     },
 };
 
-type ProcessApportionmentError<LV> = ApportionmentError<ListNumber<LV>, CandidateNumber<LV>>;
+#[derive(Debug, PartialEq)]
+pub enum ApportionmentOutput<'a, T: ApportionmentInput> {
+    Completed(ApportionmentDetails<'a, T::List>),
+    ListDrawingLotsRequired(
+        ListDrawingLotsVariant<ListNumber<T::List>>,
+        SeatAssignmentDetails<ListNumber<T::List>>,
+    ),
+    CandidateDrawingLotsRequired(
+        CandidateDrawingLotsVariant<ListNumber<T::List>, CandidateNumber<T::List>>,
+        SeatAssignmentDetails<ListNumber<T::List>>,
+    ),
+}
 
 /// Perform seat assignment and candidate nomination on apportionment input.
 pub fn process<T: ApportionmentInput>(
     input: &T,
-) -> Result<ApportionmentOutput<'_, T::List>, ProcessApportionmentError<T::List>> {
-    let seat_assignment = seat_assignment(input)?;
-    let candidate_nomination_input = as_candidate_nomination_input(input, &seat_assignment);
-    let candidate_nomination = candidate_nomination(&candidate_nomination_input)?;
+) -> Result<ApportionmentOutput<'_, T>, ApportionmentError> {
+    let seat_assignment = match seat_assignment(input)? {
+        SeatAssignment::Completed(seat_assignment) => seat_assignment,
+        SeatAssignment::DrawingLotsRequired(variant, seat_assignment) => {
+            return Ok(ApportionmentOutput::ListDrawingLotsRequired(
+                variant,
+                seat_assignment,
+            ));
+        }
+    };
 
-    Ok(ApportionmentOutput {
+    let candidate_nomination_input = as_candidate_nomination_input(input, &seat_assignment);
+    let candidate_nomination = match candidate_nomination(&candidate_nomination_input)? {
+        CandidateNomination::Completed(candidate_nomination) => candidate_nomination,
+        CandidateNomination::DrawingLotsRequired(variant) => {
+            return Ok(ApportionmentOutput::CandidateDrawingLotsRequired(
+                variant,
+                seat_assignment,
+            ));
+        }
+    };
+
+    Ok(ApportionmentOutput::Completed(ApportionmentDetails {
         seat_assignment,
         candidate_nomination,
-    })
+    }))
 }
 
 #[cfg(test)]
 mod tests {
     use std::collections::{HashMap, HashSet};
 
-    use super::process;
+    use super::{ApportionmentOutput, process};
     use crate::{
         Fraction,
         test_helpers::{
@@ -62,13 +90,15 @@ mod tests {
     };
 
     #[test]
-    #[allow(clippy::too_many_lines)]
+    #[expect(clippy::too_many_lines)]
     fn test_apportionment_process() {
         let input = seat_assignment_fixture_with_default_50_candidates(
             15,
             vec![540, 160, 160, 80, 80, 80, 60, 40],
         );
-        let result = process(&input).unwrap();
+        let Ok(ApportionmentOutput::Completed(result)) = process(&input) else {
+            panic!("should be Completed")
+        };
         assert_eq!(result.seat_assignment.full_seats, 13);
         assert_eq!(result.seat_assignment.residual_seats, 2);
         assert_eq!(result.seat_assignment.steps.len(), 2);
@@ -203,7 +233,7 @@ mod tests {
     /// Seat assignment must be unchanged (votes of deceased candidates still count toward
     /// the list total). Only the candidate nomination changes for list 1.
     #[test]
-    #[allow(clippy::too_many_lines)]
+    #[expect(clippy::too_many_lines)]
     fn test_apportionment_process_with_deceased_candidates() {
         let mut input = seat_assignment_fixture_with_default_50_candidates(
             15,
@@ -211,7 +241,9 @@ mod tests {
         );
         input.deceased_candidates = HashMap::from([(1, HashSet::from([1, 50]))]);
 
-        let result = process(&input).unwrap();
+        let Ok(ApportionmentOutput::Completed(result)) = process(&input) else {
+            panic!("should be Completed")
+        };
 
         // Seat assignment is identical to the `test_apportionment_process` test.
         assert_eq!(result.seat_assignment.full_seats, 13);
@@ -292,6 +324,7 @@ mod tests {
     /// List 3: 80 -> 0 full seats, 1 residual (largest remainder = 80, threshold 72)
     /// Initial distribution: [3, 1, 1].
     #[test]
+    #[allow(clippy::too_many_lines, reason = "Written out cases take many lines")]
     fn test_apportionment_process_with_deceased_scenarios() {
         struct Case {
             name: &'static str,
@@ -352,6 +385,10 @@ mod tests {
 
             let result =
                 process(&input).unwrap_or_else(|e| panic!("case `{}` failed: {e:?}", case.name));
+
+            let ApportionmentOutput::Completed(result) = result else {
+                panic!("should be Completed for case {}", case.name)
+            };
 
             let total_seats = get_total_seats_from_apportionment_result(&result.seat_assignment);
             assert_eq!(total_seats, case.expected_seats, "case: {}", case.name);

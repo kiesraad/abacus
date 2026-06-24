@@ -4,26 +4,21 @@ use std::{
     process,
 };
 
-use abacus::{
-    AppError, create_sqlite_pool,
-    infra::backup::{BackupConfig, run_backup_scheduler},
-    start_server,
-};
+use abacus::{AppError, create_sqlite_pool};
 use clap::Parser;
 use socket2::{Domain, Protocol, Socket, Type};
 use tokio::net::TcpListener;
 use tracing::{error, level_filters::LevelFilter};
 use tracing_subscriber::EnvFilter;
 
-/// Get the default port for the server, 8080 in debug builds and 80 for release builds
+/// Default port: with the `tls` feature 8443 (debug) / 443 (release),
+/// without it 8080 (debug) / 80 (release).
 fn get_default_port() -> u16 {
-    #[cfg(debug_assertions)]
-    {
-        8080
-    }
-    #[cfg(not(debug_assertions))]
-    {
-        80
+    match (cfg!(feature = "tls"), cfg!(debug_assertions)) {
+        (true, true) => 8443,
+        (true, false) => 443,
+        (false, true) => 8080,
+        (false, false) => 80,
     }
 }
 
@@ -37,6 +32,11 @@ struct Args {
     /// Location of the database file, will be created if it doesn't exist
     #[arg(short, long, default_value = "db.sqlite", env = "ABACUS_DATABASE")]
     database: String,
+
+    /// Location of the TLS directory (CA certificate and key), will be created if it doesn't exist
+    #[cfg(feature = "tls")]
+    #[arg(long, default_value = "tls", env = "ABACUS_TLS_DIR")]
+    tls_dir: std::path::PathBuf,
 
     /// Seed the database with initial data using the fixtures
     #[cfg(feature = "dev-database")]
@@ -114,9 +114,13 @@ async fn run() -> Result<(), AppError> {
 
     let listener = TcpListener::from_std(socket.into())?;
 
-    let backup_pool = pool.clone();
-    let backup_config = BackupConfig::new().expect("Failed to setup backup directory");
-    tokio::spawn(run_backup_scheduler(backup_pool, backup_config));
-
-    start_server(pool, listener, enable_airgap_detection).await
+    // When compiled with the `tls` feature the server always serves HTTPS.
+    #[cfg(feature = "tls")]
+    {
+        let certificates = abacus::infra::tls::load_or_generate(&args.tls_dir)?;
+        let tls_config = certificates.server_config()?;
+        abacus::start_server_tls(pool, listener, enable_airgap_detection, tls_config).await
+    }
+    #[cfg(not(feature = "tls"))]
+    abacus::start_server(pool, listener, enable_airgap_detection).await
 }

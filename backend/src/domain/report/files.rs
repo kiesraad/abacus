@@ -1,9 +1,13 @@
+use apportionment::ApportionmentOutput;
 use chrono::{Local, Utc};
 use sqlx::{SqliteConnection, SqlitePool};
 
 use crate::{
     APIError, SqlitePoolExt,
-    api::{apportionment::ApportionmentInputData, report::ReportApiError},
+    api::{
+        apportionment::{ApportionmentApiError, ApportionmentInputData},
+        report::ReportApiError,
+    },
     domain::{
         committee_session::{CommitteeSession, CommitteeSessionError, CommitteeSessionId},
         committee_session_status::CommitteeSessionStatus,
@@ -112,7 +116,11 @@ async fn generate_and_save_files_csb_election(
         state.get_lists_drawn(),
         state.get_candidates_drawn(),
     );
-    let apportionment_result = apportionment::process(&apportionment_input)?;
+    let ApportionmentOutput::Completed(apportionment_result) =
+        apportionment::process(&apportionment_input)?
+    else {
+        return Err(ApportionmentApiError::ApportionmentNotCompleted.into());
+    };
 
     let generated_files = csb_input.generate_csb_files(&apportionment_result).await?;
 

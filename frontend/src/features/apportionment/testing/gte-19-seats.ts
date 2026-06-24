@@ -428,7 +428,7 @@ export const seat_assignment: SeatAssignment = {
     denominator: 23,
   },
   steps: steps,
-  final_standing: [
+  standings: [
     {
       list_number: 1,
       votes_cast: 600,

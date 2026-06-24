@@ -63,20 +63,17 @@ impl ListVotes for ListVotesMock {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct CandidateVotesMock {
-    pub number: u32,
-    pub votes: u32,
-}
+pub struct CandidateVotesMock(pub u32, pub u32);
 
 impl CandidateVotes for CandidateVotesMock {
     type CandidateNumber = u32;
 
     fn number(&self) -> Self::CandidateNumber {
-        self.number
+        self.0
     }
 
     fn votes(&self) -> u32 {
-        self.votes
+        self.1
     }
 }
 
@@ -87,10 +84,7 @@ impl ListVotesMock {
             candidate_votes: candidate_votes
                 .into_iter()
                 .enumerate()
-                .map(|(i, votes)| CandidateVotesMock {
-                    number: u32::try_from(i + 1).unwrap(),
-                    votes,
-                })
+                .map(|(i, votes)| CandidateVotesMock(u32::try_from(i + 1).unwrap(), votes))
                 .collect(),
         }
     }
@@ -120,9 +114,10 @@ impl ListDrawn<u32> for ListDrawnMock {
     }
 }
 
+#[derive(Debug)]
 pub struct CandidateDrawnMock {
-    variant: CandidateDrawingLotsVariant<u32, u32>,
-    drawn: u32,
+    pub variant: CandidateDrawingLotsVariant<u32, u32>,
+    pub drawn: u32,
 }
 
 impl CandidateDrawn<u32, u32> for CandidateDrawnMock {
@@ -237,7 +232,7 @@ pub fn candidate_nomination_fixture_with_given_number_of_seats(
 pub fn candidate_nomination_fixture_with_given_list_numbers_and_number_of_seats(
     quota: Fraction,
     seat_assignment_input: &ApportionmentInputMock,
-    total_seats_per_list_number: Vec<(u32, u32)>,
+    total_seats_per_list_number: HashMap<u32, u32>,
 ) -> CandidateNominationInput<'_, ListVotesMock> {
     CandidateNominationInput {
         number_of_seats: seat_assignment_input.number_of_seats,
@@ -334,10 +329,7 @@ pub fn seat_assignment_fixture_with_given_list_numbers_candidate_numbers_and_vot
             number: list_number,
             candidate_votes: list_candidate_votes
                 .into_iter()
-                .map(|(number, candidate_votes)| CandidateVotesMock {
-                    number,
-                    votes: candidate_votes,
-                })
+                .map(|(number, candidate_votes)| CandidateVotesMock(number, candidate_votes))
                 .collect(),
         })
     }

@@ -1,4 +1,4 @@
-use std::cmp::Ordering;
+use std::{cmp::Ordering, collections::HashMap, hash::Hash};
 
 mod residual_seat_assignment;
 mod structs;
@@ -18,8 +18,8 @@ use crate::{
         AbsoluteMajority, AbsoluteMajorityResult, GetListStandingByNumber, RemainderAssignment,
     },
     structs::{
-        AbsoluteMajorityDrawingLots, CandidateNominationInput, CandidateNominationInputType,
-        DeceasedCandidates, ListDrawingLotsVariant, ListNumber,
+        AbsoluteMajorityDrawingLots, CandidateNominationInput, DeceasedCandidates,
+        ListDrawingLotsVariant, ListNumber,
     },
 };
 
@@ -201,14 +201,14 @@ pub(crate) fn seat_assignment<T: ApportionmentInput>(input: &T) -> SeatAssignmen
 }
 
 /// Returns the total number of seats each list number received in the apportionment result.
-pub fn get_total_seats_per_list_number_from_apportionment_result<LN: Copy>(
+pub fn get_total_seats_per_list_number_from_apportionment_result<LN: Copy + Eq + Hash>(
     result: &SeatAssignmentDetails<LN>,
-) -> Vec<(LN, u32)> {
+) -> HashMap<LN, u32> {
     result
         .standings
         .iter()
         .map(|p| (p.list_number, p.total_seats))
-        .collect::<Vec<_>>()
+        .collect()
 }
 
 /// Returns candidate nomination input created from the initial apportionment input
@@ -216,7 +216,7 @@ pub fn get_total_seats_per_list_number_from_apportionment_result<LN: Copy>(
 pub fn as_candidate_nomination_input<'a, T: ApportionmentInput>(
     input: &'a T,
     seat_assignment: &SeatAssignmentDetails<ListNumber<T::List>>,
-) -> CandidateNominationInputType<'a, T> {
+) -> CandidateNominationInput<'a, T::List> {
     CandidateNominationInput {
         number_of_seats: input.number_of_seats(),
         list_votes: input.list_votes(),
@@ -431,7 +431,7 @@ fn reassign_residual_seats_for_exhausted_lists<'a, T: ListVotes>(
 
 #[cfg(test)]
 pub(crate) mod tests {
-    use std::fmt::Debug;
+    use std::{collections::HashMap, fmt::Debug, hash::Hash};
 
     use test_log::test;
 
@@ -444,13 +444,13 @@ pub(crate) mod tests {
         test_helpers::{CandidateVotesMock, ListVotesMock},
     };
 
-    fn check_total_seats_per_list<LN: Copy + Debug + PartialEq>(
+    fn check_total_seats_per_list<LN: Copy + Debug + Eq + Hash>(
         result: &SeatAssignmentDetails<LN>,
-        expected_total_seats_per_list: &[(LN, u32)],
+        expected_total_seats_per_list: &HashMap<LN, u32>,
     ) {
         let total_seats_per_list_number =
             get_total_seats_per_list_number_from_apportionment_result(result);
-        assert_eq!(expected_total_seats_per_list, total_seats_per_list_number);
+        assert_eq!(expected_total_seats_per_list, &total_seats_per_list_number);
     }
 
     #[test]
@@ -460,10 +460,7 @@ pub(crate) mod tests {
                 ListStanding::new(
                     &ListVotesMock {
                         number: n,
-                        candidate_votes: vec![CandidateVotesMock {
-                            number: 1,
-                            votes: 1249,
-                        }],
+                        candidate_votes: vec![CandidateVotesMock(1, 1249)],
                     },
                     Fraction::new(100, 1),
                 )
@@ -1690,7 +1687,7 @@ pub(crate) mod tests {
             assert_eq!(result.steps[1].change.list_number_assigned(), 3);
             assert_eq!(result.steps[2].change.list_number_assigned(), 1);
             assert_eq!(result.steps[3].change.list_number_assigned(), 6);
-            check_total_seats_per_list(&result, &[(1, 12), (3, 6), (4, 1), (6, 2), (7, 2)]);
+            check_total_seats_per_list(&result, &[(1, 12), (3, 6), (4, 1), (6, 2), (7, 2)].into());
         }
 
         /// Apportionment with residual seats assigned with highest averages method

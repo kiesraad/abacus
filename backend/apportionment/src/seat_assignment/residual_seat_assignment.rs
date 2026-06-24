@@ -678,10 +678,7 @@ mod tests {
         ListStanding::new(
             &ListVotesMock {
                 number: list_number,
-                candidate_votes: vec![CandidateVotesMock {
-                    number: 1,
-                    votes: votes_cast,
-                }],
+                candidate_votes: vec![CandidateVotesMock(1, votes_cast)],
             },
             Fraction::new(100, 1),
         )

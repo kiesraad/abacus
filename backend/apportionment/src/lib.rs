@@ -58,15 +58,16 @@ pub fn process<T: ApportionmentInput>(
     };
 
     let candidate_nomination_input = as_candidate_nomination_input(input, &seat_assignment);
-    let candidate_nomination = match candidate_nomination(&candidate_nomination_input)? {
-        CandidateNomination::Completed(candidate_nomination) => candidate_nomination,
-        CandidateNomination::DrawingLotsRequired(variant) => {
-            return Ok(ApportionmentOutput::CandidateDrawingLotsRequired(
-                variant,
-                seat_assignment,
-            ));
-        }
-    };
+    let candidate_nomination =
+        match candidate_nomination(&candidate_nomination_input, input.candidates_drawn())? {
+            CandidateNomination::Completed(candidate_nomination) => candidate_nomination,
+            CandidateNomination::DrawingLotsRequired(variant) => {
+                return Ok(ApportionmentOutput::CandidateDrawingLotsRequired(
+                    variant,
+                    seat_assignment,
+                ));
+            }
+        };
 
     Ok(ApportionmentOutput::Completed(ApportionmentDetails {
         seat_assignment,

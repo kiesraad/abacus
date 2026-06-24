@@ -127,13 +127,38 @@ pub trait ListDrawn<LN> {
 
 /// Variant of drawing lots for candidates, with all the information needed to do the drawing
 #[derive(Clone, Debug, Eq, PartialEq)]
-pub struct CandidateDrawingLotsVariant<LN, CN> {
+pub struct CandidateDrawingLotsVariant<LN: PartialEq, CN: PartialEq> {
     pub list: LN,
     pub options: Vec<CN>,
 }
 
+impl<LN: PartialEq, CN: PartialEq> CandidateDrawingLotsVariant<LN, CN> {
+    /// Validate the candidate drawn against this variant.
+    ///
+    /// Return [[ApportionmentError::InvalidLotDrawing]] if the variant is different
+    /// or the candidate drawn is not one of the options.
+    pub fn validate(
+        &self,
+        candidate_drawn: &impl CandidateDrawn<LN, CN>,
+    ) -> Result<(), ApportionmentError> {
+        if candidate_drawn.variant() != *self {
+            return Err(ApportionmentError::InvalidLotDrawing(
+                "Variant mismatch".to_string(),
+            ));
+        }
+
+        if !self.options.contains(candidate_drawn.drawn()) {
+            return Err(ApportionmentError::InvalidLotDrawing(
+                "Invalid number drawn".to_string(),
+            ));
+        }
+
+        Ok(())
+    }
+}
+
 /// The candidate that has been drawn and the variant with all information about the drawing
-pub trait CandidateDrawn<LN, CN> {
+pub trait CandidateDrawn<LN: PartialEq, CN: PartialEq> {
     /// The type and information for drawing lots
     fn variant(&self) -> CandidateDrawingLotsVariant<LN, CN>;
     /// The candidate that the lot was drawn for
@@ -189,11 +214,8 @@ pub(crate) struct CandidateNominationInput<'a, L: ListVotes> {
     pub list_votes: &'a [L],
     pub deceased_candidates: &'a DeceasedCandidates<L>,
     pub quota: Fraction,
-    pub total_seats_per_list: Vec<(L::ListNumber, u32)>,
+    pub total_seats_per_list: HashMap<L::ListNumber, u32>,
 }
-
-pub(crate) type CandidateNominationInputType<'a, T> =
-    CandidateNominationInput<'a, <T as ApportionmentInput>::List>;
 
 #[cfg(test)]
 mod tests {

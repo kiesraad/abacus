@@ -31,12 +31,12 @@ export function ElectionProgress() {
       {
         title: t("status.first_entry_finished_short"),
         id: "first-entry-finished",
-        percentage: total > 0 ? Math.round((totalFirstEntryFinished / total) * 100) : 0,
+        percentage: total > 0 ? Math.floor((totalFirstEntryFinished / total) * 100) : 0,
       },
       {
         title: t("status.first_and_second_entry_finished"),
         id: "first-and-second-entry-finished",
-        percentage: total > 0 ? Math.round((totalFirstAndSecondEntryFinished / total) * 100) : 0,
+        percentage: total > 0 ? Math.floor((totalFirstAndSecondEntryFinished / total) * 100) : 0,
       },
     ];
   }, [statuses]);

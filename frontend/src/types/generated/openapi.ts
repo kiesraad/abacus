@@ -407,6 +407,7 @@ export interface AbsoluteMajorityDrawingLots {
 }
 
 export interface AbsoluteMajorityReassignedSeat {
+  drawing_lots?: ListDrawingLotsVariant;
   list_assigned_seat: PGNumber;
   list_retracted_seat: PGNumber;
 }
@@ -1169,6 +1170,7 @@ export interface GenerateElectionArgs {
 }
 
 export interface HighestAverageAssignedSeat {
+  drawing_lots?: ListDrawingLotsVariant;
   list_assigned: PGNumber[];
   list_exhausted: PGNumber[];
   list_options: PGNumber[];
@@ -1210,6 +1212,7 @@ export type InvestigationStatus =
   | { state: InvestigationConcludedWithNewResults; status: "ConcludedWithNewResults" };
 
 export interface LargestRemainderAssignedSeat {
+  drawing_lots?: ListDrawingLotsVariant;
   list_assigned: PGNumber[];
   list_options: PGNumber[];
   remainder_votes: DisplayFraction;

@@ -73,6 +73,18 @@ impl<LN: Debug + PartialEq> ListDrawingLotsVariant<LN> {
     }
 }
 
+impl<LN> ListDrawingLotsVariant<LN> {
+    /// The list numbers that are options for drawing lots
+    pub fn options(&self) -> &[LN] {
+        match self {
+            Self::HighestAverageResidualSeat(v) => &v.options,
+            Self::LargestRemainderResidualSeat(v) => &v.options,
+            Self::AbsoluteMajorityLargestRemainder(v) => &v.options,
+            Self::AbsoluteMajorityHighestAverage(v) => &v.options,
+        }
+    }
+}
+
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct HighestAverageResidualSeatDrawingLots<LN> {
     pub max_average: Fraction,
@@ -194,6 +206,7 @@ mod tests {
             list_options: vec![1],
             list_assigned: vec![1],
             remainder_votes: Fraction::ZERO,
+            drawing_lots: None,
         });
 
         assert_eq!(

@@ -301,8 +301,8 @@ fn reassign_residual_seat_for_absolute_majority<'a, T: ListVotes>(
 
     if list_seats <= half_of_seats_count {
         let lists_last_residual_seat = last_seat_change.list_assigned();
-        let list_retracted_seat = if lists_last_residual_seat.len() == 1 {
-            lists_last_residual_seat[0]
+        let (list_retracted_seat, drawing_lots) = if lists_last_residual_seat.len() == 1 {
+            (lists_last_residual_seat[0], None)
         } else {
             info!(
                 "Drawing of lots is required for lists: {:?} to pick a list which the residual seat gets retracted from",
@@ -325,7 +325,7 @@ fn reassign_residual_seat_for_absolute_majority<'a, T: ListVotes>(
             // Assert the required variant including all data
             list_drawn.variant().ensure_eq(&variant)?;
 
-            *list_drawn.drawn()
+            (*list_drawn.drawn(), Some(variant))
         };
 
         // Reassign the seat
@@ -350,6 +350,7 @@ fn reassign_residual_seat_for_absolute_majority<'a, T: ListVotes>(
                 AbsoluteMajorityReassignedSeat {
                     list_retracted_seat,
                     list_assigned_seat: majority_list_votes.number(),
+                    drawing_lots,
                 },
             )),
         ))
@@ -773,7 +774,10 @@ pub(crate) mod tests {
                 );
 
                 // Draw list 3
-                input.lists_drawn.push(ListDrawnMock { variant, drawn: 3 });
+                input.lists_drawn.push(ListDrawnMock {
+                    variant: variant.clone(),
+                    drawn: 3,
+                });
                 let Ok(SeatAssignment::Completed(result)) = seat_assignment(&input) else {
                     panic!("should be Completed");
                 };
@@ -794,6 +798,7 @@ pub(crate) mod tests {
                     SeatChange::AbsoluteMajorityReassignment(AbsoluteMajorityReassignedSeat {
                         list_retracted_seat: 3,
                         list_assigned_seat: 1,
+                        drawing_lots: Some(variant),
                     })
                 );
             }
@@ -873,6 +878,7 @@ pub(crate) mod tests {
                         list_options: vec![1],
                         list_assigned: vec![1],
                         remainder_votes: Fraction::new(900, 15),
+                        drawing_lots: None,
                     })
                 );
                 assert_eq!(
@@ -882,6 +888,23 @@ pub(crate) mod tests {
                         list_options: vec![2, 3, 4, 5, 6],
                         list_assigned: vec![6],
                         remainder_votes: Fraction::new(0, 15),
+                        drawing_lots: Some(ListDrawingLotsVariant::LargestRemainderResidualSeat(
+                            LargestRemainderResidualSeatDrawingLots {
+                                max_remainder: Fraction::new(0, 1),
+                                residual_seat_numbers: vec![2],
+                                options: vec![2, 3, 4, 5, 6],
+                                list_remainders: vec![
+                                    (1, Fraction::new(60, 1)),
+                                    (2, Fraction::new(0, 1)),
+                                    (3, Fraction::new(0, 1)),
+                                    (4, Fraction::new(0, 1)),
+                                    (5, Fraction::new(0, 1)),
+                                    (6, Fraction::new(0, 1)),
+                                    (7, Fraction::new(55, 1)),
+                                    (8, Fraction::new(45, 1)),
+                                ]
+                            }
+                        )),
                     })
                 );
             }
@@ -1853,7 +1876,10 @@ pub(crate) mod tests {
                 );
 
                 // Draw lot 6
-                input.lists_drawn.push(ListDrawnMock { variant, drawn: 6 });
+                input.lists_drawn.push(ListDrawnMock {
+                    variant: variant.clone(),
+                    drawn: 6,
+                });
                 let Ok(SeatAssignment::Completed(result)) = seat_assignment(&input) else {
                     panic!("should be Completed");
                 };
@@ -1874,6 +1900,7 @@ pub(crate) mod tests {
                     SeatChange::AbsoluteMajorityReassignment(AbsoluteMajorityReassignedSeat {
                         list_retracted_seat: 6,
                         list_assigned_seat: 1,
+                        drawing_lots: Some(variant),
                     })
                 );
             }
@@ -2039,6 +2066,7 @@ pub(crate) mod tests {
                         list_assigned: vec![1],
                         list_exhausted: vec![],
                         votes_per_seat: Fraction::new(500, 14),
+                        drawing_lots: None,
                     })
                 );
                 assert_eq!(
@@ -2049,6 +2077,19 @@ pub(crate) mod tests {
                         list_assigned: vec![3],
                         list_exhausted: vec![],
                         votes_per_seat: Fraction::new(140, 4),
+                        drawing_lots: Some(ListDrawingLotsVariant::HighestAverageResidualSeat(
+                            HighestAverageResidualSeatDrawingLots {
+                                max_average: Fraction::new(35, 1),
+                                residual_seat_numbers: vec![2],
+                                options: vec![2, 3, 4],
+                                list_averages: vec![
+                                    (1, Fraction::new(500, 15)),
+                                    (2, Fraction::new(140, 4)),
+                                    (3, Fraction::new(140, 4)),
+                                    (4, Fraction::new(140, 4)),
+                                ]
+                            }
+                        )),
                     })
                 );
             }

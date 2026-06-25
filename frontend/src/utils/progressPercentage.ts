@@ -10,7 +10,6 @@ export function calculateProgressPercentage(
     return 0;
   }
   const percentage = (count / total) * 100;
-  if (percentage >= ceilingThresholdFrom && percentage < ceilingThresholdTo) {
-    return Math.ceil(percentage);
-  } else return Math.floor(percentage);
+  const shouldRoundUp = percentage >= ceilingThresholdFrom && percentage < ceilingThresholdTo;
+  return shouldRoundUp ? Math.ceil(percentage) : Math.floor(percentage);
 }

@@ -118,7 +118,7 @@ function get_detailed_deceased_candidates(
 export function DeceasedCandidatesPage() {
   const navigate = useNavigate();
   const { election } = useElection();
-  const { state, error, isLoading, refetchState } = useApportionmentContext();
+  const { state, error, isLoading, refetch } = useApportionmentContext();
   const [apiError, setApiError] = useState<AnyApiError>();
   const client = useApiClient();
 
@@ -147,7 +147,7 @@ export function DeceasedCandidatesPage() {
     const response: ApiResult<ApportionmentState> = await client.postRequest(path, body);
 
     if (isSuccess(response)) {
-      void refetchState();
+      void refetch();
     } else {
       setApiError(response);
     }
@@ -158,7 +158,7 @@ export function DeceasedCandidatesPage() {
     const response: ApiResult<ApportionmentState> = await client.postRequest(path);
 
     if (isSuccess(response)) {
-      await refetchState();
+      await refetch();
       void navigate(`/elections/${election.id}/apportionment`);
     } else {
       setApiError(response);
@@ -170,7 +170,7 @@ export function DeceasedCandidatesPage() {
     const response: ApiResult<ApportionmentState> = await client.postRequest(path);
 
     if (isSuccess(response)) {
-      await refetchState();
+      await refetch();
     } else {
       setApiError(response);
     }

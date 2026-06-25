@@ -1,6 +1,6 @@
 import { createContext } from "react";
 
-import type { ApiError, ApiResult } from "@/api/ApiResult";
+import type { ApiError } from "@/api/ApiResult";
 import type {
   ApportionmentState,
   ApportionmentWarning,
@@ -17,7 +17,7 @@ export interface iElectionApportionmentProviderContext {
   state?: ApportionmentState;
   error?: ApiError;
   isLoading: boolean;
-  refetchState: (controller?: AbortController) => Promise<ApiResult<ApportionmentState>>;
+  refetch: (controller?: AbortController) => Promise<void>;
 }
 
 export const ApportionmentProviderContext = createContext<iElectionApportionmentProviderContext | undefined>(undefined);

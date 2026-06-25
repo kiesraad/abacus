@@ -400,10 +400,14 @@ export type USER_DELETE_REQUEST_PATH = `/api/users/${UserId}`;
 /** TYPES **/
 
 export interface AbsoluteMajorityDrawingLots {
+  /** The list where the reassigned residual seat will go to */
+  assign_to: PGNumber;
+  /** The list options where the residual seat should come from */
   options: PGNumber[];
 }
 
 export interface AbsoluteMajorityReassignedSeat {
+  drawing_lots?: ListDrawingLotsVariant;
   list_assigned_seat: PGNumber;
   list_retracted_seat: PGNumber;
 }
@@ -1166,6 +1170,7 @@ export interface GenerateElectionArgs {
 }
 
 export interface HighestAverageAssignedSeat {
+  drawing_lots?: ListDrawingLotsVariant;
   list_assigned: PGNumber[];
   list_exhausted: PGNumber[];
   list_options: PGNumber[];
@@ -1207,6 +1212,7 @@ export type InvestigationStatus =
   | { state: InvestigationConcludedWithNewResults; status: "ConcludedWithNewResults" };
 
 export interface LargestRemainderAssignedSeat {
+  drawing_lots?: ListDrawingLotsVariant;
   list_assigned: PGNumber[];
   list_options: PGNumber[];
   remainder_votes: DisplayFraction;
@@ -1237,7 +1243,8 @@ export interface ListCandidateNomination {
 export type ListDrawingLotsVariant =
   | (HighestAverageResidualSeatDrawingLots & { variant: "HighestAverageResidualSeat" })
   | (LargestRemainderResidualSeatDrawingLots & { variant: "LargestRemainderResidualSeat" })
-  | (AbsoluteMajorityDrawingLots & { variant: "AbsoluteMajority" });
+  | (AbsoluteMajorityDrawingLots & { variant: "AbsoluteMajorityHighestAverage" })
+  | (AbsoluteMajorityDrawingLots & { variant: "AbsoluteMajorityLargestRemainder" });
 
 /**
  * The list that has been drawn plus information to assert the correct drawing
@@ -1575,6 +1582,7 @@ export interface User {
   created_at: string;
   fullname?: string;
   id: UserId;
+  is_logged_in: boolean;
   last_activity_at?: string;
   role: Role;
   updated_at: string;

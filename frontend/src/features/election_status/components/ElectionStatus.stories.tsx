@@ -65,11 +65,11 @@ export const ElectionStatusNoLinks: StoryObj<StoryProps> = {
       await expect(canvas.getByTestId("progressbar-all")).toBeVisible();
       const bars = canvas.getByTestId("multi-outer-bar").children;
       const expectedData = [
-        { index: 0, percentage: 13, class: "definitive" },
+        { index: 0, percentage: 12, class: "definitive" },
         { index: 1, percentage: 25, class: "first-entry-finished" },
         { index: 2, percentage: 25, class: "in-progress" },
         { index: 3, percentage: 25, class: "errors-and-warnings" },
-        { index: 4, percentage: 13, class: "not-started" },
+        { index: 4, percentage: 12, class: "not-started" },
       ];
 
       for (const data of expectedData) {

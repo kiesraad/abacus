@@ -23,7 +23,8 @@ use crate::{
 pub enum ApportionmentApiError {
     ApportionmentNotCompleted,
     CommitteeSessionNotCompleted,
-    InvalidLotDrawing,
+    InvalidLotDrawing(String),
+    InvalidState(String),
 }
 
 impl ApiErrorResponse for ApportionmentApiError {
@@ -49,11 +50,19 @@ impl ApiErrorResponse for ApportionmentApiError {
                     false,
                 ),
             ),
-            ApportionmentApiError::InvalidLotDrawing => (
+            ApportionmentApiError::InvalidLotDrawing(message) => (
                 StatusCode::CONFLICT,
                 ErrorResponse::new(
-                    "Drawn lot is invalid",
+                    format!("Drawn lot is invalid: {}", message),
                     ErrorReference::ApportionmentInvalidLotDrawing,
+                    true,
+                ),
+            ),
+            ApportionmentApiError::InvalidState(message) => (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                ErrorResponse::new(
+                    format!("Apportionment invalid state: {}", message),
+                    ErrorReference::InternalServerError,
                     true,
                 ),
             ),
@@ -62,8 +71,15 @@ impl ApiErrorResponse for ApportionmentApiError {
 }
 
 impl From<apportionment::ApportionmentError> for APIError {
-    fn from(_err: apportionment::ApportionmentError) -> Self {
-        ApportionmentApiError::InvalidLotDrawing.into()
+    fn from(error: apportionment::ApportionmentError) -> Self {
+        match error {
+            apportionment::ApportionmentError::InvalidLotDrawing(message) => {
+                ApportionmentApiError::InvalidLotDrawing(message).into()
+            }
+            apportionment::ApportionmentError::InvalidState(message) => {
+                ApportionmentApiError::InvalidState(message).into()
+            }
+        }
     }
 }
 

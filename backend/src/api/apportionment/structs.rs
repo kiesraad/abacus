@@ -148,8 +148,19 @@ impl From<ListDrawingLotsVariant> for apportionment::ListDrawingLotsVariant<PGNu
                         .collect(),
                 },
             ),
-            ListDrawingLotsVariant::AbsoluteMajority(AbsoluteMajorityDrawingLots { options }) => {
-                Self::AbsoluteMajority(apportionment::AbsoluteMajorityDrawingLots { options })
+            ListDrawingLotsVariant::AbsoluteMajorityHighestAverage(
+                AbsoluteMajorityDrawingLots { assign_to, options },
+            ) => Self::AbsoluteMajorityHighestAverage(apportionment::AbsoluteMajorityDrawingLots {
+                assign_to,
+                options,
+            }),
+            ListDrawingLotsVariant::AbsoluteMajorityLargestRemainder(
+                AbsoluteMajorityDrawingLots { assign_to, options },
+            ) => {
+                Self::AbsoluteMajorityLargestRemainder(apportionment::AbsoluteMajorityDrawingLots {
+                    assign_to,
+                    options,
+                })
             }
         }
     }

@@ -895,7 +895,7 @@ export const noRecountNoDifferencesDrawingLotsDataEntryGSB: GSBResults & { model
 };
 
 export const dataEntryRequest: DataEntry = {
-  progress: 88,
+  progress: 87,
   data: noRecountNoDifferencesDataEntry,
   client_state: {
     furthest: "political_group_votes_3",
@@ -1047,7 +1047,7 @@ export const noRecountNoDifferencesDataEntryWithGaps: Results = {
 };
 
 export const dataEntryRequestWithGaps: DataEntry = {
-  progress: 86,
+  progress: 85,
   data: noRecountNoDifferencesDataEntryWithGaps,
   client_state: {
     furthest: "political_group_votes_3",

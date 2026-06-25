@@ -42,7 +42,8 @@ pub(crate) async fn inject_user(
         return request;
     };
 
-    let Ok(Some(session)) = session_repo::get_by_identifier(&mut conn, &session_id).await else {
+    let Ok(Some(session)) = session_repo::get_by_identifier_if_valid(&mut conn, &session_id).await
+    else {
         return request;
     };
 

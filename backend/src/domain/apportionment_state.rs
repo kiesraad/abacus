@@ -308,11 +308,12 @@ mod tests {
     use crate::domain::apportionment::{AbsoluteMajorityDrawingLots, CandidateDrawingLotsVariant};
 
     fn list_required() -> DrawingLotsRequired {
-        DrawingLotsRequired::ListDrawingLotsRequired(ListDrawingLotsVariant::AbsoluteMajority(
-            AbsoluteMajorityDrawingLots {
+        DrawingLotsRequired::ListDrawingLotsRequired(
+            ListDrawingLotsVariant::AbsoluteMajorityHighestAverage(AbsoluteMajorityDrawingLots {
+                assign_to: PGNumber::from(1),
                 options: PGNumber::from_values(vec![8, 9]),
-            },
-        ))
+            }),
+        )
     }
 
     fn list_drawn() -> ListDrawn {

@@ -14,23 +14,29 @@ exports.pdfDiff = ({ core }) => {
   // Ensure diff folder exists
   fs.mkdirSync(dirs.diff, { recursive: true });
 
-  // Reads .pdf files in the given directory (if it exists) and returns file names
-  const listPdfFiles = (root) => {
-    if (!fs.existsSync(root)) {
-      return [];
+  // Read the manifest gen-pdf writes next to the PDFs
+  const loadManifest = (root) => {
+    const manifestPath = path.join(root, "manifest.json");
+    if (!fs.existsSync(manifestPath)) {
+      return {};
     }
-
-    return fs
-      .readdirSync(root, { withFileTypes: true })
-      .filter(
-        (entry) => entry.isFile() && entry.name.toLowerCase().endsWith(".pdf"),
-      )
-      .map((entry) => entry.name);
+    try {
+      return JSON.parse(fs.readFileSync(manifestPath, "utf8"));
+    } catch (err) {
+      core.warning(`Failed to parse ${manifestPath}: ${err}`);
+      return {};
+    }
   };
 
-  const allFiles = Array.from(
-    new Set([...listPdfFiles(dirs.base), ...listPdfFiles(dirs.head)]),
-  ).sort();
+  // Retrieve and merge manifests
+  const baseManifest = loadManifest(dirs.base);
+  const headManifest = loadManifest(dirs.head);
+  const manifest = { ...baseManifest, ...headManifest };
+
+  // The manifest's keys enumerate exactly the PDFs gen-pdf produced on each side.
+  const baseFiles = new Set(Object.keys(baseManifest));
+  const headFiles = new Set(Object.keys(headManifest));
+  const allFiles = Array.from(new Set([...baseFiles, ...headFiles])).sort();
 
   // Markdown table that will be posted as a comment on the PR
   const baseRef = process.env.BASE_REF;
@@ -58,8 +64,8 @@ exports.pdfDiff = ({ core }) => {
   for (const relativePath of allFiles) {
     const baseFile = path.join(dirs.base, relativePath);
     const headFile = path.join(dirs.head, relativePath);
-    const hasBase = fs.existsSync(baseFile);
-    const hasHead = fs.existsSync(headFile);
+    const hasBase = baseFiles.has(relativePath);
+    const hasHead = headFiles.has(relativePath);
     let status = "";
 
     if (hasBase && hasHead) {
@@ -112,15 +118,21 @@ exports.pdfDiff = ({ core }) => {
     fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, `${rows.join("\n")}\n`);
   }
 
+  // Resolve a PDF output name to its source template via the manifest
+  const resolveTemplate = (relativePath) => {
+    const templateName = manifest[relativePath];
+    if (!templateName) {
+      return null;
+    }
+    const templatePath = path.join("backend", "templates", templateName);
+    return fs.existsSync(templatePath) ? templatePath : null;
+  };
+
   // Add a yellow warning annotation for every changed PDF
   for (const { relativePath, status } of changedFiles) {
-    const template = path.join(
-      "backend",
-      "templates",
-      `${relativePath.replace(/\.pdf$/i, "")}.typ`,
-    );
+    const template = resolveTemplate(relativePath);
     const annotation = { title: "PDF output changed" };
-    if (fs.existsSync(template)) {
+    if (template) {
       annotation.file = template;
       annotation.startLine = 1;
     }

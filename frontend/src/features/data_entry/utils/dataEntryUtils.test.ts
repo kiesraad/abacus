@@ -11,8 +11,10 @@ import {
   getDefaultFormSection,
   getInitialValues,
 } from "../testing/mock-data";
+import type { FormState } from "../types/types";
 import {
   addValidationResultsToFormState,
+  calculateDataEntryProgress,
   formSectionComplete,
   getNextSectionID,
   isFormSectionEmpty,
@@ -192,6 +194,24 @@ describe("isFormSectionEmpty", () => {
     };
 
     expect(isFormSectionEmpty([booleanSection], section, valuesWithTrue)).toBeFalsy();
+  });
+});
+
+describe("calculateDataEntryProgress", () => {
+  test("data entry progress is rounded down", () => {
+    const formState: FormState = {
+      furthest: "voters_votes_counts",
+      sections: {
+        voters_votes_counts: getDefaultFormSection("voters_votes_counts", 0),
+        differences_counts: getDefaultFormSection("differences_counts", 1),
+        political_group_votes_1: getDefaultFormSection("political_group_votes_1", 2),
+        political_group_votes_2: getDefaultFormSection("political_group_votes_2", 3),
+        political_group_votes_3: getDefaultFormSection("political_group_votes_3", 4),
+        save: getDefaultFormSection("save", 5),
+      },
+    };
+    const progress = calculateDataEntryProgress(formState);
+    expect(progress).toBe(16);
   });
 });
 

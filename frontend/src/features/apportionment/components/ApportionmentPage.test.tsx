@@ -1,5 +1,6 @@
 import { render as rtlRender } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
+import { HttpResponse, http } from "msw";
 import * as ReactRouter from "react-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
@@ -302,12 +303,19 @@ describe("ApportionmentPage", () => {
     const resetApportionmentState = spyOnHandler(ResetApportionmentStateRequestHandler);
     const getApportionmentState = spyOnHandler(GetApportionmentStateRequestHandler);
     overrideOnce("get", "/api/elections/3", 200, getElectionMockData(election, committee_session));
-    overrideOnce("post", "/api/elections/3/apportionment", 200, {
-      seat_assignment: seat_assignment,
-      candidate_nomination: candidate_nomination,
-      election_summary: election_summary,
-      warnings: ["NotAllSeatsAssigned"],
-    } satisfies ElectionApportionmentResponse);
+    server.use(
+      http.post("/api/elections/3/apportionment", () =>
+        HttpResponse.json(
+          {
+            seat_assignment: seat_assignment,
+            candidate_nomination: candidate_nomination,
+            election_summary: election_summary,
+            warnings: ["NotAllSeatsAssigned"],
+          } satisfies ElectionApportionmentResponse,
+          { status: 200 },
+        ),
+      ),
+    );
     overrideOnce("get", "/api/elections/3/apportionment/state", 200, {
       deceased_candidates: [],
       lists_drawn: [],

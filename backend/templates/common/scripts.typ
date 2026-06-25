@@ -139,12 +139,18 @@
 }
 
 /// Format a list of items with comma separation, or return - if empty
-#let comma_list(items, empty: "-") = {
+#let comma_list(items, empty: "-", last_separator: none) = {
   if items.len() == 0 {
     return empty
   }
 
-  items.map(str).join(", ")
+  if items.len() == 1 {
+    return str(items.at(0))
+  }
+
+  let result = items.map(str).slice(0, -1).join(", ")
+  result += if last_separator == none { "," } else { " " + last_separator } + " " + str(items.at(-1))
+  result
 }
 
 /// Format a number with thousands separator, return as str

@@ -351,8 +351,9 @@ Na toewijzing van de volle zetels blijft een aantal te verdelen zetels over. Dit
     set enum(spacing: 12pt, numbering: numbering("I", 1))
     for drawn_lot in drawn_lots {
       let lot_variant = if drawn_lot.variant == "HighestAverageResidualSeat" { [gemiddelden] } else { [overschotten] };
-      let list_names = comma_list(drawn_lot.lists.map((list) => format_political_group_name(list.number, list.name, with_prefix: "with_list_prefix")));
-      [+ De lijsten #list_names hebben gelijke #lot_variant, maar er zijn niet voldoende restzetels voor toekenning ervan aan die lijst. Er is daarom geloot welke lijst de restzetel krijgt.]
+      let list_names = drawn_lot.lists.map((list) => format_political_group_name(list.number, list.name, with_prefix: "with_list_prefix"));
+      let list_names_formatted = comma_list(list_names, last_separator: "en");
+      [+ De lijsten #list_names_formatted hebben gelijke #lot_variant, maar er zijn niet voldoende restzetels voor toekenning ervan aan die lijst. Er is daarom geloot welke lijst de restzetel krijgt.]
     }
     if absolute_majority != none {
       [+ #format_political_group_name(absolute_majority.number, absolute_majority.name, with_prefix: "with_list_prefix") heeft meer dan de helft van de stemmen behaald en heeft daardoor een volstrekte meerderheid. Omdat de lijst op basis van de zetelverdeling niet meer dan de helft van de zetels heeft gekregen, heeft de lijst via de restzetelverdeling een extra (rest)zetel gekregen.]

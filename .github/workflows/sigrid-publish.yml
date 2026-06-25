@@ -14,11 +14,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
-        uses: actions/checkout@v6.0.3
+        uses: actions/checkout@v7.0.0
         with:
           fetch-depth: 0
       - name: Sigrid CI
-        uses: Software-Improvement-Group/sigridci@b475df83e9b6cc4e45ad1df8c3236e896e6c995a # main
+        uses: Software-Improvement-Group/sigridci@d3ebc1f4c3962bfb6d52b93f476a346dc1be6d69 # main
         with:
           customer: kiesraad
           system: abacus

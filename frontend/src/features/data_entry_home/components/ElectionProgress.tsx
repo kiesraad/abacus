@@ -33,13 +33,13 @@ export function ElectionProgress() {
         title: t("status.first_entry_finished_short"),
         id: "first-entry-finished",
         // The percentage is rounded up when between 0.5 and 1, so that progress is not set to 0% for too long, when the total is large.
-        percentage: total > 0 ? calculateProgressPercentage(totalFirstEntryFinished, total, 0.5, 1) : 0,
+        percentage: calculateProgressPercentage(totalFirstEntryFinished, total, 0.5, 1),
       },
       {
         title: t("status.first_and_second_entry_finished"),
         id: "first-and-second-entry-finished",
         // The percentage is rounded up when between 0.5 and 1, so that progress is not set to 0% for too long, when the total is large.
-        percentage: total > 0 ? calculateProgressPercentage(totalFirstAndSecondEntryFinished, total, 0.5, 1) : 0,
+        percentage: calculateProgressPercentage(totalFirstAndSecondEntryFinished, total, 0.5, 1),
       },
     ];
   }, [statuses]);

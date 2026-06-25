@@ -3,6 +3,7 @@ import { useMemo } from "react";
 import type { PercentageAndColorClass, ProgressBarColorClass } from "@/components/ui/ProgressBar/ProgressBar";
 import { useUsers } from "@/hooks/user/useUsers";
 import type { DataEntryStatusName, ElectionStatusResponseEntry } from "@/types/generated/openapi";
+import { calculateProgressPercentage } from "@/utils/progressPercentage";
 
 export const statusCategories = [
   "errors_and_warnings",
@@ -73,12 +74,15 @@ export function useElectionStatus(statuses: ElectionStatusResponseEntry[]): Elec
 
   const progressBarData: PercentageAndColorClass[] = useMemo(() => {
     const total = statuses.length;
-    // Reverse the categories and make sure not started is at the end of the progress bar
     const [notStarted, ...data] = statusCategories
-      .map((cat) => ({
-        percentage: total > 0 ? Math.round((categoryCounts[cat] / total) * 100) : 0,
-        class: categoryColorClass[cat],
-      }))
+      .map((cat) => {
+        return {
+          // The percentage is rounded up when between 0 and 1, so even with 1 item in a category and a large total, the item is shown in the progress bar.
+          percentage: calculateProgressPercentage(categoryCounts[cat], total, 0, 1),
+          class: categoryColorClass[cat],
+        };
+      })
+      // Reverse the categories and make sure not started is at the end of the progress bar
       .reverse();
     if (notStarted) {
       data.push(notStarted);

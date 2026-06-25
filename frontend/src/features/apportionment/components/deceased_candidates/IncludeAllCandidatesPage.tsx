@@ -36,7 +36,7 @@ function renderForm(radioError: boolean, handleSubmit: (e: SubmitEvent<HTMLFormE
           <ChoiceList>
             {radioError && (
               <ChoiceList.Error id="include_all_candidates_error">
-                {t("apportionment.include_all_candidates.mandatory_question")}
+                {t("apportionment.mandatory_question")}
               </ChoiceList.Error>
             )}
             <ChoiceList.Radio

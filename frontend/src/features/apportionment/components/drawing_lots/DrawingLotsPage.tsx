@@ -18,7 +18,10 @@ import { DrawingLotsForList } from "./DrawingLotsForList";
 function getPageTitle(state: ApportionmentState) {
   if (state.type === "DrawingLots") {
     if (state.drawing_lots_required.type === "ListDrawingLotsRequired") {
-      if (state.drawing_lots_required.variant !== "AbsoluteMajority") {
+      if (
+        state.drawing_lots_required.variant !== "AbsoluteMajorityHighestAverage" &&
+        state.drawing_lots_required.variant !== "AbsoluteMajorityLargestRemainder"
+      ) {
         return t("apportionment.drawing_lots_for_seat", {
           number: state.drawing_lots_required.residual_seat_numbers[0] || "",
         });

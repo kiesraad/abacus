@@ -560,9 +560,10 @@ async fn generate_csb_data_entry(
 
         // number of voters that actually came and voted
         let results = if let Some(v) = votes {
+            let total_votes: u32 = v.iter().flatten().sum();
             Results::GSB(generate_gsb_results_from_votes(
                 &election.political_groups,
-                election.number_of_voters,
+                rng.random_range(total_votes..=total_votes * 2),
                 v,
             ))
         } else {

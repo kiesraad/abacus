@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "INSERT INTO users (username, fullname, password_hash, needs_password_change, role)\n        VALUES (?, ?, ?, ?, ?)\n        RETURNING\n            id,\n            username,\n            fullname,\n            password_hash,\n            needs_password_change,\n            role,\n            last_activity_at,\n            updated_at,\n            created_at\n        ",
+  "query": "SELECT\n            u.id,\n            u.username,\n            u.fullname,\n            u.password_hash,\n            u.needs_password_change,\n            u.role,\n            u.last_activity_at,\n            (\n                SELECT COUNT(*)\n                FROM sessions s\n                WHERE s.user_id = u.id\n                    AND s.expires_at > datetime($1)\n            ) > 0 as \"is_logged_in: bool\",\n            u.updated_at,\n            u.created_at\n        FROM users u\n        WHERE ($2 IS NULL OR u.role = $2)\n        ",
   "describe": {
     "columns": [
       {
@@ -81,8 +81,14 @@
         }
       },
       {
-        "name": "updated_at",
+        "name": "is_logged_in: bool",
         "ordinal": 7,
+        "type_info": "Integer",
+        "origin": "Expression"
+      },
+      {
+        "name": "updated_at",
+        "ordinal": 8,
         "type_info": "Text",
         "origin": {
           "Table": {
@@ -93,7 +99,7 @@
       },
       {
         "name": "created_at",
-        "ordinal": 8,
+        "ordinal": 9,
         "type_info": "Text",
         "origin": {
           "Table": {
@@ -104,7 +110,7 @@
       }
     ],
     "parameters": {
-      "Right": 5
+      "Right": 2
     },
     "nullable": [
       false,
@@ -115,8 +121,9 @@
       false,
       true,
       false,
+      false,
       false
     ]
   },
-  "hash": "cf86905fc1fc1d6a9fdd644e8c0e7834ab5bac2b52192d2dd7358e3ed346ba3a"
+  "hash": "9167c1b9360a0afa70894641ac318f1d9b36cd638e7b009b6e2d9ed9009aaf84"
 }

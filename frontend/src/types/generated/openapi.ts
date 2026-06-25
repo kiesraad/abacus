@@ -1582,6 +1582,7 @@ export interface User {
   created_at: string;
   fullname?: string;
   id: UserId;
+  is_logged_in: boolean;
   last_activity_at?: string;
   role: Role;
   updated_at: string;

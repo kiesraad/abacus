@@ -34,7 +34,7 @@ function getPageTitle(state: ApportionmentState) {
 export function DrawingLotsPage() {
   const navigate = useNavigate();
   const { election } = useElection();
-  const { error, state, refetchState } = useApportionmentContext();
+  const { error, state, refetch } = useApportionmentContext();
   const [apiError, setApiError] = useState<AnyApiError>();
   const [radioError, setRadioError] = useState(false);
   const client = useApiClient();
@@ -67,8 +67,7 @@ export function DrawingLotsPage() {
     const response = await client.postRequest(path, payload);
 
     if (isSuccess(response)) {
-      // TODO: Needs to refetch both state and apportionment result, will be done in #3422
-      await refetchState();
+      await refetch();
       void navigate(`/elections/${election.id}/apportionment`);
     } else {
       setApiError(response);

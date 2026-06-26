@@ -1,14 +1,18 @@
 import { render as rtlRender } from "@testing-library/react";
+import userEvent from "@testing-library/user-event/dist/cjs/index.js";
+import { HttpResponse, http } from "msw";
 import * as ReactRouter from "react-router";
+import { within } from "storybook/test";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { Providers } from "@/testing/Providers";
-import { overrideOnce } from "@/testing/server";
-import { expectErrorPage, render, screen, setupTestRouter, waitFor } from "@/testing/test-utils";
+import { overrideOnce, server } from "@/testing/server";
+import { expectErrorPage, render, screen, setupTestRouter, spyOnHandler, waitFor } from "@/testing/test-utils";
 import type { ApportionmentState, ElectionApportionmentResponse, ErrorResponse } from "@/types/generated/openapi";
 import { apportionmentRoutes } from "../../routes";
+import * as gte19SeatsAndP7 from "../../testing/gte-19-seats-and-p7";
 import * as lt19Seats from "../../testing/lt-19-seats";
 import * as lt19SeatsAndP7 from "../../testing/lt-19-seats-and-p7";
 import { ApportionmentProvider } from "../ApportionmentProvider";
@@ -103,6 +107,233 @@ describe("DrawingLotsPage", () => {
       expect(await screen.findByRole("heading", { level: 1, name: "Loting voor restzetel 2" }));
       expect(navigate).not.toHaveBeenCalled();
     }
+  });
+
+  test("Renders for drawing lots for list highest average variant and submits", async () => {
+    vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
+    const addListDrawnRequestHandler = http.post("/api/elections/8/apportionment/add_list_drawn", () =>
+      HttpResponse.json(
+        {
+          candidates_drawn: [],
+          deceased_candidates: [],
+          drawing_lots_required: {
+            type: "ListDrawingLotsRequired",
+            ...gte19SeatsAndP7.drawing_lots_required,
+          },
+          lists_drawn: [],
+          type: "DrawingLots",
+        } satisfies ApportionmentState,
+        { status: 200 },
+      ),
+    );
+    server.use(addListDrawnRequestHandler);
+    const addListDrawn = spyOnHandler(addListDrawnRequestHandler);
+    overrideOnce(
+      "get",
+      "/api/elections/8",
+      200,
+      getElectionMockData(gte19SeatsAndP7.election, gte19SeatsAndP7.committee_session),
+    );
+    server.use(
+      http.post("/api/elections/8/apportionment", () =>
+        HttpResponse.json(
+          {
+            seat_assignment: gte19SeatsAndP7.seat_assignment,
+            election_summary: gte19SeatsAndP7.election_summary,
+            warnings: [],
+          },
+          { status: 200 },
+        ),
+      ),
+    );
+    server.use(
+      http.get("/api/elections/8/apportionment/state", () => HttpResponse.json(gte19SeatsAndP7.state, { status: 200 })),
+    );
+    const user = userEvent.setup();
+
+    renderDrawingLotsPage(8);
+
+    expect(await screen.findByRole("heading", { level: 1, name: "Loting voor restzetel 2" })).toBeVisible();
+
+    expect(await screen.findByRole("heading", { level: 2, name: "Loting noodzakelijk" })).toBeVisible();
+    const list = screen.getByRole("list");
+    expect(list).toBeVisible();
+    const listitems = within(list).getAllByRole("listitem");
+    expect(listitems.length).toBe(5);
+    expect(listitems[0]).toHaveTextContent("Er zijn 4 restzetels te verdelen");
+    expect(listitems[1]).toHaveTextContent("Restzetel 2 kan niet automatisch worden toegewezen");
+    expect(listitems[2]).toHaveTextContent(
+      "De partij met het hoogste gemiddeld aantal stemmen na het toewijzen van de restzetel krijgt de restzetel",
+    );
+    expect(listitems[3]).toHaveTextContent(
+      "Lijst 2 - Algemene Partij, Lijst 3 - KEUS, Lijst 4 - Algemene Lijst, Lijst 5 - Unie van kandidaten en Lijst 6 - Lijst van stemmers krijgen samen het hoogste gemiddeld aantal stemmen per zetel (46 2/3 stemmen)",
+    );
+    expect(listitems[4]).toHaveTextContent("Daarom moet er geloot worden welke lijst de restzetel krijgt");
+
+    expect(await screen.findByRole("heading", { level: 3, name: "Instructies voor loting" })).toBeVisible();
+
+    expect(await screen.findByRole("heading", { level: 3, name: "Resultaat loting" })).toBeVisible();
+
+    const options = await screen.findAllByRole("radio");
+    expect(options.length).toBe(5);
+    const option = await screen.findByRole("radio", { name: "Lijst 3 - KEUS" });
+    expect(option).toBeVisible();
+    expect(option).not.toBeChecked();
+    await user.click(option);
+    await user.click(screen.getByRole("button", { name: "Volgende" }));
+
+    expect(addListDrawn).toHaveBeenCalledWith({
+      drawn: 3,
+      variant: {
+        type: "ListDrawingLotsRequired",
+        ...gte19SeatsAndP7.drawing_lots_required,
+      },
+    });
+    expect(navigate).toHaveBeenCalledWith("/elections/8/apportionment");
+  });
+
+  test("Renders for drawing lots for list largest remainder variant and submits", async () => {
+    vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
+    const addListDrawnRequestHandler = http.post("/api/elections/7/apportionment/add_list_drawn", () =>
+      HttpResponse.json(
+        {
+          candidates_drawn: [],
+          deceased_candidates: [],
+          drawing_lots_required: {
+            type: "ListDrawingLotsRequired",
+            ...lt19SeatsAndP7.drawing_lots_required,
+          },
+          lists_drawn: [],
+          type: "DrawingLots",
+        } satisfies ApportionmentState,
+        { status: 200 },
+      ),
+    );
+    server.use(addListDrawnRequestHandler);
+    const addListDrawn = spyOnHandler(addListDrawnRequestHandler);
+    overrideOnce(
+      "get",
+      "/api/elections/7",
+      200,
+      getElectionMockData(lt19SeatsAndP7.election, lt19SeatsAndP7.committee_session),
+    );
+    server.use(
+      http.post("/api/elections/7/apportionment", () =>
+        HttpResponse.json(
+          {
+            seat_assignment: lt19SeatsAndP7.seat_assignment,
+            election_summary: lt19SeatsAndP7.election_summary,
+            warnings: [],
+          },
+          { status: 200 },
+        ),
+      ),
+    );
+    server.use(
+      http.get("/api/elections/7/apportionment/state", () => HttpResponse.json(lt19SeatsAndP7.state, { status: 200 })),
+    );
+    const user = userEvent.setup();
+
+    renderDrawingLotsPage(7);
+
+    expect(await screen.findByRole("heading", { level: 1, name: "Loting voor restzetel 2" })).toBeVisible();
+
+    expect(await screen.findByRole("heading", { level: 2, name: "Loting noodzakelijk" })).toBeVisible();
+    const list = screen.getByRole("list");
+    expect(list).toBeVisible();
+    const listitems = within(list).getAllByRole("listitem");
+    expect(listitems.length).toBe(5);
+    expect(listitems[0]).toHaveTextContent("Er zijn 2 restzetels te verdelen");
+    expect(listitems[1]).toHaveTextContent("Restzetel 2 kan niet automatisch worden toegewezen");
+    expect(listitems[2]).toHaveTextContent("De partij met het grootste overschot aan stemmen krijgt de restzetel");
+    expect(listitems[3]).toHaveTextContent(
+      "Lijst 2 - Politieke Groep der Kandidaten, Lijst 3 - Stemalliantie, Lijst 4 - Stem voor de Partij, Lijst 5 - Alliantie van Partijen en Lijst 6 - Unie voor Stemmen hebben samen het grootste overschot (0 stemmen)",
+    );
+    expect(listitems[4]).toHaveTextContent("Daarom moet er geloot worden welke lijst de restzetel krijgt");
+
+    expect(await screen.findByRole("heading", { level: 3, name: "Instructies voor loting" })).toBeVisible();
+
+    expect(await screen.findByRole("heading", { level: 3, name: "Resultaat loting" })).toBeVisible();
+
+    const options = await screen.findAllByRole("radio");
+    expect(options.length).toBe(5);
+    const option = await screen.findByRole("radio", { name: "Lijst 2 - Politieke Groep der Kandidaten" });
+    expect(option).toBeVisible();
+    expect(option).not.toBeChecked();
+    await user.click(option);
+    await user.click(screen.getByRole("button", { name: "Volgende" }));
+
+    expect(addListDrawn).toHaveBeenCalledWith({
+      drawn: 2,
+      variant: {
+        type: "ListDrawingLotsRequired",
+        ...lt19SeatsAndP7.drawing_lots_required,
+      },
+    });
+    expect(navigate).toHaveBeenCalledWith("/elections/7/apportionment");
+  });
+
+  test("Renders form and shows error when submitting without selecting a list", async () => {
+    vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
+    const addListDrawnRequestHandler = http.post("/api/elections/7/apportionment/add_list_drawn", () =>
+      HttpResponse.json(
+        {
+          candidates_drawn: [],
+          deceased_candidates: [],
+          drawing_lots_required: {
+            type: "ListDrawingLotsRequired",
+            ...lt19SeatsAndP7.drawing_lots_required,
+          },
+          lists_drawn: [],
+          type: "DrawingLots",
+        } satisfies ApportionmentState,
+        { status: 200 },
+      ),
+    );
+    server.use(addListDrawnRequestHandler);
+    const addListDrawn = spyOnHandler(addListDrawnRequestHandler);
+    overrideOnce(
+      "get",
+      "/api/elections/7",
+      200,
+      getElectionMockData(lt19SeatsAndP7.election, lt19SeatsAndP7.committee_session),
+    );
+    overrideOnce("post", "/api/elections/7/apportionment", 200, {
+      seat_assignment: lt19SeatsAndP7.seat_assignment,
+      election_summary: lt19SeatsAndP7.election_summary,
+      warnings: [],
+    });
+    overrideOnce("get", "/api/elections/7/apportionment/state", 200, lt19SeatsAndP7.state);
+    const user = userEvent.setup();
+
+    renderDrawingLotsPage(7);
+
+    expect(await screen.findByRole("heading", { level: 1, name: "Loting voor restzetel 2" })).toBeVisible();
+
+    expect(await screen.findByRole("heading", { level: 3, name: "Resultaat loting" })).toBeVisible();
+
+    const options = await screen.findAllByRole("radio");
+    expect(options.length).toBe(5);
+    const option1 = await screen.findByRole("radio", { name: "Lijst 2 - Politieke Groep der Kandidaten" });
+    const option2 = await screen.findByRole("radio", { name: "Lijst 3 - Stemalliantie" });
+    const option3 = await screen.findByRole("radio", { name: "Lijst 4 - Stem voor de Partij" });
+    const option4 = await screen.findByRole("radio", { name: "Lijst 5 - Alliantie van Partijen" });
+    const option5 = await screen.findByRole("radio", { name: "Lijst 6 - Unie voor Stemmen" });
+    expect(option1).toBeVisible();
+    expect(option1).not.toBeChecked();
+    expect(option2).toBeVisible();
+    expect(option2).not.toBeChecked();
+    expect(option3).toBeVisible();
+    expect(option3).not.toBeChecked();
+    expect(option4).toBeVisible();
+    expect(option4).not.toBeChecked();
+    expect(option5).toBeVisible();
+    expect(option5).not.toBeChecked();
+    await user.click(screen.getByRole("button", { name: "Volgende" }));
+
+    expect(await screen.findByText("Deze vraag is verplicht")).toBeVisible();
+
+    expect(addListDrawn).not.toHaveBeenCalled();
   });
 
   describe("Apportionment not yet available", () => {

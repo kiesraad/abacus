@@ -52,7 +52,7 @@ export function DrawingLotsForList({ drawingLotsRequired, options }: DrawingLots
               options.map((pg) => formatPoliticalGroupName(pg)),
               t("and"),
             ),
-            value: `${getFractionInteger(max_value)} ${max_value.numerator > 0 && getFractionWithoutInteger(max_value)}`,
+            value: `${getFractionInteger(max_value)} ${max_value.numerator > 0 ? getFractionWithoutInteger(max_value) : ""}`,
           })}
         </li>
         <li>{t("apportionment.drawing_lots_for_list.hence_drawing_lots_is_needed")}</li>

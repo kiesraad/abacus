@@ -201,6 +201,7 @@ jobs:
           name: Version ${{ github.ref_name }}
 
   deploy:
+    if: github.repository == 'kiesraad/abacus'
     name: Deploy to abacus-test.nl, without airgap detection
     needs:
       - build

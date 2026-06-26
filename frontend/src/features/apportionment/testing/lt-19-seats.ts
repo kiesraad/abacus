@@ -1696,17 +1696,16 @@ export const committee_session: CommitteeSession = {
 
 export const election: ElectionWithPoliticalGroups = {
   id: 3,
-  name: "Test Election < 19 seats",
-  counting_method: "CSO",
+  name: "Election < 19 seats",
   committee_category: "CSB",
-  election_id: "TestLocation_2026",
-  location: "Test Location",
-  domain_id: "0000",
+  election_id: "GR2026_Juinen",
+  location: "Juinen",
+  domain_id: "0035",
   category: "Municipal",
   number_of_seats: 15,
+  number_of_voters: 1,
   election_date: "2026-03-18",
   nomination_date: "2026-02-02",
-  number_of_voters: 1,
   political_groups: [
     political_group_1,
     {

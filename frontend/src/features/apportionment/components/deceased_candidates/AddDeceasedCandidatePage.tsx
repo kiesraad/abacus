@@ -32,7 +32,7 @@ function checkStateAndRedirect(state: ApportionmentState | undefined, electionId
 export function AddDeceasedCandidatePage() {
   const navigate = useNavigate();
   const { election } = useElection();
-  const { state, error, isLoading, refetchState } = useApportionmentContext();
+  const { state, error, isLoading, refetch } = useApportionmentContext();
   const [apiError, setApiError] = useState<AnyApiError>();
   const [selectedList, setSelectedList] = useState<PoliticalGroup | undefined>(election.political_groups.at(0));
   const client = useApiClient();
@@ -60,7 +60,7 @@ export function AddDeceasedCandidatePage() {
     const response: ApiResult<ApportionmentState> = await client.postRequest(path, body);
 
     if (isSuccess(response)) {
-      await refetchState();
+      await refetch();
       void navigate(`/elections/${election.id}/apportionment/deceased-candidates`);
     } else {
       setApiError(response);

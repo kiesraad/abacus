@@ -97,7 +97,7 @@ function renderLinksToSeatAssignmentPages(seatAssignment: SeatAssignment) {
 export function ApportionmentPage() {
   const navigate = useNavigate();
   const { currentCommitteeSession, election } = useElection();
-  const { seatAssignment, candidateNomination, electionSummary, warnings, state, error, refetchState } =
+  const { seatAssignment, candidateNomination, electionSummary, warnings, state, error, refetch } =
     useApportionmentContext();
   const [apiError, setApiError] = useState<AnyApiError>();
   const client = useApiClient();
@@ -117,7 +117,7 @@ export function ApportionmentPage() {
     const response: ApiResult<ApportionmentState> = await client.postRequest(path);
 
     if (isSuccess(response)) {
-      await refetchState();
+      await refetch();
     } else {
       setApiError(response);
     }

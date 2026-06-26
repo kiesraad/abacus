@@ -64,7 +64,7 @@ function renderForm(radioError: boolean, handleSubmit: (e: SubmitEvent<HTMLFormE
 export function IncludeAllCandidatesPage() {
   const navigate = useNavigate();
   const { election } = useElection();
-  const { state, error, isLoading, refetchState } = useApportionmentContext();
+  const { state, error, isLoading, refetch } = useApportionmentContext();
   const [apiError, setApiError] = useState<AnyApiError>();
   const [radioError, setRadioError] = useState(false);
   const client = useApiClient();
@@ -106,7 +106,7 @@ export function IncludeAllCandidatesPage() {
     const response: ApiResult<ApportionmentState> = await client.postRequest(path);
 
     if (isSuccess(response)) {
-      void refetchState();
+      void refetch();
     } else {
       setApiError(response);
     }

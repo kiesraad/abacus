@@ -114,11 +114,19 @@ server (leaf) certificate is created in memory on every start, signed by the CA
 and covering `localhost`, `abacus.local`, and all routable LAN addresses.
 
 To trust the server, import the CA into the client trust store: `ca.pem` on
-Linux/macOS/Firefox, `ca.cer` (DER) on Windows.
+Linux/macOS/Firefox, `ca.cer` (DER) on Windows. The CA can be downloaded from the
+running server at `/ca.pem` and `/ca.cer`.
 
 With the `tls` feature enabled, the default port is 8443 in debug builds and 443
 in release builds. Binding to 443 requires elevated privileges (e.g. the
 `CAP_NET_BIND_SERVICE` capability on Linux).
+
+Alongside the HTTPS port, Abacus runs a plain HTTP server that provides the CA
+certificate at `/ca.pem` and `/ca.cer` over plain HTTP (so clients can fetch it
+before trusting the server) and redirects every other request to HTTPS. Its port
+is set by `--http-port` / `ABACUS_HTTP_PORT`, defaulting to 80 in release builds
+and 8080 in debug builds. The CA is served over HTTPS as well. Failing to bind the
+HTTP port (for example without the required privileges) is logged but not fatal.
 
 #### Building with TLS enabled on Windows
 
@@ -250,12 +258,13 @@ The abacus binary supports a few arguments, which can be passed on the command l
 
 ```
 Options:
-  -p, --port <PORT>          Server port, optional [env: ABACUS_PORT=] [default: 8080]
-  -d, --database <DATABASE>  Location of the database file, will be created if it doesn't exist [env: ABACUS_DATABASE=] [default: db.sqlite]
-      --tls-dir <TLS_DIR>    Location of the TLS directory (CA certificate and key), will be created if it doesn't exist [env: ABACUS_TLS_DIR=] [default: tls]
-  -a, --airgap-detection     Enable airgap detection [env: ABACUS_AIRGAP_DETECTION=]
-  -V, --version              Show version
-  -h, --help                 Print help
+  -p, --port <PORT>            Server port, optional [env: ABACUS_PORT=] [default: 8443]
+  -d, --database <DATABASE>    Location of the database file, will be created if it doesn't exist [env: ABACUS_DATABASE=] [default: db.sqlite]
+      --tls-dir <TLS_DIR>      Location of the TLS directory (CA certificate and key), will be created if it doesn't exist [env: ABACUS_TLS_DIR=] [default: tls]
+      --http-port <HTTP_PORT>  Port for the plain HTTP server that serves the CA certificate and redirects to HTTPS [env: ABACUS_HTTP_PORT=] [default: 8080]
+  -a, --airgap-detection       Enable airgap detection [env: ABACUS_AIRGAP_DETECTION=]
+  -V, --version                Show version
+  -h, --help                   Print help
 ```
 
 Note that airgap-detection is forced in our (pre-)releases.

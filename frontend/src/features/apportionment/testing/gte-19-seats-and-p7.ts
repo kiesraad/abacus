@@ -3,71 +3,79 @@ import type {
   CommitteeSession,
   ElectionSummary,
   ElectionWithPoliticalGroups,
+  HighestAverageResidualSeatDrawingLots,
   SeatAssignment,
 } from "@/types/generated/openapi";
+
+export const options = [2, 3, 4, 5, 6];
+export const drawing_lots_required: HighestAverageResidualSeatDrawingLots & {
+  variant: "HighestAverageResidualSeat";
+} = {
+  variant: "HighestAverageResidualSeat",
+  max_average: {
+    integer: 46,
+    numerator: 2,
+    denominator: 3,
+  },
+  residual_seat_numbers: [2, 3, 4],
+  options,
+  list_averages: [
+    {
+      pg_number: 1,
+      average: {
+        integer: 45,
+        numerator: 5,
+        denominator: 11,
+      },
+    },
+    {
+      pg_number: 2,
+      average: {
+        integer: 46,
+        numerator: 2,
+        denominator: 3,
+      },
+    },
+    {
+      pg_number: 3,
+      average: {
+        integer: 46,
+        numerator: 2,
+        denominator: 3,
+      },
+    },
+    {
+      pg_number: 4,
+      average: {
+        integer: 46,
+        numerator: 2,
+        denominator: 3,
+      },
+    },
+    {
+      pg_number: 5,
+      average: {
+        integer: 46,
+        numerator: 2,
+        denominator: 3,
+      },
+    },
+    {
+      pg_number: 6,
+      average: {
+        integer: 46,
+        numerator: 2,
+        denominator: 3,
+      },
+    },
+  ],
+};
 
 export const state: ApportionmentState = {
   type: "DrawingLots",
   drawing_lots_required: {
     type: "ListDrawingLotsRequired",
-    variant: "HighestAverageResidualSeat",
-    max_average: {
-      integer: 46,
-      numerator: 2,
-      denominator: 3,
-    },
-    residual_seat_numbers: [2, 3, 4],
-    options: [2, 3, 4, 5, 6],
-    list_averages: [
-      {
-        pg_number: 1,
-        average: {
-          integer: 45,
-          numerator: 5,
-          denominator: 11,
-        },
-      },
-      {
-        pg_number: 2,
-        average: {
-          integer: 46,
-          numerator: 2,
-          denominator: 3,
-        },
-      },
-      {
-        pg_number: 3,
-        average: {
-          integer: 46,
-          numerator: 2,
-          denominator: 3,
-        },
-      },
-      {
-        pg_number: 4,
-        average: {
-          integer: 46,
-          numerator: 2,
-          denominator: 3,
-        },
-      },
-      {
-        pg_number: 5,
-        average: {
-          integer: 46,
-          numerator: 2,
-          denominator: 3,
-        },
-      },
-      {
-        pg_number: 6,
-        average: {
-          integer: 46,
-          numerator: 2,
-          denominator: 3,
-        },
-      },
-    ],
+    ...drawing_lots_required,
   },
   deceased_candidates: [],
   lists_drawn: [],

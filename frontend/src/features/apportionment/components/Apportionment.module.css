@@ -174,3 +174,8 @@ table.highestAveragesTable {
   display: flex;
   gap: 1rem;
 }
+
+/* Styling for drawing lots pages */
+.drawingLotsList {
+  margin: 0;
+}

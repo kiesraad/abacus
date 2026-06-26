@@ -31,6 +31,7 @@ function getPageTitle(state: ApportionmentState) {
   return t("apportionment.drawing_lots");
 }
 
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO: Refactor when adding other variants
 export function DrawingLotsPage() {
   const navigate = useNavigate();
   const { election } = useElection();
@@ -95,7 +96,11 @@ export function DrawingLotsPage() {
                 <FormLayout.Section>
                   <div>
                     <h2>{t("apportionment.drawing_lots_necessary")}</h2>
-                    <DrawingLotsForList state={state} />
+                    {state.drawing_lots_required.type === "ListDrawingLotsRequired" &&
+                      (state.drawing_lots_required.variant === "HighestAverageResidualSeat" ||
+                        state.drawing_lots_required.variant === "LargestRemainderResidualSeat") && (
+                        <DrawingLotsForList drawingLotsRequired={state.drawing_lots_required} options={options} />
+                      )}
                   </div>
                 </FormLayout.Section>
                 <FormLayout.Section>

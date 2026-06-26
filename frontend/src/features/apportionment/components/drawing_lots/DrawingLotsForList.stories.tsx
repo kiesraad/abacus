@@ -5,7 +5,12 @@ import { DrawingLotsForList } from "./DrawingLotsForList";
 
 export const Default: StoryObj = {
   render: () => {
-    return <DrawingLotsForList state={gte19SeatsAndP7.state} />;
+    return (
+      <DrawingLotsForList
+        drawingLotsRequired={gte19SeatsAndP7.drawing_lots_required}
+        options={gte19SeatsAndP7.election.political_groups.filter((pg) => gte19SeatsAndP7.options.includes(pg.number))}
+      />
+    );
   },
   play: async ({ canvas }) => {
     const list = canvas.getByRole("list");

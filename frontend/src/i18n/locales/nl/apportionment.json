@@ -16,6 +16,22 @@
   "data_entry_finished": "Invoerfase afgerond",
   "details_residual_seats_allocation": "Details restzetelverdeling",
   "drawing_lots": "Loting",
+  "drawing_lots_for_list": {
+    "hence_drawing_lots_is_needed": "Daarom moet er geloot worden welke lijst de restzetel krijgt",
+    "list_gets_the_seat_with": {
+      "highest_average": "De partij met het hoogste gemiddeld aantal stemmen na het toewijzen van de restzetel krijgt de restzetel",
+      "largest_remainder": "De partij met het grootste overschot aan stemmen krijgt de restzetel"
+    },
+    "draw_lots_for_lists_with_same": {
+      "highest_average": "<strong>{lists}</strong> krijgen samen het hoogste gemiddeld aantal stemmen per zetel ({value} stemmen)",
+      "largest_remainder": "<strong>{lists}</strong> hebben samen het grootste overschot ({value} stemmen)"
+    },
+    "residual_seats_to_assign": {
+      "singular": "Er is {nr} restzetel te verdelen",
+      "plural": "Er zijn {nr} restzetels te verdelen"
+    },
+    "seat_cannot_be_assigned_automatically": "Restzetel {nr} kan niet automatisch worden toegewezen"
+  },
   "drawing_lots_for_seat": "Loting voor restzetel {number}",
   "drawing_lots_instructions": {
     "title": "Instructies voor loting",

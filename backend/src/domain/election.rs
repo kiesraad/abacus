@@ -364,7 +364,7 @@ pub(crate) mod tests {
             name: "Test".to_string(),
             committee_category,
             counting_method: Some(VoteCountingMethod::CSO),
-            election_id: "Test_2023".to_string(),
+            election_id: "GR2023_Test".to_string(),
             location: "Test".to_string(),
             domain_id: "0000".to_string(),
             category: ElectionCategory::Municipal,

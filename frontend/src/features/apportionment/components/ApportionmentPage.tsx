@@ -202,7 +202,7 @@ function ApportionmentTableSection({
           {state.type === "DrawingLots" ? t("apportionment.preliminary_result") : t("apportionment.title")}
         </h2>
         {notAssignedSeats > 0 && (
-          <div className={cn(cls.notAssignedSeatsAlert, "mb-md-lg")}>
+          <div className={cn(cls.smallNotAssignedSeatsAlert, "mb-md-lg")}>
             {renderNotAssignedSeatsAlert(notAssignedSeats, "./details-residual-seats", t("apportionment.view_details"))}
           </div>
         )}

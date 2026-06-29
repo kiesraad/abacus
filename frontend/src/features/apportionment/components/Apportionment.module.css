@@ -162,11 +162,17 @@ table.highestAveragesTable {
   }
 }
 
-.notAssignedSeatsAlert {
+/* Styling for the drawing lots alerts */
+.smallNotAssignedSeatsAlert {
   div:global(.small) {
     max-width: 52rem;
     width: 100%;
   }
+}
+
+.notAssignedSeatsAlert {
+  overflow: hidden;
+  margin: -2.5rem -5rem 0.5rem -5rem;
 }
 
 /* Styling for the apportionment finalised alert buttons */

@@ -370,6 +370,7 @@ export const seat_assignment: SeatAssignment = {
 };
 
 export const election_summary: ElectionSummary = {
+  number_of_voters: 2272,
   voters_counts: {
     poll_card_count: 1200,
     proxy_certificate_count: 0,
@@ -2080,7 +2081,6 @@ export const election_summary: ElectionSummary = {
     investigated_other_reason: [],
     ballots_recounted: [],
   },
-  number_of_voters: 1,
 };
 
 export const committee_session: CommitteeSession = {

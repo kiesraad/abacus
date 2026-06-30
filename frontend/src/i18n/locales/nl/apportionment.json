@@ -40,7 +40,10 @@
   "drawing_lots_necessary": "Loting noodzakelijk",
   "drawing_lots_needed": "Loting nodig",
   "drawing_lots_required_alert": {
-    "title": "Loting noodzakelijk voor toekennen restzetel",
+    "title": {
+      "singular": "Loting noodzakelijk voor toekennen restzetel",
+      "plural": "Loting noodzakelijk voor toekennen restzetels"
+    },
     "description": "Er is een restzetel te verdelen. In de wet staat dat de partij met het grootste {variant} stemmen per toegewezen zetel deze krijgt.",
     "drawing_lots_needed": "Hierdoor kan de restzetel niet automatisch worden toegewezen. Het centraal stembureau moet een loting uitvoeren om de restzetel toe te wijzen.",
     "same_averages": "Er zijn meerdere partijen die na het toewijzen van de volgende restzetel precies hetzelfde hoogste gemiddelde krijgen.",

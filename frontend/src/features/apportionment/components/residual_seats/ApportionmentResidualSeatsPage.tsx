@@ -240,7 +240,6 @@ function SmallCouncilSection({
   );
 }
 
-// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO: Is there any way to make this shorter?
 export function ApportionmentResidualSeatsPage() {
   const navigate = useNavigate();
   const { election } = useElection();
@@ -254,22 +253,18 @@ export function ApportionmentResidualSeatsPage() {
     return <ApportionmentErrorPage sectionTitle={t("apportionment.allocation_of_residual_seats")} error={error} />;
   }
   if (seatAssignment && state) {
-    const { largestRemainderSteps, uniqueHighestAverageSteps, highestAverageSteps, absoluteMajorityReassignment } =
+    const { largestRemainderSteps, uniqueHighestAverageSteps, highestAverageSteps, absoluteMajorityStep } =
       getAssignmentSteps(seatAssignment);
-    const { residualSeatRemovalSteps, uniquePgNumbersWithFullSeatsRemoved } = getRemovalSteps(seatAssignment);
+    const { residualSeatRemovalSteps, listsWithFullSeatsRemoved } = getRemovalSteps(seatAssignment);
 
-    const resultChanges = getResultChanges(
-      uniquePgNumbersWithFullSeatsRemoved,
-      absoluteMajorityReassignment,
-      residualSeatRemovalSteps,
-    );
+    const resultChanges = getResultChanges(listsWithFullSeatsRemoved, absoluteMajorityStep, residualSeatRemovalSteps);
 
     function renderFootnotes(): ReactElement {
       return (
         <Footnotes
-          uniquePgNumbersWithFullSeatsRemoved={uniquePgNumbersWithFullSeatsRemoved}
+          listsWithFullSeatsRemoved={listsWithFullSeatsRemoved}
           seatAssignment={seatAssignment}
-          absoluteMajorityReassignment={absoluteMajorityReassignment}
+          absoluteMajorityStep={absoluteMajorityStep}
           residualSeatRemovalSteps={residualSeatRemovalSteps}
         />
       );

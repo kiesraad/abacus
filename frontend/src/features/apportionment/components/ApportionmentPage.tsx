@@ -97,8 +97,10 @@ function renderHighestAverageOrLargestRemainderDrawingLotsAlert(
     <FormLayout.Alert>
       <Alert type="warning">
         <strong className="heading-md">
-          {t("apportionment.drawing_lots_required_alert.title")}
-          {residualSeatNumbers.length > 1 && "s"} {formatList(residualSeatNumbers, t("and"))}
+          {t(
+            `apportionment.drawing_lots_required_alert.title.${residualSeatNumbers.length === 1 ? "singular" : "plural"}`,
+          )}{" "}
+          {formatList(residualSeatNumbers, t("and"))}
         </strong>
         <p>
           {t("apportionment.drawing_lots_required_alert.description", {

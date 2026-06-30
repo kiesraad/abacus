@@ -274,16 +274,14 @@ fn preferential_candidate_nomination<'a, LV: ListVotes>(
         Item = &'a (impl CandidateDrawn<ListNumber<LV>, CandidateNumber<LV>> + 'a),
     >,
 ) -> Result<PreferentialCandidateNomination<'a, LV>, ApportionmentError> {
-    if candidates.len() <= total_seats as usize {
-        // All candidates can be nominated
-        return Ok(PreferentialCandidateNomination::Completed(
-            candidates.to_vec(),
-        ));
-    }
-
     // Loop over all seats one by one, keeping track of how many seats are remaining
     let mut nomination: Vec<&LV::Cv> = vec![];
     for (index, seats_remaining) in (1..=total_seats).rev().enumerate() {
+        // If there are no more candidates to nominate, break the loop
+        if index >= candidates.len() {
+            break;
+        }
+
         // Get all candidates with the same number of votes, that have not been nominated yet
         let same_votes_candidates_remaining: Vec<&LV::Cv> = candidates
             .iter()
@@ -291,9 +289,10 @@ fn preferential_candidate_nomination<'a, LV: ListVotes>(
             .filter(|cv| !nomination.contains(cv) && cv.votes() == candidates[index].votes())
             .collect();
 
-        // Check if we can nominate all these candidates, else we draw lots
-        if same_votes_candidates_remaining.len() <= seats_remaining as usize {
-            nomination.push(candidates[index]);
+        // If there is only candidate with this number of votes, nominate that candidate. Otherwise, a drawing of lots is required,
+        // even if there are enough seats remaining for all candidates with the same number of votes
+        if same_votes_candidates_remaining.len() == 1 {
+            nomination.push(same_votes_candidates_remaining[0]);
         } else {
             let options = candidate_votes_numbers(&same_votes_candidates_remaining);
             info!(
@@ -1022,11 +1021,11 @@ mod tests {
         let seat_assignment_input = seat_assignment_fixture_with_given_candidate_votes(
             19,
             vec![
-                vec![500, 0, 500, 500, 500, 500, 500],
-                vec![400, 400, 0, 400, 400, 400, 399],
-                vec![300, 300, 300, 0, 300, 299, 298],
-                vec![200, 200, 199, 198, 0, 197, 196],
-                vec![200, 200, 199, 198, 198, 0, 119],
+                vec![515, 0, 499, 498, 497, 496, 495],
+                vec![415, 399, 0, 398, 397, 396, 395],
+                vec![315, 299, 298, 0, 297, 296, 295],
+                vec![215, 199, 198, 197, 0, 196, 195],
+                vec![215, 199, 198, 197, 196, 0, 119],
             ],
         );
         let input = candidate_nomination_fixture_with_given_number_of_seats(
@@ -1034,6 +1033,7 @@ mod tests {
             &seat_assignment_input,
             vec![6, 5, 4, 2, 2],
         );
+
         let Ok(CandidateNomination::Completed(result)) =
             candidate_nomination(&input, &mut iter::empty::<&CandidateDrawnMock>())
         else {
@@ -1199,7 +1199,7 @@ mod tests {
         let seat_assignment_input = seat_assignment_fixture_with_given_candidate_votes(
             19,
             vec![
-                vec![500, 500, 500, 500, 500, 500],
+                vec![515, 499, 498, 497, 496, 495],
                 vec![500, 400, 400, 400, 400, 400],
             ],
         );
@@ -1266,12 +1266,12 @@ mod tests {
                     list_number: 1,
                     list_seats: 6,
                     preferential_candidate_nomination: vec![
-                        &CandidateVotesMock(1, 500),
-                        &CandidateVotesMock(2, 500),
-                        &CandidateVotesMock(3, 500),
-                        &CandidateVotesMock(4, 500),
-                        &CandidateVotesMock(5, 500),
-                        &CandidateVotesMock(6, 500),
+                        &CandidateVotesMock(1, 515),
+                        &CandidateVotesMock(2, 499),
+                        &CandidateVotesMock(3, 498),
+                        &CandidateVotesMock(4, 497),
+                        &CandidateVotesMock(5, 496),
+                        &CandidateVotesMock(6, 495),
                     ],
                     other_candidate_nomination: Vec::new(),
                     updated_candidate_ranking: Vec::new()
@@ -1317,7 +1317,7 @@ mod tests {
                 expected_nominations: vec![1, 3],
             },
             Case {
-                name: "first two candidates nominated with drawing lots",
+                name: "drawing of lots for candidates with same votes (not enough seats)",
                 candidates: vec![(1, 1000), (3, 900), (4, 900)],
                 total_seats: 2,
                 candidates_drawn: vec![CandidateDrawnMock {
@@ -1328,6 +1328,19 @@ mod tests {
                     drawn: 4,
                 }],
                 expected_nominations: vec![1, 4],
+            },
+            Case {
+                name: "drawing of lots for candidates with same votes (enough seats, should still draw)",
+                candidates: vec![(1, 1000), (3, 1000), (4, 900)],
+                total_seats: 2,
+                candidates_drawn: vec![CandidateDrawnMock {
+                    variant: CandidateDrawingLotsVariant {
+                        list: 1,
+                        options: vec![1, 3],
+                    },
+                    drawn: 3,
+                }],
+                expected_nominations: vec![3, 1],
             },
             Case {
                 name: "first three candidates nominated with drawing lots twice",
@@ -1352,11 +1365,40 @@ mod tests {
                 expected_nominations: vec![1, 4, 3],
             },
             Case {
-                name: "no need for drawing of lots if all candidates can be nominated",
-                candidates: vec![(1, 1000), (3, 900), (4, 900), (5, 900)],
+                name: "all candidates can be nominated and have different votes, no drawing of lots",
+                candidates: vec![(1, 1000), (3, 900), (4, 800), (5, 700)],
                 total_seats: 4,
                 candidates_drawn: vec![],
                 expected_nominations: vec![1, 3, 4, 5],
+            },
+            Case {
+                name: "all candidates can be nominated and have equal votes, drawing of lots is required",
+                candidates: vec![(1, 1000), (3, 1000), (4, 1000), (5, 1000)],
+                total_seats: 4,
+                candidates_drawn: vec![
+                    CandidateDrawnMock {
+                        variant: CandidateDrawingLotsVariant {
+                            list: 1,
+                            options: vec![1, 3, 4, 5],
+                        },
+                        drawn: 1,
+                    },
+                    CandidateDrawnMock {
+                        variant: CandidateDrawingLotsVariant {
+                            list: 1,
+                            options: vec![3, 4, 5],
+                        },
+                        drawn: 5,
+                    },
+                    CandidateDrawnMock {
+                        variant: CandidateDrawingLotsVariant {
+                            list: 1,
+                            options: vec![3, 4],
+                        },
+                        drawn: 3,
+                    },
+                ],
+                expected_nominations: vec![1, 5, 3, 4],
             },
         ];
 

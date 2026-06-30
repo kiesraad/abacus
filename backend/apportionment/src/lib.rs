@@ -16,7 +16,10 @@ use self::{
     seat_assignment::{as_candidate_nomination_input, seat_assignment},
 };
 pub use self::{
-    candidate_nomination::{CandidateNomination, CandidateNominationDetails, PreferenceThreshold},
+    candidate_nomination::{
+        Candidate, CandidateNomination, CandidateNominationDetails, ListCandidateNomination,
+        PreferenceThreshold,
+    },
     fraction::Fraction,
     seat_assignment::{
         ApportionmentWarning, HighestAverageAssignedSeat, SeatAssignment, SeatAssignmentDetails,

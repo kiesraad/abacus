@@ -743,7 +743,6 @@ impl ElectionWithPoliticalGroups {
                             ),
                         )
                         .elected(YesNoType::new(true))
-                        .ranking(RankingType::First)
                         .build()?,
                 );
 
@@ -937,13 +936,13 @@ pub fn polling_stations_eml_matches_election(
 
 #[cfg(test)]
 mod tests {
-    use apportionment::ApportionmentOutput;
+    use apportionment::Fraction;
     use eml_nl::utils::StringValue;
 
     use super::*;
-    use crate::{
-        api::apportionment::ApportionmentInputData,
-        domain::{committee_session::committee_session_fixture, election::tests::election_fixture},
+    use crate::domain::{
+        committee_session::committee_session_fixture, election::tests::election_fixture,
+        results::political_group_candidate_votes::CandidateVotes,
     };
 
     #[test]
@@ -1028,27 +1027,31 @@ mod tests {
 
     #[test]
     fn test_as_eml_result() {
-        let election = election_fixture(CommitteeCategory::CSB, &[0]);
-        let summary = ElectionSummary::from_results(&election, &[]).unwrap();
-        let apportionment_input = ApportionmentInputData::new(
-            election.number_of_seats,
-            &summary.political_group_votes,
-            &[],
-            &[],
-            &[],
-        );
-        let ApportionmentOutput::Completed(apportionment_output) =
-            apportionment::process(&apportionment_input).unwrap()
-        else {
-            panic!("Apportionment should be completed");
+        let election = election_fixture(CommitteeCategory::CSB, &[2]);
+        let cv1 = CandidateVotes {
+            number: CandidateNumber::from(1),
+            votes: 1000,
+        };
+        let details = CandidateNominationDetails {
+            preference_threshold: apportionment::PreferenceThreshold {
+                percentage: 25,
+                number_of_votes: Fraction::new(1000, 1),
+            },
+            chosen_candidates: vec![apportionment::Candidate {
+                list_number: PGNumber::from(1),
+                candidate_number: CandidateNumber::from(1),
+            }],
+            list_candidate_nomination: vec![apportionment::ListCandidateNomination {
+                list_number: PGNumber::from(1),
+                list_seats: 1,
+                preferential_candidate_nomination: vec![&cv1],
+                other_candidate_nomination: vec![],
+                updated_candidate_ranking: vec![CandidateNumber::from(1)],
+            }],
         };
 
         let eml_result = election
-            .as_result_eml(
-                None,
-                chrono::Utc::now(),
-                &apportionment_output.candidate_nomination,
-            )
+            .as_result_eml(None, chrono::Utc::now(), &details)
             .unwrap();
         assert_eq!(
             eml_result
@@ -1059,6 +1062,21 @@ mod tests {
                 .unwrap()
                 .value(),
             "CSB"
+        );
+
+        // check that the first selection (i.e. first affiliation) has no ranking
+        assert!(
+            eml_result
+                .result
+                .election
+                .contests
+                .first()
+                .unwrap()
+                .selections
+                .first()
+                .unwrap()
+                .ranking
+                .is_none()
         );
     }
 

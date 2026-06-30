@@ -402,9 +402,9 @@ Na toewijzing van de volle zetels blijft een aantal te verdelen zetels over. Dit
     #if initial_highest_average_steps.len() > 0 [
       #v(8pt)
       #if initial_highest_average_steps.len() == 1 {
-        [Hierna was er nog #initial_highest_average_steps.len() restzetel te verdelen. Deze zetel is toegewezen aan de lijst die met een zetel erbij het grootste gemiddelde aantal stemmen per zetel zou hebben.]
+        [Nadat de restzetels zijn verdeeld via het systeem van de grootste gemiddelden, is er nog #initial_highest_average_steps.len() zetel te verdelen. Deze zetel wordt nogmaals verdeeld via het systeem van de grootste gemiddelden, met dien verstande dat de bepaling dat aan iedere lijst maar eenmaal een zetel mag worden toegekend buiten beschouwing wordt gelaten.]
       } else {
-        [Hierna waren er nog #initial_highest_average_steps.len() restzetels te verdelen. Deze zetels zijn toegewezen aan de lijsten die met een zetel erbij het grootste gemiddelde aantal stemmen per zetel zouden hebben.]
+        [Nadat de restzetels zijn verdeeld via het systeem van de grootste gemiddelden, zijn er nog #initial_highest_average_steps.len() zetels te verdelen. Deze zetels worden nogmaals verdeeld via het systeem van de grootste gemiddelden, met dien verstande dat de bepaling dat aan iedere lijst maar eenmaal een zetel mag worden toegekend buiten beschouwing wordt gelaten.]
       }
       #highest_averages_table(initial_highest_average_steps, input.seat_assignment.list_seat_assignment)
     ]

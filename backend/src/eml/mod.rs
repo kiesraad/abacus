@@ -519,7 +519,7 @@ impl ElectionWithPoliticalGroups {
         ElectionCount::builder()
             .transaction_id(transaction_id.unwrap_or(1))
             .managing_authority(ManagingAuthority::new(
-                AuthorityIdentifier::new(AuthorityId::new(&self.domain_id)?)
+                AuthorityIdentifier::new(self.output_eml_authority_id()?)
                     .with_name(self.location.clone()),
             ))
             .creation_date_time(timestamp)
@@ -593,6 +593,13 @@ impl ElectionWithPoliticalGroups {
         };
 
         builder.build()
+    }
+
+    fn output_eml_authority_id(&self) -> Result<AuthorityId, EMLError> {
+        match self.committee_category {
+            CommitteeCategory::GSB => AuthorityId::new(&self.domain_id),
+            CommitteeCategory::CSB => AuthorityId::new("CSB"),
+        }
     }
 
     /// Depending on the context of the summary coming from GSB or from CSB, the number of voters source is different.
@@ -695,10 +702,15 @@ impl ElectionWithPoliticalGroups {
         timestamp: DateTime<Utc>,
         nominations: &CandidateNominationDetails<PoliticalGroupCandidateVotes>,
     ) -> Result<ElectionResult, EMLError> {
+        if self.committee_category != CommitteeCategory::CSB {
+            return Err(EMLError::custom(
+                "ElectionResult EML is only supported for CSB elections",
+            ));
+        }
         ElectionResult::builder()
             .transaction_id(transaction_id.unwrap_or(1))
             .managing_authority(ManagingAuthority::new(
-                AuthorityIdentifier::new(AuthorityId::new(&self.domain_id)?)
+                AuthorityIdentifier::new(self.output_eml_authority_id()?)
                     .with_name(self.location.clone()),
             ))
             .creation_date_time(timestamp)
@@ -925,11 +937,13 @@ pub fn polling_stations_eml_matches_election(
 
 #[cfg(test)]
 mod tests {
+    use apportionment::ApportionmentOutput;
     use eml_nl::utils::StringValue;
 
     use super::*;
-    use crate::domain::{
-        committee_session::committee_session_fixture, election::tests::election_fixture,
+    use crate::{
+        api::apportionment::ApportionmentInputData,
+        domain::{committee_session::committee_session_fixture, election::tests::election_fixture},
     };
 
     #[test]
@@ -956,6 +970,96 @@ mod tests {
         let res = NewElection::from_eml_str(data).unwrap_err();
         dbg!(&res);
         assert!(matches!(res, EMLImportError::OnlyMunicipalSupported));
+    }
+
+    #[test]
+    fn test_as_count_eml_csb() {
+        let election = election_fixture(CommitteeCategory::CSB, &[0]);
+        let committee_session = committee_session_fixture(election.id);
+        let summary = ElectionSummary::from_results(&election, &[]).unwrap();
+
+        let eml_count = election
+            .as_count_eml(
+                None,
+                &committee_session,
+                &[],
+                &summary,
+                chrono::Local::now(),
+            )
+            .unwrap();
+        assert_eq!(
+            eml_count
+                .managing_authority
+                .authority_identifier
+                .id
+                .cloned_value()
+                .unwrap()
+                .value(),
+            "CSB"
+        );
+    }
+
+    #[test]
+    fn test_as_count_eml_gsb() {
+        let election = election_fixture(CommitteeCategory::GSB, &[0]);
+        let committee_session = committee_session_fixture(election.id);
+        let summary = ElectionSummary::from_results(&election, &[]).unwrap();
+
+        let eml_count = election
+            .as_count_eml(
+                None,
+                &committee_session,
+                &[],
+                &summary,
+                chrono::Local::now(),
+            )
+            .unwrap();
+        assert_eq!(
+            eml_count
+                .managing_authority
+                .authority_identifier
+                .id
+                .cloned_value()
+                .unwrap()
+                .value(),
+            "0000"
+        );
+    }
+
+    #[test]
+    fn test_as_eml_result() {
+        let election = election_fixture(CommitteeCategory::CSB, &[0]);
+        let summary = ElectionSummary::from_results(&election, &[]).unwrap();
+        let apportionment_input = ApportionmentInputData::new(
+            election.number_of_seats,
+            &summary.political_group_votes,
+            &[],
+            &[],
+            &[],
+        );
+        let ApportionmentOutput::Completed(apportionment_output) =
+            apportionment::process(&apportionment_input).unwrap()
+        else {
+            panic!("Apportionment should be completed");
+        };
+
+        let eml_result = election
+            .as_result_eml(
+                None,
+                chrono::Utc::now(),
+                &apportionment_output.candidate_nomination,
+            )
+            .unwrap();
+        assert_eq!(
+            eml_result
+                .managing_authority
+                .authority_identifier
+                .id
+                .cloned_value()
+                .unwrap()
+                .value(),
+            "CSB"
+        );
     }
 
     #[test]

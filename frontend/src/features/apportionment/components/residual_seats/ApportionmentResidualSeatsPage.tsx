@@ -73,7 +73,7 @@ function LargeCouncilSection({
         {renderInformation(seatAssignment.seats, seatAssignment.residual_seats)}
         <h3 className={cls.tableTitle}>{t("apportionment.averages_per_list")}:</h3>
         {notAssignedSeats > 0 && (
-          <div className={cn(cls.smallNotAssignedSeatsAlert, "mb-md-lg")}>
+          <div className={cn(cls.smallAlert, "mb-md-lg")}>
             {renderNotAssignedSeatsAlert(notAssignedSeats, "../drawing-lots", t("apportionment.go_to_drawing_lots"))}
           </div>
         )}

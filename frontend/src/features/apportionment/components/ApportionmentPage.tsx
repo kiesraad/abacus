@@ -184,17 +184,12 @@ function ElectionSummaryTableSection({
 
 interface ApportionmentTableSectionProps {
   state: ApportionmentState;
-  notAssignedSeats: number;
   seatAssignment: SeatAssignment;
   election: ElectionWithPoliticalGroups;
 }
 
-function ApportionmentTableSection({
-  state,
-  notAssignedSeats,
-  seatAssignment,
-  election,
-}: ApportionmentTableSectionProps) {
+function ApportionmentTableSection({ state, seatAssignment, election }: ApportionmentTableSectionProps) {
+  const notAssignedSeats = getNotAssignedSeats(state);
   return (
     <div className={cn(cls.tableDiv, "mb-lg")}>
       <div>
@@ -202,7 +197,7 @@ function ApportionmentTableSection({
           {state.type === "DrawingLots" ? t("apportionment.preliminary_result") : t("apportionment.title")}
         </h2>
         {notAssignedSeats > 0 && (
-          <div className={cn(cls.smallNotAssignedSeatsAlert, "mb-md-lg")}>
+          <div className={cn(cls.smallAlert, "mb-md-lg")}>
             {renderNotAssignedSeatsAlert(notAssignedSeats, "./details-residual-seats", t("apportionment.view_details"))}
           </div>
         )}
@@ -232,7 +227,6 @@ function ChosenCandidatesTableSection({ chosenCandidates }: { chosenCandidates: 
   );
 }
 
-// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO: Is there any way to make this shorter?
 export function ApportionmentPage() {
   const navigate = useNavigate();
   const { currentCommitteeSession, election } = useElection();
@@ -251,7 +245,6 @@ export function ApportionmentPage() {
 
   const renderTables =
     electionSummary && seatAssignment && (state?.type === "DrawingLots" || state?.type === "Finalised");
-  const notAssignedSeats = getNotAssignedSeats(state);
 
   async function handleResetApportionmentState() {
     const path: RESET_APPORTIONMENT_STATE_REQUEST_PATH = `/api/elections/${election.id}/apportionment/reset`;
@@ -295,12 +288,7 @@ export function ApportionmentPage() {
                   preferenceThreshold={candidateNomination?.preference_threshold}
                   numberOfDeceasedCandidates={state.deceased_candidates.length}
                 />
-                <ApportionmentTableSection
-                  state={state}
-                  notAssignedSeats={notAssignedSeats}
-                  seatAssignment={seatAssignment}
-                  election={election}
-                />
+                <ApportionmentTableSection state={state} seatAssignment={seatAssignment} election={election} />
                 {candidateNomination?.chosen_candidates && (
                   <ChosenCandidatesTableSection chosenCandidates={candidateNomination.chosen_candidates} />
                 )}

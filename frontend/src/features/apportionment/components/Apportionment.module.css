@@ -163,7 +163,7 @@ table.highestAveragesTable {
 }
 
 /* Styling for the drawing lots alerts */
-.smallNotAssignedSeatsAlert {
+.smallAlert {
   div:global(.small) {
     max-width: 52rem;
     width: 100%;

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { type ReactElement, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { type AnyApiError, type ApiResult, isSuccess } from "@/api/ApiResult";
 import { useApiClient } from "@/api/useApiClient";
@@ -23,6 +23,7 @@ import { formatList } from "@/utils/strings";
 import { useApportionmentContext } from "../hooks/useApportionmentContext";
 import {
   apportionmentCheckStateAndRedirect,
+  getAssignedByDrawingLotsStepAlertText,
   getNotAssignedSeats,
   isListDrawingLotsVariant,
   renderNotAssignedSeatsAlert,
@@ -193,6 +194,13 @@ interface ApportionmentTableSectionProps {
 
 function ApportionmentTableSection({ state, seatAssignment, election }: ApportionmentTableSectionProps) {
   const notAssignedSeats = getNotAssignedSeats(state);
+  const assignedByDrawingLotsAlertTexts: ReactElement[] = [];
+  seatAssignment.steps.forEach((step) => {
+    const text = getAssignedByDrawingLotsStepAlertText(step, election.political_groups);
+    if (text !== undefined) {
+      assignedByDrawingLotsAlertTexts.push(text);
+    }
+  });
   return (
     <div className={cn(cls.tableDiv, "mb-lg")}>
       <div>
@@ -202,6 +210,19 @@ function ApportionmentTableSection({ state, seatAssignment, election }: Apportio
         {notAssignedSeats > 0 && (
           <div className={cn(cls.smallAlert, "mb-md-lg")}>
             {renderNotAssignedSeatsAlert(notAssignedSeats, "./details-residual-seats", t("apportionment.view_details"))}
+          </div>
+        )}
+        {assignedByDrawingLotsAlertTexts.length > 0 && (
+          <div className={cn(cls.smallAlert, "mb-md-lg")}>
+            {
+              <Alert type="notify" small>
+                <p>
+                  {assignedByDrawingLotsAlertTexts.map((text, index) => (
+                    <span key={`drawing-lots-assignment-${index + 1}`}>{text}</span>
+                  ))}
+                </p>
+              </Alert>
+            }
           </div>
         )}
         <ApportionmentTable

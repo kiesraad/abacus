@@ -167,6 +167,7 @@ table.highestAveragesTable {
   div:global(.small) {
     max-width: 52rem;
     width: 100%;
+    align-items: flex-start;
   }
 }
 

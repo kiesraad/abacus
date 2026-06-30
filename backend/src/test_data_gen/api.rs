@@ -39,40 +39,43 @@ async fn generate_election_handler(
 }
 
 async fn generate_p22_2_variants(args: &GenerateElectionArgs, pool: &SqlitePool) {
-    // 1. Test Election >= 19 seats
-    //    based on test `gte_19_seats::test_with_remainder_seats`
+    let mut args = args.clone();
+
+    // based on test `gte_19_seats::test_with_remainder_seats`
+    args.custom_name = Some("Election >= 19 seats".to_string());
     let _ = create_test_election_with_votes(
-        args,
+        &args,
         pool,
         23,
         default_50_candidates(&[600, 302, 98, 99, 101]),
     )
     .await;
 
-    // 2. Test Election >= 19 seats & Absolute Majority Change
-    //    based on test `gte_19_seats::test_with_absolute_majority_of_votes_but_not_seats`
+    // based on test `gte_19_seats::test_with_absolute_majority_of_votes_but_not_seats`
+    args.custom_name = Some("Election >= 19 seats & Absolute Majority Change".to_string());
     let _ = create_test_election_with_votes(
-        args,
+        &args,
         pool,
         24,
         default_50_candidates(&[7501, 1249, 1249, 1249, 1249, 1249, 1248, 7]),
     )
     .await;
 
-    // 3. Test Election < 19 seats
-    //    based on test `lt_19_seats::test_with_1_list_that_meets_threshold`
+    // based on test `lt_19_seats::test_with_1_list_that_meets_threshold`
+    args.custom_name = Some("Election < 19 seats".to_string());
     let _ = create_test_election_with_votes(
-        args,
+        &args,
         pool,
         15,
         default_50_candidates(&[808, 59, 58, 57, 56, 55, 54, 53]),
     )
     .await;
 
-    // 4. Test Election < 19 seats & Absolute Majority Change & List Exhaustion
-    //    based on test `lt_19_seats::test_with_absolute_majority_of_votes_but_not_seats_and_list_exhaustion`
+    // based on test `lt_19_seats::test_with_absolute_majority_of_votes_but_not_seats_and_list_exhaustion`
+    args.custom_name =
+        Some("Election < 19 seats & Absolute Majority Change & List Exhaustion".to_string());
     let _ = create_test_election_with_votes(
-        args,
+        &args,
         pool,
         15,
         vec![
@@ -85,10 +88,10 @@ async fn generate_p22_2_variants(args: &GenerateElectionArgs, pool: &SqlitePool)
     )
     .await;
 
-    // 5. Test Election < 19 seats & List Exhaustion
-    //    based on test `lt_19_seats::test_with_list_exhaustion_triggering_2nd_round_highest_average_assignment_with_different_averages`
+    // based on test `lt_19_seats::test_with_list_exhaustion_triggering_2nd_round_highest_average_assignment_with_different_averages`
+    args.custom_name = Some("Election < 19 seats & List Exhaustion".to_string());
     let _ =
-        create_test_election_with_votes(args, pool, 6, vec![vec![3, 3], vec![2, 2], vec![25, 25]])
+        create_test_election_with_votes(&args, pool, 6, vec![vec![3, 3], vec![2, 2], vec![25, 25]])
             .await;
 }
 

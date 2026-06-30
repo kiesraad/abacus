@@ -322,7 +322,7 @@ impl From<ElectionSummary> for ElectionSummaryWithoutVotes {
 }
 
 /// A version of ElectionSummary without the political group votes and investigations
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct ElectionSummaryCSB {
     /// The number of voters (i.e. "Kiesgerechtigden")

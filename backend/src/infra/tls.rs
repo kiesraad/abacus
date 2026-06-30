@@ -24,6 +24,7 @@ fn tls_err<E: core::fmt::Debug>(e: E) -> AppError {
 
 /// The local CA certificate, in the two encodings clients import:
 /// PEM (Linux/macOS/Firefox) and DER (Windows `.cer`).
+#[derive(Clone)]
 pub struct CaCertificate {
     pub pem: String,
     pub der: Vec<u8>,

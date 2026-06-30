@@ -1,6 +1,8 @@
 pub mod audit_log;
 pub mod backup;
 pub mod pdf_gen;
+#[cfg(feature = "tls")]
+pub mod plain_http;
 pub mod router;
 #[cfg(feature = "dev-database")]
 pub mod seed_data;

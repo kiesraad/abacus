@@ -17,6 +17,8 @@ use utoipa_axum::router::OpenApiRouter;
 #[cfg(feature = "openapi")]
 use utoipa_swagger_ui::SwaggerUi;
 
+#[cfg(feature = "tls")]
+use crate::infra::tls::CaCertificate;
 #[cfg(feature = "dev-database")]
 use crate::test_data_gen;
 use crate::{
@@ -25,6 +27,8 @@ use crate::{
     error,
     infra::audit_log,
 };
+#[cfg(feature = "tls")]
+use axum::{body::Bytes, routing::get};
 
 pub fn openapi_router() -> OpenApiRouter<AppState> {
     #[derive(utoipa::OpenApi)]
@@ -184,7 +188,10 @@ fn add_storybook_memory_serve(router: Router<AppState>) -> Router<AppState> {
 
 /// Add headers for security hardening
 /// Best practices according to the OWASP Secure Headers Project, https://owasp.org/www-project-secure-headers/
-fn add_security_headers(router: Router<AppState>) -> Router<AppState> {
+pub(crate) fn add_security_headers<S>(router: Router<S>) -> Router<S>
+where
+    S: Clone + Send + Sync + 'static,
+{
     let security_headers_service = tower::ServiceBuilder::new()
         .layer(SetResponseHeaderLayer::if_not_present(
             header::X_FRAME_OPTIONS,
@@ -211,6 +218,51 @@ fn add_security_headers(router: Router<AppState>) -> Router<AppState> {
             HeaderValue::from_static("same-origin"),
         ));
     router.layer(security_headers_service)
+}
+
+/// Routes that serve the local CA certificate for download.
+#[cfg(feature = "tls")]
+pub fn ca_router(ca: &CaCertificate) -> Router {
+    let pem = Bytes::from(ca.pem.clone());
+    let der = Bytes::from(ca.der.clone());
+    let routes = Router::new()
+        .route(
+            "/ca.pem",
+            get(move || {
+                let pem = pem.clone();
+                async move {
+                    (
+                        [
+                            (header::CONTENT_TYPE, "application/x-pem-file"),
+                            (
+                                header::CONTENT_DISPOSITION,
+                                "attachment; filename=\"abacus-ca.pem\"",
+                            ),
+                        ],
+                        pem,
+                    )
+                }
+            }),
+        )
+        .route(
+            "/ca.cer",
+            get(move || {
+                let der = der.clone();
+                async move {
+                    (
+                        [
+                            (header::CONTENT_TYPE, "application/pkix-cert"),
+                            (
+                                header::CONTENT_DISPOSITION,
+                                "attachment; filename=\"abacus-ca.cer\"",
+                            ),
+                        ],
+                        der,
+                    )
+                }
+            }),
+        );
+    add_security_headers(routes)
 }
 
 /// Complete Axum router for the application

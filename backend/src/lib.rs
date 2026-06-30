@@ -120,6 +120,7 @@ pub async fn start_server_tls(
     listener: TcpListener,
     enable_airgap_detection: bool,
     tls_config: std::sync::Arc<rustls::ServerConfig>,
+    ca: std::sync::Arc<infra::tls::CaCertificate>,
 ) -> Result<(), AppError> {
     use std::time::Duration;
 
@@ -128,7 +129,7 @@ pub async fn start_server_tls(
         tls_rustls::{RustlsAcceptor, RustlsConfig},
     };
 
-    let app = build_app(&pool, enable_airgap_detection)?;
+    let app = build_app(&pool, enable_airgap_detection)?.merge(infra::router::ca_router(&ca));
 
     info!("Starting Abacus on https://{}", listener.local_addr()?);
 
@@ -476,11 +477,12 @@ mod test {
             let certificates = load_or_generate(&dir.path().join("tls")).unwrap();
             let ca_pem = certificates.ca.pem.clone();
             let server_config = certificates.server_config().unwrap();
+            let ca = std::sync::Arc::new(certificates.ca);
 
             let listener = TcpListener::bind(bind_addr).await.unwrap();
             let addr = listener.local_addr().unwrap();
             let task = tokio::spawn(async move {
-                start_server_tls(pool, listener, false, server_config)
+                start_server_tls(pool, listener, false, server_config, ca)
                     .await
                     .unwrap();
             });
@@ -573,6 +575,34 @@ mod test {
             assert!(
                 format!("{err:?}").contains("UnknownIssuer"),
                 "expected an untrusted-issuer certificate error, got: {err:?}"
+            );
+
+            task.abort();
+            let _ = task.await;
+        }
+
+        /// The CA certificate is downloadable over HTTPS as well as over the
+        /// plaintext HTTP redirect server.
+        #[test(sqlx::test)]
+        async fn test_ca_download_over_https(pool: SqlitePool) {
+            let (addr, ca_pem, task) = spawn_https_server(pool, "127.0.0.1:0").await;
+            let client = client_trusting(&ca_pem);
+
+            let response = client
+                .get(format!("https://{addr}/ca.pem"))
+                .send()
+                .await
+                .unwrap();
+            assert_eq!(response.status(), StatusCode::OK);
+            assert_eq!(
+                response.headers()[reqwest::header::X_CONTENT_TYPE_OPTIONS],
+                "nosniff",
+                "the CA download carries the app's security headers"
+            );
+            assert_eq!(
+                response.text().await.unwrap(),
+                ca_pem,
+                "the served CA matches the trusted CA"
             );
 
             task.abort();

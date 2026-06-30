@@ -292,7 +292,7 @@ impl ResultsInputCSB {
 
         let xml_results_data = data.election.as_result_eml(
             None,
-            data.created_at.with_timezone(&Utc),
+            data.created_at,
             &apportionment_result.candidate_nomination,
         )?;
         let xml_results_string = xml_results_data.write_eml_root_str(true, true)?;

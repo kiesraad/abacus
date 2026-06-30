@@ -142,7 +142,7 @@ fn candidate_nomination_per_list<'a, LV: ListVotes>(
             .to_owned();
 
         info!(
-            "Deceased candidates {:?} will be filtered out for list {:?}",
+            "Deceased candidates: {:?} will be filtered out for list {:?}",
             input.deceased_candidates.get(&list.number()),
             list.number()
         );
@@ -289,14 +289,14 @@ fn preferential_candidate_nomination<'a, LV: ListVotes>(
             .filter(|cv| !nomination.contains(cv) && cv.votes() == candidates[index].votes())
             .collect();
 
-        // If there is only candidate with this number of votes, nominate that candidate. Otherwise, a drawing of lots is required,
-        // even if there are enough seats remaining for all candidates with the same number of votes
+        // If there is one candidate with this number of votes, nominate that candidate. Otherwise, a drawing of lots is required,
+        // even if there are enough seats remaining for all candidates with the equal number of votes
         if same_votes_candidates_remaining.len() == 1 {
             nomination.push(same_votes_candidates_remaining[0]);
         } else {
             let options = candidate_votes_numbers(&same_votes_candidates_remaining);
             info!(
-                "Drawing of lots is required for candidates: {options:?}, only {seats_remaining} seat(s) available",
+                "Drawing of lots is required for candidates: {options:?}, {seats_remaining} seat(s) available",
             );
 
             let variant = CandidateDrawingLotsVariant { list, options };

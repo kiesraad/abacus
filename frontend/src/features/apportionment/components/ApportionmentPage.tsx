@@ -24,6 +24,7 @@ import { useApportionmentContext } from "../hooks/useApportionmentContext";
 import {
   apportionmentCheckStateAndRedirect,
   getNotAssignedSeats,
+  isListDrawingLotsVariant,
   renderNotAssignedSeatsAlert,
   renderTitleAndHeader,
 } from "../utils/utils";
@@ -276,9 +277,7 @@ export function ApportionmentPage() {
                       currentCommitteeSession.id,
                       () => void handleResetApportionmentState(),
                     )
-                  : state.drawing_lots_required.type === "ListDrawingLotsRequired" &&
-                    state.drawing_lots_required.variant !== "AbsoluteMajorityHighestAverage" &&
-                    state.drawing_lots_required.variant !== "AbsoluteMajorityLargestRemainder" &&
+                  : isListDrawingLotsVariant(state, ["HighestAverageResidualSeat", "LargestRemainderResidualSeat"]) &&
                     renderHighestAverageOrLargestRemainderDrawingLotsAlert(
                       state.drawing_lots_required.residual_seat_numbers,
                       state.drawing_lots_required.variant,

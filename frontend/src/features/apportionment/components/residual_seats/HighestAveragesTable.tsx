@@ -6,6 +6,7 @@ import { cn } from "@/utils/classnames";
 import { formatPoliticalGroupName } from "@/utils/politicalGroup";
 import { getFootnotesFromResultChanges, type ResultChange } from "../../utils/seat-change";
 import type { HighestAverageAssignmentStep } from "../../utils/steps";
+import { isListDrawingLotsVariant } from "../../utils/utils";
 import cls from "../Apportionment.module.css";
 
 function getCellClassName(step: HighestAverageAssignmentStep, listNumber: PGNumber) {
@@ -18,11 +19,7 @@ function getCellClassName(step: HighestAverageAssignmentStep, listNumber: PGNumb
 }
 
 function getListDrawingLotsInformation(state: ApportionmentState, list_number: number) {
-  if (
-    state.type === "DrawingLots" &&
-    state.drawing_lots_required.type === "ListDrawingLotsRequired" &&
-    state.drawing_lots_required.variant === "HighestAverageResidualSeat"
-  ) {
+  if (isListDrawingLotsVariant(state, ["HighestAverageResidualSeat"])) {
     const list_drawing_lots_average = state.drawing_lots_required.list_averages.find(
       (list_average) => list_average.pg_number === list_number,
     )?.average;
@@ -47,10 +44,7 @@ export function HighestAveragesTable({
   resultChanges,
   state,
 }: HighestAveragesTableProps) {
-  const addDrawingLotsRound =
-    state.type === "DrawingLots" &&
-    state.drawing_lots_required.type === "ListDrawingLotsRequired" &&
-    state.drawing_lots_required.variant === "HighestAverageResidualSeat";
+  const addDrawingLotsRound = isListDrawingLotsVariant(state, ["HighestAverageResidualSeat"]);
   return (
     <div className={cls.scrollable}>
       <Table id="highest-averages-table" className={cn(cls.table, cls.highestAveragesTable)}>

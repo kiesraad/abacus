@@ -11,22 +11,15 @@ import { t } from "@/i18n/translate";
 import type { ADD_LIST_DRAWN_REQUEST_PATH, ApportionmentState } from "@/types/generated/openapi";
 import { formatPoliticalGroupName } from "@/utils/politicalGroup";
 import { useApportionmentContext } from "../../hooks/useApportionmentContext";
-import { apportionmentCheckStateAndRedirect, renderTitleAndHeader } from "../../utils/utils";
+import { apportionmentCheckStateAndRedirect, isListDrawingLotsVariant, renderTitleAndHeader } from "../../utils/utils";
 import { ApportionmentErrorPage } from "../ApportionmentError";
 import { DrawingLotsForList } from "./DrawingLotsForList";
 
 function getPageTitle(state: ApportionmentState) {
-  if (state.type === "DrawingLots") {
-    if (state.drawing_lots_required.type === "ListDrawingLotsRequired") {
-      if (
-        state.drawing_lots_required.variant !== "AbsoluteMajorityHighestAverage" &&
-        state.drawing_lots_required.variant !== "AbsoluteMajorityLargestRemainder"
-      ) {
-        return t("apportionment.drawing_lots_for_seat", {
-          number: state.drawing_lots_required.residual_seat_numbers[0] || "",
-        });
-      }
-    }
+  if (isListDrawingLotsVariant(state, ["HighestAverageResidualSeat", "LargestRemainderResidualSeat"])) {
+    return t("apportionment.drawing_lots_for_seat", {
+      number: state.drawing_lots_required.residual_seat_numbers[0] || "",
+    });
   }
   return t("apportionment.drawing_lots");
 }
@@ -96,11 +89,10 @@ export function DrawingLotsPage() {
                 <FormLayout.Section>
                   <div>
                     <h2>{t("apportionment.drawing_lots_necessary")}</h2>
-                    {state.drawing_lots_required.type === "ListDrawingLotsRequired" &&
-                      (state.drawing_lots_required.variant === "HighestAverageResidualSeat" ||
-                        state.drawing_lots_required.variant === "LargestRemainderResidualSeat") && (
-                        <DrawingLotsForList drawingLotsRequired={state.drawing_lots_required} options={options} />
-                      )}
+                    {isListDrawingLotsVariant(state, [
+                      "HighestAverageResidualSeat",
+                      "LargestRemainderResidualSeat",
+                    ]) && <DrawingLotsForList drawingLotsRequired={state.drawing_lots_required} options={options} />}
                   </div>
                 </FormLayout.Section>
                 <FormLayout.Section>

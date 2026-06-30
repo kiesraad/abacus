@@ -2,7 +2,7 @@ import { Link, type NavigateFunction } from "react-router";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { t } from "@/i18n/translate";
-import type { ApportionmentState } from "@/types/generated/openapi";
+import type { ApportionmentState, DrawingLotsRequired, ListDrawingLotsVariant } from "@/types/generated/openapi";
 
 export function renderTitleAndHeader(sectionTitle: string) {
   return (
@@ -45,11 +45,21 @@ export function apportionmentCheckStateAndRedirect(
   }
 }
 
+export function isListDrawingLotsVariant<TVariant extends ListDrawingLotsVariant["variant"]>(
+  state: ApportionmentState | undefined,
+  variants: TVariant[],
+): state is Extract<ApportionmentState, { type: "DrawingLots" }> & {
+  drawing_lots_required: Extract<DrawingLotsRequired, { variant: TVariant }>;
+} {
+  if (state?.type !== "DrawingLots" || state.drawing_lots_required.type !== "ListDrawingLotsRequired") {
+    return false;
+  }
+  const { variant } = state.drawing_lots_required;
+  return variants.some((v) => v === variant);
+}
+
 export function getNotAssignedSeats(state: ApportionmentState | undefined) {
-  return state?.type === "DrawingLots" &&
-    state.drawing_lots_required.type === "ListDrawingLotsRequired" &&
-    (state.drawing_lots_required.variant === "HighestAverageResidualSeat" ||
-      state.drawing_lots_required.variant === "LargestRemainderResidualSeat")
+  return isListDrawingLotsVariant(state, ["HighestAverageResidualSeat", "LargestRemainderResidualSeat"])
     ? state.drawing_lots_required.residual_seat_numbers.length
     : 0;
 }

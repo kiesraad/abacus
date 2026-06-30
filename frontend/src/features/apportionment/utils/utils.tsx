@@ -45,6 +45,16 @@ export function renderNotAssignedSeatsAlert(notAssignedSeats: number, linkTo: st
   );
 }
 
+export function renderSeatNeedsToBeRetractedAlert(alertText: string, linkTo: string, linkText: string) {
+  return (
+    <Alert type="notify" small>
+      <p>
+        {alertText} <Link to={linkTo}>{linkText}</Link>
+      </p>
+    </Alert>
+  );
+}
+
 export function getAssignedByDrawingLotsStepAlertText(step: SeatChangeStep, politicalGroups: PoliticalGroup[]) {
   if (
     (isHighestAverageAssignmentStep(step) ||
@@ -93,4 +103,22 @@ export function getNotAssignedSeats(state: ApportionmentState | undefined) {
   return isListDrawingLotsVariant(state, ["HighestAverageResidualSeat", "LargestRemainderResidualSeat"])
     ? state.drawing_lots_required.residual_seat_numbers.length
     : 0;
+}
+
+export function getSeatNeedsToBeRetracted(state: ApportionmentState | undefined) {
+  return (
+    state?.type === "DrawingLots" &&
+    state.drawing_lots_required.type === "ListDrawingLotsRequired" &&
+    (state.drawing_lots_required.variant === "AbsoluteMajorityLargestRemainder" ||
+      state.drawing_lots_required.variant === "AbsoluteMajorityHighestAverage")
+  );
+}
+
+export function getAbsoluteMajorityReassignmentLists(state: ApportionmentState | undefined) {
+  return state?.type === "DrawingLots" &&
+    state.drawing_lots_required.type === "ListDrawingLotsRequired" &&
+    (state.drawing_lots_required.variant === "AbsoluteMajorityLargestRemainder" ||
+      state.drawing_lots_required.variant === "AbsoluteMajorityHighestAverage")
+    ? { seat_from_lists: state.drawing_lots_required.options, seat_to_list: state.drawing_lots_required.assign_to }
+    : { seat_from_lists: [], seat_to_list: undefined };
 }

@@ -23,10 +23,12 @@ import { formatList } from "@/utils/strings";
 import { useApportionmentContext } from "../hooks/useApportionmentContext";
 import {
   apportionmentCheckStateAndRedirect,
+  getAbsoluteMajorityReassignmentLists,
   getAssignedByDrawingLotsStepAlertText,
   getNotAssignedSeats,
   isListDrawingLotsVariant,
   renderNotAssignedSeatsAlert,
+  renderSeatNeedsToBeRetractedAlert,
   renderTitleAndHeader,
 } from "../utils/utils";
 import cls from "./Apportionment.module.css";
@@ -194,6 +196,7 @@ interface ApportionmentTableSectionProps {
 
 function ApportionmentTableSection({ state, seatAssignment, election }: ApportionmentTableSectionProps) {
   const notAssignedSeats = getNotAssignedSeats(state);
+  const { seat_from_lists, seat_to_list } = getAbsoluteMajorityReassignmentLists(state);
   const assignedByDrawingLotsAlertTexts: ReactElement[] = [];
   seatAssignment.steps.forEach((step) => {
     const text = getAssignedByDrawingLotsStepAlertText(step, election.political_groups);
@@ -210,6 +213,18 @@ function ApportionmentTableSection({ state, seatAssignment, election }: Apportio
         {notAssignedSeats > 0 && (
           <div className={cn(cls.smallAlert, "mb-md-lg")}>
             {renderNotAssignedSeatsAlert(notAssignedSeats, "./details-residual-seats", t("apportionment.view_details"))}
+          </div>
+        )}
+        {seat_from_lists.length > 0 && seat_to_list && (
+          <div className={cn(cls.smallAlert, "mb-md-lg")}>
+            {renderSeatNeedsToBeRetractedAlert(
+              t("apportionment.lists_a_seat_needs_to_be_reassigned_for", {
+                seat_from_lists: formatList(seat_from_lists, t("or")),
+                seat_to_list,
+              }),
+              "../drawing-lots",
+              t("apportionment.go_to_drawing_lots"),
+            )}
           </div>
         )}
         {assignedByDrawingLotsAlertTexts.length > 0 && (

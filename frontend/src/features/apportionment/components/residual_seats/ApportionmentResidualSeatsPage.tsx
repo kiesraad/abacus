@@ -19,7 +19,9 @@ import {
   apportionmentCheckStateAndRedirect,
   getNotAssignedSeats,
   getNotAssignedSeatsText,
+  getSeatNeedsToBeRetracted,
   renderNotAssignedSeatsAlert,
+  renderSeatNeedsToBeRetractedAlert,
   renderTitleAndHeader,
 } from "../../utils/utils";
 import cls from "../Apportionment.module.css";
@@ -66,6 +68,7 @@ function LargeCouncilSection({
   state,
 }: LargeCouncilSectionProps) {
   const notAssignedSeats = getNotAssignedSeats(state);
+  const seatNeedsToBeRetracted = getSeatNeedsToBeRetracted(state);
   return (
     <div className={cn(cls.tableDiv, "mb-lg")}>
       <div>
@@ -75,6 +78,15 @@ function LargeCouncilSection({
         {notAssignedSeats > 0 && (
           <div className={cn(cls.smallAlert, "mb-md-lg")}>
             {renderNotAssignedSeatsAlert(notAssignedSeats, "../drawing-lots", t("apportionment.go_to_drawing_lots"))}
+          </div>
+        )}
+        {seatNeedsToBeRetracted && (
+          <div className={cn(cls.smallAlert, "mb-md-lg")}>
+            {renderSeatNeedsToBeRetractedAlert(
+              t("apportionment.seat_needs_to_be_retracted"),
+              "../drawing-lots",
+              t("apportionment.go_to_drawing_lots"),
+            )}
           </div>
         )}
         {highestAverageSteps.length > 0 && (

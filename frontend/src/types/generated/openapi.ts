@@ -447,6 +447,8 @@ export const auditEventTypeValues = [
   "UserLoggedOut",
   "UserAccountUpdated",
   "UserSessionExtended",
+  "UserSessionExpired",
+  "UserSessionRemoved",
   "UserCreated",
   "UserUpdated",
   "UserDeleted",

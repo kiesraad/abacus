@@ -3804,6 +3804,73 @@
     "initial_total_full_seats": 19,
     "initial_total_residual_seats": 4
   },
+  "footnotes": {
+    "drawn_lots": [
+      {
+        "variant": "HighestAverageResidualSeat",
+        "lists": [
+          {
+            "number": 2,
+            "name": "Stemmers 101"
+          },
+          {
+            "number": 3,
+            "name": "Partij van de groepen"
+          },
+          {
+            "number": 4,
+            "name": "De Kandidatenlijst"
+          },
+          {
+            "number": 5,
+            "name": "Partij van de Wet"
+          },
+          {
+            "number": 6,
+            "name": "Algemene Lijst"
+          }
+        ]
+      },
+      {
+        "variant": "HighestAverageResidualSeat",
+        "lists": [
+          {
+            "number": 2,
+            "name": "Stemmers 101"
+          },
+          {
+            "number": 3,
+            "name": "Partij van de groepen"
+          },
+          {
+            "number": 5,
+            "name": "Partij van de Wet"
+          },
+          {
+            "number": 6,
+            "name": "Algemene Lijst"
+          }
+        ]
+      },
+      {
+        "variant": "HighestAverageResidualSeat",
+        "lists": [
+          {
+            "number": 2,
+            "name": "Stemmers 101"
+          },
+          {
+            "number": 3,
+            "name": "Partij van de groepen"
+          },
+          {
+            "number": 5,
+            "name": "Partij van de Wet"
+          }
+        ]
+      }
+    ]
+  },
   "hash": "dedf 17b4 684e 1214 fcab b770 925d c75c 624b e338 0bd3 4647 29c3 7a80 a379 40ad",
   "creation_date_time": "19-03-2023 17:07:00 +02:00"
 }

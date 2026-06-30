@@ -3725,6 +3725,35 @@
     "initial_total_full_seats": 13,
     "initial_total_residual_seats": 2
   },
+  "footnotes": {
+    "drawn_lots": [
+      {
+        "variant": "LargestRemainderResidualSeat",
+        "lists": [
+          {
+            "number": 2,
+            "name": "GROEP 1"
+          },
+          {
+            "number": 3,
+            "name": "GROEP 2"
+          },
+          {
+            "number": 4,
+            "name": "GROEP 3"
+          },
+          {
+            "number": 5,
+            "name": "GROEP 4"
+          },
+          {
+            "number": 6,
+            "name": "GROEP 5"
+          }
+        ]
+      }
+    ]
+  },
   "hash": "dedf 17b4 684e 1214 fcab b770 925d c75c 624b e338 0bd3 4647 29c3 7a80 a379 40ad",
   "creation_date_time": "19-03-2023 17:07:00 +02:00"
 }

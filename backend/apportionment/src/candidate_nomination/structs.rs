@@ -16,7 +16,18 @@ pub struct ListCandidateNomination<'a, T: ListVotes> {
     /// The list of other chosen candidates, can be empty
     pub other_candidate_nomination: Vec<&'a T::Cv>,
     /// The updated ranking of the whole candidate list, can be empty
+    ///
+    /// This contains the candidate numbers of all candidates in the list (including
+    /// those that did not receive a nomination) ordered such that candidates
+    /// have been re-ordered according to their preferential votes.
     pub updated_candidate_ranking: Vec<CandidateNumber<T>>,
+}
+
+impl<'a, T: ListVotes> ListCandidateNomination<'a, T> {
+    /// Returns a slice of the updated candidate ranking, but only for the nominated candidates
+    pub fn nominated_candidate_ranking(&self) -> &[CandidateNumber<T>] {
+        &self.updated_candidate_ranking[..(self.list_seats as usize)]
+    }
 }
 
 /// Contains the preference threshold as a percentage and as a fraction of the number of votes.

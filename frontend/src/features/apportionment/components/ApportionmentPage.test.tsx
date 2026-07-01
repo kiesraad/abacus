@@ -168,9 +168,9 @@ describe("ApportionmentPage", () => {
     expect(election_summary_table).toBeVisible();
     expect(election_summary_table).toHaveTableContent([
       ["Kiesgerechtigden", "2.000", ""],
-      ["Getelde stembiljetten", "1.205", "Opkomst: 60.25%"],
-      ["Blanco stemmen", "3", "0.25%"],
-      ["Ongeldige stemmen", "2", "0.17%"],
+      ["Getelde stembiljetten", "1.205", "Opkomst: 60,25%"],
+      ["Blanco stemmen", "3", "0,25%"],
+      ["Ongeldige stemmen", "2", "0,17%"],
       ["Totaal stemmen op kandidaten", "1.200", ""],
       ["Aantal raadszetels", "15", ""],
       ["Kiesdeler", "80", "Benodigde stemmen per volle zetel"],
@@ -223,9 +223,9 @@ describe("ApportionmentPage", () => {
     expect(election_summary_table).toBeVisible();
     expect(election_summary_table).toHaveTableContent([
       ["Kiesgerechtigden", "2.000", ""],
-      ["Getelde stembiljetten", "1.205", "Opkomst: 60.25%"],
-      ["Blanco stemmen", "3", "0.25%"],
-      ["Ongeldige stemmen", "2", "0.17%"],
+      ["Getelde stembiljetten", "1.205", "Opkomst: 60,25%"],
+      ["Blanco stemmen", "3", "0,25%"],
+      ["Ongeldige stemmen", "2", "0,17%"],
       ["Totaal stemmen op kandidaten", "1.200", ""],
       ["Aantal raadszetels", "15", ""],
       ["Kiesdeler", "80", "Benodigde stemmen per volle zetel"],

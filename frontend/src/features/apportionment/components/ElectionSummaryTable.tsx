@@ -9,7 +9,7 @@ import type {
   VotesCounts,
 } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
-import { formatNumber } from "@/utils/number";
+import { formatNumber, formatPercentage } from "@/utils/number";
 import cls from "./Apportionment.module.css";
 
 export interface DeceasedCandidatesInfo {
@@ -54,7 +54,7 @@ export function ElectionSummaryTable({
           <Table.NumberCell>{formatNumber(votesCounts.total_votes_cast_count)}</Table.NumberCell>
           <Table.Cell className="fs-sm">
             {numberOfVoters
-              ? `${t("apportionment.turnout")}: ${((votesCounts.total_votes_cast_count / numberOfVoters) * 100).toFixed(2)}%`
+              ? `${t("apportionment.turnout")}: ${formatPercentage(votesCounts.total_votes_cast_count, numberOfVoters)}`
               : ""}
           </Table.Cell>
         </Table.Row>
@@ -62,18 +62,26 @@ export function ElectionSummaryTable({
           <Table.HeaderCell scope="row" className="normal">
             {t("voters_votes_counts.votes_counts.blank_votes_count")}
           </Table.HeaderCell>
-          <Table.NumberCell>{formatNumber(votesCounts.blank_votes_count)}</Table.NumberCell>
+          <Table.NumberCell>
+            {votesCounts.blank_votes_count > 0 ? formatNumber(votesCounts.blank_votes_count) : "0"}
+          </Table.NumberCell>
           <Table.Cell className="fs-sm">
-            {`${((votesCounts.blank_votes_count / votesCounts.total_votes_cast_count) * 100).toFixed(2)}%`}
+            {votesCounts.blank_votes_count > 0
+              ? formatPercentage(votesCounts.blank_votes_count, votesCounts.total_votes_cast_count)
+              : ""}
           </Table.Cell>
         </Table.Row>
         <Table.Row>
           <Table.HeaderCell scope="row" className="normal">
             {t("voters_votes_counts.votes_counts.invalid_votes_count")}
           </Table.HeaderCell>
-          <Table.NumberCell>{formatNumber(votesCounts.invalid_votes_count)}</Table.NumberCell>
+          <Table.NumberCell>
+            {votesCounts.invalid_votes_count > 0 ? formatNumber(votesCounts.invalid_votes_count) : "0"}
+          </Table.NumberCell>
           <Table.Cell className="fs-sm">
-            {`${((votesCounts.invalid_votes_count / votesCounts.total_votes_cast_count) * 100).toFixed(2)}%`}
+            {votesCounts.invalid_votes_count > 0
+              ? formatPercentage(votesCounts.invalid_votes_count, votesCounts.total_votes_cast_count)
+              : ""}
           </Table.Cell>
         </Table.Row>
         <Table.Row>

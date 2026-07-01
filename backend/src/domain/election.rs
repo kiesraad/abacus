@@ -329,15 +329,12 @@ pub(crate) mod tests {
 
     use super::*;
 
-    /// Create a test election with some political groups and a given number of seats.
-    /// The number of political groups is the length of the `political_groups_candidates` slice.
-    /// The number of candidates in each political group is equal to the value in the slice at that index.
-    pub fn election_fixture_with_given_number_of_seats(
-        committee_category: CommitteeCategory,
+    /// Creates a vector of political groups with candidates, where the number of candidates in each
+    /// political group is equal to the value in the slice at that index.
+    pub fn political_groups_with_candidates(
         political_groups_candidates: &[u32],
-        number_of_seats: u32,
-    ) -> ElectionWithPoliticalGroups {
-        let political_groups = political_groups_candidates
+    ) -> Vec<PoliticalGroup> {
+        political_groups_candidates
             .iter()
             .enumerate()
             .map(|(i, &candidates)| PoliticalGroup {
@@ -357,8 +354,17 @@ pub(crate) mod tests {
                     })
                     .collect(),
             })
-            .collect();
+            .collect()
+    }
 
+    /// Create a test election with some political groups and a given number of seats.
+    /// The number of political groups is the length of the `political_groups_candidates` slice.
+    /// The number of candidates in each political group is equal to the value in the slice at that index.
+    pub fn election_fixture_with_given_number_of_seats(
+        committee_category: CommitteeCategory,
+        political_groups_candidates: &[u32],
+        number_of_seats: u32,
+    ) -> ElectionWithPoliticalGroups {
         ElectionWithPoliticalGroups {
             id: ElectionId::from(1),
             name: "Test".to_string(),
@@ -372,7 +378,7 @@ pub(crate) mod tests {
             number_of_voters: 1000,
             election_date: NaiveDate::from_ymd_opt(2023, 11, 1).unwrap(),
             nomination_date: NaiveDate::from_ymd_opt(2023, 11, 1).unwrap(),
-            political_groups,
+            political_groups: political_groups_with_candidates(political_groups_candidates),
         }
     }
 

@@ -23,7 +23,7 @@ interface ElectionSummaryTableProps {
   seats: number;
   quota: DisplayFractionType;
   numberOfVoters: number | undefined;
-  preferenceThreshold: PreferenceThreshold;
+  preferenceThreshold: PreferenceThreshold | undefined;
   deceasedCandidatesInfo: DeceasedCandidatesInfo;
 }
 
@@ -99,17 +99,19 @@ export function ElectionSummaryTable({
           </Table.NumberCell>
           <Table.Cell className="fs-sm">{t("apportionment.quota_description")}</Table.Cell>
         </Table.Row>
-        <Table.Row>
-          <Table.HeaderCell scope="row" className="normal">
-            {t("apportionment.preference_threshold")}
-          </Table.HeaderCell>
-          <Table.NumberCell>
-            <DisplayFraction id="quota" fraction={preferenceThreshold.number_of_votes} />
-          </Table.NumberCell>
-          <Table.Cell className="fs-sm">
-            {t("apportionment.preference_threshold_description", { percentage: preferenceThreshold.percentage })}
-          </Table.Cell>
-        </Table.Row>
+        {preferenceThreshold && (
+          <Table.Row>
+            <Table.HeaderCell scope="row" className="normal">
+              {t("apportionment.preference_threshold")}
+            </Table.HeaderCell>
+            <Table.NumberCell>
+              <DisplayFraction id="quota" fraction={preferenceThreshold.number_of_votes} />
+            </Table.NumberCell>
+            <Table.Cell className="fs-sm">
+              {t("apportionment.preference_threshold_description", { percentage: preferenceThreshold.percentage })}
+            </Table.Cell>
+          </Table.Row>
+        )}
         <Table.Row>
           <Table.HeaderCell scope="row" className="normal">
             {t("apportionment.candidates_for_apportionment")}

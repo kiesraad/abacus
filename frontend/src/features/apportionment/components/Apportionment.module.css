@@ -77,6 +77,12 @@ td > .footnoteNumber {
   border-top: 1px solid var(--bg-gray-darkest);
 }
 
+.rowWithoutLink {
+  td:last-of-type {
+    padding-right: 4.5rem;
+  }
+}
+
 .scrollable {
   width: calc(100vw - 10rem);
   overflow-x: auto;
@@ -156,8 +162,27 @@ table.highestAveragesTable {
   }
 }
 
+/* Styling for the drawing lots alerts */
+.smallAlert {
+  div:global(.small) {
+    max-width: 52rem;
+    width: 100%;
+    align-items: flex-start;
+  }
+}
+
+.notAssignedSeatsAlert {
+  overflow: hidden;
+  margin: -2.5rem -5rem 0.5rem -5rem;
+}
+
 /* Styling for the apportionment finalised alert buttons */
 .alertButtons {
   display: flex;
   gap: 1rem;
+}
+
+/* Styling for drawing lots pages */
+.drawingLotsList {
+  margin: 0;
 }

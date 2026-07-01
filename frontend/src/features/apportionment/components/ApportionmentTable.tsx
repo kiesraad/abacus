@@ -11,6 +11,7 @@ interface ApportionmentTableProps {
   fullSeats: number;
   residualSeats: number;
   seats: number;
+  notAssignedSeats: number;
 }
 
 function convertZeroToDash(number: number): string {
@@ -26,6 +27,7 @@ export function ApportionmentTable({
   fullSeats,
   residualSeats,
   seats,
+  notAssignedSeats,
 }: ApportionmentTableProps) {
   return (
     <Table id="apportionment-table" className={cls.table}>
@@ -37,8 +39,22 @@ export function ApportionmentTable({
         <Table.HeaderCell className="text-align-r link-cell-padding">{t("apportionment.total_seats")}</Table.HeaderCell>
       </Table.Header>
       <Table.Body>
+        {notAssignedSeats > 0 && (
+          <Table.Row id="not-assigned-seats" to="./details-residual-seats">
+            <Table.Cell></Table.Cell>
+            <Table.Cell className="bold">{t("apportionment.not_yet_assigned")}</Table.Cell>
+            <Table.NumberCell>{convertZeroToDash(0)}</Table.NumberCell>
+            <Table.NumberCell>{notAssignedSeats}</Table.NumberCell>
+            <Table.NumberCell className="bold">{notAssignedSeats}</Table.NumberCell>
+          </Table.Row>
+        )}
         {standings.map((standing: ListSeatAssignment) => (
-          <Table.Row key={standing.list_number} id={`list-${standing.list_number}`} to={`./${standing.list_number}`}>
+          <Table.Row
+            key={standing.list_number}
+            id={`list-${standing.list_number}`}
+            className={notAssignedSeats > 0 ? cls.rowWithoutLink : undefined}
+            to={notAssignedSeats === 0 ? `./${standing.list_number}` : undefined}
+          >
             <Table.Cell className={cn(cls.listNumberColumn, "text-align-r", "font-number")}>
               {standing.list_number}
             </Table.Cell>

@@ -5,14 +5,14 @@ import { Footnotes } from "./Footnotes";
 
 export const Default: StoryFn = () => {
   const seatAssignment = lt19SeatsAndP9AndP10.seat_assignment;
-  const absoluteMajorityReassignment = seatAssignment.steps.find(isAbsoluteMajorityReassignmentStep);
-  const { residualSeatRemovalSteps, uniquePgNumbersWithFullSeatsRemoved } = getRemovalSteps(seatAssignment);
+  const absoluteMajorityStep = seatAssignment.steps.find(isAbsoluteMajorityReassignmentStep);
+  const { residualSeatRemovalSteps, listsWithFullSeatsRemoved } = getRemovalSteps(seatAssignment);
 
   return (
     <Footnotes
-      uniquePgNumbersWithFullSeatsRemoved={uniquePgNumbersWithFullSeatsRemoved}
+      listsWithFullSeatsRemoved={listsWithFullSeatsRemoved}
       seatAssignment={seatAssignment}
-      absoluteMajorityReassignment={absoluteMajorityReassignment}
+      absoluteMajorityStep={absoluteMajorityStep}
       residualSeatRemovalSteps={residualSeatRemovalSteps}
     />
   );

@@ -602,8 +602,8 @@ export const noRecountNoDifferencesDrawingLotsDataEntryGSB: GSBResults & { model
   votes_counts: {
     political_group_total_votes: [
       { number: 1, total: 80000 },
-      { number: 2, total: 14000 },
-      { number: 3, total: 6000 },
+      { number: 2, total: 10000 },
+      { number: 3, total: 10000 },
       { number: 4, total: 80000 },
       { number: 5, total: 14000 },
       { number: 6, total: 6000 },
@@ -677,19 +677,19 @@ export const noRecountNoDifferencesDrawingLotsDataEntryGSB: GSBResults & { model
     },
     {
       number: 2,
-      total: 14000,
+      total: 10000,
       candidate_votes: [
         {
           number: 1,
-          votes: 8000,
+          votes: 2500,
         },
         {
           number: 2,
-          votes: 2000,
+          votes: 2500,
         },
         {
           number: 3,
-          votes: 1500,
+          votes: 2500,
         },
         {
           number: 4,
@@ -699,15 +699,15 @@ export const noRecountNoDifferencesDrawingLotsDataEntryGSB: GSBResults & { model
     },
     {
       number: 3,
-      total: 6000,
+      total: 10000,
       candidate_votes: [
         {
           number: 1,
-          votes: 4000,
+          votes: 5000,
         },
         {
           number: 2,
-          votes: 2000,
+          votes: 5000,
         },
       ],
     },

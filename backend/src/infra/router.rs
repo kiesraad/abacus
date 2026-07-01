@@ -25,7 +25,7 @@ use crate::{
     AppError, AppState, MAX_BODY_SIZE_MB, api,
     api::middleware::{airgap, airgap::AirgapDetection, authentication},
     error,
-    infra::audit_log,
+    infra::{audit_log, backup::BackupConfig},
 };
 #[cfg(feature = "tls")]
 use axum::{body::Bytes, routing::get};
@@ -69,7 +69,8 @@ fn build_routes(doc: utoipa::openapi::OpenApi) -> OpenApiRouter<AppState> {
         .merge(api::polling_station::router())
         .merge(api::report::router())
         .merge(api::document::router())
-        .merge(api::investigation::router());
+        .merge(api::investigation::router())
+        .merge(api::backup::router());
 
     #[cfg(feature = "dev-database")]
     let router = router.merge(test_data_gen::router());
@@ -269,11 +270,13 @@ pub fn ca_router(ca: &CaCertificate) -> Router {
 pub fn create_router(
     pool: SqlitePool,
     airgap_detection: AirgapDetection,
+    backup_config: BackupConfig,
 ) -> Result<Router, AppError> {
     let router = axum_router_from_openapi(openapi_router());
     let state = AppState {
         pool,
         airgap_detection,
+        backup_config,
     };
     let router = add_middleware(router, &state);
     #[cfg(feature = "memory-serve")]
@@ -283,10 +286,6 @@ pub fn create_router(
     let router = add_security_headers(router);
     let router = router.with_state(state);
     Ok(router)
-}
-
-pub fn create_router_without_airgap_detection(pool: SqlitePool) -> Result<Router, AppError> {
-    create_router(pool, AirgapDetection::nop())
 }
 
 #[cfg(test)]

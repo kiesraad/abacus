@@ -2,33 +2,20 @@ use chrono::Local;
 use sqlx::SqlitePool;
 use std::path::{Path, PathBuf};
 
-/// Configuration for the local database backup system.
 #[derive(Clone)]
 pub struct BackupConfig {
-    /// Directory where backup files are stored.
     pub directory: PathBuf,
 }
 
-impl BackupConfig {
-    /// Creates a new `BackupConfig` using a `backups` directory
-    /// in the same folder as the database file.
-    pub fn new(database: &str) -> Result<Self, BackupError> {
-        let database_path = Path::new(database);
-        let working_directory = database_path
-            .parent()
-            .ok_or(BackupError::InvalidDatabasePath)?;
-        let backup_directory = working_directory.join("backups");
-        Ok(BackupConfig {
-            directory: backup_directory,
-        })
-    }
+pub struct BackupResult {
+    pub filename: String,
+    pub created_at: chrono::DateTime<Local>,
 }
 
-/// Errors that can occur during backup operations.
 #[derive(Debug)]
 pub enum BackupError {
+    AlreadyExists,
     InvalidPath,
-    InvalidDatabasePath,
     Io(std::io::Error),
     Database(sqlx::Error),
 }
@@ -48,12 +35,19 @@ impl From<sqlx::Error> for BackupError {
 pub async fn create_local_backup(
     pool: &SqlitePool,
     backup_config: &BackupConfig,
-) -> Result<(), BackupError> {
+) -> Result<BackupResult, BackupError> {
     create_backup_directory(backup_config)?;
-    let filename = format!("backup_{}.db", Local::now().format("%Y-%m-%d_%H-%M-%S"));
-    let backup_path = backup_config.directory.join(filename);
+    let now = Local::now();
+    let filename = format!("db_backup_{}.sqlite", now.format("%Y-%m-%d_%H-%M-%S"));
+    let backup_path = backup_config.directory.join(&filename);
+    if backup_path.exists() {
+        return Err(BackupError::AlreadyExists);
+    }
     backup_database(pool, &backup_path).await?;
-    Ok(())
+    Ok(BackupResult {
+        filename,
+        created_at: now,
+    })
 }
 
 fn create_backup_directory(backup_config: &BackupConfig) -> Result<(), BackupError> {
@@ -109,18 +103,12 @@ mod tests {
         delete_backup_directory(&backup_config);
     }
 
-    #[test]
-    fn backup_path_ends_with_correct_directory_name() {
-        let backup_config = BackupConfig::new("db.sqlite").unwrap();
-        assert!(backup_config.directory.ends_with("backups"));
-    }
-
     #[sqlx::test]
-    async fn local_backup_is_succesfull(pool: SqlitePool) {
+    async fn local_backup_is_successful(pool: SqlitePool) {
         let backup_config = setup_backup_config();
         create_backup_directory(&backup_config).unwrap();
-        create_local_backup(&pool, &backup_config).await.unwrap();
-        assert!(backup_config.directory.read_dir().unwrap().next().is_some());
+        let result = create_local_backup(&pool, &backup_config).await.unwrap();
+        assert!(backup_config.directory.join(&result.filename).exists());
         delete_backup_directory(&backup_config);
     }
 }

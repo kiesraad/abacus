@@ -91,7 +91,7 @@ pub fn map_candidate_nomination(
                 .collect(),
             updated_candidate_ranking: lcn
                 .updated_candidate_ranking
-                .iter()
+                .iter_updated()
                 .map(|num| candidate_map[&(lcn.list_number, *num)].clone())
                 .collect(),
         })

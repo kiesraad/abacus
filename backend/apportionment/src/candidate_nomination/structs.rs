@@ -3,6 +3,66 @@ use crate::{
     structs::{CandidateNumber, ListNumber},
 };
 
+/// Indicates what the ranking of candidates in the list is.
+///
+/// This is either the original list as defined in the candidate lists, or the
+/// updated ranking if preferential votes or deceased candidates have changed
+/// the ranking of candidates.
+#[derive(Debug, PartialEq, Eq)]
+pub enum UpdatedCandidateRanking<T> {
+    /// The ranking of candidates was updated.
+    ///
+    /// This could happen because of deceased candidates or because of preferential votes.
+    Updated(Vec<T>),
+    /// The ranking of candidates was not updated.
+    Original(Vec<T>),
+}
+
+impl<T> UpdatedCandidateRanking<T> {
+    /// Return a slice of the ranked candidate numbers, either the updated
+    /// ranking when it was changed from the original or the original ranking
+    /// if no changes were made.
+    pub fn as_slice(&self) -> &[T] {
+        match self {
+            UpdatedCandidateRanking::Updated(vec) => vec.as_slice(),
+            UpdatedCandidateRanking::Original(vec) => vec.as_slice(),
+        }
+    }
+
+    /// If the candidate list was updated, this returns a slice of the
+    /// updated candidate ranking. If it was not updated (i.e. is original),
+    /// this returns an empty slice.
+    pub fn as_updated_slice(&self) -> &[T] {
+        match self {
+            UpdatedCandidateRanking::Updated(vec) => vec.as_slice(),
+            _ => &[],
+        }
+    }
+
+    /// Iterate over the ranked candidate numbers (either the original or the
+    /// updated ranking).
+    pub fn iter(&self) -> impl Iterator<Item = &T> {
+        self.as_slice().iter()
+    }
+
+    /// Iterate over the updated ranked candidate numbers, if they are updated.
+    ///
+    /// If the candidate ranking is not updated, this returns an empty iterator.
+    pub fn iter_updated(&self) -> impl Iterator<Item = &T> {
+        self.as_updated_slice().iter()
+    }
+
+    /// Returns true if the ranking of candidates was updated, false otherwise.
+    pub fn is_updated(&self) -> bool {
+        matches!(self, UpdatedCandidateRanking::Updated(_))
+    }
+
+    /// Returns true if the ranking of candidates was not updated, false otherwise.
+    pub fn is_original(&self) -> bool {
+        matches!(self, UpdatedCandidateRanking::Original(_))
+    }
+}
+
 /// Contains information about the chosen candidates and
 /// the candidate list ranking for a specific list.
 #[derive(Debug, PartialEq)]
@@ -20,13 +80,13 @@ pub struct ListCandidateNomination<'a, T: ListVotes> {
     /// This contains the candidate numbers of all candidates in the list (including
     /// those that did not receive a nomination) ordered such that candidates
     /// have been re-ordered according to their preferential votes.
-    pub updated_candidate_ranking: Vec<CandidateNumber<T>>,
+    pub updated_candidate_ranking: UpdatedCandidateRanking<CandidateNumber<T>>,
 }
 
 impl<'a, T: ListVotes> ListCandidateNomination<'a, T> {
     /// Returns a slice of the updated candidate ranking, but only for the nominated candidates
     pub fn nominated_candidate_ranking(&self) -> &[CandidateNumber<T>] {
-        &self.updated_candidate_ranking[..(self.list_seats as usize)]
+        &self.updated_candidate_ranking.as_slice()[..(self.list_seats as usize)]
     }
 }
 

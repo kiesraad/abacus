@@ -1067,7 +1067,10 @@ mod tests {
                 list_seats: 2,
                 preferential_candidate_nomination: vec![&cv2, &cv1],
                 other_candidate_nomination: vec![],
-                updated_candidate_ranking: vec![CandidateNumber::from(2), CandidateNumber::from(1)],
+                updated_candidate_ranking: apportionment::UpdatedCandidateRanking::Updated(vec![
+                    CandidateNumber::from(2),
+                    CandidateNumber::from(1),
+                ]),
             }],
         };
 

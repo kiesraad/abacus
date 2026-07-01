@@ -154,7 +154,7 @@ pub fn check_list_candidate_nomination(
     );
 
     assert_eq!(
-        nomination.updated_candidate_ranking.to_vec(),
+        nomination.updated_candidate_ranking.as_slice(),
         expected_updated_ranking
     );
 }

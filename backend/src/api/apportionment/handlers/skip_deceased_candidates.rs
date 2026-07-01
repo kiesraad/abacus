@@ -60,20 +60,20 @@ mod tests {
 
     #[test(sqlx::test(fixtures(
         path = "../../../../fixtures",
-        scripts("election_5_with_results")
+        scripts("election_8_csb_with_results")
     )))]
     async fn test_skip_deceased_candidates(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
-        let user = User::test_user(Role::CoordinatorGSB, UserId::from(1));
+        let user = User::test_user(Role::CoordinatorCSB, UserId::from(3));
         let audit_service = AuditService::new(Some(user.clone()), None);
-        let id = CommitteeSessionId::from(6);
+        let id = CommitteeSessionId::from(801);
 
         committee_session_repo::change_status(&mut conn, id, CommitteeSessionStatus::Completed)
             .await
             .expect("should change committee session status");
 
         let state =
-            skip_deceased_candidates(user, State(pool), audit_service, Path(ElectionId::from(5)))
+            skip_deceased_candidates(user, State(pool), audit_service, Path(ElectionId::from(8)))
                 .await
                 .expect("should call the handler successfully");
 

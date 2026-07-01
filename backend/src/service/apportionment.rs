@@ -17,7 +17,9 @@ use crate::{
         apportionment_state::{ApportionmentState, ApportionmentStateError, DrawingLotsRequired},
         committee_session::CommitteeSessionId,
         committee_session_status::CommitteeSessionStatus,
-        election::{CandidateNumber, ElectionId, ElectionWithPoliticalGroups, PGNumber},
+        election::{
+            CandidateNumber, CommitteeCategory, ElectionId, ElectionWithPoliticalGroups, PGNumber,
+        },
         summary::ElectionSummary,
     },
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
@@ -112,6 +114,7 @@ pub async fn next_state(
     .await
 }
 
+#[derive(Debug)]
 #[allow(clippy::large_enum_variant)]
 pub enum ApportionmentResult {
     Ok(ElectionApportionmentResponse),
@@ -197,6 +200,10 @@ pub async fn process(
     conn: &mut SqliteConnection,
     election: &ElectionWithPoliticalGroups,
 ) -> Result<ApportionmentResult, APIError> {
+    if election.committee_category != CommitteeCategory::CSB {
+        return Err(ApportionmentApiError::NotCSBElection.into());
+    }
+
     let (committee_session_id, state) = service::get_apportionment_state(conn, election.id).await?;
 
     let data_entry_results =
@@ -257,6 +264,7 @@ mod tests {
         domain::{apportionment_state::DeceasedCandidate, committee_session::CommitteeSessionId},
         error::assert_delegated,
         infra::audit_log::assert_last_event,
+        repository::election_repo,
     };
 
     const ELECTION_ID: u32 = 5;
@@ -278,6 +286,20 @@ mod tests {
                 .await
                 .expect("should upsert apportionment state");
         }
+    }
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
+    async fn test_process_requires_csb_election(pool: SqlitePool) {
+        let mut conn = pool.acquire().await.unwrap();
+        let election = election_repo::get(&mut conn, ElectionId::from(ELECTION_ID))
+            .await
+            .unwrap();
+
+        let err = process(&mut conn, &election)
+            .await
+            .expect_err("should error for a non-CSB election");
+
+        assert_delegated(err, &ApportionmentApiError::NotCSBElection);
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]

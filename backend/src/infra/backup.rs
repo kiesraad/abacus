@@ -8,6 +8,7 @@ use std::{
     sync::Arc,
 };
 use tokio::sync::Mutex;
+use tracing::info;
 
 #[derive(Clone)]
 pub struct BackupConfig {
@@ -69,6 +70,7 @@ pub async fn create_local_backup(
         return Err(err);
     }
     drop(guard);
+    info!("Created database backup: {filename}");
     Ok(BackupResult {
         filename,
         created_at: now,

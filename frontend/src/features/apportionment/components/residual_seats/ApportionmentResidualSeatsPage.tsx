@@ -1,7 +1,5 @@
 import { type ReactElement, useEffect } from "react";
 import { Link, useNavigate } from "react-router";
-import { Alert } from "@/components/ui/Alert/Alert";
-import { Button } from "@/components/ui/Button/Button";
 import { useElection } from "@/hooks/election/useElection";
 import { t, tx } from "@/i18n/translate";
 import type { ApportionmentState, PoliticalGroup, SeatAssignment } from "@/types/generated/openapi";
@@ -18,7 +16,6 @@ import {
 import {
   apportionmentCheckStateAndRedirect,
   getNotAssignedSeats,
-  getNotAssignedSeatsText,
   getSeatNeedsToBeRetracted,
   renderNotAssignedSeatsAlert,
   renderSeatNeedsToBeRetractedAlert,
@@ -67,7 +64,6 @@ function LargeCouncilSection({
   footNotes,
   state,
 }: LargeCouncilSectionProps) {
-  const notAssignedSeats = getNotAssignedSeats(state);
   const seatNeedsToBeRetracted = getSeatNeedsToBeRetracted(state);
   return (
     <div className={cn(cls.tableDiv, "mb-lg")}>
@@ -75,11 +71,6 @@ function LargeCouncilSection({
         <h2 className={cls.tableTitle}>{t("apportionment.residual_seats_highest_averages")}</h2>
         {renderInformation(seatAssignment.seats, seatAssignment.residual_seats)}
         <h3 className={cls.tableTitle}>{t("apportionment.averages_per_list")}:</h3>
-        {notAssignedSeats > 0 && (
-          <div className={cn(cls.smallAlert, "mb-md-lg")}>
-            {renderNotAssignedSeatsAlert(notAssignedSeats, "../drawing-lots", t("apportionment.go_to_drawing_lots"))}
-          </div>
-        )}
         {seatNeedsToBeRetracted && (
           <div className={cn(cls.smallAlert, "mb-md-lg")}>
             {renderSeatNeedsToBeRetractedAlert(
@@ -219,17 +210,8 @@ function SmallCouncilSection({
   footNotes,
   state,
 }: SmallCouncilSectionProps) {
-  const notAssignedSeats = getNotAssignedSeats(state);
   return (
     <>
-      {notAssignedSeats > 0 && (
-        <div className={cls.notAssignedSeatsAlert}>
-          <Alert type="notify">
-            <strong className="heading-md">{getNotAssignedSeatsText(notAssignedSeats)}</strong>
-            <Button.Link to="../drawing-lots">{t("apportionment.go_to_drawing_lots")}</Button.Link>
-          </Alert>
-        </div>
-      )}
       <LargestRemaindersSection
         seatAssignment={seatAssignment}
         largestRemainderSteps={largestRemainderSteps}
@@ -268,8 +250,8 @@ export function ApportionmentResidualSeatsPage() {
     const { largestRemainderSteps, uniqueHighestAverageSteps, highestAverageSteps, absoluteMajorityStep } =
       getAssignmentSteps(seatAssignment);
     const { residualSeatRemovalSteps, listsWithFullSeatsRemoved } = getRemovalSteps(seatAssignment);
-
     const resultChanges = getResultChanges(listsWithFullSeatsRemoved, absoluteMajorityStep, residualSeatRemovalSteps);
+    const notAssignedSeats = getNotAssignedSeats(state);
 
     function renderFootnotes(): ReactElement {
       return (
@@ -287,6 +269,7 @@ export function ApportionmentResidualSeatsPage() {
         {renderTitleAndHeader(t("apportionment.allocation_of_residual_seats"))}
         <main>
           <article className={cls.article}>
+            {notAssignedSeats > 0 && renderNotAssignedSeatsAlert(notAssignedSeats)}
             {seatAssignment.residual_seats > 0 ? (
               seatAssignment.seats >= LARGE_COUNCIL_THRESHOLD ? (
                 <LargeCouncilSection

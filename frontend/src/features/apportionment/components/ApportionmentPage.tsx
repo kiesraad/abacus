@@ -27,8 +27,8 @@ import {
   getAssignedByDrawingLotsStepAlertText,
   getNotAssignedSeats,
   isListDrawingLotsVariant,
-  renderNotAssignedSeatsAlert,
   renderSeatNeedsToBeRetractedAlert,
+  renderSmallNotAssignedSeatsAlert,
   renderTitleAndHeader,
 } from "../utils/utils";
 import cls from "./Apportionment.module.css";
@@ -212,7 +212,11 @@ function ApportionmentTableSection({ state, seatAssignment, election }: Apportio
         </h2>
         {notAssignedSeats > 0 && (
           <div className={cn(cls.smallAlert, "mb-md-lg")}>
-            {renderNotAssignedSeatsAlert(notAssignedSeats, "./details-residual-seats", t("apportionment.view_details"))}
+            {renderSmallNotAssignedSeatsAlert(
+              notAssignedSeats,
+              "./details-residual-seats",
+              t("apportionment.view_details"),
+            )}
           </div>
         )}
         {seat_from_lists.length > 0 && seat_to_list && (

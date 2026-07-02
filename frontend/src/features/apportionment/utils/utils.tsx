@@ -1,6 +1,7 @@
 import { Link, type NavigateFunction } from "react-router";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { Alert } from "@/components/ui/Alert/Alert";
+import { Button } from "@/components/ui/Button/Button";
 import { t, tx } from "@/i18n/translate";
 import type {
   ApportionmentState,
@@ -10,6 +11,7 @@ import type {
   SeatChangeStep,
 } from "@/types/generated/openapi";
 import { formatPoliticalGroupName } from "@/utils/politicalGroup";
+import cls from "../components/Apportionment.module.css";
 import {
   isHighestAverageAssignmentStep,
   isLargestRemainderAssignmentStep,
@@ -35,13 +37,24 @@ export function getNotAssignedSeatsText(notAssignedSeats: number) {
   });
 }
 
-export function renderNotAssignedSeatsAlert(notAssignedSeats: number, linkTo: string, linkText: string) {
+export function renderSmallNotAssignedSeatsAlert(notAssignedSeats: number, linkTo: string, linkText: string) {
   return (
     <Alert type="notify" small>
       <p>
         {getNotAssignedSeatsText(notAssignedSeats)} <Link to={linkTo}>{linkText}</Link>
       </p>
     </Alert>
+  );
+}
+
+export function renderNotAssignedSeatsAlert(notAssignedSeats: number) {
+  return (
+    <div className={cls.notAssignedSeatsAlert}>
+      <Alert type="notify">
+        <strong className="heading-md">{getNotAssignedSeatsText(notAssignedSeats)}</strong>
+        <Button.Link to="../drawing-lots">{t("apportionment.go_to_drawing_lots")}</Button.Link>
+      </Alert>
+    </div>
   );
 }
 

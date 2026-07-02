@@ -2,7 +2,7 @@ import { Link, type NavigateFunction } from "react-router";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
-import { t, tx } from "@/i18n/translate";
+import { t } from "@/i18n/translate";
 import type {
   ApportionmentState,
   DrawingLotsRequired,
@@ -37,16 +37,6 @@ export function getNotAssignedSeatsText(notAssignedSeats: number) {
   });
 }
 
-export function renderSmallNotAssignedSeatsAlert(notAssignedSeats: number, linkTo: string, linkText: string) {
-  return (
-    <Alert type="notify" small>
-      <p>
-        {getNotAssignedSeatsText(notAssignedSeats)} <Link to={linkTo}>{linkText}</Link>
-      </p>
-    </Alert>
-  );
-}
-
 export function renderNotAssignedSeatsAlert(notAssignedSeats: number) {
   return (
     <div className={cls.notAssignedSeatsAlert}>
@@ -68,7 +58,15 @@ export function renderSeatNeedsToBeRetractedAlert(alertText: string, linkTo: str
   );
 }
 
-export function getAssignedByDrawingLotsStepAlertText(step: SeatChangeStep, politicalGroups: PoliticalGroup[]) {
+export interface ListAssignedByDrawingLots {
+  residual_seat_number: number;
+  name: string;
+}
+
+export function getAssignedByDrawingLotsStep(
+  step: SeatChangeStep,
+  politicalGroups: PoliticalGroup[],
+): ListAssignedByDrawingLots | undefined {
   if (
     (isHighestAverageAssignmentStep(step) ||
       isUniqueHighestAverageAssignmentStep(step) ||
@@ -76,13 +74,13 @@ export function getAssignedByDrawingLotsStepAlertText(step: SeatChangeStep, poli
     step.change.drawing_lots !== undefined &&
     step.residual_seat_number
   ) {
-    return tx("apportionment.assigned_by_drawing_lots_alert", undefined, {
-      nr: step.residual_seat_number,
-      list: formatPoliticalGroupName(
+    return {
+      residual_seat_number: step.residual_seat_number,
+      name: formatPoliticalGroupName(
         politicalGroups.find((pg) => pg.number === step.change.selected_list_number),
         true,
       ),
-    });
+    };
   }
   return undefined;
 }

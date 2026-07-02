@@ -1,4 +1,4 @@
-import { type ReactElement, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { type AnyApiError, type ApiResult, isSuccess } from "@/api/ApiResult";
 import { useApiClient } from "@/api/useApiClient";
@@ -6,7 +6,7 @@ import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { useElection } from "@/hooks/election/useElection";
-import { t } from "@/i18n/translate";
+import { t, tx } from "@/i18n/translate";
 import type {
   ApportionmentState,
   ApportionmentWarning,
@@ -24,11 +24,11 @@ import { useApportionmentContext } from "../hooks/useApportionmentContext";
 import {
   apportionmentCheckStateAndRedirect,
   getAbsoluteMajorityReassignmentLists,
-  getAssignedByDrawingLotsStepAlertText,
+  getAssignedByDrawingLotsStep,
   getNotAssignedSeats,
+  getNotAssignedSeatsText,
   isListDrawingLotsVariant,
-  renderSeatNeedsToBeRetractedAlert,
-  renderSmallNotAssignedSeatsAlert,
+  type ListAssignedByDrawingLots,
   renderTitleAndHeader,
 } from "../utils/utils";
 import cls from "./Apportionment.module.css";
@@ -135,6 +135,63 @@ function renderHighestAverageOrLargestRemainderDrawingLotsAlert(
   );
 }
 
+function renderDrawingLotsAlert(
+  listsAssignedByDrawingLots: ListAssignedByDrawingLots[],
+  seat_from_lists: number[],
+  seat_to_list: number | undefined,
+  notAssignedSeats: number,
+) {
+  return (
+    <div className={cn(cls.smallAlert, "mb-md-lg")}>
+      <Alert type="notify" small>
+        {listsAssignedByDrawingLots.length === 1 ? (
+          <p>
+            {listsAssignedByDrawingLots.map((list, index) => (
+              <span key={`drawing-lots-assignment-${index + 1}`}>
+                {tx("apportionment.assigned_by_drawing_lots_alert.singular", undefined, {
+                  nr: list.residual_seat_number,
+                  list: list.name,
+                })}
+              </span>
+            ))}
+          </p>
+        ) : (
+          listsAssignedByDrawingLots.length > 1 && (
+            <>
+              <p>{t("apportionment.assigned_by_drawing_lots_alert.plural.title")}</p>
+              <ul>
+                {listsAssignedByDrawingLots.map((list, index) => (
+                  <li key={`drawing-lots-assignment-${index + 1}`}>
+                    {tx("apportionment.assigned_by_drawing_lots_alert.plural.assigned_to", undefined, {
+                      nr: list.residual_seat_number,
+                      list: list.name,
+                    })}
+                  </li>
+                ))}
+              </ul>
+            </>
+          )
+        )}
+        {seat_from_lists.length > 0 && seat_to_list && (
+          <p>
+            {t("apportionment.lists_a_seat_needs_to_be_reassigned_for", {
+              seat_from_lists: formatList(seat_from_lists, t("or")),
+              seat_to_list,
+            })}{" "}
+            <Link to="../drawing-lots">{t("apportionment.go_to_drawing_lots")}</Link>
+          </p>
+        )}
+        {notAssignedSeats > 0 && (
+          <p>
+            {getNotAssignedSeatsText(notAssignedSeats)}{" "}
+            <Link to="./details-residual-seats">{t("apportionment.view_details")}</Link>
+          </p>
+        )}
+      </Alert>
+    </div>
+  );
+}
+
 function renderLinksToSeatAssignmentPages(seatAssignment: SeatAssignment) {
   return (
     <ul>
@@ -197,11 +254,11 @@ interface ApportionmentTableSectionProps {
 function ApportionmentTableSection({ state, seatAssignment, election }: ApportionmentTableSectionProps) {
   const notAssignedSeats = getNotAssignedSeats(state);
   const { seat_from_lists, seat_to_list } = getAbsoluteMajorityReassignmentLists(state);
-  const assignedByDrawingLotsAlertTexts: ReactElement[] = [];
+  const listsAssignedByDrawingLots: ListAssignedByDrawingLots[] = [];
   seatAssignment.steps.forEach((step) => {
-    const text = getAssignedByDrawingLotsStepAlertText(step, election.political_groups);
-    if (text !== undefined) {
-      assignedByDrawingLotsAlertTexts.push(text);
+    const listAssignedByDrawingLots = getAssignedByDrawingLotsStep(step, election.political_groups);
+    if (listAssignedByDrawingLots !== undefined) {
+      listsAssignedByDrawingLots.push(listAssignedByDrawingLots);
     }
   });
   return (
@@ -210,40 +267,10 @@ function ApportionmentTableSection({ state, seatAssignment, election }: Apportio
         <h2 className={cls.tableTitle}>
           {state.type === "DrawingLots" ? t("apportionment.preliminary_result") : t("apportionment.title")}
         </h2>
-        {notAssignedSeats > 0 && (
-          <div className={cn(cls.smallAlert, "mb-md-lg")}>
-            {renderSmallNotAssignedSeatsAlert(
-              notAssignedSeats,
-              "./details-residual-seats",
-              t("apportionment.view_details"),
-            )}
-          </div>
-        )}
-        {seat_from_lists.length > 0 && seat_to_list && (
-          <div className={cn(cls.smallAlert, "mb-md-lg")}>
-            {renderSeatNeedsToBeRetractedAlert(
-              t("apportionment.lists_a_seat_needs_to_be_reassigned_for", {
-                seat_from_lists: formatList(seat_from_lists, t("or")),
-                seat_to_list,
-              }),
-              "../drawing-lots",
-              t("apportionment.go_to_drawing_lots"),
-            )}
-          </div>
-        )}
-        {assignedByDrawingLotsAlertTexts.length > 0 && (
-          <div className={cn(cls.smallAlert, "mb-md-lg")}>
-            {
-              <Alert type="notify" small>
-                <p>
-                  {assignedByDrawingLotsAlertTexts.map((text, index) => (
-                    <span key={`drawing-lots-assignment-${index + 1}`}>{text}</span>
-                  ))}
-                </p>
-              </Alert>
-            }
-          </div>
-        )}
+        {(notAssignedSeats > 0 ||
+          (seat_from_lists.length > 0 && seat_to_list !== undefined) ||
+          listsAssignedByDrawingLots.length > 0) &&
+          renderDrawingLotsAlert(listsAssignedByDrawingLots, seat_from_lists, seat_to_list, notAssignedSeats)}
         <ApportionmentTable
           standings={seatAssignment.standings}
           politicalGroups={election.political_groups}

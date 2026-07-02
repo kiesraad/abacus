@@ -168,6 +168,10 @@ table.highestAveragesTable {
     max-width: 52rem;
     width: 100%;
     align-items: flex-start;
+
+    section {
+      max-width: 100%;
+    }
   }
 }
 

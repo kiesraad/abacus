@@ -6,7 +6,13 @@
   "already_assigned": "Reeds toegewezen",
   "apportionment_already_calculated": "De zetelverdeling is al berekend.",
   "article_p10": "(Kieswet, artikel P 10)",
-  "assigned_by_drawing_lots_alert": "Restzetel {nr} kon niet automatisch worden toegewezen en is na loting toegekend aan <strong>{list}</strong>.\n",
+  "assigned_by_drawing_lots_alert": {
+    "singular": "Restzetel {nr} kon niet automatisch worden toegewezen en is na loting toegekend aan <strong>{list}</strong>.",
+    "plural": {
+      "title": "Sommige restzetels konden niet automatisch worden toegewezen en zijn via loting toegekend:",
+      "assigned_to": "Restzetel {nr} is toegekend aan <strong>{list}</strong>"
+    }
+  },
   "assigned_number_of_seats": "Toegewezen aantal zetels",
   "average": "Gemiddelde",
   "average_number": "gemiddeld aantal",

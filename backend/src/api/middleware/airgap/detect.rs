@@ -400,7 +400,6 @@ mod tests {
         let backup_config =
             crate::infra::backup::BackupConfig::new(backup_dir.path().to_path_buf());
         tokio::spawn(async move {
-            let _backup_dir = backup_dir;
             let app = router::create_router(pool, airgap_detection, backup_config).unwrap();
 
             axum::serve(

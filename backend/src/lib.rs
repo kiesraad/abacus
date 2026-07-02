@@ -498,7 +498,6 @@ mod test {
             let listener = TcpListener::bind(bind_addr).await.unwrap();
             let addr = listener.local_addr().unwrap();
             let task = tokio::spawn(async move {
-                let _dir = dir; // keep tempdir alive for the duration of the test
                 start_server_tls(pool, listener, false, backup_config, server_config, ca)
                     .await
                     .unwrap();

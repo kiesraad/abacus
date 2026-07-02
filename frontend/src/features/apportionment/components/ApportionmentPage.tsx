@@ -23,6 +23,7 @@ import { getNumberOfCandidates } from "@/utils/politicalGroups";
 import { formatList } from "@/utils/strings";
 import { useApportionmentContext } from "../hooks/useApportionmentContext";
 import {
+  type AbsoluteMajorityReassignmentLists,
   apportionmentCheckStateAndRedirect,
   getAbsoluteMajorityReassignmentLists,
   getAssignedByDrawingLotsStep,
@@ -36,7 +37,7 @@ import cls from "./Apportionment.module.css";
 import { ApportionmentError } from "./ApportionmentError";
 import { ApportionmentTable } from "./ApportionmentTable";
 import { ChosenCandidatesTable } from "./ChosenCandidatesTable";
-import { DrawingLotsWarningAlert } from "./DrawingLotsWarningAlert";
+import { DrawingLotsWarningAlert } from "./DrawingLotsAlerts";
 import { type DeceasedCandidatesInfo, ElectionSummaryTable } from "./ElectionSummaryTable";
 
 function getNumberOfSeatsAssignedSentence(seats: number, type: "residual_seat" | "full_seat"): string {
@@ -167,8 +168,7 @@ function renderDrawingLotsAlert(state: ApportionmentState, politicalGroups: Poli
 
 function renderNotifyDrawingLotsAlert(
   listsAssignedByDrawingLots: ListAssignedByDrawingLots[],
-  seat_from_lists: number[],
-  seat_to_list: number | undefined,
+  absoluteMajorityReassignmentLists: AbsoluteMajorityReassignmentLists | undefined,
   notAssignedSeats: number,
 ) {
   return (
@@ -202,11 +202,11 @@ function renderNotifyDrawingLotsAlert(
             </>
           )
         )}
-        {seat_from_lists.length > 0 && seat_to_list && (
+        {absoluteMajorityReassignmentLists !== undefined && (
           <p>
             {t("apportionment.lists_a_seat_needs_to_be_reassigned_for", {
-              seat_from_lists: formatList(seat_from_lists, t("or")),
-              seat_to_list,
+              seat_from_lists: formatList(absoluteMajorityReassignmentLists.seat_from_lists, t("or")),
+              seat_to_list: absoluteMajorityReassignmentLists.seat_to_list,
             })}{" "}
             <Link to="../drawing-lots">{t("apportionment.go_to_drawing_lots")}</Link>
           </p>
@@ -283,7 +283,7 @@ interface ApportionmentTableSectionProps {
 
 function ApportionmentTableSection({ state, seatAssignment, election }: ApportionmentTableSectionProps) {
   const notAssignedSeats = getNotAssignedSeats(state);
-  const { seat_from_lists, seat_to_list } = getAbsoluteMajorityReassignmentLists(state);
+  const absoluteMajorityReassignmentLists = getAbsoluteMajorityReassignmentLists(state);
   const listsAssignedByDrawingLots: ListAssignedByDrawingLots[] = [];
   seatAssignment.steps.forEach((step) => {
     const listAssignedByDrawingLots = getAssignedByDrawingLotsStep(step, election.political_groups);
@@ -298,9 +298,9 @@ function ApportionmentTableSection({ state, seatAssignment, election }: Apportio
           {state.type === "DrawingLots" ? t("apportionment.preliminary_result") : t("apportionment.title")}
         </h2>
         {(notAssignedSeats > 0 ||
-          (seat_from_lists.length > 0 && seat_to_list !== undefined) ||
+          absoluteMajorityReassignmentLists !== undefined ||
           listsAssignedByDrawingLots.length > 0) &&
-          renderNotifyDrawingLotsAlert(listsAssignedByDrawingLots, seat_from_lists, seat_to_list, notAssignedSeats)}
+          renderNotifyDrawingLotsAlert(listsAssignedByDrawingLots, absoluteMajorityReassignmentLists, notAssignedSeats)}
         <ApportionmentTable
           standings={seatAssignment.standings}
           politicalGroups={election.political_groups}

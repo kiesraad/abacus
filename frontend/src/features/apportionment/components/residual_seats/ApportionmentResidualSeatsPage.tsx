@@ -13,16 +13,10 @@ import {
   type LargestRemainderAssignmentStep,
   type UniqueHighestAverageAssignmentStep,
 } from "../../utils/steps";
-import {
-  apportionmentCheckStateAndRedirect,
-  getNotAssignedSeats,
-  getSeatNeedsToBeRetracted,
-  renderNotAssignedSeatsAlert,
-  renderSeatNeedsToBeRetractedAlert,
-  renderTitleAndHeader,
-} from "../../utils/utils";
+import { apportionmentCheckStateAndRedirect, renderTitleAndHeader } from "../../utils/utils";
 import cls from "../Apportionment.module.css";
 import { ApportionmentErrorPage } from "../ApportionmentError";
+import { DrawingLotsNotifyAlert } from "../DrawingLotsAlerts";
 import { Footnotes } from "./Footnotes";
 import { HighestAveragesTable } from "./HighestAveragesTable";
 import { LargestRemaindersTable } from "./LargestRemaindersTable";
@@ -64,22 +58,12 @@ function LargeCouncilSection({
   footNotes,
   state,
 }: LargeCouncilSectionProps) {
-  const seatNeedsToBeRetracted = getSeatNeedsToBeRetracted(state);
   return (
     <div className={cn(cls.tableDiv, "mb-lg")}>
       <div>
         <h2 className={cls.tableTitle}>{t("apportionment.residual_seats_highest_averages")}</h2>
         {renderInformation(seatAssignment.seats, seatAssignment.residual_seats)}
         <h3 className={cls.tableTitle}>{t("apportionment.averages_per_list")}:</h3>
-        {seatNeedsToBeRetracted && (
-          <div className={cn(cls.smallAlert, "mb-md-lg")}>
-            {renderSeatNeedsToBeRetractedAlert(
-              t("apportionment.seat_needs_to_be_retracted"),
-              "../drawing-lots",
-              t("apportionment.go_to_drawing_lots"),
-            )}
-          </div>
-        )}
         {highestAverageSteps.length > 0 && (
           <HighestAveragesTable
             steps={highestAverageSteps}
@@ -251,7 +235,6 @@ export function ApportionmentResidualSeatsPage() {
       getAssignmentSteps(seatAssignment);
     const { residualSeatRemovalSteps, listsWithFullSeatsRemoved } = getRemovalSteps(seatAssignment);
     const resultChanges = getResultChanges(listsWithFullSeatsRemoved, absoluteMajorityStep, residualSeatRemovalSteps);
-    const notAssignedSeats = getNotAssignedSeats(state);
 
     function renderFootnotes(): ReactElement {
       return (
@@ -269,7 +252,7 @@ export function ApportionmentResidualSeatsPage() {
         {renderTitleAndHeader(t("apportionment.allocation_of_residual_seats"))}
         <main>
           <article className={cls.article}>
-            {notAssignedSeats > 0 && renderNotAssignedSeatsAlert(notAssignedSeats)}
+            <DrawingLotsNotifyAlert state={state} />
             {seatAssignment.residual_seats > 0 ? (
               seatAssignment.seats >= LARGE_COUNCIL_THRESHOLD ? (
                 <LargeCouncilSection

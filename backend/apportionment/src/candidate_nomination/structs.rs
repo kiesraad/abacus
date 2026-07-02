@@ -9,7 +9,7 @@ use crate::{
 /// updated ranking if preferential votes or deceased candidates have changed
 /// the ranking of candidates.
 #[derive(Debug, PartialEq, Eq)]
-pub enum UpdatedCandidateRanking<T> {
+pub enum CandidateRanking<T> {
     /// The ranking of candidates was updated.
     ///
     /// This could happen because of deceased candidates or because of preferential votes.
@@ -18,14 +18,14 @@ pub enum UpdatedCandidateRanking<T> {
     Original(Vec<T>),
 }
 
-impl<T> UpdatedCandidateRanking<T> {
+impl<T> CandidateRanking<T> {
     /// Return a slice of the ranked candidate numbers, either the updated
     /// ranking when it was changed from the original or the original ranking
     /// if no changes were made.
     pub fn as_slice(&self) -> &[T] {
         match self {
-            UpdatedCandidateRanking::Updated(vec) => vec.as_slice(),
-            UpdatedCandidateRanking::Original(vec) => vec.as_slice(),
+            CandidateRanking::Updated(vec) => vec.as_slice(),
+            CandidateRanking::Original(vec) => vec.as_slice(),
         }
     }
 
@@ -34,7 +34,7 @@ impl<T> UpdatedCandidateRanking<T> {
     /// this returns an empty slice.
     pub fn as_updated_slice(&self) -> &[T] {
         match self {
-            UpdatedCandidateRanking::Updated(vec) => vec.as_slice(),
+            CandidateRanking::Updated(vec) => vec.as_slice(),
             _ => &[],
         }
     }
@@ -54,12 +54,12 @@ impl<T> UpdatedCandidateRanking<T> {
 
     /// Returns true if the ranking of candidates was updated, false otherwise.
     pub fn is_updated(&self) -> bool {
-        matches!(self, UpdatedCandidateRanking::Updated(_))
+        matches!(self, CandidateRanking::Updated(_))
     }
 
     /// Returns true if the ranking of candidates was not updated, false otherwise.
     pub fn is_original(&self) -> bool {
-        matches!(self, UpdatedCandidateRanking::Original(_))
+        matches!(self, CandidateRanking::Original(_))
     }
 }
 
@@ -75,18 +75,19 @@ pub struct ListCandidateNomination<'a, T: ListVotes> {
     pub preferential_candidate_nomination: Vec<&'a T::Cv>,
     /// The list of other chosen candidates, can be empty
     pub other_candidate_nomination: Vec<&'a T::Cv>,
-    /// The updated ranking of the whole candidate list, can be empty
+    /// The ranking of the whole candidate list, either the original ranking or
+    /// the updated ranking if changes were made.
     ///
     /// This contains the candidate numbers of all candidates in the list (including
     /// those that did not receive a nomination) ordered such that candidates
     /// have been re-ordered according to their preferential votes.
-    pub updated_candidate_ranking: UpdatedCandidateRanking<CandidateNumber<T>>,
+    pub candidate_ranking: CandidateRanking<CandidateNumber<T>>,
 }
 
 impl<'a, T: ListVotes> ListCandidateNomination<'a, T> {
-    /// Returns a slice of the updated candidate ranking, but only for the nominated candidates
+    /// Returns a slice of the candidate ranking, but only for the nominated candidates
     pub fn nominated_candidate_ranking(&self) -> &[CandidateNumber<T>] {
-        &self.updated_candidate_ranking.as_slice()[..(self.list_seats as usize)]
+        &self.candidate_ranking.as_slice()[..(self.list_seats as usize)]
     }
 }
 

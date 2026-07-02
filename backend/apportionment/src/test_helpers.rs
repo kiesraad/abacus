@@ -6,7 +6,7 @@ use super::{
 use crate::{
     ApportionmentInput, CandidateVotes, SeatAssignmentDetails,
     candidate_nomination::{
-        Candidate, ListCandidateNomination, UpdatedCandidateRanking, candidate_votes_numbers,
+        Candidate, CandidateRanking, ListCandidateNomination, candidate_votes_numbers,
     },
     structs::{CandidateDrawn, ListDrawingLotsVariant, ListDrawn},
 };
@@ -157,16 +157,16 @@ pub fn check_list_candidate_nomination(
 
     if expected_updated_ranking.is_empty() {
         assert!(matches!(
-            nomination.updated_candidate_ranking,
-            UpdatedCandidateRanking::Original(_)
+            nomination.candidate_ranking,
+            CandidateRanking::Original(_)
         ));
     } else {
         assert!(matches!(
-            nomination.updated_candidate_ranking,
-            UpdatedCandidateRanking::Updated(_)
+            nomination.candidate_ranking,
+            CandidateRanking::Updated(_)
         ));
         assert_eq!(
-            nomination.updated_candidate_ranking.as_slice(),
+            nomination.candidate_ranking.as_slice(),
             expected_updated_ranking
         );
     }

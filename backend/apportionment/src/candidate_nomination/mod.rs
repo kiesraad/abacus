@@ -1,8 +1,8 @@
 mod structs;
 
 pub use structs::{
-    Candidate, CandidateNominationDetails, ListCandidateNomination, PreferenceThreshold,
-    UpdatedCandidateRanking,
+    Candidate, CandidateNominationDetails, CandidateRanking, ListCandidateNomination,
+    PreferenceThreshold,
 };
 use tracing::{debug, info};
 
@@ -180,11 +180,11 @@ fn candidate_nomination_per_list<'a, LV: ListVotes>(
             .collect::<Vec<_>>();
 
         // [Artikel P 19 Kieswet](https://wetten.overheid.nl/BWBR0004627/2026-01-01/#AfdelingII_HoofdstukP_Paragraaf3_ArtikelP19)
-        let updated_candidate_ranking = if input.deceased_candidates.get(&list.number()).is_none()
+        let candidate_ranking = if input.deceased_candidates.get(&list.number()).is_none()
             && (candidate_votes_meeting_preference_threshold.is_empty()
                 || (input.number_of_seats >= LARGE_COUNCIL_THRESHOLD && total_seats == 0))
         {
-            UpdatedCandidateRanking::Original(original_ranking)
+            CandidateRanking::Original(original_ranking)
         } else {
             let updated_ranking = update_candidate_ranking(
                 preference_threshold,
@@ -196,9 +196,9 @@ fn candidate_nomination_per_list<'a, LV: ListVotes>(
             // return an empty list, otherwise return the updated list
             // Note: we base this on the original list, so if there are deceased candidates, the ranking is always updated
             if updated_ranking == original_ranking {
-                UpdatedCandidateRanking::Original(original_ranking)
+                CandidateRanking::Original(original_ranking)
             } else {
-                UpdatedCandidateRanking::Updated(updated_ranking)
+                CandidateRanking::Updated(updated_ranking)
             }
         };
 
@@ -207,7 +207,7 @@ fn candidate_nomination_per_list<'a, LV: ListVotes>(
             list_seats: total_seats,
             preferential_candidate_nomination,
             other_candidate_nomination,
-            updated_candidate_ranking,
+            candidate_ranking,
         });
     }
     Ok(ListCandidateNominations::Completed(
@@ -1277,9 +1277,7 @@ mod tests {
                         &CandidateVotesMock(6, 500),
                     ],
                     other_candidate_nomination: Vec::new(),
-                    updated_candidate_ranking: UpdatedCandidateRanking::Original(vec![
-                        1, 2, 3, 4, 5, 6
-                    ]),
+                    candidate_ranking: CandidateRanking::Original(vec![1, 2, 3, 4, 5, 6]),
                 },
                 ListCandidateNomination {
                     list_number: 2,
@@ -1290,9 +1288,7 @@ mod tests {
                         &CandidateVotesMock(3, 400),
                     ],
                     other_candidate_nomination: Vec::new(),
-                    updated_candidate_ranking: UpdatedCandidateRanking::Original(vec![
-                        1, 2, 3, 4, 5, 6
-                    ]),
+                    candidate_ranking: CandidateRanking::Original(vec![1, 2, 3, 4, 5, 6]),
                 }
             ]
         );

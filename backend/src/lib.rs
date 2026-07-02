@@ -135,9 +135,15 @@ pub async fn start_server_tls(
         accept::NoDelayAcceptor,
         tls_rustls::{RustlsAcceptor, RustlsConfig},
     };
+    use hyper::http::{HeaderValue, header};
+    use tower_http::set_header::SetResponseHeaderLayer;
 
     let app = build_app(&pool, enable_airgap_detection, backup_config)?
-        .merge(infra::router::ca_router(&ca));
+        .merge(infra::router::ca_router(&ca))
+        .layer(SetResponseHeaderLayer::overriding(
+            header::STRICT_TRANSPORT_SECURITY,
+            HeaderValue::from_static("max-age=31536000; includeSubDomains"),
+        ));
 
     info!("Starting Abacus on https://{}", listener.local_addr()?);
 
@@ -591,6 +597,36 @@ mod test {
             assert!(
                 format!("{err:?}").contains("UnknownIssuer"),
                 "expected an untrusted-issuer certificate error, got: {err:?}"
+            );
+
+            task.abort();
+            let _ = task.await;
+        }
+
+        /// Test that HSTS header is present on HTTPS responses
+        #[test(sqlx::test)]
+        async fn test_hsts_header(pool: SqlitePool) {
+            let (addr, ca_pem, task) = spawn_https_server(pool, "127.0.0.1:0").await;
+            let client = client_trusting(&ca_pem);
+
+            let api_response = client
+                .get(format!("https://{addr}/api/account"))
+                .send()
+                .await
+                .unwrap();
+            assert_eq!(
+                api_response.headers()["strict-transport-security"],
+                "max-age=31536000; includeSubDomains"
+            );
+
+            let ca_response = client
+                .get(format!("https://{addr}/ca.pem"))
+                .send()
+                .await
+                .unwrap();
+            assert_eq!(
+                ca_response.headers()["strict-transport-security"],
+                "max-age=31536000; includeSubDomains"
             );
 
             task.abort();

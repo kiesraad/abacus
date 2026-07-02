@@ -1277,7 +1277,9 @@ mod tests {
                         &CandidateVotesMock(6, 500),
                     ],
                     other_candidate_nomination: Vec::new(),
-                    updated_candidate_ranking: UpdatedCandidateRanking::Original(vec![]),
+                    updated_candidate_ranking: UpdatedCandidateRanking::Original(vec![
+                        1, 2, 3, 4, 5, 6
+                    ]),
                 },
                 ListCandidateNomination {
                     list_number: 2,
@@ -1288,7 +1290,9 @@ mod tests {
                         &CandidateVotesMock(3, 400),
                     ],
                     other_candidate_nomination: Vec::new(),
-                    updated_candidate_ranking: UpdatedCandidateRanking::Original(vec![]),
+                    updated_candidate_ranking: UpdatedCandidateRanking::Original(vec![
+                        1, 2, 3, 4, 5, 6
+                    ]),
                 }
             ]
         );

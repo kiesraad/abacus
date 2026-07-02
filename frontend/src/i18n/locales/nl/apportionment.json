@@ -39,6 +39,12 @@
     },
     "seat_cannot_be_assigned_automatically": "Restzetel {nr} kan niet automatisch worden toegewezen"
   },
+  "drawing_lots_for_p9": {
+    "hence_drawing_lots_is_needed": "Daarom moet er geloot worden welke lijst de restzetel moet afstaan",
+    "last_residual_seat_to_list": "De laatste restzetel moet worden afgestaan aan lijst {nr}.",
+    "list_got_absolute_majority": "Lijst {nr} heeft de volstrekte meerderheid van stemmen gekregen, maar heeft niet de volstrekte meerderheid aan zetels.",
+    "lists_got_last_residual_seats": "Lijst {lists} hebben met hetzelfde {variant} stemmen de laatste restzetels gekregen."
+  },
   "drawing_lots_for_seat": "Loting voor restzetel {number}",
   "drawing_lots_instructions": {
     "title": "Instructies voor loting",
@@ -65,7 +71,8 @@
   },
   "drawing_lots_result": {
     "title": "Resultaat loting",
-    "which_list_gets_a_residual_seat": "Welke partij krijgt de restzetel?"
+    "which_list_gets_a_residual_seat": "Welke partij krijgt de restzetel?",
+    "which_list_has_to_give_up_a_seat": "Welke partij moet een restzetel afstaan?"
   },
   "election_summary": "Kengetallen",
   "full_seat": {

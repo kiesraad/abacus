@@ -372,6 +372,9 @@ impl From<BackupError> for APIError {
             BackupError::InvalidPath => {
                 APIError::StdError(Box::new(std::io::Error::other("invalid backup path")))
             }
+            BackupError::IntegrityCheckFailed(output) => APIError::StdError(Box::new(
+                std::io::Error::other(format!("backup integrity check failed: {output}")),
+            )),
             BackupError::Io(err) => APIError::StdError(Box::new(err)),
             BackupError::Database(err) => APIError::SqlxError(err),
         }

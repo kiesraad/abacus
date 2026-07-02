@@ -1,5 +1,8 @@
 use chrono::Local;
-use sqlx::SqlitePool;
+use sqlx::{
+    Connection, Row, SqlitePool,
+    sqlite::{SqliteConnectOptions, SqliteConnection},
+};
 use std::{
     path::{Path, PathBuf},
     sync::Arc,
@@ -31,6 +34,7 @@ pub struct BackupResult {
 pub enum BackupError {
     AlreadyExists,
     InvalidPath,
+    IntegrityCheckFailed(String),
     Io(std::io::Error),
     Database(sqlx::Error),
 }
@@ -59,7 +63,11 @@ pub async fn create_local_backup(
     if backup_path.exists() {
         return Err(BackupError::AlreadyExists);
     }
-    backup_database(pool, &backup_path).await?;
+    if let Err(err) = write_and_verify_backup(pool, &backup_path).await {
+        // try to delete the backup, ignore error if deleting fails
+        let _ = std::fs::remove_file(&backup_path);
+        return Err(err);
+    }
     drop(guard);
     Ok(BackupResult {
         filename,
@@ -70,6 +78,11 @@ pub async fn create_local_backup(
 fn create_backup_directory(backup_config: &BackupConfig) -> Result<(), BackupError> {
     std::fs::create_dir_all(&backup_config.directory)?;
     Ok(())
+}
+
+async fn write_and_verify_backup(pool: &SqlitePool, backup_path: &Path) -> Result<(), BackupError> {
+    backup_database(pool, backup_path).await?;
+    verify_backup(backup_path).await
 }
 
 async fn backup_database(pool: &SqlitePool, destination: &Path) -> Result<(), BackupError> {
@@ -83,6 +96,24 @@ async fn backup_database(pool: &SqlitePool, destination: &Path) -> Result<(), Ba
         .execute(&mut *connection)
         .await?;
     Ok(())
+}
+
+/// Run SQLite integrity check on a separate read-only connection.
+async fn verify_backup(backup_path: &Path) -> Result<(), BackupError> {
+    let options = SqliteConnectOptions::new()
+        .filename(backup_path)
+        .read_only(true);
+    let mut connection = SqliteConnection::connect_with(&options).await?;
+    let result = sqlx::query("PRAGMA integrity_check")
+        .fetch_one(&mut connection)
+        .await;
+    connection.close().await?;
+    let message = result?.try_get::<String, _>(0)?;
+    if message == "ok" {
+        Ok(())
+    } else {
+        Err(BackupError::IntegrityCheckFailed(message))
+    }
 }
 
 #[cfg(test)]
@@ -124,6 +155,16 @@ mod tests {
         create_backup_directory(&backup_config).unwrap();
         let result = create_local_backup(&pool, &backup_config).await.unwrap();
         assert!(backup_config.directory.join(&result.filename).exists());
+        delete_backup_directory(&backup_config);
+    }
+
+    #[tokio::test]
+    async fn verify_backup_fails_on_corrupt_file() {
+        let backup_config = setup_backup_config();
+        create_backup_directory(&backup_config).unwrap();
+        let backup_path = backup_config.directory.join("corrupt.sqlite");
+        std::fs::write(&backup_path, b"corrupt database").unwrap();
+        assert!(verify_backup(&backup_path).await.is_err());
         delete_backup_directory(&backup_config);
     }
 }

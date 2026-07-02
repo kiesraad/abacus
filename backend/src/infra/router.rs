@@ -189,6 +189,8 @@ fn add_storybook_memory_serve(router: Router<AppState>) -> Router<AppState> {
 
 /// Add headers for security hardening
 /// Best practices according to the OWASP Secure Headers Project, https://owasp.org/www-project-secure-headers/
+/// HSTS (Strict-Transport-Security) is not set here because this function is also applied to
+/// the plaintext HTTP server (via `ca_router`). HSTS is added in `start_server_tls` (lib.rs) instead.
 pub(crate) fn add_security_headers<S>(router: Router<S>) -> Router<S>
 where
     S: Clone + Send + Sync + 'static,

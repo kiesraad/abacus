@@ -1,0 +1,28 @@
+import type { ReactNode } from "react";
+import { Alert } from "@/components/ui/Alert/Alert";
+import { Button } from "@/components/ui/Button/Button";
+import { FormLayout } from "@/components/ui/Form/FormLayout";
+import { t } from "@/i18n/translate";
+import cls from "./Apportionment.module.css";
+
+export interface DrawingLotsWarningAlertProps {
+  children: ReactNode;
+}
+
+export function DrawingLotsWarningAlert({ children }: DrawingLotsWarningAlertProps) {
+  return (
+    <FormLayout.Alert>
+      <Alert type="warning">
+        {children}
+        <div className={cls.alertButtons}>
+          <Button.Link size="md" to="./drawing-lots">
+            {t("apportionment.to_drawing_lots")}
+          </Button.Link>
+          <Button.Link variant="secondary" size="md" to="./details-residual-seats">
+            {t("apportionment.details_residual_seats_allocation")}
+          </Button.Link>
+        </div>
+      </Alert>
+    </FormLayout.Alert>
+  );
+}

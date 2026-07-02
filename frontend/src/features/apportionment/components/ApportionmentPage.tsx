@@ -13,6 +13,7 @@ import type {
   ChosenCandidate,
   ElectionSummary,
   ElectionWithPoliticalGroups,
+  PoliticalGroup,
   PreferenceThreshold,
   RESET_APPORTIONMENT_STATE_REQUEST_PATH,
   SeatAssignment,
@@ -35,6 +36,7 @@ import cls from "./Apportionment.module.css";
 import { ApportionmentError } from "./ApportionmentError";
 import { ApportionmentTable } from "./ApportionmentTable";
 import { ChosenCandidatesTable } from "./ChosenCandidatesTable";
+import { DrawingLotsWarningAlert } from "./DrawingLotsWarningAlert";
 import { type DeceasedCandidatesInfo, ElectionSummaryTable } from "./ElectionSummaryTable";
 
 function getNumberOfSeatsAssignedSentence(seats: number, type: "residual_seat" | "full_seat"): string {
@@ -98,44 +100,72 @@ function renderHighestAverageOrLargestRemainderDrawingLotsAlert(
   variant: "HighestAverageResidualSeat" | "LargestRemainderResidualSeat",
 ) {
   return (
-    <FormLayout.Alert>
-      <Alert type="warning">
-        <strong className="heading-md">
+    <DrawingLotsWarningAlert>
+      <strong className="heading-md">
+        {t(
+          `apportionment.drawing_lots_required_for_list_alert.title.${residualSeatNumbers.length === 1 ? "singular" : "plural"}`,
+        )}{" "}
+        {formatList(residualSeatNumbers, t("and"))}
+      </strong>
+      <p>
+        {t("apportionment.drawing_lots_required_for_list_alert.description", {
+          variant:
+            variant === "HighestAverageResidualSeat"
+              ? t("apportionment.average_number")
+              : t("apportionment.remainder_of"),
+        })}
+      </p>
+      <ul>
+        <li>
           {t(
-            `apportionment.drawing_lots_required_alert.title.${residualSeatNumbers.length === 1 ? "singular" : "plural"}`,
-          )}{" "}
-          {formatList(residualSeatNumbers, t("and"))}
-        </strong>
-        <p>
-          {t("apportionment.drawing_lots_required_alert.description", {
-            variant:
-              variant === "HighestAverageResidualSeat"
-                ? t("apportionment.average_number")
-                : t("apportionment.remainder_of"),
-          })}
-        </p>
-        <ul>
-          <li>
-            {t(
-              `apportionment.drawing_lots_required_alert.${variant === "HighestAverageResidualSeat" ? "same_averages" : "same_remainders"}`,
-            )}
-          </li>
-          <li>{t("apportionment.drawing_lots_required_alert.drawing_lots_needed")}</li>
-        </ul>
-        <div className={cls.alertButtons}>
-          <Button.Link size="md" to="./drawing-lots">
-            {t("apportionment.to_drawing_lots")}
-          </Button.Link>
-          <Button.Link variant="secondary" size="md" to="./details-residual-seats">
-            {t("apportionment.details_residual_seats_allocation")}
-          </Button.Link>
-        </div>
-      </Alert>
-    </FormLayout.Alert>
+            `apportionment.drawing_lots_required_for_list_alert.${variant === "HighestAverageResidualSeat" ? "same_averages" : "same_remainders"}`,
+          )}
+        </li>
+        <li>{t("apportionment.drawing_lots_required_for_list_alert.drawing_lots_needed")}</li>
+      </ul>
+    </DrawingLotsWarningAlert>
   );
 }
 
-function renderDrawingLotsAlert(
+function renderAbsoluteMajorityDrawingLotsAlert(
+  options: number[],
+  assign_to: string,
+  variant: "AbsoluteMajorityHighestAverage" | "AbsoluteMajorityLargestRemainder",
+) {
+  return (
+    <DrawingLotsWarningAlert>
+      <strong className="heading-md">{t("apportionment.drawing_lots_required_for_p9_alert.title")}</strong>
+      <p>{t("apportionment.drawing_lots_required_for_p9_alert.description", { name: assign_to })}</p>
+      <p>
+        {t("apportionment.drawing_lots_required_for_p9_alert.article_p9")}{" "}
+        {tx("apportionment.drawing_lots_required_for_p9_alert.last_residual_seat", undefined, {
+          lists: formatList(options, t("and")),
+          variant:
+            variant === "AbsoluteMajorityHighestAverage"
+              ? t("apportionment.average_number")
+              : t("apportionment.remainder_of"),
+        })}{" "}
+        {t("apportionment.drawing_lots_required_for_p9_alert.drawing_lots_needed")}
+      </p>
+    </DrawingLotsWarningAlert>
+  );
+}
+
+function renderDrawingLotsAlert(state: ApportionmentState, politicalGroups: PoliticalGroup[]) {
+  return isListDrawingLotsVariant(state, ["HighestAverageResidualSeat", "LargestRemainderResidualSeat"])
+    ? renderHighestAverageOrLargestRemainderDrawingLotsAlert(
+        state.drawing_lots_required.residual_seat_numbers,
+        state.drawing_lots_required.variant,
+      )
+    : isListDrawingLotsVariant(state, ["AbsoluteMajorityLargestRemainder", "AbsoluteMajorityHighestAverage"]) &&
+        renderAbsoluteMajorityDrawingLotsAlert(
+          state.drawing_lots_required.options,
+          politicalGroups.find((pg) => pg.number === state.drawing_lots_required.assign_to)?.name || "",
+          state.drawing_lots_required.variant,
+        );
+}
+
+function renderNotifyDrawingLotsAlert(
   listsAssignedByDrawingLots: ListAssignedByDrawingLots[],
   seat_from_lists: number[],
   seat_to_list: number | undefined,
@@ -270,7 +300,7 @@ function ApportionmentTableSection({ state, seatAssignment, election }: Apportio
         {(notAssignedSeats > 0 ||
           (seat_from_lists.length > 0 && seat_to_list !== undefined) ||
           listsAssignedByDrawingLots.length > 0) &&
-          renderDrawingLotsAlert(listsAssignedByDrawingLots, seat_from_lists, seat_to_list, notAssignedSeats)}
+          renderNotifyDrawingLotsAlert(listsAssignedByDrawingLots, seat_from_lists, seat_to_list, notAssignedSeats)}
         <ApportionmentTable
           standings={seatAssignment.standings}
           politicalGroups={election.political_groups}
@@ -344,11 +374,7 @@ export function ApportionmentPage() {
                       currentCommitteeSession.id,
                       () => void handleResetApportionmentState(),
                     )
-                  : isListDrawingLotsVariant(state, ["HighestAverageResidualSeat", "LargestRemainderResidualSeat"]) &&
-                    renderHighestAverageOrLargestRemainderDrawingLotsAlert(
-                      state.drawing_lots_required.residual_seat_numbers,
-                      state.drawing_lots_required.variant,
-                    )}
+                  : renderDrawingLotsAlert(state, election.political_groups)}
                 <ElectionSummaryTableSection
                   electionSummary={electionSummary}
                   seatAssignment={seatAssignment}

@@ -315,7 +315,6 @@ mod test {
             directory: backup_dir.path().to_path_buf(),
         };
         let server_task = tokio::spawn(async move {
-            let _backup_dir = backup_dir; // keep tempdir alive for the duration of the test
             start_server(pool, listener, false, backup_config)
                 .await
                 .unwrap();

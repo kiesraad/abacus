@@ -108,6 +108,73 @@
         ]
       }
     },
+    "/api/backup": {
+      "post": {
+        "summary": "administrator, coordinator_csb, coordinator_gsb",
+        "operationId": "create_backup",
+        "responses": {
+          "201": {
+            "description": "Backup created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BackupResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Backup already exists",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "administrator",
+              "coordinator_csb",
+              "coordinator_gsb"
+            ]
+          }
+        ]
+      }
+    },
     "/api/data_entries/{data_entry_id}": {
       "delete": {
         "summary": "Reset the data entry to empty (coordinator_csb, coordinator_gsb)",
@@ -5548,6 +5615,7 @@
           "AirGapViolationDetected",
           "AirGapViolationResolved",
           "ApplicationStarted",
+          "DatabaseBackupCreated",
           "ApiError",
           "ApiWarning",
           "UnknownEvent"
@@ -5661,6 +5729,22 @@
           }
         },
         "additionalProperties": false
+      },
+      "BackupResponse": {
+        "type": "object",
+        "required": [
+          "filename",
+          "created_at"
+        ],
+        "properties": {
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "filename": {
+            "type": "string"
+          }
+        }
       },
       "BasePollingStation": {
         "type": "object",
@@ -7113,6 +7197,7 @@
         "enum": [
           "AirgapViolation",
           "AlreadyInitialised",
+          "BackupAlreadyExists",
           "ApportionmentNotCompleted",
           "ApportionmentCommitteeSessionNotCompleted",
           "ApportionmentInvalidLotDrawing",

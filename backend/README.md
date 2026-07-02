@@ -209,7 +209,7 @@ Additionally, the following development dependencies are used:
 - `test-log`: show tracing messages while running tests
 - `reqwest`: HTTP client for testing the API.
 - `http-body-util`: trait used to extract a response body in some tests.
-- `tempfile`: to create temporary directories for TLS certificate tests.
+- `tempfile`: to create temporary directories in tests.
 
 ### Database
 

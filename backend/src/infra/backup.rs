@@ -1,34 +1,41 @@
 use chrono::Local;
-use sqlx::SqlitePool;
-use std::path::{Path, PathBuf};
+use sqlx::{
+    Connection, SqlitePool,
+    sqlite::{SqliteConnectOptions, SqliteConnection},
+};
+use std::{
+    path::{Path, PathBuf},
+    sync::Arc,
+};
+use tokio::sync::Mutex;
+use tracing::info;
 
-/// Configuration for the local database backup system.
 #[derive(Clone)]
 pub struct BackupConfig {
-    /// Directory where backup files are stored.
     pub directory: PathBuf,
+    /// Mutex to prevent concurrent backup creation
+    lock: Arc<Mutex<()>>,
 }
 
 impl BackupConfig {
-    /// Creates a new `BackupConfig` using a `backups` directory
-    /// in the same folder as the database file.
-    pub fn new(database: &str) -> Result<Self, BackupError> {
-        let database_path = Path::new(database);
-        let working_directory = database_path
-            .parent()
-            .ok_or(BackupError::InvalidDatabasePath)?;
-        let backup_directory = working_directory.join("backups");
-        Ok(BackupConfig {
-            directory: backup_directory,
-        })
+    pub fn new(directory: PathBuf) -> Self {
+        Self {
+            directory,
+            lock: Arc::new(Mutex::new(())),
+        }
     }
 }
 
-/// Errors that can occur during backup operations.
+pub struct BackupResult {
+    pub filename: String,
+    pub created_at: chrono::DateTime<Local>,
+}
+
 #[derive(Debug)]
 pub enum BackupError {
+    AlreadyExists,
     InvalidPath,
-    InvalidDatabasePath,
+    IntegrityCheckFailed(String),
     Io(std::io::Error),
     Database(sqlx::Error),
 }
@@ -48,17 +55,36 @@ impl From<sqlx::Error> for BackupError {
 pub async fn create_local_backup(
     pool: &SqlitePool,
     backup_config: &BackupConfig,
-) -> Result<(), BackupError> {
+) -> Result<BackupResult, BackupError> {
+    let guard = backup_config.lock.lock().await;
     create_backup_directory(backup_config)?;
-    let filename = format!("backup_{}.db", Local::now().format("%Y-%m-%d_%H-%M-%S"));
-    let backup_path = backup_config.directory.join(filename);
-    backup_database(pool, &backup_path).await?;
-    Ok(())
+    let now = Local::now();
+    let filename = format!("db_backup_{}.sqlite", now.format("%Y-%m-%d_%H-%M-%S"));
+    let backup_path = backup_config.directory.join(&filename);
+    if backup_path.exists() {
+        return Err(BackupError::AlreadyExists);
+    }
+    if let Err(err) = write_and_verify_backup(pool, &backup_path).await {
+        // try to delete the backup, ignore error if deleting fails
+        let _ = std::fs::remove_file(&backup_path);
+        return Err(err);
+    }
+    drop(guard);
+    info!("Created database backup: {filename}");
+    Ok(BackupResult {
+        filename,
+        created_at: now,
+    })
 }
 
 fn create_backup_directory(backup_config: &BackupConfig) -> Result<(), BackupError> {
     std::fs::create_dir_all(&backup_config.directory)?;
     Ok(())
+}
+
+async fn write_and_verify_backup(pool: &SqlitePool, backup_path: &Path) -> Result<(), BackupError> {
+    backup_database(pool, backup_path).await?;
+    verify_backup(backup_path).await
 }
 
 async fn backup_database(pool: &SqlitePool, destination: &Path) -> Result<(), BackupError> {
@@ -74,53 +100,63 @@ async fn backup_database(pool: &SqlitePool, destination: &Path) -> Result<(), Ba
     Ok(())
 }
 
+/// Run SQLite integrity check on a separate read-only connection.
+async fn verify_backup(backup_path: &Path) -> Result<(), BackupError> {
+    let options = SqliteConnectOptions::new()
+        .filename(backup_path)
+        .read_only(true);
+    let mut connection = SqliteConnection::connect_with(&options).await?;
+    let result = sqlx::query_scalar::<_, String>("PRAGMA integrity_check")
+        .fetch_one(&mut connection)
+        .await;
+    connection.close().await?;
+    let message = result?;
+    if message == "ok" {
+        Ok(())
+    } else {
+        Err(BackupError::IntegrityCheckFailed(message))
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::sync::atomic::{AtomicU32, Ordering};
+    use tempfile::TempDir;
 
-    static TEST_ID: AtomicU32 = AtomicU32::new(0);
-
-    fn setup_backup_config() -> BackupConfig {
-        let id = TEST_ID.fetch_add(1, Ordering::Relaxed);
-        let backup_directory =
-            std::env::temp_dir().join(format!("backups_{}_{}", std::process::id(), id));
-        BackupConfig {
-            directory: backup_directory,
-        }
-    }
-
-    fn delete_backup_directory(backup_config: &BackupConfig) {
-        std::fs::remove_dir_all(&backup_config.directory).unwrap();
+    fn setup_backup_config() -> (TempDir, BackupConfig) {
+        let temp_dir = tempfile::tempdir().unwrap();
+        let backup_config = BackupConfig::new(temp_dir.path().join("backups"));
+        (temp_dir, backup_config)
     }
 
     #[tokio::test]
     async fn backup_directory_is_created_succesfully() {
-        let backup_config = setup_backup_config();
+        let (_temp_dir, backup_config) = setup_backup_config();
         create_backup_directory(&backup_config).unwrap();
-        delete_backup_directory(&backup_config);
+        assert!(backup_config.directory.exists());
     }
 
     #[tokio::test]
     async fn backup_directory_creation_is_idempotent() {
-        let backup_config = setup_backup_config();
+        let (_temp_dir, backup_config) = setup_backup_config();
         create_backup_directory(&backup_config).unwrap();
         create_backup_directory(&backup_config).unwrap();
-        delete_backup_directory(&backup_config);
-    }
-
-    #[test]
-    fn backup_path_ends_with_correct_directory_name() {
-        let backup_config = BackupConfig::new("db.sqlite").unwrap();
-        assert!(backup_config.directory.ends_with("backups"));
     }
 
     #[sqlx::test]
-    async fn local_backup_is_succesfull(pool: SqlitePool) {
-        let backup_config = setup_backup_config();
+    async fn local_backup_is_successful(pool: SqlitePool) {
+        let (_temp_dir, backup_config) = setup_backup_config();
         create_backup_directory(&backup_config).unwrap();
-        create_local_backup(&pool, &backup_config).await.unwrap();
-        assert!(backup_config.directory.read_dir().unwrap().next().is_some());
-        delete_backup_directory(&backup_config);
+        let result = create_local_backup(&pool, &backup_config).await.unwrap();
+        assert!(backup_config.directory.join(&result.filename).exists());
+    }
+
+    #[tokio::test]
+    async fn verify_backup_fails_on_corrupt_file() {
+        let (_temp_dir, backup_config) = setup_backup_config();
+        create_backup_directory(&backup_config).unwrap();
+        let backup_path = backup_config.directory.join("corrupt.sqlite");
+        std::fs::write(&backup_path, b"corrupt database").unwrap();
+        assert!(verify_backup(&backup_path).await.is_err());
     }
 }

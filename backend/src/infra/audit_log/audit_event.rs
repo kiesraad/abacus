@@ -147,6 +147,7 @@ pub enum AuditEventType {
     AirGapViolationResolved,
     // system events
     ApplicationStarted,
+    DatabaseBackupCreated,
     // API events (one for each severity level)
     ApiError,
     ApiWarning,

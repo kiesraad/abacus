@@ -13,7 +13,7 @@ pmOnFail: error
 strictDepBuilds: true
 strictPeerDependencies: true
 catalog:
-  vite: 8.0.16
+  vite: 8.1.0
   "@vitest/expect": 4.1.8
 overrides:
   # Storybook currently uses @vitest/expect 3.2.4 which doesn't work with our vitest.d.ts

@@ -4,7 +4,7 @@ use std::{
     process,
 };
 
-use abacus::{AppError, create_sqlite_pool};
+use abacus::{AppError, create_sqlite_pool, infra::backup::BackupConfig};
 use clap::Parser;
 use socket2::{Domain, Protocol, Socket, Type};
 use tokio::net::TcpListener;
@@ -85,6 +85,10 @@ struct Args {
     #[arg(short, long, default_value = "db.sqlite", env = "ABACUS_DATABASE")]
     database: String,
 
+    /// Directory for database backups
+    #[arg(long, default_value = "backups", env = "ABACUS_BACKUP_DIR")]
+    backup_dir: std::path::PathBuf,
+
     /// Location of the TLS directory (CA certificate and key), will be created if it doesn't exist
     #[cfg(feature = "tls")]
     #[arg(long, default_value = "tls", env = "ABACUS_TLS_DIR")]
@@ -149,6 +153,8 @@ async fn run() -> Result<(), AppError> {
     )
     .await?;
 
+    let backup_config = BackupConfig::new(args.backup_dir);
+
     // Enable airgap detection if the feature is enabled or if the command line argument is set.
     #[cfg(feature = "airgap-detection")]
     let enable_airgap_detection = true;
@@ -167,8 +173,16 @@ async fn run() -> Result<(), AppError> {
 
         spawn_plain_http_server(args.http_port, args.port, ca.clone());
 
-        abacus::start_server_tls(pool, listener, enable_airgap_detection, tls_config, ca).await
+        abacus::start_server_tls(
+            pool,
+            listener,
+            enable_airgap_detection,
+            backup_config,
+            tls_config,
+            ca,
+        )
+        .await
     }
     #[cfg(not(feature = "tls"))]
-    abacus::start_server(pool, listener, enable_airgap_detection).await
+    abacus::start_server(pool, listener, enable_airgap_detection, backup_config).await
 }

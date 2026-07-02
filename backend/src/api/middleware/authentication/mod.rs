@@ -55,7 +55,7 @@ mod tests {
         api::{authentication::*, middleware::airgap::AirgapDetection, user::*},
         domain::role::Role,
         error::ErrorReference,
-        infra::audit_log::LogFilter,
+        infra::{audit_log::LogFilter, backup::BackupConfig},
         repository::{
             session_repo::{self, Session},
             user_repo::{self, User, UserId},
@@ -66,9 +66,11 @@ mod tests {
     };
 
     fn create_app(pool: &SqlitePool) -> Router {
+        let backup_dir = tempfile::tempdir().unwrap();
         let state = AppState {
             pool: pool.clone(),
             airgap_detection: AirgapDetection::nop(),
+            backup_config: BackupConfig::new(backup_dir.path().to_path_buf()),
         };
 
         Router::from(router())

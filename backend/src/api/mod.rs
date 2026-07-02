@@ -1,6 +1,7 @@
 pub mod apportionment;
 pub mod audit;
 pub mod authentication;
+pub mod backup;
 pub mod committee_session;
 pub mod data_entry;
 pub mod document;

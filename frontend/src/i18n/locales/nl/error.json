@@ -10,6 +10,7 @@
     "ApportionmentNotCompleted": "De documenten kunnen pas gedownload worden als de zetelverdeling is afgerond",
     "ApportionmentCommitteeSessionNotCompleted": "De zetelverdeling kan pas gemaakt worden als de zitting is afgerond",
     "ApportionmentInvalidLotDrawing": "Loting is ongeldig",
+    "BackupAlreadyExists": "De backup met deze naam bestaat al, probeer het later opnieuw",
     "CommitteeSessionPaused": "De coördinator heeft het invoeren van stemmen gepauzeerd. Je kan niet meer verder.",
     "DatabaseError": "Er is een fout opgetreden bij het opslaan van de invoer",
     "DataEntryAlreadyClaimed": "Een andere invoerder is bezig met dit stembureau",

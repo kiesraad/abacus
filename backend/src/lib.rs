@@ -27,7 +27,7 @@ pub use app_error::AppError;
 pub use error::{APIError, ErrorResponse};
 #[cfg(feature = "dev-database")]
 use infra::seed_data;
-use infra::{audit_log, router};
+use infra::{audit_log, backup::BackupConfig, router};
 
 use crate::{
     app_error::{DatabaseErrorWithPath, DatabaseMigrationErrorWithPath},
@@ -57,6 +57,7 @@ impl SqlitePoolExt for SqlitePool {
 pub struct AppState {
     pool: SqlitePool,
     airgap_detection: AirgapDetection,
+    backup_config: BackupConfig,
 }
 
 /// Start airgap detection if enabled, logging which path was taken.
@@ -72,10 +73,14 @@ fn setup_airgap_detection(pool: &SqlitePool, enable: bool) -> AirgapDetection {
 
 /// Log startup, start airgap detection, and build the router shared by the
 /// HTTP and HTTPS servers.
-fn build_app(pool: &SqlitePool, enable_airgap_detection: bool) -> Result<axum::Router, AppError> {
+fn build_app(
+    pool: &SqlitePool,
+    enable_airgap_detection: bool,
+    backup_config: BackupConfig,
+) -> Result<axum::Router, AppError> {
     info!("Starting Abacus (version {})", env!("ABACUS_GIT_VERSION"));
     let airgap_detection = setup_airgap_detection(pool, enable_airgap_detection);
-    router::create_router(pool.clone(), airgap_detection)
+    router::create_router(pool.clone(), airgap_detection, backup_config)
 }
 
 /// Close the database pool (flushing SQLite WAL/shm) and log a clean shutdown.
@@ -89,8 +94,9 @@ pub async fn start_server(
     pool: SqlitePool,
     listener: TcpListener,
     enable_airgap_detection: bool,
+    backup_config: BackupConfig,
 ) -> Result<(), AppError> {
-    let app = build_app(&pool, enable_airgap_detection)?;
+    let app = build_app(&pool, enable_airgap_detection, backup_config)?;
 
     warn!("TLS is disabled, serving Abacus over plain HTTP. This is not allowed in production.");
     info!("Starting Abacus on http://{}", listener.local_addr()?);
@@ -119,6 +125,7 @@ pub async fn start_server_tls(
     pool: SqlitePool,
     listener: TcpListener,
     enable_airgap_detection: bool,
+    backup_config: BackupConfig,
     tls_config: std::sync::Arc<rustls::ServerConfig>,
     ca: std::sync::Arc<infra::tls::CaCertificate>,
 ) -> Result<(), AppError> {
@@ -129,7 +136,8 @@ pub async fn start_server_tls(
         tls_rustls::{RustlsAcceptor, RustlsConfig},
     };
 
-    let app = build_app(&pool, enable_airgap_detection)?.merge(infra::router::ca_router(&ca));
+    let app = build_app(&pool, enable_airgap_detection, backup_config)?
+        .merge(infra::router::ca_router(&ca));
 
     info!("Starting Abacus on https://{}", listener.local_addr()?);
 
@@ -289,7 +297,7 @@ mod test {
     use tokio::net::TcpListener;
 
     use super::start_server;
-    use crate::{AppError, create_sqlite_pool};
+    use crate::{AppError, create_sqlite_pool, infra::backup::BackupConfig};
 
     pub(crate) async fn run_server_test<F, Fut>(pool: SqlitePool, test_fn: F)
     where
@@ -302,8 +310,12 @@ mod test {
         let base_url = format!("http://{addr}");
 
         // Start server in background task
+        let backup_dir = tempfile::tempdir().unwrap();
+        let backup_config = BackupConfig::new(backup_dir.path().to_path_buf());
         let server_task = tokio::spawn(async move {
-            start_server(pool, listener, false).await.unwrap();
+            start_server(pool, listener, false, backup_config)
+                .await
+                .unwrap();
         });
 
         // Run the test
@@ -466,7 +478,10 @@ mod test {
         use test_log::test;
         use tokio::{net::TcpListener, task::JoinHandle};
 
-        use crate::{infra::audit_log, infra::tls::load_or_generate, start_server_tls};
+        use crate::{
+            infra::audit_log, infra::backup::BackupConfig, infra::tls::load_or_generate,
+            start_server_tls,
+        };
 
         /// Helper to start an HTTPS server on `bind_addr` with a new CA+leaf certificate
         async fn spawn_https_server(
@@ -478,11 +493,12 @@ mod test {
             let ca_pem = certificates.ca.pem.clone();
             let server_config = certificates.server_config().unwrap();
             let ca = std::sync::Arc::new(certificates.ca);
+            let backup_config = BackupConfig::new(dir.path().join("backups"));
 
             let listener = TcpListener::bind(bind_addr).await.unwrap();
             let addr = listener.local_addr().unwrap();
             let task = tokio::spawn(async move {
-                start_server_tls(pool, listener, false, server_config, ca)
+                start_server_tls(pool, listener, false, backup_config, server_config, ca)
                     .await
                     .unwrap();
             });

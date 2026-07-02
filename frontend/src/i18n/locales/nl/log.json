@@ -76,6 +76,7 @@
     "file_mime_type": "Bestandstype",
     "file_name": "Bestandsnaam",
     "file_size_bytes": "Bestandsgrootte (bytes)",
+    "filename": "Bestandsnaam",
     "findings": "Bevindingen",
     "finished_at": "Afgerond op",
     "first_entry_user_id": "Eerste invoer Gebruikers-ID",

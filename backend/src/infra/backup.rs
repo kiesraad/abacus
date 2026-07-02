@@ -1,6 +1,6 @@
 use chrono::Local;
 use sqlx::{
-    Connection, Row, SqlitePool,
+    Connection, SqlitePool,
     sqlite::{SqliteConnectOptions, SqliteConnection},
 };
 use std::{
@@ -104,11 +104,11 @@ async fn verify_backup(backup_path: &Path) -> Result<(), BackupError> {
         .filename(backup_path)
         .read_only(true);
     let mut connection = SqliteConnection::connect_with(&options).await?;
-    let result = sqlx::query("PRAGMA integrity_check")
+    let result = sqlx::query_scalar::<_, String>("PRAGMA integrity_check")
         .fetch_one(&mut connection)
         .await;
     connection.close().await?;
-    let message = result?.try_get::<String, _>(0)?;
+    let message = result?;
     if message == "ok" {
         Ok(())
     } else {

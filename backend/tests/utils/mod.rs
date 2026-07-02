@@ -17,9 +17,7 @@ pub async fn serve_api(pool: SqlitePool) -> SocketAddr {
 
 pub async fn serve_api_with_backup_dir(pool: SqlitePool) -> (SocketAddr, TempDir) {
     let backup_dir = tempfile::tempdir().unwrap();
-    let backup_config = BackupConfig {
-        directory: backup_dir.path().to_path_buf(),
-    };
+    let backup_config = BackupConfig::new(backup_dir.path().to_path_buf());
     let app = router::create_router(pool, AirgapDetection::nop(), backup_config)
         .unwrap()
         .into_make_service_with_connect_info::<SocketAddr>();

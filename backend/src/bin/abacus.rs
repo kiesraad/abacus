@@ -153,9 +153,7 @@ async fn run() -> Result<(), AppError> {
     )
     .await?;
 
-    let backup_config = BackupConfig {
-        directory: args.backup_dir,
-    };
+    let backup_config = BackupConfig::new(args.backup_dir);
 
     // Enable airgap detection if the feature is enabled or if the command line argument is set.
     #[cfg(feature = "airgap-detection")]

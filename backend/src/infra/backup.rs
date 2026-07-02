@@ -1,10 +1,25 @@
 use chrono::Local;
 use sqlx::SqlitePool;
-use std::path::{Path, PathBuf};
+use std::{
+    path::{Path, PathBuf},
+    sync::Arc,
+};
+use tokio::sync::Mutex;
 
 #[derive(Clone)]
 pub struct BackupConfig {
     pub directory: PathBuf,
+    /// Mutex to prevent concurrent backup creation
+    lock: Arc<Mutex<()>>,
+}
+
+impl BackupConfig {
+    pub fn new(directory: PathBuf) -> Self {
+        Self {
+            directory,
+            lock: Arc::new(Mutex::new(())),
+        }
+    }
 }
 
 pub struct BackupResult {
@@ -36,6 +51,7 @@ pub async fn create_local_backup(
     pool: &SqlitePool,
     backup_config: &BackupConfig,
 ) -> Result<BackupResult, BackupError> {
+    let guard = backup_config.lock.lock().await;
     create_backup_directory(backup_config)?;
     let now = Local::now();
     let filename = format!("db_backup_{}.sqlite", now.format("%Y-%m-%d_%H-%M-%S"));
@@ -44,6 +60,7 @@ pub async fn create_local_backup(
         return Err(BackupError::AlreadyExists);
     }
     backup_database(pool, &backup_path).await?;
+    drop(guard);
     Ok(BackupResult {
         filename,
         created_at: now,
@@ -79,9 +96,7 @@ mod tests {
         let id = TEST_ID.fetch_add(1, Ordering::Relaxed);
         let backup_directory =
             std::env::temp_dir().join(format!("backups_{}_{}", std::process::id(), id));
-        BackupConfig {
-            directory: backup_directory,
-        }
+        BackupConfig::new(backup_directory)
     }
 
     fn delete_backup_directory(backup_config: &BackupConfig) {

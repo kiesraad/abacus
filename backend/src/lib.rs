@@ -311,9 +311,7 @@ mod test {
 
         // Start server in background task
         let backup_dir = tempfile::tempdir().unwrap();
-        let backup_config = BackupConfig {
-            directory: backup_dir.path().to_path_buf(),
-        };
+        let backup_config = BackupConfig::new(backup_dir.path().to_path_buf());
         let server_task = tokio::spawn(async move {
             start_server(pool, listener, false, backup_config)
                 .await
@@ -495,9 +493,7 @@ mod test {
             let ca_pem = certificates.ca.pem.clone();
             let server_config = certificates.server_config().unwrap();
             let ca = std::sync::Arc::new(certificates.ca);
-            let backup_config = BackupConfig {
-                directory: dir.path().join("backups"),
-            };
+            let backup_config = BackupConfig::new(dir.path().join("backups"));
 
             let listener = TcpListener::bind(bind_addr).await.unwrap();
             let addr = listener.local_addr().unwrap();

@@ -70,9 +70,7 @@ mod tests {
         let state = AppState {
             pool: pool.clone(),
             airgap_detection: AirgapDetection::nop(),
-            backup_config: BackupConfig {
-                directory: backup_dir.path().to_path_buf(),
-            },
+            backup_config: BackupConfig::new(backup_dir.path().to_path_buf()),
         };
 
         Router::from(router())

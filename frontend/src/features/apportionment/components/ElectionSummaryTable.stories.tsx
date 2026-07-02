@@ -76,7 +76,7 @@ export const DefaultWithoutNumberOfVoters: StoryObj = {
   },
 };
 
-export const DefaultWithoutBlankAndInvalidVotes: StoryObj = {
+export const DefaultWithoutVotes: StoryObj = {
   render: () => {
     return (
       <ElectionSummaryTable
@@ -84,7 +84,8 @@ export const DefaultWithoutBlankAndInvalidVotes: StoryObj = {
           ...gte19Seats.election_summary.votes_counts,
           blank_votes_count: 0,
           invalid_votes_count: 0,
-          total_votes_candidates_count: 1205,
+          total_votes_candidates_count: 0,
+          total_votes_cast_count: 0,
         }}
         seats={gte19Seats.seat_assignment.seats}
         quota={gte19Seats.seat_assignment.quota}
@@ -105,10 +106,10 @@ export const DefaultWithoutBlankAndInvalidVotes: StoryObj = {
     await expect(table).toBeVisible();
     expect(table).toHaveTableContent([
       ["Kiesgerechtigden", "2.000", ""],
-      ["Getelde stembiljetten", "1.205", "Opkomst: 60,25%"],
+      ["Getelde stembiljetten", "0", ""],
       ["Blanco stemmen", "0", ""],
       ["Ongeldige stemmen", "0", ""],
-      ["Totaal stemmen op kandidaten", "1.205", ""],
+      ["Totaal stemmen op kandidaten", "0", ""],
       ["Aantal raadszetels", "23", ""],
       ["Kiesdeler", "52 4/23", "Benodigde stemmen per volle zetel"],
       ["Voorkeursdrempel", "13 100/2300", "25% van de kiesdeler"],

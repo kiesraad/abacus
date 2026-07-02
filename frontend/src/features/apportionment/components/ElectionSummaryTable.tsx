@@ -27,6 +27,14 @@ interface ElectionSummaryTableProps {
   deceasedCandidatesInfo: DeceasedCandidatesInfo;
 }
 
+function formatVoteCount(count: number): string {
+  return count > 0 ? formatNumber(count) : "0";
+}
+
+function formatVotePercentage(count: number, total: number): string {
+  return count > 0 ? formatPercentage(count, total) : "";
+}
+
 export function ElectionSummaryTable({
   votesCounts,
   seats,
@@ -51,10 +59,10 @@ export function ElectionSummaryTable({
           <Table.HeaderCell scope="row" className="normal">
             {t("apportionment.total_votes_cast_count")}
           </Table.HeaderCell>
-          <Table.NumberCell>{formatNumber(votesCounts.total_votes_cast_count)}</Table.NumberCell>
+          <Table.NumberCell>{formatVoteCount(votesCounts.total_votes_cast_count)}</Table.NumberCell>
           <Table.Cell className="fs-sm">
-            {numberOfVoters
-              ? `${t("apportionment.turnout")}: ${formatPercentage(votesCounts.total_votes_cast_count, numberOfVoters)}`
+            {numberOfVoters && votesCounts.total_votes_cast_count > 0
+              ? `${t("apportionment.turnout")}: ${formatVotePercentage(votesCounts.total_votes_cast_count, numberOfVoters)}`
               : ""}
           </Table.Cell>
         </Table.Row>
@@ -62,33 +70,25 @@ export function ElectionSummaryTable({
           <Table.HeaderCell scope="row" className="normal">
             {t("voters_votes_counts.votes_counts.blank_votes_count")}
           </Table.HeaderCell>
-          <Table.NumberCell>
-            {votesCounts.blank_votes_count > 0 ? formatNumber(votesCounts.blank_votes_count) : "0"}
-          </Table.NumberCell>
+          <Table.NumberCell>{formatVoteCount(votesCounts.blank_votes_count)}</Table.NumberCell>
           <Table.Cell className="fs-sm">
-            {votesCounts.blank_votes_count > 0
-              ? formatPercentage(votesCounts.blank_votes_count, votesCounts.total_votes_cast_count)
-              : ""}
+            {formatVotePercentage(votesCounts.blank_votes_count, votesCounts.total_votes_cast_count)}
           </Table.Cell>
         </Table.Row>
         <Table.Row>
           <Table.HeaderCell scope="row" className="normal">
             {t("voters_votes_counts.votes_counts.invalid_votes_count")}
           </Table.HeaderCell>
-          <Table.NumberCell>
-            {votesCounts.invalid_votes_count > 0 ? formatNumber(votesCounts.invalid_votes_count) : "0"}
-          </Table.NumberCell>
+          <Table.NumberCell>{formatVoteCount(votesCounts.invalid_votes_count)}</Table.NumberCell>
           <Table.Cell className="fs-sm">
-            {votesCounts.invalid_votes_count > 0
-              ? formatPercentage(votesCounts.invalid_votes_count, votesCounts.total_votes_cast_count)
-              : ""}
+            {formatVotePercentage(votesCounts.invalid_votes_count, votesCounts.total_votes_cast_count)}
           </Table.Cell>
         </Table.Row>
         <Table.Row>
           <Table.HeaderCell scope="row" className="normal">
             {t("voters_votes_counts.votes_counts.total_votes_candidates_count")}
           </Table.HeaderCell>
-          <Table.NumberCell>{formatNumber(votesCounts.total_votes_candidates_count)}</Table.NumberCell>
+          <Table.NumberCell>{formatVoteCount(votesCounts.total_votes_candidates_count)}</Table.NumberCell>
           <Table.Cell className="fs-sm" />
         </Table.Row>
         <Table.Row>

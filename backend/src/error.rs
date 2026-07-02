@@ -22,6 +22,7 @@ use crate::{
         role::RoleNotAuthorizedError, validate::DataError,
     },
     eml::EMLImportError,
+    infra::backup::BackupError,
     repository::polling_station_repo,
     service::{DataEntryServiceError, PollingStationServiceError, SubCommitteeServiceError},
 };
@@ -41,6 +42,7 @@ pub trait ApiErrorResponse: Debug + Any {
 pub enum ErrorReference {
     AirgapViolation,
     AlreadyInitialised,
+    BackupAlreadyExists,
     ApportionmentNotCompleted,
     ApportionmentCommitteeSessionNotCompleted,
     ApportionmentInvalidLotDrawing,
@@ -356,6 +358,25 @@ impl From<sqlx::Error> for APIError {
                 _ => APIError::SqlxError(err),
             },
             _ => APIError::SqlxError(err),
+        }
+    }
+}
+
+impl From<BackupError> for APIError {
+    fn from(err: BackupError) -> Self {
+        match err {
+            BackupError::AlreadyExists => APIError::Conflict(
+                "A backup with this filename already exists".to_string(),
+                ErrorReference::BackupAlreadyExists,
+            ),
+            BackupError::InvalidPath => {
+                APIError::StdError(Box::new(std::io::Error::other("invalid backup path")))
+            }
+            BackupError::IntegrityCheckFailed(output) => APIError::StdError(Box::new(
+                std::io::Error::other(format!("backup integrity check failed: {output}")),
+            )),
+            BackupError::Io(err) => APIError::StdError(Box::new(err)),
+            BackupError::Database(err) => APIError::SqlxError(err),
         }
     }
 }

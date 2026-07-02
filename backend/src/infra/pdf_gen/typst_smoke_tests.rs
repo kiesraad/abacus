@@ -779,7 +779,7 @@ async fn test_p_22_2() {
     let enriched_candidate_nomination =
         EnrichedCandidateNomination::new(&election, &candidate_nomination).unwrap();
     let footnotes =
-        ApportionmentFootnotes::new(&election.political_groups, &seat_assignment).unwrap();
+        ApportionmentFootnotes::new(&election.political_groups, &seat_assignment.steps).unwrap();
 
     let hash = random_string(&mut rng, 64);
     let creation_date_time = random_date_time(&mut rng)

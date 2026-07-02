@@ -75,13 +75,13 @@ mod tests {
 
     #[test(sqlx::test(fixtures(
         path = "../../../../fixtures",
-        scripts("election_5_with_results")
+        scripts("election_8_csb_with_results")
     )))]
     async fn test_add_candidate_drawn(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
-        let user = User::test_user(Role::CoordinatorGSB, UserId::from(1));
+        let user = User::test_user(Role::CoordinatorCSB, UserId::from(3));
         let audit_service = AuditService::new(Some(user.clone()), None);
-        let id = CommitteeSessionId::from(6);
+        let id = CommitteeSessionId::from(801);
 
         committee_session_repo::change_status(&mut conn, id, CommitteeSessionStatus::Completed)
             .await
@@ -118,7 +118,7 @@ mod tests {
             user,
             State(pool),
             audit_service,
-            Path(ElectionId::from(5)),
+            Path(ElectionId::from(8)),
             Json::from(candidate_drawn.clone()),
         )
         .await

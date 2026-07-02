@@ -4,7 +4,7 @@ mod error;
 pub mod hash;
 
 use apportionment::CandidateNominationDetails;
-use chrono::{DateTime, Local, Utc};
+use chrono::{DateTime, Local};
 use eml_nl::{
     EMLError,
     common::{
@@ -371,9 +371,9 @@ impl ElectionWithPoliticalGroups {
     pub fn as_candidates_eml(
         &self,
         transaction_id: Option<u64>,
-        timestamp: Option<DateTime<Utc>>,
+        timestamp: Option<DateTime<Local>>,
     ) -> Result<CandidateLists, EMLError> {
-        let timestamp = timestamp.unwrap_or_else(Utc::now);
+        let timestamp = timestamp.unwrap_or_else(Local::now);
 
         CandidateLists::builder()
             .transaction_id(transaction_id.unwrap_or(1))
@@ -417,9 +417,9 @@ impl ElectionWithPoliticalGroups {
     pub fn as_definition_eml(
         &self,
         transaction_id: Option<u64>,
-        timestamp: Option<DateTime<Utc>>,
+        timestamp: Option<DateTime<Local>>,
     ) -> Result<ElectionDefinition, EMLError> {
-        let timestamp = timestamp.unwrap_or_else(Utc::now);
+        let timestamp = timestamp.unwrap_or_else(Local::now);
 
         ElectionDefinition::builder()
             .transaction_id(transaction_id.unwrap_or(1))
@@ -459,9 +459,9 @@ impl ElectionWithPoliticalGroups {
         &self,
         polling_stations: &[crate::domain::polling_station::PollingStation],
         transaction_id: Option<u64>,
-        timestamp: Option<DateTime<Utc>>,
+        timestamp: Option<DateTime<Local>>,
     ) -> Result<PollingStations, EMLError> {
-        let timestamp = timestamp.unwrap_or_else(Utc::now);
+        let timestamp = timestamp.unwrap_or_else(Local::now);
 
         PollingStations::builder()
             .transaction_id(transaction_id.unwrap_or(1))
@@ -699,7 +699,7 @@ impl ElectionWithPoliticalGroups {
     pub fn as_result_eml(
         &self,
         transaction_id: Option<u64>,
-        timestamp: DateTime<Utc>,
+        timestamp: DateTime<Local>,
         nominations: &CandidateNominationDetails<PoliticalGroupCandidateVotes>,
     ) -> Result<ElectionResult, EMLError> {
         if self.committee_category != CommitteeCategory::CSB {
@@ -1051,7 +1051,7 @@ mod tests {
         };
 
         let eml_result = election
-            .as_result_eml(None, chrono::Utc::now(), &details)
+            .as_result_eml(None, Local::now(), &details)
             .unwrap();
         assert_eq!(
             eml_result

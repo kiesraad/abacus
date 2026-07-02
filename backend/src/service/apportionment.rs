@@ -17,11 +17,15 @@ use crate::{
         apportionment_state::{ApportionmentState, ApportionmentStateError, DrawingLotsRequired},
         committee_session::CommitteeSessionId,
         committee_session_status::CommitteeSessionStatus,
-        election::{CandidateNumber, ElectionId, ElectionWithPoliticalGroups, PGNumber},
+        election::{
+            CandidateNumber, CommitteeCategory, ElectionId, ElectionWithPoliticalGroups, PGNumber,
+        },
         summary::ElectionSummary,
     },
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
-    repository::{apportionment_state_repo, committee_session_repo, data_entry_repo},
+    repository::{
+        apportionment_state_repo, committee_session_repo, data_entry_repo, election_repo,
+    },
     service,
 };
 
@@ -45,6 +49,11 @@ pub async fn get_state(
     conn: &mut SqliteConnection,
     election_id: ElectionId,
 ) -> Result<(CommitteeSessionId, ApportionmentState), APIError> {
+    let election = election_repo::get(conn, election_id).await?;
+    if election.committee_category != CommitteeCategory::CSB {
+        return Err(ApportionmentApiError::NotCSBElection.into());
+    }
+
     let committee_session =
         committee_session_repo::get_election_committee_session(conn, election_id).await?;
 
@@ -112,6 +121,7 @@ pub async fn next_state(
     .await
 }
 
+#[derive(Debug)]
 #[allow(clippy::large_enum_variant)]
 pub enum ApportionmentResult {
     Ok(ElectionApportionmentResponse),
@@ -197,6 +207,10 @@ pub async fn process(
     conn: &mut SqliteConnection,
     election: &ElectionWithPoliticalGroups,
 ) -> Result<ApportionmentResult, APIError> {
+    if election.committee_category != CommitteeCategory::CSB {
+        return Err(ApportionmentApiError::NotCSBElection.into());
+    }
+
     let (committee_session_id, state) = service::get_apportionment_state(conn, election.id).await?;
 
     let data_entry_results =
@@ -259,8 +273,8 @@ mod tests {
         infra::audit_log::assert_last_event,
     };
 
-    const ELECTION_ID: u32 = 5;
-    const COMMITTEE_SESSION_ID: u32 = 6;
+    const ELECTION_ID: u32 = 8;
+    const COMMITTEE_SESSION_ID: u32 = 801;
 
     async fn set_states(
         conn: &mut SqliteConnection,
@@ -281,6 +295,31 @@ mod tests {
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
+    async fn test_process_requires_csb_election(pool: SqlitePool) {
+        let mut conn = pool.acquire().await.unwrap();
+        let election = election_repo::get(&mut conn, ElectionId::from(5))
+            .await
+            .unwrap();
+
+        let err = process(&mut conn, &election)
+            .await
+            .expect_err("should error for a non-CSB election");
+
+        assert_delegated(err, &ApportionmentApiError::NotCSBElection);
+    }
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
+    async fn test_get_state_requires_csb_election(pool: SqlitePool) {
+        let mut conn = pool.acquire().await.unwrap();
+
+        let err = get_state(&mut conn, ElectionId::from(5))
+            .await
+            .expect_err("should error for a non-CSB election");
+
+        assert_delegated(err, &ApportionmentApiError::NotCSBElection);
+    }
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_8_csb_with_results"))))]
     async fn test_election_not_found(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
 
@@ -300,7 +339,7 @@ mod tests {
         );
     }
 
-    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_8_csb_with_results"))))]
     async fn test_invalid_committee_session_status(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
 
@@ -318,7 +357,7 @@ mod tests {
         assert_delegated(err, &ApportionmentApiError::CommitteeSessionNotCompleted);
     }
 
-    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_8_csb_with_results"))))]
     async fn test_get_apportionment_state_not_found(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
 
@@ -334,7 +373,7 @@ mod tests {
         assert_eq!(state, ApportionmentState::Uninitialised);
     }
 
-    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_8_csb_with_results"))))]
     async fn test_update_apportionment_state_not_found(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
 
@@ -361,7 +400,7 @@ mod tests {
         assert_eq!(state, Some(ApportionmentState::Uninitialised));
     }
 
-    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_8_csb_with_results"))))]
     async fn test_update_apportionment_state(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
 

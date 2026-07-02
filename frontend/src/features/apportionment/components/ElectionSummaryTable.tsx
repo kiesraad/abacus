@@ -9,7 +9,7 @@ import type {
   VotesCounts,
 } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
-import { formatNumber } from "@/utils/number";
+import { formatNumber, formatPercentage } from "@/utils/number";
 import cls from "./Apportionment.module.css";
 
 export interface DeceasedCandidatesInfo {
@@ -23,8 +23,16 @@ interface ElectionSummaryTableProps {
   seats: number;
   quota: DisplayFractionType;
   numberOfVoters: number | undefined;
-  preferenceThreshold: PreferenceThreshold;
+  preferenceThreshold: PreferenceThreshold | undefined;
   deceasedCandidatesInfo: DeceasedCandidatesInfo;
+}
+
+function formatVoteCount(count: number): string {
+  return count > 0 ? formatNumber(count) : "0";
+}
+
+function formatVotePercentage(count: number, total: number): string {
+  return count > 0 ? formatPercentage(count, total) : "";
 }
 
 export function ElectionSummaryTable({
@@ -51,10 +59,10 @@ export function ElectionSummaryTable({
           <Table.HeaderCell scope="row" className="normal">
             {t("apportionment.total_votes_cast_count")}
           </Table.HeaderCell>
-          <Table.NumberCell>{formatNumber(votesCounts.total_votes_cast_count)}</Table.NumberCell>
+          <Table.NumberCell>{formatVoteCount(votesCounts.total_votes_cast_count)}</Table.NumberCell>
           <Table.Cell className="fs-sm">
-            {numberOfVoters
-              ? `${t("apportionment.turnout")}: ${((votesCounts.total_votes_cast_count / numberOfVoters) * 100).toFixed(2)}%`
+            {numberOfVoters && votesCounts.total_votes_cast_count > 0
+              ? `${t("apportionment.turnout")}: ${formatVotePercentage(votesCounts.total_votes_cast_count, numberOfVoters)}`
               : ""}
           </Table.Cell>
         </Table.Row>
@@ -62,25 +70,25 @@ export function ElectionSummaryTable({
           <Table.HeaderCell scope="row" className="normal">
             {t("voters_votes_counts.votes_counts.blank_votes_count")}
           </Table.HeaderCell>
-          <Table.NumberCell>{formatNumber(votesCounts.blank_votes_count)}</Table.NumberCell>
+          <Table.NumberCell>{formatVoteCount(votesCounts.blank_votes_count)}</Table.NumberCell>
           <Table.Cell className="fs-sm">
-            {`${((votesCounts.blank_votes_count / votesCounts.total_votes_cast_count) * 100).toFixed(2)}%`}
+            {formatVotePercentage(votesCounts.blank_votes_count, votesCounts.total_votes_cast_count)}
           </Table.Cell>
         </Table.Row>
         <Table.Row>
           <Table.HeaderCell scope="row" className="normal">
             {t("voters_votes_counts.votes_counts.invalid_votes_count")}
           </Table.HeaderCell>
-          <Table.NumberCell>{formatNumber(votesCounts.invalid_votes_count)}</Table.NumberCell>
+          <Table.NumberCell>{formatVoteCount(votesCounts.invalid_votes_count)}</Table.NumberCell>
           <Table.Cell className="fs-sm">
-            {`${((votesCounts.invalid_votes_count / votesCounts.total_votes_cast_count) * 100).toFixed(2)}%`}
+            {formatVotePercentage(votesCounts.invalid_votes_count, votesCounts.total_votes_cast_count)}
           </Table.Cell>
         </Table.Row>
         <Table.Row>
           <Table.HeaderCell scope="row" className="normal">
             {t("voters_votes_counts.votes_counts.total_votes_candidates_count")}
           </Table.HeaderCell>
-          <Table.NumberCell>{formatNumber(votesCounts.total_votes_candidates_count)}</Table.NumberCell>
+          <Table.NumberCell>{formatVoteCount(votesCounts.total_votes_candidates_count)}</Table.NumberCell>
           <Table.Cell className="fs-sm" />
         </Table.Row>
         <Table.Row>
@@ -99,17 +107,19 @@ export function ElectionSummaryTable({
           </Table.NumberCell>
           <Table.Cell className="fs-sm">{t("apportionment.quota_description")}</Table.Cell>
         </Table.Row>
-        <Table.Row>
-          <Table.HeaderCell scope="row" className="normal">
-            {t("apportionment.preference_threshold")}
-          </Table.HeaderCell>
-          <Table.NumberCell>
-            <DisplayFraction id="quota" fraction={preferenceThreshold.number_of_votes} />
-          </Table.NumberCell>
-          <Table.Cell className="fs-sm">
-            {t("apportionment.preference_threshold_description", { percentage: preferenceThreshold.percentage })}
-          </Table.Cell>
-        </Table.Row>
+        {preferenceThreshold && (
+          <Table.Row>
+            <Table.HeaderCell scope="row" className="normal">
+              {t("apportionment.preference_threshold")}
+            </Table.HeaderCell>
+            <Table.NumberCell>
+              <DisplayFraction id="quota" fraction={preferenceThreshold.number_of_votes} />
+            </Table.NumberCell>
+            <Table.Cell className="fs-sm">
+              {t("apportionment.preference_threshold_description", { percentage: preferenceThreshold.percentage })}
+            </Table.Cell>
+          </Table.Row>
+        )}
         <Table.Row>
           <Table.HeaderCell scope="row" className="normal">
             {t("apportionment.candidates_for_apportionment")}

@@ -1,8 +1,10 @@
 import { type ReactElement, useEffect } from "react";
 import { Link, useNavigate } from "react-router";
+import { Alert } from "@/components/ui/Alert/Alert";
+import { Button } from "@/components/ui/Button/Button";
 import { useElection } from "@/hooks/election/useElection";
 import { t, tx } from "@/i18n/translate";
-import type { PoliticalGroup, SeatAssignment } from "@/types/generated/openapi";
+import type { ApportionmentState, PoliticalGroup, SeatAssignment } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 import { useApportionmentContext } from "../../hooks/useApportionmentContext";
 import { getResultChanges, type ResultChange } from "../../utils/seat-change";
@@ -13,7 +15,13 @@ import {
   type LargestRemainderAssignmentStep,
   type UniqueHighestAverageAssignmentStep,
 } from "../../utils/steps";
-import { apportionmentCheckStateAndRedirect, renderTitleAndHeader } from "../../utils/utils";
+import {
+  apportionmentCheckStateAndRedirect,
+  getNotAssignedSeats,
+  getNotAssignedSeatsText,
+  renderNotAssignedSeatsAlert,
+  renderTitleAndHeader,
+} from "../../utils/utils";
 import cls from "../Apportionment.module.css";
 import { ApportionmentErrorPage } from "../ApportionmentError";
 import { Footnotes } from "./Footnotes";
@@ -46,6 +54,7 @@ interface LargeCouncilSectionProps {
   politicalGroups: PoliticalGroup[];
   resultChanges: ResultChange[];
   footNotes?: ReactElement;
+  state: ApportionmentState;
 }
 
 function LargeCouncilSection({
@@ -54,18 +63,27 @@ function LargeCouncilSection({
   politicalGroups,
   resultChanges,
   footNotes,
+  state,
 }: LargeCouncilSectionProps) {
+  const notAssignedSeats = getNotAssignedSeats(state);
   return (
     <div className={cn(cls.tableDiv, "mb-lg")}>
       <div>
         <h2 className={cls.tableTitle}>{t("apportionment.residual_seats_highest_averages")}</h2>
         {renderInformation(seatAssignment.seats, seatAssignment.residual_seats)}
+        <h3 className={cls.tableTitle}>{t("apportionment.averages_per_list")}:</h3>
+        {notAssignedSeats > 0 && (
+          <div className={cn(cls.smallAlert, "mb-md-lg")}>
+            {renderNotAssignedSeatsAlert(notAssignedSeats, "../drawing-lots", t("apportionment.go_to_drawing_lots"))}
+          </div>
+        )}
         {highestAverageSteps.length > 0 && (
           <HighestAveragesTable
             steps={highestAverageSteps}
             standings={seatAssignment.standings}
             politicalGroups={politicalGroups}
             resultChanges={resultChanges}
+            state={state}
           />
         )}
       </div>
@@ -115,6 +133,7 @@ interface HighestAveragesSectionProps {
   highestAverageSteps: HighestAverageAssignmentStep[];
   politicalGroups: PoliticalGroup[];
   footNotes?: ReactElement;
+  state: ApportionmentState;
 }
 
 function HighestAveragesSection({
@@ -124,6 +143,7 @@ function HighestAveragesSection({
   highestAverageSteps,
   politicalGroups,
   footNotes,
+  state,
 }: HighestAveragesSectionProps) {
   return (
     <div className={cn(cls.tableDiv, "mb-lg")}>
@@ -155,6 +175,7 @@ function HighestAveragesSection({
                 standings={seatAssignment.standings}
                 politicalGroups={politicalGroups}
                 resultChanges={[]}
+                state={state}
               />
             }
           </>
@@ -173,6 +194,7 @@ interface SmallCouncilSectionProps {
   politicalGroups: PoliticalGroup[];
   resultChanges: ResultChange[];
   footNotes?: ReactElement;
+  state: ApportionmentState;
 }
 
 function SmallCouncilSection({
@@ -183,9 +205,19 @@ function SmallCouncilSection({
   politicalGroups,
   resultChanges,
   footNotes,
+  state,
 }: SmallCouncilSectionProps) {
+  const notAssignedSeats = getNotAssignedSeats(state);
   return (
     <>
+      {notAssignedSeats > 0 && (
+        <div className={cls.notAssignedSeatsAlert}>
+          <Alert type="notify">
+            <strong className="heading-md">{getNotAssignedSeatsText(notAssignedSeats)}</strong>
+            <Button.Link to="../drawing-lots">{t("apportionment.go_to_drawing_lots")}</Button.Link>
+          </Alert>
+        </div>
+      )}
       <LargestRemaindersSection
         seatAssignment={seatAssignment}
         largestRemainderSteps={largestRemainderSteps}
@@ -201,6 +233,7 @@ function SmallCouncilSection({
           highestAverageSteps={highestAverageSteps}
           politicalGroups={politicalGroups}
           footNotes={resultChanges.length > 0 ? footNotes : undefined}
+          state={state}
         />
       )}
     </>
@@ -217,25 +250,21 @@ export function ApportionmentResidualSeatsPage() {
   });
 
   if (error) {
-    return <ApportionmentErrorPage sectionTitle={t("apportionment.details_residual_seats")} error={error} />;
+    return <ApportionmentErrorPage sectionTitle={t("apportionment.allocation_of_residual_seats")} error={error} />;
   }
-  if (seatAssignment) {
-    const { largestRemainderSteps, uniqueHighestAverageSteps, highestAverageSteps, absoluteMajorityReassignment } =
+  if (seatAssignment && state) {
+    const { largestRemainderSteps, uniqueHighestAverageSteps, highestAverageSteps, absoluteMajorityStep } =
       getAssignmentSteps(seatAssignment);
-    const { residualSeatRemovalSteps, uniquePgNumbersWithFullSeatsRemoved } = getRemovalSteps(seatAssignment);
+    const { residualSeatRemovalSteps, listsWithFullSeatsRemoved } = getRemovalSteps(seatAssignment);
 
-    const resultChanges = getResultChanges(
-      uniquePgNumbersWithFullSeatsRemoved,
-      absoluteMajorityReassignment,
-      residualSeatRemovalSteps,
-    );
+    const resultChanges = getResultChanges(listsWithFullSeatsRemoved, absoluteMajorityStep, residualSeatRemovalSteps);
 
     function renderFootnotes(): ReactElement {
       return (
         <Footnotes
-          uniquePgNumbersWithFullSeatsRemoved={uniquePgNumbersWithFullSeatsRemoved}
+          listsWithFullSeatsRemoved={listsWithFullSeatsRemoved}
           seatAssignment={seatAssignment}
-          absoluteMajorityReassignment={absoluteMajorityReassignment}
+          absoluteMajorityStep={absoluteMajorityStep}
           residualSeatRemovalSteps={residualSeatRemovalSteps}
         />
       );
@@ -243,7 +272,7 @@ export function ApportionmentResidualSeatsPage() {
 
     return (
       <>
-        {renderTitleAndHeader(t("apportionment.details_residual_seats"))}
+        {renderTitleAndHeader(t("apportionment.allocation_of_residual_seats"))}
         <main>
           <article className={cls.article}>
             {seatAssignment.residual_seats > 0 ? (
@@ -254,6 +283,7 @@ export function ApportionmentResidualSeatsPage() {
                   politicalGroups={election.political_groups}
                   resultChanges={resultChanges}
                   footNotes={resultChanges.length > 0 ? renderFootnotes() : undefined}
+                  state={state}
                 />
               ) : (
                 <SmallCouncilSection
@@ -264,6 +294,7 @@ export function ApportionmentResidualSeatsPage() {
                   politicalGroups={election.political_groups}
                   resultChanges={resultChanges}
                   footNotes={renderFootnotes()}
+                  state={state}
                 />
               )
             ) : (

@@ -17,15 +17,26 @@ import { CandidatesRankingTable } from "./CandidatesRankingTable";
 import { CandidatesWithSeatTable } from "./CandidatesWithSeatTable";
 import { CandidatesWithVotesTable } from "./CandidatesWithVotesTable";
 
+function getListAssignedSeatsText(listTotalSeats: number, listName: string) {
+  return tx(
+    `apportionment.list_assigned_nr_seats.${listTotalSeats === 1 ? "singular" : "plural"}`,
+    {},
+    {
+      list_name: listName,
+      num_seats: listTotalSeats,
+    },
+  );
+}
+
 function renderDeceasedCandidatesAlert(listDeceasedCandidateNumbers: number[]) {
   return (
     <Alert type="notify" small>
       <p>
         {listDeceasedCandidateNumbers.length === 1
-          ? tx("apportionment.list_details_alert.deceased_candidate", undefined, {
+          ? t("apportionment.list_details_alert.deceased_candidate", {
               nr: formatList(listDeceasedCandidateNumbers, t("and")),
             })
-          : tx("apportionment.list_details_alert.deceased_candidates", undefined, {
+          : t("apportionment.list_details_alert.deceased_candidates", {
               nrs: formatList(listDeceasedCandidateNumbers, t("and")),
             })}
         <br />
@@ -184,6 +195,9 @@ export function ApportionmentListDetailsPage() {
 
   useEffect(() => {
     apportionmentCheckStateAndRedirect(state, election.id, navigate);
+    if (state?.type === "DrawingLots") {
+      void navigate(`/elections/${election.id}/apportionment`);
+    }
   });
 
   const list = election.political_groups.find((group) => group.number === listNumber);
@@ -225,16 +239,7 @@ export function ApportionmentListDetailsPage() {
                 <div>
                   <div>
                     <h2 className={cls.tableTitle}>{t("apportionment.assigned_number_of_seats")}</h2>
-                    <span id="text-list-assigned-nr-seats">
-                      {tx(
-                        `apportionment.list_assigned_nr_seats.${listTotalSeats === 1 ? "singular" : "plural"}`,
-                        {},
-                        {
-                          list_name: listName,
-                          num_seats: listTotalSeats,
-                        },
-                      )}
-                    </span>
+                    <span id="text-list-assigned-nr-seats">{getListAssignedSeatsText(listTotalSeats, listName)}</span>
                   </div>
                   {listDeceasedCandidateNumbers.length > 0 && (
                     <div className={cn("mt-md-lg", cls.deceasedCandidatesAlert)}>

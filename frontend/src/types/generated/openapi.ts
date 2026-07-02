@@ -9,6 +9,10 @@ export type ACCOUNT_UPDATE_REQUEST_PARAMS = Record<string, never>;
 export type ACCOUNT_UPDATE_REQUEST_PATH = `/api/account`;
 export type ACCOUNT_UPDATE_REQUEST_BODY = AccountUpdateRequest;
 
+// /api/backup
+export type CREATE_BACKUP_REQUEST_PARAMS = Record<string, never>;
+export type CREATE_BACKUP_REQUEST_PATH = `/api/backup`;
+
 // /api/data_entries/{data_entry_id}
 export interface DATA_ENTRY_RESET_REQUEST_PARAMS {
   data_entry_id: DataEntryId;
@@ -480,6 +484,7 @@ export const auditEventTypeValues = [
   "AirGapViolationDetected",
   "AirGapViolationResolved",
   "ApplicationStarted",
+  "DatabaseBackupCreated",
   "ApiError",
   "ApiWarning",
   "UnknownEvent",
@@ -514,6 +519,11 @@ export interface AuditLogUser {
   id: number;
   role: Role;
   username: string;
+}
+
+export interface BackupResponse {
+  created_at: string;
+  filename: string;
 }
 
 /**
@@ -1006,6 +1016,7 @@ export interface ElectionWithPoliticalGroups {
 export const errorReferenceValues = [
   "AirgapViolation",
   "AlreadyInitialised",
+  "BackupAlreadyExists",
   "ApportionmentNotCompleted",
   "ApportionmentCommitteeSessionNotCompleted",
   "ApportionmentInvalidLotDrawing",

@@ -396,8 +396,11 @@ mod tests {
         let listener = TcpListener::bind("127.0.0.1:0").await.unwrap();
         let addr = listener.local_addr().unwrap();
 
+        let backup_dir = tempfile::tempdir().unwrap();
+        let backup_config =
+            crate::infra::backup::BackupConfig::new(backup_dir.path().to_path_buf());
         tokio::spawn(async move {
-            let app = router::create_router(pool, airgap_detection).unwrap();
+            let app = router::create_router(pool, airgap_detection, backup_config).unwrap();
 
             axum::serve(
                 listener,

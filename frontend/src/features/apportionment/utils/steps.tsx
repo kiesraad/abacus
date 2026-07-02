@@ -37,7 +37,7 @@ export interface AssignmentSteps {
   largestRemainderSteps: LargestRemainderAssignmentStep[];
   uniqueHighestAverageSteps: UniqueHighestAverageAssignmentStep[];
   highestAverageSteps: HighestAverageAssignmentStep[];
-  absoluteMajorityReassignment?: AbsoluteMajorityReassignmentStep;
+  absoluteMajorityStep?: AbsoluteMajorityReassignmentStep;
 }
 
 export function getAssignmentSteps(seatAssignment: SeatAssignment): AssignmentSteps {
@@ -45,14 +45,14 @@ export function getAssignmentSteps(seatAssignment: SeatAssignment): AssignmentSt
     largestRemainderSteps: seatAssignment.steps.filter(isLargestRemainderAssignmentStep),
     uniqueHighestAverageSteps: seatAssignment.steps.filter(isUniqueHighestAverageAssignmentStep),
     highestAverageSteps: seatAssignment.steps.filter(isHighestAverageAssignmentStep),
-    absoluteMajorityReassignment: seatAssignment.steps.find(isAbsoluteMajorityReassignmentStep),
+    absoluteMajorityStep: seatAssignment.steps.find(isAbsoluteMajorityReassignmentStep),
   };
 }
 
 export interface RemovalSteps {
   fullSeatRemovalSteps: ListExhaustionRemovalStep[];
   residualSeatRemovalSteps: ListExhaustionRemovalStep[];
-  uniquePgNumbersWithFullSeatsRemoved: number[];
+  listsWithFullSeatsRemoved: number[];
 }
 
 export function getRemovalSteps(seatAssignment: SeatAssignment): RemovalSteps {
@@ -60,11 +60,11 @@ export function getRemovalSteps(seatAssignment: SeatAssignment): RemovalSteps {
   const fullSeatRemovalSteps = listExhaustionSteps.filter((step) => step.change.full_seat);
   const residualSeatRemovalSteps = listExhaustionSteps.filter((step) => !step.change.full_seat);
 
-  const uniquePgNumbersWithFullSeatsRemoved: number[] = [];
+  const listsWithFullSeatsRemoved: number[] = [];
   fullSeatRemovalSteps.forEach((step) => {
-    if (!uniquePgNumbersWithFullSeatsRemoved.includes(step.change.list_retracted_seat)) {
-      uniquePgNumbersWithFullSeatsRemoved.push(step.change.list_retracted_seat);
+    if (!listsWithFullSeatsRemoved.includes(step.change.list_retracted_seat)) {
+      listsWithFullSeatsRemoved.push(step.change.list_retracted_seat);
     }
   });
-  return { fullSeatRemovalSteps, residualSeatRemovalSteps, uniquePgNumbersWithFullSeatsRemoved };
+  return { fullSeatRemovalSteps, residualSeatRemovalSteps, listsWithFullSeatsRemoved };
 }

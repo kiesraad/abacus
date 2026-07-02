@@ -1,5 +1,6 @@
 import type { StoryObj } from "@storybook/react-vite";
 import { expect } from "storybook/test";
+import type { ApportionmentState } from "@/types/generated/openapi";
 import * as gte19Seats from "../../testing/gte-19-seats";
 import { HighestAveragesTable } from "./HighestAveragesTable";
 
@@ -11,6 +12,14 @@ export const Default: StoryObj = {
         standings={gte19Seats.seat_assignment.standings}
         politicalGroups={gte19Seats.election.political_groups}
         resultChanges={[]}
+        state={
+          {
+            type: "Finalised",
+            deceased_candidates: [],
+            lists_drawn: [],
+            candidates_drawn: [],
+          } satisfies ApportionmentState
+        }
       />
     );
   },

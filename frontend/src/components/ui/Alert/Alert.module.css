@@ -62,6 +62,10 @@
       width: 100%;
     }
 
+    > ul {
+      margin: 0;
+    }
+
     button {
       width: fit-content;
     }

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { type ReactElement, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { type AnyApiError, type ApiResult, isSuccess } from "@/api/ApiResult";
 import { useApiClient } from "@/api/useApiClient";
@@ -10,13 +10,25 @@ import { t } from "@/i18n/translate";
 import type {
   ApportionmentState,
   ApportionmentWarning,
+  ChosenCandidate,
+  ElectionSummary,
+  ElectionWithPoliticalGroups,
+  PreferenceThreshold,
   RESET_APPORTIONMENT_STATE_REQUEST_PATH,
   SeatAssignment,
 } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 import { getNumberOfCandidates } from "@/utils/politicalGroups";
+import { formatList } from "@/utils/strings";
 import { useApportionmentContext } from "../hooks/useApportionmentContext";
-import { apportionmentCheckStateAndRedirect, renderTitleAndHeader } from "../utils/utils";
+import {
+  apportionmentCheckStateAndRedirect,
+  getAssignedByDrawingLotsStepAlertText,
+  getNotAssignedSeats,
+  isListDrawingLotsVariant,
+  renderNotAssignedSeatsAlert,
+  renderTitleAndHeader,
+} from "../utils/utils";
 import cls from "./Apportionment.module.css";
 import { ApportionmentError } from "./ApportionmentError";
 import { ApportionmentTable } from "./ApportionmentTable";
@@ -79,18 +91,163 @@ function renderFinalisedAlert(
   );
 }
 
+function renderHighestAverageOrLargestRemainderDrawingLotsAlert(
+  residualSeatNumbers: number[],
+  variant: "HighestAverageResidualSeat" | "LargestRemainderResidualSeat",
+) {
+  return (
+    <FormLayout.Alert>
+      <Alert type="warning">
+        <strong className="heading-md">
+          {t(
+            `apportionment.drawing_lots_required_alert.title.${residualSeatNumbers.length === 1 ? "singular" : "plural"}`,
+          )}{" "}
+          {formatList(residualSeatNumbers, t("and"))}
+        </strong>
+        <p>
+          {t("apportionment.drawing_lots_required_alert.description", {
+            variant:
+              variant === "HighestAverageResidualSeat"
+                ? t("apportionment.average_number")
+                : t("apportionment.remainder_of"),
+          })}
+        </p>
+        <ul>
+          <li>
+            {t(
+              `apportionment.drawing_lots_required_alert.${variant === "HighestAverageResidualSeat" ? "same_averages" : "same_remainders"}`,
+            )}
+          </li>
+          <li>{t("apportionment.drawing_lots_required_alert.drawing_lots_needed")}</li>
+        </ul>
+        <div className={cls.alertButtons}>
+          <Button.Link size="md" to="./drawing-lots">
+            {t("apportionment.to_drawing_lots")}
+          </Button.Link>
+          <Button.Link variant="secondary" size="md" to="./details-residual-seats">
+            {t("apportionment.details_residual_seats_allocation")}
+          </Button.Link>
+        </div>
+      </Alert>
+    </FormLayout.Alert>
+  );
+}
+
 function renderLinksToSeatAssignmentPages(seatAssignment: SeatAssignment) {
   return (
     <ul>
       <li>
         {getNumberOfSeatsAssignedSentence(seatAssignment.full_seats, "full_seat")} (
-        <Link to="./details-full-seats">{t("apportionment.view_details")}</Link>)
+        <Link to="./details-full-seats">{t("apportionment.view_details").toLowerCase()}</Link>)
       </li>
       <li>
         {getNumberOfSeatsAssignedSentence(seatAssignment.residual_seats, "residual_seat")} (
-        <Link to="./details-residual-seats">{t("apportionment.view_details")}</Link>)
+        <Link to="./details-residual-seats">{t("apportionment.view_details").toLowerCase()}</Link>)
       </li>
     </ul>
+  );
+}
+
+interface ElectionSummaryTableSectionProps {
+  electionSummary: ElectionSummary;
+  seatAssignment: SeatAssignment;
+  election: ElectionWithPoliticalGroups;
+  preferenceThreshold: PreferenceThreshold | undefined;
+  numberOfDeceasedCandidates: number;
+}
+
+function ElectionSummaryTableSection({
+  electionSummary,
+  seatAssignment,
+  election,
+  preferenceThreshold,
+  numberOfDeceasedCandidates,
+}: ElectionSummaryTableSectionProps) {
+  return (
+    <div className={cn(cls.tableDiv, "mb-lg")}>
+      <div>
+        <h2 className={cls.tableTitle}>{t("apportionment.election_summary")}</h2>
+        <ElectionSummaryTable
+          votesCounts={electionSummary.votes_counts}
+          seats={seatAssignment.seats}
+          quota={seatAssignment.quota}
+          numberOfVoters={electionSummary.number_of_voters}
+          preferenceThreshold={preferenceThreshold}
+          deceasedCandidatesInfo={
+            {
+              numberOfCandidates: getNumberOfCandidates(election.political_groups),
+              numberOfDeceasedCandidates: numberOfDeceasedCandidates,
+              deceasedCandidatesLink: `/elections/${election.id}/apportionment/deceased-candidates`,
+            } satisfies DeceasedCandidatesInfo
+          }
+        />
+      </div>
+    </div>
+  );
+}
+
+interface ApportionmentTableSectionProps {
+  state: ApportionmentState;
+  seatAssignment: SeatAssignment;
+  election: ElectionWithPoliticalGroups;
+}
+
+function ApportionmentTableSection({ state, seatAssignment, election }: ApportionmentTableSectionProps) {
+  const notAssignedSeats = getNotAssignedSeats(state);
+  const assignedByDrawingLotsAlertTexts: ReactElement[] = [];
+  seatAssignment.steps.forEach((step) => {
+    const text = getAssignedByDrawingLotsStepAlertText(step, election.political_groups);
+    if (text !== undefined) {
+      assignedByDrawingLotsAlertTexts.push(text);
+    }
+  });
+  return (
+    <div className={cn(cls.tableDiv, "mb-lg")}>
+      <div>
+        <h2 className={cls.tableTitle}>
+          {state.type === "DrawingLots" ? t("apportionment.preliminary_result") : t("apportionment.title")}
+        </h2>
+        {notAssignedSeats > 0 && (
+          <div className={cn(cls.smallAlert, "mb-md-lg")}>
+            {renderNotAssignedSeatsAlert(notAssignedSeats, "./details-residual-seats", t("apportionment.view_details"))}
+          </div>
+        )}
+        {assignedByDrawingLotsAlertTexts.length > 0 && (
+          <div className={cn(cls.smallAlert, "mb-md-lg")}>
+            {
+              <Alert type="notify" small>
+                <p>
+                  {assignedByDrawingLotsAlertTexts.map((text, index) => (
+                    <span key={`drawing-lots-assignment-${index + 1}`}>{text}</span>
+                  ))}
+                </p>
+              </Alert>
+            }
+          </div>
+        )}
+        <ApportionmentTable
+          standings={seatAssignment.standings}
+          politicalGroups={election.political_groups}
+          fullSeats={seatAssignment.full_seats}
+          residualSeats={seatAssignment.residual_seats}
+          seats={seatAssignment.seats}
+          notAssignedSeats={notAssignedSeats}
+        />
+        <div className={cls.footnoteDiv}>{renderLinksToSeatAssignmentPages(seatAssignment)}</div>
+      </div>
+    </div>
+  );
+}
+
+function ChosenCandidatesTableSection({ chosenCandidates }: { chosenCandidates: ChosenCandidate[] }) {
+  return (
+    <div className={cn(cls.tableDiv, "mb-lg")}>
+      <div>
+        <h2 className={cls.tableTitle}>{t("apportionment.chosen_candidates")}</h2>
+        <span className={cls.tableInformation}>{t("apportionment.in_alphabetical_order")}</span>
+        <ChosenCandidatesTable chosenCandidates={chosenCandidates} />
+      </div>
+    </div>
   );
 }
 
@@ -110,7 +267,8 @@ export function ApportionmentPage() {
     apportionmentCheckStateAndRedirect(state, election.id, navigate);
   });
 
-  const renderTables = seatAssignment && candidateNomination && electionSummary && state?.type === "Finalised";
+  const renderTables =
+    electionSummary && seatAssignment && (state?.type === "DrawingLots" || state?.type === "Finalised");
 
   async function handleResetApportionmentState() {
     const path: RESET_APPORTIONMENT_STATE_REQUEST_PATH = `/api/elections/${election.id}/apportionment/reset`;
@@ -134,46 +292,28 @@ export function ApportionmentPage() {
             renderTables && (
               <>
                 {renderApportionmentWarnings(warnings)}
-                {renderFinalisedAlert(warnings, currentCommitteeSession.id, () => void handleResetApportionmentState())}
-                <div className={cn(cls.tableDiv, "mb-lg")}>
-                  <div>
-                    <h2 className={cls.tableTitle}>{t("apportionment.election_summary")}</h2>
-                    <ElectionSummaryTable
-                      votesCounts={electionSummary.votes_counts}
-                      seats={seatAssignment.seats}
-                      quota={seatAssignment.quota}
-                      numberOfVoters={electionSummary.number_of_voters}
-                      preferenceThreshold={candidateNomination.preference_threshold}
-                      deceasedCandidatesInfo={
-                        {
-                          numberOfCandidates: getNumberOfCandidates(election.political_groups),
-                          numberOfDeceasedCandidates: state.deceased_candidates.length,
-                          deceasedCandidatesLink: `/elections/${election.id}/apportionment/deceased-candidates`,
-                        } satisfies DeceasedCandidatesInfo
-                      }
-                    />
-                  </div>
-                </div>
-                <div className={cn(cls.tableDiv, "mb-lg")}>
-                  <div>
-                    <h2 className={cls.tableTitle}>{t("apportionment.title")}</h2>
-                    <ApportionmentTable
-                      standings={seatAssignment.standings}
-                      politicalGroups={election.political_groups}
-                      fullSeats={seatAssignment.full_seats}
-                      residualSeats={seatAssignment.residual_seats}
-                      seats={seatAssignment.seats}
-                    />
-                    <div className={cls.footnoteDiv}>{renderLinksToSeatAssignmentPages(seatAssignment)}</div>
-                  </div>
-                </div>
-                <div className={cn(cls.tableDiv, "mb-lg")}>
-                  <div>
-                    <h2 className={cls.tableTitle}>{t("apportionment.chosen_candidates")}</h2>
-                    <span className={cls.tableInformation}>{t("apportionment.in_alphabetical_order")}</span>
-                    <ChosenCandidatesTable chosenCandidates={candidateNomination.chosen_candidates} />
-                  </div>
-                </div>
+                {state.type === "Finalised"
+                  ? renderFinalisedAlert(
+                      warnings,
+                      currentCommitteeSession.id,
+                      () => void handleResetApportionmentState(),
+                    )
+                  : isListDrawingLotsVariant(state, ["HighestAverageResidualSeat", "LargestRemainderResidualSeat"]) &&
+                    renderHighestAverageOrLargestRemainderDrawingLotsAlert(
+                      state.drawing_lots_required.residual_seat_numbers,
+                      state.drawing_lots_required.variant,
+                    )}
+                <ElectionSummaryTableSection
+                  electionSummary={electionSummary}
+                  seatAssignment={seatAssignment}
+                  election={election}
+                  preferenceThreshold={candidateNomination?.preference_threshold}
+                  numberOfDeceasedCandidates={state.deceased_candidates.length}
+                />
+                <ApportionmentTableSection state={state} seatAssignment={seatAssignment} election={election} />
+                {candidateNomination?.chosen_candidates && (
+                  <ChosenCandidatesTableSection chosenCandidates={candidateNomination.chosen_candidates} />
+                )}
               </>
             )
           )}

@@ -25,6 +25,7 @@ pub enum ApportionmentApiError {
     CommitteeSessionNotCompleted,
     InvalidLotDrawing(String),
     InvalidState(String),
+    NotCSBElection,
 }
 
 impl ApiErrorResponse for ApportionmentApiError {
@@ -62,6 +63,14 @@ impl ApiErrorResponse for ApportionmentApiError {
                 StatusCode::INTERNAL_SERVER_ERROR,
                 ErrorResponse::new(
                     format!("Apportionment invalid state: {}", message),
+                    ErrorReference::InternalServerError,
+                    true,
+                ),
+            ),
+            ApportionmentApiError::NotCSBElection => (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                ErrorResponse::new(
+                    "Apportionment is only available for CSB elections",
                     ErrorReference::InternalServerError,
                     true,
                 ),

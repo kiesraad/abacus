@@ -115,17 +115,17 @@ mod tests {
 
     #[test(sqlx::test(fixtures(
         path = "../../../../fixtures",
-        scripts("election_5_with_results")
+        scripts("election_8_csb_with_results")
     )))]
     async fn test_election_apportionment(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
 
-        let user = User::test_user(Role::CoordinatorGSB, UserId::from(1));
+        let user = User::test_user(Role::CoordinatorCSB, UserId::from(3));
         let audit_service = AuditService::new(Some(user.clone()), None);
 
         change_committee_session_status(
             &mut conn,
-            CommitteeSessionId::from(6),
+            CommitteeSessionId::from(801),
             CommitteeSessionStatus::Completed,
             audit_service.clone(),
         )
@@ -133,20 +133,20 @@ mod tests {
         .unwrap();
 
         let response =
-            process_apportionment(user, State(pool), audit_service, Path(ElectionId::from(5)))
+            process_apportionment(user, State(pool), audit_service, Path(ElectionId::from(8)))
                 .await
                 .into_response();
 
         assert_eq!(response.status(), StatusCode::OK);
     }
 
-    #[test(sqlx::test(fixtures(path = "../../../../fixtures", scripts("election_4"))))]
+    #[test(sqlx::test(fixtures(path = "../../../../fixtures", scripts("election_9_csb"))))]
     async fn test_election_apportionment_not_complete(pool: SqlitePool) {
-        let user = User::test_user(Role::CoordinatorGSB, UserId::from(1));
+        let user = User::test_user(Role::CoordinatorCSB, UserId::from(3));
         let audit_service = AuditService::new(Some(user.clone()), None);
 
         let response =
-            process_apportionment(user, State(pool), audit_service, Path(ElectionId::from(4)))
+            process_apportionment(user, State(pool), audit_service, Path(ElectionId::from(9)))
                 .await
                 .into_response();
 
@@ -171,31 +171,31 @@ mod tests {
             pool: SqlitePool,
             coordinator_role: Role,
         ) -> Vec<(&'static str, Response)> {
-            let user = User::test_user(coordinator_role, UserId::from(1));
+            let user = User::test_user(coordinator_role, UserId::from(3));
             let audit = AuditService::new(Some(user.clone()), None);
 
             #[rustfmt::skip]
             let results = vec![
-                ("apportionment", process_apportionment(user.clone(), State(pool.clone()), audit.clone(), Path(ElectionId::from(5))).await.into_response()),
+                ("apportionment", process_apportionment(user.clone(), State(pool.clone()), audit.clone(), Path(ElectionId::from(8))).await.into_response()),
             ];
             results
         }
 
         #[test(sqlx::test(fixtures(
             path = "../../../../fixtures",
-            scripts("election_5_with_results")
+            scripts("election_8_csb_with_results")
         )))]
         async fn test_committee_category_authorization_err(pool: SqlitePool) {
-            let results = call_handlers(pool, Role::CoordinatorCSB).await;
+            let results = call_handlers(pool, Role::CoordinatorGSB).await;
             assert_committee_category_authorization_err(results).await;
         }
 
         #[test(sqlx::test(fixtures(
             path = "../../../../fixtures",
-            scripts("election_5_with_results")
+            scripts("election_8_csb_with_results")
         )))]
         async fn test_committee_category_authorization_ok(pool: SqlitePool) {
-            let results = call_handlers(pool, Role::CoordinatorGSB).await;
+            let results = call_handlers(pool, Role::CoordinatorCSB).await;
             assert_committee_category_authorization_ok(results);
         }
     }

@@ -6,21 +6,21 @@ import type { AbsoluteMajorityReassignmentStep, ListExhaustionRemovalStep } from
 import cls from "../Apportionment.module.css";
 
 interface FootnotesProps {
-  uniquePgNumbersWithFullSeatsRemoved: number[];
+  listsWithFullSeatsRemoved: number[];
   seatAssignment: SeatAssignment | undefined;
-  absoluteMajorityReassignment: AbsoluteMajorityReassignmentStep | undefined;
+  absoluteMajorityStep: AbsoluteMajorityReassignmentStep | undefined;
   residualSeatRemovalSteps: ListExhaustionRemovalStep[];
 }
 
 export function Footnotes({
-  uniquePgNumbersWithFullSeatsRemoved,
+  listsWithFullSeatsRemoved,
   seatAssignment,
-  absoluteMajorityReassignment,
+  absoluteMajorityStep,
   residualSeatRemovalSteps,
 }: FootnotesProps): ReactElement {
   return (
     <ol id="footnotes-list" className={cn(cls.footnotesList, "w-39")}>
-      {uniquePgNumbersWithFullSeatsRemoved.map((listNumber) => {
+      {listsWithFullSeatsRemoved.map((listNumber) => {
         return (
           <li key={listNumber} id={`list-${listNumber}-full-seat-list-exhaustion-information`}>
             {t("apportionment.full_seat_removed_remainder_information", {
@@ -29,11 +29,11 @@ export function Footnotes({
           </li>
         );
       })}
-      {absoluteMajorityReassignment && (
+      {absoluteMajorityStep && (
         <li id={`absolute-majority-reassignment-information`}>
           {t("apportionment.absolute_majority_reassignment", {
-            list_assigned_seat: absoluteMajorityReassignment.change.list_assigned_seat,
-            list_retracted_seat: absoluteMajorityReassignment.change.list_retracted_seat,
+            list_assigned_seat: absoluteMajorityStep.change.list_assigned_seat,
+            list_retracted_seat: absoluteMajorityStep.change.list_retracted_seat,
           })}
         </li>
       )}

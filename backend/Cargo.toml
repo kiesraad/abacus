@@ -84,7 +84,7 @@ eml-nl = { version = "0.6.0" }
 hyper = { version = "1", features = ["full"] }
 tokio.workspace = true
 memory-serve = { version = "2.1.0", optional = true, features = ["force-embed"] }
-utoipa = { version = "5.4.0", features = ["axum_extras"] }
+utoipa = { version = "5.4.0", features = ["axum_extras", "chrono"] }
 utoipa-axum = "0.2.0"
 utoipa-swagger-ui = { version = "9.0.2", features = ["axum"], optional = true }
 serde = { version = "1.0", features = ["derive"] }

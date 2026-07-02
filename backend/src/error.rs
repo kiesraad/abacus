@@ -366,7 +366,7 @@ impl From<BackupError> for APIError {
     fn from(err: BackupError) -> Self {
         match err {
             BackupError::AlreadyExists => APIError::Conflict(
-                "A backup for this timestamp already exists".to_string(),
+                "A backup with this filename already exists".to_string(),
                 ErrorReference::BackupAlreadyExists,
             ),
             BackupError::InvalidPath => {

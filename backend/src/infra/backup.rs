@@ -119,52 +119,42 @@ async fn verify_backup(backup_path: &Path) -> Result<(), BackupError> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::sync::atomic::{AtomicU32, Ordering};
+    use tempfile::TempDir;
 
-    static TEST_ID: AtomicU32 = AtomicU32::new(0);
-
-    fn setup_backup_config() -> BackupConfig {
-        let id = TEST_ID.fetch_add(1, Ordering::Relaxed);
-        let backup_directory =
-            std::env::temp_dir().join(format!("backups_{}_{}", std::process::id(), id));
-        BackupConfig::new(backup_directory)
-    }
-
-    fn delete_backup_directory(backup_config: &BackupConfig) {
-        std::fs::remove_dir_all(&backup_config.directory).unwrap();
+    fn setup_backup_config() -> (TempDir, BackupConfig) {
+        let temp_dir = tempfile::tempdir().unwrap();
+        let backup_config = BackupConfig::new(temp_dir.path().join("backups"));
+        (temp_dir, backup_config)
     }
 
     #[tokio::test]
     async fn backup_directory_is_created_succesfully() {
-        let backup_config = setup_backup_config();
+        let (_temp_dir, backup_config) = setup_backup_config();
         create_backup_directory(&backup_config).unwrap();
-        delete_backup_directory(&backup_config);
+        assert!(backup_config.directory.exists());
     }
 
     #[tokio::test]
     async fn backup_directory_creation_is_idempotent() {
-        let backup_config = setup_backup_config();
+        let (_temp_dir, backup_config) = setup_backup_config();
         create_backup_directory(&backup_config).unwrap();
         create_backup_directory(&backup_config).unwrap();
-        delete_backup_directory(&backup_config);
     }
 
     #[sqlx::test]
     async fn local_backup_is_successful(pool: SqlitePool) {
-        let backup_config = setup_backup_config();
+        let (_temp_dir, backup_config) = setup_backup_config();
         create_backup_directory(&backup_config).unwrap();
         let result = create_local_backup(&pool, &backup_config).await.unwrap();
         assert!(backup_config.directory.join(&result.filename).exists());
-        delete_backup_directory(&backup_config);
     }
 
     #[tokio::test]
     async fn verify_backup_fails_on_corrupt_file() {
-        let backup_config = setup_backup_config();
+        let (_temp_dir, backup_config) = setup_backup_config();
         create_backup_directory(&backup_config).unwrap();
         let backup_path = backup_config.directory.join("corrupt.sqlite");
         std::fs::write(&backup_path, b"corrupt database").unwrap();
         assert!(verify_backup(&backup_path).await.is_err());
-        delete_backup_directory(&backup_config);
     }
 }

@@ -10,6 +10,7 @@ import type {
 } from "@/types/generated/openapi";
 import { formatPoliticalGroupName } from "@/utils/politicalGroup";
 import {
+  isAbsoluteMajorityReassignmentStep,
   isHighestAverageAssignmentStep,
   isLargestRemainderAssignmentStep,
   isUniqueHighestAverageAssignmentStep,
@@ -57,6 +58,29 @@ export function getAssignedByDrawingLotsStep(
         true,
       ),
     };
+  }
+  return undefined;
+}
+
+export interface SeatReassignedByDrawingLots {
+  assigned_to: number;
+  retracted_from: string;
+}
+
+export function getSeatReassignedByDrawingLotsStep(
+  steps: SeatChangeStep[],
+  politicalGroups: PoliticalGroup[],
+): SeatReassignedByDrawingLots | undefined {
+  for (const step of steps) {
+    if (isAbsoluteMajorityReassignmentStep(step) && step.change.drawing_lots !== undefined) {
+      return {
+        assigned_to: step.change.list_assigned_seat,
+        retracted_from: formatPoliticalGroupName(
+          politicalGroups.find((pg) => pg.number === step.change.list_retracted_seat),
+          true,
+        ),
+      };
+    }
   }
   return undefined;
 }

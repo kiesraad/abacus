@@ -29,9 +29,11 @@ import {
   getAssignedByDrawingLotsStep,
   getNotAssignedSeats,
   getNotAssignedSeatsText,
+  getSeatReassignedByDrawingLotsStep,
   isListDrawingLotsVariant,
   type ListAssignedByDrawingLots,
   renderTitleAndHeader,
+  type SeatReassignedByDrawingLots,
 } from "../utils/utils";
 import cls from "./Apportionment.module.css";
 import { ApportionmentError } from "./ApportionmentError";
@@ -168,8 +170,9 @@ function renderDrawingLotsAlert(state: ApportionmentState, politicalGroups: Poli
 
 function renderNotifyDrawingLotsAlert(
   listsAssignedByDrawingLots: ListAssignedByDrawingLots[],
-  absoluteMajorityReassignmentLists: AbsoluteMajorityReassignmentLists | undefined,
+  seatReassignedByDrawingLots: SeatReassignedByDrawingLots | undefined,
   notAssignedSeats: number,
+  absoluteMajorityReassignmentLists: AbsoluteMajorityReassignmentLists | undefined,
 ) {
   return (
     <div className={cn(cls.smallAlert, "mb-md-lg")}>
@@ -202,6 +205,20 @@ function renderNotifyDrawingLotsAlert(
             </>
           )
         )}
+        {seatReassignedByDrawingLots !== undefined && (
+          <p>
+            {tx("apportionment.reassigned_by_drawing_lots_alert", undefined, {
+              assigned_to: seatReassignedByDrawingLots.assigned_to,
+              retracted_from: seatReassignedByDrawingLots.retracted_from,
+            })}
+          </p>
+        )}
+        {notAssignedSeats > 0 && (
+          <p>
+            {getNotAssignedSeatsText(notAssignedSeats)}{" "}
+            <Link to="./details-residual-seats">{t("apportionment.view_details")}</Link>
+          </p>
+        )}
         {absoluteMajorityReassignmentLists !== undefined && (
           <p>
             {t("apportionment.lists_a_seat_needs_to_be_reassigned_for", {
@@ -209,12 +226,6 @@ function renderNotifyDrawingLotsAlert(
               seat_to_list: absoluteMajorityReassignmentLists.seat_to_list,
             })}{" "}
             <Link to="../drawing-lots">{t("apportionment.go_to_drawing_lots")}</Link>
-          </p>
-        )}
-        {notAssignedSeats > 0 && (
-          <p>
-            {getNotAssignedSeatsText(notAssignedSeats)}{" "}
-            <Link to="./details-residual-seats">{t("apportionment.view_details")}</Link>
           </p>
         )}
       </Alert>
@@ -291,6 +302,10 @@ function ApportionmentTableSection({ state, seatAssignment, election }: Apportio
       listsAssignedByDrawingLots.push(listAssignedByDrawingLots);
     }
   });
+  const seatReassignedByDrawingLots = getSeatReassignedByDrawingLotsStep(
+    seatAssignment.steps,
+    election.political_groups,
+  );
   return (
     <div className={cn(cls.tableDiv, "mb-lg")}>
       <div>
@@ -299,8 +314,14 @@ function ApportionmentTableSection({ state, seatAssignment, election }: Apportio
         </h2>
         {(notAssignedSeats > 0 ||
           absoluteMajorityReassignmentLists !== undefined ||
-          listsAssignedByDrawingLots.length > 0) &&
-          renderNotifyDrawingLotsAlert(listsAssignedByDrawingLots, absoluteMajorityReassignmentLists, notAssignedSeats)}
+          listsAssignedByDrawingLots.length > 0 ||
+          seatReassignedByDrawingLots !== undefined) &&
+          renderNotifyDrawingLotsAlert(
+            listsAssignedByDrawingLots,
+            seatReassignedByDrawingLots,
+            notAssignedSeats,
+            absoluteMajorityReassignmentLists,
+          )}
         <ApportionmentTable
           standings={seatAssignment.standings}
           politicalGroups={election.political_groups}

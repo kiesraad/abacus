@@ -1,7 +1,6 @@
-import { Link, type NavigateFunction } from "react-router";
+import type { NavigateFunction } from "react-router";
 import { PageTitle } from "@/components/page_title/PageTitle";
-import { Alert } from "@/components/ui/Alert/Alert";
-import { t, tx } from "@/i18n/translate";
+import { t } from "@/i18n/translate";
 import type {
   ApportionmentState,
   DrawingLotsRequired,
@@ -11,6 +10,7 @@ import type {
 } from "@/types/generated/openapi";
 import { formatPoliticalGroupName } from "@/utils/politicalGroup";
 import {
+  isAbsoluteMajorityReassignmentStep,
   isHighestAverageAssignmentStep,
   isLargestRemainderAssignmentStep,
   isUniqueHighestAverageAssignmentStep,
@@ -35,17 +35,15 @@ export function getNotAssignedSeatsText(notAssignedSeats: number) {
   });
 }
 
-export function renderNotAssignedSeatsAlert(notAssignedSeats: number, linkTo: string, linkText: string) {
-  return (
-    <Alert type="notify" small>
-      <p>
-        {getNotAssignedSeatsText(notAssignedSeats)} <Link to={linkTo}>{linkText}</Link>
-      </p>
-    </Alert>
-  );
+export interface ListAssignedByDrawingLots {
+  residual_seat_number: number;
+  name: string;
 }
 
-export function getAssignedByDrawingLotsStepAlertText(step: SeatChangeStep, politicalGroups: PoliticalGroup[]) {
+export function getAssignedByDrawingLotsStep(
+  step: SeatChangeStep,
+  politicalGroups: PoliticalGroup[],
+): ListAssignedByDrawingLots | undefined {
   if (
     (isHighestAverageAssignmentStep(step) ||
       isUniqueHighestAverageAssignmentStep(step) ||
@@ -53,15 +51,51 @@ export function getAssignedByDrawingLotsStepAlertText(step: SeatChangeStep, poli
     step.change.drawing_lots !== undefined &&
     step.residual_seat_number
   ) {
-    return tx("apportionment.assigned_by_drawing_lots_alert", undefined, {
-      nr: step.residual_seat_number,
-      list: formatPoliticalGroupName(
+    return {
+      residual_seat_number: step.residual_seat_number,
+      name: formatPoliticalGroupName(
         politicalGroups.find((pg) => pg.number === step.change.selected_list_number),
         true,
       ),
-    });
+    };
   }
   return undefined;
+}
+
+export interface SeatReassignedByDrawingLots {
+  assigned_to: number;
+  retracted_from: string;
+}
+
+export function getSeatReassignedByDrawingLotsStep(
+  steps: SeatChangeStep[],
+  politicalGroups: PoliticalGroup[],
+): SeatReassignedByDrawingLots | undefined {
+  for (const step of steps) {
+    if (isAbsoluteMajorityReassignmentStep(step) && step.change.drawing_lots !== undefined) {
+      return {
+        assigned_to: step.change.list_assigned_seat,
+        retracted_from: formatPoliticalGroupName(
+          politicalGroups.find((pg) => pg.number === step.change.list_retracted_seat),
+          true,
+        ),
+      };
+    }
+  }
+  return undefined;
+}
+
+export interface AbsoluteMajorityReassignmentLists {
+  seat_from_lists: number[];
+  seat_to_list: number;
+}
+
+export function getAbsoluteMajorityReassignmentLists(
+  state: ApportionmentState | undefined,
+): AbsoluteMajorityReassignmentLists | undefined {
+  return isListDrawingLotsVariant(state, ["AbsoluteMajorityLargestRemainder", "AbsoluteMajorityHighestAverage"])
+    ? { seat_from_lists: state.drawing_lots_required.options, seat_to_list: state.drawing_lots_required.assign_to }
+    : undefined;
 }
 
 export function apportionmentCheckStateAndRedirect(

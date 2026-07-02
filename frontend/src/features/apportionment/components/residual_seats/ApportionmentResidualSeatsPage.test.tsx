@@ -661,7 +661,7 @@ describe("ApportionmentResidualSeatsPage", () => {
 
       if (alerts[0]) {
         expect(alerts[0]).toHaveClass(alertCls.notify!);
-        expect(alerts[0]).toHaveTextContent("Er zijn nog 3 restzetels te verdelen. Ga naar loting");
+        expect(alerts[0]).toHaveTextContent("Er zijn nog 3 restzetels te verdelen.Ga naar loting");
         const link = within(alerts[0]).getByRole("link", { name: "Ga naar loting" });
         expect(link).toHaveAttribute("href", "/drawing-lots");
       }

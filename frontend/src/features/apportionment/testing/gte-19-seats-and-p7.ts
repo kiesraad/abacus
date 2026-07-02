@@ -214,6 +214,201 @@ export const state_after_one_drawing_lots_seat_assigned: ApportionmentState = {
   candidates_drawn: [],
 };
 
+export const state_after_two_drawing_lots_seats_assigned: ApportionmentState = {
+  type: "DrawingLots",
+  drawing_lots_required: {
+    type: "ListDrawingLotsRequired",
+    variant: "HighestAverageResidualSeat",
+    max_average: {
+      integer: 46,
+      numerator: 2,
+      denominator: 3,
+    },
+    residual_seat_numbers: [4],
+    options: [2, 3, 5],
+    list_averages: [
+      {
+        pg_number: 1,
+        average: {
+          integer: 45,
+          numerator: 5,
+          denominator: 11,
+        },
+      },
+      {
+        pg_number: 2,
+        average: {
+          integer: 46,
+          numerator: 2,
+          denominator: 3,
+        },
+      },
+      {
+        pg_number: 3,
+        average: {
+          integer: 46,
+          numerator: 2,
+          denominator: 3,
+        },
+      },
+      {
+        pg_number: 4,
+        average: {
+          integer: 35,
+          numerator: 0,
+          denominator: 4,
+        },
+      },
+      {
+        pg_number: 5,
+        average: {
+          integer: 46,
+          numerator: 2,
+          denominator: 3,
+        },
+      },
+      {
+        pg_number: 6,
+        average: {
+          integer: 35,
+          numerator: 0,
+          denominator: 4,
+        },
+      },
+    ],
+  },
+  deceased_candidates: [],
+  lists_drawn: [
+    {
+      variant: {
+        variant: "HighestAverageResidualSeat",
+        max_average: {
+          integer: 46,
+          numerator: 2,
+          denominator: 3,
+        },
+        residual_seat_numbers: [2, 3, 4],
+        options: [2, 3, 4, 5, 6],
+        list_averages: [
+          {
+            pg_number: 1,
+            average: {
+              integer: 45,
+              numerator: 5,
+              denominator: 11,
+            },
+          },
+          {
+            pg_number: 2,
+            average: {
+              integer: 46,
+              numerator: 2,
+              denominator: 3,
+            },
+          },
+          {
+            pg_number: 3,
+            average: {
+              integer: 46,
+              numerator: 2,
+              denominator: 3,
+            },
+          },
+          {
+            pg_number: 4,
+            average: {
+              integer: 46,
+              numerator: 2,
+              denominator: 3,
+            },
+          },
+          {
+            pg_number: 5,
+            average: {
+              integer: 46,
+              numerator: 2,
+              denominator: 3,
+            },
+          },
+          {
+            pg_number: 6,
+            average: {
+              integer: 46,
+              numerator: 2,
+              denominator: 3,
+            },
+          },
+        ],
+      },
+      drawn: 4,
+    },
+    {
+      variant: {
+        variant: "HighestAverageResidualSeat",
+        max_average: {
+          integer: 46,
+          numerator: 2,
+          denominator: 3,
+        },
+        residual_seat_numbers: [3, 4],
+        options: [2, 3, 5, 6],
+        list_averages: [
+          {
+            pg_number: 1,
+            average: {
+              integer: 45,
+              numerator: 5,
+              denominator: 11,
+            },
+          },
+          {
+            pg_number: 2,
+            average: {
+              integer: 46,
+              numerator: 2,
+              denominator: 3,
+            },
+          },
+          {
+            pg_number: 3,
+            average: {
+              integer: 46,
+              numerator: 2,
+              denominator: 3,
+            },
+          },
+          {
+            pg_number: 4,
+            average: {
+              integer: 35,
+              numerator: 0,
+              denominator: 4,
+            },
+          },
+          {
+            pg_number: 5,
+            average: {
+              integer: 46,
+              numerator: 2,
+              denominator: 3,
+            },
+          },
+          {
+            pg_number: 6,
+            average: {
+              integer: 46,
+              numerator: 2,
+              denominator: 3,
+            },
+          },
+        ],
+      },
+      drawn: 6,
+    },
+  ],
+  candidates_drawn: [],
+};
+
 export const seat_assignment: SeatAssignment = {
   seats: 23,
   full_seats: 19,
@@ -688,6 +883,272 @@ export const seat_assignment_after_one_drawing_lots_seat_assigned: SeatAssignmen
       full_seats: 2,
       residual_seats: 0,
       total_seats: 2,
+    },
+  ],
+};
+
+export const seat_assignment_after_two_drawing_lots_seats_assigned: SeatAssignment = {
+  ...seat_assignment_after_one_drawing_lots_seat_assigned,
+  steps: [
+    ...seat_assignment_after_one_drawing_lots_seat_assigned.steps,
+    {
+      residual_seat_number: 3,
+      change: {
+        changed_by: "HighestAverageAssignment",
+        selected_list_number: 6,
+        list_options: [2, 3, 5, 6],
+        list_assigned: [4, 6],
+        list_exhausted: [],
+        votes_per_seat: {
+          integer: 46,
+          numerator: 2,
+          denominator: 3,
+        },
+        drawing_lots: {
+          variant: "HighestAverageResidualSeat",
+          max_average: {
+            integer: 46,
+            numerator: 2,
+            denominator: 3,
+          },
+          residual_seat_numbers: [3, 4],
+          options: [2, 3, 5, 6],
+          list_averages: [
+            {
+              pg_number: 1,
+              average: {
+                integer: 45,
+                numerator: 5,
+                denominator: 11,
+              },
+            },
+            {
+              pg_number: 2,
+              average: {
+                integer: 46,
+                numerator: 2,
+                denominator: 3,
+              },
+            },
+            {
+              pg_number: 3,
+              average: {
+                integer: 46,
+                numerator: 2,
+                denominator: 3,
+              },
+            },
+            {
+              pg_number: 4,
+              average: {
+                integer: 35,
+                numerator: 0,
+                denominator: 4,
+              },
+            },
+            {
+              pg_number: 5,
+              average: {
+                integer: 46,
+                numerator: 2,
+                denominator: 3,
+              },
+            },
+            {
+              pg_number: 6,
+              average: {
+                integer: 46,
+                numerator: 2,
+                denominator: 3,
+              },
+            },
+          ],
+        },
+      },
+      standings: [
+        {
+          list_number: 1,
+          votes_cast: 500,
+          remainder_votes: {
+            integer: 30,
+            numerator: 10,
+            denominator: 23,
+          },
+          meets_remainder_threshold: true,
+          next_votes_per_seat: {
+            integer: 45,
+            numerator: 5,
+            denominator: 11,
+          },
+          full_seats: 9,
+          residual_seats: 1,
+        },
+        {
+          list_number: 2,
+          votes_cast: 140,
+          remainder_votes: {
+            integer: 35,
+            numerator: 15,
+            denominator: 23,
+          },
+          meets_remainder_threshold: true,
+          next_votes_per_seat: {
+            integer: 46,
+            numerator: 2,
+            denominator: 3,
+          },
+          full_seats: 2,
+          residual_seats: 0,
+        },
+        {
+          list_number: 3,
+          votes_cast: 140,
+          remainder_votes: {
+            integer: 35,
+            numerator: 15,
+            denominator: 23,
+          },
+          meets_remainder_threshold: true,
+          next_votes_per_seat: {
+            integer: 46,
+            numerator: 2,
+            denominator: 3,
+          },
+          full_seats: 2,
+          residual_seats: 0,
+        },
+        {
+          list_number: 4,
+          votes_cast: 140,
+          remainder_votes: {
+            integer: 35,
+            numerator: 15,
+            denominator: 23,
+          },
+          meets_remainder_threshold: true,
+          next_votes_per_seat: {
+            integer: 35,
+            numerator: 0,
+            denominator: 4,
+          },
+          full_seats: 2,
+          residual_seats: 1,
+        },
+        {
+          list_number: 5,
+          votes_cast: 140,
+          remainder_votes: {
+            integer: 35,
+            numerator: 15,
+            denominator: 23,
+          },
+          meets_remainder_threshold: true,
+          next_votes_per_seat: {
+            integer: 46,
+            numerator: 2,
+            denominator: 3,
+          },
+          full_seats: 2,
+          residual_seats: 0,
+        },
+        {
+          list_number: 6,
+          votes_cast: 140,
+          remainder_votes: {
+            integer: 35,
+            numerator: 15,
+            denominator: 23,
+          },
+          meets_remainder_threshold: true,
+          next_votes_per_seat: {
+            integer: 46,
+            numerator: 2,
+            denominator: 3,
+          },
+          full_seats: 2,
+          residual_seats: 0,
+        },
+      ],
+    },
+  ],
+  standings: [
+    {
+      list_number: 1,
+      votes_cast: 500,
+      remainder_votes: {
+        integer: 30,
+        numerator: 10,
+        denominator: 23,
+      },
+      meets_remainder_threshold: true,
+      full_seats: 9,
+      residual_seats: 1,
+      total_seats: 10,
+    },
+    {
+      list_number: 2,
+      votes_cast: 140,
+      remainder_votes: {
+        integer: 35,
+        numerator: 15,
+        denominator: 23,
+      },
+      meets_remainder_threshold: true,
+      full_seats: 2,
+      residual_seats: 0,
+      total_seats: 2,
+    },
+    {
+      list_number: 3,
+      votes_cast: 140,
+      remainder_votes: {
+        integer: 35,
+        numerator: 15,
+        denominator: 23,
+      },
+      meets_remainder_threshold: true,
+      full_seats: 2,
+      residual_seats: 0,
+      total_seats: 2,
+    },
+    {
+      list_number: 4,
+      votes_cast: 140,
+      remainder_votes: {
+        integer: 35,
+        numerator: 15,
+        denominator: 23,
+      },
+      meets_remainder_threshold: true,
+      full_seats: 2,
+      residual_seats: 1,
+      total_seats: 3,
+    },
+    {
+      list_number: 5,
+      votes_cast: 140,
+      remainder_votes: {
+        integer: 35,
+        numerator: 15,
+        denominator: 23,
+      },
+      meets_remainder_threshold: true,
+      full_seats: 2,
+      residual_seats: 0,
+      total_seats: 2,
+    },
+    {
+      list_number: 6,
+      votes_cast: 140,
+      remainder_votes: {
+        integer: 35,
+        numerator: 15,
+        denominator: 23,
+      },
+      meets_remainder_threshold: true,
+      full_seats: 2,
+      residual_seats: 1,
+      total_seats: 3,
     },
   ],
 };

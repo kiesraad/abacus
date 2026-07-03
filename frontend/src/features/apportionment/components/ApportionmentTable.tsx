@@ -12,6 +12,7 @@ interface ApportionmentTableProps {
   residualSeats: number;
   seats: number;
   notAssignedSeats: number;
+  withoutLinks: boolean;
 }
 
 function convertZeroToDash(number: number): string {
@@ -28,6 +29,7 @@ export function ApportionmentTable({
   residualSeats,
   seats,
   notAssignedSeats,
+  withoutLinks,
 }: ApportionmentTableProps) {
   return (
     <Table id="apportionment-table" className={cls.table}>
@@ -52,8 +54,8 @@ export function ApportionmentTable({
           <Table.Row
             key={standing.list_number}
             id={`list-${standing.list_number}`}
-            className={notAssignedSeats > 0 ? cls.rowWithoutLink : undefined}
-            to={notAssignedSeats === 0 ? `./${standing.list_number}` : undefined}
+            className={withoutLinks ? cls.rowWithoutLink : undefined}
+            to={!withoutLinks ? `./${standing.list_number}` : undefined}
           >
             <Table.Cell className={cn(cls.listNumberColumn, "text-align-r", "font-number")}>
               {standing.list_number}

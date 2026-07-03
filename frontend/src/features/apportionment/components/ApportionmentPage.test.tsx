@@ -27,9 +27,9 @@ import {
 } from "@/testing/test-utils";
 import type { ApportionmentState, ElectionApportionmentResponse, ErrorResponse } from "@/types/generated/openapi";
 import { apportionmentRoutes } from "../routes";
-import * as gte19SeatsAndP7 from "../testing/gte-19-seats-and-p7";
+import * as gte19SeatsAndP7DrawingLots from "../testing/gte-19-seats-and-p7-drawing-lots";
 import * as lt19Seats from "../testing/lt-19-seats";
-import * as lt19SeatsAndP7 from "../testing/lt-19-seats-and-p7";
+import * as lt19SeatsAndP7DrawingLots from "../testing/lt-19-seats-and-p7-drawing-lots";
 import { ApportionmentPage } from "./ApportionmentPage";
 import { ApportionmentProvider } from "./ApportionmentProvider";
 
@@ -459,13 +459,13 @@ describe("ApportionmentPage", () => {
         "get",
         "/api/elections/7",
         200,
-        getElectionMockData(lt19SeatsAndP7.election, lt19SeatsAndP7.committee_session),
+        getElectionMockData(lt19SeatsAndP7DrawingLots.election, lt19SeatsAndP7DrawingLots.committee_session),
       );
       overrideOnce("post", "/api/elections/7/apportionment", 200, {
-        seat_assignment: lt19SeatsAndP7.seat_assignment,
-        election_summary: lt19SeatsAndP7.election_summary,
+        seat_assignment: lt19SeatsAndP7DrawingLots.seat_assignment,
+        election_summary: lt19SeatsAndP7DrawingLots.election_summary,
       });
-      overrideOnce("get", "/api/elections/7/apportionment/state", 200, lt19SeatsAndP7.state);
+      overrideOnce("get", "/api/elections/7/apportionment/state", 200, lt19SeatsAndP7DrawingLots.state);
 
       const router = renderApportionmentPage(7, true) as Router;
       expect(await screen.findByRole("heading", { level: 1, name: "Zetelverdeling" })).toBeVisible();
@@ -524,13 +524,13 @@ describe("ApportionmentPage", () => {
         "get",
         "/api/elections/8",
         200,
-        getElectionMockData(gte19SeatsAndP7.election, gte19SeatsAndP7.committee_session),
+        getElectionMockData(gte19SeatsAndP7DrawingLots.election, gte19SeatsAndP7DrawingLots.committee_session),
       );
       overrideOnce("post", "/api/elections/8/apportionment", 200, {
-        seat_assignment: gte19SeatsAndP7.seat_assignment,
-        election_summary: gte19SeatsAndP7.election_summary,
+        seat_assignment: gte19SeatsAndP7DrawingLots.seat_assignment,
+        election_summary: gte19SeatsAndP7DrawingLots.election_summary,
       });
-      overrideOnce("get", "/api/elections/8/apportionment/state", 200, gte19SeatsAndP7.state);
+      overrideOnce("get", "/api/elections/8/apportionment/state", 200, gte19SeatsAndP7DrawingLots.state);
 
       const router = renderApportionmentPage(8, true) as Router;
       expect(await screen.findByRole("heading", { level: 1, name: "Zetelverdeling" })).toBeVisible();
@@ -586,17 +586,17 @@ describe("ApportionmentPage", () => {
         "get",
         "/api/elections/8",
         200,
-        getElectionMockData(gte19SeatsAndP7.election, gte19SeatsAndP7.committee_session),
+        getElectionMockData(gte19SeatsAndP7DrawingLots.election, gte19SeatsAndP7DrawingLots.committee_session),
       );
       overrideOnce("post", "/api/elections/8/apportionment", 200, {
-        seat_assignment: gte19SeatsAndP7.seat_assignment_after_one_drawing_lots_seat_assigned,
-        election_summary: gte19SeatsAndP7.election_summary,
+        seat_assignment: gte19SeatsAndP7DrawingLots.seat_assignment_after_one_drawing_lots_seat_assigned,
+        election_summary: gte19SeatsAndP7DrawingLots.election_summary,
       });
       overrideOnce(
         "get",
         "/api/elections/8/apportionment/state",
         200,
-        gte19SeatsAndP7.state_after_one_drawing_lots_seat_assigned,
+        gte19SeatsAndP7DrawingLots.state_after_one_drawing_lots_seat_assigned,
       );
 
       renderApportionmentPage(8, false);
@@ -643,17 +643,17 @@ describe("ApportionmentPage", () => {
         "get",
         "/api/elections/8",
         200,
-        getElectionMockData(gte19SeatsAndP7.election, gte19SeatsAndP7.committee_session),
+        getElectionMockData(gte19SeatsAndP7DrawingLots.election, gte19SeatsAndP7DrawingLots.committee_session),
       );
       overrideOnce("post", "/api/elections/8/apportionment", 200, {
-        seat_assignment: gte19SeatsAndP7.seat_assignment_after_two_drawing_lots_seats_assigned,
-        election_summary: gte19SeatsAndP7.election_summary,
+        seat_assignment: gte19SeatsAndP7DrawingLots.seat_assignment_after_two_drawing_lots_seats_assigned,
+        election_summary: gte19SeatsAndP7DrawingLots.election_summary,
       });
       overrideOnce(
         "get",
         "/api/elections/8/apportionment/state",
         200,
-        gte19SeatsAndP7.state_after_two_drawing_lots_seats_assigned,
+        gte19SeatsAndP7DrawingLots.state_after_two_drawing_lots_seats_assigned,
       );
 
       renderApportionmentPage(8, false);

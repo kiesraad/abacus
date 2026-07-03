@@ -14,10 +14,10 @@ import { expectErrorPage, render, renderReturningRouter, screen, setupTestRouter
 import type { ApportionmentState, ElectionApportionmentResponse, ErrorResponse } from "@/types/generated/openapi";
 import { apportionmentRoutes } from "../../routes";
 import * as gte19Seats from "../../testing/gte-19-seats";
-import * as gte19SeatsAndP7 from "../../testing/gte-19-seats-and-p7";
+import * as gte19SeatsAndP7DrawingLots from "../../testing/gte-19-seats-and-p7-drawing-lots";
 import * as gte19SeatsAndP9 from "../../testing/gte-19-seats-and-p9";
 import * as lt19Seats from "../../testing/lt-19-seats";
-import * as lt19SeatsAndP7 from "../../testing/lt-19-seats-and-p7";
+import * as lt19SeatsAndP7DrawingLots from "../../testing/lt-19-seats-and-p7-drawing-lots";
 import * as lt19SeatsAndP9AndP10 from "../../testing/lt-19-seats-and-p9-and-p10";
 import * as lt19SeatsAndP10 from "../../testing/lt-19-seats-and-p10";
 import { ApportionmentProvider } from "../ApportionmentProvider";
@@ -595,13 +595,13 @@ describe("ApportionmentResidualSeatsPage", () => {
         "get",
         "/api/elections/7",
         200,
-        getElectionMockData(lt19SeatsAndP7.election, lt19SeatsAndP7.committee_session),
+        getElectionMockData(lt19SeatsAndP7DrawingLots.election, lt19SeatsAndP7DrawingLots.committee_session),
       );
       overrideOnce("post", "/api/elections/7/apportionment", 200, {
-        seat_assignment: lt19SeatsAndP7.seat_assignment,
-        election_summary: lt19SeatsAndP7.election_summary,
+        seat_assignment: lt19SeatsAndP7DrawingLots.seat_assignment,
+        election_summary: lt19SeatsAndP7DrawingLots.election_summary,
       });
-      overrideOnce("get", "/api/elections/7/apportionment/state", 200, lt19SeatsAndP7.state);
+      overrideOnce("get", "/api/elections/7/apportionment/state", 200, lt19SeatsAndP7DrawingLots.state);
 
       renderApportionmentResidualSeatsPage(7, false);
       expect(await screen.findByRole("heading", { level: 1, name: "Verdeling van de restzetels" }));
@@ -645,13 +645,13 @@ describe("ApportionmentResidualSeatsPage", () => {
         "get",
         "/api/elections/8",
         200,
-        getElectionMockData(gte19SeatsAndP7.election, gte19SeatsAndP7.committee_session),
+        getElectionMockData(gte19SeatsAndP7DrawingLots.election, gte19SeatsAndP7DrawingLots.committee_session),
       );
       overrideOnce("post", "/api/elections/8/apportionment", 200, {
-        seat_assignment: gte19SeatsAndP7.seat_assignment,
-        election_summary: gte19SeatsAndP7.election_summary,
+        seat_assignment: gte19SeatsAndP7DrawingLots.seat_assignment,
+        election_summary: gte19SeatsAndP7DrawingLots.election_summary,
       });
-      overrideOnce("get", "/api/elections/8/apportionment/state", 200, gte19SeatsAndP7.state);
+      overrideOnce("get", "/api/elections/8/apportionment/state", 200, gte19SeatsAndP7DrawingLots.state);
 
       const router = renderApportionmentResidualSeatsPage(8, true) as Router;
       expect(await screen.findByRole("heading", { level: 1, name: "Verdeling van de restzetels" })).toBeVisible();

@@ -329,6 +329,7 @@ function ApportionmentTableSection({ state, seatAssignment, election }: Apportio
           residualSeats={seatAssignment.residual_seats}
           seats={seatAssignment.seats}
           notAssignedSeats={notAssignedSeats}
+          withoutLinks={notAssignedSeats > 0 || absoluteMajorityReassignmentLists !== undefined}
         />
         <div className={cls.footnoteDiv}>{renderLinksToSeatAssignmentPages(seatAssignment)}</div>
       </div>

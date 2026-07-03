@@ -12,9 +12,9 @@ import { overrideOnce, server } from "@/testing/server";
 import { expectErrorPage, render, screen, setupTestRouter, spyOnHandler, waitFor } from "@/testing/test-utils";
 import type { ApportionmentState, ElectionApportionmentResponse, ErrorResponse } from "@/types/generated/openapi";
 import { apportionmentRoutes } from "../../routes";
-import * as gte19SeatsAndP7 from "../../testing/gte-19-seats-and-p7";
+import * as gte19SeatsAndP7DrawingLots from "../../testing/gte-19-seats-and-p7-drawing-lots";
 import * as lt19Seats from "../../testing/lt-19-seats";
-import * as lt19SeatsAndP7 from "../../testing/lt-19-seats-and-p7";
+import * as lt19SeatsAndP7DrawingLots from "../../testing/lt-19-seats-and-p7-drawing-lots";
 import { ApportionmentProvider } from "../ApportionmentProvider";
 import { DrawingLotsPage } from "./DrawingLotsPage";
 
@@ -118,7 +118,7 @@ describe("DrawingLotsPage", () => {
           deceased_candidates: [],
           drawing_lots_required: {
             type: "ListDrawingLotsRequired",
-            ...gte19SeatsAndP7.drawing_lots_required,
+            ...gte19SeatsAndP7DrawingLots.drawing_lots_required,
           },
           lists_drawn: [],
           type: "DrawingLots",
@@ -132,14 +132,14 @@ describe("DrawingLotsPage", () => {
       "get",
       "/api/elections/8",
       200,
-      getElectionMockData(gte19SeatsAndP7.election, gte19SeatsAndP7.committee_session),
+      getElectionMockData(gte19SeatsAndP7DrawingLots.election, gte19SeatsAndP7DrawingLots.committee_session),
     );
     server.use(
       http.post("/api/elections/8/apportionment", () =>
         HttpResponse.json(
           {
-            seat_assignment: gte19SeatsAndP7.seat_assignment,
-            election_summary: gte19SeatsAndP7.election_summary,
+            seat_assignment: gte19SeatsAndP7DrawingLots.seat_assignment,
+            election_summary: gte19SeatsAndP7DrawingLots.election_summary,
             warnings: [],
           },
           { status: 200 },
@@ -147,7 +147,9 @@ describe("DrawingLotsPage", () => {
       ),
     );
     server.use(
-      http.get("/api/elections/8/apportionment/state", () => HttpResponse.json(gte19SeatsAndP7.state, { status: 200 })),
+      http.get("/api/elections/8/apportionment/state", () =>
+        HttpResponse.json(gte19SeatsAndP7DrawingLots.state, { status: 200 }),
+      ),
     );
     const user = userEvent.setup();
 
@@ -186,7 +188,7 @@ describe("DrawingLotsPage", () => {
       drawn: 3,
       variant: {
         type: "ListDrawingLotsRequired",
-        ...gte19SeatsAndP7.drawing_lots_required,
+        ...gte19SeatsAndP7DrawingLots.drawing_lots_required,
       },
     });
     expect(navigate).toHaveBeenCalledWith("/elections/8/apportionment");
@@ -201,7 +203,7 @@ describe("DrawingLotsPage", () => {
           deceased_candidates: [],
           drawing_lots_required: {
             type: "ListDrawingLotsRequired",
-            ...lt19SeatsAndP7.drawing_lots_required,
+            ...lt19SeatsAndP7DrawingLots.drawing_lots_required,
           },
           lists_drawn: [],
           type: "DrawingLots",
@@ -215,14 +217,14 @@ describe("DrawingLotsPage", () => {
       "get",
       "/api/elections/7",
       200,
-      getElectionMockData(lt19SeatsAndP7.election, lt19SeatsAndP7.committee_session),
+      getElectionMockData(lt19SeatsAndP7DrawingLots.election, lt19SeatsAndP7DrawingLots.committee_session),
     );
     server.use(
       http.post("/api/elections/7/apportionment", () =>
         HttpResponse.json(
           {
-            seat_assignment: lt19SeatsAndP7.seat_assignment,
-            election_summary: lt19SeatsAndP7.election_summary,
+            seat_assignment: lt19SeatsAndP7DrawingLots.seat_assignment,
+            election_summary: lt19SeatsAndP7DrawingLots.election_summary,
             warnings: [],
           },
           { status: 200 },
@@ -230,7 +232,9 @@ describe("DrawingLotsPage", () => {
       ),
     );
     server.use(
-      http.get("/api/elections/7/apportionment/state", () => HttpResponse.json(lt19SeatsAndP7.state, { status: 200 })),
+      http.get("/api/elections/7/apportionment/state", () =>
+        HttpResponse.json(lt19SeatsAndP7DrawingLots.state, { status: 200 }),
+      ),
     );
     const user = userEvent.setup();
 
@@ -267,7 +271,7 @@ describe("DrawingLotsPage", () => {
       drawn: 2,
       variant: {
         type: "ListDrawingLotsRequired",
-        ...lt19SeatsAndP7.drawing_lots_required,
+        ...lt19SeatsAndP7DrawingLots.drawing_lots_required,
       },
     });
     expect(navigate).toHaveBeenCalledWith("/elections/7/apportionment");
@@ -282,7 +286,7 @@ describe("DrawingLotsPage", () => {
           deceased_candidates: [],
           drawing_lots_required: {
             type: "ListDrawingLotsRequired",
-            ...lt19SeatsAndP7.drawing_lots_required,
+            ...lt19SeatsAndP7DrawingLots.drawing_lots_required,
           },
           lists_drawn: [],
           type: "DrawingLots",
@@ -296,14 +300,14 @@ describe("DrawingLotsPage", () => {
       "get",
       "/api/elections/7",
       200,
-      getElectionMockData(lt19SeatsAndP7.election, lt19SeatsAndP7.committee_session),
+      getElectionMockData(lt19SeatsAndP7DrawingLots.election, lt19SeatsAndP7DrawingLots.committee_session),
     );
     overrideOnce("post", "/api/elections/7/apportionment", 200, {
-      seat_assignment: lt19SeatsAndP7.seat_assignment,
-      election_summary: lt19SeatsAndP7.election_summary,
+      seat_assignment: lt19SeatsAndP7DrawingLots.seat_assignment,
+      election_summary: lt19SeatsAndP7DrawingLots.election_summary,
       warnings: [],
     });
-    overrideOnce("get", "/api/elections/7/apportionment/state", 200, lt19SeatsAndP7.state);
+    overrideOnce("get", "/api/elections/7/apportionment/state", 200, lt19SeatsAndP7DrawingLots.state);
     const user = userEvent.setup();
 
     renderDrawingLotsPage(7);
@@ -342,9 +346,9 @@ describe("DrawingLotsPage", () => {
         "get",
         "/api/elections/7",
         200,
-        getElectionMockData(lt19SeatsAndP7.election, lt19SeatsAndP7.committee_session),
+        getElectionMockData(lt19SeatsAndP7DrawingLots.election, lt19SeatsAndP7DrawingLots.committee_session),
       );
-      overrideOnce("get", "/api/elections/7/apportionment/state", 200, lt19SeatsAndP7.state);
+      overrideOnce("get", "/api/elections/7/apportionment/state", 200, lt19SeatsAndP7DrawingLots.state);
     });
 
     test("Not available until committee session is completed", async () => {

@@ -28,8 +28,10 @@ import {
 import type { ApportionmentState, ElectionApportionmentResponse, ErrorResponse } from "@/types/generated/openapi";
 import { apportionmentRoutes } from "../routes";
 import * as gte19SeatsAndP7DrawingLots from "../testing/gte-19-seats-and-p7-drawing-lots";
+import * as gte19SeatsAndP9DrawingLots from "../testing/gte-19-seats-and-p9-drawing-lots-and-deceased-candidates";
 import * as lt19Seats from "../testing/lt-19-seats";
 import * as lt19SeatsAndP7DrawingLots from "../testing/lt-19-seats-and-p7-drawing-lots";
+import * as lt19SeatsAndP9DrawingLots from "../testing/lt-19-seats-and-p9-drawing-lots";
 import { ApportionmentPage } from "./ApportionmentPage";
 import { ApportionmentProvider } from "./ApportionmentProvider";
 
@@ -453,7 +455,7 @@ describe("ApportionmentPage", () => {
   });
 
   describe("Drawing lots residual seats", () => {
-    test("Render alert drawing lots required and table for LargestRemainderResidualSeat", async () => {
+    test("Render alert drawing lots for list required and table for LargestRemainderResidualSeat", async () => {
       const user = userEvent.setup();
       overrideOnce(
         "get",
@@ -477,7 +479,7 @@ describe("ApportionmentPage", () => {
       expect(alerts[0]).toHaveTextContent(
         [
           "Loting noodzakelijk voor toekennen restzetel 2",
-          `Er is een restzetel te verdelen. In de wet staat dat de partij met het grootste overschot aan stemmen per toegewezen zetel deze krijgt.`,
+          "Er is een restzetel te verdelen. In de wet staat dat de partij met het grootste overschot aan stemmen per toegewezen zetel deze krijgt.",
           "Er zijn meerdere partijen die hetzelfde grootste overschot hebben.",
           "Hierdoor kan de restzetel niet automatisch worden toegewezen. Het centraal stembureau moet een loting uitvoeren om de restzetel toe te wijzen.",
           "Naar loting",
@@ -518,7 +520,7 @@ describe("ApportionmentPage", () => {
       expect(router.state.location.pathname).toEqual("/details-residual-seats");
     });
 
-    test("Render alert drawing lots required and table for HighestAverageResidualSeat", async () => {
+    test("Render alert drawing lots for list required and table for HighestAverageResidualSeat", async () => {
       const user = userEvent.setup();
       overrideOnce(
         "get",
@@ -542,7 +544,7 @@ describe("ApportionmentPage", () => {
       expect(alerts[0]).toHaveTextContent(
         [
           "Loting noodzakelijk voor toekennen restzetels 2, 3 en 4",
-          `Er is een restzetel te verdelen. In de wet staat dat de partij met het grootste gemiddeld aantal stemmen per toegewezen zetel deze krijgt.`,
+          "Er is een restzetel te verdelen. In de wet staat dat de partij met het grootste gemiddeld aantal stemmen per toegewezen zetel deze krijgt.",
           "Er zijn meerdere partijen die na het toewijzen van de volgende restzetel precies hetzelfde hoogste gemiddelde krijgen.",
           "Hierdoor kan de restzetel niet automatisch worden toegewezen. Het centraal stembureau moet een loting uitvoeren om de restzetel toe te wijzen.",
           "Naar loting",
@@ -581,7 +583,7 @@ describe("ApportionmentPage", () => {
       expect(router.state.location.pathname).toEqual("/details-residual-seats");
     });
 
-    test("Render alert drawing lots required and alert assigned after drawing 1 lot", async () => {
+    test("Render alert drawing lots for list required and alert assigned after drawing 1 lot", async () => {
       overrideOnce(
         "get",
         "/api/elections/8",
@@ -609,7 +611,7 @@ describe("ApportionmentPage", () => {
       expect(alerts[0]).toHaveTextContent(
         [
           "Loting noodzakelijk voor toekennen restzetels 3 en 4",
-          `Er is een restzetel te verdelen. In de wet staat dat de partij met het grootste gemiddeld aantal stemmen per toegewezen zetel deze krijgt.`,
+          "Er is een restzetel te verdelen. In de wet staat dat de partij met het grootste gemiddeld aantal stemmen per toegewezen zetel deze krijgt.",
           "Er zijn meerdere partijen die na het toewijzen van de volgende restzetel precies hetzelfde hoogste gemiddelde krijgen.",
           "Hierdoor kan de restzetel niet automatisch worden toegewezen. Het centraal stembureau moet een loting uitvoeren om de restzetel toe te wijzen.",
           "Naar loting",
@@ -638,7 +640,7 @@ describe("ApportionmentPage", () => {
       ]);
     });
 
-    test("Render alert drawing lots required and alert assigned after drawing 2 lots", async () => {
+    test("Render alert drawing lots for list required and alert assigned after drawing 2 lots", async () => {
       overrideOnce(
         "get",
         "/api/elections/8",
@@ -666,7 +668,7 @@ describe("ApportionmentPage", () => {
       expect(alerts[0]).toHaveTextContent(
         [
           "Loting noodzakelijk voor toekennen restzetel 4",
-          `Er is een restzetel te verdelen. In de wet staat dat de partij met het grootste gemiddeld aantal stemmen per toegewezen zetel deze krijgt.`,
+          "Er is een restzetel te verdelen. In de wet staat dat de partij met het grootste gemiddeld aantal stemmen per toegewezen zetel deze krijgt.",
           "Er zijn meerdere partijen die na het toewijzen van de volgende restzetel precies hetzelfde hoogste gemiddelde krijgen.",
           "Hierdoor kan de restzetel niet automatisch worden toegewezen. Het centraal stembureau moet een loting uitvoeren om de restzetel toe te wijzen.",
           "Naar loting",
@@ -694,6 +696,179 @@ describe("ApportionmentPage", () => {
         ["5", "Unie van kandidaten", "2", "-", "2"],
         ["6", "Lijst van stemmers", "2", "1", "3"],
         ["", "Totaal", "19", "4", "23"],
+      ]);
+    });
+
+    test("Render alert drawing lots for p9 required and table for LargestRemainderResidualSeat", async () => {
+      const user = userEvent.setup();
+      overrideOnce(
+        "get",
+        "/api/elections/9",
+        200,
+        getElectionMockData(lt19SeatsAndP9DrawingLots.election, lt19SeatsAndP9DrawingLots.committee_session),
+      );
+      overrideOnce("post", "/api/elections/9/apportionment", 200, {
+        seat_assignment: lt19SeatsAndP9DrawingLots.seat_assignment,
+        election_summary: lt19SeatsAndP9DrawingLots.election_summary,
+      });
+      overrideOnce("get", "/api/elections/9/apportionment/state", 200, lt19SeatsAndP9DrawingLots.state);
+
+      const router = renderApportionmentPage(9, true) as Router;
+      expect(await screen.findByRole("heading", { level: 1, name: "Zetelverdeling" })).toBeVisible();
+
+      const alerts = await screen.findAllByRole("alert");
+      expect(alerts).toHaveLength(2);
+
+      expect(alerts[0]).toHaveClass(alertCls.warning!);
+      expect(alerts[0]).toHaveTextContent(
+        [
+          "Loting noodzakelijk vanwege volstrekte meerderheid",
+          "De partijdigen heeft de volstrekte meerderheid van stemmen gekregen, maar heeft niet de volstrekte meerderheid aan zetels.",
+          "Volgens artikel P9 van de kieswet wordt een zetel afgenomen van de lijst waaraan de laatste restzetel is toegekend. ",
+          "Lijst 2, 3 en 4 hebben met hetzelfde overschot aan stemmen hun laatste restzetel gekregen. ",
+          "In de zitting van het CSB moet door loting worden bepaald welk van deze lijsten een zetel af moet staan.",
+          "Naar loting",
+          "Details restzetelverdeling",
+        ].join(""),
+      );
+
+      expect(alerts[1]).toHaveClass(alertCls.notify!);
+      expect(alerts[1]).toHaveTextContent("Lijst 2, 3 of 4 moet een zetel afstaan aan lijst 1. Ga naar loting");
+
+      const apportionment_table = await screen.findByTestId("apportionment-table");
+      expect(apportionment_table).toBeVisible();
+      expect(apportionment_table).toHaveTableContent([
+        ["Lijst", "Lijstnaam", "Volle zetels", "Restzetels", "Totaal zetels"],
+        ["1", "De partijdigen", "7", "-", "7"],
+        ["2", "Kiezers nu!", "1", "1", "2"],
+        ["3", "Lijst De Partij", "1", "1", "2"],
+        ["4", "Partij voor de Opkomst", "1", "1", "2"],
+        ["5", "STEM", "1", "-", "1"],
+        ["6", "Lijst van stemmers", "1", "-", "1"],
+        ["", "Totaal", "12", "3", "15"],
+      ]);
+
+      // Check that there are no links to the list details pages
+      const rows = within(apportionment_table).getAllByRole("row");
+      if (rows[2]) {
+        await user.click(rows[2]);
+      }
+      expect(router.state.location.pathname).toEqual("/");
+    });
+
+    test("Render alert drawing lots for p9 required and table for HighestAverageResidualSeat", async () => {
+      const user = userEvent.setup();
+      overrideOnce(
+        "get",
+        "/api/elections/10",
+        200,
+        getElectionMockData(gte19SeatsAndP9DrawingLots.election, gte19SeatsAndP9DrawingLots.committee_session),
+      );
+      overrideOnce("post", "/api/elections/10/apportionment", 200, {
+        seat_assignment: gte19SeatsAndP9DrawingLots.seat_assignment,
+        election_summary: gte19SeatsAndP9DrawingLots.election_summary,
+      });
+      overrideOnce("get", "/api/elections/10/apportionment/state", 200, gte19SeatsAndP9DrawingLots.state);
+
+      const router = renderApportionmentPage(10, true) as Router;
+      expect(await screen.findByRole("heading", { level: 1, name: "Zetelverdeling" })).toBeVisible();
+
+      const alerts = await screen.findAllByRole("alert");
+      expect(alerts).toHaveLength(2);
+
+      expect(alerts[0]).toHaveClass(alertCls.warning!);
+      expect(alerts[0]).toHaveTextContent(
+        [
+          "Loting noodzakelijk vanwege volstrekte meerderheid",
+          "De Kandidaat heeft de volstrekte meerderheid van stemmen gekregen, maar heeft niet de volstrekte meerderheid aan zetels.",
+          "Volgens artikel P9 van de kieswet wordt een zetel afgenomen van de lijst waaraan de laatste restzetel is toegekend. ",
+          "Lijst 6 en 7 hebben met hetzelfde gemiddeld aantal stemmen hun laatste restzetel gekregen. ",
+          "In de zitting van het CSB moet door loting worden bepaald welk van deze lijsten een zetel af moet staan.",
+          "Naar loting",
+          "Details restzetelverdeling",
+        ].join(""),
+      );
+
+      expect(alerts[1]).toHaveClass(alertCls.notify!);
+      expect(alerts[1]).toHaveTextContent("Lijst 6 of 7 moet een zetel afstaan aan lijst 1. Ga naar loting");
+
+      const apportionment_table = await screen.findByTestId("apportionment-table");
+      expect(apportionment_table).toBeVisible();
+      expect(apportionment_table).toHaveTableContent([
+        ["Lijst", "Lijstnaam", "Volle zetels", "Restzetels", "Totaal zetels"],
+        ["1", "De Kandidaat", "12", "-", "12"],
+        ["2", "Kandidaten eerst!", "1", "1", "2"],
+        ["3", "Unie voor Stemmen", "1", "1", "2"],
+        ["4", "Stem voor kandidaten", "1", "1", "2"],
+        ["5", "De Stemunie", "1", "1", "2"],
+        ["6", "Altijd van de Partij", "1", "1", "2"],
+        ["7", "Partij van de Keuze", "1", "1", "2"],
+        ["8", "Stemmersgroep", "-", "-", "-"],
+        ["", "Totaal", "18", "6", "24"],
+      ]);
+
+      // Check that there are no links to the list details pages
+      const rows = within(apportionment_table).getAllByRole("row");
+      if (rows[2]) {
+        await user.click(rows[2]);
+      }
+      expect(router.state.location.pathname).toEqual("/");
+    });
+
+    test("Render alert drawing lots for p9 required and alert assigned after drawing 1 lot", async () => {
+      overrideOnce(
+        "get",
+        "/api/elections/10",
+        200,
+        getElectionMockData(gte19SeatsAndP9DrawingLots.election, gte19SeatsAndP9DrawingLots.committee_session),
+      );
+      overrideOnce("post", "/api/elections/10/apportionment", 200, {
+        seat_assignment: gte19SeatsAndP9DrawingLots.seat_assignment_after_drawing_lots_seat_reassigned,
+        election_summary: gte19SeatsAndP9DrawingLots.election_summary,
+      });
+      overrideOnce(
+        "get",
+        "/api/elections/10/apportionment/state",
+        200,
+        gte19SeatsAndP9DrawingLots.state_after_drawing_lots_seat_reassigned,
+      );
+
+      renderApportionmentPage(10, false);
+      expect(await screen.findByRole("heading", { level: 1, name: "Zetelverdeling" })).toBeVisible();
+
+      const alerts = await screen.findAllByRole("alert");
+      expect(alerts).toHaveLength(2);
+
+      const finished_alert = alerts[0]!;
+      expect(finished_alert).toHaveClass(alertCls.success!);
+      expect(finished_alert).toHaveTextContent("Alle zetels zijn toegewezen");
+      expect(finished_alert).toHaveTextContent(
+        "Je kunt de zetelverdeling nu definitief maken en het proces-verbaal downloaden.",
+      );
+      expect(within(finished_alert).getByRole("link", { name: "Naar proces-verbaal" })).toHaveAttribute(
+        "href",
+        "/report/committee-session/10/download",
+      );
+      expect(within(finished_alert).getByRole("button", { name: "Zetelverdeling opnieuw doen" })).toBeVisible();
+
+      expect(alerts[1]).toHaveClass(alertCls.notify!);
+      expect(alerts[1]).toHaveTextContent(
+        "De laatste restzetel voor lijst 1 (artikel P9) is na loting afgestaan door Lijst 7 - Partij van de Keuze",
+      );
+
+      const apportionment_table = await screen.findByTestId("apportionment-table");
+      expect(apportionment_table).toBeVisible();
+      expect(apportionment_table).toHaveTableContent([
+        ["Lijst", "Lijstnaam", "Volle zetels", "Restzetels", "Totaal zetels"],
+        ["1", "De Kandidaat", "12", "1", "13"],
+        ["2", "Kandidaten eerst!", "1", "1", "2"],
+        ["3", "Unie voor Stemmen", "1", "1", "2"],
+        ["4", "Stem voor kandidaten", "1", "1", "2"],
+        ["5", "De Stemunie", "1", "1", "2"],
+        ["6", "Altijd van de Partij", "1", "1", "2"],
+        ["7", "Partij van de Keuze", "1", "-", "1"],
+        ["8", "Stemmersgroep", "-", "-", "-"],
+        ["", "Totaal", "18", "6", "24"],
       ]);
     });
   });

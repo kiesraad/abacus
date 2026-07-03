@@ -1099,7 +1099,7 @@ export const seat_assignment: SeatAssignment = {
   ],
 };
 
-export const seat_assignment_drawing_lots_seat_reassigned: SeatAssignment = {
+export const seat_assignment_after_drawing_lots_seat_reassigned: SeatAssignment = {
   ...seat_assignment,
   steps: [
     ...seat_assignment.steps,

@@ -1,4 +1,5 @@
 import type {
+  AbsoluteMajorityDrawingLots,
   ApportionmentState,
   CommitteeSession,
   ElectionSummary,
@@ -6,13 +7,20 @@ import type {
   SeatAssignment,
 } from "@/types/generated/openapi";
 
+export const options = [2, 3, 4];
+export const assign_to = 1;
+export const drawing_lots_required: AbsoluteMajorityDrawingLots & {
+  variant: "AbsoluteMajorityLargestRemainder";
+} = {
+  variant: "AbsoluteMajorityLargestRemainder",
+  assign_to,
+  options,
+};
 export const state: ApportionmentState = {
   type: "DrawingLots",
   drawing_lots_required: {
     type: "ListDrawingLotsRequired",
-    variant: "AbsoluteMajorityLargestRemainder",
-    assign_to: 1,
-    options: [2, 3, 4],
+    ...drawing_lots_required,
   },
   deceased_candidates: [],
   lists_drawn: [],

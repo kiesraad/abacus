@@ -25,6 +25,7 @@
   "details_residual_seats_allocation": "Details restzetelverdeling",
   "drawing_lots": "Loting",
   "drawing_lots_for_list": {
+    "title": "Loting voor restzetel {number}",
     "hence_drawing_lots_is_needed": "Daarom moet er geloot worden welke lijst de restzetel krijgt",
     "list_gets_the_seat_with": {
       "highest_average": "De partij met het hoogste gemiddeld aantal stemmen na het toewijzen van de restzetel krijgt de restzetel",
@@ -41,12 +42,12 @@
     "seat_cannot_be_assigned_automatically": "Restzetel {nr} kan niet automatisch worden toegewezen"
   },
   "drawing_lots_for_p9": {
+    "title": "Loting voor afstaan restzetel aan lijst {assign_to}",
     "hence_drawing_lots_is_needed": "Daarom moet er geloot worden welke lijst de restzetel moet afstaan",
     "last_residual_seat_to_list": "De laatste restzetel moet worden afgestaan aan lijst {nr}.",
     "list_got_absolute_majority": "Lijst {nr} heeft de volstrekte meerderheid van stemmen gekregen, maar heeft niet de volstrekte meerderheid aan zetels.",
     "lists_got_last_residual_seats": "Lijst {lists} hebben met hetzelfde {variant} stemmen de laatste restzetels gekregen."
   },
-  "drawing_lots_for_seat": "Loting voor restzetel {number}",
   "drawing_lots_instructions": {
     "title": "Instructies voor loting",
     "description": "De loting wordt uitgevoerd op papier, in aanwezigheid van alle leden van het centraal stembureau. Waarnemers mogen meekijken."

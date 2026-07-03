@@ -13,8 +13,10 @@ import { expectErrorPage, render, screen, setupTestRouter, spyOnHandler, waitFor
 import type { ApportionmentState, ElectionApportionmentResponse, ErrorResponse } from "@/types/generated/openapi";
 import { apportionmentRoutes } from "../../routes";
 import * as gte19SeatsAndP7DrawingLots from "../../testing/gte-19-seats-and-p7-drawing-lots";
+import * as gte19SeatsAndP9DrawingLots from "../../testing/gte-19-seats-and-p9-drawing-lots-and-deceased-candidates";
 import * as lt19Seats from "../../testing/lt-19-seats";
 import * as lt19SeatsAndP7DrawingLots from "../../testing/lt-19-seats-and-p7-drawing-lots";
+import * as lt19SeatsAndP9DrawingLots from "../../testing/lt-19-seats-and-p9-drawing-lots";
 import { ApportionmentProvider } from "../ApportionmentProvider";
 import { DrawingLotsPage } from "./DrawingLotsPage";
 
@@ -275,6 +277,178 @@ describe("DrawingLotsPage", () => {
       },
     });
     expect(navigate).toHaveBeenCalledWith("/elections/7/apportionment");
+  });
+
+  test("Renders for drawing lots for p9 highest average variant and submits", async () => {
+    vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
+    const addListDrawnRequestHandler = http.post("/api/elections/10/apportionment/add_list_drawn", () =>
+      HttpResponse.json(
+        {
+          candidates_drawn: [],
+          deceased_candidates: [],
+          drawing_lots_required: {
+            type: "ListDrawingLotsRequired",
+            ...gte19SeatsAndP9DrawingLots.drawing_lots_required,
+          },
+          lists_drawn: [],
+          type: "DrawingLots",
+        } satisfies ApportionmentState,
+        { status: 200 },
+      ),
+    );
+    server.use(addListDrawnRequestHandler);
+    const addListDrawn = spyOnHandler(addListDrawnRequestHandler);
+    overrideOnce(
+      "get",
+      "/api/elections/10",
+      200,
+      getElectionMockData(gte19SeatsAndP9DrawingLots.election, gte19SeatsAndP9DrawingLots.committee_session),
+    );
+    server.use(
+      http.post("/api/elections/10/apportionment", () =>
+        HttpResponse.json(
+          {
+            seat_assignment: gte19SeatsAndP9DrawingLots.seat_assignment,
+            election_summary: gte19SeatsAndP9DrawingLots.election_summary,
+            warnings: [],
+          },
+          { status: 200 },
+        ),
+      ),
+    );
+    server.use(
+      http.get("/api/elections/10/apportionment/state", () =>
+        HttpResponse.json(gte19SeatsAndP9DrawingLots.state, { status: 200 }),
+      ),
+    );
+    const user = userEvent.setup();
+
+    renderDrawingLotsPage(10);
+
+    expect(
+      await screen.findByRole("heading", { level: 1, name: "Loting voor afstaan restzetel aan lijst 1" }),
+    ).toBeVisible();
+
+    expect(await screen.findByRole("heading", { level: 2, name: "Loting noodzakelijk" })).toBeVisible();
+    const list = screen.getByRole("list");
+    expect(list).toBeVisible();
+    const listitems = within(list).getAllByRole("listitem");
+    expect(listitems.length).toBe(4);
+    expect(listitems[0]).toHaveTextContent(
+      "Lijst 1 heeft de volstrekte meerderheid van stemmen gekregen, maar heeft niet de volstrekte meerderheid aan zetels.",
+    );
+    expect(listitems[1]).toHaveTextContent("De laatste restzetel moet worden afgestaan aan lijst 1.");
+    expect(listitems[2]).toHaveTextContent(
+      "Lijst 6 en 7 hebben met hetzelfde gemiddeld aantal stemmen de laatste restzetels gekregen.",
+    );
+    expect(listitems[3]).toHaveTextContent("Daarom moet er geloot worden welke lijst de restzetel krijgt");
+
+    expect(await screen.findByRole("heading", { level: 3, name: "Instructies voor loting" })).toBeVisible();
+
+    expect(await screen.findByRole("heading", { level: 3, name: "Resultaat loting" })).toBeVisible();
+
+    const options = await screen.findAllByRole("radio");
+    expect(options.length).toBe(2);
+    const option = await screen.findByRole("radio", { name: "Lijst 7 - Partij van de Keuze" });
+    expect(option).toBeVisible();
+    expect(option).not.toBeChecked();
+    await user.click(option);
+    await user.click(screen.getByRole("button", { name: "Volgende" }));
+
+    expect(addListDrawn).toHaveBeenCalledWith({
+      drawn: 7,
+      variant: {
+        type: "ListDrawingLotsRequired",
+        ...gte19SeatsAndP9DrawingLots.drawing_lots_required,
+      },
+    });
+    expect(navigate).toHaveBeenCalledWith("/elections/10/apportionment");
+  });
+
+  test("Renders for drawing lots for p9 largest remainder variant and submits", async () => {
+    vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
+    const addListDrawnRequestHandler = http.post("/api/elections/9/apportionment/add_list_drawn", () =>
+      HttpResponse.json(
+        {
+          candidates_drawn: [],
+          deceased_candidates: [],
+          drawing_lots_required: {
+            type: "ListDrawingLotsRequired",
+            ...lt19SeatsAndP9DrawingLots.drawing_lots_required,
+          },
+          lists_drawn: [],
+          type: "DrawingLots",
+        } satisfies ApportionmentState,
+        { status: 200 },
+      ),
+    );
+    server.use(addListDrawnRequestHandler);
+    const addListDrawn = spyOnHandler(addListDrawnRequestHandler);
+    overrideOnce(
+      "get",
+      "/api/elections/9",
+      200,
+      getElectionMockData(lt19SeatsAndP9DrawingLots.election, lt19SeatsAndP9DrawingLots.committee_session),
+    );
+    server.use(
+      http.post("/api/elections/9/apportionment", () =>
+        HttpResponse.json(
+          {
+            seat_assignment: lt19SeatsAndP9DrawingLots.seat_assignment,
+            election_summary: lt19SeatsAndP9DrawingLots.election_summary,
+            warnings: [],
+          },
+          { status: 200 },
+        ),
+      ),
+    );
+    server.use(
+      http.get("/api/elections/9/apportionment/state", () =>
+        HttpResponse.json(lt19SeatsAndP9DrawingLots.state, { status: 200 }),
+      ),
+    );
+    const user = userEvent.setup();
+
+    renderDrawingLotsPage(9);
+
+    expect(
+      await screen.findByRole("heading", { level: 1, name: "Loting voor afstaan restzetel aan lijst 1" }),
+    ).toBeVisible();
+
+    expect(await screen.findByRole("heading", { level: 2, name: "Loting noodzakelijk" })).toBeVisible();
+    const list = screen.getByRole("list");
+    expect(list).toBeVisible();
+    const listitems = within(list).getAllByRole("listitem");
+    expect(listitems.length).toBe(4);
+    expect(listitems[0]).toHaveTextContent(
+      "Lijst 1 heeft de volstrekte meerderheid van stemmen gekregen, maar heeft niet de volstrekte meerderheid aan zetels.",
+    );
+    expect(listitems[1]).toHaveTextContent("De laatste restzetel moet worden afgestaan aan lijst 1.");
+    expect(listitems[2]).toHaveTextContent(
+      "Lijst 2, 3 en 4 hebben met hetzelfde overschot aan stemmen de laatste restzetels gekregen.",
+    );
+    expect(listitems[3]).toHaveTextContent("Daarom moet er geloot worden welke lijst de restzetel krijgt");
+
+    expect(await screen.findByRole("heading", { level: 3, name: "Instructies voor loting" })).toBeVisible();
+
+    expect(await screen.findByRole("heading", { level: 3, name: "Resultaat loting" })).toBeVisible();
+
+    const options = await screen.findAllByRole("radio");
+    expect(options.length).toBe(3);
+    const option = await screen.findByRole("radio", { name: "Lijst 3 - Lijst De Partij" });
+    expect(option).toBeVisible();
+    expect(option).not.toBeChecked();
+    await user.click(option);
+    await user.click(screen.getByRole("button", { name: "Volgende" }));
+
+    expect(addListDrawn).toHaveBeenCalledWith({
+      drawn: 3,
+      variant: {
+        type: "ListDrawingLotsRequired",
+        ...lt19SeatsAndP9DrawingLots.drawing_lots_required,
+      },
+    });
+    expect(navigate).toHaveBeenCalledWith("/elections/9/apportionment");
   });
 
   test("Renders form and shows error when submitting without selecting a list", async () => {

@@ -18,8 +18,12 @@ import { DrawingLotsForP9 } from "./DrawingLotsForP9";
 
 function getPageTitle(state: ApportionmentState) {
   if (isListDrawingLotsVariant(state, ["HighestAverageResidualSeat", "LargestRemainderResidualSeat"])) {
-    return t("apportionment.drawing_lots_for_seat", {
+    return t("apportionment.drawing_lots_for_list.title", {
       number: state.drawing_lots_required.residual_seat_numbers[0] || "",
+    });
+  } else if (isListDrawingLotsVariant(state, ["AbsoluteMajorityHighestAverage", "AbsoluteMajorityLargestRemainder"])) {
+    return t("apportionment.drawing_lots_for_p9.title", {
+      assign_to: state.drawing_lots_required.assign_to || "",
     });
   }
   return t("apportionment.drawing_lots");

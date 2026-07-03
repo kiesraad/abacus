@@ -17,6 +17,7 @@
 #define MyAppExeName "abacus.exe"
 #define MyAppIcon "abacus.ico"
 #define MyDatabaseFile = "db.sqlite"
+#define MyBackupDirName = "backups"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application. Do not use the same AppId value in installers for other applications.
@@ -72,11 +73,14 @@ Source: ".\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion sign
 Source: ".\VC_redist.x64.exe"; DestDir: "{tmp}"; Flags: deleteafterinstall
 Source: ".\{#MyAppIcon}"; DestDir: "{app}"
 
+[Dirs]
+Name: "{app}\{#MyBackupDirName}"
+
 [Icons]
 Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; IconFilename: "{app}\{#MyAppIcon}"
 Name: "{autodesktop}\1. Start {#MyAppName} server"; Filename: "{sys}\cmd.exe"; Parameters: "/k ""{app}\{#MyAppExeName}"""; WorkingDir: "{app}"; IconFilename: "{app}\{#MyAppIcon}"
 Name: "{autodesktop}\2. Open {#MyAppName} in browser"; Filename: "http://localhost"; IconFilename: "{app}\{#MyAppIcon}"
-Name: "{autodesktop}\{#MyAppName} database map"; Filename: "{app}"; IconFilename: "{sys}\shell32.dll"; IconIndex: 3
+Name: "{autodesktop}\{#MyAppName} backups"; Filename: "{app}\{#MyBackupDirName}"; IconFilename: "{sys}\shell32.dll"; IconIndex: 3
 
 [Run]
 Filename: "{tmp}\VC_redist.x64.exe"; Parameters: "/install /passive /norestart"; StatusMsg: "Visual C++ Redistributable installeren..."
@@ -156,7 +160,7 @@ begin
       if FileExists(ExpandConstant('{app}\{#MyDatabaseFile}')) then
         begin
         case TaskDialogMsgBox('Database verwijderen?',
-                     'De database bevat alle verkiezingsdetails, ingevoerde data en gemaakte processen-verbaal.' + #13#10#13#10 + 'Als u de database verwijdert, gaan deze gegevens definitief verloren.',
+                     'De database bevat alle verkiezingsdetails, ingevoerde data en gemaakte processen-verbaal. Ook alle gemaakte backups worden verwijderd.' + #13#10#13#10 + 'Als u de database verwijdert, gaan deze gegevens definitief verloren.',
                       mbConfirmation,
                       MB_YESNO, ['Database verwijderen', 'Bewaren'],
                       0) of

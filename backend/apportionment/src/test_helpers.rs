@@ -5,7 +5,9 @@ use super::{
 };
 use crate::{
     ApportionmentInput, CandidateVotes, SeatAssignmentDetails,
-    candidate_nomination::{Candidate, ListCandidateNomination, candidate_votes_numbers},
+    candidate_nomination::{
+        Candidate, CandidateRanking, ListCandidateNomination, candidate_votes_numbers,
+    },
     structs::{CandidateDrawn, ListDrawingLotsVariant, ListDrawn},
 };
 
@@ -153,10 +155,21 @@ pub fn check_list_candidate_nomination(
         expected_other_nomination
     );
 
-    assert_eq!(
-        nomination.updated_candidate_ranking.to_vec(),
-        expected_updated_ranking
-    );
+    if expected_updated_ranking.is_empty() {
+        assert!(matches!(
+            nomination.candidate_ranking,
+            CandidateRanking::Original(_)
+        ));
+    } else {
+        assert!(matches!(
+            nomination.candidate_ranking,
+            CandidateRanking::Updated(_)
+        ));
+        assert_eq!(
+            nomination.candidate_ranking.as_slice(),
+            expected_updated_ranking
+        );
+    }
 }
 
 pub fn check_chosen_candidates(

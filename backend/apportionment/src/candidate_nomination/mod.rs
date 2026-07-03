@@ -1,7 +1,8 @@
 mod structs;
 
 pub use structs::{
-    Candidate, CandidateNominationDetails, ListCandidateNomination, PreferenceThreshold,
+    Candidate, CandidateNominationDetails, CandidateRanking, ListCandidateNomination,
+    PreferenceThreshold,
 };
 use tracing::{debug, info};
 
@@ -122,7 +123,7 @@ enum ListCandidateNominations<'a, LV: ListVotes> {
     DrawingLotsRequired(CandidateDrawingLotsVariant<ListNumber<LV>, CandidateNumber<LV>>),
 }
 
-/// This function nominates candidates for the seats each list has been assigned.  
+/// This function nominates candidates for the seats each list has been assigned.
 /// The candidate nomination is first done based on preferential votes and then the other
 /// candidates are nominated.
 #[expect(clippy::too_many_lines)]
@@ -171,12 +172,19 @@ fn candidate_nomination_per_list<'a, LV: ListVotes>(
             non_assigned_seats,
         );
 
+        // Determine original ranking of candidates, used to determine if the ranking was changed
+        let original_ranking = list
+            .candidate_votes()
+            .iter()
+            .map(|cv| cv.number())
+            .collect::<Vec<_>>();
+
         // [Artikel P 19 Kieswet](https://wetten.overheid.nl/BWBR0004627/2026-01-01/#AfdelingII_HoofdstukP_Paragraaf3_ArtikelP19)
-        let updated_candidate_ranking = if input.deceased_candidates.get(&list.number()).is_none()
+        let candidate_ranking = if input.deceased_candidates.get(&list.number()).is_none()
             && (candidate_votes_meeting_preference_threshold.is_empty()
                 || (input.number_of_seats >= LARGE_COUNCIL_THRESHOLD && total_seats == 0))
         {
-            vec![]
+            CandidateRanking::Original(original_ranking)
         } else {
             let updated_ranking = update_candidate_ranking(
                 preference_threshold,
@@ -187,15 +195,10 @@ fn candidate_nomination_per_list<'a, LV: ListVotes>(
             // If the updated candidate ranking is the same as the original candidate list,
             // return an empty list, otherwise return the updated list
             // Note: we base this on the original list, so if there are deceased candidates, the ranking is always updated
-            let original_ranking = list
-                .candidate_votes()
-                .iter()
-                .map(|cv| cv.number())
-                .collect::<Vec<_>>();
             if updated_ranking == original_ranking {
-                vec![]
+                CandidateRanking::Original(original_ranking)
             } else {
-                updated_ranking
+                CandidateRanking::Updated(updated_ranking)
             }
         };
 
@@ -204,7 +207,7 @@ fn candidate_nomination_per_list<'a, LV: ListVotes>(
             list_seats: total_seats,
             preferential_candidate_nomination,
             other_candidate_nomination,
-            updated_candidate_ranking,
+            candidate_ranking,
         });
     }
     Ok(ListCandidateNominations::Completed(
@@ -1274,7 +1277,7 @@ mod tests {
                         &CandidateVotesMock(6, 495),
                     ],
                     other_candidate_nomination: Vec::new(),
-                    updated_candidate_ranking: Vec::new()
+                    candidate_ranking: CandidateRanking::Original(vec![1, 2, 3, 4, 5, 6]),
                 },
                 ListCandidateNomination {
                     list_number: 2,
@@ -1285,7 +1288,7 @@ mod tests {
                         &CandidateVotesMock(3, 400),
                     ],
                     other_candidate_nomination: Vec::new(),
-                    updated_candidate_ranking: Vec::new()
+                    candidate_ranking: CandidateRanking::Original(vec![1, 2, 3, 4, 5, 6]),
                 }
             ]
         );

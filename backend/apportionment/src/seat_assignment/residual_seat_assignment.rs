@@ -177,34 +177,18 @@ fn list_qualifies_for_extra_seat<LN: Copy + Eq>(
     let number_of_seats_largest_remainders =
         list_largest_remainder_assigned_seats(previous_steps, list_number);
 
-    let number_of_seats_unique_highest_averages_option = if check_for_unique_highest_average_seats {
-        Some(list_unique_highest_average_assigned_seats(
-            previous_steps,
-            list_number,
-        ))
-    } else {
-        None
-    };
-
     // A list qualifies for an extra seat if in a previous step, a seat has been removed
     // due to absolute majority reassignment, and that that seat has then been removed due
     // to list exhaustion. In that case, the seat can be returned to the original list.
-    let has_absolute_majority_retracted_seat: bool = previous_steps.iter().any(|prev| {
+    let has_absolute_majority_retracted_seat = previous_steps.iter().any(|prev| {
         prev.change.is_changed_by_absolute_majority_reassignment()
             && prev.change.list_number_retracted() == list_number
     });
 
-    // In case of largest remainder assignment
-    if number_of_seats_unique_highest_averages_option.is_none() {
-        // If no largest remainder seat has been assigned to this list
-        // or the largest remainder assigned seat has been retracted
-        number_of_seats_largest_remainders == 0
-            || (has_absolute_majority_retracted_seat && number_of_seats_largest_remainders == 1)
-    }
     // In case of unique highest average assignment
-    else if let Some(number_of_seats_unique_highest_averages) =
-        number_of_seats_unique_highest_averages_option
-    {
+    if check_for_unique_highest_average_seats {
+        let number_of_seats_unique_highest_averages =
+            list_unique_highest_average_assigned_seats(previous_steps, list_number);
         // If no unique highest average seat has been assigned to this list
         // or (the unique highest average assigned seat has been retracted,
         // and no largest remainder seat has been retracted and reassigned)
@@ -214,8 +198,13 @@ fn list_qualifies_for_extra_seat<LN: Copy + Eq>(
                 // It is possible to receive one LR seat, then get it retracted
                 // and then received back again based on LR, which would mean 2.
                 && number_of_seats_largest_remainders <= 1)
-    } else {
-        false
+    }
+    // In case of largest remainder assignment
+    else {
+        // If no largest remainder seat has been assigned to this list
+        // or the largest remainder assigned seat has been retracted
+        number_of_seats_largest_remainders == 0
+            || (has_absolute_majority_retracted_seat && number_of_seats_largest_remainders == 1)
     }
 }
 

@@ -170,15 +170,26 @@ fn exhausted_list_numbers<T: ListVotes>(
 
 /// Returns if a list qualifies for an extra seat.
 fn list_qualifies_for_extra_seat<LN: Copy + Eq>(
-    number_of_seats_largest_remainders: usize,
-    number_of_seats_unique_highest_averages_option: Option<usize>,
     previous_steps: &[SeatChangeStep<LN>],
     list_number: LN,
+    check_for_unique_highest_average_seats: bool,
 ) -> bool {
+    let number_of_seats_largest_remainders =
+        list_largest_remainder_assigned_seats(previous_steps, list_number);
+
+    let number_of_seats_unique_highest_averages_option = if check_for_unique_highest_average_seats {
+        Some(list_unique_highest_average_assigned_seats(
+            previous_steps,
+            list_number,
+        ))
+    } else {
+        None
+    };
+
     // A list qualifies for an extra seat if in a previous step, a seat has been removed
     // due to absolute majority reassignment, and that that seat has then been removed due
     // to list exhaustion. In that case, the seat can be returned to the original list.
-    let has_retracted_seat: bool = previous_steps.iter().any(|prev| {
+    let has_absolute_majority_retracted_seat: bool = previous_steps.iter().any(|prev| {
         prev.change.is_changed_by_absolute_majority_reassignment()
             && prev.change.list_number_retracted() == list_number
     });
@@ -188,7 +199,7 @@ fn list_qualifies_for_extra_seat<LN: Copy + Eq>(
         // If no largest remainder seat has been assigned to this list
         // or the largest remainder assigned seat has been retracted
         number_of_seats_largest_remainders == 0
-            || (has_retracted_seat && number_of_seats_largest_remainders == 1)
+            || (has_absolute_majority_retracted_seat && number_of_seats_largest_remainders == 1)
     }
     // In case of unique highest average assignment
     else if let Some(number_of_seats_unique_highest_averages) =
@@ -198,7 +209,7 @@ fn list_qualifies_for_extra_seat<LN: Copy + Eq>(
         // or (the unique highest average assigned seat has been retracted,
         // and no largest remainder seat has been retracted and reassigned)
         number_of_seats_unique_highest_averages == 0
-            || (has_retracted_seat
+            || (has_absolute_majority_retracted_seat
                 && number_of_seats_unique_highest_averages == 1
                 && number_of_seats_largest_remainders <= 1)
     } else {
@@ -223,12 +234,7 @@ fn list_standings_qualifying_for_largest_remainder<'a, LN: Copy + Eq>(
         s.votes_cast() > 0
             && s.meets_remainder_threshold()
             && !exhausted_list_numbers.contains(&s.list_number())
-            && list_qualifies_for_extra_seat(
-                list_largest_remainder_assigned_seats(previous_steps, s.list_number()),
-                None,
-                previous_steps,
-                s.list_number(),
-            )
+            && list_qualifies_for_extra_seat(previous_steps, s.list_number(), false)
     })
 }
 
@@ -244,19 +250,11 @@ fn list_standings_qualifying_for_unique_highest_average<'a, LN: Copy + Eq>(
     standings.iter().filter(|&s| {
         s.votes_cast() > 0
             && !exhausted_list_numbers.contains(&s.list_number())
-            && list_qualifies_for_extra_seat(
-                list_largest_remainder_assigned_seats(previous_steps, s.list_number()),
-                Some(list_unique_highest_average_assigned_seats(
-                    previous_steps,
-                    s.list_number(),
-                )),
-                previous_steps,
-                s.list_number(),
-            )
+            && list_qualifies_for_extra_seat(previous_steps, s.list_number(), true)
     })
 }
 
-/// Returns the number of seats assigned with highest averages method.
+/// Returns the number of seats assigned with unique highest averages method.
 fn list_unique_highest_average_assigned_seats<LN: Copy + Eq>(
     previous_steps: &[SeatChangeStep<LN>],
     list_number: LN,
@@ -814,10 +812,9 @@ mod tests {
         };
 
         assert!(list_qualifies_for_extra_seat(
-            0,
-            Some(1),
             &[previous_steps],
-            RETRACTED_LIST
+            RETRACTED_LIST,
+            true,
         ))
     }
 }

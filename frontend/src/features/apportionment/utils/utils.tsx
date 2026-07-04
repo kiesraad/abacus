@@ -123,6 +123,15 @@ export function isListDrawingLotsVariant<TVariant extends ListDrawingLotsVariant
   return variants.some((v) => v === variant);
 }
 
+export function isCandidateDrawingLots(state: ApportionmentState | undefined): state is Extract<
+  ApportionmentState,
+  { type: "DrawingLots" }
+> & {
+  drawing_lots_required: Extract<DrawingLotsRequired, { type: "CandidateDrawingLotsRequired" }>;
+} {
+  return state?.type === "DrawingLots" && state.drawing_lots_required.type === "CandidateDrawingLotsRequired";
+}
+
 export function getNotAssignedSeats(state: ApportionmentState | undefined) {
   return isListDrawingLotsVariant(state, ["HighestAverageResidualSeat", "LargestRemainderResidualSeat"])
     ? state.drawing_lots_required.residual_seat_numbers.length

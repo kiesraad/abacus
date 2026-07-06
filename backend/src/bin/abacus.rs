@@ -99,6 +99,11 @@ struct Args {
     #[arg(long, default_value_t = default_http_port(), env = "ABACUS_HTTP_PORT")]
     http_port: u16,
 
+    /// Create the TLS directory and CA certificate (if missing) and exit without starting the server
+    #[cfg(feature = "tls")]
+    #[arg(long)]
+    init_tls: bool,
+
     /// Seed the database with initial data using the fixtures
     #[cfg(feature = "dev-database")]
     #[arg(short, long, env = "ABACUS_SEED_DATA")]
@@ -129,6 +134,25 @@ async fn main() {
     }
 }
 
+/// Create the CA in `tls_dir` (if missing) and print its location and SHA-256
+/// fingerprint. Used for the `--init-tls` CLI flag.
+#[cfg(feature = "tls")]
+fn init_tls(tls_dir: &std::path::Path) -> Result<(), AppError> {
+    use abacus::infra::tls;
+    let ca = tls::init_ca(tls_dir)?;
+    let tls_dir = std::path::absolute(tls_dir)?;
+    println!(
+        "CA certificate (PEM): {}",
+        tls_dir.join(tls::CA_CERT_PEM).display()
+    );
+    println!(
+        "CA certificate (DER): {}",
+        tls_dir.join(tls::CA_CERT_DER).display()
+    );
+    println!("CA SHA-256 fingerprint: {}", ca.sha256_fingerprint());
+    Ok(())
+}
+
 async fn run() -> Result<(), AppError> {
     tracing_subscriber::fmt()
         .with_env_filter(
@@ -142,6 +166,12 @@ async fn run() -> Result<(), AppError> {
     if args.version {
         println!(env!("ABACUS_GIT_VERSION"));
         return Ok(());
+    }
+
+    // Create the CA and exit, without touching the database or starting the server.
+    #[cfg(feature = "tls")]
+    if args.init_tls {
+        return init_tls(&args.tls_dir);
     }
 
     let pool = create_sqlite_pool(

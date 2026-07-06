@@ -26,12 +26,8 @@
   "drawing_lots": "Loting",
   "drawing_lots_for_candidate": {
     "title": "Loting voor kandidaten met evenveel stemmen",
-    "candidates_for_drawing_lots": "Er zijn {num_candidates} kandidaten die op basis van hun voorkeursstemmen in aanmerking komen voor zetel {seats}. Zij hebben allen {votes} stemmen. Het gaat om de kandidaten:",
-    "hence_drawing_lots_is_needed": "Daarom moet er geloot worden wie een zetel krijgt",
-    "seats_assigned_already": {
-      "singular": "Zetel {assigned_seats} is toegewezen aan de kandidaten met het hoogste aantal voorkeurstemmen.",
-      "plural": "Zetel {assigned_seats} zijn toegewezen aan de kandidaten met het hoogste aantal voorkeurstemmen."
-    },
+    "candidates_for_drawing_lots": "Er zijn {num_candidates} kandidaten die op basis van hun voorkeursstemmen in aanmerking komen voor zetel {seat_number}. Zij hebben allen {votes} stemmen. Het gaat om de kandidaten:",
+    "hence_drawing_lots_is_needed": "Daarom moet er geloot worden wie zetel {seat_number} krijgt",
     "total_seats": "{list} heeft {total_seats} zetels"
   },
   "drawing_lots_for_list": {
@@ -94,7 +90,7 @@
   },
   "drawing_lots_result": {
     "title": "Resultaat loting",
-    "which_candidate_was_chosen": "Welke kandidaat is gekozen?",
+    "which_candidate_gets_the_seat": "Welke kandidaat krijgt de zetel?",
     "which_list_gets_a_residual_seat": "Welke partij krijgt de restzetel?",
     "which_list_has_to_give_up_a_seat": "Welke partij moet een restzetel afstaan?"
   },

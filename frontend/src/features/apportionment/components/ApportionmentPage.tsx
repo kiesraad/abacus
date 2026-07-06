@@ -155,16 +155,19 @@ function renderAbsoluteMajorityDrawingLotsAlert(
   );
 }
 
-function renderCandidatesDrawingLotsAlert(options: number[], list: string) {
-  // TODO: Add num_seats and make conditional based on num_seats to singular/plural
+function renderCandidatesDrawingLotsAlert(options: number[], list: string, num_seats: number) {
   return (
     <DrawingLotsWarningAlert withoutResidualSeatsLink>
       <strong className="heading-md">{t("apportionment.drawing_lots_required_for_candidates_alert.title")}</strong>
       <p>
-        {t("apportionment.drawing_lots_required_for_candidates_alert.description.singular", {
-          num_candidates: options.length,
-          list: list,
-        })}
+        {t(
+          `apportionment.drawing_lots_required_for_candidates_alert.description.${num_seats === 1 ? "singular" : "plural"}`,
+          {
+            num_candidates: options.length,
+            list: list,
+            num_seats: num_seats,
+          },
+        )}
       </p>
       <ul>
         <li>{t("apportionment.drawing_lots_required_for_candidates_alert.drawing_lots_needed.singular")}</li>
@@ -189,6 +192,7 @@ function renderDrawingLotsAlert(state: ApportionmentState, politicalGroups: Poli
         renderCandidatesDrawingLotsAlert(
           state.drawing_lots_required.options,
           politicalGroups.find((pg) => pg.number === state.drawing_lots_required.list)?.name || "",
+          state.drawing_lots_required.seat_numbers.length,
         );
 }
 

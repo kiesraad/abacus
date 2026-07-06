@@ -47,7 +47,11 @@ function getPageTitle(state: ApportionmentState) {
   return t("apportionment.drawing_lots");
 }
 
-function renderListSection(state: ApportionmentState, options: Candidate[] | PoliticalGroup[]) {
+function renderListSection(
+  state: ApportionmentState,
+  options: Candidate[] | PoliticalGroup[],
+  politicalGroups: PoliticalGroup[],
+) {
   return (
     <FormLayout.Section>
       <div>
@@ -64,7 +68,11 @@ function renderListSection(state: ApportionmentState, options: Candidate[] | Pol
         ) : (
           isCandidateDrawingLots(state) &&
           isCandidateList(options) && (
-            <DrawingLotsForCandidate drawingLotsRequired={state.drawing_lots_required} options={options} />
+            <DrawingLotsForCandidate
+              drawingLotsRequired={state.drawing_lots_required}
+              options={options}
+              list={politicalGroups.find((pg) => pg.number === state.drawing_lots_required.list)?.name || ""}
+            />
           )
         )}
       </div>
@@ -90,7 +98,7 @@ function renderChoiceListLegend(state: ApportionmentState) {
         ? t("apportionment.drawing_lots_result.which_list_gets_a_residual_seat")
         : isListDrawingLotsVariant(state, ["AbsoluteMajorityHighestAverage", "AbsoluteMajorityLargestRemainder"])
           ? t("apportionment.drawing_lots_result.which_list_has_to_give_up_a_seat")
-          : isCandidateDrawingLots(state) && t("apportionment.drawing_lots_result.which_candidate_was_chosen")}
+          : isCandidateDrawingLots(state) && t("apportionment.drawing_lots_result.which_candidate_gets_the_seat")}
     </ChoiceList.Legend>
   );
 }
@@ -180,7 +188,7 @@ export function DrawingLotsPage() {
                 }}
               >
                 <FormLayout>
-                  {renderListSection(state, options)}
+                  {renderListSection(state, options, election.political_groups)}
                   {renderInstructions()}
                   <FormLayout.Section>
                     <div>

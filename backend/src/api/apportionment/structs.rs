@@ -179,8 +179,18 @@ impl apportionment::ListDrawn<PGNumber> for ListDrawn {
 impl From<CandidateDrawingLotsVariant>
     for apportionment::CandidateDrawingLotsVariant<PGNumber, CandidateNumber>
 {
-    fn from(CandidateDrawingLotsVariant { list, options }: CandidateDrawingLotsVariant) -> Self {
-        Self { list, options }
+    fn from(
+        CandidateDrawingLotsVariant {
+            list,
+            seat_numbers,
+            options,
+        }: CandidateDrawingLotsVariant,
+    ) -> Self {
+        Self {
+            list,
+            seat_numbers,
+            options,
+        }
     }
 }
 

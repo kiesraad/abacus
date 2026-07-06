@@ -620,6 +620,8 @@ export interface CandidateDrawingLotsVariant {
   list: PGNumber;
   /** The candidates that lots are drawn for */
   options: CandidateNumber[];
+  /** The seat numbers that the candidates can be drawn for */
+  seat_numbers: number[];
 }
 
 /**

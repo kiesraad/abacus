@@ -5977,6 +5977,7 @@
         "type": "object",
         "required": [
           "list",
+          "seat_numbers",
           "options"
         ],
         "properties": {
@@ -5990,6 +5991,15 @@
               "$ref": "#/components/schemas/CandidateNumber"
             },
             "description": "The candidates that lots are drawn for"
+          },
+          "seat_numbers": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            },
+            "description": "The seat numbers that the candidates can be drawn for"
           }
         }
       },

@@ -135,6 +135,7 @@ impl From<apportionment::CandidateDrawingLotsVariant<PGNumber, CandidateNumber>>
     fn from(value: apportionment::CandidateDrawingLotsVariant<PGNumber, CandidateNumber>) -> Self {
         CandidateDrawingLotsVariant {
             list: value.list,
+            seat_numbers: value.seat_numbers,
             options: value.options,
         }
     }

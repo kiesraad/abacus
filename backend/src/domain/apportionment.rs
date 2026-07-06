@@ -421,6 +421,8 @@ pub struct ListDrawn {
 pub struct CandidateDrawingLotsVariant {
     /// The list the candidate needs to be drawn from
     pub list: PGNumber,
+    /// The seat numbers that the candidates can be drawn for
+    pub seat_numbers: Vec<u32>,
     /// The candidates that lots are drawn for
     pub options: Vec<CandidateNumber>,
 }

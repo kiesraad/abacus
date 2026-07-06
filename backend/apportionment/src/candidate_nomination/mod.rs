@@ -302,7 +302,17 @@ fn preferential_candidate_nomination<'a, LV: ListVotes>(
                 "Drawing of lots is required for candidates: {options:?}, {seats_remaining} seat(s) available",
             );
 
-            let variant = CandidateDrawingLotsVariant { list, options };
+            let current_seat_number = index + 1;
+            let nr_of_seats = options.len().min(seats_remaining as usize);
+            let seat_numbers = (current_seat_number..current_seat_number + nr_of_seats)
+                .map(|n| u32::try_from(n).expect("should fit in u32"))
+                .collect();
+
+            let variant = CandidateDrawingLotsVariant {
+                list,
+                seat_numbers,
+                options,
+            };
 
             let Some(candidate_drawn) = candidates_drawn.next() else {
                 return Ok(PreferentialCandidateNomination::DrawingLotsRequired(
@@ -1222,6 +1232,7 @@ mod tests {
             variant_one,
             CandidateDrawingLotsVariant {
                 list: 2,
+                seat_numbers: vec![2, 3],
                 options: vec![2, 3, 4, 5, 6]
             }
         );
@@ -1241,6 +1252,7 @@ mod tests {
             variant_two,
             CandidateDrawingLotsVariant {
                 list: 2,
+                seat_numbers: vec![3],
                 options: vec![2, 3, 4, 6]
             }
         );
@@ -1326,6 +1338,7 @@ mod tests {
                 candidates_drawn: vec![CandidateDrawnMock {
                     variant: CandidateDrawingLotsVariant {
                         list: 1,
+                        seat_numbers: vec![2],
                         options: vec![3, 4],
                     },
                     drawn: 4,
@@ -1339,6 +1352,7 @@ mod tests {
                 candidates_drawn: vec![CandidateDrawnMock {
                     variant: CandidateDrawingLotsVariant {
                         list: 1,
+                        seat_numbers: vec![1, 2],
                         options: vec![1, 3],
                     },
                     drawn: 3,
@@ -1353,6 +1367,7 @@ mod tests {
                     CandidateDrawnMock {
                         variant: CandidateDrawingLotsVariant {
                             list: 1,
+                            seat_numbers: vec![2, 3],
                             options: vec![3, 4, 5],
                         },
                         drawn: 4,
@@ -1360,6 +1375,7 @@ mod tests {
                     CandidateDrawnMock {
                         variant: CandidateDrawingLotsVariant {
                             list: 1,
+                            seat_numbers: vec![3],
                             options: vec![3, 5],
                         },
                         drawn: 3,
@@ -1382,6 +1398,7 @@ mod tests {
                     CandidateDrawnMock {
                         variant: CandidateDrawingLotsVariant {
                             list: 1,
+                            seat_numbers: vec![1, 2, 3, 4],
                             options: vec![1, 3, 4, 5],
                         },
                         drawn: 1,
@@ -1389,6 +1406,7 @@ mod tests {
                     CandidateDrawnMock {
                         variant: CandidateDrawingLotsVariant {
                             list: 1,
+                            seat_numbers: vec![2, 3, 4],
                             options: vec![3, 4, 5],
                         },
                         drawn: 5,
@@ -1396,6 +1414,7 @@ mod tests {
                     CandidateDrawnMock {
                         variant: CandidateDrawingLotsVariant {
                             list: 1,
+                            seat_numbers: vec![3, 4],
                             options: vec![3, 4],
                         },
                         drawn: 3,

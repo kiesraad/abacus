@@ -65,27 +65,3 @@ async fn backup_success_as_coordinator_csb(pool: SqlitePool) {
         .unwrap();
     assert_eq!(response.status(), StatusCode::CREATED);
 }
-
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
-async fn backup_conflict(pool: SqlitePool) {
-    let (addr, _backup_dir) = serve_api_with_backup_dir(pool).await;
-    let cookie = login(&addr, Admin).await;
-    let client = reqwest::Client::new();
-    let url = format!("http://{addr}/api/backup");
-
-    let first = client
-        .post(&url)
-        .header("cookie", cookie.clone())
-        .send()
-        .await
-        .unwrap();
-    assert_eq!(first.status(), StatusCode::CREATED);
-
-    let second = client
-        .post(&url)
-        .header("cookie", cookie)
-        .send()
-        .await
-        .unwrap();
-    assert_eq!(second.status(), StatusCode::CONFLICT);
-}

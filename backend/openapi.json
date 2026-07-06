@@ -5977,6 +5977,9 @@
         "type": "object",
         "required": [
           "list",
+          "total_seats",
+          "number_of_votes",
+          "seat_numbers",
           "options"
         ],
         "properties": {
@@ -5984,12 +5987,33 @@
             "$ref": "#/components/schemas/PGNumber",
             "description": "The list the candidate needs to be drawn from"
           },
+          "number_of_votes": {
+            "type": "integer",
+            "format": "int32",
+            "description": "The number of votes, equal for these candidates",
+            "minimum": 0
+          },
           "options": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/CandidateNumber"
             },
             "description": "The candidates that lots are drawn for"
+          },
+          "seat_numbers": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            },
+            "description": "The seat numbers that the candidates can be drawn for"
+          },
+          "total_seats": {
+            "type": "integer",
+            "format": "int32",
+            "description": "The total number of seats for the list",
+            "minimum": 0
           }
         }
       },

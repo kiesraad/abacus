@@ -129,6 +129,9 @@ pub trait ListDrawn<LN> {
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct CandidateDrawingLotsVariant<LN: PartialEq, CN: PartialEq> {
     pub list: LN,
+    pub total_seats: u32,
+    pub number_of_votes: u32,
+    pub seat_numbers: Vec<u32>,
     pub options: Vec<CN>,
 }
 

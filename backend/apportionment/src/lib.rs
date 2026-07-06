@@ -17,8 +17,8 @@ use self::{
 };
 pub use self::{
     candidate_nomination::{
-        Candidate, CandidateNomination, CandidateNominationDetails, ListCandidateNomination,
-        PreferenceThreshold,
+        Candidate, CandidateNomination, CandidateNominationDetails, CandidateRanking,
+        ListCandidateNomination, PreferenceThreshold,
     },
     fraction::Fraction,
     seat_assignment::{

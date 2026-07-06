@@ -746,20 +746,32 @@ impl ElectionWithPoliticalGroups {
                         .build()?,
                 );
 
-                for can in &pg.candidates {
-                    let non_preferentially_selected = pg_nominations
-                        .other_candidate_nomination
+                for (idx, can_num) in pg_nominations
+                    .nominated_candidate_ranking()
+                    .iter()
+                    .enumerate()
+                {
+                    let position = idx + 1;
+                    let candidate = pg
+                        .candidates
                         .iter()
-                        .any(|&cv| cv.number == can.number);
+                        .find(|c| c.number == *can_num)
+                        .ok_or_else(|| {
+                            EMLError::custom(format!(
+                                "Candidate {} not found in political group {}",
+                                can_num.as_internal_u32(),
+                                pg.number.as_internal_u32()
+                            ))
+                        })?;
                     let preferentially_selected = pg_nominations
                         .preferential_candidate_nomination
                         .iter()
-                        .any(|&cv| cv.number == can.number);
-                    let can_selected = non_preferentially_selected || preferentially_selected;
-
-                    if can_selected {
-                        selections.push(build_candidate_result(can, preferentially_selected)?);
-                    }
+                        .any(|&cv| cv.number == *can_num);
+                    selections.push(build_candidate_result(
+                        candidate,
+                        position,
+                        preferentially_selected,
+                    )?);
                 }
             }
         }
@@ -772,14 +784,13 @@ impl ElectionWithPoliticalGroups {
 
 fn build_candidate_result(
     can: &Candidate,
+    position: usize,
     preferentially_selected: bool,
 ) -> Result<ElectionResultSelection, EMLError> {
     ElectionResultSelection::builder()
         .candidate({
             let mut builder = eml_nl::documents::election_result::CandidateSelection::builder()
-                .identifier(CandidateId::from_str(
-                    &can.number.as_internal_u32().to_string(),
-                )?)
+                .identifier(CandidateId::from_str(&position.to_string())?)
                 .name(
                     PersonName::new(can.last_name.clone())
                         .with_first_name_option(can.first_name.clone())
@@ -937,7 +948,7 @@ pub fn polling_stations_eml_matches_election(
 #[cfg(test)]
 mod tests {
     use apportionment::Fraction;
-    use eml_nl::utils::StringValue;
+    use eml_nl::{documents::election_result::ElectionResultSelectionType, utils::StringValue};
 
     use super::*;
     use crate::domain::{
@@ -1030,54 +1041,66 @@ mod tests {
         let election = election_fixture(CommitteeCategory::CSB, &[2]);
         let cv1 = CandidateVotes {
             number: CandidateNumber::from(1),
-            votes: 1000,
+            votes: 400,
+        };
+        let cv2 = CandidateVotes {
+            number: CandidateNumber::from(2),
+            votes: 600,
         };
         let details = CandidateNominationDetails {
             preference_threshold: apportionment::PreferenceThreshold {
                 percentage: 25,
                 number_of_votes: Fraction::new(1000, 1),
             },
-            chosen_candidates: vec![apportionment::Candidate {
-                list_number: PGNumber::from(1),
-                candidate_number: CandidateNumber::from(1),
-            }],
+            chosen_candidates: vec![
+                apportionment::Candidate {
+                    list_number: PGNumber::from(1),
+                    candidate_number: CandidateNumber::from(2),
+                },
+                apportionment::Candidate {
+                    list_number: PGNumber::from(1),
+                    candidate_number: CandidateNumber::from(1),
+                },
+            ],
             list_candidate_nomination: vec![apportionment::ListCandidateNomination {
                 list_number: PGNumber::from(1),
-                list_seats: 1,
-                preferential_candidate_nomination: vec![&cv1],
+                list_seats: 2,
+                preferential_candidate_nomination: vec![&cv2, &cv1],
                 other_candidate_nomination: vec![],
-                updated_candidate_ranking: vec![CandidateNumber::from(1)],
+                candidate_ranking: apportionment::CandidateRanking::Updated(vec![
+                    CandidateNumber::from(2),
+                    CandidateNumber::from(1),
+                ]),
             }],
         };
 
         let eml_result = election
             .as_result_eml(None, Local::now(), &details)
             .unwrap();
-        assert_eq!(
-            eml_result
-                .managing_authority
-                .authority_identifier
-                .id
-                .cloned_value()
-                .unwrap()
-                .value(),
-            "CSB"
-        );
+        let auth_id = eml_result.managing_authority.authority_identifier.id;
+        assert_eq!(auth_id.cloned_value().unwrap().value(), "CSB");
+
+        let contests = &eml_result.result.election.contests;
+        let selections = &contests.first().unwrap().selections;
 
         // check that the first selection (i.e. first affiliation) has no ranking
-        assert!(
-            eml_result
-                .result
-                .election
-                .contests
-                .first()
-                .unwrap()
-                .selections
-                .first()
-                .unwrap()
-                .ranking
-                .is_none()
-        );
+        assert!(selections.first().unwrap().ranking.is_none());
+
+        // check that the second selection (i.e. first selected candidate) has CandidateId 1 even though it is candidate number 2
+        let first_can = selections.get(1).unwrap();
+        let ElectionResultSelectionType::Candidate(first_can_sel) = &first_can.selection_type
+        else {
+            panic!("Expected selection to be a candidate");
+        };
+        assert_eq!(first_can_sel.identifier.id.raw().as_ref(), "1");
+
+        // check that the third selection (i.e. second selected candidate) has CandidateId 2 even though it is candidate number 1
+        let second_can = selections.get(2).unwrap();
+        let ElectionResultSelectionType::Candidate(second_can_sel) = &second_can.selection_type
+        else {
+            panic!("Expected selection to be a candidate");
+        };
+        assert_eq!(second_can_sel.identifier.id.raw().as_ref(), "2");
     }
 
     #[test]

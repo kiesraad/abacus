@@ -5977,6 +5977,7 @@
         "type": "object",
         "required": [
           "list",
+          "total_seats",
           "number_of_votes",
           "seat_numbers",
           "options"
@@ -6007,6 +6008,12 @@
               "minimum": 0
             },
             "description": "The seat numbers that the candidates can be drawn for"
+          },
+          "total_seats": {
+            "type": "integer",
+            "format": "int32",
+            "description": "The total number of seats for the list",
+            "minimum": 0
           }
         }
       },

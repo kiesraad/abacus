@@ -112,6 +112,7 @@ mod tests {
                 candidates_drawn: vec![CandidateDrawn {
                     variant: CandidateDrawingLotsVariant {
                         list: PGNumber::from(1),
+                        total_seats: 3,
                         number_of_votes: 1000,
                         seat_numbers: vec![1, 2, 3],
                         options: CandidateNumber::from_values(vec![2, 3, 4]),

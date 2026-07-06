@@ -90,6 +90,7 @@ mod tests {
         let drawing_lots_required =
             DrawingLotsRequired::CandidateDrawingLotsRequired(CandidateDrawingLotsVariant {
                 list: PGNumber::from(3),
+                total_seats: 2,
                 number_of_votes: 200,
                 seat_numbers: vec![1, 2],
                 options: CandidateNumber::from_values(vec![1, 2]),
@@ -111,6 +112,7 @@ mod tests {
         let candidate_drawn = CandidateDrawn {
             variant: CandidateDrawingLotsVariant {
                 list: PGNumber::from(3),
+                total_seats: 2,
                 number_of_votes: 200,
                 seat_numbers: vec![2],
                 options: CandidateNumber::from_values(vec![1, 2]),

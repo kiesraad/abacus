@@ -624,6 +624,8 @@ export interface CandidateDrawingLotsVariant {
   options: CandidateNumber[];
   /** The seat numbers that the candidates can be drawn for */
   seat_numbers: number[];
+  /** The total number of seats for the list */
+  total_seats: number;
 }
 
 /**

@@ -310,6 +310,7 @@ fn preferential_candidate_nomination<'a, LV: ListVotes>(
 
             let variant = CandidateDrawingLotsVariant {
                 list,
+                total_seats,
                 number_of_votes: same_votes_candidates_remaining[0].votes(),
                 seat_numbers,
                 options,
@@ -1233,6 +1234,7 @@ mod tests {
             variant_one,
             CandidateDrawingLotsVariant {
                 list: 2,
+                total_seats: 3,
                 number_of_votes: 400,
                 seat_numbers: vec![2, 3],
                 options: vec![2, 3, 4, 5, 6]
@@ -1254,6 +1256,7 @@ mod tests {
             variant_two,
             CandidateDrawingLotsVariant {
                 list: 2,
+                total_seats: 3,
                 number_of_votes: 400,
                 seat_numbers: vec![3],
                 options: vec![2, 3, 4, 6]
@@ -1341,6 +1344,7 @@ mod tests {
                 candidates_drawn: vec![CandidateDrawnMock {
                     variant: CandidateDrawingLotsVariant {
                         list: 1,
+                        total_seats: 2,
                         number_of_votes: 900,
                         seat_numbers: vec![2],
                         options: vec![3, 4],
@@ -1356,6 +1360,7 @@ mod tests {
                 candidates_drawn: vec![CandidateDrawnMock {
                     variant: CandidateDrawingLotsVariant {
                         list: 1,
+                        total_seats: 2,
                         number_of_votes: 1000,
                         seat_numbers: vec![1, 2],
                         options: vec![1, 3],
@@ -1372,6 +1377,7 @@ mod tests {
                     CandidateDrawnMock {
                         variant: CandidateDrawingLotsVariant {
                             list: 1,
+                            total_seats: 3,
                             number_of_votes: 900,
                             seat_numbers: vec![2, 3],
                             options: vec![3, 4, 5],
@@ -1381,6 +1387,7 @@ mod tests {
                     CandidateDrawnMock {
                         variant: CandidateDrawingLotsVariant {
                             list: 1,
+                            total_seats: 3,
                             number_of_votes: 900,
                             seat_numbers: vec![3],
                             options: vec![3, 5],
@@ -1405,6 +1412,7 @@ mod tests {
                     CandidateDrawnMock {
                         variant: CandidateDrawingLotsVariant {
                             list: 1,
+                            total_seats: 4,
                             number_of_votes: 1000,
                             seat_numbers: vec![1, 2, 3, 4],
                             options: vec![1, 3, 4, 5],
@@ -1414,6 +1422,7 @@ mod tests {
                     CandidateDrawnMock {
                         variant: CandidateDrawingLotsVariant {
                             list: 1,
+                            total_seats: 4,
                             number_of_votes: 1000,
                             seat_numbers: vec![2, 3, 4],
                             options: vec![3, 4, 5],
@@ -1423,6 +1432,7 @@ mod tests {
                     CandidateDrawnMock {
                         variant: CandidateDrawingLotsVariant {
                             list: 1,
+                            total_seats: 4,
                             number_of_votes: 1000,
                             seat_numbers: vec![3, 4],
                             options: vec![3, 4],

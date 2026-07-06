@@ -9,9 +9,16 @@ import type { HighestAverageAssignmentStep } from "../../utils/steps";
 import { isListDrawingLotsVariant } from "../../utils/utils";
 import cls from "../Apportionment.module.css";
 
-function getCellClassName(step: HighestAverageAssignmentStep, listNumber: PGNumber) {
+function getCellClassName(state: ApportionmentState, step: HighestAverageAssignmentStep, listNumber: PGNumber) {
   if (step.change.selected_list_number === listNumber) {
-    return "bg-yellow bold";
+    if (
+      isListDrawingLotsVariant(state, ["AbsoluteMajorityHighestAverage"]) &&
+      state.drawing_lots_required.options.includes(step.change.selected_list_number)
+    ) {
+      return "bg-highlight bold";
+    } else {
+      return "bg-yellow bold";
+    }
   } else if (step.change.list_options.includes(listNumber)) {
     return "bg-highlight";
   }
@@ -99,7 +106,7 @@ export function HighestAveragesTable({
                   return (
                     <Table.DisplayFractionCells
                       key={`${listSeatAssignment.list_number}-${step.residual_seat_number}`}
-                      className={getCellClassName(step, listSeatAssignment.list_number)}
+                      className={getCellClassName(state, step, listSeatAssignment.list_number)}
                     >
                       {!step.change.list_exhausted.includes(listSeatAssignment.list_number) ? average : undefined}
                     </Table.DisplayFractionCells>

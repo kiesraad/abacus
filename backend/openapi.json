@@ -5977,6 +5977,7 @@
         "type": "object",
         "required": [
           "list",
+          "number_of_votes",
           "seat_numbers",
           "options"
         ],
@@ -5984,6 +5985,12 @@
           "list": {
             "$ref": "#/components/schemas/PGNumber",
             "description": "The list the candidate needs to be drawn from"
+          },
+          "number_of_votes": {
+            "type": "integer",
+            "format": "int32",
+            "description": "The number of votes, equal for these candidates",
+            "minimum": 0
           },
           "options": {
             "type": "array",

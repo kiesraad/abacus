@@ -182,12 +182,14 @@ impl From<CandidateDrawingLotsVariant>
     fn from(
         CandidateDrawingLotsVariant {
             list,
+            number_of_votes,
             seat_numbers,
             options,
         }: CandidateDrawingLotsVariant,
     ) -> Self {
         Self {
             list,
+            number_of_votes,
             seat_numbers,
             options,
         }

@@ -175,6 +175,11 @@ describe("DrawingLotsPage", () => {
     expect(listitems[4]).toHaveTextContent("Daarom moet er geloot worden welke lijst de restzetel krijgt");
 
     expect(await screen.findByRole("heading", { level: 3, name: "Instructies voor loting" })).toBeVisible();
+    expect(
+      screen.getByText(
+        "De loting vindt buiten Abacus plaats, in aanwezigheid van alle leden van het centraal stembureau. Waarnemers mogen meekijken. Voer het resultaat hieronder in.",
+      ),
+    ).toBeVisible();
 
     expect(await screen.findByRole("heading", { level: 3, name: "Resultaat loting" })).toBeVisible();
 
@@ -258,6 +263,11 @@ describe("DrawingLotsPage", () => {
     expect(listitems[4]).toHaveTextContent("Daarom moet er geloot worden welke lijst de restzetel krijgt");
 
     expect(await screen.findByRole("heading", { level: 3, name: "Instructies voor loting" })).toBeVisible();
+    expect(
+      screen.getByText(
+        "De loting vindt buiten Abacus plaats, in aanwezigheid van alle leden van het centraal stembureau. Waarnemers mogen meekijken. Voer het resultaat hieronder in.",
+      ),
+    ).toBeVisible();
 
     expect(await screen.findByRole("heading", { level: 3, name: "Resultaat loting" })).toBeVisible();
 
@@ -344,6 +354,11 @@ describe("DrawingLotsPage", () => {
     expect(listitems[3]).toHaveTextContent("Daarom moet er geloot worden welke lijst de restzetel krijgt");
 
     expect(await screen.findByRole("heading", { level: 3, name: "Instructies voor loting" })).toBeVisible();
+    expect(
+      screen.getByText(
+        "De loting vindt buiten Abacus plaats, in aanwezigheid van alle leden van het centraal stembureau. Waarnemers mogen meekijken. Voer het resultaat hieronder in.",
+      ),
+    ).toBeVisible();
 
     expect(await screen.findByRole("heading", { level: 3, name: "Resultaat loting" })).toBeVisible();
 
@@ -430,6 +445,11 @@ describe("DrawingLotsPage", () => {
     expect(listitems[3]).toHaveTextContent("Daarom moet er geloot worden welke lijst de restzetel krijgt");
 
     expect(await screen.findByRole("heading", { level: 3, name: "Instructies voor loting" })).toBeVisible();
+    expect(
+      screen.getByText(
+        "De loting vindt buiten Abacus plaats, in aanwezigheid van alle leden van het centraal stembureau. Waarnemers mogen meekijken. Voer het resultaat hieronder in.",
+      ),
+    ).toBeVisible();
 
     expect(await screen.findByRole("heading", { level: 3, name: "Resultaat loting" })).toBeVisible();
 

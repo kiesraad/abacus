@@ -817,151 +817,126 @@ mod tests {
         }
     }
 
-    #[test]
-    #[expect(clippy::too_many_lines)]
-    fn test_list_qualifies_for_extra_seat() {
+    mod list_qualifies_for_extra_seat {
+        use super::*;
+
         const LIST: u32 = 1;
         const OTHER_LIST: u32 = 2;
 
-        struct Case {
-            description: &'static str,
-            check_for_unique_highest_average_seats: bool,
-            previous_steps: Vec<SeatChangeStep<u32>>,
-            expected: bool,
+        #[test]
+        fn test_largest_remainder_qualify_when_no_seat_assigned() {
+            let previous_steps = vec![];
+            assert!(list_qualifies_for_extra_seat(&previous_steps, LIST, false));
         }
 
-        let cases = vec![
-            // Largest remainder assignment (check_for_unique_highest_average_seats = false)
-            Case {
-                description: "largest remainder: qualifies when no seat was assigned yet",
-                check_for_unique_highest_average_seats: false,
-                previous_steps: vec![],
-                expected: true,
-            },
-            Case {
-                description: "largest remainder: seat assigned to another list does not count",
-                check_for_unique_highest_average_seats: false,
-                previous_steps: vec![largest_remainder_step(OTHER_LIST)],
-                expected: true,
-            },
-            Case {
-                description: "largest remainder: unique highest average seat does not count",
-                check_for_unique_highest_average_seats: false,
-                previous_steps: vec![unique_highest_average_step(LIST)],
-                expected: true,
-            },
-            Case {
-                description: "largest remainder: does not qualify when a seat was assigned",
-                check_for_unique_highest_average_seats: false,
-                previous_steps: vec![largest_remainder_step(LIST)],
-                expected: false,
-            },
-            Case {
-                description: "largest remainder: qualifies again when the assigned seat was retracted by absolute majority reassignment",
-                check_for_unique_highest_average_seats: false,
-                previous_steps: vec![
-                    largest_remainder_step(LIST),
-                    absolute_majority_reassignment_step(LIST, OTHER_LIST),
-                ],
-                expected: true,
-            },
-            Case {
-                description: "largest remainder: retraction from another list does not requalify this list",
-                check_for_unique_highest_average_seats: false,
-                previous_steps: vec![
-                    largest_remainder_step(LIST),
-                    absolute_majority_reassignment_step(OTHER_LIST, LIST),
-                ],
-                expected: false,
-            },
-            Case {
-                description: "largest remainder: does not qualify with two assigned seats even after a retraction",
-                check_for_unique_highest_average_seats: false,
-                previous_steps: vec![
-                    largest_remainder_step(LIST),
-                    largest_remainder_step(LIST),
-                    absolute_majority_reassignment_step(LIST, OTHER_LIST),
-                ],
-                expected: false,
-            },
-            // Unique highest average assignment (check_for_unique_highest_average_seats = true)
-            Case {
-                description: "unique highest average: qualifies when no seat was assigned yet",
-                check_for_unique_highest_average_seats: true,
-                previous_steps: vec![],
-                expected: true,
-            },
-            Case {
-                description: "unique highest average: seat assigned to another list does not count",
-                check_for_unique_highest_average_seats: true,
-                previous_steps: vec![unique_highest_average_step(OTHER_LIST)],
-                expected: true,
-            },
-            Case {
-                description: "unique highest average: largest remainder seat does not count",
-                check_for_unique_highest_average_seats: true,
-                previous_steps: vec![largest_remainder_step(LIST)],
-                expected: true,
-            },
-            Case {
-                description: "unique highest average: does not qualify when a seat was assigned",
-                check_for_unique_highest_average_seats: true,
-                previous_steps: vec![unique_highest_average_step(LIST)],
-                expected: false,
-            },
-            Case {
-                description: "unique highest average: qualifies again when the assigned seat was retracted by absolute majority reassignment",
-                check_for_unique_highest_average_seats: true,
-                previous_steps: vec![
-                    unique_highest_average_step(LIST),
-                    absolute_majority_reassignment_step(LIST, OTHER_LIST),
-                ],
-                expected: true,
-            },
-            Case {
-                description: "unique highest average: retracted seat with one largest remainder seat still qualifies",
-                check_for_unique_highest_average_seats: true,
-                previous_steps: vec![
-                    largest_remainder_step(LIST),
-                    unique_highest_average_step(LIST),
-                    absolute_majority_reassignment_step(LIST, OTHER_LIST),
-                ],
-                expected: true,
-            },
-            Case {
-                description: "unique highest average: retracted seat with two largest remainder seats does not qualify",
-                check_for_unique_highest_average_seats: true,
-                previous_steps: vec![
-                    largest_remainder_step(LIST),
-                    largest_remainder_step(LIST),
-                    unique_highest_average_step(LIST),
-                    absolute_majority_reassignment_step(LIST, OTHER_LIST),
-                ],
-                expected: false,
-            },
-            Case {
-                description: "unique highest average: does not qualify with two assigned seats even after a retraction",
-                check_for_unique_highest_average_seats: true,
-                previous_steps: vec![
-                    unique_highest_average_step(LIST),
-                    unique_highest_average_step(LIST),
-                    absolute_majority_reassignment_step(LIST, OTHER_LIST),
-                ],
-                expected: false,
-            },
-        ];
+        #[test]
+        fn test_largest_remainder_qualify_when_seat_assigned_to_other_list() {
+            let previous_steps = vec![largest_remainder_step(OTHER_LIST)];
+            assert!(list_qualifies_for_extra_seat(&previous_steps, LIST, false));
+        }
 
-        for case in cases {
-            assert_eq!(
-                list_qualifies_for_extra_seat(
-                    &case.previous_steps,
-                    LIST,
-                    case.check_for_unique_highest_average_seats,
-                ),
-                case.expected,
-                "{}",
-                case.description
-            );
+        #[test]
+        fn test_largest_remainder_qualify_when_unique_highest_average_step() {
+            let previous_steps = vec![unique_highest_average_step(LIST)];
+            assert!(list_qualifies_for_extra_seat(&previous_steps, LIST, false));
+        }
+
+        #[test]
+        fn test_largest_remainder_not_qualify_when_seat_assigned() {
+            let previous_steps = vec![largest_remainder_step(LIST)];
+            assert!(!list_qualifies_for_extra_seat(&previous_steps, LIST, false));
+        }
+
+        #[test]
+        fn test_largest_remainder_qualify_when_seat_retracted_by_absolute_majority() {
+            let previous_steps = vec![
+                largest_remainder_step(LIST),
+                absolute_majority_reassignment_step(LIST, OTHER_LIST),
+            ];
+            assert!(list_qualifies_for_extra_seat(&previous_steps, LIST, false));
+        }
+
+        #[test]
+        fn test_largest_remainder_not_qualify_when_seat_retracted_from_other_list() {
+            let previous_steps = vec![
+                largest_remainder_step(LIST),
+                absolute_majority_reassignment_step(OTHER_LIST, LIST),
+            ];
+            assert!(!list_qualifies_for_extra_seat(&previous_steps, LIST, false));
+        }
+
+        #[test]
+        fn test_largest_remainder_not_qualify_with_two_assigned_seats_even_after_retraction() {
+            let previous_steps = vec![
+                largest_remainder_step(LIST),
+                largest_remainder_step(LIST),
+                absolute_majority_reassignment_step(LIST, OTHER_LIST),
+            ];
+            assert!(!list_qualifies_for_extra_seat(&previous_steps, LIST, false));
+        }
+
+        #[test]
+        fn test_unique_highest_average_qualify_when_no_seat_assigned() {
+            let previous_steps = vec![];
+            assert!(list_qualifies_for_extra_seat(&previous_steps, LIST, true));
+        }
+
+        #[test]
+        fn test_unique_highest_average_qualify_when_seat_assigned_to_other_list() {
+            let previous_steps = vec![unique_highest_average_step(OTHER_LIST)];
+            assert!(list_qualifies_for_extra_seat(&previous_steps, LIST, true));
+        }
+
+        #[test]
+        fn test_unique_highest_average_qualify_when_largest_remainder_step() {
+            let previous_steps = vec![largest_remainder_step(LIST)];
+            assert!(list_qualifies_for_extra_seat(&previous_steps, LIST, true));
+        }
+
+        #[test]
+        fn test_unique_highest_average_not_qualify_when_seat_assigned() {
+            let previous_steps = vec![unique_highest_average_step(LIST)];
+            assert!(!list_qualifies_for_extra_seat(&previous_steps, LIST, true));
+        }
+
+        #[test]
+        fn test_unique_highest_average_qualify_when_seat_retracted_by_absolute_majority() {
+            let previous_steps = vec![
+                unique_highest_average_step(LIST),
+                absolute_majority_reassignment_step(LIST, OTHER_LIST),
+            ];
+            assert!(list_qualifies_for_extra_seat(&previous_steps, LIST, true));
+        }
+
+        #[test]
+        fn test_unioque_highest_average_qualify_when_retracted_with_one_largest_remainder() {
+            let previous_steps = vec![
+                largest_remainder_step(LIST),
+                unique_highest_average_step(LIST),
+                absolute_majority_reassignment_step(LIST, OTHER_LIST),
+            ];
+            assert!(list_qualifies_for_extra_seat(&previous_steps, LIST, true));
+        }
+
+        #[test]
+        fn test_unique_highest_average_not_qualify_when_retracted_with_two_largest_remainders() {
+            let previous_steps = vec![
+                largest_remainder_step(LIST),
+                largest_remainder_step(LIST),
+                unique_highest_average_step(LIST),
+                absolute_majority_reassignment_step(LIST, OTHER_LIST),
+            ];
+            assert!(!list_qualifies_for_extra_seat(&previous_steps, LIST, true));
+        }
+
+        #[test]
+        fn test_unique_highest_average_not_qualify_with_two_assigned_seats_even_after_retraction() {
+            let previous_steps = vec![
+                unique_highest_average_step(LIST),
+                unique_highest_average_step(LIST),
+                absolute_majority_reassignment_step(LIST, OTHER_LIST),
+            ];
+            assert!(!list_qualifies_for_extra_seat(&previous_steps, LIST, true));
         }
     }
 }

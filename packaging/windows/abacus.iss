@@ -1,4 +1,4 @@
-; Made with InnoSetup 6.6, make sure to use this version
+; Made with InnoSetup 6.7, make sure to use this version
 ; Using a different version of InnoSetup can give different results
 
 #define GetVersion() \

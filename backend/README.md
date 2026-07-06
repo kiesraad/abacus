@@ -111,7 +111,7 @@ cargo build --release --features tls
 On startup Abacus loads (or, on first run, generates) a local certificate
 authority under the directory given by `--tls-dir` (defaults to `tls`). A fresh
 server (leaf) certificate is created in memory on every start, signed by the CA
-and covering `localhost`, `abacus.local`, and all routable LAN addresses.
+and covering `localhost`, `abacus.internal`, and all routable LAN addresses.
 
 To trust the server, import the CA into the client trust store: `ca.pem` on
 Linux/macOS/Firefox, `ca.cer` (DER) on Windows. The CA can be downloaded from the

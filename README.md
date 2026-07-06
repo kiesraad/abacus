@@ -86,7 +86,7 @@ Meer informatie over de Kiesraad en de verkiezingen is te vinden op onze [GitHub
 
 ## Auteursrecht en licenties
 
-Auteursrecht © 2024 Kiesraad.
+Auteursrecht © 2026 Kiesraad.
 Gelicentieerd onder EUPL-1.2 of hoger, tenzij anders aangegeven:
 
 - Fonts in `frontend/src/assets/font` en `backend/templates/fonts` zijn gelicentieerd onder de SIL Open Font License versie 1.1 (OFL v1.1).

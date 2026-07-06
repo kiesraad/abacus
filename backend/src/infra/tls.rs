@@ -177,13 +177,13 @@ fn create_leaf(
 }
 
 /// Get the Subject Alternative Names for the leaf certificate:
-/// localhost, `abacus.local`, and every routable LAN address
+/// localhost, `abacus.internal`, and every routable LAN address
 fn get_subjects() -> Vec<String> {
     let mut subjects = vec![
         "localhost".to_owned(),
         "127.0.0.1".to_owned(),
         "::1".to_owned(),
-        "abacus.local".to_owned(),
+        "abacus.internal".to_owned(),
     ];
     if let Ok(interfaces) = if_addrs::get_if_addrs() {
         for iface in interfaces {

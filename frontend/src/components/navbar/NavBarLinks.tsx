@@ -96,6 +96,7 @@ function TopLevelManagementLinks() {
       <NavLink to={"/elections"}>{t("election.title.plural")}</NavLink>
       <NavLink to={"/users"}>{t("users.users")}</NavLink>
       <NavLink to={"/logs"}>{t("logs")}</NavLink>
+      <NavLink to={"/backups"}>{t("backups.backups")}</NavLink>
     </>
   );
 }
@@ -108,6 +109,7 @@ export function NavBarLinks({ location }: NavBarLinksProps) {
     location.pathname.startsWith("/elections/create") ||
     location.pathname.startsWith("/users") ||
     location.pathname === "/logs" ||
+    location.pathname === "/backups" ||
     (location.pathname === "/privacy-statement" && (isAdministrator || isCoordinator))
   ) {
     return <TopLevelManagementLinks />;

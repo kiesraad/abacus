@@ -1,0 +1,9 @@
+{
+  "backups": "Backups",
+  "title": "Database backups",
+  "subtitle": "Handig om te weten",
+  "description": "<ul><li>Backups worden opgeslagen op de server, in de database map.</li><li>Je moet zelf controleren of er voldoende schijfruimte is voor backups.</li><li>Tijdens het maken van een backup kan iedereen gewoon doorwerken.</li><li>Instructies voor het terugzetten van een backup staan in de handleiding.</li></ul>",
+  "create_backup_button": "Nu backup maken",
+  "running": "backup aan het maken",
+  "last": "Laatste backup gemaakt om {time}"
+}

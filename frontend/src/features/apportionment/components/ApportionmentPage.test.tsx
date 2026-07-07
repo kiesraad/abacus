@@ -32,6 +32,7 @@ import * as gte19SeatsAndP9DrawingLots from "../testing/gte-19-seats-and-p9-draw
 import * as lt19Seats from "../testing/lt-19-seats";
 import * as lt19SeatsAndP7DrawingLots from "../testing/lt-19-seats-and-p7-drawing-lots";
 import * as lt19SeatsAndP9DrawingLots from "../testing/lt-19-seats-and-p9-drawing-lots";
+import * as lt19SeatsAndP15DrawingLots from "../testing/lt-19-seats-and-p15-drawing-lots";
 import { ApportionmentPage } from "./ApportionmentPage";
 import { ApportionmentProvider } from "./ApportionmentProvider";
 
@@ -936,6 +937,117 @@ describe("ApportionmentPage", () => {
         ["8", "Stemmersgroep", "-", "-", "-"],
         ["", "Totaal", "18", "6", "24"],
       ]);
+    });
+
+    test("Render alert drawing lots for candidate required for one seat and table", async () => {
+      const user = userEvent.setup();
+      overrideOnce(
+        "get",
+        "/api/elections/11",
+        200,
+        getElectionMockData(lt19SeatsAndP15DrawingLots.election, lt19SeatsAndP15DrawingLots.committee_session),
+      );
+      overrideOnce("post", "/api/elections/11/apportionment", 200, {
+        seat_assignment: lt19SeatsAndP15DrawingLots.seat_assignment,
+        election_summary: lt19SeatsAndP15DrawingLots.election_summary,
+      });
+      overrideOnce(
+        "get",
+        "/api/elections/11/apportionment/state",
+        200,
+        lt19SeatsAndP15DrawingLots.state_after_two_drawing_lots_candidates_assigned,
+      );
+
+      const router = renderApportionmentPage(11, true) as Router;
+      expect(await screen.findByRole("heading", { level: 1, name: "Zetelverdeling" })).toBeVisible();
+
+      const alerts = await screen.findAllByRole("alert");
+      expect(alerts).toHaveLength(1);
+
+      if (alerts[0]) {
+        expect(alerts[0]).toHaveClass(alertCls.warning!);
+        expect(alerts[0]).toHaveTextContent(
+          [
+            "Loting noodzakelijk voor kandidaten met gelijk aantal voorkeursstemmen",
+            "3 Kandidaten van GROEP 9 hebben evenveel voorkeursstemmen gekregen. Er is nog 1 zetel beschikbaar. ",
+            "In de wet staat dat de kandidaat met het hoogste aantal voorkeursstemmen de zetel krijgt.",
+            "Hierdoor kan de zetel niet automatisch worden toegewezen. Het centraal stembureau moet een loting uitvoeren om te bepalen welke kandidaat gekozen wordt.",
+          ].join(""),
+        );
+        expect(within(alerts[0]).getByRole("link", { name: "Naar loting" })).toHaveAttribute("href", "/drawing-lots");
+      }
+
+      const apportionment_table = await screen.findByTestId("apportionment-table");
+      expect(apportionment_table).toBeVisible();
+      expect(apportionment_table).toHaveTableContent([
+        ["Lijst", "Lijstnaam", "Volle zetels", "Restzetels", "Totaal zetels"],
+        ["1", "GROEP 8", "5", "-", "5"],
+        ["2", "GROEP 9", "4", "-", "4"],
+        ["3", "GROEP 10", "2", "1", "3"],
+        ["4", "GROEP 11", "2", "-", "2"],
+        ["5", "GROEP 12", "1", "-", "1"],
+        ["", "Totaal", "14", "1", "15"],
+      ]);
+
+      // Check that there are no links to the list details pages
+      const rows = within(apportionment_table).getAllByRole("row");
+      if (rows[2]) {
+        await user.click(rows[2]);
+      }
+      expect(router.state.location.pathname).toEqual("/");
+    });
+
+    test("Render alert drawing lots for candidates required for multiple seats and table", async () => {
+      const user = userEvent.setup();
+      overrideOnce(
+        "get",
+        "/api/elections/11",
+        200,
+        getElectionMockData(lt19SeatsAndP15DrawingLots.election, lt19SeatsAndP15DrawingLots.committee_session),
+      );
+      overrideOnce("post", "/api/elections/11/apportionment", 200, {
+        seat_assignment: lt19SeatsAndP15DrawingLots.seat_assignment,
+        election_summary: lt19SeatsAndP15DrawingLots.election_summary,
+      });
+      overrideOnce("get", "/api/elections/11/apportionment/state", 200, lt19SeatsAndP15DrawingLots.state);
+
+      const router = renderApportionmentPage(11, true) as Router;
+      expect(await screen.findByRole("heading", { level: 1, name: "Zetelverdeling" })).toBeVisible();
+
+      const alerts = await screen.findAllByRole("alert");
+      expect(alerts).toHaveLength(1);
+
+      if (alerts[0]) {
+        expect(alerts[0]).toHaveClass(alertCls.warning!);
+        expect(alerts[0]).toHaveTextContent(
+          [
+            "Loting noodzakelijk voor kandidaten met gelijk aantal voorkeursstemmen",
+            "2 Kandidaten van GROEP 8 hebben evenveel voorkeursstemmen gekregen. Er zijn nog 2 zetels beschikbaar. ",
+            "In de wet staat dat de kandidaten met het hoogste aantal voorkeursstemmen de zetels krijgen.",
+            "Hierdoor kan de zetel niet automatisch worden toegewezen. Het centraal stembureau moet een loting uitvoeren om te bepalen welke kandidaat gekozen wordt.",
+          ].join(""),
+        );
+        expect(within(alerts[0]).getByRole("link", { name: "Naar loting" })).toHaveAttribute("href", "/drawing-lots");
+      }
+
+      const apportionment_table = await screen.findByTestId("apportionment-table");
+      expect(apportionment_table).toBeVisible();
+      expect(apportionment_table).toHaveTableContent([
+        ["Lijst", "Lijstnaam", "Volle zetels", "Restzetels", "Totaal zetels"],
+        ["1", "GROEP 8", "5", "-", "5"],
+        ["2", "GROEP 9", "4", "-", "4"],
+        ["3", "GROEP 10", "2", "1", "3"],
+        ["4", "GROEP 11", "2", "-", "2"],
+        ["5", "GROEP 12", "1", "-", "1"],
+        ["", "Totaal", "14", "1", "15"],
+      ]);
+
+      // Check that there are no links to the list details pages
+      const rows = within(apportionment_table).getAllByRole("row");
+      if (rows[2]) {
+        await user.click(rows[2]);
+      }
+      expect(router.state.location.pathname).toEqual("/");
     });
   });
 });

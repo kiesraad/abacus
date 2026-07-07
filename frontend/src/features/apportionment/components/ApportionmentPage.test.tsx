@@ -475,20 +475,31 @@ describe("ApportionmentPage", () => {
       const alerts = await screen.findAllByRole("alert");
       expect(alerts).toHaveLength(2);
 
-      expect(alerts[0]).toHaveClass(alertCls.warning!);
-      expect(alerts[0]).toHaveTextContent(
-        [
-          "Loting noodzakelijk voor toekennen restzetel 2",
-          "Er is een restzetel te verdelen. In de wet staat dat de partij met het grootste overschot aan stemmen per toegewezen zetel deze krijgt.",
-          "Er zijn meerdere partijen die hetzelfde grootste overschot hebben.",
-          "Hierdoor kan de restzetel niet automatisch worden toegewezen. Het centraal stembureau moet een loting uitvoeren om de restzetel toe te wijzen.",
-          "Naar loting",
-          "Details restzetelverdeling",
-        ].join(""),
-      );
+      if (alerts[0]) {
+        expect(alerts[0]).toHaveClass(alertCls.warning!);
+        expect(alerts[0]).toHaveTextContent(
+          [
+            "Loting noodzakelijk voor toekennen restzetel 2",
+            "Er is een restzetel te verdelen. In de wet staat dat de partij met het grootste overschot aan stemmen per toegewezen zetel deze krijgt.",
+            "Er zijn meerdere partijen die hetzelfde grootste overschot hebben.",
+            "Hierdoor kan de restzetel niet automatisch worden toegewezen. Het centraal stembureau moet een loting uitvoeren om de restzetel toe te wijzen.",
+          ].join(""),
+        );
+        expect(within(alerts[0]).getByRole("link", { name: "Naar loting" })).toHaveAttribute("href", "/drawing-lots");
+        expect(within(alerts[0]).getByRole("link", { name: "Details restzetelverdeling" })).toHaveAttribute(
+          "href",
+          "/details-residual-seats",
+        );
+      }
 
-      expect(alerts[1]).toHaveClass(alertCls.notify!);
-      expect(alerts[1]).toHaveTextContent("Er is nog 1 restzetel te verdelen. Bekijk details");
+      if (alerts[1]) {
+        expect(alerts[1]).toHaveClass(alertCls.notify!);
+        expect(alerts[1]).toHaveTextContent("Er is nog 1 restzetel te verdelen.");
+        expect(within(alerts[1]).getByRole("link", { name: "Bekijk details" })).toHaveAttribute(
+          "href",
+          "/details-residual-seats",
+        );
+      }
 
       const apportionment_table = await screen.findByTestId("apportionment-table");
       expect(apportionment_table).toBeVisible();
@@ -540,20 +551,31 @@ describe("ApportionmentPage", () => {
       const alerts = await screen.findAllByRole("alert");
       expect(alerts).toHaveLength(2);
 
-      expect(alerts[0]).toHaveClass(alertCls.warning!);
-      expect(alerts[0]).toHaveTextContent(
-        [
-          "Loting noodzakelijk voor toekennen restzetels 2, 3 en 4",
-          "Er is een restzetel te verdelen. In de wet staat dat de partij met het grootste gemiddeld aantal stemmen per toegewezen zetel deze krijgt.",
-          "Er zijn meerdere partijen die na het toewijzen van de volgende restzetel precies hetzelfde hoogste gemiddelde krijgen.",
-          "Hierdoor kan de restzetel niet automatisch worden toegewezen. Het centraal stembureau moet een loting uitvoeren om de restzetel toe te wijzen.",
-          "Naar loting",
-          "Details restzetelverdeling",
-        ].join(""),
-      );
+      if (alerts[0]) {
+        expect(alerts[0]).toHaveClass(alertCls.warning!);
+        expect(alerts[0]).toHaveTextContent(
+          [
+            "Loting noodzakelijk voor toekennen restzetels 2, 3 en 4",
+            "Er is een restzetel te verdelen. In de wet staat dat de partij met het grootste gemiddeld aantal stemmen per toegewezen zetel deze krijgt.",
+            "Er zijn meerdere partijen die na het toewijzen van de volgende restzetel precies hetzelfde hoogste gemiddelde krijgen.",
+            "Hierdoor kan de restzetel niet automatisch worden toegewezen. Het centraal stembureau moet een loting uitvoeren om de restzetel toe te wijzen.",
+          ].join(""),
+        );
+        expect(within(alerts[0]).getByRole("link", { name: "Naar loting" })).toHaveAttribute("href", "/drawing-lots");
+        expect(within(alerts[0]).getByRole("link", { name: "Details restzetelverdeling" })).toHaveAttribute(
+          "href",
+          "/details-residual-seats",
+        );
+      }
 
-      expect(alerts[1]).toHaveClass(alertCls.notify!);
-      expect(alerts[1]).toHaveTextContent("Er zijn nog 3 restzetels te verdelen. Bekijk details");
+      if (alerts[1]) {
+        expect(alerts[1]).toHaveClass(alertCls.notify!);
+        expect(alerts[1]).toHaveTextContent("Er zijn nog 3 restzetels te verdelen.");
+        expect(within(alerts[1]).getByRole("link", { name: "Bekijk details" })).toHaveAttribute(
+          "href",
+          "/details-residual-seats",
+        );
+      }
 
       const apportionment_table = await screen.findByTestId("apportionment-table");
       expect(apportionment_table).toBeVisible();
@@ -607,23 +629,34 @@ describe("ApportionmentPage", () => {
       const alerts = await screen.findAllByRole("alert");
       expect(alerts).toHaveLength(2);
 
-      expect(alerts[0]).toHaveClass(alertCls.warning!);
-      expect(alerts[0]).toHaveTextContent(
-        [
-          "Loting noodzakelijk voor toekennen restzetels 3 en 4",
-          "Er is een restzetel te verdelen. In de wet staat dat de partij met het grootste gemiddeld aantal stemmen per toegewezen zetel deze krijgt.",
-          "Er zijn meerdere partijen die na het toewijzen van de volgende restzetel precies hetzelfde hoogste gemiddelde krijgen.",
-          "Hierdoor kan de restzetel niet automatisch worden toegewezen. Het centraal stembureau moet een loting uitvoeren om de restzetel toe te wijzen.",
-          "Naar loting",
-          "Details restzetelverdeling",
-        ].join(""),
-      );
+      if (alerts[0]) {
+        expect(alerts[0]).toHaveClass(alertCls.warning!);
+        expect(alerts[0]).toHaveTextContent(
+          [
+            "Loting noodzakelijk voor toekennen restzetels 3 en 4",
+            "Er is een restzetel te verdelen. In de wet staat dat de partij met het grootste gemiddeld aantal stemmen per toegewezen zetel deze krijgt.",
+            "Er zijn meerdere partijen die na het toewijzen van de volgende restzetel precies hetzelfde hoogste gemiddelde krijgen.",
+            "Hierdoor kan de restzetel niet automatisch worden toegewezen. Het centraal stembureau moet een loting uitvoeren om de restzetel toe te wijzen.",
+          ].join(""),
+        );
+        expect(within(alerts[0]).getByRole("link", { name: "Naar loting" })).toHaveAttribute("href", "/drawing-lots");
+        expect(within(alerts[0]).getByRole("link", { name: "Details restzetelverdeling" })).toHaveAttribute(
+          "href",
+          "/details-residual-seats",
+        );
+      }
 
-      expect(alerts[1]).toHaveClass(alertCls.notify!);
-      expect(alerts[1]).toHaveTextContent(
-        "Restzetel 2 kon niet automatisch worden toegewezen en is na loting toegekend aan Lijst 4 - Algemene Lijst.",
-      );
-      expect(alerts[1]).toHaveTextContent("Er zijn nog 2 restzetels te verdelen. Bekijk details");
+      if (alerts[1]) {
+        expect(alerts[1]).toHaveClass(alertCls.notify!);
+        expect(alerts[1]).toHaveTextContent(
+          "Restzetel 2 kon niet automatisch worden toegewezen en is na loting toegekend aan Lijst 4 - Algemene Lijst.",
+        );
+        expect(alerts[1]).toHaveTextContent("Er zijn nog 2 restzetels te verdelen.");
+        expect(within(alerts[1]).getByRole("link", { name: "Bekijk details" })).toHaveAttribute(
+          "href",
+          "/details-residual-seats",
+        );
+      }
 
       const apportionment_table = await screen.findByTestId("apportionment-table");
       expect(apportionment_table).toBeVisible();
@@ -664,25 +697,36 @@ describe("ApportionmentPage", () => {
       const alerts = await screen.findAllByRole("alert");
       expect(alerts).toHaveLength(2);
 
-      expect(alerts[0]).toHaveClass(alertCls.warning!);
-      expect(alerts[0]).toHaveTextContent(
-        [
-          "Loting noodzakelijk voor toekennen restzetel 4",
-          "Er is een restzetel te verdelen. In de wet staat dat de partij met het grootste gemiddeld aantal stemmen per toegewezen zetel deze krijgt.",
-          "Er zijn meerdere partijen die na het toewijzen van de volgende restzetel precies hetzelfde hoogste gemiddelde krijgen.",
-          "Hierdoor kan de restzetel niet automatisch worden toegewezen. Het centraal stembureau moet een loting uitvoeren om de restzetel toe te wijzen.",
-          "Naar loting",
-          "Details restzetelverdeling",
-        ].join(""),
-      );
+      if (alerts[0]) {
+        expect(alerts[0]).toHaveClass(alertCls.warning!);
+        expect(alerts[0]).toHaveTextContent(
+          [
+            "Loting noodzakelijk voor toekennen restzetel 4",
+            "Er is een restzetel te verdelen. In de wet staat dat de partij met het grootste gemiddeld aantal stemmen per toegewezen zetel deze krijgt.",
+            "Er zijn meerdere partijen die na het toewijzen van de volgende restzetel precies hetzelfde hoogste gemiddelde krijgen.",
+            "Hierdoor kan de restzetel niet automatisch worden toegewezen. Het centraal stembureau moet een loting uitvoeren om de restzetel toe te wijzen.",
+          ].join(""),
+        );
+        expect(within(alerts[0]).getByRole("link", { name: "Naar loting" })).toHaveAttribute("href", "/drawing-lots");
+        expect(within(alerts[0]).getByRole("link", { name: "Details restzetelverdeling" })).toHaveAttribute(
+          "href",
+          "/details-residual-seats",
+        );
+      }
 
-      expect(alerts[1]).toHaveClass(alertCls.notify!);
-      expect(alerts[1]).toHaveTextContent(
-        "Sommige restzetels konden niet automatisch worden toegewezen en zijn via loting toegekend:",
-      );
-      expect(alerts[1]).toHaveTextContent("Restzetel 2 is toegekend aan Lijst 4 - Algemene Lijst");
-      expect(alerts[1]).toHaveTextContent("Restzetel 3 is toegekend aan Lijst 6 - Lijst van stemmers");
-      expect(alerts[1]).toHaveTextContent("Er is nog 1 restzetel te verdelen. Bekijk details");
+      if (alerts[1]) {
+        expect(alerts[1]).toHaveClass(alertCls.notify!);
+        expect(alerts[1]).toHaveTextContent(
+          "Sommige restzetels konden niet automatisch worden toegewezen en zijn via loting toegekend:",
+        );
+        expect(alerts[1]).toHaveTextContent("Restzetel 2 is toegekend aan Lijst 4 - Algemene Lijst");
+        expect(alerts[1]).toHaveTextContent("Restzetel 3 is toegekend aan Lijst 6 - Lijst van stemmers");
+        expect(alerts[1]).toHaveTextContent("Er is nog 1 restzetel te verdelen.");
+        expect(within(alerts[1]).getByRole("link", { name: "Bekijk details" })).toHaveAttribute(
+          "href",
+          "/details-residual-seats",
+        );
+      }
 
       const apportionment_table = await screen.findByTestId("apportionment-table");
       expect(apportionment_table).toBeVisible();
@@ -719,21 +763,32 @@ describe("ApportionmentPage", () => {
       const alerts = await screen.findAllByRole("alert");
       expect(alerts).toHaveLength(2);
 
-      expect(alerts[0]).toHaveClass(alertCls.warning!);
-      expect(alerts[0]).toHaveTextContent(
-        [
-          "Loting noodzakelijk vanwege volstrekte meerderheid",
-          "De partijdigen heeft de volstrekte meerderheid van stemmen gekregen, maar heeft niet de volstrekte meerderheid aan zetels.",
-          "Volgens artikel P9 van de kieswet wordt een zetel afgenomen van de lijst waaraan de laatste restzetel is toegekend. ",
-          "Lijst 2, 3 en 4 hebben met hetzelfde overschot aan stemmen hun laatste restzetel gekregen. ",
-          "In de zitting van het CSB moet door loting worden bepaald welk van deze lijsten een zetel af moet staan.",
-          "Naar loting",
-          "Details restzetelverdeling",
-        ].join(""),
-      );
+      if (alerts[0]) {
+        expect(alerts[0]).toHaveClass(alertCls.warning!);
+        expect(alerts[0]).toHaveTextContent(
+          [
+            "Loting noodzakelijk vanwege volstrekte meerderheid",
+            "De partijdigen heeft de volstrekte meerderheid van stemmen gekregen, maar heeft niet de volstrekte meerderheid aan zetels.",
+            "Volgens artikel P 9 van de kieswet wordt een zetel afgenomen van de lijst waaraan de laatste restzetel is toegekend. ",
+            "Lijst 2, 3 en 4 hebben met hetzelfde overschot aan stemmen hun laatste restzetel gekregen. ",
+            "In de zitting van het CSB moet door loting worden bepaald welk van deze lijsten een zetel af moet staan.",
+          ].join(""),
+        );
+        expect(within(alerts[0]).getByRole("link", { name: "Naar loting" })).toHaveAttribute("href", "/drawing-lots");
+        expect(within(alerts[0]).getByRole("link", { name: "Details restzetelverdeling" })).toHaveAttribute(
+          "href",
+          "/details-residual-seats",
+        );
+      }
 
-      expect(alerts[1]).toHaveClass(alertCls.notify!);
-      expect(alerts[1]).toHaveTextContent("Lijst 2, 3 of 4 moet een zetel afstaan aan lijst 1. Ga naar loting");
+      if (alerts[1]) {
+        expect(alerts[1]).toHaveClass(alertCls.notify!);
+        expect(alerts[1]).toHaveTextContent("Lijst 2, 3 of 4 moet een zetel afstaan aan lijst 1.");
+        expect(within(alerts[1]).getByRole("link", { name: "Ga naar loting" })).toHaveAttribute(
+          "href",
+          "/drawing-lots",
+        );
+      }
 
       const apportionment_table = await screen.findByTestId("apportionment-table");
       expect(apportionment_table).toBeVisible();
@@ -776,21 +831,32 @@ describe("ApportionmentPage", () => {
       const alerts = await screen.findAllByRole("alert");
       expect(alerts).toHaveLength(2);
 
-      expect(alerts[0]).toHaveClass(alertCls.warning!);
-      expect(alerts[0]).toHaveTextContent(
-        [
-          "Loting noodzakelijk vanwege volstrekte meerderheid",
-          "De Kandidaat heeft de volstrekte meerderheid van stemmen gekregen, maar heeft niet de volstrekte meerderheid aan zetels.",
-          "Volgens artikel P9 van de kieswet wordt een zetel afgenomen van de lijst waaraan de laatste restzetel is toegekend. ",
-          "Lijst 6 en 7 hebben met hetzelfde gemiddeld aantal stemmen hun laatste restzetel gekregen. ",
-          "In de zitting van het CSB moet door loting worden bepaald welk van deze lijsten een zetel af moet staan.",
-          "Naar loting",
-          "Details restzetelverdeling",
-        ].join(""),
-      );
+      if (alerts[0]) {
+        expect(alerts[0]).toHaveClass(alertCls.warning!);
+        expect(alerts[0]).toHaveTextContent(
+          [
+            "Loting noodzakelijk vanwege volstrekte meerderheid",
+            "De Kandidaat heeft de volstrekte meerderheid van stemmen gekregen, maar heeft niet de volstrekte meerderheid aan zetels.",
+            "Volgens artikel P 9 van de kieswet wordt een zetel afgenomen van de lijst waaraan de laatste restzetel is toegekend. ",
+            "Lijst 6 en 7 hebben met hetzelfde gemiddeld aantal stemmen hun laatste restzetel gekregen. ",
+            "In de zitting van het CSB moet door loting worden bepaald welk van deze lijsten een zetel af moet staan.",
+          ].join(""),
+        );
+        expect(within(alerts[0]).getByRole("link", { name: "Naar loting" })).toHaveAttribute("href", "/drawing-lots");
+        expect(within(alerts[0]).getByRole("link", { name: "Details restzetelverdeling" })).toHaveAttribute(
+          "href",
+          "/details-residual-seats",
+        );
+      }
 
-      expect(alerts[1]).toHaveClass(alertCls.notify!);
-      expect(alerts[1]).toHaveTextContent("Lijst 6 of 7 moet een zetel afstaan aan lijst 1. Ga naar loting");
+      if (alerts[1]) {
+        expect(alerts[1]).toHaveClass(alertCls.notify!);
+        expect(alerts[1]).toHaveTextContent("Lijst 6 of 7 moet een zetel afstaan aan lijst 1.");
+        expect(within(alerts[1]).getByRole("link", { name: "Ga naar loting" })).toHaveAttribute(
+          "href",
+          "/drawing-lots",
+        );
+      }
 
       const apportionment_table = await screen.findByTestId("apportionment-table");
       expect(apportionment_table).toBeVisible();
@@ -853,7 +919,7 @@ describe("ApportionmentPage", () => {
 
       expect(alerts[1]).toHaveClass(alertCls.notify!);
       expect(alerts[1]).toHaveTextContent(
-        "De laatste restzetel voor lijst 1 (artikel P9) is na loting afgestaan door Lijst 7 - Partij van de Keuze",
+        "De laatste restzetel voor lijst 1 (artikel P 9) is na loting afgestaan door Lijst 7 - Partij van de Keuze",
       );
 
       const apportionment_table = await screen.findByTestId("apportionment-table");

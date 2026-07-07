@@ -66,7 +66,7 @@
   },
   "drawing_lots_required_for_p9_alert": {
     "title": "Loting noodzakelijk vanwege volstrekte meerderheid",
-    "article_p9": "Volgens artikel P9 van de kieswet wordt een zetel afgenomen van de lijst waaraan de laatste restzetel is toegekend.",
+    "article_p9": "Volgens artikel P 9 van de kieswet wordt een zetel afgenomen van de lijst waaraan de laatste restzetel is toegekend.",
     "description": "{name} heeft de volstrekte meerderheid van stemmen gekregen, maar heeft niet de volstrekte meerderheid aan zetels.",
     "drawing_lots_needed": "In de zitting van het CSB moet door loting worden bepaald welk van deze lijsten een zetel af moet staan.",
     "last_residual_seat": "<strong>Lijst {lists}</strong> hebben met hetzelfde {variant} stemmen hun laatste restzetel gekregen."
@@ -139,7 +139,7 @@
   "ranking_candidates": "Rangschikking van kandidaten voor opvolging",
   "ranking_candidates_empty": "Geen enkele kandidaat is niet gekozen.",
   "ranking_candidates_info": "De volgende kandidaten hebben geen zetel toegewezen gekregen. Als een zetel vrijkomt wordt deze via de onderstaande volgorde aan opvolgers toegewezen.",
-  "reassigned_by_drawing_lots_alert": "De laatste restzetel voor lijst {assigned_to} (artikel P9) is na loting afgestaan door <strong>{retracted_from}</strong>",
+  "reassigned_by_drawing_lots_alert": "De laatste restzetel voor lijst {assigned_to} (artikel P 9) is na loting afgestaan door <strong>{retracted_from}</strong>",
   "redo_apportionment": "Doe dan de zetelverdeling opnieuw",
   "redo_apportionment_button": "Zetelverdeling opnieuw doen",
   "remainder": "Overschot",

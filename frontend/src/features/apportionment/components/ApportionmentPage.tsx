@@ -225,7 +225,7 @@ function renderNotifyDrawingLotsAlert(
               seat_from_lists: formatList(absoluteMajorityReassignmentLists.seat_from_lists, t("or")),
               seat_to_list: absoluteMajorityReassignmentLists.seat_to_list,
             })}{" "}
-            <Link to="../drawing-lots">{t("apportionment.go_to_drawing_lots")}</Link>
+            <Link to="./drawing-lots">{t("apportionment.go_to_drawing_lots")}</Link>
           </p>
         )}
       </Alert>

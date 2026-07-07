@@ -614,8 +614,10 @@ describe("ApportionmentResidualSeatsPage", () => {
       if (alerts[0]) {
         expect(alerts[0]).toHaveClass(alertCls.notify!);
         expect(alerts[0]).toHaveTextContent("Er is nog 1 restzetel te verdelen.");
-        const link = within(alerts[0]).getByRole("link", { name: "Ga naar loting" });
-        expect(link).toHaveAttribute("href", "/drawing-lots");
+        expect(within(alerts[0]).getByRole("link", { name: "Ga naar loting" })).toHaveAttribute(
+          "href",
+          "/drawing-lots",
+        );
       }
 
       expect(
@@ -664,8 +666,10 @@ describe("ApportionmentResidualSeatsPage", () => {
       if (alerts[0]) {
         expect(alerts[0]).toHaveClass(alertCls.notify!);
         expect(alerts[0]).toHaveTextContent("Er zijn nog 3 restzetels te verdelen.");
-        const link = within(alerts[0]).getByRole("link", { name: "Ga naar loting" });
-        expect(link).toHaveAttribute("href", "/drawing-lots");
+        expect(within(alerts[0]).getByRole("link", { name: "Ga naar loting" })).toHaveAttribute(
+          "href",
+          "/drawing-lots",
+        );
       }
 
       expect(
@@ -722,8 +726,10 @@ describe("ApportionmentResidualSeatsPage", () => {
       if (alerts[0]) {
         expect(alerts[0]).toHaveClass(alertCls.notify!);
         expect(alerts[0]).toHaveTextContent("Er moet 1 restzetel worden afgestaan.");
-        const link = within(alerts[0]).getByRole("link", { name: "Ga naar loting" });
-        expect(link).toHaveAttribute("href", "/drawing-lots");
+        expect(within(alerts[0]).getByRole("link", { name: "Ga naar loting" })).toHaveAttribute(
+          "href",
+          "/drawing-lots",
+        );
       }
 
       expect(
@@ -771,8 +777,10 @@ describe("ApportionmentResidualSeatsPage", () => {
       if (alerts[0]) {
         expect(alerts[0]).toHaveClass(alertCls.notify!);
         expect(alerts[0]).toHaveTextContent("Er moet 1 restzetel worden afgestaan.");
-        const link = within(alerts[0]).getByRole("link", { name: "Ga naar loting" });
-        expect(link).toHaveAttribute("href", "/drawing-lots");
+        expect(within(alerts[0]).getByRole("link", { name: "Ga naar loting" })).toHaveAttribute(
+          "href",
+          "/drawing-lots",
+        );
       }
 
       expect(

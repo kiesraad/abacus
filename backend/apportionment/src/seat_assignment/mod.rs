@@ -133,11 +133,18 @@ pub(crate) fn seat_assignment<T: ApportionmentInput>(input: &T) -> SeatAssignmen
     };
     if let Some(assigned_seat) = assigned_seat {
         // add the absolute majority change to the remainder assignment steps
-        steps.push(SeatChangeStep {
+        let step = SeatChangeStep {
             standings: current_standings,
             residual_seat_number: None,
             change: assigned_seat,
-        });
+        };
+        if let Some(last_step) = steps.last() {
+            assert_ne!(
+                last_step.standings, step.standings,
+                "standings should be different"
+            );
+        }
+        steps.push(step);
     }
 
     // [Artikel P 19a Kieswet](https://wetten.overheid.nl/BWBR0004627/2026-01-01/#AfdelingII_HoofdstukP_Paragraaf3_ArtikelP19a)
@@ -189,6 +196,13 @@ pub(crate) fn seat_assignment<T: ApportionmentInput>(input: &T) -> SeatAssignmen
         .iter()
         .map(|list| list.residual_seats())
         .sum::<u32>();
+
+    if let Some(last_step) = final_steps.last() {
+        assert_ne!(
+            last_step.standings, final_standing,
+            "standings should be different"
+        );
+    }
 
     Ok(SeatAssignment::Completed(SeatAssignmentDetails {
         seats: input.number_of_seats(),
@@ -382,6 +396,9 @@ fn reassign_residual_seats_for_exhausted_lists<'a, T: ListVotes>(
             seats_to_reassign += seats;
             let mut full_seat: bool = false;
             for _ in 1..=seats {
+                // Clone standings for returned step as they are before changes
+                let standings = current_standings.clone();
+
                 let list_standing = current_standings
                     .iter_mut()
                     .find(|list_standing| list_standing.list_number() == list_number)
@@ -398,14 +415,20 @@ fn reassign_residual_seats_for_exhausted_lists<'a, T: ListVotes>(
                     "Seat first assigned to list {:?} has been removed and will be assigned to another list in accordance with Article P 10 Kieswet",
                     list_number
                 );
-                list_exhaustion_steps.push(SeatChangeStep {
-                    standings: current_standings.clone(),
+
+                let step = SeatChangeStep {
+                    standings,
                     residual_seat_number: None,
                     change: SeatChange::ListExhaustionRemoval(ListExhaustionRemovedSeat {
                         list_retracted_seat: list_number,
                         full_seat,
                     }),
-                });
+                };
+                assert_ne!(
+                    step.standings, current_standings,
+                    "standings should be different"
+                );
+                list_exhaustion_steps.push(step);
             }
         }
         let mut current_steps = previous_steps.to_owned();

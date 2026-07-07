@@ -187,7 +187,7 @@ fn candidate_nomination_per_list<'a, LV: ListVotes>(
             CandidateRanking::Original(original_ranking)
         } else {
             let updated_ranking = update_candidate_ranking(
-                preference_threshold,
+                &preferential_candidate_nomination,
                 &candidate_votes_meeting_preference_threshold,
                 candidate_votes,
             );
@@ -340,22 +340,28 @@ fn preferential_candidate_nomination<'a, LV: ListVotes>(
 /// Update the candidate list, moving the candidates meeting the preference threshold
 /// to the top of the list and keeping the ranking of the rest of candidates on the list the same
 fn update_candidate_ranking<T: CandidateVotes>(
-    preference_threshold: Fraction,
+    preferential_candidate_nomination: &[&T],
     candidate_votes_meeting_preference_threshold: &[&T],
     candidate_votes: &[&T],
 ) -> Vec<T::CandidateNumber> {
     let mut updated_candidate_ranking: Vec<T::CandidateNumber> = vec![];
-    // Add candidates meeting preference threshold to the top of the ranking
-    for candidate_votes in candidate_votes_meeting_preference_threshold {
+    // First add the nominated candidates to the top of the ranking
+    for candidate_votes in preferential_candidate_nomination {
         updated_candidate_ranking.push(candidate_votes.number());
     }
 
+    // Add the remaining candidates meeting preference threshold to the updated ranking
+    for candidate_votes in candidate_votes_meeting_preference_threshold {
+        if !updated_candidate_ranking.contains(&candidate_votes.number()) {
+            updated_candidate_ranking.push(candidate_votes.number());
+        }
+    }
+
     // Add the remaining candidates in the order of the original candidate list
-    for candidate_votes in candidate_votes
-        .iter()
-        .filter(|candidate_votes| Fraction::from(candidate_votes.votes()) <= preference_threshold)
-    {
-        updated_candidate_ranking.push(candidate_votes.number());
+    for candidate_votes in candidate_votes {
+        if !updated_candidate_ranking.contains(&candidate_votes.number()) {
+            updated_candidate_ranking.push(candidate_votes.number());
+        }
     }
 
     updated_candidate_ranking
@@ -1208,8 +1214,10 @@ mod tests {
     /// List seats: [6, 3]
     /// - List 1: Preferential candidate nominations of candidates 1, 2, 3, 4, 5 and 6 no other candidate nominations
     /// - List 2: Drawing of lots is required for candidates: [2, 3, 4, 5, 6], only 3 seats available
+    /// - List 2: Drawing of lots is required for candidates: [2, 3, 4, 6], only 2 seats available
+    /// - List 2: Drawing of lots is required for candidates: [2, 4, 6], only 1 seat available
     #[test]
-    fn test_with_drawing_of_lots_error() {
+    fn test_with_drawing_of_lots_required() {
         let quota = Fraction::new(9600, 19);
         let seat_assignment_input = seat_assignment_fixture_with_given_candidate_votes(
             19,
@@ -1306,7 +1314,7 @@ mod tests {
                         &CandidateVotesMock(3, 400),
                     ],
                     other_candidate_nomination: Vec::new(),
-                    candidate_ranking: CandidateRanking::Original(vec![1, 2, 3, 4, 5, 6]),
+                    candidate_ranking: CandidateRanking::Updated(vec![1, 5, 3, 2, 4, 6]),
                 }
             ]
         );

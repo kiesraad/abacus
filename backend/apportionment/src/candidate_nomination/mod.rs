@@ -1213,9 +1213,11 @@ mod tests {
     ///
     /// List seats: [6, 3]
     /// - List 1: Preferential candidate nominations of candidates 1, 2, 3, 4, 5 and 6 no other candidate nominations
-    /// - List 2: Drawing of lots is required for candidates: [2, 3, 4, 5, 6], only 3 seats available
-    /// - List 2: Drawing of lots is required for candidates: [2, 3, 4, 6], only 2 seats available
-    /// - List 2: Drawing of lots is required for candidates: [2, 4, 6], only 1 seat available
+    /// - List 2: Preferential candidate nomination of candidate 1 and no other candidate nominations
+    ///   - Drawing of lots is required for candidates: [2, 3, 4, 5, 6], only 2 seats available
+    ///   - Candidate 5 is drawn
+    ///   - Drawing of lots is required for candidates: [2, 3, 4, 6], only 1 seat available
+    ///   - Candidate 3 is drawn
     #[test]
     fn test_with_drawing_of_lots_required() {
         let quota = Fraction::new(9600, 19);

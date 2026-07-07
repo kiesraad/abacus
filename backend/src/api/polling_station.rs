@@ -139,7 +139,7 @@ pub fn authorize_user_and_gsb_election(
     Ok(())
 }
 
-/// Get a list of all [PollingStation]s for an election
+/// Get a list of all [PollingStation](crate::domain::polling_station::PollingStation)s for an election
 #[utoipa::path(
     get,
     path = "/api/elections/{election_id}/polling_stations",
@@ -189,7 +189,7 @@ pub fn validate_user_is_allowed_to_perform_action(
     }
 }
 
-/// Create a new [PollingStation]
+/// Create a new [PollingStation](crate::domain::polling_station::PollingStation)
 #[utoipa::path(
     post,
     path = "/api/elections/{election_id}/polling_stations",
@@ -261,7 +261,7 @@ async fn polling_station_create(
     Ok((StatusCode::CREATED, response))
 }
 
-/// Get a [PollingStation]
+/// Get a [PollingStation](crate::domain::polling_station::PollingStation)
 #[utoipa::path(
     get,
     path = "/api/elections/{election_id}/polling_stations/{polling_station_id}",
@@ -290,7 +290,7 @@ async fn polling_station_get(
     Ok((StatusCode::OK, polling_station.into_response(election_id)))
 }
 
-/// Update a [PollingStation]
+/// Update a [PollingStation](crate::domain::polling_station::PollingStation)
 #[utoipa::path(
     put,
     path = "/api/elections/{election_id}/polling_stations/{polling_station_id}",
@@ -355,7 +355,7 @@ async fn polling_station_update(
     Ok((StatusCode::OK, response))
 }
 
-/// Delete a [PollingStation]
+/// Delete a [PollingStation](crate::domain::polling_station::PollingStation)
 #[utoipa::path(
     delete,
     path = "/api/elections/{election_id}/polling_stations/{polling_station_id}",

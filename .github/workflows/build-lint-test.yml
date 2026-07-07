@@ -135,7 +135,7 @@ jobs:
       - name: Run tests
         run: cargo --verbose --locked nextest run --target=x86_64-unknown-linux-musl --workspace --exclude pdf_gen_dylib --no-default-features --features openapi,dev-database,embed-typst,tls
       - name: Build documentation
-        run: cargo doc --workspace --no-deps --all-features
+        run: cargo doc --workspace --no-deps --all-features --document-private-items
         env:
           RUSTDOCFLAGS: "-D warnings"
       - name: Create documentation artifact

@@ -3359,7 +3359,7 @@
     },
     "/api/elections/{election_id}/polling_stations": {
       "get": {
-        "summary": "Get a list of all [PollingStation]s for an election (administrator, coordinator_gsb, typist_gsb)",
+        "summary": "Get a list of all [PollingStation](crate::domain::polling_station::PollingStation)s for an election (administrator, coordinator_gsb, typist_gsb)",
         "operationId": "polling_station_list",
         "parameters": [
           {
@@ -3425,7 +3425,7 @@
         ]
       },
       "post": {
-        "summary": "Create a new [PollingStation] (administrator, coordinator_gsb)",
+        "summary": "Create a new [PollingStation](crate::domain::polling_station::PollingStation) (administrator, coordinator_gsb)",
         "operationId": "polling_station_create",
         "parameters": [
           {
@@ -3696,7 +3696,7 @@
     },
     "/api/elections/{election_id}/polling_stations/{polling_station_id}": {
       "get": {
-        "summary": "Get a [PollingStation] (administrator, coordinator_gsb, typist_gsb)",
+        "summary": "Get a [PollingStation](crate::domain::polling_station::PollingStation) (administrator, coordinator_gsb, typist_gsb)",
         "operationId": "polling_station_get",
         "parameters": [
           {
@@ -3771,7 +3771,7 @@
         ]
       },
       "put": {
-        "summary": "Update a [PollingStation] (administrator, coordinator_gsb)",
+        "summary": "Update a [PollingStation](crate::domain::polling_station::PollingStation) (administrator, coordinator_gsb)",
         "operationId": "polling_station_update",
         "parameters": [
           {
@@ -3865,7 +3865,7 @@
         ]
       },
       "delete": {
-        "summary": "Delete a [PollingStation] (administrator, coordinator_gsb)",
+        "summary": "Delete a [PollingStation](crate::domain::polling_station::PollingStation) (administrator, coordinator_gsb)",
         "operationId": "polling_station_delete",
         "parameters": [
           {

@@ -43,7 +43,7 @@ impl<'pw> ValidatedPassword<'pw> {
 
 /// Helper newtype indicating the containing string is hashed with `hash_password`.
 /// Note that this newtype doesn't give any guarantees, as it is easily constructible
-/// because of the From<String> impl.
+/// because of the `From<String>` impl.
 #[derive(Deserialize, Default, PartialEq, Eq, Clone, Debug, Hash, Type)]
 #[serde(deny_unknown_fields)]
 #[sqlx(transparent)]

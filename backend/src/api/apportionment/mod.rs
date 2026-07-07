@@ -26,6 +26,7 @@ pub enum ApportionmentApiError {
     InvalidLotDrawing(String),
     InvalidState(String),
     NotCSBElection,
+    UnsortedInput,
 }
 
 impl ApiErrorResponse for ApportionmentApiError {
@@ -75,6 +76,14 @@ impl ApiErrorResponse for ApportionmentApiError {
                     true,
                 ),
             ),
+            ApportionmentApiError::UnsortedInput => (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                ErrorResponse::new(
+                    "Apportionment expects lists and candidates to be sorted",
+                    ErrorReference::InternalServerError,
+                    true,
+                ),
+            ),
         }
     }
 }
@@ -87,6 +96,9 @@ impl From<apportionment::ApportionmentError> for APIError {
             }
             apportionment::ApportionmentError::InvalidState(message) => {
                 ApportionmentApiError::InvalidState(message).into()
+            }
+            apportionment::ApportionmentError::UnsortedInput => {
+                ApportionmentApiError::UnsortedInput.into()
             }
         }
     }

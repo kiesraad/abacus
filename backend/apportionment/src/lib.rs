@@ -50,6 +50,20 @@ pub enum ApportionmentOutput<'a, T: ApportionmentInput> {
 pub fn process<T: ApportionmentInput>(
     input: &T,
 ) -> Result<ApportionmentOutput<'_, T>, ApportionmentError> {
+    // Check if all list votes are sorted by number
+    if !input.list_votes().is_sorted_by_key(|lv| lv.number()) {
+        return Err(ApportionmentError::UnsortedInput);
+    }
+
+    // Check if all candidate votes are sorted by number
+    if input
+        .list_votes()
+        .iter()
+        .any(|lv| !lv.candidate_votes().is_sorted_by_key(|cv| cv.number()))
+    {
+        return Err(ApportionmentError::UnsortedInput);
+    }
+
     let seat_assignment = match seat_assignment(input)? {
         SeatAssignment::Completed(seat_assignment) => seat_assignment,
         SeatAssignment::DrawingLotsRequired(variant, seat_assignment) => {
@@ -80,11 +94,14 @@ pub fn process<T: ApportionmentInput>(
 
 #[cfg(test)]
 mod tests {
-    use std::collections::{HashMap, HashSet};
+    use std::{
+        assert_matches,
+        collections::{HashMap, HashSet},
+    };
 
     use super::{ApportionmentOutput, process};
     use crate::{
-        Fraction,
+        ApportionmentError, Fraction,
         test_helpers::{
             check_chosen_candidates, check_list_candidate_nomination,
             get_total_seats_from_apportionment_result,
@@ -408,5 +425,31 @@ mod tests {
                 case.name, result.seat_assignment.steps,
             );
         }
+    }
+
+    #[test]
+    fn test_apportionment_process_unsorted_list_number_fails() {
+        let mut input = seat_assignment_fixture_with_default_50_candidates(
+            15,
+            vec![540, 160, 160, 80, 80, 80, 60, 40],
+        );
+
+        input.list_votes.reverse();
+
+        assert_matches!(process(&input), Err(ApportionmentError::UnsortedInput));
+    }
+
+    #[test]
+    fn test_apportionment_process_unsorted_list_candidate_number_fails() {
+        let mut input = seat_assignment_fixture_with_default_50_candidates(
+            15,
+            vec![540, 160, 160, 80, 80, 80, 60, 40],
+        );
+
+        input.list_votes.iter_mut().for_each(|lv| {
+            lv.candidate_votes.reverse();
+        });
+
+        assert_matches!(process(&input), Err(ApportionmentError::UnsortedInput));
     }
 }

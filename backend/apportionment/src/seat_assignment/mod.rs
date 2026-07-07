@@ -493,6 +493,67 @@ pub(crate) mod tests {
         assert_eq!(result, HashMap::from([(1, 3), (2, 1)]));
     }
 
+    mod get_number_of_candidates {
+        use std::collections::{HashMap, HashSet};
+
+        use crate::{seat_assignment::get_number_of_candidates, test_helpers::ListVotesMock};
+
+        #[test]
+        fn test_without_deceased_candidates() {
+            let list_votes = [
+                ListVotesMock::from_test_data_auto(1, vec![100, 80, 60]),
+                ListVotesMock::from_test_data_auto(2, vec![50, 40]),
+            ];
+            let deceased_candidates = HashMap::new();
+
+            assert_eq!(
+                get_number_of_candidates(&list_votes, 1, &deceased_candidates),
+                3
+            );
+            assert_eq!(
+                get_number_of_candidates(&list_votes, 2, &deceased_candidates),
+                2
+            );
+        }
+
+        #[test]
+        fn test_subtracts_deceased_candidates() {
+            let list_votes = [
+                ListVotesMock::from_test_data_auto(1, vec![100, 80, 60]),
+                ListVotesMock::from_test_data_auto(2, vec![50, 40]),
+            ];
+            // deceased candidates of list 1 do not affect list 2
+            let deceased_candidates = HashMap::from([(1, HashSet::from([2, 3]))]);
+
+            assert_eq!(
+                get_number_of_candidates(&list_votes, 1, &deceased_candidates),
+                1
+            );
+            assert_eq!(
+                get_number_of_candidates(&list_votes, 2, &deceased_candidates),
+                2
+            );
+        }
+
+        #[test]
+        fn test_with_all_candidates_deceased() {
+            let list_votes = [ListVotesMock::from_test_data_auto(1, vec![100, 80])];
+            let deceased_candidates = HashMap::from([(1, HashSet::from([1, 2]))]);
+
+            assert_eq!(
+                get_number_of_candidates(&list_votes, 1, &deceased_candidates),
+                0
+            );
+        }
+
+        #[test]
+        #[should_panic(expected = "List votes exists")]
+        fn test_panics_for_unknown_list() {
+            let list_votes = [ListVotesMock::from_test_data_auto(1, vec![100])];
+            get_number_of_candidates(&list_votes, 2, &HashMap::new());
+        }
+    }
+
     #[test]
     fn test_list_numbers() {
         let standings: Vec<ListStanding<u32>> = (2..=6)

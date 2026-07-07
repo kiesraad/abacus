@@ -554,6 +554,100 @@ pub(crate) mod tests {
         }
     }
 
+    mod list_numbers_with_exhausted_seats {
+        use std::collections::{HashMap, HashSet};
+
+        use crate::{
+            fraction::Fraction,
+            seat_assignment::{ListStanding, list_numbers_with_exhausted_seats},
+            test_helpers::ListVotesMock,
+        };
+
+        /// Create a standing using a quota of 100, so every 100 votes
+        /// in the list votes is one full seat.
+        fn standing(list_votes: &ListVotesMock) -> ListStanding<u32> {
+            ListStanding::new(list_votes, Fraction::new(100, 1))
+        }
+
+        #[test]
+        fn test_no_exhausted_lists_when_enough_candidates() {
+            let list_votes = [
+                // 3 seats, 3 candidates
+                ListVotesMock::from_test_data_auto(1, vec![100, 100, 100]),
+                // 1 seat, 2 candidates
+                ListVotesMock::from_test_data_auto(2, vec![60, 40]),
+            ];
+            let standings: Vec<_> = list_votes.iter().map(standing).collect();
+
+            assert_eq!(
+                list_numbers_with_exhausted_seats(&standings, &list_votes, &HashMap::new()),
+                vec![]
+            );
+        }
+
+        #[test]
+        fn test_more_seats_than_candidates() {
+            let list_votes = [
+                // 3 seats, 2 candidates
+                ListVotesMock::from_test_data_auto(1, vec![200, 100]),
+                // 1 seat, 1 candidate
+                ListVotesMock::from_test_data_auto(2, vec![100]),
+            ];
+            let standings: Vec<_> = list_votes.iter().map(standing).collect();
+
+            assert_eq!(
+                list_numbers_with_exhausted_seats(&standings, &list_votes, &HashMap::new()),
+                vec![(1, 1)]
+            );
+        }
+
+        #[test]
+        fn test_excess_seats_for_multiple_exhausted_lists() {
+            let list_votes = [
+                // 3 seats, 1 candidate
+                ListVotesMock::from_test_data_auto(1, vec![300]),
+                // 2 seats, 2 candidates
+                ListVotesMock::from_test_data_auto(2, vec![100, 100]),
+                // 4 seats, 2 candidates
+                ListVotesMock::from_test_data_auto(3, vec![250, 150]),
+            ];
+            let standings: Vec<_> = list_votes.iter().map(standing).collect();
+
+            assert_eq!(
+                list_numbers_with_exhausted_seats(&standings, &list_votes, &HashMap::new()),
+                vec![(1, 2), (3, 2)]
+            );
+        }
+
+        #[test]
+        fn test_residual_seats_count_towards_exhaustion() {
+            // 1 full seat, 1 candidate
+            let list_votes = [ListVotesMock::from_test_data_auto(1, vec![100])];
+            let mut standings: Vec<_> = list_votes.iter().map(standing).collect();
+            // 2 total seats, 1 candidate
+            standings[0].add_residual_seat();
+
+            assert_eq!(
+                list_numbers_with_exhausted_seats(&standings, &list_votes, &HashMap::new()),
+                vec![(1, 1)]
+            );
+        }
+
+        #[test]
+        fn test_deceased_candidates_can_exhaust_a_list() {
+            // 2 seats, 2 candidates
+            let list_votes = [ListVotesMock::from_test_data_auto(1, vec![100, 100])];
+            let standings: Vec<_> = list_votes.iter().map(standing).collect();
+            // candidate 2 of list 1 is deceased, leaving 1 candidate for 2 seats
+            let deceased_candidates = HashMap::from([(1, HashSet::from([2]))]);
+
+            assert_eq!(
+                list_numbers_with_exhausted_seats(&standings, &list_votes, &deceased_candidates),
+                vec![(1, 1)]
+            );
+        }
+    }
+
     #[test]
     fn test_list_numbers() {
         let standings: Vec<ListStanding<u32>> = (2..=6)

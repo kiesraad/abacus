@@ -68,9 +68,9 @@ static VARIANTS: &[ModelVariant] = &[
         input: "extra-model-p-22-2-variations/gte-19-seats.json",
     },
     ModelVariant {
-        name: "model-p-22-2-gte-19-seats-and-p7",
+        name: "model-p-22-2-gte-19-seats-and-p7-drawing-lots",
         model: "model-p-22-2",
-        input: "extra-model-p-22-2-variations/gte-19-seats-and-p7.json",
+        input: "extra-model-p-22-2-variations/gte-19-seats-and-p7-drawing-lots.json",
     },
     ModelVariant {
         name: "model-p-22-2-gte-19-seats-and-p9",
@@ -78,20 +78,30 @@ static VARIANTS: &[ModelVariant] = &[
         input: "extra-model-p-22-2-variations/gte-19-seats-and-p9.json",
     },
     ModelVariant {
+        name: "model-p-22-2-gte-19-seats-and-p9-drawing-lots-and-deceased-candidates",
+        model: "model-p-22-2",
+        input: "extra-model-p-22-2-variations/gte-19-seats-and-p9-drawing-lots-and-deceased-candidates.json",
+    },
+    ModelVariant {
         name: "model-p-22-2-lt-19-seats",
         model: "model-p-22-2",
         input: "extra-model-p-22-2-variations/lt-19-seats.json",
     },
     ModelVariant {
-        name: "model-p-22-2-lt-19-seats-and-p7",
+        name: "model-p-22-2-lt-19-seats-and-p7-drawing-lots",
         model: "model-p-22-2",
-        input: "extra-model-p-22-2-variations/lt-19-seats-and-p7.json",
+        input: "extra-model-p-22-2-variations/lt-19-seats-and-p7-drawing-lots.json",
     },
     // `lt-19-seats-and-p9-and-p10.json` is equal to input `model-p-22-2.json`
     ModelVariant {
         name: "model-p-22-2-lt-19-seats-and-p9-and-p10",
         model: "model-p-22-2",
         input: "extra-model-p-22-2-variations/lt-19-seats-and-p9-and-p10.json",
+    },
+    ModelVariant {
+        name: "model-p-22-2-lt-19-seats-and-p9-drawing-lots",
+        model: "model-p-22-2",
+        input: "extra-model-p-22-2-variations/lt-19-seats-and-p9-drawing-lots.json",
     },
     ModelVariant {
         name: "model-p-22-2-lt-19-seats-and-p10",

@@ -33,6 +33,8 @@ export function Footnotes({
         <li id={`absolute-majority-reassignment-information`}>
           {t("apportionment.absolute_majority_reassignment", {
             list_assigned_seat: absoluteMajorityStep.change.list_assigned_seat,
+          })}{" "}
+          {t("apportionment.absolute_majority_reassignment_result", {
             list_retracted_seat: absoluteMajorityStep.change.list_retracted_seat,
           })}
         </li>

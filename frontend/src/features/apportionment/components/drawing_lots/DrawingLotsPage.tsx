@@ -8,23 +8,69 @@ import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { useElection } from "@/hooks/election/useElection";
 import { t } from "@/i18n/translate";
-import type { ADD_LIST_DRAWN_REQUEST_PATH, ApportionmentState } from "@/types/generated/openapi";
+import type { ADD_LIST_DRAWN_REQUEST_PATH, ApportionmentState, PoliticalGroup } from "@/types/generated/openapi";
 import { formatPoliticalGroupName } from "@/utils/politicalGroup";
 import { useApportionmentContext } from "../../hooks/useApportionmentContext";
 import { apportionmentCheckStateAndRedirect, isListDrawingLotsVariant, renderTitleAndHeader } from "../../utils/utils";
 import { ApportionmentErrorPage } from "../ApportionmentError";
 import { DrawingLotsForList } from "./DrawingLotsForList";
+import { DrawingLotsForP9 } from "./DrawingLotsForP9";
 
 function getPageTitle(state: ApportionmentState) {
   if (isListDrawingLotsVariant(state, ["HighestAverageResidualSeat", "LargestRemainderResidualSeat"])) {
-    return t("apportionment.drawing_lots_for_seat", {
+    return t("apportionment.drawing_lots_for_list.title", {
       number: state.drawing_lots_required.residual_seat_numbers[0] || "",
+    });
+  } else if (isListDrawingLotsVariant(state, ["AbsoluteMajorityHighestAverage", "AbsoluteMajorityLargestRemainder"])) {
+    return t("apportionment.drawing_lots_for_p9.title", {
+      assign_to: state.drawing_lots_required.assign_to || "",
     });
   }
   return t("apportionment.drawing_lots");
 }
 
-// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO: Refactor when adding other variants
+function renderListSection(state: ApportionmentState, options: PoliticalGroup[]) {
+  return (
+    <FormLayout.Section>
+      <div>
+        <h2>{t("apportionment.drawing_lots_necessary")}</h2>
+        {isListDrawingLotsVariant(state, ["HighestAverageResidualSeat", "LargestRemainderResidualSeat"]) ? (
+          <DrawingLotsForList drawingLotsRequired={state.drawing_lots_required} options={options} />
+        ) : (
+          isListDrawingLotsVariant(state, ["AbsoluteMajorityLargestRemainder", "AbsoluteMajorityHighestAverage"]) && (
+            <DrawingLotsForP9
+              drawingLotsRequired={state.drawing_lots_required}
+              options={state.drawing_lots_required.options}
+              assign_to={state.drawing_lots_required.assign_to}
+            />
+          )
+        )}
+      </div>
+    </FormLayout.Section>
+  );
+}
+
+function renderInstructions() {
+  return (
+    <FormLayout.Section>
+      <div>
+        <h3 className="mb-md">{t("apportionment.drawing_lots_instructions.title")}</h3>
+        <p className="w-32">{t("apportionment.drawing_lots_instructions.description")}</p>
+      </div>
+    </FormLayout.Section>
+  );
+}
+
+function renderChoiceListLegend(state: ApportionmentState) {
+  return (
+    <ChoiceList.Legend>
+      {isListDrawingLotsVariant(state, ["HighestAverageResidualSeat", "LargestRemainderResidualSeat"])
+        ? t("apportionment.drawing_lots_result.which_list_gets_a_residual_seat")
+        : t("apportionment.drawing_lots_result.which_list_has_to_give_up_a_seat")}
+    </ChoiceList.Legend>
+  );
+}
+
 export function DrawingLotsPage() {
   const navigate = useNavigate();
   const { election } = useElection();
@@ -86,28 +132,13 @@ export function DrawingLotsPage() {
               }}
             >
               <FormLayout>
-                <FormLayout.Section>
-                  <div>
-                    <h2>{t("apportionment.drawing_lots_necessary")}</h2>
-                    {isListDrawingLotsVariant(state, [
-                      "HighestAverageResidualSeat",
-                      "LargestRemainderResidualSeat",
-                    ]) && <DrawingLotsForList drawingLotsRequired={state.drawing_lots_required} options={options} />}
-                  </div>
-                </FormLayout.Section>
-                <FormLayout.Section>
-                  <div>
-                    <h3 className="mb-md">{t("apportionment.drawing_lots_instructions.title")}</h3>
-                    <p className="w-32">{t("apportionment.drawing_lots_instructions.description")}</p>
-                  </div>
-                </FormLayout.Section>
+                {renderListSection(state, options)}
+                {renderInstructions()}
                 <FormLayout.Section>
                   <div>
                     <h3 className="mb-md">{t("apportionment.drawing_lots_result.title")}</h3>
                     <ChoiceList>
-                      <ChoiceList.Legend>
-                        {t("apportionment.drawing_lots_result.which_list_gets_a_residual_seat")}
-                      </ChoiceList.Legend>
+                      {renderChoiceListLegend(state)}
                       {radioError && (
                         <ChoiceList.Error id="option_drawn_error">
                           {t("apportionment.mandatory_question")}

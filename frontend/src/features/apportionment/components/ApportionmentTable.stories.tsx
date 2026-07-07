@@ -1,7 +1,7 @@
 import type { StoryObj } from "@storybook/react-vite";
 import { expect } from "storybook/test";
 import * as gte19Seats from "../testing/gte-19-seats";
-import * as gte19SeatsAndP7 from "../testing/gte-19-seats-and-p7";
+import * as gte19SeatsAndP7DrawingLots from "../testing/gte-19-seats-and-p7-drawing-lots";
 import { getNotAssignedSeats } from "../utils/utils";
 import { ApportionmentTable } from "./ApportionmentTable";
 
@@ -15,6 +15,7 @@ export const Default: StoryObj = {
         residualSeats={gte19Seats.seat_assignment.residual_seats}
         seats={gte19Seats.seat_assignment.seats}
         notAssignedSeats={0}
+        withoutLinks={false}
       />
     );
   },
@@ -37,12 +38,13 @@ export const NotAssignedSeats: StoryObj = {
   render: () => {
     return (
       <ApportionmentTable
-        standings={gte19SeatsAndP7.seat_assignment.standings}
-        politicalGroups={gte19SeatsAndP7.election.political_groups}
-        fullSeats={gte19SeatsAndP7.seat_assignment.full_seats}
-        residualSeats={gte19SeatsAndP7.seat_assignment.residual_seats}
-        seats={gte19SeatsAndP7.seat_assignment.seats}
-        notAssignedSeats={getNotAssignedSeats(gte19SeatsAndP7.state)}
+        standings={gte19SeatsAndP7DrawingLots.seat_assignment.standings}
+        politicalGroups={gte19SeatsAndP7DrawingLots.election.political_groups}
+        fullSeats={gte19SeatsAndP7DrawingLots.seat_assignment.full_seats}
+        residualSeats={gte19SeatsAndP7DrawingLots.seat_assignment.residual_seats}
+        seats={gte19SeatsAndP7DrawingLots.seat_assignment.seats}
+        notAssignedSeats={getNotAssignedSeats(gte19SeatsAndP7DrawingLots.state)}
+        withoutLinks={true}
       />
     );
   },

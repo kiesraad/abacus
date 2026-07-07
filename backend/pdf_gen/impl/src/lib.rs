@@ -36,7 +36,7 @@ fn get_pdf_options() -> PdfOptions {
 }
 
 /// Convert [`chrono::DateTime`] to [`Datetime`]
-/// From https://github.com/typst/typst/blob/96dd67e011bb317cf78683bcf1edfdfca5e7b6b3/crates/typst-cli/src/compile.rs#L305
+/// From <https://github.com/typst/typst/blob/96dd67e011bb317cf78683bcf1edfdfca5e7b6b3/crates/typst-cli/src/compile.rs#L305>
 fn convert_datetime<Tz: chrono::TimeZone>(date_time: &chrono::DateTime<Tz>) -> Option<Datetime> {
     Datetime::from_ymd_hms(
         date_time.year(),

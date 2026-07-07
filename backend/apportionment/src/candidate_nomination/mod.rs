@@ -1505,4 +1505,75 @@ mod tests {
             )
         }
     }
+
+    #[test]
+    fn test_update_candidate_ranking_scenarios() {
+        struct Case {
+            name: &'static str,
+            candidates: Vec<(u32, u32)>,
+            preferential_candidate_nomination: Vec<u32>,
+            candidates_meeting_threshold: Vec<u32>,
+            expected_ranking: Vec<u32>,
+        }
+
+        let cases = vec![
+            Case {
+                name: "no preferential candidates and no candidates meeting threshold keeps original order",
+                candidates: vec![(1, 50), (2, 40), (3, 30)],
+                preferential_candidate_nomination: vec![],
+                candidates_meeting_threshold: vec![],
+                expected_ranking: vec![1, 2, 3],
+            },
+            Case {
+                name: "preferential nominated candidates move to the top in vote order",
+                candidates: vec![(1, 100), (2, 20), (3, 500), (4, 30)],
+                preferential_candidate_nomination: vec![3, 1],
+                candidates_meeting_threshold: vec![3, 1],
+                expected_ranking: vec![3, 1, 2, 4],
+            },
+            Case {
+                name: "candidates meeting threshold are moved to top after preferential nominations",
+                candidates: vec![(2, 80), (5, 90), (9, 100), (11, 5)],
+                preferential_candidate_nomination: vec![9],
+                candidates_meeting_threshold: vec![9, 5, 2],
+                expected_ranking: vec![9, 5, 2, 11],
+            },
+            Case {
+                name: "first preferential nominated candidates, then candidates meeting threshold, then remaining candidates",
+                candidates: vec![(1, 500), (2, 400), (3, 400), (4, 400), (5, 400), (6, 300)],
+                preferential_candidate_nomination: vec![1, 5, 3],
+                candidates_meeting_threshold: vec![1, 2, 3, 4, 5],
+                expected_ranking: vec![1, 5, 3, 2, 4, 6],
+            },
+        ];
+
+        fn get_candidates<'a>(
+            candidates: &'a [CandidateVotesMock],
+            numbers: &[u32],
+        ) -> Vec<&'a CandidateVotesMock> {
+            numbers
+                .iter()
+                .flat_map(|number| candidates.iter().filter(|c| c.number() == *number))
+                .collect()
+        }
+
+        for case in cases {
+            let candidates: Vec<CandidateVotesMock> = case
+                .candidates
+                .iter()
+                .map(|(number, votes)| CandidateVotesMock(*number, *votes))
+                .collect();
+
+            assert_eq!(
+                update_candidate_ranking(
+                    &get_candidates(&candidates, &case.preferential_candidate_nomination),
+                    &get_candidates(&candidates, &case.candidates_meeting_threshold),
+                    &candidates.iter().collect::<Vec<_>>(),
+                ),
+                case.expected_ranking,
+                "updated ranking should match: {}",
+                case.name
+            );
+        }
+    }
 }

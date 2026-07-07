@@ -1,5 +1,6 @@
 import type {
   ApportionmentState,
+  CandidateDrawingLotsVariant,
   CandidateNomination,
   CommitteeSession,
   ElectionSummary,
@@ -7,30 +8,43 @@ import type {
   SeatAssignment,
 } from "@/types/generated/openapi";
 
+export const drawing_lots_required: CandidateDrawingLotsVariant & {
+  variant: "CandidateDrawingLotsVariant";
+} = {
+  variant: "CandidateDrawingLotsVariant",
+  list: 1,
+  total_seats: 5,
+  number_of_votes: 550,
+  seat_numbers: [2, 3],
+  options: [2, 6],
+};
 export const state: ApportionmentState = {
   type: "DrawingLots",
   drawing_lots_required: {
     type: "CandidateDrawingLotsRequired",
-    list: 1,
-    total_seats: 5,
-    number_of_votes: 550,
-    seat_numbers: [2, 3],
-    options: [2, 6],
+    ...drawing_lots_required,
   },
   deceased_candidates: [],
   lists_drawn: [],
   candidates_drawn: [],
 };
 
+export const drawing_lots_required_after_one_drawing_lots_candidate_assigned: CandidateDrawingLotsVariant & {
+  variant: "CandidateDrawingLotsVariant";
+} = {
+  variant: "CandidateDrawingLotsVariant",
+  list: 1,
+  total_seats: 5,
+  number_of_votes: 500,
+  seat_numbers: [4, 5],
+  options: [3, 4],
+};
+
 export const state_after_one_drawing_lots_candidate_assigned: ApportionmentState = {
   type: "DrawingLots",
   drawing_lots_required: {
     type: "CandidateDrawingLotsRequired",
-    list: 1,
-    total_seats: 5,
-    number_of_votes: 500,
-    seat_numbers: [4, 5],
-    options: [3, 4],
+    ...drawing_lots_required_after_one_drawing_lots_candidate_assigned,
   },
   deceased_candidates: [],
   lists_drawn: [],
@@ -48,15 +62,22 @@ export const state_after_one_drawing_lots_candidate_assigned: ApportionmentState
   ],
 };
 
+export const drawing_lots_required_after_two_drawing_lots_candidate_assigned: CandidateDrawingLotsVariant & {
+  variant: "CandidateDrawingLotsVariant";
+} = {
+  variant: "CandidateDrawingLotsVariant",
+  list: 2,
+  total_seats: 4,
+  number_of_votes: 350,
+  seat_numbers: [4],
+  options: [2, 4, 5],
+};
+
 export const state_after_two_drawing_lots_candidates_assigned: ApportionmentState = {
   type: "DrawingLots",
   drawing_lots_required: {
     type: "CandidateDrawingLotsRequired",
-    list: 2,
-    total_seats: 4,
-    number_of_votes: 350,
-    seat_numbers: [4],
-    options: [2, 4, 5],
+    ...drawing_lots_required_after_two_drawing_lots_candidate_assigned,
   },
   deceased_candidates: [],
   lists_drawn: [],

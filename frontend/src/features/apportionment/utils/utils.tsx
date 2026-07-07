@@ -9,6 +9,7 @@ import type {
   PoliticalGroup,
   SeatChangeStep,
 } from "@/types/generated/openapi";
+import { getCandidateFullName } from "@/utils/candidate";
 import { formatPoliticalGroupName } from "@/utils/politicalGroup";
 import {
   isAbsoluteMajorityReassignmentStep,
@@ -82,6 +83,34 @@ export function getSeatReassignedByDrawingLotsStep(
         ),
       };
     }
+  }
+  return undefined;
+}
+
+export interface ListCandidateDrawn {
+  seat_number: number;
+  candidate: string;
+}
+
+export function getListCandidatesDrawn(
+  state: ApportionmentState,
+  politicalGroup: PoliticalGroup,
+): ListCandidateDrawn[] | undefined {
+  if (state.type === "Finalised") {
+    const listCandidatesDrawn: ListCandidateDrawn[] = [];
+    for (const lot_drawn of state.candidates_drawn) {
+      if (lot_drawn.variant.list === politicalGroup.number) {
+        const seat_number = lot_drawn.variant.seat_numbers[0];
+        const drawn_candidate = politicalGroup.candidates.find((candidate) => candidate.number === lot_drawn.drawn);
+        if (seat_number && drawn_candidate) {
+          listCandidatesDrawn.push({
+            seat_number: seat_number,
+            candidate: getCandidateFullName(drawn_candidate, true),
+          });
+        }
+      }
+    }
+    return listCandidatesDrawn;
   }
   return undefined;
 }

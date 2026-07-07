@@ -14,6 +14,13 @@
       "assigned_to": "Restzetel {nr} is toegekend aan <strong>{list}</strong>"
     }
   },
+  "assigned_by_drawing_lots_to_candidate_alert": {
+    "singular": "Zetel {seat_number} is na loting toegewezen aan <strong>{candidate}</strong>",
+    "plural": {
+      "title": "Sommige zetels konden niet automatisch worden toegewezen en zijn via loting toegekend:",
+      "assigned_to": "Zetel {seat_number} is toegewezen aan <strong>{candidate}</strong>"
+    }
+  },
   "assigned_number_of_seats": "Toegewezen aantal zetels",
   "average": "Gemiddelde",
   "average_number": "gemiddeld aantal",

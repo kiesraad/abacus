@@ -140,7 +140,7 @@ async fn generate_drawing_lots(args: &GenerateElectionArgs, pool: &SqlitePool) {
         pool,
         15,
         vec![
-            vec![600, 450, 500, 500, 400, 550],
+            vec![600, 550, 500, 500, 400, 550],
             vec![500, 350, 400, 350, 350, 450],
             vec![400, 100, 200, 150, 300, 350],
             vec![300, 150, 200, 200, 100, 250],

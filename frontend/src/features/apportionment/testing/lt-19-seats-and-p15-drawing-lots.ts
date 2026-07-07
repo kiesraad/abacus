@@ -1,0 +1,1203 @@
+import type {
+  ApportionmentState,
+  CandidateNomination,
+  CommitteeSession,
+  ElectionSummary,
+  ElectionWithPoliticalGroups,
+  SeatAssignment,
+} from "@/types/generated/openapi";
+
+export const state: ApportionmentState = {
+  type: "DrawingLots",
+  drawing_lots_required: {
+    type: "CandidateDrawingLotsRequired",
+    list: 1,
+    total_seats: 5,
+    number_of_votes: 550,
+    seat_numbers: [2, 3],
+    options: [2, 6],
+  },
+  deceased_candidates: [],
+  lists_drawn: [],
+  candidates_drawn: [],
+};
+
+export const state_after_one_drawing_lots_candidate_assigned: ApportionmentState = {
+  type: "DrawingLots",
+  drawing_lots_required: {
+    type: "CandidateDrawingLotsRequired",
+    list: 1,
+    total_seats: 5,
+    number_of_votes: 500,
+    seat_numbers: [4, 5],
+    options: [3, 4],
+  },
+  deceased_candidates: [],
+  lists_drawn: [],
+  candidates_drawn: [
+    {
+      variant: {
+        list: 1,
+        total_seats: 5,
+        number_of_votes: 550,
+        seat_numbers: [2, 3],
+        options: [2, 6],
+      },
+      drawn: 6,
+    },
+  ],
+};
+
+export const state_after_two_drawing_lots_candidates_assigned: ApportionmentState = {
+  type: "DrawingLots",
+  drawing_lots_required: {
+    type: "CandidateDrawingLotsRequired",
+    list: 2,
+    total_seats: 4,
+    number_of_votes: 350,
+    seat_numbers: [4],
+    options: [2, 4, 5],
+  },
+  deceased_candidates: [],
+  lists_drawn: [],
+  candidates_drawn: [
+    {
+      variant: {
+        list: 1,
+        total_seats: 5,
+        number_of_votes: 550,
+        seat_numbers: [2, 3],
+        options: [2, 6],
+      },
+      drawn: 6,
+    },
+    {
+      variant: {
+        list: 1,
+        total_seats: 5,
+        number_of_votes: 500,
+        seat_numbers: [4, 5],
+        options: [3, 4],
+      },
+      drawn: 4,
+    },
+  ],
+};
+
+export const state_after_three_drawing_lots_candidates_assigned: ApportionmentState = {
+  type: "Finalised",
+  deceased_candidates: [],
+  lists_drawn: [],
+  candidates_drawn: [
+    {
+      variant: {
+        list: 1,
+        total_seats: 5,
+        number_of_votes: 550,
+        seat_numbers: [2, 3],
+        options: [2, 6],
+      },
+      drawn: 6,
+    },
+    {
+      variant: {
+        list: 1,
+        total_seats: 5,
+        number_of_votes: 500,
+        seat_numbers: [4, 5],
+        options: [3, 4],
+      },
+      drawn: 4,
+    },
+    {
+      variant: {
+        list: 2,
+        total_seats: 4,
+        number_of_votes: 350,
+        seat_numbers: [4],
+        options: [2, 4, 5],
+      },
+      drawn: 5,
+    },
+  ],
+};
+
+export const seat_assignment: SeatAssignment = {
+  seats: 15,
+  full_seats: 14,
+  residual_seats: 1,
+  quota: {
+    integer: 593,
+    numerator: 5,
+    denominator: 15,
+  },
+  steps: [
+    {
+      residual_seat_number: 1,
+      change: {
+        changed_by: "LargestRemainderAssignment",
+        selected_list_number: 3,
+        list_options: [3],
+        list_assigned: [3],
+        remainder_votes: {
+          integer: 313,
+          numerator: 5,
+          denominator: 15,
+        },
+      },
+      standings: [
+        {
+          list_number: 1,
+          votes_cast: 3100,
+          remainder_votes: {
+            integer: 133,
+            numerator: 5,
+            denominator: 15,
+          },
+          meets_remainder_threshold: true,
+          next_votes_per_seat: {
+            integer: 516,
+            numerator: 4,
+            denominator: 6,
+          },
+          full_seats: 5,
+          residual_seats: 0,
+        },
+        {
+          list_number: 2,
+          votes_cast: 2400,
+          remainder_votes: {
+            integer: 26,
+            numerator: 10,
+            denominator: 15,
+          },
+          meets_remainder_threshold: true,
+          next_votes_per_seat: {
+            integer: 480,
+            numerator: 0,
+            denominator: 5,
+          },
+          full_seats: 4,
+          residual_seats: 0,
+        },
+        {
+          list_number: 3,
+          votes_cast: 1500,
+          remainder_votes: {
+            integer: 313,
+            numerator: 5,
+            denominator: 15,
+          },
+          meets_remainder_threshold: true,
+          next_votes_per_seat: {
+            integer: 500,
+            numerator: 0,
+            denominator: 3,
+          },
+          full_seats: 2,
+          residual_seats: 0,
+        },
+        {
+          list_number: 4,
+          votes_cast: 1200,
+          remainder_votes: {
+            integer: 13,
+            numerator: 5,
+            denominator: 15,
+          },
+          meets_remainder_threshold: true,
+          next_votes_per_seat: {
+            integer: 400,
+            numerator: 0,
+            denominator: 3,
+          },
+          full_seats: 2,
+          residual_seats: 0,
+        },
+        {
+          list_number: 5,
+          votes_cast: 700,
+          remainder_votes: {
+            integer: 106,
+            numerator: 10,
+            denominator: 15,
+          },
+          meets_remainder_threshold: true,
+          next_votes_per_seat: {
+            integer: 350,
+            numerator: 0,
+            denominator: 2,
+          },
+          full_seats: 1,
+          residual_seats: 0,
+        },
+      ],
+    },
+  ],
+  standings: [
+    {
+      list_number: 1,
+      votes_cast: 3100,
+      remainder_votes: {
+        integer: 133,
+        numerator: 5,
+        denominator: 15,
+      },
+      meets_remainder_threshold: true,
+      full_seats: 5,
+      residual_seats: 0,
+      total_seats: 5,
+    },
+    {
+      list_number: 2,
+      votes_cast: 2400,
+      remainder_votes: {
+        integer: 26,
+        numerator: 10,
+        denominator: 15,
+      },
+      meets_remainder_threshold: true,
+      full_seats: 4,
+      residual_seats: 0,
+      total_seats: 4,
+    },
+    {
+      list_number: 3,
+      votes_cast: 1500,
+      remainder_votes: {
+        integer: 313,
+        numerator: 5,
+        denominator: 15,
+      },
+      meets_remainder_threshold: true,
+      full_seats: 2,
+      residual_seats: 1,
+      total_seats: 3,
+    },
+    {
+      list_number: 4,
+      votes_cast: 1200,
+      remainder_votes: {
+        integer: 13,
+        numerator: 5,
+        denominator: 15,
+      },
+      meets_remainder_threshold: true,
+      full_seats: 2,
+      residual_seats: 0,
+      total_seats: 2,
+    },
+    {
+      list_number: 5,
+      votes_cast: 700,
+      remainder_votes: {
+        integer: 106,
+        numerator: 10,
+        denominator: 15,
+      },
+      meets_remainder_threshold: true,
+      full_seats: 1,
+      residual_seats: 0,
+      total_seats: 1,
+    },
+  ],
+};
+
+export const candidate_nomination: CandidateNomination = {
+  preference_threshold: {
+    percentage: 50,
+    number_of_votes: {
+      integer: 296,
+      numerator: 1000,
+      denominator: 1500,
+    },
+  },
+  chosen_candidates: [
+    {
+      number: 6,
+      initials: "T.E.",
+      first_name: "Tiemen",
+      last_name: "Arets",
+      locality: "'s Gravenveen",
+      gender: "Female",
+      list_number: 1,
+      list_name: "GROEP 8",
+    },
+    {
+      number: 5,
+      initials: "K.",
+      last_name: "Aygün",
+      locality: "Bloemstede",
+      gender: "Male",
+      list_number: 3,
+      list_name: "GROEP 10",
+    },
+    {
+      number: 1,
+      initials: "J.",
+      first_name: "Jory",
+      last_name_prefix: "van",
+      last_name: "Bekking",
+      locality: "Huisden",
+      gender: "Male",
+      list_number: 1,
+      list_name: "GROEP 8",
+    },
+    {
+      number: 1,
+      initials: "L.L.",
+      last_name_prefix: "van",
+      last_name: "Bekking",
+      locality: "Eemstricht",
+      gender: "X",
+      list_number: 2,
+      list_name: "GROEP 9",
+    },
+    {
+      number: 4,
+      initials: "C.O.V.",
+      first_name: "Cornelus",
+      last_name: "Boermans",
+      locality: "Bloemstede",
+      gender: "Female",
+      list_number: 1,
+      list_name: "GROEP 8",
+    },
+    {
+      number: 6,
+      initials: "O.",
+      last_name: "Bruins-Van den Kerk",
+      locality: "Eemstricht",
+      gender: "Female",
+      list_number: 2,
+      list_name: "GROEP 9",
+    },
+    {
+      number: 3,
+      initials: "S.",
+      last_name: "Groenen",
+      locality: "Bloemstede",
+      gender: "Female",
+      list_number: 2,
+      list_name: "GROEP 9",
+    },
+    {
+      number: 6,
+      initials: "M.",
+      last_name_prefix: "van de",
+      last_name: "Kerkhof",
+      locality: "Huisden",
+      gender: "X",
+      list_number: 3,
+      list_name: "GROEP 10",
+    },
+    {
+      number: 2,
+      initials: "H.O.",
+      last_name_prefix: "den",
+      last_name: "Mateman",
+      locality: "Sluisdam",
+      gender: "Female",
+      list_number: 4,
+      list_name: "GROEP 11",
+    },
+    {
+      number: 3,
+      initials: "E.V.L.P.",
+      first_name: "Esra",
+      last_name_prefix: "van der",
+      last_name: "Meulen",
+      locality: "Middelgein",
+      gender: "Male",
+      list_number: 1,
+      list_name: "GROEP 8",
+    },
+    {
+      number: 1,
+      initials: "D.L.E.",
+      last_name: "Prakken",
+      locality: "Heemdamseburg",
+      gender: "X",
+      list_number: 5,
+      list_name: "GROEP 12",
+    },
+    {
+      number: 1,
+      initials: "Z.W.K.",
+      last_name: "Titulaer",
+      locality: "Hoek van Zoom",
+      gender: "X",
+      list_number: 4,
+      list_name: "GROEP 11",
+    },
+    {
+      number: 5,
+      initials: "F.W.",
+      last_name_prefix: "de",
+      last_name: "Vegt",
+      locality: "Eksterlo",
+      gender: "X",
+      list_number: 2,
+      list_name: "GROEP 9",
+    },
+    {
+      number: 2,
+      initials: "K.",
+      first_name: "Kris",
+      last_name: "Wiertz",
+      locality: "Huisden",
+      gender: "Male",
+      list_number: 1,
+      list_name: "GROEP 8",
+    },
+    {
+      number: 1,
+      initials: "Q.K.",
+      last_name: "Wolfswinkel",
+      locality: "Bloemstede",
+      gender: "X",
+      list_number: 3,
+      list_name: "GROEP 10",
+    },
+  ],
+  list_candidate_nomination: [
+    {
+      list_number: 1,
+      list_name: "GROEP 8",
+      list_seats: 5,
+      preferential_candidate_nomination: [
+        {
+          number: 1,
+          votes: 600,
+        },
+        {
+          number: 6,
+          votes: 550,
+        },
+        {
+          number: 2,
+          votes: 550,
+        },
+        {
+          number: 4,
+          votes: 500,
+        },
+        {
+          number: 3,
+          votes: 500,
+        },
+      ],
+      other_candidate_nomination: [],
+      updated_candidate_ranking: [
+        {
+          number: 1,
+          initials: "J.",
+          first_name: "Jory",
+          last_name_prefix: "van",
+          last_name: "Bekking",
+          locality: "Huisden",
+          gender: "Male",
+        },
+        {
+          number: 6,
+          initials: "T.E.",
+          first_name: "Tiemen",
+          last_name: "Arets",
+          locality: "'s Gravenveen",
+          gender: "Female",
+        },
+        {
+          number: 2,
+          initials: "K.",
+          first_name: "Kris",
+          last_name: "Wiertz",
+          locality: "Huisden",
+          gender: "Male",
+        },
+        {
+          number: 4,
+          initials: "C.O.V.",
+          first_name: "Cornelus",
+          last_name: "Boermans",
+          locality: "Bloemstede",
+          gender: "Female",
+        },
+        {
+          number: 3,
+          initials: "E.V.L.P.",
+          first_name: "Esra",
+          last_name_prefix: "van der",
+          last_name: "Meulen",
+          locality: "Middelgein",
+          gender: "Male",
+        },
+        {
+          number: 5,
+          initials: "S.S.",
+          first_name: "Sijtze",
+          last_name: "Gopal",
+          locality: "'s Gravenveen",
+          gender: "Female",
+        },
+      ],
+    },
+    {
+      list_number: 2,
+      list_name: "GROEP 9",
+      list_seats: 4,
+      preferential_candidate_nomination: [
+        {
+          number: 1,
+          votes: 500,
+        },
+        {
+          number: 6,
+          votes: 450,
+        },
+        {
+          number: 3,
+          votes: 400,
+        },
+        {
+          number: 5,
+          votes: 350,
+        },
+      ],
+      other_candidate_nomination: [],
+      updated_candidate_ranking: [
+        {
+          number: 1,
+          initials: "L.L.",
+          last_name_prefix: "van",
+          last_name: "Bekking",
+          locality: "Eemstricht",
+          gender: "X",
+        },
+        {
+          number: 6,
+          initials: "O.",
+          last_name: "Bruins-Van den Kerk",
+          locality: "Eemstricht",
+          gender: "Female",
+        },
+        {
+          number: 3,
+          initials: "S.",
+          last_name: "Groenen",
+          locality: "Bloemstede",
+          gender: "Female",
+        },
+        {
+          number: 5,
+          initials: "F.W.",
+          last_name_prefix: "de",
+          last_name: "Vegt",
+          locality: "Eksterlo",
+          gender: "X",
+        },
+        {
+          number: 2,
+          initials: "W.",
+          last_name: "Oorschot",
+          locality: "Eksterlo",
+          gender: "Female",
+        },
+        {
+          number: 4,
+          initials: "W.",
+          last_name_prefix: "van",
+          last_name: "Bekking",
+          locality: "Juinen",
+          gender: "Male",
+        },
+      ],
+    },
+    {
+      list_number: 3,
+      list_name: "GROEP 10",
+      list_seats: 3,
+      preferential_candidate_nomination: [
+        {
+          number: 1,
+          votes: 400,
+        },
+        {
+          number: 6,
+          votes: 350,
+        },
+        {
+          number: 5,
+          votes: 300,
+        },
+      ],
+      other_candidate_nomination: [],
+      updated_candidate_ranking: [
+        {
+          number: 1,
+          initials: "Q.K.",
+          last_name: "Wolfswinkel",
+          locality: "Bloemstede",
+          gender: "X",
+        },
+        {
+          number: 6,
+          initials: "M.",
+          last_name_prefix: "van de",
+          last_name: "Kerkhof",
+          locality: "Huisden",
+          gender: "X",
+        },
+        {
+          number: 5,
+          initials: "K.",
+          last_name: "Aygün",
+          locality: "Bloemstede",
+          gender: "Male",
+        },
+        {
+          number: 2,
+          initials: "Q.",
+          last_name_prefix: "van der",
+          last_name: "Meulen",
+          locality: "Huisden",
+          gender: "X",
+        },
+        {
+          number: 3,
+          initials: "V.D.",
+          last_name_prefix: "de",
+          last_name: "Vegt",
+          locality: "Lekkum",
+          gender: "Female",
+        },
+        {
+          number: 4,
+          initials: "P.S.",
+          last_name: "Meulenkolk",
+          locality: "Bloemstede",
+          gender: "Male",
+        },
+      ],
+    },
+    {
+      list_number: 4,
+      list_name: "GROEP 11",
+      list_seats: 2,
+      preferential_candidate_nomination: [
+        {
+          number: 1,
+          votes: 300,
+        },
+      ],
+      other_candidate_nomination: [
+        {
+          number: 2,
+          votes: 150,
+        },
+      ],
+      updated_candidate_ranking: [],
+    },
+    {
+      list_number: 5,
+      list_name: "GROEP 12",
+      list_seats: 1,
+      preferential_candidate_nomination: [],
+      other_candidate_nomination: [
+        {
+          number: 1,
+          votes: 200,
+        },
+      ],
+      updated_candidate_ranking: [],
+    },
+  ],
+};
+
+export const election_summary: ElectionSummary = {
+  voters_counts: {
+    poll_card_count: 8900,
+    proxy_certificate_count: 0,
+    total_admitted_voters_count: 8900,
+  },
+  votes_counts: {
+    political_group_total_votes: [
+      {
+        number: 1,
+        total: 3100,
+      },
+      {
+        number: 2,
+        total: 2400,
+      },
+      {
+        number: 3,
+        total: 1500,
+      },
+      {
+        number: 4,
+        total: 1200,
+      },
+      {
+        number: 5,
+        total: 700,
+      },
+    ],
+    total_votes_candidates_count: 8900,
+    blank_votes_count: 0,
+    invalid_votes_count: 0,
+    total_votes_cast_count: 8900,
+  },
+  differences_counts: {
+    more_ballots_count: {
+      count: 0,
+      data_entry_sources: [],
+    },
+    fewer_ballots_count: {
+      count: 0,
+      data_entry_sources: [],
+    },
+  },
+  political_group_votes: [
+    {
+      number: 1,
+      total: 3100,
+      candidate_votes: [
+        {
+          number: 1,
+          votes: 600,
+        },
+        {
+          number: 2,
+          votes: 550,
+        },
+        {
+          number: 3,
+          votes: 500,
+        },
+        {
+          number: 4,
+          votes: 500,
+        },
+        {
+          number: 5,
+          votes: 400,
+        },
+        {
+          number: 6,
+          votes: 550,
+        },
+      ],
+    },
+    {
+      number: 2,
+      total: 2400,
+      candidate_votes: [
+        {
+          number: 1,
+          votes: 500,
+        },
+        {
+          number: 2,
+          votes: 350,
+        },
+        {
+          number: 3,
+          votes: 400,
+        },
+        {
+          number: 4,
+          votes: 350,
+        },
+        {
+          number: 5,
+          votes: 350,
+        },
+        {
+          number: 6,
+          votes: 450,
+        },
+      ],
+    },
+    {
+      number: 3,
+      total: 1500,
+      candidate_votes: [
+        {
+          number: 1,
+          votes: 400,
+        },
+        {
+          number: 2,
+          votes: 100,
+        },
+        {
+          number: 3,
+          votes: 200,
+        },
+        {
+          number: 4,
+          votes: 150,
+        },
+        {
+          number: 5,
+          votes: 300,
+        },
+        {
+          number: 6,
+          votes: 350,
+        },
+      ],
+    },
+    {
+      number: 4,
+      total: 1200,
+      candidate_votes: [
+        {
+          number: 1,
+          votes: 300,
+        },
+        {
+          number: 2,
+          votes: 150,
+        },
+        {
+          number: 3,
+          votes: 200,
+        },
+        {
+          number: 4,
+          votes: 200,
+        },
+        {
+          number: 5,
+          votes: 100,
+        },
+        {
+          number: 6,
+          votes: 250,
+        },
+      ],
+    },
+    {
+      number: 5,
+      total: 700,
+      candidate_votes: [
+        {
+          number: 1,
+          votes: 200,
+        },
+        {
+          number: 2,
+          votes: 100,
+        },
+        {
+          number: 3,
+          votes: 100,
+        },
+        {
+          number: 4,
+          votes: 100,
+        },
+        {
+          number: 5,
+          votes: 100,
+        },
+        {
+          number: 6,
+          votes: 100,
+        },
+      ],
+    },
+  ],
+  polling_station_investigations: {
+    admitted_voters_recounted: [],
+    investigated_other_reason: [],
+    ballots_recounted: [],
+  },
+  number_of_voters: 11639,
+};
+
+export const committee_session: CommitteeSession = {
+  id: 11,
+  number: 1,
+  election_id: 11,
+  status: "completed",
+  location: "",
+  start_date_time: "",
+};
+
+export const election: ElectionWithPoliticalGroups = {
+  id: 11,
+  name: "Election < 19 seats & Drawing lots, Candidate",
+  committee_category: "CSB",
+  election_id: "GR2026_Juinen",
+  location: "Juinen",
+  domain_id: "0035",
+  category: "Municipal",
+  number_of_seats: 15,
+  number_of_voters: 1,
+  election_date: "2026-03-18",
+  nomination_date: "2026-02-02",
+  political_groups: [
+    {
+      number: 1,
+      name: "GROEP 8",
+      candidates: [
+        {
+          number: 1,
+          initials: "J.",
+          first_name: "Jory",
+          last_name_prefix: "van",
+          last_name: "Bekking",
+          locality: "Huisden",
+          gender: "Male",
+        },
+        {
+          number: 2,
+          initials: "K.",
+          first_name: "Kris",
+          last_name: "Wiertz",
+          locality: "Huisden",
+          gender: "Male",
+        },
+        {
+          number: 3,
+          initials: "E.V.L.P.",
+          first_name: "Esra",
+          last_name_prefix: "van der",
+          last_name: "Meulen",
+          locality: "Middelgein",
+          gender: "Male",
+        },
+        {
+          number: 4,
+          initials: "C.O.V.",
+          first_name: "Cornelus",
+          last_name: "Boermans",
+          locality: "Bloemstede",
+          gender: "Female",
+        },
+        {
+          number: 5,
+          initials: "S.S.",
+          first_name: "Sijtze",
+          last_name: "Gopal",
+          locality: "'s Gravenveen",
+          gender: "Female",
+        },
+        {
+          number: 6,
+          initials: "T.E.",
+          first_name: "Tiemen",
+          last_name: "Arets",
+          locality: "'s Gravenveen",
+          gender: "Female",
+        },
+      ],
+    },
+    {
+      number: 2,
+      name: "GROEP 9",
+      candidates: [
+        {
+          number: 1,
+          initials: "L.L.",
+          last_name_prefix: "van",
+          last_name: "Bekking",
+          locality: "Eemstricht",
+          gender: "X",
+        },
+        {
+          number: 2,
+          initials: "W.",
+          last_name: "Oorschot",
+          locality: "Eksterlo",
+          gender: "Female",
+        },
+        {
+          number: 3,
+          initials: "S.",
+          last_name: "Groenen",
+          locality: "Bloemstede",
+          gender: "Female",
+        },
+        {
+          number: 4,
+          initials: "W.",
+          last_name_prefix: "van",
+          last_name: "Bekking",
+          locality: "Juinen",
+          gender: "Male",
+        },
+        {
+          number: 5,
+          initials: "F.W.",
+          last_name_prefix: "de",
+          last_name: "Vegt",
+          locality: "Eksterlo",
+          gender: "X",
+        },
+        {
+          number: 6,
+          initials: "O.",
+          last_name: "Bruins-Van den Kerk",
+          locality: "Eemstricht",
+          gender: "Female",
+        },
+      ],
+    },
+    {
+      number: 3,
+      name: "GROEP 10",
+      candidates: [
+        {
+          number: 1,
+          initials: "Q.K.",
+          last_name: "Wolfswinkel",
+          locality: "Bloemstede",
+          gender: "X",
+        },
+        {
+          number: 2,
+          initials: "Q.",
+          last_name_prefix: "van der",
+          last_name: "Meulen",
+          locality: "Huisden",
+          gender: "X",
+        },
+        {
+          number: 3,
+          initials: "V.D.",
+          last_name_prefix: "de",
+          last_name: "Vegt",
+          locality: "Lekkum",
+          gender: "Female",
+        },
+        {
+          number: 4,
+          initials: "P.S.",
+          last_name: "Meulenkolk",
+          locality: "Bloemstede",
+          gender: "Male",
+        },
+        {
+          number: 5,
+          initials: "K.",
+          last_name: "Aygün",
+          locality: "Bloemstede",
+          gender: "Male",
+        },
+        {
+          number: 6,
+          initials: "M.",
+          last_name_prefix: "van de",
+          last_name: "Kerkhof",
+          locality: "Huisden",
+          gender: "X",
+        },
+      ],
+    },
+    {
+      number: 4,
+      name: "GROEP 11",
+      candidates: [
+        {
+          number: 1,
+          initials: "Z.W.K.",
+          last_name: "Titulaer",
+          locality: "Hoek van Zoom",
+          gender: "X",
+        },
+        {
+          number: 2,
+          initials: "H.O.",
+          last_name_prefix: "den",
+          last_name: "Mateman",
+          locality: "Sluisdam",
+          gender: "Female",
+        },
+        {
+          number: 3,
+          initials: "L.Z.",
+          last_name_prefix: "van",
+          last_name: "Lent",
+          locality: "Heemdamseburg",
+          gender: "X",
+        },
+        {
+          number: 4,
+          initials: "T.C.",
+          last_name: "Philippen",
+          locality: "Middelgein",
+          gender: "X",
+        },
+        {
+          number: 5,
+          initials: "N.",
+          last_name: "Aygün",
+          locality: "Middelgein",
+          gender: "Male",
+        },
+        {
+          number: 6,
+          initials: "I.R.",
+          last_name: "Oorschot",
+          locality: "Sluisdam",
+          gender: "X",
+        },
+      ],
+    },
+    {
+      number: 5,
+      name: "GROEP 12",
+      candidates: [
+        {
+          number: 1,
+          initials: "D.L.E.",
+          last_name: "Prakken",
+          locality: "Heemdamseburg",
+          gender: "X",
+        },
+        {
+          number: 2,
+          initials: "U.",
+          last_name: "Wiertz",
+          locality: "Heemdamseburg",
+          gender: "Female",
+        },
+        {
+          number: 3,
+          initials: "L.",
+          last_name_prefix: "van de",
+          last_name: "Kerkhof",
+          locality: "'s Gravenveen",
+          gender: "Male",
+        },
+        {
+          number: 4,
+          initials: "S.S.",
+          last_name_prefix: "van",
+          last_name: "Jaspers-Gezen",
+          locality: "Juinen",
+          gender: "X",
+        },
+        {
+          number: 5,
+          initials: "G.",
+          last_name_prefix: "de",
+          last_name: "Vegt",
+          locality: "Bloemstede",
+          gender: "X",
+        },
+        {
+          number: 6,
+          initials: "P.L.V.I.",
+          last_name_prefix: "de",
+          last_name: "Vegt",
+          locality: "Huisden",
+          gender: "X",
+        },
+      ],
+    },
+  ],
+};

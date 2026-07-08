@@ -969,7 +969,7 @@ describe("ApportionmentPage", () => {
         expect(alerts[0]).toHaveTextContent(
           [
             "Loting noodzakelijk voor kandidaten met gelijk aantal voorkeursstemmen",
-            "3 Kandidaten van GROEP 9 hebben evenveel voorkeursstemmen gekregen. Er is nog 1 zetel beschikbaar. ",
+            "3 kandidaten van GROEP 9 hebben evenveel voorkeursstemmen gekregen. Er is nog 1 zetel beschikbaar. ",
             "In de wet staat dat de kandidaat met het hoogste aantal voorkeursstemmen de zetel krijgt.",
             "Hierdoor kan de zetel niet automatisch worden toegewezen. Het centraal stembureau moet een loting uitvoeren om te bepalen welke kandidaat gekozen wordt.",
           ].join(""),
@@ -1022,9 +1022,9 @@ describe("ApportionmentPage", () => {
         expect(alerts[0]).toHaveTextContent(
           [
             "Loting noodzakelijk voor kandidaten met gelijk aantal voorkeursstemmen",
-            "2 Kandidaten van GROEP 8 hebben evenveel voorkeursstemmen gekregen. Er zijn nog 2 zetels beschikbaar. ",
+            "2 kandidaten van GROEP 8 hebben evenveel voorkeursstemmen gekregen. Er zijn nog 2 zetels beschikbaar. ",
             "In de wet staat dat de kandidaten met het hoogste aantal voorkeursstemmen de zetels krijgen.",
-            "Hierdoor kan de zetel niet automatisch worden toegewezen. Het centraal stembureau moet een loting uitvoeren om te bepalen welke kandidaat gekozen wordt.",
+            "Hierdoor kunnen de zetels niet automatisch worden toegewezen. Het centraal stembureau moet een loting uitvoeren om te bepalen welke kandidaten gekozen worden.",
           ].join(""),
         );
         expect(within(alerts[0]).getByRole("link", { name: "Naar loting" })).toHaveAttribute("href", "/drawing-lots");

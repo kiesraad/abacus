@@ -170,7 +170,11 @@ function renderCandidatesDrawingLotsAlert(options: number[], list: string, num_s
         )}
       </p>
       <ul>
-        <li>{t("apportionment.drawing_lots_required_for_candidates_alert.drawing_lots_needed.singular")}</li>
+        <li>
+          {t(
+            `apportionment.drawing_lots_required_for_candidates_alert.drawing_lots_needed.${num_seats === 1 ? "singular" : "plural"}`,
+          )}
+        </li>
       </ul>
     </DrawingLotsWarningAlert>
   );

@@ -70,12 +70,12 @@
   "drawing_lots_required_for_candidates_alert": {
     "title": "Loting noodzakelijk voor kandidaten met gelijk aantal voorkeursstemmen",
     "description": {
-      "singular": "{num_candidates} Kandidaten van {list} hebben evenveel voorkeursstemmen gekregen. Er is nog {num_seats} zetel beschikbaar. In de wet staat dat de kandidaat met het hoogste aantal voorkeursstemmen de zetel krijgt.",
-      "plural": "{num_candidates} Kandidaten van {list} hebben evenveel voorkeursstemmen gekregen. Er zijn nog {num_seats} zetels beschikbaar. In de wet staat dat de kandidaten met het hoogste aantal voorkeursstemmen de zetels krijgen."
+      "singular": "{num_candidates} kandidaten van {list} hebben evenveel voorkeursstemmen gekregen. Er is nog {num_seats} zetel beschikbaar. In de wet staat dat de kandidaat met het hoogste aantal voorkeursstemmen de zetel krijgt.",
+      "plural": "{num_candidates} kandidaten van {list} hebben evenveel voorkeursstemmen gekregen. Er zijn nog {num_seats} zetels beschikbaar. In de wet staat dat de kandidaten met het hoogste aantal voorkeursstemmen de zetels krijgen."
     },
     "drawing_lots_needed": {
       "singular": "Hierdoor kan de zetel niet automatisch worden toegewezen. Het centraal stembureau moet een loting uitvoeren om te bepalen welke kandidaat gekozen wordt.",
-      "plural": "Hierdoor kan de zetel niet automatisch worden toegewezen. Het centraal stembureau moet een loting uitvoeren om te bepalen welke kandidaten gekozen worden."
+      "plural": "Hierdoor kunnen de zetels niet automatisch worden toegewezen. Het centraal stembureau moet een loting uitvoeren om te bepalen welke kandidaten gekozen worden."
     }
   },
   "drawing_lots_required_for_list_alert": {

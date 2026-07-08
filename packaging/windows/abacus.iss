@@ -78,15 +78,16 @@ Name: "{app}\{#MyBackupDirName}"
 [Icons]
 Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; IconFilename: "{app}\{#MyAppIcon}"
 Name: "{autodesktop}\1. Start {#MyAppName} server"; Filename: "{sys}\cmd.exe"; Parameters: "/k ""{app}\{#MyAppExeName}"""; WorkingDir: "{app}"; IconFilename: "{app}\{#MyAppIcon}"
-Name: "{autodesktop}\2. Open {#MyAppName} in browser"; Filename: "http://localhost"; IconFilename: "{app}\{#MyAppIcon}"
+Name: "{autodesktop}\2. Open {#MyAppName} in browser"; Filename: "https://localhost"; IconFilename: "{app}\{#MyAppIcon}"
 Name: "{autodesktop}\{#MyAppName} backups"; Filename: "{app}\{#MyBackupDirName}"; IconFilename: "{sys}\shell32.dll"; IconIndex: 3
 
 [Run]
 Filename: "{tmp}\VC_redist.x64.exe"; Parameters: "/install /passive /norestart"; StatusMsg: "Visual C++ Redistributable installeren..."
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
-Filename: "http://localhost"; Description: "Open Abacus Interface"; Flags: shellexec postinstall skipifsilent
+Filename: "https://localhost"; Description: "Open Abacus Interface"; Flags: shellexec postinstall skipifsilent
 
 [UninstallRun]
+Filename: "{sys}\certutil.exe"; Parameters: "-delstore root ""Abacus Local CA"""; Flags: runhidden; RunOnceId: "RemoveCaCert"
 Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall delete rule name=""Abacus server"" "; Flags: runhidden; RunOnceId: "RemoveFirewallExc"
 
 [Messages]
@@ -139,15 +140,32 @@ end;
 procedure CurStepChanged(CurStep: TSetupStep);
 var
   CmdLine: String;
+  CaCertPath: String;
+  ResultCode: Integer;
 begin
   if CurStep = ssPostInstall then
     begin
+      // Generate the CA by running non-elevated with `--init-tls`
+      if (not Exec(ExpandConstant('{app}\{#MyAppExeName}'),
+          '--init-tls --tls-dir "' + ExpandConstant('{app}\tls') + '"',
+          ExpandConstant('{app}'), SW_HIDE, ewWaitUntilTerminated, ResultCode))
+         or (ResultCode <> 0) then
+        MsgBox('Het aanmaken van het beveiligingscertificaat is mislukt (foutcode: '
+          + IntToStr(ResultCode) + ').'#13#10#13#10
+          + 'Installeer het beveiligingscertificaat handmatig volgens de gebruikershandleiding.',
+          mbError, MB_OK);
+
+      // Create firewall rule and import CA into machine root store.
+      CaCertPath := ExpandConstant('{app}\tls\ca.cer');
       CmdLine :=
         'netsh advfirewall firewall delete rule name="Abacus server" >nul 2>&1 & ' +
         'netsh advfirewall firewall add rule name="Abacus server" ' +
         'program="' + ExpandConstant('{app}\{#MyAppExeName}') + '" ' +
-        'protocol=TCP dir=in localport=80 action=allow';
-      RunElevatedCommandWithRetry(CmdLine, 'Het toevoegen van de firewallregel');
+        'protocol=TCP dir=in localport=80,443 action=allow';
+      // Import the CA only if it was generated.
+      if FileExists(CaCertPath) then
+        CmdLine := CmdLine + ' && certutil -f -addstore root "' + CaCertPath + '"';
+      RunElevatedCommandWithRetry(CmdLine, 'Het instellen van de firewall en het beveiligingscertificaat');
     end;
 end;
 
@@ -163,11 +181,12 @@ begin
                     0) of
         IDYES: begin
           DelTree(ExpandConstant('{userappdata}\{#MyAppName}'), True, True, True);
-          MsgBox('Database en backups zijn verwijderd', mbInformation, MB_OK);
+          MsgBox('Database en backups zijn verwijderd.', mbInformation, MB_OK);
         end;
-        IDNO: MsgBox('Database en backups worden behouden', mbInformation, MB_OK);
+        IDNO: MsgBox('Database en backups worden behouden.', mbInformation, MB_OK);
       end;
 
-      RunElevatedCommandWithRetry('netsh advfirewall firewall delete rule name="Abacus server"', 'Het verwijderen van de firewallregel');
+      // delete Abacus CA from the machine root store by name and delete firewall rule
+      RunElevatedCommandWithRetry('certutil -delstore root "Abacus Local CA" >nul 2>&1 & netsh advfirewall firewall delete rule name="Abacus server"', 'Het verwijderen van de firewallregel en het beveiligingscertificaat');
     end;
 end;

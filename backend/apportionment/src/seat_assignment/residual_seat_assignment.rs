@@ -1,4 +1,4 @@
-use std::{cmp::Ordering, fmt::Debug};
+use std::fmt::Debug;
 
 use tracing::{debug, info};
 
@@ -149,16 +149,15 @@ fn exhausted_list_numbers<T: ListVotes>(
     list_votes: &[T],
     deceased_candidates: &DeceasedCandidates<T>,
 ) -> Vec<T::ListNumber> {
-    let exhausted = standings
+    let exhausted: Vec<T::ListNumber> = standings
         .iter()
-        .fold(vec![], |mut list_numbers_without_empty_seats, s| {
-            let number_of_candidates =
-                get_number_of_candidates(list_votes, s.list_number(), deceased_candidates);
-            if number_of_candidates.cmp(&s.total_seats()) == Ordering::Equal {
-                list_numbers_without_empty_seats.push(s.list_number())
-            }
-            list_numbers_without_empty_seats
-        });
+        .filter(|s| {
+            get_number_of_candidates(list_votes, s.list_number(), deceased_candidates)
+                <= s.total_seats()
+        })
+        .map(|s| s.list_number())
+        .collect();
+
     if !exhausted.is_empty() {
         debug!("Exhausted lists in accordance with Article P 10 Kieswet: {exhausted:?}");
     }
@@ -884,14 +883,14 @@ mod tests {
         }
 
         #[test]
-        fn test_skips_lists_with_more_seats_than_candidates() {
-            // 2 full seats, 1 candidate: over-assigned instead of exactly exhausted
+        fn test_returns_lists_with_more_seats_than_candidates() {
+            // 2 full seats, 1 candidate
             let lists = [ListVotesMock::from_test_data_auto(1, vec![200])];
             let standings = [standing(1, 200)];
 
             assert_eq!(
                 exhausted_list_numbers(&standings, &lists, &HashMap::new()),
-                vec![]
+                vec![1]
             );
         }
     }

@@ -217,6 +217,7 @@ fn candidate_nomination_per_list<'a, LV: ListVotes>(
 }
 
 /// List and sort the candidate votes whose votes meet the preference threshold
+/// Only candidates which are above (>) the threshold are included
 fn candidate_votes_meeting_preference_threshold<'a, T: CandidateVotes>(
     preference_threshold: Fraction,
     candidate_votes: &[&'a T],
@@ -498,6 +499,81 @@ mod tests {
                 &list.candidate_votes()[4]
             ]
         );
+    }
+
+    mod candidate_votes_meeting_preference_threshold {
+        use crate::{
+            Fraction,
+            candidate_nomination::{
+                candidate_votes_meeting_preference_threshold, candidate_votes_numbers,
+            },
+            test_helpers::CandidateVotesMock,
+        };
+
+        #[test]
+        fn test_excludes_candidates_with_votes_at_or_below_the_threshold() {
+            let candidate_votes: Vec<_> = [
+                CandidateVotesMock(1, 51),
+                CandidateVotesMock(2, 50),
+                CandidateVotesMock(3, 49),
+            ]
+            .iter()
+            .collect();
+
+            let meeting = candidate_votes_meeting_preference_threshold(
+                Fraction::new(50, 1),
+                &candidate_votes,
+            );
+            assert_eq!(candidate_votes_numbers(&meeting), vec![1]);
+        }
+
+        #[test]
+        fn test_sorts_candidates_by_votes_descending() {
+            let candidate_votes: Vec<_> = [
+                CandidateVotesMock(1, 60),
+                CandidateVotesMock(2, 100),
+                CandidateVotesMock(3, 80),
+            ]
+            .iter()
+            .collect();
+
+            let meeting = candidate_votes_meeting_preference_threshold(
+                Fraction::new(50, 1),
+                &candidate_votes,
+            );
+            assert_eq!(candidate_votes_numbers(&meeting), vec![2, 3, 1]);
+        }
+
+        #[test]
+        fn test_keeps_candidate_order_for_equal_votes() {
+            let candidate_votes: Vec<_> = [
+                CandidateVotesMock(1, 80),
+                CandidateVotesMock(2, 100),
+                CandidateVotesMock(3, 80),
+            ]
+            .iter()
+            .collect();
+
+            // Candidates 1 and 3 have equal votes, so they keep their relative order
+            let meeting = candidate_votes_meeting_preference_threshold(
+                Fraction::new(50, 1),
+                &candidate_votes,
+            );
+            assert_eq!(candidate_votes_numbers(&meeting), vec![2, 1, 3]);
+        }
+
+        #[test]
+        fn test_returns_empty_when_no_candidate_meets_the_threshold() {
+            let candidate_votes: Vec<_> = [CandidateVotesMock(1, 10), CandidateVotesMock(2, 0)]
+                .iter()
+                .collect();
+
+            let meeting = candidate_votes_meeting_preference_threshold(
+                Fraction::new(50, 1),
+                &candidate_votes,
+            );
+            assert!(meeting.is_empty());
+        }
     }
 
     /// Candidate nomination with non-consecutive list and candidate numbers

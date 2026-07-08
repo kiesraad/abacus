@@ -101,12 +101,15 @@ pub fn assign_remainder<'b, T: ListVotes>(
     Ok(RemainderAssignment::Completed(steps, current_standings))
 }
 
-/// Get a vector with the list number that was assigned the last residual seat.  
-/// If the last residual seat was assigned to a list with the same
-/// remainder/votes per seat as lists assigned a seat in previous steps,
-/// return all list numbers that had the same remainder/votes per seat.
-fn list_assigned_from_previous_step<LN: Copy + Eq>(
-    selected_list: &ListStanding<LN>,
+/// Gets the list numbers that have been assigned a seat during consecutive
+/// assignment steps of the same type.
+///
+/// If the previous step is of the same [SeatChange] type (checked via `matcher`)
+/// and the `selected_list_number` was among the previous options (because it
+/// had the same remainder/votes per seat), the previous step `list_assigned` is
+/// taken as the starting point. `selected_list_number` is then appended.
+fn extend_list_assigned_from_previous_step<LN: Copy + Eq>(
+    selected_list_number: LN,
     previous_steps: &[SeatChangeStep<LN>],
     matcher: fn(&SeatChange<LN>) -> bool,
 ) -> Vec<LN> {
@@ -116,11 +119,11 @@ fn list_assigned_from_previous_step<LN: Copy + Eq>(
         && previous_step
             .change
             .list_options()
-            .contains(&selected_list.list_number())
+            .contains(&selected_list_number)
     {
         list_assigned = previous_step.change.list_assigned()
     }
-    list_assigned.push(selected_list.list_number());
+    list_assigned.push(selected_list_number);
     list_assigned
 }
 
@@ -568,8 +571,8 @@ fn step_assign_remainder_using_highest_averages<'a, 'b, LN: Copy + Debug + Eq + 
 
     let assigned_seat = HighestAverageAssignedSeat {
         selected_list_number: selected_list.list_number(),
-        list_assigned: list_assigned_from_previous_step(
-            selected_list,
+        list_assigned: extend_list_assigned_from_previous_step(
+            selected_list.list_number(),
             previous_steps,
             if unique {
                 SeatChange::is_changed_by_unique_highest_average_assignment
@@ -636,8 +639,8 @@ fn step_assign_remainder_using_largest_remainder<'a, 'b, LN: Copy + Debug + Eq>(
         Ok(ResidualSeat::SeatChange(
             SeatChange::LargestRemainderAssignment(LargestRemainderAssignedSeat {
                 selected_list_number: selected_list.list_number(),
-                list_assigned: list_assigned_from_previous_step(
-                    selected_list,
+                list_assigned: extend_list_assigned_from_previous_step(
+                    selected_list.list_number(),
                     previous_steps,
                     SeatChange::is_changed_by_largest_remainder_assignment,
                 ),
@@ -681,6 +684,25 @@ mod tests {
         )
     }
 
+    fn highest_average_step(
+        selected_list_number: u32,
+        list_options: Vec<u32>,
+        list_assigned: Vec<u32>,
+    ) -> SeatChangeStep<u32> {
+        SeatChangeStep {
+            residual_seat_number: None,
+            standings: vec![],
+            change: SeatChange::HighestAverageAssignment(HighestAverageAssignedSeat {
+                selected_list_number,
+                list_options,
+                list_assigned,
+                list_exhausted: vec![],
+                votes_per_seat: Fraction::ZERO,
+                drawing_lots: None,
+            }),
+        }
+    }
+
     fn unique_highest_average_step(list_number: u32) -> SeatChangeStep<u32> {
         SeatChangeStep {
             residual_seat_number: None,
@@ -722,6 +744,84 @@ mod tests {
                 list_assigned_seat,
                 drawing_lots: None,
             }),
+        }
+    }
+
+    mod extend_list_assigned_from_previous_step {
+        use super::*;
+
+        #[test]
+        fn test_returns_only_given_list_number_when_no_previous_steps() {
+            assert_eq!(
+                extend_list_assigned_from_previous_step(
+                    1,
+                    &[],
+                    SeatChange::is_changed_by_highest_average_assignment,
+                ),
+                vec![1]
+            );
+        }
+
+        #[test]
+        fn test_returns_only_given_list_number_when_last_step_does_not_match_type() {
+            let previous_steps = vec![unique_highest_average_step(1)];
+
+            assert_eq!(
+                extend_list_assigned_from_previous_step(
+                    1,
+                    &previous_steps,
+                    SeatChange::is_changed_by_highest_average_assignment,
+                ),
+                vec![1]
+            );
+        }
+
+        #[test]
+        fn test_returns_only_given_list_number_when_not_in_previous_step_options() {
+            let previous_steps = vec![highest_average_step(1, vec![1, 2], vec![1])];
+
+            assert_eq!(
+                extend_list_assigned_from_previous_step(
+                    3,
+                    &previous_steps,
+                    SeatChange::is_changed_by_highest_average_assignment,
+                ),
+                vec![3]
+            );
+        }
+
+        #[test]
+        fn test_returns_all_lists_when_selected_list_in_previous_step_options() {
+            let previous_steps = vec![
+                highest_average_step(1, vec![1, 2, 3], vec![1]),
+                highest_average_step(2, vec![2, 3], vec![1, 2]),
+            ];
+
+            assert_eq!(
+                extend_list_assigned_from_previous_step(
+                    3,
+                    &previous_steps,
+                    SeatChange::is_changed_by_highest_average_assignment,
+                ),
+                vec![1, 2, 3]
+            );
+        }
+
+        #[test]
+        fn test_only_considers_the_last_step() {
+            let previous_steps = vec![
+                highest_average_step(1, vec![1, 2], vec![1]),
+                largest_remainder_step(3),
+            ];
+
+            assert_eq!(
+                extend_list_assigned_from_previous_step(
+                    2,
+                    &previous_steps,
+                    SeatChange::is_changed_by_highest_average_assignment,
+                ),
+                vec![2]
+            );
         }
     }
 

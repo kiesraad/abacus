@@ -86,11 +86,16 @@ pub fn assign_remainder<'b, T: ListVotes>(
         list_standing.add_residual_seat();
 
         // add the update to the remainder assignment steps
-        steps.push(SeatChangeStep {
+        let step = SeatChangeStep {
             standings,
             residual_seat_number: Some(residual_seat_number),
             change,
-        });
+        };
+        assert_ne!(
+            step.standings, current_standings,
+            "standings should be different"
+        );
+        steps.push(step);
     }
 
     Ok(RemainderAssignment::Completed(steps, current_standings))

@@ -72,7 +72,8 @@ pub(crate) fn candidate_nomination<'a, L: ListVotes>(
 }
 
 /// Collect all chosen candidates via nomination with preferential votes and
-/// the other nominated candidates into one list
+/// the other nominated candidates into one list.
+/// Returns candidates in order of occurrence in the list votes, not nominations
 fn all_chosen_candidates<T: ListVotes>(
     list_votes: &[T],
     list_candidate_nomination: &[ListCandidateNomination<T>],
@@ -378,6 +379,110 @@ mod tests {
 
     use super::*;
     use crate::test_helpers::*;
+
+    mod all_chosen_candidates {
+        use crate::{
+            Candidate, CandidateRanking, ListCandidateNomination,
+            candidate_nomination::all_chosen_candidates, test_helpers::ListVotesMock,
+        };
+
+        #[test]
+        fn test_combines_preferential_and_other_nominations() {
+            let lists = [
+                ListVotesMock::from_test_data_auto(1, vec![100, 50, 25]),
+                ListVotesMock::from_test_data_auto(2, vec![80, 40]),
+            ];
+            let nominations = vec![
+                ListCandidateNomination {
+                    list_number: 1,
+                    list_seats: 2,
+                    preferential_candidate_nomination: vec![&lists[0].candidate_votes[0]],
+                    other_candidate_nomination: vec![&lists[0].candidate_votes[2]],
+                    candidate_ranking: CandidateRanking::Original(vec![1, 2, 3]),
+                },
+                ListCandidateNomination {
+                    list_number: 2,
+                    list_seats: 1,
+                    preferential_candidate_nomination: vec![&lists[1].candidate_votes[1]],
+                    other_candidate_nomination: vec![],
+                    candidate_ranking: CandidateRanking::Original(vec![1, 2]),
+                },
+            ];
+
+            assert_eq!(
+                all_chosen_candidates(&lists, &nominations),
+                vec![
+                    Candidate {
+                        list_number: 1,
+                        candidate_number: 1,
+                    },
+                    Candidate {
+                        list_number: 1,
+                        candidate_number: 3,
+                    },
+                    Candidate {
+                        list_number: 2,
+                        candidate_number: 2,
+                    },
+                ]
+            );
+        }
+
+        #[test]
+        fn test_returns_candidates_in_list_order() {
+            let lists = [ListVotesMock::from_test_data_auto(1, vec![100, 50, 25])];
+            let nominations = vec![ListCandidateNomination {
+                list_number: 1,
+                list_seats: 2,
+                preferential_candidate_nomination: vec![
+                    &lists[0].candidate_votes[2],
+                    &lists[0].candidate_votes[0],
+                ],
+                other_candidate_nomination: vec![&lists[0].candidate_votes[1]],
+                candidate_ranking: CandidateRanking::Updated(vec![3, 1, 2]),
+            }];
+
+            assert_eq!(
+                all_chosen_candidates(&lists, &nominations),
+                vec![
+                    Candidate {
+                        list_number: 1,
+                        candidate_number: 1,
+                    },
+                    Candidate {
+                        list_number: 1,
+                        candidate_number: 2,
+                    },
+                    Candidate {
+                        list_number: 1,
+                        candidate_number: 3,
+                    },
+                ]
+            );
+        }
+
+        #[test]
+        fn test_returns_empty_when_no_nominations() {
+            let lists = [ListVotesMock::from_test_data_auto(1, vec![100, 50])];
+            let nominations = vec![ListCandidateNomination {
+                list_number: 1,
+                list_seats: 0,
+                preferential_candidate_nomination: vec![],
+                other_candidate_nomination: vec![],
+                candidate_ranking: CandidateRanking::Original(vec![1, 2]),
+            }];
+
+            assert_eq!(all_chosen_candidates(&lists, &nominations), vec![]);
+        }
+
+        #[test]
+        #[should_panic(expected = "List candidate nomination should exist")]
+        fn test_panics_when_nomination_is_missing_for_a_list() {
+            let lists = [ListVotesMock::from_test_data_auto(1, vec![100])];
+
+            all_chosen_candidates::<ListVotesMock>(&lists, &[]);
+        }
+    }
 
     #[test]
     fn test_filter_out_deceased_candidates() {

@@ -64,6 +64,7 @@ const locationsWithAdminLinks: Locations = [
   { pathname: "/elections", userRole: "coordinator_gsb" },
   { pathname: "/users", userRole: "coordinator_gsb" },
   { pathname: "/logs", userRole: "coordinator_gsb" },
+  { pathname: "/backups", userRole: "coordinator_gsb" },
   { pathname: "/elections/1", userRole: "coordinator_gsb" },
 ];
 
@@ -76,6 +77,7 @@ export const NavBarWithAdminLinks: Story = {
     const numberOfVerkiezingenLinks = canvas.getAllByRole("link", { name: "Verkiezingen" }).length;
     const numberOfGebruikersLinks = canvas.getAllByRole("link", { name: "Gebruikers" }).length;
     const numberOfLogsLinks = canvas.getAllByRole("link", { name: "Logs" }).length;
+    const numberOfBackupsLinks = canvas.getAllByRole("link", { name: "Backups" }).length;
     const numberOfLogoutLinks = canvas.getAllByRole("link", { name: "Afmelden" }).length;
 
     await expect(numberOfVerkiezingenLinks, "number of links to 'Verkiezingen' does not match").toEqual(
@@ -83,9 +85,14 @@ export const NavBarWithAdminLinks: Story = {
     );
     await expect(numberOfGebruikersLinks, "number of links to 'Gebruikers' does not match").toEqual(numberOfLocations);
     await expect(numberOfLogsLinks, "number of links to 'Logs' does not match").toEqual(numberOfLocations);
+    await expect(numberOfBackupsLinks, "number of links to 'Backups' does not match").toEqual(numberOfLocations);
     await expect(numberOfLogoutLinks, "number of links to 'Afmelden' does not match").toEqual(numberOfLocations);
     await expect(totalNumberOfLinks, "sum of number of links does not match total number of links").toEqual(
-      numberOfVerkiezingenLinks + numberOfGebruikersLinks + numberOfLogsLinks + numberOfLogoutLinks,
+      numberOfVerkiezingenLinks +
+        numberOfGebruikersLinks +
+        numberOfLogsLinks +
+        numberOfBackupsLinks +
+        numberOfLogoutLinks,
     );
   },
 };

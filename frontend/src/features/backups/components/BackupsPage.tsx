@@ -10,7 +10,7 @@ import type { BackupResponse, CREATE_BACKUP_REQUEST_PATH } from "@/types/generat
 import { formatTime } from "@/utils/dateTime.ts";
 import cls from "./BackupsPage.module.css";
 
-const MIN_LOADING_MS = 600; // Time the loading state should at least remain visible
+const MIN_LOADING_MS = 1000; // Time the loading state should at least remain visible
 const BACKUP_PATH: CREATE_BACKUP_REQUEST_PATH = `/api/backup`;
 
 export function BackupsPage() {
@@ -50,10 +50,10 @@ export function BackupsPage() {
         <article>
           <h2>{t("backups.subtitle")}</h2>
 
-          {tx("backups.description")}
+          <div className="mb-lg">{tx("backups.description")}</div>
 
           {error && (
-            <Alert type="error" margin="mb-md-lg">
+            <Alert type="error" small margin="mb-lg">
               {"reference" in error ? t(`error.api_error.${error.reference}`) : error.message}
             </Alert>
           )}

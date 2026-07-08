@@ -37,7 +37,11 @@ pub fn assign_remainder<'b, T: ListVotes>(
 
     while residual_seat_number != total_residual_seats {
         let exhausted_list_numbers =
-            exhausted_list_numbers(&current_standings, exclude_exhausted_lists);
+            if let Some((list_votes, deceased_candidates)) = exclude_exhausted_lists {
+                exhausted_list_numbers(&current_standings, list_votes, deceased_candidates)
+            } else {
+                vec![]
+            };
 
         // Stop assigning when no list is eligible, either when every non-exhausted list has zero
         // votes or every list is exhausted. Any remaining seats will be reported as unassigned.
@@ -138,35 +142,23 @@ fn steps_of_type_assigning_to_list<LN: Copy + Eq>(
     })
 }
 
-/// Returns a vector with list numbers of which the same number of seats are assigned
-/// compared to the number of candidates.
-fn list_numbers_without_empty_seats<'a, T: ListVotes>(
-    standings: impl Iterator<Item = &'a ListStanding<T::ListNumber>>,
-    input_list_votes: &[T],
-    deceased_candidates: &DeceasedCandidates<T>,
-) -> Vec<T::ListNumber>
-where
-    T::ListNumber: 'a,
-{
-    standings.fold(vec![], |mut list_numbers_without_empty_seats, s| {
-        let number_of_candidates =
-            get_number_of_candidates(input_list_votes, s.list_number(), deceased_candidates);
-        if number_of_candidates.cmp(&s.total_seats()) == Ordering::Equal {
-            list_numbers_without_empty_seats.push(s.list_number())
-        }
-        list_numbers_without_empty_seats
-    })
-}
-
 /// Determine which lists are exhausted (have no empty seats left) under
 /// Artikel P 10 Kieswet.
 fn exhausted_list_numbers<T: ListVotes>(
     standings: &[ListStanding<T::ListNumber>],
-    exclude_exhausted_lists: Option<(&[T], &DeceasedCandidates<T>)>,
+    list_votes: &[T],
+    deceased_candidates: &DeceasedCandidates<T>,
 ) -> Vec<T::ListNumber> {
-    let exhausted = exclude_exhausted_lists.map_or_else(Vec::new, |(list_votes, deceased)| {
-        list_numbers_without_empty_seats(standings.iter(), list_votes, deceased)
-    });
+    let exhausted = standings
+        .iter()
+        .fold(vec![], |mut list_numbers_without_empty_seats, s| {
+            let number_of_candidates =
+                get_number_of_candidates(list_votes, s.list_number(), deceased_candidates);
+            if number_of_candidates.cmp(&s.total_seats()) == Ordering::Equal {
+                list_numbers_without_empty_seats.push(s.list_number())
+            }
+            list_numbers_without_empty_seats
+        });
     if !exhausted.is_empty() {
         debug!("Exhausted lists in accordance with Article P 10 Kieswet: {exhausted:?}");
     }
@@ -664,6 +656,7 @@ mod tests {
         seat_assignment::AbsoluteMajorityReassignedSeat,
         test_helpers::{CandidateVotesMock, ListVotesMock},
     };
+
     fn standing(list_number: u32, votes_cast: u32) -> ListStanding<u32> {
         ListStanding::new(
             &ListVotesMock {
@@ -831,6 +824,76 @@ mod tests {
         .collect();
         assert_eq!(steps_for_list_1.len(), 1);
         assert_eq!(steps_for_list_1[0].change.list_number_assigned(), 1);
+    }
+
+    mod exhausted_list_numbers {
+        use std::collections::{HashMap, HashSet};
+
+        use super::*;
+
+        #[test]
+        fn test_returns_empty_when_there_are_no_standings() {
+            assert_eq!(
+                exhausted_list_numbers::<ListVotesMock>(&[], &[], &HashMap::new()),
+                vec![]
+            );
+        }
+
+        #[test]
+        fn test_returns_lists_with_as_many_seats_as_candidates() {
+            let lists = [
+                // 1 full seat, 2 candidates: not exhausted
+                ListVotesMock::from_test_data_auto(1, vec![100, 0]),
+                // 1 full seat, 1 candidate: exhausted
+                ListVotesMock::from_test_data_auto(2, vec![100]),
+                // 0 full seats, 1 candidate: not exhausted
+                ListVotesMock::from_test_data_auto(3, vec![50]),
+            ];
+            let standings = [standing(1, 100), standing(2, 100), standing(3, 50)];
+
+            assert_eq!(
+                exhausted_list_numbers(&standings, &lists, &HashMap::new()),
+                vec![2]
+            );
+        }
+
+        #[test]
+        fn test_counts_residual_seats_towards_exhaustion() {
+            let lists = [ListVotesMock::from_test_data_auto(1, vec![100, 0])];
+            let mut standings = [standing(1, 100)];
+            // 1 full seat and 1 residual seat, total of 2 candidates
+            standings[0].add_residual_seat();
+
+            assert_eq!(
+                exhausted_list_numbers(&standings, &lists, &HashMap::new()),
+                vec![1]
+            );
+        }
+
+        #[test]
+        fn test_deceased_candidates_reduce_the_number_of_candidates() {
+            // 1 full seat and 2 candidates, but candidate 2 is deceased
+            let lists = [ListVotesMock::from_test_data_auto(1, vec![100, 0])];
+            let standings = [standing(1, 100)];
+            let deceased = HashMap::from([(1, HashSet::from([2]))]);
+
+            assert_eq!(
+                exhausted_list_numbers(&standings, &lists, &deceased),
+                vec![1]
+            );
+        }
+
+        #[test]
+        fn test_skips_lists_with_more_seats_than_candidates() {
+            // 2 full seats, 1 candidate: over-assigned instead of exactly exhausted
+            let lists = [ListVotesMock::from_test_data_auto(1, vec![200])];
+            let standings = [standing(1, 200)];
+
+            assert_eq!(
+                exhausted_list_numbers(&standings, &lists, &HashMap::new()),
+                vec![]
+            );
+        }
     }
 
     #[test]

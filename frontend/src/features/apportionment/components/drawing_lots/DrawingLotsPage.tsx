@@ -60,11 +60,7 @@ function renderListSection(
         isPoliticalGroupList(options) ? (
           <DrawingLotsForList drawingLotsRequired={state.drawing_lots_required} options={options} />
         ) : isListDrawingLotsVariant(state, ["AbsoluteMajorityLargestRemainder", "AbsoluteMajorityHighestAverage"]) ? (
-          <DrawingLotsForP9
-            drawingLotsRequired={state.drawing_lots_required}
-            options={state.drawing_lots_required.options}
-            assign_to={state.drawing_lots_required.assign_to}
-          />
+          <DrawingLotsForP9 drawingLotsRequired={state.drawing_lots_required} />
         ) : (
           isCandidateDrawingLots(state) &&
           isCandidateList(options) && (

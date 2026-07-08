@@ -895,6 +895,98 @@ mod tests {
         }
     }
 
+    mod list_standings_qualifying_for_largest_remainder {
+        use super::*;
+
+        #[test]
+        fn test_excludes_lists_without_votes() {
+            let standings = [standing(1, 100), standing(2, 0)];
+
+            let qualifying: Vec<_> =
+                list_standings_qualifying_for_largest_remainder(&standings, &[], &[]).collect();
+            assert_eq!(list_numbers(&qualifying), vec![1]);
+        }
+
+        #[test]
+        fn test_excludes_lists_below_the_remainder_threshold() {
+            // remainder_threshold = 75 (75% of quota)
+            let standings = [standing(1, 76), standing(2, 75), standing(3, 74)];
+
+            let qualifying: Vec<_> =
+                list_standings_qualifying_for_largest_remainder(&standings, &[], &[]).collect();
+            assert_eq!(list_numbers(&qualifying), vec![1, 2]);
+        }
+
+        #[test]
+        fn test_excludes_exhausted_lists() {
+            let standings = [standing(1, 100), standing(2, 100)];
+
+            let qualifying: Vec<_> =
+                list_standings_qualifying_for_largest_remainder(&standings, &[], &[2]).collect();
+            assert_eq!(list_numbers(&qualifying), vec![1]);
+        }
+
+        #[test]
+        fn test_excludes_lists_already_assigned_a_largest_remainder_seat() {
+            let standings = [standing(1, 100), standing(2, 100)];
+            let previous_steps = vec![largest_remainder_step(1)];
+
+            let qualifying: Vec<_> =
+                list_standings_qualifying_for_largest_remainder(&standings, &previous_steps, &[])
+                    .collect();
+            assert_eq!(list_numbers(&qualifying), vec![2]);
+        }
+    }
+
+    mod list_standings_qualifying_for_unique_highest_average {
+        use super::*;
+
+        #[test]
+        fn test_excludes_lists_without_votes() {
+            let standings = [standing(1, 100), standing(2, 0)];
+
+            let qualifying: Vec<_> =
+                list_standings_qualifying_for_unique_highest_average(&standings, &[], &[])
+                    .collect();
+            assert_eq!(list_numbers(&qualifying), vec![1]);
+        }
+
+        #[test]
+        fn test_does_not_apply_the_remainder_threshold() {
+            // remainder_threshold = 75 (75% of quota)
+            let standings = [standing(1, 74)];
+
+            let qualifying: Vec<_> =
+                list_standings_qualifying_for_unique_highest_average(&standings, &[], &[])
+                    .collect();
+            assert_eq!(list_numbers(&qualifying), vec![1]);
+        }
+
+        #[test]
+        fn test_excludes_exhausted_lists() {
+            let standings = [standing(1, 100), standing(2, 100)];
+
+            let qualifying: Vec<_> =
+                list_standings_qualifying_for_unique_highest_average(&standings, &[], &[2])
+                    .collect();
+            assert_eq!(list_numbers(&qualifying), vec![1]);
+        }
+
+        #[test]
+        fn test_excludes_lists_already_assigned_a_unique_highest_average_seat() {
+            let standings = [standing(1, 100), standing(2, 100)];
+            let previous_steps = vec![unique_highest_average_step(1)];
+
+            let qualifying: Vec<_> = list_standings_qualifying_for_unique_highest_average(
+                &standings,
+                &previous_steps,
+                &[],
+            )
+            .collect();
+            assert_eq!(list_numbers(&qualifying), vec![2]);
+        }
+    }
+
     #[test]
     #[expect(clippy::too_many_lines)]
     fn test_lists_qualifying_for_highest_average() {

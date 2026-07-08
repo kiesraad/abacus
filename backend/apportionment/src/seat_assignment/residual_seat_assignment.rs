@@ -127,18 +127,15 @@ fn extend_list_assigned_from_previous_step<LN: Copy + Eq>(
     list_assigned
 }
 
-/// Returns the number of seats assigned with largest remainder method.
-fn list_largest_remainder_assigned_seats<LN: Copy + Eq>(
+/// Returns an iterator with steps of the given type and given list_number_assigned
+fn steps_of_type_assigning_to_list<LN: Copy + Eq>(
     previous_steps: &[SeatChangeStep<LN>],
+    matcher: fn(&SeatChange<LN>) -> bool,
     list_number: LN,
-) -> usize {
-    previous_steps
-        .iter()
-        .filter(|prev| {
-            prev.change.is_changed_by_largest_remainder_assignment()
-                && prev.change.list_number_assigned() == list_number
-        })
-        .count()
+) -> impl Iterator<Item = &SeatChangeStep<LN>> {
+    previous_steps.iter().filter(move |step| {
+        matcher(&step.change) && step.change.list_number_assigned() == list_number
+    })
 }
 
 /// Returns a vector with list numbers of which the same number of seats are assigned
@@ -182,8 +179,12 @@ fn list_qualifies_for_extra_seat<LN: Copy + Eq>(
     list_number: LN,
     check_for_unique_highest_average_seats: bool,
 ) -> bool {
-    let number_of_seats_largest_remainders =
-        list_largest_remainder_assigned_seats(previous_steps, list_number);
+    let number_of_seats_largest_remainders = steps_of_type_assigning_to_list(
+        previous_steps,
+        SeatChange::is_changed_by_largest_remainder_assignment,
+        list_number,
+    )
+    .count();
 
     // A list qualifies for an extra seat if in a previous step, a seat has been removed
     // due to absolute majority reassignment, and that that seat has then been removed due
@@ -195,8 +196,12 @@ fn list_qualifies_for_extra_seat<LN: Copy + Eq>(
 
     // In case of unique highest average assignment
     if check_for_unique_highest_average_seats {
-        let number_of_seats_unique_highest_averages =
-            list_unique_highest_average_assigned_seats(previous_steps, list_number);
+        let number_of_seats_unique_highest_averages = steps_of_type_assigning_to_list(
+            previous_steps,
+            SeatChange::is_changed_by_unique_highest_average_assignment,
+            list_number,
+        )
+        .count();
         // If no unique highest average seat has been assigned to this list
         // or (the unique highest average assigned seat has been retracted,
         // and no largest remainder seat has been retracted and reassigned)
@@ -251,21 +256,6 @@ fn list_standings_qualifying_for_unique_highest_average<'a, LN: Copy + Eq>(
             && !exhausted_list_numbers.contains(&s.list_number())
             && list_qualifies_for_extra_seat(previous_steps, s.list_number(), true)
     })
-}
-
-/// Returns the number of seats assigned with unique highest averages method.
-fn list_unique_highest_average_assigned_seats<LN: Copy + Eq>(
-    previous_steps: &[SeatChangeStep<LN>],
-    list_number: LN,
-) -> usize {
-    previous_steps
-        .iter()
-        .filter(|prev| {
-            prev.change
-                .is_changed_by_unique_highest_average_assignment()
-                && prev.change.list_number_assigned() == list_number
-        })
-        .count()
 }
 
 enum ListStandings<'a, LN> {
@@ -823,6 +813,24 @@ mod tests {
                 vec![2]
             );
         }
+    }
+
+    #[test]
+    fn test_steps_of_type_assigning_to_list() {
+        let previous_steps = vec![
+            highest_average_step(1, vec![1, 2], vec![1]),
+            largest_remainder_step(2),
+            highest_average_step(2, vec![2, 3], vec![1, 2]),
+        ];
+
+        let steps_for_list_1: Vec<_> = steps_of_type_assigning_to_list(
+            &previous_steps,
+            SeatChange::is_changed_by_highest_average_assignment,
+            1,
+        )
+        .collect();
+        assert_eq!(steps_for_list_1.len(), 1);
+        assert_eq!(steps_for_list_1[0].change.list_number_assigned(), 1);
     }
 
     #[test]

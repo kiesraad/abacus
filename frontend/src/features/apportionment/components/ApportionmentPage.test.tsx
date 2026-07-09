@@ -650,7 +650,7 @@ describe("ApportionmentPage", () => {
       if (alerts[1]) {
         expect(alerts[1]).toHaveClass(alertCls.notify!);
         expect(alerts[1]).toHaveTextContent(
-          "Restzetel 2 kon niet automatisch worden toegewezen en is na loting toegekend aan Lijst 4 - Algemene Lijst.",
+          "Restzetel 2 kon niet automatisch worden toegewezen en is na loting toegekend aan Lijst 4 - Algemene Lijst (er is geloot tussen lijst 2, 3, 4, 5 en 6).",
         );
         expect(alerts[1]).toHaveTextContent("Er zijn nog 2 restzetels te verdelen.");
         expect(within(alerts[1]).getByRole("link", { name: "Bekijk details" })).toHaveAttribute(
@@ -720,8 +720,12 @@ describe("ApportionmentPage", () => {
         expect(alerts[1]).toHaveTextContent(
           "Sommige restzetels konden niet automatisch worden toegewezen en zijn via loting toegekend:",
         );
-        expect(alerts[1]).toHaveTextContent("Restzetel 2 is toegekend aan Lijst 4 - Algemene Lijst");
-        expect(alerts[1]).toHaveTextContent("Restzetel 3 is toegekend aan Lijst 6 - Lijst van stemmers");
+        expect(alerts[1]).toHaveTextContent(
+          "Restzetel 2 is toegekend aan Lijst 4 - Algemene Lijst(er is geloot tussen lijst 2, 3, 4, 5 en 6)",
+        );
+        expect(alerts[1]).toHaveTextContent(
+          "Restzetel 3 is toegekend aan Lijst 6 - Lijst van stemmers(er is geloot tussen lijst 2, 3, 5 en 6)",
+        );
         expect(alerts[1]).toHaveTextContent("Er is nog 1 restzetel te verdelen.");
         expect(within(alerts[1]).getByRole("link", { name: "Bekijk details" })).toHaveAttribute(
           "href",
@@ -920,7 +924,7 @@ describe("ApportionmentPage", () => {
 
       expect(alerts[1]).toHaveClass(alertCls.notify!);
       expect(alerts[1]).toHaveTextContent(
-        "De laatste restzetel voor lijst 1 (artikel P 9) is na loting afgestaan door Lijst 7 - Partij van de Keuze",
+        "De laatste restzetel voor lijst 1 (artikel P 9) is na loting afgestaan door Lijst 7 - Partij van de Keuze (er is geloot tussen lijst 6 en 7)",
       );
 
       const apportionment_table = await screen.findByTestId("apportionment-table");

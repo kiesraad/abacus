@@ -39,6 +39,7 @@ export function getNotAssignedSeatsText(notAssignedSeats: number) {
 export interface ListAssignedByDrawingLots {
   residual_seat_number: number;
   name: string;
+  options: number[];
 }
 
 export function getAssignedByDrawingLotsStep(
@@ -58,6 +59,7 @@ export function getAssignedByDrawingLotsStep(
         politicalGroups.find((pg) => pg.number === step.change.selected_list_number),
         true,
       ),
+      options: step.change.list_options,
     };
   }
   return undefined;
@@ -66,6 +68,7 @@ export function getAssignedByDrawingLotsStep(
 export interface SeatReassignedByDrawingLots {
   assigned_to: number;
   retracted_from: string;
+  options: number[];
 }
 
 export function getSeatReassignedByDrawingLotsStep(
@@ -80,6 +83,7 @@ export function getSeatReassignedByDrawingLotsStep(
           politicalGroups.find((pg) => pg.number === step.change.list_retracted_seat),
           true,
         ),
+        options: step.change.drawing_lots.options,
       };
     }
   }
@@ -89,6 +93,7 @@ export function getSeatReassignedByDrawingLotsStep(
 export interface ListCandidateDrawn {
   seat_number: number;
   candidate: string;
+  options: number[];
 }
 
 export function getListCandidatesDrawn(
@@ -104,7 +109,8 @@ export function getListCandidatesDrawn(
         if (seat_number && drawn_candidate) {
           listCandidatesDrawn.push({
             seat_number: seat_number,
-            candidate: getCandidateFullName(drawn_candidate, true),
+            candidate: `${drawn_candidate.number}. ${getCandidateFullName(drawn_candidate, true)}`,
+            options: lot_drawn.variant.options,
           });
         }
       }

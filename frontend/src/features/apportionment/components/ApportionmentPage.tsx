@@ -19,9 +19,9 @@ import type {
   SeatAssignment,
 } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
+import { formatPoliticalGroupName } from "@/utils/politicalGroup";
 import { getNumberOfCandidates } from "@/utils/politicalGroups";
 import { formatList } from "@/utils/strings";
-import { formatPoliticalGroupName } from "../../../utils/politicalGroup";
 import { useApportionmentContext } from "../hooks/useApportionmentContext";
 import {
   type AbsoluteMajorityReassignmentLists,
@@ -217,6 +217,7 @@ function renderNotifyDrawingLotsAlert(
                 {tx("apportionment.assigned_by_drawing_lots_alert.singular", undefined, {
                   nr: list.residual_seat_number,
                   list: list.name,
+                  options: formatList(list.options, t("and")),
                 })}
               </span>
             ))}
@@ -231,6 +232,7 @@ function renderNotifyDrawingLotsAlert(
                     {tx("apportionment.assigned_by_drawing_lots_alert.plural.assigned_to", undefined, {
                       nr: list.residual_seat_number,
                       list: list.name,
+                      options: formatList(list.options, t("and")),
                     })}
                   </li>
                 ))}
@@ -243,6 +245,7 @@ function renderNotifyDrawingLotsAlert(
             {tx("apportionment.reassigned_by_drawing_lots_alert", undefined, {
               assigned_to: seatReassignedByDrawingLots.assigned_to,
               retracted_from: seatReassignedByDrawingLots.retracted_from,
+              options: formatList(seatReassignedByDrawingLots.options, t("and")),
             })}
           </p>
         )}

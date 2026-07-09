@@ -8,17 +8,17 @@
   "apportionment_already_calculated": "De zetelverdeling is al berekend.",
   "article_p10": "(Kieswet, artikel P 10)",
   "assigned_by_drawing_lots_alert": {
-    "singular": "Restzetel {nr} kon niet automatisch worden toegewezen en is na loting toegekend aan <strong>{list}</strong>.",
+    "singular": "Restzetel {nr} kon niet automatisch worden toegewezen en is na loting toegekend aan <strong>{list}</strong> (er is geloot tussen lijst {options}).",
     "plural": {
       "title": "Sommige restzetels konden niet automatisch worden toegewezen en zijn via loting toegekend:",
-      "assigned_to": "Restzetel {nr} is toegekend aan <strong>{list}</strong>"
+      "assigned_to": "Restzetel {nr} is toegekend aan <strong>{list}</strong>\n(er is geloot tussen lijst {options})"
     }
   },
   "assigned_by_drawing_lots_to_candidate_alert": {
-    "singular": "Zetel {seat_number} is na loting toegewezen aan <strong>{candidate}</strong>",
+    "singular": "Zetel {seat_number} is na loting toegewezen aan kandidaat <strong>{candidate}</strong> (er is geloot tussen kandidaat {options})",
     "plural": {
       "title": "Sommige zetels konden niet automatisch worden toegewezen en zijn via loting toegekend:",
-      "assigned_to": "Zetel {seat_number} is toegewezen aan <strong>{candidate}</strong>"
+      "assigned_to": "Zetel {seat_number} is toegewezen aan kandidaat <strong>{candidate}</strong>\n(er is geloot tussen kandidaat {options})"
     }
   },
   "assigned_number_of_seats": "Toegewezen aantal zetels",
@@ -164,7 +164,7 @@
   "ranking_candidates": "Rangschikking van kandidaten voor opvolging",
   "ranking_candidates_empty": "Geen enkele kandidaat is niet gekozen.",
   "ranking_candidates_info": "De volgende kandidaten hebben geen zetel toegewezen gekregen. Als een zetel vrijkomt wordt deze via de onderstaande volgorde aan opvolgers toegewezen.",
-  "reassigned_by_drawing_lots_alert": "De laatste restzetel voor lijst {assigned_to} (artikel P 9) is na loting afgestaan door <strong>{retracted_from}</strong>",
+  "reassigned_by_drawing_lots_alert": "De laatste restzetel voor lijst {assigned_to} (artikel P 9) is na loting afgestaan door <strong>{retracted_from}</strong> (er is geloot tussen lijst {options})",
   "redo_apportionment": "Doe dan de zetelverdeling opnieuw",
   "redo_apportionment_button": "Zetelverdeling opnieuw doen",
   "remainder": "Overschot",

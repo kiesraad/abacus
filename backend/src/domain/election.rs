@@ -273,7 +273,7 @@ fn political_group_name(registered_name: &str, candidates: &[Candidate]) -> Stri
         if let Some(last_name_prefix) = &first_candidate.last_name_prefix {
             last_name.push_str(&format!(
                 "{} {}",
-                last_name_prefix, &first_candidate.last_name
+                last_name_prefix, first_candidate.last_name
             ));
         } else {
             last_name.push_str(&first_candidate.last_name.to_string());
@@ -281,7 +281,7 @@ fn political_group_name(registered_name: &str, candidates: &[Candidate]) -> Stri
 
         name.push_str(&format!(
             "Blanco ({}, {})",
-            &last_name, &first_candidate.initials
+            last_name, first_candidate.initials
         ));
         name
     } else {

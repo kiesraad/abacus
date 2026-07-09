@@ -292,7 +292,7 @@ pub async fn committee_session_update(
         return Err(CommitteeSessionError::InvalidDetails.into());
     }
 
-    let date_time_str = format!("{}T{}", &request.start_date, &request.start_time);
+    let date_time_str = format!("{}T{}", request.start_date, request.start_time);
     let date_time = match NaiveDateTime::parse_from_str(&date_time_str, "%Y-%m-%dT%H:%M") {
         Ok(date) => date,
         Err(_) => {

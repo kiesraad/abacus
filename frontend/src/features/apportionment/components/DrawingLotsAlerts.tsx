@@ -8,10 +8,11 @@ import { getNotAssignedSeats, getNotAssignedSeatsText, isListDrawingLotsVariant 
 import cls from "./Apportionment.module.css";
 
 export interface DrawingLotsWarningAlertProps {
+  withoutResidualSeatsLink?: boolean;
   children: ReactNode;
 }
 
-export function DrawingLotsWarningAlert({ children }: DrawingLotsWarningAlertProps) {
+export function DrawingLotsWarningAlert({ withoutResidualSeatsLink = false, children }: DrawingLotsWarningAlertProps) {
   return (
     <FormLayout.Alert>
       <Alert type="warning">
@@ -20,9 +21,11 @@ export function DrawingLotsWarningAlert({ children }: DrawingLotsWarningAlertPro
           <Button.Link size="md" to="./drawing-lots">
             {t("apportionment.to_drawing_lots")}
           </Button.Link>
-          <Button.Link variant="secondary" size="md" to="./details-residual-seats">
-            {t("apportionment.details_residual_seats_allocation")}
-          </Button.Link>
+          {!withoutResidualSeatsLink && (
+            <Button.Link variant="secondary" size="md" to="./details-residual-seats">
+              {t("apportionment.details_residual_seats_allocation")}
+            </Button.Link>
+          )}
         </div>
       </Alert>
     </FormLayout.Alert>

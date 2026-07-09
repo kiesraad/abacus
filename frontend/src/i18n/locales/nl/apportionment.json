@@ -14,6 +14,13 @@
       "assigned_to": "Restzetel {nr} is toegekend aan <strong>{list}</strong>"
     }
   },
+  "assigned_by_drawing_lots_to_candidate_alert": {
+    "singular": "Zetel {seat_number} is na loting toegewezen aan <strong>{candidate}</strong>",
+    "plural": {
+      "title": "Sommige zetels konden niet automatisch worden toegewezen en zijn via loting toegekend:",
+      "assigned_to": "Zetel {seat_number} is toegewezen aan <strong>{candidate}</strong>"
+    }
+  },
   "assigned_number_of_seats": "Toegewezen aantal zetels",
   "average": "Gemiddelde",
   "average_number": "gemiddeld aantal",
@@ -24,6 +31,12 @@
   "data_entry_finished": "Invoerfase afgerond",
   "details_residual_seats_allocation": "Details restzetelverdeling",
   "drawing_lots": "Loting",
+  "drawing_lots_for_candidate": {
+    "title": "Loting voor kandidaten met evenveel stemmen",
+    "candidates_for_drawing_lots": "Er zijn {num_candidates} kandidaten die op basis van hun voorkeursstemmen in aanmerking komen voor zetel {seat_number}. Zij hebben allen {votes} stemmen. Het gaat om de kandidaten:",
+    "hence_drawing_lots_is_needed": "Daarom moet er geloot worden wie zetel {seat_number} krijgt",
+    "total_seats": "{list} heeft {total_seats} zetels"
+  },
   "drawing_lots_for_list": {
     "title": "Loting voor restzetel {number}",
     "hence_drawing_lots_is_needed": "Daarom moet er geloot worden welke lijst de restzetel krijgt",
@@ -50,10 +63,21 @@
   },
   "drawing_lots_instructions": {
     "title": "Instructies voor loting",
-    "description": "De loting wordt uitgevoerd op papier, in aanwezigheid van alle leden van het centraal stembureau. Waarnemers mogen meekijken."
+    "description": "De loting vindt buiten Abacus plaats, in aanwezigheid van alle leden van het centraal stembureau. Waarnemers mogen meekijken. Voer het resultaat hieronder in."
   },
   "drawing_lots_necessary": "Loting noodzakelijk",
   "drawing_lots_needed": "Loting nodig",
+  "drawing_lots_required_for_candidates_alert": {
+    "title": "Loting noodzakelijk voor kandidaten met gelijk aantal voorkeursstemmen",
+    "description": {
+      "singular": "{num_candidates} kandidaten van {list} hebben evenveel voorkeursstemmen gekregen. Er is nog {num_seats} zetel beschikbaar. In de wet staat dat de kandidaat met het hoogste aantal voorkeursstemmen de zetel krijgt.",
+      "plural": "{num_candidates} kandidaten van {list} hebben evenveel voorkeursstemmen gekregen. Er zijn nog {num_seats} zetels beschikbaar. In de wet staat dat de kandidaten met het hoogste aantal voorkeursstemmen de zetels krijgen."
+    },
+    "drawing_lots_needed": {
+      "singular": "Hierdoor kan de zetel niet automatisch worden toegewezen. Het centraal stembureau moet een loting uitvoeren om te bepalen welke kandidaat gekozen wordt.",
+      "plural": "Hierdoor kunnen de zetels niet automatisch worden toegewezen. Het centraal stembureau moet een loting uitvoeren om te bepalen welke kandidaten gekozen worden."
+    }
+  },
   "drawing_lots_required_for_list_alert": {
     "title": {
       "singular": "Loting noodzakelijk voor toekennen restzetel",
@@ -73,6 +97,7 @@
   },
   "drawing_lots_result": {
     "title": "Resultaat loting",
+    "which_candidate_gets_the_seat": "Welke kandidaat krijgt de zetel?",
     "which_list_gets_a_residual_seat": "Welke partij krijgt de restzetel?",
     "which_list_has_to_give_up_a_seat": "Welke partij moet een restzetel afstaan?"
   },

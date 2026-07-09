@@ -6,13 +6,10 @@ use sqlx::SqlitePool;
 
 use crate::{
     APIError, ErrorResponse, SqlitePoolExt,
-    domain::apportionment_state::ApportionmentState,
-    domain::election::ElectionId,
+    domain::{apportionment_state::ApportionmentState, election::ElectionId},
     infra::audit_log::AuditService,
-    repository,
-    repository::{election_repo, user_repo::User},
-    service,
-    service::update_apportionment_state,
+    repository::{committee_session_repo, election_repo, user_repo::User},
+    service::{delete_committee_session_files, update_apportionment_state},
 };
 
 /// Reset apportionment state
@@ -47,10 +44,8 @@ pub async fn reset_apportionment_state(
             .await?;
 
     let committee_session =
-        repository::committee_session_repo::get_election_committee_session(&mut tx, election_id)
-            .await?;
-    service::delete_committee_session_files(&mut tx, audit_service.clone(), committee_session.id)
-        .await?;
+        committee_session_repo::get_election_committee_session(&mut tx, election_id).await?;
+    delete_committee_session_files(&mut tx, audit_service.clone(), committee_session.id).await?;
 
     tx.commit().await?;
 
@@ -63,14 +58,14 @@ mod tests {
     use test_log::test;
 
     use super::*;
-    use crate::domain::file::FileType;
-    use crate::repository::file_repo;
     use crate::{
         domain::{
             apportionment_state::ApportionmentState, committee_session::CommitteeSessionId,
-            committee_session_status::CommitteeSessionStatus, role::Role,
+            committee_session_status::CommitteeSessionStatus, file::FileType, role::Role,
         },
-        repository::{apportionment_state_repo, committee_session_repo, user_repo::UserId},
+        repository::{
+            apportionment_state_repo, committee_session_repo, file_repo, user_repo::UserId,
+        },
     };
 
     #[test(sqlx::test(fixtures(

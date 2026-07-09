@@ -233,7 +233,7 @@ describe("ApportionmentPage", () => {
       ["Aantal raadszetels", "15", ""],
       ["Kiesdeler", "80", "Benodigde stemmen per volle zetel"],
       ["Voorkeursdrempel", "40", "50% van de kiesdeler"],
-      ["Kandidaten voor zetelverdeling", "44 - 0 † = 44", "Beheer overleden kandidaten"],
+      ["Kandidaten voor zetelverdeling", "44", "Beheer overleden kandidaten"],
     ]);
 
     expect(await screen.findByRole("heading", { level: 2, name: "Zetelverdeling" })).toBeVisible();

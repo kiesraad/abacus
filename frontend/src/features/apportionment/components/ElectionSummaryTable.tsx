@@ -35,6 +35,16 @@ function formatVotePercentage(count: number, total: number): string {
   return count > 0 ? formatPercentage(count, total) : "";
 }
 
+function renderNumberOfCandidatesCalculation(deceasedCandidatesInfo: DeceasedCandidatesInfo) {
+  return (
+    <>
+      {formatNumber(deceasedCandidatesInfo.numberOfCandidates)} - {deceasedCandidatesInfo.numberOfDeceasedCandidates}
+      <span className="superscript">&nbsp;&dagger;</span> ={" "}
+      {formatNumber(deceasedCandidatesInfo.numberOfCandidates - deceasedCandidatesInfo.numberOfDeceasedCandidates)}
+    </>
+  );
+}
+
 export function ElectionSummaryTable({
   votesCounts,
   seats,
@@ -125,12 +135,9 @@ export function ElectionSummaryTable({
             {t("apportionment.candidates_for_apportionment")}
           </Table.HeaderCell>
           <Table.NumberCell>
-            {formatNumber(deceasedCandidatesInfo.numberOfCandidates)} -{" "}
-            {deceasedCandidatesInfo.numberOfDeceasedCandidates}
-            <span className="superscript">&nbsp;&dagger;</span> ={" "}
-            {formatNumber(
-              deceasedCandidatesInfo.numberOfCandidates - deceasedCandidatesInfo.numberOfDeceasedCandidates,
-            )}
+            {deceasedCandidatesInfo.numberOfDeceasedCandidates > 0
+              ? renderNumberOfCandidatesCalculation(deceasedCandidatesInfo)
+              : formatNumber(deceasedCandidatesInfo.numberOfCandidates)}
           </Table.NumberCell>
           <Table.Cell className="fs-sm">
             <Button.Link variant="underlined" size="md" to={deceasedCandidatesInfo.deceasedCandidatesLink}>

@@ -357,7 +357,7 @@ describe("ApportionmentListDetailsPage", () => {
       if (alerts[0]) {
         expect(alerts[0]).toHaveClass(alertCls.notify!);
         expect(alerts[0]).toHaveTextContent(
-          "Zetel 4 is na loting toegewezen aan kandidaat 5. De Vegt, F.W. (er is geloot tussen kandidaat 2, 4 en 5)",
+          "Zetel 4 is na loting toegewezen aan Kandidaat 5 – De Vegt, F.W. (er is geloot tussen kandidaat 2, 4 en 5)",
         );
       }
       const preferentially_chosen_candidates_table = await screen.findByTestId(
@@ -439,10 +439,10 @@ describe("ApportionmentListDetailsPage", () => {
           "Sommige zetels konden niet automatisch worden toegewezen en zijn via loting toegekend:",
         );
         expect(alerts[0]).toHaveTextContent(
-          "Zetel 2 is toegewezen aan kandidaat 6. Arets, T.E. (Tiemen)(er is geloot tussen kandidaat 2 en 6)",
+          "Zetel 2 is toegewezen aan Kandidaat 6 – Arets, T.E. (Tiemen)(er is geloot tussen kandidaat 2 en 6)",
         );
         expect(alerts[0]).toHaveTextContent(
-          "Zetel 4 is toegewezen aan kandidaat 4. Boermans, C.O.V. (Cornelus)(er is geloot tussen kandidaat 3 en 4)",
+          "Zetel 4 is toegewezen aan Kandidaat 4 – Boermans, C.O.V. (Cornelus)(er is geloot tussen kandidaat 3 en 4)",
         );
       }
       const preferentially_chosen_candidates_table = await screen.findByTestId(

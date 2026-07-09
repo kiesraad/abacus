@@ -15,10 +15,10 @@
     }
   },
   "assigned_by_drawing_lots_to_candidate_alert": {
-    "singular": "Zetel {seat_number} is na loting toegewezen aan kandidaat <strong>{candidate}</strong> (er is geloot tussen kandidaat {options})",
+    "singular": "Zetel {seat_number} is na loting toegewezen aan <strong>{candidate}</strong> (er is geloot tussen kandidaat {options})",
     "plural": {
       "title": "Sommige zetels konden niet automatisch worden toegewezen en zijn via loting toegekend:",
-      "assigned_to": "Zetel {seat_number} is toegewezen aan kandidaat <strong>{candidate}</strong>\n(er is geloot tussen kandidaat {options})"
+      "assigned_to": "Zetel {seat_number} is toegewezen aan <strong>{candidate}</strong>\n(er is geloot tussen kandidaat {options})"
     }
   },
   "assigned_number_of_seats": "Toegewezen aantal zetels",

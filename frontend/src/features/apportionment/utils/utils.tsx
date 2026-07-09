@@ -109,7 +109,7 @@ export function getListCandidatesDrawn(
         if (seat_number && drawn_candidate) {
           listCandidatesDrawn.push({
             seat_number: seat_number,
-            candidate: `${drawn_candidate.number}. ${getCandidateFullName(drawn_candidate, true)}`,
+            candidate: `${t("candidate.title.singular")} ${drawn_candidate.number} – ${getCandidateFullName(drawn_candidate, true)}`,
             options: lot_drawn.variant.options,
           });
         }

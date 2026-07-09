@@ -437,7 +437,7 @@ mod tests {
                     // replace path parameters with (dummy) values
                     if let Some(parameters) = operation.parameters.as_ref() {
                         for param in parameters {
-                            path = path.replace(&format!("{{{}}}", &param.name), "1");
+                            path = path.replace(&format!("{{{}}}", param.name), "1");
                         }
                     }
 

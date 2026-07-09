@@ -3,7 +3,6 @@ import { PageTitle } from "@/components/page_title/PageTitle";
 import { t } from "@/i18n/translate";
 import type {
   ApportionmentState,
-  Candidate,
   DrawingLotsRequired,
   ListDrawingLotsVariant,
   PoliticalGroup,
@@ -160,28 +159,6 @@ export function isCandidateDrawingLots(state: ApportionmentState | undefined): s
   drawing_lots_required: Extract<DrawingLotsRequired, { type: "CandidateDrawingLotsRequired" }>;
 } {
   return state?.type === "DrawingLots" && state.drawing_lots_required.type === "CandidateDrawingLotsRequired";
-}
-
-export function isCandidate(option: Candidate | PoliticalGroup): option is Candidate {
-  return "last_name" in option;
-}
-
-export function isCandidateList(options: Candidate[] | PoliticalGroup[]): options is Candidate[] {
-  for (const option of options) {
-    if (!("last_name" in option)) {
-      return false;
-    }
-  }
-  return true;
-}
-
-export function isPoliticalGroupList(options: Candidate[] | PoliticalGroup[]): options is PoliticalGroup[] {
-  for (const option of options) {
-    if (!("candidates" in option)) {
-      return false;
-    }
-  }
-  return true;
 }
 
 export function getNotAssignedSeats(state: ApportionmentState | undefined) {

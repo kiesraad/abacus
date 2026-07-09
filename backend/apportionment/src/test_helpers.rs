@@ -11,6 +11,7 @@ use crate::{
     structs::{CandidateDrawn, ListDrawingLotsVariant, ListDrawn},
 };
 
+#[derive(Debug)]
 pub struct ApportionmentInputMock {
     pub number_of_seats: u32,
     pub list_votes: Vec<ListVotesMock>,
@@ -92,6 +93,7 @@ impl ListVotesMock {
     }
 }
 
+#[derive(Debug)]
 pub struct ListDrawnMock {
     pub variant: ListDrawingLotsVariant<u32>,
     pub drawn: u32,

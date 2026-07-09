@@ -3,21 +3,16 @@ import * as ReactRouter from "react-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
+import alertCls from "@/components/ui/Alert/Alert.module.css";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { Providers } from "@/testing/Providers";
 import { overrideOnce } from "@/testing/server";
 import { expectErrorPage, render, screen, setupTestRouter, waitFor } from "@/testing/test-utils";
 import type { ApportionmentState, ElectionApportionmentResponse, ErrorResponse } from "@/types/generated/openapi";
-
 import { apportionmentRoutes } from "../../routes";
-import {
-  candidate_nomination,
-  committee_session,
-  election,
-  election_summary,
-  seat_assignment,
-} from "../../testing/lt-19-seats";
+import * as lt19Seats from "../../testing/lt-19-seats";
+import * as lt19SeatsAndP15DrawingLots from "../../testing/lt-19-seats-and-p15-drawing-lots";
 import { ApportionmentProvider } from "../ApportionmentProvider";
 import { ApportionmentListDetailsPage } from "./ApportionmentListDetailsPage";
 
@@ -34,7 +29,7 @@ const renderApportionmentListDetailsPage = (electionId: number) =>
 
 describe("ApportionmentListDetailsPage", () => {
   beforeEach(() => {
-    overrideOnce("get", "/api/elections/3", 200, getElectionMockData(election, committee_session));
+    overrideOnce("get", "/api/elections/3", 200, getElectionMockData(lt19Seats.election, lt19Seats.committee_session));
     overrideOnce("get", "/api/elections/3/apportionment/state", 200, {
       deceased_candidates: [
         { pg_number: 1, candidate_number: 12 },
@@ -46,9 +41,9 @@ describe("ApportionmentListDetailsPage", () => {
       type: "Finalised",
     } satisfies ApportionmentState);
     overrideOnce("post", "/api/elections/3/apportionment", 200, {
-      seat_assignment: seat_assignment,
-      candidate_nomination: candidate_nomination,
-      election_summary: election_summary,
+      seat_assignment: lt19Seats.seat_assignment,
+      candidate_nomination: lt19Seats.candidate_nomination,
+      election_summary: lt19Seats.election_summary,
       warnings: [],
     } satisfies ElectionApportionmentResponse);
   });
@@ -317,9 +312,195 @@ describe("ApportionmentListDetailsPage", () => {
     ]);
   });
 
+  describe("Drawing lots candidates", () => {
+    beforeEach(() => {
+      overrideOnce(
+        "get",
+        "/api/elections/11",
+        200,
+        getElectionMockData(lt19SeatsAndP15DrawingLots.election, lt19SeatsAndP15DrawingLots.committee_session),
+      );
+      overrideOnce("post", "/api/elections/11/apportionment", 200, {
+        seat_assignment: lt19SeatsAndP15DrawingLots.seat_assignment,
+        candidate_nomination: lt19SeatsAndP15DrawingLots.candidate_nomination,
+        election_summary: lt19SeatsAndP15DrawingLots.election_summary,
+        warnings: [],
+      } satisfies ElectionApportionmentResponse);
+      overrideOnce(
+        "get",
+        "/api/elections/11/apportionment/state",
+        200,
+        lt19SeatsAndP15DrawingLots.state_after_three_drawing_lots_candidates_assigned,
+      );
+    });
+
+    test("Render tables and alert assigned after drawing 1 lot", async () => {
+      vi.spyOn(ReactRouter, "useParams").mockReturnValue({ listNumber: "2" });
+
+      renderApportionmentListDetailsPage(11);
+
+      expect(await screen.findByRole("heading", { level: 1, name: "Lijst 2 - GROEP 9" })).toBeVisible();
+
+      expect(await screen.findByRole("heading", { level: 2, name: "Toegewezen aantal zetels" })).toBeVisible();
+      expect(await screen.findByTestId("text-list-assigned-nr-seats")).toHaveTextContent(
+        "Lijst 2 - GROEP 9 heeft 4 zetels toegewezen gekregen.",
+      );
+
+      expect(
+        await screen.findByRole("heading", { level: 2, name: "Met voorkeursstemmen gekozen kandidaten" }),
+      ).toBeVisible();
+      expect(await screen.findByTestId("text-preferentially-chosen-candidates")).toHaveTextContent(
+        "De volgende kandidaten zijn met voorkeursstemmen gekozen. Deze kandidaten hebben meer dan 50% van de kiesdeler gehaald.",
+      );
+      const alerts = await screen.findAllByRole("alert");
+      expect(alerts).toHaveLength(1);
+      if (alerts[0]) {
+        expect(alerts[0]).toHaveClass(alertCls.notify!);
+        expect(alerts[0]).toHaveTextContent("Zetel 4 is na loting toegewezen aan De Vegt, F.W.");
+      }
+      const preferentially_chosen_candidates_table = await screen.findByTestId(
+        "preferentially-chosen-candidates-table",
+      );
+      expect(preferentially_chosen_candidates_table).toBeVisible();
+      expect(preferentially_chosen_candidates_table).toHaveTableContent([
+        ["Zetel", "Naam", "Woonplaats", "Aantal stemmen"],
+        ["1", "Van Bekking, L.L. (x)", "Eemstricht", "500"],
+        ["2", "Bruins-Van den Kerk, O. (v)", "Eemstricht", "450"],
+        ["3", "Groenen, S. (v)", "Bloemstede", "400"],
+        ["4", "De Vegt, F.W. (x)", "Eksterlo", "350"],
+      ]);
+
+      expect(
+        await screen.findByRole("heading", {
+          level: 2,
+          name: "Kandidaten die gekozen zijn vanwege hun positie op de lijst",
+        }),
+      ).toBeVisible();
+      expect(await screen.findByTestId("text-other-chosen-candidates")).toHaveTextContent(
+        "Geen enkele kandidaat is zonder voorkeursstemmen gekozen.",
+      );
+      expect(screen.queryByTestId("other-chosen-candidates-table")).not.toBeInTheDocument();
+
+      expect(
+        await screen.findByRole("heading", { level: 2, name: "Rangschikking van kandidaten voor opvolging" }),
+      ).toBeVisible();
+      expect(await screen.findByTestId("text-ranking-candidates")).toHaveTextContent(
+        "De volgende kandidaten hebben geen zetel toegewezen gekregen. Als een zetel vrijkomt wordt deze via de onderstaande volgorde aan opvolgers toegewezen.",
+      );
+      const candidates_ranking_table = await screen.findByTestId("candidates-ranking-table");
+      expect(candidates_ranking_table).toBeVisible();
+      expect(candidates_ranking_table).toHaveTableContent([
+        ["Rang", "Naam", "Woonplaats", "Positie op lijst"],
+        ["1", "Oorschot, W. (v)", "Eksterlo", "2"],
+        ["2", "Van Bekking, W. (m)", "Juinen", "4"],
+      ]);
+
+      expect(
+        await screen.findByRole("heading", { level: 2, name: "Totaal aantal stemmen per kandidaat" }),
+      ).toBeVisible();
+      const total_votes_per_candidate_table = await screen.findByTestId("total-votes-per-candidate-table");
+      expect(total_votes_per_candidate_table).toBeVisible();
+      expect(total_votes_per_candidate_table).toHaveTableContent([
+        ["Nummer", "Kandidaat", "Woonplaats", "Aantal stemmen"],
+        ["1", "Van Bekking, L.L. (x)", "Eemstricht", "500"],
+        ["2", "Oorschot, W. (v)", "Eksterlo", "350"],
+        ["3", "Groenen, S. (v)", "Bloemstede", "400"],
+        ["4", "Van Bekking, W. (m)", "Juinen", "350"],
+        ["5", "De Vegt, F.W. (x)", "Eksterlo", "350"],
+        ["6", "Bruins-Van den Kerk, O. (v)", "Eemstricht", "450"],
+      ]);
+    });
+
+    test("Render tables and alert assigned after drawing 2 lots", async () => {
+      vi.spyOn(ReactRouter, "useParams").mockReturnValue({ listNumber: "1" });
+
+      renderApportionmentListDetailsPage(11);
+
+      expect(await screen.findByRole("heading", { level: 1, name: "Lijst 1 - GROEP 8" })).toBeVisible();
+
+      expect(await screen.findByRole("heading", { level: 2, name: "Toegewezen aantal zetels" })).toBeVisible();
+      expect(await screen.findByTestId("text-list-assigned-nr-seats")).toHaveTextContent(
+        "Lijst 1 - GROEP 8 heeft 5 zetels toegewezen gekregen.",
+      );
+
+      expect(
+        await screen.findByRole("heading", { level: 2, name: "Met voorkeursstemmen gekozen kandidaten" }),
+      ).toBeVisible();
+      expect(await screen.findByTestId("text-preferentially-chosen-candidates")).toHaveTextContent(
+        "De volgende kandidaten zijn met voorkeursstemmen gekozen. Deze kandidaten hebben meer dan 50% van de kiesdeler gehaald.",
+      );
+      const alerts = await screen.findAllByRole("alert");
+      expect(alerts).toHaveLength(1);
+      if (alerts[0]) {
+        expect(alerts[0]).toHaveClass(alertCls.notify!);
+        expect(alerts[0]).toHaveTextContent(
+          "Sommige zetels konden niet automatisch worden toegewezen en zijn via loting toegekend:",
+        );
+        expect(alerts[0]).toHaveTextContent("Zetel 2 is toegewezen aan Arets, T.E. (Tiemen)");
+        expect(alerts[0]).toHaveTextContent("Zetel 4 is toegewezen aan Boermans, C.O.V. (Cornelus)");
+      }
+      const preferentially_chosen_candidates_table = await screen.findByTestId(
+        "preferentially-chosen-candidates-table",
+      );
+      expect(preferentially_chosen_candidates_table).toBeVisible();
+      expect(preferentially_chosen_candidates_table).toHaveTableContent([
+        ["Zetel", "Naam", "Woonplaats", "Aantal stemmen"],
+        ["1", "Van Bekking, J. (Jory) (m)", "Huisden", "600"],
+        ["2", "Arets, T.E. (Tiemen) (v)", "'s Gravenveen", "550"],
+        ["3", "Wiertz, K. (Kris) (m)", "Huisden", "550"],
+        ["4", "Boermans, C.O.V. (Cornelus) (v)", "Bloemstede", "500"],
+        ["5", "Van der Meulen, E.V.L.P. (Esra) (m)", "Middelgein", "500"],
+      ]);
+
+      expect(
+        await screen.findByRole("heading", {
+          level: 2,
+          name: "Kandidaten die gekozen zijn vanwege hun positie op de lijst",
+        }),
+      ).toBeVisible();
+      expect(await screen.findByTestId("text-other-chosen-candidates")).toHaveTextContent(
+        "Geen enkele kandidaat is zonder voorkeursstemmen gekozen.",
+      );
+      expect(screen.queryByTestId("other-chosen-candidates-table")).not.toBeInTheDocument();
+
+      expect(
+        await screen.findByRole("heading", { level: 2, name: "Rangschikking van kandidaten voor opvolging" }),
+      ).toBeVisible();
+      expect(await screen.findByTestId("text-ranking-candidates")).toHaveTextContent(
+        "De volgende kandidaten hebben geen zetel toegewezen gekregen. Als een zetel vrijkomt wordt deze via de onderstaande volgorde aan opvolgers toegewezen.",
+      );
+      const candidates_ranking_table = await screen.findByTestId("candidates-ranking-table");
+      expect(candidates_ranking_table).toBeVisible();
+      expect(candidates_ranking_table).toHaveTableContent([
+        ["Rang", "Naam", "Woonplaats", "Positie op lijst"],
+        ["1", "Gopal, S.S. (Sijtze) (v)", "'s Gravenveen", "5"],
+      ]);
+
+      expect(
+        await screen.findByRole("heading", { level: 2, name: "Totaal aantal stemmen per kandidaat" }),
+      ).toBeVisible();
+      const total_votes_per_candidate_table = await screen.findByTestId("total-votes-per-candidate-table");
+      expect(total_votes_per_candidate_table).toBeVisible();
+      expect(total_votes_per_candidate_table).toHaveTableContent([
+        ["Nummer", "Kandidaat", "Woonplaats", "Aantal stemmen"],
+        ["1", "Van Bekking, J. (Jory) (m)", "Huisden", "600"],
+        ["2", "Wiertz, K. (Kris) (m)", "Huisden", "550"],
+        ["3", "Van der Meulen, E.V.L.P. (Esra) (m)", "Middelgein", "500"],
+        ["4", "Boermans, C.O.V. (Cornelus) (v)", "Bloemstede", "500"],
+        ["5", "Gopal, S.S. (Sijtze) (v)", "'s Gravenveen", "400"],
+        ["6", "Arets, T.E. (Tiemen) (v)", "'s Gravenveen", "550"],
+      ]);
+    });
+  });
+
   describe("Apportionment not yet available", () => {
     beforeEach(() => {
-      overrideOnce("get", "/api/elections/3", 200, getElectionMockData(election, committee_session));
+      overrideOnce(
+        "get",
+        "/api/elections/3",
+        200,
+        getElectionMockData(lt19Seats.election, lt19Seats.committee_session),
+      );
       overrideOnce("get", "/api/elections/3/apportionment/state", 200, {
         type: "Uninitialised",
       } satisfies ApportionmentState);

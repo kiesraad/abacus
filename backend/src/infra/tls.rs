@@ -14,8 +14,8 @@ use rustls_pki_types::{CertificateDer, PrivateKeyDer, PrivatePkcs8KeyDer, pem::P
 
 use crate::AppError;
 
-const CA_CERT_PEM: &str = "ca.pem";
-const CA_CERT_DER: &str = "ca.cer";
+pub const CA_CERT_PEM: &str = "ca.pem";
+pub const CA_CERT_DER: &str = "ca.cer";
 const CA_KEY_DER: &str = "ca-key.der";
 
 fn tls_err<E: core::fmt::Debug>(e: E) -> AppError {
@@ -28,6 +28,13 @@ fn tls_err<E: core::fmt::Debug>(e: E) -> AppError {
 pub struct CaCertificate {
     pub pem: String,
     pub der: Vec<u8>,
+}
+
+impl CaCertificate {
+    /// SHA-256 fingerprint of the CA certificate (colon-separated hex).
+    pub fn sha256_fingerprint(&self) -> String {
+        fingerprint(&self.der)
+    }
 }
 
 /// TLS certificates: the local CA and leaf certificate and the leaf private key
@@ -51,14 +58,20 @@ impl TlsCertificates {
     }
 }
 
-/// Load or generate the CA and create a new leaf certificate
-pub fn load_or_generate(tls_dir: &Path) -> Result<TlsCertificates, AppError> {
+/// Create the TLS directory (if missing) and lock it down to the owner on unix.
+fn ensure_tls_dir(tls_dir: &Path) -> Result<(), AppError> {
     fs::create_dir_all(tls_dir)?;
     #[cfg(unix)]
     {
         use std::os::unix::fs::PermissionsExt;
         fs::set_permissions(tls_dir, fs::Permissions::from_mode(0o700))?;
     }
+    Ok(())
+}
+
+/// Load or generate the CA and create a new leaf certificate
+pub fn load_or_generate(tls_dir: &Path) -> Result<TlsCertificates, AppError> {
+    ensure_tls_dir(tls_dir)?;
 
     let (issuer, ca) = load_or_generate_ca(tls_dir)?;
     let (leaf_cert, leaf_key) = create_leaf(&issuer, &get_subjects())?;
@@ -67,6 +80,14 @@ pub fn load_or_generate(tls_dir: &Path) -> Result<TlsCertificates, AppError> {
         leaf_cert,
         leaf_key,
     })
+}
+
+/// Ensure the TLS directory and persisted CA exist, without creating a leaf certificate.
+/// Used by `--init-tls`, the Windows installer runs this before importing the CA.
+pub fn init_ca(tls_dir: &Path) -> Result<CaCertificate, AppError> {
+    ensure_tls_dir(tls_dir)?;
+    let (_issuer, ca) = load_or_generate_ca(tls_dir)?;
+    Ok(ca)
 }
 
 /// Load the persisted local CA or generate and persist a new one.
@@ -299,8 +320,54 @@ mod tests {
             second.leaf_cert.as_ref(),
             "each call creates a fresh leaf"
         );
+    }
 
-        // clean up
-        dir.close().expect("temporary directory is cleaned up");
+    /// Test that `init_ca` persists the CA (and only the CA, no leaf) and reuses it on a second call
+    #[test]
+    fn init_ca_persists_and_reuses() {
+        let dir = tempfile::tempdir().unwrap();
+        let tls_dir = dir.path().join("tls");
+
+        let first = init_ca(&tls_dir).unwrap();
+
+        // exactly the three CA files exist; no leaf certificate was persisted
+        for file in [CA_CERT_PEM, CA_CERT_DER, CA_KEY_DER] {
+            assert!(tls_dir.join(file).exists(), "{file} should be persisted");
+        }
+        assert_eq!(
+            fs::read_dir(&tls_dir).unwrap().count(),
+            3,
+            "only the three CA files should exist, no leaf"
+        );
+
+        // ca.cer matches the returned DER
+        assert_eq!(fs::read(tls_dir.join(CA_CERT_DER)).unwrap(), first.der);
+
+        // fingerprint: 64 hex chars + 31 colons = 95 chars
+        let fp = first.sha256_fingerprint();
+        assert_eq!(fp.len(), 95, "fingerprint should be 95 chars");
+        assert!(
+            fp.chars()
+                .all(|c| c.is_ascii_uppercase() || c.is_ascii_digit() || c == ':'),
+            "fingerprint should be uppercase colon-separated hex, got {fp}"
+        );
+
+        // check file permissions
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            let key_mode = fs::metadata(tls_dir.join(CA_KEY_DER))
+                .unwrap()
+                .permissions()
+                .mode()
+                & 0o777;
+            assert_eq!(key_mode, 0o600, "the CA private key must be private");
+            let dir_mode = fs::metadata(&tls_dir).unwrap().permissions().mode() & 0o777;
+            assert_eq!(dir_mode, 0o700, "the tls directory must be private");
+        }
+
+        // a second call reuses the same persisted CA
+        let second = init_ca(&tls_dir).unwrap();
+        assert_eq!(first.der, second.der, "CA persists across runs");
     }
 }

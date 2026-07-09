@@ -446,9 +446,7 @@ mod tests {
             vec![540, 160, 160, 80, 80, 80, 60, 40],
         );
 
-        input.list_votes.iter_mut().for_each(|lv| {
-            lv.candidate_votes.reverse();
-        });
+        input.list_votes[1].candidate_votes.reverse();
 
         assert_matches!(process(&input), Err(ApportionmentError::UnsortedInput));
     }

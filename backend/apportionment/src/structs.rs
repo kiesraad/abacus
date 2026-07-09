@@ -21,6 +21,7 @@ pub type CandidateNumber<LV> = <<LV as ListVotes>::Cv as CandidateVotes>::Candid
 pub enum ApportionmentError {
     InvalidLotDrawing(String),
     InvalidState(String),
+    UnsortedInput,
 }
 
 /// Different variants of drawing lots for lists, with all the information needed to do the drawing
@@ -192,7 +193,7 @@ pub struct ApportionmentDetails<'a, T: ListVotes> {
 
 pub trait ListVotes: PartialEq + Debug {
     type Cv: CandidateVotes;
-    type ListNumber: Copy + Debug + Eq + Hash;
+    type ListNumber: Copy + Debug + Eq + PartialOrd + Hash;
 
     fn number(&self) -> Self::ListNumber;
     fn total_votes(&self) -> u32 {
@@ -205,7 +206,7 @@ pub trait ListVotes: PartialEq + Debug {
 }
 
 pub trait CandidateVotes: PartialEq + Debug {
-    type CandidateNumber: Copy + Debug + Eq + Hash;
+    type CandidateNumber: Copy + Debug + Eq + PartialOrd + Hash;
 
     fn number(&self) -> Self::CandidateNumber;
     fn votes(&self) -> u32;

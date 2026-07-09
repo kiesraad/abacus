@@ -535,7 +535,9 @@ describe("DrawingLotsPage", () => {
     );
     expect(listitems[2]).toHaveTextContent("2. Wiertz, K. (Kris)");
     expect(listitems[3]).toHaveTextContent("6. Arets, T.E. (Tiemen)");
-    expect(listitems[4]).toHaveTextContent("Daarom moet er geloot worden wie zetel 2 krijgt");
+    expect(listitems[4]).toHaveTextContent(
+      "Volgens artikel P 15 van de Kieswet moet er geloot worden wie zetel 2 krijgt",
+    );
 
     expect(await screen.findByRole("heading", { level: 3, name: "Instructies voor loting" })).toBeVisible();
     expect(

@@ -576,6 +576,82 @@ mod tests {
         }
     }
 
+    #[test]
+    fn test_candidate_votes_numbers() {
+        let candidate_votes: Vec<_> = [
+            CandidateVotesMock(3, 100),
+            CandidateVotesMock(1, 80),
+            CandidateVotesMock(7, 60),
+        ]
+        .iter()
+        .collect();
+
+        assert_eq!(candidate_votes_numbers(&candidate_votes), vec![3, 1, 7]);
+    }
+
+    mod other_candidate_nomination {
+        use crate::{
+            candidate_nomination::{candidate_votes_numbers, other_candidate_nomination},
+            test_helpers::CandidateVotesMock,
+        };
+
+        #[test]
+        fn test_nominates_remaining_candidates() {
+            let candidate_votes: Vec<_> = [
+                CandidateVotesMock(1, 100),
+                CandidateVotesMock(2, 20),
+                CandidateVotesMock(3, 80),
+                CandidateVotesMock(4, 10),
+            ]
+            .iter()
+            .collect();
+            let preferential_nomination = vec![candidate_votes[0], candidate_votes[2]];
+
+            let other = other_candidate_nomination(&preferential_nomination, &candidate_votes, 2);
+            assert_eq!(candidate_votes_numbers(&other), vec![2, 4]);
+        }
+
+        #[test]
+        fn test_takes_no_more_candidates_than_non_assigned_seats() {
+            let candidate_votes: Vec<_> = [
+                CandidateVotesMock(1, 50),
+                CandidateVotesMock(2, 40),
+                CandidateVotesMock(3, 30),
+            ]
+            .iter()
+            .collect();
+
+            let other = other_candidate_nomination::<CandidateVotesMock>(&[], &candidate_votes, 2);
+            assert_eq!(candidate_votes_numbers(&other), vec![1, 2]);
+        }
+
+        #[test]
+        fn test_returns_empty_when_no_non_assigned_seats() {
+            let candidate_votes: Vec<_> = [CandidateVotesMock(1, 50), CandidateVotesMock(2, 40)]
+                .iter()
+                .collect();
+            let preferential_nomination = vec![candidate_votes[0]];
+
+            let other = other_candidate_nomination(&preferential_nomination, &candidate_votes, 0);
+            assert!(other.is_empty());
+        }
+
+        #[test]
+        fn test_returns_all_remaining_candidates_when_seats_exceed_candidates() {
+            let candidate_votes: Vec<_> = [
+                CandidateVotesMock(1, 50),
+                CandidateVotesMock(2, 40),
+                CandidateVotesMock(3, 30),
+            ]
+            .iter()
+            .collect();
+            let preferential_nomination = vec![candidate_votes[0]];
+
+            let other = other_candidate_nomination(&preferential_nomination, &candidate_votes, 5);
+            assert_eq!(candidate_votes_numbers(&other), vec![2, 3]);
+        }
+    }
+
     /// Candidate nomination with non-consecutive list and candidate numbers
     ///
     /// List seats: [(1, 8), (2, 3), (4, 2), (5, 1), (7, 1)]

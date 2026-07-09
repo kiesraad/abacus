@@ -83,17 +83,17 @@
       "singular": "Loting noodzakelijk voor toekennen restzetel",
       "plural": "Loting noodzakelijk voor toekennen restzetels"
     },
-    "description": "Er is een restzetel te verdelen. In de wet staat dat de partij met het grootste {variant} stemmen per toegewezen zetel deze krijgt.",
+    "description": "Er is een restzetel te verdelen. In de wet staat dat de partij met het grootste {variant} stemmen per toegewezen zetel deze restzetel krijgt.",
     "drawing_lots_needed": "Hierdoor kan de restzetel niet automatisch worden toegewezen. Het centraal stembureau moet een loting uitvoeren om de restzetel toe te wijzen.",
-    "same_averages": "Er zijn meerdere partijen die na het toewijzen van de volgende restzetel precies hetzelfde hoogste gemiddelde krijgen.",
+    "same_averages": "Er zijn meerdere partijen die na het toewijzen van de volgende restzetel precies hetzelfde hoogste gemiddelde hebben.",
     "same_remainders": "Er zijn meerdere partijen die hetzelfde grootste overschot hebben."
   },
   "drawing_lots_required_for_p9_alert": {
     "title": "Loting noodzakelijk vanwege volstrekte meerderheid",
-    "article_p9": "Volgens artikel P 9 van de kieswet wordt een zetel afgenomen van de lijst waaraan de laatste restzetel is toegekend.",
+    "article_p9": "Volgens artikel P 9 van de kieswet wordt een zetel afgenomen van de lijst die een zetel heeft gekregen op basis van het kleinste {variant} stemmen.",
     "description": "{name} heeft de volstrekte meerderheid van stemmen gekregen, maar heeft niet de volstrekte meerderheid aan zetels.",
     "drawing_lots_needed": "In de zitting van het CSB moet door loting worden bepaald welk van deze lijsten een zetel af moet staan.",
-    "last_residual_seat": "<strong>Lijst {lists}</strong> hebben met hetzelfde {variant} stemmen hun laatste restzetel gekregen."
+    "last_residual_seat": "<strong>Lijst {lists}</strong> hebben met hetzelfde {variant} stemmen hun zetels gekregen."
   },
   "drawing_lots_result": {
     "title": "Resultaat loting",

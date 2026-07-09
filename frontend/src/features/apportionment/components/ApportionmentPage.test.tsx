@@ -481,7 +481,7 @@ describe("ApportionmentPage", () => {
         expect(alerts[0]).toHaveTextContent(
           [
             "Loting noodzakelijk voor toekennen restzetel 2",
-            "Er is een restzetel te verdelen. In de wet staat dat de partij met het grootste overschot aan stemmen per toegewezen zetel deze krijgt.",
+            "Er is een restzetel te verdelen. In de wet staat dat de partij met het grootste overschot aan stemmen per toegewezen zetel deze restzetel krijgt.",
             "Er zijn meerdere partijen die hetzelfde grootste overschot hebben.",
             "Hierdoor kan de restzetel niet automatisch worden toegewezen. Het centraal stembureau moet een loting uitvoeren om de restzetel toe te wijzen.",
           ].join(""),
@@ -557,8 +557,8 @@ describe("ApportionmentPage", () => {
         expect(alerts[0]).toHaveTextContent(
           [
             "Loting noodzakelijk voor toekennen restzetels 2, 3 en 4",
-            "Er is een restzetel te verdelen. In de wet staat dat de partij met het grootste gemiddeld aantal stemmen per toegewezen zetel deze krijgt.",
-            "Er zijn meerdere partijen die na het toewijzen van de volgende restzetel precies hetzelfde hoogste gemiddelde krijgen.",
+            "Er is een restzetel te verdelen. In de wet staat dat de partij met het grootste gemiddeld aantal stemmen per toegewezen zetel deze restzetel krijgt.",
+            "Er zijn meerdere partijen die na het toewijzen van de volgende restzetel precies hetzelfde hoogste gemiddelde hebben.",
             "Hierdoor kan de restzetel niet automatisch worden toegewezen. Het centraal stembureau moet een loting uitvoeren om de restzetel toe te wijzen.",
           ].join(""),
         );
@@ -635,8 +635,8 @@ describe("ApportionmentPage", () => {
         expect(alerts[0]).toHaveTextContent(
           [
             "Loting noodzakelijk voor toekennen restzetels 3 en 4",
-            "Er is een restzetel te verdelen. In de wet staat dat de partij met het grootste gemiddeld aantal stemmen per toegewezen zetel deze krijgt.",
-            "Er zijn meerdere partijen die na het toewijzen van de volgende restzetel precies hetzelfde hoogste gemiddelde krijgen.",
+            "Er is een restzetel te verdelen. In de wet staat dat de partij met het grootste gemiddeld aantal stemmen per toegewezen zetel deze restzetel krijgt.",
+            "Er zijn meerdere partijen die na het toewijzen van de volgende restzetel precies hetzelfde hoogste gemiddelde hebben.",
             "Hierdoor kan de restzetel niet automatisch worden toegewezen. Het centraal stembureau moet een loting uitvoeren om de restzetel toe te wijzen.",
           ].join(""),
         );
@@ -703,8 +703,8 @@ describe("ApportionmentPage", () => {
         expect(alerts[0]).toHaveTextContent(
           [
             "Loting noodzakelijk voor toekennen restzetel 4",
-            "Er is een restzetel te verdelen. In de wet staat dat de partij met het grootste gemiddeld aantal stemmen per toegewezen zetel deze krijgt.",
-            "Er zijn meerdere partijen die na het toewijzen van de volgende restzetel precies hetzelfde hoogste gemiddelde krijgen.",
+            "Er is een restzetel te verdelen. In de wet staat dat de partij met het grootste gemiddeld aantal stemmen per toegewezen zetel deze restzetel krijgt.",
+            "Er zijn meerdere partijen die na het toewijzen van de volgende restzetel precies hetzelfde hoogste gemiddelde hebben.",
             "Hierdoor kan de restzetel niet automatisch worden toegewezen. Het centraal stembureau moet een loting uitvoeren om de restzetel toe te wijzen.",
           ].join(""),
         );
@@ -769,9 +769,9 @@ describe("ApportionmentPage", () => {
         expect(alerts[0]).toHaveTextContent(
           [
             "Loting noodzakelijk vanwege volstrekte meerderheid",
-            "De partijdigen heeft de volstrekte meerderheid van stemmen gekregen, maar heeft niet de volstrekte meerderheid aan zetels.",
-            "Volgens artikel P 9 van de kieswet wordt een zetel afgenomen van de lijst waaraan de laatste restzetel is toegekend. ",
-            "Lijst 2, 3 en 4 hebben met hetzelfde overschot aan stemmen hun laatste restzetel gekregen. ",
+            "Lijst 1 - De partijdigen heeft de volstrekte meerderheid van stemmen gekregen, maar heeft niet de volstrekte meerderheid aan zetels.",
+            "Volgens artikel P 9 van de kieswet wordt een zetel afgenomen van de lijst die een zetel heeft gekregen op basis van het kleinste overschot aan stemmen. ",
+            "Lijst 2, 3 en 4 hebben met hetzelfde overschot aan stemmen hun zetels gekregen. ",
             "In de zitting van het CSB moet door loting worden bepaald welk van deze lijsten een zetel af moet staan.",
           ].join(""),
         );
@@ -837,9 +837,9 @@ describe("ApportionmentPage", () => {
         expect(alerts[0]).toHaveTextContent(
           [
             "Loting noodzakelijk vanwege volstrekte meerderheid",
-            "De Kandidaat heeft de volstrekte meerderheid van stemmen gekregen, maar heeft niet de volstrekte meerderheid aan zetels.",
-            "Volgens artikel P 9 van de kieswet wordt een zetel afgenomen van de lijst waaraan de laatste restzetel is toegekend. ",
-            "Lijst 6 en 7 hebben met hetzelfde gemiddeld aantal stemmen hun laatste restzetel gekregen. ",
+            "Lijst 1 - De Kandidaat heeft de volstrekte meerderheid van stemmen gekregen, maar heeft niet de volstrekte meerderheid aan zetels.",
+            "Volgens artikel P 9 van de kieswet wordt een zetel afgenomen van de lijst die een zetel heeft gekregen op basis van het kleinste gemiddeld aantal stemmen. ",
+            "Lijst 6 en 7 hebben met hetzelfde gemiddeld aantal stemmen hun zetels gekregen. ",
             "In de zitting van het CSB moet door loting worden bepaald welk van deze lijsten een zetel af moet staan.",
           ].join(""),
         );
@@ -969,7 +969,7 @@ describe("ApportionmentPage", () => {
         expect(alerts[0]).toHaveTextContent(
           [
             "Loting noodzakelijk voor kandidaten met gelijk aantal voorkeursstemmen",
-            "3 kandidaten van GROEP 9 hebben evenveel voorkeursstemmen gekregen. Er is nog 1 zetel beschikbaar. ",
+            "3 kandidaten van Lijst 2 - GROEP 9 hebben evenveel voorkeursstemmen gekregen. Er is nog 1 zetel beschikbaar. ",
             "In de wet staat dat de kandidaat met het hoogste aantal voorkeursstemmen de zetel krijgt.",
             "Hierdoor kan de zetel niet automatisch worden toegewezen. Het centraal stembureau moet een loting uitvoeren om te bepalen welke kandidaat gekozen wordt.",
           ].join(""),
@@ -1022,7 +1022,7 @@ describe("ApportionmentPage", () => {
         expect(alerts[0]).toHaveTextContent(
           [
             "Loting noodzakelijk voor kandidaten met gelijk aantal voorkeursstemmen",
-            "2 kandidaten van GROEP 8 hebben evenveel voorkeursstemmen gekregen. Er zijn nog 2 zetels beschikbaar. ",
+            "2 kandidaten van Lijst 1 - GROEP 8 hebben evenveel voorkeursstemmen gekregen. Er zijn nog 2 zetels beschikbaar. ",
             "In de wet staat dat de kandidaten met het hoogste aantal voorkeursstemmen de zetels krijgen.",
             "Hierdoor kunnen de zetels niet automatisch worden toegewezen. Het centraal stembureau moet een loting uitvoeren om te bepalen welke kandidaten gekozen worden.",
           ].join(""),

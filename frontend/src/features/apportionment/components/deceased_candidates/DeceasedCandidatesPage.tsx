@@ -184,7 +184,9 @@ export function DeceasedCandidatesPage() {
           {error ? (
             <ApportionmentError error={error} />
           ) : (
-            (state?.type === "RegisteringDeceasedCandidates" || state?.type === "Finalised") && (
+            (state?.type === "RegisteringDeceasedCandidates" ||
+              state?.type === "DrawingLots" ||
+              state?.type === "Finalised") && (
               <div className={cls.container}>
                 <div className="w-39">{renderPageDescription(state, deceasedCandidates)}</div>
                 {deceasedCandidates.length > 0 && (
@@ -214,7 +216,7 @@ export function DeceasedCandidatesPage() {
                     </div>
                   </>
                 )}
-                {state.type === "Finalised" && (
+                {(state.type === "DrawingLots" || state.type === "Finalised") && (
                   <div className="mt-md-lg">
                     {t("apportionment.want_to_make_changes")}
                     <div className={cls.resetSection}>

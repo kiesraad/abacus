@@ -612,6 +612,17 @@ mod tests {
         }
 
         #[test]
+        fn test_returns_empty_when_all_candidates_are_preferentially_nominated() {
+            let candidate_votes: Vec<_> = [CandidateVotesMock(1, 100), CandidateVotesMock(2, 20)]
+                .iter()
+                .collect();
+            let preferential_nomination = vec![candidate_votes[0], candidate_votes[1]];
+
+            let other = other_candidate_nomination(&preferential_nomination, &candidate_votes, 2);
+            assert_eq!(candidate_votes_numbers(&other), vec![]);
+        }
+
+        #[test]
         fn test_takes_no_more_candidates_than_non_assigned_seats() {
             let candidate_votes: Vec<_> = [
                 CandidateVotesMock(1, 50),

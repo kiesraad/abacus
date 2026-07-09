@@ -8,6 +8,7 @@ import type {
   PoliticalGroup,
   SeatChangeStep,
 } from "@/types/generated/openapi";
+import { getCandidateFullName } from "@/utils/candidate";
 import { formatPoliticalGroupName } from "@/utils/politicalGroup";
 import {
   isAbsoluteMajorityReassignmentStep,
@@ -85,6 +86,34 @@ export function getSeatReassignedByDrawingLotsStep(
   return undefined;
 }
 
+export interface ListCandidateDrawn {
+  seat_number: number;
+  candidate: string;
+}
+
+export function getListCandidatesDrawn(
+  state: ApportionmentState,
+  politicalGroup: PoliticalGroup,
+): ListCandidateDrawn[] | undefined {
+  if (state.type === "Finalised") {
+    const listCandidatesDrawn: ListCandidateDrawn[] = [];
+    for (const lot_drawn of state.candidates_drawn) {
+      if (lot_drawn.variant.list === politicalGroup.number) {
+        const seat_number = lot_drawn.variant.seat_numbers[0];
+        const drawn_candidate = politicalGroup.candidates.find((candidate) => candidate.number === lot_drawn.drawn);
+        if (seat_number && drawn_candidate) {
+          listCandidatesDrawn.push({
+            seat_number: seat_number,
+            candidate: getCandidateFullName(drawn_candidate, true),
+          });
+        }
+      }
+    }
+    return listCandidatesDrawn;
+  }
+  return undefined;
+}
+
 export interface AbsoluteMajorityReassignmentLists {
   seat_from_lists: number[];
   seat_to_list: number;
@@ -121,6 +150,15 @@ export function isListDrawingLotsVariant<TVariant extends ListDrawingLotsVariant
   }
   const { variant } = state.drawing_lots_required;
   return variants.some((v) => v === variant);
+}
+
+export function isCandidateDrawingLots(state: ApportionmentState | undefined): state is Extract<
+  ApportionmentState,
+  { type: "DrawingLots" }
+> & {
+  drawing_lots_required: Extract<DrawingLotsRequired, { type: "CandidateDrawingLotsRequired" }>;
+} {
+  return state?.type === "DrawingLots" && state.drawing_lots_required.type === "CandidateDrawingLotsRequired";
 }
 
 export function getNotAssignedSeats(state: ApportionmentState | undefined) {

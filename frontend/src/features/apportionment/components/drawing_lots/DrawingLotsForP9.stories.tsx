@@ -6,13 +6,7 @@ import { DrawingLotsForP9 } from "./DrawingLotsForP9";
 
 export const AbsoluteMajorityHighestAverage: StoryObj = {
   render: () => {
-    return (
-      <DrawingLotsForP9
-        drawingLotsRequired={gte19SeatsAndP9DrawingLots.drawing_lots_required}
-        options={gte19SeatsAndP9DrawingLots.options}
-        assign_to={gte19SeatsAndP9DrawingLots.assign_to}
-      />
-    );
+    return <DrawingLotsForP9 drawingLotsRequired={gte19SeatsAndP9DrawingLots.drawing_lots_required} />;
   },
   play: async ({ canvas }) => {
     const list = canvas.getByRole("list");
@@ -32,13 +26,7 @@ export const AbsoluteMajorityHighestAverage: StoryObj = {
 
 export const AbsoluteMajorityLargestRemainder: StoryObj = {
   render: () => {
-    return (
-      <DrawingLotsForP9
-        drawingLotsRequired={lt19SeatsAndP9DrawingLots.drawing_lots_required}
-        options={lt19SeatsAndP9DrawingLots.options}
-        assign_to={lt19SeatsAndP9DrawingLots.assign_to}
-      />
-    );
+    return <DrawingLotsForP9 drawingLotsRequired={lt19SeatsAndP9DrawingLots.drawing_lots_required} />;
   },
   play: async ({ canvas }) => {
     const list = canvas.getByRole("list");

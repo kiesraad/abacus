@@ -502,95 +502,6 @@ describe("ApportionmentResidualSeatsPage", () => {
     );
   });
 
-  describe("Apportionment not yet available", () => {
-    beforeEach(() => {
-      overrideOnce(
-        "get",
-        "/api/elections/3",
-        200,
-        getElectionMockData(lt19Seats.election, lt19Seats.committee_session),
-      );
-      overrideOnce("get", "/api/elections/3/apportionment/state", 200, {
-        type: "Uninitialised",
-      } satisfies ApportionmentState);
-    });
-
-    test("Not available until committee session is completed", async () => {
-      overrideOnce("post", "/api/elections/3/apportionment", 412, {
-        error: "Committee session not completed",
-        fatal: false,
-        reference: "ApportionmentCommitteeSessionNotCompleted",
-      } satisfies ErrorResponse);
-
-      renderApportionmentResidualSeatsPage(3, false);
-
-      // Wait for the page to be loaded
-      expect(await screen.findByRole("heading", { level: 1, name: "Verdeling van de restzetels" })).toBeVisible();
-
-      expect(await screen.findByText("Zetelverdeling is nog niet beschikbaar")).toBeVisible();
-      expect(
-        await screen.findByText("De zetelverdeling kan pas gemaakt worden als de zitting is afgerond"),
-      ).toBeVisible();
-
-      expect(screen.queryByTestId("highest-averages-table")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("largest-remainders-table")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("unique-highest-averages-table")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("footnotes-list")).not.toBeInTheDocument();
-    });
-
-    test("Not possible because committee session is not completed yet", async () => {
-      overrideOnce("post", "/api/elections/3/apportionment", 412, {
-        error: "Committee session not completed",
-        fatal: false,
-        reference: "ApportionmentCommitteeSessionNotCompleted",
-      } satisfies ErrorResponse);
-
-      renderApportionmentResidualSeatsPage(3, false);
-
-      // Wait for the page to be loaded
-      expect(await screen.findByRole("heading", { level: 1, name: "Verdeling van de restzetels" })).toBeVisible();
-
-      expect(await screen.findByText("Zetelverdeling is nog niet beschikbaar")).toBeVisible();
-      expect(
-        await screen.findByText("De zetelverdeling kan pas gemaakt worden als de zitting is afgerond"),
-      ).toBeVisible();
-
-      expect(screen.queryByTestId("highest-averages-table")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("largest-remainders-table")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("unique-highest-averages-table")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("footnotes-list")).not.toBeInTheDocument();
-    });
-
-    test("Internal Server Error renders error page", async () => {
-      // error is expected
-      vi.spyOn(console, "error").mockImplementation(() => {});
-      const router = setupTestRouter([
-        {
-          Component: null,
-          errorElement: <ErrorBoundary />,
-          children: [
-            {
-              path: "elections/:electionId/apportionment",
-              children: apportionmentRoutes,
-            },
-          ],
-        },
-      ]);
-
-      overrideOnce("post", "/api/elections/3/apportionment", 500, {
-        error: "Internal Server Error",
-        fatal: true,
-        reference: "InternalServerError",
-      });
-
-      await router.navigate("/elections/3/apportionment/details-residual-seats");
-
-      rtlRender(<Providers router={router} />);
-
-      await expectErrorPage();
-    });
-  });
-
   describe("Drawing lots residual seats", () => {
     test("Render alert drawing lots for list required and table for LargestRemainderResidualSeat", async () => {
       overrideOnce(
@@ -855,6 +766,95 @@ describe("ApportionmentResidualSeatsPage", () => {
       expect(screen.queryByTestId("largest-remainders-table")).not.toBeInTheDocument();
       expect(screen.queryByTestId("unique-highest-averages-table")).not.toBeInTheDocument();
       expect(screen.queryByTestId("footnotes-list")).not.toBeInTheDocument();
+    });
+  });
+
+  describe("Apportionment not yet available", () => {
+    beforeEach(() => {
+      overrideOnce(
+        "get",
+        "/api/elections/3",
+        200,
+        getElectionMockData(lt19Seats.election, lt19Seats.committee_session),
+      );
+      overrideOnce("get", "/api/elections/3/apportionment/state", 200, {
+        type: "Uninitialised",
+      } satisfies ApportionmentState);
+    });
+
+    test("Not available until committee session is completed", async () => {
+      overrideOnce("post", "/api/elections/3/apportionment", 412, {
+        error: "Committee session not completed",
+        fatal: false,
+        reference: "ApportionmentCommitteeSessionNotCompleted",
+      } satisfies ErrorResponse);
+
+      renderApportionmentResidualSeatsPage(3, false);
+
+      // Wait for the page to be loaded
+      expect(await screen.findByRole("heading", { level: 1, name: "Verdeling van de restzetels" })).toBeVisible();
+
+      expect(await screen.findByText("Zetelverdeling is nog niet beschikbaar")).toBeVisible();
+      expect(
+        await screen.findByText("De zetelverdeling kan pas gemaakt worden als de zitting is afgerond"),
+      ).toBeVisible();
+
+      expect(screen.queryByTestId("highest-averages-table")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("largest-remainders-table")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("unique-highest-averages-table")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("footnotes-list")).not.toBeInTheDocument();
+    });
+
+    test("Not possible because committee session is not completed yet", async () => {
+      overrideOnce("post", "/api/elections/3/apportionment", 412, {
+        error: "Committee session not completed",
+        fatal: false,
+        reference: "ApportionmentCommitteeSessionNotCompleted",
+      } satisfies ErrorResponse);
+
+      renderApportionmentResidualSeatsPage(3, false);
+
+      // Wait for the page to be loaded
+      expect(await screen.findByRole("heading", { level: 1, name: "Verdeling van de restzetels" })).toBeVisible();
+
+      expect(await screen.findByText("Zetelverdeling is nog niet beschikbaar")).toBeVisible();
+      expect(
+        await screen.findByText("De zetelverdeling kan pas gemaakt worden als de zitting is afgerond"),
+      ).toBeVisible();
+
+      expect(screen.queryByTestId("highest-averages-table")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("largest-remainders-table")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("unique-highest-averages-table")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("footnotes-list")).not.toBeInTheDocument();
+    });
+
+    test("Internal Server Error renders error page", async () => {
+      // error is expected
+      vi.spyOn(console, "error").mockImplementation(() => {});
+      const router = setupTestRouter([
+        {
+          Component: null,
+          errorElement: <ErrorBoundary />,
+          children: [
+            {
+              path: "elections/:electionId/apportionment",
+              children: apportionmentRoutes,
+            },
+          ],
+        },
+      ]);
+
+      overrideOnce("post", "/api/elections/3/apportionment", 500, {
+        error: "Internal Server Error",
+        fatal: true,
+        reference: "InternalServerError",
+      });
+
+      await router.navigate("/elections/3/apportionment/details-residual-seats");
+
+      rtlRender(<Providers router={router} />);
+
+      await expectErrorPage();
     });
   });
 });

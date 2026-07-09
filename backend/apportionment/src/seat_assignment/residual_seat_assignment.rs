@@ -987,6 +987,181 @@ mod tests {
         }
     }
 
+    mod lists_with_highest_average {
+        use super::*;
+        use crate::test_helpers::ListDrawnMock;
+
+        /// Get the list averages of all standings
+        fn list_averages(standings: &[ListStanding<u32>]) -> Vec<(u32, Fraction)> {
+            standings
+                .iter()
+                .map(|s| (s.list_number(), s.next_votes_per_seat()))
+                .collect()
+        }
+
+        #[test]
+        fn test_returns_the_single_list_with_the_highest_average() {
+            // next votes per seat: list 1: 100/2 = 50, list 2: 80, list 3: 60
+            // list 2 has the highest average, so it should be returned
+            let standings = [standing(1, 100), standing(2, 80), standing(3, 60)];
+            let lists_drawn: Vec<ListDrawnMock> = vec![];
+
+            let result = lists_with_highest_average(
+                standings.iter(),
+                list_averages(&standings),
+                1,
+                1,
+                &mut lists_drawn.iter(),
+            );
+
+            let Ok(ListStandings::Completed(lists)) = result else {
+                panic!("expected Completed");
+            };
+            assert_eq!(list_numbers(&lists), vec![2]);
+        }
+
+        #[test]
+        fn test_returns_all_tied_lists_when_enough_seats_are_available() {
+            // next votes per seat: list 1: 100/2 = 50, lists 2 and 3: 80
+            // 2 seats are available, so both lists 2 and 3 can be assigned a seat
+            let standings = [standing(1, 100), standing(2, 80), standing(3, 80)];
+            let lists_drawn: Vec<ListDrawnMock> = vec![];
+
+            let result = lists_with_highest_average(
+                standings.iter(),
+                list_averages(&standings),
+                2,
+                1,
+                &mut lists_drawn.iter(),
+            );
+
+            let Ok(ListStandings::Completed(lists)) = result else {
+                panic!("expected Completed");
+            };
+            assert_eq!(list_numbers(&lists), vec![2, 3]);
+        }
+
+        #[test]
+        fn test_requires_drawing_lots_when_tied_lists_exceed_available_seats() {
+            // next votes per seat: list 1: 100/2 = 50, lists 2 and 3: 80
+            // only 1 seat available, but 2 lists have the same highest average
+            let standings = [standing(1, 100), standing(2, 80), standing(3, 80)];
+            let lists_drawn: Vec<ListDrawnMock> = vec![];
+
+            let result = lists_with_highest_average(
+                standings.iter(),
+                list_averages(&standings),
+                1,
+                3,
+                &mut lists_drawn.iter(),
+            );
+
+            let Ok(ListStandings::DrawingLotsRequired(variant)) = result else {
+                panic!("expected DrawingLotsRequired");
+            };
+            assert_eq!(
+                variant,
+                ListDrawingLotsVariant::HighestAverageResidualSeat(
+                    HighestAverageResidualSeatDrawingLots {
+                        max_average: Fraction::new(80, 1),
+                        residual_seat_numbers: vec![3],
+                        options: vec![2, 3],
+                        list_averages: list_averages(&standings),
+                    }
+                )
+            );
+        }
+
+        #[test]
+        fn test_assigns_the_seat_to_the_drawn_list() {
+            let standings = [standing(1, 100), standing(2, 80), standing(3, 80)];
+            let expected_variant = ListDrawingLotsVariant::HighestAverageResidualSeat(
+                HighestAverageResidualSeatDrawingLots {
+                    max_average: Fraction::new(80, 1),
+                    residual_seat_numbers: vec![1],
+                    options: vec![2, 3],
+                    list_averages: list_averages(&standings),
+                },
+            );
+            let lists_drawn = [ListDrawnMock::new(&expected_variant, 3)];
+
+            let result = lists_with_highest_average(
+                standings.iter(),
+                list_averages(&standings),
+                1,
+                1,
+                &mut lists_drawn.iter(),
+            );
+
+            let Ok(ListStandings::CompletedWithDrawingLots(lists, variant)) = result else {
+                panic!("expected CompletedWithDrawingLots");
+            };
+            assert_eq!(list_numbers(&lists), vec![3]);
+            assert_eq!(variant, expected_variant);
+        }
+
+        #[test]
+        fn test_returns_error_when_drawn_list_has_a_different_variant() {
+            let standings = [standing(1, 100), standing(2, 80), standing(3, 80)];
+            let other_variant = ListDrawingLotsVariant::HighestAverageResidualSeat(
+                HighestAverageResidualSeatDrawingLots {
+                    max_average: Fraction::ZERO,
+                    residual_seat_numbers: vec![1],
+                    options: vec![2, 3],
+                    list_averages: vec![],
+                },
+            );
+            let lists_drawn = [ListDrawnMock::new(&other_variant, 3)];
+
+            let result = lists_with_highest_average(
+                standings.iter(),
+                list_averages(&standings),
+                1,
+                1,
+                &mut lists_drawn.iter(),
+            );
+
+            let Err(error) = result else {
+                panic!("expected an error");
+            };
+            assert_eq!(
+                error,
+                ApportionmentError::InvalidLotDrawing("Variant mismatch".to_string())
+            );
+        }
+
+        #[test]
+        fn test_returns_error_when_drawn_list_is_not_one_of_the_options() {
+            let standings = [standing(1, 100), standing(2, 80), standing(3, 80)];
+            let variant = ListDrawingLotsVariant::HighestAverageResidualSeat(
+                HighestAverageResidualSeatDrawingLots {
+                    max_average: Fraction::new(80, 1),
+                    residual_seat_numbers: vec![1],
+                    options: vec![2, 3],
+                    list_averages: list_averages(&standings),
+                },
+            );
+            // List 1 does not have the highest average and is not an option
+            let lists_drawn = [ListDrawnMock::new(&variant, 1)];
+
+            let result = lists_with_highest_average(
+                standings.iter(),
+                list_averages(&standings),
+                1,
+                1,
+                &mut lists_drawn.iter(),
+            );
+
+            let Err(error) = result else {
+                panic!("expected an error");
+            };
+            assert_eq!(
+                error,
+                ApportionmentError::InvalidLotDrawing("Invalid number drawn".to_string())
+            );
+        }
+    }
+
     #[test]
     #[expect(clippy::too_many_lines)]
     fn test_lists_qualifying_for_highest_average() {

@@ -144,7 +144,7 @@ pub async fn change_committee_session_status(
     Ok(())
 }
 
-async fn delete_committee_session_files(
+pub async fn delete_committee_session_files(
     conn: &mut SqliteConnection,
     audit_service: AuditService,
     committee_session_id: CommitteeSessionId,

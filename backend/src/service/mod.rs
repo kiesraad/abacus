@@ -12,7 +12,7 @@ pub use apportionment::{
 };
 pub use change_committee_session_status::{
     CommitteeSessionAuditData, CommitteeSessionUpdatedAuditData, FileAuditData,
-    change_committee_session_status,
+    change_committee_session_status, delete_committee_session_files,
 };
 #[cfg(test)]
 pub use data_entry::create_definitive_data_entry;

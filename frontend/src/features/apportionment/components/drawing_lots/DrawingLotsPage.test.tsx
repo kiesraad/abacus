@@ -171,7 +171,7 @@ describe("DrawingLotsPage", () => {
       "De partij met het hoogste gemiddeld aantal stemmen na het toewijzen van de restzetel krijgt de restzetel",
     );
     expect(listitems[3]).toHaveTextContent(
-      "Lijst 2 - Algemene Partij, Lijst 3 - KEUS, Lijst 4 - Algemene Lijst, Lijst 5 - Unie van kandidaten en Lijst 6 - Lijst van stemmers krijgen samen het hoogste gemiddeld aantal stemmen per zetel (46 2/3 stemmen)",
+      "Lijst 2 - Algemene Partij, Lijst 3 - KEUS, Lijst 4 - Algemene Lijst, Lijst 5 - Unie van kandidaten en Lijst 6 - Lijst van stemmers hebben samen het hoogste gemiddeld aantal stemmen per zetel (46 2/3 stemmen)",
     );
     expect(listitems[4]).toHaveTextContent("Daarom moet er geloot worden welke lijst de restzetel krijgt");
 

@@ -119,7 +119,7 @@ describe("AddDeceasedCandidatesPage", () => {
     renderAddDeceasedCandidatePage(3);
     expect(await screen.findByRole("heading", { level: 1, name: "Overleden kandidaat" }));
 
-    expect(await screen.findByRole("heading", { level: 3, name: "Lijst 1 - Political Group A" }));
+    expect(await screen.findByRole("heading", { level: 3, name: "Lijst 1 – Political Group A" }));
 
     const table = await screen.findByRole("table");
     expect(table).toBeVisible();
@@ -203,7 +203,7 @@ describe("AddDeceasedCandidatesPage", () => {
     expect(group8).toHaveAttribute("aria-current", "false");
     expect(within(group8).queryByRole("img")).not.toBeInTheDocument();
 
-    expect(await screen.findByRole("heading", { level: 3, name: "Lijst 1 - Political Group A" }));
+    expect(await screen.findByRole("heading", { level: 3, name: "Lijst 1 – Political Group A" }));
 
     await user.click(within(group2).getByRole("button"));
 
@@ -216,7 +216,7 @@ describe("AddDeceasedCandidatesPage", () => {
     const group2Icon = within(group2).getByRole("img");
     expect(group2Icon).toHaveAccessibleName("je bent hier");
 
-    expect(await screen.findByRole("heading", { level: 3, name: "Lijst 2 - Political Group B" }));
+    expect(await screen.findByRole("heading", { level: 3, name: "Lijst 2 – Political Group B" }));
 
     const table = await screen.findByRole("table");
     expect(table).toBeVisible();

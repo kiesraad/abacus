@@ -73,7 +73,7 @@ describe("Test CandidatesVotesForm", () => {
     renderForm();
 
     await waitFor(() => {
-      expect(screen.getByRole("group", { name: "Lijst 1 - Vurige Vleugels Partij" })).toBeVisible();
+      expect(screen.getByRole("group", { name: "Lijst 1 – Vurige Vleugels Partij" })).toBeVisible();
     });
   });
 
@@ -210,7 +210,7 @@ describe("Test CandidatesVotesForm", () => {
       const candidateNames = getCandidateFullNamesFromMockData(politicalGroupMockData);
 
       const candidate1 = await screen.findByRole("textbox", { name: `1 ${candidateNames[0]}` });
-      expect(candidate1.closest("fieldset")).toHaveAccessibleName("Lijst 1 - Vurige Vleugels Partij");
+      expect(candidate1.closest("fieldset")).toHaveAccessibleName("Lijst 1 – Vurige Vleugels Partij");
       expect(candidate1).toHaveAccessibleName("1 Zilverlicht, E. (Eldor)");
       expect(candidate1).toHaveFocus();
       await user.type(candidate1, "12345");

@@ -77,8 +77,8 @@ describe("ResolveDifferencesPage", () => {
       "Verschillen met stembureau",
       "Aantal kiezers en stemmen",
       "Verschillen D & H",
-      "Lijst 1 - Vurige Vleugels Partij",
-      "Lijst 2 - Wijzen van Water en Wind",
+      "Lijst 1 – Vurige Vleugels Partij",
+      "Lijst 2 – Wijzen van Water en Wind",
     ]);
 
     const mdash = "—";

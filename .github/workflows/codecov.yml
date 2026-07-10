@@ -26,6 +26,8 @@ jobs:
       CARGO_TERM_COLOR: always
       SQLX_OFFLINE: "true"
       BINSTALL_DISABLE_TELEMETRY: "true"
+      # Branch coverage requires Rust nightly: https://github.com/taiki-e/cargo-llvm-cov/issues/8
+      RUSTUP_TOOLCHAIN: nightly-2026-07-10
     steps:
       # Free up runner disk space, so that our job has enough space to run
       # https://dev.to/mathio/squeezing-disk-space-from-github-actions-runners-an-engineers-guide-3pjg
@@ -56,12 +58,9 @@ jobs:
         uses: actions/checkout@v7.0.0
         with:
           fetch-depth: 0
-      # Branch coverage requires Rust nightly: https://github.com/taiki-e/cargo-llvm-cov/issues/8
       - name: Setup Rust Nightly
         shell: bash
-        run: >
-          rustup update nightly-2026-02-21 &&
-          rustup default nightly-2026-02-21
+        run: rustup toolchain install "$RUSTUP_TOOLCHAIN"
       - name: Cargo cache
         uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4 # v2
         with:

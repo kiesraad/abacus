@@ -8,17 +8,17 @@ The `data_entry_status` fuzz test tests that the data entry system matches the s
 
 This fuzz test covers all possible states and all possible `DataEntryTransitionError` errors, except for the `FirstEntryAlreadyClaimed`, `ValidatorError` and `ValidationError` errors. The `FirstEntryAlreadyClaimed` error is not triggered by the fuzzer for simplicity, but this error is explicitly tested by the `first_entry_in_progress_claim_first_entry_other_user_error` unit test. The `ValidatorError` and `ValidationError` errors are not triggered by the fuzzer because the fuzzer does not test the API directly. Instead, the fuzzer only tests the internal functions to focus on verifying the data entry state machine. This fuzz test can be seen as a more complete extension of the unit tests that test individual transitions, which shows that no unexpected errors or transition can happen.
 
-To run the fuzzer, first install the nightly compiler and cargo fuzz if you haven't already:
+To run the fuzzer, first install cargo-fuzz if you haven't already:
 
 ```
-rustup install nightly
-cargo +nightly install cargo-fuzz
+cargo install cargo-fuzz
 ```
 
-Then, run the fuzzer with the following command from within the `/backend` folder:
+Then, run the fuzzer with the following command from within the `/backend/fuzz` folder
+(the pinned nightly toolchain from `rust-toolchain.toml` is installed automatically):
 
 ```
-cargo +nightly fuzz run data_entry_status
+cargo fuzz run data_entry_status
 ```
 
 The output of the fuzzer should look something like:

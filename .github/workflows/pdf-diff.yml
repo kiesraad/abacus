@@ -24,10 +24,10 @@ jobs:
       - uses: actions/checkout@v7.0.0
         with:
           ref: ${{ github.base_ref || 'main' }}
+      # The base ref may not have a rust-toolchain.toml yet, so fall back to stable.
       - name: Setup Rust
-        run: >
-          rustup update stable &&
-          rustup default stable
+        shell: bash
+        run: if [ -f rust-toolchain.toml ]; then rustup toolchain install; else rustup update stable && rustup default stable; fi
       - name: Cargo cache
         uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4 # v2
         with:
@@ -38,6 +38,8 @@ jobs:
         uses: actions/checkout@v7.0.0
         with:
           clean: false
+      - name: Setup Rust for current branch
+        run: rustup toolchain install
       - name: Generate PDFs on the current branch
         run: cargo run --bin gen-pdf --features embed-typst -- --directory head
       - name: Install diff-pdf

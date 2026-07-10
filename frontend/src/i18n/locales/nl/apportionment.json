@@ -1,13 +1,9 @@
 {
-  "absolute_majority_reassignment": "Lijst {list_assigned_seat} heeft meer dan de helft van alle uitgebrachte stemmen behaald, maar krijgt op basis van de standaard zetelverdeling niet de meerderheid van de zetels. Volgens de Kieswet (Artikel P 9 Toewijzing zetels bij volstrekte meerderheid) krijgt deze lijst één extra zetel.",
-  "absolute_majority_reassignment_options": " (er is geloot tussen lijst {options})",
-  "absolute_majority_reassignment_result": "Deze zetel gaat ten koste van lijst {list_retracted_seat}",
   "allocation_of_full_seats": "Verdeling van de volle zetels",
   "allocation_of_residual_seats": "Verdeling van de restzetels",
   "all_seats_assigned": "Alle zetels zijn toegewezen",
   "already_assigned": "Reeds toegewezen",
   "apportionment_already_calculated": "De zetelverdeling is al berekend.",
-  "article_p10": "(Kieswet, artikel P 10)",
   "assigned_by_drawing_lots_alert": {
     "singular": "Restzetel {nr} kon niet automatisch worden toegewezen en is na loting toegekend aan <strong>{list}</strong> (er is geloot tussen lijst {options}).",
     "plural": {
@@ -106,11 +102,21 @@
     "which_list_has_to_give_up_a_seat": "Welke partij moet een restzetel afstaan?"
   },
   "election_summary": "Kengetallen",
+  "footnotes": {
+    "absolute_majority_reassignment": {
+      "options": " (er is geloot tussen lijst {options})",
+      "result": "Deze zetel gaat ten koste van lijst {list_retracted_seat}",
+      "text": "Lijst {list_assigned_seat} heeft meer dan de helft van alle uitgebrachte stemmen behaald, maar krijgt op basis van de standaard zetelverdeling niet de meerderheid van de zetels. Volgens de Kieswet (Artikel P 9 Toewijzing zetels bij volstrekte meerderheid) krijgt deze lijst één extra zetel."
+    },
+    "article_p10": "(Kieswet, artikel P 10)",
+    "full_seat_removed_remainder_information": "Het overschot is berekend op basis van de {num_full_seats} volle zetels die de lijst heeft gehaald voordat lijstuitputting is meegenomen (Kieswet, artikel P 8).",
+    "list_exhaustion_full_seat_removal": "Omdat lijst {list_retracted_seat} onvoldoende kandidaten heeft, is één volle zetel herverdeeld als restzetel.",
+    "list_exhaustion_residual_seat_removal": "Omdat lijst {list_retracted_seat} geen kandidaat heeft voor een zetel, is deze herverdeeld naar een andere lijst."
+  },
   "full_seat": {
     "singular": "Volle zetel",
     "plural": "Volle zetels"
   },
-  "full_seat_removed_remainder_information": "Het overschot is berekend op basis van de {num_full_seats} volle zetels die de lijst heeft gehaald voordat lijstuitputting is meegenomen (Kieswet, artikel P 8).",
   "full_seats_count": "Aantal volle zetels",
   "full_seats_information": "Per politieke groepering wordt berekend hoe vaak de kiesdeler in het aantal stemmen past. Het resultaat van deze deling geeft het aantal volle zetels dat is behaald.",
   "full_seats_information_link": {
@@ -139,8 +145,6 @@
     "deceased_candidates": "Kandidaten {nrs} zijn buiten beschouwing gelaten bij het verdelen van de zetels vanwege overlijden.",
     "votes_have_been_counted_on_the_list": "Stemmen op overleden kandidaten zijn wel meegeteld als stemmen op diens lijst."
   },
-  "list_exhaustion_full_seat_removal": "Omdat lijst {list_retracted_seat} onvoldoende kandidaten heeft, is één volle zetel herverdeeld als restzetel.",
-  "list_exhaustion_residual_seat_removal": "Omdat lijst {list_retracted_seat} geen kandidaat heeft voor een zetel, is deze herverdeeld naar een andere lijst.",
   "lists_a_seat_needs_to_be_reassigned_for": "Lijst {seat_from_lists} moet een zetel afstaan aan lijst {seat_to_list}.",
   "make_apportionment_definitive": "Je kunt de zetelverdeling nu definitief maken en het proces-verbaal downloaden.",
   "manage_deceased_candidates": "Beheer overleden kandidaten",

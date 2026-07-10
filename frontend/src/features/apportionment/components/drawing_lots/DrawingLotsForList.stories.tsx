@@ -26,7 +26,7 @@ export const HighestAverage: StoryObj = {
       "De partij met het hoogste gemiddeld aantal stemmen na het toewijzen van de restzetel krijgt de restzetel",
     );
     await expect(listitems[3]).toHaveTextContent(
-      "Lijst 2 - Algemene Partij, Lijst 3 - KEUS, Lijst 4 - Algemene Lijst, Lijst 5 - Unie van kandidaten en Lijst 6 - Lijst van stemmers krijgen samen het hoogste gemiddeld aantal stemmen per zetel (46 2/3 stemmen)",
+      "Lijst 2 – Algemene Partij, Lijst 3 – KEUS, Lijst 4 – Algemene Lijst, Lijst 5 – Unie van kandidaten en Lijst 6 – Lijst van stemmers hebben samen het hoogste gemiddeld aantal stemmen per zetel (46 2/3 stemmen)",
     );
     await expect(listitems[4]).toHaveTextContent("Daarom moet er geloot worden welke lijst de restzetel krijgt");
   },
@@ -54,7 +54,7 @@ export const LargestRemainder: StoryObj = {
       "De partij met het grootste overschot aan stemmen krijgt de restzetel",
     );
     await expect(listitems[3]).toHaveTextContent(
-      "Lijst 2 - Politieke Groep der Kandidaten, Lijst 3 - Stemalliantie, Lijst 4 - Stem voor de Partij, Lijst 5 - Alliantie van Partijen en Lijst 6 - Unie voor Stemmen hebben samen het grootste overschot (0 stemmen)",
+      "Lijst 2 – Politieke Groep der Kandidaten, Lijst 3 – Stemalliantie, Lijst 4 – Stem voor de Partij, Lijst 5 – Alliantie van Partijen en Lijst 6 – Unie voor Stemmen hebben samen het grootste overschot (0 stemmen)",
     );
     await expect(listitems[4]).toHaveTextContent("Daarom moet er geloot worden welke lijst de restzetel krijgt");
   },

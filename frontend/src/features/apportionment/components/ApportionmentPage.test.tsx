@@ -233,7 +233,7 @@ describe("ApportionmentPage", () => {
       ["Aantal raadszetels", "15", ""],
       ["Kiesdeler", "80", "Benodigde stemmen per volle zetel"],
       ["Voorkeursdrempel", "40", "50% van de kiesdeler"],
-      ["Kandidaten voor zetelverdeling", "44 - 0 † = 44", "Beheer overleden kandidaten"],
+      ["Kandidaten voor zetelverdeling", "44", "Beheer overleden kandidaten"],
     ]);
 
     expect(await screen.findByRole("heading", { level: 2, name: "Zetelverdeling" })).toBeVisible();
@@ -270,21 +270,21 @@ describe("ApportionmentPage", () => {
     expect(chosen_candidates_table).toBeVisible();
     expect(chosen_candidates_table).toHaveTableContent([
       ["Naam", "Woonplaats", "Lijst"],
-      ["Bakker, S. (Sophie) (v)", "Test Location", "Lijst 1 - Political Group A"],
-      ["Bakker, T. (Tinus) (m)", "Test Location (BE)", "Lijst 2 - Political Group B"],
-      ["Van den Berg, M. (Marijke) (v)", "Test Location", "Lijst 1 - Political Group A"],
-      ["Bogaert, G. (Gerard) (m)", "Test Location", "Lijst 4 - Political Group D"],
-      ["Van Doorn, A. (Adelbert) (m)", "Test Location", "Lijst 3 - Political Group C"],
-      ["Jansen, A. (Arie) (m)", "Test Location", "Lijst 1 - Political Group A"],
-      ["De Jong, R. (Rolf) (m)", "Test Location", "Lijst 1 - Political Group A"],
-      ["Kok, K. (Karin) (v)", "Test Location", "Lijst 1 - Political Group A"],
-      ["Oud, J. (Johan) (m)", "Test Location", "Lijst 1 - Political Group A"],
-      ["Oud, K. (Klaas) (m)", "Test Location", "Lijst 1 - Political Group A"],
-      ["Oud, L. (Lidewij) (v)", "Test Location", "Lijst 1 - Political Group A"],
-      ["Oud, M. (Marijke) (v)", "Test Location", "Lijst 1 - Political Group A"],
-      ["De Vries, J. (Johan) (m)", "Test Location", "Lijst 1 - Political Group A"],
-      ["Van der Weijden, B. (Berta) (v)", "Test Location (BE)", "Lijst 1 - Political Group A"],
-      ["Van der Weijden, H. (Henk) (m)", "Test Location", "Lijst 1 - Political Group A"],
+      ["Bakker, S. (Sophie) (v)", "Test Location", "Lijst 1 – Political Group A"],
+      ["Bakker, T. (Tinus) (m)", "Test Location (BE)", "Lijst 2 – Political Group B"],
+      ["Van den Berg, M. (Marijke) (v)", "Test Location", "Lijst 1 – Political Group A"],
+      ["Bogaert, G. (Gerard) (m)", "Test Location", "Lijst 4 – Political Group D"],
+      ["Van Doorn, A. (Adelbert) (m)", "Test Location", "Lijst 3 – Political Group C"],
+      ["Jansen, A. (Arie) (m)", "Test Location", "Lijst 1 – Political Group A"],
+      ["De Jong, R. (Rolf) (m)", "Test Location", "Lijst 1 – Political Group A"],
+      ["Kok, K. (Karin) (v)", "Test Location", "Lijst 1 – Political Group A"],
+      ["Oud, J. (Johan) (m)", "Test Location", "Lijst 1 – Political Group A"],
+      ["Oud, K. (Klaas) (m)", "Test Location", "Lijst 1 – Political Group A"],
+      ["Oud, L. (Lidewij) (v)", "Test Location", "Lijst 1 – Political Group A"],
+      ["Oud, M. (Marijke) (v)", "Test Location", "Lijst 1 – Political Group A"],
+      ["De Vries, J. (Johan) (m)", "Test Location", "Lijst 1 – Political Group A"],
+      ["Van der Weijden, B. (Berta) (v)", "Test Location (BE)", "Lijst 1 – Political Group A"],
+      ["Van der Weijden, H. (Henk) (m)", "Test Location", "Lijst 1 – Political Group A"],
     ]);
 
     // Check if the link to the list details page works
@@ -481,7 +481,7 @@ describe("ApportionmentPage", () => {
         expect(alerts[0]).toHaveTextContent(
           [
             "Loting noodzakelijk voor toekennen restzetel 2",
-            "Er is een restzetel te verdelen. In de wet staat dat de partij met het grootste overschot aan stemmen per toegewezen zetel deze krijgt.",
+            "Er is een restzetel te verdelen. In de wet staat dat de partij met het grootste overschot aan stemmen per toegewezen zetel deze restzetel krijgt.",
             "Er zijn meerdere partijen die hetzelfde grootste overschot hebben.",
             "Hierdoor kan de restzetel niet automatisch worden toegewezen. Het centraal stembureau moet een loting uitvoeren om de restzetel toe te wijzen.",
           ].join(""),
@@ -557,8 +557,8 @@ describe("ApportionmentPage", () => {
         expect(alerts[0]).toHaveTextContent(
           [
             "Loting noodzakelijk voor toekennen restzetels 2, 3 en 4",
-            "Er is een restzetel te verdelen. In de wet staat dat de partij met het grootste gemiddeld aantal stemmen per toegewezen zetel deze krijgt.",
-            "Er zijn meerdere partijen die na het toewijzen van de volgende restzetel precies hetzelfde hoogste gemiddelde krijgen.",
+            "Er is een restzetel te verdelen. In de wet staat dat de partij met het grootste gemiddeld aantal stemmen per toegewezen zetel deze restzetel krijgt.",
+            "Er zijn meerdere partijen die na het toewijzen van de volgende restzetel precies hetzelfde hoogste gemiddelde hebben.",
             "Hierdoor kan de restzetel niet automatisch worden toegewezen. Het centraal stembureau moet een loting uitvoeren om de restzetel toe te wijzen.",
           ].join(""),
         );
@@ -635,8 +635,8 @@ describe("ApportionmentPage", () => {
         expect(alerts[0]).toHaveTextContent(
           [
             "Loting noodzakelijk voor toekennen restzetels 3 en 4",
-            "Er is een restzetel te verdelen. In de wet staat dat de partij met het grootste gemiddeld aantal stemmen per toegewezen zetel deze krijgt.",
-            "Er zijn meerdere partijen die na het toewijzen van de volgende restzetel precies hetzelfde hoogste gemiddelde krijgen.",
+            "Er is een restzetel te verdelen. In de wet staat dat de partij met het grootste gemiddeld aantal stemmen per toegewezen zetel deze restzetel krijgt.",
+            "Er zijn meerdere partijen die na het toewijzen van de volgende restzetel precies hetzelfde hoogste gemiddelde hebben.",
             "Hierdoor kan de restzetel niet automatisch worden toegewezen. Het centraal stembureau moet een loting uitvoeren om de restzetel toe te wijzen.",
           ].join(""),
         );
@@ -650,7 +650,7 @@ describe("ApportionmentPage", () => {
       if (alerts[1]) {
         expect(alerts[1]).toHaveClass(alertCls.notify!);
         expect(alerts[1]).toHaveTextContent(
-          "Restzetel 2 kon niet automatisch worden toegewezen en is na loting toegekend aan Lijst 4 - Algemene Lijst.",
+          "Restzetel 2 kon niet automatisch worden toegewezen en is na loting toegekend aan Lijst 4 – Algemene Lijst (er is geloot tussen lijst 2, 3, 4, 5 en 6).",
         );
         expect(alerts[1]).toHaveTextContent("Er zijn nog 2 restzetels te verdelen.");
         expect(within(alerts[1]).getByRole("link", { name: "Bekijk details" })).toHaveAttribute(
@@ -703,8 +703,8 @@ describe("ApportionmentPage", () => {
         expect(alerts[0]).toHaveTextContent(
           [
             "Loting noodzakelijk voor toekennen restzetel 4",
-            "Er is een restzetel te verdelen. In de wet staat dat de partij met het grootste gemiddeld aantal stemmen per toegewezen zetel deze krijgt.",
-            "Er zijn meerdere partijen die na het toewijzen van de volgende restzetel precies hetzelfde hoogste gemiddelde krijgen.",
+            "Er is een restzetel te verdelen. In de wet staat dat de partij met het grootste gemiddeld aantal stemmen per toegewezen zetel deze restzetel krijgt.",
+            "Er zijn meerdere partijen die na het toewijzen van de volgende restzetel precies hetzelfde hoogste gemiddelde hebben.",
             "Hierdoor kan de restzetel niet automatisch worden toegewezen. Het centraal stembureau moet een loting uitvoeren om de restzetel toe te wijzen.",
           ].join(""),
         );
@@ -720,8 +720,12 @@ describe("ApportionmentPage", () => {
         expect(alerts[1]).toHaveTextContent(
           "Sommige restzetels konden niet automatisch worden toegewezen en zijn via loting toegekend:",
         );
-        expect(alerts[1]).toHaveTextContent("Restzetel 2 is toegekend aan Lijst 4 - Algemene Lijst");
-        expect(alerts[1]).toHaveTextContent("Restzetel 3 is toegekend aan Lijst 6 - Lijst van stemmers");
+        expect(alerts[1]).toHaveTextContent(
+          "Restzetel 2 is toegekend aan Lijst 4 – Algemene Lijst(er is geloot tussen lijst 2, 3, 4, 5 en 6)",
+        );
+        expect(alerts[1]).toHaveTextContent(
+          "Restzetel 3 is toegekend aan Lijst 6 – Lijst van stemmers(er is geloot tussen lijst 2, 3, 5 en 6)",
+        );
         expect(alerts[1]).toHaveTextContent("Er is nog 1 restzetel te verdelen.");
         expect(within(alerts[1]).getByRole("link", { name: "Bekijk details" })).toHaveAttribute(
           "href",
@@ -769,9 +773,9 @@ describe("ApportionmentPage", () => {
         expect(alerts[0]).toHaveTextContent(
           [
             "Loting noodzakelijk vanwege volstrekte meerderheid",
-            "De partijdigen heeft de volstrekte meerderheid van stemmen gekregen, maar heeft niet de volstrekte meerderheid aan zetels.",
-            "Volgens artikel P 9 van de kieswet wordt een zetel afgenomen van de lijst waaraan de laatste restzetel is toegekend. ",
-            "Lijst 2, 3 en 4 hebben met hetzelfde overschot aan stemmen hun laatste restzetel gekregen. ",
+            "Lijst 1 – De partijdigen heeft de volstrekte meerderheid van stemmen gekregen, maar heeft niet de volstrekte meerderheid aan zetels.",
+            "Volgens artikel P 9 van de kieswet wordt een zetel afgenomen van de lijst die een zetel heeft gekregen op basis van het kleinste overschot aan stemmen. ",
+            "Lijst 2, 3 en 4 hebben met hetzelfde overschot aan stemmen hun zetels gekregen. ",
             "In de zitting van het CSB moet door loting worden bepaald welk van deze lijsten een zetel af moet staan.",
           ].join(""),
         );
@@ -837,9 +841,9 @@ describe("ApportionmentPage", () => {
         expect(alerts[0]).toHaveTextContent(
           [
             "Loting noodzakelijk vanwege volstrekte meerderheid",
-            "De Kandidaat heeft de volstrekte meerderheid van stemmen gekregen, maar heeft niet de volstrekte meerderheid aan zetels.",
-            "Volgens artikel P 9 van de kieswet wordt een zetel afgenomen van de lijst waaraan de laatste restzetel is toegekend. ",
-            "Lijst 6 en 7 hebben met hetzelfde gemiddeld aantal stemmen hun laatste restzetel gekregen. ",
+            "Lijst 1 – De Kandidaat heeft de volstrekte meerderheid van stemmen gekregen, maar heeft niet de volstrekte meerderheid aan zetels.",
+            "Volgens artikel P 9 van de kieswet wordt een zetel afgenomen van de lijst die een zetel heeft gekregen op basis van het kleinste gemiddeld aantal stemmen. ",
+            "Lijst 6 en 7 hebben met hetzelfde gemiddeld aantal stemmen hun zetels gekregen. ",
             "In de zitting van het CSB moet door loting worden bepaald welk van deze lijsten een zetel af moet staan.",
           ].join(""),
         );
@@ -920,7 +924,7 @@ describe("ApportionmentPage", () => {
 
       expect(alerts[1]).toHaveClass(alertCls.notify!);
       expect(alerts[1]).toHaveTextContent(
-        "De laatste restzetel voor lijst 1 (artikel P 9) is na loting afgestaan door Lijst 7 - Partij van de Keuze",
+        "De laatste restzetel voor lijst 1 (artikel P 9) is na loting afgestaan door Lijst 7 – Partij van de Keuze (er is geloot tussen lijst 6 en 7)",
       );
 
       const apportionment_table = await screen.findByTestId("apportionment-table");
@@ -969,7 +973,7 @@ describe("ApportionmentPage", () => {
         expect(alerts[0]).toHaveTextContent(
           [
             "Loting noodzakelijk voor kandidaten met gelijk aantal voorkeursstemmen",
-            "3 kandidaten van GROEP 9 hebben evenveel voorkeursstemmen gekregen. Er is nog 1 zetel beschikbaar. ",
+            "3 kandidaten van Lijst 2 – GROEP 9 hebben evenveel voorkeursstemmen gekregen. Er is nog 1 zetel beschikbaar. ",
             "In de wet staat dat de kandidaat met het hoogste aantal voorkeursstemmen de zetel krijgt.",
             "Hierdoor kan de zetel niet automatisch worden toegewezen. Het centraal stembureau moet een loting uitvoeren om te bepalen welke kandidaat gekozen wordt.",
           ].join(""),
@@ -1022,7 +1026,7 @@ describe("ApportionmentPage", () => {
         expect(alerts[0]).toHaveTextContent(
           [
             "Loting noodzakelijk voor kandidaten met gelijk aantal voorkeursstemmen",
-            "2 kandidaten van GROEP 8 hebben evenveel voorkeursstemmen gekregen. Er zijn nog 2 zetels beschikbaar. ",
+            "2 kandidaten van Lijst 1 – GROEP 8 hebben evenveel voorkeursstemmen gekregen. Er zijn nog 2 zetels beschikbaar. ",
             "In de wet staat dat de kandidaten met het hoogste aantal voorkeursstemmen de zetels krijgen.",
             "Hierdoor kunnen de zetels niet automatisch worden toegewezen. Het centraal stembureau moet een loting uitvoeren om te bepalen welke kandidaten gekozen worden.",
           ].join(""),

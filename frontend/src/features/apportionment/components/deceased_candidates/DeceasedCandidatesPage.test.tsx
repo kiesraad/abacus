@@ -145,7 +145,7 @@ describe("DeceasedCandidatesPage", () => {
     expect(table).toBeVisible();
     expect(table).toHaveTableContent([
       ["Overleden kandidaat", "Lijst", "Positie op lijst", ""],
-      ["Oud, L. (Lidewij) †", "Lijst 1 - Political Group A", "1", "Verwijderen"],
+      ["Oud, L. (Lidewij) †", "Lijst 1 – Political Group A", "1", "Verwijderen"],
     ]);
 
     // Check if the delete link works
@@ -189,7 +189,7 @@ describe("DeceasedCandidatesPage", () => {
     expect(table).toBeVisible();
     expect(table).toHaveTableContent([
       ["Overleden kandidaat", "Lijst", "Positie op lijst"],
-      ["Oud, L. (Lidewij) †", "Lijst 1 - Political Group A", "1"],
+      ["Oud, L. (Lidewij) †", "Lijst 1 – Political Group A", "1"],
     ]);
 
     expect(screen.queryByRole("button", { name: "+ Kandidaat toevoegen" })).not.toBeInTheDocument();
@@ -273,7 +273,7 @@ describe("DeceasedCandidatesPage", () => {
     expect(table).toBeVisible();
     expect(table).toHaveTableContent([
       ["Overleden kandidaat", "Lijst", "Positie op lijst"],
-      ["Oud, L. (Lidewij) †", "Lijst 1 - Political Group A", "1"],
+      ["Oud, L. (Lidewij) †", "Lijst 1 – Political Group A", "1"],
     ]);
 
     expect(screen.queryByRole("button", { name: "+ Kandidaat toevoegen" })).not.toBeInTheDocument();

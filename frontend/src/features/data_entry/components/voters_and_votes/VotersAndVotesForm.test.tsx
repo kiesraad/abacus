@@ -149,7 +149,7 @@ describe("Test VotersAndVotesForm", () => {
       await user.keyboard("{enter}");
 
       const totalVotesOnPoliticalParty1 = screen.getByRole("textbox", {
-        name: "E.1 Totaal Lijst 1 - Vurige Vleugels Partij",
+        name: "E.1 Totaal Lijst 1 – Vurige Vleugels Partij",
       });
       expect(totalVotesOnPoliticalParty1).toHaveFocus();
       await user.type(totalVotesOnPoliticalParty1, "12");
@@ -158,7 +158,7 @@ describe("Test VotersAndVotesForm", () => {
       await user.keyboard("{enter}");
 
       const totalVotesOnPoliticalParty2 = screen.getByRole("textbox", {
-        name: "E.2 Totaal Lijst 2 - Wijzen van Water en Wind",
+        name: "E.2 Totaal Lijst 2 – Wijzen van Water en Wind",
       });
       expect(totalVotesOnPoliticalParty2).toHaveFocus();
       await user.type(totalVotesOnPoliticalParty2, "34");

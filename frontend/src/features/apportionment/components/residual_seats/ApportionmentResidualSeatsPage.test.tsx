@@ -275,7 +275,7 @@ describe("ApportionmentResidualSeatsPage", () => {
     ]);
 
     expect(await screen.findByTestId("footnotes-list")).toHaveTextContent(
-      "Lijst 1 heeft meer dan de helft van alle uitgebrachte stemmen behaald, maar krijgt op basis van de standaard zetelverdeling niet de meerderheid van de zetels. Volgens de Kieswet (Artikel P 9 Toewijzing zetels bij volstrekte meerderheid) krijgt deze lijst één extra zetel. Deze zetel gaat ten koste van lijst 7 omdat die de laatste restzetel toegewezen heeft gekregen.",
+      "Lijst 1 heeft meer dan de helft van alle uitgebrachte stemmen behaald, maar krijgt op basis van de standaard zetelverdeling niet de meerderheid van de zetels. Volgens de Kieswet (Artikel P 9 Toewijzing zetels bij volstrekte meerderheid) krijgt deze lijst één extra zetel. Deze zetel gaat ten koste van lijst 7.",
     );
 
     expect(screen.queryByTestId("largest-remainders-table")).not.toBeInTheDocument();
@@ -430,7 +430,7 @@ describe("ApportionmentResidualSeatsPage", () => {
     ]);
 
     expect(await screen.findByTestId("footnotes-list")).toHaveTextContent(
-      /^Het overschot is berekend op basis van de 7 volle zetels die de lijst heeft gehaald voordat lijstuitputting is meegenomen \(Kieswet, artikel P 8\).Lijst 1 heeft meer dan de helft van alle uitgebrachte stemmen behaald, maar krijgt op basis van de standaard zetelverdeling niet de meerderheid van de zetels. Volgens de Kieswet \(Artikel P 9 Toewijzing zetels bij volstrekte meerderheid\) krijgt deze lijst één extra zetel. Deze zetel gaat ten koste van lijst 4 omdat die de laatste restzetel toegewezen heeft gekregen.Omdat lijst 1 geen kandidaat heeft voor een zetel, is deze herverdeeld naar een andere lijst. \(Kieswet, artikel P 10\)$/,
+      /^Het overschot is berekend op basis van de 7 volle zetels die de lijst heeft gehaald voordat lijstuitputting is meegenomen \(Kieswet, artikel P 8\).Lijst 1 heeft meer dan de helft van alle uitgebrachte stemmen behaald, maar krijgt op basis van de standaard zetelverdeling niet de meerderheid van de zetels. Volgens de Kieswet \(Artikel P 9 Toewijzing zetels bij volstrekte meerderheid\) krijgt deze lijst één extra zetel. Deze zetel gaat ten koste van lijst 4.Omdat lijst 1 geen kandidaat heeft voor een zetel, is deze herverdeeld naar een andere lijst. \(Kieswet, artikel P 10\)$/,
     );
 
     expect(screen.queryByTestId("highest-averages-table")).not.toBeInTheDocument();

@@ -171,7 +171,7 @@ describe("DrawingLotsPage", () => {
       "De partij met het hoogste gemiddeld aantal stemmen na het toewijzen van de restzetel krijgt de restzetel",
     );
     expect(listitems[3]).toHaveTextContent(
-      "Lijst 2 - Algemene Partij, Lijst 3 - KEUS, Lijst 4 - Algemene Lijst, Lijst 5 - Unie van kandidaten en Lijst 6 - Lijst van stemmers krijgen samen het hoogste gemiddeld aantal stemmen per zetel (46 2/3 stemmen)",
+      "Lijst 2 – Algemene Partij, Lijst 3 – KEUS, Lijst 4 – Algemene Lijst, Lijst 5 – Unie van kandidaten en Lijst 6 – Lijst van stemmers hebben samen het hoogste gemiddeld aantal stemmen per zetel (46 2/3 stemmen)",
     );
     expect(listitems[4]).toHaveTextContent("Daarom moet er geloot worden welke lijst de restzetel krijgt");
 
@@ -186,7 +186,7 @@ describe("DrawingLotsPage", () => {
 
     const options = await screen.findAllByRole("radio");
     expect(options.length).toBe(5);
-    const option = await screen.findByRole("radio", { name: "Lijst 3 - KEUS" });
+    const option = await screen.findByRole("radio", { name: "Lijst 3 – KEUS" });
     expect(option).toBeVisible();
     expect(option).not.toBeChecked();
     await user.click(option);
@@ -259,7 +259,7 @@ describe("DrawingLotsPage", () => {
     expect(listitems[1]).toHaveTextContent("Restzetel 2 kan niet automatisch worden toegewezen");
     expect(listitems[2]).toHaveTextContent("De partij met het grootste overschot aan stemmen krijgt de restzetel");
     expect(listitems[3]).toHaveTextContent(
-      "Lijst 2 - Politieke Groep der Kandidaten, Lijst 3 - Stemalliantie, Lijst 4 - Stem voor de Partij, Lijst 5 - Alliantie van Partijen en Lijst 6 - Unie voor Stemmen hebben samen het grootste overschot (0 stemmen)",
+      "Lijst 2 – Politieke Groep der Kandidaten, Lijst 3 – Stemalliantie, Lijst 4 – Stem voor de Partij, Lijst 5 – Alliantie van Partijen en Lijst 6 – Unie voor Stemmen hebben samen het grootste overschot (0 stemmen)",
     );
     expect(listitems[4]).toHaveTextContent("Daarom moet er geloot worden welke lijst de restzetel krijgt");
 
@@ -274,7 +274,7 @@ describe("DrawingLotsPage", () => {
 
     const options = await screen.findAllByRole("radio");
     expect(options.length).toBe(5);
-    const option = await screen.findByRole("radio", { name: "Lijst 2 - Politieke Groep der Kandidaten" });
+    const option = await screen.findByRole("radio", { name: "Lijst 2 – Politieke Groep der Kandidaten" });
     expect(option).toBeVisible();
     expect(option).not.toBeChecked();
     await user.click(option);
@@ -365,7 +365,7 @@ describe("DrawingLotsPage", () => {
 
     const options = await screen.findAllByRole("radio");
     expect(options.length).toBe(2);
-    const option = await screen.findByRole("radio", { name: "Lijst 7 - Partij van de Keuze" });
+    const option = await screen.findByRole("radio", { name: "Lijst 7 – Partij van de Keuze" });
     expect(option).toBeVisible();
     expect(option).not.toBeChecked();
     await user.click(option);
@@ -456,7 +456,7 @@ describe("DrawingLotsPage", () => {
 
     const options = await screen.findAllByRole("radio");
     expect(options.length).toBe(3);
-    const option = await screen.findByRole("radio", { name: "Lijst 3 - Lijst De Partij" });
+    const option = await screen.findByRole("radio", { name: "Lijst 3 – Lijst De Partij" });
     expect(option).toBeVisible();
     expect(option).not.toBeChecked();
     await user.click(option);
@@ -535,7 +535,9 @@ describe("DrawingLotsPage", () => {
     );
     expect(listitems[2]).toHaveTextContent("2. Wiertz, K. (Kris)");
     expect(listitems[3]).toHaveTextContent("6. Arets, T.E. (Tiemen)");
-    expect(listitems[4]).toHaveTextContent("Daarom moet er geloot worden wie zetel 2 krijgt");
+    expect(listitems[4]).toHaveTextContent(
+      "Volgens artikel P 15 van de Kieswet moet er geloot worden wie zetel 2 krijgt",
+    );
 
     expect(await screen.findByRole("heading", { level: 3, name: "Instructies voor loting" })).toBeVisible();
     expect(
@@ -605,11 +607,11 @@ describe("DrawingLotsPage", () => {
 
     const options = await screen.findAllByRole("radio");
     expect(options.length).toBe(5);
-    const option1 = await screen.findByRole("radio", { name: "Lijst 2 - Politieke Groep der Kandidaten" });
-    const option2 = await screen.findByRole("radio", { name: "Lijst 3 - Stemalliantie" });
-    const option3 = await screen.findByRole("radio", { name: "Lijst 4 - Stem voor de Partij" });
-    const option4 = await screen.findByRole("radio", { name: "Lijst 5 - Alliantie van Partijen" });
-    const option5 = await screen.findByRole("radio", { name: "Lijst 6 - Unie voor Stemmen" });
+    const option1 = await screen.findByRole("radio", { name: "Lijst 2 – Politieke Groep der Kandidaten" });
+    const option2 = await screen.findByRole("radio", { name: "Lijst 3 – Stemalliantie" });
+    const option3 = await screen.findByRole("radio", { name: "Lijst 4 – Stem voor de Partij" });
+    const option4 = await screen.findByRole("radio", { name: "Lijst 5 – Alliantie van Partijen" });
+    const option5 = await screen.findByRole("radio", { name: "Lijst 6 – Unie voor Stemmen" });
     expect(option1).toBeVisible();
     expect(option1).not.toBeChecked();
     expect(option2).toBeVisible();

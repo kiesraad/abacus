@@ -203,7 +203,7 @@ describe("DataEntryProgress", () => {
       `/elections/${electionId}/data-entry/${dataEntryId}/${entryNumber}/differences_counts`,
     );
 
-    const list1Link = within(list1).getByRole("link", { name: "Lijst 1 - Vurige Vleugels Partij" });
+    const list1Link = within(list1).getByRole("link", { name: "Lijst 1 – Vurige Vleugels Partij" });
     expect(list1Link).toBeVisible();
     expect(list1Link).toHaveAttribute(
       "href",
@@ -240,7 +240,7 @@ describe("DataEntryProgress", () => {
     expect(list1).toHaveAttribute("aria-current", "step");
     const list1Icon = within(list1).getByRole("img");
     expect(list1Icon).toHaveAccessibleName("je bent hier");
-    expect(within(list1).queryByRole("link", { name: "Lijst 1 - Vurige Vleugels Partij" })).not.toBeInTheDocument();
+    expect(within(list1).queryByRole("link", { name: "Lijst 1 – Vurige Vleugels Partij" })).not.toBeInTheDocument();
 
     expect(checkAndSave).toHaveClass("unsaved");
     expect(checkAndSave).toHaveAttribute("aria-current", "false");

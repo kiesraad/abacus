@@ -33,7 +33,7 @@ describe("ResolveDifferencesTables", () => {
     expect(votersVotesCountsTable).toBeVisible();
     expect(votersVotesCountsTable).toHaveTableContent([
       ["Veld", "Eerste invoer", "Tweede invoer", "Omschrijving"],
-      ["E.1", "1.512", "1.481", "Totaal Lijst 1 - Vurige Vleugels Partij"],
+      ["E.1", "1.512", "1.481", "Totaal Lijst 1 – Vurige Vleugels Partij"],
       [""],
       ["E", "1.514", "1.483", "Totaal stemmen op kandidaten"],
       [""],
@@ -46,7 +46,7 @@ describe("ResolveDifferencesTables", () => {
     expect(differencesCountsTable).not.toBeInTheDocument();
 
     const fieryWingsPartyTable = await screen.findByRole("table", {
-      name: "Rubriek: Lijst 1 - Vurige Vleugels Partij",
+      name: "Rubriek: Lijst 1 – Vurige Vleugels Partij",
     });
     expect(fieryWingsPartyTable).toBeVisible();
     expect(fieryWingsPartyTable).toHaveTableContent([
@@ -63,7 +63,7 @@ describe("ResolveDifferencesTables", () => {
     ]);
 
     const wiseOfWaterAndWindTable = screen.queryByRole("table", {
-      name: "Lijst 2 - Wijzen van Water en Wind",
+      name: "Lijst 2 – Wijzen van Water en Wind",
     });
     expect(wiseOfWaterAndWindTable).not.toBeInTheDocument();
   });

@@ -57,11 +57,12 @@ function renderNotifyDrawingLotsAlert(listCandidatesDrawn: ListCandidateDrawn[])
       <Alert type="notify" small>
         {listCandidatesDrawn.length === 1 ? (
           <p>
-            {listCandidatesDrawn.map(({ seat_number, candidate }) => (
+            {listCandidatesDrawn.map(({ seat_number, candidate, options }) => (
               <span key={`drawing-lots-assignment-${seat_number}`}>
                 {tx("apportionment.assigned_by_drawing_lots_to_candidate_alert.singular", undefined, {
                   seat_number: seat_number,
                   candidate: candidate,
+                  options: formatList(options, t("and")),
                 })}
               </span>
             ))}
@@ -71,11 +72,12 @@ function renderNotifyDrawingLotsAlert(listCandidatesDrawn: ListCandidateDrawn[])
             <>
               <p>{t("apportionment.assigned_by_drawing_lots_to_candidate_alert.plural.title")}</p>
               <ul>
-                {listCandidatesDrawn.map(({ seat_number, candidate }) => (
+                {listCandidatesDrawn.map(({ seat_number, candidate, options }) => (
                   <li key={`drawing-lots-assignment-${seat_number}`}>
                     {tx("apportionment.assigned_by_drawing_lots_to_candidate_alert.plural.assigned_to", undefined, {
                       seat_number: seat_number,
                       candidate: candidate,
+                      options: formatList(options, t("and")),
                     })}
                   </li>
                 ))}
@@ -290,7 +292,7 @@ export function ApportionmentListDetailsPage() {
                     <span id="text-list-assigned-nr-seats">{getListAssignedSeatsText(listTotalSeats, listName)}</span>
                   </div>
                   {listDeceasedCandidateNumbers.length > 0 && (
-                    <div className={cn("mt-md-lg", cls.deceasedCandidatesAlert)}>
+                    <div className={cn("mt-md-lg", cls.smallAlert)}>
                       {renderDeceasedCandidatesAlert(listDeceasedCandidateNumbers.sort((a, b) => a - b))}
                     </div>
                   )}

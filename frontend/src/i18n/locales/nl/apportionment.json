@@ -1,6 +1,6 @@
 {
   "absolute_majority_reassignment": "Lijst {list_assigned_seat} heeft meer dan de helft van alle uitgebrachte stemmen behaald, maar krijgt op basis van de standaard zetelverdeling niet de meerderheid van de zetels. Volgens de Kieswet (Artikel P 9 Toewijzing zetels bij volstrekte meerderheid) krijgt deze lijst één extra zetel.",
-  "absolute_majority_reassignment_result": "Deze zetel gaat ten koste van lijst {list_retracted_seat} omdat die de laatste restzetel toegewezen heeft gekregen.",
+  "absolute_majority_reassignment_result": "Deze zetel gaat ten koste van lijst {list_retracted_seat}.",
   "allocation_of_full_seats": "Verdeling van de volle zetels",
   "allocation_of_residual_seats": "Verdeling van de restzetels",
   "all_seats_assigned": "Alle zetels zijn toegewezen",
@@ -8,17 +8,17 @@
   "apportionment_already_calculated": "De zetelverdeling is al berekend.",
   "article_p10": "(Kieswet, artikel P 10)",
   "assigned_by_drawing_lots_alert": {
-    "singular": "Restzetel {nr} kon niet automatisch worden toegewezen en is na loting toegekend aan <strong>{list}</strong>.",
+    "singular": "Restzetel {nr} kon niet automatisch worden toegewezen en is na loting toegekend aan <strong>{list}</strong> (er is geloot tussen lijst {options}).",
     "plural": {
       "title": "Sommige restzetels konden niet automatisch worden toegewezen en zijn via loting toegekend:",
-      "assigned_to": "Restzetel {nr} is toegekend aan <strong>{list}</strong>"
+      "assigned_to": "Restzetel {nr} is toegekend aan <strong>{list}</strong>\n(er is geloot tussen lijst {options})"
     }
   },
   "assigned_by_drawing_lots_to_candidate_alert": {
-    "singular": "Zetel {seat_number} is na loting toegewezen aan <strong>{candidate}</strong>",
+    "singular": "Zetel {seat_number} is na loting toegewezen aan <strong>{candidate}</strong> (er is geloot tussen kandidaat {options})",
     "plural": {
       "title": "Sommige zetels konden niet automatisch worden toegewezen en zijn via loting toegekend:",
-      "assigned_to": "Zetel {seat_number} is toegewezen aan <strong>{candidate}</strong>"
+      "assigned_to": "Zetel {seat_number} is toegewezen aan <strong>{candidate}</strong>\n(er is geloot tussen kandidaat {options})"
     }
   },
   "assigned_number_of_seats": "Toegewezen aantal zetels",
@@ -34,7 +34,7 @@
   "drawing_lots_for_candidate": {
     "title": "Loting voor kandidaten met evenveel stemmen",
     "candidates_for_drawing_lots": "Er zijn {num_candidates} kandidaten die op basis van hun voorkeursstemmen in aanmerking komen voor zetel {seat_number}. Zij hebben allen {votes} stemmen. Het gaat om de kandidaten:",
-    "hence_drawing_lots_is_needed": "Daarom moet er geloot worden wie zetel {seat_number} krijgt",
+    "hence_drawing_lots_is_needed": "Volgens artikel P 15 van de Kieswet moet er geloot worden wie zetel {seat_number} krijgt",
     "total_seats": "{list} heeft {total_seats} zetels"
   },
   "drawing_lots_for_list": {
@@ -45,7 +45,7 @@
       "largest_remainder": "De partij met het grootste overschot aan stemmen krijgt de restzetel"
     },
     "draw_lots_for_lists_with_same": {
-      "highest_average": "<strong>{lists}</strong> krijgen samen het hoogste gemiddeld aantal stemmen per zetel ({value} stemmen)",
+      "highest_average": "<strong>{lists}</strong> hebben samen het hoogste gemiddeld aantal stemmen per zetel ({value} stemmen)",
       "largest_remainder": "<strong>{lists}</strong> hebben samen het grootste overschot ({value} stemmen)"
     },
     "residual_seats_to_assign": {
@@ -83,17 +83,17 @@
       "singular": "Loting noodzakelijk voor toekennen restzetel",
       "plural": "Loting noodzakelijk voor toekennen restzetels"
     },
-    "description": "Er is een restzetel te verdelen. In de wet staat dat de partij met het grootste {variant} stemmen per toegewezen zetel deze krijgt.",
+    "description": "Er is een restzetel te verdelen. In de wet staat dat de partij met het grootste {variant} stemmen per toegewezen zetel deze restzetel krijgt.",
     "drawing_lots_needed": "Hierdoor kan de restzetel niet automatisch worden toegewezen. Het centraal stembureau moet een loting uitvoeren om de restzetel toe te wijzen.",
-    "same_averages": "Er zijn meerdere partijen die na het toewijzen van de volgende restzetel precies hetzelfde hoogste gemiddelde krijgen.",
+    "same_averages": "Er zijn meerdere partijen die na het toewijzen van de volgende restzetel precies hetzelfde hoogste gemiddelde hebben.",
     "same_remainders": "Er zijn meerdere partijen die hetzelfde grootste overschot hebben."
   },
   "drawing_lots_required_for_p9_alert": {
     "title": "Loting noodzakelijk vanwege volstrekte meerderheid",
-    "article_p9": "Volgens artikel P 9 van de kieswet wordt een zetel afgenomen van de lijst waaraan de laatste restzetel is toegekend.",
+    "article_p9": "Volgens artikel P 9 van de kieswet wordt een zetel afgenomen van de lijst die een zetel heeft gekregen op basis van het kleinste {variant} stemmen.",
     "description": "{name} heeft de volstrekte meerderheid van stemmen gekregen, maar heeft niet de volstrekte meerderheid aan zetels.",
     "drawing_lots_needed": "In de zitting van het CSB moet door loting worden bepaald welk van deze lijsten een zetel af moet staan.",
-    "last_residual_seat": "<strong>Lijst {lists}</strong> hebben met hetzelfde {variant} stemmen hun laatste restzetel gekregen."
+    "last_residual_seat": "<strong>Lijst {lists}</strong> hebben met hetzelfde {variant} stemmen hun zetels gekregen."
   },
   "drawing_lots_result": {
     "title": "Resultaat loting",
@@ -125,7 +125,7 @@
   },
   "indicate_deceased_candidate": "Geef aan welke kandidaat of kandidaten als gevolg van overlijden bij de zetelverdeling buiten beschouwing moeten worden gelaten.",
   "information_highest_averages": "Er zijn 19 of meer zetels. Daarom worden restzetels toegewezen volgens het <strong>systeem van de grootste gemiddelden</strong>. De partij die na toewijzing van een restzetel het hoogste aantal stemmen per zetel heeft, krijgt de restzetel.\nIn de tabel is het gemiddeld aantal stemmen per zetel te vinden dat elke lijst zou krijgen als een restzetel zou worden toegekend.",
-  "information_largest_remainders": "Er zijn minder dan 19 zetels. Daarom worden restzetels toegewezen volgens het <strong>systeem van de grootste overschotten</strong>. De restzetels zijn één voor één toegewezen aan de lijsten die na verdeling van de zetels het grootste overschot aan stemmen hebben. Lijsten die minder dan 75% van de kiesdeler hebben gehaald, komen niet in aanmerking voor een restzetel.",
+  "information_largest_remainders": "Er zijn minder dan 19 zetels. Daarom worden restzetels toegewezen volgens het <strong>systeem van de grootste overschotten</strong>. De restzetels zijn één voor één toegewezen aan de lijsten die na verdeling van de zetels het grootste overschot aan stemmen hebben. Hierbij heeft iedere lijst niet meer dan één zetel toegewezen gekregen. Lijsten die minder dan 75% van de kiesdeler hebben gehaald, komen niet in aanmerking voor een restzetel.",
   "list_assigned_nr_seats": {
     "singular": "{list_name} heeft <strong>{num_seats} zetel</strong> toegewezen gekregen.",
     "plural": "{list_name} heeft <strong>{num_seats} zetels</strong> toegewezen gekregen."
@@ -164,7 +164,7 @@
   "ranking_candidates": "Rangschikking van kandidaten voor opvolging",
   "ranking_candidates_empty": "Geen enkele kandidaat is niet gekozen.",
   "ranking_candidates_info": "De volgende kandidaten hebben geen zetel toegewezen gekregen. Als een zetel vrijkomt wordt deze via de onderstaande volgorde aan opvolgers toegewezen.",
-  "reassigned_by_drawing_lots_alert": "De laatste restzetel voor lijst {assigned_to} (artikel P 9) is na loting afgestaan door <strong>{retracted_from}</strong>",
+  "reassigned_by_drawing_lots_alert": "De laatste restzetel voor lijst {assigned_to} (artikel P 9) is na loting afgestaan door <strong>{retracted_from}</strong> (er is geloot tussen lijst {options})",
   "redo_apportionment": "Doe dan de zetelverdeling opnieuw",
   "redo_apportionment_button": "Zetelverdeling opnieuw doen",
   "remainder": "Overschot",

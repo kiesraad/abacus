@@ -729,6 +729,280 @@ mod tests {
         }
     }
 
+    mod assign_remainder {
+        use std::collections::HashMap;
+
+        use super::*;
+        use crate::test_helpers::ListDrawnMock;
+
+        #[test]
+        fn test_returns_previous_steps_and_standings_when_no_residual_seats_remain() {
+            // Validate if steps given to the function are returned as-is when no seats have to be assigned
+            let standings = [standing(1, 100), standing(2, 80)];
+            let previous_steps = vec![highest_average_step(2, vec![2], vec![2])];
+            let lists_drawn: Vec<ListDrawnMock> = vec![];
+
+            let result = assign_remainder::<ListVotesMock>(
+                &standings,
+                19,
+                2,
+                2,
+                &previous_steps,
+                None,
+                &mut lists_drawn.iter(),
+            );
+
+            let Ok(RemainderAssignment::Completed(steps, final_standings)) = result else {
+                panic!("expected Completed");
+            };
+            assert_eq!(steps, previous_steps);
+            assert_eq!(final_standings, standings.to_vec());
+        }
+
+        #[test]
+        fn test_uses_highest_averages_for_large_councils() {
+            // next votes per seat: list 1: 100/2 = 50, list 2: 80, list 3: 60.
+            // Seat 1 goes to list 2, after which its average drops to 80/2 = 40,
+            // so seat 2 goes to list 3
+            let standings = [standing(1, 100), standing(2, 80), standing(3, 60)];
+            let lists_drawn: Vec<ListDrawnMock> = vec![];
+
+            let result = assign_remainder::<ListVotesMock>(
+                &standings,
+                19,
+                2,
+                0,
+                &[],
+                None,
+                &mut lists_drawn.iter(),
+            );
+
+            let Ok(RemainderAssignment::Completed(steps, final_standings)) = result else {
+                panic!("expected Completed");
+            };
+            assert!(
+                steps
+                    .iter()
+                    .all(|s| s.change.is_changed_by_highest_average_assignment())
+            );
+            assert_eq!(steps.len(), 2);
+            // Should be standings before the change
+            assert_eq!(steps[0].standings, standings.to_vec());
+            assert_eq!(steps[0].residual_seat_number, Some(1));
+            assert_eq!(steps[0].change.list_number_assigned(), 2);
+
+            assert_eq!(steps[1].residual_seat_number, Some(2));
+            assert_eq!(steps[1].change.list_number_assigned(), 3);
+
+            assert_eq!(final_standings[0].residual_seats(), 0);
+            assert_eq!(final_standings[1].residual_seats(), 1);
+            assert_eq!(final_standings[2].residual_seats(), 1);
+        }
+
+        #[test]
+        fn test_uses_largest_remainder_for_small_councils() {
+            // remainder votes: list 1: 150 - 100 = 50, list 2: 80.
+            // Seat 1 goes to list 2, after which it no longer qualifies,
+            // so seat 2 goes to list 1
+            let standings = [standing(1, 150), standing(2, 80)];
+            let lists_drawn: Vec<ListDrawnMock> = vec![];
+
+            let result = assign_remainder::<ListVotesMock>(
+                &standings,
+                18,
+                2,
+                0,
+                &[],
+                None,
+                &mut lists_drawn.iter(),
+            );
+
+            let Ok(RemainderAssignment::Completed(steps, final_standings)) = result else {
+                panic!("expected Completed");
+            };
+            assert!(
+                steps
+                    .iter()
+                    .all(|s| s.change.is_changed_by_largest_remainder_assignment())
+            );
+            assert_eq!(steps.len(), 2);
+            assert_eq!(final_standings[0].residual_seats(), 1);
+            assert_eq!(steps[0].change.list_number_assigned(), 2);
+            assert_eq!(final_standings[1].residual_seats(), 1);
+            assert_eq!(steps[1].change.list_number_assigned(), 1);
+        }
+
+        #[test]
+        fn test_counts_from_current_residual_seat_number() {
+            let standings = [standing(1, 100), standing(2, 80)];
+            let previous_steps = vec![highest_average_step(1, vec![1], vec![1])];
+            let lists_drawn: Vec<ListDrawnMock> = vec![];
+
+            let result = assign_remainder::<ListVotesMock>(
+                &standings,
+                19,
+                2,
+                // Starting at 1
+                1,
+                &previous_steps,
+                None,
+                &mut lists_drawn.iter(),
+            );
+
+            let Ok(RemainderAssignment::Completed(steps, _)) = result else {
+                panic!("expected Completed");
+            };
+            assert_eq!(steps.len(), 2);
+            assert_eq!(steps[0], previous_steps[0]);
+            // So next is 2
+            assert_eq!(steps[1].residual_seat_number, Some(2));
+            assert_eq!(steps[1].change.list_number_assigned(), 2);
+        }
+
+        #[test]
+        fn test_stops_when_no_list_has_votes() {
+            // Should stop due to no eligible lists
+            let standings = [standing(1, 0), standing(2, 0)];
+            let lists_drawn: Vec<ListDrawnMock> = vec![];
+
+            let result = assign_remainder::<ListVotesMock>(
+                &standings,
+                19,
+                1,
+                0,
+                &[],
+                None,
+                &mut lists_drawn.iter(),
+            );
+
+            let Ok(RemainderAssignment::Completed(steps, final_standings)) = result else {
+                panic!("expected Completed");
+            };
+            assert_eq!(steps, vec![]);
+            assert_eq!(final_standings, standings.to_vec());
+        }
+
+        #[test]
+        fn test_stops_when_all_lists_are_exhausted() {
+            // Should stop due to no eligible lists
+            // List 1 has 1 full seat and only 1 candidate, so it is exhausted
+            let lists = [ListVotesMock::from_test_data_auto(1, vec![100])];
+            let standings = [standing(1, 100)];
+            let deceased = HashMap::new();
+            let lists_drawn: Vec<ListDrawnMock> = vec![];
+
+            let result = assign_remainder(
+                &standings,
+                19,
+                1,
+                0,
+                &[],
+                Some((&lists, &deceased)),
+                &mut lists_drawn.iter(),
+            );
+
+            let Ok(RemainderAssignment::Completed(steps, final_standings)) = result else {
+                panic!("expected Completed");
+            };
+            assert_eq!(steps, vec![]);
+            assert_eq!(final_standings, standings.to_vec());
+        }
+
+        #[test]
+        fn test_excludes_exhausted_lists_from_assignment() {
+            // List 1 has the highest average but is exhausted (1 seat, 1 candidate)
+            // List 1 highest average = 100/2 = 50, list 2 = 40
+            let lists = [
+                ListVotesMock::from_test_data_auto(1, vec![100]),
+                ListVotesMock::from_test_data_auto(2, vec![40, 0]),
+            ];
+            let standings = [standing(1, 100), standing(2, 40)];
+            let deceased = HashMap::new();
+            let lists_drawn: Vec<ListDrawnMock> = vec![];
+
+            let result = assign_remainder(
+                &standings,
+                19,
+                1,
+                0,
+                &[],
+                Some((&lists, &deceased)),
+                &mut lists_drawn.iter(),
+            );
+
+            let Ok(RemainderAssignment::Completed(steps, _)) = result else {
+                panic!("expected Completed");
+            };
+            assert_eq!(steps.len(), 1);
+            assert_eq!(steps[0].change.list_number_assigned(), 2);
+        }
+
+        #[test]
+        fn test_returns_drawing_lots_required_when_tied() {
+            // Lists 2 and 3 are tied at 80 votes per seat, with only 1 seat available
+            let standings = [standing(1, 100), standing(2, 80), standing(3, 80)];
+            let lists_drawn: Vec<ListDrawnMock> = vec![];
+
+            let result = assign_remainder::<ListVotesMock>(
+                &standings,
+                19,
+                1,
+                0,
+                &[],
+                None,
+                &mut lists_drawn.iter(),
+            );
+
+            let Ok(RemainderAssignment::DrawingLotsRequired(variant, steps, final_standings)) =
+                result
+            else {
+                panic!("expected DrawingLotsRequired");
+            };
+            assert_eq!(variant.options(), vec![2, 3]);
+            assert_eq!(steps, vec![]);
+            assert_eq!(final_standings, standings.to_vec());
+        }
+
+        #[test]
+        fn test_continues_after_drawing_lots() {
+            // Lists 2 and 3 are tied at 80 votes per seat, with only 1 seat available;
+            // list 3 is drawn
+            let standings = [standing(1, 100), standing(2, 80), standing(3, 80)];
+            let variant = ListDrawingLotsVariant::HighestAverageResidualSeat(
+                HighestAverageResidualSeatDrawingLots {
+                    max_average: Fraction::new(80, 1),
+                    residual_seat_numbers: vec![1],
+                    options: vec![2, 3],
+                    list_averages: vec![
+                        (1, Fraction::new(50, 1)),
+                        (2, Fraction::new(80, 1)),
+                        (3, Fraction::new(80, 1)),
+                    ],
+                },
+            );
+            let lists_drawn = [ListDrawnMock::new(&variant, 3)];
+
+            let result = assign_remainder::<ListVotesMock>(
+                &standings,
+                19,
+                1,
+                0,
+                &[],
+                None,
+                &mut lists_drawn.iter(),
+            );
+
+            let Ok(RemainderAssignment::Completed(steps, final_standings)) = result else {
+                panic!("expected Completed");
+            };
+            assert_eq!(steps.len(), 1);
+            assert_eq!(steps[0].change.list_number_assigned(), 3);
+            assert_eq!(final_standings[0].residual_seats(), 0);
+            assert_eq!(final_standings[1].residual_seats(), 0);
+            assert_eq!(final_standings[2].residual_seats(), 1);
+        }
+    }
+
     mod extend_list_assigned_from_previous_step {
         use super::*;
 

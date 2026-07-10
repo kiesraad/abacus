@@ -1,7 +1,11 @@
 import type { JSX } from "react/jsx-runtime";
 import type { ApportionmentState } from "@/types/generated/openapi";
 import cls from "../components/Apportionment.module.css";
-import type { AbsoluteMajorityReassignmentStep, ListExhaustionRemovalStep } from "./steps";
+import type {
+  AbsoluteMajorityReassignmentStep,
+  LargestRemainderAssignmentStep,
+  ListExhaustionRemovalStep,
+} from "./steps";
 import { isListDrawingLotsVariant } from "./utils";
 
 export interface ResultChange {
@@ -77,6 +81,32 @@ export function getResultChanges(
     });
   });
   return resultChanges;
+}
+
+export function splitResultChanges(
+  resultChanges: ResultChange[],
+  largestRemainderSteps: LargestRemainderAssignmentStep[],
+) {
+  const largestRemainderResultChanges: ResultChange[] = [];
+  const uniqueHighestAverageResultChanges: ResultChange[] = [];
+  resultChanges.forEach((change) => {
+    if (change.type === "residual_seat") {
+      if (
+        largestRemainderSteps.find((step) => step.change.selected_list_number === change.listNumber) &&
+        largestRemainderResultChanges.find(
+          (largestRemainderChange) =>
+            largestRemainderChange.listNumber === change.listNumber && largestRemainderChange.type === "residual_seat",
+        )
+      ) {
+        uniqueHighestAverageResultChanges.push(change);
+      } else {
+        largestRemainderResultChanges.push(change);
+      }
+    } else {
+      largestRemainderResultChanges.push(change);
+    }
+  });
+  return { largestRemainderResultChanges, uniqueHighestAverageResultChanges };
 }
 
 export function getFootnotesFromResultChanges(listResultChanges: ResultChange[]) {

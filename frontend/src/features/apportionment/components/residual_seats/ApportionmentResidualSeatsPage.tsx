@@ -5,7 +5,7 @@ import { t, tx } from "@/i18n/translate";
 import type { ApportionmentState, PoliticalGroup, SeatAssignment } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 import { useApportionmentContext } from "../../hooks/useApportionmentContext";
-import { getResultChanges, type ResultChange } from "../../utils/seat-change";
+import { getResultChanges, type ResultChange, splitResultChanges } from "../../utils/seat-change";
 import {
   getAssignmentSteps,
   getRemovalSteps,
@@ -119,6 +119,7 @@ interface HighestAveragesSectionProps {
   uniqueHighestAverageSteps: UniqueHighestAverageAssignmentStep[];
   highestAverageSteps: HighestAverageAssignmentStep[];
   politicalGroups: PoliticalGroup[];
+  resultChanges: ResultChange[];
   footNotes?: ReactElement;
   state: ApportionmentState;
 }
@@ -129,6 +130,7 @@ function HighestAveragesSection({
   uniqueHighestAverageSteps,
   highestAverageSteps,
   politicalGroups,
+  resultChanges,
   footNotes,
   state,
 }: HighestAveragesSectionProps) {
@@ -147,6 +149,7 @@ function HighestAveragesSection({
           largestRemainderSteps={largestRemainderSteps}
           standings={seatAssignment.standings}
           politicalGroups={politicalGroups}
+          resultChanges={resultChanges}
         />
         {highestAverageSteps.length > 0 && (
           <>
@@ -195,13 +198,17 @@ function SmallCouncilSection({
   state,
 }: SmallCouncilSectionProps) {
   const showFootnotes = isP9DrawingLots(state) || resultChanges.length > 0;
+  const { largestRemainderResultChanges, uniqueHighestAverageResultChanges } = splitResultChanges(
+    resultChanges,
+    largestRemainderSteps,
+  );
   return (
     <>
       <LargestRemaindersSection
         seatAssignment={seatAssignment}
         largestRemainderSteps={largestRemainderSteps}
         politicalGroups={politicalGroups}
-        resultChanges={resultChanges}
+        resultChanges={largestRemainderResultChanges}
         footNotes={uniqueHighestAverageSteps.length === 0 && showFootnotes ? footNotes : undefined}
       />
       {uniqueHighestAverageSteps.length > 0 && (
@@ -211,6 +218,7 @@ function SmallCouncilSection({
           uniqueHighestAverageSteps={uniqueHighestAverageSteps}
           highestAverageSteps={highestAverageSteps}
           politicalGroups={politicalGroups}
+          resultChanges={uniqueHighestAverageResultChanges}
           footNotes={showFootnotes ? footNotes : undefined}
           state={state}
         />

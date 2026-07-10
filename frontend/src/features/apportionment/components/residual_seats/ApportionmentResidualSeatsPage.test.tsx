@@ -22,6 +22,7 @@ import * as lt19SeatsAndP7DrawingLots from "../../testing/lt-19-seats-and-p7-dra
 import * as lt19SeatsAndP9AndP10 from "../../testing/lt-19-seats-and-p9-and-p10";
 import * as lt19SeatsAndP9DrawingLots from "../../testing/lt-19-seats-and-p9-drawing-lots";
 import * as lt19SeatsAndP10 from "../../testing/lt-19-seats-and-p10";
+import * as lt19SeatsAndP10AndDeceasedCandidates from "../../testing/lt-19-seats-and-p10-and-deceased-candidates";
 import { ApportionmentProvider } from "../ApportionmentProvider";
 import { ApportionmentResidualSeatsPage } from "./ApportionmentResidualSeatsPage";
 
@@ -332,6 +333,63 @@ describe("ApportionmentResidualSeatsPage", () => {
 
     expect(screen.queryByTestId("highest-averages-table")).not.toBeInTheDocument();
     expect(screen.queryByTestId("footnotes-list")).not.toBeInTheDocument();
+  });
+
+  test("Residual seats assignment largest remainders and unique highest averages tables with footnotes visible", async () => {
+    overrideOnce(
+      "get",
+      "/api/elections/12",
+      200,
+      getElectionMockData(
+        lt19SeatsAndP10AndDeceasedCandidates.election,
+        lt19SeatsAndP10AndDeceasedCandidates.committee_session,
+      ),
+    );
+    overrideOnce("post", "/api/elections/12/apportionment", 200, {
+      seat_assignment: lt19SeatsAndP10AndDeceasedCandidates.seat_assignment,
+      candidate_nomination: lt19SeatsAndP10AndDeceasedCandidates.candidate_nomination,
+      election_summary: lt19SeatsAndP10AndDeceasedCandidates.election_summary,
+      warnings: [],
+    } satisfies ElectionApportionmentResponse);
+    overrideOnce("get", "/api/elections/12/apportionment/state", 200, lt19SeatsAndP10AndDeceasedCandidates.state);
+
+    renderApportionmentResidualSeatsPage(12, false);
+
+    expect(await screen.findByRole("heading", { level: 1, name: "Verdeling van de restzetels" })).toBeVisible();
+
+    expect(
+      await screen.findByRole("heading", {
+        level: 2,
+        name: "De restzetels gaan naar de partijen met de grootste overschotten",
+      }),
+    ).toBeVisible();
+    const largest_remainders_table = await screen.findByTestId("largest-remainders-table");
+    expect(largest_remainders_table).toBeVisible();
+    expect(largest_remainders_table).toHaveTableContent([
+      ["Lijst", "Lijstnaam", "Aantal volle zetels", "Overschot", "Aantal restzetels"],
+      ["1", "Political Group A", "10", "8", "", "1 0"],
+    ]);
+
+    expect(await screen.findByRole("heading", { level: 2, name: "Verdeling overige restzetels" })).toBeVisible();
+    const unique_highest_averages_table = await screen.findByTestId("unique-highest-averages-table");
+    expect(unique_highest_averages_table).toBeVisible();
+    expect(unique_highest_averages_table).toHaveTableContent([
+      ["Lijst", "Lijstnaam", "Reeds toegewezen", "Gemiddelde", "Aantal restzetels"],
+      ["1", "Political Group A", "11", "67", "4/12", "2 0"],
+      ["2", "Political Group B", "0", "59", "", "1"],
+      ["3", "Political Group C", "0", "58", "", "1"],
+      ["4", "Political Group D", "0", "57", "", "1"],
+      ["5", "Blanco (Smit, G.)", "0", "56", "", "1"],
+      ["6", "Political Group F", "0", "55", "", "1"],
+      ["7", "Political Group G", "0", "54", "", "0"],
+      ["8", "Political Group H", "0", "53", "", "0"],
+    ]);
+
+    expect(await screen.findByTestId("footnotes-list")).toHaveTextContent(
+      "Omdat lijst 1 geen kandidaat heeft voor een zetel, is deze herverdeeld naar een andere lijst. (Kieswet, artikel P 10)Omdat lijst 1 geen kandidaat heeft voor een zetel, is deze herverdeeld naar een andere lijst.",
+    );
+
+    expect(screen.queryByTestId("highest-averages-table")).not.toBeInTheDocument();
   });
 
   test("Residual seats assignment only largest remainders table visible", async () => {

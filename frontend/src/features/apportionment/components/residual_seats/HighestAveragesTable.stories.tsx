@@ -45,35 +45,23 @@ export const Default: StoryObj = {
 
 export const AbsoluteMajorityReassignment: StoryObj = {
   render: () => {
+    const absoluteMajorityReassignment =
+      gte19SeatsAndP9DrawingLots.seat_assignment_after_drawing_lots_seat_reassigned.steps.find(
+        isAbsoluteMajorityReassignmentStep,
+      );
+    const state = {
+      type: "Finalised",
+      deceased_candidates: [],
+      lists_drawn: [],
+      candidates_drawn: [],
+    } satisfies ApportionmentState;
     return (
       <HighestAveragesTable
         steps={gte19SeatsAndP9.highest_averages_steps}
         standings={gte19SeatsAndP9.seat_assignment.standings}
         politicalGroups={gte19SeatsAndP9.election.political_groups}
-        resultChanges={[
-          {
-            listNumber: 1,
-            footnoteNumber: 1,
-            increase: 1,
-            decrease: 0,
-            type: "residual_seat",
-          },
-          {
-            listNumber: 7,
-            footnoteNumber: 1,
-            increase: 0,
-            decrease: 1,
-            type: "residual_seat",
-          },
-        ]}
-        state={
-          {
-            type: "Finalised",
-            deceased_candidates: [],
-            lists_drawn: [],
-            candidates_drawn: [],
-          } satisfies ApportionmentState
-        }
+        resultChanges={getResultChanges([], state, absoluteMajorityReassignment)}
+        state={state}
       />
     );
   },
@@ -283,6 +271,10 @@ export const P9BeforeDrawingLots: StoryObj = {
 
 export const P9AfterDrawingLots: StoryObj = {
   render: () => {
+    const absoluteMajorityReassignment =
+      gte19SeatsAndP9DrawingLots.seat_assignment_after_drawing_lots_seat_reassigned.steps.find(
+        isAbsoluteMajorityReassignmentStep,
+      );
     return (
       <HighestAveragesTable
         steps={gte19SeatsAndP9DrawingLots.steps}
@@ -291,9 +283,7 @@ export const P9AfterDrawingLots: StoryObj = {
         resultChanges={getResultChanges(
           [],
           gte19SeatsAndP9DrawingLots.state_after_drawing_lots_seat_reassigned,
-          gte19SeatsAndP9DrawingLots.seat_assignment_after_drawing_lots_seat_reassigned.steps.find(
-            isAbsoluteMajorityReassignmentStep,
-          ),
+          absoluteMajorityReassignment,
         )}
         state={gte19SeatsAndP9DrawingLots.state_after_drawing_lots_seat_reassigned}
       />

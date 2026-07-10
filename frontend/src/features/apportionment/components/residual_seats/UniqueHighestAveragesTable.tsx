@@ -3,6 +3,7 @@ import { t } from "@/i18n/translate";
 import type { ListSeatAssignment, PoliticalGroup } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 import { formatPoliticalGroupName } from "@/utils/politicalGroup";
+import { getFootnotesFromResultChanges, type ResultChange } from "../../utils/seat-change";
 import type { LargestRemainderAssignmentStep, UniqueHighestAverageAssignmentStep } from "../../utils/steps";
 import cls from "../Apportionment.module.css";
 
@@ -11,6 +12,7 @@ interface UniqueHighestAveragesTableProps {
   largestRemainderSteps: LargestRemainderAssignmentStep[];
   standings: ListSeatAssignment[];
   politicalGroups: PoliticalGroup[];
+  resultChanges: ResultChange[];
 }
 
 export function UniqueHighestAveragesTable({
@@ -18,6 +20,7 @@ export function UniqueHighestAveragesTable({
   largestRemainderSteps,
   standings,
   politicalGroups,
+  resultChanges,
 }: UniqueHighestAveragesTableProps) {
   return (
     <Table id="unique-highest-averages-table" className={cls.table}>
@@ -41,8 +44,14 @@ export function UniqueHighestAveragesTable({
             const average = steps[0]?.standings.find(
               (standing) => standing.list_number === listSeatAssignment.list_number,
             )?.next_votes_per_seat;
-            const listSeatAssignmentSteps = steps.filter((step) => {
+            let residualSeats = steps.filter((step) => {
               return step.change.selected_list_number === listSeatAssignment.list_number;
+            }).length;
+            const listResultChanges = resultChanges.filter(
+              (change) => change.type === "residual_seat" && change.listNumber === listSeatAssignment.list_number,
+            );
+            listResultChanges.forEach((listResultChange) => {
+              residualSeats = residualSeats + listResultChange.increase - listResultChange.decrease;
             });
             return (
               <Table.Row key={listSeatAssignment.list_number}>
@@ -59,7 +68,9 @@ export function UniqueHighestAveragesTable({
                   {listSeatAssignment.full_seats + residualSeatsAlreadyAssigned}
                 </Table.NumberCell>
                 <Table.DisplayFractionCells>{average}</Table.DisplayFractionCells>
-                <Table.NumberCell className="bold">{listSeatAssignmentSteps.length}</Table.NumberCell>
+                <Table.NumberCell className="bold">
+                  {getFootnotesFromResultChanges(listResultChanges)} {residualSeats}
+                </Table.NumberCell>
               </Table.Row>
             );
           }

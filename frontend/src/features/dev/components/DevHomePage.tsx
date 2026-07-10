@@ -128,6 +128,9 @@ function AdministratorCoordinatorLinks({ electionList, committeeSessions }: Link
         <li>
           <Link to={`/logs`}>{t("activity_log")}</Link>
         </li>
+        <li>
+          <Link to={`/backups`}>{t("backups.title")}</Link>
+        </li>
       </ul>
     </>
   );

@@ -8,6 +8,7 @@ import {
   formatDateTime,
   formatDateTimeFull,
   formatDateTimeFullWithoutWeekday,
+  formatTime,
   formatTimeToGo,
   isValidNLDate,
   isValidTime,
@@ -73,6 +74,14 @@ describe("DateTime util", () => {
     [new Date("Sat Dec 18 2010 23:27:11 GMT+0100"), /^zaterdag \d+ december 2010$/],
   ])("Format date %s as %s", (input: Date, expected: RegExp) => {
     expect(formatDateFull(input)).toMatch(expected);
+  });
+
+  test.each([
+    [new Date("Fri Oct 17 2008 05:09:20 GMT+0200"), /^\d\d:\d\d$/],
+    [new Date("Sat Jun 03 2023 14:26:13 GMT+0200"), /^\d\d:\d\d$/],
+    [new Date("Sat Dec 18 2010 23:27:11 GMT+0100"), /^\d\d:\d\d$/],
+  ])("Format time %s as %s", (input: Date, expected: RegExp) => {
+    expect(formatTime(input)).toMatch(expected);
   });
 
   test.each([

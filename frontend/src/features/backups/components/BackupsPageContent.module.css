@@ -1,0 +1,10 @@
+.actions,
+.status {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.status {
+  line-height: 1;
+}

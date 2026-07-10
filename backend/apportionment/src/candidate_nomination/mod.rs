@@ -72,7 +72,8 @@ pub(crate) fn candidate_nomination<'a, L: ListVotes>(
 }
 
 /// Collect all chosen candidates via nomination with preferential votes and
-/// the other nominated candidates into one list
+/// the other nominated candidates into one list.
+/// Returns candidates in order of occurrence in the list votes, not nominations
 fn all_chosen_candidates<T: ListVotes>(
     list_votes: &[T],
     list_candidate_nomination: &[ListCandidateNomination<T>],
@@ -216,6 +217,7 @@ fn candidate_nomination_per_list<'a, LV: ListVotes>(
 }
 
 /// List and sort the candidate votes whose votes meet the preference threshold
+/// Only candidates which are above (>) the threshold are included
 fn candidate_votes_meeting_preference_threshold<'a, T: CandidateVotes>(
     preference_threshold: Fraction,
     candidate_votes: &[&'a T],
@@ -379,6 +381,110 @@ mod tests {
     use super::*;
     use crate::test_helpers::*;
 
+    mod all_chosen_candidates {
+        use crate::{
+            Candidate, CandidateRanking, ListCandidateNomination,
+            candidate_nomination::all_chosen_candidates, test_helpers::ListVotesMock,
+        };
+
+        #[test]
+        fn test_combines_preferential_and_other_nominations() {
+            let lists = [
+                ListVotesMock::from_test_data_auto(1, vec![100, 50, 25]),
+                ListVotesMock::from_test_data_auto(2, vec![80, 40]),
+            ];
+            let nominations = vec![
+                ListCandidateNomination {
+                    list_number: 1,
+                    list_seats: 2,
+                    preferential_candidate_nomination: vec![&lists[0].candidate_votes[0]],
+                    other_candidate_nomination: vec![&lists[0].candidate_votes[2]],
+                    candidate_ranking: CandidateRanking::Original(vec![1, 2, 3]),
+                },
+                ListCandidateNomination {
+                    list_number: 2,
+                    list_seats: 1,
+                    preferential_candidate_nomination: vec![&lists[1].candidate_votes[1]],
+                    other_candidate_nomination: vec![],
+                    candidate_ranking: CandidateRanking::Original(vec![1, 2]),
+                },
+            ];
+
+            assert_eq!(
+                all_chosen_candidates(&lists, &nominations),
+                vec![
+                    Candidate {
+                        list_number: 1,
+                        candidate_number: 1,
+                    },
+                    Candidate {
+                        list_number: 1,
+                        candidate_number: 3,
+                    },
+                    Candidate {
+                        list_number: 2,
+                        candidate_number: 2,
+                    },
+                ]
+            );
+        }
+
+        #[test]
+        fn test_returns_candidates_in_list_order() {
+            let lists = [ListVotesMock::from_test_data_auto(1, vec![100, 50, 25])];
+            let nominations = vec![ListCandidateNomination {
+                list_number: 1,
+                list_seats: 2,
+                preferential_candidate_nomination: vec![
+                    &lists[0].candidate_votes[2],
+                    &lists[0].candidate_votes[0],
+                ],
+                other_candidate_nomination: vec![&lists[0].candidate_votes[1]],
+                candidate_ranking: CandidateRanking::Updated(vec![3, 1, 2]),
+            }];
+
+            assert_eq!(
+                all_chosen_candidates(&lists, &nominations),
+                vec![
+                    Candidate {
+                        list_number: 1,
+                        candidate_number: 1,
+                    },
+                    Candidate {
+                        list_number: 1,
+                        candidate_number: 2,
+                    },
+                    Candidate {
+                        list_number: 1,
+                        candidate_number: 3,
+                    },
+                ]
+            );
+        }
+
+        #[test]
+        fn test_returns_empty_when_no_nominations() {
+            let lists = [ListVotesMock::from_test_data_auto(1, vec![100, 50])];
+            let nominations = vec![ListCandidateNomination {
+                list_number: 1,
+                list_seats: 0,
+                preferential_candidate_nomination: vec![],
+                other_candidate_nomination: vec![],
+                candidate_ranking: CandidateRanking::Original(vec![1, 2]),
+            }];
+
+            assert_eq!(all_chosen_candidates(&lists, &nominations), vec![]);
+        }
+
+        #[test]
+        #[should_panic(expected = "List candidate nomination should exist")]
+        fn test_panics_when_nomination_is_missing_for_a_list() {
+            let lists = [ListVotesMock::from_test_data_auto(1, vec![100])];
+
+            all_chosen_candidates::<ListVotesMock>(&lists, &[]);
+        }
+    }
+
     #[test]
     fn test_filter_out_deceased_candidates() {
         let deceased_candidates: DeceasedCandidates<ListVotesMock> =
@@ -393,6 +499,168 @@ mod tests {
                 &list.candidate_votes()[4]
             ]
         );
+    }
+
+    mod candidate_votes_meeting_preference_threshold {
+        use crate::{
+            Fraction,
+            candidate_nomination::{
+                candidate_votes_meeting_preference_threshold, candidate_votes_numbers,
+            },
+            test_helpers::CandidateVotesMock,
+        };
+
+        #[test]
+        fn test_excludes_candidates_with_votes_at_or_below_the_threshold() {
+            let candidate_votes: Vec<_> = [
+                CandidateVotesMock(1, 51),
+                CandidateVotesMock(2, 50),
+                CandidateVotesMock(3, 49),
+            ]
+            .iter()
+            .collect();
+
+            let meeting = candidate_votes_meeting_preference_threshold(
+                Fraction::new(50, 1),
+                &candidate_votes,
+            );
+            assert_eq!(candidate_votes_numbers(&meeting), vec![1]);
+        }
+
+        #[test]
+        fn test_sorts_candidates_by_votes_descending() {
+            let candidate_votes: Vec<_> = [
+                CandidateVotesMock(1, 60),
+                CandidateVotesMock(2, 100),
+                CandidateVotesMock(3, 80),
+            ]
+            .iter()
+            .collect();
+
+            let meeting = candidate_votes_meeting_preference_threshold(
+                Fraction::new(50, 1),
+                &candidate_votes,
+            );
+            assert_eq!(candidate_votes_numbers(&meeting), vec![2, 3, 1]);
+        }
+
+        #[test]
+        fn test_keeps_candidate_order_for_equal_votes() {
+            let candidate_votes: Vec<_> = [
+                CandidateVotesMock(1, 80),
+                CandidateVotesMock(2, 100),
+                CandidateVotesMock(3, 80),
+            ]
+            .iter()
+            .collect();
+
+            // Candidates 1 and 3 have equal votes, so they keep their relative order
+            let meeting = candidate_votes_meeting_preference_threshold(
+                Fraction::new(50, 1),
+                &candidate_votes,
+            );
+            assert_eq!(candidate_votes_numbers(&meeting), vec![2, 1, 3]);
+        }
+
+        #[test]
+        fn test_returns_empty_when_no_candidate_meets_the_threshold() {
+            let candidate_votes: Vec<_> = [CandidateVotesMock(1, 10), CandidateVotesMock(2, 0)]
+                .iter()
+                .collect();
+
+            let meeting = candidate_votes_meeting_preference_threshold(
+                Fraction::new(50, 1),
+                &candidate_votes,
+            );
+            assert!(meeting.is_empty());
+        }
+    }
+
+    #[test]
+    fn test_candidate_votes_numbers() {
+        let candidate_votes: Vec<_> = [
+            CandidateVotesMock(3, 100),
+            CandidateVotesMock(1, 80),
+            CandidateVotesMock(7, 60),
+        ]
+        .iter()
+        .collect();
+
+        assert_eq!(candidate_votes_numbers(&candidate_votes), vec![3, 1, 7]);
+    }
+
+    mod other_candidate_nomination {
+        use crate::{
+            candidate_nomination::{candidate_votes_numbers, other_candidate_nomination},
+            test_helpers::CandidateVotesMock,
+        };
+
+        #[test]
+        fn test_nominates_remaining_candidates() {
+            let candidate_votes: Vec<_> = [
+                CandidateVotesMock(1, 100),
+                CandidateVotesMock(2, 20),
+                CandidateVotesMock(3, 80),
+                CandidateVotesMock(4, 10),
+            ]
+            .iter()
+            .collect();
+            let preferential_nomination = vec![candidate_votes[0], candidate_votes[2]];
+
+            let other = other_candidate_nomination(&preferential_nomination, &candidate_votes, 2);
+            assert_eq!(candidate_votes_numbers(&other), vec![2, 4]);
+        }
+
+        #[test]
+        fn test_returns_empty_when_all_candidates_are_preferentially_nominated() {
+            let candidate_votes: Vec<_> = [CandidateVotesMock(1, 100), CandidateVotesMock(2, 20)]
+                .iter()
+                .collect();
+            let preferential_nomination = vec![candidate_votes[0], candidate_votes[1]];
+
+            let other = other_candidate_nomination(&preferential_nomination, &candidate_votes, 2);
+            assert_eq!(candidate_votes_numbers(&other), vec![]);
+        }
+
+        #[test]
+        fn test_takes_no_more_candidates_than_non_assigned_seats() {
+            let candidate_votes: Vec<_> = [
+                CandidateVotesMock(1, 50),
+                CandidateVotesMock(2, 40),
+                CandidateVotesMock(3, 30),
+            ]
+            .iter()
+            .collect();
+
+            let other = other_candidate_nomination::<CandidateVotesMock>(&[], &candidate_votes, 2);
+            assert_eq!(candidate_votes_numbers(&other), vec![1, 2]);
+        }
+
+        #[test]
+        fn test_returns_empty_when_no_non_assigned_seats() {
+            let candidate_votes: Vec<_> = [CandidateVotesMock(1, 50), CandidateVotesMock(2, 40)]
+                .iter()
+                .collect();
+            let preferential_nomination = vec![candidate_votes[0]];
+
+            let other = other_candidate_nomination(&preferential_nomination, &candidate_votes, 0);
+            assert!(other.is_empty());
+        }
+
+        #[test]
+        fn test_returns_all_remaining_candidates_when_seats_exceed_candidates() {
+            let candidate_votes: Vec<_> = [
+                CandidateVotesMock(1, 50),
+                CandidateVotesMock(2, 40),
+                CandidateVotesMock(3, 30),
+            ]
+            .iter()
+            .collect();
+            let preferential_nomination = vec![candidate_votes[0]];
+
+            let other = other_candidate_nomination(&preferential_nomination, &candidate_votes, 5);
+            assert_eq!(candidate_votes_numbers(&other), vec![2, 3]);
+        }
     }
 
     /// Candidate nomination with non-consecutive list and candidate numbers

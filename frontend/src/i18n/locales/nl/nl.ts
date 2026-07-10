@@ -1,5 +1,6 @@
 import account from "./account.json";
 import apportionment from "./apportionment.json";
+import backups from "./backups.json";
 import candidate from "./candidate.json";
 import candidates_votes from "./candidates_votes.json";
 import check_and_save from "./check_and_save.json";
@@ -67,6 +68,7 @@ const nl = {
   resolve_differences,
   status,
   users,
+  backups,
   voters_votes_counts,
 };
 

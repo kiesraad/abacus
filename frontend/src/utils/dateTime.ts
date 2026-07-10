@@ -81,6 +81,13 @@ export function formatDateTime(date: Date, relative = true) {
   return `${dateString} om ${timeString}`;
 }
 
+export function formatTime(date: Date) {
+  return date.toLocaleTimeString(t("date_locale"), {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
 export function formatTimeToGo(seconds: number) {
   const secondsRounded = Math.round(seconds);
   const remainingMinutes = Math.floor(secondsRounded / 60);

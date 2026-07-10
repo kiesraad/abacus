@@ -2803,19 +2803,10 @@ dependencies = [
 name = "pdf_gen"
 version = "1.1.0"
 dependencies = [
- "pdf_gen_dylib",
  "pdf_gen_impl",
  "pdf_gen_types",
  "tokio",
  "tracing",
-]
-
-[[package]]
-name = "pdf_gen_dylib"
-version = "1.1.0"
-dependencies = [
- "pdf_gen_impl",
- "pdf_gen_types",
 ]
 
 [[package]]

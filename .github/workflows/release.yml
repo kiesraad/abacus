@@ -73,7 +73,7 @@ jobs:
           name: frontend-production-build
           path: frontend/dist
       - name: Setup Rust
-        run: rustup update stable && rustup default stable
+        run: rustup toolchain install
       - name: Install target
         run: rustup target add ${{ matrix.target.name }}
       - name: Install musl

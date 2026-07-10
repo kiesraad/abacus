@@ -15,7 +15,8 @@ use crate::{
     ApportionmentError, ApportionmentInput, ListDrawn, ListVotes,
     fraction::Fraction,
     seat_assignment::structs::{
-        AbsoluteMajority, AbsoluteMajorityResult, GetListStandingByNumber, RemainderAssignment,
+        AbsoluteMajority, AbsoluteMajorityResult, GetListStandingByNumber, ListSeatAssignment,
+        RemainderAssignment,
     },
     structs::{
         AbsoluteMajorityDrawingLots, CandidateNominationInput, DeceasedCandidates,
@@ -214,12 +215,11 @@ pub(crate) fn seat_assignment<T: ApportionmentInput>(input: &T) -> SeatAssignmen
     }))
 }
 
-/// Returns the total number of seats each list number received in the apportionment result.
-pub fn get_total_seats_per_list_number_from_apportionment_result<LN: Copy + Eq + Hash>(
-    result: &SeatAssignmentDetails<LN>,
+/// Returns the total number of seats each list number received from seat assignments.
+pub fn get_total_seats_per_list_number_from_seat_assignments<LN: Copy + Eq + Hash>(
+    assignments: &[ListSeatAssignment<LN>],
 ) -> HashMap<LN, u32> {
-    result
-        .standings
+    assignments
         .iter()
         .map(|p| (p.list_number, p.total_seats))
         .collect()
@@ -236,8 +236,8 @@ pub fn as_candidate_nomination_input<'a, T: ApportionmentInput>(
         list_votes: input.list_votes(),
         deceased_candidates: input.deceased_candidates(),
         quota: seat_assignment.quota,
-        total_seats_per_list: get_total_seats_per_list_number_from_apportionment_result(
-            seat_assignment,
+        total_seats_per_list: get_total_seats_per_list_number_from_seat_assignments(
+            &seat_assignment.standings,
         ),
     }
 }
@@ -454,26 +454,198 @@ fn reassign_residual_seats_for_exhausted_lists<'a, T: ListVotes>(
 
 #[cfg(test)]
 pub(crate) mod tests {
-    use std::{collections::HashMap, fmt::Debug, hash::Hash};
+    use std::collections::HashMap;
 
     use test_log::test;
 
     use crate::{
-        SeatAssignmentDetails,
         fraction::Fraction,
         seat_assignment::{
-            ListStanding, get_total_seats_per_list_number_from_apportionment_result, list_numbers,
+            ListStanding, get_total_seats_per_list_number_from_seat_assignments, list_numbers,
+            structs::ListSeatAssignment,
         },
         test_helpers::{CandidateVotesMock, ListVotesMock},
     };
 
-    fn check_total_seats_per_list<LN: Copy + Debug + Eq + Hash>(
-        result: &SeatAssignmentDetails<LN>,
-        expected_total_seats_per_list: &HashMap<LN, u32>,
-    ) {
-        let total_seats_per_list_number =
-            get_total_seats_per_list_number_from_apportionment_result(result);
-        assert_eq!(expected_total_seats_per_list, &total_seats_per_list_number);
+    #[test]
+    fn test_get_total_seats_per_list_number_from_seat_assignments() {
+        let assignments = [
+            ListSeatAssignment {
+                list_number: 1,
+                votes_cast: 300,
+                remainder_votes: Fraction::ZERO,
+                meets_remainder_threshold: true,
+                full_seats: 2,
+                residual_seats: 1,
+                total_seats: 3,
+            },
+            ListSeatAssignment {
+                list_number: 2,
+                votes_cast: 100,
+                remainder_votes: Fraction::ZERO,
+                meets_remainder_threshold: false,
+                full_seats: 1,
+                residual_seats: 0,
+                total_seats: 1,
+            },
+        ];
+        let result = get_total_seats_per_list_number_from_seat_assignments(&assignments);
+        assert_eq!(result, HashMap::from([(1, 3), (2, 1)]));
+    }
+
+    mod get_number_of_candidates {
+        use std::collections::{HashMap, HashSet};
+
+        use crate::{seat_assignment::get_number_of_candidates, test_helpers::ListVotesMock};
+
+        #[test]
+        fn test_without_deceased_candidates() {
+            let list_votes = [
+                ListVotesMock::from_test_data_auto(1, vec![100, 80, 60]),
+                ListVotesMock::from_test_data_auto(2, vec![50, 40]),
+            ];
+            let deceased_candidates = HashMap::new();
+
+            assert_eq!(
+                get_number_of_candidates(&list_votes, 1, &deceased_candidates),
+                3
+            );
+            assert_eq!(
+                get_number_of_candidates(&list_votes, 2, &deceased_candidates),
+                2
+            );
+        }
+
+        #[test]
+        fn test_subtracts_deceased_candidates() {
+            let list_votes = [
+                ListVotesMock::from_test_data_auto(1, vec![100, 80, 60]),
+                ListVotesMock::from_test_data_auto(2, vec![50, 40]),
+            ];
+            // deceased candidates of list 1 do not affect list 2
+            let deceased_candidates = HashMap::from([(1, HashSet::from([2, 3]))]);
+
+            assert_eq!(
+                get_number_of_candidates(&list_votes, 1, &deceased_candidates),
+                1
+            );
+            assert_eq!(
+                get_number_of_candidates(&list_votes, 2, &deceased_candidates),
+                2
+            );
+        }
+
+        #[test]
+        fn test_with_all_candidates_deceased() {
+            let list_votes = [ListVotesMock::from_test_data_auto(1, vec![100, 80])];
+            let deceased_candidates = HashMap::from([(1, HashSet::from([1, 2]))]);
+
+            assert_eq!(
+                get_number_of_candidates(&list_votes, 1, &deceased_candidates),
+                0
+            );
+        }
+
+        #[test]
+        #[should_panic(expected = "List votes exists")]
+        fn test_panics_for_unknown_list() {
+            let list_votes = [ListVotesMock::from_test_data_auto(1, vec![100])];
+            get_number_of_candidates(&list_votes, 2, &HashMap::new());
+        }
+    }
+
+    mod list_numbers_with_exhausted_seats {
+        use std::collections::{HashMap, HashSet};
+
+        use crate::{
+            fraction::Fraction,
+            seat_assignment::{ListStanding, list_numbers_with_exhausted_seats},
+            test_helpers::ListVotesMock,
+        };
+
+        /// Create a standing using a quota of 100, so every 100 votes
+        /// in the list votes is one full seat.
+        fn standing(list_votes: &ListVotesMock) -> ListStanding<u32> {
+            ListStanding::new(list_votes, Fraction::new(100, 1))
+        }
+
+        #[test]
+        fn test_no_exhausted_lists_when_enough_candidates() {
+            let list_votes = [
+                // 3 seats, 3 candidates
+                ListVotesMock::from_test_data_auto(1, vec![100, 100, 100]),
+                // 1 seat, 2 candidates
+                ListVotesMock::from_test_data_auto(2, vec![60, 40]),
+            ];
+            let standings: Vec<_> = list_votes.iter().map(standing).collect();
+
+            assert_eq!(
+                list_numbers_with_exhausted_seats(&standings, &list_votes, &HashMap::new()),
+                vec![]
+            );
+        }
+
+        #[test]
+        fn test_more_seats_than_candidates() {
+            let list_votes = [
+                // 3 seats, 2 candidates
+                ListVotesMock::from_test_data_auto(1, vec![200, 100]),
+                // 1 seat, 1 candidate
+                ListVotesMock::from_test_data_auto(2, vec![100]),
+            ];
+            let standings: Vec<_> = list_votes.iter().map(standing).collect();
+
+            assert_eq!(
+                list_numbers_with_exhausted_seats(&standings, &list_votes, &HashMap::new()),
+                vec![(1, 1)]
+            );
+        }
+
+        #[test]
+        fn test_excess_seats_for_multiple_exhausted_lists() {
+            let list_votes = [
+                // 3 seats, 1 candidate
+                ListVotesMock::from_test_data_auto(1, vec![300]),
+                // 2 seats, 2 candidates
+                ListVotesMock::from_test_data_auto(2, vec![100, 100]),
+                // 4 seats, 2 candidates
+                ListVotesMock::from_test_data_auto(3, vec![250, 150]),
+            ];
+            let standings: Vec<_> = list_votes.iter().map(standing).collect();
+
+            assert_eq!(
+                list_numbers_with_exhausted_seats(&standings, &list_votes, &HashMap::new()),
+                vec![(1, 2), (3, 2)]
+            );
+        }
+
+        #[test]
+        fn test_residual_seats_count_towards_exhaustion() {
+            // 1 full seat, 1 candidate
+            let list_votes = [ListVotesMock::from_test_data_auto(1, vec![100])];
+            let mut standings: Vec<_> = list_votes.iter().map(standing).collect();
+            // 2 total seats, 1 candidate
+            standings[0].add_residual_seat();
+
+            assert_eq!(
+                list_numbers_with_exhausted_seats(&standings, &list_votes, &HashMap::new()),
+                vec![(1, 1)]
+            );
+        }
+
+        #[test]
+        fn test_deceased_candidates_can_exhaust_a_list() {
+            // 2 seats, 2 candidates
+            let list_votes = [ListVotesMock::from_test_data_auto(1, vec![100, 100])];
+            let standings: Vec<_> = list_votes.iter().map(standing).collect();
+            // candidate 2 of list 1 is deceased, leaving 1 candidate for 2 seats
+            let deceased_candidates = HashMap::from([(1, HashSet::from([2]))]);
+
+            assert_eq!(
+                list_numbers_with_exhausted_seats(&standings, &list_votes, &deceased_candidates),
+                vec![(1, 1)]
+            );
+        }
     }
 
     #[test]
@@ -1818,9 +1990,11 @@ pub(crate) mod tests {
     mod gte_19_seats {
         use test_log::test;
 
-        use super::check_total_seats_per_list;
         use crate::{
-            seat_assignment::{SeatAssignment, seat_assignment},
+            seat_assignment::{
+                SeatAssignment, get_total_seats_per_list_number_from_seat_assignments,
+                seat_assignment,
+            },
             test_helpers::{
                 get_total_seats_from_apportionment_result,
                 seat_assignment_fixture_with_default_50_candidates,
@@ -1878,7 +2052,10 @@ pub(crate) mod tests {
             assert_eq!(result.steps[1].change.list_number_assigned(), 3);
             assert_eq!(result.steps[2].change.list_number_assigned(), 1);
             assert_eq!(result.steps[3].change.list_number_assigned(), 6);
-            check_total_seats_per_list(&result, &[(1, 12), (3, 6), (4, 1), (6, 2), (7, 2)].into());
+            assert_eq!(
+                get_total_seats_per_list_number_from_seat_assignments(&result.standings),
+                [(1, 12), (3, 6), (4, 1), (6, 2), (7, 2)].into()
+            );
         }
 
         /// Apportionment with residual seats assigned with highest averages method

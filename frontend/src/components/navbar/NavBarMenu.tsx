@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { NavLink } from "react-router";
 
-import { IconCompass, IconHamburger, IconLogs, IconUsers } from "@/components/generated/icons";
+import { IconCompass, IconFolderCheck, IconHamburger, IconLogs, IconUsers } from "@/components/generated/icons";
 import { t } from "@/i18n/translate";
 import { isNode } from "@/utils/typeChecks";
 
@@ -21,6 +21,10 @@ export function NavBarMenu() {
       <NavLink to={"/logs"}>
         <IconLogs />
         {t("logs")}
+      </NavLink>
+      <NavLink to={"/backups"}>
+        <IconFolderCheck />
+        {t("backups.backups")}
       </NavLink>
     </div>
   );

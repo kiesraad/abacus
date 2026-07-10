@@ -41,7 +41,7 @@
     "title": "Loting voor restzetel {number}",
     "hence_drawing_lots_is_needed": "Daarom moet er geloot worden welke lijst de restzetel krijgt",
     "list_gets_the_seat_with": {
-      "highest_average": "De partij met het hoogste gemiddeld aantal stemmen na het toewijzen van de restzetel krijgt de restzetel",
+      "highest_average": "De partij met het hoogste gemiddeld aantal stemmen bij het toewijzen van de restzetel krijgt de restzetel",
       "largest_remainder": "De partij met het grootste overschot aan stemmen krijgt de restzetel"
     },
     "draw_lots_for_lists_with_same": {
@@ -85,7 +85,7 @@
     },
     "description": "Er is een restzetel te verdelen. In de wet staat dat de partij met het grootste {variant} stemmen per toegewezen zetel deze restzetel krijgt.",
     "drawing_lots_needed": "Hierdoor kan de restzetel niet automatisch worden toegewezen. Het centraal stembureau moet een loting uitvoeren om de restzetel toe te wijzen.",
-    "same_averages": "Er zijn meerdere partijen die na het toewijzen van de volgende restzetel precies hetzelfde hoogste gemiddelde hebben.",
+    "same_averages": "Er zijn meerdere partijen die bij het toewijzen van de volgende restzetel precies hetzelfde hoogste gemiddelde hebben.",
     "same_remainders": "Er zijn meerdere partijen die hetzelfde grootste overschot hebben."
   },
   "drawing_lots_required_for_p9_alert": {

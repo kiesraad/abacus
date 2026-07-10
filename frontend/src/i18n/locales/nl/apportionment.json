@@ -104,6 +104,7 @@
   "election_summary": "Kengetallen",
   "footnotes": {
     "absolute_majority_reassignment": {
+      "drawing_lots": "Lijst {options} moet een restzetel afstaan. Hiervoor moet geloot worden.",
       "options": " (er is geloot tussen lijst {options})",
       "result": "Deze zetel gaat ten koste van lijst {list_retracted_seat}",
       "text": "Lijst {list_assigned_seat} heeft meer dan de helft van alle uitgebrachte stemmen behaald, maar krijgt op basis van de standaard zetelverdeling niet de meerderheid van de zetels. Volgens de Kieswet (Artikel P 9 Toewijzing zetels bij volstrekte meerderheid) krijgt deze lijst één extra zetel."

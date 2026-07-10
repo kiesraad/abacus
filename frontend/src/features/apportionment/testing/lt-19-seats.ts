@@ -319,7 +319,7 @@ export const largest_remainder_steps: LargestRemainderAssignmentStep[] = [
   },
 ];
 
-export const highest_average_steps: UniqueHighestAverageAssignmentStep[] = [
+export const unique_highest_average_steps: UniqueHighestAverageAssignmentStep[] = [
   {
     residual_seat_number: 3,
     change: {
@@ -790,7 +790,7 @@ export const seat_assignment: SeatAssignment = {
     numerator: 0,
     denominator: 15,
   },
-  steps: (largest_remainder_steps as SeatChangeStep[]).concat(highest_average_steps),
+  steps: (largest_remainder_steps as SeatChangeStep[]).concat(unique_highest_average_steps),
   standings: [
     {
       list_number: 1,

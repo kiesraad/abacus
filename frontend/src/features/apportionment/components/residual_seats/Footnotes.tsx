@@ -1,9 +1,10 @@
 import type { ReactElement } from "react";
 import { t } from "@/i18n/translate";
-import type { SeatAssignment } from "@/types/generated/openapi";
+import type { ApportionmentState, SeatAssignment } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 import { formatList } from "@/utils/strings";
 import type { AbsoluteMajorityReassignmentStep, ListExhaustionRemovalStep } from "../../utils/steps";
+import { isListDrawingLotsVariant } from "../../utils/utils";
 import cls from "../Apportionment.module.css";
 
 interface FootnotesProps {
@@ -11,6 +12,7 @@ interface FootnotesProps {
   seatAssignment: SeatAssignment | undefined;
   absoluteMajorityStep: AbsoluteMajorityReassignmentStep | undefined;
   residualSeatRemovalSteps: ListExhaustionRemovalStep[];
+  state: ApportionmentState;
 }
 
 export function Footnotes({
@@ -18,6 +20,7 @@ export function Footnotes({
   seatAssignment,
   absoluteMajorityStep,
   residualSeatRemovalSteps,
+  state,
 }: FootnotesProps): ReactElement {
   return (
     <ol id="footnotes-list" className={cn(cls.footnotesList, "w-39")}>
@@ -30,6 +33,16 @@ export function Footnotes({
           </li>
         );
       })}
+      {isListDrawingLotsVariant(state, ["AbsoluteMajorityHighestAverage", "AbsoluteMajorityLargestRemainder"]) && (
+        <li id={`absolute-majority-reassignment-drawing-lots-information`}>
+          {t("apportionment.footnotes.absolute_majority_reassignment.text", {
+            list_assigned_seat: state.drawing_lots_required.assign_to,
+          })}{" "}
+          {t("apportionment.footnotes.absolute_majority_reassignment.drawing_lots", {
+            options: formatList(state.drawing_lots_required.options, t("or")),
+          })}
+        </li>
+      )}
       {absoluteMajorityStep && (
         <li id={`absolute-majority-reassignment-information`}>
           {t("apportionment.footnotes.absolute_majority_reassignment.text", {

@@ -1,7 +1,8 @@
 import type { JSX } from "react/jsx-runtime";
-
+import type { ApportionmentState } from "@/types/generated/openapi";
 import cls from "../components/Apportionment.module.css";
 import type { AbsoluteMajorityReassignmentStep, ListExhaustionRemovalStep } from "./steps";
+import { isListDrawingLotsVariant } from "./utils";
 
 export interface ResultChange {
   listNumber: number;
@@ -13,6 +14,7 @@ export interface ResultChange {
 
 export function getResultChanges(
   uniquePgNumbersWithFullSeatsRemoved: number[],
+  state: ApportionmentState,
   absoluteMajorityReassignment?: AbsoluteMajorityReassignmentStep,
   residualSeatRemovalSteps?: ListExhaustionRemovalStep[],
 ) {
@@ -28,6 +30,25 @@ export function getResultChanges(
       type: "full_seat",
     });
   });
+  if (isListDrawingLotsVariant(state, ["AbsoluteMajorityHighestAverage", "AbsoluteMajorityLargestRemainder"])) {
+    footnoteNumber += 1;
+    resultChanges.push({
+      listNumber: state.drawing_lots_required.assign_to,
+      footnoteNumber: footnoteNumber,
+      increase: 0,
+      decrease: 0,
+      type: "residual_seat",
+    });
+    state.drawing_lots_required.options.forEach((list) => {
+      resultChanges.push({
+        listNumber: list,
+        footnoteNumber: footnoteNumber,
+        increase: 0,
+        decrease: 0,
+        type: "residual_seat",
+      });
+    });
+  }
   if (absoluteMajorityReassignment) {
     footnoteNumber += 1;
     resultChanges.push({

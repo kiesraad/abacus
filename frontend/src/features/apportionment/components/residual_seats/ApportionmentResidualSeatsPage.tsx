@@ -13,7 +13,7 @@ import {
   type LargestRemainderAssignmentStep,
   type UniqueHighestAverageAssignmentStep,
 } from "../../utils/steps";
-import { apportionmentCheckStateAndRedirect, renderTitleAndHeader } from "../../utils/utils";
+import { apportionmentCheckStateAndRedirect, isListDrawingLotsVariant, renderTitleAndHeader } from "../../utils/utils";
 import cls from "../Apportionment.module.css";
 import { ApportionmentErrorPage } from "../ApportionmentError";
 import { DrawingLotsNotifyAlert } from "../DrawingLotsAlerts";
@@ -194,6 +194,7 @@ function SmallCouncilSection({
   footNotes,
   state,
 }: SmallCouncilSectionProps) {
+  const showFootnotes = isP9DrawingLots(state) || resultChanges.length > 0;
   return (
     <>
       <LargestRemaindersSection
@@ -201,7 +202,7 @@ function SmallCouncilSection({
         largestRemainderSteps={largestRemainderSteps}
         politicalGroups={politicalGroups}
         resultChanges={resultChanges}
-        footNotes={uniqueHighestAverageSteps.length === 0 && resultChanges.length > 0 ? footNotes : undefined}
+        footNotes={uniqueHighestAverageSteps.length === 0 && showFootnotes ? footNotes : undefined}
       />
       {uniqueHighestAverageSteps.length > 0 && (
         <HighestAveragesSection
@@ -210,11 +211,17 @@ function SmallCouncilSection({
           uniqueHighestAverageSteps={uniqueHighestAverageSteps}
           highestAverageSteps={highestAverageSteps}
           politicalGroups={politicalGroups}
-          footNotes={resultChanges.length > 0 ? footNotes : undefined}
+          footNotes={showFootnotes ? footNotes : undefined}
           state={state}
         />
       )}
     </>
+  );
+}
+
+function isP9DrawingLots(state: ApportionmentState) {
+  return (
+    isListDrawingLotsVariant(state, ["AbsoluteMajorityHighestAverage", "AbsoluteMajorityLargestRemainder"]) || false
   );
 }
 
@@ -231,18 +238,19 @@ export function ApportionmentResidualSeatsPage() {
     return <ApportionmentErrorPage sectionTitle={t("apportionment.allocation_of_residual_seats")} error={error} />;
   }
   if (seatAssignment && state) {
-    const { largestRemainderSteps, uniqueHighestAverageSteps, highestAverageSteps, absoluteMajorityStep } =
+    const { largestRemainderSteps, uniqueHighestAverageSteps, highestAverageSteps, P9Step } =
       getAssignmentSteps(seatAssignment);
     const { residualSeatRemovalSteps, listsWithFullSeatsRemoved } = getRemovalSteps(seatAssignment);
-    const resultChanges = getResultChanges(listsWithFullSeatsRemoved, absoluteMajorityStep, residualSeatRemovalSteps);
+    const resultChanges = getResultChanges(listsWithFullSeatsRemoved, state, P9Step, residualSeatRemovalSteps);
 
-    function renderFootnotes(): ReactElement {
+    function renderFootnotes(state: ApportionmentState): ReactElement {
       return (
         <Footnotes
           listsWithFullSeatsRemoved={listsWithFullSeatsRemoved}
           seatAssignment={seatAssignment}
-          absoluteMajorityStep={absoluteMajorityStep}
+          absoluteMajorityStep={P9Step}
           residualSeatRemovalSteps={residualSeatRemovalSteps}
+          state={state}
         />
       );
     }
@@ -260,7 +268,7 @@ export function ApportionmentResidualSeatsPage() {
                   highestAverageSteps={highestAverageSteps}
                   politicalGroups={election.political_groups}
                   resultChanges={resultChanges}
-                  footNotes={resultChanges.length > 0 ? renderFootnotes() : undefined}
+                  footNotes={isP9DrawingLots(state) || resultChanges.length > 0 ? renderFootnotes(state) : undefined}
                   state={state}
                 />
               ) : (
@@ -271,7 +279,7 @@ export function ApportionmentResidualSeatsPage() {
                   highestAverageSteps={highestAverageSteps}
                   politicalGroups={election.political_groups}
                   resultChanges={resultChanges}
-                  footNotes={renderFootnotes()}
+                  footNotes={renderFootnotes(state)}
                   state={state}
                 />
               )

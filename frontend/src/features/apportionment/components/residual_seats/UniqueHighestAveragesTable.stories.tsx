@@ -7,7 +7,7 @@ export const Default: StoryObj = {
   render: () => {
     return (
       <UniqueHighestAveragesTable
-        steps={lt19Seats.highest_average_steps}
+        steps={lt19Seats.unique_highest_average_steps}
         largestRemainderSteps={lt19Seats.largest_remainder_steps}
         standings={lt19Seats.seat_assignment.standings}
         politicalGroups={lt19Seats.election.political_groups}

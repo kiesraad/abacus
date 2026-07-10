@@ -653,17 +653,20 @@ describe("ApportionmentResidualSeatsPage", () => {
       expect(largest_remainders_table).toBeVisible();
       expect(largest_remainders_table).toHaveTableContent([
         ["Lijst", "Lijstnaam", "Aantal volle zetels", "Overschot", "Aantal restzetels"],
-        ["1", "De partijdigen", "7", "170", "9/15", "0"],
-        ["2", "Kiezers nu!", "1", "170", "12/15", "1"],
-        ["3", "Lijst De Partij", "1", "170", "12/15", "1"],
-        ["4", "Partij voor de Opkomst", "1", "170", "12/15", "1"],
+        ["1", "De partijdigen", "7", "170", "9/15", "1 0"],
+        ["2", "Kiezers nu!", "1", "170", "12/15", "1 1"],
+        ["3", "Lijst De Partij", "1", "170", "12/15", "1 1"],
+        ["4", "Partij voor de Opkomst", "1", "170", "12/15", "1 1"],
         ["5", "STEM", "1", "168", "12/15", "0"],
         ["6", "Lijst van stemmers", "1", "168", "12/15", "0"],
       ]);
 
+      expect(await screen.findByTestId("footnotes-list")).toHaveTextContent(
+        "Lijst 1 heeft meer dan de helft van alle uitgebrachte stemmen behaald, maar krijgt op basis van de standaard zetelverdeling niet de meerderheid van de zetels. Volgens de Kieswet (Artikel P 9 Toewijzing zetels bij volstrekte meerderheid) krijgt deze lijst één extra zetel. Lijst 2, 3 of 4 moet een restzetel afstaan. Hiervoor moet geloot worden.",
+      );
+
       expect(screen.queryByTestId("unique-highest-averages-table")).not.toBeInTheDocument();
       expect(screen.queryByTestId("highest-averages-table")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("footnotes-list")).not.toBeInTheDocument();
     });
 
     test("Render alert drawing lots for P 9 required and table for HighestAverageResidualSeat", async () => {
@@ -704,7 +707,7 @@ describe("ApportionmentResidualSeatsPage", () => {
       expect(highest_averages_table).toBeVisible();
       expect(highest_averages_table).toHaveTableContent([
         ["Lijst", "Lijstnaam", "Ronde 1", "Ronde 2", "Ronde 3", "Ronde 4", "Ronde 5", "Ronde 6", "Aantal restzetels"],
-        ["1", "De Kandidaat", "577", "", "577", "", "577", "", "577", "", "577", "", "577", "", "0"],
+        ["1", "De Kandidaat", "577", "", "577", "", "577", "", "577", "", "577", "", "577", "", "1 0"],
         [
           "2",
           "Kandidaten eerst!",
@@ -757,15 +760,18 @@ describe("ApportionmentResidualSeatsPage", () => {
           "1",
         ],
         ["5", "De Stemunie", "624", "1/2", "624", "1/2", "624", "1/2", "624", "1/2", "416", "1/3", "416", "1/3", "1"],
-        ["6", "Altijd van de Partij", "624", "", "624", "", "624", "", "624", "", "624", "", "416", "", "1"],
-        ["7", "Partij van de Keuze", "624", "", "624", "", "624", "", "624", "", "624", "", "624", "", "1"],
+        ["6", "Altijd van de Partij", "624", "", "624", "", "624", "", "624", "", "624", "", "416", "", "1 1"],
+        ["7", "Partij van de Keuze", "624", "", "624", "", "624", "", "624", "", "624", "", "624", "", "1 1"],
         ["8", "Stemmersgroep", "8", "", "8", "", "8", "", "8", "", "8", "", "8", "", "0"],
         ["", "Restzetel toegekend aan lijst", "2", "3", "4", "5", "6", "7", ""],
       ]);
 
+      expect(await screen.findByTestId("footnotes-list")).toHaveTextContent(
+        "Lijst 1 heeft meer dan de helft van alle uitgebrachte stemmen behaald, maar krijgt op basis van de standaard zetelverdeling niet de meerderheid van de zetels. Volgens de Kieswet (Artikel P 9 Toewijzing zetels bij volstrekte meerderheid) krijgt deze lijst één extra zetel. Lijst 6 of 7 moet een restzetel afstaan. Hiervoor moet geloot worden.",
+      );
+
       expect(screen.queryByTestId("largest-remainders-table")).not.toBeInTheDocument();
       expect(screen.queryByTestId("unique-highest-averages-table")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("footnotes-list")).not.toBeInTheDocument();
     });
 
     test("Render drawing lots information in footnote after drawing lots for P 9", async () => {

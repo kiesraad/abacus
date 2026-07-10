@@ -37,7 +37,7 @@ export interface AssignmentSteps {
   largestRemainderSteps: LargestRemainderAssignmentStep[];
   uniqueHighestAverageSteps: UniqueHighestAverageAssignmentStep[];
   highestAverageSteps: HighestAverageAssignmentStep[];
-  absoluteMajorityStep?: AbsoluteMajorityReassignmentStep;
+  P9Step?: AbsoluteMajorityReassignmentStep;
 }
 
 export function getAssignmentSteps(seatAssignment: SeatAssignment): AssignmentSteps {
@@ -45,7 +45,7 @@ export function getAssignmentSteps(seatAssignment: SeatAssignment): AssignmentSt
     largestRemainderSteps: seatAssignment.steps.filter(isLargestRemainderAssignmentStep),
     uniqueHighestAverageSteps: seatAssignment.steps.filter(isUniqueHighestAverageAssignmentStep),
     highestAverageSteps: seatAssignment.steps.filter(isHighestAverageAssignmentStep),
-    absoluteMajorityStep: seatAssignment.steps.find(isAbsoluteMajorityReassignmentStep),
+    P9Step: seatAssignment.steps.find(isAbsoluteMajorityReassignmentStep),
   };
 }
 

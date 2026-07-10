@@ -5,6 +5,8 @@ import * as gte19Seats from "../../testing/gte-19-seats";
 import * as gte19SeatsAndP7DrawingLots from "../../testing/gte-19-seats-and-p7-drawing-lots";
 import * as gte19SeatsAndP9 from "../../testing/gte-19-seats-and-p9";
 import * as gte19SeatsAndP9DrawingLots from "../../testing/gte-19-seats-and-p9-drawing-lots-and-deceased-candidates";
+import { getResultChanges } from "../../utils/seat-change";
+import { isAbsoluteMajorityReassignmentStep } from "../../utils/steps";
 import { HighestAveragesTable } from "./HighestAveragesTable";
 
 export const Default: StoryObj = {
@@ -201,14 +203,14 @@ export const DrawingLotsForList: StoryObj = {
   },
 };
 
-export const DrawingLotsForP9: StoryObj = {
+export const P9BeforeDrawingLots: StoryObj = {
   render: () => {
     return (
       <HighestAveragesTable
         steps={gte19SeatsAndP9DrawingLots.steps}
         standings={gte19SeatsAndP9DrawingLots.seat_assignment.standings}
         politicalGroups={gte19SeatsAndP9DrawingLots.election.political_groups}
-        resultChanges={[]}
+        resultChanges={getResultChanges([], gte19SeatsAndP9DrawingLots.state)}
         state={gte19SeatsAndP9DrawingLots.state}
       />
     );
@@ -218,7 +220,91 @@ export const DrawingLotsForP9: StoryObj = {
     await expect(table).toBeVisible();
     expect(table).toHaveTableContent([
       ["Lijst", "Lijstnaam", "Ronde 1", "Ronde 2", "Ronde 3", "Ronde 4", "Ronde 5", "Ronde 6", "Aantal restzetels"],
-      ["1", "De Kandidaat", "577", "", "577", "", "577", "", "577", "", "577", "", "577", "", "0"],
+      ["1", "De Kandidaat", "577", "", "577", "", "577", "", "577", "", "577", "", "577", "", "1 0"],
+      [
+        "2",
+        "Kandidaten eerst!",
+        "624",
+        "1/2",
+        "416",
+        "1/3",
+        "416",
+        "1/3",
+        "416",
+        "1/3",
+        "416",
+        "1/3",
+        "416",
+        "1/3",
+        "1",
+      ],
+      [
+        "3",
+        "Unie voor Stemmen",
+        "624",
+        "1/2",
+        "624",
+        "1/2",
+        "416",
+        "1/3",
+        "416",
+        "1/3",
+        "416",
+        "1/3",
+        "416",
+        "1/3",
+        "1",
+      ],
+      [
+        "4",
+        "Stem voor kandidaten",
+        "624",
+        "1/2",
+        "624",
+        "1/2",
+        "624",
+        "1/2",
+        "416",
+        "1/3",
+        "416",
+        "1/3",
+        "416",
+        "1/3",
+        "1",
+      ],
+      ["5", "De Stemunie", "624", "1/2", "624", "1/2", "624", "1/2", "624", "1/2", "416", "1/3", "416", "1/3", "1"],
+      ["6", "Altijd van de Partij", "624", "", "624", "", "624", "", "624", "", "624", "", "416", "", "1 1"],
+      ["7", "Partij van de Keuze", "624", "", "624", "", "624", "", "624", "", "624", "", "624", "", "1 1"],
+      ["8", "Stemmersgroep", "8", "", "8", "", "8", "", "8", "", "8", "", "8", "", "0"],
+      ["", "Restzetel toegekend aan lijst", "2", "3", "4", "5", "6", "7", ""],
+    ]);
+  },
+};
+
+export const P9AfterDrawingLots: StoryObj = {
+  render: () => {
+    return (
+      <HighestAveragesTable
+        steps={gte19SeatsAndP9DrawingLots.steps}
+        standings={gte19SeatsAndP9DrawingLots.seat_assignment_after_drawing_lots_seat_reassigned.standings}
+        politicalGroups={gte19SeatsAndP9DrawingLots.election.political_groups}
+        resultChanges={getResultChanges(
+          [],
+          gte19SeatsAndP9DrawingLots.state_after_drawing_lots_seat_reassigned,
+          gte19SeatsAndP9DrawingLots.seat_assignment_after_drawing_lots_seat_reassigned.steps.find(
+            isAbsoluteMajorityReassignmentStep,
+          ),
+        )}
+        state={gte19SeatsAndP9DrawingLots.state_after_drawing_lots_seat_reassigned}
+      />
+    );
+  },
+  play: async ({ canvas }) => {
+    const table = canvas.getByRole("table");
+    await expect(table).toBeVisible();
+    expect(table).toHaveTableContent([
+      ["Lijst", "Lijstnaam", "Ronde 1", "Ronde 2", "Ronde 3", "Ronde 4", "Ronde 5", "Ronde 6", "Aantal restzetels"],
+      ["1", "De Kandidaat", "577", "", "577", "", "577", "", "577", "", "577", "", "577", "", "1 1"],
       [
         "2",
         "Kandidaten eerst!",
@@ -272,7 +358,7 @@ export const DrawingLotsForP9: StoryObj = {
       ],
       ["5", "De Stemunie", "624", "1/2", "624", "1/2", "624", "1/2", "624", "1/2", "416", "1/3", "416", "1/3", "1"],
       ["6", "Altijd van de Partij", "624", "", "624", "", "624", "", "624", "", "624", "", "416", "", "1"],
-      ["7", "Partij van de Keuze", "624", "", "624", "", "624", "", "624", "", "624", "", "624", "", "1"],
+      ["7", "Partij van de Keuze", "624", "", "624", "", "624", "", "624", "", "624", "", "624", "", "1 0"],
       ["8", "Stemmersgroep", "8", "", "8", "", "8", "", "8", "", "8", "", "8", "", "0"],
       ["", "Restzetel toegekend aan lijst", "2", "3", "4", "5", "6", "7", ""],
     ]);

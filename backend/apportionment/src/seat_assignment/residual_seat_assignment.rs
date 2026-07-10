@@ -1169,6 +1169,129 @@ mod tests {
         }
     }
 
+    mod list_qualifies_for_extra_seat {
+        use super::*;
+
+        const LIST: u32 = 1;
+        const OTHER_LIST: u32 = 2;
+
+        #[test]
+        fn test_largest_remainder_qualify_when_no_seat_assigned() {
+            let previous_steps = vec![];
+            assert!(list_qualifies_for_extra_seat(&previous_steps, LIST, false));
+        }
+
+        #[test]
+        fn test_largest_remainder_qualify_when_seat_assigned_to_other_list() {
+            let previous_steps = vec![largest_remainder_step(OTHER_LIST)];
+            assert!(list_qualifies_for_extra_seat(&previous_steps, LIST, false));
+        }
+
+        #[test]
+        fn test_largest_remainder_qualify_when_unique_highest_average_step() {
+            let previous_steps = vec![unique_highest_average_step(LIST)];
+            assert!(list_qualifies_for_extra_seat(&previous_steps, LIST, false));
+        }
+
+        #[test]
+        fn test_largest_remainder_not_qualify_when_seat_assigned() {
+            let previous_steps = vec![largest_remainder_step(LIST)];
+            assert!(!list_qualifies_for_extra_seat(&previous_steps, LIST, false));
+        }
+
+        #[test]
+        fn test_largest_remainder_qualify_when_seat_retracted_by_absolute_majority() {
+            let previous_steps = vec![
+                largest_remainder_step(LIST),
+                absolute_majority_reassignment_step(LIST, OTHER_LIST),
+            ];
+            assert!(list_qualifies_for_extra_seat(&previous_steps, LIST, false));
+        }
+
+        #[test]
+        fn test_largest_remainder_not_qualify_when_seat_retracted_from_other_list() {
+            let previous_steps = vec![
+                largest_remainder_step(LIST),
+                absolute_majority_reassignment_step(OTHER_LIST, LIST),
+            ];
+            assert!(!list_qualifies_for_extra_seat(&previous_steps, LIST, false));
+        }
+
+        #[test]
+        fn test_largest_remainder_not_qualify_with_two_assigned_seats_even_after_retraction() {
+            let previous_steps = vec![
+                largest_remainder_step(LIST),
+                largest_remainder_step(LIST),
+                absolute_majority_reassignment_step(LIST, OTHER_LIST),
+            ];
+            assert!(!list_qualifies_for_extra_seat(&previous_steps, LIST, false));
+        }
+
+        #[test]
+        fn test_unique_highest_average_qualify_when_no_seat_assigned() {
+            let previous_steps = vec![];
+            assert!(list_qualifies_for_extra_seat(&previous_steps, LIST, true));
+        }
+
+        #[test]
+        fn test_unique_highest_average_qualify_when_seat_assigned_to_other_list() {
+            let previous_steps = vec![unique_highest_average_step(OTHER_LIST)];
+            assert!(list_qualifies_for_extra_seat(&previous_steps, LIST, true));
+        }
+
+        #[test]
+        fn test_unique_highest_average_qualify_when_largest_remainder_step() {
+            let previous_steps = vec![largest_remainder_step(LIST)];
+            assert!(list_qualifies_for_extra_seat(&previous_steps, LIST, true));
+        }
+
+        #[test]
+        fn test_unique_highest_average_not_qualify_when_seat_assigned() {
+            let previous_steps = vec![unique_highest_average_step(LIST)];
+            assert!(!list_qualifies_for_extra_seat(&previous_steps, LIST, true));
+        }
+
+        #[test]
+        fn test_unique_highest_average_qualify_when_seat_retracted_by_absolute_majority() {
+            let previous_steps = vec![
+                unique_highest_average_step(LIST),
+                absolute_majority_reassignment_step(LIST, OTHER_LIST),
+            ];
+            assert!(list_qualifies_for_extra_seat(&previous_steps, LIST, true));
+        }
+
+        #[test]
+        fn test_unioque_highest_average_qualify_when_retracted_with_one_largest_remainder() {
+            let previous_steps = vec![
+                largest_remainder_step(LIST),
+                unique_highest_average_step(LIST),
+                absolute_majority_reassignment_step(LIST, OTHER_LIST),
+            ];
+            assert!(list_qualifies_for_extra_seat(&previous_steps, LIST, true));
+        }
+
+        #[test]
+        fn test_unique_highest_average_not_qualify_when_retracted_with_two_largest_remainders() {
+            let previous_steps = vec![
+                largest_remainder_step(LIST),
+                largest_remainder_step(LIST),
+                unique_highest_average_step(LIST),
+                absolute_majority_reassignment_step(LIST, OTHER_LIST),
+            ];
+            assert!(!list_qualifies_for_extra_seat(&previous_steps, LIST, true));
+        }
+
+        #[test]
+        fn test_unique_highest_average_not_qualify_with_two_assigned_seats_even_after_retraction() {
+            let previous_steps = vec![
+                unique_highest_average_step(LIST),
+                unique_highest_average_step(LIST),
+                absolute_majority_reassignment_step(LIST, OTHER_LIST),
+            ];
+            assert!(!list_qualifies_for_extra_seat(&previous_steps, LIST, true));
+        }
+    }
+
     mod list_standings_qualifying_for_largest_remainder {
         use super::*;
 
@@ -2216,129 +2339,6 @@ mod tests {
                     drawing_lots: Some(variant),
                 })
             );
-        }
-    }
-
-    mod list_qualifies_for_extra_seat {
-        use super::*;
-
-        const LIST: u32 = 1;
-        const OTHER_LIST: u32 = 2;
-
-        #[test]
-        fn test_largest_remainder_qualify_when_no_seat_assigned() {
-            let previous_steps = vec![];
-            assert!(list_qualifies_for_extra_seat(&previous_steps, LIST, false));
-        }
-
-        #[test]
-        fn test_largest_remainder_qualify_when_seat_assigned_to_other_list() {
-            let previous_steps = vec![largest_remainder_step(OTHER_LIST)];
-            assert!(list_qualifies_for_extra_seat(&previous_steps, LIST, false));
-        }
-
-        #[test]
-        fn test_largest_remainder_qualify_when_unique_highest_average_step() {
-            let previous_steps = vec![unique_highest_average_step(LIST)];
-            assert!(list_qualifies_for_extra_seat(&previous_steps, LIST, false));
-        }
-
-        #[test]
-        fn test_largest_remainder_not_qualify_when_seat_assigned() {
-            let previous_steps = vec![largest_remainder_step(LIST)];
-            assert!(!list_qualifies_for_extra_seat(&previous_steps, LIST, false));
-        }
-
-        #[test]
-        fn test_largest_remainder_qualify_when_seat_retracted_by_absolute_majority() {
-            let previous_steps = vec![
-                largest_remainder_step(LIST),
-                absolute_majority_reassignment_step(LIST, OTHER_LIST),
-            ];
-            assert!(list_qualifies_for_extra_seat(&previous_steps, LIST, false));
-        }
-
-        #[test]
-        fn test_largest_remainder_not_qualify_when_seat_retracted_from_other_list() {
-            let previous_steps = vec![
-                largest_remainder_step(LIST),
-                absolute_majority_reassignment_step(OTHER_LIST, LIST),
-            ];
-            assert!(!list_qualifies_for_extra_seat(&previous_steps, LIST, false));
-        }
-
-        #[test]
-        fn test_largest_remainder_not_qualify_with_two_assigned_seats_even_after_retraction() {
-            let previous_steps = vec![
-                largest_remainder_step(LIST),
-                largest_remainder_step(LIST),
-                absolute_majority_reassignment_step(LIST, OTHER_LIST),
-            ];
-            assert!(!list_qualifies_for_extra_seat(&previous_steps, LIST, false));
-        }
-
-        #[test]
-        fn test_unique_highest_average_qualify_when_no_seat_assigned() {
-            let previous_steps = vec![];
-            assert!(list_qualifies_for_extra_seat(&previous_steps, LIST, true));
-        }
-
-        #[test]
-        fn test_unique_highest_average_qualify_when_seat_assigned_to_other_list() {
-            let previous_steps = vec![unique_highest_average_step(OTHER_LIST)];
-            assert!(list_qualifies_for_extra_seat(&previous_steps, LIST, true));
-        }
-
-        #[test]
-        fn test_unique_highest_average_qualify_when_largest_remainder_step() {
-            let previous_steps = vec![largest_remainder_step(LIST)];
-            assert!(list_qualifies_for_extra_seat(&previous_steps, LIST, true));
-        }
-
-        #[test]
-        fn test_unique_highest_average_not_qualify_when_seat_assigned() {
-            let previous_steps = vec![unique_highest_average_step(LIST)];
-            assert!(!list_qualifies_for_extra_seat(&previous_steps, LIST, true));
-        }
-
-        #[test]
-        fn test_unique_highest_average_qualify_when_seat_retracted_by_absolute_majority() {
-            let previous_steps = vec![
-                unique_highest_average_step(LIST),
-                absolute_majority_reassignment_step(LIST, OTHER_LIST),
-            ];
-            assert!(list_qualifies_for_extra_seat(&previous_steps, LIST, true));
-        }
-
-        #[test]
-        fn test_unioque_highest_average_qualify_when_retracted_with_one_largest_remainder() {
-            let previous_steps = vec![
-                largest_remainder_step(LIST),
-                unique_highest_average_step(LIST),
-                absolute_majority_reassignment_step(LIST, OTHER_LIST),
-            ];
-            assert!(list_qualifies_for_extra_seat(&previous_steps, LIST, true));
-        }
-
-        #[test]
-        fn test_unique_highest_average_not_qualify_when_retracted_with_two_largest_remainders() {
-            let previous_steps = vec![
-                largest_remainder_step(LIST),
-                largest_remainder_step(LIST),
-                unique_highest_average_step(LIST),
-                absolute_majority_reassignment_step(LIST, OTHER_LIST),
-            ];
-            assert!(!list_qualifies_for_extra_seat(&previous_steps, LIST, true));
-        }
-
-        #[test]
-        fn test_unique_highest_average_not_qualify_with_two_assigned_seats_even_after_retraction() {
-            let previous_steps = vec![
-                unique_highest_average_step(LIST),
-                unique_highest_average_step(LIST),
-                absolute_majority_reassignment_step(LIST, OTHER_LIST),
-            ];
-            assert!(!list_qualifies_for_extra_seat(&previous_steps, LIST, true));
         }
     }
 }

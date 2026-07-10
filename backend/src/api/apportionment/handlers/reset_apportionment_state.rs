@@ -8,8 +8,8 @@ use crate::{
     APIError, ErrorResponse, SqlitePoolExt,
     domain::{apportionment_state::ApportionmentState, election::ElectionId},
     infra::audit_log::AuditService,
-    repository::{election_repo, user_repo::User},
-    service::update_apportionment_state,
+    repository::{committee_session_repo, election_repo, user_repo::User},
+    service::{delete_committee_session_files, update_apportionment_state},
 };
 
 /// Reset apportionment state
@@ -43,21 +43,29 @@ pub async fn reset_apportionment_state(
         update_apportionment_state(&mut tx, &audit_service, election_id, |state| state.reset())
             .await?;
 
+    let committee_session =
+        committee_session_repo::get_election_committee_session(&mut tx, election_id).await?;
+    delete_committee_session_files(&mut tx, audit_service.clone(), committee_session.id).await?;
+
     tx.commit().await?;
+
     Ok(Json(state))
 }
 
 #[cfg(test)]
 mod tests {
+    use chrono::Utc;
     use test_log::test;
 
     use super::*;
     use crate::{
         domain::{
             apportionment_state::ApportionmentState, committee_session::CommitteeSessionId,
-            committee_session_status::CommitteeSessionStatus, role::Role,
+            committee_session_status::CommitteeSessionStatus, file::FileType, role::Role,
         },
-        repository::{apportionment_state_repo, committee_session_repo, user_repo::UserId},
+        repository::{
+            apportionment_state_repo, committee_session_repo, file_repo, user_repo::UserId,
+        },
     };
 
     #[test(sqlx::test(fixtures(
@@ -84,11 +92,30 @@ mod tests {
         .await
         .expect("should upsert initial state");
 
+        file_repo::create(
+            &mut conn,
+            id,
+            FileType::CsbResultsPdf,
+            "filename.txt".into(),
+            &[97, 98, 97, 99, 117, 115, 0],
+            "text/plain".into(),
+            Utc::now(),
+        )
+        .await
+        .expect("should create file");
+
         let state =
             reset_apportionment_state(user, State(pool), audit_service, Path(ElectionId::from(8)))
                 .await
                 .expect("should call the handler successfully");
 
         assert_eq!(state.0, ApportionmentState::Uninitialised);
+
+        assert_eq!(
+            file_repo::get_for_session(&mut conn, id, FileType::CsbResultsPdf)
+                .await
+                .expect("should query files"),
+            None,
+        );
     }
 }

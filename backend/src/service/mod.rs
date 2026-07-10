@@ -1,5 +1,5 @@
 mod apportionment;
-mod change_committee_session_status;
+mod committee_session;
 mod data_entry;
 mod investigation;
 mod polling_station;
@@ -10,9 +10,9 @@ pub use apportionment::{
     next_state as next_apportionment_state, process as process_apportionment,
     update_state as update_apportionment_state,
 };
-pub use change_committee_session_status::{
+pub use committee_session::{
     CommitteeSessionAuditData, CommitteeSessionUpdatedAuditData, FileAuditData,
-    change_committee_session_status,
+    change_committee_session_status, delete_committee_session_files,
 };
 #[cfg(test)]
 pub use data_entry::create_definitive_data_entry;

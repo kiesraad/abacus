@@ -8,7 +8,7 @@ The Abacus apportionment crate has several fuzz targets that check our implement
 
 ## Running
 
-[cargo fuzz](https://rust-fuzz.github.io/book/cargo-fuzz/tutorial.html) is used as a fuzzing tool. A nightly version of the Rust toolchain is required; when using `rustup` this should get taken care of automatically because of the `rust-toolchain` file in this directory.
+[cargo fuzz](https://rust-fuzz.github.io/book/cargo-fuzz/tutorial.html) is used as a fuzzing tool. A nightly version of the Rust toolchain is required; when using `rustup` this should get taken care of automatically because of the `rust-toolchain.toml` file in this directory. Run the commands below from within this directory, so that the pinned nightly toolchain is used.
 
 Basic commands:
 - Installation: `cargo install cargo-fuzz`

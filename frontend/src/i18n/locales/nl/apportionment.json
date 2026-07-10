@@ -1,6 +1,7 @@
 {
   "absolute_majority_reassignment": "Lijst {list_assigned_seat} heeft meer dan de helft van alle uitgebrachte stemmen behaald, maar krijgt op basis van de standaard zetelverdeling niet de meerderheid van de zetels. Volgens de Kieswet (Artikel P 9 Toewijzing zetels bij volstrekte meerderheid) krijgt deze lijst één extra zetel.",
-  "absolute_majority_reassignment_result": "Deze zetel gaat ten koste van lijst {list_retracted_seat}.",
+  "absolute_majority_reassignment_options": " (er is geloot tussen lijst {options})",
+  "absolute_majority_reassignment_result": "Deze zetel gaat ten koste van lijst {list_retracted_seat}",
   "allocation_of_full_seats": "Verdeling van de volle zetels",
   "allocation_of_residual_seats": "Verdeling van de restzetels",
   "all_seats_assigned": "Alle zetels zijn toegewezen",

@@ -615,7 +615,7 @@ describe("ApportionmentResidualSeatsPage", () => {
       expect(screen.queryByTestId("footnotes-list")).not.toBeInTheDocument();
     });
 
-    test("Render alert drawing lots for p9 required and table for LargestRemainderResidualSeat", async () => {
+    test("Render alert drawing lots for P 9 required and table for LargestRemainderResidualSeat", async () => {
       overrideOnce(
         "get",
         "/api/elections/9",
@@ -666,7 +666,7 @@ describe("ApportionmentResidualSeatsPage", () => {
       expect(screen.queryByTestId("footnotes-list")).not.toBeInTheDocument();
     });
 
-    test("Render alert drawing lots for p9 required and table for HighestAverageResidualSeat", async () => {
+    test("Render alert drawing lots for P 9 required and table for HighestAverageResidualSeat", async () => {
       overrideOnce(
         "get",
         "/api/elections/10",
@@ -766,6 +766,105 @@ describe("ApportionmentResidualSeatsPage", () => {
       expect(screen.queryByTestId("largest-remainders-table")).not.toBeInTheDocument();
       expect(screen.queryByTestId("unique-highest-averages-table")).not.toBeInTheDocument();
       expect(screen.queryByTestId("footnotes-list")).not.toBeInTheDocument();
+    });
+
+    test("Render drawing lots information in footnote after drawing lots for P 9", async () => {
+      overrideOnce(
+        "get",
+        "/api/elections/10",
+        200,
+        getElectionMockData(gte19SeatsAndP9DrawingLots.election, gte19SeatsAndP9DrawingLots.committee_session),
+      );
+      overrideOnce("post", "/api/elections/10/apportionment", 200, {
+        seat_assignment: gte19SeatsAndP9DrawingLots.seat_assignment_after_drawing_lots_seat_reassigned,
+        election_summary: gte19SeatsAndP9DrawingLots.election_summary,
+        warnings: [],
+      });
+      overrideOnce(
+        "get",
+        "/api/elections/10/apportionment/state",
+        200,
+        gte19SeatsAndP9DrawingLots.state_after_drawing_lots_seat_reassigned,
+      );
+
+      renderApportionmentResidualSeatsPage(10, false);
+      expect(await screen.findByRole("heading", { level: 1, name: "Verdeling van de restzetels" }));
+
+      expect(
+        await screen.findByRole("heading", {
+          level: 2,
+          name: "De restzetels gaan naar de partijen met de grootste gemiddelden",
+        }),
+      );
+      const highest_averages_table = await screen.findByTestId("highest-averages-table");
+      expect(highest_averages_table).toBeVisible();
+      expect(highest_averages_table).toHaveTableContent([
+        ["Lijst", "Lijstnaam", "Ronde 1", "Ronde 2", "Ronde 3", "Ronde 4", "Ronde 5", "Ronde 6", "Aantal restzetels"],
+        ["1", "De Kandidaat", "577", "", "577", "", "577", "", "577", "", "577", "", "577", "", "1 1"],
+        [
+          "2",
+          "Kandidaten eerst!",
+          "624",
+          "1/2",
+          "416",
+          "1/3",
+          "416",
+          "1/3",
+          "416",
+          "1/3",
+          "416",
+          "1/3",
+          "416",
+          "1/3",
+          "1",
+        ],
+        [
+          "3",
+          "Unie voor Stemmen",
+          "624",
+          "1/2",
+          "624",
+          "1/2",
+          "416",
+          "1/3",
+          "416",
+          "1/3",
+          "416",
+          "1/3",
+          "416",
+          "1/3",
+          "1",
+        ],
+        [
+          "4",
+          "Stem voor kandidaten",
+          "624",
+          "1/2",
+          "624",
+          "1/2",
+          "624",
+          "1/2",
+          "416",
+          "1/3",
+          "416",
+          "1/3",
+          "416",
+          "1/3",
+          "1",
+        ],
+        ["5", "De Stemunie", "624", "1/2", "624", "1/2", "624", "1/2", "624", "1/2", "416", "1/3", "416", "1/3", "1"],
+        ["6", "Altijd van de Partij", "624", "", "624", "", "624", "", "624", "", "624", "", "416", "", "1"],
+        ["7", "Partij van de Keuze", "624", "", "624", "", "624", "", "624", "", "624", "", "624", "", "1 0"],
+        ["8", "Stemmersgroep", "8", "", "8", "", "8", "", "8", "", "8", "", "8", "", "0"],
+        ["", "Restzetel toegekend aan lijst", "2", "3", "4", "5", "6", "7", ""],
+      ]);
+
+      expect(await screen.findByTestId("footnotes-list")).toHaveTextContent(
+        "Lijst 1 heeft meer dan de helft van alle uitgebrachte stemmen behaald, maar krijgt op basis van de standaard zetelverdeling niet de meerderheid van de zetels. Volgens de Kieswet (Artikel P 9 Toewijzing zetels bij volstrekte meerderheid) krijgt deze lijst één extra zetel. Deze zetel gaat ten koste van lijst 7 (er is geloot tussen lijst 6 en 7).",
+      );
+
+      expect(screen.queryByTestId("largest-remainders-table")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("unique-highest-averages-table")).not.toBeInTheDocument();
     });
   });
 

@@ -2,6 +2,7 @@ import type { ReactElement } from "react";
 import { t } from "@/i18n/translate";
 import type { SeatAssignment } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
+import { formatList } from "@/utils/strings";
 import type { AbsoluteMajorityReassignmentStep, ListExhaustionRemovalStep } from "../../utils/steps";
 import cls from "../Apportionment.module.css";
 
@@ -37,6 +38,11 @@ export function Footnotes({
           {t("apportionment.absolute_majority_reassignment_result", {
             list_retracted_seat: absoluteMajorityStep.change.list_retracted_seat,
           })}
+          {absoluteMajorityStep.change.drawing_lots &&
+            t("apportionment.absolute_majority_reassignment_options", {
+              options: formatList(absoluteMajorityStep.change.drawing_lots.options, t("and")),
+            })}
+          .
         </li>
       )}
       {residualSeatRemovalSteps.map((listSeatRemoval, index) => {

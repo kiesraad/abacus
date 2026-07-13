@@ -868,7 +868,7 @@ fn add_reporting_unit_investigations(
 pub fn parse_polling_stations_eml_str(
     polling_stations_data: &str,
 ) -> Result<PollingStations, EMLImportError> {
-    Ok(PollingStations::parse_eml(polling_stations_data, EMLParsingMode::Strict).ok()?)
+    Ok(PollingStations::parse_eml(polling_stations_data, EMLParsingMode::StrictFallback).ok()?)
 }
 
 pub fn polling_stations_from_eml_str(

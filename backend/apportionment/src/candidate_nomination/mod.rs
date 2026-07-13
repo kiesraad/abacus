@@ -144,7 +144,7 @@ fn candidate_nomination_per_list<'a, LV: ListVotes>(
             .to_owned();
 
         info!(
-            "Deceased candidates {:?} will be filtered out for list {:?}",
+            "Deceased candidates: {:?} will be filtered out for list {:?}",
             input.deceased_candidates.get(&list.number()),
             list.number()
         );
@@ -1616,7 +1616,7 @@ mod tests {
                 expected_nominations: vec![1, 3],
             },
             Case {
-                name: "first two candidates nominated with drawing lots",
+                name: "drawing of lots for candidates with same votes (not enough seats)",
                 candidates: vec![(1, 1000), (3, 900), (4, 900)],
                 total_seats: 2,
                 candidates_drawn: vec![CandidateDrawnMock {
@@ -1630,6 +1630,13 @@ mod tests {
                     drawn: 4,
                 }],
                 expected_nominations: vec![1, 4],
+            },
+            Case {
+                name: "no drawing of lots for candidates with same votes (enough seats)",
+                candidates: vec![(1, 1000), (3, 1000), (4, 900)],
+                total_seats: 2,
+                candidates_drawn: vec![],
+                expected_nominations: vec![1, 3],
             },
             Case {
                 name: "first three candidates nominated with drawing lots twice",

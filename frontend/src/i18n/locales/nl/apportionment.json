@@ -35,7 +35,10 @@
     "title": "Loting voor kandidaten met evenveel stemmen",
     "candidates_for_drawing_lots": "Er zijn {num_candidates} kandidaten die op basis van hun voorkeursstemmen in aanmerking komen voor zetel {seat_number}. Zij hebben allen {votes} stemmen. Het gaat om de kandidaten:",
     "hence_drawing_lots_is_needed": "Daarom moet er geloot worden wie zetel {seat_number} krijgt",
-    "total_seats": "{list} heeft {total_seats} zetels"
+    "total_seats": {
+      "singular": "{list} heeft {total_seats} zetel",
+      "plural": "{list} heeft {total_seats} zetels"
+    }
   },
   "drawing_lots_for_list": {
     "title": "Loting voor restzetel {number}",
@@ -102,6 +105,18 @@
     "which_list_has_to_give_up_a_seat": "Welke partij moet een restzetel afstaan?"
   },
   "election_summary": "Kengetallen",
+  "footnotes": {
+    "absolute_majority_reassignment": {
+      "drawing_lots": "Lijst {options} moet een restzetel afstaan. Hiervoor moet geloot worden.",
+      "options": " (er is geloot tussen lijst {options})",
+      "result": "Deze zetel gaat ten koste van lijst {list_retracted_seat}",
+      "text": "Lijst {list_assigned_seat} heeft meer dan de helft van alle uitgebrachte stemmen behaald, maar krijgt op basis van de standaard zetelverdeling niet de meerderheid van de zetels. Volgens de Kieswet (Artikel P 9 Toewijzing zetels bij volstrekte meerderheid) krijgt deze lijst één extra zetel."
+    },
+    "article_p10": "(Kieswet, artikel P 10)",
+    "full_seat_removed_remainder_information": "Het overschot is berekend op basis van de {num_full_seats} volle zetels die de lijst heeft gehaald voordat lijstuitputting is meegenomen (Kieswet, artikel P 8).",
+    "list_exhaustion_full_seat_removal": "Omdat lijst {list_retracted_seat} onvoldoende kandidaten heeft, is één volle zetel herverdeeld als restzetel.",
+    "list_exhaustion_residual_seat_removal": "Omdat lijst {list_retracted_seat} geen kandidaat heeft voor een zetel, is deze herverdeeld naar een andere lijst."
+  },
   "full_seat": {
     "singular": "Volle zetel",
     "plural": "Volle zetels"

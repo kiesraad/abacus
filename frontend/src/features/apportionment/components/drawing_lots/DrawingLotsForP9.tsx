@@ -16,7 +16,7 @@ interface DrawingLotsForListProps {
 
 export function DrawingLotsForP9({ drawingLotsRequired }: DrawingLotsForListProps) {
   return (
-    <ul className={cn(cls.drawingLotsList, "w-32")}>
+    <ul className={cn(cls.drawingLotsList, "w-32")} aria-label="drawing-lots-information">
       <li>
         {t("apportionment.drawing_lots_for_p9.list_got_absolute_majority", { nr: drawingLotsRequired.assign_to })}
       </li>

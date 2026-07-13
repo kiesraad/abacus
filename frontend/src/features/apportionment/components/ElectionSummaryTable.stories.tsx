@@ -71,7 +71,7 @@ export const DefaultWithoutNumberOfVoters: StoryObj = {
       ["Aantal raadszetels", "23", ""],
       ["Kiesdeler", "52 4/23", "Benodigde stemmen per volle zetel"],
       ["Voorkeursdrempel", "13 100/2300", "25% van de kiesdeler"],
-      ["Kandidaten voor zetelverdeling", "33 - 0 † = 33", "Beheer overleden kandidaten"],
+      ["Kandidaten voor zetelverdeling", "33", "Beheer overleden kandidaten"],
     ]);
   },
 };

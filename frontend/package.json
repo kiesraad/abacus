@@ -60,9 +60,9 @@
     "@types/react-dom": "19.2.3",
     "@typescript-eslint/eslint-plugin": "8.62.1",
     "@typescript-eslint/parser": "8.62.1",
-    "@vitest/browser-playwright": "4.1.10",
-    "@vitest/coverage-v8": "4.1.10",
-    "@vitest/expect": "4.1.9",
+    "@vitest/browser-playwright": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
+    "@vitest/expect": "catalog:",
     "@xstate/graph": "3.0.4",
     "cross-env": "10.1.0",
     "eslint": "10.6.0",
@@ -78,7 +78,7 @@
     "typescript": "6.0.3",
     "typescript-eslint": "8.62.1",
     "vite-node": "6.0.0",
-    "vitest": "4.1.10",
+    "vitest": "catalog:",
     "vitest-fail-on-console": "0.10.1",
     "xstate": "5.32.4"
   }

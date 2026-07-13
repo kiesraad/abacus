@@ -151,18 +151,7 @@ table.highestAveragesTable {
   }
 }
 
-/* Styling for the deceased candidates alert */
-.deceasedCandidatesAlert {
-  div:global(.small) {
-    align-items: flex-start;
-
-    section {
-      max-width: 100%;
-    }
-  }
-}
-
-/* Styling for the drawing lots alerts */
+/* Styling for the deceased candidates and drawing lots alerts */
 .smallAlert {
   div:global(.small) {
     max-width: 52rem;
@@ -171,6 +160,11 @@ table.highestAveragesTable {
 
     section {
       max-width: 100%;
+
+      p,
+      ul {
+        max-width: 100%;
+      }
     }
   }
 }

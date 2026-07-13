@@ -77,7 +77,7 @@ describe("ErrorsAndWarningsOverview", () => {
       },
     ]);
 
-    const political_group_votes_1 = screen.queryByRole("region", { name: "Lijst 1 - Vurige Vleugels Partij" });
+    const political_group_votes_1 = screen.queryByRole("region", { name: "Lijst 1 – Vurige Vleugels Partij" });
     expect(political_group_votes_1).toBeInTheDocument();
     expect(getValidationResults(political_group_votes_1)).toEqual([
       {
@@ -87,7 +87,7 @@ describe("ErrorsAndWarningsOverview", () => {
       },
     ]);
 
-    const political_group_votes_2 = screen.queryByRole("region", { name: "Lijst 2 - Wijzen van Water en Wind" });
+    const political_group_votes_2 = screen.queryByRole("region", { name: "Lijst 2 – Wijzen van Water en Wind" });
     expect(political_group_votes_2).not.toBeInTheDocument();
   });
 });

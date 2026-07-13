@@ -31,7 +31,9 @@ export const EqualCandidatesAndSeatsAvailable: StoryObj = {
     );
     await expect(listitems[2]).toHaveTextContent("2. Wiertz, K. (Kris)");
     await expect(listitems[3]).toHaveTextContent("6. Arets, T.E. (Tiemen)");
-    await expect(listitems[4]).toHaveTextContent("Daarom moet er geloot worden wie zetel 2 krijgt");
+    await expect(listitems[4]).toHaveTextContent(
+      "Volgens artikel P 15 van de Kieswet moet er geloot worden wie zetel 2 krijgt",
+    );
   },
 };
 
@@ -67,7 +69,9 @@ export const MoreCandidatesThanSeatsAvailable: StoryObj = {
     await expect(listitems[2]).toHaveTextContent("2. Oorschot, W.");
     await expect(listitems[3]).toHaveTextContent("4. Van Bekking, W.");
     await expect(listitems[4]).toHaveTextContent("5. De Vegt, F.W.");
-    await expect(listitems[5]).toHaveTextContent("Daarom moet er geloot worden wie zetel 4 krijgt");
+    await expect(listitems[5]).toHaveTextContent(
+      "Volgens artikel P 15 van de Kieswet moet er geloot worden wie zetel 4 krijgt",
+    );
   },
 };
 

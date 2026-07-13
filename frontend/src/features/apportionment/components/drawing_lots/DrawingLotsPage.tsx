@@ -69,7 +69,7 @@ function getContent(
         <DrawingLotsForCandidate
           drawingLotsRequired={state.drawing_lots_required}
           options={candidates}
-          list={list.name}
+          list={formatPoliticalGroupName(list)}
         />
       ),
       radioOptions: candidates.map((candidate) => ({

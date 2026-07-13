@@ -973,7 +973,7 @@ describe("ApportionmentPage", () => {
         expect(alerts[0]).toHaveTextContent(
           [
             "Loting noodzakelijk voor kandidaten met gelijk aantal voorkeursstemmen",
-            "3 kandidaten van Lijst 2 – GROEP 9 hebben evenveel voorkeursstemmen gekregen. Er is nog 1 zetel beschikbaar. ",
+            "2 kandidaten van Lijst 5 – GROEP 12 hebben evenveel voorkeursstemmen gekregen. Er is nog 1 zetel beschikbaar. ",
             "In de wet staat dat de kandidaat met het hoogste aantal voorkeursstemmen de zetel krijgt.",
             "Hierdoor kan de zetel niet automatisch worden toegewezen. Het centraal stembureau moet een loting uitvoeren om te bepalen welke kandidaat gekozen wordt.",
           ].join(""),
@@ -986,11 +986,11 @@ describe("ApportionmentPage", () => {
       expect(apportionment_table).toHaveTableContent([
         ["Lijst", "Lijstnaam", "Volle zetels", "Restzetels", "Totaal zetels"],
         ["1", "GROEP 8", "5", "-", "5"],
-        ["2", "GROEP 9", "4", "-", "4"],
+        ["2", "GROEP 9", "3", "1", "4"],
         ["3", "GROEP 10", "2", "1", "3"],
         ["4", "GROEP 11", "2", "-", "2"],
         ["5", "GROEP 12", "1", "-", "1"],
-        ["", "Totaal", "14", "1", "15"],
+        ["", "Totaal", "13", "2", "15"],
       ]);
 
       // Check that there are no links to the list details pages
@@ -1026,7 +1026,7 @@ describe("ApportionmentPage", () => {
         expect(alerts[0]).toHaveTextContent(
           [
             "Loting noodzakelijk voor kandidaten met gelijk aantal voorkeursstemmen",
-            "2 kandidaten van Lijst 1 – GROEP 8 hebben evenveel voorkeursstemmen gekregen. Er zijn nog 2 zetels beschikbaar. ",
+            "3 kandidaten van Lijst 1 – GROEP 8 hebben evenveel voorkeursstemmen gekregen. Er zijn nog 2 zetels beschikbaar. ",
             "In de wet staat dat de kandidaten met het hoogste aantal voorkeursstemmen de zetels krijgen.",
             "Hierdoor kunnen de zetels niet automatisch worden toegewezen. Het centraal stembureau moet een loting uitvoeren om te bepalen welke kandidaten gekozen worden.",
           ].join(""),
@@ -1039,11 +1039,11 @@ describe("ApportionmentPage", () => {
       expect(apportionment_table).toHaveTableContent([
         ["Lijst", "Lijstnaam", "Volle zetels", "Restzetels", "Totaal zetels"],
         ["1", "GROEP 8", "5", "-", "5"],
-        ["2", "GROEP 9", "4", "-", "4"],
+        ["2", "GROEP 9", "3", "1", "4"],
         ["3", "GROEP 10", "2", "1", "3"],
         ["4", "GROEP 11", "2", "-", "2"],
         ["5", "GROEP 12", "1", "-", "1"],
-        ["", "Totaal", "14", "1", "15"],
+        ["", "Totaal", "13", "2", "15"],
       ]);
 
       // Check that there are no links to the list details pages

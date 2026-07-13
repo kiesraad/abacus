@@ -34,7 +34,7 @@
   "drawing_lots_for_candidate": {
     "title": "Loting voor kandidaten met evenveel stemmen",
     "candidates_for_drawing_lots": "Er zijn {num_candidates} kandidaten die op basis van hun voorkeursstemmen in aanmerking komen voor zetel {seat_number}. Zij hebben allen {votes} stemmen. Het gaat om de kandidaten:",
-    "hence_drawing_lots_is_needed": "Volgens artikel P 15 van de Kieswet moet er geloot worden wie zetel {seat_number} krijgt",
+    "hence_drawing_lots_is_needed": "Daarom moet er geloot worden wie zetel {seat_number} krijgt",
     "total_seats": "{list} heeft {total_seats} zetels"
   },
   "drawing_lots_for_list": {

@@ -916,6 +916,17 @@ export const dataEntryRequestGSB: DataEntry = {
   },
 };
 
+export const dataEntryRequestGSBTriggeringDrawingLots: DataEntry = {
+  progress: 100,
+  data: noRecountNoDifferencesDrawingLotsDataEntryGSB,
+  client_state: {
+    furthest: "political_group_votes_9",
+    current: "political_group_votes_9",
+    acceptedErrorsAndWarnings: [],
+    continue: true,
+  },
+};
+
 export const dataEntryWithErrorRequest: DataEntry = {
   progress: 86,
   data: {

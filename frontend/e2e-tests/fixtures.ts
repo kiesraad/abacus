@@ -7,6 +7,7 @@ import { type Eml230b, eml110a, eml230b, eml230b_more_than_45_candidates } from 
 import {
   dataEntryRequest,
   dataEntryRequestGSB,
+  dataEntryRequestGSBTriggeringDrawingLots,
   dataEntryWithDifferencesRequest,
   dataEntryWithErrorRequest,
   pollingStationRequests,
@@ -82,6 +83,8 @@ type Fixtures = {
   completedElectionGSB: Election;
   // CSB election with subcommittee and two completed data entries
   completedElectionCSB: Election;
+  // CSB election with subcommittee and two completed data entries that triggers drawing lots for lists and candidates
+  completedElectionCSBWithDrawingLots: Election;
   // The current committee session for the GSB election
   currentCommitteeSessionElectionGSB: CommitteeSession;
   // Newly created GSB User
@@ -321,6 +324,26 @@ export const test = base.extend<Fixtures>({
       typistTwoCSB.request,
       dataEntryRequestGSB,
       dataEntryRequestGSB,
+    );
+
+    await use(electionCSB.election);
+  },
+  completedElectionCSBWithDrawingLots: async ({ electionCSB, typistOneCSB, typistTwoCSB }, use) => {
+    const { request } = typistOneCSB;
+    // get the existing election statuses
+    const url: ELECTION_STATUS_REQUEST_PATH = `/api/elections/${electionCSB.election.id}/status`;
+    const response = await request.get(url);
+    expect(response.ok()).toBeTruthy();
+    const electionStatus = (await response.json()) as ElectionStatusResponse;
+    const dataEntryId = electionStatus.statuses[0]!.data_entry_id;
+
+    // finalise both data entries for the subcommittee
+    await completeDataEntries(
+      dataEntryId,
+      typistOneCSB.request,
+      typistTwoCSB.request,
+      dataEntryRequestGSBTriggeringDrawingLots,
+      dataEntryRequestGSBTriggeringDrawingLots,
     );
 
     await use(electionCSB.election);

@@ -3,7 +3,7 @@ import type { Locator, Page } from "@playwright/test";
 export class ApportionmentResidualSeats {
   readonly header: Locator;
 
-  readonly drawingLotsForListNeeded: Locator;
+  private readonly drawingLotsForListNeeded: Locator;
   readonly drawingLotsForListNeededAlert: Locator;
   readonly toDrawingLots: Locator;
 

@@ -1,14 +1,14 @@
 import type { Locator, Page } from "@playwright/test";
 
 export class Apportionment {
-  readonly allSeatsAssigned: Locator;
+  private readonly allSeatsAssigned: Locator;
   readonly allSeatsAssignedAlert: Locator;
   readonly toReport: Locator;
-  readonly drawingLotsForListNeeded: Locator;
+  private readonly drawingLotsForListNeeded: Locator;
   readonly drawingLotsForListNeededAlert: Locator;
   readonly toDrawingLots: Locator;
   readonly toResidualSeatAllocationDetails: Locator;
-  readonly drawingLotsForCandidateNeeded: Locator;
+  private readonly drawingLotsForCandidateNeeded: Locator;
   readonly drawingLotsForCandidateNeededAlert: Locator;
   readonly preliminaryResult: Locator;
   readonly apportionment: Locator;

@@ -111,6 +111,7 @@ test.describe("CSB election apportionment", () => {
 
     await expect(apportionmentPage.header).toBeVisible();
     await expect(apportionmentPage.allSeatsAssignedAlert).toBeVisible();
+    await expect(apportionmentPage.toReport).toBeVisible();
     await expect(apportionmentPage.apportionment).toBeVisible();
     // Alert with drawing lots for list result is still visible
     await expect(

@@ -13,7 +13,7 @@ import {
   isLargestRemainderAssignmentStep,
   isUniqueHighestAverageAssignmentStep,
 } from "../../utils/steps";
-import { apportionmentCheckStateAndRedirect, isListDrawingLotsVariant, renderTitleAndHeader } from "../../utils/utils";
+import { apportionmentCheckStateAndRedirect, renderTitleAndHeader } from "../../utils/utils";
 import cls from "../Apportionment.module.css";
 import { ApportionmentErrorPage } from "../ApportionmentError";
 import { DrawingLotsNotifyAlert } from "../DrawingLotsAlerts";
@@ -24,7 +24,12 @@ import { UniqueHighestAveragesTable } from "./UniqueHighestAveragesTable";
 
 export const LARGE_COUNCIL_THRESHOLD = 19;
 
-function renderInformation(seats: number, residualSeats: number) {
+interface ResidualSeatsInformationProps {
+  residualSeats: number;
+  system: "highest_averages" | "largest_remainders";
+}
+
+function ResidualSeatsInformation({ residualSeats, system }: ResidualSeatsInformationProps) {
   return (
     <span className={cls.tableInformation}>
       {tx(
@@ -36,7 +41,7 @@ function renderInformation(seats: number, residualSeats: number) {
       )}
       <br />
       <br />
-      {tx(`apportionment.information_${seats >= LARGE_COUNCIL_THRESHOLD ? "highest_averages" : "largest_remainders"}`)}
+      {tx(`apportionment.information_${system}`)}
     </span>
   );
 }
@@ -54,7 +59,7 @@ function LargestRemaindersSection({ seatAssignment, politicalGroups, resultChang
   return (
     <div>
       <h2 className={cls.tableTitle}>{t("apportionment.residual_seats_largest_remainders")}</h2>
-      {renderInformation(seatAssignment.seats, seatAssignment.residual_seats)}
+      <ResidualSeatsInformation residualSeats={seatAssignment.residual_seats} system="largest_remainders" />
       {largestRemainderSteps.length > 0 && (
         <LargestRemaindersTable
           steps={largestRemainderSteps}
@@ -137,7 +142,7 @@ function HighestAveragesSectionLargeCouncil({
   return (
     <div>
       <h2 className={cls.tableTitle}>{t("apportionment.residual_seats_highest_averages")}</h2>
-      {renderInformation(seatAssignment.seats, seatAssignment.residual_seats)}
+      <ResidualSeatsInformation residualSeats={seatAssignment.residual_seats} system="highest_averages" />
       <h3 className={cls.tableTitle}>{t("apportionment.averages_per_list")}:</h3>
       {highestAverageSteps.length > 0 && (
         <HighestAveragesTable
@@ -165,59 +170,57 @@ export function ApportionmentResidualSeatsPage() {
     return <ApportionmentErrorPage sectionTitle={t("apportionment.allocation_of_residual_seats")} error={error} />;
   }
 
-  if (seatAssignment && state) {
-    const { residualSeatRemovalSteps, listsWithFullSeatsRemoved } = getRemovalSteps(seatAssignment);
-    const absoluteMajorityStep = seatAssignment.steps.find(isAbsoluteMajorityReassignmentStep);
-    const resultChanges = getResultChanges(
-      listsWithFullSeatsRemoved,
-      state,
-      absoluteMajorityStep,
-      residualSeatRemovalSteps,
-    );
+  if (!seatAssignment || !state) {
+    return null;
+  }
 
-    return (
-      <>
-        {renderTitleAndHeader(t("apportionment.allocation_of_residual_seats"))}
-        <main>
-          <article className={cls.article}>
-            <DrawingLotsNotifyAlert state={state} />
+  const { residualSeatRemovalSteps, listsWithFullSeatsRemoved } = getRemovalSteps(seatAssignment);
+  const absoluteMajorityStep = seatAssignment.steps.find(isAbsoluteMajorityReassignmentStep);
+  const resultChanges = getResultChanges(
+    listsWithFullSeatsRemoved,
+    state,
+    absoluteMajorityStep,
+    residualSeatRemovalSteps,
+  );
 
-            {seatAssignment.residual_seats > 0 ? (
-              <div className={cn(cls.tableDiv, "mb-lg")}>
-                {seatAssignment.seats >= LARGE_COUNCIL_THRESHOLD ? (
-                  <HighestAveragesSectionLargeCouncil
+  return (
+    <>
+      {renderTitleAndHeader(t("apportionment.allocation_of_residual_seats"))}
+      <main>
+        <article className={cls.article}>
+          <DrawingLotsNotifyAlert state={state} />
+
+          {seatAssignment.residual_seats > 0 ? (
+            <div className={cn(cls.tableDiv, "mb-lg")}>
+              {seatAssignment.seats >= LARGE_COUNCIL_THRESHOLD ? (
+                <HighestAveragesSectionLargeCouncil
+                  seatAssignment={seatAssignment}
+                  politicalGroups={election.political_groups}
+                  resultChanges={resultChanges}
+                  state={state}
+                />
+              ) : (
+                <>
+                  <LargestRemaindersSection
+                    seatAssignment={seatAssignment}
+                    politicalGroups={election.political_groups}
+                    resultChanges={resultChanges}
+                  />
+                  <HighestAveragesSectionSmallCouncil
                     seatAssignment={seatAssignment}
                     politicalGroups={election.political_groups}
                     resultChanges={resultChanges}
                     state={state}
                   />
-                ) : (
-                  <>
-                    <LargestRemaindersSection
-                      seatAssignment={seatAssignment}
-                      politicalGroups={election.political_groups}
-                      resultChanges={resultChanges}
-                    />
-                    <HighestAveragesSectionSmallCouncil
-                      seatAssignment={seatAssignment}
-                      politicalGroups={election.political_groups}
-                      resultChanges={resultChanges}
-                      state={state}
-                    />
-                  </>
-                )}
-                {(isListDrawingLotsVariant(state, [
-                  "AbsoluteMajorityHighestAverage",
-                  "AbsoluteMajorityLargestRemainder",
-                ]) ||
-                  resultChanges.length > 0) && <Footnotes seatAssignment={seatAssignment} state={state} />}
-              </div>
-            ) : (
-              <span>{t("apportionment.no_residual_seats_to_assign")}</span>
-            )}
-          </article>
-        </main>
-      </>
-    );
-  }
+                </>
+              )}
+              <Footnotes seatAssignment={seatAssignment} state={state} />
+            </div>
+          ) : (
+            <span>{t("apportionment.no_residual_seats_to_assign")}</span>
+          )}
+        </article>
+      </main>
+    </>
+  );
 }

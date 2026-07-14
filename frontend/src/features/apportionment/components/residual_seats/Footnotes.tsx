@@ -1,4 +1,3 @@
-import type { ReactElement } from "react";
 import { t } from "@/i18n/translate";
 import type { ApportionmentState, SeatAssignment } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
@@ -12,9 +11,22 @@ interface FootnotesProps {
   state: ApportionmentState;
 }
 
-export function Footnotes({ seatAssignment, state }: FootnotesProps): ReactElement {
+export function Footnotes({ seatAssignment, state }: FootnotesProps) {
   const { residualSeatRemovalSteps, listsWithFullSeatsRemoved } = getRemovalSteps(seatAssignment);
   const absoluteMajorityStep = seatAssignment.steps.find(isAbsoluteMajorityReassignmentStep);
+  const absoluteMajorityDrawingLots = isListDrawingLotsVariant(state, [
+    "AbsoluteMajorityHighestAverage",
+    "AbsoluteMajorityLargestRemainder",
+  ]);
+
+  if (
+    listsWithFullSeatsRemoved.length === 0 &&
+    !absoluteMajorityDrawingLots &&
+    !absoluteMajorityStep &&
+    residualSeatRemovalSteps.length === 0
+  ) {
+    return null;
+  }
 
   return (
     <ol id="footnotes-list" className={cn(cls.footnotesList, "w-39")}>
@@ -27,7 +39,7 @@ export function Footnotes({ seatAssignment, state }: FootnotesProps): ReactEleme
           </li>
         );
       })}
-      {isListDrawingLotsVariant(state, ["AbsoluteMajorityHighestAverage", "AbsoluteMajorityLargestRemainder"]) && (
+      {absoluteMajorityDrawingLots && (
         <li id={`absolute-majority-reassignment-drawing-lots-information`}>
           {t("apportionment.footnotes.absolute_majority_reassignment.text", {
             list_assigned_seat: state.drawing_lots_required.assign_to,

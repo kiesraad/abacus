@@ -20,13 +20,6 @@ export const isLargestRemainderAssignmentStep = isSpecificStep("LargestRemainder
 export const isAbsoluteMajorityReassignmentStep = isSpecificStep("AbsoluteMajorityReassignment");
 export const isListExhaustionRemovalStep = isSpecificStep("ListExhaustionRemoval");
 
-export interface AssignmentSteps {
-  largestRemainderSteps: LargestRemainderAssignmentStep[];
-  uniqueHighestAverageSteps: UniqueHighestAverageAssignmentStep[];
-  highestAverageSteps: HighestAverageAssignmentStep[];
-  P9Step?: AbsoluteMajorityReassignmentStep;
-}
-
 export interface RemovalSteps {
   fullSeatRemovalSteps: ListExhaustionRemovalStep[];
   residualSeatRemovalSteps: ListExhaustionRemovalStep[];

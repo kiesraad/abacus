@@ -5,7 +5,7 @@ import { t, tx } from "@/i18n/translate";
 import type { ApportionmentState, PoliticalGroup, SeatAssignment } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 import { useApportionmentContext } from "../../hooks/useApportionmentContext";
-import { getResultChanges, type ResultChange, splitResultChanges } from "../../utils/seat-change";
+import { getResultChanges, splitResultChanges } from "../../utils/seat-change";
 import {
   getRemovalSteps,
   isAbsoluteMajorityReassignmentStep,
@@ -46,98 +46,95 @@ function ResidualSeatsInformation({ residualSeats, system }: ResidualSeatsInform
   );
 }
 
-interface LargestRemaindersSectionProps {
+interface CouncilSectionProps {
   seatAssignment: SeatAssignment;
   politicalGroups: PoliticalGroup[];
-  resultChanges: ResultChange[];
-}
-
-function LargestRemaindersSection({ seatAssignment, politicalGroups, resultChanges }: LargestRemaindersSectionProps) {
-  const largestRemainderSteps = seatAssignment.steps.filter(isLargestRemainderAssignmentStep);
-  const { largestRemainderResultChanges } = splitResultChanges(resultChanges, largestRemainderSteps);
-
-  return (
-    <div>
-      <h2 className={cls.tableTitle}>{t("apportionment.residual_seats_largest_remainders")}</h2>
-      <ResidualSeatsInformation residualSeats={seatAssignment.residual_seats} system="largest_remainders" />
-      {largestRemainderSteps.length > 0 && (
-        <LargestRemaindersTable
-          steps={largestRemainderSteps}
-          standings={seatAssignment.standings}
-          politicalGroups={politicalGroups}
-          resultChanges={largestRemainderResultChanges}
-        />
-      )}
-    </div>
-  );
-}
-
-interface HighestAveragesSectionProps {
-  seatAssignment: SeatAssignment;
-  politicalGroups: PoliticalGroup[];
-  resultChanges: ResultChange[];
   state: ApportionmentState;
 }
 
-function HighestAveragesSectionSmallCouncil({
-  seatAssignment,
-  politicalGroups,
-  resultChanges,
-  state,
-}: HighestAveragesSectionProps) {
+function SmallCouncilSection({ seatAssignment, politicalGroups, state }: CouncilSectionProps) {
+  const absoluteMajorityStep = seatAssignment.steps.find(isAbsoluteMajorityReassignmentStep);
   const uniqueHighestAverageSteps = seatAssignment.steps.filter(isUniqueHighestAverageAssignmentStep);
-  if (uniqueHighestAverageSteps.length === 0) return null;
-
   const largestRemainderSteps = seatAssignment.steps.filter(isLargestRemainderAssignmentStep);
   const highestAverageSteps = seatAssignment.steps.filter(isHighestAverageAssignmentStep);
-  const { uniqueHighestAverageResultChanges } = splitResultChanges(resultChanges, largestRemainderSteps);
+
+  const { residualSeatRemovalSteps, listsWithFullSeatsRemoved } = getRemovalSteps(seatAssignment);
+  const resultChanges = getResultChanges(
+    listsWithFullSeatsRemoved,
+    state,
+    absoluteMajorityStep,
+    residualSeatRemovalSteps,
+  );
+
+  const { largestRemainderResultChanges, uniqueHighestAverageResultChanges } = splitResultChanges(
+    resultChanges,
+    largestRemainderSteps,
+  );
 
   return (
-    <div>
-      <h2 className={cls.tableTitle}>{t("apportionment.remaining_residual_seats_assignment")}</h2>
-      <span className={cls.tableInformation}>
-        {t(
-          `apportionment.remaining_residual_seats_amount_and_information.${uniqueHighestAverageSteps.length + highestAverageSteps.length === 1 ? "singular" : "plural_unique"}`,
-          { num_seats: uniqueHighestAverageSteps.length + highestAverageSteps.length },
+    <>
+      <div>
+        <h2 className={cls.tableTitle}>{t("apportionment.residual_seats_largest_remainders")}</h2>
+        <ResidualSeatsInformation residualSeats={seatAssignment.residual_seats} system="largest_remainders" />
+        {largestRemainderSteps.length > 0 && (
+          <LargestRemaindersTable
+            steps={largestRemainderSteps}
+            standings={seatAssignment.standings}
+            politicalGroups={politicalGroups}
+            resultChanges={largestRemainderResultChanges}
+          />
         )}
-      </span>
-      <UniqueHighestAveragesTable
-        steps={uniqueHighestAverageSteps}
-        largestRemainderSteps={largestRemainderSteps}
-        standings={seatAssignment.standings}
-        politicalGroups={politicalGroups}
-        resultChanges={uniqueHighestAverageResultChanges}
-      />
-      {highestAverageSteps.length > 0 && (
-        <>
-          <span className={cn(cls.tableInformation, "mt-lg")}>
+      </div>
+      {uniqueHighestAverageSteps.length > 0 && (
+        <div>
+          <h2 className={cls.tableTitle}>{t("apportionment.remaining_residual_seats_assignment")}</h2>
+          <span className={cls.tableInformation}>
             {t(
-              `apportionment.remaining_residual_seats_amount_and_information.${highestAverageSteps.length === 1 ? "singular" : "plural"}`,
-              { num_seats: highestAverageSteps.length },
+              `apportionment.remaining_residual_seats_amount_and_information.${uniqueHighestAverageSteps.length + highestAverageSteps.length === 1 ? "singular" : "plural_unique"}`,
+              { num_seats: uniqueHighestAverageSteps.length + highestAverageSteps.length },
             )}
           </span>
-          {
-            <HighestAveragesTable
-              steps={highestAverageSteps}
-              standings={seatAssignment.standings}
-              politicalGroups={politicalGroups}
-              resultChanges={[]}
-              state={state}
-            />
-          }
-        </>
+          <UniqueHighestAveragesTable
+            steps={uniqueHighestAverageSteps}
+            largestRemainderSteps={largestRemainderSteps}
+            standings={seatAssignment.standings}
+            politicalGroups={politicalGroups}
+            resultChanges={uniqueHighestAverageResultChanges}
+          />
+          {highestAverageSteps.length > 0 && (
+            <>
+              <span className={cn(cls.tableInformation, "mt-lg")}>
+                {t(
+                  `apportionment.remaining_residual_seats_amount_and_information.${highestAverageSteps.length === 1 ? "singular" : "plural"}`,
+                  { num_seats: highestAverageSteps.length },
+                )}
+              </span>
+              <HighestAveragesTable
+                steps={highestAverageSteps}
+                standings={seatAssignment.standings}
+                politicalGroups={politicalGroups}
+                resultChanges={[]}
+                state={state}
+              />
+            </>
+          )}
+        </div>
       )}
-    </div>
+    </>
   );
 }
 
-function HighestAveragesSectionLargeCouncil({
-  seatAssignment,
-  politicalGroups,
-  resultChanges,
-  state,
-}: HighestAveragesSectionProps) {
+function LargeCouncilSection({ seatAssignment, politicalGroups, state }: CouncilSectionProps) {
+  const absoluteMajorityStep = seatAssignment.steps.find(isAbsoluteMajorityReassignmentStep);
   const highestAverageSteps = seatAssignment.steps.filter(isHighestAverageAssignmentStep);
+
+  const { residualSeatRemovalSteps, listsWithFullSeatsRemoved } = getRemovalSteps(seatAssignment);
+  const resultChanges = getResultChanges(
+    listsWithFullSeatsRemoved,
+    state,
+    absoluteMajorityStep,
+    residualSeatRemovalSteps,
+  );
 
   return (
     <div>
@@ -174,15 +171,6 @@ export function ApportionmentResidualSeatsPage() {
     return null;
   }
 
-  const { residualSeatRemovalSteps, listsWithFullSeatsRemoved } = getRemovalSteps(seatAssignment);
-  const absoluteMajorityStep = seatAssignment.steps.find(isAbsoluteMajorityReassignmentStep);
-  const resultChanges = getResultChanges(
-    listsWithFullSeatsRemoved,
-    state,
-    absoluteMajorityStep,
-    residualSeatRemovalSteps,
-  );
-
   return (
     <>
       {renderTitleAndHeader(t("apportionment.allocation_of_residual_seats"))}
@@ -193,26 +181,17 @@ export function ApportionmentResidualSeatsPage() {
           {seatAssignment.residual_seats > 0 ? (
             <div className={cn(cls.tableDiv, "mb-lg")}>
               {seatAssignment.seats >= LARGE_COUNCIL_THRESHOLD ? (
-                <HighestAveragesSectionLargeCouncil
+                <LargeCouncilSection
                   seatAssignment={seatAssignment}
                   politicalGroups={election.political_groups}
-                  resultChanges={resultChanges}
                   state={state}
                 />
               ) : (
-                <>
-                  <LargestRemaindersSection
-                    seatAssignment={seatAssignment}
-                    politicalGroups={election.political_groups}
-                    resultChanges={resultChanges}
-                  />
-                  <HighestAveragesSectionSmallCouncil
-                    seatAssignment={seatAssignment}
-                    politicalGroups={election.political_groups}
-                    resultChanges={resultChanges}
-                    state={state}
-                  />
-                </>
+                <SmallCouncilSection
+                  seatAssignment={seatAssignment}
+                  politicalGroups={election.political_groups}
+                  state={state}
+                />
               )}
               <Footnotes seatAssignment={seatAssignment} state={state} />
             </div>

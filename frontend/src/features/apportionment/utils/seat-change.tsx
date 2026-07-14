@@ -87,25 +87,31 @@ export function splitResultChanges(
   resultChanges: ResultChange[],
   largestRemainderSteps: LargestRemainderAssignmentStep[],
 ) {
+  const listsWithLargestRemainderSeat = new Set(largestRemainderSteps.map((step) => step.change.selected_list_number));
+  const listsWithResidualSeatChange = new Set<number>();
+
   const largestRemainderResultChanges: ResultChange[] = [];
   const uniqueHighestAverageResultChanges: ResultChange[] = [];
-  resultChanges.forEach((change) => {
-    if (change.type === "residual_seat") {
-      if (
-        largestRemainderSteps.find((step) => step.change.selected_list_number === change.listNumber) &&
-        largestRemainderResultChanges.find(
-          (largestRemainderChange) =>
-            largestRemainderChange.listNumber === change.listNumber && largestRemainderChange.type === "residual_seat",
-        )
-      ) {
-        uniqueHighestAverageResultChanges.push(change);
-      } else {
-        largestRemainderResultChanges.push(change);
-      }
+
+  // The first residual seat change of a list is shown in the largest remainders table
+  // any further changes for that list are shown in the unique highest averages table
+  for (const change of resultChanges) {
+    const isNextResidualSeatChange =
+      change.type === "residual_seat" &&
+      listsWithLargestRemainderSeat.has(change.listNumber) &&
+      listsWithResidualSeatChange.has(change.listNumber);
+
+    if (isNextResidualSeatChange) {
+      uniqueHighestAverageResultChanges.push(change);
     } else {
       largestRemainderResultChanges.push(change);
+
+      if (change.type === "residual_seat") {
+        listsWithResidualSeatChange.add(change.listNumber);
+      }
     }
-  });
+  }
+
   return { largestRemainderResultChanges, uniqueHighestAverageResultChanges };
 }
 

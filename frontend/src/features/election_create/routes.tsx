@@ -1,7 +1,7 @@
 import type { RouteObject } from "react-router";
 
 import { CheckAndSave } from "./components/CheckAndSave";
-import { CommitteeCategory } from "./components/CommitteeCategory.tsx";
+import { CommitteeCategory } from "./components/CommitteeCategory";
 import { CountingMethodType } from "./components/CountingMethodType";
 import { ElectionCreateLayout } from "./components/ElectionCreateLayout";
 import { NumberOfVoters } from "./components/NumberOfVoters";

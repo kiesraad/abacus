@@ -1,8 +1,8 @@
 import { Alert } from "@/components/ui/Alert/Alert";
-import { Button } from "@/components/ui/Button/Button.tsx";
-import { Spinner } from "@/components/ui/Spinner/Spinner.tsx";
+import { Button } from "@/components/ui/Button/Button";
+import { Spinner } from "@/components/ui/Spinner/Spinner";
 import { t, tx } from "@/i18n/translate";
-import { formatTime } from "@/utils/dateTime.ts";
+import { formatTime } from "@/utils/dateTime";
 import cls from "./BackupsPageContent.module.css";
 
 interface BackupsPageContentProps {

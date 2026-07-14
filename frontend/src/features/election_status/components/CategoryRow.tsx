@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/Badge/Badge";
 import { Icon } from "@/components/ui/Icon/Icon";
 import { ProgressBar } from "@/components/ui/ProgressBar/ProgressBar";
 import { Table } from "@/components/ui/Table/Table";
-import { useUser } from "@/hooks/user/useUser.ts";
+import { useUser } from "@/hooks/user/useUser";
 import { t } from "@/i18n/translate";
 import type { DataEntryStatusName, ElectionStatusResponseEntry } from "@/types/generated/openapi";
 import { formatDateTime } from "@/utils/dateTime";

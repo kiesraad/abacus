@@ -1,5 +1,5 @@
 import { hasTranslation, t } from "@/i18n/translate";
-import type { CommitteeCategory } from "@/types/generated/openapi.ts";
+import type { CommitteeCategory } from "@/types/generated/openapi";
 
 export function committeeSessionLabel(
   committeeCategory: CommitteeCategory,

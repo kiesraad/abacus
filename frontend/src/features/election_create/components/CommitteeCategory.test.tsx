@@ -3,12 +3,12 @@ import { describe, expect, test, vi } from "vitest";
 import {
   csbElectionImportValidateMockResponse,
   gsbElectionImportValidateMockResponse,
-} from "@/testing/api-mocks/ElectionMockData.ts";
-import { overrideOnce } from "@/testing/server.ts";
+} from "@/testing/api-mocks/ElectionMockData";
+import { overrideOnce } from "@/testing/server";
 import { renderReturningRouter, screen } from "@/testing/test-utils";
-import type { CommitteeCategory as CommitteeCategoryType, NewElection } from "@/types/generated/openapi.ts";
+import type { CommitteeCategory as CommitteeCategoryType, NewElection } from "@/types/generated/openapi";
 import * as useElectionCreateContext from "../hooks/useElectionCreateContext";
-import { CommitteeCategory } from "./CommitteeCategory.tsx";
+import { CommitteeCategory } from "./CommitteeCategory";
 import { ElectionCreateContextProvider } from "./ElectionCreateContextProvider";
 
 const election = { name: "Naam", location: "Plek", committee_category: "GSB" } as NewElection;

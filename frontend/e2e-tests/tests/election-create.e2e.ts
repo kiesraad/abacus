@@ -8,7 +8,7 @@ import { AbortModalPgObj } from "e2e-tests/page-objects/election/create/AbortMod
 import { CheckAndSavePgObj } from "e2e-tests/page-objects/election/create/CheckAndSavePgObj";
 import { CheckCandidateDefinitionPgObj } from "e2e-tests/page-objects/election/create/CheckCandidateDefinitionPgObj";
 import { CheckElectionDefinitionPgObj } from "e2e-tests/page-objects/election/create/CheckElectionDefinitionPgObj";
-import { CommitteeCategoryPgObj } from "e2e-tests/page-objects/election/create/CommitteeCategoryPgObj.ts";
+import { CommitteeCategoryPgObj } from "e2e-tests/page-objects/election/create/CommitteeCategoryPgObj";
 import { CountingMethodTypePgObj } from "e2e-tests/page-objects/election/create/CountingMethodTypePgObj";
 import { NumberOfVotersPgObj } from "e2e-tests/page-objects/election/create/NumberOfVotersPgObj";
 import { UploadCandidateDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadCandidateDefinitionPgObj";

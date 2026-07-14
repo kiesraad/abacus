@@ -9,7 +9,7 @@ import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { InputField } from "@/components/ui/InputField/InputField";
 import { type CommitteeCategory, committeeCategoryValues } from "@/types/generated/openapi";
-import { StringFormData } from "@/utils/stringFormData.ts";
+import { StringFormData } from "@/utils/stringFormData";
 
 const RANGE_HINT = "Gebruik notatie zoals 10..50 of 9..=45 of een enkel getal zoals 40";
 

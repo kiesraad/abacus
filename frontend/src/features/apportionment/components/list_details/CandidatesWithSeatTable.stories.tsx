@@ -1,5 +1,6 @@
 import type { StoryObj } from "@storybook/react-vite";
 import { expect } from "storybook/test";
+import type { Candidate } from "@/types/generated/openapi.ts";
 import * as lt19Seats from "../../testing/lt-19-seats";
 import { CandidatesWithSeatTable } from "./CandidatesWithSeatTable";
 
@@ -60,6 +61,41 @@ export const DefaultWithPositionAndStartSeatNumber: StoryObj = {
       ["11", "De Jong, R. (Rolf) (m)", "Test Location", "11"],
       ["12", "Jansen, A. (Arie) (m)", "Test Location", "4"],
       ["13", "Bakker, S. (Sophie) (v)", "Test Location", "8"],
+    ]);
+  },
+};
+
+export const LargeVoteCount: StoryObj = {
+  render: () => {
+    const candidateList: Candidate[] = [
+      {
+        number: 1,
+        initials: "T.",
+        first_name: "Test",
+        last_name: "Test",
+        locality: "Test Location",
+        gender: "Female",
+      },
+    ];
+
+    const candidateVotesList = [{ number: 1, votes: 1_234 }];
+
+    return (
+      <CandidatesWithSeatTable
+        id="test-table"
+        showPosition={false}
+        showVotes={true}
+        candidateList={candidateList}
+        candidateVotesList={candidateVotesList}
+      />
+    );
+  },
+  play: async ({ canvas }) => {
+    const table = canvas.getByRole("table");
+    await expect(table).toBeVisible();
+    expect(table).toHaveTableContent([
+      ["Zetel", "Naam", "Woonplaats", "Aantal stemmen"],
+      ["1", "Test, T. (Test) (v)", "Test Location", "1.234"],
     ]);
   },
 };

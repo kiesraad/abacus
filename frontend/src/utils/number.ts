@@ -44,3 +44,7 @@ export function formatPercentage(value: number, total: number): string {
 
   return percentageFormatter.format(value / total);
 }
+
+export function formatVoteCount(count: number): string {
+  return count > 0 ? formatNumber(count) : "0";
+}

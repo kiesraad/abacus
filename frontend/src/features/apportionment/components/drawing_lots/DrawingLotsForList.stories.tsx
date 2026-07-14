@@ -23,7 +23,7 @@ export const HighestAverage: StoryObj = {
     await expect(listitems[0]).toHaveTextContent("Er zijn 4 restzetels te verdelen");
     await expect(listitems[1]).toHaveTextContent("Restzetel 2 kan niet automatisch worden toegewezen");
     await expect(listitems[2]).toHaveTextContent(
-      "De partij met het hoogste gemiddeld aantal stemmen na het toewijzen van de restzetel krijgt de restzetel",
+      "De partij met het hoogste gemiddeld aantal stemmen bij het toewijzen van de restzetel krijgt de restzetel",
     );
     await expect(listitems[3]).toHaveTextContent(
       "Lijst 2 – Algemene Partij, Lijst 3 – KEUS, Lijst 4 – Algemene Lijst, Lijst 5 – Unie van kandidaten en Lijst 6 – Lijst van stemmers hebben samen het hoogste gemiddeld aantal stemmen per zetel (46 2/3 stemmen)",

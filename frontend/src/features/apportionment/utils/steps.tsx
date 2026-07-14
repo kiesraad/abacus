@@ -1,53 +1,24 @@
-import type {
-  AbsoluteMajorityReassignedSeat,
-  HighestAverageAssignedSeat,
-  LargestRemainderAssignedSeat,
-  ListExhaustionRemovedSeat,
-  SeatAssignment,
-  SeatChangeStep,
-} from "@/types/generated/openapi";
+import type { SeatAssignment, SeatChange, SeatChangeStep } from "@/types/generated/openapi";
 
-export type HighestAverageAssignmentStep = SeatChangeStep & { change: HighestAverageAssignedSeat };
-export type UniqueHighestAverageAssignmentStep = SeatChangeStep & { change: HighestAverageAssignedSeat };
-export type LargestRemainderAssignmentStep = SeatChangeStep & { change: LargestRemainderAssignedSeat };
-export type AbsoluteMajorityReassignmentStep = SeatChangeStep & { change: AbsoluteMajorityReassignedSeat };
-export type ListExhaustionRemovalStep = SeatChangeStep & { change: ListExhaustionRemovedSeat };
+type SpecificStep<T extends SeatChange["changed_by"]> = SeatChangeStep & {
+  change: Extract<SeatChange, { changed_by: T }>;
+};
 
-export function isHighestAverageAssignmentStep(step: SeatChangeStep): step is HighestAverageAssignmentStep {
-  return step.change.changed_by === "HighestAverageAssignment";
+function isSpecificStep<T extends SeatChange["changed_by"]>(changedBy: T) {
+  return (step: SeatChangeStep): step is SpecificStep<T> => step.change.changed_by === changedBy;
 }
 
-export function isUniqueHighestAverageAssignmentStep(step: SeatChangeStep): step is UniqueHighestAverageAssignmentStep {
-  return step.change.changed_by === "UniqueHighestAverageAssignment";
-}
+export type HighestAverageAssignmentStep = SpecificStep<"HighestAverageAssignment">;
+export type UniqueHighestAverageAssignmentStep = SpecificStep<"UniqueHighestAverageAssignment">;
+export type LargestRemainderAssignmentStep = SpecificStep<"LargestRemainderAssignment">;
+export type AbsoluteMajorityReassignmentStep = SpecificStep<"AbsoluteMajorityReassignment">;
+export type ListExhaustionRemovalStep = SpecificStep<"ListExhaustionRemoval">;
 
-export function isLargestRemainderAssignmentStep(step: SeatChangeStep): step is LargestRemainderAssignmentStep {
-  return step.change.changed_by === "LargestRemainderAssignment";
-}
-
-export function isAbsoluteMajorityReassignmentStep(step: SeatChangeStep): step is AbsoluteMajorityReassignmentStep {
-  return step.change.changed_by === "AbsoluteMajorityReassignment";
-}
-
-export function isListExhaustionRemovalStep(step: SeatChangeStep): step is ListExhaustionRemovalStep {
-  return step.change.changed_by === "ListExhaustionRemoval";
-}
-
-export interface AssignmentSteps {
-  largestRemainderSteps: LargestRemainderAssignmentStep[];
-  uniqueHighestAverageSteps: UniqueHighestAverageAssignmentStep[];
-  highestAverageSteps: HighestAverageAssignmentStep[];
-  absoluteMajorityStep?: AbsoluteMajorityReassignmentStep;
-}
-
-export function getAssignmentSteps(seatAssignment: SeatAssignment): AssignmentSteps {
-  return {
-    largestRemainderSteps: seatAssignment.steps.filter(isLargestRemainderAssignmentStep),
-    uniqueHighestAverageSteps: seatAssignment.steps.filter(isUniqueHighestAverageAssignmentStep),
-    highestAverageSteps: seatAssignment.steps.filter(isHighestAverageAssignmentStep),
-    absoluteMajorityStep: seatAssignment.steps.find(isAbsoluteMajorityReassignmentStep),
-  };
-}
+export const isHighestAverageAssignmentStep = isSpecificStep("HighestAverageAssignment");
+export const isUniqueHighestAverageAssignmentStep = isSpecificStep("UniqueHighestAverageAssignment");
+export const isLargestRemainderAssignmentStep = isSpecificStep("LargestRemainderAssignment");
+export const isAbsoluteMajorityReassignmentStep = isSpecificStep("AbsoluteMajorityReassignment");
+export const isListExhaustionRemovalStep = isSpecificStep("ListExhaustionRemoval");
 
 export interface RemovalSteps {
   fullSeatRemovalSteps: ListExhaustionRemovalStep[];
@@ -59,12 +30,11 @@ export function getRemovalSteps(seatAssignment: SeatAssignment): RemovalSteps {
   const listExhaustionSteps = seatAssignment.steps.filter(isListExhaustionRemovalStep);
   const fullSeatRemovalSteps = listExhaustionSteps.filter((step) => step.change.full_seat);
   const residualSeatRemovalSteps = listExhaustionSteps.filter((step) => !step.change.full_seat);
+  const listsWithFullSeatsRemoved = new Set(fullSeatRemovalSteps.map((step) => step.change.list_retracted_seat));
 
-  const listsWithFullSeatsRemoved: number[] = [];
-  fullSeatRemovalSteps.forEach((step) => {
-    if (!listsWithFullSeatsRemoved.includes(step.change.list_retracted_seat)) {
-      listsWithFullSeatsRemoved.push(step.change.list_retracted_seat);
-    }
-  });
-  return { fullSeatRemovalSteps, residualSeatRemovalSteps, listsWithFullSeatsRemoved };
+  return {
+    fullSeatRemovalSteps,
+    residualSeatRemovalSteps,
+    listsWithFullSeatsRemoved: Array.from(listsWithFullSeatsRemoved),
+  };
 }

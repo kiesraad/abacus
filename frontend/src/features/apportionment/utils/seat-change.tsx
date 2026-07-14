@@ -1,7 +1,12 @@
 import type { JSX } from "react/jsx-runtime";
-
+import type { ApportionmentState } from "@/types/generated/openapi";
 import cls from "../components/Apportionment.module.css";
-import type { AbsoluteMajorityReassignmentStep, ListExhaustionRemovalStep } from "./steps";
+import type {
+  AbsoluteMajorityReassignmentStep,
+  LargestRemainderAssignmentStep,
+  ListExhaustionRemovalStep,
+} from "./steps";
+import { isListDrawingLotsVariant } from "./utils";
 
 export interface ResultChange {
   listNumber: number;
@@ -13,6 +18,7 @@ export interface ResultChange {
 
 export function getResultChanges(
   uniquePgNumbersWithFullSeatsRemoved: number[],
+  state: ApportionmentState,
   absoluteMajorityReassignment?: AbsoluteMajorityReassignmentStep,
   residualSeatRemovalSteps?: ListExhaustionRemovalStep[],
 ) {
@@ -28,6 +34,25 @@ export function getResultChanges(
       type: "full_seat",
     });
   });
+  if (isListDrawingLotsVariant(state, ["AbsoluteMajorityHighestAverage", "AbsoluteMajorityLargestRemainder"])) {
+    footnoteNumber += 1;
+    resultChanges.push({
+      listNumber: state.drawing_lots_required.assign_to,
+      footnoteNumber: footnoteNumber,
+      increase: 0,
+      decrease: 0,
+      type: "residual_seat",
+    });
+    state.drawing_lots_required.options.forEach((list) => {
+      resultChanges.push({
+        listNumber: list,
+        footnoteNumber: footnoteNumber,
+        increase: 0,
+        decrease: 0,
+        type: "residual_seat",
+      });
+    });
+  }
   if (absoluteMajorityReassignment) {
     footnoteNumber += 1;
     resultChanges.push({
@@ -56,6 +81,38 @@ export function getResultChanges(
     });
   });
   return resultChanges;
+}
+
+export function splitResultChanges(
+  resultChanges: ResultChange[],
+  largestRemainderSteps: LargestRemainderAssignmentStep[],
+) {
+  const listsWithLargestRemainderSeat = new Set(largestRemainderSteps.map((step) => step.change.selected_list_number));
+  const listsWithResidualSeatChange = new Set<number>();
+
+  const largestRemainderResultChanges: ResultChange[] = [];
+  const uniqueHighestAverageResultChanges: ResultChange[] = [];
+
+  // The first residual seat change of a list is shown in the largest remainders table
+  // any further changes for that list are shown in the unique highest averages table
+  for (const change of resultChanges) {
+    const isNextResidualSeatChange =
+      change.type === "residual_seat" &&
+      listsWithLargestRemainderSeat.has(change.listNumber) &&
+      listsWithResidualSeatChange.has(change.listNumber);
+
+    if (isNextResidualSeatChange) {
+      uniqueHighestAverageResultChanges.push(change);
+    } else {
+      largestRemainderResultChanges.push(change);
+
+      if (change.type === "residual_seat") {
+        listsWithResidualSeatChange.add(change.listNumber);
+      }
+    }
+  }
+
+  return { largestRemainderResultChanges, uniqueHighestAverageResultChanges };
 }
 
 export function getFootnotesFromResultChanges(listResultChanges: ResultChange[]) {

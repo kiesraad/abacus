@@ -558,7 +558,7 @@ describe("ApportionmentPage", () => {
           [
             "Loting noodzakelijk voor toekennen restzetels 2, 3 en 4",
             "Er is een restzetel te verdelen. In de wet staat dat de partij met het grootste gemiddeld aantal stemmen per toegewezen zetel deze restzetel krijgt.",
-            "Er zijn meerdere partijen die na het toewijzen van de volgende restzetel precies hetzelfde hoogste gemiddelde hebben.",
+            "Er zijn meerdere partijen die bij het toewijzen van de volgende restzetel precies hetzelfde hoogste gemiddelde hebben.",
             "Hierdoor kan de restzetel niet automatisch worden toegewezen. Het centraal stembureau moet een loting uitvoeren om de restzetel toe te wijzen.",
           ].join(""),
         );
@@ -636,7 +636,7 @@ describe("ApportionmentPage", () => {
           [
             "Loting noodzakelijk voor toekennen restzetels 3 en 4",
             "Er is een restzetel te verdelen. In de wet staat dat de partij met het grootste gemiddeld aantal stemmen per toegewezen zetel deze restzetel krijgt.",
-            "Er zijn meerdere partijen die na het toewijzen van de volgende restzetel precies hetzelfde hoogste gemiddelde hebben.",
+            "Er zijn meerdere partijen die bij het toewijzen van de volgende restzetel precies hetzelfde hoogste gemiddelde hebben.",
             "Hierdoor kan de restzetel niet automatisch worden toegewezen. Het centraal stembureau moet een loting uitvoeren om de restzetel toe te wijzen.",
           ].join(""),
         );
@@ -704,7 +704,7 @@ describe("ApportionmentPage", () => {
           [
             "Loting noodzakelijk voor toekennen restzetel 4",
             "Er is een restzetel te verdelen. In de wet staat dat de partij met het grootste gemiddeld aantal stemmen per toegewezen zetel deze restzetel krijgt.",
-            "Er zijn meerdere partijen die na het toewijzen van de volgende restzetel precies hetzelfde hoogste gemiddelde hebben.",
+            "Er zijn meerdere partijen die bij het toewijzen van de volgende restzetel precies hetzelfde hoogste gemiddelde hebben.",
             "Hierdoor kan de restzetel niet automatisch worden toegewezen. Het centraal stembureau moet een loting uitvoeren om de restzetel toe te wijzen.",
           ].join(""),
         );

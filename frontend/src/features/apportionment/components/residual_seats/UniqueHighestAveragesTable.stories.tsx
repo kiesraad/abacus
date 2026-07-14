@@ -1,16 +1,20 @@
 import type { StoryObj } from "@storybook/react-vite";
 import { expect } from "storybook/test";
 import * as lt19Seats from "../../testing/lt-19-seats";
+import * as lt19SeatsAndP10AndDeceasedCandidates from "../../testing/lt-19-seats-and-p10-and-deceased-candidates";
+import { getResultChanges, splitResultChanges } from "../../utils/seat-change";
+import { isAbsoluteMajorityReassignmentStep, isListExhaustionRemovalStep } from "../../utils/steps";
 import { UniqueHighestAveragesTable } from "./UniqueHighestAveragesTable";
 
 export const Default: StoryObj = {
   render: () => {
     return (
       <UniqueHighestAveragesTable
-        steps={lt19Seats.highest_average_steps}
+        steps={lt19Seats.unique_highest_average_steps}
         largestRemainderSteps={lt19Seats.largest_remainder_steps}
         standings={lt19Seats.seat_assignment.standings}
         politicalGroups={lt19Seats.election.political_groups}
+        resultChanges={[]}
       />
     );
   },
@@ -27,6 +31,56 @@ export const Default: StoryObj = {
       ["6", "Political Group F", "0", "55", "", "0"],
       ["7", "Political Group G", "0", "54", "", "0"],
       ["8", "Political Group H", "0", "52", "", "0"],
+    ]);
+  },
+};
+
+export const P10: StoryObj = {
+  render: () => {
+    const absoluteMajorityReassignment = lt19SeatsAndP10AndDeceasedCandidates.seat_assignment.steps.find(
+      isAbsoluteMajorityReassignmentStep,
+    );
+    const listExhaustionSteps =
+      lt19SeatsAndP10AndDeceasedCandidates.seat_assignment.steps.filter(isListExhaustionRemovalStep);
+    const residualSeatRemovalSteps = listExhaustionSteps.filter((step) => !step.change.full_seat);
+    const largestRemainderSteps = lt19SeatsAndP10AndDeceasedCandidates.largest_remainder_steps;
+    const resultChanges = getResultChanges(
+      [],
+      {
+        type: "Finalised",
+        deceased_candidates: [],
+        lists_drawn: [],
+        candidates_drawn: [],
+      },
+      absoluteMajorityReassignment,
+      residualSeatRemovalSteps,
+    );
+    const { uniqueHighestAverageResultChanges } = splitResultChanges(resultChanges, largestRemainderSteps);
+    return (
+      <UniqueHighestAveragesTable
+        steps={lt19SeatsAndP10AndDeceasedCandidates.unique_highest_averages_steps_part_1.concat(
+          lt19SeatsAndP10AndDeceasedCandidates.unique_highest_averages_steps_part_2,
+        )}
+        largestRemainderSteps={largestRemainderSteps}
+        standings={lt19SeatsAndP10AndDeceasedCandidates.seat_assignment.standings}
+        politicalGroups={lt19SeatsAndP10AndDeceasedCandidates.election.political_groups}
+        resultChanges={uniqueHighestAverageResultChanges}
+      />
+    );
+  },
+  play: async ({ canvas }) => {
+    const table = canvas.getByRole("table");
+    await expect(table).toBeVisible();
+    expect(table).toHaveTableContent([
+      ["Lijst", "Lijstnaam", "Reeds toegewezen", "Gemiddelde", "Aantal restzetels"],
+      ["1", "Political Group A", "11", "67", "4/12", "2 0"],
+      ["2", "Political Group B", "0", "59", "", "1"],
+      ["3", "Political Group C", "0", "58", "", "1"],
+      ["4", "Political Group D", "0", "57", "", "1"],
+      ["5", "Blanco (Smit, G.)", "0", "56", "", "1"],
+      ["6", "Political Group F", "0", "55", "", "1"],
+      ["7", "Political Group G", "0", "54", "", "0"],
+      ["8", "Political Group H", "0", "53", "", "0"],
     ]);
   },
 };

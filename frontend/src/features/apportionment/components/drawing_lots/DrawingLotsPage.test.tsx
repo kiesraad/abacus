@@ -528,16 +528,15 @@ describe("DrawingLotsPage", () => {
     expect(lists.length).toBe(2);
     expect(lists[0]).toBeVisible();
     const listitems = within(lists[0]!).getAllByRole("listitem");
-    expect(listitems.length).toBe(5);
+    expect(listitems.length).toBe(6);
     expect(listitems[0]).toHaveTextContent("GROEP 8 heeft 5 zetels");
     expect(listitems[1]).toHaveTextContent(
-      "Er zijn 2 kandidaten die op basis van hun voorkeursstemmen in aanmerking komen voor zetel 2. Zij hebben allen 550 stemmen. Het gaat om de kandidaten:",
+      "Er zijn 3 kandidaten die op basis van hun voorkeursstemmen in aanmerking komen voor zetel 4. Zij hebben allen 500 stemmen. Het gaat om de kandidaten:",
     );
-    expect(listitems[2]).toHaveTextContent("2. Wiertz, K. (Kris)");
-    expect(listitems[3]).toHaveTextContent("6. Arets, T.E. (Tiemen)");
-    expect(listitems[4]).toHaveTextContent(
-      "Volgens artikel P 15 van de Kieswet moet er geloot worden wie zetel 2 krijgt",
-    );
+    expect(listitems[2]).toHaveTextContent("3. Den Mateman, D.P.K. (Damian)");
+    expect(listitems[3]).toHaveTextContent("4. Katsma, S.O. (Sammie)");
+    expect(listitems[4]).toHaveTextContent("5. Philippen, F.G. (Jory)");
+    expect(listitems[5]).toHaveTextContent("Daarom moet er geloot worden wie zetel 4 krijgt");
 
     expect(await screen.findByRole("heading", { level: 3, name: "Instructies voor loting" })).toBeVisible();
     expect(
@@ -549,15 +548,15 @@ describe("DrawingLotsPage", () => {
     expect(await screen.findByRole("heading", { level: 3, name: "Resultaat loting" })).toBeVisible();
 
     const options = await screen.findAllByRole("radio");
-    expect(options.length).toBe(2);
-    const option = await screen.findByRole("radio", { name: "6. Arets, T.E. (Tiemen)" });
+    expect(options.length).toBe(3);
+    const option = await screen.findByRole("radio", { name: "5. Philippen, F.G. (Jory)" });
     expect(option).toBeVisible();
     expect(option).not.toBeChecked();
     await user.click(option);
     await user.click(screen.getByRole("button", { name: "Volgende" }));
 
     expect(addCandidateDrawn).toHaveBeenCalledWith({
-      drawn: 6,
+      drawn: 5,
       variant: {
         type: "CandidateDrawingLotsRequired",
         ...lt19SeatsAndP15DrawingLots.drawing_lots_required,

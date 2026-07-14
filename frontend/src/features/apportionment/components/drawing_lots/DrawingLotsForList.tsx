@@ -32,7 +32,7 @@ export function DrawingLotsForList({ drawingLotsRequired, options }: DrawingLots
       : drawingLotsRequired.max_remainder;
   if (total_residual_seats && current_residual_seat) {
     return (
-      <ul className={cn(cls.drawingLotsList, "w-32")}>
+      <ul className={cn(cls.drawingLotsList, "w-32")} id="drawing-lots-information">
         <li>
           {t(
             `apportionment.drawing_lots_for_list.residual_seats_to_assign.${total_residual_seats === 1 ? "singular" : "plural"}`,

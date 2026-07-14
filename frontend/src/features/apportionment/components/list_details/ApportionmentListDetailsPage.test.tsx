@@ -335,15 +335,15 @@ describe("ApportionmentListDetailsPage", () => {
     });
 
     test("Render tables and alert assigned after drawing 1 lot", async () => {
-      vi.spyOn(ReactRouter, "useParams").mockReturnValue({ listNumber: "2" });
+      vi.spyOn(ReactRouter, "useParams").mockReturnValue({ listNumber: "5" });
 
       renderApportionmentListDetailsPage(11);
 
-      expect(await screen.findByRole("heading", { level: 1, name: "Lijst 2 – GROEP 9" })).toBeVisible();
+      expect(await screen.findByRole("heading", { level: 1, name: "Lijst 5 – GROEP 12" })).toBeVisible();
 
       expect(await screen.findByRole("heading", { level: 2, name: "Toegewezen aantal zetels" })).toBeVisible();
       expect(await screen.findByTestId("text-list-assigned-nr-seats")).toHaveTextContent(
-        "Lijst 2 – GROEP 9 heeft 4 zetels toegewezen gekregen.",
+        "Lijst 5 – GROEP 12 heeft 1 zetel toegewezen gekregen.",
       );
 
       expect(
@@ -357,7 +357,7 @@ describe("ApportionmentListDetailsPage", () => {
       if (alerts[0]) {
         expect(alerts[0]).toHaveClass(alertCls.notify!);
         expect(alerts[0]).toHaveTextContent(
-          "Zetel 4 is na loting toegewezen aan Kandidaat 5 – De Vegt, F.W. (er is geloot tussen kandidaat 2, 4 en 5)",
+          "Zetel 1 is na loting toegewezen aan Kandidaat 2 – Wolfswinkel, R. (Ruth) (er is geloot tussen kandidaat 1 en 2)",
         );
       }
       const preferentially_chosen_candidates_table = await screen.findByTestId(
@@ -366,10 +366,7 @@ describe("ApportionmentListDetailsPage", () => {
       expect(preferentially_chosen_candidates_table).toBeVisible();
       expect(preferentially_chosen_candidates_table).toHaveTableContent([
         ["Zetel", "Naam", "Woonplaats", "Aantal stemmen"],
-        ["1", "Van Bekking, L.L. (x)", "Eemstricht", "500"],
-        ["2", "Bruins-Van den Kerk, O. (v)", "Eemstricht", "450"],
-        ["3", "Groenen, S. (v)", "Bloemstede", "400"],
-        ["4", "De Vegt, F.W. (x)", "Eksterlo", "350"],
+        ["1", "Wolfswinkel, R. (Ruth) (x)", "'s Gravenveen", "300"],
       ]);
 
       expect(
@@ -393,8 +390,11 @@ describe("ApportionmentListDetailsPage", () => {
       expect(candidates_ranking_table).toBeVisible();
       expect(candidates_ranking_table).toHaveTableContent([
         ["Rang", "Naam", "Woonplaats", "Positie op lijst"],
-        ["1", "Oorschot, W. (v)", "Eksterlo", "2"],
-        ["2", "Van Bekking, W. (m)", "Juinen", "4"],
+        ["1", "Wolfswinkel, G. (Gijsbertje) (x)", "Eemstricht", "1"],
+        ["2", "Güneş, İ. (İlknur) (x)", "Eksterlo", "3"],
+        ["3", "Güneş, K. (Kris) (x)", "Lekkum", "4"],
+        ["4", "Den Mateman, L. (Leontien) (v)", "Bloemstede", "5"],
+        ["5", "Wiertz, Q.U.E. (Rachid) (v)", "Bloemstede", "6"],
       ]);
 
       expect(
@@ -404,12 +404,12 @@ describe("ApportionmentListDetailsPage", () => {
       expect(total_votes_per_candidate_table).toBeVisible();
       expect(total_votes_per_candidate_table).toHaveTableContent([
         ["Nummer", "Kandidaat", "Woonplaats", "Aantal stemmen"],
-        ["1", "Van Bekking, L.L. (x)", "Eemstricht", "500"],
-        ["2", "Oorschot, W. (v)", "Eksterlo", "350"],
-        ["3", "Groenen, S. (v)", "Bloemstede", "400"],
-        ["4", "Van Bekking, W. (m)", "Juinen", "350"],
-        ["5", "De Vegt, F.W. (x)", "Eksterlo", "350"],
-        ["6", "Bruins-Van den Kerk, O. (v)", "Eemstricht", "450"],
+        ["1", "Wolfswinkel, G. (Gijsbertje) (x)", "Eemstricht", "300"],
+        ["2", "Wolfswinkel, R. (Ruth) (x)", "'s Gravenveen", "300"],
+        ["3", "Güneş, İ. (İlknur) (x)", "Eksterlo", "50"],
+        ["4", "Güneş, K. (Kris) (x)", "Lekkum", "0"],
+        ["5", "Den Mateman, L. (Leontien) (v)", "Bloemstede", "0"],
+        ["6", "Wiertz, Q.U.E. (Rachid) (v)", "Bloemstede", "50"],
       ]);
     });
 
@@ -439,10 +439,10 @@ describe("ApportionmentListDetailsPage", () => {
           "Sommige zetels konden niet automatisch worden toegewezen en zijn via loting toegekend:",
         );
         expect(alerts[0]).toHaveTextContent(
-          "Zetel 2 is toegewezen aan Kandidaat 6 – Arets, T.E. (Tiemen)(er is geloot tussen kandidaat 2 en 6)",
+          "Zetel 4 is toegewezen aan Kandidaat 5 – Philippen, F.G. (Jory)(er is geloot tussen kandidaat 3, 4 en 5)",
         );
         expect(alerts[0]).toHaveTextContent(
-          "Zetel 4 is toegewezen aan Kandidaat 4 – Boermans, C.O.V. (Cornelus)(er is geloot tussen kandidaat 3 en 4)",
+          "Zetel 5 is toegewezen aan Kandidaat 4 – Katsma, S.O. (Sammie)(er is geloot tussen kandidaat 3 en 4)",
         );
       }
       const preferentially_chosen_candidates_table = await screen.findByTestId(
@@ -451,11 +451,11 @@ describe("ApportionmentListDetailsPage", () => {
       expect(preferentially_chosen_candidates_table).toBeVisible();
       expect(preferentially_chosen_candidates_table).toHaveTableContent([
         ["Zetel", "Naam", "Woonplaats", "Aantal stemmen"],
-        ["1", "Van Bekking, J. (Jory) (m)", "Huisden", "600"],
-        ["2", "Arets, T.E. (Tiemen) (v)", "'s Gravenveen", "550"],
-        ["3", "Wiertz, K. (Kris) (m)", "Huisden", "550"],
-        ["4", "Boermans, C.O.V. (Cornelus) (v)", "Bloemstede", "500"],
-        ["5", "Van der Meulen, E.V.L.P. (Esra) (m)", "Middelgein", "500"],
+        ["1", "Wiertz, İ. (İlknur) (x)", "Bloemstede", "600"],
+        ["2", "Van Lent, E. (Esra) (v)", "Eemstricht", "550"],
+        ["3", "Van der Spek, J.W.Q.Y. (Jelisa) (m)", "Middelgein", "550"],
+        ["4", "Philippen, F.G. (Jory) (v)", "Eemstricht", "500"],
+        ["5", "Katsma, S.O. (Sammie) (x)", "Eksterlo", "500"],
       ]);
 
       expect(
@@ -479,7 +479,7 @@ describe("ApportionmentListDetailsPage", () => {
       expect(candidates_ranking_table).toBeVisible();
       expect(candidates_ranking_table).toHaveTableContent([
         ["Rang", "Naam", "Woonplaats", "Positie op lijst"],
-        ["1", "Gopal, S.S. (Sijtze) (v)", "'s Gravenveen", "5"],
+        ["1", "Den Mateman, D.P.K. (Damian) (x)", "Lekkum", "3"],
       ]);
 
       expect(
@@ -489,12 +489,12 @@ describe("ApportionmentListDetailsPage", () => {
       expect(total_votes_per_candidate_table).toBeVisible();
       expect(total_votes_per_candidate_table).toHaveTableContent([
         ["Nummer", "Kandidaat", "Woonplaats", "Aantal stemmen"],
-        ["1", "Van Bekking, J. (Jory) (m)", "Huisden", "600"],
-        ["2", "Wiertz, K. (Kris) (m)", "Huisden", "550"],
-        ["3", "Van der Meulen, E.V.L.P. (Esra) (m)", "Middelgein", "500"],
-        ["4", "Boermans, C.O.V. (Cornelus) (v)", "Bloemstede", "500"],
-        ["5", "Gopal, S.S. (Sijtze) (v)", "'s Gravenveen", "400"],
-        ["6", "Arets, T.E. (Tiemen) (v)", "'s Gravenveen", "550"],
+        ["1", "Wiertz, İ. (İlknur) (x)", "Bloemstede", "600"],
+        ["2", "Van Lent, E. (Esra) (v)", "Eemstricht", "550"],
+        ["3", "Den Mateman, D.P.K. (Damian) (x)", "Lekkum", "500"],
+        ["4", "Katsma, S.O. (Sammie) (x)", "Eksterlo", "500"],
+        ["5", "Philippen, F.G. (Jory) (v)", "Eemstricht", "500"],
+        ["6", "Van der Spek, J.W.Q.Y. (Jelisa) (m)", "Middelgein", "550"],
       ]);
     });
   });

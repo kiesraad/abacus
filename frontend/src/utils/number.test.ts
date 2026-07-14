@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { deformatNumber, formatNumber, formatPercentage, validateNumberString } from "./number";
+import { deformatNumber, formatNumber, formatPercentage, formatVoteCount, validateNumberString } from "./number";
 
 describe("Number util", () => {
   test.each([
@@ -75,5 +75,13 @@ describe("Number util", () => {
     [1, Infinity],
   ])("Return empty string for %j/%j", (value, total) => {
     expect(formatPercentage(value, total)).toBe("");
+  });
+
+  test.each([
+    [-1, "0"],
+    [0, "0"],
+    [1_234, "1.234"],
+  ])("Format vote count %j as %j", (value: number, expected: string) => {
+    expect(formatVoteCount(value)).toBe(expected);
   });
 });

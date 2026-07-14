@@ -165,7 +165,7 @@ describe("ApportionmentFullSeatsPage", () => {
     expect(full_seats_table).toBeVisible();
     expect(full_seats_table).toHaveTableContent([
       ["Lijst", "Lijstnaam", "Aantal stemmen", ":", "Kiesdeler", "=", "Aantal volle zetels"],
-      ["1", "Political Group A", "2571", ":", "340", "4/15", "=", "7 1 , 2 5"],
+      ["1", "Political Group A", "2.571", ":", "340", "4/15", "=", "7 1 , 2 5"],
       ["2", "Political Group B", "977", ":", "340", "4/15", "=", "2"],
       ["3", "Political Group C", "567", ":", "340", "4/15", "=", "1"],
       ["4", "Political Group D", "536", ":", "340", "4/15", "=", "1"],

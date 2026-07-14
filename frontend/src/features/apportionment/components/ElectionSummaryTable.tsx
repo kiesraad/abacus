@@ -9,7 +9,7 @@ import type {
   VotesCounts,
 } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
-import { formatNumber, formatPercentage } from "@/utils/number";
+import { formatNumber, formatPercentage, formatVoteCount } from "@/utils/number";
 import cls from "./Apportionment.module.css";
 
 export interface DeceasedCandidatesInfo {
@@ -25,10 +25,6 @@ interface ElectionSummaryTableProps {
   numberOfVoters: number | undefined;
   preferenceThreshold: PreferenceThreshold | undefined;
   deceasedCandidatesInfo: DeceasedCandidatesInfo;
-}
-
-function formatVoteCount(count: number): string {
-  return count > 0 ? formatNumber(count) : "0";
 }
 
 function formatVotePercentage(count: number, total: number): string {

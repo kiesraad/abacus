@@ -3,6 +3,7 @@ import { t } from "@/i18n/translate";
 import type { Candidate, CandidateVotes } from "@/types/generated/openapi";
 import { getCandidateFullNameWithGender, getCandidateLocalityWithCountryCode } from "@/utils/candidate";
 import { cn } from "@/utils/classnames";
+import { formatVoteCount } from "@/utils/number";
 
 import cls from "../Apportionment.module.css";
 
@@ -44,7 +45,7 @@ export function CandidatesWithSeatTable({
             <Table.Cell>{getCandidateFullNameWithGender(candidate)}</Table.Cell>
             <Table.Cell>{getCandidateLocalityWithCountryCode(candidate)}</Table.Cell>
             {showPosition && <Table.Cell className="text-align-r">{candidate.number}</Table.Cell>}
-            {showVotes && <Table.Cell className="text-align-r">{candidate.votes}</Table.Cell>}
+            {showVotes && <Table.NumberCell>{formatVoteCount(candidate.votes)}</Table.NumberCell>}
           </Table.Row>
         ))}
       </Table.Body>

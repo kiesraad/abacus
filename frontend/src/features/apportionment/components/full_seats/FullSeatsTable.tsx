@@ -2,7 +2,7 @@ import { Table } from "@/components/ui/Table/Table";
 import { t } from "@/i18n/translate";
 import type { DisplayFraction, ListSeatAssignment, PoliticalGroup } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
-import { formatVoteCount } from "@/utils/number.ts";
+import { formatVoteCount } from "@/utils/number";
 import { formatPoliticalGroupName } from "@/utils/politicalGroup";
 import { getFootnotesFromResultChanges, type ResultChange } from "../../utils/seat-change";
 import cls from "../Apportionment.module.css";

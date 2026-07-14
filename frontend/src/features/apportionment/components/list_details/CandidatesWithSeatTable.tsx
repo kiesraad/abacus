@@ -3,7 +3,7 @@ import { t } from "@/i18n/translate";
 import type { Candidate, CandidateVotes } from "@/types/generated/openapi";
 import { getCandidateFullNameWithGender, getCandidateLocalityWithCountryCode } from "@/utils/candidate";
 import { cn } from "@/utils/classnames";
-import { formatVoteCount } from "@/utils/number.ts";
+import { formatVoteCount } from "@/utils/number";
 
 import cls from "../Apportionment.module.css";
 

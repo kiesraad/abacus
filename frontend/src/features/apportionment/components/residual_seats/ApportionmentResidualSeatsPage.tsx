@@ -1,4 +1,4 @@
-import { type ReactElement, useEffect } from "react";
+import { useEffect } from "react";
 import { Link, useNavigate } from "react-router";
 import { useElection } from "@/hooks/election/useElection";
 import { t, tx } from "@/i18n/translate";
@@ -46,7 +46,6 @@ interface LargeCouncilSectionProps {
   highestAverageSteps: HighestAverageAssignmentStep[];
   politicalGroups: PoliticalGroup[];
   resultChanges: ResultChange[];
-  footNotes?: ReactElement;
   state: ApportionmentState;
 }
 
@@ -55,7 +54,6 @@ function LargeCouncilSection({
   highestAverageSteps,
   politicalGroups,
   resultChanges,
-  footNotes,
   state,
 }: LargeCouncilSectionProps) {
   return (
@@ -74,7 +72,9 @@ function LargeCouncilSection({
           />
         )}
       </div>
-      {footNotes}
+      {(isP9DrawingLots(state) || resultChanges.length > 0) && (
+        <Footnotes seatAssignment={seatAssignment} state={state} />
+      )}
     </div>
   );
 }
@@ -84,7 +84,7 @@ interface LargestRemaindersSectionProps {
   largestRemainderSteps: LargestRemainderAssignmentStep[];
   politicalGroups: PoliticalGroup[];
   resultChanges: ResultChange[];
-  footNotes?: ReactElement;
+  state: ApportionmentState;
 }
 
 function LargestRemaindersSection({
@@ -92,8 +92,11 @@ function LargestRemaindersSection({
   largestRemainderSteps,
   politicalGroups,
   resultChanges,
-  footNotes,
+  state,
 }: LargestRemaindersSectionProps) {
+  const { uniqueHighestAverageSteps } = getAssignmentSteps(seatAssignment);
+  const { largestRemainderResultChanges } = splitResultChanges(resultChanges, largestRemainderSteps);
+
   return (
     <div className={cn(cls.tableDiv, "mb-lg")}>
       <div>
@@ -104,11 +107,13 @@ function LargestRemaindersSection({
             steps={largestRemainderSteps}
             standings={seatAssignment.standings}
             politicalGroups={politicalGroups}
-            resultChanges={resultChanges}
+            resultChanges={largestRemainderResultChanges}
           />
         )}
       </div>
-      {footNotes}
+      {uniqueHighestAverageSteps.length === 0 && (isP9DrawingLots(state) || resultChanges.length > 0) && (
+        <Footnotes seatAssignment={seatAssignment} state={state} />
+      )}
     </div>
   );
 }
@@ -120,7 +125,6 @@ interface HighestAveragesSectionProps {
   highestAverageSteps: HighestAverageAssignmentStep[];
   politicalGroups: PoliticalGroup[];
   resultChanges: ResultChange[];
-  footNotes?: ReactElement;
   state: ApportionmentState;
 }
 
@@ -131,9 +135,10 @@ function HighestAveragesSection({
   highestAverageSteps,
   politicalGroups,
   resultChanges,
-  footNotes,
   state,
 }: HighestAveragesSectionProps) {
+  const { uniqueHighestAverageResultChanges } = splitResultChanges(resultChanges, largestRemainderSteps);
+
   return (
     <div className={cn(cls.tableDiv, "mb-lg")}>
       <div>
@@ -149,7 +154,7 @@ function HighestAveragesSection({
           largestRemainderSteps={largestRemainderSteps}
           standings={seatAssignment.standings}
           politicalGroups={politicalGroups}
-          resultChanges={resultChanges}
+          resultChanges={uniqueHighestAverageResultChanges}
         />
         {highestAverageSteps.length > 0 && (
           <>
@@ -171,7 +176,9 @@ function HighestAveragesSection({
           </>
         )}
       </div>
-      {footNotes}
+      {(isP9DrawingLots(state) || resultChanges.length > 0) && (
+        <Footnotes seatAssignment={seatAssignment} state={state} />
+      )}
     </div>
   );
 }
@@ -183,7 +190,6 @@ interface SmallCouncilSectionProps {
   highestAverageSteps: HighestAverageAssignmentStep[];
   politicalGroups: PoliticalGroup[];
   resultChanges: ResultChange[];
-  footNotes?: ReactElement;
   state: ApportionmentState;
 }
 
@@ -194,22 +200,16 @@ function SmallCouncilSection({
   highestAverageSteps,
   politicalGroups,
   resultChanges,
-  footNotes,
   state,
 }: SmallCouncilSectionProps) {
-  const showFootnotes = isP9DrawingLots(state) || resultChanges.length > 0;
-  const { largestRemainderResultChanges, uniqueHighestAverageResultChanges } = splitResultChanges(
-    resultChanges,
-    largestRemainderSteps,
-  );
   return (
     <>
       <LargestRemaindersSection
         seatAssignment={seatAssignment}
         largestRemainderSteps={largestRemainderSteps}
         politicalGroups={politicalGroups}
-        resultChanges={largestRemainderResultChanges}
-        footNotes={uniqueHighestAverageSteps.length === 0 && showFootnotes ? footNotes : undefined}
+        resultChanges={resultChanges}
+        state={state}
       />
       {uniqueHighestAverageSteps.length > 0 && (
         <HighestAveragesSection
@@ -218,8 +218,7 @@ function SmallCouncilSection({
           uniqueHighestAverageSteps={uniqueHighestAverageSteps}
           highestAverageSteps={highestAverageSteps}
           politicalGroups={politicalGroups}
-          resultChanges={uniqueHighestAverageResultChanges}
-          footNotes={showFootnotes ? footNotes : undefined}
+          resultChanges={resultChanges}
           state={state}
         />
       )}
@@ -251,18 +250,6 @@ export function ApportionmentResidualSeatsPage() {
     const { residualSeatRemovalSteps, listsWithFullSeatsRemoved } = getRemovalSteps(seatAssignment);
     const resultChanges = getResultChanges(listsWithFullSeatsRemoved, state, P9Step, residualSeatRemovalSteps);
 
-    function renderFootnotes(state: ApportionmentState): ReactElement {
-      return (
-        <Footnotes
-          listsWithFullSeatsRemoved={listsWithFullSeatsRemoved}
-          seatAssignment={seatAssignment}
-          absoluteMajorityStep={P9Step}
-          residualSeatRemovalSteps={residualSeatRemovalSteps}
-          state={state}
-        />
-      );
-    }
-
     return (
       <>
         {renderTitleAndHeader(t("apportionment.allocation_of_residual_seats"))}
@@ -276,7 +263,6 @@ export function ApportionmentResidualSeatsPage() {
                   highestAverageSteps={highestAverageSteps}
                   politicalGroups={election.political_groups}
                   resultChanges={resultChanges}
-                  footNotes={isP9DrawingLots(state) || resultChanges.length > 0 ? renderFootnotes(state) : undefined}
                   state={state}
                 />
               ) : (
@@ -287,7 +273,6 @@ export function ApportionmentResidualSeatsPage() {
                   highestAverageSteps={highestAverageSteps}
                   politicalGroups={election.political_groups}
                   resultChanges={resultChanges}
-                  footNotes={renderFootnotes(state)}
                   state={state}
                 />
               )

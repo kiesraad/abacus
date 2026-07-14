@@ -3,32 +3,26 @@ import { t } from "@/i18n/translate";
 import type { ApportionmentState, SeatAssignment } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 import { formatList } from "@/utils/strings";
-import type { AbsoluteMajorityReassignmentStep, ListExhaustionRemovalStep } from "../../utils/steps";
+import { getRemovalSteps, isAbsoluteMajorityReassignmentStep } from "../../utils/steps";
 import { isListDrawingLotsVariant } from "../../utils/utils";
 import cls from "../Apportionment.module.css";
 
 interface FootnotesProps {
-  listsWithFullSeatsRemoved: number[];
-  seatAssignment: SeatAssignment | undefined;
-  absoluteMajorityStep: AbsoluteMajorityReassignmentStep | undefined;
-  residualSeatRemovalSteps: ListExhaustionRemovalStep[];
+  seatAssignment: SeatAssignment;
   state: ApportionmentState;
 }
 
-export function Footnotes({
-  listsWithFullSeatsRemoved,
-  seatAssignment,
-  absoluteMajorityStep,
-  residualSeatRemovalSteps,
-  state,
-}: FootnotesProps): ReactElement {
+export function Footnotes({ seatAssignment, state }: FootnotesProps): ReactElement {
+  const { residualSeatRemovalSteps, listsWithFullSeatsRemoved } = getRemovalSteps(seatAssignment);
+  const absoluteMajorityStep = seatAssignment.steps.find(isAbsoluteMajorityReassignmentStep);
+
   return (
     <ol id="footnotes-list" className={cn(cls.footnotesList, "w-39")}>
       {listsWithFullSeatsRemoved.map((listNumber) => {
         return (
           <li key={listNumber} id={`list-${listNumber}-full-seat-list-exhaustion-information`}>
             {t("apportionment.footnotes.full_seat_removed_remainder_information", {
-              num_full_seats: seatAssignment?.steps[0]?.standings[listNumber - 1]?.full_seats || "",
+              num_full_seats: seatAssignment.steps[0]?.standings[listNumber - 1]?.full_seats || "",
             })}
           </li>
         );

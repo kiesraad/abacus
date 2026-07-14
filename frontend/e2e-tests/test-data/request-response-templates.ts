@@ -591,7 +591,7 @@ export const noRecountNoDifferencesDataEntryGSB: GSBResults & { model: "GSB" } =
   ],
 };
 
-export const noRecountNoDifferencesDrawingLotsDataEntryGSB: GSBResults & { model: "GSB" } = {
+export const noRecountNoDifferencesDrawingLotsForListAndCandidateDataEntryGSB: GSBResults & { model: "GSB" } = {
   model: "GSB",
   number_of_voters: 612694,
   voters_counts: {
@@ -894,6 +894,309 @@ export const noRecountNoDifferencesDrawingLotsDataEntryGSB: GSBResults & { model
   ],
 };
 
+export const noRecountNoDifferencesDrawingLotsForP9DataEntryGSB: GSBResults & { model: "GSB" } = {
+  model: "GSB",
+  number_of_voters: 8000,
+  voters_counts: {
+    poll_card_count: 5103,
+    proxy_certificate_count: 500,
+    total_admitted_voters_count: 5603,
+  },
+  votes_counts: {
+    political_group_total_votes: [
+      { number: 1, total: 2552 },
+      { number: 2, total: 511 },
+      { number: 3, total: 511 },
+      { number: 4, total: 511 },
+      { number: 5, total: 509 },
+      { number: 6, total: 509 },
+      { number: 7, total: 0 },
+      { number: 8, total: 0 },
+      { number: 9, total: 0 },
+    ],
+    total_votes_candidates_count: 5103,
+    blank_votes_count: 300,
+    invalid_votes_count: 200,
+    total_votes_cast_count: 5603,
+  },
+  differences_counts: {
+    more_ballots_count: 0,
+    fewer_ballots_count: 0,
+  },
+  political_group_votes: [
+    {
+      number: 1,
+      total: 2552,
+      candidate_votes: [
+        {
+          number: 1,
+          votes: 1000,
+        },
+        {
+          number: 2,
+          votes: 400,
+        },
+        {
+          number: 3,
+          votes: 300,
+        },
+        {
+          number: 4,
+          votes: 200,
+        },
+        {
+          number: 5,
+          votes: 100,
+        },
+        {
+          number: 6,
+          votes: 50,
+        },
+        {
+          number: 7,
+          votes: 2,
+        },
+        {
+          number: 8,
+          votes: 0,
+        },
+        {
+          number: 9,
+          votes: 0,
+        },
+        {
+          number: 10,
+          votes: 0,
+        },
+        {
+          number: 11,
+          votes: 0,
+        },
+        {
+          number: 12,
+          votes: 500,
+        },
+      ],
+    },
+    {
+      number: 2,
+      total: 511,
+      candidate_votes: [
+        {
+          number: 1,
+          votes: 500,
+        },
+        {
+          number: 2,
+          votes: 0,
+        },
+        {
+          number: 3,
+          votes: 0,
+        },
+        {
+          number: 4,
+          votes: 11,
+        },
+      ],
+    },
+    {
+      number: 3,
+      total: 511,
+      candidate_votes: [
+        {
+          number: 1,
+          votes: 400,
+        },
+        {
+          number: 2,
+          votes: 111,
+        },
+      ],
+    },
+    {
+      number: 4,
+      total: 511,
+      candidate_votes: [
+        {
+          number: 1,
+          votes: 300,
+        },
+        {
+          number: 2,
+          votes: 100,
+        },
+        {
+          number: 3,
+          votes: 0,
+        },
+        {
+          number: 4,
+          votes: 0,
+        },
+        {
+          number: 5,
+          votes: 0,
+        },
+        {
+          number: 6,
+          votes: 0,
+        },
+        {
+          number: 7,
+          votes: 0,
+        },
+        {
+          number: 8,
+          votes: 0,
+        },
+        {
+          number: 9,
+          votes: 0,
+        },
+        {
+          number: 10,
+          votes: 0,
+        },
+        {
+          number: 11,
+          votes: 0,
+        },
+        {
+          number: 12,
+          votes: 111,
+        },
+      ],
+    },
+    {
+      number: 5,
+      total: 509,
+      candidate_votes: [
+        {
+          number: 1,
+          votes: 500,
+        },
+        {
+          number: 2,
+          votes: 0,
+        },
+        {
+          number: 3,
+          votes: 0,
+        },
+        {
+          number: 4,
+          votes: 9,
+        },
+      ],
+    },
+    {
+      number: 6,
+      total: 509,
+      candidate_votes: [
+        {
+          number: 1,
+          votes: 450,
+        },
+        {
+          number: 2,
+          votes: 59,
+        },
+      ],
+    },
+    {
+      number: 7,
+      total: 0,
+      candidate_votes: [
+        {
+          number: 1,
+          votes: 0,
+        },
+        {
+          number: 2,
+          votes: 0,
+        },
+        {
+          number: 3,
+          votes: 0,
+        },
+        {
+          number: 4,
+          votes: 0,
+        },
+        {
+          number: 5,
+          votes: 0,
+        },
+        {
+          number: 6,
+          votes: 0,
+        },
+        {
+          number: 7,
+          votes: 0,
+        },
+        {
+          number: 8,
+          votes: 0,
+        },
+        {
+          number: 9,
+          votes: 0,
+        },
+        {
+          number: 10,
+          votes: 0,
+        },
+        {
+          number: 11,
+          votes: 0,
+        },
+        {
+          number: 12,
+          votes: 0,
+        },
+      ],
+    },
+    {
+      number: 8,
+      total: 0,
+      candidate_votes: [
+        {
+          number: 1,
+          votes: 0,
+        },
+        {
+          number: 2,
+          votes: 0,
+        },
+        {
+          number: 3,
+          votes: 0,
+        },
+        {
+          number: 4,
+          votes: 0,
+        },
+      ],
+    },
+    {
+      number: 9,
+      total: 0,
+      candidate_votes: [
+        {
+          number: 1,
+          votes: 0,
+        },
+        {
+          number: 2,
+          votes: 0,
+        },
+      ],
+    },
+  ],
+};
+
 export const dataEntryRequest: DataEntry = {
   progress: 87,
   data: noRecountNoDifferencesDataEntry,
@@ -908,6 +1211,28 @@ export const dataEntryRequest: DataEntry = {
 export const dataEntryRequestGSB: DataEntry = {
   progress: 88,
   data: noRecountNoDifferencesDataEntryGSB,
+  client_state: {
+    furthest: "political_group_votes_9",
+    current: "political_group_votes_9",
+    acceptedErrorsAndWarnings: [],
+    continue: true,
+  },
+};
+
+export const dataEntryRequestGSBTriggeringDrawingLotsForListAndCandidate: DataEntry = {
+  progress: 100,
+  data: noRecountNoDifferencesDrawingLotsForListAndCandidateDataEntryGSB,
+  client_state: {
+    furthest: "political_group_votes_9",
+    current: "political_group_votes_9",
+    acceptedErrorsAndWarnings: [],
+    continue: true,
+  },
+};
+
+export const dataEntryRequestGSBTriggeringDrawingLotsForP9: DataEntry = {
+  progress: 100,
+  data: noRecountNoDifferencesDrawingLotsForP9DataEntryGSB,
   client_state: {
     furthest: "political_group_votes_9",
     current: "political_group_votes_9",

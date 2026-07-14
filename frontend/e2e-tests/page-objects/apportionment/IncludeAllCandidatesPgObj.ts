@@ -2,7 +2,7 @@ import type { Locator, Page } from "@playwright/test";
 
 export class IncludeAllCandidates {
   readonly header: Locator;
-  readonly dataEntryFinished: Locator;
+  private readonly dataEntryFinished: Locator;
   readonly dataEntryFinishedAlert: Locator;
   readonly title: Locator;
   readonly noDeceased: Locator;

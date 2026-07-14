@@ -34,7 +34,7 @@ export function DrawingLotsForP9({ drawingLotsRequired }: DrawingLotsForListProp
               : t("apportionment.remainder_of"),
         })}
       </li>
-      <li>{t("apportionment.drawing_lots_for_list.hence_drawing_lots_is_needed")}</li>
+      <li>{t("apportionment.drawing_lots_for_p9.hence_drawing_lots_is_needed")}</li>
     </ul>
   );
 }

@@ -316,11 +316,11 @@ mod tests {
     fn test_enriched_seat_assignment_lt_19_seats() {
         let candidate_votes = vec![
             vec![0],
-            vec![30],
-            vec![50],
-            vec![60],
-            vec![70],
-            vec![97, 96, 95, 94, 93, 92, 91, 90],
+            vec![3],
+            vec![5],
+            vec![6],
+            vec![7],
+            vec![10, 10, 10, 10, 10, 10, 10, 9],
         ];
         let election = election_fixture_with_given_number_of_seats(
             CommitteeCategory::CSB,

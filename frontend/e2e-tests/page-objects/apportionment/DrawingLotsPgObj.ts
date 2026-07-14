@@ -9,7 +9,7 @@ export class DrawingLots {
 
   constructor(protected readonly page: Page) {
     this.title = page.getByRole("heading", { level: 2, name: "Loting noodzakelijk" });
-    this.list = page.getByRole("list", { name: "drawing-lots-information" });
+    this.list = page.getByTestId("drawing-lots-information");
     this.instructions = page.getByRole("heading", { level: 3, name: "Instructies voor loting" });
     this.result = page.getByRole("heading", { level: 3, name: "Resultaat loting" });
     this.next = page.getByRole("button", { name: "Volgende" });

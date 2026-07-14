@@ -5,7 +5,7 @@ import { StickyNav } from "@/components/ui/AppLayout/StickyNav";
 import { DataEntryHeader } from "@/features/data_entry/components/DataEntryHeader";
 import { useElection } from "@/hooks/election/useElection";
 import { useNumericParam } from "@/hooks/useNumericParam";
-import { useUser } from "@/hooks/user/useUser.ts";
+import { useUser } from "@/hooks/user/useUser";
 import type { FormSectionId } from "@/types/types";
 import { CheckAndSaveForm } from "./check_and_save/CheckAndSaveForm";
 import { DataEntryProgress } from "./DataEntryProgress";

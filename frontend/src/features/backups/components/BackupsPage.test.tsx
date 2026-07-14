@@ -12,7 +12,7 @@ import type {
 } from "@/types/generated/openapi";
 import { formatTime } from "@/utils/dateTime";
 
-import { BackupsPage } from "./BackupsPage.tsx";
+import { BackupsPage } from "./BackupsPage";
 
 const createdAt = new Date(2026, 6, 7, 0, 0).toISOString();
 

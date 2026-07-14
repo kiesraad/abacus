@@ -12,7 +12,7 @@ import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { useElection } from "@/hooks/election/useElection";
 import { useMessages } from "@/hooks/messages/useMessages";
 import { useNumericParam } from "@/hooks/useNumericParam";
-import { useUser } from "@/hooks/user/useUser.ts";
+import { useUser } from "@/hooks/user/useUser";
 import { t } from "@/i18n/translate";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 import { useDataEntryErrors } from "../hooks/useDataEntryErrors";

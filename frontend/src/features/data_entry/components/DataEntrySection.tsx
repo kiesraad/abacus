@@ -14,7 +14,7 @@ import { Form } from "@/components/ui/Form/Form";
 import { KeyboardKeys } from "@/components/ui/KeyboardKeys/KeyboardKeys";
 import { useUser } from "@/hooks/user/useUser";
 import { t } from "@/i18n/translate";
-import type { CommitteeCategory } from "@/types/generated/openapi.ts";
+import type { CommitteeCategory } from "@/types/generated/openapi";
 import { KeyboardKey } from "@/types/ui";
 import { getTranslations } from "@/utils/ValidationResults";
 import { useDataEntryFormSection } from "../hooks/useDataEntryFormSection";

@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { type AnyApiError, isSuccess } from "@/api/ApiResult.ts";
-import { useApiClient } from "@/api/useApiClient.ts";
-import { PageTitle } from "@/components/page_title/PageTitle.tsx";
+import { type AnyApiError, isSuccess } from "@/api/ApiResult";
+import { useApiClient } from "@/api/useApiClient";
+import { PageTitle } from "@/components/page_title/PageTitle";
 import { t } from "@/i18n/translate";
-import type { BackupResponse, CREATE_BACKUP_REQUEST_PATH } from "@/types/generated/openapi.ts";
-import { BackupsPageContent } from "./BackupsPageContent.tsx";
+import type { BackupResponse, CREATE_BACKUP_REQUEST_PATH } from "@/types/generated/openapi";
+import { BackupsPageContent } from "./BackupsPageContent";
 
 const MIN_LOADING_MS = 1000; // Time the loading state should at least remain visible
 const BACKUP_PATH: CREATE_BACKUP_REQUEST_PATH = `/api/backup`;

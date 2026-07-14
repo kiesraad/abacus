@@ -16,7 +16,7 @@ import { AccountSetupPgObj } from "e2e-tests/page-objects/authentication/Account
 import { LoginPgObj } from "e2e-tests/page-objects/authentication/LoginPgObj";
 import { DataEntryHomePage } from "e2e-tests/page-objects/data_entry/DataEntryHomePgObj";
 import { CheckAndSavePgObj } from "e2e-tests/page-objects/election/create/CheckAndSavePgObj";
-import { CommitteeCategoryPgObj } from "e2e-tests/page-objects/election/create/CommitteeCategoryPgObj.ts";
+import { CommitteeCategoryPgObj } from "e2e-tests/page-objects/election/create/CommitteeCategoryPgObj";
 import { ElectionDetailsPgObj } from "e2e-tests/page-objects/election/ElectionDetailsPgObj";
 import { ElectionHome } from "e2e-tests/page-objects/election/ElectionHomePgObj";
 import { ElectionReport } from "e2e-tests/page-objects/election/ElectionReportPgObj";

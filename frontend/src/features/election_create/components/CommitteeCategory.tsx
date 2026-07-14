@@ -1,12 +1,12 @@
 import { type ReactNode, type SubmitEvent, useState } from "react";
 import { Navigate, useNavigate } from "react-router";
-import { Alert } from "@/components/ui/Alert/Alert.tsx";
+import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
 import { ChoiceList } from "@/components/ui/CheckboxAndRadio/ChoiceList";
 import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { t } from "@/i18n/translate";
-import { StringFormData } from "@/utils/stringFormData.ts";
+import { StringFormData } from "@/utils/stringFormData";
 import { useElectionCreateContext } from "../hooks/useElectionCreateContext";
 
 export function CommitteeCategory() {

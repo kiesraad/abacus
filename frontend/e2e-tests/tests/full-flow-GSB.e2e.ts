@@ -21,7 +21,7 @@ import { ExtraInvestigationPage } from "e2e-tests/page-objects/data_entry/ExtraI
 import { ProgressList } from "e2e-tests/page-objects/data_entry/ProgressListPgObj";
 import { VotersAndVotesPage } from "e2e-tests/page-objects/data_entry/VotersAndVotesPgObj";
 import { CheckAndSavePgObj } from "e2e-tests/page-objects/election/create/CheckAndSavePgObj";
-import { CommitteeCategoryPgObj } from "e2e-tests/page-objects/election/create/CommitteeCategoryPgObj.ts";
+import { CommitteeCategoryPgObj } from "e2e-tests/page-objects/election/create/CommitteeCategoryPgObj";
 import { CountingMethodTypePgObj } from "e2e-tests/page-objects/election/create/CountingMethodTypePgObj";
 import { NumberOfVotersPgObj } from "e2e-tests/page-objects/election/create/NumberOfVotersPgObj";
 import { ElectionDetailsPgObj } from "e2e-tests/page-objects/election/ElectionDetailsPgObj";

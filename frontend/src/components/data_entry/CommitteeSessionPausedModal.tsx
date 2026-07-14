@@ -2,7 +2,7 @@ import { CommitteeSessionStatusWithRightIcon } from "@/components/committee_sess
 import { Button } from "@/components/ui/Button/Button";
 import { Modal } from "@/components/ui/Modal/Modal";
 import { t } from "@/i18n/translate";
-import type { CommitteeCategory } from "@/types/generated/openapi.ts";
+import type { CommitteeCategory } from "@/types/generated/openapi";
 
 interface CommitteeSessionPausedModalProps {
   showUnsavedChanges?: boolean;

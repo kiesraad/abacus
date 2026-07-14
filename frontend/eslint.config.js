@@ -36,6 +36,19 @@ export default defineConfig(
     ],
     rules: {
       "import-x/namespace": "off",
+      "import-x/extensions": [
+        "error",
+        "never",
+        {
+          pattern: {
+            css: "always",
+            json: "always",
+            webp: "always",
+          },
+          checkTypeImports: true,
+          fix: true,
+        },
+      ],
       "@typescript-eslint/no-unsafe-type-assertion": "error",
       "@typescript-eslint/restrict-template-expressions": [
         "error",

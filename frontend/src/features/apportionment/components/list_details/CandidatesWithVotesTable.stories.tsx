@@ -1,6 +1,6 @@
 import type { StoryObj } from "@storybook/react-vite";
 import { expect } from "storybook/test";
-import type { Candidate } from "@/types/generated/openapi.ts";
+import type { Candidate } from "@/types/generated/openapi";
 import * as lt19Seats from "../../testing/lt-19-seats";
 import { CandidatesWithVotesTable } from "./CandidatesWithVotesTable";
 

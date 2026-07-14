@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 import { type CommitteeCategory, committeeCategoryValues } from "@/types/generated/openapi";
-import translations from "./locales/nl/nl.ts";
+import translations from "./locales/nl/nl";
 
 describe("feedback translations structure", () => {
   test.each(committeeCategoryValues)("validate feedback_%s.json", (cat: CommitteeCategory) => {

@@ -3,7 +3,7 @@ import * as ReactRouter from "react-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { committeeSessionMockData } from "@/testing/api-mocks/CommitteeSessionMockData";
-import { getCSBElectionMockData } from "@/testing/api-mocks/ElectionMockData.ts";
+import { getCSBElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 import { render, screen, within } from "@/testing/test-utils";
 import type { CommitteeSessionStatus, Role } from "@/types/generated/openapi";

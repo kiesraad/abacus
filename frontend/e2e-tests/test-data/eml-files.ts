@@ -25,6 +25,33 @@ export const eml110a = {
   ],
 };
 
+export const eml110a_less_than_19_seats = {
+  filename: "eml110a_test_less_than_19_seats.eml.xml",
+  path: "../backend/src/eml/tests/eml110a_test_less_than_19_seats.eml.xml",
+  electionName: "Gemeenteraad Test 2022",
+  electionDate: "woensdag 16 maart 2022",
+  hashInput1: "f369",
+  hashInput2: "2efd",
+  fullHash: [
+    "f369",
+    "ea57",
+    "0b45",
+    "a68e",
+    "416e",
+    "a6a3",
+    "1a39",
+    "91ec",
+    "5a33",
+    "0785",
+    "ee27",
+    "2efd",
+    "c376",
+    "e869",
+    "e3c3",
+    "9848",
+  ],
+};
+
 export const eml110b = {
   filename: "eml110b_test.eml.xml",
   path: "../backend/src/eml/tests/eml110b_test.eml.xml",

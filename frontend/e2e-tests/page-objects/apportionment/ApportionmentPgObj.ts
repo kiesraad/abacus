@@ -8,6 +8,8 @@ export class Apportionment {
   readonly drawingLotsForListNeededAlert: Locator;
   readonly toDrawingLots: Locator;
   readonly toResidualSeatAllocationDetails: Locator;
+  private readonly drawingLotsForP9Needed: Locator;
+  readonly drawingLotsForP9NeededAlert: Locator;
   private readonly drawingLotsForCandidateNeeded: Locator;
   readonly drawingLotsForCandidateNeededAlert: Locator;
   readonly preliminaryResult: Locator;
@@ -33,14 +35,18 @@ export class Apportionment {
       hasText: /Loting noodzakelijk voor toekennen restzetel \d/,
     });
     this.drawingLotsForListNeededAlert = page.getByRole("alert").filter({ has: this.drawingLotsForListNeeded });
-    this.toDrawingLots = page.getByRole("link", { name: "Naar loting" });
-    this.toResidualSeatAllocationDetails = page.getByRole("link", { name: "Details restzetelverdeling" });
+    this.drawingLotsForP9Needed = page.getByRole("strong").filter({
+      hasText: "Loting noodzakelijk vanwege volstrekte meerderheid",
+    });
+    this.drawingLotsForP9NeededAlert = page.getByRole("alert").filter({ has: this.drawingLotsForP9Needed });
     this.drawingLotsForCandidateNeeded = page.getByRole("strong").filter({
       hasText: "Loting noodzakelijk voor kandidaten met gelijk aantal voorkeursstemmen",
     });
     this.drawingLotsForCandidateNeededAlert = page
       .getByRole("alert")
       .filter({ has: this.drawingLotsForCandidateNeeded });
+    this.toDrawingLots = page.getByRole("link", { name: /Naar loting/ });
+    this.toResidualSeatAllocationDetails = page.getByRole("link", { name: "Details restzetelverdeling" });
 
     this.preliminaryResult = page.getByRole("heading", { level: 2, name: "Voorlopig resultaat" });
     this.apportionment = page.getByRole("heading", { level: 2, name: "Zetelverdeling" });

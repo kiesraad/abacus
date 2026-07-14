@@ -73,6 +73,7 @@ Source: ".\VC_redist.x64.exe"; DestDir: "{tmp}"; Flags: deleteafterinstall
 Source: ".\{#MyAppIcon}"; DestDir: "{app}"
 
 [Dirs]
+Name: "{app}"; Flags: uninsalwaysuninstall
 Name: "{app}\{#MyBackupDirName}"
 
 [Icons]

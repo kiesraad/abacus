@@ -352,7 +352,7 @@ describe("DrawingLotsPage", () => {
     expect(listitems[2]).toHaveTextContent(
       "Lijst 6 en 7 hebben met hetzelfde gemiddeld aantal stemmen de laatste restzetels gekregen.",
     );
-    expect(listitems[3]).toHaveTextContent("Daarom moet er geloot worden welke lijst de restzetel krijgt");
+    expect(listitems[3]).toHaveTextContent("Daarom moet er geloot worden welke lijst de restzetel moet afstaan");
 
     expect(await screen.findByRole("heading", { level: 3, name: "Instructies voor loting" })).toBeVisible();
     expect(
@@ -443,7 +443,7 @@ describe("DrawingLotsPage", () => {
     expect(listitems[2]).toHaveTextContent(
       "Lijst 2, 3 en 4 hebben met hetzelfde overschot aan stemmen de laatste restzetels gekregen.",
     );
-    expect(listitems[3]).toHaveTextContent("Daarom moet er geloot worden welke lijst de restzetel krijgt");
+    expect(listitems[3]).toHaveTextContent("Daarom moet er geloot worden welke lijst de restzetel moet afstaan");
 
     expect(await screen.findByRole("heading", { level: 3, name: "Instructies voor loting" })).toBeVisible();
     expect(

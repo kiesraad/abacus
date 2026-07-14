@@ -14,7 +14,7 @@ export function DrawingLotsForCandidate({ drawingLotsRequired, options, list }: 
   const seatNumber = drawingLotsRequired.seat_numbers[0];
   if (seatNumber) {
     return (
-      <ul className={cn(cls.drawingLotsList, "w-32")} aria-label="drawing-lots-information">
+      <ul className={cn(cls.drawingLotsList, "w-32")} id="drawing-lots-information">
         <li>
           {t(
             `apportionment.drawing_lots_for_candidate.total_seats.${drawingLotsRequired.total_seats === 1 ? "singular" : "plural"}`,
@@ -30,7 +30,7 @@ export function DrawingLotsForCandidate({ drawingLotsRequired, options, list }: 
             seat_number: seatNumber,
             votes: drawingLotsRequired.number_of_votes,
           })}
-          <ul aria-label="drawing-lots-options">
+          <ul id="drawing-lots-options">
             {options.map((option) => (
               <li key={option.number}>{`${option.number}. ${getCandidateFullName(option, true)}`}</li>
             ))}

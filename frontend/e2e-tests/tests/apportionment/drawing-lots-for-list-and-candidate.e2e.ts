@@ -77,7 +77,7 @@ test.describe("CSB election apportionment", () => {
     await expect(apportionmentPage.header).toBeVisible();
     await expect(apportionmentPage.preliminaryResult).toBeVisible();
     await expect(
-      apportionmentPage.getAlert(
+      apportionmentPage.getAlertByText(
         "Restzetel 6 kon niet automatisch worden toegewezen en is na loting toegekend aan Lijst 3 – Stemmmers 22 (er is geloot tussen lijst 2 en 3).",
       ),
     ).toBeVisible();
@@ -114,7 +114,7 @@ test.describe("CSB election apportionment", () => {
     await expect(apportionmentPage.apportionment).toBeVisible();
     // Alert with drawing lots for list result is still visible
     await expect(
-      apportionmentPage.getAlert(
+      apportionmentPage.getAlertByText(
         "Restzetel 6 kon niet automatisch worden toegewezen en is na loting toegekend aan Lijst 3 – Stemmmers 22 (er is geloot tussen lijst 2 en 3).",
       ),
     ).toBeVisible();

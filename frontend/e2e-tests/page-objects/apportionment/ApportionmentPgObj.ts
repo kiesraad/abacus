@@ -55,7 +55,7 @@ export class Apportionment {
     this.manageDeceasedCandidates = page.getByRole("link", { name: "Beheer overleden kandidaten" });
   }
 
-  getAlert(text: string) {
+  getAlertByText(text: string) {
     return this.page.getByRole("alert").filter({
       hasText: text,
     });

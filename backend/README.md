@@ -177,7 +177,6 @@ The following dependencies (crates) are used:
 - `hyper`: fast and correct HTTP implementation.
 - `memory-serve`: serves frontend assets from memory, but ad-hoc from disk during development.
 - `password_hash`: password hashing interfaces.
-- `quick-xml`: reading and writing EML_NL XML files.
 - `rand`: create a random session key.
 - `serde_json`: JSON support for Serde.
 - `serde`: framework for serializing and deserializing data structures.

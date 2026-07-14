@@ -9,7 +9,6 @@ use axum::{
 use eml_nl::EMLError;
 use hyper::header::InvalidHeaderValue;
 use pdf_gen::{PdfGenError, zip::ZipResponseError};
-use quick_xml::{DeError, SeError};
 use serde::{Deserialize, Serialize};
 use tracing::error;
 use utoipa::ToSchema;
@@ -72,7 +71,6 @@ pub enum ErrorReference {
     InvalidUsernameOrPassword,
     InvalidVoteCandidate,
     InvalidVoteGroup,
-    InvalidXml,
     InvestigationHasDataEntryOrResult,
     InvestigationRequiresCorrectedResults,
     NotInitialised,
@@ -136,8 +134,6 @@ pub enum APIError {
     SerdeJsonError(serde_json::Error),
     SqlxError(sqlx::Error),
     StdError(Box<dyn Error>),
-    XmlDeError(DeError),
-    XmlError(SeError),
     ZipError(ZipResponseError),
 }
 
@@ -256,24 +252,6 @@ impl APIError {
                 (
                     StatusCode::BAD_REQUEST,
                     ErrorResponse::new("Invalid hash", ErrorReference::InvalidHash, false),
-                )
-            }
-            APIError::XmlError(err) => {
-                error!("Could not serialize XML: {:?}", err);
-                (
-                    StatusCode::INTERNAL_SERVER_ERROR,
-                    ErrorResponse::new(
-                        "Internal server error",
-                        ErrorReference::InternalServerError,
-                        false,
-                    ),
-                )
-            }
-            APIError::XmlDeError(err) => {
-                error!("Could not deserialize XML: {:?}", err);
-                (
-                    StatusCode::BAD_REQUEST,
-                    ErrorResponse::new("Invalid XML", ErrorReference::InvalidXml, false),
                 )
             }
             APIError::ZipError(err) => {

@@ -7251,7 +7251,6 @@
           "InvalidUsernameOrPassword",
           "InvalidVoteCandidate",
           "InvalidVoteGroup",
-          "InvalidXml",
           "InvestigationHasDataEntryOrResult",
           "InvestigationRequiresCorrectedResults",
           "NotInitialised",

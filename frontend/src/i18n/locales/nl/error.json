@@ -37,7 +37,6 @@
     "InvalidUsernameOrPassword": "De gebruikersnaam of het wachtwoord is onjuist",
     "InvalidVoteCandidate": "De kandidaat van de stem is niet geldig",
     "InvalidVoteGroup": "De politieke partij van de stem is niet geldig",
-    "InvalidXml": "De XML is niet geldig",
     "InvestigationHasDataEntryOrResult": "Er zijn al gecorrigeerde telresultaten ingevoerd",
     "InvestigationRequiresCorrectedResults": "Er zijn gecorrigeerde telresultaten vereist voor dit onderzoek",
     "NotInitialised": "De applicatie is nog niet klaar voor gebruik.",

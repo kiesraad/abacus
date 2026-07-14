@@ -5,7 +5,6 @@ use axum::{
 };
 use chrono::NaiveDate;
 use eml_nl::EMLError;
-use quick_xml::{DeError, SeError};
 use serde::{Deserialize, Serialize};
 use sqlx::{SqliteConnection, SqlitePool};
 use strum::VariantArray;
@@ -713,18 +712,6 @@ async fn create_sub_committees(
         (CommitteeCategory::GSB, _) => {}
     }
     Ok(())
-}
-
-impl From<DeError> for APIError {
-    fn from(err: DeError) -> Self {
-        APIError::XmlDeError(err)
-    }
-}
-
-impl From<SeError> for APIError {
-    fn from(err: SeError) -> Self {
-        APIError::XmlError(err)
-    }
 }
 
 impl From<EMLImportError> for APIError {

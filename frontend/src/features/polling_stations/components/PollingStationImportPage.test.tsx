@@ -48,9 +48,9 @@ describe("PollingStationImportPage", () => {
 
   test("Shows an error when uploading invalid polling stations file", async () => {
     overrideOnce("post", "/api/elections/1/polling_stations/validate-import", 400, {
-      error: "Invalid XML",
+      error: "EML import error",
       fatal: false,
-      reference: "InvalidXml",
+      reference: "EmlImportError",
     });
 
     await renderPage();

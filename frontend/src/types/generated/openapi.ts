@@ -1052,7 +1052,6 @@ export const errorReferenceValues = [
   "InvalidUsernameOrPassword",
   "InvalidVoteCandidate",
   "InvalidVoteGroup",
-  "InvalidXml",
   "InvestigationHasDataEntryOrResult",
   "InvestigationRequiresCorrectedResults",
   "NotInitialised",

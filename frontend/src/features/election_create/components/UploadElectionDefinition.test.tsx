@@ -127,9 +127,9 @@ describe("UploadElectionDefinition component", () => {
     const dispatch = vi.fn();
     vi.spyOn(useElectionCreateContext, "useElectionCreateContext").mockReturnValue({ state, dispatch });
     overrideOnce("post", "/api/elections/import/validate", 400, {
-      error: "Invalid XML",
+      error: "EML import error",
       fatal: false,
-      reference: "InvalidXml",
+      reference: "EmlImportError",
     });
 
     await renderPage();

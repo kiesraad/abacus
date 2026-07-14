@@ -40,15 +40,6 @@ export interface AssignmentSteps {
   P9Step?: AbsoluteMajorityReassignmentStep;
 }
 
-export function getAssignmentSteps(seatAssignment: SeatAssignment): AssignmentSteps {
-  return {
-    largestRemainderSteps: seatAssignment.steps.filter(isLargestRemainderAssignmentStep),
-    uniqueHighestAverageSteps: seatAssignment.steps.filter(isUniqueHighestAverageAssignmentStep),
-    highestAverageSteps: seatAssignment.steps.filter(isHighestAverageAssignmentStep),
-    P9Step: seatAssignment.steps.find(isAbsoluteMajorityReassignmentStep),
-  };
-}
-
 export interface RemovalSteps {
   fullSeatRemovalSteps: ListExhaustionRemovalStep[];
   residualSeatRemovalSteps: ListExhaustionRemovalStep[];

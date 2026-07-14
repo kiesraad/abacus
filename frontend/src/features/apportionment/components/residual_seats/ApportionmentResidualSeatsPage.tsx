@@ -41,39 +41,6 @@ function renderInformation(seats: number, residualSeats: number) {
   );
 }
 
-interface LargeCouncilSectionProps {
-  seatAssignment: SeatAssignment;
-  politicalGroups: PoliticalGroup[];
-  resultChanges: ResultChange[];
-  state: ApportionmentState;
-}
-
-function LargeCouncilSection({ seatAssignment, politicalGroups, resultChanges, state }: LargeCouncilSectionProps) {
-  const highestAverageSteps = seatAssignment.steps.filter(isHighestAverageAssignmentStep);
-
-  return (
-    <div className={cn(cls.tableDiv, "mb-lg")}>
-      <div>
-        <h2 className={cls.tableTitle}>{t("apportionment.residual_seats_highest_averages")}</h2>
-        {renderInformation(seatAssignment.seats, seatAssignment.residual_seats)}
-        <h3 className={cls.tableTitle}>{t("apportionment.averages_per_list")}:</h3>
-        {highestAverageSteps.length > 0 && (
-          <HighestAveragesTable
-            steps={highestAverageSteps}
-            standings={seatAssignment.standings}
-            politicalGroups={politicalGroups}
-            resultChanges={resultChanges}
-            state={state}
-          />
-        )}
-      </div>
-      {(isP9DrawingLots(state) || resultChanges.length > 0) && (
-        <Footnotes seatAssignment={seatAssignment} state={state} />
-      )}
-    </div>
-  );
-}
-
 interface LargestRemaindersSectionProps {
   seatAssignment: SeatAssignment;
   politicalGroups: PoliticalGroup[];
@@ -107,7 +74,7 @@ interface HighestAveragesSectionProps {
   state: ApportionmentState;
 }
 
-function HighestAveragesSection({
+function HighestAveragesSectionSmallCouncil({
   seatAssignment,
   politicalGroups,
   resultChanges,
@@ -159,37 +126,29 @@ function HighestAveragesSection({
   );
 }
 
-interface SmallCouncilSectionProps {
-  seatAssignment: SeatAssignment;
-  politicalGroups: PoliticalGroup[];
-  resultChanges: ResultChange[];
-  state: ApportionmentState;
-}
+function HighestAveragesSectionLargeCouncil({
+  seatAssignment,
+  politicalGroups,
+  resultChanges,
+  state,
+}: HighestAveragesSectionProps) {
+  const highestAverageSteps = seatAssignment.steps.filter(isHighestAverageAssignmentStep);
 
-function SmallCouncilSection({ seatAssignment, politicalGroups, resultChanges, state }: SmallCouncilSectionProps) {
   return (
-    <div className={cn(cls.tableDiv, "mb-lg")}>
-      <LargestRemaindersSection
-        seatAssignment={seatAssignment}
-        politicalGroups={politicalGroups}
-        resultChanges={resultChanges}
-      />
-      <HighestAveragesSection
-        seatAssignment={seatAssignment}
-        politicalGroups={politicalGroups}
-        resultChanges={resultChanges}
-        state={state}
-      />
-      {(isP9DrawingLots(state) || resultChanges.length > 0) && (
-        <Footnotes seatAssignment={seatAssignment} state={state} />
+    <div>
+      <h2 className={cls.tableTitle}>{t("apportionment.residual_seats_highest_averages")}</h2>
+      {renderInformation(seatAssignment.seats, seatAssignment.residual_seats)}
+      <h3 className={cls.tableTitle}>{t("apportionment.averages_per_list")}:</h3>
+      {highestAverageSteps.length > 0 && (
+        <HighestAveragesTable
+          steps={highestAverageSteps}
+          standings={seatAssignment.standings}
+          politicalGroups={politicalGroups}
+          resultChanges={resultChanges}
+          state={state}
+        />
       )}
     </div>
-  );
-}
-
-function isP9DrawingLots(state: ApportionmentState) {
-  return (
-    isListDrawingLotsVariant(state, ["AbsoluteMajorityHighestAverage", "AbsoluteMajorityLargestRemainder"]) || false
   );
 }
 
@@ -205,10 +164,16 @@ export function ApportionmentResidualSeatsPage() {
   if (error) {
     return <ApportionmentErrorPage sectionTitle={t("apportionment.allocation_of_residual_seats")} error={error} />;
   }
+
   if (seatAssignment && state) {
     const { residualSeatRemovalSteps, listsWithFullSeatsRemoved } = getRemovalSteps(seatAssignment);
-    const P9Step = seatAssignment.steps.find(isAbsoluteMajorityReassignmentStep);
-    const resultChanges = getResultChanges(listsWithFullSeatsRemoved, state, P9Step, residualSeatRemovalSteps);
+    const absoluteMajorityStep = seatAssignment.steps.find(isAbsoluteMajorityReassignmentStep);
+    const resultChanges = getResultChanges(
+      listsWithFullSeatsRemoved,
+      state,
+      absoluteMajorityStep,
+      residualSeatRemovalSteps,
+    );
 
     return (
       <>
@@ -216,22 +181,37 @@ export function ApportionmentResidualSeatsPage() {
         <main>
           <article className={cls.article}>
             <DrawingLotsNotifyAlert state={state} />
+
             {seatAssignment.residual_seats > 0 ? (
-              seatAssignment.seats >= LARGE_COUNCIL_THRESHOLD ? (
-                <LargeCouncilSection
-                  seatAssignment={seatAssignment}
-                  politicalGroups={election.political_groups}
-                  resultChanges={resultChanges}
-                  state={state}
-                />
-              ) : (
-                <SmallCouncilSection
-                  seatAssignment={seatAssignment}
-                  politicalGroups={election.political_groups}
-                  resultChanges={resultChanges}
-                  state={state}
-                />
-              )
+              <div className={cn(cls.tableDiv, "mb-lg")}>
+                {seatAssignment.seats >= LARGE_COUNCIL_THRESHOLD ? (
+                  <HighestAveragesSectionLargeCouncil
+                    seatAssignment={seatAssignment}
+                    politicalGroups={election.political_groups}
+                    resultChanges={resultChanges}
+                    state={state}
+                  />
+                ) : (
+                  <>
+                    <LargestRemaindersSection
+                      seatAssignment={seatAssignment}
+                      politicalGroups={election.political_groups}
+                      resultChanges={resultChanges}
+                    />
+                    <HighestAveragesSectionSmallCouncil
+                      seatAssignment={seatAssignment}
+                      politicalGroups={election.political_groups}
+                      resultChanges={resultChanges}
+                      state={state}
+                    />
+                  </>
+                )}
+                {(isListDrawingLotsVariant(state, [
+                  "AbsoluteMajorityHighestAverage",
+                  "AbsoluteMajorityLargestRemainder",
+                ]) ||
+                  resultChanges.length > 0) && <Footnotes seatAssignment={seatAssignment} state={state} />}
+              </div>
             ) : (
               <span>{t("apportionment.no_residual_seats_to_assign")}</span>
             )}

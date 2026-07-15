@@ -210,6 +210,29 @@ async fn test_election_validate_missing_election_domain(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+async fn test_gsb_election_validate_hash_file_instead_of_election_definition(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+
+    let url = format!("http://{addr}/api/elections/import/validate");
+    let admin_cookie = login(&addr, Admin).await;
+    let response = reqwest::Client::new()
+        .post(&url)
+        .header("cookie", admin_cookie)
+        .json(&serde_json::json!({
+          "committee_category": "GSB",
+          "election_data": "5738 d520 a7f2 89b8 8875 ebfe cfc8 6012 d7b6 f65f 3271 d0e1 180b ccdd 8134 cd5d",
+        }))
+        .send()
+        .await
+        .unwrap();
+
+    // Ensure the response is what we expect
+    assert_eq!(response.status(), StatusCode::BAD_REQUEST);
+    let body: serde_json::Value = response.json().await.unwrap();
+    assert_eq!(body["reference"], "EmlImportError");
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
 async fn test_election_candidates_validate_valid(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let admin_cookie = login(&addr, Admin).await;

@@ -24,7 +24,7 @@ The `coverage_differential_osv2020.sh` script can be used as a starting point de
 
 Running the `differential_osv2002` target requires extra steps:
 
-1. Clone https://github.com/kiesraad/osv2020-apportionment-wrapper (internal repo)
+1. Clone https://github.com/kiesraad/osv2020-apportionment-wrapper
 2. Follow the instructions in the README
 3. Point the `OSV2020_WRAPPER_BIN` environment to the output of `./gradlew installDist`. For example:
 ```sh

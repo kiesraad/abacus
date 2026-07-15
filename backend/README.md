@@ -175,6 +175,7 @@ The following dependencies (crates) are used:
 - `clap`: library for command-line argument parsing.
 - `cookie`: dependency of axum_extra, for encoding and parsing cookies.
 - `hyper`: fast and correct HTTP implementation.
+- `icu_collator`: locale-aware string comparison
 - `memory-serve`: serves frontend assets from memory, but ad-hoc from disk during development.
 - `password_hash`: password hashing interfaces.
 - `rand`: create a random session key.

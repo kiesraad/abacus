@@ -1,5 +1,7 @@
 use std::collections::HashMap;
 
+use icu_collator::{Collator, CollatorPreferences, options::CollatorOptions};
+
 use crate::domain::{
     apportionment::{
         CandidateNomination, ChosenCandidate, DisplayFraction, ListCandidateNomination,
@@ -32,11 +34,15 @@ pub fn map_seat_assignment(sa: &apportionment::SeatAssignmentDetails<PGNumber>) 
     }
 }
 
+/// Sorts candidates alphabetically by last name, then by initials
+/// Uses collation to handle diacritics
 fn sort_candidates_alphabetically(mut candidates: Vec<ChosenCandidate>) -> Vec<ChosenCandidate> {
+    let collator = Collator::try_new(CollatorPreferences::default(), CollatorOptions::default())
+        .expect("collator data should be available");
     candidates.sort_by(|a, b| {
-        a.last_name
-            .cmp(&b.last_name)
-            .then_with(|| a.initials.cmp(&b.initials))
+        collator
+            .compare(&a.last_name, &b.last_name)
+            .then_with(|| collator.compare(&a.initials, &b.initials))
     });
     candidates
 }
@@ -110,11 +116,7 @@ pub fn map_candidate_nomination(
 
 #[cfg(test)]
 mod tests {
-    use super::{DisplayFraction, sort_candidates_alphabetically};
-    use crate::domain::{
-        apportionment::ChosenCandidate,
-        election::{CandidateNumber, PGNumber},
-    };
+    use super::DisplayFraction;
 
     #[test]
     fn test_display_fraction() {
@@ -125,58 +127,148 @@ mod tests {
         assert_eq!(display_fraction.denominator, 5);
     }
 
-    #[test]
-    fn test_sort_candidates_alphabetically() {
-        // (initials, last name)
-        let names: Vec<(&str, &str)> = vec![
-            ("A.", "Duin"),
-            ("M.", "Appel"),
-            ("M.", "Zee"),
-            ("A.", "Zee"),
-            ("N.", "Zee"),
-            ("D.", "Zee"),
-            ("D.J.E", "Korte"),
-            ("N.B.", "Groen"),
-            ("N.", "Groen"),
-            ("N.A.", "Groen"),
-        ];
+    mod sort_candidates_alphabetically {
+        use crate::{
+            api::apportionment::mapping::sort_candidates_alphabetically,
+            domain::{
+                apportionment::ChosenCandidate,
+                election::{CandidateNumber, PGNumber},
+            },
+        };
 
-        let candidates: Vec<ChosenCandidate> = names
-            .iter()
-            .enumerate()
-            .map(|(i, &(initials, last_name))| ChosenCandidate {
-                number: CandidateNumber::from(u32::try_from(i).unwrap() + 1),
-                initials: initials.to_string(),
-                first_name: None,
-                last_name_prefix: None,
-                last_name: last_name.to_string(),
-                locality: String::new(),
-                country_code: None,
-                gender: None,
-                list_number: PGNumber::from(1),
-                list_name: String::new(),
-            })
-            .collect();
-        let sorted_candidates = sort_candidates_alphabetically(candidates);
+        fn create_candidates(names: &[(&str, Option<&str>, &str)]) -> Vec<ChosenCandidate> {
+            names
+                .iter()
+                .enumerate()
+                .map(|(i, &(initials, first_name, last_name))| ChosenCandidate {
+                    number: CandidateNumber::from(u32::try_from(i).unwrap() + 1),
+                    initials: initials.to_string(),
+                    first_name: first_name.map(String::from),
+                    last_name_prefix: None,
+                    last_name: last_name.to_string(),
+                    locality: String::new(),
+                    country_code: None,
+                    gender: None,
+                    list_number: PGNumber::from(1),
+                    list_name: String::new(),
+                })
+                .collect()
+        }
 
-        let sorted_names: Vec<(&str, &str)> = sorted_candidates
-            .iter()
-            .map(|c| (c.initials.as_str(), c.last_name.as_str()))
-            .collect();
-        assert_eq!(
-            sorted_names,
-            vec![
-                ("M.", "Appel"),
-                ("A.", "Duin"),
-                ("N.", "Groen"),
-                ("N.A.", "Groen"),
-                ("N.B.", "Groen"),
-                ("D.J.E", "Korte"),
-                ("A.", "Zee"),
-                ("D.", "Zee"),
-                ("M.", "Zee"),
-                ("N.", "Zee"),
-            ]
-        );
+        #[test]
+        fn test_last_name_then_initials() {
+            let candidates = create_candidates(&[
+                ("A.", Some("Pieter"), "Duin"),
+                ("M.", Some("Zainab"), "Appel"),
+                ("M.", Some("Yana"), "Zee"),
+                ("A.", Some("Ruben"), "Zee"),
+                ("N.", Some("Anna"), "Zee"),
+                ("D.", None, "Zee"),
+                ("D.J.E", Some("Sofia"), "Korte"),
+                ("N.B.", Some("Tessa"), "Groen"),
+                ("N.", Some("Willem"), "Groen"),
+                ("N.A.", Some("Vera"), "Groen"),
+            ]);
+            let sorted_candidates = sort_candidates_alphabetically(candidates);
+
+            let sorted_names: Vec<(&str, &str)> = sorted_candidates
+                .iter()
+                .map(|c| (c.initials.as_str(), c.last_name.as_str()))
+                .collect();
+            assert_eq!(
+                sorted_names,
+                vec![
+                    ("M.", "Appel"),
+                    ("A.", "Duin"),
+                    ("N.", "Groen"),
+                    ("N.A.", "Groen"),
+                    ("N.B.", "Groen"),
+                    ("D.J.E", "Korte"),
+                    ("A.", "Zee"),
+                    ("D.", "Zee"),
+                    ("M.", "Zee"),
+                    ("N.", "Zee"),
+                ]
+            );
+        }
+
+        #[test]
+        fn test_diacritics() {
+            let candidates = create_candidates(&[
+                ("A.", None, "Zee"),
+                ("N.", None, "Müller"),
+                ("B.", None, "Ćelik"),
+                ("P.", None, "Groen"),
+                ("C.", None, "Éland"),
+                ("O.", None, "Šimić"),
+                ("H.", None, "Ñuñez"),
+                ("D.", None, "Öztürk"),
+                ("Ö.", None, "Groen"),
+                ("R.", None, "Ådal"),
+                ("E.", None, "Ekker"),
+                ("I.", None, "boer"),
+                ("I.", None, "Boenen"),
+                ("F.", None, "Aalst"),
+                ("j.", None, "groot"),
+                ("L.", None, "Mulder"),
+                ("G.", None, "Ünal"),
+            ]);
+            let sorted_candidates = sort_candidates_alphabetically(candidates);
+
+            let sorted_names: Vec<(&str, &str)> = sorted_candidates
+                .iter()
+                .map(|c| (c.initials.as_str(), c.last_name.as_str()))
+                .collect();
+            assert_eq!(
+                sorted_names,
+                vec![
+                    ("F.", "Aalst"),
+                    ("R.", "Ådal"),
+                    ("I.", "Boenen"),
+                    ("I.", "boer"),
+                    ("B.", "Ćelik"),
+                    ("E.", "Ekker"),
+                    ("C.", "Éland"),
+                    ("Ö.", "Groen"),
+                    ("P.", "Groen"),
+                    ("j.", "groot"),
+                    ("L.", "Mulder"),
+                    ("N.", "Müller"),
+                    ("H.", "Ñuñez"),
+                    ("D.", "Öztürk"),
+                    ("O.", "Šimić"),
+                    ("G.", "Ünal"),
+                    ("A.", "Zee"),
+                ]
+            );
+        }
+
+        #[test]
+        fn test_case() {
+            // lowercase comes first
+            let candidates = create_candidates(&[
+                ("J.", None, "Groen"),
+                ("B.", None, "Boer"),
+                ("B.", None, "Boen"),
+                ("j.", None, "Groen"),
+                ("I.", None, "boer"),
+            ]);
+            let sorted_candidates = sort_candidates_alphabetically(candidates);
+
+            let sorted_names: Vec<(&str, &str)> = sorted_candidates
+                .iter()
+                .map(|c| (c.initials.as_str(), c.last_name.as_str()))
+                .collect();
+            assert_eq!(
+                sorted_names,
+                vec![
+                    ("B.", "Boen"),
+                    ("I.", "boer"),
+                    ("B.", "Boer"),
+                    ("j.", "Groen"),
+                    ("J.", "Groen"),
+                ]
+            );
+        }
     }
 }

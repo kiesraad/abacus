@@ -18,6 +18,7 @@ dependencies = [
  "eml-nl",
  "http-body-util",
  "hyper",
+ "icu_collator",
  "if-addrs",
  "memory-serve",
  "pdf_gen",

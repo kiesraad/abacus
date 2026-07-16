@@ -2,6 +2,7 @@ import type { StoryObj } from "@storybook/react-vite";
 import { expect } from "storybook/test";
 import * as gte19Seats from "../testing/gte-19-seats";
 import * as gte19SeatsAndP7DrawingLots from "../testing/gte-19-seats-and-p7-drawing-lots";
+import * as lt19SeatsAndNotAllSeatsAssigned from "../testing/lt-19-seats-and-not-all-seats-assigned";
 import { getNotAssignedSeats } from "../utils/utils";
 import { ApportionmentTable } from "./ApportionmentTable";
 
@@ -13,7 +14,6 @@ export const Default: StoryObj = {
         politicalGroups={gte19Seats.election.political_groups}
         fullSeats={gte19Seats.seat_assignment.full_seats}
         residualSeats={gte19Seats.seat_assignment.residual_seats}
-        seats={gte19Seats.seat_assignment.seats}
         notAssignedSeats={0}
         withoutLinks={false}
       />
@@ -42,7 +42,6 @@ export const NotAssignedSeats: StoryObj = {
         politicalGroups={gte19SeatsAndP7DrawingLots.election.political_groups}
         fullSeats={gte19SeatsAndP7DrawingLots.seat_assignment.full_seats}
         residualSeats={gte19SeatsAndP7DrawingLots.seat_assignment.residual_seats}
-        seats={gte19SeatsAndP7DrawingLots.seat_assignment.seats}
         notAssignedSeats={getNotAssignedSeats(gte19SeatsAndP7DrawingLots.state)}
         withoutLinks={true}
       />
@@ -61,6 +60,32 @@ export const NotAssignedSeats: StoryObj = {
       ["5", "Unie van kandidaten", "2", "-", "2"],
       ["6", "Lijst van stemmers", "2", "-", "2"],
       ["", "Totaal", "19", "4", "23"],
+    ]);
+  },
+};
+
+export const NotAllSeatsAssigned: StoryObj = {
+  render: () => {
+    return (
+      <ApportionmentTable
+        standings={lt19SeatsAndNotAllSeatsAssigned.seat_assignment.standings}
+        politicalGroups={lt19SeatsAndNotAllSeatsAssigned.election.political_groups}
+        fullSeats={lt19SeatsAndNotAllSeatsAssigned.seat_assignment.full_seats}
+        residualSeats={lt19SeatsAndNotAllSeatsAssigned.seat_assignment.residual_seats}
+        notAssignedSeats={getNotAssignedSeats(lt19SeatsAndNotAllSeatsAssigned.state)}
+        withoutLinks={true}
+      />
+    );
+  },
+  play: async ({ canvas }) => {
+    const table = canvas.getByRole("table");
+    await expect(table).toBeVisible();
+    expect(table).toHaveTableContent([
+      ["Lijst", "Lijstnaam", "Volle zetels", "Restzetels", "Totaal zetels"],
+      ["1", "Political Group A", "-", "1", "1"],
+      ["2", "Political Group B", "-", "2", "2"],
+      ["3", "Blanco (Smit, G.)", "2", "-", "2"],
+      ["", "Totaal", "2", "3", "5"],
     ]);
   },
 };

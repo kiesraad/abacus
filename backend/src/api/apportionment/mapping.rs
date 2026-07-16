@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
-use icu_collator::{Collator, CollatorPreferences, options::CollatorOptions};
+use icu_collator::{Collator, options::CollatorOptions};
+use icu_locale_core::locale;
 
 use crate::domain::{
     apportionment::{
@@ -37,7 +38,7 @@ pub fn map_seat_assignment(sa: &apportionment::SeatAssignmentDetails<PGNumber>) 
 /// Sorts candidates alphabetically by last name, then by initials
 /// Uses collation to handle diacritics
 fn sort_candidates_alphabetically(mut candidates: Vec<ChosenCandidate>) -> Vec<ChosenCandidate> {
-    let collator = Collator::try_new(CollatorPreferences::default(), CollatorOptions::default())
+    let collator = Collator::try_new(locale!("nl").into(), CollatorOptions::default())
         .expect("collator data should be available");
     candidates.sort_by(|a, b| {
         collator

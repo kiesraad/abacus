@@ -43,15 +43,15 @@ export const P10: StoryObj = {
       lists_drawn: [],
       candidates_drawn: [],
     } satisfies ApportionmentState;
-    const dataset = buildAssignmentTableData(lt19SeatsAndP10AndDeceasedCandidates.seat_assignment.steps, state);
+    const tableData = buildAssignmentTableData(lt19SeatsAndP10AndDeceasedCandidates.seat_assignment.steps, state);
 
     return (
       <UniqueHighestAveragesTable
-        steps={dataset.UniqueHighestAverageAssignment.steps}
-        largestRemainderSteps={dataset.LargestRemainderAssignment.steps}
+        steps={tableData.UniqueHighestAverageAssignment.steps}
+        largestRemainderSteps={tableData.LargestRemainderAssignment.steps}
         standings={lt19SeatsAndP10AndDeceasedCandidates.seat_assignment.standings}
         politicalGroups={lt19SeatsAndP10AndDeceasedCandidates.election.political_groups}
-        resultChanges={dataset.UniqueHighestAverageAssignment.resultChanges}
+        resultChanges={tableData.UniqueHighestAverageAssignment.resultChanges}
       />
     );
   },

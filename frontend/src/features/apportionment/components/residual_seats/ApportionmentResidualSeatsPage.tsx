@@ -46,16 +46,11 @@ interface CouncilSectionProps {
 }
 
 function SmallCouncilSection({ seatAssignment, politicalGroups, state }: CouncilSectionProps) {
-  const dataset = buildAssignmentTableData(seatAssignment.steps, state);
-  console.log("dataset", dataset);
+  const tableData = buildAssignmentTableData(seatAssignment.steps, state);
 
-  const largestRemainderSteps = dataset.LargestRemainderAssignment.steps;
-  const largestRemainderResultChanges = dataset.LargestRemainderAssignment.resultChanges;
-
-  const uniqueHighestAverageSteps = dataset.UniqueHighestAverageAssignment.steps;
-  const uniqueHighestAverageResultChanges = dataset.UniqueHighestAverageAssignment.resultChanges;
-
-  const highestAverageSteps = dataset.HighestAverageAssignment.steps;
+  const largestRemainderSteps = tableData.LargestRemainderAssignment.steps;
+  const uniqueHighestAverageSteps = tableData.UniqueHighestAverageAssignment.steps;
+  const highestAverageSteps = tableData.HighestAverageAssignment.steps;
 
   return (
     <>
@@ -67,7 +62,7 @@ function SmallCouncilSection({ seatAssignment, politicalGroups, state }: Council
             steps={largestRemainderSteps}
             standings={seatAssignment.standings}
             politicalGroups={politicalGroups}
-            resultChanges={largestRemainderResultChanges}
+            resultChanges={tableData.LargestRemainderAssignment.resultChanges}
           />
         )}
       </div>
@@ -85,7 +80,7 @@ function SmallCouncilSection({ seatAssignment, politicalGroups, state }: Council
             largestRemainderSteps={largestRemainderSteps}
             standings={seatAssignment.standings}
             politicalGroups={politicalGroups}
-            resultChanges={uniqueHighestAverageResultChanges}
+            resultChanges={tableData.UniqueHighestAverageAssignment.resultChanges}
           />
           {highestAverageSteps.length > 0 && (
             <>
@@ -111,10 +106,9 @@ function SmallCouncilSection({ seatAssignment, politicalGroups, state }: Council
 }
 
 function LargeCouncilSection({ seatAssignment, politicalGroups, state }: CouncilSectionProps) {
-  const dataset = buildAssignmentTableData(seatAssignment.steps, state);
+  const tableData = buildAssignmentTableData(seatAssignment.steps, state);
 
-  const highestAverageSteps = dataset.HighestAverageAssignment.steps;
-  const resultChanges = dataset.HighestAverageAssignment.resultChanges;
+  const highestAverageSteps = tableData.HighestAverageAssignment.steps;
 
   return (
     <div>
@@ -126,7 +120,7 @@ function LargeCouncilSection({ seatAssignment, politicalGroups, state }: Council
           steps={highestAverageSteps}
           standings={seatAssignment.standings}
           politicalGroups={politicalGroups}
-          resultChanges={resultChanges}
+          resultChanges={tableData.HighestAverageAssignment.resultChanges}
           state={state}
         />
       )}

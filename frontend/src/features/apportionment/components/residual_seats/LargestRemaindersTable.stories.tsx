@@ -38,14 +38,14 @@ export const P9AndP10: StoryObj = {
       lists_drawn: [],
       candidates_drawn: [],
     } satisfies ApportionmentState;
-    const dataset = buildAssignmentTableData(lt19SeatsAndP9AndP10.seat_assignment.steps, state);
+    const tableData = buildAssignmentTableData(lt19SeatsAndP9AndP10.seat_assignment.steps, state);
 
     return (
       <LargestRemaindersTable
-        steps={dataset.LargestRemainderAssignment.steps}
+        steps={tableData.LargestRemainderAssignment.steps}
         standings={lt19SeatsAndP9AndP10.seat_assignment.standings}
         politicalGroups={lt19SeatsAndP9AndP10.election.political_groups}
-        resultChanges={dataset.LargestRemainderAssignment.resultChanges}
+        resultChanges={tableData.LargestRemainderAssignment.resultChanges}
       />
     );
   },
@@ -65,17 +65,17 @@ export const P9AndP10: StoryObj = {
 
 export const P9BeforeDrawingLots: StoryObj = {
   render: () => {
-    const dataset = buildAssignmentTableData(
+    const tableData = buildAssignmentTableData(
       lt19SeatsAndP9DrawingLots.seat_assignment.steps,
       lt19SeatsAndP9DrawingLots.state,
     );
 
     return (
       <LargestRemaindersTable
-        steps={dataset.LargestRemainderAssignment.steps}
+        steps={tableData.LargestRemainderAssignment.steps}
         standings={lt19SeatsAndP9DrawingLots.seat_assignment.standings}
         politicalGroups={lt19SeatsAndP9DrawingLots.election.political_groups}
-        resultChanges={dataset.LargestRemainderAssignment.resultChanges}
+        resultChanges={tableData.LargestRemainderAssignment.resultChanges}
       />
     );
   },
@@ -96,17 +96,17 @@ export const P9BeforeDrawingLots: StoryObj = {
 
 export const P9AfterDrawingLots: StoryObj = {
   render: () => {
-    const dataset = buildAssignmentTableData(
+    const tableData = buildAssignmentTableData(
       lt19SeatsAndP9DrawingLots.seat_assignment_after_drawing_lots_seat_reassigned.steps,
       lt19SeatsAndP9DrawingLots.state_after_drawing_lots_seat_reassigned,
     );
 
     return (
       <LargestRemaindersTable
-        steps={dataset.LargestRemainderAssignment.steps}
+        steps={tableData.LargestRemainderAssignment.steps}
         standings={lt19SeatsAndP9DrawingLots.seat_assignment_after_drawing_lots_seat_reassigned.standings}
         politicalGroups={lt19SeatsAndP9DrawingLots.election.political_groups}
-        resultChanges={dataset.LargestRemainderAssignment.resultChanges}
+        resultChanges={tableData.LargestRemainderAssignment.resultChanges}
       />
     );
   },
@@ -133,14 +133,14 @@ export const P10: StoryObj = {
       lists_drawn: [],
       candidates_drawn: [],
     } satisfies ApportionmentState;
-    const dataset = buildAssignmentTableData(lt19SeatsAndP10AndDeceasedCandidates.seat_assignment.steps, state);
+    const tableData = buildAssignmentTableData(lt19SeatsAndP10AndDeceasedCandidates.seat_assignment.steps, state);
 
     return (
       <LargestRemaindersTable
-        steps={dataset.LargestRemainderAssignment.steps}
+        steps={tableData.LargestRemainderAssignment.steps}
         standings={lt19SeatsAndP10AndDeceasedCandidates.seat_assignment.standings}
         politicalGroups={lt19SeatsAndP10AndDeceasedCandidates.election.political_groups}
-        resultChanges={dataset.LargestRemainderAssignment.resultChanges}
+        resultChanges={tableData.LargestRemainderAssignment.resultChanges}
       />
     );
   },

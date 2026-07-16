@@ -51,13 +51,13 @@ export const AbsoluteMajorityReassignment: StoryObj = {
       candidates_drawn: [],
     } satisfies ApportionmentState;
 
-    const dataset = buildAssignmentTableData(gte19SeatsAndP9.seat_assignment.steps, state);
+    const tableData = buildAssignmentTableData(gte19SeatsAndP9.seat_assignment.steps, state);
     return (
       <HighestAveragesTable
-        steps={dataset.HighestAverageAssignment.steps}
+        steps={tableData.HighestAverageAssignment.steps}
         standings={gte19SeatsAndP9.seat_assignment.standings}
         politicalGroups={gte19SeatsAndP9.election.political_groups}
-        resultChanges={dataset.HighestAverageAssignment.resultChanges}
+        resultChanges={tableData.HighestAverageAssignment.resultChanges}
         state={state}
       />
     );
@@ -190,17 +190,17 @@ export const DrawingLotsForList: StoryObj = {
 
 export const P9BeforeDrawingLots: StoryObj = {
   render: () => {
-    const dataset = buildAssignmentTableData(
+    const tableData = buildAssignmentTableData(
       gte19SeatsAndP9DrawingLots.seat_assignment.steps,
       gte19SeatsAndP9DrawingLots.state,
     );
 
     return (
       <HighestAveragesTable
-        steps={dataset.HighestAverageAssignment.steps}
+        steps={tableData.HighestAverageAssignment.steps}
         standings={gte19SeatsAndP9DrawingLots.seat_assignment.standings}
         politicalGroups={gte19SeatsAndP9DrawingLots.election.political_groups}
-        resultChanges={dataset.HighestAverageAssignment.resultChanges}
+        resultChanges={tableData.HighestAverageAssignment.resultChanges}
         state={gte19SeatsAndP9DrawingLots.state}
       />
     );
@@ -273,16 +273,16 @@ export const P9BeforeDrawingLots: StoryObj = {
 
 export const P9AfterDrawingLots: StoryObj = {
   render: () => {
-    const dataset = buildAssignmentTableData(
+    const tableData = buildAssignmentTableData(
       gte19SeatsAndP9DrawingLots.seat_assignment_after_drawing_lots_seat_reassigned.steps,
       gte19SeatsAndP9DrawingLots.state_after_drawing_lots_seat_reassigned,
     );
     return (
       <HighestAveragesTable
-        steps={dataset.HighestAverageAssignment.steps}
+        steps={tableData.HighestAverageAssignment.steps}
         standings={gte19SeatsAndP9DrawingLots.seat_assignment_after_drawing_lots_seat_reassigned.standings}
         politicalGroups={gte19SeatsAndP9DrawingLots.election.political_groups}
-        resultChanges={dataset.HighestAverageAssignment.resultChanges}
+        resultChanges={tableData.HighestAverageAssignment.resultChanges}
         state={gte19SeatsAndP9DrawingLots.state_after_drawing_lots_seat_reassigned}
       />
     );

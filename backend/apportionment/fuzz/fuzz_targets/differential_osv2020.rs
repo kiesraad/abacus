@@ -195,8 +195,12 @@ fn fuzz(data: FuzzedApportionmentInput) {
 
     let (abacus_result, abacus_log) = run_with_log(|| process(&data));
 
-    // Skip cases where there are fewer than 19 seats and both art. P 9 (absolute majority) and art. P 10 (list exhaustion) are applied.
-    // Reason is that Abacus does not include the P 9-seat for the max. one seat requirement when assiging residual seats.
+    // Skip cases where there are fewer than 19 seats and both art. P 9 (absolute majority) and
+    // art. P 10 (list exhaustion) are applied.
+    //
+    // Reason is that Abacus does not include the P 9-seat for the max. one seat requirement when
+    // re-assigning residual seats that were freed up after list exhaustion.
+    //
     // related issue: #3219
     if data.seats < 19
         && osv2020_log
@@ -229,13 +233,19 @@ fn fuzz(data: FuzzedApportionmentInput) {
                     }
                 }
                 Osv2020Result::Conflict => {
-                    // OSV2020 can require a drawing lots (P 7) for a residual seat while
+                    // OSV2020 can require a drawing lots for a residual seat while
                     // Abacus assigns it directly.
                     //
                     // This is because OSV2020 does not enforce list exhaustion (P 10) during
                     // its residual seat assignment, it only retracts seats after assigning.
                     // Abacus will not assign a residual seat to a list that is already
                     // exhausted, so it never sees the same drawing lots.
+                    //
+                    // Note that while the OSV2020 log line about drawing of lots ("Auslosung
+                    // bezüglich P7") might suggest it only applies to elections with a total
+                    // number of 19 seats or more, this is not the case. It can also emit this log
+                    // line for elections with fewer than 19 seats, while applying the method of
+                    // highest averages.
                     //
                     // Related issues: #3214, #3219
                     let osv_p7_conflict = osv2020_log
@@ -272,8 +282,13 @@ fn fuzz(data: FuzzedApportionmentInput) {
                     );
                 }
                 Osv2020Result::Conflict => {
-                    // OSV2020 assigns residual seats to exhausted lists via drawing of lots,
-                    // so accept if Abacus also applied list exhaustion.
+                    // After list exhaustion it's possible both OSV2020 and Abacus require drawing
+                    // of lots, but with different options. So accept if Abacus applied list exhaustion.
+                    //
+                    // This is because OSV2020 does not enforce list exhaustion (P 10) during
+                    // its residual seat assignment, it only retracts seats after assigning.
+                    // Abacus will not assign a residual seat to a list that is already
+                    // exhausted, so it will have fewer options for the draw.
                     //
                     // Related issues: #3214, #3367
                     if abacus_applied_list_exhaustion(&abacus_log) {

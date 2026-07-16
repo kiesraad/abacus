@@ -199,7 +199,7 @@ fn fuzz(data: FuzzedApportionmentInput) {
     // art. P 10 (list exhaustion) are applied.
     //
     // Reason is that Abacus does not include the P 9-seat for the max. one seat requirement when
-    // re-assiging residual seats that were freed up after list exhaustion.
+    // re-assigning residual seats that were freed up after list exhaustion.
     //
     // related issue: #3219
     if data.seats < 19

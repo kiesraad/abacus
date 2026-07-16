@@ -1,9 +1,9 @@
 import type { StoryObj } from "@storybook/react-vite";
 import { expect } from "storybook/test";
+import type { ApportionmentState } from "@/types/generated/openapi";
 import * as lt19Seats from "../../testing/lt-19-seats";
 import * as lt19SeatsAndP10AndDeceasedCandidates from "../../testing/lt-19-seats-and-p10-and-deceased-candidates";
-import { getResultChanges, splitResultChanges } from "../../utils/seat-change";
-import { isAbsoluteMajorityReassignmentStep, isListExhaustionRemovalStep } from "../../utils/steps";
+import { buildAssignmentTableData } from "../../utils/seat-change";
 import { UniqueHighestAveragesTable } from "./UniqueHighestAveragesTable";
 
 export const Default: StoryObj = {
@@ -37,34 +37,21 @@ export const Default: StoryObj = {
 
 export const P10: StoryObj = {
   render: () => {
-    const absoluteMajorityReassignment = lt19SeatsAndP10AndDeceasedCandidates.seat_assignment.steps.find(
-      isAbsoluteMajorityReassignmentStep,
-    );
-    const listExhaustionSteps =
-      lt19SeatsAndP10AndDeceasedCandidates.seat_assignment.steps.filter(isListExhaustionRemovalStep);
-    const residualSeatRemovalSteps = listExhaustionSteps.filter((step) => !step.change.full_seat);
-    const largestRemainderSteps = lt19SeatsAndP10AndDeceasedCandidates.largest_remainder_steps;
-    const resultChanges = getResultChanges(
-      [],
-      {
-        type: "Finalised",
-        deceased_candidates: [],
-        lists_drawn: [],
-        candidates_drawn: [],
-      },
-      absoluteMajorityReassignment,
-      residualSeatRemovalSteps,
-    );
-    const { uniqueHighestAverageResultChanges } = splitResultChanges(resultChanges, largestRemainderSteps);
+    const state = {
+      type: "Finalised",
+      deceased_candidates: [],
+      lists_drawn: [],
+      candidates_drawn: [],
+    } satisfies ApportionmentState;
+    const dataset = buildAssignmentTableData(lt19SeatsAndP10AndDeceasedCandidates.seat_assignment.steps, state);
+
     return (
       <UniqueHighestAveragesTable
-        steps={lt19SeatsAndP10AndDeceasedCandidates.unique_highest_averages_steps_part_1.concat(
-          lt19SeatsAndP10AndDeceasedCandidates.unique_highest_averages_steps_part_2,
-        )}
-        largestRemainderSteps={largestRemainderSteps}
+        steps={dataset.UniqueHighestAverageAssignment.steps}
+        largestRemainderSteps={dataset.LargestRemainderAssignment.steps}
         standings={lt19SeatsAndP10AndDeceasedCandidates.seat_assignment.standings}
         politicalGroups={lt19SeatsAndP10AndDeceasedCandidates.election.political_groups}
-        resultChanges={uniqueHighestAverageResultChanges}
+        resultChanges={dataset.UniqueHighestAverageAssignment.resultChanges}
       />
     );
   },

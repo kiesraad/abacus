@@ -5,14 +5,7 @@ import { t, tx } from "@/i18n/translate";
 import type { ApportionmentState, PoliticalGroup, SeatAssignment } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 import { useApportionmentContext } from "../../hooks/useApportionmentContext";
-import { getResultChanges, splitResultChanges } from "../../utils/seat-change";
-import {
-  getRemovalSteps,
-  isAbsoluteMajorityReassignmentStep,
-  isHighestAverageAssignmentStep,
-  isLargestRemainderAssignmentStep,
-  isUniqueHighestAverageAssignmentStep,
-} from "../../utils/steps";
+import { buildAssignmentTableData } from "../../utils/seat-change";
 import { apportionmentCheckStateAndRedirect, renderTitleAndHeader } from "../../utils/utils";
 import cls from "../Apportionment.module.css";
 import { ApportionmentErrorPage } from "../ApportionmentError";
@@ -53,23 +46,16 @@ interface CouncilSectionProps {
 }
 
 function SmallCouncilSection({ seatAssignment, politicalGroups, state }: CouncilSectionProps) {
-  const absoluteMajorityStep = seatAssignment.steps.find(isAbsoluteMajorityReassignmentStep);
-  const uniqueHighestAverageSteps = seatAssignment.steps.filter(isUniqueHighestAverageAssignmentStep);
-  const largestRemainderSteps = seatAssignment.steps.filter(isLargestRemainderAssignmentStep);
-  const highestAverageSteps = seatAssignment.steps.filter(isHighestAverageAssignmentStep);
+  const dataset = buildAssignmentTableData(seatAssignment.steps, state);
+  console.log("dataset", dataset);
 
-  const { residualSeatRemovalSteps, listsWithFullSeatsRemoved } = getRemovalSteps(seatAssignment);
-  const resultChanges = getResultChanges(
-    listsWithFullSeatsRemoved,
-    state,
-    absoluteMajorityStep,
-    residualSeatRemovalSteps,
-  );
+  const largestRemainderSteps = dataset.LargestRemainderAssignment.steps;
+  const largestRemainderResultChanges = dataset.LargestRemainderAssignment.resultChanges;
 
-  const { largestRemainderResultChanges, uniqueHighestAverageResultChanges } = splitResultChanges(
-    resultChanges,
-    largestRemainderSteps,
-  );
+  const uniqueHighestAverageSteps = dataset.UniqueHighestAverageAssignment.steps;
+  const uniqueHighestAverageResultChanges = dataset.UniqueHighestAverageAssignment.resultChanges;
+
+  const highestAverageSteps = dataset.HighestAverageAssignment.steps;
 
   return (
     <>
@@ -125,16 +111,10 @@ function SmallCouncilSection({ seatAssignment, politicalGroups, state }: Council
 }
 
 function LargeCouncilSection({ seatAssignment, politicalGroups, state }: CouncilSectionProps) {
-  const absoluteMajorityStep = seatAssignment.steps.find(isAbsoluteMajorityReassignmentStep);
-  const highestAverageSteps = seatAssignment.steps.filter(isHighestAverageAssignmentStep);
+  const dataset = buildAssignmentTableData(seatAssignment.steps, state);
 
-  const { residualSeatRemovalSteps, listsWithFullSeatsRemoved } = getRemovalSteps(seatAssignment);
-  const resultChanges = getResultChanges(
-    listsWithFullSeatsRemoved,
-    state,
-    absoluteMajorityStep,
-    residualSeatRemovalSteps,
-  );
+  const highestAverageSteps = dataset.HighestAverageAssignment.steps;
+  const resultChanges = dataset.HighestAverageAssignment.resultChanges;
 
   return (
     <div>

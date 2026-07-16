@@ -5,8 +5,7 @@ import * as gte19Seats from "../../testing/gte-19-seats";
 import * as gte19SeatsAndP7DrawingLots from "../../testing/gte-19-seats-and-p7-drawing-lots";
 import * as gte19SeatsAndP9 from "../../testing/gte-19-seats-and-p9";
 import * as gte19SeatsAndP9DrawingLots from "../../testing/gte-19-seats-and-p9-drawing-lots-and-deceased-candidates";
-import { getResultChanges } from "../../utils/seat-change";
-import { isAbsoluteMajorityReassignmentStep } from "../../utils/steps";
+import { buildAssignmentTableData } from "../../utils/seat-change";
 import { HighestAveragesTable } from "./HighestAveragesTable";
 
 export const Default: StoryObj = {
@@ -45,22 +44,20 @@ export const Default: StoryObj = {
 
 export const AbsoluteMajorityReassignment: StoryObj = {
   render: () => {
-    const absoluteMajorityReassignment =
-      gte19SeatsAndP9DrawingLots.seat_assignment_after_drawing_lots_seat_reassigned.steps.find(
-        isAbsoluteMajorityReassignmentStep,
-      );
     const state = {
       type: "Finalised",
       deceased_candidates: [],
       lists_drawn: [],
       candidates_drawn: [],
     } satisfies ApportionmentState;
+
+    const dataset = buildAssignmentTableData(gte19SeatsAndP9.seat_assignment.steps, state);
     return (
       <HighestAveragesTable
-        steps={gte19SeatsAndP9.highest_averages_steps}
+        steps={dataset.HighestAverageAssignment.steps}
         standings={gte19SeatsAndP9.seat_assignment.standings}
         politicalGroups={gte19SeatsAndP9.election.political_groups}
-        resultChanges={getResultChanges([], state, absoluteMajorityReassignment)}
+        resultChanges={dataset.HighestAverageAssignment.resultChanges}
         state={state}
       />
     );
@@ -193,12 +190,17 @@ export const DrawingLotsForList: StoryObj = {
 
 export const P9BeforeDrawingLots: StoryObj = {
   render: () => {
+    const dataset = buildAssignmentTableData(
+      gte19SeatsAndP9DrawingLots.seat_assignment.steps,
+      gte19SeatsAndP9DrawingLots.state,
+    );
+
     return (
       <HighestAveragesTable
-        steps={gte19SeatsAndP9DrawingLots.steps}
+        steps={dataset.HighestAverageAssignment.steps}
         standings={gte19SeatsAndP9DrawingLots.seat_assignment.standings}
         politicalGroups={gte19SeatsAndP9DrawingLots.election.political_groups}
-        resultChanges={getResultChanges([], gte19SeatsAndP9DrawingLots.state)}
+        resultChanges={dataset.HighestAverageAssignment.resultChanges}
         state={gte19SeatsAndP9DrawingLots.state}
       />
     );
@@ -271,20 +273,16 @@ export const P9BeforeDrawingLots: StoryObj = {
 
 export const P9AfterDrawingLots: StoryObj = {
   render: () => {
-    const absoluteMajorityReassignment =
-      gte19SeatsAndP9DrawingLots.seat_assignment_after_drawing_lots_seat_reassigned.steps.find(
-        isAbsoluteMajorityReassignmentStep,
-      );
+    const dataset = buildAssignmentTableData(
+      gte19SeatsAndP9DrawingLots.seat_assignment_after_drawing_lots_seat_reassigned.steps,
+      gte19SeatsAndP9DrawingLots.state_after_drawing_lots_seat_reassigned,
+    );
     return (
       <HighestAveragesTable
-        steps={gte19SeatsAndP9DrawingLots.steps}
+        steps={dataset.HighestAverageAssignment.steps}
         standings={gte19SeatsAndP9DrawingLots.seat_assignment_after_drawing_lots_seat_reassigned.standings}
         politicalGroups={gte19SeatsAndP9DrawingLots.election.political_groups}
-        resultChanges={getResultChanges(
-          [],
-          gte19SeatsAndP9DrawingLots.state_after_drawing_lots_seat_reassigned,
-          absoluteMajorityReassignment,
-        )}
+        resultChanges={dataset.HighestAverageAssignment.resultChanges}
         state={gte19SeatsAndP9DrawingLots.state_after_drawing_lots_seat_reassigned}
       />
     );

@@ -28,6 +28,7 @@ export function Footnotes({ seatAssignment, state }: FootnotesProps) {
     return null;
   }
 
+  // Uses the same order as buildAssignmentTableData in seat-change.tsx
   return (
     <ol id="footnotes-list" className={cn(cls.footnotesList, "w-39")}>
       {listsWithFullSeatsRemoved.map((listNumber) => {

@@ -24,6 +24,7 @@ struct ApportionmentRequest {
 enum ApportionmentResponse {
     Seats {
         seats: Vec<u32>,
+        candidates: Vec<[u32; 2]>,
         log: Vec<String>,
     },
     Conflict {
@@ -43,7 +44,10 @@ static OSV2020_WRAPPER: OnceLock<Mutex<Osv2020WrapperProcess>> = OnceLock::new()
 
 #[derive(Debug)]
 enum Osv2020Result {
-    Allocated(Vec<u32>),
+    Allocated {
+        seats: Vec<u32>,
+        candidates: Vec<[u32; 2]>,
+    },
     Conflict,
 }
 
@@ -72,7 +76,11 @@ fn osv2020_apportionment(
 
     let resp: ApportionmentResponse = serde_json::from_str(&response).unwrap();
     match resp {
-        ApportionmentResponse::Seats { seats, log } => (Osv2020Result::Allocated(seats), log),
+        ApportionmentResponse::Seats {
+            seats,
+            candidates,
+            log,
+        } => (Osv2020Result::Allocated { seats, candidates }, log),
         ApportionmentResponse::Conflict { log, .. } => (Osv2020Result::Conflict, log),
     }
 }
@@ -220,7 +228,11 @@ fn fuzz(data: FuzzedApportionmentInput) {
             let abacus_seats = get_total_seats(&output.seat_assignment);
 
             match osv2020_result {
-                Osv2020Result::Allocated(osv2020_seats) => {
+                Osv2020Result::Allocated {
+                    seats: osv2020_seats,
+                    candidates: osv2020_candidates,
+                } => {
+		    // Compare seat allocation
                     if abacus_seats != osv2020_seats {
                         report_mismatch(
                             &data,
@@ -229,6 +241,31 @@ fn fuzz(data: FuzzedApportionmentInput) {
                             &format!("seats: {:?}", osv2020_seats),
                             &osv2020_log,
                             "seat allocation mismatch",
+                        );
+                    }
+
+                    // Compare candidate nomination
+                    let abacus_candidates: Vec<[u32; 2]> = output
+                        .candidate_nomination
+                        .list_candidate_nomination
+                        .iter()
+                        .flat_map(|nomination| {
+                            nomination
+                                .preferential_candidate_nomination
+                                .iter()
+                                .chain(&nomination.other_candidate_nomination)
+                                .map(|cv| [nomination.list_number, cv.number()])
+                        })
+                        .collect();
+
+                    if abacus_candidates != osv2020_candidates {
+                        report_mismatch(
+                            &data,
+                            &format!("candidates: {abacus_candidates:?}"),
+                            &abacus_log,
+                            &format!("candidates: {osv2020_candidates:?}"),
+                            &osv2020_log,
+                            "candidate nomination mismatch",
                         );
                     }
                 }
@@ -271,7 +308,10 @@ fn fuzz(data: FuzzedApportionmentInput) {
             | e @ ApportionmentOutput::CandidateDrawingLotsRequired(..),
         ) => {
             match osv2020_result {
-                Osv2020Result::Allocated(osv2020_seats) => {
+                Osv2020Result::Allocated {
+                    seats: osv2020_seats,
+                    ..
+                } => {
                     report_mismatch(
                         &data,
                         &format!("Err({e:?})"),

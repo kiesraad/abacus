@@ -689,6 +689,7 @@ mod tests {
         /// - List 4: Preferential candidate nomination of candidate 1 and no other candidate nominations
         /// - List 5: Preferential candidate nomination of candidate 3 and no other candidate nominations
         #[test]
+        #[allow(clippy::too_many_lines)]
         fn test_with_lt_19_seats_and_non_consecutive_list_and_candidate_numbers() {
             let quota = Fraction::new(5104, 15);
             let seat_assignment_input =
@@ -812,6 +813,7 @@ mod tests {
         /// - List 4: Preferential candidate nomination of candidate 1 and no other candidate nominations
         /// - List 5: Preferential candidate nomination of candidate 1 and no other candidate nominations
         #[test]
+        #[allow(clippy::too_many_lines)]
         fn test_with_lt_19_seats_and_preferential_candidate_nomination_and_updated_candidate_ranking()
          {
             let quota = Fraction::new(5104, 15);
@@ -901,6 +903,7 @@ mod tests {
         /// - List 4: Preferential candidate nomination of candidate 1 and no other candidate nominations
         /// - List 5: Preferential candidate nomination of candidate 1 and no other candidate nominations
         #[test]
+        #[allow(clippy::too_many_lines)]
         fn test_with_lt_19_seats_and_preferential_candidate_nomination_and_deceased_candidates() {
             let quota = Fraction::new(5104, 15);
             let mut seat_assignment_input = seat_assignment_fixture_with_given_candidate_votes(
@@ -999,6 +1002,7 @@ mod tests {
         /// - List 4: No preferential candidate nominations and other candidate nomination of candidate 1
         /// - List 5: No preferential candidate nominations and other candidate nomination of candidate 1
         #[test]
+        #[allow(clippy::too_many_lines)]
         fn test_with_lt_19_seats_and_no_preferential_candidate_nomination() {
             let quota = Fraction::new(105, 5);
             let seat_assignment_input = seat_assignment_fixture_with_given_candidate_votes(
@@ -1074,6 +1078,7 @@ mod tests {
         /// - List 4: No preferential candidate nominations and other candidate nomination of candidate 1
         /// - List 5: No preferential candidate nominations and other candidate nomination of candidate 1
         #[test]
+        #[allow(clippy::too_many_lines)]
         fn test_with_lt_19_seats_and_no_preferential_candidate_nomination_and_deceased_candidates()
         {
             let quota = Fraction::new(105, 5);
@@ -1233,7 +1238,7 @@ mod tests {
         /// - 2 total seats, 200 total votes, quota is 100 votes, preference threshold is 50% so 50 votes
         /// - List seats: [2]
         /// - List 1: Preferential candidate nomination of candidate 1 (60 votes > threshold) only,
-        ///           candidate 2 (50 votes == threshold) is nominated via the 'other' route
+        ///   candidate 2 (50 votes == threshold) is nominated via the 'other' route
         #[test]
         fn test_lt_19_seats_candidate_votes_equals_threshold() {
             let quota = Fraction::new(100, 1);
@@ -1284,6 +1289,7 @@ mod tests {
         /// - List 4: Preferential candidate nominations of candidates 1 and 2 and no other candidate nominations
         /// - List 5: No preferential candidate nominations and no other candidate nomination
         #[test]
+        #[allow(clippy::too_many_lines)]
         fn test_with_gte_19_seats_and_candidate_votes_meeting_preference_threshold_but_no_seat() {
             let quota = Fraction::new(960, 19);
             let seat_assignment_input = seat_assignment_fixture_with_given_candidate_votes(
@@ -1383,6 +1389,7 @@ mod tests {
         /// - List 5: Preferential candidate nomination of candidate 1 and 2 and no other candidate nominations
         ///   - Candidates 4, 5 and 7 also meet the preferential threshold but do not get seats
         #[test]
+        #[allow(clippy::too_many_lines)]
         fn test_with_gte_19_seats_and_more_candidates_eligible_for_preferential_nomination_than_seats()
          {
             let quota = Fraction::new(9500, 19);
@@ -1537,6 +1544,7 @@ mod tests {
         /// - List 8: No preferential candidate nomination and no other candidate nomination
         /// - List 9: Preferential candidate nomination of candidate 1 and no other candidate nomination
         #[test]
+        #[allow(clippy::too_many_lines)]
         fn test_with_gte_19_seats_and_preferential_candidate_nomination_and_updated_candidate_ranking()
          {
             let quota = Fraction::new(23050, 33);

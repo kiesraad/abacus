@@ -1522,6 +1522,288 @@ mod tests {
                 &list_4_not_chosen_candidates,
             );
         }
+
+        /// Candidate nomination with ranking change due to preferential candidate nomination
+        ///
+        /// Actual case from GR2026  
+        /// List seats: [13, 7, 2, 4, 1, 3, 2, 0, 1]
+        /// - List 1: Preferential candidate nomination of candidates 1, 26, 3, 2, 8, 5, 4, 11, 9, 12 and 25 and other candidate nomination of candidates 6 and 7
+        /// - List 2: Preferential candidate nomination of candidates 1, 2, 3 and 5 and other candidate nomination of candidates 4, 6 and 7
+        /// - List 3: Preferential candidate nomination of candidates 1 and 8 and no other candidate nomination
+        /// - List 4: Preferential candidate nomination of candidate 1, 2 and 3 and other candidate nomination of candidate 4
+        /// - List 5: Preferential candidate nomination of candidate 1 and no other candidate nomination
+        /// - List 6: Preferential candidate nomination of candidates 1, 3 and 2 and no other candidate nomination
+        /// - List 7: Preferential candidate nomination of candidate 1 and other candidate nomination of candidate 2
+        /// - List 8: No preferential candidate nomination and no other candidate nomination
+        /// - List 9: Preferential candidate nomination of candidate 1 and no other candidate nomination
+        #[test]
+        fn test_with_gte_19_seats_and_preferential_candidate_nomination_and_updated_candidate_ranking()
+         {
+            let quota = Fraction::new(23050, 33);
+            let seat_assignment_input = seat_assignment_fixture_with_given_candidate_votes(
+                33,
+                vec![
+                    vec![
+                        1596, 870, 1023, 298, 477, 86, 118, 714, 283, 133, 286, 256, 104, 45, 17,
+                        41, 126, 18, 144, 89, 11, 64, 30, 22, 188, 1229,
+                    ],
+                    vec![
+                        3104, 310, 280, 110, 280, 137, 166, 68, 20, 124, 34, 12, 11, 22, 33, 6, 6,
+                        6, 14, 12, 14, 16, 1, 1, 4, 6, 8, 3, 3, 5, 4, 2, 6, 5, 2, 1, 7, 1, 1, 3, 6,
+                        3, 9, 9, 17,
+                    ],
+                    vec![
+                        547, 123, 165, 224, 93, 14, 8, 228, 17, 23, 109, 2, 27, 40, 3, 8, 44, 13,
+                        25, 10, 8, 10, 13, 14, 7, 34, 42,
+                    ],
+                    vec![
+                        730, 288, 218, 84, 159, 144, 37, 62, 109, 27, 41, 52, 16, 39, 34, 43, 33,
+                        18, 38, 14, 31, 14, 17, 22, 50, 17, 34, 7, 51, 157,
+                    ],
+                    vec![
+                        631, 58, 99, 19, 31, 25, 11, 13, 14, 23, 8, 1, 23, 3, 14, 15, 86,
+                    ],
+                    vec![
+                        628, 181, 212, 75, 69, 86, 65, 68, 13, 30, 80, 67, 5, 16, 14, 19, 11, 22,
+                        33, 14, 5, 34, 19, 24, 4, 11, 47,
+                    ],
+                    vec![882, 91, 106, 21, 80, 43, 19, 8, 5, 36, 9, 1, 13, 23],
+                    vec![
+                        264, 134, 27, 29, 5, 19, 25, 6, 8, 16, 5, 2, 2, 0, 5, 5, 6, 3, 3, 9,
+                    ],
+                    vec![
+                        242, 21, 140, 44, 5, 15, 5, 30, 60, 7, 10, 20, 3, 6, 0, 2, 0, 7,
+                    ],
+                ],
+            );
+            let input = candidate_nomination_fixture_with_given_number_of_seats(
+                quota,
+                &seat_assignment_input,
+                vec![13, 7, 2, 4, 1, 3, 2, 0, 1],
+            );
+            let Ok(CandidateNomination::Completed(result)) =
+                candidate_nomination(&input, &mut iter::empty::<&CandidateDrawnMock>())
+            else {
+                panic!("should be completed");
+            };
+
+            assert_eq!(result.preference_threshold.percentage, 25);
+            assert_eq!(
+                result.preference_threshold.number_of_votes,
+                quota * Fraction::new(result.preference_threshold.percentage, 100)
+            );
+            let list_0_preferential_nominated_candidate_numbers =
+                &[1, 26, 3, 2, 8, 5, 4, 11, 9, 12, 25];
+            let list_0_other_nominated_candidate_numbers = &[6, 7];
+            check_list_candidate_nomination(
+                &result.list_candidate_nomination[0],
+                list_0_preferential_nominated_candidate_numbers,
+                list_0_other_nominated_candidate_numbers,
+                &[
+                    1, 26, 3, 2, 8, 5, 4, 11, 9, 12, 25, 6, 7, 10, 13, 14, 15, 16, 17, 18, 19, 20,
+                    21, 22, 23, 24,
+                ],
+            );
+
+            let list_1_preferential_nominated_candidate_numbers = &[1, 2, 3, 5];
+            let list_1_other_nominated_candidate_numbers = &[4, 6, 7];
+            check_list_candidate_nomination(
+                &result.list_candidate_nomination[1],
+                list_1_preferential_nominated_candidate_numbers,
+                list_1_other_nominated_candidate_numbers,
+                &[
+                    1, 2, 3, 5, 4, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
+                    23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42,
+                    43, 44, 45,
+                ],
+            );
+
+            let list_2_preferential_nominated_candidate_numbers = &[1, 8];
+            let list_2_other_nominated_candidate_numbers = &[];
+            check_list_candidate_nomination(
+                &result.list_candidate_nomination[2],
+                list_2_preferential_nominated_candidate_numbers,
+                list_2_other_nominated_candidate_numbers,
+                &[
+                    1, 8, 4, 2, 3, 5, 6, 7, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
+                    23, 24, 25, 26, 27,
+                ],
+            );
+
+            let list_3_preferential_nominated_candidate_numbers = &[1, 2, 3];
+            let list_3_other_nominated_candidate_numbers = &[4];
+            check_list_candidate_nomination(
+                &result.list_candidate_nomination[3],
+                list_3_preferential_nominated_candidate_numbers,
+                list_3_other_nominated_candidate_numbers,
+                &[],
+            );
+
+            let list_4_preferential_nominated_candidate_numbers = &[1];
+            let list_4_other_nominated_candidate_numbers = &[];
+            check_list_candidate_nomination(
+                &result.list_candidate_nomination[4],
+                list_4_preferential_nominated_candidate_numbers,
+                list_4_other_nominated_candidate_numbers,
+                &[],
+            );
+
+            let list_5_preferential_nominated_candidate_numbers = &[1, 3, 2];
+            let list_5_other_nominated_candidate_numbers = &[];
+            check_list_candidate_nomination(
+                &result.list_candidate_nomination[5],
+                list_5_preferential_nominated_candidate_numbers,
+                list_5_other_nominated_candidate_numbers,
+                &[
+                    1, 3, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
+                    23, 24, 25, 26, 27,
+                ],
+            );
+
+            let list_6_preferential_nominated_candidate_numbers = &[1];
+            let list_6_other_nominated_candidate_numbers = &[2];
+            check_list_candidate_nomination(
+                &result.list_candidate_nomination[6],
+                list_6_preferential_nominated_candidate_numbers,
+                list_6_other_nominated_candidate_numbers,
+                &[],
+            );
+
+            let list_7_preferential_nominated_candidate_numbers = &[];
+            let list_7_other_nominated_candidate_numbers = &[];
+            check_list_candidate_nomination(
+                &result.list_candidate_nomination[7],
+                list_7_preferential_nominated_candidate_numbers,
+                list_7_other_nominated_candidate_numbers,
+                &[],
+            );
+
+            let list_8_preferential_nominated_candidate_numbers = &[1];
+            let list_8_other_nominated_candidate_numbers = &[];
+            check_list_candidate_nomination(
+                &result.list_candidate_nomination[8],
+                list_8_preferential_nominated_candidate_numbers,
+                list_8_other_nominated_candidate_numbers,
+                &[],
+            );
+
+            let (list_0_chosen_candidates, list_0_not_chosen_candidates) =
+                get_chosen_and_not_chosen_candidates_for_a_list(
+                    &input.list_votes[0].candidate_votes,
+                    list_0_preferential_nominated_candidate_numbers,
+                    list_0_other_nominated_candidate_numbers,
+                );
+            check_chosen_candidates(
+                &result.chosen_candidates,
+                input.list_votes[0].number,
+                &list_0_chosen_candidates,
+                &list_0_not_chosen_candidates,
+            );
+
+            let (list_1_chosen_candidates, list_1_not_chosen_candidates) =
+                get_chosen_and_not_chosen_candidates_for_a_list(
+                    &input.list_votes[1].candidate_votes,
+                    list_1_preferential_nominated_candidate_numbers,
+                    list_1_other_nominated_candidate_numbers,
+                );
+            check_chosen_candidates(
+                &result.chosen_candidates,
+                input.list_votes[1].number,
+                &list_1_chosen_candidates,
+                &list_1_not_chosen_candidates,
+            );
+
+            let (list_2_chosen_candidates, list_2_not_chosen_candidates) =
+                get_chosen_and_not_chosen_candidates_for_a_list(
+                    &input.list_votes[2].candidate_votes,
+                    list_2_preferential_nominated_candidate_numbers,
+                    list_2_other_nominated_candidate_numbers,
+                );
+            check_chosen_candidates(
+                &result.chosen_candidates,
+                input.list_votes[2].number,
+                &list_2_chosen_candidates,
+                &list_2_not_chosen_candidates,
+            );
+
+            let (list_3_chosen_candidates, list_3_not_chosen_candidates) =
+                get_chosen_and_not_chosen_candidates_for_a_list(
+                    &input.list_votes[3].candidate_votes,
+                    list_3_preferential_nominated_candidate_numbers,
+                    list_3_other_nominated_candidate_numbers,
+                );
+            check_chosen_candidates(
+                &result.chosen_candidates,
+                input.list_votes[3].number,
+                &list_3_chosen_candidates,
+                &list_3_not_chosen_candidates,
+            );
+
+            let (list_4_chosen_candidates, list_4_not_chosen_candidates) =
+                get_chosen_and_not_chosen_candidates_for_a_list(
+                    &input.list_votes[4].candidate_votes,
+                    list_4_preferential_nominated_candidate_numbers,
+                    list_4_other_nominated_candidate_numbers,
+                );
+            check_chosen_candidates(
+                &result.chosen_candidates,
+                input.list_votes[4].number,
+                &list_4_chosen_candidates,
+                &list_4_not_chosen_candidates,
+            );
+
+            let (list_5_chosen_candidates, list_5_not_chosen_candidates) =
+                get_chosen_and_not_chosen_candidates_for_a_list(
+                    &input.list_votes[5].candidate_votes,
+                    list_5_preferential_nominated_candidate_numbers,
+                    list_5_other_nominated_candidate_numbers,
+                );
+            check_chosen_candidates(
+                &result.chosen_candidates,
+                input.list_votes[5].number,
+                &list_5_chosen_candidates,
+                &list_5_not_chosen_candidates,
+            );
+
+            let (list_6_chosen_candidates, list_6_not_chosen_candidates) =
+                get_chosen_and_not_chosen_candidates_for_a_list(
+                    &input.list_votes[6].candidate_votes,
+                    list_6_preferential_nominated_candidate_numbers,
+                    list_6_other_nominated_candidate_numbers,
+                );
+            check_chosen_candidates(
+                &result.chosen_candidates,
+                input.list_votes[6].number,
+                &list_6_chosen_candidates,
+                &list_6_not_chosen_candidates,
+            );
+
+            let (list_7_chosen_candidates, list_7_not_chosen_candidates) =
+                get_chosen_and_not_chosen_candidates_for_a_list(
+                    &input.list_votes[7].candidate_votes,
+                    list_7_preferential_nominated_candidate_numbers,
+                    list_7_other_nominated_candidate_numbers,
+                );
+            check_chosen_candidates(
+                &result.chosen_candidates,
+                input.list_votes[7].number,
+                &list_7_chosen_candidates,
+                &list_7_not_chosen_candidates,
+            );
+
+            let (list_8_chosen_candidates, list_8_not_chosen_candidates) =
+                get_chosen_and_not_chosen_candidates_for_a_list(
+                    &input.list_votes[8].candidate_votes,
+                    list_8_preferential_nominated_candidate_numbers,
+                    list_8_other_nominated_candidate_numbers,
+                );
+            check_chosen_candidates(
+                &result.chosen_candidates,
+                input.list_votes[8].number,
+                &list_8_chosen_candidates,
+                &list_8_not_chosen_candidates,
+            );
+        }
     }
 
     /// Candidate nomination with more candidates eligible for preferential nomination than seats

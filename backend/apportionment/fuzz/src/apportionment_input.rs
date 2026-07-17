@@ -173,11 +173,7 @@ impl apportionment::ApportionmentInput for FuzzedApportionmentInput {
 }
 
 pub fn get_total_seats(result: &apportionment::SeatAssignmentDetails<u32>) -> Vec<u32> {
-    result
-        .standings
-        .iter()
-        .map(|p| p.total_seats)
-        .collect()
+    result.standings.iter().map(|p| p.total_seats).collect()
 }
 
 impl fmt::Debug for FuzzedApportionmentInput {

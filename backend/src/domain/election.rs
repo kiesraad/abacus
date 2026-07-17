@@ -263,27 +263,20 @@ impl From<RegisteredPoliticalGroup> for PoliticalGroup {
 
 fn political_group_name(registered_name: &str, candidates: &[Candidate]) -> String {
     if registered_name.is_empty() {
-        let mut name = String::new();
         let first_candidate = candidates
             .first()
             .expect("At least 1 candidate should be present");
 
-        let mut last_name = String::new();
+        let mut name = format!(
+            "{}, {}",
+            first_candidate.last_name, first_candidate.initials
+        );
 
         if let Some(last_name_prefix) = &first_candidate.last_name_prefix {
-            last_name.push_str(&format!(
-                "{} {}",
-                last_name_prefix, first_candidate.last_name
-            ));
-        } else {
-            last_name.push_str(&first_candidate.last_name.to_string());
+            name.push_str(&format!(" {}", last_name_prefix));
         }
 
-        name.push_str(&format!(
-            "Blanco ({}, {})",
-            last_name, first_candidate.initials
-        ));
-        name
+        format!("Blanco ({})", name)
     } else {
         registered_name.to_string()
     }
@@ -394,5 +387,57 @@ pub(crate) mod tests {
             political_groups_candidates,
             29,
         )
+    }
+
+    fn candidate_fixture(last_name_prefix: Option<&str>) -> Candidate {
+        Candidate {
+            number: CandidateNumber::from(1),
+            initials: "A.B.".to_string(),
+            first_name: Some("Anne".to_string()),
+            last_name_prefix: last_name_prefix.map(str::to_string),
+            last_name: "Boer".to_string(),
+            locality: "Juinen".to_string(),
+            country_code: None,
+            gender: None,
+        }
+    }
+
+    #[test]
+    fn test_political_group_name_with_registered_name() {
+        assert_eq!(
+            political_group_name("Vurige Vleugels Partij", &[candidate_fixture(Some("de"))]),
+            "Vurige Vleugels Partij"
+        );
+    }
+
+    #[test]
+    fn test_political_group_name_empty_registered_name() {
+        assert_eq!(
+            political_group_name("", &[candidate_fixture(None)]),
+            "Blanco (Boer, A.B.)"
+        );
+    }
+
+    #[test]
+    fn test_political_group_name_empty_registered_name_with_last_name_prefix() {
+        assert_eq!(
+            political_group_name("", &[candidate_fixture(Some("de"))]),
+            "Blanco (Boer, A.B. de)"
+        );
+    }
+
+    #[test]
+    fn test_political_group_name_uses_first_candidate() {
+        let second_candidate = Candidate {
+            number: CandidateNumber::from(2),
+            initials: "C.D.".to_string(),
+            last_name: "Visser".to_string(),
+            ..candidate_fixture(None)
+        };
+
+        assert_eq!(
+            political_group_name("", &[candidate_fixture(Some("de")), second_candidate]),
+            "Blanco (Boer, A.B. de)"
+        );
     }
 }

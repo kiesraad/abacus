@@ -393,24 +393,24 @@
   if election_candidate == none {
     return name
   }
-
-  if "last_name_prefix" in election_candidate {
-    name += election_candidate.last_name_prefix + " "
-  }
-
-  name += election_candidate.last_name + ", " + election_candidate.initials + " "
+  
+  name += election_candidate.last_name + ", " + election_candidate.initials
 
   if "first_name" in election_candidate and with_first_name {
-    name += "(" + election_candidate.first_name + ") "
+    name += " (" + election_candidate.first_name + ")"
+  }
+
+  if "last_name_prefix" in election_candidate {
+    name += " " + election_candidate.last_name_prefix
   }
 
   if "gender" in election_candidate and with_gender {
     if election_candidate.gender == "Male" {
-      name += "(m)"
+      name += " (m)"
     } else if election_candidate.gender == "Female" {
-      name += "(v)"
+      name += " (v)"
     } else if election_candidate.gender == "X" {
-      name += "(x)"
+      name += " (x)"
     }
   }
 

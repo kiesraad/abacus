@@ -126,11 +126,11 @@ describe("ApportionmentListDetailsPage", () => {
       ["Zetel", "Naam", "Woonplaats", "Aantal stemmen"],
       ["1", "Kok, K. (Karin) (v)", "Test Location", "200"],
       ["2", "Oud, L. (Lidewij) (v)", "Test Location", "138"],
-      ["3", "Van der Weijden, B. (Berta) (v)", "Test Location (BE)", "100"],
+      ["3", "Weijden, B. (Berta) van der (v)", "Test Location (BE)", "100"],
       ["4", "Oud, K. (Klaas) (m)", "Test Location", "60"],
       ["5", "Oud, M. (Marijke) (v)", "Test Location", "55"],
-      ["6", "Van der Weijden, H. (Henk) (m)", "Test Location", "50"],
-      ["7", "De Jong, R. (Rolf) (m)", "Test Location", "50"],
+      ["6", "Weijden, H. (Henk) van der (m)", "Test Location", "50"],
+      ["7", "Jong, R. (Rolf) de (m)", "Test Location", "50"],
       ["8", "Jansen, A. (Arie) (m)", "Test Location", "45"],
       ["9", "Bakker, S. (Sophie) (v)", "Test Location", "40"],
     ]);
@@ -149,8 +149,8 @@ describe("ApportionmentListDetailsPage", () => {
     expect(other_chosen_candidates_table).toHaveTableContent([
       ["Zetel", "Naam", "Woonplaats", "Positie op lijst"],
       ["10", "Oud, J. (Johan) (m)", "Test Location", "2"],
-      ["11", "De Vries, J. (Johan) (m)", "Test Location", "9"],
-      ["12", "Van den Berg, M. (Marijke) (v)", "Test Location", "10"],
+      ["11", "Vries, J. (Johan) de (m)", "Test Location", "9"],
+      ["12", "Berg, M. (Marijke) van den (v)", "Test Location", "10"],
     ]);
 
     expect(
@@ -170,13 +170,13 @@ describe("ApportionmentListDetailsPage", () => {
       ["2", "Oud, J. (Johan) (m)", "Test Location", "20"],
       ["3", "Oud, M. (Marijke) (v)", "Test Location", "55"],
       ["4", "Jansen, A. (Arie) (m)", "Test Location", "45"],
-      ["5", "Van der Weijden, H. (Henk) (m) †", "Test Location", "50"],
-      ["6", "Van der Weijden, B. (Berta) (v)", "Test Location (BE)", "100"],
+      ["5", "Weijden, H. (Henk) van der (m) †", "Test Location", "50"],
+      ["6", "Weijden, B. (Berta) van der (v)", "Test Location (BE)", "100"],
       ["7", "Oud, K. (Klaas) (m)", "Test Location", "60"],
       ["8", "Bakker, S. (Sophie) (v)", "Test Location", "40"],
-      ["9", "De Vries, J. (Johan) (m)", "Test Location", "30"],
-      ["10", "Van den Berg, M. (Marijke) (v)", "Test Location", "20"],
-      ["11", "De Jong, R. (Rolf) (m)", "Test Location", "50"],
+      ["9", "Vries, J. (Johan) de (m)", "Test Location", "30"],
+      ["10", "Berg, M. (Marijke) van den (v)", "Test Location", "20"],
+      ["11", "Jong, R. (Rolf) de (m)", "Test Location", "50"],
       ["12", "Kok, K. (Karin) (v) †", "Test Location", "200"],
     ]);
   });
@@ -232,10 +232,10 @@ describe("ApportionmentListDetailsPage", () => {
     expect(candidates_ranking_table).toHaveTableContent([
       ["Rang", "Naam", "Woonplaats", "Positie op lijst"],
       ["1", "Po, D. (x)", "Test Location", "2"],
-      ["2", "De Vries, W. (Willem) (m)", "Test Location", "3"],
+      ["2", "Vries, W. (Willem) de (m)", "Test Location", "3"],
       ["3", "Kloosterboer, K. (Klaas) (m)", "Test Location", "4"],
       ["4", "Jansen, L. (Liesbeth) (v)", "Test Location", "5"],
-      ["5", "Van den Berg, H. (Henk) (m)", "Test Location", "6"],
+      ["5", "Berg, H. (Henk) van den (m)", "Test Location", "6"],
     ]);
 
     expect(await screen.findByRole("heading", { level: 2, name: "Totaal aantal stemmen per kandidaat" })).toBeVisible();
@@ -245,10 +245,10 @@ describe("ApportionmentListDetailsPage", () => {
       ["Nummer", "Kandidaat", "Woonplaats", "Aantal stemmen"],
       ["1", "Bakker, T. (Tinus) (m)", "Test Location (BE)", "20"],
       ["2", "Po, D. (x)", "Test Location", "15"],
-      ["3", "De Vries, W. (Willem) (m) †", "Test Location", "5"],
+      ["3", "Vries, W. (Willem) de (m) †", "Test Location", "5"],
       ["4", "Kloosterboer, K. (Klaas) (m)", "Test Location", "3"],
       ["5", "Jansen, L. (Liesbeth) (v)", "Test Location", "2"],
-      ["6", "Van den Berg, H. (Henk) (m)", "Test Location", "15"],
+      ["6", "Berg, H. (Henk) van den (m)", "Test Location", "15"],
     ]);
   });
 
@@ -393,7 +393,7 @@ describe("ApportionmentListDetailsPage", () => {
         ["1", "Wolfswinkel, G. (Gijsbertje) (x)", "Eemstricht", "1"],
         ["2", "Güneş, İ. (İlknur) (x)", "Eksterlo", "3"],
         ["3", "Güneş, K. (Kris) (x)", "Lekkum", "4"],
-        ["4", "Den Mateman, L. (Leontien) (v)", "Bloemstede", "5"],
+        ["4", "Mateman, L. (Leontien) den (v)", "Bloemstede", "5"],
         ["5", "Wiertz, Q.U.E. (Rachid) (v)", "Bloemstede", "6"],
       ]);
 
@@ -408,7 +408,7 @@ describe("ApportionmentListDetailsPage", () => {
         ["2", "Wolfswinkel, R. (Ruth) (x)", "'s Gravenveen", "300"],
         ["3", "Güneş, İ. (İlknur) (x)", "Eksterlo", "50"],
         ["4", "Güneş, K. (Kris) (x)", "Lekkum", "0"],
-        ["5", "Den Mateman, L. (Leontien) (v)", "Bloemstede", "0"],
+        ["5", "Mateman, L. (Leontien) den (v)", "Bloemstede", "0"],
         ["6", "Wiertz, Q.U.E. (Rachid) (v)", "Bloemstede", "50"],
       ]);
     });
@@ -452,8 +452,8 @@ describe("ApportionmentListDetailsPage", () => {
       expect(preferentially_chosen_candidates_table).toHaveTableContent([
         ["Zetel", "Naam", "Woonplaats", "Aantal stemmen"],
         ["1", "Wiertz, İ. (İlknur) (x)", "Bloemstede", "600"],
-        ["2", "Van Lent, E. (Esra) (v)", "Eemstricht", "550"],
-        ["3", "Van der Spek, J.W.Q.Y. (Jelisa) (m)", "Middelgein", "550"],
+        ["2", "Lent, E. (Esra) van (v)", "Eemstricht", "550"],
+        ["3", "Spek, J.W.Q.Y. (Jelisa) van der (m)", "Middelgein", "550"],
         ["4", "Philippen, F.G. (Jory) (v)", "Eemstricht", "500"],
         ["5", "Katsma, S.O. (Sammie) (x)", "Eksterlo", "500"],
       ]);
@@ -479,7 +479,7 @@ describe("ApportionmentListDetailsPage", () => {
       expect(candidates_ranking_table).toBeVisible();
       expect(candidates_ranking_table).toHaveTableContent([
         ["Rang", "Naam", "Woonplaats", "Positie op lijst"],
-        ["1", "Den Mateman, D.P.K. (Damian) (x)", "Lekkum", "3"],
+        ["1", "Mateman, D.P.K. (Damian) den (x)", "Lekkum", "3"],
       ]);
 
       expect(
@@ -490,11 +490,11 @@ describe("ApportionmentListDetailsPage", () => {
       expect(total_votes_per_candidate_table).toHaveTableContent([
         ["Nummer", "Kandidaat", "Woonplaats", "Aantal stemmen"],
         ["1", "Wiertz, İ. (İlknur) (x)", "Bloemstede", "600"],
-        ["2", "Van Lent, E. (Esra) (v)", "Eemstricht", "550"],
-        ["3", "Den Mateman, D.P.K. (Damian) (x)", "Lekkum", "500"],
+        ["2", "Lent, E. (Esra) van (v)", "Eemstricht", "550"],
+        ["3", "Mateman, D.P.K. (Damian) den (x)", "Lekkum", "500"],
         ["4", "Katsma, S.O. (Sammie) (x)", "Eksterlo", "500"],
         ["5", "Philippen, F.G. (Jory) (v)", "Eemstricht", "500"],
-        ["6", "Van der Spek, J.W.Q.Y. (Jelisa) (m)", "Middelgein", "550"],
+        ["6", "Spek, J.W.Q.Y. (Jelisa) van der (m)", "Middelgein", "550"],
       ]);
     });
   });

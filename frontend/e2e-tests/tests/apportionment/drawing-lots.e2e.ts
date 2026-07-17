@@ -98,10 +98,10 @@ test.describe("CSB election apportionment", () => {
     await expect(drawingLotsPage.getListItemByText("Daarom moet er geloot worden wie zetel 1 krijgt")).toBeVisible();
     await expect(drawingLotsPage.instructions).toBeVisible();
     await expect(drawingLotsPage.result).toBeVisible();
-    const candidateOption1 = drawingLotsPage.getOptionByName("1. Van der Spek, C.P.M. (Charèl)");
+    const candidateOption1 = drawingLotsPage.getOptionByName("1. Spek, C.P.M. (Charèl) van der");
     const candidateOption2 = drawingLotsPage.getOptionByName("2. Arets, W.P. (Tjeu)");
-    const candidateOption3 = drawingLotsPage.getOptionByName("3. Van den Arets, X.T. (Xuan)");
-    const candidateOption4 = drawingLotsPage.getOptionByName("4. Van den Eijnden, F.M. (Frédérique)");
+    const candidateOption3 = drawingLotsPage.getOptionByName("3. Arets, X.T. (Xuan) van den");
+    const candidateOption4 = drawingLotsPage.getOptionByName("4. Eijnden, F.M. (Frédérique) van den");
     await expect(candidateOption1).toBeVisible();
     await expect(candidateOption2).toBeVisible();
     await expect(candidateOption3).toBeVisible();
@@ -127,7 +127,7 @@ test.describe("CSB election apportionment", () => {
     await expect(listDetailsPage.header).toContainText("Lijst 2 – Partij voor de Stemmer");
     await expect(listDetailsPage.alert).toBeVisible();
     await expect(listDetailsPage.alert).toContainText(
-      "Zetel 1 is na loting toegewezen aan Kandidaat 3 – Van den Arets, X.T. (Xuan) (er is geloot tussen kandidaat 1, 2, 3 en 4)",
+      "Zetel 1 is na loting toegewezen aan Kandidaat 3 – Arets, X.T. (Xuan) van den (er is geloot tussen kandidaat 1, 2, 3 en 4)",
     );
   });
 

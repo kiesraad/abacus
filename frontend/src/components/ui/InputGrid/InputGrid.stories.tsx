@@ -190,7 +190,7 @@ export const CandidatesGrid: StoryObj<Props> = {
             readOnly={readOnly}
             id="zebra2"
             field="2"
-            title="Van Es, T.J. (Error)"
+            title="Es, T.J. van (Error)"
             value={200}
             errorsAndWarnings={errorsAndWarnings}
           />
@@ -198,7 +198,7 @@ export const CandidatesGrid: StoryObj<Props> = {
             readOnly={readOnly}
             id="zebra3"
             field="3"
-            title="Van Es, K."
+            title="Es, K. van"
             value={3000}
             errorsAndWarnings={errorsAndWarnings}
           />
@@ -206,7 +206,7 @@ export const CandidatesGrid: StoryObj<Props> = {
             readOnly={readOnly}
             id="zebra4"
             field="4"
-            title="Van Yvonne, T. (Warning)"
+            title="Yvonne, T. van (Warning)"
             value={4000}
             errorsAndWarnings={errorsAndWarnings}
           />
@@ -214,7 +214,7 @@ export const CandidatesGrid: StoryObj<Props> = {
             readOnly={readOnly}
             id="zebra5"
             field="5"
-            title="Van Yvonne, W. (Error)"
+            title="Yvonne, W. van (Error)"
             value={5000}
             errorsAndWarnings={errorsAndWarnings}
           />

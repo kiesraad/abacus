@@ -129,13 +129,13 @@ describe("AddDeceasedCandidatesPage", () => {
       ["2", "Oud, J. (Johan)"],
       ["3", "Oud, M. (Marijke)"],
       ["4", "Jansen, A. (Arie)"],
-      ["5", "Van der Weijden, H. (Henk)"],
-      ["6", "Van der Weijden, B. (Berta)"],
+      ["5", "Weijden, H. (Henk) van der"],
+      ["6", "Weijden, B. (Berta) van der"],
       ["7", "Oud, K. (Klaas)"],
       ["8", "Bakker, S. (Sophie)"],
-      ["9", "De Vries, J. (Johan)"],
-      ["10", "Van den Berg, M. (Marijke)"],
-      ["11", "De Jong, R. (Rolf)"],
+      ["9", "Vries, J. (Johan) de"],
+      ["10", "Berg, M. (Marijke) van den"],
+      ["11", "Jong, R. (Rolf) de"],
       ["12", "Kok, K. (Karin)"],
     ]);
 
@@ -224,10 +224,10 @@ describe("AddDeceasedCandidatesPage", () => {
       ["Nummer", "Kandidaat"],
       ["1", "Bakker, T. (Tinus)"],
       ["2", "Po, D."],
-      ["3", "De Vries, W. (Willem)"],
+      ["3", "Vries, W. (Willem) de"],
       ["4", "Kloosterboer, K. (Klaas)"],
       ["5", "Jansen, L. (Liesbeth)"],
-      ["6", "Van den Berg, H. (Henk)"],
+      ["6", "Berg, H. (Henk) van den"],
     ]);
 
     // Check if clicking the row works

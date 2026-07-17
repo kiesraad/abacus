@@ -30,7 +30,7 @@ export const MultipleSeatsAvailable: StoryObj = {
     await expect(listitems[1]).toHaveTextContent(
       "Er zijn 3 kandidaten die op basis van hun voorkeursstemmen in aanmerking komen voor zetel 4. Zij hebben allen 500 stemmen. Het gaat om de kandidaten:",
     );
-    await expect(listitems[2]).toHaveTextContent("3. Den Mateman, D.P.K. (Damian)");
+    await expect(listitems[2]).toHaveTextContent("3. Mateman, D.P.K. (Damian) den");
     await expect(listitems[3]).toHaveTextContent("4. Katsma, S.O. (Sammie)");
     await expect(listitems[4]).toHaveTextContent("5. Philippen, F.G. (Jory)");
     await expect(listitems[5]).toHaveTextContent("Daarom moet er geloot worden wie zetel 4 krijgt");

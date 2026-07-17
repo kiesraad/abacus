@@ -232,7 +232,7 @@ fn fuzz(data: FuzzedApportionmentInput) {
                     seats: osv2020_seats,
                     candidates: osv2020_candidates,
                 } => {
-		    // Compare seat allocation
+                    // Compare seat allocation
                     if abacus_seats != osv2020_seats {
                         report_mismatch(
                             &data,

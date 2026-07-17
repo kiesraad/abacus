@@ -12,7 +12,7 @@ export const Default: StoryObj = {
     return (
       <UniqueHighestAveragesTable
         steps={tableData.UniqueHighestAverageAssignment.steps}
-        largestRemainderSteps={lt19Seats.largest_remainder_steps}
+        largestRemainderSteps={tableData.LargestRemainderAssignment.steps}
         standings={lt19Seats.seat_assignment.standings}
         politicalGroups={lt19Seats.election.political_groups}
         resultChanges={tableData.UniqueHighestAverageAssignment.resultChanges}

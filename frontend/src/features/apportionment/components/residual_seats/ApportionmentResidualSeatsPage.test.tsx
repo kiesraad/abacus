@@ -23,6 +23,7 @@ import * as lt19SeatsAndP9AndP10 from "../../testing/lt-19-seats-and-p9-and-p10"
 import * as lt19SeatsAndP9DrawingLots from "../../testing/lt-19-seats-and-p9-drawing-lots";
 import * as lt19SeatsAndP10 from "../../testing/lt-19-seats-and-p10";
 import * as lt19SeatsAndP10AndDeceasedCandidates from "../../testing/lt-19-seats-and-p10-and-deceased-candidates";
+import * as lt19SeatsAndP15DrawingLots from "../../testing/lt-19-seats-and-p15-drawing-lots";
 import { ApportionmentProvider } from "../ApportionmentProvider";
 import { ApportionmentResidualSeatsPage } from "./ApportionmentResidualSeatsPage";
 
@@ -378,19 +379,21 @@ describe("ApportionmentResidualSeatsPage", () => {
   });
 
   test("Residual seats assignment only largest remainders table visible", async () => {
-    overrideOnce("get", "/api/elections/3", 200, getElectionMockData(lt19Seats.election, lt19Seats.committee_session));
-    overrideOnce("post", "/api/elections/3/apportionment", 200, {
-      seat_assignment: {
-        ...lt19Seats.seat_assignment,
-        steps: lt19Seats.largest_remainder_steps,
-      },
-      candidate_nomination: lt19Seats.candidate_nomination,
-      election_summary: lt19Seats.election_summary,
+    overrideOnce(
+      "get",
+      "/api/elections/11",
+      200,
+      getElectionMockData(lt19SeatsAndP15DrawingLots.election, lt19SeatsAndP15DrawingLots.committee_session),
+    );
+    overrideOnce("post", "/api/elections/11/apportionment", 200, {
+      seat_assignment: lt19SeatsAndP15DrawingLots.seat_assignment,
+      candidate_nomination: lt19SeatsAndP15DrawingLots.candidate_nomination,
+      election_summary: lt19SeatsAndP15DrawingLots.election_summary,
       warnings: [],
     } satisfies ElectionApportionmentResponse);
-    overrideOnce("get", "/api/elections/3/apportionment/state", 200, lt19Seats.state);
+    overrideOnce("get", "/api/elections/11/apportionment/state", 200, lt19SeatsAndP15DrawingLots.state);
 
-    renderApportionmentResidualSeatsPage(3, false);
+    renderApportionmentResidualSeatsPage(11, false);
 
     expect(await screen.findByRole("heading", { level: 1, name: "Verdeling van de restzetels" })).toBeVisible();
 
@@ -404,8 +407,11 @@ describe("ApportionmentResidualSeatsPage", () => {
     expect(largest_remainders_table).toBeVisible();
     expect(largest_remainders_table).toHaveTableContent([
       ["Lijst", "Lijstnaam", "Aantal volle zetels", "Overschot", "Aantal restzetels"],
-      ["1", "Political Group A", "10", "8", "", "1"],
-      ["2", "Political Group B", "0", "60", "", "1"],
+      ["1", "GROEP 8", "5", "233", "5/15", "0"],
+      ["2", "GROEP 9", "3", "520", "", "1"],
+      ["3", "GROEP 10", "2", "313", "5/15", "1"],
+      ["4", "GROEP 11", "2", "13", "5/15", "0"],
+      ["5", "GROEP 12", "1", "106", "10/15", "0"],
     ]);
 
     expect(screen.queryByTestId("highest-averages-table")).not.toBeInTheDocument();

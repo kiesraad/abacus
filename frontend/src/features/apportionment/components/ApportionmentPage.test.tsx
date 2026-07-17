@@ -10,7 +10,6 @@ import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import {
   GetApportionmentStateRequestHandler,
   RegisterDeceasedCandidatesRequestHandler,
-  ResetApportionmentStateRequestHandler,
 } from "@/testing/api-mocks/RequestHandlers";
 import { Providers } from "@/testing/Providers";
 import type { Router } from "@/testing/router";
@@ -30,6 +29,7 @@ import { apportionmentRoutes } from "../routes";
 import * as gte19SeatsAndP7DrawingLots from "../testing/gte-19-seats-and-p7-drawing-lots";
 import * as gte19SeatsAndP9DrawingLots from "../testing/gte-19-seats-and-p9-drawing-lots-and-deceased-candidates";
 import * as lt19Seats from "../testing/lt-19-seats";
+import * as lt19SeatsAndNotAllSeatsAssigned from "../testing/lt-19-seats-and-not-all-seats-assigned";
 import * as lt19SeatsAndP7DrawingLots from "../testing/lt-19-seats-and-p7-drawing-lots";
 import * as lt19SeatsAndP9DrawingLots from "../testing/lt-19-seats-and-p9-drawing-lots";
 import * as lt19SeatsAndP15DrawingLots from "../testing/lt-19-seats-and-p15-drawing-lots";
@@ -297,32 +297,40 @@ describe("ApportionmentPage", () => {
 
   test("Renders yellow warning when finalised but not all seats assigned and clicks reset button", async () => {
     const user = userEvent.setup();
-    server.use(GetApportionmentStateRequestHandler);
-    server.use(ResetApportionmentStateRequestHandler);
-    const resetApportionmentState = spyOnHandler(ResetApportionmentStateRequestHandler);
-    const getApportionmentState = spyOnHandler(GetApportionmentStateRequestHandler);
-    overrideOnce("get", "/api/elections/3", 200, getElectionMockData(lt19Seats.election, lt19Seats.committee_session));
+    const resetApportionmentStateRequestHandler = http.post("/api/elections/13/apportionment/reset", () =>
+      HttpResponse.json({ type: "Uninitialised" } satisfies ApportionmentState, {
+        status: 200,
+      }),
+    );
+    server.use(resetApportionmentStateRequestHandler);
+    const resetApportionmentState = spyOnHandler(resetApportionmentStateRequestHandler);
+    const getApportionmentStateRequestHandler = http.get("/api/elections/13/apportionment/state", () =>
+      HttpResponse.json(gte19SeatsAndP7DrawingLots.state, { status: 200 }),
+    );
+    server.use(getApportionmentStateRequestHandler);
+    const getApportionmentState = spyOnHandler(getApportionmentStateRequestHandler);
+    overrideOnce(
+      "get",
+      "/api/elections/13",
+      200,
+      getElectionMockData(lt19SeatsAndNotAllSeatsAssigned.election, lt19SeatsAndNotAllSeatsAssigned.committee_session),
+    );
     server.use(
-      http.post("/api/elections/3/apportionment", () =>
+      http.post("/api/elections/13/apportionment", () =>
         HttpResponse.json(
           {
-            seat_assignment: lt19Seats.seat_assignment,
-            candidate_nomination: lt19Seats.candidate_nomination,
-            election_summary: lt19Seats.election_summary,
-            warnings: ["NotAllSeatsAssigned"],
+            seat_assignment: lt19SeatsAndNotAllSeatsAssigned.seat_assignment,
+            candidate_nomination: lt19SeatsAndNotAllSeatsAssigned.candidate_nomination,
+            election_summary: lt19SeatsAndNotAllSeatsAssigned.election_summary,
+            warnings: lt19SeatsAndNotAllSeatsAssigned.warnings,
           } satisfies ElectionApportionmentResponse,
           { status: 200 },
         ),
       ),
     );
-    overrideOnce("get", "/api/elections/3/apportionment/state", 200, {
-      deceased_candidates: [],
-      lists_drawn: [],
-      candidates_drawn: [],
-      type: "Finalised",
-    } satisfies ApportionmentState);
+    overrideOnce("get", "/api/elections/13/apportionment/state", 200, lt19SeatsAndNotAllSeatsAssigned.state);
 
-    renderApportionmentPage(3, false);
+    renderApportionmentPage(13, false);
 
     const alerts = await screen.findAllByRole("alert");
     expect(alerts).toHaveLength(2);
@@ -330,6 +338,32 @@ describe("ApportionmentPage", () => {
     alerts.forEach((alert) => {
       expect(alert).not.toHaveTextContent("Alle zetels zijn toegewezen");
     });
+
+    expect(await screen.findByRole("heading", { level: 2, name: "Kengetallen" })).toBeVisible();
+    const election_summary_table = await screen.findByTestId("election-summary-table");
+    expect(election_summary_table).toBeVisible();
+    expect(election_summary_table).toHaveTableContent([
+      ["Kiesgerechtigden", "91", ""],
+      ["Getelde stembiljetten", "60", "Opkomst: 65,93%"],
+      ["Blanco stemmen", "0", ""],
+      ["Ongeldige stemmen", "0", ""],
+      ["Totaal stemmen op kandidaten", "60", ""],
+      ["Aantal raadszetels", "6", ""],
+      ["Kiesdeler", "10", "Benodigde stemmen per volle zetel"],
+      ["Voorkeursdrempel", "5", "50% van de kiesdeler"],
+      ["Kandidaten voor zetelverdeling", "6 - 1 † = 5", "Beheer overleden kandidaten"],
+    ]);
+
+    expect(await screen.findByRole("heading", { level: 2, name: "Zetelverdeling" })).toBeVisible();
+    const apportionment_table = await screen.findByTestId("apportionment-table");
+    expect(apportionment_table).toBeVisible();
+    expect(apportionment_table).toHaveTableContent([
+      ["Lijst", "Lijstnaam", "Volle zetels", "Restzetels", "Totaal zetels"],
+      ["1", "Political Group A", "-", "1", "1"],
+      ["2", "Political Group B", "-", "2", "2"],
+      ["3", "Blanco (Smit, G.)", "2", "-", "2"],
+      ["", "Totaal", "2", "3", "5"],
+    ]);
 
     const finalisedAlert = alerts[1] as HTMLElement;
     await user.click(within(finalisedAlert).getByRole("button", { name: "Zetelverdeling opnieuw doen" }));

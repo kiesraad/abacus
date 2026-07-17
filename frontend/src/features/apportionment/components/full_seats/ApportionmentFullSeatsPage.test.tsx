@@ -94,12 +94,7 @@ describe("ApportionmentFullSeatsPage", () => {
       election_summary: lt19Seats.election_summary,
       warnings: [],
     } satisfies ElectionApportionmentResponse);
-    overrideOnce("get", "/api/elections/3/apportionment/state", 200, {
-      deceased_candidates: [],
-      lists_drawn: [],
-      candidates_drawn: [],
-      type: "Finalised",
-    } satisfies ApportionmentState);
+    overrideOnce("get", "/api/elections/3/apportionment/state", 200, lt19Seats.state);
 
     renderApportionmentFullSeatsPage(3);
 
@@ -149,12 +144,7 @@ describe("ApportionmentFullSeatsPage", () => {
       election_summary: lt19SeatsAndP9AndP10.election_summary,
       warnings: [],
     } satisfies ElectionApportionmentResponse);
-    overrideOnce("get", "/api/elections/4/apportionment/state", 200, {
-      deceased_candidates: [],
-      lists_drawn: [],
-      candidates_drawn: [],
-      type: "Finalised",
-    } satisfies ApportionmentState);
+    overrideOnce("get", "/api/elections/4/apportionment/state", 200, lt19SeatsAndP9AndP10.state);
 
     renderApportionmentFullSeatsPage(4);
 
@@ -194,12 +184,7 @@ describe("ApportionmentFullSeatsPage", () => {
         200,
         getElectionMockData(lt19Seats.election, lt19Seats.committee_session),
       );
-      overrideOnce("get", "/api/elections/3/apportionment/state", 200, {
-        deceased_candidates: [],
-        lists_drawn: [],
-        candidates_drawn: [],
-        type: "Finalised",
-      } satisfies ApportionmentState);
+      overrideOnce("get", "/api/elections/3/apportionment/state", 200, lt19Seats.state);
     });
 
     test("Not available until committee session is completed", async () => {

@@ -1,4 +1,5 @@
 import type {
+  ApportionmentState,
   CandidateNomination,
   CommitteeSession,
   ElectionSummary,
@@ -7,6 +8,13 @@ import type {
   SeatChangeStep,
 } from "@/types/generated/openapi";
 import type { LargestRemainderAssignmentStep } from "../utils/steps";
+
+export const state: ApportionmentState = {
+  type: "Finalised",
+  deceased_candidates: [],
+  lists_drawn: [],
+  candidates_drawn: [],
+};
 
 export const largest_remainder_steps_part_1: LargestRemainderAssignmentStep[] = [
   {

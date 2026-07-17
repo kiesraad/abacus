@@ -52,7 +52,7 @@ export function buildAssignmentTableData(steps: SeatChangeStep[], state: Apporti
 
   let currentTable: AssignmentStepType | undefined;
   for (const step of steps) {
-    // Assign every step to the correct table,
+    // Assign every step to the correct table
     if (isLargestRemainderAssignmentStep(step)) {
       tableData.LargestRemainderAssignment.steps.push(step);
       currentTable = step.change.changed_by;

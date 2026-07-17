@@ -1,6 +1,5 @@
 import type { StoryObj } from "@storybook/react-vite";
 import { expect } from "storybook/test";
-import type { ApportionmentState } from "@/types/generated/openapi";
 import * as lt19Seats from "../../testing/lt-19-seats";
 import * as lt19SeatsAndP9AndP10 from "../../testing/lt-19-seats-and-p9-and-p10";
 import * as lt19SeatsAndP9DrawingLots from "../../testing/lt-19-seats-and-p9-drawing-lots";
@@ -10,12 +9,14 @@ import { LargestRemaindersTable } from "./LargestRemaindersTable";
 
 export const Default: StoryObj = {
   render: () => {
+    const tableData = buildAssignmentTableData(lt19Seats.seat_assignment.steps, lt19Seats.state);
+
     return (
       <LargestRemaindersTable
-        steps={lt19Seats.largest_remainder_steps}
+        steps={tableData.LargestRemainderAssignment.steps}
         standings={lt19Seats.seat_assignment.standings}
         politicalGroups={lt19Seats.election.political_groups}
-        resultChanges={[]}
+        resultChanges={tableData.LargestRemainderAssignment.resultChanges}
       />
     );
   },
@@ -32,13 +33,7 @@ export const Default: StoryObj = {
 
 export const P9AndP10: StoryObj = {
   render: () => {
-    const state = {
-      type: "Finalised",
-      deceased_candidates: [],
-      lists_drawn: [],
-      candidates_drawn: [],
-    } satisfies ApportionmentState;
-    const tableData = buildAssignmentTableData(lt19SeatsAndP9AndP10.seat_assignment.steps, state);
+    const tableData = buildAssignmentTableData(lt19SeatsAndP9AndP10.seat_assignment.steps, lt19SeatsAndP9AndP10.state);
 
     return (
       <LargestRemaindersTable
@@ -127,13 +122,10 @@ export const P9AfterDrawingLots: StoryObj = {
 
 export const P10: StoryObj = {
   render: () => {
-    const state = {
-      type: "Finalised",
-      deceased_candidates: [],
-      lists_drawn: [],
-      candidates_drawn: [],
-    } satisfies ApportionmentState;
-    const tableData = buildAssignmentTableData(lt19SeatsAndP10AndDeceasedCandidates.seat_assignment.steps, state);
+    const tableData = buildAssignmentTableData(
+      lt19SeatsAndP10AndDeceasedCandidates.seat_assignment.steps,
+      lt19SeatsAndP10AndDeceasedCandidates.state,
+    );
 
     return (
       <LargestRemaindersTable

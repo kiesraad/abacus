@@ -116,12 +116,7 @@ describe("ApportionmentResidualSeatsPage", () => {
       election_summary: gte19Seats.election_summary,
       warnings: [],
     } satisfies ElectionApportionmentResponse);
-    overrideOnce("get", "/api/elections/2/apportionment/state", 200, {
-      deceased_candidates: [],
-      lists_drawn: [],
-      candidates_drawn: [],
-      type: "Finalised",
-    } satisfies ApportionmentState);
+    overrideOnce("get", "/api/elections/2/apportionment/state", 200, gte19Seats.state);
 
     renderApportionmentResidualSeatsPage(2, false);
 
@@ -163,12 +158,7 @@ describe("ApportionmentResidualSeatsPage", () => {
       election_summary: gte19SeatsAndP9.election_summary,
       warnings: [],
     } satisfies ElectionApportionmentResponse);
-    overrideOnce("get", "/api/elections/5/apportionment/state", 200, {
-      deceased_candidates: [],
-      lists_drawn: [],
-      candidates_drawn: [],
-      type: "Finalised",
-    } satisfies ApportionmentState);
+    overrideOnce("get", "/api/elections/5/apportionment/state", 200, gte19SeatsAndP9.state);
 
     renderApportionmentResidualSeatsPage(5, false);
 
@@ -291,12 +281,7 @@ describe("ApportionmentResidualSeatsPage", () => {
       election_summary: lt19Seats.election_summary,
       warnings: [],
     } satisfies ElectionApportionmentResponse);
-    overrideOnce("get", "/api/elections/3/apportionment/state", 200, {
-      deceased_candidates: [],
-      lists_drawn: [],
-      candidates_drawn: [],
-      type: "Finalised",
-    } satisfies ApportionmentState);
+    overrideOnce("get", "/api/elections/3/apportionment/state", 200, lt19Seats.state);
 
     renderApportionmentResidualSeatsPage(3, false);
 
@@ -403,12 +388,7 @@ describe("ApportionmentResidualSeatsPage", () => {
       election_summary: lt19Seats.election_summary,
       warnings: [],
     } satisfies ElectionApportionmentResponse);
-    overrideOnce("get", "/api/elections/3/apportionment/state", 200, {
-      deceased_candidates: [],
-      lists_drawn: [],
-      candidates_drawn: [],
-      type: "Finalised",
-    } satisfies ApportionmentState);
+    overrideOnce("get", "/api/elections/3/apportionment/state", 200, lt19Seats.state);
 
     renderApportionmentResidualSeatsPage(3, false);
 
@@ -446,12 +426,7 @@ describe("ApportionmentResidualSeatsPage", () => {
       election_summary: lt19SeatsAndP9AndP10.election_summary,
       warnings: [],
     } satisfies ElectionApportionmentResponse);
-    overrideOnce("get", "/api/elections/4/apportionment/state", 200, {
-      deceased_candidates: [],
-      lists_drawn: [],
-      candidates_drawn: [],
-      type: "Finalised",
-    } satisfies ApportionmentState);
+    overrideOnce("get", "/api/elections/4/apportionment/state", 200, lt19SeatsAndP9AndP10.state);
 
     renderApportionmentResidualSeatsPage(4, false);
 
@@ -507,12 +482,7 @@ describe("ApportionmentResidualSeatsPage", () => {
       election_summary: lt19SeatsAndP10.election_summary,
       warnings: [],
     } satisfies ElectionApportionmentResponse);
-    overrideOnce("get", "/api/elections/6/apportionment/state", 200, {
-      deceased_candidates: [],
-      lists_drawn: [],
-      candidates_drawn: [],
-      type: "Finalised",
-    } satisfies ApportionmentState);
+    overrideOnce("get", "/api/elections/6/apportionment/state", 200, lt19SeatsAndP10.state);
 
     renderApportionmentResidualSeatsPage(6, false);
 

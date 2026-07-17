@@ -1,6 +1,5 @@
 import type { StoryObj } from "@storybook/react-vite";
 import { expect } from "storybook/test";
-import type { ApportionmentState } from "@/types/generated/openapi";
 import * as lt19Seats from "../../testing/lt-19-seats";
 import * as lt19SeatsAndP10AndDeceasedCandidates from "../../testing/lt-19-seats-and-p10-and-deceased-candidates";
 import { buildAssignmentTableData } from "../../utils/seat-change";
@@ -8,13 +7,15 @@ import { UniqueHighestAveragesTable } from "./UniqueHighestAveragesTable";
 
 export const Default: StoryObj = {
   render: () => {
+    const tableData = buildAssignmentTableData(lt19Seats.seat_assignment.steps, lt19Seats.state);
+
     return (
       <UniqueHighestAveragesTable
-        steps={lt19Seats.unique_highest_average_steps}
+        steps={tableData.UniqueHighestAverageAssignment.steps}
         largestRemainderSteps={lt19Seats.largest_remainder_steps}
         standings={lt19Seats.seat_assignment.standings}
         politicalGroups={lt19Seats.election.political_groups}
-        resultChanges={[]}
+        resultChanges={tableData.UniqueHighestAverageAssignment.resultChanges}
       />
     );
   },
@@ -37,13 +38,10 @@ export const Default: StoryObj = {
 
 export const P10: StoryObj = {
   render: () => {
-    const state = {
-      type: "Finalised",
-      deceased_candidates: [],
-      lists_drawn: [],
-      candidates_drawn: [],
-    } satisfies ApportionmentState;
-    const tableData = buildAssignmentTableData(lt19SeatsAndP10AndDeceasedCandidates.seat_assignment.steps, state);
+    const tableData = buildAssignmentTableData(
+      lt19SeatsAndP10AndDeceasedCandidates.seat_assignment.steps,
+      lt19SeatsAndP10AndDeceasedCandidates.state,
+    );
 
     return (
       <UniqueHighestAveragesTable

@@ -119,20 +119,20 @@ impl NameResolver for ElectionWithPoliticalGroups {
             .find(|pg| pg.number == aff_id)
             .and_then(|pg| pg.candidates.iter().find(|c| c.number == cand_id))
             .map(|c| {
-                let last = &c.last_name;
-                let prefix = c.last_name_prefix.as_deref();
+                let last_name = &c.last_name;
+                let last_name_prefix = c.last_name_prefix.as_deref();
                 let initials = &c.initials;
 
-                let last_part = if let Some(prefix) = prefix {
-                    format!("{} {}", prefix, last)
+                let name = if !initials.is_empty() {
+                    format!("{}, {}", last_name, initials)
                 } else {
-                    last.to_string()
+                    last_name.to_string()
                 };
 
-                if !initials.is_empty() {
-                    format!("{}, {}", last_part, initials)
+                if let Some(prefix) = last_name_prefix {
+                    format!("{} {}", name, prefix)
                 } else {
-                    last_part
+                    name
                 }
             })
     }

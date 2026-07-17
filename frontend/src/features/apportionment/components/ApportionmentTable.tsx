@@ -10,7 +10,6 @@ interface ApportionmentTableProps {
   politicalGroups: PoliticalGroup[];
   fullSeats: number;
   residualSeats: number;
-  seats: number;
   notAssignedSeats: number;
   withoutLinks: boolean;
 }
@@ -27,7 +26,6 @@ export function ApportionmentTable({
   politicalGroups,
   fullSeats,
   residualSeats,
-  seats,
   notAssignedSeats,
   withoutLinks,
 }: ApportionmentTableProps) {
@@ -76,7 +74,7 @@ export function ApportionmentTable({
           <Table.Cell className="text-align-r bold">{t("apportionment.total")}</Table.Cell>
           <Table.NumberCell>{fullSeats}</Table.NumberCell>
           <Table.NumberCell>{residualSeats}</Table.NumberCell>
-          <Table.NumberCell className="link-cell-padding">{seats}</Table.NumberCell>
+          <Table.NumberCell className="link-cell-padding">{fullSeats + residualSeats}</Table.NumberCell>
         </Table.TotalRow>
       </Table.Body>
     </Table>

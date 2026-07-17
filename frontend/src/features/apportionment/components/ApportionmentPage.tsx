@@ -363,7 +363,6 @@ function ApportionmentTableSection({ state, seatAssignment, election }: Apportio
           politicalGroups={election.political_groups}
           fullSeats={seatAssignment.full_seats}
           residualSeats={seatAssignment.residual_seats}
-          seats={seatAssignment.seats}
           notAssignedSeats={notAssignedSeats}
           withoutLinks={state.type === "DrawingLots"}
         />

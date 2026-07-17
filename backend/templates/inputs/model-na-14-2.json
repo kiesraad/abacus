@@ -96,7 +96,7 @@
       },
       "fewer_ballots_count": {
         "count": 1,
-        "data_entry_sources": [{"type": "PollingStation", "number": 1}]
+        "data_entry_sources": [{ "type": "PollingStation", "number": 1 }]
       }
     },
     "polling_station_investigations": {
@@ -641,7 +641,7 @@
     },
     {
       "number": 2,
-      "name": "Blanco (van der Spek, X.)",
+      "name": "Blanco (Spek, X. van der)",
       "total": 57153,
       "previous_total": 57153,
       "columns": [

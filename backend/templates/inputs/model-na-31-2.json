@@ -78,7 +78,11 @@
       },
       "fewer_ballots_count": {
         "count": 2,
-        "data_entry_sources": [{"type": "PollingStation", "number": 1}, {"type": "PollingStation", "number": 3}, {"type": "PollingStation", "number": 5}]
+        "data_entry_sources": [
+          { "type": "PollingStation", "number": 1 },
+          { "type": "PollingStation", "number": 3 },
+          { "type": "PollingStation", "number": 5 }
+        ]
       }
     },
     "polling_station_investigations": {
@@ -5043,7 +5047,7 @@
     },
     {
       "number": 8,
-      "name": "Blanco (van Lent, J.)",
+      "name": "Blanco (Lent, J. van)",
       "total": 487,
       "previous_total": null,
       "columns": [

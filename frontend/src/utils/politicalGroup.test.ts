@@ -22,7 +22,7 @@ describe("formatPoliticalGroupName", () => {
 
   it("formats unnamed political groups correctly", () => {
     const politicalGroup: PoliticalGroup = {
-      name: "Blanco (de Boer, A.B.)",
+      name: "Blanco (Boer, A.B. de)",
       number: 123,
       candidates: [
         {
@@ -35,7 +35,7 @@ describe("formatPoliticalGroupName", () => {
       ],
     };
 
-    expect(formatPoliticalGroupName(politicalGroup)).toBe("Lijst 123 – Blanco (de Boer, A.B.)");
-    expect(formatPoliticalGroupName(politicalGroup, false)).toBe("Blanco (de Boer, A.B.)");
+    expect(formatPoliticalGroupName(politicalGroup)).toBe("Lijst 123 – Blanco (Boer, A.B. de)");
+    expect(formatPoliticalGroupName(politicalGroup, false)).toBe("Blanco (Boer, A.B. de)");
   });
 });

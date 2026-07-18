@@ -121,3 +121,36 @@ pub struct Candidate<T: ListVotes> {
     pub list_number: ListNumber<T>,
     pub candidate_number: CandidateNumber<T>,
 }
+
+#[cfg(test)]
+pub(crate) mod tests {
+    use crate::CandidateRanking;
+
+    #[test]
+    fn test_candidate_ranking_functions() {
+        let original_candidate_ranking = CandidateRanking::Original(vec![1, 2, 3]);
+        let updated_candidate_ranking = CandidateRanking::Updated(vec![1, 3, 2]);
+
+        assert_eq!(original_candidate_ranking.as_slice(), &[1, 2, 3]);
+        assert_eq!(updated_candidate_ranking.as_slice(), &[1, 3, 2]);
+
+        assert_eq!(original_candidate_ranking.as_updated_slice(), []);
+        assert_eq!(updated_candidate_ranking.as_updated_slice(), &[1, 3, 2]);
+
+        assert!(original_candidate_ranking.iter().eq([1, 2, 3].iter()));
+        assert!(updated_candidate_ranking.iter().eq([1, 3, 2].iter()));
+
+        assert!(original_candidate_ranking.iter_updated().eq([].iter()));
+        assert!(
+            updated_candidate_ranking
+                .iter_updated()
+                .eq([1, 3, 2].iter())
+        );
+
+        assert!(original_candidate_ranking.is_original());
+        assert!(!updated_candidate_ranking.is_original());
+
+        assert!(!original_candidate_ranking.is_updated());
+        assert!(updated_candidate_ranking.is_updated());
+    }
+}

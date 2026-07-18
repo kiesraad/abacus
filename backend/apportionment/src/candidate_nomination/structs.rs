@@ -124,7 +124,10 @@ pub struct Candidate<T: ListVotes> {
 
 #[cfg(test)]
 pub(crate) mod tests {
-    use crate::CandidateRanking;
+    use crate::{
+        CandidateRanking, ListCandidateNomination,
+        test_helpers::{CandidateVotesMock, ListVotesMock},
+    };
 
     #[test]
     fn test_candidate_ranking_functions() {
@@ -152,5 +155,25 @@ pub(crate) mod tests {
 
         assert!(!original_candidate_ranking.is_updated());
         assert!(updated_candidate_ranking.is_updated());
+    }
+
+    #[test]
+    fn test_list_candidate_nomination_function() {
+        let list_candidate_nomination: ListCandidateNomination<ListVotesMock> =
+            ListCandidateNomination {
+                list_number: 1,
+                list_seats: 4,
+                preferential_candidate_nomination: vec![
+                    &CandidateVotesMock(1, 500),
+                    &CandidateVotesMock(5, 400),
+                    &CandidateVotesMock(3, 400),
+                ],
+                other_candidate_nomination: vec![&CandidateVotesMock(2, 300)],
+                candidate_ranking: CandidateRanking::Updated(vec![1, 5, 3, 2, 4, 6]),
+            };
+        assert_eq!(
+            list_candidate_nomination.nominated_candidate_ranking(),
+            &[1, 5, 3, 2]
+        );
     }
 }

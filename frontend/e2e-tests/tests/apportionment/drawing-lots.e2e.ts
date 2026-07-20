@@ -59,7 +59,7 @@ test.describe("CSB election apportionment", () => {
     ).toBeVisible();
     await expect(
       drawingLotsPage.getListItemByText(
-        "Lijst 2 – Partij voor de Stemmer en Lijst 3 – Stemmmers 22 hebben samen het hoogste gemiddeld aantal stemmen per zetel (5.000 stemmen)",
+        "Lijst 2 – Partij voor de Stemmer en Lijst 3 – Stemmmers 22 hebben ieder het hoogste gemiddeld aantal stemmen per zetel (5.000 stemmen)",
       ),
     ).toBeVisible();
     await expect(

@@ -45,8 +45,8 @@
       "largest_remainder": "De partij met het grootste overschot aan stemmen krijgt de restzetel"
     },
     "draw_lots_for_lists_with_same": {
-      "highest_average": "<strong>{lists}</strong> hebben samen het hoogste gemiddeld aantal stemmen per zetel ({value} stemmen)",
-      "largest_remainder": "<strong>{lists}</strong> hebben samen het grootste overschot ({value} stemmen)"
+      "highest_average": "<strong>{lists}</strong> hebben ieder het hoogste gemiddeld aantal stemmen per zetel ({value} stemmen)",
+      "largest_remainder": "<strong>{lists}</strong> hebben ieder het grootste overschot ({value} stemmen)"
     },
     "residual_seats_to_assign": {
       "singular": "Er is {nr} restzetel te verdelen",

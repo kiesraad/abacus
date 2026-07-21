@@ -128,7 +128,10 @@ fn parse_last_bracketed_list_numbers(log: &str, prefix: &str) -> Option<BTreeSet
 /// "Drawing of lots is required for lists: [..]" log line.
 /// Returns None when there is no drawing of lots for lists.
 fn parse_abacus_lots_options(abacus_log: &str) -> Option<BTreeSet<u32>> {
-    parse_last_bracketed_list_numbers(abacus_log, "Drawing of lots is required for lists: [")
+    parse_last_bracketed_list_numbers(abacus_log, "Drawing of lots is required for lists: [").or_else(|| {
+	let line = abacus_log.lines().rev().find(|l| l.contains("Drawing of lots is required asdfasdf for candidates: ["))?;												      dbg!(line);
+	parse_last_bracketed_list_numbers(abacus_log, "Drawing of lots is required asdfasdf for candidates: [")
+    })
 }
 
 /// Parse the list numbers from OSV2020's

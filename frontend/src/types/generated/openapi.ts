@@ -901,7 +901,7 @@ export interface ElectionApportionmentResponse {
 /**
  * Election category (limited for now)
  */
-export const electionCategoryValues = ["Municipal"] as const;
+export const electionCategoryValues = ["Municipal", "Provincial", "WaterAuthority"] as const;
 export type ElectionCategory = (typeof electionCategoryValues)[number];
 
 export type ElectionCreationRequest =

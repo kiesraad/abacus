@@ -175,12 +175,16 @@ pub struct ElectionNumberOfVotersChangeRequest {
 #[strum(serialize_all = "lowercase")]
 pub enum ElectionCategory {
     Municipal,
+    Provincial,
+    WaterAuthority,
 }
 
 impl ElectionCategory {
     pub fn to_eml_code(&self) -> &'static str {
         match self {
             ElectionCategory::Municipal => "GR",
+            ElectionCategory::Provincial => "PS",
+            ElectionCategory::WaterAuthority => "AB",
         }
     }
 }

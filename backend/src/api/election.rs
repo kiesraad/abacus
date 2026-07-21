@@ -709,6 +709,10 @@ async fn create_sub_committees(
             )
             .await?;
         }
+        (
+            CommitteeCategory::CSB,
+            ElectionCategory::Provincial | ElectionCategory::WaterAuthority,
+        ) => {}
         (CommitteeCategory::GSB, _) => {}
     }
     Ok(())

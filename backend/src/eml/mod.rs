@@ -326,6 +326,12 @@ impl ElectionWithPoliticalGroups {
             crate::domain::election::ElectionCategory::Municipal => {
                 eml_nl::utils::ElectionCategory::GR
             }
+            crate::domain::election::ElectionCategory::Provincial => {
+                eml_nl::utils::ElectionCategory::PS
+            }
+            crate::domain::election::ElectionCategory::WaterAuthority => {
+                eml_nl::utils::ElectionCategory::AB
+            }
         }
     }
 
@@ -337,6 +343,21 @@ impl ElectionWithPoliticalGroups {
                     eml_nl::utils::ElectionSubcategory::GR1
                 } else {
                     eml_nl::utils::ElectionSubcategory::GR2
+                }
+            }
+            crate::domain::election::ElectionCategory::Provincial => {
+                // TODO: Needs to be changed to if single district else multiple districts
+                if self.number_of_seats < 19 {
+                    eml_nl::utils::ElectionSubcategory::PS1
+                } else {
+                    eml_nl::utils::ElectionSubcategory::PS2
+                }
+            }
+            crate::domain::election::ElectionCategory::WaterAuthority => {
+                if self.number_of_seats < 19 {
+                    eml_nl::utils::ElectionSubcategory::AB1
+                } else {
+                    eml_nl::utils::ElectionSubcategory::AB2
                 }
             }
         }

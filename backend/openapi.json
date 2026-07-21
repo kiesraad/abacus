@@ -6809,7 +6809,9 @@
         "type": "string",
         "description": "Election category (limited for now)",
         "enum": [
-          "Municipal"
+          "Municipal",
+          "Provincial",
+          "WaterAuthority"
         ]
       },
       "ElectionCreationRequest": {

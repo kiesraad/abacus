@@ -128,14 +128,41 @@ fn parse_last_bracketed_list_numbers(log: &str, prefix: &str) -> Option<BTreeSet
 /// "Drawing of lots is required for {lists|candidates}: [..]" log line.
 /// Returns None when there is no drawing of lots for lists or candidates.
 fn parse_abacus_lots_options(abacus_log: &str) -> Option<BTreeSet<u32>> {
-    parse_last_bracketed_list_numbers(abacus_log, "Drawing of lots is required for lists: [").or_else(|| {
-	parse_last_bracketed_list_numbers(abacus_log, "Drawing of lots is required for candidates: [")
-    })
+    parse_last_bracketed_list_numbers(abacus_log, "Drawing of lots is required for lists: [")
+        .or_else(|| {
+            parse_last_bracketed_list_numbers(
+                abacus_log,
+                "Drawing of lots is required for candidates: [",
+            )
+        })
 }
 
 /// Parse the list numbers from OSV2020's
 /// "... Alternativen: List2, List3." log line
 /// Returns None when there is no drawing of lots for lists.
+fn parse_osv2020_list_alternatives(lists: &str) -> Option<BTreeSet<u32>> {
+    lists
+        .split(", ")
+        .map(|name| {
+            name.rsplit_once('_')
+                .and_then(|(_, n)| n.parse::<u32>().ok())
+        })
+        .collect::<Option<BTreeSet<u32>>>()
+}
+
+/// Parse the candidate numbers from OSV2020's
+/// "... Alternativen: List2_1, List2_2." log line
+/// Returns None when there is no drawing of candidates for lists.
+fn parse_osv2020_candidate_alternatives(lists: &str) -> Option<BTreeSet<u32>> {
+    lists
+        .split(", ")
+        .map(|name| {
+            name.strip_prefix("List")
+                .and_then(|n| n.parse::<u32>().ok())
+        })
+        .collect::<Option<BTreeSet<u32>>>()
+}
+
 fn parse_osv2020_lots_options(osv2020_log: &[String]) -> Option<BTreeSet<u32>> {
     let prefix = "Alternativen: ";
     let line = osv2020_log.iter().rev().find(|l| l.contains(prefix))?;
@@ -144,13 +171,8 @@ fn parse_osv2020_lots_options(osv2020_log: &[String]) -> Option<BTreeSet<u32>> {
         .trim()
         .strip_suffix('.')
         .unwrap_or(line[start..].trim());
-    lists
-        .split(", ")
-        .map(|name| {
-            name.strip_prefix("List")
-                .and_then(|n| n.parse::<u32>().ok())
-        })
-        .collect::<Option<BTreeSet<u32>>>()
+
+    parse_osv2020_list_alternatives(lists).or_else(|| parse_osv2020_candidate_alternatives(lists))
 }
 
 /// Whether Abacus hit Article P 10 (list exhaustion) during seat assignment.
@@ -224,7 +246,7 @@ fn fuzz(data: FuzzedApportionmentInput) {
     {
         return;
     }
-    
+
     match abacus_result {
         Ok(ApportionmentOutput::Completed(ref output)) => {
             let abacus_seats = get_total_seats(&output.seat_assignment);
@@ -305,10 +327,10 @@ fn fuzz(data: FuzzedApportionmentInput) {
                 }
             }
         }
-	Ok(
-            e @ ApportionmentOutput::ListDrawingLotsRequired(..) |
-	    e @ ApportionmentOutput::CandidateDrawingLotsRequired(..)
-	) => {
+        Ok(
+            e @ ApportionmentOutput::ListDrawingLotsRequired(..)
+            | e @ ApportionmentOutput::CandidateDrawingLotsRequired(..),
+        ) => {
             match osv2020_result {
                 Osv2020Result::Allocated {
                     seats: osv2020_seats,

@@ -47,8 +47,8 @@ pub fn init_tracing() {
         .with_level(true)
         .with_filter(
             Targets::new()
-		.with_target("apportionment::seat_assignment", LevelFilter::TRACE)
-		.with_target("apportionment::candidate_nomination", LevelFilter::TRACE),
+                .with_target("apportionment::seat_assignment", LevelFilter::TRACE)
+                .with_target("apportionment::candidate_nomination", LevelFilter::TRACE),
         );
     tracing_subscriber::registry().with(layer).init();
 }

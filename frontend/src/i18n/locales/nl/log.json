@@ -45,7 +45,9 @@
     "UserLoggedIn": "Gebruiker ingelogd",
     "UserLoggedOut": "Gebruiker uitgelogd",
     "UserLoginFailed": "Mislukte inlogpoging",
+    "UserSessionExpired": "Gebruikerssessie is verlopen",
     "UserSessionExtended": "Gebruikerssessie verlengd",
+    "UserSessionRemoved": "Gebruikerssessie verwijderd",
     "UserUpdated": "Gebruikersaccount bijgewerkt"
   },
   "field": {

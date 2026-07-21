@@ -365,9 +365,17 @@ fn generate_political_party(
             .copied(),
         })
     }
+
+    // Include some unnamed political groups.
+    let registered_name = if rng.random_ratio(1, 5) {
+        String::new()
+    } else {
+        super::data::political_group_name(rng)
+    };
+
     RegisteredPoliticalGroup {
         number: pg_number,
-        registered_name: super::data::political_group_name(rng),
+        registered_name,
         candidates,
     }
 }

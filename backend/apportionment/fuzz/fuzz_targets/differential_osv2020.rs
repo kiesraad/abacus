@@ -142,6 +142,7 @@ fn abacus_lots_options(
 /// Parse the lots options from OSV2020
 /// - For lists: "... Alternativen: List2, List3."
 /// - For candidates: "... Alternativen: List1_2, List1_3."
+///
 /// Returns None if the prefix is not found in the log
 fn parse_osv2020_lots_options(osv2020_log: &[String]) -> Option<LotsOptions> {
     let prefix = "Alternativen: ";
@@ -306,10 +307,6 @@ fn fuzz(data: FuzzedApportionmentInput) {
                             "candidate nomination mismatch",
                         );
                     }
-
-                    eprintln!(
-                        "Abacus and OSV2020 agree on seat allocation and candidate nomination (1)"
-                    );
                 }
                 Osv2020Result::Conflict => {
                     // OSV2020 can require a drawing lots for a residual seat while
@@ -342,10 +339,6 @@ fn fuzz(data: FuzzedApportionmentInput) {
                             "OSV2020 has conflict where Abacus has allocation",
                         );
                     }
-
-                    eprintln!(
-                        "Abacus and OSV2020 agree on seat allocation and candidate nomination (2)"
-                    );
                 }
             }
         }
@@ -391,10 +384,6 @@ fn fuzz(data: FuzzedApportionmentInput) {
                                 &format!("OSV2020 lots options: {osv2020_options:?}"),
                                 &osv2020_log,
                                 "OSV2020 and Abacus require drawing lots, but the options do not match",
-                            );
-                        } else {
-                            eprintln!(
-                                "OSV2020 and Abacus require drawing lots, and the options match: {abacus_options:?}"
                             );
                         }
                     }

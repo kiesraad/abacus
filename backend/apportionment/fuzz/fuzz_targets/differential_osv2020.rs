@@ -125,10 +125,12 @@ fn parse_last_bracketed_list_numbers(log: &str, prefix: &str) -> Option<BTreeSet
 }
 
 /// Parse the list numbers from Abacus's
-/// "Drawing of lots is required for lists: [..]" log line.
-/// Returns None when there is no drawing of lots for lists.
+/// "Drawing of lots is required for {lists|candidates}: [..]" log line.
+/// Returns None when there is no drawing of lots for lists or candidates.
 fn parse_abacus_lots_options(abacus_log: &str) -> Option<BTreeSet<u32>> {
-    parse_last_bracketed_list_numbers(abacus_log, "Drawing of lots is required for lists: [")
+    parse_last_bracketed_list_numbers(abacus_log, "Drawing of lots is required for lists: [").or_else(|| {
+	parse_last_bracketed_list_numbers(abacus_log, "Drawing of lots is required for candidates: [")
+    })
 }
 
 /// Parse the list numbers from OSV2020's
@@ -222,7 +224,7 @@ fn fuzz(data: FuzzedApportionmentInput) {
     {
         return;
     }
-
+    
     match abacus_result {
         Ok(ApportionmentOutput::Completed(ref output)) => {
             let abacus_seats = get_total_seats(&output.seat_assignment);
@@ -303,10 +305,10 @@ fn fuzz(data: FuzzedApportionmentInput) {
                 }
             }
         }
-        Ok(
-            e @ ApportionmentOutput::ListDrawingLotsRequired(..)
-            | e @ ApportionmentOutput::CandidateDrawingLotsRequired(..),
-        ) => {
+	Ok(
+            e @ ApportionmentOutput::ListDrawingLotsRequired(..) |
+	    e @ ApportionmentOutput::CandidateDrawingLotsRequired(..)
+	) => {
             match osv2020_result {
                 Osv2020Result::Allocated {
                     seats: osv2020_seats,

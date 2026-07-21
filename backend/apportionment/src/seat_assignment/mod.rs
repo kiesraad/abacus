@@ -886,19 +886,34 @@ pub(crate) mod tests {
             assert!(result.warnings().is_empty());
         }
 
-        /// Article P 9 Kieswet requires a strict majority of votes (> 50%), so exactly 50% should not trigger it.
+        /// Apportionment with residual seats assigned with largest remainders method  
+        /// This test does not trigger Kieswet Article P 9, since this requires a
+        /// strict majority of votes (> 50%), so exactly 50% does not trigger it.
+        ///
+        /// Full seats: [7, 2, 1, 1, 1] - Remainder seats: 3  
+        /// Remainders: [170 2/15, 306 7/15, 229 11/15, 198 11/15, 115 11/15]  
+        /// 1 - largest remainder: seat assigned to list 2  
+        /// 2 - largest remainder: seat assigned to list 3  
+        /// 3 - largest remainder: seat assigned to list 4
         #[test]
         fn test_exactly_half_of_votes_should_not_trigger_absolute_majority_reassignment() {
-            let input = seat_assignment_fixture_with_default_50_candidates(7, vec![500, 300, 200]);
+            let input = seat_assignment_fixture_with_default_50_candidates(
+                15,
+                vec![2552, 987, 570, 539, 456],
+            );
             let SeatAssignment::Completed(result) = seat_assignment(&input).unwrap() else {
                 panic!("should be Completed");
             };
-            assert!(
-                !result
-                    .steps
-                    .iter()
-                    .any(|step| step.change.is_changed_by_absolute_majority_reassignment())
-            );
+
+            assert_eq!(result.full_seats, 12);
+            assert_eq!(result.residual_seats, 3);
+            assert_eq!(result.steps.len(), 3);
+            assert_eq!(result.steps[0].change.list_number_assigned(), 2);
+            assert_eq!(result.steps[1].change.list_number_assigned(), 3);
+            assert_eq!(result.steps[2].change.list_number_assigned(), 4);
+            let total_seats = get_total_seats_from_apportionment_result(&result);
+            assert_eq!(total_seats, vec![7, 3, 2, 2, 1]);
+            assert!(result.warnings().is_empty());
         }
 
         mod drawing_of_lots {

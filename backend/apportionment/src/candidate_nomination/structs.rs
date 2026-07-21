@@ -121,3 +121,59 @@ pub struct Candidate<T: ListVotes> {
     pub list_number: ListNumber<T>,
     pub candidate_number: CandidateNumber<T>,
 }
+
+#[cfg(test)]
+pub(crate) mod tests {
+    use crate::{
+        CandidateRanking, ListCandidateNomination,
+        test_helpers::{CandidateVotesMock, ListVotesMock},
+    };
+
+    #[test]
+    fn test_candidate_ranking_functions() {
+        let original_candidate_ranking = CandidateRanking::Original(vec![1, 2, 3]);
+        let updated_candidate_ranking = CandidateRanking::Updated(vec![1, 3, 2]);
+
+        assert_eq!(original_candidate_ranking.as_slice(), &[1, 2, 3]);
+        assert_eq!(updated_candidate_ranking.as_slice(), &[1, 3, 2]);
+
+        assert_eq!(original_candidate_ranking.as_updated_slice(), []);
+        assert_eq!(updated_candidate_ranking.as_updated_slice(), &[1, 3, 2]);
+
+        assert!(original_candidate_ranking.iter().eq([1, 2, 3].iter()));
+        assert!(updated_candidate_ranking.iter().eq([1, 3, 2].iter()));
+
+        assert!(original_candidate_ranking.iter_updated().eq([].iter()));
+        assert!(
+            updated_candidate_ranking
+                .iter_updated()
+                .eq([1, 3, 2].iter())
+        );
+
+        assert!(original_candidate_ranking.is_original());
+        assert!(!updated_candidate_ranking.is_original());
+
+        assert!(!original_candidate_ranking.is_updated());
+        assert!(updated_candidate_ranking.is_updated());
+    }
+
+    #[test]
+    fn test_list_candidate_nomination_function() {
+        let list_candidate_nomination: ListCandidateNomination<ListVotesMock> =
+            ListCandidateNomination {
+                list_number: 1,
+                list_seats: 4,
+                preferential_candidate_nomination: vec![
+                    &CandidateVotesMock(1, 500),
+                    &CandidateVotesMock(5, 400),
+                    &CandidateVotesMock(3, 400),
+                ],
+                other_candidate_nomination: vec![&CandidateVotesMock(2, 300)],
+                candidate_ranking: CandidateRanking::Updated(vec![1, 5, 3, 2, 4, 6]),
+            };
+        assert_eq!(
+            list_candidate_nomination.nominated_candidate_ranking(),
+            &[1, 5, 3, 2]
+        );
+    }
+}

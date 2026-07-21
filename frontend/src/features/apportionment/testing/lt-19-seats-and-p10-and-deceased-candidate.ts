@@ -1633,16 +1633,16 @@ export const election_summary: ElectionSummary = {
 };
 
 export const committee_session: CommitteeSession = {
-  id: 13,
+  id: 14,
   number: 1,
-  election_id: 13,
+  election_id: 14,
   status: "completed",
   location: "",
   start_date_time: "",
 };
 
 export const election: ElectionWithPoliticalGroups = {
-  id: 13,
+  id: 14,
   name: "Election < 19 seats & List Exhaustion & Deceased Candidate",
   committee_category: "CSB",
   election_id: "GR2026_Juinen",

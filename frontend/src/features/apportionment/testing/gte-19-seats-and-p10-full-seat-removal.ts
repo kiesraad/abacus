@@ -816,16 +816,16 @@ export const election_summary: ElectionSummary = {
 };
 
 export const committee_session: CommitteeSession = {
-  id: 1,
+  id: 15,
   number: 1,
-  election_id: 5,
+  election_id: 15,
   status: "completed",
   location: "",
   start_date_time: "",
 };
 
 export const election: ElectionWithPoliticalGroups = {
-  id: 2,
+  id: 15,
   name: "Election >= 19 seats with full seat removal",
   committee_category: "CSB",
   election_id: "GR2026_Juinen",

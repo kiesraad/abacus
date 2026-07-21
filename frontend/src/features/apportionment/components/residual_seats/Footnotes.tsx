@@ -5,6 +5,7 @@ import { formatList } from "@/utils/strings";
 import { getRemovalSteps, isAbsoluteMajorityReassignmentStep } from "../../utils/steps";
 import { isListDrawingLotsVariant } from "../../utils/utils";
 import cls from "../Apportionment.module.css";
+import { LARGE_COUNCIL_THRESHOLD } from "./ApportionmentResidualSeatsPage";
 
 interface FootnotesProps {
   seatAssignment: SeatAssignment;
@@ -19,8 +20,13 @@ export function Footnotes({ seatAssignment, state }: FootnotesProps) {
     "AbsoluteMajorityLargestRemainder",
   ]);
 
+  // Full seats are only shown in the largest remainder table, which is not shown
+  // for large councils, so we don't need to show those footnotes in that case.
+  const showFullSeatRemovalFootnote =
+    seatAssignment.seats < LARGE_COUNCIL_THRESHOLD && listsWithFullSeatsRemoved.length > 0;
+
   if (
-    listsWithFullSeatsRemoved.length === 0 &&
+    !showFullSeatRemovalFootnote &&
     !absoluteMajorityDrawingLots &&
     !absoluteMajorityStep &&
     residualSeatRemovalSteps.length === 0
@@ -31,15 +37,16 @@ export function Footnotes({ seatAssignment, state }: FootnotesProps) {
   // Uses the same order as buildAssignmentTableData in seat-change.tsx
   return (
     <ol id="footnotes-list" className={cn(cls.footnotesList, "w-39")}>
-      {listsWithFullSeatsRemoved.map((listNumber) => {
-        return (
-          <li key={listNumber} id={`list-${listNumber}-full-seat-list-exhaustion-information`}>
-            {t("apportionment.footnotes.full_seat_removed_remainder_information", {
-              num_full_seats: seatAssignment.steps[0]?.standings[listNumber - 1]?.full_seats || "",
-            })}
-          </li>
-        );
-      })}
+      {showFullSeatRemovalFootnote &&
+        listsWithFullSeatsRemoved.map((listNumber) => {
+          return (
+            <li key={listNumber} id={`list-${listNumber}-full-seat-list-exhaustion-information`}>
+              {t("apportionment.footnotes.full_seat_removed_remainder_information", {
+                num_full_seats: seatAssignment.steps[0]?.standings[listNumber - 1]?.full_seats || "",
+              })}
+            </li>
+          );
+        })}
       {absoluteMajorityDrawingLots && (
         <li id={`absolute-majority-reassignment-drawing-lots-information`}>
           {t("apportionment.footnotes.absolute_majority_reassignment.text", {

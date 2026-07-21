@@ -98,8 +98,6 @@ function addListExhaustionChanges(
       (c) => c.type === "FullSeatRemoval" && c.listNumber === change.list_retracted_seat,
     );
 
-    // If < 19 this change is shown in the largest remainders table
-    // If >= 19 this change is not shown
     if (!existingFullSeatRemoval) {
       tableData.LargestRemainderAssignment.resultChanges.push(
         resultChange(change.list_retracted_seat, -1, "FullSeat", "FullSeatRemoval"),

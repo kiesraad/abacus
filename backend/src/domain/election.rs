@@ -174,8 +174,11 @@ pub struct ElectionNumberOfVotersChangeRequest {
 )]
 #[strum(serialize_all = "lowercase")]
 pub enum ElectionCategory {
+    /// Gemeenteraadsverkiezing
     Municipal,
+    /// Provinciale statenverkiezing
     Provincial,
+    /// Waterschapsverkiezing
     WaterAuthority,
 }
 

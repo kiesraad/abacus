@@ -346,12 +346,8 @@ impl ElectionWithPoliticalGroups {
                 }
             }
             crate::domain::election::ElectionCategory::Provincial => {
-                // TODO: Needs to be changed to if single district else multiple districts
-                if self.number_of_seats < 19 {
-                    eml_nl::utils::ElectionSubcategory::PS1
-                } else {
-                    eml_nl::utils::ElectionSubcategory::PS2
-                }
+                // TODO: Needs to be changed to if single district { PS1 } else { PS2 } once import works
+                eml_nl::utils::ElectionSubcategory::PS1
             }
             crate::domain::election::ElectionCategory::WaterAuthority => {
                 if self.number_of_seats < 19 {

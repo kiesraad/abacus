@@ -8,7 +8,7 @@ export class NumberOfVotersPgObj {
   readonly next: Locator;
 
   constructor(protected readonly page: Page) {
-    this.header = page.getByRole("heading", { level: 2, name: "Hoeveel kiesgerechtigden telt de gemeente?" });
+    this.header = page.getByRole("heading", { level: 2, name: "Hoeveel kiesgerechtigden telt het GSB?" });
     this.hint = page.getByText("Ingelezen uit bestand met stembureaus");
     this.error = page.getByText("Vul het aantal kiesgerechtigden in");
     this.input = page.getByRole("textbox", { name: "Aantal kiesgerechtigden" });

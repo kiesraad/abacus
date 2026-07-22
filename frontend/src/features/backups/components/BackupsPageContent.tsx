@@ -17,7 +17,7 @@ export function BackupsPageContent({ isLoading, errorMessage, lastBackupAt, onCr
     <>
       <h2>{t("backups.subtitle")}</h2>
 
-      <div className="mb-lg">{tx("backups.description")}</div>
+      <section className="md mb-lg">{tx("backups.description")}</section>
 
       {errorMessage && (
         <Alert type="error" small margin="mb-lg">

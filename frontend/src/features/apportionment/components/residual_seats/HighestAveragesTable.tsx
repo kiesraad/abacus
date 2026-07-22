@@ -74,7 +74,7 @@ export function HighestAveragesTable({
               (change) => change.listNumber === listSeatAssignment.list_number,
             );
             listResultChanges.forEach((listResultChange) => {
-              residualSeats = residualSeats + listResultChange.increase - listResultChange.decrease;
+              residualSeats = residualSeats + listResultChange.delta;
             });
             const { list_drawing_lots_average, mark_list_drawing_lots_average } = getListDrawingLotsInformation(
               state,

@@ -48,10 +48,10 @@ export function UniqueHighestAveragesTable({
               return step.change.selected_list_number === listSeatAssignment.list_number;
             }).length;
             const listResultChanges = resultChanges.filter(
-              (change) => change.type === "residual_seat" && change.listNumber === listSeatAssignment.list_number,
+              (change) => change.seat_type === "ResidualSeat" && change.listNumber === listSeatAssignment.list_number,
             );
             listResultChanges.forEach((listResultChange) => {
-              residualSeats = residualSeats + listResultChange.increase - listResultChange.decrease;
+              residualSeats = residualSeats + listResultChange.delta;
             });
             return (
               <Table.Row key={listSeatAssignment.list_number}>

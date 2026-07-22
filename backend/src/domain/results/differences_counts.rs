@@ -390,6 +390,7 @@ mod tests {
             voters_counts: VotersCounts {
                 poll_card_count: 103,
                 proxy_certificate_count: 2,
+                voter_cards_count: None,
                 total_admitted_voters_count: 105,
             },
             votes_counts: VotesCounts {
@@ -423,6 +424,7 @@ mod tests {
             voters_counts: VotersCounts {
                 poll_card_count: 103,
                 proxy_certificate_count: 2,
+                voter_cards_count: None,
                 total_admitted_voters_count: 105,
             },
             votes_counts: VotesCounts {
@@ -466,6 +468,7 @@ mod tests {
             voters_counts: VotersCounts {
                 poll_card_count: 103,
                 proxy_certificate_count: 2,
+                voter_cards_count: None,
                 total_admitted_voters_count: 105,
             },
             votes_counts: VotesCounts {
@@ -499,6 +502,7 @@ mod tests {
             voters_counts: VotersCounts {
                 poll_card_count: 103,
                 proxy_certificate_count: 2,
+                voter_cards_count: None,
                 total_admitted_voters_count: 105,
             },
             votes_counts: VotesCounts {
@@ -542,6 +546,7 @@ mod tests {
             voters_counts: VotersCounts {
                 poll_card_count: 100,
                 proxy_certificate_count: 2,
+                voter_cards_count: None,
                 total_admitted_voters_count: 105,
             },
             votes_counts: VotesCounts {
@@ -582,6 +587,7 @@ mod tests {
             voters_counts: VotersCounts {
                 poll_card_count: 100,
                 proxy_certificate_count: 2,
+                voter_cards_count: None,
                 total_admitted_voters_count: 105,
             },
             votes_counts: VotesCounts {
@@ -650,6 +656,7 @@ mod tests {
             voters_counts: VotersCounts {
                 poll_card_count: 103,
                 proxy_certificate_count: 2,
+                voter_cards_count: None,
                 total_admitted_voters_count: 105,
             },
             votes_counts: VotesCounts {
@@ -672,6 +679,7 @@ mod tests {
         *second_entry.voters_counts_mut() = VotersCounts {
             poll_card_count: 101,
             proxy_certificate_count: 1,
+            voter_cards_count: None,
             total_admitted_voters_count: 102,
         };
         *second_entry.votes_counts_mut() = VotesCounts {
@@ -725,6 +733,7 @@ mod tests {
             voters_counts: VotersCounts {
                 poll_card_count: 103,
                 proxy_certificate_count: 2,
+                voter_cards_count: None,
                 total_admitted_voters_count: 105,
             },
             votes_counts: VotesCounts {

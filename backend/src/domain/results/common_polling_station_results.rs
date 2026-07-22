@@ -194,6 +194,7 @@ mod tests {
             voters_counts: VotersCounts {
                 poll_card_count: 90,
                 proxy_certificate_count: 0,
+                voter_cards_count: None,
                 total_admitted_voters_count: 90,
             },
             votes_counts: VotesCounts {

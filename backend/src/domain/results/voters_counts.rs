@@ -21,6 +21,10 @@ pub struct VotersCounts {
     /// Number of valid proxy certificates ("Aantal geldige volmachtbewijzen")
     #[schema(value_type = u32)]
     pub proxy_certificate_count: Count,
+    /// Number of valid voter cards ("Aantal geldige kiezerspassen")
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(value_type = u32)]
+    pub voter_cards_count: Option<Count>,
     /// Total number of admitted voters ("Totaal aantal toegelaten kiezers")
     #[schema(value_type = u32)]
     pub total_admitted_voters_count: Count,
@@ -105,12 +109,14 @@ mod tests {
         let mut curr_votes = VotersCounts {
             poll_card_count: 2,
             proxy_certificate_count: 3,
+            voter_cards_count: None,
             total_admitted_voters_count: 9,
         };
 
         curr_votes += &VotersCounts {
             poll_card_count: 1,
             proxy_certificate_count: 2,
+            voter_cards_count: None,
             total_admitted_voters_count: 5,
         };
 
@@ -128,6 +134,7 @@ mod tests {
         let voters_counts = VotersCounts {
             poll_card_count,
             proxy_certificate_count,
+            voter_cards_count: None,
             total_admitted_voters_count,
         };
 

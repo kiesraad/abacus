@@ -22,7 +22,7 @@ describe("votersAndVotesSection", () => {
     const inputGrid = votersAndVotesSection.subsections[0] as InputGridSubsection;
     expect(inputGrid.type).toBe("inputGrid");
 
-    expect(inputGrid.rows).toHaveLength(9);
+    expect(inputGrid.rows).toHaveLength(10);
     // Check that it has the basic voter and vote count rows
     expect(inputGrid.rows.some((row) => row.path === "voters_counts.poll_card_count")).toBe(true);
     expect(inputGrid.rows.some((row) => row.path === "votes_counts.total_votes_cast_count")).toBe(true);
@@ -51,7 +51,7 @@ describe("votersAndVotesSection", () => {
     expect(inputGrid.type).toBe("inputGrid");
 
     const codes = inputGrid.rows.map((row) => row.code);
-    expect(codes).toEqual(["A", "B", "D", "E.1", "E.2", "E", "F", "G", "H"]);
+    expect(codes).toEqual(["A", "B", "C", "D", "E.1", "E.2", "E", "F", "G", "H"]);
   });
 });
 

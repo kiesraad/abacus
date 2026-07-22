@@ -15,7 +15,8 @@
   "voters_counts": {
     "poll_card_count": "Stempassen",
     "proxy_certificate_count": "Volmachtbewijzen",
-    "total_admitted_voters_count": "Totaal toegelaten kiezers"
+    "total_admitted_voters_count": "Totaal toegelaten kiezers",
+    "voter_cards_count": "Kiezerspassen"
   },
   "votes_counts": {
     "total_votes_candidates_count": "Totaal stemmen op kandidaten",

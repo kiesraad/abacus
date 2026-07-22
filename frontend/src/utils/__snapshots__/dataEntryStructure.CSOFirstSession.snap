@@ -128,10 +128,16 @@
             "title": "Stempassen",
           },
           {
-            "addSeparator": true,
             "code": "B",
             "path": "voters_counts.proxy_certificate_count",
             "title": "Volmachtbewijzen",
+          },
+          {
+            "addSeparator": true,
+            "code": "C",
+            "isDisabled": true,
+            "path": "voters_counts.voter_cards_count",
+            "title": "Kiezerspassen",
           },
           {
             "addSeparator": true,

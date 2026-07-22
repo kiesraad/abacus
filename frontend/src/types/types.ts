@@ -69,6 +69,7 @@ export interface InputGridSubsectionRow {
   code?: string;
   path: ResultsPath;
   title: string;
+  isDisabled?: boolean;
   isTotal?: boolean;
   isListTotal?: boolean;
   addSeparator?: boolean;

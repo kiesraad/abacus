@@ -80,7 +80,7 @@ Name: "{app}\{#MyBackupDirName}"
 Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; IconFilename: "{app}\{#MyAppIcon}"
 Name: "{autodesktop}\1. Start {#MyAppName} server"; Filename: "{sys}\cmd.exe"; Parameters: "/k ""{app}\{#MyAppExeName}"""; WorkingDir: "{app}"; IconFilename: "{app}\{#MyAppIcon}"
 Name: "{autodesktop}\2. Open {#MyAppName} in browser"; Filename: "https://localhost"; IconFilename: "{app}\{#MyAppIcon}"
-Name: "{autodesktop}\{#MyAppName} backups"; Filename: "{app}\{#MyBackupDirName}"; IconFilename: "{sys}\shell32.dll"; IconIndex: 3
+Name: "{autodesktop}\{#MyAppName} data"; Filename: "{app}"; IconFilename: "{sys}\shell32.dll"; IconIndex: 3
 
 [Run]
 Filename: "{tmp}\VC_redist.x64.exe"; Parameters: "/install /passive /norestart"; StatusMsg: "Visual C++ Redistributable installeren..."

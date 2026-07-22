@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest";
 
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
-import type { Candidate, ElectionWithPoliticalGroups } from "@/types/generated/openapi";
+import { type Candidate, type ElectionWithPoliticalGroups, electionCategoryValues } from "@/types/generated/openapi";
 import { type DataEntryModel, dataEntryModelValues, type InputGridSubsection } from "@/types/types";
 
 import {
@@ -240,10 +240,13 @@ describe("getDataEntryStructure", () => {
     expect(structure.map((section) => section.id)).toStrictEqual(expectedSectionIds);
   });
 
-  // Snapshot test every model to catch any unintended changes in the structure
-  test.each(dataEntryModelValues)("%s structure snapshot", async (model) => {
-    await expect(getDataEntryStructure(model, electionMockData)).toMatchFileSnapshot(
-      `./__snapshots__/dataEntryStructure.${model}.snap`,
+  // Snapshot test every model and election category to catch any unintended changes in the structure
+  const testCombinations = dataEntryModelValues.flatMap((model) =>
+    electionCategoryValues.map((category) => [model, category] as const),
+  );
+  test.each(testCombinations)("%s %s structure snapshot", async (model, category) => {
+    await expect(getDataEntryStructure(model, { ...electionMockData, category })).toMatchFileSnapshot(
+      `./__snapshots__/dataEntryStructure.${model}.${category}.snap`,
     );
   });
 });

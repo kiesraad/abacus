@@ -4,8 +4,8 @@ use abacus::{
     domain::{
         data_entry::{CurrentDataEntry, DataEntryStatus, DataEntryTransitionError},
         election::{
-            CommitteeCategory, ElectionCategory, ElectionId, ElectionWithPoliticalGroups,
-            VoteCountingMethod,
+            CommitteeCategory, ElectionCategory, ElectionId, ElectionSubCategory,
+            ElectionWithPoliticalGroups, VoteCountingMethod,
         },
         results::{
             Results,
@@ -105,6 +105,7 @@ fn election() -> ElectionWithPoliticalGroups {
         location: "Test locatie".to_string(),
         domain_id: "0000".to_string(),
         category: ElectionCategory::Municipal,
+        sub_category: ElectionSubCategory::GR1,
         number_of_seats: 18,
         number_of_voters: 1000,
         election_date: NaiveDate::from_ymd_opt(2024, 1, 1).unwrap(),

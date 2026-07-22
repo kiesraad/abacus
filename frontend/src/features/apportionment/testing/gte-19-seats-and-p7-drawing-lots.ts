@@ -2464,6 +2464,7 @@ export const election: ElectionWithPoliticalGroups = {
   location: "Juinen",
   domain_id: "0035",
   category: "Municipal",
+  sub_category: "GR2",
   number_of_seats: 23,
   number_of_voters: 1,
   election_date: "2026-03-18",

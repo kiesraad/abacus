@@ -1,6 +1,6 @@
-INSERT INTO elections (id, name, committee_category, counting_method, election_id, location, domain_id, category, number_of_seats, number_of_voters, election_date, nomination_date, political_groups)
+INSERT INTO elections (id, name, committee_category, counting_method, election_id, location, domain_id, category, sub_category, number_of_seats, number_of_voters, election_date, nomination_date, political_groups)
 -- copy of election_4 with committee_category changed to 'CSB' and subcommittee instead of polling station
-VALUES (9, 'Test Election < 19 seats', 'CSB', NULL, 'GR2026_TestLocation', 'Test Location', '9101', 'Municipal', 15, 1, '2026-03-18', '2026-02-02', '[
+VALUES (9, 'Test Election < 19 seats', 'CSB', NULL, 'GR2026_TestLocation', 'Test Location', '9101', 'Municipal', 'GR1', 15, 1, '2026-03-18', '2026-02-02', '[
          {
            "number": 1,
            "registered_name": "Political Group A",

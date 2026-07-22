@@ -47,6 +47,49 @@ use crate::domain::{
 };
 
 impl NewElection {
+    fn get_category_or_err(
+        category: eml_nl::utils::ElectionCategory,
+    ) -> Result<crate::domain::election::ElectionCategory, EMLImportError> {
+        match category {
+            eml_nl::utils::ElectionCategory::AB => {
+                Ok(crate::domain::election::ElectionCategory::WaterAuthority)
+            }
+            eml_nl::utils::ElectionCategory::GR => {
+                Ok(crate::domain::election::ElectionCategory::Municipal)
+            }
+            eml_nl::utils::ElectionCategory::PS => {
+                Ok(crate::domain::election::ElectionCategory::Provincial)
+            }
+            _ => Err(EMLImportError::LimitedElectionsSupported),
+        }
+    }
+
+    fn get_sub_category_or_err(
+        sub_category: eml_nl::utils::ElectionSubcategory,
+    ) -> Result<crate::domain::election::ElectionSubCategory, EMLImportError> {
+        match sub_category {
+            eml_nl::utils::ElectionSubcategory::AB1 => {
+                Ok(crate::domain::election::ElectionSubCategory::AB1)
+            }
+            eml_nl::utils::ElectionSubcategory::AB2 => {
+                Ok(crate::domain::election::ElectionSubCategory::AB2)
+            }
+            eml_nl::utils::ElectionSubcategory::GR1 => {
+                Ok(crate::domain::election::ElectionSubCategory::GR1)
+            }
+            eml_nl::utils::ElectionSubcategory::GR2 => {
+                Ok(crate::domain::election::ElectionSubCategory::GR2)
+            }
+            eml_nl::utils::ElectionSubcategory::PS1 => {
+                Ok(crate::domain::election::ElectionSubCategory::PS1)
+            }
+            eml_nl::utils::ElectionSubcategory::PS2 => {
+                Ok(crate::domain::election::ElectionSubCategory::PS2)
+            }
+            _ => Err(EMLImportError::LimitedElectionsSupported),
+        }
+    }
+
     pub fn from_eml_str(election_definition_data: &str) -> Result<Self, EMLImportError> {
         // attempt to parse in strict mode (we don't expect any errors in this EML)
         let definition =
@@ -58,14 +101,10 @@ impl NewElection {
         // extract common information
         let election = &definition.election_event.election;
         let identifier = &election.identifier;
-        let category = identifier.category.copied_value()?;
+        let category = Self::get_category_or_err(identifier.category.copied_value()?)?;
+        let sub_category = Self::get_sub_category_or_err(identifier.subcategory.copied_value()?)?;
         let election_date = identifier.election_date.copied_value()?.date;
         let nomination_date = identifier.nomination_date.copied_value()?.date;
-
-        // we currently only support GR elections
-        if category != eml_nl::utils::ElectionCategory::GR {
-            return Err(EMLImportError::OnlyMunicipalSupported);
-        }
 
         // we need the election domain and its id
         let Some(domain) = &identifier.domain else {
@@ -123,7 +162,8 @@ impl NewElection {
             election_id: identifier.id.raw().into_owned(),
             location: domain.name.to_string(),
             domain_id: domain_id.raw().into_owned(),
-            category: crate::domain::election::ElectionCategory::Municipal,
+            category,
+            sub_category,
             number_of_seats,
             number_of_voters,
             election_date,
@@ -335,33 +375,33 @@ impl ElectionWithPoliticalGroups {
         }
     }
 
-    /// Get the EML election subcategory for this election.
-    pub fn get_eml_subcategory(&self) -> eml_nl::utils::ElectionSubcategory {
-        match self.category {
-            crate::domain::election::ElectionCategory::Municipal => {
-                if self.number_of_seats < 19 {
-                    eml_nl::utils::ElectionSubcategory::GR1
-                } else {
-                    eml_nl::utils::ElectionSubcategory::GR2
-                }
+    /// Get the EML election sub category for this election.
+    pub fn get_eml_sub_category(&self) -> eml_nl::utils::ElectionSubcategory {
+        match self.sub_category {
+            crate::domain::election::ElectionSubCategory::AB1 => {
+                eml_nl::utils::ElectionSubcategory::AB1
             }
-            crate::domain::election::ElectionCategory::Provincial => {
-                // TODO: Needs to be changed to if single district { PS1 } else { PS2 } once import works
+            crate::domain::election::ElectionSubCategory::AB2 => {
+                eml_nl::utils::ElectionSubcategory::AB2
+            }
+            crate::domain::election::ElectionSubCategory::GR1 => {
+                eml_nl::utils::ElectionSubcategory::GR1
+            }
+            crate::domain::election::ElectionSubCategory::GR2 => {
+                eml_nl::utils::ElectionSubcategory::GR2
+            }
+            crate::domain::election::ElectionSubCategory::PS1 => {
                 eml_nl::utils::ElectionSubcategory::PS1
             }
-            crate::domain::election::ElectionCategory::WaterAuthority => {
-                if self.number_of_seats < 19 {
-                    eml_nl::utils::ElectionSubcategory::AB1
-                } else {
-                    eml_nl::utils::ElectionSubcategory::AB2
-                }
+            crate::domain::election::ElectionSubCategory::PS2 => {
+                eml_nl::utils::ElectionSubcategory::PS2
             }
         }
     }
 
     /// Get the preference threshold for this election, which is used in the EML definition.
     pub fn get_eml_preference_threshold(&self) -> u64 {
-        match self.get_eml_subcategory() {
+        match self.get_eml_sub_category() {
             eml_nl::utils::ElectionSubcategory::GR1 => 50,
             _ => 25,
         }
@@ -378,7 +418,7 @@ impl ElectionWithPoliticalGroups {
             .election_date(self.election_date)
             .nomination_date(self.nomination_date)
             .category(self.get_eml_category())
-            .subcategory(self.get_eml_subcategory())
+            .subcategory(self.get_eml_sub_category())
             .domain(ElectionDomain::new(
                 Some(ElectionDomainId::new(&self.domain_id)?),
                 self.location.clone(),
@@ -991,12 +1031,13 @@ mod tests {
     }
 
     #[test]
-    fn test_invalid_election_only_municipal_supported() {
-        let data =
-            include_str!("../eml/tests/eml110a_invalid_election_only_municipal_supported.eml.xml");
+    fn test_invalid_election_limited_elections_supported() {
+        let data = include_str!(
+            "../eml/tests/eml110a_invalid_election_limited_elections_supported.eml.xml"
+        );
         let res = NewElection::from_eml_str(data).unwrap_err();
         dbg!(&res);
-        assert!(matches!(res, EMLImportError::OnlyMunicipalSupported));
+        assert!(matches!(res, EMLImportError::LimitedElectionsSupported));
     }
 
     #[test]

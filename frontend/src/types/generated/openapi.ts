@@ -889,6 +889,7 @@ export interface Election {
   nomination_date: string;
   number_of_seats: number;
   number_of_voters: number;
+  sub_category: ElectionSubCategory;
 }
 
 export interface ElectionApportionmentResponse {
@@ -980,6 +981,12 @@ export interface ElectionStatusResponseEntry {
 }
 
 /**
+ * Election sub category (limited for now)
+ */
+export const electionSubCategoryValues = ["AB1", "AB2", "GR1", "GR2", "PS1", "PS2"] as const;
+export type ElectionSubCategory = (typeof electionSubCategoryValues)[number];
+
+/**
  * Contains a summary of the election results, added up from the votes of all polling stations.
  */
 export interface ElectionSummary {
@@ -1014,6 +1021,7 @@ export interface ElectionWithPoliticalGroups {
   number_of_seats: number;
   number_of_voters: number;
   political_groups: PoliticalGroup[];
+  sub_category: ElectionSubCategory;
 }
 
 /**
@@ -1325,6 +1333,7 @@ export interface NewElection {
   nomination_date: string;
   number_of_seats: number;
   number_of_voters: number;
+  sub_category: ElectionSubCategory;
 }
 
 export type PGNumber = number;

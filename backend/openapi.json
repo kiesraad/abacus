@@ -6728,6 +6728,7 @@
           "location",
           "domain_id",
           "category",
+          "sub_category",
           "number_of_seats",
           "number_of_voters",
           "election_date",
@@ -6775,6 +6776,9 @@
             "type": "integer",
             "format": "int32",
             "minimum": 0
+          },
+          "sub_category": {
+            "$ref": "#/components/schemas/ElectionSubCategory"
           }
         },
         "additionalProperties": false
@@ -7105,6 +7109,18 @@
         },
         "additionalProperties": false
       },
+      "ElectionSubCategory": {
+        "type": "string",
+        "description": "Election sub category (limited for now)",
+        "enum": [
+          "AB1",
+          "AB2",
+          "GR1",
+          "GR2",
+          "PS1",
+          "PS2"
+        ]
+      },
       "ElectionSummary": {
         "type": "object",
         "description": "Contains a summary of the election results, added up from the votes of all polling stations.",
@@ -7159,6 +7175,7 @@
           "location",
           "domain_id",
           "category",
+          "sub_category",
           "number_of_seats",
           "number_of_voters",
           "election_date",
@@ -7213,6 +7230,9 @@
             "items": {
               "$ref": "#/components/schemas/PoliticalGroup"
             }
+          },
+          "sub_category": {
+            "$ref": "#/components/schemas/ElectionSubCategory"
           }
         },
         "additionalProperties": false
@@ -8148,6 +8168,7 @@
           "location",
           "domain_id",
           "category",
+          "sub_category",
           "number_of_seats",
           "number_of_voters",
           "election_date",
@@ -8192,6 +8213,9 @@
             "type": "integer",
             "format": "int32",
             "minimum": 0
+          },
+          "sub_category": {
+            "$ref": "#/components/schemas/ElectionSubCategory"
           }
         },
         "additionalProperties": false

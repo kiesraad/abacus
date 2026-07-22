@@ -29,6 +29,7 @@ const renderGSBTable = (
           location: "Heemdamseburg",
           domain_id: "0035",
           category: "Municipal",
+          sub_category: "GR2",
           number_of_seats: 29,
           number_of_voters: electionNumberOfVoters,
           election_date: "2024-11-30",

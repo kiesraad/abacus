@@ -8,6 +8,7 @@
     "location": "Test",
     "domain_id": "0000",
     "category": "Municipal",
+    "sub_category": "GR2",
     "number_of_seats": 45,
     "number_of_voters": 820,
     "election_date": "2022-03-16",

@@ -26,6 +26,7 @@ pub struct Election {
     pub location: String,
     pub domain_id: String,
     pub category: ElectionCategory,
+    pub sub_category: ElectionSubCategory,
     pub number_of_seats: u32,
     pub number_of_voters: u32,
     #[schema(value_type = String, format = "date")]
@@ -48,6 +49,7 @@ pub struct ElectionWithPoliticalGroups {
     pub location: String,
     pub domain_id: String,
     pub category: ElectionCategory,
+    pub sub_category: ElectionSubCategory,
     pub number_of_seats: u32,
     pub number_of_voters: u32,
     #[schema(value_type = String, format = "date")]
@@ -69,6 +71,7 @@ impl From<ElectionWithPoliticalGroups> for Election {
             location: value.location,
             domain_id: value.domain_id,
             category: value.category,
+            sub_category: value.sub_category,
             number_of_seats: value.number_of_seats,
             number_of_voters: value.number_of_voters,
             election_date: value.election_date,
@@ -151,6 +154,7 @@ pub struct NewElection {
     pub location: String,
     pub domain_id: String,
     pub category: ElectionCategory,
+    pub sub_category: ElectionSubCategory,
     pub number_of_seats: u32,
     pub number_of_voters: u32,
     #[schema(value_type = String, format = "date")]
@@ -188,6 +192,53 @@ impl ElectionCategory {
             ElectionCategory::Municipal => "GR",
             ElectionCategory::Provincial => "PS",
             ElectionCategory::WaterAuthority => "AB",
+        }
+    }
+}
+
+/// Election sub category (limited for now)
+#[derive(
+    Serialize, Deserialize, strum::Display, ToSchema, Clone, Copy, Debug, PartialEq, Eq, Hash, Type,
+)]
+#[strum(serialize_all = "lowercase")]
+pub enum ElectionSubCategory {
+    /// Waterschapsverkiezing < 19 seats
+    AB1,
+    /// Waterschapsverkiezing >= 19 seats
+    AB2,
+    /// Gemeenteraadsverkiezing < 19 seats
+    GR1,
+    /// Gemeenteraadsverkiezing >= 19 seats
+    GR2,
+    /// Provinciale statenverkiezing single district
+    PS1,
+    /// Provinciale statenverkiezing multiple district
+    PS2,
+}
+
+impl From<String> for ElectionSubCategory {
+    fn from(value: String) -> Self {
+        match value.as_str() {
+            "AB1" => Self::AB1,
+            "AB2" => Self::AB2,
+            "GR1" => Self::GR1,
+            "GR2" => Self::GR2,
+            "PS1" => Self::PS1,
+            "PS2" => Self::PS2,
+            _ => panic!("invalid ElectionSubCategory `{value}`"),
+        }
+    }
+}
+
+impl ElectionSubCategory {
+    pub fn to_eml_code(&self) -> &'static str {
+        match self {
+            ElectionSubCategory::AB1 => "AB1",
+            ElectionSubCategory::AB2 => "AB2",
+            ElectionSubCategory::GR1 => "GR1",
+            ElectionSubCategory::GR2 => "AB2",
+            ElectionSubCategory::PS1 => "PS1",
+            ElectionSubCategory::PS2 => "PS2",
         }
     }
 }
@@ -381,6 +432,11 @@ pub(crate) mod tests {
             location: "Test".to_string(),
             domain_id: "0000".to_string(),
             category: ElectionCategory::Municipal,
+            sub_category: if number_of_seats < 19 {
+                ElectionSubCategory::GR1
+            } else {
+                ElectionSubCategory::GR2
+            },
             number_of_seats,
             number_of_voters: 1000,
             election_date: NaiveDate::from_ymd_opt(2023, 11, 1).unwrap(),

@@ -9,6 +9,7 @@ pub enum EMLImportError {
     InvalidVotingMethod,
     InvalidPollingStation,
     InvalidNumberOfVoters,
+    LimitedElectionsSupported,
     MismatchElection,
     MismatchElectionDate,
     MismatchElectionDomain,
@@ -27,7 +28,6 @@ pub enum EMLImportError {
     Needs230b,
     NumberOfSeatsNotInRange,
     NumberOfPollingStationsNotInRange,
-    OnlyMunicipalSupported,
     TooManyPoliticalGroups,
     PoliticalGroupNumbersNotIncreasing {
         expected_larger_than: PGNumber,

@@ -133,13 +133,13 @@ impl AsAuditEvent for ElectionUpdatedAuditData {
 /// Get a list of all elections, without their candidate lists and
 /// a list of the current committee session for each election
 #[utoipa::path(
-    get,
-    path = "/api/elections",
-    responses(
+  get,
+  path = "/api/elections",
+  responses(
         (status = 200, description = "Election list", body = ElectionListResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
-    ),
+  ),
 )]
 pub async fn election_list(
     user: User,
@@ -164,17 +164,17 @@ pub async fn election_list(
 /// Get election details including the election's candidate list (political groups),
 /// its polling stations and the current committee session and its investigations
 #[utoipa::path(
-    get,
-    path = "/api/elections/{election_id}",
-    responses(
+  get,
+  path = "/api/elections/{election_id}",
+  responses(
         (status = 200, description = "Election", body = ElectionDetailsResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
-    ),
-    params(
+  ),
+  params(
         ("election_id" = ElectionId, description = "Election database id"),
-    ),
+  ),
 )]
 pub async fn election_details(
     user: User,

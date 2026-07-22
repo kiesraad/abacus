@@ -42,15 +42,15 @@ async fn test_gsb_election_validate_invalid_election_only_municipal_supported(po
     let url = format!("http://{addr}/api/elections/import/validate");
     let admin_cookie = login(&addr, Admin).await;
     let response = reqwest::Client::new()
-        .post(&url)
-        .header("cookie", admin_cookie)
-        .json(&serde_json::json!({
+    .post(&url)
+    .header("cookie", admin_cookie)
+    .json(&serde_json::json!({
           "committee_category": "GSB",
-          "election_data": include_str!("../src/eml/tests/eml110a_invalid_election_only_municipal_supported.eml.xml"),
+          "election_data": include_str!("../src/eml/tests/eml110a_invalid_election_limited_elections_supported.eml.xml"),
         }))
-        .send()
-        .await
-        .unwrap();
+    .send()
+    .await
+    .unwrap();
 
     // Ensure the response is what we expect
     assert_eq!(response.status(), StatusCode::BAD_REQUEST);
@@ -174,15 +174,15 @@ async fn test_election_validate_number_of_seats_out_of_range(pool: SqlitePool) {
     let url = format!("http://{addr}/api/elections/import/validate");
     let admin_cookie = login(&addr, Admin).await;
     let response = reqwest::Client::new()
-        .post(&url)
-        .header("cookie", admin_cookie)
-        .json(&serde_json::json!({
+    .post(&url)
+    .header("cookie", admin_cookie)
+    .json(&serde_json::json!({
           "committee_category": "GSB",
           "election_data": include_str!("../src/eml/tests/eml110a_invalid_election_number_of_seats_out_of_range.eml.xml"),
         }))
-        .send()
-        .await
-        .unwrap();
+    .send()
+    .await
+    .unwrap();
 
     // Ensure the response is what we expect
     assert_eq!(response.status(), StatusCode::BAD_REQUEST);
@@ -195,15 +195,15 @@ async fn test_election_validate_missing_election_domain(pool: SqlitePool) {
     let url = format!("http://{addr}/api/elections/import/validate");
     let admin_cookie = login(&addr, Admin).await;
     let response = reqwest::Client::new()
-        .post(&url)
-        .header("cookie", admin_cookie)
-        .json(&serde_json::json!({
+    .post(&url)
+    .header("cookie", admin_cookie)
+    .json(&serde_json::json!({
           "committee_category": "GSB",
           "election_data": include_str!("../src/eml/tests/eml110a_invalid_election_missing_election_domain.eml.xml"),
         }))
-        .send()
-        .await
-        .unwrap();
+    .send()
+    .await
+    .unwrap();
 
     // Ensure the response is what we expect
     assert_eq!(response.status(), StatusCode::BAD_REQUEST);
@@ -216,15 +216,15 @@ async fn test_gsb_election_validate_hash_file_instead_of_election_definition(poo
     let url = format!("http://{addr}/api/elections/import/validate");
     let admin_cookie = login(&addr, Admin).await;
     let response = reqwest::Client::new()
-        .post(&url)
-        .header("cookie", admin_cookie)
-        .json(&serde_json::json!({
+    .post(&url)
+    .header("cookie", admin_cookie)
+    .json(&serde_json::json!({
           "committee_category": "GSB",
           "election_data": "5738 d520 a7f2 89b8 8875 ebfe cfc8 6012 d7b6 f65f 3271 d0e1 180b ccdd 8134 cd5d",
         }))
-        .send()
-        .await
-        .unwrap();
+    .send()
+    .await
+    .unwrap();
 
     // Ensure the response is what we expect
     assert_eq!(response.status(), StatusCode::BAD_REQUEST);
@@ -266,9 +266,9 @@ async fn test_election_candidates_validate_wrong_file(pool: SqlitePool) {
     let url = format!("http://{addr}/api/elections/import/validate");
     let admin_cookie = login(&addr, Admin).await;
     let response = reqwest::Client::new()
-        .post(&url)
-        .header("cookie", admin_cookie)
-        .json(&serde_json::json!({
+    .post(&url)
+    .header("cookie", admin_cookie)
+    .json(&serde_json::json!({
             "committee_category": "GSB",
             "election_hash": [
                 "4291", "a4e7", "c76e", "ed19",
@@ -279,9 +279,9 @@ async fn test_election_candidates_validate_wrong_file(pool: SqlitePool) {
             "election_data": include_str!("../src/eml/tests/eml110a_test.eml.xml"),
             "candidate_data": include_str!("../src/eml/tests/eml230b_invalid_document_type.eml.xml"),
         }))
-        .send()
-        .await
-        .unwrap();
+    .send()
+    .await
+    .unwrap();
 
     assert_eq!(response.status(), StatusCode::BAD_REQUEST);
 }
@@ -293,9 +293,9 @@ async fn test_election_candidates_validate_missing_authority(pool: SqlitePool) {
     let url = format!("http://{addr}/api/elections/import/validate");
     let admin_cookie = login(&addr, Admin).await;
     let response = reqwest::Client::new()
-        .post(&url)
-        .header("cookie", admin_cookie)
-        .json(&serde_json::json!({
+    .post(&url)
+    .header("cookie", admin_cookie)
+    .json(&serde_json::json!({
             "committee_category": "GSB",
             "election_hash": [
                 "4291", "a4e7", "c76e", "ed19",
@@ -306,9 +306,9 @@ async fn test_election_candidates_validate_missing_authority(pool: SqlitePool) {
             "election_data": include_str!("../src/eml/tests/eml110a_test.eml.xml"),
             "candidate_data": include_str!("../src/eml/tests/eml230b_invalid_missing_authority.eml.xml"),
         }))
-        .send()
-        .await
-        .unwrap();
+    .send()
+    .await
+    .unwrap();
 
     assert_eq!(response.status(), StatusCode::BAD_REQUEST);
 }
@@ -320,9 +320,9 @@ async fn test_election_candidates_validate_wrong_election_type(pool: SqlitePool)
     let url = format!("http://{addr}/api/elections/import/validate");
     let admin_cookie = login(&addr, Admin).await;
     let response = reqwest::Client::new()
-        .post(&url)
-        .header("cookie", admin_cookie)
-        .json(&serde_json::json!({
+    .post(&url)
+    .header("cookie", admin_cookie)
+    .json(&serde_json::json!({
             "committee_category": "GSB",
             "election_hash": [
                 "4291", "a4e7", "c76e", "ed19",
@@ -333,9 +333,9 @@ async fn test_election_candidates_validate_wrong_election_type(pool: SqlitePool)
             "election_data": include_str!("../src/eml/tests/eml110a_test.eml.xml"),
             "candidate_data": include_str!("../src/eml/tests/eml230b_invalid_incorrect_election_type.eml.xml"),
         }))
-        .send()
-        .await
-        .unwrap();
+    .send()
+    .await
+    .unwrap();
 
     assert_eq!(response.status(), StatusCode::BAD_REQUEST);
 }
@@ -347,9 +347,9 @@ async fn test_election_candidates_validate_wrong_election_id(pool: SqlitePool) {
     let url = format!("http://{addr}/api/elections/import/validate");
     let admin_cookie = login(&addr, Admin).await;
     let response = reqwest::Client::new()
-        .post(&url)
-        .header("cookie", admin_cookie)
-        .json(&serde_json::json!({
+    .post(&url)
+    .header("cookie", admin_cookie)
+    .json(&serde_json::json!({
             "committee_category": "GSB",
             "election_hash": [
                 "4291", "a4e7", "c76e", "ed19",
@@ -360,9 +360,9 @@ async fn test_election_candidates_validate_wrong_election_id(pool: SqlitePool) {
             "election_data": include_str!("../src/eml/tests/eml110a_test.eml.xml"),
             "candidate_data": include_str!("../src/eml/tests/eml230b_invalid_incorrect_election.eml.xml"),
         }))
-        .send()
-        .await
-        .unwrap();
+    .send()
+    .await
+    .unwrap();
 
     assert_eq!(response.status(), StatusCode::BAD_REQUEST);
 }
@@ -374,9 +374,9 @@ async fn test_election_candidates_validate_missing_election_domain(pool: SqliteP
     let url = format!("http://{addr}/api/elections/import/validate");
     let admin_cookie = login(&addr, Admin).await;
     let response = reqwest::Client::new()
-        .post(&url)
-        .header("cookie", admin_cookie)
-        .json(&serde_json::json!({
+    .post(&url)
+    .header("cookie", admin_cookie)
+    .json(&serde_json::json!({
             "committee_category": "GSB",
             "election_hash": [
                 "4291", "a4e7", "c76e", "ed19",
@@ -387,9 +387,9 @@ async fn test_election_candidates_validate_missing_election_domain(pool: SqliteP
             "election_data": include_str!("../src/eml/tests/eml110a_test.eml.xml"),
             "candidate_data": include_str!("../src/eml/tests/eml230b_invalid_incorrect_election_domain.eml.xml"),
         }))
-        .send()
-        .await
-        .unwrap();
+    .send()
+    .await
+    .unwrap();
 
     assert_eq!(response.status(), StatusCode::BAD_REQUEST);
 }
@@ -401,9 +401,9 @@ async fn test_election_candidates_validate_wrong_domain_id(pool: SqlitePool) {
     let url = format!("http://{addr}/api/elections/import/validate");
     let admin_cookie = login(&addr, Admin).await;
     let response = reqwest::Client::new()
-        .post(&url)
-        .header("cookie", admin_cookie)
-        .json(&serde_json::json!({
+    .post(&url)
+    .header("cookie", admin_cookie)
+    .json(&serde_json::json!({
             "committee_category": "GSB",
             "election_hash": [
                 "4291", "a4e7", "c76e", "ed19",
@@ -414,9 +414,9 @@ async fn test_election_candidates_validate_wrong_domain_id(pool: SqlitePool) {
             "election_data": include_str!("../src/eml/tests/eml110a_test.eml.xml"),
             "candidate_data": include_str!("../src/eml/tests/eml230b_invalid_incorrect_election_domain.eml.xml"),
         }))
-        .send()
-        .await
-        .unwrap();
+    .send()
+    .await
+    .unwrap();
 
     assert_eq!(response.status(), StatusCode::BAD_REQUEST);
 }
@@ -428,9 +428,9 @@ async fn test_election_candidates_validate_wrong_election_date(pool: SqlitePool)
     let url = format!("http://{addr}/api/elections/import/validate");
     let admin_cookie = login(&addr, Admin).await;
     let response = reqwest::Client::new()
-        .post(&url)
-        .header("cookie", admin_cookie)
-        .json(&serde_json::json!({
+    .post(&url)
+    .header("cookie", admin_cookie)
+    .json(&serde_json::json!({
             "committee_category": "GSB",
             "election_hash": [
                 "4291", "a4e7", "c76e", "ed19",
@@ -441,9 +441,9 @@ async fn test_election_candidates_validate_wrong_election_date(pool: SqlitePool)
             "election_data": include_str!("../src/eml/tests/eml110a_test.eml.xml"),
             "candidate_data": include_str!("../src/eml/tests/eml230b_invalid_incorrect_election_date.eml.xml"),
         }))
-        .send()
-        .await
-        .unwrap();
+    .send()
+    .await
+    .unwrap();
 
     assert_eq!(response.status(), StatusCode::BAD_REQUEST);
 }
@@ -455,9 +455,9 @@ async fn test_election_candidates_validate_empty_affiliates(pool: SqlitePool) {
     let url = format!("http://{addr}/api/elections/import/validate");
     let admin_cookie = login(&addr, Admin).await;
     let response = reqwest::Client::new()
-        .post(&url)
-        .header("cookie", admin_cookie)
-        .json(&serde_json::json!({
+    .post(&url)
+    .header("cookie", admin_cookie)
+    .json(&serde_json::json!({
             "committee_category": "GSB",
             "election_hash": [
                 "4291", "a4e7", "c76e", "ed19",
@@ -468,9 +468,9 @@ async fn test_election_candidates_validate_empty_affiliates(pool: SqlitePool) {
             "election_data": include_str!("../src/eml/tests/eml110a_test.eml.xml"),
             "candidate_data": include_str!("../src/eml/tests/eml230b_invalid_empty_affiliates.eml.xml"),
         }))
-        .send()
-        .await
-        .unwrap();
+    .send()
+    .await
+    .unwrap();
 
     assert_eq!(response.status(), StatusCode::BAD_REQUEST);
 }
@@ -482,9 +482,9 @@ async fn test_election_candidates_validate_empty_candidates(pool: SqlitePool) {
     let url = format!("http://{addr}/api/elections/import/validate");
     let admin_cookie = login(&addr, Admin).await;
     let response = reqwest::Client::new()
-        .post(&url)
-        .header("cookie", admin_cookie)
-        .json(&serde_json::json!({
+    .post(&url)
+    .header("cookie", admin_cookie)
+    .json(&serde_json::json!({
             "committee_category": "GSB",
             "election_hash": [
                 "4291", "a4e7", "c76e", "ed19",
@@ -497,9 +497,9 @@ async fn test_election_candidates_validate_empty_candidates(pool: SqlitePool) {
             "number_of_voters": 1234,
             "counting_method": "CSO",
         }))
-        .send()
-        .await
-        .unwrap();
+    .send()
+    .await
+    .unwrap();
 
     assert_eq!(response.status(), StatusCode::BAD_REQUEST);
 }
@@ -755,9 +755,9 @@ async fn test_election_polling_stations_not_matching_election(pool: SqlitePool) 
     let admin_cookie = login(&addr, Admin).await;
     let url = format!("http://{addr}/api/elections/import/validate");
     let response = reqwest::Client::new()
-        .post(&url)
-        .header("cookie", admin_cookie)
-        .json(&serde_json::json!({
+    .post(&url)
+    .header("cookie", admin_cookie)
+    .json(&serde_json::json!({
           "committee_category": "GSB",
           "election_hash": [
                 "4291", "a4e7", "c76e", "ed19",
@@ -778,9 +778,9 @@ async fn test_election_polling_stations_not_matching_election(pool: SqlitePool) 
             "number_of_voters": 1234,
             "counting_method": "CSO",
         }))
-        .send()
-        .await
-        .unwrap();
+    .send()
+    .await
+    .unwrap();
 
     // Ensure the response is what we expect
     assert_eq!(response.status(), StatusCode::OK);

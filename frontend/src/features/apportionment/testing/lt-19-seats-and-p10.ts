@@ -1,10 +1,18 @@
 import type {
+  ApportionmentState,
   CandidateNomination,
   CommitteeSession,
   ElectionSummary,
   ElectionWithPoliticalGroups,
   SeatAssignment,
 } from "@/types/generated/openapi";
+
+export const state: ApportionmentState = {
+  type: "Finalised",
+  deceased_candidates: [],
+  lists_drawn: [],
+  candidates_drawn: [],
+};
 
 export const seat_assignment: SeatAssignment = {
   seats: 6,

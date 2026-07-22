@@ -489,7 +489,7 @@ describe("Election create pages", () => {
       await user.click(screen.getByRole("button", { name: "Volgende" }));
 
       // eligible voters
-      expect(await screen.findByRole("heading", { name: "Hoeveel kiesgerechtigden telt de gemeente?" })).toBeVisible();
+      expect(await screen.findByRole("heading", { name: "Hoeveel kiesgerechtigden telt het GSB?" })).toBeVisible();
       expect(screen.getByRole("textbox", { name: "Aantal kiesgerechtigden" })).toHaveValue(eligibleVoters.toString());
       await user.click(screen.getByRole("button", { name: "Volgende" }));
 

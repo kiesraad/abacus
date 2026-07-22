@@ -15,7 +15,7 @@
     "CommitteeSessionCreated": "Zitting aangemaakt",
     "CommitteeSessionDeleted": "Zitting verwijderd",
     "CommitteeSessionUpdated": "Zitting bijgewerkt",
-    "DatabaseBackupCreated": "Databasebackup gemaakt",
+    "DatabaseBackupCreated": "Back-up van de database gemaakt",
     "DataEntryDeleted": "Invoer verwijderd",
     "DataEntryDiscardedBoth": "Beide invoeren verwijderd",
     "DataEntryDiscardedFirst": "Eerste invoer verwijderd",

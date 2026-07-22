@@ -63,6 +63,7 @@ fn invalid_result() -> Results {
         voters_counts: VotersCounts {
             poll_card_count: 10,
             proxy_certificate_count: 5,
+            voter_cards_count: None,
             total_admitted_voters_count: 20,
         },
         votes_counts: VotesCounts {

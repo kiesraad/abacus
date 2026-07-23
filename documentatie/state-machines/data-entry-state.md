@@ -2,7 +2,8 @@
 
 This document describes the states a data entry can have.
 The transition labels describe the endpoint that is used for performing the transition.
-The "save" endpoint which is used for [First/Second]EntryInProgress states is kept out, because Mermaid doesn't render self-loops too well.
+The `save` endpoint which is used for [First/Second]EntryInProgress states is kept out, because Mermaid doesn't render self-loops too well.
+All states except for `FirstEntryHasErrors` and `EntriesDifferent` also have a `reset` endpoint which transitions to the `Empty` state. 
 
 Note the difference between `discard` and `reset`:
 - `discard` is a typist removing their own _in-progress_ entry (the `data_entry_discard` endpoint). Discarding an in-progress second entry keeps the finalised first entry. 
@@ -12,17 +13,14 @@ Note the difference between `discard` and `reset`:
 stateDiagram-v2
   [*] --> Empty
   Empty --> FirstEntryInProgress: claim
-  %% FirstEntryInProgress --> FirstEntryInProgress: save
 
   state first_has_errors <<choice>>
   FirstEntryInProgress --> first_has_errors: finalise
   FirstEntryInProgress --> Empty: discard
-  
   first_has_errors --> FirstEntryFinalised: errors? no
   first_has_errors --> FirstEntryHasErrors: errors? yes
 
   FirstEntryFinalised --> SecondEntryInProgress: claim
-  %% SecondEntryInProgress --> SecondEntryInProgress: save
   SecondEntryInProgress --> FirstEntryFinalised: discard
 
   state first_resolve_errors <<choice>>
@@ -37,12 +35,15 @@ stateDiagram-v2
   
   state resolve <<choice>>
   EntriesDifferent --> resolve: resolve differences
-  resolve --> first_has_errors: keep one entry
   resolve --> Empty: discard both entries
-  FirstEntryInProgress --> Empty: reset
-  FirstEntryFinalised --> Empty: reset
-  SecondEntryInProgress --> Empty: reset
-  Definitive --> Empty: reset
+  resolve --> first_has_errors: keep one entry
+  resolve --> FirstEntryCorrection: correct first entry
+  resolve --> SecondEntryCorrection: correct second entry
+
+  FirstEntryCorrection --> is_different: finalise
+  FirstEntryCorrection --> FirstEntryFinalised: discard
+  SecondEntryCorrection --> FirstEntryFinalised: discard
+  SecondEntryCorrection --> is_different: finalise
 
   Definitive --> [*]
 ```

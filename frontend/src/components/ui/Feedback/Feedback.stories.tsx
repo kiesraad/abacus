@@ -53,7 +53,7 @@ export const GSBCoordinator: Story = {
     const titles = await canvas.findAllByRole("heading");
     await expect(titles).toHaveLength(2);
 
-    await expect(titles[0]).toHaveTextContent("A en B tellen niet op tot D");
+    await expect(titles[0]).toHaveTextContent("A, B en C tellen niet op tot D");
     await expect(titles[0]!.nextSibling).toHaveTextContent("F.201");
 
     await expect(titles[1]).toHaveTextContent("De stemmen op lijsten tellen niet op tot E");

@@ -48,6 +48,7 @@ function renderForm() {
 const votersFieldIds = {
   pollCardCount: "data.voters_counts.poll_card_count",
   proxyCertificateCount: "data.voters_counts.proxy_certificate_count",
+  voterCardCount: "data.voters_counts.voter_card_count",
   totalAdmittedVotersCount: "data.voters_counts.total_admitted_voters_count",
 };
 
@@ -303,16 +304,7 @@ describe("Test VotersAndVotesForm", () => {
       await screen.findByTestId("voters_votes_counts_form");
       overrideOnce("post", "/api/data_entries/1/1", 200, {
         validation_results: {
-          errors: [
-            {
-              fields: [
-                "data.voters_counts.total_admitted_voters_count",
-                "data.voters_counts.poll_card_count",
-                "data.voters_counts.proxy_certificate_count",
-              ],
-              code: "F201",
-            },
-          ],
+          errors: [validationResultMockData.F201],
           warnings: [],
         },
       });
@@ -332,6 +324,7 @@ describe("Test VotersAndVotesForm", () => {
       const expectedInvalidFieldIds = [
         votersFieldIds.pollCardCount,
         votersFieldIds.proxyCertificateCount,
+        votersFieldIds.voterCardCount,
         votersFieldIds.totalAdmittedVotersCount,
       ];
       const expectedValidFieldIds = [
@@ -381,6 +374,7 @@ describe("Test VotersAndVotesForm", () => {
         votesFieldIds.politicalGroup2TotalVotes,
         votersFieldIds.pollCardCount,
         votersFieldIds.proxyCertificateCount,
+        votersFieldIds.voterCardCount,
         votersFieldIds.totalAdmittedVotersCount,
       ];
       expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFieldIds, feedbackMessage);
@@ -418,6 +412,7 @@ describe("Test VotersAndVotesForm", () => {
       const expectedValidFieldIds = [
         votersFieldIds.pollCardCount,
         votersFieldIds.proxyCertificateCount,
+        votersFieldIds.voterCardCount,
         votersFieldIds.totalAdmittedVotersCount,
         votesFieldIds.politicalGroup1TotalVotes,
         votesFieldIds.politicalGroup2TotalVotes,
@@ -508,6 +503,7 @@ describe("Test VotersAndVotesForm", () => {
       const expectedValidFieldIds = [
         votersFieldIds.pollCardCount,
         votersFieldIds.proxyCertificateCount,
+        votersFieldIds.voterCardCount,
         votersFieldIds.totalAdmittedVotersCount,
         votesFieldIds.politicalGroup1TotalVotes,
         votesFieldIds.politicalGroup2TotalVotes,
@@ -550,6 +546,7 @@ describe("Test VotersAndVotesForm", () => {
       const expectedValidFieldIds = [
         votersFieldIds.pollCardCount,
         votersFieldIds.proxyCertificateCount,
+        votersFieldIds.voterCardCount,
         votersFieldIds.totalAdmittedVotersCount,
         votesFieldIds.politicalGroup1TotalVotes,
         votesFieldIds.politicalGroup2TotalVotes,
@@ -589,6 +586,7 @@ describe("Test VotersAndVotesForm", () => {
       const expectedValidFieldIds = [
         votersFieldIds.pollCardCount,
         votersFieldIds.proxyCertificateCount,
+        votersFieldIds.voterCardCount,
         votesFieldIds.politicalGroup1TotalVotes,
         votesFieldIds.politicalGroup2TotalVotes,
         votesFieldIds.totalVotesCandidatesCount,
@@ -627,6 +625,7 @@ describe("Test VotersAndVotesForm", () => {
       const expectedValidFieldIds = [
         votersFieldIds.pollCardCount,
         votersFieldIds.proxyCertificateCount,
+        votersFieldIds.voterCardCount,
         votersFieldIds.totalAdmittedVotersCount,
         votesFieldIds.politicalGroup1TotalVotes,
         votesFieldIds.politicalGroup2TotalVotes,

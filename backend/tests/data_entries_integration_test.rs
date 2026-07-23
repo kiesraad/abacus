@@ -168,8 +168,9 @@ async fn test_data_entry_validation(pool: SqlitePool) {
         error_1_fields[1],
         "data.voters_counts.proxy_certificate_count"
     );
+    assert_eq!(error_1_fields[2], "data.voters_counts.voter_card_count");
     assert_eq!(
-        error_1_fields[2],
+        error_1_fields[3],
         "data.voters_counts.total_admitted_voters_count"
     );
     // error 2

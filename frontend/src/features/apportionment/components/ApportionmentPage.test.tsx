@@ -800,7 +800,7 @@ describe("ApportionmentPage", () => {
             "Lijst 1 – De partijdigen heeft de volstrekte meerderheid van stemmen gekregen, maar heeft niet de volstrekte meerderheid aan zetels.",
             "Volgens artikel P 9 van de Kieswet wordt een zetel afgenomen van de lijst die een zetel heeft gekregen op basis van het kleinste overschot aan stemmen. ",
             "Lijst 2, 3 en 4 hebben met hetzelfde overschot aan stemmen hun zetels gekregen. ",
-            "In de zitting van het CSB moet door loting worden bepaald welk van deze lijsten een zetel af moet staan.",
+            "In de zitting van het CSB moet door loting worden bepaald welke van deze lijsten een zetel af moet staan.",
           ].join(""),
         );
         expect(within(alerts[0]).getByRole("link", { name: "Naar loting" })).toHaveAttribute("href", "/drawing-lots");
@@ -868,7 +868,7 @@ describe("ApportionmentPage", () => {
             "Lijst 1 – De Kandidaat heeft de volstrekte meerderheid van stemmen gekregen, maar heeft niet de volstrekte meerderheid aan zetels.",
             "Volgens artikel P 9 van de Kieswet wordt een zetel afgenomen van de lijst die een zetel heeft gekregen op basis van het kleinste gemiddeld aantal stemmen. ",
             "Lijst 6 en 7 hebben met hetzelfde gemiddeld aantal stemmen hun zetels gekregen. ",
-            "In de zitting van het CSB moet door loting worden bepaald welk van deze lijsten een zetel af moet staan.",
+            "In de zitting van het CSB moet door loting worden bepaald welke van deze lijsten een zetel af moet staan.",
           ].join(""),
         );
         expect(within(alerts[0]).getByRole("link", { name: "Naar loting" })).toHaveAttribute("href", "/drawing-lots");

@@ -56,7 +56,7 @@ Licht hieronder toe wat de reden van het extra onderzoek was
 
 === Was er in de telresultaten van het *stembureau* (rubriek 2.3 van het proces-verbaal van het stembureau) een onverklaard verschil tussen het totaal aantal getelde stembiljetten en het aantal toegelaten kiezers?
 
-#checkbox[Ja #sym.arrow.r *Hertel het aantal toegelaten kiezers (#if input.election.category == "Municipal" {[stempassen en volmachten]} else {[stempassen, kiezerspassen en volmachten]})*, en noteer de uitkomsten bij rubriek 3.1]
+#checkbox[Ja #sym.arrow.r *Hertel het aantal toegelaten kiezers (#is_local_election(input.election.category)[stempassen en volmachten][stempassen, kiezerspassen en volmachten])*, en noteer de uitkomsten bij rubriek 3.1]
 #checkbox[Nee]
 
 == Tel de stembiljetten

@@ -77,9 +77,9 @@ export function useDataEntryDifferences(
       // reload the election status data then navigate according to new status
       await electionContext?.refetch();
       let firstEntryUserId: number | undefined;
-      if (differences && action === "keep_first_entry") {
+      if (differences && action === "keep_first_and_discard_second") {
         firstEntryUserId = differences.first_entry_user_id;
-      } else if (differences && action === "keep_second_entry") {
+      } else if (differences && action === "keep_second_and_discard_first") {
         firstEntryUserId = differences.second_entry_user_id;
       }
       afterSave(response.data.status, firstEntryUserId);

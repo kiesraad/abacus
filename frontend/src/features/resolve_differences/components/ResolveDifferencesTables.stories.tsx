@@ -13,7 +13,11 @@ type Props = {
   action: ResolveDifferencesAction;
 };
 
-const actions: ResolveDifferencesAction[] = ["keep_first_entry", "keep_second_entry", "discard_both_entries"];
+const actions: ResolveDifferencesAction[] = [
+  "keep_first_and_discard_second",
+  "keep_second_and_discard_first",
+  "discard_both",
+];
 const first = resultsMockData(true);
 const second = resultsMockData(false);
 const structure = getDataEntryStructure("CSOFirstSession", electionMockData);

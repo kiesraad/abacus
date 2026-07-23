@@ -80,8 +80,8 @@ describe("DifferencesTable", () => {
   describe("show result of action in differences tables", () => {
     const rows = [{ first: "10", second: "11" }];
 
-    test("keep_first_entry", async () => {
-      renderTable(rows, "keep_first_entry");
+    test("keep_first_and_discard_second", async () => {
+      renderTable(rows, "keep_first_and_discard_second");
       const [first, second] = await screen.findAllByRole("cell");
 
       expect(first).toHaveClass(cls.keep!);
@@ -90,8 +90,8 @@ describe("DifferencesTable", () => {
       expect(second).not.toHaveClass(cls.keep!);
     });
 
-    test("keep_second_entry", async () => {
-      renderTable(rows, "keep_second_entry");
+    test("keep_second_and_discard_first", async () => {
+      renderTable(rows, "keep_second_and_discard_first");
       const [first, second] = await screen.findAllByRole("cell");
 
       expect(first).toHaveClass(cls.discard!);
@@ -100,8 +100,8 @@ describe("DifferencesTable", () => {
       expect(second).not.toHaveClass(cls.discard!);
     });
 
-    test("discard_both_entries", async () => {
-      renderTable(rows, "discard_both_entries");
+    test("discard_both", async () => {
+      renderTable(rows, "discard_both");
       const [first, second] = await screen.findAllByRole("cell");
 
       expect(first).toHaveClass(cls.discard!);

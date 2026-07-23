@@ -125,7 +125,7 @@ describe("ResolveDifferencesPage", () => {
     overrideResponseStatus("first_entry_finalised");
     await user.click(await screen.findByRole("radio", { name: "Eerste invoer (Gebruiker01)" }));
     await user.click(submit);
-    expect(resolve).toHaveBeenCalledWith("keep_first_entry");
+    expect(resolve).toHaveBeenCalledWith("keep_first_and_discard_second");
     expect(navigate).toHaveBeenCalledWith("/elections/1/status");
   });
 

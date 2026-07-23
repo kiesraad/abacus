@@ -1505,9 +1505,9 @@ export interface RedactedEmlHash {
 }
 
 export const resolveDifferencesActionValues = [
-  "keep_first_entry",
-  "keep_second_entry",
-  "discard_both_entries",
+  "keep_first_and_discard_second",
+  "keep_second_and_discard_first",
+  "discard_both",
 ] as const;
 export type ResolveDifferencesAction = (typeof resolveDifferencesActionValues)[number];
 

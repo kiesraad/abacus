@@ -48,10 +48,10 @@ export function DifferencesTable({ title, headers, rows, action }: DifferencesTa
     return null;
   }
 
-  const keepFirst = action === "keep_first_entry";
-  const keepSecond = action === "keep_second_entry";
-  const discardFirst = action === "keep_second_entry" || action === "discard_both_entries";
-  const discardSecond = action === "keep_first_entry" || action === "discard_both_entries";
+  const keepFirst = action === "keep_first_and_discard_second";
+  const keepSecond = action === "keep_second_and_discard_first";
+  const discardFirst = action === "keep_second_and_discard_first" || action === "discard_both";
+  const discardSecond = action === "keep_first_and_discard_second" || action === "discard_both";
 
   return (
     <section>

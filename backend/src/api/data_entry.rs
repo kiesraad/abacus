@@ -285,17 +285,21 @@ fn initial_current_data_entry(
 #[from_request(via(axum::Json), rejection(APIError))]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub enum ResolveDifferencesAction {
-    KeepFirstEntry,
-    KeepSecondEntry,
-    DiscardBothEntries,
+    KeepFirstAndDiscardSecond,
+    KeepSecondAndDiscardFirst,
+    DiscardBoth,
 }
 
 impl ResolveDifferencesAction {
     pub fn audit_event(&self) -> AuditEventType {
         match self {
-            ResolveDifferencesAction::KeepFirstEntry => AuditEventType::DataEntryKeptFirst,
-            ResolveDifferencesAction::KeepSecondEntry => AuditEventType::DataEntryKeptSecond,
-            ResolveDifferencesAction::DiscardBothEntries => AuditEventType::DataEntryDiscardedBoth,
+            ResolveDifferencesAction::KeepFirstAndDiscardSecond => {
+                AuditEventType::DataEntryKeptFirst
+            }
+            ResolveDifferencesAction::KeepSecondAndDiscardFirst => {
+                AuditEventType::DataEntryKeptSecond
+            }
+            ResolveDifferencesAction::DiscardBoth => AuditEventType::DataEntryDiscardedBoth,
         }
     }
 }
@@ -890,9 +894,13 @@ async fn data_entry_resolve_differences(
     let (context, state) = validate_and_get_data(&mut tx, data_entry_id, &user).await?;
 
     let new_state = match action {
-        ResolveDifferencesAction::KeepFirstEntry => state.keep_first_entry(&context.election)?,
-        ResolveDifferencesAction::KeepSecondEntry => state.keep_second_entry(&context.election)?,
-        ResolveDifferencesAction::DiscardBothEntries => state.delete_entries()?,
+        ResolveDifferencesAction::KeepFirstAndDiscardSecond => {
+            state.keep_first_entry(&context.election)?
+        }
+        ResolveDifferencesAction::KeepSecondAndDiscardFirst => {
+            state.keep_second_entry(&context.election)?
+        }
+        ResolveDifferencesAction::DiscardBoth => state.delete_entries()?,
     };
 
     let data_entry = data_entry_repo::update(&mut tx, data_entry_id, &new_state).await?;
@@ -2165,7 +2173,7 @@ mod tests {
         let response = resolve_differences(
             pool.clone(),
             data_entry_id,
-            ResolveDifferencesAction::KeepFirstEntry,
+            ResolveDifferencesAction::KeepFirstAndDiscardSecond,
         )
         .await;
         assert_eq!(response.status(), StatusCode::OK);
@@ -2200,7 +2208,7 @@ mod tests {
         let response = resolve_differences(
             pool.clone(),
             data_entry_id,
-            ResolveDifferencesAction::KeepSecondEntry,
+            ResolveDifferencesAction::KeepSecondAndDiscardFirst,
         )
         .await;
         assert_eq!(response.status(), StatusCode::OK);
@@ -2232,7 +2240,7 @@ mod tests {
         let response = resolve_differences(
             pool.clone(),
             data_entry_id,
-            ResolveDifferencesAction::DiscardBothEntries,
+            ResolveDifferencesAction::DiscardBoth,
         )
         .await;
         assert_eq!(response.status(), StatusCode::OK);
@@ -2258,7 +2266,7 @@ mod tests {
         let response = resolve_differences(
             pool.clone(),
             data_entry_id,
-            ResolveDifferencesAction::DiscardBothEntries,
+            ResolveDifferencesAction::DiscardBoth,
         )
         .await;
         assert_eq!(response.status(), StatusCode::CONFLICT);
@@ -2735,7 +2743,7 @@ mod tests {
                 ("get",                 data_entry_get(coordinator_user.clone(), State(pool.clone()), Path(data_entry_id)).await.into_response()),
                 ("resolve_errors",      data_entry_resolve_errors(coordinator_user.clone(), State(pool.clone()), Path(data_entry_id), coordinator_audit.clone(), ResolveErrorsAction::DiscardFirstEntry).await.into_response()),
                 ("get_differences",     data_entry_get_differences(coordinator_user.clone(), State(pool.clone()), Path(data_entry_id)).await.into_response()),
-                ("resolve_differences", data_entry_resolve_differences(coordinator_user.clone(), State(pool.clone()), Path(data_entry_id), coordinator_audit.clone(), ResolveDifferencesAction::DiscardBothEntries).await.into_response()),
+                ("resolve_differences", data_entry_resolve_differences(coordinator_user.clone(), State(pool.clone()), Path(data_entry_id), coordinator_audit.clone(), ResolveDifferencesAction::DiscardBoth).await.into_response()),
                 ("election_status",     election_status(coordinator_user.clone(), State(pool.clone()), Path(election_id)).await.into_response()),
             ];
             results

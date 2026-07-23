@@ -35,27 +35,27 @@ export function ResolveDifferencesForm({
           <ChoiceList>
             {validationError && <ChoiceList.Error id="resolve-differences-error">{validationError}</ChoiceList.Error>}
             <ChoiceList.Radio
-              id="keep_first_entry"
-              label={t("resolve_differences.options.keep_first_entry", { name: firstEntryName })}
-              checked={action === "keep_first_entry"}
+              id="keep_first_and_discard_second"
+              label={t("resolve_differences.options.keep_first_and_discard_second", { name: firstEntryName })}
+              checked={action === "keep_first_and_discard_second"}
               onChange={() => {
-                setAction("keep_first_entry");
+                setAction("keep_first_and_discard_second");
               }}
             />
             <ChoiceList.Radio
-              id="keep_second_entry"
-              label={t("resolve_differences.options.keep_second_entry", { name: secondEntryName })}
-              checked={action === "keep_second_entry"}
+              id="keep_second_and_discard_first"
+              label={t("resolve_differences.options.keep_second_and_discard_first", { name: secondEntryName })}
+              checked={action === "keep_second_and_discard_first"}
               onChange={() => {
-                setAction("keep_second_entry");
+                setAction("keep_second_and_discard_first");
               }}
             />
             <ChoiceList.Radio
-              id="discard_both_entries"
-              label={t("resolve_differences.options.discard_both_entries")}
-              checked={action === "discard_both_entries"}
+              id="discard_both"
+              label={t("resolve_differences.options.discard_both")}
+              checked={action === "discard_both"}
               onChange={() => {
-                setAction("discard_both_entries");
+                setAction("discard_both");
               }}
             />
           </ChoiceList>

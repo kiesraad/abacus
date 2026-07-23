@@ -51,13 +51,13 @@ export const Default: Story = {
     await expect(canvas.getByText(t("resolve_differences.form_content"))).toBeVisible();
 
     const firstEntry = canvas.getByRole("radio", {
-      name: t("resolve_differences.options.keep_first_entry", { name: args.firstEntryName }),
+      name: t("resolve_differences.options.keep_first_and_discard_second", { name: args.firstEntryName }),
     });
     const secondEntry = canvas.getByRole("radio", {
-      name: t("resolve_differences.options.keep_second_entry", { name: args.secondEntryName }),
+      name: t("resolve_differences.options.keep_second_and_discard_first", { name: args.secondEntryName }),
     });
     const discardBoth = canvas.getByRole("radio", {
-      name: t("resolve_differences.options.discard_both_entries"),
+      name: t("resolve_differences.options.discard_both"),
     });
 
     // No option is selected initially
@@ -67,14 +67,14 @@ export const Default: Story = {
 
     // Selecting an option reports the action and checks the radio exclusively
     await userEvent.click(secondEntry);
-    await expect(args.setAction).toHaveBeenLastCalledWith("keep_second_entry");
+    await expect(args.setAction).toHaveBeenLastCalledWith("keep_second_and_discard_first");
     await expect(secondEntry).toBeChecked();
     await expect(firstEntry).not.toBeChecked();
     await expect(discardBoth).not.toBeChecked();
 
     // Switching to another option updates the selection
     await userEvent.click(discardBoth);
-    await expect(args.setAction).toHaveBeenLastCalledWith("discard_both_entries");
+    await expect(args.setAction).toHaveBeenLastCalledWith("discard_both");
     await expect(discardBoth).toBeChecked();
     await expect(secondEntry).not.toBeChecked();
 
@@ -87,18 +87,20 @@ export const Default: Story = {
 export const FirstEntrySelected: Story = {
   ...Default,
   args: {
-    action: "keep_first_entry",
+    action: "keep_first_and_discard_second",
   },
   play: async ({ canvas }) => {
     await expect(
-      canvas.getByRole("radio", { name: t("resolve_differences.options.keep_first_entry", { name: "Gebruiker01" }) }),
+      canvas.getByRole("radio", {
+        name: t("resolve_differences.options.keep_first_and_discard_second", { name: "Gebruiker01" }),
+      }),
     ).toBeChecked();
     await expect(
-      canvas.getByRole("radio", { name: t("resolve_differences.options.keep_second_entry", { name: "Gebruiker02" }) }),
+      canvas.getByRole("radio", {
+        name: t("resolve_differences.options.keep_second_and_discard_first", { name: "Gebruiker02" }),
+      }),
     ).not.toBeChecked();
-    await expect(
-      canvas.getByRole("radio", { name: t("resolve_differences.options.discard_both_entries") }),
-    ).not.toBeChecked();
+    await expect(canvas.getByRole("radio", { name: t("resolve_differences.options.discard_both") })).not.toBeChecked();
   },
 };
 

@@ -8,9 +8,9 @@
     "second_entry": "Tweede invoer"
   },
   "options": {
-    "discard_both_entries": "Geen van beide: alles opnieuw invoeren",
-    "keep_first_entry": "Eerste invoer ({name})",
-    "keep_second_entry": "Tweede invoer ({name})"
+    "discard_both": "Geen van beide: alles opnieuw invoeren",
+    "keep_first_and_discard_second": "Eerste invoer ({name})",
+    "keep_second_and_discard_first": "Tweede invoer ({name})"
   },
   "page_content": "De eerste en tweede invoer zijn niet gelijk. Controleer welke invoer precies overeenkomt met het papieren proces-verbaal. Je ziet hieronder alleen de verschillen tussen invoer 1 en 2.",
   "page_title": "Verschillen oplossen",

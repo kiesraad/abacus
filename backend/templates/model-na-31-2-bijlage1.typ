@@ -109,20 +109,20 @@ Licht hieronder toe wat de reden van het extra onderzoek was
 
 === Heeft het #location_type het aantal toegelaten kiezers opnieuw geteld? Schrijf dan die aantallen op. Neem anders de aantallen over die het stembureau heeft opgeschreven in het proces-verbaal.
 
-#if input.election.category == "Municipal" {
-  sum(
+#is_local_election(input.election.category)[
+  #sum(
     empty_letterbox("A")[Stempassen], 
     empty_letterbox("B")[Volmachtbewijzen], 
     empty_letterbox("D", light: false)[Totaal toegelaten kiezers (A+B)],
   )
-} else {
-  sum(
+][
+  #sum(
     empty_letterbox("A")[Stempassen],
     empty_letterbox("B")[Volmachtbewijzen],
     empty_letterbox("C")[Kiezerspassen],
     empty_letterbox("D", light: false)[Totaal toegelaten kiezers (A+B+C)],
   )
-}
+]
 
 #pagebreak(weak: true)
 

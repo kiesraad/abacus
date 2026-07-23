@@ -148,21 +148,21 @@ Zo komt het handtekeningen-blad altijd op een losse pagina, ook als het verslag 
 
 #textbox_only_bottom_stroke[Datum en tijd:][Plaats:]
 
-== Verplicht: voorzitter en #is_municipality[#input.election.location][twee][vier] leden van het #location_type
+== Verplicht: voorzitter en #is_local_election(input.election.category)[twee][vier] leden van het #location_type
 
 === Voorzitter van het #location_type:
 
 #textbox[Naam:][Handtekening:]
 
-=== #is_municipality[#input.election.location][2][4] leden van het #location_type:
+=== #is_local_election(input.election.category)[2][4] leden van het #location_type:
 
-#stack(spacing: 0.5em, ..range(0, is_municipality(input.election.location, 2, 4)).map(_ => textbox[Naam:][Handtekening:]))
+#stack(spacing: 0.5em, ..range(0, is_local_election(input.election.category, 2, 4)).map(_ => textbox[Naam:][Handtekening:]))
 
 == Ondertekening door andere aanwezige leden van het #location_type
 
 === Extra ondertekening: (niet verplicht)
 
-#stack(spacing: 0.5em, ..range(0, is_municipality(input.election.location, 3, 1)).map(_ => textbox[Naam:][Handtekening:]))
+#stack(spacing: 0.5em, ..range(0, is_local_election(input.election.category, 3, 1)).map(_ => textbox[Naam:][Handtekening:]))
 
 #pagebreak(weak: true)
 

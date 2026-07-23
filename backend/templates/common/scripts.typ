@@ -3,6 +3,11 @@
   location in public_bodies
 ) { public_body } else { municipal }
 
+// In the future category == "Island" will also be added
+#let is_local_election = (category, local, other) => if (
+  category == "Municipal"
+) { local } else { other }
+
 // A paragraph with a vertical line on the left
 #let emph_block(content) = {
   block(width: 75%, above: 3em, below: 1.5em, outset: (left: 6pt, top: 3pt, bottom: 3pt), stroke: (left: 1pt), text(

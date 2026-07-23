@@ -155,10 +155,10 @@ Bijvoorbeeld als er meerdere verkiezingen tegelijk werden georganiseerd, en een 
 
 == Toegelaten kiezers
 
-#if input.election.category == "Municipal" {
-  [Tel het aantal geldige stempassen en volmachtbewijzen]
+#is_local_election(input.election.category)[
+  Tel het aantal geldige stempassen en volmachtbewijzen
 
-  sum(
+  #sum(
     empty_letterbox("A")[Stempassen],
     empty_letterbox("B")[Volmachtbewijzen (schriftelijk of via ingevulde stempas)],
     empty_letterbox(
@@ -166,10 +166,10 @@ Bijvoorbeeld als er meerdere verkiezingen tegelijk werden georganiseerd, en een 
       light: false,
     )[Totaal toegelaten kiezers (A+B)],
   )
-} else {
-  [Tel het aantal geldige stempassen, volmachtbewijzen en kiezerspassen]
+][
+  Tel het aantal geldige stempassen, volmachtbewijzen en kiezerspassen
 
-  sum(
+  #sum(
     empty_letterbox("A")[Stempassen],
     empty_letterbox(
       "B",
@@ -180,7 +180,7 @@ Bijvoorbeeld als er meerdere verkiezingen tegelijk werden georganiseerd, en een 
       light: false,
     )[Totaal toegelaten kiezers (A+B+C)],
   )
-}
+]
 
 #pagebreak(weak: true)
 

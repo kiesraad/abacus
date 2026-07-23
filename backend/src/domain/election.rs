@@ -200,7 +200,6 @@ impl ElectionCategory {
 #[derive(
     Serialize, Deserialize, strum::Display, ToSchema, Clone, Copy, Debug, PartialEq, Eq, Hash, Type,
 )]
-#[strum(serialize_all = "lowercase")]
 pub enum ElectionSubCategory {
     /// Waterschapsverkiezing < 19 seats
     AB1,
@@ -226,19 +225,6 @@ impl From<String> for ElectionSubCategory {
             "PS1" => Self::PS1,
             "PS2" => Self::PS2,
             _ => panic!("invalid ElectionSubCategory `{value}`"),
-        }
-    }
-}
-
-impl ElectionSubCategory {
-    pub fn to_eml_code(&self) -> &'static str {
-        match self {
-            ElectionSubCategory::AB1 => "AB1",
-            ElectionSubCategory::AB2 => "AB2",
-            ElectionSubCategory::GR1 => "GR1",
-            ElectionSubCategory::GR2 => "GR2",
-            ElectionSubCategory::PS1 => "PS1",
-            ElectionSubCategory::PS2 => "PS2",
         }
     }
 }

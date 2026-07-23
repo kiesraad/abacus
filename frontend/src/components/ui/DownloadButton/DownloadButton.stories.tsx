@@ -22,7 +22,7 @@ export const Disabled: Story = {
   args: {
     icon: "file",
     href: "#",
-    title: "Bekijk een preview van het proces verbaal",
+    title: "Bekijk een preview van het proces-verbaal",
     isDisabled: true,
   },
 };

@@ -2,10 +2,6 @@ import { useNavigate } from "react-router";
 
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { DataEntrySourceNumber } from "@/components/ui/Badge/DataEntrySourceNumber";
-import { Button } from "@/components/ui/Button/Button";
-import { ChoiceList } from "@/components/ui/CheckboxAndRadio/ChoiceList";
-import { Form } from "@/components/ui/Form/Form";
-import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { Loader } from "@/components/ui/Loader/Loader";
 import { useMessages } from "@/hooks/messages/useMessages";
 import { useNumericParam } from "@/hooks/useNumericParam";
@@ -15,10 +11,10 @@ import type { DataEntryStatusName } from "@/types/generated/openapi";
 
 import { useDataEntryDifferences } from "../hooks/useDataEntryDifferences";
 import cls from "./ResolveDifferences.module.css";
+import { ResolveDifferencesForm } from "./ResolveDifferencesForm";
 import { ResolveDifferencesOverview } from "./ResolveDifferencesOverview";
 import { ResolveDifferencesTables } from "./ResolveDifferencesTables";
 
-// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function ResolveDifferencesPage() {
   const { pushMessage } = useMessages();
   const navigate = useNavigate();
@@ -86,50 +82,14 @@ export function ResolveDifferencesPage() {
             structure={dataEntryStructure}
             action={action}
           />
-          <Form
-            onSubmit={(e) => {
-              e.preventDefault();
-              void onSubmit();
-            }}
-          >
-            <FormLayout>
-              <FormLayout.Section title={t("resolve_differences.form_question")}>
-                <p className="md">{t("resolve_differences.form_content")}</p>
-                <ChoiceList>
-                  {validationError && (
-                    <ChoiceList.Error id="resolve-differences-error">{validationError}</ChoiceList.Error>
-                  )}
-                  <ChoiceList.Radio
-                    id="keep_first_entry"
-                    label={t("resolve_differences.options.keep_first_entry", { name: getName(first_entry_user_id) })}
-                    checked={action === "keep_first_entry"}
-                    onChange={() => {
-                      setAction("keep_first_entry");
-                    }}
-                  />
-                  <ChoiceList.Radio
-                    id="keep_second_entry"
-                    label={t("resolve_differences.options.keep_second_entry", { name: getName(second_entry_user_id) })}
-                    checked={action === "keep_second_entry"}
-                    onChange={() => {
-                      setAction("keep_second_entry");
-                    }}
-                  />
-                  <ChoiceList.Radio
-                    id="discard_both_entries"
-                    label={t("resolve_differences.options.discard_both_entries")}
-                    checked={action === "discard_both_entries"}
-                    onChange={() => {
-                      setAction("discard_both_entries");
-                    }}
-                  />
-                </ChoiceList>
-              </FormLayout.Section>
-              <FormLayout.Controls>
-                <Button type="submit">{t("save")}</Button>
-              </FormLayout.Controls>
-            </FormLayout>
-          </Form>
+          <ResolveDifferencesForm
+            firstEntryName={getName(first_entry_user_id)}
+            secondEntryName={getName(second_entry_user_id)}
+            action={action}
+            setAction={setAction}
+            validationError={validationError}
+            onSubmit={onSubmit}
+          />
         </article>
       </main>
     </>

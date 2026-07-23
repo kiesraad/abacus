@@ -199,12 +199,7 @@ describe("ApportionmentPage", () => {
       election_summary: lt19Seats.election_summary,
       warnings: [],
     } satisfies ElectionApportionmentResponse);
-    overrideOnce("get", "/api/elections/3/apportionment/state", 200, {
-      deceased_candidates: [],
-      lists_drawn: [],
-      candidates_drawn: [],
-      type: "Finalised",
-    } satisfies ApportionmentState);
+    overrideOnce("get", "/api/elections/3/apportionment/state", 200, lt19Seats.state);
 
     const router = renderApportionmentPage(3, true) as Router;
 
@@ -379,12 +374,7 @@ describe("ApportionmentPage", () => {
       election_summary: lt19Seats.election_summary,
       warnings: ["AbsoluteMajorityAndListExhaustion"],
     } satisfies ElectionApportionmentResponse);
-    overrideOnce("get", "/api/elections/3/apportionment/state", 200, {
-      deceased_candidates: [],
-      lists_drawn: [],
-      candidates_drawn: [],
-      type: "Finalised",
-    } satisfies ApportionmentState);
+    overrideOnce("get", "/api/elections/3/apportionment/state", 200, lt19Seats.state);
 
     renderApportionmentPage(3, false);
     expect(await screen.findByTestId("election-summary-table")).toBeVisible();

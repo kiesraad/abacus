@@ -6,7 +6,6 @@ import type {
   HighestAverageResidualSeatDrawingLots,
   SeatAssignment,
 } from "@/types/generated/openapi";
-import type { HighestAverageAssignmentStep } from "../utils/steps";
 
 export const options = [2, 3, 4, 5, 6];
 export const drawing_lots_required: HighestAverageResidualSeatDrawingLots & {
@@ -410,128 +409,6 @@ export const state_after_two_drawing_lots_seats_assigned: ApportionmentState = {
   candidates_drawn: [],
 };
 
-export const steps: HighestAverageAssignmentStep[] = [
-  {
-    residual_seat_number: 1,
-    change: {
-      changed_by: "HighestAverageAssignment",
-      selected_list_number: 1,
-      list_options: [1],
-      list_assigned: [1],
-      list_exhausted: [],
-      votes_per_seat: {
-        integer: 50,
-        numerator: 0,
-        denominator: 10,
-      },
-    },
-    standings: [
-      {
-        list_number: 1,
-        votes_cast: 500,
-        remainder_votes: {
-          integer: 30,
-          numerator: 10,
-          denominator: 23,
-        },
-        meets_remainder_threshold: true,
-        next_votes_per_seat: {
-          integer: 50,
-          numerator: 0,
-          denominator: 10,
-        },
-        full_seats: 9,
-        residual_seats: 0,
-      },
-      {
-        list_number: 2,
-        votes_cast: 140,
-        remainder_votes: {
-          integer: 35,
-          numerator: 15,
-          denominator: 23,
-        },
-        meets_remainder_threshold: true,
-        next_votes_per_seat: {
-          integer: 46,
-          numerator: 2,
-          denominator: 3,
-        },
-        full_seats: 2,
-        residual_seats: 0,
-      },
-      {
-        list_number: 3,
-        votes_cast: 140,
-        remainder_votes: {
-          integer: 35,
-          numerator: 15,
-          denominator: 23,
-        },
-        meets_remainder_threshold: true,
-        next_votes_per_seat: {
-          integer: 46,
-          numerator: 2,
-          denominator: 3,
-        },
-        full_seats: 2,
-        residual_seats: 0,
-      },
-      {
-        list_number: 4,
-        votes_cast: 140,
-        remainder_votes: {
-          integer: 35,
-          numerator: 15,
-          denominator: 23,
-        },
-        meets_remainder_threshold: true,
-        next_votes_per_seat: {
-          integer: 46,
-          numerator: 2,
-          denominator: 3,
-        },
-        full_seats: 2,
-        residual_seats: 0,
-      },
-      {
-        list_number: 5,
-        votes_cast: 140,
-        remainder_votes: {
-          integer: 35,
-          numerator: 15,
-          denominator: 23,
-        },
-        meets_remainder_threshold: true,
-        next_votes_per_seat: {
-          integer: 46,
-          numerator: 2,
-          denominator: 3,
-        },
-        full_seats: 2,
-        residual_seats: 0,
-      },
-      {
-        list_number: 6,
-        votes_cast: 140,
-        remainder_votes: {
-          integer: 35,
-          numerator: 15,
-          denominator: 23,
-        },
-        meets_remainder_threshold: true,
-        next_votes_per_seat: {
-          integer: 46,
-          numerator: 2,
-          denominator: 3,
-        },
-        full_seats: 2,
-        residual_seats: 0,
-      },
-    ],
-  },
-];
-
 export const seat_assignment: SeatAssignment = {
   seats: 23,
   full_seats: 19,
@@ -541,7 +418,127 @@ export const seat_assignment: SeatAssignment = {
     numerator: 4,
     denominator: 23,
   },
-  steps,
+  steps: [
+    {
+      residual_seat_number: 1,
+      change: {
+        changed_by: "HighestAverageAssignment",
+        selected_list_number: 1,
+        list_options: [1],
+        list_assigned: [1],
+        list_exhausted: [],
+        votes_per_seat: {
+          integer: 50,
+          numerator: 0,
+          denominator: 10,
+        },
+      },
+      standings: [
+        {
+          list_number: 1,
+          votes_cast: 500,
+          remainder_votes: {
+            integer: 30,
+            numerator: 10,
+            denominator: 23,
+          },
+          meets_remainder_threshold: true,
+          next_votes_per_seat: {
+            integer: 50,
+            numerator: 0,
+            denominator: 10,
+          },
+          full_seats: 9,
+          residual_seats: 0,
+        },
+        {
+          list_number: 2,
+          votes_cast: 140,
+          remainder_votes: {
+            integer: 35,
+            numerator: 15,
+            denominator: 23,
+          },
+          meets_remainder_threshold: true,
+          next_votes_per_seat: {
+            integer: 46,
+            numerator: 2,
+            denominator: 3,
+          },
+          full_seats: 2,
+          residual_seats: 0,
+        },
+        {
+          list_number: 3,
+          votes_cast: 140,
+          remainder_votes: {
+            integer: 35,
+            numerator: 15,
+            denominator: 23,
+          },
+          meets_remainder_threshold: true,
+          next_votes_per_seat: {
+            integer: 46,
+            numerator: 2,
+            denominator: 3,
+          },
+          full_seats: 2,
+          residual_seats: 0,
+        },
+        {
+          list_number: 4,
+          votes_cast: 140,
+          remainder_votes: {
+            integer: 35,
+            numerator: 15,
+            denominator: 23,
+          },
+          meets_remainder_threshold: true,
+          next_votes_per_seat: {
+            integer: 46,
+            numerator: 2,
+            denominator: 3,
+          },
+          full_seats: 2,
+          residual_seats: 0,
+        },
+        {
+          list_number: 5,
+          votes_cast: 140,
+          remainder_votes: {
+            integer: 35,
+            numerator: 15,
+            denominator: 23,
+          },
+          meets_remainder_threshold: true,
+          next_votes_per_seat: {
+            integer: 46,
+            numerator: 2,
+            denominator: 3,
+          },
+          full_seats: 2,
+          residual_seats: 0,
+        },
+        {
+          list_number: 6,
+          votes_cast: 140,
+          remainder_votes: {
+            integer: 35,
+            numerator: 15,
+            denominator: 23,
+          },
+          meets_remainder_threshold: true,
+          next_votes_per_seat: {
+            integer: 46,
+            numerator: 2,
+            denominator: 3,
+          },
+          full_seats: 2,
+          residual_seats: 0,
+        },
+      ],
+    },
+  ],
   standings: [
     {
       list_number: 1,

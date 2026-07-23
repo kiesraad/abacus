@@ -212,7 +212,7 @@ pub enum ElectionSubCategory {
     GR2,
     /// Provinciale statenverkiezing single district
     PS1,
-    /// Provinciale statenverkiezing multiple district
+    /// Provinciale statenverkiezing multiple districts
     PS2,
 }
 
@@ -236,7 +236,7 @@ impl ElectionSubCategory {
             ElectionSubCategory::AB1 => "AB1",
             ElectionSubCategory::AB2 => "AB2",
             ElectionSubCategory::GR1 => "GR1",
-            ElectionSubCategory::GR2 => "AB2",
+            ElectionSubCategory::GR2 => "GR2",
             ElectionSubCategory::PS1 => "PS1",
             ElectionSubCategory::PS2 => "PS2",
         }

@@ -2,13 +2,9 @@
 #import "common/scripts.typ": *
 #let input = json("inputs/model-na-31-2.json")
 
-#let is_municipality = (municipal, public_body) => if (
-  input.election.category == "Municipal"
-) { municipal } else { public_body }
-
-#let location_name = is_municipality[Gemeente #input.election.domain_id #input.election.location][Openbaar lichaam #input.election.location]
-#let location_type = is_municipality[gemeentelijk stembureau][stembureau voor het openbaar lichaam]
-#let this_location = is_municipality[deze gemeente][dit openbaar lichaam]
+#let location_name = is_municipality[#input.election.location][Gemeente #input.election.domain_id #input.election.location][Openbaar lichaam #input.election.location]
+#let location_type = is_municipality[#input.election.location][gemeentelijk stembureau][stembureau voor het openbaar lichaam]
+#let this_location = is_municipality[#input.election.location][deze gemeente][dit openbaar lichaam]
 
 #show: doc => conf(doc, header-right: location_name, footer: [
   #input.creation_date_time. Digitale vingerafdruk van EML-telbestand bij dit proces-verbaal (SHA-256): \
@@ -18,8 +14,8 @@
 #set heading(numbering: none)
 
 #title_page(
-  is_municipality[#input.election.domain_id #input.election.location][#input.election.location],
-  is_municipality[Gemeentelijk stembureau][Stembureau voor het openbaar lichaam],
+  is_municipality[#input.election.location][#input.election.domain_id #input.election.location][#input.election.location],
+  is_municipality[#input.election.location][Gemeentelijk stembureau][Stembureau voor het openbaar lichaam],
   [#input.election.name - #format_date(input.election.election_date)],
   [
     Verslag en telresultaten per lijst en kandidaat -
@@ -35,7 +31,7 @@
 
 == Proces-verbaal
 
-Elke #is_municipality[gemeente][openbaar lichaam] maakt bij een verkiezing een verslag: het proces-verbaal. Hierin staat hoe het tellen van de stemmen is verlopen en wat de uitslag van de stemming was.
+Elke #is_municipality[#input.election.location][gemeente][openbaar lichaam] maakt bij een verkiezing een verslag: het proces-verbaal. Hierin staat hoe het tellen van de stemmen is verlopen en wat de uitslag van de stemming was.
 
 #emph_block[
   In #this_location is gekozen voor *centrale stemopneming*.
@@ -46,12 +42,12 @@ Elke #is_municipality[gemeente][openbaar lichaam] maakt bij een verkiezing een v
 == Inhoudsopgave
 
 - Deel 1 - *Verslag van de zitting* (het verloop van het tellen en optellen)
-- Deel 2 - *Telresultaten* van #is_municipality[de hele gemeente][het hele openbaar lichaam]
+- Deel 2 - *Telresultaten* van #is_municipality[#input.election.location][de hele gemeente][het hele openbaar lichaam]
 - Deel 3 - *Ondertekening* door de leden van het #location_type
 
 \
 
-- Bijlage 1: Telresultaten van alle stembureaus in #is_municipality[de gemeente][het openbaar lichaam]
+- Bijlage 1: Telresultaten van alle stembureaus in #is_municipality[#input.election.location][de gemeente][het openbaar lichaam]
 - Bijlage 2: Overzicht van alle bezwaren die op de stembureaus zijn gemaakt
 
 #pagebreak(weak: true)
@@ -77,7 +73,7 @@ De volgende rollen zijn mogelijk: voorzitter, plaatsvervangend voorzitter of lid
 
 == Getelde stembureaus
 
-=== De resultaten van onderstaande stembureaus zijn door het #location_type gecontroleerd en opgeteld tot het totaal van #is_municipality[de gemeente][het openbaar lichaam]. Als er extra onderzoeken hebben plaatsgevonden, dan kan dat in de laatste drie kolommen worden aangegeven.
+=== De resultaten van onderstaande stembureaus zijn door het #location_type gecontroleerd en opgeteld tot het totaal van #is_municipality[#input.election.location][de gemeente][het openbaar lichaam]. Als er extra onderzoeken hebben plaatsgevonden, dan kan dat in de laatste drie kolommen worden aangegeven.
 
 #light_table(
   columns: (5em, 1fr, 1fr, 6em, 6em, 6em),
@@ -148,7 +144,7 @@ Bijvoorbeeld een schorsing of als er meerdere verkiezingen tegelijk werden georg
 
 #pagebreak(weak: true)
 
-= Telresultaten van #is_municipality[de gemeente][het openbaar lichaam]
+= Telresultaten van #is_municipality[#input.election.location][de gemeente][het openbaar lichaam]
 
 == Aantal kiesgerechtigden
 
@@ -295,21 +291,21 @@ Zo komt het handtekeningen-blad altijd op een losse pagina, ook als het verslag 
 
 #textbox_only_bottom_stroke[Datum en tijd:][Plaats:]
 
-== Verplicht: voorzitter en #is_municipality[twee][vier] leden van het #location_type
+== Verplicht: voorzitter en #is_municipality[#input.election.location][twee][vier] leden van het #location_type
 
 === Voorzitter van het #location_type:
 
 #textbox[Naam:][Handtekening:]
 
-=== #is_municipality[2][4] leden van het #location_type:
+=== #is_municipality[#input.election.location][2][4] leden van het #location_type:
 
-#stack(spacing: 0.5em, ..range(0, is_municipality(2, 4)).map(_ => textbox[Naam:][Handtekening:]))
+#stack(spacing: 0.5em, ..range(0, is_municipality(input.election.location, 2, 4)).map(_ => textbox[Naam:][Handtekening:]))
 
 == Ondertekening door andere aanwezige leden van het #location_type
 
 === Extra ondertekening: (niet verplicht)
 
-#stack(spacing: 0.5em, ..range(0, is_municipality(3, 1)).map(_ => textbox[Naam:][Handtekening:]))
+#stack(spacing: 0.5em, ..range(0, is_municipality(input.election.location, 3, 1)).map(_ => textbox[Naam:][Handtekening:]))
 
 #pagebreak(weak: true)
 

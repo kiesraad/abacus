@@ -2,16 +2,12 @@
 #import "common/scripts.typ": *
 #let input = json("inputs/model-n-10-2.json")
 
-#let is_municipality = (municipal, public_body) => if (
-  input.election.category == "Municipal"
-) { municipal } else { public_body }
-
 #let is_mobile = "polling_station_type" in input.polling_station and input.polling_station.polling_station_type == "Mobile"
 
-#let location_name = is_municipality[Gemeente #input.election.domain_id #input.election.location][Openbaar lichaam #input.election.location]
-#let location_type = is_municipality[gemeentelijk stembureau][stembureau voor het openbaar lichaam]
-#let this_location = is_municipality[deze gemeente][dit openbaar lichaam]
-#let location = is_municipality[gemeente][openbaar lichaam]
+#let location_name = is_municipality[#input.election.location][Gemeente #input.election.domain_id #input.election.location][Openbaar lichaam #input.election.location]
+#let location_type = is_municipality[#input.election.location][gemeentelijk stembureau][stembureau voor het openbaar lichaam]
+#let this_location = is_municipality[#input.election.location][deze gemeente][dit openbaar lichaam]
+#let location = is_municipality[#input.election.location][gemeente][openbaar lichaam]
 
 #let header-right = [Stembureau #input.polling_station.number]
 
@@ -159,10 +155,10 @@ Bijvoorbeeld als er meerdere verkiezingen tegelijk werden georganiseerd, en een 
 
 == Toegelaten kiezers
 
-#is_municipality[
-  Tel het aantal geldige stempassen en volmachtbewijzen
+#if input.election.category == "Municipal" {
+  [Tel het aantal geldige stempassen en volmachtbewijzen]
 
-  #sum(
+  sum(
     empty_letterbox("A")[Stempassen],
     empty_letterbox("B")[Volmachtbewijzen (schriftelijk of via ingevulde stempas)],
     empty_letterbox(
@@ -170,10 +166,10 @@ Bijvoorbeeld als er meerdere verkiezingen tegelijk werden georganiseerd, en een 
       light: false,
     )[Totaal toegelaten kiezers (A+B)],
   )
-][
-  Tel het aantal geldige stempassen, volmachtbewijzen en kiezerspassen
+} else {
+  [Tel het aantal geldige stempassen, volmachtbewijzen en kiezerspassen]
 
-  #sum(
+  sum(
     empty_letterbox("A")[Stempassen],
     empty_letterbox(
       "B",
@@ -184,7 +180,7 @@ Bijvoorbeeld als er meerdere verkiezingen tegelijk werden georganiseerd, en een 
       light: false,
     )[Totaal toegelaten kiezers (A+B+C)],
   )
-]
+}
 
 #pagebreak(weak: true)
 

@@ -1,3 +1,8 @@
+#let public_bodies = ("Bonaire", "Saba", "Sint Eustatius");
+#let is_municipality = (location, municipal, public_body) => if (
+  location in public_bodies
+) { public_body } else { municipal }
+
 // A paragraph with a vertical line on the left
 #let emph_block(content) = {
   block(width: 75%, above: 3em, below: 1.5em, outset: (left: 6pt, top: 3pt, bottom: 3pt), stroke: (left: 1pt), text(

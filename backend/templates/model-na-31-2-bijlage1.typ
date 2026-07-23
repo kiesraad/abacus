@@ -2,12 +2,8 @@
 #import "common/scripts.typ": *
 #let input = json("inputs/model-na-31-2-bijlage1.json")
 
-#let is_municipality = (municipal, public_body) => if (
-  input.election.category == "Municipal"
-) { municipal } else { public_body }
-
-#let location_name = is_municipality[Gemeente #input.election.domain_id #input.election.location][Openbaar lichaam #input.election.location]
-#let location_type = is_municipality[gemeentelijk stembureau][stembureau voor het openbaar lichaam]
+#let location_name = is_municipality[#input.election.location][Gemeente #input.election.domain_id #input.election.location][Openbaar lichaam #input.election.location]
+#let location_type = is_municipality[#input.election.location][gemeentelijk stembureau][stembureau voor het openbaar lichaam]
 
 #show: doc => conf(
   doc,
@@ -60,7 +56,7 @@ Licht hieronder toe wat de reden van het extra onderzoek was
 
 === Was er in de telresultaten van het *stembureau* (rubriek 2.3 van het proces-verbaal van het stembureau) een onverklaard verschil tussen het totaal aantal getelde stembiljetten en het aantal toegelaten kiezers?
 
-#checkbox[Ja #sym.arrow.r *Hertel het aantal toegelaten kiezers (#is_municipality[stempassen en volmachten][stempassen, kiezerspassen en volmachten])*, en noteer de uitkomsten bij rubriek 3.1]
+#checkbox[Ja #sym.arrow.r *Hertel het aantal toegelaten kiezers (#if input.election.category == "Municipal" {[stempassen en volmachten]} else {[stempassen, kiezerspassen en volmachten]})*, en noteer de uitkomsten bij rubriek 3.1]
 #checkbox[Nee]
 
 == Tel de stembiljetten
@@ -113,19 +109,20 @@ Licht hieronder toe wat de reden van het extra onderzoek was
 
 === Heeft het #location_type het aantal toegelaten kiezers opnieuw geteld? Schrijf dan die aantallen op. Neem anders de aantallen over die het stembureau heeft opgeschreven in het proces-verbaal.
 
-#is_municipality[
-  #sum(empty_letterbox("A")[Stempassen], empty_letterbox("B")[Volmachtbewijzen], empty_letterbox(
-    "D",
-    light: false,
-  )[Totaal toegelaten kiezers (A+B)])
-][
-  #sum(
+#if input.election.category == "Municipal" {
+  sum(
+    empty_letterbox("A")[Stempassen], 
+    empty_letterbox("B")[Volmachtbewijzen], 
+    empty_letterbox("D", light: false)[Totaal toegelaten kiezers (A+B)],
+  )
+} else {
+  sum(
     empty_letterbox("A")[Stempassen],
     empty_letterbox("B")[Volmachtbewijzen],
     empty_letterbox("C")[Kiezerspassen],
     empty_letterbox("D", light: false)[Totaal toegelaten kiezers (A+B+C)],
   )
-]
+}
 
 #pagebreak(weak: true)
 

@@ -2,12 +2,8 @@
 #import "common/scripts.typ": *
 #let input = json("inputs/model-na-14-2-bijlage1.json")
 
-#let is_municipality = (municipal, public_body) => if (
-  input.election.category == "Municipal"
-) { municipal } else { public_body }
-
-#let location_name = is_municipality[Gemeente #input.election.domain_id #input.election.location][Openbaar lichaam #input.election.location]
-#let location_type = is_municipality[gemeentelijk stembureau][stembureau voor het openbaar lichaam]
+#let location_name = is_municipality[#input.election.location][Gemeente #input.election.domain_id #input.election.location][Openbaar lichaam #input.election.location]
+#let location_type = is_municipality[#input.election.location][gemeentelijk stembureau][stembureau voor het openbaar lichaam]
 
 #show: doc => conf(
   doc,
@@ -59,7 +55,7 @@ Schrijf op wat de *uitkomst* van het onderzoek door het #location_type was.
     checkbox[Ja #sym.arrow.r *Ga verder met B1 - #ref(<corrected_results>)*]
   }
 )
-  
+
 #pagebreak(weak: true)
 
 = Gecorrigeerde telresultaten <corrected_results>

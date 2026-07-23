@@ -284,6 +284,33 @@ export const TotalTableWithFractions: StoryObj = {
             </Table.TotalRow>
           </Table.Body>
         </Table>
+
+        <h2>Table with fraction aligned number</h2>
+        <Table id="total_table_with_fraction_aligned_number">
+          <Table.Header>
+            <Table.HeaderCell className="text-align-r">Number</Table.HeaderCell>
+            <Table.HeaderCell className="w-full">List name</Table.HeaderCell>
+            <Table.HeaderCell span={2} className="text-align-r">
+              Fractions
+            </Table.HeaderCell>
+          </Table.Header>
+          <Table.Body>
+            {data.map((row) => {
+              return (
+                <Table.Row key={row[0]}>
+                  <Table.NumberCell>{row[0]}</Table.NumberCell>
+                  <Table.Cell>{row[1]}</Table.Cell>
+                  <Table.DisplayFractionCells>{row[2]}</Table.DisplayFractionCells>
+                </Table.Row>
+              );
+            })}
+            <Table.TotalRow>
+              <Table.Cell />
+              <Table.Cell className="text-align-r">Fraction aligned number:</Table.Cell>
+              <Table.FractionAlignedNumberCells>{2}</Table.FractionAlignedNumberCells>
+            </Table.TotalRow>
+          </Table.Body>
+        </Table>
       </>
     );
   },
@@ -303,6 +330,14 @@ export const TotalTableWithFractions: StoryObj = {
       ["2", "Political Group B", "5", "", "11"],
       ["3", "Political Group C", "8", "", "4"],
       ["", "", "Total", "60"],
+    ]);
+    const fractionAlignedNumberTable = canvas.getByTestId("total_table_with_fraction_aligned_number");
+    await expect(fractionAlignedNumberTable).toHaveTableContent([
+      ["Number", "List name", "Fractions"],
+      ["1", "Political Group A", "3", "149/150"],
+      ["2", "Political Group B", "5", ""],
+      ["3", "Political Group C", "8", "1/150"],
+      ["", "Fraction aligned number:", "2", ""],
     ]);
   },
 };

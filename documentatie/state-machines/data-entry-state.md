@@ -2,12 +2,17 @@
 
 This document describes the states a data entry can have.
 The transition labels describe the endpoint that is used for performing the transition.
+
 The `save` endpoint which is used for [First/Second]EntryInProgress states is kept out, because Mermaid doesn't render self-loops too well.
+
 All states except for `FirstEntryHasErrors` and `EntriesDifferent` also have a `reset` endpoint which transitions to the `Empty` state. 
 
 Note the difference between `discard` and `reset`:
 - `discard` is a typist removing their own _in-progress_ entry (the `data_entry_discard` endpoint). Discarding an in-progress second entry keeps the finalised first entry. 
 - `reset` is a coordinator clearing the whole data entry back to `Empty` (the `data_entry_reset` endpoint). It always removes _both_ entries.
+
+When resolving differences between the first and second entry (`EntriesDifferent` state), the coordinator can choose to
+discard one of the two data entries. The remaining entry will from then on be the first entry, and the data entry is open for a new second entry.
 
 ```mermaid
 stateDiagram-v2
@@ -48,9 +53,4 @@ stateDiagram-v2
   Definitive --> [*]
 ```
 
-When resolving differences between the first and second entry (`EntriesDifferent` state), the coordinator can choose to
-keep one of the entries or discard both. If one of the entries is kept, the other entry is discarded. The remaining entry
-will from then on be the first entry, and the data entry is open for a new second entry.
 
-When the coordinator resets the data entry while there's a second entry (`SecondEntryInProgress` &
-`Definitive` state), both entries will be deleted.

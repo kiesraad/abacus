@@ -2558,6 +2558,7 @@ mod tests {
                     fields: vec![
                         "data.voters_counts.poll_card_count".into(),
                         "data.voters_counts.proxy_certificate_count".into(),
+                        "data.voters_counts.voter_card_count".into(),
                         "data.voters_counts.total_admitted_voters_count".into()
                     ],
                     context: None,

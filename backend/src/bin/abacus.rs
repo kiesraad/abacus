@@ -134,8 +134,8 @@ async fn main() {
     }
 }
 
-/// Create the CA in `tls_dir` (if missing) and print its location and SHA-256
-/// fingerprint. Used for the `--init-tls` CLI flag.
+/// Create the CA in `tls_dir` (if missing) and print its location and its
+/// SHA-256 and SHA-1 fingerprints. Used for the `--init-tls` CLI flag.
 #[cfg(feature = "tls")]
 fn init_tls(tls_dir: &std::path::Path) -> Result<(), AppError> {
     use abacus::infra::tls;
@@ -150,6 +150,7 @@ fn init_tls(tls_dir: &std::path::Path) -> Result<(), AppError> {
         tls_dir.join(tls::CA_CERT_DER).display()
     );
     println!("CA SHA-256 fingerprint: {}", ca.sha256_fingerprint());
+    println!("CA SHA-1 fingerprint:   {}", ca.sha1_fingerprint());
     Ok(())
 }
 

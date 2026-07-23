@@ -595,6 +595,13 @@ async fn import_csb_election(
 
     let mut new_election =
         parse_election_candidates_eml(&edu.election_data, Some(&edu.candidate_data))?;
+    // PS/WS CSB support will be implemented later
+    if matches!(
+        new_election.category,
+        ElectionCategory::Provincial | ElectionCategory::WaterAuthority
+    ) {
+        return Err(EMLImportError::CommitteeCategoryForElectionCategoryNotSupported.into());
+    }
     new_election.committee_category = CommitteeCategory::CSB;
 
     let mut tx = pool.begin_immediate().await?;

@@ -9,7 +9,7 @@
             <ElectionIdentifier Id="GR2022_Test">
                 <ElectionName>Gemeenteraad Test 2022</ElectionName>
                 <ElectionCategory>GR</ElectionCategory>
-                <kr:ElectionSubcategory>GR2</kr:ElectionSubcategory>
+                <kr:ElectionSubcategory>AB2</kr:ElectionSubcategory>
                 <kr:ElectionDomain Id="0000">Test</kr:ElectionDomain>
                 <kr:ElectionDate>2022-03-16</kr:ElectionDate>
                 <kr:NominationDate>2022-01-31</kr:NominationDate>
@@ -19,7 +19,7 @@
                 <VotingMethod>SPV</VotingMethod>
                 <MaxVotes></MaxVotes>
             </Contest>
-            <kr:NumberOfSeats>250</kr:NumberOfSeats>
+            <kr:NumberOfSeats>45</kr:NumberOfSeats>
             <kr:PreferenceThreshold>25</kr:PreferenceThreshold>
             <kr:ElectionTree>
                 <kr:Region RegionNumber="000" RegionCategory="GEMEENTE">

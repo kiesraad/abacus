@@ -90,6 +90,26 @@ impl NewElection {
         }
     }
 
+    fn category_and_sub_category_match(
+        category: crate::domain::election::ElectionCategory,
+        sub_category: crate::domain::election::ElectionSubCategory,
+    ) -> bool {
+        match category {
+            crate::domain::election::ElectionCategory::WaterAuthority => {
+                sub_category == crate::domain::election::ElectionSubCategory::AB1
+                    || sub_category == crate::domain::election::ElectionSubCategory::AB2
+            }
+            crate::domain::election::ElectionCategory::Municipal => {
+                sub_category == crate::domain::election::ElectionSubCategory::GR1
+                    || sub_category == crate::domain::election::ElectionSubCategory::GR2
+            }
+            crate::domain::election::ElectionCategory::Provincial => {
+                sub_category == crate::domain::election::ElectionSubCategory::PS1
+                    || sub_category == crate::domain::election::ElectionSubCategory::PS2
+            }
+        }
+    }
+
     pub fn from_eml_str(election_definition_data: &str) -> Result<Self, EMLImportError> {
         // attempt to parse in strict mode (we don't expect any errors in this EML)
         let definition =
@@ -106,6 +126,10 @@ impl NewElection {
         let election_date = identifier.election_date.copied_value()?.date;
         let nomination_date = identifier.nomination_date.copied_value()?.date;
 
+        if !Self::category_and_sub_category_match(category, sub_category) {
+            return Err(EMLImportError::MismatchElectionCategoryAndSubCategory);
+        }
+
         // we need the election domain and its id
         let Some(domain) = &identifier.domain else {
             return Err(EMLImportError::MissingElectionDomain);
@@ -115,8 +139,9 @@ impl NewElection {
         };
 
         // we need the number of seats and it must be a valid u32
-        let number_of_seats = election.number_of_seats.copied_value()?;
-        let number_of_seats = number_of_seats
+        let number_of_seats = election
+            .number_of_seats
+            .copied_value()?
             .try_into()
             .map_err(|_| EMLImportError::NumberOfSeatsNotInRange)?;
 
@@ -128,15 +153,6 @@ impl NewElection {
             .unwrap_or(0)
             .try_into()
             .unwrap_or(0);
-
-        // the number of seats must be between 9 and 45 for municipal elections
-        #[expect(
-            clippy::manual_range_contains,
-            reason = "clippy suggests way less readable alternative"
-        )]
-        if number_of_seats < 9 || number_of_seats > 45 {
-            return Err(EMLImportError::NumberOfSeatsNotInRange);
-        }
 
         // extract initial listing of political groups
         let political_groups = election
@@ -1022,15 +1038,6 @@ mod tests {
     }
 
     #[test]
-    fn test_invalid_election_number_of_seats_not_in_range() {
-        let data = include_str!(
-            "../eml/tests/eml110a_invalid_election_number_of_seats_out_of_range.eml.xml"
-        );
-        let res = NewElection::from_eml_str(data).unwrap_err();
-        assert!(matches!(res, EMLImportError::NumberOfSeatsNotInRange));
-    }
-
-    #[test]
     fn test_invalid_election_limited_elections_supported() {
         let data = include_str!(
             "../eml/tests/eml110a_invalid_election_limited_elections_supported.eml.xml"
@@ -1038,6 +1045,19 @@ mod tests {
         let res = NewElection::from_eml_str(data).unwrap_err();
         dbg!(&res);
         assert!(matches!(res, EMLImportError::LimitedElectionsSupported));
+    }
+
+    #[test]
+    fn test_invalid_election_category_and_sub_category_do_not_match() {
+        let data = include_str!(
+            "tests/eml110a_invalid_election_category_and_sub_category_mismatch.eml.xml"
+        );
+        let res = NewElection::from_eml_str(data).unwrap_err();
+        dbg!(&res);
+        assert!(matches!(
+            res,
+            EMLImportError::MismatchElectionCategoryAndSubCategory
+        ));
     }
 
     #[test]

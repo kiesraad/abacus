@@ -215,20 +215,6 @@ pub enum ElectionSubCategory {
     PS2,
 }
 
-impl From<String> for ElectionSubCategory {
-    fn from(value: String) -> Self {
-        match value.as_str() {
-            "AB1" => Self::AB1,
-            "AB2" => Self::AB2,
-            "GR1" => Self::GR1,
-            "GR2" => Self::GR2,
-            "PS1" => Self::PS1,
-            "PS2" => Self::PS2,
-            _ => panic!("invalid ElectionSubCategory `{value}`"),
-        }
-    }
-}
-
 /// Committee category
 #[derive(
     Serialize,

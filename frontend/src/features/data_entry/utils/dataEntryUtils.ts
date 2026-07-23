@@ -110,6 +110,12 @@ export function getClientState(
   acceptErrorsAndWarnings: boolean,
   continueToNextSection: boolean,
 ) {
+  const differences = Object.values(formState.sections).some((section) => section.differences !== undefined)
+    ? Object.fromEntries(
+        Object.entries(formState.sections).map(([sectionId, section]) => [sectionId, section.differences?.fields]),
+      )
+    : undefined;
+
   const clientState: ClientState = {
     furthest: formState.furthest,
     current: currentSectionId,
@@ -118,6 +124,7 @@ export function getClientState(
       .filter((s: FormSection) => s.id !== currentSectionId)
       .map((s: FormSection) => s.id),
     continue: continueToNextSection,
+    differences,
   };
   // the form state is not updated for the current submission,
   // so add the current section to the accepted warnings if needed
@@ -210,6 +217,8 @@ export function updateFormStateAfterSubmit(
     currentFormSection.isSubmitted = saved;
     // There are no changes after a successful submit
     currentFormSection.hasChanges = false;
+    // Remove differences to be re-entered during correction
+    currentFormSection.differences = undefined;
   }
 
   //distribute errors and warnings to sections
@@ -239,6 +248,34 @@ export function addValidationResultsToFormState(
       for (const validationResult of validationResults) {
         if (doesValidationResultApplyToSection(validationResult, section)) {
           formSection[errorsOrWarnings].add(validationResult);
+        }
+      }
+    }
+  }
+}
+
+export function addDifferencesToFormState(
+  differences: string[],
+  formState: FormState,
+  dataEntryStructure: DataEntryStructure,
+) {
+  console.log("addDifferencesToFormState", differences);
+  for (const section of dataEntryStructure) {
+    const formSection = formState.sections[section.id];
+    if (formSection === undefined) continue;
+
+    for (const diff of differences) {
+      const validationResult: ValidationResult = {
+        code: "W002",
+        fields: [diff],
+      };
+
+      if (doesValidationResultApplyToSection(validationResult, section)) {
+        if (formSection.differences === undefined) {
+          console.log("Adding corrections", section.id);
+          formSection.differences = validationResult;
+        } else {
+          formSection.differences.fields.push(diff);
         }
       }
     }

@@ -146,6 +146,17 @@
       "content": "Voor de coördinator hebben we het scherm 'verschillen oplossen'."
     }
   },
+  "W002": {
+    "typist": {
+      "title": "Verschil met tweede invoer. Nieuwe invoer nodig",
+      "content": "Een coördinator heeft beide invoeren vergeleken, en aangegeven dat in deze invoer fouten zijn gemaakt. Neem de gemarkeerde velden opnieuw over van het papieren proces verbaal.",
+      "actions": "<ul><li>Heb je alles ingevuld en komt je invoer overeen met het papier? Ga dan verder.</li></ul>"
+    },
+    "coordinator": {
+      "title": "W.002 is er alleen voor invoerders",
+      "content": "Voor de coördinator hebben we het scherm 'verschillen oplossen'."
+    }
+  },
   "W201": {
     "coordinator": {
       "title": "Het aantal blanco stemmen (F) is erg hoog",

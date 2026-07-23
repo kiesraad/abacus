@@ -144,6 +144,10 @@ pub struct ClaimDataEntryResponse {
     pub previous_results: Option<CommonPollingStationResults>,
     pub source: DataEntrySource,
     pub status: DataEntryStatusName,
+    /// Differences that have to be re-entered during correction
+    #[serde(skip_serializing_if = "Option::is_none", default)]
+    #[schema(nullable = false)]
+    pub differences: Option<Vec<String>>,
 }
 
 pub fn router() -> OpenApiRouter<AppState> {
@@ -369,7 +373,8 @@ async fn data_entry_claim(
     // Save the new data entry state
     let data_entry = data_entry_repo::update(&mut tx, data_entry_id, &new_state).await?;
 
-    match state {
+    match &new_state {
+        // TODO extra log type voor correction?
         DataEntryStatus::Empty | DataEntryStatus::FirstEntryFinalised(_) => {
             audit_service
                 .log(&mut tx, &DataEntryStartedAuditData(data_entry.into()), None)
@@ -393,6 +398,7 @@ async fn data_entry_claim(
         previous_results,
         source: context.source,
         status: new_state.status_name(),
+        differences: new_state.differences(),
     }))
 }
 
@@ -729,6 +735,22 @@ async fn data_entry_get(
                 data: second_entry_in_progress_state.second_entry,
                 status: state.status_name(),
                 validation_results: ValidationResults::default(),
+                source: context.source,
+            }))
+        }
+        DataEntryStatus::FirstEntryCorrection(correction_state) => Ok(Json(DataEntryGetResponse {
+            user_id: Some(correction_state.first_entry_user_id),
+            data: correction_state.first_entry,
+            status: state.status_name(),
+            validation_results: state.start_validate(&context.election)?,
+            source: context.source,
+        })),
+        DataEntryStatus::SecondEntryCorrection(correction_state) => {
+            Ok(Json(DataEntryGetResponse {
+                user_id: Some(correction_state.second_entry_user_id),
+                data: correction_state.second_entry,
+                status: state.status_name(),
+                validation_results: state.start_validate(&context.election)?,
                 source: context.source,
             }))
         }

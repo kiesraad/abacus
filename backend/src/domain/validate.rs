@@ -114,6 +114,8 @@ pub enum ValidationResultCode {
 
     /// GSB CSO, GSB DSO, CSB: (Bij tweede invoer) Niet alle ingevoerde waardes van de tweede invoer zijn gelijk aan die van de eerste invoer
     W001,
+    // TODO doc
+    W002,
     /// GSB CSO, GSB DSO: 'Aantal kiezers en stemmen': Aantal blanco stemmen is groter dan of gelijk aan 3% van het totaal aantal uitgebrachte stemmen
     W201,
     /// GSB CSO, GSB DSO: 'Aantal kiezers en stemmen': Aantal ongeldige stemmen is groter dan of gelijk aan 3% van het totaal aantal uitgebrachte stemmen

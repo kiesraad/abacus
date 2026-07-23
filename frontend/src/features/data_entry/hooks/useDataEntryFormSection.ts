@@ -44,22 +44,33 @@ export function useDataEntryFormSection() {
     }
   });
 
+  for (const section of Object.values(formState.sections)) {
+    console.log(`Section ${section.id}: 
+    isSaved=${section.isSaved}, isSubmitted=${section.isSubmitted}, hasChanges=${section.hasChanges}`);
+  }
+
   // derived state
   const formSection = formState.sections[sectionId];
   if (!formSection) {
     throw new Error(`Form section ${sectionId} not found in form state`);
   }
-  const { errors, warnings, isSaved, isSubmitted, acceptErrorsAndWarnings, hasChanges } = formSection;
-  const defaultProps = {
-    errorsAndWarnings: isSaved ? mapValidationResultSetsToFields(errors, warnings) : undefined,
-    errorsAndWarningsAccepted: acceptErrorsAndWarnings,
-  };
+  const { differences, errors, warnings, isSaved, isSubmitted, acceptErrorsAndWarnings, hasChanges } = formSection;
+  const defaultProps = differences
+    ? {
+        errorsAndWarnings: new Map(differences.fields.map((f) => [f, "warning" as const])),
+        errorsAndWarningsAccepted: false,
+      }
+    : {
+        errorsAndWarnings: isSaved ? mapValidationResultSetsToFields(errors, warnings) : undefined,
+        errorsAndWarningsAccepted: acceptErrorsAndWarnings,
+      };
 
   // Find error code that is shown on the bottom of the form
   const trailingError = errors.find("F401");
 
   // Whether to show the accept errors and warnings checkbox
-  const showAcceptErrorsAndWarnings = (!formSection.warnings.isEmpty() || !formSection.errors.isEmpty()) && !hasChanges;
+  const showAcceptErrorsAndWarnings =
+    !formSection.differences && (!formSection.warnings.isEmpty() || !formSection.errors.isEmpty()) && !hasChanges;
 
   // register changes when fields change
   const setValues = (path: string, value: string) => {

@@ -679,6 +679,8 @@ export interface ChosenCandidate {
 export interface ClaimDataEntryResponse {
   client_state: unknown;
   data: Results;
+  /** Differences that have to be re-entered during correction */
+  differences?: string[];
   previous_results?: CommonPollingStationResults;
   source: DataEntrySource;
   status: DataEntryStatusName;
@@ -815,6 +817,8 @@ export const dataEntryStatusNameValues = [
   "first_entry_finalised",
   "second_entry_in_progress",
   "entries_different",
+  "first_entry_correction",
+  "second_entry_correction",
   "definitive",
 ] as const;
 export type DataEntryStatusName = (typeof dataEntryStatusNameValues)[number];
@@ -1641,6 +1645,7 @@ export const validationResultCodeValues = [
   "F402",
   "F403",
   "W001",
+  "W002",
   "W201",
   "W202",
   "W203",

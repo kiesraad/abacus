@@ -53,6 +53,8 @@ export function DataEntrySection({ committeeCategory }: DataEntryProps) {
 
   const keyboardHintText = section.id.startsWith("political_group_votes_") ? t("candidates_votes.goto_totals") : null;
 
+  console.log("formSection corrections", formSection.id, formSection.differences);
+
   // Memoize errors to prevent unnecessary focus triggers in Feedback
   const memoizedErrors = useMemo(
     () => formSection.errors.getAll().filter((result) => result.code !== "F401"),
@@ -110,6 +112,16 @@ export function DataEntrySection({ committeeCategory }: DataEntryProps) {
             validationResults={memoizedWarnings}
             userRole={user.role}
             shouldFocus={formSection.errors.isEmpty()}
+          />
+        )}
+        {!formSection.isSaved && formSection.differences && (
+          <Feedback
+            id="feedback-warning"
+            type="warning"
+            election={election}
+            validationResults={[formSection.differences]}
+            userRole={user.role}
+            shouldFocus={true}
           />
         )}
 

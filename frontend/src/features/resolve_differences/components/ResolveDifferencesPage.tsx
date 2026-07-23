@@ -55,6 +55,9 @@ export function ResolveDifferencesPage() {
         });
         void navigate(`/elections/${election.id}/status`);
         break;
+      default:
+        // TODO anders oplossen
+        void navigate(`/elections/${election.id}/status`);
     }
   }
 

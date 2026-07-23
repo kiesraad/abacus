@@ -20,6 +20,7 @@ function typeToLabel(badgeType: BadgeType): LabelProps {
     case "empty":
       return { label: t("data_entry.first_entry") };
     case "first_entry_in_progress":
+    case "first_entry_correction":
       return { label: t("data_entry.first_entry"), icon: <Icon size="sm" icon={<IconEdit />} /> };
     case "first_entry_has_errors":
       return { label: t("data_entry.first_entry") };
@@ -28,6 +29,7 @@ function typeToLabel(badgeType: BadgeType): LabelProps {
     case "first_entry_finalised_for_typist":
       return { label: t("data_entry.second_entry") };
     case "second_entry_in_progress":
+    case "second_entry_correction":
       return { label: t("data_entry.second_entry"), icon: <Icon size="sm" icon={<IconEdit />} /> };
     case "entries_different":
       return { label: t("data_entry.second_entry") };

@@ -23,18 +23,19 @@ export function getDataEntryWithStatusList({
   statuses: ElectionStatusResponseEntry[];
   user: LoginResponse | null;
 }): DataEntryStatusWithUserStatus[] {
+  // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: TODO function should be refactored
   return statuses.map((statusEntry: ElectionStatusResponseEntry) => {
     const result: DataEntryStatusWithUserStatus = { statusEntry, userStatus: DataEntryUserStatus.Available };
 
     if (finishedStatuses.includes(statusEntry.status)) {
       result.userStatus = DataEntryUserStatus.Finished;
-    } else if (statusEntry.status === "first_entry_in_progress") {
+    } else if (statusEntry.status === "first_entry_in_progress" || statusEntry.status === "first_entry_correction") {
       if (statusEntry.first_entry_user_id === user?.user_id) {
         result.userStatus = DataEntryUserStatus.InProgressCurrentUser;
       } else {
         result.userStatus = DataEntryUserStatus.InProgressOtherUser;
       }
-    } else if (statusEntry.status === "second_entry_in_progress") {
+    } else if (statusEntry.status === "second_entry_in_progress" || statusEntry.status === "second_entry_correction") {
       if (statusEntry.second_entry_user_id === user?.user_id) {
         result.userStatus = DataEntryUserStatus.InProgressCurrentUser;
       } else {
@@ -52,6 +53,10 @@ export function getDataEntryWithStatusList({
 
 export function getUrlForDataEntry(electionId: number, dataEntry: ElectionStatusResponseEntry): string {
   const entryNumber =
-    dataEntry.status === "first_entry_finalised" || dataEntry.status === "second_entry_in_progress" ? 2 : 1;
+    dataEntry.status === "first_entry_finalised" ||
+    dataEntry.status === "second_entry_in_progress" ||
+    dataEntry.status === "second_entry_correction"
+      ? 2
+      : 1;
   return `/elections/${electionId}/data-entry/${dataEntry.data_entry_id}/${entryNumber}`;
 }

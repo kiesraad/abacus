@@ -101,6 +101,8 @@ export function setValueAtPath(
   value: string,
   valueType: "boolean" | "number" | undefined,
 ): void {
+
+  console.log("setValueAtPath", path, value)
   const segments = path.split(".");
   const lastProperty = segments.pop();
   const refParent = traversePath(data, segments);

@@ -3,7 +3,14 @@ import type { DataEntryId, ElectionWithPoliticalGroups } from "@/types/generated
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
 import type { ClientState, DataEntryAction, DataEntryState, EntryNumber } from "../types/types";
-import { buildFormState, getInitialFormState, getNextSectionID, updateFormStateAfterSubmit } from "./dataEntryUtils";
+import {
+  addDifferencesToFormState,
+  buildFormState,
+  getInitialFormState,
+  getNextSectionID,
+  updateFormStateAfterSubmit,
+} from "./dataEntryUtils";
+import { mapSectionValues } from '@/utils/dataEntryMapping';
 
 export function getInitialState(
   election: ElectionWithPoliticalGroups,
@@ -34,12 +41,17 @@ export default function dataEntryReducer(state: DataEntryState, action: DataEntr
       const model = action.dataEntry.data.model;
       const dataEntryStructure = getDataEntryStructure(model, state.election);
       if (action.dataEntry.client_state) {
+        console.log("Has client state");
         const { formState, targetFormSectionId } = buildFormState(
           // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
           action.dataEntry.client_state as ClientState,
           action.dataEntry.validation_results,
           dataEntryStructure,
         );
+
+        // addDifferencesToFormState(action.dataEntry.differences, formState, dataEntryStructure);
+        // TODO clear correction fields -- niet hier?
+
         return {
           ...state,
           dataEntryStructure,
@@ -52,17 +64,43 @@ export default function dataEntryReducer(state: DataEntryState, action: DataEntr
           error: null,
         };
       } else {
+        console.log("No client state");
         const targetFormSectionId = dataEntryStructure[0]?.id;
         if (targetFormSectionId === undefined) {
           throw new Error("Cannot determine initial section from dataEntryStructure");
         }
+
+        const formState = getInitialFormState(dataEntryStructure);
+        let results = action.dataEntry.data;
+        console.log("results before", results);
+
+        if (action.dataEntry.differences) {
+          addDifferencesToFormState(action.dataEntry.differences, formState, dataEntryStructure);
+
+          for (const section of dataEntryStructure) {
+            const sectionDifferences = formState.sections[section.id]?.differences?.fields ?? [];
+            results = mapSectionValues(results, Object.fromEntries(sectionDifferences.map((fieldName) => {
+              // Remove "data." prefix if present
+              const normalizedFieldName = fieldName.startsWith("data.") ? fieldName.substring(5) : fieldName;
+              return [normalizedFieldName, ""]
+            })), section)
+          }
+          console.log("results after", results);
+        }
+
+
+
+
+        // TODO clear correction fields
+        // TODO save to backend??
+
         return {
           ...state,
           dataEntryStructure,
-          formState: getInitialFormState(dataEntryStructure),
+          formState,
           targetFormSectionId,
           previousResults: action.dataEntry.previous_results ?? null,
-          results: action.dataEntry.data,
+          results,
           source: action.dataEntry.source,
           dataEntryStatus: action.dataEntry.status,
           error: null,

@@ -103,6 +103,13 @@ export const validationResultMockData: ErrorWarningsMap<ValidationResultCode> = 
     code: "F403",
   },
   W001: { fields: ["data.voters_counts.poll_card_count"], code: "W001" },
+  W002: {
+    fields: [
+      "data.political_group_votes.0.candidate_votes.0.votes",
+      "data.political_group_votes.0.candidate_votes.1.votes",
+    ],
+    code: "W002",
+  },
   W201: { fields: ["data.votes_counts.blank_votes_count"], code: "W201" },
   W202: { fields: ["data.votes_counts.invalid_votes_count"], code: "W202" },
   W203: {

@@ -6158,6 +6158,13 @@
           "data": {
             "$ref": "#/components/schemas/Results"
           },
+          "differences": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Differences that have to be re-entered during correction"
+          },
           "previous_results": {
             "$ref": "#/components/schemas/CommonPollingStationResults"
           },
@@ -6558,6 +6565,8 @@
           "first_entry_finalised",
           "second_entry_in_progress",
           "entries_different",
+          "first_entry_correction",
+          "second_entry_correction",
           "definitive"
         ]
       },
@@ -9238,6 +9247,7 @@
           "F402",
           "F403",
           "W001",
+          "W002",
           "W201",
           "W202",
           "W203",

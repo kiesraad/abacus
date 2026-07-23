@@ -307,7 +307,7 @@ describe("InvestigationFindingsPage", () => {
 
     const alert = await screen.findByRole("alert");
     expect(alert).toHaveTextContent(
-      "Er zijn al gecorrigeerde telresultaten ingevoerd. Als je verdergaat worden deze verwijderd.",
+      "Er zijn al gecorrigeerde telresultaten ingevoerd. Als je verder gaat worden deze verwijderd.",
     );
 
     const acceptWarning = await screen.findByRole("checkbox", {

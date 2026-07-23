@@ -26,6 +26,7 @@ Table.TotalRow = TotalRow;
 Table.Cell = Cell;
 Table.NumberCell = NumberCell;
 Table.DisplayFractionCells = DisplayFractionCells;
+Table.FractionAlignedNumberCells = FractionAlignedNumberCells;
 
 function Header({ children, className }: { children: ReactNode; className?: string }) {
   return (
@@ -135,6 +136,15 @@ function DisplayFractionCells({ children, className }: { children: DisplayFracti
       <td className={cn(cls.fractionCell, "font-number", className)}>
         {children && getFractionWithoutInteger(children)}
       </td>
+    </>
+  );
+}
+
+function FractionAlignedNumberCells({ children, className }: { children: number; className?: string }) {
+  return (
+    <>
+      <td className={cn(cls.integerCell, "font-number", className)}>{children}</td>
+      <td className={cn(cls.fractionCell, "font-number", className)}></td>
     </>
   );
 }

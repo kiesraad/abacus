@@ -119,13 +119,29 @@ impl<'a> Arbitrary<'a> for FuzzedApportionmentInput {
         for list_idx in 0..list_count {
             // Generate candidates for each list
             let candidate_count = u.int_in_range(1..=80)?;
-            let mut candidate_votes = Vec::with_capacity(candidate_count);
+            let mut candidate_votes: Vec<u32> = Vec::with_capacity(candidate_count);
 
             // Generate votes for each candidate
             for _ in 0..candidate_count {
                 // Limit votes to ensure total doesn't exceed 100 million to prevent overflows
                 let max_votes_per_candidate = 100_000_000u32.saturating_sub(total_votes);
-                let votes: u32 = u.int_in_range(0..=max_votes_per_candidate)?;
+                // Generating two random numbers in a large range makes the chances of a
+                // tie very low. To bias more towards drawing of lots for candidates,
+                // sometimes copy an earlier candidate's votes (a guaranteed tie),
+                // and sometimes pick a small value, which keeps the quota (and thus the
+                // preference threshold) low enough for tied candidates to still reach
+                // the candidate drawing of lots.
+                let votes: u32 = match u.int_in_range(0..=3u8)? {
+                    // Copy the votes of an earlier candidate on this list, producing an exact tie
+                    0 if !candidate_votes.is_empty() => {
+                        let index = u.int_in_range(0..=candidate_votes.len() - 1)?;
+                        candidate_votes[index].min(max_votes_per_candidate)
+                    }
+                    // Small values keep the quota low, so tied candidates can still meet the
+                    // preference threshold
+                    1 => u.int_in_range(0..=100u32)?.min(max_votes_per_candidate),
+                    _ => u.int_in_range(0..=max_votes_per_candidate)?,
+                };
                 candidate_votes.push(votes);
                 // Ensure total_votes does not overflow, which would cause a panic in the apportionment code (#3179)
                 total_votes = total_votes
@@ -173,11 +189,7 @@ impl apportionment::ApportionmentInput for FuzzedApportionmentInput {
 }
 
 pub fn get_total_seats(result: &apportionment::SeatAssignmentDetails<u32>) -> Vec<u32> {
-    result
-        .standings
-        .iter()
-        .map(|p| p.total_seats)
-        .collect()
+    result.standings.iter().map(|p| p.total_seats).collect()
 }
 
 impl fmt::Debug for FuzzedApportionmentInput {

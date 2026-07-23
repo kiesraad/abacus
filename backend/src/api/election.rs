@@ -719,7 +719,9 @@ async fn create_sub_committees(
         (
             CommitteeCategory::CSB,
             ElectionCategory::Provincial | ElectionCategory::WaterAuthority,
-        ) => {}
+        ) => {
+            todo!("Will be implemented in the future")
+        }
         (CommitteeCategory::GSB, _) => {}
     }
     Ok(())

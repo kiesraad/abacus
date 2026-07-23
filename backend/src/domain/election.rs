@@ -180,7 +180,7 @@ pub struct ElectionNumberOfVotersChangeRequest {
 pub enum ElectionCategory {
     /// Gemeenteraadsverkiezing
     Municipal,
-    /// Provinciale statenverkiezing
+    /// Provinciale Statenverkiezing
     Provincial,
     /// Waterschapsverkiezing
     WaterAuthority,
@@ -209,9 +209,9 @@ pub enum ElectionSubCategory {
     GR1,
     /// Gemeenteraadsverkiezing >= 19 seats
     GR2,
-    /// Provinciale statenverkiezing single district
+    /// Provinciale Statenverkiezing single district
     PS1,
-    /// Provinciale statenverkiezing multiple districts
+    /// Provinciale Statenverkiezing multiple districts
     PS2,
 }
 

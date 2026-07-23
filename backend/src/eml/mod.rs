@@ -42,7 +42,7 @@ use crate::domain::{
         Candidate, CandidateGender, CandidateNumber, CommitteeCategory,
         ElectionWithPoliticalGroups, NewElection, PGNumber, RegisteredPoliticalGroup,
     },
-    results::{Results, political_group_candidate_votes::PoliticalGroupCandidateVotes},
+    results::political_group_candidate_votes::PoliticalGroupCandidateVotes,
     summary::ElectionSummary,
 };
 
@@ -50,62 +50,49 @@ impl NewElection {
     fn get_category_or_err(
         category: eml_nl::utils::ElectionCategory,
     ) -> Result<crate::domain::election::ElectionCategory, EMLImportError> {
-        match category {
-            eml_nl::utils::ElectionCategory::AB => {
-                Ok(crate::domain::election::ElectionCategory::WaterAuthority)
-            }
-            eml_nl::utils::ElectionCategory::GR => {
-                Ok(crate::domain::election::ElectionCategory::Municipal)
-            }
-            eml_nl::utils::ElectionCategory::PS => {
-                Ok(crate::domain::election::ElectionCategory::Provincial)
-            }
-            _ => Err(EMLImportError::LimitedElectionsSupported),
-        }
+        use crate::domain::election::ElectionCategory as Domain;
+        use eml_nl::utils::ElectionCategory as Eml;
+        let category = match category {
+            Eml::AB => Domain::WaterAuthority,
+            Eml::GR => Domain::Municipal,
+            Eml::PS => Domain::Provincial,
+            _ => return Err(EMLImportError::LimitedElectionsSupported),
+        };
+        Ok(category)
     }
 
     fn get_sub_category_or_err(
         sub_category: eml_nl::utils::ElectionSubcategory,
     ) -> Result<crate::domain::election::ElectionSubCategory, EMLImportError> {
-        match sub_category {
-            eml_nl::utils::ElectionSubcategory::AB1 => {
-                Ok(crate::domain::election::ElectionSubCategory::AB1)
-            }
-            eml_nl::utils::ElectionSubcategory::AB2 => {
-                Ok(crate::domain::election::ElectionSubCategory::AB2)
-            }
-            eml_nl::utils::ElectionSubcategory::GR1 => {
-                Ok(crate::domain::election::ElectionSubCategory::GR1)
-            }
-            eml_nl::utils::ElectionSubcategory::GR2 => {
-                Ok(crate::domain::election::ElectionSubCategory::GR2)
-            }
-            eml_nl::utils::ElectionSubcategory::PS1 => {
-                Ok(crate::domain::election::ElectionSubCategory::PS1)
-            }
-            eml_nl::utils::ElectionSubcategory::PS2 => {
-                Ok(crate::domain::election::ElectionSubCategory::PS2)
-            }
-            _ => Err(EMLImportError::LimitedElectionsSupported),
-        }
+        use crate::domain::election::ElectionSubCategory as Domain;
+        use eml_nl::utils::ElectionSubcategory as Eml;
+        let sub_category = match sub_category {
+            Eml::AB1 => Domain::AB1,
+            Eml::AB2 => Domain::AB2,
+            Eml::GR1 => Domain::GR1,
+            Eml::GR2 => Domain::GR2,
+            Eml::PS1 => Domain::PS1,
+            Eml::PS2 => Domain::PS2,
+            _ => return Err(EMLImportError::LimitedElectionsSupported),
+        };
+        Ok(sub_category)
     }
 
     fn category_and_sub_category_match(
         category: crate::domain::election::ElectionCategory,
         sub_category: crate::domain::election::ElectionSubCategory,
     ) -> bool {
+        use crate::domain::election::ElectionCategory;
+        use crate::domain::election::ElectionSubCategory;
         match category {
-            crate::domain::election::ElectionCategory::WaterAuthority => {
-                sub_category == crate::domain::election::ElectionSubCategory::AB1
-                    || sub_category == crate::domain::election::ElectionSubCategory::AB2
+            ElectionCategory::WaterAuthority => {
+                sub_category == ElectionSubCategory::AB1 || sub_category == ElectionSubCategory::AB2
             }
-            crate::domain::election::ElectionCategory::Municipal => {
-                sub_category == crate::domain::election::ElectionSubCategory::GR1
-                    || sub_category == crate::domain::election::ElectionSubCategory::GR2
+            ElectionCategory::Municipal => {
+                sub_category == ElectionSubCategory::GR1 || sub_category == ElectionSubCategory::GR2
             }
-            crate::domain::election::ElectionCategory::Provincial => {
-                sub_category == crate::domain::election::ElectionSubCategory::PS1
-                    || sub_category == crate::domain::election::ElectionSubCategory::PS2
+            ElectionCategory::Provincial => {
+                sub_category == ElectionSubCategory::PS1 || sub_category == ElectionSubCategory::PS2
             }
         }
     }
@@ -378,40 +365,26 @@ impl Candidate {
 impl ElectionWithPoliticalGroups {
     /// Get the EML election category for this election.
     pub fn get_eml_category(&self) -> eml_nl::utils::ElectionCategory {
+        use crate::domain::election::ElectionCategory as Domain;
+        use eml_nl::utils::ElectionCategory as Eml;
         match self.category {
-            crate::domain::election::ElectionCategory::Municipal => {
-                eml_nl::utils::ElectionCategory::GR
-            }
-            crate::domain::election::ElectionCategory::Provincial => {
-                eml_nl::utils::ElectionCategory::PS
-            }
-            crate::domain::election::ElectionCategory::WaterAuthority => {
-                eml_nl::utils::ElectionCategory::AB
-            }
+            Domain::Municipal => Eml::GR,
+            Domain::Provincial => Eml::PS,
+            Domain::WaterAuthority => Eml::AB,
         }
     }
 
     /// Get the EML election sub category for this election.
     pub fn get_eml_sub_category(&self) -> eml_nl::utils::ElectionSubcategory {
+        use crate::domain::election::ElectionSubCategory as Domain;
+        use eml_nl::utils::ElectionSubcategory as Eml;
         match self.sub_category {
-            crate::domain::election::ElectionSubCategory::AB1 => {
-                eml_nl::utils::ElectionSubcategory::AB1
-            }
-            crate::domain::election::ElectionSubCategory::AB2 => {
-                eml_nl::utils::ElectionSubcategory::AB2
-            }
-            crate::domain::election::ElectionSubCategory::GR1 => {
-                eml_nl::utils::ElectionSubcategory::GR1
-            }
-            crate::domain::election::ElectionSubCategory::GR2 => {
-                eml_nl::utils::ElectionSubcategory::GR2
-            }
-            crate::domain::election::ElectionSubCategory::PS1 => {
-                eml_nl::utils::ElectionSubcategory::PS1
-            }
-            crate::domain::election::ElectionSubCategory::PS2 => {
-                eml_nl::utils::ElectionSubcategory::PS2
-            }
+            Domain::AB1 => Eml::AB1,
+            Domain::AB2 => Eml::AB2,
+            Domain::GR1 => Eml::GR1,
+            Domain::GR2 => Eml::GR2,
+            Domain::PS1 => Eml::PS1,
+            Domain::PS2 => Eml::PS2,
         }
     }
 
@@ -731,8 +704,9 @@ impl ElectionWithPoliticalGroups {
             ))
             .selections(self.as_eml_count_selections(results.political_group_votes())?)
             .eligible_voter_count(match results {
-                Results::GSB(gsb_results) => gsb_results.number_of_voters,
-                Results::CSOFirstSession(_) | Results::CSONextSession(_) => {
+                crate::domain::results::Results::GSB(gsb_results) => gsb_results.number_of_voters,
+                crate::domain::results::Results::CSOFirstSession(_)
+                | crate::domain::results::Results::CSONextSession(_) => {
                     data_source.eml_eligible_voter_count().unwrap_or(0)
                 }
             })
@@ -905,7 +879,7 @@ fn add_reporting_unit_investigations(
     results: &crate::domain::results::Results,
 ) -> ReportingUnitVotesBuilder {
     if !committee_session.is_next_session()
-        && let Results::CSOFirstSession(first_session_result) = results
+        && let crate::domain::results::Results::CSOFirstSession(first_session_result) = results
     {
         if let Some(extra_investigation_other_reason) = first_session_result
             .extra_investigation
@@ -1067,13 +1041,7 @@ mod tests {
         let summary = ElectionSummary::from_results(&election, &[]).unwrap();
 
         let eml_count = election
-            .as_count_eml(
-                None,
-                &committee_session,
-                &[],
-                &summary,
-                chrono::Local::now(),
-            )
+            .as_count_eml(None, &committee_session, &[], &summary, Local::now())
             .unwrap();
         assert_eq!(
             eml_count
@@ -1094,13 +1062,7 @@ mod tests {
         let summary = ElectionSummary::from_results(&election, &[]).unwrap();
 
         let eml_count = election
-            .as_count_eml(
-                None,
-                &committee_session,
-                &[],
-                &summary,
-                chrono::Local::now(),
-            )
+            .as_count_eml(None, &committee_session, &[], &summary, Local::now())
             .unwrap();
         assert_eq!(
             eml_count

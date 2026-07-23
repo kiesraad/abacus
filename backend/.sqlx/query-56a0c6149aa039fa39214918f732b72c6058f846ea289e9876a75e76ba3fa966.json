@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "SELECT\n            id,\n            name, \n            committee_category,\n            counting_method,\n            election_id, \n            location, \n            domain_id, \n            category,\n            number_of_seats,\n            number_of_voters,\n            election_date,\n            nomination_date\n        FROM elections \n        WHERE ($1 IS NULL OR committee_category = $1)\n        ",
+  "query": "SELECT\n            id,\n            name, \n            committee_category,\n            counting_method,\n            election_id, \n            location, \n            domain_id, \n            category,\n            sub_category,\n            number_of_seats,\n            number_of_voters,\n            election_date,\n            nomination_date\n        FROM elections \n        WHERE ($1 IS NULL OR committee_category = $1)\n        ",
   "describe": {
     "columns": [
       {
@@ -92,8 +92,19 @@
         }
       },
       {
-        "name": "number_of_seats",
+        "name": "sub_category",
         "ordinal": 8,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "elections",
+            "name": "sub_category"
+          }
+        }
+      },
+      {
+        "name": "number_of_seats",
+        "ordinal": 9,
         "type_info": "Integer",
         "origin": {
           "Table": {
@@ -104,7 +115,7 @@
       },
       {
         "name": "number_of_voters",
-        "ordinal": 9,
+        "ordinal": 10,
         "type_info": "Integer",
         "origin": {
           "Table": {
@@ -115,7 +126,7 @@
       },
       {
         "name": "election_date",
-        "ordinal": 10,
+        "ordinal": 11,
         "type_info": "Text",
         "origin": {
           "Table": {
@@ -126,7 +137,7 @@
       },
       {
         "name": "nomination_date",
-        "ordinal": 11,
+        "ordinal": 12,
         "type_info": "Text",
         "origin": {
           "Table": {
@@ -151,8 +162,9 @@
       false,
       false,
       false,
+      false,
       false
     ]
   },
-  "hash": "ad6dbdf103eb6ce5afe329571ea8b1cafc46f61bb0d7e49582a8b7bdfc8a60eb"
+  "hash": "56a0c6149aa039fa39214918f732b72c6058f846ea289e9876a75e76ba3fa966"
 }

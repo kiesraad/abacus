@@ -901,8 +901,8 @@ mod tests {
     use super::*;
     use crate::domain::{
         election::{
-            Candidate, CandidateNumber, CommitteeCategory, ElectionCategory, ElectionId, PGNumber,
-            PoliticalGroup, VoteCountingMethod,
+            Candidate, CandidateNumber, CommitteeCategory, ElectionCategory, ElectionId,
+            ElectionSubCategory, PGNumber, PoliticalGroup, VoteCountingMethod,
         },
         results::{
             cso_first_session_results::CSOFirstSessionResults,
@@ -972,6 +972,7 @@ mod tests {
             location: "Test location".to_string(),
             domain_id: "0000".to_string(),
             category: ElectionCategory::Municipal,
+            sub_category: ElectionSubCategory::GR1,
             number_of_seats: 18,
             number_of_voters: 1000,
             election_date: Utc::now().date_naive(),

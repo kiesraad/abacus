@@ -15,8 +15,8 @@ use crate::{
         },
         election::{
             self, CandidateGender, CandidateNumber, CommitteeCategory, ElectionCategory,
-            ElectionWithPoliticalGroups, NewElection, PGNumber, PoliticalGroup,
-            RegisteredPoliticalGroup, VoteCountingMethod,
+            ElectionSubCategory, ElectionWithPoliticalGroups, NewElection, PGNumber,
+            PoliticalGroup, RegisteredPoliticalGroup, VoteCountingMethod,
         },
         field_path::FieldPath,
         polling_station::{PollingStation, PollingStationRequest, PollingStationType},
@@ -302,6 +302,8 @@ fn generate_election(
 
     info!("Election has name '{name}'");
 
+    let number_of_seats = rng.random_range(args.seats.clone());
+
     // and put it all in the struct (generating some additional fields where needed)
     NewElection {
         name,
@@ -315,7 +317,12 @@ fn generate_election(
         election_id,
         location: locality,
         category: ElectionCategory::Municipal,
-        number_of_seats: rng.random_range(args.seats.clone()),
+        sub_category: if number_of_seats < 19 {
+            ElectionSubCategory::GR1
+        } else {
+            ElectionSubCategory::GR2
+        },
+        number_of_seats,
         number_of_voters: if args.committee_category == CommitteeCategory::GSB {
             rng.random_range(args.voters.clone())
         } else {

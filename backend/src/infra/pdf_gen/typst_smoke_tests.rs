@@ -18,7 +18,8 @@ use crate::{
         data_entry::{DataEntryId, DataEntrySource, DataEntrySourceNumber},
         election::{
             Candidate, CandidateGender, CandidateNumber, CommitteeCategory, ElectionCategory,
-            ElectionId, ElectionWithPoliticalGroups, PGNumber, PoliticalGroup, VoteCountingMethod,
+            ElectionId, ElectionSubCategory, ElectionWithPoliticalGroups, PGNumber, PoliticalGroup,
+            VoteCountingMethod,
         },
         investigation::PollingStationInvestigation,
         models::{
@@ -130,6 +131,7 @@ fn random_election(
     string_length: usize,
     none_where_possible: bool,
 ) -> ElectionWithPoliticalGroups {
+    let number_of_seats = rng.random_range(9..45);
     ElectionWithPoliticalGroups {
         id: ElectionId::from(rng.random_range(0..5)),
         name: random_string(rng, string_length),
@@ -142,7 +144,12 @@ fn random_election(
         location: random_string(rng, string_length),
         domain_id: random_string(rng, string_length),
         category: ElectionCategory::Municipal,
-        number_of_seats: rng.random_range(9..45),
+        sub_category: if number_of_seats < 19 {
+            ElectionSubCategory::GR1
+        } else {
+            ElectionSubCategory::GR2
+        },
+        number_of_seats,
         number_of_voters: rng.random_range(0..=10_000),
         election_date: random_date(rng),
         nomination_date: random_date(rng),

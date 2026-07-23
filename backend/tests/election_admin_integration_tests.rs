@@ -36,7 +36,7 @@ async fn test_gsb_election_validate_valid(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
-async fn test_gsb_election_validate_invalid_election_only_municipal_supported(pool: SqlitePool) {
+async fn test_gsb_election_validate_invalid_election_limited_elections_supported(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     let url = format!("http://{addr}/api/elections/import/validate");
@@ -46,7 +46,30 @@ async fn test_gsb_election_validate_invalid_election_only_municipal_supported(po
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
           "committee_category": "GSB",
-          "election_data": include_str!("../src/eml/tests/eml110a_invalid_election_only_municipal_supported.eml.xml"),
+          "election_data": include_str!("../src/eml/tests/eml110a_invalid_election_limited_elections_supported.eml.xml"),
+        }))
+        .send()
+        .await
+        .unwrap();
+
+    // Ensure the response is what we expect
+    assert_eq!(response.status(), StatusCode::BAD_REQUEST);
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+async fn test_gsb_election_validate_invalid_election_category_and_sub_category_mismatch(
+    pool: SqlitePool,
+) {
+    let addr = serve_api(pool).await;
+
+    let url = format!("http://{addr}/api/elections/import/validate");
+    let admin_cookie = login(&addr, Admin).await;
+    let response = reqwest::Client::new()
+        .post(&url)
+        .header("cookie", admin_cookie)
+        .json(&serde_json::json!({
+          "committee_category": "GSB",
+          "election_data": include_str!("../src/eml/tests/eml110a_invalid_election_category_and_sub_category_mismatch.eml.xml"),
         }))
         .send()
         .await
@@ -168,23 +191,35 @@ async fn test_csb_election_import_save(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
-async fn test_election_validate_number_of_seats_out_of_range(pool: SqlitePool) {
+async fn test_csb_election_import_only_municipal_election_supported(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
-    let url = format!("http://{addr}/api/elections/import/validate");
+    let url = format!("http://{addr}/api/elections/import");
     let admin_cookie = login(&addr, Admin).await;
     let response = reqwest::Client::new()
         .post(&url)
-        .header("cookie", admin_cookie)
+        .header("cookie", &admin_cookie)
         .json(&serde_json::json!({
-          "committee_category": "GSB",
-          "election_data": include_str!("../src/eml/tests/eml110a_invalid_election_number_of_seats_out_of_range.eml.xml"),
+            "committee_category": "CSB",
+            "election_hash": [
+                "4fd2", "2e51", "1566", "d059",
+                "e2a3", "6862", "56fe", "d4eb",
+                "7d47", "8a74", "7be5", "8f92",
+                "b127", "2f55", "540b", "5aa4"
+            ],
+            "election_data": include_str!("../src/eml/tests/eml110a_test_AB.eml.xml"),
+            "candidate_hash": [
+                "146d", "3784", "efa2", "93b5",
+                "721a", "7578", "a43f", "0636",
+                "7281", "66a0", "acf1", "55d3",
+                "ab25", "083c", "c000", "7096"
+            ],
+            "candidate_data": include_str!("../src/eml/tests/eml230b_test.eml.xml"),
         }))
         .send()
         .await
         .unwrap();
 
-    // Ensure the response is what we expect
     assert_eq!(response.status(), StatusCode::BAD_REQUEST);
 }
 

@@ -31,32 +31,32 @@
   "drawing_lots_for_candidate": {
     "title": "Loting voor kandidaten met evenveel stemmen",
     "candidates_for_drawing_lots": "Er zijn {num_candidates} kandidaten die op basis van hun voorkeursstemmen in aanmerking komen voor zetel {seat_number}. Zij hebben allen {votes} stemmen. Het gaat om de kandidaten:",
-    "hence_drawing_lots_is_needed": "Daarom moet er geloot worden wie zetel {seat_number} krijgt",
+    "hence_drawing_lots_is_needed": "Daarom moet er geloot worden wie zetel {seat_number} krijgt.",
     "total_seats": {
-      "singular": "{list} heeft {total_seats} zetel",
-      "plural": "{list} heeft {total_seats} zetels"
+      "singular": "{list} heeft {total_seats} zetel.",
+      "plural": "{list} heeft {total_seats} zetels."
     }
   },
   "drawing_lots_for_list": {
     "title": "Loting voor restzetel {number}",
-    "hence_drawing_lots_is_needed": "Daarom moet er geloot worden welke lijst de restzetel krijgt",
+    "hence_drawing_lots_is_needed": "Daarom moet er geloot worden welke lijst de restzetel krijgt.",
     "list_gets_the_seat_with": {
-      "highest_average": "De partij met het hoogste gemiddeld aantal stemmen bij het toewijzen van de restzetel krijgt de restzetel",
-      "largest_remainder": "De partij met het grootste overschot aan stemmen krijgt de restzetel"
+      "highest_average": "De partij met het hoogste gemiddeld aantal stemmen bij het toewijzen van de restzetel krijgt de restzetel.",
+      "largest_remainder": "De partij met het grootste overschot aan stemmen krijgt de restzetel."
     },
     "draw_lots_for_lists_with_same": {
-      "highest_average": "<strong>{lists}</strong> hebben ieder het hoogste gemiddeld aantal stemmen per zetel ({value} stemmen)",
-      "largest_remainder": "<strong>{lists}</strong> hebben ieder het grootste overschot ({value} stemmen)"
+      "highest_average": "<strong>{lists}</strong> hebben ieder het hoogste gemiddeld aantal stemmen per zetel ({value} stemmen).",
+      "largest_remainder": "<strong>{lists}</strong> hebben ieder het grootste overschot ({value} stemmen)."
     },
     "residual_seats_to_assign": {
-      "singular": "Er is {nr} restzetel te verdelen",
-      "plural": "Er zijn {nr} restzetels te verdelen"
+      "singular": "Er is {nr} restzetel te verdelen.",
+      "plural": "Er zijn {nr} restzetels te verdelen."
     },
-    "seat_cannot_be_assigned_automatically": "Restzetel {nr} kan niet automatisch worden toegewezen"
+    "seat_cannot_be_assigned_automatically": "Restzetel {nr} kan niet automatisch worden toegewezen."
   },
   "drawing_lots_for_p9": {
     "title": "Loting voor afstaan restzetel aan lijst {assign_to}",
-    "hence_drawing_lots_is_needed": "Daarom moet er geloot worden welke lijst de restzetel moet afstaan",
+    "hence_drawing_lots_is_needed": "Daarom moet er geloot worden welke lijst de restzetel moet afstaan.",
     "last_residual_seat_to_list": "De laatste restzetel moet worden afgestaan aan lijst {nr}.",
     "list_got_absolute_majority": "Lijst {nr} heeft de volstrekte meerderheid van stemmen gekregen, maar heeft niet de volstrekte meerderheid aan zetels.",
     "lists_got_last_residual_seats": "Lijst {lists} hebben met hetzelfde {variant} stemmen de laatste restzetels gekregen."
@@ -70,8 +70,8 @@
   "drawing_lots_required_for_candidates_alert": {
     "title": "Loting noodzakelijk voor kandidaten met gelijk aantal voorkeursstemmen",
     "description": {
-      "singular": "{num_candidates} kandidaten van {list} hebben evenveel voorkeursstemmen gekregen. Er is nog {num_seats} zetel beschikbaar. In de wet staat dat de kandidaat met het hoogste aantal voorkeursstemmen de zetel krijgt.",
-      "plural": "{num_candidates} kandidaten van {list} hebben evenveel voorkeursstemmen gekregen. Er zijn nog {num_seats} zetels beschikbaar. In de wet staat dat de kandidaten met het hoogste aantal voorkeursstemmen de zetels krijgen."
+      "singular": "{num_candidates} kandidaten van {list} hebben evenveel voorkeursstemmen gekregen. Er is nog {num_seats} zetel beschikbaar. In de Kieswet staat dat de kandidaat met het hoogste aantal voorkeursstemmen de zetel krijgt.",
+      "plural": "{num_candidates} kandidaten van {list} hebben evenveel voorkeursstemmen gekregen. Er zijn nog {num_seats} zetels beschikbaar. In de Kieswet staat dat de kandidaten met het hoogste aantal voorkeursstemmen de zetels krijgen."
     },
     "drawing_lots_needed": {
       "singular": "Hierdoor kan de zetel niet automatisch worden toegewezen. Het centraal stembureau moet een loting uitvoeren om te bepalen welke kandidaat gekozen wordt.",
@@ -83,16 +83,16 @@
       "singular": "Loting noodzakelijk voor toekennen restzetel",
       "plural": "Loting noodzakelijk voor toekennen restzetels"
     },
-    "description": "Er is een restzetel te verdelen. In de wet staat dat de partij met het grootste {variant} stemmen per toegewezen zetel deze restzetel krijgt.",
+    "description": "Er is een restzetel te verdelen. In de Kieswet staat dat de partij met het grootste {variant} stemmen per toegewezen zetel deze restzetel krijgt.",
     "drawing_lots_needed": "Hierdoor kan de restzetel niet automatisch worden toegewezen. Het centraal stembureau moet een loting uitvoeren om de restzetel toe te wijzen.",
     "same_averages": "Er zijn meerdere partijen die bij het toewijzen van de volgende restzetel precies hetzelfde hoogste gemiddelde hebben.",
     "same_remainders": "Er zijn meerdere partijen die hetzelfde grootste overschot hebben."
   },
   "drawing_lots_required_for_p9_alert": {
     "title": "Loting noodzakelijk vanwege volstrekte meerderheid",
-    "article_p9": "Volgens artikel P 9 van de kieswet wordt een zetel afgenomen van de lijst die een zetel heeft gekregen op basis van het kleinste {variant} stemmen.",
+    "article_p9": "Volgens artikel P 9 van de Kieswet wordt een zetel afgenomen van de lijst die een zetel heeft gekregen op basis van het kleinste {variant} stemmen.",
     "description": "{name} heeft de volstrekte meerderheid van stemmen gekregen, maar heeft niet de volstrekte meerderheid aan zetels.",
-    "drawing_lots_needed": "In de zitting van het CSB moet door loting worden bepaald welk van deze lijsten een zetel af moet staan.",
+    "drawing_lots_needed": "In de zitting van het CSB moet door loting worden bepaald welke van deze lijsten een zetel af moet staan.",
     "last_residual_seat": "<strong>Lijst {lists}</strong> hebben met hetzelfde {variant} stemmen hun zetels gekregen."
   },
   "drawing_lots_result": {
@@ -194,7 +194,7 @@
     "singular": "Er is <link>{num_residual_seats} restzetel te verdelen</link>.",
     "plural": "Er zijn <link>{num_residual_seats} restzetels te verdelen</link>."
   },
-  "residual_seats_information_highest_averages": "Omdat het totaal aantal zetels groter of gelijk is aan 19, gebeurt dat via het systeem van de grootste gemiddelden.",
+  "residual_seats_information_highest_averages": "Omdat het totaal aantal zetels groter is dan of gelijk is aan 19, gebeurt dat via het systeem van de grootste gemiddelden.",
   "residual_seats_information_largest_remainders": "Omdat het totaal aantal zetels kleiner is dan 19, gebeurt dat via het systeem van de grootste overschotten.",
   "residual_seats_highest_averages": "De restzetels gaan naar de partijen met de grootste gemiddelden",
   "residual_seats_largest_remainders": "De restzetels gaan naar de partijen met de grootste overschotten",

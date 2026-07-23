@@ -53,7 +53,7 @@
     "UserNotFound": "De gebruiker is niet gevonden"
   },
   "committee_session_not_found": "Zitting niet gevonden",
-  "data_entry_not_found": "Het invoer nummer is ongeldig",
+  "data_entry_not_found": "Het invoernummer is ongeldig",
   "election_not_found": "Verkiezing niet gevonden",
   "elections_not_found": "Verkiezingen niet gevonden",
   "forbidden": "Geen toegang",

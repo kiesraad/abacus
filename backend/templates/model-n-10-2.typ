@@ -2,12 +2,15 @@
 #import "common/scripts.typ": *
 #let input = json("inputs/model-n-10-2.json")
 
+#let is_municipality = (municipal, public_body) => is_municipality(input.election.location, municipal, public_body)
+#let is_local_election = (local, other) => is_local_election(input.election.category, local, other)
+
 #let is_mobile = "polling_station_type" in input.polling_station and input.polling_station.polling_station_type == "Mobile"
 
-#let location_name = is_municipality[#input.election.location][Gemeente #input.election.domain_id #input.election.location][Openbaar lichaam #input.election.location]
-#let location_type = is_municipality[#input.election.location][gemeentelijk stembureau][stembureau voor het openbaar lichaam]
-#let this_location = is_municipality[#input.election.location][deze gemeente][dit openbaar lichaam]
-#let location = is_municipality[#input.election.location][gemeente][openbaar lichaam]
+#let location_name = is_municipality[Gemeente #input.election.domain_id #input.election.location][Openbaar lichaam #input.election.location]
+#let location_type = is_municipality[gemeentelijk stembureau][stembureau voor het openbaar lichaam]
+#let this_location = is_municipality[deze gemeente][dit openbaar lichaam]
+#let location = is_municipality[gemeente][openbaar lichaam]
 
 #let header-right = [Stembureau #input.polling_station.number]
 
@@ -155,7 +158,7 @@ Bijvoorbeeld als er meerdere verkiezingen tegelijk werden georganiseerd, en een 
 
 == Toegelaten kiezers
 
-#is_local_election(input.election.category)[
+#is_local_election[
   Tel het aantal geldige stempassen en volmachtbewijzen
 
   #sum(

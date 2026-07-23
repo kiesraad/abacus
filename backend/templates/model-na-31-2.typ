@@ -2,10 +2,12 @@
 #import "common/scripts.typ": *
 #let input = json("inputs/model-na-31-2.json")
 
-#let location_name = is_municipality[#input.election.location][Gemeente #input.election.domain_id #input.election.location][Openbaar lichaam #input.election.location]
-#let location_type = is_municipality[#input.election.location][gemeentelijk stembureau][stembureau voor het openbaar lichaam]
-#let this_location = is_municipality[#input.election.location][deze gemeente][dit openbaar lichaam]
-#let the_location = is_municipality[#input.election.location][de gemeente][het openbaar lichaam]
+#let is_municipality = (municipal, public_body) => is_municipality(input.election.location, municipal, public_body)
+#let is_local_election = (local, other) => is_local_election(input.election.category, local, other)
+#let location_name = is_municipality[Gemeente #input.election.domain_id #input.election.location][Openbaar lichaam #input.election.location]
+#let location_type = is_municipality[gemeentelijk stembureau][stembureau voor het openbaar lichaam]
+#let this_location = is_municipality[deze gemeente][dit openbaar lichaam]
+#let the_location = is_municipality[de gemeente][het openbaar lichaam]
 
 #show: doc => conf(doc, header-right: location_name, footer: [
   #input.creation_date_time. Digitale vingerafdruk van EML-telbestand bij dit proces-verbaal (SHA-256): \
@@ -15,8 +17,8 @@
 #set heading(numbering: none)
 
 #title_page(
-  is_municipality[#input.election.location][#input.election.domain_id #input.election.location][#input.election.location],
-  is_municipality[#input.election.location][Gemeentelijk stembureau][Stembureau voor het openbaar lichaam],
+  is_municipality[#input.election.domain_id #input.election.location][#input.election.location],
+  is_municipality[Gemeentelijk stembureau][Stembureau voor het openbaar lichaam],
   [#input.election.name - #format_date(input.election.election_date)],
   [
     Verslag en telresultaten per lijst en kandidaat -
@@ -32,7 +34,7 @@
 
 == Proces-verbaal
 
-Elke #is_municipality[#input.election.location][gemeente][openbaar lichaam] maakt bij een verkiezing een verslag: het proces-verbaal. Hierin staat hoe het tellen van de stemmen is verlopen en wat de uitslag van de stemming was.
+Elke #is_municipality[gemeente][openbaar lichaam] maakt bij een verkiezing een verslag: het proces-verbaal. Hierin staat hoe het tellen van de stemmen is verlopen en wat de uitslag van de stemming was.
 
 #emph_block[
   In #this_location is gekozen voor *centrale stemopneming*.
@@ -43,7 +45,7 @@ Elke #is_municipality[#input.election.location][gemeente][openbaar lichaam] maak
 == Inhoudsopgave
 
 - Deel 1 - *Verslag van de zitting* (het verloop van het tellen en optellen)
-- Deel 2 - *Telresultaten* van #is_municipality[#input.election.location][de hele gemeente][het hele openbaar lichaam]
+- Deel 2 - *Telresultaten* van #is_municipality[de hele gemeente][het hele openbaar lichaam]
 - Deel 3 - *Ondertekening* door de leden van het #location_type
 
 \
@@ -292,21 +294,21 @@ Zo komt het handtekeningen-blad altijd op een losse pagina, ook als het verslag 
 
 #textbox_only_bottom_stroke[Datum en tijd:][Plaats:]
 
-== Verplicht: voorzitter en #is_local_election(input.election.category)[twee][vier] leden van het #location_type
+== Verplicht: voorzitter en #is_local_election[twee][vier] leden van het #location_type
 
 === Voorzitter van het #location_type:
 
 #textbox[Naam:][Handtekening:]
 
-=== #is_local_election(input.election.category)[2][4] leden van het #location_type:
+=== #is_local_election[2][4] leden van het #location_type:
 
-#stack(spacing: 0.5em, ..range(0, is_local_election(input.election.category, 2, 4)).map(_ => textbox[Naam:][Handtekening:]))
+#stack(spacing: 0.5em, ..range(0, is_local_election(2, 4)).map(_ => textbox[Naam:][Handtekening:]))
 
 == Ondertekening door andere aanwezige leden van het #location_type
 
 === Extra ondertekening: (niet verplicht)
 
-#stack(spacing: 0.5em, ..range(0, is_local_election(input.election.category, 3, 1)).map(_ => textbox[Naam:][Handtekening:]))
+#stack(spacing: 0.5em, ..range(0, is_local_election(3, 1)).map(_ => textbox[Naam:][Handtekening:]))
 
 #pagebreak(weak: true)
 

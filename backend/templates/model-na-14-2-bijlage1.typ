@@ -2,8 +2,9 @@
 #import "common/scripts.typ": *
 #let input = json("inputs/model-na-14-2-bijlage1.json")
 
-#let location_name = is_municipality[#input.election.location][Gemeente #input.election.domain_id #input.election.location][Openbaar lichaam #input.election.location]
-#let location_type = is_municipality[#input.election.location][gemeentelijk stembureau][stembureau voor het openbaar lichaam]
+#let is_municipality = (municipal, public_body) => is_municipality(input.election.location, municipal, public_body)
+#let location_name = is_municipality[Gemeente #input.election.domain_id #input.election.location][Openbaar lichaam #input.election.location]
+#let location_type = is_municipality[gemeentelijk stembureau][stembureau voor het openbaar lichaam]
 
 #show: doc => conf(
   doc,

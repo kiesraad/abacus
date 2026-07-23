@@ -31,7 +31,7 @@ export const Default: StoryObj = {
       ["3", "Political Group C", "49", "", "49", "", "49", "", "49", "", "0"],
       ["4", "Political Group D", "49", "1/2", "49", "1/2", "49", "1/2", "49", "1/2", "1"],
       ["5", "Blanco (Smit, G.)", "50", "1/2", "33", "2/3", "33", "2/3", "33", "2/3", "1"],
-      ["", "Restzetel toegekend aan lijst", "5", "2", "1", "4", ""],
+      ["", "Restzetel toegekend aan lijst", "5", "", "2", "", "1", "", "4", "", ""],
     ]);
   },
 };
@@ -143,7 +143,7 @@ export const AbsoluteMajorityReassignment: StoryObj = {
       ],
       ["7", "Political Group G", "624", "", "624", "", "624", "", "624", "", "624", "", "624", "", "1 0"],
       ["8", "Political Group H", "7", "", "7", "", "7", "", "7", "", "7", "", "7", "", "0"],
-      ["", "Restzetel toegekend aan lijst", "2", "3", "4", "5", "6", "7", ""],
+      ["", "Restzetel toegekend aan lijst", "2", "", "3", "", "4", "", "5", "", "6", "", "7", "", ""],
     ]);
   },
 };
@@ -176,7 +176,7 @@ export const DrawingLotsForList: StoryObj = {
       ["4", "Algemene Lijst", "46", "2/3", "46", "2/3", "0"],
       ["5", "Unie van kandidaten", "46", "2/3", "46", "2/3", "0"],
       ["6", "Lijst van stemmers", "46", "2/3", "46", "2/3", "0"],
-      ["", "Restzetel toegekend aan lijst", "1", "Loting nodig", ""],
+      ["", "Restzetel toegekend aan lijst", "1", "", "Loting nodig", ""],
     ]);
   },
 };
@@ -259,7 +259,7 @@ export const P9BeforeDrawingLots: StoryObj = {
       ["6", "Altijd van de Partij", "624", "", "624", "", "624", "", "624", "", "624", "", "416", "", "1 1"],
       ["7", "Partij van de Keuze", "624", "", "624", "", "624", "", "624", "", "624", "", "624", "", "1 1"],
       ["8", "Stemmersgroep", "8", "", "8", "", "8", "", "8", "", "8", "", "8", "", "0"],
-      ["", "Restzetel toegekend aan lijst", "2", "3", "4", "5", "6", "7", ""],
+      ["", "Restzetel toegekend aan lijst", "2", "", "3", "", "4", "", "5", "", "6", "", "7", "", ""],
     ]);
   },
 };
@@ -342,7 +342,7 @@ export const P9AfterDrawingLots: StoryObj = {
       ["6", "Altijd van de Partij", "624", "", "624", "", "624", "", "624", "", "624", "", "416", "", "1"],
       ["7", "Partij van de Keuze", "624", "", "624", "", "624", "", "624", "", "624", "", "624", "", "1 0"],
       ["8", "Stemmersgroep", "8", "", "8", "", "8", "", "8", "", "8", "", "8", "", "0"],
-      ["", "Restzetel toegekend aan lijst", "2", "3", "4", "5", "6", "7", ""],
+      ["", "Restzetel toegekend aan lijst", "2", "", "3", "", "4", "", "5", "", "6", "", "7", "", ""],
     ]);
   },
 };

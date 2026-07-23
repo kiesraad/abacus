@@ -122,9 +122,9 @@ export function HighestAveragesTable({
               {t("apportionment.residual_seat_assigned_to_list")}
             </Table.Cell>
             {steps.map((step) => (
-              <Table.NumberCell key={step.residual_seat_number} colSpan={2}>
+              <Table.FractionAlignedNumberCells key={step.residual_seat_number}>
                 {step.change.selected_list_number}
-              </Table.NumberCell>
+              </Table.FractionAlignedNumberCells>
             ))}
             {addDrawingLotsRound && (
               <Table.Cell className={cn(cls.sticky, "text-align-r")} colSpan={2}>

@@ -141,7 +141,7 @@ describe("ApportionmentResidualSeatsPage", () => {
         ["3", "Political Group C", "49", "", "49", "", "49", "", "49", "", "0"],
         ["4", "Political Group D", "49", "1/2", "49", "1/2", "49", "1/2", "49", "1/2", "1"],
         ["5", "Blanco (Smit, G.)", "50", "1/2", "33", "2/3", "33", "2/3", "33", "2/3", "1"],
-        ["", "Restzetel toegekend aan lijst", "5", "2", "1", "4", ""],
+        ["", "Restzetel toegekend aan lijst", "5", "", "2", "", "1", "", "4", "", ""],
       ]);
 
       expect(screen.queryByTestId("largest-remainders-table")).not.toBeInTheDocument();
@@ -266,7 +266,7 @@ describe("ApportionmentResidualSeatsPage", () => {
         ],
         ["7", "Political Group G", "624", "", "624", "", "624", "", "624", "", "624", "", "624", "", "1 0"],
         ["8", "Political Group H", "7", "", "7", "", "7", "", "7", "", "7", "", "7", "", "0"],
-        ["", "Restzetel toegekend aan lijst", "2", "3", "4", "5", "6", "7", ""],
+        ["", "Restzetel toegekend aan lijst", "2", "", "3", "", "4", "", "5", "", "6", "", "7", "", ""],
       ]);
 
       expect(await screen.findByTestId("footnotes-list")).toHaveTextContent(
@@ -319,7 +319,7 @@ describe("ApportionmentResidualSeatsPage", () => {
         ["3", "Political Group C", "320", "", "0"],
         ["4", "Political Group D", "320", "", "0"],
         ["5", "Political Group E", "266", "2/3", "0"],
-        ["", "Restzetel toegekend aan lijst", "2", ""],
+        ["", "Restzetel toegekend aan lijst", "2", "", ""],
       ]);
       expect(screen.queryByTestId("largest-remainders-table")).not.toBeInTheDocument();
       expect(screen.queryByTestId("unique-highest-averages-table")).not.toBeInTheDocument();
@@ -651,7 +651,7 @@ describe("ApportionmentResidualSeatsPage", () => {
         ["1", "Political Group A", "2", "1/2", "", "", "1"],
         ["2", "Political Group B", "2", "1/2", "2", "1/2", "1"],
         ["3", "Blanco (Smit, G.)", "", "", "", "", "0"],
-        ["", "Restzetel toegekend aan lijst", "1", "2", ""],
+        ["", "Restzetel toegekend aan lijst", "1", "", "2", "", ""],
       ]);
 
       expect(await screen.findByTestId("footnotes-list")).toHaveTextContent(
@@ -757,7 +757,7 @@ describe("ApportionmentResidualSeatsPage", () => {
         ["4", "Algemene Lijst", "46", "2/3", "46", "2/3", "0"],
         ["5", "Unie van kandidaten", "46", "2/3", "46", "2/3", "0"],
         ["6", "Lijst van stemmers", "46", "2/3", "46", "2/3", "0"],
-        ["", "Restzetel toegekend aan lijst", "1", "Loting nodig", ""],
+        ["", "Restzetel toegekend aan lijst", "1", "", "Loting nodig", ""],
       ]);
 
       // Check that the "Loting nodig" link links to the drawing lots page
@@ -921,7 +921,7 @@ describe("ApportionmentResidualSeatsPage", () => {
         ["6", "Altijd van de Partij", "624", "", "624", "", "624", "", "624", "", "624", "", "416", "", "1 1"],
         ["7", "Partij van de Keuze", "624", "", "624", "", "624", "", "624", "", "624", "", "624", "", "1 1"],
         ["8", "Stemmersgroep", "8", "", "8", "", "8", "", "8", "", "8", "", "8", "", "0"],
-        ["", "Restzetel toegekend aan lijst", "2", "3", "4", "5", "6", "7", ""],
+        ["", "Restzetel toegekend aan lijst", "2", "", "3", "", "4", "", "5", "", "6", "", "7", "", ""],
       ]);
 
       expect(await screen.findByTestId("footnotes-list")).toHaveTextContent(
@@ -1020,7 +1020,7 @@ describe("ApportionmentResidualSeatsPage", () => {
         ["6", "Altijd van de Partij", "624", "", "624", "", "624", "", "624", "", "624", "", "416", "", "1"],
         ["7", "Partij van de Keuze", "624", "", "624", "", "624", "", "624", "", "624", "", "624", "", "1 0"],
         ["8", "Stemmersgroep", "8", "", "8", "", "8", "", "8", "", "8", "", "8", "", "0"],
-        ["", "Restzetel toegekend aan lijst", "2", "3", "4", "5", "6", "7", ""],
+        ["", "Restzetel toegekend aan lijst", "2", "", "3", "", "4", "", "5", "", "6", "", "7", "", ""],
       ]);
 
       expect(await screen.findByTestId("footnotes-list")).toHaveTextContent(

@@ -738,21 +738,7 @@
   steps,
   list_seat_assignments,
 ) = {
-  let steps_copy = steps
-  let slices = ()
-  if steps_copy.len() > 6 {
-    let slice = ()
-    while steps_copy.len() > 0 {
-      slice.push(steps_copy.remove(0))
-      if slice.len() == 6 {
-        slices.push(slice)
-        slice = ()
-      }
-    }
-    slices.push(slice)
-  } else {
-    slices.push(steps_copy)
-  }
+  let slices = steps.chunks(6)
   for slice in slices {
     table(
       columns: (1fr,) + slice.len() * (6em,) + (6em,),

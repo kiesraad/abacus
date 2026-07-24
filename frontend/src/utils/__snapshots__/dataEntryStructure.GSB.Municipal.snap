@@ -46,7 +46,7 @@
             "addSeparator": true,
             "code": "C",
             "isDisabled": true,
-            "path": "voters_counts.voter_cards_count",
+            "path": "voters_counts.voter_card_count",
             "title": "Kiezerspassen",
           },
           {

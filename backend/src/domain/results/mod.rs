@@ -345,7 +345,7 @@ pub mod tests {
             voters_counts: VotersCounts {
                 poll_card_count: 99,
                 proxy_certificate_count: 1,
-                voter_cards_count: None,
+                voter_card_count: None,
                 total_admitted_voters_count: 100,
             },
             votes_counts: VotesCounts {

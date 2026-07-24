@@ -1682,7 +1682,7 @@ export interface VotersCounts {
   /** Total number of admitted voters ("Totaal aantal toegelaten kiezers") */
   total_admitted_voters_count: number;
   /** Number of valid voter cards ("Aantal geldige kiezerspassen") */
-  voter_cards_count?: number;
+  voter_card_count?: number;
 }
 
 /**

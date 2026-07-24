@@ -303,7 +303,7 @@ fn random_result(
         voters_counts: VotersCounts {
             poll_card_count: rng.random_range(0..500),
             proxy_certificate_count: rng.random_range(0..500),
-            voter_cards_count: Some(rng.random_range(0..500)),
+            voter_card_count: Some(rng.random_range(0..500)),
             total_admitted_voters_count: rng.random_range(0..500),
         },
         votes_counts: VotesCounts {
@@ -364,7 +364,7 @@ fn random_csb_result(
         voters_counts: VotersCounts {
             poll_card_count: rng.random_range(0..500),
             proxy_certificate_count: rng.random_range(0..500),
-            voter_cards_count: Some(rng.random_range(0..500)),
+            voter_card_count: Some(rng.random_range(0..500)),
             total_admitted_voters_count: rng.random_range(0..500),
         },
         votes_counts: EnrichedVotesCounts {

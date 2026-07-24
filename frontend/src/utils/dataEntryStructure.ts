@@ -47,8 +47,8 @@ const createVotersAndVotesRows = (
     },
     {
       code: "C",
-      path: "voters_counts.voter_cards_count",
-      title: t("voters_votes_counts.voters_counts.voter_cards_count"),
+      path: "voters_counts.voter_card_count",
+      title: t("voters_votes_counts.voters_counts.voter_card_count"),
       isDisabled: election.category === "Municipal",
       addSeparator: true,
     },

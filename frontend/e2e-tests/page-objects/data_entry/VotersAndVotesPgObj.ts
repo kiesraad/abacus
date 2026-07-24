@@ -10,7 +10,7 @@ export class VotersAndVotesPage extends DataEntryBasePage {
   readonly numberOfVoters: Locator;
   readonly pollCardCount: Locator;
   readonly proxyCertificateCount: Locator;
-  readonly voterCardsCount: Locator;
+  readonly voterCardCount: Locator;
   readonly totalAdmittedVotersCount: Locator;
   readonly politicalGroupTotalVotes: Locator;
   readonly totalVotesCandidatesCount: Locator;
@@ -39,7 +39,7 @@ export class VotersAndVotesPage extends DataEntryBasePage {
     // voters counts
     this.pollCardCount = page.getByRole("textbox", { name: "A Stempassen" });
     this.proxyCertificateCount = page.getByRole("textbox", { name: "B Volmachtbewijzen" });
-    this.voterCardsCount = page.getByRole("textbox", { name: "C Kiezerspassen" });
+    this.voterCardCount = page.getByRole("textbox", { name: "C Kiezerspassen" });
     this.totalAdmittedVotersCount = page.getByRole("textbox", { name: "D Totaal toegelaten kiezers" });
 
     // votes counts
@@ -62,8 +62,8 @@ export class VotersAndVotesPage extends DataEntryBasePage {
   async inputVotersCounts(votersCounts: VotersCounts) {
     await this.pollCardCount.fill(votersCounts.poll_card_count.toString());
     await this.proxyCertificateCount.fill(votersCounts.proxy_certificate_count.toString());
-    if (votersCounts.voter_cards_count) {
-      await this.voterCardsCount.fill(votersCounts.voter_cards_count.toString());
+    if (votersCounts.voter_card_count) {
+      await this.voterCardCount.fill(votersCounts.voter_card_count.toString());
     }
     await this.totalAdmittedVotersCount.fill(votersCounts.total_admitted_voters_count.toString());
   }
@@ -76,8 +76,8 @@ export class VotersAndVotesPage extends DataEntryBasePage {
       total_admitted_voters_count: Number(await this.totalAdmittedVotersCount.inputValue()),
     };
 
-    if (!(await this.voterCardsCount.isDisabled())) {
-      data.voter_cards_count = Number(await this.voterCardsCount.inputValue());
+    if (!(await this.voterCardCount.isDisabled())) {
+      data.voter_card_count = Number(await this.voterCardCount.inputValue());
     }
 
     return data;

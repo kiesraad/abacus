@@ -293,7 +293,7 @@ mod tests {
             voters_counts: VotersCounts {
                 poll_card_count: total_votes_candidates_count,
                 proxy_certificate_count: 0,
-                voter_cards_count: None,
+                voter_card_count: None,
                 total_admitted_voters_count: total_votes_candidates_count,
             },
             votes_counts: VotesCounts {

@@ -166,7 +166,7 @@ describe("mapSectionValues", () => {
           rows: [
             { code: "A", path: "voters_counts.poll_card_count", title: "Test Title" },
             { code: "B", path: "voters_counts.proxy_certificate_count", title: "Test Title" },
-            { code: "C", path: "voters_counts.voter_cards_count", title: "Test Title", isDisabled: true },
+            { code: "C", path: "voters_counts.voter_card_count", title: "Test Title", isDisabled: true },
             { code: "D", path: "voters_counts.total_admitted_voters_count", title: "Test Title" },
           ],
         },
@@ -177,7 +177,7 @@ describe("mapSectionValues", () => {
 
     expect(result.voters_counts.poll_card_count).toBe(123);
     expect(result.voters_counts.proxy_certificate_count).toBe(45);
-    expect(result.voters_counts.voter_cards_count).toBe(undefined);
+    expect(result.voters_counts.voter_card_count).toBe(undefined);
     expect(result.voters_counts.total_admitted_voters_count).toBe(235);
   });
 

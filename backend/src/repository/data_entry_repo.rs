@@ -439,7 +439,7 @@ mod tests {
                 VotersCounts {
                     poll_card_count: 100,
                     proxy_certificate_count,
-                    voter_cards_count: None,
+                    voter_card_count: None,
                     total_admitted_voters_count: 100 + proxy_certificate_count,
                 }
             },

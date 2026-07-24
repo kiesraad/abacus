@@ -2,10 +2,7 @@
 #import "common/scripts.typ": *
 #let input = json("inputs/model-na-31-2-inlegvel.json")
 
-#let is_municipality = (municipal, public_body) => if (
-  input.election.category == "Municipal"
-) { municipal } else { public_body }
-
+#let is_municipality = (municipal, public_body) => is_municipality(input.election.location, municipal, public_body)
 #let location_name = is_municipality[Gemeente #input.election.domain_id #input.election.location][Openbaar lichaam #input.election.location]
 #let location_type = is_municipality[gemeentelijk stembureau][stembureau voor het openbaar lichaam]
 

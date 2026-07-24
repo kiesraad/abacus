@@ -628,6 +628,7 @@ mod tests {
         assert_eq!(totals.voters_counts.total_admitted_voters_count, 94);
         assert_eq!(totals.voters_counts.poll_card_count, 89);
         assert_eq!(totals.voters_counts.proxy_certificate_count, 5);
+        assert_eq!(totals.voters_counts.voter_card_count, None);
 
         // tests for votes counts
         assert_eq!(totals.votes_counts.total_votes_cast_count, 93);

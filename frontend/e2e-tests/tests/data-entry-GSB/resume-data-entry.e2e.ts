@@ -179,6 +179,7 @@ test.describe("resume data entry flow", () => {
               fields: [
                 "data.voters_counts.poll_card_count",
                 "data.voters_counts.proxy_certificate_count",
+                "data.voters_counts.voter_card_count",
                 "data.voters_counts.total_admitted_voters_count",
               ],
               code: "F201",

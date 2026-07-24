@@ -73,7 +73,7 @@ pub enum ValidationResultCode {
     /// GSB CSO: 'Verschillen met telresultaten van het stembureau': meerdere antwoorden per vraag
     F112,
 
-    /// GSB CSO, GSB DSO, CSB: 'Aantal kiezers en stemmen': stempassen + volmachten <> totaal toegelaten kiezers
+    /// GSB CSO, GSB DSO, CSB: 'Aantal kiezers en stemmen': stempassen + volmachten + kiezerspassen <> totaal toegelaten kiezers
     F201,
     /// GSB CSO, GSB DSO, CSB: 'Aantal kiezers en stemmen': (Als F.204 niet getoond wordt) E.1 t/m E.n tellen niet op naar E
     F202,

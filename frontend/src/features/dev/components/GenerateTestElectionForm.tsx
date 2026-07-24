@@ -8,7 +8,8 @@ import { ChoiceList } from "@/components/ui/CheckboxAndRadio/ChoiceList";
 import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { InputField } from "@/components/ui/InputField/InputField";
-import { type CommitteeCategory, committeeCategoryValues } from "@/types/generated/openapi";
+import { t } from "@/i18n/translate";
+import { type CommitteeCategory, committeeCategoryValues, electionCategoryValues } from "@/types/generated/openapi";
 import { StringFormData } from "@/utils/stringFormData";
 
 const RANGE_HINT = "Gebruik notatie zoals 10..50 of 9..=45 of een enkel getal zoals 40";
@@ -75,12 +76,17 @@ export function GenerateTestElectionForm() {
       formState.generate_p22_2_variants || formState.generate_drawing_lots
         ? "CSB"
         : formData.getString("committee_category");
+    const election_category =
+      formState.generate_p22_2_variants || formState.generate_drawing_lots
+        ? "Municipal"
+        : formData.getString("election_category");
 
     const payload = RANGE_FIELDS.reduce<Record<string, string | boolean>>(
       (acc, field) =>
         Object.assign(acc, { [field.key]: formState[field.key] ? formState[field.key] : field.placeholder }),
       {
         committee_category,
+        election_category,
         generate_p22_2_variants: formState.generate_p22_2_variants,
         generate_drawing_lots: formState.generate_drawing_lots,
         with_data_entry: formState.with_data_entry,
@@ -112,20 +118,21 @@ export function GenerateTestElectionForm() {
         <Checkbox
           id="generate-p22-2-variants"
           name="generate_p22_2_variants"
-          label="Genereer meerdere verkiezingen voor P 22-2 varianten (CSB)"
+          label="Genereer meerdere verkiezingen voor P 22-2 varianten (CSB GR)"
           checked={formState.generate_p22_2_variants}
           onChange={handleBooleanChange}
         />
         <Checkbox
           id="generate-drawing-lots"
           name="generate_drawing_lots"
-          label="Genereer meerdere verkiezingen met verschillende vormen van loting"
+          label="Genereer meerdere verkiezingen met verschillende vormen van loting (CSB GR)"
           checked={formState.generate_drawing_lots}
           onChange={handleBooleanChange}
         />
         {formState.generate_p22_2_variants || formState.generate_drawing_lots || (
           <>
             <ChoiceList>
+              <ChoiceList.Legend>{t("election.committee_category.title")}</ChoiceList.Legend>
               {committeeCategoryValues.map((committeeCategory, index) => (
                 <ChoiceList.Radio
                   id={committeeCategory}
@@ -133,7 +140,20 @@ export function GenerateTestElectionForm() {
                   name={"committee_category"}
                   defaultChecked={index === 0}
                   defaultValue={committeeCategory}
-                  label={committeeCategory}
+                  label={t(`committee_category.${committeeCategory}.full`)}
+                />
+              ))}
+            </ChoiceList>
+            <ChoiceList>
+              <ChoiceList.Legend>{t("election.election_category.title")}</ChoiceList.Legend>
+              {electionCategoryValues.map((electionCategory, index) => (
+                <ChoiceList.Radio
+                  id={electionCategory}
+                  key={electionCategory}
+                  name={"election_category"}
+                  defaultChecked={index === 0}
+                  defaultValue={electionCategory}
+                  label={t(`election_category.${electionCategory}`)}
                 />
               ))}
             </ChoiceList>

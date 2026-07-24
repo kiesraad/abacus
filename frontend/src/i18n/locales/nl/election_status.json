@@ -21,6 +21,7 @@
   "start": "Starten",
   "success": {
     "data_entries_discarded": "Omdat beide invoeren zijn verwijderd, moet stembureau {number} twee keer opnieuw ingevoerd worden.",
+    "data_entry_corrected": "De invoer die niet klopt moet worden hersteld door {typist}.",
     "data_entry_discarded": "Invoer stembureau {nr} verwijderd",
     "data_entry_kept": "Omdat er nog maar één invoer over is, moet er een nieuwe tweede invoer gedaan worden. Kies hiervoor een andere invoerder dan {typist}.",
     "data_entry_resumed": "Stembureau {nr} teruggegeven aan {typist}",

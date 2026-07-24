@@ -342,7 +342,93 @@ async fn test_data_entry_resolve_differences(pool: SqlitePool) {
         &addr,
         &coordinator_cookie,
         data_entry_id,
-        "keep_first_entry",
+        "keep_first_and_discard_second",
+    )
+    .await;
+    assert_eq!(res.status(), StatusCode::OK);
+    let body: serde_json::Value = res.json().await.unwrap();
+    assert_eq!(body["status"], "first_entry_finalised");
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+async fn test_data_entry_resolve_differences_keep_first_and_correct_second(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+
+    let first_data_entry = example_cso_data_entry(None);
+    let mut second_data_entry = first_data_entry.clone();
+    second_data_entry["data"]["voters_counts"]["poll_card_count"] = serde_json::Value::from(
+        first_data_entry["data"]["voters_counts"]["poll_card_count"]
+            .as_u64()
+            .unwrap()
+            - 2,
+    );
+    second_data_entry["data"]["voters_counts"]["proxy_certificate_count"] = serde_json::Value::from(
+        first_data_entry["data"]["voters_counts"]["poll_card_count"]
+            .as_u64()
+            .unwrap()
+            + 2,
+    );
+
+    let typist = login(&addr, TypistGSB).await;
+    let data_entry_id = 201;
+    let res = complete_data_entry(&addr, &typist, data_entry_id, 1, first_data_entry).await;
+    let data_entry_status: serde_json::Value = res.json().await.unwrap();
+    assert_eq!(data_entry_status["status"], "first_entry_finalised");
+
+    let typist2 = login(&addr, Typist2GSB).await;
+    let res = complete_data_entry(&addr, &typist2, data_entry_id, 2, second_data_entry).await;
+    let data_entry_status: serde_json::Value = res.json().await.unwrap();
+    assert_eq!(data_entry_status["status"], "entries_different");
+
+    let coordinator_cookie = login(&addr, CoordinatorGSB).await;
+    let res = resolve_differences(
+        &addr,
+        &coordinator_cookie,
+        data_entry_id,
+        "keep_first_and_correct_second",
+    )
+    .await;
+    assert_eq!(res.status(), StatusCode::OK);
+    let body: serde_json::Value = res.json().await.unwrap();
+    assert_eq!(body["status"], "first_entry_finalised");
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+async fn test_data_entry_resolve_differences_keep_second_and_correct_first(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+
+    let first_data_entry = example_cso_data_entry(None);
+    let mut second_data_entry = first_data_entry.clone();
+    second_data_entry["data"]["voters_counts"]["poll_card_count"] = serde_json::Value::from(
+        first_data_entry["data"]["voters_counts"]["poll_card_count"]
+            .as_u64()
+            .unwrap()
+            - 2,
+    );
+    second_data_entry["data"]["voters_counts"]["proxy_certificate_count"] = serde_json::Value::from(
+        first_data_entry["data"]["voters_counts"]["proxy_certificate_count"]
+            .as_u64()
+            .unwrap()
+            + 2,
+    );
+
+    let typist = login(&addr, TypistGSB).await;
+    let data_entry_id = 201;
+    let res = complete_data_entry(&addr, &typist, data_entry_id, 1, first_data_entry).await;
+    let data_entry_status: serde_json::Value = res.json().await.unwrap();
+    assert_eq!(data_entry_status["status"], "first_entry_finalised");
+
+    let typist2 = login(&addr, Typist2GSB).await;
+    let res = complete_data_entry(&addr, &typist2, data_entry_id, 2, second_data_entry).await;
+    let data_entry_status: serde_json::Value = res.json().await.unwrap();
+    assert_eq!(data_entry_status["status"], "entries_different");
+
+    let coordinator_cookie = login(&addr, CoordinatorGSB).await;
+    let res = resolve_differences(
+        &addr,
+        &coordinator_cookie,
+        data_entry_id,
+        "keep_second_and_correct_first",
     )
     .await;
     assert_eq!(res.status(), StatusCode::OK);
@@ -374,7 +460,7 @@ async fn test_data_entry_resolve_differences_then_resolve_errors(pool: SqlitePoo
         &addr,
         &coordinator_cookie,
         data_entry_id,
-        "keep_second_entry",
+        "keep_second_and_discard_first",
     )
     .await;
     assert_eq!(res.status(), StatusCode::OK);

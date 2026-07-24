@@ -141,6 +141,8 @@ pub enum AuditEventType {
     DataEntryReturnedFirst,
     DataEntryKeptFirst,
     DataEntryKeptSecond,
+    DataEntryKeptFirstReturnedSecond,
+    DataEntryKeptSecondReturnedFirst,
     DataEntryDiscardedBoth,
     // airgap detection events
     AirGapViolationDetected,

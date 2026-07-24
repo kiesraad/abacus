@@ -480,6 +480,8 @@ export const auditEventTypeValues = [
   "DataEntryReturnedFirst",
   "DataEntryKeptFirst",
   "DataEntryKeptSecond",
+  "DataEntryKeptFirstReturnedSecond",
+  "DataEntryKeptSecondReturnedFirst",
   "DataEntryDiscardedBoth",
   "AirGapViolationDetected",
   "AirGapViolationResolved",
@@ -1505,9 +1507,11 @@ export interface RedactedEmlHash {
 }
 
 export const resolveDifferencesActionValues = [
-  "keep_first_entry",
-  "keep_second_entry",
-  "discard_both_entries",
+  "keep_first_and_discard_second",
+  "keep_first_and_correct_second",
+  "keep_second_and_discard_first",
+  "keep_second_and_correct_first",
+  "discard_both",
 ] as const;
 export type ResolveDifferencesAction = (typeof resolveDifferencesActionValues)[number];
 

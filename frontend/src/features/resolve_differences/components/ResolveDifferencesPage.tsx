@@ -1,60 +1,101 @@
-import { useNavigate } from "react-router";
+import { type NavigateFunction, useNavigate } from "react-router";
 
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { DataEntrySourceNumber } from "@/components/ui/Badge/DataEntrySourceNumber";
-import { Button } from "@/components/ui/Button/Button";
-import { ChoiceList } from "@/components/ui/CheckboxAndRadio/ChoiceList";
-import { Form } from "@/components/ui/Form/Form";
-import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { Loader } from "@/components/ui/Loader/Loader";
+import type { Message } from "@/hooks/messages/MessagesContext";
 import { useMessages } from "@/hooks/messages/useMessages";
 import { useNumericParam } from "@/hooks/useNumericParam";
 import { useUsers } from "@/hooks/user/useUsers";
 import { t } from "@/i18n/translate";
-import type { DataEntryStatusName } from "@/types/generated/openapi";
+import type { DataEntryGetDifferencesResponse, DataEntryStatusName } from "@/types/generated/openapi";
 
-import { useDataEntryDifferences } from "../hooks/useDataEntryDifferences";
+import { type ResolveOutcome, useDataEntryDifferences } from "../hooks/useDataEntryDifferences";
 import cls from "./ResolveDifferences.module.css";
+import { ResolveDifferencesForm } from "./ResolveDifferencesForm";
 import { ResolveDifferencesOverview } from "./ResolveDifferencesOverview";
 import { ResolveDifferencesTables } from "./ResolveDifferencesTables";
 
-// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
+interface ResolveDifferencesNavigation {
+  differences: DataEntryGetDifferencesResponse;
+  electionId: number;
+  dataEntryId: number;
+  pushMessage: ReturnType<typeof useMessages>["pushMessage"];
+  navigate: NavigateFunction;
+  getName: ReturnType<typeof useUsers>["getName"];
+}
+
+// Build the success message and destination for a resolved status, or null when the status does
+// not complete a resolution.
+function resolvedMessageAndPath(
+  status: DataEntryStatusName,
+  navigation: ResolveDifferencesNavigation,
+  outcome: ResolveOutcome,
+): { message: Message; path: string } | null {
+  const { differences, electionId, dataEntryId, getName } = navigation;
+  const number = differences.source.number;
+  const statusPath = `/elections/${electionId}/status`;
+
+  switch (status) {
+    case "first_entry_has_errors":
+      return {
+        message: {
+          title: t("data_entry_detail.resolve_errors.differences_resolved", { number }),
+          text: t("data_entry_detail.resolve_errors.alert_contains_errors"),
+        },
+        path: `${statusPath}/${dataEntryId}/detail`,
+      };
+    case "first_entry_finalised":
+      return {
+        message: {
+          title: t("election_status.success.differences_resolved", { number }),
+          text:
+            outcome.wrongEntryAction === "correct"
+              ? t("election_status.success.data_entry_corrected", { typist: getName(outcome.wrongUserId) })
+              : t("election_status.success.data_entry_kept", { typist: getName(outcome.keptUserId) }),
+        },
+        path: statusPath,
+      };
+    case "empty":
+      return {
+        message: {
+          title: t("election_status.success.differences_resolved", { number }),
+          text: t("election_status.success.data_entries_discarded", { number }),
+        },
+        path: statusPath,
+      };
+    default:
+      return null;
+  }
+}
+
+// Push the result message and navigate away after resolving differences
+function navigateAfterResolve(
+  navigation: ResolveDifferencesNavigation,
+  status: DataEntryStatusName,
+  outcome: ResolveOutcome,
+) {
+  const result = resolvedMessageAndPath(status, navigation, outcome);
+  if (result) {
+    navigation.pushMessage(result.message);
+    void navigation.navigate(result.path);
+  }
+}
+
 export function ResolveDifferencesPage() {
   const { pushMessage } = useMessages();
   const navigate = useNavigate();
-  const dataEntryId = useNumericParam("dataEntryId");
-  const { election, loading, differences, dataEntryStructure, action, setAction, onSubmit, validationError } =
-    useDataEntryDifferences(dataEntryId, afterSave);
   const { getName } = useUsers();
+  const dataEntryId = useNumericParam("dataEntryId");
+  const { election, loading, differences, dataEntryStructure, formState, onSubmit } = useDataEntryDifferences(
+    dataEntryId,
+    afterSave,
+  );
 
-  function afterSave(status: DataEntryStatusName, firstEntryUserId: number | undefined) {
-    if (!differences) {
-      return;
-    }
-    const number = differences.source.number;
-
-    switch (status) {
-      case "first_entry_has_errors":
-        pushMessage({
-          title: t("data_entry_detail.resolve_errors.differences_resolved", { number }),
-          text: t("data_entry_detail.resolve_errors.alert_contains_errors"),
-        });
-        void navigate(`/elections/${election.id}/status/${dataEntryId}/detail`);
-        break;
-      case "first_entry_finalised":
-        pushMessage({
-          title: t("election_status.success.differences_resolved", { number }),
-          text: t("election_status.success.data_entry_kept", { typist: getName(firstEntryUserId) }),
-        });
-        void navigate(`/elections/${election.id}/status`);
-        break;
-      case "empty":
-        pushMessage({
-          title: t("election_status.success.differences_resolved", { number }),
-          text: t("election_status.success.data_entries_discarded", { number }),
-        });
-        void navigate(`/elections/${election.id}/status`);
-        break;
+  function afterSave(status: DataEntryStatusName, outcome: ResolveOutcome) {
+    if (differences) {
+      const context = { differences, electionId: election.id, dataEntryId, pushMessage, navigate, getName };
+      navigateAfterResolve(context, status, outcome);
     }
   }
 
@@ -84,52 +125,14 @@ export function ResolveDifferencesPage() {
             first={first_entry}
             second={second_entry}
             structure={dataEntryStructure}
-            action={action}
+            correctEntry={formState.correctEntry}
           />
-          <Form
-            onSubmit={(e) => {
-              e.preventDefault();
-              void onSubmit();
-            }}
-          >
-            <FormLayout>
-              <FormLayout.Section title={t("resolve_differences.form_question")}>
-                <p className="md">{t("resolve_differences.form_content")}</p>
-                <ChoiceList>
-                  {validationError && (
-                    <ChoiceList.Error id="resolve-differences-error">{validationError}</ChoiceList.Error>
-                  )}
-                  <ChoiceList.Radio
-                    id="keep_first_entry"
-                    label={t("resolve_differences.options.keep_first_entry", { name: getName(first_entry_user_id) })}
-                    checked={action === "keep_first_entry"}
-                    onChange={() => {
-                      setAction("keep_first_entry");
-                    }}
-                  />
-                  <ChoiceList.Radio
-                    id="keep_second_entry"
-                    label={t("resolve_differences.options.keep_second_entry", { name: getName(second_entry_user_id) })}
-                    checked={action === "keep_second_entry"}
-                    onChange={() => {
-                      setAction("keep_second_entry");
-                    }}
-                  />
-                  <ChoiceList.Radio
-                    id="discard_both_entries"
-                    label={t("resolve_differences.options.discard_both_entries")}
-                    checked={action === "discard_both_entries"}
-                    onChange={() => {
-                      setAction("discard_both_entries");
-                    }}
-                  />
-                </ChoiceList>
-              </FormLayout.Section>
-              <FormLayout.Controls>
-                <Button type="submit">{t("save")}</Button>
-              </FormLayout.Controls>
-            </FormLayout>
-          </Form>
+          <ResolveDifferencesForm
+            firstEntryName={getName(first_entry_user_id)}
+            secondEntryName={getName(second_entry_user_id)}
+            onSubmit={onSubmit}
+            {...formState}
+          />
         </article>
       </main>
     </>

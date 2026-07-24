@@ -1,5 +1,5 @@
 {
-  "form_content": "De resultaten van dit stembureau zijn pas definitief als er twee gelijke invoeren zijn. Kies de invoer die overeenkomt met het papieren proces-verbaal. De andere invoer moet opnieuw gedaan worden.",
+  "form_content": "De resultaten van dit stembureau zijn pas definitief als er twee gelijke invoeren zijn. Kies de invoer die overeenkomt met het papieren proces-verbaal.",
   "form_question": "Welke invoer klopt?",
   "headers": {
     "description": "Omschrijving",
@@ -16,5 +16,10 @@
   "page_title": "Verschillen oplossen",
   "required_error": "Dit is een verplichte vraag. Maak een keuze uit de opties hieronder.",
   "section": "Rubriek",
-  "title": "Verschil tussen eerste en tweede invoer"
+  "title": "Verschil tussen eerste en tweede invoer",
+  "wrong_entry_options": {
+    "correct": "Laten herstellen door oorspronkelijke invoerder",
+    "reenter": "Opnieuw laten invoeren"
+  },
+  "wrong_entry_question": "Wat wil je doen met de invoer die <u>niet</u> klopt?"
 }

@@ -14,32 +14,71 @@ import type {
   DataEntryStatusName,
   DataEntryStatusResponse,
   ElectionWithPoliticalGroups,
-  ResolveDifferencesAction,
 } from "@/types/generated/openapi";
 import type { DataEntryStructure } from "@/types/types";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
+import {
+  type CorrectEntry,
+  getResolveDifferencesAction,
+  getUnansweredQuestions,
+  type WrongEntryAction,
+} from "../utils/differences";
+
 interface DataEntryDifferences {
-  action: ResolveDifferencesAction | undefined;
-  setAction: (action: ResolveDifferencesAction | undefined) => void;
+  correctEntry: CorrectEntry | undefined;
+  setCorrectEntry: (correctEntry: CorrectEntry) => void;
+  wrongEntryAction: WrongEntryAction | undefined;
+  setWrongEntryAction: (wrongEntryAction: WrongEntryAction) => void;
+  correctEntryError: string | undefined;
+  wrongEntryError: string | undefined;
   election: ElectionWithPoliticalGroups;
   loading: boolean;
   differences: DataEntryGetDifferencesResponse | null;
   dataEntryStructure: DataEntryStructure | null;
   onSubmit: () => Promise<void>;
-  validationError: string | undefined;
+}
+
+// What happened to the two entries, used to pick the right success message.
+export interface ResolveOutcome {
+  wrongEntryAction: WrongEntryAction | undefined;
+  keptUserId: number | undefined;
+  wrongUserId: number | undefined;
+}
+
+// The typist of the entry that is kept, used to pick a different typist for the re-entry.
+function keptEntryUserId(
+  differences: DataEntryGetDifferencesResponse | null,
+  correctEntry: CorrectEntry | undefined,
+): number | undefined {
+  if (!differences) return undefined;
+  if (correctEntry === "first") return differences.first_entry_user_id;
+  if (correctEntry === "second") return differences.second_entry_user_id;
+  return undefined;
+}
+
+// The typist of the entry that does not match, used to name who corrects it.
+function wrongEntryUserId(
+  differences: DataEntryGetDifferencesResponse | null,
+  correctEntry: CorrectEntry | undefined,
+): number | undefined {
+  if (!differences) return undefined;
+  if (correctEntry === "first") return differences.second_entry_user_id;
+  if (correctEntry === "second") return differences.first_entry_user_id;
+  return undefined;
 }
 
 export function useDataEntryDifferences(
   dataEntryId: number,
-  afterSave: (status: DataEntryStatusName, firstEntryUserId: number | undefined) => void,
+  afterSave: (status: DataEntryStatusName, outcome: ResolveOutcome) => void,
 ): DataEntryDifferences {
   const client = useApiClient();
   const { election } = useElection();
-  const [action, setAction] = useState<ResolveDifferencesAction>();
+  const [correctEntry, setCorrectEntry] = useState<CorrectEntry>();
+  const [wrongEntryAction, setWrongEntryAction] = useState<WrongEntryAction>();
   const electionContext = useContext(ElectionStatusProviderContext);
   const [error, setError] = useState<AnyApiError | null>(null);
-  const [validationError, setValidationError] = useState<string>();
+  const [submitted, setSubmitted] = useState(false);
 
   const path: DATA_ENTRY_GET_DIFFERENCES_REQUEST_PATH = `/api/data_entries/${dataEntryId}/resolve_differences`;
   const { requestState } = useInitialApiGet<DataEntryGetDifferencesResponse>(path);
@@ -61,12 +100,15 @@ export function useDataEntryDifferences(
     dataEntryStructure = getDataEntryStructure(differences.first_entry.model, election);
   }
 
+  const unanswered = getUnansweredQuestions(correctEntry, wrongEntryAction);
+  const requiredError = t("resolve_differences.required_error");
+
   const onSubmit = async () => {
+    setSubmitted(true);
+
+    const action = getResolveDifferencesAction(correctEntry, wrongEntryAction);
     if (action === undefined) {
-      setValidationError(t("resolve_differences.required_error"));
       return;
-    } else {
-      setValidationError(undefined);
     }
 
     const path: DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_PATH = `/api/data_entries/${dataEntryId}/resolve_differences`;
@@ -76,26 +118,27 @@ export function useDataEntryDifferences(
     if (isSuccess(response)) {
       // reload the election status data then navigate according to new status
       await electionContext?.refetch();
-      let firstEntryUserId: number | undefined;
-      if (differences && action === "keep_first_and_discard_second") {
-        firstEntryUserId = differences.first_entry_user_id;
-      } else if (differences && action === "keep_second_and_discard_first") {
-        firstEntryUserId = differences.second_entry_user_id;
-      }
-      afterSave(response.data.status, firstEntryUserId);
+      afterSave(response.data.status, {
+        wrongEntryAction,
+        keptUserId: keptEntryUserId(differences, correctEntry),
+        wrongUserId: wrongEntryUserId(differences, correctEntry),
+      });
     } else {
       setError(response);
     }
   };
 
   return {
-    action,
-    setAction,
+    correctEntry,
+    setCorrectEntry,
+    wrongEntryAction,
+    setWrongEntryAction,
+    correctEntryError: submitted && unanswered.correctEntry ? requiredError : undefined,
+    wrongEntryError: submitted && unanswered.wrongEntry ? requiredError : undefined,
     election,
     loading: requestState.status === "loading",
     differences,
     dataEntryStructure,
     onSubmit,
-    validationError,
   };
 }

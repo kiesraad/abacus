@@ -1,17 +1,17 @@
 import { Fragment, type ReactElement, useId } from "react";
 
 import { Table } from "@/components/ui/Table/Table";
-import type { ResolveDifferencesAction } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 import { formatNumber, validateNumberString } from "@/utils/number";
 
+import type { CorrectEntry } from "../utils/differences";
 import cls from "./ResolveDifferences.module.css";
 
 interface DifferencesTableProps {
   title: string;
   headers: string[];
   rows: DifferencesRow[];
-  action?: ResolveDifferencesAction;
+  correctEntry?: CorrectEntry;
 }
 
 function formatValue(value: string | undefined): string | ReactElement {
@@ -33,7 +33,7 @@ export interface DifferencesRow {
 
 const CELL_CLASSES = ["text-align-r", "font-number", "bold"];
 
-export function DifferencesTable({ title, headers, rows, action }: DifferencesTableProps) {
+export function DifferencesTable({ title, headers, rows, correctEntry }: DifferencesTableProps) {
   const id = useId();
   // An array of indices for rows that are different, also used to detect row gaps.
   // Two falsy values are considered equal (e.g. 0 and undefined)
@@ -48,10 +48,10 @@ export function DifferencesTable({ title, headers, rows, action }: DifferencesTa
     return null;
   }
 
-  const keepFirst = action === "keep_first_and_discard_second";
-  const keepSecond = action === "keep_second_and_discard_first";
-  const discardFirst = action === "keep_second_and_discard_first" || action === "discard_both";
-  const discardSecond = action === "keep_first_and_discard_second" || action === "discard_both";
+  const keepFirst = correctEntry === "first";
+  const keepSecond = correctEntry === "second";
+  const discardFirst = correctEntry === "second" || correctEntry === "neither";
+  const discardSecond = correctEntry === "first" || correctEntry === "neither";
 
   return (
     <section>

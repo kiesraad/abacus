@@ -2,35 +2,31 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { Alert } from "@/components/ui/Alert/Alert";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
-import type { ResolveDifferencesAction } from "@/types/generated/openapi";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
 import { resultsMockData } from "../testing/polling-station-results";
+import type { CorrectEntry } from "../utils/differences";
 import cls from "./ResolveDifferences.module.css";
 import { ResolveDifferencesTables } from "./ResolveDifferencesTables";
 
 type Props = {
-  action: ResolveDifferencesAction;
+  correctEntry: CorrectEntry;
 };
 
-const actions: ResolveDifferencesAction[] = [
-  "keep_first_and_discard_second",
-  "keep_second_and_discard_first",
-  "discard_both",
-];
+const correctEntries: CorrectEntry[] = ["first", "second", "neither"];
 const first = resultsMockData(true);
 const second = resultsMockData(false);
 const structure = getDataEntryStructure("CSOFirstSession", electionMockData);
 
 export const DefaultResolveDifferencesTables: StoryObj<Props> = {
-  render: ({ action }) => {
+  render: ({ correctEntry }) => {
     return (
       <main className={cls.resolveDifferences}>
         <Alert type="notify" small>
-          <p>Previewing the result of an action can be seen using the Controls below</p>
+          <p>Previewing the result of a choice can be seen using the Controls below</p>
         </Alert>
 
-        <ResolveDifferencesTables first={first} second={second} action={action} structure={structure} />
+        <ResolveDifferencesTables first={first} second={second} correctEntry={correctEntry} structure={structure} />
       </main>
     );
   },
@@ -38,8 +34,8 @@ export const DefaultResolveDifferencesTables: StoryObj<Props> = {
 
 export default {
   argTypes: {
-    action: {
-      options: actions,
+    correctEntry: {
+      options: correctEntries,
       control: { type: "radio" },
     },
   },

@@ -2,26 +2,36 @@ import { Button } from "@/components/ui/Button/Button";
 import { ChoiceList } from "@/components/ui/CheckboxAndRadio/ChoiceList";
 import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
-import { t } from "@/i18n/translate";
-import type { ResolveDifferencesAction } from "@/types/generated/openapi";
+import { t, tx } from "@/i18n/translate";
+
+import type { CorrectEntry, WrongEntryAction } from "../utils/differences";
 
 export interface ResolveDifferencesFormProps {
   firstEntryName: string;
   secondEntryName: string;
-  action: ResolveDifferencesAction | undefined;
-  setAction: (action: ResolveDifferencesAction | undefined) => void;
-  validationError: string | undefined;
+  correctEntry: CorrectEntry | undefined;
+  setCorrectEntry: (correctEntry: CorrectEntry) => void;
+  wrongEntryAction: WrongEntryAction | undefined;
+  setWrongEntryAction: (wrongEntryAction: WrongEntryAction) => void;
+  correctEntryError: string | undefined;
+  wrongEntryError: string | undefined;
   onSubmit: () => void | Promise<void>;
 }
 
 export function ResolveDifferencesForm({
   firstEntryName,
   secondEntryName,
-  action,
-  setAction,
-  validationError,
+  correctEntry,
+  setCorrectEntry,
+  wrongEntryAction,
+  setWrongEntryAction,
+  correctEntryError,
+  wrongEntryError,
   onSubmit,
 }: ResolveDifferencesFormProps) {
+  // The second question only applies when one of the two entries is kept.
+  const wrongEntryDisabled = correctEntry !== "first" && correctEntry !== "second";
+
   return (
     <Form
       onSubmit={(e) => {
@@ -33,29 +43,59 @@ export function ResolveDifferencesForm({
         <FormLayout.Section title={t("resolve_differences.form_question")}>
           <p className="md">{t("resolve_differences.form_content")}</p>
           <ChoiceList>
-            {validationError && <ChoiceList.Error id="resolve-differences-error">{validationError}</ChoiceList.Error>}
+            {correctEntryError && (
+              <ChoiceList.Error id="resolve-differences-correct-entry-error">{correctEntryError}</ChoiceList.Error>
+            )}
             <ChoiceList.Radio
-              id="keep_first_and_discard_second"
+              id="keep_first_entry"
+              name="correct_entry"
               label={t("resolve_differences.options.keep_first_and_discard_second", { name: firstEntryName })}
-              checked={action === "keep_first_and_discard_second"}
+              checked={correctEntry === "first"}
               onChange={() => {
-                setAction("keep_first_and_discard_second");
+                setCorrectEntry("first");
               }}
             />
             <ChoiceList.Radio
-              id="keep_second_and_discard_first"
+              id="keep_second_entry"
+              name="correct_entry"
               label={t("resolve_differences.options.keep_second_and_discard_first", { name: secondEntryName })}
-              checked={action === "keep_second_and_discard_first"}
+              checked={correctEntry === "second"}
               onChange={() => {
-                setAction("keep_second_and_discard_first");
+                setCorrectEntry("second");
               }}
             />
             <ChoiceList.Radio
-              id="discard_both"
+              id="discard_both_entries"
+              name="correct_entry"
               label={t("resolve_differences.options.discard_both")}
-              checked={action === "discard_both"}
+              checked={correctEntry === "neither"}
               onChange={() => {
-                setAction("discard_both");
+                setCorrectEntry("neither");
+              }}
+            />
+          </ChoiceList>
+        </FormLayout.Section>
+        <FormLayout.Section title={tx("resolve_differences.wrong_entry_question")}>
+          <ChoiceList disabled={wrongEntryDisabled}>
+            {wrongEntryError && (
+              <ChoiceList.Error id="resolve-differences-wrong-entry-error">{wrongEntryError}</ChoiceList.Error>
+            )}
+            <ChoiceList.Radio
+              id="correct_wrong_entry"
+              name="wrong_entry_action"
+              label={t("resolve_differences.wrong_entry_options.correct")}
+              checked={wrongEntryAction === "correct"}
+              onChange={() => {
+                setWrongEntryAction("correct");
+              }}
+            />
+            <ChoiceList.Radio
+              id="reenter_wrong_entry"
+              name="wrong_entry_action"
+              label={t("resolve_differences.wrong_entry_options.reenter")}
+              checked={wrongEntryAction === "reenter"}
+              onChange={() => {
+                setWrongEntryAction("reenter");
               }}
             />
           </ChoiceList>

@@ -3,8 +3,8 @@ import { useState } from "react";
 import { expect, fn } from "storybook/test";
 
 import { t } from "@/i18n/translate";
-import type { ResolveDifferencesAction } from "@/types/generated/openapi";
 
+import type { CorrectEntry, WrongEntryAction } from "../utils/differences";
 import cls from "./ResolveDifferences.module.css";
 import { ResolveDifferencesForm } from "./ResolveDifferencesForm";
 
@@ -13,14 +13,19 @@ const meta = {
   args: {
     firstEntryName: "Gebruiker01",
     secondEntryName: "Gebruiker02",
-    action: undefined,
-    setAction: fn(),
-    validationError: undefined,
+    correctEntry: undefined,
+    setCorrectEntry: fn(),
+    wrongEntryAction: undefined,
+    setWrongEntryAction: fn(),
+    correctEntryError: undefined,
+    wrongEntryError: undefined,
     onSubmit: fn(),
   },
   argTypes: {
-    action: { control: false },
-    validationError: { control: "text" },
+    correctEntry: { control: false },
+    wrongEntryAction: { control: false },
+    correctEntryError: { control: "text" },
+    wrongEntryError: { control: "text" },
   },
 } satisfies Meta<typeof ResolveDifferencesForm>;
 
@@ -29,17 +34,23 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   render: function Render(args) {
-    const [action, setAction] = useState<ResolveDifferencesAction | undefined>(args.action);
+    const [correctEntry, setCorrectEntry] = useState<CorrectEntry | undefined>(args.correctEntry);
+    const [wrongEntryAction, setWrongEntryAction] = useState<WrongEntryAction | undefined>(args.wrongEntryAction);
 
     return (
       <main className={cls.resolveDifferences}>
         <article>
           <ResolveDifferencesForm
             {...args}
-            action={action}
-            setAction={(next) => {
-              args.setAction(next);
-              setAction(next);
+            correctEntry={correctEntry}
+            setCorrectEntry={(next) => {
+              args.setCorrectEntry(next);
+              setCorrectEntry(next);
+            }}
+            wrongEntryAction={wrongEntryAction}
+            setWrongEntryAction={(next) => {
+              args.setWrongEntryAction(next);
+              setWrongEntryAction(next);
             }}
           />
         </article>
@@ -49,34 +60,43 @@ export const Default: Story = {
   play: async ({ args, canvas, userEvent }) => {
     await expect(canvas.getByRole("heading", { level: 3, name: t("resolve_differences.form_question") })).toBeVisible();
     await expect(canvas.getByText(t("resolve_differences.form_content"))).toBeVisible();
+    await expect(canvas.getByRole("heading", { level: 3, name: /Wat wil je doen/ })).toBeVisible();
 
     const firstEntry = canvas.getByRole("radio", {
       name: t("resolve_differences.options.keep_first_and_discard_second", { name: args.firstEntryName }),
     });
-    const secondEntry = canvas.getByRole("radio", {
-      name: t("resolve_differences.options.keep_second_and_discard_first", { name: args.secondEntryName }),
-    });
     const discardBoth = canvas.getByRole("radio", {
       name: t("resolve_differences.options.discard_both"),
     });
+    const correctWrongEntry = canvas.getByRole("radio", {
+      name: t("resolve_differences.wrong_entry_options.correct"),
+    });
+    const reenterWrongEntry = canvas.getByRole("radio", {
+      name: t("resolve_differences.wrong_entry_options.reenter"),
+    });
 
-    // No option is selected initially
+    // Nothing is selected initially and the second question is disabled
     await expect(firstEntry).not.toBeChecked();
-    await expect(secondEntry).not.toBeChecked();
-    await expect(discardBoth).not.toBeChecked();
+    await expect(correctWrongEntry).toBeDisabled();
+    await expect(reenterWrongEntry).toBeDisabled();
 
-    // Selecting an option reports the action and checks the radio exclusively
-    await userEvent.click(secondEntry);
-    await expect(args.setAction).toHaveBeenLastCalledWith("keep_second_and_discard_first");
-    await expect(secondEntry).toBeChecked();
-    await expect(firstEntry).not.toBeChecked();
-    await expect(discardBoth).not.toBeChecked();
+    // Choosing the correct entry reports it and enables the second question
+    await userEvent.click(firstEntry);
+    await expect(args.setCorrectEntry).toHaveBeenLastCalledWith("first");
+    await expect(firstEntry).toBeChecked();
+    await expect(correctWrongEntry).toBeEnabled();
+    await expect(reenterWrongEntry).toBeEnabled();
 
-    // Switching to another option updates the selection
+    // Choosing what to do with the wrong entry reports it
+    await userEvent.click(reenterWrongEntry);
+    await expect(args.setWrongEntryAction).toHaveBeenLastCalledWith("reenter");
+    await expect(reenterWrongEntry).toBeChecked();
+
+    // Choosing "neither" disables the second question again
     await userEvent.click(discardBoth);
-    await expect(args.setAction).toHaveBeenLastCalledWith("discard_both");
-    await expect(discardBoth).toBeChecked();
-    await expect(secondEntry).not.toBeChecked();
+    await expect(args.setCorrectEntry).toHaveBeenLastCalledWith("neither");
+    await expect(correctWrongEntry).toBeDisabled();
+    await expect(reenterWrongEntry).toBeDisabled();
 
     // Submitting the form calls onSubmit
     await userEvent.click(canvas.getByRole("button", { name: t("save") }));
@@ -87,7 +107,7 @@ export const Default: Story = {
 export const FirstEntrySelected: Story = {
   ...Default,
   args: {
-    action: "keep_first_and_discard_second",
+    correctEntry: "first",
   },
   play: async ({ canvas }) => {
     await expect(
@@ -95,21 +115,24 @@ export const FirstEntrySelected: Story = {
         name: t("resolve_differences.options.keep_first_and_discard_second", { name: "Gebruiker01" }),
       }),
     ).toBeChecked();
+
+    // The second question is enabled once an entry is chosen
     await expect(
-      canvas.getByRole("radio", {
-        name: t("resolve_differences.options.keep_second_and_discard_first", { name: "Gebruiker02" }),
-      }),
-    ).not.toBeChecked();
-    await expect(canvas.getByRole("radio", { name: t("resolve_differences.options.discard_both") })).not.toBeChecked();
+      canvas.getByRole("radio", { name: t("resolve_differences.wrong_entry_options.correct") }),
+    ).toBeEnabled();
+    await expect(
+      canvas.getByRole("radio", { name: t("resolve_differences.wrong_entry_options.reenter") }),
+    ).toBeEnabled();
   },
 };
 
-export const WithValidationError: Story = {
+export const WithValidationErrors: Story = {
   ...Default,
   args: {
-    validationError: t("resolve_differences.required_error"),
+    correctEntryError: t("resolve_differences.required_error"),
+    wrongEntryError: t("resolve_differences.required_error"),
   },
-  play: async ({ args, canvas }) => {
-    await expect(canvas.getByText(args.validationError!)).toBeVisible();
+  play: async ({ canvas }) => {
+    await expect(canvas.getAllByText(t("resolve_differences.required_error"))).toHaveLength(2);
   },
 };

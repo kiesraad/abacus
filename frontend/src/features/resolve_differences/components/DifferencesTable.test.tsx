@@ -1,15 +1,15 @@
 import { describe, expect, test } from "vitest";
 
 import { render, screen } from "@/testing/test-utils";
-import type { ResolveDifferencesAction } from "@/types/generated/openapi";
 
+import type { CorrectEntry } from "../utils/differences";
 import { type DifferencesRow, DifferencesTable } from "./DifferencesTable";
 import cls from "./ResolveDifferences.module.css";
 
 const tableHeaders = ["Code", "First", "Second", "Description"];
 
-function renderTable(rows: DifferencesRow[], action?: ResolveDifferencesAction) {
-  render(<DifferencesTable title={"Differences"} headers={tableHeaders} rows={rows} action={action} />);
+function renderTable(rows: DifferencesRow[], correctEntry?: CorrectEntry) {
+  render(<DifferencesTable title={"Differences"} headers={tableHeaders} rows={rows} correctEntry={correctEntry} />);
 }
 
 describe("DifferencesTable", () => {
@@ -77,11 +77,11 @@ describe("DifferencesTable", () => {
     ]);
   });
 
-  describe("show result of action in differences tables", () => {
+  describe("highlights the kept and discarded entries", () => {
     const rows = [{ first: "10", second: "11" }];
 
-    test("keep_first_and_discard_second", async () => {
-      renderTable(rows, "keep_first_and_discard_second");
+    test("first entry is correct", async () => {
+      renderTable(rows, "first");
       const [first, second] = await screen.findAllByRole("cell");
 
       expect(first).toHaveClass(cls.keep!);
@@ -90,8 +90,8 @@ describe("DifferencesTable", () => {
       expect(second).not.toHaveClass(cls.keep!);
     });
 
-    test("keep_second_and_discard_first", async () => {
-      renderTable(rows, "keep_second_and_discard_first");
+    test("second entry is correct", async () => {
+      renderTable(rows, "second");
       const [first, second] = await screen.findAllByRole("cell");
 
       expect(first).toHaveClass(cls.discard!);
@@ -100,8 +100,8 @@ describe("DifferencesTable", () => {
       expect(second).not.toHaveClass(cls.discard!);
     });
 
-    test("discard_both", async () => {
-      renderTable(rows, "discard_both");
+    test("neither entry is correct", async () => {
+      renderTable(rows, "neither");
       const [first, second] = await screen.findAllByRole("cell");
 
       expect(first).toHaveClass(cls.discard!);
@@ -110,7 +110,7 @@ describe("DifferencesTable", () => {
       expect(second).not.toHaveClass(cls.keep!);
     });
 
-    test("no action chosen", async () => {
+    test("no entry chosen", async () => {
       renderTable(rows, undefined);
       const [first, second] = await screen.findAllByRole("cell");
 

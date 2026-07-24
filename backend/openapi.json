@@ -5611,6 +5611,8 @@
           "DataEntryReturnedFirst",
           "DataEntryKeptFirst",
           "DataEntryKeptSecond",
+          "DataEntryKeptFirstReturnedSecond",
+          "DataEntryKeptSecondReturnedFirst",
           "DataEntryDiscardedBoth",
           "AirGapViolationDetected",
           "AirGapViolationResolved",
@@ -8769,7 +8771,9 @@
         "type": "string",
         "enum": [
           "keep_first_and_discard_second",
+          "keep_first_and_correct_second",
           "keep_second_and_discard_first",
+          "keep_second_and_correct_first",
           "discard_both"
         ]
       },

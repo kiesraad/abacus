@@ -286,7 +286,9 @@ fn initial_current_data_entry(
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub enum ResolveDifferencesAction {
     KeepFirstAndDiscardSecond,
+    KeepFirstAndCorrectSecond,
     KeepSecondAndDiscardFirst,
+    KeepSecondAndCorrectFirst,
     DiscardBoth,
 }
 
@@ -296,8 +298,14 @@ impl ResolveDifferencesAction {
             ResolveDifferencesAction::KeepFirstAndDiscardSecond => {
                 AuditEventType::DataEntryKeptFirst
             }
+            ResolveDifferencesAction::KeepFirstAndCorrectSecond => {
+                AuditEventType::DataEntryKeptFirstReturnedSecond
+            }
             ResolveDifferencesAction::KeepSecondAndDiscardFirst => {
                 AuditEventType::DataEntryKeptSecond
+            }
+            ResolveDifferencesAction::KeepSecondAndCorrectFirst => {
+                AuditEventType::DataEntryKeptSecondReturnedFirst
             }
             ResolveDifferencesAction::DiscardBoth => AuditEventType::DataEntryDiscardedBoth,
         }
@@ -894,10 +902,13 @@ async fn data_entry_resolve_differences(
     let (context, state) = validate_and_get_data(&mut tx, data_entry_id, &user).await?;
 
     let new_state = match action {
-        ResolveDifferencesAction::KeepFirstAndDiscardSecond => {
+        // TODO: replace with correction state transitions in #3655
+        ResolveDifferencesAction::KeepFirstAndDiscardSecond
+        | ResolveDifferencesAction::KeepFirstAndCorrectSecond => {
             state.keep_first_entry(&context.election)?
         }
-        ResolveDifferencesAction::KeepSecondAndDiscardFirst => {
+        ResolveDifferencesAction::KeepSecondAndDiscardFirst
+        | ResolveDifferencesAction::KeepSecondAndCorrectFirst => {
             state.keep_second_entry(&context.election)?
         }
         ResolveDifferencesAction::DiscardBoth => state.delete_entries()?,
@@ -2181,6 +2192,14 @@ mod tests {
         let mut conn = pool.acquire().await.unwrap();
         let data_entry = get_data_entry_for_ps(&mut conn, polling_station_id).await;
 
+        audit_log::assert_last_event(
+            &mut conn,
+            AuditEventType::DataEntryKeptFirst,
+            AuditEventLevel::Info,
+            serde_json::to_value(DataEntryAuditData::from(data_entry.clone())).unwrap(),
+        )
+        .await;
+
         let status: DataEntryStatus = data_entry.state.0;
         let DataEntryStatus::FirstEntryFinalised(state) = status else {
             panic!("Expected entry to be in FirstEntryFinalised state");
@@ -2216,6 +2235,92 @@ mod tests {
         let mut conn = pool.acquire().await.unwrap();
         let data_entry = get_data_entry_for_ps(&mut conn, polling_station_id).await;
 
+        audit_log::assert_last_event(
+            &mut conn,
+            AuditEventType::DataEntryKeptSecond,
+            AuditEventLevel::Info,
+            serde_json::to_value(DataEntryAuditData::from(data_entry.clone())).unwrap(),
+        )
+        .await;
+
+        let status: DataEntryStatus = data_entry.state.0;
+        let DataEntryStatus::FirstEntryFinalised(state) = status else {
+            panic!("Expected entry to be in FirstEntryFinalised state");
+        };
+        let Results::CSOFirstSession(first_entry) = state.finalised_first_entry else {
+            panic!("Expected entry to be CSOFirstSession model");
+        };
+
+        assert_eq!(first_entry.voters_counts.poll_card_count, 100);
+    }
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
+    async fn test_data_entry_resolve_differences_keep_first_and_correct_second(pool: SqlitePool) {
+        let polling_station_id = PollingStationId::from(211);
+        let data_entry_id = DataEntryId::from(201);
+        finalise_different_entries(pool.clone()).await;
+        let response = resolve_differences(
+            pool.clone(),
+            data_entry_id,
+            ResolveDifferencesAction::KeepFirstAndCorrectSecond,
+        )
+        .await;
+        assert_eq!(response.status(), StatusCode::OK);
+
+        let mut conn = pool.acquire().await.unwrap();
+        let data_entry = get_data_entry_for_ps(&mut conn, polling_station_id).await;
+
+        audit_log::assert_last_event(
+            &mut conn,
+            AuditEventType::DataEntryKeptFirstReturnedSecond,
+            AuditEventLevel::Info,
+            serde_json::to_value(DataEntryAuditData::from(data_entry.clone())).unwrap(),
+        )
+        .await;
+
+        let status: DataEntryStatus = data_entry.state.0;
+        let DataEntryStatus::FirstEntryFinalised(state) = status else {
+            panic!("Expected entry to be in FirstEntryFinalised state");
+        };
+        let Results::CSOFirstSession(first_entry) = state.finalised_first_entry else {
+            panic!("Expected entry to be CSOFirstSession model");
+        };
+
+        assert_eq!(first_entry.voters_counts.poll_card_count, 99);
+    }
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
+    async fn test_data_entry_resolve_differences_keep_second_and_correct_first(pool: SqlitePool) {
+        let polling_station_id = PollingStationId::from(211);
+        let data_entry_id = DataEntryId::from(201);
+        finalise_different_entries(pool.clone()).await;
+
+        change_status_committee_session(
+            pool.clone(),
+            CommitteeSessionId::from(2),
+            CommitteeSessionStatus::Paused,
+        )
+        .await;
+
+        let response = resolve_differences(
+            pool.clone(),
+            data_entry_id,
+            ResolveDifferencesAction::KeepSecondAndCorrectFirst,
+        )
+        .await;
+        assert_eq!(response.status(), StatusCode::OK);
+
+        let mut conn = pool.acquire().await.unwrap();
+        let data_entry = get_data_entry_for_ps(&mut conn, polling_station_id).await;
+
+        audit_log::assert_last_event(
+            &mut conn,
+            AuditEventType::DataEntryKeptSecondReturnedFirst,
+            AuditEventLevel::Info,
+            serde_json::to_value(DataEntryAuditData::from(data_entry.clone())).unwrap(),
+        )
+        .await;
+
         let status: DataEntryStatus = data_entry.state.0;
         let DataEntryStatus::FirstEntryFinalised(state) = status else {
             panic!("Expected entry to be in FirstEntryFinalised state");
@@ -2248,6 +2353,14 @@ mod tests {
         // Check that the data entry is reset to Empty
         let data_entry = get_data_entry_for_ps(&mut conn, polling_station_id).await;
         assert_eq!(data_entry.state.0, DataEntryStatus::Empty);
+
+        audit_log::assert_last_event(
+            &mut conn,
+            AuditEventType::DataEntryDiscardedBoth,
+            AuditEventLevel::Info,
+            serde_json::to_value(DataEntryAuditData::from(data_entry)).unwrap(),
+        )
+        .await;
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]

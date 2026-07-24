@@ -10,7 +10,7 @@ use votes_counts::VotesCounts;
 
 use crate::domain::{
     compare::Compare,
-    election::{ElectionWithPoliticalGroups, PoliticalGroup},
+    election::{ElectionCategory, ElectionWithPoliticalGroups, PoliticalGroup},
     field_path::FieldPath,
     results::{count::Count, gsb_results::GSBResults},
     validate::{DataError, Validate, ValidateRoot, ValidationResults},
@@ -201,6 +201,15 @@ impl Results {
             })
             .collect()
     }
+
+    /// Create a default value for `voters_counts`, with all counts set to 0.
+    /// Voter cards ("kiezerspassen") only exist for non-municipal elections.
+    pub fn default_voters_counts(election: &ElectionWithPoliticalGroups) -> VotersCounts {
+        VotersCounts {
+            voter_card_count: (election.category != ElectionCategory::Municipal).then_some(0),
+            ..Default::default()
+        }
+    }
 }
 
 /// Contains common functions which are specific to polling station results
@@ -208,7 +217,7 @@ pub trait PollingStationResults {
     /// Convert to CommonPollingStationResults, which contains only the common fields.
     fn as_common(&self) -> CommonPollingStationResults;
 
-    fn empty(political_groups: &[PoliticalGroup]) -> Self;
+    fn empty(election: &ElectionWithPoliticalGroups) -> Self;
 }
 
 impl PollingStationResults for CSOFirstSessionResults {
@@ -221,19 +230,21 @@ impl PollingStationResults for CSOFirstSessionResults {
         }
     }
 
-    fn empty(political_groups: &[PoliticalGroup]) -> Self {
+    fn empty(election: &ElectionWithPoliticalGroups) -> Self {
         Self {
             extra_investigation: Default::default(),
             counting_differences_polling_station: Default::default(),
-            voters_counts: Default::default(),
+            voters_counts: Results::default_voters_counts(election),
             votes_counts: VotesCounts {
                 political_group_total_votes: Results::default_political_group_total_votes(
-                    political_groups,
+                    &election.political_groups,
                 ),
                 ..Default::default()
             },
             differences_counts: Default::default(),
-            political_group_votes: Results::default_political_group_votes(political_groups),
+            political_group_votes: Results::default_political_group_votes(
+                &election.political_groups,
+            ),
         }
     }
 }
@@ -248,34 +259,38 @@ impl PollingStationResults for CSONextSessionResults {
         }
     }
 
-    fn empty(political_groups: &[PoliticalGroup]) -> Self {
+    fn empty(election: &ElectionWithPoliticalGroups) -> Self {
         Self {
-            voters_counts: Default::default(),
+            voters_counts: Results::default_voters_counts(election),
             votes_counts: VotesCounts {
                 political_group_total_votes: Results::default_political_group_total_votes(
-                    political_groups,
+                    &election.political_groups,
                 ),
                 ..Default::default()
             },
             differences_counts: Default::default(),
-            political_group_votes: Results::default_political_group_votes(political_groups),
+            political_group_votes: Results::default_political_group_votes(
+                &election.political_groups,
+            ),
         }
     }
 }
 
 impl GSBResults {
-    pub fn empty(political_groups: &[PoliticalGroup]) -> Self {
+    pub fn empty(election: &ElectionWithPoliticalGroups) -> Self {
         Self {
             number_of_voters: 0,
-            voters_counts: Default::default(),
+            voters_counts: Results::default_voters_counts(election),
             votes_counts: VotesCounts {
                 political_group_total_votes: Results::default_political_group_total_votes(
-                    political_groups,
+                    &election.political_groups,
                 ),
                 ..Default::default()
             },
             differences_counts: Default::default(),
-            political_group_votes: Results::default_political_group_votes(political_groups),
+            political_group_votes: Results::default_political_group_votes(
+                &election.political_groups,
+            ),
         }
     }
 }
@@ -345,6 +360,7 @@ pub mod tests {
             voters_counts: VotersCounts {
                 poll_card_count: 99,
                 proxy_certificate_count: 1,
+                voter_card_count: None,
                 total_admitted_voters_count: 100,
             },
             votes_counts: VotesCounts {

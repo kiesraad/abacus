@@ -18,6 +18,8 @@ export function extractFieldInfoFromSection(section: DataEntrySection): Map<stri
         break;
       case "inputGrid":
         for (const row of subsection.rows) {
+          if (row.isDisabled) continue;
+
           fieldInfoMap.set(row.path, "number");
         }
         break;

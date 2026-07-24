@@ -44,6 +44,12 @@ const createVotersAndVotesRows = (
       code: "B",
       path: "voters_counts.proxy_certificate_count",
       title: t("voters_votes_counts.voters_counts.proxy_certificate_count"),
+    },
+    {
+      code: "C",
+      path: "voters_counts.voter_card_count",
+      title: t("voters_votes_counts.voters_counts.voter_card_count"),
+      isDisabled: election.category === "Municipal",
       addSeparator: true,
     },
     {

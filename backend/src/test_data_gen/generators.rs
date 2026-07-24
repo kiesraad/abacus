@@ -730,6 +730,7 @@ fn generate_cso_first_session_results(
         voters_counts: VotersCounts {
             poll_card_count: number_of_votes,
             proxy_certificate_count: 0,
+            voter_card_count: None,
             total_admitted_voters_count: number_of_votes,
         },
         votes_counts: VotesCounts {
@@ -812,6 +813,7 @@ fn generate_gsb_results(
         voters_counts: VotersCounts {
             poll_card_count: number_of_votes,
             proxy_certificate_count: 0,
+            voter_card_count: None,
             total_admitted_voters_count: number_of_votes,
         },
         votes_counts: VotesCounts {
@@ -874,6 +876,7 @@ fn generate_gsb_results_from_votes(
         voters_counts: VotersCounts {
             poll_card_count: number_of_votes,
             proxy_certificate_count: 0,
+            voter_card_count: None,
             total_admitted_voters_count: number_of_votes,
         },
         votes_counts: VotesCounts {

@@ -80,6 +80,7 @@ export const InputGridWithPreviousValues: Story = {
       ["Veld", "Oorspronkelijk", "Gecorrigeerd", "Omschrijving"],
       ["A", "1.024", "", "Stempassen"],
       ["B", "32", "", "Volmachtbewijzen"],
+      ["C", "", "", "Kiezerspassen"],
       [""],
       ["D", "1.056", "", "Totaal toegelaten kiezers"],
       [""],

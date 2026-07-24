@@ -1426,6 +1426,7 @@ mod tests {
                 voters_counts: VotersCounts {
                     poll_card_count: 1,
                     proxy_certificate_count: 0,
+                    voter_card_count: None,
                     total_admitted_voters_count: 1,
                 },
                 votes_counts: VotesCounts {
@@ -1455,6 +1456,7 @@ mod tests {
                 voters_counts: VotersCounts {
                     poll_card_count: 1,
                     proxy_certificate_count: 0,
+                    voter_card_count: None,
                     total_admitted_voters_count: 1,
                 },
                 votes_counts: VotesCounts {

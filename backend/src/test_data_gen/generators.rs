@@ -16,7 +16,7 @@ use crate::{
         election::{
             self, CandidateGender, CandidateNumber, CommitteeCategory, ElectionCategory,
             ElectionSubCategory, ElectionWithPoliticalGroups, NewElection, PGNumber,
-            PoliticalGroup, RegisteredPoliticalGroup, VoteCountingMethod,
+            RegisteredPoliticalGroup, VoteCountingMethod,
         },
         field_path::FieldPath,
         polling_station::{PollingStation, PollingStationRequest, PollingStationType},
@@ -254,6 +254,39 @@ pub async fn create_test_election(
     })
 }
 
+fn format_election_name(election_category: ElectionCategory, locality: &str, year: i32) -> String {
+    let election_type = match election_category {
+        ElectionCategory::Municipal => "Gemeenteraadsverkiezing",
+        ElectionCategory::Provincial => "Provinciale Statenverkiezing",
+        ElectionCategory::WaterAuthority => "Waterschapsverkiezing",
+    };
+    format!("{election_type} {locality} {year}")
+}
+
+fn get_election_sub_category(
+    election_category: ElectionCategory,
+    number_of_seats: u32,
+) -> ElectionSubCategory {
+    match election_category {
+        ElectionCategory::Municipal => {
+            if number_of_seats < 19 {
+                ElectionSubCategory::GR1
+            } else {
+                ElectionSubCategory::GR2
+            }
+        }
+        // Default to PS1
+        ElectionCategory::Provincial => ElectionSubCategory::PS1,
+        ElectionCategory::WaterAuthority => {
+            if number_of_seats < 19 {
+                ElectionSubCategory::AB1
+            } else {
+                ElectionSubCategory::AB2
+            }
+        }
+    }
+}
+
 /// Generate a random election using the limits from args.
 fn generate_election(
     rng: &mut impl rand::RngExt,
@@ -287,18 +320,18 @@ fn generate_election(
     let election_date =
         super::data::date_between(rng, nomination_date, nomination_date + Days::new(63));
 
-    // extract the year from the election date, generate the locality where this election would be
+    let category = args.election_category.to_eml_code();
     let year = election_date.year();
     let locality = super::data::locality(rng).to_owned();
 
     // use the previous data to generate some identifiers and names
-    let name: String = args
-        .custom_name
-        .clone()
-        .unwrap_or(format!("Gemeenteraad {locality} {year}"));
-
+    let name: String = args.custom_name.clone().unwrap_or(format_election_name(
+        args.election_category,
+        &locality,
+        year,
+    ));
     let cleaned_up_locality = locality.replace(" ", "_").replace("'", "");
-    let election_id = format!("GR{year}_{cleaned_up_locality}");
+    let election_id = format!("{category}{year}_{cleaned_up_locality}");
 
     info!("Election has name '{name}'");
 
@@ -316,12 +349,8 @@ fn generate_election(
         domain_id: super::data::domain_id(rng),
         election_id,
         location: locality,
-        category: ElectionCategory::Municipal,
-        sub_category: if number_of_seats < 19 {
-            ElectionSubCategory::GR1
-        } else {
-            ElectionSubCategory::GR2
-        },
+        category: args.election_category,
+        sub_category: get_election_sub_category(args.election_category, number_of_seats),
         number_of_seats,
         number_of_voters: if args.committee_category == CommitteeCategory::GSB {
             rng.random_range(args.voters.clone())
@@ -483,7 +512,7 @@ async fn generate_gsb_data_entry(
                 rng.random_range(args.candidate_distribution_slope.clone()) as f64 / 1000.0;
             let results = Results::CSOFirstSession(generate_cso_first_session_results(
                 rng,
-                &election.political_groups,
+                election,
                 voters_turned_out,
                 &group_weights,
                 candidate_slope,
@@ -577,7 +606,7 @@ async fn generate_csb_data_entry(
         let results = if let Some(v) = votes {
             let total_votes: u32 = v.iter().flatten().sum();
             Results::GSB(generate_gsb_results_from_votes(
-                &election.political_groups,
+                election,
                 rng.random_range(total_votes..=total_votes * 2),
                 v,
             ))
@@ -590,7 +619,7 @@ async fn generate_csb_data_entry(
 
             Results::GSB(generate_gsb_results(
                 rng,
-                &election.political_groups,
+                election,
                 number_of_eligible_voters,
                 voters_turned_out,
                 &group_weights,
@@ -652,7 +681,7 @@ async fn generate_csb_data_entry(
 #[allow(clippy::too_many_lines)]
 fn generate_cso_first_session_results(
     rng: &mut impl rand::RngExt,
-    political_groups: &[PoliticalGroup],
+    election: &ElectionWithPoliticalGroups,
     number_of_votes: u32,
     group_weights: &[f64],
     candidate_distribution_slope: f64,
@@ -707,10 +736,10 @@ fn generate_cso_first_session_results(
     ];
 
     let extra_investigation = extra_investigation_options
-	.choose_weighted(rng, |item| item.0)
-	.expect("Weighted random selection for extra_investigation should never fail with valid weights")
-	.1
-	.clone();
+        .choose_weighted(rng, |item| item.0)
+        .expect("Weighted random selection for extra_investigation should never fail with valid weights")
+        .1
+        .clone();
 
     CSOFirstSessionResults {
         extra_investigation,
@@ -730,11 +759,12 @@ fn generate_cso_first_session_results(
         voters_counts: VotersCounts {
             poll_card_count: number_of_votes,
             proxy_certificate_count: 0,
-            voter_card_count: None,
+            voter_card_count: (election.category != ElectionCategory::Municipal).then_some(0),
             total_admitted_voters_count: number_of_votes,
         },
         votes_counts: VotesCounts {
-            political_group_total_votes: political_groups
+            political_group_total_votes: election
+                .political_groups
                 .iter()
                 .zip(pg_votes.clone())
                 .map(|(pg, votes)| PoliticalGroupTotalVotes {
@@ -757,7 +787,8 @@ fn generate_cso_first_session_results(
             fewer_ballots_count: 0,
             difference_completely_accounted_for: YesNo::default(),
         },
-        political_group_votes: political_groups
+        political_group_votes: election
+            .political_groups
             .iter()
             .zip(pg_votes)
             .map(|(pg, votes)| {
@@ -787,9 +818,10 @@ fn generate_cso_first_session_results(
     }
 }
 
+#[allow(clippy::too_many_lines)]
 fn generate_gsb_results(
     rng: &mut impl rand::RngExt,
-    political_groups: &[PoliticalGroup],
+    election: &ElectionWithPoliticalGroups,
     number_of_voters: u32,
     number_of_votes: u32,
     group_weights: &[f64],
@@ -813,11 +845,12 @@ fn generate_gsb_results(
         voters_counts: VotersCounts {
             poll_card_count: number_of_votes,
             proxy_certificate_count: 0,
-            voter_card_count: None,
+            voter_card_count: (election.category != ElectionCategory::Municipal).then_some(0),
             total_admitted_voters_count: number_of_votes,
         },
         votes_counts: VotesCounts {
-            political_group_total_votes: political_groups
+            political_group_total_votes: election
+                .political_groups
                 .iter()
                 .zip(pg_votes.clone())
                 .map(|(pg, votes)| PoliticalGroupTotalVotes {
@@ -834,7 +867,8 @@ fn generate_gsb_results(
             more_ballots_count: 0,
             fewer_ballots_count: 0,
         },
-        political_group_votes: political_groups
+        political_group_votes: election
+            .political_groups
             .iter()
             .zip(pg_votes)
             .map(|(pg, votes)| {
@@ -865,7 +899,7 @@ fn generate_gsb_results(
 }
 
 fn generate_gsb_results_from_votes(
-    political_groups: &[PoliticalGroup],
+    election: &ElectionWithPoliticalGroups,
     number_of_voters: u32,
     pg_votes: Vec<Vec<u32>>,
 ) -> GSBResults {
@@ -876,11 +910,12 @@ fn generate_gsb_results_from_votes(
         voters_counts: VotersCounts {
             poll_card_count: number_of_votes,
             proxy_certificate_count: 0,
-            voter_card_count: None,
+            voter_card_count: (election.category != ElectionCategory::Municipal).then_some(0),
             total_admitted_voters_count: number_of_votes,
         },
         votes_counts: VotesCounts {
-            political_group_total_votes: political_groups
+            political_group_total_votes: election
+                .political_groups
                 .iter()
                 .zip(pg_votes.clone())
                 .map(|(pg, votes)| PoliticalGroupTotalVotes {
@@ -897,7 +932,8 @@ fn generate_gsb_results_from_votes(
             more_ballots_count: 0,
             fewer_ballots_count: 0,
         },
-        political_group_votes: political_groups
+        political_group_votes: election
+            .political_groups
             .iter()
             .zip(pg_votes)
             .map(|(pg, votes)| {
@@ -1008,6 +1044,7 @@ mod tests {
         let args = GenerateElectionArgs {
             custom_name: None,
             committee_category: CommitteeCategory::GSB,
+            election_category: ElectionCategory::Municipal,
             political_groups: RandomRange(20..50),
             candidates_per_group: RandomRange(10..50),
             polling_stations: RandomRange(50..200),

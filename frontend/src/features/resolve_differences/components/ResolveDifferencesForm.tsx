@@ -4,17 +4,11 @@ import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { t, tx } from "@/i18n/translate";
 
-import type { CorrectEntry, WrongEntryAction } from "../utils/differences";
+import type { ResolveDifferencesFormState } from "../utils/differences";
 
-export interface ResolveDifferencesFormProps {
+export interface ResolveDifferencesFormProps extends ResolveDifferencesFormState {
   firstEntryName: string;
   secondEntryName: string;
-  correctEntry: CorrectEntry | undefined;
-  setCorrectEntry: (correctEntry: CorrectEntry) => void;
-  wrongEntryAction: WrongEntryAction | undefined;
-  setWrongEntryAction: (wrongEntryAction: WrongEntryAction) => void;
-  correctEntryError: string | undefined;
-  wrongEntryError: string | undefined;
   onSubmit: () => void | Promise<void>;
 }
 

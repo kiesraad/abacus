@@ -8,35 +8,33 @@ export type CorrectEntry = "first" | "second" | "neither";
 /** Answer to the second question: what to do with the entry that does not match? */
 export type WrongEntryAction = "correct" | "reenter";
 
-/** Map the two questions to the API action. Returns `undefined` if  the answers are incomplete. */
+/** The form fields and setters shared between the resolve differences hook and form. */
+export interface ResolveDifferencesFormState {
+  correctEntry: CorrectEntry | undefined;
+  setCorrectEntry: (correctEntry: CorrectEntry) => void;
+  wrongEntryAction: WrongEntryAction | undefined;
+  setWrongEntryAction: (wrongEntryAction: WrongEntryAction) => void;
+  correctEntryError: string | undefined;
+  wrongEntryError: string | undefined;
+}
+
+const KEEP_ENTRY_ACTIONS = {
+  first: { correct: "keep_first_and_correct_second", reenter: "keep_first_and_discard_second" },
+  second: { correct: "keep_second_and_correct_first", reenter: "keep_second_and_discard_first" },
+} as const;
+
+/** Map the two questions to the API action. Returns `undefined` if the answers are incomplete. */
 export function getResolveDifferencesAction(
   correctEntry: CorrectEntry | undefined,
   wrongEntryAction: WrongEntryAction | undefined,
 ): ResolveDifferencesAction | undefined {
-  switch (correctEntry) {
-    case "first":
-      switch (wrongEntryAction) {
-        case "correct":
-          return "keep_first_and_correct_second";
-        case "reenter":
-          return "keep_first_and_discard_second";
-        default:
-          return undefined;
-      }
-    case "second":
-      switch (wrongEntryAction) {
-        case "correct":
-          return "keep_second_and_correct_first";
-        case "reenter":
-          return "keep_second_and_discard_first";
-        default:
-          return undefined;
-      }
-    case "neither":
-      return "discard_both";
-    default:
-      return undefined;
+  if (correctEntry === "neither") {
+    return "discard_both";
   }
+  if (correctEntry === undefined || wrongEntryAction === undefined) {
+    return undefined;
+  }
+  return KEEP_ENTRY_ACTIONS[correctEntry][wrongEntryAction];
 }
 
 /** Which of the two questions still need an answer at submit time. */

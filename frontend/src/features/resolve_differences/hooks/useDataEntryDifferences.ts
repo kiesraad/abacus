@@ -22,16 +22,12 @@ import {
   type CorrectEntry,
   getResolveDifferencesAction,
   getUnansweredQuestions,
+  type ResolveDifferencesFormState,
   type WrongEntryAction,
 } from "../utils/differences";
 
 interface DataEntryDifferences {
-  correctEntry: CorrectEntry | undefined;
-  setCorrectEntry: (correctEntry: CorrectEntry) => void;
-  wrongEntryAction: WrongEntryAction | undefined;
-  setWrongEntryAction: (wrongEntryAction: WrongEntryAction) => void;
-  correctEntryError: string | undefined;
-  wrongEntryError: string | undefined;
+  formState: ResolveDifferencesFormState;
   election: ElectionWithPoliticalGroups;
   loading: boolean;
   differences: DataEntryGetDifferencesResponse | null;
@@ -46,26 +42,18 @@ export interface ResolveOutcome {
   wrongUserId: number | undefined;
 }
 
-// The typist of the entry that is kept, used to pick a different typist for the re-entry.
-function keptEntryUserId(
+// The typists of the kept and wrong entries, used to name who kept and who corrects each entry.
+function resolvedUserIds(
   differences: DataEntryGetDifferencesResponse | null,
   correctEntry: CorrectEntry | undefined,
-): number | undefined {
-  if (!differences) return undefined;
-  if (correctEntry === "first") return differences.first_entry_user_id;
-  if (correctEntry === "second") return differences.second_entry_user_id;
-  return undefined;
-}
-
-// The typist of the entry that does not match, used to name who corrects it.
-function wrongEntryUserId(
-  differences: DataEntryGetDifferencesResponse | null,
-  correctEntry: CorrectEntry | undefined,
-): number | undefined {
-  if (!differences) return undefined;
-  if (correctEntry === "first") return differences.second_entry_user_id;
-  if (correctEntry === "second") return differences.first_entry_user_id;
-  return undefined;
+): { keptUserId: number | undefined; wrongUserId: number | undefined } {
+  if (differences && correctEntry === "first") {
+    return { keptUserId: differences.first_entry_user_id, wrongUserId: differences.second_entry_user_id };
+  }
+  if (differences && correctEntry === "second") {
+    return { keptUserId: differences.second_entry_user_id, wrongUserId: differences.first_entry_user_id };
+  }
+  return { keptUserId: undefined, wrongUserId: undefined };
 }
 
 export function useDataEntryDifferences(
@@ -120,8 +108,7 @@ export function useDataEntryDifferences(
       await electionContext?.refetch();
       afterSave(response.data.status, {
         wrongEntryAction,
-        keptUserId: keptEntryUserId(differences, correctEntry),
-        wrongUserId: wrongEntryUserId(differences, correctEntry),
+        ...resolvedUserIds(differences, correctEntry),
       });
     } else {
       setError(response);
@@ -129,12 +116,14 @@ export function useDataEntryDifferences(
   };
 
   return {
-    correctEntry,
-    setCorrectEntry,
-    wrongEntryAction,
-    setWrongEntryAction,
-    correctEntryError: submitted && unanswered.correctEntry ? requiredError : undefined,
-    wrongEntryError: submitted && unanswered.wrongEntry ? requiredError : undefined,
+    formState: {
+      correctEntry,
+      setCorrectEntry,
+      wrongEntryAction,
+      setWrongEntryAction,
+      correctEntryError: submitted && unanswered.correctEntry ? requiredError : undefined,
+      wrongEntryError: submitted && unanswered.wrongEntry ? requiredError : undefined,
+    },
     election,
     loading: requestState.status === "loading",
     differences,

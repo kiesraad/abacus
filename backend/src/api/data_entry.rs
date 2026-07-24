@@ -22,7 +22,7 @@ use crate::{
             DataEntrySourceContext, DataEntryStatus, DataEntryStatusName, DataEntryStatusResponse,
             DataEntryTransitionError, EntriesDifferent,
         },
-        election::{CommitteeCategory, ElectionId, PoliticalGroup},
+        election::{CommitteeCategory, ElectionId, ElectionWithPoliticalGroups},
         entry_number::EntryNumber,
         investigation::InvestigationStatus,
         polling_station::PollingStationId,
@@ -243,14 +243,16 @@ pub async fn delete_data_entry_for_polling_station(
 
 fn initial_current_data_entry(
     user_id: UserId,
-    committee_category: CommitteeCategory,
-    political_groups: &[PoliticalGroup],
+    election: &ElectionWithPoliticalGroups,
     committee_session: &CommitteeSession,
     previous_results: Option<&CommonPollingStationResults>,
 ) -> CurrentDataEntry {
-    let entry = match (committee_category, committee_session.is_next_session()) {
+    let entry = match (
+        election.committee_category,
+        committee_session.is_next_session(),
+    ) {
         (CommitteeCategory::GSB, false) => {
-            Results::CSOFirstSession(CSOFirstSessionResults::empty(political_groups))
+            Results::CSOFirstSession(CSOFirstSessionResults::empty(election))
         }
         (CommitteeCategory::GSB, true) => {
             if let Some(prev) = previous_results {
@@ -267,10 +269,10 @@ fn initial_current_data_entry(
 
                 Results::CSONextSession(copy)
             } else {
-                Results::CSONextSession(CSONextSessionResults::empty(political_groups))
+                Results::CSONextSession(CSONextSessionResults::empty(election))
             }
         }
-        (CommitteeCategory::CSB, _) => Results::GSB(GSBResults::empty(political_groups)),
+        (CommitteeCategory::CSB, _) => Results::GSB(GSBResults::empty(election)),
     };
 
     CurrentDataEntry {
@@ -348,8 +350,7 @@ async fn data_entry_claim(
 
     let new_data_entry = initial_current_data_entry(
         user.id(),
-        context.election.committee_category,
-        &context.election.political_groups,
+        &context.election,
         &context.committee_session,
         previous_results.as_ref(),
     );
@@ -1004,6 +1005,7 @@ mod tests {
         domain::{
             committee_session::CommitteeSessionId,
             committee_session_status::CommitteeSessionStatus,
+            election::{ElectionCategory, tests::election_fixture},
             results::tests::example_results,
             role::Role,
             validate::{ValidationResult, ValidationResultCode},
@@ -1270,6 +1272,56 @@ mod tests {
         change_status(&mut conn, committee_session_id, status)
             .await
             .unwrap()
+    }
+
+    #[test]
+    fn test_initial_current_data_entry_voter_card_count() {
+        let user_id = UserId::from(1);
+        let first_session = CommitteeSession::first_session();
+
+        // Voter cards only exist for non-municipal elections
+        let cases = [
+            (ElectionCategory::Municipal, None),
+            (ElectionCategory::Provincial, Some(0)),
+            (ElectionCategory::WaterAuthority, Some(0)),
+        ];
+
+        for (category, expected_voter_card_count) in cases {
+            for committee_category in [CommitteeCategory::GSB, CommitteeCategory::CSB] {
+                let mut election = election_fixture(committee_category, &[2]);
+                election.category = category;
+                let current_data_entry =
+                    initial_current_data_entry(user_id, &election, &first_session, None);
+                assert_eq!(
+                    current_data_entry.entry.voters_counts().voter_card_count,
+                    expected_voter_card_count,
+                    "election category {category:?}, committee category {committee_category:?}"
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn test_initial_current_data_entry_voter_card_count_next_session() {
+        let mut election = election_fixture(CommitteeCategory::GSB, &[2]);
+        election.category = ElectionCategory::Provincial;
+
+        let mut previous_results = CSOFirstSessionResults::empty(&election).as_common();
+        previous_results.voters_counts.voter_card_count = Some(5);
+        let current_data_entry = initial_current_data_entry(
+            UserId::from(1),
+            &election,
+            &CommitteeSession::next_session(),
+            Some(&previous_results),
+        );
+        assert!(matches!(
+            current_data_entry.entry,
+            Results::CSONextSession(_)
+        ));
+        assert_eq!(
+            current_data_entry.entry.voters_counts().voter_card_count,
+            Some(5)
+        );
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]

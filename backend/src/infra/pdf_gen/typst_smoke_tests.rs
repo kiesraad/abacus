@@ -818,7 +818,6 @@ async fn test_p_22_2_no_votes_cast_regression_3669() {
     );
     // Use large council so residual seats are distributed via the highest-averages method
     election.number_of_seats = 29;
-    election.sub_category = ElectionSubCategory::GR2;
 
     let committee_session = random_committee_session(&mut rng, election.id, string_length);
     let polling_stations = random_polling_stations(&mut rng, string_length, none_where_possible);

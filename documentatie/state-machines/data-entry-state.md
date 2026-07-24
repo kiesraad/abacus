@@ -5,14 +5,14 @@ The transition labels describe the endpoint that is used for performing the tran
 
 The `save` endpoint which is used for [First/Second]EntryInProgress states is kept out, because Mermaid doesn't render self-loops too well.
 
-All states except for `FirstEntryHasErrors` and `EntriesDifferent` also have a `reset` endpoint which transitions to the `Empty` state. 
+All states also have a `reset` endpoint which transitions to the `Empty` state, which is not shown in the diagram below. For the states `FirstEntryHasErrors` and `EntriesDifferent`, the `reset` is more explicitly called `discard first entry` resp. `discard both entries` and shown in the diagram.
 
 Note the difference between `discard` and `reset`:
 - `discard` is a typist removing their own _in-progress_ entry (the `data_entry_discard` endpoint). Discarding an in-progress second entry keeps the finalised first entry. 
 - `reset` is a coordinator clearing the whole data entry back to `Empty` (the `data_entry_reset` endpoint). It always removes _both_ entries.
 
-When resolving differences between the first and second entry (`EntriesDifferent` state), the coordinator can choose to
-discard one of the two data entries. The remaining entry will from then on be the first entry, and the data entry is open for a new second entry.
+When resolving differences between the first and second data entry (`EntriesDifferent` state), one of the options for the coordinator is to
+discard one entry. In this case, the remaining entry will from then on be the first entry, and the data entry is open for a new second entry.
 
 ```mermaid
 stateDiagram-v2
@@ -28,22 +28,22 @@ stateDiagram-v2
   FirstEntryFinalised --> SecondEntryInProgress: claim
   SecondEntryInProgress --> FirstEntryFinalised: discard
 
-  state first_resolve_errors <<choice>>
-  FirstEntryHasErrors --> first_resolve_errors: resolve errors
-  first_resolve_errors --> FirstEntryInProgress: resume first entry
-  first_resolve_errors --> Empty: discard first entry
+  state resolve_errors <<choice>>
+  FirstEntryHasErrors --> resolve_errors: resolve errors
+  resolve_errors --> FirstEntryInProgress: resume first entry
+  resolve_errors --> Empty: discard first entry
   
   state is_different <<choice>>
   SecondEntryInProgress --> is_different: finalise
   is_different --> EntriesDifferent: different? yes
   is_different --> Definitive: different? no
   
-  state resolve <<choice>>
-  EntriesDifferent --> resolve: resolve differences
-  resolve --> Empty: discard both entries
-  resolve --> first_has_errors: keep one entry
-  resolve --> FirstEntryCorrection: correct first entry
-  resolve --> SecondEntryCorrection: correct second entry
+  state resolve_differences <<choice>>
+  EntriesDifferent --> resolve_differences: resolve differences
+  resolve_differences --> Empty: discard both entries
+  resolve_differences --> first_has_errors: discard one entry
+  resolve_differences --> FirstEntryCorrection: correct first entry
+  resolve_differences --> SecondEntryCorrection: correct second entry
 
   FirstEntryCorrection --> is_different: finalise
   FirstEntryCorrection --> FirstEntryFinalised: discard

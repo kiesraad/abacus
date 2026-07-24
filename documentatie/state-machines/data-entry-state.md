@@ -5,7 +5,7 @@ The transition labels describe the endpoint that is used for performing the tran
 
 The `save` endpoint which is used for [First/Second]EntryInProgress states is kept out, because Mermaid doesn't render self-loops too well.
 
-All states also have a `reset` endpoint which transitions to the `Empty` state, which is not shown in the diagram below. For the states `FirstEntryHasErrors` and `EntriesDifferent`, the `reset` is more explicitly called `discard first entry` resp. `discard both entries` and shown in the diagram.
+All states also have a `reset` endpoint which transitions to the `Empty` state, which is not shown in the diagram below. For the states `FirstEntryHasErrors` and `EntriesDifferent`, the `reset` is more explicitly called `discard first entry` and `discard both entries`, and shown in the diagram.
 
 Note the difference between `discard` and `reset`:
 - `discard` is a typist removing their own _in-progress_ entry (the `data_entry_discard` endpoint). Discarding an in-progress second entry keeps the finalised first entry. 

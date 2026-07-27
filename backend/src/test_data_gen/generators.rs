@@ -256,9 +256,9 @@ pub async fn create_test_election(
 
 fn format_election_name(election_category: ElectionCategory, locality: &str, year: i32) -> String {
     let election_type = match election_category {
-        ElectionCategory::Municipal => "Gemeenteraadsverkiezing",
-        ElectionCategory::Provincial => "Provinciale Statenverkiezing",
-        ElectionCategory::WaterAuthority => "Waterschapsverkiezing",
+        ElectionCategory::Municipal => "Gemeenteraad",
+        ElectionCategory::Provincial => "Provinciale Staten",
+        ElectionCategory::WaterAuthority => "Algemeen bestuur van het waterschap",
     };
     format!("{election_type} {locality} {year}")
 }

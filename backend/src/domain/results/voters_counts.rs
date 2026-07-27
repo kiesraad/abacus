@@ -6,7 +6,7 @@ use utoipa::ToSchema;
 use super::count::Count;
 use crate::domain::{
     compare::Compare,
-    election::{ElectionCategory, ElectionWithPoliticalGroups},
+    election::ElectionWithPoliticalGroups,
     field_path::FieldPath,
     validate::{DataError, Validate, ValidationResult, ValidationResultCode, ValidationResults},
 };
@@ -104,19 +104,19 @@ impl Validate for VotersCounts {
                 .validate(election, &path.field("proxy_certificate_count"))?,
         );
 
-        match (election.category, self.voter_card_count) {
-            (ElectionCategory::Municipal, None) => {}
-            (ElectionCategory::Municipal, Some(_)) => {
+        match (election.category.is_local_election(), self.voter_card_count) {
+            (true, None) => {}
+            (true, Some(_)) => {
                 return Err(DataError::new(
-                    "Voter card count is not allowed for municipal elections",
+                    "Voter card count is not allowed for local elections",
                 ));
             }
-            (_, None) => {
+            (false, None) => {
                 return Err(DataError::new(
-                    "Voter card count is required for non-municipal elections",
+                    "Voter card count is required for non-local elections",
                 ));
             }
-            (_, Some(voter_card_count)) => {
+            (false, Some(voter_card_count)) => {
                 validation_results
                     .join(voter_card_count.validate(election, &path.field("voter_card_count"))?);
             }
@@ -151,7 +151,9 @@ mod tests {
 
     use super::*;
     use crate::domain::election::{
-        CommitteeCategory, CommitteeCategory::*, tests::election_fixture,
+        CommitteeCategory::{self, *},
+        ElectionCategory,
+        tests::election_fixture,
     };
 
     #[test]
@@ -299,26 +301,26 @@ mod tests {
     }
 
     #[test]
-    fn test_voter_card_count_not_allowed_for_municipal() {
+    fn test_voter_card_count_not_allowed_for_local() {
         let result = validate(GSB, ElectionCategory::Municipal, 100, 50, Some(25), 175);
         assert_eq!(
             result.unwrap_err().message,
-            "Voter card count is not allowed for municipal elections"
+            "Voter card count is not allowed for local elections"
         );
     }
 
     #[test]
-    fn test_voter_card_count_required_for_non_municipal() {
+    fn test_voter_card_count_required_for_non_local() {
         let result = validate(GSB, ElectionCategory::Provincial, 100, 50, None, 150);
         assert_eq!(
             result.unwrap_err().message,
-            "Voter card count is required for non-municipal elections"
+            "Voter card count is required for non-local elections"
         );
 
         let result = validate(GSB, ElectionCategory::WaterAuthority, 100, 50, None, 150);
         assert_eq!(
             result.unwrap_err().message,
-            "Voter card count is required for non-municipal elections"
+            "Voter card count is required for non-local elections"
         );
     }
 

@@ -3,7 +3,7 @@ import { PollingStationImportPgObj } from "e2e-tests/page-objects/polling_statio
 import { PollingStationListEmptyPgObj } from "e2e-tests/page-objects/polling_station/PollingStationListEmptyPgObj";
 import { PollingStationListPgObj } from "e2e-tests/page-objects/polling_station/PollingStationListPgObj";
 import { eml110a, eml110b } from "e2e-tests/test-data/eml-files";
-import { test } from "../fixtures";
+import { test } from "../../fixtures";
 
 test.use({
   storageState: "e2e-tests/state/coordinator1-GSB.json",

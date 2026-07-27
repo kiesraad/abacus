@@ -65,6 +65,7 @@ export function ResolveDifferencesForm({
               checked={correctEntry === "neither"}
               onChange={() => {
                 setCorrectEntry("neither");
+                setWrongEntryAction(undefined);
               }}
             />
           </ChoiceList>

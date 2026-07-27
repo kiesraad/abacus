@@ -87,11 +87,13 @@ export const Default: Story = {
     await expect(args.setWrongEntryAction).toHaveBeenLastCalledWith("reenter");
     await expect(reenterWrongEntry).toBeChecked();
 
-    // Choosing "neither" disables the second question again
+    // Choosing "neither" disables the second question again and clears its answer
     await userEvent.click(discardBoth);
     await expect(args.setCorrectEntry).toHaveBeenLastCalledWith("neither");
+    await expect(args.setWrongEntryAction).toHaveBeenLastCalledWith(undefined);
     await expect(correctWrongEntry).toBeDisabled();
     await expect(reenterWrongEntry).toBeDisabled();
+    await expect(reenterWrongEntry).not.toBeChecked();
 
     // Submitting the form calls onSubmit
     await userEvent.click(canvas.getByRole("button", { name: "Opslaan" }));

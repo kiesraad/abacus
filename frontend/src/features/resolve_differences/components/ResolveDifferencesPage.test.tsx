@@ -143,6 +143,7 @@ describe("ResolveDifferencesPage", () => {
     await user.click(await screen.findByRole("radio", { name: "Geen van beide: alles opnieuw invoeren" }));
     expect(correctWrongEntry).toBeDisabled();
     expect(reenterWrongEntry).toBeDisabled();
+    expect(reenterWrongEntry).not.toBeChecked();
   });
 
   test("should validate both questions before submitting", async () => {

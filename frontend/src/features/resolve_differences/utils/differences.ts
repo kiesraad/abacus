@@ -13,7 +13,7 @@ export interface ResolveDifferencesFormState {
   correctEntry: CorrectEntry | undefined;
   setCorrectEntry: (correctEntry: CorrectEntry) => void;
   wrongEntryAction: WrongEntryAction | undefined;
-  setWrongEntryAction: (wrongEntryAction: WrongEntryAction) => void;
+  setWrongEntryAction: (wrongEntryAction: WrongEntryAction | undefined) => void;
   correctEntryError: string | undefined;
   wrongEntryError: string | undefined;
 }

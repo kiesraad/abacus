@@ -8,7 +8,7 @@ use abacus::{
     domain::{
         committee_session::CommitteeSession,
         data_entry::DataEntrySource,
-        election::{CommitteeCategory, ElectionWithPoliticalGroups},
+        election::{CommitteeCategory, ElectionCategory, ElectionWithPoliticalGroups},
         models::{ModelNa31_2Input, ToPdfFileModel, votes_table::VotesTables},
         polling_station::PollingStation,
         report::DEFAULT_DATE_TIME_FORMAT,
@@ -28,6 +28,10 @@ struct Args {
     /// The committee category
     #[arg(value_enum)]
     committee_category: CommitteeCategory,
+
+    /// The election category
+    #[arg(value_enum)]
+    election_category: ElectionCategory,
 
     /// Location of the database file, will be created if it doesn't exist
     #[arg(short, long, default_value = "db.sqlite")]
@@ -107,6 +111,7 @@ impl From<Args> for GenerateElectionArgs {
         GenerateElectionArgs {
             custom_name: args.custom_name,
             committee_category: args.committee_category,
+            election_category: args.election_category,
             political_groups: RandomRange(args.political_groups),
             candidates_per_group: RandomRange(args.candidates_per_group),
             polling_stations: RandomRange(args.polling_stations),

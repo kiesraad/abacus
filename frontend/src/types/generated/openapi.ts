@@ -1170,6 +1170,8 @@ export interface GenerateElectionArgs {
   committee_category: CommitteeCategory;
   /** Custom election name */
   custom_name?: string;
+  /** Municipal, Provincial or WaterAuthority */
+  election_category: ElectionCategory;
   /** Percentage of the first data entry to complete if data entry is included */
   first_data_entry: RandomRange;
   /** Generate multiple elections, each resulting in drawing lots */

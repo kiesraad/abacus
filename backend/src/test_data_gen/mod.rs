@@ -11,7 +11,7 @@ mod generators;
 pub use api::router;
 pub use generators::create_test_election;
 
-use crate::domain::election::CommitteeCategory;
+use crate::domain::election::{CommitteeCategory, ElectionCategory};
 
 #[derive(Clone, Debug)]
 pub struct RandomRange(pub Range<u32>);
@@ -26,6 +26,9 @@ pub struct GenerateElectionArgs {
 
     /// GSB or CSB
     pub committee_category: CommitteeCategory,
+
+    /// Municipal, Provincial or WaterAuthority
+    pub election_category: ElectionCategory,
 
     /// Number of political groups to create
     pub political_groups: RandomRange,

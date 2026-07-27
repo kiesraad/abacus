@@ -174,7 +174,18 @@ pub struct ElectionNumberOfVotersChangeRequest {
 
 /// Election category (limited for now)
 #[derive(
-    Serialize, Deserialize, strum::Display, ToSchema, Clone, Copy, Debug, PartialEq, Eq, Hash, Type,
+    Serialize,
+    Deserialize,
+    strum::Display,
+    strum::EnumString,
+    ToSchema,
+    Clone,
+    Copy,
+    Debug,
+    PartialEq,
+    Eq,
+    Hash,
+    Type,
 )]
 #[strum(serialize_all = "lowercase")]
 pub enum ElectionCategory {

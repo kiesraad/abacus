@@ -7514,6 +7514,7 @@
         "description": "Abacus API and asset server",
         "required": [
           "committee_category",
+          "election_category",
           "political_groups",
           "candidates_per_group",
           "polling_stations",
@@ -7543,6 +7544,10 @@
           "custom_name": {
             "type": "string",
             "description": "Custom election name"
+          },
+          "election_category": {
+            "$ref": "#/components/schemas/ElectionCategory",
+            "description": "Municipal, Provincial or WaterAuthority"
           },
           "first_data_entry": {
             "$ref": "#/components/schemas/RandomRange",

@@ -37,7 +37,9 @@ export const IsAdministrator: Story = {
       await canvas.findByText("Zorg dat de bestanden op deze computer staan voordat je verder gaat."),
     ).toBeVisible();
 
-    await expect(await canvas.findByRole("link", { name: "Verkiezing toevoegen" })).toBeVisible();
+    const link = await canvas.findByRole("link", { name: "Verkiezing toevoegen" });
+    await expect(link).toBeVisible();
+    await expect(link).toHaveAttribute("href", "/create");
   },
 };
 

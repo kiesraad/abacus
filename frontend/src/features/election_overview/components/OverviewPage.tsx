@@ -3,7 +3,6 @@ import { useLocation, useNavigate } from "react-router";
 
 import { useInitialApiGet } from "@/api/useInitialApiGet";
 import { CommitteeSessionStatusWithIcon } from "@/components/committee_session/CommitteeSessionStatus";
-import { AddFirstElection } from "@/components/election/AddFirstElection";
 import { Footer } from "@/components/footer/Footer";
 import { IconPlus } from "@/components/generated/icons";
 import { Messages } from "@/components/messages/Messages";
@@ -19,6 +18,7 @@ import { useUserRole } from "@/hooks/user/useUserRole";
 import { t } from "@/i18n/translate";
 import type { ELECTION_LIST_REQUEST_PATH, Election, ElectionListResponse } from "@/types/generated/openapi";
 import { committeeSessionLabel } from "@/utils/committeeSession";
+import { AddFirstElection } from "./AddFirstElection";
 import cls from "./OverviewPage.module.css";
 
 // biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored

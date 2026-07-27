@@ -21,7 +21,7 @@ import { PollingStationImportPgObj } from "e2e-tests/page-objects/polling_statio
 import { PollingStationListEmptyPgObj } from "e2e-tests/page-objects/polling_station/PollingStationListEmptyPgObj";
 import { PollingStationListPgObj } from "e2e-tests/page-objects/polling_station/PollingStationListPgObj";
 import { eml110a, eml110b, eml230b } from "e2e-tests/test-data/eml-files";
-import { test } from "../fixtures";
+import { test } from "../../fixtures";
 
 test.use({
   storageState: "e2e-tests/state/admin1.json",
@@ -62,8 +62,14 @@ test.describe("Election creation", () => {
       // Now we should be at the check and save page
       const checkAndSavePage = new CheckAndSavePgObj(page);
       await expect(checkAndSavePage.header).toBeVisible();
+
+      await expect(checkAndSavePage.electionName).toContainText("verkiezing: Gemeenteraad Test 2022");
+      await expect(checkAndSavePage.committeeCategory).toContainText("type stembureau: Gemeentelijk stembureau");
+      await expect(checkAndSavePage.electionLocation).toContainText("gebiedsaanduiding: Test");
+      await expect(checkAndSavePage.numberOfListsAndCandidates).toContainText("3 lijsten en 18 kandidaten");
+      await expect(checkAndSavePage.numberOfPollingStations).toContainText("420 stembureaus");
       await expect(checkAndSavePage.countingMethod).toContainText("Centrale stemopneming");
-      await expect(checkAndSavePage.numberOfVoters).toContainText("612.694");
+      await expect(checkAndSavePage.numberOfVoters).toContainText("612.694 kiesgerechtigden");
 
       // Now go back and fill the number of voters with a custom value
       await page.goBack();
@@ -74,7 +80,7 @@ test.describe("Election creation", () => {
 
       // Check that the value is updated
       await expect(checkAndSavePage.header).toBeVisible();
-      await expect(checkAndSavePage.numberOfVoters).toContainText("1.234");
+      await expect(checkAndSavePage.numberOfVoters).toContainText("1.234 kiesgerechtigden");
 
       // Go back another time to check that the hint is gone (since now it's not an imported value anymore)
       // It should also still show the updated value
@@ -135,6 +141,13 @@ test.describe("Election creation", () => {
       // Now we should be at the check and save page
       const checkAndSavePage = new CheckAndSavePgObj(page);
       await expect(checkAndSavePage.header).toBeVisible();
+      await expect(checkAndSavePage.electionName).toContainText("verkiezing: Gemeenteraad Test 2022");
+      await expect(checkAndSavePage.committeeCategory).toHaveText("type stembureau: Gemeentelijk stembureau");
+      await expect(checkAndSavePage.electionLocation).toContainText("gebiedsaanduiding: Test");
+      await expect(checkAndSavePage.numberOfListsAndCandidates).toContainText("3 lijsten en 18 kandidaten");
+      await expect(checkAndSavePage.numberOfPollingStations).toBeHidden();
+      await expect(checkAndSavePage.countingMethod).toContainText("Centrale stemopneming");
+      await expect(checkAndSavePage.numberOfVoters).toContainText("1.234 kiesgerechtigden");
 
       const election = await checkAndSavePage.saveElection();
       await expect(overviewPage.adminHeader).toBeVisible();
@@ -190,7 +203,11 @@ test.describe("Election creation", () => {
       // Now we should be at the check and save page
       const checkAndSavePage = new CheckAndSavePgObj(page);
       await expect(checkAndSavePage.header).toBeVisible();
+      await expect(checkAndSavePage.electionName).toContainText("verkiezing: Gemeenteraad Test 2022");
       await expect(checkAndSavePage.committeeCategory).toHaveText("type stembureau: Centraal stembureau");
+      await expect(checkAndSavePage.electionLocation).toContainText("gebiedsaanduiding: Test");
+      await expect(checkAndSavePage.numberOfListsAndCandidates).toContainText("3 lijsten en 18 kandidaten");
+      await expect(checkAndSavePage.numberOfPollingStations).toBeHidden();
       await expect(checkAndSavePage.countingMethod).toBeHidden();
       await expect(checkAndSavePage.numberOfVoters).toBeHidden();
 

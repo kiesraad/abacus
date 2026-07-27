@@ -8,6 +8,51 @@ import { t } from "@/i18n/translate";
 import type { ELECTION_IMPORT_REQUEST_PATH, ElectionWithPoliticalGroups } from "@/types/generated/openapi";
 import { formatNumber } from "@/utils/number";
 import { useElectionCreateContext } from "../hooks/useElectionCreateContext";
+import type { ElectionCreateState } from "./ElectionCreateContextProvider";
+
+function electionInformation(state: ElectionCreateState) {
+  if (state.election && state.committeeCategory) {
+    let numCandidates = 0;
+    state.election.political_groups.forEach((pg) => {
+      numCandidates += pg.candidates.length;
+    });
+    return (
+      <>
+        <ul>
+          <li id="election-name">
+            <strong>{t("election.singular")}:</strong> {state.election.name}
+          </li>
+          <li id="committee-category">
+            <strong>{t("election.committee_category.title").toLowerCase()}:</strong>{" "}
+            {t(`committee_category.${state.committeeCategory}.short`)}
+          </li>
+          <li id="election-location">
+            <strong>{t("area_designation")}:</strong> {state.election.location}
+          </li>
+        </ul>
+        <ul>
+          {state.election.political_groups.length > 0 && (
+            <li id="lists-and-candidates">
+              {t("election.political_groups_added", {
+                num_groups: state.election.political_groups.length,
+                num_candidates: numCandidates,
+              })}
+            </li>
+          )}
+          {state.pollingStations && (
+            <li id="polling-stations">{t("election.polling_stations.added", { num: state.pollingStations.length })}</li>
+          )}
+          {state.countingMethod && <li id="counting-method">{t(state.countingMethod)}</li>}
+          {state.numberOfVoters && (
+            <li id="number-of-voters">
+              {formatNumber(state.numberOfVoters)} {t("voters")}
+            </li>
+          )}
+        </ul>
+      </>
+    );
+  }
+}
 
 export function CheckAndSave() {
   const { pushMessage } = useMessages();
@@ -68,32 +113,7 @@ export function CheckAndSave() {
     <section className="md">
       <h2>{t("election.check_and_save.title")}</h2>
       <p className="mt-lg">{t("election.check_and_save.description")}</p>
-      <ul>
-        <li>
-          <strong>{t("election.singular")}:</strong> {state.election.name}
-        </li>
-        <li id="committee-category">
-          <strong>{t("election.committee_category.title").toLowerCase()}:</strong>{" "}
-          {t(`committee_category.${state.committeeCategory}.short`)}
-        </li>
-        <li>
-          <strong>{t("area_designation")}:</strong> {state.election.location}
-        </li>
-      </ul>
-
-      <ul>
-        {state.pollingStations && (
-          <li id="polling-stations-added">
-            {t("election.polling_stations.added", { num: state.pollingStations.length })}
-          </li>
-        )}
-        {state.countingMethod && <li id="counting-method">{t(state.countingMethod)}</li>}
-        {state.numberOfVoters && (
-          <li id="number-of-voters">
-            {formatNumber(state.numberOfVoters)} {t("voters")}
-          </li>
-        )}
-      </ul>
+      {electionInformation(state)}
       <div className="mt-xl">
         <Button
           type="submit"

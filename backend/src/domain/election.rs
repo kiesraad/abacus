@@ -161,7 +161,6 @@ pub struct NewElection {
     pub election_date: NaiveDate,
     #[schema(value_type = String, format = "date")]
     pub nomination_date: NaiveDate,
-    #[serde(skip_serializing)]
     pub political_groups: Vec<RegisteredPoliticalGroup>,
 }
 

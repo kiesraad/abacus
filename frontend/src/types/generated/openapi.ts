@@ -1335,6 +1335,7 @@ export interface NewElection {
   nomination_date: string;
   number_of_seats: number;
   number_of_voters: number;
+  political_groups: RegisteredPoliticalGroup[];
   sub_category: ElectionSubCategory;
 }
 
@@ -1504,6 +1505,18 @@ export interface RedactedEmlHash {
   chunks: string[];
   /** Indexes of chunks that will be empty, sorted */
   redacted_indexes: number[];
+}
+
+/**
+ * Political group and its candidates (with registered name as imported from the EML)
+ */
+export interface RegisteredPoliticalGroup {
+  /** List of candidates of the political group */
+  candidates: Candidate[];
+  /** Political group number */
+  number: number;
+  /** Registered political group name as imported from the candidates list EML (230) */
+  registered_name: string;
 }
 
 export const resolveDifferencesActionValues = [

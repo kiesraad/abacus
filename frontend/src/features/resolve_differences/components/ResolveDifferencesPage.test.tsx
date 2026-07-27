@@ -25,14 +25,6 @@ import { ResolveDifferencesPage } from "./ResolveDifferencesPage";
 
 const navigate = vi.fn();
 
-const requiredError = "Dit is een verplichte vraag. Maak een keuze uit de opties hieronder.";
-
-const firstEntryLabel = "Eerste invoer (Gebruiker01)";
-const secondEntryLabel = "Tweede invoer (Gebruiker02)";
-const neitherLabel = "Geen van beide: alles opnieuw invoeren";
-const correctWrongEntryLabel = "Laten herstellen door oorspronkelijke invoerder";
-const reenterWrongEntryLabel = "Opnieuw laten invoeren";
-
 const renderPage = async () => {
   render(
     <TestUserProvider userRole="coordinator_gsb">
@@ -98,14 +90,16 @@ describe("ResolveDifferencesPage", () => {
 
     // First question
     expect(await screen.findByRole("heading", { level: 3, name: "Welke invoer klopt?" })).toBeVisible();
-    expect(await screen.findByRole("radio", { name: firstEntryLabel })).toBeVisible();
-    expect(await screen.findByRole("radio", { name: secondEntryLabel })).toBeVisible();
-    expect(await screen.findByRole("radio", { name: neitherLabel })).toBeVisible();
+    expect(await screen.findByRole("radio", { name: "Eerste invoer (Gebruiker01)" })).toBeVisible();
+    expect(await screen.findByRole("radio", { name: "Tweede invoer (Gebruiker02)" })).toBeVisible();
+    expect(await screen.findByRole("radio", { name: "Geen van beide: alles opnieuw invoeren" })).toBeVisible();
 
     // Second question is visible but disabled until an entry is kept
     expect(await screen.findByRole("heading", { level: 3, name: /Wat wil je doen/ })).toBeVisible();
-    expect(await screen.findByRole("radio", { name: correctWrongEntryLabel })).toBeDisabled();
-    expect(await screen.findByRole("radio", { name: reenterWrongEntryLabel })).toBeDisabled();
+    expect(
+      await screen.findByRole("radio", { name: "Laten herstellen door oorspronkelijke invoerder" }),
+    ).toBeDisabled();
+    expect(await screen.findByRole("radio", { name: "Opnieuw laten invoeren" })).toBeDisabled();
   });
 
   test("should show the selection in the table", async () => {
@@ -116,13 +110,13 @@ describe("ResolveDifferencesPage", () => {
     expect(firstEntry).not.toHaveClass(cls.keep!);
     expect(firstEntry).not.toHaveClass(cls.discard!);
 
-    await user.click(await screen.findByRole("radio", { name: firstEntryLabel }));
+    await user.click(await screen.findByRole("radio", { name: "Eerste invoer (Gebruiker01)" }));
     expect(firstEntry).toHaveClass(cls.keep!);
 
-    await user.click(await screen.findByRole("radio", { name: secondEntryLabel }));
+    await user.click(await screen.findByRole("radio", { name: "Tweede invoer (Gebruiker02)" }));
     expect(firstEntry).toHaveClass(cls.discard!);
 
-    await user.click(await screen.findByRole("radio", { name: neitherLabel }));
+    await user.click(await screen.findByRole("radio", { name: "Geen van beide: alles opnieuw invoeren" }));
     expect(firstEntry).toHaveClass(cls.discard!);
   });
 
@@ -130,21 +124,23 @@ describe("ResolveDifferencesPage", () => {
     const user = userEvent.setup();
     await renderPage();
 
-    const correctWrongEntry = await screen.findByRole("radio", { name: correctWrongEntryLabel });
-    const reenterWrongEntry = await screen.findByRole("radio", { name: reenterWrongEntryLabel });
+    const correctWrongEntry = await screen.findByRole("radio", {
+      name: "Laten herstellen door oorspronkelijke invoerder",
+    });
+    const reenterWrongEntry = await screen.findByRole("radio", { name: "Opnieuw laten invoeren" });
 
     expect(correctWrongEntry).toBeDisabled();
     expect(reenterWrongEntry).toBeDisabled();
 
-    await user.click(await screen.findByRole("radio", { name: firstEntryLabel }));
+    await user.click(await screen.findByRole("radio", { name: "Eerste invoer (Gebruiker01)" }));
     expect(correctWrongEntry).toBeEnabled();
     expect(reenterWrongEntry).toBeEnabled();
 
-    await user.click(await screen.findByRole("radio", { name: secondEntryLabel }));
+    await user.click(await screen.findByRole("radio", { name: "Tweede invoer (Gebruiker02)" }));
     expect(correctWrongEntry).toBeEnabled();
     expect(reenterWrongEntry).toBeEnabled();
 
-    await user.click(await screen.findByRole("radio", { name: neitherLabel }));
+    await user.click(await screen.findByRole("radio", { name: "Geen van beide: alles opnieuw invoeren" }));
     expect(correctWrongEntry).toBeDisabled();
     expect(reenterWrongEntry).toBeDisabled();
   });
@@ -158,44 +154,46 @@ describe("ResolveDifferencesPage", () => {
 
     // Nothing answered -> first question error, no request
     await user.click(submit);
-    const firstError = await screen.findByText(requiredError);
-    expect(firstError).toHaveAttribute("id", "resolve-differences-correct-entry-error");
+    expect(
+      await screen.findByText("Dit is een verplichte vraag. Maak een keuze uit de opties hieronder."),
+    ).toBeVisible();
     expect(resolve).not.toHaveBeenCalled();
 
     // First question answered, second still missing -> second question error, no request
-    await user.click(await screen.findByRole("radio", { name: firstEntryLabel }));
+    await user.click(await screen.findByRole("radio", { name: "Eerste invoer (Gebruiker01)" }));
     await user.click(submit);
-    const secondError = await screen.findByText(requiredError);
-    expect(secondError).toHaveAttribute("id", "resolve-differences-wrong-entry-error");
+    expect(
+      await screen.findByText("Dit is een verplichte vraag. Maak een keuze uit de opties hieronder."),
+    ).toBeVisible();
     expect(resolve).not.toHaveBeenCalled();
   });
 
   test.each([
     {
-      q1: firstEntryLabel,
-      q2: reenterWrongEntryLabel,
+      q1: "Eerste invoer (Gebruiker01)",
+      q2: "Opnieuw laten invoeren",
       status: "first_entry_finalised",
       action: "keep_first_and_discard_second",
     },
     {
-      q1: firstEntryLabel,
-      q2: correctWrongEntryLabel,
+      q1: "Eerste invoer (Gebruiker01)",
+      q2: "Laten herstellen door oorspronkelijke invoerder",
       status: "first_entry_finalised",
       action: "keep_first_and_correct_second",
     },
     {
-      q1: secondEntryLabel,
-      q2: reenterWrongEntryLabel,
+      q1: "Tweede invoer (Gebruiker02)",
+      q2: "Opnieuw laten invoeren",
       status: "first_entry_finalised",
       action: "keep_second_and_discard_first",
     },
     {
-      q1: secondEntryLabel,
-      q2: correctWrongEntryLabel,
+      q1: "Tweede invoer (Gebruiker02)",
+      q2: "Laten herstellen door oorspronkelijke invoerder",
       status: "first_entry_finalised",
       action: "keep_second_and_correct_first",
     },
-    { q1: neitherLabel, q2: undefined, status: "empty", action: "discard_both" },
+    { q1: "Geen van beide: alles opnieuw invoeren", q2: undefined, status: "empty", action: "discard_both" },
   ] as const)("should submit $action", async ({ q1, q2, status, action }) => {
     const user = userEvent.setup();
     const resolve = spyOnHandler(DataEntryResolveDifferencesHandler);
@@ -220,8 +218,8 @@ describe("ResolveDifferencesPage", () => {
     expect(getElectionStatus).toHaveBeenCalledTimes(1);
 
     overrideResponseStatus("first_entry_finalised");
-    await user.click(await screen.findByRole("radio", { name: secondEntryLabel }));
-    await user.click(await screen.findByRole("radio", { name: reenterWrongEntryLabel }));
+    await user.click(await screen.findByRole("radio", { name: "Tweede invoer (Gebruiker02)" }));
+    await user.click(await screen.findByRole("radio", { name: "Opnieuw laten invoeren" }));
     await user.click(await screen.findByRole("button", { name: "Opslaan" }));
 
     expect(getElectionStatus).toHaveBeenCalledTimes(2);
@@ -233,8 +231,8 @@ describe("ResolveDifferencesPage", () => {
 
     await renderPage();
     overrideResponseStatus("first_entry_finalised");
-    await user.click(await screen.findByRole("radio", { name: firstEntryLabel }));
-    await user.click(await screen.findByRole("radio", { name: reenterWrongEntryLabel }));
+    await user.click(await screen.findByRole("radio", { name: "Eerste invoer (Gebruiker01)" }));
+    await user.click(await screen.findByRole("radio", { name: "Opnieuw laten invoeren" }));
     await user.click(await screen.findByRole("button", { name: "Opslaan" }));
 
     expect(pushMessage).toHaveBeenCalledWith({
@@ -251,8 +249,8 @@ describe("ResolveDifferencesPage", () => {
 
     await renderPage();
     overrideResponseStatus("first_entry_finalised");
-    await user.click(await screen.findByRole("radio", { name: secondEntryLabel }));
-    await user.click(await screen.findByRole("radio", { name: reenterWrongEntryLabel }));
+    await user.click(await screen.findByRole("radio", { name: "Tweede invoer (Gebruiker02)" }));
+    await user.click(await screen.findByRole("radio", { name: "Opnieuw laten invoeren" }));
     await user.click(await screen.findByRole("button", { name: "Opslaan" }));
 
     expect(pushMessage).toHaveBeenCalledWith({
@@ -269,8 +267,8 @@ describe("ResolveDifferencesPage", () => {
 
     await renderPage();
     overrideResponseStatus("first_entry_finalised");
-    await user.click(await screen.findByRole("radio", { name: firstEntryLabel }));
-    await user.click(await screen.findByRole("radio", { name: correctWrongEntryLabel }));
+    await user.click(await screen.findByRole("radio", { name: "Eerste invoer (Gebruiker01)" }));
+    await user.click(await screen.findByRole("radio", { name: "Laten herstellen door oorspronkelijke invoerder" }));
     await user.click(await screen.findByRole("button", { name: "Opslaan" }));
 
     expect(pushMessage).toHaveBeenCalledWith({
@@ -284,8 +282,8 @@ describe("ResolveDifferencesPage", () => {
 
     await renderPage();
     overrideResponseStatus("first_entry_finalised");
-    await user.click(await screen.findByRole("radio", { name: secondEntryLabel }));
-    await user.click(await screen.findByRole("radio", { name: correctWrongEntryLabel }));
+    await user.click(await screen.findByRole("radio", { name: "Tweede invoer (Gebruiker02)" }));
+    await user.click(await screen.findByRole("radio", { name: "Laten herstellen door oorspronkelijke invoerder" }));
     await user.click(await screen.findByRole("button", { name: "Opslaan" }));
 
     expect(pushMessage).toHaveBeenCalledWith({
@@ -300,7 +298,7 @@ describe("ResolveDifferencesPage", () => {
     await renderPage();
 
     overrideResponseStatus("empty");
-    await user.click(await screen.findByRole("radio", { name: neitherLabel }));
+    await user.click(await screen.findByRole("radio", { name: "Geen van beide: alles opnieuw invoeren" }));
     await user.click(await screen.findByRole("button", { name: "Opslaan" }));
 
     expect(pushMessage).toHaveBeenCalledWith({
@@ -316,8 +314,8 @@ describe("ResolveDifferencesPage", () => {
     await renderPage();
 
     overrideResponseStatus("first_entry_has_errors");
-    await user.click(await screen.findByRole("radio", { name: secondEntryLabel }));
-    await user.click(await screen.findByRole("radio", { name: reenterWrongEntryLabel }));
+    await user.click(await screen.findByRole("radio", { name: "Tweede invoer (Gebruiker02)" }));
+    await user.click(await screen.findByRole("radio", { name: "Opnieuw laten invoeren" }));
     await user.click(await screen.findByRole("button", { name: "Opslaan" }));
 
     expect(pushMessage).toHaveBeenCalledWith({

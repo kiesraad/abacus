@@ -1,6 +1,5 @@
 import { stat } from "node:fs/promises";
 import { expect, request } from "@playwright/test";
-import { test } from "e2e-tests/fixtures";
 import { apiLogout, createUser, firstLogin, getTestPassword } from "e2e-tests/helpers-utils/e2e-test-api-helpers";
 import {
   createInvestigation,
@@ -45,6 +44,7 @@ import { UserListPgObj } from "e2e-tests/page-objects/users/UserListPgObj";
 import { eml110b_single, eml230b } from "e2e-tests/test-data/eml-files";
 import { noRecountNoDifferencesDataEntry } from "e2e-tests/test-data/request-response-templates";
 import type { TestUser } from "e2e-tests/test-data/users";
+import { test } from "../../fixtures";
 
 const investigations = [
   { number: "1", name: "Stadhuis", reason: "Reden", findings: "Probleem", correctedResults: true },

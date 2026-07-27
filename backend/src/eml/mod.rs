@@ -704,6 +704,8 @@ impl ElectionWithPoliticalGroups {
             ))
             .selections(self.as_eml_count_selections(results.political_group_votes())?)
             .eligible_voter_count(match results {
+                crate::domain::results::Results::DSOFirstSession(_)
+                | crate::domain::results::Results::DSONextSession(_) => todo!(),
                 crate::domain::results::Results::GSB(gsb_results) => gsb_results.number_of_voters,
                 crate::domain::results::Results::CSOFirstSession(_)
                 | crate::domain::results::Results::CSONextSession(_) => {

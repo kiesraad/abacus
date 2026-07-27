@@ -584,24 +584,6 @@ export interface CSOFirstSessionResults {
 }
 
 /**
- * CSONextSessionResults, following the fields in Model Na 14-2 Bijlage 1.
- *
- * See "Model Na 14-2. Corrigendum bij het proces-verbaal van een gemeentelijk stembureau/
- * stembureau voor het openbaar lichaam, Bijlage 1: uitkomsten per stembureau" from
- * [Kiesraad](https://www.kiesraad.nl/documenten/2025/11/27/na-14-2-corrigendum-gsb-inclusief-bijlage-voor-cso).
- */
-export interface CSONextSessionResults {
-  /** Differences counts ("Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten") */
-  differences_counts: DifferencesCounts;
-  /** Vote counts per list and candidate ("Aantal stemmen per lijst en kandidaat") */
-  political_group_votes: PoliticalGroupCandidateVotes[];
-  /** Voters counts ("Aantal toegelaten kiezers") */
-  voters_counts: VotersCounts;
-  /** Votes counts ("Aantal getelde stembiljetten") */
-  votes_counts: VotesCounts;
-}
-
-/**
  * Candidate
  */
 export interface Candidate {
@@ -770,6 +752,21 @@ export interface CreateUserRequest {
 export interface Credentials {
   password: string;
   username: string;
+}
+
+export interface DSOFirstSessionResults {
+  /** Counting Differences Polling Station ("B1-2 Verschillen met telresultaten van het stembureau") */
+  counting_differences_polling_station: CountingDifferencesPollingStation;
+  /** Differences counts ("3. Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten") */
+  differences_counts: DifferencesCounts;
+  /** Extra investigation ("B1-1 Alleen bij extra onderzoek") */
+  extra_investigation: ExtraInvestigation;
+  /** Vote counts per list and candidate (5. "Aantal stemmen per lijst en kandidaat") */
+  political_group_votes: PoliticalGroupCandidateVotes[];
+  /** Voters counts ("1. Aantal toegelaten kiezers") */
+  voters_counts: VotersCounts;
+  /** Votes counts ("2. Aantal getelde stembiljetten") */
+  votes_counts: VotesCounts;
 }
 
 /**
@@ -1336,6 +1333,24 @@ export interface NewElection {
   sub_category: ElectionSubCategory;
 }
 
+/**
+ * CSONextSessionResults, following the fields in Model Na 14-2 Bijlage 1.
+ *
+ * See "Model Na 14-2. Corrigendum bij het proces-verbaal van een gemeentelijk stembureau/
+ * stembureau voor het openbaar lichaam, Bijlage 1: uitkomsten per stembureau" from
+ * [Kiesraad](https://www.kiesraad.nl/documenten/2025/11/27/na-14-2-corrigendum-gsb-inclusief-bijlage-voor-cso).
+ */
+export interface NextSessionResults {
+  /** Differences counts ("Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten") */
+  differences_counts: DifferencesCounts;
+  /** Vote counts per list and candidate ("Aantal stemmen per lijst en kandidaat") */
+  political_group_votes: PoliticalGroupCandidateVotes[];
+  /** Voters counts ("Aantal toegelaten kiezers") */
+  voters_counts: VotersCounts;
+  /** Votes counts ("Aantal getelde stembiljetten") */
+  votes_counts: VotesCounts;
+}
+
 export type PGNumber = number;
 
 /**
@@ -1521,8 +1536,10 @@ export type ResolveErrorsAction = (typeof resolveErrorsActionValues)[number];
  * election committee category and whether this is the first or any subsequent data entry session.
  */
 export type Results =
+  | (DSOFirstSessionResults & { model: "DSOFirstSession" })
+  | (NextSessionResults & { model: "DSONextSession" })
   | (CSOFirstSessionResults & { model: "CSOFirstSession" })
-  | (CSONextSessionResults & { model: "CSONextSession" })
+  | (NextSessionResults & { model: "CSONextSession" })
   | (GSBResults & { model: "GSB" });
 
 export const roleValues = ["administrator", "coordinator_gsb", "coordinator_csb", "typist_gsb", "typist_csb"] as const;

@@ -30,7 +30,7 @@ use crate::{
             PollingStationResults, Results,
             common_polling_station_results::CommonPollingStationResults,
             cso_first_session_results::CSOFirstSessionResults,
-            cso_next_session_results::CSONextSessionResults, gsb_results::GSBResults,
+            cso_next_session_results::NextSessionResults, gsb_results::GSBResults,
         },
         role::Role,
         validate::{DataError, ValidateRoot, ValidationResults},
@@ -256,7 +256,7 @@ fn initial_current_data_entry(
         }
         (CommitteeCategory::GSB, true) => {
             if let Some(prev) = previous_results {
-                let mut copy = CSONextSessionResults {
+                let mut copy = NextSessionResults {
                     voters_counts: prev.voters_counts.clone(),
                     votes_counts: prev.votes_counts.clone(),
                     differences_counts: prev.differences_counts.clone(),
@@ -269,7 +269,7 @@ fn initial_current_data_entry(
 
                 Results::CSONextSession(copy)
             } else {
-                Results::CSONextSession(CSONextSessionResults::empty(election))
+                Results::CSONextSession(NextSessionResults::empty(election))
             }
         }
         (CommitteeCategory::CSB, _) => Results::GSB(GSBResults::empty(election)),

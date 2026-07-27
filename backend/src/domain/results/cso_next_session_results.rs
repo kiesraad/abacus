@@ -15,7 +15,7 @@ use crate::domain::{compare::Compare, field_path::FieldPath};
 /// [Kiesraad](https://www.kiesraad.nl/documenten/2025/11/27/na-14-2-corrigendum-gsb-inclusief-bijlage-voor-cso).
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
-pub struct CSONextSessionResults {
+pub struct NextSessionResults {
     /// Voters counts ("Aantal toegelaten kiezers")
     pub voters_counts: VotersCounts,
     /// Votes counts ("Aantal getelde stembiljetten")
@@ -26,7 +26,7 @@ pub struct CSONextSessionResults {
     pub political_group_votes: Vec<PoliticalGroupCandidateVotes>,
 }
 
-impl Compare for CSONextSessionResults {
+impl Compare for NextSessionResults {
     fn compare(&self, first_entry: &Self, different_fields: &mut Vec<String>, path: &FieldPath) {
         self.voters_counts.compare(
             &first_entry.voters_counts,

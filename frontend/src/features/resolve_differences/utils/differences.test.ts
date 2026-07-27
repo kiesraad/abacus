@@ -33,15 +33,15 @@ describe("getResolveDifferencesAction", () => {
     expected: ResolveDifferencesAction | undefined;
   }>([
     { correctEntry: "first", wrongEntryAction: "correct", expected: "keep_first_and_correct_second" },
-    { correctEntry: "first", wrongEntryAction: "reenter", expected: "keep_first_and_discard_second" },
+    { correctEntry: "first", wrongEntryAction: "discard", expected: "keep_first_and_discard_second" },
     { correctEntry: "second", wrongEntryAction: "correct", expected: "keep_second_and_correct_first" },
-    { correctEntry: "second", wrongEntryAction: "reenter", expected: "keep_second_and_discard_first" },
+    { correctEntry: "second", wrongEntryAction: "discard", expected: "keep_second_and_discard_first" },
     // "neither" ignores the second question
     { correctEntry: "neither", wrongEntryAction: undefined, expected: "discard_both" },
     { correctEntry: "neither", wrongEntryAction: "correct", expected: "discard_both" },
     // incomplete answers map to undefined
     { correctEntry: undefined, wrongEntryAction: undefined, expected: undefined },
-    { correctEntry: undefined, wrongEntryAction: "reenter", expected: undefined },
+    { correctEntry: undefined, wrongEntryAction: "discard", expected: undefined },
     { correctEntry: "first", wrongEntryAction: undefined, expected: undefined },
     { correctEntry: "second", wrongEntryAction: undefined, expected: undefined },
   ])("maps ($correctEntry, $wrongEntryAction) to $expected", ({ correctEntry, wrongEntryAction, expected }) => {

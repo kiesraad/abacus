@@ -127,23 +127,23 @@ describe("ResolveDifferencesPage", () => {
     const correctWrongEntry = await screen.findByRole("radio", {
       name: "Laten herstellen door oorspronkelijke invoerder",
     });
-    const reenterWrongEntry = await screen.findByRole("radio", { name: "Opnieuw laten invoeren" });
+    const discardWrongEntry = await screen.findByRole("radio", { name: "Opnieuw laten invoeren" });
 
     expect(correctWrongEntry).toBeDisabled();
-    expect(reenterWrongEntry).toBeDisabled();
+    expect(discardWrongEntry).toBeDisabled();
 
     await user.click(await screen.findByRole("radio", { name: "Eerste invoer (Gebruiker01)" }));
     expect(correctWrongEntry).toBeEnabled();
-    expect(reenterWrongEntry).toBeEnabled();
+    expect(discardWrongEntry).toBeEnabled();
 
     await user.click(await screen.findByRole("radio", { name: "Tweede invoer (Gebruiker02)" }));
     expect(correctWrongEntry).toBeEnabled();
-    expect(reenterWrongEntry).toBeEnabled();
+    expect(discardWrongEntry).toBeEnabled();
 
     await user.click(await screen.findByRole("radio", { name: "Geen van beide: alles opnieuw invoeren" }));
     expect(correctWrongEntry).toBeDisabled();
-    expect(reenterWrongEntry).toBeDisabled();
-    expect(reenterWrongEntry).not.toBeChecked();
+    expect(discardWrongEntry).toBeDisabled();
+    expect(discardWrongEntry).not.toBeChecked();
   });
 
   test("should validate both questions before submitting", async () => {

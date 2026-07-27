@@ -19,7 +19,7 @@
   "title": "Verschil tussen eerste en tweede invoer",
   "wrong_entry_options": {
     "correct": "Laten herstellen door oorspronkelijke invoerder",
-    "reenter": "Opnieuw laten invoeren"
+    "discard": "Opnieuw laten invoeren"
   },
   "wrong_entry_question": "Wat wil je doen met de invoer die <u>niet</u> klopt?"
 }

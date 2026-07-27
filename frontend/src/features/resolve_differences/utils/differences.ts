@@ -6,7 +6,7 @@ import { mapResultsToSectionValues } from "@/utils/dataEntryMapping";
 export type CorrectEntry = "first" | "second" | "neither";
 
 /** Answer to the second question: what to do with the entry that does not match? */
-export type WrongEntryAction = "correct" | "reenter";
+export type WrongEntryAction = "correct" | "discard";
 
 /** The form fields and setters shared between the resolve differences hook and form. */
 export interface ResolveDifferencesFormState {
@@ -19,8 +19,8 @@ export interface ResolveDifferencesFormState {
 }
 
 const KEEP_ENTRY_ACTIONS = {
-  first: { correct: "keep_first_and_correct_second", reenter: "keep_first_and_discard_second" },
-  second: { correct: "keep_second_and_correct_first", reenter: "keep_second_and_discard_first" },
+  first: { correct: "keep_first_and_correct_second", discard: "keep_first_and_discard_second" },
+  second: { correct: "keep_second_and_correct_first", discard: "keep_second_and_discard_first" },
 } as const;
 
 /** Map the two questions to the API action. Returns `undefined` if the answers are incomplete. */

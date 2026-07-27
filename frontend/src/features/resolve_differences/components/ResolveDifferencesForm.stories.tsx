@@ -68,32 +68,32 @@ export const Default: Story = {
     const firstEntry = canvas.getByRole("radio", { name: "Eerste invoer (Gebruiker01)" });
     const discardBoth = canvas.getByRole("radio", { name: "Geen van beide: alles opnieuw invoeren" });
     const correctWrongEntry = canvas.getByRole("radio", { name: "Laten herstellen door oorspronkelijke invoerder" });
-    const reenterWrongEntry = canvas.getByRole("radio", { name: "Opnieuw laten invoeren" });
+    const discardWrongEntry = canvas.getByRole("radio", { name: "Opnieuw laten invoeren" });
 
     // Nothing is selected initially and the second question is disabled
     await expect(firstEntry).not.toBeChecked();
     await expect(correctWrongEntry).toBeDisabled();
-    await expect(reenterWrongEntry).toBeDisabled();
+    await expect(discardWrongEntry).toBeDisabled();
 
     // Choosing the correct entry reports it and enables the second question
     await userEvent.click(firstEntry);
     await expect(args.setCorrectEntry).toHaveBeenLastCalledWith("first");
     await expect(firstEntry).toBeChecked();
     await expect(correctWrongEntry).toBeEnabled();
-    await expect(reenterWrongEntry).toBeEnabled();
+    await expect(discardWrongEntry).toBeEnabled();
 
     // Choosing what to do with the wrong entry reports it
-    await userEvent.click(reenterWrongEntry);
-    await expect(args.setWrongEntryAction).toHaveBeenLastCalledWith("reenter");
-    await expect(reenterWrongEntry).toBeChecked();
+    await userEvent.click(discardWrongEntry);
+    await expect(args.setWrongEntryAction).toHaveBeenLastCalledWith("discard");
+    await expect(discardWrongEntry).toBeChecked();
 
     // Choosing "neither" disables the second question again and clears its answer
     await userEvent.click(discardBoth);
     await expect(args.setCorrectEntry).toHaveBeenLastCalledWith("neither");
     await expect(args.setWrongEntryAction).toHaveBeenLastCalledWith(undefined);
     await expect(correctWrongEntry).toBeDisabled();
-    await expect(reenterWrongEntry).toBeDisabled();
-    await expect(reenterWrongEntry).not.toBeChecked();
+    await expect(discardWrongEntry).toBeDisabled();
+    await expect(discardWrongEntry).not.toBeChecked();
 
     // Submitting the form calls onSubmit
     await userEvent.click(canvas.getByRole("button", { name: "Opslaan" }));

@@ -10,7 +10,7 @@ export class ResolveDifferencesPgObj {
   readonly discardBothEntries: Locator;
   readonly wrongEntryQuestion: Locator;
   readonly correctWrongEntry: Locator;
-  readonly reenterWrongEntry: Locator;
+  readonly discardWrongEntry: Locator;
   readonly save: Locator;
 
   constructor(protected readonly page: Page) {
@@ -23,7 +23,7 @@ export class ResolveDifferencesPgObj {
     this.discardBothEntries = page.getByRole("radio", { name: /Geen van beide/ });
     this.wrongEntryQuestion = page.getByRole("heading", { name: /Wat wil je doen/ });
     this.correctWrongEntry = page.getByRole("radio", { name: /Laten herstellen/ });
-    this.reenterWrongEntry = page.getByRole("radio", { name: /Opnieuw laten invoeren/ });
+    this.discardWrongEntry = page.getByRole("radio", { name: /Opnieuw laten invoeren/ });
     this.save = page.getByRole("button", { name: "Opslaan" });
   }
 }

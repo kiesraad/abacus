@@ -85,12 +85,12 @@ export function ResolveDifferencesForm({
               }}
             />
             <ChoiceList.Radio
-              id="reenter_wrong_entry"
+              id="discard_wrong_entry"
               name="wrong_entry_action"
-              label={t("resolve_differences.wrong_entry_options.reenter")}
-              checked={wrongEntryAction === "reenter"}
+              label={t("resolve_differences.wrong_entry_options.discard")}
+              checked={wrongEntryAction === "discard"}
               onChange={() => {
-                setWrongEntryAction("reenter");
+                setWrongEntryAction("discard");
               }}
             />
           </ChoiceList>

@@ -19,7 +19,7 @@ test.describe("resolve differences", () => {
 
     // The second question is disabled until an entry is chosen
     await expect(resolveDifferencesPage.correctWrongEntry).toBeDisabled();
-    await expect(resolveDifferencesPage.reenterWrongEntry).toBeDisabled();
+    await expect(resolveDifferencesPage.discardWrongEntry).toBeDisabled();
 
     // Saving without answering the first question shows an error and stays on the page
     await resolveDifferencesPage.save.click();
@@ -28,7 +28,7 @@ test.describe("resolve differences", () => {
 
     // Choosing an entry enables the second question, but saving without answering it still errors
     await resolveDifferencesPage.keepFirstEntry.click();
-    await expect(resolveDifferencesPage.reenterWrongEntry).toBeEnabled();
+    await expect(resolveDifferencesPage.discardWrongEntry).toBeEnabled();
     await resolveDifferencesPage.save.click();
     await expect(resolveDifferencesPage.validationError).toBeVisible();
     await expect(resolveDifferencesPage.title).toBeVisible();
@@ -44,7 +44,7 @@ test.describe("resolve differences", () => {
     await resolveDifferencesPage.keepFirstEntry.click();
     await expect(resolveDifferencesPage.firstValue).toHaveClass(/keep/);
     await expect(resolveDifferencesPage.secondValue).toHaveClass(/discard/);
-    await resolveDifferencesPage.reenterWrongEntry.click();
+    await resolveDifferencesPage.discardWrongEntry.click();
     await resolveDifferencesPage.save.click();
 
     await expect(electionStatusPage.firstEntryFinished).toContainText(
@@ -91,7 +91,7 @@ test.describe("resolve differences", () => {
     await resolveDifferencesPage.keepSecondEntry.click();
     await expect(resolveDifferencesPage.firstValue).toHaveClass(/discard/);
     await expect(resolveDifferencesPage.secondValue).toHaveClass(/keep/);
-    await resolveDifferencesPage.reenterWrongEntry.click();
+    await resolveDifferencesPage.discardWrongEntry.click();
     await resolveDifferencesPage.save.click();
 
     await expect(electionStatusPage.firstEntryFinished).toContainText(
@@ -138,7 +138,7 @@ test.describe("resolve differences then errors", () => {
     const resolveDifferencesPage = new ResolveDifferencesPgObj(page);
     await expect(resolveDifferencesPage.title).toBeVisible();
     await resolveDifferencesPage.keepSecondEntry.click();
-    await resolveDifferencesPage.reenterWrongEntry.click();
+    await resolveDifferencesPage.discardWrongEntry.click();
     await resolveDifferencesPage.save.click();
 
     const resolveErrorsPage = new ResolveErrorsPgObj(page);

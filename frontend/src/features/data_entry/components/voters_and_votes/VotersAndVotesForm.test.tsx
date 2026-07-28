@@ -20,6 +20,7 @@ import { getTypistUser } from "@/testing/user-mock-data";
 import type { DATA_ENTRY_SAVE_REQUEST_BODY, Results } from "@/types/generated/openapi";
 import { getDefaultDataEntryState, getEmptyDataEntryRequest } from "../../testing/mock-data";
 import {
+  expectFieldsToBeDisabled,
   expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage,
   expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage,
   expectFieldsToHaveIconAndToHaveAccessibleName,
@@ -324,7 +325,6 @@ describe("Test VotersAndVotesForm", () => {
       const expectedInvalidFieldIds = [
         votersFieldIds.pollCardCount,
         votersFieldIds.proxyCertificateCount,
-        votersFieldIds.voterCardCount,
         votersFieldIds.totalAdmittedVotersCount,
       ];
       const expectedValidFieldIds = [
@@ -335,6 +335,7 @@ describe("Test VotersAndVotesForm", () => {
         votesFieldIds.invalidVotesCount,
         votesFieldIds.totalVotesCastCount,
       ];
+      expectFieldsToBeDisabled([votersFieldIds.voterCardCount]);
       expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFieldIds, feedbackMessage);
       expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFieldIds, "bevat een fout");
       expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
@@ -377,6 +378,7 @@ describe("Test VotersAndVotesForm", () => {
         votersFieldIds.voterCardCount,
         votersFieldIds.totalAdmittedVotersCount,
       ];
+      expectFieldsToBeDisabled([votersFieldIds.voterCardCount]);
       expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFieldIds, feedbackMessage);
       expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFieldIds, "bevat een fout");
       expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
@@ -420,6 +422,7 @@ describe("Test VotersAndVotesForm", () => {
         votesFieldIds.invalidVotesCount,
         votesFieldIds.totalVotesCastCount,
       ];
+      expectFieldsToBeDisabled([votersFieldIds.voterCardCount]);
       expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFieldIds, feedbackMessage);
       expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFieldIds, "bevat een waarschuwing");
       expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
@@ -511,6 +514,7 @@ describe("Test VotersAndVotesForm", () => {
         votesFieldIds.invalidVotesCount,
         votesFieldIds.totalVotesCastCount,
       ];
+      expectFieldsToBeDisabled([votersFieldIds.voterCardCount]);
       expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFieldIds, feedbackMessage);
       expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFieldIds, "bevat een waarschuwing");
       expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
@@ -554,6 +558,7 @@ describe("Test VotersAndVotesForm", () => {
         votesFieldIds.blankVotesCount,
         votesFieldIds.totalVotesCastCount,
       ];
+      expectFieldsToBeDisabled([votersFieldIds.voterCardCount]);
       expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFieldIds, feedbackMessage);
       expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFieldIds, "bevat een waarschuwing");
       expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
@@ -593,6 +598,7 @@ describe("Test VotersAndVotesForm", () => {
         votesFieldIds.blankVotesCount,
         votesFieldIds.invalidVotesCount,
       ];
+      expectFieldsToBeDisabled([votersFieldIds.voterCardCount]);
       expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFieldIds, feedbackMessage);
       expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFieldIds, "bevat een waarschuwing");
       expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
@@ -633,6 +639,7 @@ describe("Test VotersAndVotesForm", () => {
         votesFieldIds.blankVotesCount,
         votesFieldIds.invalidVotesCount,
       ];
+      expectFieldsToBeDisabled([votersFieldIds.voterCardCount]);
       expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFieldIds, feedbackMessage);
       expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFieldIds, "bevat een waarschuwing");
       expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);

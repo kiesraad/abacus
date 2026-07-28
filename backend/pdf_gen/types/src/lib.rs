@@ -17,9 +17,9 @@ pub trait PdfGenInput: Send + Sync + 'static {
     fn sources(&self) -> &[SourceFile];
     /// Font data
     fn fonts(&self) -> &[FontData];
-    /// Which Typst source file is the entry point (e.g., "model-na-31-2.typ")
+    /// Which Typst source file is the entry point (e.g., "model-na-10-2.typ")
     fn main_template_path(&self) -> &str;
-    /// Virtual path for JSON input (e.g., "inputs/model-na-31-2.json")
+    /// Virtual path for JSON input (e.g., "inputs/model-na-10-2.json")
     fn input_path(&self) -> &str;
     /// The JSON input data
     fn input_json(&self) -> String;

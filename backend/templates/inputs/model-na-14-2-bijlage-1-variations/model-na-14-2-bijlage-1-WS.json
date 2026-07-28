@@ -1,14 +1,14 @@
 {
   "election": {
     "id": 2,
-    "name": "Gemeenteraad Test 2022",
+    "name": "Waterschap Rivierenland 2022",
     "committee_category": "GSB",
     "counting_method": "CSO",
-    "election_id": "GR2022_Test",
-    "location": "Test",
-    "domain_id": "0000",
-    "category": "Municipal",
-    "sub_category": "GR2",
+    "election_id": "WS2022_Eemstricht",
+    "location": "Eemstricht",
+    "domain_id": "0445",
+    "category": "WaterAuthority",
+    "sub_category": "AB2",
     "number_of_seats": 45,
     "number_of_voters": 820,
     "election_date": "2022-03-16",
@@ -27,7 +27,8 @@
   "previous_results": {
     "voters_counts": {
       "poll_card_count": 3450,
-      "proxy_certificate_count": 157,
+      "proxy_certificate_count": 107,
+      "voter_card_count": 50,
       "total_admitted_voters_count": 3607
     },
     "votes_counts": {

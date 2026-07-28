@@ -1,6 +1,6 @@
 #import "common/style.typ": attachment_numbering, conf
 #import "common/scripts.typ": *
-#let input = json("inputs/model-na-14-2-bijlage1-GR.json")
+#let input = json("inputs/model-na-14-2-bijlage-1-variations/model-na-14-2-bijlage-1-GR.json")
 
 #let is_municipality = (municipal, public_body) => is_municipality(input.election.location, municipal, public_body)
 #let location_name = is_municipality[Gemeente #input.election.domain_id #input.election.location][Openbaar lichaam #input.election.location]

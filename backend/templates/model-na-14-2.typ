@@ -1,6 +1,6 @@
 #import "common/style.typ": conf, default_header, document_numbering
 #import "common/scripts.typ": *
-#let input = json("inputs/model-na-14-2-GR.json")
+#let input = json("inputs/model-na-14-2-variations/model-na-14-2-GR.json")
 
 #let is_municipality = (municipal, public_body) => is_municipality(input.election.location, municipal, public_body)
 #let is_local_election = (local, other) => is_local_election(input.election.category, local, other)

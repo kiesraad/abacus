@@ -28,24 +28,64 @@ struct ModelVariant {
 /// List of all model variants to render
 static VARIANTS: &[ModelVariant] = &[
     ModelVariant {
-        name: "model-na-14-2",
+        name: "model-na-14-2 for GR",
         model: "model-na-14-2",
-        input: "model-na-14-2.json",
+        input: "model-na-14-2-variations/model-na-14-2-GR.json",
     },
     ModelVariant {
-        name: "model-na-14-2-bijlage1",
+        name: "model-na-14-2 for PS",
+        model: "model-na-14-2",
+        input: "model-na-14-2-variations/model-na-14-2-PS.json",
+    },
+    ModelVariant {
+        name: "model-na-14-2 for WS",
+        model: "model-na-14-2",
+        input: "model-na-14-2-variations/model-na-14-2-WS.json",
+    },
+    ModelVariant {
+        name: "model-na-14-2-bijlage1 for GR",
         model: "model-na-14-2-bijlage1",
-        input: "model-na-14-2-bijlage1.json",
+        input: "model-na-14-2-bijlage-1-variations/model-na-14-2-bijlage-1-GR.json",
     },
     ModelVariant {
-        name: "model-na-31-2",
+        name: "model-na-14-2-bijlage1 for PS",
+        model: "model-na-14-2-bijlage1",
+        input: "model-na-14-2-bijlage-1-variations/model-na-14-2-bijlage-1-PS.json",
+    },
+    ModelVariant {
+        name: "model-na-14-2-bijlage1 for WS",
+        model: "model-na-14-2-bijlage1",
+        input: "model-na-14-2-bijlage-1-variations/model-na-14-2-bijlage-1-WS.json",
+    },
+    ModelVariant {
+        name: "model-na-31-2 for GR",
         model: "model-na-31-2",
-        input: "model-na-31-2.json",
+        input: "model-na-31-2-variations/model-na-31-2-GR.json",
     },
     ModelVariant {
-        name: "model-na-31-2-bijlage1",
+        name: "model-na-31-2 for PS",
+        model: "model-na-31-2",
+        input: "model-na-31-2-variations/model-na-31-2-PS.json",
+    },
+    ModelVariant {
+        name: "model-na-31-2 for WS",
+        model: "model-na-31-2",
+        input: "model-na-31-2-variations/model-na-31-2-WS.json",
+    },
+    ModelVariant {
+        name: "model-na-31-2-bijlage1 for GR",
         model: "model-na-31-2-bijlage1",
-        input: "model-na-31-2-bijlage1.json",
+        input: "model-na-31-2-bijlage-1-GR.json",
+    },
+    ModelVariant {
+        name: "model-na-31-2-bijlage1 for PS",
+        model: "model-na-31-2-bijlage1",
+        input: "model-na-31-2-bijlage-1-PS.json",
+    },
+    ModelVariant {
+        name: "model-na-31-2-bijlage1 for WS",
+        model: "model-na-31-2-bijlage1",
+        input: "model-na-31-2-bijlage-1-WS.json",
     },
     ModelVariant {
         name: "model-na-31-2-inlegvel",

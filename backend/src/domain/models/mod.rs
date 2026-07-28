@@ -75,9 +75,9 @@ impl PdfModel {
     pub fn as_template_path_str(&self) -> &'static str {
         match self {
             Self::ModelNa14_2(_) => "model-na-14-2.typ",
-            Self::ModelNa14_2Bijlage1(_) => "model-na-14-2-bijlage1.typ",
+            Self::ModelNa14_2Bijlage1(_) => "model-na-14-2-bijlage-1.typ",
             Self::ModelNa31_2(_) => "model-na-31-2.typ",
-            Self::ModelNa31_2Bijlage1(_) => "model-na-31-2-bijlage1.typ",
+            Self::ModelNa31_2Bijlage1(_) => "model-na-31-2-bijlage-1.typ",
             Self::ModelNa31_2Inlegvel(_) => "model-na-31-2-inlegvel.typ",
             Self::ModelN10_2(_) => "model-n-10-2.typ",
             Self::ModelP2a(_) => "model-p-2a.typ",
@@ -90,13 +90,13 @@ impl PdfModel {
         }
     }
 
-    /// Get the input path as a static string (e.g., "inputs/model-na-31-2.json")
+    /// Get the input path as a static string (e.g., "inputs/model-na-31-2-GR.json")
     pub fn as_input_path_str(&self) -> &'static str {
         match self {
-            Self::ModelNa14_2(_) => "inputs/model-na-14-2.json",
-            Self::ModelNa14_2Bijlage1(_) => "inputs/model-na-14-2-bijlage1.json",
-            Self::ModelNa31_2(_) => "inputs/model-na-31-2.json",
-            Self::ModelNa31_2Bijlage1(_) => "inputs/model-na-31-2-bijlage1.json",
+            Self::ModelNa14_2(_) => "inputs/model-na-14-2-variantions/model-na-14-2-GR.json",
+            Self::ModelNa14_2Bijlage1(_) => "inputs/model-na-14-2-bijlage-1-GR.json",
+            Self::ModelNa31_2(_) => "inputs/model-na-31-2-GR.json",
+            Self::ModelNa31_2Bijlage1(_) => "inputs/model-na-31-2-bijlage-1-GR.json",
             Self::ModelNa31_2Inlegvel(_) => "inputs/model-na-31-2-inlegvel.json",
             Self::ModelN10_2(_) => "inputs/model-n-10-2.json",
             Self::ModelP2a(_) => "inputs/model-p-2a.json",

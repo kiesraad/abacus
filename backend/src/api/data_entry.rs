@@ -824,6 +824,7 @@ pub struct DataEntryGetDifferencesResponse {
     pub first_entry: Results,
     pub second_entry_user_id: UserId,
     pub second_entry: Results,
+    pub second_entry_has_errors: bool,
     pub source: DataEntrySource,
 }
 
@@ -859,13 +860,19 @@ async fn data_entry_get_differences(
             second_entry_user_id,
             second_entry,
             ..
-        }) => Ok(Json(DataEntryGetDifferencesResponse {
-            first_entry_user_id,
-            first_entry,
-            second_entry_user_id,
-            second_entry,
-            source: context.source,
-        })),
+        }) => {
+            let second_entry_has_errors =
+                second_entry.start_validate(&context.election)?.has_errors();
+
+            Ok(Json(DataEntryGetDifferencesResponse {
+                first_entry_user_id,
+                first_entry,
+                second_entry_user_id,
+                second_entry,
+                second_entry_has_errors,
+                source: context.source,
+            }))
+        }
         _ => Err(APIError::NotFound(
             "No data entry with differences found".to_string(),
             ErrorReference::EntryNotFound,
@@ -908,9 +915,11 @@ async fn data_entry_resolve_differences(
         | ResolveDifferencesAction::KeepFirstAndCorrectSecond => {
             state.keep_first_entry(&context.election)?
         }
-        ResolveDifferencesAction::KeepSecondAndDiscardFirst
-        | ResolveDifferencesAction::KeepSecondAndCorrectFirst => {
+        ResolveDifferencesAction::KeepSecondAndDiscardFirst => {
             state.keep_second_entry(&context.election)?
+        }
+        ResolveDifferencesAction::KeepSecondAndCorrectFirst => {
+            state.keep_second_and_correct_first(&context.election)?
         }
         ResolveDifferencesAction::DiscardBoth => state.delete_entries()?,
     };
@@ -1212,7 +1221,8 @@ mod tests {
         .into_response()
     }
 
-    async fn finalise_different_entries(pool: SqlitePool) {
+    /// Finalise the example first entry and the given, different second entry.
+    async fn finalise_different_entries_with(pool: SqlitePool, second_entry: DataEntry) {
         // Save and finalise the first data entry
         let request_body = example_data_entry();
         let data_entry_id = DataEntryId::from(201);
@@ -1229,18 +1239,12 @@ mod tests {
         let response = finalise(pool.clone(), data_entry_id, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
 
-        // Save and finalise a different second data entry
-        let mut request_body = example_data_entry();
-        request_body.data.voters_counts_mut().poll_card_count = 100;
-        request_body
-            .data
-            .voters_counts_mut()
-            .proxy_certificate_count = 0;
+        // Save and finalise the different second data entry
         let response = claim(pool.clone(), data_entry_id, EntryNumber::SecondEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
         let response = save(
             pool.clone(),
-            request_body.clone(),
+            second_entry,
             data_entry_id,
             EntryNumber::SecondEntry,
         )
@@ -1253,6 +1257,25 @@ mod tests {
         let DataEntryStatusResponse { status } = serde_json::from_slice(&body).unwrap();
 
         assert_eq!(status, DataEntryStatusName::EntriesDifferent);
+    }
+
+    async fn finalise_different_entries(pool: SqlitePool) {
+        let mut second_entry = example_data_entry();
+        second_entry.data.voters_counts_mut().poll_card_count = 100;
+        second_entry
+            .data
+            .voters_counts_mut()
+            .proxy_certificate_count = 0;
+
+        finalise_different_entries_with(pool, second_entry).await;
+    }
+
+    /// Like `finalise_different_entries`, but the second entry has an error.
+    async fn finalise_different_entries_second_entry_has_errors(pool: SqlitePool) {
+        let mut second_entry = example_data_entry();
+        second_entry.data.voters_counts_mut().poll_card_count = 100;
+
+        finalise_different_entries_with(pool, second_entry).await;
     }
 
     async fn finalise_with_errors(pool: SqlitePool) {
@@ -2387,6 +2410,55 @@ mod tests {
             };
 
             assert_eq!(first_entry.voters_counts.poll_card_count, 100);
+        }
+
+        async fn get_differences(
+            pool: SqlitePool,
+            data_entry_id: DataEntryId,
+        ) -> DataEntryGetDifferencesResponse {
+            let user = User::test_user(Role::CoordinatorGSB, UserId::from(1));
+            let response = data_entry_get_differences(user, State(pool), Path(data_entry_id))
+                .await
+                .into_response();
+            assert_eq!(response.status(), StatusCode::OK);
+
+            let body = response.into_body().collect().await.unwrap().to_bytes();
+            serde_json::from_slice(&body).unwrap()
+        }
+
+        #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
+        async fn test_get_differences_second_entry_has_errors(pool: SqlitePool) {
+            let data_entry_id = DataEntryId::from(201);
+            finalise_different_entries_second_entry_has_errors(pool.clone()).await;
+
+            let differences = get_differences(pool.clone(), data_entry_id).await;
+            assert!(differences.second_entry_has_errors);
+        }
+
+        #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
+        async fn test_keep_second_has_errors_rejects_correction(pool: SqlitePool) {
+            let polling_station_id = PollingStationId::from(211);
+            let data_entry_id = DataEntryId::from(201);
+            finalise_different_entries_second_entry_has_errors(pool.clone()).await;
+
+            let response = resolve_differences(
+                pool.clone(),
+                data_entry_id,
+                ResolveDifferencesAction::KeepSecondAndCorrectFirst,
+            )
+            .await;
+            assert_eq!(response.status(), StatusCode::CONFLICT);
+            let body = response.into_body().collect().await.unwrap().to_bytes();
+            let result: ErrorResponse = serde_json::from_slice(&body).unwrap();
+            assert_eq!(result.reference, ErrorReference::InvalidStateTransition);
+
+            // The state must be unchanged
+            let mut conn = pool.acquire().await.unwrap();
+            let data_entry = get_data_entry_for_ps(&mut conn, polling_station_id).await;
+            assert!(matches!(
+                data_entry.state.0,
+                DataEntryStatus::EntriesDifferent(_)
+            ));
         }
 
         #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]

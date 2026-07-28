@@ -973,12 +973,13 @@ pub fn number_of_voters_from_polling_stations_eml(
         .contests
         .first()
         .ok_or(EMLImportError::PollingStationsWithoutContest)?;
-    contest
-        .max_votes
-        .copied_value()?
-        .get()
-        .try_into()
-        .map_err(|_| EMLImportError::InvalidNumberOfVoters)
+
+    Ok(match contest.max_votes.copied_value() {
+        // If max_votes is too large we fall back to zero
+        Ok(v) => v.get().try_into().unwrap_or(0u32),
+        // If max_votes is not present or an invalid value we fall back to zero
+        Err(_) => 0u32,
+    })
 }
 
 pub fn polling_stations_eml_matches_election(

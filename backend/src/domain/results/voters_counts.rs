@@ -130,13 +130,19 @@ impl Validate for VotersCounts {
         if self.poll_card_count + self.proxy_certificate_count + self.voter_card_count.unwrap_or(0)
             != self.total_admitted_voters_count
         {
+            let mut fields = vec![
+                path.field("poll_card_count").to_string(),
+                path.field("proxy_certificate_count").to_string(),
+            ];
+
+            if !election.category.is_local_election() {
+                fields.push(path.field("voter_card_count").to_string());
+            }
+
+            fields.push(path.field("total_admitted_voters_count").to_string());
+
             validation_results.errors.push(ValidationResult {
-                fields: vec![
-                    path.field("poll_card_count").to_string(),
-                    path.field("proxy_certificate_count").to_string(),
-                    path.field("voter_card_count").to_string(),
-                    path.field("total_admitted_voters_count").to_string(),
-                ],
+                fields,
                 code: ValidationResultCode::F201,
                 context: None,
             });
@@ -248,7 +254,6 @@ mod tests {
             fields: vec![
                 "voters_counts.poll_card_count".into(),
                 "voters_counts.proxy_certificate_count".into(),
-                "voters_counts.voter_card_count".into(),
                 "voters_counts.total_admitted_voters_count".into(),
             ],
             context: None,

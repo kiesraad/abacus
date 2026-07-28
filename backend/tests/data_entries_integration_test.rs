@@ -441,13 +441,11 @@ async fn test_election_details_status(pool: SqlitePool) {
     assert_eq!(statuses[&211]["status"], "empty");
     assert!(statuses[&211]["first_entry_user_id"].is_null());
     assert!(statuses[&211]["second_entry_user_id"].is_null());
-    assert!(statuses[&211]["first_entry_progress"].is_null());
-    assert!(statuses[&211]["second_entry_progress"].is_null());
+    assert!(statuses[&211]["data_entry_progress"].is_null());
     assert_eq!(statuses[&212]["status"], "empty");
     assert!(statuses[&212]["first_entry_user_id"].is_null());
     assert!(statuses[&212]["second_entry_user_id"].is_null());
-    assert!(statuses[&212]["first_entry_progress"].is_null());
-    assert!(statuses[&212]["second_entry_progress"].is_null());
+    assert!(statuses[&212]["data_entry_progress"].is_null());
 
     // Finalise the first data entry for polling station 1
     complete_data_entry(
@@ -476,14 +474,12 @@ async fn test_election_details_status(pool: SqlitePool) {
     assert_eq!(statuses[&211]["status"], "first_entry_finalised");
     assert_eq!(statuses[&211]["first_entry_user_id"], typist_user_id);
     assert!(statuses[&211]["second_entry_user_id"].is_null());
-    assert_eq!(statuses[&211]["first_entry_progress"], 100);
-    assert!(statuses[&211]["second_entry_progress"].is_null());
+    assert!(statuses[&211]["data_entry_progress"].is_null());
 
     assert_eq!(statuses[&212]["status"], "first_entry_in_progress");
     assert_eq!(statuses[&212]["first_entry_user_id"], typist_user_id);
     assert!(statuses[&212]["second_entry_user_id"].is_null());
-    assert_eq!(statuses[&212]["first_entry_progress"], 60);
-    assert!(statuses[&212]["second_entry_progress"].is_null());
+    assert_eq!(statuses[&212]["data_entry_progress"], 60);
 
     // Claim and save the entries
     claim_data_entry(&addr, &typist2_cookie, data_entry_id_1, 2).await;
@@ -510,14 +506,12 @@ async fn test_election_details_status(pool: SqlitePool) {
     assert_eq!(statuses[&211]["status"], "second_entry_in_progress");
     assert_eq!(statuses[&211]["first_entry_user_id"], typist_user_id);
     assert_eq!(statuses[&211]["second_entry_user_id"], typist2_user_id);
-    assert_eq!(statuses[&211]["first_entry_progress"], 100);
-    assert_eq!(statuses[&211]["second_entry_progress"], 60);
+    assert_eq!(statuses[&211]["data_entry_progress"], 60);
 
     assert_eq!(statuses[&212]["status"], "first_entry_in_progress");
     assert_eq!(statuses[&212]["first_entry_user_id"], typist_user_id);
     assert!(statuses[&212]["second_entry_user_id"].is_null());
-    assert_eq!(statuses[&212]["first_entry_progress"], 60);
-    assert!(statuses[&212]["second_entry_progress"].is_null());
+    assert_eq!(statuses[&212]["data_entry_progress"], 60);
 
     // finalise second data entry for polling station 1
     complete_data_entry(
@@ -535,14 +529,12 @@ async fn test_election_details_status(pool: SqlitePool) {
     assert_eq!(statuses[&211]["status"], "definitive");
     assert_eq!(statuses[&211]["first_entry_user_id"], typist_user_id);
     assert_eq!(statuses[&211]["second_entry_user_id"], typist2_user_id);
-    assert_eq!(statuses[&211]["first_entry_progress"], 100);
-    assert_eq!(statuses[&211]["second_entry_progress"], 100);
+    assert!(statuses[&211]["data_entry_progress"].is_null());
 
     assert_eq!(statuses[&212]["status"], "first_entry_in_progress");
     assert_eq!(statuses[&212]["first_entry_user_id"], typist_user_id);
     assert!(statuses[&212]["second_entry_user_id"].is_null());
-    assert_eq!(statuses[&212]["first_entry_progress"], 60);
-    assert!(statuses[&212]["second_entry_progress"].is_null());
+    assert_eq!(statuses[&212]["data_entry_progress"], 60);
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "election_3", "users"))))]

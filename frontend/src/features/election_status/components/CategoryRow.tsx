@@ -90,7 +90,7 @@ function CategoryRowContent({ category, statusEntryWithTypist, warning }: Catego
           <ProgressBar
             id={`${key}-progressbar`}
             data={{
-              percentage: entry.second_entry_progress ?? entry.first_entry_progress ?? 0,
+              percentage: entry.data_entry_progress ?? 0,
               class: "default",
             }}
             showPercentage

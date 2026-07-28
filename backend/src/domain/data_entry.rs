@@ -748,36 +748,16 @@ impl DataEntryStatus {
         }
     }
 
-    /// Get the progress of the first entry (if there is a first entry), from 0 to 100
-    pub fn get_first_entry_progress(&self) -> Option<u8> {
+    /// Get the progress of the current data entry (0..100) if data entry is in progress
+    pub fn get_data_entry_progress(&self) -> Option<u8> {
         match self {
             DataEntryStatus::Empty => None,
             DataEntryStatus::FirstEntryInProgress(state) => Some(state.progress),
-            _ => Some(100),
-        }
-    }
-
-    /// Get the progress of the second entry (if there is a second entry), from 0 to 100
-    pub fn get_second_entry_progress(&self) -> Option<u8> {
-        match self {
-            DataEntryStatus::Empty
-            | DataEntryStatus::FirstEntryInProgress(_)
-            | DataEntryStatus::FirstEntryFinalised(_) => None,
+            DataEntryStatus::FirstEntryHasErrors(_) => None,
+            DataEntryStatus::FirstEntryFinalised(_) => None,
             DataEntryStatus::SecondEntryInProgress(state) => Some(state.progress),
-            _ => Some(100),
-        }
-    }
-
-    /// Get the total progress of the data entry process, from 0 to 100
-    pub fn get_progress(&self) -> u8 {
-        match self {
-            DataEntryStatus::Empty => 0,
-            DataEntryStatus::FirstEntryInProgress(state) => state.progress,
-            DataEntryStatus::FirstEntryHasErrors(_) => 100,
-            DataEntryStatus::FirstEntryFinalised(_) => 0,
-            DataEntryStatus::SecondEntryInProgress(state) => state.progress,
-            DataEntryStatus::EntriesDifferent(_) => 100,
-            DataEntryStatus::Definitive(_) => 100,
+            DataEntryStatus::EntriesDifferent(_) => None,
+            DataEntryStatus::Definitive(_) => None,
         }
     }
 
@@ -1718,11 +1698,14 @@ mod tests {
 
     #[test]
     fn check_get_progress_method_return_values() {
-        assert_eq!(first_entry_in_progress().get_progress(), 0);
-        assert_eq!(first_entry_finalised().get_progress(), 0);
-        assert_eq!(second_entry_in_progress().get_progress(), 0);
-        assert_eq!(entries_different().get_progress(), 100);
-        assert_eq!(definitive().get_progress(), 100);
+        assert_eq!(first_entry_in_progress().get_data_entry_progress(), Some(0));
+        assert_eq!(first_entry_finalised().get_data_entry_progress(), None);
+        assert_eq!(
+            second_entry_in_progress().get_data_entry_progress(),
+            Some(0)
+        );
+        assert_eq!(entries_different().get_data_entry_progress(), None);
+        assert_eq!(definitive().get_data_entry_progress(), None);
     }
 
     #[test]

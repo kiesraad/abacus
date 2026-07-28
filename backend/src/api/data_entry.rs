@@ -72,7 +72,8 @@ impl From<DataEntryTransitionError> for APIError {
 pub struct DataEntryAuditData {
     pub data_entry_id: DataEntryId,
     pub data_entry_status: String,
-    pub data_entry_progress: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub data_entry_progress: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub finished_at: Option<DateTime<Utc>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -88,7 +89,7 @@ impl From<DataEntryRow> for DataEntryAuditData {
         Self {
             data_entry_id: value.id,
             data_entry_status: state.status_name().to_string(),
-            data_entry_progress: format!("{}%", state.get_progress()),
+            data_entry_progress: state.get_data_entry_progress().map(|p| format!("{p}%")),
             finished_at: state.finished_at().copied(),
             first_entry_user_id: state.get_first_entry_user_id(),
             second_entry_user_id: state.get_second_entry_user_id(),
@@ -962,14 +963,10 @@ pub struct ElectionStatusResponseEntry {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(value_type = u8)]
     pub second_entry_user_id: Option<UserId>,
-    /// First entry progress as a percentage (0 to 100)
+    /// Current data entry progress as a percentage (0 to 100)
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(value_type = u8)]
-    pub first_entry_progress: Option<u8>,
-    /// Second entry progress as a percentage (0 to 100)
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(value_type = u8)]
-    pub second_entry_progress: Option<u8>,
+    pub data_entry_progress: Option<u8>,
     /// Time when the data entry was finalised
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(value_type = String)]
@@ -1754,7 +1751,6 @@ mod tests {
             *last_event.event(),
             serde_json::json!({
                 "data_entry_id": 201,
-                "data_entry_progress": "100%",
                 "data_entry_status": "first_entry_has_errors",
             })
         );

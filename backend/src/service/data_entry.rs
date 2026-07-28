@@ -41,8 +41,7 @@ fn map_to_response_entry(entry: DataEntryStatusWithSource) -> ElectionStatusResp
         status: status.status_name(),
         first_entry_user_id: status.get_first_entry_user_id(),
         second_entry_user_id: status.get_second_entry_user_id(),
-        first_entry_progress: status.get_first_entry_progress(),
-        second_entry_progress: status.get_second_entry_progress(),
+        data_entry_progress: status.get_data_entry_progress(),
         finished_at: status.finished_at().copied(),
         finalised_with_warnings: status.finalised_with_warnings().copied(),
     }

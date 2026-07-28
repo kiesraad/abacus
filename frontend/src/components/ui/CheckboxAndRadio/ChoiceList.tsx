@@ -5,10 +5,15 @@ import cls from "./CheckboxAndRadio.module.css";
 
 export interface ChoiceListProps {
   children: ReactNode;
+  disabled?: boolean;
 }
 
-export function ChoiceList({ children }: ChoiceListProps) {
-  return <fieldset className="choiceList">{children}</fieldset>;
+export function ChoiceList({ children, disabled }: ChoiceListProps) {
+  return (
+    <fieldset className="choiceList" disabled={disabled}>
+      {children}
+    </fieldset>
+  );
 }
 
 interface ChoiceListOptionProps extends CheckboxAndRadioProps {

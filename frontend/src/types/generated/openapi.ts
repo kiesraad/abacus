@@ -754,6 +754,12 @@ export interface Credentials {
   username: string;
 }
 
+/**
+ * DSOFirstSessionResults, following the fields in Model N 10-1
+ *
+ * See: Model N 10-1 (Proces-verbaal van een stembureau) from
+ * [kiesraad](https://www.kiesraad.nl/documenten/2025/11/27/n-10-1-pv-sb-dso)
+ */
 export interface DSOFirstSessionResults {
   /** Counting Differences Polling Station ("B1-2 Verschillen met telresultaten van het stembureau") */
   counting_differences_polling_station: CountingDifferencesPollingStation;
@@ -1334,7 +1340,7 @@ export interface NewElection {
 }
 
 /**
- * CSONextSessionResults, following the fields in Model Na 14-2 Bijlage 1.
+ * NextSessionResults, following the fields in Model Na 14-2 Bijlage 1.
  *
  * See "Model Na 14-2. Corrigendum bij het proces-verbaal van een gemeentelijk stembureau/
  * stembureau voor het openbaar lichaam, Bijlage 1: uitkomsten per stembureau" from

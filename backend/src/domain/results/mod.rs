@@ -340,7 +340,13 @@ impl GSBResults {
 impl Compare for Results {
     fn compare(&self, first_entry: &Self, different_fields: &mut Vec<String>, path: &FieldPath) {
         match (self, first_entry) {
+            (Results::DSOFirstSession(s), Results::DSOFirstSession(f)) => {
+                s.compare(f, different_fields, path)
+            }
             (Results::CSOFirstSession(s), Results::CSOFirstSession(f)) => {
+                s.compare(f, different_fields, path)
+            }
+            (Results::DSONextSession(s), Results::DSONextSession(f)) => {
                 s.compare(f, different_fields, path)
             }
             (Results::CSONextSession(s), Results::CSONextSession(f)) => {
@@ -363,7 +369,9 @@ impl Validate for Results {
         path: &FieldPath,
     ) -> Result<ValidationResults, DataError> {
         match self {
-            Results::DSOFirstSession(_) | Results::DSONextSession(_) => todo!(),
+            Results::DSOFirstSession(_) | Results::DSONextSession(_) => {
+                todo!("implement in #3687")
+            }
             Results::CSOFirstSession(results) => {
                 let mut validation_results = results
                     .extra_investigation

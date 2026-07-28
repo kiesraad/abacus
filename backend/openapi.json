@@ -6346,6 +6346,7 @@
       },
       "DSOFirstSessionResults": {
         "type": "object",
+        "description": "DSOFirstSessionResults, following the fields in Model N 10-1\n\nSee: Model N 10-1 (Proces-verbaal van een stembureau) from\n[kiesraad](https://www.kiesraad.nl/documenten/2025/11/27/n-10-1-pv-sb-dso)",
         "required": [
           "extra_investigation",
           "counting_differences_polling_station",

@@ -1,6 +1,6 @@
 #import "common/style.typ": conf, default_header, document_numbering
 #import "common/scripts.typ": *
-#let input = json("inputs/model-na-14-2.json")
+#let input = json("inputs/model-na-14-2-GR.json")
 
 #let is_municipality = (municipal, public_body) => is_municipality(input.election.location, municipal, public_body)
 #let is_local_election = (local, other) => is_local_election(input.election.category, local, other)
@@ -67,15 +67,29 @@ vastgesteld.
 #letterbox("Z", value: input.election.number_of_voters)[Kiesgerechtigden]
 
 == Toegelaten kiezers
-Het totaal van alle getelde geldige stempassen en volmachtbewijzen.
-#sum(
-  with_correction_title: true,
-  letterbox("A", original_value: input.previous_summary.voters_counts.poll_card_count, value: input.summary.voters_counts.poll_card_count, bold_top_border: true, wide_cells: true)[Stempassen],
-  letterbox("B", original_value: input.previous_summary.voters_counts.proxy_certificate_count, value: input.summary.voters_counts.proxy_certificate_count, wide_cells: true)[Volmachtbewijzen],
-  letterbox("D", original_value: input.previous_summary.voters_counts.total_admitted_voters_count, value: input.summary.voters_counts.total_admitted_voters_count, wide_cells: true, light: false)[
-    *Totaal toegelaten kiezers (A+B)*
-  ]
-)
+
+#if not "voter_card_count" in input.summary.voters_counts [
+  Het totaal van alle getelde geldige stempassen en volmachtbewijzen.
+  #sum(
+    with_correction_title: true,
+    letterbox("A", original_value: input.previous_summary.voters_counts.poll_card_count, value: input.summary.voters_counts.poll_card_count, bold_top_border: true, wide_cells: true)[Stempassen],
+    letterbox("B", original_value: input.previous_summary.voters_counts.proxy_certificate_count, value: input.summary.voters_counts.proxy_certificate_count, wide_cells: true)[Volmachtbewijzen],
+    letterbox("D", original_value: input.previous_summary.voters_counts.total_admitted_voters_count, value: input.summary.voters_counts.total_admitted_voters_count, wide_cells: true, light: false)[
+      *Totaal toegelaten kiezers (A+B)*
+    ]
+  )
+] else [
+  Het totaal van alle getelde geldige stempassen, kiezerspassen en volmachtbewijzen.
+  #sum(
+    with_correction_title: true,
+    letterbox("A", original_value: input.previous_summary.voters_counts.poll_card_count, value: input.summary.voters_counts.poll_card_count, bold_top_border: true, wide_cells: true)[Stempassen],
+    letterbox("B", original_value: input.previous_summary.voters_counts.proxy_certificate_count, value: input.summary.voters_counts.proxy_certificate_count, wide_cells: true)[Volmachtbewijzen],
+    letterbox("C", original_value: input.previous_summary.voters_counts.voter_card_count, value: input.summary.voters_counts.voter_card_count, wide_cells: true)[Kiezerspassen],
+    letterbox("D", original_value: input.previous_summary.voters_counts.total_admitted_voters_count, value: input.summary.voters_counts.total_admitted_voters_count, wide_cells: true, light: false)[
+      *Totaal toegelaten kiezers (A+B+C)*
+    ]
+  )
+]
 
 #pagebreak(weak: true)
 

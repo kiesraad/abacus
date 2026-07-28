@@ -1,6 +1,6 @@
 #import "common/style.typ": attachment_numbering, conf
 #import "common/scripts.typ": *
-#let input = json("inputs/model-na-14-2-bijlage1.json")
+#let input = json("inputs/model-na-14-2-bijlage1-GR.json")
 
 #let is_municipality = (municipal, public_body) => is_municipality(input.election.location, municipal, public_body)
 #let location_name = is_municipality[Gemeente #input.election.domain_id #input.election.location][Openbaar lichaam #input.election.location]
@@ -70,16 +70,30 @@ Schrijf op wat de *uitkomst* van het onderzoek door het #location_type was.
 
 == Toegelaten kiezers
 
-Het totaal van alle getelde geldige stempassen en volmachtbewijzen
-
-#sum(
-  with_correction_title: true,
-  empty_letterbox("A", cells: 4, original_value: input.previous_results.voters_counts.poll_card_count, bold_top_border: true)[Stempassen],
-  empty_letterbox("B", cells: 4, original_value: input.previous_results.voters_counts.proxy_certificate_count)[Volmachtbewijzen],
-  empty_letterbox("D", cells: 4, original_value: input.previous_results.voters_counts.total_admitted_voters_count, light: false)[
-    *Totaal toegelaten kiezers (A+B)*
-  ]
-)
+#if not "voter_card_count" in input.previous_results.voters_counts [
+  Het totaal van alle getelde geldige stempassen en volmachtbewijzen
+  
+  #sum(
+    with_correction_title: true,
+    empty_letterbox("A", cells: 4, original_value: input.previous_results.voters_counts.poll_card_count, bold_top_border: true)[Stempassen],
+    empty_letterbox("B", cells: 4, original_value: input.previous_results.voters_counts.proxy_certificate_count)[Volmachtbewijzen],
+    empty_letterbox("D", cells: 4, original_value: input.previous_results.voters_counts.total_admitted_voters_count, light: false)[
+      *Totaal toegelaten kiezers (A+B)*
+    ]
+  )
+] else [
+  Het totaal van alle getelde geldige stempassen, kiezerspassen en volmachtbewijzen
+  
+  #sum(
+    with_correction_title: true,
+    empty_letterbox("A", cells: 4, original_value: input.previous_results.voters_counts.poll_card_count, bold_top_border: true)[Stempassen],
+    empty_letterbox("B", cells: 4, original_value: input.previous_results.voters_counts.proxy_certificate_count)[Volmachtbewijzen],
+    empty_letterbox("C", cells: 4, original_value: input.previous_results.voters_counts.voter_card_count)[Kiezerspassen],
+    empty_letterbox("D", cells: 4, original_value: input.previous_results.voters_counts.total_admitted_voters_count, light: false)[
+      *Totaal toegelaten kiezers (A+B+C)*
+    ]
+  )
+]
 
 #pagebreak(weak: true)
 

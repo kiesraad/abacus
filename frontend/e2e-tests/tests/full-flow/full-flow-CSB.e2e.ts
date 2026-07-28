@@ -90,13 +90,13 @@ test.describe("full flow CSB", () => {
 
     await uploadElectionAndInputHash(page);
 
+    await uploadCandidatesAndInputHash(page, eml230b_more_than_45_candidates);
+
     const committeeCategoryPage = new CommitteeCategoryPgObj(page);
     await expect(committeeCategoryPage.header).toBeVisible();
     await committeeCategoryPage.csb.click();
     await expect(committeeCategoryPage.csb).toBeChecked();
     await committeeCategoryPage.next.click();
-
-    await uploadCandidatesAndInputHash(page, eml230b_more_than_45_candidates);
 
     const checkAndSavePage = new CheckAndSavePgObj(page);
     await expect(checkAndSavePage.header).toBeVisible();

@@ -54,17 +54,20 @@ mod tests {
 
     #[test]
     fn test_json_matches_struct() {
-        let reader = BufReader::new(File::open("templates/inputs/model-p-22-2.json").unwrap());
+        let reader = BufReader::new(
+            File::open("templates/inputs/model-p-22-2-variations/lt-19-seats-and-p9-and-p10.json")
+                .unwrap(),
+        );
         serde_json::from_reader::<_, ModelP22_2Input>(reader)
-            .expect("model-p-22-2.json should deserialize to struct ModelP22_2Input");
+            .expect("model-p-22-2-lt-19-seats-and-p9-and-p10.json should deserialize to struct ModelP22_2Input");
     }
 
     #[test]
     fn test_bijlage_json_matches_struct() {
         let reader =
-            BufReader::new(File::open("templates/inputs/model-p-22-2-bijlage1.json").unwrap());
+            BufReader::new(File::open("templates/inputs/model-p-22-2-bijlage-1.json").unwrap());
         serde_json::from_reader::<_, ModelP22_2Bijlage1Input>(reader).expect(
-            "model-p-22-2-bijlage1.json should deserialize to struct ModelP22_2Bijlage1Input",
+            "model-p-22-2-bijlage-1.json should deserialize to struct ModelP22_2Bijlage1Input",
         );
     }
 }

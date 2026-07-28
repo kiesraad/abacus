@@ -2,9 +2,8 @@
   "election": {
     "id": 2,
     "name": "Test Election >= 19 seats",
-    "counting_method": "CSO",
     "committee_category": "CSB",
-    "election_id": "Juinen_2026",
+    "election_id": "GR2026_Juinen",
     "location": "Juinen",
     "domain_id": "0035",
     "category": "Municipal",

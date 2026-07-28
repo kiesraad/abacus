@@ -28,64 +28,64 @@ struct ModelVariant {
 /// List of all model variants to render
 static VARIANTS: &[ModelVariant] = &[
     ModelVariant {
-        name: "model-na-14-2 for GR",
+        name: "model-na-14-2-GR",
         model: "model-na-14-2",
         input: "model-na-14-2-variations/model-na-14-2-GR.json",
     },
     ModelVariant {
-        name: "model-na-14-2 for PS",
+        name: "model-na-14-2-PS",
         model: "model-na-14-2",
         input: "model-na-14-2-variations/model-na-14-2-PS.json",
     },
     ModelVariant {
-        name: "model-na-14-2 for WS",
+        name: "model-na-14-2-WS",
         model: "model-na-14-2",
         input: "model-na-14-2-variations/model-na-14-2-WS.json",
     },
     ModelVariant {
-        name: "model-na-14-2-bijlage1 for GR",
-        model: "model-na-14-2-bijlage1",
+        name: "model-na-14-2-bijlage-1-GR",
+        model: "model-na-14-2-bijlage-1",
         input: "model-na-14-2-bijlage-1-variations/model-na-14-2-bijlage-1-GR.json",
     },
     ModelVariant {
-        name: "model-na-14-2-bijlage1 for PS",
-        model: "model-na-14-2-bijlage1",
+        name: "model-na-14-2-bijlage-1-PS",
+        model: "model-na-14-2-bijlage-1",
         input: "model-na-14-2-bijlage-1-variations/model-na-14-2-bijlage-1-PS.json",
     },
     ModelVariant {
-        name: "model-na-14-2-bijlage1 for WS",
-        model: "model-na-14-2-bijlage1",
+        name: "model-na-14-2-bijlage-1-WS",
+        model: "model-na-14-2-bijlage-1",
         input: "model-na-14-2-bijlage-1-variations/model-na-14-2-bijlage-1-WS.json",
     },
     ModelVariant {
-        name: "model-na-31-2 for GR",
+        name: "model-na-31-2-GR",
         model: "model-na-31-2",
         input: "model-na-31-2-variations/model-na-31-2-GR.json",
     },
     ModelVariant {
-        name: "model-na-31-2 for PS",
+        name: "model-na-31-2-PS",
         model: "model-na-31-2",
         input: "model-na-31-2-variations/model-na-31-2-PS.json",
     },
     ModelVariant {
-        name: "model-na-31-2 for WS",
+        name: "model-na-31-2-WS",
         model: "model-na-31-2",
         input: "model-na-31-2-variations/model-na-31-2-WS.json",
     },
     ModelVariant {
-        name: "model-na-31-2-bijlage1 for GR",
-        model: "model-na-31-2-bijlage1",
-        input: "model-na-31-2-bijlage-1-GR.json",
+        name: "model-na-31-2-bijlage-1-GR",
+        model: "model-na-31-2-bijlage-1",
+        input: "model-na-31-2-bijlage-1-variations/model-na-31-2-bijlage-1-GR.json",
     },
     ModelVariant {
-        name: "model-na-31-2-bijlage1 for PS",
-        model: "model-na-31-2-bijlage1",
-        input: "model-na-31-2-bijlage-1-PS.json",
+        name: "model-na-31-2-bijlage-1-PS",
+        model: "model-na-31-2-bijlage-1",
+        input: "model-na-31-2-bijlage-1-variations/model-na-31-2-bijlage-1-PS.json",
     },
     ModelVariant {
-        name: "model-na-31-2-bijlage1 for WS",
-        model: "model-na-31-2-bijlage1",
-        input: "model-na-31-2-bijlage-1-WS.json",
+        name: "model-na-31-2-bijlage-1-WS",
+        model: "model-na-31-2-bijlage-1",
+        input: "model-na-31-2-bijlage-1-variations/model-na-31-2-bijlage-1-WS.json",
     },
     ModelVariant {
         name: "model-na-31-2-inlegvel",
@@ -105,63 +105,62 @@ static VARIANTS: &[ModelVariant] = &[
     ModelVariant {
         name: "model-p-22-2-gte-19-seats",
         model: "model-p-22-2",
-        input: "extra-model-p-22-2-variations/gte-19-seats.json",
+        input: "model-p-22-2-variations/gte-19-seats.json",
     },
     ModelVariant {
         name: "model-p-22-2-gte-19-seats-and-p7-drawing-lots",
         model: "model-p-22-2",
-        input: "extra-model-p-22-2-variations/gte-19-seats-and-p7-drawing-lots.json",
+        input: "model-p-22-2-variations/gte-19-seats-and-p7-drawing-lots.json",
     },
     ModelVariant {
         name: "model-p-22-2-gte-19-seats-and-p9",
         model: "model-p-22-2",
-        input: "extra-model-p-22-2-variations/gte-19-seats-and-p9.json",
+        input: "model-p-22-2-variations/gte-19-seats-and-p9.json",
     },
     ModelVariant {
         name: "model-p-22-2-gte-19-seats-and-p9-drawing-lots-and-deceased-candidates",
         model: "model-p-22-2",
-        input: "extra-model-p-22-2-variations/gte-19-seats-and-p9-drawing-lots-and-deceased-candidates.json",
+        input: "model-p-22-2-variations/gte-19-seats-and-p9-drawing-lots-and-deceased-candidates.json",
     },
     ModelVariant {
         name: "model-p-22-2-gte-19-seats-and-p9-drawing-lots-and-p10-and-deceased-candidates",
         model: "model-p-22-2",
-        input: "extra-model-p-22-2-variations/gte-19-seats-and-p9-drawing-lots-and-p10-and-deceased-candidates.json",
+        input: "model-p-22-2-variations/gte-19-seats-and-p9-drawing-lots-and-p10-and-deceased-candidates.json",
     },
     ModelVariant {
         name: "model-p-22-2-lt-19-seats",
         model: "model-p-22-2",
-        input: "extra-model-p-22-2-variations/lt-19-seats.json",
+        input: "model-p-22-2-variations/lt-19-seats.json",
     },
     ModelVariant {
         name: "model-p-22-2-lt-19-seats-and-p7-drawing-lots",
         model: "model-p-22-2",
-        input: "extra-model-p-22-2-variations/lt-19-seats-and-p7-drawing-lots.json",
+        input: "model-p-22-2-variations/lt-19-seats-and-p7-drawing-lots.json",
     },
-    // `lt-19-seats-and-p9-and-p10.json` is equal to input `model-p-22-2.json`
     ModelVariant {
         name: "model-p-22-2-lt-19-seats-and-p9-and-p10",
         model: "model-p-22-2",
-        input: "extra-model-p-22-2-variations/lt-19-seats-and-p9-and-p10.json",
+        input: "model-p-22-2-variations/lt-19-seats-and-p9-and-p10.json",
     },
     ModelVariant {
         name: "model-p-22-2-lt-19-seats-and-p9-drawing-lots",
         model: "model-p-22-2",
-        input: "extra-model-p-22-2-variations/lt-19-seats-and-p9-drawing-lots.json",
+        input: "model-p-22-2-variations/lt-19-seats-and-p9-drawing-lots.json",
     },
     ModelVariant {
         name: "model-p-22-2-lt-19-seats-and-p10",
         model: "model-p-22-2",
-        input: "extra-model-p-22-2-variations/lt-19-seats-and-p10.json",
+        input: "model-p-22-2-variations/lt-19-seats-and-p10.json",
     },
     ModelVariant {
         name: "model-p-22-2-lt-19-seats-and-p15-drawing-lots",
         model: "model-p-22-2",
-        input: "extra-model-p-22-2-variations/lt-19-seats-and-p15-drawing-lots.json",
+        input: "model-p-22-2-variations/lt-19-seats-and-p15-drawing-lots.json",
     },
     ModelVariant {
-        name: "model-p-22-2-bijlage1",
-        model: "model-p-22-2-bijlage1",
-        input: "model-p-22-2-bijlage1.json",
+        name: "model-p-22-2-bijlage-1",
+        model: "model-p-22-2-bijlage-1",
+        input: "model-p-22-2-bijlage-1.json",
     },
 ];
 

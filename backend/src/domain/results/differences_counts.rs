@@ -355,7 +355,7 @@ mod tests {
         election::PGNumber,
         results::{
             Results, cso_first_session_results::CSOFirstSessionResults,
-            cso_next_session_results::NextSessionResults,
+            next_session_results::NextSessionResults,
             political_group_candidate_votes::PoliticalGroupCandidateVotes,
             political_group_total_votes::PoliticalGroupTotalVotes, voters_counts::VotersCounts,
             votes_counts::VotesCounts,

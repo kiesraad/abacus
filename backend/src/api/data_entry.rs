@@ -30,7 +30,7 @@ use crate::{
             PollingStationResults, Results,
             common_polling_station_results::CommonPollingStationResults,
             cso_first_session_results::CSOFirstSessionResults,
-            cso_next_session_results::NextSessionResults, gsb_results::GSBResults,
+            next_session_results::NextSessionResults, gsb_results::GSBResults,
         },
         role::Role,
         validate::{DataError, ValidateRoot, ValidationResults},

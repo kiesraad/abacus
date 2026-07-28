@@ -1,6 +1,6 @@
 use common_polling_station_results::CommonPollingStationResults;
 use cso_first_session_results::CSOFirstSessionResults;
-use cso_next_session_results::NextSessionResults;
+use next_session_results::NextSessionResults;
 use political_group_candidate_votes::{CandidateVotes, PoliticalGroupCandidateVotes};
 use political_group_total_votes::PoliticalGroupTotalVotes;
 use serde::{Deserialize, Serialize};
@@ -23,7 +23,7 @@ pub mod common_validation;
 pub mod count;
 pub mod counting_differences_polling_station;
 pub mod cso_first_session_results;
-pub mod cso_next_session_results;
+pub mod next_session_results;
 pub mod differences_counts;
 pub mod dso_first_session_results;
 pub mod dso_next_session_results;

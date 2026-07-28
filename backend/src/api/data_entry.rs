@@ -18,19 +18,17 @@ use crate::{
         committee_session::{CommitteeSession, CommitteeSessionError},
         committee_session_status::CommitteeSessionStatus,
         data_entry::{
-            ClientState, CurrentDataEntry, DataEntryId, DataEntryRow, DataEntrySource,
-            DataEntrySourceContext, DataEntryStatus, DataEntryStatusName, DataEntryStatusResponse,
-            DataEntryTransitionError, EntriesDifferent,
+            ClientState, DataEntryId, DataEntryRow, DataEntrySource, DataEntrySourceContext,
+            DataEntryStatus, DataEntryStatusName, DataEntryStatusResponse,
+            DataEntryTransitionError, DataEntryUpdate, EntriesDifferent,
         },
-        election::{CommitteeCategory, ElectionId, ElectionWithPoliticalGroups},
+        election::ElectionId,
         entry_number::EntryNumber,
         investigation::InvestigationStatus,
         polling_station::PollingStationId,
         results::{
             PollingStationResults, Results,
             common_polling_station_results::CommonPollingStationResults,
-            cso_first_session_results::CSOFirstSessionResults,
-            cso_next_session_results::CSONextSessionResults, gsb_results::GSBResults,
         },
         role::Role,
         validate::{DataError, ValidateRoot, ValidationResults},
@@ -242,48 +240,6 @@ pub async fn delete_data_entry_for_polling_station(
     Ok(())
 }
 
-fn initial_current_data_entry(
-    user_id: UserId,
-    election: &ElectionWithPoliticalGroups,
-    committee_session: &CommitteeSession,
-    previous_results: Option<&CommonPollingStationResults>,
-) -> CurrentDataEntry {
-    let entry = match (
-        election.committee_category,
-        committee_session.is_next_session(),
-    ) {
-        (CommitteeCategory::GSB, false) => {
-            Results::CSOFirstSession(CSOFirstSessionResults::empty(election))
-        }
-        (CommitteeCategory::GSB, true) => {
-            if let Some(prev) = previous_results {
-                let mut copy = CSONextSessionResults {
-                    voters_counts: prev.voters_counts.clone(),
-                    votes_counts: prev.votes_counts.clone(),
-                    differences_counts: prev.differences_counts.clone(),
-                    political_group_votes: prev.political_group_votes.to_vec(),
-                };
-
-                // clear checkboxes in differences because they always need to be re-entered
-                copy.differences_counts.compare_votes_cast_admitted_voters = Default::default();
-                copy.differences_counts.difference_completely_accounted_for = Default::default();
-
-                Results::CSONextSession(copy)
-            } else {
-                Results::CSONextSession(CSONextSessionResults::empty(election))
-            }
-        }
-        (CommitteeCategory::CSB, _) => Results::GSB(GSBResults::empty(election)),
-    };
-
-    CurrentDataEntry {
-        progress: None,
-        user_id,
-        entry,
-        client_state: None,
-    }
-}
-
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, ToSchema, FromRequest)]
 #[from_request(via(axum::Json), rejection(APIError))]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
@@ -361,8 +317,7 @@ async fn data_entry_claim(
         None => None,
     };
 
-    let new_data_entry = initial_current_data_entry(
-        user.id(),
+    let initial = Results::new(
         &context.election,
         &context.committee_session,
         previous_results.as_ref(),
@@ -370,8 +325,8 @@ async fn data_entry_claim(
 
     // Transition to the new state
     let new_state = match entry_number {
-        EntryNumber::FirstEntry => state.clone().claim_first_entry(new_data_entry.clone())?,
-        EntryNumber::SecondEntry => state.clone().claim_second_entry(new_data_entry.clone())?,
+        EntryNumber::FirstEntry => state.clone().claim_first_entry(user.id(), initial)?,
+        EntryNumber::SecondEntry => state.clone().claim_second_entry(user.id(), initial)?,
     };
 
     // Validate the state
@@ -468,17 +423,17 @@ async fn data_entry_save(
 
     let (context, state) = validate_and_get_data(&mut tx, data_entry_id, &user).await?;
 
-    let current_data_entry = CurrentDataEntry {
-        progress: Some(data_entry_request.progress),
+    let update = DataEntryUpdate {
+        progress: data_entry_request.progress,
         user_id: user.id(),
         entry: data_entry_request.data,
-        client_state: Some(data_entry_request.client_state),
+        client_state: data_entry_request.client_state,
     };
 
     // Transition to the new state
     let new_state = match entry_number {
-        EntryNumber::FirstEntry => state.update_first_entry(current_data_entry)?,
-        EntryNumber::SecondEntry => state.update_second_entry(current_data_entry)?,
+        EntryNumber::FirstEntry => state.update_first_entry(update)?,
+        EntryNumber::SecondEntry => state.update_second_entry(update)?,
     };
 
     // Validate the state
@@ -1023,7 +978,6 @@ mod tests {
         domain::{
             committee_session::CommitteeSessionId,
             committee_session_status::CommitteeSessionStatus,
-            election::{ElectionCategory, tests::election_fixture},
             results::tests::example_results,
             role::Role,
             validate::{ValidationResult, ValidationResultCode},
@@ -1290,56 +1244,6 @@ mod tests {
         change_status(&mut conn, committee_session_id, status)
             .await
             .unwrap()
-    }
-
-    #[test]
-    fn test_initial_current_data_entry_voter_card_count() {
-        let user_id = UserId::from(1);
-        let first_session = CommitteeSession::first_session();
-
-        // Voter cards only exist for non-local elections
-        let cases = [
-            (ElectionCategory::Municipal, None),
-            (ElectionCategory::Provincial, Some(0)),
-            (ElectionCategory::WaterAuthority, Some(0)),
-        ];
-
-        for (category, expected_voter_card_count) in cases {
-            for committee_category in [CommitteeCategory::GSB, CommitteeCategory::CSB] {
-                let mut election = election_fixture(committee_category, &[2]);
-                election.category = category;
-                let current_data_entry =
-                    initial_current_data_entry(user_id, &election, &first_session, None);
-                assert_eq!(
-                    current_data_entry.entry.voters_counts().voter_card_count,
-                    expected_voter_card_count,
-                    "election category {category:?}, committee category {committee_category:?}"
-                );
-            }
-        }
-    }
-
-    #[test]
-    fn test_initial_current_data_entry_voter_card_count_next_session() {
-        let mut election = election_fixture(CommitteeCategory::GSB, &[2]);
-        election.category = ElectionCategory::Provincial;
-
-        let mut previous_results = CSOFirstSessionResults::empty(&election).as_common();
-        previous_results.voters_counts.voter_card_count = Some(5);
-        let current_data_entry = initial_current_data_entry(
-            UserId::from(1),
-            &election,
-            &CommitteeSession::next_session(),
-            Some(&previous_results),
-        );
-        assert!(matches!(
-            current_data_entry.entry,
-            Results::CSONextSession(_)
-        ));
-        assert_eq!(
-            current_data_entry.entry.voters_counts().voter_card_count,
-            Some(5)
-        );
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]

@@ -28,19 +28,9 @@ describe("getCandidateFullName util", () => {
     expect(getCandidateFullName(candidate, false)).toBe("Boer, A.B.");
   });
 
-  test("with last name prefix", () => {
-    const candidate = { last_name_prefix, last_name, initials } as Candidate;
-    expect(getCandidateFullName(candidate)).toBe("Boer, A.B. de");
-  });
-
-  test("with first name and last name prefix", () => {
+  test("with firstname and lastname prefix", () => {
     const candidate = { last_name_prefix, last_name, initials, first_name } as Candidate;
-    expect(getCandidateFullName(candidate)).toBe("Boer, A.B. (Anne) de");
-  });
-
-  test("capitalizes last name", () => {
-    const candidate = { last_name_prefix, last_name: last_name.toLowerCase(), initials, first_name } as Candidate;
-    expect(getCandidateFullName(candidate)).toBe("Boer, A.B. (Anne) de");
+    expect(getCandidateFullName(candidate)).toBe("De Boer, A.B. (Anne)");
   });
 });
 

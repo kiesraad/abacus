@@ -268,16 +268,7 @@ describe("Test VotersAndVotesForm", () => {
       await screen.findByTestId("voters_votes_counts_form");
       overrideOnce("post", "/api/data_entries/1/1", 200, {
         validation_results: {
-          errors: [
-            {
-              fields: [
-                "data.voters_counts.total_admitted_voters_count",
-                "data.voters_counts.poll_card_count",
-                "data.voters_counts.proxy_certificate_count",
-              ],
-              code: "F201",
-            },
-          ],
+          errors: [validationResultMockData.F201],
           warnings: [],
         },
       });
@@ -723,12 +714,7 @@ describe("Test VotersAndVotesForm", () => {
     test("Both errors and warning feedback should be shown", async () => {
       overrideOnce("post", "/api/data_entries/1/1", 200, {
         validation_results: {
-          errors: [
-            {
-              fields: ["data.votes_counts.blank_votes_count"],
-              code: "F201",
-            },
-          ],
+          errors: [validationResultMockData.F201],
           warnings: [{ fields: ["data.votes_counts.blank_votes_count"], code: "W201" }],
         },
       });

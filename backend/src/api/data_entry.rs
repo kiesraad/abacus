@@ -524,8 +524,10 @@ async fn data_entry_discard(
 
     let user_id = user.id();
     let new_state = match entry_number {
-        EntryNumber::FirstEntry => state.delete_first_entry(user_id)?,
-        EntryNumber::SecondEntry => state.delete_second_entry(user_id, &context.election)?,
+        EntryNumber::FirstEntry => state.discard_first_entry_in_progress(user_id)?,
+        EntryNumber::SecondEntry => {
+            state.discard_second_entry_in_progress(user_id, &context.election)?
+        }
     };
 
     let data_entry = data_entry_repo::update(&mut tx, data_entry_id, &new_state).await?;
@@ -793,8 +795,8 @@ async fn data_entry_resolve_errors(
     let (.., state) = validate_and_get_data(&mut tx, data_entry_id, &user).await?;
 
     let new_state = match action {
-        ResolveErrorsAction::DiscardFirstEntry => state.discard_first_entry()?,
-        ResolveErrorsAction::ResumeFirstEntry => state.resume_first_entry()?,
+        ResolveErrorsAction::DiscardFirstEntry => state.discard_first_entry_with_errors()?,
+        ResolveErrorsAction::ResumeFirstEntry => state.resume_first_entry_with_errors()?,
     };
 
     let data_entry = data_entry_repo::update(&mut tx, data_entry_id, &new_state).await?;
@@ -912,7 +914,7 @@ async fn data_entry_resolve_differences(
         | ResolveDifferencesAction::KeepSecondAndCorrectFirst => {
             state.keep_second_entry(&context.election)?
         }
-        ResolveDifferencesAction::DiscardBoth => state.delete_entries()?,
+        ResolveDifferencesAction::DiscardBoth => state.discard_entries()?,
     };
 
     let data_entry = data_entry_repo::update(&mut tx, data_entry_id, &new_state).await?;

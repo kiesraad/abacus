@@ -32,7 +32,7 @@ pub enum DataEntryTransitionError {
     SecondEntryAlreadyClaimed,
     FirstEntryAlreadyFinalised,
     SecondEntryAlreadyFinalised,
-    /// An existing first/second data entry needs to be saved, finalised, or deleted by the same user
+    /// An existing first/second data entry needs to be saved, finalised, or discarded by the same user
     CannotTransitionUsingDifferentUser,
     /// The second data entry needs to be claimed by a user other than the one who claimed the first entry
     SecondEntryNeedsDifferentUser,
@@ -610,8 +610,11 @@ impl DataEntryStatus {
         }
     }
 
-    /// Delete the first entry while it is in progress
-    pub fn delete_first_entry(self, user_id: UserId) -> Result<Self, DataEntryTransitionError> {
+    /// Discard the first entry while it is in progress
+    pub fn discard_first_entry_in_progress(
+        self,
+        user_id: UserId,
+    ) -> Result<Self, DataEntryTransitionError> {
         match self {
             DataEntryStatus::FirstEntryInProgress(state) => {
                 if state.first_entry_user_id != user_id {
@@ -630,8 +633,8 @@ impl DataEntryStatus {
         }
     }
 
-    /// Delete the second entry while it is in progress
-    pub fn delete_second_entry(
+    /// Discard the second entry while it is in progress
+    pub fn discard_second_entry_in_progress(
         self,
         user_id: UserId,
         election: &ElectionWithPoliticalGroups,
@@ -665,7 +668,7 @@ impl DataEntryStatus {
     }
 
     /// Resume first data entry while resolving accepted errors
-    pub fn resume_first_entry(&self) -> Result<Self, DataEntryTransitionError> {
+    pub fn resume_first_entry_with_errors(&self) -> Result<Self, DataEntryTransitionError> {
         match self {
             DataEntryStatus::FirstEntryHasErrors(state) => {
                 Ok(Self::FirstEntryInProgress(FirstEntryInProgress {
@@ -680,15 +683,15 @@ impl DataEntryStatus {
     }
 
     /// Discard first data entry while resolving accepted errors
-    pub fn discard_first_entry(&self) -> Result<Self, DataEntryTransitionError> {
+    pub fn discard_first_entry_with_errors(&self) -> Result<Self, DataEntryTransitionError> {
         match self {
             DataEntryStatus::FirstEntryHasErrors(_) => Ok(Self::Empty),
             _ => Err(DataEntryTransitionError::Invalid),
         }
     }
 
-    /// Delete both entries while resolving differences
-    pub fn delete_entries(self) -> Result<Self, DataEntryTransitionError> {
+    /// Discard both entries while resolving differences
+    pub fn discard_entries(self) -> Result<Self, DataEntryTransitionError> {
         match self {
             DataEntryStatus::EntriesDifferent(_) => Ok(Self::Empty),
             _ => Err(DataEntryTransitionError::Invalid),
@@ -1197,13 +1200,13 @@ mod tests {
         );
     }
 
-    /// FirstEntryInProgress --> Empty: delete
+    /// FirstEntryInProgress --> Empty: discard
     #[test]
     fn first_entry_in_progress_to_empty() {
         // Happy path
         assert!(matches!(
             first_entry_in_progress()
-                .delete_first_entry(UserId::from(0))
+                .discard_first_entry_in_progress(UserId::from(0))
                 .unwrap(),
             DataEntryStatus::Empty
         ));
@@ -1211,32 +1214,32 @@ mod tests {
 
     // Error states
     #[test]
-    fn first_entry_finalised_delete_first_entry_error() {
+    fn first_entry_finalised_discard_first_entry_error() {
         assert_eq!(
-            first_entry_finalised().delete_first_entry(UserId::from(0)),
+            first_entry_finalised().discard_first_entry_in_progress(UserId::from(0)),
             Err(DataEntryTransitionError::FirstEntryAlreadyFinalised)
         );
     }
     #[test]
-    fn second_entry_in_progress_delete_first_entry_error() {
+    fn second_entry_in_progress_discard_first_entry_error() {
         assert_eq!(
-            second_entry_in_progress().delete_first_entry(UserId::from(0)),
+            second_entry_in_progress().discard_first_entry_in_progress(UserId::from(0)),
             Err(DataEntryTransitionError::FirstEntryAlreadyFinalised)
         );
     }
     #[test]
-    fn definitive_delete_first_entry_error() {
+    fn definitive_discard_first_entry_error() {
         assert_eq!(
-            definitive().delete_first_entry(UserId::from(0)),
+            definitive().discard_first_entry_in_progress(UserId::from(0)),
             Err(DataEntryTransitionError::SecondEntryAlreadyFinalised)
         );
     }
 
-    /// FirstEntryInProgress --> Empty: error when deleting as a different user
+    /// FirstEntryInProgress --> Empty: error when discarding as a different user
     #[test]
-    fn first_entry_in_progress_delete_as_other_user_error() {
+    fn first_entry_in_progress_discard_as_other_user_error() {
         assert_eq!(
-            first_entry_in_progress().delete_first_entry(UserId::from(1)),
+            first_entry_in_progress().discard_first_entry_in_progress(UserId::from(1)),
             Err(DataEntryTransitionError::CannotTransitionUsingDifferentUser)
         );
     }
@@ -1508,22 +1511,23 @@ mod tests {
         assert!(matches!(next, DataEntryStatus::EntriesDifferent(_)));
     }
 
-    /// SecondEntryInProgress --> FirstEntryFinalised: delete
+    /// SecondEntryInProgress --> FirstEntryFinalised: discard
     #[test]
     fn second_entry_in_progress_to_first_entry_finalised() {
         assert!(matches!(
             second_entry_in_progress()
-                .delete_second_entry(UserId::from(0), &election())
+                .discard_second_entry_in_progress(UserId::from(0), &election())
                 .unwrap(),
             DataEntryStatus::FirstEntryFinalised(_)
         ));
     }
 
-    /// SecondEntryInProgress --> FirstEntryFinalised: error when deleting as a different user
+    /// SecondEntryInProgress --> FirstEntryFinalised: error when discarding as a different user
     #[test]
-    fn second_entry_in_progress_delete_as_other_user_error() {
+    fn second_entry_in_progress_discard_as_other_user_error() {
         assert_eq!(
-            second_entry_in_progress().delete_second_entry(UserId::from(1), &election()),
+            second_entry_in_progress()
+                .discard_second_entry_in_progress(UserId::from(1), &election()),
             Err(DataEntryTransitionError::CannotTransitionUsingDifferentUser)
         );
     }
@@ -1531,7 +1535,7 @@ mod tests {
     #[test]
     fn has_errors_discard_first() {
         assert!(matches!(
-            first_entry_has_errors().discard_first_entry(),
+            first_entry_has_errors().discard_first_entry_with_errors(),
             Ok(DataEntryStatus::Empty)
         ));
     }
@@ -1539,7 +1543,7 @@ mod tests {
     #[test]
     fn has_errors_resume_first() {
         assert!(matches!(
-            first_entry_has_errors().resume_first_entry(),
+            first_entry_has_errors().resume_first_entry_with_errors(),
             Ok(DataEntryStatus::FirstEntryInProgress(
                 FirstEntryInProgress {
                     first_entry_user_id,
@@ -1550,9 +1554,9 @@ mod tests {
     }
 
     #[test]
-    fn definitive_delete_second_entry_error() {
+    fn definitive_discard_second_entry_error() {
         assert_eq!(
-            definitive().delete_second_entry(UserId::from(0), &election()),
+            definitive().discard_second_entry_in_progress(UserId::from(0), &election()),
             Err(DataEntryTransitionError::SecondEntryAlreadyFinalised)
         );
     }
@@ -1641,14 +1645,14 @@ mod tests {
     #[test]
     fn entries_different_to_empty() {
         let initial = entries_different();
-        let next = initial.delete_entries().unwrap();
+        let next = initial.discard_entries().unwrap();
         assert!(matches!(next, DataEntryStatus::Empty));
     }
 
     #[test]
-    fn definitive_delete_entries_error() {
+    fn definitive_discard_entries_error() {
         assert_eq!(
-            definitive().delete_entries(),
+            definitive().discard_entries(),
             Err(DataEntryTransitionError::Invalid)
         );
     }
@@ -1852,23 +1856,23 @@ mod tests {
         }
 
         #[test]
-        fn delete_second_entry_without_warnings() {
+        fn discard_second_entry_without_warnings() {
             assert_eq!(
                 second_entry_in_progress()
-                    .delete_second_entry(UserId::from(0), &election())
+                    .discard_second_entry_in_progress(UserId::from(0), &election())
                     .unwrap()
                     .finalised_with_warnings(),
                 Some(&false)
             )
         }
         #[test]
-        fn delete_second_entry_first_with_warnings() {
+        fn discard_second_entry_first_with_warnings() {
             let mut status = second_entry_in_progress();
             status.set_first_entry(example_results().with_warning());
 
             assert_eq!(
                 status
-                    .delete_second_entry(UserId::from(0), &election())
+                    .discard_second_entry_in_progress(UserId::from(0), &election())
                     .unwrap()
                     .finalised_with_warnings(),
                 Some(&true)
@@ -1876,13 +1880,13 @@ mod tests {
         }
 
         #[test]
-        fn delete_second_entry_second_with_warnings() {
+        fn discard_second_entry_second_with_warnings() {
             let mut status = second_entry_in_progress();
             status.set_second_entry(example_results().with_warning());
 
             assert_eq!(
                 status
-                    .delete_second_entry(UserId::from(0), &election())
+                    .discard_second_entry_in_progress(UserId::from(0), &election())
                     .unwrap()
                     .finalised_with_warnings(),
                 Some(&false)

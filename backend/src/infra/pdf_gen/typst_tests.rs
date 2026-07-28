@@ -35,10 +35,11 @@ async fn it_generates_a_pdf() {
         political_groups: vec![],
     };
 
+    let summary = ElectionSummary::zero(&election);
     let content = generate_pdf(
         ModelNa31_2Input {
-            summary: ElectionSummary::zero().into(),
-            votes_tables: VotesTables::new(&election, &ElectionSummary::zero()).unwrap(),
+            summary: summary.clone().into(),
+            votes_tables: VotesTables::new(&election, &summary).unwrap(),
             committee_session: committee_session_fixture(ElectionId::from(1)),
             election: election.into(),
             polling_stations: vec![],

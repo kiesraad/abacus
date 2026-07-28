@@ -31,7 +31,11 @@ fn init_tls_creates_ca_and_exits_without_database() {
     let stdout = String::from_utf8_lossy(&output.stdout);
     assert!(
         stdout.contains("CA SHA-256 fingerprint:"),
-        "stdout should include the fingerprint line, got:\n{stdout}"
+        "stdout should include the SHA-256 fingerprint line, got:\n{stdout}"
+    );
+    assert!(
+        stdout.contains("CA SHA-1 fingerprint:"),
+        "stdout should include the SHA-1 fingerprint line, got:\n{stdout}"
     );
 
     assert!(

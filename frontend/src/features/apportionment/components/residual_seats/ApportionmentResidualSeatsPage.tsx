@@ -5,14 +5,7 @@ import { t, tx } from "@/i18n/translate";
 import type { ApportionmentState, PoliticalGroup, SeatAssignment } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 import { useApportionmentContext } from "../../hooks/useApportionmentContext";
-import { getResultChanges, splitResultChanges } from "../../utils/seat-change";
-import {
-  getRemovalSteps,
-  isAbsoluteMajorityReassignmentStep,
-  isHighestAverageAssignmentStep,
-  isLargestRemainderAssignmentStep,
-  isUniqueHighestAverageAssignmentStep,
-} from "../../utils/steps";
+import { buildAssignmentTableData } from "../../utils/seat-change";
 import { apportionmentCheckStateAndRedirect, renderTitleAndHeader } from "../../utils/utils";
 import cls from "../Apportionment.module.css";
 import { ApportionmentErrorPage } from "../ApportionmentError";
@@ -53,23 +46,11 @@ interface CouncilSectionProps {
 }
 
 function SmallCouncilSection({ seatAssignment, politicalGroups, state }: CouncilSectionProps) {
-  const absoluteMajorityStep = seatAssignment.steps.find(isAbsoluteMajorityReassignmentStep);
-  const uniqueHighestAverageSteps = seatAssignment.steps.filter(isUniqueHighestAverageAssignmentStep);
-  const largestRemainderSteps = seatAssignment.steps.filter(isLargestRemainderAssignmentStep);
-  const highestAverageSteps = seatAssignment.steps.filter(isHighestAverageAssignmentStep);
+  const tableData = buildAssignmentTableData(seatAssignment.steps, state);
 
-  const { residualSeatRemovalSteps, listsWithFullSeatsRemoved } = getRemovalSteps(seatAssignment);
-  const resultChanges = getResultChanges(
-    listsWithFullSeatsRemoved,
-    state,
-    absoluteMajorityStep,
-    residualSeatRemovalSteps,
-  );
-
-  const { largestRemainderResultChanges, uniqueHighestAverageResultChanges } = splitResultChanges(
-    resultChanges,
-    largestRemainderSteps,
-  );
+  const largestRemainderSteps = tableData.LargestRemainderAssignment.steps;
+  const uniqueHighestAverageSteps = tableData.UniqueHighestAverageAssignment.steps;
+  const highestAverageSteps = tableData.HighestAverageAssignment.steps;
 
   return (
     <>
@@ -81,7 +62,7 @@ function SmallCouncilSection({ seatAssignment, politicalGroups, state }: Council
             steps={largestRemainderSteps}
             standings={seatAssignment.standings}
             politicalGroups={politicalGroups}
-            resultChanges={largestRemainderResultChanges}
+            resultChanges={tableData.LargestRemainderAssignment.resultChanges}
           />
         )}
       </div>
@@ -99,7 +80,7 @@ function SmallCouncilSection({ seatAssignment, politicalGroups, state }: Council
             largestRemainderSteps={largestRemainderSteps}
             standings={seatAssignment.standings}
             politicalGroups={politicalGroups}
-            resultChanges={uniqueHighestAverageResultChanges}
+            resultChanges={tableData.UniqueHighestAverageAssignment.resultChanges}
           />
           {highestAverageSteps.length > 0 && (
             <>
@@ -125,16 +106,9 @@ function SmallCouncilSection({ seatAssignment, politicalGroups, state }: Council
 }
 
 function LargeCouncilSection({ seatAssignment, politicalGroups, state }: CouncilSectionProps) {
-  const absoluteMajorityStep = seatAssignment.steps.find(isAbsoluteMajorityReassignmentStep);
-  const highestAverageSteps = seatAssignment.steps.filter(isHighestAverageAssignmentStep);
+  const tableData = buildAssignmentTableData(seatAssignment.steps, state);
 
-  const { residualSeatRemovalSteps, listsWithFullSeatsRemoved } = getRemovalSteps(seatAssignment);
-  const resultChanges = getResultChanges(
-    listsWithFullSeatsRemoved,
-    state,
-    absoluteMajorityStep,
-    residualSeatRemovalSteps,
-  );
+  const highestAverageSteps = tableData.HighestAverageAssignment.steps;
 
   return (
     <div>
@@ -146,7 +120,7 @@ function LargeCouncilSection({ seatAssignment, politicalGroups, state }: Council
           steps={highestAverageSteps}
           standings={seatAssignment.standings}
           politicalGroups={politicalGroups}
-          resultChanges={resultChanges}
+          resultChanges={tableData.HighestAverageAssignment.resultChanges}
           state={state}
         />
       )}

@@ -2,9 +2,8 @@
 #import "common/scripts.typ": *
 #let input = json("inputs/model-n-10-2.json")
 
-#let is_municipality = (municipal, public_body) => if (
-  input.election.category == "Municipal"
-) { municipal } else { public_body }
+#let is_municipality = (municipal, public_body) => is_municipality(input.election.location, municipal, public_body)
+#let is_local_election = (local, other) => is_local_election(input.election.category, local, other)
 
 #let is_mobile = "polling_station_type" in input.polling_station and input.polling_station.polling_station_type == "Mobile"
 
@@ -159,7 +158,7 @@ Bijvoorbeeld als er meerdere verkiezingen tegelijk werden georganiseerd, en een 
 
 == Toegelaten kiezers
 
-#is_municipality[
+#is_local_election[
   Tel het aantal geldige stempassen en volmachtbewijzen
 
   #sum(

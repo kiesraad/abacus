@@ -5611,6 +5611,8 @@
           "DataEntryReturnedFirst",
           "DataEntryKeptFirst",
           "DataEntryKeptSecond",
+          "DataEntryKeptFirstReturnedSecond",
+          "DataEntryKeptSecondReturnedFirst",
           "DataEntryDiscardedBoth",
           "AirGapViolationDetected",
           "AirGapViolationResolved",
@@ -6728,6 +6730,7 @@
           "location",
           "domain_id",
           "category",
+          "sub_category",
           "number_of_seats",
           "number_of_voters",
           "election_date",
@@ -6775,6 +6778,9 @@
             "type": "integer",
             "format": "int32",
             "minimum": 0
+          },
+          "sub_category": {
+            "$ref": "#/components/schemas/ElectionSubCategory"
           }
         },
         "additionalProperties": false
@@ -6809,7 +6815,9 @@
         "type": "string",
         "description": "Election category (limited for now)",
         "enum": [
-          "Municipal"
+          "Municipal",
+          "Provincial",
+          "WaterAuthority"
         ]
       },
       "ElectionCreationRequest": {
@@ -7103,6 +7111,18 @@
         },
         "additionalProperties": false
       },
+      "ElectionSubCategory": {
+        "type": "string",
+        "description": "Election sub category (limited for now)",
+        "enum": [
+          "AB1",
+          "AB2",
+          "GR1",
+          "GR2",
+          "PS1",
+          "PS2"
+        ]
+      },
       "ElectionSummary": {
         "type": "object",
         "description": "Contains a summary of the election results, added up from the votes of all polling stations.",
@@ -7157,6 +7177,7 @@
           "location",
           "domain_id",
           "category",
+          "sub_category",
           "number_of_seats",
           "number_of_voters",
           "election_date",
@@ -7211,6 +7232,9 @@
             "items": {
               "$ref": "#/components/schemas/PoliticalGroup"
             }
+          },
+          "sub_category": {
+            "$ref": "#/components/schemas/ElectionSubCategory"
           }
         },
         "additionalProperties": false
@@ -7492,6 +7516,7 @@
         "description": "Abacus API and asset server",
         "required": [
           "committee_category",
+          "election_category",
           "political_groups",
           "candidates_per_group",
           "polling_stations",
@@ -7521,6 +7546,10 @@
           "custom_name": {
             "type": "string",
             "description": "Custom election name"
+          },
+          "election_category": {
+            "$ref": "#/components/schemas/ElectionCategory",
+            "description": "Municipal, Provincial or WaterAuthority"
           },
           "first_data_entry": {
             "$ref": "#/components/schemas/RandomRange",
@@ -8146,6 +8175,7 @@
           "location",
           "domain_id",
           "category",
+          "sub_category",
           "number_of_seats",
           "number_of_voters",
           "election_date",
@@ -8190,6 +8220,9 @@
             "type": "integer",
             "format": "int32",
             "minimum": 0
+          },
+          "sub_category": {
+            "$ref": "#/components/schemas/ElectionSubCategory"
           }
         },
         "additionalProperties": false
@@ -8742,9 +8775,11 @@
       "ResolveDifferencesAction": {
         "type": "string",
         "enum": [
-          "keep_first_entry",
-          "keep_second_entry",
-          "discard_both_entries"
+          "keep_first_and_discard_second",
+          "keep_first_and_correct_second",
+          "keep_second_and_discard_first",
+          "keep_second_and_correct_first",
+          "discard_both"
         ]
       },
       "ResolveErrorsAction": {
@@ -9311,6 +9346,12 @@
             "type": "integer",
             "format": "int32",
             "description": "Total number of admitted voters (\"Totaal aantal toegelaten kiezers\")",
+            "minimum": 0
+          },
+          "voter_card_count": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Number of valid voter cards (\"Aantal geldige kiezerspassen\")",
             "minimum": 0
           }
         },

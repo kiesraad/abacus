@@ -79,7 +79,7 @@ async fn generate_p22_2_variants(args: &GenerateElectionArgs, pool: &SqlitePool)
         pool,
         15,
         vec![
-            vec![2571, 0, 0, 0, 0, 0, 0],
+            vec![2571, 0, 0, 0, 0],
             vec![977, 0, 0, 0],
             vec![567, 0],
             vec![536, 0],

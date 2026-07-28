@@ -1,7 +1,117 @@
 [
   {
+    "id": "extra_investigation",
+    "sectionNumber": "B1-1",
+    "short_title": "Extra onderzoek",
+    "subsections": [
+      {
+        "message": "Neem de vinkjes over zoals ze op het papieren formulier zijn gezet.",
+        "type": "message",
+      },
+      {
+        "error_message": "Controleer of je antwoord gelijk is aan het papieren proces-verbaal",
+        "error_path": "extra_investigation.extra_investigation_other_reason",
+        "options": [
+          {
+            "autoFocusInput": true,
+            "label": "Ja",
+            "path": "extra_investigation.extra_investigation_other_reason.yes",
+            "short_label": "Ja",
+          },
+          {
+            "label": "Nee",
+            "path": "extra_investigation.extra_investigation_other_reason.no",
+            "short_label": "Nee",
+          },
+        ],
+        "short_title": "Extra onderzoek vanwege andere reden dan onverklaard verschil?",
+        "title": "Heeft het gemeentelijk stembureau extra onderzoek gedaan vanwege een andere reden dan een onverklaard verschil?",
+        "type": "checkboxes",
+      },
+      {
+        "error_message": "Controleer of je antwoord gelijk is aan het papieren proces-verbaal",
+        "error_path": "extra_investigation.ballots_recounted_extra_investigation",
+        "options": [
+          {
+            "label": "Ja",
+            "path": "extra_investigation.ballots_recounted_extra_investigation.yes",
+            "short_label": "Ja",
+          },
+          {
+            "label": "Nee",
+            "path": "extra_investigation.ballots_recounted_extra_investigation.no",
+            "short_label": "Nee",
+          },
+        ],
+        "short_title": "Stembiljetten na onderzoek (deels) herteld?",
+        "title": "Zijn de stembiljetten naar aanleiding van het extra onderzoek (gedeeltelijk) herteld?",
+        "type": "checkboxes",
+      },
+    ],
+    "title": "Alleen bij extra onderzoek",
+  },
+  {
+    "id": "counting_differences_polling_station",
+    "sectionNumber": "B1-2",
+    "short_title": "Verschillen met stembureau",
+    "subsections": [
+      {
+        "message": "Neem de vinkjes over zoals ze op het papieren formulier zijn gezet.",
+        "type": "message",
+      },
+      {
+        "title": "2.1  Aantallen kiezers en stemmen",
+        "type": "heading",
+      },
+      {
+        "error_message": "Controleer of je antwoord gelijk is aan het papieren proces-verbaal",
+        "error_path": "counting_differences_polling_station.unexplained_difference_ballots_voters",
+        "options": [
+          {
+            "autoFocusInput": true,
+            "label": "Ja",
+            "path": "counting_differences_polling_station.unexplained_difference_ballots_voters.yes",
+            "short_label": "Ja",
+          },
+          {
+            "label": "Nee",
+            "path": "counting_differences_polling_station.unexplained_difference_ballots_voters.no",
+            "short_label": "Nee",
+          },
+        ],
+        "short_title": "Verschil tussen getelde stembiljetten en toegelaten kiezers?",
+        "title": "Was er in de telresultaten van het stembureau een onverklaard verschil tussen het totaal aantal getelde stembiljetten en het aantal toegelaten kiezers?",
+        "type": "checkboxes",
+      },
+      {
+        "title": "2.3 Tellingen op lijstniveau",
+        "type": "heading",
+      },
+      {
+        "error_message": "Controleer of je antwoord gelijk is aan het papieren proces-verbaal",
+        "error_path": "counting_differences_polling_station.difference_ballots_per_list",
+        "options": [
+          {
+            "label": "Ja",
+            "path": "counting_differences_polling_station.difference_ballots_per_list.yes",
+            "short_label": "Ja",
+          },
+          {
+            "label": "Nee",
+            "path": "counting_differences_polling_station.difference_ballots_per_list.no",
+            "short_label": "Nee",
+          },
+        ],
+        "short_title": "Verschil tussen totalen per lijst op stembureau en gemeentelijk stembureau?",
+        "title": "Is er een verschil tussen het totaal aantal getelde stembiljetten per lijst zoals eerder vastgesteld door het stembureau en zoals door u geteld op het gemeentelijk stembureau?",
+        "type": "checkboxes",
+      },
+    ],
+    "title": "Verschillen met telresultaten van het stembureau",
+  },
+  {
     "id": "voters_votes_counts",
-    "sectionNumber": "",
+    "sectionNumber": "B1-3.1 en 3.2",
     "short_title": "Aantal kiezers en stemmen",
     "subsections": [
       {
@@ -13,35 +123,21 @@
         "rows": [
           {
             "autoFocusInput": true,
-            "code": "Z",
-            "path": "number_of_voters",
-            "title": "Kiesgerechtigden",
-          },
-        ],
-        "type": "inputGrid",
-      },
-      {
-        "message": "Voer je een corrigendum in, en staat het aantal kiesgerechtigden niet op het formulier? Pak dan het oorspronkelijke proces-verbaal erbij, en vul de waarde in die daar staat ingevuld.",
-        "type": "message",
-      },
-      {
-        "headers": [
-          "Veld",
-          "Geteld aantal",
-          "Omschrijving",
-        ],
-        "rows": [
-          {
-            "autoFocusInput": false,
             "code": "A",
             "path": "voters_counts.poll_card_count",
             "title": "Stempassen",
           },
           {
-            "addSeparator": true,
             "code": "B",
             "path": "voters_counts.proxy_certificate_count",
             "title": "Volmachtbewijzen",
+          },
+          {
+            "addSeparator": true,
+            "code": "C",
+            "isDisabled": false,
+            "path": "voters_counts.voter_card_count",
+            "title": "Kiezerspassen",
           },
           {
             "addSeparator": true,
@@ -89,16 +185,48 @@
         "type": "inputGrid",
       },
     ],
-    "title": "Kiesgerechtigden, toegelaten kiezers en uitgebrachte stemmen",
+    "title": "Toegelaten kiezers en uitgebrachte stemmen",
   },
   {
     "id": "differences_counts",
+    "sectionNumber": "B1-3.3",
     "short_title": "Verschillen D & H",
     "subsections": [
       {
-        "message": "De vinkvraag op deze pagina in het proces-verbaal vul je niet in Abacus in.",
-        "type": "message",
-        "variant": "dimmed",
+        "error_message": "Controleer of je antwoord gelijk is aan het papieren proces-verbaal",
+        "error_path": "differences_counts.compare_votes_cast_admitted_voters",
+        "options": [
+          {
+            "autoFocusInput": true,
+            "label": "D en H zijn gelijk",
+            "path": "differences_counts.compare_votes_cast_admitted_voters.admitted_voters_equal_votes_cast",
+            "short_label": "D en H zijn gelijk",
+          },
+          {
+            "label": "H is groter dan D (meer uitgebrachte stemmen dan toegelaten kiezers)",
+            "path": "differences_counts.compare_votes_cast_admitted_voters.votes_cast_greater_than_admitted_voters",
+            "short_label": "H is groter dan D",
+          },
+          {
+            "label": "H is kleiner dan D (minder uitgebrachte stemmen dan toegelaten kiezers)",
+            "path": "differences_counts.compare_votes_cast_admitted_voters.votes_cast_smaller_than_admitted_voters",
+            "short_label": "H is kleiner dan D",
+          },
+        ],
+        "short_title": "Extra onderzoek vanwege andere reden dan onverklaard verschil?",
+        "title": <React.Fragment>
+          <strong>
+            <React.Fragment>
+              <React.Fragment>
+                3.3.1
+              </React.Fragment>
+            </React.Fragment>
+          </strong>
+          <React.Fragment>
+             Vergelijk D (totaal toegelaten kiezers) en H (totaal uitgebrachte stemmen)
+          </React.Fragment>
+        </React.Fragment>,
+        "type": "checkboxes",
       },
       {
         "headers": [
@@ -110,15 +238,55 @@
           {
             "code": "I",
             "path": "differences_counts.more_ballots_count",
-            "title": "Totaal aantal méér getelde stemmen",
+            "title": "Aantal méér getelde stemmen",
           },
           {
             "code": "J",
             "path": "differences_counts.fewer_ballots_count",
-            "title": "Totaal aantal minder getelde stemmen",
+            "title": "Aantal minder getelde stemmen",
           },
         ],
         "type": "inputGrid",
+      },
+      {
+        "error_message": "Controleer of je antwoord gelijk is aan het papieren proces-verbaal",
+        "error_path": "differences_counts.difference_completely_accounted_for",
+        "options": [
+          {
+            "label": "Ja",
+            "path": "differences_counts.difference_completely_accounted_for.yes",
+            "short_label": "Ja",
+          },
+          {
+            "label": "Nee, er is een onverklaard verschil",
+            "path": "differences_counts.difference_completely_accounted_for.no",
+            "short_label": "Nee, er is een onverklaard verschil",
+          },
+        ],
+        "short_title": "Verschil tussen D en H volledig verklaard?",
+        "title": <React.Fragment>
+          <strong>
+            <React.Fragment>
+              <React.Fragment>
+                3.3.2
+              </React.Fragment>
+            </React.Fragment>
+          </strong>
+          <React.Fragment>
+             Zijn er tijdens de stemming dingen opgeschreven die het verschil tussen D en H 
+          </React.Fragment>
+          <strong>
+            <React.Fragment>
+              <React.Fragment>
+                volledig
+              </React.Fragment>
+            </React.Fragment>
+          </strong>
+          <React.Fragment>
+             verklaren?
+          </React.Fragment>
+        </React.Fragment>,
+        "type": "checkboxes",
       },
     ],
     "title": "Verschillen tussen aantal kiezers en uitgebrachte stemmen",

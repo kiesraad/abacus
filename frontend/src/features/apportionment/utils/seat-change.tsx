@@ -1,118 +1,183 @@
 import type { JSX } from "react/jsx-runtime";
-import type { ApportionmentState } from "@/types/generated/openapi";
+import type { ApportionmentState, SeatChange, SeatChangeStep } from "@/types/generated/openapi";
 import cls from "../components/Apportionment.module.css";
-import type {
-  AbsoluteMajorityReassignmentStep,
-  LargestRemainderAssignmentStep,
-  ListExhaustionRemovalStep,
+import {
+  isAbsoluteMajorityReassignmentStep,
+  isHighestAverageAssignmentStep,
+  isLargestRemainderAssignmentStep,
+  isListExhaustionRemovalStep,
+  isUniqueHighestAverageAssignmentStep,
+  type ListExhaustionRemovalStep,
+  type SpecificStep,
 } from "./steps";
 import { isListDrawingLotsVariant } from "./utils";
 
 export interface ResultChange {
   listNumber: number;
   footnoteNumber: number;
-  increase: number;
-  decrease: number;
-  type: "full_seat" | "residual_seat";
+  delta: number;
+  seat_type: "FullSeat" | "ResidualSeat";
+  type: "FullSeatRemoval" | "AbsoluteMajorityDrawingOfLots" | "AbsoluteMajorityReassignment" | "ResidualSeatRemoval";
 }
 
-export function getResultChanges(
-  uniquePgNumbersWithFullSeatsRemoved: number[],
-  state: ApportionmentState,
-  absoluteMajorityReassignment?: AbsoluteMajorityReassignmentStep,
-  residualSeatRemovalSteps?: ListExhaustionRemovalStep[],
-) {
-  const resultChanges: ResultChange[] = [];
-  let footnoteNumber = 0;
-  uniquePgNumbersWithFullSeatsRemoved.forEach((listNumber) => {
-    footnoteNumber += 1;
-    resultChanges.push({
-      listNumber: listNumber,
-      footnoteNumber: footnoteNumber,
-      increase: 0,
-      decrease: 1,
-      type: "full_seat",
-    });
-  });
-  if (isListDrawingLotsVariant(state, ["AbsoluteMajorityHighestAverage", "AbsoluteMajorityLargestRemainder"])) {
-    footnoteNumber += 1;
-    resultChanges.push({
-      listNumber: state.drawing_lots_required.assign_to,
-      footnoteNumber: footnoteNumber,
-      increase: 0,
-      decrease: 0,
-      type: "residual_seat",
-    });
-    state.drawing_lots_required.options.forEach((list) => {
-      resultChanges.push({
-        listNumber: list,
-        footnoteNumber: footnoteNumber,
-        increase: 0,
-        decrease: 0,
-        type: "residual_seat",
-      });
-    });
-  }
-  if (absoluteMajorityReassignment) {
-    footnoteNumber += 1;
-    resultChanges.push({
-      listNumber: absoluteMajorityReassignment.change.list_assigned_seat,
-      footnoteNumber: footnoteNumber,
-      increase: 1,
-      decrease: 0,
-      type: "residual_seat",
-    });
-    resultChanges.push({
-      listNumber: absoluteMajorityReassignment.change.list_retracted_seat,
-      footnoteNumber: footnoteNumber,
-      increase: 0,
-      decrease: 1,
-      type: "residual_seat",
-    });
-  }
-  residualSeatRemovalSteps?.forEach((step) => {
-    footnoteNumber += 1;
-    resultChanges.push({
-      listNumber: step.change.list_retracted_seat,
-      footnoteNumber: footnoteNumber,
-      increase: 0,
-      decrease: 1,
-      type: "residual_seat",
-    });
-  });
-  return resultChanges;
+type AssignmentStepType = Extract<
+  SeatChange["changed_by"],
+  "LargestRemainderAssignment" | "HighestAverageAssignment" | "UniqueHighestAverageAssignment"
+>;
+
+type AssignmentTableDatasets = {
+  [T in AssignmentStepType]: {
+    steps: SpecificStep<T>[];
+    resultChanges: ResultChange[];
+  };
+};
+
+function resultChange(
+  listNumber: number,
+  delta: number,
+  seat_type: ResultChange["seat_type"],
+  type: ResultChange["type"],
+): ResultChange {
+  return { listNumber, footnoteNumber: 0, delta, seat_type, type };
 }
 
-export function splitResultChanges(
-  resultChanges: ResultChange[],
-  largestRemainderSteps: LargestRemainderAssignmentStep[],
-) {
-  const listsWithLargestRemainderSeat = new Set(largestRemainderSteps.map((step) => step.change.selected_list_number));
-  const listsWithResidualSeatChange = new Set<number>();
+const emptyTableData = () => ({ steps: [], resultChanges: [] });
 
-  const largestRemainderResultChanges: ResultChange[] = [];
-  const uniqueHighestAverageResultChanges: ResultChange[] = [];
+export function buildAssignmentTableData(steps: SeatChangeStep[], state: ApportionmentState) {
+  const tableData: AssignmentTableDatasets = {
+    LargestRemainderAssignment: emptyTableData(),
+    HighestAverageAssignment: emptyTableData(),
+    UniqueHighestAverageAssignment: emptyTableData(),
+  };
 
-  // The first residual seat change of a list is shown in the largest remainders table
-  // any further changes for that list are shown in the unique highest averages table
-  for (const change of resultChanges) {
-    const isNextResidualSeatChange =
-      change.type === "residual_seat" &&
-      listsWithLargestRemainderSeat.has(change.listNumber) &&
-      listsWithResidualSeatChange.has(change.listNumber);
+  let currentTable: AssignmentStepType | undefined;
+  for (const step of steps) {
+    // Assign every step to the correct table
+    if (isLargestRemainderAssignmentStep(step)) {
+      tableData.LargestRemainderAssignment.steps.push(step);
+      currentTable = step.change.changed_by;
+    } else if (isHighestAverageAssignmentStep(step)) {
+      tableData.HighestAverageAssignment.steps.push(step);
+      currentTable = step.change.changed_by;
+    } else if (isUniqueHighestAverageAssignmentStep(step)) {
+      tableData.UniqueHighestAverageAssignment.steps.push(step);
+      currentTable = step.change.changed_by;
+    }
 
-    if (isNextResidualSeatChange) {
-      uniqueHighestAverageResultChanges.push(change);
-    } else {
-      largestRemainderResultChanges.push(change);
+    // Assign absolute majority and list exhaustion changes based on the current table
+    if (isAbsoluteMajorityReassignmentStep(step)) {
+      // This step can never occur as a first step
+      if (!currentTable) continue;
 
-      if (change.type === "residual_seat") {
-        listsWithResidualSeatChange.add(change.listNumber);
-      }
+      tableData[currentTable].resultChanges.push(
+        resultChange(step.change.list_assigned_seat, 1, "ResidualSeat", "AbsoluteMajorityReassignment"),
+        resultChange(step.change.list_retracted_seat, -1, "ResidualSeat", "AbsoluteMajorityReassignment"),
+      );
+    } else if (isListExhaustionRemovalStep(step)) {
+      addListExhaustionChanges(tableData, currentTable, step.change);
     }
   }
 
-  return { largestRemainderResultChanges, uniqueHighestAverageResultChanges };
+  // Add drawing of lots changes to the current table, if applicable
+  addAbsoluteMajorityDrawingOfLotsChanges(tableData, currentTable, state);
+
+  // Finally update the footnote numbers for all changes in the table data
+  assignFootnoteNumbers(tableData);
+
+  return tableData;
+}
+
+function addListExhaustionChanges(
+  tableData: AssignmentTableDatasets,
+  currentTable: AssignmentStepType | undefined,
+  change: ListExhaustionRemovalStep["change"],
+) {
+  // The full seat removal footnote is only rendered once per list, not for every removal
+  if (change.full_seat) {
+    const existingFullSeatRemoval = tableData.LargestRemainderAssignment.resultChanges.find(
+      (c) => c.type === "FullSeatRemoval" && c.listNumber === change.list_retracted_seat,
+    );
+
+    if (!existingFullSeatRemoval) {
+      tableData.LargestRemainderAssignment.resultChanges.push(
+        resultChange(change.list_retracted_seat, -1, "FullSeat", "FullSeatRemoval"),
+      );
+    } else {
+      existingFullSeatRemoval.delta -= 1;
+    }
+  }
+
+  if (!change.full_seat) {
+    // This step can never occur as a first step
+    if (!currentTable) return;
+
+    const hasUniqueHighestAverageRemoval = tableData.UniqueHighestAverageAssignment.resultChanges.some(
+      (c) => c.type === "ResidualSeatRemoval" && c.listNumber === change.list_retracted_seat,
+    );
+
+    // A list can only get one residual seat removed in UniqueHighestAverageTable, hence another
+    // ResidualSeatRemoval needs to be displayed in the LargestRemainderTable
+    // There is never a footnote for HighestAverageAssignment (< 19 seats), because you can only
+    // have these steps once list exhaustion (P 10) has been completed.
+    const table =
+      currentTable === "UniqueHighestAverageAssignment" && hasUniqueHighestAverageRemoval
+        ? "LargestRemainderAssignment"
+        : currentTable;
+
+    tableData[table].resultChanges.push(
+      resultChange(change.list_retracted_seat, -1, "ResidualSeat", "ResidualSeatRemoval"),
+    );
+  }
+}
+
+function addAbsoluteMajorityDrawingOfLotsChanges(
+  tableData: AssignmentTableDatasets,
+  currentTable: AssignmentStepType | undefined,
+  state: ApportionmentState,
+) {
+  // Drawing of lots can not occur as a first step, so currentTable must be defined
+  if (
+    !isListDrawingLotsVariant(state, ["AbsoluteMajorityHighestAverage", "AbsoluteMajorityLargestRemainder"]) ||
+    !currentTable
+  ) {
+    return;
+  }
+
+  tableData[currentTable].resultChanges.push(
+    resultChange(state.drawing_lots_required.assign_to, 0, "ResidualSeat", "AbsoluteMajorityDrawingOfLots"),
+    ...state.drawing_lots_required.options.map((list) =>
+      resultChange(list, 0, "ResidualSeat", "AbsoluteMajorityDrawingOfLots"),
+    ),
+  );
+}
+
+// Assigns a footnote number to each change in the table data, based on the defined order
+function assignFootnoteNumbers(tableData: AssignmentTableDatasets) {
+  const changes = Object.values(tableData).flatMap((table) => table.resultChanges);
+  const order: Record<ResultChange["type"], number> = {
+    FullSeatRemoval: 0,
+    AbsoluteMajorityDrawingOfLots: 1,
+    AbsoluteMajorityReassignment: 2,
+    ResidualSeatRemoval: 3,
+  };
+  changes.sort((a, b) => order[a.type] - order[b.type]);
+
+  let footnoteNumber = 0;
+  let previousChangeType: ResultChange["type"] | undefined;
+  for (const change of changes) {
+    // Absolute majority types share a footnote if they are consecutive,
+    // so we only increment the footnote number if the previous change was not the same type
+    const sharesFootnoteWithPrevious =
+      ["AbsoluteMajorityDrawingOfLots", "AbsoluteMajorityReassignment"].includes(change.type) &&
+      change.type === previousChangeType;
+
+    if (!sharesFootnoteWithPrevious) {
+      footnoteNumber++;
+    }
+
+    change.footnoteNumber = footnoteNumber;
+    previousChangeType = change.type;
+  }
 }
 
 export function getFootnotesFromResultChanges(listResultChanges: ResultChange[]) {

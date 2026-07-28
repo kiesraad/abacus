@@ -1,23 +1,10 @@
 import type { StoryFn } from "@storybook/react-vite";
-import type { ApportionmentState } from "@/types/generated/openapi";
 import * as gte19SeatsAndP9DrawingLots from "../../testing/gte-19-seats-and-p9-drawing-lots-and-deceased-candidates";
 import * as lt19SeatsAndP9AndP10 from "../../testing/lt-19-seats-and-p9-and-p10";
 import { Footnotes } from "./Footnotes";
 
 export const Default: StoryFn = () => {
-  return (
-    <Footnotes
-      seatAssignment={lt19SeatsAndP9AndP10.seat_assignment}
-      state={
-        {
-          type: "Finalised",
-          deceased_candidates: [],
-          lists_drawn: [],
-          candidates_drawn: [],
-        } satisfies ApportionmentState
-      }
-    />
-  );
+  return <Footnotes seatAssignment={lt19SeatsAndP9AndP10.seat_assignment} state={lt19SeatsAndP9AndP10.state} />;
 };
 
 export const P9BeforeDrawingLots: StoryFn = () => {

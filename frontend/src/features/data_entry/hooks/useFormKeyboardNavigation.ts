@@ -21,7 +21,9 @@ export function useFormKeyboardNavigation(): RefObject<HTMLFormElement | null> {
       return;
     }
 
-    const inputs: NodeListOf<HTMLInputElement> = innerRef.current.querySelectorAll("input, select, textarea");
+    const inputs: NodeListOf<HTMLInputElement> = innerRef.current.querySelectorAll(
+      "input:not(:disabled), select:not(:disabled), textarea:not(:disabled)",
+    );
     const submitButton: HTMLButtonElement | null = innerRef.current.querySelector("button[type=submit]");
 
     const elements: HTMLElement[] = [...inputs];

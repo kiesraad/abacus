@@ -714,7 +714,7 @@ async fn polling_station_investigation_download_corrigendum_pdf(
                 }
             }
         }
-        None => CSOFirstSessionResults::empty(&election.political_groups).as_common(),
+        None => CSOFirstSessionResults::empty(&election).as_common(),
     };
 
     let polling_station: PollingStation = ps.into_polling_station();

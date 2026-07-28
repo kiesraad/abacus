@@ -77,6 +77,6 @@ describe("routes", () => {
     const router = renderWithRouter("typist_gsb");
     await router.navigate("/elections/1/data-entry/1/3");
     expect(router.state.location.pathname).toEqual("/elections/1/data-entry/1/3");
-    await expectNotFound("Het invoer nummer is ongeldig");
+    await expectNotFound("Het invoernummer is ongeldig");
   });
 });

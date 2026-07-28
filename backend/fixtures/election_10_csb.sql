@@ -1,6 +1,6 @@
-INSERT INTO elections (id, name, committee_category, counting_method, election_id, location, domain_id, category, number_of_seats, number_of_voters, election_date, nomination_date, political_groups)
+INSERT INTO elections (id, name, committee_category, counting_method, election_id, location, domain_id, category, sub_category, number_of_seats, number_of_voters, election_date, nomination_date, political_groups)
 -- copy of election_3 with committee_category changed to 'CSB' and subcommittee instead of polling station
-VALUES (10, 'Municipal Re-election', 'CSB', NULL, 'GR2024_Heemdamseburg', 'Heemdamseburg', '9102', 'Municipal', 29, 1, '2024-12-31', '2024-12-01',
+VALUES (10, 'Municipal Re-election', 'CSB', NULL, 'GR2024_Heemdamseburg', 'Heemdamseburg', '9102', 'Municipal', 'GR2', 29, 1, '2024-12-31', '2024-12-01',
         '[
           {
             "number": 1,

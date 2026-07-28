@@ -18,7 +18,8 @@ use crate::{
         data_entry::{DataEntryId, DataEntrySource, DataEntrySourceNumber},
         election::{
             Candidate, CandidateGender, CandidateNumber, CommitteeCategory, ElectionCategory,
-            ElectionId, ElectionWithPoliticalGroups, PGNumber, PoliticalGroup, VoteCountingMethod,
+            ElectionId, ElectionSubCategory, ElectionWithPoliticalGroups, PGNumber, PoliticalGroup,
+            VoteCountingMethod,
         },
         investigation::PollingStationInvestigation,
         models::{
@@ -130,6 +131,7 @@ fn random_election(
     string_length: usize,
     none_where_possible: bool,
 ) -> ElectionWithPoliticalGroups {
+    let number_of_seats = rng.random_range(9..45);
     ElectionWithPoliticalGroups {
         id: ElectionId::from(rng.random_range(0..5)),
         name: random_string(rng, string_length),
@@ -142,7 +144,12 @@ fn random_election(
         location: random_string(rng, string_length),
         domain_id: random_string(rng, string_length),
         category: ElectionCategory::Municipal,
-        number_of_seats: rng.random_range(9..45),
+        sub_category: if number_of_seats < 19 {
+            ElectionSubCategory::GR1
+        } else {
+            ElectionSubCategory::GR2
+        },
+        number_of_seats,
         number_of_voters: rng.random_range(0..=10_000),
         election_date: random_date(rng),
         nomination_date: random_date(rng),
@@ -296,6 +303,7 @@ fn random_result(
         voters_counts: VotersCounts {
             poll_card_count: rng.random_range(0..500),
             proxy_certificate_count: rng.random_range(0..500),
+            voter_card_count: Some(rng.random_range(0..500)),
             total_admitted_voters_count: rng.random_range(0..500),
         },
         votes_counts: VotesCounts {
@@ -356,6 +364,7 @@ fn random_csb_result(
         voters_counts: VotersCounts {
             poll_card_count: rng.random_range(0..500),
             proxy_certificate_count: rng.random_range(0..500),
+            voter_card_count: Some(rng.random_range(0..500)),
             total_admitted_voters_count: rng.random_range(0..500),
         },
         votes_counts: EnrichedVotesCounts {
@@ -770,6 +779,97 @@ async fn test_p_22_2() {
     };
 
     let seat_assignment = map_seat_assignment(&apportionment.seat_assignment);
+    let enriched_seat_assignment =
+        EnrichedSeatAssignment::new(election.number_of_seats, &summary, &seat_assignment).unwrap();
+    let candidate_nomination = map_candidate_nomination(
+        &apportionment.candidate_nomination,
+        &election.political_groups,
+    );
+    let enriched_candidate_nomination =
+        EnrichedCandidateNomination::new(&election, &candidate_nomination).unwrap();
+    let footnotes =
+        ApportionmentFootnotes::new(&election.political_groups, &seat_assignment.steps).unwrap();
+
+    let hash = random_string(&mut rng, 64);
+    let creation_date_time = random_date_time(&mut rng)
+        .format(DEFAULT_DATE_TIME_FORMAT)
+        .to_string();
+
+    let model = PdfModel::ModelP22_2(Box::new(ModelP22_2Input {
+        committee_session,
+        election: election.into(),
+        summary,
+        footnotes,
+        seat_assignment: enriched_seat_assignment,
+        candidate_nomination: enriched_candidate_nomination,
+        hash,
+        creation_date_time,
+    }));
+
+    test_pdf(model).await;
+}
+
+/// Regression test for #3669, "number must be positive" error from Typst.
+/// This reproduces the issue with a large council GR election and zero votes cast.
+#[test(tokio::test)]
+async fn test_p_22_2_no_votes_cast_regression_3669() {
+    use rand::SeedableRng;
+    let mut rng = rand::rngs::StdRng::seed_from_u64(791397299);
+
+    let (parties, candidates, string_length, none_where_possible) = (10, 10, 10, false);
+
+    let mut election = random_election(
+        &mut rng,
+        parties,
+        candidates,
+        string_length,
+        none_where_possible,
+    );
+    // Use large council so residual seats are distributed via the highest-averages method
+    election.number_of_seats = 29;
+    election.sub_category = ElectionSubCategory::GR2;
+
+    let committee_session = random_committee_session(&mut rng, election.id, string_length);
+    let polling_stations = random_polling_stations(&mut rng, string_length, none_where_possible);
+    let data_sources = ps_as_first_data_entry_sources(&polling_stations);
+    let summary = random_election_summary_csb(&mut rng, &election, &data_sources, string_length);
+
+    // Zero votes cast on any candidate/list
+    let political_group_votes: Vec<PoliticalGroupCandidateVotes> = election
+        .political_groups
+        .iter()
+        .map(|group| PoliticalGroupCandidateVotes {
+            number: group.number,
+            total: 0,
+            candidate_votes: group
+                .candidates
+                .iter()
+                .map(|candidate| CandidateVotes {
+                    number: candidate.number,
+                    votes: 0,
+                })
+                .collect(),
+        })
+        .collect();
+
+    let apportionment_input = ApportionmentInputData::new(
+        election.number_of_seats,
+        &political_group_votes,
+        &[],
+        &[],
+        &[],
+    );
+    let apportionment_result = apportionment::process(&apportionment_input);
+    let Ok(ApportionmentOutput::Completed(apportionment)) = apportionment_result else {
+        panic!("apportionment should be Completed");
+    };
+
+    let seat_assignment = map_seat_assignment(&apportionment.seat_assignment);
+    assert!(
+        seat_assignment.steps.is_empty(),
+        "expected no seat assignment steps when zero votes are cast"
+    );
+
     let enriched_seat_assignment =
         EnrichedSeatAssignment::new(election.number_of_seats, &summary, &seat_assignment).unwrap();
     let candidate_nomination = map_candidate_nomination(

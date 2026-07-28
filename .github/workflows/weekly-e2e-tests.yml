@@ -19,9 +19,9 @@ jobs:
     env:
       SHOW_DEV_PAGE: false
     steps:
-      - uses: actions/checkout@v7.0.0
+      - uses: actions/checkout@v7.0.1
       - name: Setup Node
-        uses: actions/setup-node@v6.4.0
+        uses: actions/setup-node@v7.0.0
         with:
           node-version: 24
           package-manager-cache: false
@@ -60,7 +60,7 @@ jobs:
       CARGO_TERM_COLOR: always
       SQLX_OFFLINE: "true"
     steps:
-      - uses: actions/checkout@v7.0.0
+      - uses: actions/checkout@v7.0.1
       - name: Download Abacus Frontend
         uses: actions/download-artifact@v8
         with:
@@ -96,9 +96,9 @@ jobs:
     env:
       RELEASE_BUILD: true
     steps:
-      - uses: actions/checkout@v7.0.0
+      - uses: actions/checkout@v7.0.1
       - name: Setup Node
-        uses: actions/setup-node@v6.4.0
+        uses: actions/setup-node@v7.0.0
         with:
           node-version: 24
           package-manager-cache: false

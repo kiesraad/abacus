@@ -480,6 +480,8 @@ export const auditEventTypeValues = [
   "DataEntryReturnedFirst",
   "DataEntryKeptFirst",
   "DataEntryKeptSecond",
+  "DataEntryKeptFirstReturnedSecond",
+  "DataEntryKeptSecondReturnedFirst",
   "DataEntryDiscardedBoth",
   "AirGapViolationDetected",
   "AirGapViolationResolved",
@@ -889,6 +891,7 @@ export interface Election {
   nomination_date: string;
   number_of_seats: number;
   number_of_voters: number;
+  sub_category: ElectionSubCategory;
 }
 
 export interface ElectionApportionmentResponse {
@@ -901,7 +904,7 @@ export interface ElectionApportionmentResponse {
 /**
  * Election category (limited for now)
  */
-export const electionCategoryValues = ["Municipal"] as const;
+export const electionCategoryValues = ["Municipal", "Provincial", "WaterAuthority"] as const;
 export type ElectionCategory = (typeof electionCategoryValues)[number];
 
 export type ElectionCreationRequest =
@@ -980,6 +983,12 @@ export interface ElectionStatusResponseEntry {
 }
 
 /**
+ * Election sub category (limited for now)
+ */
+export const electionSubCategoryValues = ["AB1", "AB2", "GR1", "GR2", "PS1", "PS2"] as const;
+export type ElectionSubCategory = (typeof electionSubCategoryValues)[number];
+
+/**
  * Contains a summary of the election results, added up from the votes of all polling stations.
  */
 export interface ElectionSummary {
@@ -1014,6 +1023,7 @@ export interface ElectionWithPoliticalGroups {
   number_of_seats: number;
   number_of_voters: number;
   political_groups: PoliticalGroup[];
+  sub_category: ElectionSubCategory;
 }
 
 /**
@@ -1162,6 +1172,8 @@ export interface GenerateElectionArgs {
   committee_category: CommitteeCategory;
   /** Custom election name */
   custom_name?: string;
+  /** Municipal, Provincial or WaterAuthority */
+  election_category: ElectionCategory;
   /** Percentage of the first data entry to complete if data entry is included */
   first_data_entry: RandomRange;
   /** Generate multiple elections, each resulting in drawing lots */
@@ -1325,6 +1337,7 @@ export interface NewElection {
   nomination_date: string;
   number_of_seats: number;
   number_of_voters: number;
+  sub_category: ElectionSubCategory;
 }
 
 export type PGNumber = number;
@@ -1496,9 +1509,11 @@ export interface RedactedEmlHash {
 }
 
 export const resolveDifferencesActionValues = [
-  "keep_first_entry",
-  "keep_second_entry",
-  "discard_both_entries",
+  "keep_first_and_discard_second",
+  "keep_first_and_correct_second",
+  "keep_second_and_discard_first",
+  "keep_second_and_correct_first",
+  "discard_both",
 ] as const;
 export type ResolveDifferencesAction = (typeof resolveDifferencesActionValues)[number];
 
@@ -1672,6 +1687,8 @@ export interface VotersCounts {
   proxy_certificate_count: number;
   /** Total number of admitted voters ("Totaal aantal toegelaten kiezers") */
   total_admitted_voters_count: number;
+  /** Number of valid voter cards ("Aantal geldige kiezerspassen") */
+  voter_card_count?: number;
 }
 
 /**

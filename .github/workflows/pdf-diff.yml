@@ -21,7 +21,7 @@ jobs:
       CARGO_TERM_COLOR: always
       SQLX_OFFLINE: "true"
     steps:
-      - uses: actions/checkout@v7.0.0
+      - uses: actions/checkout@v7.0.1
         with:
           ref: ${{ github.base_ref || 'main' }}
       # The base ref may not have a rust-toolchain.toml yet, so fall back to stable.
@@ -35,7 +35,7 @@ jobs:
       - name: Generate PDFs
         run: cargo run --bin gen-pdf --features embed-typst -- --directory base
       - name: Switch to current branch
-        uses: actions/checkout@v7.0.0
+        uses: actions/checkout@v7.0.1
         with:
           clean: false
       - name: Setup Rust for current branch

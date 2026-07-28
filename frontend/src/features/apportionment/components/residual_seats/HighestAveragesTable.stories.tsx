@@ -1,30 +1,23 @@
 import type { StoryObj } from "@storybook/react-vite";
 import { expect } from "storybook/test";
-import type { ApportionmentState } from "@/types/generated/openapi";
 import * as gte19Seats from "../../testing/gte-19-seats";
 import * as gte19SeatsAndP7DrawingLots from "../../testing/gte-19-seats-and-p7-drawing-lots";
 import * as gte19SeatsAndP9 from "../../testing/gte-19-seats-and-p9";
 import * as gte19SeatsAndP9DrawingLots from "../../testing/gte-19-seats-and-p9-drawing-lots-and-deceased-candidates";
-import { getResultChanges } from "../../utils/seat-change";
-import { isAbsoluteMajorityReassignmentStep } from "../../utils/steps";
+import { buildAssignmentTableData } from "../../utils/seat-change";
 import { HighestAveragesTable } from "./HighestAveragesTable";
 
 export const Default: StoryObj = {
   render: () => {
+    const tableData = buildAssignmentTableData(gte19Seats.seat_assignment.steps, gte19Seats.state);
+
     return (
       <HighestAveragesTable
-        steps={gte19Seats.steps}
+        steps={tableData.HighestAverageAssignment.steps}
         standings={gte19Seats.seat_assignment.standings}
         politicalGroups={gte19Seats.election.political_groups}
-        resultChanges={[]}
-        state={
-          {
-            type: "Finalised",
-            deceased_candidates: [],
-            lists_drawn: [],
-            candidates_drawn: [],
-          } satisfies ApportionmentState
-        }
+        resultChanges={tableData.HighestAverageAssignment.resultChanges}
+        state={gte19Seats.state}
       />
     );
   },
@@ -38,30 +31,22 @@ export const Default: StoryObj = {
       ["3", "Political Group C", "49", "", "49", "", "49", "", "49", "", "0"],
       ["4", "Political Group D", "49", "1/2", "49", "1/2", "49", "1/2", "49", "1/2", "1"],
       ["5", "Blanco (Smit, G.)", "50", "1/2", "33", "2/3", "33", "2/3", "33", "2/3", "1"],
-      ["", "Restzetel toegekend aan lijst", "5", "2", "1", "4", ""],
+      ["", "Restzetel toegekend aan lijst", "5", "", "2", "", "1", "", "4", "", ""],
     ]);
   },
 };
 
 export const AbsoluteMajorityReassignment: StoryObj = {
   render: () => {
-    const absoluteMajorityReassignment =
-      gte19SeatsAndP9DrawingLots.seat_assignment_after_drawing_lots_seat_reassigned.steps.find(
-        isAbsoluteMajorityReassignmentStep,
-      );
-    const state = {
-      type: "Finalised",
-      deceased_candidates: [],
-      lists_drawn: [],
-      candidates_drawn: [],
-    } satisfies ApportionmentState;
+    const tableData = buildAssignmentTableData(gte19SeatsAndP9.seat_assignment.steps, gte19SeatsAndP9.state);
+
     return (
       <HighestAveragesTable
-        steps={gte19SeatsAndP9.highest_averages_steps}
+        steps={tableData.HighestAverageAssignment.steps}
         standings={gte19SeatsAndP9.seat_assignment.standings}
         politicalGroups={gte19SeatsAndP9.election.political_groups}
-        resultChanges={getResultChanges([], state, absoluteMajorityReassignment)}
-        state={state}
+        resultChanges={tableData.HighestAverageAssignment.resultChanges}
+        state={gte19SeatsAndP9.state}
       />
     );
   },
@@ -158,19 +143,24 @@ export const AbsoluteMajorityReassignment: StoryObj = {
       ],
       ["7", "Political Group G", "624", "", "624", "", "624", "", "624", "", "624", "", "624", "", "1 0"],
       ["8", "Political Group H", "7", "", "7", "", "7", "", "7", "", "7", "", "7", "", "0"],
-      ["", "Restzetel toegekend aan lijst", "2", "3", "4", "5", "6", "7", ""],
+      ["", "Restzetel toegekend aan lijst", "2", "", "3", "", "4", "", "5", "", "6", "", "7", "", ""],
     ]);
   },
 };
 
 export const DrawingLotsForList: StoryObj = {
   render: () => {
+    const tableData = buildAssignmentTableData(
+      gte19SeatsAndP7DrawingLots.seat_assignment.steps,
+      gte19SeatsAndP7DrawingLots.state,
+    );
+
     return (
       <HighestAveragesTable
-        steps={gte19SeatsAndP7DrawingLots.steps}
+        steps={tableData.HighestAverageAssignment.steps}
         standings={gte19SeatsAndP7DrawingLots.seat_assignment.standings}
         politicalGroups={gte19SeatsAndP7DrawingLots.election.political_groups}
-        resultChanges={[]}
+        resultChanges={tableData.HighestAverageAssignment.resultChanges}
         state={gte19SeatsAndP7DrawingLots.state}
       />
     );
@@ -186,19 +176,24 @@ export const DrawingLotsForList: StoryObj = {
       ["4", "Algemene Lijst", "46", "2/3", "46", "2/3", "0"],
       ["5", "Unie van kandidaten", "46", "2/3", "46", "2/3", "0"],
       ["6", "Lijst van stemmers", "46", "2/3", "46", "2/3", "0"],
-      ["", "Restzetel toegekend aan lijst", "1", "Loting nodig", ""],
+      ["", "Restzetel toegekend aan lijst", "1", "", "Loting nodig", ""],
     ]);
   },
 };
 
 export const P9BeforeDrawingLots: StoryObj = {
   render: () => {
+    const tableData = buildAssignmentTableData(
+      gte19SeatsAndP9DrawingLots.seat_assignment.steps,
+      gte19SeatsAndP9DrawingLots.state,
+    );
+
     return (
       <HighestAveragesTable
-        steps={gte19SeatsAndP9DrawingLots.steps}
+        steps={tableData.HighestAverageAssignment.steps}
         standings={gte19SeatsAndP9DrawingLots.seat_assignment.standings}
         politicalGroups={gte19SeatsAndP9DrawingLots.election.political_groups}
-        resultChanges={getResultChanges([], gte19SeatsAndP9DrawingLots.state)}
+        resultChanges={tableData.HighestAverageAssignment.resultChanges}
         state={gte19SeatsAndP9DrawingLots.state}
       />
     );
@@ -264,27 +259,24 @@ export const P9BeforeDrawingLots: StoryObj = {
       ["6", "Altijd van de Partij", "624", "", "624", "", "624", "", "624", "", "624", "", "416", "", "1 1"],
       ["7", "Partij van de Keuze", "624", "", "624", "", "624", "", "624", "", "624", "", "624", "", "1 1"],
       ["8", "Stemmersgroep", "8", "", "8", "", "8", "", "8", "", "8", "", "8", "", "0"],
-      ["", "Restzetel toegekend aan lijst", "2", "3", "4", "5", "6", "7", ""],
+      ["", "Restzetel toegekend aan lijst", "2", "", "3", "", "4", "", "5", "", "6", "", "7", "", ""],
     ]);
   },
 };
 
 export const P9AfterDrawingLots: StoryObj = {
   render: () => {
-    const absoluteMajorityReassignment =
-      gte19SeatsAndP9DrawingLots.seat_assignment_after_drawing_lots_seat_reassigned.steps.find(
-        isAbsoluteMajorityReassignmentStep,
-      );
+    const tableData = buildAssignmentTableData(
+      gte19SeatsAndP9DrawingLots.seat_assignment_after_drawing_lots_seat_reassigned.steps,
+      gte19SeatsAndP9DrawingLots.state_after_drawing_lots_seat_reassigned,
+    );
+
     return (
       <HighestAveragesTable
-        steps={gte19SeatsAndP9DrawingLots.steps}
+        steps={tableData.HighestAverageAssignment.steps}
         standings={gte19SeatsAndP9DrawingLots.seat_assignment_after_drawing_lots_seat_reassigned.standings}
         politicalGroups={gte19SeatsAndP9DrawingLots.election.political_groups}
-        resultChanges={getResultChanges(
-          [],
-          gte19SeatsAndP9DrawingLots.state_after_drawing_lots_seat_reassigned,
-          absoluteMajorityReassignment,
-        )}
+        resultChanges={tableData.HighestAverageAssignment.resultChanges}
         state={gte19SeatsAndP9DrawingLots.state_after_drawing_lots_seat_reassigned}
       />
     );
@@ -350,7 +342,7 @@ export const P9AfterDrawingLots: StoryObj = {
       ["6", "Altijd van de Partij", "624", "", "624", "", "624", "", "624", "", "624", "", "416", "", "1"],
       ["7", "Partij van de Keuze", "624", "", "624", "", "624", "", "624", "", "624", "", "624", "", "1 0"],
       ["8", "Stemmersgroep", "8", "", "8", "", "8", "", "8", "", "8", "", "8", "", "0"],
-      ["", "Restzetel toegekend aan lijst", "2", "3", "4", "5", "6", "7", ""],
+      ["", "Restzetel toegekend aan lijst", "2", "", "3", "", "4", "", "5", "", "6", "", "7", "", ""],
     ]);
   },
 };

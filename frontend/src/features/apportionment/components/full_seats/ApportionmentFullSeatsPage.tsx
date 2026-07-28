@@ -35,9 +35,9 @@ export function ApportionmentFullSeatsPage() {
       resultChanges.push({
         listNumber: step.change.list_retracted_seat,
         footnoteNumber: footnoteNumber,
-        increase: 0,
-        decrease: 1,
-        type: "full_seat",
+        delta: -1,
+        seat_type: "FullSeat",
+        type: "FullSeatRemoval",
       });
     });
     return (

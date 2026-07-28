@@ -40,13 +40,13 @@ export function LargestRemaindersTable({
             return step.change.selected_list_number === listSeatAssignment.list_number;
           }).length;
           const listResultChanges = resultChanges.filter(
-            (change) => change.type === "residual_seat" && change.listNumber === listSeatAssignment.list_number,
+            (change) => change.seat_type === "ResidualSeat" && change.listNumber === listSeatAssignment.list_number,
           );
           listResultChanges.forEach((listResultChange) => {
-            residualSeats = residualSeats + listResultChange.increase - listResultChange.decrease;
+            residualSeats = residualSeats + listResultChange.delta;
           });
           const listFullSeatsNotes = resultChanges.filter(
-            (change) => change.type === "full_seat" && change.listNumber === listSeatAssignment.list_number,
+            (change) => change.seat_type === "FullSeat" && change.listNumber === listSeatAssignment.list_number,
           );
           return (
             <Table.Row key={listSeatAssignment.list_number}>

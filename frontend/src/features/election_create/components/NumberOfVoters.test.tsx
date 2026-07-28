@@ -15,9 +15,7 @@ async function renderPage() {
     </ElectionCreateContextProvider>,
   );
 
-  expect(
-    await screen.findByRole("heading", { name: "Hoeveel kiesgerechtigden telt de gemeente?" }),
-  ).toBeInTheDocument();
+  expect(await screen.findByRole("heading", { name: "Hoeveel kiesgerechtigden telt het GSB?" })).toBeInTheDocument();
 }
 
 const election = { name: "Naam", location: "Plek" } as NewElection;

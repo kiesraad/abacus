@@ -2,10 +2,7 @@
 #import "common/scripts.typ": *
 #let input = json("inputs/model-p-22-2.json")
 
-#let is_municipality = (municipal, public_body) => if (
-  input.election.category == "Municipal"
-) { municipal } else { public_body }
-
+#let is_municipality = (municipal, public_body) => is_municipality(input.election.location, municipal, public_body)
 #let location_name = is_municipality[Gemeente #input.election.domain_id #input.election.location][Openbaar lichaam #input.election.location]
 #let location_type = [centraal stembureau]
 #let subcommittee_type = [gemeentelijk stembureau]
@@ -353,7 +350,7 @@ Na toewijzing van de volle zetels blijft een aantal te verdelen zetels over. Dit
       let lot_variant = if drawn_lot.variant == "HighestAverageResidualSeat" { [gemiddelden] } else { [overschotten] };
       let list_names = drawn_lot.lists.map((list) => format_political_group_name(list.number, list.name, with_prefix: "with_list_prefix"));
       let list_names_formatted = comma_list(list_names, last_separator: "en");
-      [+ De lijsten #list_names_formatted hebben gelijke #lot_variant, maar er zijn niet voldoende restzetels voor toekenning ervan aan die lijst. Er is daarom geloot welke lijst de restzetel krijgt.]
+      [+ De lijsten #list_names_formatted hebben gelijke #lot_variant, maar er zijn niet voldoende restzetels voor toekenning ervan aan die lijsten. Er is daarom geloot welke lijst de restzetel krijgt.]
     }
     if absolute_majority != none {
       [+ #format_political_group_name(absolute_majority.number, absolute_majority.name, with_prefix: "with_list_prefix") heeft meer dan de helft van de stemmen behaald en heeft daardoor een volstrekte meerderheid. Omdat de lijst op basis van de zetelverdeling niet meer dan de helft van de zetels heeft gekregen, heeft de lijst via de restzetelverdeling een extra (rest)zetel gekregen.]

@@ -33,7 +33,12 @@ pub struct CaCertificate {
 impl CaCertificate {
     /// SHA-256 fingerprint of the CA certificate (colon-separated hex).
     pub fn sha256_fingerprint(&self) -> String {
-        fingerprint(&self.der)
+        sha256_fingerprint(&self.der)
+    }
+
+    /// SHA-1 fingerprint of the CA certificate (colon-separated hex).
+    pub fn sha1_fingerprint(&self) -> String {
+        sha1_fingerprint(&self.der)
     }
 }
 
@@ -123,9 +128,10 @@ fn load_ca(
     let ca_key = KeyPair::try_from(key_der.as_slice()).map_err(tls_err)?;
     let issuer = Issuer::from_ca_cert_der(&cert_der, ca_key).map_err(tls_err)?;
     tracing::info!(
-        "Loaded the local CA from {:?} (SHA-256 fingerprint {})",
+        "Loaded the local CA from {:?}\n  SHA-256 fingerprint {}\n  SHA-1 fingerprint   {}",
         cert_pem_path,
-        fingerprint(&der),
+        sha256_fingerprint(&der),
+        sha1_fingerprint(&der),
     );
     Ok((issuer, CaCertificate { pem, der }))
 }
@@ -147,9 +153,10 @@ fn generate_ca(
     write_file(key_der_path, &key_der, 0o600)?;
 
     tracing::warn!(
-        "Generated a new local CA at {:?} (SHA-256 fingerprint {}).",
+        "Generated a new local CA at {:?}\n  SHA-256 fingerprint {}\n  SHA-1 fingerprint   {}",
         cert_pem_path,
-        fingerprint(&der),
+        sha256_fingerprint(&der),
+        sha1_fingerprint(&der),
     );
 
     let issuer = Issuer::from_ca_cert_der(ca_cert.der(), ca_key).map_err(tls_err)?;
@@ -191,7 +198,7 @@ fn create_leaf(
     let cert_der = cert.der().clone();
     tracing::info!(
         "Created a new server certificate for {subjects:?} (SHA-256 fingerprint {})",
-        fingerprint(&cert_der),
+        sha256_fingerprint(&cert_der),
     );
     let key_der = PrivateKeyDer::Pkcs8(PrivatePkcs8KeyDer::from(pkcs8));
     Ok((cert_der, key_der))
@@ -240,16 +247,29 @@ fn ymd(dt: DateTime<Utc>) -> Result<(i32, u8, u8), AppError> {
         u8::try_from(dt.day()).map_err(tls_err)?,
     ))
 }
-/// SHA-256 fingerprint of a DER-encoded certificate
-/// Uppercase colon-separated hex is used by most browsers and the OpenSSL CLI.
-fn fingerprint(der: &[u8]) -> String {
-    use sha2::{Digest, Sha256};
-
-    Sha256::digest(der)
+/// Format a digest as uppercase colon-separated hex, as used by most browsers
+/// and the OpenSSL CLI.
+fn format_fingerprint(digest: &[u8]) -> String {
+    digest
         .iter()
         .map(|b| format!("{b:02X}"))
         .collect::<Vec<_>>()
         .join(":")
+}
+
+/// SHA-256 fingerprint of a DER-encoded certificate.
+fn sha256_fingerprint(der: &[u8]) -> String {
+    use sha2::{Digest, Sha256};
+
+    format_fingerprint(&Sha256::digest(der))
+}
+
+/// SHA-1 fingerprint of a DER-encoded certificate.
+/// Windows shows the SHA-1/ digest as the certificate "thumbprint"
+fn sha1_fingerprint(der: &[u8]) -> String {
+    use sha1::{Digest, Sha1};
+
+    format_fingerprint(&Sha1::digest(der))
 }
 
 /// Write `bytes` to `path` with mode permission bits (only on Unix).
@@ -343,14 +363,22 @@ mod tests {
         // ca.cer matches the returned DER
         assert_eq!(fs::read(tls_dir.join(CA_CERT_DER)).unwrap(), first.der);
 
-        // fingerprint: 64 hex chars + 31 colons = 95 chars
-        let fp = first.sha256_fingerprint();
-        assert_eq!(fp.len(), 95, "fingerprint should be 95 chars");
-        assert!(
-            fp.chars()
-                .all(|c| c.is_ascii_uppercase() || c.is_ascii_digit() || c == ':'),
-            "fingerprint should be uppercase colon-separated hex, got {fp}"
-        );
+        // fingerprints are uppercase colon-separated hex
+        let assert_fingerprint = |fp: &str, digest_bytes: usize, name: &str| {
+            let expected_len = 3 * digest_bytes - 1;
+            assert_eq!(
+                fp.len(),
+                expected_len,
+                "{name} fingerprint should be {expected_len} chars, got {fp}"
+            );
+            assert!(
+                fp.chars()
+                    .all(|c| c.is_ascii_uppercase() || c.is_ascii_digit() || c == ':'),
+                "{name} fingerprint should be uppercase colon-separated hex, got {fp}"
+            );
+        };
+        assert_fingerprint(&first.sha256_fingerprint(), 32, "SHA-256");
+        assert_fingerprint(&first.sha1_fingerprint(), 20, "SHA-1");
 
         // check file permissions
         #[cfg(unix)]

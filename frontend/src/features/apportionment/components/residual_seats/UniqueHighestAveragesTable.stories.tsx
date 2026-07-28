@@ -2,19 +2,20 @@ import type { StoryObj } from "@storybook/react-vite";
 import { expect } from "storybook/test";
 import * as lt19Seats from "../../testing/lt-19-seats";
 import * as lt19SeatsAndP10AndDeceasedCandidates from "../../testing/lt-19-seats-and-p10-and-deceased-candidates";
-import { getResultChanges, splitResultChanges } from "../../utils/seat-change";
-import { isAbsoluteMajorityReassignmentStep, isListExhaustionRemovalStep } from "../../utils/steps";
+import { buildAssignmentTableData } from "../../utils/seat-change";
 import { UniqueHighestAveragesTable } from "./UniqueHighestAveragesTable";
 
 export const Default: StoryObj = {
   render: () => {
+    const tableData = buildAssignmentTableData(lt19Seats.seat_assignment.steps, lt19Seats.state);
+
     return (
       <UniqueHighestAveragesTable
-        steps={lt19Seats.unique_highest_average_steps}
-        largestRemainderSteps={lt19Seats.largest_remainder_steps}
+        steps={tableData.UniqueHighestAverageAssignment.steps}
+        largestRemainderSteps={tableData.LargestRemainderAssignment.steps}
         standings={lt19Seats.seat_assignment.standings}
         politicalGroups={lt19Seats.election.political_groups}
-        resultChanges={[]}
+        resultChanges={tableData.UniqueHighestAverageAssignment.resultChanges}
       />
     );
   },
@@ -37,34 +38,18 @@ export const Default: StoryObj = {
 
 export const P10: StoryObj = {
   render: () => {
-    const absoluteMajorityReassignment = lt19SeatsAndP10AndDeceasedCandidates.seat_assignment.steps.find(
-      isAbsoluteMajorityReassignmentStep,
+    const tableData = buildAssignmentTableData(
+      lt19SeatsAndP10AndDeceasedCandidates.seat_assignment.steps,
+      lt19SeatsAndP10AndDeceasedCandidates.state,
     );
-    const listExhaustionSteps =
-      lt19SeatsAndP10AndDeceasedCandidates.seat_assignment.steps.filter(isListExhaustionRemovalStep);
-    const residualSeatRemovalSteps = listExhaustionSteps.filter((step) => !step.change.full_seat);
-    const largestRemainderSteps = lt19SeatsAndP10AndDeceasedCandidates.largest_remainder_steps;
-    const resultChanges = getResultChanges(
-      [],
-      {
-        type: "Finalised",
-        deceased_candidates: [],
-        lists_drawn: [],
-        candidates_drawn: [],
-      },
-      absoluteMajorityReassignment,
-      residualSeatRemovalSteps,
-    );
-    const { uniqueHighestAverageResultChanges } = splitResultChanges(resultChanges, largestRemainderSteps);
+
     return (
       <UniqueHighestAveragesTable
-        steps={lt19SeatsAndP10AndDeceasedCandidates.unique_highest_averages_steps_part_1.concat(
-          lt19SeatsAndP10AndDeceasedCandidates.unique_highest_averages_steps_part_2,
-        )}
-        largestRemainderSteps={largestRemainderSteps}
+        steps={tableData.UniqueHighestAverageAssignment.steps}
+        largestRemainderSteps={tableData.LargestRemainderAssignment.steps}
         standings={lt19SeatsAndP10AndDeceasedCandidates.seat_assignment.standings}
         politicalGroups={lt19SeatsAndP10AndDeceasedCandidates.election.political_groups}
-        resultChanges={uniqueHighestAverageResultChanges}
+        resultChanges={tableData.UniqueHighestAverageAssignment.resultChanges}
       />
     );
   },

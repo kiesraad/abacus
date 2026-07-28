@@ -112,7 +112,7 @@ pub struct LogFilter {
 
 impl LogFilter {
     pub(crate) fn from_query(query: &LogFilterQuery) -> Self {
-        let offset = (query.page - 1) * query.per_page;
+        let offset = query.page.saturating_sub(1).saturating_mul(query.per_page);
         let limit = query.per_page;
 
         let level = query

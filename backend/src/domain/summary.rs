@@ -50,6 +50,7 @@ impl ElectionSummary {
             voters_counts: VotersCounts {
                 poll_card_count: 0,
                 proxy_certificate_count: 0,
+                voter_card_count: None,
                 total_admitted_voters_count: 0,
             },
             votes_counts: VotesCounts {
@@ -409,6 +410,7 @@ mod tests {
             voters_counts: VotersCounts {
                 poll_card_count: 30,
                 proxy_certificate_count: 4,
+                voter_card_count: None,
                 total_admitted_voters_count: 34,
             },
             votes_counts: VotesCounts {
@@ -452,6 +454,7 @@ mod tests {
             voters_counts: VotersCounts {
                 poll_card_count: 59,
                 proxy_certificate_count: 1,
+                voter_card_count: None,
                 total_admitted_voters_count: 60,
             },
             votes_counts: VotesCounts {
@@ -490,6 +493,7 @@ mod tests {
             voters_counts: VotersCounts {
                 poll_card_count: 30,
                 proxy_certificate_count: 4,
+                voter_card_count: None,
                 total_admitted_voters_count: 34,
             },
             votes_counts: VotesCounts {
@@ -525,6 +529,7 @@ mod tests {
             voters_counts: VotersCounts {
                 poll_card_count: 59,
                 proxy_certificate_count: 1,
+                voter_card_count: None,
                 total_admitted_voters_count: 60,
             },
             votes_counts: VotesCounts {

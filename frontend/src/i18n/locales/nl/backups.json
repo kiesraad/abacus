@@ -1,9 +1,9 @@
 {
-  "backups": "Backups",
-  "title": "Database backups",
+  "backups": "Back-ups",
+  "title": "Back-ups van de database",
   "subtitle": "Handig om te weten",
-  "description": "<ul><li>Backups worden opgeslagen op de server, in de database map.</li><li>Je moet zelf controleren of er voldoende schijfruimte is voor backups.</li><li>Tijdens het maken van een backup kan iedereen gewoon doorwerken.</li><li>Instructies voor het terugzetten van een backup staan in de handleiding.</li></ul>",
-  "create_backup_button": "Nu backup maken",
-  "running": "backup aan het maken",
-  "last": "Laatste backup gemaakt om {time}"
+  "description": "<ul><li>Back-ups worden opgeslagen op de server, in de map voor back-ups.</li><li>Je moet zelf controleren of er voldoende schijfruimte is voor back-ups.</li><li>Tijdens het maken van een back-up kan iedereen gewoon doorwerken.</li><li>Instructies voor het terugzetten van een back-up staan in de documentatie van Abacus.</li></ul>",
+  "create_backup_button": "Nu back-up maken",
+  "running": "back-up aan het maken",
+  "last": "Laatste back-up gemaakt om {time}"
 }

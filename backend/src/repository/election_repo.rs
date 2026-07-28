@@ -2,8 +2,8 @@ use chrono::NaiveDate;
 use sqlx::{SqliteConnection, query_as, types::Json};
 
 use crate::domain::election::{
-    CommitteeCategory, Election, ElectionCategory, ElectionId, ElectionWithPoliticalGroups,
-    NewElection, RegisteredPoliticalGroup, VoteCountingMethod,
+    CommitteeCategory, Election, ElectionCategory, ElectionId, ElectionSubCategory,
+    ElectionWithPoliticalGroups, NewElection, RegisteredPoliticalGroup, VoteCountingMethod,
 };
 
 pub async fn list(
@@ -21,6 +21,7 @@ pub async fn list(
             location, 
             domain_id, 
             category,
+            sub_category,
             number_of_seats,
             number_of_voters,
             election_date,
@@ -45,6 +46,7 @@ pub struct ElectionRow {
     pub location: String,
     pub domain_id: String,
     pub category: ElectionCategory,
+    pub sub_category: ElectionSubCategory,
     pub number_of_seats: u32,
     pub number_of_voters: u32,
     pub election_date: NaiveDate,
@@ -63,6 +65,7 @@ impl From<ElectionRow> for ElectionWithPoliticalGroups {
             location: row.location,
             domain_id: row.domain_id,
             category: row.category,
+            sub_category: row.sub_category,
             number_of_seats: row.number_of_seats,
             number_of_voters: row.number_of_voters,
             election_date: row.election_date,
@@ -93,6 +96,7 @@ pub async fn get(
             location,
             domain_id,
             category,
+            sub_category,
             number_of_seats,
             number_of_voters,
             election_date,
@@ -124,12 +128,13 @@ pub async fn create(
             location,
             domain_id,
             category,
+            sub_category,
             number_of_seats,
             number_of_voters,
             election_date,
             nomination_date,
             political_groups
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         RETURNING
             id,
             name,
@@ -139,6 +144,7 @@ pub async fn create(
             location,
             domain_id,
             category,
+            sub_category,
             number_of_seats,
             number_of_voters,
             election_date,
@@ -152,6 +158,7 @@ pub async fn create(
         election.location,
         election.domain_id,
         election.category,
+        election.sub_category,
         election.number_of_seats,
         election.number_of_voters,
         election.election_date,
@@ -183,6 +190,7 @@ pub async fn change_number_of_voters(
             location,
             domain_id,
             category,
+            sub_category,
             number_of_seats,
             number_of_voters,
             election_date,

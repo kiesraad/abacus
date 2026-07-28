@@ -1,6 +1,6 @@
 import type { SeatAssignment, SeatChange, SeatChangeStep } from "@/types/generated/openapi";
 
-type SpecificStep<T extends SeatChange["changed_by"]> = SeatChangeStep & {
+export type SpecificStep<T extends SeatChange["changed_by"]> = SeatChangeStep & {
   change: Extract<SeatChange, { changed_by: T }>;
 };
 

@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n        INSERT INTO elections (\n            name,\n            committee_category,\n            counting_method,\n            election_id,\n            location,\n            domain_id,\n            category,\n            number_of_seats,\n            number_of_voters,\n            election_date,\n            nomination_date,\n            political_groups\n        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)\n        RETURNING\n            id,\n            name,\n            committee_category,\n            counting_method,\n            election_id,\n            location,\n            domain_id,\n            category,\n            number_of_seats,\n            number_of_voters,\n            election_date,\n            nomination_date,\n            political_groups\n        ",
+  "query": "\n        UPDATE elections\n        SET number_of_voters = ?\n        WHERE id = ?\n        RETURNING\n            id,\n            name,\n            committee_category,\n            counting_method, \n            election_id,\n            location,\n            domain_id,\n            category,\n            sub_category,\n            number_of_seats,\n            number_of_voters,\n            election_date,\n            nomination_date\n        ",
   "describe": {
     "columns": [
       {
@@ -92,8 +92,19 @@
         }
       },
       {
-        "name": "number_of_seats",
+        "name": "sub_category",
         "ordinal": 8,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "elections",
+            "name": "sub_category"
+          }
+        }
+      },
+      {
+        "name": "number_of_seats",
+        "ordinal": 9,
         "type_info": "Integer",
         "origin": {
           "Table": {
@@ -104,7 +115,7 @@
       },
       {
         "name": "number_of_voters",
-        "ordinal": 9,
+        "ordinal": 10,
         "type_info": "Integer",
         "origin": {
           "Table": {
@@ -115,7 +126,7 @@
       },
       {
         "name": "election_date",
-        "ordinal": 10,
+        "ordinal": 11,
         "type_info": "Text",
         "origin": {
           "Table": {
@@ -126,7 +137,7 @@
       },
       {
         "name": "nomination_date",
-        "ordinal": 11,
+        "ordinal": 12,
         "type_info": "Text",
         "origin": {
           "Table": {
@@ -134,21 +145,10 @@
             "name": "nomination_date"
           }
         }
-      },
-      {
-        "name": "political_groups",
-        "ordinal": 12,
-        "type_info": "Text",
-        "origin": {
-          "Table": {
-            "table": "elections",
-            "name": "political_groups"
-          }
-        }
       }
     ],
     "parameters": {
-      "Right": 12
+      "Right": 2
     },
     "nullable": [
       false,
@@ -166,5 +166,5 @@
       false
     ]
   },
-  "hash": "d0d2dad44ff911ae83e585ca58cc255478710e4700991c3ff5b2ce2c24da7744"
+  "hash": "e92b59e5b5ccc43e1e715fa8320284a2a673754204dd773d97dce5d60eed40df"
 }

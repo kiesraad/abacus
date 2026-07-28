@@ -135,17 +135,6 @@ pub enum PollingStationType {
     Mobile,
 }
 
-impl From<String> for PollingStationType {
-    fn from(value: String) -> Self {
-        match value.as_str() {
-            "FixedLocation" => Self::FixedLocation,
-            "Special" => Self::Special,
-            "Mobile" => Self::Mobile,
-            _ => panic!("invalid PollingStationType `{value}`"),
-        }
-    }
-}
-
 /// Polling station in a first committee session.
 /// No investigations, no previous data entries.
 #[derive(Serialize, Deserialize, ToSchema, Debug, Clone)]

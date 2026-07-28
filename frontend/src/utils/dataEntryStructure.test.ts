@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest";
 
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
-import type { Candidate, ElectionWithPoliticalGroups } from "@/types/generated/openapi";
+import { type Candidate, type ElectionWithPoliticalGroups, electionCategoryValues } from "@/types/generated/openapi";
 import { type DataEntryModel, dataEntryModelValues, type InputGridSubsection } from "@/types/types";
 
 import {
@@ -22,7 +22,7 @@ describe("votersAndVotesSection", () => {
     const inputGrid = votersAndVotesSection.subsections[0] as InputGridSubsection;
     expect(inputGrid.type).toBe("inputGrid");
 
-    expect(inputGrid.rows).toHaveLength(9);
+    expect(inputGrid.rows).toHaveLength(10);
     // Check that it has the basic voter and vote count rows
     expect(inputGrid.rows.some((row) => row.path === "voters_counts.poll_card_count")).toBe(true);
     expect(inputGrid.rows.some((row) => row.path === "votes_counts.total_votes_cast_count")).toBe(true);
@@ -51,7 +51,7 @@ describe("votersAndVotesSection", () => {
     expect(inputGrid.type).toBe("inputGrid");
 
     const codes = inputGrid.rows.map((row) => row.code);
-    expect(codes).toEqual(["A", "B", "D", "E.1", "E.2", "E", "F", "G", "H"]);
+    expect(codes).toEqual(["A", "B", "C", "D", "E.1", "E.2", "E", "F", "G", "H"]);
   });
 });
 
@@ -240,10 +240,13 @@ describe("getDataEntryStructure", () => {
     expect(structure.map((section) => section.id)).toStrictEqual(expectedSectionIds);
   });
 
-  // Snapshot test every model to catch any unintended changes in the structure
-  test.each(dataEntryModelValues)("%s structure snapshot", async (model) => {
-    await expect(getDataEntryStructure(model, electionMockData)).toMatchFileSnapshot(
-      `./__snapshots__/dataEntryStructure.${model}.snap`,
+  // Snapshot test every model and election category to catch any unintended changes in the structure
+  const testCombinations = dataEntryModelValues.flatMap((model) =>
+    electionCategoryValues.map((category) => [model, category] as const),
+  );
+  test.each(testCombinations)("%s %s structure snapshot", async (model, category) => {
+    await expect(getDataEntryStructure(model, { ...electionMockData, category })).toMatchFileSnapshot(
+      `./__snapshots__/dataEntryStructure.${model}.${category}.snap`,
     );
   });
 });

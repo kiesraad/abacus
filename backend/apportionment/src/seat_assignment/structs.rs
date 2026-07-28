@@ -407,3 +407,77 @@ pub enum AbsoluteMajority<LN> {
     Completed(Vec<ListStanding<LN>>, Option<SeatChange<LN>>),
     DrawingLotsRequired(ListDrawingLotsVariant<LN>),
 }
+
+#[cfg(test)]
+pub(crate) mod tests {
+    use crate::{Fraction, seat_assignment::ListStanding, test_helpers::ListVotesMock};
+
+    #[test]
+    #[allow(clippy::too_many_lines)]
+    fn test_list_standing_functions() {
+        let candidate_votes: Vec<u32> = vec![100, 100, 100];
+        let votes_cast: u64 = candidate_votes.iter().sum::<u32>() as u64;
+        let mut standing = ListStanding::new(
+            &ListVotesMock::from_test_data_auto(1, candidate_votes),
+            Fraction {
+                numerator: 50,
+                denominator: 1,
+            },
+        );
+        assert_eq!(standing.full_seats(), 6);
+        assert_eq!(standing.residual_seats(), 0);
+        assert_eq!(
+            standing.total_seats(),
+            standing.full_seats() + standing.residual_seats()
+        );
+        assert_eq!(
+            standing.next_votes_per_seat,
+            Fraction {
+                numerator: votes_cast,
+                denominator: (standing.total_seats() + 1) as u64
+            }
+        );
+        standing.add_residual_seat();
+        assert_eq!(standing.full_seats(), 6);
+        assert_eq!(standing.residual_seats(), 1);
+        assert_eq!(
+            standing.total_seats(),
+            standing.full_seats() + standing.residual_seats()
+        );
+        assert_eq!(
+            standing.next_votes_per_seat,
+            Fraction {
+                numerator: votes_cast,
+                denominator: (standing.total_seats() + 1) as u64
+            }
+        );
+        standing.remove_residual_seat();
+        assert_eq!(standing.full_seats(), 6);
+        assert_eq!(standing.residual_seats(), 0);
+        assert_eq!(
+            standing.total_seats(),
+            standing.full_seats() + standing.residual_seats()
+        );
+        assert_eq!(
+            standing.next_votes_per_seat,
+            Fraction {
+                numerator: votes_cast,
+                denominator: (standing.total_seats() + 1) as u64
+            }
+        );
+        standing.remove_full_seat();
+        assert_eq!(standing.full_seats(), 5);
+        assert_eq!(standing.residual_seats(), 0);
+        assert_eq!(
+            standing.total_seats(),
+            standing.full_seats() + standing.residual_seats()
+        );
+        assert_eq!(
+            standing.next_votes_per_seat,
+            Fraction {
+                numerator: votes_cast,
+                denominator: (standing.total_seats() + 1) as u64
+            }
+        );
+    }
+}

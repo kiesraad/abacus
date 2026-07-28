@@ -12,6 +12,7 @@ export interface InputGridRowProps {
   id: string;
   field: string;
   title: string;
+  isDisabled?: boolean;
   errorsAndWarnings?: Map<string, "error" | "warning">;
   warningsAccepted?: boolean;
   name?: string;
@@ -30,6 +31,7 @@ export function InputGridRow({
   field,
   name,
   title,
+  isDisabled,
   errorsAndWarnings,
   warningsAccepted,
   previousValue,
@@ -87,6 +89,7 @@ export function InputGridRow({
               key={id}
               id={id}
               name={name || id}
+              disabled={isDisabled}
               autoFocus={autoFocusInput}
               value={value}
               onChange={onChange}

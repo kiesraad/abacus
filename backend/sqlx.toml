@@ -3,6 +3,7 @@
 'committee_category' = "crate::domain::election::CommitteeCategory"
 'counting_method' = "crate::domain::election::VoteCountingMethod"
 'category' = "crate::domain::election::ElectionCategory"
+'sub_category' = "crate::domain::election::ElectionSubCategory"
 'number_of_seats' = "u32"
 'number_of_voters' = "u32"
 'election_date' = "chrono::NaiveDate"

@@ -2,10 +2,8 @@
 #import "common/scripts.typ": *
 #let input = json("inputs/model-p-2a.json")
 
-#let is_municipality = (municipal, public_body) => if (
-  input.election.category == "Municipal"
-) { municipal } else { public_body }
-
+#let is_municipality = (municipal, public_body) => is_municipality(input.election.location, municipal, public_body)
+#let is_local_election = (local, other) => is_local_election(input.election.category, local, other)
 #let location_name = is_municipality[Gemeente #input.election.domain_id #input.election.location][Openbaar lichaam #input.election.location]
 #let location_type = is_municipality[gemeentelijk stembureau][stembureau voor het openbaar lichaam]
 #let this_location = is_municipality[deze gemeente][dit openbaar lichaam]
@@ -152,21 +150,21 @@ Zo komt het handtekeningen-blad altijd op een losse pagina, ook als het verslag 
 
 #textbox_only_bottom_stroke[Datum en tijd:][Plaats:]
 
-== Verplicht: voorzitter en #is_municipality[twee][vier] leden van het #location_type
+== Verplicht: voorzitter en #is_local_election[twee][vier] leden van het #location_type
 
 === Voorzitter van het #location_type:
 
 #textbox[Naam:][Handtekening:]
 
-=== #is_municipality[2][4] leden van het #location_type:
+=== #is_local_election[2][4] leden van het #location_type:
 
-#stack(spacing: 0.5em, ..range(0, is_municipality(2, 4)).map(_ => textbox[Naam:][Handtekening:]))
+#stack(spacing: 0.5em, ..range(0, is_local_election(2, 4)).map(_ => textbox[Naam:][Handtekening:]))
 
 == Ondertekening door andere aanwezige leden van het #location_type
 
 === Extra ondertekening: (niet verplicht)
 
-#stack(spacing: 0.5em, ..range(0, is_municipality(3, 1)).map(_ => textbox[Naam:][Handtekening:]))
+#stack(spacing: 0.5em, ..range(0, is_local_election(3, 1)).map(_ => textbox[Naam:][Handtekening:]))
 
 #pagebreak(weak: true)
 

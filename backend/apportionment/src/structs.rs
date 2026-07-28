@@ -228,7 +228,7 @@ mod tests {
     use super::*;
     use crate::{
         seat_assignment::{LargestRemainderAssignedSeat, ListExhaustionRemovedSeat},
-        test_helpers::ListDrawnMock,
+        test_helpers::{CandidateDrawnMock, ListDrawnMock},
     };
 
     #[test]
@@ -304,5 +304,52 @@ mod tests {
         );
 
         assert_eq!(variant.validate(&ListDrawnMock::new(&variant, 2)), Ok(()));
+    }
+
+    #[test]
+    fn test_candidate_drawing_lots_variant_validate() {
+        let variant = CandidateDrawingLotsVariant {
+            list: 2,
+            total_seats: 3,
+            number_of_votes: 400,
+            seat_numbers: vec![2, 3],
+            options: vec![2, 3, 4, 5, 6],
+        };
+
+        let another_variant = CandidateDrawingLotsVariant {
+            list: 1,
+            total_seats: 3,
+            number_of_votes: 400,
+            seat_numbers: vec![2, 3],
+            options: vec![2, 3, 4, 5, 6],
+        };
+
+        assert_eq!(
+            variant.validate(&CandidateDrawnMock {
+                variant: another_variant,
+                drawn: 3
+            }),
+            Err(ApportionmentError::InvalidLotDrawing(
+                "Variant mismatch".to_string()
+            ))
+        );
+
+        assert_eq!(
+            variant.validate(&CandidateDrawnMock {
+                variant: variant.clone(),
+                drawn: 7
+            }),
+            Err(ApportionmentError::InvalidLotDrawing(
+                "Invalid number drawn".to_string()
+            ))
+        );
+
+        assert_eq!(
+            variant.validate(&CandidateDrawnMock {
+                variant: variant.clone(),
+                drawn: 2
+            }),
+            Ok(())
+        );
     }
 }

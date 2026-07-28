@@ -1,7 +1,7 @@
 #![no_main]
 
 use std::{
-    collections::BTreeSet,
+    collections::HashSet,
     io::{BufRead, BufReader, Write},
     process::{Command, Stdio},
     sync::{Mutex, OnceLock},
@@ -24,6 +24,7 @@ struct ApportionmentRequest {
 enum ApportionmentResponse {
     Seats {
         seats: Vec<u32>,
+        candidates: Vec<[u32; 2]>,
         log: Vec<String>,
     },
     Conflict {
@@ -43,7 +44,10 @@ static OSV2020_WRAPPER: OnceLock<Mutex<Osv2020WrapperProcess>> = OnceLock::new()
 
 #[derive(Debug)]
 enum Osv2020Result {
-    Allocated(Vec<u32>),
+    Allocated {
+        seats: Vec<u32>,
+        candidates: Vec<[u32; 2]>,
+    },
     Conflict,
 }
 
@@ -72,7 +76,11 @@ fn osv2020_apportionment(
 
     let resp: ApportionmentResponse = serde_json::from_str(&response).unwrap();
     match resp {
-        ApportionmentResponse::Seats { seats, log } => (Osv2020Result::Allocated(seats), log),
+        ApportionmentResponse::Seats {
+            seats,
+            candidates,
+            log,
+        } => (Osv2020Result::Allocated { seats, candidates }, log),
         ApportionmentResponse::Conflict { log, .. } => (Osv2020Result::Conflict, log),
     }
 }
@@ -103,44 +111,83 @@ fn report_mismatch(
     panic!("{message}");
 }
 
-/// Parse a bracketed list of numbers (e.g. `[1, 2, 3]`) that follows `prefix`.
-/// Returns None when the prefix or no valid list is not found.
-fn parse_last_bracketed_list_numbers(log: &str, prefix: &str) -> Option<BTreeSet<u32>> {
-    let line = log.lines().rev().find(|l| l.contains(prefix))?;
-    let start = line.find(prefix)? + prefix.len();
-    let lists = &line[start..line[start..].find(']')? + start];
-    lists
-        .split(',')
-        .map(|s| s.trim().parse::<u32>())
-        .collect::<Result<BTreeSet<u32>, _>>()
-        .ok()
+/// The options for a required drawing of lots
+#[derive(Debug, PartialEq, Eq)]
+enum LotsOptions {
+    /// List numbers
+    Lists(Vec<u32>),
+    /// (list number, candidate number) pairs
+    Candidates { list: u32, options: Vec<u32> },
 }
 
-/// Parse the list numbers from Abacus's
-/// "Drawing of lots is required for lists: [..]" log line.
-/// Returns None when there is no drawing of lots for lists.
-fn parse_abacus_lots_options(abacus_log: &str) -> Option<BTreeSet<u32>> {
-    parse_last_bracketed_list_numbers(abacus_log, "Drawing of lots is required for lists: [")
+/// Extract the drawing of lots options from Abacus's apportionment output.
+/// Returns None when the output does not require a drawing of lots.
+fn abacus_lots_options(
+    output: &ApportionmentOutput<'_, FuzzedApportionmentInput>,
+) -> Option<LotsOptions> {
+    match output {
+        ApportionmentOutput::Completed(_) => None,
+        ApportionmentOutput::ListDrawingLotsRequired(variant, _) => {
+            Some(LotsOptions::Lists(variant.options().to_vec()))
+        }
+        ApportionmentOutput::CandidateDrawingLotsRequired(variant, _) => {
+            Some(LotsOptions::Candidates {
+                list: variant.list,
+                options: variant.options.clone(),
+            })
+        }
+    }
 }
 
-/// Parse the list numbers from OSV2020's
-/// "... Alternativen: List2, List3." log line
-/// Returns None when there is no drawing of lots for lists.
-fn parse_osv2020_lots_options(osv2020_log: &[String]) -> Option<BTreeSet<u32>> {
+/// Parse the lots options from OSV2020
+/// - For lists: "... Alternativen: List2, List3."
+/// - For candidates: "... Alternativen: List1_2, List1_3."
+///
+/// Returns None if the prefix is not found in the log
+fn parse_osv2020_lots_options(osv2020_log: &[String]) -> Option<LotsOptions> {
     let prefix = "Alternativen: ";
     let line = osv2020_log.iter().rev().find(|l| l.contains(prefix))?;
     let start = line.find(prefix)? + prefix.len();
-    let lists = line[start..]
-        .trim()
-        .strip_suffix('.')
-        .unwrap_or(line[start..].trim());
-    lists
-        .split(", ")
-        .map(|name| {
-            name.strip_prefix("List")
-                .and_then(|n| n.parse::<u32>().ok())
+    let names = line[start..].trim();
+    let names = names.strip_suffix('.').unwrap_or(names);
+
+    if names.contains('_') {
+        // Format "List<list>_<candidate>, List<list>_<candidate>, ..."
+        let options = names
+            .split(", ")
+            .map(|name| {
+                let (list, candidate) = name.strip_prefix("List")?.split_once('_')?;
+                Some((list.parse().ok()?, candidate.parse().ok()?))
+            })
+            .collect::<Option<Vec<(u32, u32)>>>()?;
+
+        let lists = options
+            .iter()
+            .map(|(list, _)| *list)
+            .collect::<HashSet<u32>>();
+
+        // Assert same list
+        assert!(
+            lists.len() == 1,
+            "OSV2020 drawing of lots for candidates has multiple lists: {names}"
+        );
+
+        Some(LotsOptions::Candidates {
+            list: lists.into_iter().next().unwrap(),
+            options: options
+                .into_iter()
+                .map(|(_, candidate)| candidate)
+                .collect(),
         })
-        .collect::<Option<BTreeSet<u32>>>()
+    } else {
+        // Format "List<list>, List<list>, ..."
+        let options = names
+            .split(", ")
+            .map(|name| name.strip_prefix("List")?.parse().ok())
+            .collect::<Option<Vec<u32>>>()?;
+
+        Some(LotsOptions::Lists(options))
+    }
 }
 
 /// Whether Abacus hit Article P 10 (list exhaustion) during seat assignment.
@@ -220,7 +267,11 @@ fn fuzz(data: FuzzedApportionmentInput) {
             let abacus_seats = get_total_seats(&output.seat_assignment);
 
             match osv2020_result {
-                Osv2020Result::Allocated(osv2020_seats) => {
+                Osv2020Result::Allocated {
+                    seats: osv2020_seats,
+                    candidates: osv2020_candidates,
+                } => {
+                    // Compare seat allocation
                     if abacus_seats != osv2020_seats {
                         report_mismatch(
                             &data,
@@ -229,6 +280,31 @@ fn fuzz(data: FuzzedApportionmentInput) {
                             &format!("seats: {:?}", osv2020_seats),
                             &osv2020_log,
                             "seat allocation mismatch",
+                        );
+                    }
+
+                    // Compare candidate nomination
+                    let abacus_candidates: Vec<[u32; 2]> = output
+                        .candidate_nomination
+                        .list_candidate_nomination
+                        .iter()
+                        .flat_map(|nomination| {
+                            nomination
+                                .preferential_candidate_nomination
+                                .iter()
+                                .chain(&nomination.other_candidate_nomination)
+                                .map(|cv| [nomination.list_number, cv.number()])
+                        })
+                        .collect();
+
+                    if abacus_candidates != osv2020_candidates {
+                        report_mismatch(
+                            &data,
+                            &format!("candidates: {abacus_candidates:?}"),
+                            &abacus_log,
+                            &format!("candidates: {osv2020_candidates:?}"),
+                            &osv2020_log,
+                            "candidate nomination mismatch",
                         );
                     }
                 }
@@ -271,7 +347,10 @@ fn fuzz(data: FuzzedApportionmentInput) {
             | e @ ApportionmentOutput::CandidateDrawingLotsRequired(..),
         ) => {
             match osv2020_result {
-                Osv2020Result::Allocated(osv2020_seats) => {
+                Osv2020Result::Allocated {
+                    seats: osv2020_seats,
+                    ..
+                } => {
                     report_mismatch(
                         &data,
                         &format!("Err({e:?})"),
@@ -295,7 +374,7 @@ fn fuzz(data: FuzzedApportionmentInput) {
                         // accept, do nothing
                     } else {
                         // No exhaustion: the options for drawing lots must match.
-                        let abacus_options = parse_abacus_lots_options(&abacus_log);
+                        let abacus_options = abacus_lots_options(&e);
                         let osv2020_options = parse_osv2020_lots_options(&osv2020_log);
                         if abacus_options != osv2020_options {
                             report_mismatch(

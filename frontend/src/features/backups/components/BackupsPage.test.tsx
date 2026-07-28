@@ -32,8 +32,8 @@ describe("BackupsPage", () => {
   test("Shows page content", () => {
     render(<BackupsPage />);
 
-    expect(screen.getByRole("heading", { level: 1, name: "Database backups" })).toBeVisible();
-    expect(screen.getByRole("button", { name: "Nu backup maken" })).toBeVisible();
+    expect(screen.getByRole("heading", { level: 1, name: "Back-ups van de database" })).toBeVisible();
+    expect(screen.getByRole("button", { name: "Nu back-up maken" })).toBeVisible();
   });
 
   test("Creates a backup: success", async () => {
@@ -43,11 +43,11 @@ describe("BackupsPage", () => {
 
     render(<BackupsPage />);
 
-    const button = await screen.findByRole("button", { name: "Nu backup maken" });
+    const button = await screen.findByRole("button", { name: "Nu back-up maken" });
     await user.click(button);
 
     expect(button).toBeDisabled();
-    expect(screen.getByText("backup aan het maken")).toBeVisible();
+    expect(screen.getByText("back-up aan het maken")).toBeVisible();
 
     await waitFor(() => {
       expect(createBackup).toHaveBeenCalledExactlyOnceWith(null);
@@ -56,8 +56,8 @@ describe("BackupsPage", () => {
     await waitFor(() => {
       expect(button).toBeEnabled();
     });
-    expect(screen.queryByText("backup aan het maken")).not.toBeInTheDocument();
-    expect(screen.getByText(`Laatste backup gemaakt om ${formatTime(new Date(createdAt))}`)).toBeVisible();
+    expect(screen.queryByText("back-up aan het maken")).not.toBeInTheDocument();
+    expect(screen.getByText(`Laatste back-up gemaakt om ${formatTime(new Date(createdAt))}`)).toBeVisible();
   });
 
   test("Creates a backup: error", async () => {
@@ -79,11 +79,11 @@ describe("BackupsPage", () => {
 
     render(<BackupsPage />);
 
-    await user.click(await screen.findByRole("button", { name: "Nu backup maken" }));
+    await user.click(await screen.findByRole("button", { name: "Nu back-up maken" }));
 
     expect(await screen.findByRole("alert")).toHaveTextContent(
-      "De backup met deze naam bestaat al, probeer het later opnieuw",
+      "De back-up met deze naam bestaat al, probeer het later opnieuw",
     );
-    expect(screen.queryByText(/Laatste backup gemaakt om/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Laatste back-up gemaakt om/)).not.toBeInTheDocument();
   });
 });

@@ -20,7 +20,7 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   play: async ({ canvas }) => {
-    await expect(canvas.getByRole("button", { name: "Nu backup maken" })).toBeEnabled();
+    await expect(canvas.getByRole("button", { name: "Nu back-up maken" })).toBeEnabled();
   },
 };
 
@@ -29,8 +29,8 @@ export const Loading: Story = {
     isLoading: true,
   },
   play: async ({ canvas }) => {
-    await expect(await canvas.findByText("backup aan het maken")).toBeVisible();
-    await expect(canvas.getByRole("button", { name: "Nu backup maken" })).toBeDisabled();
+    await expect(await canvas.findByText("back-up aan het maken")).toBeVisible();
+    await expect(canvas.getByRole("button", { name: "Nu back-up maken" })).toBeDisabled();
   },
 };
 
@@ -39,8 +39,8 @@ export const BackupSuccess: Story = {
     lastBackupAt: new Date(2026, 6, 7, 12, 34, 56),
   },
   play: async ({ canvas }) => {
-    await expect(await canvas.findByText("Laatste backup gemaakt om 12:34")).toBeVisible();
-    await expect(canvas.getByRole("button", { name: "Nu backup maken" })).toBeEnabled();
+    await expect(await canvas.findByText("Laatste back-up gemaakt om 12:34")).toBeVisible();
+    await expect(canvas.getByRole("button", { name: "Nu back-up maken" })).toBeEnabled();
   },
 };
 
@@ -50,8 +50,8 @@ export const BackupError: Story = {
   },
   play: async ({ canvas }) => {
     await expect(await canvas.findByRole("alert")).toHaveTextContent(
-      "De backup met deze naam bestaat al, probeer het later opnieuw",
+      "De back-up met deze naam bestaat al, probeer het later opnieuw",
     );
-    await expect(canvas.getByRole("button", { name: "Nu backup maken" })).toBeEnabled();
+    await expect(canvas.getByRole("button", { name: "Nu back-up maken" })).toBeEnabled();
   },
 };

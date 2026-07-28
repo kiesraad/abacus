@@ -342,7 +342,7 @@ async fn test_data_entry_resolve_differences(pool: SqlitePool) {
         &addr,
         &coordinator_cookie,
         data_entry_id,
-        "keep_first_entry",
+        "keep_first_and_discard_second",
     )
     .await;
     assert_eq!(res.status(), StatusCode::OK);
@@ -374,7 +374,7 @@ async fn test_data_entry_resolve_differences_then_resolve_errors(pool: SqlitePoo
         &addr,
         &coordinator_cookie,
         data_entry_id,
-        "keep_second_entry",
+        "keep_second_and_discard_first",
     )
     .await;
     assert_eq!(res.status(), StatusCode::OK);

@@ -117,6 +117,12 @@ To trust the server, import the CA into the client trust store: `ca.pem` on
 Linux/macOS/Firefox, `ca.cer` (DER) on Windows. The CA can be downloaded from the
 running server at `/ca.pem` and `/ca.cer`.
 
+Verify that you have the right certificate by comparing its fingerprint. Abacus
+logs both the SHA-256 and SHA-1 fingerprint of the CA on startup. Compare
+against whatever your client shows: browsers and the OpenSSL CLI (`openssl x509
+-in ca.pem -noout -fingerprint -sha256`) show SHA-256, while the Windows
+certificate manager displays the SHA-1 digest as the certificate "thumbprint".
+
 With the `tls` feature enabled, the default port is 8443 in debug builds and 443
 in release builds. Binding to 443 requires elevated privileges (e.g. the
 `CAP_NET_BIND_SERVICE` capability on Linux).

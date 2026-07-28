@@ -362,6 +362,18 @@ impl Candidate {
     }
 }
 
+/// Apply a function if the given value is `Some`
+trait ApplyIfSome: Sized {
+    fn apply_if_some<T>(self, value: Option<T>, f: impl FnOnce(Self, T) -> Self) -> Self {
+        match value {
+            Some(value) => f(self, value),
+            None => self,
+        }
+    }
+}
+
+impl<T> ApplyIfSome for T {}
+
 impl ElectionWithPoliticalGroups {
     /// Get the EML election category for this election.
     pub fn get_eml_category(&self) -> eml_nl::utils::ElectionCategory {
@@ -610,6 +622,15 @@ impl ElectionWithPoliticalGroups {
                 UncountedVotesReason::ValidProxyCertificates,
                 summary.voters_counts.proxy_certificate_count,
             )
+            .apply_if_some(
+                summary.voters_counts.voter_card_count,
+                |builder, voter_card_count| {
+                    builder.total_uncounted_votes(
+                        UncountedVotesReason::ValidVoterCards,
+                        voter_card_count,
+                    )
+                },
+            )
             .total_uncounted_votes(
                 UncountedVotesReason::AdmittedVoters,
                 summary.voters_counts.total_admitted_voters_count,
@@ -726,6 +747,12 @@ impl ElectionWithPoliticalGroups {
             .uncounted_votes(
                 UncountedVotesReason::ValidProxyCertificates,
                 results.voters_counts().proxy_certificate_count,
+            )
+            .apply_if_some(
+                results.voters_counts().voter_card_count,
+                |builder, voter_card_count| {
+                    builder.uncounted_votes(UncountedVotesReason::ValidVoterCards, voter_card_count)
+                },
             )
             .uncounted_votes(
                 UncountedVotesReason::AdmittedVoters,
@@ -999,9 +1026,34 @@ mod tests {
 
     use super::*;
     use crate::domain::{
-        committee_session::committee_session_fixture, election::tests::election_fixture,
-        results::political_group_candidate_votes::CandidateVotes,
+        committee_session::{CommitteeSessionId, committee_session_fixture},
+        data_entry::{DataEntryId, DataEntrySource},
+        election::tests::election_fixture,
+        polling_station::{
+            PollingStationFirstSession, PollingStationForSession,
+            test_helpers::polling_stations_fixture,
+        },
+        results::{
+            Results, count::Count, political_group_candidate_votes::CandidateVotes,
+            tests::example_results,
+        },
     };
+
+    fn source_and_results_gsb(voter_card_count: Option<Count>) -> (DataEntrySource, Results) {
+        let mut results = example_results();
+        results.voters_counts_mut().voter_card_count = voter_card_count;
+
+        (
+            DataEntrySource::PollingStation(PollingStationForSession::First(
+                PollingStationFirstSession {
+                    committee_session_id: CommitteeSessionId::from(0),
+                    polling_station: polling_stations_fixture(&[100]).remove(0),
+                    data_entry_id: DataEntryId::from(0),
+                },
+            )),
+            results,
+        )
+    }
 
     #[test]
     fn test_election_validate_missing_election_domain() {
@@ -1146,26 +1198,88 @@ mod tests {
     #[test]
     fn test_as_eml_count_contest() {
         // Default number_of_voters=1000
-        let mut election = election_fixture(CommitteeCategory::CSB, &[0]);
+        let mut election = election_fixture(CommitteeCategory::CSB, &[2]);
         let committee_session = committee_session_fixture(election.id);
         let mut summary = ElectionSummary::from_results(&election, &[]).unwrap();
 
         let result_csb = election
             .as_eml_count_contest(&committee_session, &[], &summary)
             .unwrap();
+        let total_votes_csb = result_csb.total_votes.unwrap();
         assert_eq!(
-            result_csb.total_votes.unwrap().eligible_voter_count,
+            total_votes_csb.eligible_voter_count,
             StringValue::from_value(1000u64)
         );
+        assert!(
+            !total_votes_csb
+                .uncounted_votes
+                .contains_key(&UncountedVotesReason::ValidVoterCards)
+        );
+        assert!(result_csb.reporting_unit_votes.is_empty());
 
         election.committee_category = CommitteeCategory::GSB;
         summary.number_of_voters = Some(1001);
         let result_gsb = election
-            .as_eml_count_contest(&committee_session, &[], &summary)
+            .as_eml_count_contest(
+                &committee_session,
+                &[source_and_results_gsb(None)],
+                &summary,
+            )
             .unwrap();
+
+        let total_votes_gsb = result_gsb.total_votes.unwrap();
         assert_eq!(
-            result_gsb.total_votes.unwrap().eligible_voter_count,
+            total_votes_gsb.eligible_voter_count,
             StringValue::from_value(1001u64)
+        );
+
+        assert_eq!(
+            total_votes_gsb
+                .uncounted_votes
+                .get(&UncountedVotesReason::ValidVoterCards),
+            None
+        );
+        assert!(
+            !result_gsb
+                .reporting_unit_votes
+                .first()
+                .unwrap()
+                .uncounted_votes
+                .contains_key(&UncountedVotesReason::ValidVoterCards)
+        );
+    }
+
+    #[test]
+    fn test_as_eml_count_contest_with_voter_cards() {
+        let election = election_fixture(CommitteeCategory::GSB, &[2]);
+        let committee_session = committee_session_fixture(election.id);
+        let mut summary = ElectionSummary::from_results(&election, &[]).unwrap();
+        summary.voters_counts.voter_card_count = Some(42);
+
+        let result = election
+            .as_eml_count_contest(
+                &committee_session,
+                &[source_and_results_gsb(Some(17))],
+                &summary,
+            )
+            .unwrap();
+
+        assert_eq!(
+            result
+                .total_votes
+                .unwrap()
+                .uncounted_votes
+                .get(&UncountedVotesReason::ValidVoterCards),
+            Some(&StringValue::from_value(42u64))
+        );
+        assert_eq!(
+            result
+                .reporting_unit_votes
+                .first()
+                .unwrap()
+                .uncounted_votes
+                .get(&UncountedVotesReason::ValidVoterCards),
+            Some(&StringValue::from_value(17u64))
         );
     }
 }

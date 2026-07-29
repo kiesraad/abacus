@@ -258,9 +258,18 @@ fn format_election_name(election_category: ElectionCategory, locality: &str, yea
     let election_type = match election_category {
         ElectionCategory::Municipal => "Gemeenteraad",
         ElectionCategory::Provincial => "Provinciale Staten",
-        ElectionCategory::WaterAuthority => "Algemeen bestuur van het waterschap",
+        ElectionCategory::WaterAuthority => "Waterschap",
     };
     format!("{election_type} {locality} {year}")
+}
+
+fn generate_locality(rng: &mut impl rand::RngExt, election_category: ElectionCategory) -> String {
+    match election_category {
+        ElectionCategory::Municipal => super::data::locality(rng),
+        ElectionCategory::Provincial => super::data::province(rng),
+        ElectionCategory::WaterAuthority => super::data::water_authority(rng),
+    }
+    .to_owned()
 }
 
 fn get_election_sub_category(
@@ -322,7 +331,7 @@ fn generate_election(
 
     let category = args.election_category.to_eml_code();
     let year = election_date.year();
-    let locality = super::data::locality(rng).to_owned();
+    let locality = generate_locality(rng, args.election_category);
 
     // use the previous data to generate some identifiers and names
     let name: String = args.custom_name.clone().unwrap_or(format_election_name(

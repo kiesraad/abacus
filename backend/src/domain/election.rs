@@ -161,7 +161,6 @@ pub struct NewElection {
     pub election_date: NaiveDate,
     #[schema(value_type = String, format = "date")]
     pub nomination_date: NaiveDate,
-    #[serde(skip_serializing)]
     pub political_groups: Vec<RegisteredPoliticalGroup>,
 }
 
@@ -198,6 +197,14 @@ pub enum ElectionCategory {
 }
 
 impl ElectionCategory {
+    pub fn is_local_election(&self) -> bool {
+        match self {
+            ElectionCategory::Municipal => true,
+            ElectionCategory::Provincial => false,
+            ElectionCategory::WaterAuthority => false,
+        }
+    }
+
     pub fn to_eml_code(&self) -> &'static str {
         match self {
             ElectionCategory::Municipal => "GR",

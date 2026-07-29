@@ -62,9 +62,9 @@ describe("Data Entry cache behavior", () => {
     const proxyCertificates = screen.getByRole("textbox", { name: "B Volmachtbewijzen" });
     expect(proxyCertificates).toHaveValue("200");
 
-    const validVotersCount = screen.getByRole("textbox", { name: "C Kiezerspassen" });
-    expect(validVotersCount).toBeDisabled();
-    expect(validVotersCount).toHaveValue("");
+    const voterCardCount = screen.getByRole("textbox", { name: "C Kiezerspassen" });
+    expect(voterCardCount).toBeDisabled();
+    expect(voterCardCount).toHaveValue("");
 
     const totalAdmittedVoters = screen.getByRole("textbox", { name: "D Totaal toegelaten kiezers" });
     expect(totalAdmittedVoters).toHaveValue("600");

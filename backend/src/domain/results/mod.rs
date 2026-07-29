@@ -10,7 +10,7 @@ use votes_counts::VotesCounts;
 
 use crate::domain::{
     compare::Compare,
-    election::{ElectionCategory, ElectionWithPoliticalGroups, PoliticalGroup},
+    election::{ElectionWithPoliticalGroups, PoliticalGroup},
     field_path::FieldPath,
     results::{count::Count, gsb_results::GSBResults},
     validate::{DataError, Validate, ValidateRoot, ValidationResults},
@@ -203,10 +203,10 @@ impl Results {
     }
 
     /// Create a default value for `voters_counts`, with all counts set to 0.
-    /// Voter cards ("kiezerspassen") only exist for non-municipal elections.
+    /// Voter cards ("kiezerspassen") only exist for non-local elections.
     pub fn default_voters_counts(election: &ElectionWithPoliticalGroups) -> VotersCounts {
         VotersCounts {
-            voter_card_count: (election.category != ElectionCategory::Municipal).then_some(0),
+            voter_card_count: (!election.category.is_local_election()).then_some(0),
             ..Default::default()
         }
     }

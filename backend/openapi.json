@@ -8179,7 +8179,8 @@
           "number_of_seats",
           "number_of_voters",
           "election_date",
-          "nomination_date"
+          "nomination_date",
+          "political_groups"
         ],
         "properties": {
           "category": {
@@ -8220,6 +8221,12 @@
             "type": "integer",
             "format": "int32",
             "minimum": 0
+          },
+          "political_groups": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RegisteredPoliticalGroup"
+            }
           },
           "sub_category": {
             "$ref": "#/components/schemas/ElectionSubCategory"
@@ -8771,6 +8778,35 @@
             "description": "Indexes of chunks that will be empty, sorted"
           }
         }
+      },
+      "RegisteredPoliticalGroup": {
+        "type": "object",
+        "description": "Political group and its candidates (with registered name as imported from the EML)",
+        "required": [
+          "number",
+          "registered_name",
+          "candidates"
+        ],
+        "properties": {
+          "candidates": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Candidate"
+            },
+            "description": "List of candidates of the political group"
+          },
+          "number": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Political group number",
+            "minimum": 0
+          },
+          "registered_name": {
+            "type": "string",
+            "description": "Registered political group name as imported from the candidates list EML (230)"
+          }
+        },
+        "additionalProperties": false
       },
       "ResolveDifferencesAction": {
         "type": "string",

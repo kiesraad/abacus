@@ -23,7 +23,7 @@ describe("CommitteeCategory component", () => {
     expect(router.state.location.pathname).toEqual("/elections/create");
   });
 
-  test("GSB: Navigates to candidate list upload page", async () => {
+  test("GSB: Navigates to polling station upload page", async () => {
     const state = { election, committeeCategory: "GSB" as CommitteeCategoryType };
     const dispatch = vi.fn();
     vi.spyOn(useElectionCreateContext, "useElectionCreateContext").mockReturnValue({ state, dispatch });
@@ -46,10 +46,10 @@ describe("CommitteeCategory component", () => {
       committeeCategory: "GSB",
     });
 
-    expect(router.state.location.pathname).toEqual("/elections/create/list-of-candidates");
+    expect(router.state.location.pathname).toEqual("/elections/create/polling-stations");
   });
 
-  test("CSB: Navigates to candidate list upload page", async () => {
+  test("CSB: Navigates to check and save page", async () => {
     const state = { election, committeeCategory: "CSB" as CommitteeCategoryType };
     const dispatch = vi.fn();
     vi.spyOn(useElectionCreateContext, "useElectionCreateContext").mockReturnValue({ state, dispatch });
@@ -72,6 +72,6 @@ describe("CommitteeCategory component", () => {
       committeeCategory: "CSB",
     });
 
-    expect(router.state.location.pathname).toEqual("/elections/create/list-of-candidates");
+    expect(router.state.location.pathname).toEqual("/elections/create/check-and-save");
   });
 });

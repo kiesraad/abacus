@@ -8,6 +8,7 @@ import type {
   NewElection,
   PoliticalGroup,
   PollingStationInvestigation,
+  RegisteredPoliticalGroup,
 } from "@/types/generated/openapi";
 
 import {
@@ -379,12 +380,28 @@ export const electionDetailsMockResponse: Required<ElectionDetailsResponse> = ge
 export const csbElectionDetailsMockResponse: Required<ElectionDetailsResponse> = getCSBElectionMockData();
 export const electionMockData = electionDetailsMockResponse.election;
 export const csbElectionMockData = csbElectionDetailsMockResponse.election;
+
+export function getRegisteredPoliticalGroupsFromPoliticalGroups(
+  political_groups: PoliticalGroup[],
+): RegisteredPoliticalGroup[] {
+  const registered_political_groups: RegisteredPoliticalGroup[] = [];
+  political_groups.forEach((pg) => {
+    registered_political_groups.push({
+      ...pg,
+      registered_name: pg.name,
+    } satisfies RegisteredPoliticalGroup);
+  });
+  return registered_political_groups;
+}
+
 export const newElectionMockData = {
   ...electionDetailsMockResponse.election,
+  political_groups: getRegisteredPoliticalGroupsFromPoliticalGroups(politicalGroupsMockData),
 } satisfies NewElection;
 
 export const newCSBElectionMockData = {
   ...csbElectionDetailsMockResponse.election,
+  political_groups: getRegisteredPoliticalGroupsFromPoliticalGroups(politicalGroupsMockData),
   committee_category: "CSB",
 } satisfies NewElection;
 

@@ -31,7 +31,11 @@ export function CommitteeCategory() {
       type: "SET_COMMITTEE_CATEGORY",
       committeeCategory,
     });
-    await navigate("/elections/create/list-of-candidates");
+    if (committeeCategory === "CSB") {
+      await navigate("/elections/create/check-and-save");
+    } else {
+      await navigate("/elections/create/polling-stations");
+    }
   }
 
   return (

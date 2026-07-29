@@ -68,12 +68,13 @@
     "hint": "Ingelezen uit bestand met stembureaus"
   },
   "please_wait_for_coordinator": "Je kan als invoerder nog niks doen. Wacht tot de coördinator het systeem openstelt voor het invoeren van telresultaten.",
+  "political_groups_added": "{num_groups} lijsten en {num_candidates} kandidaten",
   "polling_station_definition_does_not_match_election": {
     "description": "Het bestand <file>filename</file> bevat stembureaus voor een andere verkiezing. Controleer voor je verder gaat of de stembureaus juist zijn.",
     "title": "Afwijkende verkiezing"
   },
   "polling_stations": {
-    "added": "{num} stembureaus toegevoegd",
+    "added": "{num} stembureaus",
     "check": {
       "description": "Het bestand <file>filename</file> is geïmporteerd en bevat onderstaande stembureaus. Zie je een verschil met de vooraf gepubliceerde lijst? Je kan na het toevoegen van deze verkiezing stembureaus toevoegen, verwijderen of aanpassen.",
       "title": "Controleer stembureaus"

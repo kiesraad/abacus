@@ -43,7 +43,7 @@ export function UploadCandidatesDefinition() {
       setFile(currentFile);
       const data = await currentFile.text();
       const response = await create({
-        committee_category: state.committeeCategory,
+        committee_category: "GSB",
         candidate_data: data,
         election_hash: state.electionDefinitionHash,
         election_data: state.electionDefinitionData,
@@ -83,7 +83,7 @@ export function UploadCandidatesDefinition() {
   ) {
     async function onSubmit(chunks: string[]) {
       const response = await create({
-        committee_category: state.committeeCategory,
+        committee_category: "GSB",
         candidate_data: state.candidateDefinitionData,
         election_hash: state.electionDefinitionHash,
         election_data: state.electionDefinitionData,
@@ -94,11 +94,7 @@ export function UploadCandidatesDefinition() {
           type: "SET_CANDIDATES_DEFINITION_HASH",
           candidateDefinitionHash: chunks,
         });
-        if (state.committeeCategory && state.committeeCategory === "CSB") {
-          await navigate("/elections/create/check-and-save");
-        } else {
-          await navigate("/elections/create/polling-stations");
-        }
+        await navigate("/elections/create/committee-category");
       } else if (isError(response) && response instanceof ApiError && response.reference === "InvalidHash") {
         setError(response.message);
       }

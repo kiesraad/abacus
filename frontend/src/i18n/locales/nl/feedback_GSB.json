@@ -22,7 +22,7 @@
   },
   "F201": {
     "coordinator": {
-      "title": "A en B tellen niet op tot D",
+      "title": "A, B en C tellen niet op tot D",
       "content": "Controleer in rubriek 3.3 (eerste zitting) of 2.3 (volgende zitting) of er een onverklaard verschil opgelost wordt als het juiste getal bij D wordt ingevuld.",
       "actions": "<ul><li>Zo ja: herstel op papier de optelfout door bij D het juiste getal in te vullen.</li><li>Zo nee: tel de stembiljetten en het aantal toegelaten kiezers opnieuw tot de fout gevonden is, of alles één keer herteld is.</li></ul>"
     }

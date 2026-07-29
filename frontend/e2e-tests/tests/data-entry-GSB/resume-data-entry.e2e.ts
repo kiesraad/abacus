@@ -14,6 +14,7 @@ import {
 } from "e2e-tests/page-objects/data_entry/ExtraInvestigationPgObj";
 import { VotersAndVotesPage } from "e2e-tests/page-objects/data_entry/VotersAndVotesPgObj";
 import { emptyCSOFirstSessionResults } from "e2e-tests/test-data/request-response-templates";
+import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMockData";
 import type { ClaimDataEntryResponse, VotersCounts, VotesCounts } from "@/types/generated/openapi";
 import { type DataEntry, test } from "../../fixtures";
 
@@ -174,26 +175,8 @@ test.describe("resume data entry flow", () => {
           },
         },
         validation_results: {
-          errors: [
-            {
-              fields: [
-                "data.voters_counts.poll_card_count",
-                "data.voters_counts.proxy_certificate_count",
-                "data.voters_counts.total_admitted_voters_count",
-              ],
-              code: "F201",
-            },
-            {
-              fields: ["data.differences_counts.compare_votes_cast_admitted_voters"],
-              code: "F304",
-            },
-          ],
-          warnings: [
-            {
-              fields: ["data.votes_counts.total_votes_cast_count"],
-              code: "W204",
-            },
-          ],
+          errors: [validationResultMockData.F201, validationResultMockData.F304],
+          warnings: [validationResultMockData.W204],
         },
       });
 

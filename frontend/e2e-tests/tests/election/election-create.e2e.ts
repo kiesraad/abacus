@@ -21,7 +21,7 @@ import { PollingStationImportPgObj } from "e2e-tests/page-objects/polling_statio
 import { PollingStationListEmptyPgObj } from "e2e-tests/page-objects/polling_station/PollingStationListEmptyPgObj";
 import { PollingStationListPgObj } from "e2e-tests/page-objects/polling_station/PollingStationListPgObj";
 import { eml110a, eml110b, eml110b_zero_voters, eml230b } from "e2e-tests/test-data/eml-files";
-import { test } from "../fixtures";
+import { test } from "../../fixtures";
 
 test.use({
   storageState: "e2e-tests/state/admin1.json",
@@ -37,13 +37,13 @@ test.describe("Election creation", () => {
       // upload election and check hash
       await uploadElectionAndInputHash(page);
 
+      // upload candidates list and check
+      await uploadCandidatesAndInputHash(page, eml230b);
+
       // committee category
       const committeeCategoryPage = new CommitteeCategoryPgObj(page);
       await expect(committeeCategoryPage.header).toBeVisible();
       await committeeCategoryPage.next.click();
-
-      // upload candidates list and check
-      await uploadCandidatesAndInputHash(page, eml230b);
 
       // upload polling stations
       await uploadPollingStations(page);
@@ -62,8 +62,14 @@ test.describe("Election creation", () => {
       // Now we should be at the check and save page
       const checkAndSavePage = new CheckAndSavePgObj(page);
       await expect(checkAndSavePage.header).toBeVisible();
+
+      await expect(checkAndSavePage.electionName).toContainText("verkiezing: Gemeenteraad Test 2022");
+      await expect(checkAndSavePage.committeeCategory).toContainText("type stembureau: Gemeentelijk stembureau");
+      await expect(checkAndSavePage.electionLocation).toContainText("gebiedsaanduiding: Test");
+      await expect(checkAndSavePage.numberOfListsAndCandidates).toContainText("3 lijsten en 18 kandidaten");
+      await expect(checkAndSavePage.numberOfPollingStations).toContainText("420 stembureaus");
       await expect(checkAndSavePage.countingMethod).toContainText("Centrale stemopneming");
-      await expect(checkAndSavePage.numberOfVoters).toContainText("612.694");
+      await expect(checkAndSavePage.numberOfVoters).toContainText("612.694 kiesgerechtigden");
 
       // Now go back and fill the number of voters with a custom value
       await page.goBack();
@@ -74,7 +80,7 @@ test.describe("Election creation", () => {
 
       // Check that the value is updated
       await expect(checkAndSavePage.header).toBeVisible();
-      await expect(checkAndSavePage.numberOfVoters).toContainText("1.234");
+      await expect(checkAndSavePage.numberOfVoters).toContainText("1.234 kiesgerechtigden");
 
       // Go back another time to check that the hint is gone (since now it's not an imported value anymore)
       // It should also still show the updated value
@@ -103,13 +109,13 @@ test.describe("Election creation", () => {
       // upload election and check hash
       await uploadElectionAndInputHash(page);
 
+      // upload candidates list and check
+      await uploadCandidatesAndInputHash(page, eml230b);
+
       // committee category
       const committeeCategoryPage = new CommitteeCategoryPgObj(page);
       await expect(committeeCategoryPage.header).toBeVisible();
       await committeeCategoryPage.next.click();
-
-      // upload candidates list and check
-      await uploadCandidatesAndInputHash(page, eml230b);
 
       // skip polling stations
       const uploadPollingStationsPage = new UploadPollingStationsFilePgObj(page);
@@ -135,6 +141,13 @@ test.describe("Election creation", () => {
       // Now we should be at the check and save page
       const checkAndSavePage = new CheckAndSavePgObj(page);
       await expect(checkAndSavePage.header).toBeVisible();
+      await expect(checkAndSavePage.electionName).toContainText("verkiezing: Gemeenteraad Test 2022");
+      await expect(checkAndSavePage.committeeCategory).toHaveText("type stembureau: Gemeentelijk stembureau");
+      await expect(checkAndSavePage.electionLocation).toContainText("gebiedsaanduiding: Test");
+      await expect(checkAndSavePage.numberOfListsAndCandidates).toContainText("3 lijsten en 18 kandidaten");
+      await expect(checkAndSavePage.numberOfPollingStations).toBeHidden();
+      await expect(checkAndSavePage.countingMethod).toContainText("Centrale stemopneming");
+      await expect(checkAndSavePage.numberOfVoters).toContainText("1.234 kiesgerechtigden");
 
       const election = await checkAndSavePage.saveElection();
       await expect(overviewPage.adminHeader).toBeVisible();
@@ -177,6 +190,9 @@ test.describe("Election creation", () => {
       // upload election and check hash
       await uploadElectionAndInputHash(page);
 
+      // upload candidates list and check
+      await uploadCandidatesAndInputHash(page, eml230b);
+
       // committee category
       const committeeCategoryPage = new CommitteeCategoryPgObj(page);
       await expect(committeeCategoryPage.header).toBeVisible();
@@ -184,13 +200,14 @@ test.describe("Election creation", () => {
       await expect(committeeCategoryPage.csb).toBeChecked();
       await committeeCategoryPage.next.click();
 
-      // upload candidates list and check
-      await uploadCandidatesAndInputHash(page, eml230b);
-
       // Now we should be at the check and save page
       const checkAndSavePage = new CheckAndSavePgObj(page);
       await expect(checkAndSavePage.header).toBeVisible();
+      await expect(checkAndSavePage.electionName).toContainText("verkiezing: Gemeenteraad Test 2022");
       await expect(checkAndSavePage.committeeCategory).toHaveText("type stembureau: Centraal stembureau");
+      await expect(checkAndSavePage.electionLocation).toContainText("gebiedsaanduiding: Test");
+      await expect(checkAndSavePage.numberOfListsAndCandidates).toContainText("3 lijsten en 18 kandidaten");
+      await expect(checkAndSavePage.numberOfPollingStations).toBeHidden();
       await expect(checkAndSavePage.countingMethod).toBeHidden();
       await expect(checkAndSavePage.numberOfVoters).toBeHidden();
 
@@ -239,8 +256,9 @@ test.describe("Election creation", () => {
       const checkDefinitionPage = new CheckElectionDefinitionPgObj(page);
       await expect(checkDefinitionPage.hashInput1).toBeFocused();
       await checkDefinitionPage.inputHash("476B", "C0DE");
-      const committeeCategoryPage = new CommitteeCategoryPgObj(page);
-      await expect(committeeCategoryPage.header).toBeVisible();
+
+      const uploadCandidateDefinitionPage = new UploadCandidateDefinitionPgObj(page);
+      await expect(uploadCandidateDefinitionPage.header).toBeVisible();
     });
 
     test("it fails on valid, but incorrect file", async ({ page }) => {
@@ -268,11 +286,6 @@ test.describe("Election creation", () => {
       // upload election and check hash
       await uploadElectionAndInputHash(page);
 
-      // committee category
-      const committeeCategoryPage = new CommitteeCategoryPgObj(page);
-      await expect(committeeCategoryPage.header).toBeVisible();
-      await committeeCategoryPage.next.click();
-
       // Candidate page
       const uploadCandidateDefinitionPage = new UploadCandidateDefinitionPgObj(page);
       await expect(uploadCandidateDefinitionPage.header).toBeVisible();
@@ -292,11 +305,6 @@ test.describe("Election creation", () => {
 
       // upload election and check hash
       await uploadElectionAndInputHash(page);
-
-      // committee category
-      const committeeCategoryPage = new CommitteeCategoryPgObj(page);
-      await expect(committeeCategoryPage.header).toBeVisible();
-      await committeeCategoryPage.next.click();
 
       // Candidate page
       const uploadCandidateDefinitionPage = new UploadCandidateDefinitionPgObj(page);
@@ -341,12 +349,8 @@ test.describe("Election creation", () => {
       await overviewPage.create.click();
 
       // upload election and check hash
+      const uploadElectionDefinitionPage = new UploadElectionDefinitionPgObj(page);
       await uploadElectionAndInputHash(page);
-
-      // committee category
-      const committeeCategoryPage = new CommitteeCategoryPgObj(page);
-      await expect(committeeCategoryPage.header).toBeVisible();
-      await committeeCategoryPage.next.click();
 
       // Candidate page
       const uploadCandidateDefinitionPage = new UploadCandidateDefinitionPgObj(page);
@@ -354,7 +358,7 @@ test.describe("Election creation", () => {
 
       // Back button
       await page.goBack();
-      await expect(committeeCategoryPage.header).toBeVisible();
+      await expect(uploadElectionDefinitionPage.header).toBeVisible();
     });
 
     test("after candidate upload, moving back to candidate page resets candidates", async ({ page }) => {
@@ -365,17 +369,12 @@ test.describe("Election creation", () => {
       // upload election and check hash
       await uploadElectionAndInputHash(page);
 
-      // committee category
-      const committeeCategoryPage = new CommitteeCategoryPgObj(page);
-      await expect(committeeCategoryPage.header).toBeVisible();
-      await committeeCategoryPage.next.click();
-
       // upload candidates list and check hash
       await uploadCandidatesAndInputHash(page, eml230b);
 
-      // Now we should be at the polling station upload page
-      const uploadPollingStationsPage = new UploadPollingStationsFilePgObj(page);
-      await expect(uploadPollingStationsPage.header).toBeVisible();
+      // Now we should be at the committee category page
+      const committeeCategoryPage = new CommitteeCategoryPgObj(page);
+      await expect(committeeCategoryPage.header).toBeVisible();
 
       // Back button
       await page.goBack();
@@ -395,13 +394,13 @@ test.describe("Election creation", () => {
       // upload election and check hash
       await uploadElectionAndInputHash(page);
 
+      // upload candidates list and check hash
+      await uploadCandidatesAndInputHash(page, eml230b);
+
       // committee category
       const committeeCategoryPage = new CommitteeCategoryPgObj(page);
       await expect(committeeCategoryPage.header).toBeVisible();
       await committeeCategoryPage.next.click();
-
-      // upload candidates list and check hash
-      await uploadCandidatesAndInputHash(page, eml230b);
 
       // Now we should be at the polling station upload page
       const uploadPollingStationsPage = new UploadPollingStationsFilePgObj(page);
@@ -428,13 +427,13 @@ test.describe("Election creation", () => {
       // upload election and check hash
       await uploadElectionAndInputHash(page);
 
+      // upload candidates list and check hash
+      await uploadCandidatesAndInputHash(page, eml230b);
+
       // committee category
       const committeeCategoryPage = new CommitteeCategoryPgObj(page);
       await expect(committeeCategoryPage.header).toBeVisible();
       await committeeCategoryPage.next.click();
-
-      // upload candidates list and check hash
-      await uploadCandidatesAndInputHash(page, eml230b);
 
       // upload polling stations
       await uploadPollingStations(page);
@@ -474,11 +473,11 @@ test.describe("Election creation", () => {
 
       await uploadElectionAndInputHash(page);
 
+      await uploadCandidatesAndInputHash(page, eml230b);
+
       const committeeCategoryPage = new CommitteeCategoryPgObj(page);
       await expect(committeeCategoryPage.header).toBeVisible();
       await committeeCategoryPage.next.click();
-
-      await uploadCandidatesAndInputHash(page, eml230b);
 
       await uploadPollingStations(page, eml110b_zero_voters);
 
@@ -509,13 +508,13 @@ test.describe("Election creation", () => {
       // upload election and check hash
       await uploadElectionAndInputHash(page);
 
+      // upload candidates list and check hash
+      await uploadCandidatesAndInputHash(page, eml230b);
+
       // committee category
       const committeeCategoryPage = new CommitteeCategoryPgObj(page);
       await expect(committeeCategoryPage.header).toBeVisible();
       await committeeCategoryPage.next.click();
-
-      // upload candidates list and check hash
-      await uploadCandidatesAndInputHash(page, eml230b);
 
       // upload wrong file
       const uploadPollingStationsPage = new UploadPollingStationsFilePgObj(page);

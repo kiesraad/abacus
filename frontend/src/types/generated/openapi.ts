@@ -480,6 +480,8 @@ export const auditEventTypeValues = [
   "DataEntryReturnedFirst",
   "DataEntryKeptFirst",
   "DataEntryKeptSecond",
+  "DataEntryKeptFirstReturnedSecond",
+  "DataEntryKeptSecondReturnedFirst",
   "DataEntryDiscardedBoth",
   "AirGapViolationDetected",
   "AirGapViolationResolved",
@@ -1170,6 +1172,8 @@ export interface GenerateElectionArgs {
   committee_category: CommitteeCategory;
   /** Custom election name */
   custom_name?: string;
+  /** Municipal, Provincial or WaterAuthority */
+  election_category: ElectionCategory;
   /** Percentage of the first data entry to complete if data entry is included */
   first_data_entry: RandomRange;
   /** Generate multiple elections, each resulting in drawing lots */
@@ -1333,6 +1337,7 @@ export interface NewElection {
   nomination_date: string;
   number_of_seats: number;
   number_of_voters: number;
+  political_groups: RegisteredPoliticalGroup[];
   sub_category: ElectionSubCategory;
 }
 
@@ -1504,10 +1509,24 @@ export interface RedactedEmlHash {
   redacted_indexes: number[];
 }
 
+/**
+ * Political group and its candidates (with registered name as imported from the EML)
+ */
+export interface RegisteredPoliticalGroup {
+  /** List of candidates of the political group */
+  candidates: Candidate[];
+  /** Political group number */
+  number: number;
+  /** Registered political group name as imported from the candidates list EML (230) */
+  registered_name: string;
+}
+
 export const resolveDifferencesActionValues = [
-  "keep_first_entry",
-  "keep_second_entry",
-  "discard_both_entries",
+  "keep_first_and_discard_second",
+  "keep_first_and_correct_second",
+  "keep_second_and_discard_first",
+  "keep_second_and_correct_first",
+  "discard_both",
 ] as const;
 export type ResolveDifferencesAction = (typeof resolveDifferencesActionValues)[number];
 

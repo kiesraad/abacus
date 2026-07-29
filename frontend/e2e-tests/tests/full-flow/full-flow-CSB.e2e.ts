@@ -1,6 +1,5 @@
 import { stat } from "node:fs/promises";
 import { expect, request } from "@playwright/test";
-import { test } from "e2e-tests/fixtures";
 import { apiLogout, createUser, firstLogin, getTestPassword } from "e2e-tests/helpers-utils/e2e-test-api-helpers";
 import {
   fillDataEntryPagesAndSave,
@@ -33,6 +32,7 @@ import { UserListPgObj } from "e2e-tests/page-objects/users/UserListPgObj";
 import { eml230b_more_than_45_candidates } from "e2e-tests/test-data/eml-files";
 import { noRecountNoDifferencesDataEntryGSB } from "e2e-tests/test-data/request-response-templates";
 import type { TestUser } from "e2e-tests/test-data/users";
+import { test } from "../../fixtures";
 
 // Note: Do not use the randomSuffix in test titles. You cannot interpolate a non-static value.
 // Using the randomSuffix in test titles will result in those tests being executed last.
@@ -90,13 +90,13 @@ test.describe("full flow CSB", () => {
 
     await uploadElectionAndInputHash(page);
 
+    await uploadCandidatesAndInputHash(page, eml230b_more_than_45_candidates);
+
     const committeeCategoryPage = new CommitteeCategoryPgObj(page);
     await expect(committeeCategoryPage.header).toBeVisible();
     await committeeCategoryPage.csb.click();
     await expect(committeeCategoryPage.csb).toBeChecked();
     await committeeCategoryPage.next.click();
-
-    await uploadCandidatesAndInputHash(page, eml230b_more_than_45_candidates);
 
     const checkAndSavePage = new CheckAndSavePgObj(page);
     await expect(checkAndSavePage.header).toBeVisible();

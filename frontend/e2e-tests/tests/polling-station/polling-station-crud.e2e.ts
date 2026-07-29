@@ -2,7 +2,7 @@ import { expect } from "@playwright/test";
 import { PollingStationFormPgObj } from "e2e-tests/page-objects/polling_station/PollingStationFormPgObj";
 import { PollingStationListEmptyPgObj } from "e2e-tests/page-objects/polling_station/PollingStationListEmptyPgObj";
 import { PollingStationListPgObj } from "e2e-tests/page-objects/polling_station/PollingStationListPgObj";
-import { test } from "../fixtures";
+import { test } from "../../fixtures";
 
 test.use({
   storageState: "e2e-tests/state/coordinator1-GSB.json",

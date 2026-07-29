@@ -6,8 +6,8 @@ import { Button } from "@/components/ui/Button/Button";
 import { useMessages } from "@/hooks/messages/useMessages";
 import { t } from "@/i18n/translate";
 import type { ELECTION_IMPORT_REQUEST_PATH, ElectionWithPoliticalGroups } from "@/types/generated/openapi";
-import { formatNumber } from "@/utils/number";
 import { useElectionCreateContext } from "../hooks/useElectionCreateContext";
+import { ImportedElectionInformation } from "./ImportedElectionInformation";
 
 export function CheckAndSave() {
   const { pushMessage } = useMessages();
@@ -68,32 +68,13 @@ export function CheckAndSave() {
     <section className="md">
       <h2>{t("election.check_and_save.title")}</h2>
       <p className="mt-lg">{t("election.check_and_save.description")}</p>
-      <ul>
-        <li>
-          <strong>{t("election.singular")}:</strong> {state.election.name}
-        </li>
-        <li id="committee-category">
-          <strong>{t("election.committee_category.title").toLowerCase()}:</strong>{" "}
-          {t(`committee_category.${state.committeeCategory}.short`)}
-        </li>
-        <li>
-          <strong>{t("area_designation")}:</strong> {state.election.location}
-        </li>
-      </ul>
-
-      <ul>
-        {state.pollingStations && (
-          <li id="polling-stations-added">
-            {t("election.polling_stations.added", { num: state.pollingStations.length })}
-          </li>
-        )}
-        {state.countingMethod && <li id="counting-method">{t(state.countingMethod)}</li>}
-        {state.numberOfVoters && (
-          <li id="number-of-voters">
-            {formatNumber(state.numberOfVoters)} {t("voters")}
-          </li>
-        )}
-      </ul>
+      <ImportedElectionInformation
+        election={state.election}
+        committeeCategory={state.committeeCategory}
+        pollingStations={state.pollingStations}
+        countingMethod={state.countingMethod}
+        numberOfVoters={state.numberOfVoters}
+      />
       <div className="mt-xl">
         <Button
           type="submit"

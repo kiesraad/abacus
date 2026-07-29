@@ -122,6 +122,18 @@ impl AsAuditEvent for DataEntryDeletedAuditData {
     const EVENT_TYPE: AuditEventType = AuditEventType::DataEntryDeleted;
     const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Info;
 }
+#[derive(Serialize)]
+struct DataEntryDiscardedAuditData(pub DataEntryAuditData);
+impl AsAuditEvent for DataEntryDiscardedAuditData {
+    const EVENT_TYPE: AuditEventType = AuditEventType::DataEntryDiscarded;
+    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Info;
+}
+#[derive(Serialize)]
+struct DataEntryResetAuditData(pub DataEntryAuditData);
+impl AsAuditEvent for DataEntryResetAuditData {
+    const EVENT_TYPE: AuditEventType = AuditEventType::DataEntryReset;
+    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Info;
+}
 
 #[derive(Serialize)]
 struct DataEntryFinalisedAuditData(pub DataEntryAuditData);
@@ -486,10 +498,10 @@ async fn data_entry_discard(
         }
     };
 
-    let data_entry = data_entry_repo::update(&mut tx, data_entry_id, &new_state).await?;
+    let entry = data_entry_repo::update(&mut tx, data_entry_id, &new_state).await?;
 
     audit_service
-        .log(&mut tx, &DataEntryDeletedAuditData(data_entry.into()), None)
+        .log(&mut tx, &DataEntryDiscardedAuditData(entry.into()), None)
         .await?;
 
     tx.commit().await?;
@@ -604,13 +616,13 @@ async fn data_entry_reset(
 
         Err(APIError::Conflict(
             "Data entry cannot be reset.".to_string(),
-            ErrorReference::DataEntryCannotBeDeleted,
+            ErrorReference::DataEntryCannotBeReset,
         ))
     } else {
         data_entry_repo::update(&mut tx, data_entry_id, &DataEntryStatus::Empty).await?;
 
         audit_service
-            .log(&mut tx, &DataEntryDeletedAuditData(data_entry.into()), None)
+            .log(&mut tx, &DataEntryResetAuditData(data_entry.into()), None)
             .await?;
 
         if context.committee_session.status == CommitteeSessionStatus::Completed {
@@ -979,6 +991,8 @@ async fn election_status(
 
 #[cfg(test)]
 mod tests {
+    use std::assert_matches;
+
     use axum::http::StatusCode;
     use http_body_util::BodyExt;
     use sqlx::SqlitePool;
@@ -1092,7 +1106,7 @@ mod tests {
         .into_response()
     }
 
-    async fn delete(
+    async fn discard(
         pool: SqlitePool,
         data_entry_id: DataEntryId,
         entry_number: EntryNumber,
@@ -1815,13 +1829,21 @@ mod tests {
         let mut conn = pool.acquire().await.unwrap();
         assert!(ps_has_data_entry(&mut conn, polling_station_id).await);
 
-        // delete data entry
-        let response = delete(pool.clone(), data_entry_id, EntryNumber::FirstEntry).await;
+        // discard data entry
+        let response = discard(pool.clone(), data_entry_id, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::NO_CONTENT);
 
         // Check that the data entry is reset to Empty
         let data_entry = get_data_entry_for_ps(&mut conn, polling_station_id).await;
         assert_eq!(data_entry.state.0, DataEntryStatus::Empty);
+
+        audit_log::assert_last_event(
+            &mut conn,
+            AuditEventType::DataEntryDiscarded,
+            AuditEventLevel::Info,
+            serde_json::to_value(DataEntryAuditData::from(data_entry.clone())).unwrap(),
+        )
+        .await;
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
@@ -1883,8 +1905,8 @@ mod tests {
         let status: DataEntryStatus = data_entry.state.0;
         assert!(matches!(status, DataEntryStatus::SecondEntryInProgress(_)));
 
-        // delete second data entry
-        let response = delete(pool.clone(), data_entry_id, EntryNumber::SecondEntry).await;
+        // discard second data entry
+        let response = discard(pool.clone(), data_entry_id, EntryNumber::SecondEntry).await;
         assert_eq!(response.status(), StatusCode::NO_CONTENT);
 
         // Check that the second data entry is deleted
@@ -1918,8 +1940,8 @@ mod tests {
         )
         .await;
 
-        // delete data entry
-        let response = delete(pool.clone(), data_entry_id, EntryNumber::FirstEntry).await;
+        // discard data entry
+        let response = discard(pool.clone(), data_entry_id, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::CONFLICT);
         let body = response.into_body().collect().await.unwrap().to_bytes();
         let result: ErrorResponse = serde_json::from_slice(&body).unwrap();
@@ -1959,8 +1981,8 @@ mod tests {
         )
         .await;
 
-        // delete data entry
-        let response = delete(pool.clone(), data_entry_id, EntryNumber::FirstEntry).await;
+        // discard data entry
+        let response = discard(pool.clone(), data_entry_id, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::CONFLICT);
         let body = response.into_body().collect().await.unwrap().to_bytes();
         let result: ErrorResponse = serde_json::from_slice(&body).unwrap();
@@ -2015,9 +2037,9 @@ mod tests {
             let response = finalise(pool.clone(), data_entry_id, entry_number).await;
             assert_eq!(response.status(), StatusCode::OK);
 
-            // check that deleting finalised or non-existent data entry returns 404
+            // check that discarding finalised or non-existent data entry returns 404
             for _entry_number in 1..=2 {
-                let response = delete(pool.clone(), data_entry_id, entry_number).await;
+                let response = discard(pool.clone(), data_entry_id, entry_number).await;
                 assert_eq!(response.status(), StatusCode::CONFLICT);
             }
 
@@ -2047,15 +2069,27 @@ mod tests {
         assert_eq!(response.status(), StatusCode::OK);
 
         let mut conn = pool.acquire().await.unwrap();
-        assert!(ps_has_data_entry(&mut conn, polling_station_id).await);
+        let in_progress = get_data_entry_for_ps(&mut conn, polling_station_id).await;
+        assert_matches!(
+            in_progress.state.0,
+            DataEntryStatus::FirstEntryInProgress(_)
+        );
 
-        // delete data entry with status FirstEntryInProgress
+        // Reset data entry with status FirstEntryInProgress
         let response = reset(pool.clone(), data_entry_id).await;
         assert_eq!(response.status(), StatusCode::NO_CONTENT);
 
         // Check that the data entry is reset to Empty
-        let data_entry = get_data_entry_for_ps(&mut conn, polling_station_id).await;
-        assert_eq!(data_entry.state.0, DataEntryStatus::Empty);
+        let reset = get_data_entry_for_ps(&mut conn, polling_station_id).await;
+        assert_eq!(reset.state.0, DataEntryStatus::Empty);
+
+        audit_log::assert_last_event(
+            &mut conn,
+            AuditEventType::DataEntryReset,
+            AuditEventLevel::Info,
+            serde_json::to_value(DataEntryAuditData::from(in_progress.clone())).unwrap(),
+        )
+        .await;
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_3"))))]
@@ -2130,7 +2164,7 @@ mod tests {
         assert_eq!(response.status(), StatusCode::CONFLICT);
         let body = response.into_body().collect().await.unwrap().to_bytes();
         let result: ErrorResponse = serde_json::from_slice(&body).unwrap();
-        assert_eq!(result.reference, ErrorReference::DataEntryCannotBeDeleted);
+        assert_eq!(result.reference, ErrorReference::DataEntryCannotBeReset);
 
         // Check that the data entry is not deleted
         assert!(ps_has_data_entry(&mut conn, polling_station_id).await);
@@ -2150,7 +2184,7 @@ mod tests {
         assert_eq!(response.status(), StatusCode::CONFLICT);
         let body = response.into_body().collect().await.unwrap().to_bytes();
         let result: ErrorResponse = serde_json::from_slice(&body).unwrap();
-        assert_eq!(result.reference, ErrorReference::DataEntryCannotBeDeleted);
+        assert_eq!(result.reference, ErrorReference::DataEntryCannotBeReset);
 
         // Check that the data entry is not deleted
         assert!(ps_has_data_entry(&mut conn, polling_station_id).await);

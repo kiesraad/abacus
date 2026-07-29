@@ -373,7 +373,7 @@ async fn test_data_entry_claim_finalised(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_data_entry_deletion(pool: SqlitePool) {
+async fn test_data_entry_discard(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let typist_cookie = login(&addr, TypistGSB).await;
     let request_body = example_cso_data_entry(None);
@@ -401,8 +401,8 @@ async fn test_data_entry_deletion(pool: SqlitePool) {
         .unwrap();
     assert_eq!(response.status(), StatusCode::OK);
 
-    // delete the data entry
-    async fn delete_data_entry(
+    // discard the data entry
+    async fn data_entry_discard(
         addr: SocketAddr,
         data_entry_id: u32,
         cookie: &HeaderValue,
@@ -415,11 +415,11 @@ async fn test_data_entry_deletion(pool: SqlitePool) {
             .await
             .unwrap()
     }
-    let response = delete_data_entry(addr, data_entry_id, &typist_cookie).await;
+    let response = data_entry_discard(addr, data_entry_id, &typist_cookie).await;
     assert_eq!(response.status(), StatusCode::NO_CONTENT);
 
     // we should not be allowed to delete the entry again
-    let response = delete_data_entry(addr, data_entry_id, &typist_cookie).await;
+    let response = data_entry_discard(addr, data_entry_id, &typist_cookie).await;
     assert_eq!(response.status(), StatusCode::CONFLICT);
 }
 

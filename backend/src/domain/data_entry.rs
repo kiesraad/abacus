@@ -36,6 +36,8 @@ pub enum DataEntryTransitionError {
     CannotTransitionUsingDifferentUser,
     /// The second data entry needs to be claimed by a user other than the one who claimed the first entry
     SecondEntryNeedsDifferentUser,
+    /// Correction is not allowed because the second entry has errors
+    CorrectionNotAllowed,
     ValidatorError(DataError),
     ValidationError(ValidationResults),
 }
@@ -882,9 +884,17 @@ impl DataEntryStatus {
     }
 
     /// Correct first entry while resolving differences
-    pub fn correct_first_entry(self) -> Result<Self, DataEntryTransitionError> {
+    /// This is only allowed when the second entry has no errors.
+    pub fn correct_first_entry(
+        self,
+        election: &ElectionWithPoliticalGroups,
+    ) -> Result<Self, DataEntryTransitionError> {
         match &self {
             DataEntryStatus::EntriesDifferent(state) => {
+                if state.second_entry.start_validate(election)?.has_errors() {
+                    return Err(DataEntryTransitionError::CorrectionNotAllowed);
+                }
+
                 Ok(Self::FirstEntryCorrection(FirstEntryCorrection {
                     first_entry_user_id: state.first_entry_user_id,
                     second_entry_user_id: state.second_entry_user_id,
@@ -1054,6 +1064,9 @@ impl Display for DataEntryTransitionError {
                 )
             }
             DataEntryTransitionError::Invalid => write!(f, "Invalid state transition"),
+            DataEntryTransitionError::CorrectionNotAllowed => {
+                write!(f, "Correction not allowed: second entry has errors")
+            }
             DataEntryTransitionError::ValidatorError(data_error) => {
                 write!(f, "Validator error: {data_error}")
             }
@@ -1756,6 +1769,26 @@ mod tests {
         } else {
             panic!("{next:?}")
         };
+    }
+
+    #[test]
+    fn entries_different_keep_second_and_correct_first_with_errors_is_rejected() {
+        let first_entry = example_results();
+        let second_entry = example_results().with_error();
+
+        let initial = DataEntryStatus::EntriesDifferent(EntriesDifferent {
+            first_entry,
+            first_entry_user_id: UserId::from(0),
+            second_entry,
+            second_entry_user_id: UserId::from(0),
+            first_entry_finished_at: Utc::now(),
+            second_entry_finished_at: Utc::now(),
+        });
+
+        assert_eq!(
+            initial.correct_first_entry(&election()),
+            Err(DataEntryTransitionError::CorrectionNotAllowed)
+        );
     }
 
     #[test]

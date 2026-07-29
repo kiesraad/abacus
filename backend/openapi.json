@@ -6412,6 +6412,7 @@
           "first_entry",
           "second_entry_user_id",
           "second_entry",
+          "second_entry_has_errors",
           "source"
         ],
         "properties": {
@@ -6423,6 +6424,9 @@
           },
           "second_entry": {
             "$ref": "#/components/schemas/Results"
+          },
+          "second_entry_has_errors": {
+            "type": "boolean"
           },
           "second_entry_user_id": {
             "$ref": "#/components/schemas/UserId"

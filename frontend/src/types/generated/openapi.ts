@@ -790,6 +790,7 @@ export interface DataEntryGetDifferencesResponse {
   first_entry: Results;
   first_entry_user_id: UserId;
   second_entry: Results;
+  second_entry_has_errors: boolean;
   second_entry_user_id: UserId;
   source: DataEntrySource;
 }

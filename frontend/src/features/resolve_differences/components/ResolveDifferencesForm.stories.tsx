@@ -15,6 +15,7 @@ const meta = {
     setCorrectEntry: fn(),
     wrongEntryAction: undefined,
     setWrongEntryAction: fn(),
+    correctionBlocked: false,
     correctEntryError: undefined,
     wrongEntryError: undefined,
     onSubmit: fn(),
@@ -22,6 +23,7 @@ const meta = {
   argTypes: {
     correctEntry: { control: false },
     wrongEntryAction: { control: false },
+    correctionBlocked: { control: false },
     correctEntryError: { control: "text" },
     wrongEntryError: { control: "text" },
   },
@@ -44,6 +46,7 @@ export const Default: Story = {
             setCorrectEntry={(next) => {
               args.setCorrectEntry(next);
               setCorrectEntry(next);
+              setWrongEntryAction(undefined);
             }}
             wrongEntryAction={wrongEntryAction}
             setWrongEntryAction={(next) => {
@@ -87,13 +90,13 @@ export const Default: Story = {
     await expect(args.setWrongEntryAction).toHaveBeenLastCalledWith("discard");
     await expect(discardWrongEntry).toBeChecked();
 
-    // Choosing "neither" disables the second question again and clears its answer
+    // Choosing "neither" disables the second question again and sets discarding as the (disabled) answer
     await userEvent.click(discardBoth);
     await expect(args.setCorrectEntry).toHaveBeenLastCalledWith("neither");
-    await expect(args.setWrongEntryAction).toHaveBeenLastCalledWith(undefined);
     await expect(correctWrongEntry).toBeDisabled();
+    await expect(correctWrongEntry).not.toBeChecked();
     await expect(discardWrongEntry).toBeDisabled();
-    await expect(discardWrongEntry).not.toBeChecked();
+    await expect(discardWrongEntry).toBeChecked();
 
     // Submitting the form calls onSubmit
     await userEvent.click(canvas.getByRole("button", { name: "Opslaan" }));
@@ -112,6 +115,34 @@ export const FirstEntrySelected: Story = {
     // The second question is enabled once an entry is chosen
     await expect(canvas.getByRole("radio", { name: "Laten herstellen door oorspronkelijke invoerder" })).toBeEnabled();
     await expect(canvas.getByRole("radio", { name: "Opnieuw laten invoeren" })).toBeEnabled();
+  },
+};
+
+export const SecondEntryHasErrors: Story = {
+  ...Default,
+  args: {
+    correctEntry: "second",
+    correctionBlocked: true,
+  },
+  play: async ({ canvas }) => {
+    await expect(
+      canvas.getByText(
+        "Uit de tweede invoer blijkt dat er waarschijnlijk fouten in het papieren proces-verbaal zijn gemaakt. " +
+          "Daarom kan je de eerste invoer nu niet laten herstellen door de oorspronkelijke invoerder. " +
+          "Eerst moet het papieren proces-verbaal worden gecontroleerd. Dat doen we in de volgende stap. " +
+          "De eerste invoer wordt verwijderd.",
+      ),
+    ).toBeVisible();
+
+    const correctWrongEntry = canvas.getByRole("radio", { name: "Laten herstellen door oorspronkelijke invoerder" });
+    const discardWrongEntry = canvas.getByRole("radio", { name: "Opnieuw laten invoeren" });
+    await expect(correctWrongEntry).toBeDisabled();
+    await expect(correctWrongEntry).not.toBeChecked();
+    await expect(discardWrongEntry).toBeDisabled();
+    await expect(discardWrongEntry).toBeChecked();
+
+    // The submit button announces that resolving the errors is the next step
+    await expect(canvas.getByRole("button", { name: "Verder naar fouten oplossen" })).toBeVisible();
   },
 };
 

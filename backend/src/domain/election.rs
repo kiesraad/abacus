@@ -198,6 +198,14 @@ pub enum ElectionCategory {
 }
 
 impl ElectionCategory {
+    pub fn is_local_election(&self) -> bool {
+        match self {
+            ElectionCategory::Municipal => true,
+            ElectionCategory::Provincial => false,
+            ElectionCategory::WaterAuthority => false,
+        }
+    }
+
     pub fn to_eml_code(&self) -> &'static str {
         match self {
             ElectionCategory::Municipal => "GR",

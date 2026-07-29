@@ -1298,7 +1298,7 @@ mod tests {
         let user_id = UserId::from(1);
         let first_session = CommitteeSession::first_session();
 
-        // Voter cards only exist for non-municipal elections
+        // Voter cards only exist for non-local elections
         let cases = [
             (ElectionCategory::Municipal, None),
             (ElectionCategory::Provincial, Some(0)),

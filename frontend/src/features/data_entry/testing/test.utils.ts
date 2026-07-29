@@ -82,6 +82,13 @@ export function expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(fields: 
   });
 }
 
+export function expectFieldsToBeDisabled(fields: Array<string>) {
+  fields.forEach((field) => {
+    const inputField = within(screen.getByTestId(`value-${field}`)).getByRole("textbox");
+    expect(inputField).toBeDisabled();
+  });
+}
+
 export function expectFieldsToNotHaveIcon(fields: Array<string>) {
   fields.forEach((field) => {
     const icon = within(screen.getByTestId(`value-${field}`)).queryByRole("img");

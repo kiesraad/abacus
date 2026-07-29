@@ -21,7 +21,9 @@ interface CategoryRowProps {
 
 const SHOW_BADGE: DataEntryStatusName[] = [
   "first_entry_in_progress",
+  "first_entry_correction",
   "second_entry_in_progress",
+  "second_entry_correction",
   "entries_different",
   "first_entry_has_errors",
 ];

@@ -662,63 +662,66 @@ async fn data_entry_get(
     State(pool): State<SqlitePool>,
     Path(data_entry_id): Path<DataEntryId>,
 ) -> Result<Json<DataEntryGetResponse>, APIError> {
-    let mut conn = pool.acquire().await?;
+    use DataEntryStatus::*;
 
+    let mut conn = pool.acquire().await?;
     let (context, state) = validate_and_get_data(&mut conn, data_entry_id, &user).await?;
 
-    match state.clone() {
-        DataEntryStatus::FirstEntryInProgress(first_entry_in_progress_state) => {
-            Ok(Json(DataEntryGetResponse {
-                user_id: Some(first_entry_in_progress_state.first_entry_user_id),
-                data: first_entry_in_progress_state.first_entry,
-                status: state.status_name(),
-                validation_results: ValidationResults::default(),
-                source: context.source,
-            }))
-        }
-        DataEntryStatus::FirstEntryHasErrors(first_entry_has_errors_state) => {
-            Ok(Json(DataEntryGetResponse {
-                user_id: Some(first_entry_has_errors_state.first_entry_user_id),
-                data: first_entry_has_errors_state.finalised_first_entry,
-                status: state.status_name(),
-                validation_results: state.start_validate(&context.election)?,
-                source: context.source,
-            }))
-        }
-        DataEntryStatus::FirstEntryFinalised(first_entry_finalised_state) => {
-            Ok(Json(DataEntryGetResponse {
-                user_id: Some(first_entry_finalised_state.first_entry_user_id),
-                data: first_entry_finalised_state.finalised_first_entry,
-                status: state.status_name(),
-                validation_results: state.start_validate(&context.election)?,
-                source: context.source,
-            }))
-        }
-        DataEntryStatus::SecondEntryInProgress(second_entry_in_progress_state) => {
-            Ok(Json(DataEntryGetResponse {
-                user_id: Some(second_entry_in_progress_state.second_entry_user_id),
-                data: second_entry_in_progress_state.second_entry,
-                status: state.status_name(),
-                validation_results: ValidationResults::default(),
-                source: context.source,
-            }))
-        }
-        DataEntryStatus::Definitive(definitive_state) => {
-            let validation_results = definitive_state.results.start_validate(&context.election)?;
-
-            Ok(Json(DataEntryGetResponse {
-                user_id: None,
-                data: definitive_state.results,
-                status: state.status_name(),
-                validation_results,
-                source: context.source,
-            }))
-        }
+    Ok(Json(match state.clone() {
+        FirstEntryInProgress(first_entry_in_progress_state) => DataEntryGetResponse {
+            user_id: Some(first_entry_in_progress_state.first_entry_user_id),
+            data: first_entry_in_progress_state.first_entry,
+            status: state.status_name(),
+            validation_results: ValidationResults::default(),
+            source: context.source,
+        },
+        FirstEntryCorrection(first_entry_correction_state) => DataEntryGetResponse {
+            user_id: Some(first_entry_correction_state.first_entry_user_id),
+            data: first_entry_correction_state.first_entry,
+            status: state.status_name(),
+            validation_results: ValidationResults::default(),
+            source: context.source,
+        },
+        FirstEntryHasErrors(first_entry_has_errors_state) => DataEntryGetResponse {
+            user_id: Some(first_entry_has_errors_state.first_entry_user_id),
+            data: first_entry_has_errors_state.finalised_first_entry,
+            status: state.status_name(),
+            validation_results: state.start_validate(&context.election)?,
+            source: context.source,
+        },
+        FirstEntryFinalised(first_entry_finalised_state) => DataEntryGetResponse {
+            user_id: Some(first_entry_finalised_state.first_entry_user_id),
+            data: first_entry_finalised_state.finalised_first_entry,
+            status: state.status_name(),
+            validation_results: state.start_validate(&context.election)?,
+            source: context.source,
+        },
+        SecondEntryInProgress(second_entry_in_progress_state) => DataEntryGetResponse {
+            user_id: Some(second_entry_in_progress_state.second_entry_user_id),
+            data: second_entry_in_progress_state.second_entry,
+            status: state.status_name(),
+            validation_results: ValidationResults::default(),
+            source: context.source,
+        },
+        SecondEntryCorrection(second_entry_correction_state) => DataEntryGetResponse {
+            user_id: Some(second_entry_correction_state.second_entry_user_id),
+            data: second_entry_correction_state.second_entry,
+            status: state.status_name(),
+            validation_results: ValidationResults::default(),
+            source: context.source,
+        },
+        Definitive(definitive_state) => DataEntryGetResponse {
+            user_id: None,
+            data: definitive_state.results,
+            status: state.status_name(),
+            validation_results: state.start_validate(&context.election)?,
+            source: context.source,
+        },
         _ => Err(APIError::Conflict(
             "Data entry is in the wrong state".to_string(),
             ErrorReference::DataEntryGetNotAllowed,
-        )),
-    }
+        ))?,
+    }))
 }
 
 /// Resolve accepted data entry errors by providing a `ResolveErrorsAction`
@@ -861,15 +864,14 @@ async fn data_entry_resolve_differences(
     let (context, state) = validate_and_get_data(&mut tx, data_entry_id, &user).await?;
 
     let new_state = match action {
-        // TODO: replace with correction state transitions in #3655
-        ResolveDifferencesAction::KeepFirstAndDiscardSecond
-        | ResolveDifferencesAction::KeepFirstAndCorrectSecond => {
+        ResolveDifferencesAction::KeepFirstAndDiscardSecond => {
             state.keep_first_entry(&context.election)?
         }
-        ResolveDifferencesAction::KeepSecondAndDiscardFirst
-        | ResolveDifferencesAction::KeepSecondAndCorrectFirst => {
+        ResolveDifferencesAction::KeepFirstAndCorrectSecond => state.correct_second_entry()?,
+        ResolveDifferencesAction::KeepSecondAndDiscardFirst => {
             state.keep_second_entry(&context.election)?
         }
+        ResolveDifferencesAction::KeepSecondAndCorrectFirst => state.correct_first_entry()?,
         ResolveDifferencesAction::DiscardBoth => state.discard_entries()?,
     };
 
@@ -1656,6 +1658,7 @@ mod tests {
             serde_json::json!({
                 "data_entry_id": 201,
                 "data_entry_status": "first_entry_has_errors",
+                "first_entry_user_id": 1,
             })
         );
     }
@@ -2238,14 +2241,19 @@ mod tests {
             .await;
 
             let status: DataEntryStatus = data_entry.state.0;
-            let DataEntryStatus::FirstEntryFinalised(state) = status else {
-                panic!("Expected entry to be in FirstEntryFinalised state");
+            let DataEntryStatus::SecondEntryCorrection(state) = status else {
+                panic!("Expected entry to be in SecondEntryCorrection state");
             };
+
             let Results::CSOFirstSession(first_entry) = state.finalised_first_entry else {
+                panic!("Expected entry to be CSOFirstSession model");
+            };
+            let Results::CSOFirstSession(second_entry) = state.second_entry else {
                 panic!("Expected entry to be CSOFirstSession model");
             };
 
             assert_eq!(first_entry.voters_counts.poll_card_count, 99);
+            assert_eq!(second_entry.voters_counts.poll_card_count, 100);
         }
 
         #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
@@ -2281,14 +2289,19 @@ mod tests {
             .await;
 
             let status: DataEntryStatus = data_entry.state.0;
-            let DataEntryStatus::FirstEntryFinalised(state) = status else {
-                panic!("Expected entry to be in FirstEntryFinalised state");
+            let DataEntryStatus::FirstEntryCorrection(state) = status else {
+                panic!("Expected entry to be in FirstEntryCorrection state");
             };
-            let Results::CSOFirstSession(first_entry) = state.finalised_first_entry else {
+
+            let Results::CSOFirstSession(first_entry) = state.first_entry else {
+                panic!("Expected entry to be CSOFirstSession model");
+            };
+            let Results::CSOFirstSession(second_entry) = state.finalised_second_entry else {
                 panic!("Expected entry to be CSOFirstSession model");
             };
 
-            assert_eq!(first_entry.voters_counts.poll_card_count, 100);
+            assert_eq!(first_entry.voters_counts.poll_card_count, 99);
+            assert_eq!(second_entry.voters_counts.poll_card_count, 100);
         }
 
         #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]

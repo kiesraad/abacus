@@ -83,7 +83,7 @@ fn invalid_result() -> Results {
     })
 }
 
-fn get_cde(user_id: UserId, correct_entry: bool) -> DataEntryUpdate {
+fn update(user_id: UserId, correct_entry: bool) -> DataEntryUpdate {
     DataEntryUpdate {
         progress: 0,
         user_id,
@@ -372,7 +372,7 @@ fuzz_target!(|transitions: Vec<Transition>| {
             }
             Transition::UpdateFirstEntry(correct_user, correct_entry) => {
                 let res =
-                    state.update_first_entry(get_cde(users.first(correct_user), correct_entry));
+                    state.update_first_entry(update(users.first(correct_user), correct_entry));
                 if res.is_ok() {
                     first_entry_correct = correct_entry
                 };
@@ -393,7 +393,7 @@ fuzz_target!(|transitions: Vec<Transition>| {
             }
             Transition::UpdateSecondEntry(correct_user, correct_entry) => {
                 let res =
-                    state.update_second_entry(get_cde(users.second(correct_user), correct_entry));
+                    state.update_second_entry(update(users.second(correct_user), correct_entry));
                 if res.is_ok() {
                     second_entry_correct = correct_entry
                 };

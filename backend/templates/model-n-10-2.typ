@@ -1,4 +1,4 @@
-#import "common/style.typ": conf, default_header, document_numbering
+#import "common/style.typ": conf, document_numbering, blank_page_before_signing
 #import "common/scripts.typ": *
 #let input = json("inputs/model-n-10-2.json")
 
@@ -240,38 +240,27 @@ Bijvoorbeeld als er meerdere verkiezingen tegelijk werden georganiseerd, en een 
 #checkbox[Ja]
 #checkbox[Nee, er is een onverklaard verschil]
 
-#pagebreak(weak: true)
-
-#set page(header: "")
-
-#show heading.where(level: 3): it => [#block(it.body)]
-
-=== Deze pagina is expres leeg
-Zo komt het handtekeningen-blad altijd op een losse pagina, ook als het verslag dubbelzijdig is geprint.
-
-#pagebreak(weak: true)
-
-#set page(header: default_header(none, header-right))
+#blank_page_before_signing(header-right)
 
 = Ondertekening <signing>
 
-=== Datum
+#emph_block[Datum]
 
 #textbox_only_bottom_stroke[Datum en tijd:][Plaats:]
 
 == Verplicht: voorzitter en twee leden van het stembureau
 
-=== Voorzitter van het stembureau:
+#emph_block[Voorzitter van het stembureau:]
 
 #textbox[Naam:][Handtekening:]
 
-=== 2 leden van het stembureau:
+#emph_block[2 leden van het stembureau:]
 
 #stack(spacing: 0.5em, ..range(0, 2).map(_ => textbox[Naam:][Handtekening:]))
 
 == Ondertekening door andere aanwezige leden van het stembureau
 
-=== Extra ondertekening: (niet verplicht)
+#emph_block[Extra ondertekening: (niet verplicht)]
 
 #stack(spacing: 0.5em, ..range(0, 4).map(_ => textbox[Naam:][Handtekening:]))
 

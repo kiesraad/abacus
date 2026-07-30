@@ -297,7 +297,6 @@ pub struct FirstEntryInProgress {
     /// Client state for the data entry (arbitrary JSON)
     pub client_state: ClientState,
     /// Whether this entry was returned for correction
-    #[serde(default)]
     pub is_correction: bool,
 }
 

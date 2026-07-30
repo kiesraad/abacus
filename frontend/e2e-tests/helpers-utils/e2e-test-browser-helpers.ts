@@ -14,7 +14,7 @@ import { CheckElectionDefinitionPgObj } from "e2e-tests/page-objects/election/cr
 import { CheckPollingStationDefinitionPgObj } from "e2e-tests/page-objects/election/create/CheckPollingStationDefinitionPgObj";
 import { UploadCandidateDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadCandidateDefinitionPgObj";
 import { UploadElectionDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadElectionDefinitionPgObj";
-import { UploadPollingStationsFilePgObj } from "e2e-tests/page-objects/election/create/UploadPollingStationDefinitionPgObj";
+import { UploadPollingStationsFilePgObj } from "e2e-tests/page-objects/election/create/UploadPollingStationsFilePgObj";
 import { AddInvestigationPgObj } from "e2e-tests/page-objects/investigations/AddInvestigationPgObj";
 import { InvestigationOverviewPgObj } from "e2e-tests/page-objects/investigations/InvestigationOverviewPgObj";
 import { InvestigationPrintCorrigendumPgObj } from "e2e-tests/page-objects/investigations/InvestigationPrintCorrigendumPgObj";

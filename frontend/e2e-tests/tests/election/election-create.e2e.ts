@@ -13,7 +13,7 @@ import { CountingMethodTypePgObj } from "e2e-tests/page-objects/election/create/
 import { NumberOfVotersPgObj } from "e2e-tests/page-objects/election/create/NumberOfVotersPgObj";
 import { UploadCandidateDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadCandidateDefinitionPgObj";
 import { UploadElectionDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadElectionDefinitionPgObj";
-import { UploadPollingStationsFilePgObj } from "e2e-tests/page-objects/election/create/UploadPollingStationDefinitionPgObj";
+import { UploadPollingStationsFilePgObj } from "e2e-tests/page-objects/election/create/UploadPollingStationsFilePgObj";
 import { ElectionHome } from "e2e-tests/page-objects/election/ElectionHomePgObj";
 import { ElectionsOverviewPgObj } from "e2e-tests/page-objects/election/ElectionsOverviewPgObj";
 import { AdminNavBar } from "e2e-tests/page-objects/nav_bar/AdminNavBarPgObj";

@@ -264,12 +264,9 @@ fn format_election_name(
         ElectionCategory::Municipal => ("Gemeenteraad", locality),
         ElectionCategory::Provincial => ("Provinciale Staten", super::data::province(rng)),
         ElectionCategory::WaterAuthority => (
-            *[
-                "Algemeen bestuur van het waterschap",
-                "Algemeen bestuur van het hoogheemraadschap",
-            ]
-            .choose(rng)
-            .expect("Missing test data"),
+            *["Waterschap", "Hoogheemraadschap"]
+                .choose(rng)
+                .expect("Missing test data"),
             super::data::water_authority(rng),
         ),
     };

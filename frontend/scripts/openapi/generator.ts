@@ -164,6 +164,7 @@ function tsType(s: ReferenceObject | SchemaObject | undefined): string {
   switch (s.type) {
     case "string":
     case "boolean":
+    case "null":
       type = s.type;
       break;
     case "integer":

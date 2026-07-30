@@ -2,7 +2,7 @@ import { describe, expect, test } from "vitest";
 
 import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMockData";
 import type { ValidationResult, ValidationResultCode } from "@/types/generated/openapi";
-import type { DataEntrySection } from "@/types/types";
+import type { DataEntryResults, DataEntrySection } from "@/types/types";
 import { ValidationResultSet } from "@/utils/ValidationResults";
 
 import {
@@ -13,11 +13,13 @@ import {
 } from "../testing/mock-data";
 import type { FormState } from "../types/types";
 import {
+  addCorrectionWarnings,
   addValidationResultsToFormState,
   calculateDataEntryProgress,
   formSectionComplete,
   getNextSectionID,
   isFormSectionEmpty,
+  resetFieldValues,
   resetFormSectionState,
 } from "./dataEntryUtils";
 
@@ -287,5 +289,84 @@ describe("addValidationResultToFormState", () => {
     addValidationResultsToFormState(validationResults, formState, dataEntryStructure, "errors");
 
     expect(formState.sections.differences_counts!.errors.size()).toBe(0);
+  });
+});
+
+describe("correction warnings", () => {
+  test("addCorrectionWarnings", () => {
+    const defaultState = getDefaultDataEntryState();
+    const formState = defaultState.formState;
+    const structure = defaultState.dataEntryStructure;
+
+    const correctionWarnings = [
+      "data.voters_counts.poll_card_count",
+      "data.voters_counts.proxy_certificate_count",
+      "data.political_group_votes.0.candidate_votes.0.votes",
+    ];
+
+    addCorrectionWarnings(structure, correctionWarnings, formState);
+
+    expect(formState.sections.voters_votes_counts!.correctionWarning).toStrictEqual({
+      code: "W002",
+      fields: ["data.voters_counts.poll_card_count", "data.voters_counts.proxy_certificate_count"],
+    });
+    expect(formState.sections.differences_counts!.correctionWarning).toBeUndefined();
+    expect(formState.sections.political_group_votes_1!.correctionWarning).toStrictEqual({
+      code: "W002",
+      fields: ["data.political_group_votes.0.candidate_votes.0.votes"],
+    });
+  });
+
+  test("resetFieldValues", () => {
+    const defaultState = getDefaultDataEntryState();
+    const structure = defaultState.dataEntryStructure;
+    const data: DataEntryResults = {
+      voters_counts: {
+        poll_card_count: 99,
+        proxy_certificate_count: 1,
+        voter_card_count: 5,
+        total_admitted_voters_count: 5,
+      },
+      differences_counts: {
+        difference_completely_accounted_for: {
+          yes: true,
+          no: false,
+        },
+      },
+      political_group_votes: [
+        {
+          candidate_votes: [{ votes: 100 }, { votes: 33 }, { votes: 2 }],
+        },
+      ],
+    };
+
+    const correctionWarnings = [
+      "data.voters_counts.poll_card_count",
+      "data.voters_counts.proxy_certificate_count",
+      "data.differences_counts.difference_completely_accounted_for",
+      "data.political_group_votes.0.candidate_votes.0.votes",
+    ];
+
+    resetFieldValues(structure, correctionWarnings, data);
+
+    expect(data).toStrictEqual({
+      voters_counts: {
+        poll_card_count: 0,
+        proxy_certificate_count: 0,
+        voter_card_count: 5,
+        total_admitted_voters_count: 5,
+      },
+      differences_counts: {
+        difference_completely_accounted_for: {
+          yes: false,
+          no: false,
+        },
+      },
+      political_group_votes: [
+        {
+          candidate_votes: [{ votes: 0 }, { votes: 33 }, { votes: 2 }],
+        },
+      ],
+    });
   });
 });

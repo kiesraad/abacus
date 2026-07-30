@@ -49,17 +49,24 @@ export function useDataEntryFormSection() {
   if (!formSection) {
     throw new Error(`Form section ${sectionId} not found in form state`);
   }
-  const { errors, warnings, isSaved, isSubmitted, acceptErrorsAndWarnings, hasChanges } = formSection;
-  const defaultProps = {
-    errorsAndWarnings: isSaved ? mapValidationResultSetsToFields(errors, warnings) : undefined,
-    errorsAndWarningsAccepted: acceptErrorsAndWarnings,
-  };
+  const { correctionWarning, errors, warnings, isSaved, isSubmitted, acceptErrorsAndWarnings, hasChanges } =
+    formSection;
+  const defaultProps = correctionWarning
+    ? {
+        errorsAndWarnings: new Map(correctionWarning.fields.map((f) => [f, "warning" as const])),
+        errorsAndWarningsAccepted: false,
+      }
+    : {
+        errorsAndWarnings: isSaved ? mapValidationResultSetsToFields(errors, warnings) : undefined,
+        errorsAndWarningsAccepted: acceptErrorsAndWarnings,
+      };
 
   // Find error code that is shown on the bottom of the form
   const trailingError = errors.find("F401");
 
   // Whether to show the accept errors and warnings checkbox
-  const showAcceptErrorsAndWarnings = (!formSection.warnings.isEmpty() || !formSection.errors.isEmpty()) && !hasChanges;
+  const showAcceptErrorsAndWarnings =
+    !formSection.correctionWarning && (!formSection.warnings.isEmpty() || !formSection.errors.isEmpty()) && !hasChanges;
 
   // register changes when fields change
   const setValues = (path: string, value: string) => {

@@ -5388,6 +5388,21 @@
   },
   "components": {
     "schemas": {
+      "AboutReport": {
+        "type": "object",
+        "description": "Information about the report (\"Over het proces-verbaal\")",
+        "properties": {
+          "checks_and_corrections_present": {
+            "$ref": "#/components/schemas/ChecksAndCorrectionsPresent",
+            "description": "Whether the extra page \"controles en correcties\" is inserted in the report\n(\"Is voorin het proces-verbaal de extra pagina controles en correcties ingevoegd?\")"
+          },
+          "corrigendum_present": {
+            "$ref": "#/components/schemas/CorrigendumPresent",
+            "description": "Whether a corrigendum accompanies the report\n(\"Is er een corrigendum bij het papieren proces-verbaal aanwezig?\")"
+          }
+        },
+        "additionalProperties": false
+      },
       "AbsoluteMajorityDrawingLots": {
         "type": "object",
         "required": [
@@ -6066,6 +6081,38 @@
         },
         "additionalProperties": false
       },
+      "ChecksAndCorrections": {
+        "type": "object",
+        "description": "Checks and corrections (\"Controles en correcties\")",
+        "required": [
+          "reason_investigation_own_initiative",
+          "corrected_results_own_initiative",
+          "corrected_results_csb_request"
+        ],
+        "properties": {
+          "corrected_results_csb_request": {
+            "$ref": "#/components/schemas/YesNo",
+            "description": "Whether investigation at the request of the central electoral committee\nhas led to corrected results\n(\"Op verzoek van het centraal stembureau: Zijn er gecorrigeerde telresultaten?\")"
+          },
+          "corrected_results_own_initiative": {
+            "$ref": "#/components/schemas/YesNo",
+            "description": "Whether the investigation on its own initiative has led to corrected results\n(\"Op eigen initiatief van het gemeentelijk stembureau: Zijn er gecorrigeerde telresultaten?\")"
+          },
+          "reason_investigation_own_initiative": {
+            "$ref": "#/components/schemas/ReasonInvestigationOwnInitiative",
+            "description": "Whether the GSB investigated the counting results on its own initiative\n(\"Op eigen initiatief van het gemeentelijk stembureau: Waarom heeft het gemeentelijk stembureau\n de telresultaten onderzocht?\")"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ChecksAndCorrectionsPresent": {
+        "type": "string",
+        "description": "Whether the extra page \"controles en correcties\" is inserted in the report",
+        "enum": [
+          "PagePresent",
+          "PageMissing"
+        ]
+      },
       "ChosenCandidate": {
         "type": "object",
         "description": "Chosen candidate",
@@ -6275,6 +6322,14 @@
         },
         "additionalProperties": false
       },
+      "CorrigendumPresent": {
+        "type": "string",
+        "description": "Whether a corrigendum accompanies the report",
+        "enum": [
+          "TwoDocuments",
+          "OneDocument"
+        ]
+      },
       "CountingDifferencesPollingStation": {
         "type": "object",
         "description": "Counting Differences Polling Station,\npart of the results (\"B1-2 Verschillen met telresultaten van het stembureau\")",
@@ -6357,25 +6412,25 @@
         "type": "object",
         "description": "DSOFirstSessionResults, following the fields in Model N 10-1\n\nSee: Model N 10-1 (Proces-verbaal van een stembureau) from\n[kiesraad](https://www.kiesraad.nl/documenten/2025/11/27/n-10-1-pv-sb-dso)",
         "required": [
-          "extra_investigation",
-          "counting_differences_polling_station",
+          "about_report",
+          "checks_and_corrections",
           "voters_counts",
           "votes_counts",
           "differences_counts",
           "political_group_votes"
         ],
         "properties": {
-          "counting_differences_polling_station": {
-            "$ref": "#/components/schemas/CountingDifferencesPollingStation",
-            "description": "Counting Differences Polling Station (\"B1-2 Verschillen met telresultaten van het stembureau\")"
+          "about_report": {
+            "$ref": "#/components/schemas/AboutReport",
+            "description": "About report (\"Over het proces-verbaal\")"
+          },
+          "checks_and_corrections": {
+            "$ref": "#/components/schemas/ChecksAndCorrections",
+            "description": "Checks and corrections (\"Controles en correcties\")"
           },
           "differences_counts": {
             "$ref": "#/components/schemas/DifferencesCounts",
             "description": "Differences counts (\"3. Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten\")"
-          },
-          "extra_investigation": {
-            "$ref": "#/components/schemas/ExtraInvestigation",
-            "description": "Extra investigation (\"B1-1 Alleen bij extra onderzoek\")"
           },
           "political_group_votes": {
             "type": "array",
@@ -8802,6 +8857,25 @@
       },
       "RandomRange": {
         "type": "string"
+      },
+      "ReasonInvestigationOwnInitiative": {
+        "type": "object",
+        "description": "Reason for investigation on own initiative",
+        "required": [
+          "unaccounted_difference",
+          "other_error"
+        ],
+        "properties": {
+          "other_error": {
+            "type": "boolean",
+            "description": "Because of a (suspected) other error\n(\"Vanwege (het vermoeden van) een andere fout\")"
+          },
+          "unaccounted_difference": {
+            "type": "boolean",
+            "description": "Because of an unaccounted difference\n(\"Vanwege een onverklaard verschil\")"
+          }
+        },
+        "additionalProperties": false
       },
       "RedactedEmlHash": {
         "type": "object",

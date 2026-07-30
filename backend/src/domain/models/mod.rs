@@ -74,15 +74,15 @@ impl PdfModel {
     /// Get the template path as a static string (e.g., "model-na-31-2.typ")
     pub fn as_template_path_str(&self) -> &'static str {
         match self {
-            Self::ModelNa14_2(_) => "model-na-14-2.typ",
-            Self::ModelNa14_2Bijlage1(_) => "model-na-14-2-bijlage1.typ",
-            Self::ModelNa31_2(_) => "model-na-31-2.typ",
-            Self::ModelNa31_2Bijlage1(_) => "model-na-31-2-bijlage1.typ",
-            Self::ModelNa31_2Inlegvel(_) => "model-na-31-2-inlegvel.typ",
             Self::ModelN10_2(_) => "model-n-10-2.typ",
+            Self::ModelNa14_2(_) => "model-na-14-2.typ",
+            Self::ModelNa14_2Bijlage1(_) => "model-na-14-2-bijlage-1.typ",
+            Self::ModelNa31_2(_) => "model-na-31-2.typ",
+            Self::ModelNa31_2Bijlage1(_) => "model-na-31-2-bijlage-1.typ",
+            Self::ModelNa31_2Inlegvel(_) => "model-na-31-2-inlegvel.typ",
             Self::ModelP2a(_) => "model-p-2a.typ",
             Self::ModelP22_2(_) => "model-p-22-2.typ",
-            Self::ModelP22_2Bijlage1(_) => "model-p-22-2-bijlage1.typ",
+            Self::ModelP22_2Bijlage1(_) => "model-p-22-2-bijlage-1.typ",
             #[cfg(test)]
             Self::TestTeletexCharset() => "test-teletex-charset.typ",
             #[cfg(test)]
@@ -90,18 +90,22 @@ impl PdfModel {
         }
     }
 
-    /// Get the input path as a static string (e.g., "inputs/model-na-31-2.json")
+    /// Get the input path as a static string (e.g., "inputs/model-n-10-2.json")
     pub fn as_input_path_str(&self) -> &'static str {
         match self {
-            Self::ModelNa14_2(_) => "inputs/model-na-14-2.json",
-            Self::ModelNa14_2Bijlage1(_) => "inputs/model-na-14-2-bijlage1.json",
-            Self::ModelNa31_2(_) => "inputs/model-na-31-2.json",
-            Self::ModelNa31_2Bijlage1(_) => "inputs/model-na-31-2-bijlage1.json",
-            Self::ModelNa31_2Inlegvel(_) => "inputs/model-na-31-2-inlegvel.json",
             Self::ModelN10_2(_) => "inputs/model-n-10-2.json",
+            Self::ModelNa14_2(_) => "inputs/model-na-14-2-variations/model-na-14-2-GR.json",
+            Self::ModelNa14_2Bijlage1(_) => {
+                "inputs/model-na-14-2-bijlage-1-variations/model-na-14-2-bijlage-1-GR.json"
+            }
+            Self::ModelNa31_2(_) => "inputs/model-na-31-2-variations/model-na-31-2-GR.json",
+            Self::ModelNa31_2Bijlage1(_) => {
+                "inputs/model-na-31-2-bijlage-1-variations/model-na-31-2-bijlage-1-GR.json"
+            }
+            Self::ModelNa31_2Inlegvel(_) => "inputs/model-na-31-2-inlegvel.json",
             Self::ModelP2a(_) => "inputs/model-p-2a.json",
-            Self::ModelP22_2(_) => "inputs/model-p-22-2.json",
-            Self::ModelP22_2Bijlage1(_) => "inputs/model-p-22-2-bijlage1.json",
+            Self::ModelP22_2(_) => "inputs/model-p-22-2-variations/lt-19-seats-and-p9-and-p10.json",
+            Self::ModelP22_2Bijlage1(_) => "inputs/model-p-22-2-bijlage-1.json",
             #[cfg(test)]
             Self::TestTeletexCharset() => "inputs/test-teletex-charset.json",
             #[cfg(test)]
@@ -140,15 +144,19 @@ impl PdfModel {
         use std::io::{Error, ErrorKind};
 
         match name {
-            "model-na-14-2" => Ok(Self::ModelNa14_2(serde_json::from_str(input)?)),
-            "model-na-14-2-bijlage1" => Ok(Self::ModelNa14_2Bijlage1(serde_json::from_str(input)?)),
-            "model-na-31-2" => Ok(Self::ModelNa31_2(serde_json::from_str(input)?)),
-            "model-na-31-2-bijlage1" => Ok(Self::ModelNa31_2Bijlage1(serde_json::from_str(input)?)),
-            "model-na-31-2-inlegvel" => Ok(Self::ModelNa31_2Inlegvel(serde_json::from_str(input)?)),
             "model-n-10-2" => Ok(Self::ModelN10_2(serde_json::from_str(input)?)),
+            "model-na-14-2" => Ok(Self::ModelNa14_2(serde_json::from_str(input)?)),
+            "model-na-14-2-bijlage-1" => {
+                Ok(Self::ModelNa14_2Bijlage1(serde_json::from_str(input)?))
+            }
+            "model-na-31-2" => Ok(Self::ModelNa31_2(serde_json::from_str(input)?)),
+            "model-na-31-2-bijlage-1" => {
+                Ok(Self::ModelNa31_2Bijlage1(serde_json::from_str(input)?))
+            }
+            "model-na-31-2-inlegvel" => Ok(Self::ModelNa31_2Inlegvel(serde_json::from_str(input)?)),
             "model-p-2a" => Ok(Self::ModelP2a(serde_json::from_str(input)?)),
             "model-p-22-2" => Ok(Self::ModelP22_2(serde_json::from_str(input)?)),
-            "model-p-22-2-bijlage1" => Ok(Self::ModelP22_2Bijlage1(serde_json::from_str(input)?)),
+            "model-p-22-2-bijlage-1" => Ok(Self::ModelP22_2Bijlage1(serde_json::from_str(input)?)),
             _ => Err(Error::new(ErrorKind::InvalidInput, "Unknown model").into()),
         }
     }

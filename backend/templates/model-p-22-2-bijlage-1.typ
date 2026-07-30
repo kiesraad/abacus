@@ -1,6 +1,6 @@
 #import "common/style.typ": attachment_numbering, conf
 #import "common/scripts.typ": *
-#let input = json("inputs/model-p-22-2-bijlage1.json")
+#let input = json("inputs/model-p-22-2-bijlage-1.json")
 
 #let location_type = [centraal stembureau]
 

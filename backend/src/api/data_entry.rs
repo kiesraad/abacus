@@ -29,8 +29,8 @@ use crate::{
         results::{
             PollingStationResults, Results,
             common_polling_station_results::CommonPollingStationResults,
-            cso_first_session_results::CSOFirstSessionResults,
-            next_session_results::NextSessionResults, gsb_results::GSBResults,
+            cso_first_session_results::CSOFirstSessionResults, gsb_results::GSBResults,
+            next_session_results::NextSessionResults,
         },
         role::Role,
         validate::{DataError, ValidateRoot, ValidationResults},

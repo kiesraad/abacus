@@ -8827,7 +8827,7 @@
             "allOf": [
               {
                 "$ref": "#/components/schemas/DSOFirstSessionResults",
-                "description": "Results for decentrally counted (DSO) elections, first election committee session.\nThis contains the data entry values from Model Na 31-2 Bijlage 1."
+                "description": "Results for decentrally counted (DSO) elections, first election committee session.\nThis contains the data entry values from Model Model N 10-1."
               },
               {
                 "type": "object",
@@ -8844,7 +8844,7 @@
                 }
               }
             ],
-            "description": "Results for decentrally counted (DSO) elections, first election committee session.\nThis contains the data entry values from Model Na 31-2 Bijlage 1."
+            "description": "Results for decentrally counted (DSO) elections, first election committee session.\nThis contains the data entry values from Model Model N 10-1."
           },
           {
             "allOf": [

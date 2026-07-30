@@ -1340,7 +1340,7 @@ export interface NewElection {
 }
 
 /**
- * NextSessionResults, following the fields in Model Na 14-2 Bijlage 1.
+ * CSONextSessionResults, following the fields in Model Na 14-2 Bijlage 1.
  *
  * See "Model Na 14-2. Corrigendum bij het proces-verbaal van een gemeentelijk stembureau/
  * stembureau voor het openbaar lichaam, Bijlage 1: uitkomsten per stembureau" from

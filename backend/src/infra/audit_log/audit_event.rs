@@ -135,6 +135,8 @@ pub enum AuditEventType {
     DataEntrySaved,
     DataEntryResumed,
     DataEntryDeleted,
+    DataEntryDiscarded,
+    DataEntryReset,
     DataEntryFinalised,
     // data entry resolving events
     DataEntryDiscardedFirst,

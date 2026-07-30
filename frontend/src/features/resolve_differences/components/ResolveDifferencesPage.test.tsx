@@ -269,7 +269,7 @@ describe("ResolveDifferencesPage", () => {
     const user = userEvent.setup();
 
     await renderPage();
-    overrideResponseStatus("first_entry_finalised");
+    overrideResponseStatus("second_entry_correction");
     await user.click(await screen.findByRole("radio", { name: "Eerste invoer (Gebruiker01)" }));
     await user.click(await screen.findByRole("radio", { name: "Laten herstellen door oorspronkelijke invoerder" }));
     await user.click(await screen.findByRole("button", { name: "Opslaan" }));
@@ -284,7 +284,7 @@ describe("ResolveDifferencesPage", () => {
     const user = userEvent.setup();
 
     await renderPage();
-    overrideResponseStatus("first_entry_finalised");
+    overrideResponseStatus("first_entry_correction");
     await user.click(await screen.findByRole("radio", { name: "Tweede invoer (Gebruiker02)" }));
     await user.click(await screen.findByRole("radio", { name: "Laten herstellen door oorspronkelijke invoerder" }));
     await user.click(await screen.findByRole("button", { name: "Opslaan" }));

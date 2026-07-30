@@ -49,10 +49,16 @@ function resolvedMessageAndPath(
       return {
         message: {
           title: t("election_status.success.differences_resolved", { number }),
-          text:
-            outcome.wrongEntryAction === "correct"
-              ? t("election_status.success.data_entry_corrected", { typist: getName(outcome.wrongUserId) })
-              : t("election_status.success.data_entry_kept", { typist: getName(outcome.keptUserId) }),
+          text: t("election_status.success.data_entry_kept", { typist: getName(outcome.keptUserId) }),
+        },
+        path: statusPath,
+      };
+    case "first_entry_correction":
+    case "second_entry_correction":
+      return {
+        message: {
+          title: t("election_status.success.differences_resolved", { number }),
+          text: t("election_status.success.data_entry_corrected", { typist: getName(outcome.wrongUserId) }),
         },
         path: statusPath,
       };
@@ -130,8 +136,8 @@ export function ResolveDifferencesPage() {
           <ResolveDifferencesForm
             firstEntryName={getName(first_entry_user_id)}
             secondEntryName={getName(second_entry_user_id)}
+            formState={formState}
             onSubmit={onSubmit}
-            {...formState}
           />
         </article>
       </main>

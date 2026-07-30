@@ -49,7 +49,7 @@ pub enum ErrorReference {
     DatabaseError,
     DataEntryAlreadyClaimed,
     DataEntryAlreadyFinalised,
-    DataEntryCannotBeDeleted,
+    DataEntryCannotBeReset,
     DataEntryGetNotAllowed,
     DataEntryNotAllowed,
     EmlImportError,

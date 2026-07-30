@@ -7,22 +7,25 @@ import { t, tx } from "@/i18n/translate";
 
 import { effectiveWrongEntryAction, type ResolveDifferencesFormState } from "../utils/differences";
 
-export interface ResolveDifferencesFormProps extends ResolveDifferencesFormState {
+export interface ResolveDifferencesFormProps {
   firstEntryName: string;
   secondEntryName: string;
+  formState: ResolveDifferencesFormState;
   onSubmit: () => void | Promise<void>;
 }
 
 export function ResolveDifferencesForm({
   firstEntryName,
   secondEntryName,
-  correctEntry,
-  setCorrectEntry,
-  wrongEntryAction,
-  setWrongEntryAction,
-  correctionBlocked,
-  correctEntryError,
-  wrongEntryError,
+  formState: {
+    correctEntry,
+    setCorrectEntry,
+    wrongEntryAction,
+    setWrongEntryAction,
+    correctionBlocked,
+    correctEntryError,
+    wrongEntryError,
+  },
   onSubmit,
 }: ResolveDifferencesFormProps) {
   const wrongEntryDisabled = (correctEntry !== "first" && correctEntry !== "second") || correctionBlocked;

@@ -9,8 +9,9 @@ use voters_counts::VotersCounts;
 use votes_counts::VotesCounts;
 
 use crate::domain::{
+    committee_session::CommitteeSession,
     compare::Compare,
-    election::{ElectionWithPoliticalGroups, PoliticalGroup},
+    election::{CommitteeCategory, ElectionWithPoliticalGroups, PoliticalGroup},
     field_path::FieldPath,
     results::{count::Count, gsb_results::GSBResults},
     validate::{DataError, Validate, ValidateRoot, ValidationResults},
@@ -63,6 +64,41 @@ pub struct CommonDifferenceCountsMut<'a> {
 
 /// Contains common functions for all result models
 impl Results {
+    pub fn new(
+        election: &ElectionWithPoliticalGroups,
+        committee_session: &CommitteeSession,
+        previous_results: Option<&CommonPollingStationResults>,
+    ) -> Self {
+        match (
+            election.committee_category,
+            committee_session.is_next_session(),
+        ) {
+            (CommitteeCategory::GSB, false) => {
+                Results::CSOFirstSession(CSOFirstSessionResults::empty(election))
+            }
+            (CommitteeCategory::GSB, true) => {
+                if let Some(prev) = previous_results {
+                    let mut copy = CSONextSessionResults {
+                        voters_counts: prev.voters_counts.clone(),
+                        votes_counts: prev.votes_counts.clone(),
+                        differences_counts: prev.differences_counts.clone(),
+                        political_group_votes: prev.political_group_votes.to_vec(),
+                    };
+
+                    // clear checkboxes in differences because they always need to be re-entered
+                    copy.differences_counts.compare_votes_cast_admitted_voters = Default::default();
+                    copy.differences_counts.difference_completely_accounted_for =
+                        Default::default();
+
+                    Results::CSONextSession(copy)
+                } else {
+                    Results::CSONextSession(CSONextSessionResults::empty(election))
+                }
+            }
+            (CommitteeCategory::CSB, _) => Results::GSB(GSBResults::empty(election)),
+        }
+    }
+
     /// Common accessor for voter counts regardless of the underlying model.
     pub fn voters_counts(&self) -> &VotersCounts {
         match self {
@@ -342,7 +378,7 @@ impl Validate for Results {
 pub mod tests {
     use super::*;
     use crate::domain::{
-        election::PGNumber,
+        election::{ElectionCategory, PGNumber, tests::election_fixture},
         results::{
             count::Count,
             differences_counts::{
@@ -430,5 +466,49 @@ pub mod tests {
 
             self
         }
+    }
+
+    #[test]
+    fn test_initial_voter_card_count() {
+        let first_session = CommitteeSession::first_session();
+
+        // Voter cards only exist for non-local elections
+        let cases = [
+            (ElectionCategory::Municipal, None),
+            (ElectionCategory::Provincial, Some(0)),
+            (ElectionCategory::WaterAuthority, Some(0)),
+        ];
+
+        for (category, expected_voter_card_count) in cases {
+            for committee_category in [CommitteeCategory::GSB, CommitteeCategory::CSB] {
+                let mut election = election_fixture(committee_category, &[2]);
+                election.category = category;
+
+                let results = Results::new(&election, &first_session, None);
+
+                assert_eq!(
+                    results.voters_counts().voter_card_count,
+                    expected_voter_card_count,
+                    "election category {category:?}, committee category {committee_category:?}"
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn test_initial_voter_card_count_next_session() {
+        let mut election = election_fixture(CommitteeCategory::GSB, &[2]);
+        election.category = ElectionCategory::Provincial;
+        let mut previous_results = CSOFirstSessionResults::empty(&election).as_common();
+        previous_results.voters_counts.voter_card_count = Some(5);
+
+        let results = Results::new(
+            &election,
+            &CommitteeSession::next_session(),
+            Some(&previous_results),
+        );
+
+        assert!(matches!(results, Results::CSONextSession(_)));
+        assert_eq!(results.voters_counts().voter_card_count, Some(5));
     }
 }

@@ -53,18 +53,102 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_json_matches_struct() {
-        let reader = BufReader::new(File::open("templates/inputs/model-p-22-2.json").unwrap());
+    #[allow(clippy::too_many_lines)]
+    fn test_main_json_variations_match_struct() {
+        let mut reader = BufReader::new(
+            File::open("templates/inputs/model-p-22-2-variations/gte-19-seats.json").unwrap(),
+        );
         serde_json::from_reader::<_, ModelP22_2Input>(reader)
-            .expect("model-p-22-2.json should deserialize to struct ModelP22_2Input");
+            .expect("gte-19-seats.json should deserialize to struct ModelP22_2Input");
+
+        reader = BufReader::new(
+            File::open(
+                "templates/inputs/model-p-22-2-variations/gte-19-seats-and-p7-drawing-lots.json",
+            )
+            .unwrap(),
+        );
+        serde_json::from_reader::<_, ModelP22_2Input>(reader).expect(
+            "gte-19-seats-and-p7-drawing-lots.json should deserialize to struct ModelP22_2Input",
+        );
+
+        reader = BufReader::new(
+            File::open("templates/inputs/model-p-22-2-variations/gte-19-seats-and-p9.json")
+                .unwrap(),
+        );
+        serde_json::from_reader::<_, ModelP22_2Input>(reader)
+            .expect("gte-19-seats-and-p9.json should deserialize to struct ModelP22_2Input");
+
+        reader = BufReader::new(
+            File::open("templates/inputs/model-p-22-2-variations/gte-19-seats-and-p9-drawing-lots-and-deceased-candidates.json")
+                .unwrap(),
+        );
+        serde_json::from_reader::<_, ModelP22_2Input>(reader)
+            .expect("gte-19-seats-and-p9-drawing-lots-and-deceased-candidates.json should deserialize to struct ModelP22_2Input");
+
+        reader = BufReader::new(
+            File::open("templates/inputs/model-p-22-2-variations/gte-19-seats-and-p9-drawing-lots-and-p10-and-deceased-candidates.json")
+                .unwrap(),
+        );
+        serde_json::from_reader::<_, ModelP22_2Input>(reader)
+            .expect("gte-19-seats-and-p9-drawing-lots-and-p10-and-deceased-candidates.json should deserialize to struct ModelP22_2Input");
+
+        reader = BufReader::new(
+            File::open("templates/inputs/model-p-22-2-variations/lt-19-seats.json").unwrap(),
+        );
+        serde_json::from_reader::<_, ModelP22_2Input>(reader)
+            .expect("lt-19-seats.json should deserialize to struct ModelP22_2Input");
+
+        reader = BufReader::new(
+            File::open(
+                "templates/inputs/model-p-22-2-variations/lt-19-seats-and-p7-drawing-lots.json",
+            )
+            .unwrap(),
+        );
+        serde_json::from_reader::<_, ModelP22_2Input>(reader).expect(
+            "lt-19-seats-and-p7-drawing-lots.json should deserialize to struct ModelP22_2Input",
+        );
+
+        reader = BufReader::new(
+            File::open("templates/inputs/model-p-22-2-variations/lt-19-seats-and-p9-and-p10.json")
+                .unwrap(),
+        );
+        serde_json::from_reader::<_, ModelP22_2Input>(reader)
+            .expect("lt-19-seats-and-p9-and-p10.json should deserialize to struct ModelP22_2Input");
+
+        reader = BufReader::new(
+            File::open(
+                "templates/inputs/model-p-22-2-variations/lt-19-seats-and-p9-drawing-lots.json",
+            )
+            .unwrap(),
+        );
+        serde_json::from_reader::<_, ModelP22_2Input>(reader).expect(
+            "lt-19-seats-and-p9-drawing-lots.json should deserialize to struct ModelP22_2Input",
+        );
+
+        reader = BufReader::new(
+            File::open("templates/inputs/model-p-22-2-variations/lt-19-seats-and-p10.json")
+                .unwrap(),
+        );
+        serde_json::from_reader::<_, ModelP22_2Input>(reader)
+            .expect("lt-19-seats-and-p10.json should deserialize to struct ModelP22_2Input");
+
+        reader = BufReader::new(
+            File::open(
+                "templates/inputs/model-p-22-2-variations/lt-19-seats-and-p15-drawing-lots.json",
+            )
+            .unwrap(),
+        );
+        serde_json::from_reader::<_, ModelP22_2Input>(reader).expect(
+            "lt-19-seats-and-p15-drawing-lots.json should deserialize to struct ModelP22_2Input",
+        );
     }
 
     #[test]
     fn test_bijlage_json_matches_struct() {
         let reader =
-            BufReader::new(File::open("templates/inputs/model-p-22-2-bijlage1.json").unwrap());
+            BufReader::new(File::open("templates/inputs/model-p-22-2-bijlage-1.json").unwrap());
         serde_json::from_reader::<_, ModelP22_2Bijlage1Input>(reader).expect(
-            "model-p-22-2-bijlage1.json should deserialize to struct ModelP22_2Bijlage1Input",
+            "model-p-22-2-bijlage-1.json should deserialize to struct ModelP22_2Bijlage1Input",
         );
     }
 }

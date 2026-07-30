@@ -72,8 +72,8 @@ test.describe("resolve differences", () => {
     await resolveDifferencesPage.correctWrongEntry.click();
     await resolveDifferencesPage.save.click();
 
-    await expect(electionStatusPage.firstEntryFinished).toContainText(
-      `${dataEntryGSBEntriesDifferent.name}Sam Kuijpers`,
+    await expect(electionStatusPage.inProgress).toContainText(
+      [dataEntryGSBEntriesDifferent.name, "2e invoer", "Aliyah van den Berg"].join(""),
     );
     await expect(electionStatusPage.alertDifferencesResolved).toBeVisible();
     await expect(electionStatusPage.alertDifferencesResolved).toContainText(

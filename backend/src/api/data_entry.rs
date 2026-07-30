@@ -73,8 +73,6 @@ pub struct DataEntryAuditData {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub data_entry_progress: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub finished_at: Option<DateTime<Utc>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub first_entry_user_id: Option<UserId>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub second_entry_user_id: Option<UserId>,
@@ -88,7 +86,6 @@ impl From<DataEntryRow> for DataEntryAuditData {
             data_entry_id: value.id,
             data_entry_status: state.status_name().to_string(),
             data_entry_progress: state.get_data_entry_progress().map(|p| format!("{p}%")),
-            finished_at: state.finished_at().copied(),
             first_entry_user_id: state.get_first_entry_user_id(),
             second_entry_user_id: state.get_second_entry_user_id(),
         }

@@ -4,7 +4,7 @@ use crate::{
     api::data_entry::ElectionStatusResponseEntry,
     domain::{
         committee_session::CommitteeSession,
-        data_entry::DataEntryStatusWithSource,
+        data_entry::{DataEntryStatus, DataEntryStatusWithSource},
         election::{CommitteeCategory, Election},
     },
     repository::{polling_station_repo, sub_committee_repo},
@@ -35,6 +35,14 @@ impl From<polling_station_repo::CreateDataEntryError> for DataEntryServiceError 
 
 fn map_to_response_entry(entry: DataEntryStatusWithSource) -> ElectionStatusResponseEntry {
     let status = &entry.status;
+
+    // Show finished_at in the election status for first entry finished and both entries finished
+    let finished_at = match status {
+        DataEntryStatus::FirstEntryFinalised(status) => Some(status.first_entry_finished_at),
+        DataEntryStatus::Definitive(status) => Some(status.finished_at),
+        _ => None,
+    };
+
     ElectionStatusResponseEntry {
         data_entry_id: entry.data_entry_id,
         source: entry.source,
@@ -42,7 +50,7 @@ fn map_to_response_entry(entry: DataEntryStatusWithSource) -> ElectionStatusResp
         first_entry_user_id: status.get_first_entry_user_id(),
         second_entry_user_id: status.get_second_entry_user_id(),
         data_entry_progress: status.get_data_entry_progress(),
-        finished_at: status.finished_at().copied(),
+        finished_at,
         finalised_with_warnings: status.finalised_with_warnings().copied(),
     }
 }

@@ -1017,22 +1017,6 @@ impl DataEntryStatus {
         }
     }
 
-    /// Returns the timestamp at which point this data entry process was made definitive
-    pub fn finished_at(&self) -> Option<&DateTime<Utc>> {
-        match self {
-            DataEntryStatus::FirstEntryFinalised(FirstEntryFinalised {
-                first_entry_finished_at,
-                ..
-            }) => Some(first_entry_finished_at),
-            DataEntryStatus::SecondEntryInProgress(SecondEntryInProgress {
-                first_entry_finished_at,
-                ..
-            }) => Some(first_entry_finished_at),
-            DataEntryStatus::Definitive(Definitive { finished_at, .. }) => Some(finished_at),
-            _ => None,
-        }
-    }
-
     /// Returns whether the finalised first or second data entry has warnings
     pub fn finalised_with_warnings(&self) -> Option<&bool> {
         match self {
@@ -1872,15 +1856,6 @@ mod tests {
         assert!(first_entry_finalised().get_client_state().is_none());
         assert!(second_entry_in_progress().get_client_state().is_some());
         assert!(entries_different().get_client_state().is_none());
-    }
-
-    #[test]
-    fn check_finished_at_method_return_values() {
-        assert!(first_entry_in_progress().finished_at().is_none());
-        assert!(entries_different().finished_at().is_none());
-        assert!(first_entry_finalised().finished_at().is_some());
-        assert!(second_entry_in_progress().finished_at().is_some());
-        assert!(definitive().finished_at().is_some());
     }
 
     #[test]

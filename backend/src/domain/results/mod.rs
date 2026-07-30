@@ -44,7 +44,7 @@ pub mod yes_no;
 #[serde(tag = "model")]
 pub enum Results {
     /// Results for decentrally counted (DSO) elections, first election committee session.
-    /// This contains the data entry values from Model Na 31-2 Bijlage 1.
+    /// This contains the data entry values from Model Model N 10-1.
     DSOFirstSession(DSOFirstSessionResults),
     /// Results for decentrally counted (DSO) elections, any subsequent election committee session.
     /// This contains the data entry values from Model Na 14-1 Bijlage 1.

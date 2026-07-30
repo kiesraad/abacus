@@ -172,7 +172,6 @@ impl Display for DataEntrySourceNumber {
 #[derive(Serialize, Deserialize, ToSchema, Debug, Clone, Copy, PartialEq, Eq)]
 #[serde(tag = "type", content = "id", deny_unknown_fields)]
 pub enum DataEntrySourceId {
-    asdf
     PollingStation(PollingStationId),
     SubCommittee(SubCommitteeId),
 }

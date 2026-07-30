@@ -979,7 +979,11 @@ impl DataEntryStatus {
             DataEntryStatus::SecondEntryInProgress(state) => Some(&state.second_entry),
             DataEntryStatus::FirstEntryCorrection(state) => Some(&state.first_entry),
             DataEntryStatus::SecondEntryCorrection(state) => Some(&state.second_entry),
-            _ => None,
+            DataEntryStatus::Empty
+            | DataEntryStatus::FirstEntryHasErrors(_)
+            | DataEntryStatus::FirstEntryFinalised(_)
+            | DataEntryStatus::EntriesDifferent(_)
+            | DataEntryStatus::Definitive(_) => None,
         }
     }
 
@@ -988,7 +992,13 @@ impl DataEntryStatus {
         match self {
             DataEntryStatus::FirstEntryInProgress(state) => state.client_state.as_ref(),
             DataEntryStatus::SecondEntryInProgress(state) => state.client_state.as_ref(),
-            _ => None,
+            DataEntryStatus::FirstEntryCorrection(state) => state.client_state.as_ref(),
+            DataEntryStatus::SecondEntryCorrection(state) => state.client_state.as_ref(),
+            DataEntryStatus::Empty
+            | DataEntryStatus::FirstEntryHasErrors(_)
+            | DataEntryStatus::FirstEntryFinalised(_)
+            | DataEntryStatus::EntriesDifferent(_)
+            | DataEntryStatus::Definitive(_) => None,
         }
     }
 

@@ -101,6 +101,7 @@ export const claimDataEntryResponse: ClaimDataEntryResponse = {
   client_state: null,
   source: source(1),
   status: "first_entry_in_progress",
+  is_correction: false,
 };
 
 export const saveDataEntryResponse: SaveDataEntryResponse = {

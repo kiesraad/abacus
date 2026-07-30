@@ -192,6 +192,24 @@ export function buildFormState(
   return { formState: newFormState, targetFormSectionId };
 }
 
+/*
+ * Build the form state for an entry that is being corrected. The typist starts at the first section and has to
+ * accept the errors and warnings again.
+ */
+export function buildCorrectionFormState(validationResults: ValidationResults, dataEntryStructure: DataEntryStructure) {
+  const firstSectionId = dataEntryStructure[0]?.id;
+  if (firstSectionId === undefined) {
+    throw new Error("Cannot determine initial section from dataEntryStructure");
+  }
+
+  // "save" is the last section
+  return buildFormState(
+    { furthest: "save", current: firstSectionId, acceptedErrorsAndWarnings: [], continue: false },
+    validationResults,
+    dataEntryStructure,
+  );
+}
+
 export function updateFormStateAfterSubmit(
   dataEntryStructure: DataEntryStructure,
   formState: FormState,

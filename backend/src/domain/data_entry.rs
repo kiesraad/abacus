@@ -296,6 +296,9 @@ pub struct FirstEntryInProgress {
     #[schema(value_type = Object)]
     /// Client state for the data entry (arbitrary JSON)
     pub client_state: ClientState,
+    /// Whether this entry was returned for correction
+    #[serde(default)]
+    pub is_correction: bool,
 }
 
 #[derive(Debug, Default, Serialize, Deserialize, Clone, Type, Eq, PartialEq)]
@@ -451,6 +454,7 @@ impl DataEntryStatus {
                 first_entry_user_id: user_id,
                 first_entry: initial_results,
                 client_state: ClientState::default(),
+                is_correction: false,
             })),
             DataEntryStatus::FirstEntryInProgress(_) | DataEntryStatus::FirstEntryCorrection(_) => {
                 if user_id == self.get_first_entry_user_id().expect("user id is present") {
@@ -811,6 +815,7 @@ impl DataEntryStatus {
                     first_entry_user_id: state.first_entry_user_id,
                     first_entry: state.finalised_first_entry.clone(),
                     client_state: Default::default(),
+                    is_correction: true,
                 }))
             }
             _ => Err(DataEntryTransitionError::Invalid),
@@ -1002,6 +1007,21 @@ impl DataEntryStatus {
         }
     }
 
+    /// Whether the typist is correcting an entry that was completed before
+    pub fn is_correction(&self) -> bool {
+        match self {
+            DataEntryStatus::FirstEntryInProgress(state) => state.is_correction,
+            DataEntryStatus::FirstEntryCorrection(_)
+            | DataEntryStatus::SecondEntryCorrection(_) => true,
+            DataEntryStatus::Empty
+            | DataEntryStatus::SecondEntryInProgress(_)
+            | DataEntryStatus::FirstEntryHasErrors(_)
+            | DataEntryStatus::FirstEntryFinalised(_)
+            | DataEntryStatus::EntriesDifferent(_)
+            | DataEntryStatus::Definitive(_) => false,
+        }
+    }
+
     /// Get the name of the current status
     pub fn status_name(&self) -> DataEntryStatusName {
         match self {
@@ -1160,6 +1180,7 @@ mod tests {
             first_entry_user_id: UserId::from(0),
             first_entry: example_results(),
             client_state: ClientState::new_from_str(Some("{}")).unwrap(),
+            is_correction: false,
         })
     }
 
@@ -1331,6 +1352,7 @@ mod tests {
             first_entry_user_id: UserId::from(0),
             first_entry: invalid_entry,
             client_state: ClientState::new_from_str(Some("{}")).unwrap(),
+            is_correction: false,
         });
         let next = initial
             .finalise_first_entry(&election(), UserId::from(0))
@@ -1673,15 +1695,44 @@ mod tests {
 
     #[test]
     fn has_errors_resume_first() {
-        assert!(matches!(
-            first_entry_has_errors().resume_first_entry_with_errors(),
-            Ok(DataEntryStatus::FirstEntryInProgress(
-                FirstEntryInProgress {
-                    first_entry_user_id,
-                    ..
-                }
-            )) if first_entry_user_id == UserId::from(0)
-        ));
+        let resumed = first_entry_has_errors()
+            .resume_first_entry_with_errors()
+            .expect("should be Ok");
+
+        let DataEntryStatus::FirstEntryInProgress(state) = &resumed else {
+            panic!("expected FirstEntryInProgress, got {resumed:?}");
+        };
+        assert_eq!(state.first_entry_user_id, UserId::from(0));
+        assert!(resumed.is_correction());
+    }
+
+    #[test]
+    fn claimed_first_entry_is_not_a_correction() {
+        assert!(!first_entry_in_progress().is_correction());
+        assert!(
+            !DataEntryStatus::Empty
+                .claim_first_entry(UserId::from(0), example_results())
+                .expect("should be Ok")
+                .is_correction()
+        );
+    }
+
+    #[test]
+    fn correction_survives_saving_the_first_entry() {
+        let resumed = first_entry_has_errors()
+            .resume_first_entry_with_errors()
+            .expect("should be Ok");
+
+        let saved = resumed
+            .update_first_entry(DataEntryUpdate {
+                progress: 60,
+                user_id: UserId::from(0),
+                entry: example_results(),
+                client_state: ClientState::new_from_str(Some(r#"{"furthest":"save"}"#)).unwrap(),
+            })
+            .expect("should be Ok");
+
+        assert!(saved.is_correction());
     }
 
     #[test]
@@ -1856,6 +1907,28 @@ mod tests {
         assert!(first_entry_finalised().get_client_state().is_none());
         assert!(second_entry_in_progress().get_client_state().is_some());
         assert!(entries_different().get_client_state().is_none());
+    }
+
+    #[test]
+    fn check_is_correction_return_values() {
+        assert!(!DataEntryStatus::Empty.is_correction());
+        assert!(!first_entry_in_progress().is_correction());
+        assert!(!second_entry_in_progress().is_correction());
+        assert!(!entries_different().is_correction());
+
+        // an entry corrected to resolve differences is also a correction
+        assert!(
+            entries_different()
+                .correct_first_entry(&election())
+                .unwrap()
+                .is_correction()
+        );
+        assert!(
+            entries_different()
+                .correct_second_entry()
+                .unwrap()
+                .is_correction()
+        );
     }
 
     #[test]

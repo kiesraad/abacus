@@ -562,18 +562,18 @@ De aan de lijsten toegewezen volle zetels en restzetels zijn bij elkaar opgeteld
 
 = Ondertekening
 
-#emph_block[Datum]
+#signing_form_label[Datum]
 
 #textbox_only_bottom_stroke[Datum en tijd:][Plaats:]
 
-#emph_block[Voorzitter van het #location_type:]
+#signing_form_label[Voorzitter van het #location_type:]
 
 #textbox[Naam:][Handtekening:]
 
-#emph_block[Plaatsvervangend voorzitter van het #location_type:]
+#signing_form_label[Plaatsvervangend voorzitter van het #location_type:]
 
 #textbox[Naam:][Handtekening:]
 
-#emph_block[De andere leden van het #location_type:]
+#signing_form_label[De andere leden van het #location_type:]
 
 #stack(spacing: 0.5em, ..range(0, 5).map(_ => textbox[Naam:][Handtekening:]))

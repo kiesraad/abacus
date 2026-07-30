@@ -244,23 +244,23 @@ Bijvoorbeeld als er meerdere verkiezingen tegelijk werden georganiseerd, en een 
 
 = Ondertekening <signing>
 
-#emph_block[Datum]
+#signing_form_label[Datum]
 
 #textbox_only_bottom_stroke[Datum en tijd:][Plaats:]
 
 == Verplicht: voorzitter en twee leden van het stembureau
 
-#emph_block[Voorzitter van het stembureau:]
+#signing_form_label[Voorzitter van het stembureau:]
 
 #textbox[Naam:][Handtekening:]
 
-#emph_block[2 leden van het stembureau:]
+#signing_form_label[2 leden van het stembureau:]
 
 #stack(spacing: 0.5em, ..range(0, 2).map(_ => textbox[Naam:][Handtekening:]))
 
 == Ondertekening door andere aanwezige leden van het stembureau
 
-#emph_block[Extra ondertekening: (niet verplicht)]
+#signing_form_label[Extra ondertekening: (niet verplicht)]
 
 #stack(spacing: 0.5em, ..range(0, 4).map(_ => textbox[Naam:][Handtekening:]))
 

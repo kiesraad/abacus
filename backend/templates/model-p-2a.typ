@@ -135,23 +135,23 @@ Bijvoorbeeld een schorsing of als er meerdere verkiezingen tegelijk werden georg
 
 = Ondertekening
 
-#emph_block[Datum]
+#signing_form_label[Datum]
 
 #textbox_only_bottom_stroke[Datum en tijd:][Plaats:]
 
 == Verplicht: voorzitter en #is_local_election[twee][vier] leden van het #location_type
 
-#emph_block[Voorzitter van het #location_type:]
+#signing_form_label[Voorzitter van het #location_type:]
 
 #textbox[Naam:][Handtekening:]
 
-#emph_block[#is_local_election[2][4] leden van het #location_type:]
+#signing_form_label[#is_local_election[2][4] leden van het #location_type:]
 
 #stack(spacing: 0.5em, ..range(0, is_local_election(2, 4)).map(_ => textbox[Naam:][Handtekening:]))
 
 == Ondertekening door andere aanwezige leden van het #location_type
 
-#emph_block[Extra ondertekening: (niet verplicht)]
+#signing_form_label[Extra ondertekening: (niet verplicht)]
 
 #stack(spacing: 0.5em, ..range(0, is_local_election(3, 1)).map(_ => textbox[Naam:][Handtekening:]))
 

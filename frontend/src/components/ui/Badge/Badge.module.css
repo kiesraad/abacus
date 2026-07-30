@@ -63,6 +63,7 @@
 
 .empty,
 .first_entry_in_progress,
+.first_entry_correction,
 .first_entry_has_errors,
 .first_entry_finalised {
   background: var(--badge-second-entry-bg);
@@ -78,6 +79,7 @@
 
 .first_entry_finalised_for_typist,
 .second_entry_in_progress,
+.second_entry_correction,
 .entries_different,
 .extra_entry {
   background: var(--badge-first-entry-bg);

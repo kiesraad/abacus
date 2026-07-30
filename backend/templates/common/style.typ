@@ -1,3 +1,5 @@
+#import "scripts.typ": emph_block
+
 // Get the chapter defined in the current page or the last defined chapter
 #let current_chapter() = {
   let chapters = query(heading.where(level: 1))
@@ -151,3 +153,18 @@
 
   #doc
 ]
+
+// Intentionally blank page before the signature page. Header shows the next level-1 chapter.
+#let blank_page_before_signing(header-right) = {
+  pagebreak(weak: true)
+
+  set page(header: context default_header(
+    query(heading.where(level: 1).after(here())).at(0, default: none),
+    header-right,
+  ))
+
+  emph_block[Deze pagina is expres leeg]
+  [Zo komt het handtekeningen-blad altijd op een losse pagina, ook als het verslag dubbelzijdig is geprint.]
+
+  pagebreak(weak: true)
+}

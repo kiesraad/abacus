@@ -5606,11 +5606,15 @@
           "DataEntrySaved",
           "DataEntryResumed",
           "DataEntryDeleted",
+          "DataEntryDiscarded",
+          "DataEntryReset",
           "DataEntryFinalised",
           "DataEntryDiscardedFirst",
           "DataEntryReturnedFirst",
           "DataEntryKeptFirst",
           "DataEntryKeptSecond",
+          "DataEntryKeptFirstReturnedSecond",
+          "DataEntryKeptSecondReturnedFirst",
           "DataEntryDiscardedBoth",
           "AirGapViolationDetected",
           "AirGapViolationResolved",
@@ -6419,6 +6423,7 @@
           "first_entry",
           "second_entry_user_id",
           "second_entry",
+          "second_entry_has_errors",
           "source"
         ],
         "properties": {
@@ -6430,6 +6435,9 @@
           },
           "second_entry": {
             "$ref": "#/components/schemas/Results"
+          },
+          "second_entry_has_errors": {
+            "type": "boolean"
           },
           "second_entry_user_id": {
             "$ref": "#/components/schemas/UserId"
@@ -6567,6 +6575,8 @@
           "first_entry_finalised",
           "second_entry_in_progress",
           "entries_different",
+          "first_entry_correction",
+          "second_entry_correction",
           "definitive"
         ]
       },
@@ -7075,6 +7085,12 @@
             "$ref": "#/components/schemas/DataEntryId",
             "description": "Data entry id"
           },
+          "data_entry_progress": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Current data entry progress as a percentage (0 to 100)",
+            "minimum": 0
+          },
           "finalised_with_warnings": {
             "type": "boolean",
             "description": "Whether the finalised first or second data entry has warnings"
@@ -7083,22 +7099,10 @@
             "type": "string",
             "description": "Time when the data entry was finalised"
           },
-          "first_entry_progress": {
-            "type": "integer",
-            "format": "int32",
-            "description": "First entry progress as a percentage (0 to 100)",
-            "minimum": 0
-          },
           "first_entry_user_id": {
             "type": "integer",
             "format": "int32",
             "description": "First entry user id",
-            "minimum": 0
-          },
-          "second_entry_progress": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Second entry progress as a percentage (0 to 100)",
             "minimum": 0
           },
           "second_entry_user_id": {
@@ -7260,7 +7264,7 @@
           "DatabaseError",
           "DataEntryAlreadyClaimed",
           "DataEntryAlreadyFinalised",
-          "DataEntryCannotBeDeleted",
+          "DataEntryCannotBeReset",
           "DataEntryGetNotAllowed",
           "DataEntryNotAllowed",
           "EmlImportError",
@@ -7523,6 +7527,7 @@
         "description": "Abacus API and asset server",
         "required": [
           "committee_category",
+          "election_category",
           "political_groups",
           "candidates_per_group",
           "polling_stations",
@@ -7552,6 +7557,10 @@
           "custom_name": {
             "type": "string",
             "description": "Custom election name"
+          },
+          "election_category": {
+            "$ref": "#/components/schemas/ElectionCategory",
+            "description": "Municipal, Provincial or WaterAuthority"
           },
           "first_data_entry": {
             "$ref": "#/components/schemas/RandomRange",
@@ -8181,7 +8190,8 @@
           "number_of_seats",
           "number_of_voters",
           "election_date",
-          "nomination_date"
+          "nomination_date",
+          "political_groups"
         ],
         "properties": {
           "category": {
@@ -8222,6 +8232,12 @@
             "type": "integer",
             "format": "int32",
             "minimum": 0
+          },
+          "political_groups": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RegisteredPoliticalGroup"
+            }
           },
           "sub_category": {
             "$ref": "#/components/schemas/ElectionSubCategory"
@@ -8806,12 +8822,43 @@
           }
         }
       },
+      "RegisteredPoliticalGroup": {
+        "type": "object",
+        "description": "Political group and its candidates (with registered name as imported from the EML)",
+        "required": [
+          "number",
+          "registered_name",
+          "candidates"
+        ],
+        "properties": {
+          "candidates": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Candidate"
+            },
+            "description": "List of candidates of the political group"
+          },
+          "number": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Political group number",
+            "minimum": 0
+          },
+          "registered_name": {
+            "type": "string",
+            "description": "Registered political group name as imported from the candidates list EML (230)"
+          }
+        },
+        "additionalProperties": false
+      },
       "ResolveDifferencesAction": {
         "type": "string",
         "enum": [
-          "keep_first_entry",
-          "keep_second_entry",
-          "discard_both_entries"
+          "keep_first_and_discard_second",
+          "keep_first_and_correct_second",
+          "keep_second_and_discard_first",
+          "keep_second_and_correct_first",
+          "discard_both"
         ]
       },
       "ResolveErrorsAction": {

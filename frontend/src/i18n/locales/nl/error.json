@@ -15,7 +15,7 @@
     "DatabaseError": "Er is een fout opgetreden bij het opslaan van de invoer",
     "DataEntryAlreadyClaimed": "Een andere invoerder is bezig met dit stembureau",
     "DataEntryAlreadyFinalised": "De invoer voor dit stembureau is al gedaan",
-    "DataEntryCannotBeDeleted": "De invoer kan niet verwijderd worden",
+    "DataEntryCannotBeReset": "De invoer kan niet verwijderd worden",
     "DataEntryGetNotAllowed": "De status van de invoer staat deze actie niet toe",
     "DataEntryNotAllowed": "De invoer voor dit stembureau is niet toegestaan",
     "InvalidDataEntrySource": "De bron van de invoer is ongeldig",

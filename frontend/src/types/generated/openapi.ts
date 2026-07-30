@@ -475,11 +475,15 @@ export const auditEventTypeValues = [
   "DataEntrySaved",
   "DataEntryResumed",
   "DataEntryDeleted",
+  "DataEntryDiscarded",
+  "DataEntryReset",
   "DataEntryFinalised",
   "DataEntryDiscardedFirst",
   "DataEntryReturnedFirst",
   "DataEntryKeptFirst",
   "DataEntryKeptSecond",
+  "DataEntryKeptFirstReturnedSecond",
+  "DataEntryKeptSecondReturnedFirst",
   "DataEntryDiscardedBoth",
   "AirGapViolationDetected",
   "AirGapViolationResolved",
@@ -791,6 +795,7 @@ export interface DataEntryGetDifferencesResponse {
   first_entry: Results;
   first_entry_user_id: UserId;
   second_entry: Results;
+  second_entry_has_errors: boolean;
   second_entry_user_id: UserId;
   source: DataEntrySource;
 }
@@ -818,6 +823,8 @@ export const dataEntryStatusNameValues = [
   "first_entry_finalised",
   "second_entry_in_progress",
   "entries_different",
+  "first_entry_correction",
+  "second_entry_correction",
   "definitive",
 ] as const;
 export type DataEntryStatusName = (typeof dataEntryStatusNameValues)[number];
@@ -965,16 +972,14 @@ export interface ElectionStatusResponse {
 export interface ElectionStatusResponseEntry {
   /** Data entry id */
   data_entry_id: DataEntryId;
+  /** Current data entry progress as a percentage (0 to 100) */
+  data_entry_progress?: number;
   /** Whether the finalised first or second data entry has warnings */
   finalised_with_warnings?: boolean;
   /** Time when the data entry was finalised */
   finished_at?: string;
-  /** First entry progress as a percentage (0 to 100) */
-  first_entry_progress?: number;
   /** First entry user id */
   first_entry_user_id?: number;
-  /** Second entry progress as a percentage (0 to 100) */
-  second_entry_progress?: number;
   /** Second entry user id */
   second_entry_user_id?: number;
   /** Data entry source (polling station or sub committee) */
@@ -1041,7 +1046,7 @@ export const errorReferenceValues = [
   "DatabaseError",
   "DataEntryAlreadyClaimed",
   "DataEntryAlreadyFinalised",
-  "DataEntryCannotBeDeleted",
+  "DataEntryCannotBeReset",
   "DataEntryGetNotAllowed",
   "DataEntryNotAllowed",
   "EmlImportError",
@@ -1173,6 +1178,8 @@ export interface GenerateElectionArgs {
   committee_category: CommitteeCategory;
   /** Custom election name */
   custom_name?: string;
+  /** Municipal, Provincial or WaterAuthority */
+  election_category: ElectionCategory;
   /** Percentage of the first data entry to complete if data entry is included */
   first_data_entry: RandomRange;
   /** Generate multiple elections, each resulting in drawing lots */
@@ -1336,6 +1343,7 @@ export interface NewElection {
   nomination_date: string;
   number_of_seats: number;
   number_of_voters: number;
+  political_groups: RegisteredPoliticalGroup[];
   sub_category: ElectionSubCategory;
 }
 
@@ -1525,10 +1533,24 @@ export interface RedactedEmlHash {
   redacted_indexes: number[];
 }
 
+/**
+ * Political group and its candidates (with registered name as imported from the EML)
+ */
+export interface RegisteredPoliticalGroup {
+  /** List of candidates of the political group */
+  candidates: Candidate[];
+  /** Political group number */
+  number: number;
+  /** Registered political group name as imported from the candidates list EML (230) */
+  registered_name: string;
+}
+
 export const resolveDifferencesActionValues = [
-  "keep_first_entry",
-  "keep_second_entry",
-  "discard_both_entries",
+  "keep_first_and_discard_second",
+  "keep_first_and_correct_second",
+  "keep_second_and_discard_first",
+  "keep_second_and_correct_first",
+  "discard_both",
 ] as const;
 export type ResolveDifferencesAction = (typeof resolveDifferencesActionValues)[number];
 

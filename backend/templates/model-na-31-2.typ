@@ -1,6 +1,6 @@
-#import "common/style.typ": conf, default_header, document_numbering
+#import "common/style.typ": conf, document_numbering, blank_page_before_signing
 #import "common/scripts.typ": *
-#let input = json("inputs/model-na-31-2.json")
+#let input = json("inputs/model-na-31-2-variations/model-na-31-2-GR.json")
 
 #let is_municipality = (municipal, public_body) => is_municipality(input.election.location, municipal, public_body)
 #let is_local_election = (local, other) => is_local_election(input.election.category, local, other)
@@ -155,22 +155,7 @@ Bijvoorbeeld een schorsing of als er meerdere verkiezingen tegelijk werden georg
 
 == Toegelaten kiezers
 
-#if not "voter_card_count" in input.summary.voters_counts [
-  Tel het aantal geldige stempassen en volmachtbewijzen
-
-  #sum(
-    letterbox("A", value: input.summary.voters_counts.poll_card_count)[Stempassen],
-    letterbox(
-      "B",
-      value: input.summary.voters_counts.proxy_certificate_count,
-    )[Volmachtbewijzen (schriftelijk of via ingevulde stempas)],
-    letterbox(
-      "D",
-      light: false,
-      value: input.summary.voters_counts.total_admitted_voters_count,
-    )[Totaal toegelaten kiezers (A+B)],
-  )
-] else [
+#if not is_local_election(true, false) and "voter_card_count" in input.summary.voters_counts [
   Tel het aantal geldige stempassen, volmachtbewijzen en kiezerspassen
 
   #sum(
@@ -185,6 +170,21 @@ Bijvoorbeeld een schorsing of als er meerdere verkiezingen tegelijk werden georg
       light: false,
       value: input.summary.voters_counts.total_admitted_voters_count,
     )[Totaal toegelaten kiezers (A+B+C)],
+  )
+] else [
+  Tel het aantal geldige stempassen en volmachtbewijzen
+
+  #sum(
+    letterbox("A", value: input.summary.voters_counts.poll_card_count)[Stempassen],
+    letterbox(
+      "B",
+      value: input.summary.voters_counts.proxy_certificate_count,
+    )[Volmachtbewijzen (schriftelijk of via ingevulde stempas)],
+    letterbox(
+      "D",
+      light: false,
+      value: input.summary.voters_counts.total_admitted_voters_count,
+    )[Totaal toegelaten kiezers (A+B)],
   )
 ]
 
@@ -275,38 +275,27 @@ Voer de controle uit volgens de stappen in het controleprotocol.
   )
 }
 
-#pagebreak(weak: true)
-
-#set page(header: "")
-
-#show heading.where(level: 3): it => [#block(it.body)]
-
-=== Deze pagina is expres leeg
-Zo komt het handtekeningen-blad altijd op een losse pagina, ook als het verslag dubbelzijdig is geprint.
-
-#pagebreak(weak: true)
-
-#set page(header: default_header(none, location_name))
+#blank_page_before_signing(location_name)
 
 = Ondertekening
 
-=== Datum
+#signing_form_label[Datum]
 
 #textbox_only_bottom_stroke[Datum en tijd:][Plaats:]
 
 == Verplicht: voorzitter en #is_local_election[twee][vier] leden van het #location_type
 
-=== Voorzitter van het #location_type:
+#signing_form_label[Voorzitter van het #location_type:]
 
 #textbox[Naam:][Handtekening:]
 
-=== #is_local_election[2][4] leden van het #location_type:
+#signing_form_label[#is_local_election[2][4] leden van het #location_type:]
 
 #stack(spacing: 0.5em, ..range(0, is_local_election(2, 4)).map(_ => textbox[Naam:][Handtekening:]))
 
 == Ondertekening door andere aanwezige leden van het #location_type
 
-=== Extra ondertekening: (niet verplicht)
+#signing_form_label[Extra ondertekening: (niet verplicht)]
 
 #stack(spacing: 0.5em, ..range(0, is_local_election(3, 1)).map(_ => textbox[Naam:][Handtekening:]))
 

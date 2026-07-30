@@ -8,7 +8,12 @@ export class ResolveDifferencesPgObj {
   readonly keepFirstEntry: Locator;
   readonly keepSecondEntry: Locator;
   readonly discardBothEntries: Locator;
+  readonly wrongEntryQuestion: Locator;
+  readonly correctWrongEntry: Locator;
+  readonly discardWrongEntry: Locator;
+  readonly correctionBlocked: Locator;
   readonly save: Locator;
+  readonly continueToResolveErrors: Locator;
 
   constructor(protected readonly page: Page) {
     this.title = this.page.getByRole("heading", { name: "Verschil tussen eerste en tweede invoer" });
@@ -18,6 +23,11 @@ export class ResolveDifferencesPgObj {
     this.keepFirstEntry = page.getByRole("radio", { name: /Eerste invoer/ });
     this.keepSecondEntry = page.getByRole("radio", { name: /Tweede invoer/ });
     this.discardBothEntries = page.getByRole("radio", { name: /Geen van beide/ });
+    this.wrongEntryQuestion = page.getByRole("heading", { name: /Wat wil je doen/ });
+    this.correctWrongEntry = page.getByRole("radio", { name: /Laten herstellen/ });
+    this.discardWrongEntry = page.getByRole("radio", { name: /Opnieuw laten invoeren/ });
+    this.correctionBlocked = page.getByText(/Uit de tweede invoer blijkt/);
     this.save = page.getByRole("button", { name: "Opslaan" });
+    this.continueToResolveErrors = page.getByRole("button", { name: "Verder naar fouten oplossen" });
   }
 }

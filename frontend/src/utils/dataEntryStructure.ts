@@ -10,6 +10,7 @@ import type {
 } from "@/types/types";
 import { getCandidateFullName } from "@/utils/candidate";
 import { formatPoliticalGroupName } from "@/utils/politicalGroup";
+import { isLocalElection } from "./election";
 
 type ModelForGSB = Extract<DataEntryModel, "DSOFirstSession" | "CSOFirstSession" | "DSONextSession" | "CSONextSession">;
 type ModelForCSB = Extract<DataEntryModel, "GSB">;
@@ -49,7 +50,7 @@ const createVotersAndVotesRows = (
       code: "C",
       path: "voters_counts.voter_card_count",
       title: t("voters_votes_counts.voters_counts.voter_card_count"),
-      isDisabled: election.category === "Municipal",
+      isDisabled: isLocalElection(election.category),
       addSeparator: true,
     },
     {

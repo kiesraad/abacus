@@ -1,6 +1,6 @@
 {
   "add": "Toevoegen: {name}",
-  "add_first_election": "<p>Om Abacus in te richten voor het invoeren van telresultaten, heb je de volgende bestanden nodig:</p><ul><li>Verkiezingsdefinitie (krijg je van het centraal stembureau)</li><li>Kandidatenlijsten (krijg je van het centraal stembureau)</li><li>Overzicht stembureaus in jouw gemeente</li></ul><p>Zorg dat de bestanden op deze computer staan voordat je verder gaat.</p>",
+  "add_first_election": "<p>Om Abacus in te richten voor het invoeren van telresultaten, heb je de volgende bestanden nodig:</p><ul><li>Verkiezingsdefinitie (krijg je van het centraal stembureau)</li><li>Kandidatenlijsten (krijg je van het centraal stembureau)</li><li>Overzicht stembureaus in jouw gemeente (voor GSB)</li></ul><p>Zorg dat de bestanden op deze computer staan voordat je verder gaat.</p>",
   "abort": {
     "action": "Afbreken",
     "description": "<p>De verkiezing wordt pas opgeslagen als je alle stappen doorlopen hebt. Weet je zeker dat je het aanmaken van de verkiezing wilt afbreken?</p>",
@@ -29,9 +29,17 @@
     "list_name": "{location}, kandidatenlijsten {name}",
     "polling_station_title": "Controleer stembureaus"
   },
+  "committee_category": {
+    "choose": "Kies het type stembureau",
+    "description": "Voor welk stembureau wil je deze verkiezing nu klaarzetten? Ga je Abacus voor GSB én CSB gebruiken? Zet dan eerst het GSB klaar, en doe daarna hetzelfde voor het CSB.",
+    "title": "Type stembureau"
+  },
   "configuration_not_finished": "De configuratie van Abacus is nog niet afgerond.",
   "create": "Verkiezing toevoegen",
   "dso_not_supported": "Niet ondersteund in deze versie van Abacus",
+  "election_category": {
+    "title": "Type verkiezing"
+  },
   "import_candidates_eml": "Importeer kandidatenlijsten",
   "import_election_eml": "Importeer verkiezingsdefinitie",
   "import_polling_station_eml": "Importeer stembureaus gemeente {location}",
@@ -48,15 +56,11 @@
     "title": "Ongeldig stembureaubestand"
   },
   "invalid_committee_category": "Ongeldig type stembureau",
+  "location": "Gebied",
+  "manage": "Verkiezingen beheren",
   "message": {
     "election_created": "Verkiezing {committee_category} {name} toegevoegd"
   },
-  "polling_station_definition_does_not_match_election": {
-    "title": "Afwijkende verkiezing",
-    "description": "Het bestand <file>filename</file> bevat stembureaus voor een andere verkiezing. Controleer voor je verder gaat of de stembureaus juist zijn."
-  },
-  "location": "Gebied",
-  "manage": "Verkiezingen beheren",
   "no_elections_added": "Nog geen verkiezingen ingesteld",
   "not_ready_for_use": "Abacus is nog niet klaar voor gebruik",
   "number_of_voters": {
@@ -64,8 +68,13 @@
     "hint": "Ingelezen uit bestand met stembureaus"
   },
   "please_wait_for_coordinator": "Je kan als invoerder nog niks doen. Wacht tot de coördinator het systeem openstelt voor het invoeren van telresultaten.",
+  "political_groups_added": "{num_groups} lijsten en {num_candidates} kandidaten",
+  "polling_station_definition_does_not_match_election": {
+    "description": "Het bestand <file>filename</file> bevat stembureaus voor een andere verkiezing. Controleer voor je verder gaat of de stembureaus juist zijn.",
+    "title": "Afwijkende verkiezing"
+  },
   "polling_stations": {
-    "added": "{num} stembureaus toegevoegd",
+    "added": "{num} stembureaus",
     "check": {
       "description": "Het bestand <file>filename</file> is geïmporteerd en bevat onderstaande stembureaus. Zie je een verschil met de vooraf gepubliceerde lijst? Je kan na het toevoegen van deze verkiezing stembureaus toevoegen, verwijderen of aanpassen.",
       "title": "Controleer stembureaus"
@@ -94,11 +103,6 @@
     "dso_description": "Op de verkiezingsdag tellen de stembureaus de stemmen per kandidaat",
     "dso_not_supported": "Niet ondersteund in deze versie van Abacus",
     "title": "Type stemopneming in"
-  },
-  "committee_category": {
-    "title": "Type stembureau",
-    "description": "Voor welk stembureau wil je deze verkiezing nu klaarzetten? Ga je Abacus voor GSB én CSB gebruiken? Zet dan eerst het GSB klaar, en doe daarna hetzelfde voor het CSB.",
-    "choose": "Kies het type stembureau"
   },
   "you_cannot_start_data_entry_yet": "Je kan nog geen telresultaten invoeren."
 }

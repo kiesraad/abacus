@@ -32,10 +32,12 @@ pub enum DataEntryTransitionError {
     SecondEntryAlreadyClaimed,
     FirstEntryAlreadyFinalised,
     SecondEntryAlreadyFinalised,
-    /// An existing first/second data entry needs to be saved, finalised, or deleted by the same user
+    /// An existing first/second data entry needs to be saved, finalised, or discarded by the same user
     CannotTransitionUsingDifferentUser,
     /// The second data entry needs to be claimed by a user other than the one who claimed the first entry
     SecondEntryNeedsDifferentUser,
+    /// Correction is not allowed because the second entry has errors
+    CorrectionNotAllowed,
     ValidatorError(DataError),
     ValidationError(ValidationResults),
 }
@@ -206,6 +208,8 @@ pub enum DataEntryStatus {
     FirstEntryFinalised(FirstEntryFinalised),
     SecondEntryInProgress(SecondEntryInProgress),
     EntriesDifferent(EntriesDifferent),
+    FirstEntryCorrection(FirstEntryCorrection),
+    SecondEntryCorrection(SecondEntryCorrection),
     Definitive(Definitive), // First and second entry are finished
 }
 
@@ -229,7 +233,18 @@ impl Validate for DataEntryStatus {
             | DataEntryStatus::FirstEntryFinalised(FirstEntryFinalised {
                 finalised_first_entry: entry,
                 ..
-            }) => entry.validate(election, &"data".into()),
+            })
+            | DataEntryStatus::FirstEntryCorrection(FirstEntryCorrection {
+                first_entry: entry,
+                ..
+            })
+            | DataEntryStatus::SecondEntryCorrection(SecondEntryCorrection {
+                second_entry: entry,
+                ..
+            })
+            | DataEntryStatus::Definitive(Definitive { results: entry, .. }) => {
+                entry.validate(election, &"data".into())
+            }
             DataEntryStatus::SecondEntryInProgress(state) => {
                 let mut validation_results =
                     state.second_entry.validate(election, &"data".into())?;
@@ -263,6 +278,8 @@ pub enum DataEntryStatusName {
     FirstEntryFinalised,
     SecondEntryInProgress,
     EntriesDifferent,
+    FirstEntryCorrection,
+    SecondEntryCorrection,
     Definitive,
 }
 
@@ -274,7 +291,7 @@ pub struct FirstEntryInProgress {
     pub progress: u8,
     /// User who is doing the first data entry
     pub first_entry_user_id: UserId,
-    /// First data entry for a polling station
+    /// First data entry
     pub first_entry: Results,
     #[schema(value_type = Object)]
     /// Client state for the data entry (arbitrary JSON)
@@ -301,7 +318,7 @@ impl ClientState {
 pub struct FirstEntryHasErrors {
     /// User who did the first data entry
     pub first_entry_user_id: UserId,
-    /// First data entry for a polling station
+    /// First data entry
     pub finalised_first_entry: Results,
     /// When the first data entry was finalised
     #[schema(value_type = String)]
@@ -313,7 +330,7 @@ pub struct FirstEntryHasErrors {
 pub struct FirstEntryFinalised {
     /// User who did the first data entry
     pub first_entry_user_id: UserId,
-    /// First data entry for a polling station
+    /// First data entry
     pub finalised_first_entry: Results,
     /// When the first data entry was finalised
     #[schema(value_type = String)]
@@ -327,7 +344,7 @@ pub struct FirstEntryFinalised {
 pub struct SecondEntryInProgress {
     /// User who did the first data entry
     pub first_entry_user_id: UserId,
-    /// First data entry for a polling station
+    /// First data entry
     pub finalised_first_entry: Results,
     /// When the first data entry was finalised
     #[schema(value_type = String)]
@@ -337,7 +354,7 @@ pub struct SecondEntryInProgress {
     pub progress: u8,
     /// User who is doing the second data entry
     pub second_entry_user_id: UserId,
-    /// Second data entry for a polling station
+    /// Second data entry
     pub second_entry: Results,
     #[schema(value_type = Object)]
     /// Client state for the data entry (arbitrary JSON)
@@ -351,9 +368,9 @@ pub struct EntriesDifferent {
     pub first_entry_user_id: UserId,
     /// User who did the second data entry
     pub second_entry_user_id: UserId,
-    /// First data entry for a polling station
+    /// First data entry
     pub first_entry: Results,
-    /// Second data entry for a polling station
+    /// Second data entry
     pub second_entry: Results,
     /// When the first data entry was finalised
     #[schema(value_type = String)]
@@ -361,6 +378,39 @@ pub struct EntriesDifferent {
     /// When the second data entry was finalised
     #[schema(value_type = String)]
     pub second_entry_finished_at: DateTime<Utc>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type)]
+#[serde(deny_unknown_fields)]
+pub struct FirstEntryCorrection {
+    pub first_entry_user_id: UserId,
+    pub second_entry_user_id: UserId,
+    pub first_entry: Results,
+    pub finalised_second_entry: Results,
+    #[schema(value_type = String)]
+    pub second_entry_finished_at: DateTime<Utc>,
+    /// Data entry progress between 0 and 100
+    #[schema(maximum = 100)]
+    pub progress: u8,
+    #[schema(value_type = Object)]
+    /// Client state for the data entry (arbitrary JSON)
+    pub client_state: ClientState,
+}
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type)]
+#[serde(deny_unknown_fields)]
+pub struct SecondEntryCorrection {
+    pub first_entry_user_id: UserId,
+    pub second_entry_user_id: UserId,
+    pub finalised_first_entry: Results,
+    pub second_entry: Results,
+    #[schema(value_type = String)]
+    pub first_entry_finished_at: DateTime<Utc>,
+    /// Data entry progress between 0 and 100
+    #[schema(maximum = 100)]
+    pub progress: u8,
+    #[schema(value_type = Object)]
+    /// Client state for the data entry (arbitrary JSON)
+    pub client_state: ClientState,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type)]
@@ -379,32 +429,31 @@ pub struct Definitive {
     pub finalised_with_warnings: bool,
 }
 
-/// Current data entry, used for function parameters only
+/// Data entry update, used for function parameters only
 #[derive(Debug, Clone)]
-pub struct CurrentDataEntry {
-    pub progress: Option<u8>,
+pub struct DataEntryUpdate {
+    pub progress: u8,
     pub user_id: UserId,
     pub entry: Results,
-    pub client_state: Option<ClientState>,
+    pub client_state: ClientState,
 }
 
 impl DataEntryStatus {
     /// Claim of the first entry by a specific typist
     pub fn claim_first_entry(
         self,
-        current_data_entry: CurrentDataEntry,
+        user_id: UserId,
+        initial_results: Results,
     ) -> Result<Self, DataEntryTransitionError> {
         match self {
             DataEntryStatus::Empty => Ok(Self::FirstEntryInProgress(FirstEntryInProgress {
-                progress: current_data_entry.progress.unwrap_or(0),
-                first_entry_user_id: current_data_entry.user_id,
-                first_entry: current_data_entry.entry,
-                client_state: current_data_entry.client_state.unwrap_or_default(),
+                progress: 0,
+                first_entry_user_id: user_id,
+                first_entry: initial_results,
+                client_state: ClientState::default(),
             })),
-            DataEntryStatus::FirstEntryInProgress(_) => {
-                if current_data_entry.user_id
-                    == self.get_first_entry_user_id().expect("user id is present")
-                {
+            DataEntryStatus::FirstEntryInProgress(_) | DataEntryStatus::FirstEntryCorrection(_) => {
+                if user_id == self.get_first_entry_user_id().expect("user id is present") {
                     Ok(self)
                 } else {
                     Err(DataEntryTransitionError::FirstEntryAlreadyClaimed)
@@ -423,33 +472,30 @@ impl DataEntryStatus {
     /// Claim of the second entry by a specific typist
     pub fn claim_second_entry(
         self,
-        current_data_entry: CurrentDataEntry,
+        user_id: UserId,
+        initial_results: Results,
     ) -> Result<Self, DataEntryTransitionError> {
         match self {
             DataEntryStatus::FirstEntryFinalised(state) => {
-                if current_data_entry.user_id == state.first_entry_user_id {
+                if user_id == state.first_entry_user_id {
                     Err(DataEntryTransitionError::SecondEntryNeedsDifferentUser)
-                } else if !state
-                    .finalised_first_entry
-                    .is_same_model(&current_data_entry.entry)
-                {
+                } else if !state.finalised_first_entry.is_same_model(&initial_results) {
                     Err(DataEntryTransitionError::Invalid)
                 } else {
                     Ok(Self::SecondEntryInProgress(SecondEntryInProgress {
                         first_entry_user_id: state.first_entry_user_id,
                         finalised_first_entry: state.finalised_first_entry,
                         first_entry_finished_at: state.first_entry_finished_at,
-                        progress: current_data_entry.progress.unwrap_or(0),
-                        second_entry_user_id: current_data_entry.user_id,
-                        second_entry: current_data_entry.entry,
-                        client_state: current_data_entry.client_state.unwrap_or_default(),
+                        progress: 0,
+                        second_entry_user_id: user_id,
+                        second_entry: initial_results,
+                        client_state: ClientState::default(),
                     }))
                 }
             }
-            DataEntryStatus::SecondEntryInProgress(_) => {
-                if current_data_entry.user_id
-                    == self.get_second_entry_user_id().expect("user id is present")
-                {
+            DataEntryStatus::SecondEntryInProgress(_)
+            | DataEntryStatus::SecondEntryCorrection(_) => {
+                if user_id == self.get_second_entry_user_id().expect("user id is present") {
                     Ok(self)
                 } else {
                     Err(DataEntryTransitionError::SecondEntryAlreadyClaimed)
@@ -465,23 +511,39 @@ impl DataEntryStatus {
     /// Update the data in the first entry while it is in progress
     pub fn update_first_entry(
         self,
-        current_data_entry: CurrentDataEntry,
+        update: DataEntryUpdate,
     ) -> Result<Self, DataEntryTransitionError> {
         match self {
             DataEntryStatus::FirstEntryInProgress(state) => {
-                if state.first_entry_user_id != current_data_entry.user_id {
+                if state.first_entry_user_id != update.user_id {
                     return Err(DataEntryTransitionError::CannotTransitionUsingDifferentUser);
                 }
 
-                if !state.first_entry.is_same_model(&current_data_entry.entry) {
+                if !state.first_entry.is_same_model(&update.entry) {
                     return Err(DataEntryTransitionError::Invalid);
                 }
 
                 Ok(Self::FirstEntryInProgress(FirstEntryInProgress {
-                    progress: current_data_entry.progress.unwrap_or(0),
-                    first_entry_user_id: state.first_entry_user_id,
-                    first_entry: current_data_entry.entry,
-                    client_state: current_data_entry.client_state.unwrap_or_default(),
+                    progress: update.progress,
+                    first_entry: update.entry,
+                    client_state: update.client_state,
+                    ..state
+                }))
+            }
+            DataEntryStatus::FirstEntryCorrection(state) => {
+                if state.first_entry_user_id != update.user_id {
+                    return Err(DataEntryTransitionError::CannotTransitionUsingDifferentUser);
+                }
+
+                if !state.first_entry.is_same_model(&update.entry) {
+                    return Err(DataEntryTransitionError::Invalid);
+                }
+
+                Ok(Self::FirstEntryCorrection(FirstEntryCorrection {
+                    progress: update.progress,
+                    first_entry: update.entry,
+                    client_state: update.client_state,
+                    ..state
                 }))
             }
             DataEntryStatus::FirstEntryFinalised(_) | DataEntryStatus::SecondEntryInProgress(_) => {
@@ -497,26 +559,39 @@ impl DataEntryStatus {
     /// Update the data in the second entry while it is in progress
     pub fn update_second_entry(
         self,
-        current_data_entry: CurrentDataEntry,
+        update: DataEntryUpdate,
     ) -> Result<Self, DataEntryTransitionError> {
         match self {
             DataEntryStatus::SecondEntryInProgress(state) => {
-                if state.second_entry_user_id != current_data_entry.user_id {
+                if state.second_entry_user_id != update.user_id {
                     return Err(DataEntryTransitionError::CannotTransitionUsingDifferentUser);
                 }
 
-                if !state.second_entry.is_same_model(&current_data_entry.entry) {
+                if !state.second_entry.is_same_model(&update.entry) {
                     return Err(DataEntryTransitionError::Invalid);
                 }
 
                 Ok(Self::SecondEntryInProgress(SecondEntryInProgress {
-                    first_entry_user_id: state.first_entry_user_id,
-                    finalised_first_entry: state.finalised_first_entry,
-                    first_entry_finished_at: state.first_entry_finished_at,
-                    progress: current_data_entry.progress.unwrap_or(0),
-                    second_entry_user_id: state.second_entry_user_id,
-                    second_entry: current_data_entry.entry,
-                    client_state: current_data_entry.client_state.unwrap_or_default(),
+                    progress: update.progress,
+                    second_entry: update.entry,
+                    client_state: update.client_state,
+                    ..state
+                }))
+            }
+            DataEntryStatus::SecondEntryCorrection(state) => {
+                if state.second_entry_user_id != update.user_id {
+                    return Err(DataEntryTransitionError::CannotTransitionUsingDifferentUser);
+                }
+
+                if !state.second_entry.is_same_model(&update.entry) {
+                    return Err(DataEntryTransitionError::Invalid);
+                }
+
+                Ok(Self::SecondEntryCorrection(SecondEntryCorrection {
+                    progress: update.progress,
+                    second_entry: update.entry,
+                    client_state: update.client_state,
+                    ..state
                 }))
             }
             DataEntryStatus::Definitive(_) => {
@@ -552,6 +627,36 @@ impl DataEntryStatus {
                         finalised_first_entry: state.first_entry.clone(),
                         first_entry_finished_at: Utc::now(),
                         finalised_with_warnings: validation_results.has_warnings(),
+                    }))
+                }
+            }
+            DataEntryStatus::FirstEntryCorrection(state) => {
+                if state.first_entry_user_id != user_id {
+                    return Err(DataEntryTransitionError::CannotTransitionUsingDifferentUser);
+                }
+
+                if state.first_entry == state.finalised_second_entry {
+                    let validation_results = self.start_validate(election)?;
+
+                    if validation_results.has_errors() {
+                        return Err(validation_results.into());
+                    }
+
+                    Ok(Self::Definitive(Definitive {
+                        first_entry_user_id: state.first_entry_user_id,
+                        second_entry_user_id: state.second_entry_user_id,
+                        finished_at: Utc::now(),
+                        finalised_with_warnings: validation_results.has_warnings(),
+                        results: state.finalised_second_entry.clone(),
+                    }))
+                } else {
+                    Ok(Self::EntriesDifferent(EntriesDifferent {
+                        first_entry_user_id: state.first_entry_user_id,
+                        second_entry_user_id: state.second_entry_user_id,
+                        first_entry: state.first_entry.clone(),
+                        second_entry: state.finalised_second_entry.clone(),
+                        first_entry_finished_at: Utc::now(),
+                        second_entry_finished_at: state.second_entry_finished_at,
                     }))
                 }
             }
@@ -603,6 +708,36 @@ impl DataEntryStatus {
                     }))
                 }
             }
+            DataEntryStatus::SecondEntryCorrection(state) => {
+                if state.second_entry_user_id != user_id {
+                    return Err(DataEntryTransitionError::CannotTransitionUsingDifferentUser);
+                }
+
+                if state.finalised_first_entry == state.second_entry {
+                    let validation_results = self.start_validate(election)?;
+
+                    if validation_results.has_errors() {
+                        return Err(validation_results.into());
+                    }
+
+                    Ok(Self::Definitive(Definitive {
+                        first_entry_user_id: state.first_entry_user_id,
+                        second_entry_user_id: state.second_entry_user_id,
+                        finished_at: Utc::now(),
+                        finalised_with_warnings: validation_results.has_warnings(),
+                        results: state.second_entry.clone(),
+                    }))
+                } else {
+                    Ok(Self::EntriesDifferent(EntriesDifferent {
+                        first_entry_user_id: state.first_entry_user_id,
+                        second_entry_user_id: state.second_entry_user_id,
+                        first_entry: state.finalised_first_entry.clone(),
+                        second_entry: state.second_entry.clone(),
+                        first_entry_finished_at: state.first_entry_finished_at,
+                        second_entry_finished_at: Utc::now(),
+                    }))
+                }
+            }
             DataEntryStatus::Definitive(_) => {
                 Err(DataEntryTransitionError::SecondEntryAlreadyFinalised)
             }
@@ -610,8 +745,11 @@ impl DataEntryStatus {
         }
     }
 
-    /// Delete the first entry while it is in progress
-    pub fn delete_first_entry(self, user_id: UserId) -> Result<Self, DataEntryTransitionError> {
+    /// Discard the first entry while it is in progress
+    pub fn discard_first_entry_in_progress(
+        self,
+        user_id: UserId,
+    ) -> Result<Self, DataEntryTransitionError> {
         match self {
             DataEntryStatus::FirstEntryInProgress(state) => {
                 if state.first_entry_user_id != user_id {
@@ -630,8 +768,8 @@ impl DataEntryStatus {
         }
     }
 
-    /// Delete the second entry while it is in progress
-    pub fn delete_second_entry(
+    /// Discard the second entry while it is in progress
+    pub fn discard_second_entry_in_progress(
         self,
         user_id: UserId,
         election: &ElectionWithPoliticalGroups,
@@ -665,7 +803,7 @@ impl DataEntryStatus {
     }
 
     /// Resume first data entry while resolving accepted errors
-    pub fn resume_first_entry(&self) -> Result<Self, DataEntryTransitionError> {
+    pub fn resume_first_entry_with_errors(&self) -> Result<Self, DataEntryTransitionError> {
         match self {
             DataEntryStatus::FirstEntryHasErrors(state) => {
                 Ok(Self::FirstEntryInProgress(FirstEntryInProgress {
@@ -680,15 +818,15 @@ impl DataEntryStatus {
     }
 
     /// Discard first data entry while resolving accepted errors
-    pub fn discard_first_entry(&self) -> Result<Self, DataEntryTransitionError> {
+    pub fn discard_first_entry_with_errors(&self) -> Result<Self, DataEntryTransitionError> {
         match self {
             DataEntryStatus::FirstEntryHasErrors(_) => Ok(Self::Empty),
             _ => Err(DataEntryTransitionError::Invalid),
         }
     }
 
-    /// Delete both entries while resolving differences
-    pub fn delete_entries(self) -> Result<Self, DataEntryTransitionError> {
+    /// Discard both entries while resolving differences
+    pub fn discard_entries(self) -> Result<Self, DataEntryTransitionError> {
         match self {
             DataEntryStatus::EntriesDifferent(_) => Ok(Self::Empty),
             _ => Err(DataEntryTransitionError::Invalid),
@@ -745,58 +883,92 @@ impl DataEntryStatus {
         }
     }
 
-    /// Get the progress of the first entry (if there is a first entry), from 0 to 100
-    pub fn get_first_entry_progress(&self) -> Option<u8> {
+    /// Correct first entry while resolving differences
+    /// This is only allowed when the second entry has no errors.
+    pub fn correct_first_entry(
+        self,
+        election: &ElectionWithPoliticalGroups,
+    ) -> Result<Self, DataEntryTransitionError> {
+        match &self {
+            DataEntryStatus::EntriesDifferent(state) => {
+                if state.second_entry.start_validate(election)?.has_errors() {
+                    return Err(DataEntryTransitionError::CorrectionNotAllowed);
+                }
+
+                Ok(Self::FirstEntryCorrection(FirstEntryCorrection {
+                    first_entry_user_id: state.first_entry_user_id,
+                    second_entry_user_id: state.second_entry_user_id,
+                    first_entry: state.first_entry.clone(),
+                    finalised_second_entry: state.second_entry.clone(),
+                    second_entry_finished_at: state.second_entry_finished_at,
+                    progress: 0,
+                    client_state: ClientState::default(),
+                }))
+            }
+            _ => Err(DataEntryTransitionError::Invalid),
+        }
+    }
+
+    /// Correct second entry while resolving differences
+    pub fn correct_second_entry(self) -> Result<Self, DataEntryTransitionError> {
+        match &self {
+            DataEntryStatus::EntriesDifferent(state) => {
+                Ok(Self::SecondEntryCorrection(SecondEntryCorrection {
+                    first_entry_user_id: state.first_entry_user_id,
+                    finalised_first_entry: state.first_entry.clone(),
+                    second_entry_user_id: state.second_entry_user_id,
+                    second_entry: state.second_entry.clone(),
+                    first_entry_finished_at: state.first_entry_finished_at,
+                    progress: 0,
+                    client_state: ClientState::default(),
+                }))
+            }
+            _ => Err(DataEntryTransitionError::Invalid),
+        }
+    }
+
+    /// Get the progress of the current data entry (0..100) if data entry is in progress
+    pub fn get_data_entry_progress(&self) -> Option<u8> {
         match self {
             DataEntryStatus::Empty => None,
             DataEntryStatus::FirstEntryInProgress(state) => Some(state.progress),
-            _ => Some(100),
-        }
-    }
-
-    /// Get the progress of the second entry (if there is a second entry), from 0 to 100
-    pub fn get_second_entry_progress(&self) -> Option<u8> {
-        match self {
-            DataEntryStatus::Empty
-            | DataEntryStatus::FirstEntryInProgress(_)
-            | DataEntryStatus::FirstEntryFinalised(_) => None,
+            DataEntryStatus::FirstEntryHasErrors(_) => None,
+            DataEntryStatus::FirstEntryFinalised(_) => None,
             DataEntryStatus::SecondEntryInProgress(state) => Some(state.progress),
-            _ => Some(100),
-        }
-    }
-
-    /// Get the total progress of the data entry process, from 0 to 100
-    pub fn get_progress(&self) -> u8 {
-        match self {
-            DataEntryStatus::Empty => 0,
-            DataEntryStatus::FirstEntryInProgress(state) => state.progress,
-            DataEntryStatus::FirstEntryHasErrors(_) => 100,
-            DataEntryStatus::FirstEntryFinalised(_) => 0,
-            DataEntryStatus::SecondEntryInProgress(state) => state.progress,
-            DataEntryStatus::EntriesDifferent(_) => 100,
-            DataEntryStatus::Definitive(_) => 100,
+            DataEntryStatus::EntriesDifferent(_) => None,
+            DataEntryStatus::FirstEntryCorrection(state) => Some(state.progress),
+            DataEntryStatus::SecondEntryCorrection(state) => Some(state.progress),
+            DataEntryStatus::Definitive(_) => None,
         }
     }
 
     /// Get the user ID of the first entry typist
     pub fn get_first_entry_user_id(&self) -> Option<UserId> {
         match self {
+            DataEntryStatus::Empty => None,
             DataEntryStatus::FirstEntryInProgress(state) => Some(state.first_entry_user_id),
+            DataEntryStatus::FirstEntryHasErrors(state) => Some(state.first_entry_user_id),
             DataEntryStatus::FirstEntryFinalised(state) => Some(state.first_entry_user_id),
             DataEntryStatus::SecondEntryInProgress(state) => Some(state.first_entry_user_id),
             DataEntryStatus::EntriesDifferent(state) => Some(state.first_entry_user_id),
+            DataEntryStatus::FirstEntryCorrection(state) => Some(state.first_entry_user_id),
+            DataEntryStatus::SecondEntryCorrection(state) => Some(state.first_entry_user_id),
             DataEntryStatus::Definitive(state) => Some(state.first_entry_user_id),
-            _ => None,
         }
     }
 
     /// Get the user ID of the second entry typist
     pub fn get_second_entry_user_id(&self) -> Option<UserId> {
         match self {
+            DataEntryStatus::Empty
+            | DataEntryStatus::FirstEntryInProgress(_)
+            | DataEntryStatus::FirstEntryHasErrors(_)
+            | DataEntryStatus::FirstEntryFinalised(_) => None,
             DataEntryStatus::SecondEntryInProgress(state) => Some(state.second_entry_user_id),
             DataEntryStatus::EntriesDifferent(state) => Some(state.second_entry_user_id),
+            DataEntryStatus::FirstEntryCorrection(state) => Some(state.second_entry_user_id),
+            DataEntryStatus::SecondEntryCorrection(state) => Some(state.second_entry_user_id),
             DataEntryStatus::Definitive(state) => Some(state.second_entry_user_id),
-            _ => None,
         }
     }
 
@@ -805,7 +977,13 @@ impl DataEntryStatus {
         match self {
             DataEntryStatus::FirstEntryInProgress(state) => Some(&state.first_entry),
             DataEntryStatus::SecondEntryInProgress(state) => Some(&state.second_entry),
-            _ => None,
+            DataEntryStatus::FirstEntryCorrection(state) => Some(&state.first_entry),
+            DataEntryStatus::SecondEntryCorrection(state) => Some(&state.second_entry),
+            DataEntryStatus::Empty
+            | DataEntryStatus::FirstEntryHasErrors(_)
+            | DataEntryStatus::FirstEntryFinalised(_)
+            | DataEntryStatus::EntriesDifferent(_)
+            | DataEntryStatus::Definitive(_) => None,
         }
     }
 
@@ -814,7 +992,13 @@ impl DataEntryStatus {
         match self {
             DataEntryStatus::FirstEntryInProgress(state) => state.client_state.as_ref(),
             DataEntryStatus::SecondEntryInProgress(state) => state.client_state.as_ref(),
-            _ => None,
+            DataEntryStatus::FirstEntryCorrection(state) => state.client_state.as_ref(),
+            DataEntryStatus::SecondEntryCorrection(state) => state.client_state.as_ref(),
+            DataEntryStatus::Empty
+            | DataEntryStatus::FirstEntryHasErrors(_)
+            | DataEntryStatus::FirstEntryFinalised(_)
+            | DataEntryStatus::EntriesDifferent(_)
+            | DataEntryStatus::Definitive(_) => None,
         }
     }
 
@@ -827,23 +1011,9 @@ impl DataEntryStatus {
             DataEntryStatus::FirstEntryFinalised(_) => DataEntryStatusName::FirstEntryFinalised,
             DataEntryStatus::SecondEntryInProgress(_) => DataEntryStatusName::SecondEntryInProgress,
             DataEntryStatus::EntriesDifferent(_) => DataEntryStatusName::EntriesDifferent,
+            DataEntryStatus::FirstEntryCorrection(_) => DataEntryStatusName::FirstEntryCorrection,
+            DataEntryStatus::SecondEntryCorrection(_) => DataEntryStatusName::SecondEntryCorrection,
             DataEntryStatus::Definitive(_) => DataEntryStatusName::Definitive,
-        }
-    }
-
-    /// Returns the timestamp at which point this data entry process was made definitive
-    pub fn finished_at(&self) -> Option<&DateTime<Utc>> {
-        match self {
-            DataEntryStatus::FirstEntryFinalised(FirstEntryFinalised {
-                first_entry_finished_at,
-                ..
-            }) => Some(first_entry_finished_at),
-            DataEntryStatus::SecondEntryInProgress(SecondEntryInProgress {
-                first_entry_finished_at,
-                ..
-            }) => Some(first_entry_finished_at),
-            DataEntryStatus::Definitive(Definitive { finished_at, .. }) => Some(finished_at),
-            _ => None,
         }
     }
 
@@ -888,6 +1058,9 @@ impl Display for DataEntryTransitionError {
                 )
             }
             DataEntryTransitionError::Invalid => write!(f, "Invalid state transition"),
+            DataEntryTransitionError::CorrectionNotAllowed => {
+                write!(f, "Correction not allowed: second entry has errors")
+            }
             DataEntryTransitionError::ValidatorError(data_error) => {
                 write!(f, "Validator error: {data_error}")
             }
@@ -926,39 +1099,21 @@ mod tests {
         }
     }
 
-    fn empty_current_data_entry() -> CurrentDataEntry {
-        CurrentDataEntry {
-            progress: None,
-            user_id: UserId::from(0),
+    fn example_update(user_id: UserId) -> DataEntryUpdate {
+        DataEntryUpdate {
+            progress: 0,
+            user_id,
             entry: example_results(),
-            client_state: None,
+            client_state: ClientState::default(),
         }
     }
 
-    fn empty_current_second_data_entry() -> CurrentDataEntry {
-        CurrentDataEntry {
-            progress: None,
-            user_id: UserId::from(1),
-            entry: example_results(),
-            client_state: None,
-        }
-    }
-
-    fn next_session_data_entry() -> CurrentDataEntry {
-        CurrentDataEntry {
-            progress: None,
+    fn next_session_update() -> DataEntryUpdate {
+        DataEntryUpdate {
+            progress: 0,
             user_id: UserId::from(0),
             entry: Results::CSONextSession(Default::default()),
-            client_state: None,
-        }
-    }
-
-    fn next_session_second_data_entry() -> CurrentDataEntry {
-        CurrentDataEntry {
-            progress: None,
-            user_id: UserId::from(1),
-            entry: Results::CSONextSession(Default::default()),
-            client_state: None,
+            client_state: ClientState::default(),
         }
     }
 
@@ -1063,7 +1218,7 @@ mod tests {
     fn empty_to_first_entry_in_progress() {
         // Happy path
         assert!(matches!(
-            DataEntryStatus::Empty.claim_first_entry(empty_current_data_entry()),
+            DataEntryStatus::Empty.claim_first_entry(UserId::from(0), example_results()),
             Ok(DataEntryStatus::FirstEntryInProgress(_))
         ));
     }
@@ -1072,7 +1227,7 @@ mod tests {
     #[test]
     fn first_entry_in_progress_claim_first_entry_ok() {
         assert!(matches!(
-            first_entry_in_progress().claim_first_entry(empty_current_data_entry()),
+            first_entry_in_progress().claim_first_entry(UserId::from(0), example_results()),
             Ok(DataEntryStatus::FirstEntryInProgress(_))
         ));
     }
@@ -1080,14 +1235,8 @@ mod tests {
     /// FirstEntryInProgress --> FirstEntryInProgress: claim with different user returns error
     #[test]
     fn first_entry_in_progress_claim_first_entry_other_user_error() {
-        let current_data_entry = CurrentDataEntry {
-            progress: None,
-            user_id: UserId::from(1),
-            entry: example_results(),
-            client_state: None,
-        };
         assert_eq!(
-            first_entry_in_progress().claim_first_entry(current_data_entry),
+            first_entry_in_progress().claim_first_entry(UserId::from(1), example_results()),
             Err(DataEntryTransitionError::FirstEntryAlreadyClaimed)
         );
     }
@@ -1095,7 +1244,7 @@ mod tests {
     #[test]
     fn definitive_claim_first_entry_error() {
         assert_eq!(
-            definitive().claim_first_entry(empty_current_data_entry()),
+            definitive().claim_first_entry(UserId::from(0), example_results()),
             Err(DataEntryTransitionError::SecondEntryAlreadyFinalised)
         );
     }
@@ -1103,7 +1252,7 @@ mod tests {
     #[test]
     fn first_entry_finalised_claim_first_entry_error() {
         assert_eq!(
-            first_entry_finalised().claim_first_entry(empty_current_data_entry()),
+            first_entry_finalised().claim_first_entry(UserId::from(0), example_results()),
             Err(DataEntryTransitionError::FirstEntryAlreadyFinalised)
         );
     }
@@ -1111,7 +1260,7 @@ mod tests {
     #[test]
     fn second_entry_in_progress_claim_first_entry_error() {
         assert_eq!(
-            second_entry_in_progress().claim_first_entry(empty_current_data_entry()),
+            second_entry_in_progress().claim_first_entry(UserId::from(0), example_results()),
             Err(DataEntryTransitionError::Invalid)
         );
     }
@@ -1120,7 +1269,7 @@ mod tests {
     #[test]
     fn first_entry_in_progress_to_first_entry_in_progress() {
         assert!(matches!(
-            first_entry_in_progress().update_first_entry(empty_current_data_entry()),
+            first_entry_in_progress().update_first_entry(example_update(UserId::from(0))),
             Ok(DataEntryStatus::FirstEntryInProgress(_))
         ));
     }
@@ -1143,12 +1292,7 @@ mod tests {
     #[test]
     fn first_entry_in_progress_save_as_other_user_error() {
         assert_eq!(
-            first_entry_in_progress().update_first_entry(CurrentDataEntry {
-                progress: None,
-                user_id: UserId::from(1),
-                entry: example_results(),
-                client_state: None,
-            }),
+            first_entry_in_progress().update_first_entry(example_update(UserId::from(1))),
             Err(DataEntryTransitionError::CannotTransitionUsingDifferentUser)
         );
     }
@@ -1197,13 +1341,13 @@ mod tests {
         );
     }
 
-    /// FirstEntryInProgress --> Empty: delete
+    /// FirstEntryInProgress --> Empty: discard
     #[test]
     fn first_entry_in_progress_to_empty() {
         // Happy path
         assert!(matches!(
             first_entry_in_progress()
-                .delete_first_entry(UserId::from(0))
+                .discard_first_entry_in_progress(UserId::from(0))
                 .unwrap(),
             DataEntryStatus::Empty
         ));
@@ -1211,32 +1355,32 @@ mod tests {
 
     // Error states
     #[test]
-    fn first_entry_finalised_delete_first_entry_error() {
+    fn first_entry_finalised_discard_first_entry_error() {
         assert_eq!(
-            first_entry_finalised().delete_first_entry(UserId::from(0)),
+            first_entry_finalised().discard_first_entry_in_progress(UserId::from(0)),
             Err(DataEntryTransitionError::FirstEntryAlreadyFinalised)
         );
     }
     #[test]
-    fn second_entry_in_progress_delete_first_entry_error() {
+    fn second_entry_in_progress_discard_first_entry_error() {
         assert_eq!(
-            second_entry_in_progress().delete_first_entry(UserId::from(0)),
+            second_entry_in_progress().discard_first_entry_in_progress(UserId::from(0)),
             Err(DataEntryTransitionError::FirstEntryAlreadyFinalised)
         );
     }
     #[test]
-    fn definitive_delete_first_entry_error() {
+    fn definitive_discard_first_entry_error() {
         assert_eq!(
-            definitive().delete_first_entry(UserId::from(0)),
+            definitive().discard_first_entry_in_progress(UserId::from(0)),
             Err(DataEntryTransitionError::SecondEntryAlreadyFinalised)
         );
     }
 
-    /// FirstEntryInProgress --> Empty: error when deleting as a different user
+    /// FirstEntryInProgress --> Empty: error when discarding as a different user
     #[test]
-    fn first_entry_in_progress_delete_as_other_user_error() {
+    fn first_entry_in_progress_discard_as_other_user_error() {
         assert_eq!(
-            first_entry_in_progress().delete_first_entry(UserId::from(1)),
+            first_entry_in_progress().discard_first_entry_in_progress(UserId::from(1)),
             Err(DataEntryTransitionError::CannotTransitionUsingDifferentUser)
         );
     }
@@ -1246,7 +1390,7 @@ mod tests {
     fn first_entry_finalised_to_second_entry_in_progress() {
         assert!(matches!(
             first_entry_finalised()
-                .claim_second_entry(empty_current_second_data_entry())
+                .claim_second_entry(UserId::from(1), example_results())
                 .unwrap(),
             DataEntryStatus::SecondEntryInProgress(_)
         ));
@@ -1256,7 +1400,7 @@ mod tests {
     #[test]
     fn first_entry_finalised_claim_second_entry_same_user_error() {
         assert!(matches!(
-            first_entry_finalised().claim_second_entry(empty_current_data_entry()),
+            first_entry_finalised().claim_second_entry(UserId::from(0), example_results()),
             Err(DataEntryTransitionError::SecondEntryNeedsDifferentUser)
         ));
     }
@@ -1265,7 +1409,7 @@ mod tests {
     #[test]
     fn second_entry_in_progress_claim_second_entry_ok() {
         assert!(matches!(
-            second_entry_in_progress().claim_second_entry(empty_current_data_entry()),
+            second_entry_in_progress().claim_second_entry(UserId::from(0), example_results()),
             Ok(DataEntryStatus::SecondEntryInProgress(_))
         ));
     }
@@ -1273,14 +1417,8 @@ mod tests {
     /// SecondEntryInProgress --> SecondEntryInProgress: claim with different user returns error
     #[test]
     fn second_entry_in_progress_claim_second_entry_other_user_error() {
-        let current_data_entry = CurrentDataEntry {
-            progress: None,
-            user_id: UserId::from(1),
-            entry: example_results(),
-            client_state: None,
-        };
         assert_eq!(
-            second_entry_in_progress().claim_second_entry(current_data_entry),
+            second_entry_in_progress().claim_second_entry(UserId::from(1), example_results()),
             Err(DataEntryTransitionError::SecondEntryAlreadyClaimed)
         );
     }
@@ -1288,7 +1426,7 @@ mod tests {
     #[test]
     fn definitive_claim_second_entry_error() {
         assert_eq!(
-            definitive().claim_second_entry(empty_current_data_entry()),
+            definitive().claim_second_entry(UserId::from(0), example_results()),
             Err(DataEntryTransitionError::SecondEntryAlreadyFinalised)
         );
     }
@@ -1296,7 +1434,7 @@ mod tests {
     #[test]
     fn empty_claim_second_entry_error() {
         assert_eq!(
-            DataEntryStatus::Empty.claim_second_entry(empty_current_data_entry()),
+            DataEntryStatus::Empty.claim_second_entry(UserId::from(0), example_results()),
             Err(DataEntryTransitionError::Invalid)
         );
     }
@@ -1304,7 +1442,8 @@ mod tests {
     #[test]
     fn claim_second_entry_wrong_model_error() {
         assert_eq!(
-            first_entry_finalised().claim_second_entry(next_session_second_data_entry()),
+            first_entry_finalised()
+                .claim_second_entry(UserId::from(1), Results::CSONextSession(Default::default())),
             Err(DataEntryTransitionError::Invalid)
         );
     }
@@ -1314,7 +1453,7 @@ mod tests {
     fn second_entry_in_progress_to_second_entry_in_progress() {
         assert!(matches!(
             second_entry_in_progress()
-                .update_second_entry(empty_current_data_entry())
+                .update_second_entry(example_update(UserId::from(0)))
                 .unwrap(),
             DataEntryStatus::SecondEntryInProgress(_)
         ));
@@ -1323,7 +1462,7 @@ mod tests {
     #[test]
     fn definitive_update_second_entry_error() {
         assert_eq!(
-            definitive().update_second_entry(empty_current_data_entry()),
+            definitive().update_second_entry(example_update(UserId::from(0))),
             Err(DataEntryTransitionError::SecondEntryAlreadyFinalised)
         );
     }
@@ -1331,7 +1470,7 @@ mod tests {
     #[test]
     fn first_entry_in_progress_update_second_entry_error() {
         assert_eq!(
-            first_entry_in_progress().update_second_entry(empty_current_data_entry()),
+            first_entry_in_progress().update_second_entry(example_update(UserId::from(0))),
             Err(DataEntryTransitionError::Invalid)
         );
     }
@@ -1340,12 +1479,7 @@ mod tests {
     #[test]
     fn second_entry_in_progress_save_as_other_user_error() {
         assert_eq!(
-            second_entry_in_progress().update_second_entry(CurrentDataEntry {
-                progress: None,
-                user_id: UserId::from(1),
-                entry: example_results(),
-                client_state: None,
-            }),
+            second_entry_in_progress().update_second_entry(example_update(UserId::from(1))),
             Err(DataEntryTransitionError::CannotTransitionUsingDifferentUser)
         );
     }
@@ -1353,7 +1487,7 @@ mod tests {
     #[test]
     fn update_second_entry_wrong_model_error() {
         assert_eq!(
-            second_entry_in_progress().update_second_entry(next_session_data_entry()),
+            second_entry_in_progress().update_second_entry(next_session_update()),
             Err(DataEntryTransitionError::Invalid)
         );
     }
@@ -1508,22 +1642,23 @@ mod tests {
         assert!(matches!(next, DataEntryStatus::EntriesDifferent(_)));
     }
 
-    /// SecondEntryInProgress --> FirstEntryFinalised: delete
+    /// SecondEntryInProgress --> FirstEntryFinalised: discard
     #[test]
     fn second_entry_in_progress_to_first_entry_finalised() {
         assert!(matches!(
             second_entry_in_progress()
-                .delete_second_entry(UserId::from(0), &election())
+                .discard_second_entry_in_progress(UserId::from(0), &election())
                 .unwrap(),
             DataEntryStatus::FirstEntryFinalised(_)
         ));
     }
 
-    /// SecondEntryInProgress --> FirstEntryFinalised: error when deleting as a different user
+    /// SecondEntryInProgress --> FirstEntryFinalised: error when discarding as a different user
     #[test]
-    fn second_entry_in_progress_delete_as_other_user_error() {
+    fn second_entry_in_progress_discard_as_other_user_error() {
         assert_eq!(
-            second_entry_in_progress().delete_second_entry(UserId::from(1), &election()),
+            second_entry_in_progress()
+                .discard_second_entry_in_progress(UserId::from(1), &election()),
             Err(DataEntryTransitionError::CannotTransitionUsingDifferentUser)
         );
     }
@@ -1531,7 +1666,7 @@ mod tests {
     #[test]
     fn has_errors_discard_first() {
         assert!(matches!(
-            first_entry_has_errors().discard_first_entry(),
+            first_entry_has_errors().discard_first_entry_with_errors(),
             Ok(DataEntryStatus::Empty)
         ));
     }
@@ -1539,7 +1674,7 @@ mod tests {
     #[test]
     fn has_errors_resume_first() {
         assert!(matches!(
-            first_entry_has_errors().resume_first_entry(),
+            first_entry_has_errors().resume_first_entry_with_errors(),
             Ok(DataEntryStatus::FirstEntryInProgress(
                 FirstEntryInProgress {
                     first_entry_user_id,
@@ -1550,9 +1685,9 @@ mod tests {
     }
 
     #[test]
-    fn definitive_delete_second_entry_error() {
+    fn definitive_discard_second_entry_error() {
         assert_eq!(
-            definitive().delete_second_entry(UserId::from(0), &election()),
+            definitive().discard_second_entry_in_progress(UserId::from(0), &election()),
             Err(DataEntryTransitionError::SecondEntryAlreadyFinalised)
         );
     }
@@ -1631,6 +1766,26 @@ mod tests {
     }
 
     #[test]
+    fn entries_different_keep_second_and_correct_first_with_errors_is_rejected() {
+        let first_entry = example_results();
+        let second_entry = example_results().with_error();
+
+        let initial = DataEntryStatus::EntriesDifferent(EntriesDifferent {
+            first_entry,
+            first_entry_user_id: UserId::from(0),
+            second_entry,
+            second_entry_user_id: UserId::from(0),
+            first_entry_finished_at: Utc::now(),
+            second_entry_finished_at: Utc::now(),
+        });
+
+        assert_eq!(
+            initial.correct_first_entry(&election()),
+            Err(DataEntryTransitionError::CorrectionNotAllowed)
+        );
+    }
+
+    #[test]
     fn definitive_keep_second_entry_error() {
         assert_eq!(
             definitive().keep_second_entry(&election()),
@@ -1641,14 +1796,14 @@ mod tests {
     #[test]
     fn entries_different_to_empty() {
         let initial = entries_different();
-        let next = initial.delete_entries().unwrap();
+        let next = initial.discard_entries().unwrap();
         assert!(matches!(next, DataEntryStatus::Empty));
     }
 
     #[test]
-    fn definitive_delete_entries_error() {
+    fn definitive_discard_entries_error() {
         assert_eq!(
-            definitive().delete_entries(),
+            definitive().discard_entries(),
             Err(DataEntryTransitionError::Invalid)
         );
     }
@@ -1657,7 +1812,7 @@ mod tests {
     #[test]
     fn first_entry_finalised_update_first_entry() {
         assert!(matches!(
-            first_entry_finalised().update_first_entry(empty_current_data_entry()),
+            first_entry_finalised().update_first_entry(example_update(UserId::from(0))),
             Err(DataEntryTransitionError::FirstEntryAlreadyFinalised)
         ));
     }
@@ -1665,7 +1820,7 @@ mod tests {
     #[test]
     fn second_entry_in_progress_update_first_entry() {
         assert!(matches!(
-            second_entry_in_progress().update_first_entry(empty_current_data_entry()),
+            second_entry_in_progress().update_first_entry(example_update(UserId::from(0))),
             Err(DataEntryTransitionError::FirstEntryAlreadyFinalised)
         ));
     }
@@ -1673,7 +1828,7 @@ mod tests {
     #[test]
     fn entries_different_update_first_entry() {
         assert!(matches!(
-            entries_different().update_first_entry(empty_current_data_entry()),
+            entries_different().update_first_entry(example_update(UserId::from(0))),
             Err(DataEntryTransitionError::Invalid)
         ));
     }
@@ -1681,7 +1836,7 @@ mod tests {
     #[test]
     fn definitive_entry_update_first_entry() {
         assert!(matches!(
-            definitive().update_first_entry(empty_current_data_entry()),
+            definitive().update_first_entry(example_update(UserId::from(0))),
             Err(DataEntryTransitionError::SecondEntryAlreadyFinalised)
         ));
     }
@@ -1689,7 +1844,7 @@ mod tests {
     #[test]
     fn update_first_entry_wrong_model_error() {
         assert_eq!(
-            first_entry_in_progress().update_first_entry(next_session_data_entry()),
+            first_entry_in_progress().update_first_entry(next_session_update()),
             Err(DataEntryTransitionError::Invalid)
         );
     }
@@ -1704,21 +1859,15 @@ mod tests {
     }
 
     #[test]
-    fn check_finished_at_method_return_values() {
-        assert!(first_entry_in_progress().finished_at().is_none());
-        assert!(entries_different().finished_at().is_none());
-        assert!(first_entry_finalised().finished_at().is_some());
-        assert!(second_entry_in_progress().finished_at().is_some());
-        assert!(definitive().finished_at().is_some());
-    }
-
-    #[test]
     fn check_get_progress_method_return_values() {
-        assert_eq!(first_entry_in_progress().get_progress(), 0);
-        assert_eq!(first_entry_finalised().get_progress(), 0);
-        assert_eq!(second_entry_in_progress().get_progress(), 0);
-        assert_eq!(entries_different().get_progress(), 100);
-        assert_eq!(definitive().get_progress(), 100);
+        assert_eq!(first_entry_in_progress().get_data_entry_progress(), Some(0));
+        assert_eq!(first_entry_finalised().get_data_entry_progress(), None);
+        assert_eq!(
+            second_entry_in_progress().get_data_entry_progress(),
+            Some(0)
+        );
+        assert_eq!(entries_different().get_data_entry_progress(), None);
+        assert_eq!(definitive().get_data_entry_progress(), None);
     }
 
     #[test]
@@ -1852,23 +2001,23 @@ mod tests {
         }
 
         #[test]
-        fn delete_second_entry_without_warnings() {
+        fn discard_second_entry_without_warnings() {
             assert_eq!(
                 second_entry_in_progress()
-                    .delete_second_entry(UserId::from(0), &election())
+                    .discard_second_entry_in_progress(UserId::from(0), &election())
                     .unwrap()
                     .finalised_with_warnings(),
                 Some(&false)
             )
         }
         #[test]
-        fn delete_second_entry_first_with_warnings() {
+        fn discard_second_entry_first_with_warnings() {
             let mut status = second_entry_in_progress();
             status.set_first_entry(example_results().with_warning());
 
             assert_eq!(
                 status
-                    .delete_second_entry(UserId::from(0), &election())
+                    .discard_second_entry_in_progress(UserId::from(0), &election())
                     .unwrap()
                     .finalised_with_warnings(),
                 Some(&true)
@@ -1876,13 +2025,13 @@ mod tests {
         }
 
         #[test]
-        fn delete_second_entry_second_with_warnings() {
+        fn discard_second_entry_second_with_warnings() {
             let mut status = second_entry_in_progress();
             status.set_second_entry(example_results().with_warning());
 
             assert_eq!(
                 status
-                    .delete_second_entry(UserId::from(0), &election())
+                    .discard_second_entry_in_progress(UserId::from(0), &election())
                     .unwrap()
                     .finalised_with_warnings(),
                 Some(&false)

@@ -161,7 +161,6 @@ pub struct NewElection {
     pub election_date: NaiveDate,
     #[schema(value_type = String, format = "date")]
     pub nomination_date: NaiveDate,
-    #[serde(skip_serializing)]
     pub political_groups: Vec<RegisteredPoliticalGroup>,
 }
 
@@ -174,7 +173,18 @@ pub struct ElectionNumberOfVotersChangeRequest {
 
 /// Election category (limited for now)
 #[derive(
-    Serialize, Deserialize, strum::Display, ToSchema, Clone, Copy, Debug, PartialEq, Eq, Hash, Type,
+    Serialize,
+    Deserialize,
+    strum::Display,
+    strum::EnumString,
+    ToSchema,
+    Clone,
+    Copy,
+    Debug,
+    PartialEq,
+    Eq,
+    Hash,
+    Type,
 )]
 #[strum(serialize_all = "lowercase")]
 pub enum ElectionCategory {
@@ -187,6 +197,14 @@ pub enum ElectionCategory {
 }
 
 impl ElectionCategory {
+    pub fn is_local_election(&self) -> bool {
+        match self {
+            ElectionCategory::Municipal => true,
+            ElectionCategory::Provincial => false,
+            ElectionCategory::WaterAuthority => false,
+        }
+    }
+
     pub fn to_eml_code(&self) -> &'static str {
         match self {
             ElectionCategory::Municipal => "GR",

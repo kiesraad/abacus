@@ -16,6 +16,12 @@
   ))
 }
 
+// Label on the signing page form (similar to heading 3 with chapter numbering removed)
+#let signing_form_label(content) = {
+  set text(size: 10pt)
+  block(width: 75%, above: 2em, below: 1.5em, outset: (left: 6pt, top: 3pt, bottom: 3pt), stroke: (left: 1pt), content)
+}
+
 #let paragraph(content) = block(width: 75%, content)
 
 // A box with optional titles, aligned horizontally

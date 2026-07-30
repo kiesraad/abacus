@@ -8,6 +8,7 @@ import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
 import * as useMessages from "@/hooks/messages/useMessages";
 import { UsersProvider } from "@/hooks/user/UsersProvider";
+import { dataEntryStatusDifferences } from "@/testing/api-mocks/DataEntryMockData";
 import {
   DataEntryGetDifferencesHandler,
   DataEntryResolveDifferencesHandler,
@@ -88,10 +89,18 @@ describe("ResolveDifferencesPage", () => {
       ["2", mdash, "2", "Doe, C. (Charlie)"],
     ]);
 
+    // First question
     expect(await screen.findByRole("heading", { level: 3, name: "Welke invoer klopt?" })).toBeVisible();
     expect(await screen.findByRole("radio", { name: "Eerste invoer (Gebruiker01)" })).toBeVisible();
     expect(await screen.findByRole("radio", { name: "Tweede invoer (Gebruiker02)" })).toBeVisible();
     expect(await screen.findByRole("radio", { name: "Geen van beide: alles opnieuw invoeren" })).toBeVisible();
+
+    // Second question is visible but disabled until an entry is kept
+    expect(await screen.findByRole("heading", { level: 3, name: /Wat wil je doen/ })).toBeVisible();
+    expect(
+      await screen.findByRole("radio", { name: "Laten herstellen door oorspronkelijke invoerder" }),
+    ).toBeDisabled();
+    expect(await screen.findByRole("radio", { name: "Opnieuw laten invoeren" })).toBeDisabled();
   });
 
   test("should show the selection in the table", async () => {
@@ -112,21 +121,96 @@ describe("ResolveDifferencesPage", () => {
     expect(firstEntry).toHaveClass(cls.discard!);
   });
 
-  test("should only submit after making a selection", async () => {
+  test("should enable the second question only after choosing to keep an entry", async () => {
+    const user = userEvent.setup();
+    await renderPage();
+
+    const correctWrongEntry = await screen.findByRole("radio", {
+      name: "Laten herstellen door oorspronkelijke invoerder",
+    });
+    const discardWrongEntry = await screen.findByRole("radio", { name: "Opnieuw laten invoeren" });
+
+    expect(correctWrongEntry).toBeDisabled();
+    expect(discardWrongEntry).toBeDisabled();
+
+    await user.click(await screen.findByRole("radio", { name: "Eerste invoer (Gebruiker01)" }));
+    expect(correctWrongEntry).toBeEnabled();
+    expect(discardWrongEntry).toBeEnabled();
+
+    await user.click(await screen.findByRole("radio", { name: "Tweede invoer (Gebruiker02)" }));
+    expect(correctWrongEntry).toBeEnabled();
+    expect(discardWrongEntry).toBeEnabled();
+
+    await user.click(await screen.findByRole("radio", { name: "Geen van beide: alles opnieuw invoeren" }));
+    expect(correctWrongEntry).toBeDisabled();
+    expect(correctWrongEntry).not.toBeChecked();
+    expect(discardWrongEntry).toBeDisabled();
+    expect(discardWrongEntry).toBeChecked();
+  });
+
+  test("should validate both questions before submitting", async () => {
     const user = userEvent.setup();
     const resolve = spyOnHandler(DataEntryResolveDifferencesHandler);
 
     await renderPage();
     const submit = await screen.findByRole("button", { name: "Opslaan" });
 
+    // Nothing answered -> first question error, no request
     await user.click(submit);
+    expect(
+      await screen.findByText("Dit is een verplichte vraag. Maak een keuze uit de opties hieronder."),
+    ).toBeVisible();
     expect(resolve).not.toHaveBeenCalled();
 
-    overrideResponseStatus("first_entry_finalised");
+    // First question answered, second still missing -> second question error, no request
     await user.click(await screen.findByRole("radio", { name: "Eerste invoer (Gebruiker01)" }));
     await user.click(submit);
-    expect(resolve).toHaveBeenCalledWith("keep_first_entry");
-    expect(navigate).toHaveBeenCalledWith("/elections/1/status");
+    expect(
+      await screen.findByText("Dit is een verplichte vraag. Maak een keuze uit de opties hieronder."),
+    ).toBeVisible();
+    expect(resolve).not.toHaveBeenCalled();
+  });
+
+  test.each([
+    {
+      q1: "Eerste invoer (Gebruiker01)",
+      q2: "Opnieuw laten invoeren",
+      status: "first_entry_finalised",
+      action: "keep_first_and_discard_second",
+    },
+    {
+      q1: "Eerste invoer (Gebruiker01)",
+      q2: "Laten herstellen door oorspronkelijke invoerder",
+      status: "first_entry_finalised",
+      action: "keep_first_and_correct_second",
+    },
+    {
+      q1: "Tweede invoer (Gebruiker02)",
+      q2: "Opnieuw laten invoeren",
+      status: "first_entry_finalised",
+      action: "keep_second_and_discard_first",
+    },
+    {
+      q1: "Tweede invoer (Gebruiker02)",
+      q2: "Laten herstellen door oorspronkelijke invoerder",
+      status: "first_entry_finalised",
+      action: "keep_second_and_correct_first",
+    },
+    { q1: "Geen van beide: alles opnieuw invoeren", q2: undefined, status: "empty", action: "discard_both" },
+  ] as const)("should submit $action", async ({ q1, q2, status, action }) => {
+    const user = userEvent.setup();
+    const resolve = spyOnHandler(DataEntryResolveDifferencesHandler);
+
+    await renderPage();
+    overrideResponseStatus(status);
+
+    await user.click(await screen.findByRole("radio", { name: q1 }));
+    if (q2 !== undefined) {
+      await user.click(await screen.findByRole("radio", { name: q2 }));
+    }
+    await user.click(await screen.findByRole("button", { name: "Opslaan" }));
+
+    expect(resolve).toHaveBeenCalledWith(action);
   });
 
   test("should refresh election status and navigate to election status page after submit", async () => {
@@ -138,6 +222,7 @@ describe("ResolveDifferencesPage", () => {
 
     overrideResponseStatus("first_entry_finalised");
     await user.click(await screen.findByRole("radio", { name: "Tweede invoer (Gebruiker02)" }));
+    await user.click(await screen.findByRole("radio", { name: "Opnieuw laten invoeren" }));
     await user.click(await screen.findByRole("button", { name: "Opslaan" }));
 
     expect(getElectionStatus).toHaveBeenCalledTimes(2);
@@ -150,6 +235,7 @@ describe("ResolveDifferencesPage", () => {
     await renderPage();
     overrideResponseStatus("first_entry_finalised");
     await user.click(await screen.findByRole("radio", { name: "Eerste invoer (Gebruiker01)" }));
+    await user.click(await screen.findByRole("radio", { name: "Opnieuw laten invoeren" }));
     await user.click(await screen.findByRole("button", { name: "Opslaan" }));
 
     expect(pushMessage).toHaveBeenCalledWith({
@@ -167,6 +253,7 @@ describe("ResolveDifferencesPage", () => {
     await renderPage();
     overrideResponseStatus("first_entry_finalised");
     await user.click(await screen.findByRole("radio", { name: "Tweede invoer (Gebruiker02)" }));
+    await user.click(await screen.findByRole("radio", { name: "Opnieuw laten invoeren" }));
     await user.click(await screen.findByRole("button", { name: "Opslaan" }));
 
     expect(pushMessage).toHaveBeenCalledWith({
@@ -175,6 +262,36 @@ describe("ResolveDifferencesPage", () => {
         "Omdat er nog maar één invoer over is, moet er een nieuwe tweede invoer gedaan worden.",
         "Kies hiervoor een andere invoerder dan Gebruiker02.",
       ].join(" "),
+    });
+  });
+
+  test("should name the correcting typist when the first entry is kept and the second is corrected", async () => {
+    const user = userEvent.setup();
+
+    await renderPage();
+    overrideResponseStatus("second_entry_correction");
+    await user.click(await screen.findByRole("radio", { name: "Eerste invoer (Gebruiker01)" }));
+    await user.click(await screen.findByRole("radio", { name: "Laten herstellen door oorspronkelijke invoerder" }));
+    await user.click(await screen.findByRole("button", { name: "Opslaan" }));
+
+    expect(pushMessage).toHaveBeenCalledWith({
+      title: "Verschil opgelost voor stembureau 35",
+      text: "De invoer die niet klopt moet worden hersteld door Gebruiker02.",
+    });
+  });
+
+  test("should name the correcting typist when the second entry is kept and the first is corrected", async () => {
+    const user = userEvent.setup();
+
+    await renderPage();
+    overrideResponseStatus("first_entry_correction");
+    await user.click(await screen.findByRole("radio", { name: "Tweede invoer (Gebruiker02)" }));
+    await user.click(await screen.findByRole("radio", { name: "Laten herstellen door oorspronkelijke invoerder" }));
+    await user.click(await screen.findByRole("button", { name: "Opslaan" }));
+
+    expect(pushMessage).toHaveBeenCalledWith({
+      title: "Verschil opgelost voor stembureau 35",
+      text: "De invoer die niet klopt moet worden hersteld door Gebruiker01.",
     });
   });
 
@@ -201,6 +318,7 @@ describe("ResolveDifferencesPage", () => {
 
     overrideResponseStatus("first_entry_has_errors");
     await user.click(await screen.findByRole("radio", { name: "Tweede invoer (Gebruiker02)" }));
+    await user.click(await screen.findByRole("radio", { name: "Opnieuw laten invoeren" }));
     await user.click(await screen.findByRole("button", { name: "Opslaan" }));
 
     expect(pushMessage).toHaveBeenCalledWith({
@@ -208,5 +326,33 @@ describe("ResolveDifferencesPage", () => {
       text: "Let op: het proces-verbaal bevat fouten die moeten worden opgelost",
     });
     expect(navigate).toHaveBeenCalledWith("/elections/1/status/3/detail");
+  });
+
+  test("should block correcting the first entry when the kept second entry has errors", async () => {
+    const user = userEvent.setup();
+    const resolve = spyOnHandler(DataEntryResolveDifferencesHandler);
+    overrideOnce("get", "/api/data_entries/3/resolve_differences", 200, {
+      ...dataEntryStatusDifferences,
+      second_entry_has_errors: true,
+    });
+
+    await renderPage();
+    overrideResponseStatus("first_entry_has_errors");
+    await user.click(await screen.findByRole("radio", { name: "Tweede invoer (Gebruiker02)" }));
+
+    expect(
+      await screen.findByText(
+        "Uit de tweede invoer blijkt dat er waarschijnlijk fouten in het papieren proces-verbaal zijn gemaakt. " +
+          "Daarom kan je de eerste invoer nu niet laten herstellen door de oorspronkelijke invoerder. " +
+          "Eerst moet het papieren proces-verbaal worden gecontroleerd. Dat doen we in de volgende stap. " +
+          "De eerste invoer wordt verwijderd.",
+      ),
+    ).toBeVisible();
+    expect(
+      await screen.findByRole("radio", { name: "Laten herstellen door oorspronkelijke invoerder" }),
+    ).toBeDisabled();
+
+    await user.click(await screen.findByRole("button", { name: "Verder naar fouten oplossen" }));
+    expect(resolve).toHaveBeenCalledWith("keep_second_and_discard_first");
   });
 });

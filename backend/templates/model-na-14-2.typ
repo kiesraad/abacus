@@ -7,10 +7,17 @@
 #let location_name = is_municipality[Gemeente #input.election.domain_id #input.election.location][Openbaar lichaam #input.election.location]
 #let location_type = is_municipality[gemeentelijk stembureau][stembureau voor het openbaar lichaam]
 
-#show: doc => conf(doc, header-right: location_name, footer: [
-  #input.creation_date_time. Digitale vingerafdruk van EML-telbestand bij dit proces-verbaal (SHA-256): \
-  #input.hash
-])
+#show: doc => conf(
+  doc,
+  header-right: location_name,
+  footer: [
+    Corrigendum van een #location_type \
+    Model Na 14-2 (versie 2027) \
+
+    Datum: #input.creation_date_time. Digitale vingerafdruk van EML-telbestand bij dit PV: \
+    #input.hash
+  ], margin-bottom: 3.2cm
+)
 
 #set heading(numbering: none)
 

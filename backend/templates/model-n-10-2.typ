@@ -15,7 +15,7 @@
 #let header-right = [Stembureau #input.polling_station.number]
 
 #show: doc => conf(doc, header-right: header-right, footer: [Proces-verbaal van een stembureau \
-  Model N 10-2 centrale stemopneming])
+  Model N 10-2 centrale stemopneming (versie 2027)])
 
 #set heading(numbering: none)
 

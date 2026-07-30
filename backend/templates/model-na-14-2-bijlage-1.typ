@@ -18,7 +18,7 @@
   ],
   footer: [
     Corrigendum van een #location_type \
-    Model Na 14-2
+    Model Na 14-2 (versie 2027)
   ]
 )
 
@@ -50,7 +50,7 @@ Schrijf op wat de *uitkomst* van het onderzoek door het #location_type was.
 #block(below: 1.5em)
 
 #block(
-  breakable: false, 
+  breakable: false,
   {
     [Is er een *gecorrigeerde uitslag*?]
     checkbox[Nee #sym.arrow.r *Neem de uitkomst van het onderzoek over in het proces-verbaal van het #location_type (nieuwe zitting). Deze bijlage hoeft verder niet ingevuld te worden.*]

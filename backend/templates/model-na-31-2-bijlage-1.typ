@@ -18,7 +18,7 @@
   ],
   footer: [
     Proces-verbaal van een #location_type \
-    Model Na 31-2 centrale stemopneming
+    Model Na 31-2 centrale stemopneming (versie 2027)
   ]
 )
 
@@ -113,8 +113,8 @@ Licht hieronder toe wat de reden van het extra onderzoek was
 
 #is_local_election[
   #sum(
-    empty_letterbox("A")[Stempassen], 
-    empty_letterbox("B")[Volmachtbewijzen], 
+    empty_letterbox("A")[Stempassen],
+    empty_letterbox("B")[Volmachtbewijzen],
     empty_letterbox("D", light: false)[Totaal toegelaten kiezers (A+B)],
   )
 ][

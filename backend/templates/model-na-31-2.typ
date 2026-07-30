@@ -9,10 +9,17 @@
 #let this_location = is_municipality[deze gemeente][dit openbaar lichaam]
 #let the_location = is_municipality[de gemeente][het openbaar lichaam]
 
-#show: doc => conf(doc, header-right: location_name, footer: [
-  #input.creation_date_time. Digitale vingerafdruk van EML-telbestand bij dit proces-verbaal (SHA-256): \
-  #input.hash
-])
+#show: doc => conf(
+  doc,
+  header-right: location_name,
+  footer: [
+    Proces-verbaal van een #location_type \
+    Model Na 31-2 centrale stemopneming (versie 2027) \
+
+    Datum: #input.creation_date_time. Digitale vingerafdruk van EML-telbestand bij dit PV: \
+    #input.hash
+  ], margin-bottom: 3.2cm
+)
 
 #set heading(numbering: none)
 

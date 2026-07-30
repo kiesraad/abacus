@@ -25,7 +25,6 @@ pub mod counting_differences_polling_station;
 pub mod cso_first_session_results;
 pub mod differences_counts;
 pub mod dso_first_session_results;
-pub mod dso_next_session_results;
 pub mod extra_investigation;
 pub mod gsb_differences_counts;
 pub mod gsb_results;
@@ -44,10 +43,10 @@ pub mod yes_no;
 #[serde(tag = "model")]
 pub enum Results {
     /// Results for decentrally counted (DSO) elections, first election committee session.
-    /// This contains the data entry values from Model Model N 10-1.
+    /// This contains the data entry values from Model Model N 10-1 and possibly in combination with the values from Model Na 14-1 versie 1.
     DSOFirstSession(DSOFirstSessionResults),
     /// Results for decentrally counted (DSO) elections, any subsequent election committee session.
-    /// This contains the data entry values from Model Na 14-1 Bijlage 1.
+    /// This contains the data entry values from Model Na 14-1 versie 2.
     DSONextSession(NextSessionResults),
 
     /// Results for centrally counted (CSO) elections, first election committee session.

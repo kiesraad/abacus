@@ -175,7 +175,7 @@ const WATER_AUTHORITIES: &[&str] = &[
     "Hoogwaard en Delta",
     "Duin en Diep",
     "De Kleiwaarden",
-    "Aqua Delta",
+    "Rivier en Polder",
     "Waterkring",
     "Noorderwater",
     "De Oude Beek",

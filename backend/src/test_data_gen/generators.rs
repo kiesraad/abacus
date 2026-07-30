@@ -263,7 +263,15 @@ fn format_election_name(
     let (election_type, election_locality) = match election_category {
         ElectionCategory::Municipal => ("Gemeenteraad", locality),
         ElectionCategory::Provincial => ("Provinciale Staten", super::data::province(rng)),
-        ElectionCategory::WaterAuthority => ("Waterschap", super::data::water_authority(rng)),
+        ElectionCategory::WaterAuthority => (
+            *[
+                "Algemeen bestuur van het waterschap",
+                "Algemeen bestuur van het hoogheemraadschap",
+            ]
+            .choose(rng)
+            .expect("Missing test data"),
+            super::data::water_authority(rng),
+        ),
     };
     format!("{election_type} {election_locality} {year}")
 }

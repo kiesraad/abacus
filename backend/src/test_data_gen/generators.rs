@@ -254,13 +254,23 @@ pub async fn create_test_election(
     })
 }
 
-fn format_election_name(election_category: ElectionCategory, locality: &str, year: i32) -> String {
-    let election_type = match election_category {
-        ElectionCategory::Municipal => "Gemeenteraad",
-        ElectionCategory::Provincial => "Provinciale Staten",
-        ElectionCategory::WaterAuthority => "Algemeen bestuur van het waterschap",
+fn format_election_name(
+    rng: &mut impl rand::RngExt,
+    election_category: ElectionCategory,
+    locality: &str,
+    year: i32,
+) -> String {
+    let (election_type, election_locality) = match election_category {
+        ElectionCategory::Municipal => ("Gemeenteraad", locality),
+        ElectionCategory::Provincial => ("Provinciale Staten", super::data::province(rng)),
+        ElectionCategory::WaterAuthority => (
+            *["Waterschap", "Hoogheemraadschap"]
+                .choose(rng)
+                .expect("Missing test data"),
+            super::data::water_authority(rng),
+        ),
     };
-    format!("{election_type} {locality} {year}")
+    format!("{election_type} {election_locality} {year}")
 }
 
 fn get_election_sub_category(
@@ -325,11 +335,10 @@ fn generate_election(
     let locality = super::data::locality(rng).to_owned();
 
     // use the previous data to generate some identifiers and names
-    let name: String = args.custom_name.clone().unwrap_or(format_election_name(
-        args.election_category,
-        &locality,
-        year,
-    ));
+    let name: String = args
+        .custom_name
+        .clone()
+        .unwrap_or_else(|| format_election_name(rng, args.election_category, &locality, year));
     let cleaned_up_locality = locality.replace(" ", "_").replace("'", "");
     let election_id = format!("{category}{year}_{cleaned_up_locality}");
 

@@ -14,6 +14,14 @@ Note the difference between `discard` and `reset`:
 When resolving differences between the first and second data entry (`EntriesDifferent` state), one of the options for the coordinator is to
 discard one entry. In this case, the remaining entry will from then on be the first entry, and the data entry is open for a new second entry.
 
+Instead of discarding an entry, the coordinator can also have it corrected by
+the typist who entered it. That is only possible when the entry that is kept has
+no errors. The first entry never has errors at this point, so keeping the first
+entry and correcting the second is always allowed. Keeping the second entry
+while it has errors is not allowed: the coordinator has to resolve errors first,
+so the only option is to discard the first entry, which transitions the state to
+`FirstEntryHasErrors`.
+
 ```mermaid
 stateDiagram-v2
   [*] --> Empty
@@ -42,7 +50,7 @@ stateDiagram-v2
   EntriesDifferent --> resolve_differences: resolve differences
   resolve_differences --> Empty: discard both entries
   resolve_differences --> first_has_errors: discard one entry
-  resolve_differences --> FirstEntryCorrection: correct first entry
+  resolve_differences --> FirstEntryCorrection: correct first entry<br>(only without errors in second entry)
   resolve_differences --> SecondEntryCorrection: correct second entry
 
   FirstEntryCorrection --> is_different: finalise

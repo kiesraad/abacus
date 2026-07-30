@@ -1,3 +1,4 @@
+import { t } from "@/i18n/translate";
 import type { ResolveDifferencesAction } from "@/types/generated/openapi";
 import type { DataEntryResults, DataEntrySection } from "@/types/types";
 import { mapResultsToSectionValues } from "@/utils/dataEntryMapping";
@@ -13,9 +14,18 @@ export interface ResolveDifferencesFormState {
   correctEntry: CorrectEntry | undefined;
   setCorrectEntry: (correctEntry: CorrectEntry) => void;
   wrongEntryAction: WrongEntryAction | undefined;
-  setWrongEntryAction: (wrongEntryAction: WrongEntryAction | undefined) => void;
+  setWrongEntryAction: (wrongEntryAction: WrongEntryAction) => void;
+  correctionBlocked: boolean;
   correctEntryError: string | undefined;
   wrongEntryError: string | undefined;
+}
+
+export function effectiveWrongEntryAction(
+  correctEntry: CorrectEntry | undefined,
+  wrongEntryAction: WrongEntryAction | undefined,
+  correctionBlocked: boolean,
+): WrongEntryAction | undefined {
+  return correctEntry === "neither" || correctionBlocked ? "discard" : wrongEntryAction;
 }
 
 const KEEP_ENTRY_ACTIONS = {
@@ -37,14 +47,19 @@ export function getResolveDifferencesAction(
   return KEEP_ENTRY_ACTIONS[correctEntry][wrongEntryAction];
 }
 
-/** Which of the two questions still need an answer at submit time. */
-export function getUnansweredQuestions(
+/** The error to show for each of the two questions at submit time. */
+export function getQuestionErrors(
   correctEntry: CorrectEntry | undefined,
   wrongEntryAction: WrongEntryAction | undefined,
-): { correctEntry: boolean; wrongEntry: boolean } {
+  submitted: boolean,
+): Pick<ResolveDifferencesFormState, "correctEntryError" | "wrongEntryError"> {
+  const requiredError = submitted ? t("resolve_differences.required_error") : undefined;
+  const wrongEntryUnanswered =
+    (correctEntry === "first" || correctEntry === "second") && wrongEntryAction === undefined;
+
   return {
-    correctEntry: correctEntry === undefined,
-    wrongEntry: (correctEntry === "first" || correctEntry === "second") && wrongEntryAction === undefined,
+    correctEntryError: correctEntry === undefined ? requiredError : undefined,
+    wrongEntryError: wrongEntryUnanswered ? requiredError : undefined,
   };
 }
 

@@ -130,8 +130,8 @@ export function ResolveDifferencesPage() {
           <ResolveDifferencesForm
             firstEntryName={getName(first_entry_user_id)}
             secondEntryName={getName(second_entry_user_id)}
+            formState={formState}
             onSubmit={onSubmit}
-            {...formState}
           />
         </article>
       </main>

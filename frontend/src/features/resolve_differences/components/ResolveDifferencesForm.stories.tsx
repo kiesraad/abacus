@@ -2,30 +2,30 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 import { expect, fn } from "storybook/test";
 
-import type { CorrectEntry, WrongEntryAction } from "../utils/differences";
+import type { CorrectEntry, ResolveDifferencesFormState, WrongEntryAction } from "../utils/differences";
 import cls from "./ResolveDifferences.module.css";
 import { ResolveDifferencesForm } from "./ResolveDifferencesForm";
+
+const defaultFormState: ResolveDifferencesFormState = {
+  correctEntry: undefined,
+  setCorrectEntry: fn(),
+  wrongEntryAction: undefined,
+  setWrongEntryAction: fn(),
+  correctionBlocked: false,
+  correctEntryError: undefined,
+  wrongEntryError: undefined,
+};
 
 const meta = {
   component: ResolveDifferencesForm,
   args: {
     firstEntryName: "Gebruiker01",
     secondEntryName: "Gebruiker02",
-    correctEntry: undefined,
-    setCorrectEntry: fn(),
-    wrongEntryAction: undefined,
-    setWrongEntryAction: fn(),
-    correctionBlocked: false,
-    correctEntryError: undefined,
-    wrongEntryError: undefined,
+    formState: defaultFormState,
     onSubmit: fn(),
   },
   argTypes: {
-    correctEntry: { control: false },
-    wrongEntryAction: { control: false },
-    correctionBlocked: { control: false },
-    correctEntryError: { control: "text" },
-    wrongEntryError: { control: "text" },
+    formState: { control: "object" },
   },
 } satisfies Meta<typeof ResolveDifferencesForm>;
 
@@ -34,24 +34,29 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   render: function Render(args) {
-    const [correctEntry, setCorrectEntry] = useState<CorrectEntry | undefined>(args.correctEntry);
-    const [wrongEntryAction, setWrongEntryAction] = useState<WrongEntryAction | undefined>(args.wrongEntryAction);
+    const [correctEntry, setCorrectEntry] = useState<CorrectEntry | undefined>(args.formState.correctEntry);
+    const [wrongEntryAction, setWrongEntryAction] = useState<WrongEntryAction | undefined>(
+      args.formState.wrongEntryAction,
+    );
 
     return (
       <main className={cls.resolveDifferences}>
         <article>
           <ResolveDifferencesForm
             {...args}
-            correctEntry={correctEntry}
-            setCorrectEntry={(next) => {
-              args.setCorrectEntry(next);
-              setCorrectEntry(next);
-              setWrongEntryAction(undefined);
-            }}
-            wrongEntryAction={wrongEntryAction}
-            setWrongEntryAction={(next) => {
-              args.setWrongEntryAction(next);
-              setWrongEntryAction(next);
+            formState={{
+              ...args.formState,
+              correctEntry,
+              setCorrectEntry: (next) => {
+                args.formState.setCorrectEntry(next);
+                setCorrectEntry(next);
+                setWrongEntryAction(undefined);
+              },
+              wrongEntryAction,
+              setWrongEntryAction: (next) => {
+                args.formState.setWrongEntryAction(next);
+                setWrongEntryAction(next);
+              },
             }}
           />
         </article>
@@ -80,19 +85,19 @@ export const Default: Story = {
 
     // Choosing the correct entry reports it and enables the second question
     await userEvent.click(firstEntry);
-    await expect(args.setCorrectEntry).toHaveBeenLastCalledWith("first");
+    await expect(args.formState.setCorrectEntry).toHaveBeenLastCalledWith("first");
     await expect(firstEntry).toBeChecked();
     await expect(correctWrongEntry).toBeEnabled();
     await expect(discardWrongEntry).toBeEnabled();
 
     // Choosing what to do with the wrong entry reports it
     await userEvent.click(discardWrongEntry);
-    await expect(args.setWrongEntryAction).toHaveBeenLastCalledWith("discard");
+    await expect(args.formState.setWrongEntryAction).toHaveBeenLastCalledWith("discard");
     await expect(discardWrongEntry).toBeChecked();
 
     // Choosing "neither" disables the second question again and sets discarding as the (disabled) answer
     await userEvent.click(discardBoth);
-    await expect(args.setCorrectEntry).toHaveBeenLastCalledWith("neither");
+    await expect(args.formState.setCorrectEntry).toHaveBeenLastCalledWith("neither");
     await expect(correctWrongEntry).toBeDisabled();
     await expect(correctWrongEntry).not.toBeChecked();
     await expect(discardWrongEntry).toBeDisabled();
@@ -107,7 +112,7 @@ export const Default: Story = {
 export const FirstEntrySelected: Story = {
   ...Default,
   args: {
-    correctEntry: "first",
+    formState: { ...defaultFormState, correctEntry: "first" },
   },
   play: async ({ canvas }) => {
     await expect(canvas.getByRole("radio", { name: "Eerste invoer (Gebruiker01)" })).toBeChecked();
@@ -121,8 +126,7 @@ export const FirstEntrySelected: Story = {
 export const SecondEntryHasErrors: Story = {
   ...Default,
   args: {
-    correctEntry: "second",
-    correctionBlocked: true,
+    formState: { ...defaultFormState, correctEntry: "second", correctionBlocked: true },
   },
   play: async ({ canvas }) => {
     await expect(
@@ -149,8 +153,11 @@ export const SecondEntryHasErrors: Story = {
 export const WithValidationErrors: Story = {
   ...Default,
   args: {
-    correctEntryError: "Dit is een verplichte vraag. Maak een keuze uit de opties hieronder.",
-    wrongEntryError: "Dit is een verplichte vraag. Maak een keuze uit de opties hieronder.",
+    formState: {
+      ...defaultFormState,
+      correctEntryError: "Dit is een verplichte vraag. Maak een keuze uit de opties hieronder.",
+      wrongEntryError: "Dit is een verplichte vraag. Maak een keuze uit de opties hieronder.",
+    },
   },
   play: async ({ canvas }) => {
     await expect(

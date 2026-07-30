@@ -3,6 +3,7 @@
 #let input = json("inputs/model-na-14-2-bijlage-1-variations/model-na-14-2-bijlage-1-GR.json")
 
 #let is_municipality = (municipal, public_body) => is_municipality(input.election.location, municipal, public_body)
+#let is_local_election = (local, other) => is_local_election(input.election.category, local, other)
 #let location_name = is_municipality[Gemeente #input.election.domain_id #input.election.location][Openbaar lichaam #input.election.location]
 #let location_type = is_municipality[gemeentelijk stembureau][stembureau voor het openbaar lichaam]
 
@@ -70,18 +71,7 @@ Schrijf op wat de *uitkomst* van het onderzoek door het #location_type was.
 
 == Toegelaten kiezers
 
-#if not "voter_card_count" in input.previous_results.voters_counts [
-  Het totaal van alle getelde geldige stempassen en volmachtbewijzen
-  
-  #sum(
-    with_correction_title: true,
-    empty_letterbox("A", cells: 4, original_value: input.previous_results.voters_counts.poll_card_count, bold_top_border: true)[Stempassen],
-    empty_letterbox("B", cells: 4, original_value: input.previous_results.voters_counts.proxy_certificate_count)[Volmachtbewijzen],
-    empty_letterbox("D", cells: 4, original_value: input.previous_results.voters_counts.total_admitted_voters_count, light: false)[
-      *Totaal toegelaten kiezers (A+B)*
-    ]
-  )
-] else [
+#if not is_local_election(true, false) and "voter_card_count" in input.previous_results.voters_counts [
   Het totaal van alle getelde geldige stempassen, kiezerspassen en volmachtbewijzen
   
   #sum(
@@ -91,6 +81,17 @@ Schrijf op wat de *uitkomst* van het onderzoek door het #location_type was.
     empty_letterbox("C", cells: 4, original_value: input.previous_results.voters_counts.voter_card_count)[Kiezerspassen],
     empty_letterbox("D", cells: 4, original_value: input.previous_results.voters_counts.total_admitted_voters_count, light: false)[
       *Totaal toegelaten kiezers (A+B+C)*
+    ]
+  )
+] else [
+  Het totaal van alle getelde geldige stempassen en volmachtbewijzen
+  
+  #sum(
+    with_correction_title: true,
+    empty_letterbox("A", cells: 4, original_value: input.previous_results.voters_counts.poll_card_count, bold_top_border: true)[Stempassen],
+    empty_letterbox("B", cells: 4, original_value: input.previous_results.voters_counts.proxy_certificate_count)[Volmachtbewijzen],
+    empty_letterbox("D", cells: 4, original_value: input.previous_results.voters_counts.total_admitted_voters_count, light: false)[
+      *Totaal toegelaten kiezers (A+B)*
     ]
   )
 ]

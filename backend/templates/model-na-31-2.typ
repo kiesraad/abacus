@@ -155,22 +155,7 @@ Bijvoorbeeld een schorsing of als er meerdere verkiezingen tegelijk werden georg
 
 == Toegelaten kiezers
 
-#if not "voter_card_count" in input.summary.voters_counts [
-  Tel het aantal geldige stempassen en volmachtbewijzen
-
-  #sum(
-    letterbox("A", value: input.summary.voters_counts.poll_card_count)[Stempassen],
-    letterbox(
-      "B",
-      value: input.summary.voters_counts.proxy_certificate_count,
-    )[Volmachtbewijzen (schriftelijk of via ingevulde stempas)],
-    letterbox(
-      "D",
-      light: false,
-      value: input.summary.voters_counts.total_admitted_voters_count,
-    )[Totaal toegelaten kiezers (A+B)],
-  )
-] else [
+#if not is_local_election(true, false) and "voter_card_count" in input.summary.voters_counts [
   Tel het aantal geldige stempassen, volmachtbewijzen en kiezerspassen
 
   #sum(
@@ -185,6 +170,21 @@ Bijvoorbeeld een schorsing of als er meerdere verkiezingen tegelijk werden georg
       light: false,
       value: input.summary.voters_counts.total_admitted_voters_count,
     )[Totaal toegelaten kiezers (A+B+C)],
+  )
+] else [
+  Tel het aantal geldige stempassen en volmachtbewijzen
+
+  #sum(
+    letterbox("A", value: input.summary.voters_counts.poll_card_count)[Stempassen],
+    letterbox(
+      "B",
+      value: input.summary.voters_counts.proxy_certificate_count,
+    )[Volmachtbewijzen (schriftelijk of via ingevulde stempas)],
+    letterbox(
+      "D",
+      light: false,
+      value: input.summary.voters_counts.total_admitted_voters_count,
+    )[Totaal toegelaten kiezers (A+B)],
   )
 ]
 

@@ -73,7 +73,7 @@ De volgende rollen zijn mogelijk: voorzitter, plaatsvervangend voorzitter, lid o
 
 #empty_table(
   columns: (8em, 1fr, 1fr, 1fr, 7em, 7em),
-  headers: ("Voorletters", "Achternaam", "Rol", "Aanwezig (van - tot)", "Aanwezig bij stemmen", "Aanwezig bij tellen"),
+  headers: ("Voorletters", "Achternaam", "Rol", "Aanwezig van - tot", "Aanwezig bij stemmen", "Aanwezig bij tellen"),
   values: ("", "", "", "-", checkbox(small: true)[], checkbox(small: true)[]),
   rows: 22,
 )
@@ -125,7 +125,7 @@ Denk aan stembureauleden die te laat waren, niet werkende techniek of stembussen
 
 #empty_table(
   columns: (8em, 10em, 1fr),
-  headers: ("Datum", "Tijd (van - tot)", "Locatie (als anders dan stembureau)"),
+  headers: ("Datum", "Tijd van - tot", "Locatie (als anders dan stembureau)"),
   values: ("", "", ""),
   rows: 1,
 )

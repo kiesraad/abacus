@@ -475,6 +475,8 @@ export const auditEventTypeValues = [
   "DataEntrySaved",
   "DataEntryResumed",
   "DataEntryDeleted",
+  "DataEntryDiscarded",
+  "DataEntryReset",
   "DataEntryFinalised",
   "DataEntryDiscardedFirst",
   "DataEntryReturnedFirst",
@@ -790,6 +792,7 @@ export interface DataEntryGetDifferencesResponse {
   first_entry: Results;
   first_entry_user_id: UserId;
   second_entry: Results;
+  second_entry_has_errors: boolean;
   second_entry_user_id: UserId;
   source: DataEntrySource;
 }
@@ -817,6 +820,8 @@ export const dataEntryStatusNameValues = [
   "first_entry_finalised",
   "second_entry_in_progress",
   "entries_different",
+  "first_entry_correction",
+  "second_entry_correction",
   "definitive",
 ] as const;
 export type DataEntryStatusName = (typeof dataEntryStatusNameValues)[number];
@@ -964,16 +969,14 @@ export interface ElectionStatusResponse {
 export interface ElectionStatusResponseEntry {
   /** Data entry id */
   data_entry_id: DataEntryId;
+  /** Current data entry progress as a percentage (0 to 100) */
+  data_entry_progress?: number;
   /** Whether the finalised first or second data entry has warnings */
   finalised_with_warnings?: boolean;
   /** Time when the data entry was finalised */
   finished_at?: string;
-  /** First entry progress as a percentage (0 to 100) */
-  first_entry_progress?: number;
   /** First entry user id */
   first_entry_user_id?: number;
-  /** Second entry progress as a percentage (0 to 100) */
-  second_entry_progress?: number;
   /** Second entry user id */
   second_entry_user_id?: number;
   /** Data entry source (polling station or sub committee) */
@@ -1040,7 +1043,7 @@ export const errorReferenceValues = [
   "DatabaseError",
   "DataEntryAlreadyClaimed",
   "DataEntryAlreadyFinalised",
-  "DataEntryCannotBeDeleted",
+  "DataEntryCannotBeReset",
   "DataEntryGetNotAllowed",
   "DataEntryNotAllowed",
   "EmlImportError",

@@ -21,7 +21,9 @@ interface CategoryRowProps {
 
 const SHOW_BADGE: DataEntryStatusName[] = [
   "first_entry_in_progress",
+  "first_entry_correction",
   "second_entry_in_progress",
+  "second_entry_correction",
   "entries_different",
   "first_entry_has_errors",
 ];
@@ -90,7 +92,7 @@ function CategoryRowContent({ category, statusEntryWithTypist, warning }: Catego
           <ProgressBar
             id={`${key}-progressbar`}
             data={{
-              percentage: entry.second_entry_progress ?? entry.first_entry_progress ?? 0,
+              percentage: entry.data_entry_progress ?? 0,
               class: "default",
             }}
             showPercentage

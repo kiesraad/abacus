@@ -47,6 +47,13 @@ export function ReadOnlyDataEntryDelete({
     });
   }
 
+  const statusWithTwoEntries: DataEntryStatusName[] = [
+    "second_entry_in_progress",
+    "first_entry_correction",
+    "second_entry_correction",
+    "definitive",
+  ];
+
   return (
     <div>
       <Button variant="tertiary" leftIcon={<IconTrash />} onClick={toggleModal}>
@@ -55,7 +62,7 @@ export function ReadOnlyDataEntryDelete({
 
       {showModal && (
         <Modal title={t("data_entry_detail.delete")} onClose={toggleModal}>
-          {status === "second_entry_in_progress" || status === "definitive" ? (
+          {statusWithTwoEntries.includes(status) ? (
             <p>{t("data_entry_detail.delete_all_are_you_sure", { nr: dataEntrySource.number })}</p>
           ) : (
             <p>{t("data_entry_detail.delete_are_you_sure", { nr: dataEntrySource.number })}</p>

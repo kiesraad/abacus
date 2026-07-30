@@ -5606,6 +5606,8 @@
           "DataEntrySaved",
           "DataEntryResumed",
           "DataEntryDeleted",
+          "DataEntryDiscarded",
+          "DataEntryReset",
           "DataEntryFinalised",
           "DataEntryDiscardedFirst",
           "DataEntryReturnedFirst",
@@ -6412,6 +6414,7 @@
           "first_entry",
           "second_entry_user_id",
           "second_entry",
+          "second_entry_has_errors",
           "source"
         ],
         "properties": {
@@ -6423,6 +6426,9 @@
           },
           "second_entry": {
             "$ref": "#/components/schemas/Results"
+          },
+          "second_entry_has_errors": {
+            "type": "boolean"
           },
           "second_entry_user_id": {
             "$ref": "#/components/schemas/UserId"
@@ -6560,6 +6566,8 @@
           "first_entry_finalised",
           "second_entry_in_progress",
           "entries_different",
+          "first_entry_correction",
+          "second_entry_correction",
           "definitive"
         ]
       },
@@ -7068,6 +7076,12 @@
             "$ref": "#/components/schemas/DataEntryId",
             "description": "Data entry id"
           },
+          "data_entry_progress": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Current data entry progress as a percentage (0 to 100)",
+            "minimum": 0
+          },
           "finalised_with_warnings": {
             "type": "boolean",
             "description": "Whether the finalised first or second data entry has warnings"
@@ -7076,22 +7090,10 @@
             "type": "string",
             "description": "Time when the data entry was finalised"
           },
-          "first_entry_progress": {
-            "type": "integer",
-            "format": "int32",
-            "description": "First entry progress as a percentage (0 to 100)",
-            "minimum": 0
-          },
           "first_entry_user_id": {
             "type": "integer",
             "format": "int32",
             "description": "First entry user id",
-            "minimum": 0
-          },
-          "second_entry_progress": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Second entry progress as a percentage (0 to 100)",
             "minimum": 0
           },
           "second_entry_user_id": {
@@ -7253,7 +7255,7 @@
           "DatabaseError",
           "DataEntryAlreadyClaimed",
           "DataEntryAlreadyFinalised",
-          "DataEntryCannotBeDeleted",
+          "DataEntryCannotBeReset",
           "DataEntryGetNotAllowed",
           "DataEntryNotAllowed",
           "EmlImportError",

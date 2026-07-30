@@ -1,6 +1,6 @@
 #import "common/style.typ": attachment_numbering, conf
 #import "common/scripts.typ": *
-#let input = json("inputs/model-na-31-2-bijlage1.json")
+#let input = json("inputs/model-na-31-2-bijlage-1-variations/model-na-31-2-bijlage-1-GR.json")
 
 #let is_municipality = (municipal, public_body) => is_municipality(input.election.location, municipal, public_body)
 #let is_local_election = (local, other) => is_local_election(input.election.category, local, other)

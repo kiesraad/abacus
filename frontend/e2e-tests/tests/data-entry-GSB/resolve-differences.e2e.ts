@@ -72,8 +72,8 @@ test.describe("resolve differences", () => {
     await resolveDifferencesPage.correctWrongEntry.click();
     await resolveDifferencesPage.save.click();
 
-    await expect(electionStatusPage.firstEntryFinished).toContainText(
-      `${dataEntryGSBEntriesDifferent.name}Sam Kuijpers`,
+    await expect(electionStatusPage.inProgress).toContainText(
+      [dataEntryGSBEntriesDifferent.name, "2e invoer", "Aliyah van den Berg"].join(""),
     );
     await expect(electionStatusPage.alertDifferencesResolved).toBeVisible();
     await expect(electionStatusPage.alertDifferencesResolved).toContainText(
@@ -138,8 +138,14 @@ test.describe("resolve differences then errors", () => {
     const resolveDifferencesPage = new ResolveDifferencesPgObj(page);
     await expect(resolveDifferencesPage.title).toBeVisible();
     await resolveDifferencesPage.keepSecondEntry.click();
-    await resolveDifferencesPage.discardWrongEntry.click();
-    await resolveDifferencesPage.save.click();
+
+    // The kept second entry has errors, so the first entry cannot be corrected
+    await expect(resolveDifferencesPage.correctionBlocked).toBeVisible();
+    await expect(resolveDifferencesPage.correctWrongEntry).toBeDisabled();
+    await expect(resolveDifferencesPage.correctWrongEntry).not.toBeChecked();
+    await expect(resolveDifferencesPage.discardWrongEntry).toBeDisabled();
+    await expect(resolveDifferencesPage.discardWrongEntry).toBeChecked();
+    await resolveDifferencesPage.continueToResolveErrors.click();
 
     const resolveErrorsPage = new ResolveErrorsPgObj(page);
     await expect(resolveErrorsPage.title).toBeVisible();

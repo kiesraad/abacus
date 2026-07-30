@@ -127,18 +127,18 @@ const createCompareVotesCastCheckboxes = (model: ModelForGSB): CheckboxesSubsect
     options: [
       {
         path: "differences_counts.compare_votes_cast_admitted_voters.admitted_voters_equal_votes_cast",
-        label: t("differences_counts.admitted_voters_equal_votes_cast.title"),
+        label: tx("differences_counts.admitted_voters_equal_votes_cast.title"),
         short_label: t("differences_counts.admitted_voters_equal_votes_cast.short_title"),
         autoFocusInput: true,
       },
       {
         path: "differences_counts.compare_votes_cast_admitted_voters.votes_cast_greater_than_admitted_voters",
-        label: t("differences_counts.votes_cast_greater_than_admitted_voters.title"),
+        label: tx("differences_counts.votes_cast_greater_than_admitted_voters.title"),
         short_label: t("differences_counts.votes_cast_greater_than_admitted_voters.short_title"),
       },
       {
         path: "differences_counts.compare_votes_cast_admitted_voters.votes_cast_smaller_than_admitted_voters",
-        label: t("differences_counts.votes_cast_smaller_than_admitted_voters.title"),
+        label: tx("differences_counts.votes_cast_smaller_than_admitted_voters.title"),
         short_label: t("differences_counts.votes_cast_smaller_than_admitted_voters.short_title"),
       },
     ],

@@ -304,7 +304,6 @@ fn preferential_candidate_nomination<'a, LV: ListVotes>(
             info!(
                 "Drawing of lots is required for candidates: {options:?}, only {seats_remaining} seat(s) available",
             );
-
             let current_seat_number = index + 1;
             let nr_of_seats = options.len().min(seats_remaining as usize);
             let seat_numbers = (current_seat_number..current_seat_number + nr_of_seats)

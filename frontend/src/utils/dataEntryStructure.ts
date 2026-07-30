@@ -369,7 +369,9 @@ function buildDataEntryStructure(model: DataEntryModel, election: ElectionWithPo
   switch (model) {
     case "DSOFirstSession":
       return [
-        /* TODO: https://github.com/kiesraad/abacus/issues/3685 */
+        createVotersAndVotesSection(model, election),
+        createDifferencesSection(model),
+        ...createPoliticalGroupSections(election),
       ];
     case "CSOFirstSession":
       return [
@@ -380,15 +382,7 @@ function buildDataEntryStructure(model: DataEntryModel, election: ElectionWithPo
         ...createPoliticalGroupSections(election),
       ];
     case "DSONextSession":
-      return [
-        /* TODO: https://github.com/kiesraad/abacus/issues/3685 */
-      ];
     case "CSONextSession":
-      return [
-        createVotersAndVotesSection(model, election),
-        createDifferencesSection(model),
-        ...createPoliticalGroupSections(election),
-      ];
     case "GSB":
       return [
         createVotersAndVotesSection(model, election),

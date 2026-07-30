@@ -8247,7 +8247,7 @@
       },
       "NextSessionResults": {
         "type": "object",
-        "description": "CSONextSessionResults, following the fields in Model Na 14-2 Bijlage 1.\n\nSee \"Model Na 14-2. Corrigendum bij het proces-verbaal van een gemeentelijk stembureau/\nstembureau voor het openbaar lichaam, Bijlage 1: uitkomsten per stembureau\" from\n[Kiesraad](https://www.kiesraad.nl/documenten/2025/11/27/na-14-2-corrigendum-gsb-inclusief-bijlage-voor-cso).",
+        "description": "NextSessionResults, following the fields in Model Na 14-2 Bijlage 1/Na 14-1 versie 2.\n\nSee \"Model Na 14-2. Corrigendum bij het proces-verbaal van een gemeentelijk stembureau/\nstembureau voor het openbaar lichaam, Bijlage 1: uitkomsten per stembureau\" from\n<https://www.kiesraad.nl/documenten/2025/11/27/na-14-2-corrigendum-gsb-inclusief-bijlage-voor-cso)>.\nSee also \"Model Na 14-1 (Corrigendum bij het proces-verbaal van een stembureau)\"\n<https://www.kiesraad.nl/documenten/2025/11/27/model-na-14-1>.",
         "required": [
           "voters_counts",
           "votes_counts",
@@ -8874,7 +8874,7 @@
             "allOf": [
               {
                 "$ref": "#/components/schemas/DSOFirstSessionResults",
-                "description": "Results for decentrally counted (DSO) elections, first election committee session.\nThis contains the data entry values from Model Model N 10-1."
+                "description": "Results for decentrally counted (DSO) elections, first election committee session.\nThis contains the data entry values from Model Model N 10-1 and possibly in combination with the values from Model Na 14-1 versie 1."
               },
               {
                 "type": "object",
@@ -8891,13 +8891,13 @@
                 }
               }
             ],
-            "description": "Results for decentrally counted (DSO) elections, first election committee session.\nThis contains the data entry values from Model Model N 10-1."
+            "description": "Results for decentrally counted (DSO) elections, first election committee session.\nThis contains the data entry values from Model Model N 10-1 and possibly in combination with the values from Model Na 14-1 versie 1."
           },
           {
             "allOf": [
               {
                 "$ref": "#/components/schemas/NextSessionResults",
-                "description": "Results for decentrally counted (DSO) elections, any subsequent election committee session.\nThis contains the data entry values from Model Na 14-1 Bijlage 1."
+                "description": "Results for decentrally counted (DSO) elections, any subsequent election committee session.\nThis contains the data entry values from Model Na 14-1 versie 2."
               },
               {
                 "type": "object",
@@ -8914,7 +8914,7 @@
                 }
               }
             ],
-            "description": "Results for decentrally counted (DSO) elections, any subsequent election committee session.\nThis contains the data entry values from Model Na 14-1 Bijlage 1."
+            "description": "Results for decentrally counted (DSO) elections, any subsequent election committee session.\nThis contains the data entry values from Model Na 14-1 versie 2."
           },
           {
             "allOf": [

@@ -89,7 +89,7 @@ impl Results {
             }
             (CommitteeCategory::GSB, true) => {
                 if let Some(prev) = previous_results {
-                    let mut copy = CSONextSessionResults {
+                    let mut copy = NextSessionResults {
                         voters_counts: prev.voters_counts.clone(),
                         votes_counts: prev.votes_counts.clone(),
                         differences_counts: prev.differences_counts.clone(),
@@ -103,7 +103,7 @@ impl Results {
 
                     Results::CSONextSession(copy)
                 } else {
-                    Results::CSONextSession(CSONextSessionResults::empty(election))
+                    Results::CSONextSession(NextSessionResults::empty(election))
                 }
             }
             (CommitteeCategory::CSB, _) => Results::GSB(GSBResults::empty(election)),

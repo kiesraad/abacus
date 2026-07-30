@@ -12,9 +12,9 @@ use crate::domain::{compare::Compare, field_path::FieldPath};
 ///
 /// See "Model Na 14-2. Corrigendum bij het proces-verbaal van een gemeentelijk stembureau/
 /// stembureau voor het openbaar lichaam, Bijlage 1: uitkomsten per stembureau" from
-/// https://www.kiesraad.nl/documenten/2025/11/27/na-14-2-corrigendum-gsb-inclusief-bijlage-voor-cso).
+/// <https://www.kiesraad.nl/documenten/2025/11/27/na-14-2-corrigendum-gsb-inclusief-bijlage-voor-cso)>.
 /// See also "Model Na 14-1 (Corrigendum bij het proces-verbaal van een stembureau)"
-/// https://www.kiesraad.nl/documenten/2025/11/27/model-na-14-1.
+/// <https://www.kiesraad.nl/documenten/2025/11/27/model-na-14-1>.
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
 pub struct NextSessionResults {

@@ -52,7 +52,8 @@ dit dan op. Schrijf zo concreet mogelijk op wat de opdracht van het centraal ste
 is. Bijvoorbeeld: hertel de stembiljetten van lijst 12.
 
 ==== Aanleiding van het onderzoek
-#empty_lines(10)
+
+#text_area_with_content(input.investigation.reason)
 
 #block(below: 3em)
 

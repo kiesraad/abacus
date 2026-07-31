@@ -7,10 +7,7 @@ export interface RadioSubsectionProps {
   subsection: RadioSubsection;
   currentValues: SectionValues;
   setValues: (path: string, value: string) => void;
-  defaultProps: {
-    errorsAndWarnings?: Map<string, "error" | "warning">;
-    errorsAndWarningsAccepted: boolean;
-  };
+  errorsAndWarnings?: Map<string, "error" | "warning">;
   readOnly?: boolean;
 }
 
@@ -18,14 +15,14 @@ export function RadioSubsectionComponent({
   subsection,
   currentValues,
   setValues,
-  defaultProps,
+  errorsAndWarnings,
   readOnly = false,
 }: RadioSubsectionProps) {
   return (
     <div className={cls.container}>
       <ChoiceList>
         {subsection.title && <ChoiceList.Legend>{subsection.title}</ChoiceList.Legend>}
-        {defaultProps.errorsAndWarnings?.get(`data.${subsection.path}`) && (
+        {errorsAndWarnings?.get(`data.${subsection.path}`) && (
           <ChoiceList.Error id={`${subsection.path}-error`}>{subsection.error}</ChoiceList.Error>
         )}
         {subsection.options.map((option) => (

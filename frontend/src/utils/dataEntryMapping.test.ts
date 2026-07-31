@@ -74,9 +74,8 @@ const createRadioSection = (): DataEntrySection => {
 
 describe("mapSectionValues", () => {
   test.each([
-    { input: "true", expected: true, description: "true" },
-    { input: "false", expected: false, description: "false" },
-    { input: "", expected: undefined, description: "empty" },
+    { input: "OptionA", expected: "OptionA", description: "true" },
+    { input: "", expected: null, description: "empty" },
   ])("should handle radio $description", ({ input, expected }) => {
     const radioSection = createRadioSection();
     const current = { test: null };
@@ -89,11 +88,11 @@ describe("mapSectionValues", () => {
 
   test("should use section info to distinguish radio vs inputGrid fields", () => {
     const current = {
-      test: null,
+      test: "OptionA",
       test2: null,
     };
     const formValues = {
-      test: "true", // Radio field - should become boolean
+      test: "", // Radio field - should become null
       test2: "456", // InputGrid field - should be deformatted to number
     };
 
@@ -113,7 +112,7 @@ describe("mapSectionValues", () => {
 
     const result = mapSectionValues(current, formValues, testSection);
 
-    expect(result.test).toBe(true); // Radio test field becomes boolean
+    expect(result.test).toBe(null); // Radio test field becomes null
     expect(result.test2).toBe(456); // InputGrid field gets deformatted to number
   });
 

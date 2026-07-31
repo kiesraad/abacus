@@ -1,0 +1,17 @@
+{
+  "form_title": "Over het proces-verbaal",
+  "short_title": "Over het proces-verbaal",
+  "validation_error": "Controleer of je antwoord gelijk is aan het papieren proces-verbaal",
+  "corrigendum_present": {
+    "title": "Is er een <strong>corrigendum</strong> bij het papieren proces-verbaal aanwezig?",
+    "short_title": "Corrigendum aanwezig?",
+    "one_document": "Nee, ik heb <strong>één document</strong> (alleen een proces-verbaal)",
+    "two_documents": "Ja, ik heb <strong>twee documenten</strong> (een proces-verbaal en een corrigendum)"
+  },
+  "checks_and_corrections_present": {
+    "title": "Is voorin het proces-verbaal de extra pagina <strong>controles en correcties</strong> ingevoegd?",
+    "short_title": "Extra pagina controles en correcties aanwezig?",
+    "page_present": "Ja, de pagina ‘controles en correcties’ is aanwezig",
+    "page_missing": "Nee, de pagina ontbreekt"
+  }
+}

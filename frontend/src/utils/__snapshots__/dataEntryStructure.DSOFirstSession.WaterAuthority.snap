@@ -1,5 +1,183 @@
 [
   {
+    "id": "about_report",
+    "short_title": "Over het proces-verbaal",
+    "subsections": [
+      {
+        "error": "Controleer of je antwoord gelijk is aan het papieren proces-verbaal",
+        "options": [
+          {
+            "label": <React.Fragment>
+              <React.Fragment>
+                Ja, ik heb 
+              </React.Fragment>
+              <strong>
+                <React.Fragment>
+                  <React.Fragment>
+                    twee documenten
+                  </React.Fragment>
+                </React.Fragment>
+              </strong>
+              <React.Fragment>
+                 (een proces-verbaal en een corrigendum)
+              </React.Fragment>
+            </React.Fragment>,
+            "short_label": "Ja, ik heb <strong>twee documenten</strong> (een proces-verbaal en een corrigendum)",
+            "value": "TwoDocuments",
+          },
+          {
+            "label": <React.Fragment>
+              <React.Fragment>
+                Nee, ik heb 
+              </React.Fragment>
+              <strong>
+                <React.Fragment>
+                  <React.Fragment>
+                    één document
+                  </React.Fragment>
+                </React.Fragment>
+              </strong>
+              <React.Fragment>
+                 (alleen een proces-verbaal)
+              </React.Fragment>
+            </React.Fragment>,
+            "short_label": "Nee, ik heb <strong>één document</strong> (alleen een proces-verbaal)",
+            "value": "OneDocument",
+          },
+        ],
+        "path": "about_report.corrigendum_present",
+        "short_title": "Corrigendum aanwezig?",
+        "title": <React.Fragment>
+          <React.Fragment>
+            Is er een 
+          </React.Fragment>
+          <strong>
+            <React.Fragment>
+              <React.Fragment>
+                corrigendum
+              </React.Fragment>
+            </React.Fragment>
+          </strong>
+          <React.Fragment>
+             bij het papieren proces-verbaal aanwezig?
+          </React.Fragment>
+        </React.Fragment>,
+        "type": "radio",
+      },
+      {
+        "error": "Controleer of je antwoord gelijk is aan het papieren proces-verbaal",
+        "options": [
+          {
+            "label": "Ja, de pagina ‘controles en correcties’ is aanwezig",
+            "short_label": "Ja, de pagina ‘controles en correcties’ is aanwezig",
+            "value": "PagePresent",
+          },
+          {
+            "label": "Nee, de pagina ontbreekt",
+            "short_label": "Nee, de pagina ontbreekt",
+            "value": "PageMissing",
+          },
+        ],
+        "path": "about_report.checks_and_corrections_present",
+        "short_title": "Extra pagina controles en correcties aanwezig?",
+        "title": <React.Fragment>
+          <React.Fragment>
+            Is voorin het proces-verbaal de extra pagina 
+          </React.Fragment>
+          <strong>
+            <React.Fragment>
+              <React.Fragment>
+                controles en correcties
+              </React.Fragment>
+            </React.Fragment>
+          </strong>
+          <React.Fragment>
+             ingevoegd?
+          </React.Fragment>
+        </React.Fragment>,
+        "type": "radio",
+      },
+    ],
+    "title": "Over het proces-verbaal",
+  },
+  {
+    "id": "checks_and_corrections",
+    "short_title": "Controles en correcties",
+    "subsections": [
+      {
+        "message": "Neem de vinkjes over zoals ze op het papieren formulier zijn gezet.",
+        "type": "message",
+      },
+      {
+        "title": "Op eigen initiatief van het gemeentelijk stembureau",
+        "type": "heading",
+      },
+      {
+        "error_message": "Controleer of je antwoord gelijk is aan het papieren proces-verbaal",
+        "error_path": "checks_and_corrections.reason_investigation_own_initiative",
+        "options": [
+          {
+            "autoFocusInput": true,
+            "label": "Vanwege een onverklaard verschil",
+            "path": "checks_and_corrections.reason_investigation_own_initiative.unaccounted_difference",
+            "short_label": "Vanwege een onverklaard verschil",
+          },
+          {
+            "label": "Vanwege (het vermoeden van) een andere fout",
+            "path": "checks_and_corrections.reason_investigation_own_initiative.other_error",
+            "short_label": "Vanwege (het vermoeden van) een andere fout",
+          },
+        ],
+        "short_title": "Waarom heeft het GSB de telresultaten onderzocht?",
+        "title": "Waarom heeft het gemeentelijk stembureau de telresultaten onderzocht?",
+        "type": "checkboxes",
+      },
+      {
+        "error_message": "Controleer of je antwoord gelijk is aan het papieren proces-verbaal",
+        "error_path": "checks_and_corrections.corrected_results_own_initiative",
+        "options": [
+          {
+            "label": "Nee, de oorspronkelijke telresultaten waren correct",
+            "path": "checks_and_corrections.corrected_results_own_initiative.no",
+            "short_label": "Nee, de oorspronkelijke telresultaten waren correct",
+          },
+          {
+            "label": "Ja, er zijn gecorrigeerde telresultaten",
+            "path": "checks_and_corrections.corrected_results_own_initiative.yes",
+            "short_label": "Ja, er zijn gecorrigeerde telresultaten",
+          },
+        ],
+        "short_title": "Zijn er gecorrigeerde telresultaten?",
+        "title": "Zijn er gecorrigeerde telresultaten?",
+        "type": "checkboxes",
+      },
+      {
+        "title": "Op verzoek van het centraal stembureau",
+        "type": "heading",
+      },
+      {
+        "error_message": "Controleer of je antwoord gelijk is aan het papieren proces-verbaal",
+        "error_path": "checks_and_corrections.corrected_results_csb_request",
+        "options": [
+          {
+            "label": "Nee, de oorspronkelijke telresultaten waren correct",
+            "path": "checks_and_corrections.corrected_results_csb_request.no",
+            "short_label": "Nee, de oorspronkelijke telresultaten waren correct",
+          },
+          {
+            "label": "Ja, er zijn gecorrigeerde telresultaten",
+            "path": "checks_and_corrections.corrected_results_csb_request.yes",
+            "short_label": "Ja, er zijn gecorrigeerde telresultaten",
+          },
+        ],
+        "short_title": "Zijn er gecorrigeerde telresultaten?",
+        "title": "Zijn er gecorrigeerde telresultaten?",
+        "type": "checkboxes",
+      },
+    ],
+    "title": "Controles en correcties",
+  },
+  {
     "id": "voters_votes_counts",
     "sectionNumber": "2.1 en 2.2",
     "short_title": "Aantal kiezers en stemmen",
@@ -13,26 +191,6 @@
         "rows": [
           {
             "autoFocusInput": true,
-            "code": "Z",
-            "path": "number_of_voters",
-            "title": "Kiesgerechtigden",
-          },
-        ],
-        "type": "inputGrid",
-      },
-      {
-        "message": "Voer je een corrigendum in, en staat het aantal kiesgerechtigden niet op het formulier? Pak dan het oorspronkelijke proces-verbaal erbij, en vul de waarde in die daar staat ingevuld.",
-        "type": "message",
-      },
-      {
-        "headers": [
-          "Veld",
-          "Geteld aantal",
-          "Omschrijving",
-        ],
-        "rows": [
-          {
-            "autoFocusInput": false,
             "code": "A",
             "path": "voters_counts.poll_card_count",
             "title": "Stempassen",
@@ -108,17 +266,56 @@
         "options": [
           {
             "autoFocusInput": true,
-            "label": "D en H zijn gelijk",
+            "label": <React.Fragment>
+              <React.Fragment>
+                D en H zijn 
+              </React.Fragment>
+              <strong>
+                <React.Fragment>
+                  <React.Fragment>
+                    gelijk
+                  </React.Fragment>
+                </React.Fragment>
+              </strong>
+            </React.Fragment>,
             "path": "differences_counts.compare_votes_cast_admitted_voters.admitted_voters_equal_votes_cast",
             "short_label": "D en H zijn gelijk",
           },
           {
-            "label": "H is groter dan D (meer uitgebrachte stemmen dan toegelaten kiezers)",
+            "label": <React.Fragment>
+              <React.Fragment>
+                H is 
+              </React.Fragment>
+              <strong>
+                <React.Fragment>
+                  <React.Fragment>
+                    groter
+                  </React.Fragment>
+                </React.Fragment>
+              </strong>
+              <React.Fragment>
+                 dan D (meer uitgebrachte stemmen dan toegelaten kiezers)
+              </React.Fragment>
+            </React.Fragment>,
             "path": "differences_counts.compare_votes_cast_admitted_voters.votes_cast_greater_than_admitted_voters",
             "short_label": "H is groter dan D",
           },
           {
-            "label": "H is kleiner dan D (minder uitgebrachte stemmen dan toegelaten kiezers)",
+            "label": <React.Fragment>
+              <React.Fragment>
+                H is 
+              </React.Fragment>
+              <strong>
+                <React.Fragment>
+                  <React.Fragment>
+                    kleiner
+                  </React.Fragment>
+                </React.Fragment>
+              </strong>
+              <React.Fragment>
+                 dan D (minder uitgebrachte stemmen dan toegelaten kiezers)
+              </React.Fragment>
+            </React.Fragment>,
             "path": "differences_counts.compare_votes_cast_admitted_voters.votes_cast_smaller_than_admitted_voters",
             "short_label": "H is kleiner dan D",
           },

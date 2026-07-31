@@ -96,12 +96,12 @@
   "use_instructions_to_import_eml": "Je hebt van het centraal stembureau instructies gekregen waarmee je de verkiezingsdefinitie kunt downloaden. Zet het bestand op deze computer en importeer het.",
   "use_instructions_to_import_polling_stations_eml": "Importeer het bestand met stembureaus. Heb je geen bestand met stembureaus? Je kan ze later nog handmatig invoeren. Sla deze stap dan over.",
   "voting_method_type": {
-    "cso": "Centrale stemopneming (CSO)",
-    "cso_description": "Op de verkiezingsdag wordt het aantal stemmen per lijst geteld. De stemmen op kandidaten worden door het gemeentelijke stembureau geteld.",
+    "CSO": "Centrale stemopneming (CSO)",
+    "CSO_description": "Op de verkiezingsdag wordt het aantal stemmen per lijst geteld. De stemmen op kandidaten worden door het gemeentelijke stembureau geteld.",
     "description": "Hoe worden stemmen voor de {election} in de gemeente {location} geteld? Het type stemopneming wordt bepaald door het college van burgemeester en wethouders (B&W) van de gemeente.",
-    "dso": "Decentrale stemopneming (DSO)",
-    "dso_description": "Op de verkiezingsdag tellen de stembureaus de stemmen per kandidaat",
-    "dso_not_supported": "Niet ondersteund in deze versie van Abacus",
+    "DSO": "Decentrale stemopneming (DSO)",
+    "DSO_description": "Op de verkiezingsdag tellen de stembureaus de stemmen per kandidaat",
+    "DSO_not_supported": "Niet ondersteund in deze versie van Abacus",
     "title": "Type stemopneming in"
   },
   "you_cannot_start_data_entry_yet": "Je kan nog geen telresultaten invoeren."

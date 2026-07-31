@@ -49,7 +49,7 @@ export function CountingMethodType() {
             <ChoiceList>
               <ChoiceList.Radio
                 id="cso"
-                label={t("election.voting_method_type.cso")}
+                label={t("election.voting_method_type.CSO")}
                 checked={true}
                 onChange={() => {
                   /*
@@ -58,19 +58,19 @@ export function CountingMethodType() {
             */
                 }}
               >
-                {t("election.voting_method_type.cso_description")}
+                {t("election.voting_method_type.CSO_description")}
               </ChoiceList.Radio>
               <ChoiceList.Radio
                 id="dso"
                 label={
                   <span>
-                    {t("election.voting_method_type.dso")} (<b>{t("election.voting_method_type.dso_not_supported")}</b>)
+                    {t("election.voting_method_type.DSO")} (<b>{t("election.voting_method_type.DSO_not_supported")}</b>)
                   </span>
                 }
                 checked={false}
                 disabled
               >
-                {t("election.voting_method_type.dso_description")}
+                {t("election.voting_method_type.DSO_description")}
               </ChoiceList.Radio>
             </ChoiceList>
           </FormLayout.Section>

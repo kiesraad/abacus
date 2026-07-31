@@ -16,7 +16,7 @@ use crate::{
         election::{
             self, CandidateGender, CandidateNumber, CommitteeCategory, ElectionCategory,
             ElectionSubCategory, ElectionWithPoliticalGroups, NewElection, PGNumber,
-            RegisteredPoliticalGroup, VoteCountingMethod,
+            RegisteredPoliticalGroup,
         },
         field_path::FieldPath,
         polling_station::{PollingStation, PollingStationRequest, PollingStationType},
@@ -350,11 +350,7 @@ fn generate_election(
     NewElection {
         name,
         committee_category: args.committee_category,
-        counting_method: if args.committee_category == CommitteeCategory::GSB {
-            Some(VoteCountingMethod::CSO)
-        } else {
-            None
-        },
+        counting_method: args.counting_method,
         domain_id: super::data::domain_id(rng),
         election_id,
         location: locality,
@@ -1045,7 +1041,9 @@ fn distribute_power_law(
 mod tests {
     use super::*;
     use crate::{
-        domain::election::CommitteeCategory, repository::election_repo, test_data_gen::RandomRange,
+        domain::election::{CommitteeCategory, VoteCountingMethod},
+        repository::election_repo,
+        test_data_gen::RandomRange,
     };
 
     #[sqlx::test]
@@ -1053,6 +1051,7 @@ mod tests {
         let args = GenerateElectionArgs {
             custom_name: None,
             committee_category: CommitteeCategory::GSB,
+            counting_method: Some(VoteCountingMethod::CSO),
             election_category: ElectionCategory::Municipal,
             political_groups: RandomRange(20..50),
             candidates_per_group: RandomRange(10..50),

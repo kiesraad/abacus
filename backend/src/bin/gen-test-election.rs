@@ -8,7 +8,9 @@ use abacus::{
     domain::{
         committee_session::CommitteeSession,
         data_entry::DataEntrySource,
-        election::{CommitteeCategory, ElectionCategory, ElectionWithPoliticalGroups},
+        election::{
+            CommitteeCategory, ElectionCategory, ElectionWithPoliticalGroups, VoteCountingMethod,
+        },
         models::{ModelNa31_2Input, ToPdfFileModel, votes_table::VotesTables},
         polling_station::PollingStation,
         report::DEFAULT_DATE_TIME_FORMAT,
@@ -28,6 +30,10 @@ struct Args {
     /// The committee category
     #[arg(value_enum)]
     committee_category: CommitteeCategory,
+
+    /// The vote counting method
+    #[arg(value_enum)]
+    counting_method: Option<VoteCountingMethod>,
 
     /// The election category
     #[arg(value_enum)]
@@ -111,6 +117,7 @@ impl From<Args> for GenerateElectionArgs {
         GenerateElectionArgs {
             custom_name: args.custom_name,
             committee_category: args.committee_category,
+            counting_method: args.counting_method,
             election_category: args.election_category,
             political_groups: RandomRange(args.political_groups),
             candidates_per_group: RandomRange(args.candidates_per_group),

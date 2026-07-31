@@ -5906,38 +5906,6 @@
         },
         "additionalProperties": false
       },
-      "CSONextSessionResults": {
-        "type": "object",
-        "description": "CSONextSessionResults, following the fields in Model Na 14-2 Bijlage 1.\n\nSee \"Model Na 14-2. Corrigendum bij het proces-verbaal van een gemeentelijk stembureau/\nstembureau voor het openbaar lichaam, Bijlage 1: uitkomsten per stembureau\" from\n[Kiesraad](https://www.kiesraad.nl/documenten/2025/11/27/na-14-2-corrigendum-gsb-inclusief-bijlage-voor-cso).",
-        "required": [
-          "voters_counts",
-          "votes_counts",
-          "differences_counts",
-          "political_group_votes"
-        ],
-        "properties": {
-          "differences_counts": {
-            "$ref": "#/components/schemas/DifferencesCounts",
-            "description": "Differences counts (\"Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten\")"
-          },
-          "political_group_votes": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PoliticalGroupCandidateVotes"
-            },
-            "description": "Vote counts per list and candidate (\"Aantal stemmen per lijst en kandidaat\")"
-          },
-          "voters_counts": {
-            "$ref": "#/components/schemas/VotersCounts",
-            "description": "Voters counts (\"Aantal toegelaten kiezers\")"
-          },
-          "votes_counts": {
-            "$ref": "#/components/schemas/VotesCounts",
-            "description": "Votes counts (\"Aantal getelde stembiljetten\")"
-          }
-        },
-        "additionalProperties": false
-      },
       "Candidate": {
         "type": "object",
         "description": "Candidate",
@@ -6384,6 +6352,47 @@
           }
         },
         "additionalProperties": false
+      },
+      "DSOFirstSessionResults": {
+        "type": "object",
+        "description": "DSOFirstSessionResults, following the fields in Model N 10-1\n\nSee: Model N 10-1 (Proces-verbaal van een stembureau) from\n[kiesraad](https://www.kiesraad.nl/documenten/2025/11/27/n-10-1-pv-sb-dso)",
+        "required": [
+          "extra_investigation",
+          "counting_differences_polling_station",
+          "voters_counts",
+          "votes_counts",
+          "differences_counts",
+          "political_group_votes"
+        ],
+        "properties": {
+          "counting_differences_polling_station": {
+            "$ref": "#/components/schemas/CountingDifferencesPollingStation",
+            "description": "Counting Differences Polling Station (\"B1-2 Verschillen met telresultaten van het stembureau\")"
+          },
+          "differences_counts": {
+            "$ref": "#/components/schemas/DifferencesCounts",
+            "description": "Differences counts (\"3. Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten\")"
+          },
+          "extra_investigation": {
+            "$ref": "#/components/schemas/ExtraInvestigation",
+            "description": "Extra investigation (\"B1-1 Alleen bij extra onderzoek\")"
+          },
+          "political_group_votes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PoliticalGroupCandidateVotes"
+            },
+            "description": "Vote counts per list and candidate (5. \"Aantal stemmen per lijst en kandidaat\")"
+          },
+          "voters_counts": {
+            "$ref": "#/components/schemas/VotersCounts",
+            "description": "Voters counts (\"1. Aantal toegelaten kiezers\")"
+          },
+          "votes_counts": {
+            "$ref": "#/components/schemas/VotesCounts",
+            "description": "Votes counts (\"2. Aantal getelde stembiljetten\")"
+          }
+        }
       },
       "DataEntry": {
         "type": "object",
@@ -8241,6 +8250,38 @@
         },
         "additionalProperties": false
       },
+      "NextSessionResults": {
+        "type": "object",
+        "description": "NextSessionResults, following the fields in Model Na 14-2 Bijlage 1/Na 14-1 versie 2.\n\nSee \"Model Na 14-2. Corrigendum bij het proces-verbaal van een gemeentelijk stembureau/\nstembureau voor het openbaar lichaam, Bijlage 1: uitkomsten per stembureau\" from\n<https://www.kiesraad.nl/documenten/2025/11/27/na-14-2-corrigendum-gsb-inclusief-bijlage-voor-cso)>.\nSee also \"Model Na 14-1 (Corrigendum bij het proces-verbaal van een stembureau)\"\n<https://www.kiesraad.nl/documenten/2025/11/27/model-na-14-1>.",
+        "required": [
+          "voters_counts",
+          "votes_counts",
+          "differences_counts",
+          "political_group_votes"
+        ],
+        "properties": {
+          "differences_counts": {
+            "$ref": "#/components/schemas/DifferencesCounts",
+            "description": "Differences counts (\"Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten\")"
+          },
+          "political_group_votes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PoliticalGroupCandidateVotes"
+            },
+            "description": "Vote counts per list and candidate (\"Aantal stemmen per lijst en kandidaat\")"
+          },
+          "voters_counts": {
+            "$ref": "#/components/schemas/VotersCounts",
+            "description": "Voters counts (\"Aantal toegelaten kiezers\")"
+          },
+          "votes_counts": {
+            "$ref": "#/components/schemas/VotesCounts",
+            "description": "Votes counts (\"Aantal getelde stembiljetten\")"
+          }
+        },
+        "additionalProperties": false
+      },
       "PGNumber": {
         "type": "integer",
         "format": "int32",
@@ -8837,6 +8878,52 @@
           {
             "allOf": [
               {
+                "$ref": "#/components/schemas/DSOFirstSessionResults",
+                "description": "Results for decentrally counted (DSO) elections, first election committee session.\nThis contains the data entry values from Model Model N 10-1 and possibly in combination with the values from Model Na 14-1 versie 1."
+              },
+              {
+                "type": "object",
+                "required": [
+                  "model"
+                ],
+                "properties": {
+                  "model": {
+                    "type": "string",
+                    "enum": [
+                      "DSOFirstSession"
+                    ]
+                  }
+                }
+              }
+            ],
+            "description": "Results for decentrally counted (DSO) elections, first election committee session.\nThis contains the data entry values from Model Model N 10-1 and possibly in combination with the values from Model Na 14-1 versie 1."
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/NextSessionResults",
+                "description": "Results for decentrally counted (DSO) elections, any subsequent election committee session.\nThis contains the data entry values from Model Na 14-1 versie 2."
+              },
+              {
+                "type": "object",
+                "required": [
+                  "model"
+                ],
+                "properties": {
+                  "model": {
+                    "type": "string",
+                    "enum": [
+                      "DSONextSession"
+                    ]
+                  }
+                }
+              }
+            ],
+            "description": "Results for decentrally counted (DSO) elections, any subsequent election committee session.\nThis contains the data entry values from Model Na 14-1 versie 2."
+          },
+          {
+            "allOf": [
+              {
                 "$ref": "#/components/schemas/CSOFirstSessionResults",
                 "description": "Results for centrally counted (CSO) elections, first election committee session.\nThis contains the data entry values from Model Na 31-2 Bijlage 1."
               },
@@ -8860,7 +8947,7 @@
           {
             "allOf": [
               {
-                "$ref": "#/components/schemas/CSONextSessionResults",
+                "$ref": "#/components/schemas/NextSessionResults",
                 "description": "Results for centrally counted (CSO) elections, any subsequent election committee session.\nThis contains the data entry values from Model Na 14-2 Bijlage 1."
               },
               {

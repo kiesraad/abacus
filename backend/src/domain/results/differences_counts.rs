@@ -355,7 +355,7 @@ mod tests {
         election::PGNumber,
         results::{
             Results, cso_first_session_results::CSOFirstSessionResults,
-            cso_next_session_results::CSONextSessionResults,
+            next_session_results::NextSessionResults,
             political_group_candidate_votes::PoliticalGroupCandidateVotes,
             political_group_total_votes::PoliticalGroupTotalVotes, voters_counts::VotersCounts,
             votes_counts::VotesCounts,
@@ -729,7 +729,7 @@ mod tests {
     #[test]
     fn test_not_equal_political_group_votes_differences() {
         let mut different_fields = vec![];
-        let first_entry = Results::CSONextSession(CSONextSessionResults {
+        let first_entry = Results::CSONextSession(NextSessionResults {
             voters_counts: VotersCounts {
                 poll_card_count: 103,
                 proxy_certificate_count: 2,

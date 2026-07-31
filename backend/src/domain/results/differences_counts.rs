@@ -24,7 +24,7 @@ pub struct DifferencesCounts {
     #[schema(value_type = u32)]
     pub fewer_ballots_count: Count,
     /// Whether the difference between the total of admitted voters and total of votes cast is explained.
-    /// (B1-3.3.2 "Zijn er tijdens de stemming dingen opgeschreven die het verschil tussen D en H volledig verklaren?")
+    /// (B1-3.3.2 "Zijn er tijdens de stemming dingen opgeschreven die het bovenstaande verschil tussen D en H volledig verklaren?")
     pub difference_completely_accounted_for: YesNo,
 }
 

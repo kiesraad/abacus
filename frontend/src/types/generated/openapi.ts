@@ -861,7 +861,7 @@ export interface DifferencesCounts {
 (B1-3.3.1 "Vergelijk D (totaal toegelaten kiezers) en H (totaal uitgebrachte stemmen)") */
   compare_votes_cast_admitted_voters: DifferenceCountsCompareVotesCastAdmittedVoters;
   /** Whether the difference between the total of admitted voters and total of votes cast is explained.
-(B1-3.3.2 "Zijn er tijdens de stemming dingen opgeschreven die het verschil tussen D en H volledig verklaren?") */
+(B1-3.3.2 "Zijn er tijdens de stemming dingen opgeschreven die het bovenstaande verschil tussen D en H volledig verklaren?") */
   difference_completely_accounted_for: YesNo;
   /** Number of fewer counted ballots ("Aantal minder getelde stemmen (bereken: D min H)") */
   fewer_ballots_count: number;

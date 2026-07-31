@@ -24,6 +24,16 @@
 
 #set heading(numbering: none)
 
+= Bijlage 1
+
+== Verslagen van tellingen van stembureaus
+
+#line(length: 100%)
+
+_De bijlagen worden separaat gepubliceerd bij het betreffende stembureau._
+
+#pagebreak(weak: true)
+
 = Stembureau #input.polling_station.number \ #input.polling_station.name
 
 #line(length: 100%)
@@ -34,17 +44,29 @@ Het stembureau heeft op de dag van de verkiezingen de stemmen per lijst geteld. 
 
 #show: doc => attachment_numbering(doc, "B1")
 
-= Alleen bij extra onderzoek: opmerkingen #location_type
+= Extra onderzoek: opmerkingen #location_type
 
-=== Heeft het #location_type extra onderzoek gedaan vanwege een andere reden dan een onverklaard verschil?
+#emph_block[
+  Het #location_type kan tijdens de zitting nadat zij de telling van het stembureau heeft afgerond, extra onderzoek uitvoeren.
+  Bijvoorbeeld als er sprake is van een opvallend hoog aantal ongeldige of blanco uitgebrachte
+  stemmen. Geef in dit onderdeel aan of, en zo ja, welk extra onderzoek #location_type heeft uitgevoerd.
+]
+
+#block(below: 1em)
+
+Heeft het #location_type *extra* onderzoek gedaan?
 
 #checkbox[Ja]
 #checkbox[Nee]
 
-=== Zijn de stembiljetten naar aanleiding van het extra onderzoek (gedeeltelijk) herteld?
+#block(below: 1em)
+
+Zijn de stembiljetten naar aanleiding van het *extra* onderzoek (gedeeltelijk) herteld?
 
 #checkbox[Ja]
 #checkbox[Nee]
+
+#block(below: 1em)
 
 Licht hieronder toe wat de reden van het extra onderzoek was
 
@@ -56,22 +78,31 @@ Licht hieronder toe wat de reden van het extra onderzoek was
 
 == Aantallen kiezers en stemmen
 
-=== Was er in de telresultaten van het *stembureau* (rubriek 2.3 van het proces-verbaal van het stembureau) een onverklaard verschil tussen het totaal aantal getelde stembiljetten en het aantal toegelaten kiezers?
+#emph_block[
+  Is in de telresultaten van het stembureau (rubriek 2.3 van het proces-verbaal van
+  het stembureau) het verschil tussen het totaal aantal getelde stemmen en het aantal
+  toegelaten kiezers volledig verklaard? Controleer daarbij ook of rubriek 2.3 van het
+  proces-verbaal van het stembureau correct is ingevuld en de verklaringen het verschil
+  daadwerkelijk verklaren.
+]
 
-#checkbox[Ja #sym.arrow.r *Hertel het aantal toegelaten kiezers (#is_local_election[stempassen en volmachten][stempassen, kiezerspassen en volmachten])*, en noteer de uitkomsten bij rubriek 3.1]
-#checkbox[Nee]
+#checkbox[Ja]
+#checkbox[*Nee #sym.arrow.r Hertel het aantal toegelaten kiezers (#is_local_election[stempassen en volmachten][stempassen, kiezerspassen en volmachten])*, en noteer de uitkomsten bij rubriek 3.1]
 
 == Tel de stembiljetten
 
 #emph_block[
-  Tel nu de stembiljetten per kandidaat en noteer de uitkomsten bij rubrieken 3.2 en 3.5 van deze bijlage.
+  Tel nu de stembiljetten per kandidaat en noteer de uitkomsten bij rubrieken *3.2* en *3.5* van deze bijlage.
 ]
 
 == Tellingen op lijstniveau
 
-=== Is er een verschil tussen het totaal aantal getelde stemmen (vak H van rubriek 2.2) zoals eerder vastgesteld door het *stembureau* en zoals door u geteld op het *#location_type*?
+#emph_block[
+  Is er een verschil tussen het totaal aantal getelde stemmen zoals eerder vastgesteld
+  door het #underline[*stembureau*] (vak H van rubriek 2.2) en zoals door u geteld op het #underline[*#location_type*] (vak H van rubriek 3.2)?
+]
 
-#checkbox[Ja #sym.arrow.r *Hertel het aantal toegelaten kiezers (tenzij dat bij de vorige vraag al gedaan is)*, en noteer de uitkomsten bij rubriek 3.1]
+#checkbox[Ja #sym.arrow.r *Hertel het aantal toegelaten kiezers (tenzij dat bij de vraag 2.1 al gedaan is)*, en vul de resultaten in rubriek 3.1]
 #checkbox[Nee]
 
 #pagebreak(weak: true)
@@ -109,20 +140,23 @@ Licht hieronder toe wat de reden van het extra onderzoek was
 
 == Toegelaten kiezers <admitted_voters>
 
-=== Heeft het #location_type het aantal toegelaten kiezers opnieuw geteld? Schrijf dan die aantallen op. Neem anders de aantallen over die het stembureau heeft opgeschreven in het proces-verbaal.
+#emph_block[
+  Heeft het #location_type het aantal toegelaten kiezers opnieuw geteld? Schrijf dan die aantallen op. Neem anders de aantallen over die het stembureau heeft opgeschreven in het proces-verbaal.
+]
 
 #is_local_election[
   #sum(
-    empty_letterbox("A")[Stempassen], 
-    empty_letterbox("B")[Volmachtbewijzen], 
-    empty_letterbox("D", light: false)[Totaal toegelaten kiezers (A+B)],
+    empty_letterbox("A")[Stempassen],
+    empty_letterbox("B")[Volmachtbewijzen (schriftelijk of via ingevulde achterkant stempas)],
+    no_entry_letterbox("C")[Kiezerspassen (niet van toepassing bij gemeente- en eilandraadsverkiezingen)],
+    empty_letterbox("D", light: false)[*Totaal toegelaten kiezers (A+B)*],
   )
 ][
   #sum(
     empty_letterbox("A")[Stempassen],
-    empty_letterbox("B")[Volmachtbewijzen],
+    empty_letterbox("B")[Volmachtbewijzen (schriftelijk of via ingevulde achterkant stempas of kiezerspas)],
     empty_letterbox("C")[Kiezerspassen],
-    empty_letterbox("D", light: false)[Totaal toegelaten kiezers (A+B+C)],
+    empty_letterbox("D", light: false)[*Totaal toegelaten kiezers (A+B+C)*],
   )
 ]
 
@@ -156,34 +190,36 @@ Licht hieronder toe wat de reden van het extra onderzoek was
 
 === Vergelijk D (totaal toegelaten kiezers) en H (totaal uitgebrachte stemmen)
 
-#checkbox[D en H zijn gelijk #sym.arrow.r Ga door naar #ref(<polling_station_declaration>)]
+#checkbox[D en H zijn *gelijk* #sym.arrow.r *Ga door naar #ref(<polling_station_declaration>)*]
 
-#checkbox[H is groter is dan D (meer uitgebrachte stemmen dan toegelaten kiezers)]
+#checkbox[H is *groter* dan D (meer uitgebrachte stemmen dan toegelaten kiezers)]
 
 #box(inset: (left: 3em, bottom: 1em), empty_letterbox(
   "I",
   cells: 3,
   light: false,
-)[Aantal méér getelde stemmen (bereken: H min D)])
+)[Aantal méér getelde stemmen (bereken: H _min_ D)])
 
-#checkbox[H is kleiner dan D (minder uitgebrachte stemmen dan toegelaten kiezers)]
+#checkbox[H is *kleiner* dan D (minder uitgebrachte stemmen dan toegelaten kiezers)]
 
 #box(inset: (left: 3em, bottom: 1em), empty_letterbox(
   "J",
   cells: 3,
   light: false,
-)[Aantal minder getelde stemmen (bereken: D min H)])
+)[Aantal minder getelde stemmen (bereken: D _min_ H)])
 
-=== Zijn er tijdens de stemming dingen opgeschreven die het verschil tussen D en H *volledig* verklaren?
+=== Zijn er tijdens de stemming dingen opgeschreven die het bovenstaande verschil tussen D en H *volledig* verklaren?
 
-_(Gebruik het proces-verbaal van het stembureau #sym.arrow.r Tijdens de stemming, vraag 1.2.2)_
+(Gebruik het proces-verbaal van het stembureau #sym.arrow.r *Tijdens de stemming, vraag 1.2.2*)
 
 #checkbox[Ja]
 #checkbox[Nee, er is een onverklaard verschil #sym.arrow.r Hertel het aantal toegelaten kiezers (tenzij dat bij rubriek 2 al gedaan is) en noteer dit bij #ref(<admitted_voters>)]
 
 == Verklaringen vanuit het stembureau <polling_station_declaration>
 
-=== Neem de verklaringen over die in het *proces-verbaal van het stembureau bij vraag 1.2.2* staan. Ook als er nu geen telverschil meer is of als het telverschil kleiner is.
+#emph_block[
+  Neem de verklaringen over die in het *proces-verbaal van het stembureau bij vraag 1.2.2* staan. Ook als er nu geen telverschil meer is of als het telverschil kleiner is.
+]
 
 #empty_lines(12)
 

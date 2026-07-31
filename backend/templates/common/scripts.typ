@@ -257,6 +257,32 @@
   )
 }
 
+/// Like empty_letterbox, but replaces the digit entry area (and the original
+/// value area when `with_original: true`) with a single merged cell containing
+/// "Niet invullen".
+#let no_entry_letterbox(letter, cells: 5, with_original: false, content) = {
+  let stroke = 0.5pt + black
+  let no_entry_cell = grid.cell(align: center + horizon, stroke: stroke, [Niet invullen])
+
+  // Note: `wide_cells` is not needed for `no_entry_letterbox` atm.
+  let entry_width = cells * 2em
+  let columns = if with_original {
+    (entry_width, entry_width, 3.5em, 1fr)
+  } else {
+    (entry_width, 3.5em, 1fr)
+  }
+
+  grid(
+    inset: 9pt,
+    columns: columns,
+    align: (center, right),
+    ..cell_if(with_original, no_entry_cell),
+    no_entry_cell,
+    grid.cell(stroke: stroke, align: center + horizon, fill: luma(213), text(weight: "bold", letter)),
+    grid.cell(align: horizon + left, content),
+  )
+}
+
 /// Display a box with a prefixed label and a value
 #let letterbox(letter, original_value: none, value: none, light: true, bold_top_border: false, wide_cells: true, content) = {
   empty_letterbox(

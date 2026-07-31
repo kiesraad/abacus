@@ -1,10 +1,10 @@
 {
   "election": {
     "id": 2,
-    "name": "Waterschap Rivierenland 2022",
+    "name": "Waterschap Rivier en Polder 2022",
     "committee_category": "GSB",
     "counting_method": "CSO",
-    "election_id": "WS2022_Eemstricht",
+    "election_id": "AB2022_Eemstricht",
     "location": "Eemstricht",
     "domain_id": "0445",
     "category": "WaterAuthority",

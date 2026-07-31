@@ -25,9 +25,23 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_json_matches_struct() {
-        let reader = BufReader::new(File::open("templates/inputs/model-n-10-2.json").unwrap());
+    fn test_json_variations_match_struct() {
+        let mut reader = BufReader::new(
+            File::open("templates/inputs/model-n-10-2-variations/model-n-10-2-GR.json").unwrap(),
+        );
         serde_json::from_reader::<_, ModelN10_2Input>(reader)
-            .expect("model-n-10-2.json should deserialize to struct ModelN10_2Input");
+            .expect("model-n-10-2-GR.json should deserialize to struct ModelN10_2Input");
+
+        reader = BufReader::new(
+            File::open("templates/inputs/model-n-10-2-variations/model-n-10-2-PS.json").unwrap(),
+        );
+        serde_json::from_reader::<_, ModelN10_2Input>(reader)
+            .expect("model-n-10-2-PS.json should deserialize to struct ModelN10_2Input");
+
+        reader = BufReader::new(
+            File::open("templates/inputs/model-n-10-2-variations/model-n-10-2-WS.json").unwrap(),
+        );
+        serde_json::from_reader::<_, ModelN10_2Input>(reader)
+            .expect("model-n-10-2-WS.json should deserialize to struct ModelN10_2Input");
     }
 }

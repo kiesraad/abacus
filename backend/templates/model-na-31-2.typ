@@ -308,4 +308,4 @@ Voer de controle uit volgens de stappen in het controleprotocol.
 
 #pagebreak(weak: true)
 
-#stack(spacing: 0.5em, ..range(0, 12).map(_ => textbox[Naam:][Handtekening:]))
+#stack(spacing: 0.5em, ..range(0, 11).map(_ => textbox[Naam:][Handtekening:]))

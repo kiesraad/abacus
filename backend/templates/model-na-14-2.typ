@@ -77,7 +77,7 @@ vastgesteld.
 
 #if not is_local_election(true, false) and "voter_card_count" in input.summary.voters_counts [
   Het totaal van alle getelde geldige stempassen, kiezerspassen en volmachtbewijzen.
-  
+
   #sum(
     with_correction_title: true,
     letterbox("A", original_value: input.previous_summary.voters_counts.poll_card_count, value: input.summary.voters_counts.poll_card_count, bold_top_border: true, wide_cells: true)[Stempassen],
@@ -89,7 +89,7 @@ vastgesteld.
   )
 ] else [
   Het totaal van alle getelde geldige stempassen en volmachtbewijzen.
-  
+
   #sum(
     with_correction_title: true,
     letterbox("A", original_value: input.previous_summary.voters_counts.poll_card_count, value: input.summary.voters_counts.poll_card_count, bold_top_border: true, wide_cells: true)[Stempassen],
@@ -209,4 +209,4 @@ ingevuld te worden in de kolom ‘gecorrigeerd'. Onder ‘oorspronkelijk’ staa
 
 #pagebreak(weak: true)
 
-#stack(spacing: 0.5em, ..range(0, 12).map(_ => textbox[Naam:][Handtekening:]))
+#stack(spacing: 0.5em, ..range(0, 11).map(_ => textbox[Naam:][Handtekening:]))

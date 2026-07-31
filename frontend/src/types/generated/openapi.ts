@@ -403,6 +403,18 @@ export type USER_DELETE_REQUEST_PATH = `/api/users/${UserId}`;
 
 /** TYPES **/
 
+/**
+ * Information about the report ("Over het proces-verbaal")
+ */
+export interface AboutReport {
+  /** Whether the extra page "controles en correcties" is inserted in the report
+("Is voorin het proces-verbaal de extra pagina controles en correcties ingevoegd?") */
+  checks_and_corrections_present: null | ChecksAndCorrectionsPresent;
+  /** Whether a corrigendum accompanies the report
+("Is er een corrigendum bij het papieren proces-verbaal aanwezig?") */
+  corrigendum_present: null | CorrigendumPresent;
+}
+
 export interface AbsoluteMajorityDrawingLots {
   /** The list where the reassigned residual seat will go to */
   assign_to: PGNumber;
@@ -644,6 +656,29 @@ export interface CandidateVotes {
 }
 
 /**
+ * Checks and corrections ("Controles en correcties")
+ */
+export interface ChecksAndCorrections {
+  /** Whether investigation at the request of the central electoral committee
+has led to corrected results
+("Op verzoek van het centraal stembureau: Zijn er gecorrigeerde telresultaten?") */
+  corrected_results_csb_request: YesNo;
+  /** Whether the investigation on its own initiative has led to corrected results
+("Op eigen initiatief van het gemeentelijk stembureau: Zijn er gecorrigeerde telresultaten?") */
+  corrected_results_own_initiative: YesNo;
+  /** Why the GSB investigated the counting results on its own initiative
+("Op eigen initiatief van het gemeentelijk stembureau: Waarom heeft het gemeentelijk stembureau
+ de telresultaten onderzocht?") */
+  reason_investigation_own_initiative: ReasonInvestigationOwnInitiative;
+}
+
+/**
+ * Whether the extra page "controles en correcties" is inserted in the report
+ */
+export const checksAndCorrectionsPresentValues = ["PagePresent", "PageMissing"] as const;
+export type ChecksAndCorrectionsPresent = (typeof checksAndCorrectionsPresentValues)[number];
+
+/**
  * Chosen candidate
  */
 export interface ChosenCandidate {
@@ -730,6 +765,12 @@ export interface CommonPollingStationResults {
 }
 
 /**
+ * Whether a corrigendum accompanies the report
+ */
+export const corrigendumPresentValues = ["TwoDocuments", "OneDocument"] as const;
+export type CorrigendumPresent = (typeof corrigendumPresentValues)[number];
+
+/**
  * Counting Differences Polling Station,
  * part of the results ("B1-2 Verschillen met telresultaten van het stembureau")
  */
@@ -767,12 +808,12 @@ export interface Credentials {
  * [kiesraad](https://www.kiesraad.nl/documenten/2025/11/27/n-10-1-pv-sb-dso)
  */
 export interface DSOFirstSessionResults {
-  /** Counting Differences Polling Station ("B1-2 Verschillen met telresultaten van het stembureau") */
-  counting_differences_polling_station: CountingDifferencesPollingStation;
+  /** About report ("Over het proces-verbaal") */
+  about_report: AboutReport;
+  /** Checks and corrections ("Controles en correcties") */
+  checks_and_corrections: ChecksAndCorrections;
   /** Differences counts ("3. Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten") */
   differences_counts: DifferencesCounts;
-  /** Extra investigation ("B1-1 Alleen bij extra onderzoek") */
-  extra_investigation: ExtraInvestigation;
   /** Vote counts per list and candidate (5. "Aantal stemmen per lijst en kandidaat") */
   political_group_votes: PoliticalGroupCandidateVotes[];
   /** Voters counts ("1. Aantal toegelaten kiezers") */
@@ -1531,6 +1572,18 @@ export type ProcessApportionmentResponse =
   | { election_summary: ElectionSummary; seat_assignment: SeatAssignment; status: "DrawingLotsRequired" };
 
 export type RandomRange = string;
+
+/**
+ * Reason for investigation on own initiative
+ */
+export interface ReasonInvestigationOwnInitiative {
+  /** Because of a (suspected) other error
+("Vanwege (het vermoeden van) een andere fout") */
+  other_error: boolean;
+  /** Because of an unaccounted-for difference
+("Vanwege een onverklaard verschil") */
+  unaccounted_difference: boolean;
+}
 
 export interface RedactedEmlHash {
   /** Array holding the hash chunks as text */

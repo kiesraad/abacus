@@ -1017,7 +1017,7 @@ mod tests {
     use crate::domain::{
         committee_session::{CommitteeSessionId, committee_session_fixture},
         data_entry::{DataEntryId, DataEntrySource},
-        election::tests::election_fixture,
+        election::{ElectionCategory, tests::election_fixture},
         polling_station::{
             PollingStationFirstSession, PollingStationForSession,
             test_helpers::polling_stations_fixture,
@@ -1077,7 +1077,7 @@ mod tests {
 
     #[test]
     fn test_as_count_eml_csb() {
-        let election = election_fixture(CommitteeCategory::CSB, &[0]);
+        let election = election_fixture(ElectionCategory::Municipal, CommitteeCategory::CSB, &[0]);
         let committee_session = committee_session_fixture(election.id);
         let summary = ElectionSummary::from_results(&election, &[]).unwrap();
 
@@ -1098,7 +1098,7 @@ mod tests {
 
     #[test]
     fn test_as_count_eml_gsb() {
-        let election = election_fixture(CommitteeCategory::GSB, &[0]);
+        let election = election_fixture(ElectionCategory::Municipal, CommitteeCategory::GSB, &[0]);
         let committee_session = committee_session_fixture(election.id);
         let summary = ElectionSummary::from_results(&election, &[]).unwrap();
 
@@ -1119,7 +1119,7 @@ mod tests {
 
     #[test]
     fn test_as_eml_result() {
-        let election = election_fixture(CommitteeCategory::CSB, &[2]);
+        let election = election_fixture(ElectionCategory::Municipal, CommitteeCategory::CSB, &[2]);
         let cv1 = CandidateVotes {
             number: CandidateNumber::from(1),
             votes: 400,
@@ -1187,7 +1187,8 @@ mod tests {
     #[test]
     fn test_as_eml_count_contest() {
         // Default number_of_voters=1000
-        let mut election = election_fixture(CommitteeCategory::CSB, &[2]);
+        let mut election =
+            election_fixture(ElectionCategory::Municipal, CommitteeCategory::CSB, &[2]);
         let committee_session = committee_session_fixture(election.id);
         let mut summary = ElectionSummary::from_results(&election, &[]).unwrap();
 
@@ -1240,7 +1241,7 @@ mod tests {
 
     #[test]
     fn test_as_eml_count_contest_with_voter_cards() {
-        let election = election_fixture(CommitteeCategory::GSB, &[2]);
+        let election = election_fixture(ElectionCategory::Municipal, CommitteeCategory::GSB, &[2]);
         let committee_session = committee_session_fixture(election.id);
         let mut summary = ElectionSummary::from_results(&election, &[]).unwrap();
         summary.voters_counts.voter_card_count = Some(42);

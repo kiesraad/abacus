@@ -237,9 +237,7 @@ mod tests {
             total_admitted_voters_count,
         };
 
-        let mut election = election_fixture(committee_category, &[]);
-        election.category = election_category;
-
+        let election = election_fixture(election_category, committee_category, &[]);
         voters_counts.validate(&election, &"voters_counts".into())
     }
 

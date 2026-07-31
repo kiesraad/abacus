@@ -379,7 +379,7 @@ mod tests {
         data_entry::DataEntryId,
         election::{
             CommitteeCategory::{self, *},
-            PGNumber,
+            ElectionCategory, PGNumber,
             tests::election_fixture,
         },
         polling_station::{
@@ -596,7 +596,7 @@ mod tests {
 
     #[test]
     fn test_political_group_counting() {
-        let election = election_fixture(GSB, &[2, 3]);
+        let election = election_fixture(ElectionCategory::Municipal, GSB, &[2, 3]);
         let ps = polling_stations_fixture(&[20, 20]);
         let results = vec![
             (test_ps_to_source(ps[0].clone()), results_fixture_a()),
@@ -656,7 +656,7 @@ mod tests {
 
     #[test]
     fn test_adding_zero_polling_stations() {
-        let election = election_fixture(GSB, &[10, 20, 18]);
+        let election = election_fixture(ElectionCategory::Municipal, GSB, &[10, 20, 18]);
         let totals = ElectionSummary::from_results(&election, &[]).unwrap();
         assert_eq!(totals.voters_counts.total_admitted_voters_count, 0);
         assert_eq!(totals.votes_counts.total_votes_cast_count, 0);
@@ -664,7 +664,7 @@ mod tests {
 
     #[test]
     fn test_adding_many_polling_stations() {
-        let election = election_fixture(GSB, &[2, 3]);
+        let election = election_fixture(ElectionCategory::Municipal, GSB, &[2, 3]);
         let ps = polling_stations_fixture(&[20; 600]);
         let results_ps = results_fixture_a();
         let results = ps
@@ -685,7 +685,7 @@ mod tests {
     #[test]
     #[should_panic]
     fn test_too_high_polling_station_numbers() {
-        let election = election_fixture(GSB, &[2, 3]);
+        let election = election_fixture(ElectionCategory::Municipal, GSB, &[2, 3]);
         let ps = polling_stations_fixture(&[20; 5]);
         let mut ps_results = results_fixture_a();
         ps_results.political_group_votes_mut()[0].total = 999_999_998;
@@ -725,7 +725,7 @@ mod tests {
 
     #[test]
     fn test_invalid_polling_station_data_does_not_add() {
-        let election = election_fixture(GSB, &[2, 3]);
+        let election = election_fixture(ElectionCategory::Municipal, GSB, &[2, 3]);
         let ps = polling_stations_fixture(&[20, 20]);
         let ps_results = results_fixture_a();
         let mut ps_results2 = ps_results.clone();
@@ -744,7 +744,7 @@ mod tests {
 
     #[test]
     fn test_repeated_polling_stations() {
-        let election = election_fixture(GSB, &[2, 3]);
+        let election = election_fixture(ElectionCategory::Municipal, GSB, &[2, 3]);
         let ps = polling_stations_fixture(&[20, 20]);
         let totals = ElectionSummary::from_results(
             &election,
@@ -760,7 +760,7 @@ mod tests {
 
     #[test]
     fn test_missing_votes_count_political_groups_total() {
-        let election = election_fixture(GSB, &[2, 3]);
+        let election = election_fixture(ElectionCategory::Municipal, GSB, &[2, 3]);
         let ps = polling_stations_fixture(&[20, 20]);
         let ps1_result = results_fixture_a();
         let mut ps2_result = results_fixture_b();
@@ -781,7 +781,7 @@ mod tests {
 
     #[test]
     fn test_too_many_votes_count_political_groups_total() {
-        let election = election_fixture(GSB, &[2, 3]);
+        let election = election_fixture(ElectionCategory::Municipal, GSB, &[2, 3]);
         let ps = polling_stations_fixture(&[20, 20]);
         let ps1_result = results_fixture_a();
         let mut ps2_result = results_fixture_b();
@@ -805,7 +805,7 @@ mod tests {
 
     #[test]
     fn test_duplicate_votes_count_political_groups_total() {
-        let election = election_fixture(GSB, &[2, 3]);
+        let election = election_fixture(ElectionCategory::Municipal, GSB, &[2, 3]);
         let ps = polling_stations_fixture(&[20, 20]);
         let ps1_result = results_fixture_a();
         let mut ps2_result = results_fixture_b();
@@ -827,7 +827,7 @@ mod tests {
 
     #[test]
     fn test_invalid_votes_count_political_group_total() {
-        let election = election_fixture(GSB, &[2, 3]);
+        let election = election_fixture(ElectionCategory::Municipal, GSB, &[2, 3]);
         let ps = polling_stations_fixture(&[20, 20]);
         let ps1_result = results_fixture_a();
         let mut ps2_result = results_fixture_b();
@@ -848,7 +848,7 @@ mod tests {
 
     #[test]
     fn test_missing_political_groups() {
-        let election = election_fixture(GSB, &[2, 3]);
+        let election = election_fixture(ElectionCategory::Municipal, GSB, &[2, 3]);
         let ps = polling_stations_fixture(&[20, 20]);
         let ps1_result = results_fixture_a();
         let mut ps2_result = results_fixture_b();
@@ -866,7 +866,7 @@ mod tests {
 
     #[test]
     fn test_too_many_political_groups() {
-        let election = election_fixture(GSB, &[2, 3]);
+        let election = election_fixture(ElectionCategory::Municipal, GSB, &[2, 3]);
         let ps = polling_stations_fixture(&[20, 20]);
         let ps1_result = results_fixture_a();
         let mut ps2_result = results_fixture_b();
@@ -886,7 +886,7 @@ mod tests {
 
     #[test]
     fn test_duplicate_political_group() {
-        let election = election_fixture(GSB, &[2, 3]);
+        let election = election_fixture(ElectionCategory::Municipal, GSB, &[2, 3]);
         let ps = polling_stations_fixture(&[20, 20]);
         let mut ps1_result = results_fixture_a();
         let ps1_pgvote_copy = ps1_result.political_group_votes()[1].clone();
@@ -907,7 +907,7 @@ mod tests {
 
     #[test]
     fn test_invalid_political_group() {
-        let election = election_fixture(GSB, &[2, 3]);
+        let election = election_fixture(ElectionCategory::Municipal, GSB, &[2, 3]);
         let ps = polling_stations_fixture(&[20, 20]);
         let ps1_result = results_fixture_a();
         let mut ps2_result = results_fixture_b();
@@ -926,7 +926,7 @@ mod tests {
 
     #[test]
     fn test_invalid_number_of_candidates() {
-        let election = election_fixture(GSB, &[2, 3]);
+        let election = election_fixture(ElectionCategory::Municipal, GSB, &[2, 3]);
         let ps = polling_stations_fixture(&[20, 20]);
         let ps1_result = results_fixture_a();
         let mut ps2_result = results_fixture_b();
@@ -946,7 +946,7 @@ mod tests {
 
     #[test]
     fn test_investigation() {
-        let election = election_fixture(GSB, &[2, 3]);
+        let election = election_fixture(ElectionCategory::Municipal, GSB, &[2, 3]);
         let ps = polling_stations_fixture(&[20, 20]);
         let ps1_result = results_fixture_a();
         let ps2_result = results_fixture_b();
@@ -966,7 +966,7 @@ mod tests {
 
     #[test]
     fn test_gsb_number_of_voters() {
-        let election = election_fixture(CSB, &[2, 3]);
+        let election = election_fixture(ElectionCategory::Municipal, CSB, &[2, 3]);
         let gsb1_result = gsb_results_fixture_a();
         let gsb2_result = gsb_results_fixture_b();
 

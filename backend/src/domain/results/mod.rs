@@ -19,6 +19,8 @@ use crate::domain::{
     validate::{DataError, Validate, ValidateRoot, ValidationResults},
 };
 
+pub mod about_report;
+pub mod checks_and_corrections;
 pub mod common_polling_station_results;
 pub mod common_validation;
 pub mod count;
@@ -531,9 +533,7 @@ pub mod tests {
 
         for (category, expected_voter_card_count) in cases {
             for committee_category in [CommitteeCategory::GSB, CommitteeCategory::CSB] {
-                let mut election = election_fixture(committee_category, &[2]);
-                election.category = category;
-
+                let election = election_fixture(category, committee_category, &[2]);
                 let results = Results::new(&election, &first_session, None);
 
                 assert_eq!(
@@ -547,8 +547,7 @@ pub mod tests {
 
     #[test]
     fn test_initial_voter_card_count_next_session() {
-        let mut election = election_fixture(CommitteeCategory::GSB, &[2]);
-        election.category = ElectionCategory::Provincial;
+        let election = election_fixture(ElectionCategory::Provincial, CommitteeCategory::GSB, &[2]);
         let mut previous_results = CSOFirstSessionResults::empty(&election).as_common();
         previous_results.voters_counts.voter_card_count = Some(5);
 

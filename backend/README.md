@@ -61,14 +61,12 @@ sqlx database setup
 cargo run --features memory-serve
 ```
 
-By default (for compilation efficiency) Abacus will use Typst from a Rust dylib.
-Rust dylibs are not stable, so should not be used in production. If you want to
-switch to the statically linked Typst (as is done with production builds of
-Abacus) you can simply enable the `embed-typst` feature. This can be combined 
-with the memory-serve feature as well, e.g.:
+PDF generation uses a statically linked Typst, enabled by the `embed-typst` feature. That feature is part of the default
+feature set. If you build with `--no-default-features` you have to enable it explicitly, otherwise `generate_pdf` is
+unimplemented and PDF generation is unavailable. It can be combined with the memory-serve feature, e.g.:
 
 ```shell
-cargo build --features memory-serve,embed-typst
+cargo build --no-default-features --features memory-serve,embed-typst
 ```
 
 ### Linting

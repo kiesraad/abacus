@@ -409,6 +409,7 @@ pub(crate) mod tests {
     /// The number of political groups is the length of the `political_groups_candidates` slice.
     /// The number of candidates in each political group is equal to the value in the slice at that index.
     pub fn election_fixture_with_given_number_of_seats(
+        election_category: ElectionCategory,
         committee_category: CommitteeCategory,
         political_groups_candidates: &[u32],
         number_of_seats: u32,
@@ -421,7 +422,7 @@ pub(crate) mod tests {
             election_id: "GR2023_Test".to_string(),
             location: "Test".to_string(),
             domain_id: "0000".to_string(),
-            category: ElectionCategory::Municipal,
+            category: election_category,
             sub_category: if number_of_seats < 19 {
                 ElectionSubCategory::GR1
             } else {
@@ -439,10 +440,12 @@ pub(crate) mod tests {
     /// The number of political groups is the length of the `political_groups_candidates` slice.
     /// The number of candidates in each political group is equal to the value in the slice at that index.
     pub fn election_fixture(
+        election_category: ElectionCategory,
         committee_category: CommitteeCategory,
         political_groups_candidates: &[u32],
     ) -> ElectionWithPoliticalGroups {
         election_fixture_with_given_number_of_seats(
+            election_category,
             committee_category,
             political_groups_candidates,
             29,

@@ -66,7 +66,7 @@ De volgende rollen zijn mogelijk: voorzitter, plaatsvervangend voorzitter of lid
 
 #empty_table(
   columns: (8em, 1fr, 1fr, 1fr, 8em),
-  headers: ("Voorletters", "Achternaam", "Rol", "Aanwezig (van - tot)", "Locatie"),
+  headers: ("Voorletters", "Achternaam", "Rol", "Aanwezig van - tot", "Locatie"),
   values: ("", "", "", "-", ""),
   rows: 24,
 )

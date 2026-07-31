@@ -186,7 +186,7 @@ pub struct ElectionNumberOfVotersChangeRequest {
     Hash,
     Type,
 )]
-#[strum(serialize_all = "lowercase")]
+#[strum(serialize_all = "lowercase", ascii_case_insensitive)]
 pub enum ElectionCategory {
     /// Gemeenteraadsverkiezing
     Municipal,
@@ -293,7 +293,7 @@ pub enum CommitteeCategory {
     Hash,
     Type,
 )]
-#[strum(serialize_all = "lowercase")]
+#[strum(serialize_all = "lowercase", ascii_case_insensitive)]
 pub enum VoteCountingMethod {
     /// centralized vote counting method
     CSO,

@@ -35,7 +35,7 @@ struct Args {
     #[arg(value_enum)]
     election_category: ElectionCategory,
 
-    /// The vote counting method
+    /// The vote counting method (required for GSB, if not provided uses default: CSO)
     #[arg(short, long, value_enum)]
     counting_method: Option<VoteCountingMethod>,
 

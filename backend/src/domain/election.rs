@@ -213,6 +213,8 @@ impl ElectionCategory {
         }
     }
 
+    /// Get the sub category for test elections, only available for tests and test data generation
+    #[cfg(any(test, feature = "dev-database"))]
     pub fn sub_category(&self, number_of_seats: u32) -> ElectionSubCategory {
         match self {
             ElectionCategory::Municipal => {

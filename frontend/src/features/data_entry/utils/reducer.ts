@@ -1,9 +1,16 @@
 import { assertStateIsLoaded } from "@/features/data_entry/utils/utils";
 import type { DataEntryId, ElectionWithPoliticalGroups } from "@/types/generated/openapi";
+import type { FormSectionId } from "@/types/types";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
-import type { ClientState, DataEntryAction, DataEntryState, EntryNumber } from "../types/types";
-import { buildFormState, getInitialFormState, getNextSectionID, updateFormStateAfterSubmit } from "./dataEntryUtils";
+import type { ClientState, DataEntryAction, DataEntryState, EntryNumber, FormState } from "../types/types";
+import {
+  buildCorrectionFormState,
+  buildFormState,
+  getInitialFormState,
+  getNextSectionID,
+  updateFormStateAfterSubmit,
+} from "./dataEntryUtils";
 
 export function getInitialState(
   election: ElectionWithPoliticalGroups,
@@ -33,41 +40,42 @@ export default function dataEntryReducer(state: DataEntryState, action: DataEntr
     case "DATA_ENTRY_CLAIMED": {
       const model = action.dataEntry.data.model;
       const dataEntryStructure = getDataEntryStructure(model, state.election);
+
+      let formState: FormState;
+      let targetFormSectionId: FormSectionId | undefined;
       if (action.dataEntry.client_state) {
-        const { formState, targetFormSectionId } = buildFormState(
+        ({ formState, targetFormSectionId } = buildFormState(
           // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
           action.dataEntry.client_state as ClientState,
           action.dataEntry.validation_results,
           dataEntryStructure,
-        );
-        return {
-          ...state,
+        ));
+      } else if (action.dataEntry.is_correction) {
+        // an entry that was returned for correction and has no client state left to restore
+        ({ formState, targetFormSectionId } = buildCorrectionFormState(
+          action.dataEntry.validation_results,
           dataEntryStructure,
-          formState,
-          targetFormSectionId,
-          previousResults: action.dataEntry.previous_results ?? null,
-          results: action.dataEntry.data,
-          source: action.dataEntry.source,
-          dataEntryStatus: action.dataEntry.status,
-          error: null,
-        };
+        ));
       } else {
-        const targetFormSectionId = dataEntryStructure[0]?.id;
-        if (targetFormSectionId === undefined) {
-          throw new Error("Cannot determine initial section from dataEntryStructure");
-        }
-        return {
-          ...state,
-          dataEntryStructure,
-          formState: getInitialFormState(dataEntryStructure),
-          targetFormSectionId,
-          previousResults: action.dataEntry.previous_results ?? null,
-          results: action.dataEntry.data,
-          source: action.dataEntry.source,
-          dataEntryStatus: action.dataEntry.status,
-          error: null,
-        };
+        formState = getInitialFormState(dataEntryStructure);
+        targetFormSectionId = dataEntryStructure[0]?.id;
       }
+
+      if (targetFormSectionId === undefined) {
+        throw new Error("Cannot determine initial section from dataEntryStructure");
+      }
+
+      return {
+        ...state,
+        dataEntryStructure,
+        formState,
+        targetFormSectionId,
+        previousResults: action.dataEntry.previous_results ?? null,
+        results: action.dataEntry.data,
+        source: action.dataEntry.source,
+        dataEntryStatus: action.dataEntry.status,
+        error: null,
+      };
     }
     case "DATA_ENTRY_CLAIM_FAILED":
       return {

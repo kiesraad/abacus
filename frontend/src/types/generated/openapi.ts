@@ -683,6 +683,8 @@ export interface ChosenCandidate {
 export interface ClaimDataEntryResponse {
   client_state: unknown;
   data: Results;
+  /** Whether the typist is correcting an entry that was completed before */
+  is_correction: boolean;
   previous_results?: CommonPollingStationResults;
   source: DataEntrySource;
   status: DataEntryStatusName;

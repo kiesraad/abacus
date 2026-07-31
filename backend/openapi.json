@@ -5391,14 +5391,32 @@
       "AboutReport": {
         "type": "object",
         "description": "Information about the report (\"Over het proces-verbaal\")",
+        "required": [
+          "corrigendum_present",
+          "checks_and_corrections_present"
+        ],
         "properties": {
           "checks_and_corrections_present": {
-            "$ref": "#/components/schemas/ChecksAndCorrectionsPresent",
-            "description": "Whether the extra page \"controles en correcties\" is inserted in the report\n(\"Is voorin het proces-verbaal de extra pagina controles en correcties ingevoegd?\")"
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ChecksAndCorrectionsPresent",
+                "description": "Whether the extra page \"controles en correcties\" is inserted in the report\n(\"Is voorin het proces-verbaal de extra pagina controles en correcties ingevoegd?\")"
+              }
+            ]
           },
           "corrigendum_present": {
-            "$ref": "#/components/schemas/CorrigendumPresent",
-            "description": "Whether a corrigendum accompanies the report\n(\"Is er een corrigendum bij het papieren proces-verbaal aanwezig?\")"
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/CorrigendumPresent",
+                "description": "Whether a corrigendum accompanies the report\n(\"Is er een corrigendum bij het papieren proces-verbaal aanwezig?\")"
+              }
+            ]
           }
         },
         "additionalProperties": false

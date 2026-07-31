@@ -409,10 +409,10 @@ export type USER_DELETE_REQUEST_PATH = `/api/users/${UserId}`;
 export interface AboutReport {
   /** Whether the extra page "controles en correcties" is inserted in the report
 ("Is voorin het proces-verbaal de extra pagina controles en correcties ingevoegd?") */
-  checks_and_corrections_present?: ChecksAndCorrectionsPresent;
+  checks_and_corrections_present: null | ChecksAndCorrectionsPresent;
   /** Whether a corrigendum accompanies the report
 ("Is er een corrigendum bij het papieren proces-verbaal aanwezig?") */
-  corrigendum_present?: CorrigendumPresent;
+  corrigendum_present: null | CorrigendumPresent;
 }
 
 export interface AbsoluteMajorityDrawingLots {

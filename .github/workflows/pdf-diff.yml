@@ -3,12 +3,21 @@ name: Track PDF model changes
 on:
   workflow_dispatch:
   pull_request:
+  # Run on pushes to main and release branches to populate cache
+  push:
+    branches:
+      - main
+      - release-*
 
 permissions:
   contents: read
 
 env:
   TZ: "Europe/Amsterdam"
+
+concurrency:
+  group: pdf-diff-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   diff:
@@ -32,19 +41,27 @@ jobs:
         uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4 # v2
         with:
           workspaces: "backend -> target"
+          # Save cache only for main and release branches to prevent cache thrashing
+          save-if: ${{ github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/release-') }}
       - name: Generate PDFs
         run: cargo run --bin gen-pdf --features embed-typst -- --directory base
+      # PDF diffing steps are skipped for push events: base and head are the same commit
       - name: Switch to current branch
+        if: github.event_name != 'push'
         uses: actions/checkout@v7.0.1
         with:
           clean: false
       - name: Setup Rust for current branch
+        if: github.event_name != 'push'
         run: rustup toolchain install
       - name: Generate PDFs on the current branch
+        if: github.event_name != 'push'
         run: cargo run --bin gen-pdf --features embed-typst -- --directory head
       - name: Install diff-pdf
+        if: github.event_name != 'push'
         run: sudo apt-get update && sudo apt-get install -y diff-pdf-wx
       - name: Generate PDF diff summary
+        if: github.event_name != 'push'
         id: diff_summary
         uses: actions/github-script@v9
         env:

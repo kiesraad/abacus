@@ -22,6 +22,14 @@ import type {
 import { GenerateTestElectionForm } from "./GenerateTestElectionForm";
 import { MockTest } from "./MockTest";
 
+function getElectionNameWithDetails(election: Election) {
+  const electionDetails =
+    election.committee_category === "GSB"
+      ? `(${election.committee_category} ${election.counting_method})`
+      : `(${election.committee_category})`;
+  return `${election.name} ${electionDetails}`;
+}
+
 function Links() {
   const { isTypist, isAdministrator, isCoordinator } = useUserRole();
   const { requestState: getElections } = useInitialApiGet<ElectionListResponse>(
@@ -68,9 +76,7 @@ function TypistLinks({ electionList }: LinksProps) {
         <ul>
           {electionList.map((election) => (
             <li key={election.id}>
-              <Link to={`/elections/${election.id}/data-entry`}>
-                {election.name} ({election.committee_category})
-              </Link>
+              <Link to={`/elections/${election.id}/data-entry`}>{getElectionNameWithDetails(election)}</Link>
             </li>
           ))}
         </ul>
@@ -93,12 +99,9 @@ function AdministratorCoordinatorLinks({ electionList, committeeSessions }: Link
         <ul>
           {electionList.map((election) => {
             const committeeSession = committeeSessions.find((cs) => cs.election_id === election.id);
-
             return (
               <li key={election.id}>
-                <Link to={`/elections/${election.id}`}>
-                  {election.name} ({election.committee_category})
-                </Link>
+                <Link to={`/elections/${election.id}`}>{getElectionNameWithDetails(election)}</Link>
                 <ul>
                   <li>
                     <Link to={`/elections/${election.id}/status`}>{t("election_status.main_title")}</Link>

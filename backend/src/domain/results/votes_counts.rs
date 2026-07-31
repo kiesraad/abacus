@@ -298,7 +298,9 @@ mod tests {
     use test_log::test;
 
     use super::*;
-    use crate::domain::election::{CommitteeCategory::*, PGNumber, tests::election_fixture};
+    use crate::domain::election::{
+        CommitteeCategory::*, ElectionCategory, PGNumber, tests::election_fixture,
+    };
 
     #[test]
     fn test_votes_addition() {
@@ -409,7 +411,7 @@ mod tests {
         };
 
         votes_counts.validate(
-            &election_fixture(committee_category, &[1, 1, 1]),
+            &election_fixture(ElectionCategory::Municipal, committee_category, &[1, 1, 1]),
             &"votes_counts".into(),
         )
     }

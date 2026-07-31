@@ -81,7 +81,7 @@ mod tests {
 
     use super::*;
     use crate::domain::{
-        election::{CandidateNumber, CommitteeCategory, tests::election_fixture},
+        election::{CandidateNumber, CommitteeCategory, ElectionCategory, tests::election_fixture},
         results::political_group_candidate_votes::{CandidateVotes, PoliticalGroupCandidateVotes},
     };
 
@@ -110,6 +110,7 @@ mod tests {
             .collect();
 
         let election = election_fixture(
+            ElectionCategory::Municipal,
             CommitteeCategory::GSB,
             &candidate_votes_and_totals
                 .iter()

@@ -262,7 +262,7 @@ mod tests {
         api::apportionment::{ApportionmentInputData, map_seat_assignment},
         domain::{
             election::{
-                CommitteeCategory, ElectionWithPoliticalGroups,
+                CommitteeCategory, ElectionCategory, ElectionWithPoliticalGroups,
                 tests::election_fixture_with_given_number_of_seats,
             },
             models::enriched_seat_assignment::EnrichedSeatAssignment,
@@ -324,6 +324,7 @@ mod tests {
             vec![10, 10, 10, 10, 10, 10, 10, 9],
         ];
         let election = election_fixture_with_given_number_of_seats(
+            ElectionCategory::Municipal,
             CommitteeCategory::CSB,
             &candidate_votes
                 .iter()
@@ -447,6 +448,7 @@ mod tests {
             vec![7],
         ];
         let election = election_fixture_with_given_number_of_seats(
+            ElectionCategory::Municipal,
             CommitteeCategory::CSB,
             &candidate_votes
                 .iter()
@@ -538,6 +540,7 @@ mod tests {
             vec![50, 30],
         ];
         let election = election_fixture_with_given_number_of_seats(
+            ElectionCategory::Municipal,
             CommitteeCategory::CSB,
             &candidate_votes
                 .iter()

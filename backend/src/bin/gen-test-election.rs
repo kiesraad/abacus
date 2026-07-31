@@ -31,13 +31,13 @@ struct Args {
     #[arg(value_enum)]
     committee_category: CommitteeCategory,
 
-    /// The vote counting method
-    #[arg(value_enum)]
-    counting_method: Option<VoteCountingMethod>,
-
     /// The election category
     #[arg(value_enum)]
     election_category: ElectionCategory,
+
+    /// The vote counting method
+    #[arg(short, long, value_enum)]
+    counting_method: Option<VoteCountingMethod>,
 
     /// Location of the database file, will be created if it doesn't exist
     #[arg(short, long, default_value = "db.sqlite")]

@@ -12,7 +12,7 @@ import { getCandidateFullName } from "@/utils/candidate";
 import { formatPoliticalGroupName } from "@/utils/politicalGroup";
 import { isLocalElection } from "./election";
 
-type ModelForGSB = Extract<DataEntryModel, "CSOFirstSession" | "CSONextSession">;
+type ModelForGSB = Extract<DataEntryModel, "DSOFirstSession" | "CSOFirstSession" | "DSONextSession" | "CSONextSession">;
 type ModelForCSB = Extract<DataEntryModel, "GSB">;
 
 const isEntryGSB = (model: DataEntryModel): model is ModelForGSB => {
@@ -367,6 +367,10 @@ export function createPoliticalGroupSections(election: ElectionWithPoliticalGrou
 
 function buildDataEntryStructure(model: DataEntryModel, election: ElectionWithPoliticalGroups): DataEntryStructure {
   switch (model) {
+    case "DSOFirstSession":
+      return [
+        /* TODO: https://github.com/kiesraad/abacus/issues/3685 */
+      ];
     case "CSOFirstSession":
       return [
         extraInvestigationSection,
@@ -374,6 +378,10 @@ function buildDataEntryStructure(model: DataEntryModel, election: ElectionWithPo
         createVotersAndVotesSection(model, election),
         createDifferencesSection(model),
         ...createPoliticalGroupSections(election),
+      ];
+    case "DSONextSession":
+      return [
+        /* TODO: https://github.com/kiesraad/abacus/issues/3685 */
       ];
     case "CSONextSession":
       return [

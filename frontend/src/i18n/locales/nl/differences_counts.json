@@ -4,24 +4,32 @@
   "checkbox_message": "De vinkvraag op deze pagina in het proces-verbaal vul je niet in Abacus in.",
   "validation_error": "Controleer of je antwoord gelijk is aan het papieren proces-verbaal",
   "section_number": {
+    "DSOFirstSession": "2.3",
     "CSOFirstSession": "B1-3.3",
+    "DSONextSession": "2.3",
     "CSONextSession": "B1-2.3"
   },
   "differences_counts": {
     "more_ballots_count": {
+      "DSOFirstSession": "Aantal méér getelde stemmen",
       "CSOFirstSession": "Aantal méér getelde stemmen",
+      "DSONextSession": "Aantal méér getelde stemmen",
       "CSONextSession": "Aantal méér getelde stemmen",
       "GSB": "Totaal aantal méér getelde stemmen"
     },
     "fewer_ballots_count": {
       "CSOFirstSession": "Aantal minder getelde stemmen",
+      "DSOFirstSession": "Aantal minder getelde stemmen",
       "CSONextSession": "Aantal minder getelde stemmen",
+      "DSONextSession": "Aantal minder getelde stemmen",
       "GSB": "Totaal aantal minder getelde stemmen"
     }
   },
   "compare_votes_cast_admitted_voters": {
     "title": {
+      "DSOFirstSession": "<strong>2.3.1</strong> Vergelijk D (totaal toegelaten kiezers) en H (totaal uitgebrachte stemmen)",
       "CSOFirstSession": "<strong>3.3.1</strong> Vergelijk D (totaal toegelaten kiezers) en H (totaal uitgebrachte stemmen)",
+      "DSONextSession": "<strong>2.3.1</strong> Vergelijk D (totaal toegelaten kiezers) en H (totaal uitgebrachte stemmen)",
       "CSONextSession": "<strong>2.3.1</strong> Vergelijk D (totaal toegelaten kiezers) en H (totaal uitgebrachte stemmen)"
     },
     "short_title": "Extra onderzoek vanwege andere reden dan onverklaard verschil?"
@@ -40,7 +48,9 @@
   },
   "difference_completely_accounted_for": {
     "title": {
+      "DSOFirstSession": "<strong>2.3.2</strong> Zijn er tijdens de stemming dingen opgeschreven die het verschil tussen D en H <strong>volledig</strong> verklaren?",
       "CSOFirstSession": "<strong>3.3.2</strong> Zijn er tijdens de stemming dingen opgeschreven die het bovenstaande verschil tussen D en H <strong>volledig</strong> verklaren?",
+      "DSONextSession": "<strong>2.3.2</strong> Zijn er tijdens de stemming dingen opgeschreven die het verschil tussen D en H <strong>volledig</strong> verklaren?",
       "CSONextSession": "<strong>2.3.2</strong> Zijn er tijdens de stemming dingen opgeschreven die het bovenstaande verschil tussen D en H <strong>volledig</strong> verklaren?"
     },
     "short_title": "Verschil tussen D en H volledig verklaard?",

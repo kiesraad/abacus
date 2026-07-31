@@ -103,7 +103,7 @@ export type DataEntryModel = Results["model"];
 // All models, includes exhaustive check if all models are defined
 export const dataEntryModelValues = (<T extends DataEntryModel[]>(
   models: [Exclude<DataEntryModel, T[number]>] extends [never] ? T : never,
-) => models)(["CSOFirstSession", "CSONextSession", "GSB"]);
+) => models)(["DSOFirstSession", "CSOFirstSession", "DSONextSession", "CSONextSession", "GSB"]);
 
 export type DataEntryStructure = DataEntrySection[];
 

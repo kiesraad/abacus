@@ -77,6 +77,19 @@ Use `cargo clippy --all-targets --all-features -- -D warnings` to lint the proje
 
 Use `cargo test` to run the tests. The tests are also run in a GitHub Actions workflow.
 
+### Debugging with gdb/lldb
+
+Debug builds are compiled with [`debug = "line-tables-only"`](debug), which keeps panic backtraces with file and line
+numbers but omits type and variable information. To inspect variables in a debugger:
+
+- **Single command:** `CARGO_PROFILE_DEV_DEBUG=2 cargo build` (or `cargo nextest run`, `cargo run`).
+- **Entire workspace:** create `backend/.cargo/config.toml` (Git ignores the `.cargo` directory):
+
+      [profile.dev]
+      debug = 2
+
+[debug]: https://doc.rust-lang.org/cargo/reference/profiles.html#debug
+
 ### Air gap detection
 
 In production, Abacus must be built with air gap detection enabled. To enforce air gap detection during build, enable the feature `airgap-detection`:

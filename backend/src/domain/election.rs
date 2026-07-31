@@ -177,6 +177,7 @@ pub struct ElectionNumberOfVotersChangeRequest {
     Deserialize,
     strum::Display,
     strum::EnumString,
+    strum::VariantArray,
     ToSchema,
     Clone,
     Copy,
@@ -272,6 +273,7 @@ pub enum ElectionSubCategory {
     Hash,
     Type,
 )]
+#[strum(ascii_case_insensitive)]
 pub enum CommitteeCategory {
     /// Gemeentelijk stembureau
     GSB,
@@ -284,6 +286,7 @@ pub enum CommitteeCategory {
     Deserialize,
     strum::Display,
     strum::EnumString,
+    strum::VariantArray,
     ToSchema,
     Clone,
     Copy,

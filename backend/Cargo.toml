@@ -76,7 +76,7 @@ pdf_gen.workspace = true
 axum.workspace = true
 axum-extra.workspace = true
 chrono.workspace = true
-clap = { version = "4.6", default-features = false, features = ["derive", "std", "help", "env"] }
+clap = { version = "4.6", default-features = false, features = ["derive", "std", "help", "env", "string"] }
 eml-nl = { version = "0.6.1" }
 hyper = { version = "1", features = ["full"] }
 icu_collator = "2.2.0"

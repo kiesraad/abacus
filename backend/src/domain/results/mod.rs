@@ -19,6 +19,8 @@ use crate::domain::{
     validate::{DataError, Validate, ValidateRoot, ValidationResults},
 };
 
+pub mod about_report;
+pub mod checks_and_corrections;
 pub mod common_polling_station_results;
 pub mod common_validation;
 pub mod count;

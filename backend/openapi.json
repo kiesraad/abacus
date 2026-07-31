@@ -6153,7 +6153,8 @@
           "client_state",
           "validation_results",
           "source",
-          "status"
+          "status",
+          "is_correction"
         ],
         "properties": {
           "client_state": {
@@ -6161,6 +6162,10 @@
           },
           "data": {
             "$ref": "#/components/schemas/Results"
+          },
+          "is_correction": {
+            "type": "boolean",
+            "description": "Whether the typist is correcting an entry that was completed before"
           },
           "previous_results": {
             "$ref": "#/components/schemas/CommonPollingStationResults"

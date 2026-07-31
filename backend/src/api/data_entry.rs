@@ -152,6 +152,8 @@ pub struct ClaimDataEntryResponse {
     pub previous_results: Option<CommonPollingStationResults>,
     pub source: DataEntrySource,
     pub status: DataEntryStatusName,
+    /// Whether the typist is correcting an entry that was completed before
+    pub is_correction: bool,
 }
 
 pub fn router() -> OpenApiRouter<AppState> {
@@ -371,6 +373,7 @@ async fn data_entry_claim(
         previous_results,
         source: context.source,
         status: new_state.status_name(),
+        is_correction: new_state.is_correction(),
     }))
 }
 
@@ -1080,6 +1083,17 @@ mod tests {
         )
         .await
         .into_response()
+    }
+
+    /// Claim the first entry and deserialise the response body
+    async fn claim_and_parse(
+        pool: SqlitePool,
+        data_entry_id: DataEntryId,
+    ) -> ClaimDataEntryResponse {
+        let response = claim(pool, data_entry_id, EntryNumber::FirstEntry).await;
+        assert_eq!(response.status(), StatusCode::OK);
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        serde_json::from_slice(&body).unwrap()
     }
 
     async fn save(
@@ -2490,6 +2504,33 @@ mod tests {
         let data_entry = get_data_entry_for_ps(&mut conn, polling_station_id).await;
         let status: DataEntryStatus = data_entry.state.0;
         assert!(matches!(status, DataEntryStatus::FirstEntryInProgress(_)));
+    }
+
+    /// Test that a first entry returned for correction is has is_correction set
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
+    async fn test_claim_data_entry_resumed_first_entry_is_correction(pool: SqlitePool) {
+        let data_entry_id = DataEntryId::from(201);
+
+        // check that is_correction is false for a new entry, then finalise with errors
+        let claimed = claim_and_parse(pool.clone(), data_entry_id).await;
+        assert_eq!(claimed.status, DataEntryStatusName::FirstEntryInProgress);
+        assert!(!claimed.is_correction);
+        finalise_with_errors(pool.clone()).await;
+
+        // resolve errors by resuming first entry (return for correction)
+        let response = resolve_errors(
+            pool.clone(),
+            data_entry_id,
+            ResolveErrorsAction::ResumeFirstEntry,
+        )
+        .await;
+        assert_eq!(response.status(), StatusCode::OK);
+
+        // is_correction is true and client state is empty
+        let claimed = claim_and_parse(pool.clone(), data_entry_id).await;
+        assert_eq!(claimed.status, DataEntryStatusName::FirstEntryInProgress);
+        assert!(claimed.is_correction);
+        assert_eq!(claimed.client_state, None);
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]

@@ -42,6 +42,7 @@ test("should handle CSOFirstSession DATA_ENTRY_CLAIMED with no client_state", ()
       },
       source,
       status: "first_entry_in_progress",
+      is_correction: false,
       validation_results: {
         errors: [],
         warnings: [],
@@ -74,6 +75,7 @@ test("should handle CSONextSession DATA_ENTRY_CLAIMED with no client_state", () 
       },
       source,
       status: "first_entry_in_progress",
+      is_correction: false,
       validation_results: {
         errors: [],
         warnings: [],
@@ -91,6 +93,38 @@ test("should handle CSONextSession DATA_ENTRY_CLAIMED with no client_state", () 
   expect(state.targetFormSectionId).toEqual("voters_votes_counts");
   expect(state.results).toEqual(action.dataEntry.data);
   expect(state.error).toBeNull();
+});
+
+test("should handle DATA_ENTRY_CLAIMED for a correction", () => {
+  const action: DataEntryAction = {
+    type: "DATA_ENTRY_CLAIMED",
+    dataEntry: {
+      client_state: null,
+      data: {
+        model: "CSOFirstSession",
+        ...getInitialValues(),
+      },
+      source,
+      status: "first_entry_in_progress",
+      is_correction: true,
+      validation_results: {
+        errors: [validationResultMockData.F204],
+        warnings: [],
+      },
+    },
+  };
+
+  const state = dataEntryReducer(getInitialState(), action);
+
+  // every section is reachable and typist starts at the first section
+  expect(state.formState?.furthest).toBe("save");
+  for (const section of state.dataEntryStructure!) {
+    expect(state.formState?.sections[section.id]?.isSaved).toBe(true);
+  }
+  expect(state.targetFormSectionId).toBe("extra_investigation");
+
+  // errors and warnings are not accepted anymore
+  expect(state.formState?.sections.differences_counts?.acceptErrorsAndWarnings).toBe(false);
 });
 
 test("should handle DATA_ENTRY_CLAIM_FAILED", () => {

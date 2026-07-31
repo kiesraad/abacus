@@ -383,7 +383,7 @@ mod tests {
     fn votes_tables_fails_when_group_missing_in_summary() {
         let group = sample_group(1, &[1]);
         let election = sample_election(group);
-        let summary = ElectionSummary::zero();
+        let summary = ElectionSummary::zero(&election);
 
         let err = VotesTables::new(&election, &summary).unwrap_err();
 

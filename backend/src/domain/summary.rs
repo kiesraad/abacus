@@ -45,12 +45,12 @@ pub struct ElectionSummary {
 
 impl ElectionSummary {
     /// Initialize a new summary with all counts set to zero.
-    pub fn zero() -> ElectionSummary {
+    pub fn zero(election: &ElectionWithPoliticalGroups) -> ElectionSummary {
         ElectionSummary {
             voters_counts: VotersCounts {
                 poll_card_count: 0,
                 proxy_certificate_count: 0,
-                voter_card_count: None,
+                voter_card_count: (!election.category.is_local_election()).then_some(0),
                 total_admitted_voters_count: 0,
             },
             votes_counts: VotesCounts {
@@ -159,7 +159,7 @@ impl ElectionSummary {
         results: &[(DataEntrySource, Results)],
     ) -> Result<ElectionSummary, APIError> {
         // running totals
-        let mut totals = ElectionSummary::zero();
+        let mut totals = ElectionSummary::zero(election);
 
         // initialize political group votes to zero
         for group in &election.political_groups {

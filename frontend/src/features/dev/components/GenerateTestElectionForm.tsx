@@ -166,7 +166,7 @@ export function GenerateTestElectionForm() {
             </ChoiceList>
             {formState.committee_category === "GSB" && (
               <ChoiceList>
-                <ChoiceList.Legend>{t("election.committee_category.title")}</ChoiceList.Legend>
+                <ChoiceList.Legend>{t("counting_method_type")}</ChoiceList.Legend>
                 {voteCountingMethodValues.map((countingMethod, index) => {
                   return (
                     <ChoiceList.Radio
@@ -175,7 +175,7 @@ export function GenerateTestElectionForm() {
                       name={"counting_method"}
                       defaultChecked={index === 0}
                       defaultValue={countingMethod}
-                      label={t(`election.voting_method_type.${countingMethod}`)}
+                      label={`${t(countingMethod)} (${countingMethod})`}
                       onChange={handleRadioChange}
                     />
                   );

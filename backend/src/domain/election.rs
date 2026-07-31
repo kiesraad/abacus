@@ -212,6 +212,27 @@ impl ElectionCategory {
             ElectionCategory::WaterAuthority => "AB",
         }
     }
+
+    pub fn sub_category(&self, number_of_seats: u32) -> ElectionSubCategory {
+        match self {
+            ElectionCategory::Municipal => {
+                if number_of_seats < 19 {
+                    ElectionSubCategory::GR1
+                } else {
+                    ElectionSubCategory::GR2
+                }
+            }
+            // Default to PS1
+            ElectionCategory::Provincial => ElectionSubCategory::PS1,
+            ElectionCategory::WaterAuthority => {
+                if number_of_seats < 19 {
+                    ElectionSubCategory::AB1
+                } else {
+                    ElectionSubCategory::AB2
+                }
+            }
+        }
+    }
 }
 
 /// Election sub category (limited for now)
@@ -423,11 +444,7 @@ pub(crate) mod tests {
             location: "Test".to_string(),
             domain_id: "0000".to_string(),
             category: election_category,
-            sub_category: if number_of_seats < 19 {
-                ElectionSubCategory::GR1
-            } else {
-                ElectionSubCategory::GR2
-            },
+            sub_category: election_category.sub_category(number_of_seats),
             number_of_seats,
             number_of_voters: 1000,
             election_date: NaiveDate::from_ymd_opt(2023, 11, 1).unwrap(),

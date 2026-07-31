@@ -15,8 +15,8 @@ use crate::{
         },
         election::{
             self, CandidateGender, CandidateNumber, CommitteeCategory, ElectionCategory,
-            ElectionSubCategory, ElectionWithPoliticalGroups, NewElection, PGNumber,
-            RegisteredPoliticalGroup, VoteCountingMethod,
+            ElectionWithPoliticalGroups, NewElection, PGNumber, RegisteredPoliticalGroup,
+            VoteCountingMethod,
         },
         field_path::FieldPath,
         polling_station::{PollingStation, PollingStationRequest, PollingStationType},
@@ -273,30 +273,6 @@ fn format_election_name(
     format!("{election_type} {election_locality} {year}")
 }
 
-fn get_election_sub_category(
-    election_category: ElectionCategory,
-    number_of_seats: u32,
-) -> ElectionSubCategory {
-    match election_category {
-        ElectionCategory::Municipal => {
-            if number_of_seats < 19 {
-                ElectionSubCategory::GR1
-            } else {
-                ElectionSubCategory::GR2
-            }
-        }
-        // Default to PS1
-        ElectionCategory::Provincial => ElectionSubCategory::PS1,
-        ElectionCategory::WaterAuthority => {
-            if number_of_seats < 19 {
-                ElectionSubCategory::AB1
-            } else {
-                ElectionSubCategory::AB2
-            }
-        }
-    }
-}
-
 /// Generate a random election using the limits from args.
 fn generate_election(
     rng: &mut impl rand::RngExt,
@@ -359,7 +335,7 @@ fn generate_election(
         election_id,
         location: locality,
         category: args.election_category,
-        sub_category: get_election_sub_category(args.election_category, number_of_seats),
+        sub_category: args.election_category.sub_category(number_of_seats),
         number_of_seats,
         number_of_voters: if args.committee_category == CommitteeCategory::GSB {
             rng.random_range(args.voters.clone())

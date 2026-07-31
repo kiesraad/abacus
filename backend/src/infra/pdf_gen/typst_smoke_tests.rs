@@ -144,11 +144,7 @@ fn random_election(
         location: random_string(rng, string_length),
         domain_id: random_string(rng, string_length),
         category: ElectionCategory::Municipal,
-        sub_category: if number_of_seats < 19 {
-            ElectionSubCategory::GR1
-        } else {
-            ElectionSubCategory::GR2
-        },
+        sub_category: ElectionCategory::Municipal.sub_category(number_of_seats),
         number_of_seats,
         number_of_voters: rng.random_range(0..=10_000),
         election_date: random_date(rng),

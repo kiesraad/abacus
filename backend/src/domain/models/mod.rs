@@ -90,10 +90,10 @@ impl PdfModel {
         }
     }
 
-    /// Get the input path as a static string (e.g., "inputs/model-n-10-2.json")
+    /// Get the input path as a static string (e.g., "inputs/model-n-10-2-variations/model-n-10-2-GR.json")
     pub fn as_input_path_str(&self) -> &'static str {
         match self {
-            Self::ModelN10_2(_) => "inputs/model-n-10-2.json",
+            Self::ModelN10_2(_) => "inputs/model-n-10-2-variations/model-n-10-2-GR.json",
             Self::ModelNa14_2(_) => "inputs/model-na-14-2-variations/model-na-14-2-GR.json",
             Self::ModelNa14_2Bijlage1(_) => {
                 "inputs/model-na-14-2-bijlage-1-variations/model-na-14-2-bijlage-1-GR.json"

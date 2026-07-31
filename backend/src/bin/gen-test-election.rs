@@ -72,7 +72,7 @@ where
     }
 }
 
-/// Abacus API and asset server
+/// Generate a random test election in the Abacus database
 #[derive(Parser, Debug, Clone)]
 struct Args {
     /// The committee category

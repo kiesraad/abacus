@@ -362,18 +362,6 @@ impl Candidate {
     }
 }
 
-/// Apply a function if the given value is `Some`
-trait ApplyIfSome: Sized {
-    fn apply_if_some<T>(self, value: Option<T>, f: impl FnOnce(Self, T) -> Self) -> Self {
-        match value {
-            Some(value) => f(self, value),
-            None => self,
-        }
-    }
-}
-
-impl<T> ApplyIfSome for T {}
-
 impl ElectionWithPoliticalGroups {
     /// Get the EML election category for this election.
     pub fn get_eml_category(&self) -> eml_nl::utils::ElectionCategory {
@@ -602,7 +590,7 @@ impl ElectionWithPoliticalGroups {
         )],
         summary: &ElectionSummary,
     ) -> Result<ElectionCountContest, EMLError> {
-        let builder = ElectionCountContest::builder()
+        let mut builder = ElectionCountContest::builder()
             .identifier(ContestIdentifier::geen())
             .total_eligible_voter_count(self.get_eligible_voter_count(summary))
             .total_candidate_votes_count(summary.votes_counts.total_votes_candidates_count)
@@ -621,16 +609,14 @@ impl ElectionWithPoliticalGroups {
             .total_uncounted_votes(
                 UncountedVotesReason::ValidProxyCertificates,
                 summary.voters_counts.proxy_certificate_count,
-            )
-            .apply_if_some(
-                summary.voters_counts.voter_card_count,
-                |builder, voter_card_count| {
-                    builder.total_uncounted_votes(
-                        UncountedVotesReason::ValidVoterCards,
-                        voter_card_count,
-                    )
-                },
-            )
+            );
+
+        if let Some(voter_card_count) = summary.voters_counts.voter_card_count {
+            builder = builder
+                .total_uncounted_votes(UncountedVotesReason::ValidVoterCards, voter_card_count);
+        }
+
+        let builder = builder
             .total_uncounted_votes(
                 UncountedVotesReason::AdmittedVoters,
                 summary.voters_counts.total_admitted_voters_count,
@@ -747,13 +733,14 @@ impl ElectionWithPoliticalGroups {
             .uncounted_votes(
                 UncountedVotesReason::ValidProxyCertificates,
                 results.voters_counts().proxy_certificate_count,
-            )
-            .apply_if_some(
-                results.voters_counts().voter_card_count,
-                |builder, voter_card_count| {
-                    builder.uncounted_votes(UncountedVotesReason::ValidVoterCards, voter_card_count)
-                },
-            )
+            );
+
+        if let Some(voter_card_count) = results.voters_counts().voter_card_count {
+            builder =
+                builder.uncounted_votes(UncountedVotesReason::ValidVoterCards, voter_card_count);
+        }
+
+        builder = builder
             .uncounted_votes(
                 UncountedVotesReason::AdmittedVoters,
                 results.voters_counts().total_admitted_voters_count,

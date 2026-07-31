@@ -44,7 +44,7 @@ export interface RadioSubsection {
 export interface CheckboxesSubsectionOption {
   path: ResultsPath;
   /** Label for data entry form view */
-  label: string;
+  label: string | ReactElement;
   /** Short label for differences view */
   short_label: string;
   autoFocusInput?: boolean;

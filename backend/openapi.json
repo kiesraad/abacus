@@ -6652,7 +6652,7 @@
           },
           "difference_completely_accounted_for": {
             "$ref": "#/components/schemas/YesNo",
-            "description": "Whether the difference between the total of admitted voters and total of votes cast is explained.\n(B1-3.3.2 \"Zijn er tijdens de stemming dingen opgeschreven die het verschil tussen D en H volledig verklaren?\")"
+            "description": "Whether the difference between the total of admitted voters and total of votes cast is explained.\n(B1-3.3.2 \"Zijn er tijdens de stemming dingen opgeschreven die het bovenstaande verschil tussen D en H volledig verklaren?\")"
           },
           "fewer_ballots_count": {
             "type": "integer",

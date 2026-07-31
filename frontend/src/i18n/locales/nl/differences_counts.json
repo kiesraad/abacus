@@ -35,23 +35,23 @@
     "short_title": "Extra onderzoek vanwege andere reden dan onverklaard verschil?"
   },
   "admitted_voters_equal_votes_cast": {
-    "title": "D en H zijn gelijk",
+    "title": "D en H zijn <strong>gelijk</strong>",
     "short_title": "D en H zijn gelijk"
   },
   "votes_cast_greater_than_admitted_voters": {
-    "title": "H is groter dan D (meer uitgebrachte stemmen dan toegelaten kiezers)",
+    "title": "H is <strong>groter</strong> dan D (meer uitgebrachte stemmen dan toegelaten kiezers)",
     "short_title": "H is groter dan D"
   },
   "votes_cast_smaller_than_admitted_voters": {
-    "title": "H is kleiner dan D (minder uitgebrachte stemmen dan toegelaten kiezers)",
+    "title": "H is <strong>kleiner</strong> dan D (minder uitgebrachte stemmen dan toegelaten kiezers)",
     "short_title": "H is kleiner dan D"
   },
   "difference_completely_accounted_for": {
     "title": {
       "DSOFirstSession": "<strong>2.3.2</strong> Zijn er tijdens de stemming dingen opgeschreven die het verschil tussen D en H <strong>volledig</strong> verklaren?",
-      "CSOFirstSession": "<strong>3.3.2</strong> Zijn er tijdens de stemming dingen opgeschreven die het verschil tussen D en H <strong>volledig</strong> verklaren?",
+      "CSOFirstSession": "<strong>3.3.2</strong> Zijn er tijdens de stemming dingen opgeschreven die het bovenstaande verschil tussen D en H <strong>volledig</strong> verklaren?",
       "DSONextSession": "<strong>2.3.2</strong> Zijn er tijdens de stemming dingen opgeschreven die het verschil tussen D en H <strong>volledig</strong> verklaren?",
-      "CSONextSession": "<strong>2.3.2</strong> Zijn er tijdens de stemming dingen opgeschreven die het verschil tussen D en H <strong>volledig</strong> verklaren?"
+      "CSONextSession": "<strong>2.3.2</strong> Zijn er tijdens de stemming dingen opgeschreven die het bovenstaande verschil tussen D en H <strong>volledig</strong> verklaren?"
     },
     "short_title": "Verschil tussen D en H volledig verklaard?",
     "no_there_is_an_unexplained_difference": "Nee, er is een onverklaard verschil"

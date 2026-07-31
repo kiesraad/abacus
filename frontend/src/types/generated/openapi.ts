@@ -666,7 +666,7 @@ has led to corrected results
   /** Whether the investigation on its own initiative has led to corrected results
 ("Op eigen initiatief van het gemeentelijk stembureau: Zijn er gecorrigeerde telresultaten?") */
   corrected_results_own_initiative: YesNo;
-  /** Whether the GSB investigated the counting results on its own initiative
+  /** Why the GSB investigated the counting results on its own initiative
 ("Op eigen initiatief van het gemeentelijk stembureau: Waarom heeft het gemeentelijk stembureau
  de telresultaten onderzocht?") */
   reason_investigation_own_initiative: ReasonInvestigationOwnInitiative;
@@ -1578,7 +1578,7 @@ export interface ReasonInvestigationOwnInitiative {
   /** Because of a (suspected) other error
 ("Vanwege (het vermoeden van) een andere fout") */
   other_error: boolean;
-  /** Because of an unaccounted difference
+  /** Because of an unaccounted-for difference
 ("Vanwege een onverklaard verschil") */
   unaccounted_difference: boolean;
 }

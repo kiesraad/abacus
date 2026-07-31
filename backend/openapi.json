@@ -6100,7 +6100,7 @@
           },
           "reason_investigation_own_initiative": {
             "$ref": "#/components/schemas/ReasonInvestigationOwnInitiative",
-            "description": "Whether the GSB investigated the counting results on its own initiative\n(\"Op eigen initiatief van het gemeentelijk stembureau: Waarom heeft het gemeentelijk stembureau\n de telresultaten onderzocht?\")"
+            "description": "Why the GSB investigated the counting results on its own initiative\n(\"Op eigen initiatief van het gemeentelijk stembureau: Waarom heeft het gemeentelijk stembureau\n de telresultaten onderzocht?\")"
           }
         },
         "additionalProperties": false
@@ -8872,7 +8872,7 @@
           },
           "unaccounted_difference": {
             "type": "boolean",
-            "description": "Because of an unaccounted difference\n(\"Vanwege een onverklaard verschil\")"
+            "description": "Because of an unaccounted-for difference\n(\"Vanwege een onverklaard verschil\")"
           }
         },
         "additionalProperties": false

@@ -13,7 +13,7 @@ use crate::domain::{
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
 pub struct ChecksAndCorrections {
-    /// Whether the GSB investigated the counting results on its own initiative
+    /// Why the GSB investigated the counting results on its own initiative
     /// ("Op eigen initiatief van het gemeentelijk stembureau: Waarom heeft het gemeentelijk stembureau
     ///  de telresultaten onderzocht?")
     pub reason_investigation_own_initiative: ReasonInvestigationOwnInitiative,
@@ -32,7 +32,7 @@ pub struct ChecksAndCorrections {
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
 pub struct ReasonInvestigationOwnInitiative {
-    /// Because of an unaccounted difference
+    /// Because of an unaccounted-for difference
     /// ("Vanwege een onverklaard verschil")
     pub unaccounted_difference: bool,
     /// Because of a (suspected) other error

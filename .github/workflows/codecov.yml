@@ -16,7 +16,7 @@ env:
   TZ: "Europe/Amsterdam"
 
 jobs:
-  backend:
+  backend-coverage:
     name: Backend coverage
     runs-on: ubuntu-latest
     defaults:
@@ -85,7 +85,7 @@ jobs:
       - name: Report disk space
         run: df -h
 
-  frontend:
+  frontend-coverage:
     name: Frontend coverage
     runs-on: ubuntu-latest
     defaults:

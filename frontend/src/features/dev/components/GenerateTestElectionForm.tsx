@@ -59,7 +59,7 @@ const INITIAL_RANGE_STATE: RangeFormState = Object.fromEntries(
 const INITIAL_FORM_STATE: FormState = {
   ...INITIAL_RANGE_STATE,
   committee_category: committeeCategoryValues[0],
-  counting_method: null,
+  counting_method: voteCountingMethodValues[0],
   election_category: electionCategoryValues[0],
   generate_p22_2_variants: false,
   generate_drawing_lots: false,
@@ -167,12 +167,13 @@ export function GenerateTestElectionForm() {
             {formState.committee_category === "GSB" && (
               <ChoiceList>
                 <ChoiceList.Legend>{t("election.committee_category.title")}</ChoiceList.Legend>
-                {voteCountingMethodValues.map((countingMethod) => {
+                {voteCountingMethodValues.map((countingMethod, index) => {
                   return (
                     <ChoiceList.Radio
                       id={countingMethod}
                       key={countingMethod}
                       name={"counting_method"}
+                      defaultChecked={index === 0}
                       defaultValue={countingMethod}
                       label={t(`election.voting_method_type.${countingMethod}`)}
                       onChange={handleRadioChange}

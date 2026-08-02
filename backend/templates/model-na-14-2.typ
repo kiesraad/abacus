@@ -58,7 +58,7 @@ de aantallen in het proces-verbaal.
 = Gecorrigeerde telresultaten van #is_municipality[de gemeente][het openbaar lichaam]
 
 Vul alléén de getallen in die veranderd zijn ten opzichte van een eerdere telling. Getallen die niet zijn
-veranderd, hoeven niet ingevuld te worden in de kolom ‘gecorrigeerd'. Onder ‘oorspronkelijk’ staan de getallen
+veranderd, hoeven niet ingevuld te worden in de kolom ‘gecorrigeerd’. Onder ‘oorspronkelijk’ staan de getallen
 die in een eerdere zitting door het #location_type zijn
 vastgesteld.
 
@@ -97,7 +97,7 @@ vastgesteld.
 
 == Uitgebrachte stemmen <cast_votes>
 Vul alléén de getallen in die veranderd zijn ten opzichte van een eerdere telling. Getallen die niet zijn veranderd, hoeven niet
-ingevuld te worden in de kolom ‘gecorrigeerd'. Onder ‘oorspronkelijk’ staan de getallen die in een eerdere zitting door het #location_type zijn vastgesteld.
+ingevuld te worden in de kolom ‘gecorrigeerd’. Onder ‘oorspronkelijk’ staan de getallen die in een eerdere zitting door het #location_type zijn vastgesteld.
 
 #if input.votes_tables.len() > 0 [
   #sum(
@@ -140,7 +140,7 @@ Vul alléén de getallen in die veranderd zijn ten opzichte van een eerdere tell
 
 #checkbox(checked: differences)[Nee, er zijn stembureaus met een verschil]
 
-=== #if input.summary.differences_counts.more_ballots_count.count > 0 [Voor de stembureaus met de nummers #comma_list(input.summary.differences_counts.more_ballots_count.data_entry_sources.map(p => p.number))] else [In geen van de stembureaus] zijn er *méér* uitgebrachte stemmen dan toegelaten kiezers geteld. Noteer onder ‘gecorrigeerd' het nieuwe verschil.
+=== #if input.summary.differences_counts.more_ballots_count.count > 0 [Voor de stembureaus met de nummers #comma_list(input.summary.differences_counts.more_ballots_count.data_entry_sources.map(p => p.number))] else [In geen van de stembureaus] zijn er *méér* uitgebrachte stemmen dan toegelaten kiezers geteld. Noteer onder ‘gecorrigeerd’ het nieuwe verschil.
 
 #grid(
   rows: auto,
@@ -148,7 +148,7 @@ Vul alléén de getallen in die veranderd zijn ten opzichte van een eerdere tell
   letterbox("I", original_value: input.previous_summary.differences_counts.more_ballots_count.count, value: input.summary.differences_counts.more_ballots_count.count, bold_top_border: true, wide_cells: true)[Totaal aantal méér getelde stemmen]
 )
 
-=== #if input.summary.differences_counts.fewer_ballots_count.count > 0 [Voor de stembureaus met de nummers #comma_list(input.summary.differences_counts.fewer_ballots_count.data_entry_sources.map(p => p.number))] else [In geen van de stembureaus] zijn er *minder* uitgebrachte stemmen dan toegelaten kiezers geteld. Noteer onder ‘gecorrigeerd' het nieuwe verschil.
+=== #if input.summary.differences_counts.fewer_ballots_count.count > 0 [Voor de stembureaus met de nummers #comma_list(input.summary.differences_counts.fewer_ballots_count.data_entry_sources.map(p => p.number))] else [In geen van de stembureaus] zijn er *minder* uitgebrachte stemmen dan toegelaten kiezers geteld. Noteer onder ‘gecorrigeerd’ het nieuwe verschil.
 
 #grid(
   rows: auto,
@@ -173,7 +173,7 @@ Vul alléén de getallen in die veranderd zijn ten opzichte van een eerdere tell
     sum_total: columns => [Totaal lijst (kolom #columns)],
     total_instruction: [Neem dit totaal over in rubriek #ref(<cast_votes>) van deze bijlage bij de juiste lijst.],
     explainer_text: [
-      Vul alléén de getallen in die veranderd zijn ten opzichte van een eerdere telling. Getallen die niet zijn veranderd, hoeven niet ingevuld te worden in de kolom ‘gecorrigeerd'. Onder ‘oorspronkelijk’ staan de getallen die in een eerdere zitting door het #location_type zijn vastgesteld.
+      Vul alléén de getallen in die veranderd zijn ten opzichte van een eerdere telling. Getallen die niet zijn veranderd, hoeven niet ingevuld te worden in de kolom ‘gecorrigeerd’. Onder ‘oorspronkelijk’ staan de getallen die in een eerdere zitting door het #location_type zijn vastgesteld.
     ],
   )
 }

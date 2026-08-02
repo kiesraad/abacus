@@ -80,7 +80,7 @@ Schrijf op wat de *uitkomst* van het onderzoek door het #location_type was.
 #emph_block[
   Vul alléén de getallen in die veranderd zijn ten opzichte van een eerdere
   telling. Getallen die niet zijn veranderd, hoeven niet ingevuld te worden in de
-  kolom ‘gecorrigeerd'. Onder ‘oorspronkelijk’ staan de getallen die in een eerdere
+  kolom ‘gecorrigeerd’. Onder ‘oorspronkelijk’ staan de getallen die in een eerdere
   zitting door het #location_type zijn vastgesteld.
 ]
 
@@ -117,7 +117,7 @@ Schrijf op wat de *uitkomst* van het onderzoek door het #location_type was.
 == Uitgebrachte stemmen <cast_votes>
 
 Vul alléén de getallen in die veranderd zijn ten opzichte van een eerdere telling. Getallen die niet zijn veranderd, hoeven niet
-ingevuld te worden in de kolom ‘gecorrigeerd'. Onder ‘oorspronkelijk’ staan de getallen die in een eerdere zitting door het #location_type zijn vastgesteld.
+ingevuld te worden in de kolom ‘gecorrigeerd’. Onder ‘oorspronkelijk’ staan de getallen die in een eerdere zitting door het #location_type zijn vastgesteld.
 
 #if input.votes_tables.len() > 0 [
   #sum(
@@ -153,7 +153,7 @@ ingevuld te worden in de kolom ‘gecorrigeerd'. Onder ‘oorspronkelijk’ staa
 == Verschillen tussen aantal kiezers en uitgebrachte stemmen
 
 Vul alléén de getallen in die veranderd zijn ten opzichte van een eerdere telling. Getallen die niet zijn veranderd, hoeven niet
-ingevuld te worden in de kolom ‘gecorrigeerd'. Onder ‘oorspronkelijk’ staan de getallen die in een eerdere zitting door het #location_type zijn vastgesteld. Is het getal bij I én J gewijzigd? Vul dan
+ingevuld te worden in de kolom ‘gecorrigeerd’. Onder ‘oorspronkelijk’ staan de getallen die in een eerdere zitting door het #location_type zijn vastgesteld. Is het getal bij I én J gewijzigd? Vul dan
 bij beiden het gecorrigeerde getal in. Vink alléén het selectievakje aan dat van toepassing is.
 
 === Vergelijk D (totaal toegelaten kiezers) en H (totaal uitgebrachte stemmen)
@@ -187,7 +187,7 @@ bij beiden het gecorrigeerde getal in. Vink alléén het selectievakje aan dat v
 
 == Stemmen per lijst en per kandidaat <per_list_and_candidate>
 
-Vul alléén de getallen in die veranderd zijn ten opzichte van een eerdere telling. Getallen die niet zijn veranderd, hoeven niet ingevuld te worden in de kolom ‘gecorrigeerd'. Onder ‘oorspronkelijk’ staan de getallen die in een eerdere zitting door het #location_type zijn vastgesteld.
+Vul alléén de getallen in die veranderd zijn ten opzichte van een eerdere telling. Getallen die niet zijn veranderd, hoeven niet ingevuld te worden in de kolom ‘gecorrigeerd’. Onder ‘oorspronkelijk’ staan de getallen die in een eerdere zitting door het #location_type zijn vastgesteld.
 
 #pagebreak(weak: true)
 

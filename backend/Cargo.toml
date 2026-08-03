@@ -141,3 +141,13 @@ workspace = true
 
 [profile.release]
 overflow-checks = true
+
+# line-tables-only keeps file and line numbers in backtraces but omits type and variable information.
+# This saves ~30% compile time and ~60% disk space for the linked (test) binaries.
+# See "Debugging with gdb/lldb" in README.md to go back to full DWARF debug symbols.
+[profile.dev]
+debug = "line-tables-only"
+
+# Optimising Argon2 make hashing operations ~12x faster and cuts backend test suite CPU time by ~60%
+[profile.dev.package.argon2]
+opt-level = 3

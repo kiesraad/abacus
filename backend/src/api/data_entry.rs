@@ -795,6 +795,7 @@ async fn data_entry_resolve_errors(
 pub struct DataEntryGetDifferencesResponse {
     pub first_entry_user_id: UserId,
     pub first_entry: Results,
+    pub first_entry_has_errors: bool,
     pub second_entry_user_id: UserId,
     pub second_entry: Results,
     pub second_entry_has_errors: bool,
@@ -834,12 +835,15 @@ async fn data_entry_get_differences(
             second_entry,
             ..
         }) => {
+            let first_entry_has_errors =
+                first_entry.start_validate(&context.election)?.has_errors();
             let second_entry_has_errors =
                 second_entry.start_validate(&context.election)?.has_errors();
 
             Ok(Json(DataEntryGetDifferencesResponse {
                 first_entry_user_id,
                 first_entry,
+                first_entry_has_errors,
                 second_entry_user_id,
                 second_entry,
                 second_entry_has_errors,
@@ -886,7 +890,9 @@ async fn data_entry_resolve_differences(
         ResolveDifferencesAction::KeepFirstAndDiscardSecond => {
             state.keep_first_entry(&context.election)?
         }
-        ResolveDifferencesAction::KeepFirstAndCorrectSecond => state.correct_second_entry()?,
+        ResolveDifferencesAction::KeepFirstAndCorrectSecond => {
+            state.correct_second_entry(&context.election)?
+        }
         ResolveDifferencesAction::KeepSecondAndDiscardFirst => {
             state.keep_second_entry(&context.election)?
         }
@@ -1256,6 +1262,43 @@ mod tests {
         second_entry.data.voters_counts_mut().poll_card_count = 100;
 
         finalise_different_entries_with(pool, second_entry).await;
+    }
+
+    /// Like `finalise_different_entries`, but the first entry has an error.
+    async fn finalise_different_entries_first_entry_has_errors(pool: SqlitePool) {
+        let data_entry_id = DataEntryId::from(201);
+        finalise_different_entries(pool.clone()).await;
+
+        // Keep the second entry and let the original typist correct the first entry
+        let response = resolve_differences(
+            pool.clone(),
+            data_entry_id,
+            ResolveDifferencesAction::KeepSecondAndCorrectFirst,
+        )
+        .await;
+        assert_eq!(response.status(), StatusCode::OK);
+
+        // The corrected first entry has an error and still differs from the second entry
+        let mut first_entry = example_data_entry();
+        first_entry.data.voters_counts_mut().poll_card_count = 100;
+
+        let response = claim(pool.clone(), data_entry_id, EntryNumber::FirstEntry).await;
+        assert_eq!(response.status(), StatusCode::OK);
+        let response = save(
+            pool.clone(),
+            first_entry,
+            data_entry_id,
+            EntryNumber::FirstEntry,
+        )
+        .await;
+        assert_eq!(response.status(), StatusCode::OK);
+        let response = finalise(pool.clone(), data_entry_id, EntryNumber::FirstEntry).await;
+        assert_eq!(response.status(), StatusCode::OK);
+
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let DataEntryStatusResponse { status } = serde_json::from_slice(&body).unwrap();
+
+        assert_eq!(status, DataEntryStatusName::EntriesDifferent);
     }
 
     async fn finalise_with_errors(pool: SqlitePool) {
@@ -2393,6 +2436,68 @@ mod tests {
 
             let differences = get_differences(pool.clone(), data_entry_id).await;
             assert!(differences.second_entry_has_errors);
+            assert!(!differences.first_entry_has_errors);
+        }
+
+        #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
+        async fn test_get_differences_first_entry_has_errors(pool: SqlitePool) {
+            let data_entry_id = DataEntryId::from(201);
+            finalise_different_entries_first_entry_has_errors(pool.clone()).await;
+
+            let differences = get_differences(pool.clone(), data_entry_id).await;
+            assert!(differences.first_entry_has_errors);
+            assert!(!differences.second_entry_has_errors);
+        }
+
+        #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
+        async fn test_keep_first_has_errors_rejects_correction(pool: SqlitePool) {
+            let polling_station_id = PollingStationId::from(211);
+            let data_entry_id = DataEntryId::from(201);
+            finalise_different_entries_first_entry_has_errors(pool.clone()).await;
+
+            let response = resolve_differences(
+                pool.clone(),
+                data_entry_id,
+                ResolveDifferencesAction::KeepFirstAndCorrectSecond,
+            )
+            .await;
+            assert_eq!(response.status(), StatusCode::CONFLICT);
+            let body = response.into_body().collect().await.unwrap().to_bytes();
+            let result: ErrorResponse = serde_json::from_slice(&body).unwrap();
+            assert_eq!(result.reference, ErrorReference::InvalidStateTransition);
+
+            // The state must be unchanged
+            let mut conn = pool.acquire().await.unwrap();
+            let data_entry = get_data_entry_for_ps(&mut conn, polling_station_id).await;
+            assert!(matches!(
+                data_entry.state.0,
+                DataEntryStatus::EntriesDifferent(_)
+            ));
+        }
+
+        #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
+        async fn test_keep_first_has_errors_discard_second(pool: SqlitePool) {
+            let polling_station_id = PollingStationId::from(211);
+            let data_entry_id = DataEntryId::from(201);
+            finalise_different_entries_first_entry_has_errors(pool.clone()).await;
+
+            let response = resolve_differences(
+                pool.clone(),
+                data_entry_id,
+                ResolveDifferencesAction::KeepFirstAndDiscardSecond,
+            )
+            .await;
+            assert_eq!(response.status(), StatusCode::OK);
+
+            let mut conn = pool.acquire().await.unwrap();
+            let data_entry = get_data_entry_for_ps(&mut conn, polling_station_id).await;
+            let DataEntryStatus::FirstEntryHasErrors(state) = data_entry.state.0 else {
+                panic!("Expected entry to be in FirstEntryHasErrors state");
+            };
+            assert_eq!(
+                state.finalised_first_entry.voters_counts().poll_card_count,
+                100
+            );
         }
 
         #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]

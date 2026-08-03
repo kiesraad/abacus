@@ -231,6 +231,7 @@ export const dataEntryStatusDifferences: DataEntryGetDifferencesResponse = {
       },
     ],
   },
+  first_entry_has_errors: false,
   second_entry_has_errors: false,
   source: source(3),
 };

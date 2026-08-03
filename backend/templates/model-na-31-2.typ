@@ -13,11 +13,11 @@
   doc,
   header-right: location_name,
   footer: [
-    Proces-verbaal van een #location_type \
-    Model Na 31-2 centrale stemopneming (versie 2027) \
-
     Datum: #input.creation_date_time. Digitale vingerafdruk van EML-telbestand bij dit PV: \
-    #input.hash
+    #input.hash \
+
+    Proces-verbaal van een #location_type \
+    Model Na 31-2 centrale stemopneming (versie 2027)
   ], margin-bottom: 3.2cm
 )
 

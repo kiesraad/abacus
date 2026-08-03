@@ -25,4 +25,9 @@
       flex-grow: 1;
     }
   }
+
+  [disabled] {
+    border: solid var(--bg-gray-darkest);
+    background: var(--bg-gray-darker);
+  }
 }

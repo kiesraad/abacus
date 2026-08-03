@@ -150,6 +150,33 @@ export const SecondEntryHasErrors: Story = {
   },
 };
 
+export const FirstEntryHasErrors: Story = {
+  ...Default,
+  args: {
+    formState: { ...defaultFormState, correctEntry: "first", correctionBlocked: true },
+  },
+  play: async ({ canvas }) => {
+    await expect(
+      canvas.getByText(
+        "Uit de eerste invoer blijkt dat er waarschijnlijk fouten in het papieren proces-verbaal zijn gemaakt. " +
+          "Daarom kan je de tweede invoer nu niet laten herstellen door de oorspronkelijke invoerder. " +
+          "Eerst moet het papieren proces-verbaal worden gecontroleerd. Dat doen we in de volgende stap. " +
+          "De tweede invoer wordt verwijderd.",
+      ),
+    ).toBeVisible();
+
+    const correctWrongEntry = canvas.getByRole("radio", { name: "Laten herstellen door oorspronkelijke invoerder" });
+    const discardWrongEntry = canvas.getByRole("radio", { name: "Opnieuw laten invoeren" });
+    await expect(correctWrongEntry).toBeDisabled();
+    await expect(correctWrongEntry).not.toBeChecked();
+    await expect(discardWrongEntry).toBeDisabled();
+    await expect(discardWrongEntry).toBeChecked();
+
+    // The submit button announces that resolving the errors is the next step
+    await expect(canvas.getByRole("button", { name: "Verder naar fouten oplossen" })).toBeVisible();
+  },
+};
+
 export const WithValidationErrors: Story = {
   ...Default,
   args: {

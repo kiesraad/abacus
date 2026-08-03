@@ -6499,6 +6499,7 @@
         "required": [
           "first_entry_user_id",
           "first_entry",
+          "first_entry_has_errors",
           "second_entry_user_id",
           "second_entry",
           "second_entry_has_errors",
@@ -6507,6 +6508,9 @@
         "properties": {
           "first_entry": {
             "$ref": "#/components/schemas/Results"
+          },
+          "first_entry_has_errors": {
+            "type": "boolean"
           },
           "first_entry_user_id": {
             "$ref": "#/components/schemas/UserId"

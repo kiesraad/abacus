@@ -1,5 +1,5 @@
 import { t } from "@/i18n/translate";
-import type { ResolveDifferencesAction } from "@/types/generated/openapi";
+import type { DataEntryGetDifferencesResponse, ResolveDifferencesAction } from "@/types/generated/openapi";
 import type { DataEntryResults, DataEntrySection } from "@/types/types";
 import { mapResultsToSectionValues } from "@/utils/dataEntryMapping";
 
@@ -18,6 +18,20 @@ export interface ResolveDifferencesFormState {
   correctionBlocked: boolean;
   correctEntryError: string | undefined;
   wrongEntryError: string | undefined;
+}
+
+/** Correcting the other entry is blocked when the entry that is kept has errors. */
+export function isCorrectionBlocked(
+  correctEntry: CorrectEntry | undefined,
+  differences: DataEntryGetDifferencesResponse | null,
+): boolean {
+  if (correctEntry === "first") {
+    return differences?.first_entry_has_errors ?? false;
+  }
+  if (correctEntry === "second") {
+    return differences?.second_entry_has_errors ?? false;
+  }
+  return false;
 }
 
 export function effectiveWrongEntryAction(

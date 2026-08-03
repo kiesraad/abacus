@@ -355,4 +355,32 @@ describe("ResolveDifferencesPage", () => {
     await user.click(await screen.findByRole("button", { name: "Verder naar fouten oplossen" }));
     expect(resolve).toHaveBeenCalledWith("keep_second_and_discard_first");
   });
+
+  test("should block correcting the second entry when the kept first entry has errors", async () => {
+    const user = userEvent.setup();
+    const resolve = spyOnHandler(DataEntryResolveDifferencesHandler);
+    overrideOnce("get", "/api/data_entries/3/resolve_differences", 200, {
+      ...dataEntryStatusDifferences,
+      first_entry_has_errors: true,
+    });
+
+    await renderPage();
+    overrideResponseStatus("first_entry_has_errors");
+    await user.click(await screen.findByRole("radio", { name: "Eerste invoer (Gebruiker01)" }));
+
+    expect(
+      await screen.findByText(
+        "Uit de eerste invoer blijkt dat er waarschijnlijk fouten in het papieren proces-verbaal zijn gemaakt. " +
+          "Daarom kan je de tweede invoer nu niet laten herstellen door de oorspronkelijke invoerder. " +
+          "Eerst moet het papieren proces-verbaal worden gecontroleerd. Dat doen we in de volgende stap. " +
+          "De tweede invoer wordt verwijderd.",
+      ),
+    ).toBeVisible();
+    expect(
+      await screen.findByRole("radio", { name: "Laten herstellen door oorspronkelijke invoerder" }),
+    ).toBeDisabled();
+
+    await user.click(await screen.findByRole("button", { name: "Verder naar fouten oplossen" }));
+    expect(resolve).toHaveBeenCalledWith("keep_first_and_discard_second");
+  });
 });

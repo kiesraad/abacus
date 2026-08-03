@@ -230,7 +230,11 @@ fn is_as_expected(
         }
         // KeepFirstEntry
         (DataEntryStatus::EntriesDifferent(_), Transition::KeepFirstEntry) => {
-            matches!(resulting_state, Ok(DataEntryStatus::FirstEntryFinalised(_)))
+            if first_entry_correct {
+                matches!(resulting_state, Ok(DataEntryStatus::FirstEntryFinalised(_)))
+            } else {
+                matches!(resulting_state, Ok(DataEntryStatus::FirstEntryHasErrors(_)))
+            }
         }
         // KeepSecondEntry
         (DataEntryStatus::EntriesDifferent(_), Transition::KeepSecondEntry) => {

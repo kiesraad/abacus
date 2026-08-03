@@ -14,13 +14,17 @@ Note the difference between `discard` and `reset`:
 When resolving differences between the first and second data entry (`EntriesDifferent` state), one of the options for the coordinator is to
 discard one entry. In this case, the remaining entry will from then on be the first entry, and the data entry is open for a new second entry.
 
-Instead of discarding an entry, the coordinator can also have it corrected by
-the typist who entered it. That is only possible when the entry that is kept has
-no errors. The first entry never has errors at this point, so keeping the first
-entry and correcting the second is always allowed. Keeping the second entry
-while it has errors is not allowed: the coordinator has to resolve errors first,
-so the only option is to discard the first entry, which transitions the state to
-`FirstEntryHasErrors`.
+Instead of discarding an entry, the coordinator can also have it corrected by the typist who entered it. That is only
+possible when the entry that is kept has no errors. Keeping an entry that has errors while correcting the other one is
+not allowed: the coordinator has to resolve the errors first, so the only option is to discard the other entry, which
+transitions the state to `FirstEntryHasErrors`.
+
+Both the first and second entries can have errors in the `EntriesDifferent` state:
+- the first entry through `Empty` -> `FirstEntryInProgress` -> `FirstEntryFinalised` -> `SecondEntryInProgress` ->
+  `EntriesDifferent` -> `FirstEntryCorrection` -> introduce errors in first entry -> `EntriesDifferent` with errors in
+  first entry
+- the second entry through `Empty` -> `FirstEntryInProgress` -> `FirstEntryFinalised` -> `SecondEntryInProgress` ->
+  introduce errors in second entry -> `EntriesDifferent` with errors in second entry.
 
 ```mermaid
 stateDiagram-v2
@@ -51,7 +55,7 @@ stateDiagram-v2
   resolve_differences --> Empty: discard both entries
   resolve_differences --> first_has_errors: discard one entry
   resolve_differences --> FirstEntryCorrection: correct first entry<br>(only without errors in second entry)
-  resolve_differences --> SecondEntryCorrection: correct second entry
+  resolve_differences --> SecondEntryCorrection: correct second entry<br>(only without errors in first entry)
 
   FirstEntryCorrection --> is_different: finalise
   FirstEntryCorrection --> FirstEntryFinalised: discard
@@ -60,5 +64,3 @@ stateDiagram-v2
 
   Definitive --> [*]
 ```
-
-

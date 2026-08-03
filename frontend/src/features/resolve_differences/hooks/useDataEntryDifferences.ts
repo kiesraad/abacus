@@ -22,6 +22,7 @@ import {
   effectiveWrongEntryAction,
   getQuestionErrors,
   getResolveDifferencesAction,
+  isCorrectionBlocked,
   type ResolveDifferencesFormState,
   type WrongEntryAction,
 } from "../utils/differences";
@@ -88,8 +89,7 @@ export function useDataEntryDifferences(
     dataEntryStructure = getDataEntryStructure(differences.first_entry.model, election);
   }
 
-  // Block correction of first entry when second entry has errors
-  const correctionBlocked = correctEntry === "second" && (differences?.second_entry_has_errors ?? false);
+  const correctionBlocked = isCorrectionBlocked(correctEntry, differences);
   const effectiveAction = effectiveWrongEntryAction(correctEntry, wrongEntryAction, correctionBlocked);
 
   const questionErrors = getQuestionErrors(correctEntry, effectiveAction, submitted);

@@ -7636,6 +7636,10 @@
             "$ref": "#/components/schemas/CommitteeCategory",
             "description": "GSB or CSB"
           },
+          "counting_method": {
+            "$ref": "#/components/schemas/VoteCountingMethod",
+            "description": "CSO or DSO"
+          },
           "custom_name": {
             "type": "string",
             "description": "Custom election name"

@@ -1220,6 +1220,8 @@ export interface GenerateElectionArgs {
   candidates_per_group: RandomRange;
   /** GSB or CSB */
   committee_category: CommitteeCategory;
+  /** CSO or DSO */
+  counting_method?: VoteCountingMethod;
   /** Custom election name */
   custom_name?: string;
   /** Municipal, Provincial or WaterAuthority */

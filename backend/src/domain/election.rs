@@ -177,6 +177,7 @@ pub struct ElectionNumberOfVotersChangeRequest {
     Deserialize,
     strum::Display,
     strum::EnumString,
+    strum::VariantArray,
     ToSchema,
     Clone,
     Copy,
@@ -186,7 +187,7 @@ pub struct ElectionNumberOfVotersChangeRequest {
     Hash,
     Type,
 )]
-#[strum(serialize_all = "lowercase")]
+#[strum(serialize_all = "lowercase", ascii_case_insensitive)]
 pub enum ElectionCategory {
     /// Gemeenteraadsverkiezing
     Municipal,
@@ -272,6 +273,7 @@ pub enum ElectionSubCategory {
     Hash,
     Type,
 )]
+#[strum(serialize_all = "lowercase", ascii_case_insensitive)]
 pub enum CommitteeCategory {
     /// Gemeentelijk stembureau
     GSB,
@@ -280,9 +282,21 @@ pub enum CommitteeCategory {
 }
 
 #[derive(
-    Serialize, Deserialize, strum::Display, ToSchema, Clone, Copy, Debug, PartialEq, Eq, Hash, Type,
+    Serialize,
+    Deserialize,
+    strum::Display,
+    strum::EnumString,
+    strum::VariantArray,
+    ToSchema,
+    Clone,
+    Copy,
+    Debug,
+    PartialEq,
+    Eq,
+    Hash,
+    Type,
 )]
-#[strum(serialize_all = "lowercase")]
+#[strum(serialize_all = "lowercase", ascii_case_insensitive)]
 pub enum VoteCountingMethod {
     /// centralized vote counting method
     CSO,

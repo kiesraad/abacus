@@ -3,7 +3,7 @@ use std::error::Error;
 use chrono::{Datelike, Days, NaiveDate, TimeDelta};
 use rand::{SeedableRng, rngs::StdRng, seq::IndexedRandom};
 use sqlx::{SqliteConnection, SqlitePool};
-use tracing::info;
+use tracing::{info, warn};
 
 use crate::{
     SqlitePoolExt,
@@ -233,8 +233,12 @@ pub async fn create_test_election(
     };
 
     info!(
-        "Election generated with election id: {}, election name: '{}'",
-        election.id, election.name
+        "Election generated with:\nelection id: {}\nelection name: '{}'\ncommittee category: '{}'\ncounting method: {:?}\nelection category: '{}'",
+        election.id,
+        election.name,
+        election.committee_category,
+        election.counting_method,
+        election.category,
     );
 
     let results = if data_entry_completed {
@@ -274,6 +278,7 @@ fn format_election_name(
 }
 
 /// Generate a random election using the limits from args.
+#[allow(clippy::too_many_lines, clippy::cognitive_complexity)]
 fn generate_election(
     rng: &mut impl rand::RngExt,
     args: &GenerateElectionArgs,
@@ -322,15 +327,21 @@ fn generate_election(
 
     let number_of_seats = rng.random_range(args.seats.clone());
 
+    let counting_method = match args.committee_category {
+        CommitteeCategory::GSB => Some(args.counting_method.unwrap_or(VoteCountingMethod::CSO)),
+        CommitteeCategory::CSB => {
+            if args.counting_method.is_some() {
+                warn!("ignoring counting method: only applies to committee category GSB");
+            }
+            None
+        }
+    };
+
     // and put it all in the struct (generating some additional fields where needed)
     NewElection {
         name,
         committee_category: args.committee_category,
-        counting_method: if args.committee_category == CommitteeCategory::GSB {
-            Some(VoteCountingMethod::CSO)
-        } else {
-            None
-        },
+        counting_method,
         domain_id: super::data::domain_id(rng),
         election_id,
         location: locality,
@@ -1021,7 +1032,9 @@ fn distribute_power_law(
 mod tests {
     use super::*;
     use crate::{
-        domain::election::CommitteeCategory, repository::election_repo, test_data_gen::RandomRange,
+        domain::election::{CommitteeCategory, VoteCountingMethod},
+        repository::election_repo,
+        test_data_gen::RandomRange,
     };
 
     #[sqlx::test]
@@ -1029,6 +1042,7 @@ mod tests {
         let args = GenerateElectionArgs {
             custom_name: None,
             committee_category: CommitteeCategory::GSB,
+            counting_method: Some(VoteCountingMethod::CSO),
             election_category: ElectionCategory::Municipal,
             political_groups: RandomRange(20..50),
             candidates_per_group: RandomRange(10..50),

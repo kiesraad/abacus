@@ -6,12 +6,9 @@ import { ChoiceList } from "@/components/ui/CheckboxAndRadio/ChoiceList";
 import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { t } from "@/i18n/translate";
-
+import { StringFormData } from "@/utils/stringFormData";
 import { useElectionCreateContext } from "../hooks/useElectionCreateContext";
 
-/*
- * NOTE: DSO is currently unsupported by Abacus, so it is disabled by default
- */
 export function CountingMethodType() {
   const { state, dispatch } = useElectionCreateContext();
   const navigate = useNavigate();
@@ -23,10 +20,15 @@ export function CountingMethodType() {
 
   async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
+    const formData = new StringFormData(event.currentTarget);
+    const countingMethod = formData.getString("counting_method");
+    if (!countingMethod || (countingMethod !== "CSO" && countingMethod !== "DSO")) {
+      return;
+    }
+
     dispatch({
       type: "SET_COUNTING_METHOD_TYPE",
-      // This is hardcoded to CSO until we have support for DSO
-      countingMethod: "CSO",
+      countingMethod,
     });
     await navigate("/elections/create/number-of-voters");
   }
@@ -49,26 +51,19 @@ export function CountingMethodType() {
             <ChoiceList>
               <ChoiceList.Radio
                 id="cso"
+                name={"counting_method"}
                 label={t("election.voting_method_type.cso")}
-                checked={true}
-                onChange={() => {
-                  /*
-              We need this to suppress an error because we explicitly set the `checked` property.
-              We'll actually implement this handler once we support DSO
-            */
-                }}
+                defaultValue={"CSO"}
+                defaultChecked={state.countingMethod === "CSO" || !state.countingMethod}
               >
                 {t("election.voting_method_type.cso_description")}
               </ChoiceList.Radio>
               <ChoiceList.Radio
                 id="dso"
-                label={
-                  <span>
-                    {t("election.voting_method_type.dso")} (<b>{t("election.voting_method_type.dso_not_supported")}</b>)
-                  </span>
-                }
-                checked={false}
-                disabled
+                name={"counting_method"}
+                label={t("election.voting_method_type.dso")}
+                defaultValue={"DSO"}
+                defaultChecked={state.countingMethod === "DSO"}
               >
                 {t("election.voting_method_type.dso_description")}
               </ChoiceList.Radio>

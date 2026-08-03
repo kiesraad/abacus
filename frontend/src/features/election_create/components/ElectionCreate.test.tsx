@@ -452,7 +452,7 @@ describe("Election create pages", () => {
       });
     });
 
-    test("Adds new election when finishing election import", async () => {
+    test("Adds new CSO election when finishing election import", async () => {
       vi.spyOn(console, "warn").mockImplementation(() => {});
       const router = renderWithRouter();
       const user = userEvent.setup();
@@ -483,6 +483,60 @@ describe("Election create pages", () => {
         await screen.findByRole("heading", { level: 2, name: "Type stemopneming in Heemdamseburg" }),
       ).toBeVisible();
       expect(screen.getByRole("radio", { name: /Centrale stemopneming \(CSO\)/ })).toBeChecked();
+      await user.click(screen.getByRole("button", { name: "Volgende" }));
+
+      // eligible voters
+      expect(await screen.findByRole("heading", { name: "Hoeveel kiesgerechtigden telt het GSB?" })).toBeVisible();
+      expect(screen.getByRole("textbox", { name: "Aantal kiesgerechtigden" })).toHaveValue(eligibleVoters.toString());
+      await user.click(screen.getByRole("button", { name: "Volgende" }));
+
+      // check and save
+      expect(await screen.findByRole("heading", { name: "Controleren en opslaan" })).toBeVisible();
+      await user.click(screen.getByRole("button", { name: "Opslaan" }));
+
+      await waitFor(() => {
+        expect(pushMessage).toHaveBeenCalledWith({ title: "Verkiezing GSB Gemeenteraad Test 2022 toegevoegd" });
+      });
+    });
+
+    test("Adds new DSO election when finishing election import", async () => {
+      vi.spyOn(console, "warn").mockImplementation(() => {});
+      const router = renderWithRouter();
+      const user = userEvent.setup();
+      const file = new File(["foo"], "foo.txt", { type: "text/plain" });
+
+      // election definition
+      await uploadElectionDefinition(router, file);
+      await inputElectionHash();
+
+      // candidates lists
+      await uploadCandidateDefinition(file);
+      await inputCandidateHash();
+
+      // committee category
+      await setCommitteeCategory();
+
+      // polling stations
+      const eligibleVoters = 1234;
+      await uploadPollingStationList(file, true, eligibleVoters);
+      expect(await screen.findByRole("heading", { level: 2, name: "Controleer stembureaus" })).toBeVisible();
+      expect(await screen.findByRole("table")).toBeVisible();
+      expect(await screen.findAllByRole("row")).toHaveLength(8);
+      expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+      await user.click(screen.getByRole("button", { name: "Volgende" }));
+
+      // vote counting
+      expect(
+        await screen.findByRole("heading", { level: 2, name: "Type stemopneming in Heemdamseburg" }),
+      ).toBeVisible();
+      expect(screen.getByRole("radio", { name: /Centrale stemopneming \(CSO\)/ })).toBeChecked();
+      const DSORadio = screen.getByRole("radio", { name: /Decentrale stemopneming \(DSO\)/ });
+      expect(DSORadio).not.toBeChecked();
+      await waitFor(() => {
+        DSORadio.click();
+      });
+      expect(DSORadio).toBeChecked();
+
       await user.click(screen.getByRole("button", { name: "Volgende" }));
 
       // eligible voters

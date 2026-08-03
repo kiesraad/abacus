@@ -36,7 +36,6 @@
   },
   "configuration_not_finished": "De configuratie van Abacus is nog niet afgerond.",
   "create": "Verkiezing toevoegen",
-  "dso_not_supported": "Niet ondersteund in deze versie van Abacus",
   "election_category": {
     "title": "Type verkiezing"
   },
@@ -101,7 +100,6 @@
     "description": "Hoe worden stemmen voor de {election} in de gemeente {location} geteld? Het type stemopneming wordt bepaald door het college van burgemeester en wethouders (B&W) van de gemeente.",
     "dso": "Decentrale stemopneming (DSO)",
     "dso_description": "Op de verkiezingsdag tellen de stembureaus de stemmen per kandidaat",
-    "dso_not_supported": "Niet ondersteund in deze versie van Abacus",
     "title": "Type stemopneming in"
   },
   "you_cannot_start_data_entry_yet": "Je kan nog geen telresultaten invoeren."

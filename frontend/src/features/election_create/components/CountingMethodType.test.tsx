@@ -38,7 +38,7 @@ describe("CountingMethodType component", () => {
     expect(screen.getByRole("radio", { name: /Centrale stemopneming \(CSO\)/ })).toBeChecked();
     expect(
       screen.getByRole("radio", {
-        name: /Decentrale stemopneming \(DSO\) \(Niet ondersteund in deze versie van Abacus\)/,
+        name: /Decentrale stemopneming \(DSO\)/,
       }),
     ).not.toBeChecked();
     await user.click(screen.getByRole("button", { name: "Volgende" }));

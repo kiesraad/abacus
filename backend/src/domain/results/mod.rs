@@ -11,7 +11,9 @@ use votes_counts::VotesCounts;
 use crate::domain::{
     committee_session::CommitteeSession,
     compare::Compare,
-    election::{CommitteeCategory, ElectionWithPoliticalGroups, PoliticalGroup},
+    election::{
+        CommitteeCategory, ElectionWithPoliticalGroups, PoliticalGroup, VoteCountingMethod,
+    },
     field_path::FieldPath,
     results::{
         count::Count, dso_first_session_results::DSOFirstSessionResults, gsb_results::GSBResults,
@@ -87,7 +89,11 @@ impl Results {
             committee_session.is_next_session(),
         ) {
             (CommitteeCategory::GSB, false) => {
-                Results::CSOFirstSession(CSOFirstSessionResults::empty(election))
+                if election.counting_method == Some(VoteCountingMethod::CSO) {
+                    Results::CSOFirstSession(CSOFirstSessionResults::empty(election))
+                } else {
+                    Results::DSOFirstSession(DSOFirstSessionResults::empty(election))
+                }
             }
             (CommitteeCategory::GSB, true) => {
                 if let Some(prev) = previous_results {
@@ -103,9 +109,17 @@ impl Results {
                     copy.differences_counts.difference_completely_accounted_for =
                         Default::default();
 
-                    Results::CSONextSession(copy)
+                    if election.counting_method == Some(VoteCountingMethod::CSO) {
+                        Results::CSONextSession(copy)
+                    } else {
+                        Results::DSONextSession(copy)
+                    }
                 } else {
-                    Results::CSONextSession(NextSessionResults::empty(election))
+                    if election.counting_method == Some(VoteCountingMethod::CSO) {
+                        Results::CSONextSession(NextSessionResults::empty(election))
+                    } else {
+                        Results::DSONextSession(NextSessionResults::empty(election))
+                    }
                 }
             }
             (CommitteeCategory::CSB, _) => Results::GSB(GSBResults::empty(election)),
@@ -313,6 +327,35 @@ impl PollingStationResults for CSOFirstSessionResults {
         Self {
             extra_investigation: Default::default(),
             counting_differences_polling_station: Default::default(),
+            voters_counts: Results::default_voters_counts(election),
+            votes_counts: VotesCounts {
+                political_group_total_votes: Results::default_political_group_total_votes(
+                    &election.political_groups,
+                ),
+                ..Default::default()
+            },
+            differences_counts: Default::default(),
+            political_group_votes: Results::default_political_group_votes(
+                &election.political_groups,
+            ),
+        }
+    }
+}
+
+impl PollingStationResults for DSOFirstSessionResults {
+    fn as_common(&self) -> CommonPollingStationResults {
+        CommonPollingStationResults {
+            voters_counts: self.voters_counts.clone(),
+            votes_counts: self.votes_counts.clone(),
+            differences_counts: self.differences_counts.clone(),
+            political_group_votes: self.political_group_votes.to_vec(),
+        }
+    }
+
+    fn empty(election: &ElectionWithPoliticalGroups) -> Self {
+        Self {
+            about_report: Default::default(),
+            checks_and_corrections: Default::default(),
             voters_counts: Results::default_voters_counts(election),
             votes_counts: VotesCounts {
                 political_group_total_votes: Results::default_political_group_total_votes(

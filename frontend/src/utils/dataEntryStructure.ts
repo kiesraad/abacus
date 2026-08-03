@@ -237,12 +237,12 @@ const aboutReportSection: DataEntrySection = {
       options: [
         {
           label: tx("about_report.corrigendum_present.two_documents"),
-          short_label: t("about_report.corrigendum_present.two_documents"),
+          short_label: t("about_report.corrigendum_present.two_documents_short"),
           value: "TwoDocuments" satisfies CorrigendumPresent,
         },
         {
           label: tx("about_report.corrigendum_present.one_document"),
-          short_label: t("about_report.corrigendum_present.one_document"),
+          short_label: t("about_report.corrigendum_present.one_document_short"),
           value: "OneDocument" satisfies CorrigendumPresent,
         },
       ],

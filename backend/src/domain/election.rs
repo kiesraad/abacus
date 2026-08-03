@@ -273,7 +273,7 @@ pub enum ElectionSubCategory {
     Hash,
     Type,
 )]
-#[strum(ascii_case_insensitive)]
+#[strum(serialize_all = "lowercase", ascii_case_insensitive)]
 pub enum CommitteeCategory {
     /// Gemeentelijk stembureau
     GSB,

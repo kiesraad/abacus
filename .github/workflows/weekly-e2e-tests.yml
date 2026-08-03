@@ -73,6 +73,14 @@ jobs:
       - name: Install musl
         run: sudo apt-get update && sudo apt-get install -y musl-tools
         if: matrix.target.os == 'ubuntu-latest'
+      - name: Create empty Storybook build dir for memory-serve
+        run: mkdir -p dist-storybook
+        working-directory: ./frontend
+        if: matrix.target.os == 'ubuntu-latest'
+      # The Backend job in build-lint-test.yml checks Clippy only for the host target, so check with musl here
+      - name: Check Clippy with all features
+        run: cargo --locked clippy --workspace --all-targets --all-features --target=${{ matrix.target.name }} -- -D warnings
+        if: matrix.target.os == 'ubuntu-latest'
       - name: Build without airgap detection
         run: cargo --locked build --release --no-default-features --features memory-serve,embed-typst --target=${{ matrix.target.name }}
       - uses: actions/upload-artifact@v7

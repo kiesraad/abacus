@@ -26,7 +26,7 @@
     }
   }
 
-  [disabled] {
+  input:disabled {
     border: solid var(--bg-gray-darkest);
     background: var(--bg-gray-darker);
   }

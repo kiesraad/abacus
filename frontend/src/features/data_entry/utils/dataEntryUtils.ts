@@ -65,6 +65,11 @@ export function isFormSectionEmpty(
           return false;
         }
         break;
+      case "enum":
+        if (value !== null && value !== "") {
+          return false;
+        }
+        break;
     }
   }
 

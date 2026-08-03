@@ -407,7 +407,8 @@ impl Validate for Results {
     ) -> Result<ValidationResults, DataError> {
         match self {
             Results::DSOFirstSession(_) | Results::DSONextSession(_) => {
-                todo!("implement in #3687")
+                // TODO: https://github.com/kiesraad/abacus/issues/3687
+                Ok(ValidationResults::default())
             }
             Results::CSOFirstSession(results) => {
                 let mut validation_results = results

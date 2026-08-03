@@ -20,9 +20,9 @@ export interface MessageSubsection {
 }
 
 export interface RadioSubsectionOption {
-  value: "true" | "false";
+  value: string;
   /** Label for data entry form view */
-  label: string;
+  label: string | ReactElement;
   /** Short label for differences view */
   short_label: string;
   autoFocusInput?: boolean;
@@ -31,8 +31,8 @@ export interface RadioSubsectionOption {
 export interface RadioSubsection {
   type: "radio";
   /** Title to display above the radio buttons */
-  title?: string;
-  /** Description to display above the checkboxes */
+  title?: string | ReactElement;
+  /** Description to display above the radio buttons */
   description?: string;
   /** Short title for differences view */
   short_title: string;

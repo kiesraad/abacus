@@ -482,7 +482,14 @@ describe("Election create pages", () => {
       expect(
         await screen.findByRole("heading", { level: 2, name: "Type stemopneming in Heemdamseburg" }),
       ).toBeVisible();
-      expect(screen.getByRole("radio", { name: /Centrale stemopneming \(CSO\)/ })).toBeChecked();
+      const CSORadio = screen.getByRole("radio", { name: /Centrale stemopneming \(CSO\)/ });
+      expect(CSORadio).not.toBeChecked();
+      expect(screen.getByRole("radio", { name: /Decentrale stemopneming \(DSO\)/ })).not.toBeChecked();
+      await waitFor(() => {
+        CSORadio.click();
+      });
+      expect(CSORadio).toBeChecked();
+
       await user.click(screen.getByRole("button", { name: "Volgende" }));
 
       // eligible voters
@@ -529,7 +536,7 @@ describe("Election create pages", () => {
       expect(
         await screen.findByRole("heading", { level: 2, name: "Type stemopneming in Heemdamseburg" }),
       ).toBeVisible();
-      expect(screen.getByRole("radio", { name: /Centrale stemopneming \(CSO\)/ })).toBeChecked();
+      expect(screen.getByRole("radio", { name: /Centrale stemopneming \(CSO\)/ })).not.toBeChecked();
       const DSORadio = screen.getByRole("radio", { name: /Decentrale stemopneming \(DSO\)/ });
       expect(DSORadio).not.toBeChecked();
       await waitFor(() => {

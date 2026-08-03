@@ -87,6 +87,40 @@ jobs:
         with:
           name: abacus-${{ matrix.target.os }}-weekly
           path: ${{ matrix.target.binary }}
+      - name: Build with airgap detection and TLS (for the installer)
+        run: cargo --locked build --release --no-default-features --features memory-serve,embed-typst,airgap-detection,tls --target=${{ matrix.target.name }}
+        if: matrix.target.os == 'windows-latest'
+      - uses: actions/upload-artifact@v7
+        with:
+          name: abacus-windows-latest-weekly-release
+          path: ${{ matrix.target.binary }}
+        if: matrix.target.os == 'windows-latest'
+
+  build-installer:
+    name: Build Windows installer
+    needs:
+      - build
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: pwsh
+        working-directory: packaging/windows
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - name: Download Abacus
+        uses: actions/download-artifact@v8
+        with:
+          name: abacus-windows-latest-weekly-release
+          path: packaging/windows
+      - name: Download Visual C++ Redistributable
+        run: Invoke-WebRequest -Uri https://aka.ms/vc14/vc_redist.x64.exe -OutFile VC_redist.x64.exe
+      # Inno Setup is preinstalled on the runner image
+      - name: Compile installer
+        run: '& "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" abacus.iss'
+      - uses: actions/upload-artifact@v7
+        with:
+          name: abacus-windows-installer-weekly
+          path: packaging/windows/Output/abacussetup.exe
 
   playwright-e2e:
     name: Playwright e2e tests (${{ matrix.os }} ${{ matrix.shardIndex }}/${{ matrix.shardTotal }})

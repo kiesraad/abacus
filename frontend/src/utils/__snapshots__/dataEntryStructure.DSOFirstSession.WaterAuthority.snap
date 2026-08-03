@@ -22,7 +22,7 @@
                  (een proces-verbaal en een corrigendum)
               </React.Fragment>
             </React.Fragment>,
-            "short_label": "Ja, ik heb <strong>twee documenten</strong> (een proces-verbaal en een corrigendum)",
+            "short_label": "Ja, een proces-verbaal en een corrigendum",
             "value": "TwoDocuments",
           },
           {
@@ -41,7 +41,7 @@
                  (alleen een proces-verbaal)
               </React.Fragment>
             </React.Fragment>,
-            "short_label": "Nee, ik heb <strong>één document</strong> (alleen een proces-verbaal)",
+            "short_label": "Nee, alleen een proces-verbaal",
             "value": "OneDocument",
           },
         ],

@@ -102,7 +102,7 @@ Licht hieronder toe wat de reden van het extra onderzoek was
   door het #underline[*stembureau*] (vak H van rubriek 2.2) en zoals door u geteld op het #underline[*#location_type*] (vak H van rubriek 3.2)?
 ]
 
-#checkbox[Ja #sym.arrow.r *Hertel het aantal toegelaten kiezers (tenzij dat bij de vraag 2.1 al gedaan is)*, en vul de resultaten in rubriek 3.1]
+#checkbox[Ja #sym.arrow.r *Hertel het aantal toegelaten kiezers (tenzij dat bij vraag 2.1 al gedaan is)*, en vul de resultaten in rubriek 3.1 in]
 #checkbox[Nee]
 
 #pagebreak(weak: true)

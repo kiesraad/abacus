@@ -205,12 +205,12 @@ Het proces-verbaal moet worden ondertekend door alle aanwezige leden. Bij een #l
 
 #stack(spacing: 0.5em, ..range(0, is_local_election(2, 4)).map(_ => textbox[Naam:][Handtekening:]))
 
+#if not is_local_election(true, false) {
+  pagebreak(weak: true)
+}
+
 == Ondertekening door andere aanwezige leden van het #location_type
 
 #signing_form_label[Extra ondertekening:]
 
-#stack(spacing: 0.5em, ..range(0, is_local_election(3, 1)).map(_ => textbox[Naam:][Handtekening:]))
-
-#pagebreak(weak: true)
-
-#stack(spacing: 0.5em, ..range(0, 11).map(_ => textbox[Naam:][Handtekening:]))
+#stack(spacing: 0.5em, ..range(0, is_local_election(13, 10)).map(_ => textbox[Naam:][Handtekening:]))

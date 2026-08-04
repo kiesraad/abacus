@@ -45,7 +45,7 @@ export default function dataEntryReducer(state: DataEntryState, action: DataEntr
 
       let formState: FormState;
       let targetFormSectionId: FormSectionId | undefined;
-      const results = action.dataEntry.data;
+      const results = structuredClone(action.dataEntry.data);
 
       if (action.dataEntry.client_state) {
         ({ formState, targetFormSectionId } = buildFormState(

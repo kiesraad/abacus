@@ -73,6 +73,19 @@ pub enum ValidationResultCode {
     /// GSB CSO: 'Verschillen met telresultaten van het stembureau': meerdere antwoorden per vraag
     F112,
 
+    /// GSB DSO: Over het proces-verbaal: Niet alle vragen bij 'Over het proces-verbaal' zijn beantwoord
+    F121,
+    /// GSB DSO: Over het proces-verbaal: Ongeldige combinatie van antwoorden: wel corrigendum, geen inlegvel
+    F122,
+    /// GSB DSO: Controles en correcties': geen vinkjes bij de eerste twee vragen
+    F131,
+    /// GSB DSO: Controles en correcties': Ongeldige set documenten (vraag 'gecorrigeerde telresultaten' = 'nee
+    F132,
+    /// GSB DSO: Controles en correcties': Ongeldig antwoord in eerste zitting (vraag 'op verzoek van het CSB' is ingevuld
+    F133,
+    /// GSB DSO: Controles en correcties': meer dan 1 antwoord op vraag 'zijn er gecorrigeerde telresultaten
+    F134,
+
     /// GSB CSO, GSB DSO, CSB: 'Aantal kiezers en stemmen': stempassen + volmachten + kiezerspassen <> totaal toegelaten kiezers
     F201,
     /// GSB CSO, GSB DSO, CSB: 'Aantal kiezers en stemmen': (Als F.204 niet getoond wordt) E.1 t/m E.n tellen niet op naar E

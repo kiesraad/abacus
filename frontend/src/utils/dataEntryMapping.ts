@@ -1,20 +1,20 @@
 import type { DataEntryResults, DataEntrySection, SectionValues } from "@/types/types";
 import { parseIntUserInput } from "@/utils/strings";
 
-type PathValue = boolean | number | string | undefined;
+type PathValue = boolean | number | string | null | undefined;
 
 /**
  * Extracts all data field paths and their types from a DataEntrySection as a Map
  * @param section The data entry section to extract field information from
  * @returns Map where key is the field path and value is the field type
  */
-export function extractFieldInfoFromSection(section: DataEntrySection): Map<string, "boolean" | "number"> {
-  const fieldInfoMap = new Map<string, "boolean" | "number">();
+export function extractFieldInfoFromSection(section: DataEntrySection): Map<string, "boolean" | "number" | "enum"> {
+  const fieldInfoMap = new Map<string, "boolean" | "number" | "enum">();
 
   for (const subsection of section.subsections) {
     switch (subsection.type) {
       case "radio":
-        fieldInfoMap.set(subsection.path, "boolean");
+        fieldInfoMap.set(subsection.path, "enum");
         break;
       case "inputGrid":
         for (const row of subsection.rows) {
@@ -101,7 +101,7 @@ export function setValueAtPath(
   data: DataEntryResults,
   path: string,
   value: string,
-  valueType: "boolean" | "number" | undefined,
+  valueType: "boolean" | "number" | "enum" | undefined,
 ): void {
   const segments = path.split(".");
   const lastProperty = segments.pop();
@@ -144,8 +144,8 @@ function traversePath(data: DataEntryResults, segments: string[]): unknown {
 
 function processValue(
   value: string,
-  valueType: "boolean" | "number" | undefined,
-): boolean | number | string | undefined {
+  valueType: "boolean" | "number" | "enum" | undefined,
+): boolean | number | string | null | undefined {
   if (valueType === "boolean") {
     if (value === "") {
       return undefined;
@@ -155,6 +155,10 @@ function processValue(
 
   if (valueType === "number") {
     return parseIntUserInput(value) ?? 0;
+  }
+
+  if (valueType === "enum" && value === "") {
+    return null;
   }
 
   return value;
@@ -170,7 +174,7 @@ export function stringRepresentsInteger(str: string): boolean {
 }
 
 function valueToString(value: PathValue): string {
-  if (value === undefined || value === 0) {
+  if (value === undefined || value === null || value === 0) {
     return "";
   }
   return String(value);
@@ -181,7 +185,13 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 function isPathValue(value: unknown): value is PathValue {
-  return typeof value === "boolean" || typeof value === "number" || typeof value === "string" || value === undefined;
+  return (
+    typeof value === "boolean" ||
+    typeof value === "number" ||
+    typeof value === "string" ||
+    value === null ||
+    value === undefined
+  );
 }
 
 /**

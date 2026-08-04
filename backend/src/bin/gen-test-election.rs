@@ -8,7 +8,9 @@ use abacus::{
     domain::{
         committee_session::CommitteeSession,
         data_entry::DataEntrySource,
-        election::{CommitteeCategory, ElectionCategory, ElectionWithPoliticalGroups},
+        election::{
+            CommitteeCategory, ElectionCategory, ElectionWithPoliticalGroups, VoteCountingMethod,
+        },
         models::{ModelNa31_2Input, ToPdfFileModel, votes_table::VotesTables},
         polling_station::PollingStation,
         report::DEFAULT_DATE_TIME_FORMAT,
@@ -17,21 +19,73 @@ use abacus::{
     },
     test_data_gen::{GenerateElectionArgs, RandomRange, create_test_election, parse_range},
 };
-use clap::Parser;
+use clap::{
+    Arg, Command, Parser,
+    builder::{PossibleValue, PossibleValuesParser, TypedValueParser},
+    error::Error as ClapError,
+};
 use eml_nl::io::EMLWrite as _;
+use strum::VariantArray;
 use tracing::{info, level_filters::LevelFilter};
 use tracing_subscriber::EnvFilter;
 
-/// Abacus API and asset server
+#[derive(Clone)]
+struct EnumParser<T>(std::marker::PhantomData<T>);
+
+impl<T> EnumParser<T>
+where
+    T: VariantArray + std::fmt::Display,
+{
+    fn new() -> Self {
+        Self(std::marker::PhantomData)
+    }
+
+    fn variant_names() -> impl Iterator<Item = String> {
+        T::VARIANTS.iter().map(ToString::to_string)
+    }
+}
+
+impl<T> TypedValueParser for EnumParser<T>
+where
+    T: VariantArray + std::fmt::Display + std::str::FromStr + Clone + Send + Sync + 'static,
+{
+    type Value = T;
+
+    fn parse_ref(
+        &self,
+        cmd: &Command,
+        arg: Option<&Arg>,
+        value: &std::ffi::OsStr,
+    ) -> Result<T, ClapError> {
+        value
+            .to_str()
+            .and_then(|value| T::from_str(value).ok())
+            .ok_or_else(|| {
+                PossibleValuesParser::new(Self::variant_names())
+                    .parse_ref(cmd, arg, value)
+                    .expect_err("value did not parse, so it is not a possible value either")
+            })
+    }
+
+    fn possible_values(&self) -> Option<Box<dyn Iterator<Item = PossibleValue> + '_>> {
+        Some(Box::new(Self::variant_names().map(PossibleValue::new)))
+    }
+}
+
+/// Generate a random test election in the Abacus database
 #[derive(Parser, Debug, Clone)]
 struct Args {
     /// The committee category
-    #[arg(value_enum)]
+    #[arg(value_parser = EnumParser::<CommitteeCategory>::new())]
     committee_category: CommitteeCategory,
 
     /// The election category
-    #[arg(value_enum)]
+    #[arg(value_parser = EnumParser::<ElectionCategory>::new())]
     election_category: ElectionCategory,
+
+    /// The vote counting method (required for GSB, if not provided uses default: CSO)
+    #[arg(short, long, value_parser = EnumParser::<VoteCountingMethod>::new())]
+    counting_method: Option<VoteCountingMethod>,
 
     /// Location of the database file, will be created if it doesn't exist
     #[arg(short, long, default_value = "db.sqlite")]
@@ -111,6 +165,7 @@ impl From<Args> for GenerateElectionArgs {
         GenerateElectionArgs {
             custom_name: args.custom_name,
             committee_category: args.committee_category,
+            counting_method: args.counting_method,
             election_category: args.election_category,
             political_groups: RandomRange(args.political_groups),
             candidates_per_group: RandomRange(args.candidates_per_group),

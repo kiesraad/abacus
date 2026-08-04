@@ -65,8 +65,8 @@ de aantallen in het proces-verbaal.
 = Gecorrigeerde telresultaten van #is_municipality[de gemeente][het openbaar lichaam]
 
 Vul alléén de getallen in die veranderd zijn ten opzichte van een eerdere telling. Getallen die niet zijn
-veranderd, hoeven niet ingevuld te worden in de kolom ‘gecorrigeerd'. Onder ‘oorspronkelijk’ staan de getallen
-die in de eerste zitting door het #location_type zijn
+veranderd, hoeven niet ingevuld te worden in de kolom ‘gecorrigeerd’. Onder ‘oorspronkelijk’ staan de getallen
+die in een eerdere zitting door het #location_type zijn
 vastgesteld.
 
 == Aantal kiesgerechtigden
@@ -76,12 +76,12 @@ vastgesteld.
 == Toegelaten kiezers
 
 #if not is_local_election(true, false) and "voter_card_count" in input.summary.voters_counts [
-  Het totaal van alle getelde geldige stempassen, kiezerspassen en volmachtbewijzen.
+  Het totaal van alle getelde geldige stempassen, volmachtbewijzen en kiezerspassen.
 
   #sum(
     with_correction_title: true,
     letterbox("A", original_value: input.previous_summary.voters_counts.poll_card_count, value: input.summary.voters_counts.poll_card_count, bold_top_border: true, wide_cells: true)[Stempassen],
-    letterbox("B", original_value: input.previous_summary.voters_counts.proxy_certificate_count, value: input.summary.voters_counts.proxy_certificate_count, wide_cells: true)[Volmachtbewijzen],
+    letterbox("B", original_value: input.previous_summary.voters_counts.proxy_certificate_count, value: input.summary.voters_counts.proxy_certificate_count, wide_cells: true)[Volmachtbewijzen (schriftelijk of via ingevulde achterkant stempas of kiezerspas)],
     letterbox("C", original_value: input.previous_summary.voters_counts.voter_card_count, value: input.summary.voters_counts.voter_card_count, wide_cells: true)[Kiezerspassen],
     letterbox("D", original_value: input.previous_summary.voters_counts.total_admitted_voters_count, value: input.summary.voters_counts.total_admitted_voters_count, wide_cells: true, light: false)[
       *Totaal toegelaten kiezers (A+B+C)*
@@ -93,7 +93,7 @@ vastgesteld.
   #sum(
     with_correction_title: true,
     letterbox("A", original_value: input.previous_summary.voters_counts.poll_card_count, value: input.summary.voters_counts.poll_card_count, bold_top_border: true, wide_cells: true)[Stempassen],
-    letterbox("B", original_value: input.previous_summary.voters_counts.proxy_certificate_count, value: input.summary.voters_counts.proxy_certificate_count, wide_cells: true)[Volmachtbewijzen],
+    letterbox("B", original_value: input.previous_summary.voters_counts.proxy_certificate_count, value: input.summary.voters_counts.proxy_certificate_count, wide_cells: true)[Volmachtbewijzen (schriftelijk of via ingevulde achterkant stempas)],
     letterbox("D", original_value: input.previous_summary.voters_counts.total_admitted_voters_count, value: input.summary.voters_counts.total_admitted_voters_count, wide_cells: true, light: false)[
       *Totaal toegelaten kiezers (A+B)*
     ]
@@ -104,7 +104,7 @@ vastgesteld.
 
 == Uitgebrachte stemmen <cast_votes>
 Vul alléén de getallen in die veranderd zijn ten opzichte van een eerdere telling. Getallen die niet zijn veranderd, hoeven niet
-ingevuld te worden in de kolom ‘gecorrigeerd'. Onder ‘oorspronkelijk’ staan de getallen die in de eerste zitting door het #location_type zijn vastgesteld.
+ingevuld te worden in de kolom ‘gecorrigeerd’. Onder ‘oorspronkelijk’ staan de getallen die in een eerdere zitting door het #location_type zijn vastgesteld.
 
 #if input.votes_tables.len() > 0 [
   #sum(
@@ -137,6 +137,8 @@ ingevuld te worden in de kolom ‘gecorrigeerd'. Onder ‘oorspronkelijk’ staa
 
 == Verschillen tussen aantal kiezers en uitgebrachte stemmen
 
+Vul alléén de getallen in die veranderd zijn ten opzichte van een eerdere telling. Getallen die niet zijn veranderd, hoeven niet ingevuld te worden in de kolom ‘gecorrigeerd’. Onder ‘oorspronkelijk’ staan de getallen die in een eerdere zitting door het #location_type zijn vastgesteld.
+
 === Is bij *alle afzonderlijke stembureaus* in #is_municipality[deze gemeente][dit openbaar lichaam] het aantal uitgebrachte stemmen en het aantal toegelaten kiezers gelijk?
 
 #let differences = input.summary.differences_counts.more_ballots_count.count > 0 or input.summary.differences_counts.fewer_ballots_count.count > 0
@@ -145,7 +147,7 @@ ingevuld te worden in de kolom ‘gecorrigeerd'. Onder ‘oorspronkelijk’ staa
 
 #checkbox(checked: differences)[Nee, er zijn stembureaus met een verschil]
 
-=== #if input.summary.differences_counts.more_ballots_count.count > 0 [Voor de stembureaus met de nummers #comma_list(input.summary.differences_counts.more_ballots_count.data_entry_sources.map(p => p.number))] else [In geen van de stembureaus] zijn er *méér* uitgebrachte stemmen dan toegelaten kiezers geteld. Noteer onder ‘gecorrigeerd' het nieuwe verschil.
+=== #if input.summary.differences_counts.more_ballots_count.count > 0 [Voor de stembureaus met de nummers #comma_list(input.summary.differences_counts.more_ballots_count.data_entry_sources.map(p => p.number))] else [In geen van de stembureaus] zijn er *méér* uitgebrachte stemmen dan toegelaten kiezers geteld. Noteer onder ‘gecorrigeerd’ het nieuwe verschil.
 
 #grid(
   rows: auto,
@@ -153,7 +155,7 @@ ingevuld te worden in de kolom ‘gecorrigeerd'. Onder ‘oorspronkelijk’ staa
   letterbox("I", original_value: input.previous_summary.differences_counts.more_ballots_count.count, value: input.summary.differences_counts.more_ballots_count.count, bold_top_border: true, wide_cells: true)[Totaal aantal méér getelde stemmen]
 )
 
-=== #if input.summary.differences_counts.fewer_ballots_count.count > 0 [Voor de stembureaus met de nummers #comma_list(input.summary.differences_counts.fewer_ballots_count.data_entry_sources.map(p => p.number))] else [In geen van de stembureaus] zijn er *minder* uitgebrachte stemmen dan toegelaten kiezers geteld. Noteer onder ‘gecorrigeerd' het nieuwe verschil.
+=== #if input.summary.differences_counts.fewer_ballots_count.count > 0 [Voor de stembureaus met de nummers #comma_list(input.summary.differences_counts.fewer_ballots_count.data_entry_sources.map(p => p.number))] else [In geen van de stembureaus] zijn er *minder* uitgebrachte stemmen dan toegelaten kiezers geteld. Noteer onder ‘gecorrigeerd’ het nieuwe verschil.
 
 #grid(
   rows: auto,
@@ -178,7 +180,7 @@ ingevuld te worden in de kolom ‘gecorrigeerd'. Onder ‘oorspronkelijk’ staa
     sum_total: columns => [Totaal lijst (kolom #columns)],
     total_instruction: [Neem dit totaal over in rubriek #ref(<cast_votes>) van deze bijlage bij de juiste lijst.],
     explainer_text: [
-      Vul alléén de getallen in die veranderd zijn ten opzichte van een eerdere telling. Getallen die niet zijn veranderd, hoeven niet ingevuld te worden in de kolom ‘gecorrigeerd'. Onder ‘oorspronkelijk’ staan de getallen die in de eerste zitting door het #location_type zijn vastgesteld.
+      Vul alléén de getallen in die veranderd zijn ten opzichte van een eerdere telling. Getallen die niet zijn veranderd, hoeven niet ingevuld te worden in de kolom ‘gecorrigeerd’. Onder ‘oorspronkelijk’ staan de getallen die in een eerdere zitting door het #location_type zijn vastgesteld.
     ],
   )
 }
@@ -187,11 +189,13 @@ ingevuld te worden in de kolom ‘gecorrigeerd'. Onder ‘oorspronkelijk’ staa
 
 = Ondertekening
 
+Het proces-verbaal moet worden ondertekend door alle aanwezige leden. Bij een #location_type zijn dit er minimaal #is_local_election[3][5].
+
 #signing_form_label[Datum]
 
 #textbox_only_bottom_stroke[Datum en tijd:][Plaats:]
 
-== Verplicht: voorzitter en #is_local_election[twee][vier] leden van het #location_type
+== Voorzitter en #is_local_election[twee][vier] leden van het #location_type
 
 #signing_form_label[Voorzitter van het #location_type:]
 
@@ -203,7 +207,7 @@ ingevuld te worden in de kolom ‘gecorrigeerd'. Onder ‘oorspronkelijk’ staa
 
 == Ondertekening door andere aanwezige leden van het #location_type
 
-#signing_form_label[Extra ondertekening: (niet verplicht)]
+#signing_form_label[Extra ondertekening:]
 
 #stack(spacing: 0.5em, ..range(0, is_local_election(3, 1)).map(_ => textbox[Naam:][Handtekening:]))
 

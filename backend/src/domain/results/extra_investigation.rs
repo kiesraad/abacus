@@ -75,7 +75,10 @@ pub mod tests {
     use test_log::test;
 
     use super::*;
-    use crate::domain::{election::tests::election_fixture, valid_default::ValidDefault};
+    use crate::domain::{
+        election::{ElectionCategory, tests::election_fixture},
+        valid_default::ValidDefault,
+    };
 
     impl ValidDefault for ExtraInvestigation {
         fn valid_default() -> Self {
@@ -97,7 +100,7 @@ pub mod tests {
         };
 
         let validation_results = extra_investigation.validate(
-            &election_fixture(committee_category, &[]),
+            &election_fixture(ElectionCategory::Municipal, committee_category, &[]),
             &"extra_investigation".into(),
         )?;
 

@@ -152,16 +152,6 @@ describe("isFormSectionEmpty", () => {
       short_title: "Boolean Test",
       subsections: [
         {
-          type: "radio",
-          short_title: "Radio Test",
-          error: "Radio error",
-          path: "test.radio_field",
-          options: [
-            { value: "true", label: "Yes", short_label: "Yes" },
-            { value: "false", label: "No", short_label: "No" },
-          ],
-        },
-        {
           type: "checkboxes",
           short_title: "Checkbox Test",
           error_path: "test.checkbox_error",
@@ -177,7 +167,6 @@ describe("isFormSectionEmpty", () => {
     const valuesWithFalse = {
       ...getInitialValues(),
       test: {
-        radio_field: false,
         checkbox_field: false,
       },
     };
@@ -188,12 +177,50 @@ describe("isFormSectionEmpty", () => {
     const valuesWithTrue = {
       ...getInitialValues(),
       test: {
-        radio_field: true,
-        checkbox_field: false,
+        checkbox_field: true,
       },
     };
 
     expect(isFormSectionEmpty([booleanSection], section, valuesWithTrue)).toBeFalsy();
+  });
+
+  test("radio fields with empty value are considered null", () => {
+    const radioSection: DataEntrySection = {
+      id: "radio_test",
+      title: "Radio Test Section",
+      short_title: "Radio Test",
+      subsections: [
+        {
+          type: "radio",
+          short_title: "Radio Test",
+          error: "Radio error",
+          path: "test.radio_field",
+          options: [{ label: "Radio", short_label: "Radio", value: "OptionA" }],
+        },
+      ],
+    };
+
+    const section = getDefaultFormSection("radio_test", 0);
+
+    // Test with empty values - should be considered null
+    const data = {
+      ...getInitialValues(),
+      test: {
+        radio_field: "",
+      },
+    };
+
+    expect(isFormSectionEmpty([radioSection], section, data)).toBeTruthy();
+
+    // Test with a non-empty value - should be considered non-empty
+    const valuesWithTrue = {
+      ...getInitialValues(),
+      test: {
+        radio_field: "OptionA",
+      },
+    };
+
+    expect(isFormSectionEmpty([radioSection], section, valuesWithTrue)).toBeFalsy();
   });
 });
 

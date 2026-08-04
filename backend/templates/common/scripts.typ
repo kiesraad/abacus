@@ -204,6 +204,11 @@
   prefilled_text(fmt-number(value, thousands-sep: thousands-sep, zero: zero))
 }
 
+/// Lock the height of all letterbox rows. Needed bc > 1 line suffixes (`content`)
+/// would vertically stretch the box. Note: in case of > 2 line suffixes, content
+/// will spill outside the designated area.
+#let letterbox_row_height = 2.70em
+
 #let empty_letterbox(letter, cells: 5, light: true, original_value: none, value: none, bold_top_border: false, wide_cells: false, content) = {
   let bg_grey = luma(213)
   let bg = if light { bg_grey } else { black }
@@ -233,6 +238,7 @@
 
   grid(
     inset: 9pt,
+    rows: letterbox_row_height,
     columns: grid_columns,
     align: (center, right),
     grid.vline(stroke: (thickness: 0.5pt, dash: "solid")),
@@ -252,7 +258,34 @@
       )
     }),
     grid.vline(stroke: (thickness: 0.5pt, dash: "solid")),
-    grid.cell(stroke: (rest: 0.5pt + black) + top_border_stroke, align: center, fill: bg, text(fill: fill, weight: "bold", letter)),
+    grid.cell(stroke: (rest: 0.5pt + black) + top_border_stroke, align: center + horizon, fill: bg, text(fill: fill, weight: "bold", letter)),
+    grid.cell(align: horizon + left, content),
+  )
+}
+
+/// Like empty_letterbox, but replaces the digit entry area (and the original
+/// value area when `with_original: true`) with a single merged cell containing
+/// "Niet invullen".
+#let no_entry_letterbox(letter, cells: 5, with_original: false, content) = {
+  let stroke = 0.5pt + black
+  let no_entry_cell = grid.cell(align: center + horizon, stroke: stroke, [Niet invullen])
+
+  // Note: `wide_cells` is not needed for `no_entry_letterbox` atm.
+  let entry_width = cells * 2em
+  let columns = if with_original {
+    (entry_width, entry_width, 3.5em, 1fr)
+  } else {
+    (entry_width, 3.5em, 1fr)
+  }
+
+  grid(
+    inset: 9pt,
+    rows: letterbox_row_height,
+    columns: columns,
+    align: (center, right),
+    ..cell_if(with_original, no_entry_cell),
+    no_entry_cell,
+    grid.cell(stroke: stroke, align: center + horizon, fill: luma(213), text(weight: "bold", letter)),
     grid.cell(align: horizon + left, content),
   )
 }
@@ -276,6 +309,7 @@
 #let number_box(value: none, content) = {
   grid(
     inset: 9pt,
+    rows: letterbox_row_height,
     columns: (8em, 1fr),
     align: (center, right),
     grid.vline(stroke: (thickness: 0.5pt, dash: "solid")),

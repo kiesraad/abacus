@@ -5,7 +5,36 @@ import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { t, tx } from "@/i18n/translate";
 
-import { effectiveWrongEntryAction, type ResolveDifferencesFormState } from "../utils/differences";
+import { type CorrectEntry, effectiveWrongEntryAction, type ResolveDifferencesFormState } from "../utils/differences";
+
+// Explains why the kept entry blocks correcting the other one.
+function correctionBlockedMessage(correctEntry: CorrectEntry | undefined): string | undefined {
+  if (correctEntry === "first") {
+    return t("resolve_differences.correction_blocked.first_entry_has_errors");
+  }
+  if (correctEntry === "second") {
+    return t("resolve_differences.correction_blocked.second_entry_has_errors");
+  }
+  return undefined;
+}
+
+// Renders nothing when correcting the other entry is not blocked
+function CorrectionBlockedAlert({
+  correctEntry,
+  correctionBlocked,
+}: Pick<ResolveDifferencesFormState, "correctEntry" | "correctionBlocked">) {
+  const message = correctionBlocked ? correctionBlockedMessage(correctEntry) : undefined;
+
+  if (!message) {
+    return null;
+  }
+
+  return (
+    <Alert type="notify" small>
+      {message}
+    </Alert>
+  );
+}
 
 export interface ResolveDifferencesFormProps {
   firstEntryName: string;
@@ -75,11 +104,7 @@ export function ResolveDifferencesForm({
           </ChoiceList>
         </FormLayout.Section>
         <FormLayout.Section title={tx("resolve_differences.wrong_entry_question")}>
-          {correctionBlocked && (
-            <Alert type="notify" small>
-              {t("resolve_differences.correction_blocked")}
-            </Alert>
-          )}
+          <CorrectionBlockedAlert correctEntry={correctEntry} correctionBlocked={correctionBlocked} />
           <ChoiceList disabled={wrongEntryDisabled}>
             {wrongEntryError && (
               <ChoiceList.Error id="resolve-differences-wrong-entry-error">{wrongEntryError}</ChoiceList.Error>

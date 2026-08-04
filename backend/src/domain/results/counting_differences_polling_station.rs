@@ -77,7 +77,7 @@ mod tests {
 
     use super::*;
     use crate::domain::{
-        election::{CommitteeCategory, tests::election_fixture},
+        election::{CommitteeCategory, ElectionCategory, tests::election_fixture},
         valid_default::ValidDefault,
     };
 
@@ -101,7 +101,7 @@ mod tests {
         };
 
         let validation_results = counting_differences_polling_station.validate(
-            &election_fixture(committee_category, &[]),
+            &election_fixture(ElectionCategory::Municipal, committee_category, &[]),
             &"counting_differences_polling_station".into(),
         )?;
 

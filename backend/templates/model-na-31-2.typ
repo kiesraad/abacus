@@ -74,7 +74,7 @@ De volgende rollen zijn mogelijk: voorzitter, plaatsvervangend voorzitter of lid
 
 #empty_table(
   columns: (8em, 1fr, 1fr, 1fr, 8em),
-  headers: ("Voorletters", "Achternaam", "Rol", "Aanwezig (van - tot)", "Locatie"),
+  headers: ("Voorletters", "Achternaam", "Rol", "Aanwezig van - tot", "Locatie"),
   values: ("", "", "", "-", ""),
   rows: 24,
 )
@@ -170,13 +170,13 @@ Bijvoorbeeld een schorsing of als er meerdere verkiezingen tegelijk werden georg
     letterbox(
       "B",
       value: input.summary.voters_counts.proxy_certificate_count,
-    )[Volmachtbewijzen (schriftelijk of via ingevulde stempas)],
+    )[Volmachtbewijzen (schriftelijk of via ingevulde achterkant stempas of kiezerspas)],
     letterbox("C", value: input.summary.voters_counts.voter_card_count)[Kiezerspassen],
     letterbox(
       "D",
       light: false,
       value: input.summary.voters_counts.total_admitted_voters_count,
-    )[Totaal toegelaten kiezers (A+B+C)],
+    )[*Totaal toegelaten kiezers (A+B+C)*],
   )
 ] else [
   Tel het aantal geldige stempassen en volmachtbewijzen
@@ -186,12 +186,12 @@ Bijvoorbeeld een schorsing of als er meerdere verkiezingen tegelijk werden georg
     letterbox(
       "B",
       value: input.summary.voters_counts.proxy_certificate_count,
-    )[Volmachtbewijzen (schriftelijk of via ingevulde stempas)],
+    )[Volmachtbewijzen (schriftelijk of via ingevulde achterkant stempas)],
     letterbox(
       "D",
       light: false,
       value: input.summary.voters_counts.total_admitted_voters_count,
-    )[Totaal toegelaten kiezers (A+B)],
+    )[*Totaal toegelaten kiezers (A+B)*],
   )
 ]
 
@@ -235,7 +235,7 @@ Bijvoorbeeld een schorsing of als er meerdere verkiezingen tegelijk werden georg
 
 #let differences = input.summary.differences_counts.more_ballots_count.count > 0 or input.summary.differences_counts.fewer_ballots_count.count > 0
 
-#checkbox(checked: not differences)[Ja, #sym.arrow.r Ga door naar #ref(<monitoring_protocol>)]
+#checkbox(checked: not differences)[Ja]
 
 #checkbox(checked: differences)[Nee, er zijn stembureaus met een verschil]
 
@@ -286,11 +286,13 @@ Voer de controle uit volgens de stappen in het controleprotocol.
 
 = Ondertekening
 
+Het proces-verbaal moet worden ondertekend door alle aanwezige leden. Bij een #location_type zijn dit er minimaal #is_local_election[3][5].
+
 #signing_form_label[Datum]
 
 #textbox_only_bottom_stroke[Datum en tijd:][Plaats:]
 
-== Verplicht: voorzitter en #is_local_election[twee][vier] leden van het #location_type
+== Voorzitter en #is_local_election[twee][vier] leden van het #location_type
 
 #signing_form_label[Voorzitter van het #location_type:]
 
@@ -302,7 +304,7 @@ Voer de controle uit volgens de stappen in het controleprotocol.
 
 == Ondertekening door andere aanwezige leden van het #location_type
 
-#signing_form_label[Extra ondertekening: (niet verplicht)]
+#signing_form_label[Extra ondertekening:]
 
 #stack(spacing: 0.5em, ..range(0, is_local_election(3, 1)).map(_ => textbox[Naam:][Handtekening:]))
 

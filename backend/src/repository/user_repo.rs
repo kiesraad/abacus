@@ -13,6 +13,10 @@ use crate::{
 
 const MIN_UPDATE_LAST_ACTIVITY_AT_SECS: i64 = 60; // 1 minute
 
+/// Pre-computed Argon2id hash of "TotallyValidP4ssW0rd". This hash is never verified, only used in a fixture.
+#[cfg(test)]
+const TEST_USER_PASSWORD_HASH: &str = "$argon2id$v=19$m=19456,t=2,p=1$ySkT+RWXZ+VGKh0wxfz9kA$aCyyi3a6ok9WaKiX5Jvacrxi9ifPxTOQ8wba40rVAbg";
+
 id!(UserId);
 
 /// User object, corresponds to a row in the users table
@@ -102,10 +106,7 @@ impl User {
             fullname: Some("Full Name".to_string()),
             role,
             needs_password_change: false,
-            password_hash: hash_password(
-                &ValidatedPassword::new("test_user_1", "TotallyValidP4ssW0rd", None).unwrap(),
-            )
-            .unwrap(),
+            password_hash: HashedPassword::from(TEST_USER_PASSWORD_HASH.to_string()),
             last_activity_at: None,
             is_logged_in: false,
             updated_at: Utc::now(),
@@ -658,11 +659,9 @@ mod tests {
             fullname: Some("Full Name".to_string()),
             role: Role::TypistGSB,
             needs_password_change: false,
-            password_hash: password::hash_password(
-                &password::ValidatedPassword::new("test_user_1", "TotallyValidP4ssW0rd", None)
-                    .unwrap(),
-            )
-            .unwrap(),
+            password_hash: password::HashedPassword::from(
+                super::TEST_USER_PASSWORD_HASH.to_string(),
+            ),
             last_activity_at: None,
             is_logged_in: false,
             updated_at: chrono::Utc::now(),

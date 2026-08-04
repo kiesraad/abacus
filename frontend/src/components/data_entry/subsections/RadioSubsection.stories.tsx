@@ -32,9 +32,6 @@ const meta = {
   args: {
     subsection: radioSubsection,
     currentValues: {},
-    defaultProps: {
-      errorsAndWarningsAccepted: false,
-    },
     readOnly: false,
   },
 } satisfies Meta<typeof RadioSubsectionComponent>;

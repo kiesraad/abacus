@@ -35,10 +35,11 @@ async fn it_generates_a_pdf() {
         political_groups: vec![],
     };
 
+    let summary = ElectionSummary::zero(&election);
     let content = generate_pdf(
         ModelNa31_2Input {
-            summary: ElectionSummary::zero().into(),
-            votes_tables: VotesTables::new(&election, &ElectionSummary::zero()).unwrap(),
+            summary: summary.clone().into(),
+            votes_tables: VotesTables::new(&election, &summary).unwrap(),
             committee_session: committee_session_fixture(ElectionId::from(1)),
             election: election.into(),
             polling_stations: vec![],
@@ -98,7 +99,7 @@ async fn it_generates_a_pdf_with_unsupported_chars() {
 
 #[test(tokio::test)]
 async fn it_generates_a_pdf_with_polling_stations() {
-    let election = election_fixture(CommitteeCategory::GSB, &[2, 3]);
+    let election = election_fixture(ElectionCategory::Municipal, CommitteeCategory::GSB, &[2, 3]);
     let committee_session = committee_session_fixture(election.id);
     let summary = ElectionSummary::from_results(&election, &[]).unwrap();
 

@@ -1,117 +1,185 @@
 [
   {
-    "id": "extra_investigation",
-    "sectionNumber": "B1-1",
-    "short_title": "Extra onderzoek",
+    "id": "about_report",
+    "short_title": "Over het proces-verbaal",
     "subsections": [
       {
-        "message": "Neem de vinkjes over zoals ze op het papieren formulier zijn gezet.",
-        "type": "message",
-      },
-      {
-        "error_message": "Controleer of je antwoord gelijk is aan het papieren proces-verbaal",
-        "error_path": "extra_investigation.extra_investigation_other_reason",
+        "error": "Controleer of je antwoord gelijk is aan het papieren proces-verbaal",
         "options": [
           {
-            "autoFocusInput": true,
-            "label": "Ja",
-            "path": "extra_investigation.extra_investigation_other_reason.yes",
-            "short_label": "Ja",
+            "label": <React.Fragment>
+              <React.Fragment>
+                Ja, ik heb 
+              </React.Fragment>
+              <strong>
+                <React.Fragment>
+                  <React.Fragment>
+                    twee documenten
+                  </React.Fragment>
+                </React.Fragment>
+              </strong>
+              <React.Fragment>
+                 (een proces-verbaal en een corrigendum)
+              </React.Fragment>
+            </React.Fragment>,
+            "short_label": "Ja, een proces-verbaal en een corrigendum",
+            "value": "TwoDocuments",
           },
           {
-            "label": "Nee",
-            "path": "extra_investigation.extra_investigation_other_reason.no",
-            "short_label": "Nee",
+            "label": <React.Fragment>
+              <React.Fragment>
+                Nee, ik heb 
+              </React.Fragment>
+              <strong>
+                <React.Fragment>
+                  <React.Fragment>
+                    één document
+                  </React.Fragment>
+                </React.Fragment>
+              </strong>
+              <React.Fragment>
+                 (alleen een proces-verbaal)
+              </React.Fragment>
+            </React.Fragment>,
+            "short_label": "Nee, alleen een proces-verbaal",
+            "value": "OneDocument",
           },
         ],
-        "short_title": "Extra onderzoek vanwege andere reden dan onverklaard verschil?",
-        "title": "Heeft het gemeentelijk stembureau extra onderzoek gedaan vanwege een andere reden dan een onverklaard verschil?",
-        "type": "checkboxes",
+        "path": "about_report.corrigendum_present",
+        "short_title": "Corrigendum aanwezig?",
+        "title": <React.Fragment>
+          <React.Fragment>
+            Is er een 
+          </React.Fragment>
+          <strong>
+            <React.Fragment>
+              <React.Fragment>
+                corrigendum
+              </React.Fragment>
+            </React.Fragment>
+          </strong>
+          <React.Fragment>
+             bij het papieren proces-verbaal aanwezig?
+          </React.Fragment>
+        </React.Fragment>,
+        "type": "radio",
       },
       {
-        "error_message": "Controleer of je antwoord gelijk is aan het papieren proces-verbaal",
-        "error_path": "extra_investigation.ballots_recounted_extra_investigation",
+        "error": "Controleer of je antwoord gelijk is aan het papieren proces-verbaal",
         "options": [
           {
-            "label": "Ja",
-            "path": "extra_investigation.ballots_recounted_extra_investigation.yes",
-            "short_label": "Ja",
+            "label": "Ja, de pagina ‘controles en correcties’ is aanwezig",
+            "short_label": "Ja, de pagina ‘controles en correcties’ is aanwezig",
+            "value": "PagePresent",
           },
           {
-            "label": "Nee",
-            "path": "extra_investigation.ballots_recounted_extra_investigation.no",
-            "short_label": "Nee",
+            "label": "Nee, de pagina ontbreekt",
+            "short_label": "Nee, de pagina ontbreekt",
+            "value": "PageMissing",
           },
         ],
-        "short_title": "Stembiljetten na onderzoek (deels) herteld?",
-        "title": "Zijn de stembiljetten naar aanleiding van het extra onderzoek (gedeeltelijk) herteld?",
-        "type": "checkboxes",
+        "path": "about_report.checks_and_corrections_present",
+        "short_title": "Extra pagina controles en correcties aanwezig?",
+        "title": <React.Fragment>
+          <React.Fragment>
+            Is voorin het proces-verbaal de extra pagina 
+          </React.Fragment>
+          <strong>
+            <React.Fragment>
+              <React.Fragment>
+                controles en correcties
+              </React.Fragment>
+            </React.Fragment>
+          </strong>
+          <React.Fragment>
+             ingevoegd?
+          </React.Fragment>
+        </React.Fragment>,
+        "type": "radio",
       },
     ],
-    "title": "Alleen bij extra onderzoek",
+    "title": "Over het proces-verbaal",
   },
   {
-    "id": "counting_differences_polling_station",
-    "sectionNumber": "B1-2",
-    "short_title": "Verschillen met stembureau",
+    "id": "checks_and_corrections",
+    "short_title": "Controles en correcties",
     "subsections": [
       {
         "message": "Neem de vinkjes over zoals ze op het papieren formulier zijn gezet.",
         "type": "message",
       },
       {
-        "title": "2.1  Aantallen kiezers en stemmen",
+        "title": "Op eigen initiatief van het gemeentelijk stembureau",
         "type": "heading",
       },
       {
         "error_message": "Controleer of je antwoord gelijk is aan het papieren proces-verbaal",
-        "error_path": "counting_differences_polling_station.unexplained_difference_ballots_voters",
+        "error_path": "checks_and_corrections.reason_investigation_own_initiative",
         "options": [
           {
             "autoFocusInput": true,
-            "label": "Ja",
-            "path": "counting_differences_polling_station.unexplained_difference_ballots_voters.yes",
-            "short_label": "Ja",
+            "label": "Vanwege een onverklaard verschil",
+            "path": "checks_and_corrections.reason_investigation_own_initiative.unaccounted_difference",
+            "short_label": "Vanwege een onverklaard verschil",
           },
           {
-            "label": "Nee",
-            "path": "counting_differences_polling_station.unexplained_difference_ballots_voters.no",
-            "short_label": "Nee",
+            "label": "Vanwege (het vermoeden van) een andere fout",
+            "path": "checks_and_corrections.reason_investigation_own_initiative.other_error",
+            "short_label": "Vanwege (het vermoeden van) een andere fout",
           },
         ],
-        "short_title": "Verschil tussen getelde stembiljetten en toegelaten kiezers?",
-        "title": "Was er in de telresultaten van het stembureau een onverklaard verschil tussen het totaal aantal getelde stembiljetten en het aantal toegelaten kiezers?",
+        "short_title": "Waarom heeft het GSB de telresultaten onderzocht?",
+        "title": "Waarom heeft het gemeentelijk stembureau de telresultaten onderzocht?",
         "type": "checkboxes",
       },
       {
-        "title": "2.3 Tellingen op lijstniveau",
+        "error_message": "Controleer of je antwoord gelijk is aan het papieren proces-verbaal",
+        "error_path": "checks_and_corrections.corrected_results_own_initiative",
+        "options": [
+          {
+            "label": "Nee, de oorspronkelijke telresultaten waren correct",
+            "path": "checks_and_corrections.corrected_results_own_initiative.no",
+            "short_label": "Nee, de oorspronkelijke telresultaten waren correct",
+          },
+          {
+            "label": "Ja, er zijn gecorrigeerde telresultaten",
+            "path": "checks_and_corrections.corrected_results_own_initiative.yes",
+            "short_label": "Ja, er zijn gecorrigeerde telresultaten",
+          },
+        ],
+        "short_title": "Zijn er gecorrigeerde telresultaten?",
+        "title": "Zijn er gecorrigeerde telresultaten?",
+        "type": "checkboxes",
+      },
+      {
+        "title": "Op verzoek van het centraal stembureau",
         "type": "heading",
       },
       {
         "error_message": "Controleer of je antwoord gelijk is aan het papieren proces-verbaal",
-        "error_path": "counting_differences_polling_station.difference_ballots_per_list",
+        "error_path": "checks_and_corrections.corrected_results_csb_request",
         "options": [
           {
-            "label": "Ja",
-            "path": "counting_differences_polling_station.difference_ballots_per_list.yes",
-            "short_label": "Ja",
+            "label": "Nee, de oorspronkelijke telresultaten waren correct",
+            "path": "checks_and_corrections.corrected_results_csb_request.no",
+            "short_label": "Nee, de oorspronkelijke telresultaten waren correct",
           },
           {
-            "label": "Nee",
-            "path": "counting_differences_polling_station.difference_ballots_per_list.no",
-            "short_label": "Nee",
+            "label": "Ja, er zijn gecorrigeerde telresultaten",
+            "path": "checks_and_corrections.corrected_results_csb_request.yes",
+            "short_label": "Ja, er zijn gecorrigeerde telresultaten",
           },
         ],
-        "short_title": "Verschil tussen totalen per lijst op stembureau en gemeentelijk stembureau?",
-        "title": "Is er een verschil tussen het totaal aantal getelde stembiljetten per lijst zoals eerder vastgesteld door het stembureau en zoals door u geteld op het gemeentelijk stembureau?",
+        "short_title": "Zijn er gecorrigeerde telresultaten?",
+        "title": "Zijn er gecorrigeerde telresultaten?",
         "type": "checkboxes",
       },
     ],
-    "title": "Verschillen met telresultaten van het stembureau",
+    "title": "Controles en correcties",
   },
   {
     "id": "voters_votes_counts",
-    "sectionNumber": "B1-3.1 en 3.2",
+    "sectionNumber": "2.1 en 2.2",
     "short_title": "Aantal kiezers en stemmen",
     "subsections": [
       {
@@ -189,7 +257,7 @@
   },
   {
     "id": "differences_counts",
-    "sectionNumber": "B1-3.3",
+    "sectionNumber": "2.3",
     "short_title": "Verschillen D & H",
     "subsections": [
       {
@@ -257,7 +325,7 @@
           <strong>
             <React.Fragment>
               <React.Fragment>
-                3.3.1
+                2.3.1
               </React.Fragment>
             </React.Fragment>
           </strong>
@@ -307,7 +375,7 @@
           <strong>
             <React.Fragment>
               <React.Fragment>
-                3.3.2
+                2.3.2
               </React.Fragment>
             </React.Fragment>
           </strong>

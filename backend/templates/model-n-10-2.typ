@@ -163,11 +163,12 @@ Bijvoorbeeld als er meerdere verkiezingen tegelijk werden georganiseerd, en een 
 
   #sum(
     empty_letterbox("A")[Stempassen],
-    empty_letterbox("B")[Volmachtbewijzen (schriftelijk of via ingevulde stempas)],
+    empty_letterbox("B")[Volmachtbewijzen (schriftelijk of via ingevulde achterkant stempas)],
+    no_entry_letterbox("C")[Kiezerspassen (niet van toepassing bij gemeente- en eilandraadsverkiezingen)],
     empty_letterbox(
       "D",
       light: false,
-    )[Totaal toegelaten kiezers (A+B)],
+    )[*Totaal toegelaten kiezers (A+B)*],
   )
 ][
   Tel het aantal geldige stempassen, volmachtbewijzen en kiezerspassen
@@ -176,12 +177,12 @@ Bijvoorbeeld als er meerdere verkiezingen tegelijk werden georganiseerd, en een 
     empty_letterbox("A")[Stempassen],
     empty_letterbox(
       "B",
-    )[Volmachtbewijzen (schriftelijk of via ingevulde stempas of kiezerspas)],
+    )[Volmachtbewijzen (schriftelijk of via ingevulde achterkant stempas of kiezerspas)],
     empty_letterbox("C")[Kiezerspassen],
     empty_letterbox(
       "D",
       light: false,
-    )[Totaal toegelaten kiezers (A+B+C)],
+    )[*Totaal toegelaten kiezers (A+B+C)*],
   )
 ]
 
@@ -217,9 +218,9 @@ Bijvoorbeeld als er meerdere verkiezingen tegelijk werden georganiseerd, en een 
 
 === Vergelijk D (totaal toegelaten kiezers) en H (totaal uitgebrachte stemmen)
 
-#checkbox[D en H zijn gelijk #sym.arrow.r *Ga door naar #ref(<signing>)*]
+#checkbox[D en H zijn *gelijk* #sym.arrow.r *Ga door naar #ref(<signing>)*]
 
-#checkbox[H is groter is dan D (meer uitgebrachte stemmen dan toegelaten kiezers)]
+#checkbox[H is *groter* dan D (meer uitgebrachte stemmen dan toegelaten kiezers)]
 
 #box(inset: (left: 3em, bottom: 1em), empty_letterbox(
   "I",
@@ -227,7 +228,7 @@ Bijvoorbeeld als er meerdere verkiezingen tegelijk werden georganiseerd, en een 
   light: false,
 )[Aantal méér getelde stemmen (bereken: H _min_ D)])
 
-#checkbox[H is kleiner dan D (minder uitgebrachte stemmen dan toegelaten kiezers)]
+#checkbox[H is *kleiner* dan D (minder uitgebrachte stemmen dan toegelaten kiezers)]
 
 #box(inset: (left: 3em, bottom: 1em), empty_letterbox(
   "J",
@@ -244,11 +245,13 @@ Bijvoorbeeld als er meerdere verkiezingen tegelijk werden georganiseerd, en een 
 
 = Ondertekening <signing>
 
+Het proces-verbaal moet worden ondertekend door alle aanwezige leden. Bij een stembureau zijn dit er minimaal 3.
+
 #signing_form_label[Datum]
 
 #textbox_only_bottom_stroke[Datum en tijd:][Plaats:]
 
-== Verplicht: voorzitter en twee leden van het stembureau
+== Voorzitter en twee leden van het stembureau
 
 #signing_form_label[Voorzitter van het stembureau:]
 
@@ -260,7 +263,7 @@ Bijvoorbeeld als er meerdere verkiezingen tegelijk werden georganiseerd, en een 
 
 == Ondertekening door andere aanwezige leden van het stembureau
 
-#signing_form_label[Extra ondertekening: (niet verplicht)]
+#signing_form_label[Extra ondertekening:]
 
 #stack(spacing: 0.5em, ..range(0, 4).map(_ => textbox[Naam:][Handtekening:]))
 

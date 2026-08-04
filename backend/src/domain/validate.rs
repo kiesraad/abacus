@@ -115,6 +115,7 @@ pub enum ValidationResultCode {
     /// GSB CSO, GSB DSO, CSB: (Bij tweede invoer) Niet alle ingevoerde waardes van de tweede invoer zijn gelijk aan die van de eerste invoer
     W001,
     /// GSB CSO, GSB DSO, CSB: (Bij verschil met andere invoer) Een coördinator heeft beide invoeren vergeleken, en aangegeven dat in deze invoer fouten zijn gemaakt
+    /// This warning is triggered in the frontend, not in the backend.
     W002,
     /// GSB CSO, GSB DSO: 'Aantal kiezers en stemmen': Aantal blanco stemmen is groter dan of gelijk aan 3% van het totaal aantal uitgebrachte stemmen
     W201,

@@ -3,7 +3,7 @@
     "id": 2,
     "name": "Gemeenteraad Juinen 2035",
     "committee_category": "GSB",
-    "counting_method": "CSO",
+    "counting_method": "DSO",
     "election_id": "GR2035_Juinen",
     "location": "Juinen",
     "domain_id": "0035",

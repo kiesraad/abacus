@@ -759,7 +759,7 @@
         ]
       },
       "delete": {
-        "summary": "Discard an in-progress (not finalised) data entry (typist_csb, typist_gsb)",
+        "summary": "Discard an in-progress data entry or a correction. Discarding a\ncorrection finalises the other entry as the first entry. (typist_csb, typist_gsb)",
         "operationId": "data_entry_discard",
         "parameters": [
           {

@@ -10,8 +10,8 @@ import { DataEntryClaimHandler, ElectionRequestHandler } from "@/testing/api-moc
 import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMockData";
 import { server } from "@/testing/server";
 import { render, screen, waitFor, within } from "@/testing/test-utils";
+import type { CSOFirstSessionResults } from "@/types/generated/openapi";
 import { ValidationResultSet } from "@/utils/ValidationResults";
-
 import { getDefaultFormSection } from "../testing/mock-data";
 import { overrideServerClaimDataEntryResponse } from "../testing/test.utils";
 import type { FormState } from "../types/types";
@@ -70,7 +70,7 @@ const results = {
       candidate_votes: [{ number: 1, votes: 10 }],
     },
   ],
-};
+} satisfies Partial<CSOFirstSessionResults>;
 
 describe("DataEntryProgress", () => {
   beforeEach(() => {
@@ -86,8 +86,15 @@ describe("DataEntryProgress", () => {
     formState.sections.differences_counts!.acceptErrorsAndWarnings = true;
 
     overrideServerClaimDataEntryResponse({
+      model: "DSOFirstSession",
       formState: formState,
-      results: results,
+      results: {
+        ...results,
+        about_report: {
+          corrigendum_present: "OneDocument",
+          checks_and_corrections_present: "PageMissing",
+        },
+      },
       continueToNextSection: false,
       validationResults: {
         errors: [validationResultMockData.F201],
@@ -100,11 +107,18 @@ describe("DataEntryProgress", () => {
       expect(screen.getByText("Aantal kiezers en stemmen")).toBeVisible();
     });
 
+    const checksAndCorrections = screen.getByTestId("list-item-checks_and_corrections");
     const votersAndVotes = screen.getByTestId("list-item-voters_votes_counts");
     const differences = screen.getByTestId("list-item-differences_counts");
     const list1 = screen.getByTestId("list-item-political_group_votes_1");
     const list2 = screen.getByTestId("list-item-political_group_votes_2");
     const checkAndSave = screen.getByTestId("list-item-save");
+
+    expect(checksAndCorrections).toHaveClass("skipped");
+    expect(checksAndCorrections).toHaveAttribute("aria-current", "false");
+    const checksAndCorrectionsIcon = within(checksAndCorrections).getByRole("img");
+    expect(checksAndCorrectionsIcon).toHaveAccessibleName("overgeslagen");
+    expect(within(checksAndCorrections).queryByRole("link")).not.toBeInTheDocument();
 
     expect(votersAndVotes).toHaveClass("error");
     expect(votersAndVotes).toHaveAttribute("aria-current", "false");

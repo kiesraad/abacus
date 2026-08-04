@@ -103,6 +103,10 @@
   {
     "id": "checks_and_corrections",
     "short_title": "Controles en correcties",
+    "skip_when": {
+      "equal_to": "PageMissing",
+      "path": "about_report.checks_and_corrections_present",
+    },
     "subsections": [
       {
         "message": "Neem de vinkjes over zoals ze op het papieren formulier zijn gezet.",

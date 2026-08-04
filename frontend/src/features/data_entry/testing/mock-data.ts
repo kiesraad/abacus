@@ -1,6 +1,10 @@
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
-import type { CSOFirstSessionResults, DATA_ENTRY_SAVE_REQUEST_BODY } from "@/types/generated/openapi";
+import type {
+  CSOFirstSessionResults,
+  DATA_ENTRY_SAVE_REQUEST_BODY,
+  DSOFirstSessionResults,
+} from "@/types/generated/openapi";
 import type { DataEntryModel, DataEntryStructure, FormSectionId } from "@/types/types";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 import { ValidationResultSet } from "@/utils/ValidationResults";
@@ -52,10 +56,30 @@ export function getInitialValues(election = electionMockData): CSOFirstSessionRe
   };
 }
 
+export function getDSOInitialValues(election = electionMockData): DSOFirstSessionResults {
+  const { voters_counts, votes_counts, differences_counts, political_group_votes } = getInitialValues(election);
+  return {
+    about_report: {
+      corrigendum_present: null,
+      checks_and_corrections_present: null,
+    },
+    checks_and_corrections: {
+      reason_investigation_own_initiative: { unaccounted_difference: false, other_error: false },
+      corrected_results_own_initiative: { yes: false, no: false },
+      corrected_results_csb_request: { yes: false, no: false },
+    },
+    voters_counts,
+    votes_counts,
+    differences_counts,
+    political_group_votes,
+  };
+}
+
 export function getDefaultFormSection(id: FormSectionId, index: number): FormSection {
   return {
     id,
     index,
+    isDisabled: false,
     isSaved: false,
     acceptErrorsAndWarnings: false,
     hasChanges: false,

@@ -1,6 +1,6 @@
 #import "common/style.typ": conf, document_numbering, blank_page_before_signing
 #import "common/scripts.typ": *
-#let input = json("inputs/model-n-10-2-variations/model-n-10-2-GR.json")
+#let input = json("inputs/model-n-10-1-variations/model-n-10-1-GR.json")
 
 #let is_municipality = (municipal, public_body) => is_municipality(input.election.location, municipal, public_body)
 #let is_local_election = (local, other) => is_local_election(input.election.category, local, other)
@@ -14,24 +14,33 @@
 
 #let header-right = [Stembureau #input.polling_station.number]
 
-#show: doc => conf(doc, header-right: header-right, footer: [Proces-verbaal van een stembureau \
-  Model N 10-2 centrale stemopneming])
+#show: doc => conf(
+  doc,
+  header-left: [
+    #input.election.location #header-right #input.polling_station.name
+  ],
+  header-right: header-right, 
+  footer: [
+    Proces-verbaal van een stembureau \
+    Model N 10-1 decentrale stemopneming (versie 2027)
+  ]
+)
 
 #set heading(numbering: none)
 
 #title_page(
-  [#input.election.location Stembureau #input.polling_station.number #input.polling_station.name],
+  [#input.election.location #header-right #input.polling_station.name],
   "",
   [#input.election.name - #format_date(input.election.election_date)],
   [
-    Verslag en telresultaten per lijst –
-    Model N 10-2
-  ]
+    Verslag en telresultaten per lijst en kandidaat \
+    Model N 10-1
+  ],
 )
 
-== Details van het #if is_mobile { "mobiele stembureau" } else { "stembureau" }
+== Details van het #if is_mobile { "mobiel stembureau" } else { "stembureau" }
 
-#location_name #sym.arrow.r Stembureau #input.polling_station.number
+Kieskring \<nummer> #sym.arrow.r #location_name #sym.arrow.r Stembureau #input.polling_station.number
 
 #v(0.5em)
 
@@ -47,10 +56,10 @@
 
 == Proces-verbaal
 
-Elk stembureau maakt bij een verkiezing een verslag: het proces-verbaal. Hierin staat hoe het stemmen en het tellen van de stemmen is verlopen.
+Elk stembureau maakt bij een verkiezing een verslag: het proces-verbaal. Hierin staat hoe het stemmen en het tellen van de stemmen is verlopen
 
 #emph_block[
-  In #this_location is gekozen voor *centrale stemopneming*. Het stembureau telt na het stemmen het aantal kiezers, en hoeveel stemmen elke lijst heeft gekregen. Het #location_type telt 1 of 2 dagen later de stemmen per kandidaat op een centrale tellocatie. Die telresultaten staan in het verslag van het #location_type.
+  In #this_location is gekozen voor *decentrale stemopneming*. Het stembureau telt na het stemmen het aantal kiezers, en hoeveel stemmen elke lijst en elke kandidaat hebben gekregen.
 ]
 
 == Inhoudsopgave
@@ -61,13 +70,48 @@ Elk stembureau maakt bij een verkiezing een verslag: het proces-verbaal. Hierin 
 
 #pagebreak(weak: true)
 
+= Controles en correcties
+
+#emph_block[
+  Deze pagina is toegevoegd door de leden van het #location_type, *nadat er extra controles op de telresultaten van dit stembureau zijn uitgevoerd*. Voeg deze pagina toe na het voorblad van het oorspronkelijke proces-verbaal van het stembureau (N 10-1).
+]
+
+== Op eigen initiatief van het #location_type
+
+=== Waarom heeft het #location_type de telresultaten onderzocht?
+
+#checkbox[Vanwege een onverklaard verschil]
+#checkbox[Vanwege (het vermoeden van) een andere fout]
+
+=== Zijn er gecorrigeerde telresultaten?
+
+#checkbox[Nee, de oorspronkelijke telresultaten waren correct]
+#checkbox[Ja, er zijn gecorrigeerde telresultaten (de gecorrigeerde telresultaten zijn bij dit proces-verbaal gevoegd)]
+
+=== Opgesteld door het #location_type
+
+#textbox[Datum en tijd:]
+
+== Op verzoek van het centraal stembureau
+
+=== Zijn er gecorrigeerde telresultaten?
+
+#checkbox[Nee, de oorspronkelijke telresultaten waren correct]
+#checkbox[Ja, er zijn gecorrigeerde telresultaten (de gecorrigeerde telresultaten zijn bij dit proces-verbaal gevoegd)]
+
+=== Opgesteld door het #location_type
+
+#textbox[Datum en tijd:]
+
+#pagebreak(weak: true)
+
 #show: doc => document_numbering(doc)
 
 = Verslag van de zitting
 
 == Presentielijst
 
-=== Aanwezige leden van het stembureau
+#emph_block[Aanwezige leden van het stembureau]
 
 De volgende rollen zijn mogelijk: voorzitter, plaatsvervangend voorzitter, lid of teller. Vink aan of iemand bij het stemmen en/of tellen aanwezig was.
 
@@ -80,7 +124,7 @@ De volgende rollen zijn mogelijk: voorzitter, plaatsvervangend voorzitter, lid o
 
 == Tijdens het stemmen
 
-=== Schrijf *alle bezwaren van aanwezigen tijdens het stemmen* op.
+=== Schrijf alle *bezwaren van aanwezigen tijdens het stemmen* op.
 
 Bijvoorbeeld over toegankelijkheid, niet toegelaten worden of het stemgeheim.
 
@@ -90,7 +134,7 @@ Schrijf geen namen of andere persoonsgegevens op. Schrijf alle bezwaren op, ook 
   columns: (7em, 1fr, 1fr),
   headers: ("Tijdstip", "Bezwaar", "Reactie stembureau"),
   values: ("", "", ""),
-  rows: 24,
+  rows: 27,
 )
 
 #pagebreak(weak: true)
@@ -125,7 +169,7 @@ Denk aan stembureauleden die te laat waren, niet werkende techniek of stembussen
 
 #empty_table(
   columns: (8em, 10em, 1fr),
-  headers: ("Datum", "Tijd van - tot", "Locatie (als anders dan stembureau)"),
+  headers: ("Datum", "Tijd (van - tot)", "Locatie (als anders dan stembureau)"),
   values: ("", "", ""),
   rows: 1,
 )
@@ -165,24 +209,16 @@ Bijvoorbeeld als er meerdere verkiezingen tegelijk werden georganiseerd, en een 
     empty_letterbox("A")[Stempassen],
     empty_letterbox("B")[Volmachtbewijzen (schriftelijk of via ingevulde achterkant stempas)],
     no_entry_letterbox("C")[Kiezerspassen (niet van toepassing bij gemeente- en eilandraadsverkiezingen)],
-    empty_letterbox(
-      "D",
-      light: false,
-    )[*Totaal toegelaten kiezers (A+B)*],
+    empty_letterbox("D", light: false)[Totaal toegelaten kiezers (A+B)],
   )
 ][
   Tel het aantal geldige stempassen, volmachtbewijzen en kiezerspassen
 
   #sum(
     empty_letterbox("A")[Stempassen],
-    empty_letterbox(
-      "B",
-    )[Volmachtbewijzen (schriftelijk of via ingevulde achterkant stempas of kiezerspas)],
+    empty_letterbox("B")[Volmachtbewijzen (schriftelijk of via ingevulde achterkant stempas of kiezerspas)],
     empty_letterbox("C")[Kiezerspassen],
-    empty_letterbox(
-      "D",
-      light: false,
-    )[*Totaal toegelaten kiezers (A+B+C)*],
+    empty_letterbox("D", light: false)[Totaal toegelaten kiezers (A+B+C)],
   )
 ]
 
@@ -190,18 +226,18 @@ Bijvoorbeeld als er meerdere verkiezingen tegelijk werden georganiseerd, en een 
 
 == Uitgebrachte stemmen <cast_votes>
 
-=== Beoordeel de stembiljetten en tel het aantal stembiljetten per lijst. En tel de blanco en ongeldige stembiljetten.
+#emph_block[Beoordeel de stembiljetten en tel het aantal stembiljetten per kandidaat. Bereken het aantal stemmen per lijst. Tel de blanco en ongeldige stembiljetten.]
 
-#if input.election.political_groups.len() > 0 [
+#if input.candidates_tables.len() > 0 [
   #sum(
     sum(
-      ..input.election.political_groups.map(list => {
+      ..input.candidates_tables.map(list => {
         empty_letterbox([E.#list.number])[Totaal lijst #list.number - #list.name]
       }),
       empty_letterbox(
         "E",
         light: false,
-      )[*Totaal stemmen op kandidaten* (tel E.1 t/m E.#input.election.political_groups.last().number op)],
+      )[*Totaal stemmen op kandidaten* (tel E.1 t/m E.#input.candidates_tables.last().number op)],
     ),
     empty_letterbox("F")[Blanco stemmen],
     empty_letterbox("G")[Ongeldige stemmen],
@@ -218,7 +254,7 @@ Bijvoorbeeld als er meerdere verkiezingen tegelijk werden georganiseerd, en een 
 
 === Vergelijk D (totaal toegelaten kiezers) en H (totaal uitgebrachte stemmen)
 
-#checkbox[D en H zijn *gelijk* #sym.arrow.r *Ga door naar #ref(<signing>)*]
+#checkbox[D en H zijn *gelijk* #sym.arrow.r *Ga door naar #ref(<candidate_votes>)*]
 
 #checkbox[H is *groter* dan D (meer uitgebrachte stemmen dan toegelaten kiezers)]
 
@@ -241,32 +277,45 @@ Bijvoorbeeld als er meerdere verkiezingen tegelijk werden georganiseerd, en een 
 #checkbox[Ja]
 #checkbox[Nee, er is een onverklaard verschil]
 
+#pagebreak(weak: true)
+
+== Stemmen per lijst en per kandidaat <candidate_votes>
+
+#for political_group in input.candidates_tables {
+  votes_table(
+    title: [#political_group.number #political_group.name],
+    headers: ("Kandidaat", "", "Stemmen"),
+    total: political_group.total,
+    votes_columns: political_group.columns,
+    continue_on_next_page: [#sym.arrow.r De lijst gaat verder op de volgende pagina],
+    column_total: "Subtotaal kolom",
+    sum_total: columns => [Totaal lijst (kolom #columns)],
+    total_instruction: [Neem dit totaal over in rubriek #ref(<cast_votes>) van deze bijlage bij de juiste lijst.],
+  )
+}
+
 #blank_page_before_signing(header-right)
 
 = Ondertekening <signing>
 
-Het proces-verbaal moet worden ondertekend door alle aanwezige leden. Bij een stembureau zijn dit er minimaal 3.
+#block(width: 100%, [Het proces-verbaal moet worden ondertekend door alle aanwezige leden. Bij een stembureau zijn dit er minimaal 3.])
 
 #signing_form_label[Datum]
 
 #textbox_only_bottom_stroke[Datum en tijd:][Plaats:]
 
-== Voorzitter en twee leden van het stembureau
+== Voorzitter en #is_local_election[twee][vier] leden van het stembureau
 
 #signing_form_label[Voorzitter van het stembureau:]
 
 #textbox[Naam:][Handtekening:]
 
-#signing_form_label[2 leden van het stembureau:]
+#signing_form_label[#is_local_election[2][4] leden van het stembureau:]
 
-#stack(spacing: 0.5em, ..range(0, 2).map(_ => textbox[Naam:][Handtekening:]))
+#stack(spacing: 0.5em, ..range(0, is_local_election(2, 4)).map(_ => textbox[Naam:][Handtekening:]))
 
 == Ondertekening door andere aanwezige leden van het stembureau
 
 #signing_form_label[Extra ondertekening:]
 
-#stack(spacing: 0.5em, ..range(0, 4).map(_ => textbox[Naam:][Handtekening:]))
-
-#pagebreak(weak: true)
-
-#stack(spacing: 0.5em, ..range(0, 12).map(_ => textbox[Naam:][Handtekening:]))
+#stack(spacing: 0.5em, ..range(0, is_local_election(4, 1)).map(_ => textbox[Naam:][Handtekening:]))

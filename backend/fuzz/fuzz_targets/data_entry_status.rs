@@ -386,7 +386,7 @@ fuzz_target!(|transitions: Vec<Transition>| {
                 state.finalise_first_entry(&election(), users.first(correct_user))
             }
             Transition::DiscardFirstEntryInProgress(correct_user) => {
-                state.discard_first_entry_in_progress(users.first(correct_user))
+                state.discard_first_entry_in_progress(users.first(correct_user), &election())
             }
             Transition::DiscardFirstEntryWithErrors => state.discard_first_entry_with_errors(),
             Transition::ClaimSecondEntry(correct_user) => {

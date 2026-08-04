@@ -86,23 +86,44 @@ impl Validate for ChecksAndCorrections {
     ) -> Result<ValidationResults, DataError> {
         let mut validation_results = ValidationResults::default();
 
-	if election.committee_category == CommitteeCategory::GSB {
-	    if (!self.reason_investigation_own_initiative.unaccounted_difference && !self.reason_investigation_own_initiative.other_error)
-		|| self.corrected_results_own_initiative.is_empty() {
-		    validation_results.errors.push(ValidationResult {
-			fields: vec![path.to_string()],
-			code: ValidationResultCode::F131,
-			context: None,
-                    });
-		}
+        if election.committee_category == CommitteeCategory::GSB {
+            if (!self
+                .reason_investigation_own_initiative
+                .unaccounted_difference
+                && !self.reason_investigation_own_initiative.other_error)
+                || self.corrected_results_own_initiative.is_empty()
+            {
+                validation_results.errors.push(ValidationResult {
+                    fields: vec![path.to_string()],
+                    code: ValidationResultCode::F131,
+                    context: None,
+                });
+            }
 
-	    if self.corrected_results_own_initiative == YesNo::no() {
-		validation_results.errors.push(ValidationResult {
-			fields: vec![path.to_string()],
-			code: ValidationResultCode::F132,
-			context: None,
-                    });
-	    }
+            if self.corrected_results_own_initiative == YesNo::no() {
+                validation_results.errors.push(ValidationResult {
+                    fields: vec![path.to_string()],
+                    code: ValidationResultCode::F132,
+                    context: None,
+                });
+            }
+
+            if !self.corrected_results_csb_request.is_empty() {
+                validation_results.errors.push(ValidationResult {
+                    fields: vec![path.to_string()],
+                    code: ValidationResultCode::F133,
+                    context: None,
+                });
+            }
+
+            if self.corrected_results_own_initiative.is_both() {
+                validation_results.errors.push(ValidationResult {
+                    fields: vec![path.to_string()],
+                    code: ValidationResultCode::F134,
+                    context: None,
+                });
+            }
+        }
         Ok(validation_results)
     }
 }
@@ -111,7 +132,7 @@ impl Validate for ChecksAndCorrections {
 mod tests {
     use super::*;
     use crate::domain::{
-        election::{CommitteeCategory, ElectionCategory, tests::election_fixture},
+        election::{tests::election_fixture, CommitteeCategory, ElectionCategory},
         results::yes_no::YesNo,
         validate::{DataError, ValidationResult, ValidationResultCode, ValidationResults},
     };
@@ -170,13 +191,19 @@ mod tests {
                 true,
             ),
             (
-                ReasonInvestigationOwnInitiative { unaccounted_difference: true, other_error: true },
+                ReasonInvestigationOwnInitiative {
+                    unaccounted_difference: true,
+                    other_error: true,
+                },
                 YesNo::yes(),
                 YesNo::no(),
                 false,
             ),
-	    (
-                ReasonInvestigationOwnInitiative { unaccounted_difference: true, other_error: false },
+            (
+                ReasonInvestigationOwnInitiative {
+                    unaccounted_difference: true,
+                    other_error: false,
+                },
                 YesNo::no(),
                 YesNo::yes(),
                 false,
@@ -219,20 +246,26 @@ mod tests {
                 YesNo::default(),
                 false,
             ),
-	    (
+            (
                 ReasonInvestigationOwnInitiative::default(),
                 YesNo::no(),
                 YesNo::yes(),
                 true,
             ),
-	    (
-                ReasonInvestigationOwnInitiative { unaccounted_difference: true, other_error: false },
+            (
+                ReasonInvestigationOwnInitiative {
+                    unaccounted_difference: true,
+                    other_error: false,
+                },
                 YesNo::no(),
                 YesNo::no(),
                 true,
             ),
-	    (
-                ReasonInvestigationOwnInitiative { unaccounted_difference: true, other_error: true },
+            (
+                ReasonInvestigationOwnInitiative {
+                    unaccounted_difference: true,
+                    other_error: true,
+                },
                 YesNo::yes(),
                 YesNo::no(),
                 false,
@@ -258,8 +291,125 @@ mod tests {
 	    );
         }
 
-	Ok(())
+        Ok(())
     }
 
+    /// GSB DSO | F.133: 'Controles en correcties': Ongeldig antwoord in eerste zitting (vraag 'op verzoek van het CSB' is ingevuld)
+    #[test]
+    fn test_f133() -> Result<(), DataError> {
+        let f133 = ValidationResult {
+            code: ValidationResultCode::F133,
+            fields: vec!["checks_and_corrections".into()],
+            context: None,
+        };
+
+        let cases = vec![
+            (
+                ReasonInvestigationOwnInitiative::default(),
+                YesNo::default(),
+                YesNo::yes(),
+                true,
+            ),
+            (
+                ReasonInvestigationOwnInitiative::default(),
+                YesNo::no(),
+                YesNo::no(),
+                true,
+            ),
+            (
+                ReasonInvestigationOwnInitiative {
+                    unaccounted_difference: true,
+                    other_error: false,
+                },
+                YesNo::no(),
+                YesNo::default(),
+                false,
+            ),
+        ];
+
+        for (
+            reason_investigation_own_initiative,
+            corrected_results_own_initiative,
+            corrected_results_csb_request,
+            expect_f133,
+        ) in cases
+        {
+            let result = validate(
+                CommitteeCategory::GSB,
+                reason_investigation_own_initiative.clone(),
+                corrected_results_own_initiative.clone(),
+                corrected_results_csb_request.clone(),
+            )?;
+            let has_f133 = result.errors.iter().any(|e| e == &f133);
+            assert_eq!(has_f133, expect_f133,
+	               "Failed: reason_investigation_own_initiative: {reason_investigation_own_initiative:?}, corrected_results_own_initiative: {corrected_results_own_initiative:?}, corrected_results_csb_request: {corrected_results_csb_request:?}"
+	    );
+        }
+
+        Ok(())
+    }
+
+    /// GSB DSO | F.134: 'Controles en correcties': meer dan 1 antwoord op vraag 'zijn er gecorrigeerde telresultaten'
+    #[test]
+    fn test_f134() -> Result<(), DataError> {
+        let f134 = ValidationResult {
+            code: ValidationResultCode::F134,
+            fields: vec!["checks_and_corrections".into()],
+            context: None,
+        };
+
+        let cases = vec![
+            (
+                ReasonInvestigationOwnInitiative::default(),
+                YesNo::both(),
+                YesNo::yes(),
+                true,
+            ),
+            (
+                ReasonInvestigationOwnInitiative::default(),
+                YesNo::yes(),
+                YesNo::no(),
+                false,
+            ),
+            (
+                ReasonInvestigationOwnInitiative {
+                    unaccounted_difference: true,
+                    other_error: false,
+                },
+                YesNo::no(),
+                YesNo::default(),
+                false,
+            ),
+            (
+                ReasonInvestigationOwnInitiative {
+                    unaccounted_difference: true,
+                    other_error: false,
+                },
+                YesNo::default(),
+                YesNo::default(),
+                false,
+            ),
+        ];
+
+        for (
+            reason_investigation_own_initiative,
+            corrected_results_own_initiative,
+            corrected_results_csb_request,
+            expect_f134,
+        ) in cases
+        {
+            let result = validate(
+                CommitteeCategory::GSB,
+                reason_investigation_own_initiative.clone(),
+                corrected_results_own_initiative.clone(),
+                corrected_results_csb_request.clone(),
+            )?;
+            let has_f134 = result.errors.iter().any(|e| e == &f134);
+            assert_eq!(has_f134, expect_f134,
+	               "Failed: reason_investigation_own_initiative: {reason_investigation_own_initiative:?}, corrected_results_own_initiative: {corrected_results_own_initiative:?}, corrected_results_csb_request: {corrected_results_csb_request:?}"
+	    );
+        }
+
+        Ok(())
     }
 }

@@ -64,8 +64,13 @@ describe("ReadOnlyDataEntryDelete", () => {
     expect(onDeleted).toHaveBeenCalledOnce();
   });
 
-  test("Renders different text when there are 2 data entries", async () => {
-    const { onDeleted } = renderComponent("definitive");
+  test.each<DataEntryStatusName>([
+    "second_entry_in_progress",
+    "first_entry_correction",
+    "second_entry_correction",
+    "definitive",
+  ])("Renders different text when there are 2 data entries (%s)", async (status) => {
+    const { onDeleted } = renderComponent(status);
 
     const user = userEvent.setup();
     await user.click(screen.getByRole("button", { name: "Invoer verwijderen" }));

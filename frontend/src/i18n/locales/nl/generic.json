@@ -45,6 +45,7 @@
   "list_name": "Lijstnaam",
   "loading": "Laden...",
   "logs": "Logs",
+  "mandatory_question": "Deze vraag is verplicht",
   "manual_input": "Handmatig invullen",
   "import_from_file": "Importeren uit een bestand",
   "menu": "Menu",

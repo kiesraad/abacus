@@ -131,6 +131,8 @@ test.describe("full flow GSB", () => {
 
     const countingMethodPage = new CountingMethodTypePgObj(page);
     await expect(countingMethodPage.header).toBeVisible();
+    await expect(countingMethodPage.cso).toBeVisible();
+    await countingMethodPage.cso.click();
     await expect(countingMethodPage.cso).toBeChecked();
     await countingMethodPage.next.click();
 

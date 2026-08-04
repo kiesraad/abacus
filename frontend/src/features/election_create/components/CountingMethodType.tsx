@@ -1,4 +1,4 @@
-import type { SubmitEvent } from "react";
+import { type SubmitEvent, useState } from "react";
 import { Navigate, useNavigate } from "react-router";
 
 import { Button } from "@/components/ui/Button/Button";
@@ -6,14 +6,13 @@ import { ChoiceList } from "@/components/ui/CheckboxAndRadio/ChoiceList";
 import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { t } from "@/i18n/translate";
-
+import { type VoteCountingMethod, voteCountingMethodValues } from "@/types/generated/openapi";
+import { StringFormData } from "@/utils/stringFormData";
 import { useElectionCreateContext } from "../hooks/useElectionCreateContext";
 
-/*
- * NOTE: DSO is currently unsupported by Abacus, so it is disabled by default
- */
 export function CountingMethodType() {
   const { state, dispatch } = useElectionCreateContext();
+  const [error, setError] = useState<string | undefined>();
   const navigate = useNavigate();
 
   // if no election data was stored, navigate back to beginning
@@ -22,13 +21,28 @@ export function CountingMethodType() {
   }
 
   async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
+    function isVoteCountingMethod(value: string): value is VoteCountingMethod {
+      for (countingMethod of voteCountingMethodValues) {
+        if (value === countingMethod) {
+          return true;
+        }
+      }
+      return false;
+    }
+
     event.preventDefault();
-    dispatch({
-      type: "SET_COUNTING_METHOD_TYPE",
-      // This is hardcoded to CSO until we have support for DSO
-      countingMethod: "CSO",
-    });
-    await navigate("/elections/create/number-of-voters");
+    const formData = new StringFormData(event.currentTarget);
+    let countingMethod = formData.getString("counting_method");
+
+    if (isVoteCountingMethod(countingMethod)) {
+      dispatch({
+        type: "SET_COUNTING_METHOD_TYPE",
+        countingMethod,
+      });
+      await navigate("/elections/create/number-of-voters");
+    } else {
+      setError(t("mandatory_question"));
+    }
   }
 
   return (
@@ -47,31 +61,21 @@ export function CountingMethodType() {
             </p>
 
             <ChoiceList>
-              <ChoiceList.Radio
-                id="cso"
-                label={t("election.voting_method_type.cso")}
-                checked={true}
-                onChange={() => {
-                  /*
-              We need this to suppress an error because we explicitly set the `checked` property.
-              We'll actually implement this handler once we support DSO
-            */
-                }}
-              >
-                {t("election.voting_method_type.cso_description")}
-              </ChoiceList.Radio>
-              <ChoiceList.Radio
-                id="dso"
-                label={
-                  <span>
-                    {t("election.voting_method_type.dso")} (<b>{t("election.voting_method_type.dso_not_supported")}</b>)
-                  </span>
-                }
-                checked={false}
-                disabled
-              >
-                {t("election.voting_method_type.dso_description")}
-              </ChoiceList.Radio>
+              {error && <ChoiceList.Error id="choicelist-error">{error}</ChoiceList.Error>}
+              {voteCountingMethodValues.map((countingMethod) => {
+                return (
+                  <ChoiceList.Radio
+                    id={countingMethod}
+                    key={countingMethod}
+                    name={"counting_method"}
+                    label={t(`election.voting_method_type.${countingMethod}`)}
+                    defaultValue={countingMethod}
+                    defaultChecked={state.countingMethod === countingMethod}
+                  >
+                    {t(`election.voting_method_type.${countingMethod}_description`)}
+                  </ChoiceList.Radio>
+                );
+              })}
             </ChoiceList>
           </FormLayout.Section>
 

@@ -1,6 +1,6 @@
 import type { Locator, Page } from "@playwright/test";
 
-export class UploadPollingStationDefinitionPgObj {
+export class UploadPollingStationsFilePgObj {
   readonly header: Locator;
   readonly invalidFileAlert: Locator;
   readonly upload: Locator;

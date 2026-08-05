@@ -13,14 +13,14 @@ import { CountingMethodTypePgObj } from "e2e-tests/page-objects/election/create/
 import { NumberOfVotersPgObj } from "e2e-tests/page-objects/election/create/NumberOfVotersPgObj";
 import { UploadCandidateDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadCandidateDefinitionPgObj";
 import { UploadElectionDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadElectionDefinitionPgObj";
-import { UploadPollingStationDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadPollingStationDefinitionPgObj";
+import { UploadPollingStationsFilePgObj } from "e2e-tests/page-objects/election/create/UploadPollingStationsFilePgObj";
 import { ElectionHome } from "e2e-tests/page-objects/election/ElectionHomePgObj";
 import { ElectionsOverviewPgObj } from "e2e-tests/page-objects/election/ElectionsOverviewPgObj";
 import { AdminNavBar } from "e2e-tests/page-objects/nav_bar/AdminNavBarPgObj";
 import { PollingStationImportPgObj } from "e2e-tests/page-objects/polling_station/PollingStationImportPgObj";
 import { PollingStationListEmptyPgObj } from "e2e-tests/page-objects/polling_station/PollingStationListEmptyPgObj";
 import { PollingStationListPgObj } from "e2e-tests/page-objects/polling_station/PollingStationListPgObj";
-import { eml110a, eml110b, eml230b } from "e2e-tests/test-data/eml-files";
+import { eml110a, eml110b, eml110b_zero_voters, eml230b } from "e2e-tests/test-data/eml-files";
 import { test } from "../fixtures";
 
 test.use({
@@ -112,7 +112,7 @@ test.describe("Election creation", () => {
       await uploadCandidatesAndInputHash(page, eml230b);
 
       // skip polling stations
-      const uploadPollingStationsPage = new UploadPollingStationDefinitionPgObj(page);
+      const uploadPollingStationsPage = new UploadPollingStationsFilePgObj(page);
       await expect(uploadPollingStationsPage.header).toBeVisible();
       await uploadPollingStationsPage.skipButton.click();
 
@@ -374,8 +374,8 @@ test.describe("Election creation", () => {
       await uploadCandidatesAndInputHash(page, eml230b);
 
       // Now we should be at the polling station upload page
-      const uploadPollingStationDefinitionPage = new UploadPollingStationDefinitionPgObj(page);
-      await expect(uploadPollingStationDefinitionPage.header).toBeVisible();
+      const uploadPollingStationsPage = new UploadPollingStationsFilePgObj(page);
+      await expect(uploadPollingStationsPage.header).toBeVisible();
 
       // Back button
       await page.goBack();
@@ -404,8 +404,8 @@ test.describe("Election creation", () => {
       await uploadCandidatesAndInputHash(page, eml230b);
 
       // Now we should be at the polling station upload page
-      const uploadPollingStationDefinitionPage = new UploadPollingStationDefinitionPgObj(page);
-      await expect(uploadPollingStationDefinitionPage.header).toBeVisible();
+      const uploadPollingStationsPage = new UploadPollingStationsFilePgObj(page);
+      await expect(uploadPollingStationsPage.header).toBeVisible();
 
       // Now upload a new election
       const uploadElectionDefinitionPage = new UploadElectionDefinitionPgObj(page);
@@ -467,6 +467,41 @@ test.describe("Election creation", () => {
   });
 
   test.describe("polling stations", () => {
+    test("it accepts a polling station file with maxvotes 0", async ({ page }) => {
+      await page.goto("/elections");
+      const overviewPage = new ElectionsOverviewPgObj(page);
+      await overviewPage.create.click();
+
+      await uploadElectionAndInputHash(page);
+
+      const committeeCategoryPage = new CommitteeCategoryPgObj(page);
+      await expect(committeeCategoryPage.header).toBeVisible();
+      await committeeCategoryPage.next.click();
+
+      await uploadCandidatesAndInputHash(page, eml230b);
+
+      await uploadPollingStations(page, eml110b_zero_voters);
+
+      const countingMethodPage = new CountingMethodTypePgObj(page);
+      await expect(countingMethodPage.header).toBeVisible();
+      await countingMethodPage.cso.check();
+      await countingMethodPage.next.click();
+
+      const numberOfVotersPage = new NumberOfVotersPgObj(page);
+      await expect(numberOfVotersPage.header).toBeVisible();
+      await expect(numberOfVotersPage.input).toHaveValue("");
+      await numberOfVotersPage.input.fill("45678");
+      await numberOfVotersPage.next.click();
+
+      const checkAndSavePage = new CheckAndSavePgObj(page);
+      await expect(checkAndSavePage.header).toBeVisible();
+      await expect(checkAndSavePage.numberOfVoters).toContainText("45.678");
+
+      await checkAndSavePage.saveElection();
+      await expect(overviewPage.adminHeader).toBeVisible();
+      await expect(overviewPage.alertGSBElectionCreated).toBeVisible();
+    });
+
     test("it fails on valid, but incorrect polling station file", async ({ page }) => {
       await page.goto("/elections");
       const overviewPage = new ElectionsOverviewPgObj(page);
@@ -484,12 +519,12 @@ test.describe("Election creation", () => {
       await uploadCandidatesAndInputHash(page, eml230b);
 
       // upload wrong file
-      const uploadElectionDefinitionPage = new UploadPollingStationDefinitionPgObj(page);
-      await expect(uploadElectionDefinitionPage.header).toBeVisible();
-      await uploadElectionDefinitionPage.uploadFile(eml110a.path);
-      await expect(uploadElectionDefinitionPage.fieldset).toContainText(eml110a.filename);
-      await expect(uploadElectionDefinitionPage.invalidFileAlert).toBeVisible();
-      await expect(uploadElectionDefinitionPage.invalidFileAlert).toContainText(
+      const uploadPollingStationsPage = new UploadPollingStationsFilePgObj(page);
+      await expect(uploadPollingStationsPage.header).toBeVisible();
+      await uploadPollingStationsPage.uploadFile(eml110a.path);
+      await expect(uploadPollingStationsPage.fieldset).toContainText(eml110a.filename);
+      await expect(uploadPollingStationsPage.invalidFileAlert).toBeVisible();
+      await expect(uploadPollingStationsPage.invalidFileAlert).toContainText(
         "Het bestand eml110a_test.eml.xml bevat geen geldige lijst met stembureaus. Kies een ander bestand.",
       );
     });

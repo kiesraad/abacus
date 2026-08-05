@@ -67,6 +67,11 @@ export const eml110b_single = {
   path: "../backend/src/eml/tests/eml110b_1_station.eml.xml",
 };
 
+export const eml110b_zero_voters = {
+  filename: "eml110b_zero_number_of_voters.eml.xml",
+  path: "../backend/src/eml/tests/eml110b_zero_number_of_voters.eml.xml",
+};
+
 export type Eml230b = {
   filename: string;
   path: string;

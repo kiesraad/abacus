@@ -30,7 +30,8 @@ use eml_nl::{
     io::{EMLParsingMode, EMLRead as _},
     utils::{
         AffiliationId, AffiliationType, AuthorityId, CandidateId, ElectionDomainId, ElectionId,
-        Gender, ReportingUnitIdentifierId, StringValueData, VotingChannelType, VotingMethod,
+        Gender, ReportingUnitIdentifierId, StringValue, StringValueData, VotingChannelType,
+        VotingMethod,
     },
 };
 pub use error::EMLImportError;
@@ -45,6 +46,15 @@ use crate::domain::{
     results::political_group_candidate_votes::PoliticalGroupCandidateVotes,
     summary::ElectionSummary,
 };
+
+fn max_votes(max_votes: &StringValue<NonZeroU64>) -> u32 {
+    match max_votes.copied_value() {
+        // If max_votes is too large we fall back to zero
+        Ok(v) => v.get().try_into().unwrap_or(0u32),
+        // If max_votes is not present or an invalid value we fall back to zero
+        Err(_) => 0u32,
+    }
+}
 
 impl NewElection {
     fn get_category_or_err(
@@ -134,12 +144,7 @@ impl NewElection {
 
         // typically number of voters is not available in the EML, but it could
         // be so we try and extract it anyway
-        let max_votes = election.contest.max_votes.copied_value();
-        let number_of_voters = max_votes
-            .map(|v| v.get())
-            .unwrap_or(0)
-            .try_into()
-            .unwrap_or(0);
+        let number_of_voters = max_votes(&election.contest.max_votes);
 
         // extract initial listing of political groups
         let political_groups = election
@@ -974,12 +979,7 @@ pub fn number_of_voters_from_polling_stations_eml(
         .first()
         .ok_or(EMLImportError::PollingStationsWithoutContest)?;
 
-    Ok(match contest.max_votes.copied_value() {
-        // If max_votes is too large we fall back to zero
-        Ok(v) => v.get().try_into().unwrap_or(0u32),
-        // If max_votes is not present or an invalid value we fall back to zero
-        Err(_) => 0u32,
-    })
+    Ok(max_votes(&contest.max_votes))
 }
 
 pub fn polling_stations_eml_matches_election(
@@ -1167,6 +1167,34 @@ mod tests {
         assert_eq!(
             result_gsb.total_votes.unwrap().eligible_voter_count,
             StringValue::from_value(1001u64)
+        );
+    }
+
+    #[test]
+    fn test_max_votes_extraction() {
+        assert_eq!(max_votes(&StringValue::Raw("0".into())), 0);
+        assert_eq!(max_votes(&StringValue::Raw("-1".into())), 0);
+        assert_eq!(max_votes(&StringValue::Raw("not-a-number".into())), 0);
+        assert_eq!(max_votes(&StringValue::Raw("100".into())), 100);
+        assert_eq!(
+            max_votes(&StringValue::Parsed(NonZeroU64::new(10).unwrap())),
+            10
+        );
+        assert_eq!(
+            max_votes(&StringValue::Parsed(NonZeroU64::new(u64::MAX).unwrap())),
+            0
+        );
+        assert_eq!(
+            max_votes(&StringValue::Parsed(
+                NonZeroU64::new((u32::MAX as u64) + 1).unwrap()
+            )),
+            0
+        );
+        assert_eq!(
+            max_votes(&StringValue::Parsed(
+                NonZeroU64::new(u32::MAX as u64).unwrap()
+            )),
+            u32::MAX
         );
     }
 }

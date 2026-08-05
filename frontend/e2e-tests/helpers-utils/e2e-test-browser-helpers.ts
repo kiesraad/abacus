@@ -14,7 +14,7 @@ import { CheckElectionDefinitionPgObj } from "e2e-tests/page-objects/election/cr
 import { CheckPollingStationDefinitionPgObj } from "e2e-tests/page-objects/election/create/CheckPollingStationDefinitionPgObj";
 import { UploadCandidateDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadCandidateDefinitionPgObj";
 import { UploadElectionDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadElectionDefinitionPgObj";
-import { UploadPollingStationDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadPollingStationDefinitionPgObj";
+import { UploadPollingStationsFilePgObj } from "e2e-tests/page-objects/election/create/UploadPollingStationsFilePgObj";
 import { AddInvestigationPgObj } from "e2e-tests/page-objects/investigations/AddInvestigationPgObj";
 import { InvestigationOverviewPgObj } from "e2e-tests/page-objects/investigations/InvestigationOverviewPgObj";
 import { InvestigationPrintCorrigendumPgObj } from "e2e-tests/page-objects/investigations/InvestigationPrintCorrigendumPgObj";
@@ -130,9 +130,9 @@ export async function uploadCandidatesAndInputHash(page: Page, eml: Eml230b) {
 }
 
 export async function uploadPollingStations(page: Page, eml = eml110b) {
-  const uploadElectionDefinitionPage = new UploadPollingStationDefinitionPgObj(page);
-  await expect(uploadElectionDefinitionPage.header).toBeVisible();
-  await uploadElectionDefinitionPage.uploadFile(eml.path);
+  const uploadPollingStationsPage = new UploadPollingStationsFilePgObj(page);
+  await expect(uploadPollingStationsPage.header).toBeVisible();
+  await uploadPollingStationsPage.uploadFile(eml.path);
 
   const checkDefinitionPage = new CheckPollingStationDefinitionPgObj(page);
   await expect(checkDefinitionPage.header).toBeVisible();

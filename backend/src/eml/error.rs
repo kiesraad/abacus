@@ -12,7 +12,6 @@ pub enum EMLImportError {
     EMLError(eml_nl::EMLError),
     InvalidCandidate,
     InvalidDateFormat,
-    InvalidNumberOfVoters,
     InvalidPollingStation,
     InvalidVotingMethod,
     LimitedElectionsSupported,

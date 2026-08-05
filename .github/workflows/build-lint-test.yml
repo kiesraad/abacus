@@ -110,6 +110,8 @@ jobs:
         run: cargo --verbose --locked clippy --workspace --all-targets --all-features -- -D warnings
       - name: Install Nextest
         run: cargo binstall cargo-nextest
+      - name: Symlink sqlx test directory to /dev/shm
+        run: mkdir -p /dev/shm/sqlx && ln -s /dev/shm/sqlx target/sqlx
       - name: Run tests
         run: cargo --verbose --locked nextest run --workspace --no-default-features --features openapi,dev-database,embed-typst,tls
       - name: Build documentation

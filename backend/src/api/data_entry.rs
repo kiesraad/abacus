@@ -154,6 +154,10 @@ pub struct ClaimDataEntryResponse {
     pub status: DataEntryStatusName,
     /// Whether the typist is correcting an entry that was completed before
     pub is_correction: bool,
+    /// Fields for which a warning should be shown that a difference should be corrected
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    pub correction_warnings: Option<Vec<String>>,
 }
 
 pub fn router() -> OpenApiRouter<AppState> {
@@ -282,6 +286,32 @@ impl ResolveDifferencesAction {
     }
 }
 
+async fn get_previous_results(
+    tx: &mut SqliteConnection,
+    source: &DataEntrySource,
+) -> Result<Option<CommonPollingStationResults>, APIError> {
+    let prev_data_entry_id = match source {
+        DataEntrySource::PollingStation(ps) => ps.prev_data_entry_id(),
+        _ => None,
+    };
+
+    // If there is a previous data entry with status definitive
+    let previous_results: Option<CommonPollingStationResults> = match prev_data_entry_id {
+        Some(prev_id) => match data_entry_repo::get_status(tx, prev_id).await? {
+            // Match polling station results only and get the common results
+            DataEntryStatus::Definitive(d) => match d.results {
+                Results::CSOFirstSession(r) => Some(r.as_common()),
+                Results::CSONextSession(r) => Some(r.as_common()),
+                _ => None,
+            },
+            _ => None,
+        },
+        None => None,
+    };
+
+    Ok(previous_results)
+}
+
 /// Claim a data entry, returning any existing progress
 #[utoipa::path(
     post,
@@ -309,24 +339,7 @@ async fn data_entry_claim(
 
     let (context, state) = validate_and_get_data(&mut tx, data_entry_id, &user).await?;
 
-    let prev_data_entry_id = match &context.source {
-        DataEntrySource::PollingStation(ps) => ps.prev_data_entry_id(),
-        _ => None,
-    };
-
-    // If there is a previous data entry with status definitive
-    let previous_results: Option<CommonPollingStationResults> = match prev_data_entry_id {
-        Some(prev_id) => match data_entry_repo::get_status(&mut tx, prev_id).await? {
-            // Match polling station results only and get the common results
-            DataEntryStatus::Definitive(d) => match d.results {
-                Results::CSOFirstSession(r) => Some(r.as_common()),
-                Results::CSONextSession(r) => Some(r.as_common()),
-                _ => None,
-            },
-            _ => None,
-        },
-        None => None,
-    };
+    let previous_results = get_previous_results(&mut tx, &context.source).await?;
 
     let initial = Results::new(
         &context.election,
@@ -366,6 +379,13 @@ async fn data_entry_claim(
 
     tx.commit().await?;
 
+    let correction_warnings = match new_state {
+        DataEntryStatus::FirstEntryCorrection(_) | DataEntryStatus::SecondEntryCorrection(_) => {
+            new_state.compare_entries()
+        }
+        _ => None,
+    };
+
     Ok(Json(ClaimDataEntryResponse {
         data: data.clone(),
         client_state,
@@ -374,6 +394,7 @@ async fn data_entry_claim(
         source: context.source,
         status: new_state.status_name(),
         is_correction: new_state.is_correction(),
+        correction_warnings,
     }))
 }
 

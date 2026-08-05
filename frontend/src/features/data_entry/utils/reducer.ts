@@ -5,10 +5,12 @@ import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
 import type { ClientState, DataEntryAction, DataEntryState, EntryNumber, FormState } from "../types/types";
 import {
+  addCorrectionWarnings,
   buildCorrectionFormState,
   buildFormState,
   getInitialFormState,
   getNextSectionID,
+  resetFieldValues,
   updateFormStateAfterSubmit,
 } from "./dataEntryUtils";
 
@@ -43,6 +45,8 @@ export default function dataEntryReducer(state: DataEntryState, action: DataEntr
 
       let formState: FormState;
       let targetFormSectionId: FormSectionId | undefined;
+      const results = structuredClone(action.dataEntry.data);
+
       if (action.dataEntry.client_state) {
         ({ formState, targetFormSectionId } = buildFormState(
           // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
@@ -56,11 +60,15 @@ export default function dataEntryReducer(state: DataEntryState, action: DataEntr
           action.dataEntry.validation_results,
           dataEntryStructure,
         ));
+
+        if (action.dataEntry.correction_warnings) {
+          addCorrectionWarnings(dataEntryStructure, action.dataEntry.correction_warnings, formState);
+          resetFieldValues(dataEntryStructure, action.dataEntry.correction_warnings, results);
+        }
       } else {
         formState = getInitialFormState(dataEntryStructure);
         targetFormSectionId = dataEntryStructure[0]?.id;
       }
-
       if (targetFormSectionId === undefined) {
         throw new Error("Cannot determine initial section from dataEntryStructure");
       }
@@ -71,7 +79,7 @@ export default function dataEntryReducer(state: DataEntryState, action: DataEntr
         formState,
         targetFormSectionId,
         previousResults: action.dataEntry.previous_results ?? null,
-        results: action.dataEntry.data,
+        results,
         source: action.dataEntry.source,
         dataEntryStatus: action.dataEntry.status,
         error: null,

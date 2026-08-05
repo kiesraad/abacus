@@ -243,18 +243,13 @@ impl Validate for DataEntryStatus {
                 ..
             })
             | DataEntryStatus::Definitive(Definitive { results: entry, .. }) => {
-                entry.validate(election, &"data".into())
+                entry.validate(election, path)
             }
             DataEntryStatus::SecondEntryInProgress(state) => {
-                let mut validation_results =
-                    state.second_entry.validate(election, &"data".into())?;
-                let mut different_fields: Vec<String> = vec![];
-                state.second_entry.compare(
-                    &state.finalised_first_entry,
-                    &mut different_fields,
-                    path,
-                );
-                if !different_fields.is_empty() {
+                let mut validation_results = state.second_entry.validate(election, path)?;
+                if let Some(different_fields) = self.compare_entries()
+                    && !different_fields.is_empty()
+                {
                     validation_results.warnings.push(ValidationResult {
                         fields: different_fields.clone(),
                         code: ValidationResultCode::W001,
@@ -1116,6 +1111,40 @@ impl DataEntryStatus {
                 ..
             }) => Some(finalised_with_warnings),
             _ => None,
+        }
+    }
+
+    pub fn compare_entries(&self) -> Option<Vec<String>> {
+        match self {
+            DataEntryStatus::Empty
+            | DataEntryStatus::FirstEntryInProgress(_)
+            | DataEntryStatus::FirstEntryHasErrors(_)
+            | DataEntryStatus::FirstEntryFinalised(_) => None,
+            DataEntryStatus::SecondEntryInProgress(SecondEntryInProgress {
+                finalised_first_entry: first_entry,
+                second_entry,
+                ..
+            })
+            | DataEntryStatus::EntriesDifferent(EntriesDifferent {
+                first_entry,
+                second_entry,
+                ..
+            })
+            | DataEntryStatus::FirstEntryCorrection(FirstEntryCorrection {
+                first_entry,
+                finalised_second_entry: second_entry,
+                ..
+            })
+            | DataEntryStatus::SecondEntryCorrection(SecondEntryCorrection {
+                finalised_first_entry: first_entry,
+                second_entry,
+                ..
+            }) => {
+                let mut different_fields: Vec<String> = vec![];
+                second_entry.compare(first_entry, &mut different_fields, &"data".into());
+                Some(different_fields)
+            }
+            DataEntryStatus::Definitive(_) => None,
         }
     }
 }
@@ -2485,6 +2514,65 @@ mod tests {
                     .finalised_with_warnings(),
                 Some(&true)
             )
+        }
+    }
+
+    mod compare_entries {
+        use super::*;
+
+        #[test]
+        fn no_two_entries() {
+            for status in [
+                DataEntryStatus::Empty,
+                first_entry_in_progress(),
+                first_entry_has_errors(),
+                first_entry_finalised(),
+                definitive(),
+            ] {
+                assert!(
+                    status.compare_entries().is_none(),
+                    "should be none for state {status:?}"
+                );
+            }
+        }
+
+        const EXPECTED_DIFFERENCES: [&str; 2] = [
+            "data.voters_counts.poll_card_count",
+            "data.voters_counts.proxy_certificate_count",
+        ];
+
+        #[test]
+        fn second_entry_in_progress_differences() {
+            let mut state = second_entry_in_progress();
+            state.set_second_entry(example_results().with_difference());
+
+            assert_eq!(
+                state.compare_entries(),
+                Some(EXPECTED_DIFFERENCES.iter().map(|s| s.to_string()).collect())
+            );
+        }
+
+        #[test]
+        fn entries_different_differences() {
+            assert_eq!(
+                entries_different().compare_entries(),
+                Some(EXPECTED_DIFFERENCES.iter().map(|s| s.to_string()).collect())
+            );
+        }
+
+        #[test]
+        fn first_entry_correction_differences() {
+            assert_eq!(
+                first_entry_correction().compare_entries(),
+                Some(EXPECTED_DIFFERENCES.iter().map(|s| s.to_string()).collect())
+            );
+        }
+        #[test]
+        fn second_entry_correction_differences() {
+            assert_eq!(
+                second_entry_correction().compare_entries(),
+                Some(EXPECTED_DIFFERENCES.iter().map(|s| s.to_string()).collect())
+            );
         }
     }
 }

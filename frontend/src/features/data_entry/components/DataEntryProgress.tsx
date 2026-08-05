@@ -27,6 +27,10 @@ export function DataEntryProgress() {
     (formSection?: FormSection): Exclude<MenuStatus, "active"> => {
       if (!formSection) return "idle";
 
+      if (formSection.correctionWarning) {
+        return "warning";
+      }
+
       if (!formSection.errors.isEmpty()) {
         return "error";
       }

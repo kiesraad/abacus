@@ -24,8 +24,8 @@ use crate::{
         investigation::PollingStationInvestigation,
         models::{
             ModelN10_2Input, ModelNa14_2Bijlage1Input, ModelNa14_2Input, ModelNa31_1InlegvelInput,
-            ModelNa31_2Bijlage1Input, ModelNa31_2InlegvelInput, ModelNa31_2Input, ModelP2aInput,
-            ModelP22_2Bijlage1Input, ModelP22_2Input, PdfFileModel, PdfModel,
+            ModelNa31_1Input, ModelNa31_2Bijlage1Input, ModelNa31_2InlegvelInput, ModelNa31_2Input,
+            ModelP2aInput, ModelP22_2Bijlage1Input, ModelP22_2Input, PdfFileModel, PdfModel,
             apportionment_footnotes::ApportionmentFootnotes,
             enriched_candidate_nomination::EnrichedCandidateNomination,
             enriched_seat_assignment::EnrichedSeatAssignment,
@@ -616,6 +616,42 @@ async fn test_na_14_2_bijlage_1() {
             election: election.into(),
             polling_station,
             investigation,
+        }));
+
+        test_pdf(model).await;
+    }
+}
+
+#[test(tokio::test)]
+async fn test_na_31_1() {
+    let mut rng = rand::rng();
+
+    for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
+        let election = random_election(
+            &mut rng,
+            parties,
+            candidates,
+            string_length,
+            none_where_possible,
+        );
+        let committee_session = random_committee_session(&mut rng, election.id, string_length);
+        let polling_stations =
+            random_polling_stations(&mut rng, string_length, none_where_possible);
+        let data_sources = ps_as_first_data_entry_sources(&polling_stations);
+        let summary = random_election_summary(&mut rng, &election, &data_sources);
+        let hash = random_string(&mut rng, 64);
+        let creation_date_time = random_date_time(&mut rng)
+            .format(DEFAULT_DATE_TIME_FORMAT)
+            .to_string();
+
+        let model = PdfModel::ModelNa31_1(Box::new(ModelNa31_1Input {
+            votes_tables: VotesTables::new(&election, &summary).unwrap(),
+            committee_session,
+            election: election.into(),
+            summary: summary.into(),
+            polling_stations,
+            hash,
+            creation_date_time,
         }));
 
         test_pdf(model).await;

@@ -67,7 +67,7 @@ De volgende rollen zijn mogelijk: voorzitter, plaatsvervangend voorzitter of lid
 
 #empty_table(
   columns: (8em, 1fr, 1fr, 1fr, 8em),
-  headers: ("Voorletters", "Achternaam", "Rol", "Aanwezig (van - tot)", "Locatie"),
+  headers: ("Voorletters", "Achternaam", "Rol", "Aanwezig van - tot", "Locatie"),
   values: ("", "", "", "-", ""),
   rows: 24,
 )
@@ -84,9 +84,9 @@ De volgende rollen zijn mogelijk: voorzitter, plaatsvervangend voorzitter of lid
     [Nr.],
     [Naam locatie],
     [Postcode + Adres],
-    [Toegelaten kiezers opnieuw vastgesteld?],
-    [Onderzocht vanwege andere reden dan onverklaard verschil?],
-    [Stembiljetten (deels) herteld?],
+    [Onderzocht vanwege een onverklaard verschil?],
+    [Onderzocht vanwege (een vermoeden van) een andere fout?],
+    [Uitslag gecorrigeerd?],
   ),
   values: input
     .polling_stations
@@ -102,9 +102,9 @@ De volgende rollen zijn mogelijk: voorzitter, plaatsvervangend voorzitter of lid
             #polling_station.postal_code #polling_station.locality
           ]
         ],
-        align(center, checkbox(checked: false)[]),
-        align(center, checkbox(checked: false)[]),
-        align(center, checkbox(checked: false)[]),
+        align(center, checkbox(checked: input.summary.polling_station_investigations.unaccounted_difference.contains(polling_station.number))[]),
+        align(center, checkbox(checked: input.summary.polling_station_investigations.other_error.contains(polling_station.number))[]),
+        align(center, checkbox(checked: input.summary.polling_station_investigations.result_corrected.contains(polling_station.number))[]),
       )
     })
     .flatten(),

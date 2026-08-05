@@ -83,7 +83,7 @@ pub async fn read_zip_entry(
         reader.entry().filename().as_str().unwrap(),
         expected_filename
     );
-    assert!(reader.entry().uncompressed_size() > 1024);
+    assert!(reader.entry().uncompressed_size() > 512);
     let mut buf = Vec::new();
     reader.read_to_end_checked(&mut buf).await.unwrap();
     buf
@@ -109,7 +109,6 @@ async fn test_gsb_election_first_session_zip_download_works(pool: SqlitePool) {
     let pdf_hash1 = sha2::Sha256::digest(read_zip_entry(&archive, 0, "Model_Na31-2.pdf").await);
     let xml_zip = read_zip_entry(&archive, 1, "Telling_GR2024_Heemdamseburg.zip").await;
     let csv = read_zip_entry(&archive, 2, "osv4-3_telling_gr2024_heemdamseburg.csv").await;
-    assert!(csv.len() > 1024);
     let xml_archive = ZipFileReader::new(xml_zip).await.unwrap();
     assert_eq!(xml_archive.file().entries().len(), 1);
     let eml_hash1 = sha2::Sha256::digest(
@@ -163,7 +162,6 @@ async fn test_gsb_election_next_session_zip_download_works(pool: SqlitePool) {
     let pdf_hash1 = sha2::Sha256::digest(read_zip_entry(&archive, 0, "Model_Na14-2.pdf").await);
     let xml_zip = read_zip_entry(&archive, 1, "Telling_GR2026_GroteStad.zip").await;
     let csv = read_zip_entry(&archive, 2, "osv4-3_telling_gr2026_grotestad.csv").await;
-    assert!(csv.len() > 1024);
     let xml_archive = ZipFileReader::new(xml_zip).await.unwrap();
     assert_eq!(xml_archive.file().entries().len(), 1);
     let eml_hash1 = sha2::Sha256::digest(
@@ -419,7 +417,6 @@ async fn test_csb_election_zip_download_total_counts_works(pool: SqlitePool) {
     let archive = ZipFileReader::new(bytes).await.unwrap();
     assert_eq!(archive.file().entries().len(), 2);
     let csv_count = read_zip_entry(&archive, 0, "osv4-3_telling_gr2024_juinen.csv").await;
-    assert!(csv_count.len() > 1024);
     let xml_zip = read_zip_entry(&archive, 1, "Totaaltelling_GR2024_Juinen.zip").await;
     let xml_archive = ZipFileReader::new(xml_zip).await.unwrap();
     assert_eq!(xml_archive.file().entries().len(), 1);

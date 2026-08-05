@@ -51,9 +51,9 @@ test.describe("Election creation", () => {
       // Counting method page
       const countingMethodPage = new CountingMethodTypePgObj(page);
       await expect(countingMethodPage.header).toBeVisible();
-      await expect(countingMethodPage.cso).toBeVisible();
-      await countingMethodPage.cso.click();
-      await expect(countingMethodPage.cso).toBeChecked();
+      await expect(countingMethodPage.cso).not.toBeChecked();
+      await expect(countingMethodPage.dso).not.toBeChecked();
+      await countingMethodPage.cso.check();
       await countingMethodPage.next.click();
 
       // Number of voters page
@@ -128,9 +128,7 @@ test.describe("Election creation", () => {
       // Counting method page
       const countingMethodPage = new CountingMethodTypePgObj(page);
       await expect(countingMethodPage.header).toBeVisible();
-      await expect(countingMethodPage.cso).toBeVisible();
-      await countingMethodPage.cso.click();
-      await expect(countingMethodPage.cso).toBeChecked();
+      await countingMethodPage.cso.check();
       await countingMethodPage.next.click();
 
       // Number of voters page
@@ -447,9 +445,7 @@ test.describe("Election creation", () => {
       // Counting method page
       const countingMethodPage = new CountingMethodTypePgObj(page);
       await expect(countingMethodPage.header).toBeVisible();
-      await expect(countingMethodPage.cso).toBeVisible();
-      await countingMethodPage.cso.click();
-      await expect(countingMethodPage.cso).toBeChecked();
+      await countingMethodPage.cso.check();
       await countingMethodPage.next.click();
 
       // Number of voters page

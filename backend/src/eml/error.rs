@@ -8,7 +8,6 @@ pub enum EMLImportError {
     InvalidDateFormat,
     InvalidVotingMethod,
     InvalidPollingStation,
-    InvalidNumberOfVoters,
     MismatchElection,
     MismatchElectionDate,
     MismatchElectionDomain,

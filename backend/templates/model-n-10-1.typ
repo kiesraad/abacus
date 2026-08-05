@@ -38,9 +38,9 @@
   ],
 )
 
-== Details van het #if is_mobile { "mobiel stembureau" } else { "stembureau" }
+== Details van het #if is_mobile { "mobiele stembureau" } else { "stembureau" }
 
-Kieskring \<nummer> #sym.arrow.r #location_name #sym.arrow.r Stembureau #input.polling_station.number
+#location_name #sym.arrow.r Stembureau #input.polling_station.number
 
 #v(0.5em)
 
@@ -56,7 +56,7 @@ Kieskring \<nummer> #sym.arrow.r #location_name #sym.arrow.r Stembureau #input.p
 
 == Proces-verbaal
 
-Elk stembureau maakt bij een verkiezing een verslag: het proces-verbaal. Hierin staat hoe het stemmen en het tellen van de stemmen is verlopen
+Elk stembureau maakt bij een verkiezing een verslag: het proces-verbaal. Hierin staat hoe het stemmen en het tellen van de stemmen is verlopen.
 
 #emph_block[
   In #this_location is gekozen voor *decentrale stemopneming*. Het stembureau telt na het stemmen het aantal kiezers, en hoeveel stemmen elke lijst en elke kandidaat hebben gekregen.
@@ -290,7 +290,7 @@ Bijvoorbeeld als er meerdere verkiezingen tegelijk werden georganiseerd, en een 
     continue_on_next_page: [#sym.arrow.r De lijst gaat verder op de volgende pagina],
     column_total: "Subtotaal kolom",
     sum_total: columns => [Totaal lijst (kolom #columns)],
-    total_instruction: [Neem dit totaal over in rubriek #ref(<cast_votes>) van deze bijlage bij de juiste lijst.],
+    total_instruction: [Neem dit totaal over in rubriek #ref(<cast_votes>) bij de juiste lijst.],
   )
 }
 

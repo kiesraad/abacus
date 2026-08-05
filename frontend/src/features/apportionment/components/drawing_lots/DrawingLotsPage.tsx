@@ -189,9 +189,7 @@ export function DrawingLotsPage() {
                       <ChoiceList>
                         <ChoiceList.Legend>{content.legend}</ChoiceList.Legend>
                         {radioError && (
-                          <ChoiceList.Error id="option_drawn_error">
-                            {t("apportionment.mandatory_question")}
-                          </ChoiceList.Error>
+                          <ChoiceList.Error id="option_drawn_error">{t("mandatory_question")}</ChoiceList.Error>
                         )}
                         {content.radioOptions.map((option) => renderChoiceListRadio(option))}
                       </ChoiceList>

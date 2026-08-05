@@ -49,6 +49,7 @@ export function overrideServerClaimDataEntryResponse({
       address: pollingStationMockData[0]!.address,
     },
     status: "first_entry_in_progress",
+    is_correction: false,
   } satisfies ClaimDataEntryResponse);
 }
 

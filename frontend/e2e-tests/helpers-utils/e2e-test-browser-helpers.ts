@@ -41,6 +41,10 @@ export async function fillDataEntryPages(page: Page, results: Results) {
   }
 
   switch (results.model) {
+    case "DSOFirstSession":
+    case "DSONextSession": {
+      /* TODO: https://github.com/kiesraad/abacus/issues/3691 */ break;
+    }
     case "CSOFirstSession":
     case "CSONextSession":
       {

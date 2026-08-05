@@ -1,12 +1,12 @@
 {
   "election": {
     "id": 2,
-    "name": "Gemeenteraad Test 2022",
+    "name": "Gemeenteraad Eemstricht 2022",
     "committee_category": "GSB",
     "counting_method": "CSO",
-    "election_id": "GR2022_Test",
-    "location": "Test",
-    "domain_id": "0000",
+    "election_id": "GR2022_Eemstricht",
+    "location": "Eemstricht",
+    "domain_id": "0445",
     "category": "Municipal",
     "sub_category": "GR2",
     "number_of_seats": 45,

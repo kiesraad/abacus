@@ -198,17 +198,56 @@
         "options": [
           {
             "autoFocusInput": true,
-            "label": "D en H zijn gelijk",
+            "label": <React.Fragment>
+              <React.Fragment>
+                D en H zijn 
+              </React.Fragment>
+              <strong>
+                <React.Fragment>
+                  <React.Fragment>
+                    gelijk
+                  </React.Fragment>
+                </React.Fragment>
+              </strong>
+            </React.Fragment>,
             "path": "differences_counts.compare_votes_cast_admitted_voters.admitted_voters_equal_votes_cast",
             "short_label": "D en H zijn gelijk",
           },
           {
-            "label": "H is groter dan D (meer uitgebrachte stemmen dan toegelaten kiezers)",
+            "label": <React.Fragment>
+              <React.Fragment>
+                H is 
+              </React.Fragment>
+              <strong>
+                <React.Fragment>
+                  <React.Fragment>
+                    groter
+                  </React.Fragment>
+                </React.Fragment>
+              </strong>
+              <React.Fragment>
+                 dan D (meer uitgebrachte stemmen dan toegelaten kiezers)
+              </React.Fragment>
+            </React.Fragment>,
             "path": "differences_counts.compare_votes_cast_admitted_voters.votes_cast_greater_than_admitted_voters",
             "short_label": "H is groter dan D",
           },
           {
-            "label": "H is kleiner dan D (minder uitgebrachte stemmen dan toegelaten kiezers)",
+            "label": <React.Fragment>
+              <React.Fragment>
+                H is 
+              </React.Fragment>
+              <strong>
+                <React.Fragment>
+                  <React.Fragment>
+                    kleiner
+                  </React.Fragment>
+                </React.Fragment>
+              </strong>
+              <React.Fragment>
+                 dan D (minder uitgebrachte stemmen dan toegelaten kiezers)
+              </React.Fragment>
+            </React.Fragment>,
             "path": "differences_counts.compare_votes_cast_admitted_voters.votes_cast_smaller_than_admitted_voters",
             "short_label": "H is kleiner dan D",
           },
@@ -273,7 +312,7 @@
             </React.Fragment>
           </strong>
           <React.Fragment>
-             Zijn er tijdens de stemming dingen opgeschreven die het verschil tussen D en H 
+             Zijn er tijdens de stemming dingen opgeschreven die het bovenstaande verschil tussen D en H 
           </React.Fragment>
           <strong>
             <React.Fragment>

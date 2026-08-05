@@ -1,30 +1,64 @@
+import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
 import { ChoiceList } from "@/components/ui/CheckboxAndRadio/ChoiceList";
 import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { t, tx } from "@/i18n/translate";
 
-import type { ResolveDifferencesFormState } from "../utils/differences";
+import { type CorrectEntry, effectiveWrongEntryAction, type ResolveDifferencesFormState } from "../utils/differences";
 
-export interface ResolveDifferencesFormProps extends ResolveDifferencesFormState {
+// Explains why the kept entry blocks correcting the other one.
+function correctionBlockedMessage(correctEntry: CorrectEntry | undefined): string | undefined {
+  if (correctEntry === "first") {
+    return t("resolve_differences.correction_blocked.first_entry_has_errors");
+  }
+  if (correctEntry === "second") {
+    return t("resolve_differences.correction_blocked.second_entry_has_errors");
+  }
+  return undefined;
+}
+
+// Renders nothing when correcting the other entry is not blocked
+function CorrectionBlockedAlert({
+  correctEntry,
+  correctionBlocked,
+}: Pick<ResolveDifferencesFormState, "correctEntry" | "correctionBlocked">) {
+  const message = correctionBlocked ? correctionBlockedMessage(correctEntry) : undefined;
+
+  if (!message) {
+    return null;
+  }
+
+  return (
+    <Alert type="notify" small>
+      {message}
+    </Alert>
+  );
+}
+
+export interface ResolveDifferencesFormProps {
   firstEntryName: string;
   secondEntryName: string;
+  formState: ResolveDifferencesFormState;
   onSubmit: () => void | Promise<void>;
 }
 
 export function ResolveDifferencesForm({
   firstEntryName,
   secondEntryName,
-  correctEntry,
-  setCorrectEntry,
-  wrongEntryAction,
-  setWrongEntryAction,
-  correctEntryError,
-  wrongEntryError,
+  formState: {
+    correctEntry,
+    setCorrectEntry,
+    wrongEntryAction,
+    setWrongEntryAction,
+    correctionBlocked,
+    correctEntryError,
+    wrongEntryError,
+  },
   onSubmit,
 }: ResolveDifferencesFormProps) {
-  // The second question only applies when one of the two entries is kept.
-  const wrongEntryDisabled = correctEntry !== "first" && correctEntry !== "second";
+  const wrongEntryDisabled = (correctEntry !== "first" && correctEntry !== "second") || correctionBlocked;
+  const checkedAction = effectiveWrongEntryAction(correctEntry, wrongEntryAction, correctionBlocked);
 
   return (
     <Form
@@ -65,12 +99,12 @@ export function ResolveDifferencesForm({
               checked={correctEntry === "neither"}
               onChange={() => {
                 setCorrectEntry("neither");
-                setWrongEntryAction(undefined);
               }}
             />
           </ChoiceList>
         </FormLayout.Section>
         <FormLayout.Section title={tx("resolve_differences.wrong_entry_question")}>
+          <CorrectionBlockedAlert correctEntry={correctEntry} correctionBlocked={correctionBlocked} />
           <ChoiceList disabled={wrongEntryDisabled}>
             {wrongEntryError && (
               <ChoiceList.Error id="resolve-differences-wrong-entry-error">{wrongEntryError}</ChoiceList.Error>
@@ -79,7 +113,7 @@ export function ResolveDifferencesForm({
               id="correct_wrong_entry"
               name="wrong_entry_action"
               label={t("resolve_differences.wrong_entry_options.correct")}
-              checked={wrongEntryAction === "correct"}
+              checked={checkedAction === "correct"}
               onChange={() => {
                 setWrongEntryAction("correct");
               }}
@@ -88,7 +122,7 @@ export function ResolveDifferencesForm({
               id="discard_wrong_entry"
               name="wrong_entry_action"
               label={t("resolve_differences.wrong_entry_options.discard")}
-              checked={wrongEntryAction === "discard"}
+              checked={checkedAction === "discard"}
               onChange={() => {
                 setWrongEntryAction("discard");
               }}
@@ -96,7 +130,9 @@ export function ResolveDifferencesForm({
           </ChoiceList>
         </FormLayout.Section>
         <FormLayout.Controls>
-          <Button type="submit">{t("save")}</Button>
+          <Button type="submit">
+            {correctionBlocked ? t("resolve_differences.continue_to_resolve_errors") : t("save")}
+          </Button>
         </FormLayout.Controls>
       </FormLayout>
     </Form>

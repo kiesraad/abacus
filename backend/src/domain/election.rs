@@ -177,6 +177,7 @@ pub struct ElectionNumberOfVotersChangeRequest {
     Deserialize,
     strum::Display,
     strum::EnumString,
+    strum::VariantArray,
     ToSchema,
     Clone,
     Copy,
@@ -186,7 +187,7 @@ pub struct ElectionNumberOfVotersChangeRequest {
     Hash,
     Type,
 )]
-#[strum(serialize_all = "lowercase")]
+#[strum(serialize_all = "lowercase", ascii_case_insensitive)]
 pub enum ElectionCategory {
     /// Gemeenteraadsverkiezing
     Municipal,
@@ -210,6 +211,29 @@ impl ElectionCategory {
             ElectionCategory::Municipal => "GR",
             ElectionCategory::Provincial => "PS",
             ElectionCategory::WaterAuthority => "AB",
+        }
+    }
+
+    /// Get the sub category for test elections, only available for tests and test data generation
+    #[cfg(any(test, feature = "dev-database"))]
+    pub fn sub_category(&self, number_of_seats: u32) -> ElectionSubCategory {
+        match self {
+            ElectionCategory::Municipal => {
+                if number_of_seats < 19 {
+                    ElectionSubCategory::GR1
+                } else {
+                    ElectionSubCategory::GR2
+                }
+            }
+            // Default to PS1
+            ElectionCategory::Provincial => ElectionSubCategory::PS1,
+            ElectionCategory::WaterAuthority => {
+                if number_of_seats < 19 {
+                    ElectionSubCategory::AB1
+                } else {
+                    ElectionSubCategory::AB2
+                }
+            }
         }
     }
 }
@@ -249,6 +273,7 @@ pub enum ElectionSubCategory {
     Hash,
     Type,
 )]
+#[strum(serialize_all = "lowercase", ascii_case_insensitive)]
 pub enum CommitteeCategory {
     /// Gemeentelijk stembureau
     GSB,
@@ -257,9 +282,21 @@ pub enum CommitteeCategory {
 }
 
 #[derive(
-    Serialize, Deserialize, strum::Display, ToSchema, Clone, Copy, Debug, PartialEq, Eq, Hash, Type,
+    Serialize,
+    Deserialize,
+    strum::Display,
+    strum::EnumString,
+    strum::VariantArray,
+    ToSchema,
+    Clone,
+    Copy,
+    Debug,
+    PartialEq,
+    Eq,
+    Hash,
+    Type,
 )]
-#[strum(serialize_all = "lowercase")]
+#[strum(serialize_all = "lowercase", ascii_case_insensitive)]
 pub enum VoteCountingMethod {
     /// centralized vote counting method
     CSO,
@@ -409,6 +446,7 @@ pub(crate) mod tests {
     /// The number of political groups is the length of the `political_groups_candidates` slice.
     /// The number of candidates in each political group is equal to the value in the slice at that index.
     pub fn election_fixture_with_given_number_of_seats(
+        election_category: ElectionCategory,
         committee_category: CommitteeCategory,
         political_groups_candidates: &[u32],
         number_of_seats: u32,
@@ -421,12 +459,8 @@ pub(crate) mod tests {
             election_id: "GR2023_Test".to_string(),
             location: "Test".to_string(),
             domain_id: "0000".to_string(),
-            category: ElectionCategory::Municipal,
-            sub_category: if number_of_seats < 19 {
-                ElectionSubCategory::GR1
-            } else {
-                ElectionSubCategory::GR2
-            },
+            category: election_category,
+            sub_category: election_category.sub_category(number_of_seats),
             number_of_seats,
             number_of_voters: 1000,
             election_date: NaiveDate::from_ymd_opt(2023, 11, 1).unwrap(),
@@ -439,10 +473,12 @@ pub(crate) mod tests {
     /// The number of political groups is the length of the `political_groups_candidates` slice.
     /// The number of candidates in each political group is equal to the value in the slice at that index.
     pub fn election_fixture(
+        election_category: ElectionCategory,
         committee_category: CommitteeCategory,
         political_groups_candidates: &[u32],
     ) -> ElectionWithPoliticalGroups {
         election_fixture_with_given_number_of_seats(
+            election_category,
             committee_category,
             political_groups_candidates,
             29,

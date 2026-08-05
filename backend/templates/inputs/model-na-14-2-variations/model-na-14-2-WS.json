@@ -17,14 +17,14 @@
   },
   "election": {
     "id": 4,
-    "name": "Gemeenteraad Hovenerwoud 2022",
+    "name": "Waterschap Rivier en Polder 2022",
     "committee_category": "GSB",
     "counting_method": "CSO",
-    "election_id": "Hovenerwoud_2022",
+    "election_id": "AB2022_Hovenerwoud",
     "location": "Hovenerwoud",
     "domain_id": "0446",
-    "category": "Municipal",
-    "sub_category": "GR2",
+    "category": "WaterAuthority",
+    "sub_category": "AB2",
     "number_of_seats": 26,
     "number_of_voters": 152191,
     "election_date": "2022-02-11",
@@ -32,8 +32,9 @@
   },
   "previous_summary": {
     "voters_counts": {
-      "poll_card_count": 109855,
-      "proxy_certificate_count": 0,
+      "poll_card_count": 109850,
+      "proxy_certificate_count": 3,
+      "voter_card_count": 2,
       "total_admitted_voters_count": 109855
     },
     "votes_counts": {
@@ -70,9 +71,10 @@
   },
   "summary": {
     "voters_counts": {
-      "poll_card_count": 109856,
-      "proxy_certificate_count": 0,
-      "total_admitted_voters_count": 109856
+      "poll_card_count": 109850,
+      "proxy_certificate_count": 2,
+      "voter_card_count": 3,
+      "total_admitted_voters_count": 109855
     },
     "votes_counts": {
       "political_group_total_votes": [

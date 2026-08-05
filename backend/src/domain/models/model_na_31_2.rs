@@ -62,18 +62,44 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_main_json_matches_struct() {
-        let reader = BufReader::new(File::open("templates/inputs/model-na-31-2.json").unwrap());
+    fn test_main_json_variations_match_struct() {
+        let mut reader = BufReader::new(
+            File::open("templates/inputs/model-na-31-2-variations/model-na-31-2-GR.json").unwrap(),
+        );
         serde_json::from_reader::<_, ModelNa31_2Input>(reader)
-            .expect("model-na-31-2.json should deserialize to struct ModelNa31_2Input");
+            .expect("model-na-31-2-GR.json should deserialize to struct ModelNa31_2Input");
+
+        reader = BufReader::new(
+            File::open("templates/inputs/model-na-31-2-variations/model-na-31-2-PS.json").unwrap(),
+        );
+        serde_json::from_reader::<_, ModelNa31_2Input>(reader)
+            .expect("model-na-31-2-PS.json should deserialize to struct ModelNa31_2Input");
+
+        reader = BufReader::new(
+            File::open("templates/inputs/model-na-31-2-variations/model-na-31-2-WS.json").unwrap(),
+        );
+        serde_json::from_reader::<_, ModelNa31_2Input>(reader)
+            .expect("model-na-31-2-WS.json should deserialize to struct ModelNa31_2Input");
     }
 
     #[test]
-    fn test_bijlage_json_matches_struct() {
-        let reader =
-            BufReader::new(File::open("templates/inputs/model-na-31-2-bijlage1.json").unwrap());
+    fn test_bijlage_json_variations_match_struct() {
+        let mut reader =
+            BufReader::new(File::open("templates/inputs/model-na-31-2-bijlage-1-variations/model-na-31-2-bijlage-1-GR.json").unwrap());
         serde_json::from_reader::<_, ModelNa31_2Bijlage1Input>(reader).expect(
-            "model-na-31-2-bijlage1.json should deserialize to struct ModelNa31_2Bijlage1Input",
+            "model-na-31-2-bijlage-1-GR.json should deserialize to struct ModelNa31_2Bijlage1Input",
+        );
+
+        reader =
+            BufReader::new(File::open("templates/inputs/model-na-31-2-bijlage-1-variations/model-na-31-2-bijlage-1-PS.json").unwrap());
+        serde_json::from_reader::<_, ModelNa31_2Bijlage1Input>(reader).expect(
+            "model-na-31-2-bijlage-1-PS.json should deserialize to struct ModelNa31_2Bijlage1Input",
+        );
+
+        reader =
+            BufReader::new(File::open("templates/inputs/model-na-31-2-bijlage-1-variations/model-na-31-2-bijlage-1-WS.json").unwrap());
+        serde_json::from_reader::<_, ModelNa31_2Bijlage1Input>(reader).expect(
+            "model-na-31-2-bijlage-1-WS.json should deserialize to struct ModelNa31_2Bijlage1Input",
         );
     }
 

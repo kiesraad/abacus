@@ -5,7 +5,6 @@ import { useApiClient } from "@/api/useApiClient";
 import { useInitialApiGet } from "@/api/useInitialApiGet";
 import { ElectionStatusProviderContext } from "@/hooks/election/ElectionStatusProviderContext";
 import { useElection } from "@/hooks/election/useElection";
-import { t } from "@/i18n/translate";
 import type {
   DATA_ENTRY_GET_DIFFERENCES_REQUEST_PATH,
   DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_BODY,
@@ -20,8 +19,10 @@ import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
 import {
   type CorrectEntry,
+  effectiveWrongEntryAction,
+  getQuestionErrors,
   getResolveDifferencesAction,
-  getUnansweredQuestions,
+  isCorrectionBlocked,
   type ResolveDifferencesFormState,
   type WrongEntryAction,
 } from "../utils/differences";
@@ -62,7 +63,7 @@ export function useDataEntryDifferences(
 ): DataEntryDifferences {
   const client = useApiClient();
   const { election } = useElection();
-  const [correctEntry, setCorrectEntry] = useState<CorrectEntry>();
+  const [correctEntry, setCorrectEntryAnswer] = useState<CorrectEntry>();
   const [wrongEntryAction, setWrongEntryAction] = useState<WrongEntryAction>();
   const electionContext = useContext(ElectionStatusProviderContext);
   const [error, setError] = useState<AnyApiError | null>(null);
@@ -88,13 +89,15 @@ export function useDataEntryDifferences(
     dataEntryStructure = getDataEntryStructure(differences.first_entry.model, election);
   }
 
-  const unanswered = getUnansweredQuestions(correctEntry, wrongEntryAction);
-  const requiredError = t("resolve_differences.required_error");
+  const correctionBlocked = isCorrectionBlocked(correctEntry, differences);
+  const effectiveAction = effectiveWrongEntryAction(correctEntry, wrongEntryAction, correctionBlocked);
+
+  const questionErrors = getQuestionErrors(correctEntry, effectiveAction, submitted);
 
   const onSubmit = async () => {
     setSubmitted(true);
 
-    const action = getResolveDifferencesAction(correctEntry, wrongEntryAction);
+    const action = getResolveDifferencesAction(correctEntry, effectiveAction);
     if (action === undefined) {
       return;
     }
@@ -107,7 +110,7 @@ export function useDataEntryDifferences(
       // reload the election status data then navigate according to new status
       await electionContext?.refetch();
       afterSave(response.data.status, {
-        wrongEntryAction,
+        wrongEntryAction: effectiveAction,
         ...resolvedUserIds(differences, correctEntry),
       });
     } else {
@@ -118,11 +121,15 @@ export function useDataEntryDifferences(
   return {
     formState: {
       correctEntry,
-      setCorrectEntry,
+      // Answering the first question clears the second question
+      setCorrectEntry: (next) => {
+        setCorrectEntryAnswer(next);
+        setWrongEntryAction(undefined);
+      },
       wrongEntryAction,
       setWrongEntryAction,
-      correctEntryError: submitted && unanswered.correctEntry ? requiredError : undefined,
-      wrongEntryError: submitted && unanswered.wrongEntry ? requiredError : undefined,
+      correctionBlocked,
+      ...questionErrors,
     },
     election,
     loading: requestState.status === "loading",

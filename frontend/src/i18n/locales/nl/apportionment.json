@@ -149,7 +149,6 @@
   "lists_a_seat_needs_to_be_reassigned_for": "Lijst {seat_from_lists} moet een zetel afstaan aan lijst {seat_to_list}.",
   "make_apportionment_definitive": "Je kunt de zetelverdeling nu definitief maken en het proces-verbaal downloaden.",
   "manage_deceased_candidates": "Beheer overleden kandidaten",
-  "mandatory_question": "Deze vraag is verplicht",
   "minus": "min",
   "no_candidates_are_deceased": "Alle kandidaten zijn meegenomen bij het verdelen van de zetels. Er zijn geen kandidaten buiten beschouwing gelaten vanwege overlijden.",
   "not_possible": "Zetelverdeling is niet mogelijk",

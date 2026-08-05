@@ -24,7 +24,7 @@ pub struct DifferencesCounts {
     #[schema(value_type = u32)]
     pub fewer_ballots_count: Count,
     /// Whether the difference between the total of admitted voters and total of votes cast is explained.
-    /// (B1-3.3.2 "Zijn er tijdens de stemming dingen opgeschreven die het verschil tussen D en H volledig verklaren?")
+    /// (B1-3.3.2 "Zijn er tijdens de stemming dingen opgeschreven die het bovenstaande verschil tussen D en H volledig verklaren?")
     pub difference_completely_accounted_for: YesNo,
 }
 
@@ -355,7 +355,7 @@ mod tests {
         election::PGNumber,
         results::{
             Results, cso_first_session_results::CSOFirstSessionResults,
-            cso_next_session_results::CSONextSessionResults,
+            next_session_results::NextSessionResults,
             political_group_candidate_votes::PoliticalGroupCandidateVotes,
             political_group_total_votes::PoliticalGroupTotalVotes, voters_counts::VotersCounts,
             votes_counts::VotesCounts,
@@ -729,7 +729,7 @@ mod tests {
     #[test]
     fn test_not_equal_political_group_votes_differences() {
         let mut different_fields = vec![];
-        let first_entry = Results::CSONextSession(CSONextSessionResults {
+        let first_entry = Results::CSONextSession(NextSessionResults {
             voters_counts: VotersCounts {
                 poll_card_count: 103,
                 proxy_certificate_count: 2,

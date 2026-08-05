@@ -759,7 +759,7 @@
         ]
       },
       "delete": {
-        "summary": "Discard an in-progress (not finalised) data entry (typist_csb, typist_gsb)",
+        "summary": "Discard an in-progress data entry or a correction. Discarding a\ncorrection finalises the other entry as the first entry. (typist_csb, typist_gsb)",
         "operationId": "data_entry_discard",
         "parameters": [
           {
@@ -5388,6 +5388,39 @@
   },
   "components": {
     "schemas": {
+      "AboutReport": {
+        "type": "object",
+        "description": "Information about the report (\"Over het proces-verbaal\")",
+        "required": [
+          "corrigendum_present",
+          "checks_and_corrections_present"
+        ],
+        "properties": {
+          "checks_and_corrections_present": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ChecksAndCorrectionsPresent",
+                "description": "Whether the extra page \"controles en correcties\" is inserted in the report\n(\"Is voorin het proces-verbaal de extra pagina controles en correcties ingevoegd?\")"
+              }
+            ]
+          },
+          "corrigendum_present": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/CorrigendumPresent",
+                "description": "Whether a corrigendum accompanies the report\n(\"Is er een corrigendum bij het papieren proces-verbaal aanwezig?\")"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
       "AbsoluteMajorityDrawingLots": {
         "type": "object",
         "required": [
@@ -5606,6 +5639,8 @@
           "DataEntrySaved",
           "DataEntryResumed",
           "DataEntryDeleted",
+          "DataEntryDiscarded",
+          "DataEntryReset",
           "DataEntryFinalised",
           "DataEntryDiscardedFirst",
           "DataEntryReturnedFirst",
@@ -5904,38 +5939,6 @@
         },
         "additionalProperties": false
       },
-      "CSONextSessionResults": {
-        "type": "object",
-        "description": "CSONextSessionResults, following the fields in Model Na 14-2 Bijlage 1.\n\nSee \"Model Na 14-2. Corrigendum bij het proces-verbaal van een gemeentelijk stembureau/\nstembureau voor het openbaar lichaam, Bijlage 1: uitkomsten per stembureau\" from\n[Kiesraad](https://www.kiesraad.nl/documenten/2025/11/27/na-14-2-corrigendum-gsb-inclusief-bijlage-voor-cso).",
-        "required": [
-          "voters_counts",
-          "votes_counts",
-          "differences_counts",
-          "political_group_votes"
-        ],
-        "properties": {
-          "differences_counts": {
-            "$ref": "#/components/schemas/DifferencesCounts",
-            "description": "Differences counts (\"Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten\")"
-          },
-          "political_group_votes": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PoliticalGroupCandidateVotes"
-            },
-            "description": "Vote counts per list and candidate (\"Aantal stemmen per lijst en kandidaat\")"
-          },
-          "voters_counts": {
-            "$ref": "#/components/schemas/VotersCounts",
-            "description": "Voters counts (\"Aantal toegelaten kiezers\")"
-          },
-          "votes_counts": {
-            "$ref": "#/components/schemas/VotesCounts",
-            "description": "Votes counts (\"Aantal getelde stembiljetten\")"
-          }
-        },
-        "additionalProperties": false
-      },
       "Candidate": {
         "type": "object",
         "description": "Candidate",
@@ -6096,6 +6099,38 @@
         },
         "additionalProperties": false
       },
+      "ChecksAndCorrections": {
+        "type": "object",
+        "description": "Checks and corrections (\"Controles en correcties\")",
+        "required": [
+          "reason_investigation_own_initiative",
+          "corrected_results_own_initiative",
+          "corrected_results_csb_request"
+        ],
+        "properties": {
+          "corrected_results_csb_request": {
+            "$ref": "#/components/schemas/YesNo",
+            "description": "Whether investigation at the request of the central electoral committee\nhas led to corrected results\n(\"Op verzoek van het centraal stembureau: Zijn er gecorrigeerde telresultaten?\")"
+          },
+          "corrected_results_own_initiative": {
+            "$ref": "#/components/schemas/YesNo",
+            "description": "Whether the investigation on its own initiative has led to corrected results\n(\"Op eigen initiatief van het gemeentelijk stembureau: Zijn er gecorrigeerde telresultaten?\")"
+          },
+          "reason_investigation_own_initiative": {
+            "$ref": "#/components/schemas/ReasonInvestigationOwnInitiative",
+            "description": "Why the GSB investigated the counting results on its own initiative\n(\"Op eigen initiatief van het gemeentelijk stembureau: Waarom heeft het gemeentelijk stembureau\n de telresultaten onderzocht?\")"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ChecksAndCorrectionsPresent": {
+        "type": "string",
+        "description": "Whether the extra page \"controles en correcties\" is inserted in the report",
+        "enum": [
+          "PagePresent",
+          "PageMissing"
+        ]
+      },
       "ChosenCandidate": {
         "type": "object",
         "description": "Chosen candidate",
@@ -6151,7 +6186,8 @@
           "client_state",
           "validation_results",
           "source",
-          "status"
+          "status",
+          "is_correction"
         ],
         "properties": {
           "client_state": {
@@ -6159,6 +6195,10 @@
           },
           "data": {
             "$ref": "#/components/schemas/Results"
+          },
+          "is_correction": {
+            "type": "boolean",
+            "description": "Whether the typist is correcting an entry that was completed before"
           },
           "previous_results": {
             "$ref": "#/components/schemas/CommonPollingStationResults"
@@ -6300,6 +6340,14 @@
         },
         "additionalProperties": false
       },
+      "CorrigendumPresent": {
+        "type": "string",
+        "description": "Whether a corrigendum accompanies the report",
+        "enum": [
+          "TwoDocuments",
+          "OneDocument"
+        ]
+      },
       "CountingDifferencesPollingStation": {
         "type": "object",
         "description": "Counting Differences Polling Station,\npart of the results (\"B1-2 Verschillen met telresultaten van het stembureau\")",
@@ -6378,6 +6426,47 @@
         },
         "additionalProperties": false
       },
+      "DSOFirstSessionResults": {
+        "type": "object",
+        "description": "DSOFirstSessionResults, following the fields in Model N 10-1\n\nSee: Model N 10-1 (Proces-verbaal van een stembureau) from\n[kiesraad](https://www.kiesraad.nl/documenten/2025/11/27/n-10-1-pv-sb-dso)",
+        "required": [
+          "about_report",
+          "checks_and_corrections",
+          "voters_counts",
+          "votes_counts",
+          "differences_counts",
+          "political_group_votes"
+        ],
+        "properties": {
+          "about_report": {
+            "$ref": "#/components/schemas/AboutReport",
+            "description": "About report (\"Over het proces-verbaal\")"
+          },
+          "checks_and_corrections": {
+            "$ref": "#/components/schemas/ChecksAndCorrections",
+            "description": "Checks and corrections (\"Controles en correcties\")"
+          },
+          "differences_counts": {
+            "$ref": "#/components/schemas/DifferencesCounts",
+            "description": "Differences counts (\"3. Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten\")"
+          },
+          "political_group_votes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PoliticalGroupCandidateVotes"
+            },
+            "description": "Vote counts per list and candidate (5. \"Aantal stemmen per lijst en kandidaat\")"
+          },
+          "voters_counts": {
+            "$ref": "#/components/schemas/VotersCounts",
+            "description": "Voters counts (\"1. Aantal toegelaten kiezers\")"
+          },
+          "votes_counts": {
+            "$ref": "#/components/schemas/VotesCounts",
+            "description": "Votes counts (\"2. Aantal getelde stembiljetten\")"
+          }
+        }
+      },
       "DataEntry": {
         "type": "object",
         "description": "Request structure for saving data entry",
@@ -6410,19 +6499,27 @@
         "required": [
           "first_entry_user_id",
           "first_entry",
+          "first_entry_has_errors",
           "second_entry_user_id",
           "second_entry",
+          "second_entry_has_errors",
           "source"
         ],
         "properties": {
           "first_entry": {
             "$ref": "#/components/schemas/Results"
           },
+          "first_entry_has_errors": {
+            "type": "boolean"
+          },
           "first_entry_user_id": {
             "$ref": "#/components/schemas/UserId"
           },
           "second_entry": {
             "$ref": "#/components/schemas/Results"
+          },
+          "second_entry_has_errors": {
+            "type": "boolean"
           },
           "second_entry_user_id": {
             "$ref": "#/components/schemas/UserId"
@@ -6560,6 +6657,8 @@
           "first_entry_finalised",
           "second_entry_in_progress",
           "entries_different",
+          "first_entry_correction",
+          "second_entry_correction",
           "definitive"
         ]
       },
@@ -6630,7 +6729,7 @@
           },
           "difference_completely_accounted_for": {
             "$ref": "#/components/schemas/YesNo",
-            "description": "Whether the difference between the total of admitted voters and total of votes cast is explained.\n(B1-3.3.2 \"Zijn er tijdens de stemming dingen opgeschreven die het verschil tussen D en H volledig verklaren?\")"
+            "description": "Whether the difference between the total of admitted voters and total of votes cast is explained.\n(B1-3.3.2 \"Zijn er tijdens de stemming dingen opgeschreven die het bovenstaande verschil tussen D en H volledig verklaren?\")"
           },
           "fewer_ballots_count": {
             "type": "integer",
@@ -7068,6 +7167,12 @@
             "$ref": "#/components/schemas/DataEntryId",
             "description": "Data entry id"
           },
+          "data_entry_progress": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Current data entry progress as a percentage (0 to 100)",
+            "minimum": 0
+          },
           "finalised_with_warnings": {
             "type": "boolean",
             "description": "Whether the finalised first or second data entry has warnings"
@@ -7076,22 +7181,10 @@
             "type": "string",
             "description": "Time when the data entry was finalised"
           },
-          "first_entry_progress": {
-            "type": "integer",
-            "format": "int32",
-            "description": "First entry progress as a percentage (0 to 100)",
-            "minimum": 0
-          },
           "first_entry_user_id": {
             "type": "integer",
             "format": "int32",
             "description": "First entry user id",
-            "minimum": 0
-          },
-          "second_entry_progress": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Second entry progress as a percentage (0 to 100)",
             "minimum": 0
           },
           "second_entry_user_id": {
@@ -7253,7 +7346,7 @@
           "DatabaseError",
           "DataEntryAlreadyClaimed",
           "DataEntryAlreadyFinalised",
-          "DataEntryCannotBeDeleted",
+          "DataEntryCannotBeReset",
           "DataEntryGetNotAllowed",
           "DataEntryNotAllowed",
           "EmlImportError",
@@ -7542,6 +7635,10 @@
           "committee_category": {
             "$ref": "#/components/schemas/CommitteeCategory",
             "description": "GSB or CSB"
+          },
+          "counting_method": {
+            "$ref": "#/components/schemas/VoteCountingMethod",
+            "description": "CSO or DSO"
           },
           "custom_name": {
             "type": "string",
@@ -8234,6 +8331,38 @@
         },
         "additionalProperties": false
       },
+      "NextSessionResults": {
+        "type": "object",
+        "description": "NextSessionResults, following the fields in Model Na 14-2 Bijlage 1/Na 14-1 versie 2.\n\nSee \"Model Na 14-2. Corrigendum bij het proces-verbaal van een gemeentelijk stembureau/\nstembureau voor het openbaar lichaam, Bijlage 1: uitkomsten per stembureau\" from\n<https://www.kiesraad.nl/documenten/2025/11/27/na-14-2-corrigendum-gsb-inclusief-bijlage-voor-cso)>.\nSee also \"Model Na 14-1 (Corrigendum bij het proces-verbaal van een stembureau)\"\n<https://www.kiesraad.nl/documenten/2025/11/27/model-na-14-1>.",
+        "required": [
+          "voters_counts",
+          "votes_counts",
+          "differences_counts",
+          "political_group_votes"
+        ],
+        "properties": {
+          "differences_counts": {
+            "$ref": "#/components/schemas/DifferencesCounts",
+            "description": "Differences counts (\"Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten\")"
+          },
+          "political_group_votes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PoliticalGroupCandidateVotes"
+            },
+            "description": "Vote counts per list and candidate (\"Aantal stemmen per lijst en kandidaat\")"
+          },
+          "voters_counts": {
+            "$ref": "#/components/schemas/VotersCounts",
+            "description": "Voters counts (\"Aantal toegelaten kiezers\")"
+          },
+          "votes_counts": {
+            "$ref": "#/components/schemas/VotesCounts",
+            "description": "Votes counts (\"Aantal getelde stembiljetten\")"
+          }
+        },
+        "additionalProperties": false
+      },
       "PGNumber": {
         "type": "integer",
         "format": "int32",
@@ -8755,6 +8884,25 @@
       "RandomRange": {
         "type": "string"
       },
+      "ReasonInvestigationOwnInitiative": {
+        "type": "object",
+        "description": "Reason for investigation on own initiative",
+        "required": [
+          "unaccounted_difference",
+          "other_error"
+        ],
+        "properties": {
+          "other_error": {
+            "type": "boolean",
+            "description": "Because of a (suspected) other error\n(\"Vanwege (het vermoeden van) een andere fout\")"
+          },
+          "unaccounted_difference": {
+            "type": "boolean",
+            "description": "Because of an unaccounted-for difference\n(\"Vanwege een onverklaard verschil\")"
+          }
+        },
+        "additionalProperties": false
+      },
       "RedactedEmlHash": {
         "type": "object",
         "required": [
@@ -8830,6 +8978,52 @@
           {
             "allOf": [
               {
+                "$ref": "#/components/schemas/DSOFirstSessionResults",
+                "description": "Results for decentrally counted (DSO) elections, first election committee session.\nThis contains the data entry values from Model Model N 10-1 and possibly in combination with the values from Model Na 14-1 versie 1."
+              },
+              {
+                "type": "object",
+                "required": [
+                  "model"
+                ],
+                "properties": {
+                  "model": {
+                    "type": "string",
+                    "enum": [
+                      "DSOFirstSession"
+                    ]
+                  }
+                }
+              }
+            ],
+            "description": "Results for decentrally counted (DSO) elections, first election committee session.\nThis contains the data entry values from Model Model N 10-1 and possibly in combination with the values from Model Na 14-1 versie 1."
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/NextSessionResults",
+                "description": "Results for decentrally counted (DSO) elections, any subsequent election committee session.\nThis contains the data entry values from Model Na 14-1 versie 2."
+              },
+              {
+                "type": "object",
+                "required": [
+                  "model"
+                ],
+                "properties": {
+                  "model": {
+                    "type": "string",
+                    "enum": [
+                      "DSONextSession"
+                    ]
+                  }
+                }
+              }
+            ],
+            "description": "Results for decentrally counted (DSO) elections, any subsequent election committee session.\nThis contains the data entry values from Model Na 14-1 versie 2."
+          },
+          {
+            "allOf": [
+              {
                 "$ref": "#/components/schemas/CSOFirstSessionResults",
                 "description": "Results for centrally counted (CSO) elections, first election committee session.\nThis contains the data entry values from Model Na 31-2 Bijlage 1."
               },
@@ -8853,7 +9047,7 @@
           {
             "allOf": [
               {
-                "$ref": "#/components/schemas/CSONextSessionResults",
+                "$ref": "#/components/schemas/NextSessionResults",
                 "description": "Results for centrally counted (CSO) elections, any subsequent election committee session.\nThis contains the data entry values from Model Na 14-2 Bijlage 1."
               },
               {

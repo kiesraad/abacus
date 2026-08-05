@@ -164,7 +164,7 @@ jobs:
       - name: Get build date
         run: |
           BUILD_DATE=$(date -u +'%Y-%m-%d')
-          echo "BUILD_DATE=$BUILD_DATE" >> $GITHUB_ENV
+          echo "BUILD_DATE=$BUILD_DATE" >> "$GITHUB_ENV"
       - name: Create release directory
         run: mkdir -p release
       - name: Download abacus
@@ -186,7 +186,7 @@ jobs:
           rmdir abacus-release-windows-latest
         working-directory: release
       - name: Create a SHA256SUMS file
-        run: sha256sum -b * > SHA256SUMS
+        run: sha256sum -b -- * > SHA256SUMS
         working-directory: release
       - name: Release
         uses: softprops/action-gh-release@3d0d9888cb7fd7b750713d6e236d1fcb99157228 # v2

@@ -403,6 +403,18 @@ export type USER_DELETE_REQUEST_PATH = `/api/users/${UserId}`;
 
 /** TYPES **/
 
+/**
+ * Information about the report ("Over het proces-verbaal")
+ */
+export interface AboutReport {
+  /** Whether the extra page "controles en correcties" is inserted in the report
+("Is voorin het proces-verbaal de extra pagina controles en correcties ingevoegd?") */
+  checks_and_corrections_present: null | ChecksAndCorrectionsPresent;
+  /** Whether a corrigendum accompanies the report
+("Is er een corrigendum bij het papieren proces-verbaal aanwezig?") */
+  corrigendum_present: null | CorrigendumPresent;
+}
+
 export interface AbsoluteMajorityDrawingLots {
   /** The list where the reassigned residual seat will go to */
   assign_to: PGNumber;
@@ -475,6 +487,8 @@ export const auditEventTypeValues = [
   "DataEntrySaved",
   "DataEntryResumed",
   "DataEntryDeleted",
+  "DataEntryDiscarded",
+  "DataEntryReset",
   "DataEntryFinalised",
   "DataEntryDiscardedFirst",
   "DataEntryReturnedFirst",
@@ -586,24 +600,6 @@ export interface CSOFirstSessionResults {
 }
 
 /**
- * CSONextSessionResults, following the fields in Model Na 14-2 Bijlage 1.
- *
- * See "Model Na 14-2. Corrigendum bij het proces-verbaal van een gemeentelijk stembureau/
- * stembureau voor het openbaar lichaam, Bijlage 1: uitkomsten per stembureau" from
- * [Kiesraad](https://www.kiesraad.nl/documenten/2025/11/27/na-14-2-corrigendum-gsb-inclusief-bijlage-voor-cso).
- */
-export interface CSONextSessionResults {
-  /** Differences counts ("Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten") */
-  differences_counts: DifferencesCounts;
-  /** Vote counts per list and candidate ("Aantal stemmen per lijst en kandidaat") */
-  political_group_votes: PoliticalGroupCandidateVotes[];
-  /** Voters counts ("Aantal toegelaten kiezers") */
-  voters_counts: VotersCounts;
-  /** Votes counts ("Aantal getelde stembiljetten") */
-  votes_counts: VotesCounts;
-}
-
-/**
  * Candidate
  */
 export interface Candidate {
@@ -660,6 +656,29 @@ export interface CandidateVotes {
 }
 
 /**
+ * Checks and corrections ("Controles en correcties")
+ */
+export interface ChecksAndCorrections {
+  /** Whether investigation at the request of the central electoral committee
+has led to corrected results
+("Op verzoek van het centraal stembureau: Zijn er gecorrigeerde telresultaten?") */
+  corrected_results_csb_request: YesNo;
+  /** Whether the investigation on its own initiative has led to corrected results
+("Op eigen initiatief van het gemeentelijk stembureau: Zijn er gecorrigeerde telresultaten?") */
+  corrected_results_own_initiative: YesNo;
+  /** Why the GSB investigated the counting results on its own initiative
+("Op eigen initiatief van het gemeentelijk stembureau: Waarom heeft het gemeentelijk stembureau
+ de telresultaten onderzocht?") */
+  reason_investigation_own_initiative: ReasonInvestigationOwnInitiative;
+}
+
+/**
+ * Whether the extra page "controles en correcties" is inserted in the report
+ */
+export const checksAndCorrectionsPresentValues = ["PagePresent", "PageMissing"] as const;
+export type ChecksAndCorrectionsPresent = (typeof checksAndCorrectionsPresentValues)[number];
+
+/**
  * Chosen candidate
  */
 export interface ChosenCandidate {
@@ -681,6 +700,8 @@ export interface ChosenCandidate {
 export interface ClaimDataEntryResponse {
   client_state: unknown;
   data: Results;
+  /** Whether the typist is correcting an entry that was completed before */
+  is_correction: boolean;
   previous_results?: CommonPollingStationResults;
   source: DataEntrySource;
   status: DataEntryStatusName;
@@ -744,6 +765,12 @@ export interface CommonPollingStationResults {
 }
 
 /**
+ * Whether a corrigendum accompanies the report
+ */
+export const corrigendumPresentValues = ["TwoDocuments", "OneDocument"] as const;
+export type CorrigendumPresent = (typeof corrigendumPresentValues)[number];
+
+/**
  * Counting Differences Polling Station,
  * part of the results ("B1-2 Verschillen met telresultaten van het stembureau")
  */
@@ -775,6 +802,27 @@ export interface Credentials {
 }
 
 /**
+ * DSOFirstSessionResults, following the fields in Model N 10-1
+ *
+ * See: Model N 10-1 (Proces-verbaal van een stembureau) from
+ * [kiesraad](https://www.kiesraad.nl/documenten/2025/11/27/n-10-1-pv-sb-dso)
+ */
+export interface DSOFirstSessionResults {
+  /** About report ("Over het proces-verbaal") */
+  about_report: AboutReport;
+  /** Checks and corrections ("Controles en correcties") */
+  checks_and_corrections: ChecksAndCorrections;
+  /** Differences counts ("3. Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten") */
+  differences_counts: DifferencesCounts;
+  /** Vote counts per list and candidate (5. "Aantal stemmen per lijst en kandidaat") */
+  political_group_votes: PoliticalGroupCandidateVotes[];
+  /** Voters counts ("1. Aantal toegelaten kiezers") */
+  voters_counts: VotersCounts;
+  /** Votes counts ("2. Aantal getelde stembiljetten") */
+  votes_counts: VotesCounts;
+}
+
+/**
  * Request structure for saving data entry
  */
 export interface DataEntry {
@@ -788,8 +836,10 @@ export interface DataEntry {
 
 export interface DataEntryGetDifferencesResponse {
   first_entry: Results;
+  first_entry_has_errors: boolean;
   first_entry_user_id: UserId;
   second_entry: Results;
+  second_entry_has_errors: boolean;
   second_entry_user_id: UserId;
   source: DataEntrySource;
 }
@@ -817,6 +867,8 @@ export const dataEntryStatusNameValues = [
   "first_entry_finalised",
   "second_entry_in_progress",
   "entries_different",
+  "first_entry_correction",
+  "second_entry_correction",
   "definitive",
 ] as const;
 export type DataEntryStatusName = (typeof dataEntryStatusNameValues)[number];
@@ -854,7 +906,7 @@ export interface DifferencesCounts {
 (B1-3.3.1 "Vergelijk D (totaal toegelaten kiezers) en H (totaal uitgebrachte stemmen)") */
   compare_votes_cast_admitted_voters: DifferenceCountsCompareVotesCastAdmittedVoters;
   /** Whether the difference between the total of admitted voters and total of votes cast is explained.
-(B1-3.3.2 "Zijn er tijdens de stemming dingen opgeschreven die het verschil tussen D en H volledig verklaren?") */
+(B1-3.3.2 "Zijn er tijdens de stemming dingen opgeschreven die het bovenstaande verschil tussen D en H volledig verklaren?") */
   difference_completely_accounted_for: YesNo;
   /** Number of fewer counted ballots ("Aantal minder getelde stemmen (bereken: D min H)") */
   fewer_ballots_count: number;
@@ -964,16 +1016,14 @@ export interface ElectionStatusResponse {
 export interface ElectionStatusResponseEntry {
   /** Data entry id */
   data_entry_id: DataEntryId;
+  /** Current data entry progress as a percentage (0 to 100) */
+  data_entry_progress?: number;
   /** Whether the finalised first or second data entry has warnings */
   finalised_with_warnings?: boolean;
   /** Time when the data entry was finalised */
   finished_at?: string;
-  /** First entry progress as a percentage (0 to 100) */
-  first_entry_progress?: number;
   /** First entry user id */
   first_entry_user_id?: number;
-  /** Second entry progress as a percentage (0 to 100) */
-  second_entry_progress?: number;
   /** Second entry user id */
   second_entry_user_id?: number;
   /** Data entry source (polling station or sub committee) */
@@ -1040,7 +1090,7 @@ export const errorReferenceValues = [
   "DatabaseError",
   "DataEntryAlreadyClaimed",
   "DataEntryAlreadyFinalised",
-  "DataEntryCannotBeDeleted",
+  "DataEntryCannotBeReset",
   "DataEntryGetNotAllowed",
   "DataEntryNotAllowed",
   "EmlImportError",
@@ -1170,6 +1220,8 @@ export interface GenerateElectionArgs {
   candidates_per_group: RandomRange;
   /** GSB or CSB */
   committee_category: CommitteeCategory;
+  /** CSO or DSO */
+  counting_method?: VoteCountingMethod;
   /** Custom election name */
   custom_name?: string;
   /** Municipal, Provincial or WaterAuthority */
@@ -1341,6 +1393,26 @@ export interface NewElection {
   sub_category: ElectionSubCategory;
 }
 
+/**
+ * NextSessionResults, following the fields in Model Na 14-2 Bijlage 1/Na 14-1 versie 2.
+ *
+ * See "Model Na 14-2. Corrigendum bij het proces-verbaal van een gemeentelijk stembureau/
+ * stembureau voor het openbaar lichaam, Bijlage 1: uitkomsten per stembureau" from
+ * <https://www.kiesraad.nl/documenten/2025/11/27/na-14-2-corrigendum-gsb-inclusief-bijlage-voor-cso)>.
+ * See also "Model Na 14-1 (Corrigendum bij het proces-verbaal van een stembureau)"
+ * <https://www.kiesraad.nl/documenten/2025/11/27/model-na-14-1>.
+ */
+export interface NextSessionResults {
+  /** Differences counts ("Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten") */
+  differences_counts: DifferencesCounts;
+  /** Vote counts per list and candidate ("Aantal stemmen per lijst en kandidaat") */
+  political_group_votes: PoliticalGroupCandidateVotes[];
+  /** Voters counts ("Aantal toegelaten kiezers") */
+  voters_counts: VotersCounts;
+  /** Votes counts ("Aantal getelde stembiljetten") */
+  votes_counts: VotesCounts;
+}
+
 export type PGNumber = number;
 
 /**
@@ -1502,6 +1574,18 @@ export type ProcessApportionmentResponse =
 
 export type RandomRange = string;
 
+/**
+ * Reason for investigation on own initiative
+ */
+export interface ReasonInvestigationOwnInitiative {
+  /** Because of a (suspected) other error
+("Vanwege (het vermoeden van) een andere fout") */
+  other_error: boolean;
+  /** Because of an unaccounted-for difference
+("Vanwege een onverklaard verschil") */
+  unaccounted_difference: boolean;
+}
+
 export interface RedactedEmlHash {
   /** Array holding the hash chunks as text */
   chunks: string[];
@@ -1540,8 +1624,10 @@ export type ResolveErrorsAction = (typeof resolveErrorsActionValues)[number];
  * election committee category and whether this is the first or any subsequent data entry session.
  */
 export type Results =
+  | (DSOFirstSessionResults & { model: "DSOFirstSession" })
+  | (NextSessionResults & { model: "DSONextSession" })
   | (CSOFirstSessionResults & { model: "CSOFirstSession" })
-  | (CSONextSessionResults & { model: "CSONextSession" })
+  | (NextSessionResults & { model: "CSONextSession" })
   | (GSBResults & { model: "GSB" });
 
 export const roleValues = ["administrator", "coordinator_gsb", "coordinator_csb", "typist_gsb", "typist_csb"] as const;

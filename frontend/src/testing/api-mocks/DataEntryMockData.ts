@@ -101,6 +101,7 @@ export const claimDataEntryResponse: ClaimDataEntryResponse = {
   client_state: null,
   source: source(1),
   status: "first_entry_in_progress",
+  is_correction: false,
 };
 
 export const saveDataEntryResponse: SaveDataEntryResponse = {
@@ -230,6 +231,8 @@ export const dataEntryStatusDifferences: DataEntryGetDifferencesResponse = {
       },
     ],
   },
+  first_entry_has_errors: false,
+  second_entry_has_errors: false,
   source: source(3),
 };
 

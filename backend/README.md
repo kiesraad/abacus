@@ -61,14 +61,12 @@ sqlx database setup
 cargo run --features memory-serve
 ```
 
-By default (for compilation efficiency) Abacus will use Typst from a Rust dylib.
-Rust dylibs are not stable, so should not be used in production. If you want to
-switch to the statically linked Typst (as is done with production builds of
-Abacus) you can simply enable the `embed-typst` feature. This can be combined 
-with the memory-serve feature as well, e.g.:
+PDF generation uses a statically linked Typst, enabled by the `embed-typst` feature. That feature is part of the default
+feature set. If you build with `--no-default-features` you have to enable it explicitly, otherwise `generate_pdf` is
+unimplemented and PDF generation is unavailable. It can be combined with the memory-serve feature, e.g.:
 
 ```shell
-cargo build --features memory-serve,embed-typst
+cargo build --no-default-features --features memory-serve,embed-typst
 ```
 
 ### Linting
@@ -78,6 +76,19 @@ Use `cargo clippy --all-targets --all-features -- -D warnings` to lint the proje
 ### Testing
 
 Use `cargo test` to run the tests. The tests are also run in a GitHub Actions workflow.
+
+### Debugging with gdb/lldb
+
+Debug builds are compiled with [`debug = "line-tables-only"`](debug), which keeps panic backtraces with file and line
+numbers but omits type and variable information. To inspect variables in a debugger:
+
+- **Single command:** `CARGO_PROFILE_DEV_DEBUG=2 cargo build` (or `cargo nextest run`, `cargo run`).
+- **Entire workspace:** create `backend/.cargo/config.toml` (Git ignores the `.cargo` directory):
+
+      [profile.dev]
+      debug = 2
+
+[debug]: https://doc.rust-lang.org/cargo/reference/profiles.html#debug
 
 ### Air gap detection
 

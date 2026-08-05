@@ -87,37 +87,18 @@ jobs:
       SQLX_OFFLINE: "true"
       BINSTALL_DISABLE_TELEMETRY: "true"
     steps:
-      # Free up runner disk space, so that our job has enough space to run
-      # https://dev.to/mathio/squeezing-disk-space-from-github-actions-runners-an-engineers-guide-3pjg
-      - name: Free up runner disk space
-        working-directory: /
-        run: >
-          df -h
-          &&
-          echo "Freeing up disk space..."
-          &&
-          sudo rm -rf
-          /usr/local/.ghcup
-          /usr/share/dotnet
-          /usr/share/swift
-          &&
-          df -h
       - uses: actions/checkout@v7.0.1
-      # Test backend
-      - name: Install musl
-        run: sudo apt-get update && sudo apt-get install -y musl-tools
+      # Test backend. Uses the default host target (x86_64-unknown-linux-gnu) for faster linking
+      # using rust-lld, and avoiding copying libc and libstd into every test binary.
       - name: Setup Rust
-        shell: bash
-        run: >
-          rustup toolchain install &&
-          rustup target add x86_64-unknown-linux-musl
+        run: rustup toolchain install
       - name: Cargo cache
         uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4 # v2
         with:
           workspaces: "backend -> target"
           cache-bin: "false"
       - name: Install Binstall
-        uses: cargo-bins/cargo-binstall@ead08b90bd7b2e6d81963fb9cf0b7239f66d5db4 # main
+        uses: cargo-bins/cargo-binstall@e00d2c94cc0067b77737821097a62d91c0301baa # main
       - name: Create empty frontend build dir for memory-serve
         run: mkdir -p dist dist-storybook
         working-directory: ./frontend
@@ -126,11 +107,11 @@ jobs:
       - name: Check Clippy with default features
         run: cargo --verbose --locked clippy --workspace --all-targets -- -D warnings
       - name: Check Clippy with all features
-        run: cargo --verbose --locked clippy --target=x86_64-unknown-linux-musl --workspace --all-targets --all-features -- -D warnings
+        run: cargo --verbose --locked clippy --workspace --all-targets --all-features -- -D warnings
       - name: Install Nextest
         run: cargo binstall cargo-nextest
       - name: Run tests
-        run: cargo --verbose --locked nextest run --target=x86_64-unknown-linux-musl --workspace --exclude pdf_gen_dylib --no-default-features --features openapi,dev-database,embed-typst,tls
+        run: cargo --verbose --locked nextest run --workspace --no-default-features --features openapi,dev-database,embed-typst,tls
       - name: Build documentation
         run: cargo doc --workspace --no-deps --all-features --document-private-items
         env:
@@ -276,6 +257,8 @@ jobs:
             backend/fuzz -> target
             backend/apportionment/fuzz -> target
           shared-key: "fuzzer"
+          # Save cache only for main and release branches to prevent cache thrashing
+          save-if: ${{ github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/release-') }}
       - name: Install cargo fuzz
         working-directory: ./backend/fuzz
         run: cargo install cargo-fuzz

@@ -1,6 +1,6 @@
-#import "common/style.typ": conf, default_header, document_numbering
+#import "common/style.typ": conf, document_numbering, blank_page_before_signing
 #import "common/scripts.typ": *
-#let input = json("inputs/model-n-10-2.json")
+#let input = json("inputs/model-n-10-2-variations/model-n-10-2-GR.json")
 
 #let is_municipality = (municipal, public_body) => is_municipality(input.election.location, municipal, public_body)
 #let is_local_election = (local, other) => is_local_election(input.election.category, local, other)
@@ -73,7 +73,7 @@ De volgende rollen zijn mogelijk: voorzitter, plaatsvervangend voorzitter, lid o
 
 #empty_table(
   columns: (8em, 1fr, 1fr, 1fr, 7em, 7em),
-  headers: ("Voorletters", "Achternaam", "Rol", "Aanwezig (van - tot)", "Aanwezig bij stemmen", "Aanwezig bij tellen"),
+  headers: ("Voorletters", "Achternaam", "Rol", "Aanwezig van - tot", "Aanwezig bij stemmen", "Aanwezig bij tellen"),
   values: ("", "", "", "-", checkbox(small: true)[], checkbox(small: true)[]),
   rows: 22,
 )
@@ -125,7 +125,7 @@ Denk aan stembureauleden die te laat waren, niet werkende techniek of stembussen
 
 #empty_table(
   columns: (8em, 10em, 1fr),
-  headers: ("Datum", "Tijd (van - tot)", "Locatie (als anders dan stembureau)"),
+  headers: ("Datum", "Tijd van - tot", "Locatie (als anders dan stembureau)"),
   values: ("", "", ""),
   rows: 1,
 )
@@ -163,11 +163,12 @@ Bijvoorbeeld als er meerdere verkiezingen tegelijk werden georganiseerd, en een 
 
   #sum(
     empty_letterbox("A")[Stempassen],
-    empty_letterbox("B")[Volmachtbewijzen (schriftelijk of via ingevulde stempas)],
+    empty_letterbox("B")[Volmachtbewijzen (schriftelijk of via ingevulde achterkant stempas)],
+    no_entry_letterbox("C")[Kiezerspassen (niet van toepassing bij gemeente- en eilandraadsverkiezingen)],
     empty_letterbox(
       "D",
       light: false,
-    )[Totaal toegelaten kiezers (A+B)],
+    )[*Totaal toegelaten kiezers (A+B)*],
   )
 ][
   Tel het aantal geldige stempassen, volmachtbewijzen en kiezerspassen
@@ -176,12 +177,12 @@ Bijvoorbeeld als er meerdere verkiezingen tegelijk werden georganiseerd, en een 
     empty_letterbox("A")[Stempassen],
     empty_letterbox(
       "B",
-    )[Volmachtbewijzen (schriftelijk of via ingevulde stempas of kiezerspas)],
+    )[Volmachtbewijzen (schriftelijk of via ingevulde achterkant stempas of kiezerspas)],
     empty_letterbox("C")[Kiezerspassen],
     empty_letterbox(
       "D",
       light: false,
-    )[Totaal toegelaten kiezers (A+B+C)],
+    )[*Totaal toegelaten kiezers (A+B+C)*],
   )
 ]
 
@@ -217,9 +218,9 @@ Bijvoorbeeld als er meerdere verkiezingen tegelijk werden georganiseerd, en een 
 
 === Vergelijk D (totaal toegelaten kiezers) en H (totaal uitgebrachte stemmen)
 
-#checkbox[D en H zijn gelijk #sym.arrow.r *Ga door naar #ref(<signing>)*]
+#checkbox[D en H zijn *gelijk* #sym.arrow.r *Ga door naar #ref(<signing>)*]
 
-#checkbox[H is groter is dan D (meer uitgebrachte stemmen dan toegelaten kiezers)]
+#checkbox[H is *groter* dan D (meer uitgebrachte stemmen dan toegelaten kiezers)]
 
 #box(inset: (left: 3em, bottom: 1em), empty_letterbox(
   "I",
@@ -227,7 +228,7 @@ Bijvoorbeeld als er meerdere verkiezingen tegelijk werden georganiseerd, en een 
   light: false,
 )[Aantal méér getelde stemmen (bereken: H _min_ D)])
 
-#checkbox[H is kleiner dan D (minder uitgebrachte stemmen dan toegelaten kiezers)]
+#checkbox[H is *kleiner* dan D (minder uitgebrachte stemmen dan toegelaten kiezers)]
 
 #box(inset: (left: 3em, bottom: 1em), empty_letterbox(
   "J",
@@ -240,38 +241,29 @@ Bijvoorbeeld als er meerdere verkiezingen tegelijk werden georganiseerd, en een 
 #checkbox[Ja]
 #checkbox[Nee, er is een onverklaard verschil]
 
-#pagebreak(weak: true)
-
-#set page(header: "")
-
-#show heading.where(level: 3): it => [#block(it.body)]
-
-=== Deze pagina is expres leeg
-Zo komt het handtekeningen-blad altijd op een losse pagina, ook als het verslag dubbelzijdig is geprint.
-
-#pagebreak(weak: true)
-
-#set page(header: default_header(none, header-right))
+#blank_page_before_signing(header-right)
 
 = Ondertekening <signing>
 
-=== Datum
+Het proces-verbaal moet worden ondertekend door alle aanwezige leden. Bij een stembureau zijn dit er minimaal 3.
+
+#signing_form_label[Datum]
 
 #textbox_only_bottom_stroke[Datum en tijd:][Plaats:]
 
-== Verplicht: voorzitter en twee leden van het stembureau
+== Voorzitter en twee leden van het stembureau
 
-=== Voorzitter van het stembureau:
+#signing_form_label[Voorzitter van het stembureau:]
 
 #textbox[Naam:][Handtekening:]
 
-=== 2 leden van het stembureau:
+#signing_form_label[2 leden van het stembureau:]
 
 #stack(spacing: 0.5em, ..range(0, 2).map(_ => textbox[Naam:][Handtekening:]))
 
 == Ondertekening door andere aanwezige leden van het stembureau
 
-=== Extra ondertekening: (niet verplicht)
+#signing_form_label[Extra ondertekening:]
 
 #stack(spacing: 0.5em, ..range(0, 4).map(_ => textbox[Naam:][Handtekening:]))
 

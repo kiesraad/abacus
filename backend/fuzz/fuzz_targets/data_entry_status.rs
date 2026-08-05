@@ -2,7 +2,7 @@
 
 use abacus::{
     domain::{
-        data_entry::{CurrentDataEntry, DataEntryStatus, DataEntryTransitionError},
+        data_entry::{ClientState, DataEntryStatus, DataEntryTransitionError, DataEntryUpdate},
         election::{
             CommitteeCategory, ElectionCategory, ElectionId, ElectionSubCategory,
             ElectionWithPoliticalGroups, VoteCountingMethod,
@@ -83,16 +83,16 @@ fn invalid_result() -> Results {
     })
 }
 
-fn get_cde(user_id: UserId, correct_entry: bool) -> CurrentDataEntry {
-    CurrentDataEntry {
-        progress: None,
+fn update(user_id: UserId, correct_entry: bool) -> DataEntryUpdate {
+    DataEntryUpdate {
+        progress: 0,
         user_id,
         entry: if correct_entry {
             valid_result()
         } else {
             invalid_result()
         },
-        client_state: None,
+        client_state: ClientState::default(),
     }
 }
 
@@ -123,11 +123,11 @@ enum Transition {
     UpdateSecondEntry(bool, bool),
     FinaliseFirstEntry(bool),
     FinaliseSecondEntry(bool),
-    DeleteFirstEntry(bool),
-    DeleteSecondEntry(bool),
-    ResumeFirstEntry,
-    DiscardFirstEntry,
-    DeleteBothEntries,
+    DiscardFirstEntryInProgress(bool),
+    DiscardSecondEntryInProgress(bool),
+    ResumeFirstEntryWithErrors,
+    DiscardFirstEntryWithErrors,
+    DiscardEntries,
     KeepFirstEntry,
     KeepSecondEntry,
 }
@@ -167,7 +167,10 @@ fn is_as_expected(
             )
         }
         // DeleteFirstEntry
-        (DataEntryStatus::FirstEntryInProgress(_), Transition::DeleteFirstEntry(true)) => {
+        (
+            DataEntryStatus::FirstEntryInProgress(_),
+            Transition::DiscardFirstEntryInProgress(true),
+        ) => {
             matches!(resulting_state, Ok(DataEntryStatus::Empty))
         }
         // FinaliseFirstEntry
@@ -179,11 +182,11 @@ fn is_as_expected(
             }
         }
         // DiscardFirstEntry
-        (DataEntryStatus::FirstEntryHasErrors(_), Transition::DiscardFirstEntry) => {
+        (DataEntryStatus::FirstEntryHasErrors(_), Transition::DiscardFirstEntryWithErrors) => {
             matches!(resulting_state, Ok(DataEntryStatus::Empty))
         }
         // ResumeFirstEntry
-        (DataEntryStatus::FirstEntryHasErrors(_), Transition::ResumeFirstEntry) => {
+        (DataEntryStatus::FirstEntryHasErrors(_), Transition::ResumeFirstEntryWithErrors) => {
             matches!(
                 resulting_state,
                 Ok(DataEntryStatus::FirstEntryInProgress(_))
@@ -211,7 +214,10 @@ fn is_as_expected(
             )
         }
         // DeleteSecondEntry
-        (DataEntryStatus::SecondEntryInProgress(_), Transition::DeleteSecondEntry(true)) => {
+        (
+            DataEntryStatus::SecondEntryInProgress(_),
+            Transition::DiscardSecondEntryInProgress(true),
+        ) => {
             matches!(resulting_state, Ok(DataEntryStatus::FirstEntryFinalised(_)))
         }
         // FinaliseSecondEntry
@@ -224,7 +230,11 @@ fn is_as_expected(
         }
         // KeepFirstEntry
         (DataEntryStatus::EntriesDifferent(_), Transition::KeepFirstEntry) => {
-            matches!(resulting_state, Ok(DataEntryStatus::FirstEntryFinalised(_)))
+            if first_entry_correct {
+                matches!(resulting_state, Ok(DataEntryStatus::FirstEntryFinalised(_)))
+            } else {
+                matches!(resulting_state, Ok(DataEntryStatus::FirstEntryHasErrors(_)))
+            }
         }
         // KeepSecondEntry
         (DataEntryStatus::EntriesDifferent(_), Transition::KeepSecondEntry) => {
@@ -235,7 +245,7 @@ fn is_as_expected(
             }
         }
         // DiscardBothEntries
-        (DataEntryStatus::EntriesDifferent(_), Transition::DeleteBothEntries) => {
+        (DataEntryStatus::EntriesDifferent(_), Transition::DiscardEntries) => {
             matches!(resulting_state, Ok(DataEntryStatus::Empty))
         }
         // Expected error: SecondEntryNeedsDifferentUser
@@ -256,7 +266,7 @@ fn is_as_expected(
         (
             DataEntryStatus::FirstEntryInProgress(_),
             Transition::UpdateFirstEntry(false, _)
-            | Transition::DeleteFirstEntry(false)
+            | Transition::DiscardFirstEntryInProgress(false)
             | Transition::FinaliseFirstEntry(false),
         ) => {
             matches!(
@@ -268,7 +278,7 @@ fn is_as_expected(
         (
             DataEntryStatus::SecondEntryInProgress(_),
             Transition::UpdateSecondEntry(false, _)
-            | Transition::DeleteSecondEntry(false)
+            | Transition::DiscardSecondEntryInProgress(false)
             | Transition::FinaliseSecondEntry(false),
         ) => {
             matches!(
@@ -286,7 +296,7 @@ fn is_as_expected(
             Transition::FinaliseFirstEntry(_)
             | Transition::ClaimFirstEntry
             | Transition::UpdateFirstEntry(_, _)
-            | Transition::DeleteFirstEntry(_),
+            | Transition::DiscardFirstEntryInProgress(_),
         ) => matches!(
             resulting_state,
             Err(DataEntryTransitionError::FirstEntryAlreadyFinalised)
@@ -297,11 +307,11 @@ fn is_as_expected(
             Transition::FinaliseFirstEntry(_)
             | Transition::ClaimFirstEntry
             | Transition::UpdateFirstEntry(_, _)
-            | Transition::DeleteFirstEntry(_)
+            | Transition::DiscardFirstEntryInProgress(_)
             | Transition::FinaliseSecondEntry(_)
             | Transition::ClaimSecondEntry(_)
             | Transition::UpdateSecondEntry(_, _)
-            | Transition::DeleteSecondEntry(_),
+            | Transition::DiscardSecondEntryInProgress(_),
         ) => matches!(
             resulting_state,
             Err(DataEntryTransitionError::SecondEntryAlreadyFinalised)
@@ -362,11 +372,11 @@ fuzz_target!(|transitions: Vec<Transition>| {
                 if prev_state == DataEntryStatus::Empty {
                     first_entry_correct = true;
                 }
-                state.claim_first_entry(get_cde(users.first, true))
+                state.claim_first_entry(users.first, valid_result())
             }
             Transition::UpdateFirstEntry(correct_user, correct_entry) => {
                 let res =
-                    state.update_first_entry(get_cde(users.first(correct_user), correct_entry));
+                    state.update_first_entry(update(users.first(correct_user), correct_entry));
                 if res.is_ok() {
                     first_entry_correct = correct_entry
                 };
@@ -375,32 +385,32 @@ fuzz_target!(|transitions: Vec<Transition>| {
             Transition::FinaliseFirstEntry(correct_user) => {
                 state.finalise_first_entry(&election(), users.first(correct_user))
             }
-            Transition::DeleteFirstEntry(correct_user) => {
-                state.delete_first_entry(users.first(correct_user))
+            Transition::DiscardFirstEntryInProgress(correct_user) => {
+                state.discard_first_entry_in_progress(users.first(correct_user), &election())
             }
-            Transition::DiscardFirstEntry => state.discard_first_entry(),
+            Transition::DiscardFirstEntryWithErrors => state.discard_first_entry_with_errors(),
             Transition::ClaimSecondEntry(correct_user) => {
                 if matches!(prev_state, DataEntryStatus::FirstEntryFinalised(_)) {
                     second_entry_correct = true;
                 }
-                state.claim_second_entry(get_cde(users.second(correct_user), true))
+                state.claim_second_entry(users.second(correct_user), valid_result())
             }
             Transition::UpdateSecondEntry(correct_user, correct_entry) => {
                 let res =
-                    state.update_second_entry(get_cde(users.second(correct_user), correct_entry));
+                    state.update_second_entry(update(users.second(correct_user), correct_entry));
                 if res.is_ok() {
                     second_entry_correct = correct_entry
                 };
                 res
             }
-            Transition::DeleteSecondEntry(correct_user) => {
-                state.delete_second_entry(users.second(correct_user), &election())
+            Transition::DiscardSecondEntryInProgress(correct_user) => {
+                state.discard_second_entry_in_progress(users.second(correct_user), &election())
             }
             Transition::FinaliseSecondEntry(correct_user) => {
                 state.finalise_second_entry(&election(), users.second(correct_user))
             }
-            Transition::ResumeFirstEntry => state.resume_first_entry(),
-            Transition::DeleteBothEntries => state.delete_entries(),
+            Transition::ResumeFirstEntryWithErrors => state.resume_first_entry_with_errors(),
+            Transition::DiscardEntries => state.discard_entries(),
             Transition::KeepFirstEntry => state.keep_first_entry(&election()),
             Transition::KeepSecondEntry => {
                 let res = state.keep_second_entry(&election());

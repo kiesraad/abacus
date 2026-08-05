@@ -1,5 +1,10 @@
 import { t, tx } from "@/i18n/translate";
-import type { ElectionWithPoliticalGroups, PoliticalGroup } from "@/types/generated/openapi";
+import type {
+  ChecksAndCorrectionsPresent,
+  CorrigendumPresent,
+  ElectionWithPoliticalGroups,
+  PoliticalGroup,
+} from "@/types/generated/openapi";
 import type {
   CheckboxesSubsection,
   DataEntryModel,
@@ -12,14 +17,22 @@ import { getCandidateFullName } from "@/utils/candidate";
 import { formatPoliticalGroupName } from "@/utils/politicalGroup";
 import { isLocalElection } from "./election";
 
-type ModelForGSB = Extract<DataEntryModel, "CSOFirstSession" | "CSONextSession">;
+type ModelForGSB = Extract<DataEntryModel, "DSOFirstSession" | "CSOFirstSession" | "DSONextSession" | "CSONextSession">;
 type ModelForCSB = Extract<DataEntryModel, "GSB">;
 
-const isEntryGSB = (model: DataEntryModel): model is ModelForGSB => {
-  return model === "CSOFirstSession" || model === "CSONextSession";
+const isEntryForGSB = (model: DataEntryModel): model is ModelForGSB => {
+  switch (model) {
+    case "DSOFirstSession":
+    case "CSOFirstSession":
+    case "DSONextSession":
+    case "CSONextSession":
+      return true;
+    case "GSB":
+      return false;
+  }
 };
 
-const isEntryCSB = (model: DataEntryModel): model is ModelForCSB => {
+const isEntryForCSB = (model: DataEntryModel): model is ModelForCSB => {
   return model === "GSB";
 };
 
@@ -39,7 +52,7 @@ const createVotersAndVotesRows = (
       code: "A",
       path: "voters_counts.poll_card_count",
       title: t("voters_votes_counts.voters_counts.poll_card_count"),
-      autoFocusInput: isEntryGSB(model),
+      autoFocusInput: isEntryForGSB(model),
     },
     {
       code: "B",
@@ -93,7 +106,7 @@ export const createVotersAndVotesSection = (
 ): DataEntrySection => {
   const subsections: DataEntrySection["subsections"] = [];
 
-  if (!isEntryGSB(model)) {
+  if (!isEntryForGSB(model)) {
     subsections.push({
       type: "inputGrid",
       headers: [t("field"), t("counted_number"), t("description")],
@@ -127,18 +140,18 @@ const createCompareVotesCastCheckboxes = (model: ModelForGSB): CheckboxesSubsect
     options: [
       {
         path: "differences_counts.compare_votes_cast_admitted_voters.admitted_voters_equal_votes_cast",
-        label: t("differences_counts.admitted_voters_equal_votes_cast.title"),
+        label: tx("differences_counts.admitted_voters_equal_votes_cast.title"),
         short_label: t("differences_counts.admitted_voters_equal_votes_cast.short_title"),
         autoFocusInput: true,
       },
       {
         path: "differences_counts.compare_votes_cast_admitted_voters.votes_cast_greater_than_admitted_voters",
-        label: t("differences_counts.votes_cast_greater_than_admitted_voters.title"),
+        label: tx("differences_counts.votes_cast_greater_than_admitted_voters.title"),
         short_label: t("differences_counts.votes_cast_greater_than_admitted_voters.short_title"),
       },
       {
         path: "differences_counts.compare_votes_cast_admitted_voters.votes_cast_smaller_than_admitted_voters",
-        label: t("differences_counts.votes_cast_smaller_than_admitted_voters.title"),
+        label: tx("differences_counts.votes_cast_smaller_than_admitted_voters.title"),
         short_label: t("differences_counts.votes_cast_smaller_than_admitted_voters.short_title"),
       },
     ],
@@ -181,7 +194,7 @@ export const createDifferencesSection = (model: DataEntryModel): DataEntrySectio
     ],
   };
 
-  if (isEntryCSB(model)) {
+  if (isEntryForCSB(model)) {
     return {
       id: "differences_counts",
       title: t("differences_counts.form_title"),
@@ -210,7 +223,131 @@ export const createDifferencesSection = (model: DataEntryModel): DataEntrySectio
   };
 };
 
-export const extraInvestigationSection: DataEntrySection = {
+const aboutReportSection: DataEntrySection = {
+  id: "about_report",
+  title: t("about_report.form_title"),
+  short_title: t("about_report.short_title"),
+  subsections: [
+    {
+      type: "radio",
+      path: "about_report.corrigendum_present",
+      title: tx("about_report.corrigendum_present.title"),
+      short_title: t("about_report.corrigendum_present.short_title"),
+      error: t("about_report.validation_error"),
+      options: [
+        {
+          label: tx("about_report.corrigendum_present.two_documents"),
+          short_label: t("about_report.corrigendum_present.two_documents_short"),
+          value: "TwoDocuments" satisfies CorrigendumPresent,
+        },
+        {
+          label: tx("about_report.corrigendum_present.one_document"),
+          short_label: t("about_report.corrigendum_present.one_document_short"),
+          value: "OneDocument" satisfies CorrigendumPresent,
+        },
+      ],
+    },
+    {
+      type: "radio",
+      path: "about_report.checks_and_corrections_present",
+      title: tx("about_report.checks_and_corrections_present.title"),
+      short_title: t("about_report.checks_and_corrections_present.short_title"),
+      error: t("about_report.validation_error"),
+      options: [
+        {
+          label: t("about_report.checks_and_corrections_present.page_present"),
+          short_label: t("about_report.checks_and_corrections_present.page_present"),
+          value: "PagePresent" satisfies ChecksAndCorrectionsPresent,
+        },
+        {
+          label: t("about_report.checks_and_corrections_present.page_missing"),
+          short_label: t("about_report.checks_and_corrections_present.page_missing"),
+          value: "PageMissing" satisfies ChecksAndCorrectionsPresent,
+        },
+      ],
+    },
+  ],
+};
+
+const checksAndCorrections: DataEntrySection = {
+  id: "checks_and_corrections",
+  title: t("checks_and_corrections.form_title"),
+  short_title: t("checks_and_corrections.short_title"),
+  subsections: [
+    {
+      type: "message",
+      message: t("checks_and_corrections.form_description"),
+    },
+    {
+      type: "heading",
+      title: t("checks_and_corrections.own_initiative"),
+    },
+    {
+      type: "checkboxes",
+      title: t("checks_and_corrections.reason_investigation_own_initiative.title"),
+      short_title: t("checks_and_corrections.reason_investigation_own_initiative.short_title"),
+      error_path: "checks_and_corrections.reason_investigation_own_initiative",
+      error_message: t("checks_and_corrections.validation_error"),
+      options: [
+        {
+          path: "checks_and_corrections.reason_investigation_own_initiative.unaccounted_difference",
+          label: t("checks_and_corrections.reason_investigation_own_initiative.unaccounted_difference"),
+          short_label: t("checks_and_corrections.reason_investigation_own_initiative.unaccounted_difference"),
+          autoFocusInput: true,
+        },
+        {
+          path: "checks_and_corrections.reason_investigation_own_initiative.other_error",
+          label: t("checks_and_corrections.reason_investigation_own_initiative.other_error"),
+          short_label: t("checks_and_corrections.reason_investigation_own_initiative.other_error"),
+        },
+      ],
+    },
+    {
+      type: "checkboxes",
+      title: t("checks_and_corrections.corrected_results_own_initiative.title"),
+      short_title: t("checks_and_corrections.corrected_results_own_initiative.short_title"),
+      error_path: "checks_and_corrections.corrected_results_own_initiative",
+      error_message: t("checks_and_corrections.validation_error"),
+      options: [
+        {
+          path: "checks_and_corrections.corrected_results_own_initiative.no",
+          label: t("checks_and_corrections.corrected_results_own_initiative.no"),
+          short_label: t("checks_and_corrections.corrected_results_own_initiative.no"),
+        },
+        {
+          path: "checks_and_corrections.corrected_results_own_initiative.yes",
+          label: t("checks_and_corrections.corrected_results_own_initiative.yes"),
+          short_label: t("checks_and_corrections.corrected_results_own_initiative.yes"),
+        },
+      ],
+    },
+    {
+      type: "heading",
+      title: t("checks_and_corrections.csb_request"),
+    },
+    {
+      type: "checkboxes",
+      title: t("checks_and_corrections.corrected_results_csb_request.title"),
+      short_title: t("checks_and_corrections.corrected_results_csb_request.short_title"),
+      error_path: "checks_and_corrections.corrected_results_csb_request",
+      error_message: t("checks_and_corrections.validation_error"),
+      options: [
+        {
+          path: "checks_and_corrections.corrected_results_csb_request.no",
+          label: t("checks_and_corrections.corrected_results_csb_request.no"),
+          short_label: t("checks_and_corrections.corrected_results_csb_request.no"),
+        },
+        {
+          path: "checks_and_corrections.corrected_results_csb_request.yes",
+          label: t("checks_and_corrections.corrected_results_csb_request.yes"),
+          short_label: t("checks_and_corrections.corrected_results_csb_request.yes"),
+        },
+      ],
+    },
+  ],
+};
+
+const extraInvestigationSection: DataEntrySection = {
   id: "extra_investigation",
   title: t("extra_investigation.form_title"),
   short_title: t("extra_investigation.short_title"),
@@ -262,7 +399,7 @@ export const extraInvestigationSection: DataEntrySection = {
   ],
 };
 
-export const countingDifferencesPollingStation: DataEntrySection = {
+const countingDifferencesPollingStation: DataEntrySection = {
   id: "counting_differences_polling_station",
   title: t("counting_differences_polling_station.form_title"),
   short_title: t("counting_differences_polling_station.short_title"),
@@ -367,6 +504,14 @@ export function createPoliticalGroupSections(election: ElectionWithPoliticalGrou
 
 function buildDataEntryStructure(model: DataEntryModel, election: ElectionWithPoliticalGroups): DataEntryStructure {
   switch (model) {
+    case "DSOFirstSession":
+      return [
+        aboutReportSection,
+        checksAndCorrections,
+        createVotersAndVotesSection(model, election),
+        createDifferencesSection(model),
+        ...createPoliticalGroupSections(election),
+      ];
     case "CSOFirstSession":
       return [
         extraInvestigationSection,
@@ -375,12 +520,8 @@ function buildDataEntryStructure(model: DataEntryModel, election: ElectionWithPo
         createDifferencesSection(model),
         ...createPoliticalGroupSections(election),
       ];
+    case "DSONextSession":
     case "CSONextSession":
-      return [
-        createVotersAndVotesSection(model, election),
-        createDifferencesSection(model),
-        ...createPoliticalGroupSections(election),
-      ];
     case "GSB":
       return [
         createVotersAndVotesSection(model, election),

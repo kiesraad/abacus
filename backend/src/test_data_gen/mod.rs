@@ -11,7 +11,7 @@ mod generators;
 pub use api::router;
 pub use generators::create_test_election;
 
-use crate::domain::election::{CommitteeCategory, ElectionCategory};
+use crate::domain::election::{CommitteeCategory, ElectionCategory, VoteCountingMethod};
 
 #[derive(Clone, Debug)]
 pub struct RandomRange(pub Range<u32>);
@@ -26,6 +26,11 @@ pub struct GenerateElectionArgs {
 
     /// GSB or CSB
     pub committee_category: CommitteeCategory,
+
+    /// CSO or DSO
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    pub counting_method: Option<VoteCountingMethod>,
 
     /// Municipal, Provincial or WaterAuthority
     pub election_category: ElectionCategory,

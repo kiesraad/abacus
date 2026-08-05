@@ -24,8 +24,8 @@ export class ResolveDifferencesPgObj {
     this.keepSecondEntry = page.getByRole("radio", { name: /Tweede invoer/ });
     this.discardBothEntries = page.getByRole("radio", { name: /Geen van beide/ });
     this.wrongEntryQuestion = page.getByRole("heading", { name: /Wat wil je doen/ });
-    this.correctWrongEntry = page.getByRole("radio", { name: /Laten herstellen/ });
-    this.discardWrongEntry = page.getByRole("radio", { name: /Opnieuw laten invoeren/ });
+    this.correctWrongEntry = page.getByRole("radio", { name: /Verschillen laten herstellen/ });
+    this.discardWrongEntry = page.getByRole("radio", { name: /Hele proces-verbaal opnieuw/ });
     this.correctionBlocked = page.getByText(/Uit de tweede invoer blijkt/);
     this.save = page.getByRole("button", { name: "Opslaan" });
     this.continueToResolveErrors = page.getByRole("button", { name: "Verder naar fouten oplossen" });

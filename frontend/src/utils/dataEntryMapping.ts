@@ -1,5 +1,12 @@
-import type { DataEntryResults, DataEntrySection, SectionValues } from "@/types/types";
+import {
+  type DataEntryResults,
+  type DataEntrySection,
+  isCheckboxesSubsection,
+  type ResultsPath,
+  type SectionValues,
+} from "@/types/types";
 import { parseIntUserInput } from "@/utils/strings";
+import { normalizeFieldName } from "@/utils/ValidationResults";
 
 type PathValue = boolean | number | string | null | undefined;
 
@@ -119,6 +126,29 @@ export function setValueAtPath(
 }
 
 /**
+ * Reset the value at the specified path to its empty value.
+ */
+export function resetValueAtPath(section: DataEntrySection, data: DataEntryResults, path: ResultsPath) {
+  const normalizedPath = normalizeFieldName(path);
+
+  // Check if the path refers to a checkboxes subsection by its error_path,
+  // because then we have to reset the individual options instead.
+  const checkboxes = section.subsections
+    .filter(isCheckboxesSubsection)
+    .find(({ error_path }) => error_path === normalizedPath);
+
+  if (checkboxes) {
+    for (const option of checkboxes.options) {
+      setValueAtPath(data, option.path, "", "boolean");
+    }
+  } else {
+    const fieldInfoMap = extractFieldInfoFromSection(section);
+    const valueType = fieldInfoMap.get(normalizedPath);
+    setValueAtPath(data, normalizedPath, "", valueType);
+  }
+}
+
+/**
  * Traverses the data object based on the provided path segments
  * @param data The data object to traverse
  * @param segments The path segments to follow
@@ -147,9 +177,6 @@ function processValue(
   valueType: "boolean" | "number" | "enum" | undefined,
 ): boolean | number | string | null | undefined {
   if (valueType === "boolean") {
-    if (value === "") {
-      return undefined;
-    }
     return value === "true";
   }
 

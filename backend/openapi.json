@@ -759,7 +759,7 @@
         ]
       },
       "delete": {
-        "summary": "Discard an in-progress (not finalised) data entry (typist_csb, typist_gsb)",
+        "summary": "Discard an in-progress data entry or a correction. Discarding a\ncorrection finalises the other entry as the first entry. (typist_csb, typist_gsb)",
         "operationId": "data_entry_discard",
         "parameters": [
           {
@@ -6193,6 +6193,13 @@
           "client_state": {
             "type": "object"
           },
+          "correction_warnings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Fields for which a warning should be shown that a difference should be corrected"
+          },
           "data": {
             "$ref": "#/components/schemas/Results"
           },
@@ -9503,6 +9510,7 @@
           "F402",
           "F403",
           "W001",
+          "W002",
           "W201",
           "W202",
           "W203",

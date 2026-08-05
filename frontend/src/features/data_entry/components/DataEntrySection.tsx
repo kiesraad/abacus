@@ -55,10 +55,13 @@ export function DataEntrySection({ committeeCategory }: DataEntryProps) {
 
   // Memoize errors to prevent unnecessary focus triggers in Feedback
   const memoizedErrors = useMemo(
-    () => formSection.errors.getAll().filter((result) => result.code !== "F401"),
-    [formSection.errors],
+    () => (formSection.correctionWarning ? [] : formSection.errors.getAll().filter((result) => result.code !== "F401")),
+    [formSection.correctionWarning, formSection.errors],
   );
-  const memoizedWarnings = useMemo(() => formSection.warnings.getAll(), [formSection.warnings]);
+  const memoizedWarnings = useMemo(
+    () => (formSection.correctionWarning ? [] : formSection.warnings.getAll()),
+    [formSection.correctionWarning, formSection.warnings],
+  );
 
   // Scroll unaccepted warnings/errors checkbox into view when error for it is triggered
   useEffect(() => {
@@ -112,7 +115,16 @@ export function DataEntrySection({ committeeCategory }: DataEntryProps) {
             shouldFocus={formSection.errors.isEmpty()}
           />
         )}
-
+        {formSection.correctionWarning && (
+          <Feedback
+            id="feedback-warning"
+            type="warning"
+            election={election}
+            validationResults={[formSection.correctionWarning]}
+            userRole={user.role}
+            shouldFocus={true}
+          />
+        )}
         <DataEntrySubsections
           key={section.id}
           section={section}
@@ -122,7 +134,6 @@ export function DataEntrySection({ committeeCategory }: DataEntryProps) {
           defaultProps={defaultProps}
           missingTotalError={trailingError !== undefined}
         />
-
         {trailingError && (
           <div id="missing-total-error" className={cls.missingTotalError}>
             <Alert type="error" small>

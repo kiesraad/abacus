@@ -8,9 +8,10 @@ import type {
   DataEntryStatusName,
   DataEntryStatusResponse,
   ElectionWithPoliticalGroups,
+  ValidationResult,
   ValidationResults,
 } from "@/types/generated/openapi";
-import type { DataEntryResults, DataEntryStructure, FormSectionId, SectionValues } from "@/types/types";
+import type { DataEntryResults, DataEntryStructure, FormSectionId, ResultsPath, SectionValues } from "@/types/types";
 import type { ValidationResultSet } from "@/utils/ValidationResults";
 
 export type EntryNumber = 1 | 2;
@@ -133,6 +134,7 @@ export interface ClientState {
   current: FormSectionId;
   acceptedErrorsAndWarnings: FormSectionId[];
   continue: boolean;
+  correctionWarnings?: ResultsPath[];
 }
 
 export interface FormState {
@@ -151,4 +153,5 @@ export type FormSection = {
   acceptErrorsAndWarningsError: boolean;
   errors: ValidationResultSet;
   warnings: ValidationResultSet;
+  correctionWarning?: ValidationResult;
 };

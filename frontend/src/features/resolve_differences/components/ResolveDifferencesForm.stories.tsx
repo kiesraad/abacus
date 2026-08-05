@@ -75,8 +75,10 @@ export const Default: Story = {
 
     const firstEntry = canvas.getByRole("radio", { name: "Eerste invoer (Gebruiker01)" });
     const discardBoth = canvas.getByRole("radio", { name: "Geen van beide: alles opnieuw invoeren" });
-    const correctWrongEntry = canvas.getByRole("radio", { name: "Laten herstellen door oorspronkelijke invoerder" });
-    const discardWrongEntry = canvas.getByRole("radio", { name: "Opnieuw laten invoeren" });
+    const correctWrongEntry = canvas.getByRole("radio", {
+      name: "Verschillen laten herstellen door de oorspronkelijke invoerder",
+    });
+    const discardWrongEntry = canvas.getByRole("radio", { name: "Hele proces-verbaal opnieuw laten invoeren" });
 
     // Nothing is selected initially and the second question is disabled
     await expect(firstEntry).not.toBeChecked();
@@ -118,8 +120,10 @@ export const FirstEntrySelected: Story = {
     await expect(canvas.getByRole("radio", { name: "Eerste invoer (Gebruiker01)" })).toBeChecked();
 
     // The second question is enabled once an entry is chosen
-    await expect(canvas.getByRole("radio", { name: "Laten herstellen door oorspronkelijke invoerder" })).toBeEnabled();
-    await expect(canvas.getByRole("radio", { name: "Opnieuw laten invoeren" })).toBeEnabled();
+    await expect(
+      canvas.getByRole("radio", { name: "Verschillen laten herstellen door de oorspronkelijke invoerder" }),
+    ).toBeEnabled();
+    await expect(canvas.getByRole("radio", { name: "Hele proces-verbaal opnieuw laten invoeren" })).toBeEnabled();
   },
 };
 
@@ -138,8 +142,10 @@ export const SecondEntryHasErrors: Story = {
       ),
     ).toBeVisible();
 
-    const correctWrongEntry = canvas.getByRole("radio", { name: "Laten herstellen door oorspronkelijke invoerder" });
-    const discardWrongEntry = canvas.getByRole("radio", { name: "Opnieuw laten invoeren" });
+    const correctWrongEntry = canvas.getByRole("radio", {
+      name: "Verschillen laten herstellen door de oorspronkelijke invoerder",
+    });
+    const discardWrongEntry = canvas.getByRole("radio", { name: "Hele proces-verbaal opnieuw laten invoeren" });
     await expect(correctWrongEntry).toBeDisabled();
     await expect(correctWrongEntry).not.toBeChecked();
     await expect(discardWrongEntry).toBeDisabled();
@@ -165,8 +171,10 @@ export const FirstEntryHasErrors: Story = {
       ),
     ).toBeVisible();
 
-    const correctWrongEntry = canvas.getByRole("radio", { name: "Laten herstellen door oorspronkelijke invoerder" });
-    const discardWrongEntry = canvas.getByRole("radio", { name: "Opnieuw laten invoeren" });
+    const correctWrongEntry = canvas.getByRole("radio", {
+      name: "Verschillen laten herstellen door de oorspronkelijke invoerder",
+    });
+    const discardWrongEntry = canvas.getByRole("radio", { name: "Hele proces-verbaal opnieuw laten invoeren" });
     await expect(correctWrongEntry).toBeDisabled();
     await expect(correctWrongEntry).not.toBeChecked();
     await expect(discardWrongEntry).toBeDisabled();

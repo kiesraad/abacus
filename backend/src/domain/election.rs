@@ -103,7 +103,7 @@ impl NameResolver for ElectionWithPoliticalGroups {
         self.political_groups
             .iter()
             .find(|pg| pg.number == aff_id)
-            .map(|pg| pg.registered_name.clone())
+            .map(|pg| pg.name.clone())
     }
 
     fn resolve_candidate_name(

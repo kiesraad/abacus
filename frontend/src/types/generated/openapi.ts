@@ -699,6 +699,8 @@ export interface ChosenCandidate {
  */
 export interface ClaimDataEntryResponse {
   client_state: unknown;
+  /** Fields for which a warning should be shown that a difference should be corrected */
+  correction_warnings?: string[];
   data: Results;
   /** Whether the typist is correcting an entry that was completed before */
   is_correction: boolean;
@@ -1755,6 +1757,7 @@ export const validationResultCodeValues = [
   "F402",
   "F403",
   "W001",
+  "W002",
   "W201",
   "W202",
   "W203",

@@ -23,8 +23,8 @@
   "section": "Rubriek",
   "title": "Verschil tussen eerste en tweede invoer",
   "wrong_entry_options": {
-    "correct": "Laten herstellen door oorspronkelijke invoerder",
-    "discard": "Opnieuw laten invoeren"
+    "correct": "Verschillen laten herstellen door de oorspronkelijke invoerder",
+    "discard": "Hele proces-verbaal opnieuw laten invoeren"
   },
   "wrong_entry_question": "Wat wil je doen met de invoer die <u>niet</u> klopt?"
 }

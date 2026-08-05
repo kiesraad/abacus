@@ -492,6 +492,7 @@ test.describe("Election creation", () => {
 
       const countingMethodPage = new CountingMethodTypePgObj(page);
       await expect(countingMethodPage.header).toBeVisible();
+      await countingMethodPage.cso.check();
       await countingMethodPage.next.click();
 
       const numberOfVotersPage = new NumberOfVotersPgObj(page);

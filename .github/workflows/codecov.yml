@@ -29,31 +29,6 @@ jobs:
       # Branch coverage requires Rust nightly: https://github.com/taiki-e/cargo-llvm-cov/issues/8
       RUSTUP_TOOLCHAIN: nightly-2026-07-10
     steps:
-      # Free up runner disk space, so that our job has enough space to run
-      # https://dev.to/mathio/squeezing-disk-space-from-github-actions-runners-an-engineers-guide-3pjg
-      - name: Free up runner disk space
-        working-directory: /
-        run: >
-          df -h
-          &&
-          echo "Freeing up disk space..."
-          &&
-          sudo rm -rf
-          /opt/az
-          /opt/google
-          /opt/hostedtoolcache
-          /opt/microsoft
-          /usr/lib/google-cloud-sdk
-          /usr/lib/jvm
-          /usr/local/.ghcup
-          /usr/local/julia*
-          /usr/local/lib/android
-          /usr/local/share/chromium
-          /usr/local/share/powershell
-          /usr/share/dotnet
-          /usr/share/swift
-          &&
-          df -h
       - name: Checkout
         uses: actions/checkout@v7.0.1
         with:
@@ -72,6 +47,8 @@ jobs:
         run: cargo binstall cargo-llvm-cov
       - name: Install Nextest
         run: cargo binstall cargo-nextest
+      - name: Symlink sqlx test directory to /dev/shm
+        run: mkdir -p target /dev/shm/sqlx && ln -s /dev/shm/sqlx target/sqlx
       - name: Run tests with coverage
         run: cargo llvm-cov nextest --workspace --branch --profile ci --features embed-typst,airgap-detection --cobertura --output-path ./target/llvm-cov-target/codecov.json
       - name: Upload coverage to Codecov

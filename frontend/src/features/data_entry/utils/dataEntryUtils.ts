@@ -1,7 +1,7 @@
 import type { ValidationResult, ValidationResults } from "@/types/generated/openapi";
-import type { DataEntryResults, DataEntryStructure, FormSectionId } from "@/types/types";
-import { extractFieldInfoFromSection, getValueAtPath } from "@/utils/dataEntryMapping";
-import { doesValidationResultApplyToSection, ValidationResultSet } from "@/utils/ValidationResults";
+import type { DataEntryResults, DataEntryStructure, FormSectionId, ResultsPath } from "@/types/types";
+import { extractFieldInfoFromSection, getValueAtPath, resetValueAtPath } from "@/utils/dataEntryMapping";
+import { doesValidationResultApplyToSection, isFieldInSection, ValidationResultSet } from "@/utils/ValidationResults";
 import type { ClientState, FormSection, FormState } from "../types/types";
 
 export function formSectionComplete(section: FormSection): boolean {
@@ -115,6 +115,13 @@ export function getClientState(
   acceptErrorsAndWarnings: boolean,
   continueToNextSection: boolean,
 ) {
+  // Collect all the correctionWarning fields from the sections
+  const correctionWarnings = Object.values(formState.sections).reduce(
+    (warnings: ResultsPath[], section: FormSection) =>
+      section.correctionWarning ? warnings.concat(section.correctionWarning.fields) : warnings,
+    [],
+  );
+
   const clientState: ClientState = {
     furthest: formState.furthest,
     current: currentSectionId,
@@ -123,6 +130,7 @@ export function getClientState(
       .filter((s: FormSection) => s.id !== currentSectionId)
       .map((s: FormSection) => s.id),
     continue: continueToNextSection,
+    correctionWarnings: correctionWarnings.length > 0 ? correctionWarnings : undefined,
   };
   // the form state is not updated for the current submission,
   // so add the current section to the accepted warnings if needed
@@ -179,6 +187,11 @@ export function buildFormState(
     (sectionID: FormSectionId) => sectionID === serverCurrentSection,
   );
 
+  // set correctionWarning on the sections
+  if (clientState.correctionWarnings) {
+    addCorrectionWarnings(dataEntryStructure, clientState.correctionWarnings, newFormState);
+  }
+
   updateFormStateAfterSubmit(
     dataEntryStructure,
     newFormState,
@@ -233,6 +246,8 @@ export function updateFormStateAfterSubmit(
     currentFormSection.isSubmitted = saved;
     // There are no changes after a successful submit
     currentFormSection.hasChanges = false;
+    // Remove correction warning
+    currentFormSection.correctionWarning = undefined;
   }
 
   //distribute errors and warnings to sections
@@ -264,6 +279,28 @@ export function addValidationResultsToFormState(
           formSection[errorsOrWarnings].add(validationResult);
         }
       }
+    }
+  }
+}
+
+export function addCorrectionWarnings(dataEntryStructure: DataEntryStructure, fields: string[], formState: FormState) {
+  for (const section of dataEntryStructure) {
+    const sectionFields = fields.filter((field) => isFieldInSection(field, section));
+    const formSection = formState.sections[section.id];
+    if (formSection === undefined || sectionFields.length === 0) {
+      continue;
+    }
+
+    formSection.correctionWarning = { code: "W002", fields: sectionFields };
+  }
+}
+
+export function resetFieldValues(dataEntryStructure: DataEntryStructure, fields: string[], results: DataEntryResults) {
+  for (const section of dataEntryStructure) {
+    const sectionFields = fields.filter((field) => isFieldInSection(field, section));
+
+    for (const field of sectionFields) {
+      resetValueAtPath(section, results, field);
     }
   }
 }

@@ -90,6 +90,10 @@ export type DataEntrySubsection =
   | InputGridSubsection
   | CheckboxesSubsection;
 
+export function isCheckboxesSubsection(subsection: DataEntrySubsection): subsection is CheckboxesSubsection {
+  return subsection.type === "checkboxes";
+}
+
 export interface DataEntrySection {
   id: FormSectionId;
   title: string;

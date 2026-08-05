@@ -81,9 +81,11 @@ describe("BackupsPage", () => {
 
     await user.click(await screen.findByRole("button", { name: "Nu back-up maken" }));
 
-    expect(await screen.findByRole("alert")).toHaveTextContent(
-      "De back-up met deze naam bestaat al, probeer het later opnieuw",
-    );
+    await waitFor(() => {
+      expect(screen.queryByRole("alert")).toHaveTextContent(
+        "De back-up met deze naam bestaat al, probeer het later opnieuw",
+      );
+    });
     expect(screen.queryByText(/Laatste back-up gemaakt om/)).not.toBeInTheDocument();
   });
 });

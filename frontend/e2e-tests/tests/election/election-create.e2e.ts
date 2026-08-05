@@ -13,14 +13,14 @@ import { CountingMethodTypePgObj } from "e2e-tests/page-objects/election/create/
 import { NumberOfVotersPgObj } from "e2e-tests/page-objects/election/create/NumberOfVotersPgObj";
 import { UploadCandidateDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadCandidateDefinitionPgObj";
 import { UploadElectionDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadElectionDefinitionPgObj";
-import { UploadPollingStationDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadPollingStationDefinitionPgObj";
+import { UploadPollingStationsFilePgObj } from "e2e-tests/page-objects/election/create/UploadPollingStationsFilePgObj";
 import { ElectionHome } from "e2e-tests/page-objects/election/ElectionHomePgObj";
 import { ElectionsOverviewPgObj } from "e2e-tests/page-objects/election/ElectionsOverviewPgObj";
 import { AdminNavBar } from "e2e-tests/page-objects/nav_bar/AdminNavBarPgObj";
 import { PollingStationImportPgObj } from "e2e-tests/page-objects/polling_station/PollingStationImportPgObj";
 import { PollingStationListEmptyPgObj } from "e2e-tests/page-objects/polling_station/PollingStationListEmptyPgObj";
 import { PollingStationListPgObj } from "e2e-tests/page-objects/polling_station/PollingStationListPgObj";
-import { eml110a, eml110b, eml230b } from "e2e-tests/test-data/eml-files";
+import { eml110a, eml110b, eml110b_zero_voters, eml230b } from "e2e-tests/test-data/eml-files";
 import { test } from "../../fixtures";
 
 test.use({
@@ -51,9 +51,9 @@ test.describe("Election creation", () => {
       // Counting method page
       const countingMethodPage = new CountingMethodTypePgObj(page);
       await expect(countingMethodPage.header).toBeVisible();
-      await expect(countingMethodPage.cso).toBeVisible();
-      await countingMethodPage.cso.click();
-      await expect(countingMethodPage.cso).toBeChecked();
+      await expect(countingMethodPage.cso).not.toBeChecked();
+      await expect(countingMethodPage.dso).not.toBeChecked();
+      await countingMethodPage.cso.check();
       await countingMethodPage.next.click();
 
       // Number of voters page
@@ -121,16 +121,14 @@ test.describe("Election creation", () => {
       await committeeCategoryPage.next.click();
 
       // skip polling stations
-      const uploadPollingStationsPage = new UploadPollingStationDefinitionPgObj(page);
+      const uploadPollingStationsPage = new UploadPollingStationsFilePgObj(page);
       await expect(uploadPollingStationsPage.header).toBeVisible();
       await uploadPollingStationsPage.skipButton.click();
 
       // Counting method page
       const countingMethodPage = new CountingMethodTypePgObj(page);
       await expect(countingMethodPage.header).toBeVisible();
-      await expect(countingMethodPage.cso).toBeVisible();
-      await countingMethodPage.cso.click();
-      await expect(countingMethodPage.cso).toBeChecked();
+      await countingMethodPage.cso.check();
       await countingMethodPage.next.click();
 
       // Number of voters page
@@ -409,8 +407,8 @@ test.describe("Election creation", () => {
       await committeeCategoryPage.next.click();
 
       // Now we should be at the polling station upload page
-      const uploadPollingStationDefinitionPage = new UploadPollingStationDefinitionPgObj(page);
-      await expect(uploadPollingStationDefinitionPage.header).toBeVisible();
+      const uploadPollingStationsPage = new UploadPollingStationsFilePgObj(page);
+      await expect(uploadPollingStationsPage.header).toBeVisible();
 
       // Now upload a new election
       const uploadElectionDefinitionPage = new UploadElectionDefinitionPgObj(page);
@@ -447,9 +445,7 @@ test.describe("Election creation", () => {
       // Counting method page
       const countingMethodPage = new CountingMethodTypePgObj(page);
       await expect(countingMethodPage.header).toBeVisible();
-      await expect(countingMethodPage.cso).toBeVisible();
-      await countingMethodPage.cso.click();
-      await expect(countingMethodPage.cso).toBeChecked();
+      await countingMethodPage.cso.check();
       await countingMethodPage.next.click();
 
       // Number of voters page
@@ -475,6 +471,41 @@ test.describe("Election creation", () => {
   });
 
   test.describe("polling stations", () => {
+    test("it accepts a polling station file with maxvotes 0", async ({ page }) => {
+      await page.goto("/elections");
+      const overviewPage = new ElectionsOverviewPgObj(page);
+      await overviewPage.create.click();
+
+      await uploadElectionAndInputHash(page);
+
+      await uploadCandidatesAndInputHash(page, eml230b);
+
+      const committeeCategoryPage = new CommitteeCategoryPgObj(page);
+      await expect(committeeCategoryPage.header).toBeVisible();
+      await committeeCategoryPage.next.click();
+
+      await uploadPollingStations(page, eml110b_zero_voters);
+
+      const countingMethodPage = new CountingMethodTypePgObj(page);
+      await expect(countingMethodPage.header).toBeVisible();
+      await countingMethodPage.cso.check();
+      await countingMethodPage.next.click();
+
+      const numberOfVotersPage = new NumberOfVotersPgObj(page);
+      await expect(numberOfVotersPage.header).toBeVisible();
+      await expect(numberOfVotersPage.input).toHaveValue("");
+      await numberOfVotersPage.input.fill("45678");
+      await numberOfVotersPage.next.click();
+
+      const checkAndSavePage = new CheckAndSavePgObj(page);
+      await expect(checkAndSavePage.header).toBeVisible();
+      await expect(checkAndSavePage.numberOfVoters).toContainText("45.678");
+
+      await checkAndSavePage.saveElection();
+      await expect(overviewPage.adminHeader).toBeVisible();
+      await expect(overviewPage.alertGSBElectionCreated).toBeVisible();
+    });
+
     test("it fails on valid, but incorrect polling station file", async ({ page }) => {
       await page.goto("/elections");
       const overviewPage = new ElectionsOverviewPgObj(page);
@@ -492,12 +523,12 @@ test.describe("Election creation", () => {
       await committeeCategoryPage.next.click();
 
       // upload wrong file
-      const uploadPollingStationDefinitionPage = new UploadPollingStationDefinitionPgObj(page);
-      await expect(uploadPollingStationDefinitionPage.header).toBeVisible();
-      await uploadPollingStationDefinitionPage.uploadFile(eml110a.path);
-      await expect(uploadPollingStationDefinitionPage.fieldset).toContainText(eml110a.filename);
-      await expect(uploadPollingStationDefinitionPage.invalidFileAlert).toBeVisible();
-      await expect(uploadPollingStationDefinitionPage.invalidFileAlert).toContainText(
+      const uploadPollingStationsPage = new UploadPollingStationsFilePgObj(page);
+      await expect(uploadPollingStationsPage.header).toBeVisible();
+      await uploadPollingStationsPage.uploadFile(eml110a.path);
+      await expect(uploadPollingStationsPage.fieldset).toContainText(eml110a.filename);
+      await expect(uploadPollingStationsPage.invalidFileAlert).toBeVisible();
+      await expect(uploadPollingStationsPage.invalidFileAlert).toContainText(
         "Het bestand eml110a_test.eml.xml bevat geen geldige lijst met stembureaus. Kies een ander bestand.",
       );
     });

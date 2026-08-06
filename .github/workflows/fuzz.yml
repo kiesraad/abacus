@@ -55,7 +55,7 @@ jobs:
           key: ${{ matrix.target }}
       # The corpus is restored from the previous run
       - name: Restore fuzz corpus
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v6.1.0
         with:
           path: ${{ matrix.dir }}/corpus/${{ matrix.target }}
           key: fuzz-corpus-${{ matrix.target }}-${{ github.run_id }}
@@ -67,7 +67,7 @@ jobs:
       - name: Minimise corpus
         run: cargo fuzz cmin ${{ matrix.target }}
       - name: Save fuzz corpus
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v6.1.0
         with:
           path: ${{ matrix.dir }}/corpus/${{ matrix.target }}
           key: fuzz-corpus-${{ matrix.target }}-${{ github.run_id }}

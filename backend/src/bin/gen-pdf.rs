@@ -28,6 +28,26 @@ struct ModelVariant {
 /// List of all model variants to render
 static VARIANTS: &[ModelVariant] = &[
     ModelVariant {
+        name: "model-n-10-1-GR",
+        model: "model-n-10-1",
+        input: "model-n-10-1-variations/model-n-10-1-GR.json",
+    },
+    ModelVariant {
+        name: "model-n-10-1-PS",
+        model: "model-n-10-1",
+        input: "model-n-10-1-variations/model-n-10-1-PS.json",
+    },
+    ModelVariant {
+        name: "model-n-10-1-WS",
+        model: "model-n-10-1",
+        input: "model-n-10-1-variations/model-n-10-1-WS.json",
+    },
+    ModelVariant {
+        name: "model-n-10-1-inlegvel",
+        model: "model-n-10-1-inlegvel",
+        input: "model-n-10-1-inlegvel.json",
+    },
+    ModelVariant {
         name: "model-n-10-2-GR",
         model: "model-n-10-2",
         input: "model-n-10-2-variations/model-n-10-2-GR.json",

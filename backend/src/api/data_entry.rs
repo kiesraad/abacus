@@ -304,7 +304,7 @@ async fn get_previous_results(
                 Results::DSOFirstSession(r) => Some(r.as_common()),
                 Results::CSONextSession(r) => Some(r.as_common()),
                 Results::DSONextSession(r) => Some(r.as_common()),
-                _ => None,
+                Results::GSB(_) => None,
             },
             _ => None,
         },

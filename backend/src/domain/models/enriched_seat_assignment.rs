@@ -271,14 +271,17 @@ mod tests {
                 political_group_total_votes::PoliticalGroupTotalVotes, voters_counts::VotersCounts,
                 votes_counts::VotesCounts,
             },
-            summary::{ElectionSummary, ElectionSummaryCSB, SumCount, SummaryDifferencesCounts},
+            summary::{
+                ElectionSummaryApportionment, ElectionSummaryCSB, SumCount,
+                SummaryDifferencesCounts,
+            },
         },
     };
 
-    fn get_election_summary(
+    fn get_apportionment_election_summary(
         election: &ElectionWithPoliticalGroups,
         candidate_votes: &[Vec<u32>],
-    ) -> ElectionSummary {
+    ) -> ElectionSummaryApportionment {
         let total_votes_candidates_count = candidate_votes.iter().flatten().sum::<u32>();
         let political_group_votes =
             create_political_group_candidate_votes(&election.political_groups, candidate_votes);
@@ -289,7 +292,7 @@ mod tests {
                 total: pg_votes.total,
             })
             .collect();
-        ElectionSummary {
+        ElectionSummaryApportionment {
             voters_counts: VotersCounts {
                 poll_card_count: total_votes_candidates_count,
                 proxy_certificate_count: 0,
@@ -308,8 +311,7 @@ mod tests {
                 fewer_ballots_count: SumCount::zero(),
             },
             political_group_votes,
-            polling_station_investigations: Default::default(),
-            number_of_voters: Some(election.number_of_voters),
+            number_of_voters: election.number_of_voters,
         }
     }
 
@@ -333,7 +335,7 @@ mod tests {
             10,
         );
         let political_groups = &election.political_groups;
-        let summary = get_election_summary(&election, &candidate_votes);
+        let summary = get_apportionment_election_summary(&election, &candidate_votes);
         let summary_csb = ElectionSummaryCSB::new(&summary, political_groups);
         let apportionment_input = ApportionmentInputData::new(
             election.number_of_seats,
@@ -457,7 +459,7 @@ mod tests {
             24,
         );
         let political_groups = &election.political_groups;
-        let summary = get_election_summary(&election, &candidate_votes);
+        let summary = get_apportionment_election_summary(&election, &candidate_votes);
         let summary_csb = ElectionSummaryCSB::new(&summary, political_groups);
         let apportionment_input = ApportionmentInputData::new(
             election.number_of_seats,
@@ -549,7 +551,7 @@ mod tests {
             15,
         );
         let political_groups = &election.political_groups;
-        let summary = get_election_summary(&election, &candidate_votes);
+        let summary = get_apportionment_election_summary(&election, &candidate_votes);
         let summary_csb = ElectionSummaryCSB::new(&summary, political_groups);
         let apportionment_input = ApportionmentInputData::new(
             election.number_of_seats,

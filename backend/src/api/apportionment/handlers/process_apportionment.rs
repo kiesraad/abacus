@@ -13,7 +13,7 @@ use crate::{
     domain::{
         apportionment::SeatAssignment,
         election::{Election, ElectionId},
-        summary::ElectionSummary,
+        summary::ElectionSummaryApportionment,
     },
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType},
     repository::{election_repo, user_repo::User},
@@ -34,7 +34,7 @@ impl AsAuditEvent for ApportionmentProcessed {
 pub enum ProcessApportionmentResponse {
     Finalised(ElectionApportionmentResponse),
     DrawingLotsRequired {
-        election_summary: ElectionSummary,
+        election_summary: ElectionSummaryApportionment,
         seat_assignment: SeatAssignment,
     },
 }

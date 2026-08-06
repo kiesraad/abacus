@@ -5,14 +5,14 @@ import type {
   ApportionmentState,
   ApportionmentWarning,
   CandidateNomination,
-  ElectionSummary,
+  ElectionSummaryApportionment,
   SeatAssignment,
 } from "@/types/generated/openapi";
 
 export interface iElectionApportionmentProviderContext {
   seatAssignment?: SeatAssignment;
   candidateNomination?: CandidateNomination;
-  electionSummary?: ElectionSummary;
+  electionSummary?: ElectionSummaryApportionment;
   warnings: ApportionmentWarning[];
   state?: ApportionmentState;
   error?: ApiError;

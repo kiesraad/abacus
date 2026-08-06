@@ -14,7 +14,7 @@ use crate::domain::{
     apportionment_state::DeceasedCandidate,
     election::{CandidateNumber, PGNumber},
     results::political_group_candidate_votes::{CandidateVotes, PoliticalGroupCandidateVotes},
-    summary::ElectionSummary,
+    summary::ElectionSummaryApportionment,
 };
 
 #[derive(Clone, Debug)]
@@ -212,6 +212,6 @@ impl apportionment::CandidateDrawn<PGNumber, CandidateNumber> for CandidateDrawn
 pub struct ElectionApportionmentResponse {
     pub seat_assignment: SeatAssignment,
     pub candidate_nomination: CandidateNomination,
-    pub election_summary: ElectionSummary,
+    pub election_summary: ElectionSummaryApportionment,
     pub warnings: Vec<ApportionmentWarning>,
 }

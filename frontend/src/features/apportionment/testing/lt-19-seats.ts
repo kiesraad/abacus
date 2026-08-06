@@ -2,7 +2,7 @@ import type {
   ApportionmentState,
   CandidateNomination,
   CommitteeSession,
-  ElectionSummary,
+  ElectionSummaryApportionment,
   ElectionWithPoliticalGroups,
   ListCandidateNomination,
   PoliticalGroup,
@@ -1363,7 +1363,7 @@ export const political_group_1_votes: PoliticalGroupCandidateVotes = {
   ],
 };
 
-export const election_summary: ElectionSummary = {
+export const election_summary: ElectionSummaryApportionment = {
   number_of_voters: 2000,
   voters_counts: {
     poll_card_count: 1203,
@@ -1395,11 +1395,6 @@ export const election_summary: ElectionSummary = {
       count: 0,
       data_entry_sources: [],
     },
-  },
-  polling_station_investigations: {
-    admitted_voters_recounted: [],
-    ballots_recounted: [],
-    investigated_other_reason: [],
   },
   political_group_votes: [
     political_group_1_votes,

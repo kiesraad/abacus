@@ -2,7 +2,7 @@ import type {
   ApportionmentState,
   CandidateNomination,
   CommitteeSession,
-  ElectionSummary,
+  ElectionSummaryApportionment,
   ElectionWithPoliticalGroups,
   SeatAssignment,
 } from "@/types/generated/openapi";
@@ -635,7 +635,7 @@ export const candidate_nomination: CandidateNomination = {
   ],
 };
 
-export const election_summary: ElectionSummary = {
+export const election_summary: ElectionSummaryApportionment = {
   voters_counts: {
     poll_card_count: 8000,
     proxy_certificate_count: 0,
@@ -807,11 +807,6 @@ export const election_summary: ElectionSummary = {
       ],
     },
   ],
-  polling_station_investigations: {
-    admitted_voters_recounted: [],
-    investigated_other_reason: [],
-    ballots_recounted: [],
-  },
   number_of_voters: 8634,
 };
 

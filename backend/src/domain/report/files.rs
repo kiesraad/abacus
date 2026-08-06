@@ -1,5 +1,5 @@
 use apportionment::ApportionmentOutput;
-use chrono::{Local, Utc};
+use chrono::{DateTime, Local, Utc};
 use sqlx::{SqliteConnection, SqlitePool};
 
 use crate::{
@@ -14,7 +14,7 @@ use crate::{
         file::{File, FileType},
         report::structs::{
             CsbFiles, FileCreatedAuditData, GeneratedFile, GsbFiles, ResultsInputCSB,
-            ResultsInputData, ResultsInputGSB,
+            ResultsInputCSO,
         },
     },
     infra::audit_log::AuditService,
@@ -29,19 +29,20 @@ use crate::{
 struct FileSaver<'a> {
     conn: &'a mut SqliteConnection,
     audit_service: &'a AuditService,
-    input: &'a ResultsInputData,
+    committee_session: &'a CommitteeSession,
+    created_at: DateTime<Local>,
 }
 
 impl FileSaver<'_> {
     async fn save(&mut self, generated_file: GeneratedFile) -> Result<File, APIError> {
         let file = file_repo::create(
             self.conn,
-            self.input.committee_session.id,
+            self.committee_session.id,
             generated_file.file_type,
             generated_file.filename,
             &generated_file.content,
             generated_file.file_type.mime_type().into(),
-            self.input.created_at.with_timezone(&Utc),
+            self.created_at.with_timezone(&Utc),
         )
         .await?;
 
@@ -52,19 +53,20 @@ impl FileSaver<'_> {
     }
 }
 
-async fn generate_and_save_files_gsb_election(
+async fn generate_and_save_files_cso_election(
     conn: &mut SqliteConnection,
     audit_service: &AuditService,
     committee_session: CommitteeSession,
     corrections: bool,
 ) -> Result<GsbFiles, APIError> {
-    let gsb_input = ResultsInputGSB::new(conn, committee_session.id, Local::now()).await?;
+    let gsb_input = ResultsInputCSO::new(conn, committee_session.id, Local::now()).await?;
     let input_data = &gsb_input.data;
 
     let mut saver = FileSaver {
         conn,
         audit_service,
-        input: input_data,
+        committee_session: &input_data.committee_session,
+        created_at: input_data.created_at,
     };
 
     let mut files = GsbFiles {
@@ -74,7 +76,7 @@ async fn generate_and_save_files_gsb_election(
         results_csv: None,
     };
 
-    let generated_files = gsb_input.generate_gsb_files().await?;
+    let generated_files = gsb_input.generate_cso_files().await?;
 
     // For the first session, or if there are corrections, we also store the EML and count PDF
     // For next sessions without corrections, we don't store these
@@ -106,7 +108,8 @@ async fn generate_and_save_files_csb_election(
     let mut saver = FileSaver {
         conn,
         audit_service,
-        input: input_data,
+        committee_session: &input_data.committee_session,
+        created_at: input_data.created_at,
     };
 
     let apportionment_input = ApportionmentInputData::new(
@@ -169,7 +172,7 @@ async fn get_existing_csb_files(
     })
 }
 
-pub async fn get_files_gsb_election(
+pub async fn get_files_cso_election(
     pool: &SqlitePool,
     audit_service: AuditService,
     committee_session_id: CommitteeSessionId,
@@ -194,7 +197,7 @@ pub async fn get_files_gsb_election(
     // If one of the files doesn't exist, generate all and save them to the database
     if files.needs_generation(&committee_session, corrections) {
         let mut tx = pool.begin_immediate().await?;
-        files = generate_and_save_files_gsb_election(
+        files = generate_and_save_files_cso_election(
             &mut tx,
             &audit_service,
             committee_session,
@@ -271,7 +274,7 @@ mod tests {
         let audit_service = AuditService::new(None, None);
 
         let result =
-            get_files_gsb_election(&pool, audit_service.clone(), CommitteeSessionId::from(6)).await;
+            get_files_cso_election(&pool, audit_service.clone(), CommitteeSessionId::from(6)).await;
         assert!(result.is_err());
 
         // Change committee session status to completed
@@ -284,7 +287,7 @@ mod tests {
         .unwrap();
 
         let result =
-            get_files_gsb_election(&pool, audit_service.clone(), CommitteeSessionId::from(6)).await;
+            get_files_cso_election(&pool, audit_service.clone(), CommitteeSessionId::from(6)).await;
         assert!(result.is_err());
 
         // Change committee session details
@@ -298,7 +301,7 @@ mod tests {
         .unwrap();
 
         let result =
-            get_files_gsb_election(&pool, audit_service.clone(), CommitteeSessionId::from(6)).await;
+            get_files_cso_election(&pool, audit_service.clone(), CommitteeSessionId::from(6)).await;
         assert!(result.is_ok());
     }
 
@@ -310,7 +313,7 @@ mod tests {
         // Files should be generated exactly once
         for _ in 1..=2 {
             let files =
-                get_files_gsb_election(&pool, audit_service.clone(), CommitteeSessionId::from(5))
+                get_files_cso_election(&pool, audit_service.clone(), CommitteeSessionId::from(5))
                     .await
                     .expect("should return files");
             let eml = files.results_eml.expect("should have generated eml");
@@ -340,7 +343,7 @@ mod tests {
         // Files should be generated exactly once
         for _ in 1..=2 {
             let files =
-                get_files_gsb_election(&pool, audit_service.clone(), CommitteeSessionId::from(703))
+                get_files_cso_election(&pool, audit_service.clone(), CommitteeSessionId::from(703))
                     .await
                     .expect("should return files");
 
@@ -387,7 +390,7 @@ mod tests {
         // File should be generated exactly once
         for _ in 1..=2 {
             let files =
-                get_files_gsb_election(&pool, audit_service.clone(), CommitteeSessionId::from(703))
+                get_files_cso_election(&pool, audit_service.clone(), CommitteeSessionId::from(703))
                     .await
                     .expect("should return files");
 

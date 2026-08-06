@@ -11,7 +11,7 @@ import type {
   ApportionmentState,
   ApportionmentWarning,
   ChosenCandidate,
-  ElectionSummary,
+  ElectionSummaryApportionment,
   ElectionWithPoliticalGroups,
   PoliticalGroup,
   PreferenceThreshold,
@@ -285,7 +285,7 @@ function renderLinksToSeatAssignmentPages(seatAssignment: SeatAssignment) {
 }
 
 interface ElectionSummaryTableSectionProps {
-  electionSummary: ElectionSummary;
+  electionSummary: ElectionSummaryApportionment;
   seatAssignment: SeatAssignment;
   election: ElectionWithPoliticalGroups;
   preferenceThreshold: PreferenceThreshold | undefined;

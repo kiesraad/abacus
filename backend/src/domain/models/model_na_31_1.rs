@@ -5,7 +5,7 @@ use crate::domain::{
     election::Election,
     models::{PdfFileModel, PdfModel, ToPdfFileModel, votes_table::VotesTables},
     polling_station::PollingStation,
-    summary::ElectionSummaryWithoutVotes,
+    summary::DSOElectionSummaryWithoutVotes,
 };
 
 #[derive(Serialize, Deserialize)]
@@ -13,7 +13,7 @@ use crate::domain::{
 pub struct ModelNa31_1Input {
     pub committee_session: CommitteeSession,
     pub election: Election,
-    pub summary: ElectionSummaryWithoutVotes,
+    pub summary: DSOElectionSummaryWithoutVotes,
     pub polling_stations: Vec<PollingStation>,
     pub hash: String,
     pub creation_date_time: String,

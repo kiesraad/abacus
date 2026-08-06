@@ -10,7 +10,7 @@ use crate::domain::{
     },
     polling_station::PollingStation,
     results::common_polling_station_results::CommonPollingStationResultsWithoutVotes,
-    summary::ElectionSummaryWithoutVotes,
+    summary::CSOElectionSummaryWithoutVotes,
 };
 
 #[derive(Serialize, Deserialize)]
@@ -19,8 +19,8 @@ pub struct ModelNa14_2Input {
     pub committee_session: CommitteeSession,
     pub previous_committee_session: CommitteeSession,
     pub election: Election,
-    pub previous_summary: ElectionSummaryWithoutVotes,
-    pub summary: ElectionSummaryWithoutVotes,
+    pub previous_summary: CSOElectionSummaryWithoutVotes,
+    pub summary: CSOElectionSummaryWithoutVotes,
     pub hash: String,
     pub creation_date_time: String,
     pub votes_tables: VotesTablesWithPreviousVotes,

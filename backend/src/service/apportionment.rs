@@ -20,7 +20,7 @@ use crate::{
         election::{
             CandidateNumber, CommitteeCategory, ElectionId, ElectionWithPoliticalGroups, PGNumber,
         },
-        summary::ElectionSummary,
+        summary::ElectionSummaryApportionment,
     },
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
     repository::{
@@ -125,8 +125,16 @@ pub async fn next_state(
 #[allow(clippy::large_enum_variant)]
 pub enum ApportionmentResult {
     Ok(ElectionApportionmentResponse),
-    ListDrawingLotsRequired(ListDrawingLotsVariant, ElectionSummary, SeatAssignment),
-    CandidateDrawingLotsRequired(CandidateDrawingLotsVariant, ElectionSummary, SeatAssignment),
+    ListDrawingLotsRequired(
+        ListDrawingLotsVariant,
+        ElectionSummaryApportionment,
+        SeatAssignment,
+    ),
+    CandidateDrawingLotsRequired(
+        CandidateDrawingLotsVariant,
+        ElectionSummaryApportionment,
+        SeatAssignment,
+    ),
 }
 
 impl From<apportionment::CandidateDrawingLotsVariant<PGNumber, CandidateNumber>>
@@ -218,7 +226,8 @@ pub async fn process(
 
     let data_entry_results =
         data_entry_repo::list_results_for_committee_session(conn, committee_session_id).await?;
-    let election_summary = ElectionSummary::from_results(election, &data_entry_results)?;
+    let election_summary =
+        ElectionSummaryApportionment::from_results(election, &data_entry_results)?;
 
     let input = ApportionmentInputData::new(
         election.number_of_seats,

@@ -15,7 +15,7 @@ use abacus::{
         polling_station::PollingStation,
         report::DEFAULT_DATE_TIME_FORMAT,
         results::Results,
-        summary::ElectionSummary,
+        summary::ElectionSummaryCSO,
     },
     test_data_gen::{GenerateElectionArgs, RandomRange, create_test_election, parse_range},
 };
@@ -298,10 +298,10 @@ async fn export_election(
         .expect("Failed to write polling stations file");
 
     if export_results_json {
-        let election_summary = ElectionSummary::from_results(election, &results)
+        let election_summary = ElectionSummaryCSO::from_results(election, &results)
             .expect("Failed to create election summary");
         let input = ModelNa31_2Input {
-            votes_tables: VotesTables::new(election, &election_summary)
+            votes_tables: VotesTables::new(election, &election_summary.political_group_votes)
                 .expect("Failed to create votes tables"),
             summary: election_summary.into(),
             committee_session: committee_session.clone(),

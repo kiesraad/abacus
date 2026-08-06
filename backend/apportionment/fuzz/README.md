@@ -17,6 +17,10 @@ Basic commands:
 
 More documentation can be found in the [Rust Fuzz Book](https://rust-fuzz.github.io/book/cargo-fuzz.html).
 
+Every fuzz target except `differential_osv2020` is fuzzed nightly in CI, with one job per fuzz target. The differential
+target is skipped because it needs the external OSV2020 wrapper binary. Pull requests only lint the fuzz targets using
+Clippy. See [fuzzing in CI](../../fuzz/README.md#fuzzing-in-ci) for details.
+
 To check the fuzz test coverage, see the [instructions in our `fuzz` package](../../fuzz/README.md#checking-the-fuzz-test-coverage).
 The `coverage_differential_osv2020.sh` script can be used as a starting point depending on your system configuration.
 

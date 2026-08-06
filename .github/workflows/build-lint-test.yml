@@ -235,8 +235,8 @@ jobs:
           -T ./abacus \
           https://abacus-test.nl/etes/api/v1/executable/${{ github.event.pull_request.head.sha || github.sha }}/${{ github.sha }}
 
-  fuzz:
-    name: Backend fuzzer
+  fuzz-check:
+    name: Fuzz targets
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -249,33 +249,21 @@ jobs:
       - name: Setup Rust Nightly
         working-directory: ./backend/fuzz
         run: rustup toolchain install
-      - name: Setup Rust Nightly (apportionment)
-        working-directory: ./backend/apportionment/fuzz
-        run: rustup toolchain install
       - name: Cargo cache
         uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4 # v2
         with:
           workspaces: |
             backend/fuzz -> target
             backend/apportionment/fuzz -> target
-          shared-key: "fuzzer"
+          shared-key: "fuzz-check"
           # Save cache only for main and release branches to prevent cache thrashing
           save-if: ${{ github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/release-') }}
-      - name: Install cargo fuzz
-        working-directory: ./backend/fuzz
-        run: cargo install cargo-fuzz
       - name: Check Clippy for ./backend/fuzz
-        run: cargo --verbose --locked clippy -- -D warnings
+        run: cargo --verbose --locked clippy --all-targets -- -D warnings
         working-directory: ./backend/fuzz
       - name: Check Clippy for ./backend/apportionment/fuzz
-        run: cargo --verbose --locked clippy -- -D warnings
+        run: cargo --verbose --locked clippy --all-targets -- -D warnings
         working-directory: ./backend/apportionment/fuzz
-      - name: Run data entry fuzzer
-        working-directory: ./backend/fuzz
-        run: cargo fuzz run data_entry_status -- -max_total_time=60
-      - name: Run simple apportionment fuzzer
-        working-directory: ./backend/apportionment/fuzz
-        run: cargo fuzz run simple_apportionment -- -max_total_time=60
 
   rustdoc:
     name: Deploy rustdoc to GitHub Pages

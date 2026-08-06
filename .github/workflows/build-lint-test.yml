@@ -115,7 +115,7 @@ jobs:
       - name: Run tests
         run: cargo nextest run --verbose --locked --workspace --no-default-features --features openapi,dev-database,embed-typst,tls
       - name: Build documentation
-        run: cargo doc --workspace --no-deps --all-features --document-private-items
+        run: cargo doc --locked --workspace --no-deps --all-features --document-private-items
         env:
           RUSTDOCFLAGS: "-D warnings"
       - name: Create documentation artifact

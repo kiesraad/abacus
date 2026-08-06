@@ -16,9 +16,6 @@
 
 #show: doc => conf(
   doc,
-  header-left: [
-    #input.election.location #header-right #input.polling_station.name
-  ],
   header-right: header-right, 
   footer: [
     Proces-verbaal van een stembureau \

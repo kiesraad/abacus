@@ -4,6 +4,7 @@ pub mod enriched_seat_assignment;
 pub mod error;
 pub mod filter_input;
 mod model_n_10_2;
+mod model_na_14_1;
 mod model_na_14_2;
 mod model_na_31_1;
 mod model_na_31_2;
@@ -15,6 +16,7 @@ use std::error::Error;
 
 use filter_input::replace_unsupported_glyphs;
 pub use model_n_10_2::*;
+pub use model_na_14_1::*;
 pub use model_na_14_2::*;
 pub use model_na_31_1::*;
 pub use model_na_31_2::*;
@@ -38,6 +40,7 @@ impl PdfFileModel {
 
 /// Defines the available models and what their input parameters are.
 pub enum PdfModel {
+    ModelNa14_1Versie1(Box<ModelNa14_1Versie1Input>),
     ModelNa14_2(Box<ModelNa14_2Input>),
     ModelNa14_2Bijlage1(Box<ModelNa14_2Bijlage1Input>),
     ModelNa31_1Inlegvel(Box<ModelNa31_1InlegvelInput>),
@@ -58,6 +61,7 @@ impl PdfModel {
     /// Get the name for the input and template
     pub fn as_model_name(&self) -> &'static str {
         match self {
+            Self::ModelNa14_1Versie1(_) => "model-na-14-1-versie1",
             Self::ModelNa14_2(_) => "model-na-14-2",
             Self::ModelNa14_2Bijlage1(_) => "model-na-14-2-bijlage1",
             Self::ModelNa31_1Inlegvel(_) => "model-na-31-1-inlegvel",
@@ -79,6 +83,7 @@ impl PdfModel {
     pub fn as_template_path_str(&self) -> &'static str {
         match self {
             Self::ModelN10_2(_) => "model-n-10-2.typ",
+            Self::ModelNa14_1Versie1(_) => "model-na-14-1-versie-1.typ",
             Self::ModelNa14_2(_) => "model-na-14-2.typ",
             Self::ModelNa14_2Bijlage1(_) => "model-na-14-2-bijlage-1.typ",
             Self::ModelNa31_1Inlegvel(_) => "model-na-31-1-inlegvel.typ",
@@ -99,6 +104,9 @@ impl PdfModel {
     pub fn as_input_path_str(&self) -> &'static str {
         match self {
             Self::ModelN10_2(_) => "inputs/model-n-10-2-variations/model-n-10-2-GR.json",
+            Self::ModelNa14_1Versie1(_) => {
+                "inputs/model-na-14-1-versie-1-variations/model-na-14-1-versie-1-GR.json"
+            }
             Self::ModelNa14_2(_) => "inputs/model-na-14-2-variations/model-na-14-2-GR.json",
             Self::ModelNa14_2Bijlage1(_) => {
                 "inputs/model-na-14-2-bijlage-1-variations/model-na-14-2-bijlage-1-GR.json"
@@ -122,6 +130,7 @@ impl PdfModel {
     /// Get the input, serialized as json
     pub fn get_input(&self) -> String {
         let data = match self {
+            Self::ModelNa14_1Versie1(input) => serde_json::to_string(input),
             Self::ModelNa14_2(input) => serde_json::to_string(input),
             Self::ModelNa14_2Bijlage1(input) => serde_json::to_string(input),
             Self::ModelNa31_1Inlegvel(input) => serde_json::to_string(input),
@@ -152,6 +161,7 @@ impl PdfModel {
 
         match name {
             "model-n-10-2" => Ok(Self::ModelN10_2(serde_json::from_str(input)?)),
+            "model-na-14-1-versie-1" => Ok(Self::ModelNa14_1Versie1(serde_json::from_str(input)?)),
             "model-na-14-2" => Ok(Self::ModelNa14_2(serde_json::from_str(input)?)),
             "model-na-14-2-bijlage-1" => {
                 Ok(Self::ModelNa14_2Bijlage1(serde_json::from_str(input)?))

@@ -1383,7 +1383,6 @@ mod tests {
         assert_eq!(status, DataEntryStatusName::FirstEntryInProgress);
     }
 
-    // TODO: This will work once #3687 is implemented
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_11_dso"))))]
     async fn test_claim_data_entry_dso_ok(pool: SqlitePool) {
         let data_entry_id = DataEntryId::from(1101);
@@ -1520,31 +1519,19 @@ mod tests {
         assert!(ps_has_data_entry(&mut conn, polling_station_id).await);
     }
 
-    // TODO: Add new fixture with results and then add this test
-    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
+    #[test(sqlx::test(fixtures(
+        path = "../../fixtures",
+        scripts("election_12_dso_with_results")
+    )))]
     async fn test_claim_data_entry_dso_next_session_ok(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
-        let polling_station_id = PollingStationId::from(742);
-        // Insert investigation with corrected_results and create empty data entry
-        // (simulates what the investigation conclude flow does)
-        create_test_investigation(&mut conn, polling_station_id, Some(true))
-            .await
-            .unwrap();
-        let ps = polling_station_repo::get(&mut conn, polling_station_id)
-            .await
-            .unwrap();
-        let data_entry_id = ps
-            .data_entry_id()
-            .expect("data entry should be set after creating investigation with corrected results");
 
-        change_status_committee_session(
+        let response = claim(
             pool.clone(),
-            CommitteeSessionId::from(704),
-            CommitteeSessionStatus::DataEntry,
+            DataEntryId::from(1202),
+            EntryNumber::FirstEntry,
         )
         .await;
-
-        let response = claim(pool.clone(), data_entry_id, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
 
         let body = response.into_body().collect().await.unwrap().to_bytes();
@@ -1559,7 +1546,7 @@ mod tests {
         assert_eq!(status, DataEntryStatusName::FirstEntryInProgress);
 
         // Check that row exists
-        assert!(ps_has_data_entry(&mut conn, polling_station_id).await);
+        assert!(ps_has_data_entry(&mut conn, PollingStationId::from(12211)).await);
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]

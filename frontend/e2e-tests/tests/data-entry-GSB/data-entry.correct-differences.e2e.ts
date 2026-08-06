@@ -20,11 +20,11 @@ test.describe("data entry - correct differences", () => {
     dataEntryGSBFirstEntryCorrection: dataEntry,
   }) => {
     // Start data entry correction
-    const typistPage = typistOneGSB.page;
-    await typistPage.goto(`/elections/${dataEntry.election_id}/data-entry/${dataEntry.id}/1`);
+    const typist = typistOneGSB.page;
+    await typist.goto(`/elections/${dataEntry.election_id}/data-entry/${dataEntry.id}/1`);
 
     // Assert progress icons
-    const dataEntryPage = new DataEntryBasePage(typistPage);
+    const dataEntryPage = new DataEntryBasePage(typist);
     await expect(dataEntryPage.progressList.extraInvestigationIcon).toHaveAccessibleName("je bent hier");
     await expect(dataEntryPage.progressList.countingDifferencesPollingStationIcon).toHaveAccessibleName("opgeslagen");
     await expect(dataEntryPage.progressList.votersAndVotesIcon).toHaveAccessibleName("bevat een waarschuwing");
@@ -36,7 +36,7 @@ test.describe("data entry - correct differences", () => {
 
     // Go to section with warning
     await dataEntryPage.progressList.votersAndVotes.click();
-    const votersAndVotesPage = new VotersAndVotesPage(typistPage);
+    const votersAndVotesPage = new VotersAndVotesPage(typist);
     await expect(votersAndVotesPage.fieldset).toBeVisible();
 
     // Assert warning message only
@@ -122,12 +122,12 @@ test.describe("data entry - correct differences", () => {
 
     // eslint-disable-next-line playwright/expect-expect
     test("first entry correction differences resolved", async ({
-      page,
+      coordinatorOneGSB,
       typistOneGSB,
       dataEntryGSBFirstEntryCorrection,
     }) => {
       await testCorrection({
-        coordinator: page,
+        coordinator: coordinatorOneGSB.page,
         typist: typistOneGSB.page,
         dataEntry: dataEntryGSBFirstEntryCorrection,
         entry: 1,
@@ -154,12 +154,12 @@ test.describe("data entry - correct differences", () => {
 
     // eslint-disable-next-line playwright/expect-expect
     test("second entry correction differences resolved", async ({
-      page,
+      coordinatorOneGSB,
       typistTwoGSB,
       dataEntryGSBSecondEntryCorrection,
     }) => {
       await testCorrection({
-        coordinator: page,
+        coordinator: coordinatorOneGSB.page,
         typist: typistTwoGSB.page,
         dataEntry: dataEntryGSBSecondEntryCorrection,
         entry: 2,
@@ -170,12 +170,12 @@ test.describe("data entry - correct differences", () => {
 
     // eslint-disable-next-line playwright/expect-expect
     test("second entry correction differences remain", async ({
-      page,
+      coordinatorOneGSB,
       typistTwoGSB,
       dataEntryGSBSecondEntryCorrection,
     }) => {
       await testCorrection({
-        coordinator: page,
+        coordinator: coordinatorOneGSB.page,
         typist: typistTwoGSB.page,
         dataEntry: dataEntryGSBSecondEntryCorrection,
         entry: 2,
@@ -186,62 +186,64 @@ test.describe("data entry - correct differences", () => {
   });
 
   test("typist discards a second entry correction", async ({
-    page,
+    coordinatorOneGSB,
     typistTwoGSB,
     dataEntryGSBSecondEntryCorrection: dataEntry,
   }) => {
-    await page.goto(`/elections/${dataEntry.election_id}/status`);
+    const coordinator = coordinatorOneGSB.page;
+    await coordinator.goto(`/elections/${dataEntry.election_id}/status`);
 
-    const electionStatusPage = new ElectionStatus(page);
+    const electionStatusPage = new ElectionStatus(coordinator);
     await expect(electionStatusPage.inProgress).toContainText(
       [dataEntry.name, "2e invoer", "Aliyah van den Berg"].join(""),
     );
 
     // the typist correcting the second entry abandons the correction
-    const typistPage = typistTwoGSB.page;
-    await typistPage.goto(`/elections/${dataEntry.election_id}/data-entry/${dataEntry.id}/2`);
+    const typist = typistTwoGSB.page;
+    await typist.goto(`/elections/${dataEntry.election_id}/data-entry/${dataEntry.id}/2`);
 
-    const dataEntryPage = new DataEntryBasePage(typistPage);
+    const dataEntryPage = new DataEntryBasePage(typist);
     await dataEntryPage.abortInput.click();
 
-    const abortInputModal = new AbortInputModal(typistPage);
+    const abortInputModal = new AbortInputModal(typist);
     await expect(abortInputModal.heading).toBeVisible();
     await abortInputModal.discardInput.click();
 
-    const dataEntryHomePage = new DataEntryHomePage(typistPage);
+    const dataEntryHomePage = new DataEntryHomePage(typist);
     await expect(dataEntryHomePage.fieldset).toBeVisible();
 
     // the finalised first entry is kept, so a new second entry can be started
-    await page.goto(`/elections/${dataEntry.election_id}/status`);
+    await coordinator.goto(`/elections/${dataEntry.election_id}/status`);
     await expect(electionStatusPage.firstEntryFinished).toContainText(`${dataEntry.name}Sam Kuijpers`);
   });
 
   test("typist discards a first entry correction", async ({
-    page,
+    coordinatorOneGSB,
     typistOneGSB,
     dataEntryGSBFirstEntryCorrection: dataEntry,
   }) => {
-    await page.goto(`/elections/${dataEntry.election_id}/status`);
+    const coordinator = coordinatorOneGSB.page;
+    await coordinator.goto(`/elections/${dataEntry.election_id}/status`);
 
-    const electionStatusPage = new ElectionStatus(page);
+    const electionStatusPage = new ElectionStatus(coordinator);
     await expect(electionStatusPage.inProgress).toContainText([dataEntry.name, "1e invoer", "Sam Kuijpers"].join(""));
 
     // the typist correcting the first entry abandons the correction
-    const typistPage = typistOneGSB.page;
-    await typistPage.goto(`/elections/${dataEntry.election_id}/data-entry/${dataEntry.id}/1`);
+    const typist = typistOneGSB.page;
+    await typist.goto(`/elections/${dataEntry.election_id}/data-entry/${dataEntry.id}/1`);
 
-    const dataEntryPage = new DataEntryBasePage(typistPage);
+    const dataEntryPage = new DataEntryBasePage(typist);
     await dataEntryPage.abortInput.click();
 
-    const abortInputModal = new AbortInputModal(typistPage);
+    const abortInputModal = new AbortInputModal(typist);
     await expect(abortInputModal.heading).toBeVisible();
     await abortInputModal.discardInput.click();
 
-    const dataEntryHomePage = new DataEntryHomePage(typistPage);
+    const dataEntryHomePage = new DataEntryHomePage(typist);
     await expect(dataEntryHomePage.fieldset).toBeVisible();
 
     // the kept second entry has become the finalised first entry
-    await page.goto(`/elections/${dataEntry.election_id}/status`);
+    await coordinator.goto(`/elections/${dataEntry.election_id}/status`);
     await expect(electionStatusPage.firstEntryFinished).toContainText(`${dataEntry.name}Aliyah van den Berg`);
   });
 });

@@ -93,6 +93,11 @@ static VARIANTS: &[ModelVariant] = &[
         input: "model-na-14-2-bijlage-1-variations/model-na-14-2-bijlage-1-WS.json",
     },
     ModelVariant {
+        name: "model-na-31-1-inlegvel",
+        model: "model-na-31-1-inlegvel",
+        input: "model-na-31-1-inlegvel.json",
+    },
+    ModelVariant {
         name: "model-na-31-2-GR",
         model: "model-na-31-2",
         input: "model-na-31-2-variations/model-na-31-2-GR.json",

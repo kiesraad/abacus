@@ -11,11 +11,12 @@ read -p "Press Enter to continue..."
 typst compile --font-path fonts model-n-10-1.typ model-n-10-1-old.pdf
 typst compile --font-path fonts model-n-10-1-inlegvel.typ model-n-10-1-inlegvel-old.pdf
 typst compile --font-path fonts model-n-10-2.typ model-n-10-2-old.pdf
-typst compile --font-path fonts model-na-14-2-bijlage-1.typ model-na-14-2-bijlage-1-old.pdf
 typst compile --font-path fonts model-na-14-2.typ model-na-14-2-old.pdf
+typst compile --font-path fonts model-na-14-2-bijlage-1.typ model-na-14-2-bijlage-1-old.pdf
+typst compile --font-path fonts model-na-31-1-inlegvel.typ model-na-31-1-inlegvel-old.pdf
+typst compile --font-path fonts model-na-31-2.typ model-na-31-2-old.pdf
 typst compile --font-path fonts model-na-31-2-bijlage-1.typ model-na-31-2-bijlage-1-old.pdf
 typst compile --font-path fonts model-na-31-2-inlegvel.typ model-na-31-2-inlegvel-old.pdf
-typst compile --font-path fonts model-na-31-2.typ model-na-31-2-old.pdf
 typst compile --font-path fonts model-p-2a.typ model-p-2a-old.pdf
 typst compile --font-path fonts model-p-22-2.typ model-p-22-2-old.pdf
 typst compile --font-path fonts model-p-22-2-bijlage-1.typ model-p-22-2-bijlage-1-old.pdf
@@ -27,11 +28,12 @@ read -p "Press Enter to continue..."
 typst compile --font-path fonts model-n-10-1.typ model-n-10-1-new.pdf
 typst compile --font-path fonts model-n-10-1-inlegvel.typ model-n-10-1-inlegvel-new.pdf
 typst compile --font-path fonts model-n-10-2.typ model-n-10-2-new.pdf
-typst compile --font-path fonts model-na-14-2-bijlage-1.typ model-na-14-2-bijlage-1-new.pdf
 typst compile --font-path fonts model-na-14-2.typ model-na-14-2-new.pdf
+typst compile --font-path fonts model-na-14-2-bijlage-1.typ model-na-14-2-bijlage-1-new.pdf
+typst compile --font-path fonts model-na-31-1-inlegvel.typ model-na-31-1-inlegvel-new.pdf
+typst compile --font-path fonts model-na-31-2.typ model-na-31-2-new.pdf
 typst compile --font-path fonts model-na-31-2-bijlage-1.typ model-na-31-2-bijlage-1-new.pdf
 typst compile --font-path fonts model-na-31-2-inlegvel.typ model-na-31-2-inlegvel-new.pdf
-typst compile --font-path fonts model-na-31-2.typ model-na-31-2-new.pdf
 typst compile --font-path fonts model-p-2a.typ model-p-2a-new.pdf
 typst compile --font-path fonts model-p-22-2.typ model-p-22-2-new.pdf
 typst compile --font-path fonts model-p-22-2-bijlage-1.typ model-p-22-2-bijlage-1-new.pdf
@@ -39,11 +41,12 @@ typst compile --font-path fonts model-p-22-2-bijlage-1.typ model-p-22-2-bijlage-
 diff-pdf --view model-n-10-1-old.pdf model-n-10-1-new.pdf
 diff-pdf --view model-n-10-1-inlegvel-old.pdf model-n-10-1-inlegvel-new.pdf
 diff-pdf --view model-n-10-2-old.pdf model-n-10-2-new.pdf
-diff-pdf --view model-na-14-2-bijlage-1-old.pdf model-na-14-2-bijlage-1-new.pdf
 diff-pdf --view model-na-14-2-old.pdf model-na-14-2-new.pdf
+diff-pdf --view model-na-14-2-bijlage-1-old.pdf model-na-14-2-bijlage-1-new.pdf
+diff-pdf --view model-na-31-1-inlegvel-old.pdf model-na-31-1-inlegvel-new.pdf
+diff-pdf --view model-na-31-2-old.pdf model-na-31-2-new.pdf
 diff-pdf --view model-na-31-2-bijlage-1-old.pdf model-na-31-2-bijlage-1-new.pdf
 diff-pdf --view model-na-31-2-inlegvel-old.pdf model-na-31-2-inlegvel-new.pdf
-diff-pdf --view model-na-31-2-old.pdf model-na-31-2-new.pdf
 diff-pdf --view model-p-2a-old.pdf model-p-2a-new.pdf
 diff-pdf --view model-p-22-2-old.pdf model-p-22-2-new.pdf
 diff-pdf --view model-p-22-2-bijlage-1-old.pdf model-p-22-2-bijlage-1-new.pdf

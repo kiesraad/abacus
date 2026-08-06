@@ -70,41 +70,6 @@ Elk stembureau maakt bij een verkiezing een verslag: het proces-verbaal. Hierin 
 
 #pagebreak(weak: true)
 
-= Controles en correcties
-
-#emph_block[
-  Deze pagina is toegevoegd door de leden van het #location_type, *nadat er extra controles op de telresultaten van dit stembureau zijn uitgevoerd*. Voeg deze pagina toe na het voorblad van het oorspronkelijke proces-verbaal van het stembureau (N 10-1).
-]
-
-== Op eigen initiatief van het #location_type
-
-=== Waarom heeft het #location_type de telresultaten onderzocht?
-
-#checkbox[Vanwege een onverklaard verschil]
-#checkbox[Vanwege (het vermoeden van) een andere fout]
-
-=== Zijn er gecorrigeerde telresultaten?
-
-#checkbox[Nee, de oorspronkelijke telresultaten waren correct]
-#checkbox[Ja, er zijn gecorrigeerde telresultaten (de gecorrigeerde telresultaten zijn bij dit proces-verbaal gevoegd)]
-
-=== Opgesteld door het #location_type
-
-#textbox[Datum en tijd:]
-
-== Op verzoek van het centraal stembureau
-
-=== Zijn er gecorrigeerde telresultaten?
-
-#checkbox[Nee, de oorspronkelijke telresultaten waren correct]
-#checkbox[Ja, er zijn gecorrigeerde telresultaten (de gecorrigeerde telresultaten zijn bij dit proces-verbaal gevoegd)]
-
-=== Opgesteld door het #location_type
-
-#textbox[Datum en tijd:]
-
-#pagebreak(weak: true)
-
 #show: doc => document_numbering(doc)
 
 = Verslag van de zitting

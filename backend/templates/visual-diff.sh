@@ -9,6 +9,7 @@ echo "Please make sure you are on the main branch to generate the 'old' PDFs."
 read -p "Press Enter to continue..."
 
 typst compile --font-path fonts model-n-10-1.typ model-n-10-1-old.pdf
+typst compile --font-path fonts model-n-10-1-inlegvel.typ model-n-10-1-inlegvel-old.pdf
 typst compile --font-path fonts model-n-10-2.typ model-n-10-2-old.pdf
 typst compile --font-path fonts model-na-14-2-bijlage-1.typ model-na-14-2-bijlage-1-old.pdf
 typst compile --font-path fonts model-na-14-2.typ model-na-14-2-old.pdf
@@ -24,6 +25,7 @@ echo "Please make sure you are on the feature branch to generate the 'new' PDFs.
 read -p "Press Enter to continue..."
 
 typst compile --font-path fonts model-n-10-1.typ model-n-10-1-new.pdf
+typst compile --font-path fonts model-n-10-1-inlegvel.typ model-n-10-1-inlegvel-new.pdf
 typst compile --font-path fonts model-n-10-2.typ model-n-10-2-new.pdf
 typst compile --font-path fonts model-na-14-2-bijlage-1.typ model-na-14-2-bijlage-1-new.pdf
 typst compile --font-path fonts model-na-14-2.typ model-na-14-2-new.pdf
@@ -35,6 +37,7 @@ typst compile --font-path fonts model-p-22-2.typ model-p-22-2-new.pdf
 typst compile --font-path fonts model-p-22-2-bijlage-1.typ model-p-22-2-bijlage-1-new.pdf
 
 diff-pdf --view model-n-10-1-old.pdf model-n-10-1-new.pdf
+diff-pdf --view model-n-10-1-inlegvel-old.pdf model-n-10-1-inlegvel-new.pdf
 diff-pdf --view model-n-10-2-old.pdf model-n-10-2-new.pdf
 diff-pdf --view model-na-14-2-bijlage-1-old.pdf model-na-14-2-bijlage-1-new.pdf
 diff-pdf --view model-na-14-2-old.pdf model-na-14-2-new.pdf

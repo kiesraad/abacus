@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { type APIRequestContext, test as base, expect, type Page } from "@playwright/test";
 import { DataEntryApiClient } from "e2e-tests/helpers-utils/api-clients";
-import { completeDataEntries } from "e2e-tests/helpers-utils/e2e-test-api-helpers";
+import { completeDataEntries, resolveDifferences } from "e2e-tests/helpers-utils/e2e-test-api-helpers";
 import { createRandomUsername } from "e2e-tests/helpers-utils/e2e-test-utils";
 import {
   type Eml230b,
@@ -82,6 +82,10 @@ type Fixtures = {
   dataEntryGSBFirstEntryClaimed: DataEntry;
   // First data entry of the GSB election with first data entry done
   dataEntryGSBFirstEntryDone: DataEntry;
+  // First data entry correction of the GSB election after resolve differences
+  dataEntryGSBFirstEntryCorrection: DataEntry;
+  // Second data entry correction of the GSB election after resolve differences
+  dataEntryGSBSecondEntryCorrection: DataEntry;
   // First data entry of the GSB election with first data entry with errors
   dataEntryGSBFirstEntryHasErrors: DataEntry;
   // First data entry of the GSB election with first and second data entries done
@@ -320,6 +324,14 @@ export const test = base.extend<Fixtures>({
     await firstDataEntry.finalise();
 
     await use(dataEntryGSB);
+  },
+  dataEntryGSBFirstEntryCorrection: async ({ coordinatorOneGSB, dataEntryGSBEntriesDifferent }, use) => {
+    await resolveDifferences(coordinatorOneGSB, dataEntryGSBEntriesDifferent.id, "keep_second_and_correct_first");
+    await use(dataEntryGSBEntriesDifferent);
+  },
+  dataEntryGSBSecondEntryCorrection: async ({ coordinatorOneGSB, dataEntryGSBEntriesDifferent }, use) => {
+    await resolveDifferences(coordinatorOneGSB, dataEntryGSBEntriesDifferent.id, "keep_first_and_correct_second");
+    await use(dataEntryGSBEntriesDifferent);
   },
   dataEntryGSBFirstEntryHasErrors: async ({ dataEntryGSB, typistOneGSB }, use) => {
     const { request } = typistOneGSB;

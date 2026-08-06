@@ -102,16 +102,24 @@ test.describe("data entry - correct differences", () => {
       await expect(checkAndSavePage.fieldset).toBeVisible();
       await checkAndSavePage.save.click();
 
-      // Assert message (typist) and status (coordinator)
+      // Assert notification message
       const dataEntryHomePage = new DataEntryHomePage(typist);
+      if (expectResolved) {
+        await expect(dataEntryHomePage.alertDataEntrySaved).toContainText(
+          entry === 1 ? "Eerste invoer is opgeslagen" : "Tweede invoer is opgeslagen",
+        );
+      } else {
+        await expect(dataEntryHomePage.alertDataEntryDifferent).toContainText(
+          entry === 1 ? "Let op: verschil met tweede invoer" : "Let op: verschil met eerste invoer",
+        );
+      }
+
+      // Assert status
       await coordinator.goto(`/elections/${dataEntry.election_id}/status`);
       const electionStatusPage = new ElectionStatus(coordinator);
-
       if (expectResolved) {
-        await expect(dataEntryHomePage.alertDataEntrySaved).toBeVisible();
         await expect(electionStatusPage.definitive).toContainText(dataEntry.name);
       } else {
-        await expect(dataEntryHomePage.alertDataEntryDifferent).toBeVisible();
         await expect(electionStatusPage.errorsAndWarnings).toContainText(dataEntry.name);
       }
     }

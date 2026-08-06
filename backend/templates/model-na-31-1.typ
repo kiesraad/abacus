@@ -104,7 +104,7 @@ De volgende rollen zijn mogelijk: voorzitter, plaatsvervangend voorzitter of lid
         ],
         align(center, checkbox(checked: input.summary.polling_station_investigations.unaccounted_difference.contains(polling_station.number))[]),
         align(center, checkbox(checked: input.summary.polling_station_investigations.other_error.contains(polling_station.number))[]),
-        align(center, checkbox(checked: input.summary.polling_station_investigations.result_corrected.contains(polling_station.number))[]),
+        align(center, checkbox(checked: input.summary.polling_station_investigations.corrected_results.contains(polling_station.number))[]),
       )
     })
     .flatten(),

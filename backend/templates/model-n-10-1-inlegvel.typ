@@ -13,7 +13,7 @@
   ],
   header-right: location_name,
   footer: [
-    Proces-verbaal van een #location_type\
+    Proces-verbaal van een stembureau\
     Model N 10-1 decentrale stemopneming (versie 2027)
   ]
 )

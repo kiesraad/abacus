@@ -134,7 +134,7 @@ Denk aan stembureauleden die te laat waren, niet werkende techniek of stembussen
 
 #empty_table(
   columns: (8em, 10em, 1fr),
-  headers: ("Datum", "Tijd (van - tot)", "Locatie (als anders dan stembureau)"),
+  headers: ("Datum", "Tijd van - tot", "Locatie (als anders dan stembureau)"),
   values: ("", "", ""),
   rows: 1,
 )
@@ -174,7 +174,7 @@ Bijvoorbeeld als er meerdere verkiezingen tegelijk werden georganiseerd, en een 
     empty_letterbox("A")[Stempassen],
     empty_letterbox("B")[Volmachtbewijzen (schriftelijk of via ingevulde achterkant stempas)],
     no_entry_letterbox("C")[Kiezerspassen (niet van toepassing bij gemeente- en eilandraadsverkiezingen)],
-    empty_letterbox("D", light: false)[Totaal toegelaten kiezers (A+B)],
+    empty_letterbox("D", light: false)[*Totaal toegelaten kiezers (A+B)*],
   )
 ][
   Tel het aantal geldige stempassen, volmachtbewijzen en kiezerspassen
@@ -183,7 +183,7 @@ Bijvoorbeeld als er meerdere verkiezingen tegelijk werden georganiseerd, en een 
     empty_letterbox("A")[Stempassen],
     empty_letterbox("B")[Volmachtbewijzen (schriftelijk of via ingevulde achterkant stempas of kiezerspas)],
     empty_letterbox("C")[Kiezerspassen],
-    empty_letterbox("D", light: false)[Totaal toegelaten kiezers (A+B+C)],
+    empty_letterbox("D", light: false)[*Totaal toegelaten kiezers (A+B+C)*],
   )
 ]
 
@@ -269,18 +269,22 @@ Bijvoorbeeld als er meerdere verkiezingen tegelijk werden georganiseerd, en een 
 
 #textbox_only_bottom_stroke[Datum en tijd:][Plaats:]
 
-== Voorzitter en #is_local_election[twee][vier] leden van het stembureau
+== Voorzitter en twee leden van het stembureau
 
 #signing_form_label[Voorzitter van het stembureau:]
 
 #textbox[Naam:][Handtekening:]
 
-#signing_form_label[#is_local_election[2][4] leden van het stembureau:]
+#signing_form_label[2 leden van het stembureau:]
 
-#stack(spacing: 0.5em, ..range(0, is_local_election(2, 4)).map(_ => textbox[Naam:][Handtekening:]))
+#stack(spacing: 0.5em, ..range(0, 2).map(_ => textbox[Naam:][Handtekening:]))
 
 == Ondertekening door andere aanwezige leden van het stembureau
 
 #signing_form_label[Extra ondertekening:]
 
-#stack(spacing: 0.5em, ..range(0, is_local_election(4, 1)).map(_ => textbox[Naam:][Handtekening:]))
+#stack(spacing: 0.5em, ..range(0, 4).map(_ => textbox[Naam:][Handtekening:]))
+
+#pagebreak(weak: true)
+
+#stack(spacing: 0.5em, ..range(0, 12).map(_ => textbox[Naam:][Handtekening:]))

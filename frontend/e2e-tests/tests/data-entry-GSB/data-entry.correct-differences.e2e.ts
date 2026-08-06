@@ -138,12 +138,12 @@ test.describe("data entry - correct differences", () => {
 
     // eslint-disable-next-line playwright/expect-expect
     test("first entry correction differences remain", async ({
-      page,
+      coordinatorOneGSB,
       typistOneGSB,
       dataEntryGSBFirstEntryCorrection,
     }) => {
       await testCorrection({
-        coordinator: page,
+        coordinator: coordinatorOneGSB.page,
         typist: typistOneGSB.page,
         dataEntry: dataEntryGSBFirstEntryCorrection,
         entry: 1,

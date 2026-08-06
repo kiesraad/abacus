@@ -264,6 +264,8 @@ Voer de controle uit volgens de stappen in het controleprotocol.
 
 == Stemmen per lijst en per kandidaat
 
+#pagebreak(weak: true)
+
 #for political_group in input.votes_tables {
   votes_table(
     title: [#political_group.number #political_group.name],

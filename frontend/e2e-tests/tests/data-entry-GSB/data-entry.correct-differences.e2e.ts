@@ -10,10 +10,6 @@ import { dataEntryRequest, dataEntryWithDifferencesRequest } from "e2e-tests/tes
 import type { Results } from "@/types/generated/openapi";
 import { type DataEntry, test } from "../../fixtures";
 
-test.use({
-  storageState: "e2e-tests/state/coordinator1-GSB.json",
-});
-
 test.describe("data entry - correct differences", () => {
   test("show warnings and empty fields for first entry correction", async ({
     typistOneGSB,

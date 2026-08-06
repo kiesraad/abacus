@@ -111,7 +111,7 @@ jobs:
       - name: Install Nextest
         run: cargo binstall cargo-nextest
       - name: Symlink sqlx test directory to /dev/shm
-        run: mkdir -p /dev/shm/sqlx && ln -s /dev/shm/sqlx target/sqlx
+        run: mkdir -p target /dev/shm/sqlx && rm -rf target/sqlx && ln -s /dev/shm/sqlx target/sqlx
       - name: Run tests
         run: cargo nextest run --verbose --locked --workspace --no-default-features --features openapi,dev-database,embed-typst,tls
       - name: Build documentation

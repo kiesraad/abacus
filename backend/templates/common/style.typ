@@ -114,7 +114,8 @@
 
 // Document header numbering
 #let document_numbering(doc) = [
-  #set heading(numbering: "1.1", hanging-indent: 0pt, supplement: "")
+  // Note: `supplement: none` removes the default "Hoofdstuk" prefix (`supplement: ""` will render an empty space)
+  #set heading(numbering: "1.1", hanging-indent: 0pt, supplement: none)
   #show heading.where(level: 1): set heading(numbering: "Deel 1.1 -", supplement: "Deel")
   #show heading.where(level: 3): it => [
     #block(
@@ -131,7 +132,8 @@
 
 // Attachment header numbering
 #let attachment_numbering(doc, prefix) = [
-  #set heading(numbering: "1.1", hanging-indent: 0pt, supplement: "")
+  // Note: `supplement: none` removes the default "Hoofdstuk" prefix (`supplement: ""` will render an empty space)
+  #set heading(numbering: "1.1", hanging-indent: 0pt, supplement: none)
 
   #show heading: it => {
     if it.level >= 4 {

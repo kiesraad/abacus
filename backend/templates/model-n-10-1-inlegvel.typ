@@ -6,12 +6,14 @@
 #let location_name = is_municipality[Gemeente #input.election.domain_id #input.election.location][Openbaar lichaam #input.election.domain_id #input.election.location]
 #let location_type = is_municipality[gemeentelijk stembureau][stembureau voor het openbaar lichaam]
 
+#let header-right = [Stembureau #input.polling_station.number]
+
 #show: doc => conf(
   doc,
   header-left: [
     Controles en correcties
   ],
-  header-right: location_name,
+  header-right: header-right,
   footer: [
     Proces-verbaal van een stembureau\
     Model N 10-1 decentrale stemopneming (versie 2027)

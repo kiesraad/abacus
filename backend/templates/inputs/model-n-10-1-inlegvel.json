@@ -3,7 +3,7 @@
     "id": 2,
     "name": "Gemeenteraad Juinen 2035",
     "committee_category": "GSB",
-    "counting_method": "CSO",
+    "counting_method": "DSO",
     "election_id": "GR2035_Juinen",
     "location": "Juinen",
     "domain_id": "0035",
@@ -13,5 +13,15 @@
     "number_of_voters": 820,
     "election_date": "2035-01-08",
     "nomination_date": "2034-12-15"
+  },
+  "polling_station": {
+    "id": 87,
+    "name": "Hotel Van Den Stem",
+    "number": 1,
+    "number_of_voters": 820,
+    "polling_station_type": "FixedLocation",
+    "address": "Nieuwstraat 82",
+    "postal_code": "6215PG",
+    "locality": "Eemstricht"
   }
 }

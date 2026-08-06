@@ -24,6 +24,7 @@ impl ToPdfFileModel for ModelN10_1Input {
 #[serde(deny_unknown_fields)]
 pub struct ModelN10_1InlegvelInput {
     pub election: Election,
+    pub polling_station: PollingStation,
 }
 
 impl ToPdfFileModel for ModelN10_1InlegvelInput {

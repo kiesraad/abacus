@@ -560,9 +560,11 @@ async fn test_n_10_1_inlegvel() {
             string_length,
             none_where_possible,
         );
+        let polling_station = random_polling_station(&mut rng, string_length, none_where_possible);
 
         let model = PdfModel::ModelN10_1Inlegvel(Box::new(ModelN10_1InlegvelInput {
             election: election.into(),
+            polling_station,
         }));
 
         test_pdf(model).await;

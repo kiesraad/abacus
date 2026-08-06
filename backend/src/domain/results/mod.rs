@@ -490,6 +490,7 @@ pub mod tests {
         },
         valid_default::ValidDefault,
     };
+    use core::assert_matches;
 
     pub fn example_results() -> Results {
         Results::CSOFirstSession(CSOFirstSessionResults {
@@ -607,7 +608,7 @@ pub mod tests {
             Some(&previous_results),
         );
 
-        assert!(matches!(results, Results::CSONextSession(_)));
+        assert_matches!(results, Results::CSONextSession(_));
         assert_eq!(results.voters_counts().voter_card_count, Some(5));
     }
 
@@ -617,7 +618,7 @@ pub mod tests {
         let election = election_fixture(ElectionCategory::Municipal, CommitteeCategory::GSB, &[2]);
         let results = Results::new(&election, &first_session, None);
 
-        assert!(matches!(results, Results::CSOFirstSession(_)));
+        assert_matches!(results, Results::CSOFirstSession(_));
     }
 
     #[test]
@@ -628,7 +629,7 @@ pub mod tests {
         election.counting_method = Some(VoteCountingMethod::DSO);
         let results = Results::new(&election, &first_session, None);
 
-        assert!(matches!(results, Results::DSOFirstSession(_)));
+        assert_matches!(results, Results::DSOFirstSession(_));
     }
 
     #[test]
@@ -648,7 +649,7 @@ pub mod tests {
         let previous_results = CSOFirstSessionResults::empty(&election).as_common();
         let results = Results::new(&election, &next_session, Some(&previous_results));
 
-        assert!(matches!(results, Results::CSONextSession(_)));
+        assert_matches!(results, Results::CSONextSession(_));
     }
 
     #[test]
@@ -660,7 +661,7 @@ pub mod tests {
         let previous_results = DSOFirstSessionResults::empty(&election).as_common();
         let results = Results::new(&election, &next_session, Some(&previous_results));
 
-        assert!(matches!(results, Results::DSONextSession(_)));
+        assert_matches!(results, Results::DSONextSession(_));
     }
 
     #[test]
@@ -680,7 +681,7 @@ pub mod tests {
         let election = election_fixture(ElectionCategory::Municipal, CommitteeCategory::GSB, &[2]);
         let results = Results::new(&election, &next_session, None);
 
-        assert!(matches!(results, Results::CSONextSession(_)));
+        assert_matches!(results, Results::CSONextSession(_));
     }
 
     #[test]
@@ -691,7 +692,7 @@ pub mod tests {
         election.counting_method = Some(VoteCountingMethod::DSO);
         let results = Results::new(&election, &next_session, None);
 
-        assert!(matches!(results, Results::DSONextSession(_)));
+        assert_matches!(results, Results::DSONextSession(_));
     }
 
     #[test]
@@ -712,6 +713,6 @@ pub mod tests {
 
         let results = Results::new(&election, &first_session, None);
 
-        assert!(matches!(results, Results::GSB(_)));
+        assert_matches!(results, Results::GSB(_));
     }
 }

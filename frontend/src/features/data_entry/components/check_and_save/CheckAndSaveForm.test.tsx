@@ -107,10 +107,10 @@ describe("Test CheckAndSaveForm", () => {
     // check message and navigation for next data entry page
     expect(pushMessage).toHaveBeenCalledWith({
       type: "notify",
-      title: "Let op: verschil met eerste invoer",
+      title: "Let op: verschil met tweede invoer",
       text:
         "Je invoer is opgeslagen. Geef het papieren proces-verbaal terug aan de coördinator,\n" +
-        "en geef aan dat er een verschil is met de eerste invoer.",
+        "en geef aan dat er een verschil is met de tweede invoer.",
     });
     expect(router.state.location.pathname).toEqual("/elections/1/data-entry");
     expect(router.state.location.hash).toEqual("#next");

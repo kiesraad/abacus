@@ -455,7 +455,11 @@ pub(crate) mod tests {
             id: ElectionId::from(1),
             name: "Test".to_string(),
             committee_category,
-            counting_method: Some(VoteCountingMethod::CSO),
+            counting_method: if committee_category == CommitteeCategory::GSB {
+                Some(VoteCountingMethod::CSO)
+            } else {
+                None
+            },
             election_id: "GR2023_Test".to_string(),
             location: "Test".to_string(),
             domain_id: "0000".to_string(),

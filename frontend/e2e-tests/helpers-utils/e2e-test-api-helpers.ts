@@ -1,6 +1,12 @@
 import { type APIRequestContext, expect } from "@playwright/test";
 import { dataEntryRequest } from "e2e-tests/test-data/request-response-templates";
 import type { TestUser } from "e2e-tests/test-data/users";
+import type {
+  DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_BODY,
+  DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_PATH,
+  DataEntryId,
+  ResolveDifferencesAction,
+} from "@/types/generated/openapi";
 import { DataEntryApiClient } from "./api-clients";
 
 export function getTestPassword(username: string, prefix = ""): string {
@@ -62,4 +68,16 @@ export async function firstLogin(userContext: APIRequestContext, user: TestUser)
     },
   });
   expect(response.status(), `response status not 200: ${await response.json()}`).toBe(200);
+}
+
+export async function resolveDifferences(
+  coordinator: { request: APIRequestContext },
+  dataEntryId: DataEntryId,
+  action: ResolveDifferencesAction,
+): Promise<number> {
+  const url: DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_PATH = `/api/data_entries/${dataEntryId}/resolve_differences`;
+  const data: DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_BODY = action;
+  const response = await coordinator.request.post(url, { data, headers: { "content-type": "application/json" } });
+  expect(response.ok(), `Unexpected response: ${response.statusText()}`).toBeTruthy();
+  return response.status();
 }

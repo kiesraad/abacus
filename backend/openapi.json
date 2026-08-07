@@ -3084,6 +3084,188 @@
         ]
       }
     },
+    "/api/elections/{election_id}/download_n_10_1": {
+      "get": {
+        "summary": "administrator, coordinator_gsb",
+        "operationId": "election_download_n_10_1",
+        "parameters": [
+          {
+            "name": "election_id",
+            "in": "path",
+            "description": "Election database id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ElectionId"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ZIP",
+            "headers": {
+              "Content-Disposition": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "attachment; filename=\"filename.zip\""
+              }
+            },
+            "content": {
+              "application/zip": {}
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Request cannot be completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "administrator",
+              "coordinator_gsb"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/elections/{election_id}/download_n_10_1_inlegvel": {
+      "get": {
+        "summary": "administrator, coordinator_gsb",
+        "operationId": "election_download_n_10_1_inlegvel",
+        "parameters": [
+          {
+            "name": "election_id",
+            "in": "path",
+            "description": "Election database id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ElectionId"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ZIP",
+            "headers": {
+              "Content-Disposition": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "attachment; filename=\"filename.zip\""
+              }
+            },
+            "content": {
+              "application/zip": {}
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Request cannot be completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "administrator",
+              "coordinator_gsb"
+            ]
+          }
+        ]
+      }
+    },
     "/api/elections/{election_id}/download_n_10_2": {
       "get": {
         "summary": "administrator, coordinator_gsb",
@@ -3112,6 +3294,188 @@
             },
             "content": {
               "application/zip": {}
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Request cannot be completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "administrator",
+              "coordinator_gsb"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/elections/{election_id}/download_na_14_1_versie1": {
+      "get": {
+        "summary": "administrator, coordinator_gsb",
+        "operationId": "election_download_na_14_1_versie1",
+        "parameters": [
+          {
+            "name": "election_id",
+            "in": "path",
+            "description": "Election database id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ElectionId"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ZIP",
+            "headers": {
+              "Content-Disposition": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "attachment; filename=\"filename.zip\""
+              }
+            },
+            "content": {
+              "application/zip": {}
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Request cannot be completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "administrator",
+              "coordinator_gsb"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/elections/{election_id}/download_na_31_1_inlegvel": {
+      "get": {
+        "summary": "administrator, coordinator_gsb",
+        "operationId": "election_download_na_31_1_inlegvel",
+        "parameters": [
+          {
+            "name": "election_id",
+            "in": "path",
+            "description": "Election database id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ElectionId"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "PDF",
+            "headers": {
+              "Content-Disposition": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "attachment; filename=\"filename.pdf\""
+              }
+            },
+            "content": {
+              "application/pdf": {}
             }
           },
           "401": {

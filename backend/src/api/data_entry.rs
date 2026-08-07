@@ -301,8 +301,10 @@ async fn get_previous_results(
             // Match polling station results only and get the common results
             DataEntryStatus::Definitive(d) => match d.results {
                 Results::CSOFirstSession(r) => Some(r.as_common()),
+                Results::DSOFirstSession(r) => Some(r.as_common()),
                 Results::CSONextSession(r) => Some(r.as_common()),
-                _ => None,
+                Results::DSONextSession(r) => Some(r.as_common()),
+                Results::GSB(_) => None,
             },
             _ => None,
         },
@@ -1381,6 +1383,24 @@ mod tests {
         assert_eq!(status, DataEntryStatusName::FirstEntryInProgress);
     }
 
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_11_dso"))))]
+    async fn test_claim_data_entry_dso_ok(pool: SqlitePool) {
+        let data_entry_id = DataEntryId::from(1101);
+        let response = claim(pool.clone(), data_entry_id, EntryNumber::FirstEntry).await;
+        assert_eq!(response.status(), StatusCode::OK);
+
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let ClaimDataEntryResponse {
+            data,
+            source,
+            status,
+            ..
+        } = serde_json::from_slice(&body).unwrap();
+        assert!(matches!(data, Results::DSOFirstSession(_)));
+        assert!(matches!(source, DataEntrySource::PollingStation(_)));
+        assert_eq!(status, DataEntryStatusName::FirstEntryInProgress);
+    }
+
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_9_csb"))))]
     async fn test_claim_data_entry_gsb_ok(pool: SqlitePool) {
         let data_entry_id = DataEntryId::from(901);
@@ -1459,7 +1479,7 @@ mod tests {
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
-    async fn test_claim_data_entry_next_session_ok(pool: SqlitePool) {
+    async fn test_claim_data_entry_cso_next_session_ok(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
         let polling_station_id = PollingStationId::from(742);
         // Insert investigation with corrected_results and create empty data entry
@@ -1484,8 +1504,49 @@ mod tests {
         let response = claim(pool.clone(), data_entry_id, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
 
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let ClaimDataEntryResponse {
+            data,
+            source,
+            status,
+            ..
+        } = serde_json::from_slice(&body).unwrap();
+        assert!(matches!(data, Results::CSONextSession(_)));
+        assert!(matches!(source, DataEntrySource::PollingStation(_)));
+        assert_eq!(status, DataEntryStatusName::FirstEntryInProgress);
+
         // Check that row exists
         assert!(ps_has_data_entry(&mut conn, polling_station_id).await);
+    }
+
+    #[test(sqlx::test(fixtures(
+        path = "../../fixtures",
+        scripts("election_12_dso_with_results")
+    )))]
+    async fn test_claim_data_entry_dso_next_session_ok(pool: SqlitePool) {
+        let mut conn = pool.acquire().await.unwrap();
+
+        let response = claim(
+            pool.clone(),
+            DataEntryId::from(1202),
+            EntryNumber::FirstEntry,
+        )
+        .await;
+        assert_eq!(response.status(), StatusCode::OK);
+
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let ClaimDataEntryResponse {
+            data,
+            source,
+            status,
+            ..
+        } = serde_json::from_slice(&body).unwrap();
+        assert!(matches!(data, Results::DSONextSession(_)));
+        assert!(matches!(source, DataEntrySource::PollingStation(_)));
+        assert_eq!(status, DataEntryStatusName::FirstEntryInProgress);
+
+        // Check that row exists
+        assert!(ps_has_data_entry(&mut conn, PollingStationId::from(12211)).await);
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]

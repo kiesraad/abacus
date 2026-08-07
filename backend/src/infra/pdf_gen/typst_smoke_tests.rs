@@ -23,7 +23,8 @@ use crate::{
         },
         investigation::PollingStationInvestigation,
         models::{
-            ModelN10_2Input, ModelNa14_2Bijlage1Input, ModelNa14_2Input, ModelNa31_2Bijlage1Input,
+            ModelN10_1InlegvelInput, ModelN10_1Input, ModelN10_2Input, ModelNa14_2Bijlage1Input,
+            ModelNa14_2Input, ModelNa31_1InlegvelInput, ModelNa31_2Bijlage1Input,
             ModelNa31_2InlegvelInput, ModelNa31_2Input, ModelP2aInput, ModelP22_2Bijlage1Input,
             ModelP22_2Input, PdfFileModel, PdfModel,
             apportionment_footnotes::ApportionmentFootnotes,
@@ -524,6 +525,53 @@ async fn test_pdf(model: PdfModel) {
 }
 
 #[test(tokio::test)]
+async fn test_n_10_1() {
+    let mut rng = rand::rng();
+
+    for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
+        let election = random_election(
+            &mut rng,
+            parties,
+            candidates,
+            string_length,
+            none_where_possible,
+        );
+        let polling_station = random_polling_station(&mut rng, string_length, none_where_possible);
+
+        let model = PdfModel::ModelN10_1(Box::new(ModelN10_1Input {
+            candidates_tables: CandidatesTables::new(&election).unwrap(),
+            election: election.into(),
+            polling_station,
+        }));
+
+        test_pdf(model).await;
+    }
+}
+
+#[test(tokio::test)]
+async fn test_n_10_1_inlegvel() {
+    let mut rng = rand::rng();
+
+    for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
+        let election = random_election(
+            &mut rng,
+            parties,
+            candidates,
+            string_length,
+            none_where_possible,
+        );
+        let polling_station = random_polling_station(&mut rng, string_length, none_where_possible);
+
+        let model = PdfModel::ModelN10_1Inlegvel(Box::new(ModelN10_1InlegvelInput {
+            election: election.into(),
+            polling_station,
+        }));
+
+        test_pdf(model).await;
+    }
+}
+
+#[test(tokio::test)]
 async fn test_n_10_2() {
     let mut rng = rand::rng();
 
@@ -616,6 +664,27 @@ async fn test_na_14_2_bijlage_1() {
             election: election.into(),
             polling_station,
             investigation,
+        }));
+
+        test_pdf(model).await;
+    }
+}
+
+#[test(tokio::test)]
+async fn test_na_31_1_inlegvel() {
+    let mut rng = rand::rng();
+
+    for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
+        let election = random_election(
+            &mut rng,
+            parties,
+            candidates,
+            string_length,
+            none_where_possible,
+        );
+
+        let model = PdfModel::ModelNa31_1Inlegvel(Box::new(ModelNa31_1InlegvelInput {
+            election: election.into(),
         }));
 
         test_pdf(model).await;

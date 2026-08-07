@@ -33,9 +33,12 @@ pub(super) fn load_sources() -> &'static [SourceFile] {
     &[
         include_source!("common/scripts.typ"),
         include_source!("common/style.typ"),
+        include_source!("model-n-10-1.typ"),
+        include_source!("model-n-10-1-inlegvel.typ"),
         include_source!("model-n-10-2.typ"),
         include_source!("model-na-14-2.typ"),
         include_source!("model-na-14-2-bijlage-1.typ"),
+        include_source!("model-na-31-1-inlegvel.typ"),
         include_source!("model-na-31-2.typ"),
         include_source!("model-na-31-2-bijlage-1.typ"),
         include_source!("model-na-31-2-inlegvel.typ"),

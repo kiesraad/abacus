@@ -37,6 +37,7 @@ pub(super) fn load_sources() -> &'static [SourceFile] {
         include_source!("model-n-10-1-inlegvel.typ"),
         include_source!("model-n-10-2.typ"),
         include_source!("model-na-14-1-versie-1.typ"),
+        include_source!("model-na-14-1-versie-2.typ"),
         include_source!("model-na-14-2.typ"),
         include_source!("model-na-14-2-bijlage-1.typ"),
         include_source!("model-na-31-1-inlegvel.typ"),

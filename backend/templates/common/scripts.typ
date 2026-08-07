@@ -436,6 +436,12 @@
   v(space)
 }
 
+// Title layout for an attachment or corrigendum
+#let attachment_or_corrigendum_title(title) = {
+  text(size: 20pt, title)
+  line(length: 100%)
+}
+
 // Format the name of a candidate
 #let candidate_name(election_candidate, with_first_name: true, with_gender: true) = {
   let name = ""

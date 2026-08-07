@@ -62,14 +62,7 @@ Het #location_type heeft de telresultaten van dit stembureau onderzocht en is to
   )
 )
 
-#grid(
-  columns: 1fr,
-  gutter: 1.33em,
-  v(1em),
-  text(size: 20pt, [Stembureau #input.polling_station.number #input.polling_station.name]),
-  v(1em),
-  grid.hline(position: top)
-)
+#attachment_or_corrigendum_title([Stembureau #input.polling_station.number\ #input.polling_station.name])
 
 = Onderzoek naar telresultaten
 

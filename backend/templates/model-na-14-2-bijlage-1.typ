@@ -24,18 +24,14 @@
 
 = Bijlage 1
 
-== Verslagen van tellingen van stembureaus die zijn herteld door het #location_type
-
-#line(length: 100%)
+#attachment_or_corrigendum_title([Verslagen van tellingen van stembureaus die zijn herteld door het #location_type])
 
 _Let op! Alleen voor #is_municipality[gemeenten][openbare lichamen] waar een centrale stemopneming heeft
 plaatsgevonden. De bijlagen worden separaat gepubliceerd bij het betreffende stembureau._
 
 #pagebreak(weak: true)
 
-= Stembureau #input.polling_station.number \ #input.polling_station.name
-
-#line(length: 100%)
+#attachment_or_corrigendum_title([Stembureau #input.polling_station.number\ #input.polling_station.name])
 
 == Over deze bijlage
 
@@ -158,7 +154,7 @@ bij beiden het gecorrigeerde getal in. Vink alléén het selectievakje aan dat v
 
 === Vergelijk D (totaal toegelaten kiezers) en H (totaal uitgebrachte stemmen)
 
-#checkbox[D en H zijn *gelijk* #sym.arrow.r Ga door naar B1 - #ref(<per_list_and_candidate>)]
+#checkbox[D en H zijn *gelijk* #sym.arrow.r *Ga door naar B1 - #ref(<per_list_and_candidate>)*]
 
 #checkbox[H is *groter* dan D (meer uitgebrachte stemmen dan toegelaten kiezers)]
 #box(width: 500pt, inset: (left: 3em, bottom: 1em))[

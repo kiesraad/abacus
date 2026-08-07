@@ -950,7 +950,7 @@ export interface Election {
 
 export interface ElectionApportionmentResponse {
   candidate_nomination: CandidateNomination;
-  election_summary: ElectionSummary;
+  election_summary: ElectionSummaryApportionment;
   seat_assignment: SeatAssignment;
   warnings: ApportionmentWarning[];
 }
@@ -1041,17 +1041,15 @@ export const electionSubCategoryValues = ["AB1", "AB2", "GR1", "GR2", "PS1", "PS
 export type ElectionSubCategory = (typeof electionSubCategoryValues)[number];
 
 /**
- * Contains a summary of the election results, added up from the votes of all polling stations.
+ * A version of ElectionSummary without the investigations
  */
-export interface ElectionSummary {
+export interface ElectionSummaryApportionment {
   /** The differences between voters and votes */
   differences_counts: SummaryDifferencesCounts;
   /** The number of voters (i.e. "Kiesgerechtigden") */
-  number_of_voters?: number;
+  number_of_voters: number;
   /** The summary votes for each political group (and each candidate within) */
   political_group_votes: PoliticalGroupCandidateVotes[];
-  /** Polling stations where results were investigated by the GSB */
-  polling_station_investigations: PollingStationInvestigations;
   /** The total number of voters */
   voters_counts: VotersCounts;
   /** The total number of votes */
@@ -1505,22 +1503,6 @@ export interface PollingStationInvestigationUpdateRequest {
 }
 
 /**
- * Polling stations where results were investigated by the GSB,
- * as vectors of polling station numbers
- */
-export interface PollingStationInvestigations {
-  /** Admitted voters were recounted
-("Toegelaten kiezers opnieuw vastgesteld?") */
-  admitted_voters_recounted: number[];
-  /** Ballots were (partially) recounted
-("Stembiljetten (deels) herteld?") */
-  ballots_recounted: number[];
-  /** Investigated for other reasons than unexplained difference
-("Onderzocht vanwege andere reden dan onverklaard verschil?") */
-  investigated_other_reason: number[];
-}
-
-/**
  * Polling station list response
  */
 export interface PollingStationListResponse {
@@ -1572,7 +1554,7 @@ export interface PreferenceThreshold {
 
 export type ProcessApportionmentResponse =
   | (ElectionApportionmentResponse & { status: "Finalised" })
-  | { election_summary: ElectionSummary; seat_assignment: SeatAssignment; status: "DrawingLotsRequired" };
+  | { election_summary: ElectionSummaryApportionment; seat_assignment: SeatAssignment; status: "DrawingLotsRequired" };
 
 export type RandomRange = string;
 

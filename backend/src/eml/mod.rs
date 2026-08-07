@@ -44,7 +44,7 @@ use crate::domain::{
         ElectionWithPoliticalGroups, NewElection, PGNumber, RegisteredPoliticalGroup,
     },
     results::political_group_candidate_votes::PoliticalGroupCandidateVotes,
-    summary::ElectionSummary,
+    summary::{ElectionSummaryApportionment, ElectionSummaryCSO, ElectionSummaryDSO},
 };
 
 fn max_votes(max_votes: &StringValue<NonZeroU64>) -> u32 {
@@ -556,7 +556,7 @@ impl ElectionWithPoliticalGroups {
             .build()
     }
 
-    pub fn as_count_eml(
+    pub fn as_cso_count_eml(
         &self,
         transaction_id: Option<u64>,
         committee_session: &CommitteeSession,
@@ -564,7 +564,7 @@ impl ElectionWithPoliticalGroups {
             crate::domain::data_entry::DataEntrySource,
             crate::domain::results::Results,
         )],
-        summary: &ElectionSummary,
+        summary: &ElectionSummaryCSO,
         timestamp: DateTime<Local>,
     ) -> Result<ElectionCount, EMLError> {
         ElectionCount::builder()
@@ -578,26 +578,72 @@ impl ElectionWithPoliticalGroups {
                 self.get_eml_election_identifier_builder()?
                     .build_for_count()?,
             )
-            .count_type(match self.committee_category {
-                CommitteeCategory::GSB => CountType::Municipal,
-                CommitteeCategory::CSB => CountType::Central,
-            })
-            .contests([self.as_eml_count_contest(committee_session, results, summary)?])
+            .count_type(CountType::Municipal)
+            .contests([self.as_cso_eml_count_contest(committee_session, results, summary)?])
             .build()
     }
 
-    fn as_eml_count_contest(
+    pub fn as_dso_count_eml(
+        &self,
+        transaction_id: Option<u64>,
+        committee_session: &CommitteeSession,
+        results: &[(
+            crate::domain::data_entry::DataEntrySource,
+            crate::domain::results::Results,
+        )],
+        summary: &ElectionSummaryDSO,
+        timestamp: DateTime<Local>,
+    ) -> Result<ElectionCount, EMLError> {
+        ElectionCount::builder()
+            .transaction_id(transaction_id.unwrap_or(1))
+            .managing_authority(ManagingAuthority::new(
+                AuthorityIdentifier::new(self.output_eml_authority_id()?)
+                    .with_name(self.location.clone()),
+            ))
+            .creation_date_time(timestamp)
+            .election_identifier(
+                self.get_eml_election_identifier_builder()?
+                    .build_for_count()?,
+            )
+            .count_type(CountType::Municipal)
+            .contests([self.as_dso_eml_count_contest(committee_session, results, summary)?])
+            .build()
+    }
+
+    pub fn as_csb_count_eml(
+        &self,
+        transaction_id: Option<u64>,
+        summary: &ElectionSummaryApportionment,
+        timestamp: DateTime<Local>,
+    ) -> Result<ElectionCount, EMLError> {
+        ElectionCount::builder()
+            .transaction_id(transaction_id.unwrap_or(1))
+            .managing_authority(ManagingAuthority::new(
+                AuthorityIdentifier::new(self.output_eml_authority_id()?)
+                    .with_name(self.location.clone()),
+            ))
+            .creation_date_time(timestamp)
+            .election_identifier(
+                self.get_eml_election_identifier_builder()?
+                    .build_for_count()?,
+            )
+            .count_type(CountType::Central)
+            .contests([self.as_csb_eml_count_contest(summary)?])
+            .build()
+    }
+
+    fn as_cso_eml_count_contest(
         &self,
         committee_session: &CommitteeSession,
         results: &[(
             crate::domain::data_entry::DataEntrySource,
             crate::domain::results::Results,
         )],
-        summary: &ElectionSummary,
+        summary: &ElectionSummaryCSO,
     ) -> Result<ElectionCountContest, EMLError> {
         let mut builder = ElectionCountContest::builder()
             .identifier(ContestIdentifier::geen())
-            .total_eligible_voter_count(self.get_eligible_voter_count(summary))
+            .total_eligible_voter_count(self.get_eligible_voter_count(summary.number_of_voters))
             .total_candidate_votes_count(summary.votes_counts.total_votes_candidates_count)
             .total_rejected_votes(
                 RejectedVotesReason::Blank,
@@ -653,6 +699,123 @@ impl ElectionWithPoliticalGroups {
         builder.build()
     }
 
+    fn as_dso_eml_count_contest(
+        &self,
+        committee_session: &CommitteeSession,
+        results: &[(
+            crate::domain::data_entry::DataEntrySource,
+            crate::domain::results::Results,
+        )],
+        summary: &ElectionSummaryDSO,
+    ) -> Result<ElectionCountContest, EMLError> {
+        let mut builder = ElectionCountContest::builder()
+            .identifier(ContestIdentifier::geen())
+            .total_eligible_voter_count(self.get_eligible_voter_count(summary.number_of_voters))
+            .total_candidate_votes_count(summary.votes_counts.total_votes_candidates_count)
+            .total_rejected_votes(
+                RejectedVotesReason::Blank,
+                summary.votes_counts.blank_votes_count,
+            )
+            .total_rejected_votes(
+                RejectedVotesReason::Invalid,
+                summary.votes_counts.invalid_votes_count,
+            )
+            .total_uncounted_votes(
+                UncountedVotesReason::ValidPollCards,
+                summary.voters_counts.poll_card_count,
+            )
+            .total_uncounted_votes(
+                UncountedVotesReason::ValidProxyCertificates,
+                summary.voters_counts.proxy_certificate_count,
+            );
+
+        if let Some(voter_card_count) = summary.voters_counts.voter_card_count {
+            builder = builder
+                .total_uncounted_votes(UncountedVotesReason::ValidVoterCards, voter_card_count);
+        }
+
+        let builder = builder
+            .total_uncounted_votes(
+                UncountedVotesReason::AdmittedVoters,
+                summary.voters_counts.total_admitted_voters_count,
+            )
+            .total_uncounted_votes(
+                UncountedVotesReason::MoreBallotsCounted,
+                summary.differences_counts.more_ballots_count.count,
+            )
+            .total_uncounted_votes(
+                UncountedVotesReason::FewerBallotsCounted,
+                summary.differences_counts.fewer_ballots_count.count,
+            )
+            .total_votes_selections(self.as_eml_count_selections(&summary.political_group_votes)?);
+
+        // GSB elections include reporting unit votes in the count
+        let builder = if self.committee_category == CommitteeCategory::GSB {
+            builder.reporting_unit_votes(
+                results
+                    .iter()
+                    .map(|(data_source, ps_res)| {
+                        self.as_eml_reporting_unit_votes(committee_session, data_source, ps_res)
+                    })
+                    .collect::<Result<Vec<_>, EMLError>>()?,
+            )
+        } else {
+            builder
+        };
+
+        builder.build()
+    }
+
+    fn as_csb_eml_count_contest(
+        &self,
+        summary: &ElectionSummaryApportionment,
+    ) -> Result<ElectionCountContest, EMLError> {
+        let mut builder = ElectionCountContest::builder()
+            .identifier(ContestIdentifier::geen())
+            .total_eligible_voter_count(
+                self.get_eligible_voter_count(Some(summary.number_of_voters)),
+            )
+            .total_candidate_votes_count(summary.votes_counts.total_votes_candidates_count)
+            .total_rejected_votes(
+                RejectedVotesReason::Blank,
+                summary.votes_counts.blank_votes_count,
+            )
+            .total_rejected_votes(
+                RejectedVotesReason::Invalid,
+                summary.votes_counts.invalid_votes_count,
+            )
+            .total_uncounted_votes(
+                UncountedVotesReason::ValidPollCards,
+                summary.voters_counts.poll_card_count,
+            )
+            .total_uncounted_votes(
+                UncountedVotesReason::ValidProxyCertificates,
+                summary.voters_counts.proxy_certificate_count,
+            );
+
+        if let Some(voter_card_count) = summary.voters_counts.voter_card_count {
+            builder = builder
+                .total_uncounted_votes(UncountedVotesReason::ValidVoterCards, voter_card_count);
+        }
+
+        let builder = builder
+            .total_uncounted_votes(
+                UncountedVotesReason::AdmittedVoters,
+                summary.voters_counts.total_admitted_voters_count,
+            )
+            .total_uncounted_votes(
+                UncountedVotesReason::MoreBallotsCounted,
+                summary.differences_counts.more_ballots_count.count,
+            )
+            .total_uncounted_votes(
+                UncountedVotesReason::FewerBallotsCounted,
+                summary.differences_counts.fewer_ballots_count.count,
+            )
+            .total_votes_selections(self.as_eml_count_selections(&summary.political_group_votes)?);
+
+        builder.build()
+    }
+
     fn output_eml_authority_id(&self) -> Result<AuthorityId, EMLError> {
         match self.committee_category {
             CommitteeCategory::GSB => AuthorityId::new(&self.domain_id),
@@ -663,8 +826,8 @@ impl ElectionWithPoliticalGroups {
     /// Depending on the context of the summary coming from GSB or from CSB, the number of voters source is different.
     /// In case of a GSB summary, the number of voters there should be the valid source.
     /// Otherwise, it is the given number of voters.
-    fn get_eligible_voter_count(&self, summary: &ElectionSummary) -> u32 {
-        summary.number_of_voters.unwrap_or(self.number_of_voters)
+    fn get_eligible_voter_count(&self, number_of_voters: Option<u32>) -> u32 {
+        number_of_voters.unwrap_or(self.number_of_voters)
     }
 
     fn as_eml_count_selections(
@@ -764,7 +927,7 @@ impl ElectionWithPoliticalGroups {
         builder.build()
     }
 
-    pub fn as_result_eml(
+    pub fn as_eml_result(
         &self,
         transaction_id: Option<u64>,
         timestamp: DateTime<Local>,
@@ -1079,11 +1242,10 @@ mod tests {
     #[test]
     fn test_as_count_eml_csb() {
         let election = election_fixture(ElectionCategory::Municipal, CommitteeCategory::CSB, &[0]);
-        let committee_session = committee_session_fixture(election.id);
-        let summary = ElectionSummary::from_results(&election, &[]).unwrap();
+        let summary = ElectionSummaryApportionment::from_results(&election, &[]).unwrap();
 
         let eml_count = election
-            .as_count_eml(None, &committee_session, &[], &summary, Local::now())
+            .as_csb_count_eml(None, &summary, Local::now())
             .unwrap();
         assert_eq!(
             eml_count
@@ -1098,13 +1260,13 @@ mod tests {
     }
 
     #[test]
-    fn test_as_count_eml_gsb() {
+    fn test_as_count_eml_cso() {
         let election = election_fixture(ElectionCategory::Municipal, CommitteeCategory::GSB, &[0]);
         let committee_session = committee_session_fixture(election.id);
-        let summary = ElectionSummary::from_results(&election, &[]).unwrap();
+        let summary = ElectionSummaryCSO::from_results(&election, &[]).unwrap();
 
         let eml_count = election
-            .as_count_eml(None, &committee_session, &[], &summary, Local::now())
+            .as_cso_count_eml(None, &committee_session, &[], &summary, Local::now())
             .unwrap();
         assert_eq!(
             eml_count
@@ -1157,7 +1319,7 @@ mod tests {
         };
 
         let eml_result = election
-            .as_result_eml(None, Local::now(), &details)
+            .as_eml_result(None, Local::now(), &details)
             .unwrap();
         let auth_id = eml_result.managing_authority.authority_identifier.id;
         assert_eq!(auth_id.cloned_value().unwrap().value(), "CSB");
@@ -1186,16 +1348,145 @@ mod tests {
     }
 
     #[test]
-    fn test_as_eml_count_contest() {
+    fn test_as_cso_eml_count_contest() {
         // Default number_of_voters=1000
-        let mut election =
-            election_fixture(ElectionCategory::Municipal, CommitteeCategory::CSB, &[2]);
+        let election = election_fixture(ElectionCategory::Municipal, CommitteeCategory::GSB, &[2]);
         let committee_session = committee_session_fixture(election.id);
-        let mut summary = ElectionSummary::from_results(&election, &[]).unwrap();
-
-        let result_csb = election
-            .as_eml_count_contest(&committee_session, &[], &summary)
+        let mut summary = ElectionSummaryCSO::from_results(&election, &[]).unwrap();
+        summary.number_of_voters = Some(1001);
+        let result_cso = election
+            .as_cso_eml_count_contest(
+                &committee_session,
+                &[source_and_results_gsb(None)],
+                &summary,
+            )
             .unwrap();
+
+        let total_votes_gsb = result_cso.total_votes.unwrap();
+        assert_eq!(
+            total_votes_gsb.eligible_voter_count,
+            StringValue::from_value(1001u64)
+        );
+        assert!(
+            !total_votes_gsb
+                .uncounted_votes
+                .contains_key(&UncountedVotesReason::ValidVoterCards),
+        );
+        assert!(
+            !result_cso
+                .reporting_unit_votes
+                .first()
+                .unwrap()
+                .uncounted_votes
+                .contains_key(&UncountedVotesReason::ValidVoterCards)
+        );
+
+        // With voter cards
+        let election = election_fixture(ElectionCategory::Provincial, CommitteeCategory::GSB, &[2]);
+        let committee_session = committee_session_fixture(election.id);
+        let mut summary = ElectionSummaryCSO::from_results(&election, &[]).unwrap();
+        summary.voters_counts.voter_card_count = Some(42);
+
+        let result = election
+            .as_cso_eml_count_contest(
+                &committee_session,
+                &[source_and_results_gsb(Some(17))],
+                &summary,
+            )
+            .unwrap();
+
+        assert_eq!(
+            result
+                .total_votes
+                .unwrap()
+                .uncounted_votes
+                .get(&UncountedVotesReason::ValidVoterCards),
+            Some(&StringValue::from_value(42u64))
+        );
+        assert_eq!(
+            result
+                .reporting_unit_votes
+                .first()
+                .unwrap()
+                .uncounted_votes
+                .get(&UncountedVotesReason::ValidVoterCards),
+            Some(&StringValue::from_value(17u64))
+        );
+    }
+
+    #[test]
+    fn test_as_dso_eml_count_contest() {
+        // Default number_of_voters=1000
+        let election = election_fixture(ElectionCategory::Municipal, CommitteeCategory::CSB, &[2]);
+        let committee_session = committee_session_fixture(election.id);
+        let mut summary = ElectionSummaryDSO::from_results(&election, &[]).unwrap();
+        summary.number_of_voters = Some(1001);
+        let result_dso = election
+            .as_dso_eml_count_contest(
+                &committee_session,
+                &[source_and_results_gsb(None)],
+                &summary,
+            )
+            .unwrap();
+
+        let total_votes_gsb = result_dso.total_votes.unwrap();
+        assert_eq!(
+            total_votes_gsb.eligible_voter_count,
+            StringValue::from_value(1001u64)
+        );
+        assert!(
+            !total_votes_gsb
+                .uncounted_votes
+                .contains_key(&UncountedVotesReason::ValidVoterCards)
+        );
+        assert!(
+            !result_dso
+                .reporting_unit_votes
+                .first()
+                .unwrap()
+                .uncounted_votes
+                .contains_key(&UncountedVotesReason::ValidVoterCards)
+        );
+
+        // With voter cards
+        let election = election_fixture(ElectionCategory::Provincial, CommitteeCategory::GSB, &[2]);
+        let committee_session = committee_session_fixture(election.id);
+        let mut summary = ElectionSummaryDSO::from_results(&election, &[]).unwrap();
+        summary.voters_counts.voter_card_count = Some(42);
+
+        let result = election
+            .as_dso_eml_count_contest(
+                &committee_session,
+                &[source_and_results_gsb(Some(17))],
+                &summary,
+            )
+            .unwrap();
+
+        assert_eq!(
+            result
+                .total_votes
+                .unwrap()
+                .uncounted_votes
+                .get(&UncountedVotesReason::ValidVoterCards),
+            Some(&StringValue::from_value(42u64))
+        );
+        assert_eq!(
+            result
+                .reporting_unit_votes
+                .first()
+                .unwrap()
+                .uncounted_votes
+                .get(&UncountedVotesReason::ValidVoterCards),
+            Some(&StringValue::from_value(17u64))
+        );
+    }
+
+    #[test]
+    fn test_as_csb_eml_count_contest() {
+        // Default number_of_voters=1000
+        let election = election_fixture(ElectionCategory::Municipal, CommitteeCategory::CSB, &[2]);
+        let summary = ElectionSummaryApportionment::from_results(&election, &[]).unwrap();
+        let result_csb = election.as_csb_eml_count_contest(&summary).unwrap();
         let total_votes_csb = result_csb.total_votes.unwrap();
         assert_eq!(
             total_votes_csb.eligible_voter_count,
@@ -1208,52 +1499,12 @@ mod tests {
         );
         assert!(result_csb.reporting_unit_votes.is_empty());
 
-        election.committee_category = CommitteeCategory::GSB;
-        summary.number_of_voters = Some(1001);
-        let result_gsb = election
-            .as_eml_count_contest(
-                &committee_session,
-                &[source_and_results_gsb(None)],
-                &summary,
-            )
-            .unwrap();
-
-        let total_votes_gsb = result_gsb.total_votes.unwrap();
-        assert_eq!(
-            total_votes_gsb.eligible_voter_count,
-            StringValue::from_value(1001u64)
-        );
-
-        assert_eq!(
-            total_votes_gsb
-                .uncounted_votes
-                .get(&UncountedVotesReason::ValidVoterCards),
-            None
-        );
-        assert!(
-            !result_gsb
-                .reporting_unit_votes
-                .first()
-                .unwrap()
-                .uncounted_votes
-                .contains_key(&UncountedVotesReason::ValidVoterCards)
-        );
-    }
-
-    #[test]
-    fn test_as_eml_count_contest_with_voter_cards() {
-        let election = election_fixture(ElectionCategory::Municipal, CommitteeCategory::GSB, &[2]);
-        let committee_session = committee_session_fixture(election.id);
-        let mut summary = ElectionSummary::from_results(&election, &[]).unwrap();
+        // With voter cards
+        let election = election_fixture(ElectionCategory::Provincial, CommitteeCategory::CSB, &[2]);
+        let mut summary = ElectionSummaryApportionment::from_results(&election, &[]).unwrap();
         summary.voters_counts.voter_card_count = Some(42);
 
-        let result = election
-            .as_eml_count_contest(
-                &committee_session,
-                &[source_and_results_gsb(Some(17))],
-                &summary,
-            )
-            .unwrap();
+        let result = election.as_csb_eml_count_contest(&summary).unwrap();
 
         assert_eq!(
             result

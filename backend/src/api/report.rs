@@ -15,7 +15,7 @@ use crate::{
     domain::{
         committee_session::CommitteeSessionId,
         election::{ElectionId, ElectionWithPoliticalGroups},
-        report::files::{get_files_csb_election, get_files_gsb_election},
+        report::files::{get_files_csb_election, get_files_cso_election},
         role::Role,
     },
     error::{ApiErrorResponse, ErrorReference},
@@ -130,7 +130,7 @@ pub async fn election_download_zip_results_gsb(
 
     let election = election_repo::get(&mut conn, election_id).await?;
     let committee_session = committee_session_repo::get(&mut conn, committee_session_id).await?;
-    let files = get_files_gsb_election(&pool, audit_service, committee_session.id).await?;
+    let files = get_files_cso_election(&pool, audit_service, committee_session.id).await?;
     drop(conn);
 
     let base_name = if committee_session.is_next_session() {

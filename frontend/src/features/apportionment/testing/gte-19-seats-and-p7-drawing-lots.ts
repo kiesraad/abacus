@@ -1,7 +1,7 @@
 import type {
   ApportionmentState,
   CommitteeSession,
-  ElectionSummary,
+  ElectionSummaryApportionment,
   ElectionWithPoliticalGroups,
   HighestAverageResidualSeatDrawingLots,
   SeatAssignment,
@@ -1153,7 +1153,7 @@ export const seat_assignment_after_two_drawing_lots_seats_assigned: SeatAssignme
   ],
 };
 
-export const election_summary: ElectionSummary = {
+export const election_summary: ElectionSummaryApportionment = {
   number_of_voters: 1329,
   voters_counts: {
     poll_card_count: 1200,
@@ -2440,11 +2440,6 @@ export const election_summary: ElectionSummary = {
       ],
     },
   ],
-  polling_station_investigations: {
-    admitted_voters_recounted: [],
-    investigated_other_reason: [],
-    ballots_recounted: [],
-  },
 };
 
 export const committee_session: CommitteeSession = {

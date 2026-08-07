@@ -115,8 +115,8 @@ export function CheckAndSaveForm() {
       if (dataEntryStatus.status === "entries_different") {
         pushMessage({
           type: "notify",
-          title: t("data_entry.entry_different"),
-          text: t("data_entry.entry_different_message"),
+          title: t(`data_entry.entry_different_${entryNumber}`),
+          text: t(`data_entry.entry_different_message_${entryNumber}`),
         });
       } else if (dataEntryStatus.status === "first_entry_has_errors") {
         pushMessage({

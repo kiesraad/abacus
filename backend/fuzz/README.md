@@ -34,6 +34,16 @@ Here, `NEW` indicates that a new code path has been triggered, and `REDUCE` indi
 Fuzzers never give hard guarantees on the correctness of software, but they are quite good at finding bugs.
 If the fuzzer has found a problem, it will exit and print the error. The error message will contain which unexpected transition took place. If after a few minutes the fuzzer stops finding new paths and has not found any problems we can be fairly certain the data entry system matches the state machine described in the fuzz test. Terminate the process manually when you feel like this is the case.
 
+### Fuzzing in CI
+
+The fuzzers do not run on pull requests. The `build-lint-test.yml` workflow only checks that the fuzz targets compile
+and lint (using Clippy). The fuzzers themselves run nightly using the `fuzz.yml` workflow. Every fuzz target gets its
+own matrix job and ten minutes of fuzzing. Each job caches its own corpus between runs, so each run continues from the
+coverage reached before rather than starting from scratch (unless the job cache is removed).
+
+When a target fails, its crashing input is uploaded as the `fuzz-artifacts-<target>` artifact. To reproduce the crash,
+download it into `artifacts/<target>/` and reproduce with `cargo fuzz run <target> <path to input>`.
+
 ### Checking the fuzz test coverage
 
 To gain some insight in what the fuzzer has actually tested, we can check the coverage of the fuzzer using the `fuzz coverage` command.

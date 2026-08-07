@@ -79,16 +79,16 @@ jobs:
         if: matrix.target.os == 'ubuntu-latest'
       # The Backend job in build-lint-test.yml checks Clippy only for the host target, so check with musl here
       - name: Check Clippy with all features
-        run: cargo --locked clippy --workspace --all-targets --all-features --target=${{ matrix.target.name }} -- -D warnings
+        run: cargo clippy --locked --workspace --all-targets --all-features --target=${{ matrix.target.name }} -- -D warnings
         if: matrix.target.os == 'ubuntu-latest'
       - name: Build without airgap detection
-        run: cargo --locked build --release --no-default-features --features memory-serve,embed-typst --target=${{ matrix.target.name }}
+        run: cargo build --locked --release --no-default-features --features memory-serve,embed-typst --target=${{ matrix.target.name }}
       - uses: actions/upload-artifact@v7
         with:
           name: abacus-${{ matrix.target.os }}-weekly
           path: ${{ matrix.target.binary }}
       - name: Build with airgap detection and TLS (for the installer)
-        run: cargo --locked build --release --no-default-features --features memory-serve,embed-typst,airgap-detection,tls --target=${{ matrix.target.name }}
+        run: cargo build --locked --release --no-default-features --features memory-serve,embed-typst,airgap-detection,tls --target=${{ matrix.target.name }}
         if: matrix.target.os == 'windows-latest'
       - uses: actions/upload-artifact@v7
         with:

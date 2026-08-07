@@ -48,7 +48,7 @@ jobs:
       - name: Install Nextest
         run: cargo binstall cargo-nextest
       - name: Symlink sqlx test directory to /dev/shm
-        run: mkdir -p target /dev/shm/sqlx && ln -s /dev/shm/sqlx target/sqlx
+        run: mkdir -p target /dev/shm/sqlx && rm -rf target/sqlx && ln -s /dev/shm/sqlx target/sqlx
       - name: Run tests with coverage
         run: cargo llvm-cov nextest --workspace --branch --profile ci --features embed-typst,airgap-detection --cobertura --output-path ./target/llvm-cov-target/codecov.json
       - name: Upload coverage to Codecov

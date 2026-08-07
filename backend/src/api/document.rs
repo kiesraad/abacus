@@ -13,7 +13,7 @@ use crate::{
     APIError, AppState, ErrorResponse,
     api::middleware::authentication::RouteAuthorization,
     domain::{
-        election::{CommitteeCategory, ElectionId},
+        election::{CommitteeCategory, ElectionId, VoteCountingMethod},
         models::{
             ModelN10_2Input, ModelNa31_2Bijlage1Input, ModelNa31_2InlegvelInput, ToPdfFileModel,
             votes_table::CandidatesTables,
@@ -67,9 +67,11 @@ async fn election_download_n_10_2(
     let election = election_repo::get(&mut conn, election_id).await?;
     user.role().is_authorized(election.committee_category)?;
 
-    if election.committee_category != CommitteeCategory::GSB {
+    if election.committee_category != CommitteeCategory::GSB
+        || election.counting_method != Some(VoteCountingMethod::CSO)
+    {
         return Err(APIError::NotFound(
-            "N 10-2 is only available for GSB elections".into(),
+            "N 10-2 is only available for GSB CSO elections".into(),
             ErrorReference::EntryNotFound,
         ));
     }
@@ -155,9 +157,11 @@ async fn election_download_na_31_2_bijlage1(
     let election = election_repo::get(&mut conn, election_id).await?;
     user.role().is_authorized(election.committee_category)?;
 
-    if election.committee_category != CommitteeCategory::GSB {
+    if election.committee_category != CommitteeCategory::GSB
+        || election.counting_method != Some(VoteCountingMethod::CSO)
+    {
         return Err(APIError::NotFound(
-            "Na 31-2 Bijlage 1 is only available for GSB elections".into(),
+            "Na 31-2 Bijlage 1 is only available for GSB CSO elections".into(),
             ErrorReference::EntryNotFound,
         ));
     }
@@ -245,9 +249,11 @@ async fn election_download_na_31_2_inlegvel(
     drop(conn);
 
     user.role().is_authorized(election.committee_category)?;
-    if election.committee_category != CommitteeCategory::GSB {
+    if election.committee_category != CommitteeCategory::GSB
+        || election.counting_method != Some(VoteCountingMethod::CSO)
+    {
         return Err(APIError::NotFound(
-            "Na 31-2 Inlegvel is only available for GSB elections".into(),
+            "Na 31-2 Inlegvel is only available for GSB CSO elections".into(),
             ErrorReference::EntryNotFound,
         ));
     }
@@ -277,18 +283,20 @@ mod tests {
     use super::*;
     use crate::{
         api::tests::{
-            assert_committee_category_authorization_err, assert_committee_category_authorization_ok,
+            assert_committee_category_authorization_err,
+            assert_committee_category_authorization_ok, assert_counting_method_authorization_err,
+            assert_counting_method_authorization_ok,
         },
         domain::role::Role,
         repository::user_repo::{User, UserId},
     };
 
-    async fn call_handlers(
+    async fn call_cso_handlers(
         pool: SqlitePool,
         coordinator_role: Role,
+        election_id: ElectionId,
     ) -> Vec<(&'static str, Response)> {
         let user = User::test_user(coordinator_role, UserId::from(1));
-        let election_id = ElectionId::from(2);
 
         #[rustfmt::skip]
         let results = vec![
@@ -300,14 +308,26 @@ mod tests {
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
-    async fn test_committee_category_authorization_err(pool: SqlitePool) {
-        let results = call_handlers(pool, Role::CoordinatorCSB).await;
+    async fn test_cso_documents_committee_category_authorization_err(pool: SqlitePool) {
+        let results = call_cso_handlers(pool, Role::CoordinatorCSB, ElectionId::from(2)).await;
         assert_committee_category_authorization_err(results).await;
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
-    async fn test_committee_category_authorization_ok(pool: SqlitePool) {
-        let results = call_handlers(pool, Role::CoordinatorGSB).await;
+    async fn test_cso_documents_committee_category_authorization_ok(pool: SqlitePool) {
+        let results = call_cso_handlers(pool, Role::CoordinatorGSB, ElectionId::from(2)).await;
         assert_committee_category_authorization_ok(results);
+    }
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_11_dso"))))]
+    async fn test_cso_documents_counting_method_authorization_err(pool: SqlitePool) {
+        let results = call_cso_handlers(pool, Role::CoordinatorGSB, ElectionId::from(11)).await;
+        assert_counting_method_authorization_err(results, VoteCountingMethod::CSO).await;
+    }
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
+    async fn test_cso_documents_counting_method_authorization_ok(pool: SqlitePool) {
+        let results = call_cso_handlers(pool, Role::CoordinatorGSB, ElectionId::from(2)).await;
+        assert_counting_method_authorization_ok(results);
     }
 }

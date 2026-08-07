@@ -33,9 +33,9 @@ interface DownloadSectionProps {
 
 function CSOFirstSessionDownloadSection({ election }: DownloadSectionProps) {
   return (
-    <div className={cn(cls.downloadModels, "mt-xl")}>
-      <h3 className={cls.tableTitle}>{t("election_management.empty_documents_title")}</h3>
-      <p>{t("election_management.empty_documents_description")}</p>
+    <div id="CSO-first-session-download-section" className={cn(cls.downloadModels, "mt-xl")}>
+      <h3 className={cls.tableTitle}>{t("election_management.empty_documents_first_session")}</h3>
+      <p>{t("election_management.empty_document_description.plural")}</p>
       <Table className={cn(cls.electionInformationTable)} variant="information">
         <Table.Header>
           <Table.HeaderCell scope="col">{t("election_management.document_model")}</Table.HeaderCell>
@@ -45,20 +45,64 @@ function CSOFirstSessionDownloadSection({ election }: DownloadSectionProps) {
           <Table.ClickRow
             downloadIcon
             onClick={() => {
+              directDownload(`/api/elections/${election.id}/download_n_10_2`);
+            }}
+          >
+            <Table.Cell>N 10-2</Table.Cell>
+            <Table.Cell>{t("election_management.document_n_10_1_and_n_10_2")}</Table.Cell>
+          </Table.ClickRow>
+          <Table.ClickRow
+            downloadIcon
+            onClick={() => {
               directDownload(`/api/elections/${election.id}/download_na_31_2_bijlage1`);
             }}
           >
             <Table.Cell>Na 31-2 Bijlage 1</Table.Cell>
             <Table.Cell>{t("election_management.document_na_31_2_bijlage_1")}</Table.Cell>
           </Table.ClickRow>
+        </Table.Body>
+      </Table>
+    </div>
+  );
+}
+
+function DSOFirstSessionDownloadSection({ election }: DownloadSectionProps) {
+  return (
+    <div id="DSO-first-session-download-section" className={cn(cls.downloadModels, "mt-xl")}>
+      <h3 className={cls.tableTitle}>{t("election_management.empty_documents_first_session")}</h3>
+      <p>{t("election_management.empty_document_description.plural")}</p>
+      <Table className={cn(cls.electionInformationTable)} variant="information">
+        <Table.Header>
+          <Table.HeaderCell scope="col">{t("election_management.document_model")}</Table.HeaderCell>
+          <Table.HeaderCell scope="col">{t("election_management.document_purpose")}</Table.HeaderCell>
+        </Table.Header>
+        <Table.Body>
           <Table.ClickRow
             downloadIcon
             onClick={() => {
-              directDownload(`/api/elections/${election.id}/download_n_10_2`);
+              directDownload(`/api/elections/${election.id}/download_n_10_1`);
             }}
           >
-            <Table.Cell>N 10-2</Table.Cell>
-            <Table.Cell>{t("election_management.document_n_10_2")}</Table.Cell>
+            <Table.Cell>N 10-1</Table.Cell>
+            <Table.Cell>{t("election_management.document_n_10_1_and_n_10_2")}</Table.Cell>
+          </Table.ClickRow>
+          <Table.ClickRow
+            downloadIcon
+            onClick={() => {
+              directDownload(`/api/elections/${election.id}/download_n_10_1_inlegvel`);
+            }}
+          >
+            <Table.Cell>N 10-1</Table.Cell>
+            <Table.Cell>{t("election_management.document_n_10_1_inlegvel")}</Table.Cell>
+          </Table.ClickRow>
+          <Table.ClickRow
+            downloadIcon
+            onClick={() => {
+              directDownload(`/api/elections/${election.id}/download_na_14_1_versie1`);
+            }}
+          >
+            <Table.Cell>Na 14-1, versie 1</Table.Cell>
+            <Table.Cell>{t("election_management.document_na_14_1_versie_1")}</Table.Cell>
           </Table.ClickRow>
         </Table.Body>
       </Table>
@@ -68,9 +112,9 @@ function CSOFirstSessionDownloadSection({ election }: DownloadSectionProps) {
 
 function CSONextSessionDownloadSection({ election }: DownloadSectionProps) {
   return (
-    <div className={cn(cls.downloadModels, "mt-xl")}>
-      <h3 className={cls.tableTitle}>{t("election_management.empty_document_title")}</h3>
-      <p>{t("election_management.empty_document_description")}</p>
+    <div id="CSO-next-session-download-section" className={cn(cls.downloadModels, "mt-xl")}>
+      <h3 className={cls.tableTitle}>{t("election_management.empty_document_next_session.singular")}</h3>
+      <p>{t("election_management.empty_document_description.singular")}</p>
       <Table className={cn(cls.electionInformationTable)} variant="information">
         <Table.Header>
           <Table.HeaderCell scope="col">{t("election_management.document_model")}</Table.HeaderCell>
@@ -83,8 +127,43 @@ function CSONextSessionDownloadSection({ election }: DownloadSectionProps) {
               directDownload(`/api/elections/${election.id}/download_na_31_2_inlegvel`);
             }}
           >
-            <Table.Cell>Na 31-2 Inlegvel</Table.Cell>
+            <Table.Cell>Na 31-2 inlegvel</Table.Cell>
             <Table.Cell>{t("election_management.document_na_31_2_inlegvel")}</Table.Cell>
+          </Table.ClickRow>
+        </Table.Body>
+      </Table>
+    </div>
+  );
+}
+
+function DSONextSessionDownloadSection({ election }: DownloadSectionProps) {
+  return (
+    <div id="DSO-next-session-download-section" className={cn(cls.downloadModels, "mt-xl")}>
+      <h3 className={cls.tableTitle}>{t("election_management.empty_document_next_session.plural")}</h3>
+      <p>{t("election_management.empty_document_description.plural")}</p>
+      <Table className={cn(cls.electionInformationTable)} variant="information">
+        <Table.Header>
+          <Table.HeaderCell scope="col">{t("election_management.document_model")}</Table.HeaderCell>
+          <Table.HeaderCell scope="col">{t("election_management.document_purpose")}</Table.HeaderCell>
+        </Table.Header>
+        <Table.Body>
+          <Table.ClickRow
+            downloadIcon
+            onClick={() => {
+              directDownload(`/api/elections/${election.id}/download_n_10_1_inlegvel`);
+            }}
+          >
+            <Table.Cell>N 10-1</Table.Cell>
+            <Table.Cell>{t("election_management.document_n_10_1_inlegvel")}</Table.Cell>
+          </Table.ClickRow>
+          <Table.ClickRow
+            downloadIcon
+            onClick={() => {
+              directDownload(`/api/elections/${election.id}/download_na_31_1_inlegvel`);
+            }}
+          >
+            <Table.Cell>Na 31-1 inlegvel</Table.Cell>
+            <Table.Cell>{t("election_management.document_na_31_1_inlegvel")}</Table.Cell>
           </Table.ClickRow>
         </Table.Body>
       </Table>
@@ -265,9 +344,15 @@ export function ElectionHomePage() {
           </div>
           {election.committee_category === "GSB" &&
             (currentCommitteeSession.number === 1 ? (
-              <CSOFirstSessionDownloadSection election={election} />
+              election.counting_method === "CSO" ? (
+                <CSOFirstSessionDownloadSection election={election} />
+              ) : (
+                <DSOFirstSessionDownloadSection election={election} />
+              )
+            ) : election.counting_method === "CSO" ? (
+              <CSONextSessionDownloadSection election={election} />
             ) : (
-              currentCommitteeSession.number > 1 && <CSONextSessionDownloadSection election={election} />
+              <DSONextSessionDownloadSection election={election} />
             ))}
         </article>
       </main>

@@ -388,8 +388,18 @@ describe("ElectionHomePage", () => {
         expect(
           await screen.findByRole("heading", { level: 3, name: "Lege processen-verbaal voor deze verkiezing" }),
         ).toBeVisible();
-        expect(screen.getByText("Na 31-2 Bijlage 1")).toBeVisible();
-        expect(screen.getByText("N 10-2")).toBeVisible();
+        const downloadSection = screen.getByTestId("CSO-first-session-download-section");
+        expect(downloadSection).toBeVisible();
+        expect(within(downloadSection).getByRole("paragraph")).toHaveTextContent(
+          "Onderstaande modellen zijn relevant voor de huidige zitting van het gemeentelijk stembureau. Overige modellen zijn te downloaden via de toolkit van de Kiesraad.",
+        );
+        const table = within(downloadSection).getByRole("table");
+        expect(table).toBeVisible();
+        expect(table).toHaveTableContent([
+          ["Model", "Doel"],
+          ["N 10-2", "Processen-verbaal per stembureau"],
+          ["Na 31-2 Bijlage 1", "Verslagen van tellingen van stembureau"],
+        ]);
       });
 
       test("Shows empty document section for second committee session", async () => {
@@ -406,13 +416,17 @@ describe("ElectionHomePage", () => {
         expect(
           await screen.findByRole("heading", { level: 3, name: "Leeg inlegvel voor deze verkiezing" }),
         ).toBeVisible();
-        expect(screen.getByText("Na 31-2 Inlegvel")).toBeVisible();
-
-        expect(
-          screen.queryByRole("heading", { level: 3, name: "Lege processen-verbaal voor deze verkiezing" }),
-        ).not.toBeInTheDocument();
-        expect(screen.queryByText("Na 31-2 Bijlage 1")).not.toBeInTheDocument();
-        expect(screen.queryByText("N 10-2")).not.toBeInTheDocument();
+        const downloadSection = screen.getByTestId("CSO-next-session-download-section");
+        expect(downloadSection).toBeVisible();
+        expect(within(downloadSection).getByRole("paragraph")).toHaveTextContent(
+          "Onderstaand model is relevant voor de huidige zitting van het gemeentelijk stembureau. Overige modellen zijn te downloaden via de toolkit van de Kiesraad.",
+        );
+        const table = within(downloadSection).getByRole("table");
+        expect(table).toBeVisible();
+        expect(table).toHaveTableContent([
+          ["Model", "Doel"],
+          ["Na 31-2 inlegvel", "Inlegvel controles en correcties"],
+        ]);
       });
 
       test("Shows empty document section for third committee session", async () => {
@@ -429,13 +443,103 @@ describe("ElectionHomePage", () => {
         expect(
           await screen.findByRole("heading", { level: 3, name: "Leeg inlegvel voor deze verkiezing" }),
         ).toBeVisible();
-        expect(screen.getByText("Na 31-2 Inlegvel")).toBeVisible();
+        const downloadSection = screen.getByTestId("CSO-next-session-download-section");
+        expect(downloadSection).toBeVisible();
+        expect(within(downloadSection).getByRole("paragraph")).toHaveTextContent(
+          "Onderstaand model is relevant voor de huidige zitting van het gemeentelijk stembureau. Overige modellen zijn te downloaden via de toolkit van de Kiesraad.",
+        );
+        const table = within(downloadSection).getByRole("table");
+        expect(table).toBeVisible();
+        expect(table).toHaveTableContent([
+          ["Model", "Doel"],
+          ["Na 31-2 inlegvel", "Inlegvel controles en correcties"],
+        ]);
+      });
+    });
+
+    describe("DSO", () => {
+      test("Shows empty documents section for first committee session", async () => {
+        const electionDataSecondSession = getElectionMockData({ counting_method: "DSO" });
+        server.use(
+          http.get("/api/elections/1", () =>
+            HttpResponse.json(electionDataSecondSession satisfies ElectionDetailsResponse, { status: 200 }),
+          ),
+        );
+
+        await renderGSBPage("coordinator_gsb");
 
         expect(
-          screen.queryByRole("heading", { level: 3, name: "Lege processen-verbaal voor deze verkiezing" }),
-        ).not.toBeInTheDocument();
-        expect(screen.queryByText("Na 31-2 Bijlage 1")).not.toBeInTheDocument();
-        expect(screen.queryByText("N 10-2")).not.toBeInTheDocument();
+          await screen.findByRole("heading", { level: 3, name: "Lege processen-verbaal voor deze verkiezing" }),
+        ).toBeVisible();
+        const downloadSection = screen.getByTestId("DSO-first-session-download-section");
+        expect(downloadSection).toBeVisible();
+        expect(within(downloadSection).getByRole("paragraph")).toHaveTextContent(
+          "Onderstaande modellen zijn relevant voor de huidige zitting van het gemeentelijk stembureau. Overige modellen zijn te downloaden via de toolkit van de Kiesraad.",
+        );
+        const table = within(downloadSection).getByRole("table");
+        expect(table).toBeVisible();
+        expect(table).toHaveTableContent([
+          ["Model", "Doel"],
+          ["N 10-1", "Processen-verbaal per stembureau"],
+          ["N 10-1", "Inlegvellen controles en correcties per stembureau"],
+          ["Na 14-1, versie 1", "Corrigenda eerste zitting per stembureau"],
+        ]);
+      });
+
+      test("Shows empty document section for second committee session", async () => {
+        const electionDataSecondSession = getElectionMockData({ counting_method: "DSO" }, { id: 2, number: 2 });
+        electionDataSecondSession.committee_sessions = getCommitteeSessionListMockData().slice(2, 3);
+        server.use(
+          http.get("/api/elections/1", () =>
+            HttpResponse.json(electionDataSecondSession satisfies ElectionDetailsResponse, { status: 200 }),
+          ),
+        );
+
+        await renderGSBPage("coordinator_gsb");
+
+        expect(
+          await screen.findByRole("heading", { level: 3, name: "Lege inlegvellen voor deze verkiezing" }),
+        ).toBeVisible();
+        const downloadSection = screen.getByTestId("DSO-next-session-download-section");
+        expect(downloadSection).toBeVisible();
+        expect(within(downloadSection).getByRole("paragraph")).toHaveTextContent(
+          "Onderstaande modellen zijn relevant voor de huidige zitting van het gemeentelijk stembureau. Overige modellen zijn te downloaden via de toolkit van de Kiesraad.",
+        );
+        const table = within(downloadSection).getByRole("table");
+        expect(table).toBeVisible();
+        expect(table).toHaveTableContent([
+          ["Model", "Doel"],
+          ["N 10-1", "Inlegvellen controles en correcties per stembureau"],
+          ["Na 31-1 inlegvel", "Inlegvel controles en correcties bij GSB proces-verbaal"],
+        ]);
+      });
+
+      test("Shows empty document section for third committee session", async () => {
+        const electionDataSecondSession = getElectionMockData({ counting_method: "DSO" }, { id: 2, number: 3 });
+        electionDataSecondSession.committee_sessions = getCommitteeSessionListMockData().slice(1, 3);
+        server.use(
+          http.get("/api/elections/1", () =>
+            HttpResponse.json(electionDataSecondSession satisfies ElectionDetailsResponse, { status: 200 }),
+          ),
+        );
+
+        await renderGSBPage("coordinator_gsb");
+
+        expect(
+          await screen.findByRole("heading", { level: 3, name: "Lege inlegvellen voor deze verkiezing" }),
+        ).toBeVisible();
+        const downloadSection = screen.getByTestId("DSO-next-session-download-section");
+        expect(downloadSection).toBeVisible();
+        expect(within(downloadSection).getByRole("paragraph")).toHaveTextContent(
+          "Onderstaande modellen zijn relevant voor de huidige zitting van het gemeentelijk stembureau. Overige modellen zijn te downloaden via de toolkit van de Kiesraad.",
+        );
+        const table = within(downloadSection).getByRole("table");
+        expect(table).toBeVisible();
+        expect(table).toHaveTableContent([
+          ["Model", "Doel"],
+          ["N 10-1", "Inlegvellen controles en correcties per stembureau"],
+          ["Na 31-1 inlegvel", "Inlegvel controles en correcties bij GSB proces-verbaal"],
+        ]);
       });
     });
   });

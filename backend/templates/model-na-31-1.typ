@@ -40,7 +40,7 @@
 
 == Proces-verbaal
 
-Elke #is_municipality[gemeente][openbaar lichaam] maakt bij een verkiezing een verslag: het proces-verbaal. Hierin staat hoe het tellen van de stemmen is verlopen en wat de uitslag van de stemming was.
+#is_municipality[Elke gemeente][Elk openbaar lichaam] maakt bij een verkiezing een verslag: het proces-verbaal. Hierin staat hoe het tellen van de stemmen is verlopen en wat de uitslag van de stemming was.
 
 #emph_block[
   In #this_location is gekozen voor *decentrale stemopneming*.

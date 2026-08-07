@@ -19,18 +19,8 @@ test.describe("data entry - correct differences", () => {
     const typist = typistOneGSB.page;
     await typist.goto(`/elections/${dataEntry.election_id}/data-entry/${dataEntry.id}/1`);
 
-    // Assert progress icons
-    const dataEntryPage = new DataEntryBasePage(typist);
-    await expect(dataEntryPage.progressList.extraInvestigationIcon).toHaveAccessibleName("je bent hier");
-    await expect(dataEntryPage.progressList.countingDifferencesPollingStationIcon).toHaveAccessibleName("opgeslagen");
-    await expect(dataEntryPage.progressList.votersAndVotesIcon).toHaveAccessibleName("bevat een waarschuwing");
-    await expect(dataEntryPage.progressList.differencesIcon).toHaveAccessibleName("opgeslagen");
-    await expect(dataEntryPage.progressList.listIcon(1)).toHaveAccessibleName("opgeslagen");
-    await expect(dataEntryPage.progressList.listIcon(2)).toHaveAccessibleName("opgeslagen");
-    await expect(dataEntryPage.progressList.listIcon(3)).toHaveAccessibleName("leeg");
-    await expect(dataEntryPage.progressList.checkAndSaveIcon).toHaveAccessibleName("nog niet afgerond");
-
     // Go to section with warning
+    const dataEntryPage = new DataEntryBasePage(typist);
     await dataEntryPage.progressList.votersAndVotes.click();
     const votersAndVotesPage = new VotersAndVotesPage(typist);
     await expect(votersAndVotesPage.fieldset).toBeVisible();
@@ -61,6 +51,41 @@ test.describe("data entry - correct differences", () => {
     await expect(votersAndVotesPage.pollCardCount).toHaveAttribute("aria-errormessage", "feedback-error");
     await expect(votersAndVotesPage.proxyCertificateCount).toHaveAttribute("aria-errormessage", "feedback-error");
     await expect(votersAndVotesPage.totalAdmittedVotersCount).toHaveAttribute("aria-errormessage", "feedback-error");
+  });
+
+  test("show only correction warnings in the progress list", async ({
+    typistOneGSB,
+    dataEntryGSBFirstEntryCorrection: dataEntry,
+  }) => {
+    // Start data entry correction
+    const typist = typistOneGSB.page;
+    await typist.goto(`/elections/${dataEntry.election_id}/data-entry/${dataEntry.id}/1`);
+
+    // Assert only correction warning progress list icons shown
+    const dataEntryPage = new DataEntryBasePage(typist);
+    await expect(dataEntryPage.progressList.extraInvestigationIcon).toHaveAccessibleName("je bent hier");
+    await expect(dataEntryPage.progressList.countingDifferencesPollingStationIcon).toBeHidden();
+    await expect(dataEntryPage.progressList.votersAndVotesIcon).toHaveAccessibleName("bevat een waarschuwing");
+    await expect(dataEntryPage.progressList.differencesIcon).toBeHidden();
+    await expect(dataEntryPage.progressList.listIcon(1)).toBeHidden();
+    await expect(dataEntryPage.progressList.listIcon(2)).toBeHidden();
+    await expect(dataEntryPage.progressList.listIcon(3)).toBeHidden();
+    await expect(dataEntryPage.progressList.checkAndSaveIcon).toBeHidden();
+
+    // Save section with warning
+    await dataEntryPage.progressList.votersAndVotes.click();
+    const votersAndVotesPage = new VotersAndVotesPage(typist);
+    await votersAndVotesPage.next.click();
+
+    // All progress list icons are shown again
+    await expect(dataEntryPage.progressList.extraInvestigationIcon).toHaveAccessibleName("opgeslagen");
+    await expect(dataEntryPage.progressList.countingDifferencesPollingStationIcon).toHaveAccessibleName("opgeslagen");
+    await expect(dataEntryPage.progressList.votersAndVotesIcon).toHaveAccessibleName("je bent hier");
+    await expect(dataEntryPage.progressList.differencesIcon).toHaveAccessibleName("opgeslagen");
+    await expect(dataEntryPage.progressList.listIcon(1)).toHaveAccessibleName("opgeslagen");
+    await expect(dataEntryPage.progressList.listIcon(2)).toHaveAccessibleName("opgeslagen");
+    await expect(dataEntryPage.progressList.listIcon(3)).toHaveAccessibleName("leeg");
+    await expect(dataEntryPage.progressList.checkAndSaveIcon).toHaveAccessibleName("nog niet afgerond");
   });
 
   test.describe("assert correction result", () => {

@@ -7,7 +7,7 @@ import { useElection } from "@/hooks/election/useElection";
 import { useNumericParam } from "@/hooks/useNumericParam";
 import { useUser } from "@/hooks/user/useUser";
 import type { FormSectionId } from "@/types/types";
-import { CheckAndSaveForm } from "./check_and_save/CheckAndSaveForm";
+import { CheckAndSaveSection } from "./check_and_save/CheckAndSaveSection";
 import { DataEntryProgress } from "./DataEntryProgress";
 import { DataEntryProvider } from "./DataEntryProvider";
 import { DataEntrySection } from "./DataEntrySection";
@@ -39,7 +39,7 @@ export function DataEntryPage() {
         <article>
           {sectionId &&
             (sectionId === "save" ? (
-              <CheckAndSaveForm />
+              <CheckAndSaveSection />
             ) : (
               <DataEntrySection key={sectionId} committeeCategory={election.committee_category} />
             ))}

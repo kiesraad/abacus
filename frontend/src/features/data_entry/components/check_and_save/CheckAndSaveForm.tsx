@@ -2,9 +2,6 @@ import { type ReactElement, type SubmitEvent, useCallback, useEffect, useMemo, u
 
 import { Link, useNavigate, useParams } from "react-router";
 
-import { ApiError, FatalApiError } from "@/api/ApiResult";
-import { CommitteeSessionPausedModal } from "@/components/data_entry/CommitteeSessionPausedModal";
-import { ErrorModal } from "@/components/error/ErrorModal";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { BottomBar } from "@/components/ui/BottomBar/BottomBar";
 import { Button } from "@/components/ui/Button/Button";
@@ -21,10 +18,8 @@ import { getTranslations } from "@/utils/ValidationResults";
 
 import { useDataEntryContext } from "../../hooks/useDataEntryContext";
 import { useFormKeyboardNavigation } from "../../hooks/useFormKeyboardNavigation";
-import type { SubmitCurrentFormOptions } from "../../types/types";
 import type { DataEntryFormSectionStatus } from "../../utils/dataEntryUtils";
 import { getUrlForFormSectionID } from "../../utils/utils";
-import { DataEntryNavigation } from "../DataEntryNavigation";
 
 // biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: TODO function should be refactored
@@ -36,7 +31,7 @@ export function CheckAndSaveForm() {
   const { election } = useElection();
   const [isConfirmed, setIsConfirmed] = useState(false);
   const [isConfirmedError, setIsConfirmedError] = useState<string | null>(null);
-  const { error, dataEntryStructure, formState, onSubmitForm, status, onFinaliseDataEntry, dataEntryId, entryNumber } =
+  const { dataEntryStructure, formState, status, onFinaliseDataEntry, dataEntryId, entryNumber } =
     useDataEntryContext();
   const acceptCheckboxRef = useRef<HTMLInputElement>(null);
 
@@ -88,11 +83,6 @@ export function CheckAndSaveForm() {
       });
     }
   }, [isConfirmedError]);
-
-  // save the current state, without finalising (for the abort dialog)
-  const onSubmit = async (options?: SubmitCurrentFormOptions) => {
-    return await onSubmitForm("save", {}, options);
-  };
 
   // finalise the data entry and navigate away
   // this also includes stopping the data entry with errors, this is handled by the server.
@@ -149,13 +139,6 @@ export function CheckAndSaveForm() {
       ref={formRef}
       aria-disabled={(hasErrors || hasWarnings) && !allFeedbackAccepted}
     >
-      <DataEntryNavigation onSubmit={onSubmit} />
-
-      {error instanceof FatalApiError && error.reference === "CommitteeSessionPaused" && (
-        <CommitteeSessionPausedModal showUnsavedChanges committeeCategory={election.committee_category} />
-      )}
-      {error instanceof ApiError && <ErrorModal error={error} />}
-
       {hasErrors && allFeedbackAccepted ? (
         <>
           <p className="md">{t("check_and_save.accepted_errors")}</p>

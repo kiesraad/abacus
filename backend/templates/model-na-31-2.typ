@@ -9,10 +9,17 @@
 #let this_location = is_municipality[deze gemeente][dit openbaar lichaam]
 #let the_location = is_municipality[de gemeente][het openbaar lichaam]
 
-#show: doc => conf(doc, header-right: location_name, footer: [
-  #input.creation_date_time. Digitale vingerafdruk van EML-telbestand bij dit proces-verbaal (SHA-256): \
-  #input.hash
-])
+#show: doc => conf(
+  doc,
+  header-right: location_name,
+  footer: [
+    Datum: #input.creation_date_time. Digitale vingerafdruk van EML-telbestand bij dit PV: \
+    #input.hash \
+
+    Proces-verbaal van een #location_type \
+    Model Na 31-2 centrale stemopneming (versie 2027)
+  ], margin-bottom: 3.2cm
+)
 
 #set heading(numbering: none)
 
@@ -262,6 +269,8 @@ Voer de controle uit volgens de stappen in het controleprotocol.
 
 == Stemmen per lijst en per kandidaat
 
+#pagebreak(weak: true)
+
 #for political_group in input.votes_tables {
   votes_table(
     title: [#political_group.number #political_group.name],
@@ -295,12 +304,12 @@ Het proces-verbaal moet worden ondertekend door alle aanwezige leden. Bij een #l
 
 #stack(spacing: 0.5em, ..range(0, is_local_election(2, 4)).map(_ => textbox[Naam:][Handtekening:]))
 
+#if not is_local_election(true, false) {
+  pagebreak(weak: true)
+}
+
 == Ondertekening door andere aanwezige leden van het #location_type
 
 #signing_form_label[Extra ondertekening:]
 
-#stack(spacing: 0.5em, ..range(0, is_local_election(3, 1)).map(_ => textbox[Naam:][Handtekening:]))
-
-#pagebreak(weak: true)
-
-#stack(spacing: 0.5em, ..range(0, 12).map(_ => textbox[Naam:][Handtekening:]))
+#stack(spacing: 0.5em, ..range(0, is_local_election(13, 10)).map(_ => textbox[Naam:][Handtekening:]))

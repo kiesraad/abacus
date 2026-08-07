@@ -15,7 +15,7 @@
 #let header-right = [Stembureau #input.polling_station.number]
 
 #show: doc => conf(doc, header-right: header-right, footer: [Proces-verbaal van een stembureau \
-  Model N 10-2 centrale stemopneming])
+  Model N 10-2 centrale stemopneming (versie 2027)])
 
 #set heading(numbering: none)
 
@@ -265,8 +265,5 @@ Het proces-verbaal moet worden ondertekend door alle aanwezige leden. Bij een st
 
 #signing_form_label[Extra ondertekening:]
 
-#stack(spacing: 0.5em, ..range(0, 4).map(_ => textbox[Naam:][Handtekening:]))
+#stack(spacing: 0.5em, ..range(0, 15).map(_ => textbox[Naam:][Handtekening:]))
 
-#pagebreak(weak: true)
-
-#stack(spacing: 0.5em, ..range(0, 12).map(_ => textbox[Naam:][Handtekening:]))

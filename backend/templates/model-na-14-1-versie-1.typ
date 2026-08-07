@@ -58,7 +58,7 @@ Het #location_type heeft de telresultaten van dit stembureau onderzocht en is to
 #set page(
   header: context default_header(
     current_chapter_title(),
-    [#location_name\ Stembureau #input.polling_station.number]
+    header-right
   )
 )
 

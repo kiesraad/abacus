@@ -78,6 +78,21 @@ static VARIANTS: &[ModelVariant] = &[
         input: "model-na-14-1-versie-1-variations/model-na-14-1-versie-1-WS.json",
     },
     ModelVariant {
+        name: "model-na-14-1-versie-2-GR",
+        model: "model-na-14-1-versie-2",
+        input: "model-na-14-1-versie-2-variations/model-na-14-1-versie-2-GR.json",
+    },
+    ModelVariant {
+        name: "model-na-14-1-versie-2-PS",
+        model: "model-na-14-1-versie-2",
+        input: "model-na-14-1-versie-2-variations/model-na-14-1-versie-2-PS.json",
+    },
+    ModelVariant {
+        name: "model-na-14-1-versie-2-WS",
+        model: "model-na-14-1-versie-2",
+        input: "model-na-14-1-versie-2-variations/model-na-14-1-versie-2-WS.json",
+    },
+    ModelVariant {
         name: "model-na-14-2-GR",
         model: "model-na-14-2",
         input: "model-na-14-2-variations/model-na-14-2-GR.json",

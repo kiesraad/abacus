@@ -1,5 +1,5 @@
 import type { ValidationResult, ValidationResults } from "@/types/generated/openapi";
-import type { DataEntryResults, DataEntryStructure, FormSectionId, ResultsPath } from "@/types/types";
+import type { DataEntryResults, DataEntrySection, DataEntryStructure, FormSectionId, ResultsPath } from "@/types/types";
 import { extractFieldInfoFromSection, getValueAtPath, resetValueAtPath } from "@/utils/dataEntryMapping";
 import { doesValidationResultApplyToSection, isFieldInSection, ValidationResultSet } from "@/utils/ValidationResults";
 import type { ClientState, FormSection, FormState } from "../types/types";
@@ -29,7 +29,7 @@ export function getNextSectionID(formState: FormState, currentSectionId: FormSec
     for (const section of Object.values(formState.sections)) {
       if (
         (formState.furthest === "save" && !section.errors.isEmpty() && !section.acceptErrorsAndWarnings) ||
-        section.index === currentSection.index + 1
+        (section.index > currentSection.index && !section.isDisabled)
       ) {
         return section.id;
       }
@@ -37,6 +37,47 @@ export function getNextSectionID(formState: FormState, currentSectionId: FormSec
   }
 
   return null;
+}
+
+export function isSectionSkipped(section: DataEntrySection, results: DataEntryResults): boolean {
+  if (!section.skip_when) {
+    return false;
+  }
+
+  return getValueAtPath(results, section.skip_when.path) === section.skip_when.equal_to;
+}
+
+export function updateSkippedSections(
+  formState: FormState,
+  dataEntryStructure: DataEntryStructure,
+  results: DataEntryResults,
+) {
+  for (const section of dataEntryStructure) {
+    const formSection = formState.sections[section.id];
+    if (formSection) {
+      formSection.isDisabled = isSectionSkipped(section, results);
+    }
+  }
+
+  const furthestSection = formState.sections[formState.furthest];
+  if (furthestSection?.isDisabled) {
+    const nextEnabledSection = Object.values(formState.sections).find(
+      (section) => section.index > furthestSection.index && !section.isDisabled,
+    );
+    if (nextEnabledSection) {
+      formState.furthest = nextEnabledSection.id;
+    }
+  }
+}
+
+export function resetSkippedSectionValues(dataEntryStructure: DataEntryStructure, results: DataEntryResults) {
+  const fields = dataEntryStructure
+    .filter((section) => isSectionSkipped(section, results))
+    .flatMap((section) => [...extractFieldInfoFromSection(section).keys()]);
+
+  if (fields.length > 0) {
+    resetFieldValues(dataEntryStructure, fields, results);
+  }
 }
 
 export function isFormSectionEmpty(
@@ -82,6 +123,7 @@ function createFormSection(id: FormSectionId, index: number): FormSection {
   return {
     index,
     id,
+    isDisabled: false,
     isSaved: false,
     acceptErrorsAndWarnings: false,
     hasChanges: false,
@@ -153,27 +195,26 @@ export function calculateDataEntryProgress(formState: FormState) {
   return Math.floor(((furthestSection.index + 1) / totalSections) * 100);
 }
 
-export function buildFormState(
+export function restoreFormState(
   clientState: ClientState,
+  formState: FormState,
   validationResults: ValidationResults,
   dataEntryStructure: DataEntryStructure,
-) {
-  const newFormState = getInitialFormState(dataEntryStructure);
-
+): FormSectionId {
   // set the furthest section
-  newFormState.furthest = clientState.furthest;
+  formState.furthest = clientState.furthest;
 
   // set accepted warnings
   clientState.acceptedErrorsAndWarnings.forEach((sectionID: FormSectionId) => {
-    const section = newFormState.sections[sectionID];
+    const section = formState.sections[sectionID];
     if (section) {
       section.acceptErrorsAndWarnings = true;
     }
   });
 
   // set saved sections to all sections before the furthest section
-  const currentIndex = newFormState.sections[newFormState.furthest]?.index ?? 0;
-  for (const section of Object.values(newFormState.sections)) {
+  const currentIndex = formState.sections[formState.furthest]?.index ?? 0;
+  for (const section of Object.values(formState.sections)) {
     if (section.index < currentIndex) {
       section.isSaved = true;
     }
@@ -189,40 +230,42 @@ export function buildFormState(
 
   // set correctionWarning on the sections
   if (clientState.correctionWarnings) {
-    addCorrectionWarnings(dataEntryStructure, clientState.correctionWarnings, newFormState);
+    addCorrectionWarnings(dataEntryStructure, clientState.correctionWarnings, formState);
   }
 
   updateFormStateAfterSubmit(
     dataEntryStructure,
-    newFormState,
+    formState,
     validationResults,
     serverCurrentSection,
     acceptErrorsAndWarnings,
   );
 
-  let targetFormSectionId: FormSectionId;
   if (clientState.continue) {
-    targetFormSectionId = getNextSectionID(newFormState, serverCurrentSection) ?? serverCurrentSection;
-  } else {
-    targetFormSectionId = serverCurrentSection;
+    return getNextSectionID(formState, serverCurrentSection) ?? serverCurrentSection;
   }
 
-  return { formState: newFormState, targetFormSectionId };
+  return serverCurrentSection;
 }
 
 /*
  * Build the form state for an entry that is being corrected. The typist starts at the first section and has to
  * accept the errors and warnings again.
  */
-export function buildCorrectionFormState(validationResults: ValidationResults, dataEntryStructure: DataEntryStructure) {
+export function restoreCorrectionFormState(
+  formState: FormState,
+  validationResults: ValidationResults,
+  dataEntryStructure: DataEntryStructure,
+): FormSectionId {
   const firstSectionId = dataEntryStructure[0]?.id;
   if (firstSectionId === undefined) {
     throw new Error("Cannot determine initial section from dataEntryStructure");
   }
 
   // "save" is the last section
-  return buildFormState(
+  return restoreFormState(
     { furthest: "save", current: firstSectionId, acceptedErrorsAndWarnings: [], continue: false },
+    formState,
     validationResults,
     dataEntryStructure,
   );

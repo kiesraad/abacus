@@ -144,11 +144,12 @@ export interface FormState {
 }
 
 export type FormSection = {
-  index: number; //fixate the order of filling in sections
+  index: number; // fixate the order of filling in sections
   id: FormSectionId;
   hasChanges: boolean;
-  isSaved: boolean; //whether this section has been sent to the server
-  isSubmitted?: boolean; //whether this section has been submitted in the latest request
+  isDisabled: boolean; // whether this section is disabled and should be skipped
+  isSaved: boolean; // whether this section has been sent to the server
+  isSubmitted?: boolean; // whether this section has been submitted in the latest request
   acceptErrorsAndWarnings: boolean;
   acceptErrorsAndWarningsError: boolean;
   errors: ValidationResultSet;

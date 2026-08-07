@@ -1,14 +1,17 @@
 import { describe, expect, test } from "vitest";
 
+import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMockData";
 import type { ValidationResult, ValidationResultCode } from "@/types/generated/openapi";
 import type { DataEntryResults, DataEntrySection } from "@/types/types";
+import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 import { ValidationResultSet } from "@/utils/ValidationResults";
 
 import {
   getDefaultDataEntryState,
   getDefaultDataEntryStructure,
   getDefaultFormSection,
+  getDSOInitialValues,
   getInitialValues,
 } from "../testing/mock-data";
 import type { FormState } from "../types/types";
@@ -19,8 +22,11 @@ import {
   formSectionComplete,
   getNextSectionID,
   isFormSectionEmpty,
+  isSectionSkipped,
   resetFieldValues,
   resetFormSectionState,
+  resetSkippedSectionValues,
+  updateSkippedSections,
 } from "./dataEntryUtils";
 
 describe("formSectionComplete", () => {
@@ -29,6 +35,7 @@ describe("formSectionComplete", () => {
       formSectionComplete({
         index: 0,
         id: "voters_votes_counts",
+        isDisabled: false,
         isSaved: false,
         acceptErrorsAndWarnings: false,
         errors: new ValidationResultSet(),
@@ -42,6 +49,7 @@ describe("formSectionComplete", () => {
       formSectionComplete({
         index: 0,
         id: "voters_votes_counts",
+        isDisabled: false,
         isSaved: true,
         acceptErrorsAndWarnings: false,
         errors: new ValidationResultSet(),
@@ -73,6 +81,141 @@ describe("getNextSectionID", () => {
     const nextSection = getNextSectionID(formState, "voters_votes_counts");
 
     expect(nextSection).toBe("differences_counts");
+  });
+
+  test("should skip disabled sections", () => {
+    const formState = getDefaultDataEntryState().formState;
+    formState.sections.voters_votes_counts!.isSaved = true;
+    formState.sections.voters_votes_counts!.isSubmitted = true;
+    formState.sections.differences_counts!.isDisabled = true;
+
+    const nextSection = getNextSectionID(formState, "voters_votes_counts");
+
+    expect(nextSection).toBe("political_group_votes_1");
+  });
+});
+
+describe("isSectionSkipped", () => {
+  const section: DataEntrySection = {
+    id: "checks_and_corrections",
+    title: "Checks and corrections",
+    short_title: "Checks and corrections",
+    skip_when: {
+      path: "about_report.checks_and_corrections_present",
+      equal_to: "PageMissing",
+    },
+    subsections: [],
+  };
+
+  test("section without skip_when is never skipped", () => {
+    const sectionWithoutSkipWhen: DataEntrySection = {
+      ...section,
+      skip_when: undefined,
+    };
+
+    expect(
+      isSectionSkipped(sectionWithoutSkipWhen, {
+        about_report: { checks_and_corrections_present: "PageMissing" },
+      }),
+    ).toBe(false);
+  });
+
+  test("section is skipped when value at path matches", () => {
+    expect(
+      isSectionSkipped(section, {
+        about_report: { checks_and_corrections_present: "PageMissing" },
+      }),
+    ).toBe(true);
+  });
+
+  test("section is not skipped when value at path does not match", () => {
+    expect(
+      isSectionSkipped(section, {
+        about_report: { checks_and_corrections_present: "PagePresent" },
+      }),
+    ).toBe(false);
+    expect(
+      isSectionSkipped(section, {
+        about_report: { checks_and_corrections_present: "" },
+      }),
+    ).toBe(false);
+  });
+});
+
+describe("updateSkippedSections", () => {
+  const skippableSection: DataEntrySection = {
+    id: "differences_counts",
+    title: "Differences",
+    short_title: "Differences",
+    skip_when: {
+      path: "about_report.checks_and_corrections_present",
+      equal_to: "PageMissing",
+    },
+    subsections: [],
+  };
+
+  test("disables sections when skip_when matches and re-enables them when it no longer does", () => {
+    const state = getDefaultDataEntryState();
+    const dataEntryStructure = state.dataEntryStructure.map((section) =>
+      section.id === "differences_counts" ? skippableSection : section,
+    );
+
+    updateSkippedSections(state.formState, dataEntryStructure, {
+      about_report: { checks_and_corrections_present: "PageMissing" },
+    });
+    expect(state.formState.sections.differences_counts!.isDisabled).toBe(true);
+    expect(state.formState.sections.voters_votes_counts!.isDisabled).toBe(false);
+
+    updateSkippedSections(state.formState, dataEntryStructure, {
+      about_report: { checks_and_corrections_present: "PagePresent" },
+    });
+    expect(state.formState.sections.differences_counts!.isDisabled).toBe(false);
+  });
+
+  test("updates furthest to the next enabled section when the furthest section is skipped", () => {
+    const state = getDefaultDataEntryState();
+    const dataEntryStructure = state.dataEntryStructure.map((section) =>
+      section.id === "differences_counts" ? skippableSection : section,
+    );
+    state.formState.furthest = "differences_counts";
+
+    updateSkippedSections(state.formState, dataEntryStructure, {
+      about_report: { checks_and_corrections_present: "PageMissing" },
+    });
+
+    expect(state.formState.furthest).toBe("political_group_votes_1");
+  });
+});
+
+describe("resetSkippedSectionValues", () => {
+  const dataEntryStructure = getDataEntryStructure("DSOFirstSession", electionMockData);
+
+  test("resets the values of a skipped section", () => {
+    const results = getDSOInitialValues();
+    results.about_report.checks_and_corrections_present = "PageMissing";
+    results.checks_and_corrections.reason_investigation_own_initiative.unaccounted_difference = true;
+    results.checks_and_corrections.corrected_results_own_initiative.yes = true;
+    results.checks_and_corrections.corrected_results_csb_request.no = true;
+    results.voters_counts.poll_card_count = 10;
+
+    resetSkippedSectionValues(dataEntryStructure, results);
+
+    expect(results.checks_and_corrections.reason_investigation_own_initiative.unaccounted_difference).toBe(false);
+    expect(results.checks_and_corrections.corrected_results_own_initiative.yes).toBe(false);
+    expect(results.checks_and_corrections.corrected_results_csb_request.no).toBe(false);
+    // other sections are untouched
+    expect(results.about_report.checks_and_corrections_present).toBe("PageMissing");
+    expect(results.voters_counts.poll_card_count).toBe(10);
+  });
+
+  test("does not reset values when the section is not skipped", () => {
+    const results = getDSOInitialValues();
+    results.about_report.checks_and_corrections_present = "PagePresent";
+    results.checks_and_corrections.corrected_results_own_initiative.yes = true;
+
+    resetSkippedSectionValues(dataEntryStructure, results);
+
+    expect(results.checks_and_corrections.corrected_results_own_initiative.yes).toBe(true);
   });
 });
 
@@ -158,7 +301,13 @@ describe("isFormSectionEmpty", () => {
           short_title: "Checkbox Test",
           error_path: "test.checkbox_error",
           error_message: "Checkbox error",
-          options: [{ path: "test.checkbox_field", label: "Checkbox", short_label: "Checkbox" }],
+          options: [
+            {
+              path: "test.checkbox_field",
+              label: "Checkbox",
+              short_label: "Checkbox",
+            },
+          ],
         },
       ],
     };

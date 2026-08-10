@@ -75,6 +75,7 @@ test.describe("data entry - correct differences", () => {
     // Save section with warning
     await dataEntryPage.progressList.votersAndVotes.click();
     const votersAndVotesPage = new VotersAndVotesPage(typist);
+    await expect(votersAndVotesPage.fieldset).toBeVisible();
     await votersAndVotesPage.next.click();
 
     // All progress list icons are shown again

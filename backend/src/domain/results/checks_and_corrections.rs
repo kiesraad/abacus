@@ -286,9 +286,10 @@ mod tests {
                 corrected_results_csb_request.clone(),
             )?;
             let has_f132 = result.errors.iter().any(|e| e == &f132);
-            assert_eq!(has_f132, expect_f132,
-	               "Failed: reason_investigation_own_initiative: {reason_investigation_own_initiative:?}, corrected_results_own_initiative: {corrected_results_own_initiative:?}, corrected_results_csb_request: {corrected_results_csb_request:?}"
-	    );
+            assert_eq!(
+                has_f132, expect_f132,
+                "Failed: reason_investigation_own_initiative: {reason_investigation_own_initiative:?}, corrected_results_own_initiative: {corrected_results_own_initiative:?}, corrected_results_csb_request: {corrected_results_csb_request:?}"
+            );
         }
 
         Ok(())
@@ -341,9 +342,10 @@ mod tests {
                 corrected_results_csb_request.clone(),
             )?;
             let has_f133 = result.errors.iter().any(|e| e == &f133);
-            assert_eq!(has_f133, expect_f133,
-	               "Failed: reason_investigation_own_initiative: {reason_investigation_own_initiative:?}, corrected_results_own_initiative: {corrected_results_own_initiative:?}, corrected_results_csb_request: {corrected_results_csb_request:?}"
-	    );
+            assert_eq!(
+                has_f133, expect_f133,
+                "Failed: reason_investigation_own_initiative: {reason_investigation_own_initiative:?}, corrected_results_own_initiative: {corrected_results_own_initiative:?}, corrected_results_csb_request: {corrected_results_csb_request:?}"
+            );
         }
 
         Ok(())
@@ -405,9 +407,10 @@ mod tests {
                 corrected_results_csb_request.clone(),
             )?;
             let has_f134 = result.errors.iter().any(|e| e == &f134);
-            assert_eq!(has_f134, expect_f134,
-	               "Failed: reason_investigation_own_initiative: {reason_investigation_own_initiative:?}, corrected_results_own_initiative: {corrected_results_own_initiative:?}, corrected_results_csb_request: {corrected_results_csb_request:?}"
-	    );
+            assert_eq!(
+                has_f134, expect_f134,
+                "Failed: reason_investigation_own_initiative: {reason_investigation_own_initiative:?}, corrected_results_own_initiative: {corrected_results_own_initiative:?}, corrected_results_csb_request: {corrected_results_csb_request:?}"
+            );
         }
 
         Ok(())

@@ -28,7 +28,7 @@ export function DataEntryProgress() {
       if (!formSection) return "idle";
 
       if (formSection.isDisabled) {
-        return "skipped";
+        return "empty";
       }
 
       if (formSection.correctionWarning) {

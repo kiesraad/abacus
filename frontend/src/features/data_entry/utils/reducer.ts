@@ -8,12 +8,12 @@ import {
   addCorrectionWarnings,
   getInitialFormState,
   getNextSectionID,
+  resetDisabledSectionValues,
   resetFieldValues,
-  resetSkippedSectionValues,
   restoreCorrectionFormState,
   restoreFormState,
+  updateDisabledSections,
   updateFormStateAfterSubmit,
-  updateSkippedSections,
 } from "./dataEntryUtils";
 
 export function getInitialState(
@@ -48,11 +48,11 @@ export default function dataEntryReducer(state: DataEntryState, action: DataEntr
       let targetFormSectionId: FormSectionId;
 
       const results = structuredClone(action.dataEntry.data);
-      // clean values of skipped sections from the results
-      resetSkippedSectionValues(dataEntryStructure, results);
+      // make sure that the values of disabled sections are reset
+      resetDisabledSectionValues(dataEntryStructure, results);
 
       const formState = getInitialFormState(dataEntryStructure);
-      updateSkippedSections(formState, dataEntryStructure, results);
+      updateDisabledSections(formState, dataEntryStructure, results);
 
       if (action.dataEntry.client_state) {
         targetFormSectionId = restoreFormState(
@@ -135,7 +135,7 @@ export default function dataEntryReducer(state: DataEntryState, action: DataEntr
       };
     case "FORM_SAVED": {
       assertStateIsLoaded(state);
-      updateSkippedSections(state.formState, state.dataEntryStructure, action.data);
+      updateDisabledSections(state.formState, state.dataEntryStructure, action.data);
       const formState = updateFormStateAfterSubmit(
         state.dataEntryStructure,
         state.formState,

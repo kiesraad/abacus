@@ -13,7 +13,7 @@ import type {
   SubmitCurrentFormOptions,
   TemporaryCache,
 } from "../types/types";
-import { calculateDataEntryProgress, getClientState, resetSkippedSectionValues } from "./dataEntryUtils";
+import { calculateDataEntryProgress, getClientState, resetDisabledSectionValues } from "./dataEntryUtils";
 
 function isResults(value: DataEntryResults): value is Results {
   if (!isRecord(value)) {
@@ -88,7 +88,7 @@ export function onSubmitForm(
       }
     }
 
-    resetSkippedSectionValues(state.dataEntryStructure, data);
+    resetDisabledSectionValues(state.dataEntryStructure, data);
 
     // prepare data to send to server
     const clientState = getClientState(

@@ -128,19 +128,6 @@
       }
     }
 
-    &:global(.skipped) {
-      opacity: 0.5;
-      &:hover {
-        background-color: transparent;
-      }
-
-      aside {
-        svg {
-          fill: var(--menu-skipped);
-        }
-      }
-    }
-
     &:global(.unsaved) {
       aside {
         svg {

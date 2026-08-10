@@ -39,15 +39,15 @@ export function getNextSectionID(formState: FormState, currentSectionId: FormSec
   return null;
 }
 
-export function isSectionSkipped(section: DataEntrySection, results: DataEntryResults): boolean {
-  if (!section.skip_when) {
+export function isSectionDisabled(section: DataEntrySection, results: DataEntryResults): boolean {
+  if (section.disabled_when === undefined) {
     return false;
   }
 
-  return getValueAtPath(results, section.skip_when.path) === section.skip_when.equal_to;
+  return getValueAtPath(results, section.disabled_when.path) === section.disabled_when.equal_to;
 }
 
-export function updateSkippedSections(
+export function updateDisabledSections(
   formState: FormState,
   dataEntryStructure: DataEntryStructure,
   results: DataEntryResults,
@@ -55,7 +55,7 @@ export function updateSkippedSections(
   for (const section of dataEntryStructure) {
     const formSection = formState.sections[section.id];
     if (formSection) {
-      formSection.isDisabled = isSectionSkipped(section, results);
+      formSection.isDisabled = isSectionDisabled(section, results);
     }
   }
 
@@ -70,9 +70,9 @@ export function updateSkippedSections(
   }
 }
 
-export function resetSkippedSectionValues(dataEntryStructure: DataEntryStructure, results: DataEntryResults) {
+export function resetDisabledSectionValues(dataEntryStructure: DataEntryStructure, results: DataEntryResults) {
   const fields = dataEntryStructure
-    .filter((section) => isSectionSkipped(section, results))
+    .filter((section) => isSectionDisabled(section, results))
     .flatMap((section) => [...extractFieldInfoFromSection(section).keys()]);
 
   if (fields.length > 0) {

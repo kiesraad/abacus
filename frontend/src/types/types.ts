@@ -94,7 +94,7 @@ export function isCheckboxesSubsection(subsection: DataEntrySubsection): subsect
   return subsection.type === "checkboxes";
 }
 
-export interface SectionSkipCondition {
+export interface EqualToCondition {
   path: ResultsPath;
   equal_to: string;
 }
@@ -103,7 +103,7 @@ export interface DataEntrySection {
   id: FormSectionId;
   title: string;
   short_title: string;
-  skip_when?: SectionSkipCondition;
+  disabled_when?: EqualToCondition;
   sectionNumber?: string;
   subsections: DataEntrySubsection[];
 }

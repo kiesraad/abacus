@@ -273,7 +273,7 @@ const checksAndCorrections: DataEntrySection = {
   id: "checks_and_corrections",
   title: t("checks_and_corrections.form_title"),
   short_title: t("checks_and_corrections.short_title"),
-  skip_when: {
+  disabled_when: {
     path: "about_report.checks_and_corrections_present",
     equal_to: "PageMissing" satisfies ChecksAndCorrectionsPresent,
   },

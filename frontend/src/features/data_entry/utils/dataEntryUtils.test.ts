@@ -22,11 +22,11 @@ import {
   formSectionComplete,
   getNextSectionID,
   isFormSectionEmpty,
-  isSectionSkipped,
+  isSectionDisabled,
+  resetDisabledSectionValues,
   resetFieldValues,
   resetFormSectionState,
-  resetSkippedSectionValues,
-  updateSkippedSections,
+  updateDisabledSections,
 } from "./dataEntryUtils";
 
 describe("formSectionComplete", () => {
@@ -95,78 +95,78 @@ describe("getNextSectionID", () => {
   });
 });
 
-describe("isSectionSkipped", () => {
+describe("isSectionDisabled", () => {
   const section: DataEntrySection = {
     id: "checks_and_corrections",
     title: "Checks and corrections",
     short_title: "Checks and corrections",
-    skip_when: {
+    disabled_when: {
       path: "about_report.checks_and_corrections_present",
       equal_to: "PageMissing",
     },
     subsections: [],
   };
 
-  test("section without skip_when is never skipped", () => {
-    const sectionWithoutSkipWhen: DataEntrySection = {
+  test("section without disabled_when is never disabled", () => {
+    const sectionWithoutDisabledWhen: DataEntrySection = {
       ...section,
-      skip_when: undefined,
+      disabled_when: undefined,
     };
 
     expect(
-      isSectionSkipped(sectionWithoutSkipWhen, {
+      isSectionDisabled(sectionWithoutDisabledWhen, {
         about_report: { checks_and_corrections_present: "PageMissing" },
       }),
     ).toBe(false);
   });
 
-  test("section is skipped when value at path matches", () => {
+  test("section is disabled when value at path matches", () => {
     expect(
-      isSectionSkipped(section, {
+      isSectionDisabled(section, {
         about_report: { checks_and_corrections_present: "PageMissing" },
       }),
     ).toBe(true);
   });
 
-  test("section is not skipped when value at path does not match", () => {
+  test("section is not disabled when value at path does not match", () => {
     expect(
-      isSectionSkipped(section, {
+      isSectionDisabled(section, {
         about_report: { checks_and_corrections_present: "PagePresent" },
       }),
     ).toBe(false);
     expect(
-      isSectionSkipped(section, {
+      isSectionDisabled(section, {
         about_report: { checks_and_corrections_present: "" },
       }),
     ).toBe(false);
   });
 });
 
-describe("updateSkippedSections", () => {
-  const skippableSection: DataEntrySection = {
+describe("updateDisabledSections", () => {
+  const disabledWhenSection: DataEntrySection = {
     id: "differences_counts",
     title: "Differences",
     short_title: "Differences",
-    skip_when: {
+    disabled_when: {
       path: "about_report.checks_and_corrections_present",
       equal_to: "PageMissing",
     },
     subsections: [],
   };
 
-  test("disables sections when skip_when matches and re-enables them when it no longer does", () => {
+  test("disables sections when disabled_when matches and re-enables them when it no longer does", () => {
     const state = getDefaultDataEntryState();
     const dataEntryStructure = state.dataEntryStructure.map((section) =>
-      section.id === "differences_counts" ? skippableSection : section,
+      section.id === "differences_counts" ? disabledWhenSection : section,
     );
 
-    updateSkippedSections(state.formState, dataEntryStructure, {
+    updateDisabledSections(state.formState, dataEntryStructure, {
       about_report: { checks_and_corrections_present: "PageMissing" },
     });
     expect(state.formState.sections.differences_counts!.isDisabled).toBe(true);
     expect(state.formState.sections.voters_votes_counts!.isDisabled).toBe(false);
 
-    updateSkippedSections(state.formState, dataEntryStructure, {
+    updateDisabledSections(state.formState, dataEntryStructure, {
       about_report: { checks_and_corrections_present: "PagePresent" },
     });
     expect(state.formState.sections.differences_counts!.isDisabled).toBe(false);
@@ -175,11 +175,11 @@ describe("updateSkippedSections", () => {
   test("updates furthest to the next enabled section when the furthest section is skipped", () => {
     const state = getDefaultDataEntryState();
     const dataEntryStructure = state.dataEntryStructure.map((section) =>
-      section.id === "differences_counts" ? skippableSection : section,
+      section.id === "differences_counts" ? disabledWhenSection : section,
     );
     state.formState.furthest = "differences_counts";
 
-    updateSkippedSections(state.formState, dataEntryStructure, {
+    updateDisabledSections(state.formState, dataEntryStructure, {
       about_report: { checks_and_corrections_present: "PageMissing" },
     });
 
@@ -198,7 +198,7 @@ describe("resetSkippedSectionValues", () => {
     results.checks_and_corrections.corrected_results_csb_request.no = true;
     results.voters_counts.poll_card_count = 10;
 
-    resetSkippedSectionValues(dataEntryStructure, results);
+    resetDisabledSectionValues(dataEntryStructure, results);
 
     expect(results.checks_and_corrections.reason_investigation_own_initiative.unaccounted_difference).toBe(false);
     expect(results.checks_and_corrections.corrected_results_own_initiative.yes).toBe(false);
@@ -213,7 +213,7 @@ describe("resetSkippedSectionValues", () => {
     results.about_report.checks_and_corrections_present = "PagePresent";
     results.checks_and_corrections.corrected_results_own_initiative.yes = true;
 
-    resetSkippedSectionValues(dataEntryStructure, results);
+    resetDisabledSectionValues(dataEntryStructure, results);
 
     expect(results.checks_and_corrections.corrected_results_own_initiative.yes).toBe(true);
   });

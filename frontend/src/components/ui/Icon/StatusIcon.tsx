@@ -13,8 +13,6 @@ export function StatusIcon({ status }: { status: MenuStatus }) {
   switch (status) {
     case "active":
       return <IconArrowNarrowRight aria-label={t("you_are_here")} aria-hidden="false" />; // "Actief"
-    case "skipped":
-      return <IconMinus aria-label={t("skipped")} aria-hidden="false" />; // "Overgeslagen"
     case "accept":
       return <IconCheckmark aria-label={t("saved")} aria-hidden="false" />; // "Ingevoerd"
     case "warning":

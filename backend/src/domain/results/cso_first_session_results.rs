@@ -39,7 +39,7 @@ impl CSOFirstSessionResults {
             self.counting_differences_polling_station
                 .unexplained_difference_ballots_voters
                 .as_bool(),
-            Some(true)
+            Some(false)
         ) || matches!(
             self.counting_differences_polling_station
                 .difference_ballots_per_list
@@ -91,5 +91,100 @@ impl Compare for CSOFirstSessionResults {
             different_fields,
             &path.field("political_group_votes"),
         );
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use test_log::test;
+
+    use super::*;
+    use crate::domain::results::yes_no::YesNo;
+
+    fn results(
+        unexplained_difference_ballots_voters: YesNo,
+        difference_ballots_per_list: YesNo,
+        difference_completely_accounted_for: YesNo,
+    ) -> CSOFirstSessionResults {
+        CSOFirstSessionResults {
+            counting_differences_polling_station: CountingDifferencesPollingStation {
+                unexplained_difference_ballots_voters,
+                difference_ballots_per_list,
+            },
+            differences_counts: DifferencesCounts {
+                difference_completely_accounted_for,
+                ..Default::default()
+            },
+            ..Default::default()
+        }
+    }
+
+    #[test]
+    fn test_admitted_voters_have_been_recounted() {
+        // name, B1-2.1, B1-2.3, B1-3.3.2, expected
+        let cases = [
+            (
+                "no answer",
+                YesNo::default(),
+                YesNo::default(),
+                YesNo::default(),
+                false,
+            ),
+            (
+                "B1-2.1 not accounted for",
+                YesNo::no(),
+                YesNo::default(),
+                YesNo::default(),
+                true,
+            ),
+            (
+                "B1-2.1 accounted for",
+                YesNo::yes(),
+                YesNo::default(),
+                YesNo::default(),
+                false,
+            ),
+            (
+                "B1-2.3 difference per list",
+                YesNo::default(),
+                YesNo::yes(),
+                YesNo::default(),
+                true,
+            ),
+            (
+                "B1-3.3.2 not accounted for diff between D and H",
+                YesNo::default(),
+                YesNo::default(),
+                YesNo::no(),
+                true,
+            ),
+            (
+                "nothing wrong",
+                YesNo::yes(),
+                YesNo::no(),
+                YesNo::yes(),
+                false,
+            ),
+        ];
+
+        for (
+            name,
+            unexplained_difference_ballots_voters,
+            difference_ballots_per_list,
+            difference_completely_accounted_for,
+            expected,
+        ) in cases
+        {
+            assert_eq!(
+                results(
+                    unexplained_difference_ballots_voters,
+                    difference_ballots_per_list,
+                    difference_completely_accounted_for
+                )
+                .admitted_voters_have_been_recounted(),
+                expected,
+                "Failed: {name}"
+            );
+        }
     }
 }

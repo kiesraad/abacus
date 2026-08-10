@@ -84,7 +84,7 @@ mod tests {
     impl ValidDefault for CountingDifferencesPollingStation {
         fn valid_default() -> Self {
             Self {
-                unexplained_difference_ballots_voters: YesNo::no(),
+                unexplained_difference_ballots_voters: YesNo::yes(),
                 difference_ballots_per_list: YesNo::no(),
             }
         }

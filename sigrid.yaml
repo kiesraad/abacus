@@ -53,6 +53,8 @@ dependencychecker:
     # Marvin Attack on RSA crate, which we do not use (Cargo weak dependency, https://github.com/rust-lang/cargo/issues/10801)
     - vulnerability: "CVE-2023-49092"
 
+component_depth: 1
+
 architecture:
   enabled: true
 

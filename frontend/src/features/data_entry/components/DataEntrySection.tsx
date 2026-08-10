@@ -133,6 +133,7 @@ export function DataEntrySection({ committeeCategory }: DataEntryProps) {
           setValues={setValues}
           defaultProps={defaultProps}
           missingTotalError={trailingError !== undefined}
+          readOnly={formSection.isDisabled}
         />
         {trailingError && (
           <div id="missing-total-error" className={cls.missingTotalError}>

@@ -114,11 +114,10 @@ describe("DataEntryProgress", () => {
     const list2 = screen.getByTestId("list-item-political_group_votes_2");
     const checkAndSave = screen.getByTestId("list-item-save");
 
-    expect(checksAndCorrections).toHaveClass("empty");
+    expect(checksAndCorrections).toHaveClass("empty disabled");
     expect(checksAndCorrections).toHaveAttribute("aria-current", "false");
     const checksAndCorrectionsIcon = within(checksAndCorrections).getByRole("img");
     expect(checksAndCorrectionsIcon).toHaveAccessibleName("leeg");
-    expect(within(checksAndCorrections).queryByRole("link")).not.toBeInTheDocument();
 
     expect(votersAndVotes).toHaveClass("error");
     expect(votersAndVotes).toHaveAttribute("aria-current", "false");

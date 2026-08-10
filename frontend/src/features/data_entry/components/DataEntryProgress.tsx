@@ -77,8 +77,8 @@ export function DataEntryProgress() {
       if (!formSection) return null;
 
       const isActive = sectionId === section.id;
-      const canNavigate = !isActive && formSection.index <= currentIndex && !formSection.isDisabled;
-      const isDisabled = options.disabled ?? formSection.index > currentIndex;
+      const canNavigate = !isActive && formSection.index <= currentIndex;
+      const isDisabled = formSection.isDisabled || (options.disabled ?? formSection.index > currentIndex);
 
       return (
         <ProgressList.Item

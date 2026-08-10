@@ -6,7 +6,7 @@ import { DataEntryBasePage } from "./DataEntryBasePgObj";
 
 export const noDifferences = {
   difference_ballots_per_list: { yes: false, no: true },
-  difference_ballots_voters_completely_accounted_for: { yes: false, no: true },
+  difference_ballots_voters_completely_accounted_for: { yes: true, no: false },
 };
 
 export class CountingDifferencesPollingStationPage extends DataEntryBasePage {
@@ -26,16 +26,18 @@ export class CountingDifferencesPollingStationPage extends DataEntryBasePage {
       name: /^Verschillen met telresultaten van het stembureau B1-2/,
     });
 
+    // B1-2.3 Tellingen op lijstniveau
     this.differenceBallotsPerList = this.fieldset.getByRole("group").filter({
       hasText:
-        "Was er in de telresultaten van het stembureau een onverklaard verschil tussen het totaal aantal getelde stembiljetten en het aantal toegelaten kiezers?",
+        "Is er een verschil tussen het totaal aantal getelde stembiljetten per lijst zoals eerder vastgesteld door het stembureau en zoals door u geteld op het gemeentelijk stembureau?",
     });
     this.differenceBallotsPerListYes = this.differenceBallotsPerList.getByRole("checkbox", { name: "Ja" });
     this.differenceBallotsPerListNo = this.differenceBallotsPerList.getByRole("checkbox", { name: "Nee" });
 
+    // B1-2.1 Aantallen kiezers en stemmen
     this.differenceBallotsVotersCompletelyAccountedFor = this.fieldset.getByRole("group").filter({
       hasText:
-        "Is er een verschil tussen het totaal aantal getelde stembiljetten per lijst zoals eerder vastgesteld door het stembureau en zoals door u geteld op het gemeentelijk stembureau?",
+        "Is in de telresultaten van het stembureau het verschil tussen het totaal aantal getelde stemmen en het aantal toegelaten kiezers volledig verklaard?",
     });
     this.differenceBallotsVotersCompletelyAccountedForYes =
       this.differenceBallotsVotersCompletelyAccountedFor.getByRole("checkbox", {

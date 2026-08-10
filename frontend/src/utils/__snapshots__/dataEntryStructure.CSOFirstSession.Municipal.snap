@@ -79,8 +79,8 @@
             "short_label": "Nee",
           },
         ],
-        "short_title": "Verschil tussen getelde stembiljetten en toegelaten kiezers?",
-        "title": "Was er in de telresultaten van het stembureau een onverklaard verschil tussen het totaal aantal getelde stembiljetten en het aantal toegelaten kiezers?",
+        "short_title": "Verschil tussen getelde stemmen en toegelaten kiezers volledig verklaard?",
+        "title": "Is in de telresultaten van het stembureau het verschil tussen het totaal aantal getelde stemmen en het aantal toegelaten kiezers volledig verklaard?",
         "type": "checkboxes",
       },
       {

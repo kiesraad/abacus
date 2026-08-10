@@ -58,7 +58,7 @@ pub fn example_cso_data_entry(client_state: Option<&str>) -> serde_json::Value {
             },
             "counting_differences_polling_station": {
                 "difference_ballots_per_list": {"yes": false, "no": true},
-                "difference_ballots_voters_completely_accounted_for": {"yes": false, "no": true},
+                "difference_ballots_voters_completely_accounted_for": {"yes": true, "no": false},
             },
             "voters_counts": {
                 "poll_card_count": 102,

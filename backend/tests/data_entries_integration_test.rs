@@ -77,7 +77,7 @@ async fn test_data_entry_validation(pool: SqlitePool) {
           "ballots_recounted_extra_investigation": { "yes": false, "no": false },
         },
         "counting_differences_polling_station": {
-          "difference_ballots_voters_completely_accounted_for": { "yes": false, "no": true },
+          "difference_ballots_voters_completely_accounted_for": { "yes": true, "no": false },
           "difference_ballots_per_list": { "yes": false, "no": true },
         },
         "voters_counts": {

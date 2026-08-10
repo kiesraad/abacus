@@ -438,7 +438,8 @@
 
 // Title layout for an attachment or corrigendum
 #let attachment_or_corrigendum_title(title) = {
-  text(size: 20pt, title)
+  block(width: 100%, text(size: 20pt, title))
+  v(1em)
   line(length: 100%)
 }
 

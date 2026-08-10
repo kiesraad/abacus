@@ -46,6 +46,10 @@
     return "Deel 1 - Gecorrigeerde telresultaten"
   }
 
+  if chapter_string.starts-with("Onderzoek naar telresultaten") {
+    return "Deel 1 - Verschillen met telresultaten stembureau"
+  }
+
   if chapter_string.starts-with("Telresultaten van") {
     return "Deel 2 - Telresultaten"
   }

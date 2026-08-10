@@ -1,6 +1,6 @@
 use axum::{
-    Json,
     response::{IntoResponse, Response},
+    Json,
 };
 use chrono::NaiveDate;
 use eml_nl::csv::NameResolver;
@@ -612,7 +612,7 @@ pub enum CandidateGender {
 }
 
 #[cfg(test)]
-pub(crate) mod tests {
+pub mod tests {
     use chrono::NaiveDate;
 
     use super::*;

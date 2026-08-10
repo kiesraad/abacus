@@ -27,7 +27,7 @@ export const eml110a = {
 
 export const eml110a_less_than_19_seats = {
   filename: "eml110a_test_less_than_19_seats.eml.xml",
-  path: "../backend/src/eml/tests/eml110a_test_less_than_19_seats.eml.xml",
+  path: "e2e-tests/test-data/eml-files/eml110a_test_less_than_19_seats.eml.xml",
   electionName: "Gemeenteraad Test 2022",
   electionDate: "woensdag 16 maart 2022",
   hashInput1: "f369",
@@ -59,17 +59,17 @@ export const eml110b = {
 
 export const eml110b_short = {
   filename: "eml110b_less_than_10_stations.eml.xml",
-  path: "../backend/src/eml/tests/eml110b_less_than_10_stations.eml.xml",
+  path: "e2e-tests/test-data/eml-files/eml110b_less_than_10_stations.eml.xml",
 };
 
 export const eml110b_single = {
   filename: "eml110b_1_station.eml.xml",
-  path: "../backend/src/eml/tests/eml110b_1_station.eml.xml",
+  path: "e2e-tests/test-data/eml-files/eml110b_1_station.eml.xml",
 };
 
 export const eml110b_zero_voters = {
   filename: "eml110b_zero_number_of_voters.eml.xml",
-  path: "../backend/src/eml/tests/eml110b_zero_number_of_voters.eml.xml",
+  path: "e2e-tests/test-data/eml-files/eml110b_zero_number_of_voters.eml.xml",
 };
 
 export type Eml230b = {
@@ -109,7 +109,7 @@ export const eml230b: Eml230b = {
 
 export const eml230b_with_gaps: Eml230b = {
   filename: "eml230b_test_with_gaps.eml.xml",
-  path: "../backend/src/eml/tests/eml230b_test_with_gaps.eml.xml",
+  path: "e2e-tests/test-data/eml-files/eml230b_test_with_gaps.eml.xml",
   electionDate: "woensdag 16 maart 2022",
   hashInput1: "02c2",
   hashInput2: "0b83",
@@ -135,7 +135,7 @@ export const eml230b_with_gaps: Eml230b = {
 
 export const eml230b_more_than_45_candidates: Eml230b = {
   filename: "eml230b_test_more_than_45_candidates.eml.xml",
-  path: "../backend/src/eml/tests/eml230b_test_more_than_45_candidates.eml.xml",
+  path: "e2e-tests/test-data/eml-files/eml230b_test_more_than_45_candidates.eml.xml",
   electionDate: "woensdag 16 maart 2022",
   hashInput1: "6c76",
   hashInput2: "56c2",

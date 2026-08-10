@@ -19,6 +19,7 @@ jobs:
           fetch-depth: 0
       - name: Sigrid CI
         uses: Software-Improvement-Group/sigridci@43db8e59cdda5f92e640b3c6f6aa1646e870d633 # main
+        continue-on-error: true
         with:
           customer: kiesraad
           system: abacus

@@ -129,6 +129,8 @@ jobs:
         run: cargo --verbose --locked clippy --target=x86_64-unknown-linux-musl --workspace --all-targets --all-features -- -D warnings
       - name: Install Nextest
         run: cargo binstall cargo-nextest
+      - name: Remove sqlx test directory
+        run: rm -rf target/sqlx
       - name: Run tests
         run: cargo --verbose --locked nextest run --target=x86_64-unknown-linux-musl --workspace --exclude pdf_gen_dylib --no-default-features --features openapi,dev-database,embed-typst,tls
       - name: Build documentation

@@ -121,67 +121,20 @@ mod tests {
 
     #[test]
     fn test_admitted_voters_have_been_recounted() {
-        // name, B1-2.1, B1-2.3, B1-3.3.2, expected
+        // name, B1-2.1, B1-2.3, B1-3.3.2 (D vs H), expected
+        #[rustfmt::skip]
         let cases = [
-            (
-                "no answer",
-                YesNo::default(),
-                YesNo::default(),
-                YesNo::default(),
-                false,
-            ),
-            (
-                "B1-2.1 not accounted for",
-                YesNo::no(),
-                YesNo::default(),
-                YesNo::default(),
-                true,
-            ),
-            (
-                "B1-2.1 accounted for",
-                YesNo::yes(),
-                YesNo::default(),
-                YesNo::default(),
-                false,
-            ),
-            (
-                "B1-2.3 difference per list",
-                YesNo::default(),
-                YesNo::yes(),
-                YesNo::default(),
-                true,
-            ),
-            (
-                "B1-3.3.2 not accounted for diff between D and H",
-                YesNo::default(),
-                YesNo::default(),
-                YesNo::no(),
-                true,
-            ),
-            (
-                "nothing wrong",
-                YesNo::yes(),
-                YesNo::no(),
-                YesNo::yes(),
-                false,
-            ),
+            ("no answer",                  YesNo::default(), YesNo::default(), YesNo::default(), false),
+            ("B1-2.1 not accounted for",   YesNo::no(),      YesNo::default(), YesNo::default(), true),
+            ("B1-2.1 accounted for",       YesNo::yes(),     YesNo::default(), YesNo::default(), false),
+            ("B1-2.3 difference per list", YesNo::default(), YesNo::yes(),     YesNo::default(), true),
+            ("B1-3.3.2 not accounted for", YesNo::default(), YesNo::default(), YesNo::no(),      true),
+            ("nothing wrong",              YesNo::yes(),     YesNo::no(),      YesNo::yes(),     false),
         ];
 
-        for (
-            name,
-            unexplained_difference_ballots_voters,
-            difference_ballots_per_list,
-            difference_completely_accounted_for,
-            expected,
-        ) in cases
-        {
+        for (name, ballots_voters, per_list, d_and_h, expected) in cases {
             assert_eq!(
-                results(
-                    unexplained_difference_ballots_voters,
-                    difference_ballots_per_list,
-                    difference_completely_accounted_for
-                )
-                .admitted_voters_have_been_recounted(),
+                results(ballots_voters, per_list, d_and_h).admitted_voters_have_been_recounted(),
                 expected,
                 "Failed: {name}"
             );

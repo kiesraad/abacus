@@ -8,7 +8,7 @@
   "heading_counts_of_lists": "2.3 Tellingen op lijstniveau",
   "heading_voters_and_votes": "2.1  Aantallen kiezers en stemmen",
   "short_title": "Verschillen met stembureau",
-  "unexplained_difference_ballots_voters": {
+  "difference_ballots_voters_completely_accounted_for": {
     "short_title": "Verschil tussen getelde stembiljetten en toegelaten kiezers?",
     "title": "Was er in de telresultaten van het stembureau een onverklaard verschil tussen het totaal aantal getelde stembiljetten en het aantal toegelaten kiezers?"
   },

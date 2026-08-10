@@ -6,7 +6,7 @@ import { DataEntryBasePage } from "./DataEntryBasePgObj";
 
 export const noDifferences = {
   difference_ballots_per_list: { yes: false, no: true },
-  unexplained_difference_ballots_voters: { yes: false, no: true },
+  difference_ballots_voters_completely_accounted_for: { yes: false, no: true },
 };
 
 export class CountingDifferencesPollingStationPage extends DataEntryBasePage {
@@ -14,9 +14,9 @@ export class CountingDifferencesPollingStationPage extends DataEntryBasePage {
   readonly differenceBallotsPerList: Locator;
   readonly differenceBallotsPerListYes: Locator;
   readonly differenceBallotsPerListNo: Locator;
-  readonly unexplainedDifferenceBallotsVoters: Locator;
-  readonly unexplainedDifferenceBallotsVotersYes: Locator;
-  readonly unexplainedDifferenceBallotsVotersNo: Locator;
+  readonly differenceBallotsVotersCompletelyAccountedFor: Locator;
+  readonly differenceBallotsVotersCompletelyAccountedForYes: Locator;
+  readonly differenceBallotsVotersCompletelyAccountedForNo: Locator;
   readonly next: Locator;
 
   constructor(page: Page) {
@@ -33,16 +33,20 @@ export class CountingDifferencesPollingStationPage extends DataEntryBasePage {
     this.differenceBallotsPerListYes = this.differenceBallotsPerList.getByRole("checkbox", { name: "Ja" });
     this.differenceBallotsPerListNo = this.differenceBallotsPerList.getByRole("checkbox", { name: "Nee" });
 
-    this.unexplainedDifferenceBallotsVoters = this.fieldset.getByRole("group").filter({
+    this.differenceBallotsVotersCompletelyAccountedFor = this.fieldset.getByRole("group").filter({
       hasText:
         "Is er een verschil tussen het totaal aantal getelde stembiljetten per lijst zoals eerder vastgesteld door het stembureau en zoals door u geteld op het gemeentelijk stembureau?",
     });
-    this.unexplainedDifferenceBallotsVotersYes = this.unexplainedDifferenceBallotsVoters.getByRole("checkbox", {
-      name: "Ja",
-    });
-    this.unexplainedDifferenceBallotsVotersNo = this.unexplainedDifferenceBallotsVoters.getByRole("checkbox", {
-      name: "Nee",
-    });
+    this.differenceBallotsVotersCompletelyAccountedForYes =
+      this.differenceBallotsVotersCompletelyAccountedFor.getByRole("checkbox", {
+        name: "Ja",
+      });
+    this.differenceBallotsVotersCompletelyAccountedForNo = this.differenceBallotsVotersCompletelyAccountedFor.getByRole(
+      "checkbox",
+      {
+        name: "Nee",
+      },
+    );
 
     this.next = page.getByRole("button", { name: "Volgende" });
   }
@@ -60,16 +64,16 @@ export class CountingDifferencesPollingStationPage extends DataEntryBasePage {
       await this.differenceBallotsPerListNo.uncheck();
     }
 
-    if (countingDifferencesPollingStation.unexplained_difference_ballots_voters.yes) {
-      await this.unexplainedDifferenceBallotsVotersYes.check();
+    if (countingDifferencesPollingStation.difference_ballots_voters_completely_accounted_for.yes) {
+      await this.differenceBallotsVotersCompletelyAccountedForYes.check();
     } else {
-      await this.unexplainedDifferenceBallotsVotersYes.uncheck();
+      await this.differenceBallotsVotersCompletelyAccountedForYes.uncheck();
     }
 
-    if (countingDifferencesPollingStation.unexplained_difference_ballots_voters.no) {
-      await this.unexplainedDifferenceBallotsVotersNo.check();
+    if (countingDifferencesPollingStation.difference_ballots_voters_completely_accounted_for.no) {
+      await this.differenceBallotsVotersCompletelyAccountedForNo.check();
     } else {
-      await this.unexplainedDifferenceBallotsVotersNo.uncheck();
+      await this.differenceBallotsVotersCompletelyAccountedForNo.uncheck();
     }
 
     await this.next.click();
@@ -78,19 +82,19 @@ export class CountingDifferencesPollingStationPage extends DataEntryBasePage {
   async getCountingDifferencesPollingStation(): Promise<CountingDifferencesPollingStation> {
     const differenceBallotsPerListYes = await this.differenceBallotsPerListYes.isChecked();
     const differenceBallotsPerListNo = await this.differenceBallotsPerListNo.isChecked();
-    const unexplainedDifferenceBallotsVotersExtraInvestigationYes =
-      await this.unexplainedDifferenceBallotsVotersYes.isChecked();
-    const unexplainedDifferenceBallotsVotersExtraInvestigationNo =
-      await this.unexplainedDifferenceBallotsVotersNo.isChecked();
+    const differenceBallotsVotersCompletelyAccountedForExtraInvestigationYes =
+      await this.differenceBallotsVotersCompletelyAccountedForYes.isChecked();
+    const differenceBallotsVotersCompletelyAccountedForExtraInvestigationNo =
+      await this.differenceBallotsVotersCompletelyAccountedForNo.isChecked();
 
     return {
       difference_ballots_per_list: {
         yes: differenceBallotsPerListYes,
         no: differenceBallotsPerListNo,
       },
-      unexplained_difference_ballots_voters: {
-        yes: unexplainedDifferenceBallotsVotersExtraInvestigationYes,
-        no: unexplainedDifferenceBallotsVotersExtraInvestigationNo,
+      difference_ballots_voters_completely_accounted_for: {
+        yes: differenceBallotsVotersCompletelyAccountedForExtraInvestigationYes,
+        no: differenceBallotsVotersCompletelyAccountedForExtraInvestigationNo,
       },
     };
   }

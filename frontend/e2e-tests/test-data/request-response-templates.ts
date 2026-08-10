@@ -34,7 +34,7 @@ export function emptyCSOFirstSessionResults(): CSOFirstSessionResults {
       ballots_recounted_extra_investigation: { yes: false, no: false },
     },
     counting_differences_polling_station: {
-      unexplained_difference_ballots_voters: { yes: false, no: false },
+      difference_ballots_voters_completely_accounted_for: { yes: false, no: false },
       difference_ballots_per_list: { yes: false, no: false },
     },
     voters_counts: {
@@ -165,7 +165,7 @@ export const noRecountNoDifferencesDataEntry: CSOFirstSessionResults & { model: 
     ballots_recounted_extra_investigation: { yes: false, no: true },
   },
   counting_differences_polling_station: {
-    unexplained_difference_ballots_voters: { yes: false, no: true },
+    difference_ballots_voters_completely_accounted_for: { yes: false, no: true },
     difference_ballots_per_list: { yes: false, no: true },
   },
   voters_counts: {
@@ -1291,7 +1291,7 @@ export const noRecountNoDifferencesDataEntryWithGaps: Results = {
     ballots_recounted_extra_investigation: { yes: false, no: true },
   },
   counting_differences_polling_station: {
-    unexplained_difference_ballots_voters: { yes: false, no: true },
+    difference_ballots_voters_completely_accounted_for: { yes: false, no: true },
     difference_ballots_per_list: { yes: false, no: true },
   },
   voters_counts: {

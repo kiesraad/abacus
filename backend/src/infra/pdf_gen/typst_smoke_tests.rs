@@ -23,10 +23,10 @@ use crate::{
         },
         investigation::PollingStationInvestigation,
         models::{
-            ModelN10_1InlegvelInput, ModelN10_1Input, ModelN10_2Input, ModelNa14_2Bijlage1Input,
-            ModelNa14_2Input, ModelNa31_1InlegvelInput, ModelNa31_2Bijlage1Input,
-            ModelNa31_2InlegvelInput, ModelNa31_2Input, ModelP2aInput, ModelP22_2Bijlage1Input,
-            ModelP22_2Input, PdfFileModel, PdfModel,
+            ModelN10_1InlegvelInput, ModelN10_1Input, ModelN10_2Input, ModelNa14_1Versie1Input,
+            ModelNa14_2Bijlage1Input, ModelNa14_2Input, ModelNa31_1InlegvelInput,
+            ModelNa31_2Bijlage1Input, ModelNa31_2InlegvelInput, ModelNa31_2Input, ModelP2aInput,
+            ModelP22_2Bijlage1Input, ModelP22_2Input, PdfFileModel, PdfModel,
             apportionment_footnotes::ApportionmentFootnotes,
             enriched_candidate_nomination::EnrichedCandidateNomination,
             enriched_seat_assignment::EnrichedSeatAssignment,
@@ -587,6 +587,32 @@ async fn test_n_10_2() {
 
         let model = PdfModel::ModelN10_2(Box::new(ModelN10_2Input {
             election,
+            polling_station,
+        }));
+
+        test_pdf(model).await;
+    }
+}
+
+#[test(tokio::test)]
+async fn test_na_14_1_versie_1() {
+    let mut rng = rand::rng();
+
+    for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
+        let election = random_election(
+            &mut rng,
+            parties,
+            candidates,
+            string_length,
+            none_where_possible,
+        );
+        let polling_station = random_polling_station(&mut rng, string_length, none_where_possible);
+        let committee_session = random_committee_session(&mut rng, election.id, string_length);
+
+        let model = PdfModel::ModelNa14_1Versie1(Box::new(ModelNa14_1Versie1Input {
+            candidates_tables: CandidatesTables::new(&election).unwrap(),
+            committee_session,
+            election: election.into(),
             polling_station,
         }));
 

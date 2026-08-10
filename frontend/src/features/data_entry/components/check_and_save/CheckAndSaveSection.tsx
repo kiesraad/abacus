@@ -26,9 +26,7 @@ interface CorrectWarningSection {
 function CheckAndSaveCorrectWarnings({ sections }: { sections: CorrectWarningSection[] }) {
   return (
     <>
-      <legend>
-        <h2>{t("check_and_save.title")}</h2>
-      </legend>
+      <h2>{t("check_and_save.title")}</h2>
       <p className="md">{t("check_and_save.correction_warnings")}</p>
       <StatusList.Wrapper>
         {sections.map((section) => (

@@ -741,7 +741,7 @@ fn generate_cso_first_session_results(
         extra_investigation,
         counting_differences_polling_station: CountingDifferencesPollingStation {
             // 90% chance of "no", 10% chance of "yes" for each field
-            unexplained_difference_ballots_voters: if rng.random_bool(0.9) {
+            difference_ballots_voters_completely_accounted_for: if rng.random_bool(0.9) {
                 YesNo::no()
             } else {
                 YesNo::yes()

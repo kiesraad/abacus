@@ -35,7 +35,7 @@ fn valid_result() -> Results {
             ballots_recounted_extra_investigation: YesNo::default(),
         },
         counting_differences_polling_station: CountingDifferencesPollingStation {
-            unexplained_difference_ballots_voters: YesNo::no(),
+            difference_ballots_voters_completely_accounted_for: YesNo::no(),
             difference_ballots_per_list: YesNo::no(),
         },
         voters_counts: Default::default(),

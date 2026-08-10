@@ -6359,7 +6359,7 @@
         "type": "object",
         "description": "Counting Differences Polling Station,\npart of the results (\"B1-2 Verschillen met telresultaten van het stembureau\")",
         "required": [
-          "unexplained_difference_ballots_voters",
+          "difference_ballots_voters_completely_accounted_for",
           "difference_ballots_per_list"
         ],
         "properties": {
@@ -6367,9 +6367,9 @@
             "$ref": "#/components/schemas/YesNo",
             "description": "Whether there was a difference between the total votes per list as determined by the polling station and by the typist\n(\"Is er een verschil tussen het totaal aantal getelde stembiljetten per lijst zoals eerder vastgesteld door het stembureau en zoals door u geteld op het gemeentelijk stembureau?\")"
           },
-          "unexplained_difference_ballots_voters": {
+          "difference_ballots_voters_completely_accounted_for": {
             "$ref": "#/components/schemas/YesNo",
-            "description": "Whether there was an unexplained difference between the number of voters and votes\n(\"Was er in de telresultaten van het stembureau een onverklaard verschil tussen het totaal aantal getelde stembiljetten en het aantal toegelaten kiezers?\")"
+            "description": "Whether any difference between the number of votes counted and the number of admitted voters was completely accounted for\n(\"Is in de telresultaten van het stembureau het verschil tussen het totaal aantal getelde stemmen en het aantal toegelaten kiezers volledig verklaard?\")"
           }
         },
         "additionalProperties": false

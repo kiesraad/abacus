@@ -37,7 +37,7 @@ impl CSOFirstSessionResults {
     pub fn admitted_voters_have_been_recounted(&self) -> bool {
         matches!(
             self.counting_differences_polling_station
-                .unexplained_difference_ballots_voters
+                .difference_ballots_voters_completely_accounted_for
                 .as_bool(),
             Some(false)
         ) || matches!(
@@ -102,13 +102,13 @@ mod tests {
     use crate::domain::results::yes_no::YesNo;
 
     fn results(
-        unexplained_difference_ballots_voters: YesNo,
+        difference_ballots_voters_completely_accounted_for: YesNo,
         difference_ballots_per_list: YesNo,
         difference_completely_accounted_for: YesNo,
     ) -> CSOFirstSessionResults {
         CSOFirstSessionResults {
             counting_differences_polling_station: CountingDifferencesPollingStation {
-                unexplained_difference_ballots_voters,
+                difference_ballots_voters_completely_accounted_for,
                 difference_ballots_per_list,
             },
             differences_counts: DifferencesCounts {

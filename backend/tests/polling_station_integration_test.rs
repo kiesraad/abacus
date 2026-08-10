@@ -1043,7 +1043,7 @@ async fn test_import_validate_correct_file(pool: SqlitePool) {
 
     assert_eq!(response.status(), StatusCode::OK);
     let body: serde_json::Value = response.json().await.unwrap();
-    assert_eq!(body["polling_stations"].as_array().unwrap().len(), 420);
+    assert_eq!(body["polling_stations"].as_array().unwrap().len(), 20);
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
@@ -1126,7 +1126,7 @@ async fn test_import_correct_file(pool: SqlitePool) {
         import_validate_polling_stations(&addr, &coordinator_cookie, election_id, data).await;
     assert_eq!(validate_response.status(), StatusCode::OK);
     let body: serde_json::Value = validate_response.json().await.unwrap();
-    assert_eq!(body["polling_stations"].as_array().unwrap().len(), 420);
+    assert_eq!(body["polling_stations"].as_array().unwrap().len(), 20);
 
     let import_response = import_polling_stations(
         &addr,

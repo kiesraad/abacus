@@ -53,8 +53,8 @@ export const eml110a_less_than_19_seats = {
 };
 
 export const eml110b = {
-  filename: "eml110b_test.eml.xml",
-  path: "../backend/src/eml/tests/eml110b_test.eml.xml",
+  filename: "eml110b_test_420_polling_stations.eml.xml",
+  path: "e2e-tests/test-data/eml-files/eml110b_test_420_polling_stations.eml.xml",
 };
 
 export const eml110b_short = {

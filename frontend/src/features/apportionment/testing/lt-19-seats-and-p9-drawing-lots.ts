@@ -2,7 +2,7 @@ import type {
   AbsoluteMajorityDrawingLots,
   ApportionmentState,
   CommitteeSession,
-  ElectionSummary,
+  ElectionTotals,
   ElectionWithPoliticalGroups,
   SeatAssignment,
 } from "@/types/generated/openapi";
@@ -693,7 +693,7 @@ export const seat_assignment_after_drawing_lots_seat_reassigned: SeatAssignment 
   ],
 };
 
-export const election_summary: ElectionSummary = {
+export const election_totals: ElectionTotals = {
   voters_counts: {
     poll_card_count: 5103,
     proxy_certificate_count: 0,

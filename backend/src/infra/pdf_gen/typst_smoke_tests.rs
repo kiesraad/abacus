@@ -53,9 +53,9 @@ use crate::{
             votes_counts::{EnrichedVotesCounts, VotesCounts},
             yes_no::YesNo,
         },
-        summary::{
-            ElectionSummary, ElectionSummaryCSB, PollingStationInvestigations, SumCount,
-            SummaryDifferencesCounts,
+        tabulation::{
+            DifferencesTotals, ElectionTotals, ElectionTotalsCSB, PollingStationInvestigations,
+            SumCount,
         },
     },
 };
@@ -355,8 +355,8 @@ fn random_csb_result(
     election: &ElectionWithPoliticalGroups,
     data_sources: &[DataEntrySource],
     string_length: usize,
-) -> ElectionSummaryCSB {
-    ElectionSummaryCSB {
+) -> ElectionTotalsCSB {
+    ElectionTotalsCSB {
         number_of_voters: rng.random_range(3000..5000),
         voters_counts: VotersCounts {
             poll_card_count: rng.random_range(0..500),
@@ -379,7 +379,7 @@ fn random_csb_result(
             invalid_votes_count: rng.random_range(0..500),
             total_votes_cast_count: rng.random_range(0..500),
         },
-        differences_counts: SummaryDifferencesCounts {
+        differences_counts: DifferencesTotals {
             more_ballots_count: SumCount {
                 count: rng.random_range(0..500),
                 data_entry_sources: random_station_subset(rng, data_sources),
@@ -410,21 +410,21 @@ fn random_sum_count(rng: &mut impl RngExt, data_sources: &[DataEntrySource]) -> 
     }
 }
 
-fn random_election_summary(
+fn random_election_totals(
     rng: &mut impl RngExt,
     election: &ElectionWithPoliticalGroups,
     data_sources: &[DataEntrySource],
-) -> ElectionSummary {
+) -> ElectionTotals {
     let result = random_result(rng, election);
     let data_source_num = |n| match n {
         DataEntrySourceNumber::PollingStation(i) => i,
         DataEntrySourceNumber::SubCommittee(i) => i,
     };
 
-    ElectionSummary {
+    ElectionTotals {
         voters_counts: result.voters_counts,
         votes_counts: result.votes_counts,
-        differences_counts: SummaryDifferencesCounts {
+        differences_counts: DifferencesTotals {
             more_ballots_count: random_sum_count(rng, data_sources),
             fewer_ballots_count: random_sum_count(rng, data_sources),
         },
@@ -447,18 +447,18 @@ fn random_election_summary(
     }
 }
 
-fn random_election_summary_csb(
+fn random_election_totals_csb(
     rng: &mut impl RngExt,
     election: &ElectionWithPoliticalGroups,
     data_sources: &[DataEntrySource],
     string_length: usize,
-) -> ElectionSummaryCSB {
+) -> ElectionTotalsCSB {
     let result = random_csb_result(rng, election, data_sources, string_length);
-    ElectionSummaryCSB {
+    ElectionTotalsCSB {
         number_of_voters: result.number_of_voters,
         voters_counts: result.voters_counts,
         votes_counts: result.votes_counts,
-        differences_counts: SummaryDifferencesCounts {
+        differences_counts: DifferencesTotals {
             more_ballots_count: random_sum_count(rng, data_sources),
             fewer_ballots_count: random_sum_count(rng, data_sources),
         },
@@ -638,8 +638,8 @@ async fn test_na_14_2() {
         let polling_stations =
             random_polling_stations(&mut rng, string_length, none_where_possible);
         let data_sources = ps_as_first_data_entry_sources(&polling_stations);
-        let previous_summary = random_election_summary(&mut rng, &election, &data_sources);
-        let summary = random_election_summary(&mut rng, &election, &data_sources);
+        let previous_totals = random_election_totals(&mut rng, &election, &data_sources);
+        let totals = random_election_totals(&mut rng, &election, &data_sources);
 
         let hash = random_string(&mut rng, 64);
         let creation_date_time = random_date_time(&mut rng)
@@ -647,11 +647,11 @@ async fn test_na_14_2() {
             .to_string();
 
         let model = PdfModel::ModelNa14_2(Box::new(ModelNa14_2Input {
-            votes_tables: VotesTablesWithPreviousVotes::new(&election, &summary, &previous_summary)
+            votes_tables: VotesTablesWithPreviousVotes::new(&election, &totals, &previous_totals)
                 .unwrap(),
             election: election.into(),
-            previous_summary: previous_summary.into(),
-            summary: summary.into(),
+            previous_summary: previous_totals.into(),
+            summary: totals.into(),
             committee_session,
             previous_committee_session,
             hash,
@@ -733,17 +733,17 @@ async fn test_na_31_2() {
         let polling_stations =
             random_polling_stations(&mut rng, string_length, none_where_possible);
         let data_sources = ps_as_first_data_entry_sources(&polling_stations);
-        let summary = random_election_summary(&mut rng, &election, &data_sources);
+        let totals = random_election_totals(&mut rng, &election, &data_sources);
         let hash = random_string(&mut rng, 64);
         let creation_date_time = random_date_time(&mut rng)
             .format(DEFAULT_DATE_TIME_FORMAT)
             .to_string();
 
         let model = PdfModel::ModelNa31_2(Box::new(ModelNa31_2Input {
-            votes_tables: VotesTables::new(&election, &summary).unwrap(),
+            votes_tables: VotesTables::new(&election, &totals).unwrap(),
             committee_session,
             election: election.into(),
-            summary: summary.into(),
+            summary: totals.into(),
             polling_stations,
             hash,
             creation_date_time,
@@ -854,12 +854,12 @@ async fn test_p_22_2() {
     let committee_session = random_committee_session(&mut rng, election.id, string_length);
     let polling_stations = random_polling_stations(&mut rng, string_length, none_where_possible);
     let data_sources = ps_as_first_data_entry_sources(&polling_stations);
-    let summary_gsb = random_election_summary(&mut rng, &election, &data_sources);
-    let summary = random_election_summary_csb(&mut rng, &election, &data_sources, string_length);
+    let totals_gsb = random_election_totals(&mut rng, &election, &data_sources);
+    let totals_csb = random_election_totals_csb(&mut rng, &election, &data_sources, string_length);
 
     let apportionment_input = ApportionmentInputData::new(
         election.number_of_seats,
-        &summary_gsb.political_group_votes,
+        &totals_gsb.political_group_votes,
         &[],
         &[],
         &[],
@@ -871,7 +871,8 @@ async fn test_p_22_2() {
 
     let seat_assignment = map_seat_assignment(&apportionment.seat_assignment);
     let enriched_seat_assignment =
-        EnrichedSeatAssignment::new(election.number_of_seats, &summary, &seat_assignment).unwrap();
+        EnrichedSeatAssignment::new(election.number_of_seats, &totals_csb, &seat_assignment)
+            .unwrap();
     let candidate_nomination = map_candidate_nomination(
         &apportionment.candidate_nomination,
         &election.political_groups,
@@ -889,7 +890,7 @@ async fn test_p_22_2() {
     let model = PdfModel::ModelP22_2(Box::new(ModelP22_2Input {
         committee_session,
         election: election.into(),
-        summary,
+        summary: totals_csb,
         footnotes,
         seat_assignment: enriched_seat_assignment,
         candidate_nomination: enriched_candidate_nomination,
@@ -923,7 +924,7 @@ async fn test_p_22_2_no_votes_cast_regression_3669() {
     let committee_session = random_committee_session(&mut rng, election.id, string_length);
     let polling_stations = random_polling_stations(&mut rng, string_length, none_where_possible);
     let data_sources = ps_as_first_data_entry_sources(&polling_stations);
-    let summary = random_election_summary_csb(&mut rng, &election, &data_sources, string_length);
+    let totals_csb = random_election_totals_csb(&mut rng, &election, &data_sources, string_length);
 
     // Zero votes cast on any candidate/list
     let political_group_votes: Vec<PoliticalGroupCandidateVotes> = election
@@ -962,7 +963,8 @@ async fn test_p_22_2_no_votes_cast_regression_3669() {
     );
 
     let enriched_seat_assignment =
-        EnrichedSeatAssignment::new(election.number_of_seats, &summary, &seat_assignment).unwrap();
+        EnrichedSeatAssignment::new(election.number_of_seats, &totals_csb, &seat_assignment)
+            .unwrap();
     let candidate_nomination = map_candidate_nomination(
         &apportionment.candidate_nomination,
         &election.political_groups,
@@ -980,7 +982,7 @@ async fn test_p_22_2_no_votes_cast_regression_3669() {
     let model = PdfModel::ModelP22_2(Box::new(ModelP22_2Input {
         committee_session,
         election: election.into(),
-        summary,
+        summary: totals_csb,
         footnotes,
         seat_assignment: enriched_seat_assignment,
         candidate_nomination: enriched_candidate_nomination,
@@ -1005,8 +1007,8 @@ async fn test_p_22_2_bijlage_1() {
         let polling_stations =
             random_polling_stations(&mut rng, string_length, none_where_possible);
         let data_sources = ps_as_first_data_entry_sources(&polling_stations);
-        let summary = random_election_summary(&mut rng, &election, &data_sources);
-        let votes_tables = VotesTables::new(&election, &summary).unwrap();
+        let totals = random_election_totals(&mut rng, &election, &data_sources);
+        let votes_tables = VotesTables::new(&election, &totals).unwrap();
         let hash = random_string(&mut rng, 64);
         let creation_date_time = random_date_time(&mut rng)
             .format(DEFAULT_DATE_TIME_FORMAT)

@@ -4,7 +4,7 @@ use crate::domain::{
     apportionment::{DisplayFraction, ListSeatAssignment, SeatAssignment, SeatChangeStep},
     election::PGNumber,
     models::error::ModelsError,
-    summary::ElectionSummaryCSB,
+    tabulation::ElectionTotalsCSB,
 };
 
 struct InitialSteps<'a> {
@@ -143,7 +143,7 @@ impl EnrichedSeatAssignment {
     }
 
     fn get_list_seat_assignments(
-        summary: &ElectionSummaryCSB,
+        totals: &ElectionTotalsCSB,
         seat_assignment: &SeatAssignment,
     ) -> Result<ListSeatAssignments, ModelsError> {
         let mut enriched_list_seat_assignments = Vec::new();
@@ -159,7 +159,7 @@ impl EnrichedSeatAssignment {
             )
         };
 
-        for pg_votes in &summary.votes_counts.political_group_total_votes {
+        for pg_votes in &totals.votes_counts.political_group_total_votes {
             let initial_full_seats = Self::get_initial_full_seats(seat_assignment, pg_votes.number);
             let largest_remainder = if initial_steps.initial_largest_remainder_steps.is_empty() {
                 None
@@ -195,10 +195,10 @@ impl EnrichedSeatAssignment {
 
     pub fn new(
         number_of_seats: u32,
-        summary: &ElectionSummaryCSB,
+        totals: &ElectionTotalsCSB,
         seat_assignment: &SeatAssignment,
     ) -> Result<Self, ModelsError> {
-        let list_seat_assignments = Self::get_list_seat_assignments(summary, seat_assignment)?;
+        let list_seat_assignments = Self::get_list_seat_assignments(totals, seat_assignment)?;
         Ok(EnrichedSeatAssignment {
             quota: seat_assignment.quota,
             list_seat_assignment: list_seat_assignments.enriched_list_seat_assignments,
@@ -271,14 +271,14 @@ mod tests {
                 political_group_total_votes::PoliticalGroupTotalVotes, voters_counts::VotersCounts,
                 votes_counts::VotesCounts,
             },
-            summary::{ElectionSummary, ElectionSummaryCSB, SumCount, SummaryDifferencesCounts},
+            tabulation::{DifferencesTotals, ElectionTotals, ElectionTotalsCSB, SumCount},
         },
     };
 
-    fn get_election_summary(
+    fn get_election_totals(
         election: &ElectionWithPoliticalGroups,
         candidate_votes: &[Vec<u32>],
-    ) -> ElectionSummary {
+    ) -> ElectionTotals {
         let total_votes_candidates_count = candidate_votes.iter().flatten().sum::<u32>();
         let political_group_votes =
             create_political_group_candidate_votes(&election.political_groups, candidate_votes);
@@ -289,7 +289,7 @@ mod tests {
                 total: pg_votes.total,
             })
             .collect();
-        ElectionSummary {
+        ElectionTotals {
             voters_counts: VotersCounts {
                 poll_card_count: total_votes_candidates_count,
                 proxy_certificate_count: 0,
@@ -303,7 +303,7 @@ mod tests {
                 invalid_votes_count: 0,
                 total_votes_cast_count: total_votes_candidates_count,
             },
-            differences_counts: SummaryDifferencesCounts {
+            differences_counts: DifferencesTotals {
                 more_ballots_count: SumCount::zero(),
                 fewer_ballots_count: SumCount::zero(),
             },
@@ -333,11 +333,11 @@ mod tests {
             10,
         );
         let political_groups = &election.political_groups;
-        let summary = get_election_summary(&election, &candidate_votes);
-        let summary_csb = ElectionSummaryCSB::new(&summary, political_groups);
+        let totals = get_election_totals(&election, &candidate_votes);
+        let totals_csb = ElectionTotalsCSB::new(&totals, political_groups);
         let apportionment_input = ApportionmentInputData::new(
             election.number_of_seats,
-            &summary.political_group_votes,
+            &totals.political_group_votes,
             &[],
             &[],
             &[],
@@ -349,7 +349,7 @@ mod tests {
 
         let seat_assignment = map_seat_assignment(&apportionment.seat_assignment);
         let result =
-            EnrichedSeatAssignment::new(election.number_of_seats, &summary_csb, &seat_assignment)
+            EnrichedSeatAssignment::new(election.number_of_seats, &totals_csb, &seat_assignment)
                 .expect("EnrichedSeatAssignment::new should succeed");
 
         assert!(result.initial_highest_average_steps.is_none());
@@ -457,11 +457,11 @@ mod tests {
             24,
         );
         let political_groups = &election.political_groups;
-        let summary = get_election_summary(&election, &candidate_votes);
-        let summary_csb = ElectionSummaryCSB::new(&summary, political_groups);
+        let totals = get_election_totals(&election, &candidate_votes);
+        let totals_csb = ElectionTotalsCSB::new(&totals, political_groups);
         let apportionment_input = ApportionmentInputData::new(
             election.number_of_seats,
-            &summary.political_group_votes,
+            &totals.political_group_votes,
             &[],
             &[],
             &[],
@@ -473,7 +473,7 @@ mod tests {
 
         let seat_assignment = map_seat_assignment(&apportionment.seat_assignment);
         let result =
-            EnrichedSeatAssignment::new(election.number_of_seats, &summary_csb, &seat_assignment)
+            EnrichedSeatAssignment::new(election.number_of_seats, &totals_csb, &seat_assignment)
                 .expect("EnrichedSeatAssignment::new should succeed");
         assert!(result.initial_highest_average_steps.is_some());
         let initial_highest_average_steps = result.initial_highest_average_steps.unwrap();
@@ -549,11 +549,11 @@ mod tests {
             15,
         );
         let political_groups = &election.political_groups;
-        let summary = get_election_summary(&election, &candidate_votes);
-        let summary_csb = ElectionSummaryCSB::new(&summary, political_groups);
+        let totals = get_election_totals(&election, &candidate_votes);
+        let totals_csb = ElectionTotalsCSB::new(&totals, political_groups);
         let apportionment_input = ApportionmentInputData::new(
             election.number_of_seats,
-            &summary.political_group_votes,
+            &totals.political_group_votes,
             &[],
             &[],
             &[],
@@ -565,7 +565,7 @@ mod tests {
 
         let seat_assignment = map_seat_assignment(&apportionment.seat_assignment);
         let result =
-            EnrichedSeatAssignment::new(election.number_of_seats, &summary_csb, &seat_assignment)
+            EnrichedSeatAssignment::new(election.number_of_seats, &totals_csb, &seat_assignment)
                 .expect("EnrichedSeatAssignment::new should succeed");
         assert!(result.initial_highest_average_steps.is_none());
         assert_eq!(result.initial_total_full_seats, 15);

@@ -20,7 +20,7 @@ use crate::{
         election::{
             CandidateNumber, CommitteeCategory, ElectionId, ElectionWithPoliticalGroups, PGNumber,
         },
-        summary::ElectionSummary,
+        tabulation::ElectionTotals,
     },
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
     repository::{
@@ -125,8 +125,8 @@ pub async fn next_state(
 #[allow(clippy::large_enum_variant)]
 pub enum ApportionmentResult {
     Ok(ElectionApportionmentResponse),
-    ListDrawingLotsRequired(ListDrawingLotsVariant, ElectionSummary, SeatAssignment),
-    CandidateDrawingLotsRequired(CandidateDrawingLotsVariant, ElectionSummary, SeatAssignment),
+    ListDrawingLotsRequired(ListDrawingLotsVariant, ElectionTotals, SeatAssignment),
+    CandidateDrawingLotsRequired(CandidateDrawingLotsVariant, ElectionTotals, SeatAssignment),
 }
 
 impl From<apportionment::CandidateDrawingLotsVariant<PGNumber, CandidateNumber>>
@@ -218,11 +218,11 @@ pub async fn process(
 
     let data_entry_results =
         data_entry_repo::list_results_for_committee_session(conn, committee_session_id).await?;
-    let election_summary = ElectionSummary::from_results(election, &data_entry_results)?;
+    let election_totals = ElectionTotals::tabulate(election, &data_entry_results)?;
 
     let input = ApportionmentInputData::new(
         election.number_of_seats,
-        &election_summary.political_group_votes,
+        &election_totals.political_group_votes,
         state.get_deceased_candidates(),
         state.get_lists_drawn(),
         state.get_candidates_drawn(),
@@ -236,7 +236,7 @@ pub async fn process(
                     &output.candidate_nomination,
                     &election.political_groups,
                 ),
-                election_summary: election_summary.clone(),
+                election_totals: election_totals.clone(),
                 warnings: output
                     .seat_assignment
                     .warnings()
@@ -248,14 +248,14 @@ pub async fn process(
         ApportionmentOutput::ListDrawingLotsRequired(variant, preliminary_seat_assignment) => {
             ApportionmentResult::ListDrawingLotsRequired(
                 variant.into(),
-                election_summary.clone(),
+                election_totals.clone(),
                 map_seat_assignment(&preliminary_seat_assignment),
             )
         }
         ApportionmentOutput::CandidateDrawingLotsRequired(variant, seat_assignment) => {
             ApportionmentResult::CandidateDrawingLotsRequired(
                 variant.into(),
-                election_summary.clone(),
+                election_totals.clone(),
                 map_seat_assignment(&seat_assignment),
             )
         }

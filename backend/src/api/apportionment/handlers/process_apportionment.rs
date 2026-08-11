@@ -13,7 +13,7 @@ use crate::{
     domain::{
         apportionment::SeatAssignment,
         election::{Election, ElectionId},
-        summary::ElectionSummary,
+        tabulation::ElectionTotals,
     },
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType},
     repository::{election_repo, user_repo::User},
@@ -34,7 +34,7 @@ impl AsAuditEvent for ApportionmentProcessed {
 pub enum ProcessApportionmentResponse {
     Finalised(ElectionApportionmentResponse),
     DrawingLotsRequired {
-        election_summary: ElectionSummary,
+        election_totals: ElectionTotals,
         seat_assignment: SeatAssignment,
     },
 }
@@ -71,10 +71,10 @@ pub async fn process_apportionment(
     let apportionment_result = service::process_apportionment(&mut conn, &election).await?;
     let apportionment_output = match apportionment_result {
         ApportionmentResult::Ok(apportionment_output) => Finalised(apportionment_output),
-        ApportionmentResult::ListDrawingLotsRequired(_, election_summary, seat_assignment)
-        | ApportionmentResult::CandidateDrawingLotsRequired(_, election_summary, seat_assignment) => {
+        ApportionmentResult::ListDrawingLotsRequired(_, election_totals, seat_assignment)
+        | ApportionmentResult::CandidateDrawingLotsRequired(_, election_totals, seat_assignment) => {
             DrawingLotsRequired {
-                election_summary,
+                election_totals,
                 seat_assignment,
             }
         }

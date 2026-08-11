@@ -13,7 +13,7 @@ use crate::domain::{
         votes_table::VotesTables,
     },
     polling_station::test_helpers::polling_stations_fixture,
-    summary::ElectionSummary,
+    tabulation::ElectionTotals,
 };
 
 #[test(tokio::test)]
@@ -35,11 +35,11 @@ async fn it_generates_a_pdf() {
         political_groups: vec![],
     };
 
-    let summary = ElectionSummary::zero(&election);
+    let totals = ElectionTotals::zero(&election);
     let content = generate_pdf(
         ModelNa31_2Input {
-            summary: summary.clone().into(),
-            votes_tables: VotesTables::new(&election, &summary).unwrap(),
+            summary: totals.clone().into(),
+            votes_tables: VotesTables::new(&election, &totals).unwrap(),
             committee_session: committee_session_fixture(ElectionId::from(1)),
             election: election.into(),
             polling_stations: vec![],
@@ -101,12 +101,12 @@ async fn it_generates_a_pdf_with_unsupported_chars() {
 async fn it_generates_a_pdf_with_polling_stations() {
     let election = election_fixture(ElectionCategory::Municipal, CommitteeCategory::GSB, &[2, 3]);
     let committee_session = committee_session_fixture(election.id);
-    let summary = ElectionSummary::from_results(&election, &[]).unwrap();
+    let totals = ElectionTotals::tabulate(&election, &[]).unwrap();
 
     let content = generate_pdf(
         ModelNa31_2Input {
-            votes_tables: VotesTables::new(&election, &summary).unwrap(),
-            summary: summary.into(),
+            votes_tables: VotesTables::new(&election, &totals).unwrap(),
+            summary: totals.into(),
             polling_stations: polling_stations_fixture(&[100, 200, 300]),
             committee_session,
             election: election.into(),

@@ -19,7 +19,7 @@ import {
   candidate_nomination,
   committee_session,
   election,
-  election_summary,
+  election_totals,
   seat_assignment,
 } from "../../testing/lt-19-seats";
 import { ApportionmentProvider } from "../ApportionmentProvider";
@@ -46,7 +46,7 @@ describe("AddDeceasedCandidatesPage", () => {
           {
             seat_assignment: seat_assignment,
             candidate_nomination: candidate_nomination,
-            election_summary: election_summary,
+            election_totals: election_totals,
             warnings: [],
           } satisfies ElectionApportionmentResponse,
           { status: 200 },

@@ -1,7 +1,7 @@
 import type {
   ApportionmentState,
   CommitteeSession,
-  ElectionSummary,
+  ElectionTotals,
   ElectionWithPoliticalGroups,
   HighestAverageResidualSeatDrawingLots,
   SeatAssignment,
@@ -1153,7 +1153,7 @@ export const seat_assignment_after_two_drawing_lots_seats_assigned: SeatAssignme
   ],
 };
 
-export const election_summary: ElectionSummary = {
+export const election_totals: ElectionTotals = {
   number_of_voters: 1329,
   voters_counts: {
     poll_card_count: 1200,

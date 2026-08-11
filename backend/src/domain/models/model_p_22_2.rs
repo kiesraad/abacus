@@ -8,7 +8,7 @@ use crate::domain::{
         enriched_candidate_nomination::EnrichedCandidateNomination,
         enriched_seat_assignment::EnrichedSeatAssignment, votes_table::VotesTables,
     },
-    summary::ElectionSummaryCSB,
+    tabulation::ElectionTotalsCSB,
 };
 
 #[derive(Serialize, Deserialize)]
@@ -16,7 +16,7 @@ use crate::domain::{
 pub struct ModelP22_2Input {
     pub committee_session: CommitteeSession,
     pub election: Election,
-    pub summary: ElectionSummaryCSB,
+    pub summary: ElectionTotalsCSB,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub footnotes: Option<ApportionmentFootnotes>,
     pub seat_assignment: EnrichedSeatAssignment,

@@ -43,7 +43,7 @@ describe("ApportionmentListDetailsPage", () => {
     overrideOnce("post", "/api/elections/3/apportionment", 200, {
       seat_assignment: lt19Seats.seat_assignment,
       candidate_nomination: lt19Seats.candidate_nomination,
-      election_summary: lt19Seats.election_summary,
+      election_totals: lt19Seats.election_totals,
       warnings: [],
     } satisfies ElectionApportionmentResponse);
   });
@@ -323,7 +323,7 @@ describe("ApportionmentListDetailsPage", () => {
       overrideOnce("post", "/api/elections/11/apportionment", 200, {
         seat_assignment: lt19SeatsAndP15DrawingLots.seat_assignment,
         candidate_nomination: lt19SeatsAndP15DrawingLots.candidate_nomination,
-        election_summary: lt19SeatsAndP15DrawingLots.election_summary,
+        election_totals: lt19SeatsAndP15DrawingLots.election_totals,
         warnings: [],
       } satisfies ElectionApportionmentResponse);
       overrideOnce(

@@ -25,7 +25,7 @@ use crate::{
         polling_station::PollingStation,
         report::DEFAULT_DATE_TIME_FORMAT,
         results::{Results, political_group_candidate_votes::PoliticalGroupCandidateVotes},
-        summary::{ElectionSummary, ElectionSummaryCSB},
+        tabulation::{ElectionTotals, ElectionTotalsCSB},
     },
     eml::EmlHash,
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType},
@@ -140,8 +140,8 @@ pub struct ResultsInputData {
     pub polling_stations: Vec<PollingStation>,
     pub investigations: Vec<PollingStationInvestigation>,
     pub results: Vec<(DataEntrySource, Results)>,
-    pub summary: ElectionSummary,
-    pub previous_summary: Option<ElectionSummary>,
+    pub totals: ElectionTotals,
+    pub previous_totals: Option<ElectionTotals>,
     pub previous_committee_session: Option<CommitteeSession>,
     pub created_at: DateTime<Local>,
 }
@@ -166,23 +166,23 @@ impl ResultsInputData {
             None
         };
 
-        // get the previous results summary from the previous committee session if it exists
-        let previous_summary = if let Some(previous_committee_session) = &previous_committee_session
+        // get the previous results totals from the previous committee session if it exists
+        let previous_totals = if let Some(previous_committee_session) = &previous_committee_session
         {
             let previous_results =
                 list_results_for_committee_session(conn, previous_committee_session.id).await?;
-            let previous_summary = ElectionSummary::from_results(&election, &previous_results)?;
-            Some(previous_summary)
+            let previous_totals = ElectionTotals::tabulate(&election, &previous_results)?;
+            Some(previous_totals)
         } else {
             None
         };
 
-        let summary = ElectionSummary::from_results(&election, &results)?;
+        let totals = ElectionTotals::tabulate(&election, &results)?;
 
         Ok(ResultsInputData {
             committee_session,
-            previous_summary,
-            summary,
+            previous_totals,
+            totals,
             created_at,
             election,
             polling_stations,
@@ -197,7 +197,7 @@ impl ResultsInputData {
             None,
             &self.committee_session,
             &self.results,
-            &self.summary,
+            &self.totals,
             self.created_at,
         )
     }
@@ -350,10 +350,13 @@ impl ResultsInputCSB {
     ) -> Result<PdfFileModel, APIError> {
         let data = &self.data;
 
-        let summary = ElectionSummaryCSB::new(&data.summary, &data.election.political_groups);
+        let totals_csb = ElectionTotalsCSB::new(&data.totals, &data.election.political_groups);
         let seat_assignment = map_seat_assignment(&apportionment_result.seat_assignment);
-        let enriched_seat_assignment =
-            EnrichedSeatAssignment::new(data.election.number_of_seats, &summary, &seat_assignment)?;
+        let enriched_seat_assignment = EnrichedSeatAssignment::new(
+            data.election.number_of_seats,
+            &totals_csb,
+            &seat_assignment,
+        )?;
         let candidate_nomination = map_candidate_nomination(
             &apportionment_result.candidate_nomination,
             &data.election.political_groups.clone(),
@@ -365,7 +368,7 @@ impl ResultsInputCSB {
         let pdf_file: PdfFileModel = ModelP22_2Input {
             committee_session: data.committee_session.clone(),
             election: data.election.clone().into(),
-            summary,
+            summary: totals_csb,
             footnotes,
             seat_assignment: enriched_seat_assignment,
             candidate_nomination: enriched_candidate_nomination,
@@ -384,7 +387,7 @@ impl ResultsInputCSB {
     ) -> Result<PdfFileModel, APIError> {
         let data = &self.data;
 
-        let votes_tables = VotesTables::new(&data.election, &data.summary)?;
+        let votes_tables = VotesTables::new(&data.election, &data.totals)?;
         let pdf_file = ModelP22_2Bijlage1Input {
             election: data.election.clone().into(),
             votes_tables,
@@ -440,9 +443,9 @@ impl ResultsInputGSB {
 
         let results_pdf_file_type = FileType::GsbResultsPdf;
         let results_pdf_model = if data.committee_session.is_next_session() {
-            let Some(previous_summary) = &data.previous_summary else {
+            let Some(previous_totals) = &data.previous_totals else {
                 return Err(APIError::DataIntegrityError(
-                "Previous summary is required for generating results PDF for next committee sessions"
+                "Previous totals are required for generating results PDF for next committee sessions"
                     .to_string(),
             ));
             };
@@ -455,7 +458,7 @@ impl ResultsInputGSB {
             };
 
             self.get_na14_2_pdf_file(
-                previous_summary,
+                previous_totals,
                 previous_committee_session,
                 xml_hash,
                 creation_date_time,
@@ -481,7 +484,7 @@ impl ResultsInputGSB {
 
     fn get_na14_2_pdf_file(
         &self,
-        previous_summary: &ElectionSummary,
+        previous_totals: &ElectionTotals,
         previous_committee_session: &CommitteeSession,
         hash: String,
         creation_date_time: String,
@@ -492,13 +495,13 @@ impl ResultsInputGSB {
         let pdf_file = ModelNa14_2Input {
             votes_tables: VotesTablesWithPreviousVotes::new(
                 &data.election,
-                &data.summary,
-                previous_summary,
+                &data.totals,
+                previous_totals,
             )?,
             committee_session: data.committee_session.clone(),
             election: data.election.clone().into(),
-            summary: data.summary.clone().into(),
-            previous_summary: previous_summary.clone().into(),
+            summary: data.totals.clone().into(),
+            previous_summary: previous_totals.clone().into(),
             previous_committee_session: previous_committee_session.clone(),
             hash,
             creation_date_time,
@@ -516,10 +519,10 @@ impl ResultsInputGSB {
         let data = &self.data;
 
         let pdf_file = ModelNa31_2Input {
-            votes_tables: VotesTables::new(&data.election, &data.summary)?,
+            votes_tables: VotesTables::new(&data.election, &data.totals)?,
             committee_session: data.committee_session.clone(),
             polling_stations: data.polling_stations.clone(),
-            summary: data.summary.clone().into(),
+            summary: data.totals.clone().into(),
             election: data.election.clone().into(),
             hash,
             creation_date_time,

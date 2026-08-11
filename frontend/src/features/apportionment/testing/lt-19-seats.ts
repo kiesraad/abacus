@@ -2,7 +2,7 @@ import type {
   ApportionmentState,
   CandidateNomination,
   CommitteeSession,
-  ElectionSummary,
+  ElectionTotals,
   ElectionWithPoliticalGroups,
   ListCandidateNomination,
   PoliticalGroup,
@@ -1363,7 +1363,7 @@ export const political_group_1_votes: PoliticalGroupCandidateVotes = {
   ],
 };
 
-export const election_summary: ElectionSummary = {
+export const election_totals: ElectionTotals = {
   number_of_voters: 2000,
   voters_counts: {
     poll_card_count: 1203,

@@ -28,6 +28,17 @@ pub struct ChecksAndCorrections {
     pub corrected_results_csb_request: YesNo,
 }
 
+impl ChecksAndCorrections {
+    pub fn is_empty(&self) -> bool {
+        !self
+            .reason_investigation_own_initiative
+            .unaccounted_difference
+            && !self.reason_investigation_own_initiative.other_error
+            && self.corrected_results_own_initiative.is_empty()
+            && self.corrected_results_csb_request.is_empty()
+    }
+}
+
 /// Reason for investigation on own initiative
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]

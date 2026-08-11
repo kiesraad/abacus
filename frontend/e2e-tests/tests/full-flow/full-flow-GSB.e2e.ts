@@ -578,9 +578,11 @@ test.describe("full flow GSB", () => {
       await firstCandidatesPage.next.click();
 
       const secondCandidatesPage = new CandidatesListPage(page, 1, secondListName!);
+      await expect(secondCandidatesPage.fieldset).toBeVisible();
       await secondCandidatesPage.next.click();
 
       const thirdCandidatesPage = new CandidatesListPage(page, 2, thirdListName!);
+      await expect(thirdCandidatesPage.fieldset).toBeVisible();
       await thirdCandidatesPage.next.click();
 
       const checkAndSavePage = new CheckAndSavePage(page);

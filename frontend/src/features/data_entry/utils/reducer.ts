@@ -8,6 +8,7 @@ import {
   addCorrectionWarnings,
   getInitialFormState,
   getNextSectionID,
+  isCachedSectionDisabled,
   resetDisabledSectionValues,
   resetFieldValues,
   restoreCorrectionFormState,
@@ -136,6 +137,8 @@ export default function dataEntryReducer(state: DataEntryState, action: DataEntr
     case "FORM_SAVED": {
       assertStateIsLoaded(state);
       updateDisabledSections(state.formState, state.dataEntryStructure, action.data);
+      const cache = isCachedSectionDisabled(state.formState, state.cache) ? null : state.cache;
+
       const formState = updateFormStateAfterSubmit(
         state.dataEntryStructure,
         state.formState,
@@ -153,6 +156,7 @@ export default function dataEntryReducer(state: DataEntryState, action: DataEntr
         targetFormSectionId: action.continueToNextSection
           ? getNextSectionID(formState, action.sectionId)
           : state.targetFormSectionId,
+        cache,
       };
     }
     case "RESET_TARGET_FORM_SECTION":

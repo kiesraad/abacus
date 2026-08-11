@@ -2,7 +2,7 @@ import type { ValidationResult, ValidationResults } from "@/types/generated/open
 import type { DataEntryResults, DataEntrySection, DataEntryStructure, FormSectionId, ResultsPath } from "@/types/types";
 import { extractFieldInfoFromSection, getValueAtPath, resetValueAtPath } from "@/utils/dataEntryMapping";
 import { doesValidationResultApplyToSection, isFieldInSection, ValidationResultSet } from "@/utils/ValidationResults";
-import type { ClientState, FormSection, FormState } from "../types/types";
+import type { ClientState, FormSection, FormState, TemporaryCache } from "../types/types";
 
 export function formSectionComplete(section: FormSection): boolean {
   return (
@@ -68,6 +68,11 @@ export function updateDisabledSections(
       formState.furthest = nextEnabledSection.id;
     }
   }
+}
+
+export function isCachedSectionDisabled(formState: FormState, cache: TemporaryCache | null) {
+  if (cache === null) return false;
+  return formState.sections[cache.key]?.isDisabled;
 }
 
 export function resetDisabledSectionValues(dataEntryStructure: DataEntryStructure, results: DataEntryResults) {

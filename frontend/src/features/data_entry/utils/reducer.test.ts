@@ -275,7 +275,7 @@ test("should handle FORM_SAVED", () => {
   expect(state.targetFormSectionId).toEqual("differences_counts");
 });
 
-describe("FORM_SAVED with a skippable section", () => {
+describe("FORM_SAVED with a disabled section", () => {
   const getClaimedDSOState = (): DataEntryState => {
     return dataEntryReducer(getInitialState(), {
       type: "DATA_ENTRY_CLAIMED",
@@ -338,6 +338,22 @@ describe("FORM_SAVED with a skippable section", () => {
     const state = dataEntryReducer(skippedState, getFormSavedAction("PagePresent"));
 
     expect(state.formState?.sections.checks_and_corrections?.isDisabled).toBe(false);
+  });
+
+  test("should clear the cache if the corresponding section is now disabled", () => {
+    const state = dataEntryReducer(getClaimedDSOState(), getFormSavedAction("PagePresent"));
+    state.cache = { key: "checks_and_corrections", data: {} };
+
+    const newState = dataEntryReducer(state, getFormSavedAction("PageMissing"));
+    expect(newState.cache).toBeNull();
+  });
+
+  test("should not clear the cache if the corresponding section is not disabled", () => {
+    const state = dataEntryReducer(getClaimedDSOState(), getFormSavedAction("PagePresent"));
+    state.cache = { key: "checks_and_corrections", data: {} };
+
+    const newState = dataEntryReducer(state, getFormSavedAction("PagePresent"));
+    expect(newState.cache).not.toBeNull();
   });
 });
 

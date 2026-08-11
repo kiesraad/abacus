@@ -41,7 +41,6 @@ export function getInitialState(
 
 // biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export default function dataEntryReducer(state: DataEntryState, action: DataEntryAction): DataEntryState {
-  console.log(">>", action.type, action);
   switch (action.type) {
     case "DATA_ENTRY_CLAIMED": {
       const model = action.dataEntry.data.model;

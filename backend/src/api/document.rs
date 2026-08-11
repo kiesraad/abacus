@@ -13,6 +13,7 @@ use crate::{
     APIError, AppState, ErrorResponse,
     api::middleware::authentication::RouteAuthorization,
     domain::{
+        committee_session::CommitteeSession,
         election::{CommitteeCategory, ElectionId, VoteCountingMethod},
         models::{
             ModelN10_1InlegvelInput, ModelN10_1Input, ModelN10_2Input, ModelNa14_1Versie1Input,
@@ -86,6 +87,12 @@ async fn election_download_n_10_1(
     let polling_stations = list_polling_stations_for_session(&mut conn, &current_committee_session)
         .await?
         .into_polling_stations();
+    if polling_stations.is_empty() {
+        return Err(APIError::NotFound(
+            "No polling stations found".into(),
+            ErrorReference::EntryNotFound,
+        ));
+    }
     drop(conn);
 
     let zip_filename = format!(
@@ -94,13 +101,6 @@ async fn election_download_n_10_1(
         election.election_date.year(),
         election.location
     );
-
-    if polling_stations.is_empty() {
-        return Err(APIError::NotFound(
-            "No polling stations found".into(),
-            ErrorReference::EntryNotFound,
-        ));
-    }
 
     let models = polling_stations
         .iter()
@@ -177,6 +177,12 @@ async fn election_download_n_10_1_inlegvel(
     let polling_stations = list_polling_stations_for_session(&mut conn, &current_committee_session)
         .await?
         .into_polling_stations();
+    if polling_stations.is_empty() {
+        return Err(APIError::NotFound(
+            "No polling stations found".into(),
+            ErrorReference::EntryNotFound,
+        ));
+    }
     drop(conn);
 
     let zip_filename = format!(
@@ -185,13 +191,6 @@ async fn election_download_n_10_1_inlegvel(
         election.election_date.year(),
         election.location
     );
-
-    if polling_stations.is_empty() {
-        return Err(APIError::NotFound(
-            "No polling stations found".into(),
-            ErrorReference::EntryNotFound,
-        ));
-    }
 
     let models = polling_stations
         .iter()
@@ -267,6 +266,12 @@ async fn election_download_n_10_2(
     let polling_stations = list_polling_stations_for_session(&mut conn, &current_committee_session)
         .await?
         .into_polling_stations();
+    if polling_stations.is_empty() {
+        return Err(APIError::NotFound(
+            "No polling stations found".into(),
+            ErrorReference::EntryNotFound,
+        ));
+    }
     drop(conn);
 
     let zip_filename = format!(
@@ -275,13 +280,6 @@ async fn election_download_n_10_2(
         election.election_date.year(),
         election.location
     );
-
-    if polling_stations.is_empty() {
-        return Err(APIError::NotFound(
-            "No polling stations found".into(),
-            ErrorReference::EntryNotFound,
-        ));
-    }
 
     let models = polling_stations
         .iter()
@@ -310,6 +308,16 @@ async fn election_download_n_10_2(
     });
 
     Ok(zip_response)
+}
+
+fn verify_committee_session_details(committee_session: &CommitteeSession) -> Result<(), APIError> {
+    if committee_session.start_date_time.is_none() || committee_session.location.is_empty() {
+        return Err(APIError::NotFound(
+            "Committee session is missing start date, start time and location details".into(),
+            ErrorReference::EntryNotFound,
+        ));
+    }
+    Ok(())
 }
 
 #[utoipa::path(
@@ -354,9 +362,17 @@ async fn election_download_na_14_1_versie1(
 
     let current_committee_session =
         committee_session_repo::get_election_committee_session(&mut conn, election.id).await?;
+    verify_committee_session_details(&current_committee_session)?;
+
     let polling_stations = list_polling_stations_for_session(&mut conn, &current_committee_session)
         .await?
         .into_polling_stations();
+    if polling_stations.is_empty() {
+        return Err(APIError::NotFound(
+            "No polling stations found".into(),
+            ErrorReference::EntryNotFound,
+        ));
+    }
     drop(conn);
 
     let zip_filename = format!(
@@ -365,13 +381,6 @@ async fn election_download_na_14_1_versie1(
         election.election_date.year(),
         election.location
     );
-
-    if polling_stations.is_empty() {
-        return Err(APIError::NotFound(
-            "No polling stations found".into(),
-            ErrorReference::EntryNotFound,
-        ));
-    }
 
     let models = polling_stations
         .iter()
@@ -504,6 +513,12 @@ async fn election_download_na_31_2_bijlage1(
     let polling_stations = list_polling_stations_for_session(&mut conn, &current_committee_session)
         .await?
         .into_polling_stations();
+    if polling_stations.is_empty() {
+        return Err(APIError::NotFound(
+            "No polling stations found".into(),
+            ErrorReference::EntryNotFound,
+        ));
+    }
     drop(conn);
 
     let zip_filename = format!(
@@ -512,13 +527,6 @@ async fn election_download_na_31_2_bijlage1(
         election.election_date.year(),
         election.location
     );
-
-    if polling_stations.is_empty() {
-        return Err(APIError::NotFound(
-            "No polling stations found".into(),
-            ErrorReference::EntryNotFound,
-        ));
-    }
 
     let models = polling_stations
         .iter()
@@ -609,8 +617,10 @@ async fn election_download_na_31_2_inlegvel(
 mod tests {
     use axum::{
         extract::{Path, State},
+        http::StatusCode,
         response::{IntoResponse, Response},
     };
+    use http_body_util::BodyExt;
     use test_log::test;
 
     use super::*;
@@ -703,5 +713,40 @@ mod tests {
     async fn test_dso_documents_counting_method_authorization_ok(pool: SqlitePool) {
         let results = call_dso_handlers(pool, Role::CoordinatorGSB, ElectionId::from(11)).await;
         assert_counting_method_authorization_ok(results);
+    }
+
+    #[test(sqlx::test(fixtures(
+        path = "../../fixtures",
+        scripts("election_12_dso_with_results")
+    )))]
+    async fn test_na_14_1_versie_1_committee_session_missing_details_err(pool: SqlitePool) {
+        let user = User::test_user(Role::CoordinatorGSB, UserId::from(1));
+        let response = election_download_na_14_1_versie1(
+            user.clone(),
+            State(pool.clone()),
+            Path(ElectionId::from(12)),
+        )
+        .await
+        .into_response();
+        let status = response.status();
+        assert_eq!(
+            status,
+            StatusCode::NOT_FOUND,
+            "handler 'download_na_14_1_versie1'"
+        );
+
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let error: ErrorResponse = serde_json::from_slice(&body).unwrap();
+        assert_eq!(
+            error.reference,
+            ErrorReference::EntryNotFound,
+            "handler 'download_na_14_1_versie1'"
+        );
+        let expected_error =
+            "Committee session is missing start date, start time and location details";
+        assert!(
+            error.error.contains(expected_error),
+            "handler 'download_na_14_1_versie1'"
+        );
     }
 }

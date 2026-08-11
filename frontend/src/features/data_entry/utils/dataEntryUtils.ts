@@ -56,6 +56,10 @@ export function updateDisabledSections(
     const formSection = formState.sections[section.id];
     if (formSection) {
       formSection.isDisabled = isSectionDisabled(section, results);
+      if (formSection.isDisabled) {
+        // Disabled sections do not have changes (values are reset when submitting)
+        formSection.hasChanges = false;
+      }
     }
   }
 

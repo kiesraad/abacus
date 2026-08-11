@@ -14,7 +14,7 @@ import {
   getDSOInitialValues,
   getInitialValues,
 } from "../testing/mock-data";
-import type { FormState } from "../types/types";
+import type { DataEntryStateLoaded, FormState } from "../types/types";
 import {
   addCorrectionWarnings,
   addValidationResultsToFormState,
@@ -154,36 +154,50 @@ describe("updateDisabledSections", () => {
     subsections: [],
   };
 
-  test("disables sections when disabled_when matches and re-enables them when it no longer does", () => {
+  function getState(): DataEntryStateLoaded {
     const state = getDefaultDataEntryState();
-    const dataEntryStructure = state.dataEntryStructure.map((section) =>
+    state.dataEntryStructure = state.dataEntryStructure.map((section) =>
       section.id === "differences_counts" ? disabledWhenSection : section,
     );
+    return state;
+  }
 
-    updateDisabledSections(state.formState, dataEntryStructure, {
+  test("disables sections when disabled_when matches and re-enables them when it no longer does", () => {
+    const { formState, dataEntryStructure } = getState();
+
+    updateDisabledSections(formState, dataEntryStructure, {
       about_report: { checks_and_corrections_present: "PageMissing" },
     });
-    expect(state.formState.sections.differences_counts!.isDisabled).toBe(true);
-    expect(state.formState.sections.voters_votes_counts!.isDisabled).toBe(false);
+    expect(formState.sections.differences_counts!.isDisabled).toBe(true);
+    expect(formState.sections.voters_votes_counts!.isDisabled).toBe(false);
 
-    updateDisabledSections(state.formState, dataEntryStructure, {
+    updateDisabledSections(formState, dataEntryStructure, {
       about_report: { checks_and_corrections_present: "PagePresent" },
     });
-    expect(state.formState.sections.differences_counts!.isDisabled).toBe(false);
+    expect(formState.sections.differences_counts!.isDisabled).toBe(false);
   });
 
   test("updates furthest to the next enabled section when the furthest section is skipped", () => {
-    const state = getDefaultDataEntryState();
-    const dataEntryStructure = state.dataEntryStructure.map((section) =>
-      section.id === "differences_counts" ? disabledWhenSection : section,
-    );
-    state.formState.furthest = "differences_counts";
+    const { formState, dataEntryStructure } = getState();
+    formState.furthest = "differences_counts";
 
-    updateDisabledSections(state.formState, dataEntryStructure, {
+    updateDisabledSections(formState, dataEntryStructure, {
       about_report: { checks_and_corrections_present: "PageMissing" },
     });
 
-    expect(state.formState.furthest).toBe("political_group_votes_1");
+    expect(formState.furthest).toBe("political_group_votes_1");
+  });
+
+  test("reset hasChanges for disabled sections", () => {
+    const { formState, dataEntryStructure } = getState();
+    formState.sections.differences_counts!.hasChanges = true;
+
+    updateDisabledSections(formState, dataEntryStructure, {
+      about_report: { checks_and_corrections_present: "PageMissing" },
+    });
+
+    expect(formState.sections.differences_counts!.isDisabled).toBeTruthy();
+    expect(formState.sections.differences_counts!.hasChanges).toBeFalsy();
   });
 });
 

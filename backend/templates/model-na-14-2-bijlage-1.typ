@@ -154,7 +154,7 @@ bij beiden het gecorrigeerde getal in. Vink alléén het selectievakje aan dat v
 
 === Vergelijk D (totaal toegelaten kiezers) en H (totaal uitgebrachte stemmen)
 
-#checkbox[D en H zijn *gelijk* #sym.arrow.r *Ga door naar B1 - #ref(<per_list_and_candidate>)*]
+#checkbox[D en H zijn *gelijk* #sym.arrow.r *Ga door naar #ref(<per_list_and_candidate>)*]
 
 #checkbox[H is *groter* dan D (meer uitgebrachte stemmen dan toegelaten kiezers)]
 #box(width: 500pt, inset: (left: 3em, bottom: 1em))[

@@ -51,7 +51,7 @@ describe("doesValidationResultApplyToSection", () => {
   const countingDifferencesPollingStationW001: ValidationResult = {
     code: "W001",
     fields: [
-      "data.counting_differences_polling_station.unexplained_difference_ballots_voters.yes",
+      "data.counting_differences_polling_station.difference_ballots_voters_completely_accounted_for.yes",
       "data.counting_differences_polling_station.difference_ballots_per_list.no",
     ],
   };

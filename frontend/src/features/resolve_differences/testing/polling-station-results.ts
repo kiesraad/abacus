@@ -29,7 +29,7 @@ export function resultsMockData(first: boolean): Results {
       ballots_recounted_extra_investigation: { yes: false, no: !first },
     },
     counting_differences_polling_station: {
-      unexplained_difference_ballots_voters: { yes: false, no: false },
+      difference_ballots_voters_completely_accounted_for: { yes: false, no: false },
       difference_ballots_per_list: { yes: false, no: false },
     },
     voters_counts: {

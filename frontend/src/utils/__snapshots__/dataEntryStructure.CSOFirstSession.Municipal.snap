@@ -65,22 +65,22 @@
       },
       {
         "error_message": "Controleer of je antwoord gelijk is aan het papieren proces-verbaal",
-        "error_path": "counting_differences_polling_station.unexplained_difference_ballots_voters",
+        "error_path": "counting_differences_polling_station.difference_ballots_voters_completely_accounted_for",
         "options": [
           {
             "autoFocusInput": true,
             "label": "Ja",
-            "path": "counting_differences_polling_station.unexplained_difference_ballots_voters.yes",
+            "path": "counting_differences_polling_station.difference_ballots_voters_completely_accounted_for.yes",
             "short_label": "Ja",
           },
           {
             "label": "Nee",
-            "path": "counting_differences_polling_station.unexplained_difference_ballots_voters.no",
+            "path": "counting_differences_polling_station.difference_ballots_voters_completely_accounted_for.no",
             "short_label": "Nee",
           },
         ],
-        "short_title": "Verschil tussen getelde stembiljetten en toegelaten kiezers?",
-        "title": "Was er in de telresultaten van het stembureau een onverklaard verschil tussen het totaal aantal getelde stembiljetten en het aantal toegelaten kiezers?",
+        "short_title": "Verschil tussen getelde stemmen en toegelaten kiezers volledig verklaard?",
+        "title": "Is in de telresultaten van het stembureau het verschil tussen het totaal aantal getelde stemmen en het aantal toegelaten kiezers volledig verklaard?",
         "type": "checkboxes",
       },
       {

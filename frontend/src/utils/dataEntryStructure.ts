@@ -415,19 +415,21 @@ const countingDifferencesPollingStation: DataEntrySection = {
     },
     {
       type: "checkboxes",
-      title: t("counting_differences_polling_station.unexplained_difference_ballots_voters.title"),
-      short_title: t("counting_differences_polling_station.unexplained_difference_ballots_voters.short_title"),
-      error_path: "counting_differences_polling_station.unexplained_difference_ballots_voters",
+      title: t("counting_differences_polling_station.difference_ballots_voters_completely_accounted_for.title"),
+      short_title: t(
+        "counting_differences_polling_station.difference_ballots_voters_completely_accounted_for.short_title",
+      ),
+      error_path: "counting_differences_polling_station.difference_ballots_voters_completely_accounted_for",
       error_message: t("counting_differences_polling_station.validation_error"),
       options: [
         {
-          path: "counting_differences_polling_station.unexplained_difference_ballots_voters.yes",
+          path: "counting_differences_polling_station.difference_ballots_voters_completely_accounted_for.yes",
           label: t("yes"),
           short_label: t("yes"),
           autoFocusInput: true,
         },
         {
-          path: "counting_differences_polling_station.unexplained_difference_ballots_voters.no",
+          path: "counting_differences_polling_station.difference_ballots_voters_completely_accounted_for.no",
           label: t("no"),
           short_label: t("no"),
         },

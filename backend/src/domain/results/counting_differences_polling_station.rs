@@ -14,9 +14,9 @@ use crate::domain::{
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
 pub struct CountingDifferencesPollingStation {
-    /// Whether there was an unexplained difference between the number of voters and votes
-    /// ("Was er in de telresultaten van het stembureau een onverklaard verschil tussen het totaal aantal getelde stembiljetten en het aantal toegelaten kiezers?")
-    pub unexplained_difference_ballots_voters: YesNo,
+    /// Whether the difference between the number of votes counted and the number of admitted voters was completely accounted for
+    /// ("Is in de telresultaten van het stembureau het verschil tussen het totaal aantal getelde stemmen en het aantal toegelaten kiezers volledig verklaard?")
+    pub difference_ballots_voters_completely_accounted_for: YesNo,
     /// Whether there was a difference between the total votes per list as determined by the polling station and by the typist
     /// ("Is er een verschil tussen het totaal aantal getelde stembiljetten per lijst zoals eerder vastgesteld door het stembureau en zoals door u geteld op het gemeentelijk stembureau?")
     pub difference_ballots_per_list: YesNo,
@@ -30,7 +30,9 @@ impl Validate for CountingDifferencesPollingStation {
     ) -> Result<ValidationResults, DataError> {
         let mut validation_results = ValidationResults::default();
         if election.committee_category == CommitteeCategory::GSB {
-            if self.unexplained_difference_ballots_voters.is_empty()
+            if self
+                .difference_ballots_voters_completely_accounted_for
+                .is_empty()
                 || self.difference_ballots_per_list.is_empty()
             {
                 validation_results.errors.push(ValidationResult {
@@ -40,7 +42,9 @@ impl Validate for CountingDifferencesPollingStation {
                 });
             }
 
-            if self.unexplained_difference_ballots_voters.is_both()
+            if self
+                .difference_ballots_voters_completely_accounted_for
+                .is_both()
                 || self.difference_ballots_per_list.is_both()
             {
                 validation_results.errors.push(ValidationResult {
@@ -57,11 +61,12 @@ impl Validate for CountingDifferencesPollingStation {
 
 impl Compare for CountingDifferencesPollingStation {
     fn compare(&self, first_entry: &Self, different_fields: &mut Vec<String>, path: &FieldPath) {
-        self.unexplained_difference_ballots_voters.compare(
-            &first_entry.unexplained_difference_ballots_voters,
-            different_fields,
-            &path.field("unexplained_difference_ballots_voters"),
-        );
+        self.difference_ballots_voters_completely_accounted_for
+            .compare(
+                &first_entry.difference_ballots_voters_completely_accounted_for,
+                different_fields,
+                &path.field("difference_ballots_voters_completely_accounted_for"),
+            );
 
         self.difference_ballots_per_list.compare(
             &first_entry.difference_ballots_per_list,
@@ -84,7 +89,7 @@ mod tests {
     impl ValidDefault for CountingDifferencesPollingStation {
         fn valid_default() -> Self {
             Self {
-                unexplained_difference_ballots_voters: YesNo::no(),
+                difference_ballots_voters_completely_accounted_for: YesNo::yes(),
                 difference_ballots_per_list: YesNo::no(),
             }
         }
@@ -92,12 +97,12 @@ mod tests {
 
     fn validate(
         committee_category: CommitteeCategory,
-        unexplained: YesNo,
-        ballots: YesNo,
+        ballots_voters: YesNo,
+        per_list: YesNo,
     ) -> Result<ValidationResults, DataError> {
         let counting_differences_polling_station = CountingDifferencesPollingStation {
-            unexplained_difference_ballots_voters: unexplained,
-            difference_ballots_per_list: ballots,
+            difference_ballots_voters_completely_accounted_for: ballots_voters,
+            difference_ballots_per_list: per_list,
         };
 
         let validation_results = counting_differences_polling_station.validate(
@@ -129,12 +134,12 @@ mod tests {
             (CSB, YesNo::default(), YesNo::no(), false), // Not applicable for CSB
         ];
 
-        for (committee_category, unexplained, ballots, expect_f111) in cases {
-            let result = validate(committee_category, unexplained.clone(), ballots.clone())?;
+        for (committee_category, ballots_voters, per_list, expect_f111) in cases {
+            let result = validate(committee_category, ballots_voters.clone(), per_list.clone())?;
             let has_f111 = result.errors.iter().any(|e| e == &f111);
             assert_eq!(
                 has_f111, expect_f111,
-                "Failed: {committee_category:?}, unexplained: {unexplained:?}, ballots: {ballots:?}"
+                "Failed: {committee_category:?}, B1-2.1: {ballots_voters:?}, B1-2.3: {per_list:?}"
             );
         }
 
@@ -161,12 +166,12 @@ mod tests {
             (CSB, YesNo::both(), YesNo::no(), false), // Not applicable for CSB
         ];
 
-        for (committee_category, unexplained, ballots, expect_f112) in cases {
-            let result = validate(committee_category, unexplained.clone(), ballots.clone())?;
+        for (committee_category, ballots_voters, per_list, expect_f112) in cases {
+            let result = validate(committee_category, ballots_voters.clone(), per_list.clone())?;
             let has_f112 = result.errors.iter().any(|e| e == &f112);
             assert_eq!(
                 has_f112, expect_f112,
-                "Failed: {committee_category:?}, unexplained: {unexplained:?}, ballots: {ballots:?}"
+                "Failed: {committee_category:?}, B1-2.1: {ballots_voters:?}, B1-2.3: {per_list:?}"
             );
         }
 

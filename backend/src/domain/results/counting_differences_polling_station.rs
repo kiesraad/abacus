@@ -14,7 +14,7 @@ use crate::domain::{
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
 pub struct CountingDifferencesPollingStation {
-    /// Whether any difference between the number of votes counted and the number of admitted voters was completely accounted for
+    /// Whether the difference between the number of votes counted and the number of admitted voters was completely accounted for
     /// ("Is in de telresultaten van het stembureau het verschil tussen het totaal aantal getelde stemmen en het aantal toegelaten kiezers volledig verklaard?")
     pub difference_ballots_voters_completely_accounted_for: YesNo,
     /// Whether there was a difference between the total votes per list as determined by the polling station and by the typist

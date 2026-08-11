@@ -82,21 +82,14 @@ export class CountingDifferencesPollingStationPage extends DataEntryBasePage {
   }
 
   async getCountingDifferencesPollingStation(): Promise<CountingDifferencesPollingStation> {
-    const differenceBallotsPerListYes = await this.differenceBallotsPerListYes.isChecked();
-    const differenceBallotsPerListNo = await this.differenceBallotsPerListNo.isChecked();
-    const differenceBallotsVotersCompletelyAccountedForExtraInvestigationYes =
-      await this.differenceBallotsVotersCompletelyAccountedForYes.isChecked();
-    const differenceBallotsVotersCompletelyAccountedForExtraInvestigationNo =
-      await this.differenceBallotsVotersCompletelyAccountedForNo.isChecked();
-
     return {
       difference_ballots_per_list: {
-        yes: differenceBallotsPerListYes,
-        no: differenceBallotsPerListNo,
+        yes: await this.differenceBallotsPerListYes.isChecked(),
+        no: await this.differenceBallotsPerListNo.isChecked(),
       },
       difference_ballots_voters_completely_accounted_for: {
-        yes: differenceBallotsVotersCompletelyAccountedForExtraInvestigationYes,
-        no: differenceBallotsVotersCompletelyAccountedForExtraInvestigationNo,
+        yes: await this.differenceBallotsVotersCompletelyAccountedForYes.isChecked(),
+        no: await this.differenceBallotsVotersCompletelyAccountedForNo.isChecked(),
       },
     };
   }

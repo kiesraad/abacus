@@ -50,7 +50,7 @@
     return "Deel 1 - Verschillen met telresultaten stembureau"
   }
 
-  if chapter_string.starts-with("Telresultaten van") or chapter_string.starts-with("Gecorrigeerde telresultaten") {
+  if chapter_string.starts-with("Telresultaten van") or chapter_string.starts-with("Gecorrigeerde telresultaten") or chapter_string.starts-with("Telresultaten"){
     return "Deel 2 - Telresultaten"
   }
 

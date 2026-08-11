@@ -14,11 +14,11 @@
   doc,
   header-right: header-right,
   footer: [
-    Proces-verbaal van het #location_type\
-    Model P 22-2
+    Datum: #input.creation_date_time. Digitale vingerafdruk van EML-telbestand bij dit PV: \
+    #input.hash \
 
-    Datum: #input.creation_date_time - SHA-256-Hashcode: \
-    #input.hash
+    Proces-verbaal van het #location_type \
+    Model P 22-2 (versie 2027)
   ], margin-bottom: 3.2cm
 )
 

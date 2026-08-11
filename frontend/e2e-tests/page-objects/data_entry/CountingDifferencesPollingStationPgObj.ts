@@ -6,7 +6,7 @@ import { DataEntryBasePage } from "./DataEntryBasePgObj";
 
 export const noDifferences = {
   difference_ballots_per_list: { yes: false, no: true },
-  unexplained_difference_ballots_voters: { yes: false, no: true },
+  difference_ballots_voters_completely_accounted_for: { yes: true, no: false },
 };
 
 export class CountingDifferencesPollingStationPage extends DataEntryBasePage {
@@ -14,9 +14,9 @@ export class CountingDifferencesPollingStationPage extends DataEntryBasePage {
   readonly differenceBallotsPerList: Locator;
   readonly differenceBallotsPerListYes: Locator;
   readonly differenceBallotsPerListNo: Locator;
-  readonly unexplainedDifferenceBallotsVoters: Locator;
-  readonly unexplainedDifferenceBallotsVotersYes: Locator;
-  readonly unexplainedDifferenceBallotsVotersNo: Locator;
+  readonly differenceBallotsVotersCompletelyAccountedFor: Locator;
+  readonly differenceBallotsVotersCompletelyAccountedForYes: Locator;
+  readonly differenceBallotsVotersCompletelyAccountedForNo: Locator;
   readonly next: Locator;
 
   constructor(page: Page) {
@@ -26,23 +26,29 @@ export class CountingDifferencesPollingStationPage extends DataEntryBasePage {
       name: /^Verschillen met telresultaten van het stembureau B1-2/,
     });
 
+    // B1-2.3 Tellingen op lijstniveau
     this.differenceBallotsPerList = this.fieldset.getByRole("group").filter({
       hasText:
-        "Was er in de telresultaten van het stembureau een onverklaard verschil tussen het totaal aantal getelde stembiljetten en het aantal toegelaten kiezers?",
+        "Is er een verschil tussen het totaal aantal getelde stembiljetten per lijst zoals eerder vastgesteld door het stembureau en zoals door u geteld op het gemeentelijk stembureau?",
     });
     this.differenceBallotsPerListYes = this.differenceBallotsPerList.getByRole("checkbox", { name: "Ja" });
     this.differenceBallotsPerListNo = this.differenceBallotsPerList.getByRole("checkbox", { name: "Nee" });
 
-    this.unexplainedDifferenceBallotsVoters = this.fieldset.getByRole("group").filter({
+    // B1-2.1 Aantallen kiezers en stemmen
+    this.differenceBallotsVotersCompletelyAccountedFor = this.fieldset.getByRole("group").filter({
       hasText:
-        "Is er een verschil tussen het totaal aantal getelde stembiljetten per lijst zoals eerder vastgesteld door het stembureau en zoals door u geteld op het gemeentelijk stembureau?",
+        "Is in de telresultaten van het stembureau het verschil tussen het totaal aantal getelde stemmen en het aantal toegelaten kiezers volledig verklaard?",
     });
-    this.unexplainedDifferenceBallotsVotersYes = this.unexplainedDifferenceBallotsVoters.getByRole("checkbox", {
-      name: "Ja",
-    });
-    this.unexplainedDifferenceBallotsVotersNo = this.unexplainedDifferenceBallotsVoters.getByRole("checkbox", {
-      name: "Nee",
-    });
+    this.differenceBallotsVotersCompletelyAccountedForYes =
+      this.differenceBallotsVotersCompletelyAccountedFor.getByRole("checkbox", {
+        name: "Ja",
+      });
+    this.differenceBallotsVotersCompletelyAccountedForNo = this.differenceBallotsVotersCompletelyAccountedFor.getByRole(
+      "checkbox",
+      {
+        name: "Nee",
+      },
+    );
 
     this.next = page.getByRole("button", { name: "Volgende" });
   }
@@ -60,37 +66,30 @@ export class CountingDifferencesPollingStationPage extends DataEntryBasePage {
       await this.differenceBallotsPerListNo.uncheck();
     }
 
-    if (countingDifferencesPollingStation.unexplained_difference_ballots_voters.yes) {
-      await this.unexplainedDifferenceBallotsVotersYes.check();
+    if (countingDifferencesPollingStation.difference_ballots_voters_completely_accounted_for.yes) {
+      await this.differenceBallotsVotersCompletelyAccountedForYes.check();
     } else {
-      await this.unexplainedDifferenceBallotsVotersYes.uncheck();
+      await this.differenceBallotsVotersCompletelyAccountedForYes.uncheck();
     }
 
-    if (countingDifferencesPollingStation.unexplained_difference_ballots_voters.no) {
-      await this.unexplainedDifferenceBallotsVotersNo.check();
+    if (countingDifferencesPollingStation.difference_ballots_voters_completely_accounted_for.no) {
+      await this.differenceBallotsVotersCompletelyAccountedForNo.check();
     } else {
-      await this.unexplainedDifferenceBallotsVotersNo.uncheck();
+      await this.differenceBallotsVotersCompletelyAccountedForNo.uncheck();
     }
 
     await this.next.click();
   }
 
   async getCountingDifferencesPollingStation(): Promise<CountingDifferencesPollingStation> {
-    const differenceBallotsPerListYes = await this.differenceBallotsPerListYes.isChecked();
-    const differenceBallotsPerListNo = await this.differenceBallotsPerListNo.isChecked();
-    const unexplainedDifferenceBallotsVotersExtraInvestigationYes =
-      await this.unexplainedDifferenceBallotsVotersYes.isChecked();
-    const unexplainedDifferenceBallotsVotersExtraInvestigationNo =
-      await this.unexplainedDifferenceBallotsVotersNo.isChecked();
-
     return {
       difference_ballots_per_list: {
-        yes: differenceBallotsPerListYes,
-        no: differenceBallotsPerListNo,
+        yes: await this.differenceBallotsPerListYes.isChecked(),
+        no: await this.differenceBallotsPerListNo.isChecked(),
       },
-      unexplained_difference_ballots_voters: {
-        yes: unexplainedDifferenceBallotsVotersExtraInvestigationYes,
-        no: unexplainedDifferenceBallotsVotersExtraInvestigationNo,
+      difference_ballots_voters_completely_accounted_for: {
+        yes: await this.differenceBallotsVotersCompletelyAccountedForYes.isChecked(),
+        no: await this.differenceBallotsVotersCompletelyAccountedForNo.isChecked(),
       },
     };
   }

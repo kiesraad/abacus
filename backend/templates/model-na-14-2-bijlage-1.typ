@@ -18,7 +18,7 @@
   ],
   footer: [
     Corrigendum van een #location_type \
-    Model Na 14-2
+    Model Na 14-2 (versie 2027)
   ]
 )
 

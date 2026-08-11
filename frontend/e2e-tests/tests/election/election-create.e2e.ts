@@ -276,7 +276,7 @@ test.describe("Election creation", () => {
       await uploadElectionDefinitionPage.uploadFile(eml110b.path);
       await expect(uploadElectionDefinitionPage.invalidFileAlert).toBeVisible();
       await expect(uploadElectionDefinitionPage.invalidFileAlert).toContainText(
-        "Het bestand eml110b_test.eml.xml bevat geen geldige verkiezingsdefinitie. Kies een bestand met een geldige definitie.",
+        "Het bestand eml110b_test_420_polling_stations.eml.xml bevat geen geldige verkiezingsdefinitie. Kies een bestand met een geldige definitie.",
       );
     });
   });
@@ -316,7 +316,7 @@ test.describe("Election creation", () => {
       await uploadCandidateDefinitionPage.uploadFile(eml110b.path);
       await expect(uploadCandidateDefinitionPage.invalidFileAlert).toBeVisible();
       await expect(uploadCandidateDefinitionPage.invalidFileAlert).toContainText(
-        "Het bestand eml110b_test.eml.xml bevat geen geldige kandidatenlijsten. Kies een bestand met een geldige definitie.",
+        "Het bestand eml110b_test_420_polling_stations.eml.xml bevat geen geldige kandidatenlijsten. Kies een bestand met een geldige definitie.",
       );
     });
   });

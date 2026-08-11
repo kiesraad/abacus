@@ -9,11 +9,11 @@
   header-left: [Bijlage 1 – Stemmen per lijst en per kandidaat],
   header-right: [Centraal stembureau #input.election.location],
   footer: [
-    Proces-verbaal van het #location_type\
-    Model P 22-2
-    
-    Datum: #input.creation_date_time - SHA-256-Hashcode: \
-    #input.hash
+    Datum: #input.creation_date_time. Digitale vingerafdruk van EML-telbestand bij dit PV: \
+    #input.hash \
+
+    Proces-verbaal van het #location_type \
+    Model P 22-2 (versie 2027)
   ], margin-bottom: 3.2cm
 )
 

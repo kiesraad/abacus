@@ -18,7 +18,7 @@
   ],
   footer: [
     Proces-verbaal van een #location_type \
-    Model Na 31-2 centrale stemopneming
+    Model Na 31-2 centrale stemopneming (versie 2027)
   ]
 )
 

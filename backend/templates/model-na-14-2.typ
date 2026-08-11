@@ -7,10 +7,17 @@
 #let location_name = is_municipality[Gemeente #input.election.domain_id #input.election.location][Openbaar lichaam #input.election.location]
 #let location_type = is_municipality[gemeentelijk stembureau][stembureau voor het openbaar lichaam]
 
-#show: doc => conf(doc, header-right: location_name, footer: [
-  #input.creation_date_time. Digitale vingerafdruk van EML-telbestand bij dit proces-verbaal (SHA-256): \
-  #input.hash
-])
+#show: doc => conf(
+  doc,
+  header-right: location_name,
+  footer: [
+    Datum: #input.creation_date_time. Digitale vingerafdruk van EML-telbestand bij dit PV: \
+    #input.hash \
+
+    Corrigendum van een #location_type \
+    Model Na 14-2 (versie 2027)
+  ], margin-bottom: 3.2cm
+)
 
 #set heading(numbering: none)
 
@@ -69,7 +76,7 @@ vastgesteld.
 == Toegelaten kiezers
 
 #if not is_local_election(true, false) and "voter_card_count" in input.summary.voters_counts [
-  Het totaal van alle getelde geldige stempassen, volmachtbewijzen en kiezerspassen
+  Het totaal van alle getelde geldige stempassen, volmachtbewijzen en kiezerspassen.
 
   #sum(
     with_correction_title: true,
@@ -81,7 +88,7 @@ vastgesteld.
     ]
   )
 ] else [
-  Het totaal van alle getelde geldige stempassen en volmachtbewijzen
+  Het totaal van alle getelde geldige stempassen en volmachtbewijzen.
 
   #sum(
     with_correction_title: true,
@@ -198,12 +205,12 @@ Het proces-verbaal moet worden ondertekend door alle aanwezige leden. Bij een #l
 
 #stack(spacing: 0.5em, ..range(0, is_local_election(2, 4)).map(_ => textbox[Naam:][Handtekening:]))
 
+#if not is_local_election(true, false) {
+  pagebreak(weak: true)
+}
+
 == Ondertekening door andere aanwezige leden van het #location_type
 
 #signing_form_label[Extra ondertekening:]
 
-#stack(spacing: 0.5em, ..range(0, is_local_election(3, 1)).map(_ => textbox[Naam:][Handtekening:]))
-
-#pagebreak(weak: true)
-
-#stack(spacing: 0.5em, ..range(0, 12).map(_ => textbox[Naam:][Handtekening:]))
+#stack(spacing: 0.5em, ..range(0, is_local_election(13, 10)).map(_ => textbox[Naam:][Handtekening:]))

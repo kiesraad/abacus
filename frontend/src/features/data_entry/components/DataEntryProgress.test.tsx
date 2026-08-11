@@ -283,4 +283,54 @@ describe("DataEntryProgress", () => {
 
     expect(screen.queryByTestId("list-item-pg-3")).not.toBeInTheDocument();
   });
+
+  test("Show only correction warnings if there is some section with a correction warning", async () => {
+    vi.spyOn(ReactRouter, "useParams").mockReturnValue({ dataEntryId: "1", sectionId: "save" });
+    const formState = getDefaultFormState();
+
+    formState.sections.voters_votes_counts!.correctionWarning = validationResultMockData.W002;
+
+    overrideServerClaimDataEntryResponse({
+      formState: formState,
+      results: results,
+      continueToNextSection: false,
+      validationResults: {
+        errors: [validationResultMockData.F301],
+        warnings: [],
+      },
+    });
+    renderForm();
+
+    await waitFor(() => {
+      expect(screen.getByText("Aantal kiezers en stemmen")).toBeVisible();
+    });
+
+    const votersAndVotes = screen.getByTestId("list-item-voters_votes_counts");
+    const differences = screen.getByTestId("list-item-differences_counts");
+    const list1 = screen.getByTestId("list-item-political_group_votes_1");
+    const list2 = screen.getByTestId("list-item-political_group_votes_2");
+    const checkAndSave = screen.getByTestId("list-item-save");
+
+    expect(votersAndVotes).toHaveClass("warning");
+    expect(votersAndVotes).toHaveAttribute("aria-current", "false");
+    const votersAndVotesIcon = within(votersAndVotes).getByRole("img");
+    expect(votersAndVotesIcon).toHaveAccessibleName("bevat een waarschuwing");
+
+    expect(differences).toHaveClass("idle");
+    expect(differences).toHaveAttribute("aria-current", "false");
+    expect(within(differences).queryByRole("img")).not.toBeInTheDocument();
+
+    expect(list1).toHaveClass("idle");
+    expect(list1).toHaveAttribute("aria-current", "false");
+    expect(within(list1).queryByRole("img")).not.toBeInTheDocument();
+
+    expect(list2).toHaveClass("idle");
+    expect(list2).toHaveAttribute("aria-current", "false");
+    expect(within(list2).queryByRole("img")).not.toBeInTheDocument();
+
+    expect(checkAndSave).toHaveClass("idle");
+    expect(checkAndSave).toHaveAttribute("aria-current", "step");
+    const checkAndSaveIcon = within(checkAndSave).getByRole("img");
+    expect(checkAndSaveIcon).toHaveAccessibleName("je bent hier");
+  });
 });

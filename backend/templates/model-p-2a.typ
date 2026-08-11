@@ -10,7 +10,7 @@
 
 #show: doc => conf(doc, header-right: location_name, footer: [
   Proces-verbaal van een #location_type (nieuwe zitting)\
-  Model P 2a
+  Model P 2a (versie 2027)
 ])
 
 #set heading(numbering: none)

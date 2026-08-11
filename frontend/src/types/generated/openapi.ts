@@ -780,7 +780,7 @@ export interface CountingDifferencesPollingStation {
   /** Whether there was a difference between the total votes per list as determined by the polling station and by the typist
 ("Is er een verschil tussen het totaal aantal getelde stembiljetten per lijst zoals eerder vastgesteld door het stembureau en zoals door u geteld op het gemeentelijk stembureau?") */
   difference_ballots_per_list: YesNo;
-  /** Whether any difference between the number of votes counted and the number of admitted voters was completely accounted for
+  /** Whether the difference between the number of votes counted and the number of admitted voters was completely accounted for
 ("Is in de telresultaten van het stembureau het verschil tussen het totaal aantal getelde stemmen en het aantal toegelaten kiezers volledig verklaard?") */
   difference_ballots_voters_completely_accounted_for: YesNo;
 }

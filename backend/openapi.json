@@ -6369,7 +6369,7 @@
           },
           "difference_ballots_voters_completely_accounted_for": {
             "$ref": "#/components/schemas/YesNo",
-            "description": "Whether any difference between the number of votes counted and the number of admitted voters was completely accounted for\n(\"Is in de telresultaten van het stembureau het verschil tussen het totaal aantal getelde stemmen en het aantal toegelaten kiezers volledig verklaard?\")"
+            "description": "Whether the difference between the number of votes counted and the number of admitted voters was completely accounted for\n(\"Is in de telresultaten van het stembureau het verschil tussen het totaal aantal getelde stemmen en het aantal toegelaten kiezers volledig verklaard?\")"
           }
         },
         "additionalProperties": false

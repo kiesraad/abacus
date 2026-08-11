@@ -1,5 +1,3 @@
-#![cfg(test)]
-
 use std::net::SocketAddr;
 
 use axum::http::StatusCode;
@@ -8,6 +6,7 @@ use serde_json::json;
 use sqlx::SqlitePool;
 use test_log::test;
 
+use crate::shared;
 use crate::{
     shared::{
         FixtureUser::*, create_gsb_result, create_gsb_result_with_non_example_data_entry,
@@ -15,9 +14,6 @@ use crate::{
     },
     utils::serve_api,
 };
-
-pub mod shared;
-pub mod utils;
 
 fn get_total_seats_from_seat_assignment(seat_assignment: &serde_json::Value) -> Vec<u64> {
     seat_assignment["standings"]
@@ -39,7 +35,7 @@ async fn get_apportionment(addr: &SocketAddr, election_id: u32) -> Response {
         .unwrap()
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_9_csb", "users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_9_csb", "users"))))]
 async fn test_lt_19_seats(pool: SqlitePool) {
     let addr: SocketAddr = serve_api(pool).await;
     let request_body = json!({
@@ -135,7 +131,7 @@ async fn test_lt_19_seats(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(
-    path = "../fixtures",
+    path = "../../fixtures",
     scripts("election_8_csb_with_results", "users")
 )))]
 async fn test_gte_19_seats(pool: SqlitePool) {
@@ -164,7 +160,7 @@ async fn test_gte_19_seats(pool: SqlitePool) {
     assert_eq!(total_seats, vec![12, 6, 1, 2, 2]);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_10_csb", "users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_10_csb", "users"))))]
 async fn test_unassigned_seats(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -184,7 +180,7 @@ async fn test_unassigned_seats(pool: SqlitePool) {
     assert_eq!(total_seats, vec![2, 2]);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_10_csb", "users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_10_csb", "users"))))]
 async fn test_drawing_of_lots_required(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -234,7 +230,7 @@ async fn test_drawing_of_lots_required(pool: SqlitePool) {
     assert_eq!(body["status"], "DrawingLotsRequired".to_string());
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
 async fn test_error_invalid_election(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -244,7 +240,10 @@ async fn test_error_invalid_election(pool: SqlitePool) {
     assert_eq!(body["error"], "Item not found");
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users", "election_5_with_results"))))]
+#[test(sqlx::test(fixtures(
+    path = "../../fixtures",
+    scripts("users", "election_5_with_results")
+)))]
 async fn test_error_election_not_csb(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -265,7 +264,7 @@ async fn test_error_election_not_csb(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(
-    path = "../fixtures",
+    path = "../../fixtures",
     scripts("users", "election_8_csb_with_results")
 )))]
 async fn test_error_election_not_completed(pool: SqlitePool) {
@@ -278,7 +277,7 @@ async fn test_error_election_not_completed(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(
-    path = "../fixtures",
+    path = "../../fixtures",
     scripts("users", "election_8_csb_with_results")
 )))]
 async fn test_api_output(pool: SqlitePool) {

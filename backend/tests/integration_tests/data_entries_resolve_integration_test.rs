@@ -15,9 +15,6 @@ use crate::{
     utils::serve_api,
 };
 
-pub mod shared;
-pub mod utils;
-
 pub fn data_entry_with_error() -> serde_json::Value {
     let mut data_entry = example_cso_data_entry(None);
     // Introduce error F.203
@@ -100,7 +97,7 @@ async fn resolve_differences(
         .unwrap()
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2", "users"))))]
 async fn test_data_entry_get_errors(pool: SqlitePool) {
     let addr = serve_api(pool.clone()).await;
 
@@ -145,7 +142,7 @@ async fn test_data_entry_get_errors(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::OK);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2", "users"))))]
 async fn test_data_entry_no_errors(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -169,7 +166,7 @@ async fn test_data_entry_no_errors(pool: SqlitePool) {
     );
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2", "users"))))]
 async fn test_data_entry_resolve_errors_discard(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -192,7 +189,7 @@ async fn test_data_entry_resolve_errors_discard(pool: SqlitePool) {
     assert_eq!(body["status"], "empty");
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2", "users"))))]
 async fn test_data_entry_resolve_errors_resume(pool: SqlitePool) {
     let addr = serve_api(pool.clone()).await;
 
@@ -225,7 +222,7 @@ async fn test_data_entry_resolve_errors_resume(pool: SqlitePool) {
     assert_eq!(body["status"], "first_entry_in_progress");
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2", "users"))))]
 async fn test_data_entry_resolve_errors_wrong_state(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -244,7 +241,7 @@ async fn test_data_entry_resolve_errors_wrong_state(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::CONFLICT);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2", "users"))))]
 async fn test_data_entry_resolve_errors_wrong_action(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -259,7 +256,7 @@ async fn test_data_entry_resolve_errors_wrong_action(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::UNPROCESSABLE_ENTITY);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2", "users"))))]
 async fn test_data_entry_get_differences(pool: SqlitePool) {
     let addr = serve_api(pool.clone()).await;
     let (first_entry, second_entry) = different_data_entries();
@@ -291,7 +288,7 @@ async fn test_data_entry_get_differences(pool: SqlitePool) {
     assert_eq!(res.status(), StatusCode::OK);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2", "users"))))]
 async fn test_data_entry_differences_not_found(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -307,7 +304,7 @@ async fn test_data_entry_differences_not_found(pool: SqlitePool) {
     assert_eq!(res.status(), StatusCode::NOT_FOUND);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2", "users"))))]
 async fn test_data_entry_resolve_differences(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -350,7 +347,7 @@ async fn test_data_entry_resolve_differences(pool: SqlitePool) {
     assert_eq!(body["status"], "first_entry_finalised");
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2", "users"))))]
 async fn test_data_entry_resolve_differences_then_resolve_errors(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 

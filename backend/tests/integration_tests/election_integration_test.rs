@@ -10,11 +10,8 @@ use crate::{
     utils::serve_api,
 };
 
-pub mod shared;
-pub mod utils;
-
 #[test(sqlx::test(fixtures(
-    path = "../fixtures",
+    path = "../../fixtures",
     scripts("election_4", "election_5_with_results", "users")
 )))]
 async fn test_election_list_works(pool: SqlitePool) {
@@ -39,7 +36,10 @@ async fn test_election_list_works(pool: SqlitePool) {
     assert_eq!(body["elections"].as_array().unwrap().len(), 2);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
+#[test(sqlx::test(fixtures(
+    path = "../../fixtures",
+    scripts("election_5_with_results", "users")
+)))]
 async fn test_election_details_works(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -63,7 +63,7 @@ async fn test_election_details_works(pool: SqlitePool) {
     assert!(polling_stations.iter().any(|ps| ps["name"] == "Testgebouw"));
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
 async fn test_election_import_payload_too_large(pool: SqlitePool) {
     use abacus::MAX_BODY_SIZE_MB;
     use reqwest::Body;
@@ -88,7 +88,7 @@ async fn test_election_import_payload_too_large(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::PAYLOAD_TOO_LARGE);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
 async fn test_election_import_payload_not_too_large(pool: SqlitePool) {
     use abacus::MAX_BODY_SIZE_MB;
     use reqwest::Body;
@@ -113,7 +113,7 @@ async fn test_election_import_payload_not_too_large(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::BAD_REQUEST);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
 async fn test_election_details_not_found(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -131,7 +131,7 @@ async fn test_election_details_not_found(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(
-    path = "../fixtures",
+    path = "../../fixtures",
     scripts("election_6_no_polling_stations", "users")
 )))]
 async fn test_election_number_of_voters_change_first_session_created_works_for_coordinator(
@@ -165,7 +165,7 @@ async fn test_election_number_of_voters_change_first_session_created_works_for_c
 }
 
 #[test(sqlx::test(fixtures(
-    path = "../fixtures",
+    path = "../../fixtures",
     scripts("election_6_no_polling_stations", "users")
 )))]
 async fn test_election_number_of_voters_change_first_session_in_preparation_works_for_administrator(
@@ -205,7 +205,10 @@ async fn test_election_number_of_voters_change_first_session_in_preparation_work
     );
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
+#[test(sqlx::test(fixtures(
+    path = "../../fixtures",
+    scripts("election_7_four_sessions", "users")
+)))]
 async fn test_election_number_of_voters_change_not_first_session_fails(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = login(&addr, CoordinatorGSB).await;
@@ -229,7 +232,7 @@ async fn test_election_number_of_voters_change_not_first_session_fails(pool: Sql
     );
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2", "users"))))]
 async fn test_election_number_of_voters_change_first_session_in_progress_fails(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = login(&addr, CoordinatorGSB).await;
@@ -253,7 +256,7 @@ async fn test_election_number_of_voters_change_first_session_in_progress_fails(p
     );
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
 async fn test_election_number_of_voters_change_not_found(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = login(&addr, CoordinatorGSB).await;
@@ -273,7 +276,7 @@ async fn test_election_number_of_voters_change_not_found(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::NOT_FOUND);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2", "users"))))]
 async fn test_election_n_10_2_download(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = login(&addr, CoordinatorGSB).await;
@@ -318,7 +321,7 @@ async fn test_election_n_10_2_download(pool: SqlitePool) {
     assert!(reader.entry().uncompressed_size() > 1024);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2", "users"))))]
 async fn test_election_na_31_2_bijlage1_download(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = login(&addr, CoordinatorGSB).await;
@@ -363,7 +366,10 @@ async fn test_election_na_31_2_bijlage1_download(pool: SqlitePool) {
     assert!(reader.entry().uncompressed_size() > 1024);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
+#[test(sqlx::test(fixtures(
+    path = "../../fixtures",
+    scripts("election_5_with_results", "users")
+)))]
 async fn test_election_na_31_2_inlegvel_download(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = login(&addr, CoordinatorGSB).await;

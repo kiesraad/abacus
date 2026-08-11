@@ -8,10 +8,8 @@ use crate::{
     shared::{FixtureUser::*, login},
     utils::serve_api_with_backup_dir,
 };
-pub mod shared;
-pub mod utils;
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
 async fn backup_unauthenticated(pool: SqlitePool) {
     let (addr, _backup_dir) = serve_api_with_backup_dir(pool).await;
     let response = reqwest::Client::new()
@@ -22,7 +20,7 @@ async fn backup_unauthenticated(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
 async fn backup_forbidden_typist(pool: SqlitePool) {
     let (addr, _backup_dir) = serve_api_with_backup_dir(pool).await;
     let cookie = login(&addr, TypistGSB).await;
@@ -35,7 +33,7 @@ async fn backup_forbidden_typist(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::FORBIDDEN);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
 async fn backup_success_as_admin(pool: SqlitePool) {
     let (addr, backup_dir) = serve_api_with_backup_dir(pool).await;
     let cookie = login(&addr, Admin).await;
@@ -53,7 +51,7 @@ async fn backup_success_as_admin(pool: SqlitePool) {
     assert!(backup_dir.path().join(filename).exists());
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
 async fn backup_success_as_coordinator_csb(pool: SqlitePool) {
     let (addr, _backup_dir) = serve_api_with_backup_dir(pool).await;
     let cookie = login(&addr, CoordinatorCSB).await;

@@ -9,10 +9,7 @@ use crate::{
     utils::serve_api,
 };
 
-pub mod shared;
-pub mod utils;
-
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
 async fn test_gsb_election_validate_valid(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -23,7 +20,7 @@ async fn test_gsb_election_validate_valid(pool: SqlitePool) {
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
           "committee_category": "GSB",
-          "election_data": include_str!("../src/eml/tests/eml110a_test.eml.xml"),
+          "election_data": include_str!("../../src/eml/tests/eml110a_test.eml.xml"),
         }))
         .send()
         .await
@@ -35,7 +32,7 @@ async fn test_gsb_election_validate_valid(pool: SqlitePool) {
     assert_eq!(body["committee_category"], "GSB");
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
 async fn test_gsb_election_validate_invalid_election_limited_elections_supported(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -46,7 +43,7 @@ async fn test_gsb_election_validate_invalid_election_limited_elections_supported
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
           "committee_category": "GSB",
-          "election_data": include_str!("../src/eml/tests/eml110a_invalid_election_limited_elections_supported.eml.xml"),
+          "election_data": include_str!("../../src/eml/tests/eml110a_invalid_election_limited_elections_supported.eml.xml"),
         }))
         .send()
         .await
@@ -56,7 +53,7 @@ async fn test_gsb_election_validate_invalid_election_limited_elections_supported
     assert_eq!(response.status(), StatusCode::BAD_REQUEST);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
 async fn test_gsb_election_validate_invalid_election_category_and_sub_category_mismatch(
     pool: SqlitePool,
 ) {
@@ -69,7 +66,7 @@ async fn test_gsb_election_validate_invalid_election_category_and_sub_category_m
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
           "committee_category": "GSB",
-          "election_data": include_str!("../src/eml/tests/eml110a_invalid_election_category_and_sub_category_mismatch.eml.xml"),
+          "election_data": include_str!("../../src/eml/tests/eml110a_invalid_election_category_and_sub_category_mismatch.eml.xml"),
         }))
         .send()
         .await
@@ -79,7 +76,7 @@ async fn test_gsb_election_validate_invalid_election_category_and_sub_category_m
     assert_eq!(response.status(), StatusCode::BAD_REQUEST);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
 async fn test_csb_election_validate_valid(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -90,7 +87,7 @@ async fn test_csb_election_validate_valid(pool: SqlitePool) {
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
           "committee_category": "CSB",
-          "election_data": include_str!("../src/eml/tests/eml110a_test.eml.xml"),
+          "election_data": include_str!("../../src/eml/tests/eml110a_test.eml.xml"),
         }))
         .send()
         .await
@@ -109,7 +106,7 @@ async fn test_csb_election_validate_valid(pool: SqlitePool) {
     );
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
 async fn test_csb_election_validate_with_candidates(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -126,8 +123,8 @@ async fn test_csb_election_validate_with_candidates(pool: SqlitePool) {
                 "9162", "1950", "0e13", "0651",
                 "34ff", "c0de", "340a", "4a38"
             ],
-            "election_data": include_str!("../src/eml/tests/eml110a_test.eml.xml"),
-            "candidate_data": include_str!("../src/eml/tests/eml230b_test.eml.xml"),
+            "election_data": include_str!("../../src/eml/tests/eml110a_test.eml.xml"),
+            "candidate_data": include_str!("../../src/eml/tests/eml230b_test.eml.xml"),
         }))
         .send()
         .await
@@ -141,7 +138,7 @@ async fn test_csb_election_validate_with_candidates(pool: SqlitePool) {
     assert!(body.get("number_of_voters").is_none());
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
 async fn test_csb_election_import_save(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -158,14 +155,14 @@ async fn test_csb_election_import_save(pool: SqlitePool) {
                 "9162", "1950", "0e13", "0651",
                 "34ff", "c0de", "340a", "4a38"
             ],
-            "election_data": include_str!("../src/eml/tests/eml110a_test.eml.xml"),
+            "election_data": include_str!("../../src/eml/tests/eml110a_test.eml.xml"),
             "candidate_hash": [
                 "146d", "3784", "efa2", "93b5",
                 "721a", "7578", "a43f", "0636",
                 "7281", "66a0", "acf1", "55d3",
                 "ab25", "083c", "c000", "7096"
             ],
-            "candidate_data": include_str!("../src/eml/tests/eml230b_test.eml.xml"),
+            "candidate_data": include_str!("../../src/eml/tests/eml230b_test.eml.xml"),
         }))
         .send()
         .await
@@ -190,7 +187,7 @@ async fn test_csb_election_import_save(pool: SqlitePool) {
     );
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
 async fn test_csb_election_import_only_municipal_election_supported(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -207,14 +204,14 @@ async fn test_csb_election_import_only_municipal_election_supported(pool: Sqlite
                 "7d47", "8a74", "7be5", "8f92",
                 "b127", "2f55", "540b", "5aa4"
             ],
-            "election_data": include_str!("../src/eml/tests/eml110a_test_AB.eml.xml"),
+            "election_data": include_str!("../../src/eml/tests/eml110a_test_AB.eml.xml"),
             "candidate_hash": [
                 "146d", "3784", "efa2", "93b5",
                 "721a", "7578", "a43f", "0636",
                 "7281", "66a0", "acf1", "55d3",
                 "ab25", "083c", "c000", "7096"
             ],
-            "candidate_data": include_str!("../src/eml/tests/eml230b_test.eml.xml"),
+            "candidate_data": include_str!("../../src/eml/tests/eml230b_test.eml.xml"),
         }))
         .send()
         .await
@@ -223,7 +220,7 @@ async fn test_csb_election_import_only_municipal_election_supported(pool: Sqlite
     assert_eq!(response.status(), StatusCode::BAD_REQUEST);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
 async fn test_election_validate_missing_election_domain(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -234,7 +231,7 @@ async fn test_election_validate_missing_election_domain(pool: SqlitePool) {
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
           "committee_category": "GSB",
-          "election_data": include_str!("../src/eml/tests/eml110a_invalid_election_missing_election_domain.eml.xml"),
+          "election_data": include_str!("../../src/eml/tests/eml110a_invalid_election_missing_election_domain.eml.xml"),
         }))
         .send()
         .await
@@ -244,7 +241,7 @@ async fn test_election_validate_missing_election_domain(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::BAD_REQUEST);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
 async fn test_gsb_election_validate_hash_file_instead_of_election_definition(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -267,7 +264,7 @@ async fn test_gsb_election_validate_hash_file_instead_of_election_definition(poo
     assert_eq!(body["reference"], "EmlImportError");
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
 async fn test_election_candidates_validate_valid(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let admin_cookie = login(&addr, Admin).await;
@@ -277,14 +274,14 @@ async fn test_election_candidates_validate_valid(pool: SqlitePool) {
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
             "committee_category": "GSB",
-            "candidate_data": include_str!("../src/eml/tests/eml230b_test.eml.xml"),
+            "candidate_data": include_str!("../../src/eml/tests/eml230b_test.eml.xml"),
             "election_hash": [
                 "4291", "a4e7", "c76e", "ed19",
                 "476b", "ae90", "3882", "c2dc",
                 "9162", "1950", "0e13", "0651",
                 "34ff", "c0de", "340a", "4a38"
             ],
-            "election_data": include_str!("../src/eml/tests/eml110a_test.eml.xml"),
+            "election_data": include_str!("../../src/eml/tests/eml110a_test.eml.xml"),
         }))
         .send()
         .await
@@ -294,7 +291,7 @@ async fn test_election_candidates_validate_valid(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::OK);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
 async fn test_election_candidates_validate_wrong_file(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -311,8 +308,8 @@ async fn test_election_candidates_validate_wrong_file(pool: SqlitePool) {
                 "9162", "1950", "0e13", "0651",
                 "34ff", "c0de", "340a", "4a38"
             ],
-            "election_data": include_str!("../src/eml/tests/eml110a_test.eml.xml"),
-            "candidate_data": include_str!("../src/eml/tests/eml230b_invalid_document_type.eml.xml"),
+            "election_data": include_str!("../../src/eml/tests/eml110a_test.eml.xml"),
+            "candidate_data": include_str!("../../src/eml/tests/eml230b_invalid_document_type.eml.xml"),
         }))
         .send()
         .await
@@ -321,7 +318,7 @@ async fn test_election_candidates_validate_wrong_file(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::BAD_REQUEST);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
 async fn test_election_candidates_validate_missing_authority(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -338,8 +335,8 @@ async fn test_election_candidates_validate_missing_authority(pool: SqlitePool) {
                 "9162", "1950", "0e13", "0651",
                 "34ff", "c0de", "340a", "4a38"
             ],
-            "election_data": include_str!("../src/eml/tests/eml110a_test.eml.xml"),
-            "candidate_data": include_str!("../src/eml/tests/eml230b_invalid_missing_authority.eml.xml"),
+            "election_data": include_str!("../../src/eml/tests/eml110a_test.eml.xml"),
+            "candidate_data": include_str!("../../src/eml/tests/eml230b_invalid_missing_authority.eml.xml"),
         }))
         .send()
         .await
@@ -348,7 +345,7 @@ async fn test_election_candidates_validate_missing_authority(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::BAD_REQUEST);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
 async fn test_election_candidates_validate_wrong_election_type(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -365,8 +362,8 @@ async fn test_election_candidates_validate_wrong_election_type(pool: SqlitePool)
                 "9162", "1950", "0e13", "0651",
                 "34ff", "c0de", "340a", "4a38"
             ],
-            "election_data": include_str!("../src/eml/tests/eml110a_test.eml.xml"),
-            "candidate_data": include_str!("../src/eml/tests/eml230b_invalid_incorrect_election_type.eml.xml"),
+            "election_data": include_str!("../../src/eml/tests/eml110a_test.eml.xml"),
+            "candidate_data": include_str!("../../src/eml/tests/eml230b_invalid_incorrect_election_type.eml.xml"),
         }))
         .send()
         .await
@@ -375,7 +372,7 @@ async fn test_election_candidates_validate_wrong_election_type(pool: SqlitePool)
     assert_eq!(response.status(), StatusCode::BAD_REQUEST);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
 async fn test_election_candidates_validate_wrong_election_id(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -392,8 +389,8 @@ async fn test_election_candidates_validate_wrong_election_id(pool: SqlitePool) {
                 "9162", "1950", "0e13", "0651",
                 "34ff", "c0de", "340a", "4a38"
             ],
-            "election_data": include_str!("../src/eml/tests/eml110a_test.eml.xml"),
-            "candidate_data": include_str!("../src/eml/tests/eml230b_invalid_incorrect_election.eml.xml"),
+            "election_data": include_str!("../../src/eml/tests/eml110a_test.eml.xml"),
+            "candidate_data": include_str!("../../src/eml/tests/eml230b_invalid_incorrect_election.eml.xml"),
         }))
         .send()
         .await
@@ -402,7 +399,7 @@ async fn test_election_candidates_validate_wrong_election_id(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::BAD_REQUEST);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
 async fn test_election_candidates_validate_missing_election_domain(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -419,8 +416,8 @@ async fn test_election_candidates_validate_missing_election_domain(pool: SqliteP
                 "9162", "1950", "0e13", "0651",
                 "34ff", "c0de", "340a", "4a38"
             ],
-            "election_data": include_str!("../src/eml/tests/eml110a_test.eml.xml"),
-            "candidate_data": include_str!("../src/eml/tests/eml230b_invalid_incorrect_election_domain.eml.xml"),
+            "election_data": include_str!("../../src/eml/tests/eml110a_test.eml.xml"),
+            "candidate_data": include_str!("../../src/eml/tests/eml230b_invalid_incorrect_election_domain.eml.xml"),
         }))
         .send()
         .await
@@ -429,7 +426,7 @@ async fn test_election_candidates_validate_missing_election_domain(pool: SqliteP
     assert_eq!(response.status(), StatusCode::BAD_REQUEST);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
 async fn test_election_candidates_validate_wrong_domain_id(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -446,8 +443,8 @@ async fn test_election_candidates_validate_wrong_domain_id(pool: SqlitePool) {
                 "9162", "1950", "0e13", "0651",
                 "34ff", "c0de", "340a", "4a38"
             ],
-            "election_data": include_str!("../src/eml/tests/eml110a_test.eml.xml"),
-            "candidate_data": include_str!("../src/eml/tests/eml230b_invalid_incorrect_election_domain.eml.xml"),
+            "election_data": include_str!("../../src/eml/tests/eml110a_test.eml.xml"),
+            "candidate_data": include_str!("../../src/eml/tests/eml230b_invalid_incorrect_election_domain.eml.xml"),
         }))
         .send()
         .await
@@ -456,7 +453,7 @@ async fn test_election_candidates_validate_wrong_domain_id(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::BAD_REQUEST);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
 async fn test_election_candidates_validate_wrong_election_date(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -473,8 +470,8 @@ async fn test_election_candidates_validate_wrong_election_date(pool: SqlitePool)
                 "9162", "1950", "0e13", "0651",
                 "34ff", "c0de", "340a", "4a38"
             ],
-            "election_data": include_str!("../src/eml/tests/eml110a_test.eml.xml"),
-            "candidate_data": include_str!("../src/eml/tests/eml230b_invalid_incorrect_election_date.eml.xml"),
+            "election_data": include_str!("../../src/eml/tests/eml110a_test.eml.xml"),
+            "candidate_data": include_str!("../../src/eml/tests/eml230b_invalid_incorrect_election_date.eml.xml"),
         }))
         .send()
         .await
@@ -483,7 +480,7 @@ async fn test_election_candidates_validate_wrong_election_date(pool: SqlitePool)
     assert_eq!(response.status(), StatusCode::BAD_REQUEST);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
 async fn test_election_candidates_validate_empty_affiliates(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -500,8 +497,8 @@ async fn test_election_candidates_validate_empty_affiliates(pool: SqlitePool) {
                 "9162", "1950", "0e13", "0651",
                 "34ff", "c0de", "340a", "4a38"
             ],
-            "election_data": include_str!("../src/eml/tests/eml110a_test.eml.xml"),
-            "candidate_data": include_str!("../src/eml/tests/eml230b_invalid_empty_affiliates.eml.xml"),
+            "election_data": include_str!("../../src/eml/tests/eml110a_test.eml.xml"),
+            "candidate_data": include_str!("../../src/eml/tests/eml230b_invalid_empty_affiliates.eml.xml"),
         }))
         .send()
         .await
@@ -510,7 +507,7 @@ async fn test_election_candidates_validate_empty_affiliates(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::BAD_REQUEST);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
 async fn test_election_candidates_validate_empty_candidates(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -527,8 +524,8 @@ async fn test_election_candidates_validate_empty_candidates(pool: SqlitePool) {
                 "9162", "1950", "0e13", "0651",
                 "34ff", "c0de", "340a", "4a38"
             ],
-            "election_data": include_str!("../src/eml/tests/eml110a_test.eml.xml"),
-            "candidate_data": include_str!("../src/eml/tests/eml230b_invalid_empty_candidates.eml.xml"),
+            "election_data": include_str!("../../src/eml/tests/eml110a_test.eml.xml"),
+            "candidate_data": include_str!("../../src/eml/tests/eml230b_invalid_empty_candidates.eml.xml"),
             "number_of_voters": 1234,
             "counting_method": "CSO",
         }))
@@ -539,7 +536,7 @@ async fn test_election_candidates_validate_empty_candidates(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::BAD_REQUEST);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
 async fn test_election_import_save_with_polling_stations(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -556,15 +553,15 @@ async fn test_election_import_save_with_polling_stations(pool: SqlitePool) {
                 "9162", "1950", "0e13", "0651",
                 "34ff", "c0de", "340a", "4a38"
             ],
-            "election_data": include_str!("../src/eml/tests/eml110a_test.eml.xml"),
+            "election_data": include_str!("../../src/eml/tests/eml110a_test.eml.xml"),
             "candidate_hash": [
                 "146d", "3784", "efa2", "93b5",
                 "721a", "7578", "a43f", "0636",
                 "7281", "66a0", "acf1", "55d3",
                 "ab25", "083c", "c000", "7096"
             ],
-            "candidate_data": include_str!("../src/eml/tests/eml230b_test.eml.xml"),
-            "polling_station_data": include_str!("../src/eml/tests/eml110b_test.eml.xml"),
+            "candidate_data": include_str!("../../src/eml/tests/eml230b_test.eml.xml"),
+            "polling_station_data": include_str!("../../src/eml/tests/eml110b_test.eml.xml"),
             "polling_station_file_name": "eml110b_test.eml.xml",
             "number_of_voters": 1234,
             "counting_method": "CSO",
@@ -589,7 +586,7 @@ async fn test_election_import_save_with_polling_stations(pool: SqlitePool) {
     );
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
 async fn test_election_import_save_without_polling_stations(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -606,14 +603,14 @@ async fn test_election_import_save_without_polling_stations(pool: SqlitePool) {
                 "9162", "1950", "0e13", "0651",
                 "34ff", "c0de", "340a", "4a38"
             ],
-            "election_data": include_str!("../src/eml/tests/eml110a_test.eml.xml"),
+            "election_data": include_str!("../../src/eml/tests/eml110a_test.eml.xml"),
             "candidate_hash": [
                 "146d", "3784", "efa2", "93b5",
                 "721a", "7578", "a43f", "0636",
                 "7281", "66a0", "acf1", "55d3",
                 "ab25", "083c", "c000", "7096"
             ],
-            "candidate_data": include_str!("../src/eml/tests/eml230b_test.eml.xml"),
+            "candidate_data": include_str!("../../src/eml/tests/eml230b_test.eml.xml"),
             "number_of_voters": 1234,
             "counting_method": "CSO",
         }))
@@ -637,7 +634,7 @@ async fn test_election_import_save_without_polling_stations(pool: SqlitePool) {
     );
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
 async fn test_election_import_save_empty_stubs(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -654,15 +651,15 @@ async fn test_election_import_save_empty_stubs(pool: SqlitePool) {
                 "9162", "1950", "", "0651",
                 "34ff", "c0de", "340a", "4a38"
             ],
-            "election_data": include_str!("../src/eml/tests/eml230b_test.eml.xml"),
+            "election_data": include_str!("../../src/eml/tests/eml230b_test.eml.xml"),
             "candidate_hash": [
                 "146d", "3784", "efa2", "93b5",
                 "721a", "7578", "a43f", "0636",
                 "7281", "66a0", "acf1", "55d3",
                 "ab25", "083c", "c000", "7096"
             ],
-            "candidate_data": include_str!("../src/eml/tests/eml230b_test.eml.xml"),
-            "polling_station_data": include_str!("../src/eml/tests/eml110b_test.eml.xml"),
+            "candidate_data": include_str!("../../src/eml/tests/eml230b_test.eml.xml"),
+            "polling_station_data": include_str!("../../src/eml/tests/eml110b_test.eml.xml"),
             "polling_station_file_name": "eml110b_test.eml.xml",
             "number_of_voters": 1234,
             "counting_method": "CSO",
@@ -674,7 +671,7 @@ async fn test_election_import_save_empty_stubs(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::BAD_REQUEST);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
 async fn test_election_import_save_empty_candidate_stubs(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -691,15 +688,15 @@ async fn test_election_import_save_empty_candidate_stubs(pool: SqlitePool) {
                 "9162", "1950", "0e13", "0651",
                 "34ff", "c0de", "340a", "4a38"
             ],
-            "election_data": include_str!("../src/eml/tests/eml230b_test.eml.xml"),
+            "election_data": include_str!("../../src/eml/tests/eml230b_test.eml.xml"),
             "candidate_hash": [
                 "146d", "3784", "efa2", "93b5",
                 "", "7578", "a43f", "0636",
                 "7281", "66a0", "acf1", "55d3",
                 "ab25", "083c", "c000", ""
             ],
-            "candidate_data": include_str!("../src/eml/tests/eml230b_test.eml.xml"),
-            "polling_station_data": include_str!("../src/eml/tests/eml110b_test.eml.xml"),
+            "candidate_data": include_str!("../../src/eml/tests/eml230b_test.eml.xml"),
+            "polling_station_data": include_str!("../../src/eml/tests/eml110b_test.eml.xml"),
             "polling_station_file_name": "eml110b_test.eml.xml",
             "number_of_voters": 1234,
             "counting_method": "CSO",
@@ -711,7 +708,7 @@ async fn test_election_import_save_empty_candidate_stubs(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::BAD_REQUEST);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
 async fn test_election_import_save_wrong_hash(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -728,15 +725,15 @@ async fn test_election_import_save_wrong_hash(pool: SqlitePool) {
                 "9162", "1950", "5678", "0651",
                 "34ff", "c0de", "340a", "4a38"
             ],
-            "election_data": include_str!("../src/eml/tests/eml110a_test.eml.xml"),
+            "election_data": include_str!("../../src/eml/tests/eml110a_test.eml.xml"),
             "candidate_hash": [
                 "a0b9", "6a6e", "5d3c", "17fd",
                 "6aeb", "3b89", "48df", "2f7a",
                 "2165", "7f17", "11a1", "d379",
                 "f7cf", "07ef", "7f7a", "cfa2"
             ],
-            "candidate_data": include_str!("../src/eml/tests/eml230b_test.eml.xml"),
-            "polling_station_data": include_str!("../src/eml/tests/eml110b_test.eml.xml"),
+            "candidate_data": include_str!("../../src/eml/tests/eml230b_test.eml.xml"),
+            "polling_station_data": include_str!("../../src/eml/tests/eml110b_test.eml.xml"),
             "polling_station_file_name": "eml110b_test.eml.xml",
             "number_of_voters": 1234,
             "counting_method": "CSO",
@@ -748,7 +745,7 @@ async fn test_election_import_save_wrong_hash(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::BAD_REQUEST);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
 async fn test_election_import_missing_file_name(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -765,15 +762,15 @@ async fn test_election_import_missing_file_name(pool: SqlitePool) {
                 "3c61", "9b99", "8af1", "a57e",
                 "cf00", "8930", "9bce", "0c33"
             ],
-            "election_data": include_str!("../src/eml/tests/eml110a_test.eml.xml"),
+            "election_data": include_str!("../../src/eml/tests/eml110a_test.eml.xml"),
             "candidate_hash": [
                 "146d", "3784", "efa2", "93b5",
                 "721a", "7578", "a43f", "0636",
                 "7281", "66a0", "acf1", "55d3",
                 "ab25", "083c", "c000", "7096"
             ],
-            "candidate_data": include_str!("../src/eml/tests/eml230b_test.eml.xml"),
-            "polling_station_data": include_str!("../src/eml/tests/eml110b_test.eml.xml"),
+            "candidate_data": include_str!("../../src/eml/tests/eml230b_test.eml.xml"),
+            "polling_station_data": include_str!("../../src/eml/tests/eml110b_test.eml.xml"),
             "number_of_voters": 1234,
             "counting_method": "CSO",
         }))
@@ -784,7 +781,7 @@ async fn test_election_import_missing_file_name(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::BAD_REQUEST);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
 async fn test_election_polling_stations_not_matching_election(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let admin_cookie = login(&addr, Admin).await;
@@ -800,15 +797,15 @@ async fn test_election_polling_stations_not_matching_election(pool: SqlitePool) 
                 "9162", "1950", "0e13", "0651",
                 "34ff", "c0de", "340a", "4a38"
           ],
-          "election_data": include_str!("../src/eml/tests/eml110a_test.eml.xml"),
+          "election_data": include_str!("../../src/eml/tests/eml110a_test.eml.xml"),
             "candidate_hash": [
                 "146d", "3784", "efa2", "93b5",
                 "721a", "7578", "a43f", "0636",
                 "7281", "66a0", "acf1", "55d3",
                 "ab25", "083c", "c000", "7096"
             ],
-            "candidate_data": include_str!("../src/eml/tests/eml230b_test.eml.xml"),
-            "polling_station_data": include_str!("../src/eml/tests/eml110b_not_matching_election_id.eml.xml"),
+            "candidate_data": include_str!("../../src/eml/tests/eml230b_test.eml.xml"),
+            "polling_station_data": include_str!("../../src/eml/tests/eml110b_not_matching_election_id.eml.xml"),
             "polling_station_file_name": "eml110b_not_matching_election_id.eml.xml",
             "number_of_voters": 1234,
             "counting_method": "CSO",
@@ -823,7 +820,7 @@ async fn test_election_polling_stations_not_matching_election(pool: SqlitePool) 
     assert_eq!(body["polling_station_definition_matches_election"], false);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
 async fn test_election_polling_stations_validate_valid(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let admin_cookie = login(&addr, Admin).await;
@@ -839,15 +836,15 @@ async fn test_election_polling_stations_validate_valid(pool: SqlitePool) {
                 "9162", "1950", "0e13", "0651",
                 "34ff", "c0de", "340a", "4a38"
           ],
-          "election_data": include_str!("../src/eml/tests/eml110a_test.eml.xml"),
+          "election_data": include_str!("../../src/eml/tests/eml110a_test.eml.xml"),
             "candidate_hash": [
                 "146d", "3784", "efa2", "93b5",
                 "721a", "7578", "a43f", "0636",
                 "7281", "66a0", "acf1", "55d3",
                 "ab25", "083c", "c000", "7096"
             ],
-            "candidate_data": include_str!("../src/eml/tests/eml230b_test.eml.xml"),
-            "polling_station_data": include_str!("../src/eml/tests/eml110b_test.eml.xml"),
+            "candidate_data": include_str!("../../src/eml/tests/eml230b_test.eml.xml"),
+            "polling_station_data": include_str!("../../src/eml/tests/eml110b_test.eml.xml"),
             "polling_station_file_name": "eml110b_test.eml.xml",
             "number_of_voters": 1234,
             "counting_method": "CSO",
@@ -862,7 +859,7 @@ async fn test_election_polling_stations_validate_valid(pool: SqlitePool) {
     assert_eq!(body["polling_station_definition_matches_election"], true);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
 async fn test_election_polling_stations_validate_missing_filename(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let admin_cookie = login(&addr, Admin).await;
@@ -878,15 +875,15 @@ async fn test_election_polling_stations_validate_missing_filename(pool: SqlitePo
               "3c61", "9b99", "8af1", "a57e",
               "cf00", "8930", "9bce", "0c33"
           ],
-          "election_data": include_str!("../src/eml/tests/eml110a_test.eml.xml"),
+          "election_data": include_str!("../../src/eml/tests/eml110a_test.eml.xml"),
             "candidate_hash": [
                 "146d", "3784", "efa2", "93b5",
                 "721a", "7578", "a43f", "0636",
                 "7281", "66a0", "acf1", "55d3",
                 "ab25", "083c", "c000", "7096"
             ],
-            "candidate_data": include_str!("../src/eml/tests/eml230b_test.eml.xml"),
-            "polling_station_data": include_str!("../src/eml/tests/eml110b_test.eml.xml"),
+            "candidate_data": include_str!("../../src/eml/tests/eml230b_test.eml.xml"),
+            "polling_station_data": include_str!("../../src/eml/tests/eml110b_test.eml.xml"),
         }))
         .send()
         .await
@@ -896,7 +893,7 @@ async fn test_election_polling_stations_validate_missing_filename(pool: SqlitePo
     assert_eq!(response.status(), StatusCode::BAD_REQUEST);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
 async fn test_election_polling_stations_validate_invalid(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let admin_cookie = login(&addr, Admin).await;
@@ -912,15 +909,15 @@ async fn test_election_polling_stations_validate_invalid(pool: SqlitePool) {
                 "9162", "1950", "0e13", "0651",
                 "34ff", "c0de", "340a", "4a38"
           ],
-          "election_data": include_str!("../src/eml/tests/eml110a_test.eml.xml"),
+          "election_data": include_str!("../../src/eml/tests/eml110a_test.eml.xml"),
             "candidate_hash": [
                 "146d", "3784", "efa2", "93b5",
                 "721a", "7578", "a43f", "0636",
                 "7281", "66a0", "acf1", "55d3",
                 "ab25", "083c", "c000", "7096"
             ],
-            "candidate_data": include_str!("../src/eml/tests/eml230b_test.eml.xml"),
-            "polling_station_data": include_str!("../src/eml/tests/eml110a_test.eml.xml"),
+            "candidate_data": include_str!("../../src/eml/tests/eml230b_test.eml.xml"),
+            "polling_station_data": include_str!("../../src/eml/tests/eml110a_test.eml.xml"),
             "number_of_voters": 1234,
             "counting_method": "CSO",
         }))

@@ -1,0 +1,13 @@
+pub mod apportionment_integration_test;
+pub mod authorization_integration_test;
+pub mod backup_integration_test;
+pub mod committee_session_integration_test;
+pub mod data_entries_integration_test;
+pub mod data_entries_resolve_integration_test;
+pub mod election_admin_integration_test;
+pub mod election_integration_test;
+pub mod init_tls_test;
+pub mod investigation_integration_test;
+pub mod polling_station_integration_test;
+pub mod report_integration_test;
+pub mod user_integration_test;

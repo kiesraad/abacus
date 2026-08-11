@@ -18,9 +18,6 @@ use crate::{
     utils::serve_api,
 };
 
-pub mod shared;
-pub mod utils;
-
 async fn conclude_investigation(
     addr: &SocketAddr,
     polling_station_id: u32,
@@ -56,7 +53,10 @@ async fn delete_investigation(addr: &SocketAddr, polling_station_id: u32) -> Res
         .unwrap()
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
+#[test(sqlx::test(fixtures(
+    path = "../../fixtures",
+    scripts("election_7_four_sessions", "users")
+)))]
 async fn test_create_conclude_update_delete(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let election_id = 7;
@@ -130,7 +130,10 @@ async fn test_create_conclude_update_delete(pool: SqlitePool) {
     );
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
+#[test(sqlx::test(fixtures(
+    path = "../../fixtures",
+    scripts("election_7_four_sessions", "users")
+)))]
 async fn test_deletion_setting_committee_session_back_to_created_status(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let election_id = 7;
@@ -173,7 +176,10 @@ async fn test_deletion_setting_committee_session_back_to_created_status(pool: Sq
     assert_eq!(committee_session["status"], "created");
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
+#[test(sqlx::test(fixtures(
+    path = "../../fixtures",
+    scripts("election_5_with_results", "users")
+)))]
 async fn test_deletion_removes_polling_station_from_status(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let election_id = 5;
@@ -194,7 +200,10 @@ async fn test_deletion_removes_polling_station_from_status(pool: SqlitePool) {
     assert_eq!(statuses.len(), 0);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
+#[test(sqlx::test(fixtures(
+    path = "../../fixtures",
+    scripts("election_7_four_sessions", "users")
+)))]
 async fn test_partials_update(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let election_id = 7;
@@ -329,7 +338,10 @@ fn second_session_data_entry_two_political_groups() -> serde_json::Value {
     })
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
+#[test(sqlx::test(fixtures(
+    path = "../../fixtures",
+    scripts("election_7_four_sessions", "users")
+)))]
 async fn test_update_with_result(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let election_id = 7;
@@ -387,7 +399,10 @@ async fn test_update_with_result(pool: SqlitePool) {
     assert_eq!(statuses.len(), 0);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
+#[test(sqlx::test(fixtures(
+    path = "../../fixtures",
+    scripts("election_7_four_sessions", "users")
+)))]
 async fn test_update_with_data_entry(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let election_id = 7;
@@ -453,7 +468,10 @@ async fn test_update_with_data_entry(pool: SqlitePool) {
     assert_eq!(statuses.len(), 0);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
+#[test(sqlx::test(fixtures(
+    path = "../../fixtures",
+    scripts("election_7_four_sessions", "users")
+)))]
 async fn test_creation_for_committee_session_with_created_status(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let election_id = 7;
@@ -469,7 +487,10 @@ async fn test_creation_for_committee_session_with_created_status(pool: SqlitePoo
     assert_eq!(committee_session["status"], "in_preparation");
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
+#[test(sqlx::test(fixtures(
+    path = "../../fixtures",
+    scripts("election_7_four_sessions", "users")
+)))]
 async fn test_creation_fails_for_wrong_polling_station(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -480,7 +501,10 @@ async fn test_creation_fails_for_wrong_polling_station(pool: SqlitePool) {
     );
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
+#[test(sqlx::test(fixtures(
+    path = "../../fixtures",
+    scripts("election_7_four_sessions", "users")
+)))]
 async fn test_creation_fails_on_creating_second_investigation(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -494,7 +518,10 @@ async fn test_creation_fails_on_creating_second_investigation(pool: SqlitePool) 
     );
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
+#[test(sqlx::test(fixtures(
+    path = "../../fixtures",
+    scripts("election_7_four_sessions", "users")
+)))]
 async fn test_can_only_conclude_existing(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -504,7 +531,10 @@ async fn test_can_only_conclude_existing(pool: SqlitePool) {
     );
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
+#[test(sqlx::test(fixtures(
+    path = "../../fixtures",
+    scripts("election_7_four_sessions", "users")
+)))]
 async fn test_can_only_update_existing(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -514,7 +544,10 @@ async fn test_can_only_update_existing(pool: SqlitePool) {
     );
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
+#[test(sqlx::test(fixtures(
+    path = "../../fixtures",
+    scripts("election_7_four_sessions", "users")
+)))]
 async fn test_can_only_conclude_current_session(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -524,7 +557,10 @@ async fn test_can_only_conclude_current_session(pool: SqlitePool) {
     );
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
+#[test(sqlx::test(fixtures(
+    path = "../../fixtures",
+    scripts("election_7_four_sessions", "users")
+)))]
 async fn test_can_only_update_current_session(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -534,7 +570,10 @@ async fn test_can_only_update_current_session(pool: SqlitePool) {
     );
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
+#[test(sqlx::test(fixtures(
+    path = "../../fixtures",
+    scripts("election_7_four_sessions", "users")
+)))]
 async fn test_conclude_creates_data_entry_when_corrected_results_true(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let election_id = 7;
@@ -564,7 +603,10 @@ async fn test_conclude_creates_data_entry_when_corrected_results_true(pool: Sqli
     assert_eq!(statuses[&polling_station_id]["status"], "empty");
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
+#[test(sqlx::test(fixtures(
+    path = "../../fixtures",
+    scripts("election_7_four_sessions", "users")
+)))]
 async fn test_conclude_does_not_create_data_entry_when_corrected_results_false(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let election_id = 7;
@@ -594,7 +636,10 @@ async fn test_conclude_does_not_create_data_entry_when_corrected_results_false(p
     assert!(!statuses.contains_key(&polling_station_id));
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
+#[test(sqlx::test(fixtures(
+    path = "../../fixtures",
+    scripts("election_7_four_sessions", "users")
+)))]
 async fn test_update_creates_data_entry_when_corrected_results_changed_to_true(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let election_id = 7;
@@ -639,7 +684,10 @@ async fn test_update_creates_data_entry_when_corrected_results_changed_to_true(p
     assert_eq!(statuses[&polling_station_id]["status"], "empty");
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
+#[test(sqlx::test(fixtures(
+    path = "../../fixtures",
+    scripts("election_7_four_sessions", "users")
+)))]
 async fn test_update_deletes_data_entry_when_corrected_results_changed_to_false(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let election_id = 7;
@@ -699,7 +747,10 @@ async fn test_update_deletes_data_entry_when_corrected_results_changed_to_false(
     assert!(!statuses.contains_key(&polling_station_id));
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
+#[test(sqlx::test(fixtures(
+    path = "../../fixtures",
+    scripts("election_7_four_sessions", "users")
+)))]
 async fn test_can_conclude_update_new_polling_station_corrected_results_true(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = login(&addr, CoordinatorGSB).await;
@@ -732,7 +783,10 @@ async fn test_can_conclude_update_new_polling_station_corrected_results_true(poo
     assert_eq!(update_response.status(), StatusCode::OK);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
+#[test(sqlx::test(fixtures(
+    path = "../../fixtures",
+    scripts("election_7_four_sessions", "users")
+)))]
 async fn test_cannot_conclude_update_new_polling_station_corrected_results_false(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = login(&addr, CoordinatorGSB).await;
@@ -777,7 +831,10 @@ async fn test_cannot_conclude_update_new_polling_station_corrected_results_false
     );
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
+#[test(sqlx::test(fixtures(
+    path = "../../fixtures",
+    scripts("election_5_with_results", "users")
+)))]
 async fn test_polling_station_corrigendum_download_with_previous_results(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     // Polling station 529 has previous results, but no investigation yet
@@ -816,7 +873,10 @@ async fn test_polling_station_corrigendum_download_with_previous_results(pool: S
     assert!(bytes.len() > 1024);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
+#[test(sqlx::test(fixtures(
+    path = "../../fixtures",
+    scripts("election_5_with_results", "users")
+)))]
 async fn test_polling_station_corrigendum_download_without_previous_results(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = login(&addr, CoordinatorGSB).await;
@@ -901,7 +961,10 @@ async fn check_completed_to_data_entry_on<F, Fut>(
     assert_eq!(committee_session["status"], "data_entry");
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
+#[test(sqlx::test(fixtures(
+    path = "../../fixtures",
+    scripts("election_5_with_results", "users")
+)))]
 async fn test_completed_to_data_entry_on_create(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     check_completed_to_data_entry_on(
@@ -913,7 +976,10 @@ async fn test_completed_to_data_entry_on_create(pool: SqlitePool) {
     .await;
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
+#[test(sqlx::test(fixtures(
+    path = "../../fixtures",
+    scripts("election_5_with_results", "users")
+)))]
 async fn test_completed_to_data_entry_on_update(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     check_completed_to_data_entry_on(
@@ -925,7 +991,10 @@ async fn test_completed_to_data_entry_on_update(pool: SqlitePool) {
     .await;
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
+#[test(sqlx::test(fixtures(
+    path = "../../fixtures",
+    scripts("election_5_with_results", "users")
+)))]
 async fn test_completed_to_data_entry_on_delete_non_last(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     check_completed_to_data_entry_on(
@@ -937,7 +1006,10 @@ async fn test_completed_to_data_entry_on_delete_non_last(pool: SqlitePool) {
     .await;
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
+#[test(sqlx::test(fixtures(
+    path = "../../fixtures",
+    scripts("election_7_four_sessions", "users")
+)))]
 async fn test_completed_to_created_on_delete_last(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let election_id = 7;

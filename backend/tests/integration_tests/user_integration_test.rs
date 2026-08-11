@@ -9,10 +9,9 @@ use crate::{
     utils::serve_api,
 };
 
-pub mod shared;
-pub mod utils;
+use crate::shared;
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
 async fn test_user_login(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     login(&addr, Admin).await;
@@ -21,7 +20,7 @@ async fn test_user_login(pool: SqlitePool) {
     login(&addr, Typist2GSB).await;
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
 async fn test_user_login_invalidates_old_session(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let url = format!("http://{addr}/api/account");
@@ -58,7 +57,7 @@ async fn test_user_login_invalidates_old_session(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::OK);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2", "users"))))]
 async fn test_user_last_activity_at_updating(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let admin_cookie = login(&addr, Admin).await;
@@ -105,7 +104,7 @@ async fn test_user_last_activity_at_updating(pool: SqlitePool) {
     assert!(!user["last_activity_at"].is_null());
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
 async fn test_user_listing(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let admin_cookie = login(&addr, Admin).await;
@@ -139,7 +138,7 @@ async fn test_user_listing(pool: SqlitePool) {
     }))
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
 async fn test_user_creation(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let admin_cookie = login(&addr, Admin).await;
@@ -169,7 +168,7 @@ async fn test_user_creation(pool: SqlitePool) {
     assert!(body.get("temp_password").is_none());
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
 async fn test_user_creation_duplicate_username(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let admin_cookie = login(&addr, Admin).await;
@@ -212,7 +211,7 @@ async fn test_user_creation_duplicate_username(pool: SqlitePool) {
     );
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
 async fn test_user_creation_anonymous(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let admin_cookie = login(&addr, Admin).await;
@@ -241,7 +240,7 @@ async fn test_user_creation_anonymous(pool: SqlitePool) {
     assert!(body.get("temp_password").is_none());
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
 async fn test_user_creation_invalid_password(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let admin_cookie = login(&addr, Admin).await;
@@ -261,7 +260,7 @@ async fn test_user_creation_invalid_password(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::BAD_REQUEST);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
 async fn test_user_update_password_invalid(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let admin_cookie = login(&addr, Admin).await;
@@ -279,7 +278,7 @@ async fn test_user_update_password_invalid(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::BAD_REQUEST);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
 async fn test_user_update_not_found(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let admin_cookie = login(&addr, Admin).await;
@@ -297,7 +296,7 @@ async fn test_user_update_not_found(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::NOT_FOUND);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
 async fn test_user_get(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let admin_cookie = login(&addr, Admin).await;
@@ -317,7 +316,7 @@ async fn test_user_get(pool: SqlitePool) {
     assert_eq!(body["fullname"], "Sanne Molenaar");
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
 async fn test_user_get_not_found(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let admin_cookie = login(&addr, Admin).await;
@@ -332,7 +331,7 @@ async fn test_user_get_not_found(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::NOT_FOUND);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
 async fn test_user_delete(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let admin_cookie = login(&addr, Admin).await;
@@ -355,7 +354,7 @@ async fn test_user_delete(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::NOT_FOUND);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
 async fn test_user_delete_not_found(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let admin_cookie = login(&addr, Admin).await;
@@ -370,7 +369,7 @@ async fn test_user_delete_not_found(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::NOT_FOUND);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
 async fn test_prevent_delete_own_account(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let admin_cookie = login(&addr, Admin).await;
@@ -385,7 +384,7 @@ async fn test_prevent_delete_own_account(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::FORBIDDEN);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
 async fn test_can_delete_logged_in_user(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     // Log in typist user
@@ -403,7 +402,7 @@ async fn test_can_delete_logged_in_user(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::NO_CONTENT);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
 async fn test_coordinator_user_listing_only_typists(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = login(&addr, CoordinatorGSB).await;
@@ -422,7 +421,7 @@ async fn test_coordinator_user_listing_only_typists(pool: SqlitePool) {
     assert!(users.iter().all(|user| user["role"] == "typist_gsb"));
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
 async fn test_coordinator_can_only_create_typists(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = login(&addr, CoordinatorGSB).await;
@@ -467,7 +466,7 @@ async fn test_coordinator_can_only_create_typists(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::FORBIDDEN);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
 async fn test_coordinator_can_only_get_typists(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = login(&addr, CoordinatorGSB).await;
@@ -503,7 +502,7 @@ async fn test_coordinator_can_only_get_typists(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::FORBIDDEN);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
 async fn test_coordinator_can_only_update_typists(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = login(&addr, CoordinatorGSB).await;
@@ -541,7 +540,7 @@ async fn test_coordinator_can_only_update_typists(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::FORBIDDEN);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
 async fn test_coordinator_can_only_delete_typists(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = login(&addr, CoordinatorGSB).await;
@@ -574,7 +573,7 @@ async fn test_coordinator_can_only_delete_typists(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::FORBIDDEN);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_1", "users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_1", "users"))))]
 async fn test_cant_do_anything_when_password_needs_change(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let admin_cookie = login(&addr, Admin).await;

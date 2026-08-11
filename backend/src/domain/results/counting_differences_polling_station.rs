@@ -97,12 +97,12 @@ mod tests {
 
     fn validate(
         committee_category: CommitteeCategory,
-        unexplained: YesNo,
-        ballots: YesNo,
+        ballots_voters: YesNo,
+        per_list: YesNo,
     ) -> Result<ValidationResults, DataError> {
         let counting_differences_polling_station = CountingDifferencesPollingStation {
-            difference_ballots_voters_completely_accounted_for: unexplained,
-            difference_ballots_per_list: ballots,
+            difference_ballots_voters_completely_accounted_for: ballots_voters,
+            difference_ballots_per_list: per_list,
         };
 
         let validation_results = counting_differences_polling_station.validate(
@@ -134,12 +134,12 @@ mod tests {
             (CSB, YesNo::default(), YesNo::no(), false), // Not applicable for CSB
         ];
 
-        for (committee_category, unexplained, ballots, expect_f111) in cases {
-            let result = validate(committee_category, unexplained.clone(), ballots.clone())?;
+        for (committee_category, ballots_voters, per_list, expect_f111) in cases {
+            let result = validate(committee_category, ballots_voters.clone(), per_list.clone())?;
             let has_f111 = result.errors.iter().any(|e| e == &f111);
             assert_eq!(
                 has_f111, expect_f111,
-                "Failed: {committee_category:?}, unexplained: {unexplained:?}, ballots: {ballots:?}"
+                "Failed: {committee_category:?}, B1-2.1: {ballots_voters:?}, B1-2.3: {per_list:?}"
             );
         }
 
@@ -166,12 +166,12 @@ mod tests {
             (CSB, YesNo::both(), YesNo::no(), false), // Not applicable for CSB
         ];
 
-        for (committee_category, unexplained, ballots, expect_f112) in cases {
-            let result = validate(committee_category, unexplained.clone(), ballots.clone())?;
+        for (committee_category, ballots_voters, per_list, expect_f112) in cases {
+            let result = validate(committee_category, ballots_voters.clone(), per_list.clone())?;
             let has_f112 = result.errors.iter().any(|e| e == &f112);
             assert_eq!(
                 has_f112, expect_f112,
-                "Failed: {committee_category:?}, unexplained: {unexplained:?}, ballots: {ballots:?}"
+                "Failed: {committee_category:?}, B1-2.1: {ballots_voters:?}, B1-2.3: {per_list:?}"
             );
         }
 

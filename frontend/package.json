@@ -15,7 +15,7 @@
     "build": "vite build --config vite-prod.config.ts",
     "build:msw": "cross-env API_MODE=mock vite build && cp mockServiceWorker.js dist/",
     "lint": "pnpm lint:biome && pnpm lint:tsc && pnpm lint:eslint",
-    "lint:biome": "biome check",
+    "lint:biome": "biome check --error-on-warnings",
     "lint:tsc": "tsc",
     "lint:eslint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "format": "biome format --write",

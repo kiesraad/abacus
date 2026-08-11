@@ -146,7 +146,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install
       - name: Run Biome
-        run: pnpm biome ci
+        run: pnpm biome ci --error-on-warnings
       - name: Run TypeScript compiler
         run: pnpm lint:tsc
       - name: Run ESLint

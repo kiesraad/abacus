@@ -1,4 +1,4 @@
-#import "common/style.typ": conf, current_chapter_title, default_header, document_numbering, blank_page_before_signing
+#import "common/style.typ": conf, current_chapter_title, default_header, corrigendum_numbering, blank_page_before_signing
 #import "common/scripts.typ": *
 #let input = json("inputs/model-na-14-1-versie-2-variations/model-na-14-1-versie-2-GR.json")
 
@@ -53,7 +53,7 @@ Het #location_type heeft de telresultaten van dit stembureau onderzocht en is to
 
 #pagebreak(weak: true)
 
-#show: doc => document_numbering(doc)
+#show: doc => corrigendum_numbering(doc)
 
 #set page(
   header: context default_header(

@@ -455,10 +455,19 @@ impl Validate for Results {
         path: &FieldPath,
     ) -> Result<ValidationResults, DataError> {
         match self {
-            Results::DSOFirstSession(_) | Results::DSONextSession(_) => {
-                // TODO: https://github.com/kiesraad/abacus/issues/3687
-                Ok(ValidationResults::default())
+            Results::DSOFirstSession(results) => {
+                let mut validation_results = results
+                    .about_report
+                    .validate(election, &path.field("about_report"))?;
+                validation_results.join(
+                    results
+                        .checks_and_corrections
+                        .validate(election, &path.field("checks_and_corrections"))?,
+                );
+                validation_results.join(results.as_common().validate(election, path)?);
+                Ok(validation_results)
             }
+            Results::DSONextSession(results) => results.as_common().validate(election, path),
             Results::CSOFirstSession(results) => {
                 let mut validation_results = results
                     .extra_investigation
@@ -480,7 +489,7 @@ impl Validate for Results {
 pub mod tests {
     use super::*;
     use crate::domain::{
-        election::{ElectionCategory, PGNumber, tests::election_fixture},
+        election::{tests::election_fixture, ElectionCategory, PGNumber},
         results::{
             count::Count,
             differences_counts::{

@@ -22,33 +22,27 @@ export const validationResultMockData: ErrorWarningsMap<ValidationResultCode> = 
     code: "F112",
   },
   F121: {
-    fields: ["data.about_report.corrigendum_present", "data.about_report.checks_and_corrections_present"],
+    fields: ["data.about_report"],
     code: "F121",
   },
   F122: {
-    fields: ["data.about_report.corrigendum_present", "data.about_report.checks_and_corrections_present"],
+    fields: ["data.about_report"],
     code: "F122",
   },
   F131: {
-    fields: [
-      "data.checks_and_corrections.reason_investigation_own_initiative",
-      "data.checks_and_corrections.corrected_results_own_initiative",
-    ],
+    fields: ["data.checks_and_corrections"],
     code: "F131",
   },
   F132: {
-    fields: ["data.checks_and_corrections.corrected_results_own_initiative"],
+    fields: ["data.checks_and_corrections"],
     code: "F132",
   },
   F133: {
-    fields: ["data.checks_and_corrections.corrected_results_csb_request"],
+    fields: ["data.checks_and_corrections"],
     code: "F133",
   },
   F134: {
-    fields: [
-      "data.checks_and_corrections.corrected_results_own_initiative",
-      "data.checks_and_corrections.corrected_results_csb_request",
-    ],
+    fields: ["data.checks_and_corrections"],
     code: "F134",
   },
   F201: {

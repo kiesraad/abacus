@@ -16,7 +16,8 @@ use crate::domain::{
     },
     field_path::FieldPath,
     results::{
-        count::Count, dso_first_session_results::DSOFirstSessionResults, gsb_results::GSBResults,
+        about_report::ChecksAndCorrectionsPresent, count::Count,
+        dso_first_session_results::DSOFirstSessionResults, gsb_results::GSBResults,
     },
     validate::{DataError, Validate, ValidateRoot, ValidationResults},
 };
@@ -456,14 +457,30 @@ impl Validate for Results {
     ) -> Result<ValidationResults, DataError> {
         match self {
             Results::DSOFirstSession(results) => {
+                // Invalid state check
+                if let (Some(ChecksAndCorrectionsPresent::PageMissing), false) = (
+                    results.about_report.checks_and_corrections_present,
+                    results.checks_and_corrections.is_empty(),
+                ) {
+                    return Err(DataError::new(
+                        "`checks_and_corrections` must be empty when `ChecksAndCorrectionsPresent::PageMissing`.",
+                    ));
+                };
+
                 let mut validation_results = results
                     .about_report
                     .validate(election, &path.field("about_report"))?;
-                validation_results.join(
-                    results
-                        .checks_and_corrections
-                        .validate(election, &path.field("checks_and_corrections"))?,
-                );
+
+                if let Some(ChecksAndCorrectionsPresent::PagePresent) =
+                    results.about_report.checks_and_corrections_present
+                {
+                    validation_results.join(
+                        results
+                            .checks_and_corrections
+                            .validate(election, &path.field("checks_and_corrections"))?,
+                    );
+                };
+
                 validation_results.join(results.as_common().validate(election, path)?);
                 Ok(validation_results)
             }
@@ -491,6 +508,8 @@ pub mod tests {
     use crate::domain::{
         election::{tests::election_fixture, ElectionCategory, PGNumber},
         results::{
+            about_report::AboutReport,
+            checks_and_corrections::{ChecksAndCorrections, ReasonInvestigationOwnInitiative},
             count::Count,
             differences_counts::{
                 DifferenceCountsCompareVotesCastAdmittedVoters, DifferencesCounts,
@@ -723,5 +742,41 @@ pub mod tests {
         let results = Results::new(&election, &first_session, None);
 
         assert_matches!(results, Results::GSB(_));
+    }
+
+    #[test]
+    fn test_error_when_checks_and_corrections_not_empty() {
+        // Non-empty checks and corrections, while `checks_and_corrections = missing`
+        // This is an invalid state, so it should return an error
+        let results = Results::DSOFirstSession(DSOFirstSessionResults {
+            about_report: AboutReport {
+                corrigendum_present: Some(about_report::CorrigendumPresent::OneDocument),
+                checks_and_corrections_present: Some(ChecksAndCorrectionsPresent::PageMissing),
+            },
+            checks_and_corrections: ChecksAndCorrections {
+                reason_investigation_own_initiative: ReasonInvestigationOwnInitiative {
+                    unaccounted_difference: true,
+                    other_error: false,
+                },
+                corrected_results_own_initiative: YesNo::yes(),
+                corrected_results_csb_request: YesNo::no(),
+            },
+            voters_counts: VotersCounts::default(),
+            votes_counts: VotesCounts::default(),
+            differences_counts: DifferencesCounts::default(),
+            political_group_votes: vec![],
+        });
+
+        let validation_results = results.validate(
+            &election_fixture(ElectionCategory::Municipal, CommitteeCategory::GSB, &[]),
+            &"data".into(),
+        );
+
+        assert_eq!(
+            validation_results,
+            Err(DataError::new(
+                "`checks_and_corrections` must be empty when `ChecksAndCorrectionsPresent::PageMissing`.",
+            ))
+        );
     }
 }

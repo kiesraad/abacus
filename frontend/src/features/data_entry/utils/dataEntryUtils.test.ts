@@ -510,7 +510,7 @@ describe("correction warnings", () => {
       "data.political_group_votes.0.candidate_votes.0.votes",
     ];
 
-    resetFieldValues(structure, correctionWarnings, data);
+    resetFieldValues(structure, correctionWarnings, undefined, data);
 
     expect(data).toStrictEqual({
       voters_counts: {

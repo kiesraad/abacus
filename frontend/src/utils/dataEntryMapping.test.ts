@@ -885,13 +885,44 @@ test("resetValueAtPath", () => {
     radio_struct: { field: "OptionA" },
   };
 
-  resetValueAtPath(mixedSection, data, "data.numbers_struct.row_b");
-  resetValueAtPath(mixedSection, data, "data.checkbox_struct.field");
-  resetValueAtPath(mixedSection, data, "data.radio_struct.field");
+  resetValueAtPath(mixedSection, undefined, data, "data.numbers_struct.row_b");
+  resetValueAtPath(mixedSection, undefined, data, "data.checkbox_struct.field");
+  resetValueAtPath(mixedSection, undefined, data, "data.radio_struct.field");
 
   expect(data).toStrictEqual({
     numbers_struct: { row_a: 10, row_b: 0 },
     checkbox_struct: { field: { option_a: false, option_b: false } },
     radio_struct: { field: null },
+  });
+});
+
+test("resetValueAtPath with previousResults", () => {
+  const mixedSection: DataEntrySection = {
+    id: "mixed_section",
+    title: "Mixed Section",
+    short_title: "Mixed",
+    subsections: [
+      ...createInputGridSection().subsections,
+      { type: "message", message: "Please select things" },
+      ...createCheckboxesSection().subsections,
+    ],
+  };
+
+  const previousResults = {
+    numbers_struct: { row_a: 12, row_b: 18 },
+    checkbox_struct: { field: { option_a: false, option_b: true } },
+  };
+
+  const data = {
+    numbers_struct: { row_a: 10, row_b: 20 },
+    checkbox_struct: { field: { option_a: true, option_b: false } },
+  };
+
+  resetValueAtPath(mixedSection, previousResults, data, "data.numbers_struct.row_b");
+  resetValueAtPath(mixedSection, previousResults, data, "data.checkbox_struct.field");
+
+  expect(data).toStrictEqual({
+    numbers_struct: { row_a: 10, row_b: 18 },
+    checkbox_struct: { field: { option_a: false, option_b: false } },
   });
 });

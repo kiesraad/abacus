@@ -446,7 +446,11 @@ fn is_as_expected(
     }
 }
 
-/// A single entry being finalised or kept while it is the only entry
+/// A single entry being finalised or kept while it is the only entry.
+/// 
+/// - Keeping the first entry will discard the second entry.
+/// - Keeping the second entry will discard the first entry, making the second entry the first entry.
+/// - The state transitions to `FirstEntryFinalised` if that data entry does not have errors and to `FirstEntryHasErrors` if it does.
 fn is_kept_as_expected(
     resulting_state: &Result<DataEntryStatus, DataEntryTransitionError>,
     entry: EntryValue,

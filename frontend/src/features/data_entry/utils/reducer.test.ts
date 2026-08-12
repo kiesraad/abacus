@@ -8,10 +8,12 @@ import { DataEntryDiscardHandler, DataEntryFinaliseHandler } from "@/testing/api
 import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMockData";
 import { overrideOnce, server } from "@/testing/server";
 import type { DATA_ENTRY_FINALISE_REQUEST_PATH, DataEntrySource, Results } from "@/types/generated/openapi";
+import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 import { ValidationResultSet } from "@/utils/ValidationResults";
-import { getDefaultDataEntryState, getInitialValues } from "../testing/mock-data";
+import { getDefaultDataEntryState, getDSOInitialValues, getInitialValues } from "../testing/mock-data";
 import type { DataEntryAction, DataEntryState } from "../types/types";
 import { onDiscardDataEntry, onFinaliseDataEntry, onSubmitForm } from "./actions";
+import { getInitialFormState } from "./dataEntryUtils";
 import dataEntryReducer, { getInitialState as _getInitialState } from "./reducer";
 
 function getInitialState(): DataEntryState {
@@ -93,6 +95,40 @@ test("should handle CSONextSession DATA_ENTRY_CLAIMED with no client_state", () 
   expect(state.targetFormSectionId).toEqual("voters_votes_counts");
   expect(state.results).toEqual(action.dataEntry.data);
   expect(state.error).toBeNull();
+});
+
+test("should handle DATA_ENTRY_CLAIMED with a disabled section", () => {
+  const data: Results = {
+    model: "DSOFirstSession",
+    ...getDSOInitialValues(),
+  };
+  data.about_report.corrigendum_present = "OneDocument";
+  data.about_report.checks_and_corrections_present = "PageMissing";
+
+  const action: DataEntryAction = {
+    type: "DATA_ENTRY_CLAIMED",
+    dataEntry: {
+      client_state: {
+        furthest: "voters_votes_counts",
+        current: "about_report",
+        acceptedErrorsAndWarnings: [],
+        continue: true,
+      },
+      data,
+      source,
+      status: "first_entry_in_progress",
+      is_correction: false,
+      validation_results: {
+        errors: [],
+        warnings: [],
+      },
+    },
+  };
+  const state = dataEntryReducer(getInitialState(), action);
+  expect(state.formState?.sections.checks_and_corrections?.isDisabled).toBe(true);
+  // getNextSectionID is called due to continue=true
+  // continuing from about_report skips checks_and_corrections and goes to voters_votes_counts
+  expect(state.targetFormSectionId).toEqual("voters_votes_counts");
 });
 
 test("should handle DATA_ENTRY_CLAIMED for a correction", () => {
@@ -239,6 +275,89 @@ test("should handle FORM_SAVED", () => {
   expect(state.targetFormSectionId).toEqual("differences_counts");
 });
 
+describe("FORM_SAVED with a disabled section", () => {
+  const getClaimedDSOState = (): DataEntryState => {
+    return dataEntryReducer(getInitialState(), {
+      type: "DATA_ENTRY_CLAIMED",
+      dataEntry: {
+        client_state: null,
+        data: {
+          model: "DSOFirstSession",
+          ...getDSOInitialValues(),
+        },
+        source,
+        status: "first_entry_in_progress",
+        is_correction: false,
+        validation_results: {
+          errors: [],
+          warnings: [],
+        },
+      },
+    });
+  };
+
+  const getFormSavedAction = (checksAndCorrectionsPresent: "PagePresent" | "PageMissing"): DataEntryAction => {
+    const data: Results = {
+      model: "DSOFirstSession",
+      ...getDSOInitialValues(),
+    };
+    data.about_report.corrigendum_present = "OneDocument";
+    data.about_report.checks_and_corrections_present = checksAndCorrectionsPresent;
+
+    return {
+      type: "FORM_SAVED",
+      data,
+      validationResults: {
+        errors: [],
+        warnings: [],
+      },
+      sectionId: "about_report",
+      aborting: false,
+      continueToNextSection: true,
+    };
+  };
+
+  test("should skip checks_and_corrections when the page is missing", () => {
+    const state = dataEntryReducer(getClaimedDSOState(), getFormSavedAction("PageMissing"));
+
+    expect(state.formState?.sections.checks_and_corrections?.isDisabled).toBe(true);
+    expect(state.formState?.furthest).toEqual("voters_votes_counts");
+    expect(state.targetFormSectionId).toEqual("voters_votes_counts");
+  });
+
+  test("should continue to checks_and_corrections when the page is present", () => {
+    const state = dataEntryReducer(getClaimedDSOState(), getFormSavedAction("PagePresent"));
+
+    expect(state.formState?.sections.checks_and_corrections?.isDisabled).toBe(false);
+    expect(state.formState?.furthest).toEqual("checks_and_corrections");
+    expect(state.targetFormSectionId).toEqual("checks_and_corrections");
+  });
+
+  test("should re-enable checks_and_corrections when the answer changes back", () => {
+    const state = dataEntryReducer(getClaimedDSOState(), getFormSavedAction("PageMissing"));
+    expect(state.formState?.sections.checks_and_corrections?.isDisabled).toBe(true);
+
+    const newState = dataEntryReducer(state, getFormSavedAction("PagePresent"));
+    expect(newState.formState?.sections.checks_and_corrections?.isDisabled).toBe(false);
+  });
+
+  test("should clear the cache if the corresponding section is now disabled", () => {
+    const state = dataEntryReducer(getClaimedDSOState(), getFormSavedAction("PagePresent"));
+    state.cache = { key: "checks_and_corrections", data: {} };
+
+    const newState = dataEntryReducer(state, getFormSavedAction("PageMissing"));
+    expect(newState.cache).toBeNull();
+  });
+
+  test("should not clear the cache if the corresponding section is not disabled", () => {
+    const state = dataEntryReducer(getClaimedDSOState(), getFormSavedAction("PagePresent"));
+    state.cache = { key: "checks_and_corrections", data: {} };
+
+    const newState = dataEntryReducer(state, getFormSavedAction("PagePresent"));
+    expect(newState.cache).not.toBeNull();
+  });
+});
+
 test("should handle RESET_TARGET_FORM_SECTION", () => {
   const oldState = getInitialState();
   oldState.targetFormSectionId = "voters_votes_counts";
@@ -375,6 +494,57 @@ describe("onSubmitForm", () => {
       } satisfies DataEntryAction,
     ]);
     expect(result).toBe(true);
+  });
+
+  test("Resets values of a section that becomes disabled by the submitted values", async () => {
+    const dispatch = vi.fn();
+
+    const dataEntryStructure = getDataEntryStructure("DSOFirstSession", electionMockData);
+    // checks_and_corrections was filled in before the user went back to about_report
+    const results: Results = { model: "DSOFirstSession", ...getDSOInitialValues() };
+    results.checks_and_corrections.reason_investigation_own_initiative.unaccounted_difference = true;
+    results.checks_and_corrections.corrected_results_own_initiative.yes = true;
+
+    const state: DataEntryState = {
+      ...getDefaultDataEntryState(),
+      results,
+      dataEntryStructure,
+      formState: getInitialFormState(dataEntryStructure),
+    };
+
+    const client = new ApiClient();
+
+    const requestPath = "/api/data_entries/1/1";
+    const submit = onSubmitForm(client, requestPath, dispatch, state);
+
+    overrideOnce("post", requestPath, 200, {
+      validation_results: {
+        errors: [],
+        warnings: [],
+      },
+    });
+
+    const result = await submit("about_report", {
+      "about_report.corrigendum_present": "OneDocument",
+      "about_report.checks_and_corrections_present": "PageMissing",
+    });
+    expect(result).toBe(true);
+
+    // the submitted data contains the reset (initial) checks_and_corrections values
+    const data: Results = { model: "DSOFirstSession", ...getDSOInitialValues() };
+    data.about_report.corrigendum_present = "OneDocument";
+    data.about_report.checks_and_corrections_present = "PageMissing";
+
+    expect(dispatch.mock.calls[2]).toStrictEqual([
+      {
+        type: "FORM_SAVED",
+        data,
+        validationResults: { errors: [], warnings: [] },
+        sectionId: "about_report",
+        aborting: false,
+        continueToNextSection: true,
+      } satisfies DataEntryAction,
+    ]);
   });
 });
 

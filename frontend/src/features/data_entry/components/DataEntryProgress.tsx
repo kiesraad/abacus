@@ -29,6 +29,10 @@ export function DataEntryProgress() {
     (formSection?: FormSection): Exclude<MenuStatus, "active"> => {
       if (!formSection) return "idle";
 
+      if (formSection.isDisabled) {
+        return "empty";
+      }
+
       if (formSection.correctionWarning) {
         return "warning";
       }
@@ -80,7 +84,7 @@ export function DataEntryProgress() {
 
       const isActive = sectionId === section.id;
       const canNavigate = !isActive && formSection.index <= currentIndex;
-      const isDisabled = options.disabled ?? formSection.index > currentIndex;
+      const isDisabled = formSection.isDisabled || (options.disabled ?? formSection.index > currentIndex);
 
       return (
         <ProgressList.Item

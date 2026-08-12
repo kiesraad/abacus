@@ -101,6 +101,10 @@
     "title": "Over het proces-verbaal",
   },
   {
+    "disabled_when": {
+      "equal_to": "PageMissing",
+      "path": "about_report.checks_and_corrections_present",
+    },
     "id": "checks_and_corrections",
     "short_title": "Controles en correcties",
     "subsections": [

@@ -13,7 +13,7 @@ import type {
   SubmitCurrentFormOptions,
   TemporaryCache,
 } from "../types/types";
-import { calculateDataEntryProgress, getClientState } from "./dataEntryUtils";
+import { calculateDataEntryProgress, getClientState, resetDisabledSectionValues } from "./dataEntryUtils";
 
 function isResults(value: DataEntryResults): value is Results {
   if (!isRecord(value)) {
@@ -75,11 +75,7 @@ export function onSubmitForm(
     }
 
     const dataEntrySection = state.dataEntryStructure.find((s) => s.id === currentSection.id);
-    if (!dataEntrySection) {
-      return false;
-    }
-
-    if (!isResults(state.results)) {
+    if (!dataEntrySection || !isResults(state.results)) {
       return false;
     }
 
@@ -91,6 +87,8 @@ export function onSubmitForm(
         data = mapSectionValues(data, cache.data, cachedDataEntrySection);
       }
     }
+
+    resetDisabledSectionValues(state.dataEntryStructure, data);
 
     // prepare data to send to server
     const clientState = getClientState(

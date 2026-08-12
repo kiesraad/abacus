@@ -4,37 +4,40 @@ import { overrideOnce } from "@/testing/server";
 import { screen, within } from "@/testing/test-utils";
 import type {
   ClaimDataEntryResponse,
-  CSOFirstSessionResults,
   DATA_ENTRY_CLAIM_REQUEST_PATH,
   PoliticalGroup,
+  Results,
 } from "@/types/generated/openapi";
 import { getCandidateFullName } from "@/utils/candidate";
 import type { FormState } from "../types/types";
 import { getClientState } from "../utils/dataEntryUtils";
-import { getInitialValues } from "./mock-data";
+import { getDSOInitialValues, getInitialValues } from "./mock-data";
 
-export interface OverrideServerClaimDataEntryResponseProps {
+type FirstSessionModel = Extract<Results["model"], "CSOFirstSession" | "DSOFirstSession">;
+
+export interface OverrideServerClaimDataEntryResponseProps<T extends FirstSessionModel = "CSOFirstSession"> {
   formState: FormState;
-  results: Partial<CSOFirstSessionResults>;
+  results: Partial<Extract<Results, { model: T }>>;
+  model?: T;
   acceptErrorsAndWarnings?: boolean;
   continueToNextSection?: boolean;
   progress?: number;
   validationResults?: ClaimDataEntryResponse["validation_results"];
 }
 
-export function overrideServerClaimDataEntryResponse({
+export function overrideServerClaimDataEntryResponse<T extends FirstSessionModel = "CSOFirstSession">({
   formState,
   results,
+  model = "CSOFirstSession" as T,
   continueToNextSection = true,
   validationResults = { errors: [], warnings: [] },
-}: OverrideServerClaimDataEntryResponseProps) {
+}: OverrideServerClaimDataEntryResponseProps<T>) {
   overrideOnce("post", "/api/data_entries/1/1/claim" satisfies DATA_ENTRY_CLAIM_REQUEST_PATH, 200, {
     client_state: getClientState(formState, formState.furthest, false, continueToNextSection),
-    data: {
-      model: "CSOFirstSession",
-      ...getInitialValues(),
-      ...results,
-    },
+    data:
+      model === "DSOFirstSession"
+        ? { model, ...getDSOInitialValues(), ...results }
+        : { model, ...getInitialValues(), ...results },
     validation_results: validationResults,
     source: {
       type: "PollingStation",

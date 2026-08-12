@@ -3,14 +3,17 @@ import type { DataEntryId, ElectionWithPoliticalGroups } from "@/types/generated
 import type { FormSectionId } from "@/types/types";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
-import type { ClientState, DataEntryAction, DataEntryState, EntryNumber, FormState } from "../types/types";
+import type { ClientState, DataEntryAction, DataEntryState, EntryNumber } from "../types/types";
 import {
   addCorrectionWarnings,
-  buildCorrectionFormState,
-  buildFormState,
   getInitialFormState,
   getNextSectionID,
+  isCachedSectionDisabled,
+  resetDisabledSectionValues,
   resetFieldValues,
+  restoreCorrectionFormState,
+  restoreFormState,
+  updateDisabledSections,
   updateFormStateAfterSubmit,
 } from "./dataEntryUtils";
 
@@ -43,34 +46,37 @@ export default function dataEntryReducer(state: DataEntryState, action: DataEntr
       const model = action.dataEntry.data.model;
       const dataEntryStructure = getDataEntryStructure(model, state.election);
 
-      let formState: FormState;
-      let targetFormSectionId: FormSectionId | undefined;
+      let targetFormSectionId: FormSectionId;
+
       const results = structuredClone(action.dataEntry.data);
+      // make sure that the values of disabled sections are reset
+      resetDisabledSectionValues(dataEntryStructure, results);
+
+      const formState = getInitialFormState(dataEntryStructure);
+      updateDisabledSections(formState, dataEntryStructure, results);
 
       if (action.dataEntry.client_state) {
-        ({ formState, targetFormSectionId } = buildFormState(
+        targetFormSectionId = restoreFormState(
           // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
           action.dataEntry.client_state as ClientState,
+          formState,
           action.dataEntry.validation_results,
           dataEntryStructure,
-        ));
+        );
       } else if (action.dataEntry.is_correction) {
         // an entry that was returned for correction and has no client state left to restore
-        ({ formState, targetFormSectionId } = buildCorrectionFormState(
+        targetFormSectionId = restoreCorrectionFormState(
+          formState,
           action.dataEntry.validation_results,
           dataEntryStructure,
-        ));
+        );
 
         if (action.dataEntry.correction_warnings) {
           addCorrectionWarnings(dataEntryStructure, action.dataEntry.correction_warnings, formState);
           resetFieldValues(dataEntryStructure, action.dataEntry.correction_warnings, results);
         }
       } else {
-        formState = getInitialFormState(dataEntryStructure);
-        targetFormSectionId = dataEntryStructure[0]?.id;
-      }
-      if (targetFormSectionId === undefined) {
-        throw new Error("Cannot determine initial section from dataEntryStructure");
+        targetFormSectionId = formState.furthest;
       }
 
       return {
@@ -130,6 +136,9 @@ export default function dataEntryReducer(state: DataEntryState, action: DataEntr
       };
     case "FORM_SAVED": {
       assertStateIsLoaded(state);
+      updateDisabledSections(state.formState, state.dataEntryStructure, action.data);
+      const cache = isCachedSectionDisabled(state.formState, state.cache) ? null : state.cache;
+
       const formState = updateFormStateAfterSubmit(
         state.dataEntryStructure,
         state.formState,
@@ -147,6 +156,7 @@ export default function dataEntryReducer(state: DataEntryState, action: DataEntr
         targetFormSectionId: action.continueToNextSection
           ? getNextSectionID(formState, action.sectionId)
           : state.targetFormSectionId,
+        cache,
       };
     }
     case "RESET_TARGET_FORM_SECTION":

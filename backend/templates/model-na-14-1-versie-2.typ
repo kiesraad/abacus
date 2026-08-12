@@ -83,7 +83,7 @@ Schrijf op wat de *uitkomst* van het onderzoek door het #location_type was.
   breakable: false,
   {
     [Heeft het onderzoek geleid tot een *gecorrigeerde uitslag*?]
-    checkbox[Nee #sym.arrow.r *Neem de uitkomst van het onderzoek over in het proces-verbaal van het #location_type (nieuwe zitting: model P2a). Dit corrigendum hoeft verder niet ingevuld te worden.*]
+    checkbox[Nee #sym.arrow.r *Neem de uitkomst van het onderzoek over in het proces-verbaal van het #location_type (nieuwe zitting: model P 2a). Dit corrigendum hoeft verder niet ingevuld te worden.*]
     checkbox[Ja #sym.arrow.r *Ga verder met #ref(<corrected_results>)*]
   }
 )

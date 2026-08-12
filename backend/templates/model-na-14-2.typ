@@ -165,7 +165,7 @@ Vul alléén de getallen in die veranderd zijn ten opzichte van een eerdere tell
 
 #pagebreak(weak: true)
 
-== Stemmen per lijst en per kandidaat <per_list_and_candidate>
+== Stemmen per lijst en per kandidaat
 
 #for political_group in input.votes_tables {
   votes_table(

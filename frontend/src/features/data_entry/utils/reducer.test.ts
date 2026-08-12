@@ -97,7 +97,7 @@ test("should handle CSONextSession DATA_ENTRY_CLAIMED with no client_state", () 
   expect(state.error).toBeNull();
 });
 
-test("should handle DATA_ENTRY_CLAIMED with a skipped section", () => {
+test("should handle DATA_ENTRY_CLAIMED with a disabled section", () => {
   const data: Results = {
     model: "DSOFirstSession",
     ...getDSOInitialValues(),
@@ -334,10 +334,11 @@ describe("FORM_SAVED with a disabled section", () => {
   });
 
   test("should re-enable checks_and_corrections when the answer changes back", () => {
-    const skippedState = dataEntryReducer(getClaimedDSOState(), getFormSavedAction("PageMissing"));
-    const state = dataEntryReducer(skippedState, getFormSavedAction("PagePresent"));
+    const state = dataEntryReducer(getClaimedDSOState(), getFormSavedAction("PageMissing"));
+    expect(state.formState?.sections.checks_and_corrections?.isDisabled).toBe(true);
 
-    expect(state.formState?.sections.checks_and_corrections?.isDisabled).toBe(false);
+    const newState = dataEntryReducer(state, getFormSavedAction("PagePresent"));
+    expect(newState.formState?.sections.checks_and_corrections?.isDisabled).toBe(false);
   });
 
   test("should clear the cache if the corresponding section is now disabled", () => {
@@ -495,7 +496,7 @@ describe("onSubmitForm", () => {
     expect(result).toBe(true);
   });
 
-  test("Resets values of a section that becomes skipped by the submitted values", async () => {
+  test("Resets values of a section that becomes disabled by the submitted values", async () => {
     const dispatch = vi.fn();
 
     const dataEntryStructure = getDataEntryStructure("DSOFirstSession", electionMockData);

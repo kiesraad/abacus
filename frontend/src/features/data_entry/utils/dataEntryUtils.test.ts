@@ -177,7 +177,7 @@ describe("updateDisabledSections", () => {
     expect(formState.sections.differences_counts!.isDisabled).toBe(false);
   });
 
-  test("updates furthest to the next enabled section when the furthest section is skipped", () => {
+  test("updates furthest to the next enabled section when the furthest section is disabled", () => {
     const { formState, dataEntryStructure } = getState();
     formState.furthest = "differences_counts";
 
@@ -201,10 +201,10 @@ describe("updateDisabledSections", () => {
   });
 });
 
-describe("resetSkippedSectionValues", () => {
+describe("resetDisabledSectionValues", () => {
   const dataEntryStructure = getDataEntryStructure("DSOFirstSession", electionMockData);
 
-  test("resets the values of a skipped section", () => {
+  test("resets the values of a disabled section", () => {
     const results = getDSOInitialValues();
     results.about_report.checks_and_corrections_present = "PageMissing";
     results.checks_and_corrections.reason_investigation_own_initiative.unaccounted_difference = true;
@@ -222,7 +222,7 @@ describe("resetSkippedSectionValues", () => {
     expect(results.voters_counts.poll_card_count).toBe(10);
   });
 
-  test("does not reset values when the section is not skipped", () => {
+  test("does not reset values when the section is not disabled", () => {
     const results = getDSOInitialValues();
     results.about_report.checks_and_corrections_present = "PagePresent";
     results.checks_and_corrections.corrected_results_own_initiative.yes = true;

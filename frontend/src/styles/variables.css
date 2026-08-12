@@ -246,7 +246,6 @@
 /* MENU COLORS */
 :root {
   --menu-empty: var(--gray-500);
-  --menu-skipped: var(--gray-500);
   --menu-unsaved: var(--color-notify);
   --menu-active: var(--text-color-header);
   --menu-accept: var(--color-success);

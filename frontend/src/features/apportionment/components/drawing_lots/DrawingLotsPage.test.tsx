@@ -95,7 +95,7 @@ describe("DrawingLotsPage", () => {
     overrideOnce("post", "/api/elections/3/apportionment", 200, {
       seat_assignment: lt19Seats.seat_assignment,
       candidate_nomination: lt19Seats.candidate_nomination,
-      election_summary: lt19Seats.election_summary,
+      election_totals: lt19Seats.election_totals,
       warnings: [],
     } satisfies ElectionApportionmentResponse);
     overrideOnce("get", "/api/elections/3/apportionment/state", 200, state);
@@ -142,7 +142,7 @@ describe("DrawingLotsPage", () => {
         HttpResponse.json(
           {
             seat_assignment: gte19SeatsAndP7DrawingLots.seat_assignment,
-            election_summary: gte19SeatsAndP7DrawingLots.election_summary,
+            election_totals: gte19SeatsAndP7DrawingLots.election_totals,
             warnings: [],
           },
           { status: 200 },
@@ -232,7 +232,7 @@ describe("DrawingLotsPage", () => {
         HttpResponse.json(
           {
             seat_assignment: lt19SeatsAndP7DrawingLots.seat_assignment,
-            election_summary: lt19SeatsAndP7DrawingLots.election_summary,
+            election_totals: lt19SeatsAndP7DrawingLots.election_totals,
             warnings: [],
           },
           { status: 200 },
@@ -320,7 +320,7 @@ describe("DrawingLotsPage", () => {
         HttpResponse.json(
           {
             seat_assignment: gte19SeatsAndP9DrawingLots.seat_assignment,
-            election_summary: gte19SeatsAndP9DrawingLots.election_summary,
+            election_totals: gte19SeatsAndP9DrawingLots.election_totals,
             warnings: [],
           },
           { status: 200 },
@@ -411,7 +411,7 @@ describe("DrawingLotsPage", () => {
         HttpResponse.json(
           {
             seat_assignment: lt19SeatsAndP9DrawingLots.seat_assignment,
-            election_summary: lt19SeatsAndP9DrawingLots.election_summary,
+            election_totals: lt19SeatsAndP9DrawingLots.election_totals,
             warnings: [],
           },
           { status: 200 },
@@ -502,7 +502,7 @@ describe("DrawingLotsPage", () => {
         HttpResponse.json(
           {
             seat_assignment: lt19SeatsAndP15DrawingLots.seat_assignment,
-            election_summary: lt19SeatsAndP15DrawingLots.election_summary,
+            election_totals: lt19SeatsAndP15DrawingLots.election_totals,
             warnings: [],
           },
           { status: 200 },
@@ -592,7 +592,7 @@ describe("DrawingLotsPage", () => {
     );
     overrideOnce("post", "/api/elections/7/apportionment", 200, {
       seat_assignment: lt19SeatsAndP7DrawingLots.seat_assignment,
-      election_summary: lt19SeatsAndP7DrawingLots.election_summary,
+      election_totals: lt19SeatsAndP7DrawingLots.election_totals,
       warnings: [],
     });
     overrideOnce("get", "/api/elections/7/apportionment/state", 200, lt19SeatsAndP7DrawingLots.state);

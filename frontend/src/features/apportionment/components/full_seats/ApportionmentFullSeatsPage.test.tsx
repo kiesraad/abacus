@@ -69,7 +69,7 @@ describe("ApportionmentFullSeatsPage", () => {
     overrideOnce("post", "/api/elections/3/apportionment", 200, {
       seat_assignment: lt19Seats.seat_assignment,
       candidate_nomination: lt19Seats.candidate_nomination,
-      election_summary: lt19Seats.election_summary,
+      election_totals: lt19Seats.election_totals,
       warnings: [],
     } satisfies ElectionApportionmentResponse);
     overrideOnce("get", "/api/elections/3/apportionment/state", 200, state);
@@ -91,7 +91,7 @@ describe("ApportionmentFullSeatsPage", () => {
     overrideOnce("post", "/api/elections/3/apportionment", 200, {
       seat_assignment: lt19Seats.seat_assignment,
       candidate_nomination: lt19Seats.candidate_nomination,
-      election_summary: lt19Seats.election_summary,
+      election_totals: lt19Seats.election_totals,
       warnings: [],
     } satisfies ElectionApportionmentResponse);
     overrideOnce("get", "/api/elections/3/apportionment/state", 200, lt19Seats.state);
@@ -141,7 +141,7 @@ describe("ApportionmentFullSeatsPage", () => {
     overrideOnce("post", "/api/elections/4/apportionment", 200, {
       seat_assignment: lt19SeatsAndP9AndP10.seat_assignment,
       candidate_nomination: lt19SeatsAndP9AndP10.candidate_nomination,
-      election_summary: lt19SeatsAndP9AndP10.election_summary,
+      election_totals: lt19SeatsAndP9AndP10.election_totals,
       warnings: [],
     } satisfies ElectionApportionmentResponse);
     overrideOnce("get", "/api/elections/4/apportionment/state", 200, lt19SeatsAndP9AndP10.state);

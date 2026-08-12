@@ -16,7 +16,7 @@ pub mod report;
 pub mod results;
 pub mod role;
 pub mod sub_committee;
-pub mod summary;
+pub mod tabulation;
 #[cfg(test)]
 pub mod valid_default;
 pub mod validate;

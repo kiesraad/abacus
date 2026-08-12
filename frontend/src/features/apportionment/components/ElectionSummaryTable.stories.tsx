@@ -8,10 +8,10 @@ export const DefaultWithNumberOfVoters: StoryObj = {
   render: () => {
     return (
       <ElectionSummaryTable
-        votesCounts={gte19Seats.election_summary.votes_counts}
+        votesCounts={gte19Seats.election_totals.votes_counts}
         seats={gte19Seats.seat_assignment.seats}
         quota={gte19Seats.seat_assignment.quota}
-        numberOfVoters={gte19Seats.election_summary.number_of_voters}
+        numberOfVoters={gte19Seats.election_totals.number_of_voters}
         preferenceThreshold={gte19Seats.candidate_nomination.preference_threshold}
         deceasedCandidatesInfo={
           {
@@ -44,7 +44,7 @@ export const DefaultWithoutNumberOfVoters: StoryObj = {
   render: () => {
     return (
       <ElectionSummaryTable
-        votesCounts={gte19Seats.election_summary.votes_counts}
+        votesCounts={gte19Seats.election_totals.votes_counts}
         seats={gte19Seats.seat_assignment.seats}
         quota={gte19Seats.seat_assignment.quota}
         numberOfVoters={undefined}
@@ -81,7 +81,7 @@ export const DefaultWithoutVotes: StoryObj = {
     return (
       <ElectionSummaryTable
         votesCounts={{
-          ...gte19Seats.election_summary.votes_counts,
+          ...gte19Seats.election_totals.votes_counts,
           blank_votes_count: 0,
           invalid_votes_count: 0,
           total_votes_candidates_count: 0,
@@ -89,7 +89,7 @@ export const DefaultWithoutVotes: StoryObj = {
         }}
         seats={gte19Seats.seat_assignment.seats}
         quota={gte19Seats.seat_assignment.quota}
-        numberOfVoters={gte19Seats.election_summary.number_of_voters}
+        numberOfVoters={gte19Seats.election_totals.number_of_voters}
         preferenceThreshold={gte19Seats.candidate_nomination.preference_threshold}
         deceasedCandidatesInfo={
           {

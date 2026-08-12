@@ -8,7 +8,7 @@ use crate::domain::{
         votes_table::{CandidatesTables, VotesTables},
     },
     polling_station::PollingStation,
-    summary::ElectionSummaryWithoutVotes,
+    tabulation::ElectionTotalsWithoutVotes,
 };
 
 #[derive(Serialize, Deserialize)]
@@ -16,7 +16,7 @@ use crate::domain::{
 pub struct ModelNa31_2Input {
     pub committee_session: CommitteeSession,
     pub election: Election,
-    pub summary: ElectionSummaryWithoutVotes,
+    pub summary: ElectionTotalsWithoutVotes,
     pub polling_stations: Vec<PollingStation>,
     pub hash: String,
     pub creation_date_time: String,

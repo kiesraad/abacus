@@ -3,7 +3,7 @@ import type {
   ApportionmentWarning,
   CandidateNomination,
   CommitteeSession,
-  ElectionSummary,
+  ElectionTotals,
   ElectionWithPoliticalGroups,
   SeatAssignment,
 } from "@/types/generated/openapi";
@@ -705,7 +705,7 @@ export const candidate_nomination: CandidateNomination = {
   ],
 };
 
-export const election_summary: ElectionSummary = {
+export const election_totals: ElectionTotals = {
   voters_counts: {
     poll_card_count: 60,
     proxy_certificate_count: 0,

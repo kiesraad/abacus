@@ -917,6 +917,14 @@ export interface DifferencesCounts {
 }
 
 /**
+ * Contains the totals of the differences, containing which polling stations had differences.
+ */
+export interface DifferencesTotals {
+  fewer_ballots_count: SumCount;
+  more_ballots_count: SumCount;
+}
+
+/**
  * Fraction with the integer part split out for display purposes
  */
 export interface DisplayFraction {
@@ -950,7 +958,7 @@ export interface Election {
 
 export interface ElectionApportionmentResponse {
   candidate_nomination: CandidateNomination;
-  election_summary: ElectionSummary;
+  election_totals: ElectionTotals;
   seat_assignment: SeatAssignment;
   warnings: ApportionmentWarning[];
 }
@@ -1041,14 +1049,14 @@ export const electionSubCategoryValues = ["AB1", "AB2", "GR1", "GR2", "PS1", "PS
 export type ElectionSubCategory = (typeof electionSubCategoryValues)[number];
 
 /**
- * Contains a summary of the election results, added up from the votes of all polling stations.
+ * Contains the totals of the election results, added up from the votes of all polling stations.
  */
-export interface ElectionSummary {
+export interface ElectionTotals {
   /** The differences between voters and votes */
-  differences_counts: SummaryDifferencesCounts;
+  differences_counts: DifferencesTotals;
   /** The number of voters (i.e. "Kiesgerechtigden") */
   number_of_voters?: number;
-  /** The summary votes for each political group (and each candidate within) */
+  /** The total votes for each political group (and each candidate within) */
   political_group_votes: PoliticalGroupCandidateVotes[];
   /** Polling stations where results were investigated by the GSB */
   polling_station_investigations: PollingStationInvestigations;
@@ -1572,7 +1580,7 @@ export interface PreferenceThreshold {
 
 export type ProcessApportionmentResponse =
   | (ElectionApportionmentResponse & { status: "Finalised" })
-  | { election_summary: ElectionSummary; seat_assignment: SeatAssignment; status: "DrawingLotsRequired" };
+  | { election_totals: ElectionTotals; seat_assignment: SeatAssignment; status: "DrawingLotsRequired" };
 
 export type RandomRange = string;
 
@@ -1686,20 +1694,12 @@ export type SubCommitteeFirstSession = SubCommittee & {
 export type SubCommitteeId = number;
 
 /**
- * Contains a summary count, containing both the count and a list of polling
+ * Contains a sum count, containing both the count and a list of polling
  * stations that contributed to it.
  */
 export interface SumCount {
   count: number;
   data_entry_sources: DataEntrySourceNumber[];
-}
-
-/**
- * Contains a summary of the differences, containing which polling stations had differences.
- */
-export interface SummaryDifferencesCounts {
-  fewer_ballots_count: SumCount;
-  more_ballots_count: SumCount;
 }
 
 export interface UpdateUserRequest {

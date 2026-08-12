@@ -111,7 +111,7 @@ async fn generate_and_save_files_csb_election(
 
     let apportionment_input = ApportionmentInputData::new(
         input_data.election.number_of_seats,
-        &input_data.summary.political_group_votes,
+        &input_data.totals.political_group_votes,
         state.get_deceased_candidates(),
         state.get_lists_drawn(),
         state.get_candidates_drawn(),

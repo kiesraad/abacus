@@ -36,7 +36,7 @@ export function ApportionmentProvider({ children, electionId }: ElectionApportio
       value={{
         seatAssignment: data?.seat_assignment,
         candidateNomination: data?.candidate_nomination,
-        electionSummary: data?.election_summary,
+        electionSummary: data?.election_totals,
         warnings: data?.warnings ?? [],
         state,
         error,

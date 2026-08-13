@@ -13,7 +13,6 @@ use crate::domain::{
 };
 
 const DEFAULT_CANDIDATES_PER_COLUMN: [usize; 4] = [25, 25, 15, 15];
-const JUSTIFIED_CANDIDATES_PER_COLUMN: [usize; 4] = [20, 20, 20, 20];
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CandidatesTables(Vec<VotesTable>);
@@ -81,7 +80,7 @@ impl VotesTablesWithPreviousVotes {
                         group,
                         Some(candidate_votes),
                         Some(previous_candidate_votes),
-                        JUSTIFIED_CANDIDATES_PER_COLUMN,
+                        DEFAULT_CANDIDATES_PER_COLUMN,
                     )
                 })
                 .collect::<Result<Vec<_>, _>>()?,

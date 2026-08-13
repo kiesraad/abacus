@@ -16,7 +16,7 @@
 
     Corrigendum van een #location_type \
     Model Na 14-2 (versie 2027)
-  ], margin-bottom: 3.2cm
+  ], margin-bottom: 2.9cm
 )
 
 #set heading(numbering: none)
@@ -167,6 +167,10 @@ Vul alléén de getallen in die veranderd zijn ten opzichte van een eerdere tell
 
 == Stemmen per lijst en per kandidaat
 
+De kolom ‘gecorrigeerd’ toont alléén de getallen die veranderd zijn ten opzichte van een eerdere telling. Onder ‘oorspronkelijk’ staan de getallen die in een eerdere zitting door het #location_type zijn vastgesteld.
+
+#pagebreak(weak: true)
+
 #for political_group in input.votes_tables {
   votes_table(
     title: [#political_group.number #political_group.name],
@@ -179,9 +183,7 @@ Vul alléén de getallen in die veranderd zijn ten opzichte van een eerdere tell
     column_total: "Subtotaal kolom",
     sum_total: columns => [Totaal lijst (kolom #columns)],
     total_instruction: [Neem dit totaal over in rubriek #ref(<cast_votes>) van deze bijlage bij de juiste lijst.],
-    explainer_text: [
-      Vul alléén de getallen in die veranderd zijn ten opzichte van een eerdere telling. Getallen die niet zijn veranderd, hoeven niet ingevuld te worden in de kolom ‘gecorrigeerd’. Onder ‘oorspronkelijk’ staan de getallen die in een eerdere zitting door het #location_type zijn vastgesteld.
-    ],
+    explainer_text: [De kolom ‘gecorrigeerd’ toont alléén de getallen die veranderd zijn ten opzichte van de oorspronkelijke telling.],
   )
 }
 

@@ -198,5 +198,6 @@ Vul alléén de getallen in die veranderd zijn ten opzichte van een eerdere tell
     column_total: "Subtotaal kolom",
     sum_total: columns => [Totaal lijst (kolom #columns)],
     total_instruction: [Neem dit totaal over in rubriek #ref(<cast_votes>) van deze bijlage bij de juiste lijst.],
+    explainer_text: [Vul alléén de getallen in die veranderd zijn ten opzichte van de oorspronkelijke telling.]
   )
 }

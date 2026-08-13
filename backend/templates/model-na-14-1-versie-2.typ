@@ -201,6 +201,10 @@ verschil.]
 
 == Stemmen per lijst en per kandidaat <per_list_and_candidate>
 
+Vul alléén de getallen in die veranderd zijn ten opzichte van een eerdere telling. Getallen die niet zijn veranderd, hoeven niet ingevuld te worden in de kolom ‘gecorrigeerd’. Onder ‘oorspronkelijk’ staan de getallen die door het stembureau of door het #location_type in een eerdere zitting zijn vastgesteld.
+
+#pagebreak(weak: true)
+
 #for political_group in input.votes_tables {
   votes_table(
     title: [#political_group.number #political_group.name],
@@ -212,9 +216,7 @@ verschil.]
     column_total: "Subtotaal kolom",
     sum_total: columns => [Totaal lijst (kolom #columns)],
     total_instruction: [Neem dit totaal over in rubriek #ref(<cast_votes>) bij de juiste lijst.],
-    explainer_text: [
-      Vul alléén de getallen in die veranderd zijn ten opzichte van een eerdere telling. Getallen die niet zijn veranderd, hoeven niet ingevuld te worden in de kolom ‘gecorrigeerd’. Onder ‘oorspronkelijk’ staan de getallen die door het stembureau of door het #location_type in een eerdere zitting zijn vastgesteld.
-    ]
+    explainer_text: [Vul alléén de getallen in die veranderd zijn ten opzichte van de oorspronkelijke telling.]
   )
 }
 

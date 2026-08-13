@@ -17,9 +17,6 @@ use crate::{
     utils::serve_api,
 };
 
-pub mod shared;
-pub mod utils;
-
 pub async fn complete_committee_session(
     addr: &SocketAddr,
     cookie: &HeaderValue,
@@ -89,7 +86,7 @@ pub async fn read_zip_entry(
     buf
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2", "users"))))]
 async fn test_gsb_election_first_session_zip_download_works(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let cookie = login(&addr, CoordinatorGSB).await;
@@ -132,7 +129,10 @@ async fn test_gsb_election_first_session_zip_download_works(pool: SqlitePool) {
     assert_eq!(eml_hash1, eml_hash2, "EML files should have the same hash");
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
+#[test(sqlx::test(fixtures(
+    path = "../../fixtures",
+    scripts("election_5_with_results", "users")
+)))]
 async fn test_gsb_election_next_session_zip_download_works(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let cookie = login(&addr, CoordinatorGSB).await;
@@ -193,7 +193,7 @@ async fn test_gsb_election_next_session_zip_download_works(pool: SqlitePool) {
     );
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2", "users"))))]
 async fn test_gsb_election_zip_download_invalid_committee_session_state(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let cookie = login(&addr, CoordinatorGSB).await;
@@ -205,7 +205,7 @@ async fn test_gsb_election_zip_download_invalid_committee_session_state(pool: Sq
 }
 
 #[test(sqlx::test(fixtures(
-    path = "../fixtures",
+    path = "../../fixtures",
     scripts("election_8_csb_with_results", "users")
 )))]
 async fn test_csb_election_zip_download_results_works(pool: SqlitePool) {
@@ -265,7 +265,7 @@ async fn test_csb_election_zip_download_results_works(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(
-    path = "../fixtures",
+    path = "../../fixtures",
     scripts("election_8_csb_with_results", "users")
 )))]
 async fn test_csb_election_zip_download_results_invalid_state(pool: SqlitePool) {
@@ -298,7 +298,7 @@ async fn test_csb_election_zip_download_results_invalid_state(pool: SqlitePool) 
 }
 
 #[test(sqlx::test(fixtures(
-    path = "../fixtures",
+    path = "../../fixtures",
     scripts("election_8_csb_with_results", "users")
 )))]
 async fn test_csb_election_zip_download_attachment_works(pool: SqlitePool) {
@@ -347,7 +347,7 @@ async fn test_csb_election_zip_download_attachment_works(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(
-    path = "../fixtures",
+    path = "../../fixtures",
     scripts("election_8_csb_with_results", "users")
 )))]
 async fn test_csb_election_zip_download_attachment_invalid_state(pool: SqlitePool) {
@@ -380,7 +380,7 @@ async fn test_csb_election_zip_download_attachment_invalid_state(pool: SqlitePoo
 }
 
 #[test(sqlx::test(fixtures(
-    path = "../fixtures",
+    path = "../../fixtures",
     scripts("election_8_csb_with_results", "users")
 )))]
 async fn test_csb_election_zip_download_total_counts_works(pool: SqlitePool) {
@@ -440,7 +440,7 @@ async fn test_csb_election_zip_download_total_counts_works(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(
-    path = "../fixtures",
+    path = "../../fixtures",
     scripts("election_8_csb_with_results", "users")
 )))]
 async fn test_csb_election_zip_download_total_counts_invalid_state(pool: SqlitePool) {

@@ -16,10 +16,7 @@ use crate::{
     utils::serve_api,
 };
 
-pub mod shared;
-pub mod utils;
-
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2", "users"))))]
 async fn test_data_entry_valid(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let typist_cookie = login(&addr, TypistGSB).await;
@@ -54,7 +51,7 @@ async fn test_data_entry_valid(pool: SqlitePool) {
     finalise_data_entry(&addr, &typist_cookie, data_entry_id, 1).await;
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2", "users"))))]
 async fn test_data_entry_validation(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let typist_cookie = login(&addr, TypistGSB).await;
@@ -240,7 +237,7 @@ async fn test_data_entry_validation(pool: SqlitePool) {
     )
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
 async fn test_data_entry_invalid(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let typist_cookie = login(&addr, TypistGSB).await;
@@ -264,7 +261,7 @@ async fn test_data_entry_invalid(pool: SqlitePool) {
     );
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2", "users"))))]
 async fn test_data_entry_only_for_existing(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let typist_cookie = login(&addr, TypistGSB).await;
@@ -298,7 +295,7 @@ async fn test_data_entry_only_for_existing(pool: SqlitePool) {
 }
 
 /// test that we can get a data entry after saving it
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2", "users"))))]
 async fn test_data_entry_claim(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let typist_cookie = login(&addr, TypistGSB).await;
@@ -347,7 +344,7 @@ async fn test_data_entry_claim(pool: SqlitePool) {
     );
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2", "users"))))]
 async fn test_data_entry_claim_finalised(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let typist_cookie = login(&addr, TypistGSB).await;
@@ -372,7 +369,7 @@ async fn test_data_entry_claim_finalised(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::CONFLICT);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2", "users"))))]
 async fn test_data_entry_discard(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let typist_cookie = login(&addr, TypistGSB).await;
@@ -423,7 +420,7 @@ async fn test_data_entry_discard(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::CONFLICT);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2", "users"))))]
 async fn test_election_details_status(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let typist_cookie = login(&addr, TypistGSB).await;
@@ -537,7 +534,10 @@ async fn test_election_details_status(pool: SqlitePool) {
     assert_eq!(statuses[&212]["data_entry_progress"], 60);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "election_3", "users"))))]
+#[test(sqlx::test(fixtures(
+    path = "../../fixtures",
+    scripts("election_2", "election_3", "users")
+)))]
 async fn test_election_details_status_no_other_election_statuses(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = login(&addr, CoordinatorGSB).await;

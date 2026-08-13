@@ -8,10 +8,8 @@ use crate::{
     shared::{FixtureUser::*, login},
     utils::serve_api,
 };
-pub mod shared;
-pub mod utils;
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
 async fn test_route_public(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -20,7 +18,7 @@ async fn test_route_public(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::NO_CONTENT);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
 async fn test_route_authorized(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let url = format!("http://{addr}/api/users");
@@ -38,7 +36,7 @@ async fn test_route_authorized(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::OK);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
 async fn test_route_authorized_wrong_role(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let typist_cookie = login(&addr, TypistGSB).await;
@@ -53,7 +51,7 @@ async fn test_route_authorized_wrong_role(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::FORBIDDEN);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
 async fn test_route_authorized_incomplete_user(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let admin_cookie = login(&addr, Admin).await;
@@ -82,7 +80,7 @@ async fn test_route_authorized_incomplete_user(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
 async fn test_route_incomplete_user(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = login(&addr, CoordinatorGSB).await;

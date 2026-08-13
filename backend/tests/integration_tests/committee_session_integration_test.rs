@@ -15,9 +15,6 @@ use crate::{
     utils::serve_api,
 };
 
-pub mod shared;
-pub mod utils;
-
 async fn delete_committee_session(
     addr: &SocketAddr,
     cookie: &HeaderValue,
@@ -35,7 +32,10 @@ async fn delete_committee_session(
         .unwrap()
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
+#[test(sqlx::test(fixtures(
+    path = "../../fixtures",
+    scripts("election_5_with_results", "users")
+)))]
 async fn test_committee_session_create_works(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = login(&addr, CoordinatorGSB).await;
@@ -67,7 +67,10 @@ async fn test_committee_session_create_works(pool: SqlitePool) {
     assert_eq!(body["status"], "created");
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
+#[test(sqlx::test(fixtures(
+    path = "../../fixtures",
+    scripts("election_5_with_results", "users")
+)))]
 async fn test_committee_session_create_current_committee_session_not_finalised(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = login(&addr, CoordinatorGSB).await;
@@ -88,7 +91,10 @@ async fn test_committee_session_create_current_committee_session_not_finalised(p
     );
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
+#[test(sqlx::test(fixtures(
+    path = "../../fixtures",
+    scripts("election_7_four_sessions", "users")
+)))]
 async fn test_committee_session_delete_ok_status_created(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = login(&addr, CoordinatorGSB).await;
@@ -119,7 +125,10 @@ async fn test_committee_session_delete_ok_status_created(pool: SqlitePool) {
     assert_eq!(committee_session["status"], "completed");
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
+#[test(sqlx::test(fixtures(
+    path = "../../fixtures",
+    scripts("election_7_four_sessions", "users")
+)))]
 async fn test_committee_session_delete_fails_with_investigation(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let election_id = 7;
@@ -143,7 +152,10 @@ async fn test_committee_session_delete_fails_with_investigation(pool: SqlitePool
     );
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
+#[test(sqlx::test(fixtures(
+    path = "../../fixtures",
+    scripts("election_5_with_results", "users")
+)))]
 async fn test_committee_session_delete_not_ok_wrong_status(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = login(&addr, CoordinatorGSB).await;
@@ -222,7 +234,7 @@ async fn test_committee_session_delete_not_ok_wrong_status(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(
-    path = "../fixtures",
+    path = "../../fixtures",
     scripts("election_6_no_polling_stations", "users")
 )))]
 async fn test_committee_session_delete_current_committee_session_but_its_the_first(
@@ -256,7 +268,10 @@ async fn test_committee_session_delete_current_committee_session_but_its_the_fir
     assert_eq!(committee_session["status"], "created");
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
+#[test(sqlx::test(fixtures(
+    path = "../../fixtures",
+    scripts("election_5_with_results", "users")
+)))]
 async fn test_committee_session_delete_previous_committee_session(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = login(&addr, CoordinatorGSB).await;
@@ -269,7 +284,10 @@ async fn test_committee_session_delete_previous_committee_session(pool: SqlitePo
     );
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
+#[test(sqlx::test(fixtures(
+    path = "../../fixtures",
+    scripts("election_5_with_results", "users")
+)))]
 async fn test_committee_session_delete_not_found(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = login(&addr, CoordinatorGSB).await;
@@ -282,7 +300,7 @@ async fn test_committee_session_delete_not_found(pool: SqlitePool) {
     );
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2", "users"))))]
 async fn test_committee_session_update_works(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = login(&addr, CoordinatorGSB).await;
@@ -308,7 +326,7 @@ async fn test_committee_session_update_works(pool: SqlitePool) {
     );
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2", "users"))))]
 async fn test_committee_session_update_works_with_time_without_leading_zero(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = login(&addr, CoordinatorGSB).await;
@@ -334,7 +352,7 @@ async fn test_committee_session_update_works_with_time_without_leading_zero(pool
     );
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2", "users"))))]
 async fn test_committee_session_update_bad_request(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = login(&addr, CoordinatorGSB).await;
@@ -371,7 +389,10 @@ async fn test_committee_session_update_bad_request(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::BAD_REQUEST);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
+#[test(sqlx::test(fixtures(
+    path = "../../fixtures",
+    scripts("election_5_with_results", "users")
+)))]
 async fn test_committee_session_update_previous_committee_session_fails(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = login(&addr, CoordinatorGSB).await;
@@ -393,7 +414,7 @@ async fn test_committee_session_update_previous_committee_session_fails(pool: Sq
     assert_eq!(response.status(), StatusCode::NOT_FOUND);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
 async fn test_committee_session_update_not_found(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = login(&addr, CoordinatorGSB).await;
@@ -415,7 +436,10 @@ async fn test_committee_session_update_not_found(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::NOT_FOUND);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
+#[test(sqlx::test(fixtures(
+    path = "../../fixtures",
+    scripts("election_5_with_results", "users")
+)))]
 async fn test_committee_session_status_change_works(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = login(&addr, CoordinatorGSB).await;
@@ -437,7 +461,7 @@ async fn test_committee_session_status_change_works(pool: SqlitePool) {
     );
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2", "users"))))]
 async fn test_committee_session_status_change_completed_to_data_entry_deletes_files(
     pool: SqlitePool,
 ) {
@@ -507,7 +531,7 @@ async fn test_committee_session_status_change_completed_to_data_entry_deletes_fi
     assert_eq!(committee_session["status"], "data_entry");
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2", "users"))))]
 async fn test_committee_session_status_change_invalid_status(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = login(&addr, CoordinatorGSB).await;
@@ -525,7 +549,7 @@ async fn test_committee_session_status_change_invalid_status(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::CONFLICT);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("users"))))]
 async fn test_committee_session_status_change_not_found(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = login(&addr, CoordinatorGSB).await;
@@ -543,7 +567,10 @@ async fn test_committee_session_status_change_not_found(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::NOT_FOUND);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
+#[test(sqlx::test(fixtures(
+    path = "../../fixtures",
+    scripts("election_5_with_results", "users")
+)))]
 async fn test_committee_session_status_change_previous_committee_session_fails(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = login(&addr, CoordinatorGSB).await;
@@ -561,7 +588,10 @@ async fn test_committee_session_status_change_previous_committee_session_fails(p
     assert_eq!(response.status(), StatusCode::NOT_FOUND);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
+#[test(sqlx::test(fixtures(
+    path = "../../fixtures",
+    scripts("election_7_four_sessions", "users")
+)))]
 async fn test_committee_session_investigations_list_works(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let cookie = login(&addr, CoordinatorGSB).await;
@@ -589,7 +619,10 @@ async fn test_committee_session_investigations_list_works(pool: SqlitePool) {
     );
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
+#[test(sqlx::test(fixtures(
+    path = "../../fixtures",
+    scripts("election_7_four_sessions", "users")
+)))]
 async fn test_committee_session_investigations_list_works_no_investigations(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let cookie = login(&addr, CoordinatorGSB).await;
@@ -613,7 +646,10 @@ async fn test_committee_session_investigations_list_works_no_investigations(pool
     assert_eq!(investigations.len(), 0);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
+#[test(sqlx::test(fixtures(
+    path = "../../fixtures",
+    scripts("election_7_four_sessions", "users")
+)))]
 async fn test_committee_session_investigations_list_fails_election_not_found(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let cookie = login(&addr, CoordinatorGSB).await;

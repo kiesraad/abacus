@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<EML xmlns:xnl="urn:oasis:names:tc:ciq:xsdschema:xNL:2.0" xmlns="urn:oasis:names:tc:evs:schema:eml" xmlns:xal="urn:oasis:names:tc:ciq:xsdschema:xAL:2.0" xmlns:kr="http://www.kiesraad.nl/extensions" Id="110a" SchemaVersion="5">
+    <TransactionId>1</TransactionId>
+    <IssueDate>2023-02-09</IssueDate>
+    <kr:CreationDateTime>2023-02-09T15:12:25.983</kr:CreationDateTime>
+    <ElectionEvent>
+        <EventIdentifier/>
+        <Election>
+            <ElectionIdentifier Id="AB2023_Limburg">
+                <ElectionName>Algemeen bestuur van het waterschap Limburg 2023</ElectionName>
+                <ElectionCategory>AB</ElectionCategory>
+                <kr:ElectionSubcategory>AB2</kr:ElectionSubcategory>
+                <kr:ElectionDomain Id="25">Limburg</kr:ElectionDomain>
+                <kr:ElectionDate>2023-03-15</kr:ElectionDate>
+                <kr:NominationDate>2023-01-30</kr:NominationDate>
+            </ElectionIdentifier>
+            <Contest>
+                <ContestIdentifier Id="geen"/>
+                <VotingMethod>SPV</VotingMethod>
+                <MaxVotes></MaxVotes>
+            </Contest>
+            <kr:NumberOfSeats>26</kr:NumberOfSeats>
+            <kr:PreferenceThreshold>25</kr:PreferenceThreshold>
+            <kr:ElectionTree>
+                <kr:Region RegionNumber="25" RegionCategory="WATERSCHAP">
+                    <kr:RegionName>Limburg</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="1" RegionCategory="KIESKRING" SuperiorRegionNumber="25" SuperiorRegionCategory="WATERSCHAP">
+                    <kr:RegionName>Limburg</kr:RegionName>
+                    <kr:Committee CommitteeCategory="CSB"/>
+                    <kr:Committee CommitteeCategory="HSB"/>
+                </kr:Region>
+                <kr:Region RegionNumber="882" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Landgraaf</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="888" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Beek</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="889" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Beesel</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="893" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Bergen (L)</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="899" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Brunssum</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="907" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Gennep</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="917" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Heerlen</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="928" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Kerkrade</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="935" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Maastricht</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="938" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Meerssen</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="944" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Mook en Middelaar</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="946" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Nederweert</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="957" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Roermond</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="965" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Simpelveld</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="971" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Stein</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="981" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Vaals</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="983" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Venlo</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="984" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Venray</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="986" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Voerendaal</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="988" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Weert</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="994" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Valkenburg aan de Geul</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="1507" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Horst aan de Maas</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="1640" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Leudal</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="1641" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Maasgouw</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="1669" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Roerdalen</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="1711" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Echt-Susteren</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="1729" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Gulpen-Wittem</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="1883" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Sittard-Geleen</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="1894" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Peel en Maas</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="1903" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Eijsden-Margraten</kr:RegionName>
+                </kr:Region>
+                <kr:Region RegionNumber="1954" RegionCategory="GEMEENTE" SuperiorRegionNumber="1" SuperiorRegionCategory="KIESKRING">
+                    <kr:RegionName>Beekdaelen</kr:RegionName>
+                </kr:Region>
+            </kr:ElectionTree>
+            <kr:RegisteredParties>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>Waterbelang Parkstad</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>Water Natuurlijk</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>Waterbelang Westelijke Mijnstreek</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>Waterbelang Midden-Limburg</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>VVD</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>Waterbelang Heuvelland</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>Lokaal Limburg</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>Waterbelang Venlo</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>Waterbelang Land van Weert + Leudal</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>Waterbelang Maastricht</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>Waterbelang Venray en Maasduinen</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>Waterbelang Horst-Helden-Beesel</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>50PLUS</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>Belang van Nederland (BVNL)</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>AWP voor water, klimaat en natuur</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>BBB</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>Partij voor Water Veiligheid</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>Partij voor de Dieren</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+            </kr:RegisteredParties>
+        </Election>
+    </ElectionEvent>
+</EML>

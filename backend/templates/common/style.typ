@@ -46,7 +46,11 @@
     return "Deel 1 - Gecorrigeerde telresultaten"
   }
 
-  if chapter_string.starts-with("Telresultaten van") {
+  if chapter_string.starts-with("Onderzoek naar telresultaten") {
+    return "Deel 1 - Verschillen met telresultaten stembureau"
+  }
+
+  if chapter_string.starts-with("Gecorrigeerde telresultaten") or chapter_string.starts-with("Telresultaten"){
     return "Deel 2 - Telresultaten"
   }
 
@@ -149,6 +153,38 @@
       outset: (left: 6pt, top: 3pt, bottom: 3pt),
     )[
       #prefix - *#counter(heading).display(it.numbering)*
+      #it.body
+    ]
+  ]
+
+  #doc
+]
+
+// Corrigendum header numbering
+#let corrigendum_numbering(doc) = [
+  // Note: `supplement: none` removes the default "Hoofdstuk" prefix (`supplement: ""` will render an empty space)
+  #set heading(numbering: "1.1", hanging-indent: 0pt, supplement: none)
+
+  #show heading: it => {
+    if it.level >= 4 {
+      block(it.body)
+    } else if it.level == 1 {
+      if it.body == [Ondertekening] {
+        [Deel #counter(heading).display(it.numbering) - #it.body]
+      } else {
+        [#counter(heading).display(it.numbering). #it.body]
+      }
+    } else if it.level == 2 {
+      [#counter(heading).display(it.numbering) #it.body]
+    }
+  }
+
+  #show heading.where(level: 3): it => [
+    #block(
+      stroke: (left: 1pt),
+      outset: (left: 6pt, top: 3pt, bottom: 3pt),
+    )[
+      *#counter(heading).display(it.numbering)*
       #it.body
     ]
   ]

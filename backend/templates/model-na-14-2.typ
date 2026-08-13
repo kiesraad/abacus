@@ -143,7 +143,7 @@ Vul alléén de getallen in die veranderd zijn ten opzichte van een eerdere tell
 
 #let differences = input.summary.differences_counts.more_ballots_count.count > 0 or input.summary.differences_counts.fewer_ballots_count.count > 0
 
-#checkbox(checked: not differences)[Ja, #sym.arrow.r Ga door naar #ref(<per_list_and_candidate>)]
+#checkbox(checked: not differences)[Ja]
 
 #checkbox(checked: differences)[Nee, er zijn stembureaus met een verschil]
 
@@ -165,7 +165,7 @@ Vul alléén de getallen in die veranderd zijn ten opzichte van een eerdere tell
 
 #pagebreak(weak: true)
 
-== Stemmen per lijst en per kandidaat <per_list_and_candidate>
+== Stemmen per lijst en per kandidaat
 
 #for political_group in input.votes_tables {
   votes_table(

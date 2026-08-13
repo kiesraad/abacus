@@ -24,9 +24,10 @@ use crate::{
         investigation::PollingStationInvestigation,
         models::{
             ModelN10_1InlegvelInput, ModelN10_1Input, ModelN10_2Input, ModelNa14_1Versie1Input,
-            ModelNa14_2Bijlage1Input, ModelNa14_2Input, ModelNa31_1InlegvelInput,
-            ModelNa31_2Bijlage1Input, ModelNa31_2InlegvelInput, ModelNa31_2Input, ModelP2aInput,
-            ModelP22_2Bijlage1Input, ModelP22_2Input, PdfFileModel, PdfModel,
+            ModelNa14_1Versie2Input, ModelNa14_2Bijlage1Input, ModelNa14_2Input,
+            ModelNa31_1InlegvelInput, ModelNa31_2Bijlage1Input, ModelNa31_2InlegvelInput,
+            ModelNa31_2Input, ModelP2aInput, ModelP22_2Bijlage1Input, ModelP22_2Input,
+            PdfFileModel, PdfModel,
             apportionment_footnotes::ApportionmentFootnotes,
             enriched_candidate_nomination::EnrichedCandidateNomination,
             enriched_seat_assignment::EnrichedSeatAssignment,
@@ -614,6 +615,42 @@ async fn test_na_14_1_versie_1() {
             committee_session,
             election: election.into(),
             polling_station,
+        }));
+
+        test_pdf(model).await;
+    }
+}
+
+#[test(tokio::test)]
+async fn test_na_14_1_versie_2() {
+    let mut rng = rand::rng();
+
+    for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
+        let election = random_election(
+            &mut rng,
+            parties,
+            candidates,
+            string_length,
+            none_where_possible,
+        );
+        let polling_station = random_polling_station(&mut rng, string_length, none_where_possible);
+        let committee_session = random_committee_session(&mut rng, election.id, string_length);
+        let investigation = random_investigation(
+            &mut rng,
+            &polling_station,
+            string_length,
+            none_where_possible,
+        );
+        let previous_results = random_result(&mut rng, &election);
+
+        let model = PdfModel::ModelNa14_1Versie2(Box::new(ModelNa14_1Versie2Input {
+            votes_tables: VotesTablesWithOnlyPreviousVotes::new(&election, &previous_results)
+                .unwrap(),
+            previous_results: previous_results.into(),
+            committee_session,
+            election: election.into(),
+            polling_station,
+            investigation,
         }));
 
         test_pdf(model).await;

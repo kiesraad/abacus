@@ -1,11 +1,9 @@
-#import "common/style.typ": conf, current_chapter_title, default_header, document_numbering, blank_page_before_signing
+#import "common/style.typ": conf, current_chapter_title, default_header, corrigendum_numbering, blank_page_before_signing
 #import "common/scripts.typ": *
 #let input = json("inputs/model-na-14-1-versie-1-variations/model-na-14-1-versie-1-GR.json")
 
 #let is_municipality = (municipal, public_body) => is_municipality(input.election.location, municipal, public_body)
 #let is_local_election = (local, other) => is_local_election(input.election.category, local, other)
-
-#let is_mobile = "polling_station_type" in input.polling_station and input.polling_station.polling_station_type == "Mobile"
 
 #let location_name = is_municipality[Gemeente #input.election.domain_id #input.election.location][Openbaar lichaam #input.election.location]
 #let location_type = is_municipality[gemeentelijk stembureau][stembureau voor het openbaar lichaam]
@@ -53,7 +51,7 @@ Het #location_type heeft de telresultaten van dit stembureau onderzocht en is to
 
 #pagebreak(weak: true)
 
-#show: doc => document_numbering(doc)
+#show: doc => corrigendum_numbering(doc)
 
 #set page(
   header: context default_header(
@@ -62,14 +60,7 @@ Het #location_type heeft de telresultaten van dit stembureau onderzocht en is to
   )
 )
 
-#grid(
-  columns: 1fr,
-  gutter: 1.33em,
-  v(1em),
-  text(size: 20pt, [Stembureau #input.polling_station.number #input.polling_station.name]),
-  v(1em),
-  grid.hline(position: top)
-)
+#attachment_or_corrigendum_title([Stembureau #input.polling_station.number\ #input.polling_station.name])
 
 = Onderzoek naar telresultaten
 

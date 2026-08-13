@@ -436,6 +436,13 @@
   v(space)
 }
 
+// Title layout for an attachment or corrigendum
+#let attachment_or_corrigendum_title(title) = {
+  block(width: 100%, text(size: 20pt, title))
+  v(1em)
+  line(length: 100%)
+}
+
 // Format the name of a candidate
 #let candidate_name(election_candidate, with_first_name: true, with_gender: true) = {
   let name = ""
@@ -608,7 +615,7 @@
   box[
     #box(inset: (bottom: 10pt), text(size: 14pt, weight: "semibold")[Lijst #title])
     #if explainer_text != none {
-      box(width: 500pt, explainer_text)
+      box(width: 500pt, text(size: 9pt)[#explainer_text])
     }
   ]
 
@@ -703,7 +710,7 @@
           place(top + left, scope: "parent", float: true, box[
             #box(inset: (bottom: 10pt), text(size: 14pt, weight: "semibold")[Vervolg lijst #title])
             #if explainer_text != none {
-              box(width: 500pt, explainer_text)
+              box(width: 500pt, text(size: 9pt)[#explainer_text])
             }
           ])
         }

@@ -26,17 +26,13 @@
 
 = Bijlage 1
 
-== Verslagen van tellingen van stembureaus
-
-#line(length: 100%)
+#attachment_or_corrigendum_title([Verslagen van tellingen van stembureaus])
 
 _De bijlagen worden separaat gepubliceerd bij het betreffende stembureau._
 
 #pagebreak(weak: true)
 
-= Stembureau #input.polling_station.number \ #input.polling_station.name
-
-#line(length: 100%)
+#attachment_or_corrigendum_title([Stembureau #input.polling_station.number\ #input.polling_station.name])
 
 == Over deze bijlage
 

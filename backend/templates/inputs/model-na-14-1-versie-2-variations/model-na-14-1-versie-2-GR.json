@@ -76,11 +76,11 @@
     {
       "number": 1,
       "name": "Algemene Lijst",
-      "total": 50584,
+      "total": null,
       "previous_total": 50583,
       "columns": [
         {
-          "column_total": 44351,
+          "column_total": null,
           "previous_column_total": 44350,
           "votes": [
             {
@@ -91,7 +91,7 @@
                 "locality": "Huisden",
                 "gender": "Female"
               },
-              "votes": 18207,
+              "votes": null,
               "previous_votes": 18206
             },
             {
@@ -102,7 +102,7 @@
                 "locality": "Hoek van Zoom",
                 "gender": "X"
               },
-              "votes": 6369,
+              "votes": null,
               "previous_votes": 6369
             },
             {
@@ -113,7 +113,7 @@
                 "locality": "Bloemstede",
                 "gender": "X"
               },
-              "votes": 3522,
+              "votes": null,
               "previous_votes": 3522
             },
             {
@@ -125,7 +125,7 @@
                 "locality": "Hovenerwoud",
                 "gender": "Male"
               },
-              "votes": 2505,
+              "votes": null,
               "previous_votes": 2505
             },
             {
@@ -137,7 +137,7 @@
                 "locality": "'s Gravenveen",
                 "gender": "Female"
               },
-              "votes": 1934,
+              "votes": null,
               "previous_votes": 1934
             },
             {
@@ -148,7 +148,7 @@
                 "locality": "Eksterlo",
                 "gender": "Male"
               },
-              "votes": 1520,
+              "votes": null,
               "previous_votes": 1520
             },
             {
@@ -160,7 +160,7 @@
                 "locality": "Middelgein",
                 "gender": "Female"
               },
-              "votes": 1318,
+              "votes": null,
               "previous_votes": 1318
             },
             {
@@ -171,7 +171,7 @@
                 "locality": "Lekkum",
                 "gender": "Female"
               },
-              "votes": 1124,
+              "votes": null,
               "previous_votes": 1124
             },
             {
@@ -182,7 +182,7 @@
                 "locality": "Middelgein",
                 "gender": "X"
               },
-              "votes": 998,
+              "votes": null,
               "previous_votes": 998
             },
             {
@@ -194,7 +194,7 @@
                 "locality": "Lekkum",
                 "gender": "Female"
               },
-              "votes": 898,
+              "votes": null,
               "previous_votes": 898
             },
             {
@@ -205,7 +205,7 @@
                 "locality": "Heemdamseburg",
                 "gender": "Male"
               },
-              "votes": 822,
+              "votes": null,
               "previous_votes": 822
             },
             {
@@ -216,7 +216,7 @@
                 "locality": "Bloemstede",
                 "gender": "Male"
               },
-              "votes": 744,
+              "votes": null,
               "previous_votes": 744
             },
             {
@@ -227,7 +227,7 @@
                 "locality": "Hovenerwoud",
                 "gender": "X"
               },
-              "votes": 684,
+              "votes": null,
               "previous_votes": 684
             },
             {
@@ -238,7 +238,7 @@
                 "locality": "Hovenerwoud",
                 "gender": "Male"
               },
-              "votes": 639,
+              "votes": null,
               "previous_votes": 639
             },
             {
@@ -249,7 +249,7 @@
                 "locality": "Hoek van Zoom",
                 "gender": "Female"
               },
-              "votes": 593,
+              "votes": null,
               "previous_votes": 593
             },
             {
@@ -260,7 +260,7 @@
                 "locality": "Bloemstede",
                 "gender": "Female"
               },
-              "votes": 553,
+              "votes": null,
               "previous_votes": 553
             },
             {
@@ -271,7 +271,7 @@
                 "locality": "Juinen",
                 "gender": "X"
               },
-              "votes": 528,
+              "votes": null,
               "previous_votes": 528
             },
             {
@@ -282,7 +282,7 @@
                 "locality": "'s Gravenveen",
                 "gender": "Male"
               },
-              "votes": 492,
+              "votes": null,
               "previous_votes": 492
             },
             {
@@ -293,7 +293,7 @@
                 "locality": "Huisden",
                 "gender": "Female"
               },
-              "votes": 462,
+              "votes": null,
               "previous_votes": 462
             },
             {
@@ -304,13 +304,13 @@
                 "locality": "Middelgein",
                 "gender": "Male"
               },
-              "votes": 439,
+              "votes": null,
               "previous_votes": 439
             }
           ]
         },
         {
-          "column_total": 5533,
+          "column_total": null,
           "previous_column_total": 5533,
           "votes": [
             {
@@ -321,7 +321,7 @@
                 "locality": "Hovenerwoud",
                 "gender": "X"
               },
-              "votes": 422,
+              "votes": null,
               "previous_votes": 422
             },
             {
@@ -332,7 +332,7 @@
                 "locality": "'s Gravenveen",
                 "gender": "Male"
               },
-              "votes": 398,
+              "votes": null,
               "previous_votes": 398
             },
             {
@@ -343,7 +343,7 @@
                 "locality": "Sluisdam",
                 "gender": "Male"
               },
-              "votes": 374,
+              "votes": null,
               "previous_votes": 374
             },
             {
@@ -354,7 +354,7 @@
                 "locality": "Sluisdam",
                 "gender": "Male"
               },
-              "votes": 361,
+              "votes": null,
               "previous_votes": 361
             },
             {
@@ -365,7 +365,7 @@
                 "locality": "Middelgein",
                 "gender": "Female"
               },
-              "votes": 343,
+              "votes": null,
               "previous_votes": 343
             },
             {
@@ -377,7 +377,7 @@
                 "locality": "Huisden",
                 "gender": "Female"
               },
-              "votes": 326,
+              "votes": null,
               "previous_votes": 326
             },
             {
@@ -388,7 +388,7 @@
                 "locality": "Huisden",
                 "gender": "X"
               },
-              "votes": 317,
+              "votes": null,
               "previous_votes": 317
             },
             {
@@ -400,7 +400,7 @@
                 "locality": "'s Gravenveen",
                 "gender": "Male"
               },
-              "votes": 302,
+              "votes": null,
               "previous_votes": 302
             },
             {
@@ -411,7 +411,7 @@
                 "locality": "Heemdamseburg",
                 "gender": "X"
               },
-              "votes": 286,
+              "votes": null,
               "previous_votes": 286
             },
             {
@@ -423,7 +423,7 @@
                 "locality": "Bloemstede",
                 "gender": "Male"
               },
-              "votes": 273,
+              "votes": null,
               "previous_votes": 273
             },
             {
@@ -434,7 +434,7 @@
                 "locality": "Juinen",
                 "gender": "X"
               },
-              "votes": 263,
+              "votes": null,
               "previous_votes": 263
             },
             {
@@ -445,7 +445,7 @@
                 "locality": "Eemstricht",
                 "gender": "Female"
               },
-              "votes": 254,
+              "votes": null,
               "previous_votes": 254
             },
             {
@@ -456,7 +456,7 @@
                 "locality": "Middelgein",
                 "gender": "Male"
               },
-              "votes": 240,
+              "votes": null,
               "previous_votes": 240
             },
             {
@@ -467,7 +467,7 @@
                 "locality": "Hoek van Zoom",
                 "gender": "X"
               },
-              "votes": 225,
+              "votes": null,
               "previous_votes": 225
             },
             {
@@ -478,7 +478,7 @@
                 "locality": "Heemdamseburg",
                 "gender": "Male"
               },
-              "votes": 215,
+              "votes": null,
               "previous_votes": 215
             },
             {
@@ -489,7 +489,7 @@
                 "locality": "Middelgein",
                 "gender": "X"
               },
-              "votes": 202,
+              "votes": null,
               "previous_votes": 202
             },
             {
@@ -500,7 +500,7 @@
                 "locality": "Hovenerwoud",
                 "gender": "Female"
               },
-              "votes": 197,
+              "votes": null,
               "previous_votes": 197
             },
             {
@@ -511,7 +511,7 @@
                 "locality": "Sluisdam",
                 "gender": "Male"
               },
-              "votes": 188,
+              "votes": null,
               "previous_votes": 188
             },
             {
@@ -522,7 +522,7 @@
                 "locality": "Huisden",
                 "gender": "Female"
               },
-              "votes": 179,
+              "votes": null,
               "previous_votes": 179
             },
             {
@@ -534,13 +534,13 @@
                 "locality": "Sluisdam",
                 "gender": "Female"
               },
-              "votes": 168,
+              "votes": null,
               "previous_votes": 168
             }
           ]
         },
         {
-          "column_total": 700,
+          "column_total": null,
           "previous_column_total": 700,
           "votes": [
             {
@@ -552,7 +552,7 @@
                 "locality": "Sluisdam",
                 "gender": "Female"
               },
-              "votes": 154,
+              "votes": null,
               "previous_votes": 154
             },
             {
@@ -563,7 +563,7 @@
                 "locality": "Hovenerwoud",
                 "gender": "Male"
               },
-              "votes": 149,
+              "votes": null,
               "previous_votes": 149
             },
             {
@@ -574,7 +574,7 @@
                 "locality": "Lekkum",
                 "gender": "Male"
               },
-              "votes": 140,
+              "votes": null,
               "previous_votes": 140
             },
             {
@@ -585,7 +585,7 @@
                 "locality": "Juinen",
                 "gender": "Male"
               },
-              "votes": 131,
+              "votes": null,
               "previous_votes": 131
             },
             {
@@ -597,7 +597,7 @@
                 "locality": "Huisden",
                 "gender": "X"
               },
-              "votes": 126,
+              "votes": null,
               "previous_votes": 126
             }
           ]
@@ -607,11 +607,11 @@
     {
       "number": 2,
       "name": "Blanco (van der Spek, X.)",
-      "total": 57153,
+      "total": null,
       "previous_total": 57153,
       "columns": [
         {
-          "column_total": 54200,
+          "column_total": null,
           "previous_column_total": 54200,
           "votes": [
             {
@@ -623,7 +623,7 @@
                 "locality": "Eemstricht",
                 "gender": "Female"
               },
-              "votes": 0,
+              "votes": null,
               "previous_votes": 0
             },
             {
@@ -635,7 +635,7 @@
                 "locality": "Huisden",
                 "gender": "Male"
               },
-              "votes": 7792,
+              "votes": null,
               "previous_votes": 0
             },
             {
@@ -646,7 +646,7 @@
                 "locality": "Huisden",
                 "gender": "X"
               },
-              "votes": 0,
+              "votes": null,
               "previous_votes": 4565
             },
             {
@@ -658,7 +658,7 @@
                 "locality": "Bloemstede",
                 "gender": "X"
               },
-              "votes": 2961,
+              "votes": null,
               "previous_votes": 2962
             },
             {
@@ -669,7 +669,7 @@
                 "locality": "Hovenerwoud",
                 "gender": "X"
               },
-              "votes": 2253,
+              "votes": null,
               "previous_votes": 2253
             },
             {
@@ -680,7 +680,7 @@
                 "locality": "Eemstricht",
                 "gender": "Male"
               },
-              "votes": 1854,
+              "votes": null,
               "previous_votes": 1854
             },
             {
@@ -691,7 +691,7 @@
                 "locality": "Juinen",
                 "gender": "Female"
               },
-              "votes": 1578,
+              "votes": null,
               "previous_votes": 1578
             },
             {
@@ -703,7 +703,7 @@
                 "locality": "Bloemstede",
                 "gender": "X"
               },
-              "votes": 1340,
+              "votes": null,
               "previous_votes": 1340
             },
             {
@@ -714,7 +714,7 @@
                 "locality": "Eksterlo",
                 "gender": "X"
               },
-              "votes": 1160,
+              "votes": null,
               "previous_votes": 1160
             },
             {
@@ -726,7 +726,7 @@
                 "locality": "Heemdamseburg",
                 "gender": "Male"
               },
-              "votes": 1050,
+              "votes": null,
               "previous_votes": 1050
             },
             {
@@ -737,7 +737,7 @@
                 "locality": "Heemdamseburg",
                 "gender": "Female"
               },
-              "votes": 948,
+              "votes": null,
               "previous_votes": 948
             },
             {
@@ -748,7 +748,7 @@
                 "locality": "Bloemstede",
                 "gender": "X"
               },
-              "votes": 867,
+              "votes": null,
               "previous_votes": 867
             },
             {
@@ -759,7 +759,7 @@
                 "locality": "Bloemstede",
                 "gender": "Male"
               },
-              "votes": 787,
+              "votes": null,
               "previous_votes": 787
             },
             {
@@ -771,7 +771,7 @@
                 "locality": "Huisden",
                 "gender": "Female"
               },
-              "votes": 732,
+              "votes": null,
               "previous_votes": 732
             },
             {
@@ -782,7 +782,7 @@
                 "locality": "Juinen",
                 "gender": "X"
               },
-              "votes": 671,
+              "votes": null,
               "previous_votes": 671
             },
             {
@@ -794,7 +794,7 @@
                 "locality": "Huisden",
                 "gender": "Male"
               },
-              "votes": 631,
+              "votes": null,
               "previous_votes": 631
             },
             {
@@ -805,7 +805,7 @@
                 "locality": "Huisden",
                 "gender": "Male"
               },
-              "votes": 587,
+              "votes": null,
               "previous_votes": 587
             },
             {
@@ -816,7 +816,7 @@
                 "locality": "Juinen",
                 "gender": "Female"
               },
-              "votes": 548,
+              "votes": null,
               "previous_votes": 548
             },
             {
@@ -828,7 +828,7 @@
                 "locality": "Juinen",
                 "gender": "Female"
               },
-              "votes": 520,
+              "votes": null,
               "previous_votes": 520
             },
             {
@@ -839,13 +839,13 @@
                 "locality": "'s Gravenveen",
                 "gender": "Male"
               },
-              "votes": 488,
+              "votes": null,
               "previous_votes": 488
             }
           ]
         },
         {
-          "column_total": 2953,
+          "column_total": null,
           "previous_column_total": 2953,
           "votes": [
             {
@@ -856,7 +856,7 @@
                 "locality": "Juinen",
                 "gender": "X"
               },
-              "votes": 460,
+              "votes": null,
               "previous_votes": 460
             },
             {
@@ -868,7 +868,7 @@
                 "locality": "Eksterlo",
                 "gender": "X"
               },
-              "votes": 432,
+              "votes": null,
               "previous_votes": 432
             },
             {
@@ -879,7 +879,7 @@
                 "locality": "Lekkum",
                 "gender": "X"
               },
-              "votes": 405,
+              "votes": null,
               "previous_votes": 405
             },
             {
@@ -891,7 +891,7 @@
                 "locality": "Lekkum",
                 "gender": "Female"
               },
-              "votes": 383,
+              "votes": null,
               "previous_votes": 383
             },
             {
@@ -902,7 +902,7 @@
                 "locality": "'s Gravenveen",
                 "gender": "Male"
               },
-              "votes": 351,
+              "votes": null,
               "previous_votes": 351
             },
             {
@@ -913,7 +913,7 @@
                 "locality": "'s Gravenveen",
                 "gender": "X"
               },
-              "votes": 330,
+              "votes": null,
               "previous_votes": 330
             },
             {
@@ -925,7 +925,7 @@
                 "locality": "Eemstricht",
                 "gender": "Female"
               },
-              "votes": 304,
+              "votes": null,
               "previous_votes": 304
             },
             {
@@ -937,7 +937,7 @@
                 "locality": "Huisden",
                 "gender": "Male"
               },
-              "votes": 288,
+              "votes": null,
               "previous_votes": 288
             }
           ]

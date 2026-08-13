@@ -38,7 +38,7 @@ jobs:
         shell: bash
         run: if [ -f rust-toolchain.toml ]; then rustup toolchain install; else rustup update stable && rustup default stable; fi
       - name: Cargo cache
-        uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4 # v2
+        uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2
         with:
           workspaces: "backend -> target"
           # Save cache only for main and release branches to prevent cache thrashing

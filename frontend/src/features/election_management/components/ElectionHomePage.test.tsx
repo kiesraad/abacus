@@ -2,9 +2,9 @@ import { render as rtlRender } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { HttpResponse, http } from "msw";
 import type { ReactNode } from "react";
+import * as ReactRouter from "react-router";
 import { RouterProvider } from "react-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
-
 import { ApiProvider } from "@/api/ApiProvider";
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { electionManagementRoutes } from "@/features/election_management/routes";
@@ -25,8 +25,9 @@ import { overrideOnce, server } from "@/testing/server";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 import { expectConflictErrorPage, render, screen, setupTestRouter, spyOnHandler, within } from "@/testing/test-utils";
 import type { CommitteeSession, ElectionDetailsResponse, ErrorResponse, Role } from "@/types/generated/openapi";
-
 import { ElectionHomePage } from "./ElectionHomePage";
+
+const navigate = vi.fn();
 
 const renderGSBPage = async (userRole: Role) => {
   render(
@@ -460,6 +461,7 @@ describe("ElectionHomePage", () => {
     describe("DSO", () => {
       test("Shows empty documents section for first committee session", async () => {
         const electionDataSecondSession = getElectionMockData({ counting_method: "DSO" });
+        vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
         server.use(
           http.get("/api/elections/1", () =>
             HttpResponse.json(electionDataSecondSession satisfies ElectionDetailsResponse, { status: 200 }),
@@ -484,6 +486,71 @@ describe("ElectionHomePage", () => {
           ["N 10-1", "Inlegvellen controles en correcties per stembureau"],
           ["Na 14-1, versie 1", "Corrigenda eerste zitting per stembureau"],
         ]);
+      });
+
+      test("Shows modal on clicking download Na 14-1 versie 1 when committee session details missing", async () => {
+        const user = userEvent.setup();
+        const electionDataSecondSession = getElectionMockData({ counting_method: "DSO" });
+        vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
+        server.use(
+          http.get("/api/elections/1", () =>
+            HttpResponse.json(electionDataSecondSession satisfies ElectionDetailsResponse, { status: 200 }),
+          ),
+        );
+
+        await renderGSBPage("coordinator_gsb");
+
+        expect(
+          await screen.findByRole("heading", { level: 3, name: "Lege processen-verbaal voor deze verkiezing" }),
+        ).toBeVisible();
+        const downloadSection = screen.getByTestId("DSO-first-session-download-section");
+        expect(downloadSection).toBeVisible();
+        expect(within(downloadSection).getByRole("paragraph")).toHaveTextContent(
+          "Onderstaande modellen zijn relevant voor de huidige zitting van het gemeentelijk stembureau. Overige modellen zijn te downloaden via de toolkit van de Kiesraad.",
+        );
+        const table = within(downloadSection).getByRole("table");
+        const rows = within(table).getAllByRole("row");
+        await user.click(rows[3]!);
+
+        const modal = await screen.findByRole("dialog");
+        expect(modal).toBeVisible();
+        const title = within(modal).getByText("Vul eerst de details van de zitting in");
+        expect(title).toBeVisible();
+
+        const enter_details_button = within(modal).getByRole("button", { name: "Details invullen" });
+        expect(enter_details_button).toBeVisible();
+        await user.click(enter_details_button);
+
+        expect(navigate).toHaveBeenCalledExactlyOnceWith("details");
+      });
+
+      test("Does not show modal on clicking download Na 14-1 versie 1 when committee session details present", async () => {
+        const user = userEvent.setup();
+        const electionDataSecondSession = getElectionMockData(
+          { counting_method: "DSO" },
+          { location: "Den Haag", start_date_time: "2026-03-18T21:36:00" },
+        );
+        server.use(
+          http.get("/api/elections/1", () =>
+            HttpResponse.json(electionDataSecondSession satisfies ElectionDetailsResponse, { status: 200 }),
+          ),
+        );
+
+        await renderGSBPage("coordinator_gsb");
+
+        expect(
+          await screen.findByRole("heading", { level: 3, name: "Lege processen-verbaal voor deze verkiezing" }),
+        ).toBeVisible();
+        const downloadSection = screen.getByTestId("DSO-first-session-download-section");
+        expect(downloadSection).toBeVisible();
+        expect(within(downloadSection).getByRole("paragraph")).toHaveTextContent(
+          "Onderstaande modellen zijn relevant voor de huidige zitting van het gemeentelijk stembureau. Overige modellen zijn te downloaden via de toolkit van de Kiesraad.",
+        );
+        const table = within(downloadSection).getByRole("table");
+        const rows = within(table).getAllByRole("row");
+        await user.click(rows[3]!);
+
+        expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
       });
 
       test("Shows empty document section for second committee session", async () => {

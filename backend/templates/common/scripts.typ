@@ -615,7 +615,7 @@
   box[
     #box(inset: (bottom: 10pt), text(size: 14pt, weight: "semibold")[Lijst #title])
     #if explainer_text != none {
-      box(width: 500pt, explainer_text)
+      box(width: 500pt, text(size: 9pt)[#explainer_text])
     }
   ]
 
@@ -710,7 +710,7 @@
           place(top + left, scope: "parent", float: true, box[
             #box(inset: (bottom: 10pt), text(size: 14pt, weight: "semibold")[Vervolg lijst #title])
             #if explainer_text != none {
-              box(width: 500pt, explainer_text)
+              box(width: 500pt, text(size: 9pt)[#explainer_text])
             }
           ])
         }

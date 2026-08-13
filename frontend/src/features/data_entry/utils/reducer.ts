@@ -73,7 +73,12 @@ export default function dataEntryReducer(state: DataEntryState, action: DataEntr
 
         if (action.dataEntry.correction_warnings) {
           addCorrectionWarnings(dataEntryStructure, action.dataEntry.correction_warnings, formState);
-          resetFieldValues(dataEntryStructure, action.dataEntry.correction_warnings, results);
+          resetFieldValues(
+            dataEntryStructure,
+            action.dataEntry.correction_warnings,
+            action.dataEntry.previous_results,
+            results,
+          );
         }
       } else {
         targetFormSectionId = formState.furthest;

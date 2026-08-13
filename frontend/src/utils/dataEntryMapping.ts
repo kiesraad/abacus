@@ -128,7 +128,12 @@ export function setValueAtPath(
 /**
  * Reset the value at the specified path to its empty value.
  */
-export function resetValueAtPath(section: DataEntrySection, data: DataEntryResults, path: ResultsPath) {
+export function resetValueAtPath(
+  section: DataEntrySection,
+  previousResults: DataEntryResults | undefined,
+  data: DataEntryResults,
+  path: ResultsPath,
+) {
   const normalizedPath = normalizeFieldName(path);
 
   // Check if the path refers to a checkboxes subsection by its error_path,
@@ -139,13 +144,31 @@ export function resetValueAtPath(section: DataEntrySection, data: DataEntryResul
 
   if (checkboxes) {
     for (const option of checkboxes.options) {
+      // Checkboxes are always unset
       setValueAtPath(data, option.path, "", "boolean");
     }
   } else {
+    const value = getValueForReset(previousResults, normalizedPath);
     const fieldInfoMap = extractFieldInfoFromSection(section);
     const valueType = fieldInfoMap.get(normalizedPath);
-    setValueAtPath(data, normalizedPath, "", valueType);
+    setValueAtPath(data, normalizedPath, value, valueType);
   }
+}
+
+function getValueForReset(previousResults: DataEntryResults | undefined, path: ResultsPath): string {
+  if (previousResults === undefined) {
+    // When there is no corrigendum, set to empty string
+    return "";
+  }
+
+  // Try to get value from previous results
+  const value = getValueAtPath(previousResults, path);
+  if (value === undefined || value === null) {
+    return "";
+  }
+
+  // Return as string
+  return String(value);
 }
 
 /**

@@ -85,7 +85,7 @@ export function resetDisabledSectionValues(dataEntryStructure: DataEntryStructur
     .flatMap((section) => [...extractFieldInfoFromSection(section).keys()]);
 
   if (fields.length > 0) {
-    resetFieldValues(dataEntryStructure, fields, results);
+    resetFieldValues(dataEntryStructure, fields, undefined, results);
   }
 }
 
@@ -347,12 +347,17 @@ export function addCorrectionWarnings(dataEntryStructure: DataEntryStructure, fi
   }
 }
 
-export function resetFieldValues(dataEntryStructure: DataEntryStructure, fields: string[], results: DataEntryResults) {
+export function resetFieldValues(
+  dataEntryStructure: DataEntryStructure,
+  fields: string[],
+  previousResults: DataEntryResults | undefined,
+  results: DataEntryResults,
+) {
   for (const section of dataEntryStructure) {
     const sectionFields = fields.filter((field) => isFieldInSection(field, section));
 
     for (const field of sectionFields) {
-      resetValueAtPath(section, results, field);
+      resetValueAtPath(section, previousResults, results, field);
     }
   }
 }

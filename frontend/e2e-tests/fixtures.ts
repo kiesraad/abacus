@@ -1,7 +1,13 @@
 import { readFile } from "node:fs/promises";
 import { type APIRequestContext, test as base, expect, type Page } from "@playwright/test";
 import { DataEntryApiClient } from "e2e-tests/helpers-utils/api-clients";
-import { completeDataEntries, resolveDifferences } from "e2e-tests/helpers-utils/e2e-test-api-helpers";
+import {
+  changeCommitteeSessionStatus,
+  completeDataEntries,
+  createCommitteeSession,
+  createInvestigation,
+  resolveDifferences,
+} from "e2e-tests/helpers-utils/e2e-test-api-helpers";
 import { createRandomUsername } from "e2e-tests/helpers-utils/e2e-test-utils";
 import {
   type Eml230b,
@@ -17,15 +23,14 @@ import {
   dataEntryRequestGSBTriggeringDrawingLotsForP9,
   dataEntryWithDifferencesRequest,
   dataEntryWithErrorRequest,
+  nextSessionResults,
+  nextSessionResultsWithDifferences,
   pollingStationRequests,
 } from "e2e-tests/test-data/request-response-templates";
 import type {
-  COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY,
-  COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH,
   COMMITTEE_SESSION_UPDATE_REQUEST_BODY,
   COMMITTEE_SESSION_UPDATE_REQUEST_PATH,
   CommitteeSession,
-  ELECTION_DETAILS_REQUEST_PATH,
   ELECTION_IMPORT_REQUEST_PATH,
   ELECTION_STATUS_REQUEST_PATH,
   Election,
@@ -78,12 +83,16 @@ type Fixtures = {
   electionCSBSmallCouncil: ElectionDetailsResponse;
   // First data entry of the GSB election
   dataEntryGSB: DataEntry;
+  // GSB election with one investigation in the second committee session
+  dataEntryNextSession: DataEntry;
   // First data entry of the GSB election with entry claimed by typist one
   dataEntryGSBFirstEntryClaimed: DataEntry;
   // First data entry of the GSB election with first data entry done
   dataEntryGSBFirstEntryDone: DataEntry;
   // First data entry correction of the GSB election after resolve differences
   dataEntryGSBFirstEntryCorrection: DataEntry;
+  // First data entry correction of the next session of a GSB election after resolve differences
+  dataEntryNextSessionFirstEntryCorrection: DataEntry;
   // Second data entry correction of the GSB election after resolve differences
   dataEntryGSBSecondEntryCorrection: DataEntry;
   // First data entry of the GSB election with first data entry with errors
@@ -220,20 +229,11 @@ export const test = base.extend<Fixtures>({
       expect(pollingStationResponse.ok()).toBeTruthy();
     }
 
-    // get election details
-    const electionUrl: ELECTION_DETAILS_REQUEST_PATH = `/api/elections/${emptyElectionGSB.id}`;
-    const electionResponse = await adminOne.request.get(electionUrl);
-    expect(electionResponse.ok()).toBeTruthy();
-    const response = (await electionResponse.json()) as ElectionDetailsResponse;
-
     // Set committee session status to DataEntry
-    const statusChangeUrl: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/elections/${response.current_committee_session.election_id}/committee_sessions/${response.current_committee_session.id}/status`;
-    const statusChangeData: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = { status: "data_entry" };
-    const statusChangeResponse = await coordinatorOneGSB.request.put(statusChangeUrl, { data: statusChangeData });
-    expect(statusChangeResponse.ok()).toBeTruthy();
+    const electionDetails = await changeCommitteeSessionStatus(coordinatorOneGSB, emptyElectionGSB.id, "data_entry");
 
     // Fill in committee session details
-    const detailsUpdateUrl: COMMITTEE_SESSION_UPDATE_REQUEST_PATH = `/api/elections/${response.current_committee_session.election_id}/committee_sessions/${response.current_committee_session.id}`;
+    const detailsUpdateUrl: COMMITTEE_SESSION_UPDATE_REQUEST_PATH = `/api/elections/${emptyElectionGSB.id}/committee_sessions/${electionDetails.current_committee_session.id}`;
     const detailsUpdateData: COMMITTEE_SESSION_UPDATE_REQUEST_BODY = {
       location: "Den Haag",
       start_date: "2026-03-18",
@@ -242,23 +242,16 @@ export const test = base.extend<Fixtures>({
     const detailsUpdateResponse = await coordinatorOneGSB.request.put(detailsUpdateUrl, { data: detailsUpdateData });
     expect(detailsUpdateResponse.ok()).toBeTruthy();
 
-    await use(response);
+    await use(electionDetails);
   },
-  electionCSBLargeCouncil: async ({ adminOne, coordinatorOneCSB, emptyElectionCSBLargeCouncil }, use) => {
-    // get election details
-    const electionUrl: ELECTION_DETAILS_REQUEST_PATH = `/api/elections/${emptyElectionCSBLargeCouncil.id}`;
-    const electionResponse = await adminOne.request.get(electionUrl);
-    expect(electionResponse.ok()).toBeTruthy();
-    const response = (await electionResponse.json()) as ElectionDetailsResponse;
+  electionCSBLargeCouncil: async ({ coordinatorOneCSB, emptyElectionCSBLargeCouncil }, use) => {
+    const electionId = emptyElectionCSBLargeCouncil.id;
 
     // Set committee session status to DataEntry
-    const statusChangeUrl: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/elections/${response.current_committee_session.election_id}/committee_sessions/${response.current_committee_session.id}/status`;
-    const statusChangeData: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = { status: "data_entry" };
-    const statusChangeResponse = await coordinatorOneCSB.request.put(statusChangeUrl, { data: statusChangeData });
-    expect(statusChangeResponse.ok()).toBeTruthy();
+    const electionDetails = await changeCommitteeSessionStatus(coordinatorOneCSB, electionId, "data_entry");
 
     // Fill in committee session details
-    const detailsUpdateUrl: COMMITTEE_SESSION_UPDATE_REQUEST_PATH = `/api/elections/${response.current_committee_session.election_id}/committee_sessions/${response.current_committee_session.id}`;
+    const detailsUpdateUrl: COMMITTEE_SESSION_UPDATE_REQUEST_PATH = `/api/elections/${electionId}/committee_sessions/${electionDetails.current_committee_session.id}`;
     const detailsUpdateData: COMMITTEE_SESSION_UPDATE_REQUEST_BODY = {
       location: "Den Haag",
       start_date: "2026-03-18",
@@ -267,23 +260,16 @@ export const test = base.extend<Fixtures>({
     const detailsUpdateResponse = await coordinatorOneCSB.request.put(detailsUpdateUrl, { data: detailsUpdateData });
     expect(detailsUpdateResponse.ok()).toBeTruthy();
 
-    await use(response);
+    await use(electionDetails);
   },
-  electionCSBSmallCouncil: async ({ adminOne, coordinatorOneCSB, emptyElectionCSBSmallCouncil }, use) => {
-    // get election details
-    const electionUrl: ELECTION_DETAILS_REQUEST_PATH = `/api/elections/${emptyElectionCSBSmallCouncil.id}`;
-    const electionResponse = await adminOne.request.get(electionUrl);
-    expect(electionResponse.ok()).toBeTruthy();
-    const response = (await electionResponse.json()) as ElectionDetailsResponse;
+  electionCSBSmallCouncil: async ({ coordinatorOneCSB, emptyElectionCSBSmallCouncil }, use) => {
+    const electionId = emptyElectionCSBSmallCouncil.id;
 
     // Set committee session status to DataEntry
-    const statusChangeUrl: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/elections/${response.current_committee_session.election_id}/committee_sessions/${response.current_committee_session.id}/status`;
-    const statusChangeData: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = { status: "data_entry" };
-    const statusChangeResponse = await coordinatorOneCSB.request.put(statusChangeUrl, { data: statusChangeData });
-    expect(statusChangeResponse.ok()).toBeTruthy();
+    const electionDetails = await changeCommitteeSessionStatus(coordinatorOneCSB, electionId, "data_entry");
 
     // Fill in committee session details
-    const detailsUpdateUrl: COMMITTEE_SESSION_UPDATE_REQUEST_PATH = `/api/elections/${response.current_committee_session.election_id}/committee_sessions/${response.current_committee_session.id}`;
+    const detailsUpdateUrl: COMMITTEE_SESSION_UPDATE_REQUEST_PATH = `/api/elections/${electionId}/committee_sessions/${electionDetails.current_committee_session.id}`;
     const detailsUpdateData: COMMITTEE_SESSION_UPDATE_REQUEST_BODY = {
       location: "Den Haag",
       start_date: "2026-03-18",
@@ -292,7 +278,7 @@ export const test = base.extend<Fixtures>({
     const detailsUpdateResponse = await coordinatorOneCSB.request.put(detailsUpdateUrl, { data: detailsUpdateData });
     expect(detailsUpdateResponse.ok()).toBeTruthy();
 
-    await use(response);
+    await use(electionDetails);
   },
   dataEntryGSB: async ({ adminOne, electionGSB }, use) => {
     const { request } = adminOne;
@@ -308,6 +294,20 @@ export const test = base.extend<Fixtures>({
       id: electionStatus.data_entry_id,
       name: electionStatus.source.name,
       number: electionStatus.source.number.toString(),
+    });
+  },
+  dataEntryNextSession: async ({ coordinatorOneGSB, completedElectionGSB }, use) => {
+    await changeCommitteeSessionStatus(coordinatorOneGSB, completedElectionGSB.id, "completed");
+    const electionDetails = await createCommitteeSession(coordinatorOneGSB, completedElectionGSB.id);
+
+    const pollingStation = electionDetails.polling_stations[0]!;
+    const investigation = await createInvestigation(coordinatorOneGSB, pollingStation.id);
+
+    await use({
+      election_id: electionDetails.election.id,
+      id: investigation.data_entry_id!,
+      name: pollingStation.name,
+      number: String(pollingStation.number),
     });
   },
   dataEntryGSBFirstEntryClaimed: async ({ typistOneGSB, dataEntryGSB }, use) => {
@@ -328,6 +328,21 @@ export const test = base.extend<Fixtures>({
   dataEntryGSBFirstEntryCorrection: async ({ coordinatorOneGSB, dataEntryGSBEntriesDifferent }, use) => {
     await resolveDifferences(coordinatorOneGSB, dataEntryGSBEntriesDifferent.id, "keep_second_and_correct_first");
     await use(dataEntryGSBEntriesDifferent);
+  },
+  dataEntryNextSessionFirstEntryCorrection: async (
+    { typistOneGSB, typistTwoGSB, coordinatorOneGSB, dataEntryNextSession },
+    use,
+  ) => {
+    await completeDataEntries(
+      dataEntryNextSession.id,
+      typistOneGSB.request,
+      typistTwoGSB.request,
+      { data: nextSessionResults, progress: 100, client_state: {} },
+      { data: nextSessionResultsWithDifferences, progress: 100, client_state: {} },
+    );
+
+    await resolveDifferences(coordinatorOneGSB, dataEntryNextSession.id, "keep_second_and_correct_first");
+    await use(dataEntryNextSession);
   },
   dataEntryGSBSecondEntryCorrection: async ({ coordinatorOneGSB, dataEntryGSBEntriesDifferent }, use) => {
     await resolveDifferences(coordinatorOneGSB, dataEntryGSBEntriesDifferent.id, "keep_first_and_correct_second");

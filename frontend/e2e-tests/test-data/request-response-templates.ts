@@ -2,6 +2,7 @@ import type {
   CSOFirstSessionResults,
   DataEntry,
   GSBResults,
+  NextSessionResults,
   PollingStationRequest,
   Results,
   SaveDataEntryResponse,
@@ -1195,6 +1196,36 @@ export const noRecountNoDifferencesDrawingLotsForP9DataEntryGSB: GSBResults & { 
       ],
     },
   ],
+};
+
+export const nextSessionResults: NextSessionResults & { model: "CSONextSession" } = {
+  model: "CSONextSession",
+  voters_counts: {
+    poll_card_count: noRecountNoDifferencesDataEntry.voters_counts.poll_card_count,
+    proxy_certificate_count: noRecountNoDifferencesDataEntry.voters_counts.proxy_certificate_count + 10,
+    total_admitted_voters_count: noRecountNoDifferencesDataEntry.voters_counts.total_admitted_voters_count + 10,
+  },
+  votes_counts: {
+    political_group_total_votes: noRecountNoDifferencesDataEntry.votes_counts.political_group_total_votes,
+    total_votes_candidates_count: noRecountNoDifferencesDataEntry.votes_counts.total_votes_candidates_count,
+    blank_votes_count: noRecountNoDifferencesDataEntry.votes_counts.blank_votes_count,
+    invalid_votes_count: noRecountNoDifferencesDataEntry.votes_counts.invalid_votes_count + 10,
+    total_votes_cast_count: noRecountNoDifferencesDataEntry.votes_counts.total_votes_cast_count + 10,
+  },
+  differences_counts: noRecountNoDifferencesDataEntry.differences_counts,
+  political_group_votes: noRecountNoDifferencesDataEntry.political_group_votes,
+};
+
+export const nextSessionResultsWithDifferences: NextSessionResults & { model: "CSONextSession" } = {
+  model: "CSONextSession",
+  voters_counts: {
+    poll_card_count: nextSessionResults.voters_counts.poll_card_count - 20,
+    proxy_certificate_count: nextSessionResults.voters_counts.proxy_certificate_count + 20,
+    total_admitted_voters_count: nextSessionResults.voters_counts.total_admitted_voters_count,
+  },
+  votes_counts: nextSessionResults.votes_counts,
+  differences_counts: nextSessionResults.differences_counts,
+  political_group_votes: nextSessionResults.political_group_votes,
 };
 
 export const dataEntryRequest: DataEntry = {

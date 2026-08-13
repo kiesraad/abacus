@@ -6,7 +6,11 @@ import { DataEntryHomePage } from "e2e-tests/page-objects/data_entry/DataEntryHo
 import { DifferencesPage } from "e2e-tests/page-objects/data_entry/DifferencesPgObj";
 import { VotersAndVotesPage } from "e2e-tests/page-objects/data_entry/VotersAndVotesPgObj";
 import { ElectionStatus } from "e2e-tests/page-objects/election/ElectionStatusPgObj";
-import { dataEntryRequest, dataEntryWithDifferencesRequest } from "e2e-tests/test-data/request-response-templates";
+import {
+  dataEntryRequest,
+  dataEntryWithDifferencesRequest,
+  nextSessionResultsWithDifferences,
+} from "e2e-tests/test-data/request-response-templates";
 import type { Results } from "@/types/generated/openapi";
 import { type DataEntry, test } from "../../fixtures";
 
@@ -44,6 +48,49 @@ test.describe("data entry - correct differences", () => {
     await expect(votersAndVotesPage.pollCardCount).toHaveValue("");
     await expect(votersAndVotesPage.proxyCertificateCount).toHaveValue("");
     await expect(votersAndVotesPage.totalAdmittedVotersCount).toHaveValue("3607");
+
+    // Save section without making corrections, assert error that was hidden by W.002
+    await votersAndVotesPage.next.click();
+    await expect(votersAndVotesPage.error).toContainText("Controleer je antwoorden");
+    await expect(votersAndVotesPage.pollCardCount).toHaveAttribute("aria-errormessage", "feedback-error");
+    await expect(votersAndVotesPage.proxyCertificateCount).toHaveAttribute("aria-errormessage", "feedback-error");
+    await expect(votersAndVotesPage.totalAdmittedVotersCount).toHaveAttribute("aria-errormessage", "feedback-error");
+  });
+
+  test("corrigendum correction empty fields", async ({
+    typistOneGSB,
+    dataEntryNextSessionFirstEntryCorrection: dataEntry,
+  }) => {
+    // Start data entry correction
+    const typist = typistOneGSB.page;
+    await typist.goto(`/elections/${dataEntry.election_id}/data-entry/${dataEntry.id}/1`);
+
+    // Go to section with warning
+    const dataEntryPage = new DataEntryBasePage(typist);
+    await dataEntryPage.progressList.votersAndVotes.click();
+    const votersAndVotesPage = new VotersAndVotesPage(typist);
+    await expect(votersAndVotesPage.fieldset).toBeVisible();
+
+    // Assert warning message only
+    await expect(votersAndVotesPage.error).toBeHidden();
+    await expect(votersAndVotesPage.warning).toContainText(
+      [
+        "Verschil met andere invoer. Nieuwe invoer nodig",
+        "W.002",
+        "Een coördinator heeft beide invoeren vergeleken, en aangegeven dat in deze invoer fouten zijn gemaakt.",
+      ].join(""),
+    );
+
+    // Assert field icons
+    await expect(votersAndVotesPage.pollCardCount).toHaveAttribute("aria-errormessage", "feedback-warning");
+    await expect(votersAndVotesPage.proxyCertificateCount).toHaveAttribute("aria-errormessage", "feedback-warning");
+    await expect(votersAndVotesPage.totalAdmittedVotersCount).not.toHaveAttribute("aria-errormessage");
+
+    // Assert different fields empty
+    await expect(votersAndVotesPage.pollCardCount).toHaveValue("");
+    await expect(votersAndVotesPage.proxyCertificateCount).toHaveValue("");
+    // Assert different from first session, but not different from other data entry, filled
+    await expect(votersAndVotesPage.totalAdmittedVotersCount).toHaveValue("3617");
 
     // Save section without making corrections, assert error that was hidden by W.002
     await votersAndVotesPage.next.click();
@@ -211,6 +258,22 @@ test.describe("data entry - correct differences", () => {
         entry: 2,
         correction: secondDataEntry,
         expectResolved: false,
+      });
+    });
+
+    // eslint-disable-next-line playwright/expect-expect
+    test("corrigendum correction differences resolved", async ({
+      coordinatorOneGSB,
+      typistOneGSB,
+      dataEntryNextSessionFirstEntryCorrection,
+    }) => {
+      await testCorrection({
+        coordinator: coordinatorOneGSB.page,
+        typist: typistOneGSB.page,
+        dataEntry: dataEntryNextSessionFirstEntryCorrection,
+        entry: 1,
+        correction: nextSessionResultsWithDifferences,
+        expectResolved: true,
       });
     });
   });

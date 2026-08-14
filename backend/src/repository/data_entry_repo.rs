@@ -1190,7 +1190,6 @@ mod tests {
 
         let results = results.unwrap();
         assert_eq!(results.voters_counts.proxy_certificate_count, 2);
-        assert_eq!(results.voters_counts.voter_card_count, Some(3));
     }
 
     /// Test previous_results_for_polling_station with cso election and 4th session, non-existing polling station

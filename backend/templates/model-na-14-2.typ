@@ -102,7 +102,7 @@ vastgesteld.
 
 #pagebreak(weak: true)
 
-== Uitgebrachte stemmen <cast_votes>
+== Uitgebrachte stemmen
 Vul alléén de getallen in die veranderd zijn ten opzichte van een eerdere telling. Getallen die niet zijn veranderd, hoeven niet
 ingevuld te worden in de kolom ‘gecorrigeerd’. Onder ‘oorspronkelijk’ staan de getallen die in een eerdere zitting door het #location_type zijn vastgesteld.
 
@@ -182,7 +182,6 @@ De kolom ‘gecorrigeerd’ toont alléén de getallen die veranderd zijn ten op
     continue_on_next_page: [#sym.arrow.r De lijst gaat verder op de volgende pagina],
     column_total: "Subtotaal kolom",
     sum_total: columns => [Totaal lijst (kolom #columns)],
-    total_instruction: [Neem dit totaal over in rubriek #ref(<cast_votes>) van deze bijlage bij de juiste lijst.],
     explainer_text: [De kolom ‘gecorrigeerd’ toont alléén de getallen die veranderd zijn ten opzichte van de oorspronkelijke telling.],
   )
 }

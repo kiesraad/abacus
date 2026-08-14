@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router";
 
 import { DEFAULT_CANCEL_REASON } from "@/api/ApiClient";
 import { useCrud } from "@/api/useCrud";
+import { MissingCommitteeSessionDetailsModal } from "@/components/committee_session/MissingCommitteeSessionDetailsModal";
 import { Footer } from "@/components/footer/Footer";
 import { IconTrash } from "@/components/generated/icons";
 import { PageTitle } from "@/components/page_title/PageTitle";
@@ -68,8 +69,6 @@ function CSOFirstSessionDownloadSection({ election }: DownloadSectionProps) {
 }
 
 function DSOFirstSessionDownloadSection({ election, committeeSession }: DownloadSectionProps) {
-  const { isAdministrator, isCoordinator } = useUserRole();
-  const navigate = useNavigate();
   const [showMissingCommitteeSessionDetailsModal, setShowMissingCommitteeSessionDetailsModal] = useState(false);
 
   return (
@@ -116,36 +115,12 @@ function DSOFirstSessionDownloadSection({ election, committeeSession }: Download
         </Table.Body>
       </Table>
       {showMissingCommitteeSessionDetailsModal && (
-        <Modal
-          title={t("election_management.missing_committee_session_details_modal.title")}
+        <MissingCommitteeSessionDetailsModal
+          to="details"
           onClose={() => {
             setShowMissingCommitteeSessionDetailsModal(false);
           }}
-        >
-          <p>{t("election_management.missing_committee_session_details_modal.content")}</p>
-          {isAdministrator && <p>{t("election_management.missing_committee_session_details_modal.ask_coordinator")}</p>}
-          {isCoordinator && (
-            <nav>
-              <Button
-                size="xl"
-                onClick={() => {
-                  void navigate("details");
-                }}
-              >
-                {t("election_management.missing_committee_session_details_modal.enter_details_button")}
-              </Button>
-              <Button
-                variant="secondary"
-                size="xl"
-                onClick={() => {
-                  setShowMissingCommitteeSessionDetailsModal(false);
-                }}
-              >
-                {t("cancel")}
-              </Button>
-            </nav>
-          )}
-        </Modal>
+        />
       )}
     </div>
   );

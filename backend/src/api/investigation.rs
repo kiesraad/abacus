@@ -13,6 +13,7 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
     api::{
+        committee_session::verify_committee_session_details_exist,
         data_entry::delete_data_entry_for_polling_station,
         middleware::authentication::RouteAuthorization,
     },
@@ -755,6 +756,9 @@ async fn polling_station_investigation_download_corrigendum_pdf(
         committee_session_repo::get(&mut conn, ps.committee_session_id()).await?;
     let election: ElectionWithPoliticalGroups =
         election_repo::get(&mut conn, committee_session.election_id).await?;
+    if election.counting_method == Some(VoteCountingMethod::DSO) {
+        verify_committee_session_details_exist(&committee_session)?;
+    }
 
     let previous_results = get_previous_results(&mut conn, &ps, &election).await?;
 
@@ -844,6 +848,7 @@ mod tests {
             extract::State,
             response::{IntoResponse, Response},
         };
+        use http_body_util::BodyExt;
         use test_log::test;
 
         use super::*;
@@ -912,6 +917,43 @@ mod tests {
             let results =
                 call_handlers(pool, Role::CoordinatorGSB, PollingStationId::from(1229)).await;
             assert_committee_category_authorization_ok(results);
+        }
+
+        #[test(sqlx::test(fixtures(
+            path = "../../fixtures",
+            scripts("election_12_dso_with_results")
+        )))]
+        async fn polling_station_investigation_download_corrigendum_pdf_dso_missing_details_err(
+            pool: SqlitePool,
+        ) {
+            let user = User::test_user(Role::CoordinatorGSB, UserId::from(1));
+            let response = polling_station_investigation_download_corrigendum_pdf(
+                user.clone(),
+                State(pool.clone()),
+                CurrentSessionPollingStationId(PollingStationId::from(12211)),
+            )
+            .await
+            .into_response();
+            let status = response.status();
+            assert_eq!(
+                status,
+                StatusCode::NOT_FOUND,
+                "handler 'polling_station_investigation_download_corrigendum_pdf'"
+            );
+
+            let body = response.into_body().collect().await.unwrap().to_bytes();
+            let error: ErrorResponse = serde_json::from_slice(&body).unwrap();
+            assert_eq!(
+                error.reference,
+                ErrorReference::EntryNotFound,
+                "handler 'polling_station_investigation_download_corrigendum_pdf'"
+            );
+            let expected_error =
+                "Committee session is missing start date, start time and location details";
+            assert!(
+                error.error.contains(expected_error),
+                "handler 'polling_station_investigation_download_corrigendum_pdf'"
+            );
         }
     }
 }

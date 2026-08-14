@@ -11,9 +11,11 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
     APIError, AppState, ErrorResponse,
-    api::middleware::authentication::RouteAuthorization,
+    api::{
+        committee_session::verify_committee_session_details_exist,
+        middleware::authentication::RouteAuthorization,
+    },
     domain::{
-        committee_session::CommitteeSession,
         election::{CommitteeCategory, ElectionId, VoteCountingMethod},
         models::{
             ModelN10_1InlegvelInput, ModelN10_1Input, ModelN10_2Input, ModelNa14_1Versie1Input,
@@ -310,16 +312,6 @@ async fn election_download_n_10_2(
     Ok(zip_response)
 }
 
-fn verify_committee_session_details(committee_session: &CommitteeSession) -> Result<(), APIError> {
-    if committee_session.start_date_time.is_none() || committee_session.location.is_empty() {
-        return Err(APIError::NotFound(
-            "Committee session is missing start date, start time and location details".into(),
-            ErrorReference::EntryNotFound,
-        ));
-    }
-    Ok(())
-}
-
 #[utoipa::path(
     get,
     path = "/api/elections/{election_id}/download_na_14_1_versie1",
@@ -362,7 +354,7 @@ async fn election_download_na_14_1_versie1(
 
     let current_committee_session =
         committee_session_repo::get_election_committee_session(&mut conn, election.id).await?;
-    verify_committee_session_details(&current_committee_session)?;
+    verify_committee_session_details_exist(&current_committee_session)?;
 
     let polling_stations = list_polling_stations_for_session(&mut conn, &current_committee_session)
         .await?

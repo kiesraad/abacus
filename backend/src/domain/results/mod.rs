@@ -16,10 +16,16 @@ use crate::domain::{
     },
     field_path::FieldPath,
     results::{
-        about_report::ChecksAndCorrectionsPresent, count::Count,
-        dso_first_session_results::DSOFirstSessionResults, gsb_results::GSBResults,
+        about_report::{ChecksAndCorrectionsPresent, CorrigendumPresent},
+        count::Count,
+        dso_first_session_results::DSOFirstSessionResults,
+        gsb_results::GSBResults,
+        yes_no::YesNo,
     },
-    validate::{DataError, Validate, ValidateRoot, ValidationResults},
+    validate::{
+        DataError, Validate, ValidateRoot, ValidationResult, ValidationResultCode,
+        ValidationResults,
+    },
 };
 
 pub mod about_report;
@@ -474,11 +480,22 @@ impl Validate for Results {
                 if let Some(ChecksAndCorrectionsPresent::PagePresent) =
                     results.about_report.checks_and_corrections_present
                 {
-                    validation_results.join(
-                        results
+                    if let Some(CorrigendumPresent::TwoDocuments) =
+                        results.about_report.corrigendum_present
+                        && results
                             .checks_and_corrections
-                            .validate(election, &path.field("checks_and_corrections"))?,
-                    );
+                            .corrected_results_own_initiative
+                            == YesNo::no()
+                    {
+                        validation_results.errors.push(ValidationResult {
+                            fields: vec![path.to_string()],
+                            code: ValidationResultCode::F132,
+                            context: None,
+                        });
+                    };
+
+                    validation_results
+                        .join(results.checks_and_corrections.validate(election, path)?);
                 };
 
                 validation_results.join(results.as_common().validate(election, path)?);
@@ -506,7 +523,7 @@ impl Validate for Results {
 pub mod tests {
     use super::*;
     use crate::domain::{
-        election::{tests::election_fixture, ElectionCategory, PGNumber},
+        election::{ElectionCategory, PGNumber, tests::election_fixture},
         results::{
             about_report::AboutReport,
             checks_and_corrections::{ChecksAndCorrections, ReasonInvestigationOwnInitiative},

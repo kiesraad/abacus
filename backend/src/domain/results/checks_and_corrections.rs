@@ -111,14 +111,6 @@ impl Validate for ChecksAndCorrections {
                 });
             }
 
-            if self.corrected_results_own_initiative == YesNo::no() {
-                validation_results.errors.push(ValidationResult {
-                    fields: vec![path.to_string()],
-                    code: ValidationResultCode::F132,
-                    context: None,
-                });
-            }
-
             if !self.corrected_results_csb_request.is_empty() {
                 validation_results.errors.push(ValidationResult {
                     fields: vec![path.to_string()],
@@ -134,6 +126,14 @@ impl Validate for ChecksAndCorrections {
                     context: None,
                 });
             }
+
+            if !self.corrected_results_csb_request.is_empty() {
+                validation_results.errors.push(ValidationResult {
+                    fields: vec![path.to_string()],
+                    code: ValidationResultCode::F135,
+                    context: None,
+                });
+            }
         }
         Ok(validation_results)
     }
@@ -144,28 +144,46 @@ mod tests {
     use super::*;
     use crate::domain::{
         election::{tests::election_fixture, CommitteeCategory, ElectionCategory},
-        results::yes_no::YesNo,
+        results::{
+            about_report::{AboutReport, ChecksAndCorrectionsPresent, CorrigendumPresent},
+            differences_counts::DifferencesCounts,
+            dso_first_session_results::DSOFirstSessionResults,
+            voters_counts::VotersCounts,
+            votes_counts::VotesCounts,
+            yes_no::YesNo,
+            Results,
+        },
         validate::{DataError, ValidationResult, ValidationResultCode, ValidationResults},
     };
 
     fn validate(
-        committee_category: CommitteeCategory,
+        corrigendum_present: Option<CorrigendumPresent>,
         reason_investigation_own_initiative: ReasonInvestigationOwnInitiative,
         corrected_results_own_initiative: YesNo,
         corrected_results_csb_request: YesNo,
     ) -> Result<ValidationResults, DataError> {
-        let checks_and_corrections = ChecksAndCorrections {
-            reason_investigation_own_initiative,
-            corrected_results_own_initiative,
-            corrected_results_csb_request,
-        };
-
-        let validation_results = checks_and_corrections.validate(
-            &election_fixture(ElectionCategory::Municipal, committee_category, &[]),
+        let validation_results = Results::DSOFirstSession(DSOFirstSessionResults {
+            about_report: AboutReport {
+                corrigendum_present,
+                checks_and_corrections_present: Some(ChecksAndCorrectionsPresent::PagePresent),
+            },
+            checks_and_corrections: ChecksAndCorrections {
+                reason_investigation_own_initiative,
+                corrected_results_own_initiative,
+                corrected_results_csb_request,
+            },
+            voters_counts: VotersCounts::default(),
+            votes_counts: VotesCounts::default(),
+            differences_counts: DifferencesCounts::default(),
+            political_group_votes: vec![],
+        })
+        .validate(
+            &election_fixture(ElectionCategory::Municipal, CommitteeCategory::GSB, &[]),
             &"checks_and_corrections".into(),
         )?;
 
-        assert_eq!(validation_results.warnings.len(), 0);
+        // We allow one, because we expect W.204 to trigger with no political_group_votes.
+        assert_eq!(validation_results.warnings.len(), 1);
         Ok(validation_results)
     }
 
@@ -182,7 +200,7 @@ mod tests {
         let cases = vec![
             (
                 ReasonInvestigationOwnInitiative::default(),
-                YesNo::default(),
+                YesNo::yes(),
                 YesNo::default(),
                 true,
             ),
@@ -215,9 +233,9 @@ mod tests {
                     unaccounted_difference: true,
                     other_error: false,
                 },
-                YesNo::no(),
+                YesNo::default(),
                 YesNo::yes(),
-                false,
+                true,
             ),
         ];
 
@@ -229,20 +247,24 @@ mod tests {
         ) in cases
         {
             let result = validate(
-                CommitteeCategory::GSB,
-                reason_investigation_own_initiative,
-                corrected_results_own_initiative,
-                corrected_results_csb_request,
+                Some(CorrigendumPresent::TwoDocuments),
+                reason_investigation_own_initiative.clone(),
+                corrected_results_own_initiative.clone(),
+                corrected_results_csb_request.clone(),
             )?;
             let has_f131 = result.errors.iter().any(|e| e == &f131);
-            assert_eq!(has_f131, expect_f131,);
+            assert_eq!(
+                has_f131, expect_f131,
+                "Failed: reason_investigation_own_initiative: {reason_investigation_own_initiative:?}, corrected_results_own_initiative: {corrected_results_own_initiative:?}, corrected_results_csb_request: {corrected_results_csb_request:?}"
+            );
         }
 
         Ok(())
     }
 
-    /// GSB DSO | F.132: 'Controles en correcties - Op eigen initiatief': 'controles en correcties aanwezig' = 'ja' EN 'gecorrigeerde telresultaten' = 'nee' EN 'Over het proces-verbaal: Is er een corrigendum?' = 'ja'
+    /// GSB DSO | F.132: 'Controles en correcties - Op eigen initiatief': 'controles en correcties aanwezig' = 'ja' EN één of beide vragen niet beantwoord
     #[test]
+    #[allow(clippy::too_many_lines)]
     fn test_f132() -> Result<(), DataError> {
         let f132 = ValidationResult {
             code: ValidationResultCode::F132,
@@ -252,54 +274,70 @@ mod tests {
 
         let cases = vec![
             (
-                ReasonInvestigationOwnInitiative::default(),
-                YesNo::default(),
-                YesNo::default(),
-                false,
-            ),
-            (
+                Some(CorrigendumPresent::TwoDocuments),
                 ReasonInvestigationOwnInitiative::default(),
                 YesNo::no(),
-                YesNo::yes(),
+                YesNo::default(),
                 true,
             ),
             (
+                Some(CorrigendumPresent::TwoDocuments),
                 ReasonInvestigationOwnInitiative {
                     unaccounted_difference: true,
                     other_error: false,
                 },
                 YesNo::no(),
-                YesNo::no(),
+                YesNo::default(),
                 true,
             ),
             (
+                Some(CorrigendumPresent::TwoDocuments),
+                ReasonInvestigationOwnInitiative::default(),
+                YesNo::yes(),
+                YesNo::default(),
+                false,
+            ),
+            (
+                Some(CorrigendumPresent::OneDocument),
+                ReasonInvestigationOwnInitiative::default(),
+                YesNo::no(),
+                YesNo::default(),
+                false,
+            ),
+            (
+                Some(CorrigendumPresent::TwoDocuments),
                 ReasonInvestigationOwnInitiative {
                     unaccounted_difference: true,
                     other_error: true,
                 },
-                YesNo::yes(),
                 YesNo::no(),
-                false,
+                YesNo::default(),
+                true,
             ),
         ];
 
         for (
-            reason_investigation_own_initiative,
-            corrected_results_own_initiative,
-            corrected_results_csb_request,
-            expect_f132,
-        ) in cases
+            case_index,
+            (
+                corrigendum_present,
+                reason_investigation_own_initiative,
+                corrected_results_own_initiative,
+                corrected_results_csb_request,
+                expect_f132,
+            ),
+        ) in cases.into_iter().enumerate()
         {
             let result = validate(
-                CommitteeCategory::GSB,
+                corrigendum_present,
                 reason_investigation_own_initiative.clone(),
                 corrected_results_own_initiative.clone(),
                 corrected_results_csb_request.clone(),
             )?;
+            dbg!(&result.errors);
             let has_f132 = result.errors.iter().any(|e| e == &f132);
             assert_eq!(
                 has_f132, expect_f132,
-                "Failed: reason_investigation_own_initiative: {reason_investigation_own_initiative:?}, corrected_results_own_initiative: {corrected_results_own_initiative:?}, corrected_results_csb_request: {corrected_results_csb_request:?}"
+                "Case #{case_index} failed: corrigendum_present: {corrigendum_present:?}, reason_investigation_own_initiative: {reason_investigation_own_initiative:?}, corrected_results_own_initiative: {corrected_results_own_initiative:?}, corrected_results_csb_request: {corrected_results_csb_request:?}"
             );
         }
 
@@ -347,7 +385,7 @@ mod tests {
         ) in cases
         {
             let result = validate(
-                CommitteeCategory::GSB,
+                Some(CorrigendumPresent::TwoDocuments),
                 reason_investigation_own_initiative.clone(),
                 corrected_results_own_initiative.clone(),
                 corrected_results_csb_request.clone(),
@@ -412,7 +450,7 @@ mod tests {
         ) in cases
         {
             let result = validate(
-                CommitteeCategory::GSB,
+                Some(CorrigendumPresent::TwoDocuments),
                 reason_investigation_own_initiative.clone(),
                 corrected_results_own_initiative.clone(),
                 corrected_results_csb_request.clone(),

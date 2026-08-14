@@ -1,5 +1,5 @@
 INSERT INTO elections (id, name, committee_category, counting_method, election_id, location, domain_id, category, sub_category, number_of_seats, number_of_voters, election_date, nomination_date, political_groups)
-VALUES (12, 'Corrigendum Provinciale Staten Oost-Holland 2026', 'GSB', 'DSO', 'PS2026_Juinen', 'Juinen', '0035', 'Provincial', 'PS1', 23, 15000, '2026-03-18', '2026-02-02',
+VALUES (12, 'Corrigendum Waterschap Rivier en Polder 2026', 'GSB', 'DSO', 'AB2026_Juinen', 'Juinen', '0035', 'WaterAuthority', 'AB2', 23, 15000, '2026-03-18', '2026-02-02',
         '[
           {
             "number": 1,

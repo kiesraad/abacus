@@ -400,7 +400,7 @@ async fn test_api_output(pool: SqlitePool) {
             "initials": "T.",
             "first_name": "Tinus",
             "last_name": "Bakker",
-            "locality": "Test Location",
+            "locality": "Juinen",
             "gender": "Male",
             "country_code": "BE",
             "list_number": 2,
@@ -432,12 +432,12 @@ async fn test_api_output(pool: SqlitePool) {
     assert_eq!(
         second_list_nomination["updated_candidate_ranking"],
         json!([
-            { "number": 1, "initials": "T.", "first_name": "Tinus", "last_name": "Bakker", "locality": "Test Location", "gender": "Male", "country_code": "BE" },
-            { "number": 2, "initials": "D.", "last_name": "Po", "locality": "Test Location", "gender": "X" },
-            { "number": 6, "initials": "H.", "first_name": "Henk", "last_name_prefix": "van den", "last_name": "Berg", "locality": "Test Location", "gender": "Male" },
-            { "number": 5, "initials": "L.", "first_name": "Liesbeth", "last_name": "Jansen", "locality": "Test Location", "gender": "Female" },
-            { "number": 3, "initials": "W.", "first_name": "Willem", "last_name_prefix": "de", "last_name": "Vries", "locality": "Test Location", "gender": "Male" },
-            { "number": 4, "initials": "K.", "first_name": "Klaas", "last_name": "Kloosterboer", "locality": "Test Location", "gender": "Male" }
+            { "number": 1, "initials": "T.", "first_name": "Tinus", "last_name": "Bakker", "locality": "Juinen", "gender": "Male", "country_code": "BE" },
+            { "number": 2, "initials": "D.", "last_name": "Po", "locality": "Juinen", "gender": "X" },
+            { "number": 6, "initials": "H.", "first_name": "Henk", "last_name_prefix": "van den", "last_name": "Berg", "locality": "Juinen", "gender": "Male" },
+            { "number": 5, "initials": "L.", "first_name": "Liesbeth", "last_name": "Jansen", "locality": "Juinen", "gender": "Female" },
+            { "number": 3, "initials": "W.", "first_name": "Willem", "last_name_prefix": "de", "last_name": "Vries", "locality": "Juinen", "gender": "Male" },
+            { "number": 4, "initials": "K.", "first_name": "Klaas", "last_name": "Kloosterboer", "locality": "Juinen", "gender": "Male" }
         ])
     );
 }

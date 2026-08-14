@@ -464,4 +464,57 @@ mod tests {
 
         Ok(())
     }
+
+    /// GSB DSO | F.135: 'Controles en correcties - Op verzoek van het centraal stembureau': 'controles en correcties aanwezig' = 'ja' EN ongeldig antwoord in eerste zitting (vraag is ingevuld)
+    #[test]
+    fn test_f135() -> Result<(), DataError> {
+        let f135 = ValidationResult {
+            code: ValidationResultCode::F135,
+            fields: vec!["checks_and_corrections".into()],
+            context: None,
+        };
+
+        let cases = vec![
+            (
+                ReasonInvestigationOwnInitiative::default(),
+                YesNo::both(),
+                YesNo::yes(),
+                true,
+            ),
+            (
+                ReasonInvestigationOwnInitiative::default(),
+                YesNo::both(),
+                YesNo::no(),
+                true,
+            ),
+            (
+                ReasonInvestigationOwnInitiative::default(),
+                YesNo::both(),
+                YesNo::default(),
+                false,
+            ),
+        ];
+
+        for (
+            reason_investigation_own_initiative,
+            corrected_results_own_initiative,
+            corrected_results_csb_request,
+            expect_f135,
+        ) in cases
+        {
+            let result = validate(
+                Some(CorrigendumPresent::TwoDocuments),
+                reason_investigation_own_initiative.clone(),
+                corrected_results_own_initiative.clone(),
+                corrected_results_csb_request.clone(),
+            )?;
+            let has_f135 = result.errors.iter().any(|e| e == &f135);
+            assert_eq!(
+                has_f135, expect_f135,
+                "Failed: reason_investigation_own_initiative: {reason_investigation_own_initiative:?}, corrected_results_own_initiative: {corrected_results_own_initiative:?}, corrected_results_csb_request: {corrected_results_csb_request:?}"
+            );
+        }
+
+        Ok(())
+    }
 }

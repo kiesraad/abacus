@@ -53,22 +53,105 @@ describe("InvestigationPrintCorrigendumPage", () => {
     });
   });
 
-  test("Renders the correct headers and a download button", async () => {
-    await renderPage();
+  describe("CSO", () => {
+    test("Renders the correct headers and a download button", async () => {
+      await renderPage();
 
-    expect(await screen.findByRole("heading", { level: 2, name: "Print het corrigendum" })).toBeVisible();
-    expect(await screen.findByRole("heading", { level: 3, name: "Voer het onderzoek uit" })).toBeVisible();
-    expect(
-      await screen.findByRole("heading", { level: 3, name: "Na het onderzoek van het gemeentelijk stembureau" }),
-    ).toBeVisible();
+      expect(await screen.findByRole("heading", { level: 2, name: "Print het corrigendum" })).toBeVisible();
+      expect(await screen.findByRole("heading", { level: 3, name: "Voer het onderzoek uit" })).toBeVisible();
+      expect(
+        await screen.findByRole("heading", { level: 3, name: "Na het onderzoek van het gemeentelijk stembureau" }),
+      ).toBeVisible();
 
-    expect(
-      await screen.findByRole("link", {
-        name: ["Download corrigendum voor stembureau 35", "Na 14-2 Bijlage 1"].join(""),
-      }),
-    ).toBeVisible();
+      expect(
+        await screen.findByRole("link", {
+          name: ["Download corrigendum voor stembureau 35", "Na 14-2 Bijlage 1"].join(""),
+        }),
+      ).toBeVisible();
 
-    expect(await screen.findByRole("link", { name: "Verder naar bevindingen" })).toBeVisible();
+      expect(await screen.findByRole("link", { name: "Verder naar bevindingen" })).toBeVisible();
+    });
+  });
+
+  describe("DSO", () => {
+    test("Renders the correct headers and a download button", async () => {
+      overrideOnce("get", "/api/elections/1", 200, getElectionMockData({ counting_method: "DSO" }, { number: 2 }));
+
+      await renderPage();
+
+      expect(await screen.findByRole("heading", { level: 2, name: "Print het corrigendum" })).toBeVisible();
+      expect(await screen.findByRole("heading", { level: 3, name: "Voer het onderzoek uit" })).toBeVisible();
+      expect(
+        await screen.findByRole("heading", { level: 3, name: "Na het onderzoek van het gemeentelijk stembureau" }),
+      ).toBeVisible();
+
+      expect(
+        await screen.findByRole("link", {
+          name: ["Download corrigendum voor stembureau 35", "Na 14-1, versie 2"].join(""),
+        }),
+      ).toBeVisible();
+
+      expect(await screen.findByRole("link", { name: "Verder naar bevindingen" })).toBeVisible();
+    });
+
+    test("Shows modal on clicking download corrigendum when committee session details missing", async () => {
+      const user = userEvent.setup();
+      overrideOnce("get", "/api/elections/1", 200, getElectionMockData({ counting_method: "DSO" }, { number: 2 }));
+
+      await renderPage();
+
+      expect(await screen.findByRole("heading", { level: 2, name: "Print het corrigendum" })).toBeVisible();
+      expect(await screen.findByRole("heading", { level: 3, name: "Voer het onderzoek uit" })).toBeVisible();
+      expect(
+        await screen.findByRole("heading", { level: 3, name: "Na het onderzoek van het gemeentelijk stembureau" }),
+      ).toBeVisible();
+
+      const link = await screen.findByRole("link", {
+        name: ["Download corrigendum voor stembureau 35", "Na 14-1, versie 2"].join(""),
+      });
+      expect(link).toBeVisible();
+      await user.click(link);
+
+      const modal = await screen.findByRole("dialog");
+      expect(modal).toBeVisible();
+      const title = within(modal).getByText("Vul eerst de details van de zitting in");
+      expect(title).toBeVisible();
+
+      const enter_details_button = within(modal).getByRole("button", { name: "Details invullen" });
+      expect(enter_details_button).toBeVisible();
+      await user.click(enter_details_button);
+
+      expect(navigate).toHaveBeenCalledExactlyOnceWith("/elections/1/details");
+    });
+
+    test("Does not show modal on clicking download corrigendum when committee session details present", async () => {
+      const user = userEvent.setup();
+      overrideOnce(
+        "get",
+        "/api/elections/1",
+        200,
+        getElectionMockData(
+          { counting_method: "DSO" },
+          { number: 2, location: "Den Haag", start_date_time: "2026-03-18T21:36:00" },
+        ),
+      );
+
+      await renderPage();
+
+      expect(await screen.findByRole("heading", { level: 2, name: "Print het corrigendum" })).toBeVisible();
+      expect(await screen.findByRole("heading", { level: 3, name: "Voer het onderzoek uit" })).toBeVisible();
+      expect(
+        await screen.findByRole("heading", { level: 3, name: "Na het onderzoek van het gemeentelijk stembureau" }),
+      ).toBeVisible();
+
+      const link = await screen.findByRole("link", {
+        name: ["Download corrigendum voor stembureau 35", "Na 14-1, versie 2"].join(""),
+      });
+      expect(link).toBeVisible();
+      await user.click(link);
+
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    });
   });
 
   test("Navigates to investigation overview when clicking back", async () => {

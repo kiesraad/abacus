@@ -127,6 +127,18 @@ pub async fn validate_committee_session_is_current_committee_session(
     }
 }
 
+pub fn verify_committee_session_details_exist(
+    committee_session: &CommitteeSession,
+) -> Result<(), APIError> {
+    if committee_session.start_date_time.is_none() || committee_session.location.is_empty() {
+        return Err(APIError::NotFound(
+            "Committee session is missing start date, start time and location details".into(),
+            ErrorReference::EntryNotFound,
+        ));
+    }
+    Ok(())
+}
+
 pub async fn create_committee_session(
     conn: &mut SqliteConnection,
     audit_service: &AuditService,

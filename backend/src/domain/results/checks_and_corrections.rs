@@ -169,7 +169,7 @@ mod tests {
         Ok(validation_results)
     }
 
-    /// GSB DSO | F.131: 'Controles en correcties': geen vinkjes bij de eerste twee vragen
+    /// GSB DSO | F.131: 'Controles en correcties - Op eigen initiatief': 'controles en correcties aanwezig' = 'ja' EN één of beide vragen niet beantwoord
     #[test]
     #[allow(clippy::too_many_lines)]
     fn test_f131() -> Result<(), DataError> {
@@ -241,7 +241,7 @@ mod tests {
         Ok(())
     }
 
-    /// GSB DSO | F.132: 'Controles en correcties': Ongeldige set documenten (vraag 'gecorrigeerde telresultaten' = 'nee')
+    /// GSB DSO | F.132: 'Controles en correcties - Op eigen initiatief': 'controles en correcties aanwezig' = 'ja' EN 'gecorrigeerde telresultaten' = 'nee' EN 'Over het proces-verbaal: Is er een corrigendum?' = 'ja'
     #[test]
     fn test_f132() -> Result<(), DataError> {
         let f132 = ValidationResult {
@@ -306,7 +306,7 @@ mod tests {
         Ok(())
     }
 
-    /// GSB DSO | F.133: 'Controles en correcties': Ongeldig antwoord in eerste zitting (vraag 'op verzoek van het CSB' is ingevuld)
+    /// GSB DSO | F.133: 'Controles en correcties - Op eigen initiatief': 'controles en correcties aanwezig' = 'ja' EN 'gecorrigeerde telresultaten' = 'ja' EN 'Over het proces-verbaal: Is er een corrigendum?' = 'nee'
     #[test]
     fn test_f133() -> Result<(), DataError> {
         let f133 = ValidationResult {
@@ -362,7 +362,7 @@ mod tests {
         Ok(())
     }
 
-    /// GSB DSO | F.134: 'Controles en correcties': meer dan 1 antwoord op vraag 'zijn er gecorrigeerde telresultaten'
+    /// GSB DSO | F.134: 'Controles en correcties - Op eigen initiatief': 'controles en correcties aanwezig' = 'ja' EN meer dan 1 antwoord op vraag 'zijn er gecorrigeerde telresultaten'
     #[test]
     fn test_f134() -> Result<(), DataError> {
         let f134 = ValidationResult {

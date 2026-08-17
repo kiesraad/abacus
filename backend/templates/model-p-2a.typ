@@ -1,6 +1,6 @@
 #import "common/style.typ": conf, document_numbering, blank_page_before_signing
 #import "common/scripts.typ": *
-#let input = json("inputs/model-p-2a.json")
+#let input = json("inputs/model-p-2a-variations/model-p-2a-GR.json")
 
 #let is_municipality = (municipal, public_body) => is_municipality(input.election.location, municipal, public_body)
 #let is_local_election = (local, other) => is_local_election(input.election.category, local, other)
@@ -156,7 +156,3 @@ Het proces-verbaal moet worden ondertekend door alle aanwezige leden. Bij een #l
 #signing_form_label[Extra ondertekening:]
 
 #stack(spacing: 0.5em, ..range(0, is_local_election(3, 1)).map(_ => textbox[Naam:][Handtekening:]))
-
-#pagebreak(weak: true)
-
-#stack(spacing: 0.5em, ..range(0, 12).map(_ => textbox[Naam:][Handtekening:]))

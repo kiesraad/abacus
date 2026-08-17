@@ -245,7 +245,7 @@ Bijvoorbeeld als er meerdere verkiezingen tegelijk werden georganiseerd, en een 
 
 = Ondertekening <signing>
 
-Het proces-verbaal moet worden ondertekend door alle aanwezige leden. Bij een stembureau zijn dit er minimaal 3.
+#block(width: 100%, [Het proces-verbaal moet worden ondertekend door alle aanwezige leden. Bij een stembureau zijn dit er minimaal 3.])
 
 #signing_form_label[Datum]
 
@@ -265,5 +265,4 @@ Het proces-verbaal moet worden ondertekend door alle aanwezige leden. Bij een st
 
 #signing_form_label[Extra ondertekening:]
 
-#stack(spacing: 0.5em, ..range(0, 15).map(_ => textbox[Naam:][Handtekening:]))
-
+#stack(spacing: 0.5em, ..range(0, 4).map(_ => textbox[Naam:][Handtekening:]))

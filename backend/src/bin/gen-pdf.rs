@@ -163,9 +163,19 @@ static VARIANTS: &[ModelVariant] = &[
         input: "model-na-31-2-inlegvel.json",
     },
     ModelVariant {
-        name: "model-p-2a",
+        name: "model-p-2a-GR",
         model: "model-p-2a",
-        input: "model-p-2a.json",
+        input: "model-p-2a-variations/model-p-2a-GR.json",
+    },
+    ModelVariant {
+        name: "model-p-2a-PS",
+        model: "model-p-2a",
+        input: "model-p-2a-variations/model-p-2a-PS.json",
+    },
+    ModelVariant {
+        name: "model-p-2a-WS",
+        model: "model-p-2a",
+        input: "model-p-2a-variations/model-p-2a-WS.json",
     },
     ModelVariant {
         name: "model-p-22-2-gte-19-seats",

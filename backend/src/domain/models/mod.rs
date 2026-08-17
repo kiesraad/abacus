@@ -133,7 +133,7 @@ impl PdfModel {
                 "inputs/model-na-31-2-bijlage-1-variations/model-na-31-2-bijlage-1-GR.json"
             }
             Self::ModelNa31_2Inlegvel(_) => "inputs/model-na-31-2-inlegvel.json",
-            Self::ModelP2a(_) => "inputs/model-p-2a.json",
+            Self::ModelP2a(_) => "inputs/model-p-2a-variations/model-p-2a-GR.json",
             Self::ModelP22_2(_) => "inputs/model-p-22-2-variations/lt-19-seats-and-p9-and-p10.json",
             Self::ModelP22_2Bijlage1(_) => "inputs/model-p-22-2-bijlage-1.json",
             #[cfg(test)]

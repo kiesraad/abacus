@@ -370,7 +370,7 @@ export const seat_assignment: SeatAssignment = {
 };
 
 export const election_totals: ElectionTotals = {
-  number_of_voters: 2272,
+  committee_specific: { committee: "CSB", number_of_voters: 2272 },
   voters_counts: {
     poll_card_count: 1200,
     proxy_certificate_count: 0,
@@ -2076,11 +2076,6 @@ export const election_totals: ElectionTotals = {
       ],
     },
   ],
-  polling_station_investigations: {
-    admitted_voters_recounted: [],
-    investigated_other_reason: [],
-    ballots_recounted: [],
-  },
 };
 
 export const committee_session: CommitteeSession = {

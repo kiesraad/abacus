@@ -600,6 +600,22 @@ export interface CSOFirstSessionResults {
 }
 
 /**
+ * Polling stations where results were investigated by the GSB,
+ * as vectors of polling station numbers
+ */
+export interface CSOInvestigations {
+  /** Admitted voters were recounted
+("Toegelaten kiezers opnieuw vastgesteld?") */
+  admitted_voters_recounted: number[];
+  /** Ballots were (partially) recounted
+("Stembiljetten (deels) herteld?") */
+  ballots_recounted: number[];
+  /** Investigated for other reasons than unexplained difference
+("Onderzocht vanwege andere reden dan onverklaard verschil?") */
+  investigated_other_reason: number[];
+}
+
+/**
  * Candidate
  */
 export interface Candidate {
@@ -753,6 +769,17 @@ export interface CommitteeSessionUpdateRequest {
 }
 
 /**
+ * Committee specific totals, i.e. specific for GSB or CSB.
+ */
+export type CommitteeSpecificTotals =
+  | (GSBTotals & { committee: "GSB" })
+  | {
+      committee: "CSB";
+      /** The number of voters ("Kiesgerechtigden") */
+      number_of_voters: number;
+    };
+
+/**
  * CommonPollingStationResults contains the common fields for polling station results,
  */
 export interface CommonPollingStationResults {
@@ -822,6 +849,22 @@ export interface DSOFirstSessionResults {
   voters_counts: VotersCounts;
   /** Votes counts ("2. Aantal getelde stembiljetten") */
   votes_counts: VotesCounts;
+}
+
+/**
+ * Polling stations where results were investigated by the GSB,
+ * as vectors of polling station numbers
+ */
+export interface DSOInvestigations {
+  /** Results were corrected
+("Uitslag gecorrigeerd?") */
+  corrected_results: number[];
+  /** Investigated because of a (suspected) other error
+("Onderzocht vanwege (het vermoeden van) een andere fout?") */
+  other_error: number[];
+  /** Investigated because of an unaccounted-for difference
+("Onderzocht vanwege een onverklaard verschil?") */
+  unaccounted_difference: number[];
 }
 
 /**
@@ -1052,14 +1095,12 @@ export type ElectionSubCategory = (typeof electionSubCategoryValues)[number];
  * Contains the totals of the election results, added up from the votes of all polling stations.
  */
 export interface ElectionTotals {
+  /** Totals specific to the committee (GSB or CSB) of the election */
+  committee_specific: CommitteeSpecificTotals;
   /** The differences between voters and votes */
   differences_counts: DifferencesTotals;
-  /** The number of voters (i.e. "Kiesgerechtigden") */
-  number_of_voters?: number;
   /** The total votes for each political group (and each candidate within) */
   political_group_votes: PoliticalGroupCandidateVotes[];
-  /** Polling stations where results were investigated by the GSB */
-  polling_station_investigations: PollingStationInvestigations;
   /** The total number of voters */
   voters_counts: VotersCounts;
   /** The total number of votes */
@@ -1220,6 +1261,13 @@ export interface GSBResults {
   /** Votes counts ("Aantal getelde stembiljetten") */
   votes_counts: VotesCounts;
 }
+
+/**
+ * GSB specific totals, depending on the vote counting method (CSO or DSO).
+ */
+export type GSBTotals =
+  | (CSOInvestigations & { counting_method: "CSO" })
+  | (DSOInvestigations & { counting_method: "DSO" });
 
 /**
  * Abacus API and asset server
@@ -1510,22 +1558,6 @@ export interface PollingStationInvestigationUpdateRequest {
   corrected_results?: boolean;
   findings?: string;
   reason: string;
-}
-
-/**
- * Polling stations where results were investigated by the GSB,
- * as vectors of polling station numbers
- */
-export interface PollingStationInvestigations {
-  /** Admitted voters were recounted
-("Toegelaten kiezers opnieuw vastgesteld?") */
-  admitted_voters_recounted: number[];
-  /** Ballots were (partially) recounted
-("Stembiljetten (deels) herteld?") */
-  ballots_recounted: number[];
-  /** Investigated for other reasons than unexplained difference
-("Onderzocht vanwege andere reden dan onverklaard verschil?") */
-  investigated_other_reason: number[];
 }
 
 /**

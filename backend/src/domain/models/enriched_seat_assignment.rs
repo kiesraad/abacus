@@ -271,7 +271,10 @@ mod tests {
                 political_group_total_votes::PoliticalGroupTotalVotes, voters_counts::VotersCounts,
                 votes_counts::VotesCounts,
             },
-            tabulation::{DifferencesTotals, ElectionTotals, ElectionTotalsCSB, SumCount},
+            tabulation::{
+                CommitteeSpecificTotals, DifferencesTotals, ElectionTotals, ElectionTotalsCSB,
+                SumCount,
+            },
         },
     };
 
@@ -308,8 +311,9 @@ mod tests {
                 fewer_ballots_count: SumCount::zero(),
             },
             political_group_votes,
-            polling_station_investigations: Default::default(),
-            number_of_voters: Some(election.number_of_voters),
+            committee_specific: CommitteeSpecificTotals::CSB {
+                number_of_voters: election.number_of_voters,
+            },
         }
     }
 
@@ -334,7 +338,8 @@ mod tests {
         );
         let political_groups = &election.political_groups;
         let totals = get_election_totals(&election, &candidate_votes);
-        let totals_csb = ElectionTotalsCSB::new(&totals, political_groups);
+        let totals_csb = ElectionTotalsCSB::new(&totals, political_groups)
+            .expect("ElectionTotalsCSB::new should succeed");
         let apportionment_input = ApportionmentInputData::new(
             election.number_of_seats,
             &totals.political_group_votes,
@@ -458,7 +463,8 @@ mod tests {
         );
         let political_groups = &election.political_groups;
         let totals = get_election_totals(&election, &candidate_votes);
-        let totals_csb = ElectionTotalsCSB::new(&totals, political_groups);
+        let totals_csb = ElectionTotalsCSB::new(&totals, political_groups)
+            .expect("ElectionTotalsCSB::new should succeed");
         let apportionment_input = ApportionmentInputData::new(
             election.number_of_seats,
             &totals.political_group_votes,
@@ -550,7 +556,8 @@ mod tests {
         );
         let political_groups = &election.political_groups;
         let totals = get_election_totals(&election, &candidate_votes);
-        let totals_csb = ElectionTotalsCSB::new(&totals, political_groups);
+        let totals_csb = ElectionTotalsCSB::new(&totals, political_groups)
+            .expect("ElectionTotalsCSB::new should succeed");
         let apportionment_input = ApportionmentInputData::new(
             election.number_of_seats,
             &totals.political_group_votes,

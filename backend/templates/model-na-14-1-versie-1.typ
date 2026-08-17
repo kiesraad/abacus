@@ -211,6 +211,8 @@ Vul alleen de gegevens in die anders zijn dan het oorspronkelijke proces-verbaal
 
 == Stemmen per lijst en per kandidaat <candidate_votes>
 
+#pagebreak(weak: true)
+
 #for political_group in input.candidates_tables {
   votes_table(
     title: [#political_group.number #political_group.name],

@@ -57,7 +57,10 @@ async fn test_election_details_works(pool: SqlitePool) {
     let body: serde_json::Value = response.json().await.unwrap();
     assert_eq!(body["current_committee_session"]["status"], "data_entry");
     assert_eq!(body["committee_sessions"].as_array().unwrap().len(), 2);
-    assert_eq!(body["election"]["name"], "Corrigendum 2026");
+    assert_eq!(
+        body["election"]["name"],
+        "Corrigendum Gemeenteraad Juinen 2026"
+    );
     let polling_stations = body["polling_stations"].as_array().unwrap();
     assert_eq!(polling_stations.len(), 2);
     assert!(polling_stations.iter().any(|ps| ps["name"] == "Testgebouw"));

@@ -1,5 +1,5 @@
 INSERT INTO elections (id, name, committee_category, counting_method, election_id, location, domain_id, category, sub_category, number_of_seats, number_of_voters, election_date, nomination_date, political_groups)
-VALUES (7, 'Test Election >= 19 seats', 'GSB', 'CSO', 'GR2026_GroteStad', 'Grote Stad', '0000', 'Municipal', 'GR2', 23, 15000, '2026-03-18', '2026-02-02',
+VALUES (7, 'Test Election >= 19 seats', 'GSB', 'CSO', 'GR2026_GroteStad', 'Grote Stad', '0099', 'Municipal', 'GR2', 23, 15000, '2026-03-18', '2026-02-02',
         '[
           {
             "number": 1,
@@ -9,14 +9,14 @@ VALUES (7, 'Test Election >= 19 seats', 'GSB', 'CSO', 'GR2026_GroteStad', 'Grote
                 "number": 1,
                 "initials": "A.",
                 "last_name": "A-Een",
-                "locality": "Test",
+                "locality": "Grote Stad",
                 "gender": "X"
               },
               {
                 "number": 2,
-                "initials": "B.",
+                "initials": "A.",
                 "last_name": "A-Twee",
-                "locality": "Test",
+                "locality": "Grote Stad",
                 "gender": "Male"
               }
             ]
@@ -29,14 +29,14 @@ VALUES (7, 'Test Election >= 19 seats', 'GSB', 'CSO', 'GR2026_GroteStad', 'Grote
                 "number": 1,
                 "initials": "B.",
                 "last_name": "B-Een",
-                "locality": "Test",
+                "locality": "Grote Stad",
                 "gender": "Female"
               },
               {
                 "number": 2,
                 "initials": "B.",
                 "last_name": "B-Twee",
-                "locality": "Test",
+                "locality": "Grote Stad",
                 "gender": "X"
               }
             ]

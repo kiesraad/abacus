@@ -1,5 +1,5 @@
 INSERT INTO elections (id, name, committee_category, counting_method, election_id, location, domain_id, category, sub_category, number_of_seats, number_of_voters, election_date, nomination_date, political_groups)
-VALUES (5, 'Corrigendum 2026', 'GSB', 'CSO', 'GR2026_GroteStad', 'Grote Stad', '0000', 'Municipal', 'GR2', 23, 15000, '2026-03-18', '2026-02-02',
+VALUES (5, 'Corrigendum Gemeenteraad Juinen 2026', 'GSB', 'CSO', 'GR2026_Juinen', 'Juinen', '0035', 'Municipal', 'GR2', 23, 15000, '2026-03-18', '2026-02-02',
         '[
           {
             "number": 1,
@@ -265,7 +265,7 @@ VALUES (5, 'Corrigendum 2026', 'GSB', 'CSO', 'GR2026_GroteStad', 'Grote Stad', '
                 "initials": "T.",
                 "first_name": "Tinus",
                 "last_name": "Bakker",
-                "locality": "Test Location",
+                "locality": "Juinen",
                 "gender": "Male",
                 "country_code": "BE"
               },
@@ -273,7 +273,7 @@ VALUES (5, 'Corrigendum 2026', 'GSB', 'CSO', 'GR2026_GroteStad', 'Grote Stad', '
                 "number": 2,
                 "initials": "D.",
                 "last_name": "Po",
-                "locality": "Test Location",
+                "locality": "Juinen",
                 "gender": "X"
               },
               {
@@ -282,7 +282,7 @@ VALUES (5, 'Corrigendum 2026', 'GSB', 'CSO', 'GR2026_GroteStad', 'Grote Stad', '
                 "first_name": "Willem",
                 "last_name_prefix": "de",
                 "last_name": "Vries",
-                "locality": "Test Location",
+                "locality": "Juinen",
                 "gender": "Male"
               },
               {
@@ -290,7 +290,7 @@ VALUES (5, 'Corrigendum 2026', 'GSB', 'CSO', 'GR2026_GroteStad', 'Grote Stad', '
                 "initials": "K.",
                 "first_name": "Klaas",
                 "last_name": "Kloosterboer",
-                "locality": "Test Location",
+                "locality": "Juinen",
                 "gender": "Male"
               },
               {
@@ -298,7 +298,7 @@ VALUES (5, 'Corrigendum 2026', 'GSB', 'CSO', 'GR2026_GroteStad', 'Grote Stad', '
                 "initials": "L.",
                 "first_name": "Liesbeth",
                 "last_name": "Jansen",
-                "locality": "Test Location",
+                "locality": "Juinen",
                 "gender": "Female"
               },
               {
@@ -307,7 +307,7 @@ VALUES (5, 'Corrigendum 2026', 'GSB', 'CSO', 'GR2026_GroteStad', 'Grote Stad', '
                 "first_name": "Henk",
                 "last_name_prefix": "van den",
                 "last_name": "Berg",
-                "locality": "Test Location",
+                "locality": "Juinen",
                 "gender": "Male"
               }
             ]
@@ -321,7 +321,7 @@ VALUES (5, 'Corrigendum 2026', 'GSB', 'CSO', 'GR2026_GroteStad', 'Grote Stad', '
                 "first_name": "Adelbert",
                 "last_name_prefix": "van",
                 "last_name": "Doorn",
-                "locality": "Test Location",
+                "locality": "Juinen",
                 "gender": "Male"
               },
               {
@@ -330,7 +330,7 @@ VALUES (5, 'Corrigendum 2026', 'GSB', 'CSO', 'GR2026_GroteStad', 'Grote Stad', '
                 "first_name": "Margriet",
                 "last_name_prefix": "van der",
                 "last_name": "Linden",
-                "locality": "Test Location",
+                "locality": "Juinen",
                 "gender": "Female"
               },
               {
@@ -338,7 +338,7 @@ VALUES (5, 'Corrigendum 2026', 'GSB', 'CSO', 'GR2026_GroteStad', 'Grote Stad', '
                 "initials": "P.",
                 "first_name": "Paul",
                 "last_name": "Veldkamp",
-                "locality": "Test Location",
+                "locality": "Juinen",
                 "gender": "Male"
               },
               {
@@ -347,7 +347,7 @@ VALUES (5, 'Corrigendum 2026', 'GSB', 'CSO', 'GR2026_GroteStad', 'Grote Stad', '
                 "first_name": "Sophie",
                 "last_name_prefix": "de",
                 "last_name": "Groot",
-                "locality": "Test Location",
+                "locality": "Juinen",
                 "gender": "Female"
               },
               {
@@ -356,7 +356,7 @@ VALUES (5, 'Corrigendum 2026', 'GSB', 'CSO', 'GR2026_GroteStad', 'Grote Stad', '
                 "first_name": "Rik",
                 "last_name_prefix": "de",
                 "last_name": "Ruiter",
-                "locality": "Test Location",
+                "locality": "Juinen",
                 "gender": "Male"
               },
               {
@@ -364,7 +364,7 @@ VALUES (5, 'Corrigendum 2026', 'GSB', 'CSO', 'GR2026_GroteStad', 'Grote Stad', '
                 "initials": "N.",
                 "first_name": "Nico",
                 "last_name": "Ruiter",
-                "locality": "Test Location",
+                "locality": "Juinen",
                 "gender": "Male"
               }
             ]
@@ -377,7 +377,7 @@ VALUES (5, 'Corrigendum 2026', 'GSB', 'CSO', 'GR2026_GroteStad', 'Grote Stad', '
                 "initials": "G.",
                 "first_name": "Gerard",
                 "last_name": "Bogaert",
-                "locality": "Test Location",
+                "locality": "Juinen",
                 "gender": "Male"
               },
               {
@@ -385,7 +385,7 @@ VALUES (5, 'Corrigendum 2026', 'GSB', 'CSO', 'GR2026_GroteStad', 'Grote Stad', '
                 "initials": "J.",
                 "first_name": "Jan",
                 "last_name": "Stevens",
-                "locality": "Test Location",
+                "locality": "Juinen",
                 "gender": "Male"
               },
               {
@@ -393,7 +393,7 @@ VALUES (5, 'Corrigendum 2026', 'GSB', 'CSO', 'GR2026_GroteStad', 'Grote Stad', '
                 "initials": "E.",
                 "first_name": "Els",
                 "last_name": "Groot",
-                "locality": "Test Location",
+                "locality": "Juinen",
                 "gender": "Female"
               },
               {
@@ -401,7 +401,7 @@ VALUES (5, 'Corrigendum 2026', 'GSB', 'CSO', 'GR2026_GroteStad', 'Grote Stad', '
                 "initials": "B.",
                 "first_name": "Bart",
                 "last_name": "Smit",
-                "locality": "Test Location",
+                "locality": "Juinen",
                 "gender": "Male"
               },
               {
@@ -409,7 +409,7 @@ VALUES (5, 'Corrigendum 2026', 'GSB', 'CSO', 'GR2026_GroteStad', 'Grote Stad', '
                 "initials": "F.",
                 "first_name": "Frits",
                 "last_name": "Veldman",
-                "locality": "Test Location",
+                "locality": "Juinen",
                 "gender": "Male"
               }
             ]
@@ -422,7 +422,7 @@ VALUES (5, 'Corrigendum 2026', 'GSB', 'CSO', 'GR2026_GroteStad', 'Grote Stad', '
                 "initials": "G.",
                 "first_name": "Gert",
                 "last_name": "Smit",
-                "locality": "Test Location",
+                "locality": "Juinen",
                 "gender": "Male"
               },
               {
@@ -430,7 +430,7 @@ VALUES (5, 'Corrigendum 2026', 'GSB', 'CSO', 'GR2026_GroteStad', 'Grote Stad', '
                 "initials": "E.",
                 "first_name": "Eva",
                 "last_name": "Koster",
-                "locality": "Test Location",
+                "locality": "Juinen",
                 "gender": "Female"
               },
               {
@@ -438,7 +438,7 @@ VALUES (5, 'Corrigendum 2026', 'GSB', 'CSO', 'GR2026_GroteStad', 'Grote Stad', '
                 "initials": "L.",
                 "first_name": "Leon",
                 "last_name": "Hofman",
-                "locality": "Test Location",
+                "locality": "Juinen",
                 "gender": "Male"
               },
               {
@@ -446,7 +446,7 @@ VALUES (5, 'Corrigendum 2026', 'GSB', 'CSO', 'GR2026_GroteStad', 'Grote Stad', '
                 "initials": "S.",
                 "first_name": "Sophie",
                 "last_name": "Visser",
-                "locality": "Test Location",
+                "locality": "Juinen",
                 "gender": "Female"
               }
             ]
@@ -454,7 +454,7 @@ VALUES (5, 'Corrigendum 2026', 'GSB', 'CSO', 'GR2026_GroteStad', 'Grote Stad', '
         ]');
 
 INSERT INTO committee_sessions (id, number, election_id, status, location, start_date_time)
-VALUES (5, 1, 5, 'completed', 'Grote Stad', '2026-03-19 09:15:00'),
+VALUES (5, 1, 5, 'completed', 'Juinen', '2026-03-19 09:15:00'),
        (6, 2, 5, 'data_entry', '', NULL);
 
 INSERT INTO
@@ -473,9 +473,9 @@ VALUES
 
 INSERT INTO polling_stations (id, committee_session_id, prev_data_entry_id, data_entry_id, name, number, number_of_voters, polling_station_type,
                               address, postal_code, locality)
-VALUES (518, 5, NULL, 501, 'Testgebouw', 41, NULL, 'FixedLocation', 'Testweg 3', '1234 QA', 'Grote Stad'),
-       (529, 6, 501, NULL, 'Testgebouw', 41, NULL, 'FixedLocation', 'Testweg 3', '1234 QA', 'Grote Stad'),
-       (5211, 6, NULL, 502, 'Test ander gebouw', 42, NULL, 'FixedLocation', 'Testweg 4', '1234 QA', 'Grote Stad');
+VALUES (518, 5, NULL, 501, 'Testgebouw', 41, NULL, 'FixedLocation', 'Testweg 3', '1234 QA', 'Juinen'),
+       (529, 6, 501, NULL, 'Testgebouw', 41, NULL, 'FixedLocation', 'Testweg 3', '1234 QA', 'Juinen'),
+       (5211, 6, NULL, 502, 'Test ander gebouw', 42, NULL, 'FixedLocation', 'Testweg 4', '1234 QA', 'Juinen');
 
 UPDATE polling_stations
 SET investigation_state = '{"status":"ConcludedWithNewResults","state":{"reason":"reason","findings":"findings"}}'

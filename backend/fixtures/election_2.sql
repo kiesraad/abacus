@@ -1,6 +1,6 @@
 INSERT INTO elections (id, name, committee_category, counting_method, election_id, location, domain_id, category, sub_category, number_of_seats, number_of_voters, election_date, nomination_date, political_groups)
 -- number_of_seats explicitly set to a value less than 19, to be used in elections with less than 19 seats
-VALUES (2, 'Municipal Election', 'GSB', 'CSO', 'GR2024_Heemdamseburg', 'Heemdamseburg', '0000', 'Municipal', 'GR1', 15, 2000, '2024-11-30', '2024-11-01',
+VALUES (2, 'Municipal Election', 'GSB', 'CSO', 'GR2024_Heemdamseburg', 'Heemdamseburg', '0065', 'Municipal', 'GR1', 15, 2000, '2024-11-30', '2024-11-01',
         '[
           {
             "number": 1,
@@ -11,7 +11,7 @@ VALUES (2, 'Municipal Election', 'GSB', 'CSO', 'GR2024_Heemdamseburg', 'Heemdams
                 "initials": "A.",
                 "first_name": "Alice",
                 "last_name": "Foo",
-                "locality": "Amsterdam",
+                "locality": "Heemdamseburg",
                 "gender": "Female"
               },
               {
@@ -19,7 +19,7 @@ VALUES (2, 'Municipal Election', 'GSB', 'CSO', 'GR2024_Heemdamseburg', 'Heemdams
                 "initials": "C.",
                 "first_name": "Charlie",
                 "last_name": "Doe",
-                "locality": "Rotterdam",
+                "locality": "Heemdamseburg",
                 "gender": null
               }
             ]
@@ -32,7 +32,7 @@ VALUES (2, 'Municipal Election', 'GSB', 'CSO', 'GR2024_Heemdamseburg', 'Heemdams
                 "initials": "A.",
                 "first_name": "Alice",
                 "last_name": "Foo",
-                "locality": "Amsterdam",
+                "locality": "Heemdamseburg",
                 "gender": "Female"
               },
               {
@@ -40,7 +40,7 @@ VALUES (2, 'Municipal Election', 'GSB', 'CSO', 'GR2024_Heemdamseburg', 'Heemdams
                 "initials": "C.",
                 "first_name": "Charlie",
                 "last_name": "Doe",
-                "locality": "Rotterdam",
+                "locality": "Heemdamseburg",
                 "gender": null
               }
             ]
@@ -56,5 +56,5 @@ VALUES (201, '{"status":"Empty"}', '2024-12-05 09:15:00'),
 
 INSERT INTO polling_stations (id, committee_session_id, prev_data_entry_id, data_entry_id, name, number, number_of_voters, polling_station_type, address,
                               postal_code, locality)
-VALUES (211, 2, NULL, 201, 'Op Rolletjes', 33, NULL, 'Mobile', 'Rijksweg A12 1', '1234 YQ', 'Den Haag'),
-       (212, 2, NULL, 202, 'Testplek', 34, 1000, 'Special', 'Teststraat 2b', '1234 QY', 'Testdorp');
+VALUES (211, 2, NULL, 201, 'Op Rolletjes', 33, NULL, 'Mobile', 'Rijksweg A12 1', '1234 YQ', 'Heemdamseburg'),
+       (212, 2, NULL, 202, 'Testplek', 34, 1000, 'Special', 'Teststraat 2b', '1234 QY', 'Heemdamseburg');

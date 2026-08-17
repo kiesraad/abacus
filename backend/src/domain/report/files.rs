@@ -317,9 +317,9 @@ mod tests {
             let csv = files.results_csv.expect("should have generated csv");
             let pdf = files.results_pdf.expect("should have generated pdf");
 
-            assert_eq!(eml.name, "Telling_GR2026_GroteStad.eml.xml");
+            assert_eq!(eml.name, "Telling_GR2026_Juinen.eml.xml");
             assert_eq!(eml.id, FileId::from(1));
-            assert_eq!(csv.name, "osv4-3_telling_gr2026_grotestad.csv");
+            assert_eq!(csv.name, "osv4-3_telling_gr2026_juinen.csv");
             assert_eq!(csv.id, FileId::from(2));
             assert_eq!(pdf.name, "Model_Na31-2.pdf");
             assert_eq!(pdf.id, FileId::from(3));

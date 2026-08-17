@@ -154,18 +154,18 @@ async fn test_gsb_election_next_session_zip_download_works(pool: SqlitePool) {
     let url = format!(
         "http://{addr}/api/elections/{election_id}/committee_sessions/{committee_session_id}/download_zip_results"
     );
-    let prefix = "\"correctie_gr2026_grotestad_gemeente_grote-stad-";
+    let prefix = "\"correctie_gr2026_juinen_gemeente_juinen-";
 
     let bytes = download_zip_assert(&cookie, &url, prefix).await;
     let archive = ZipFileReader::new(bytes).await.unwrap();
     assert_eq!(archive.file().entries().len(), 4);
     let pdf_hash1 = sha2::Sha256::digest(read_zip_entry(&archive, 0, "Model_Na14-2.pdf").await);
-    let xml_zip = read_zip_entry(&archive, 1, "Telling_GR2026_GroteStad.zip").await;
-    let csv = read_zip_entry(&archive, 2, "osv4-3_telling_gr2026_grotestad.csv").await;
+    let xml_zip = read_zip_entry(&archive, 1, "Telling_GR2026_Juinen.zip").await;
+    let csv = read_zip_entry(&archive, 2, "osv4-3_telling_gr2026_juinen.csv").await;
     let xml_archive = ZipFileReader::new(xml_zip).await.unwrap();
     assert_eq!(xml_archive.file().entries().len(), 1);
     let eml_hash1 = sha2::Sha256::digest(
-        read_zip_entry(&xml_archive, 0, "Telling_GR2026_GroteStad.eml.xml").await,
+        read_zip_entry(&xml_archive, 0, "Telling_GR2026_Juinen.eml.xml").await,
     );
     let pdf_overview_hash1 =
         sha2::Sha256::digest(read_zip_entry(&archive, 3, "Leeg_Model_P2a.pdf").await);
@@ -174,13 +174,13 @@ async fn test_gsb_election_next_session_zip_download_works(pool: SqlitePool) {
     let archive2 = ZipFileReader::new(bytes2).await.unwrap();
     assert_eq!(archive2.file().entries().len(), 4);
     let pdf_hash2 = sha2::Sha256::digest(read_zip_entry(&archive2, 0, "Model_Na14-2.pdf").await);
-    let xml_zip2 = read_zip_entry(&archive2, 1, "Telling_GR2026_GroteStad.zip").await;
-    let csv2 = read_zip_entry(&archive2, 2, "osv4-3_telling_gr2026_grotestad.csv").await;
+    let xml_zip2 = read_zip_entry(&archive2, 1, "Telling_GR2026_Juinen.zip").await;
+    let csv2 = read_zip_entry(&archive2, 2, "osv4-3_telling_gr2026_juinen.csv").await;
     assert_eq!(csv, csv2, "CSV count files should be the same");
     let xml_archive2 = ZipFileReader::new(xml_zip2).await.unwrap();
     assert_eq!(xml_archive2.file().entries().len(), 1);
     let eml_hash2 = sha2::Sha256::digest(
-        read_zip_entry(&xml_archive2, 0, "Telling_GR2026_GroteStad.eml.xml").await,
+        read_zip_entry(&xml_archive2, 0, "Telling_GR2026_Juinen.eml.xml").await,
     );
     let pdf_overview_hash2 =
         sha2::Sha256::digest(read_zip_entry(&archive2, 3, "Leeg_Model_P2a.pdf").await);

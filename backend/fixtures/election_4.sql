@@ -1,5 +1,5 @@
 INSERT INTO elections (id, name, committee_category, counting_method, election_id, location, domain_id, category, sub_category, number_of_seats, number_of_voters, election_date, nomination_date, political_groups)
-VALUES (4, 'Test Election < 19 seats', 'GSB', 'CSO', 'TestLocation_2026', 'Test Location', '0000', 'Municipal', 'GR1', 15, 3000, '2026-03-18', '2026-02-02',
+VALUES (4, 'Test Election < 19 seats', 'GSB', 'CSO', 'GR2026_TestLocation', 'Test Location', '9101', 'Municipal', 'GR1', 15, 3000, '2026-03-18', '2026-02-02',
         '[
           {
             "number": 1,
@@ -419,4 +419,4 @@ VALUES (407, '{"status":"Empty"}', '2024-12-05 09:15:00');
 
 INSERT INTO polling_stations (id, committee_session_id, prev_data_entry_id, data_entry_id, name, number, number_of_voters, polling_station_type, address,
                               postal_code, locality)
-VALUES (417, 4, NULL, 407, 'Testgebouw', 40, NULL, 'FixedLocation', 'Testweg 3', '1234 QA', 'Klein Dorp');
+VALUES (417, 4, NULL, 407, 'Testgebouw', 40, NULL, 'FixedLocation', 'Testweg 3', '1234 QA', 'Test Location');

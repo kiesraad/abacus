@@ -1,6 +1,6 @@
 INSERT INTO elections (id, name, committee_category, counting_method, election_id, location, domain_id, category, sub_category, number_of_seats,
                        number_of_voters, election_date, nomination_date, political_groups)
-VALUES (1, 'Gemeenteraad 2026', 'GSB', 'CSO', 'Juinen_2024', 'Juinen', '0000', 'Municipal', 'GR2', 29, 10000, '2024-11-30', '2024-11-01', '[
+VALUES (1, 'Gemeenteraad Juinen 2026', 'GSB', 'CSO', 'GR2026_Juinen', 'Juinen', '0035', 'Municipal', 'GR2', 29, 10000, '2026-11-30', '2026-11-01', '[
          {
            "number": 1,
            "registered_name": "Lijst Hekking",
@@ -818,6 +818,5 @@ VALUES (104, '{"status":"Empty"}', '2024-12-05 09:15:00'),
 INSERT INTO polling_stations (id, committee_session_id, prev_data_entry_id, data_entry_id, name, number, number_of_voters, polling_station_type, address,
                               postal_code, locality)
 VALUES (114, 1, NULL, 104, 'Studio The Rules', 1, NULL, 'FixedLocation', 'Gerontoplein 1', '1337 YQ', 'Juinen'),
-       (115, 1, NULL, 105, 'Buurtcentrum de Mattenklopper', 2, 1000, 'Special', 'Complexiteitslaan 2b', '1337 QY',
-        'Juinen'),
+       (115, 1, NULL, 105, 'Buurtcentrum de Mattenklopper', 2, 1000, 'Special', 'Complexiteitslaan 2b', '1337 QY', 'Juinen'),
        (116, 1, NULL, 106, 'Positivo Zaal', 3, NULL, NULL, 'Kerkweg 3', '1337 QA', 'Juinen');

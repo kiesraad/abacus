@@ -1,5 +1,5 @@
 INSERT INTO elections (id, name, committee_category, counting_method, election_id, location, domain_id, category, sub_category, number_of_seats, number_of_voters, election_date, nomination_date, political_groups)
-VALUES (3, 'Municipal Re-election', 'GSB', 'CSO', 'GR2024_Heemdamseburg', 'Heemdamseburg', '0000', 'Municipal', 'GR2', 29, 2000, '2024-12-31', '2024-12-01',
+VALUES (3, 'Municipal Re-election', 'GSB', 'CSO', 'GR2024_Heemdamseburg', 'Heemdamseburg', '0065', 'Municipal', 'GR2', 29, 2000, '2024-12-31', '2024-12-01',
         '[
           {
             "number": 1,
@@ -10,7 +10,7 @@ VALUES (3, 'Municipal Re-election', 'GSB', 'CSO', 'GR2024_Heemdamseburg', 'Heemd
                 "initials": "A.",
                 "first_name": "Alice",
                 "last_name": "Foo",
-                "locality": "Amsterdam",
+                "locality": "Heemdamseburg",
                 "gender": "Female"
               },
               {
@@ -18,7 +18,7 @@ VALUES (3, 'Municipal Re-election', 'GSB', 'CSO', 'GR2024_Heemdamseburg', 'Heemd
                 "initials": "C.",
                 "first_name": "Charlie",
                 "last_name": "Doe",
-                "locality": "Rotterdam",
+                "locality": "Heemdamseburg",
                 "gender": null
               }
             ]
@@ -31,7 +31,7 @@ VALUES (3, 'Municipal Re-election', 'GSB', 'CSO', 'GR2024_Heemdamseburg', 'Heemd
                 "initials": "A.",
                 "first_name": "Alice",
                 "last_name": "Foo",
-                "locality": "Amsterdam",
+                "locality": "Heemdamseburg",
                 "gender": "Female"
               },
               {
@@ -39,7 +39,7 @@ VALUES (3, 'Municipal Re-election', 'GSB', 'CSO', 'GR2024_Heemdamseburg', 'Heemd
                 "initials": "C.",
                 "first_name": "Charlie",
                 "last_name": "Doe",
-                "locality": "Rotterdam",
+                "locality": "Heemdamseburg",
                 "gender": null
               }
             ]
@@ -55,4 +55,4 @@ VALUES (303, '{"status":"Empty"}', '2024-12-05 09:15:00');
 
 INSERT INTO polling_stations (id, committee_session_id, prev_data_entry_id, data_entry_id, name, number, number_of_voters, polling_station_type, address,
                               postal_code, locality)
-VALUES (313, 3, NULL, 303, 'Testgebouw', 35, NULL, 'FixedLocation', 'Testweg 3', '1234 QA', 'Teststad');
+VALUES (313, 3, NULL, 303, 'Testgebouw', 35, NULL, 'FixedLocation', 'Testweg 3', '1234 QA', 'Heemdamseburg');

@@ -1,6 +1,6 @@
 INSERT INTO elections (id, name, committee_category, counting_method, election_id, location, domain_id, category, sub_category, number_of_seats, number_of_voters, election_date, nomination_date, political_groups)
 -- CSB election for GSB election_5_with_results
-VALUES (8, 'Test Election >= 19 seats', 'CSB', NULL, 'GR2024_Juinen', 'Juinen', '9100', 'Municipal', 'GR2', 23, 1, '2024-11-30', '2024-11-01', '[
+VALUES (8, 'Test Election >= 19 seats', 'CSB', NULL, 'GR2024_Juinen', 'Juinen', '0035', 'Municipal', 'GR2', 23, 1, '2024-11-30', '2024-11-01', '[
          {
            "number": 1,
            "registered_name": "Political Group A",
@@ -265,7 +265,7 @@ VALUES (8, 'Test Election >= 19 seats', 'CSB', NULL, 'GR2024_Juinen', 'Juinen', 
                "initials": "T.",
                "first_name": "Tinus",
                "last_name": "Bakker",
-               "locality": "Test Location",
+               "locality": "Juinen",
                "gender": "Male",
                "country_code": "BE"
              },
@@ -273,7 +273,7 @@ VALUES (8, 'Test Election >= 19 seats', 'CSB', NULL, 'GR2024_Juinen', 'Juinen', 
                "number": 2,
                "initials": "D.",
                "last_name": "Po",
-               "locality": "Test Location",
+               "locality": "Juinen",
                "gender": "X"
              },
              {
@@ -282,7 +282,7 @@ VALUES (8, 'Test Election >= 19 seats', 'CSB', NULL, 'GR2024_Juinen', 'Juinen', 
                "first_name": "Willem",
                "last_name_prefix": "de",
                "last_name": "Vries",
-               "locality": "Test Location",
+               "locality": "Juinen",
                "gender": "Male"
              },
              {
@@ -290,7 +290,7 @@ VALUES (8, 'Test Election >= 19 seats', 'CSB', NULL, 'GR2024_Juinen', 'Juinen', 
                "initials": "K.",
                "first_name": "Klaas",
                "last_name": "Kloosterboer",
-               "locality": "Test Location",
+               "locality": "Juinen",
                "gender": "Male"
              },
              {
@@ -298,7 +298,7 @@ VALUES (8, 'Test Election >= 19 seats', 'CSB', NULL, 'GR2024_Juinen', 'Juinen', 
                "initials": "L.",
                "first_name": "Liesbeth",
                "last_name": "Jansen",
-               "locality": "Test Location",
+               "locality": "Juinen",
                "gender": "Female"
              },
              {
@@ -307,7 +307,7 @@ VALUES (8, 'Test Election >= 19 seats', 'CSB', NULL, 'GR2024_Juinen', 'Juinen', 
                "first_name": "Henk",
                "last_name_prefix": "van den",
                "last_name": "Berg",
-               "locality": "Test Location",
+               "locality": "Juinen",
                "gender": "Male"
              }
            ]
@@ -321,7 +321,7 @@ VALUES (8, 'Test Election >= 19 seats', 'CSB', NULL, 'GR2024_Juinen', 'Juinen', 
                "first_name": "Adelbert",
                "last_name_prefix": "van",
                "last_name": "Doorn",
-               "locality": "Test Location",
+               "locality": "Juinen",
                "gender": "Male"
              },
              {
@@ -330,7 +330,7 @@ VALUES (8, 'Test Election >= 19 seats', 'CSB', NULL, 'GR2024_Juinen', 'Juinen', 
                "first_name": "Margriet",
                "last_name_prefix": "van der",
                "last_name": "Linden",
-               "locality": "Test Location",
+               "locality": "Juinen",
                "gender": "Female"
              },
              {
@@ -338,7 +338,7 @@ VALUES (8, 'Test Election >= 19 seats', 'CSB', NULL, 'GR2024_Juinen', 'Juinen', 
                "initials": "P.",
                "first_name": "Paul",
                "last_name": "Veldkamp",
-               "locality": "Test Location",
+               "locality": "Juinen",
                "gender": "Male"
              },
              {
@@ -347,7 +347,7 @@ VALUES (8, 'Test Election >= 19 seats', 'CSB', NULL, 'GR2024_Juinen', 'Juinen', 
                "first_name": "Sophie",
                "last_name_prefix": "de",
                "last_name": "Groot",
-               "locality": "Test Location",
+               "locality": "Juinen",
                "gender": "Female"
              },
              {
@@ -356,7 +356,7 @@ VALUES (8, 'Test Election >= 19 seats', 'CSB', NULL, 'GR2024_Juinen', 'Juinen', 
                "first_name": "Rik",
                "last_name_prefix": "de",
                "last_name": "Ruiter",
-               "locality": "Test Location",
+               "locality": "Juinen",
                "gender": "Male"
              },
              {
@@ -364,7 +364,7 @@ VALUES (8, 'Test Election >= 19 seats', 'CSB', NULL, 'GR2024_Juinen', 'Juinen', 
                "initials": "N.",
                "first_name": "Nico",
                "last_name": "Ruiter",
-               "locality": "Test Location",
+               "locality": "Juinen",
                "gender": "Male"
              }
            ]
@@ -377,7 +377,7 @@ VALUES (8, 'Test Election >= 19 seats', 'CSB', NULL, 'GR2024_Juinen', 'Juinen', 
                "initials": "G.",
                "first_name": "Gerard",
                "last_name": "Bogaert",
-               "locality": "Test Location",
+               "locality": "Juinen",
                "gender": "Male"
              },
              {
@@ -385,7 +385,7 @@ VALUES (8, 'Test Election >= 19 seats', 'CSB', NULL, 'GR2024_Juinen', 'Juinen', 
                "initials": "J.",
                "first_name": "Jan",
                "last_name": "Stevens",
-               "locality": "Test Location",
+               "locality": "Juinen",
                "gender": "Male"
              },
              {
@@ -393,7 +393,7 @@ VALUES (8, 'Test Election >= 19 seats', 'CSB', NULL, 'GR2024_Juinen', 'Juinen', 
                "initials": "E.",
                "first_name": "Els",
                "last_name": "Groot",
-               "locality": "Test Location",
+               "locality": "Juinen",
                "gender": "Female"
              },
              {
@@ -401,7 +401,7 @@ VALUES (8, 'Test Election >= 19 seats', 'CSB', NULL, 'GR2024_Juinen', 'Juinen', 
                "initials": "B.",
                "first_name": "Bart",
                "last_name": "Smit",
-               "locality": "Test Location",
+               "locality": "Juinen",
                "gender": "Male"
              },
              {
@@ -409,7 +409,7 @@ VALUES (8, 'Test Election >= 19 seats', 'CSB', NULL, 'GR2024_Juinen', 'Juinen', 
                "initials": "F.",
                "first_name": "Frits",
                "last_name": "Veldman",
-               "locality": "Test Location",
+               "locality": "Juinen",
                "gender": "Male"
              }
            ]
@@ -422,7 +422,7 @@ VALUES (8, 'Test Election >= 19 seats', 'CSB', NULL, 'GR2024_Juinen', 'Juinen', 
                "initials": "G.",
                "first_name": "Gert",
                "last_name": "Smit",
-               "locality": "Test Location",
+               "locality": "Juinen",
                "gender": "Male"
              },
              {
@@ -430,7 +430,7 @@ VALUES (8, 'Test Election >= 19 seats', 'CSB', NULL, 'GR2024_Juinen', 'Juinen', 
                "initials": "E.",
                "first_name": "Eva",
                "last_name": "Koster",
-               "locality": "Test Location",
+               "locality": "Juinen",
                "gender": "Female"
              },
              {
@@ -438,7 +438,7 @@ VALUES (8, 'Test Election >= 19 seats', 'CSB', NULL, 'GR2024_Juinen', 'Juinen', 
                "initials": "L.",
                "first_name": "Leon",
                "last_name": "Hofman",
-               "locality": "Test Location",
+               "locality": "Juinen",
                "gender": "Male"
              },
              {
@@ -446,7 +446,7 @@ VALUES (8, 'Test Election >= 19 seats', 'CSB', NULL, 'GR2024_Juinen', 'Juinen', 
                "initials": "S.",
                "first_name": "Sophie",
                "last_name": "Visser",
-               "locality": "Test Location",
+               "locality": "Juinen",
                "gender": "Female"
              }
            ]
@@ -462,4 +462,4 @@ VALUES (801,
         '2026-03-20 17:07:31');
 
 INSERT INTO sub_committees (id, committee_session_id, data_entry_id, name, number, category)
-VALUES (811, 801, 801, 'Juinen', 9100, 'GSB');
+VALUES (811, 801, 801, 'Juinen', 0035, 'GSB');

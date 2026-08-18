@@ -7,7 +7,9 @@ use eml_nl::{
     utils::{ContestId, RegionNode},
 };
 
-use crate::domain::election::CommitteeCategory;
+use crate::domain::election::{
+    CommitteeCategory, CommitteeDistrict, RegionCategory, RegionDetails, RegionKey,
+};
 
 mod expected {
     // This is a module so that we can use these imports without conflicting
@@ -21,23 +23,6 @@ mod expected {
         (ElectionCategory::PS, RegionCategory::Province),
         (ElectionCategory::AB, RegionCategory::WaterAuthority),
     ];
-}
-
-/// Category of a region, as defined by EML-NL
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum RegionCategory {
-    /// The highest level of government, the 'staat'.
-    State,
-    /// A 'waterschap'
-    WaterAuthority,
-    /// A 'provincie'
-    Province,
-    /// A 'kieskring'
-    ElectoralDistrict,
-    /// A 'gemeente', the lowest level of government region in mainland Netherlands.
-    Municipality,
-    /// A 'stembureau' (note: only for eerste kamer elections)
-    PollingStation,
 }
 
 impl TryFrom<eml_nl::utils::RegionCategory> for RegionCategory {
@@ -61,15 +46,6 @@ impl TryFrom<eml_nl::utils::RegionCategory> for RegionCategory {
     }
 }
 
-/// Identifies a specific region from the election tree for usage within Abacus.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub struct RegionKey {
-    /// Category of the region, as defined by EML_NL
-    pub category: RegionCategory,
-    /// Identifier of the region, if it has one.
-    pub number: Option<u16>,
-}
-
 impl TryFrom<eml_nl::common::RegionKey> for RegionKey {
     type Error = EMLError;
 
@@ -79,22 +55,6 @@ impl TryFrom<eml_nl::common::RegionKey> for RegionKey {
             number: value.number,
         })
     }
-}
-
-/// Identifies a specific region from the election tree for usage within Abacus.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct RegionDetails {
-    /// Name of the region
-    pub name: String,
-
-    /// Key of the region (combination of category and id)
-    pub key: RegionKey,
-
-    /// Whether this region uses roman numerals for its contest id.
-    pub roman_numerals: bool,
-
-    /// Whether this region allows Frisian export.
-    pub frisian_export_allowed: bool,
 }
 
 impl TryFrom<&Region> for RegionDetails {
@@ -112,33 +72,11 @@ impl TryFrom<&Region> for RegionDetails {
     }
 }
 
-/// Which district this committee is contained within.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum CommitteeDistrict {
-    /// The election has no districts
-    None,
-    /// This committee operates over all districts
-    All,
-    /// This committee operates within a specific district
-    Specific(RegionDetails),
-}
-
 impl CommitteeDistrict {
     /// Convert the committee district to a contest identifier, used for
     /// EML_NL exports.
     pub fn as_contest_identifier(&self) -> Result<eml_nl::common::ContestIdentifier, EMLError> {
         eml_nl::common::ContestIdentifier::try_from(self)
-    }
-
-    /// Retrieve the region details from the district information if available.
-    ///
-    /// Note that when the committee district is set to all or none, this
-    /// information is not available.
-    pub fn region_details(&self) -> Option<&RegionDetails> {
-        match self {
-            Self::Specific(r) => Some(r),
-            _ => None,
-        }
     }
 }
 
@@ -205,7 +143,7 @@ pub struct CommitteeDetails {
     /// Details of the region where the electoral committee is seated.
     pub seat_region: RegionDetails,
 
-    /// The district this committee operates within
+    /// The district (i.e. contest) this committee operates within
     pub district: CommitteeDistrict,
 
     /// Category for the committee (i.e. GSB, HSB, CSB)
@@ -392,9 +330,7 @@ fn committees_single_electoral_district(
 
     // there should be only a single child under the root region
     if root_region.children().len() != 1 {
-        return Err(EMLError::custom(
-            "Election should not have HSB but has multiple regions suitable for a HSB",
-        ));
+        return Err(EMLError::custom("Election should have exactly one HSB"));
     }
 
     // technically not a HSB, but we will find all our GSBs under this region

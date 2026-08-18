@@ -1,9 +1,13 @@
 use chrono::NaiveDate;
-use sqlx::{SqliteConnection, query_as, types::Json};
+use sqlx::{
+    Database, Decode, Encode, Sqlite, SqliteConnection, Type, encode::IsNull, query_as,
+    sqlite::SqliteValueRef, types::Json,
+};
 
 use crate::domain::election::{
-    CommitteeCategory, Election, ElectionCategory, ElectionId, ElectionSubCategory,
-    ElectionWithPoliticalGroups, NewElection, RegisteredPoliticalGroup, VoteCountingMethod,
+    CommitteeCategory, CommitteeDistrict, Election, ElectionCategory, ElectionDomain, ElectionId,
+    ElectionSubCategory, ElectionWithPoliticalGroups, NewElection, RegisteredPoliticalGroup,
+    VoteCountingMethod,
 };
 
 pub async fn list(
@@ -14,19 +18,23 @@ pub async fn list(
         Election,
         r#"SELECT
             id,
-            name, 
+            name,
             committee_category,
             counting_method,
-            election_id, 
-            location, 
-            domain_id, 
+            election_id,
+            location,
+            authority_id,
+            authority_name,
+            authority_region,
+            district,
+            domain,
             category,
             sub_category,
             number_of_seats,
             number_of_voters,
             election_date,
             nomination_date
-        FROM elections 
+        FROM elections
         WHERE ($1 IS NULL OR committee_category = $1)
         "#,
         filter_committee_category
@@ -44,7 +52,11 @@ pub struct ElectionRow {
     pub counting_method: Option<VoteCountingMethod>,
     pub election_id: String,
     pub location: String,
-    pub domain_id: String,
+    pub authority_id: String,
+    pub authority_name: String,
+    pub authority_region: String,
+    pub district: CommitteeDistrict,
+    pub domain: Option<ElectionDomain>,
     pub category: ElectionCategory,
     pub sub_category: ElectionSubCategory,
     pub number_of_seats: u32,
@@ -63,7 +75,11 @@ impl From<ElectionRow> for ElectionWithPoliticalGroups {
             counting_method: row.counting_method,
             election_id: row.election_id,
             location: row.location,
-            domain_id: row.domain_id,
+            authority_id: row.authority_id,
+            authority_name: row.authority_name,
+            authority_region: row.authority_region,
+            district: row.district,
+            domain: row.domain,
             category: row.category,
             sub_category: row.sub_category,
             number_of_seats: row.number_of_seats,
@@ -77,6 +93,50 @@ impl From<ElectionRow> for ElectionWithPoliticalGroups {
                 .map(|pg| pg.into())
                 .collect(),
         }
+    }
+}
+
+impl Type<Sqlite> for ElectionDomain {
+    fn type_info() -> <Sqlite as Database>::TypeInfo {
+        <Json<Self> as Type<Sqlite>>::type_info()
+    }
+}
+
+impl<'q> Encode<'q, Sqlite> for ElectionDomain {
+    fn encode_by_ref(
+        &self,
+        args: &mut <Sqlite as Database>::ArgumentBuffer,
+    ) -> Result<IsNull, sqlx::error::BoxDynError> {
+        <Json<&Self> as Encode<'q, Sqlite>>::encode_by_ref(&Json(self), args)
+    }
+}
+
+impl<'r> Decode<'r, Sqlite> for ElectionDomain {
+    fn decode(value: SqliteValueRef<'r>) -> Result<Self, sqlx::error::BoxDynError> {
+        let json: Json<Self> = <Json<Self> as Decode<'r, Sqlite>>::decode(value)?;
+        Ok(json.0)
+    }
+}
+
+impl Type<Sqlite> for CommitteeDistrict {
+    fn type_info() -> <Sqlite as Database>::TypeInfo {
+        <Json<Self> as Type<Sqlite>>::type_info()
+    }
+}
+
+impl<'q> Encode<'q, Sqlite> for CommitteeDistrict {
+    fn encode_by_ref(
+        &self,
+        args: &mut <Sqlite as Database>::ArgumentBuffer,
+    ) -> Result<IsNull, sqlx::error::BoxDynError> {
+        <Json<&Self> as Encode<'q, Sqlite>>::encode_by_ref(&Json(self), args)
+    }
+}
+
+impl<'r> Decode<'r, Sqlite> for CommitteeDistrict {
+    fn decode(value: SqliteValueRef<'r>) -> Result<Self, sqlx::error::BoxDynError> {
+        let json: Json<Self> = <Json<Self> as Decode<'r, Sqlite>>::decode(value)?;
+        Ok(json.0)
     }
 }
 
@@ -94,7 +154,11 @@ pub async fn get(
             counting_method,
             election_id,
             location,
-            domain_id,
+            authority_id,
+            authority_name,
+            authority_region,
+            district,
+            domain,
             category,
             sub_category,
             number_of_seats,
@@ -112,11 +176,14 @@ pub async fn get(
     Ok(row.into())
 }
 
+#[expect(clippy::too_many_lines)]
 pub async fn create(
     conn: &mut SqliteConnection,
     election: NewElection,
 ) -> Result<ElectionWithPoliticalGroups, sqlx::Error> {
     let political_groups = Json(election.political_groups);
+    let district = Json(election.district);
+    let domain = Json(election.domain);
     let row = query_as!(
         ElectionRow,
         r#"
@@ -126,7 +193,11 @@ pub async fn create(
             counting_method,
             election_id,
             location,
-            domain_id,
+            authority_id,
+            authority_name,
+            authority_region,
+            district,
+            domain,
             category,
             sub_category,
             number_of_seats,
@@ -134,7 +205,7 @@ pub async fn create(
             election_date,
             nomination_date,
             political_groups
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         RETURNING
             id,
             name,
@@ -142,7 +213,11 @@ pub async fn create(
             counting_method,
             election_id,
             location,
-            domain_id,
+            authority_id,
+            authority_name,
+            authority_region,
+            district,
+            domain,
             category,
             sub_category,
             number_of_seats,
@@ -156,7 +231,11 @@ pub async fn create(
         election.counting_method,
         election.election_id,
         election.location,
-        election.domain_id,
+        election.authority_id,
+        election.authority_name,
+        election.authority_region,
+        district,
+        domain,
         election.category,
         election.sub_category,
         election.number_of_seats,
@@ -185,10 +264,14 @@ pub async fn change_number_of_voters(
             id,
             name,
             committee_category,
-            counting_method, 
+            counting_method,
             election_id,
             location,
-            domain_id,
+            authority_id,
+            authority_name,
+            authority_region,
+            district,
+            domain,
             category,
             sub_category,
             number_of_seats,

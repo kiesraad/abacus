@@ -6269,6 +6269,64 @@
           "CSB"
         ]
       },
+      "CommitteeDistrict": {
+        "oneOf": [
+          {
+            "type": "object",
+            "description": "The election has no districts",
+            "required": [
+              "district"
+            ],
+            "properties": {
+              "district": {
+                "type": "string",
+                "enum": [
+                  "None"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "This committee operates over all districts",
+            "required": [
+              "district"
+            ],
+            "properties": {
+              "district": {
+                "type": "string",
+                "enum": [
+                  "All"
+                ]
+              }
+            }
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/RegionDetails",
+                "description": "This committee operates within a specific district"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "district"
+                ],
+                "properties": {
+                  "district": {
+                    "type": "string",
+                    "enum": [
+                      "Specific"
+                    ]
+                  }
+                }
+              }
+            ],
+            "description": "This committee operates within a specific district"
+          }
+        ],
+        "description": "Which district this committee is contained within."
+      },
       "CommitteeSession": {
         "type": "object",
         "description": "Committee session",
@@ -6979,7 +7037,10 @@
           "committee_category",
           "election_id",
           "location",
-          "domain_id",
+          "authority_id",
+          "authority_name",
+          "authority_region",
+          "district",
           "category",
           "sub_category",
           "number_of_seats",
@@ -6988,6 +7049,15 @@
           "nomination_date"
         ],
         "properties": {
+          "authority_id": {
+            "type": "string"
+          },
+          "authority_name": {
+            "type": "string"
+          },
+          "authority_region": {
+            "type": "string"
+          },
           "category": {
             "$ref": "#/components/schemas/ElectionCategory"
           },
@@ -6997,8 +7067,11 @@
           "counting_method": {
             "$ref": "#/components/schemas/VoteCountingMethod"
           },
-          "domain_id": {
-            "type": "string"
+          "district": {
+            "$ref": "#/components/schemas/CommitteeDistrict"
+          },
+          "domain": {
+            "$ref": "#/components/schemas/ElectionDomain"
           },
           "election_date": {
             "type": "string",
@@ -7247,6 +7320,23 @@
         },
         "additionalProperties": false
       },
+      "ElectionDomain": {
+        "type": "object",
+        "description": "Election domain (i.e. the entity at which the election takes place)",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Identfier of the domain"
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the domain"
+          }
+        }
+      },
       "ElectionId": {
         "type": "integer",
         "format": "int32",
@@ -7414,7 +7504,10 @@
           "committee_category",
           "election_id",
           "location",
-          "domain_id",
+          "authority_id",
+          "authority_name",
+          "authority_region",
+          "district",
           "category",
           "sub_category",
           "number_of_seats",
@@ -7424,6 +7517,15 @@
           "political_groups"
         ],
         "properties": {
+          "authority_id": {
+            "type": "string"
+          },
+          "authority_name": {
+            "type": "string"
+          },
+          "authority_region": {
+            "type": "string"
+          },
           "category": {
             "$ref": "#/components/schemas/ElectionCategory"
           },
@@ -7433,8 +7535,11 @@
           "counting_method": {
             "$ref": "#/components/schemas/VoteCountingMethod"
           },
-          "domain_id": {
-            "type": "string"
+          "district": {
+            "$ref": "#/components/schemas/CommitteeDistrict"
+          },
+          "domain": {
+            "$ref": "#/components/schemas/ElectionDomain"
           },
           "election_date": {
             "type": "string",
@@ -8467,7 +8572,10 @@
           "committee_category",
           "election_id",
           "location",
-          "domain_id",
+          "authority_id",
+          "authority_name",
+          "authority_region",
+          "district",
           "category",
           "sub_category",
           "number_of_seats",
@@ -8477,6 +8585,15 @@
           "political_groups"
         ],
         "properties": {
+          "authority_id": {
+            "type": "string"
+          },
+          "authority_name": {
+            "type": "string"
+          },
+          "authority_region": {
+            "type": "string"
+          },
           "category": {
             "$ref": "#/components/schemas/ElectionCategory"
           },
@@ -8486,8 +8603,11 @@
           "counting_method": {
             "$ref": "#/components/schemas/VoteCountingMethod"
           },
-          "domain_id": {
-            "type": "string"
+          "district": {
+            "$ref": "#/components/schemas/CommitteeDistrict"
+          },
+          "domain": {
+            "$ref": "#/components/schemas/ElectionDomain"
           },
           "election_date": {
             "type": "string",
@@ -9082,6 +9202,65 @@
               "minimum": 0
             },
             "description": "Indexes of chunks that will be empty, sorted"
+          }
+        }
+      },
+      "RegionCategory": {
+        "type": "string",
+        "description": "Category of a region, as defined by EML-NL",
+        "enum": [
+          "State",
+          "WaterAuthority",
+          "Province",
+          "ElectoralDistrict",
+          "Municipality",
+          "PollingStation"
+        ]
+      },
+      "RegionDetails": {
+        "type": "object",
+        "description": "Identifies a specific region from the election tree for usage within Abacus.",
+        "required": [
+          "name",
+          "key",
+          "roman_numerals",
+          "frisian_export_allowed"
+        ],
+        "properties": {
+          "frisian_export_allowed": {
+            "type": "boolean",
+            "description": "Whether this region allows Frisian export."
+          },
+          "key": {
+            "$ref": "#/components/schemas/RegionKey",
+            "description": "Key of the region (combination of category and id)"
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the region"
+          },
+          "roman_numerals": {
+            "type": "boolean",
+            "description": "Whether this region uses roman numerals for its contest id."
+          }
+        }
+      },
+      "RegionKey": {
+        "type": "object",
+        "description": "Identifies a specific region from the election tree for usage within Abacus.",
+        "required": [
+          "category"
+        ],
+        "properties": {
+          "category": {
+            "$ref": "#/components/schemas/RegionCategory",
+            "description": "Category of the region, as defined by EML_NL"
+          },
+          "number": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Identifier of the region, if it has one.",
+            "minimum": 0
           }
         }
       },

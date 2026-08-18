@@ -2,8 +2,8 @@
 #import "common/scripts.typ": *
 #let input = json("inputs/model-p-22-2-variations/lt-19-seats-and-p9-and-p10.json")
 
-#let is_municipality = (municipal, public_body) => is_municipality(input.election.location, municipal, public_body)
-#let location_name = is_municipality[Gemeente #input.election.domain_id #input.election.location][Openbaar lichaam #input.election.location]
+#let is_municipality = (municipal, public_body) => is_municipality(input.election.authority_region, municipal, public_body)
+#let location_name = is_municipality[Gemeente #input.election.authority_id #input.election.authority_region][Openbaar lichaam #input.election.authority_region]
 #let location_type = [centraal stembureau]
 #let subcommittee_type = [gemeentelijk stembureau]
 #let LARGE_COUNCIL_THRESHOLD = 19
@@ -25,7 +25,7 @@
 #set heading(numbering: none)
 
 #title_page(
-  is_municipality[#input.election.domain_id #input.election.location][#input.election.location],
+  is_municipality[#input.election.authority_id #input.election.authority_region][#input.election.authority_region],
   [Centraal Stembureau],
   [#input.election.name - #format_date(input.election.election_date)],
   [

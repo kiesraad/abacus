@@ -5,8 +5,9 @@ use test_log::test;
 use crate::domain::{
     committee_session::committee_session_fixture,
     election::{
-        CommitteeCategory, ElectionCategory, ElectionId, ElectionSubCategory,
-        ElectionWithPoliticalGroups, VoteCountingMethod, tests::election_fixture,
+        CommitteeCategory, CommitteeDistrict, ElectionCategory, ElectionDomain, ElectionId,
+        ElectionSubCategory, ElectionWithPoliticalGroups, VoteCountingMethod,
+        tests::election_fixture,
     },
     models::{
         ModelNa31_2Input, PdfFileModel, PdfModel, ToPdfFileModel, filter_input,
@@ -25,7 +26,14 @@ async fn it_generates_a_pdf() {
         counting_method: Some(VoteCountingMethod::CSO),
         election_id: "GR2025_Heemdamseburg".to_string(),
         location: "Heemdamseburg".to_string(),
-        domain_id: "0000".to_string(),
+        authority_id: "0000".to_string(),
+        authority_name: "Heemdamseburg".to_string(),
+        authority_region: "Heemdamseburg".to_string(),
+        district: CommitteeDistrict::None,
+        domain: Some(ElectionDomain {
+            id: Some("0000".to_string()),
+            name: "Heemdamseburg".to_string(),
+        }),
         category: ElectionCategory::Municipal,
         sub_category: ElectionSubCategory::GR2,
         number_of_seats: 29,

@@ -9,8 +9,8 @@ use chrono::{DateTime, Local};
 use eml_nl::{
     EMLError,
     common::{
-        AuthorityIdentifier, ContestIdentifier, ElectionDomain, ElectionTree, ManagingAuthority,
-        PersonName, ReportingUnitIdentifier,
+        AuthorityIdentifier, ContestIdentifier, ElectionTree, ManagingAuthority, PersonName,
+        ReportingUnitIdentifier,
     },
     documents::{
         candidate_lists::{
@@ -38,14 +38,17 @@ use eml_nl::{
 pub use error::EMLImportError;
 pub use hash::{EmlHash, RedactedEmlHash};
 
-use crate::domain::{
-    committee_session::CommitteeSession,
-    election::{
-        Candidate, CandidateGender, CandidateNumber, CommitteeCategory,
-        ElectionWithPoliticalGroups, NewElection, PGNumber, RegisteredPoliticalGroup,
+use crate::{
+    domain::results::political_group_candidate_votes::PoliticalGroupCandidateVotes,
+    domain::tabulation::{CommitteeSpecificTotals, ElectionTotals},
+    domain::{
+        committee_session::CommitteeSession,
+        election::{
+            Candidate, CandidateGender, CandidateNumber, CommitteeCategory, ElectionDomain,
+            ElectionWithPoliticalGroups, NewElection, PGNumber, RegisteredPoliticalGroup,
+        },
     },
-    results::political_group_candidate_votes::PoliticalGroupCandidateVotes,
-    tabulation::{CommitteeSpecificTotals, ElectionTotals},
+    eml::committees::ElectionTreeDetails,
 };
 
 fn max_votes(max_votes: &StringValue<NonZeroU64>) -> u32 {
@@ -108,14 +111,18 @@ impl NewElection {
         }
     }
 
-    pub fn from_eml_str(election_definition_data: &str) -> Result<Self, EMLImportError> {
+    pub fn from_eml_str(
+        election_definition_data: &str,
+    ) -> Result<(Self, ElectionTreeDetails), EMLImportError> {
         // attempt to parse in strict mode (we don't expect any errors in this EML)
         let definition =
             ElectionDefinition::parse_eml(election_definition_data, EMLParsingMode::Strict).ok()?;
         Self::from_eml(&definition)
     }
 
-    pub fn from_eml(definition: &ElectionDefinition) -> Result<Self, EMLImportError> {
+    pub fn from_eml(
+        definition: &ElectionDefinition,
+    ) -> Result<(Self, ElectionTreeDetails), EMLImportError> {
         // extract common information
         let election = &definition.election_event.election;
         let identifier = &election.identifier;
@@ -123,18 +130,11 @@ impl NewElection {
         let sub_category = Self::get_sub_category_or_err(identifier.subcategory.copied_value()?)?;
         let election_date = identifier.election_date.copied_value()?.date;
         let nomination_date = identifier.nomination_date.copied_value()?.date;
+        let election_tree_details = ElectionTreeDetails::from_definition(definition)?;
 
         if !Self::category_and_sub_category_match(category, sub_category) {
             return Err(EMLImportError::MismatchElectionCategoryAndSubCategory);
         }
-
-        // we need the election domain and its id
-        let Some(domain) = &identifier.domain else {
-            return Err(EMLImportError::MissingElectionDomain);
-        };
-        let Some(domain_id) = &domain.id else {
-            return Err(EMLImportError::MissingElectionDomain);
-        };
 
         // we need the number of seats and it must be a valid u32
         let number_of_seats = election
@@ -146,6 +146,11 @@ impl NewElection {
         // typically number of voters is not available in the EML, but it could
         // be so we try and extract it anyway
         let number_of_voters = max_votes(&election.contest.max_votes);
+
+        // TODO: once we support country-wide elections this is no longer true and the domain can be absent
+        if identifier.domain.is_none() {
+            return Err(EMLImportError::MissingElectionDomain);
+        }
 
         // extract initial listing of political groups
         let political_groups = election
@@ -164,21 +169,32 @@ impl NewElection {
             })
             .collect::<Result<Vec<RegisteredPoliticalGroup>, EMLImportError>>()?;
 
-        Ok(Self {
-            name: identifier.name.to_string(),
-            committee_category: CommitteeCategory::GSB,
-            counting_method: None,
-            election_id: identifier.id.raw().into_owned(),
-            location: domain.name.to_string(),
-            domain_id: domain_id.raw().into_owned(),
-            category,
-            sub_category,
-            number_of_seats,
-            number_of_voters,
-            election_date,
-            nomination_date,
-            political_groups,
-        })
+        Ok((
+            Self {
+                name: identifier.name.to_string(),
+                committee_category: CommitteeCategory::GSB,
+                counting_method: None,
+                election_id: identifier.id.raw().into_owned(),
+                location: election_tree_details.csb.location(),
+                authority_id: election_tree_details.csb.managing_authority_id.clone(),
+                authority_name: election_tree_details.csb.managing_authority_name(),
+                authority_region: election_tree_details.csb.responsible_region.name.clone(),
+                district: election_tree_details.csb.district.clone(),
+                domain: identifier
+                    .domain
+                    .as_ref()
+                    .map(ElectionDomain::from_eml_domain)
+                    .transpose()?,
+                category,
+                sub_category,
+                number_of_seats,
+                number_of_voters,
+                election_date,
+                nomination_date,
+                political_groups,
+            },
+            election_tree_details,
+        ))
     }
 
     pub fn add_candidates_from_eml_str(
@@ -202,12 +218,12 @@ impl NewElection {
         let election_domain = identifier
             .domain
             .as_ref()
-            .ok_or(EMLImportError::MissingElectionDomain)?;
-        let election_domain_id = election_domain
-            .id
-            .as_ref()
-            .ok_or(EMLImportError::MissingElectionDomain)?
-            .cloned_value()?;
+            .map(ElectionDomain::from_eml_domain)
+            .transpose()?;
+
+        if self.domain != election_domain {
+            return Err(EMLImportError::MismatchElectionDomain);
+        }
 
         if self.election_id != election_id.to_raw_value().as_ref() {
             return Err(EMLImportError::MismatchElection);
@@ -217,10 +233,7 @@ impl NewElection {
             return Err(EMLImportError::MismatchElectionDate);
         }
 
-        if self.domain_id != election_domain_id.value() {
-            return Err(EMLImportError::MismatchElectionDomain);
-        }
-
+        // TODO: ensure that contest is for same district as chosen district
         let contest = election
             .contests
             .first()
@@ -368,6 +381,29 @@ impl Candidate {
     }
 }
 
+impl ElectionDomain {
+    /// Create an Abacus `ElectionDomain` from an EML `ElectionDomain`.
+    pub fn from_eml_domain(domain: &eml_nl::common::ElectionDomain) -> Result<Self, EMLError> {
+        Ok(Self {
+            id: domain
+                .id
+                .as_ref()
+                .map(|id| id.cloned_value())
+                .transpose()?
+                .map(|v| v.to_raw_value().to_string()),
+            name: domain.name.to_string(),
+        })
+    }
+
+    /// Create an EML `ElectionDomain` from this Abacus `ElectionDomain`.
+    pub fn to_eml_domain(&self) -> Result<eml_nl::common::ElectionDomain, EMLError> {
+        Ok(eml_nl::common::ElectionDomain::new(
+            self.id.as_ref().map(ElectionDomainId::new).transpose()?,
+            self.name.clone(),
+        ))
+    }
+}
+
 impl ElectionWithPoliticalGroups {
     /// Get the EML election category for this election.
     pub fn get_eml_category(&self) -> eml_nl::utils::ElectionCategory {
@@ -407,17 +443,19 @@ impl ElectionWithPoliticalGroups {
     pub fn get_eml_election_identifier_builder(
         &self,
     ) -> Result<eml_nl::documents::ElectionIdentifierBuilder, EMLError> {
-        Ok(eml_nl::documents::ElectionIdentifierBuilder::new()
+        let mut builder = eml_nl::documents::ElectionIdentifierBuilder::new()
             .id(ElectionId::new(&self.election_id)?)
             .name(self.name.clone())
             .election_date(self.election_date)
             .nomination_date(self.nomination_date)
             .category(self.get_eml_category())
-            .subcategory(self.get_eml_sub_category())
-            .domain(ElectionDomain::new(
-                Some(ElectionDomainId::new(&self.domain_id)?),
-                self.location.clone(),
-            )))
+            .subcategory(self.get_eml_sub_category());
+
+        if let Some(domain) = &self.domain {
+            builder = builder.domain(domain.to_eml_domain()?);
+        }
+
+        Ok(builder)
     }
 
     pub fn as_candidates_eml(
@@ -430,8 +468,8 @@ impl ElectionWithPoliticalGroups {
         CandidateLists::builder()
             .transaction_id(transaction_id.unwrap_or(1))
             .managing_authority(ManagingAuthority::new(
-                AuthorityIdentifier::new(AuthorityId::new(&self.domain_id)?)
-                    .with_name(self.location.clone()),
+                AuthorityIdentifier::new(AuthorityId::new(self.authority_id.clone())?)
+                    .with_name(self.authority_name.clone()),
             ))
             .issue_date(timestamp.date_naive())
             .creation_date_time(timestamp)
@@ -476,8 +514,8 @@ impl ElectionWithPoliticalGroups {
         ElectionDefinition::builder()
             .transaction_id(transaction_id.unwrap_or(1))
             .managing_authority(ManagingAuthority::new(
-                AuthorityIdentifier::new(AuthorityId::new(&self.domain_id)?)
-                    .with_name(self.location.clone()),
+                AuthorityIdentifier::new(AuthorityId::new(&self.authority_id)?)
+                    .with_name(self.authority_name.clone()),
             ))
             .issue_date(timestamp.date_naive())
             .creation_date_time(timestamp)
@@ -518,8 +556,8 @@ impl ElectionWithPoliticalGroups {
         PollingStations::builder()
             .transaction_id(transaction_id.unwrap_or(1))
             .managing_authority(ManagingAuthority::new(
-                AuthorityIdentifier::new(AuthorityId::new(&self.domain_id)?)
-                    .with_name(self.location.clone()),
+                AuthorityIdentifier::new(AuthorityId::new(&self.authority_id)?)
+                    .with_name(self.authority_name.clone()),
             ))
             .issue_date(timestamp.date_naive())
             .creation_date_time(timestamp)
@@ -534,8 +572,8 @@ impl ElectionWithPoliticalGroups {
                 )
                 .voting_method(VotingMethod::SPV)
                 .reporting_unit(ReportingUnitIdentifier::new(
-                    ReportingUnitIdentifierId::new(&self.domain_id)?,
-                    self.location.clone(),
+                    ReportingUnitIdentifierId::new(&self.authority_id)?,
+                    self.authority_name.clone(),
                 ))
                 .polling_places(
                     polling_stations
@@ -571,8 +609,8 @@ impl ElectionWithPoliticalGroups {
         ElectionCount::builder()
             .transaction_id(transaction_id.unwrap_or(1))
             .managing_authority(ManagingAuthority::new(
-                AuthorityIdentifier::new(self.output_eml_authority_id()?)
-                    .with_name(self.location.clone()),
+                AuthorityIdentifier::new(AuthorityId::new(self.authority_id.clone())?)
+                    .with_name(self.authority_name.clone()),
             ))
             .creation_date_time(timestamp)
             .election_identifier(
@@ -654,13 +692,6 @@ impl ElectionWithPoliticalGroups {
         builder.build()
     }
 
-    fn output_eml_authority_id(&self) -> Result<AuthorityId, EMLError> {
-        match self.committee_category {
-            CommitteeCategory::GSB => AuthorityId::new(&self.domain_id),
-            CommitteeCategory::CSB => AuthorityId::new("CSB"),
-        }
-    }
-
     /// Depending on the context of the totals coming from GSB or from CSB, the number of voters source is different.
     fn get_eligible_voter_count(&self, totals: &ElectionTotals) -> u32 {
         match totals.committee_specific {
@@ -708,11 +739,10 @@ impl ElectionWithPoliticalGroups {
         data_source: &crate::domain::data_entry::DataEntrySource,
         results: &crate::domain::results::Results,
     ) -> Result<ReportingUnitVotes, EMLError> {
-        let authority_id = self.domain_id.as_str(); // TODO (post 1.0): replace with election tree when that is available
         let mut builder = ReportingUnitVotes::builder()
             .identifier(ReportingUnitIdentifier::new(
                 ReportingUnitIdentifierId::new(
-                    data_source.eml_reporting_unit_identifier_number(authority_id),
+                    data_source.eml_reporting_unit_identifier_number(&self.authority_id),
                 )?,
                 data_source.eml_reporting_unit_identifier_name(),
             ))
@@ -780,8 +810,8 @@ impl ElectionWithPoliticalGroups {
         ElectionResult::builder()
             .transaction_id(transaction_id.unwrap_or(1))
             .managing_authority(ManagingAuthority::new(
-                AuthorityIdentifier::new(self.output_eml_authority_id()?)
-                    .with_name(self.location.clone()),
+                AuthorityIdentifier::new(AuthorityId::new(self.authority_id.clone())?)
+                    .with_name(self.authority_name.clone()),
             ))
             .creation_date_time(timestamp)
             .election_identifier(

@@ -9,6 +9,11 @@
 'election_date' = "chrono::NaiveDate"
 'nomination_date' = "chrono::NaiveDate"
 'political_groups' = "sqlx::types::Json<Vec<crate::domain::election::RegisteredPoliticalGroup>>"
+'domain' = "crate::domain::election::ElectionDomain"
+'district' = "crate::domain::election::CommitteeDistrict"
+'authority_id' = "String"
+'authority_name' = "String"
+'authority_region' = "String"
 
 [macros.table-overrides.'polling_stations']
 'id' = "crate::domain::polling_station::PollingStationId"

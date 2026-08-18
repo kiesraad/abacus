@@ -306,8 +306,8 @@ mod tests {
     use super::*;
     use crate::domain::{
         election::{
-            CommitteeCategory, ElectionCategory, ElectionId, ElectionSubCategory,
-            VoteCountingMethod,
+            CommitteeCategory, CommitteeDistrict, ElectionCategory, ElectionDomain, ElectionId,
+            ElectionSubCategory, VoteCountingMethod,
         },
         results::political_group_candidate_votes::CandidateVotes,
     };
@@ -345,7 +345,14 @@ mod tests {
             counting_method: Some(VoteCountingMethod::CSO),
             election_id: "Test_2025".to_string(),
             location: "Test locatie".to_string(),
-            domain_id: "0000".to_string(),
+            authority_id: "0000".to_string(),
+            authority_name: "Test".to_string(),
+            authority_region: "Test".to_string(),
+            district: CommitteeDistrict::None,
+            domain: Some(ElectionDomain {
+                id: Some("0000".to_string()),
+                name: "Test".to_string(),
+            }),
             category: ElectionCategory::Municipal,
             sub_category: ElectionSubCategory::GR1,
             number_of_seats: 1,

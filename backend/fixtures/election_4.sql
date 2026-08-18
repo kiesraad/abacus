@@ -1,5 +1,5 @@
-INSERT INTO elections (id, name, committee_category, counting_method, election_id, location, domain_id, category, sub_category, number_of_seats, number_of_voters, election_date, nomination_date, political_groups)
-VALUES (4, 'Test Election < 19 seats', 'GSB', 'CSO', 'GR2026_TestLocation', 'Test Location', '9101', 'Municipal', 'GR1', 15, 3000, '2026-03-18', '2026-02-02',
+INSERT INTO elections (id, name, committee_category, counting_method, election_id, location, authority_id, authority_name, authority_region, district, domain, category, sub_category, number_of_seats, number_of_voters, election_date, nomination_date, political_groups)
+VALUES (4, 'Test Election < 19 seats', 'GSB', 'CSO', 'GR2026_TestLocation', 'Test Location', '9101', 'Test Location', 'Test Location', '{"district":"None"}', '{"id":"9101","name":"Test Location"}', 'Municipal', 'GR1', 15, 3000, '2026-03-18', '2026-02-02',
         '[
           {
             "number": 1,

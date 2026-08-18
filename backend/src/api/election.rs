@@ -25,9 +25,9 @@ use crate::{
         },
         committee_session_status::CommitteeSessionStatus,
         election::{
-            CommitteeCategory, Election, ElectionCategory, ElectionId,
-            ElectionNumberOfVotersChangeRequest, ElectionWithPoliticalGroups, NewElection,
-            VoteCountingMethod,
+            CommitteeCategory, CommitteeDistrict, Election, ElectionCategory, ElectionDomain,
+            ElectionId, ElectionNumberOfVotersChangeRequest, ElectionWithPoliticalGroups,
+            NewElection, VoteCountingMethod,
         },
         investigation::PollingStationInvestigation,
         polling_station::{PollingStationRequest, PollingStationResponse, PollingStationsRequest},
@@ -89,7 +89,10 @@ pub struct ElectionAuditData {
     pub election_counting_method: Option<String>,
     pub election_election_id: String,
     pub election_location: String,
-    pub election_domain_id: String,
+    pub election_authority_id: String,
+    pub election_authority_name: String,
+    pub election_district: CommitteeDistrict,
+    pub election_domain: Option<ElectionDomain>,
     pub election_category: String,
     pub election_number_of_seats: u32,
     pub election_number_of_voters: u32,
@@ -106,7 +109,10 @@ impl From<Election> for ElectionAuditData {
             election_counting_method: value.counting_method.map(|cm| cm.to_string()),
             election_election_id: value.election_id,
             election_location: value.location,
-            election_domain_id: value.domain_id,
+            election_authority_id: value.authority_id,
+            election_authority_name: value.authority_name,
+            election_district: value.district,
+            election_domain: value.domain,
             election_category: value.category.to_string(),
             election_number_of_seats: value.number_of_seats,
             election_number_of_voters: value.number_of_voters,
@@ -638,7 +644,8 @@ fn parse_election_candidates_eml(
     election_eml_data: &str,
     candidate_eml_data: Option<&str>,
 ) -> Result<NewElection, APIError> {
-    let mut election = NewElection::from_eml_str(election_eml_data)?;
+    let (mut election, _election_tree) = NewElection::from_eml_str(election_eml_data)?;
+    // TODO: need to pick the right district first before adding candidates
     if let Some(candidate_eml_data) = candidate_eml_data {
         election.add_candidates_from_eml_str(candidate_eml_data)?;
     }
@@ -703,8 +710,14 @@ async fn create_sub_committees(
 ) -> Result<(), APIError> {
     match (election.committee_category, election.category) {
         (CommitteeCategory::CSB, ElectionCategory::Municipal) => {
+            // TODO: this is not right, we should use the election tree instead
             let number = election
-                .domain_id
+                .domain
+                .as_ref()
+                .expect("Municipal elections should have an election domain")
+                .id
+                .as_ref()
+                .expect("Municipal elections should have an election domain id")
                 .parse()
                 .expect("domain_id should be numeric");
             create_sub_committee(

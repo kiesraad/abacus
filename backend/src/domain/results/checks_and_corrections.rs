@@ -149,14 +149,13 @@ mod tests {
     };
 
     fn validate(
-        corrigendum_present: Option<CorrigendumPresent>,
         reason_investigation_own_initiative: ReasonInvestigationOwnInitiative,
         corrected_results_own_initiative: YesNo,
         corrected_results_csb_request: YesNo,
     ) -> Result<ValidationResults, DataError> {
         let validation_results = Results::DSOFirstSession(DSOFirstSessionResults {
             about_report: AboutReport {
-                corrigendum_present,
+                corrigendum_present: Some(CorrigendumPresent::TwoDocuments),
                 checks_and_corrections_present: Some(ChecksAndCorrectionsPresent::PagePresent),
             },
             checks_and_corrections: ChecksAndCorrections {
@@ -181,7 +180,7 @@ mod tests {
 
     /// GSB DSO | F.131: 'Controles en correcties - Op eigen initiatief': 'controles en correcties aanwezig' = 'ja' EN één of beide vragen niet beantwoord
     #[test]
-    #[allow(clippy::too_many_lines)]
+    #[expect(clippy::too_many_lines)]
     fn test_f131() -> Result<(), DataError> {
         let f131 = ValidationResult {
             code: ValidationResultCode::F131,
@@ -232,14 +231,16 @@ mod tests {
         ];
 
         for (
-            reason_investigation_own_initiative,
-            corrected_results_own_initiative,
-            corrected_results_csb_request,
-            expect_f131,
-        ) in cases
+            case_index,
+            (
+                reason_investigation_own_initiative,
+                corrected_results_own_initiative,
+                corrected_results_csb_request,
+                expect_f131,
+            ),
+        ) in cases.into_iter().enumerate()
         {
             let result = validate(
-                Some(CorrigendumPresent::TwoDocuments),
                 reason_investigation_own_initiative.clone(),
                 corrected_results_own_initiative.clone(),
                 corrected_results_csb_request.clone(),
@@ -247,145 +248,7 @@ mod tests {
             let has_f131 = result.errors.iter().any(|e| e == &f131);
             assert_eq!(
                 has_f131, expect_f131,
-                "Failed: reason_investigation_own_initiative: {reason_investigation_own_initiative:?}, corrected_results_own_initiative: {corrected_results_own_initiative:?}, corrected_results_csb_request: {corrected_results_csb_request:?}"
-            );
-        }
-
-        Ok(())
-    }
-
-    /// GSB DSO | F.132: 'Controles en correcties - Op eigen initiatief': 'controles en correcties aanwezig' = 'ja' EN 'gecorrigeerde telresultaten' = 'nee' EN 'Over het proces-verbaal: Is er een corrigendum?' = 'ja'
-    #[test]
-    #[allow(clippy::too_many_lines)]
-    fn test_f132() -> Result<(), DataError> {
-        let f132 = ValidationResult {
-            code: ValidationResultCode::F132,
-            fields: vec!["checks_and_corrections".into()],
-            context: None,
-        };
-
-        let cases = vec![
-            (
-                Some(CorrigendumPresent::TwoDocuments),
-                ReasonInvestigationOwnInitiative::default(),
-                YesNo::no(),
-                YesNo::default(),
-                true,
-            ),
-            (
-                Some(CorrigendumPresent::TwoDocuments),
-                ReasonInvestigationOwnInitiative {
-                    unaccounted_difference: true,
-                    other_error: false,
-                },
-                YesNo::no(),
-                YesNo::default(),
-                true,
-            ),
-            (
-                Some(CorrigendumPresent::TwoDocuments),
-                ReasonInvestigationOwnInitiative::default(),
-                YesNo::yes(),
-                YesNo::default(),
-                false,
-            ),
-            (
-                Some(CorrigendumPresent::OneDocument),
-                ReasonInvestigationOwnInitiative::default(),
-                YesNo::no(),
-                YesNo::default(),
-                false,
-            ),
-            (
-                Some(CorrigendumPresent::TwoDocuments),
-                ReasonInvestigationOwnInitiative {
-                    unaccounted_difference: true,
-                    other_error: true,
-                },
-                YesNo::no(),
-                YesNo::default(),
-                true,
-            ),
-        ];
-
-        for (
-            case_index,
-            (
-                corrigendum_present,
-                reason_investigation_own_initiative,
-                corrected_results_own_initiative,
-                corrected_results_csb_request,
-                expect_f132,
-            ),
-        ) in cases.into_iter().enumerate()
-        {
-            let result = validate(
-                corrigendum_present,
-                reason_investigation_own_initiative.clone(),
-                corrected_results_own_initiative.clone(),
-                corrected_results_csb_request.clone(),
-            )?;
-            dbg!(&result.errors);
-            let has_f132 = result.errors.iter().any(|e| e == &f132);
-            assert_eq!(
-                has_f132, expect_f132,
-                "Case #{case_index} failed: corrigendum_present: {corrigendum_present:?}, reason_investigation_own_initiative: {reason_investigation_own_initiative:?}, corrected_results_own_initiative: {corrected_results_own_initiative:?}, corrected_results_csb_request: {corrected_results_csb_request:?}"
-            );
-        }
-
-        Ok(())
-    }
-
-    /// GSB DSO | F.133: 'Controles en correcties - Op eigen initiatief': 'controles en correcties aanwezig' = 'ja' EN 'gecorrigeerde telresultaten' = 'ja' EN 'Over het proces-verbaal: Is er een corrigendum?' = 'nee'
-    #[test]
-    fn test_f133() -> Result<(), DataError> {
-        let f133 = ValidationResult {
-            code: ValidationResultCode::F133,
-            fields: vec!["checks_and_corrections".into()],
-            context: None,
-        };
-
-        let cases = vec![
-            (
-                ReasonInvestigationOwnInitiative::default(),
-                YesNo::default(),
-                YesNo::yes(),
-                true,
-            ),
-            (
-                ReasonInvestigationOwnInitiative::default(),
-                YesNo::no(),
-                YesNo::no(),
-                true,
-            ),
-            (
-                ReasonInvestigationOwnInitiative {
-                    unaccounted_difference: true,
-                    other_error: false,
-                },
-                YesNo::no(),
-                YesNo::default(),
-                false,
-            ),
-        ];
-
-        for (
-            reason_investigation_own_initiative,
-            corrected_results_own_initiative,
-            corrected_results_csb_request,
-            expect_f133,
-        ) in cases
-        {
-            let result = validate(
-                Some(CorrigendumPresent::TwoDocuments),
-                reason_investigation_own_initiative.clone(),
-                corrected_results_own_initiative.clone(),
-                corrected_results_csb_request.clone(),
-            )?;
-            let has_f133 = result.errors.iter().any(|e| e == &f133);
-            assert_eq!(
-                has_f133, expect_f133,
-                "Failed: reason_investigation_own_initiative: {reason_investigation_own_initiative:?}, corrected_results_own_initiative: {corrected_results_own_initiative:?}, corrected_results_csb_request: {corrected_results_csb_request:?}"
+                "Case #{case_index} failed: reason_investigation_own_initiative: {reason_investigation_own_initiative:?}, corrected_results_own_initiative: {corrected_results_own_initiative:?}, corrected_results_csb_request: {corrected_results_csb_request:?}"
             );
         }
 
@@ -435,14 +298,16 @@ mod tests {
         ];
 
         for (
-            reason_investigation_own_initiative,
-            corrected_results_own_initiative,
-            corrected_results_csb_request,
-            expect_f134,
-        ) in cases
+            case_index,
+            (
+                reason_investigation_own_initiative,
+                corrected_results_own_initiative,
+                corrected_results_csb_request,
+                expect_f134,
+            ),
+        ) in cases.into_iter().enumerate()
         {
             let result = validate(
-                Some(CorrigendumPresent::TwoDocuments),
                 reason_investigation_own_initiative.clone(),
                 corrected_results_own_initiative.clone(),
                 corrected_results_csb_request.clone(),
@@ -450,7 +315,7 @@ mod tests {
             let has_f134 = result.errors.iter().any(|e| e == &f134);
             assert_eq!(
                 has_f134, expect_f134,
-                "Failed: reason_investigation_own_initiative: {reason_investigation_own_initiative:?}, corrected_results_own_initiative: {corrected_results_own_initiative:?}, corrected_results_csb_request: {corrected_results_csb_request:?}"
+                "Case #{case_index} failed: reason_investigation_own_initiative: {reason_investigation_own_initiative:?}, corrected_results_own_initiative: {corrected_results_own_initiative:?}, corrected_results_csb_request: {corrected_results_csb_request:?}"
             );
         }
 
@@ -488,14 +353,16 @@ mod tests {
         ];
 
         for (
-            reason_investigation_own_initiative,
-            corrected_results_own_initiative,
-            corrected_results_csb_request,
-            expect_f135,
-        ) in cases
+            case_index,
+            (
+                reason_investigation_own_initiative,
+                corrected_results_own_initiative,
+                corrected_results_csb_request,
+                expect_f135,
+            ),
+        ) in cases.into_iter().enumerate()
         {
             let result = validate(
-                Some(CorrigendumPresent::TwoDocuments),
                 reason_investigation_own_initiative.clone(),
                 corrected_results_own_initiative.clone(),
                 corrected_results_csb_request.clone(),
@@ -503,7 +370,7 @@ mod tests {
             let has_f135 = result.errors.iter().any(|e| e == &f135);
             assert_eq!(
                 has_f135, expect_f135,
-                "Failed: reason_investigation_own_initiative: {reason_investigation_own_initiative:?}, corrected_results_own_initiative: {corrected_results_own_initiative:?}, corrected_results_csb_request: {corrected_results_csb_request:?}"
+                "Case #{case_index} failed: reason_investigation_own_initiative: {reason_investigation_own_initiative:?}, corrected_results_own_initiative: {corrected_results_own_initiative:?}, corrected_results_csb_request: {corrected_results_csb_request:?}"
             );
         }
 

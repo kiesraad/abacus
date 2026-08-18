@@ -16,16 +16,9 @@ use crate::domain::{
     },
     field_path::FieldPath,
     results::{
-        about_report::{ChecksAndCorrectionsPresent, CorrigendumPresent},
-        count::Count,
-        dso_first_session_results::DSOFirstSessionResults,
-        gsb_results::GSBResults,
-        yes_no::YesNo,
+        count::Count, dso_first_session_results::DSOFirstSessionResults, gsb_results::GSBResults,
     },
-    validate::{
-        DataError, Validate, ValidateRoot, ValidationResult, ValidationResultCode,
-        ValidationResults,
-    },
+    validate::{DataError, Validate, ValidateRoot, ValidationResults},
 };
 
 pub mod about_report;
@@ -455,7 +448,6 @@ impl Compare for Results {
 
 impl ValidateRoot for Results {}
 
-#[allow(clippy::too_many_lines, reason = "This is a refactoring candidate")]
 impl Validate for Results {
     fn validate(
         &self,
@@ -463,59 +455,7 @@ impl Validate for Results {
         path: &FieldPath,
     ) -> Result<ValidationResults, DataError> {
         match self {
-            Results::DSOFirstSession(results) => {
-                // Invalid state check
-                if let (Some(ChecksAndCorrectionsPresent::PageMissing), false) = (
-                    results.about_report.checks_and_corrections_present,
-                    results.checks_and_corrections.is_empty(),
-                ) {
-                    return Err(DataError::new(
-                        "`checks_and_corrections` must be empty when `ChecksAndCorrectionsPresent::PageMissing`.",
-                    ));
-                };
-
-                let mut validation_results = results
-                    .about_report
-                    .validate(election, &path.field("about_report"))?;
-
-                if let Some(ChecksAndCorrectionsPresent::PagePresent) =
-                    results.about_report.checks_and_corrections_present
-                {
-                    match results.about_report.corrigendum_present {
-                        Some(CorrigendumPresent::TwoDocuments)
-                            if results
-                                .checks_and_corrections
-                                .corrected_results_own_initiative
-                                == YesNo::no() =>
-                        {
-                            validation_results.errors.push(ValidationResult {
-                                fields: vec![path.to_string()],
-                                code: ValidationResultCode::F132,
-                                context: None,
-                            });
-                        }
-                        Some(CorrigendumPresent::OneDocument)
-                            if results
-                                .checks_and_corrections
-                                .corrected_results_own_initiative
-                                == YesNo::yes() =>
-                        {
-                            validation_results.errors.push(ValidationResult {
-                                fields: vec![path.to_string()],
-                                code: ValidationResultCode::F133,
-                                context: None,
-                            });
-                        }
-                        _ => {}
-                    }
-
-                    validation_results
-                        .join(results.checks_and_corrections.validate(election, path)?);
-                };
-
-                validation_results.join(results.as_common().validate(election, path)?);
-                Ok(validation_results)
-            }
+            Results::DSOFirstSession(results) => results.validate(election, path),
             Results::DSONextSession(results) => results.as_common().validate(election, path),
             Results::CSOFirstSession(results) => {
                 let mut validation_results = results
@@ -540,7 +480,7 @@ pub mod tests {
     use crate::domain::{
         election::{ElectionCategory, PGNumber, tests::election_fixture},
         results::{
-            about_report::AboutReport,
+            about_report::{AboutReport, ChecksAndCorrectionsPresent},
             checks_and_corrections::{ChecksAndCorrections, ReasonInvestigationOwnInitiative},
             count::Count,
             differences_counts::{

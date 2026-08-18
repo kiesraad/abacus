@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { MissingCommitteeSessionDetailsModal } from "@/components/committee_session/MissingCommitteeSessionDetailsModal";
 import { Button } from "@/components/ui/Button/Button";
-import { DownloadButtonWithoutHref } from "@/components/ui/DownloadButton/DownloadButton";
+import { DownloadButton } from "@/components/ui/DownloadButton/DownloadButton";
 import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { Loader } from "@/components/ui/Loader/Loader";
@@ -31,9 +31,10 @@ export function InvestigationPrintCorrigendum({ pollingStationId }: Investigatio
                 <li>{tx("investigations.print_corrigendum.download_and_print")}</li>
                 <li>{tx("investigations.print_corrigendum.print_recommendation")}</li>
               </ul>
-              <DownloadButtonWithoutHref
+              <DownloadButton
                 id="download-corrigendum-button"
                 icon="download"
+                href="#"
                 title={t("investigations.print_corrigendum.download_corrigendum_link", {
                   number: pollingStation.number,
                 })}

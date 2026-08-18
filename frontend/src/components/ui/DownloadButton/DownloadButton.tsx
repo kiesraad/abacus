@@ -1,4 +1,4 @@
-import type { AnchorHTMLAttributes, ButtonHTMLAttributes } from "react";
+import type { AnchorHTMLAttributes } from "react";
 import { IconDownload, IconFile } from "@/components/generated/icons";
 import { cn } from "@/utils/classnames";
 import cls from "./DownloadButton.module.css";
@@ -36,39 +36,5 @@ export function DownloadButton({
         {subtitle && <span className={cls.subtitle}>{subtitle}</span>}
       </span>
     </a>
-  );
-}
-
-export interface DownloadButtonWithoutHrefProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  icon: "file" | "download";
-  title: string;
-  href?: string;
-  subtitle?: string;
-  isDisabled?: boolean;
-  isLoading?: boolean;
-}
-
-export function DownloadButtonWithoutHref({
-  icon,
-  title,
-  subtitle,
-  isDisabled,
-  isLoading,
-  ...htmlButtonProps
-}: DownloadButtonWithoutHrefProps) {
-  const Icon = icon === "file" ? IconFile : IconDownload;
-
-  return (
-    <span
-      className={cn(cls.DownloadButton, cls[icon], isDisabled || isLoading ? cls.disabled : "")}
-      title={title}
-      {...htmlButtonProps}
-    >
-      <Icon />
-      <span>
-        <span className={cls.title}>{title}</span>
-        {subtitle && <span className={cls.subtitle}>{subtitle}</span>}
-      </span>
-    </span>
   );
 }

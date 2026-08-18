@@ -63,10 +63,11 @@ describe("InvestigationPrintCorrigendumPage", () => {
         await screen.findByRole("heading", { level: 3, name: "Na het onderzoek van het gemeentelijk stembureau" }),
       ).toBeVisible();
 
-      expect(await screen.findByTestId("download-corrigendum-button")).toHaveTextContent(
-        ["Download corrigendum voor stembureau 35", "Na 14-2 Bijlage 1"].join(""),
-      );
-
+      expect(
+        await screen.findByRole("link", {
+          name: ["Download corrigendum voor stembureau 35", "Na 14-2 Bijlage 1"].join(""),
+        }),
+      ).toBeVisible();
       expect(await screen.findByRole("link", { name: "Verder naar bevindingen" })).toBeVisible();
     });
   });
@@ -83,9 +84,11 @@ describe("InvestigationPrintCorrigendumPage", () => {
         await screen.findByRole("heading", { level: 3, name: "Na het onderzoek van het gemeentelijk stembureau" }),
       ).toBeVisible();
 
-      expect(await screen.findByTestId("download-corrigendum-button")).toHaveTextContent(
-        ["Download corrigendum voor stembureau 35", "Na 14-1, versie 2"].join(""),
-      );
+      expect(
+        await screen.findByRole("link", {
+          name: ["Download corrigendum voor stembureau 35", "Na 14-1, versie 2"].join(""),
+        }),
+      ).toBeVisible();
       expect(await screen.findByRole("link", { name: "Verder naar bevindingen" })).toBeVisible();
     });
 
@@ -101,8 +104,10 @@ describe("InvestigationPrintCorrigendumPage", () => {
         await screen.findByRole("heading", { level: 3, name: "Na het onderzoek van het gemeentelijk stembureau" }),
       ).toBeVisible();
 
-      const link = await screen.findByTestId("download-corrigendum-button");
-      expect(link).toHaveTextContent(["Download corrigendum voor stembureau 35", "Na 14-1, versie 2"].join(""));
+      const link = await screen.findByRole("link", {
+        name: ["Download corrigendum voor stembureau 35", "Na 14-1, versie 2"].join(""),
+      });
+      expect(link).toBeVisible();
       await user.click(link);
 
       const modal = await screen.findByRole("dialog");
@@ -137,10 +142,12 @@ describe("InvestigationPrintCorrigendumPage", () => {
         await screen.findByRole("heading", { level: 3, name: "Na het onderzoek van het gemeentelijk stembureau" }),
       ).toBeVisible();
 
-      const link = await screen.findByTestId("download-corrigendum-button");
-      expect(link).toHaveTextContent(["Download corrigendum voor stembureau 35", "Na 14-1, versie 2"].join(""));
+      const link = await screen.findByRole("link", {
+        name: ["Download corrigendum voor stembureau 35", "Na 14-1, versie 2"].join(""),
+      });
+      expect(link).toBeVisible();
       await user.click(link);
-
+      await screen.findByRole("link", { name: "Terug naar alle onderzoeken" });
       expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     });
   });

@@ -39,14 +39,15 @@ pub use error::EMLImportError;
 pub use hash::{EmlHash, RedactedEmlHash};
 
 use crate::{
-    domain::results::political_group_candidate_votes::PoliticalGroupCandidateVotes,
-    domain::tabulation::{CommitteeSpecificTotals, ElectionTotals},
     domain::{
         committee_session::CommitteeSession,
         election::{
             Candidate, CandidateGender, CandidateNumber, CommitteeCategory, ElectionDomain,
-            ElectionWithPoliticalGroups, NewElection, PGNumber, RegisteredPoliticalGroup,
+            ElectionWithPoliticalGroups, NewElection, PGNumber, RegionKey,
+            RegisteredPoliticalGroup,
         },
+        results::political_group_candidate_votes::PoliticalGroupCandidateVotes,
+        tabulation::{CommitteeSpecificTotals, ElectionTotals},
     },
     eml::committees::ElectionTreeDetails,
 };
@@ -113,15 +114,18 @@ impl NewElection {
 
     pub fn from_eml_str(
         election_definition_data: &str,
+        selected_committee: Option<(CommitteeCategory, Option<RegionKey>)>,
     ) -> Result<(Self, ElectionTreeDetails), EMLImportError> {
         // attempt to parse in strict mode (we don't expect any errors in this EML)
         let definition =
             ElectionDefinition::parse_eml(election_definition_data, EMLParsingMode::Strict).ok()?;
-        Self::from_eml(&definition)
+        Self::from_eml(&definition, selected_committee)
     }
 
+    #[expect(clippy::too_many_lines)]
     pub fn from_eml(
         definition: &ElectionDefinition,
+        selected_committee: Option<(CommitteeCategory, Option<RegionKey>)>,
     ) -> Result<(Self, ElectionTreeDetails), EMLImportError> {
         // extract common information
         let election = &definition.election_event.election;
@@ -169,17 +173,26 @@ impl NewElection {
             })
             .collect::<Result<Vec<RegisteredPoliticalGroup>, EMLImportError>>()?;
 
+        // find the selected committee, falling back to the CSB if none is selected
+        let selected_committee = if let Some(selected) = selected_committee {
+            election_tree_details
+                .get_committee(selected.0, selected.1)
+                .ok_or(EMLImportError::UnknownCommittee)?
+        } else {
+            &election_tree_details.csb
+        };
+
         Ok((
             Self {
                 name: identifier.name.to_string(),
                 committee_category: CommitteeCategory::GSB,
                 counting_method: None,
                 election_id: identifier.id.raw().into_owned(),
-                location: election_tree_details.csb.location(),
-                authority_id: election_tree_details.csb.managing_authority_id.clone(),
-                authority_name: election_tree_details.csb.managing_authority_name(),
-                authority_region: election_tree_details.csb.responsible_region.name.clone(),
-                district: election_tree_details.csb.district.clone(),
+                location: selected_committee.location(),
+                authority_id: selected_committee.managing_authority_id.clone(),
+                authority_name: selected_committee.managing_authority_name(),
+                authority_region: selected_committee.responsible_region.name.clone(),
+                district: selected_committee.district.clone(),
                 domain: identifier
                     .domain
                     .as_ref()
@@ -1081,7 +1094,7 @@ mod tests {
     fn test_election_validate_missing_election_domain() {
         let data =
             include_str!("../eml/tests/eml110a_invalid_election_missing_election_domain.eml.xml");
-        let res = NewElection::from_eml_str(data).unwrap_err();
+        let res = NewElection::from_eml_str(data, None).unwrap_err();
         assert!(matches!(res, EMLImportError::MissingElectionDomain))
     }
 
@@ -1090,7 +1103,7 @@ mod tests {
         let data = include_str!(
             "../eml/tests/eml110a_invalid_election_limited_elections_supported.eml.xml"
         );
-        let res = NewElection::from_eml_str(data).unwrap_err();
+        let res = NewElection::from_eml_str(data, None).unwrap_err();
         dbg!(&res);
         assert!(matches!(res, EMLImportError::LimitedElectionsSupported));
     }
@@ -1100,7 +1113,7 @@ mod tests {
         let data = include_str!(
             "tests/eml110a_invalid_election_category_and_sub_category_mismatch.eml.xml"
         );
-        let res = NewElection::from_eml_str(data).unwrap_err();
+        let res = NewElection::from_eml_str(data, None).unwrap_err();
         dbg!(&res);
         assert!(matches!(
             res,

@@ -40,6 +40,7 @@ pub enum EMLImportError {
     },
     PollingStationsWithoutContest,
     TooManyPoliticalGroups,
+    UnknownCommittee,
 }
 
 impl From<eml_nl::EMLError> for EMLImportError {

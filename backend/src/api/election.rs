@@ -27,7 +27,7 @@ use crate::{
         election::{
             CommitteeCategory, CommitteeDistrict, Election, ElectionCategory, ElectionDomain,
             ElectionId, ElectionNumberOfVotersChangeRequest, ElectionWithPoliticalGroups,
-            NewElection, VoteCountingMethod,
+            NewElection, RegionKey, VoteCountingMethod,
         },
         investigation::PollingStationInvestigation,
         polling_station::{PollingStationRequest, PollingStationResponse, PollingStationsRequest},
@@ -392,8 +392,11 @@ fn validate_gsb_election(
     }
 
     let mut hash = RedactedEmlHash::from(edu.election_data.as_bytes());
-    let mut election =
-        parse_election_candidates_eml(&edu.election_data, edu.candidate_data.as_deref())?;
+    let mut election = parse_election_candidates_eml(
+        &edu.election_data,
+        Some((CommitteeCategory::GSB, None)),
+        edu.candidate_data.as_deref(),
+    )?;
 
     if let Some(ref data) = edu.candidate_data {
         hash = RedactedEmlHash::from(data.as_bytes());
@@ -445,8 +448,11 @@ fn validate_csb_election(
     }
 
     let mut hash = RedactedEmlHash::from(edu.election_data.as_bytes());
-    let mut election =
-        parse_election_candidates_eml(&edu.election_data, edu.candidate_data.as_deref())?;
+    let mut election = parse_election_candidates_eml(
+        &edu.election_data,
+        Some((CommitteeCategory::CSB, None)),
+        edu.candidate_data.as_deref(),
+    )?;
     election.committee_category = CommitteeCategory::CSB;
 
     if let Some(ref data) = edu.candidate_data {
@@ -546,8 +552,11 @@ async fn import_gsb_election(
     let election_data_hash = check_hash(edu.election_data.as_bytes(), Some(&edu.election_hash))?;
     let candidate_data_hash = check_hash(edu.candidate_data.as_bytes(), Some(&edu.candidate_hash))?;
 
-    let mut new_election =
-        parse_election_candidates_eml(&edu.election_data, Some(&edu.candidate_data))?;
+    let mut new_election = parse_election_candidates_eml(
+        &edu.election_data,
+        Some((CommitteeCategory::GSB, None)),
+        Some(&edu.candidate_data),
+    )?;
 
     // Validate polling stations
     if let Some(polling_station_data) = edu.polling_station_data.as_ref() {
@@ -599,8 +608,11 @@ async fn import_csb_election(
     let election_data_hash = check_hash(edu.election_data.as_bytes(), Some(&edu.election_hash))?;
     let candidate_data_hash = check_hash(edu.candidate_data.as_bytes(), Some(&edu.candidate_hash))?;
 
-    let mut new_election =
-        parse_election_candidates_eml(&edu.election_data, Some(&edu.candidate_data))?;
+    let mut new_election = parse_election_candidates_eml(
+        &edu.election_data,
+        Some((CommitteeCategory::CSB, None)),
+        Some(&edu.candidate_data),
+    )?;
     // PS/WS CSB support will be implemented later
     if matches!(
         new_election.category,
@@ -642,9 +654,11 @@ fn check_hash(
 /// Parse EML_NL 110 election definition and EML_NL 230 candidate list into a [`NewElection`]
 fn parse_election_candidates_eml(
     election_eml_data: &str,
+    selected_committee: Option<(CommitteeCategory, Option<RegionKey>)>,
     candidate_eml_data: Option<&str>,
 ) -> Result<NewElection, APIError> {
-    let (mut election, _election_tree) = NewElection::from_eml_str(election_eml_data)?;
+    let (mut election, _election_tree) =
+        NewElection::from_eml_str(election_eml_data, selected_committee)?;
     // TODO: need to pick the right district first before adding candidates
     if let Some(candidate_eml_data) = candidate_eml_data {
         election.add_candidates_from_eml_str(candidate_eml_data)?;

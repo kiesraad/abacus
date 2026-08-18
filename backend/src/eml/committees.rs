@@ -264,6 +264,38 @@ impl ElectionTreeDetails {
     pub fn all_committees(&self) -> impl Iterator<Item = &CommitteeDetails> {
         std::iter::once(&self.csb).chain(self.other_committees.values().flatten())
     }
+
+    /// Find a specific committee based on the committee category and a region
+    /// key. For the CSB category you do not need to pass a region key, for
+    /// all other categories if you pass no region key and there is not exactly
+    /// one region of that category, this returns an error. If no committee is
+    /// found that matches the given criteria, `None` is returned.
+    pub fn get_committee(
+        &self,
+        category: CommitteeCategory,
+        region_key: Option<RegionKey>,
+    ) -> Option<&CommitteeDetails> {
+        // For the CSB we don't need a region key, just return it immediately
+        if category == CommitteeCategory::CSB {
+            return Some(&self.csb);
+        }
+
+        if let Some(region_key) = region_key {
+            // Find the committee with the given key, if it exists
+            self.get_committees(category)
+                .iter()
+                .find(|c| c.responsible_region.key == region_key)
+        } else {
+            // If no region key is provided, we can only return a committee if
+            // there is exactly one committee of the given category.
+            let committees = self.get_committees(category);
+            if committees.len() == 1 {
+                Some(&committees[0])
+            } else {
+                None
+            }
+        }
+    }
 }
 
 impl TryFrom<&ElectionDefinition> for ElectionTreeDetails {
@@ -531,16 +563,18 @@ mod tests {
             ElectionDefinition::parse_eml(definition_str, EMLParsingMode::Strict).unwrap();
         let details = ElectionTreeDetails::from_definition(&definition).unwrap();
 
-        assert_eq!(details.csb.responsible_region.name, "Stadskanaal");
-        assert_eq!(details.csb.managing_authority_id, "CSB");
-        assert_eq!(details.csb.managing_authority_name(), "Stadskanaal");
-        assert_eq!(details.csb.location(), "Stadskanaal");
-        assert_eq!(details.csb.district, CommitteeDistrict::None);
+        let csb = details
+            .get_committee(CommitteeCategory::CSB, None)
+            .expect("Missing CSB");
+        assert_eq!(csb.responsible_region.name, "Stadskanaal");
+        assert_eq!(csb.managing_authority_id, "CSB");
+        assert_eq!(csb.managing_authority_name(), "Stadskanaal");
+        assert_eq!(csb.location(), "Stadskanaal");
+        assert_eq!(csb.district, CommitteeDistrict::None);
 
         assert_eq!(details.get_committees(CommitteeCategory::GSB).len(), 1);
         let gsb = details
-            .get_committees(CommitteeCategory::GSB)
-            .first()
+            .get_committee(CommitteeCategory::GSB, None)
             .expect("Missing GSB");
         assert_eq!(gsb.responsible_region.name, "Stadskanaal");
         assert_eq!(gsb.managing_authority_id, "0037");
@@ -574,6 +608,23 @@ mod tests {
         assert_eq!(gsb_coev.managing_authority_name(), "Coevorden");
         assert_eq!(gsb_coev.location(), "Coevorden");
         assert_eq!(gsb_coev.district, CommitteeDistrict::None);
+
+        assert!(
+            details
+                .get_committee(CommitteeCategory::GSB, None)
+                .is_none()
+        );
+
+        let gsb_tyn = details
+            .get_committee(
+                CommitteeCategory::GSB,
+                Some(RegionKey {
+                    category: RegionCategory::Municipality,
+                    number: Some(1730),
+                }),
+            )
+            .unwrap();
+        assert_eq!(gsb_tyn.managing_authority_name(), "Tynaarlo");
     }
 
     #[test]

@@ -886,6 +886,42 @@ pub(crate) mod tests {
             assert!(result.warnings().is_empty());
         }
 
+        /// Apportionment with residual seats assigned with largest remainders method
+        /// This test does not trigger a reassignment under Kieswet Article P 9, since the
+        /// list with an absolute majority of votes also has an absolute majority of seats.
+        ///
+        /// Full seats: [6, 2, 1] - Remainder seats: 1
+        /// Remainders: [0/10, 4, 6]
+        /// 1 - largest remainder: seat assigned to list 3
+        /// List 1 has an absolute majority of votes (60 of 100) and of seats (6 of 10),
+        /// so no reassignment takes place
+        #[test]
+        fn test_with_absolute_majority_of_votes_and_seats() {
+            let input = seat_assignment_fixture_with_default_50_candidates(10, vec![60, 24, 16]);
+            let SeatAssignment::Completed(result) = seat_assignment(&input).unwrap() else {
+                panic!("should be Completed");
+            };
+
+            assert_eq!(result.full_seats, 9);
+            assert_eq!(result.residual_seats, 1);
+            assert_eq!(result.steps.len(), 1);
+            assert!(
+                result.steps[0]
+                    .change
+                    .is_changed_by_largest_remainder_assignment()
+            );
+            assert_eq!(result.steps[0].change.list_number_assigned(), 3);
+            assert!(
+                result
+                    .steps
+                    .iter()
+                    .all(|step| !step.change.is_changed_by_absolute_majority_reassignment())
+            );
+            let total_seats = get_total_seats_from_apportionment_result(&result);
+            assert_eq!(total_seats, vec![6, 2, 2]);
+            assert!(result.warnings().is_empty());
+        }
+
         /// Apportionment with residual seats assigned with largest remainders method  
         /// This test does not trigger Kieswet Article P 9, since this requires a
         /// strict majority of votes (> 50%), so exactly 50% does not trigger it.
@@ -2446,6 +2482,42 @@ pub(crate) mod tests {
             assert_eq!(result.steps[6].change.list_number_assigned(), 1);
             let total_seats = get_total_seats_from_apportionment_result(&result);
             assert_eq!(total_seats, vec![13, 2, 2, 2, 2, 2, 1, 0]);
+            assert!(result.warnings().is_empty());
+        }
+
+        /// Apportionment with residual seats assigned with highest averages method
+        /// This test does not trigger a reassignment under Kieswet Article P 9, since the
+        /// list with an absolute majority of votes also has an absolute majority of seats.
+        ///
+        /// Full seats: [11, 4, 3] - Remainder seats: 1
+        /// 1 - highest average: [95, 92, 75] seat assigned to list 1
+        /// List 1 has an absolute majority of votes (1140 of 1900) and of seats (12 of 19),
+        /// so no reassignment takes place
+        #[test]
+        fn test_with_absolute_majority_of_votes_and_seats() {
+            let input =
+                seat_assignment_fixture_with_default_50_candidates(19, vec![1140, 460, 300]);
+            let SeatAssignment::Completed(result) = seat_assignment(&input).unwrap() else {
+                panic!("should be Completed");
+            };
+
+            assert_eq!(result.full_seats, 18);
+            assert_eq!(result.residual_seats, 1);
+            assert_eq!(result.steps.len(), 1);
+            assert!(
+                result.steps[0]
+                    .change
+                    .is_changed_by_highest_average_assignment()
+            );
+            assert_eq!(result.steps[0].change.list_number_assigned(), 1);
+            assert!(
+                result
+                    .steps
+                    .iter()
+                    .all(|step| !step.change.is_changed_by_absolute_majority_reassignment())
+            );
+            let total_seats = get_total_seats_from_apportionment_result(&result);
+            assert_eq!(total_seats, vec![12, 4, 3]);
             assert!(result.warnings().is_empty());
         }
 

@@ -136,7 +136,8 @@ impl Validate for DSOFirstSessionResults {
 #[cfg(test)]
 mod tests {
     use crate::domain::{
-        election::{CommitteeCategory, ElectionCategory, tests::election_fixture}, results::{
+        election::{CommitteeCategory, ElectionCategory, tests::election_fixture},
+        results::{
             Results,
             about_report::{AboutReport, ChecksAndCorrectionsPresent, CorrigendumPresent},
             checks_and_corrections::{ChecksAndCorrections, ReasonInvestigationOwnInitiative},
@@ -145,7 +146,10 @@ mod tests {
             voters_counts::VotersCounts,
             votes_counts::VotesCounts,
             yes_no::YesNo,
-        }, validate::{DataError, Validate, ValidationResult, ValidationResultCode, ValidationResults}
+        },
+        validate::{
+            DataError, Validate, ValidationResult, ValidationResultCode, ValidationResults,
+        },
     };
 
     fn validate(

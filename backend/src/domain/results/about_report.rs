@@ -3,7 +3,7 @@ use utoipa::ToSchema;
 
 use crate::domain::{
     compare::Compare,
-    election::{CommitteeCategory, ElectionWithPoliticalGroups},
+    election::ElectionWithPoliticalGroups,
     field_path::FieldPath,
     validate::{DataError, Validate, ValidationResult, ValidationResultCode, ValidationResults},
 };
@@ -57,33 +57,31 @@ impl Compare for AboutReport {
 impl Validate for AboutReport {
     fn validate(
         &self,
-        election: &ElectionWithPoliticalGroups,
+        _election: &ElectionWithPoliticalGroups,
         path: &FieldPath,
     ) -> Result<ValidationResults, DataError> {
         let mut validation_results = ValidationResults::default();
 
-        if election.committee_category == CommitteeCategory::GSB {
-            if self.corrigendum_present.is_none() || self.checks_and_corrections_present.is_none() {
-                validation_results.errors.push(ValidationResult {
-                    fields: vec![path.to_string()],
-                    code: ValidationResultCode::F121,
-                    context: None,
-                });
-            };
+        if self.corrigendum_present.is_none() || self.checks_and_corrections_present.is_none() {
+            validation_results.errors.push(ValidationResult {
+                fields: vec![path.to_string()],
+                code: ValidationResultCode::F121,
+                context: None,
+            });
+        };
 
-            if let (
-                Some(CorrigendumPresent::TwoDocuments),
-                Some(ChecksAndCorrectionsPresent::PageMissing),
-            ) = (
-                self.corrigendum_present,
-                self.checks_and_corrections_present,
-            ) {
-                validation_results.errors.push(ValidationResult {
-                    fields: vec![path.to_string()],
-                    code: ValidationResultCode::F122,
-                    context: None,
-                });
-            }
+        if let (
+            Some(CorrigendumPresent::TwoDocuments),
+            Some(ChecksAndCorrectionsPresent::PageMissing),
+        ) = (
+            self.corrigendum_present,
+            self.checks_and_corrections_present,
+        ) {
+            validation_results.errors.push(ValidationResult {
+                fields: vec![path.to_string()],
+                code: ValidationResultCode::F122,
+                context: None,
+            });
         }
 
         Ok(validation_results)

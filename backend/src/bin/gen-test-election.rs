@@ -303,9 +303,11 @@ async fn export_election(
         let input = ModelNa31_2Input {
             votes_tables: VotesTables::new(election, &election_totals)
                 .expect("Votes tables should be created"),
-            summary: election_totals
-                .try_into()
-                .expect("Election totals should be converted to summary"),
+            summary: (&election_totals).into(),
+            polling_station_investigations: election_totals
+                .cso_investigations()
+                .expect("Election totals should be CSO totals")
+                .clone(),
             committee_session: committee_session.clone(),
             polling_stations: polling_stations.iter().map(Clone::clone).collect(),
             election: election.clone().into(),

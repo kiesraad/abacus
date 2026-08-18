@@ -5,10 +5,10 @@ use crate::domain::{
     election::Election,
     models::{
         PdfFileModel, PdfModel, ToPdfFileModel, apportionment_footnotes::ApportionmentFootnotes,
+        election_totals::ElectionTotalsCSB,
         enriched_candidate_nomination::EnrichedCandidateNomination,
         enriched_seat_assignment::EnrichedSeatAssignment, votes_table::VotesTables,
     },
-    tabulation::ElectionTotalsCSB,
 };
 
 #[derive(Serialize, Deserialize)]

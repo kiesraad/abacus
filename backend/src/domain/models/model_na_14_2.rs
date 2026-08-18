@@ -6,11 +6,11 @@ use crate::domain::{
     investigation::PollingStationInvestigation,
     models::{
         PdfFileModel, PdfModel, ToPdfFileModel,
+        election_totals::ElectionTotalsWithoutVotes,
         votes_table::{VotesTablesWithOnlyPreviousVotes, VotesTablesWithPreviousVotes},
     },
     polling_station::PollingStation,
     results::common_polling_station_results::CommonPollingStationResultsWithoutVotes,
-    tabulation::ElectionTotalsWithoutVotes,
 };
 
 #[derive(Serialize, Deserialize)]

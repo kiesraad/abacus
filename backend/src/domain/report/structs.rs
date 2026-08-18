@@ -11,13 +11,14 @@ use crate::{
     domain::{
         committee_session::{CommitteeSession, CommitteeSessionId},
         data_entry::DataEntrySource,
-        election::{CommitteeCategory, ElectionWithPoliticalGroups},
+        election::{CommitteeCategory, ElectionWithPoliticalGroups, VoteCountingMethod},
         file::{File, FileType},
         investigation::PollingStationInvestigation,
         models::{
             ModelNa14_2Input, ModelNa31_2Input, ModelP2aInput, ModelP22_2Bijlage1Input,
             ModelP22_2Input, PdfFileModel, ToPdfFileModel,
             apportionment_footnotes::ApportionmentFootnotes,
+            election_totals::ElectionTotalsCSB,
             enriched_candidate_nomination::EnrichedCandidateNomination,
             enriched_seat_assignment::EnrichedSeatAssignment,
             votes_table::{VotesTables, VotesTablesWithPreviousVotes},
@@ -25,7 +26,7 @@ use crate::{
         polling_station::PollingStation,
         report::DEFAULT_DATE_TIME_FORMAT,
         results::{Results, political_group_candidate_votes::PoliticalGroupCandidateVotes},
-        tabulation::{ElectionTotals, ElectionTotalsCSB},
+        tabulation::ElectionTotals,
     },
     eml::EmlHash,
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType},
@@ -492,6 +493,13 @@ impl ResultsInputGSB {
     ) -> Result<PdfFileModel, APIError> {
         let data = &self.data;
 
+        // Na 14-2 is only for CSO, DSO uses Na 14-1
+        if data.election.counting_method != Some(VoteCountingMethod::CSO) {
+            return Err(APIError::DataIntegrityError(
+                "Na 14-2 report is only supported for CSO".to_string(),
+            ));
+        }
+
         let pdf_file = ModelNa14_2Input {
             votes_tables: VotesTablesWithPreviousVotes::new(
                 &data.election,
@@ -500,8 +508,8 @@ impl ResultsInputGSB {
             )?,
             committee_session: data.committee_session.clone(),
             election: data.election.clone().into(),
-            summary: data.totals.clone().try_into()?,
-            previous_summary: previous_totals.clone().try_into()?,
+            summary: (&data.totals).into(),
+            previous_summary: previous_totals.into(),
             previous_committee_session: previous_committee_session.clone(),
             hash,
             creation_date_time,
@@ -522,7 +530,8 @@ impl ResultsInputGSB {
             votes_tables: VotesTables::new(&data.election, &data.totals)?,
             committee_session: data.committee_session.clone(),
             polling_stations: data.polling_stations.clone(),
-            summary: data.totals.clone().try_into()?,
+            summary: (&data.totals).into(),
+            polling_station_investigations: data.totals.cso_investigations()?.clone(),
             election: data.election.clone().into(),
             hash,
             creation_date_time,

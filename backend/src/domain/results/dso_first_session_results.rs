@@ -154,6 +154,7 @@ mod tests {
 
     fn validate(
         corrigendum_present: Option<CorrigendumPresent>,
+        checks_and_corrections_present: Option<ChecksAndCorrectionsPresent>,
         reason_investigation_own_initiative: ReasonInvestigationOwnInitiative,
         corrected_results_own_initiative: YesNo,
         corrected_results_csb_request: YesNo,
@@ -161,7 +162,7 @@ mod tests {
         let validation_results = Results::DSOFirstSession(DSOFirstSessionResults {
             about_report: AboutReport {
                 corrigendum_present,
-                checks_and_corrections_present: Some(ChecksAndCorrectionsPresent::PagePresent),
+                checks_and_corrections_present,
             },
             checks_and_corrections: ChecksAndCorrections {
                 reason_investigation_own_initiative,
@@ -196,6 +197,7 @@ mod tests {
         let cases = vec![
             (
                 Some(CorrigendumPresent::TwoDocuments),
+                Some(ChecksAndCorrectionsPresent::PagePresent),
                 ReasonInvestigationOwnInitiative::default(),
                 YesNo::no(),
                 YesNo::default(),
@@ -203,6 +205,7 @@ mod tests {
             ),
             (
                 Some(CorrigendumPresent::TwoDocuments),
+                Some(ChecksAndCorrectionsPresent::PagePresent),
                 ReasonInvestigationOwnInitiative {
                     unaccounted_difference: true,
                     other_error: false,
@@ -213,6 +216,7 @@ mod tests {
             ),
             (
                 Some(CorrigendumPresent::TwoDocuments),
+                Some(ChecksAndCorrectionsPresent::PagePresent),
                 ReasonInvestigationOwnInitiative::default(),
                 YesNo::yes(),
                 YesNo::default(),
@@ -220,6 +224,7 @@ mod tests {
             ),
             (
                 Some(CorrigendumPresent::OneDocument),
+                Some(ChecksAndCorrectionsPresent::PagePresent),
                 ReasonInvestigationOwnInitiative::default(),
                 YesNo::no(),
                 YesNo::default(),
@@ -227,6 +232,7 @@ mod tests {
             ),
             (
                 Some(CorrigendumPresent::TwoDocuments),
+                Some(ChecksAndCorrectionsPresent::PagePresent),
                 ReasonInvestigationOwnInitiative {
                     unaccounted_difference: true,
                     other_error: true,
@@ -235,12 +241,21 @@ mod tests {
                 YesNo::default(),
                 true,
             ),
+            (
+                Some(CorrigendumPresent::TwoDocuments),
+                Some(ChecksAndCorrectionsPresent::PageMissing),
+                ReasonInvestigationOwnInitiative::default(),
+                YesNo::default(),
+                YesNo::default(),
+                false,
+            ),
         ];
 
         for (
             case_index,
             (
                 corrigendum_present,
+                checks_and_corrections_present,
                 reason_investigation_own_initiative,
                 corrected_results_own_initiative,
                 corrected_results_csb_request,
@@ -250,6 +265,7 @@ mod tests {
         {
             let result = validate(
                 corrigendum_present,
+                checks_and_corrections_present,
                 reason_investigation_own_initiative.clone(),
                 corrected_results_own_initiative.clone(),
                 corrected_results_csb_request.clone(),
@@ -267,6 +283,7 @@ mod tests {
 
     /// GSB DSO | F.133: 'Controles en correcties - Op eigen initiatief': 'controles en correcties aanwezig' = 'ja' EN 'gecorrigeerde telresultaten' = 'ja' EN 'Over het proces-verbaal: Is er een corrigendum?' = 'nee'
     #[test]
+    #[expect(clippy::too_many_lines)]
     fn test_f133() -> Result<(), DataError> {
         let f133 = ValidationResult {
             code: ValidationResultCode::F133,
@@ -277,6 +294,7 @@ mod tests {
         let cases = vec![
             (
                 Some(CorrigendumPresent::OneDocument),
+                Some(ChecksAndCorrectionsPresent::PagePresent),
                 ReasonInvestigationOwnInitiative::default(),
                 YesNo::yes(),
                 YesNo::default(),
@@ -284,6 +302,7 @@ mod tests {
             ),
             (
                 Some(CorrigendumPresent::TwoDocuments),
+                Some(ChecksAndCorrectionsPresent::PagePresent),
                 ReasonInvestigationOwnInitiative::default(),
                 YesNo::no(),
                 YesNo::no(),
@@ -291,6 +310,7 @@ mod tests {
             ),
             (
                 Some(CorrigendumPresent::OneDocument),
+                Some(ChecksAndCorrectionsPresent::PagePresent),
                 ReasonInvestigationOwnInitiative {
                     unaccounted_difference: true,
                     other_error: false,
@@ -299,12 +319,21 @@ mod tests {
                 YesNo::no(),
                 true,
             ),
+            (
+                Some(CorrigendumPresent::OneDocument),
+                Some(ChecksAndCorrectionsPresent::PageMissing),
+                ReasonInvestigationOwnInitiative::default(),
+                YesNo::default(),
+                YesNo::default(),
+                false,
+            ),
         ];
 
         for (
             case_index,
             (
                 corrigendum_present,
+                checks_and_corrections_present,
                 reason_investigation_own_initiative,
                 corrected_results_own_initiative,
                 corrected_results_csb_request,
@@ -314,6 +343,7 @@ mod tests {
         {
             let result = validate(
                 corrigendum_present,
+                checks_and_corrections_present,
                 reason_investigation_own_initiative.clone(),
                 corrected_results_own_initiative.clone(),
                 corrected_results_csb_request.clone(),

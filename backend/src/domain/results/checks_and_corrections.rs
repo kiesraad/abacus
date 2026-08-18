@@ -136,15 +136,7 @@ mod tests {
     use super::*;
     use crate::domain::{
         election::{CommitteeCategory, ElectionCategory, tests::election_fixture},
-        results::{
-            Results,
-            about_report::{AboutReport, ChecksAndCorrectionsPresent, CorrigendumPresent},
-            differences_counts::DifferencesCounts,
-            dso_first_session_results::DSOFirstSessionResults,
-            voters_counts::VotersCounts,
-            votes_counts::VotesCounts,
-            yes_no::YesNo,
-        },
+        results::yes_no::YesNo,
         validate::{DataError, ValidationResult, ValidationResultCode, ValidationResults},
     };
 
@@ -153,28 +145,17 @@ mod tests {
         corrected_results_own_initiative: YesNo,
         corrected_results_csb_request: YesNo,
     ) -> Result<ValidationResults, DataError> {
-        let validation_results = Results::DSOFirstSession(DSOFirstSessionResults {
-            about_report: AboutReport {
-                corrigendum_present: Some(CorrigendumPresent::TwoDocuments),
-                checks_and_corrections_present: Some(ChecksAndCorrectionsPresent::PagePresent),
-            },
-            checks_and_corrections: ChecksAndCorrections {
-                reason_investigation_own_initiative,
-                corrected_results_own_initiative,
-                corrected_results_csb_request,
-            },
-            voters_counts: VotersCounts::default(),
-            votes_counts: VotesCounts::default(),
-            differences_counts: DifferencesCounts::default(),
-            political_group_votes: vec![],
-        })
+        let validation_results = ChecksAndCorrections {
+            reason_investigation_own_initiative,
+            corrected_results_own_initiative,
+            corrected_results_csb_request,
+        }
         .validate(
             &election_fixture(ElectionCategory::Municipal, CommitteeCategory::GSB, &[]),
             &"checks_and_corrections".into(),
         )?;
 
-        // We allow one, because we expect W.204 to trigger with no political_group_votes.
-        assert_eq!(validation_results.warnings.len(), 1);
+        assert!(validation_results.warnings.is_empty());
         Ok(validation_results)
     }
 

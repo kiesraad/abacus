@@ -450,13 +450,7 @@ mod tests {
             PollingStation, PollingStationFirstSession, test_helpers::polling_stations_fixture,
         },
         results::{
-            checks_and_corrections::{ChecksAndCorrections, ReasonInvestigationOwnInitiative},
-            differences_counts::DifferencesCounts,
-            extra_investigation::ExtraInvestigation,
-            gsb_differences_counts::GSBDifferencesCounts,
-            gsb_results::GSBResults,
-            next_session_results::NextSessionResults,
-            yes_no::YesNo,
+            about_report::{AboutReport, ChecksAndCorrectionsPresent, CorrigendumPresent}, checks_and_corrections::{ChecksAndCorrections, ReasonInvestigationOwnInitiative}, differences_counts::DifferencesCounts, extra_investigation::ExtraInvestigation, gsb_differences_counts::GSBDifferencesCounts, gsb_results::GSBResults, next_session_results::NextSessionResults, yes_no::YesNo
         },
         sub_committee::{SubCommittee, SubCommitteeFirstSession, SubCommitteeId},
         valid_default::ValidDefault,
@@ -572,7 +566,10 @@ mod tests {
         };
 
         Results::DSOFirstSession(DSOFirstSessionResults {
-            about_report: Default::default(),
+            about_report: AboutReport {
+                corrigendum_present: Some(CorrigendumPresent::TwoDocuments),
+                checks_and_corrections_present: Some(ChecksAndCorrectionsPresent::PagePresent),
+            },
             checks_and_corrections,
             voters_counts: cso_results.voters_counts,
             votes_counts: cso_results.votes_counts,

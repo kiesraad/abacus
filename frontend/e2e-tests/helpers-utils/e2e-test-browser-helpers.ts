@@ -156,7 +156,7 @@ export async function createInvestigation(page: Page, pollingStation: string, re
   const investigationPrintCorrigendumPage = new InvestigationPrintCorrigendumPgObj(page);
   await expect(investigationPrintCorrigendumPage.header).toBeVisible();
   const downloadPromise = page.waitForEvent("download");
-  await investigationPrintCorrigendumPage.downloadLink.click();
+  await investigationPrintCorrigendumPage.downloadButton.click();
   const download = await downloadPromise;
   expect(download.suggestedFilename()).toMatch(/Model_Na14-2_GR2022_Stembureau_\d+_Bijlage_1.pdf/);
   expect((await stat(await download.path())).size).toBeGreaterThan(1024);

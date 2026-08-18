@@ -350,7 +350,7 @@ impl ResultsInputCSB {
     ) -> Result<PdfFileModel, APIError> {
         let data = &self.data;
 
-        let totals_csb = ElectionTotalsCSB::new(&data.totals, &data.election.political_groups);
+        let totals_csb = ElectionTotalsCSB::new(&data.totals, &data.election.political_groups)?;
         let seat_assignment = map_seat_assignment(&apportionment_result.seat_assignment);
         let enriched_seat_assignment = EnrichedSeatAssignment::new(
             data.election.number_of_seats,
@@ -500,8 +500,8 @@ impl ResultsInputGSB {
             )?,
             committee_session: data.committee_session.clone(),
             election: data.election.clone().into(),
-            summary: data.totals.clone().into(),
-            previous_summary: previous_totals.clone().into(),
+            summary: data.totals.clone().try_into()?,
+            previous_summary: previous_totals.clone().try_into()?,
             previous_committee_session: previous_committee_session.clone(),
             hash,
             creation_date_time,
@@ -522,7 +522,7 @@ impl ResultsInputGSB {
             votes_tables: VotesTables::new(&data.election, &data.totals)?,
             committee_session: data.committee_session.clone(),
             polling_stations: data.polling_stations.clone(),
-            summary: data.totals.clone().into(),
+            summary: data.totals.clone().try_into()?,
             election: data.election.clone().into(),
             hash,
             creation_date_time,

@@ -55,8 +55,8 @@ use crate::{
             yes_no::YesNo,
         },
         tabulation::{
-            DifferencesTotals, ElectionTotals, ElectionTotalsCSB, PollingStationInvestigations,
-            SumCount,
+            CSOInvestigations, CommitteeSpecificTotals, DifferencesTotals, ElectionTotals,
+            ElectionTotalsCSB, GSBTotals, SumCount,
         },
     },
 };
@@ -430,7 +430,7 @@ fn random_election_totals(
             fewer_ballots_count: random_sum_count(rng, data_sources),
         },
         political_group_votes: result.political_group_votes,
-        polling_station_investigations: PollingStationInvestigations {
+        committee_specific: CommitteeSpecificTotals::GSB(GSBTotals::CSO(CSOInvestigations {
             admitted_voters_recounted: random_station_subset(rng, data_sources)
                 .into_iter()
                 .map(data_source_num)
@@ -443,8 +443,7 @@ fn random_election_totals(
                 .into_iter()
                 .map(data_source_num)
                 .collect(),
-        },
-        number_of_voters: Some(100),
+        })),
     }
 }
 
@@ -687,8 +686,8 @@ async fn test_na_14_2() {
             votes_tables: VotesTablesWithPreviousVotes::new(&election, &totals, &previous_totals)
                 .unwrap(),
             election: election.into(),
-            previous_summary: previous_totals.into(),
-            summary: totals.into(),
+            previous_summary: previous_totals.try_into().unwrap(),
+            summary: totals.try_into().unwrap(),
             committee_session,
             previous_committee_session,
             hash,
@@ -780,7 +779,7 @@ async fn test_na_31_2() {
             votes_tables: VotesTables::new(&election, &totals).unwrap(),
             committee_session,
             election: election.into(),
-            summary: totals.into(),
+            summary: totals.try_into().unwrap(),
             polling_stations,
             hash,
             creation_date_time,

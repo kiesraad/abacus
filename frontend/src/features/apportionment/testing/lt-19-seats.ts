@@ -1364,7 +1364,7 @@ export const political_group_1_votes: PoliticalGroupCandidateVotes = {
 };
 
 export const election_totals: ElectionTotals = {
-  number_of_voters: 2000,
+  committee_specific: { committee: "CSB", number_of_voters: 2000 },
   voters_counts: {
     poll_card_count: 1203,
     proxy_certificate_count: 2,
@@ -1395,11 +1395,6 @@ export const election_totals: ElectionTotals = {
       count: 0,
       data_entry_sources: [],
     },
-  },
-  polling_station_investigations: {
-    admitted_voters_recounted: [],
-    ballots_recounted: [],
-    investigated_other_reason: [],
   },
   political_group_votes: [
     political_group_1_votes,

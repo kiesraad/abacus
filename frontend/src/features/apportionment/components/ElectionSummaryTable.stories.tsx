@@ -11,7 +11,11 @@ export const DefaultWithNumberOfVoters: StoryObj = {
         votesCounts={gte19Seats.election_totals.votes_counts}
         seats={gte19Seats.seat_assignment.seats}
         quota={gte19Seats.seat_assignment.quota}
-        numberOfVoters={gte19Seats.election_totals.number_of_voters}
+        numberOfVoters={
+          gte19Seats.election_totals.committee_specific.committee === "CSB"
+            ? gte19Seats.election_totals.committee_specific.number_of_voters
+            : undefined
+        }
         preferenceThreshold={gte19Seats.candidate_nomination.preference_threshold}
         deceasedCandidatesInfo={
           {
@@ -89,7 +93,11 @@ export const DefaultWithoutVotes: StoryObj = {
         }}
         seats={gte19Seats.seat_assignment.seats}
         quota={gte19Seats.seat_assignment.quota}
-        numberOfVoters={gte19Seats.election_totals.number_of_voters}
+        numberOfVoters={
+          gte19Seats.election_totals.committee_specific.committee === "CSB"
+            ? gte19Seats.election_totals.committee_specific.number_of_voters
+            : undefined
+        }
         preferenceThreshold={gte19Seats.candidate_nomination.preference_threshold}
         deceasedCandidatesInfo={
           {

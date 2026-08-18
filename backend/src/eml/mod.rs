@@ -44,7 +44,7 @@ use crate::domain::{
         ElectionWithPoliticalGroups, NewElection, PGNumber, RegisteredPoliticalGroup,
     },
     results::political_group_candidate_votes::PoliticalGroupCandidateVotes,
-    tabulation::ElectionTotals,
+    tabulation::{CommitteeSpecificTotals, ElectionTotals},
 };
 
 fn max_votes(max_votes: &StringValue<NonZeroU64>) -> u32 {
@@ -661,10 +661,11 @@ impl ElectionWithPoliticalGroups {
     }
 
     /// Depending on the context of the totals coming from GSB or from CSB, the number of voters source is different.
-    /// In case of a GSB totals, the number of voters there should be the valid source.
-    /// Otherwise, it is the given number of voters.
     fn get_eligible_voter_count(&self, totals: &ElectionTotals) -> u32 {
-        totals.number_of_voters.unwrap_or(self.number_of_voters)
+        match totals.committee_specific {
+            CommitteeSpecificTotals::CSB { number_of_voters } => number_of_voters,
+            CommitteeSpecificTotals::GSB(_) => self.number_of_voters,
+        }
     }
 
     fn as_eml_count_selections(
@@ -1187,11 +1188,13 @@ mod tests {
 
     #[test]
     fn test_as_eml_count_contest() {
-        // Default number_of_voters=1000
-        let mut election =
-            election_fixture(ElectionCategory::Municipal, CommitteeCategory::CSB, &[2]);
+        // CSB elections take the eligible voter count from the totals
+        let election = election_fixture(ElectionCategory::Municipal, CommitteeCategory::CSB, &[2]);
         let committee_session = committee_session_fixture(election.id);
         let mut totals = ElectionTotals::tabulate(&election, &[]).unwrap();
+        totals.committee_specific = CommitteeSpecificTotals::CSB {
+            number_of_voters: 1001,
+        };
 
         let result_csb = election
             .as_eml_count_contest(&committee_session, &[], &totals)
@@ -1199,7 +1202,7 @@ mod tests {
         let total_votes_csb = result_csb.total_votes.unwrap();
         assert_eq!(
             total_votes_csb.eligible_voter_count,
-            StringValue::from_value(1000u64)
+            StringValue::from_value(1001u64)
         );
         assert!(
             !total_votes_csb
@@ -1208,8 +1211,10 @@ mod tests {
         );
         assert!(result_csb.reporting_unit_votes.is_empty());
 
-        election.committee_category = CommitteeCategory::GSB;
-        totals.number_of_voters = Some(1001);
+        // GSB elections take the eligible voter count from the election (default number_of_voters=1000)
+        let election = election_fixture(ElectionCategory::Municipal, CommitteeCategory::GSB, &[2]);
+        let committee_session = committee_session_fixture(election.id);
+        let totals = ElectionTotals::tabulate(&election, &[]).unwrap();
         let result_gsb = election
             .as_eml_count_contest(&committee_session, &[source_and_results_gsb(None)], &totals)
             .unwrap();
@@ -1217,7 +1222,7 @@ mod tests {
         let total_votes_gsb = result_gsb.total_votes.unwrap();
         assert_eq!(
             total_votes_gsb.eligible_voter_count,
-            StringValue::from_value(1001u64)
+            StringValue::from_value(1000u64)
         );
 
         assert_eq!(

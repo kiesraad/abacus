@@ -1,5 +1,5 @@
 use apportionment::ApportionmentOutput;
-use chrono::{DateTime, Local, Utc};
+use chrono::{Local, Utc};
 use sqlx::{SqliteConnection, SqlitePool};
 
 use crate::{
@@ -14,7 +14,7 @@ use crate::{
         file::{File, FileType},
         report::structs::{
             CsbFiles, FileCreatedAuditData, GeneratedFile, GsbFiles, ResultsInputCSB,
-            ResultsInputGSB,
+            ResultsInputData, ResultsInputGSB,
         },
     },
     infra::audit_log::AuditService,
@@ -29,20 +29,19 @@ use crate::{
 struct FileSaver<'a> {
     conn: &'a mut SqliteConnection,
     audit_service: &'a AuditService,
-    committee_session: &'a CommitteeSession,
-    created_at: DateTime<Local>,
+    input: &'a ResultsInputData,
 }
 
 impl FileSaver<'_> {
     async fn save(&mut self, generated_file: GeneratedFile) -> Result<File, APIError> {
         let file = file_repo::create(
             self.conn,
-            self.committee_session.id,
+            self.input.committee_session.id,
             generated_file.file_type,
             generated_file.filename,
             &generated_file.content,
             generated_file.file_type.mime_type().into(),
-            self.created_at.with_timezone(&Utc),
+            self.input.created_at.with_timezone(&Utc),
         )
         .await?;
 
@@ -65,8 +64,7 @@ async fn generate_and_save_files_gsb_election(
     let mut saver = FileSaver {
         conn,
         audit_service,
-        committee_session: &input_data.committee_session,
-        created_at: input_data.created_at,
+        input: input_data,
     };
 
     let mut files = GsbFiles {
@@ -108,8 +106,7 @@ async fn generate_and_save_files_csb_election(
     let mut saver = FileSaver {
         conn,
         audit_service,
-        committee_session: &input_data.committee_session,
-        created_at: input_data.created_at,
+        input: input_data,
     };
 
     let apportionment_input = ApportionmentInputData::new(

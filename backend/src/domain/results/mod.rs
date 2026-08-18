@@ -455,6 +455,7 @@ impl Compare for Results {
 
 impl ValidateRoot for Results {}
 
+#[allow(clippy::too_many_lines, reason = "This is a refactoring candidate")]
 impl Validate for Results {
     fn validate(
         &self,
@@ -480,19 +481,33 @@ impl Validate for Results {
                 if let Some(ChecksAndCorrectionsPresent::PagePresent) =
                     results.about_report.checks_and_corrections_present
                 {
-                    if let Some(CorrigendumPresent::TwoDocuments) =
-                        results.about_report.corrigendum_present
-                        && results
-                            .checks_and_corrections
-                            .corrected_results_own_initiative
-                            == YesNo::no()
-                    {
-                        validation_results.errors.push(ValidationResult {
-                            fields: vec![path.to_string()],
-                            code: ValidationResultCode::F132,
-                            context: None,
-                        });
-                    };
+                    match results.about_report.corrigendum_present {
+                        Some(CorrigendumPresent::TwoDocuments)
+                            if results
+                                .checks_and_corrections
+                                .corrected_results_own_initiative
+                                == YesNo::no() =>
+                        {
+                            validation_results.errors.push(ValidationResult {
+                                fields: vec![path.to_string()],
+                                code: ValidationResultCode::F132,
+                                context: None,
+                            });
+                        }
+                        Some(CorrigendumPresent::OneDocument)
+                            if results
+                                .checks_and_corrections
+                                .corrected_results_own_initiative
+                                == YesNo::yes() =>
+                        {
+                            validation_results.errors.push(ValidationResult {
+                                fields: vec![path.to_string()],
+                                code: ValidationResultCode::F133,
+                                context: None,
+                            });
+                        }
+                        _ => {}
+                    }
 
                     validation_results
                         .join(results.checks_and_corrections.validate(election, path)?);

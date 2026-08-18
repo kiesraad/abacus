@@ -9,6 +9,7 @@ use crate::domain::{
         common_polling_station_results::CommonPollingStationResults, count::Count,
         political_group_candidate_votes::PoliticalGroupCandidateVotes,
     },
+    tabulation::ElectionTotals,
 };
 
 const DEFAULT_CANDIDATES_PER_COLUMN: [usize; 4] = [25, 25, 15, 15];
@@ -34,7 +35,7 @@ pub struct VotesTables(Vec<VotesTable>);
 impl VotesTables {
     pub fn new(
         election: &ElectionWithPoliticalGroups,
-        totals_political_group_votes: &[PoliticalGroupCandidateVotes],
+        totals: &ElectionTotals,
     ) -> Result<Self, ModelsError> {
         Ok(VotesTables(
             election
@@ -42,7 +43,7 @@ impl VotesTables {
                 .iter()
                 .map(|group| {
                     let candidate_votes =
-                        get_votes_for_political_party(group.number, totals_political_group_votes)?;
+                        get_votes_for_political_party(group.number, &totals.political_group_votes)?;
                     VotesTable::new(
                         group,
                         Some(candidate_votes),
@@ -61,8 +62,8 @@ pub struct VotesTablesWithPreviousVotes(Vec<VotesTable>);
 impl VotesTablesWithPreviousVotes {
     pub fn new(
         election: &ElectionWithPoliticalGroups,
-        totals_political_group_votes: &[PoliticalGroupCandidateVotes],
-        previous_totals_political_group_votes: &[PoliticalGroupCandidateVotes],
+        totals: &ElectionTotals,
+        previous_totals: &ElectionTotals,
     ) -> Result<Self, ModelsError> {
         Ok(VotesTablesWithPreviousVotes(
             election
@@ -70,10 +71,10 @@ impl VotesTablesWithPreviousVotes {
                 .iter()
                 .map(|group| {
                     let candidate_votes =
-                        get_votes_for_political_party(group.number, totals_political_group_votes)?;
+                        get_votes_for_political_party(group.number, &totals.political_group_votes)?;
                     let previous_candidate_votes = get_votes_for_political_party(
                         group.number,
-                        previous_totals_political_group_votes,
+                        &previous_totals.political_group_votes,
                     )?;
                     VotesTable::new(
                         group,
@@ -309,7 +310,6 @@ mod tests {
             ElectionSubCategory, VoteCountingMethod,
         },
         results::political_group_candidate_votes::CandidateVotes,
-        tabulation::ElectionTotals,
     };
 
     fn sample_candidate(number: CandidateNumber) -> Candidate {
@@ -387,7 +387,7 @@ mod tests {
         let election = sample_election(group);
         let totals = ElectionTotals::zero(&election);
 
-        let err = VotesTables::new(&election, &totals.political_group_votes).unwrap_err();
+        let err = VotesTables::new(&election, &totals).unwrap_err();
 
         match err {
             ModelsError::DataIntegrityError(message) => {

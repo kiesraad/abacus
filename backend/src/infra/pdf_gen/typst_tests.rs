@@ -48,7 +48,7 @@ async fn it_generates_a_pdf() {
         ModelNa31_2Input {
             summary: (&totals).into(),
             polling_station_investigations: totals.cso_investigations().unwrap().clone(),
-            votes_tables: VotesTables::new(&election, &totals.political_group_votes).unwrap(),
+            votes_tables: VotesTables::new(&election, &totals).unwrap(),
             committee_session: committee_session_fixture(ElectionId::from(1)),
             election: election.into(),
             polling_stations: vec![],
@@ -114,7 +114,7 @@ async fn it_generates_a_pdf_with_polling_stations() {
 
     let content = generate_pdf(
         ModelNa31_2Input {
-            votes_tables: VotesTables::new(&election, &totals.political_group_votes).unwrap(),
+            votes_tables: VotesTables::new(&election, &totals).unwrap(),
             summary: (&totals).into(),
             polling_station_investigations: totals.cso_investigations().unwrap().clone(),
             polling_stations: polling_stations_fixture(&[100, 200, 300]),

@@ -738,12 +738,8 @@ async fn test_na_14_2() {
             .to_string();
 
         let model = PdfModel::ModelNa14_2(Box::new(ModelNa14_2Input {
-            votes_tables: VotesTablesWithPreviousVotes::new(
-                &election,
-                &totals.political_group_votes,
-                &previous_totals.political_group_votes,
-            )
-            .unwrap(),
+            votes_tables: VotesTablesWithPreviousVotes::new(&election, &totals, &previous_totals)
+                .unwrap(),
             election: election.into(),
             previous_summary: (&previous_totals).into(),
             summary: (&totals).into(),
@@ -818,7 +814,7 @@ async fn test_na_31_1() {
             .to_string();
 
         let model = PdfModel::ModelNa31_1(Box::new(ModelNa31_1Input {
-            votes_tables: VotesTables::new(&election, &totals.political_group_votes).unwrap(),
+            votes_tables: VotesTables::new(&election, &totals).unwrap(),
             committee_session,
             election: election.into(),
             summary: (&totals).into(),
@@ -880,7 +876,7 @@ async fn test_na_31_2() {
             .to_string();
 
         let model = PdfModel::ModelNa31_2(Box::new(ModelNa31_2Input {
-            votes_tables: VotesTables::new(&election, &totals.political_group_votes).unwrap(),
+            votes_tables: VotesTables::new(&election, &totals).unwrap(),
             committee_session,
             election: election.into(),
             summary: (&totals).into(),
@@ -1161,7 +1157,7 @@ async fn test_p_22_2_bijlage_1() {
             random_polling_stations(&mut rng, string_length, none_where_possible);
         let data_sources = ps_as_first_data_entry_sources(&polling_stations);
         let totals_gsb = random_election_totals_gsb_cso(&mut rng, &election, &data_sources);
-        let votes_tables = VotesTables::new(&election, &totals_gsb.political_group_votes).unwrap();
+        let votes_tables = VotesTables::new(&election, &totals_gsb).unwrap();
         let hash = random_string(&mut rng, 64);
         let creation_date_time = random_date_time(&mut rng)
             .format(DEFAULT_DATE_TIME_FORMAT)

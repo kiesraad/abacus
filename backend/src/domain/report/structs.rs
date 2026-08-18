@@ -408,7 +408,7 @@ impl ResultsInputCSB {
     ) -> Result<PdfFileModel, APIError> {
         let data = &self.data;
 
-        let votes_tables = VotesTables::new(&data.election, &data.totals.political_group_votes)?;
+        let votes_tables = VotesTables::new(&data.election, &data.totals)?;
         let pdf_file = ModelP22_2Bijlage1Input {
             election: data.election.clone().into(),
             votes_tables,
@@ -544,8 +544,8 @@ impl ResultsInputGSB {
         let pdf_file = ModelNa14_2Input {
             votes_tables: VotesTablesWithPreviousVotes::new(
                 &data.election,
-                &data.totals.political_group_votes,
-                &previous_totals.political_group_votes,
+                &data.totals,
+                previous_totals,
             )?,
             committee_session: data.committee_session.clone(),
             election: data.election.clone().into(),
@@ -568,7 +568,7 @@ impl ResultsInputGSB {
         let data = &self.data;
 
         let pdf_file = ModelNa31_1Input {
-            votes_tables: VotesTables::new(&data.election, &data.totals.political_group_votes)?,
+            votes_tables: VotesTables::new(&data.election, &data.totals)?,
             committee_session: data.committee_session.clone(),
             polling_stations: data.polling_stations.clone(),
             summary: (&data.totals).into(),
@@ -590,7 +590,7 @@ impl ResultsInputGSB {
         let data = &self.data;
 
         let pdf_file = ModelNa31_2Input {
-            votes_tables: VotesTables::new(&data.election, &data.totals.political_group_votes)?,
+            votes_tables: VotesTables::new(&data.election, &data.totals)?,
             committee_session: data.committee_session.clone(),
             polling_stations: data.polling_stations.clone(),
             summary: (&data.totals).into(),

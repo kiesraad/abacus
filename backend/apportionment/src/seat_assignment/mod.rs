@@ -1663,6 +1663,61 @@ pub(crate) mod tests {
                 assert_eq!(total_seats, [0, 0, 0, 1, 1, 8]);
             }
 
+            /// Apportionment with residual seats assigned with largest remainders method,
+            /// where the seat freed by list exhaustion starts the 1st round of the highest averages method
+            ///
+            /// 8 seats, quota = 80 votes / 8 = 10
+            /// Full seats: [4, 2, 0, 0] - Remainder seats: 2
+            /// Remainders: [4, 3, 7, 6], only votes of lists [1, 2] meet the threshold of 75% of the quota
+            /// 1 - largest remainder: seat assigned to list 1
+            /// 2 - largest remainder: seat assigned to list 2
+            /// 3 - Seat first assigned to list 1 has been removed and
+            ///     will be assigned to another list in accordance with Article P 10 Kieswet
+            /// 1st round of highest averages method (assignment to unique lists):
+            /// 4 - highest average: [8 4/5, 5 3/4, 7, 6] seat assigned to list 3
+            ///     (list 1 is exhausted, list 2 already received a residual seat)
+            #[test]
+            fn test_with_list_exhaustion_triggering_1st_round_highest_average_assignment() {
+                let input = seat_assignment_fixture_with_given_candidate_votes(
+                    8,
+                    vec![vec![11, 11, 11, 11], vec![10, 8, 5], vec![7], vec![6]],
+                );
+                let SeatAssignment::Completed(result) = seat_assignment(&input).unwrap() else {
+                    panic!("should be Completed");
+                };
+
+                assert_eq!(result.full_seats, 6);
+                assert_eq!(result.residual_seats, 2);
+                assert_eq!(result.steps.len(), 4);
+                assert!(
+                    result.steps[0]
+                        .change
+                        .is_changed_by_largest_remainder_assignment()
+                );
+                assert_eq!(result.steps[0].change.list_number_assigned(), 1);
+                assert!(
+                    result.steps[1]
+                        .change
+                        .is_changed_by_largest_remainder_assignment()
+                );
+                assert_eq!(result.steps[1].change.list_number_assigned(), 2);
+                assert!(
+                    result.steps[2]
+                        .change
+                        .is_changed_by_list_exhaustion_removal()
+                );
+                assert_eq!(result.steps[2].change.list_number_retracted(), 1);
+                assert!(
+                    result.steps[3]
+                        .change
+                        .is_changed_by_unique_highest_average_assignment()
+                );
+                assert_eq!(result.steps[3].change.list_number_assigned(), 3);
+                let total_seats = get_total_seats_from_apportionment_result(&result);
+                assert_eq!(total_seats, [4, 3, 1, 0]);
+                assert!(result.warnings().is_empty());
+            }
+
             /// Apportionment with residual seats assigned with largest remainders and highest averages methods
             ///
             /// Full seats: [0, 0, 5] - Remainder seats: 1  

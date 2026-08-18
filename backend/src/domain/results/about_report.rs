@@ -93,7 +93,7 @@ impl Validate for AboutReport {
 #[cfg(test)]
 mod tests {
     use crate::domain::{
-        election::{tests::election_fixture, CommitteeCategory, ElectionCategory},
+        election::{CommitteeCategory, ElectionCategory, tests::election_fixture},
         results::about_report::{AboutReport, ChecksAndCorrectionsPresent, CorrigendumPresent},
         validate::{
             DataError, Validate, ValidationResult, ValidationResultCode, ValidationResults,

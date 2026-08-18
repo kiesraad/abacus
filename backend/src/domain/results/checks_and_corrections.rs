@@ -111,14 +111,6 @@ impl Validate for ChecksAndCorrections {
                 });
             }
 
-            if !self.corrected_results_csb_request.is_empty() {
-                validation_results.errors.push(ValidationResult {
-                    fields: vec![path.to_string()],
-                    code: ValidationResultCode::F133,
-                    context: None,
-                });
-            }
-
             if self.corrected_results_own_initiative.is_both() {
                 validation_results.errors.push(ValidationResult {
                     fields: vec![path.to_string()],
@@ -143,15 +135,15 @@ impl Validate for ChecksAndCorrections {
 mod tests {
     use super::*;
     use crate::domain::{
-        election::{tests::election_fixture, CommitteeCategory, ElectionCategory},
+        election::{CommitteeCategory, ElectionCategory, tests::election_fixture},
         results::{
+            Results,
             about_report::{AboutReport, ChecksAndCorrectionsPresent, CorrigendumPresent},
             differences_counts::DifferencesCounts,
             dso_first_session_results::DSOFirstSessionResults,
             voters_counts::VotersCounts,
             votes_counts::VotesCounts,
             yes_no::YesNo,
-            Results,
         },
         validate::{DataError, ValidationResult, ValidationResultCode, ValidationResults},
     };

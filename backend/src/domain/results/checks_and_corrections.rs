@@ -262,7 +262,7 @@ mod tests {
         Ok(())
     }
 
-    /// GSB DSO | F.132: 'Controles en correcties - Op eigen initiatief': 'controles en correcties aanwezig' = 'ja' EN één of beide vragen niet beantwoord
+    /// GSB DSO | F.132: 'Controles en correcties - Op eigen initiatief': 'controles en correcties aanwezig' = 'ja' EN 'gecorrigeerde telresultaten' = 'nee' EN 'Over het proces-verbaal: Is er een corrigendum?' = 'ja'
     #[test]
     #[allow(clippy::too_many_lines)]
     fn test_f132() -> Result<(), DataError> {

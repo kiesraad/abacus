@@ -301,7 +301,7 @@ async fn export_election(
         let election_totals =
             ElectionTotals::tabulate(election, &results).expect("Failed to create election totals");
         let input = ModelNa31_2Input {
-            votes_tables: VotesTables::new(election, &election_totals)
+            votes_tables: VotesTables::new(election, &election_totals.political_group_votes)
                 .expect("Votes tables should be created"),
             summary: (&election_totals).into(),
             polling_station_investigations: election_totals

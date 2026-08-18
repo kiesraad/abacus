@@ -15,8 +15,8 @@ use crate::{
         file::{File, FileType},
         investigation::PollingStationInvestigation,
         models::{
-            ModelNa14_2Input, ModelNa31_2Input, ModelP2aInput, ModelP22_2Bijlage1Input,
-            ModelP22_2Input, PdfFileModel, ToPdfFileModel,
+            ModelNa14_2Input, ModelNa31_1Input, ModelNa31_2Input, ModelP2aInput,
+            ModelP22_2Bijlage1Input, ModelP22_2Input, PdfFileModel, ToPdfFileModel,
             apportionment_footnotes::ApportionmentFootnotes,
             election_totals::ElectionTotalsCSB,
             enriched_candidate_nomination::EnrichedCandidateNomination,
@@ -134,6 +134,77 @@ impl CsbFiles {
     }
 }
 
+/// Generates a filename for the given election and file extension
+/// E.g. "{base}_GR2026_GemeenteNaam.{ext}"
+pub fn election_filename(election: &ElectionWithPoliticalGroups, base: &str, ext: &str) -> String {
+    let location_without_whitespace: String = election.location.split_whitespace().collect();
+
+    format!(
+        "{base} {}{} {}.{ext}",
+        election.category.to_eml_code(),
+        election.election_date.year(),
+        location_without_whitespace,
+    )
+}
+
+pub fn csv_filename(election: &ElectionWithPoliticalGroups) -> String {
+    format!(
+        "osv4-3_telling_{}{}_{}.csv",
+        election.category.to_eml_code().to_lowercase(),
+        election.election_date.year(),
+        election
+            .location
+            .split_whitespace()
+            .collect::<String>()
+            .to_lowercase(),
+    )
+}
+
+pub fn generated_file(
+    committee_session: &CommitteeSession,
+    election: &ElectionWithPoliticalGroups,
+    file_type: FileType,
+    content: Vec<u8>,
+) -> GeneratedFile {
+    GeneratedFile {
+        file_type,
+        filename: filename_for(committee_session, election, file_type),
+        content,
+    }
+}
+
+pub fn filename_for(
+    committee_session: &CommitteeSession,
+    election: &ElectionWithPoliticalGroups,
+    file_type: FileType,
+) -> String {
+    use FileType::*;
+
+    let filename = match file_type {
+        GsbResultsEml => election_filename(election, "Telling", "eml.xml"),
+        GsbResultsPdf => {
+            if committee_session.is_next_session() {
+                "Model Na14-2.pdf".to_string()
+            } else {
+                match election.counting_method {
+                    Some(VoteCountingMethod::CSO) => "Model Na31-2.pdf".to_string(),
+                    Some(VoteCountingMethod::DSO) => "Model Na31-1.pdf".to_string(),
+                    None => panic!("Invalid election {election:?}"),
+                }
+            }
+        }
+        GsbOverviewPdf => "Leeg Model P2a.pdf".to_string(),
+        CsbResultsEml => election_filename(election, "Resultaat", "eml.xml"),
+        CsbTotalCountsEml => election_filename(election, "Totaaltelling", "eml.xml"),
+        CsbResultsPdf => "Model P22-2.pdf".to_string(),
+        CsbAttachmentPdf => "Model P22-2 bijlage.pdf".to_string(),
+        CsbCsvCounts => csv_filename(election),
+        GsbCsvCounts => csv_filename(election),
+    };
+
+    slugify_filename(&filename)
+}
+
 #[derive(Debug)]
 pub struct ResultsInputData {
     pub committee_session: CommitteeSession,
@@ -203,63 +274,12 @@ impl ResultsInputData {
         )
     }
 
-    /// Generates a filename for the given election and file extension
-    /// E.g. "{base}_GR2026_GemeenteNaam.{ext}"
-    fn election_filename(&self, base: &str, ext: &str) -> String {
-        let location_without_whitespace: String =
-            self.election.location.split_whitespace().collect();
-
-        format!(
-            "{base} {}{} {}.{ext}",
-            self.election.category.to_eml_code(),
-            self.election.election_date.year(),
-            location_without_whitespace,
-        )
-    }
-
-    fn csv_filename(&self) -> String {
-        format!(
-            "osv4-3_telling_{}{}_{}.csv",
-            self.election.category.to_eml_code().to_lowercase(),
-            self.election.election_date.year(),
-            self.election
-                .location
-                .split_whitespace()
-                .collect::<String>()
-                .to_lowercase(),
-        )
-    }
-
     fn generated_file(&self, file_type: FileType, content: Vec<u8>) -> GeneratedFile {
-        GeneratedFile {
-            file_type,
-            filename: self.filename_for(file_type),
-            content,
-        }
+        generated_file(&self.committee_session, &self.election, file_type, content)
     }
 
     fn filename_for(&self, file_type: FileType) -> String {
-        use FileType::*;
-
-        let filename = match file_type {
-            GsbResultsEml => self.election_filename("Telling", "eml.xml"),
-            GsbResultsPdf => {
-                if self.committee_session.is_next_session() {
-                    "Model Na14-2.pdf".to_string()
-                } else {
-                    "Model Na31-2.pdf".to_string()
-                }
-            }
-            GsbOverviewPdf => "Leeg Model P2a.pdf".to_string(),
-            CsbResultsEml => self.election_filename("Resultaat", "eml.xml"),
-            CsbTotalCountsEml => self.election_filename("Totaaltelling", "eml.xml"),
-            CsbResultsPdf => "Model P22-2.pdf".to_string(),
-            CsbAttachmentPdf => "Model P22-2 bijlage.pdf".to_string(),
-            CsbCsvCounts => self.csv_filename(),
-            GsbCsvCounts => self.csv_filename(),
-        };
-
-        slugify_filename(&filename)
+        filename_for(&self.committee_session, &self.election, file_type)
     }
 }
 
@@ -388,7 +408,7 @@ impl ResultsInputCSB {
     ) -> Result<PdfFileModel, APIError> {
         let data = &self.data;
 
-        let votes_tables = VotesTables::new(&data.election, &data.totals)?;
+        let votes_tables = VotesTables::new(&data.election, &data.totals.political_group_votes)?;
         let pdf_file = ModelP22_2Bijlage1Input {
             election: data.election.clone().into(),
             votes_tables,
@@ -423,12 +443,10 @@ impl ResultsInputGSB {
 
     pub async fn generate_gsb_files(&self) -> Result<GsbGeneratedFiles, APIError> {
         let data = &self.data;
-        let creation_date_time = data.created_at.format(DEFAULT_DATE_TIME_FORMAT).to_string();
 
         let xml = data.as_xml()?;
         let xml_string = xml.write_eml_root_str(true, true)?;
         let xml_bytes = xml_string.as_bytes();
-        let xml_hash = EmlHash::from(xml_bytes).into();
         let csv_string = xml.as_osv4_3_csv(&data.election, true, false)?;
 
         let results_eml = data.generated_file(FileType::GsbResultsEml, xml_bytes.to_vec());
@@ -443,35 +461,7 @@ impl ResultsInputGSB {
         };
 
         let results_pdf_file_type = FileType::GsbResultsPdf;
-        let results_pdf_model = if data.committee_session.is_next_session() {
-            let Some(previous_totals) = &data.previous_totals else {
-                return Err(APIError::DataIntegrityError(
-                "Previous totals are required for generating results PDF for next committee sessions"
-                    .to_string(),
-            ));
-            };
-
-            let Some(previous_committee_session) = &data.previous_committee_session else {
-                return Err(APIError::DataIntegrityError(
-                "Previous committee session is required for generating results PDF for next committee sessions"
-                    .to_string(),
-            ));
-            };
-
-            self.get_na14_2_pdf_file(
-                previous_totals,
-                previous_committee_session,
-                xml_hash,
-                creation_date_time,
-                data.filename_for(results_pdf_file_type),
-            )?
-        } else {
-            self.get_na31_2_pdf_file(
-                xml_hash,
-                creation_date_time,
-                data.filename_for(results_pdf_file_type),
-            )?
-        };
+        let results_pdf_model = self.get_results_pdf_model(xml_bytes, results_pdf_file_type)?;
         let results_pdf_content = generate_pdf(results_pdf_model).await?.buffer;
         let results_pdf = data.generated_file(results_pdf_file_type, results_pdf_content);
 
@@ -481,6 +471,57 @@ impl ResultsInputGSB {
             overview_pdf,
             results_csv,
         })
+    }
+
+    fn get_results_pdf_model(
+        &self,
+        xml_bytes: &[u8],
+        results_pdf_file_type: FileType,
+    ) -> Result<PdfFileModel, APIError> {
+        let data = &self.data;
+        let creation_date_time = data.created_at.format(DEFAULT_DATE_TIME_FORMAT).to_string();
+        let xml_hash = EmlHash::from(xml_bytes).into();
+
+        if data.committee_session.is_next_session() {
+            let Some(previous_totals) = &data.previous_totals else {
+                return Err(APIError::DataIntegrityError(
+                    "Previous totals are required for generating results PDF for next committee sessions"
+                        .to_string(),
+                ));
+            };
+
+            let Some(previous_committee_session) = &data.previous_committee_session else {
+                return Err(APIError::DataIntegrityError(
+                    "Previous committee session is required for generating results PDF for next committee sessions"
+                        .to_string(),
+                ));
+            };
+
+            Ok(self.get_na14_2_pdf_file(
+                previous_totals,
+                previous_committee_session,
+                xml_hash,
+                creation_date_time,
+                data.filename_for(results_pdf_file_type),
+            )?)
+        } else {
+            match self.data.election.counting_method {
+                Some(VoteCountingMethod::CSO) => Ok(self.get_na31_2_pdf_file(
+                    xml_hash,
+                    creation_date_time,
+                    data.filename_for(results_pdf_file_type),
+                )?),
+                Some(VoteCountingMethod::DSO) => Ok(self.get_na31_1_pdf_file(
+                    xml_hash,
+                    creation_date_time,
+                    data.filename_for(results_pdf_file_type),
+                )?),
+                None => panic!(
+                    "Invalid election {election:?}",
+                    election = self.data.election
+                ),
+            }
+        }
     }
 
     fn get_na14_2_pdf_file(
@@ -503,14 +544,36 @@ impl ResultsInputGSB {
         let pdf_file = ModelNa14_2Input {
             votes_tables: VotesTablesWithPreviousVotes::new(
                 &data.election,
-                &data.totals,
-                previous_totals,
+                &data.totals.political_group_votes,
+                &previous_totals.political_group_votes,
             )?,
             committee_session: data.committee_session.clone(),
             election: data.election.clone().into(),
             summary: (&data.totals).into(),
             previous_summary: previous_totals.into(),
             previous_committee_session: previous_committee_session.clone(),
+            hash,
+            creation_date_time,
+        }
+        .to_pdf_file_model(results_pdf_filename);
+        Ok(pdf_file)
+    }
+
+    fn get_na31_1_pdf_file(
+        &self,
+        hash: String,
+        creation_date_time: String,
+        results_pdf_filename: String,
+    ) -> Result<PdfFileModel, APIError> {
+        let data = &self.data;
+
+        let pdf_file = ModelNa31_1Input {
+            votes_tables: VotesTables::new(&data.election, &data.totals.political_group_votes)?,
+            committee_session: data.committee_session.clone(),
+            polling_stations: data.polling_stations.clone(),
+            summary: (&data.totals).into(),
+            polling_station_investigations: data.totals.dso_investigations()?.clone(),
+            election: data.election.clone().into(),
             hash,
             creation_date_time,
         }
@@ -527,7 +590,7 @@ impl ResultsInputGSB {
         let data = &self.data;
 
         let pdf_file = ModelNa31_2Input {
-            votes_tables: VotesTables::new(&data.election, &data.totals)?,
+            votes_tables: VotesTables::new(&data.election, &data.totals.political_group_votes)?,
             committee_session: data.committee_session.clone(),
             polling_stations: data.polling_stations.clone(),
             summary: (&data.totals).into(),

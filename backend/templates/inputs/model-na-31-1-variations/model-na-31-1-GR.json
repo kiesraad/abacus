@@ -81,12 +81,12 @@
         "count": 2,
         "data_entry_sources": [{"type": "PollingStation", "number": 1}, {"type": "PollingStation", "number": 3}, {"type": "PollingStation", "number": 5}]
       }
-    },
-    "polling_station_investigations": {
-      "unaccounted_difference": [1, 5],
-      "other_error": [3],
-      "corrected_results": [1]
     }
+  },
+  "polling_station_investigations": {
+    "unaccounted_difference": [1, 5],
+    "other_error": [3],
+    "corrected_results": [1]
   },
   "polling_stations": [
     {

@@ -3,9 +3,12 @@ use serde::{Deserialize, Serialize};
 use crate::domain::{
     committee_session::CommitteeSession,
     election::Election,
-    models::{PdfFileModel, PdfModel, ToPdfFileModel, votes_table::VotesTables},
+    models::{
+        PdfFileModel, PdfModel, ToPdfFileModel, election_totals::ElectionTotalsWithoutVotes,
+        votes_table::VotesTables,
+    },
     polling_station::PollingStation,
-    summary::ElectionSummaryWithoutVotes,
+    tabulation::DSOInvestigations,
 };
 
 #[derive(Serialize, Deserialize)]
@@ -13,8 +16,9 @@ use crate::domain::{
 pub struct ModelNa31_1Input {
     pub committee_session: CommitteeSession,
     pub election: Election,
-    pub summary: ElectionSummaryWithoutVotes,
+    pub summary: ElectionTotalsWithoutVotes,
     pub polling_stations: Vec<PollingStation>,
+    pub polling_station_investigations: DSOInvestigations,
     pub hash: String,
     pub creation_date_time: String,
     pub votes_tables: VotesTables,

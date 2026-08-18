@@ -1850,6 +1850,77 @@ pub(crate) mod tests {
                 assert_eq!(total_seats, [2, 2, 2]);
             }
 
+            /// Apportionment with residual seats assigned with largest remainders and highest averages methods,
+            /// where the seat freed by list exhaustion starts the 2nd round of the highest averages method
+            /// (assignment to any list) directly
+            ///
+            /// All candidates of list 4 are deceased, so list 4 is exhausted without holding any seats.
+            /// This is the only way the reassignment can start with the 2nd round: every other
+            /// non-exhausted list must already hold a unique highest average seat, and a list
+            /// without any seats only counts as exhausted when it has no candidates left.
+            ///
+            /// Full seats: [1, 2, 0, 0] - Remainder seats: 3
+            /// Remainders: [99, 60, 74, 67], only votes of lists [1, 2] meet the threshold of 75% of the quota
+            /// 1 - largest remainder: seat assigned to list 1
+            /// 2 - largest remainder: seat assigned to list 2
+            /// 1st round of highest averages method (assignment to unique lists):
+            /// 3 - highest average: [66 1/3, 65, 74, 67] seat assigned to list 3
+            /// 4 - Seat first assigned to list 1 has been removed and
+            ///     will be assigned to another list in accordance with Article P 10 Kieswet
+            /// 2nd round of highest averages method (assignment to any list), since list 3 is the
+            /// only list that is not exhausted and it already received a unique highest average seat:
+            /// 5 - highest average: [99 1/2, 65, 37, 67] seat assigned to list 3
+            #[test]
+            fn test_with_list_exhaustion_where_reassignment_starts_with_2nd_round_highest_average_assignment()
+             {
+                let mut input = seat_assignment_fixture_with_given_candidate_votes(
+                    6,
+                    vec![vec![199], vec![100, 90, 70], vec![40, 34], vec![35, 32]],
+                );
+                input.deceased_candidates = HashMap::from([(4, HashSet::from([1, 2]))]);
+
+                let SeatAssignment::Completed(result) = seat_assignment(&input).unwrap() else {
+                    panic!("should be Completed");
+                };
+
+                assert_eq!(result.full_seats, 3);
+                assert_eq!(result.residual_seats, 3);
+                assert_eq!(result.steps.len(), 5);
+                assert!(
+                    result.steps[0]
+                        .change
+                        .is_changed_by_largest_remainder_assignment()
+                );
+                assert_eq!(result.steps[0].change.list_number_assigned(), 1);
+                assert!(
+                    result.steps[1]
+                        .change
+                        .is_changed_by_largest_remainder_assignment()
+                );
+                assert_eq!(result.steps[1].change.list_number_assigned(), 2);
+                assert!(
+                    result.steps[2]
+                        .change
+                        .is_changed_by_unique_highest_average_assignment()
+                );
+                assert_eq!(result.steps[2].change.list_number_assigned(), 3);
+                assert!(
+                    result.steps[3]
+                        .change
+                        .is_changed_by_list_exhaustion_removal()
+                );
+                assert_eq!(result.steps[3].change.list_number_retracted(), 1);
+                assert!(
+                    result.steps[4]
+                        .change
+                        .is_changed_by_highest_average_assignment()
+                );
+                assert_eq!(result.steps[4].change.list_number_assigned(), 3);
+                let total_seats = get_total_seats_from_apportionment_result(&result);
+                assert_eq!(total_seats, [1, 3, 2, 0]);
+                assert!(result.warnings().is_empty());
+            }
+
             /// Apportionment with residual seats assigned with largest remainders method  
             /// This test triggers Kieswet Article P 9 and P 10
             ///

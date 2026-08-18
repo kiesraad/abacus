@@ -58,7 +58,7 @@ export function OverviewPage() {
           <Table.Cell>
             {isTypist
               ? election.authority_region
-              : `${t(`committee_category.${election.committee_category}.abbreviation`)} - ${election.authority_region} (${election.authority_id})`}
+              : `${t(`committee_category.${election.committee_category}.abbreviation`)} - ${election.authority_region}${election.domain?.id ? ` (${election.domain.id})` : ""}`}
           </Table.Cell>
           <Table.Cell>
             {isTypist ? (

@@ -5,9 +5,7 @@ use crate::{
     APIError,
     domain::{
         data_entry::{DataEntrySource, DataEntrySourceNumber},
-        election::{
-            CommitteeCategory, ElectionWithPoliticalGroups, PoliticalGroup, VoteCountingMethod,
-        },
+        election::{CommitteeCategory, ElectionWithPoliticalGroups, VoteCountingMethod},
         polling_station::PollingStationForSession,
         results::{
             CommonDifferencesCounts, Results,
@@ -15,11 +13,9 @@ use crate::{
             cso_first_session_results::CSOFirstSessionResults,
             dso_first_session_results::DSOFirstSessionResults,
             political_group_candidate_votes::{CandidateVotes, PoliticalGroupCandidateVotes},
-            political_group_total_votes::{
-                EnrichedPoliticalGroupTotalVotes, PoliticalGroupTotalVotes,
-            },
+            political_group_total_votes::PoliticalGroupTotalVotes,
             voters_counts::VotersCounts,
-            votes_counts::{EnrichedVotesCounts, VotesCounts},
+            votes_counts::VotesCounts,
         },
         validate::Validate,
     },
@@ -165,6 +161,19 @@ impl ElectionTotals {
         totals = Self::process_results(election, results, &mut totals)?;
 
         Ok(totals)
+    }
+
+    /// The CSO polling station investigations of these totals,
+    /// or an error if these are not CSO totals.
+    pub fn cso_investigations(&self) -> Result<&CSOInvestigations, APIError> {
+        let CommitteeSpecificTotals::GSB(GSBTotals::CSO(investigations)) = &self.committee_specific
+        else {
+            return Err(APIError::DataIntegrityError(
+                "CSO investigations are only available for CSO totals".to_string(),
+            ));
+        };
+
+        Ok(investigations)
     }
 }
 
@@ -421,95 +430,6 @@ impl DSOInvestigations {
         {
             self.corrected_results.push(polling_station.number());
         }
-    }
-}
-
-/// A version of ElectionTotals without the political group votes.
-#[derive(Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct ElectionTotalsWithoutVotes {
-    /// The total number of voters
-    pub voters_counts: VotersCounts,
-    /// The total number of votes
-    pub votes_counts: VotesCounts,
-    /// The differences between voters and votes
-    pub differences_counts: DifferencesTotals,
-    /// Polling stations where results were investigated by the GSB
-    pub polling_station_investigations: CSOInvestigations,
-}
-
-impl TryFrom<ElectionTotals> for ElectionTotalsWithoutVotes {
-    type Error = APIError;
-
-    fn try_from(totals: ElectionTotals) -> Result<Self, Self::Error> {
-        let CommitteeSpecificTotals::GSB(GSBTotals::CSO(polling_station_investigations)) =
-            totals.committee_specific
-        else {
-            return Err(APIError::DataIntegrityError(
-                "Election totals without votes can only be created for CSO totals".to_string(),
-            ));
-        };
-
-        Ok(ElectionTotalsWithoutVotes {
-            voters_counts: totals.voters_counts,
-            votes_counts: totals.votes_counts,
-            differences_counts: totals.differences_counts,
-            polling_station_investigations,
-        })
-    }
-}
-
-/// A version of ElectionTotals without the political group votes and investigations
-#[derive(Debug, Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct ElectionTotalsCSB {
-    /// The number of voters (i.e. "Kiesgerechtigden")
-    pub number_of_voters: u32,
-    /// The total number of voters
-    pub voters_counts: VotersCounts,
-    /// The total number of votes
-    pub votes_counts: EnrichedVotesCounts,
-    /// The differences between voters and votes
-    pub differences_counts: DifferencesTotals,
-}
-
-impl ElectionTotalsCSB {
-    pub fn new(
-        totals: &ElectionTotals,
-        political_groups: &[PoliticalGroup],
-    ) -> Result<Self, APIError> {
-        let CommitteeSpecificTotals::CSB { number_of_voters } = totals.committee_specific else {
-            return Err(APIError::DataIntegrityError(
-                "CSB election totals can only be created for CSB totals".to_string(),
-            ));
-        };
-
-        Ok(ElectionTotalsCSB {
-            number_of_voters,
-            voters_counts: totals.voters_counts.clone(),
-            votes_counts: EnrichedVotesCounts {
-                political_group_total_votes: totals
-                    .votes_counts
-                    .political_group_total_votes
-                    .iter()
-                    .map(|pg_votes| EnrichedPoliticalGroupTotalVotes {
-                        number: pg_votes.number,
-                        name: political_groups
-                            .iter()
-                            .find(|pg| pg.number == pg_votes.number)
-                            .expect("Political group should exist")
-                            .name
-                            .clone(),
-                        total: pg_votes.total,
-                    })
-                    .collect(),
-                total_votes_candidates_count: totals.votes_counts.total_votes_candidates_count,
-                blank_votes_count: totals.votes_counts.blank_votes_count,
-                invalid_votes_count: totals.votes_counts.invalid_votes_count,
-                total_votes_cast_count: totals.votes_counts.total_votes_cast_count,
-            },
-            differences_counts: totals.differences_counts.clone(),
-        })
     }
 }
 
@@ -1340,23 +1260,16 @@ mod tests {
     }
 
     #[test]
-    fn test_election_totals_without_votes_requires_cso_totals() {
+    fn test_cso_investigations_requires_cso_totals() {
         let cso_election = election_fixture(ElectionCategory::Municipal, GSB, &[2, 3]);
         let cso_totals = ElectionTotals::tabulate(&cso_election, &[]).unwrap();
-        assert!(ElectionTotalsWithoutVotes::try_from(cso_totals).is_ok());
+        assert!(cso_totals.cso_investigations().is_ok());
 
         let dso_totals = ElectionTotals::tabulate(&dso_election_fixture(), &[]).unwrap();
-        assert!(ElectionTotalsWithoutVotes::try_from(dso_totals).is_err());
-    }
+        assert!(dso_totals.cso_investigations().is_err());
 
-    #[test]
-    fn test_election_totals_csb_requires_csb_totals() {
         let csb_election = election_fixture(ElectionCategory::Municipal, CSB, &[2, 3]);
         let csb_totals = ElectionTotals::tabulate(&csb_election, &[]).unwrap();
-        assert!(ElectionTotalsCSB::new(&csb_totals, &csb_election.political_groups).is_ok());
-
-        let gsb_election = election_fixture(ElectionCategory::Municipal, GSB, &[2, 3]);
-        let gsb_totals = ElectionTotals::tabulate(&gsb_election, &[]).unwrap();
-        assert!(ElectionTotalsCSB::new(&gsb_totals, &gsb_election.political_groups).is_err());
+        assert!(csb_totals.cso_investigations().is_err());
     }
 }

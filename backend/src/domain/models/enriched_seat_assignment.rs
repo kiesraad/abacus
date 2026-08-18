@@ -3,8 +3,7 @@ use serde::{Deserialize, Serialize};
 use crate::domain::{
     apportionment::{DisplayFraction, ListSeatAssignment, SeatAssignment, SeatChangeStep},
     election::PGNumber,
-    models::error::ModelsError,
-    tabulation::ElectionTotalsCSB,
+    models::{election_totals::ElectionTotalsCSB, error::ModelsError},
 };
 
 struct InitialSteps<'a> {
@@ -265,16 +264,14 @@ mod tests {
                 CommitteeCategory, ElectionCategory, ElectionWithPoliticalGroups,
                 tests::election_fixture_with_given_number_of_seats,
             },
+            models::election_totals::ElectionTotalsCSB,
             models::enriched_seat_assignment::EnrichedSeatAssignment,
             results::{
                 political_group_candidate_votes::create_political_group_candidate_votes,
                 political_group_total_votes::PoliticalGroupTotalVotes, voters_counts::VotersCounts,
                 votes_counts::VotesCounts,
             },
-            tabulation::{
-                CommitteeSpecificTotals, DifferencesTotals, ElectionTotals, ElectionTotalsCSB,
-                SumCount,
-            },
+            tabulation::{CommitteeSpecificTotals, DifferencesTotals, ElectionTotals, SumCount},
         },
     };
 

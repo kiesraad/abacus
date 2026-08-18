@@ -109,9 +109,9 @@ De volgende rollen zijn mogelijk: voorzitter, plaatsvervangend voorzitter of lid
             #polling_station.postal_code #polling_station.locality
           ]
         ],
-        align(center, checkbox(checked: input.summary.polling_station_investigations.admitted_voters_recounted.contains(polling_station.number))[]),
-        align(center, checkbox(checked: input.summary.polling_station_investigations.investigated_other_reason.contains(polling_station.number))[]),
-        align(center, checkbox(checked: input.summary.polling_station_investigations.ballots_recounted.contains(polling_station.number))[]),
+        align(center, checkbox(checked: input.polling_station_investigations.admitted_voters_recounted.contains(polling_station.number))[]),
+        align(center, checkbox(checked: input.polling_station_investigations.investigated_other_reason.contains(polling_station.number))[]),
+        align(center, checkbox(checked: input.polling_station_investigations.ballots_recounted.contains(polling_station.number))[]),
       )
     })
     .flatten(),

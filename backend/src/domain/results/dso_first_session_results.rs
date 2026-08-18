@@ -107,7 +107,7 @@ impl Validate for DSOFirstSessionResults {
                         == YesNo::no() =>
                 {
                     validation_results.errors.push(ValidationResult {
-                        fields: vec![path.to_string()],
+                        fields: vec![path.field("checks_and_corrections").to_string()],
                         code: ValidationResultCode::F132,
                         context: None,
                     });
@@ -117,7 +117,7 @@ impl Validate for DSOFirstSessionResults {
                         == YesNo::yes() =>
                 {
                     validation_results.errors.push(ValidationResult {
-                        fields: vec![path.to_string()],
+                        fields: vec![path.field("checks_and_corrections").to_string()],
                         code: ValidationResultCode::F133,
                         context: None,
                     });
@@ -125,7 +125,10 @@ impl Validate for DSOFirstSessionResults {
                 _ => {}
             }
 
-            validation_results.join(self.checks_and_corrections.validate(election, path)?);
+            validation_results.join(
+                self.checks_and_corrections
+                    .validate(election, &path.field("checks_and_corrections"))?,
+            );
         };
 
         validation_results.join(self.as_common().validate(election, path)?);
@@ -176,7 +179,7 @@ mod tests {
         })
         .validate(
             &election_fixture(ElectionCategory::Municipal, CommitteeCategory::GSB, &[]),
-            &"checks_and_corrections".into(),
+            &"data".into(),
         )?;
 
         assert_eq!(validation_results.warnings.len(), 1);
@@ -190,7 +193,7 @@ mod tests {
     fn test_f132() -> Result<(), DataError> {
         let f132 = ValidationResult {
             code: ValidationResultCode::F132,
-            fields: vec!["checks_and_corrections".into()],
+            fields: vec!["data.checks_and_corrections".into()],
             context: None,
         };
 
@@ -287,7 +290,7 @@ mod tests {
     fn test_f133() -> Result<(), DataError> {
         let f133 = ValidationResult {
             code: ValidationResultCode::F133,
-            fields: vec!["checks_and_corrections".into()],
+            fields: vec!["data.checks_and_corrections".into()],
             context: None,
         };
 

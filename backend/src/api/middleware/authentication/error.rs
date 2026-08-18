@@ -42,7 +42,7 @@ impl ApiErrorResponse for AuthenticationError {
         }
     }
 
-    #[allow(clippy::too_many_lines)]
+    #[expect(clippy::too_many_lines)]
     fn to_response_parts(&self) -> (StatusCode, ErrorResponse) {
         match self {
             AuthenticationError::InvalidUsernameOrPassword => (

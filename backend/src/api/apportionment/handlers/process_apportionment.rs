@@ -30,7 +30,6 @@ impl AsAuditEvent for ApportionmentProcessed {
 
 #[derive(Debug, PartialEq, Serialize, ToSchema)]
 #[serde(tag = "status")]
-#[allow(clippy::large_enum_variant)]
 pub enum ProcessApportionmentResponse {
     Finalised(ElectionApportionmentResponse),
     DrawingLotsRequired {

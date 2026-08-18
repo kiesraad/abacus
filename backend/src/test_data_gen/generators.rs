@@ -278,7 +278,7 @@ fn format_election_name(
 }
 
 /// Generate a random election using the limits from args.
-#[allow(clippy::too_many_lines, clippy::cognitive_complexity)]
+#[expect(clippy::too_many_lines, clippy::cognitive_complexity)]
 fn generate_election(
     rng: &mut impl rand::RngExt,
     args: &GenerateElectionArgs,
@@ -432,9 +432,9 @@ async fn generate_polling_stations(
             remaining_voters
         } else {
             let sample_voters = remaining_voters / remaining_ps;
-            #[allow(clippy::cast_possible_truncation)]
+            #[expect(clippy::cast_possible_truncation)]
             let min_sample_voters = (sample_voters as f64 * 0.9) as u32;
-            #[allow(clippy::cast_possible_truncation)]
+            #[expect(clippy::cast_possible_truncation)]
             let max_sample_voters = (sample_voters as f64 * 1.1) as u32;
             rng.random_range(min_sample_voters..=max_sample_voters)
         };
@@ -468,7 +468,7 @@ async fn generate_polling_stations(
 }
 
 /// Generate and store data entries for the given election based on arguments
-#[allow(clippy::too_many_lines)]
+#[expect(clippy::too_many_lines)]
 async fn generate_gsb_data_entry(
     election: &ElectionWithPoliticalGroups,
     polling_stations: &[(PollingStation, DataEntryId)],
@@ -567,7 +567,7 @@ async fn generate_gsb_data_entry(
 }
 
 /// Generate and store data entries for the given election based on arguments
-#[allow(clippy::too_many_lines, clippy::cognitive_complexity)]
+#[expect(clippy::too_many_lines, clippy::cognitive_complexity)]
 async fn generate_csb_data_entry(
     election: &ElectionWithPoliticalGroups,
     sub_committee_first_session: SubCommitteeFirstSession,
@@ -674,7 +674,7 @@ async fn generate_csb_data_entry(
     (generated_first_entries, generated_second_entries)
 }
 
-#[allow(clippy::too_many_lines)]
+#[expect(clippy::too_many_lines)]
 fn generate_cso_first_session_results(
     rng: &mut impl rand::RngExt,
     election: &ElectionWithPoliticalGroups,
@@ -683,12 +683,12 @@ fn generate_cso_first_session_results(
     candidate_distribution_slope: f64,
 ) -> CSOFirstSessionResults {
     // generate a small percentage of blank votes
-    #[allow(clippy::cast_possible_truncation)]
+    #[expect(clippy::cast_possible_truncation)]
     let blank_votes = (number_of_votes as f64 * rng.random_range(0.0..0.02)) as u32;
     let remaining_votes = number_of_votes - blank_votes;
 
     // generate a small percentage of invalid votes
-    #[allow(clippy::cast_possible_truncation)]
+    #[expect(clippy::cast_possible_truncation)]
     let invalid_votes = (remaining_votes as f64 * rng.random_range(0.0..0.02)) as u32;
     let remaining_votes = remaining_votes - invalid_votes;
 
@@ -814,7 +814,7 @@ fn generate_cso_first_session_results(
     }
 }
 
-#[allow(clippy::too_many_lines)]
+#[expect(clippy::too_many_lines)]
 fn generate_gsb_results(
     rng: &mut impl rand::RngExt,
     election: &ElectionWithPoliticalGroups,
@@ -824,12 +824,12 @@ fn generate_gsb_results(
     candidate_distribution_slope: f64,
 ) -> GSBResults {
     // generate a small percentage of blank votes
-    #[allow(clippy::cast_possible_truncation)]
+    #[expect(clippy::cast_possible_truncation)]
     let blank_votes = (number_of_votes as f64 * rng.random_range(0.0..0.02)) as u32;
     let remaining_votes = number_of_votes - blank_votes;
 
     // generate a small percentage of invalid votes
-    #[allow(clippy::cast_possible_truncation)]
+    #[expect(clippy::cast_possible_truncation)]
     let invalid_votes = (remaining_votes as f64 * rng.random_range(0.0..0.02)) as u32;
     let remaining_votes = remaining_votes - invalid_votes;
 
@@ -991,7 +991,7 @@ fn distribute_fill_weights(
     sorted: bool,
 ) -> Vec<u32> {
     // Convert weights to integer quantities
-    #[allow(clippy::cast_possible_truncation)]
+    #[expect(clippy::cast_possible_truncation)]
     let mut result: Vec<u32> = weights
         .iter()
         .map(|w| (w * votes as f64).floor() as u32)

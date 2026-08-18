@@ -120,7 +120,6 @@ pub async fn start_server(
 
 /// Start the API server over HTTPS using axum-server/rustls.
 #[cfg(feature = "tls")]
-#[allow(clippy::cognitive_complexity)]
 pub async fn start_server_tls(
     pool: SqlitePool,
     listener: TcpListener,

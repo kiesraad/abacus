@@ -229,8 +229,8 @@ async fn main() -> Result<(), AppError> {
 }
 
 /// Export an election (in EML) to the specified directory
-#[allow(clippy::too_many_lines)]
-#[allow(clippy::cognitive_complexity)]
+#[expect(clippy::too_many_lines)]
+#[expect(clippy::cognitive_complexity)]
 async fn export_election(
     export_dir: &Path,
     committee_session: &CommitteeSession,

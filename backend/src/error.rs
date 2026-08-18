@@ -138,8 +138,8 @@ pub enum APIError {
 }
 
 impl APIError {
-    #[allow(clippy::too_many_lines)]
-    #[allow(clippy::cognitive_complexity)]
+    #[expect(clippy::too_many_lines)]
+    #[expect(clippy::cognitive_complexity)]
     fn into_response_parts(self) -> (StatusCode, ErrorResponse) {
         match self {
             APIError::Delegated(err) => {

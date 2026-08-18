@@ -370,7 +370,7 @@ fn update_candidate_ranking<T: CandidateVotes>(
 }
 
 #[cfg(test)]
-#[allow(clippy::too_many_lines)]
+#[expect(clippy::too_many_lines)]
 mod tests {
     use std::{
         collections::{HashMap, HashSet},

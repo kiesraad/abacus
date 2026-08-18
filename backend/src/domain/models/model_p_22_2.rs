@@ -53,7 +53,7 @@ mod tests {
     use super::*;
 
     #[test]
-    #[allow(clippy::too_many_lines)]
+    #[expect(clippy::too_many_lines)]
     fn test_main_json_variations_match_struct() {
         let mut reader = BufReader::new(
             File::open("templates/inputs/model-p-22-2-variations/gte-19-seats.json").unwrap(),

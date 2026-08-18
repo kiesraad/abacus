@@ -122,7 +122,6 @@ pub async fn next_state(
 }
 
 #[derive(Debug)]
-#[allow(clippy::large_enum_variant)]
 pub enum ApportionmentResult {
     Ok(ElectionApportionmentResponse),
     ListDrawingLotsRequired(ListDrawingLotsVariant, ElectionTotals, SeatAssignment),

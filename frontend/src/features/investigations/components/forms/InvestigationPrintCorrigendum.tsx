@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { MissingCommitteeSessionDetailsModal } from "@/components/committee_session/MissingCommitteeSessionDetailsModal";
 import { Button } from "@/components/ui/Button/Button";
-import { DownloadButton } from "@/components/ui/DownloadButton/DownloadButton";
+import { DownloadButtonWithoutHref } from "@/components/ui/DownloadButton/DownloadButton";
 import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { Loader } from "@/components/ui/Loader/Loader";
 import { useElection } from "@/hooks/election/useElection";
 import { t, tx } from "@/i18n/translate";
+import { directDownload } from "@/utils/download";
 
 interface InvestigationPrintCorrigendumProps {
   pollingStationId: number;
@@ -30,9 +31,9 @@ export function InvestigationPrintCorrigendum({ pollingStationId }: Investigatio
                 <li>{tx("investigations.print_corrigendum.download_and_print")}</li>
                 <li>{tx("investigations.print_corrigendum.print_recommendation")}</li>
               </ul>
-              <DownloadButton
+              <DownloadButtonWithoutHref
+                id="download-corrigendum-button"
                 icon="download"
-                href={`/api/polling_stations/${pollingStationId}/investigation/download_corrigendum_pdf`}
                 title={t("investigations.print_corrigendum.download_corrigendum_link", {
                   number: pollingStation.number,
                 })}
@@ -44,6 +45,8 @@ export function InvestigationPrintCorrigendum({ pollingStationId }: Investigatio
                   ) {
                     event.preventDefault();
                     setShowMissingCommitteeSessionDetailsModal(true);
+                  } else {
+                    directDownload(`/api/polling_stations/${pollingStationId}/investigation/download_corrigendum_pdf`);
                   }
                 }}
               />

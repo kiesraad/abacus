@@ -22,8 +22,8 @@ import type {
 } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 import { committeeSessionDetailsPresent, committeeSessionLabel } from "@/utils/committeeSession";
+import { directDownload } from "@/utils/download";
 import { hasBooleanProperty } from "@/utils/typeChecks";
-import { directDownload } from "../utils/download";
 import { CommitteeSessionCard } from "./CommitteeSessionCard";
 import { ElectionInformationTable } from "./ElectionInformationTable";
 import cls from "./ElectionManagement.module.css";

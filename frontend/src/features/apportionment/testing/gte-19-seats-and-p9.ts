@@ -1837,7 +1837,7 @@ export const candidate_nomination: CandidateNomination = {
 };
 
 export const election_totals: ElectionTotals = {
-  number_of_voters: 20000,
+  committee_specific: { committee: "CSB", number_of_voters: 20000 },
   voters_counts: {
     poll_card_count: 15001,
     proxy_certificate_count: 1,
@@ -1868,11 +1868,6 @@ export const election_totals: ElectionTotals = {
       count: 0,
       data_entry_sources: [],
     },
-  },
-  polling_station_investigations: {
-    admitted_voters_recounted: [],
-    ballots_recounted: [],
-    investigated_other_reason: [],
   },
   political_group_votes: [
     {

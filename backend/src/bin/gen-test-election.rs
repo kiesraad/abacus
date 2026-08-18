@@ -229,8 +229,8 @@ async fn main() -> Result<(), AppError> {
 }
 
 /// Export an election (in EML) to the specified directory
-#[allow(clippy::too_many_lines)]
-#[allow(clippy::cognitive_complexity)]
+#[expect(clippy::too_many_lines)]
+#[expect(clippy::cognitive_complexity)]
 async fn export_election(
     export_dir: &Path,
     committee_session: &CommitteeSession,
@@ -302,8 +302,12 @@ async fn export_election(
             ElectionTotals::tabulate(election, &results).expect("Failed to create election totals");
         let input = ModelNa31_2Input {
             votes_tables: VotesTables::new(election, &election_totals)
-                .expect("Failed to create votes tables"),
-            summary: election_totals.into(),
+                .expect("Votes tables should be created"),
+            summary: (&election_totals).into(),
+            polling_station_investigations: election_totals
+                .cso_investigations()
+                .expect("Election totals should be CSO totals")
+                .clone(),
             committee_session: committee_session.clone(),
             polling_stations: polling_stations.iter().map(Clone::clone).collect(),
             election: election.clone().into(),

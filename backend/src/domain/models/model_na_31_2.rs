@@ -5,10 +5,11 @@ use crate::domain::{
     election::Election,
     models::{
         PdfFileModel, PdfModel, ToPdfFileModel,
+        election_totals::ElectionTotalsWithoutVotes,
         votes_table::{CandidatesTables, VotesTables},
     },
     polling_station::PollingStation,
-    tabulation::ElectionTotalsWithoutVotes,
+    tabulation::CSOInvestigations,
 };
 
 #[derive(Serialize, Deserialize)]
@@ -18,6 +19,7 @@ pub struct ModelNa31_2Input {
     pub election: Election,
     pub summary: ElectionTotalsWithoutVotes,
     pub polling_stations: Vec<PollingStation>,
+    pub polling_station_investigations: CSOInvestigations,
     pub hash: String,
     pub creation_date_time: String,
     pub votes_tables: VotesTables,

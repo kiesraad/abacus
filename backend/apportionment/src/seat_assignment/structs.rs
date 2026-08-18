@@ -413,7 +413,7 @@ pub(crate) mod tests {
     use crate::{Fraction, seat_assignment::ListStanding, test_helpers::ListVotesMock};
 
     #[test]
-    #[allow(clippy::too_many_lines)]
+    #[expect(clippy::too_many_lines)]
     fn test_list_standing_functions() {
         let candidate_votes: Vec<u32> = vec![100, 100, 100];
         let votes_cast: u64 = candidate_votes.iter().sum::<u32>() as u64;

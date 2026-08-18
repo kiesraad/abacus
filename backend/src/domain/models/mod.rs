@@ -1,4 +1,5 @@
 pub mod apportionment_footnotes;
+pub mod election_totals;
 pub mod enriched_candidate_nomination;
 pub mod enriched_seat_assignment;
 pub mod error;

@@ -81,12 +81,12 @@
         "count": 2,
         "data_entry_sources": [{"type": "PollingStation", "number": 1}, {"type": "PollingStation", "number": 3}, {"type": "PollingStation", "number": 5}]
       }
-    },
-    "polling_station_investigations": {
-      "admitted_voters_recounted": [1, 5],
-      "investigated_other_reason": [3],
-      "ballots_recounted": [1]
     }
+  },
+  "polling_station_investigations": {
+    "admitted_voters_recounted": [1, 5],
+    "investigated_other_reason": [3],
+    "ballots_recounted": [1]
   },
   "polling_stations": [
     {

@@ -66,7 +66,7 @@ pub(crate) async fn inject_user(
 }
 
 /// Middleware to extend the session lifetime
-#[allow(clippy::cognitive_complexity)]
+#[expect(clippy::cognitive_complexity)]
 pub(crate) async fn extend_session(
     State(pool): State<SqlitePool>,
     OriginalUri(uri): OriginalUri,

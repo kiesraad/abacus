@@ -33,7 +33,7 @@ type SeatAssignmentResult<T> =
     Result<SeatAssignment<ListNumber<<T as ApportionmentInput>::List>>, ApportionmentError>;
 
 /// Seat assignment
-#[allow(clippy::too_many_lines, clippy::cognitive_complexity)]
+#[expect(clippy::too_many_lines, clippy::cognitive_complexity)]
 pub(crate) fn seat_assignment<T: ApportionmentInput>(input: &T) -> SeatAssignmentResult<T> {
     info!("Seat assignment");
     info!("Seats: {}", input.number_of_seats());

@@ -5939,6 +5939,45 @@
         },
         "additionalProperties": false
       },
+      "CSOInvestigations": {
+        "type": "object",
+        "description": "Polling stations where results were investigated by the GSB,\nas vectors of polling station numbers",
+        "required": [
+          "admitted_voters_recounted",
+          "investigated_other_reason",
+          "ballots_recounted"
+        ],
+        "properties": {
+          "admitted_voters_recounted": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            },
+            "description": "Admitted voters were recounted\n(\"Toegelaten kiezers opnieuw vastgesteld?\")"
+          },
+          "ballots_recounted": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            },
+            "description": "Ballots were (partially) recounted\n(\"Stembiljetten (deels) herteld?\")"
+          },
+          "investigated_other_reason": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            },
+            "description": "Investigated for other reasons than unexplained difference\n(\"Onderzocht vanwege andere reden dan onverklaard verschil?\")"
+          }
+        },
+        "additionalProperties": false
+      },
       "Candidate": {
         "type": "object",
         "description": "Candidate",
@@ -6315,6 +6354,56 @@
         },
         "additionalProperties": false
       },
+      "CommitteeSpecificTotals": {
+        "oneOf": [
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GSBTotals",
+                "description": "Totals specific to a municipal electoral committee (gemeentelijk stembureau, GSB)"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "committee"
+                ],
+                "properties": {
+                  "committee": {
+                    "type": "string",
+                    "enum": [
+                      "GSB"
+                    ]
+                  }
+                }
+              }
+            ],
+            "description": "Totals specific to a municipal electoral committee (gemeentelijk stembureau, GSB)"
+          },
+          {
+            "type": "object",
+            "description": "Totals specific to a central electoral committee (centraal stembureau, CSB)",
+            "required": [
+              "number_of_voters",
+              "committee"
+            ],
+            "properties": {
+              "committee": {
+                "type": "string",
+                "enum": [
+                  "CSB"
+                ]
+              },
+              "number_of_voters": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The number of voters (\"Kiesgerechtigden\")",
+                "minimum": 0
+              }
+            }
+          }
+        ],
+        "description": "Committee specific totals, i.e. specific for GSB or CSB."
+      },
       "CommonPollingStationResults": {
         "type": "object",
         "description": "CommonPollingStationResults contains the common fields for polling station results,",
@@ -6473,6 +6562,45 @@
             "description": "Votes counts (\"2. Aantal getelde stembiljetten\")"
           }
         }
+      },
+      "DSOInvestigations": {
+        "type": "object",
+        "description": "Polling stations where results were investigated by the GSB,\nas vectors of polling station numbers",
+        "required": [
+          "unaccounted_difference",
+          "other_error",
+          "corrected_results"
+        ],
+        "properties": {
+          "corrected_results": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            },
+            "description": "Results were corrected\n(\"Uitslag gecorrigeerd?\")"
+          },
+          "other_error": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            },
+            "description": "Investigated because of a (suspected) other error\n(\"Onderzocht vanwege (het vermoeden van) een andere fout?\")"
+          },
+          "unaccounted_difference": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            },
+            "description": "Investigated because of an unaccounted-for difference\n(\"Onderzocht vanwege een onverklaard verschil?\")"
+          }
+        },
+        "additionalProperties": false
       },
       "DataEntry": {
         "type": "object",
@@ -7248,18 +7376,16 @@
           "votes_counts",
           "differences_counts",
           "political_group_votes",
-          "polling_station_investigations"
+          "committee_specific"
         ],
         "properties": {
+          "committee_specific": {
+            "$ref": "#/components/schemas/CommitteeSpecificTotals",
+            "description": "Totals specific to the committee (GSB or CSB) of the election"
+          },
           "differences_counts": {
             "$ref": "#/components/schemas/DifferencesTotals",
             "description": "The differences between voters and votes"
-          },
-          "number_of_voters": {
-            "type": "integer",
-            "format": "int32",
-            "description": "The number of voters (i.e. \"Kiesgerechtigden\")",
-            "minimum": 0
           },
           "political_group_votes": {
             "type": "array",
@@ -7267,10 +7393,6 @@
               "$ref": "#/components/schemas/PoliticalGroupCandidateVotes"
             },
             "description": "The total votes for each political group (and each candidate within)"
-          },
-          "polling_station_investigations": {
-            "$ref": "#/components/schemas/PollingStationInvestigations",
-            "description": "Polling stations where results were investigated by the GSB"
           },
           "voters_counts": {
             "$ref": "#/components/schemas/VotersCounts",
@@ -7627,6 +7749,57 @@
           }
         },
         "additionalProperties": false
+      },
+      "GSBTotals": {
+        "oneOf": [
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CSOInvestigations",
+                "description": "Totals specific to centrally counted (centrale stemopneming, CSO) results"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "counting_method"
+                ],
+                "properties": {
+                  "counting_method": {
+                    "type": "string",
+                    "enum": [
+                      "CSO"
+                    ]
+                  }
+                }
+              }
+            ],
+            "description": "Totals specific to centrally counted (centrale stemopneming, CSO) results"
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DSOInvestigations",
+                "description": "Totals specific to decentrally counted (decentrale stemopneming, DSO) results"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "counting_method"
+                ],
+                "properties": {
+                  "counting_method": {
+                    "type": "string",
+                    "enum": [
+                      "DSO"
+                    ]
+                  }
+                }
+              }
+            ],
+            "description": "Totals specific to decentrally counted (decentrale stemopneming, DSO) results"
+          }
+        ],
+        "description": "GSB specific totals, depending on the vote counting method (CSO or DSO)."
       },
       "GenerateElectionArgs": {
         "type": "object",
@@ -8681,45 +8854,6 @@
           },
           "reason": {
             "type": "string"
-          }
-        },
-        "additionalProperties": false
-      },
-      "PollingStationInvestigations": {
-        "type": "object",
-        "description": "Polling stations where results were investigated by the GSB,\nas vectors of polling station numbers",
-        "required": [
-          "admitted_voters_recounted",
-          "investigated_other_reason",
-          "ballots_recounted"
-        ],
-        "properties": {
-          "admitted_voters_recounted": {
-            "type": "array",
-            "items": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
-            },
-            "description": "Admitted voters were recounted\n(\"Toegelaten kiezers opnieuw vastgesteld?\")"
-          },
-          "ballots_recounted": {
-            "type": "array",
-            "items": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
-            },
-            "description": "Ballots were (partially) recounted\n(\"Stembiljetten (deels) herteld?\")"
-          },
-          "investigated_other_reason": {
-            "type": "array",
-            "items": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
-            },
-            "description": "Investigated for other reasons than unexplained difference\n(\"Onderzocht vanwege andere reden dan onverklaard verschil?\")"
           }
         },
         "additionalProperties": false

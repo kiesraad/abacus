@@ -307,7 +307,11 @@ function ElectionSummaryTableSection({
           votesCounts={electionSummary.votes_counts}
           seats={seatAssignment.seats}
           quota={seatAssignment.quota}
-          numberOfVoters={electionSummary.number_of_voters}
+          numberOfVoters={
+            electionSummary.committee_specific.committee === "CSB"
+              ? electionSummary.committee_specific.number_of_voters
+              : undefined
+          }
           preferenceThreshold={preferenceThreshold}
           deceasedCandidatesInfo={
             {

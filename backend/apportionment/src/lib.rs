@@ -2,6 +2,8 @@
 //!
 //! Crate also contains a definition of a fraction, which is used in all calculations.
 
+#![cfg_attr(test, allow(clippy::too_many_lines, clippy::cognitive_complexity))]
+
 mod candidate_nomination;
 mod fraction;
 mod seat_assignment;

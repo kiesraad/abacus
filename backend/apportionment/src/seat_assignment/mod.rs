@@ -1200,6 +1200,88 @@ pub(crate) mod tests {
 
             /// Apportionment with residual seats assigned with largest remainders method
             ///
+            /// This test triggers Kieswet Article P 9, where the last residual seat (a single
+            /// seat) was assigned by drawing of lots. The retraction itself requires no
+            /// drawing of lots, since only one list holds the last residual seat.
+            ///
+            /// Full seats: [7, 1, 2, 1, 1] - Remainder seats: 3
+            /// Remainders: [151, 210, 199, 170, 170]
+            /// 1 - largest remainder: seat assigned to list 2
+            /// 2 - largest remainder: seat assigned to list 3
+            /// 3 - Drawing of lots is required for lists: [4, 5], only 1 seat available
+            ///     Option 4 is picked
+            /// 4 - Seat first assigned to list 4 has been re-assigned to list 1 in
+            ///     accordance with Article P 9 Kieswet, without drawing of lots
+            #[test]
+            fn test_with_absolute_majority_of_votes_but_not_seats_and_single_last_residual_seat_assigned_by_drawing_of_lots()
+             {
+                let mut input = seat_assignment_fixture_with_default_50_candidates(
+                    15,
+                    vec![2251, 510, 799, 470, 470],
+                );
+
+                let Ok(SeatAssignment::DrawingLotsRequired(variant, preliminary_result)) =
+                    seat_assignment(&input)
+                else {
+                    panic!("should be DrawingLotsRequired");
+                };
+                assert_eq!(
+                    variant,
+                    ListDrawingLotsVariant::LargestRemainderResidualSeat(
+                        LargestRemainderResidualSeatDrawingLots {
+                            max_remainder: Fraction::new(170, 1),
+                            residual_seat_numbers: vec![3],
+                            options: vec![4, 5],
+                            list_remainders: vec![
+                                (1, Fraction::new(151, 1)),
+                                (2, Fraction::new(210, 1)),
+                                (3, Fraction::new(199, 1)),
+                                (4, Fraction::new(170, 1)),
+                                (5, Fraction::new(170, 1)),
+                            ],
+                        }
+                    )
+                );
+                assert_eq!(preliminary_result.seats, 15);
+                assert_eq!(preliminary_result.full_seats, 12);
+                assert_eq!(preliminary_result.residual_seats, 3);
+                assert_eq!(preliminary_result.quota, Fraction::new(4500, 15));
+                assert_eq!(preliminary_result.steps.len(), 2);
+                assert_eq!(
+                    get_standings_residual_seats(&preliminary_result),
+                    vec![0, 1, 1, 0, 0]
+                );
+
+                // Drawing lots results in list 4, which gets the last residual seat.
+                // The Article P 9 retraction then needs no drawing of lots, since
+                // list 4 is the only list holding the last residual seat.
+                input.lists_drawn.push(ListDrawnMock { variant, drawn: 4 });
+                let Ok(SeatAssignment::Completed(result)) = seat_assignment(&input) else {
+                    panic!("should be Completed");
+                };
+
+                assert_eq!(result.full_seats, 12);
+                assert_eq!(result.residual_seats, 3);
+                assert_eq!(result.steps.len(), 4);
+                assert_eq!(result.steps[0].change.list_number_assigned(), 2);
+                assert_eq!(result.steps[1].change.list_number_assigned(), 3);
+                assert_eq!(result.steps[2].change.list_number_assigned(), 4);
+                assert_eq!(
+                    result.steps[3].change,
+                    SeatChange::AbsoluteMajorityReassignment(AbsoluteMajorityReassignedSeat {
+                        list_retracted_seat: 4,
+                        list_assigned_seat: 1,
+                        drawing_lots: None,
+                    })
+                );
+                assert_eq!(get_standings_residual_seats(&result), vec![1, 1, 1, 0, 0]);
+                let total_seats = get_total_seats_from_apportionment_result(&result);
+                assert_eq!(total_seats, vec![8, 2, 3, 1, 1]);
+                assert!(result.warnings().is_empty());
+            }
+
+            /// Apportionment with residual seats assigned with largest remainders method
+            ///
             /// Full seats: [6, 2, 2, 1, 1, 1, 0, 0] - Remainder seats: 2  
             /// Remainders: [60, 0/15, 0/15, 0/15, 0/15, 0/15, 55, 45]  
             /// 1 - largest remainder: seat assigned to list 1  
@@ -2768,6 +2850,91 @@ pub(crate) mod tests {
                 );
             }
 
+            /// Apportionment with residual seats assigned with highest averages method
+            ///
+            /// This test triggers Kieswet Article P 9, where the last residual seat (a single
+            /// seat) was assigned by drawing of lots. The retraction itself requires no
+            /// drawing of lots, since only one list holds the last residual seat.
+            ///
+            /// With 19 or more seats this is only possible when the majority list itself is
+            /// among the tied lists and loses the draw. Any other list winning a residual
+            /// seat must have an average at least equal to the majority list's.
+            ///
+            /// Full seats: [10, 9] - Remainder seats: 1
+            /// 1 - Drawing of lots is required for lists: [1, 2], tied averages [20, 20],
+            ///     only 1 seat available. Option 2 is picked
+            /// 2 - Seat first assigned to list 2 has been re-assigned to list 1 in
+            ///     accordance with Article P 9 Kieswet, without drawing of lots
+            #[test]
+            fn test_with_absolute_majority_of_votes_but_not_seats_and_single_last_residual_seat_assigned_by_drawing_of_lots()
+             {
+                let mut input =
+                    seat_assignment_fixture_with_default_50_candidates(20, vec![220, 200]);
+
+                let Ok(SeatAssignment::DrawingLotsRequired(variant, preliminary_result)) =
+                    seat_assignment(&input)
+                else {
+                    panic!("should be DrawingLotsRequired");
+                };
+                assert_eq!(
+                    variant,
+                    ListDrawingLotsVariant::HighestAverageResidualSeat(
+                        HighestAverageResidualSeatDrawingLots {
+                            max_average: Fraction::new(20, 1),
+                            residual_seat_numbers: vec![1],
+                            options: vec![1, 2],
+                            list_averages: vec![
+                                (1, Fraction::new(20, 1)),
+                                (2, Fraction::new(20, 1)),
+                            ],
+                        }
+                    )
+                );
+                assert_eq!(preliminary_result.seats, 20);
+                assert_eq!(preliminary_result.full_seats, 19);
+                assert_eq!(preliminary_result.residual_seats, 1);
+                assert_eq!(preliminary_result.quota, Fraction::new(420, 20));
+                assert_eq!(preliminary_result.steps.len(), 0);
+
+                // Drawing lots results in list 2, so the majority list loses the draw and
+                // stays at exactly half of the seats. The Article P 9 retraction then needs
+                // no drawing of lots, since list 2 is the only list holding the last
+                // residual seat.
+                input.lists_drawn.push(ListDrawnMock {
+                    variant: variant.clone(),
+                    drawn: 2,
+                });
+                let Ok(SeatAssignment::Completed(result)) = seat_assignment(&input) else {
+                    panic!("should be Completed");
+                };
+
+                assert_eq!(result.full_seats, 19);
+                assert_eq!(result.residual_seats, 1);
+                assert_eq!(result.steps.len(), 2);
+                assert_eq!(
+                    result.steps[0].change,
+                    SeatChange::HighestAverageAssignment(HighestAverageAssignedSeat {
+                        selected_list_number: 2,
+                        list_options: vec![1, 2],
+                        list_assigned: vec![2],
+                        list_exhausted: vec![],
+                        votes_per_seat: Fraction::new(20, 1),
+                        drawing_lots: Some(variant),
+                    })
+                );
+                assert_eq!(
+                    result.steps[1].change,
+                    SeatChange::AbsoluteMajorityReassignment(AbsoluteMajorityReassignedSeat {
+                        list_retracted_seat: 2,
+                        list_assigned_seat: 1,
+                        drawing_lots: None,
+                    })
+                );
+                assert_eq!(get_standings_residual_seats(&result), vec![1, 0]);
+                let total_seats = get_total_seats_from_apportionment_result(&result);
+                assert_eq!(total_seats, vec![11, 9]);
+                assert!(result.warnings().is_empty());
+            }
             /// Apportionment with residual seats assigned with highest averages method
             ///
             /// This test triggers Kieswet Article P 9, where the last residual seats were

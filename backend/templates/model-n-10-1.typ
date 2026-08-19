@@ -16,7 +16,7 @@
 
 #show: doc => conf(
   doc,
-  header-right: header-right, 
+  header-right: header-right,
   footer: [
     Proces-verbaal van een stembureau \
     Model N 10-1 decentrale stemopneming (versie 2027)
@@ -81,7 +81,7 @@ De volgende rollen zijn mogelijk: voorzitter, plaatsvervangend voorzitter, lid o
   columns: (8em, 1fr, 1fr, 1fr, 7em, 7em),
   headers: ("Voorletters", "Achternaam", "Rol", "Aanwezig van - tot", "Aanwezig bij stemmen", "Aanwezig bij tellen"),
   values: ("", "", "", "-", checkbox(small: true)[], checkbox(small: true)[]),
-  rows: 22,
+  rows: 21,
 )
 
 == Tijdens het stemmen

@@ -67,7 +67,7 @@ Elk stembureau maakt bij een verkiezing een verslag: het proces-verbaal. Hierin 
 
 == Presentielijst
 
-=== Aanwezige leden van het stembureau
+#emph_block[Aanwezige leden van het stembureau]
 
 De volgende rollen zijn mogelijk: voorzitter, plaatsvervangend voorzitter, lid of teller. Vink aan of iemand bij het stemmen en/of tellen aanwezig was.
 
@@ -75,12 +75,12 @@ De volgende rollen zijn mogelijk: voorzitter, plaatsvervangend voorzitter, lid o
   columns: (8em, 1fr, 1fr, 1fr, 7em, 7em),
   headers: ("Voorletters", "Achternaam", "Rol", "Aanwezig van - tot", "Aanwezig bij stemmen", "Aanwezig bij tellen"),
   values: ("", "", "", "-", checkbox(small: true)[], checkbox(small: true)[]),
-  rows: 22,
+  rows: 21,
 )
 
 == Tijdens het stemmen
 
-=== Schrijf *alle bezwaren van aanwezigen tijdens het stemmen* op.
+=== Schrijf alle *bezwaren van aanwezigen tijdens het stemmen* op.
 
 Bijvoorbeeld over toegankelijkheid, niet toegelaten worden of het stemgeheim.
 
@@ -90,7 +90,7 @@ Schrijf geen namen of andere persoonsgegevens op. Schrijf alle bezwaren op, ook 
   columns: (7em, 1fr, 1fr),
   headers: ("Tijdstip", "Bezwaar", "Reactie stembureau"),
   values: ("", "", ""),
-  rows: 24,
+  rows: 27,
 )
 
 #pagebreak(weak: true)

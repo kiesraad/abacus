@@ -10,11 +10,11 @@
   header-right: [Centraal stembureau #input.election.location],
   footer: [
     Datum: #input.creation_date_time. Digitale vingerafdruk van EML-telbestand bij dit PV: \
-    #input.hash \
+    #input.hash
 
     Proces-verbaal van het #location_type \
     Model P 22-2 (versie 2027)
-  ], margin-bottom: 3.2cm
+  ], margin-bottom: 2.9cm, footer-descent: 0.45cm
 )
 
 = Bijlage 1

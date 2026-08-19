@@ -12,11 +12,11 @@
   header-right: location_name,
   footer: [
     Datum: #input.creation_date_time. Digitale vingerafdruk van EML-telbestand bij dit PV: \
-    #input.hash \
+    #input.hash
 
     Corrigendum van een #location_type \
     Model Na 14-2 (versie 2027)
-  ], margin-bottom: 2.9cm
+  ], margin-bottom: 2.9cm, footer-descent: 0.45cm
 )
 
 #set heading(numbering: none)
@@ -206,12 +206,8 @@ Het proces-verbaal moet worden ondertekend door alle aanwezige leden. Bij een #l
 
 #stack(spacing: 0.5em, ..range(0, is_local_election(2, 4)).map(_ => textbox[Naam:][Handtekening:]))
 
-#if not is_local_election(true, false) {
-  pagebreak(weak: true)
-}
-
 == Ondertekening door andere aanwezige leden van het #location_type
 
 #signing_form_label[Extra ondertekening:]
 
-#stack(spacing: 0.5em, ..range(0, is_local_election(13, 10)).map(_ => textbox[Naam:][Handtekening:]))
+#stack(spacing: 0.5em, ..range(0, is_local_election(3, 1)).map(_ => textbox[Naam:][Handtekening:]))

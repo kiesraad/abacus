@@ -1,0 +1,81 @@
+{
+  "committee_session": {
+    "id": 7,
+    "number": 2,
+    "election_id": 4,
+    "location": "Den Haag",
+    "start_date_time": "2025-09-24T10:12:00",
+    "status": "completed"
+  },
+  "election": {
+    "id": 4,
+    "name": "Gemeenteraad Hovenerwoud 2022",
+    "committee_category": "GSB",
+    "counting_method": "CSO",
+    "election_id": "PS2022_Hovenerwoud",
+    "location": "Hovenerwoud",
+    "domain_id": "0446",
+    "category": "Provincial",
+    "sub_category": "PS1",
+    "number_of_seats": 26,
+    "number_of_voters": 152191,
+    "election_date": "2022-02-11",
+    "nomination_date": "2021-12-18"
+  },
+  "investigations": [
+    [
+      {
+        "id": 521,
+        "name": "Filmhuis De Gang",
+        "number": 1,
+        "number_of_voters": 1419,
+        "polling_station_type": "FixedLocation",
+        "address": "Kortestraat 69",
+        "postal_code": "1605YK",
+        "locality": "Hoek van Zoom"
+      },
+      {
+        "polling_station_id": 521,
+        "reason": "Dit is de aanleiding voor het onderzoek",
+        "findings": "Dit zijn de bevindingen van het onderzoek",
+        "corrected_results": true
+      }
+    ],
+    [
+      {
+        "id": 527,
+        "name": "Café Achter De Stembus",
+        "number": 7,
+        "number_of_voters": 1343,
+        "polling_station_type": "FixedLocation",
+        "address": "Grote Markt 21",
+        "postal_code": "4619KN",
+        "locality": "Heemdamseburg"
+      },
+      {
+        "polling_station_id": 527,
+        "reason": "Dit is de aanleiding voor een onderzoek naar stembureau 7",
+        "findings": "Er is geen verschil gevonden",
+        "corrected_results": false
+      }
+    ],
+    [
+      {
+        "id": 538,
+        "name": "Clubhuis De Genieter",
+        "number": 18,
+        "number_of_voters": 1521,
+        "polling_station_type": "FixedLocation",
+        "address": "Beukenlaan 82",
+        "postal_code": "6850KX",
+        "locality": "Eemstricht"
+      },
+      {
+        "polling_station_id": 538,
+        "reason": "Er moet een onderzoek naar stembureau 18 plaatsvinden",
+        "findings": "Er zijn verschillen gevonden bij stembureau 18",
+        "corrected_results": true
+      }
+    ]
+  ]
+}

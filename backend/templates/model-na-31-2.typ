@@ -14,11 +14,11 @@
   header-right: location_name,
   footer: [
     Datum: #input.creation_date_time. Digitale vingerafdruk van EML-telbestand bij dit PV: \
-    #input.hash \
+    #input.hash
 
     Proces-verbaal van een #location_type \
     Model Na 31-2 centrale stemopneming (versie 2027)
-  ], margin-bottom: 3.2cm
+  ], margin-bottom: 2.9cm, footer-descent: 0.45cm
 )
 
 #set heading(numbering: none)
@@ -41,7 +41,7 @@
 
 == Proces-verbaal
 
-Elke #is_municipality[gemeente][openbaar lichaam] maakt bij een verkiezing een verslag: het proces-verbaal. Hierin staat hoe het tellen van de stemmen is verlopen en wat de uitslag van de stemming was.
+#is_municipality[Elke gemeente][Elk openbaar lichaam] maakt bij een verkiezing een verslag: het proces-verbaal. Hierin staat hoe het tellen van de stemmen is verlopen en wat de uitslag van de stemming was.
 
 #emph_block[
   In #this_location is gekozen voor *centrale stemopneming*.
@@ -304,12 +304,8 @@ Het proces-verbaal moet worden ondertekend door alle aanwezige leden. Bij een #l
 
 #stack(spacing: 0.5em, ..range(0, is_local_election(2, 4)).map(_ => textbox[Naam:][Handtekening:]))
 
-#if not is_local_election(true, false) {
-  pagebreak(weak: true)
-}
-
 == Ondertekening door andere aanwezige leden van het #location_type
 
 #signing_form_label[Extra ondertekening:]
 
-#stack(spacing: 0.5em, ..range(0, is_local_election(13, 10)).map(_ => textbox[Naam:][Handtekening:]))
+#stack(spacing: 0.5em, ..range(0, is_local_election(3, 1)).map(_ => textbox[Naam:][Handtekening:]))

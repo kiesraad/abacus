@@ -76,7 +76,7 @@
 }
 
 // Default document styling
-#let conf(doc, header-left: none, header-right: none, footer: none, margin-bottom: 2.0cm) = [
+#let conf(doc, header-left: none, header-right: none, footer: none, margin-bottom: 2.0cm, footer-descent: 0.6cm) = [
   #set text(
     lang: "nl",
     region: "nl",
@@ -89,6 +89,7 @@
     margin: (x: 1.5cm, top: 2.0cm, bottom: margin-bottom),
     numbering: (current, total) => [Pagina #current van #total],
     header: default_header(header-left, header-right),
+    footer-descent: footer-descent,
     footer: context (
       grid(
         columns: (1fr, auto),

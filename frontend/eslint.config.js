@@ -94,6 +94,13 @@ export default defineConfig(
       },
     },
   },
+  // Vite's future `configLoader: 'native'` requires file extensions on relative imports in its config files
+  {
+    files: ["*.config.ts"],
+    rules: {
+      "import-x/extensions": "off",
+    },
+  },
   // Enforce Rules of React for frontend code
   {
     files: ["src/**/*.ts{,x}"],

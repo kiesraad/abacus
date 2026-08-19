@@ -986,25 +986,50 @@ export type DrawingLotsRequired =
   | (CandidateDrawingLotsVariant & { type: "CandidateDrawingLotsRequired" });
 
 /**
- * Election without political groups
+ * Election without political groups.
+ *
+ * Note: an election within Abacus does not represent the entire election, but
+ * rather a single committee (i.e. stembureau at the CSB, HSB or GSB level)
+ * within the election.
+ *
+ * When access to the political groups and their candidates is required, use
+ * [`ElectionWithPoliticalGroups`] instead. When creating a new election, use
+ * [`NewElection`] instead.
  */
 export interface Election {
+  /** See [`ElectionWithPoliticalGroups::authority_id`] */
   authority_id: string;
+  /** See [`ElectionWithPoliticalGroups::authority_name`] */
   authority_name: string;
+  /** See [`ElectionWithPoliticalGroups::authority_region`] */
   authority_region: string;
+  /** See [`ElectionWithPoliticalGroups::category`] */
   category: ElectionCategory;
+  /** See [`ElectionWithPoliticalGroups::committee_category`] */
   committee_category: CommitteeCategory;
+  /** See [`ElectionWithPoliticalGroups::counting_method`] */
   counting_method?: VoteCountingMethod;
+  /** See [`ElectionWithPoliticalGroups::district`] */
   district: CommitteeDistrict;
+  /** See [`ElectionWithPoliticalGroups::domain`] */
   domain?: ElectionDomain;
+  /** See [`ElectionWithPoliticalGroups::election_date`] */
   election_date: string;
+  /** See [`ElectionWithPoliticalGroups::election_id`] */
   election_id: string;
+  /** See [`ElectionWithPoliticalGroups::id`] */
   id: ElectionId;
+  /** See [`ElectionWithPoliticalGroups::location`] */
   location: string;
+  /** See [`ElectionWithPoliticalGroups::name`] */
   name: string;
+  /** See [`ElectionWithPoliticalGroups::nomination_date`] */
   nomination_date: string;
+  /** See [`ElectionWithPoliticalGroups::number_of_seats`] */
   number_of_seats: number;
+  /** See [`ElectionWithPoliticalGroups::number_of_voters`] */
   number_of_voters: number;
+  /** See [`ElectionWithPoliticalGroups::sub_category`] */
   sub_category: ElectionSubCategory;
 }
 
@@ -1127,26 +1152,74 @@ export interface ElectionTotals {
 }
 
 /**
- * Election with political groups
+ * Election with political groups.
+ *
+ * Note: an election within Abacus does not represent the entire election, but
+ * rather a single committee (i.e. stembureau at the CSB, HSB or GSB level)
+ * within the election.
+ *
+ * When you do not need access to political groups and their candidates, you
+ * can use [`Election`] instead. When creating a new election, use
+ * [`NewElection`] instead.
  */
 export interface ElectionWithPoliticalGroups {
+  /** Identifier of the authority/region that this committee is responsible for. */
   authority_id: string;
+  /** Name of the authority. Note that most of the time this is the same as the
+region name, but specifically for country wide elections the authority
+name may also be "De Kiesraad" instead of the region name of "Nederland". */
   authority_name: string;
+  /** The name of the region that the committee is responsible for. */
   authority_region: string;
+  /** The category of the election, as defined by EML_NL election definition.
+Examples include "Municipal" for municipal elections or "WaterAuthority"
+for the water authority elections. */
   category: ElectionCategory;
+  /** The category (e.g. CSB) of the committee that this struct represents */
   committee_category: CommitteeCategory;
+  /** If this is a GSB committee, this is the counting method used for
+vote tabulation. This field is not used for other committee types. */
   counting_method?: VoteCountingMethod;
+  /** The district that this committee is responsible for. This will be None
+for committees within elections that do not have districts. When an
+election does have districts this will be All for committees that are
+responsible for all districts, or Specific for committees that sit
+within a specific district. */
   district: CommitteeDistrict;
+  /** An election wide field: for elections that do not concern the entire
+country this field contains the specific domain of that election. For
+example for municipal elections this contains the municipality that the
+election is for. Note that the election domain id is not always available,
+even if a domain is present. For country wide elections this field is None. */
   domain?: ElectionDomain;
+  /** The date of the election, as defined by the EML_NL election definition.
+Note: this is the date that the election takes/took place, not necessarily
+the date that the committee is in session. */
   election_date: string;
+  /** The election identifier as defined in the EML_NL election definition */
   election_id: string;
+  /** Identifier of the election within Abacus */
   id: ElectionId;
+  /** The location of the committee.
+
+For GSB committees this will be the same as the authority region, but
+for HSBs and CSBs this may also be a specific town or city within the
+authority region. */
   location: string;
+  /** Name of the election, as defined in the EML_NL election definition. */
   name: string;
+  /** The date when candidate nominations for this election are/were closed. */
   nomination_date: string;
+  /** The number of seats that are to be elected for. For example, this is 150
+for elections for the House of Representatives (Tweede Kamer). */
   number_of_seats: number;
+  /** How many voters are registered for this election. */
   number_of_voters: number;
+  /** The political groups and their candidates that are registered for this
+election. */
   political_groups: PoliticalGroup[];
+  /** The sub-category of the election, as defined by the EML_NL election
+definition. */
   sub_category: ElectionSubCategory;
 }
 
@@ -1456,25 +1529,53 @@ export interface LoginResponse {
 }
 
 /**
- * Election request
+ * Struct for creating a new election in Abacus.
+ *
+ * This struct does not contain the internal Abacus election id, as that is
+ * generated by Abacus when creating a new election.
+ *
+ * Note: an election within Abacus does not represent the entire election, but
+ * rather a single committee (i.e. stembureau at the CSB, HSB or GSB level)
+ * within the election.
+ *
+ * Please take a look at [`ElectionWithPoliticalGroups`] for the full election
+ * representation, or [`Election`] for the election representation without
+ * political groups and their candidates.
  */
 export interface NewElection {
+  /** See [`ElectionWithPoliticalGroups::authority_id`] */
   authority_id: string;
+  /** See [`ElectionWithPoliticalGroups::authority_name`] */
   authority_name: string;
+  /** See [`ElectionWithPoliticalGroups::authority_region`] */
   authority_region: string;
+  /** See [`ElectionWithPoliticalGroups::category`] */
   category: ElectionCategory;
+  /** See [`ElectionWithPoliticalGroups::committee_category`] */
   committee_category: CommitteeCategory;
+  /** See [`ElectionWithPoliticalGroups::counting_method`] */
   counting_method?: VoteCountingMethod;
+  /** See [`ElectionWithPoliticalGroups::district`] */
   district: CommitteeDistrict;
+  /** See [`ElectionWithPoliticalGroups::domain`] */
   domain?: ElectionDomain;
+  /** See [`ElectionWithPoliticalGroups::election_date`] */
   election_date: string;
+  /** See [`ElectionWithPoliticalGroups::election_id`] */
   election_id: string;
+  /** See [`ElectionWithPoliticalGroups::location`] */
   location: string;
+  /** See [`ElectionWithPoliticalGroups::name`] */
   name: string;
+  /** See [`ElectionWithPoliticalGroups::nomination_date`] */
   nomination_date: string;
+  /** See [`ElectionWithPoliticalGroups::number_of_seats`] */
   number_of_seats: number;
+  /** See [`ElectionWithPoliticalGroups::number_of_voters`] */
   number_of_voters: number;
+  /** See [`ElectionWithPoliticalGroups::political_groups`] */
   political_groups: RegisteredPoliticalGroup[];
+  /** See [`ElectionWithPoliticalGroups::sub_category`] */
   sub_category: ElectionSubCategory;
 }
 

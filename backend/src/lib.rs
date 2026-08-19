@@ -1,3 +1,5 @@
+#![cfg_attr(test, allow(clippy::too_many_lines, clippy::cognitive_complexity))]
+
 use std::{future::Future, net::SocketAddr, str::FromStr};
 
 use api::middleware::airgap::AirgapDetection;

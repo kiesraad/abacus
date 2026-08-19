@@ -379,6 +379,16 @@ mod tests {
                 expects_exhaustion_step: true,
             },
             Case {
+                name: "deceased on multiple lists -> list 2 blocked, seat goes to list 3 via UHA",
+                // List 1, # alive = 2, list 1 seats = 3 -> exhausted by 1.
+                // List 2, # alive = 1, list 2 seats = 1 -> not retracted, but exhausted.
+                // Unlike the single-list case above, list 2 cannot absorb the retracted
+                // seat: it goes to list 3 through unique-highest-average instead.
+                deceased: HashMap::from([(1, HashSet::from([3])), (2, HashSet::from([2]))]),
+                expected_seats: vec![2, 1, 2],
+                expects_exhaustion_step: true,
+            },
+            Case {
                 name: "two-seat exhaustion on list 1 -> list 2 gets LR, list 3 gets UHA",
                 // List 1, # alive = 1, list 1 seats = 3 -> exhausted by 2.
                 // First retraction reassigns via largest remainder to list 2; after that

@@ -338,6 +338,53 @@ mod tests {
         );
     }
 
+    /// Same as `test_apportionment_process`, but on list 1 we mark candidate 3 as deceased:
+    /// a candidate with 0 votes who would have been elected purely because of their
+    /// position on the list (list 1 gets 7 seats, only candidate 1 is nominated
+    /// preferentially, candidates 2..=7 would be nominated based on list position).
+    ///
+    /// Seat assignment must be unchanged (list 1 still has enough alive candidates).
+    /// In the candidate nomination for list 1, candidate 3 is skipped and candidate 8
+    /// takes the last seat instead.
+    #[test]
+    fn test_apportionment_process_with_deceased_candidate_elected_by_list_position() {
+        let mut input = seat_assignment_fixture_with_default_50_candidates(
+            15,
+            vec![540, 160, 160, 80, 80, 80, 60, 40],
+        );
+        input.deceased_candidates = HashMap::from([(1, HashSet::from([3]))]);
+
+        let Ok(ApportionmentOutput::Completed(result)) = process(&input) else {
+            panic!("should be Completed")
+        };
+
+        // Seat assignment is identical to the `test_apportionment_process` test.
+        assert_eq!(result.seat_assignment.full_seats, 13);
+        assert_eq!(result.seat_assignment.residual_seats, 2);
+        let total_seats = get_total_seats_from_apportionment_result(&result.seat_assignment);
+        assert_eq!(total_seats, vec![7, 2, 2, 1, 1, 1, 1, 0]);
+
+        // List 1: candidate 1 still gets the preferential seat; the other 6 seats are
+        // assigned by list position, skipping deceased candidate 3.
+        let expected_ranking: Vec<u32> = [1, 2].into_iter().chain(4..=50).collect();
+        check_list_candidate_nomination(
+            &result.candidate_nomination.list_candidate_nomination[0],
+            &[1],
+            &[2, 4, 5, 6, 7, 8],
+            &expected_ranking,
+        );
+
+        // List 1 chosen: candidates 1, 2 (indices 0..2) and 4..=8 (indices 3..8)
+        // Not chosen: candidate 3 (deceased, index 2) and candidates 9..=50 (indices 8..)
+        let list1 = &input.list_votes[0];
+        check_chosen_candidates(
+            &result.candidate_nomination.chosen_candidates,
+            list1.number,
+            &[&list1.candidate_votes[..2], &list1.candidate_votes[3..8]].concat(),
+            &[&list1.candidate_votes[2..3], &list1.candidate_votes[8..]].concat(),
+        );
+    }
+
     /// Scenarios testing deceased candidates and seat assignment.
     ///
     /// All cases share the same small fixture:

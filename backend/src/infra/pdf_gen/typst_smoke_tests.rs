@@ -17,9 +17,9 @@ use crate::{
         committee_session_status::CommitteeSessionStatus,
         data_entry::{DataEntryId, DataEntrySource, DataEntrySourceNumber},
         election::{
-            Candidate, CandidateGender, CandidateNumber, CommitteeCategory, ElectionCategory,
-            ElectionId, ElectionSubCategory, ElectionWithPoliticalGroups, PGNumber, PoliticalGroup,
-            VoteCountingMethod,
+            Candidate, CandidateGender, CandidateNumber, CommitteeCategory, CommitteeDistrict,
+            ElectionCategory, ElectionDomain, ElectionId, ElectionSubCategory,
+            ElectionWithPoliticalGroups, PGNumber, PoliticalGroup, VoteCountingMethod,
         },
         investigation::PollingStationInvestigation,
         models::{
@@ -145,7 +145,14 @@ fn random_election(
         )),
         election_id: random_string(rng, string_length),
         location: random_string(rng, string_length),
-        domain_id: random_string(rng, string_length),
+        authority_id: random_string(rng, string_length),
+        authority_name: random_string(rng, string_length),
+        authority_region: random_string(rng, string_length),
+        district: CommitteeDistrict::None,
+        domain: Some(ElectionDomain {
+            id: Some(random_string(rng, string_length)),
+            name: random_string(rng, string_length),
+        }),
         category: ElectionCategory::Municipal,
         sub_category: ElectionCategory::Municipal.sub_category(number_of_seats),
         number_of_seats,

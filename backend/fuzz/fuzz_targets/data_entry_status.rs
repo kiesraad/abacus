@@ -4,8 +4,8 @@ use abacus::{
     domain::{
         data_entry::{ClientState, DataEntryStatus, DataEntryTransitionError, DataEntryUpdate},
         election::{
-            CommitteeCategory, ElectionCategory, ElectionId, ElectionSubCategory,
-            ElectionWithPoliticalGroups, VoteCountingMethod,
+            CommitteeCategory, CommitteeDistrict, ElectionCategory, ElectionDomain, ElectionId,
+            ElectionSubCategory, ElectionWithPoliticalGroups, VoteCountingMethod,
         },
         results::{
             Results,
@@ -148,7 +148,14 @@ fn election() -> ElectionWithPoliticalGroups {
         counting_method: Some(VoteCountingMethod::CSO),
         election_id: "Test_2025".to_string(),
         location: "Test locatie".to_string(),
-        domain_id: "0000".to_string(),
+        authority_id: "0000".to_string(),
+        authority_name: "Test".to_string(),
+        authority_region: "Test".to_string(),
+        district: CommitteeDistrict::None,
+        domain: Some(ElectionDomain {
+            id: Some("0000".to_string()),
+            name: "Test".to_string(),
+        }),
         category: ElectionCategory::Municipal,
         sub_category: ElectionSubCategory::GR1,
         number_of_seats: 18,
@@ -447,7 +454,7 @@ fn is_as_expected(
 }
 
 /// A single entry being finalised or kept while it is the only entry.
-/// 
+///
 /// - Keeping the first entry will discard the second entry.
 /// - Keeping the second entry will discard the first entry, making the second entry the first entry.
 /// - The state transitions to `FirstEntryFinalised` if that data entry does not have errors and to `FirstEntryHasErrors` if it does.

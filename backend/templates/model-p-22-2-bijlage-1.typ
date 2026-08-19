@@ -7,7 +7,7 @@
 #show: doc => conf(
   doc,
   header-left: [Bijlage 1 – Stemmen per lijst en per kandidaat],
-  header-right: [Centraal stembureau #input.election.location],
+  header-right: [Centraal stembureau #input.election.authority_region],
   footer: [
     Datum: #input.creation_date_time. Digitale vingerafdruk van EML-telbestand bij dit PV: \
     #input.hash

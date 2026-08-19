@@ -15,7 +15,7 @@ function ElectionBreadcrumb({ election }: { election: Election }) {
   return (
     <>
       <span className="bold">
-        {election.committee_category} {election.domain_id} {election.location}
+        {election.committee_category} {election.authority_id} {election.authority_region}
       </span>
       <span>&mdash;</span>
       <span>{election.name}</span>

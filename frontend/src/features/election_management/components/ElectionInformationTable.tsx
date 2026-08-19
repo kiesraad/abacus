@@ -50,7 +50,7 @@ export function ElectionInformationTable({
             {t("election_management.electoral_area")}
           </Table.HeaderCell>
           <Table.Cell>
-            {election.domain_id} - {t("municipality")} {election.location}
+            {election.authority_id} - {t("municipality")} {election.authority_region}
           </Table.Cell>
         </Table.Row>
         <Table.Row>

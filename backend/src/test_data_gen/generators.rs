@@ -14,9 +14,9 @@ use crate::{
             DataEntryId, DataEntrySource, DataEntryStatus, Definitive, FirstEntryFinalised,
         },
         election::{
-            self, CandidateGender, CandidateNumber, CommitteeCategory, ElectionCategory,
-            ElectionWithPoliticalGroups, NewElection, PGNumber, RegisteredPoliticalGroup,
-            VoteCountingMethod,
+            self, CandidateGender, CandidateNumber, CommitteeCategory, CommitteeDistrict,
+            ElectionCategory, ElectionDomain, ElectionWithPoliticalGroups, NewElection, PGNumber,
+            RegisteredPoliticalGroup, VoteCountingMethod,
         },
         field_path::FieldPath,
         polling_station::{PollingStation, PollingStationRequest, PollingStationType},
@@ -156,8 +156,14 @@ async fn generate_csb_election_data(
     votes: Option<Vec<Vec<u32>>>,
 ) -> Result<(Vec<PollingStation>, bool), Box<dyn Error>> {
     let data_entry_complete = if election.category == ElectionCategory::Municipal {
+        // TODO: We should use the same setup as with the import
         let number = election
-            .domain_id
+            .domain
+            .as_ref()
+            .expect("Municipal elections should have a domain")
+            .id
+            .as_ref()
+            .expect("Municipal elections should have a domain id")
             .parse()
             .expect("domain_id should be numeric");
         let sub_committee_first_session = create_sub_committee(
@@ -313,14 +319,27 @@ fn generate_election(
 
     let category = args.election_category.to_eml_code();
     let year = election_date.year();
-    let locality = super::data::locality(rng).to_owned();
+    let domain = match args.election_category {
+        ElectionCategory::Municipal => ElectionDomain {
+            id: Some(super::data::domain_id(rng)),
+            name: super::data::locality(rng).to_owned(),
+        },
+        ElectionCategory::Provincial => ElectionDomain {
+            id: None,
+            name: super::data::province(rng).to_owned(),
+        },
+        ElectionCategory::WaterAuthority => ElectionDomain {
+            id: Some(rng.random_range(1..23).to_string()),
+            name: super::data::water_authority(rng).to_owned(),
+        },
+    };
 
     // use the previous data to generate some identifiers and names
     let name: String = args
         .custom_name
         .clone()
-        .unwrap_or_else(|| format_election_name(rng, args.election_category, &locality, year));
-    let cleaned_up_locality = locality.replace(" ", "_").replace("'", "");
+        .unwrap_or_else(|| format_election_name(rng, args.election_category, &domain.name, year));
+    let cleaned_up_locality = domain.name.replace(" ", "_").replace("'", "");
     let election_id = format!("{category}{year}_{cleaned_up_locality}");
 
     info!("Election has name '{name}'");
@@ -337,14 +356,54 @@ fn generate_election(
         }
     };
 
+    let is_municipal = args.election_category == ElectionCategory::Municipal;
+
+    // only used when we generate for a GSB committee
+    let gsb_committee_locality = super::data::locality(rng);
+
+    let authority_name = if is_municipal || args.committee_category == CommitteeCategory::CSB {
+        // municipalities and CSB committees take the authority name from the domain
+        domain.name.clone()
+    } else {
+        // for GSBs we use another locality
+        gsb_committee_locality.to_owned()
+    };
+
     // and put it all in the struct (generating some additional fields where needed)
     NewElection {
         name,
         committee_category: args.committee_category,
         counting_method,
-        domain_id: super::data::domain_id(rng),
+        authority_id: match args.committee_category {
+            CommitteeCategory::CSB => "CSB".to_string(),
+            CommitteeCategory::GSB => {
+                if is_municipal {
+                    domain
+                        .id
+                        .as_ref()
+                        .expect("Domain ID should exist for municipal election")
+                        .clone()
+                } else {
+                    // GSBs don't take the authority id from their main election unless it is a municipal election
+                    super::data::domain_id(rng)
+                }
+            }
+        },
+        authority_name: authority_name.clone(),
+        authority_region: authority_name.clone(),
+        district: CommitteeDistrict::None,
+        domain: Some(domain.clone()),
         election_id,
-        location: locality,
+        location: if is_municipal {
+            // Municipal elections take the location from their domain
+            domain.name.clone()
+        } else if args.committee_category == CommitteeCategory::CSB {
+            // The CSB is seated in a specific spot, generate a locality for that
+            super::data::locality(rng).to_owned()
+        } else {
+            // For GSBs we use the same locality used for authority name
+            gsb_committee_locality.to_owned()
+        },
         category: args.election_category,
         sub_category: args.election_category.sub_category(number_of_seats),
         number_of_seats,

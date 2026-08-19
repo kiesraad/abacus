@@ -1,6 +1,6 @@
-INSERT INTO elections (id, name, committee_category, counting_method, election_id, location, domain_id, category, sub_category, number_of_seats, number_of_voters, election_date, nomination_date, political_groups)
+INSERT INTO elections (id, name, committee_category, counting_method, election_id, location, authority_id, authority_name, authority_region, district, domain, category, sub_category, number_of_seats, number_of_voters, election_date, nomination_date, political_groups)
 -- number_of_seats explicitly set to a value less than 19, to be used in elections with less than 19 seats
-VALUES (11, 'Waterschap Rivier en Polder 2026', 'GSB', 'DSO', 'AB2026_Heemdamseburg', 'Heemdamseburg', '0065', 'WaterAuthority', 'AB1', 15, 2000, '2026-11-30', '2026-11-01',
+VALUES (11, 'Waterschap Rivier en Polder 2026', 'GSB', 'DSO', 'AB2026_Heemdamseburg', 'Heemdamseburg', '0065', 'Heemdamseburg', 'Heemdamseburg', '{"district":"None"}', '{"id":"10","name":"Rivier en Polder"}', 'WaterAuthority', 'AB1', 15, 2000, '2026-11-30', '2026-11-01',
         '[
           {
             "number": 1,

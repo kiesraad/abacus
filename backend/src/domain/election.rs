@@ -24,7 +24,13 @@ pub struct Election {
     pub counting_method: Option<VoteCountingMethod>,
     pub election_id: String,
     pub location: String,
-    pub domain_id: String,
+    pub authority_id: String,
+    pub authority_name: String,
+    pub authority_region: String,
+    pub district: CommitteeDistrict,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    pub domain: Option<ElectionDomain>,
     pub category: ElectionCategory,
     pub sub_category: ElectionSubCategory,
     pub number_of_seats: u32,
@@ -47,7 +53,13 @@ pub struct ElectionWithPoliticalGroups {
     pub counting_method: Option<VoteCountingMethod>,
     pub election_id: String,
     pub location: String,
-    pub domain_id: String,
+    pub authority_id: String,
+    pub authority_name: String,
+    pub authority_region: String,
+    pub district: CommitteeDistrict,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    pub domain: Option<ElectionDomain>,
     pub category: ElectionCategory,
     pub sub_category: ElectionSubCategory,
     pub number_of_seats: u32,
@@ -69,7 +81,11 @@ impl From<ElectionWithPoliticalGroups> for Election {
             counting_method: value.counting_method,
             election_id: value.election_id,
             location: value.location,
-            domain_id: value.domain_id,
+            authority_id: value.authority_id,
+            authority_name: value.authority_name,
+            authority_region: value.authority_region,
+            district: value.district,
+            domain: value.domain,
             category: value.category,
             sub_category: value.sub_category,
             number_of_seats: value.number_of_seats,
@@ -152,7 +168,13 @@ pub struct NewElection {
     pub counting_method: Option<VoteCountingMethod>,
     pub election_id: String,
     pub location: String,
-    pub domain_id: String,
+    pub authority_id: String,
+    pub authority_name: String,
+    pub authority_region: String,
+    pub district: CommitteeDistrict,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    pub domain: Option<ElectionDomain>,
     pub category: ElectionCategory,
     pub sub_category: ElectionSubCategory,
     pub number_of_seats: u32,
@@ -236,6 +258,86 @@ impl ElectionCategory {
             }
         }
     }
+}
+
+/// Category of a region, as defined by EML-NL
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, ToSchema)]
+pub enum RegionCategory {
+    /// The highest level of government, the 'staat'.
+    State,
+    /// A 'waterschap'
+    WaterAuthority,
+    /// A 'provincie'
+    Province,
+    /// A 'kieskring'
+    ElectoralDistrict,
+    /// A 'gemeente', the lowest level of government region in mainland Netherlands.
+    Municipality,
+    /// A 'stembureau' (note: only for eerste kamer elections)
+    PollingStation,
+}
+
+/// Identifies a specific region from the election tree for usage within Abacus.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, ToSchema)]
+pub struct RegionKey {
+    /// Category of the region, as defined by EML_NL
+    pub category: RegionCategory,
+    /// Identifier of the region, if it has one.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    pub number: Option<u16>,
+}
+
+/// Identifies a specific region from the election tree for usage within Abacus.
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, ToSchema)]
+pub struct RegionDetails {
+    /// Name of the region
+    pub name: String,
+
+    /// Key of the region (combination of category and id)
+    pub key: RegionKey,
+
+    /// Whether this region uses roman numerals for its contest id.
+    pub roman_numerals: bool,
+
+    /// Whether this region allows Frisian export.
+    pub frisian_export_allowed: bool,
+}
+
+/// Which district this committee is contained within.
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, ToSchema)]
+#[serde(tag = "district")]
+pub enum CommitteeDistrict {
+    /// The election has no districts
+    None,
+    /// This committee operates over all districts
+    All,
+    /// This committee operates within a specific district
+    Specific(RegionDetails),
+}
+
+impl CommitteeDistrict {
+    /// Retrieve the region details from the district information if available.
+    ///
+    /// Note that when the committee district is set to all or none, this
+    /// information is not available.
+    pub fn region_details(&self) -> Option<&RegionDetails> {
+        match self {
+            Self::Specific(r) => Some(r),
+            _ => None,
+        }
+    }
+}
+
+/// Election domain (i.e. the entity at which the election takes place)
+#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
+pub struct ElectionDomain {
+    /// Identfier of the domain
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    pub id: Option<String>,
+    /// Name of the domain
+    pub name: String,
 }
 
 /// Election sub category (limited for now)
@@ -462,7 +564,21 @@ pub(crate) mod tests {
             },
             election_id: "GR2023_Test".to_string(),
             location: "Test".to_string(),
-            domain_id: "0000".to_string(),
+            authority_id: match committee_category {
+                CommitteeCategory::GSB => "0000".to_string(),
+                CommitteeCategory::CSB => "CSB".to_string(),
+            },
+            authority_name: "Test".to_string(),
+            authority_region: "Test".to_string(),
+            district: CommitteeDistrict::None,
+            domain: Some(ElectionDomain {
+                id: if election_category != ElectionCategory::Provincial {
+                    Some("0000".to_string()) // provincial elections do not have a domain id
+                } else {
+                    None
+                },
+                name: "Test".to_string(),
+            }),
             category: election_category,
             sub_category: election_category.sub_category(number_of_seats),
             number_of_seats,

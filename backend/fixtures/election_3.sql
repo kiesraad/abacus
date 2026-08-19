@@ -1,5 +1,5 @@
-INSERT INTO elections (id, name, committee_category, counting_method, election_id, location, domain_id, category, sub_category, number_of_seats, number_of_voters, election_date, nomination_date, political_groups)
-VALUES (3, 'Municipal Re-election', 'GSB', 'CSO', 'GR2024_Heemdamseburg', 'Heemdamseburg', '0065', 'Municipal', 'GR2', 29, 2000, '2024-12-31', '2024-12-01',
+INSERT INTO elections (id, name, committee_category, counting_method, election_id, location, authority_id, authority_name, authority_region, district, domain, category, sub_category, number_of_seats, number_of_voters, election_date, nomination_date, political_groups)
+VALUES (3, 'Municipal Re-election', 'GSB', 'CSO', 'GR2024_Heemdamseburg', 'Heemdamseburg', '0065', 'Heemdamseburg', 'Heemdamseburg', '{"district":"None"}', '{"id":"0065","name":"Heemdamseburg"}', 'Municipal', 'GR2', 29, 2000, '2024-12-31', '2024-12-01',
         '[
           {
             "number": 1,

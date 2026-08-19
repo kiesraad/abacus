@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n        SELECT\n            id,\n            name,\n            committee_category,\n            counting_method,\n            election_id,\n            location,\n            domain_id,\n            category,\n            sub_category,\n            number_of_seats,\n            number_of_voters,\n            election_date,\n            nomination_date,\n            political_groups\n        FROM elections\n        WHERE id = ?\n        ",
+  "query": "\n        SELECT\n            id,\n            name,\n            committee_category,\n            counting_method,\n            election_id,\n            location,\n            authority_id,\n            authority_name,\n            authority_region,\n            district,\n            domain,\n            category,\n            sub_category,\n            number_of_seats,\n            number_of_voters,\n            election_date,\n            nomination_date,\n            political_groups\n        FROM elections\n        WHERE id = ?\n        ",
   "describe": {
     "columns": [
       {
@@ -70,19 +70,63 @@
         }
       },
       {
-        "name": "domain_id",
+        "name": "authority_id",
         "ordinal": 6,
         "type_info": "Text",
         "origin": {
           "Table": {
             "table": "elections",
-            "name": "domain_id"
+            "name": "authority_id"
+          }
+        }
+      },
+      {
+        "name": "authority_name",
+        "ordinal": 7,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "elections",
+            "name": "authority_name"
+          }
+        }
+      },
+      {
+        "name": "authority_region",
+        "ordinal": 8,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "elections",
+            "name": "authority_region"
+          }
+        }
+      },
+      {
+        "name": "district",
+        "ordinal": 9,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "elections",
+            "name": "district"
+          }
+        }
+      },
+      {
+        "name": "domain",
+        "ordinal": 10,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "elections",
+            "name": "domain"
           }
         }
       },
       {
         "name": "category",
-        "ordinal": 7,
+        "ordinal": 11,
         "type_info": "Text",
         "origin": {
           "Table": {
@@ -93,7 +137,7 @@
       },
       {
         "name": "sub_category",
-        "ordinal": 8,
+        "ordinal": 12,
         "type_info": "Text",
         "origin": {
           "Table": {
@@ -104,7 +148,7 @@
       },
       {
         "name": "number_of_seats",
-        "ordinal": 9,
+        "ordinal": 13,
         "type_info": "Integer",
         "origin": {
           "Table": {
@@ -115,7 +159,7 @@
       },
       {
         "name": "number_of_voters",
-        "ordinal": 10,
+        "ordinal": 14,
         "type_info": "Integer",
         "origin": {
           "Table": {
@@ -126,7 +170,7 @@
       },
       {
         "name": "election_date",
-        "ordinal": 11,
+        "ordinal": 15,
         "type_info": "Text",
         "origin": {
           "Table": {
@@ -137,7 +181,7 @@
       },
       {
         "name": "nomination_date",
-        "ordinal": 12,
+        "ordinal": 16,
         "type_info": "Text",
         "origin": {
           "Table": {
@@ -148,7 +192,7 @@
       },
       {
         "name": "political_groups",
-        "ordinal": 13,
+        "ordinal": 17,
         "type_info": "Text",
         "origin": {
           "Table": {
@@ -172,11 +216,15 @@
       false,
       false,
       false,
+      true,
+      false,
+      false,
+      false,
       false,
       false,
       false,
       false
     ]
   },
-  "hash": "f83d391a5f31a8535c015b420e38002ba5e4f273717fac3367e69f758a6a510f"
+  "hash": "3d23f67cc359b6c2738b5e23a46db2754000c330a8dcfd921aed1dd94aa7d147"
 }

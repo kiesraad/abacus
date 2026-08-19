@@ -733,6 +733,11 @@ export const committeeCategoryValues = ["GSB", "CSB"] as const;
 export type CommitteeCategory = (typeof committeeCategoryValues)[number];
 
 /**
+ * Which district this committee is contained within.
+ */
+export type CommitteeDistrict = { district: "None" } | { district: "All" } | (RegionDetails & { district: "Specific" });
+
+/**
  * Committee session
  */
 export interface CommitteeSession {
@@ -984,10 +989,14 @@ export type DrawingLotsRequired =
  * Election without political groups
  */
 export interface Election {
+  authority_id: string;
+  authority_name: string;
+  authority_region: string;
   category: ElectionCategory;
   committee_category: CommitteeCategory;
   counting_method?: VoteCountingMethod;
-  domain_id: string;
+  district: CommitteeDistrict;
+  domain?: ElectionDomain;
   election_date: string;
   election_id: string;
   id: ElectionId;
@@ -1034,6 +1043,16 @@ export interface ElectionDetailsResponse {
   election: ElectionWithPoliticalGroups;
   investigations: PollingStationInvestigation[];
   polling_stations: PollingStation[];
+}
+
+/**
+ * Election domain (i.e. the entity at which the election takes place)
+ */
+export interface ElectionDomain {
+  /** Identfier of the domain */
+  id?: string;
+  /** Name of the domain */
+  name: string;
 }
 
 export type ElectionId = number;
@@ -1111,10 +1130,14 @@ export interface ElectionTotals {
  * Election with political groups
  */
 export interface ElectionWithPoliticalGroups {
+  authority_id: string;
+  authority_name: string;
+  authority_region: string;
   category: ElectionCategory;
   committee_category: CommitteeCategory;
   counting_method?: VoteCountingMethod;
-  domain_id: string;
+  district: CommitteeDistrict;
+  domain?: ElectionDomain;
   election_date: string;
   election_id: string;
   id: ElectionId;
@@ -1436,10 +1459,14 @@ export interface LoginResponse {
  * Election request
  */
 export interface NewElection {
+  authority_id: string;
+  authority_name: string;
+  authority_region: string;
   category: ElectionCategory;
   committee_category: CommitteeCategory;
   counting_method?: VoteCountingMethod;
-  domain_id: string;
+  district: CommitteeDistrict;
+  domain?: ElectionDomain;
   election_date: string;
   election_id: string;
   location: string;
@@ -1633,6 +1660,43 @@ export interface RedactedEmlHash {
   chunks: string[];
   /** Indexes of chunks that will be empty, sorted */
   redacted_indexes: number[];
+}
+
+/**
+ * Category of a region, as defined by EML-NL
+ */
+export const regionCategoryValues = [
+  "State",
+  "WaterAuthority",
+  "Province",
+  "ElectoralDistrict",
+  "Municipality",
+  "PollingStation",
+] as const;
+export type RegionCategory = (typeof regionCategoryValues)[number];
+
+/**
+ * Identifies a specific region from the election tree for usage within Abacus.
+ */
+export interface RegionDetails {
+  /** Whether this region allows Frisian export. */
+  frisian_export_allowed: boolean;
+  /** Key of the region (combination of category and id) */
+  key: RegionKey;
+  /** Name of the region */
+  name: string;
+  /** Whether this region uses roman numerals for its contest id. */
+  roman_numerals: boolean;
+}
+
+/**
+ * Identifies a specific region from the election tree for usage within Abacus.
+ */
+export interface RegionKey {
+  /** Category of the region, as defined by EML_NL */
+  category: RegionCategory;
+  /** Identifier of the region, if it has one. */
+  number?: number;
 }
 
 /**

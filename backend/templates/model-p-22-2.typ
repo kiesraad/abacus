@@ -19,7 +19,7 @@
 
     Proces-verbaal van het #location_type \
     Model P 22-2 (versie 2027)
-  ], margin-bottom: 2.9cm, footer-descent: 0.45cm
+  ], margin-bottom: 2.9cm
 )
 
 #set heading(numbering: none)

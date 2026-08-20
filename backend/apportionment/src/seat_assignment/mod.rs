@@ -2935,6 +2935,7 @@ pub(crate) mod tests {
                 assert_eq!(total_seats, vec![11, 9]);
                 assert!(result.warnings().is_empty());
             }
+
             /// Apportionment with residual seats assigned with highest averages method
             ///
             /// This test triggers Kieswet Article P 9, where the last residual seats were

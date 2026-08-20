@@ -42,8 +42,8 @@ use crate::{
     domain::{
         committee_session::CommitteeSession,
         election::{
-            Candidate, CandidateGender, CandidateNumber, CommitteeCategory, ElectionDomain,
-            ElectionWithPoliticalGroups, NewElection, PGNumber, RegionKey,
+            Candidate, CandidateGender, CandidateNumber, CommitteeCategory, CommitteeDistrict,
+            ElectionDomain, ElectionWithPoliticalGroups, NewElection, PGNumber, RegionKey,
             RegisteredPoliticalGroup,
         },
         results::political_group_candidate_votes::PoliticalGroupCandidateVotes,
@@ -213,16 +213,18 @@ impl NewElection {
     pub fn add_candidates_from_eml_str(
         &mut self,
         candidate_list_data: &str,
+        district_region: &CommitteeDistrict,
     ) -> Result<(), EMLImportError> {
         let candidate_list =
             CandidateLists::parse_eml(candidate_list_data, EMLParsingMode::Strict).ok()?;
 
-        self.add_candidates_from_eml(&candidate_list)
+        self.add_candidates_from_eml(&candidate_list, district_region)
     }
 
     pub fn add_candidates_from_eml(
         &mut self,
         candidate_lists: &CandidateLists,
+        district_region: &CommitteeDistrict,
     ) -> Result<(), EMLImportError> {
         let election = &candidate_lists.candidate_list.election;
         let identifier = &election.identifier;
@@ -246,11 +248,26 @@ impl NewElection {
             return Err(EMLImportError::MismatchElectionDate);
         }
 
-        // TODO: ensure that contest is for same district as chosen district
         let contest = election
             .contests
             .first()
             .ok_or(EMLImportError::CandidateListWithoutContest)?;
+
+        // check that contest id is the same as the region number
+        let contest_id = contest.identifier.id.cloned_value()?;
+        match (district_region, contest_id) {
+            // Only allow none-district if the election district is none
+            (CommitteeDistrict::None, c) if c.is_geen() => {}
+            // If the district region is all, allow any contest id (except geen)
+            (CommitteeDistrict::All, c) if !c.is_geen() => {}
+            // Otherwise, the contest id must match the district number
+            (CommitteeDistrict::Specific(s), other)
+                if let Some(num) = s.key.number
+                    && other.value() == num.to_string() => {}
+            _ => {
+                return Err(EMLImportError::InvalidDistrict);
+            }
+        }
 
         // extract initial listing of political groups with candidates
         let mut previous_pg_number = PGNumber::from(0);

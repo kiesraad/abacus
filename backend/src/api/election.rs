@@ -663,7 +663,8 @@ fn parse_election_candidates_eml(
         NewElection::from_eml_str(election_eml_data, selected_committee)?;
     // TODO: need to pick the right district first before adding candidates
     if let Some(candidate_eml_data) = candidate_eml_data {
-        election.add_candidates_from_eml_str(candidate_eml_data)?;
+        let district = election.district.clone();
+        election.add_candidates_from_eml_str(candidate_eml_data, &district)?;
     }
 
     Ok(election)

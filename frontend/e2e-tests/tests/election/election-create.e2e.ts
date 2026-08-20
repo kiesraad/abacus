@@ -28,7 +28,7 @@ test.use({
 });
 
 test.describe("Election creation", () => {
-  test.describe("GSB election creation", () => {
+  test.describe("GSB CSO election creation", () => {
     test("it uploads an election file, candidate list and polling stations", async ({ page }) => {
       await page.goto("/elections");
       const overviewPage = new ElectionsOverviewPgObj(page);
@@ -151,6 +151,163 @@ test.describe("Election creation", () => {
       await expect(checkAndSavePage.numberOfListsAndCandidates).toContainText("3 lijsten en 18 kandidaten");
       await expect(checkAndSavePage.numberOfPollingStations).toBeHidden();
       await expect(checkAndSavePage.countingMethod).toContainText("Centrale stemopneming");
+      await expect(checkAndSavePage.numberOfVoters).toContainText("1.234 kiesgerechtigden");
+
+      const election = await checkAndSavePage.saveElection();
+      await expect(overviewPage.adminHeader).toBeVisible();
+
+      const electionRow = overviewPage.findElectionRowById(election.id);
+      await expect(electionRow).toBeVisible();
+      await expect(electionRow).toContainText("Gemeenteraad Test 2022");
+      await expect(electionRow).toContainText("Zitting voorbereiden");
+      await electionRow.click();
+
+      const electionHomePage = new ElectionHome(page);
+      await expect(electionHomePage.header).toHaveText("Gemeenteraad Test 2022");
+      await electionHomePage.alertLinkToPollingStations.click();
+
+      const pollingStationsPage = new PollingStationListEmptyPgObj(page);
+      await pollingStationsPage.importButton.click();
+      const importPage = new PollingStationImportPgObj(page);
+      await importPage.uploadFile(eml110b.path);
+      await importPage.importButton.click();
+
+      const listPage = new PollingStationListPgObj(page);
+      await expect(listPage.header).toBeVisible();
+      await expect(listPage.alert).toContainText(/Er zijn \d+ stembureaus geïmporteerd/);
+
+      const navBar = new AdminNavBar(page);
+      await navBar.getElectionBreadcrumb(eml110a.electionName).click();
+
+      await expect(electionHomePage.header).toBeVisible();
+      const session = electionHomePage.getCommitteeSessionCard(1);
+      await expect(session).toContainText("Klaar voor invoer");
+    });
+  });
+
+  test.describe("GSB DSO election creation", () => {
+    test("it uploads an election file, candidate list and polling stations", async ({ page }) => {
+      await page.goto("/elections");
+      const overviewPage = new ElectionsOverviewPgObj(page);
+      await overviewPage.create.click();
+
+      // upload election and check hash
+      await uploadElectionAndInputHash(page);
+
+      // upload candidates list and check
+      await uploadCandidatesAndInputHash(page, eml230b);
+
+      // committee category
+      const committeeCategoryPage = new CommitteeCategoryPgObj(page);
+      await expect(committeeCategoryPage.header).toBeVisible();
+      await committeeCategoryPage.next.click();
+
+      // upload polling stations
+      await uploadPollingStations(page);
+
+      // Counting method page
+      const countingMethodPage = new CountingMethodTypePgObj(page);
+      await expect(countingMethodPage.header).toBeVisible();
+      await expect(countingMethodPage.cso).not.toBeChecked();
+      await expect(countingMethodPage.dso).not.toBeChecked();
+      await countingMethodPage.dso.check();
+      await countingMethodPage.next.click();
+
+      // Number of voters page
+      const numberOfVotersPage = new NumberOfVotersPgObj(page);
+      await expect(numberOfVotersPage.header).toBeVisible();
+      await expect(numberOfVotersPage.hint).toBeVisible();
+      await numberOfVotersPage.next.click();
+
+      // Now we should be at the check and save page
+      const checkAndSavePage = new CheckAndSavePgObj(page);
+      await expect(checkAndSavePage.header).toBeVisible();
+
+      await expect(checkAndSavePage.electionName).toContainText("verkiezing: Gemeenteraad Test 2022");
+      await expect(checkAndSavePage.committeeCategory).toContainText("type stembureau: Gemeentelijk stembureau");
+      await expect(checkAndSavePage.electionLocation).toContainText("gebiedsaanduiding: Test");
+      await expect(checkAndSavePage.numberOfListsAndCandidates).toContainText("3 lijsten en 18 kandidaten");
+      await expect(checkAndSavePage.numberOfPollingStations).toContainText("420 stembureaus");
+      await expect(checkAndSavePage.countingMethod).toContainText("Decentrale stemopneming");
+      await expect(checkAndSavePage.numberOfVoters).toContainText("612.694 kiesgerechtigden");
+
+      // Now go back and fill the number of voters with a custom value
+      await page.goBack();
+      await expect(numberOfVotersPage.header).toBeVisible();
+      await expect(numberOfVotersPage.hint).toBeVisible();
+      await numberOfVotersPage.input.fill("1234");
+      await numberOfVotersPage.next.click();
+
+      // Check that the value is updated
+      await expect(checkAndSavePage.header).toBeVisible();
+      await expect(checkAndSavePage.numberOfVoters).toContainText("1.234 kiesgerechtigden");
+
+      // Go back another time to check that the hint is gone (since now it's not an imported value anymore)
+      // It should also still show the updated value
+      await page.goBack();
+      await expect(numberOfVotersPage.input).toHaveValue("1234");
+      await expect(numberOfVotersPage.hint).toBeHidden();
+      await numberOfVotersPage.next.click();
+
+      // Back to the check and save page to test saving the election
+      const election = await checkAndSavePage.saveElection();
+      await expect(overviewPage.adminHeader).toBeVisible();
+      await expect(overviewPage.alertGSBElectionCreated).toBeVisible();
+
+      const electionRow = overviewPage.findElectionRowById(election.id);
+      await expect(electionRow).toBeVisible();
+      await expect(electionRow).toContainText("Gemeenteraad Test 2022");
+      await expect(electionRow).toContainText("GSB - Test (0000)");
+      await expect(electionRow).toContainText("Klaar voor invoer");
+    });
+
+    test("it uploads an election file, candidate list but adds polling stations afterwards", async ({ page }) => {
+      await page.goto("/elections");
+      const overviewPage = new ElectionsOverviewPgObj(page);
+      await overviewPage.create.click();
+
+      // upload election and check hash
+      await uploadElectionAndInputHash(page);
+
+      // upload candidates list and check
+      await uploadCandidatesAndInputHash(page, eml230b);
+
+      // committee category
+      const committeeCategoryPage = new CommitteeCategoryPgObj(page);
+      await expect(committeeCategoryPage.header).toBeVisible();
+      await committeeCategoryPage.next.click();
+
+      // skip polling stations
+      const uploadPollingStationsPage = new UploadPollingStationsFilePgObj(page);
+      await expect(uploadPollingStationsPage.header).toBeVisible();
+      await uploadPollingStationsPage.skipButton.click();
+
+      // Counting method page
+      const countingMethodPage = new CountingMethodTypePgObj(page);
+      await expect(countingMethodPage.header).toBeVisible();
+      await countingMethodPage.dso.check();
+      await countingMethodPage.next.click();
+
+      // Number of voters page
+      const numberOfVotersPage = new NumberOfVotersPgObj(page);
+      await expect(numberOfVotersPage.header).toBeVisible();
+      await expect(numberOfVotersPage.hint).toBeHidden();
+      await numberOfVotersPage.next.click();
+
+      // Expect error, input a value and try clicking Next again
+      await expect(numberOfVotersPage.error).toBeVisible();
+      await numberOfVotersPage.input.fill("1234");
+      await numberOfVotersPage.next.click();
+
+      // Now we should be at the check and save page
+      const checkAndSavePage = new CheckAndSavePgObj(page);
+      await expect(checkAndSavePage.header).toBeVisible();
+      await expect(checkAndSavePage.electionName).toContainText("verkiezing: Gemeenteraad Test 2022");
+      await expect(checkAndSavePage.committeeCategory).toHaveText("type stembureau: Gemeentelijk stembureau");
+      await expect(checkAndSavePage.electionLocation).toContainText("gebiedsaanduiding: Test");
+      await expect(checkAndSavePage.numberOfListsAndCandidates).toContainText("3 lijsten en 18 kandidaten");
+      await expect(checkAndSavePage.numberOfPollingStations).toBeHidden();
+      await expect(checkAndSavePage.countingMethod).toContainText("Decentrale stemopneming");
       await expect(checkAndSavePage.numberOfVoters).toContainText("1.234 kiesgerechtigden");
 
       const election = await checkAndSavePage.saveElection();

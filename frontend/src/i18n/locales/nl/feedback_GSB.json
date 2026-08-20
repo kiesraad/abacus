@@ -20,6 +20,65 @@
       "title": "Er mag maar één antwoord per vraag worden gegeven"
     }
   },
+  "F121": {
+    "typist": {
+      "actions": "<ul><li>Beantwoord de vragen over het papieren proces-verbaal.</li><li>Overleg met de coördinator als je twijfelt.</li></ul>"
+    },
+    "coordinator": {
+      "title": "Er is niet correct aangegeven welke documenten zijn ingevoerd",
+      "actions": "<ul><li>Bekijk welke documenten aanwezig zijn.</li><li>Geef daarna de invoer terug aan de invoerder zodat deze vraag opnieuw beantwoord kan worden.</li></ul>"
+    }
+  },
+  "F122": {
+    "typist": {
+      "title": "Het inlegvel ontbreekt, maar hoort wel aanwezig te zijn",
+      "actions": "<ul><li>Overleg met de coördinator over het ontbrekende inlegvel.</li></ul>"
+    },
+    "coordinator": {
+      "title": "Het inlegvel ontbreekt, maar hoort wel aanwezig te zijn",
+      "actions": "<ul><li>Zorg dat een correct ingevuld inlegvel wordt toegevoegd.</li><li>Geef daarna de invoer terug aan de invoerder zodat deze vraag opnieuw beantwoord kan worden.</li></ul>"
+    }
+  },
+  "F131": {
+    "coordinator": {
+      "title": "De vragen op het inlegvel zijn niet volledig beantwoord",
+      "actions": "<ul><li>Zorg dat het inlegvel volledig is ingevuld.</li><li>Geef daarna de invoer terug aan de invoerder zodat deze vraag opnieuw beantwoord kan worden.</li></ul>"
+    }
+  },
+  "F132": {
+    "typist": {
+      "content": "Er is een corrigendum, maar er zijn volgens de antwoorden op het inlegvel 'controles en correcties' geen gecorrigeerde telresultaten.",
+      "actions": "<ul><li>Overleg met de coördinator.</li></ul>"
+    },
+    "coordinator": {
+      "title": "Onterecht corrigendum?",
+      "content": "Er is een corrigendum, maar er zijn volgens de antwoorden op het inlegvel 'controles en correcties' geen gecorrigeerde telresultaten.",
+      "actions": "<ul><li>Als er geen gecorrigeerde telresultaten zijn, dan hoort er ook geen corrigendum te zijn.</li><li>Verwijder het corrigendum, of geef op het inlegvel aan dat er wel gecorrigeerde telresultaten zijn.</li><li>Geef daarna de invoer terug aan de invoerder.</li></ul>"
+    }
+  },
+  "F133": {
+    "typist": {
+      "content": "Er is een corrigendum, maar er zijn volgens de antwoorden op het inlegvel 'controles en correcties' geen gecorrigeerde telresultaten.",
+      "actions": "<ul><li>Overleg met de coördinator.</li></ul>"
+    },
+    "coordinator": {
+      "title": "Ontbrekend corrigendum?",
+      "content": "Er is een corrigendum, maar er zijn volgens de antwoorden op het inlegvel 'controles en correcties' geen gecorrigeerde telresultaten.",
+      "actions": "<ul><li>Als er gecorrigeerde telresultaten zijn, dan hoort er ook een corrigendum te zijn.</li><li>Voeg het correcte corrigendum toe, of geef op het inlegvel aan dat er geen gecorrigeerde telresultaten zijn.</li><li>Geef daarna de invoer terug aan de invoerder.</li></ul>"
+    }
+  },
+  "F134": {
+    "coordinator": {
+      "title": "Er mag maar 1 antwoord per vraag worden gegeven",
+      "actions": "<ul><li>Herstel de fout door op papier de juiste optie(s) aan te (laten) vinken.</li></ul>"
+    }
+  },
+  "F135": {
+    "coordinator": {
+      "title": "Tijdens de eerste zitting kan er nog geen verzoek van het Centraal Stembureau zijn",
+      "actions": "<ul><li>Herstel de fout door op papier de juiste optie(s) aan te (laten) vinken.</li></ul>"
+    }
+  },
   "F201": {
     "coordinator": {
       "title": "A, B en C tellen niet op tot D",

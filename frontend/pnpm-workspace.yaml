@@ -13,7 +13,7 @@ pmOnFail: error
 strictDepBuilds: true
 strictPeerDependencies: true
 catalog:
-  vite: 8.2.0
+  vite: 8.2.1
   vitest: &vitest 4.1.10
   "@vitest/browser-playwright": *vitest
   "@vitest/coverage-v8": *vitest

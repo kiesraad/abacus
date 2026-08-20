@@ -7030,7 +7030,7 @@
       },
       "Election": {
         "type": "object",
-        "description": "Election without political groups",
+        "description": "Election without political groups.\n\nNote: an election within Abacus does not represent the entire election, but\nrather a single committee (i.e. stembureau at the CSB, HSB or GSB level)\nwithin the election.\n\nWhen access to the political groups and their candidates is required, use\n[`ElectionWithPoliticalGroups`] instead. When creating a new election, use\n[`NewElection`] instead.",
         "required": [
           "id",
           "name",
@@ -7050,61 +7050,78 @@
         ],
         "properties": {
           "authority_id": {
-            "type": "string"
+            "type": "string",
+            "description": "See [`ElectionWithPoliticalGroups::authority_id`]"
           },
           "authority_name": {
-            "type": "string"
+            "type": "string",
+            "description": "See [`ElectionWithPoliticalGroups::authority_name`]"
           },
           "authority_region": {
-            "type": "string"
+            "type": "string",
+            "description": "See [`ElectionWithPoliticalGroups::authority_region`]"
           },
           "category": {
-            "$ref": "#/components/schemas/ElectionCategory"
+            "$ref": "#/components/schemas/ElectionCategory",
+            "description": "See [`ElectionWithPoliticalGroups::category`]"
           },
           "committee_category": {
-            "$ref": "#/components/schemas/CommitteeCategory"
+            "$ref": "#/components/schemas/CommitteeCategory",
+            "description": "See [`ElectionWithPoliticalGroups::committee_category`]"
           },
           "counting_method": {
-            "$ref": "#/components/schemas/VoteCountingMethod"
+            "$ref": "#/components/schemas/VoteCountingMethod",
+            "description": "See [`ElectionWithPoliticalGroups::counting_method`]"
           },
           "district": {
-            "$ref": "#/components/schemas/CommitteeDistrict"
+            "$ref": "#/components/schemas/CommitteeDistrict",
+            "description": "See [`ElectionWithPoliticalGroups::district`]"
           },
           "domain": {
-            "$ref": "#/components/schemas/ElectionDomain"
+            "$ref": "#/components/schemas/ElectionDomain",
+            "description": "See [`ElectionWithPoliticalGroups::domain`]"
           },
           "election_date": {
             "type": "string",
-            "format": "date"
+            "format": "date",
+            "description": "See [`ElectionWithPoliticalGroups::election_date`]"
           },
           "election_id": {
-            "type": "string"
+            "type": "string",
+            "description": "See [`ElectionWithPoliticalGroups::election_id`]"
           },
           "id": {
-            "$ref": "#/components/schemas/ElectionId"
+            "$ref": "#/components/schemas/ElectionId",
+            "description": "See [`ElectionWithPoliticalGroups::id`]"
           },
           "location": {
-            "type": "string"
+            "type": "string",
+            "description": "See [`ElectionWithPoliticalGroups::location`]"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "description": "See [`ElectionWithPoliticalGroups::name`]"
           },
           "nomination_date": {
             "type": "string",
-            "format": "date"
+            "format": "date",
+            "description": "See [`ElectionWithPoliticalGroups::nomination_date`]"
           },
           "number_of_seats": {
             "type": "integer",
             "format": "int32",
+            "description": "See [`ElectionWithPoliticalGroups::number_of_seats`]",
             "minimum": 0
           },
           "number_of_voters": {
             "type": "integer",
             "format": "int32",
+            "description": "See [`ElectionWithPoliticalGroups::number_of_voters`]",
             "minimum": 0
           },
           "sub_category": {
-            "$ref": "#/components/schemas/ElectionSubCategory"
+            "$ref": "#/components/schemas/ElectionSubCategory",
+            "description": "See [`ElectionWithPoliticalGroups::sub_category`]"
           }
         },
         "additionalProperties": false
@@ -7497,7 +7514,7 @@
       },
       "ElectionWithPoliticalGroups": {
         "type": "object",
-        "description": "Election with political groups",
+        "description": "Election with political groups.\n\nNote: an election within Abacus does not represent the entire election, but\nrather a single committee (i.e. stembureau at the CSB, HSB or GSB level)\nwithin the election.\n\nWhen you do not need access to political groups and their candidates, you\ncan use [`Election`] instead. When creating a new election, use\n[`NewElection`] instead.",
         "required": [
           "id",
           "name",
@@ -7518,67 +7535,85 @@
         ],
         "properties": {
           "authority_id": {
-            "type": "string"
+            "type": "string",
+            "description": "Identifier of the authority/region that this committee is responsible for."
           },
           "authority_name": {
-            "type": "string"
+            "type": "string",
+            "description": "Name of the authority. Note that most of the time this is the same as the\nregion name, but specifically for country wide elections the authority\nname may also be \"De Kiesraad\" instead of the region name of \"Nederland\"."
           },
           "authority_region": {
-            "type": "string"
+            "type": "string",
+            "description": "The name of the region that the committee is responsible for."
           },
           "category": {
-            "$ref": "#/components/schemas/ElectionCategory"
+            "$ref": "#/components/schemas/ElectionCategory",
+            "description": "The category of the election, as defined by EML_NL election definition.\nExamples include \"Municipal\" for municipal elections or \"WaterAuthority\"\nfor the water authority elections."
           },
           "committee_category": {
-            "$ref": "#/components/schemas/CommitteeCategory"
+            "$ref": "#/components/schemas/CommitteeCategory",
+            "description": "The category (e.g. CSB) of the committee that this struct represents"
           },
           "counting_method": {
-            "$ref": "#/components/schemas/VoteCountingMethod"
+            "$ref": "#/components/schemas/VoteCountingMethod",
+            "description": "If this is a GSB committee, this is the counting method used for\nvote tabulation. This field is not used for other committee types."
           },
           "district": {
-            "$ref": "#/components/schemas/CommitteeDistrict"
+            "$ref": "#/components/schemas/CommitteeDistrict",
+            "description": "The district that this committee is responsible for. This will be None\nfor committees within elections that do not have districts. When an\nelection does have districts this will be All for committees that are\nresponsible for all districts, or Specific for committees that sit\nwithin a specific district."
           },
           "domain": {
-            "$ref": "#/components/schemas/ElectionDomain"
+            "$ref": "#/components/schemas/ElectionDomain",
+            "description": "An election wide field: for elections that do not concern the entire\ncountry this field contains the specific domain of that election. For\nexample for municipal elections this contains the municipality that the\nelection is for. Note that the election domain id is not always available,\neven if a domain is present. For country wide elections this field is None."
           },
           "election_date": {
             "type": "string",
-            "format": "date"
+            "format": "date",
+            "description": "The date of the election, as defined by the EML_NL election definition.\nNote: this is the date that the election takes/took place, not necessarily\nthe date that the committee is in session."
           },
           "election_id": {
-            "type": "string"
+            "type": "string",
+            "description": "The election identifier as defined in the EML_NL election definition"
           },
           "id": {
-            "$ref": "#/components/schemas/ElectionId"
+            "$ref": "#/components/schemas/ElectionId",
+            "description": "Identifier of the election within Abacus"
           },
           "location": {
-            "type": "string"
+            "type": "string",
+            "description": "The location of the committee.\n\nFor GSB committees this will be the same as the authority region, but\nfor HSBs and CSBs this may also be a specific town or city within the\nauthority region."
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "description": "Name of the election, as defined in the EML_NL election definition."
           },
           "nomination_date": {
             "type": "string",
-            "format": "date"
+            "format": "date",
+            "description": "The date when candidate nominations for this election are/were closed."
           },
           "number_of_seats": {
             "type": "integer",
             "format": "int32",
+            "description": "The number of seats that are to be elected for. For example, this is 150\nfor elections for the House of Representatives (Tweede Kamer).",
             "minimum": 0
           },
           "number_of_voters": {
             "type": "integer",
             "format": "int32",
+            "description": "How many voters are registered for this election.",
             "minimum": 0
           },
           "political_groups": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/PoliticalGroup"
-            }
+            },
+            "description": "The political groups and their candidates that are registered for this\nelection."
           },
           "sub_category": {
-            "$ref": "#/components/schemas/ElectionSubCategory"
+            "$ref": "#/components/schemas/ElectionSubCategory",
+            "description": "The sub-category of the election, as defined by the EML_NL election\ndefinition."
           }
         },
         "additionalProperties": false
@@ -8566,7 +8601,7 @@
       },
       "NewElection": {
         "type": "object",
-        "description": "Election request",
+        "description": "Struct for creating a new election in Abacus.\n\nThis struct does not contain the internal Abacus election id, as that is\ngenerated by Abacus when creating a new election.\n\nNote: an election within Abacus does not represent the entire election, but\nrather a single committee (i.e. stembureau at the CSB, HSB or GSB level)\nwithin the election.\n\nPlease take a look at [`ElectionWithPoliticalGroups`] for the full election\nrepresentation, or [`Election`] for the election representation without\npolitical groups and their candidates.",
         "required": [
           "name",
           "committee_category",
@@ -8586,64 +8621,81 @@
         ],
         "properties": {
           "authority_id": {
-            "type": "string"
+            "type": "string",
+            "description": "See [`ElectionWithPoliticalGroups::authority_id`]"
           },
           "authority_name": {
-            "type": "string"
+            "type": "string",
+            "description": "See [`ElectionWithPoliticalGroups::authority_name`]"
           },
           "authority_region": {
-            "type": "string"
+            "type": "string",
+            "description": "See [`ElectionWithPoliticalGroups::authority_region`]"
           },
           "category": {
-            "$ref": "#/components/schemas/ElectionCategory"
+            "$ref": "#/components/schemas/ElectionCategory",
+            "description": "See [`ElectionWithPoliticalGroups::category`]"
           },
           "committee_category": {
-            "$ref": "#/components/schemas/CommitteeCategory"
+            "$ref": "#/components/schemas/CommitteeCategory",
+            "description": "See [`ElectionWithPoliticalGroups::committee_category`]"
           },
           "counting_method": {
-            "$ref": "#/components/schemas/VoteCountingMethod"
+            "$ref": "#/components/schemas/VoteCountingMethod",
+            "description": "See [`ElectionWithPoliticalGroups::counting_method`]"
           },
           "district": {
-            "$ref": "#/components/schemas/CommitteeDistrict"
+            "$ref": "#/components/schemas/CommitteeDistrict",
+            "description": "See [`ElectionWithPoliticalGroups::district`]"
           },
           "domain": {
-            "$ref": "#/components/schemas/ElectionDomain"
+            "$ref": "#/components/schemas/ElectionDomain",
+            "description": "See [`ElectionWithPoliticalGroups::domain`]"
           },
           "election_date": {
             "type": "string",
-            "format": "date"
+            "format": "date",
+            "description": "See [`ElectionWithPoliticalGroups::election_date`]"
           },
           "election_id": {
-            "type": "string"
+            "type": "string",
+            "description": "See [`ElectionWithPoliticalGroups::election_id`]"
           },
           "location": {
-            "type": "string"
+            "type": "string",
+            "description": "See [`ElectionWithPoliticalGroups::location`]"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "description": "See [`ElectionWithPoliticalGroups::name`]"
           },
           "nomination_date": {
             "type": "string",
-            "format": "date"
+            "format": "date",
+            "description": "See [`ElectionWithPoliticalGroups::nomination_date`]"
           },
           "number_of_seats": {
             "type": "integer",
             "format": "int32",
+            "description": "See [`ElectionWithPoliticalGroups::number_of_seats`]",
             "minimum": 0
           },
           "number_of_voters": {
             "type": "integer",
             "format": "int32",
+            "description": "See [`ElectionWithPoliticalGroups::number_of_voters`]",
             "minimum": 0
           },
           "political_groups": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/RegisteredPoliticalGroup"
-            }
+            },
+            "description": "See [`ElectionWithPoliticalGroups::political_groups`]"
           },
           "sub_category": {
-            "$ref": "#/components/schemas/ElectionSubCategory"
+            "$ref": "#/components/schemas/ElectionSubCategory",
+            "description": "See [`ElectionWithPoliticalGroups::sub_category`]"
           }
         },
         "additionalProperties": false

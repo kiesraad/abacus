@@ -12,62 +12,135 @@ use crate::domain::identifier::id;
 
 id!(ElectionId);
 
-/// Election without political groups
+/// Election without political groups.
+///
+/// Note: an election within Abacus does not represent the entire election, but
+/// rather a single committee (i.e. stembureau at the CSB, HSB or GSB level)
+/// within the election.
+///
+/// When access to the political groups and their candidates is required, use
+/// [`ElectionWithPoliticalGroups`] instead. When creating a new election, use
+/// [`NewElection`] instead.
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash, FromRow)]
 #[serde(deny_unknown_fields)]
 pub struct Election {
+    /// See [`ElectionWithPoliticalGroups::id`]
     pub id: ElectionId,
+    /// See [`ElectionWithPoliticalGroups::name`]
     pub name: String,
+    /// See [`ElectionWithPoliticalGroups::committee_category`]
     pub committee_category: CommitteeCategory,
+    /// See [`ElectionWithPoliticalGroups::counting_method`]
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
     pub counting_method: Option<VoteCountingMethod>,
+    /// See [`ElectionWithPoliticalGroups::election_id`]
     pub election_id: String,
+    /// See [`ElectionWithPoliticalGroups::location`]
     pub location: String,
+    /// See [`ElectionWithPoliticalGroups::authority_id`]
     pub authority_id: String,
+    /// See [`ElectionWithPoliticalGroups::authority_name`]
     pub authority_name: String,
+    /// See [`ElectionWithPoliticalGroups::authority_region`]
     pub authority_region: String,
+    /// See [`ElectionWithPoliticalGroups::district`]
     pub district: CommitteeDistrict,
+    /// See [`ElectionWithPoliticalGroups::domain`]
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
     pub domain: Option<ElectionDomain>,
+    /// See [`ElectionWithPoliticalGroups::category`]
     pub category: ElectionCategory,
+    /// See [`ElectionWithPoliticalGroups::sub_category`]
     pub sub_category: ElectionSubCategory,
+    /// See [`ElectionWithPoliticalGroups::number_of_seats`]
     pub number_of_seats: u32,
+    /// See [`ElectionWithPoliticalGroups::number_of_voters`]
     pub number_of_voters: u32,
+    /// See [`ElectionWithPoliticalGroups::election_date`]
     #[schema(value_type = String, format = "date")]
     pub election_date: NaiveDate,
+    /// See [`ElectionWithPoliticalGroups::nomination_date`]
     #[schema(value_type = String, format = "date")]
     pub nomination_date: NaiveDate,
 }
 
-/// Election with political groups
+/// Election with political groups.
+///
+/// Note: an election within Abacus does not represent the entire election, but
+/// rather a single committee (i.e. stembureau at the CSB, HSB or GSB level)
+/// within the election.
+///
+/// When you do not need access to political groups and their candidates, you
+/// can use [`Election`] instead. When creating a new election, use
+/// [`NewElection`] instead.
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash, FromRow)]
 #[serde(deny_unknown_fields)]
 pub struct ElectionWithPoliticalGroups {
+    /// Identifier of the election within Abacus
     pub id: ElectionId,
+    /// Name of the election, as defined in the EML_NL election definition.
     pub name: String,
+    /// The category (e.g. CSB) of the committee that this struct represents
     pub committee_category: CommitteeCategory,
+    /// If this is a GSB committee, this is the counting method used for
+    /// vote tabulation. This field is not used for other committee types.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
     pub counting_method: Option<VoteCountingMethod>,
+    /// The election identifier as defined in the EML_NL election definition
     pub election_id: String,
+    /// The location of the committee.
+    ///
+    /// For GSB committees this will be the same as the authority region, but
+    /// for HSBs and CSBs this may also be a specific town or city within the
+    /// authority region.
     pub location: String,
+    /// Identifier of the authority/region that this committee is responsible for.
     pub authority_id: String,
+    /// Name of the authority. Note that most of the time this is the same as the
+    /// region name, but specifically for country wide elections the authority
+    /// name may also be "De Kiesraad" instead of the region name of "Nederland".
     pub authority_name: String,
+    /// The name of the region that the committee is responsible for.
     pub authority_region: String,
+    /// The district that this committee is responsible for. This will be None
+    /// for committees within elections that do not have districts. When an
+    /// election does have districts this will be All for committees that are
+    /// responsible for all districts, or Specific for committees that sit
+    /// within a specific district.
     pub district: CommitteeDistrict,
+    /// An election wide field: for elections that do not concern the entire
+    /// country this field contains the specific domain of that election. For
+    /// example for municipal elections this contains the municipality that the
+    /// election is for. Note that the election domain id is not always available,
+    /// even if a domain is present. For country wide elections this field is None.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
     pub domain: Option<ElectionDomain>,
+    /// The category of the election, as defined by EML_NL election definition.
+    /// Examples include "Municipal" for municipal elections or "WaterAuthority"
+    /// for the water authority elections.
     pub category: ElectionCategory,
+    /// The sub-category of the election, as defined by the EML_NL election
+    /// definition.
     pub sub_category: ElectionSubCategory,
+    /// The number of seats that are to be elected for. For example, this is 150
+    /// for elections for the House of Representatives (Tweede Kamer).
     pub number_of_seats: u32,
+    /// How many voters are registered for this election.
     pub number_of_voters: u32,
+    /// The date of the election, as defined by the EML_NL election definition.
+    /// Note: this is the date that the election takes/took place, not necessarily
+    /// the date that the committee is in session.
     #[schema(value_type = String, format = "date")]
     pub election_date: NaiveDate,
+    /// The date when candidate nominations for this election are/were closed.
     #[schema(value_type = String, format = "date")]
     pub nomination_date: NaiveDate,
+    /// The political groups and their candidates that are registered for this
+    /// election.
     #[sqlx(json)]
     pub political_groups: Vec<PoliticalGroup>,
 }
@@ -157,32 +230,60 @@ impl NameResolver for ElectionWithPoliticalGroups {
     }
 }
 
-/// Election request
+/// Struct for creating a new election in Abacus.
+///
+/// This struct does not contain the internal Abacus election id, as that is
+/// generated by Abacus when creating a new election.
+///
+/// Note: an election within Abacus does not represent the entire election, but
+/// rather a single committee (i.e. stembureau at the CSB, HSB or GSB level)
+/// within the election.
+///
+/// Please take a look at [`ElectionWithPoliticalGroups`] for the full election
+/// representation, or [`Election`] for the election representation without
+/// political groups and their candidates.
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct NewElection {
+    /// See [`ElectionWithPoliticalGroups::name`]
     pub name: String,
+    /// See [`ElectionWithPoliticalGroups::committee_category`]
     pub committee_category: CommitteeCategory,
+    /// See [`ElectionWithPoliticalGroups::counting_method`]
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
     pub counting_method: Option<VoteCountingMethod>,
+    /// See [`ElectionWithPoliticalGroups::election_id`]
     pub election_id: String,
+    /// See [`ElectionWithPoliticalGroups::location`]
     pub location: String,
+    /// See [`ElectionWithPoliticalGroups::authority_id`]
     pub authority_id: String,
+    /// See [`ElectionWithPoliticalGroups::authority_name`]
     pub authority_name: String,
+    /// See [`ElectionWithPoliticalGroups::authority_region`]
     pub authority_region: String,
+    /// See [`ElectionWithPoliticalGroups::district`]
     pub district: CommitteeDistrict,
+    /// See [`ElectionWithPoliticalGroups::domain`]
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
     pub domain: Option<ElectionDomain>,
+    /// See [`ElectionWithPoliticalGroups::category`]
     pub category: ElectionCategory,
+    /// See [`ElectionWithPoliticalGroups::sub_category`]
     pub sub_category: ElectionSubCategory,
+    /// See [`ElectionWithPoliticalGroups::number_of_seats`]
     pub number_of_seats: u32,
+    /// See [`ElectionWithPoliticalGroups::number_of_voters`]
     pub number_of_voters: u32,
+    /// See [`ElectionWithPoliticalGroups::election_date`]
     #[schema(value_type = String, format = "date")]
     pub election_date: NaiveDate,
+    /// See [`ElectionWithPoliticalGroups::nomination_date`]
     #[schema(value_type = String, format = "date")]
     pub nomination_date: NaiveDate,
+    /// See [`ElectionWithPoliticalGroups::political_groups`]
     pub political_groups: Vec<RegisteredPoliticalGroup>,
 }
 
@@ -273,7 +374,7 @@ pub enum RegionCategory {
     ElectoralDistrict,
     /// A 'gemeente', the lowest level of government region in mainland Netherlands.
     Municipality,
-    /// A 'stembureau' (note: only for eerste kamer elections)
+    /// A 'stembureau' (note: only for Eerste Kamer elections)
     PollingStation,
 }
 

@@ -81,6 +81,7 @@
   "investigation_ordered_by_csb": "Onderzoek in opdracht van het CSB?",
   "lists_and_candidates": "Lijsten en kandidaten",
   "missing_committee_session_details_modal": {
+    "ask_coordinator": "Vraag de coördinator om de details van de zitting in te vullen.",
     "content": "Op het corrigendum worden de plaats en tijd van de zitting weergegeven. Deze zijn nog niet ingevuld. Om het corrigendum te kunnen gebruiken, moeten deze gegevens eerst ingevuld worden.",
     "enter_details_button": "Details invullen",
     "title": "Vul eerst de details van de zitting in"

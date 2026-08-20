@@ -553,6 +553,41 @@ describe("ElectionHomePage", () => {
         expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
       });
 
+      test("Shows modal on clicking download Na 14-1 versie 1 when committee session details missing for administrator", async () => {
+        const user = userEvent.setup();
+        const electionDataSecondSession = getElectionMockData({ counting_method: "DSO" });
+        vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
+        server.use(
+          http.get("/api/elections/1", () =>
+            HttpResponse.json(electionDataSecondSession satisfies ElectionDetailsResponse, { status: 200 }),
+          ),
+        );
+
+        await renderGSBPage("administrator");
+
+        expect(
+          await screen.findByRole("heading", { level: 3, name: "Lege processen-verbaal voor deze verkiezing" }),
+        ).toBeVisible();
+        const downloadSection = screen.getByTestId("DSO-first-session-download-section");
+        expect(downloadSection).toBeVisible();
+        expect(within(downloadSection).getByRole("paragraph")).toHaveTextContent(
+          "Onderstaande modellen zijn relevant voor de huidige zitting van het gemeentelijk stembureau. Overige modellen zijn te downloaden via de toolkit van de Kiesraad.",
+        );
+        const table = within(downloadSection).getByRole("table");
+        const rows = within(table).getAllByRole("row");
+        await user.click(rows[3]!);
+
+        const modal = await screen.findByRole("dialog");
+        expect(modal).toBeVisible();
+        const title = within(modal).getByText("Vul eerst de details van de zitting in");
+        expect(title).toBeVisible();
+        const instruction = within(modal).getByText("Vraag de coördinator om de details van de zitting in te vullen.");
+        expect(instruction).toBeVisible();
+
+        const enter_details_button = within(modal).queryByRole("button", { name: "Details invullen" });
+        expect(enter_details_button).not.toBeInTheDocument();
+      });
+
       test("Shows empty document section for second committee session", async () => {
         const electionDataSecondSession = getElectionMockData({ counting_method: "DSO" }, { id: 2, number: 2 });
         electionDataSecondSession.committee_sessions = getCommitteeSessionListMockData().slice(2, 3);

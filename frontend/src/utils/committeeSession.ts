@@ -30,7 +30,7 @@ export function committeeSessionLabel(
   return label;
 }
 
-export function committee_session_details_present(committeeSession: CommitteeSession) {
+export function committeeSessionDetailsPresent(committeeSession: CommitteeSession) {
   return (
     committeeSession.start_date_time !== undefined &&
     committeeSession.start_date_time !== "" &&

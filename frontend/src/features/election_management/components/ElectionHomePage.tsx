@@ -20,7 +20,7 @@ import type {
   Election,
 } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
-import { committee_session_details_present, committeeSessionLabel } from "@/utils/committeeSession";
+import { committeeSessionDetailsPresent, committeeSessionLabel } from "@/utils/committeeSession";
 import { hasBooleanProperty } from "@/utils/typeChecks";
 import { directDownload } from "../utils/download";
 import { CommitteeSessionCard } from "./CommitteeSessionCard";
@@ -103,7 +103,7 @@ function DSOFirstSessionDownloadSection({ election, committeeSession }: Download
           <Table.ClickRow
             downloadIcon
             onClick={() => {
-              if (committee_session_details_present(committeeSession)) {
+              if (committeeSessionDetailsPresent(committeeSession)) {
                 directDownload(`/api/elections/${election.id}/download_na_14_1_versie1`);
               } else {
                 setShowMissingCommitteeSessionDetailsModal(true);

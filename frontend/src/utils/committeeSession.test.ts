@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest";
 import { getCommitteeSessionMockData } from "@/testing/api-mocks/CommitteeSessionMockData";
 import type { CommitteeSession } from "@/types/generated/openapi";
-import { committee_session_details_present, committeeSessionLabel } from "./committeeSession";
+import { committeeSessionDetailsPresent, committeeSessionLabel } from "./committeeSession";
 
 describe("CommitteeSessionLabel util", () => {
   test.each([
@@ -35,6 +35,6 @@ test.each([
   [getCommitteeSessionMockData({ location: "Juinen", start_date_time: "" }), false],
   [getCommitteeSessionMockData({ location: "", start_date_time: "2026-03-18T21:36:00" }), false],
   [getCommitteeSessionMockData({ location: "Juinen", start_date_time: "2026-03-18T21:36:00" }), true],
-])("committee_session_details_present with committeeSession %s to be %s", (input: CommitteeSession, expected: boolean) => {
-  expect(committee_session_details_present(input)).toBe(expected);
+])("committeeSessionDetailsPresent with committeeSession %s to be %s", (input: CommitteeSession, expected: boolean) => {
+  expect(committeeSessionDetailsPresent(input)).toBe(expected);
 });

@@ -1,7 +1,9 @@
 import { stat } from "node:fs/promises";
 import { expect, type Page } from "@playwright/test";
+import { AboutReportPage } from "e2e-tests/page-objects/data_entry/AboutReportPgObj";
 import { CandidatesListPage } from "e2e-tests/page-objects/data_entry/CandidatesListPgObj";
 import { CheckAndSavePage } from "e2e-tests/page-objects/data_entry/CheckAndSavePgObj";
+import { ChecksAndCorrectionsPage } from "e2e-tests/page-objects/data_entry/ChecksAndCorrectionsPgObj";
 import { CountingDifferencesPollingStationPage } from "e2e-tests/page-objects/data_entry/CountingDifferencesPollingStationPgObj";
 import { DataEntryHomePage } from "e2e-tests/page-objects/data_entry/DataEntryHomePgObj";
 import { DifferencesPage } from "e2e-tests/page-objects/data_entry/DifferencesPgObj";
@@ -32,6 +34,14 @@ export async function fillDataEntryPages(page: Page, results: Results) {
     await countingDifferencesPollingStationPage.fillAndClickNext(results.counting_differences_polling_station);
   }
 
+  if (results.model === "DSOFirstSession") {
+    const aboutReportPage = new AboutReportPage(page);
+    await aboutReportPage.fillAndClickNext(results.about_report);
+
+    const checksAndCorrectionsPage = new ChecksAndCorrectionsPage(page);
+    await checksAndCorrectionsPage.fillAndClickNext(results.checks_and_corrections);
+  }
+
   const votersAndVotesPage = new VotersAndVotesPage(page);
   await expect(votersAndVotesPage.fieldset).toBeVisible();
   if (results.model === "GSB") {
@@ -43,8 +53,14 @@ export async function fillDataEntryPages(page: Page, results: Results) {
   switch (results.model) {
     case "DSOFirstSession":
     case "DSONextSession": {
-      /* TODO: https://github.com/kiesraad/abacus/issues/3691 */ break;
+      {
+        const differencesPage = new DifferencesPage(page);
+        await expect(differencesPage.fieldset).toBeVisible();
+        await differencesPage.fillInPageAndClickNext(results.differences_counts);
+      }
+      break;
     }
+
     case "CSOFirstSession":
     case "CSONextSession":
       {

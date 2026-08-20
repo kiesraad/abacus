@@ -1,5 +1,5 @@
 import { hasTranslation, t } from "@/i18n/translate";
-import type { CommitteeCategory } from "@/types/generated/openapi";
+import type { CommitteeCategory, CommitteeSession } from "@/types/generated/openapi";
 
 export function committeeSessionLabel(
   committeeCategory: CommitteeCategory,
@@ -28,4 +28,12 @@ export function committeeSessionLabel(
   }
 
   return label;
+}
+
+export function committee_session_details_present(committeeSession: CommitteeSession) {
+  return (
+    committeeSession.start_date_time !== undefined &&
+    committeeSession.start_date_time !== "" &&
+    committeeSession.location !== ""
+  );
 }

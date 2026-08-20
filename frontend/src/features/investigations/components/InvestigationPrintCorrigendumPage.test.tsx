@@ -1,7 +1,10 @@
 import { render, waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
+import type { ReactNode } from "react";
 import * as ReactRouter from "react-router";
+import { RouterProvider } from "react-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
+import { ApiProvider } from "@/api/ApiProvider";
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { ElectionLayout } from "@/components/layout/ElectionLayout";
 import * as useMessages from "@/hooks/messages/useMessages";
@@ -11,14 +14,35 @@ import {
   ElectionStatusRequestHandler,
   PollingStationInvestigationDeleteHandler,
 } from "@/testing/api-mocks/RequestHandlers";
-import { Providers } from "@/testing/Providers";
+import { getRouter, type Router } from "@/testing/router";
 import { overrideOnce, server } from "@/testing/server";
+import { TestUserProvider } from "@/testing/TestUserProvider";
 import { screen, setupTestRouter, spyOnHandler, within } from "@/testing/test-utils";
-
+import type { Role } from "@/types/generated/openapi";
 import { investigationRoutes } from "../routes";
 
 const navigate = vi.fn();
 const pushMessage = vi.fn();
+
+const Providers = ({
+  children,
+  router = getRouter(children),
+  userRole,
+  fetchInitialUser = false,
+}: {
+  children?: ReactNode;
+  router?: Router;
+  userRole: Role;
+  fetchInitialUser?: boolean;
+}) => {
+  return (
+    <ApiProvider fetchInitialUser={fetchInitialUser}>
+      <TestUserProvider userRole={userRole}>
+        <RouterProvider router={router} />
+      </TestUserProvider>
+    </ApiProvider>
+  );
+};
 
 async function renderPage() {
   const router = setupTestRouter([
@@ -36,7 +60,7 @@ async function renderPage() {
   ]);
 
   await router.navigate("/elections/1/investigations/3/print-corrigendum");
-  render(<Providers router={router} />);
+  render(<Providers router={router} userRole="coordinator_gsb" />);
 
   return router;
 }

@@ -101,7 +101,7 @@ async fn election_download_n_10_1(
         election.election_date.year(),
         election.location
     );
-
+    let candidates_tables = CandidatesTables::new(&election)?;
     let models = polling_stations
         .iter()
         .map(|ps| {
@@ -113,7 +113,7 @@ async fn election_download_n_10_1(
             );
 
             Ok(ModelN10_1Input {
-                candidates_tables: CandidatesTables::new(&election)?,
+                candidates_tables: candidates_tables.clone(),
                 election: election.clone().into(),
                 polling_station: ps.clone(),
             }
@@ -381,7 +381,7 @@ async fn election_download_na_14_1_versie1(
         election.election_date.year(),
         election.location
     );
-
+    let candidates_tables = CandidatesTables::new(&election)?;
     let models = polling_stations
         .iter()
         .map(|ps| {
@@ -394,7 +394,7 @@ async fn election_download_na_14_1_versie1(
 
             Ok(ModelNa14_1Versie1Input {
                 committee_session: current_committee_session.clone(),
-                candidates_tables: CandidatesTables::new(&election)?,
+                candidates_tables: candidates_tables.clone(),
                 election: election.clone().into(),
                 polling_station: ps.clone(),
             }
@@ -527,7 +527,7 @@ async fn election_download_na_31_2_bijlage1(
         election.election_date.year(),
         election.location
     );
-
+    let candidates_tables = CandidatesTables::new(&election)?;
     let models = polling_stations
         .iter()
         .map(|ps| {
@@ -539,7 +539,7 @@ async fn election_download_na_31_2_bijlage1(
             );
 
             Ok(ModelNa31_2Bijlage1Input {
-                candidates_tables: CandidatesTables::new(&election)?,
+                candidates_tables: candidates_tables.clone(),
                 election: election.clone().into(),
                 polling_station: ps.clone(),
             }

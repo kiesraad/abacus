@@ -7346,7 +7346,7 @@
         "properties": {
           "id": {
             "type": "string",
-            "description": "Identfier of the domain"
+            "description": "Identifier of the domain"
           },
           "name": {
             "type": "string",

@@ -1074,7 +1074,7 @@ export interface ElectionDetailsResponse {
  * Election domain (i.e. the entity at which the election takes place)
  */
 export interface ElectionDomain {
-  /** Identfier of the domain */
+  /** Identifier of the domain */
   id?: string;
   /** Name of the domain */
   name: string;

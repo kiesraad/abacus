@@ -433,7 +433,7 @@ impl CommitteeDistrict {
 /// Election domain (i.e. the entity at which the election takes place)
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct ElectionDomain {
-    /// Identfier of the domain
+    /// Identifier of the domain
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
     pub id: Option<String>,

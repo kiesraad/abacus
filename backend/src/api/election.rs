@@ -27,16 +27,17 @@ use crate::{
         election::{
             CommitteeCategory, CommitteeDistrict, Election, ElectionCategory, ElectionDomain,
             ElectionId, ElectionNumberOfVotersChangeRequest, ElectionWithPoliticalGroups,
-            NewElection, RegionKey, VoteCountingMethod,
+            NewElection, RegionDetails, RegionKey, VoteCountingMethod,
         },
         investigation::PollingStationInvestigation,
         polling_station::{PollingStationRequest, PollingStationResponse, PollingStationsRequest},
         role::Role,
     },
     eml::{
-        EMLImportError, EmlHash, RedactedEmlHash, number_of_voters_from_polling_stations_eml,
-        parse_polling_stations_eml_str, polling_stations_eml_matches_election,
-        polling_stations_from_eml, polling_stations_from_eml_str,
+        EMLImportError, EmlHash, RedactedEmlHash, committees::ElectionTreeDetails,
+        number_of_voters_from_polling_stations_eml, parse_polling_stations_eml_str,
+        polling_stations_eml_matches_election, polling_stations_from_eml,
+        polling_stations_from_eml_str,
     },
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
     repository::{committee_session_repo, election_repo, user_repo::User},
@@ -315,6 +316,10 @@ pub struct GSBElectionCreationValidateRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
     polling_station_file_name: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    selected_region: Option<RegionKey>,
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
@@ -352,6 +357,7 @@ pub struct GSBElectionDefinitionValidateResponse {
     #[schema(nullable = false)]
     pub polling_station_definition_matches_election: Option<bool>,
     number_of_voters: u32,
+    gsb_list: Vec<RegionDetails>,
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
@@ -394,9 +400,9 @@ fn validate_gsb_election(
     }
 
     let mut hash = RedactedEmlHash::from(edu.election_data.as_bytes());
-    let mut election = parse_election_candidates_eml(
+    let (mut election, election_tree_details) = parse_election_candidates_eml(
         &edu.election_data,
-        Some((CommitteeCategory::GSB, None)),
+        Some((CommitteeCategory::GSB, edu.selected_region)),
         edu.candidate_data.as_deref(),
     )?;
 
@@ -437,6 +443,11 @@ fn validate_gsb_election(
             polling_stations,
             number_of_voters,
             polling_station_definition_matches_election,
+            gsb_list: election_tree_details
+                .get_committees(CommitteeCategory::GSB)
+                .iter()
+                .map(|c| c.responsible_region.clone())
+                .collect(),
         },
     )))
 }
@@ -450,7 +461,7 @@ fn validate_csb_election(
     }
 
     let mut hash = RedactedEmlHash::from(edu.election_data.as_bytes());
-    let mut election = parse_election_candidates_eml(
+    let (mut election, _) = parse_election_candidates_eml(
         &edu.election_data,
         Some((CommitteeCategory::CSB, None)),
         edu.candidate_data.as_deref(),
@@ -488,6 +499,9 @@ pub struct GSBElectionCreationRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
     polling_station_file_name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    selected_region: Option<RegionKey>,
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
@@ -554,9 +568,9 @@ async fn import_gsb_election(
     let election_data_hash = check_hash(edu.election_data.as_bytes(), Some(&edu.election_hash))?;
     let candidate_data_hash = check_hash(edu.candidate_data.as_bytes(), Some(&edu.candidate_hash))?;
 
-    let mut new_election = parse_election_candidates_eml(
+    let (mut new_election, _) = parse_election_candidates_eml(
         &edu.election_data,
-        Some((CommitteeCategory::GSB, None)),
+        Some((CommitteeCategory::GSB, edu.selected_region)),
         Some(&edu.candidate_data),
     )?;
 
@@ -610,7 +624,7 @@ async fn import_csb_election(
     let election_data_hash = check_hash(edu.election_data.as_bytes(), Some(&edu.election_hash))?;
     let candidate_data_hash = check_hash(edu.candidate_data.as_bytes(), Some(&edu.candidate_hash))?;
 
-    let mut new_election = parse_election_candidates_eml(
+    let (mut new_election, _) = parse_election_candidates_eml(
         &edu.election_data,
         Some((CommitteeCategory::CSB, None)),
         Some(&edu.candidate_data),
@@ -658,16 +672,22 @@ fn parse_election_candidates_eml(
     election_eml_data: &str,
     selected_committee: Option<(CommitteeCategory, Option<RegionKey>)>,
     candidate_eml_data: Option<&str>,
-) -> Result<NewElection, APIError> {
-    let (mut election, _election_tree) =
+) -> Result<(NewElection, ElectionTreeDetails), APIError> {
+    let (mut election, election_tree) =
         NewElection::from_eml_str(election_eml_data, selected_committee)?;
-    // TODO: need to pick the right district first before adding candidates
+    if election.district == CommitteeDistrict::All {
+        // Committees concerning all districts are not supported yet
+        return Err(APIError::EmlImportError(
+            EMLImportError::UnsupportedDistrictElection,
+        ));
+    }
+
     if let Some(candidate_eml_data) = candidate_eml_data {
         let district = election.district.clone();
         election.add_candidates_from_eml_str(candidate_eml_data, &district)?;
     }
 
-    Ok(election)
+    Ok((election, election_tree))
 }
 
 /// Create an election with a committee session

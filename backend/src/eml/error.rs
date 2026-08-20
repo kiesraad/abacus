@@ -41,6 +41,7 @@ pub enum EMLImportError {
     PollingStationsWithoutContest,
     TooManyPoliticalGroups,
     UnknownCommittee,
+    UnsupportedDistrictElection,
     InvalidDistrict,
 }
 

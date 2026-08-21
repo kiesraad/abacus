@@ -1,6 +1,7 @@
 import type {
   CSOFirstSessionResults,
   DataEntry,
+  DSOFirstSessionResults,
   GSBResults,
   NextSessionResults,
   PollingStationRequest,
@@ -168,6 +169,270 @@ export const noRecountNoDifferencesDataEntry: CSOFirstSessionResults & { model: 
   counting_differences_polling_station: {
     difference_ballots_voters_completely_accounted_for: { yes: true, no: false },
     difference_ballots_per_list: { yes: false, no: true },
+  },
+  voters_counts: {
+    poll_card_count: 3450,
+    proxy_certificate_count: 157,
+    total_admitted_voters_count: 3607,
+  },
+  votes_counts: {
+    political_group_total_votes: [
+      { number: 1, total: 3536 },
+      { number: 2, total: 36 },
+      { number: 3, total: 0 },
+    ],
+    total_votes_candidates_count: 3572,
+    blank_votes_count: 20,
+    invalid_votes_count: 15,
+    total_votes_cast_count: 3607,
+  },
+  differences_counts: {
+    more_ballots_count: 0,
+    fewer_ballots_count: 0,
+    compare_votes_cast_admitted_voters: {
+      admitted_voters_equal_votes_cast: true,
+      votes_cast_greater_than_admitted_voters: false,
+      votes_cast_smaller_than_admitted_voters: false,
+    },
+    difference_completely_accounted_for: { yes: true, no: false },
+  },
+  political_group_votes: [
+    {
+      number: 1,
+      total: 3536,
+      candidate_votes: [
+        {
+          number: 1,
+          votes: 1337,
+        },
+        {
+          number: 2,
+          votes: 423,
+        },
+        {
+          number: 3,
+          votes: 300,
+        },
+        {
+          number: 4,
+          votes: 236,
+        },
+        {
+          number: 5,
+          votes: 533,
+        },
+        {
+          number: 6,
+          votes: 205,
+        },
+        {
+          number: 7,
+          votes: 103,
+        },
+        {
+          number: 8,
+          votes: 286,
+        },
+        {
+          number: 9,
+          votes: 0,
+        },
+        {
+          number: 10,
+          votes: 0,
+        },
+        {
+          number: 11,
+          votes: 113,
+        },
+        {
+          number: 12,
+          votes: 0,
+        },
+      ],
+    },
+    {
+      number: 2,
+      total: 36,
+      candidate_votes: [
+        {
+          number: 1,
+          votes: 28,
+        },
+        {
+          number: 2,
+          votes: 4,
+        },
+        {
+          number: 3,
+          votes: 2,
+        },
+        {
+          number: 4,
+          votes: 2,
+        },
+      ],
+    },
+    {
+      number: 3,
+      total: 0,
+      candidate_votes: [
+        {
+          number: 1,
+          votes: 0,
+        },
+        {
+          number: 2,
+          votes: 0,
+        },
+      ],
+    },
+  ],
+};
+
+export const noRecountNoDifferencesDataEntryDSOChecksAndCorrections: DSOFirstSessionResults & {
+  model: "DSOFirstSession";
+} = {
+  model: "DSOFirstSession",
+  about_report: {
+    corrigendum_present: "TwoDocuments",
+    checks_and_corrections_present: "PagePresent",
+  },
+  checks_and_corrections: {
+    reason_investigation_own_initiative: { unaccounted_difference: true, other_error: true },
+    corrected_results_own_initiative: { yes: true, no: false },
+    corrected_results_csb_request: { yes: false, no: false },
+  },
+  voters_counts: {
+    poll_card_count: 3450,
+    proxy_certificate_count: 157,
+    total_admitted_voters_count: 3607,
+  },
+  votes_counts: {
+    political_group_total_votes: [
+      { number: 1, total: 3536 },
+      { number: 2, total: 36 },
+      { number: 3, total: 0 },
+    ],
+    total_votes_candidates_count: 3572,
+    blank_votes_count: 20,
+    invalid_votes_count: 15,
+    total_votes_cast_count: 3607,
+  },
+  differences_counts: {
+    more_ballots_count: 0,
+    fewer_ballots_count: 0,
+    compare_votes_cast_admitted_voters: {
+      admitted_voters_equal_votes_cast: true,
+      votes_cast_greater_than_admitted_voters: false,
+      votes_cast_smaller_than_admitted_voters: false,
+    },
+    difference_completely_accounted_for: { yes: true, no: false },
+  },
+  political_group_votes: [
+    {
+      number: 1,
+      total: 3536,
+      candidate_votes: [
+        {
+          number: 1,
+          votes: 1337,
+        },
+        {
+          number: 2,
+          votes: 423,
+        },
+        {
+          number: 3,
+          votes: 300,
+        },
+        {
+          number: 4,
+          votes: 236,
+        },
+        {
+          number: 5,
+          votes: 533,
+        },
+        {
+          number: 6,
+          votes: 205,
+        },
+        {
+          number: 7,
+          votes: 103,
+        },
+        {
+          number: 8,
+          votes: 286,
+        },
+        {
+          number: 9,
+          votes: 0,
+        },
+        {
+          number: 10,
+          votes: 0,
+        },
+        {
+          number: 11,
+          votes: 113,
+        },
+        {
+          number: 12,
+          votes: 0,
+        },
+      ],
+    },
+    {
+      number: 2,
+      total: 36,
+      candidate_votes: [
+        {
+          number: 1,
+          votes: 28,
+        },
+        {
+          number: 2,
+          votes: 4,
+        },
+        {
+          number: 3,
+          votes: 2,
+        },
+        {
+          number: 4,
+          votes: 2,
+        },
+      ],
+    },
+    {
+      number: 3,
+      total: 0,
+      candidate_votes: [
+        {
+          number: 1,
+          votes: 0,
+        },
+        {
+          number: 2,
+          votes: 0,
+        },
+      ],
+    },
+  ],
+};
+
+export const noRecountNoDifferencesDataEntryDSO: DSOFirstSessionResults & { model: "DSOFirstSession" } = {
+  model: "DSOFirstSession",
+  about_report: {
+    corrigendum_present: "OneDocument",
+    checks_and_corrections_present: "PageMissing",
+  },
+  checks_and_corrections: {
+    reason_investigation_own_initiative: { unaccounted_difference: false, other_error: false },
+    corrected_results_own_initiative: { yes: false, no: false },
+    corrected_results_csb_request: { yes: false, no: false },
   },
   voters_counts: {
     poll_card_count: 3450,
@@ -1231,6 +1496,28 @@ export const nextSessionResultsWithDifferences: NextSessionResults & { model: "C
 export const dataEntryRequest: DataEntry = {
   progress: 87,
   data: noRecountNoDifferencesDataEntry,
+  client_state: {
+    furthest: "political_group_votes_3",
+    current: "political_group_votes_3",
+    acceptedErrorsAndWarnings: [],
+    continue: true,
+  },
+};
+
+export const dataEntryRequestDSOChecksAndCorrections: DataEntry = {
+  progress: 87,
+  data: noRecountNoDifferencesDataEntryDSOChecksAndCorrections,
+  client_state: {
+    furthest: "political_group_votes_3",
+    current: "political_group_votes_3",
+    acceptedErrorsAndWarnings: [],
+    continue: true,
+  },
+};
+
+export const dataEntryRequestDSO: DataEntry = {
+  progress: 87,
+  data: noRecountNoDifferencesDataEntryDSO,
   client_state: {
     furthest: "political_group_votes_3",
     current: "political_group_votes_3",

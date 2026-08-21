@@ -2,7 +2,7 @@ import { stat } from "node:fs/promises";
 import { expect, request } from "@playwright/test";
 import { apiLogout, createUser, firstLogin, getTestPassword } from "e2e-tests/helpers-utils/e2e-test-api-helpers";
 import {
-  createInvestigation,
+  createCSOInvestigation,
   fillCandidatesListPages,
   fillDataEntryPagesAndSave,
   logout,
@@ -95,7 +95,7 @@ const typistUsers: TestUser[] = [
 
 test.describe.configure({ mode: "serial" });
 
-test.describe("full flow GSB", () => {
+test.describe("full flow GSB CSO", () => {
   let electionId: number | null = null;
 
   test("create and complete admin user account", async ({ adminOne }) => {
@@ -423,7 +423,7 @@ test.describe("full flow GSB", () => {
     await expect(electionHomePage.header).toHaveText("Gemeenteraad Test 2022");
 
     const downloadPromise = page.waitForEvent("download");
-    await electionHomePage.downloadInlegvel.click();
+    await electionHomePage.downloadNa31_2Inlegvel.click();
     const download = await downloadPromise;
 
     expect(download.suggestedFilename()).toBe("Model_Na_31_2_Inlegvel.pdf");
@@ -481,7 +481,7 @@ test.describe("full flow GSB", () => {
       const electionHome = new ElectionHome(page);
       await electionHome.investigationsOverviewButton.click();
 
-      await createInvestigation(page, station.name, station.reason);
+      await createCSOInvestigation(page, station.name, station.reason);
       const investigationsOverviewPage = new InvestigationOverviewPgObj(page);
       await expect(investigationsOverviewPage.alert).toHaveText(
         `Onderzoek voor stembureau ${station.number} (${station.name}) toegevoegd`,

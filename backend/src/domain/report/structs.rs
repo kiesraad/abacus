@@ -534,13 +534,6 @@ impl ResultsInputGSB {
     ) -> Result<PdfFileModel, APIError> {
         let data = &self.data;
 
-        // Na 14-2 is only for CSO, DSO uses Na 14-1
-        if data.election.counting_method != Some(VoteCountingMethod::CSO) {
-            return Err(APIError::DataIntegrityError(
-                "Na 14-2 report is only supported for CSO".to_string(),
-            ));
-        }
-
         let pdf_file = ModelNa14_2Input {
             votes_tables: VotesTablesWithPreviousVotes::new(
                 &data.election,
@@ -624,44 +617,5 @@ impl ResultsInputGSB {
                 .collect(),
         }
         .to_pdf_file_model(overview_filename)
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use chrono::Local;
-    use sqlx::SqlitePool;
-    use test_log::test;
-
-    use super::*;
-
-    #[test(sqlx::test(fixtures(
-        path = "../../../fixtures",
-        scripts("election_12_dso_with_results")
-    )))]
-    async fn test_error_na14_2_dso(pool: SqlitePool) {
-        let mut conn = pool.acquire().await.unwrap();
-        let input = ResultsInputGSB::new(&mut conn, CommitteeSessionId::from(12), Local::now())
-            .await
-            .unwrap();
-
-        // Na 14-2 is only for CSO, DSO uses Na 14-1
-        let Err(error) = input.get_na14_2_pdf_file(
-            &input.data.totals,
-            &input.data.committee_session,
-            "hash".to_string(),
-            "creation_date_time".to_string(),
-            "Model_Na14-2.pdf".to_string(),
-        ) else {
-            panic!("generating a Na 14-2 report should fail for DSO elections");
-        };
-        assert!(
-            matches!(
-                &error,
-                APIError::DataIntegrityError(message)
-                    if message == "Na 14-2 report is only supported for CSO"
-            ),
-            "unexpected error: {error:?}"
-        );
     }
 }

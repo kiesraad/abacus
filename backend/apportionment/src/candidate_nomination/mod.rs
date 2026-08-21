@@ -759,10 +759,10 @@ mod tests {
                 input.list_votes[0].number,
                 &[
                     &input.list_votes[0].candidate_votes[..7],
-                    &input.list_votes[0].candidate_votes[10..],
+                    &input.list_votes[0].candidate_votes[9..],
                 ]
                 .concat(),
-                &input.list_votes[0].candidate_votes[8..9],
+                &input.list_votes[0].candidate_votes[7..9],
             );
             check_chosen_candidates(
                 &result.chosen_candidates,
@@ -1268,12 +1268,117 @@ mod tests {
             CandidateNomination, Fraction,
             candidate_nomination::candidate_nomination,
             test_helpers::{
-                CandidateDrawnMock, candidate_nomination_fixture_with_given_number_of_seats,
-                check_chosen_candidates, check_list_candidate_nomination,
-                get_chosen_and_not_chosen_candidates_for_a_list,
+                CandidateDrawnMock,
+                candidate_nomination_fixture_with_given_list_numbers_and_number_of_seats,
+                candidate_nomination_fixture_with_given_number_of_seats, check_chosen_candidates,
+                check_list_candidate_nomination, get_chosen_and_not_chosen_candidates_for_a_list,
                 seat_assignment_fixture_with_given_candidate_votes,
+                seat_assignment_fixture_with_given_list_numbers_candidate_numbers_and_votes,
             },
         };
+
+        /// Candidate nomination with non-consecutive list and candidate numbers
+        ///
+        /// List seats: [(1, 10), (3, 6), (6, 3)]
+        /// - List 1: Preferential candidate nominations of candidates 2, 4 and 8 and
+        ///   other candidate nominations of candidates 6, 10, 12, 14, 16, 18 and 20
+        /// - List 3: Preferential candidate nominations of candidates 1, 3, 5, 7 and 9
+        ///   and other candidate nomination of candidate 11
+        /// - List 6: Preferential candidate nominations of candidates 2, 5 and 8 and
+        ///   no other candidate nominations
+        #[test]
+        fn test_with_gte_19_seats_and_non_consecutive_list_and_candidate_numbers() {
+            let quota = Fraction::new(1900, 19);
+            let seat_assignment_input =
+                seat_assignment_fixture_with_given_list_numbers_candidate_numbers_and_votes(
+                    19,
+                    vec![
+                        (
+                            1,
+                            vec![
+                                (2, 500),
+                                (4, 80),
+                                (6, 22),
+                                (8, 40),
+                                (10, 15),
+                                (12, 25),
+                                (14, 10),
+                                (16, 8),
+                                (18, 5),
+                                (20, 4),
+                                (22, 6),
+                            ],
+                        ),
+                        (
+                            3,
+                            vec![
+                                (1, 300),
+                                (3, 100),
+                                (5, 90),
+                                (7, 28),
+                                (9, 26),
+                                (11, 24),
+                                (13, 10),
+                            ],
+                        ),
+                        (6, vec![(2, 330), (5, 237), (8, 40)]),
+                    ],
+                );
+            let input = candidate_nomination_fixture_with_given_list_numbers_and_number_of_seats(
+                quota,
+                &seat_assignment_input,
+                [(1, 10), (3, 6), (6, 3)].into(),
+            );
+
+            let Ok(CandidateNomination::Completed(result)) =
+                candidate_nomination(&input, &mut iter::empty::<&CandidateDrawnMock>())
+            else {
+                panic!("should be completed");
+            };
+
+            assert_eq!(result.preference_threshold.percentage, 25);
+            assert_eq!(
+                result.preference_threshold.number_of_votes,
+                quota * Fraction::new(result.preference_threshold.percentage, 100)
+            );
+            check_list_candidate_nomination(
+                &result.list_candidate_nomination[0],
+                &[2, 4, 8],
+                &[6, 10, 12, 14, 16, 18, 20],
+                &[2, 4, 8, 6, 10, 12, 14, 16, 18, 20, 22],
+            );
+            check_list_candidate_nomination(
+                &result.list_candidate_nomination[1],
+                &[1, 3, 5, 7, 9],
+                &[11],
+                &[],
+            );
+            check_list_candidate_nomination(
+                &result.list_candidate_nomination[2],
+                &[2, 5, 8],
+                &[],
+                &[],
+            );
+
+            check_chosen_candidates(
+                &result.chosen_candidates,
+                input.list_votes[0].number,
+                &input.list_votes[0].candidate_votes[..10],
+                &input.list_votes[0].candidate_votes[10..],
+            );
+            check_chosen_candidates(
+                &result.chosen_candidates,
+                input.list_votes[1].number,
+                &input.list_votes[1].candidate_votes[..6],
+                &input.list_votes[1].candidate_votes[6..],
+            );
+            check_chosen_candidates(
+                &result.chosen_candidates,
+                input.list_votes[2].number,
+                &input.list_votes[2].candidate_votes[..],
+                &[],
+            );
+        }
 
         /// Candidate nomination with candidate votes meeting preference threshold but no seat
         ///
@@ -1919,6 +2024,150 @@ mod tests {
         );
     }
 
+    /// Candidate nomination where multiple groups of candidates with equal votes
+    /// require drawing of lots, on different lists
+    ///
+    /// Within a single list at most one group of candidates with equal votes can
+    /// require drawing of lots, so multiple groups can only occur across lists.
+    ///
+    /// List seats: [2, 3]
+    /// - List 1: Preferential candidate nomination of candidate 1
+    ///   - Drawing of lots is required for candidates: [2, 3] with 300 votes, only 1 seat available
+    ///   - Candidate 3 is drawn
+    /// - List 2: Preferential candidate nomination of candidate 1
+    ///   - Drawing of lots is required for candidates: [2, 3, 4] with 400 votes, only 2 seats available
+    ///   - Candidate 4 is drawn
+    ///   - Drawing of lots is required for candidates: [2, 3] with 400 votes, only 1 seat available
+    ///   - Candidate 2 is drawn
+    #[test]
+    fn test_with_drawing_of_lots_for_multiple_groups_of_candidates_with_equal_votes() {
+        let quota = Fraction::new(9600, 19);
+        let seat_assignment_input = seat_assignment_fixture_with_given_candidate_votes(
+            19,
+            vec![vec![500, 300, 300], vec![500, 400, 400, 400]],
+        );
+        let input = candidate_nomination_fixture_with_given_number_of_seats(
+            quota,
+            &seat_assignment_input,
+            vec![2, 3],
+        );
+
+        let Ok(CandidateNomination::DrawingLotsRequired(variant_one)) =
+            candidate_nomination(&input, &mut iter::empty::<&CandidateDrawnMock>())
+        else {
+            panic!("should be DrawingLotsRequired");
+        };
+
+        assert_eq!(
+            variant_one,
+            CandidateDrawingLotsVariant {
+                list: 1,
+                total_seats: 2,
+                number_of_votes: 300,
+                seat_numbers: vec![2],
+                options: vec![2, 3]
+            }
+        );
+
+        // Candidate 3 of list 1 is drawn
+        let candidates_drawn = [CandidateDrawnMock {
+            variant: variant_one.clone(),
+            drawn: 3,
+        }];
+
+        let result = candidate_nomination(&input, &mut candidates_drawn.iter());
+        let Ok(CandidateNomination::DrawingLotsRequired(variant_two)) = result else {
+            panic!("should be DrawingLotsRequired, but was {:?}", result);
+        };
+
+        assert_eq!(
+            variant_two,
+            CandidateDrawingLotsVariant {
+                list: 2,
+                total_seats: 3,
+                number_of_votes: 400,
+                seat_numbers: vec![2, 3],
+                options: vec![2, 3, 4]
+            }
+        );
+
+        // Candidate 4 of list 2 is drawn
+        let candidates_drawn = [
+            CandidateDrawnMock {
+                variant: variant_one.clone(),
+                drawn: 3,
+            },
+            CandidateDrawnMock {
+                variant: variant_two.clone(),
+                drawn: 4,
+            },
+        ];
+
+        let result = candidate_nomination(&input, &mut candidates_drawn.iter());
+        let Ok(CandidateNomination::DrawingLotsRequired(variant_three)) = result else {
+            panic!("should be DrawingLotsRequired, but was {:?}", result);
+        };
+
+        assert_eq!(
+            variant_three,
+            CandidateDrawingLotsVariant {
+                list: 2,
+                total_seats: 3,
+                number_of_votes: 400,
+                seat_numbers: vec![3],
+                options: vec![2, 3]
+            }
+        );
+
+        // Candidate 2 of list 2 is drawn
+        let candidates_drawn = [
+            CandidateDrawnMock {
+                variant: variant_one,
+                drawn: 3,
+            },
+            CandidateDrawnMock {
+                variant: variant_two,
+                drawn: 4,
+            },
+            CandidateDrawnMock {
+                variant: variant_three,
+                drawn: 2,
+            },
+        ];
+
+        let result = candidate_nomination(&input, &mut candidates_drawn.iter());
+        let Ok(CandidateNomination::Completed(details)) = result else {
+            panic!("should be Completed, but was {:?}", result);
+        };
+
+        assert_eq!(
+            details.list_candidate_nomination,
+            vec![
+                ListCandidateNomination {
+                    list_number: 1,
+                    list_seats: 2,
+                    preferential_candidate_nomination: vec![
+                        &CandidateVotesMock(1, 500),
+                        &CandidateVotesMock(3, 300),
+                    ],
+                    other_candidate_nomination: Vec::new(),
+                    candidate_ranking: CandidateRanking::Updated(vec![1, 3, 2]),
+                },
+                ListCandidateNomination {
+                    list_number: 2,
+                    list_seats: 3,
+                    preferential_candidate_nomination: vec![
+                        &CandidateVotesMock(1, 500),
+                        &CandidateVotesMock(4, 400),
+                        &CandidateVotesMock(2, 400),
+                    ],
+                    other_candidate_nomination: Vec::new(),
+                    candidate_ranking: CandidateRanking::Updated(vec![1, 4, 2, 3]),
+                }
+            ]
+        );
+    }
+
     #[test]
     fn test_preferential_candidate_nomination_scenarios() {
         struct Case {
@@ -2001,6 +2250,24 @@ mod tests {
                 total_seats: 4,
                 candidates_drawn: vec![],
                 expected_nominations: vec![1, 3, 4, 5],
+            },
+            Case {
+                name: "multiple groups with equal votes, only the last group draws lots",
+                // The group with 900 votes fits within the remaining seats and is
+                // nominated without lots. Only the group with 600 votes draws lots.
+                candidates: vec![(1, 1000), (3, 900), (4, 900), (5, 600), (6, 600)],
+                total_seats: 4,
+                candidates_drawn: vec![CandidateDrawnMock {
+                    variant: CandidateDrawingLotsVariant {
+                        list: 1,
+                        total_seats: 4,
+                        number_of_votes: 600,
+                        seat_numbers: vec![4],
+                        options: vec![5, 6],
+                    },
+                    drawn: 6,
+                }],
+                expected_nominations: vec![1, 3, 4, 6],
             },
         ];
 

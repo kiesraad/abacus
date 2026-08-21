@@ -156,7 +156,7 @@ export async function uploadPollingStations(page: Page, eml = eml110b) {
   await checkDefinitionPage.next.click();
 }
 
-export async function createInvestigation(page: Page, pollingStation: string, reason: string) {
+export async function createCSOInvestigation(page: Page, pollingStation: string, reason: string) {
   const investigationsOverviewPage = new InvestigationOverviewPgObj(page);
   await investigationsOverviewPage.addInvestigationButton.click();
 
@@ -175,6 +175,30 @@ export async function createInvestigation(page: Page, pollingStation: string, re
   await investigationPrintCorrigendumPage.downloadLink.click();
   const download = await downloadPromise;
   expect(download.suggestedFilename()).toMatch(/Model_Na14-2_GR2022_Stembureau_\d+_Bijlage_1.pdf/);
+  expect((await stat(await download.path())).size).toBeGreaterThan(1024);
+
+  await investigationPrintCorrigendumPage.backToInvestigationsButton.click();
+}
+
+export async function createDSOInvestigation(page: Page, pollingStation: string, reason: string) {
+  const investigationsOverviewPage = new InvestigationOverviewPgObj(page);
+  await investigationsOverviewPage.addInvestigationButton.click();
+
+  const addInvestigationPage = new AddInvestigationPgObj(page);
+  await expect(addInvestigationPage.header).toBeVisible();
+  await addInvestigationPage.selectPollingStation(pollingStation);
+
+  const investigationReasonPage = new InvestigationReasonPgObj(page);
+  await expect(investigationReasonPage.header).toBeVisible();
+  await investigationReasonPage.reasonField.fill(reason);
+  await investigationReasonPage.nextButton.click();
+
+  const investigationPrintCorrigendumPage = new InvestigationPrintCorrigendumPgObj(page);
+  await expect(investigationPrintCorrigendumPage.header).toBeVisible();
+  const downloadPromise = page.waitForEvent("download");
+  await investigationPrintCorrigendumPage.downloadLink.click();
+  const download = await downloadPromise;
+  expect(download.suggestedFilename()).toMatch(/Model_Na14-1_versie_2_GR2022_Stembureau_\d+.pdf/);
   expect((await stat(await download.path())).size).toBeGreaterThan(1024);
 
   await investigationPrintCorrigendumPage.backToInvestigationsButton.click();

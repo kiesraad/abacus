@@ -2,7 +2,7 @@ import { stat } from "node:fs/promises";
 import { expect, request } from "@playwright/test";
 import { apiLogout, createUser, firstLogin, getTestPassword } from "e2e-tests/helpers-utils/e2e-test-api-helpers";
 import {
-  createInvestigation,
+  createDSOInvestigation,
   fillCandidatesListPages,
   fillDataEntryPagesAndSave,
   logout,
@@ -412,7 +412,7 @@ test.describe("full flow GSB DSO", () => {
     await logout(page);
   });
 
-  test("download Na 31-2 inlegvel", async ({ page }) => {
+  test("download Na 31-1 inlegvel", async ({ page }) => {
     await page.goto("/account/login");
 
     const loginPage = new LoginPgObj(page);
@@ -426,10 +426,10 @@ test.describe("full flow GSB DSO", () => {
     await expect(electionHomePage.header).toHaveText("Gemeenteraad Test 2022");
 
     const downloadPromise = page.waitForEvent("download");
-    await electionHomePage.downloadInlegvel.click();
+    await electionHomePage.downloadNa31_1Inlegvel.click();
     const download = await downloadPromise;
 
-    expect(download.suggestedFilename()).toBe("Model_Na_31_2_Inlegvel.pdf");
+    expect(download.suggestedFilename()).toBe("Model_Na_31_1_Inlegvel.pdf");
     expect((await stat(await download.path())).size).toBeGreaterThan(1024);
 
     await logout(page);
@@ -482,9 +482,17 @@ test.describe("full flow GSB DSO", () => {
       await overviewPage.findElectionRowById(electionId!).click();
 
       const electionHome = new ElectionHome(page);
+      await expect(electionHome.header).toHaveText("Gemeenteraad Test 2022");
+      await expect(electionHome.getCommitteeSessionCard(2)).toContainText("Tweede zitting");
+      await electionHome.detailsButton.click();
+
+      const electionDetails = new ElectionDetailsPgObj(page);
+      await expect(electionDetails.header).toHaveText("Gemeentelijk stembureau Test");
+      await electionDetails.fillForm("Pannerdam", "18-03-2026", "21:34");
+
       await electionHome.investigationsOverviewButton.click();
 
-      await createInvestigation(page, station.name, station.reason);
+      await createDSOInvestigation(page, station.name, station.reason);
       const investigationsOverviewPage = new InvestigationOverviewPgObj(page);
       await expect(investigationsOverviewPage.alert).toHaveText(
         `Onderzoek voor stembureau ${station.number} (${station.name}) toegevoegd`,
@@ -657,13 +665,6 @@ test.describe("full flow GSB DSO", () => {
 
     const finishDataEntryPage = new FinishDataEntry(page);
     await finishDataEntryPage.finishDataEntry.click();
-
-    const electionDetails = new ElectionDetailsPgObj(page);
-    await expect(electionDetails.header).toHaveText("Gemeentelijk stembureau Test");
-    await electionDetails.locationInput.fill("Pannerdam");
-    await electionDetails.dateInput.fill("18-03-2026");
-    await electionDetails.timeInput.fill("21:34");
-    await electionDetails.toCertifiedResults.click();
 
     const electionHomePage = new ElectionReport(page);
     await expect(electionHomePage.header).toContainText("Tweede zitting gemeentelijk stembureau");

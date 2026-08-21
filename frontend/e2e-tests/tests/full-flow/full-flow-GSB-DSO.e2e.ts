@@ -123,12 +123,12 @@ test.describe("full flow GSB DSO", () => {
 
     await uploadElectionAndInputHash(page);
 
-    await uploadCandidatesAndInputHash(page, eml230b);
-
     const committeeCategoryPage = new CommitteeCategoryPgObj(page);
     await expect(committeeCategoryPage.header).toBeVisible();
     await expect(committeeCategoryPage.gsb).toBeChecked();
     await committeeCategoryPage.next.click();
+
+    await uploadCandidatesAndInputHash(page, eml230b);
 
     await uploadPollingStations(page, eml110b_single);
 

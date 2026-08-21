@@ -59,7 +59,7 @@
     "if_new_result": "Als er nieuwe telresultaten zijn: laat twee invoerders de nieuwe resultaten invoeren in Abacus.",
     "indicate_new_result": "Geef aan of er voor dit stembureau een nieuwe uitkomst is.",
     "investigate_results": "Onderzoek de resultaten van het stembureau en besluit of een hertelling nodig is.",
-    "more_investigations": "Moeten er voor meerdere stembureaus onderzoeken worden gedaan? Print dan voor ieder stembureau een corrigendum.",
+    "more_investigations": "Moeten er voor meerdere stembureaus onderzoeken worden gedaan? Maak dan voor ieder stembureau een onderzoek aan.",
     "nav_title": "Corrigendum printen",
     "print_recommendation": "<strong>Tip</strong>: print eerst alleen de eerste pagina. Druk de rest pas af als uit het onderzoek blijkt dat een hertelling moet worden gedaan.",
     "recount_needed": "Moet er herteld worden? Print dan de overige pagina's van het corrigendum. Daarop worden de gecorrigeerde telresultaten ingevoerd.",

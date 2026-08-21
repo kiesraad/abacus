@@ -248,16 +248,16 @@ async fn list_results_for_gsb_committee_session(
         "#,
         committee_session_id,
     )
-    .try_map(|row| {
-        let data = row.data.ok_or(sqlx::Error::RowNotFound)?;
-        polling_stations
-            .get(&row.original_id)
-            .cloned()
-            .map(|ps| (DataEntrySource::PollingStation(ps), data.0))
-            .ok_or(sqlx::Error::RowNotFound)
-    })
-    .fetch_all(&mut *conn)
-    .await?;
+        .try_map(|row| {
+            let data = row.data.ok_or(sqlx::Error::RowNotFound)?;
+            polling_stations
+                .get(&row.original_id)
+                .cloned()
+                .map(|ps| (DataEntrySource::PollingStation(ps), data.0))
+                .ok_or(sqlx::Error::RowNotFound)
+        })
+        .fetch_all(&mut *conn)
+        .await?;
 
     if results.len() != polling_stations.len() {
         return Err(sqlx::Error::RowNotFound);
@@ -354,7 +354,9 @@ pub async fn previous_results_for_polling_station(
 
     match row.data.map(|d| d.0) {
         Some(Results::CSOFirstSession(results)) => Ok(results.as_common()),
+        Some(Results::DSOFirstSession(results)) => Ok(results.as_common()),
         Some(Results::CSONextSession(results)) => Ok(results.as_common()),
+        Some(Results::DSONextSession(results)) => Ok(results.as_common()),
         _ => Err(sqlx::Error::RowNotFound),
     }
 }
@@ -1161,9 +1163,9 @@ mod tests {
         }
     }
 
-    /// Test previous_results_for_polling_station with 4th session, existing polling station
+    /// Test previous_results_for_polling_station with cso election and 4th session, existing polling station
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
-    async fn test_previous_results_for_polling_station(pool: SqlitePool) {
+    async fn test_previous_results_for_polling_station_cso(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
         let polling_station_id = PollingStationId::from(742);
 
@@ -1174,7 +1176,23 @@ mod tests {
         assert_eq!(results.voters_counts.proxy_certificate_count, 4);
     }
 
-    /// Test previous_results_for_polling_station with 4th session, non-existing polling station
+    /// Test previous_results_for_polling_station with dso election and 2nd session, existing polling station
+    #[test(sqlx::test(fixtures(
+        path = "../../fixtures",
+        scripts("election_12_dso_with_results")
+    )))]
+    async fn test_previous_results_for_polling_station_dso(pool: SqlitePool) {
+        let mut conn = pool.acquire().await.unwrap();
+        let polling_station_id = PollingStationId::from(1229);
+
+        let results = previous_results_for_polling_station(&mut conn, polling_station_id).await;
+        assert!(results.is_ok());
+
+        let results = results.unwrap();
+        assert_eq!(results.voters_counts.proxy_certificate_count, 2);
+    }
+
+    /// Test previous_results_for_polling_station with cso election and 4th session, non-existing polling station
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
     async fn test_previous_results_for_polling_station_non_existing(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();

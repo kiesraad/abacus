@@ -9,6 +9,11 @@ export const twoDocumentsPagePresent: AboutReport = {
   checks_and_corrections_present: "PagePresent",
 };
 
+export const oneDocumentPageMissing: AboutReport = {
+  corrigendum_present: "OneDocument",
+  checks_and_corrections_present: "PageMissing",
+};
+
 export class AboutReportPage extends DataEntryBasePage {
   readonly fieldset: Locator;
   readonly corrigendumPresent: Locator;

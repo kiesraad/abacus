@@ -156,7 +156,6 @@ async fn generate_csb_election_data(
     votes: Option<Vec<Vec<u32>>>,
 ) -> Result<(Vec<PollingStation>, bool), Box<dyn Error>> {
     let data_entry_complete = if election.category == ElectionCategory::Municipal {
-        // TODO: We should use the same setup as with the import
         let number = election
             .domain
             .as_ref()

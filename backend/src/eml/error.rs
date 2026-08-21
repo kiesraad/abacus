@@ -43,6 +43,7 @@ pub enum EMLImportError {
     UnknownCommittee,
     UnsupportedDistrictElection,
     InvalidDistrict,
+    MissingCommitteeNumber,
 }
 
 impl From<eml_nl::EMLError> for EMLImportError {

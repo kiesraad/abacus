@@ -151,8 +151,8 @@ impl NewElection {
         // be so we try and extract it anyway
         let number_of_voters = max_votes(&election.contest.max_votes);
 
-        // TODO: once we support country-wide elections this is no longer true and the domain can be absent
-        if identifier.domain.is_none() {
+        // only require an election domain if the category requires one
+        if category.has_election_domain() && identifier.domain.is_none() {
             return Err(EMLImportError::MissingElectionDomain);
         }
 

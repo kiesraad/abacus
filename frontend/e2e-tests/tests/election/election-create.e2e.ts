@@ -194,13 +194,13 @@ test.describe("Election creation", () => {
       // upload election and check hash
       await uploadElectionAndInputHash(page);
 
-      // upload candidates list and check
-      await uploadCandidatesAndInputHash(page, eml230b);
-
       // committee category
       const committeeCategoryPage = new CommitteeCategoryPgObj(page);
       await expect(committeeCategoryPage.header).toBeVisible();
       await committeeCategoryPage.next.click();
+
+      // upload candidates list and check
+      await uploadCandidatesAndInputHash(page, eml230b);
 
       // upload polling stations
       await uploadPollingStations(page);
@@ -269,13 +269,13 @@ test.describe("Election creation", () => {
       // upload election and check hash
       await uploadElectionAndInputHash(page);
 
-      // upload candidates list and check
-      await uploadCandidatesAndInputHash(page, eml230b);
-
       // committee category
       const committeeCategoryPage = new CommitteeCategoryPgObj(page);
       await expect(committeeCategoryPage.header).toBeVisible();
       await committeeCategoryPage.next.click();
+
+      // upload candidates list and check
+      await uploadCandidatesAndInputHash(page, eml230b);
 
       // skip polling stations
       const uploadPollingStationsPage = new UploadPollingStationsFilePgObj(page);

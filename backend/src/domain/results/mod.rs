@@ -455,10 +455,8 @@ impl Validate for Results {
         path: &FieldPath,
     ) -> Result<ValidationResults, DataError> {
         match self {
-            Results::DSOFirstSession(_) | Results::DSONextSession(_) => {
-                // TODO: https://github.com/kiesraad/abacus/issues/3687
-                Ok(ValidationResults::default())
-            }
+            Results::DSOFirstSession(results) => results.validate(election, path),
+            Results::DSONextSession(results) => results.as_common().validate(election, path),
             Results::CSOFirstSession(results) => {
                 let mut validation_results = results
                     .extra_investigation
@@ -482,6 +480,8 @@ pub mod tests {
     use crate::domain::{
         election::{ElectionCategory, PGNumber, tests::election_fixture},
         results::{
+            about_report::{AboutReport, ChecksAndCorrectionsPresent},
+            checks_and_corrections::{ChecksAndCorrections, ReasonInvestigationOwnInitiative},
             count::Count,
             differences_counts::{
                 DifferenceCountsCompareVotesCastAdmittedVoters, DifferencesCounts,
@@ -714,5 +714,41 @@ pub mod tests {
         let results = Results::new(&election, &first_session, None);
 
         assert_matches!(results, Results::GSB(_));
+    }
+
+    #[test]
+    fn test_error_when_checks_and_corrections_not_empty() {
+        // Non-empty checks and corrections, while `checks_and_corrections = missing`
+        // This is an invalid state, so it should return an error
+        let results = Results::DSOFirstSession(DSOFirstSessionResults {
+            about_report: AboutReport {
+                corrigendum_present: Some(about_report::CorrigendumPresent::OneDocument),
+                checks_and_corrections_present: Some(ChecksAndCorrectionsPresent::PageMissing),
+            },
+            checks_and_corrections: ChecksAndCorrections {
+                reason_investigation_own_initiative: ReasonInvestigationOwnInitiative {
+                    unaccounted_difference: true,
+                    other_error: false,
+                },
+                corrected_results_own_initiative: YesNo::yes(),
+                corrected_results_csb_request: YesNo::no(),
+            },
+            voters_counts: VotersCounts::default(),
+            votes_counts: VotesCounts::default(),
+            differences_counts: DifferencesCounts::default(),
+            political_group_votes: vec![],
+        });
+
+        let validation_results = results.validate(
+            &election_fixture(ElectionCategory::Municipal, CommitteeCategory::GSB, &[]),
+            &"data".into(),
+        );
+
+        assert_eq!(
+            validation_results,
+            Err(DataError::new(
+                "`checks_and_corrections` must be empty when `ChecksAndCorrectionsPresent::PageMissing`.",
+            ))
+        );
     }
 }

@@ -21,6 +21,34 @@ export const validationResultMockData: ErrorWarningsMap<ValidationResultCode> = 
     fields: ["data.counting_differences_polling_station"],
     code: "F112",
   },
+  F121: {
+    fields: ["data.about_report"],
+    code: "F121",
+  },
+  F122: {
+    fields: ["data.about_report"],
+    code: "F122",
+  },
+  F131: {
+    fields: ["data.checks_and_corrections"],
+    code: "F131",
+  },
+  F132: {
+    fields: ["data.checks_and_corrections"],
+    code: "F132",
+  },
+  F133: {
+    fields: ["data.checks_and_corrections"],
+    code: "F133",
+  },
+  F134: {
+    fields: ["data.checks_and_corrections"],
+    code: "F134",
+  },
+  F135: {
+    fields: ["data.checks_and_corrections"],
+    code: "F135",
+  },
   F201: {
     fields: [
       "data.voters_counts.poll_card_count",

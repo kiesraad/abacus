@@ -450,6 +450,7 @@ mod tests {
             PollingStation, PollingStationFirstSession, test_helpers::polling_stations_fixture,
         },
         results::{
+            about_report::{AboutReport, ChecksAndCorrectionsPresent, CorrigendumPresent},
             checks_and_corrections::{ChecksAndCorrections, ReasonInvestigationOwnInitiative},
             differences_counts::DifferencesCounts,
             extra_investigation::ExtraInvestigation,
@@ -566,13 +567,16 @@ mod tests {
 
     /// DSO first session results with the counts of [results_fixture_a]
     /// and the given checks and corrections.
-    fn dso_results_fixture(checks_and_corrections: ChecksAndCorrections) -> Results {
+    fn dso_results_fixture(
+        about_report: AboutReport,
+        checks_and_corrections: ChecksAndCorrections,
+    ) -> Results {
         let Results::CSOFirstSession(cso_results) = results_fixture_a() else {
             unreachable!()
         };
 
         Results::DSOFirstSession(DSOFirstSessionResults {
-            about_report: Default::default(),
+            about_report,
             checks_and_corrections,
             voters_counts: cso_results.voters_counts,
             votes_counts: cso_results.votes_counts,
@@ -1114,26 +1118,44 @@ mod tests {
         let ps = polling_stations_fixture(&[20, 20, 20]);
         // first polling station: investigated because of an unaccounted-for difference,
         // results corrected on the GSB's own initiative
-        let ps1_result = dso_results_fixture(ChecksAndCorrections {
-            reason_investigation_own_initiative: ReasonInvestigationOwnInitiative {
-                unaccounted_difference: true,
-                other_error: false,
+        let ps1_result = dso_results_fixture(
+            AboutReport {
+                corrigendum_present: Some(CorrigendumPresent::TwoDocuments),
+                checks_and_corrections_present: Some(ChecksAndCorrectionsPresent::PagePresent),
             },
-            corrected_results_own_initiative: YesNo::yes(),
-            corrected_results_csb_request: YesNo::no(),
-        });
+            ChecksAndCorrections {
+                reason_investigation_own_initiative: ReasonInvestigationOwnInitiative {
+                    unaccounted_difference: true,
+                    other_error: false,
+                },
+                corrected_results_own_initiative: YesNo::yes(),
+                corrected_results_csb_request: YesNo::default(),
+            },
+        );
         // second polling station: investigated because of a (suspected) other error,
-        // results corrected at the request of the CSB
-        let ps2_result = dso_results_fixture(ChecksAndCorrections {
-            reason_investigation_own_initiative: ReasonInvestigationOwnInitiative {
-                unaccounted_difference: false,
-                other_error: true,
+        // results corrected on the GSB's own initiative
+        let ps2_result = dso_results_fixture(
+            AboutReport {
+                corrigendum_present: Some(CorrigendumPresent::TwoDocuments),
+                checks_and_corrections_present: Some(ChecksAndCorrectionsPresent::PagePresent),
             },
-            corrected_results_own_initiative: YesNo::no(),
-            corrected_results_csb_request: YesNo::yes(),
-        });
+            ChecksAndCorrections {
+                reason_investigation_own_initiative: ReasonInvestigationOwnInitiative {
+                    unaccounted_difference: false,
+                    other_error: true,
+                },
+                corrected_results_own_initiative: YesNo::yes(),
+                corrected_results_csb_request: YesNo::default(),
+            },
+        );
         // third polling station: not investigated
-        let ps3_result = dso_results_fixture(ChecksAndCorrections::default());
+        let ps3_result = dso_results_fixture(
+            AboutReport {
+                corrigendum_present: Some(CorrigendumPresent::OneDocument),
+                checks_and_corrections_present: Some(ChecksAndCorrectionsPresent::PageMissing),
+            },
+            ChecksAndCorrections::default(),
+        );
 
         let totals = ElectionTotals::tabulate(
             &election,
@@ -1156,43 +1178,23 @@ mod tests {
     }
 
     #[test]
-    fn test_dso_corrected_results_merged() {
-        let election = dso_election_fixture();
-        let ps = polling_stations_fixture(&[20]);
-        // results corrected both on the GSB own initiative and at the
-        // request of the CSB: the station should be listed only once
-        let ps1_result = dso_results_fixture(ChecksAndCorrections {
-            reason_investigation_own_initiative: ReasonInvestigationOwnInitiative::default(),
-            corrected_results_own_initiative: YesNo::yes(),
-            corrected_results_csb_request: YesNo::yes(),
-        });
-
-        let totals =
-            ElectionTotals::tabulate(&election, &[(test_ps_to_source(ps[0].clone()), ps1_result)])
-                .unwrap();
-
-        let CommitteeSpecificTotals::GSB(GSBTotals::DSO(investigations)) =
-            totals.committee_specific
-        else {
-            panic!("Expected DSO investigations in the totals");
-        };
-        assert!(investigations.unaccounted_difference.is_empty());
-        assert!(investigations.other_error.is_empty());
-        assert_eq!(investigations.corrected_results, vec![31]);
-    }
-
-    #[test]
     fn test_dso_next_session_results() {
         let election = dso_election_fixture();
         let ps = polling_stations_fixture(&[20, 20]);
-        let ps1_result = dso_results_fixture(ChecksAndCorrections {
-            reason_investigation_own_initiative: ReasonInvestigationOwnInitiative {
-                unaccounted_difference: true,
-                other_error: false,
+        let ps1_result = dso_results_fixture(
+            AboutReport {
+                corrigendum_present: Some(CorrigendumPresent::TwoDocuments),
+                checks_and_corrections_present: Some(ChecksAndCorrectionsPresent::PagePresent),
             },
-            corrected_results_own_initiative: YesNo::yes(),
-            corrected_results_csb_request: YesNo::no(),
-        });
+            ChecksAndCorrections {
+                reason_investigation_own_initiative: ReasonInvestigationOwnInitiative {
+                    unaccounted_difference: true,
+                    other_error: false,
+                },
+                corrected_results_own_initiative: YesNo::yes(),
+                corrected_results_csb_request: YesNo::default(),
+            },
+        );
         // next session results with the counts of results_fixture_b
         let Results::CSOFirstSession(cso_results) = results_fixture_b() else {
             unreachable!()
@@ -1235,7 +1237,15 @@ mod tests {
         let cso_election = election_fixture(ElectionCategory::Municipal, GSB, &[2, 3]);
         let dso_election = dso_election_fixture();
         let csb_election = election_fixture(ElectionCategory::Municipal, CSB, &[2, 3]);
-        let dso_result = || dso_results_fixture(ChecksAndCorrections::default());
+        let dso_result = || {
+            dso_results_fixture(
+                AboutReport {
+                    corrigendum_present: Some(CorrigendumPresent::TwoDocuments),
+                    checks_and_corrections_present: Some(ChecksAndCorrectionsPresent::PagePresent),
+                },
+                ChecksAndCorrections::default(),
+            )
+        };
 
         // a CSO result in a DSO election
         let totals = ElectionTotals::tabulate(&dso_election, &[(source(), results_fixture_a())]);

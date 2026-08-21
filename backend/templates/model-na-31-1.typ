@@ -1,0 +1,306 @@
+#import "common/style.typ": conf, document_numbering, default_header, blank_page_before_signing
+#import "common/scripts.typ": *
+#let input = json("inputs/model-na-31-1-variations/model-na-31-1-GR.json")
+
+#let is_municipality = (municipal, public_body) => is_municipality(input.election.authority_region, municipal, public_body)
+#let is_local_election = (local, other) => is_local_election(input.election.category, local, other)
+#let location_name = is_municipality[Gemeente #input.election.authority_id #input.election.authority_region][Openbaar lichaam #input.election.authority_region]
+#let location_type = is_municipality[gemeentelijk stembureau][stembureau voor het openbaar lichaam]
+#let this_location = is_municipality[deze gemeente][dit openbaar lichaam]
+
+#show: doc => conf(
+  doc,
+  header-right: location_name,
+  footer: [
+    Datum: #input.creation_date_time. Digitale vingerafdruk van EML-telbestand bij dit PV: \
+    #input.hash
+
+    Proces-verbaal van een #location_type \
+    Model Na 31-1 decentrale stemopneming (versie 2027)
+  ], margin-bottom: 2.9cm, footer-descent: 0.45cm
+)
+
+#set heading(numbering: none)
+
+#title_page(
+  is_municipality[#input.election.authority_id #input.election.authority_region][#input.election.authority_region],
+  is_municipality[Gemeentelijk stembureau][Stembureau voor het openbaar lichaam],
+  [#input.election.name - #format_date(input.election.election_date)],
+  [
+    Verslag en telresultaten per lijst en kandidaat \
+    Model Na 31-1
+  ],
+)
+
+== Details van het #location_type
+
+#location_name
+
+#input.committee_session.location #format_date_time(input.committee_session.start_date_time)
+
+== Proces-verbaal
+
+#is_municipality[Elke gemeente][Elk openbaar lichaam] maakt bij een verkiezing een verslag: het proces-verbaal. Hierin staat hoe het tellen van de stemmen is verlopen en wat de uitslag van de stemming was.
+
+#emph_block[
+  In #this_location is gekozen voor *decentrale stemopneming*.
+  Ieder stembureau heeft direct na het stemmen geteld hoeveel stemmen elke lijst en elke kandidaat kreeg. Het *#location_type* telt daarna de resultaten van alle stembureaus bij elkaar op.
+]
+
+== Inhoudsopgave
+
+- Deel 1 - *Verslag van de zitting* (het verloop van het tellen en optellen)
+- Deel 2 - *Telresultaten* van #is_municipality[de gemeente][het openbaar lichaam]
+- Deel 3 - *Ondertekening* door de leden van het #location_type
+
+#pagebreak(weak: true)
+
+#show: doc => document_numbering(doc)
+
+= Verslag van de zitting
+
+== Presentielijst
+
+=== Aanwezige leden van het #location_type
+
+De volgende rollen zijn mogelijk: voorzitter, plaatsvervangend voorzitter of lid.
+
+#empty_table(
+  columns: (8em, 1fr, 1fr, 1fr, 8em),
+  headers: ("Voorletters", "Achternaam", "Rol", "Aanwezig van - tot", "Locatie"),
+  values: ("", "", "", "-", ""),
+  rows: 24,
+)
+
+#pagebreak(weak: true)
+
+== Getelde stembureaus
+
+=== De resultaten van onderstaande stembureaus zijn door het #location_type gecontroleerd en opgeteld tot het totaal van #is_municipality[de gemeente][het openbaar lichaam]. Als extra onderzoeken hebben plaatsgevonden wordt dat hier aangegeven. Als dat heeft geleid tot een correctie, en er dus een corrigendum is, wordt dat in de laatste kolom aangegeven.
+
+#light_table(
+  columns: (5em, 1fr, 1fr, 6em, 6em, 6em),
+  headers: (
+    [Nr.],
+    [Naam locatie],
+    [Postcode + Adres],
+    [Onderzocht vanwege een onverklaard verschil?],
+    [Onderzocht vanwege (een vermoeden van) een andere fout?],
+    [Uitslag gecorrigeerd?],
+  ),
+  values: input
+    .polling_stations
+    .map(polling_station => {
+      (
+        [#polling_station.number],
+        [#polling_station.name],
+        [
+          #if "polling_station_type" in polling_station and polling_station.polling_station_type == "Mobile" [
+            _(Mobiel stembureau)_
+          ] else [
+            #polling_station.address \
+            #polling_station.postal_code #polling_station.locality
+          ]
+        ],
+        align(center, checkbox(checked: input.polling_station_investigations.unaccounted_difference.contains(polling_station.number))[]),
+        align(center, checkbox(checked: input.polling_station_investigations.other_error.contains(polling_station.number))[]),
+        align(center, checkbox(checked: input.polling_station_investigations.corrected_results.contains(polling_station.number))[]),
+      )
+    })
+    .flatten(),
+)
+
+=== Voor de stembureaus waar onderzoek naar is gedaan vanwege een vermoedelijke fout, maar waar geen correctie heeft plaatsgevonden, kan hieronder een toelichting worden gegeven. Het geven van een toelichting is niet verplicht.
+
+#empty_table(
+  columns: (7em, 1fr),
+  headers: ("Nummer stembureau", "Toelichting"),
+  values: ("", ""),
+  rows: 16,
+)
+
+#pagebreak(weak: true)
+
+== Tijdens de zitting
+
+=== Schrijf alle *bezwaren* van aanwezigen op.
+
+Bijvoorbeeld over het ongeldig verklaren van een stembiljet. Schrijf geen namen of andere persoonsgegevens op. Schrijf alle bezwaren op, ook als u het er niet mee eens bent. Geef aan hoe het bezwaar door het #location_type is behandeld.
+
+#empty_table(
+  columns: (7em, 1fr, 1fr),
+  headers: ("Tijdstip", "Bezwaar", [Reactie #location_type]),
+  values: ("", "", ""),
+  rows: 10,
+)
+
+=== Andere *bijzonderheden* die mogelijk invloed hebben op het telproces of de resultaten van het #location_type.
+
+Bijvoorbeeld een schorsing of als er meerdere verkiezingen tegelijk werden georganiseerd en een stembiljet in de verkeerde stembus zat.
+
+#empty_table(
+  columns: (7em, 1fr),
+  headers: ("Tijdstip", "Bijzonderheid"),
+  values: ("", ""),
+  rows: 5,
+)
+
+#pagebreak(weak: true)
+
+= Telresultaten van #is_municipality[de gemeente][het openbaar lichaam]
+
+== Aantal kiesgerechtigden
+
+#letterbox("Z", value: input.election.number_of_voters)[Kiesgerechtigden]
+
+== Toegelaten kiezers
+
+#if not is_local_election(true, false) and "voter_card_count" in input.summary.voters_counts [
+  Tel het aantal geldige stempassen, volmachtbewijzen en kiezerspassen
+
+  #sum(
+    letterbox("A", value: input.summary.voters_counts.poll_card_count)[Stempassen],
+    letterbox(
+      "B",
+      value: input.summary.voters_counts.proxy_certificate_count,
+    )[Volmachtbewijzen (schriftelijk of via ingevulde achterkant stempas of kiezerspas)],
+    letterbox("C", value: input.summary.voters_counts.voter_card_count)[Kiezerspassen],
+    letterbox(
+      "D",
+      light: false,
+      value: input.summary.voters_counts.total_admitted_voters_count,
+    )[*Totaal toegelaten kiezers (A+B+C)*],
+  )
+] else [
+  Tel het aantal geldige stempassen en volmachtbewijzen
+
+  #sum(
+    letterbox("A", value: input.summary.voters_counts.poll_card_count)[Stempassen],
+    letterbox(
+      "B",
+      value: input.summary.voters_counts.proxy_certificate_count,
+    )[Volmachtbewijzen (schriftelijk of via ingevulde achterkant stempas)],
+    letterbox(
+      "D",
+      light: false,
+      value: input.summary.voters_counts.total_admitted_voters_count,
+    )[*Totaal toegelaten kiezers (A+B)*],
+  )
+]
+
+#pagebreak(weak: true)
+
+== Uitgebrachte stemmen
+
+#if input.votes_tables.len() > 0 [
+  #sum(
+    sum(
+      ..input.votes_tables.map(list => {
+        let votes = input.summary.votes_counts.political_group_total_votes.find(v => v.number == list.number)
+
+        if votes == none {
+          return
+        }
+
+        letterbox([E.#list.number], value: votes.total)[Totaal lijst #list.number - #list.name]
+      }),
+      letterbox(
+        "E",
+        light: false,
+        value: input.summary.votes_counts.total_votes_candidates_count,
+      )[*Totaal stemmen op kandidaten* (tel E.1 t/m E.#input.votes_tables.last().number op)],
+    ),
+    letterbox("F", value: input.summary.votes_counts.blank_votes_count)[Blanco stemmen],
+    letterbox("G", value: input.summary.votes_counts.invalid_votes_count)[Ongeldige stemmen],
+    letterbox(
+      "H",
+      light: false,
+      value: input.summary.votes_counts.total_votes_cast_count,
+    )[*Totaal uitgebrachte stemmen (E+F+G)*],
+  )
+]
+
+#pagebreak(weak: true)
+
+== Verschillen tussen aantal kiezers en uitgebrachte stemmen
+
+=== Is bij *alle afzonderlijke stembureaus* in #this_location het aantal uitgebrachte stemmen en het aantal toegelaten kiezers gelijk?
+
+#let differences = input.summary.differences_counts.more_ballots_count.count > 0 or input.summary.differences_counts.fewer_ballots_count.count > 0
+
+#checkbox(checked: not differences)[Ja]
+
+#checkbox(checked: differences)[Nee, er zijn stembureaus met een verschil]
+
+=== #if input.summary.differences_counts.more_ballots_count.count > 0 [Voor de stembureaus met de nummers #comma_list(input.summary.differences_counts.more_ballots_count.data_entry_sources.map(p => p.number))] else [In geen van de stembureaus] zijn er *méér* uitgebrachte stemmen dan toegelaten kiezers geteld.
+
+#letterbox(
+  "I",
+  value: input.summary.differences_counts.more_ballots_count.count,
+)[Totaal aantal méér getelde stemmen]
+
+=== #if input.summary.differences_counts.fewer_ballots_count.count > 0 [Voor de stembureaus met de nummers #comma_list(input.summary.differences_counts.fewer_ballots_count.data_entry_sources.map(p => p.number))] else [In geen van de stembureaus] zijn er *minder* uitgebrachte stemmen dan toegelaten kiezers geteld.
+
+#letterbox(
+  "J",
+  value: input.summary.differences_counts.fewer_ballots_count.count,
+)[Totaal aantal minder getelde stemmen]
+
+== Uitkomst controleprotocol <monitoring_protocol>
+
+Voer de controle uit volgens de stappen in het controleprotocol.
+
+=== Kruis aan wat van toepassing is:
+
+#checkbox(checked: false)[Er zijn geen verschillen geconstateerd.]
+
+#checkbox(
+  checked: false,
+)[Er zijn verschillen geconstateerd. Er is contact opgenomen met de Kiesraad. Noteer hieronder wat daarvan de uitkomst is:]
+
+#empty_lines(5)
+
+#pagebreak(weak: true)
+
+== Stemmen per lijst en per kandidaat
+
+#pagebreak(weak: true)
+
+#for political_group in input.votes_tables {
+  votes_table(
+    title: [#political_group.number #political_group.name],
+    headers: ("Kandidaat", "", "Stemmen"),
+    total: political_group.total,
+    votes_columns: political_group.columns,
+    continue_on_next_page: [#sym.arrow.r De lijst gaat verder op de volgende pagina],
+    column_total: "Subtotaal kolom",
+    column_total_with_border: false,
+    sum_total: columns => [Totaal lijst (kolom #columns)],
+  )
+}
+
+#blank_page_before_signing(location_name)
+
+= Ondertekening
+
+Het proces-verbaal moet worden ondertekend door alle aanwezige leden. Bij een #location_type zijn dit er minimaal #is_local_election[3][5].
+
+#signing_form_label[Datum]
+
+#textbox_only_bottom_stroke[Datum en tijd:][Plaats:]
+
+== Voorzitter en #is_local_election[twee][vier] leden van het #location_type
+
+#signing_form_label[Voorzitter van het #location_type:]
+
+#textbox[Naam:][Handtekening:]
+
+#signing_form_label[#is_local_election[2][4] leden van het #location_type:]
+
+#stack(spacing: 0.5em, ..range(0, is_local_election(2, 4)).map(_ => textbox[Naam:][Handtekening:]))
+
+== Ondertekening door andere aanwezige leden van het #location_type
+
+#signing_form_label[Extra ondertekening:]
+
+#stack(spacing: 0.5em, ..range(0, is_local_election(3, 1)).map(_ => textbox[Naam:][Handtekening:]))

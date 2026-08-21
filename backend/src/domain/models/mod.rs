@@ -50,6 +50,7 @@ pub enum PdfModel {
     ModelNa14_1Versie2(Box<ModelNa14_1Versie2Input>),
     ModelNa14_2(Box<ModelNa14_2Input>),
     ModelNa14_2Bijlage1(Box<ModelNa14_2Bijlage1Input>),
+    ModelNa31_1(Box<ModelNa31_1Input>),
     ModelNa31_1Inlegvel(Box<ModelNa31_1InlegvelInput>),
     ModelNa31_2(Box<ModelNa31_2Input>),
     ModelNa31_2Bijlage1(Box<ModelNa31_2Bijlage1Input>),
@@ -74,6 +75,7 @@ impl PdfModel {
             Self::ModelNa14_1Versie2(_) => "model-na-14-1-versie-2",
             Self::ModelNa14_2(_) => "model-na-14-2",
             Self::ModelNa14_2Bijlage1(_) => "model-na-14-2-bijlage-1",
+            Self::ModelNa31_1(_) => "model-na-31-1",
             Self::ModelNa31_1Inlegvel(_) => "model-na-31-1-inlegvel",
             Self::ModelNa31_2(_) => "model-na-31-2",
             Self::ModelNa31_2Bijlage1(_) => "model-na-31-2-bijlage-1",
@@ -98,6 +100,7 @@ impl PdfModel {
             Self::ModelNa14_1Versie2(_) => "model-na-14-1-versie-2.typ",
             Self::ModelNa14_2(_) => "model-na-14-2.typ",
             Self::ModelNa14_2Bijlage1(_) => "model-na-14-2-bijlage-1.typ",
+            Self::ModelNa31_1(_) => "model-na-31-1.typ",
             Self::ModelNa31_1Inlegvel(_) => "model-na-31-1-inlegvel.typ",
             Self::ModelNa31_2(_) => "model-na-31-2.typ",
             Self::ModelNa31_2Bijlage1(_) => "model-na-31-2-bijlage-1.typ",
@@ -128,6 +131,7 @@ impl PdfModel {
             Self::ModelNa14_2Bijlage1(_) => {
                 "inputs/model-na-14-2-bijlage-1-variations/model-na-14-2-bijlage-1-GR.json"
             }
+            Self::ModelNa31_1(_) => "inputs/model-na-31-1-variations/model-na-31-1-GR.json",
             Self::ModelNa31_1Inlegvel(_) => "inputs/model-na-31-1-inlegvel.json",
             Self::ModelNa31_2(_) => "inputs/model-na-31-2-variations/model-na-31-2-GR.json",
             Self::ModelNa31_2Bijlage1(_) => {
@@ -154,6 +158,7 @@ impl PdfModel {
             Self::ModelNa14_1Versie2(input) => serde_json::to_string(input),
             Self::ModelNa14_2(input) => serde_json::to_string(input),
             Self::ModelNa14_2Bijlage1(input) => serde_json::to_string(input),
+            Self::ModelNa31_1(input) => serde_json::to_string(input),
             Self::ModelNa31_1Inlegvel(input) => serde_json::to_string(input),
             Self::ModelNa31_2(input) => serde_json::to_string(input),
             Self::ModelNa31_2Bijlage1(input) => serde_json::to_string(input),
@@ -189,6 +194,7 @@ impl PdfModel {
             "model-na-14-2-bijlage-1" => {
                 Ok(Self::ModelNa14_2Bijlage1(serde_json::from_str(input)?))
             }
+            "model-na-31-1" => Ok(Self::ModelNa31_1(serde_json::from_str(input)?)),
             "model-na-31-1-inlegvel" => Ok(Self::ModelNa31_1Inlegvel(serde_json::from_str(input)?)),
             "model-na-31-2" => Ok(Self::ModelNa31_2(serde_json::from_str(input)?)),
             "model-na-31-2-bijlage-1" => {

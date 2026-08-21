@@ -24,11 +24,9 @@
   width: 58.5rem;
 }
 
-.downloadModels {
-  p {
-    width: 32rem;
-    margin-bottom: var(--space-md);
-  }
+.downloadDescription {
+  width: 32rem;
+  margin-bottom: var(--space-md);
 }
 
 main.reportMain {

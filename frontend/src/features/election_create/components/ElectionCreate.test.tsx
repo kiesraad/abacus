@@ -232,6 +232,8 @@ describe("Election create pages", () => {
       await uploadElectionDefinition(router, file);
       await inputElectionHash();
 
+      await setCommitteeCategory();
+
       // upload candidate file
       await uploadCandidateDefinition(file);
 
@@ -253,6 +255,8 @@ describe("Election create pages", () => {
       // update election and set hash, and continue
       await uploadElectionDefinition(router, file);
       await inputElectionHash();
+
+      await setCommitteeCategory();
 
       // upload candidate file
       await uploadCandidateDefinition(file);
@@ -297,6 +301,8 @@ describe("Election create pages", () => {
       await uploadElectionDefinition(router, file);
       await inputElectionHash();
 
+      await setCommitteeCategory();
+
       // upload candidate file
       await uploadCandidateDefinition(file);
 
@@ -325,6 +331,8 @@ describe("Election create pages", () => {
       // update election and set hash, and continue
       await uploadElectionDefinition(router, file);
       await inputElectionHash();
+
+      await setCommitteeCategory();
 
       // upload candidate file
       await uploadCandidateDefinition(file);
@@ -356,6 +364,8 @@ describe("Election create pages", () => {
       await uploadElectionDefinition(router, file);
       await inputElectionHash();
 
+      await setCommitteeCategory();
+
       // upload candidate file
       await uploadCandidateDefinition(file);
 
@@ -385,11 +395,11 @@ describe("Election create pages", () => {
       await uploadElectionDefinition(router, file);
       await inputElectionHash();
 
+      await setCommitteeCategory();
+
       // upload candidate file, set hash and continue
       await uploadCandidateDefinition(file);
       await inputCandidateHash();
-
-      await setCommitteeCategory();
 
       // Make sure we are on the correct page
       expect(
@@ -411,11 +421,11 @@ describe("Election create pages", () => {
       await uploadElectionDefinition(router, file);
       await inputElectionHash();
 
+      await setCommitteeCategory();
+
       // upload candidate file, set hash and continue
       await uploadCandidateDefinition(file);
       await inputCandidateHash();
-
-      await setCommitteeCategory();
 
       // upload polling station list file
       await uploadPollingStationList(file, false);
@@ -462,12 +472,12 @@ describe("Election create pages", () => {
       await uploadElectionDefinition(router, file);
       await inputElectionHash();
 
+      // committee category
+      await setCommitteeCategory();
+
       // candidates lists
       await uploadCandidateDefinition(file);
       await inputCandidateHash();
-
-      // committee category
-      await setCommitteeCategory();
 
       // polling stations
       const eligibleVoters = 1234;
@@ -516,12 +526,12 @@ describe("Election create pages", () => {
       await uploadElectionDefinition(router, file);
       await inputElectionHash();
 
+      // committee category
+      await setCommitteeCategory();
+
       // candidates lists
       await uploadCandidateDefinition(file);
       await inputCandidateHash();
-
-      // committee category
-      await setCommitteeCategory();
 
       // polling stations
       const eligibleVoters = 1234;
@@ -583,12 +593,12 @@ describe("Election create pages", () => {
       await uploadElectionDefinition(router, file, "CSB");
       await inputElectionHash("CSB");
 
+      // committee category
+      await setCommitteeCategory("CSB");
+
       // candidates lists
       await uploadCandidateDefinition(file, "CSB");
       await inputCandidateHash("CSB");
-
-      // committee category
-      await setCommitteeCategory("CSB");
 
       // check and save
       await waitFor(async () => {

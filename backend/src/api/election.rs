@@ -34,7 +34,8 @@ use crate::{
         role::Role,
     },
     eml::{
-        EMLImportError, EmlHash, RedactedEmlHash, committees::ElectionTreeDetails,
+        EMLImportError, EmlHash, RedactedEmlHash,
+        committees::{CommitteeDetails, ElectionTreeDetails},
         number_of_voters_from_polling_stations_eml, parse_polling_stations_eml_str,
         polling_stations_eml_matches_election, polling_stations_from_eml,
         polling_stations_from_eml_str,
@@ -590,6 +591,7 @@ async fn import_gsb_election(
         &mut tx,
         audit_service,
         new_election,
+        &[],
         election_data_hash,
         candidate_data_hash,
     )
@@ -624,7 +626,7 @@ async fn import_csb_election(
     let election_data_hash = check_hash(edu.election_data.as_bytes(), Some(&edu.election_hash))?;
     let candidate_data_hash = check_hash(edu.candidate_data.as_bytes(), Some(&edu.candidate_hash))?;
 
-    let (mut new_election, _) = parse_election_candidates_eml(
+    let (mut new_election, election_tree_details) = parse_election_candidates_eml(
         &edu.election_data,
         Some((CommitteeCategory::CSB, None)),
         Some(&edu.candidate_data),
@@ -643,6 +645,7 @@ async fn import_csb_election(
         &mut tx,
         audit_service,
         new_election,
+        election_tree_details.get_committees(CommitteeCategory::GSB),
         election_data_hash,
         candidate_data_hash,
     )
@@ -695,6 +698,7 @@ async fn create_election_with_committee_session(
     tx: &mut SqliteConnection,
     audit_service: &AuditService,
     new_election: NewElection,
+    sub_committees: &[CommitteeDetails],
     election_data_hash: [String; 16],
     candidate_data_hash: [String; 16],
 ) -> Result<ElectionWithPoliticalGroups, APIError> {
@@ -716,7 +720,7 @@ async fn create_election_with_committee_session(
     )
     .await?;
 
-    create_sub_committees(tx, &election, committee_session.id).await?;
+    create_sub_committees(tx, committee_session.id, sub_committees).await?;
 
     // CSB elections have sub committees created at import time, so they can
     // go straight to InPreparation.
@@ -742,37 +746,23 @@ async fn create_election_with_committee_session(
 /// Create sub electoral committees for CSB elections
 async fn create_sub_committees(
     tx: &mut SqliteConnection,
-    election: &ElectionWithPoliticalGroups,
     committee_session_id: CommitteeSessionId,
+    sub_committees: &[CommitteeDetails],
 ) -> Result<(), APIError> {
-    match (election.committee_category, election.category) {
-        (CommitteeCategory::CSB, ElectionCategory::Municipal) => {
-            // TODO: this is not right, we should use the election tree instead
-            let number = election
-                .domain
-                .as_ref()
-                .expect("Municipal elections should have an election domain")
-                .id
-                .as_ref()
-                .expect("Municipal elections should have an election domain id")
-                .parse()
-                .expect("domain_id should be numeric");
-            create_sub_committee(
-                tx,
-                committee_session_id,
-                number,
-                &election.location,
-                CommitteeCategory::GSB,
-            )
-            .await?;
-        }
-        (
-            CommitteeCategory::CSB,
-            ElectionCategory::Provincial | ElectionCategory::WaterAuthority,
-        ) => {
-            todo!("Will be implemented in the future")
-        }
-        (CommitteeCategory::GSB, _) => {}
+    for committee in sub_committees {
+        let region_number = committee
+            .responsible_region
+            .key
+            .number
+            .ok_or(EMLImportError::MissingCommitteeNumber)? as u32;
+        create_sub_committee(
+            tx,
+            committee_session_id,
+            region_number,
+            &committee.responsible_region.name,
+            committee.category,
+        )
+        .await?;
     }
     Ok(())
 }

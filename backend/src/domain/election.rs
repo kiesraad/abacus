@@ -337,6 +337,15 @@ impl ElectionCategory {
         }
     }
 
+    /// Returns whether the election should have an election domain.
+    ///
+    /// An election domain is the specific region that an election takes place in,
+    /// i.e. the municipality, province or water authority. Country wide elections
+    /// do not have an election domain.
+    pub fn has_election_domain(&self) -> bool {
+        true
+    }
+
     /// Get the sub category for test elections, only available for tests and test data generation
     #[cfg(any(test, feature = "dev-database"))]
     pub fn sub_category(&self, number_of_seats: u32) -> ElectionSubCategory {
@@ -433,7 +442,7 @@ impl CommitteeDistrict {
 /// Election domain (i.e. the entity at which the election takes place)
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct ElectionDomain {
-    /// Identfier of the domain
+    /// Identifier of the domain
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
     pub id: Option<String>,

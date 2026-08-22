@@ -399,7 +399,7 @@ fn committees_multiple_electoral_districts(
 
         let hsb_region_details: RegionDetails = hsb_region.region().try_into()?;
         let district = CommitteeDistrict::Specific(hsb_region_details.clone());
-        // TODO: rest of Abacus needs to support HSB first
+        // TODO: rest of Abacus needs to support HSB first, see https://github.com/kiesraad/abacus/issues/3861
         // let (hsb_seat_region, hsb_name) =
         //     find_committee(hsb_region, eml_nl::utils::CommitteeCategory::HSB);
         // committees.push(CommitteeDetails::new(
@@ -450,7 +450,7 @@ fn find_committee(
 fn managing_authority_id(category: CommitteeCategory, key: RegionKey) -> Result<String, EMLError> {
     Ok(match category {
         CommitteeCategory::CSB => "CSB".to_string(),
-        // TODO: rest of Abacus first needs to support HSB
+        // TODO: rest of Abacus first needs to support HSB, see https://github.com/kiesraad/abacus/issues/3861
         // CommitteeCategory::HSB => format!(
         //     "HSB{}",
         //     key.id

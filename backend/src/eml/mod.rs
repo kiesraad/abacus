@@ -42,8 +42,8 @@ use crate::{
     domain::{
         committee_session::CommitteeSession,
         election::{
-            Candidate, CandidateGender, CandidateNumber, CommitteeCategory, ElectionDomain,
-            ElectionWithPoliticalGroups, NewElection, PGNumber, RegionKey,
+            Candidate, CandidateGender, CandidateNumber, CommitteeCategory, CommitteeDistrict,
+            ElectionDomain, ElectionWithPoliticalGroups, NewElection, PGNumber, RegionKey,
             RegisteredPoliticalGroup,
         },
         results::political_group_candidate_votes::PoliticalGroupCandidateVotes,
@@ -151,8 +151,8 @@ impl NewElection {
         // be so we try and extract it anyway
         let number_of_voters = max_votes(&election.contest.max_votes);
 
-        // TODO: once we support country-wide elections this is no longer true and the domain can be absent
-        if identifier.domain.is_none() {
+        // only require an election domain if the category requires one
+        if category.has_election_domain() && identifier.domain.is_none() {
             return Err(EMLImportError::MissingElectionDomain);
         }
 
@@ -213,16 +213,18 @@ impl NewElection {
     pub fn add_candidates_from_eml_str(
         &mut self,
         candidate_list_data: &str,
+        district_region: &CommitteeDistrict,
     ) -> Result<(), EMLImportError> {
         let candidate_list =
             CandidateLists::parse_eml(candidate_list_data, EMLParsingMode::Strict).ok()?;
 
-        self.add_candidates_from_eml(&candidate_list)
+        self.add_candidates_from_eml(&candidate_list, district_region)
     }
 
     pub fn add_candidates_from_eml(
         &mut self,
         candidate_lists: &CandidateLists,
+        district_region: &CommitteeDistrict,
     ) -> Result<(), EMLImportError> {
         let election = &candidate_lists.candidate_list.election;
         let identifier = &election.identifier;
@@ -246,11 +248,23 @@ impl NewElection {
             return Err(EMLImportError::MismatchElectionDate);
         }
 
-        // TODO: ensure that contest is for same district as chosen district
         let contest = election
             .contests
             .first()
             .ok_or(EMLImportError::CandidateListWithoutContest)?;
+
+        // check that contest id is the same as the region number
+        let contest_id = contest.identifier.id.cloned_value()?;
+        match (district_region, contest_id) {
+            (CommitteeDistrict::None, c) if c.is_geen() => {}
+            (CommitteeDistrict::All, c) if c.is_alle() => {}
+            (CommitteeDistrict::Specific(s), other)
+                if let Some(num) = s.key.number
+                    && other.value() == num.to_string() => {}
+            _ => {
+                return Err(EMLImportError::InvalidDistrict);
+            }
+        }
 
         // extract initial listing of political groups with candidates
         let mut previous_pg_number = PGNumber::from(0);

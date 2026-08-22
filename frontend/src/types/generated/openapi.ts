@@ -1074,7 +1074,7 @@ export interface ElectionDetailsResponse {
  * Election domain (i.e. the entity at which the election takes place)
  */
 export interface ElectionDomain {
-  /** Identfier of the domain */
+  /** Identifier of the domain */
   id?: string;
   /** Name of the domain */
   name: string;
@@ -1317,6 +1317,7 @@ export interface GSBElectionCreationRequest {
   number_of_voters: number;
   polling_station_data?: string;
   polling_station_file_name?: string;
+  selected_region?: RegionKey;
 }
 
 export interface GSBElectionCreationValidateRequest {
@@ -1328,10 +1329,12 @@ export interface GSBElectionCreationValidateRequest {
   number_of_voters?: number;
   polling_station_data?: string;
   polling_station_file_name?: string;
+  selected_region?: RegionKey;
 }
 
 export interface GSBElectionDefinitionValidateResponse {
   election: NewElection;
+  gsb_list: RegionDetails[];
   hash: RedactedEmlHash;
   number_of_voters: number;
   polling_station_definition_matches_election?: boolean;

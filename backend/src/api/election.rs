@@ -404,6 +404,7 @@ fn validate_gsb_election(
     let (mut election, election_tree_details) = parse_election_candidates_eml(
         &edu.election_data,
         Some((CommitteeCategory::GSB, edu.selected_region)),
+        true,
         edu.candidate_data.as_deref(),
     )?;
 
@@ -465,6 +466,7 @@ fn validate_csb_election(
     let (mut election, _) = parse_election_candidates_eml(
         &edu.election_data,
         Some((CommitteeCategory::CSB, None)),
+        false,
         edu.candidate_data.as_deref(),
     )?;
     election.committee_category = CommitteeCategory::CSB;
@@ -572,6 +574,7 @@ async fn import_gsb_election(
     let (mut new_election, _) = parse_election_candidates_eml(
         &edu.election_data,
         Some((CommitteeCategory::GSB, edu.selected_region)),
+        false,
         Some(&edu.candidate_data),
     )?;
 
@@ -629,6 +632,7 @@ async fn import_csb_election(
     let (mut new_election, election_tree_details) = parse_election_candidates_eml(
         &edu.election_data,
         Some((CommitteeCategory::CSB, None)),
+        false,
         Some(&edu.candidate_data),
     )?;
     // PS/WS CSB support will be implemented later
@@ -674,10 +678,11 @@ fn check_hash(
 fn parse_election_candidates_eml(
     election_eml_data: &str,
     selected_committee: Option<(CommitteeCategory, Option<RegionKey>)>,
+    fallback_to_csb: bool,
     candidate_eml_data: Option<&str>,
 ) -> Result<(NewElection, ElectionTreeDetails), APIError> {
     let (mut election, election_tree) =
-        NewElection::from_eml_str(election_eml_data, selected_committee)?;
+        NewElection::from_eml_str(election_eml_data, selected_committee, fallback_to_csb)?;
     if election.district == CommitteeDistrict::All {
         // Committees concerning all districts are not supported yet
         return Err(APIError::EmlImportError(

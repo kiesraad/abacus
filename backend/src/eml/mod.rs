@@ -115,17 +115,19 @@ impl NewElection {
     pub fn from_eml_str(
         election_definition_data: &str,
         selected_committee: Option<(CommitteeCategory, Option<RegionKey>)>,
+        fallback_to_csb: bool,
     ) -> Result<(Self, ElectionTreeDetails), EMLImportError> {
         // attempt to parse in strict mode (we don't expect any errors in this EML)
         let definition =
             ElectionDefinition::parse_eml(election_definition_data, EMLParsingMode::Strict).ok()?;
-        Self::from_eml(&definition, selected_committee)
+        Self::from_eml(&definition, selected_committee, fallback_to_csb)
     }
 
     #[expect(clippy::too_many_lines)]
     pub fn from_eml(
         definition: &ElectionDefinition,
         selected_committee: Option<(CommitteeCategory, Option<RegionKey>)>,
+        fallback_to_csb: bool,
     ) -> Result<(Self, ElectionTreeDetails), EMLImportError> {
         // extract common information
         let election = &definition.election_event.election;
@@ -175,9 +177,12 @@ impl NewElection {
 
         // find the selected committee, falling back to the CSB if none is selected
         let selected_committee = if let Some(selected) = selected_committee {
-            election_tree_details
-                .get_committee(selected.0, selected.1)
-                .ok_or(EMLImportError::UnknownCommittee)?
+            let c = election_tree_details.get_committee(selected.0, selected.1);
+            if fallback_to_csb {
+                c.unwrap_or(&election_tree_details.csb)
+            } else {
+                c.ok_or(EMLImportError::UnknownCommittee)?
+            }
         } else {
             &election_tree_details.csb
         };
@@ -1111,7 +1116,7 @@ mod tests {
     fn test_election_validate_missing_election_domain() {
         let data =
             include_str!("../eml/tests/eml110a_invalid_election_missing_election_domain.eml.xml");
-        let res = NewElection::from_eml_str(data, None).unwrap_err();
+        let res = NewElection::from_eml_str(data, None, false).unwrap_err();
         assert!(matches!(res, EMLImportError::MissingElectionDomain))
     }
 
@@ -1120,7 +1125,7 @@ mod tests {
         let data = include_str!(
             "../eml/tests/eml110a_invalid_election_limited_elections_supported.eml.xml"
         );
-        let res = NewElection::from_eml_str(data, None).unwrap_err();
+        let res = NewElection::from_eml_str(data, None, false).unwrap_err();
         dbg!(&res);
         assert!(matches!(res, EMLImportError::LimitedElectionsSupported));
     }
@@ -1130,12 +1135,24 @@ mod tests {
         let data = include_str!(
             "tests/eml110a_invalid_election_category_and_sub_category_mismatch.eml.xml"
         );
-        let res = NewElection::from_eml_str(data, None).unwrap_err();
+        let res = NewElection::from_eml_str(data, None, false).unwrap_err();
         dbg!(&res);
         assert!(matches!(
             res,
             EMLImportError::MismatchElectionCategoryAndSubCategory
         ));
+    }
+
+    #[test]
+    fn test_election_committee_fallback_works() {
+        let data = include_str!("tests/definitions/Verkiezingsdefinitie_PS2023_Gelderland.eml.xml");
+        let res =
+            NewElection::from_eml_str(data, Some((CommitteeCategory::GSB, None)), true).unwrap();
+        assert_eq!(res.0.authority_id, "CSB");
+
+        let res = NewElection::from_eml_str(data, Some((CommitteeCategory::GSB, None)), false)
+            .unwrap_err();
+        assert!(matches!(res, EMLImportError::UnknownCommittee));
     }
 
     #[test]

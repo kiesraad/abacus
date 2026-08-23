@@ -260,15 +260,14 @@ impl NewElection {
 
         // check that contest id is the same as the region number
         let contest_id = contest.identifier.id.cloned_value()?;
-        match (district_region, contest_id) {
+        match (district_region, &contest_id) {
             // Only allow none-district if the election district is none
             (CommitteeDistrict::None, c) if c.is_geen() => {}
             // If the district region is all, allow any contest id (except geen)
             (CommitteeDistrict::All, c) if !c.is_geen() => {}
             // Otherwise, the contest id must match the district number
-            (CommitteeDistrict::Specific(s), other)
-                if let Some(num) = s.key.number
-                    && other.value() == num.to_string() => {}
+            (CommitteeDistrict::Specific(_), _)
+                if district_region.as_contest_id()? == contest_id => {}
             _ => {
                 return Err(EMLImportError::InvalidDistrict);
             }

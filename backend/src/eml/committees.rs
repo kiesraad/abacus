@@ -78,30 +78,50 @@ impl CommitteeDistrict {
     pub fn as_contest_identifier(&self) -> Result<eml_nl::common::ContestIdentifier, EMLError> {
         eml_nl::common::ContestIdentifier::try_from(self)
     }
+
+    /// Convert the committee district to a contest Id.
+    ///
+    /// Note: this is only the actual contest id, use
+    /// [`CommitteeDistrict::as_contest_identifier`] for id including the name
+    /// of the region for exports.
+    pub fn as_contest_id(&self) -> Result<eml_nl::utils::ContestId, EMLError> {
+        eml_nl::utils::ContestId::try_from(self)
+    }
+}
+
+impl TryFrom<&CommitteeDistrict> for eml_nl::utils::ContestId {
+    type Error = EMLError;
+
+    fn try_from(district: &CommitteeDistrict) -> Result<Self, Self::Error> {
+        Ok(match district {
+            CommitteeDistrict::None => eml_nl::utils::ContestId::geen(),
+            CommitteeDistrict::All => eml_nl::utils::ContestId::alle(),
+            CommitteeDistrict::Specific(region) => {
+                let id_number = region
+                    .key
+                    .number
+                    .ok_or(EMLError::custom("Missing region number"))?;
+                let id_str = if region.roman_numerals {
+                    to_roman_numeral(id_number)
+                } else {
+                    id_number.to_string()
+                };
+                ContestId::new(id_str)?
+            }
+        })
+    }
 }
 
 impl TryFrom<&CommitteeDistrict> for eml_nl::common::ContestIdentifier {
     type Error = EMLError;
 
     fn try_from(district: &CommitteeDistrict) -> Result<Self, Self::Error> {
-        Ok(match district {
-            CommitteeDistrict::None => eml_nl::common::ContestIdentifier::geen(),
-            CommitteeDistrict::All => eml_nl::common::ContestIdentifier::alle(),
-            CommitteeDistrict::Specific(region) => {
-                let id_number = region
-                    .key
-                    .number
-                    .ok_or(EMLError::custom("Missing region number"))?;
-
-                let id_str = if region.roman_numerals {
-                    to_roman_numeral(id_number)
-                } else {
-                    id_number.to_string()
-                };
-                eml_nl::common::ContestIdentifier::new(ContestId::new(id_str)?)
-                    .with_name(region.name.clone())
-            }
-        })
+        let contest_id = district.as_contest_id()?;
+        let mut identifier = eml_nl::common::ContestIdentifier::new(contest_id);
+        if let CommitteeDistrict::Specific(region) = district {
+            identifier = identifier.with_name(region.name.clone())
+        }
+        Ok(identifier)
     }
 }
 

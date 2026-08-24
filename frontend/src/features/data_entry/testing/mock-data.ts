@@ -131,6 +131,44 @@ export function getDefaultDataEntryState(): DataEntryStateLoaded {
   };
 }
 
+export function getDefaultDSODataEntryState(): DataEntryStateLoaded {
+  const model: DataEntryModel = "DSOFirstSession";
+  return {
+    election: electionMockData,
+    dataEntryId: 1,
+    error: null,
+    results: { model, ...getDSOInitialValues() },
+    entryNumber: 1,
+    previousResults: null,
+    source: {
+      type: "PollingStation",
+      id: pollingStationMockData[0]!.id,
+      number: pollingStationMockData[0]!.number,
+      name: pollingStationMockData[0]!.name,
+      committee_session_id: 1,
+      session_type: "First",
+      data_entry_id: 1,
+      locality: pollingStationMockData[0]!.locality,
+      postal_code: pollingStationMockData[0]!.postal_code,
+      address: pollingStationMockData[0]!.address,
+    },
+    dataEntryStatus: "first_entry_in_progress",
+    dataEntryStructure: getDataEntryStructure(model, electionMockData),
+    formState: {
+      furthest: "voters_votes_counts",
+      sections: {
+        voters_votes_counts: getDefaultFormSection("voters_votes_counts", 0),
+        differences_counts: getDefaultFormSection("differences_counts", 1),
+        political_group_votes_1: getDefaultFormSection("political_group_votes_1", 2),
+        save: getDefaultFormSection("save", 3),
+      },
+    },
+    targetFormSectionId: "voters_votes_counts",
+    status: "idle",
+    cache: null,
+  };
+}
+
 export function getEmptyDataEntryRequest(): Omit<DATA_ENTRY_SAVE_REQUEST_BODY, "data"> & {
   data: CSOFirstSessionResults & { model: "CSOFirstSession" };
 } {
@@ -139,6 +177,21 @@ export function getEmptyDataEntryRequest(): Omit<DATA_ENTRY_SAVE_REQUEST_BODY, "
     data: {
       model: "CSOFirstSession",
       ...getInitialValues(),
+    },
+    client_state: {
+      test: "test",
+    },
+  };
+}
+
+export function getEmptyDSODataEntryRequest(): Omit<DATA_ENTRY_SAVE_REQUEST_BODY, "data"> & {
+  data: DSOFirstSessionResults & { model: "DSOFirstSession" };
+} {
+  return {
+    progress: 0,
+    data: {
+      model: "DSOFirstSession",
+      ...getDSOInitialValues(),
     },
     client_state: {
       test: "test",

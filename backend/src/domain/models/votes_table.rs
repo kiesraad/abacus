@@ -14,7 +14,7 @@ use crate::domain::{
 
 const DEFAULT_CANDIDATES_PER_COLUMN: [usize; 4] = [25, 25, 15, 15];
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct CandidatesTables(Vec<VotesTable>);
 
 impl CandidatesTables {
@@ -151,7 +151,7 @@ fn get_votes_for_candidate(
     Ok(Some(candidate_vote.votes))
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct VotesTable {
     /// Political group number
     number: PGNumber,
@@ -278,7 +278,7 @@ impl VotesTable {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct VotesTableColumn {
     /// Sum of votes in this column
     column_total: Option<Count>,
@@ -288,7 +288,7 @@ pub struct VotesTableColumn {
     votes: Vec<CandidateVotes>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct CandidateVotes {
     /// Candidate information
     candidate: Candidate,

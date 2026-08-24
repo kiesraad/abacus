@@ -228,11 +228,35 @@ export type COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH =
   `/api/elections/${ElectionId}/committee_sessions/${CommitteeSessionId}/status`;
 export type COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = CommitteeSessionStatusChangeRequest;
 
+// /api/elections/{election_id}/download_n_10_1
+export interface ELECTION_DOWNLOAD_N_10_1_REQUEST_PARAMS {
+  election_id: ElectionId;
+}
+export type ELECTION_DOWNLOAD_N_10_1_REQUEST_PATH = `/api/elections/${ElectionId}/download_n_10_1`;
+
+// /api/elections/{election_id}/download_n_10_1_inlegvel
+export interface ELECTION_DOWNLOAD_N_10_1_INLEGVEL_REQUEST_PARAMS {
+  election_id: ElectionId;
+}
+export type ELECTION_DOWNLOAD_N_10_1_INLEGVEL_REQUEST_PATH = `/api/elections/${ElectionId}/download_n_10_1_inlegvel`;
+
 // /api/elections/{election_id}/download_n_10_2
 export interface ELECTION_DOWNLOAD_N_10_2_REQUEST_PARAMS {
   election_id: ElectionId;
 }
 export type ELECTION_DOWNLOAD_N_10_2_REQUEST_PATH = `/api/elections/${ElectionId}/download_n_10_2`;
+
+// /api/elections/{election_id}/download_na_14_1_versie1
+export interface ELECTION_DOWNLOAD_NA_14_1_VERSIE1_REQUEST_PARAMS {
+  election_id: ElectionId;
+}
+export type ELECTION_DOWNLOAD_NA_14_1_VERSIE1_REQUEST_PATH = `/api/elections/${ElectionId}/download_na_14_1_versie1`;
+
+// /api/elections/{election_id}/download_na_31_1_inlegvel
+export interface ELECTION_DOWNLOAD_NA_31_1_INLEGVEL_REQUEST_PARAMS {
+  election_id: ElectionId;
+}
+export type ELECTION_DOWNLOAD_NA_31_1_INLEGVEL_REQUEST_PATH = `/api/elections/${ElectionId}/download_na_31_1_inlegvel`;
 
 // /api/elections/{election_id}/download_na_31_2_bijlage1
 export interface ELECTION_DOWNLOAD_NA_31_2_BIJLAGE1_REQUEST_PARAMS {

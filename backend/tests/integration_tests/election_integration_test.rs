@@ -279,6 +279,96 @@ async fn test_election_number_of_voters_change_not_found(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::NOT_FOUND);
 }
 
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_11_dso", "users"))))]
+async fn test_election_n_10_1_download(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    let coordinator_cookie = login(&addr, CoordinatorGSB).await;
+
+    let url = format!("http://{addr}/api/elections/11/download_n_10_1");
+    let response = reqwest::Client::new()
+        .get(&url)
+        .header("cookie", coordinator_cookie)
+        .send()
+        .await
+        .unwrap();
+    let content_disposition = response.headers().get("Content-Disposition");
+    let content_type = response.headers().get("Content-Type");
+
+    assert_eq!(response.status(), StatusCode::OK);
+    assert_eq!(content_type.unwrap(), "application/zip");
+
+    let content_disposition_string = content_disposition.unwrap().to_str().unwrap();
+    assert_eq!(&content_disposition_string[..21], "attachment; filename=");
+    assert_eq!(
+        &content_disposition_string[21..],
+        "\"AB2026_Heemdamseburg_n_10_1.zip\""
+    );
+
+    let bytes = response.bytes().await.unwrap();
+    assert!(bytes.len() > 1024);
+
+    let archive = ZipFileReader::new(bytes.to_vec()).await.unwrap();
+
+    let reader = archive.reader_with_entry(0).await.unwrap();
+    assert_eq!(
+        reader.entry().filename().as_str().unwrap(),
+        "Model_N_10_1_AB2026_Stembureau_33.pdf"
+    );
+    assert!(reader.entry().uncompressed_size() > 1024);
+
+    let reader = archive.reader_with_entry(1).await.unwrap();
+    assert_eq!(
+        reader.entry().filename().as_str().unwrap(),
+        "Model_N_10_1_AB2026_Stembureau_34.pdf"
+    );
+    assert!(reader.entry().uncompressed_size() > 1024);
+}
+
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_11_dso", "users"))))]
+async fn test_election_n_10_1_inlegvel_download(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    let coordinator_cookie = login(&addr, CoordinatorGSB).await;
+
+    let url = format!("http://{addr}/api/elections/11/download_n_10_1_inlegvel");
+    let response = reqwest::Client::new()
+        .get(&url)
+        .header("cookie", coordinator_cookie)
+        .send()
+        .await
+        .unwrap();
+    let content_disposition = response.headers().get("Content-Disposition");
+    let content_type = response.headers().get("Content-Type");
+
+    assert_eq!(response.status(), StatusCode::OK);
+    assert_eq!(content_type.unwrap(), "application/zip");
+
+    let content_disposition_string = content_disposition.unwrap().to_str().unwrap();
+    assert_eq!(&content_disposition_string[..21], "attachment; filename=");
+    assert_eq!(
+        &content_disposition_string[21..],
+        "\"AB2026_Heemdamseburg_n_10_1_Inlegvel.zip\""
+    );
+
+    let bytes = response.bytes().await.unwrap();
+    assert!(bytes.len() > 1024);
+
+    let archive = ZipFileReader::new(bytes.to_vec()).await.unwrap();
+
+    let reader = archive.reader_with_entry(0).await.unwrap();
+    assert_eq!(
+        reader.entry().filename().as_str().unwrap(),
+        "Model_N_10_1_Inlegvel_AB2026_Stembureau_33.pdf"
+    );
+    assert!(reader.entry().uncompressed_size() > 1024);
+
+    let reader = archive.reader_with_entry(1).await.unwrap();
+    assert_eq!(
+        reader.entry().filename().as_str().unwrap(),
+        "Model_N_10_1_Inlegvel_AB2026_Stembureau_34.pdf"
+    );
+    assert!(reader.entry().uncompressed_size() > 1024);
+}
+
 #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2", "users"))))]
 async fn test_election_n_10_2_download(pool: SqlitePool) {
     let addr = serve_api(pool).await;
@@ -322,6 +412,83 @@ async fn test_election_n_10_2_download(pool: SqlitePool) {
         "Model_N_10_2_GR2024_Stembureau_34.pdf"
     );
     assert!(reader.entry().uncompressed_size() > 1024);
+}
+
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_11_dso", "users"))))]
+async fn test_election_na_14_1_versie1_download(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    let coordinator_cookie = login(&addr, CoordinatorGSB).await;
+
+    let url = format!("http://{addr}/api/elections/11/download_na_14_1_versie1");
+    let response = reqwest::Client::new()
+        .get(&url)
+        .header("cookie", coordinator_cookie)
+        .send()
+        .await
+        .unwrap();
+    let content_disposition = response.headers().get("Content-Disposition");
+    let content_type = response.headers().get("Content-Type");
+
+    assert_eq!(response.status(), StatusCode::OK);
+    assert_eq!(content_type.unwrap(), "application/zip");
+
+    let content_disposition_string = content_disposition.unwrap().to_str().unwrap();
+    assert_eq!(&content_disposition_string[..21], "attachment; filename=");
+    assert_eq!(
+        &content_disposition_string[21..],
+        "\"AB2026_Heemdamseburg_na_14_1_versie1.zip\""
+    );
+
+    let bytes = response.bytes().await.unwrap();
+    assert!(bytes.len() > 1024);
+
+    let archive = ZipFileReader::new(bytes.to_vec()).await.unwrap();
+
+    let reader = archive.reader_with_entry(0).await.unwrap();
+    assert_eq!(
+        reader.entry().filename().as_str().unwrap(),
+        "Model_Na14-1_versie_1_AB2026_Stembureau_33.pdf"
+    );
+    assert!(reader.entry().uncompressed_size() > 1024);
+
+    let reader = archive.reader_with_entry(1).await.unwrap();
+    assert_eq!(
+        reader.entry().filename().as_str().unwrap(),
+        "Model_Na14-1_versie_1_AB2026_Stembureau_34.pdf"
+    );
+    assert!(reader.entry().uncompressed_size() > 1024);
+}
+
+#[test(sqlx::test(fixtures(
+    path = "../../fixtures",
+    scripts("election_12_dso_with_results", "users")
+)))]
+async fn test_election_na_31_1_inlegvel_download(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    let coordinator_cookie = login(&addr, CoordinatorGSB).await;
+
+    let url = format!("http://{addr}/api/elections/12/download_na_31_1_inlegvel");
+    let response = reqwest::Client::new()
+        .get(&url)
+        .header("cookie", coordinator_cookie)
+        .send()
+        .await
+        .unwrap();
+    let content_disposition = response.headers().get("Content-Disposition");
+    let content_type = response.headers().get("Content-Type");
+
+    assert_eq!(response.status(), StatusCode::OK);
+    assert_eq!(content_type.unwrap(), "application/pdf");
+
+    let content_disposition_string = content_disposition.unwrap().to_str().unwrap();
+    assert_eq!(&content_disposition_string[..21], "attachment; filename=");
+    assert_eq!(
+        &content_disposition_string[21..],
+        "\"Model_Na_31_1_Inlegvel.pdf\""
+    );
+
+    let bytes = response.bytes().await.unwrap();
+    assert!(bytes.len() > 1024);
 }
 
 #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2", "users"))))]

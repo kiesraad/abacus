@@ -1261,7 +1261,7 @@ mod tests {
         }
 
         #[test]
-        fn test_unioque_highest_average_qualify_when_retracted_with_one_largest_remainder() {
+        fn test_unique_highest_average_qualify_when_retracted_with_one_largest_remainder() {
             let previous_steps = vec![
                 largest_remainder_step(LIST),
                 unique_highest_average_step(LIST),

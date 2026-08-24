@@ -1,13 +1,12 @@
-#import "common/style.typ": conf, document_numbering, blank_page_before_signing
+#import "common/style.typ": conf, document_numbering, default_header, blank_page_before_signing
 #import "common/scripts.typ": *
-#let input = json("inputs/model-na-31-2-variations/model-na-31-2-GR.json")
+#let input = json("inputs/model-na-31-1-variations/model-na-31-1-GR.json")
 
 #let is_municipality = (municipal, public_body) => is_municipality(input.election.authority_region, municipal, public_body)
 #let is_local_election = (local, other) => is_local_election(input.election.category, local, other)
 #let location_name = is_municipality[Gemeente #input.election.authority_id #input.election.authority_region][Openbaar lichaam #input.election.authority_region]
 #let location_type = is_municipality[gemeentelijk stembureau][stembureau voor het openbaar lichaam]
 #let this_location = is_municipality[deze gemeente][dit openbaar lichaam]
-#let the_location = is_municipality[de gemeente][het openbaar lichaam]
 
 #show: doc => conf(
   doc,
@@ -17,7 +16,7 @@
     #input.hash
 
     Proces-verbaal van een #location_type \
-    Model Na 31-2 centrale stemopneming (versie 2027)
+    Model Na 31-1 decentrale stemopneming (versie 2027)
   ], margin-bottom: 2.9cm, footer-descent: 0.45cm
 )
 
@@ -28,8 +27,8 @@
   is_municipality[Gemeentelijk stembureau][Stembureau voor het openbaar lichaam],
   [#input.election.name - #format_date(input.election.election_date)],
   [
-    Verslag en telresultaten per lijst en kandidaat -
-    Model Na 31-2
+    Verslag en telresultaten per lijst en kandidaat \
+    Model Na 31-1
   ],
 )
 
@@ -44,21 +43,15 @@
 #is_municipality[Elke gemeente][Elk openbaar lichaam] maakt bij een verkiezing een verslag: het proces-verbaal. Hierin staat hoe het tellen van de stemmen is verlopen en wat de uitslag van de stemming was.
 
 #emph_block[
-  In #this_location is gekozen voor *centrale stemopneming*.
-  Ieder stembureau heeft direct na het stemmen geteld hoeveel stemmen elke lijst
-  kreeg. Het *#location_type* telt de stemmen per kandidaat en telt daarna de resultaten van alle stembureaus bij elkaar op.
+  In #this_location is gekozen voor *decentrale stemopneming*.
+  Ieder stembureau heeft direct na het stemmen geteld hoeveel stemmen elke lijst en elke kandidaat kreeg. Het *#location_type* telt daarna de resultaten van alle stembureaus bij elkaar op.
 ]
 
 == Inhoudsopgave
 
 - Deel 1 - *Verslag van de zitting* (het verloop van het tellen en optellen)
-- Deel 2 - *Telresultaten* van #is_municipality[de hele gemeente][het hele openbaar lichaam]
+- Deel 2 - *Telresultaten* van #is_municipality[de gemeente][het openbaar lichaam]
 - Deel 3 - *Ondertekening* door de leden van het #location_type
-
-\
-
-- Bijlage 1: Telresultaten van alle stembureaus in #the_location
-- Bijlage 2: Overzicht van alle bezwaren die op de stembureaus zijn gemaakt
 
 #pagebreak(weak: true)
 
@@ -87,7 +80,7 @@ De volgende rollen zijn mogelijk: voorzitter, plaatsvervangend voorzitter of lid
 
 == Getelde stembureaus
 
-=== De resultaten van onderstaande stembureaus zijn door het #location_type gecontroleerd en opgeteld tot het totaal van #the_location. Als er extra onderzoeken hebben plaatsgevonden, dan kan dat in de laatste drie kolommen worden aangegeven.
+=== De resultaten van onderstaande stembureaus zijn door het #location_type gecontroleerd en opgeteld tot het totaal van #is_municipality[de gemeente][het openbaar lichaam]. Als extra onderzoeken hebben plaatsgevonden wordt dat hier aangegeven. Als dat heeft geleid tot een correctie, en er dus een corrigendum is, wordt dat in de laatste kolom aangegeven.
 
 #light_table(
   columns: (5em, 1fr, 1fr, 6em, 6em, 6em),
@@ -95,9 +88,9 @@ De volgende rollen zijn mogelijk: voorzitter, plaatsvervangend voorzitter of lid
     [Nr.],
     [Naam locatie],
     [Postcode + Adres],
-    [Toegelaten kiezers opnieuw vastgesteld?],
-    [Onderzocht vanwege andere reden dan onverklaard verschil?],
-    [Stembiljetten (deels) herteld?],
+    [Onderzocht vanwege een onverklaard verschil?],
+    [Onderzocht vanwege (een vermoeden van) een andere fout?],
+    [Uitslag gecorrigeerd?],
   ),
   values: input
     .polling_stations
@@ -113,15 +106,15 @@ De volgende rollen zijn mogelijk: voorzitter, plaatsvervangend voorzitter of lid
             #polling_station.postal_code #polling_station.locality
           ]
         ],
-        align(center, checkbox(checked: input.polling_station_investigations.admitted_voters_recounted.contains(polling_station.number))[]),
-        align(center, checkbox(checked: input.polling_station_investigations.investigated_other_reason.contains(polling_station.number))[]),
-        align(center, checkbox(checked: input.polling_station_investigations.ballots_recounted.contains(polling_station.number))[]),
+        align(center, checkbox(checked: input.polling_station_investigations.unaccounted_difference.contains(polling_station.number))[]),
+        align(center, checkbox(checked: input.polling_station_investigations.other_error.contains(polling_station.number))[]),
+        align(center, checkbox(checked: input.polling_station_investigations.corrected_results.contains(polling_station.number))[]),
       )
     })
     .flatten(),
 )
 
-=== Voor de stembureaus waar onderzoek naar is gedaan kan hieronder een toelichting worden gegeven. Het geven van een toelichting is niet verplicht.
+=== Voor de stembureaus waar onderzoek naar is gedaan vanwege een vermoedelijke fout, maar waar geen correctie heeft plaatsgevonden, kan hieronder een toelichting worden gegeven. Het geven van een toelichting is niet verplicht.
 
 #empty_table(
   columns: (7em, 1fr),
@@ -158,7 +151,7 @@ Bijvoorbeeld een schorsing of als er meerdere verkiezingen tegelijk werden georg
 
 #pagebreak(weak: true)
 
-= Telresultaten van #the_location
+= Telresultaten van #is_municipality[de gemeente][het openbaar lichaam]
 
 == Aantal kiesgerechtigden
 
@@ -265,7 +258,9 @@ Voer de controle uit volgens de stappen in het controleprotocol.
 
 #checkbox(checked: false)[Er zijn geen verschillen geconstateerd.]
 
-#checkbox(checked: false)[Er zijn verschillen geconstateerd. Er is contact opgenomen met de Kiesraad. Noteer hieronder wat daarvan de uitkomst is:]
+#checkbox(
+  checked: false,
+)[Er zijn verschillen geconstateerd. Er is contact opgenomen met de Kiesraad. Noteer hieronder wat daarvan de uitkomst is:]
 
 #empty_lines(5)
 

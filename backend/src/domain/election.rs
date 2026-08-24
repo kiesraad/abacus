@@ -12,6 +12,8 @@ use crate::domain::identifier::id;
 
 id!(ElectionId);
 
+pub struct InvalidElectionError(pub String);
+
 /// Election without political groups.
 ///
 /// Note: an election within Abacus does not represent the entire election, but

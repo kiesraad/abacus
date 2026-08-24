@@ -62,12 +62,14 @@ Elk stembureau maakt bij een verkiezing een verslag: het proces-verbaal. Hierin 
 #pagebreak(weak: true)
 
 #show: doc => document_numbering(doc)
+// Max numbering level is 2
+#show heading.where(level: 3): it => [#block(it.body)]
 
 = Verslag van de zitting
 
 == Presentielijst
 
-#emph_block[Aanwezige leden van het stembureau]
+=== Aanwezige leden van het stembureau
 
 De volgende rollen zijn mogelijk: voorzitter, plaatsvervangend voorzitter, lid of teller. Vink aan of iemand bij het stemmen en/of tellen aanwezig was.
 
@@ -77,6 +79,8 @@ De volgende rollen zijn mogelijk: voorzitter, plaatsvervangend voorzitter, lid o
   values: ("", "", "", "-", checkbox(small: true)[], checkbox(small: true)[]),
   rows: 21,
 )
+
+#show: doc => document_numbering(doc)
 
 == Tijdens het stemmen
 

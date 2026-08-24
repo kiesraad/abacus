@@ -16,15 +16,201 @@ import { t } from "@/i18n/translate";
 import type {
   COMMITTEE_SESSION_CREATE_REQUEST_PATH,
   COMMITTEE_SESSION_DELETE_REQUEST_PATH,
+  CommitteeSession,
+  Election,
 } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
-import { committeeSessionLabel } from "@/utils/committeeSession";
+import { committeeSessionDetailsPresent, committeeSessionLabel } from "@/utils/committeeSession";
 import { hasBooleanProperty } from "@/utils/typeChecks";
-
 import { directDownload } from "../utils/download";
 import { CommitteeSessionCard } from "./CommitteeSessionCard";
 import { ElectionInformationTable } from "./ElectionInformationTable";
 import cls from "./ElectionManagement.module.css";
+
+interface DownloadSectionProps {
+  election: Election;
+  committeeSession: CommitteeSession;
+}
+
+function CSOFirstSessionDownloadSection({ election }: DownloadSectionProps) {
+  return (
+    <div id="CSO-first-session-download-section" className="mt-xl">
+      <h3 className={cls.tableTitle}>{t("election_management.empty_documents_first_session")}</h3>
+      <p className={cls.downloadDescription}>{t("election_management.empty_document_description.plural")}</p>
+      <Table className={cn(cls.electionInformationTable)} variant="information">
+        <Table.Header>
+          <Table.HeaderCell scope="col">{t("election_management.document_model")}</Table.HeaderCell>
+          <Table.HeaderCell scope="col">{t("election_management.document_purpose")}</Table.HeaderCell>
+        </Table.Header>
+        <Table.Body>
+          <Table.ClickRow
+            downloadIcon
+            onClick={() => {
+              directDownload(`/api/elections/${election.id}/download_n_10_2`);
+            }}
+          >
+            <Table.Cell>N 10-2</Table.Cell>
+            <Table.Cell>{t("election_management.document_n_10_1_and_n_10_2")}</Table.Cell>
+          </Table.ClickRow>
+          <Table.ClickRow
+            downloadIcon
+            onClick={() => {
+              directDownload(`/api/elections/${election.id}/download_na_31_2_bijlage1`);
+            }}
+          >
+            <Table.Cell>Na 31-2 Bijlage 1</Table.Cell>
+            <Table.Cell>{t("election_management.document_na_31_2_bijlage_1")}</Table.Cell>
+          </Table.ClickRow>
+        </Table.Body>
+      </Table>
+    </div>
+  );
+}
+
+function DSOFirstSessionDownloadSection({ election, committeeSession }: DownloadSectionProps) {
+  const { isAdministrator, isCoordinator } = useUserRole();
+  const navigate = useNavigate();
+  const [showMissingCommitteeSessionDetailsModal, setShowMissingCommitteeSessionDetailsModal] = useState(false);
+
+  return (
+    <div id="DSO-first-session-download-section" className="mt-xl">
+      <h3 className={cls.tableTitle}>{t("election_management.empty_documents_first_session")}</h3>
+      <p className={cls.downloadDescription}>{t("election_management.empty_document_description.plural")}</p>
+      <Table className={cn(cls.electionInformationTable)} variant="information">
+        <Table.Header>
+          <Table.HeaderCell scope="col">{t("election_management.document_model")}</Table.HeaderCell>
+          <Table.HeaderCell scope="col">{t("election_management.document_purpose")}</Table.HeaderCell>
+        </Table.Header>
+        <Table.Body>
+          <Table.ClickRow
+            downloadIcon
+            onClick={() => {
+              directDownload(`/api/elections/${election.id}/download_n_10_1`);
+            }}
+          >
+            <Table.Cell>N 10-1</Table.Cell>
+            <Table.Cell>{t("election_management.document_n_10_1_and_n_10_2")}</Table.Cell>
+          </Table.ClickRow>
+          <Table.ClickRow
+            downloadIcon
+            onClick={() => {
+              directDownload(`/api/elections/${election.id}/download_n_10_1_inlegvel`);
+            }}
+          >
+            <Table.Cell>N 10-1</Table.Cell>
+            <Table.Cell>{t("election_management.document_n_10_1_inlegvel")}</Table.Cell>
+          </Table.ClickRow>
+          <Table.ClickRow
+            downloadIcon
+            onClick={() => {
+              if (committeeSessionDetailsPresent(committeeSession)) {
+                directDownload(`/api/elections/${election.id}/download_na_14_1_versie1`);
+              } else {
+                setShowMissingCommitteeSessionDetailsModal(true);
+              }
+            }}
+          >
+            <Table.Cell>Na 14-1, versie 1</Table.Cell>
+            <Table.Cell>{t("election_management.document_na_14_1_versie_1")}</Table.Cell>
+          </Table.ClickRow>
+        </Table.Body>
+      </Table>
+      {showMissingCommitteeSessionDetailsModal && (
+        <Modal
+          title={t("election_management.missing_committee_session_details_modal.title")}
+          onClose={() => {
+            setShowMissingCommitteeSessionDetailsModal(false);
+          }}
+        >
+          <p>{t("election_management.missing_committee_session_details_modal.content")}</p>
+          {isAdministrator && <p>{t("election_management.missing_committee_session_details_modal.ask_coordinator")}</p>}
+          {isCoordinator && (
+            <nav>
+              <Button
+                size="xl"
+                onClick={() => {
+                  void navigate("details");
+                }}
+              >
+                {t("election_management.missing_committee_session_details_modal.enter_details_button")}
+              </Button>
+              <Button
+                variant="secondary"
+                size="xl"
+                onClick={() => {
+                  setShowMissingCommitteeSessionDetailsModal(false);
+                }}
+              >
+                {t("cancel")}
+              </Button>
+            </nav>
+          )}
+        </Modal>
+      )}
+    </div>
+  );
+}
+
+function CSONextSessionDownloadSection({ election }: DownloadSectionProps) {
+  return (
+    <div id="CSO-next-session-download-section" className="mt-xl">
+      <h3 className={cls.tableTitle}>{t("election_management.empty_document_next_session.singular")}</h3>
+      <p className={cls.downloadDescription}>{t("election_management.empty_document_description.singular")}</p>
+      <Table className={cn(cls.electionInformationTable)} variant="information">
+        <Table.Header>
+          <Table.HeaderCell scope="col">{t("election_management.document_model")}</Table.HeaderCell>
+          <Table.HeaderCell scope="col">{t("election_management.document_purpose")}</Table.HeaderCell>
+        </Table.Header>
+        <Table.Body>
+          <Table.ClickRow
+            downloadIcon
+            onClick={() => {
+              directDownload(`/api/elections/${election.id}/download_na_31_2_inlegvel`);
+            }}
+          >
+            <Table.Cell>Na 31-2 inlegvel</Table.Cell>
+            <Table.Cell>{t("election_management.document_na_31_2_inlegvel")}</Table.Cell>
+          </Table.ClickRow>
+        </Table.Body>
+      </Table>
+    </div>
+  );
+}
+
+function DSONextSessionDownloadSection({ election }: DownloadSectionProps) {
+  return (
+    <div id="DSO-next-session-download-section" className="mt-xl">
+      <h3 className={cls.tableTitle}>{t("election_management.empty_document_next_session.plural")}</h3>
+      <p className={cls.downloadDescription}>{t("election_management.empty_document_description.plural")}</p>
+      <Table className={cn(cls.electionInformationTable)} variant="information">
+        <Table.Header>
+          <Table.HeaderCell scope="col">{t("election_management.document_model")}</Table.HeaderCell>
+          <Table.HeaderCell scope="col">{t("election_management.document_purpose")}</Table.HeaderCell>
+        </Table.Header>
+        <Table.Body>
+          <Table.ClickRow
+            downloadIcon
+            onClick={() => {
+              directDownload(`/api/elections/${election.id}/download_n_10_1_inlegvel`);
+            }}
+          >
+            <Table.Cell>N 10-1</Table.Cell>
+            <Table.Cell>{t("election_management.document_n_10_1_inlegvel")}</Table.Cell>
+          </Table.ClickRow>
+          <Table.ClickRow
+            downloadIcon
+            onClick={() => {
+              directDownload(`/api/elections/${election.id}/download_na_31_1_inlegvel`);
+            }}
+          >
+            <Table.Cell>Na 31-1 inlegvel</Table.Cell>
+            <Table.Cell>{t("election_management.document_na_31_1_inlegvel")}</Table.Cell>
+          </Table.ClickRow>
+        </Table.Body>
+      </Table>
+    </div>
+  );
+}
 
 // biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function ElectionHomePage() {
@@ -199,60 +385,15 @@ export function ElectionHomePage() {
           </div>
           {election.committee_category === "GSB" &&
             (currentCommitteeSession.number === 1 ? (
-              <div className={cn(cls.downloadModels, "mt-xl")}>
-                <h3 className={cls.tableTitle}>{t("election_management.empty_documents_title")}</h3>
-                <p>{t("election_management.empty_documents_description")}</p>
-                <Table className={cn(cls.electionInformationTable)} variant="information">
-                  <Table.Header>
-                    <Table.HeaderCell scope="col">{t("election_management.document_model")}</Table.HeaderCell>
-                    <Table.HeaderCell scope="col">{t("election_management.document_purpose")}</Table.HeaderCell>
-                  </Table.Header>
-                  <Table.Body>
-                    <Table.ClickRow
-                      downloadIcon
-                      onClick={() => {
-                        directDownload(`/api/elections/${election.id}/download_na_31_2_bijlage1`);
-                      }}
-                    >
-                      <Table.Cell>Na 31-2 Bijlage 1</Table.Cell>
-                      <Table.Cell>{t("election_management.document_na_31_2_bijlage_1")}</Table.Cell>
-                    </Table.ClickRow>
-                    <Table.ClickRow
-                      downloadIcon
-                      onClick={() => {
-                        directDownload(`/api/elections/${election.id}/download_n_10_2`);
-                      }}
-                    >
-                      <Table.Cell>N 10-2</Table.Cell>
-                      <Table.Cell>{t("election_management.document_n_10_2")}</Table.Cell>
-                    </Table.ClickRow>
-                  </Table.Body>
-                </Table>
-              </div>
-            ) : (
-              currentCommitteeSession.number === 2 && (
-                <div className={cn(cls.downloadModels, "mt-xl")}>
-                  <h3 className={cls.tableTitle}>{t("election_management.empty_document_title")}</h3>
-                  <p>{t("election_management.empty_document_description")}</p>
-                  <Table className={cn(cls.electionInformationTable)} variant="information">
-                    <Table.Header>
-                      <Table.HeaderCell scope="col">{t("election_management.document_model")}</Table.HeaderCell>
-                      <Table.HeaderCell scope="col">{t("election_management.document_purpose")}</Table.HeaderCell>
-                    </Table.Header>
-                    <Table.Body>
-                      <Table.ClickRow
-                        downloadIcon
-                        onClick={() => {
-                          directDownload(`/api/elections/${election.id}/download_na_31_2_inlegvel`);
-                        }}
-                      >
-                        <Table.Cell>Na 31-2 Inlegvel</Table.Cell>
-                        <Table.Cell>{t("election_management.document_na_31_2_inlegvel")}</Table.Cell>
-                      </Table.ClickRow>
-                    </Table.Body>
-                  </Table>
-                </div>
+              election.counting_method === "CSO" ? (
+                <CSOFirstSessionDownloadSection election={election} committeeSession={currentCommitteeSession} />
+              ) : (
+                <DSOFirstSessionDownloadSection election={election} committeeSession={currentCommitteeSession} />
               )
+            ) : election.counting_method === "CSO" ? (
+              <CSONextSessionDownloadSection election={election} committeeSession={currentCommitteeSession} />
+            ) : (
+              <DSONextSessionDownloadSection election={election} committeeSession={currentCommitteeSession} />
             ))}
         </article>
       </main>

@@ -245,6 +245,8 @@ pub async fn get_files_csb_election(
 
 #[cfg(test)]
 mod tests {
+    use std::assert_matches;
+
     use chrono::NaiveDateTime;
     use test_log::test;
 
@@ -270,9 +272,11 @@ mod tests {
         let mut conn = pool.acquire().await.unwrap();
         let audit_service = AuditService::new(None, None);
 
-        let result =
-            get_files_gsb_election(&pool, audit_service.clone(), CommitteeSessionId::from(6)).await;
-        assert!(result.is_err());
+        let error =
+            get_files_gsb_election(&pool, audit_service.clone(), CommitteeSessionId::from(6))
+                .await
+                .expect_err("Should have failed");
+        assert_delegated(error, &CommitteeSessionError::InvalidCommitteeSessionStatus);
 
         // Change committee session status to completed
         change_status(
@@ -283,9 +287,11 @@ mod tests {
         .await
         .unwrap();
 
-        let result =
-            get_files_gsb_election(&pool, audit_service.clone(), CommitteeSessionId::from(6)).await;
-        assert!(result.is_err());
+        let error =
+            get_files_gsb_election(&pool, audit_service.clone(), CommitteeSessionId::from(6))
+                .await
+                .expect_err("Should have failed");
+        assert_delegated(error, &CommitteeSessionError::InvalidCommitteeSessionStatus);
 
         // Change committee session details
         committee_session_repo::update(
@@ -299,7 +305,7 @@ mod tests {
 
         let result =
             get_files_gsb_election(&pool, audit_service.clone(), CommitteeSessionId::from(6)).await;
-        assert!(result.is_ok());
+        assert_matches!(result, Ok(_));
     }
 
     #[test(sqlx::test(fixtures(path = "../../../fixtures", scripts("election_5_with_results"))))]

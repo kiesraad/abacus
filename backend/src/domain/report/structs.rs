@@ -7,6 +7,7 @@ use sqlx::SqliteConnection;
 
 use crate::{
     APIError,
+    APIError::DataIntegrityError,
     api::apportionment::{map_candidate_nomination, map_seat_assignment},
     domain::{
         committee_session::{CommitteeSession, CommitteeSessionId},
@@ -58,6 +59,7 @@ pub struct GsbGeneratedFiles {
     pub results_csv: GeneratedFile,
 }
 
+#[derive(Debug)]
 pub struct GsbFiles {
     pub results_eml: Option<File>,
     pub results_pdf: Option<File>,
@@ -159,6 +161,12 @@ impl ResultsInputData {
         let investigations = session_pss.investigations();
         let polling_stations = session_pss.into_polling_stations();
         let results = list_results_for_committee_session(conn, committee_session.id).await?;
+
+        for (_, result) in &results {
+            if !result.is_correct_model(&election, &committee_session) {
+                return Err(DataIntegrityError("Incorrect results model".to_string()));
+            }
+        }
 
         // get the previous committee session if this is not the first session
         let previous_committee_session = if committee_session.is_next_session() {

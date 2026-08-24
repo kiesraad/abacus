@@ -1147,6 +1147,62 @@ impl DataEntryStatus {
             DataEntryStatus::Definitive(_) => None,
         }
     }
+
+    pub fn has_correct_results_model(
+        &self,
+        election: &ElectionWithPoliticalGroups,
+        session: &CommitteeSession,
+    ) -> bool {
+        match self {
+            DataEntryStatus::Empty => true,
+            DataEntryStatus::FirstEntryInProgress(FirstEntryInProgress { first_entry, .. }) => {
+                first_entry.is_correct_model(election, session)
+            }
+            DataEntryStatus::FirstEntryHasErrors(FirstEntryHasErrors {
+                finalised_first_entry,
+                ..
+            }) => finalised_first_entry.is_correct_model(election, session),
+            DataEntryStatus::FirstEntryFinalised(FirstEntryFinalised {
+                finalised_first_entry,
+                ..
+            }) => finalised_first_entry.is_correct_model(election, session),
+            DataEntryStatus::SecondEntryInProgress(SecondEntryInProgress {
+                finalised_first_entry,
+                second_entry,
+                ..
+            }) => {
+                finalised_first_entry.is_correct_model(election, session)
+                    && second_entry.is_correct_model(election, session)
+            }
+            DataEntryStatus::EntriesDifferent(EntriesDifferent {
+                first_entry,
+                second_entry,
+                ..
+            }) => {
+                first_entry.is_correct_model(election, session)
+                    && second_entry.is_correct_model(election, session)
+            }
+            DataEntryStatus::FirstEntryCorrection(FirstEntryCorrection {
+                first_entry,
+                finalised_second_entry,
+                ..
+            }) => {
+                first_entry.is_correct_model(election, session)
+                    && finalised_second_entry.is_correct_model(election, session)
+            }
+            DataEntryStatus::SecondEntryCorrection(SecondEntryCorrection {
+                finalised_first_entry,
+                second_entry,
+                ..
+            }) => {
+                finalised_first_entry.is_correct_model(election, session)
+                    && second_entry.is_correct_model(election, session)
+            }
+            DataEntryStatus::Definitive(Definitive { results, .. }) => {
+                results.is_correct_model(election, session)
+            }
+        }
+    }
 }
 
 impl Display for DataEntryTransitionError {

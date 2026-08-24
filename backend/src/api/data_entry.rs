@@ -12,7 +12,9 @@ use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
-    APIError, AppState, SqlitePoolExt,
+    APIError,
+    APIError::DataIntegrityError,
+    AppState, SqlitePoolExt,
     api::middleware::authentication::{RouteAuthorization, error::AuthenticationError},
     domain::{
         committee_session::{CommitteeSession, CommitteeSessionError},
@@ -190,6 +192,9 @@ async fn validate_and_get_data(
         .is_authorized(context.election.committee_category)?;
 
     let data_entry_status = data_entry_repo::get_status(conn, data_entry_id).await?;
+    if !data_entry_status.has_correct_results_model(&context.election, &context.committee_session) {
+        return Err(DataIntegrityError("Incorrect data entry model".to_string()));
+    }
 
     // Investigation check: only for polling stations in next sessions
     if let DataEntrySource::PollingStation(ref ps) = context.source

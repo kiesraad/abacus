@@ -7,6 +7,7 @@ import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { Loader } from "@/components/ui/Loader/Loader";
 import { useElection } from "@/hooks/election/useElection";
 import { t, tx } from "@/i18n/translate";
+import { committeeSessionDetailsPresent } from "@/utils/committeeSession";
 import { directDownload } from "@/utils/download";
 
 interface InvestigationPrintCorrigendumProps {
@@ -40,10 +41,7 @@ export function InvestigationPrintCorrigendum({ pollingStationId }: Investigatio
                 })}
                 subtitle={election.counting_method === "CSO" ? "Na 14-2 Bijlage 1" : "Na 14-1, versie 2"}
                 onClick={(event) => {
-                  if (
-                    election.counting_method === "DSO" &&
-                    (currentCommitteeSession.start_date_time === undefined || currentCommitteeSession.location === "")
-                  ) {
+                  if (election.counting_method === "DSO" && !committeeSessionDetailsPresent(currentCommitteeSession)) {
                     event.preventDefault();
                     setShowMissingCommitteeSessionDetailsModal(true);
                   } else {

@@ -681,7 +681,9 @@ async fn get_previous_results(
             Some(VoteCountingMethod::DSO) => {
                 Ok(DSOFirstSessionResults::empty(election).as_common())
             }
-            None => panic!("Invalid election {election:?}"),
+            None => Err(APIError::DataIntegrityError(
+                "GSB election needs to have a vote counting method".to_string(),
+            )),
         },
     }
 }
@@ -689,21 +691,23 @@ async fn get_previous_results(
 fn get_corrigendum_file_name(
     election: &ElectionWithPoliticalGroups,
     polling_station_number: PollingStationNumber,
-) -> String {
+) -> Result<String, APIError> {
     match election.counting_method {
-        Some(VoteCountingMethod::CSO) => format!(
+        Some(VoteCountingMethod::CSO) => Ok(format!(
             "Model_Na14-2_{}{}_Stembureau_{}_Bijlage_1.pdf",
             election.category.to_eml_code(),
             election.election_date.year(),
             polling_station_number
-        ),
-        Some(VoteCountingMethod::DSO) => format!(
+        )),
+        Some(VoteCountingMethod::DSO) => Ok(format!(
             "Model_Na14-1_versie_2_{}{}_Stembureau_{}.pdf",
             election.category.to_eml_code(),
             election.election_date.year(),
             polling_station_number
-        ),
-        None => panic!("Invalid election {election:?}"),
+        )),
+        None => Err(APIError::DataIntegrityError(
+            "GSB election needs to have a vote counting method".to_string(),
+        )),
     }
 }
 
@@ -766,7 +770,7 @@ async fn polling_station_investigation_download_corrigendum_pdf(
 
     let votes_tables = VotesTablesWithOnlyPreviousVotes::new(&election, &previous_results)?;
 
-    let name = get_corrigendum_file_name(&election, polling_station.number);
+    let name = get_corrigendum_file_name(&election, polling_station.number)?;
     let input = match election.counting_method {
         Some(VoteCountingMethod::CSO) => ModelNa14_2Bijlage1Input {
             votes_tables,
@@ -785,7 +789,11 @@ async fn polling_station_investigation_download_corrigendum_pdf(
             investigation,
         }
         .to_pdf_file_model(name.clone()),
-        None => panic!("Invalid election {election:?}"),
+        None => {
+            return Err(APIError::DataIntegrityError(
+                "GSB election needs to have a vote counting method".to_string(),
+            ));
+        }
     };
 
     let content = generate_pdf(input).await?;

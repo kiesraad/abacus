@@ -56,6 +56,8 @@
 #pagebreak(weak: true)
 
 #show: doc => document_numbering(doc)
+// Max numbering level is 2
+#show heading.where(level: 3): it => [#block(it.body)]
 
 = Verslag van de zitting
 
@@ -73,6 +75,8 @@ De volgende rollen zijn mogelijk: voorzitter, plaatsvervangend voorzitter of lid
 )
 
 #pagebreak(weak: true)
+
+#show: doc => document_numbering(doc)
 
 == Getelde stembureaus
 

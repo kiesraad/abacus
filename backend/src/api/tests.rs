@@ -52,10 +52,6 @@ pub async fn assert_counting_method_authorization_err(
 
 pub fn assert_counting_method_authorization_ok(results: Vec<(&'static str, Response)>) {
     for (handler, response) in results {
-        assert_ne!(
-            response.status(),
-            StatusCode::NOT_FOUND,
-            "handler '{handler}'"
-        );
+        assert_eq!(response.status(), StatusCode::OK, "handler '{handler}'");
     }
 }

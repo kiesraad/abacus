@@ -1,9 +1,19 @@
 use chrono::{DateTime, Utc};
+use pdf_gen::zip::slugify_filename;
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, Type};
 use utoipa::ToSchema;
 
-use crate::domain::{committee_session::CommitteeSessionId, identifier::id};
+use crate::domain::{
+    committee_session::{CommitteeSession, CommitteeSessionId},
+    election::{ElectionWithPoliticalGroups, InvalidElectionError, VoteCountingMethod},
+    file::FileType::{
+        CsbAttachmentPdf, CsbCsvCounts, CsbResultsEml, CsbResultsPdf, CsbTotalCountsEml,
+        GsbCsvCounts, GsbOverviewPdf, GsbResultsEml, GsbResultsPdf,
+    },
+    identifier::id,
+    report::structs::{csv_filename, election_filename},
+};
 
 id!(FileId);
 
@@ -41,6 +51,39 @@ impl FileType {
             GsbResultsEml | CsbResultsEml | CsbTotalCountsEml => "text/xml",
             GsbResultsPdf | GsbOverviewPdf | CsbResultsPdf | CsbAttachmentPdf => "application/pdf",
         }
+    }
+
+    pub fn filename(
+        &self,
+        committee_session: &CommitteeSession,
+        election: &ElectionWithPoliticalGroups,
+    ) -> Result<String, InvalidElectionError> {
+        let filename = match self {
+            GsbResultsEml => election_filename(election, "Telling", "eml.xml"),
+            GsbResultsPdf => {
+                if committee_session.is_next_session() {
+                    "Model Na14-2.pdf".to_string()
+                } else {
+                    match election.counting_method {
+                        Some(VoteCountingMethod::CSO) => "Model Na31-2.pdf".to_string(),
+                        Some(VoteCountingMethod::DSO) => "Model Na31-1.pdf".to_string(),
+                        None => {
+                            return Err(InvalidElectionError(
+                                "GSB election needs to have a vote counting method".to_string(),
+                            ));
+                        }
+                    }
+                }
+            }
+            GsbOverviewPdf => "Leeg Model P2a.pdf".to_string(),
+            CsbResultsEml => election_filename(election, "Resultaat", "eml.xml"),
+            CsbTotalCountsEml => election_filename(election, "Totaaltelling", "eml.xml"),
+            CsbResultsPdf => "Model P22-2.pdf".to_string(),
+            CsbAttachmentPdf => "Model P22-2 bijlage.pdf".to_string(),
+            CsbCsvCounts => csv_filename(election),
+            GsbCsvCounts => csv_filename(election),
+        };
+        Ok(slugify_filename(&filename))
     }
 }
 

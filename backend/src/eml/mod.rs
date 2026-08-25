@@ -7,7 +7,6 @@ pub mod hash;
 use apportionment::CandidateNominationDetails;
 use chrono::{DateTime, Local};
 use eml_nl::{
-    EMLError,
     common::{
         AuthorityIdentifier, ContestIdentifier, ElectionTree, ManagingAuthority, PersonName,
         ReportingUnitIdentifier,
@@ -34,6 +33,7 @@ use eml_nl::{
         Gender, ReportingUnitIdentifierId, StringValue, StringValueData, VotingChannelType,
         VotingMethod,
     },
+    EMLError,
 };
 pub use error::EMLImportError;
 pub use hash::{EmlHash, RedactedEmlHash};
@@ -46,7 +46,9 @@ use crate::{
             ElectionDomain, ElectionWithPoliticalGroups, NewElection, PGNumber, RegionKey,
             RegisteredPoliticalGroup,
         },
-        results::political_group_candidate_votes::PoliticalGroupCandidateVotes,
+        results::{
+            political_group_candidate_votes::PoliticalGroupCandidateVotes, yes_no::YesNo, Results,
+        },
         tabulation::{CommitteeSpecificTotals, ElectionTotals},
     },
     eml::committees::ElectionTreeDetails,
@@ -965,36 +967,64 @@ fn add_reporting_unit_investigations(
     committee_session: &CommitteeSession,
     results: &crate::domain::results::Results,
 ) -> ReportingUnitVotesBuilder {
-    if !committee_session.is_next_session()
-        && let crate::domain::results::Results::CSOFirstSession(first_session_result) = results
-    {
-        if let Some(extra_investigation_other_reason) = first_session_result
-            .extra_investigation
-            .extra_investigation_other_reason
-            .as_bool()
-        {
-            builder = builder.investigation(
-                InvestigationReason::OtherReason,
-                extra_investigation_other_reason,
-            );
-        }
+    if !committee_session.is_next_session() {
+        match results {
+            Results::DSOFirstSession(dso_first_session_result) => {
+                builder = builder.investigation(
+                    InvestigationReason::UnexplainedDifference,
+                    dso_first_session_result
+                        .checks_and_corrections
+                        .reason_investigation_own_initiative
+                        .unaccounted_difference,
+                );
 
-        if let Some(ballots_recounted_extra_investigation) = first_session_result
-            .extra_investigation
-            .ballots_recounted_extra_investigation
-            .as_bool()
-        {
-            builder = builder.investigation(
-                InvestigationReason::PartiallyRecountedBallots,
-                ballots_recounted_extra_investigation,
-            );
-        }
+                builder = builder.investigation(
+                    InvestigationReason::OtherError,
+                    dso_first_session_result
+                        .checks_and_corrections
+                        .reason_investigation_own_initiative
+                        .other_error,
+                );
 
-        builder = builder.investigation(
-            InvestigationReason::AdmittedVotersReestablished,
-            first_session_result.admitted_voters_have_been_recounted(),
-        );
-    }
+                builder = builder.investigation(
+                    InvestigationReason::ResultCorrected,
+                    dso_first_session_result
+                        .checks_and_corrections
+                        .corrected_results_own_initiative
+                        == YesNo::yes(),
+                );
+            }
+            Results::CSOFirstSession(cso_first_session_result) => {
+                if let Some(extra_investigation_other_reason) = cso_first_session_result
+                    .extra_investigation
+                    .extra_investigation_other_reason
+                    .as_bool()
+                {
+                    builder = builder.investigation(
+                        InvestigationReason::OtherReason,
+                        extra_investigation_other_reason,
+                    );
+                }
+
+                if let Some(ballots_recounted_extra_investigation) = cso_first_session_result
+                    .extra_investigation
+                    .ballots_recounted_extra_investigation
+                    .as_bool()
+                {
+                    builder = builder.investigation(
+                        InvestigationReason::PartiallyRecountedBallots,
+                        ballots_recounted_extra_investigation,
+                    );
+                }
+
+                builder = builder.investigation(
+                    InvestigationReason::AdmittedVotersReestablished,
+                    cso_first_session_result.admitted_voters_have_been_recounted(),
+                );
+            }
+            _ => {}
+        }
+    };
 
     builder
 }

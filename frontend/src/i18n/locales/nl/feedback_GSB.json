@@ -58,12 +58,12 @@
   },
   "F133": {
     "typist": {
-      "content": "Er is een corrigendum, maar er zijn volgens de antwoorden op het inlegvel 'controles en correcties' geen gecorrigeerde telresultaten.",
+      "content": "Er is geen corrigendum, maar er zijn volgens de antwoorden op het inlegvel 'controles en correcties' wel gecorrigeerde telresultaten.",
       "actions": "<ul><li>Overleg met de coördinator.</li></ul>"
     },
     "coordinator": {
       "title": "Ontbrekend corrigendum?",
-      "content": "Er is een corrigendum, maar er zijn volgens de antwoorden op het inlegvel 'controles en correcties' geen gecorrigeerde telresultaten.",
+      "content": "Er is geen corrigendum, maar er zijn volgens de antwoorden op het inlegvel 'controles en correcties' wel gecorrigeerde telresultaten.",
       "actions": "<ul><li>Als er gecorrigeerde telresultaten zijn, dan hoort er ook een corrigendum te zijn.</li><li>Voeg het correcte corrigendum toe, of geef op het inlegvel aan dat er geen gecorrigeerde telresultaten zijn.</li><li>Geef daarna de invoer terug aan de invoerder.</li></ul>"
     }
   },

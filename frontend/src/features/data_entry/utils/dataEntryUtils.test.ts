@@ -26,7 +26,9 @@ import {
   resetDisabledSectionValues,
   resetFieldValues,
   resetFormSectionState,
+  setIsSavedBeforeFurthestSection,
   updateDisabledSections,
+  updateFormStateAfterSubmit,
 } from "./dataEntryUtils";
 
 describe("formSectionComplete", () => {
@@ -144,9 +146,9 @@ describe("isSectionDisabled", () => {
 
 describe("updateDisabledSections", () => {
   const disabledWhenSection: DataEntrySection = {
-    id: "differences_counts",
-    title: "Differences",
-    short_title: "Differences",
+    id: "checks_and_corrections",
+    title: "Controles en correcties",
+    short_title: "Controles en correcties",
     disabled_when: {
       path: "about_report.checks_and_corrections_present",
       equal_to: "PageMissing",
@@ -154,50 +156,51 @@ describe("updateDisabledSections", () => {
     subsections: [],
   };
 
-  function getState(): DataEntryStateLoaded {
-    const state = getDefaultDataEntryState();
+  function getDSOState(): DataEntryStateLoaded {
+    const state = getDefaultDataEntryState("DSOFirstSession");
     state.dataEntryStructure = state.dataEntryStructure.map((section) =>
-      section.id === "differences_counts" ? disabledWhenSection : section,
+      section.id === "checks_and_corrections" ? disabledWhenSection : section,
     );
     return state;
   }
 
   test("disables sections when disabled_when matches and re-enables them when it no longer does", () => {
-    const { formState, dataEntryStructure } = getState();
+    const { formState, dataEntryStructure } = getDSOState();
 
     updateDisabledSections(formState, dataEntryStructure, {
       about_report: { checks_and_corrections_present: "PageMissing" },
     });
-    expect(formState.sections.differences_counts!.isDisabled).toBe(true);
+    expect(formState.sections.checks_and_corrections!.isDisabled).toBe(true);
     expect(formState.sections.voters_votes_counts!.isDisabled).toBe(false);
 
     updateDisabledSections(formState, dataEntryStructure, {
       about_report: { checks_and_corrections_present: "PagePresent" },
     });
-    expect(formState.sections.differences_counts!.isDisabled).toBe(false);
+    expect(formState.sections.checks_and_corrections!.isDisabled).toBe(false);
+    expect(formState.sections.voters_votes_counts!.isDisabled).toBe(false);
   });
 
   test("updates furthest to the next enabled section when the furthest section is disabled", () => {
-    const { formState, dataEntryStructure } = getState();
-    formState.furthest = "differences_counts";
+    const { formState, dataEntryStructure } = getDSOState();
+    formState.furthest = "checks_and_corrections";
 
     updateDisabledSections(formState, dataEntryStructure, {
       about_report: { checks_and_corrections_present: "PageMissing" },
     });
 
-    expect(formState.furthest).toBe("political_group_votes_1");
+    expect(formState.furthest).toBe("voters_votes_counts");
   });
 
   test("reset hasChanges for disabled sections", () => {
-    const { formState, dataEntryStructure } = getState();
-    formState.sections.differences_counts!.hasChanges = true;
+    const { formState, dataEntryStructure } = getDSOState();
+    formState.sections.checks_and_corrections!.hasChanges = true;
 
     updateDisabledSections(formState, dataEntryStructure, {
       about_report: { checks_and_corrections_present: "PageMissing" },
     });
 
-    expect(formState.sections.differences_counts!.isDisabled).toBeTruthy();
-    expect(formState.sections.differences_counts!.hasChanges).toBeFalsy();
+    expect(formState.sections.checks_and_corrections!.isDisabled).toBeTruthy();
+    expect(formState.sections.checks_and_corrections!.hasChanges).toBeFalsy();
   });
 });
 
@@ -404,6 +407,35 @@ describe("calculateDataEntryProgress", () => {
     };
     const progress = calculateDataEntryProgress(formState);
     expect(progress).toBe(16);
+  });
+});
+
+describe("setIsSavedBeforeFurthestSection", () => {
+  test("check is saved is set to true for sections before furthest section", () => {
+    const formState: FormState = getDefaultDataEntryState("DSOFirstSession").formState;
+    expect(formState.sections.about_report!.isSaved).toBe(false);
+    expect(formState.sections.checks_and_corrections!.isSaved).toBe(false);
+    expect(formState.sections.voters_votes_counts!.isSaved).toBe(false);
+    setIsSavedBeforeFurthestSection(formState);
+    expect(formState.sections.about_report!.isSaved).toBe(true);
+    expect(formState.sections.checks_and_corrections!.isSaved).toBe(true);
+    expect(formState.sections.voters_votes_counts!.isSaved).toBe(false);
+  });
+});
+
+describe("updateFormStateAfterSubmit", () => {
+  test("check is saved is set to true for sections before furthest section", () => {
+    const defaultState = getDefaultDataEntryState("DSOFirstSession");
+    const formState = defaultState.formState;
+    const dataEntryStructure = defaultState.dataEntryStructure;
+    expect(formState.sections.checks_and_corrections!.isSaved).toBe(false);
+    const validationResults = { errors: [], warnings: [] };
+
+    updateFormStateAfterSubmit(dataEntryStructure, formState, validationResults, "voters_votes_counts");
+
+    expect(formState.sections.about_report!.isSaved).toBe(true);
+    expect(formState.sections.checks_and_corrections!.isSaved).toBe(true);
+    expect(formState.sections.voters_votes_counts!.isSaved).toBe(false);
   });
 });
 

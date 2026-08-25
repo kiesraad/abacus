@@ -204,6 +204,16 @@ export function calculateDataEntryProgress(formState: FormState) {
   return Math.floor(((furthestSection.index + 1) / totalSections) * 100);
 }
 
+export function setIsSavedBeforeFurthestSection(formState: FormState) {
+  // set saved sections to all sections before the furthest section
+  const currentIndex = formState.sections[formState.furthest]?.index ?? 0;
+  for (const section of Object.values(formState.sections)) {
+    if (section.index < currentIndex) {
+      section.isSaved = true;
+    }
+  }
+}
+
 export function restoreFormState(
   clientState: ClientState,
   formState: FormState,
@@ -221,13 +231,7 @@ export function restoreFormState(
     }
   });
 
-  // set saved sections to all sections before the furthest section
-  const currentIndex = formState.sections[formState.furthest]?.index ?? 0;
-  for (const section of Object.values(formState.sections)) {
-    if (section.index < currentIndex) {
-      section.isSaved = true;
-    }
-  }
+  setIsSavedBeforeFurthestSection(formState);
 
   // Use server's current section for tracking
   const serverCurrentSection = clientState.current;
@@ -292,9 +296,9 @@ export function updateFormStateAfterSubmit(
   const currentFormSection = formState.sections[sectionId];
   if (currentFormSection) {
     const saved = formState.furthest !== sectionId || continueToNextSection;
-    //store that this section has been sent to the server
+    // Store that this section has been sent to the server
     currentFormSection.isSaved = saved;
-    //store that this section has been submitted, this resets on each request
+    // Store that this section has been submitted, this resets on each request
     currentFormSection.isSubmitted = saved;
     // There are no changes after a successful submit
     currentFormSection.hasChanges = false;
@@ -302,14 +306,15 @@ export function updateFormStateAfterSubmit(
     currentFormSection.correctionWarning = undefined;
   }
 
-  //distribute errors and warnings to sections
+  // Distribute errors and warnings to sections
   addValidationResultsToFormState(validationResults.errors, formState, dataEntryStructure, "errors");
   addValidationResultsToFormState(validationResults.warnings, formState, dataEntryStructure, "warnings");
 
-  //determine the new furthest section, if applicable
+  // Determine the new furthest section, if applicable
   if (continueToNextSection && currentFormSection && formState.furthest === currentFormSection.id) {
     formState.furthest = getNextSectionID(formState, sectionId) ?? formState.furthest;
   }
+  setIsSavedBeforeFurthestSection(formState);
 
   return formState;
 }

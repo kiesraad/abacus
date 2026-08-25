@@ -65,6 +65,7 @@ function electionValidateResponse(
       redacted_indexes: [2, 9],
     },
     election,
+    gsb_list: [],
     polling_stations,
     number_of_voters: 0,
     polling_station_definition_matches_election: matching_election,

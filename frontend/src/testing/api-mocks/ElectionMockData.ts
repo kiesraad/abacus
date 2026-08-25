@@ -481,6 +481,7 @@ export const gsbElectionImportValidateMockResponse = (
       ],
       redacted_indexes: [2, 9],
     },
+    gsb_list: [],
     election: newElectionMockData,
     polling_stations: pollingStationMockData,
     polling_station_definition_matches_election: matching_election,

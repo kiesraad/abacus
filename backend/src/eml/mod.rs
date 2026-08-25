@@ -42,8 +42,8 @@ use crate::{
     domain::{
         committee_session::CommitteeSession,
         election::{
-            Candidate, CandidateGender, CandidateNumber, CommitteeCategory, ElectionDomain,
-            ElectionWithPoliticalGroups, NewElection, PGNumber, RegionKey,
+            Candidate, CandidateGender, CandidateNumber, CommitteeCategory, CommitteeDistrict,
+            ElectionDomain, ElectionWithPoliticalGroups, NewElection, PGNumber, RegionKey,
             RegisteredPoliticalGroup,
         },
         results::political_group_candidate_votes::PoliticalGroupCandidateVotes,
@@ -115,17 +115,19 @@ impl NewElection {
     pub fn from_eml_str(
         election_definition_data: &str,
         selected_committee: Option<(CommitteeCategory, Option<RegionKey>)>,
+        fallback_to_csb: bool,
     ) -> Result<(Self, ElectionTreeDetails), EMLImportError> {
         // attempt to parse in strict mode (we don't expect any errors in this EML)
         let definition =
             ElectionDefinition::parse_eml(election_definition_data, EMLParsingMode::Strict).ok()?;
-        Self::from_eml(&definition, selected_committee)
+        Self::from_eml(&definition, selected_committee, fallback_to_csb)
     }
 
     #[expect(clippy::too_many_lines)]
     pub fn from_eml(
         definition: &ElectionDefinition,
         selected_committee: Option<(CommitteeCategory, Option<RegionKey>)>,
+        fallback_to_csb: bool,
     ) -> Result<(Self, ElectionTreeDetails), EMLImportError> {
         // extract common information
         let election = &definition.election_event.election;
@@ -151,8 +153,8 @@ impl NewElection {
         // be so we try and extract it anyway
         let number_of_voters = max_votes(&election.contest.max_votes);
 
-        // TODO: once we support country-wide elections this is no longer true and the domain can be absent
-        if identifier.domain.is_none() {
+        // only require an election domain if the category requires one
+        if category.has_election_domain() && identifier.domain.is_none() {
             return Err(EMLImportError::MissingElectionDomain);
         }
 
@@ -175,9 +177,12 @@ impl NewElection {
 
         // find the selected committee, falling back to the CSB if none is selected
         let selected_committee = if let Some(selected) = selected_committee {
-            election_tree_details
-                .get_committee(selected.0, selected.1)
-                .ok_or(EMLImportError::UnknownCommittee)?
+            let c = election_tree_details.get_committee(selected.0, selected.1);
+            if fallback_to_csb {
+                c.unwrap_or(&election_tree_details.csb)
+            } else {
+                c.ok_or(EMLImportError::UnknownCommittee)?
+            }
         } else {
             &election_tree_details.csb
         };
@@ -213,16 +218,18 @@ impl NewElection {
     pub fn add_candidates_from_eml_str(
         &mut self,
         candidate_list_data: &str,
+        district_region: &CommitteeDistrict,
     ) -> Result<(), EMLImportError> {
         let candidate_list =
             CandidateLists::parse_eml(candidate_list_data, EMLParsingMode::Strict).ok()?;
 
-        self.add_candidates_from_eml(&candidate_list)
+        self.add_candidates_from_eml(&candidate_list, district_region)
     }
 
     pub fn add_candidates_from_eml(
         &mut self,
         candidate_lists: &CandidateLists,
+        district_region: &CommitteeDistrict,
     ) -> Result<(), EMLImportError> {
         let election = &candidate_lists.candidate_list.election;
         let identifier = &election.identifier;
@@ -246,11 +253,25 @@ impl NewElection {
             return Err(EMLImportError::MismatchElectionDate);
         }
 
-        // TODO: ensure that contest is for same district as chosen district
         let contest = election
             .contests
             .first()
             .ok_or(EMLImportError::CandidateListWithoutContest)?;
+
+        // check that contest id is the same as the region number
+        let contest_id = contest.identifier.id.cloned_value()?;
+        match (district_region, &contest_id) {
+            // Only allow none-district if the election district is none
+            (CommitteeDistrict::None, c) if c.is_geen() => {}
+            // If the district region is all, allow any contest id (except geen)
+            (CommitteeDistrict::All, c) if !c.is_geen() => {}
+            // Otherwise, the contest id must match the district number
+            (CommitteeDistrict::Specific(_), _)
+                if district_region.as_contest_id()? == contest_id => {}
+            _ => {
+                return Err(EMLImportError::InvalidDistrict);
+            }
+        }
 
         // extract initial listing of political groups with candidates
         let mut previous_pg_number = PGNumber::from(0);
@@ -1094,7 +1115,7 @@ mod tests {
     fn test_election_validate_missing_election_domain() {
         let data =
             include_str!("../eml/tests/eml110a_invalid_election_missing_election_domain.eml.xml");
-        let res = NewElection::from_eml_str(data, None).unwrap_err();
+        let res = NewElection::from_eml_str(data, None, false).unwrap_err();
         assert!(matches!(res, EMLImportError::MissingElectionDomain))
     }
 
@@ -1103,7 +1124,7 @@ mod tests {
         let data = include_str!(
             "../eml/tests/eml110a_invalid_election_limited_elections_supported.eml.xml"
         );
-        let res = NewElection::from_eml_str(data, None).unwrap_err();
+        let res = NewElection::from_eml_str(data, None, false).unwrap_err();
         dbg!(&res);
         assert!(matches!(res, EMLImportError::LimitedElectionsSupported));
     }
@@ -1113,12 +1134,24 @@ mod tests {
         let data = include_str!(
             "tests/eml110a_invalid_election_category_and_sub_category_mismatch.eml.xml"
         );
-        let res = NewElection::from_eml_str(data, None).unwrap_err();
+        let res = NewElection::from_eml_str(data, None, false).unwrap_err();
         dbg!(&res);
         assert!(matches!(
             res,
             EMLImportError::MismatchElectionCategoryAndSubCategory
         ));
+    }
+
+    #[test]
+    fn test_election_committee_fallback_works() {
+        let data = include_str!("tests/definitions/Verkiezingsdefinitie_PS2023_Gelderland.eml.xml");
+        let res =
+            NewElection::from_eml_str(data, Some((CommitteeCategory::GSB, None)), true).unwrap();
+        assert_eq!(res.0.authority_id, "CSB");
+
+        let res = NewElection::from_eml_str(data, Some((CommitteeCategory::GSB, None)), false)
+            .unwrap_err();
+        assert!(matches!(res, EMLImportError::UnknownCommittee));
     }
 
     #[test]

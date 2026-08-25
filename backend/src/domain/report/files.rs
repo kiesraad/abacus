@@ -309,7 +309,7 @@ mod tests {
     }
 
     #[test(sqlx::test(fixtures(path = "../../../fixtures", scripts("election_5_with_results"))))]
-    async fn test_get_files_gsb_election_first_session(pool: SqlitePool) {
+    async fn test_get_files_gsb_cso_election_first_session(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
         let audit_service = AuditService::new(None, None);
 
@@ -328,6 +328,39 @@ mod tests {
             assert_eq!(csv.name, "osv4-3_telling_gr2026_juinen.csv");
             assert_eq!(csv.id, FileId::from(2));
             assert_eq!(pdf.name, "Model_Na31-2.pdf");
+            assert_eq!(pdf.id, FileId::from(3));
+            assert!(files.overview_pdf.is_none());
+
+            assert_eq!(
+                list_event_names(&mut conn).await.unwrap(),
+                ["FileCreated", "FileCreated", "FileCreated"]
+            );
+        }
+    }
+
+    #[test(sqlx::test(fixtures(
+        path = "../../../fixtures",
+        scripts("election_12_dso_with_results")
+    )))]
+    async fn test_get_files_gsb_dso_election_first_session(pool: SqlitePool) {
+        let mut conn = pool.acquire().await.unwrap();
+        let audit_service = AuditService::new(None, None);
+
+        // Files should be generated exactly once
+        for _ in 1..=2 {
+            let files =
+                get_files_gsb_election(&pool, audit_service.clone(), CommitteeSessionId::from(12))
+                    .await
+                    .expect("should return files");
+            let eml = files.results_eml.expect("should have generated eml");
+            let csv = files.results_csv.expect("should have generated csv");
+            let pdf = files.results_pdf.expect("should have generated pdf");
+
+            assert_eq!(eml.name, "Telling_AB2026_Juinen.eml.xml");
+            assert_eq!(eml.id, FileId::from(1));
+            assert_eq!(csv.name, "osv4-3_telling_ab2026_juinen.csv");
+            assert_eq!(csv.id, FileId::from(2));
+            assert_eq!(pdf.name, "Model_Na31-1.pdf");
             assert_eq!(pdf.id, FileId::from(3));
             assert!(files.overview_pdf.is_none());
 

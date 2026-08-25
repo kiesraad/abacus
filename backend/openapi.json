@@ -7710,7 +7710,7 @@
         "properties": {
           "id": {
             "type": "string",
-            "description": "Identfier of the domain"
+            "description": "Identifier of the domain"
           },
           "name": {
             "type": "string",
@@ -8139,6 +8139,9 @@
           },
           "polling_station_file_name": {
             "type": "string"
+          },
+          "selected_region": {
+            "$ref": "#/components/schemas/RegionKey"
           }
         },
         "additionalProperties": false
@@ -8180,6 +8183,9 @@
           },
           "polling_station_file_name": {
             "type": "string"
+          },
+          "selected_region": {
+            "$ref": "#/components/schemas/RegionKey"
           }
         },
         "additionalProperties": false
@@ -8189,11 +8195,18 @@
         "required": [
           "hash",
           "election",
-          "number_of_voters"
+          "number_of_voters",
+          "gsb_list"
         ],
         "properties": {
           "election": {
             "$ref": "#/components/schemas/NewElection"
+          },
+          "gsb_list": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RegionDetails"
+            }
           },
           "hash": {
             "$ref": "#/components/schemas/RedactedEmlHash"

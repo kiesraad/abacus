@@ -17,8 +17,9 @@ use crate::{
     MAX_BODY_SIZE_MB,
     api::middleware::authentication::error::AuthenticationError,
     domain::{
-        committee_session::CommitteeSessionError, models::error::ModelsError,
-        results::IncorrectResultsModel, role::RoleNotAuthorizedError, validate::DataError,
+        committee_session::CommitteeSessionError, election::InvalidElectionError,
+        models::error::ModelsError, results::IncorrectResultsModel, role::RoleNotAuthorizedError,
+        validate::DataError,
     },
     eml::EMLImportError,
     infra::backup::BackupError,
@@ -387,6 +388,13 @@ impl From<DataEntryServiceError> for APIError {
         }
     }
 }
+
+impl From<InvalidElectionError> for APIError {
+    fn from(err: InvalidElectionError) -> Self {
+        APIError::DataIntegrityError(err.0)
+    }
+}
+
 impl From<ModelsError> for APIError {
     fn from(err: ModelsError) -> Self {
         APIError::Delegated(Box::new(err))

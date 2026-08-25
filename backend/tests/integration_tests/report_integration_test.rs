@@ -11,8 +11,8 @@ use test_log::test;
 use crate::{
     shared::{
         ApportionmentAction, FixtureUser::*, apportionment_state_action,
-        change_status_committee_session, create_cso_result, get_election_committee_session, login,
-        update_committee_session_details,
+        change_status_committee_session, create_cso_result, create_dso_result,
+        get_election_committee_session, login, update_committee_session_details,
     },
     utils::serve_api,
 };
@@ -87,7 +87,7 @@ pub async fn read_zip_entry(
 }
 
 #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2", "users"))))]
-async fn test_gsb_election_first_session_zip_download_works(pool: SqlitePool) {
+async fn test_gsb_cso_election_first_session_zip_download_works(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let cookie = login(&addr, CoordinatorGSB).await;
     let election_id = 2;
@@ -123,6 +123,49 @@ async fn test_gsb_election_first_session_zip_download_works(pool: SqlitePool) {
     assert_eq!(xml_archive2.file().entries().len(), 1);
     let eml_hash2 = sha2::Sha256::digest(
         read_zip_entry(&xml_archive2, 0, "Telling_GR2024_Heemdamseburg.eml.xml").await,
+    );
+
+    assert_eq!(pdf_hash1, pdf_hash2, "PDF files should have the same hash");
+    assert_eq!(eml_hash1, eml_hash2, "EML files should have the same hash");
+}
+
+#[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_11_dso", "users"))))]
+async fn test_gsb_dso_election_first_session_zip_download_works(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    let cookie = login(&addr, CoordinatorGSB).await;
+    let election_id = 11;
+    create_dso_result(&addr, 1101, election_id).await;
+    create_dso_result(&addr, 1102, election_id).await;
+    complete_committee_session(&addr, &cookie, election_id, 11).await;
+
+    let url = format!(
+        "http://{addr}/api/elections/{election_id}/committee_sessions/11/download_zip_results"
+    );
+    let prefix = "\"definitieve-documenten_ab2026_heemdamseburg_gemeente_heemdamseburg-";
+
+    let bytes = download_zip_assert(&cookie, &url, prefix).await;
+    let archive = ZipFileReader::new(bytes).await.unwrap();
+    assert_eq!(archive.file().entries().len(), 3);
+    let pdf_hash1 = sha2::Sha256::digest(read_zip_entry(&archive, 0, "Model_Na31-1.pdf").await);
+    let xml_zip = read_zip_entry(&archive, 1, "Telling_AB2026_Heemdamseburg.zip").await;
+    let csv = read_zip_entry(&archive, 2, "osv4-3_telling_ab2026_heemdamseburg.csv").await;
+    let xml_archive = ZipFileReader::new(xml_zip).await.unwrap();
+    assert_eq!(xml_archive.file().entries().len(), 1);
+    let eml_hash1 = sha2::Sha256::digest(
+        read_zip_entry(&xml_archive, 0, "Telling_AB2026_Heemdamseburg.eml.xml").await,
+    );
+
+    let bytes2 = download_zip_assert(&cookie, &url, prefix).await;
+    let archive2 = ZipFileReader::new(bytes2).await.unwrap();
+    assert_eq!(archive2.file().entries().len(), 3);
+    let pdf_hash2 = sha2::Sha256::digest(read_zip_entry(&archive2, 0, "Model_Na31-1.pdf").await);
+    let xml_zip2 = read_zip_entry(&archive2, 1, "Telling_AB2026_Heemdamseburg.zip").await;
+    let csv2 = read_zip_entry(&archive2, 2, "osv4-3_telling_ab2026_heemdamseburg.csv").await;
+    assert_eq!(csv, csv2, "CSV count files should be the same");
+    let xml_archive2 = ZipFileReader::new(xml_zip2).await.unwrap();
+    assert_eq!(xml_archive2.file().entries().len(), 1);
+    let eml_hash2 = sha2::Sha256::digest(
+        read_zip_entry(&xml_archive2, 0, "Telling_AB2026_Heemdamseburg.eml.xml").await,
     );
 
     assert_eq!(pdf_hash1, pdf_hash2, "PDF files should have the same hash");

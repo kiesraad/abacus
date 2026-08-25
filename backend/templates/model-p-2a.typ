@@ -52,9 +52,7 @@
 
 #show: doc => document_numbering(doc)
 // Max numbering level is 2
-#show heading.where(level: 3): it =>[
-    #block(it.body)
-]
+#show heading.where(level: 3): it => [#block(it.body)]
 
 = Verslag van de zitting
 

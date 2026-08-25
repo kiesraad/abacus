@@ -25,9 +25,9 @@ use crate::{
         models::{
             ModelN10_1InlegvelInput, ModelN10_1Input, ModelN10_2Input, ModelNa14_1Versie1Input,
             ModelNa14_1Versie2Input, ModelNa14_2Bijlage1Input, ModelNa14_2Input,
-            ModelNa31_1InlegvelInput, ModelNa31_2Bijlage1Input, ModelNa31_2InlegvelInput,
-            ModelNa31_2Input, ModelP2aInput, ModelP22_2Bijlage1Input, ModelP22_2Input,
-            PdfFileModel, PdfModel,
+            ModelNa31_1InlegvelInput, ModelNa31_1Input, ModelNa31_2Bijlage1Input,
+            ModelNa31_2InlegvelInput, ModelNa31_2Input, ModelP2aInput, ModelP22_2Bijlage1Input,
+            ModelP22_2Input, PdfFileModel, PdfModel,
             apportionment_footnotes::ApportionmentFootnotes,
             election_totals::ElectionTotalsCSB,
             enriched_candidate_nomination::EnrichedCandidateNomination,
@@ -56,8 +56,8 @@ use crate::{
             yes_no::YesNo,
         },
         tabulation::{
-            CSOInvestigations, CommitteeSpecificTotals, DifferencesTotals, ElectionTotals,
-            GSBTotals, SumCount,
+            CSOInvestigations, CommitteeSpecificTotals, DSOInvestigations, DifferencesTotals,
+            ElectionTotals, GSBTotals, SumCount,
         },
     },
 };
@@ -129,6 +129,8 @@ fn random_yes_no(rng: &mut impl RngExt) -> YesNo {
 
 fn random_election(
     rng: &mut impl RngExt,
+    committee_category: CommitteeCategory,
+    counting_method: Option<VoteCountingMethod>,
     parties: u32,
     candidates: u32,
     string_length: usize,
@@ -138,11 +140,8 @@ fn random_election(
     ElectionWithPoliticalGroups {
         id: ElectionId::from(rng.random_range(0..5)),
         name: random_string(rng, string_length),
-        committee_category: random_value(rng, &[CommitteeCategory::GSB, CommitteeCategory::CSB]),
-        counting_method: Some(random_value(
-            rng,
-            &[VoteCountingMethod::CSO, VoteCountingMethod::DSO],
-        )),
+        committee_category,
+        counting_method,
         election_id: random_string(rng, string_length),
         location: random_string(rng, string_length),
         authority_id: random_string(rng, string_length),
@@ -419,7 +418,7 @@ fn random_sum_count(rng: &mut impl RngExt, data_sources: &[DataEntrySource]) -> 
     }
 }
 
-fn random_election_totals(
+fn random_election_totals_gsb_cso(
     rng: &mut impl RngExt,
     election: &ElectionWithPoliticalGroups,
     data_sources: &[DataEntrySource],
@@ -448,6 +447,42 @@ fn random_election_totals(
                 .map(data_source_num)
                 .collect(),
             ballots_recounted: random_station_subset(rng, data_sources)
+                .into_iter()
+                .map(data_source_num)
+                .collect(),
+        })),
+    }
+}
+
+fn random_election_totals_gsb_dso(
+    rng: &mut impl RngExt,
+    election: &ElectionWithPoliticalGroups,
+    data_sources: &[DataEntrySource],
+) -> ElectionTotals {
+    let result = random_result(rng, election);
+    let data_source_num = |n| match n {
+        DataEntrySourceNumber::PollingStation(i) => i,
+        DataEntrySourceNumber::SubCommittee(i) => i,
+    };
+
+    ElectionTotals {
+        voters_counts: result.voters_counts,
+        votes_counts: result.votes_counts,
+        differences_counts: DifferencesTotals {
+            more_ballots_count: random_sum_count(rng, data_sources),
+            fewer_ballots_count: random_sum_count(rng, data_sources),
+        },
+        political_group_votes: result.political_group_votes,
+        committee_specific: CommitteeSpecificTotals::GSB(GSBTotals::DSO(DSOInvestigations {
+            unaccounted_difference: random_station_subset(rng, data_sources)
+                .into_iter()
+                .map(data_source_num)
+                .collect(),
+            other_error: random_station_subset(rng, data_sources)
+                .into_iter()
+                .map(data_source_num)
+                .collect(),
+            corrected_results: random_station_subset(rng, data_sources)
                 .into_iter()
                 .map(data_source_num)
                 .collect(),
@@ -539,6 +574,8 @@ async fn test_n_10_1() {
     for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
         let election = random_election(
             &mut rng,
+            CommitteeCategory::GSB,
+            Some(VoteCountingMethod::DSO),
             parties,
             candidates,
             string_length,
@@ -563,6 +600,8 @@ async fn test_n_10_1_inlegvel() {
     for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
         let election = random_election(
             &mut rng,
+            CommitteeCategory::GSB,
+            Some(VoteCountingMethod::DSO),
             parties,
             candidates,
             string_length,
@@ -586,6 +625,8 @@ async fn test_n_10_2() {
     for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
         let election = random_election(
             &mut rng,
+            CommitteeCategory::GSB,
+            Some(VoteCountingMethod::CSO),
             parties,
             candidates,
             string_length,
@@ -609,6 +650,8 @@ async fn test_na_14_1_versie_1() {
     for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
         let election = random_election(
             &mut rng,
+            CommitteeCategory::GSB,
+            Some(VoteCountingMethod::DSO),
             parties,
             candidates,
             string_length,
@@ -635,6 +678,8 @@ async fn test_na_14_1_versie_2() {
     for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
         let election = random_election(
             &mut rng,
+            CommitteeCategory::GSB,
+            Some(VoteCountingMethod::DSO),
             parties,
             candidates,
             string_length,
@@ -671,6 +716,8 @@ async fn test_na_14_2() {
     for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
         let election = random_election(
             &mut rng,
+            CommitteeCategory::GSB,
+            Some(VoteCountingMethod::CSO),
             parties,
             candidates,
             string_length,
@@ -682,8 +729,8 @@ async fn test_na_14_2() {
         let polling_stations =
             random_polling_stations(&mut rng, string_length, none_where_possible);
         let data_sources = ps_as_first_data_entry_sources(&polling_stations);
-        let previous_totals = random_election_totals(&mut rng, &election, &data_sources);
-        let totals = random_election_totals(&mut rng, &election, &data_sources);
+        let previous_totals = random_election_totals_gsb_cso(&mut rng, &election, &data_sources);
+        let totals = random_election_totals_gsb_cso(&mut rng, &election, &data_sources);
 
         let hash = random_string(&mut rng, 64);
         let creation_date_time = random_date_time(&mut rng)
@@ -713,6 +760,8 @@ async fn test_na_14_2_bijlage_1() {
     for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
         let election = random_election(
             &mut rng,
+            CommitteeCategory::GSB,
+            Some(VoteCountingMethod::CSO),
             parties,
             candidates,
             string_length,
@@ -741,12 +790,53 @@ async fn test_na_14_2_bijlage_1() {
 }
 
 #[test(tokio::test)]
+async fn test_na_31_1() {
+    let mut rng = rand::rng();
+
+    for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
+        let election = random_election(
+            &mut rng,
+            CommitteeCategory::GSB,
+            Some(VoteCountingMethod::DSO),
+            parties,
+            candidates,
+            string_length,
+            none_where_possible,
+        );
+        let committee_session = random_committee_session(&mut rng, election.id, string_length);
+        let polling_stations =
+            random_polling_stations(&mut rng, string_length, none_where_possible);
+        let data_sources = ps_as_first_data_entry_sources(&polling_stations);
+        let totals = random_election_totals_gsb_dso(&mut rng, &election, &data_sources);
+        let hash = random_string(&mut rng, 64);
+        let creation_date_time = random_date_time(&mut rng)
+            .format(DEFAULT_DATE_TIME_FORMAT)
+            .to_string();
+
+        let model = PdfModel::ModelNa31_1(Box::new(ModelNa31_1Input {
+            votes_tables: VotesTables::new(&election, &totals).unwrap(),
+            committee_session,
+            election: election.into(),
+            summary: (&totals).into(),
+            polling_stations,
+            polling_station_investigations: totals.dso_investigations().unwrap().clone(),
+            hash,
+            creation_date_time,
+        }));
+
+        test_pdf(model).await;
+    }
+}
+
+#[test(tokio::test)]
 async fn test_na_31_1_inlegvel() {
     let mut rng = rand::rng();
 
     for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
         let election = random_election(
             &mut rng,
+            CommitteeCategory::GSB,
+            Some(VoteCountingMethod::DSO),
             parties,
             candidates,
             string_length,
@@ -768,6 +858,8 @@ async fn test_na_31_2() {
     for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
         let election = random_election(
             &mut rng,
+            CommitteeCategory::GSB,
+            Some(VoteCountingMethod::CSO),
             parties,
             candidates,
             string_length,
@@ -777,7 +869,7 @@ async fn test_na_31_2() {
         let polling_stations =
             random_polling_stations(&mut rng, string_length, none_where_possible);
         let data_sources = ps_as_first_data_entry_sources(&polling_stations);
-        let totals = random_election_totals(&mut rng, &election, &data_sources);
+        let totals = random_election_totals_gsb_cso(&mut rng, &election, &data_sources);
         let hash = random_string(&mut rng, 64);
         let creation_date_time = random_date_time(&mut rng)
             .format(DEFAULT_DATE_TIME_FORMAT)
@@ -805,6 +897,8 @@ async fn test_na_31_2_bijlage_1() {
     for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
         let election = random_election(
             &mut rng,
+            CommitteeCategory::GSB,
+            Some(VoteCountingMethod::CSO),
             parties,
             candidates,
             string_length,
@@ -829,6 +923,8 @@ async fn test_na_31_2_inlegvel() {
     for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
         let election = random_election(
             &mut rng,
+            CommitteeCategory::GSB,
+            Some(VoteCountingMethod::CSO),
             parties,
             candidates,
             string_length,
@@ -850,6 +946,8 @@ async fn test_p_2a() {
     for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
         let election = random_election(
             &mut rng,
+            CommitteeCategory::CSB,
+            None,
             parties,
             candidates,
             string_length,
@@ -891,6 +989,8 @@ async fn test_p_22_2() {
 
     let election = random_election(
         &mut rng,
+        CommitteeCategory::CSB,
+        None,
         parties,
         candidates,
         string_length,
@@ -899,7 +999,7 @@ async fn test_p_22_2() {
     let committee_session = random_committee_session(&mut rng, election.id, string_length);
     let polling_stations = random_polling_stations(&mut rng, string_length, none_where_possible);
     let data_sources = ps_as_first_data_entry_sources(&polling_stations);
-    let totals_gsb = random_election_totals(&mut rng, &election, &data_sources);
+    let totals_gsb = random_election_totals_gsb_cso(&mut rng, &election, &data_sources);
     let totals_csb = random_election_totals_csb(&mut rng, &election, &data_sources, string_length);
 
     let apportionment_input = ApportionmentInputData::new(
@@ -957,6 +1057,8 @@ async fn test_p_22_2_no_votes_cast_regression_3669() {
 
     let mut election = random_election(
         &mut rng,
+        CommitteeCategory::CSB,
+        None,
         parties,
         candidates,
         string_length,
@@ -1044,6 +1146,8 @@ async fn test_p_22_2_bijlage_1() {
     for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
         let election = random_election(
             &mut rng,
+            CommitteeCategory::CSB,
+            None,
             parties,
             candidates,
             string_length,
@@ -1052,8 +1156,8 @@ async fn test_p_22_2_bijlage_1() {
         let polling_stations =
             random_polling_stations(&mut rng, string_length, none_where_possible);
         let data_sources = ps_as_first_data_entry_sources(&polling_stations);
-        let totals = random_election_totals(&mut rng, &election, &data_sources);
-        let votes_tables = VotesTables::new(&election, &totals).unwrap();
+        let totals_gsb = random_election_totals_gsb_cso(&mut rng, &election, &data_sources);
+        let votes_tables = VotesTables::new(&election, &totals_gsb).unwrap();
         let hash = random_string(&mut rng, 64);
         let creation_date_time = random_date_time(&mut rng)
             .format(DEFAULT_DATE_TIME_FORMAT)

@@ -514,6 +514,27 @@ impl Validate for Results {
     }
 }
 
+pub trait VerifyModels {
+    fn verify_models(
+        &self,
+        election: &ElectionWithPoliticalGroups,
+        session: &CommitteeSession,
+    ) -> Result<(), IncorrectResultsModel>;
+}
+
+impl<T> VerifyModels for [(T, Results)] {
+    fn verify_models(
+        &self,
+        election: &ElectionWithPoliticalGroups,
+        session: &CommitteeSession,
+    ) -> Result<(), IncorrectResultsModel> {
+        for (_, results) in self {
+            results.verify_model(election, session)?;
+        }
+        Ok(())
+    }
+}
+
 #[cfg(test)]
 pub mod tests {
     use core::assert_matches;

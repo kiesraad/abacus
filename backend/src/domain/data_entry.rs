@@ -13,7 +13,7 @@ use crate::{
         field_path::FieldPath,
         identifier::id,
         polling_station::{PollingStationForSession, PollingStationId, PollingStationNumber},
-        results::Results,
+        results::{IncorrectResultsModel, Results},
         sub_committee::{SubCommitteeFirstSession, SubCommitteeId, SubCommitteeNumber},
         validate::{
             DataError, Validate, ValidateRoot, ValidationResult, ValidationResultCode,
@@ -1148,58 +1148,54 @@ impl DataEntryStatus {
         }
     }
 
-    pub fn has_correct_results_model(
+    pub fn verify_results_model(
         &self,
         election: &ElectionWithPoliticalGroups,
         session: &CommitteeSession,
-    ) -> bool {
+    ) -> Result<(), IncorrectResultsModel> {
         match self {
-            DataEntryStatus::Empty => true,
+            DataEntryStatus::Empty => Ok(()),
             DataEntryStatus::FirstEntryInProgress(FirstEntryInProgress { first_entry, .. }) => {
-                first_entry.is_correct_model(election, session)
+                first_entry.verify_model(election, session)
             }
             DataEntryStatus::FirstEntryHasErrors(FirstEntryHasErrors {
                 finalised_first_entry,
                 ..
-            }) => finalised_first_entry.is_correct_model(election, session),
+            }) => finalised_first_entry.verify_model(election, session),
             DataEntryStatus::FirstEntryFinalised(FirstEntryFinalised {
                 finalised_first_entry,
                 ..
-            }) => finalised_first_entry.is_correct_model(election, session),
+            }) => finalised_first_entry.verify_model(election, session),
             DataEntryStatus::SecondEntryInProgress(SecondEntryInProgress {
                 finalised_first_entry,
                 second_entry,
                 ..
-            }) => {
-                finalised_first_entry.is_correct_model(election, session)
-                    && second_entry.is_correct_model(election, session)
-            }
+            }) => finalised_first_entry
+                .verify_model(election, session)
+                .and(second_entry.verify_model(election, session)),
             DataEntryStatus::EntriesDifferent(EntriesDifferent {
                 first_entry,
                 second_entry,
                 ..
-            }) => {
-                first_entry.is_correct_model(election, session)
-                    && second_entry.is_correct_model(election, session)
-            }
+            }) => first_entry
+                .verify_model(election, session)
+                .and(second_entry.verify_model(election, session)),
             DataEntryStatus::FirstEntryCorrection(FirstEntryCorrection {
                 first_entry,
                 finalised_second_entry,
                 ..
-            }) => {
-                first_entry.is_correct_model(election, session)
-                    && finalised_second_entry.is_correct_model(election, session)
-            }
+            }) => first_entry
+                .verify_model(election, session)
+                .and(finalised_second_entry.verify_model(election, session)),
             DataEntryStatus::SecondEntryCorrection(SecondEntryCorrection {
                 finalised_first_entry,
                 second_entry,
                 ..
-            }) => {
-                finalised_first_entry.is_correct_model(election, session)
-                    && second_entry.is_correct_model(election, session)
-            }
+            }) => finalised_first_entry
+                .verify_model(election, session)
+                .and(second_entry.verify_model(election, session)),
             DataEntryStatus::Definitive(Definitive { results, .. }) => {
-                results.is_correct_model(election, session)
+                results.verify_model(election, session)
             }
         }
     }

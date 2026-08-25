@@ -7,7 +7,6 @@ use sqlx::SqliteConnection;
 
 use crate::{
     APIError,
-    APIError::DataIntegrityError,
     api::apportionment::{map_candidate_nomination, map_seat_assignment},
     domain::{
         committee_session::{CommitteeSession, CommitteeSessionId},
@@ -163,9 +162,7 @@ impl ResultsInputData {
         let results = list_results_for_committee_session(conn, committee_session.id).await?;
 
         for (_, result) in &results {
-            if !result.is_correct_model(&election, &committee_session) {
-                return Err(DataIntegrityError("Incorrect results model".to_string()));
-            }
+            result.verify_model(&election, &committee_session)?;
         }
 
         // get the previous committee session if this is not the first session

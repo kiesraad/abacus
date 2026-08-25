@@ -40,6 +40,8 @@ pub mod voters_counts;
 pub mod votes_counts;
 pub mod yes_no;
 
+pub struct IncorrectResultsModel;
+
 /// Results contains the results for a data entry
 ///
 /// The exact type of results depends on the election counting method,
@@ -132,16 +134,16 @@ impl Results {
         }
     }
 
-    pub fn is_correct_model(
+    pub fn verify_model(
         &self,
         election: &ElectionWithPoliticalGroups,
         session: &CommitteeSession,
-    ) -> bool {
+    ) -> Result<(), IncorrectResultsModel> {
         let category = election.committee_category;
         let method = election.counting_method;
         let next = session.is_next_session();
 
-        match self {
+        let correct = match self {
             Results::DSOFirstSession(_) => {
                 category == CommitteeCategory::GSB && method == Some(VoteCountingMethod::DSO)
             }
@@ -159,6 +161,12 @@ impl Results {
                     && next
             }
             Results::GSB(_) => category == CommitteeCategory::CSB && method.is_none() && !next,
+        };
+
+        if correct {
+            Ok(())
+        } else {
+            Err(IncorrectResultsModel)
         }
     }
 
@@ -819,7 +827,7 @@ pub mod tests {
                         let expect_correct = correct_combinations.contains(&combination);
 
                         assert_eq!(
-                            results.is_correct_model(&election, session),
+                            results.verify_model(&election, session).is_ok(),
                             expect_correct,
                             "is_correct_model is not {expect_correct} for {combination:?}"
                         );

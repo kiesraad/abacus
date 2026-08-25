@@ -120,8 +120,8 @@ describe("Test AboutReportForm", () => {
       expect(oneDocument).not.toHaveFocus();
       expect(oneDocument).not.toBeChecked();
 
-      // TODO: Change to using enter in issue #3864
-      await user.keyboard("{tab}");
+      await user.keyboard("{enter}");
+      await user.keyboard("{enter}");
 
       const pagePresent = await screen.findByRole("radio", {
         name: "Ja, de pagina ‘controles en correcties’ is aanwezig",

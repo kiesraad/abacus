@@ -636,4 +636,51 @@ mod tests {
 
         Ok(())
     }
+
+    /// GSB DSO | F.311: 2.3.2 Verklaring voor verschil = nee en 'vanwege een onverklaard verschil' in stap 'controles en correcties' is niet aangevinkt
+    #[test]
+    fn test_f311() -> Result<(), DataError> {
+        let f311 = ValidationResult {
+            code: ValidationResultCode::F311,
+            fields: vec!["data.checks_and_corrections".into()],
+            context: None,
+        };
+
+        let cases = vec![
+            (
+                Some(CorrigendumPresent::TwoDocuments),
+                ReasonInvestigationOwnInitiative::default(),
+                YesNo::both(),
+                YesNo::yes(),
+                true,
+            ),
+        ];
+
+        for (
+            case_index,
+            (
+                corrigendum_present,
+                reason_investigation_own_initiative,
+                corrected_results_own_initiative,
+                corrected_results_csb_request,
+                expect_f311,
+            ),
+        ) in cases.into_iter().enumerate()
+        {
+            let result = validate(
+                corrigendum_present,
+                Some(ChecksAndCorrectionsPresent::PagePresent),
+                reason_investigation_own_initiative.clone(),
+                corrected_results_own_initiative.clone(),
+                corrected_results_csb_request.clone(),
+            )?;
+            let has_f311 = result.errors.iter().any(|e| e == &f311);
+            assert_eq!(
+                has_f311, expect_f311,
+                "Case #{case_index} failed: reason_investigation_own_initiative: {reason_investigation_own_initiative:?}, corrected_results_own_initiative: {corrected_results_own_initiative:?}, corrected_results_csb_request: {corrected_results_csb_request:?}"
+            );
+        }
+
+        Ok(())
+    }
 }

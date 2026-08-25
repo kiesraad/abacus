@@ -117,6 +117,8 @@ pub enum ValidationResultCode {
     F309,
     /// GSB CSO, GSB DSO: (Als D <> H) Verklaring voor verschil niks aangevinkt of zowel 'ja' als 'nee' aangevinkt
     F310,
+    /// GSB CSO, GSB DSO: 2.3.2 Verklaring voor verschil = nee en 'vanwege een onverklaard verschil' in stap 'controles en correcties' is niet aangevinkt
+    F311,
     /// CSB: totaal aantal kiezers <> totaal aantal uitgebrachte stemmen - meer getelde stemmen + minder getelde stemmen
     F312,
 

@@ -78,6 +78,7 @@ impl Compare for DSOFirstSessionResults {
 }
 
 impl Validate for DSOFirstSessionResults {
+    #[expect(clippy::too_many_lines)]
     fn validate(
         &self,
         election: &crate::domain::election::ElectionWithPoliticalGroups,
@@ -129,8 +130,14 @@ impl Validate for DSOFirstSessionResults {
                 .checks_and_corrections
                 .reason_investigation_own_initiative
                 .unaccounted_difference
-                && !self.checks_and_corrections.reason_investigation_own_initiative.other_error)
-                || self.checks_and_corrections.corrected_results_own_initiative.is_empty()
+                && !self
+                    .checks_and_corrections
+                    .reason_investigation_own_initiative
+                    .other_error)
+                || self
+                    .checks_and_corrections
+                    .corrected_results_own_initiative
+                    .is_empty()
             {
                 validation_results.errors.push(ValidationResult {
                     fields: vec![path.field("checks_and_corrections").to_string()],
@@ -139,7 +146,11 @@ impl Validate for DSOFirstSessionResults {
                 });
             }
 
-            if self.checks_and_corrections.corrected_results_own_initiative.is_both() {
+            if self
+                .checks_and_corrections
+                .corrected_results_own_initiative
+                .is_both()
+            {
                 validation_results.errors.push(ValidationResult {
                     fields: vec![path.field("checks_and_corrections").to_string()],
                     code: ValidationResultCode::F134,
@@ -147,7 +158,11 @@ impl Validate for DSOFirstSessionResults {
                 });
             }
 
-            if !self.checks_and_corrections.corrected_results_csb_request.is_empty() {
+            if !self
+                .checks_and_corrections
+                .corrected_results_csb_request
+                .is_empty()
+            {
                 validation_results.errors.push(ValidationResult {
                     fields: vec![path.field("checks_and_corrections").to_string()],
                     code: ValidationResultCode::F135,
@@ -210,6 +225,107 @@ mod tests {
         assert_eq!(validation_results.warnings.len(), 1);
 
         Ok(validation_results)
+    }
+
+    #[test]
+    fn test_error_when_checks_and_validations_are_not_empty() {
+        assert_eq!(
+            validate(
+                Some(CorrigendumPresent::TwoDocuments),
+                Some(ChecksAndCorrectionsPresent::PageMissing),
+                ReasonInvestigationOwnInitiative::default(),
+                YesNo::no(),
+                YesNo::no(),
+            ),
+            Err(DataError::new(
+                "`checks_and_corrections` must be empty when `ChecksAndCorrectionsPresent::PageMissing`."
+            ))
+        );
+    }
+
+    /// GSB DSO | F.131: 'Controles en correcties - Op eigen initiatief': 'controles en correcties aanwezig' = 'ja' EN één of beide vragen niet beantwoord
+    #[test]
+    #[expect(clippy::too_many_lines)]
+    fn test_f131() -> Result<(), DataError> {
+        let f131 = ValidationResult {
+            code: ValidationResultCode::F131,
+            fields: vec!["data.checks_and_corrections".into()],
+            context: None,
+        };
+
+        let cases = vec![
+            (
+                Some(CorrigendumPresent::TwoDocuments),
+                ReasonInvestigationOwnInitiative::default(),
+                YesNo::yes(),
+                YesNo::default(),
+                true,
+            ),
+            (
+                Some(CorrigendumPresent::TwoDocuments),
+                ReasonInvestigationOwnInitiative {
+                    unaccounted_difference: true,
+                    other_error: false,
+                },
+                YesNo::no(),
+                YesNo::default(),
+                false,
+            ),
+            (
+                Some(CorrigendumPresent::TwoDocuments),
+                ReasonInvestigationOwnInitiative::default(),
+                YesNo::yes(),
+                YesNo::no(),
+                true,
+            ),
+            (
+                Some(CorrigendumPresent::OneDocument),
+                ReasonInvestigationOwnInitiative {
+                    unaccounted_difference: true,
+                    other_error: true,
+                },
+                YesNo::yes(),
+                YesNo::no(),
+                false,
+            ),
+            (
+                Some(CorrigendumPresent::TwoDocuments),
+                ReasonInvestigationOwnInitiative {
+                    unaccounted_difference: true,
+                    other_error: false,
+                },
+                YesNo::default(),
+                YesNo::yes(),
+                true,
+            ),
+        ];
+
+        for (
+            case_index,
+            (
+                corrigendum_present,
+                reason_investigation_own_initiative,
+                corrected_results_own_initiative,
+                corrected_results_csb_request,
+                expect_f131,
+            ),
+        ) in cases.into_iter().enumerate()
+        {
+            let result = validate(
+                corrigendum_present,
+                Some(ChecksAndCorrectionsPresent::PagePresent),
+                reason_investigation_own_initiative.clone(),
+                corrected_results_own_initiative.clone(),
+                corrected_results_csb_request.clone(),
+            )?;
+            let has_f131 = result.errors.iter().any(|e| e == &f131);
+            assert_eq!(
+                has_f131, expect_f131,
+                "Case #{case_index} failed: reason_investigation_own_initiative: {reason_investigation_own_initiative:?}, corrected_results_own_initiative: {corrected_results_own_initiative:?}, corrected_results_csb_request: {corrected_results_csb_request:?}"
+            );
+        }
+
+        Ok(())
     }
 
     /// GSB DSO | F.132: 'Controles en correcties - Op eigen initiatief': 'controles en correcties aanwezig' = 'ja' EN 'gecorrigeerde telresultaten' = 'nee' EN 'Over het proces-verbaal: Is er een corrigendum?' = 'ja'
@@ -386,91 +502,6 @@ mod tests {
         Ok(())
     }
 
-    /// GSB DSO | F.131: 'Controles en correcties - Op eigen initiatief': 'controles en correcties aanwezig' = 'ja' EN één of beide vragen niet beantwoord
-    #[test]
-    #[expect(clippy::too_many_lines)]
-    fn test_f131() -> Result<(), DataError> {
-        let f131 = ValidationResult {
-            code: ValidationResultCode::F131,
-            fields: vec!["data.checks_and_corrections".into()],
-            context: None,
-        };
-
-        let cases = vec![
-            (
-		Some(CorrigendumPresent::TwoDocuments),
-                ReasonInvestigationOwnInitiative::default(),
-                YesNo::yes(),
-                YesNo::default(),
-                true,
-            ),
-            (
-		Some(CorrigendumPresent::TwoDocuments),
-                ReasonInvestigationOwnInitiative {
-                    unaccounted_difference: true,
-                    other_error: false,
-                },
-                YesNo::no(),
-                YesNo::default(),
-                false,
-            ),
-            (
-		Some(CorrigendumPresent::TwoDocuments),
-                ReasonInvestigationOwnInitiative::default(),
-                YesNo::yes(),
-                YesNo::no(),
-                true,
-            ),
-            (
-		Some(CorrigendumPresent::OneDocument),
-                ReasonInvestigationOwnInitiative {
-                    unaccounted_difference: true,
-                    other_error: true,
-                },
-                YesNo::yes(),
-                YesNo::no(),
-                false,
-            ),
-            (
-		Some(CorrigendumPresent::TwoDocuments),
-                ReasonInvestigationOwnInitiative {
-                    unaccounted_difference: true,
-                    other_error: false,
-                },
-                YesNo::default(),
-                YesNo::yes(),
-                true,
-            ),
-        ];
-
-        for (
-            case_index,
-            (
-                corrigendum_present,
-                reason_investigation_own_initiative,
-                corrected_results_own_initiative,
-                corrected_results_csb_request,
-                expect_f131,
-            ),
-        ) in cases.into_iter().enumerate()
-        {
-            let result = validate(
-                corrigendum_present,
-                Some(ChecksAndCorrectionsPresent::PagePresent),
-                reason_investigation_own_initiative.clone(),
-                corrected_results_own_initiative.clone(),
-                corrected_results_csb_request.clone(),
-            )?;
-            let has_f131 = result.errors.iter().any(|e| e == &f131);
-            assert_eq!(
-                has_f131, expect_f131,
-                "Case #{case_index} failed: reason_investigation_own_initiative: {reason_investigation_own_initiative:?}, corrected_results_own_initiative: {corrected_results_own_initiative:?}, corrected_results_csb_request: {corrected_results_csb_request:?}"
-            );
-        }
-
-        Ok(())
-    }
-
     /// GSB DSO | F.134: 'Controles en correcties - Op eigen initiatief': 'controles en correcties aanwezig' = 'ja' EN meer dan 1 antwoord op vraag 'zijn er gecorrigeerde telresultaten'
     #[test]
     fn test_f134() -> Result<(), DataError> {
@@ -482,21 +513,21 @@ mod tests {
 
         let cases = vec![
             (
-		Some(CorrigendumPresent::TwoDocuments),
+                Some(CorrigendumPresent::TwoDocuments),
                 ReasonInvestigationOwnInitiative::default(),
                 YesNo::both(),
                 YesNo::yes(),
                 true,
             ),
             (
-		Some(CorrigendumPresent::TwoDocuments),
+                Some(CorrigendumPresent::TwoDocuments),
                 ReasonInvestigationOwnInitiative::default(),
                 YesNo::yes(),
                 YesNo::no(),
                 false,
             ),
             (
-		Some(CorrigendumPresent::OneDocument),
+                Some(CorrigendumPresent::OneDocument),
                 ReasonInvestigationOwnInitiative {
                     unaccounted_difference: true,
                     other_error: false,
@@ -506,7 +537,7 @@ mod tests {
                 false,
             ),
             (
-		Some(CorrigendumPresent::TwoDocuments),
+                Some(CorrigendumPresent::TwoDocuments),
                 ReasonInvestigationOwnInitiative {
                     unaccounted_difference: true,
                     other_error: false,
@@ -556,21 +587,21 @@ mod tests {
 
         let cases = vec![
             (
-		Some(CorrigendumPresent::TwoDocuments),
+                Some(CorrigendumPresent::TwoDocuments),
                 ReasonInvestigationOwnInitiative::default(),
                 YesNo::both(),
                 YesNo::yes(),
                 true,
             ),
             (
-		Some(CorrigendumPresent::TwoDocuments),
+                Some(CorrigendumPresent::TwoDocuments),
                 ReasonInvestigationOwnInitiative::default(),
                 YesNo::both(),
                 YesNo::no(),
                 true,
             ),
             (
-		Some(CorrigendumPresent::TwoDocuments),
+                Some(CorrigendumPresent::TwoDocuments),
                 ReasonInvestigationOwnInitiative::default(),
                 YesNo::both(),
                 YesNo::default(),
@@ -591,7 +622,7 @@ mod tests {
         {
             let result = validate(
                 corrigendum_present,
-		Some(ChecksAndCorrectionsPresent::PagePresent),
+                Some(ChecksAndCorrectionsPresent::PagePresent),
                 reason_investigation_own_initiative.clone(),
                 corrected_results_own_initiative.clone(),
                 corrected_results_csb_request.clone(),

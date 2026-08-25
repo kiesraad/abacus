@@ -98,8 +98,6 @@ export function useFormKeyboardNavigation(): RefObject<HTMLFormElement | null> {
             if (event.shiftKey || (submitButton && document.activeElement === submitButton)) {
               //ref.current.submit fails in testing environment (jsdom)
               innerRef.current?.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
-            } else if (event.target instanceof HTMLInputElement && event.target.type === "radio") {
-              submitButton?.focus();
             } else {
               moveFocus("down");
             }

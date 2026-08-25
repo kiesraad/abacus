@@ -11,11 +11,7 @@ import { overrideOnce, server } from "@/testing/server";
 import { getUrlMethodAndBody, render, screen } from "@/testing/test-utils";
 import { getTypistUser } from "@/testing/user-mock-data";
 import type { DATA_ENTRY_SAVE_REQUEST_BODY } from "@/types/generated/openapi";
-import {
-  getDefaultDataEntryState,
-  getDefaultDSODataEntryState,
-  getEmptyDSODataEntryRequest,
-} from "../../testing/mock-data";
+import { getDefaultDSODataEntryState, getEmptyDSODataEntryRequest } from "../../testing/mock-data";
 import { overrideServerClaimDataEntryResponse } from "../../testing/test.utils";
 import { DataEntryProvider } from "../DataEntryProvider";
 import { DataEntrySection } from "../DataEntrySection";
@@ -47,7 +43,7 @@ describe("Test AboutReportForm", () => {
       const user = userEvent.setup();
 
       overrideServerClaimDataEntryResponse({
-        formState: getDefaultDataEntryState().formState,
+        formState: getDefaultDSODataEntryState().formState,
         results: {},
         model: "DSOFirstSession",
       });
@@ -69,7 +65,7 @@ describe("Test AboutReportForm", () => {
     test("hitting shift+enter does result in api call", async () => {
       const user = userEvent.setup();
       overrideServerClaimDataEntryResponse({
-        formState: getDefaultDataEntryState().formState,
+        formState: getDefaultDSODataEntryState().formState,
         results: {},
         model: "DSOFirstSession",
       });
@@ -95,7 +91,7 @@ describe("Test AboutReportForm", () => {
 
       const user = userEvent.setup();
       overrideServerClaimDataEntryResponse({
-        formState: getDefaultDataEntryState().formState,
+        formState: getDefaultDSODataEntryState().formState,
         results: {},
         model: "DSOFirstSession",
       });
@@ -214,7 +210,7 @@ describe("Test AboutReportForm", () => {
       const user = userEvent.setup();
 
       overrideServerClaimDataEntryResponse({
-        formState: getDefaultDataEntryState().formState,
+        formState: getDefaultDSODataEntryState().formState,
         results: {},
         model: "DSOFirstSession",
       });
@@ -242,7 +238,7 @@ describe("Test AboutReportForm", () => {
     test("F.122 TwoDocuments but PageMissing", async () => {
       const user = userEvent.setup();
       overrideServerClaimDataEntryResponse({
-        formState: getDefaultDataEntryState().formState,
+        formState: getDefaultDSODataEntryState().formState,
         results: {},
         model: "DSOFirstSession",
       });

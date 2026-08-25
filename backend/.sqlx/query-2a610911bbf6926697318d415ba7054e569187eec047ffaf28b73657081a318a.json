@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "INSERT INTO polling_stations (id, committee_session_id, prev_data_entry_id, name, number, address, postal_code, locality) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 8
+    },
+    "nullable": []
+  },
+  "hash": "2a610911bbf6926697318d415ba7054e569187eec047ffaf28b73657081a318a"
+}

@@ -40,6 +40,7 @@ pub mod voters_counts;
 pub mod votes_counts;
 pub mod yes_no;
 
+#[derive(Debug)]
 pub struct IncorrectResultsModel;
 
 /// Results contains the results for a data entry

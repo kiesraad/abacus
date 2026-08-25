@@ -175,6 +175,19 @@ impl ElectionTotals {
 
         Ok(investigations)
     }
+
+    /// The DSO polling station investigations of these totals,
+    /// or an error if these are not DSO totals.
+    pub fn dso_investigations(&self) -> Result<&DSOInvestigations, APIError> {
+        let CommitteeSpecificTotals::GSB(GSBTotals::DSO(investigations)) = &self.committee_specific
+        else {
+            return Err(APIError::DataIntegrityError(
+                "DSO investigations are only available for DSO totals".to_string(),
+            ));
+        };
+
+        Ok(investigations)
+    }
 }
 
 /// Extract the polling station from a data entry source,
@@ -441,11 +454,7 @@ mod tests {
     use crate::domain::{
         committee_session::CommitteeSessionId,
         data_entry::DataEntryId,
-        election::{
-            CommitteeCategory::{self, *},
-            ElectionCategory, PGNumber,
-            tests::election_fixture,
-        },
+        election::{CommitteeCategory::*, ElectionCategory, PGNumber, tests::election_fixture},
         polling_station::{
             PollingStation, PollingStationFirstSession, test_helpers::polling_stations_fixture,
         },
@@ -1081,7 +1090,7 @@ mod tests {
                             id: SubCommitteeId::from(1),
                             number: 1,
                             name: "A".to_string(),
-                            category: CommitteeCategory::GSB,
+                            category: GSB,
                         },
                         data_entry_id: DataEntryId::from(0),
                     }),
@@ -1094,7 +1103,7 @@ mod tests {
                             id: SubCommitteeId::from(2),
                             number: 2,
                             name: "B".to_string(),
-                            category: CommitteeCategory::GSB,
+                            category: GSB,
                         },
                         data_entry_id: DataEntryId::from(1),
                     }),
@@ -1281,5 +1290,19 @@ mod tests {
         let csb_election = election_fixture(ElectionCategory::Municipal, CSB, &[2, 3]);
         let csb_totals = ElectionTotals::tabulate(&csb_election, &[]).unwrap();
         assert!(csb_totals.cso_investigations().is_err());
+    }
+
+    #[test]
+    fn test_dso_investigations_requires_dso_totals() {
+        let dso_totals = ElectionTotals::tabulate(&dso_election_fixture(), &[]).unwrap();
+        assert!(dso_totals.dso_investigations().is_ok());
+
+        let cso_election = election_fixture(ElectionCategory::Municipal, GSB, &[2, 3]);
+        let cso_totals = ElectionTotals::tabulate(&cso_election, &[]).unwrap();
+        assert!(cso_totals.dso_investigations().is_err());
+
+        let csb_election = election_fixture(ElectionCategory::Municipal, CSB, &[2, 3]);
+        let csb_totals = ElectionTotals::tabulate(&csb_election, &[]).unwrap();
+        assert!(csb_totals.dso_investigations().is_err());
     }
 }

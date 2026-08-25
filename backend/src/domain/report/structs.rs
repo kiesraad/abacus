@@ -205,7 +205,7 @@ impl ResultsInputData {
         {
             let previous_results =
                 list_results_for_committee_session(conn, previous_committee_session.id).await?;
-            previous_results.verify_models(&election, &committee_session)?;
+            previous_results.verify_models(&election, previous_committee_session)?;
             let previous_totals = ElectionTotals::tabulate(&election, &previous_results)?;
             Some(previous_totals)
         } else {

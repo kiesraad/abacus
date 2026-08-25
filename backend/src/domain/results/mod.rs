@@ -537,8 +537,7 @@ impl<T> VerifyModels for [(T, Results)] {
 
 #[cfg(test)]
 pub mod tests {
-    use core::assert_matches;
-    use std::iter;
+    use std::{assert_matches, iter};
 
     use strum::VariantArray;
 

@@ -125,10 +125,35 @@ impl Validate for DSOFirstSessionResults {
                 _ => {}
             }
 
-            validation_results.join(
-                self.checks_and_corrections
-                    .validate(election, &path.field("checks_and_corrections"))?,
-            );
+            if (!self
+                .checks_and_corrections
+                .reason_investigation_own_initiative
+                .unaccounted_difference
+                && !self.checks_and_corrections.reason_investigation_own_initiative.other_error)
+                || self.checks_and_corrections.corrected_results_own_initiative.is_empty()
+            {
+                validation_results.errors.push(ValidationResult {
+                    fields: vec![path.field("checks_and_corrections").to_string()],
+                    code: ValidationResultCode::F131,
+                    context: None,
+                });
+            }
+
+            if self.checks_and_corrections.corrected_results_own_initiative.is_both() {
+                validation_results.errors.push(ValidationResult {
+                    fields: vec![path.field("checks_and_corrections").to_string()],
+                    code: ValidationResultCode::F134,
+                    context: None,
+                });
+            }
+
+            if !self.checks_and_corrections.corrected_results_csb_request.is_empty() {
+                validation_results.errors.push(ValidationResult {
+                    fields: vec![path.field("checks_and_corrections").to_string()],
+                    code: ValidationResultCode::F135,
+                    context: None,
+                });
+            }
         };
 
         validation_results.join(self.as_common().validate(election, path)?);
@@ -354,6 +379,226 @@ mod tests {
             let has_f133 = result.errors.iter().any(|e| e == &f133);
             assert_eq!(
                 has_f133, expect_f133,
+                "Case #{case_index} failed: reason_investigation_own_initiative: {reason_investigation_own_initiative:?}, corrected_results_own_initiative: {corrected_results_own_initiative:?}, corrected_results_csb_request: {corrected_results_csb_request:?}"
+            );
+        }
+
+        Ok(())
+    }
+
+    /// GSB DSO | F.131: 'Controles en correcties - Op eigen initiatief': 'controles en correcties aanwezig' = 'ja' EN één of beide vragen niet beantwoord
+    #[test]
+    #[expect(clippy::too_many_lines)]
+    fn test_f131() -> Result<(), DataError> {
+        let f131 = ValidationResult {
+            code: ValidationResultCode::F131,
+            fields: vec!["data.checks_and_corrections".into()],
+            context: None,
+        };
+
+        let cases = vec![
+            (
+		Some(CorrigendumPresent::TwoDocuments),
+                ReasonInvestigationOwnInitiative::default(),
+                YesNo::yes(),
+                YesNo::default(),
+                true,
+            ),
+            (
+		Some(CorrigendumPresent::TwoDocuments),
+                ReasonInvestigationOwnInitiative {
+                    unaccounted_difference: true,
+                    other_error: false,
+                },
+                YesNo::no(),
+                YesNo::default(),
+                false,
+            ),
+            (
+		Some(CorrigendumPresent::TwoDocuments),
+                ReasonInvestigationOwnInitiative::default(),
+                YesNo::yes(),
+                YesNo::no(),
+                true,
+            ),
+            (
+		Some(CorrigendumPresent::OneDocument),
+                ReasonInvestigationOwnInitiative {
+                    unaccounted_difference: true,
+                    other_error: true,
+                },
+                YesNo::yes(),
+                YesNo::no(),
+                false,
+            ),
+            (
+		Some(CorrigendumPresent::TwoDocuments),
+                ReasonInvestigationOwnInitiative {
+                    unaccounted_difference: true,
+                    other_error: false,
+                },
+                YesNo::default(),
+                YesNo::yes(),
+                true,
+            ),
+        ];
+
+        for (
+            case_index,
+            (
+                corrigendum_present,
+                reason_investigation_own_initiative,
+                corrected_results_own_initiative,
+                corrected_results_csb_request,
+                expect_f131,
+            ),
+        ) in cases.into_iter().enumerate()
+        {
+            let result = validate(
+                corrigendum_present,
+                Some(ChecksAndCorrectionsPresent::PagePresent),
+                reason_investigation_own_initiative.clone(),
+                corrected_results_own_initiative.clone(),
+                corrected_results_csb_request.clone(),
+            )?;
+            let has_f131 = result.errors.iter().any(|e| e == &f131);
+            assert_eq!(
+                has_f131, expect_f131,
+                "Case #{case_index} failed: reason_investigation_own_initiative: {reason_investigation_own_initiative:?}, corrected_results_own_initiative: {corrected_results_own_initiative:?}, corrected_results_csb_request: {corrected_results_csb_request:?}"
+            );
+        }
+
+        Ok(())
+    }
+
+    /// GSB DSO | F.134: 'Controles en correcties - Op eigen initiatief': 'controles en correcties aanwezig' = 'ja' EN meer dan 1 antwoord op vraag 'zijn er gecorrigeerde telresultaten'
+    #[test]
+    fn test_f134() -> Result<(), DataError> {
+        let f134 = ValidationResult {
+            code: ValidationResultCode::F134,
+            fields: vec!["data.checks_and_corrections".into()],
+            context: None,
+        };
+
+        let cases = vec![
+            (
+		Some(CorrigendumPresent::TwoDocuments),
+                ReasonInvestigationOwnInitiative::default(),
+                YesNo::both(),
+                YesNo::yes(),
+                true,
+            ),
+            (
+		Some(CorrigendumPresent::TwoDocuments),
+                ReasonInvestigationOwnInitiative::default(),
+                YesNo::yes(),
+                YesNo::no(),
+                false,
+            ),
+            (
+		Some(CorrigendumPresent::OneDocument),
+                ReasonInvestigationOwnInitiative {
+                    unaccounted_difference: true,
+                    other_error: false,
+                },
+                YesNo::no(),
+                YesNo::default(),
+                false,
+            ),
+            (
+		Some(CorrigendumPresent::TwoDocuments),
+                ReasonInvestigationOwnInitiative {
+                    unaccounted_difference: true,
+                    other_error: false,
+                },
+                YesNo::default(),
+                YesNo::default(),
+                false,
+            ),
+        ];
+
+        for (
+            case_index,
+            (
+                corrigendum_present,
+                reason_investigation_own_initiative,
+                corrected_results_own_initiative,
+                corrected_results_csb_request,
+                expect_f134,
+            ),
+        ) in cases.into_iter().enumerate()
+        {
+            let result = validate(
+                corrigendum_present,
+                Some(ChecksAndCorrectionsPresent::PagePresent),
+                reason_investigation_own_initiative.clone(),
+                corrected_results_own_initiative.clone(),
+                corrected_results_csb_request.clone(),
+            )?;
+            let has_f134 = result.errors.iter().any(|e| e == &f134);
+            assert_eq!(
+                has_f134, expect_f134,
+                "Case #{case_index} failed: reason_investigation_own_initiative: {reason_investigation_own_initiative:?}, corrected_results_own_initiative: {corrected_results_own_initiative:?}, corrected_results_csb_request: {corrected_results_csb_request:?}"
+            );
+        }
+
+        Ok(())
+    }
+
+    /// GSB DSO | F.135: 'Controles en correcties - Op verzoek van het centraal stembureau': 'controles en correcties aanwezig' = 'ja' EN ongeldig antwoord in eerste zitting (vraag is ingevuld)
+    #[test]
+    fn test_f135() -> Result<(), DataError> {
+        let f135 = ValidationResult {
+            code: ValidationResultCode::F135,
+            fields: vec!["data.checks_and_corrections".into()],
+            context: None,
+        };
+
+        let cases = vec![
+            (
+		Some(CorrigendumPresent::TwoDocuments),
+                ReasonInvestigationOwnInitiative::default(),
+                YesNo::both(),
+                YesNo::yes(),
+                true,
+            ),
+            (
+		Some(CorrigendumPresent::TwoDocuments),
+                ReasonInvestigationOwnInitiative::default(),
+                YesNo::both(),
+                YesNo::no(),
+                true,
+            ),
+            (
+		Some(CorrigendumPresent::TwoDocuments),
+                ReasonInvestigationOwnInitiative::default(),
+                YesNo::both(),
+                YesNo::default(),
+                false,
+            ),
+        ];
+
+        for (
+            case_index,
+            (
+                corrigendum_present,
+                reason_investigation_own_initiative,
+                corrected_results_own_initiative,
+                corrected_results_csb_request,
+                expect_f135,
+            ),
+        ) in cases.into_iter().enumerate()
+        {
+            let result = validate(
+                corrigendum_present,
+		Some(ChecksAndCorrectionsPresent::PagePresent),
+                reason_investigation_own_initiative.clone(),
+                corrected_results_own_initiative.clone(),
+                corrected_results_csb_request.clone(),
+            )?;
+            let has_f135 = result.errors.iter().any(|e| e == &f135);
+            assert_eq!(
+                has_f135, expect_f135,
                 "Case #{case_index} failed: reason_investigation_own_initiative: {reason_investigation_own_initiative:?}, corrected_results_own_initiative: {corrected_results_own_initiative:?}, corrected_results_csb_request: {corrected_results_csb_request:?}"
             );
         }

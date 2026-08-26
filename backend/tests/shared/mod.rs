@@ -106,8 +106,8 @@ pub fn example_dso_data_entry(client_state: Option<&str>) -> serde_json::Value {
                     "unaccounted_difference": true,
                     "other_error": true
                 },
-                "corrected_results_own_initiative": { "yes": false, "no": true },
-                "corrected_results_csb_request": { "yes": true, "no": false }
+                "corrected_results_own_initiative": { "yes": true, "no": false },
+                "corrected_results_csb_request": { "yes": false, "no": false }
             },
             "voters_counts": {
                 "poll_card_count": 101,

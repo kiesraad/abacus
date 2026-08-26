@@ -135,7 +135,7 @@ mod tests {
         ];
 
         for (committee_category, ballots_voters, per_list, expect_f111) in cases {
-            let result = validate(committee_category, ballots_voters.clone(), per_list.clone())?;
+            let result = validate(committee_category, ballots_voters, per_list)?;
             let has_f111 = result.errors.iter().any(|e| e == &f111);
             assert_eq!(
                 has_f111, expect_f111,
@@ -167,7 +167,7 @@ mod tests {
         ];
 
         for (committee_category, ballots_voters, per_list, expect_f112) in cases {
-            let result = validate(committee_category, ballots_voters.clone(), per_list.clone())?;
+            let result = validate(committee_category, ballots_voters, per_list)?;
             let has_f112 = result.errors.iter().any(|e| e == &f112);
             assert_eq!(
                 has_f112, expect_f112,

@@ -34,7 +34,7 @@ impl ChecksAndCorrections {
 }
 
 /// Reason for investigation on own initiative
-#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
+#[derive(Serialize, Deserialize, ToSchema, Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
 pub struct ReasonInvestigationOwnInitiative {
     /// Because of an unaccounted-for difference

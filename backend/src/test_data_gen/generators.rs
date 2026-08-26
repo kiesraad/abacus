@@ -22,6 +22,8 @@ use crate::{
         polling_station::{PollingStation, PollingStationRequest, PollingStationType},
         results::{
             Results, VerifyModels,
+            about_report::{AboutReport, ChecksAndCorrectionsPresent, CorrigendumPresent},
+            checks_and_corrections::{ChecksAndCorrections, ReasonInvestigationOwnInitiative},
             common_polling_station_results::CommonPollingStationResults,
             counting_differences_polling_station::CountingDifferencesPollingStation,
             cso_first_session_results::CSOFirstSessionResults,
@@ -767,14 +769,17 @@ fn generate_results(
             differences_counts: common.differences_counts,
             political_group_votes: common.political_group_votes,
         }),
-        (GSB, Some(DSO)) => Results::DSOFirstSession(DSOFirstSessionResults {
-            about_report: Default::default(),
-            checks_and_corrections: Default::default(),
-            voters_counts: common.voters_counts,
-            votes_counts: common.votes_counts,
-            differences_counts: common.differences_counts,
-            political_group_votes: common.political_group_votes,
-        }),
+        (GSB, Some(DSO)) => {
+            let (about_report, checks_and_corrections) = generate_checks_and_corrections(rng);
+            Results::DSOFirstSession(DSOFirstSessionResults {
+                about_report,
+                checks_and_corrections,
+                voters_counts: common.voters_counts,
+                votes_counts: common.votes_counts,
+                differences_counts: common.differences_counts,
+                political_group_votes: common.political_group_votes,
+            })
+        }
         (CSB, None) => Results::GSB(GSBResults {
             number_of_voters,
             voters_counts: common.voters_counts,
@@ -913,6 +918,35 @@ fn generate_counting_differences_ps(
         } else {
             YesNo::yes()
         },
+    }
+}
+
+fn generate_checks_and_corrections(
+    rng: &mut impl rand::RngExt,
+) -> (AboutReport, ChecksAndCorrections) {
+    if rng.random_bool(0.2) {
+        (
+            AboutReport {
+                corrigendum_present: Some(CorrigendumPresent::TwoDocuments),
+                checks_and_corrections_present: Some(ChecksAndCorrectionsPresent::PagePresent),
+            },
+            ChecksAndCorrections {
+                reason_investigation_own_initiative: ReasonInvestigationOwnInitiative {
+                    unaccounted_difference: false,
+                    other_error: true,
+                },
+                corrected_results_own_initiative: YesNo::yes(),
+                corrected_results_csb_request: YesNo::default(),
+            },
+        )
+    } else {
+        (
+            AboutReport {
+                corrigendum_present: Some(CorrigendumPresent::OneDocument),
+                checks_and_corrections_present: Some(ChecksAndCorrectionsPresent::PageMissing),
+            },
+            ChecksAndCorrections::default(),
+        )
     }
 }
 

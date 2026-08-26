@@ -314,9 +314,9 @@ mod tests {
             let result = validate(
                 corrigendum_present,
                 Some(ChecksAndCorrectionsPresent::PagePresent),
-                reason_investigation_own_initiative.clone(),
-                corrected_results_own_initiative.clone(),
-                corrected_results_csb_request.clone(),
+                reason_investigation_own_initiative,
+                corrected_results_own_initiative,
+                corrected_results_csb_request,
             )?;
             let has_f131 = result.errors.iter().any(|e| e == &f131);
             assert_eq!(
@@ -410,9 +410,9 @@ mod tests {
             let result = validate(
                 corrigendum_present,
                 checks_and_corrections_present,
-                reason_investigation_own_initiative.clone(),
-                corrected_results_own_initiative.clone(),
-                corrected_results_csb_request.clone(),
+                reason_investigation_own_initiative,
+                corrected_results_own_initiative,
+                corrected_results_csb_request,
             )?;
 
             let has_f132 = result.errors.iter().any(|e| e == &f132);
@@ -488,9 +488,9 @@ mod tests {
             let result = validate(
                 corrigendum_present,
                 checks_and_corrections_present,
-                reason_investigation_own_initiative.clone(),
-                corrected_results_own_initiative.clone(),
-                corrected_results_csb_request.clone(),
+                reason_investigation_own_initiative,
+                corrected_results_own_initiative,
+                corrected_results_csb_request,
             )?;
             let has_f133 = result.errors.iter().any(|e| e == &f133);
             assert_eq!(
@@ -562,9 +562,9 @@ mod tests {
             let result = validate(
                 corrigendum_present,
                 Some(ChecksAndCorrectionsPresent::PagePresent),
-                reason_investigation_own_initiative.clone(),
-                corrected_results_own_initiative.clone(),
-                corrected_results_csb_request.clone(),
+                reason_investigation_own_initiative,
+                corrected_results_own_initiative,
+                corrected_results_csb_request,
             )?;
             let has_f134 = result.errors.iter().any(|e| e == &f134);
             assert_eq!(
@@ -623,9 +623,9 @@ mod tests {
             let result = validate(
                 corrigendum_present,
                 Some(ChecksAndCorrectionsPresent::PagePresent),
-                reason_investigation_own_initiative.clone(),
-                corrected_results_own_initiative.clone(),
-                corrected_results_csb_request.clone(),
+                reason_investigation_own_initiative,
+                corrected_results_own_initiative,
+                corrected_results_csb_request,
             )?;
             let has_f135 = result.errors.iter().any(|e| e == &f135);
             assert_eq!(

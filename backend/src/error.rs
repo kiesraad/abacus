@@ -18,7 +18,8 @@ use crate::{
     api::middleware::authentication::error::AuthenticationError,
     domain::{
         committee_session::CommitteeSessionError, election::InvalidElectionError,
-        models::error::ModelsError, role::RoleNotAuthorizedError, validate::DataError,
+        models::error::ModelsError, results::IncorrectResultsModel, role::RoleNotAuthorizedError,
+        validate::DataError,
     },
     eml::EMLImportError,
     infra::backup::BackupError,
@@ -419,6 +420,12 @@ impl From<SubCommitteeServiceError> for APIError {
         match err {
             SubCommitteeServiceError::DatabaseError(e) => e.into(),
         }
+    }
+}
+
+impl From<IncorrectResultsModel> for APIError {
+    fn from(_: IncorrectResultsModel) -> Self {
+        APIError::DataIntegrityError("Incorrect results model".to_string())
     }
 }
 

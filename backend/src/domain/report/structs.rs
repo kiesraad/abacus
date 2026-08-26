@@ -28,7 +28,9 @@ use crate::{
         },
         polling_station::PollingStation,
         report::DEFAULT_DATE_TIME_FORMAT,
-        results::{Results, political_group_candidate_votes::PoliticalGroupCandidateVotes},
+        results::{
+            Results, VerifyModels, political_group_candidate_votes::PoliticalGroupCandidateVotes,
+        },
         tabulation::ElectionTotals,
     },
     eml::EmlHash,
@@ -61,6 +63,7 @@ pub struct GsbGeneratedFiles {
     pub results_csv: GeneratedFile,
 }
 
+#[derive(Debug)]
 pub struct GsbFiles {
     pub results_eml: Option<File>,
     pub results_pdf: Option<File>,
@@ -188,6 +191,7 @@ impl ResultsInputData {
         let investigations = session_pss.investigations();
         let polling_stations = session_pss.into_polling_stations();
         let results = list_results_for_committee_session(conn, committee_session.id).await?;
+        results.verify_models(&election, &committee_session)?;
 
         // get the previous committee session if this is not the first session
         let previous_committee_session = if committee_session.is_next_session() {
@@ -201,6 +205,7 @@ impl ResultsInputData {
         {
             let previous_results =
                 list_results_for_committee_session(conn, previous_committee_session.id).await?;
+            previous_results.verify_models(&election, previous_committee_session)?;
             let previous_totals = ElectionTotals::tabulate(&election, &previous_results)?;
             Some(previous_totals)
         } else {

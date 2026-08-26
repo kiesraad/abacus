@@ -15,11 +15,12 @@ use crate::{
             ListAverage, ListDrawingLotsVariant, ListRemainder, SeatAssignment,
         },
         apportionment_state::{ApportionmentState, ApportionmentStateError, DrawingLotsRequired},
-        committee_session::CommitteeSessionId,
+        committee_session::CommitteeSession,
         committee_session_status::CommitteeSessionStatus,
         election::{
             CandidateNumber, CommitteeCategory, ElectionId, ElectionWithPoliticalGroups, PGNumber,
         },
+        results::VerifyModels,
         tabulation::ElectionTotals,
     },
     infra::audit_log::{AsAuditEvent, AuditEventLevel, AuditEventType, AuditService},
@@ -48,7 +49,7 @@ struct ApportionmentStateChange {
 pub async fn get_state(
     conn: &mut SqliteConnection,
     election_id: ElectionId,
-) -> Result<(CommitteeSessionId, ApportionmentState), APIError> {
+) -> Result<(CommitteeSession, ApportionmentState), APIError> {
     let election = election_repo::get(conn, election_id).await?;
     if election.committee_category != CommitteeCategory::CSB {
         return Err(ApportionmentApiError::NotCSBElection.into());
@@ -65,7 +66,7 @@ pub async fn get_state(
         .await?
         .unwrap_or(ApportionmentState::Uninitialised);
 
-    Ok((committee_session.id, state))
+    Ok((committee_session, state))
 }
 
 /// Update apportionment state:
@@ -79,11 +80,11 @@ pub async fn update_state(
     election_id: ElectionId,
     update_fn: impl FnOnce(ApportionmentState) -> Result<ApportionmentState, ApportionmentStateError>,
 ) -> Result<ApportionmentState, APIError> {
-    let (id, state) = get_state(conn, election_id).await?;
+    let (committee_session, state) = get_state(conn, election_id).await?;
 
     let state = update_fn(state).map_err(|err| APIError::Delegated(Box::new(err)))?;
 
-    apportionment_state_repo::upsert(conn, id, &state).await?;
+    apportionment_state_repo::upsert(conn, committee_session.id, &state).await?;
 
     audit_service
         .log(
@@ -213,10 +214,12 @@ pub async fn process(
         return Err(ApportionmentApiError::NotCSBElection.into());
     }
 
-    let (committee_session_id, state) = service::get_apportionment_state(conn, election.id).await?;
+    let (committee_session, state) = service::get_apportionment_state(conn, election.id).await?;
 
     let data_entry_results =
-        data_entry_repo::list_results_for_committee_session(conn, committee_session_id).await?;
+        data_entry_repo::list_results_for_committee_session(conn, committee_session.id).await?;
+    data_entry_results.verify_models(election, &committee_session)?;
+
     let election_totals = ElectionTotals::tabulate(election, &data_entry_results)?;
 
     let input = ApportionmentInputData::new(
@@ -367,11 +370,11 @@ mod tests {
         set_states(&mut conn, CommitteeSessionStatus::Completed, None).await;
 
         // Returns a new ApportionmentState::Uninitialised
-        let (id, state) = get_state(&mut conn, ElectionId::from(ELECTION_ID))
+        let (session, state) = get_state(&mut conn, ElectionId::from(ELECTION_ID))
             .await
             .expect("should get state");
 
-        assert_eq!(id, CommitteeSessionId::from(COMMITTEE_SESSION_ID));
+        assert_eq!(session.id, CommitteeSessionId::from(COMMITTEE_SESSION_ID));
         assert_eq!(state, ApportionmentState::Uninitialised);
     }
 

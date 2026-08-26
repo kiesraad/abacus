@@ -69,41 +69,47 @@ type Fixtures = {
   typistTwoCSB: { page: Page; request: APIRequestContext };
   eml230b: Eml230b;
   eml230b_more_than_45_candidates: Eml230b;
-  // GSB election without polling stations
+  // GSB CSO election without polling stations
   emptyElectionGSB: Election;
+  // GSB DSO election without polling stations
+  emptyElectionGSBDSO: Election;
   // CSB election with >= 19 seats
   emptyElectionCSBLargeCouncil: Election;
   // CSB election with < 19 seats
   emptyElectionCSBSmallCouncil: Election;
-  // GSB election with two polling stations
+  // GSB CSO election with two polling stations
   electionGSB: ElectionDetailsResponse;
+  // GSB DSO election with two polling stations
+  electionGSBDSO: ElectionDetailsResponse;
   // CSB election with >= 19 seats and one subcommittee
   electionCSBLargeCouncil: ElectionDetailsResponse;
   // CSB election with < 19 seats and one subcommittee
   electionCSBSmallCouncil: ElectionDetailsResponse;
-  // First data entry of the GSB election
+  // First data entry of the GSB CSO election
   dataEntryGSB: DataEntry;
-  // GSB election with one investigation in the second committee session
+  // First data entry of the GSB DSO election
+  dataEntryGSBDSO: DataEntry;
+  // GSB CSO election with one investigation in the second committee session
   dataEntryNextSession: DataEntry;
-  // First data entry of the GSB election with entry claimed by typist one
+  // First data entry of the GSB CSO election with entry claimed by typist one
   dataEntryGSBFirstEntryClaimed: DataEntry;
-  // First data entry of the GSB election with first data entry done
+  // First data entry of the GSB CSO election with first data entry done
   dataEntryGSBFirstEntryDone: DataEntry;
-  // First data entry correction of the GSB election after resolve differences
+  // First data entry correction of the GSB CSO election after resolve differences
   dataEntryGSBFirstEntryCorrection: DataEntry;
-  // First data entry correction of the next session of a GSB election after resolve differences
+  // First data entry correction of the next session of a GSB CSO election after resolve differences
   dataEntryNextSessionFirstEntryCorrection: DataEntry;
-  // Second data entry correction of the GSB election after resolve differences
+  // Second data entry correction of the GSB CSO election after resolve differences
   dataEntryGSBSecondEntryCorrection: DataEntry;
-  // First data entry of the GSB election with first data entry with errors
+  // First data entry of the GSB CSO election with first data entry with errors
   dataEntryGSBFirstEntryHasErrors: DataEntry;
-  // First data entry of the GSB election with first and second data entries done
+  // First data entry of the GSB CSO election with first and second data entries done
   dataEntryGSBDefinitive: DataEntry;
-  // First data entry of the GSB election with differences between the first and second data entry
+  // First data entry of the GSB CSO election with differences between the first and second data entry
   dataEntryGSBEntriesDifferent: DataEntry;
-  // First data entry of the GSB election with second data entry that has errors and is therefore different
+  // First data entry of the GSB CSO election with second data entry that has errors and is therefore different
   dataEntryGSBEntriesDifferentWithErrors: DataEntry;
-  // GSB election with polling stations and two completed data entries for each
+  // GSB CSO election with polling stations and two completed data entries for each
   completedElectionGSB: Election;
   // CSB election with >= 19 seats, one subcommittee and two completed data entries
   completedElectionCSB: Election;
@@ -111,7 +117,7 @@ type Fixtures = {
   completedElectionCSBWithDrawingLotsForListAndCandidate: Election;
   // CSB election with < 19 seats, one subcommittee and two completed data entries that triggers drawing lots for P 9
   completedElectionCSBWithDrawingLotsForP9: Election;
-  // The current committee session for the GSB election
+  // The current committee session for the GSB CSO election
   currentCommitteeSessionElectionGSB: CommitteeSession;
   // Newly created GSB User
   newTypistGSB: User;
@@ -183,6 +189,27 @@ export const test = base.extend<Fixtures>({
 
     await use(election);
   },
+  emptyElectionGSBDSO: async ({ adminOne, eml230b }, use) => {
+    const { request } = adminOne;
+    const url: ELECTION_IMPORT_REQUEST_PATH = `/api/elections/import`;
+    const election_data = await readFile(eml110a.path, "utf8");
+    const candidate_data = await readFile(eml230b.path, "utf8");
+    const electionResponse = await request.post(url, {
+      data: {
+        committee_category: "GSB",
+        election_data,
+        election_hash: eml110a.fullHash,
+        candidate_data,
+        candidate_hash: eml230b.fullHash,
+        number_of_voters: 1234,
+        counting_method: "DSO",
+      },
+    });
+    expect(electionResponse.ok()).toBeTruthy();
+    const election = (await electionResponse.json()) as Election;
+
+    await use(election);
+  },
   emptyElectionCSBLargeCouncil: async ({ adminOne, eml230b_more_than_45_candidates }, use) => {
     const { request } = adminOne;
     const url: ELECTION_IMPORT_REQUEST_PATH = `/api/elections/import`;
@@ -244,6 +271,29 @@ export const test = base.extend<Fixtures>({
 
     await use(electionDetails);
   },
+  electionGSBDSO: async ({ adminOne, coordinatorOneGSB, emptyElectionGSBDSO }, use) => {
+    // create polling stations in the existing emptyElection
+    const url: POLLING_STATION_CREATE_REQUEST_PATH = `/api/elections/${emptyElectionGSBDSO.id}/polling_stations`;
+    for (const pollingStationRequest of pollingStationRequests) {
+      const pollingStationResponse = await adminOne.request.post(url, { data: pollingStationRequest });
+      expect(pollingStationResponse.ok()).toBeTruthy();
+    }
+
+    // Set committee session status to DataEntry
+    const electionDetails = await changeCommitteeSessionStatus(coordinatorOneGSB, emptyElectionGSBDSO.id, "data_entry");
+
+    // Fill in committee session details
+    const detailsUpdateUrl: COMMITTEE_SESSION_UPDATE_REQUEST_PATH = `/api/elections/${emptyElectionGSBDSO.id}/committee_sessions/${electionDetails.current_committee_session.id}`;
+    const detailsUpdateData: COMMITTEE_SESSION_UPDATE_REQUEST_BODY = {
+      location: "Den Haag",
+      start_date: "2026-03-18",
+      start_time: "21:45",
+    };
+    const detailsUpdateResponse = await coordinatorOneGSB.request.put(detailsUpdateUrl, { data: detailsUpdateData });
+    expect(detailsUpdateResponse.ok()).toBeTruthy();
+
+    await use(electionDetails);
+  },
   electionCSBLargeCouncil: async ({ coordinatorOneCSB, emptyElectionCSBLargeCouncil }, use) => {
     const electionId = emptyElectionCSBLargeCouncil.id;
 
@@ -291,6 +341,22 @@ export const test = base.extend<Fixtures>({
 
     await use({
       election_id: electionGSB.election.id,
+      id: electionStatus.data_entry_id,
+      name: electionStatus.source.name,
+      number: electionStatus.source.number.toString(),
+    });
+  },
+  dataEntryGSBDSO: async ({ adminOne, electionGSBDSO }, use) => {
+    const { request } = adminOne;
+    // get the first polling station of the existing election
+    const url: ELECTION_STATUS_REQUEST_PATH = `/api/elections/${electionGSBDSO.election.id}/status`;
+    const response = await request.get(url);
+    expect(response.ok()).toBeTruthy();
+    const electionStatuses = (await response.json()) as ElectionStatusResponse;
+    const electionStatus = electionStatuses.statuses[0]!;
+
+    await use({
+      election_id: electionGSBDSO.election.id,
       id: electionStatus.data_entry_id,
       name: electionStatus.source.name,
       number: electionStatus.source.number.toString(),

@@ -1,6 +1,8 @@
 import type {
+  CommonPollingStationResults,
   CSOFirstSessionResults,
   DataEntry,
+  DSOFirstSessionResults,
   GSBResults,
   NextSessionResults,
   PollingStationRequest,
@@ -159,16 +161,7 @@ export function emptyCSOFirstSessionResults(): CSOFirstSessionResults {
   };
 }
 
-export const noRecountNoDifferencesDataEntry: CSOFirstSessionResults & { model: "CSOFirstSession" } = {
-  model: "CSOFirstSession",
-  extra_investigation: {
-    extra_investigation_other_reason: { yes: false, no: true },
-    ballots_recounted_extra_investigation: { yes: false, no: true },
-  },
-  counting_differences_polling_station: {
-    difference_ballots_voters_completely_accounted_for: { yes: true, no: false },
-    difference_ballots_per_list: { yes: false, no: true },
-  },
+const commonDataEntry: CommonPollingStationResults = {
   voters_counts: {
     poll_card_count: 3450,
     proxy_certificate_count: 157,
@@ -287,6 +280,49 @@ export const noRecountNoDifferencesDataEntry: CSOFirstSessionResults & { model: 
       ],
     },
   ],
+};
+
+export const noRecountNoDifferencesDataEntry: CSOFirstSessionResults & { model: "CSOFirstSession" } = {
+  model: "CSOFirstSession",
+  extra_investigation: {
+    extra_investigation_other_reason: { yes: false, no: true },
+    ballots_recounted_extra_investigation: { yes: false, no: true },
+  },
+  counting_differences_polling_station: {
+    difference_ballots_voters_completely_accounted_for: { yes: true, no: false },
+    difference_ballots_per_list: { yes: false, no: true },
+  },
+  ...structuredClone(commonDataEntry),
+};
+
+export const checksAndCorrectionsDataEntryDSO: DSOFirstSessionResults & {
+  model: "DSOFirstSession";
+} = {
+  model: "DSOFirstSession",
+  about_report: {
+    corrigendum_present: "TwoDocuments",
+    checks_and_corrections_present: "PagePresent",
+  },
+  checks_and_corrections: {
+    reason_investigation_own_initiative: { unaccounted_difference: true, other_error: true },
+    corrected_results_own_initiative: { yes: true, no: false },
+    corrected_results_csb_request: { yes: false, no: false },
+  },
+  ...structuredClone(commonDataEntry),
+};
+
+export const noChecksAndCorrectionsDataEntryDSO: DSOFirstSessionResults & { model: "DSOFirstSession" } = {
+  model: "DSOFirstSession",
+  about_report: {
+    corrigendum_present: "OneDocument",
+    checks_and_corrections_present: "PageMissing",
+  },
+  checks_and_corrections: {
+    reason_investigation_own_initiative: { unaccounted_difference: false, other_error: false },
+    corrected_results_own_initiative: { yes: false, no: false },
+    corrected_results_csb_request: { yes: false, no: false },
+  },
+  ...structuredClone(commonDataEntry),
 };
 
 export const noRecountNoDifferencesDataEntryGSB: GSBResults & { model: "GSB" } = {
@@ -1231,6 +1267,28 @@ export const nextSessionResultsWithDifferences: NextSessionResults & { model: "C
 export const dataEntryRequest: DataEntry = {
   progress: 87,
   data: noRecountNoDifferencesDataEntry,
+  client_state: {
+    furthest: "political_group_votes_3",
+    current: "political_group_votes_3",
+    acceptedErrorsAndWarnings: [],
+    continue: true,
+  },
+};
+
+export const dataEntryRequestDSOChecksAndCorrections: DataEntry = {
+  progress: 87,
+  data: checksAndCorrectionsDataEntryDSO,
+  client_state: {
+    furthest: "political_group_votes_3",
+    current: "political_group_votes_3",
+    acceptedErrorsAndWarnings: [],
+    continue: true,
+  },
+};
+
+export const dataEntryRequestDSO: DataEntry = {
+  progress: 87,
+  data: noChecksAndCorrectionsDataEntryDSO,
   client_state: {
     furthest: "political_group_votes_3",
     current: "political_group_votes_3",

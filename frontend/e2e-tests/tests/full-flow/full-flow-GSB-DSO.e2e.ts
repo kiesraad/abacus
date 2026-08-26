@@ -2,7 +2,7 @@ import { stat } from "node:fs/promises";
 import { expect, request } from "@playwright/test";
 import { apiLogout, createUser, firstLogin, getTestPassword } from "e2e-tests/helpers-utils/e2e-test-api-helpers";
 import {
-  createDSOInvestigation,
+  createInvestigation,
   fillCandidatesListPages,
   fillDataEntryPagesAndSave,
   logout,
@@ -43,8 +43,8 @@ import { UserCreateTypePgObj } from "e2e-tests/page-objects/users/UserCreateType
 import { UserListPgObj } from "e2e-tests/page-objects/users/UserListPgObj";
 import { eml110b_single, eml230b } from "e2e-tests/test-data/eml-files";
 import {
+  checksAndCorrectionsDataEntryDSO,
   noRecountNoDifferencesDataEntry,
-  noRecountNoDifferencesDataEntryDSOChecksAndCorrections,
 } from "e2e-tests/test-data/request-response-templates";
 import type { TestUser } from "e2e-tests/test-data/users";
 import { test } from "../../fixtures";
@@ -331,7 +331,7 @@ test.describe("full flow GSB DSO", () => {
       await expect(dataEntryHomePage.feedback).toContainText(station.name);
       await dataEntryHomePage.start.click();
 
-      await fillDataEntryPagesAndSave(page, noRecountNoDifferencesDataEntryDSOChecksAndCorrections);
+      await fillDataEntryPagesAndSave(page, checksAndCorrectionsDataEntryDSO);
       await expect(dataEntryHomePage.alertDataEntrySaved).toBeVisible();
 
       await logout(page);
@@ -354,7 +354,7 @@ test.describe("full flow GSB DSO", () => {
       await expect(dataEntryHomePage.feedback).toContainText(station.name);
       await dataEntryHomePage.start.click();
 
-      await fillDataEntryPagesAndSave(page, noRecountNoDifferencesDataEntryDSOChecksAndCorrections);
+      await fillDataEntryPagesAndSave(page, checksAndCorrectionsDataEntryDSO);
       await expect(dataEntryHomePage.alertDataEntrySaved).toBeVisible();
 
       await logout(page);
@@ -492,7 +492,7 @@ test.describe("full flow GSB DSO", () => {
 
       await electionHome.investigationsOverviewButton.click();
 
-      await createDSOInvestigation(page, station.name, station.reason);
+      await createInvestigation(page, station.name, station.reason, "DSO");
       const investigationsOverviewPage = new InvestigationOverviewPgObj(page);
       await expect(investigationsOverviewPage.alert).toHaveText(
         `Onderzoek voor stembureau ${station.number} (${station.name}) toegevoegd`,

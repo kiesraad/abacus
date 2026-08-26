@@ -2,7 +2,7 @@ import { stat } from "node:fs/promises";
 import { expect, request } from "@playwright/test";
 import { apiLogout, createUser, firstLogin, getTestPassword } from "e2e-tests/helpers-utils/e2e-test-api-helpers";
 import {
-  createCSOInvestigation,
+  createInvestigation,
   fillCandidatesListPages,
   fillDataEntryPagesAndSave,
   logout,
@@ -481,7 +481,7 @@ test.describe("full flow GSB CSO", () => {
       const electionHome = new ElectionHome(page);
       await electionHome.investigationsOverviewButton.click();
 
-      await createCSOInvestigation(page, station.name, station.reason);
+      await createInvestigation(page, station.name, station.reason, "CSO");
       const investigationsOverviewPage = new InvestigationOverviewPgObj(page);
       await expect(investigationsOverviewPage.alert).toHaveText(
         `Onderzoek voor stembureau ${station.number} (${station.name}) toegevoegd`,

@@ -22,7 +22,7 @@ import { InvestigationOverviewPgObj } from "e2e-tests/page-objects/investigation
 import { InvestigationPrintCorrigendumPgObj } from "e2e-tests/page-objects/investigations/InvestigationPrintCorrigendumPgObj";
 import { InvestigationReasonPgObj } from "e2e-tests/page-objects/investigations/InvestigationReasonPgObj";
 import { UserInfoTopBar } from "e2e-tests/page-objects/nav_bar/UserInfoTopBarPgObj";
-import type { Results } from "@/types/generated/openapi";
+import type { Results, VoteCountingMethod } from "@/types/generated/openapi";
 import { type Eml230b, eml110a, eml110b } from "../test-data/eml-files";
 
 export async function fillDataEntryPages(page: Page, results: Results) {
@@ -52,32 +52,20 @@ export async function fillDataEntryPages(page: Page, results: Results) {
 
   switch (results.model) {
     case "DSOFirstSession":
-    case "DSONextSession": {
-      {
-        const differencesPage = new DifferencesPage(page);
-        await expect(differencesPage.fieldset).toBeVisible();
-        await differencesPage.fillInPageAndClickNext(results.differences_counts);
-      }
+    case "DSONextSession":
+    case "CSOFirstSession":
+    case "CSONextSession": {
+      const differencesPage = new DifferencesPage(page);
+      await expect(differencesPage.fieldset).toBeVisible();
+      await differencesPage.fillInPageAndClickNext(results.differences_counts);
       break;
     }
-
-    case "CSOFirstSession":
-    case "CSONextSession":
-      {
-        const differencesPage = new DifferencesPage(page);
-        await expect(differencesPage.fieldset).toBeVisible();
-        await differencesPage.fillInPageAndClickNext(results.differences_counts);
-      }
+    case "GSB": {
+      const gsbDifferencesPage = new GSBDifferencesPage(page);
+      await expect(gsbDifferencesPage.fieldset).toBeVisible();
+      await gsbDifferencesPage.fillInPageAndClickNext(results.differences_counts);
       break;
-
-    case "GSB":
-      {
-        const gsbDifferencesPage = new GSBDifferencesPage(page);
-        await expect(gsbDifferencesPage.fieldset).toBeVisible();
-        await gsbDifferencesPage.fillInPageAndClickNext(results.differences_counts);
-      }
-      break;
-
+    }
     default:
       // Exhaustive check
       results satisfies never;
@@ -156,31 +144,21 @@ export async function uploadPollingStations(page: Page, eml = eml110b) {
   await checkDefinitionPage.next.click();
 }
 
-export async function createCSOInvestigation(page: Page, pollingStation: string, reason: string) {
-  const investigationsOverviewPage = new InvestigationOverviewPgObj(page);
-  await investigationsOverviewPage.addInvestigationButton.click();
-
-  const addInvestigationPage = new AddInvestigationPgObj(page);
-  await expect(addInvestigationPage.header).toBeVisible();
-  await addInvestigationPage.selectPollingStation(pollingStation);
-
-  const investigationReasonPage = new InvestigationReasonPgObj(page);
-  await expect(investigationReasonPage.header).toBeVisible();
-  await investigationReasonPage.reasonField.fill(reason);
-  await investigationReasonPage.nextButton.click();
-
-  const investigationPrintCorrigendumPage = new InvestigationPrintCorrigendumPgObj(page);
-  await expect(investigationPrintCorrigendumPage.header).toBeVisible();
-  const downloadPromise = page.waitForEvent("download");
-  await investigationPrintCorrigendumPage.downloadLink.click();
-  const download = await downloadPromise;
-  expect(download.suggestedFilename()).toMatch(/Model_Na14-2_GR2022_Stembureau_\d+_Bijlage_1.pdf/);
-  expect((await stat(await download.path())).size).toBeGreaterThan(1024);
-
-  await investigationPrintCorrigendumPage.backToInvestigationsButton.click();
+function getCorrigendumFilename(countingMethod: VoteCountingMethod): RegExp {
+  switch (countingMethod) {
+    case "CSO":
+      return /Model_Na14-2_GR2022_Stembureau_\d+_Bijlage_1.pdf/;
+    case "DSO":
+      return /Model_Na14-1_versie_2_GR2022_Stembureau_\d+.pdf/;
+  }
 }
 
-export async function createDSOInvestigation(page: Page, pollingStation: string, reason: string) {
+export async function createInvestigation(
+  page: Page,
+  pollingStation: string,
+  reason: string,
+  countingMethod: VoteCountingMethod,
+) {
   const investigationsOverviewPage = new InvestigationOverviewPgObj(page);
   await investigationsOverviewPage.addInvestigationButton.click();
 
@@ -198,7 +176,7 @@ export async function createDSOInvestigation(page: Page, pollingStation: string,
   const downloadPromise = page.waitForEvent("download");
   await investigationPrintCorrigendumPage.downloadLink.click();
   const download = await downloadPromise;
-  expect(download.suggestedFilename()).toMatch(/Model_Na14-1_versie_2_GR2022_Stembureau_\d+.pdf/);
+  expect(download.suggestedFilename()).toMatch(getCorrigendumFilename(countingMethod));
   expect((await stat(await download.path())).size).toBeGreaterThan(1024);
 
   await investigationPrintCorrigendumPage.backToInvestigationsButton.click();

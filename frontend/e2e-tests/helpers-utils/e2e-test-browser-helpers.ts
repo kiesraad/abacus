@@ -1,7 +1,9 @@
 import { stat } from "node:fs/promises";
 import { expect, type Page } from "@playwright/test";
+import { AboutReportPage } from "e2e-tests/page-objects/data_entry/AboutReportPgObj";
 import { CandidatesListPage } from "e2e-tests/page-objects/data_entry/CandidatesListPgObj";
 import { CheckAndSavePage } from "e2e-tests/page-objects/data_entry/CheckAndSavePgObj";
+import { ChecksAndCorrectionsPage } from "e2e-tests/page-objects/data_entry/ChecksAndCorrectionsPgObj";
 import { CountingDifferencesPollingStationPage } from "e2e-tests/page-objects/data_entry/CountingDifferencesPollingStationPgObj";
 import { DataEntryHomePage } from "e2e-tests/page-objects/data_entry/DataEntryHomePgObj";
 import { DifferencesPage } from "e2e-tests/page-objects/data_entry/DifferencesPgObj";
@@ -20,7 +22,7 @@ import { InvestigationOverviewPgObj } from "e2e-tests/page-objects/investigation
 import { InvestigationPrintCorrigendumPgObj } from "e2e-tests/page-objects/investigations/InvestigationPrintCorrigendumPgObj";
 import { InvestigationReasonPgObj } from "e2e-tests/page-objects/investigations/InvestigationReasonPgObj";
 import { UserInfoTopBar } from "e2e-tests/page-objects/nav_bar/UserInfoTopBarPgObj";
-import type { Results } from "@/types/generated/openapi";
+import type { Results, VoteCountingMethod } from "@/types/generated/openapi";
 import { type Eml230b, eml110a, eml110b } from "../test-data/eml-files";
 
 export async function fillDataEntryPages(page: Page, results: Results) {
@@ -30,6 +32,14 @@ export async function fillDataEntryPages(page: Page, results: Results) {
 
     const countingDifferencesPollingStationPage = new CountingDifferencesPollingStationPage(page);
     await countingDifferencesPollingStationPage.fillAndClickNext(results.counting_differences_polling_station);
+  }
+
+  if (results.model === "DSOFirstSession") {
+    const aboutReportPage = new AboutReportPage(page);
+    await aboutReportPage.fillAndClickNext(results.about_report);
+
+    const checksAndCorrectionsPage = new ChecksAndCorrectionsPage(page);
+    await checksAndCorrectionsPage.fillAndClickNext(results.checks_and_corrections);
   }
 
   const votersAndVotesPage = new VotersAndVotesPage(page);
@@ -42,26 +52,20 @@ export async function fillDataEntryPages(page: Page, results: Results) {
 
   switch (results.model) {
     case "DSOFirstSession":
-    case "DSONextSession": {
-      /* TODO: https://github.com/kiesraad/abacus/issues/3691 */ break;
-    }
+    case "DSONextSession":
     case "CSOFirstSession":
-    case "CSONextSession":
-      {
-        const differencesPage = new DifferencesPage(page);
-        await expect(differencesPage.fieldset).toBeVisible();
-        await differencesPage.fillInPageAndClickNext(results.differences_counts);
-      }
+    case "CSONextSession": {
+      const differencesPage = new DifferencesPage(page);
+      await expect(differencesPage.fieldset).toBeVisible();
+      await differencesPage.fillInPageAndClickNext(results.differences_counts);
       break;
-
-    case "GSB":
-      {
-        const gsbDifferencesPage = new GSBDifferencesPage(page);
-        await expect(gsbDifferencesPage.fieldset).toBeVisible();
-        await gsbDifferencesPage.fillInPageAndClickNext(results.differences_counts);
-      }
+    }
+    case "GSB": {
+      const gsbDifferencesPage = new GSBDifferencesPage(page);
+      await expect(gsbDifferencesPage.fieldset).toBeVisible();
+      await gsbDifferencesPage.fillInPageAndClickNext(results.differences_counts);
       break;
-
+    }
     default:
       // Exhaustive check
       results satisfies never;
@@ -140,7 +144,21 @@ export async function uploadPollingStations(page: Page, eml = eml110b) {
   await checkDefinitionPage.next.click();
 }
 
-export async function createInvestigation(page: Page, pollingStation: string, reason: string) {
+function getCorrigendumFilename(countingMethod: VoteCountingMethod): RegExp {
+  switch (countingMethod) {
+    case "CSO":
+      return /Model_Na14-2_GR2022_Stembureau_\d+_Bijlage_1.pdf/;
+    case "DSO":
+      return /Model_Na14-1_versie_2_GR2022_Stembureau_\d+.pdf/;
+  }
+}
+
+export async function createInvestigation(
+  page: Page,
+  pollingStation: string,
+  reason: string,
+  countingMethod: VoteCountingMethod,
+) {
   const investigationsOverviewPage = new InvestigationOverviewPgObj(page);
   await investigationsOverviewPage.addInvestigationButton.click();
 
@@ -158,7 +176,7 @@ export async function createInvestigation(page: Page, pollingStation: string, re
   const downloadPromise = page.waitForEvent("download");
   await investigationPrintCorrigendumPage.downloadLink.click();
   const download = await downloadPromise;
-  expect(download.suggestedFilename()).toMatch(/Model_Na14-2_GR2022_Stembureau_\d+_Bijlage_1.pdf/);
+  expect(download.suggestedFilename()).toMatch(getCorrigendumFilename(countingMethod));
   expect((await stat(await download.path())).size).toBeGreaterThan(1024);
 
   await investigationPrintCorrigendumPage.backToInvestigationsButton.click();

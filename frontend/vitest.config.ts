@@ -4,9 +4,10 @@ import { storybookTest } from "@storybook/addon-vitest/vitest-plugin";
 import { playwright } from "@vitest/browser-playwright";
 import { coverageConfigDefaults, defineConfig, mergeConfig } from "vitest/config";
 
-import viteConfig from "./vite.config";
+import viteConfig from "./vite.config.ts";
 
-const dirname = typeof __dirname !== "undefined" ? __dirname : path.dirname(fileURLToPath(import.meta.url));
+const dirname =
+  typeof import.meta.dirname !== "undefined" ? import.meta.dirname : path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig((configEnv) =>
   mergeConfig(

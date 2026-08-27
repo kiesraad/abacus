@@ -111,6 +111,10 @@ export const validationResultMockData: ErrorWarningsMap<ValidationResultCode> = 
     fields: ["data.differences_counts.difference_completely_accounted_for"],
     code: "F310",
   },
+  F311: {
+    fields: ["data.differences_counts.difference_completely_accounted_for"],
+    code: "F311",
+  },
   F312: {
     fields: ["data.differences_counts.more_ballots_count", "data.differences_counts.fewer_ballots_count"],
     code: "F312",

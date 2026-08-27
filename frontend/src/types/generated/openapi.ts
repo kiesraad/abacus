@@ -1983,6 +1983,7 @@ export const validationResultCodeValues = [
   "F308",
   "F309",
   "F310",
+  "F311",
   "F312",
   "F401",
   "F402",

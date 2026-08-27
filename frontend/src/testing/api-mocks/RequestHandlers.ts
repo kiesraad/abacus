@@ -153,8 +153,8 @@ import {
   csbElectionImportMockResponse,
   electionDetailsMockResponse,
   electionImportMockResponse,
+  electionImportValidateMockResponse,
   electionListMockResponse,
-  gsbElectionImportValidateMockResponse,
   investigationListMockResponse,
 } from "./ElectionMockData";
 import { statusResponseMock } from "./ElectionStatusMockData";
@@ -376,7 +376,7 @@ export const ElectionImportValidateRequestHandler = http.post<
   ELECTION_IMPORT_VALIDATE_REQUEST_BODY,
   ElectionDefinitionValidateResponse
 >("/api/elections/import/validate" satisfies ELECTION_IMPORT_VALIDATE_REQUEST_PATH, () =>
-  HttpResponse.json(gsbElectionImportValidateMockResponse(), { status: 200 }),
+  HttpResponse.json(electionImportValidateMockResponse(), { status: 200 }),
 );
 
 export const ElectionChangeNumberOfVotersHandler = http.put<

@@ -1,8 +1,9 @@
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 import {
-  csbElectionImportValidateMockResponse,
-  gsbElectionImportValidateMockResponse,
+  csbElectionMockData,
+  electionImportValidateMockResponse,
+  electionMockData,
 } from "@/testing/api-mocks/ElectionMockData";
 import { overrideOnce } from "@/testing/server";
 import { render, renderReturningRouter, screen, waitFor } from "@/testing/test-utils";
@@ -91,7 +92,7 @@ describe("UploadCandidatesDefinition component", () => {
   });
 
   describe("Navigation after submitting the candidates hash", () => {
-    const redactedHash = gsbElectionImportValidateMockResponse().hash;
+    const redactedHash = electionImportValidateMockResponse().hash;
     const hashInputs = ["zxcv", "gfsd"];
     const fullHash = redactedHash.chunks.map((chunk, index) =>
       redactedHash.redacted_indexes.includes(index) ? hashInputs[redactedHash.redacted_indexes.indexOf(index)] : chunk,
@@ -131,7 +132,9 @@ describe("UploadCandidatesDefinition component", () => {
         "post",
         "/api/elections/import/validate",
         200,
-        committeeCategory === "CSB" ? csbElectionImportValidateMockResponse : gsbElectionImportValidateMockResponse(),
+        electionImportValidateMockResponse({
+          election: committeeCategory === "CSB" ? csbElectionMockData : electionMockData,
+        }),
       );
 
       const router = renderReturningRouter(

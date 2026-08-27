@@ -1,9 +1,6 @@
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
-import {
-  csbElectionImportValidateMockResponse,
-  gsbElectionImportValidateMockResponse,
-} from "@/testing/api-mocks/ElectionMockData";
+import { csbElectionMockData, electionImportValidateMockResponse } from "@/testing/api-mocks/ElectionMockData";
 import { overrideOnce } from "@/testing/server";
 import { renderReturningRouter, screen } from "@/testing/test-utils";
 import type { CommitteeCategory as CommitteeCategoryType, NewElection } from "@/types/generated/openapi";
@@ -27,7 +24,12 @@ describe("CommitteeCategory component", () => {
     const state = { election, committeeCategory: "GSB" as CommitteeCategoryType };
     const dispatch = vi.fn();
     vi.spyOn(useElectionCreateContext, "useElectionCreateContext").mockReturnValue({ state, dispatch });
-    overrideOnce("post", "/api/elections/import/validate", 200, gsbElectionImportValidateMockResponse(false, 2000));
+    overrideOnce(
+      "post",
+      "/api/elections/import/validate",
+      200,
+      electionImportValidateMockResponse({ matchingElection: false, numberOfVoters: 2000 }),
+    );
     const user = userEvent.setup();
 
     const router = renderReturningRouter(
@@ -53,7 +55,12 @@ describe("CommitteeCategory component", () => {
     const state = { election, committeeCategory: "CSB" as CommitteeCategoryType };
     const dispatch = vi.fn();
     vi.spyOn(useElectionCreateContext, "useElectionCreateContext").mockReturnValue({ state, dispatch });
-    overrideOnce("post", "/api/elections/import/validate", 200, csbElectionImportValidateMockResponse);
+    overrideOnce(
+      "post",
+      "/api/elections/import/validate",
+      200,
+      electionImportValidateMockResponse({ election: csbElectionMockData }),
+    );
     const user = userEvent.setup();
 
     const router = renderReturningRouter(

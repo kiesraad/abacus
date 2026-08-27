@@ -1,5 +1,6 @@
 import type {
   CommitteeSession,
+  Election,
   ElectionDefinitionValidateResponse,
   ElectionDetailsResponse,
   ElectionListResponse,
@@ -8,7 +9,9 @@ import type {
   NewElection,
   PoliticalGroup,
   PollingStationInvestigation,
-  RegisteredPoliticalGroup,
+  RedactedEmlHash,
+  RegionDetails,
+  RegionKey,
 } from "@/types/generated/openapi";
 
 import {
@@ -253,46 +256,44 @@ export const politicalGroupsMockData: PoliticalGroup[] = [
   },
 ];
 
+const baseElectionGR = {
+  name: "Gemeenteraadsverkiezingen 2026",
+  election_id: "GR2024_Heemdamseburg",
+  location: "Heemdamseburg",
+  authority_id: "0035",
+  authority_name: "Heemdamseburg",
+  authority_region: "Heemdamseburg",
+  district: { district: "None" },
+  domain: { id: "0035", name: "Heemdamseburg" },
+  category: "Municipal",
+  sub_category: "GR2",
+  number_of_seats: 29,
+  election_date: "2024-11-30",
+  nomination_date: "2024-11-01",
+} satisfies Omit<Election, "id" | "committee_category" | "number_of_voters">;
+
+const baseElectionPS = {
+  name: "Provinciale Staten Juinen 2027",
+  election_id: "PS2027_Juinen",
+  location: "Juinen",
+  authority_id: "CSB",
+  authority_name: "Juinen",
+  authority_region: "Juinen",
+  district: { district: "None" },
+  domain: { name: "Juinen" },
+  category: "Provincial",
+  sub_category: "PS1",
+  number_of_seats: 29,
+  election_date: "2024-11-30",
+  nomination_date: "2024-11-01",
+} satisfies Omit<Election, "id" | "committee_category" | "number_of_voters">;
+
 export const electionListMockResponse: ElectionListResponse = {
   committee_sessions: [committeeSessionMockData],
   elections: [
-    {
-      id: 1,
-      name: "Gemeenteraadsverkiezingen 2026",
-      committee_category: "GSB",
-      counting_method: "CSO",
-      election_id: "GR2024_Heemdamseburg",
-      location: "Heemdamseburg",
-      authority_id: "0035",
-      authority_name: "Heemdamseburg",
-      authority_region: "Heemdamseburg",
-      district: { district: "None" },
-      domain: { id: "0035", name: "Heemdamseburg" },
-      category: "Municipal",
-      sub_category: "GR2",
-      number_of_seats: 29,
-      number_of_voters: 2000,
-      election_date: "2024-11-30",
-      nomination_date: "2024-11-01",
-    },
-    {
-      id: 2,
-      name: "Gemeenteraadsverkiezingen 2026",
-      committee_category: "CSB",
-      election_id: "GR2024_Heemdamseburg",
-      location: "Heemdamseburg",
-      authority_id: "0035",
-      authority_name: "Heemdamseburg",
-      authority_region: "Heemdamseburg",
-      district: { district: "None" },
-      domain: { id: "0035", name: "Heemdamseburg" },
-      category: "Municipal",
-      sub_category: "GR2",
-      number_of_seats: 29,
-      number_of_voters: 0,
-      election_date: "2024-11-30",
-      nomination_date: "2024-11-01",
-    },
+    { ...baseElectionGR, id: 1, committee_category: "GSB", counting_method: "CSO", number_of_voters: 2000 },
+    { ...baseElectionGR, id: 2, committee_category: "CSB", number_of_voters: 0 },
+    { ...baseElectionPS, id: 3, committee_category: "GSB", counting_method: "CSO", number_of_voters: 2000 },
   ],
 };
 
@@ -375,49 +376,23 @@ export const getCSBElectionMockData = (
   };
 };
 
-export const getInvestigationMockData = (
-  investigations: PollingStationInvestigation[] = mockInvestigations,
-): InvestigationListResponse => {
-  return {
-    investigations,
-  };
-};
-
-export const investigationListMockResponse: InvestigationListResponse = getInvestigationMockData();
+export const investigationListMockResponse: InvestigationListResponse = { investigations: mockInvestigations };
 export const electionDetailsMockResponse: Required<ElectionDetailsResponse> = getElectionMockData();
 export const csbElectionDetailsMockResponse: Required<ElectionDetailsResponse> = getCSBElectionMockData();
 export const electionMockData = electionDetailsMockResponse.election;
 export const csbElectionMockData = csbElectionDetailsMockResponse.election;
+export const provincialElectionMockData = electionListMockResponse.elections[2]!;
 
-export function getRegisteredPoliticalGroupsFromPoliticalGroups(
-  political_groups: PoliticalGroup[],
-): RegisteredPoliticalGroup[] {
-  const registered_political_groups: RegisteredPoliticalGroup[] = [];
-  political_groups.forEach((pg) => {
-    registered_political_groups.push({
-      ...pg,
-      registered_name: pg.name,
-    } satisfies RegisteredPoliticalGroup);
-  });
-  return registered_political_groups;
+export function getNewElectionMockData(election: Election = electionMockData): NewElection {
+  return {
+    ...election,
+    political_groups: politicalGroupsMockData.map((pg) => ({ ...pg, registered_name: pg.name })),
+  };
 }
 
-export const newElectionMockData = {
-  ...electionDetailsMockResponse.election,
-  political_groups: getRegisteredPoliticalGroupsFromPoliticalGroups(politicalGroupsMockData),
-} satisfies NewElection;
-
-export const newCSBElectionMockData = {
-  ...csbElectionDetailsMockResponse.election,
-  political_groups: getRegisteredPoliticalGroupsFromPoliticalGroups(politicalGroupsMockData),
-  committee_category: "CSB",
-} satisfies NewElection;
-
-export const electionImportMockResponse: ElectionWithPoliticalGroups = {
+const baseImportedElectionGR = {
   id: 2,
   name: "Gemeenteraad Test 2022",
-  committee_category: "GSB",
-  counting_method: "CSO",
   election_id: "GR2022_Test",
   location: "Test",
   authority_id: "0000",
@@ -428,89 +403,115 @@ export const electionImportMockResponse: ElectionWithPoliticalGroups = {
   category: "Municipal",
   sub_category: "GR2",
   number_of_seats: 45,
-  number_of_voters: 2000,
   election_date: "2022-03-16",
   nomination_date: "2022-01-31",
+} satisfies Omit<ElectionWithPoliticalGroups, "committee_category" | "number_of_voters" | "political_groups">;
+
+export const electionImportMockResponse: ElectionWithPoliticalGroups = {
+  ...baseImportedElectionGR,
+  committee_category: "GSB",
+  counting_method: "CSO",
+  number_of_voters: 2000,
   political_groups: politicalGroupsMockData,
 };
 
 export const csbElectionImportMockResponse: ElectionWithPoliticalGroups = {
-  id: 2,
-  name: "Gemeenteraad Test 2022",
+  ...baseImportedElectionGR,
   committee_category: "CSB",
-  election_id: "GR2022_Test",
-  location: "Test",
-  authority_id: "0000",
-  authority_name: "Test",
-  authority_region: "Test",
-  district: { district: "None" },
-  domain: { id: "0000", name: "Test" },
-  category: "Municipal",
-  sub_category: "GR2",
-  number_of_seats: 45,
   number_of_voters: 0,
-  election_date: "2022-03-16",
-  nomination_date: "2022-01-31",
   political_groups: [],
 };
 
-export const gsbElectionImportValidateMockResponse = (
-  matching_election: boolean = true,
-  number_of_voters: number = 0,
-): ElectionDefinitionValidateResponse => {
-  return {
-    committee_category: "GSB",
-    hash: {
-      chunks: [
-        "asdf",
-        "qwer",
-        "",
-        "tyui",
-        "ghjk",
-        "bnml",
-        "1234",
-        "5678",
-        "8765",
-        "",
-        "a345",
-        "qwer",
-        "lgmg",
-        "thnr",
-        "nytf",
-        "sdfr",
-      ],
-      redacted_indexes: [2, 9],
-    },
-    gsb_list: [],
-    election: newElectionMockData,
-    polling_stations: pollingStationMockData,
-    polling_station_definition_matches_election: matching_election,
-    number_of_voters: number_of_voters,
-  };
+const redactedHash: RedactedEmlHash = {
+  chunks: [
+    "asdf",
+    "qwer",
+    "",
+    "tyui",
+    "ghjk",
+    "bnml",
+    "1234",
+    "5678",
+    "8765",
+    "",
+    "a345",
+    "qwer",
+    "lgmg",
+    "thnr",
+    "nytf",
+    "sdfr",
+  ],
+  redacted_indexes: [2, 9],
 };
 
-export const csbElectionImportValidateMockResponse: ElectionDefinitionValidateResponse = {
-  committee_category: "CSB",
-  hash: {
-    chunks: [
-      "asdf",
-      "qwer",
-      "",
-      "tyui",
-      "ghjk",
-      "bnml",
-      "1234",
-      "5678",
-      "8765",
-      "",
-      "a345",
-      "qwer",
-      "lgmg",
-      "thnr",
-      "nytf",
-      "sdfr",
-    ],
-    redacted_indexes: [2, 9],
+export const gsbListMockData: RegionDetails[] = [
+  {
+    name: "Wegenstede",
+    key: { category: "Municipality", number: 20 },
+    roman_numerals: false,
+    frisian_export_allowed: true,
   },
-  election: newCSBElectionMockData,
-};
+  {
+    name: "Súdwest-Eemstricht",
+    key: { category: "Municipality", number: 123 },
+    roman_numerals: false,
+    frisian_export_allowed: true,
+  },
+  {
+    name: "Sud-Test",
+    key: { category: "Municipality", number: 5678 },
+    roman_numerals: false,
+    frisian_export_allowed: true,
+  },
+  {
+    name: "'s Gravenveen",
+    key: { category: "Municipality", number: 55 },
+    roman_numerals: false,
+    frisian_export_allowed: true,
+  },
+];
+
+interface ElectionImportValidateMockOptions {
+  election?: Election;
+  matchingElection?: boolean;
+  numberOfVoters?: number;
+  gsbSelected?: RegionKey;
+}
+
+/// Get a mock response for election import validaton
+/// Defaults to GSB
+export function electionImportValidateMockResponse({
+  election,
+  matchingElection = true,
+  numberOfVoters = 0,
+  gsbSelected,
+}: ElectionImportValidateMockOptions = {}): ElectionDefinitionValidateResponse {
+  const baseElection = election ? getNewElectionMockData(election) : getNewElectionMockData();
+
+  if (baseElection.committee_category === "CSB") {
+    return {
+      committee_category: "CSB",
+      election: baseElection,
+      hash: redactedHash,
+    };
+  }
+
+  const gsb = gsbListMockData.find((region) => region.key.number === gsbSelected?.number);
+  return {
+    committee_category: "GSB",
+    hash: redactedHash,
+    gsb_list: baseElection.category === "Municipal" ? [] : gsbListMockData,
+    election: gsb
+      ? {
+          ...baseElection,
+          location: gsb.name,
+          authority_id: String(gsb.key.number).padStart(4, "0"),
+          authority_name: gsb.name,
+          authority_region: gsb.name,
+        }
+      : baseElection,
+    polling_stations: pollingStationMockData,
+    polling_station_definition_matches_election: matchingElection,
+    number_of_voters: numberOfVoters,
+  };
+}

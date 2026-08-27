@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, within } from "storybook/test";
-import { newCSBElectionMockData, newElectionMockData } from "@/testing/api-mocks/ElectionMockData";
+import { csbElectionMockData, getNewElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
 import { ImportedElectionInformation } from "./ImportedElectionInformation";
 
@@ -13,7 +13,7 @@ type Story = StoryObj<typeof meta>;
 
 export const GSB_CSO: Story = {
   args: {
-    election: newElectionMockData,
+    election: getNewElectionMockData(),
     committeeCategory: "GSB",
     pollingStations: pollingStationMockData,
     countingMethod: "CSO",
@@ -43,7 +43,7 @@ export const GSB_CSO: Story = {
 
 export const GSB_DSO_WithoutPollingStations: Story = {
   args: {
-    election: newElectionMockData,
+    election: getNewElectionMockData(),
     committeeCategory: "GSB",
     countingMethod: "DSO",
     numberOfVoters: 1234,
@@ -71,7 +71,7 @@ export const GSB_DSO_WithoutPollingStations: Story = {
 
 export const CSB: Story = {
   args: {
-    election: newCSBElectionMockData,
+    election: getNewElectionMockData(csbElectionMockData),
     committeeCategory: "CSB",
   },
   play: async ({ canvas }) => {

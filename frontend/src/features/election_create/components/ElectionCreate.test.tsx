@@ -7,10 +7,9 @@ import { ApiProvider } from "@/api/ApiProvider";
 import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
 import * as useMessages from "@/hooks/messages/useMessages";
 import {
-  csbElectionImportValidateMockResponse,
-  gsbElectionImportValidateMockResponse,
-  newCSBElectionMockData,
-  newElectionMockData,
+  csbElectionMockData,
+  electionImportValidateMockResponse,
+  electionMockData,
 } from "@/testing/api-mocks/ElectionMockData";
 import {
   CSBElectionImportRequestHandler,
@@ -74,9 +73,19 @@ function renderWithRouter() {
 async function uploadElectionDefinition(router: Router, file: File, committeeCategory: CommitteeCategory = "GSB") {
   const user = userEvent.setup();
   if (committeeCategory === "CSB") {
-    overrideOnce("post", "/api/elections/import/validate", 200, csbElectionImportValidateMockResponse);
+    overrideOnce(
+      "post",
+      "/api/elections/import/validate",
+      200,
+      electionImportValidateMockResponse({ election: csbElectionMockData }),
+    );
   } else {
-    overrideOnce("post", "/api/elections/import/validate", 200, gsbElectionImportValidateMockResponse(true, 2000));
+    overrideOnce(
+      "post",
+      "/api/elections/import/validate",
+      200,
+      electionImportValidateMockResponse({ numberOfVoters: 2000 }),
+    );
   }
   await router.navigate("/elections/create");
 
@@ -98,15 +107,25 @@ async function inputElectionHash(committeeCategory: CommitteeCategory = "GSB") {
   const user = userEvent.setup();
 
   if (committeeCategory === "CSB") {
-    overrideOnce("post", "/api/elections/import/validate", 200, csbElectionImportValidateMockResponse);
+    overrideOnce(
+      "post",
+      "/api/elections/import/validate",
+      200,
+      electionImportValidateMockResponse({ election: csbElectionMockData }),
+    );
 
     // Wait for the page to be loaded and expect the election name to be present
-    expect(await screen.findByText(newCSBElectionMockData.name)).toBeInTheDocument();
+    expect(await screen.findByText(csbElectionMockData.name)).toBeInTheDocument();
   } else {
-    overrideOnce("post", "/api/elections/import/validate", 200, gsbElectionImportValidateMockResponse(false, 2000));
+    overrideOnce(
+      "post",
+      "/api/elections/import/validate",
+      200,
+      electionImportValidateMockResponse({ matchingElection: false, numberOfVoters: 2000 }),
+    );
 
     // Wait for the page to be loaded and expect the election name to be present
-    expect(await screen.findByText(newElectionMockData.name)).toBeInTheDocument();
+    expect(await screen.findByText(electionMockData.name)).toBeInTheDocument();
   }
 
   const inputPart1 = screen.getByRole("textbox", { name: "Controle deel 1" });
@@ -126,7 +145,12 @@ async function setCommitteeCategory(committeeCategory: CommitteeCategory = "GSB"
   const user = userEvent.setup();
 
   if (committeeCategory === "CSB") {
-    overrideOnce("post", "/api/elections/import/validate", 200, csbElectionImportValidateMockResponse);
+    overrideOnce(
+      "post",
+      "/api/elections/import/validate",
+      200,
+      electionImportValidateMockResponse({ election: csbElectionMockData }),
+    );
 
     expect(await screen.findByRole("heading", { level: 2, name: "Type stembureau" })).toBeInTheDocument();
     await waitFor(() => {
@@ -135,7 +159,12 @@ async function setCommitteeCategory(committeeCategory: CommitteeCategory = "GSB"
     expect(screen.getByRole("radio", { name: "Centraal stembureau (CSB)" })).toBeChecked();
     expect(screen.getByRole("radio", { name: "Gemeentelijk stembureau (GSB)" })).not.toBeChecked();
   } else {
-    overrideOnce("post", "/api/elections/import/validate", 200, gsbElectionImportValidateMockResponse(true, 2000));
+    overrideOnce(
+      "post",
+      "/api/elections/import/validate",
+      200,
+      electionImportValidateMockResponse({ numberOfVoters: 2000 }),
+    );
     await waitFor(() => {
       screen.getByRole("radio", { name: "Gemeentelijk stembureau (GSB)" }).click();
     });
@@ -153,9 +182,19 @@ async function setCommitteeCategory(committeeCategory: CommitteeCategory = "GSB"
 async function uploadCandidateDefinition(file: File, committeeCategory: CommitteeCategory = "GSB") {
   const user = userEvent.setup();
   if (committeeCategory === "CSB") {
-    overrideOnce("post", "/api/elections/import/validate", 200, csbElectionImportValidateMockResponse);
+    overrideOnce(
+      "post",
+      "/api/elections/import/validate",
+      200,
+      electionImportValidateMockResponse({ election: csbElectionMockData }),
+    );
   } else {
-    overrideOnce("post", "/api/elections/import/validate", 200, gsbElectionImportValidateMockResponse(true, 2000));
+    overrideOnce(
+      "post",
+      "/api/elections/import/validate",
+      200,
+      electionImportValidateMockResponse({ numberOfVoters: 2000 }),
+    );
   }
 
   // Wait for the candidate page to be loaded
@@ -176,9 +215,19 @@ async function uploadCandidateDefinition(file: File, committeeCategory: Committe
 async function inputCandidateHash(committeeCategory: CommitteeCategory = "GSB") {
   const user = userEvent.setup();
   if (committeeCategory === "CSB") {
-    overrideOnce("post", "/api/elections/import/validate", 200, csbElectionImportValidateMockResponse);
+    overrideOnce(
+      "post",
+      "/api/elections/import/validate",
+      200,
+      electionImportValidateMockResponse({ election: csbElectionMockData }),
+    );
   } else {
-    overrideOnce("post", "/api/elections/import/validate", 200, gsbElectionImportValidateMockResponse(true, 2000));
+    overrideOnce(
+      "post",
+      "/api/elections/import/validate",
+      200,
+      electionImportValidateMockResponse({ numberOfVoters: 2000 }),
+    );
   }
 
   const inputPart1 = screen.getByRole("textbox", { name: "Controle deel 1" });
@@ -200,7 +249,7 @@ async function uploadPollingStationList(file: File, matching_election: boolean, 
     "post",
     "/api/elections/import/validate",
     200,
-    gsbElectionImportValidateMockResponse(matching_election, number_of_voters),
+    electionImportValidateMockResponse({ matchingElection: matching_election, numberOfVoters: number_of_voters }),
   );
 
   // Wait for the polling station list page to be loaded
@@ -221,7 +270,12 @@ describe("Election create pages", () => {
 
   describe("Confirmation modal", () => {
     test("Shown when the abort button is clicked", async () => {
-      overrideOnce("post", "/api/elections/import/validate", 200, gsbElectionImportValidateMockResponse(false, 2000));
+      overrideOnce(
+        "post",
+        "/api/elections/import/validate",
+        200,
+        electionImportValidateMockResponse({ matchingElection: false, numberOfVoters: 2000 }),
+      );
 
       const router = renderWithRouter();
       const user = userEvent.setup();
@@ -245,7 +299,12 @@ describe("Election create pages", () => {
     });
 
     test("Shown when attempting to navigate away", async () => {
-      overrideOnce("post", "/api/elections/import/validate", 200, gsbElectionImportValidateMockResponse(true, 2000));
+      overrideOnce(
+        "post",
+        "/api/elections/import/validate",
+        200,
+        electionImportValidateMockResponse({ numberOfVoters: 2000 }),
+      );
 
       const router = renderWithRouter();
       const user = userEvent.setup();
@@ -272,7 +331,12 @@ describe("Election create pages", () => {
 
     test("Not shown when attempting to navigate away if nothing was done", async () => {
       vi.spyOn(console, "warn").mockImplementation(() => {});
-      overrideOnce("post", "/api/elections/import/validate", 200, gsbElectionImportValidateMockResponse(true, 2000));
+      overrideOnce(
+        "post",
+        "/api/elections/import/validate",
+        200,
+        electionImportValidateMockResponse({ numberOfVoters: 2000 }),
+      );
 
       const router = renderWithRouter();
       const user = userEvent.setup();
@@ -291,7 +355,12 @@ describe("Election create pages", () => {
     });
 
     test("Cancel button closes the modal", async () => {
-      overrideOnce("post", "/api/elections/import/validate", 200, gsbElectionImportValidateMockResponse(true, 2000));
+      overrideOnce(
+        "post",
+        "/api/elections/import/validate",
+        200,
+        electionImportValidateMockResponse({ numberOfVoters: 2000 }),
+      );
 
       const router = renderWithRouter();
       const user = userEvent.setup();
@@ -322,7 +391,12 @@ describe("Election create pages", () => {
     });
 
     test("Delete button closes the modal", async () => {
-      overrideOnce("post", "/api/elections/import/validate", 200, gsbElectionImportValidateMockResponse(true, 2000));
+      overrideOnce(
+        "post",
+        "/api/elections/import/validate",
+        200,
+        electionImportValidateMockResponse({ numberOfVoters: 2000 }),
+      );
 
       const router = renderWithRouter();
       const user = userEvent.setup();
@@ -354,7 +428,12 @@ describe("Election create pages", () => {
     });
 
     test("Close button closes the modal", async () => {
-      overrideOnce("post", "/api/elections/import/validate", 200, gsbElectionImportValidateMockResponse(true, 2000));
+      overrideOnce(
+        "post",
+        "/api/elections/import/validate",
+        200,
+        electionImportValidateMockResponse({ numberOfVoters: 2000 }),
+      );
 
       const router = renderWithRouter();
       const user = userEvent.setup();

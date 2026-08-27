@@ -10,7 +10,7 @@ import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMo
 import { overrideOnce, server } from "@/testing/server";
 import { render, screen } from "@/testing/test-utils";
 import { getTypistUser } from "@/testing/user-mock-data";
-import { getDefaultDSODataEntryState } from "../../testing/mock-data";
+import { getDefaultDataEntryState } from "../../testing/mock-data";
 import { overrideServerClaimDataEntryResponse } from "../../testing/test.utils";
 import { DataEntryProvider } from "../DataEntryProvider";
 import { DataEntrySection } from "../DataEntrySection";
@@ -41,7 +41,7 @@ describe("Test AboutReportForm errors", () => {
     const user = userEvent.setup();
 
     overrideServerClaimDataEntryResponse({
-      formState: getDefaultDSODataEntryState().formState,
+      formState: getDefaultDataEntryState("DSOFirstSession").formState,
       results: {},
       model: "DSOFirstSession",
     });
@@ -69,7 +69,7 @@ describe("Test AboutReportForm errors", () => {
   test("F.122 TwoDocuments but PageMissing", async () => {
     const user = userEvent.setup();
     overrideServerClaimDataEntryResponse({
-      formState: getDefaultDSODataEntryState().formState,
+      formState: getDefaultDataEntryState("DSOFirstSession").formState,
       results: {},
       model: "DSOFirstSession",
     });

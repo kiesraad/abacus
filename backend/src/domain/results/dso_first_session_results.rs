@@ -3,6 +3,7 @@ use utoipa::ToSchema;
 
 use crate::domain::{
     compare::Compare,
+    election::ElectionWithPoliticalGroups,
     field_path::FieldPath,
     results::{
         PollingStationResults,
@@ -14,14 +15,14 @@ use crate::domain::{
         votes_counts::VotesCounts,
         yes_no::YesNo,
     },
-    validate::{DataError, Validate, ValidationResult, ValidationResultCode},
+    validate::{DataError, Validate, ValidationResult, ValidationResultCode, ValidationResults},
 };
 
 /// DSOFirstSessionResults, following the fields in Model N 10-1
 ///
 /// See: Model N 10-1 (Proces-verbaal van een stembureau) from
 /// [kiesraad](https://www.kiesraad.nl/documenten/2025/11/27/n-10-1-pv-sb-dso)
-#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
 pub struct DSOFirstSessionResults {
     /// About report ("Over het proces-verbaal")
     pub about_report: AboutReport,
@@ -81,10 +82,9 @@ impl Validate for DSOFirstSessionResults {
     #[expect(clippy::too_many_lines)]
     fn validate(
         &self,
-        election: &crate::domain::election::ElectionWithPoliticalGroups,
+        election: &ElectionWithPoliticalGroups,
         path: &FieldPath,
-    ) -> Result<crate::domain::validate::ValidationResults, crate::domain::validate::DataError>
-    {
+    ) -> Result<ValidationResults, DataError> {
         // Invalid state check
         if let (Some(ChecksAndCorrectionsPresent::PageMissing), false) = (
             self.about_report.checks_and_corrections_present,
@@ -171,6 +171,24 @@ impl Validate for DSOFirstSessionResults {
             }
         };
 
+        let difference_accounted_for = &self.differences_counts.difference_completely_accounted_for;
+        let own_investigation_unaccounted_difference = self
+            .checks_and_corrections
+            .reason_investigation_own_initiative
+            .unaccounted_difference;
+
+        if difference_accounted_for == &YesNo::no() && !own_investigation_unaccounted_difference {
+            validation_results.errors.push(ValidationResult {
+                fields: vec![
+                    path.field("differences_counts")
+                        .field("difference_completely_accounted_for")
+                        .to_string(),
+                ],
+                code: ValidationResultCode::F311,
+                context: None,
+            });
+        }
+
         validation_results.join(self.as_common().validate(election, path)?);
         Ok(validation_results)
     }
@@ -191,7 +209,7 @@ mod tests {
             yes_no::YesNo,
         },
         validate::{
-            DataError, Validate, ValidationResult, ValidationResultCode, ValidationResults,
+            DataError, ValidateRoot, ValidationResult, ValidationResultCode, ValidationResults,
         },
     };
 
@@ -217,10 +235,11 @@ mod tests {
             differences_counts: DifferencesCounts::default(),
             political_group_votes: vec![],
         })
-        .validate(
-            &election_fixture(ElectionCategory::Municipal, CommitteeCategory::GSB, &[]),
-            &"data".into(),
-        )?;
+        .start_validate(&election_fixture(
+            ElectionCategory::Municipal,
+            CommitteeCategory::GSB,
+            &[],
+        ))?;
 
         assert_eq!(validation_results.warnings.len(), 1);
 
@@ -318,9 +337,9 @@ mod tests {
                 corrected_results_own_initiative,
                 corrected_results_csb_request,
             )?;
-            let has_f131 = result.errors.iter().any(|e| e == &f131);
             assert_eq!(
-                has_f131, expect_f131,
+                result.errors.contains(&f131),
+                expect_f131,
                 "Case #{case_index} failed: reason_investigation_own_initiative: {reason_investigation_own_initiative:?}, corrected_results_own_initiative: {corrected_results_own_initiative:?}, corrected_results_csb_request: {corrected_results_csb_request:?}"
             );
         }
@@ -415,9 +434,9 @@ mod tests {
                 corrected_results_csb_request,
             )?;
 
-            let has_f132 = result.errors.iter().any(|e| e == &f132);
             assert_eq!(
-                has_f132, expect_f132,
+                result.errors.contains(&f132),
+                expect_f132,
                 "Case #{case_index} failed: corrigendum_present: {corrigendum_present:?}, reason_investigation_own_initiative: {reason_investigation_own_initiative:?}, corrected_results_own_initiative: {corrected_results_own_initiative:?}, corrected_results_csb_request: {corrected_results_csb_request:?}"
             );
         }
@@ -492,9 +511,9 @@ mod tests {
                 corrected_results_own_initiative,
                 corrected_results_csb_request,
             )?;
-            let has_f133 = result.errors.iter().any(|e| e == &f133);
             assert_eq!(
-                has_f133, expect_f133,
+                result.errors.contains(&f133),
+                expect_f133,
                 "Case #{case_index} failed: reason_investigation_own_initiative: {reason_investigation_own_initiative:?}, corrected_results_own_initiative: {corrected_results_own_initiative:?}, corrected_results_csb_request: {corrected_results_csb_request:?}"
             );
         }
@@ -566,9 +585,9 @@ mod tests {
                 corrected_results_own_initiative,
                 corrected_results_csb_request,
             )?;
-            let has_f134 = result.errors.iter().any(|e| e == &f134);
             assert_eq!(
-                has_f134, expect_f134,
+                result.errors.contains(&f134),
+                expect_f134,
                 "Case #{case_index} failed: reason_investigation_own_initiative: {reason_investigation_own_initiative:?}, corrected_results_own_initiative: {corrected_results_own_initiative:?}, corrected_results_csb_request: {corrected_results_csb_request:?}"
             );
         }
@@ -627,10 +646,57 @@ mod tests {
                 corrected_results_own_initiative,
                 corrected_results_csb_request,
             )?;
-            let has_f135 = result.errors.iter().any(|e| e == &f135);
             assert_eq!(
-                has_f135, expect_f135,
+                result.errors.contains(&f135),
+                expect_f135,
                 "Case #{case_index} failed: reason_investigation_own_initiative: {reason_investigation_own_initiative:?}, corrected_results_own_initiative: {corrected_results_own_initiative:?}, corrected_results_csb_request: {corrected_results_csb_request:?}"
+            );
+        }
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_f311() -> Result<(), DataError> {
+        // (unaccounted_difference (own_initiative), difference_accounted_for (differences_counts), expect_f311)
+        let scenarios = [
+            (false, YesNo::yes(), false),
+            (false, YesNo::no(), true),
+            (false, YesNo::default(), false),
+            (false, YesNo::both(), false),
+            (true, YesNo::yes(), false),
+            (true, YesNo::no(), false),
+            (true, YesNo::default(), false),
+            (true, YesNo::both(), false),
+        ];
+
+        let election = election_fixture(ElectionCategory::Municipal, CommitteeCategory::GSB, &[]);
+
+        let f311 = ValidationResult {
+            code: ValidationResultCode::F311,
+            fields: vec!["data.differences_counts.difference_completely_accounted_for".into()],
+            context: None,
+        };
+
+        for (unaccounted_difference, difference_accounted_for, expect_f311) in scenarios {
+            let mut results = DSOFirstSessionResults::default();
+            results
+                .checks_and_corrections
+                .reason_investigation_own_initiative
+                .unaccounted_difference = unaccounted_difference;
+            results
+                .differences_counts
+                .difference_completely_accounted_for = difference_accounted_for;
+
+            let validation_results = Results::DSOFirstSession(results).start_validate(&election)?;
+
+            assert_eq!(
+                validation_results.errors.contains(&f311),
+                expect_f311,
+                "Failed for scenario {:?}, {:?}, expected {:?}",
+                unaccounted_difference,
+                difference_accounted_for,
+                validation_results.errors
             );
         }
 

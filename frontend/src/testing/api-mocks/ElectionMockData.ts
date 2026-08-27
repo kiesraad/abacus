@@ -1,6 +1,8 @@
 import type {
+  CommitteeCategory,
   CommitteeSession,
   Election,
+  ElectionCategory,
   ElectionDefinitionValidateResponse,
   ElectionDetailsResponse,
   ElectionListResponse,
@@ -276,7 +278,7 @@ const baseElectionPS = {
   name: "Provinciale Staten Juinen 2027",
   election_id: "PS2027_Juinen",
   location: "Juinen",
-  authority_id: "CSB",
+  authority_id: "0036",
   authority_name: "Juinen",
   authority_region: "Juinen",
   district: { district: "None" },
@@ -288,12 +290,36 @@ const baseElectionPS = {
   nomination_date: "2024-11-01",
 } satisfies Omit<Election, "id" | "committee_category" | "number_of_voters">;
 
+const baseElectionAB = {
+  name: "Waterschap Juinen 2027",
+  election_id: "AB2027_Juinen",
+  location: "Juinen",
+  authority_id: "0037",
+  authority_name: "Juinen",
+  authority_region: "Juinen",
+  district: { district: "None" },
+  domain: { id: "0037", name: "Juinen" },
+  category: "WaterAuthority",
+  sub_category: "AB2",
+  number_of_seats: 29,
+  election_date: "2024-11-30",
+  nomination_date: "2024-11-01",
+} satisfies Omit<Election, "id" | "committee_category" | "number_of_voters">;
+
+const baseElections = {
+  Municipal: baseElectionGR,
+  Provincial: baseElectionPS,
+  WaterAuthority: baseElectionAB,
+} satisfies Record<ElectionCategory, Omit<Election, "id" | "committee_category" | "number_of_voters">>;
+
 export const electionListMockResponse: ElectionListResponse = {
   committee_sessions: [committeeSessionMockData],
   elections: [
     { ...baseElectionGR, id: 1, committee_category: "GSB", counting_method: "CSO", number_of_voters: 2000 },
     { ...baseElectionGR, id: 2, committee_category: "CSB", number_of_voters: 0 },
-    { ...baseElectionPS, id: 3, committee_category: "GSB", counting_method: "CSO", number_of_voters: 2000 },
+    { ...baseElectionAB, id: 3, committee_category: "GSB", counting_method: "CSO", number_of_voters: 2000 },
+    { ...baseElectionAB, id: 4, committee_category: "CSB", counting_method: "CSO", number_of_voters: 2000 },
+    { ...baseElectionPS, id: 5, committee_category: "GSB", counting_method: "CSO", number_of_voters: 2000 },
   ],
 };
 
@@ -379,9 +405,13 @@ export const getCSBElectionMockData = (
 export const investigationListMockResponse: InvestigationListResponse = { investigations: mockInvestigations };
 export const electionDetailsMockResponse: Required<ElectionDetailsResponse> = getElectionMockData();
 export const csbElectionDetailsMockResponse: Required<ElectionDetailsResponse> = getCSBElectionMockData();
+
 export const electionMockData = electionDetailsMockResponse.election;
+export const provincialElectionMockData = getElectionMockData(electionListMockResponse.elections[4]).election;
+export const waterAuthorityElectionMockData = getElectionMockData(electionListMockResponse.elections[2]).election;
+
 export const csbElectionMockData = csbElectionDetailsMockResponse.election;
-export const provincialElectionMockData = electionListMockResponse.elections[2]!;
+export const csbWaterAuthorityElectionMockData = getCSBElectionMockData(electionListMockResponse.elections[3]).election;
 
 export function getNewElectionMockData(election: Election = electionMockData): NewElection {
   return {
@@ -390,37 +420,31 @@ export function getNewElectionMockData(election: Election = electionMockData): N
   };
 }
 
-const baseImportedElectionGR = {
-  id: 2,
-  name: "Gemeenteraad Test 2022",
-  election_id: "GR2022_Test",
-  location: "Test",
-  authority_id: "0000",
-  authority_name: "Test",
-  authority_region: "Test",
-  district: { district: "None" },
-  domain: { id: "0000", name: "Test" },
-  category: "Municipal",
-  sub_category: "GR2",
-  number_of_seats: 45,
-  election_date: "2022-03-16",
-  nomination_date: "2022-01-31",
-} satisfies Omit<ElectionWithPoliticalGroups, "committee_category" | "number_of_voters" | "political_groups">;
+interface ElectionImportMockOptions {
+  category?: ElectionCategory;
+  committeeCategory?: CommitteeCategory;
+}
 
-export const electionImportMockResponse: ElectionWithPoliticalGroups = {
-  ...baseImportedElectionGR,
-  committee_category: "GSB",
-  counting_method: "CSO",
-  number_of_voters: 2000,
-  political_groups: politicalGroupsMockData,
-};
+/// Get a mock response for election import
+/// Defaults to a GSB for a municipal election
+export function electionImportMockResponse({
+  category = "Municipal",
+  committeeCategory = "GSB",
+}: ElectionImportMockOptions = {}): ElectionWithPoliticalGroups {
+  const election = { ...baseElections[category], id: 1 };
 
-export const csbElectionImportMockResponse: ElectionWithPoliticalGroups = {
-  ...baseImportedElectionGR,
-  committee_category: "CSB",
-  number_of_voters: 0,
-  political_groups: [],
-};
+  if (committeeCategory === "CSB") {
+    return { ...election, committee_category: "CSB", number_of_voters: 0, political_groups: [] };
+  }
+
+  return {
+    ...election,
+    committee_category: "GSB",
+    counting_method: "CSO",
+    number_of_voters: 2000,
+    political_groups: politicalGroupsMockData,
+  };
+}
 
 const redactedHash: RedactedEmlHash = {
   chunks: [
@@ -471,7 +495,7 @@ export const gsbListMockData: RegionDetails[] = [
   },
 ];
 
-interface ElectionImportValidateMockOptions {
+export interface ElectionImportValidateMockOptions {
   election?: Election;
   matchingElection?: boolean;
   numberOfVoters?: number;
@@ -479,7 +503,7 @@ interface ElectionImportValidateMockOptions {
 }
 
 /// Get a mock response for election import validaton
-/// Defaults to GSB
+/// Defaults to GSB GR
 export function electionImportValidateMockResponse({
   election,
   matchingElection = true,

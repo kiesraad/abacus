@@ -40,7 +40,10 @@ describe("CommitteeCategory component", () => {
 
     expect(await screen.findByRole("heading", { name: "Type stembureau" })).toBeInTheDocument();
     expect(screen.getByRole("radio", { name: "Gemeentelijk stembureau (GSB)" })).toBeChecked();
-    expect(screen.getByRole("radio", { name: "Centraal stembureau (CSB)" })).not.toBeChecked();
+    const optionCsb = screen.getByRole("radio", { name: "Centraal stembureau (CSB)" });
+    expect(optionCsb).not.toBeChecked();
+    expect(optionCsb).not.toBeDisabled();
+
     await user.click(screen.getByRole("button", { name: "Volgende" }));
 
     expect(dispatch).toHaveBeenCalledWith({
@@ -48,6 +51,30 @@ describe("CommitteeCategory component", () => {
       committeeCategory: "GSB",
     });
 
+    expect(router.state.location.pathname).toEqual("/elections/create/list-of-candidates");
+  });
+
+  test("CSB option is disabled for provincial elections", async () => {
+    const state = { election: { ...election, category: "Provincial" } as NewElection };
+    const dispatch = vi.fn();
+    vi.spyOn(useElectionCreateContext, "useElectionCreateContext").mockReturnValue({ state, dispatch });
+    const user = userEvent.setup();
+
+    const router = renderReturningRouter(
+      <ElectionCreateContextProvider>
+        <CommitteeCategory />
+      </ElectionCreateContextProvider>,
+    );
+
+    expect(await screen.findByRole("heading", { name: "Type stembureau" })).toBeInTheDocument();
+    expect(screen.getByRole("radio", { name: "Gemeentelijk stembureau (GSB)" })).toBeChecked();
+    expect(screen.getByRole("radio", { name: "Centraal stembureau (CSB)" })).toBeDisabled();
+    await user.click(screen.getByRole("button", { name: "Volgende" }));
+
+    expect(dispatch).toHaveBeenCalledWith({
+      type: "SET_COMMITTEE_CATEGORY",
+      committeeCategory: "GSB",
+    });
     expect(router.state.location.pathname).toEqual("/elections/create/list-of-candidates");
   });
 

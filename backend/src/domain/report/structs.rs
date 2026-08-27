@@ -28,7 +28,9 @@ use crate::{
         },
         polling_station::PollingStation,
         report::DEFAULT_DATE_TIME_FORMAT,
-        results::{Results, political_group_candidate_votes::PoliticalGroupCandidateVotes},
+        results::{
+            Results, VerifyModels, political_group_candidate_votes::PoliticalGroupCandidateVotes,
+        },
         tabulation::ElectionTotals,
     },
     eml::EmlHash,
@@ -61,6 +63,7 @@ pub struct GsbGeneratedFiles {
     pub results_csv: GeneratedFile,
 }
 
+#[derive(Debug)]
 pub struct GsbFiles {
     pub results_eml: Option<File>,
     pub results_pdf: Option<File>,
@@ -188,6 +191,7 @@ impl ResultsInputData {
         let investigations = session_pss.investigations();
         let polling_stations = session_pss.into_polling_stations();
         let results = list_results_for_committee_session(conn, committee_session.id).await?;
+        results.verify_models(&election, &committee_session)?;
 
         // get the previous committee session if this is not the first session
         let previous_committee_session = if committee_session.is_next_session() {
@@ -201,6 +205,7 @@ impl ResultsInputData {
         {
             let previous_results =
                 list_results_for_committee_session(conn, previous_committee_session.id).await?;
+            previous_results.verify_models(&election, previous_committee_session)?;
             let previous_totals = ElectionTotals::tabulate(&election, &previous_results)?;
             Some(previous_totals)
         } else {
@@ -498,13 +503,6 @@ impl ResultsInputGSB {
     ) -> Result<PdfFileModel, APIError> {
         let data = &self.data;
 
-        // Na 14-2 is only for CSO, DSO uses Na 14-1
-        if data.election.counting_method != Some(VoteCountingMethod::CSO) {
-            return Err(APIError::DataIntegrityError(
-                "Na 14-2 report is only supported for CSO".to_string(),
-            ));
-        }
-
         let pdf_file = ModelNa14_2Input {
             votes_tables: VotesTablesWithPreviousVotes::new(
                 &data.election,
@@ -588,44 +586,5 @@ impl ResultsInputGSB {
                 .collect(),
         }
         .to_pdf_file_model(overview_filename)
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use chrono::Local;
-    use sqlx::SqlitePool;
-    use test_log::test;
-
-    use super::*;
-
-    #[test(sqlx::test(fixtures(
-        path = "../../../fixtures",
-        scripts("election_12_dso_with_results")
-    )))]
-    async fn test_error_na14_2_dso(pool: SqlitePool) {
-        let mut conn = pool.acquire().await.unwrap();
-        let input = ResultsInputGSB::new(&mut conn, CommitteeSessionId::from(12), Local::now())
-            .await
-            .unwrap();
-
-        // Na 14-2 is only for CSO, DSO uses Na 14-1
-        let Err(error) = input.get_na14_2_pdf_file(
-            &input.data.totals,
-            &input.data.committee_session,
-            "hash".to_string(),
-            "creation_date_time".to_string(),
-            "Model_Na14-2.pdf".to_string(),
-        ) else {
-            panic!("generating a Na 14-2 report should fail for DSO elections");
-        };
-        assert!(
-            matches!(
-                &error,
-                APIError::DataIntegrityError(message)
-                    if message == "Na 14-2 report is only supported for CSO"
-            ),
-            "unexpected error: {error:?}"
-        );
     }
 }

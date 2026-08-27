@@ -21,12 +21,16 @@ use crate::{
         field_path::FieldPath,
         polling_station::{PollingStation, PollingStationRequest, PollingStationType},
         results::{
-            Results,
+            Results, VerifyModels,
+            about_report::{AboutReport, ChecksAndCorrectionsPresent, CorrigendumPresent},
+            checks_and_corrections::{ChecksAndCorrections, ReasonInvestigationOwnInitiative},
+            common_polling_station_results::CommonPollingStationResults,
             counting_differences_polling_station::CountingDifferencesPollingStation,
             cso_first_session_results::CSOFirstSessionResults,
             differences_counts::{
                 DifferenceCountsCompareVotesCastAdmittedVoters, DifferencesCounts,
             },
+            dso_first_session_results::DSOFirstSessionResults,
             extra_investigation::ExtraInvestigation,
             gsb_differences_counts::GSBDifferencesCounts,
             gsb_results::GSBResults,
@@ -49,6 +53,7 @@ use crate::{
     test_data_gen::{GenerateElectionArgs, RandomRange},
 };
 
+#[derive(Debug)]
 pub struct CreateTestElectionResult {
     pub election: ElectionWithPoliticalGroups,
     pub committee_session: CommitteeSession,
@@ -251,6 +256,9 @@ pub async fn create_test_election(
     } else {
         vec![]
     };
+    results
+        .verify_models(&election, &committee_session)
+        .expect("Results model should match election and committee session");
 
     tx.commit().await?;
 
@@ -560,17 +568,18 @@ async fn generate_gsb_data_entry(
 
             // number of voters that actually came and voted
             let turnout = rng.random_range(args.turnout.clone());
-            let voters_turned_out = (voters_available * turnout) / 100;
+            let number_of_votes = (voters_available * turnout) / 100;
 
             let candidate_slope =
                 rng.random_range(args.candidate_distribution_slope.clone()) as f64 / 1000.0;
-            let results = Results::CSOFirstSession(generate_cso_first_session_results(
+            let results = generate_results(
                 rng,
                 election,
-                voters_turned_out,
+                0,
+                number_of_votes,
                 &group_weights,
                 candidate_slope,
-            ));
+            );
 
             // Validate the generated results to catch issues early
             let finalised_with_warnings =
@@ -666,19 +675,19 @@ async fn generate_csb_data_entry(
             ))
         } else {
             let turnout = rng.random_range(args.turnout.clone());
-            let number_of_eligible_voters = rng.random_range(args.voters.clone());
-            let voters_turned_out = (number_of_eligible_voters * turnout) / 100;
+            let number_of_voters = rng.random_range(args.voters.clone());
+            let number_of_votes = (number_of_voters * turnout) / 100;
             let candidate_slope =
                 rng.random_range(args.candidate_distribution_slope.clone()) as f64 / 1000.0;
 
-            Results::GSB(generate_gsb_results(
+            generate_results(
                 rng,
                 election,
-                number_of_eligible_voters,
-                voters_turned_out,
+                number_of_voters,
+                number_of_votes,
                 &group_weights,
                 candidate_slope,
-            ))
+            )
         };
 
         // Validate the generated results to catch issues early
@@ -732,14 +741,73 @@ async fn generate_csb_data_entry(
     (generated_first_entries, generated_second_entries)
 }
 
+fn generate_results(
+    rng: &mut impl rand::RngExt,
+    election: &ElectionWithPoliticalGroups,
+    number_of_voters: u32,
+    number_of_votes: u32,
+    group_weights: &[f64],
+    candidate_distribution_slope: f64,
+) -> Results {
+    use CommitteeCategory::*;
+    use VoteCountingMethod::*;
+
+    let common = generate_common_results(
+        rng,
+        election,
+        number_of_votes,
+        group_weights,
+        candidate_distribution_slope,
+    );
+
+    match (election.committee_category, election.counting_method) {
+        (GSB, Some(CSO)) => Results::CSOFirstSession(CSOFirstSessionResults {
+            extra_investigation: generate_extra_investigation(rng),
+            counting_differences_polling_station: generate_counting_differences_ps(rng),
+            voters_counts: common.voters_counts,
+            votes_counts: common.votes_counts,
+            differences_counts: common.differences_counts,
+            political_group_votes: common.political_group_votes,
+        }),
+        (GSB, Some(DSO)) => {
+            let (about_report, checks_and_corrections) = generate_checks_and_corrections(rng);
+            Results::DSOFirstSession(DSOFirstSessionResults {
+                about_report,
+                checks_and_corrections,
+                voters_counts: common.voters_counts,
+                votes_counts: common.votes_counts,
+                differences_counts: common.differences_counts,
+                political_group_votes: common.political_group_votes,
+            })
+        }
+        (CSB, None) => Results::GSB(GSBResults {
+            number_of_voters,
+            voters_counts: common.voters_counts,
+            votes_counts: common.votes_counts,
+            differences_counts: GSBDifferencesCounts {
+                more_ballots_count: common.differences_counts.more_ballots_count,
+                fewer_ballots_count: common.differences_counts.fewer_ballots_count,
+            },
+            political_group_votes: common.political_group_votes,
+        }),
+        _ => {
+            unimplemented!(
+                "Cannot generate results for committee category {} with counting method {:?}",
+                election.committee_category,
+                election.counting_method
+            );
+        }
+    }
+}
+
 #[expect(clippy::too_many_lines)]
-fn generate_cso_first_session_results(
+fn generate_common_results(
     rng: &mut impl rand::RngExt,
     election: &ElectionWithPoliticalGroups,
     number_of_votes: u32,
     group_weights: &[f64],
     candidate_distribution_slope: f64,
-) -> CSOFirstSessionResults {
+) -> CommonPollingStationResults {
     // generate a small percentage of blank votes
     #[expect(clippy::cast_possible_truncation)]
     let blank_votes = (number_of_votes as f64 * rng.random_range(0.0..0.02)) as u32;
@@ -753,63 +821,7 @@ fn generate_cso_first_session_results(
     // distribute the remaining votes for this polling station randomly according to a power law distribution
     let pg_votes = distribute_fill_weights(rng, group_weights, remaining_votes, false);
 
-    // Define weighted options for extra_investigation (most common: both "no")
-    let extra_investigation_options = [
-        (
-            // 85% weight - both unanswered
-            85,
-            ExtraInvestigation {
-                extra_investigation_other_reason: YesNo::default(),
-                ballots_recounted_extra_investigation: YesNo::default(),
-            },
-        ),
-        (
-            // 10% weight - no to both
-            10,
-            ExtraInvestigation {
-                extra_investigation_other_reason: YesNo::no(),
-                ballots_recounted_extra_investigation: YesNo::no(),
-            },
-        ),
-        (
-            // 3% weight - yes to investigation, no to recount
-            3,
-            ExtraInvestigation {
-                extra_investigation_other_reason: YesNo::yes(),
-                ballots_recounted_extra_investigation: YesNo::no(),
-            },
-        ),
-        (
-            // 2% weight - yes to both
-            2,
-            ExtraInvestigation {
-                extra_investigation_other_reason: YesNo::yes(),
-                ballots_recounted_extra_investigation: YesNo::yes(),
-            },
-        ),
-    ];
-
-    let extra_investigation = extra_investigation_options
-        .choose_weighted(rng, |item| item.0)
-        .expect("Weighted random selection for extra_investigation should never fail with valid weights")
-        .1
-        .clone();
-
-    CSOFirstSessionResults {
-        extra_investigation,
-        counting_differences_polling_station: CountingDifferencesPollingStation {
-            // 90% chance of nothing wrong
-            difference_ballots_voters_completely_accounted_for: if rng.random_bool(0.9) {
-                YesNo::yes()
-            } else {
-                YesNo::no()
-            },
-            difference_ballots_per_list: if rng.random_bool(0.9) {
-                YesNo::no()
-            } else {
-                YesNo::yes()
-            },
-        },
+    CommonPollingStationResults {
         voters_counts: VotersCounts {
             poll_card_count: number_of_votes,
             proxy_certificate_count: 0,
@@ -839,7 +851,7 @@ fn generate_cso_first_session_results(
             },
             more_ballots_count: 0,
             fewer_ballots_count: 0,
-            difference_completely_accounted_for: YesNo::default(),
+            difference_completely_accounted_for: Default::default(),
         },
         political_group_votes: election
             .political_groups
@@ -872,83 +884,69 @@ fn generate_cso_first_session_results(
     }
 }
 
-#[expect(clippy::too_many_lines)]
-fn generate_gsb_results(
+fn generate_extra_investigation(rng: &mut impl rand::RngExt) -> ExtraInvestigation {
+    let extra_investigation_options = [
+        (85, YesNo::default(), YesNo::default()),
+        (10, YesNo::no(), YesNo::no()),
+        (3, YesNo::yes(), YesNo::no()),
+        (2, YesNo::yes(), YesNo::yes()),
+    ];
+
+    let (_, extra_investigation_other_reason, ballots_recounted_extra_investigation) =
+        *extra_investigation_options
+            .choose_weighted(rng, |(weight, ..)| *weight)
+            .expect("Weighted random selection for extra_investigation should never fail");
+
+    ExtraInvestigation {
+        extra_investigation_other_reason,
+        ballots_recounted_extra_investigation,
+    }
+}
+
+fn generate_counting_differences_ps(
     rng: &mut impl rand::RngExt,
-    election: &ElectionWithPoliticalGroups,
-    number_of_voters: u32,
-    number_of_votes: u32,
-    group_weights: &[f64],
-    candidate_distribution_slope: f64,
-) -> GSBResults {
-    // generate a small percentage of blank votes
-    #[expect(clippy::cast_possible_truncation)]
-    let blank_votes = (number_of_votes as f64 * rng.random_range(0.0..0.02)) as u32;
-    let remaining_votes = number_of_votes - blank_votes;
-
-    // generate a small percentage of invalid votes
-    #[expect(clippy::cast_possible_truncation)]
-    let invalid_votes = (remaining_votes as f64 * rng.random_range(0.0..0.02)) as u32;
-    let remaining_votes = remaining_votes - invalid_votes;
-
-    // distribute the remaining votes for this polling station randomly according to a power law distribution
-    let pg_votes = distribute_fill_weights(rng, group_weights, remaining_votes, false);
-
-    GSBResults {
-        number_of_voters,
-        voters_counts: VotersCounts {
-            poll_card_count: number_of_votes,
-            proxy_certificate_count: 0,
-            voter_card_count: (!election.category.is_local_election()).then_some(0),
-            total_admitted_voters_count: number_of_votes,
+) -> CountingDifferencesPollingStation {
+    CountingDifferencesPollingStation {
+        // 90% chance of nothing wrong
+        difference_ballots_voters_completely_accounted_for: if rng.random_bool(0.9) {
+            YesNo::yes()
+        } else {
+            YesNo::no()
         },
-        votes_counts: VotesCounts {
-            political_group_total_votes: election
-                .political_groups
-                .iter()
-                .zip(pg_votes.clone())
-                .map(|(pg, votes)| PoliticalGroupTotalVotes {
-                    number: pg.number,
-                    total: votes,
-                })
-                .collect(),
-            total_votes_candidates_count: remaining_votes,
-            blank_votes_count: blank_votes,
-            invalid_votes_count: invalid_votes,
-            total_votes_cast_count: number_of_votes,
+        difference_ballots_per_list: if rng.random_bool(0.9) {
+            YesNo::no()
+        } else {
+            YesNo::yes()
         },
-        differences_counts: GSBDifferencesCounts {
-            more_ballots_count: 0,
-            fewer_ballots_count: 0,
-        },
-        political_group_votes: election
-            .political_groups
-            .iter()
-            .zip(pg_votes)
-            .map(|(pg, votes)| {
-                // distribute the votes for this group among candidates, but give the most votes to the first candidate
-                let candidate_votes = distribute_power_law(
-                    rng,
-                    votes,
-                    pg.candidates.len(),
-                    candidate_distribution_slope,
-                    true,
-                );
-                PoliticalGroupCandidateVotes {
-                    number: pg.number,
-                    total: votes,
-                    candidate_votes: pg
-                        .candidates
-                        .iter()
-                        .zip(candidate_votes)
-                        .map(|(candidate, votes)| CandidateVotes {
-                            number: candidate.number,
-                            votes,
-                        })
-                        .collect(),
-                }
-            })
-            .collect(),
+    }
+}
+
+fn generate_checks_and_corrections(
+    rng: &mut impl rand::RngExt,
+) -> (AboutReport, ChecksAndCorrections) {
+    if rng.random_bool(0.2) {
+        (
+            AboutReport {
+                corrigendum_present: Some(CorrigendumPresent::TwoDocuments),
+                checks_and_corrections_present: Some(ChecksAndCorrectionsPresent::PagePresent),
+            },
+            ChecksAndCorrections {
+                reason_investigation_own_initiative: ReasonInvestigationOwnInitiative {
+                    unaccounted_difference: false,
+                    other_error: true,
+                },
+                corrected_results_own_initiative: YesNo::yes(),
+                corrected_results_csb_request: YesNo::default(),
+            },
+        )
+    } else {
+        (
+            AboutReport {
+                corrigendum_present: Some(CorrigendumPresent::OneDocument),
+                checks_and_corrections_present: Some(ChecksAndCorrectionsPresent::PageMissing),
+            },
+            ChecksAndCorrections::default(),
+        )
     }
 }
 
@@ -1095,16 +1093,18 @@ mod tests {
         test_data_gen::RandomRange,
     };
 
-    #[sqlx::test]
-    async fn test_create_test_election(pool: SqlitePool) {
-        let args = GenerateElectionArgs {
+    fn municipal(
+        committee_category: CommitteeCategory,
+        counting_method: Option<VoteCountingMethod>,
+    ) -> GenerateElectionArgs {
+        GenerateElectionArgs {
             custom_name: None,
-            committee_category: CommitteeCategory::GSB,
-            counting_method: Some(VoteCountingMethod::CSO),
+            committee_category,
+            counting_method,
             election_category: ElectionCategory::Municipal,
-            political_groups: RandomRange(20..50),
-            candidates_per_group: RandomRange(10..50),
-            polling_stations: RandomRange(50..200),
+            political_groups: RandomRange(3..4),
+            candidates_per_group: RandomRange(3..10),
+            polling_stations: RandomRange(3..4),
             voters: RandomRange(100_000..200_000),
             seats: RandomRange(9..45),
             generate_p22_2_variants: false,
@@ -1115,12 +1115,32 @@ mod tests {
             turnout: RandomRange(60..85),
             candidate_distribution_slope: RandomRange(1100..1101),
             political_group_distribution_slope: RandomRange(1100..1101),
-        };
+        }
+    }
 
-        create_test_election(&args, &pool, None).await.unwrap();
+    #[sqlx::test]
+    async fn test_create_test_election(pool: SqlitePool) {
+        use CommitteeCategory::*;
+        use VoteCountingMethod::*;
+
+        let creation_results = [
+            create_test_election(&municipal(GSB, Some(CSO)), &pool, None).await,
+            create_test_election(&municipal(GSB, Some(DSO)), &pool, None).await,
+            create_test_election(&municipal(CSB, None), &pool, None).await,
+        ];
 
         let mut conn = pool.acquire().await.unwrap();
         let elections = election_repo::list(&mut conn, None).await.unwrap();
-        assert_eq!(elections.len(), 1);
+        assert_eq!(elections.len(), creation_results.len());
+
+        for result in creation_results {
+            let result = result.expect("should have been successful");
+
+            list_results_for_committee_session(&mut conn, result.committee_session.id)
+                .await
+                .expect("should have generated results in the database")
+                .verify_models(&result.election, &result.committee_session)
+                .expect("should have correct data entry models");
+        }
     }
 }

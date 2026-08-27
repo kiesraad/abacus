@@ -1,13 +1,7 @@
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
-use crate::domain::{
-    compare::Compare,
-    election::ElectionWithPoliticalGroups,
-    field_path::FieldPath,
-    results::yes_no::YesNo,
-    validate::{DataError, Validate, ValidationResults},
-};
+use crate::domain::{compare::Compare, field_path::FieldPath, results::yes_no::YesNo};
 
 /// Checks and corrections ("Controles en correcties")
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
@@ -28,8 +22,19 @@ pub struct ChecksAndCorrections {
     pub corrected_results_csb_request: YesNo,
 }
 
+impl ChecksAndCorrections {
+    pub fn is_empty(&self) -> bool {
+        !self
+            .reason_investigation_own_initiative
+            .unaccounted_difference
+            && !self.reason_investigation_own_initiative.other_error
+            && self.corrected_results_own_initiative.is_empty()
+            && self.corrected_results_csb_request.is_empty()
+    }
+}
+
 /// Reason for investigation on own initiative
-#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
+#[derive(Serialize, Deserialize, ToSchema, Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
 pub struct ReasonInvestigationOwnInitiative {
     /// Because of an unaccounted-for difference
@@ -75,18 +80,5 @@ impl Compare for ReasonInvestigationOwnInitiative {
             different_fields,
             &path.field("other_error"),
         );
-    }
-}
-
-impl Validate for ChecksAndCorrections {
-    fn validate(
-        &self,
-        _election: &ElectionWithPoliticalGroups,
-        _path: &FieldPath,
-    ) -> Result<ValidationResults, DataError> {
-        let validation_results = ValidationResults::default();
-        // TODO: https://github.com/kiesraad/abacus/issues/3687
-
-        Ok(validation_results)
     }
 }

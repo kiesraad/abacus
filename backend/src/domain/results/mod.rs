@@ -40,6 +40,9 @@ pub mod voters_counts;
 pub mod votes_counts;
 pub mod yes_no;
 
+#[derive(Debug)]
+pub struct IncorrectResultsModel;
+
 /// Results contains the results for a data entry
 ///
 /// The exact type of results depends on the election counting method,
@@ -129,6 +132,42 @@ impl Results {
                 }
             }
             (CommitteeCategory::CSB, _) => Results::GSB(GSBResults::empty(election)),
+        }
+    }
+
+    pub fn verify_model(
+        &self,
+        election: &ElectionWithPoliticalGroups,
+        session: &CommitteeSession,
+    ) -> Result<(), IncorrectResultsModel> {
+        let category = election.committee_category;
+        let method = election.counting_method;
+        let next = session.is_next_session();
+
+        let correct = match self {
+            Results::DSOFirstSession(_) => {
+                category == CommitteeCategory::GSB && method == Some(VoteCountingMethod::DSO)
+            }
+            Results::DSONextSession(_) => {
+                category == CommitteeCategory::GSB
+                    && method == Some(VoteCountingMethod::DSO)
+                    && next
+            }
+            Results::CSOFirstSession(_) => {
+                category == CommitteeCategory::GSB && method == Some(VoteCountingMethod::CSO)
+            }
+            Results::CSONextSession(_) => {
+                category == CommitteeCategory::GSB
+                    && method == Some(VoteCountingMethod::CSO)
+                    && next
+            }
+            Results::GSB(_) => category == CommitteeCategory::CSB && method.is_none() && !next,
+        };
+
+        if correct {
+            Ok(())
+        } else {
+            Err(IncorrectResultsModel)
         }
     }
 
@@ -455,10 +494,8 @@ impl Validate for Results {
         path: &FieldPath,
     ) -> Result<ValidationResults, DataError> {
         match self {
-            Results::DSOFirstSession(_) | Results::DSONextSession(_) => {
-                // TODO: https://github.com/kiesraad/abacus/issues/3687
-                Ok(ValidationResults::default())
-            }
+            Results::DSOFirstSession(results) => results.validate(election, path),
+            Results::DSONextSession(results) => results.as_common().validate(election, path),
             Results::CSOFirstSession(results) => {
                 let mut validation_results = results
                     .extra_investigation
@@ -476,12 +513,42 @@ impl Validate for Results {
     }
 }
 
+pub trait VerifyModels {
+    fn verify_models(
+        &self,
+        election: &ElectionWithPoliticalGroups,
+        session: &CommitteeSession,
+    ) -> Result<(), IncorrectResultsModel>;
+}
+
+impl<T> VerifyModels for [(T, Results)] {
+    fn verify_models(
+        &self,
+        election: &ElectionWithPoliticalGroups,
+        session: &CommitteeSession,
+    ) -> Result<(), IncorrectResultsModel> {
+        for (_, results) in self {
+            results.verify_model(election, session)?;
+        }
+        Ok(())
+    }
+}
+
 #[cfg(test)]
 pub mod tests {
+    use std::{assert_matches, iter};
+
+    use strum::VariantArray;
+
     use super::*;
     use crate::domain::{
-        election::{ElectionCategory, PGNumber, tests::election_fixture},
+        election::{
+            ElectionCategory, PGNumber,
+            tests::{ElectionBuilder, election_fixture},
+        },
         results::{
+            about_report::{AboutReport, ChecksAndCorrectionsPresent},
+            checks_and_corrections::{ChecksAndCorrections, ReasonInvestigationOwnInitiative},
             count::Count,
             differences_counts::{
                 DifferenceCountsCompareVotesCastAdmittedVoters, DifferencesCounts,
@@ -490,7 +557,6 @@ pub mod tests {
         },
         valid_default::ValidDefault,
     };
-    use core::assert_matches;
 
     pub fn example_results() -> Results {
         Results::CSOFirstSession(CSOFirstSessionResults {
@@ -571,148 +637,260 @@ pub mod tests {
         }
     }
 
-    #[test]
-    fn test_initial_voter_card_count() {
-        let first_session = CommitteeSession::first_session();
+    mod results_new {
+        use test_log::test;
 
-        // Voter cards only exist for non-local elections
-        let cases = [
-            (ElectionCategory::Municipal, None),
-            (ElectionCategory::Provincial, Some(0)),
-            (ElectionCategory::WaterAuthority, Some(0)),
+        use super::*;
+
+        #[test]
+        fn test_initial_voter_card_count() {
+            let first_session = CommitteeSession::first_session();
+
+            // Voter cards only exist for non-local elections
+            let cases = [
+                (ElectionCategory::Municipal, None),
+                (ElectionCategory::Provincial, Some(0)),
+                (ElectionCategory::WaterAuthority, Some(0)),
+            ];
+
+            for (category, expected_voter_card_count) in cases {
+                for committee_category in [CommitteeCategory::GSB, CommitteeCategory::CSB] {
+                    let election = election_fixture(category, committee_category, &[2]);
+                    let results = Results::new(&election, &first_session, None);
+
+                    assert_eq!(
+                        results.voters_counts().voter_card_count,
+                        expected_voter_card_count,
+                        "election category {category:?}, committee category {committee_category:?}"
+                    );
+                }
+            }
+        }
+
+        #[test]
+        fn test_initial_voter_card_count_next_session() {
+            let election =
+                election_fixture(ElectionCategory::Provincial, CommitteeCategory::GSB, &[2]);
+            let mut previous_results = CSOFirstSessionResults::empty(&election).as_common();
+            previous_results.voters_counts.voter_card_count = Some(5);
+
+            let results = Results::new(
+                &election,
+                &CommitteeSession::next_session(),
+                Some(&previous_results),
+            );
+
+            assert_matches!(results, Results::CSONextSession(_));
+            assert_eq!(results.voters_counts().voter_card_count, Some(5));
+        }
+
+        #[test]
+        fn test_gsb_first_session_cso() {
+            let first_session = CommitteeSession::first_session();
+            let election =
+                election_fixture(ElectionCategory::Municipal, CommitteeCategory::GSB, &[2]);
+            let results = Results::new(&election, &first_session, None);
+
+            assert_matches!(results, Results::CSOFirstSession(_));
+        }
+
+        #[test]
+        fn test_gsb_first_session_dso() {
+            let first_session = CommitteeSession::first_session();
+            let mut election =
+                election_fixture(ElectionCategory::Municipal, CommitteeCategory::GSB, &[2]);
+            election.counting_method = Some(VoteCountingMethod::DSO);
+            let results = Results::new(&election, &first_session, None);
+
+            assert_matches!(results, Results::DSOFirstSession(_));
+        }
+
+        #[test]
+        #[should_panic(expected = "Invalid election")]
+        fn test_gsb_first_session_with_invalid_counting_method() {
+            let first_session = CommitteeSession::first_session();
+            let mut election =
+                election_fixture(ElectionCategory::Municipal, CommitteeCategory::GSB, &[2]);
+            election.counting_method = None;
+            Results::new(&election, &first_session, None);
+        }
+
+        #[test]
+        fn test_gsb_next_session_cso_with_previous_results() {
+            let next_session = CommitteeSession::next_session();
+            let election =
+                election_fixture(ElectionCategory::Municipal, CommitteeCategory::GSB, &[2]);
+            let previous_results = CSOFirstSessionResults::empty(&election).as_common();
+            let results = Results::new(&election, &next_session, Some(&previous_results));
+
+            assert_matches!(results, Results::CSONextSession(_));
+        }
+
+        #[test]
+        fn test_gsb_next_session_dso_with_previous_results() {
+            let next_session = CommitteeSession::next_session();
+            let mut election =
+                election_fixture(ElectionCategory::Municipal, CommitteeCategory::GSB, &[2]);
+            election.counting_method = Some(VoteCountingMethod::DSO);
+            let previous_results = DSOFirstSessionResults::empty(&election).as_common();
+            let results = Results::new(&election, &next_session, Some(&previous_results));
+
+            assert_matches!(results, Results::DSONextSession(_));
+        }
+
+        #[test]
+        #[should_panic(expected = "Invalid election")]
+        fn test_gsb_next_session_with_invalid_counting_method_and_with_previous_results() {
+            let next_session = CommitteeSession::next_session();
+            let mut election =
+                election_fixture(ElectionCategory::Municipal, CommitteeCategory::GSB, &[2]);
+            election.counting_method = None;
+            let previous_results = CSOFirstSessionResults::empty(&election).as_common();
+            Results::new(&election, &next_session, Some(&previous_results));
+        }
+
+        #[test]
+        fn test_gsb_next_session_cso_without_previous_results() {
+            let next_session = CommitteeSession::next_session();
+            let election =
+                election_fixture(ElectionCategory::Municipal, CommitteeCategory::GSB, &[2]);
+            let results = Results::new(&election, &next_session, None);
+
+            assert_matches!(results, Results::CSONextSession(_));
+        }
+
+        #[test]
+        fn test_gsb_next_session_dso_without_previous_results() {
+            let next_session = CommitteeSession::next_session();
+            let mut election =
+                election_fixture(ElectionCategory::Municipal, CommitteeCategory::GSB, &[2]);
+            election.counting_method = Some(VoteCountingMethod::DSO);
+            let results = Results::new(&election, &next_session, None);
+
+            assert_matches!(results, Results::DSONextSession(_));
+        }
+
+        #[test]
+        #[should_panic(expected = "Invalid election")]
+        fn test_gsb_next_session_with_invalid_counting_method_and_without_previous_results() {
+            let next_session = CommitteeSession::next_session();
+            let mut election =
+                election_fixture(ElectionCategory::Municipal, CommitteeCategory::GSB, &[2]);
+            election.counting_method = None;
+            Results::new(&election, &next_session, None);
+        }
+
+        #[test]
+        fn test_csb() {
+            let first_session = CommitteeSession::first_session();
+            let election =
+                election_fixture(ElectionCategory::Municipal, CommitteeCategory::CSB, &[2]);
+
+            let results = Results::new(&election, &first_session, None);
+
+            assert_matches!(results, Results::GSB(_));
+        }
+    }
+
+    #[test]
+    fn test_is_correct_model() {
+        use CommitteeCategory::*;
+        use VoteCountingMethod::*;
+
+        let gsb_election = election_fixture(ElectionCategory::Municipal, GSB, &[2]);
+
+        let dso_first_session =
+            Results::DSOFirstSession(DSOFirstSessionResults::empty(&gsb_election));
+        let dso_next_session = Results::DSONextSession(NextSessionResults::empty(&gsb_election));
+        let cso_first_session =
+            Results::CSOFirstSession(CSOFirstSessionResults::empty(&gsb_election));
+        let cso_next_session = Results::CSONextSession(NextSessionResults::empty(&gsb_election));
+        let gsb = Results::GSB(GSBResults::default());
+
+        let results_variants = [
+            &dso_first_session,
+            &dso_next_session,
+            &cso_first_session,
+            &cso_next_session,
+            &gsb,
         ];
 
-        for (category, expected_voter_card_count) in cases {
-            for committee_category in [CommitteeCategory::GSB, CommitteeCategory::CSB] {
-                let election = election_fixture(category, committee_category, &[2]);
-                let results = Results::new(&election, &first_session, None);
+        let first = CommitteeSession::first_session();
+        let next = CommitteeSession::next_session();
 
-                assert_eq!(
-                    results.voters_counts().voter_card_count,
-                    expected_voter_card_count,
-                    "election category {category:?}, committee category {committee_category:?}"
-                );
+        let correct_combinations = [
+            (&dso_first_session, GSB, Some(DSO), &first),
+            (&dso_first_session, GSB, Some(DSO), &next),
+            (&dso_next_session, GSB, Some(DSO), &next),
+            (&cso_first_session, GSB, Some(CSO), &first),
+            (&cso_first_session, GSB, Some(CSO), &next),
+            (&cso_next_session, GSB, Some(CSO), &next),
+            (&gsb, CSB, None, &first),
+        ];
+
+        // All counting methods wrapped in Some(), and None
+        let counting_methods = VoteCountingMethod::VARIANTS
+            .iter()
+            .map(|m| Some(*m))
+            .chain(iter::once(None))
+            .collect::<Vec<_>>();
+
+        for results in results_variants {
+            for category in CommitteeCategory::VARIANTS {
+                for method in &counting_methods {
+                    for session in [&first, &next] {
+                        let election = ElectionBuilder::municipal()
+                            .with_committee_category(*category)
+                            .with_counting_method(*method)
+                            .build();
+
+                        let combination = (results, *category, *method, session);
+                        let expect_correct = correct_combinations.contains(&combination);
+
+                        assert_eq!(
+                            results.verify_model(&election, session).is_ok(),
+                            expect_correct,
+                            "is_correct_model is not {expect_correct} for {combination:?}"
+                        );
+                    }
+                }
             }
         }
     }
 
     #[test]
-    fn test_initial_voter_card_count_next_session() {
-        let election = election_fixture(ElectionCategory::Provincial, CommitteeCategory::GSB, &[2]);
-        let mut previous_results = CSOFirstSessionResults::empty(&election).as_common();
-        previous_results.voters_counts.voter_card_count = Some(5);
+    fn test_error_when_checks_and_corrections_not_empty() {
+        // Non-empty checks and corrections, while `checks_and_corrections = missing`
+        // This is an invalid state, so it should return an error
+        let results = Results::DSOFirstSession(DSOFirstSessionResults {
+            about_report: AboutReport {
+                corrigendum_present: Some(about_report::CorrigendumPresent::OneDocument),
+                checks_and_corrections_present: Some(ChecksAndCorrectionsPresent::PageMissing),
+            },
+            checks_and_corrections: ChecksAndCorrections {
+                reason_investigation_own_initiative: ReasonInvestigationOwnInitiative {
+                    unaccounted_difference: true,
+                    other_error: false,
+                },
+                corrected_results_own_initiative: YesNo::yes(),
+                corrected_results_csb_request: YesNo::no(),
+            },
+            voters_counts: VotersCounts::default(),
+            votes_counts: VotesCounts::default(),
+            differences_counts: DifferencesCounts::default(),
+            political_group_votes: vec![],
+        });
 
-        let results = Results::new(
-            &election,
-            &CommitteeSession::next_session(),
-            Some(&previous_results),
+        let validation_results = results.validate(
+            &election_fixture(ElectionCategory::Municipal, CommitteeCategory::GSB, &[]),
+            &"data".into(),
         );
 
-        assert_matches!(results, Results::CSONextSession(_));
-        assert_eq!(results.voters_counts().voter_card_count, Some(5));
-    }
-
-    #[test]
-    fn test_results_new_gsb_first_session_cso() {
-        let first_session = CommitteeSession::first_session();
-        let election = election_fixture(ElectionCategory::Municipal, CommitteeCategory::GSB, &[2]);
-        let results = Results::new(&election, &first_session, None);
-
-        assert_matches!(results, Results::CSOFirstSession(_));
-    }
-
-    #[test]
-    fn test_results_new_gsb_first_session_dso() {
-        let first_session = CommitteeSession::first_session();
-        let mut election =
-            election_fixture(ElectionCategory::Municipal, CommitteeCategory::GSB, &[2]);
-        election.counting_method = Some(VoteCountingMethod::DSO);
-        let results = Results::new(&election, &first_session, None);
-
-        assert_matches!(results, Results::DSOFirstSession(_));
-    }
-
-    #[test]
-    #[should_panic(expected = "Invalid election")]
-    fn test_results_new_gsb_first_session_with_invalid_counting_method() {
-        let first_session = CommitteeSession::first_session();
-        let mut election =
-            election_fixture(ElectionCategory::Municipal, CommitteeCategory::GSB, &[2]);
-        election.counting_method = None;
-        Results::new(&election, &first_session, None);
-    }
-
-    #[test]
-    fn test_results_new_gsb_next_session_cso_with_previous_results() {
-        let next_session = CommitteeSession::next_session();
-        let election = election_fixture(ElectionCategory::Municipal, CommitteeCategory::GSB, &[2]);
-        let previous_results = CSOFirstSessionResults::empty(&election).as_common();
-        let results = Results::new(&election, &next_session, Some(&previous_results));
-
-        assert_matches!(results, Results::CSONextSession(_));
-    }
-
-    #[test]
-    fn test_results_new_gsb_next_session_dso_with_previous_results() {
-        let next_session = CommitteeSession::next_session();
-        let mut election =
-            election_fixture(ElectionCategory::Municipal, CommitteeCategory::GSB, &[2]);
-        election.counting_method = Some(VoteCountingMethod::DSO);
-        let previous_results = DSOFirstSessionResults::empty(&election).as_common();
-        let results = Results::new(&election, &next_session, Some(&previous_results));
-
-        assert_matches!(results, Results::DSONextSession(_));
-    }
-
-    #[test]
-    #[should_panic(expected = "Invalid election")]
-    fn test_results_new_gsb_next_session_with_invalid_counting_method_and_with_previous_results() {
-        let next_session = CommitteeSession::next_session();
-        let mut election =
-            election_fixture(ElectionCategory::Municipal, CommitteeCategory::GSB, &[2]);
-        election.counting_method = None;
-        let previous_results = CSOFirstSessionResults::empty(&election).as_common();
-        Results::new(&election, &next_session, Some(&previous_results));
-    }
-
-    #[test]
-    fn test_results_new_gsb_next_session_cso_without_previous_results() {
-        let next_session = CommitteeSession::next_session();
-        let election = election_fixture(ElectionCategory::Municipal, CommitteeCategory::GSB, &[2]);
-        let results = Results::new(&election, &next_session, None);
-
-        assert_matches!(results, Results::CSONextSession(_));
-    }
-
-    #[test]
-    fn test_results_new_gsb_next_session_dso_without_previous_results() {
-        let next_session = CommitteeSession::next_session();
-        let mut election =
-            election_fixture(ElectionCategory::Municipal, CommitteeCategory::GSB, &[2]);
-        election.counting_method = Some(VoteCountingMethod::DSO);
-        let results = Results::new(&election, &next_session, None);
-
-        assert_matches!(results, Results::DSONextSession(_));
-    }
-
-    #[test]
-    #[should_panic(expected = "Invalid election")]
-    fn test_results_new_gsb_next_session_with_invalid_counting_method_and_without_previous_results()
-    {
-        let next_session = CommitteeSession::next_session();
-        let mut election =
-            election_fixture(ElectionCategory::Municipal, CommitteeCategory::GSB, &[2]);
-        election.counting_method = None;
-        Results::new(&election, &next_session, None);
-    }
-
-    #[test]
-    fn test_results_new_csb() {
-        let first_session = CommitteeSession::first_session();
-        let election = election_fixture(ElectionCategory::Municipal, CommitteeCategory::CSB, &[2]);
-
-        let results = Results::new(&election, &first_session, None);
-
-        assert_matches!(results, Results::GSB(_));
+        assert_eq!(
+            validation_results,
+            Err(DataError::new(
+                "`checks_and_corrections` must be empty when `ChecksAndCorrectionsPresent::PageMissing`.",
+            ))
+        );
     }
 }

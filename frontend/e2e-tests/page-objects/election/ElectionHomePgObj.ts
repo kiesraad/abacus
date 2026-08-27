@@ -14,7 +14,8 @@ export class ElectionHome {
   readonly pollingStationsRow: Locator;
   readonly downloadNa31_2Bijlage1: Locator;
   readonly downloadN10_2: Locator;
-  readonly downloadInlegvel: Locator;
+  readonly downloadNa31_2Inlegvel: Locator;
+  readonly downloadNa31_1Inlegvel: Locator;
 
   constructor(protected readonly page: Page) {
     this.header = page.getByRole("heading", { level: 1 });
@@ -30,7 +31,8 @@ export class ElectionHome {
     this.pollingStationsRow = page.getByRole("rowheader", { name: "Stembureaus" });
     this.downloadNa31_2Bijlage1 = page.getByRole("cell", { name: "Na 31-2 Bijlage 1" });
     this.downloadN10_2 = page.getByRole("cell", { name: "N 10-2" });
-    this.downloadInlegvel = page.getByRole("cell", { name: "Na 31-2 Inlegvel" });
+    this.downloadNa31_2Inlegvel = page.getByRole("cell", { name: "Na 31-2 Inlegvel" });
+    this.downloadNa31_1Inlegvel = page.getByRole("cell", { name: "Na 31-1 Inlegvel" });
   }
 
   getCommitteeSessionCard(number: number) {

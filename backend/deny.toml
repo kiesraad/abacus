@@ -1,0 +1,46 @@
+[graph]
+targets = [
+    { triple = "x86_64-unknown-linux-musl" },
+    { triple = "x86_64-unknown-linux-gnu" },
+    { triple = "aarch64-unknown-linux-gnu" },
+    { triple = "x86_64-pc-windows-msvc" },
+    { triple = "aarch64-apple-darwin" },
+    { triple = "x86_64-apple-darwin" },
+]
+
+all-features = true
+
+[licenses]
+version = 2
+private = { ignore = true }
+allow = [
+    "0BSD",
+    "Apache-2.0 WITH LLVM-exception",
+    "Apache-2.0",
+    "BSD-2-Clause",
+    "BSD-3-Clause",
+    "EUPL-1.2",
+    "ISC",
+    "MIT",
+    "Unicode-3.0",
+    "Zlib",
+]
+
+[bans]
+deny = [
+    { crate = "openssl", use-instead = "rustls" },
+    { crate = "openssl-sys", use-instead = "rustls" },
+    { crate = "ring", use-instead = "aws-lc-rs" },
+]
+multiple-versions = "allow"
+
+[advisories]
+ignore = [
+    { id = "RUSTSEC-2024-0320", reason = "yaml-rust is transitively used by Typst, see https://github.com/trishume/syntect/issues/537" },
+    { id = "RUSTSEC-2024-0436", reason = "paste is transitively used by Typst (biblatex, https://github.com/typst/biblatex/issues/87) and by utoipa-axum; unmaintained but no vulnerability" },
+    { id = "RUSTSEC-2025-0141", reason = "bincode is used by Typst, see https://github.com/trishume/syntect/issues/606" },
+    { id = "RUSTSEC-2026-0192", reason = "ttf-parser is unmaintained; Typst does not have a fix, see https://github.com/kiesraad/abacus/issues/3849 for direct usage" },
+    { id = "RUSTSEC-2026-0194", reason = "quick-xml <0.41 DoS (quadratic duplicate-attribute check) pulled transitively by Typst (citationberg, plist); no release depending on quick-xml >=0.41 available upstream yet, see https://github.com/tafia/quick-xml/issues/969" },
+    { id = "RUSTSEC-2026-0195", reason = "quick-xml <0.41 DoS (unbounded namespace-declaration allocation) pulled transitively by Typst (citationberg, plist); no release depending on quick-xml >=0.41 available upstream yet, see https://github.com/tafia/quick-xml/issues/969" },
+    { id = "RUSTSEC-2026-0206", reason = "rustybuzz is unmaintained (maintainer recommends harfrust); pulled transitively by Typst; no migration available upstream yet, see https://github.com/harfbuzz/rustybuzz/issues/166" },
+]

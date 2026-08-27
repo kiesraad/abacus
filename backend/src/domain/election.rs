@@ -623,7 +623,7 @@ pub enum CandidateGender {
 }
 
 #[cfg(test)]
-pub(crate) mod tests {
+pub mod tests {
     use chrono::NaiveDate;
 
     use super::*;
@@ -715,5 +715,44 @@ pub(crate) mod tests {
             political_groups_candidates,
             29,
         )
+    }
+
+    pub struct ElectionBuilder {
+        election_category: ElectionCategory,
+        committee_category: Option<CommitteeCategory>,
+        counting_method: Option<VoteCountingMethod>,
+    }
+
+    impl ElectionBuilder {
+        pub fn municipal() -> Self {
+            Self {
+                election_category: ElectionCategory::Municipal,
+                committee_category: None,
+                counting_method: None,
+            }
+        }
+
+        pub fn with_committee_category(&self, committee_category: CommitteeCategory) -> Self {
+            Self {
+                committee_category: Some(committee_category),
+                ..*self
+            }
+        }
+
+        pub fn with_counting_method(&self, counting_method: Option<VoteCountingMethod>) -> Self {
+            Self {
+                counting_method,
+                ..*self
+            }
+        }
+        pub fn build(self) -> ElectionWithPoliticalGroups {
+            let Some(category) = self.committee_category else {
+                panic!("CommitteeCategory is mandatory");
+            };
+
+            let mut election = election_fixture(self.election_category, category, &[2]);
+            election.counting_method = self.counting_method;
+            election
+        }
     }
 }

@@ -105,6 +105,13 @@
       "title": "Deze vraag moet precies één antwoord hebben"
     }
   },
+  "F311": {
+    "coordinator": {
+      "title": "Hertel onverklaard verschil",
+      "content": "Er is een onverklaard verschil dat herteld moet worden.",
+      "actions": "<ul><li>Hertel de stembiljetten en het aantal toegelaten kiezers. Hertel tot de fout gevonden is, of alles één keer herteld is.</li><li>Vul nieuwe telresultaten op een corrigendum in.</li><li>Is er al herteld? Zorg dan dat het inlegvel 'controles en correcties' wordt ingevuld en toegevoegd aan het proces-verbaal van het stembureau.</li></ul>"
+    }
+  },
   "F401": {
     "typist": {
       "title": "Controleer het totaal van de lijst. Is dit veld op het papieren proces-verbaal ook leeg? Dan kan je verdergaan. (F.401)"

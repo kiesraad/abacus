@@ -125,6 +125,28 @@ jobs:
           path: backend/target/doc
           retention-days: 30
 
+  cargo-deny:
+    name: Cargo deny
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend
+    env:
+      CARGO_TERM_COLOR: always
+      BINSTALL_DISABLE_TELEMETRY: "true"
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - name: Setup Rust
+        run: rustup toolchain install
+      - name: Install Binstall
+        uses: cargo-bins/cargo-binstall@e00d2c94cc0067b77737821097a62d91c0301baa # main
+      - name: Install cargo-deny
+        run: cargo binstall --no-confirm cargo-deny
+      # Advisories are checked in the scheduled cargo-deny.yml workflow, so that
+      # newly published RUSTSEC advisories do not break PRs.
+      - name: Check bans, licenses and sources
+        run: cargo deny check bans licenses sources
+
   frontend:
     name: Frontend
     runs-on: ubuntu-latest

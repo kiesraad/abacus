@@ -33,9 +33,14 @@ static VARIANTS: &[ModelVariant] = &[
         input: "model-n-10-1-variations/model-n-10-1-GR.json",
     },
     ModelVariant {
-        name: "model-n-10-1-PS",
+        name: "model-n-10-1-PS1",
         model: "model-n-10-1",
-        input: "model-n-10-1-variations/model-n-10-1-PS.json",
+        input: "model-n-10-1-variations/model-n-10-1-PS1.json",
+    },
+    ModelVariant {
+        name: "model-n-10-1-PS2",
+        model: "model-n-10-1",
+        input: "model-n-10-1-variations/model-n-10-1-PS2.json",
     },
     ModelVariant {
         name: "model-n-10-1-WS",
@@ -53,9 +58,14 @@ static VARIANTS: &[ModelVariant] = &[
         input: "model-n-10-2-variations/model-n-10-2-GR.json",
     },
     ModelVariant {
-        name: "model-n-10-2-PS",
+        name: "model-n-10-2-PS1",
         model: "model-n-10-2",
-        input: "model-n-10-2-variations/model-n-10-2-PS.json",
+        input: "model-n-10-2-variations/model-n-10-2-PS1.json",
+    },
+    ModelVariant {
+        name: "model-n-10-2-PS2",
+        model: "model-n-10-2",
+        input: "model-n-10-2-variations/model-n-10-2-PS2.json",
     },
     ModelVariant {
         name: "model-n-10-2-WS",
@@ -68,9 +78,14 @@ static VARIANTS: &[ModelVariant] = &[
         input: "model-na-14-1-versie-1-variations/model-na-14-1-versie-1-GR.json",
     },
     ModelVariant {
-        name: "model-na-14-1-versie-1-PS",
+        name: "model-na-14-1-versie-1-PS1",
         model: "model-na-14-1-versie-1",
-        input: "model-na-14-1-versie-1-variations/model-na-14-1-versie-1-PS.json",
+        input: "model-na-14-1-versie-1-variations/model-na-14-1-versie-1-PS1.json",
+    },
+    ModelVariant {
+        name: "model-na-14-1-versie-1-PS2",
+        model: "model-na-14-1-versie-1",
+        input: "model-na-14-1-versie-1-variations/model-na-14-1-versie-1-PS2.json",
     },
     ModelVariant {
         name: "model-na-14-1-versie-1-WS",
@@ -83,9 +98,14 @@ static VARIANTS: &[ModelVariant] = &[
         input: "model-na-14-1-versie-2-variations/model-na-14-1-versie-2-GR.json",
     },
     ModelVariant {
-        name: "model-na-14-1-versie-2-PS",
+        name: "model-na-14-1-versie-2-PS1",
         model: "model-na-14-1-versie-2",
-        input: "model-na-14-1-versie-2-variations/model-na-14-1-versie-2-PS.json",
+        input: "model-na-14-1-versie-2-variations/model-na-14-1-versie-2-PS1.json",
+    },
+    ModelVariant {
+        name: "model-na-14-1-versie-2-PS2",
+        model: "model-na-14-1-versie-2",
+        input: "model-na-14-1-versie-2-variations/model-na-14-1-versie-2-PS2.json",
     },
     ModelVariant {
         name: "model-na-14-1-versie-2-WS",
@@ -98,9 +118,14 @@ static VARIANTS: &[ModelVariant] = &[
         input: "model-na-14-2-variations/model-na-14-2-GR.json",
     },
     ModelVariant {
-        name: "model-na-14-2-PS",
+        name: "model-na-14-2-PS1",
         model: "model-na-14-2",
-        input: "model-na-14-2-variations/model-na-14-2-PS.json",
+        input: "model-na-14-2-variations/model-na-14-2-PS1.json",
+    },
+    ModelVariant {
+        name: "model-na-14-2-PS2",
+        model: "model-na-14-2",
+        input: "model-na-14-2-variations/model-na-14-2-PS2.json",
     },
     ModelVariant {
         name: "model-na-14-2-WS",
@@ -128,9 +153,14 @@ static VARIANTS: &[ModelVariant] = &[
         input: "model-na-31-1-variations/model-na-31-1-GR.json",
     },
     ModelVariant {
-        name: "model-na-31-1-PS",
+        name: "model-na-31-1-PS1",
         model: "model-na-31-1",
-        input: "model-na-31-1-variations/model-na-31-1-PS.json",
+        input: "model-na-31-1-variations/model-na-31-1-PS1.json",
+    },
+    ModelVariant {
+        name: "model-na-31-1-PS2",
+        model: "model-na-31-1",
+        input: "model-na-31-1-variations/model-na-31-1-PS2.json",
     },
     ModelVariant {
         name: "model-na-31-1-WS",
@@ -148,9 +178,14 @@ static VARIANTS: &[ModelVariant] = &[
         input: "model-na-31-2-variations/model-na-31-2-GR.json",
     },
     ModelVariant {
-        name: "model-na-31-2-PS",
+        name: "model-na-31-2-PS1",
         model: "model-na-31-2",
-        input: "model-na-31-2-variations/model-na-31-2-PS.json",
+        input: "model-na-31-2-variations/model-na-31-2-PS1.json",
+    },
+    ModelVariant {
+        name: "model-na-31-2-PS2",
+        model: "model-na-31-2",
+        input: "model-na-31-2-variations/model-na-31-2-PS2.json",
     },
     ModelVariant {
         name: "model-na-31-2-WS",
@@ -183,9 +218,14 @@ static VARIANTS: &[ModelVariant] = &[
         input: "model-p-2a-variations/model-p-2a-GR.json",
     },
     ModelVariant {
-        name: "model-p-2a-PS",
+        name: "model-p-2a-PS1",
         model: "model-p-2a",
-        input: "model-p-2a-variations/model-p-2a-PS.json",
+        input: "model-p-2a-variations/model-p-2a-PS1.json",
+    },
+    ModelVariant {
+        name: "model-p-2a-PS2",
+        model: "model-p-2a",
+        input: "model-p-2a-variations/model-p-2a-PS2.json",
     },
     ModelVariant {
         name: "model-p-2a-WS",

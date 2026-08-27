@@ -4,7 +4,8 @@
 
 #let is_municipality = (municipal, public_body) => is_municipality(input.election.authority_region, municipal, public_body)
 #let is_local_election = (local, other) => is_local_election(input.election.category, local, other)
-#let location_name = is_municipality[Gemeente #input.election.authority_id #input.election.authority_region][Openbaar lichaam #input.election.authority_region]
+#let district_number = get_district_number(input.election.district)
+#let location_name = is_municipality[Gemeente #input.election.authority_id #input.election.authority_region][Openbaar lichaam #input.election.authority_id #input.election.authority_region]
 #let location_type = is_municipality[gemeentelijk stembureau][stembureau voor het openbaar lichaam]
 
 #show: doc => conf(
@@ -33,7 +34,7 @@
 
 == Details van het #location_type
 
-#location_name
+#if (district_number != "") { [Kieskring #district_number #sym.arrow.r] } #location_name
 
 #input.committee_session.location #format_date_time(input.committee_session.start_date_time)
 

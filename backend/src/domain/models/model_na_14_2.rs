@@ -63,10 +63,16 @@ mod tests {
             .expect("model-na-14-2-GR.json should deserialize to struct ModelNa14_2Input");
 
         reader = BufReader::new(
-            File::open("templates/inputs/model-na-14-2-variations/model-na-14-2-PS.json").unwrap(),
+            File::open("templates/inputs/model-na-14-2-variations/model-na-14-2-PS1.json").unwrap(),
         );
         serde_json::from_reader::<_, ModelNa14_2Input>(reader)
-            .expect("model-na-14-2-PS.json should deserialize to struct ModelNa14_2Input");
+            .expect("model-na-14-2-PS1.json should deserialize to struct ModelNa14_2Input");
+
+        reader = BufReader::new(
+            File::open("templates/inputs/model-na-14-2-variations/model-na-14-2-PS2.json").unwrap(),
+        );
+        serde_json::from_reader::<_, ModelNa14_2Input>(reader)
+            .expect("model-na-14-2-PS2.json should deserialize to struct ModelNa14_2Input");
 
         reader = BufReader::new(
             File::open("templates/inputs/model-na-14-2-variations/model-na-14-2-WS.json").unwrap(),

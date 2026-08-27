@@ -13,11 +13,13 @@ pmOnFail: error
 strictDepBuilds: true
 strictPeerDependencies: true
 catalog:
-  vite: 8.2.1
-  vitest: &vitest 4.1.10
-  "@vitest/browser-playwright": *vitest
-  "@vitest/coverage-v8": *vitest
-  "@vitest/expect": *vitest
+  vite: 8.2.2
+  # These four versions should match, not using a YAML anchor because
+  # unfortunately Dependabot does not support updating those.
+  vitest: 4.1.11
+  "@vitest/browser-playwright": 4.1.11
+  "@vitest/coverage-v8": 4.1.11
+  "@vitest/expect": 4.1.11
 overrides:
   # Storybook currently uses @vitest/expect 3.2.4 which doesn't work with our vitest.d.ts
   "@vitest/expect": "catalog:"

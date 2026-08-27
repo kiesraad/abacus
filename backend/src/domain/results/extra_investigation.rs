@@ -130,7 +130,7 @@ pub mod tests {
         ];
 
         for (committee_category, investigation, recounted, expect_f101) in cases {
-            let result = validate(committee_category, investigation.clone(), recounted.clone())?;
+            let result = validate(committee_category, investigation, recounted)?;
             let has_f101 = result.errors.iter().any(|e| e == &f101);
             assert_eq!(
                 has_f101, expect_f101,
@@ -163,7 +163,7 @@ pub mod tests {
         ];
 
         for (committee_category, investigation, recounted, expect_f102) in cases {
-            let result = validate(committee_category, investigation.clone(), recounted.clone())?;
+            let result = validate(committee_category, investigation, recounted)?;
             let has_f102 = result.errors.iter().any(|e| e == &f102);
             assert_eq!(
                 has_f102, expect_f102,

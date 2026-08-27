@@ -6,7 +6,9 @@ import { ChoiceList } from "@/components/ui/CheckboxAndRadio/ChoiceList";
 import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { t } from "@/i18n/translate";
+import { committeeCategoryValues } from "@/types/generated/openapi";
 import { StringFormData } from "@/utils/stringFormData";
+import { isOneOf } from "@/utils/typeChecks";
 import { useElectionCreateContext } from "../hooks/useElectionCreateContext";
 
 export function CommitteeCategory() {
@@ -26,11 +28,7 @@ export function CommitteeCategory() {
     event.preventDefault();
     const formData = new StringFormData(event.currentTarget);
     const committeeCategory = formData.getString("committee_category");
-    if (
-      !committeeCategory ||
-      (committeeCategory !== "GSB" && committeeCategory !== "CSB") ||
-      (committeeCategory === "CSB" && csbDisabled)
-    ) {
+    if (!isOneOf(committeeCategoryValues, committeeCategory) || (committeeCategory === "CSB" && csbDisabled)) {
       return;
     }
 

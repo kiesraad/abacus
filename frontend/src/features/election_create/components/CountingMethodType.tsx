@@ -6,8 +6,9 @@ import { ChoiceList } from "@/components/ui/CheckboxAndRadio/ChoiceList";
 import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { t } from "@/i18n/translate";
-import { type VoteCountingMethod, voteCountingMethodValues } from "@/types/generated/openapi";
+import { voteCountingMethodValues } from "@/types/generated/openapi";
 import { StringFormData } from "@/utils/stringFormData";
+import { isOneOf } from "@/utils/typeChecks";
 import { useElectionCreateContext } from "../hooks/useElectionCreateContext";
 
 export function CountingMethodType() {
@@ -21,20 +22,11 @@ export function CountingMethodType() {
   }
 
   async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
-    function isVoteCountingMethod(value: string): value is VoteCountingMethod {
-      for (countingMethod of voteCountingMethodValues) {
-        if (value === countingMethod) {
-          return true;
-        }
-      }
-      return false;
-    }
-
     event.preventDefault();
     const formData = new StringFormData(event.currentTarget);
-    let countingMethod = formData.getString("counting_method");
+    const countingMethod = formData.getString("counting_method");
 
-    if (isVoteCountingMethod(countingMethod)) {
+    if (isOneOf(voteCountingMethodValues, countingMethod)) {
       dispatch({
         type: "SET_COUNTING_METHOD_TYPE",
         countingMethod,

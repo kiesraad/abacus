@@ -82,17 +82,38 @@ export interface ElectionCreateState {
   isNumberOfVotersUserEdited?: boolean;
 }
 
-// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
+const resetPollingStations = {
+  pollingStations: undefined,
+  pollingStationDefinitionData: undefined,
+  pollingStationDefinitionFileName: undefined,
+  pollingStationDefinitionMatchesElection: undefined,
+} satisfies ElectionCreateState;
+
+function selectPollingStationDefinition(
+  state: ElectionCreateState,
+  action: Extract<ElectionCreateAction, { type: "SELECT_POLLING_STATION_DEFINITION" }>,
+): ElectionCreateState {
+  if (action.response.committee_category !== "GSB") {
+    return state;
+  }
+  return {
+    ...state,
+    pollingStations: action.response.polling_stations,
+    pollingStationDefinitionData: action.pollingStationDefinitionData,
+    pollingStationDefinitionFileName: action.pollingStationDefinitionFileName,
+    pollingStationDefinitionMatchesElection: action.pollingStationDefinitionMatchesElection,
+    numberOfVoters: action.response.number_of_voters,
+    isNumberOfVotersUserEdited: false,
+  };
+}
+
 function reducer(state: ElectionCreateState, action: ElectionCreateAction): ElectionCreateState {
   switch (action.type) {
     case "SELECT_ELECTION_DEFINITION":
       return {
         ...state,
+        ...resetPollingStations,
         election: action.response.election,
-        pollingStations: undefined,
-        pollingStationDefinitionData: undefined,
-        pollingStationDefinitionFileName: undefined,
-        pollingStationDefinitionMatchesElection: undefined,
         electionDefinitionRedactedHash: action.response.hash,
         electionDefinitionData: action.electionDefinitionData,
         electionDefinitionFileName: action.electionDefinitionFileName,
@@ -105,60 +126,27 @@ function reducer(state: ElectionCreateState, action: ElectionCreateAction): Elec
         gsbSelected: undefined,
       };
     case "SET_ELECTION_DEFINITION_HASH":
-      return {
-        ...state,
-        electionDefinitionHash: action.electionDefinitionHash,
-      };
+      return { ...state, electionDefinitionHash: action.electionDefinitionHash };
     case "SELECT_CANDIDATES_DEFINITION":
       return {
         ...state,
+        ...resetPollingStations,
         election: action.response.election,
         candidateDefinitionRedactedHash: action.response.hash,
         candidateDefinitionData: action.candidateDefinitionData,
         candidateDefinitionFileName: action.candidateDefinitionFileName,
         candidateDefinitionHash: undefined,
-        pollingStationDefinitionData: undefined,
-        pollingStationDefinitionFileName: undefined,
-        pollingStationDefinitionMatchesElection: undefined,
       };
     case "SET_CANDIDATES_DEFINITION_HASH":
-      return {
-        ...state,
-        candidateDefinitionHash: action.candidateDefinitionHash,
-      };
+      return { ...state, candidateDefinitionHash: action.candidateDefinitionHash };
     case "SET_GSB_SELECTED":
-      return {
-        ...state,
-        gsbSelected: action.gsbSelected,
-        election: action.response.election,
-        pollingStations: undefined,
-        pollingStationDefinitionData: undefined,
-        pollingStationDefinitionFileName: undefined,
-        pollingStationDefinitionMatchesElection: undefined,
-      };
+      return { ...state, ...resetPollingStations, gsbSelected: action.gsbSelected, election: action.response.election };
     case "SELECT_POLLING_STATION_DEFINITION":
-      if (action.response.committee_category === "GSB") {
-        return {
-          ...state,
-          pollingStations: action.response.polling_stations,
-          pollingStationDefinitionData: action.pollingStationDefinitionData,
-          pollingStationDefinitionFileName: action.pollingStationDefinitionFileName,
-          pollingStationDefinitionMatchesElection: action.pollingStationDefinitionMatchesElection,
-          numberOfVoters: action.response.number_of_voters,
-          isNumberOfVotersUserEdited: false,
-        };
-      }
-      return state;
+      return selectPollingStationDefinition(state, action);
     case "SET_COUNTING_METHOD_TYPE":
-      return {
-        ...state,
-        countingMethod: action.countingMethod,
-      };
+      return { ...state, countingMethod: action.countingMethod };
     case "SET_COMMITTEE_CATEGORY":
-      return {
-        ...state,
-        committeeCategory: action.committeeCategory,
-      };
+      return { ...state, committeeCategory: action.committeeCategory };
     case "SET_NUMBER_OF_VOTERS":
       return {
         ...state,

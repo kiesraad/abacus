@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { hasTranslation, t, tx } from "@/i18n/translate";
+import { t, tOrDefault, txOrDefault } from "@/i18n/translate";
 import type { Election, ValidationResult, ValidationResultCode } from "@/types/generated/openapi";
 import type { DataEntrySection } from "@/types/types";
 
@@ -175,14 +175,17 @@ export function getTranslations(
 ): ValidationResultTranslations {
   const defaultTitle = role === "typist" ? t(`feedback.typist_title`) : "";
 
-  const titlePath = `feedback_${election.committee_category}.${result.code}.${role}.title`;
-  const contentPath = `feedback_${election.committee_category}.${result.code}.${role}.content`;
-  const actionsPath = `feedback_${election.committee_category}.${result.code}.${role}.actions`;
+  const basePath = `feedback_${election.committee_category}.${result.code}.${role}`;
+  let title = tOrDefault(`${basePath}.title`, undefined, defaultTitle);
+  let content = txOrDefault(`${basePath}.content`, undefined, { ...result.context }, undefined);
+  let actions = txOrDefault(`${basePath}.actions`, undefined, { ...result.context }, undefined);
 
-  return {
-    code: dottedCode(result.code),
-    title: hasTranslation(titlePath) ? t(titlePath, { ...result.context }) : defaultTitle,
-    content: hasTranslation(contentPath) ? tx(contentPath, undefined, { ...result.context }) : undefined,
-    actions: hasTranslation(actionsPath) ? tx(actionsPath, undefined, { ...result.context }) : undefined,
-  };
+  if (election.counting_method === "DSO") {
+    const basePath = `feedback_${election.committee_category}_DSO.${result.code}.${role}`;
+    title = tOrDefault(`${basePath}.title`, undefined, title);
+    content = txOrDefault(`${basePath}.content`, undefined, { ...result.context }, content);
+    actions = txOrDefault(`${basePath}.actions`, undefined, { ...result.context }, actions);
+  }
+
+  return { code: dottedCode(result.code), title, content, actions };
 }

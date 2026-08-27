@@ -176,21 +176,40 @@ describe("dottedCode", () => {
 });
 
 describe("getTranslations", () => {
-  const gsbElection = { committee_category: "GSB" } as Election;
+  const GSBCSOElection = { committee_category: "GSB", counting_method: "CSO" } as Election;
+  const GSBDSOElection = { committee_category: "GSB", counting_method: "DSO" } as Election;
 
   test("should return typist translations for GSB validation result with default title", () => {
     expect(hasTranslation("feedback_GSB.F101.typist.title")).toBeFalsy();
-    expect(getTranslations(gsbElection, validationResultMockData.F101, "typist")).toEqual({
+    expect(getTranslations(GSBCSOElection, validationResultMockData.F101, "typist")).toEqual({
       code: "F.101",
       title: t("feedback.typist_title"),
     });
   });
 
   test("should return coordinator translations for GSB validation result", () => {
-    expect(getTranslations(gsbElection, validationResultMockData.F101, "coordinator")).toEqual({
+    expect(getTranslations(GSBCSOElection, validationResultMockData.F101, "coordinator")).toEqual({
       code: "F.101",
       title: t("feedback_GSB.F101.coordinator.title"),
       content: tx("feedback_GSB.F101.coordinator.content"),
+    });
+  });
+
+  test("should return CSO coordinator translations for GSB validation result for CSO election with DSO override", () => {
+    expect(getTranslations(GSBCSOElection, validationResultMockData.F201, "coordinator")).toEqual({
+      code: "F.201",
+      title: t("feedback_GSB.F201.coordinator.title"),
+      content: tx("feedback_GSB.F201.coordinator.content"),
+      actions: tx("feedback_GSB.F201.coordinator.actions"),
+    });
+  });
+
+  test("should return DSO coordinator translations for GSB validation result for DSO election with DSO override", () => {
+    expect(getTranslations(GSBDSOElection, validationResultMockData.F201, "coordinator")).toEqual({
+      code: "F.201",
+      title: t("feedback_GSB.F201.coordinator.title"),
+      content: tx("feedback_GSB_DSO.F201.coordinator.content"),
+      actions: tx("feedback_GSB.F201.coordinator.actions"),
     });
   });
 });

@@ -6,6 +6,8 @@ import type {
   NewElection,
   PollingStationRequest,
   RedactedEmlHash,
+  RegionDetails,
+  RegionKey,
   VoteCountingMethod,
 } from "@/types/generated/openapi";
 
@@ -31,6 +33,11 @@ export type ElectionCreateAction =
   | {
       type: "SET_CANDIDATES_DEFINITION_HASH";
       candidateDefinitionHash: string[];
+    }
+  | {
+      type: "SET_GSB_SELECTED";
+      response: ElectionDefinitionValidateResponse;
+      gsbSelected: RegionKey;
     }
   | {
       type: "SELECT_POLLING_STATION_DEFINITION";
@@ -64,6 +71,8 @@ export interface ElectionCreateState {
   candidateDefinitionData?: string;
   candidateDefinitionFileName?: string;
   candidateDefinitionRedactedHash?: RedactedEmlHash;
+  gsbList?: RegionDetails[];
+  gsbSelected?: RegionKey;
   pollingStationDefinitionData?: string;
   pollingStationDefinitionFileName?: string;
   pollingStationDefinitionMatchesElection?: boolean;
@@ -92,6 +101,8 @@ function reducer(state: ElectionCreateState, action: ElectionCreateAction): Elec
         candidateDefinitionData: undefined,
         candidateDefinitionFileName: undefined,
         isNumberOfVotersUserEdited: false,
+        gsbList: action.response.committee_category === "GSB" ? action.response.gsb_list : undefined,
+        gsbSelected: undefined,
       };
     case "SET_ELECTION_DEFINITION_HASH":
       return {
@@ -114,6 +125,16 @@ function reducer(state: ElectionCreateState, action: ElectionCreateAction): Elec
       return {
         ...state,
         candidateDefinitionHash: action.candidateDefinitionHash,
+      };
+    case "SET_GSB_SELECTED":
+      return {
+        ...state,
+        gsbSelected: action.gsbSelected,
+        election: action.response.election,
+        pollingStations: undefined,
+        pollingStationDefinitionData: undefined,
+        pollingStationDefinitionFileName: undefined,
+        pollingStationDefinitionMatchesElection: undefined,
       };
     case "SELECT_POLLING_STATION_DEFINITION":
       if (action.response.committee_category === "GSB") {

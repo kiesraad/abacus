@@ -94,10 +94,15 @@ export function UploadCandidatesDefinition() {
           type: "SET_CANDIDATES_DEFINITION_HASH",
           candidateDefinitionHash: chunks,
         });
-        if (state.committeeCategory && state.committeeCategory === "CSB") {
+        if (state.committeeCategory === "CSB") {
           await navigate("/elections/create/check-and-save");
-        } else {
+        } else if (state.election?.category === "Municipal") {
+          // GR elections have the GSB defined in the election definition
+          // so we can go directly to the polling stations step
           await navigate("/elections/create/polling-stations");
+        } else {
+          // PS/WS elections need a GSB to be selected
+          await navigate("/elections/create/select-gsb");
         }
       } else if (isError(response) && response instanceof ApiError && response.reference === "InvalidHash") {
         setError(response.message);

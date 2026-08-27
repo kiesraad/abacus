@@ -55,6 +55,7 @@ export function UploadPollingStationDefinition() {
         candidate_data: state.candidateDefinitionData,
         polling_station_data: data,
         polling_station_file_name: currentFile.name,
+        selected_region: state.gsbSelected,
       });
 
       if (isSuccess(response) && response.data.committee_category === "GSB") {

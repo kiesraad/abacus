@@ -19,11 +19,18 @@ export function CommitteeCategory() {
     return <Navigate to="/elections/create" />;
   }
 
+  // PS CSB is not supported yet
+  const csbDisabled = state.election.category === "Provincial";
+
   async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new StringFormData(event.currentTarget);
     const committeeCategory = formData.getString("committee_category");
-    if (!committeeCategory || (committeeCategory !== "GSB" && committeeCategory !== "CSB")) {
+    if (
+      !committeeCategory ||
+      (committeeCategory !== "GSB" && committeeCategory !== "CSB") ||
+      (committeeCategory === "CSB" && csbDisabled)
+    ) {
       return;
     }
 
@@ -61,7 +68,8 @@ export function CommitteeCategory() {
                 name={"committee_category"}
                 label={t("committee_category.CSB.full")}
                 defaultValue={"CSB"}
-                defaultChecked={state.committeeCategory === "CSB"}
+                defaultChecked={state.committeeCategory === "CSB" && !csbDisabled}
+                disabled={csbDisabled}
               ></ChoiceList.Radio>
             </ChoiceList>
           </FormLayout.Section>

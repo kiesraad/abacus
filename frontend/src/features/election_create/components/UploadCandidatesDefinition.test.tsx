@@ -1,8 +1,12 @@
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
+import {
+  csbElectionImportValidateMockResponse,
+  gsbElectionImportValidateMockResponse,
+} from "@/testing/api-mocks/ElectionMockData";
 import { overrideOnce } from "@/testing/server";
-import { render, renderReturningRouter, screen } from "@/testing/test-utils";
-import type { NewElection } from "@/types/generated/openapi";
+import { render, renderReturningRouter, screen, waitFor } from "@/testing/test-utils";
+import type { CommitteeCategory, ElectionCategory, NewElection } from "@/types/generated/openapi";
 import * as uploadFileSize from "@/utils/uploadFileSize";
 import * as useElectionCreateContext from "../hooks/useElectionCreateContext";
 import { ElectionCreateContextProvider } from "./ElectionCreateContextProvider";
@@ -27,7 +31,11 @@ async function uploadFile(file: File) {
   await user.upload(input, file);
 }
 
-const election = { name: "Naam", location: "Plek" } as NewElection;
+const election = {
+  name: "Naam",
+  location: "Plek",
+  election_date: "2022-03-16",
+} as NewElection;
 
 const filename = "foo.txt";
 const file = new File(["foo"], filename, { type: "text/plain" });
@@ -80,6 +88,89 @@ describe("UploadCandidatesDefinition component", () => {
       `Het bestand ${filename} is te groot. Kies een bestand van maximaal 5 Megabyte`,
     );
     expect(dispatch).not.toHaveBeenCalled();
+  });
+
+  describe("Navigation after submitting the candidates hash", () => {
+    const redactedHash = gsbElectionImportValidateMockResponse().hash;
+    const hashInputs = ["zxcv", "gfsd"];
+    const fullHash = redactedHash.chunks.map((chunk, index) =>
+      redactedHash.redacted_indexes.includes(index) ? hashInputs[redactedHash.redacted_indexes.indexOf(index)] : chunk,
+    );
+
+    const hashState = {
+      electionDefinitionData: "mocked",
+      electionDefinitionHash: ["1234"],
+      candidateDefinitionFileName: filename,
+      candidateDefinitionData: "mocked",
+      candidateDefinitionRedactedHash: redactedHash,
+    };
+
+    async function submitHash() {
+      const user = userEvent.setup();
+      expect(await screen.findByRole("heading", { level: 2, name: "Controleer kandidatenlijsten" })).toBeVisible();
+      await user.type(screen.getByRole("textbox", { name: "Controle deel 1" }), "zxcv");
+      await user.type(screen.getByRole("textbox", { name: "Controle deel 2" }), "gfsd");
+      await user.click(screen.getByRole("button", { name: "Volgende" }));
+    }
+
+    test.each<[string, CommitteeCategory, ElectionCategory, string]>([
+      ["CSB", "CSB", "Municipal", "/elections/create/check-and-save"],
+      ["GSB for a municipal election", "GSB", "Municipal", "/elections/create/polling-stations"],
+      ["GSB for a provincial election", "GSB", "Provincial", "/elections/create/select-gsb"],
+      ["GSB for a water authority election", "GSB", "WaterAuthority", "/elections/create/select-gsb"],
+    ])("%s", async (_, committeeCategory, electionCategory, expected) => {
+      const state = {
+        ...hashState,
+        election: { ...election, category: electionCategory },
+        committeeCategory,
+      };
+
+      const dispatch = vi.fn();
+      vi.spyOn(useElectionCreateContext, "useElectionCreateContext").mockReturnValue({ state, dispatch });
+      overrideOnce(
+        "post",
+        "/api/elections/import/validate",
+        200,
+        committeeCategory === "CSB" ? csbElectionImportValidateMockResponse : gsbElectionImportValidateMockResponse(),
+      );
+
+      const router = renderReturningRouter(
+        <ElectionCreateContextProvider>
+          <UploadCandidatesDefinition />
+        </ElectionCreateContextProvider>,
+      );
+      await submitHash();
+
+      await waitFor(() => {
+        expect(dispatch).toHaveBeenCalledWith({
+          type: "SET_CANDIDATES_DEFINITION_HASH",
+          candidateDefinitionHash: fullHash,
+        });
+      });
+      expect(router.state.location.pathname).toEqual(expected);
+    });
+
+    test("Shows an error when the hash is invalid", async () => {
+      const state = { ...hashState, election, committeeCategory: "GSB" as CommitteeCategory };
+      const dispatch = vi.fn();
+      vi.spyOn(useElectionCreateContext, "useElectionCreateContext").mockReturnValue({ state, dispatch });
+      overrideOnce("post", "/api/elections/import/validate", 400, {
+        error: "Invalid hash",
+        fatal: false,
+        reference: "InvalidHash",
+      });
+
+      const router = renderReturningRouter(
+        <ElectionCreateContextProvider>
+          <UploadCandidatesDefinition />
+        </ElectionCreateContextProvider>,
+      );
+      await submitHash();
+
+      expect(await screen.findByRole("alert")).toHaveTextContent("Controle digitale vingerafdruk niet gelukt");
+      expect(dispatch).not.toHaveBeenCalled();
+      expect(router.state.location.pathname).toEqual("/");
+    });
   });
 
   test("Shows error when backend determines candidates list file is too large", async () => {

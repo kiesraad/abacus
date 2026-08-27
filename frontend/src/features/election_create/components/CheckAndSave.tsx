@@ -5,9 +5,53 @@ import { useCrud } from "@/api/useCrud";
 import { Button } from "@/components/ui/Button/Button";
 import { useMessages } from "@/hooks/messages/useMessages";
 import { t } from "@/i18n/translate";
-import type { ELECTION_IMPORT_REQUEST_PATH, ElectionWithPoliticalGroups } from "@/types/generated/openapi";
+import type {
+  ELECTION_IMPORT_REQUEST_PATH,
+  ElectionCreationRequest,
+  ElectionWithPoliticalGroups,
+} from "@/types/generated/openapi";
 import { useElectionCreateContext } from "../hooks/useElectionCreateContext";
+import type { ElectionCreateState } from "./ElectionCreateContextProvider";
 import { ImportedElectionInformation } from "./ImportedElectionInformation";
+
+function buildRequest(state: ElectionCreateState): ElectionCreationRequest | undefined {
+  if (
+    !state.committeeCategory ||
+    !state.electionDefinitionData ||
+    !state.electionDefinitionHash ||
+    !state.candidateDefinitionData ||
+    !state.candidateDefinitionHash
+  ) {
+    return undefined;
+  }
+  const definitions = {
+    election_data: state.electionDefinitionData,
+    election_hash: state.electionDefinitionHash,
+    candidate_data: state.candidateDefinitionData,
+    candidate_hash: state.candidateDefinitionHash,
+  };
+
+  switch (state.committeeCategory) {
+    case "CSB":
+      return { committee_category: "CSB", ...definitions };
+    case "GSB":
+      if (!state.countingMethod || state.numberOfVoters === undefined) {
+        return undefined;
+      }
+
+      return {
+        committee_category: "GSB",
+        ...definitions,
+        polling_station_data: state.pollingStationDefinitionData,
+        polling_station_file_name: state.pollingStationDefinitionFileName,
+        counting_method: state.countingMethod,
+        number_of_voters: state.numberOfVoters,
+        selected_region: state.gsbSelected,
+      };
+    default:
+      return state.committeeCategory satisfies never;
+  }
+}
 
 export function CheckAndSave() {
   const { pushMessage } = useMessages();
@@ -16,46 +60,20 @@ export function CheckAndSave() {
   const createPath: ELECTION_IMPORT_REQUEST_PATH = `/api/elections/import`;
   const { create } = useCrud<ElectionWithPoliticalGroups>({ createPath, throwAllErrors: true });
 
-  // if no election, committee category or candidate data is found in the state, go back to the beginning
-  if (!state.election || !state.committeeCategory || !state.electionDefinitionData || !state.candidateDefinitionData) {
+  const request = buildRequest(state);
+
+  // if we are missing data, go back to the beginning
+  if (!state.election || !request) {
     return <Navigate to="/elections/create" />;
   }
+  const committeeCategory = request.committee_category;
 
-  // GSB: if no counting method is found in the state, go back to the beginning
-  if (state.committeeCategory === "GSB" && !state.countingMethod) {
-    return <Navigate to="/elections/create" />;
-  }
-
-  function handleSubmit() {
-    let data = {
-      committee_category: state.committeeCategory,
-      election_data: state.electionDefinitionData,
-      election_hash: state.electionDefinitionHash,
-      candidate_data: state.candidateDefinitionData,
-      candidate_hash: state.candidateDefinitionHash,
-      polling_station_data: state.pollingStationDefinitionData,
-      polling_station_file_name: state.pollingStationDefinitionFileName,
-      counting_method: state.countingMethod,
-      number_of_voters: state.numberOfVoters,
-    };
-
-    if (state.committeeCategory === "CSB") {
-      data = {
-        ...data,
-        polling_station_data: undefined,
-        polling_station_file_name: undefined,
-        counting_method: undefined,
-        number_of_voters: undefined,
-      };
-    }
-
+  function handleSubmit(data: ElectionCreationRequest) {
     void create(data).then((result) => {
       if (isSuccess(result)) {
         pushMessage({
           title: t("election.message.election_created", {
-            committee_category: state.committeeCategory
-              ? t(`committee_category.${state.committeeCategory}.abbreviation`)
-              : "GSB",
+            committee_category: t(`committee_category.${committeeCategory}.abbreviation`),
             name: result.data.name,
           }),
         });
@@ -70,7 +88,7 @@ export function CheckAndSave() {
       <p className="mt-lg">{t("election.check_and_save.description")}</p>
       <ImportedElectionInformation
         election={state.election}
-        committeeCategory={state.committeeCategory}
+        committeeCategory={committeeCategory}
         pollingStations={state.pollingStations}
         countingMethod={state.countingMethod}
         numberOfVoters={state.numberOfVoters}
@@ -79,7 +97,7 @@ export function CheckAndSave() {
         <Button
           type="submit"
           onClick={() => {
-            handleSubmit();
+            handleSubmit(request);
           }}
         >
           {t("save")}

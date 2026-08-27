@@ -43,8 +43,8 @@ use crate::{
         committee_session::CommitteeSession,
         election::{
             Candidate, CandidateGender, CandidateNumber, CommitteeCategory, CommitteeDistrict,
-            ElectionDomain, ElectionWithPoliticalGroups, NewElection, PGNumber, RegionKey,
-            RegisteredPoliticalGroup,
+            ElectionCategory, ElectionDomain, ElectionWithPoliticalGroups, NewElection, PGNumber,
+            RegionKey, RegisteredPoliticalGroup,
         },
         results::political_group_candidate_votes::PoliticalGroupCandidateVotes,
         tabulation::{CommitteeSpecificTotals, ElectionTotals},
@@ -52,12 +52,38 @@ use crate::{
     eml::committees::ElectionTreeDetails,
 };
 
+const WATER_AUTHORITY_PREFIX: &str = "Algemeen bestuur van het ";
+
 fn max_votes(max_votes: &StringValue<NonZeroU64>) -> u32 {
     match max_votes.copied_value() {
         // If max_votes is too large we fall back to zero
         Ok(v) => v.get().try_into().unwrap_or(0u32),
         // If max_votes is not present or an invalid value we fall back to zero
         Err(_) => 0u32,
+    }
+}
+
+/// Format the EML election name for Abacus
+///+
+/// For water authority, the prefix is removed and the first letter capitalized
+fn format_election_name(name: &str, category: ElectionCategory) -> String {
+    let name = name.trim();
+
+    if category != ElectionCategory::WaterAuthority {
+        return name.to_string();
+    }
+
+    let mut chars = match name.get(..WATER_AUTHORITY_PREFIX.len()) {
+        Some(start) if start.eq_ignore_ascii_case(WATER_AUTHORITY_PREFIX) => {
+            &name[WATER_AUTHORITY_PREFIX.len()..]
+        }
+        _ => name,
+    }
+    .chars();
+
+    match chars.next() {
+        Some(first) => first.to_uppercase().chain(chars).collect(),
+        None => String::new(),
     }
 }
 
@@ -189,7 +215,7 @@ impl NewElection {
 
         Ok((
             Self {
-                name: identifier.name.to_string(),
+                name: format_election_name(&identifier.name, category),
                 committee_category: CommitteeCategory::GSB,
                 counting_method: None,
                 election_id: identifier.id.raw().into_owned(),
@@ -1152,6 +1178,73 @@ mod tests {
         let res = NewElection::from_eml_str(data, Some((CommitteeCategory::GSB, None)), false)
             .unwrap_err();
         assert!(matches!(res, EMLImportError::UnknownCommittee));
+    }
+
+    #[test]
+    fn test_format_election_name() {
+        assert_eq!(
+            format_election_name(
+                "Algemeen bestuur van het waterschap Juinen 2023",
+                ElectionCategory::WaterAuthority
+            ),
+            "Waterschap Juinen 2023"
+        );
+        assert_eq!(
+            format_election_name(
+                "   algemeen Bestuur van Het Wetterskip Juinen 2023",
+                ElectionCategory::WaterAuthority
+            ),
+            "Wetterskip Juinen 2023"
+        );
+        assert_eq!(
+            format_election_name(
+                "Algemeen bestuur van het hoogheemraadschap van Juinen 2023",
+                ElectionCategory::WaterAuthority
+            ),
+            "Hoogheemraadschap van Juinen 2023"
+        );
+        assert_eq!(
+            format_election_name("waterschap Juinen 2023", ElectionCategory::WaterAuthority),
+            "Waterschap Juinen 2023"
+        );
+        assert_eq!(
+            format_election_name(
+                "Algemeen bestuur van het gemeente 2023",
+                ElectionCategory::Municipal
+            ),
+            "Algemeen bestuur van het gemeente 2023"
+        );
+        assert_eq!(
+            format_election_name(
+                "Provinciale Staten Juinen 2023",
+                ElectionCategory::Provincial
+            ),
+            "Provinciale Staten Juinen 2023"
+        );
+    }
+
+    #[test]
+    fn test_water_authority_election_name_from_eml() {
+        let data = include_str!("tests/definitions/Verkiezingsdefinitie_AB2023_Limburg.eml.xml");
+        let (election, _) =
+            NewElection::from_eml_str(data, Some((CommitteeCategory::GSB, None)), true).unwrap();
+        assert_eq!(election.name, "Waterschap Limburg 2023");
+    }
+
+    #[test]
+    fn test_provincial_election_selected_gsb() {
+        let data = include_str!("tests/definitions/Verkiezingsdefinitie_PS2023_Limburg.eml.xml");
+        let region = RegionKey {
+            category: crate::domain::election::RegionCategory::Municipality,
+            number: Some(983),
+        };
+        let (election, _) =
+            NewElection::from_eml_str(data, Some((CommitteeCategory::GSB, Some(region))), false)
+                .unwrap();
+        assert_eq!(election.name, "Provinciale Staten Limburg 2023");
+        assert_eq!(election.location, "Venlo");
+        assert_eq!(election.authority_id, "0983");
+        assert_eq!(election.district.region_details().unwrap().name, "Venlo");
     }
 
     #[test]

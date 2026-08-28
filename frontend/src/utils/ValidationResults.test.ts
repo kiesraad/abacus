@@ -1,3 +1,4 @@
+import { renderToString } from "react-dom/server";
 import { describe, expect, test } from "vitest";
 import { hasTranslation, t, tx } from "@/i18n/translate";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
@@ -176,21 +177,70 @@ describe("dottedCode", () => {
 });
 
 describe("getTranslations", () => {
-  const gsbElection = { committee_category: "GSB" } as Election;
+  const GSBCSOElection = { committee_category: "GSB", counting_method: "CSO" } as Election;
+  const GSBDSOElection = { committee_category: "GSB", counting_method: "DSO" } as Election;
 
   test("should return typist translations for GSB validation result with default title", () => {
     expect(hasTranslation("feedback_GSB.F101.typist.title")).toBeFalsy();
-    expect(getTranslations(gsbElection, validationResultMockData.F101, "typist")).toEqual({
+    expect(getTranslations(GSBCSOElection, validationResultMockData.F101, "typist")).toEqual({
       code: "F.101",
       title: t("feedback.typist_title"),
     });
   });
 
   test("should return coordinator translations for GSB validation result", () => {
-    expect(getTranslations(gsbElection, validationResultMockData.F101, "coordinator")).toEqual({
+    expect(getTranslations(GSBCSOElection, validationResultMockData.F101, "coordinator")).toEqual({
       code: "F.101",
       title: t("feedback_GSB.F101.coordinator.title"),
       content: tx("feedback_GSB.F101.coordinator.content"),
     });
+  });
+
+  test("should return coordinator translations for GSB validation result with vars in title", () => {
+    const feedback = getTranslations(GSBCSOElection, validationResultMockData.F403, "coordinator");
+    expect(feedback.code).toEqual("F.403");
+    expect(feedback.title).toEqual(
+      "Controleer het totaal van de lijst en E.1 in rubriek 3.2 (eerste zitting) of 2.2 (volgende zitting)",
+    );
+    expect(feedback.content).toBe(undefined);
+    expect(renderToString(feedback.actions)).toEqual(
+      [
+        "<ul><li>Controleer wat er fout is gegaan in rubriek 3.2 (eerste zitting) of 2.2 (volgende zitting) en herstel de fout.</li>",
+        "<li>Pas zo nodig rubriek 3.3.2 (eerste zitting) of 2.3.2 (volgende zitting) aan, en volg de instructies over hertellen die daar staan.</li></ul>",
+      ].join(""),
+    );
+  });
+
+  test("should return CSO coordinator translations for GSB validation result for CSO election with DSO override", () => {
+    const feedback = getTranslations(GSBCSOElection, validationResultMockData.F401, "coordinator");
+    expect(feedback.code).toEqual("F.401");
+    expect(feedback.title).toEqual("Het totaal van de lijst is niet ingevuld");
+    expect(renderToString(feedback.content)).toEqual(
+      [
+        "Controleer of het proces-verbaal tijdens het telproces volledig is ingevuld (controleer ook E.1 in rubriek 3.2 (eerste zitting) of 2.2 (volgende zitting)).<br/>",
+        "Kijk of het corrigeren van de fout een onverklaard verschil wegneemt in rubriek 3.3 (eerste zitting) of 2.3 (volgende zitting).",
+      ].join(""),
+    );
+    expect(renderToString(feedback.actions)).toEqual(
+      [
+        "<ul><li>Zo ja: corrigeer de optelfout op het papieren proces-verbaal.</li>",
+        "<li>Zo nee: onderzoek wat er fout is gegaan en tel zo nodig de stembiljetten en het aantal toegelaten kiezers opnieuw. Begin bij deze lijst, en hertel tot de fout gevonden is, of alles één keer herteld is.</li></ul>",
+      ].join(""),
+    );
+  });
+
+  test("should return DSO coordinator translations for GSB validation result for DSO election with DSO override", () => {
+    const feedback = getTranslations(GSBDSOElection, validationResultMockData.F401, "coordinator");
+    expect(feedback.code).toEqual("F.401");
+    expect(feedback.title).toEqual("Het totaal van de lijst is niet ingevuld");
+    expect(renderToString(feedback.content)).toEqual(
+      "Kijk of het corrigeren van de fout een onverklaard verschil in rubriek 2.3 wegneemt.",
+    );
+    expect(renderToString(feedback.actions)).toEqual(
+      [
+        "<ul><li>Zo ja: maak een corrigendum en corrigeer daarin de optelfout. Corrigeer ook rubriek 2.3 in het corrigendum.</li>",
+        "<li>Zo nee: tel de stembiljetten en het aantal toegelaten kiezers opnieuw. Begin bij deze lijst, en hertel tot de fout gevonden is, of alles één keer herteld is.</li></ul>",
+      ].join(""),
+    );
   });
 });

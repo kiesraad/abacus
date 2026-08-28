@@ -3,7 +3,7 @@ import { renderToString } from "react-dom/server";
 import { describe, expect, test } from "vitest";
 
 import { locale, translations } from "./i18n";
-import { hasTranslation, t, translate, tx } from "./translate";
+import { hasTranslation, t, tOrDefault, translate, tx, txOrDefault } from "./translate";
 
 function updateTestTranslation(value: string) {
   translations[locale].test = value;
@@ -32,6 +32,15 @@ describe("i18n", () => {
     updateTestTranslation("Hello {item}! {pov} are my {thing}.");
     expect(t("test", { item: "World", pov: "You", thing: "sunshine" })).toEqual("Hello World! You are my sunshine.");
 
+    // key does not exist, return fallback
+    expect(tOrDefault("foo.bar", undefined, t("election.title.singular"))).toEqual("Verkiezing");
+    // key does not exist, return fallback which is undefined
+    expect(tOrDefault("foo.bar", undefined, undefined)).toEqual(undefined);
+    // key does exist, with vars provided
+    expect(tOrDefault("test", { item: "World", pov: "You", thing: "sunshine" }, t("election.title.singular"))).toEqual(
+      "Hello World! You are my sunshine.",
+    );
+
     // element interpolation
     {
       updateTestTranslation("Visit my homepage <link>here</link>");
@@ -40,7 +49,7 @@ describe("i18n", () => {
       expect(renderToString(translated)).toEqual(expected);
     }
 
-    // basic html support
+    // basic HTML support
     {
       updateTestTranslation("That's a <strong>bold</strong> statement!");
       const expected = "That&#x27;s a <strong>bold</strong> statement!";
@@ -62,6 +71,27 @@ describe("i18n", () => {
       const expected = "That&#x27;s a <em>nice</em> statement!";
       const translated = tx("test", { italic: (content) => <em>{content}</em> }, { what: "nice" });
       expect(renderToString(translated)).toEqual(expected);
+    }
+
+    {
+      const expected = "That&#x27;s a <em>nice</em> statement!";
+      const translated = tx("test", { italic: (content) => <em>{content}</em> }, { what: "nice" });
+      // key does not exist, return fallback
+      expect(
+        renderToString(
+          txOrDefault("foo.bar", { italic: (content) => <em>{content}</em> }, { what: "nice" }, translated),
+        ),
+      ).toEqual(expected);
+      // key does not exist, return fallback which is undefined
+      expect(
+        renderToString(
+          txOrDefault("foo.bar", { italic: (content) => <em>{content}</em> }, { what: "nice" }, undefined),
+        ),
+      ).toEqual("");
+      // key does exist
+      expect(
+        renderToString(txOrDefault("test", { italic: (content) => <em>{content}</em> }, { what: "nice" }, undefined)),
+      ).toEqual(expected);
     }
   });
 });

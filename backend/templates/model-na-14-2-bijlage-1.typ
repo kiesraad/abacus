@@ -4,7 +4,7 @@
 
 #let is_municipality = (municipal, public_body) => is_municipality(input.election.authority_region, municipal, public_body)
 #let is_local_election = (local, other) => is_local_election(input.election.category, local, other)
-#let location_name = is_municipality[Gemeente #input.election.authority_id #input.election.authority_region][Openbaar lichaam #input.election.authority_region]
+#let location_name = is_municipality[Gemeente #input.election.authority_id #input.election.authority_region][Openbaar lichaam #input.election.authority_id #input.election.authority_region]
 #let location_type = is_municipality[gemeentelijk stembureau][stembureau voor het openbaar lichaam]
 
 #show: doc => conf(

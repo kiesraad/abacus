@@ -1,0 +1,86 @@
+{
+  "F201": {
+    "coordinator": {
+      "content": "Controleer in rubriek 2.3 of er een onverklaard verschil opgelost wordt als het juiste getal bij D wordt ingevuld."
+    }
+  },
+  "F202": {
+    "coordinator": {
+      "content": "Controleer in rubriek 2.3 of er een onverklaard verschil opgelost wordt als de juiste getallen bij E en H worden ingevuld."
+    }
+  },
+  "F203": {
+    "coordinator": {
+      "content": "Controleer in rubriek 2.3 of er een onverklaard verschil opgelost wordt als het juiste getal bij H wordt ingevuld."
+    }
+  },
+  "F204": {
+    "coordinator": {
+      "content": "Controleer in rubriek 2.3 of er een onverklaard verschil opgelost wordt als de juiste getallen bij E en E.1 t/m E.n worden ingevuld."
+    }
+  },
+  "F301": {
+    "coordinator": {
+      "actions": "<ul><li>Herstel de fout door op papier het juiste getal in te (laten) vullen.</li><li>Controleer ook of er een onverklaard verschil ontstaat.</li><li>Pas zo nodig rubriek 2.3.2 aan, en volg de instructies over hertellen die daar staan.</li></ul>"
+    }
+  },
+  "F302": {
+    "coordinator": {
+      "actions": "<ul><li>Maak een corrigendum waarin de juiste optie geselecteerd wordt.</li></ul>"
+    }
+  },
+  "F303": {
+    "coordinator": {
+      "actions": "<ul><li>Maak een corrigendum waarin de juiste optie geselecteerd wordt.</li></ul>"
+    }
+  },
+  "F304": {
+    "coordinator": {
+      "content": "Is op het proces-verbaal duidelijk aangegeven welk van de opties bedoeld is?",
+      "actions": "<ul><li>Zo ja: laat dat dan overnemen in Abacus.</li><li>Zo nee: maak een corrigendum waarin de juiste optie geselecteerd wordt.</li></ul>"
+    }
+  },
+  "F305": {
+    "coordinator": {
+      "actions": "<ul><li>Corrigeer de rekenfout door een corrigendum te (laten) maken waarop I en/of J leeg zijn.</li><li>Kijk ook of het corrigeren van de fout een onverklaard verschil introduceert (zie 2.3.2).</li><li>Hertel dan de stembiljetten en het aantal toegelaten kiezers. Hertel tot de fout gevonden is, of alles één keer herteld is.</li><li>Vul nieuwe telresultaten op het corrigendum in.</li></ul>"
+    }
+  },
+  "F306": {
+    "coordinator": {
+      "actions": "<ul><li>Corrigeer de rekenfout in een corrigendum.</li><li>Kijk ook of het corrigeren van de fout een onverklaard verschil introduceert (zie 2.3.2).</li><li>Hertel dan de stembiljetten en het aantal toegelaten kiezers. Hertel tot de fout gevonden is, of alles één keer herteld is.</li><li>Vul nieuwe telresultaten op het corrigendum in.</li></ul>"
+    }
+  },
+  "F307": {
+    "coordinator": {
+      "actions": "<ul><li>Corrigeer de rekenfout in een corrigendum.</li><li>Kijk ook of het corrigeren van de fout een onverklaard verschil introduceert (zie 2.3.2).</li><li>Hertel dan de stembiljetten en het aantal toegelaten kiezers. Hertel tot de fout gevonden is, of alles één keer herteld is.</li><li>Vul nieuwe telresultaten op het corrigendum in.</li></ul>"
+    }
+  },
+  "F308": {
+    "coordinator": {
+      "actions": "<ul><li>Corrigeer de rekenfout in een corrigendum.</li><li>Kijk ook of het corrigeren van de fout een onverklaard verschil introduceert (zie 2.3.2).</li><li>Hertel dan de stembiljetten en het aantal toegelaten kiezers. Hertel tot de fout gevonden is, of alles één keer herteld is.</li><li>Vul nieuwe telresultaten op het corrigendum in.</li></ul>"
+    }
+  },
+  "F309": {
+    "coordinator": {
+      "actions": "<ul><li>Corrigeer de rekenfout in een corrigendum.</li><li>Kijk ook of het corrigeren van de fout een onverklaard verschil introduceert (zie 2.3.2).</li><li>Hertel dan de stembiljetten en het aantal toegelaten kiezers. Hertel tot de fout gevonden is, of alles één keer herteld is.</li><li>Vul nieuwe telresultaten op het corrigendum in.</li></ul>"
+    }
+  },
+  "F401": {
+    "coordinator": {
+      "content": "Kijk of het corrigeren van de fout een onverklaard verschil in rubriek 2.3 wegneemt.",
+      "actions": "<ul><li>Zo ja: maak een corrigendum en corrigeer daarin de optelfout. Corrigeer ook rubriek 2.3 in het corrigendum.</li><li>Zo nee: tel de stembiljetten en het aantal toegelaten kiezers opnieuw. Begin bij deze lijst, en hertel tot de fout gevonden is, of alles één keer herteld is.</li></ul>"
+    }
+  },
+  "F402": {
+    "coordinator": {
+      "content": "Reken de optelling in het papieren proces-verbaal na.\nKijk of het corrigeren van de fout een onverklaard verschil in rubriek 2.3 wegneemt.",
+      "actions": "<ul><li>Zo ja: maak een corrigendum en corrigeer daarin de optelfout. Corrigeer ook rubriek 2.3 in het corrigendum.</li><li>Zo nee: tel de stembiljetten en het aantal toegelaten kiezers opnieuw. Begin bij deze lijst, en hertel tot de fout gevonden is, of alles één keer herteld is.</li></ul>"
+    }
+  },
+  "F403": {
+    "coordinator": {
+      "content": "Kijk of het corrigeren van de fout een onverklaard verschil in rubriek 2.3 wegneemt.",
+      "actions": "<ul><li>Zo ja: maak een corrigendum en corrigeer daarin de optelfout. Corrigeer ook rubriek 2.3 in het corrigendum.</li><li>Zo nee: tel de stembiljetten en het aantal toegelaten kiezers opnieuw. Begin bij deze lijst, en hertel tot de fout gevonden is, of alles één keer herteld is.</li></ul>"
+    }
+  }
+}

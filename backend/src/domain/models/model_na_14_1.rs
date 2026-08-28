@@ -64,12 +64,22 @@ mod tests {
 
         reader = BufReader::new(
             File::open(
-                "templates/inputs/model-na-14-1-versie-1-variations/model-na-14-1-versie-1-PS.json",
+                "templates/inputs/model-na-14-1-versie-1-variations/model-na-14-1-versie-1-PS1.json",
             )
-            .unwrap(),
+                .unwrap(),
         );
         serde_json::from_reader::<_, ModelNa14_1Versie1Input>(reader).expect(
-            "model-na-14-1-versie-1-PS.json should deserialize to struct ModelNa14_1Versie1Input",
+            "model-na-14-1-versie-1-PS1.json should deserialize to struct ModelNa14_1Versie1Input",
+        );
+
+        reader = BufReader::new(
+            File::open(
+                "templates/inputs/model-na-14-1-versie-1-variations/model-na-14-1-versie-1-PS2.json",
+            )
+                .unwrap(),
+        );
+        serde_json::from_reader::<_, ModelNa14_1Versie1Input>(reader).expect(
+            "model-na-14-1-versie-1-PS2.json should deserialize to struct ModelNa14_1Versie1Input",
         );
 
         reader = BufReader::new(
@@ -97,12 +107,22 @@ mod tests {
 
         reader = BufReader::new(
             File::open(
-                "templates/inputs/model-na-14-1-versie-2-variations/model-na-14-1-versie-2-PS.json",
+                "templates/inputs/model-na-14-1-versie-2-variations/model-na-14-1-versie-2-PS1.json",
             )
-            .unwrap(),
+                .unwrap(),
         );
         serde_json::from_reader::<_, ModelNa14_1Versie2Input>(reader).expect(
-            "model-na-14-1-versie-2-PS.json should deserialize to struct ModelNa14_1Versie2Input",
+            "model-na-14-1-versie-2-PS1.json should deserialize to struct ModelNa14_1Versie2Input",
+        );
+
+        reader = BufReader::new(
+            File::open(
+                "templates/inputs/model-na-14-1-versie-2-variations/model-na-14-1-versie-2-PS2.json",
+            )
+                .unwrap(),
+        );
+        serde_json::from_reader::<_, ModelNa14_1Versie2Input>(reader).expect(
+            "model-na-14-1-versie-2-PS2.json should deserialize to struct ModelNa14_1Versie2Input",
         );
 
         reader = BufReader::new(

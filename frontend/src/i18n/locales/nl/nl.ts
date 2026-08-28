@@ -23,6 +23,7 @@ import extra_investigation from "./extra_investigation.json";
 import feedback from "./feedback.json";
 import feedback_CSB from "./feedback_CSB.json";
 import feedback_GSB from "./feedback_GSB.json";
+import feedback_GSB_DSO from "./feedback_GSB_DSO.json";
 import form_errors from "./form_errors.json";
 import generic from "./generic.json";
 import initialise from "./initialise.json";
@@ -62,6 +63,7 @@ const nl = {
   feedback,
   feedback_CSB,
   feedback_GSB,
+  feedback_GSB_DSO,
   form_errors,
   initialise,
   investigations,

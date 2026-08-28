@@ -64,7 +64,7 @@ fn max_votes(max_votes: &StringValue<NonZeroU64>) -> u32 {
 }
 
 /// Format the EML election name for Abacus
-///+
+///
 /// For water authority, the prefix is removed and the first letter capitalized
 fn format_election_name(name: &str, category: ElectionCategory) -> String {
     let name = name.trim();

@@ -98,7 +98,7 @@ const typistUsers: TestUser[] = [
 
 test.describe.configure({ mode: "serial" });
 
-test.describe("full flow GSB DSO", () => {
+test.describe("full flow GR GSB DSO", () => {
   let electionId: number | null = null;
 
   test("create and complete admin user account", async ({ adminOne }) => {

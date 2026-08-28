@@ -1,4 +1,4 @@
-import type { Locator, Page } from "@playwright/test";
+import { expect, type Locator, type Page } from "@playwright/test";
 
 import type { GSBResults, VotersCounts, VotesCounts } from "@/types/generated/openapi";
 
@@ -64,6 +64,8 @@ export class VotersAndVotesPage extends DataEntryBasePage {
     await this.proxyCertificateCount.fill(votersCounts.proxy_certificate_count.toString());
     if (votersCounts.voter_card_count) {
       await this.voterCardCount.fill(votersCounts.voter_card_count.toString());
+    } else {
+      await expect(this.voterCardCount).toBeDisabled();
     }
     await this.totalAdmittedVotersCount.fill(votersCounts.total_admitted_voters_count.toString());
   }

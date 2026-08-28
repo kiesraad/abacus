@@ -318,7 +318,7 @@ export const electionListMockResponse: ElectionListResponse = {
     { ...baseElectionGR, id: 1, committee_category: "GSB", counting_method: "CSO", number_of_voters: 2000 },
     { ...baseElectionGR, id: 2, committee_category: "CSB", number_of_voters: 0 },
     { ...baseElectionAB, id: 3, committee_category: "GSB", counting_method: "CSO", number_of_voters: 2000 },
-    { ...baseElectionAB, id: 4, committee_category: "CSB", number_of_voters: 2000 },
+    { ...baseElectionAB, id: 4, committee_category: "CSB", number_of_voters: 0 },
     { ...baseElectionPS, id: 5, committee_category: "GSB", counting_method: "CSO", number_of_voters: 2000 },
   ],
 };

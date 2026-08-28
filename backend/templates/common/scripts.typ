@@ -9,7 +9,9 @@
 ) { local } else { other }
 
 #let get_district_number = (district) => if (district.district == "Specific") { 
-  if (district.roman_numerals) { numbering("I", district.key.number) } else { district.key.number }
+  if ("number" in district.key) {
+    if (district.roman_numerals) { numbering("I", district.key.number) } else { district.key.number }
+  } else { "" }
 } else { "" }
 
 // A paragraph with a vertical line on the left

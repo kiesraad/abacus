@@ -26,4 +26,18 @@ describe("feedback translations structure", () => {
       }
     }
   });
+
+  test("validate feedback_GSB_DSO.json", () => {
+    const feedback = translations.feedback_GSB_DSO;
+    const feedbackItems = Object.values(feedback);
+
+    for (const entry of feedbackItems) {
+      const keys = Object.keys(entry.coordinator);
+
+      // No other keys than below allowed
+      for (const key of keys) {
+        expect(["title", "content", "actions"]).toContain(key);
+      }
+    }
+  });
 });

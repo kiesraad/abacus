@@ -176,13 +176,13 @@ export function getTranslations(
   const defaultTitle = role === "typist" ? t(`feedback.typist_title`) : "";
 
   const basePath = `feedback_${election.committee_category}.${result.code}.${role}`;
-  let title = tOrDefault(`${basePath}.title`, undefined, defaultTitle);
+  let title = tOrDefault(`${basePath}.title`, { ...result.context }, defaultTitle);
   let content = txOrDefault(`${basePath}.content`, undefined, { ...result.context }, undefined);
   let actions = txOrDefault(`${basePath}.actions`, undefined, { ...result.context }, undefined);
 
   if (election.counting_method === "DSO") {
     const basePath = `feedback_${election.committee_category}_DSO.${result.code}.${role}`;
-    title = tOrDefault(`${basePath}.title`, undefined, title);
+    title = tOrDefault(`${basePath}.title`, { ...result.context }, title);
     content = txOrDefault(`${basePath}.content`, undefined, { ...result.context }, content);
     actions = txOrDefault(`${basePath}.actions`, undefined, { ...result.context }, actions);
   }

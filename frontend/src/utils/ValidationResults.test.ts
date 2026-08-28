@@ -195,21 +195,29 @@ describe("getTranslations", () => {
     });
   });
 
+  test("should return coordinator translations for GSB validation result with vars in title", () => {
+    expect(getTranslations(GSBCSOElection, validationResultMockData.F403, "coordinator")).toEqual({
+      code: "F.403",
+      title: t("feedback_GSB.F403.coordinator.title", { political_group_number: 1 }),
+      actions: tx("feedback_GSB.F403.coordinator.actions", undefined, { political_group_number: 1 }),
+    });
+  });
+
   test("should return CSO coordinator translations for GSB validation result for CSO election with DSO override", () => {
     expect(getTranslations(GSBCSOElection, validationResultMockData.F401, "coordinator")).toEqual({
       code: "F.401",
-      title: t("feedback_GSB.F401.coordinator.title"),
+      title: t("feedback_GSB.F401.coordinator.title", { political_group_number: 1 }),
       content: tx("feedback_GSB.F401.coordinator.content", undefined, { political_group_number: 1 }),
-      actions: tx("feedback_GSB.F401.coordinator.actions"),
+      actions: tx("feedback_GSB.F401.coordinator.actions", undefined, { political_group_number: 1 }),
     });
   });
 
   test("should return DSO coordinator translations for GSB validation result for DSO election with DSO override", () => {
     expect(getTranslations(GSBDSOElection, validationResultMockData.F401, "coordinator")).toEqual({
       code: "F.401",
-      title: t("feedback_GSB.F401.coordinator.title"),
+      title: t("feedback_GSB.F401.coordinator.title", { political_group_number: 1 }),
       content: tx("feedback_GSB_DSO.F401.coordinator.content", undefined, { political_group_number: 1 }),
-      actions: tx("feedback_GSB_DSO.F401.coordinator.actions"),
+      actions: tx("feedback_GSB_DSO.F401.coordinator.actions", undefined, { political_group_number: 1 }),
     });
   });
 });

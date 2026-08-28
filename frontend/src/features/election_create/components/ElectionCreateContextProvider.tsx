@@ -87,6 +87,8 @@ const resetPollingStations = {
   pollingStationDefinitionData: undefined,
   pollingStationDefinitionFileName: undefined,
   pollingStationDefinitionMatchesElection: undefined,
+  numberOfVoters: undefined,
+  isNumberOfVotersUserEdited: undefined,
 } satisfies ElectionCreateState;
 
 function selectPollingStationDefinition(
@@ -122,6 +124,8 @@ function reducer(state: ElectionCreateState, action: ElectionCreateAction): Elec
         candidateDefinitionData: undefined,
         candidateDefinitionFileName: undefined,
         isNumberOfVotersUserEdited: false,
+        committeeCategory: undefined,
+        countingMethod: undefined,
         gsbList: action.response.committee_category === "GSB" ? action.response.gsb_list : undefined,
         gsbSelected: undefined,
       };

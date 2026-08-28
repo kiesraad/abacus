@@ -1,6 +1,6 @@
-INSERT INTO elections (id, name, committee_category, counting_method, election_id, location, authority_id, authority_name, authority_region, district, domain, category, sub_category, number_of_seats, number_of_voters, election_date, nomination_date, political_groups)
+INSERT INTO elections (id, name, eml_name, committee_category, counting_method, election_id, location, authority_id, authority_name, authority_region, district, domain, category, sub_category, number_of_seats, number_of_voters, election_date, nomination_date, political_groups)
 -- CSB election for GSB election_5_with_results
-VALUES (8, 'Test Election >= 19 seats', 'CSB', NULL, 'GR2024_Juinen', 'Juinen', 'CSB', 'Juinen', 'Juinen', '{"district":"None"}', '{"id":"0035","name":"Juinen"}', 'Municipal', 'GR2', 23, 1, '2024-11-30', '2024-11-01', '[
+VALUES (8, 'Gemeenteraad Juinen 2024 >= 19 seats', 'Gemeenteraad Juinen 2024', 'CSB', NULL, 'GR2024_Juinen', 'Juinen', 'CSB', 'Juinen', 'Juinen', '{"district":"None"}', '{"id":"0035","name":"Juinen"}', 'Municipal', 'GR2', 23, 1, '2024-11-30', '2024-11-01', '[
          {
            "number": 1,
            "registered_name": "Political Group A",

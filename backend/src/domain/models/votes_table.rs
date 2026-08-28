@@ -340,11 +340,12 @@ mod tests {
     fn sample_election(group: PoliticalGroup) -> ElectionWithPoliticalGroups {
         ElectionWithPoliticalGroups {
             id: ElectionId::from(1),
-            name: "Test election".to_string(),
+            name: "Gemeenteraad Test Location 2025".to_string(),
+            eml_name: "Gemeenteraad Test Location 2025".to_string(),
             committee_category: CommitteeCategory::GSB,
             counting_method: Some(VoteCountingMethod::CSO),
-            election_id: "Test_2025".to_string(),
-            location: "Test locatie".to_string(),
+            election_id: "GR2025_TestLocation".to_string(),
+            location: "Test Location".to_string(),
             authority_id: "0000".to_string(),
             authority_name: "Test".to_string(),
             authority_region: "Test".to_string(),

@@ -7949,7 +7949,7 @@
           },
           "name": {
             "type": "string",
-            "description": "Name of the election, as defined in the EML_NL election definition."
+            "description": "Name of the election, as formatted for display in Abacus."
           },
           "nomination_date": {
             "type": "string",

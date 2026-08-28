@@ -10,6 +10,7 @@
   "election": {
     "id": 2,
     "name": "Gemeenteraad Eemstricht 2022",
+    "eml_name": "Gemeenteraad Eemstricht 2035",
     "committee_category": "GSB",
     "counting_method": "DSO",
     "election_id": "GR2022_Eemstricht",

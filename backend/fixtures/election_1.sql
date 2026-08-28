@@ -1,6 +1,6 @@
-INSERT INTO elections (id, name, committee_category, counting_method, election_id, location, authority_id, authority_name, authority_region, district, domain, category, sub_category, number_of_seats,
+INSERT INTO elections (id, name, eml_name, committee_category, counting_method, election_id, location, authority_id, authority_name, authority_region, district, domain, category, sub_category, number_of_seats,
                        number_of_voters, election_date, nomination_date, political_groups)
-VALUES (1, 'Gemeenteraad Juinen 2026', 'GSB', 'CSO', 'GR2026_Juinen', 'Juinen', '0035', 'Juinen', 'Juinen', '{"district":"None"}', '{"id":"0035","name":"Juinen"}', 'Municipal', 'GR2', 29, 10000, '2026-11-30', '2026-11-01', '[
+VALUES (1, 'Gemeenteraad Juinen 2026', 'Gemeenteraad Juinen 2026', 'GSB', 'CSO', 'GR2026_Juinen', 'Juinen', '0035', 'Juinen', 'Juinen', '{"district":"None"}', '{"id":"0035","name":"Juinen"}', 'Municipal', 'GR2', 29, 10000, '2026-11-30', '2026-11-01', '[
          {
            "number": 1,
            "registered_name": "Lijst Hekking",

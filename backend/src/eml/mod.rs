@@ -216,6 +216,7 @@ impl NewElection {
         Ok((
             Self {
                 name: format_election_name(&identifier.name, category),
+                eml_name: identifier.name.to_string(),
                 committee_category: CommitteeCategory::GSB,
                 counting_method: None,
                 election_id: identifier.id.raw().into_owned(),

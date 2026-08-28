@@ -137,9 +137,11 @@ fn random_election(
     none_where_possible: bool,
 ) -> ElectionWithPoliticalGroups {
     let number_of_seats = rng.random_range(9..45);
+    let name = random_string(rng, string_length);
     ElectionWithPoliticalGroups {
         id: ElectionId::from(rng.random_range(0..5)),
-        name: random_string(rng, string_length),
+        name: name.clone(),
+        eml_name: name,
         committee_category,
         counting_method,
         election_id: random_string(rng, string_length),

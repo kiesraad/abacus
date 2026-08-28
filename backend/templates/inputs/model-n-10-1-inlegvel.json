@@ -2,6 +2,7 @@
   "election": {
     "id": 2,
     "name": "Gemeenteraad Juinen 2035",
+    "eml_name": "Gemeenteraad Juinen 2035",
     "committee_category": "GSB",
     "counting_method": "DSO",
     "election_id": "GR2035_Juinen",

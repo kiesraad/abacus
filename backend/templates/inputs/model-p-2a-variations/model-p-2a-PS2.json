@@ -10,6 +10,7 @@
   "election": {
     "id": 4,
     "name": "Provinciale Staten Oost-Holland 2022",
+    "eml_name": "Provinciale Staten Oost-Holland 2022",
     "committee_category": "GSB",
     "counting_method": "CSO",
     "election_id": "PS2022_Hovenerwoud",

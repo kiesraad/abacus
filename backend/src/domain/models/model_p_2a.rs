@@ -36,10 +36,16 @@ mod tests {
             .expect("model-p-2a.json should deserialize to struct ModelP2aInput");
 
         reader = BufReader::new(
-            File::open("templates/inputs/model-p-2a-variations/model-p-2a-PS.json").unwrap(),
+            File::open("templates/inputs/model-p-2a-variations/model-p-2a-PS1.json").unwrap(),
         );
         serde_json::from_reader::<_, ModelP2aInput>(reader)
-            .expect("model-p-2a-PS.json should deserialize to struct ModelP2aInput");
+            .expect("model-p-2a-PS1.json should deserialize to struct ModelP2aInput");
+
+        reader = BufReader::new(
+            File::open("templates/inputs/model-p-2a-variations/model-p-2a-PS2.json").unwrap(),
+        );
+        serde_json::from_reader::<_, ModelP2aInput>(reader)
+            .expect("model-p-2a-PS2.json should deserialize to struct ModelP2aInput");
 
         reader = BufReader::new(
             File::open("templates/inputs/model-p-2a-variations/model-p-2a-WS.json").unwrap(),

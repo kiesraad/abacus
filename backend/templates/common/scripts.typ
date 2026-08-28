@@ -8,6 +8,12 @@
   category == "Municipal"
 ) { local } else { other }
 
+#let get_district_number = (district) => if (district.district == "Specific") { 
+  if ("number" in district.key) {
+    if (district.roman_numerals) { numbering("I", district.key.number) } else { district.key.number }
+  } else { "" }
+} else { "" }
+
 // A paragraph with a vertical line on the left
 #let emph_block(content) = {
   block(width: 75%, above: 3em, below: 1.5em, outset: (left: 6pt, top: 3pt, bottom: 3pt), stroke: (left: 1pt), text(

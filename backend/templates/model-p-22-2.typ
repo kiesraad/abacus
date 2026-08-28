@@ -3,7 +3,7 @@
 #let input = json("inputs/model-p-22-2-variations/lt-19-seats-and-p9-and-p10.json")
 
 #let is_municipality = (municipal, public_body) => is_municipality(input.election.authority_region, municipal, public_body)
-#let location_name = is_municipality[Gemeente #input.election.authority_id #input.election.authority_region][Openbaar lichaam #input.election.authority_region]
+#let location_name = is_municipality[Gemeente #input.election.authority_id #input.election.authority_region][Openbaar lichaam #input.election.authority_id #input.election.authority_region]
 #let location_type = [centraal stembureau]
 #let subcommittee_type = [gemeentelijk stembureau]
 #let LARGE_COUNCIL_THRESHOLD = 19
@@ -19,7 +19,7 @@
 
     Proces-verbaal van het #location_type \
     Model P 22-2 (versie 2027)
-  ], margin-bottom: 2.9cm, footer-descent: 0.45cm
+  ], margin-bottom: 2.9cm
 )
 
 #set heading(numbering: none)
@@ -57,7 +57,7 @@ Het #location_type maakt bij een verkiezing een verslag van de controlewerkzaamh
 #pagebreak(weak: true)
 
 #show: doc => document_numbering(doc)
-
+// Max numbering level is 2
 #show heading.where(level: 3): it => [#block(it.body)]
 
 = Verslag van de zitting
@@ -176,10 +176,7 @@ De volgende rollen zijn mogelijk: voorzitter, plaatsvervangend voorzitter of lid
 
 #pagebreak(weak: true)
 
-#show heading.where(level: 3): it => [
-  #text(weight: "bold", counter(heading).display(it.numbering))
-  #it.body
-]
+#show: doc => document_numbering(doc)
 
 == Verschillen tussen aantal kiezers en uitgebrachte stemmen
 

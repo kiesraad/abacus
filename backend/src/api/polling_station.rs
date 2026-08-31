@@ -1,3 +1,4 @@
+use crate::domain::report::structs::election_filename;
 use axum::{
     Json,
     extract::{Path, State},
@@ -5,6 +6,7 @@ use axum::{
 };
 use axum_extra::response::Attachment;
 use eml_nl::io::EMLWrite;
+use pdf_gen::zip::slugify_filename;
 use serde::Serialize;
 use sqlx::{Connection, SqliteConnection, SqlitePool};
 use utoipa_axum::{router::OpenApiRouter, routes};
@@ -634,16 +636,8 @@ async fn polling_station_export(
     let eml = election.as_polling_stations_eml(&polling_stations, None, None)?;
     let xml = eml.write_eml_root_str(true, true)?;
 
-    // E.g. `eml110b_stembureaulijst-juinen-zitting1.eml.xml`, `eml110b_stembureaulijst-denhaag-zitting2.eml.xml`.
-    let file_name = format!(
-        "eml110b_stembureaulijst-{}-zitting{}.eml.xml",
-        election
-            .location
-            .split_whitespace()
-            .collect::<String>()
-            .to_lowercase(),
-        committee_session.number
-    );
+    // E.g. `Stembureaus_GR2025_Juinen.eml.xml`
+    let file_name = slugify_filename(&election_filename(&election, "Stembureaus", "eml.xml"));
 
     audit_service
         .log(

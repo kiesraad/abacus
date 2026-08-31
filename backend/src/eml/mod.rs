@@ -642,11 +642,16 @@ impl ElectionWithPoliticalGroups {
                         .map(|ps| {
                             PollingPlace::builder()
                                 .channel(VotingChannelType::Polling)
-                                .locality_name(&ps.locality[..])
+                                // Use polling station name (not ps.locality which contains the physical location).
+                                .locality_name(&ps.name[..])
                                 .postal_code(&ps.postal_code[..])
-                                .polling_station_id(ps.id.as_internal_u32() as u64)
-                                .polling_station_data_option(
-                                    ps.number_of_voters.map(|n| n.to_string()),
+                                .polling_station_id(u64::from(ps.number))
+                                // In Abacus number_of_voters on PollingStation is optional,
+                                // but EML requires at least one digit, hence the default value.
+                                .polling_station_data(
+                                    ps.number_of_voters
+                                        .map(|n| n.to_string())
+                                        .unwrap_or_else(|| "0".to_string()),
                                 )
                                 .build()
                         })

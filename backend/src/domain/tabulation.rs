@@ -438,9 +438,7 @@ impl DSOInvestigations {
         }
 
         // whether the investigation has led to corrected results
-        if checks.corrected_results_own_initiative.as_bool() == Some(true)
-            || checks.corrected_results_csb_request.as_bool() == Some(true)
-        {
+        if checks.corrected_results_own_initiative.as_bool() == Some(true) {
             self.corrected_results.push(polling_station.number());
         }
     }

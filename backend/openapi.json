@@ -3884,6 +3884,87 @@
         ]
       }
     },
+    "/api/elections/{election_id}/polling_stations/export": {
+      "get": {
+        "summary": "Export Polling Stations for the requested election (and most recent committee session) (administrator, coordinator_gsb)",
+        "operationId": "polling_station_export",
+        "parameters": [
+          {
+            "name": "election_id",
+            "in": "path",
+            "description": "Election database id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ElectionId"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of polling stations (EML)",
+            "headers": {
+              "Content-Disposition": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "attachment; filename=\"filename.eml.xml\""
+              }
+            },
+            "content": {
+              "text/xml": {}
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "administrator",
+              "coordinator_gsb"
+            ]
+          }
+        ]
+      }
+    },
     "/api/elections/{election_id}/polling_stations/import": {
       "post": {
         "summary": "Import file with Polling Stations (administrator, coordinator_gsb)",
@@ -5999,6 +6080,7 @@
           "PollingStationUpdated",
           "PollingStationDeleted",
           "PollingStationsImported",
+          "PollingStationsExported",
           "DataEntryStarted",
           "DataEntrySaved",
           "DataEntryResumed",

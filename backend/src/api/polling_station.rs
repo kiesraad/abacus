@@ -3,6 +3,8 @@ use axum::{
     extract::{Path, State},
     http::StatusCode,
 };
+use axum_extra::response::Attachment;
+use eml_nl::io::EMLWrite;
 use serde::Serialize;
 use sqlx::{Connection, SqliteConnection, SqlitePool};
 use utoipa_axum::{router::OpenApiRouter, routes};
@@ -109,6 +111,17 @@ impl AsAuditEvent for PollingStationsImportedAuditData {
     const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Success;
 }
 
+#[derive(Serialize)]
+struct PollingStationsExportedAuditData {
+    pub export_election_id: ElectionId,
+    pub export_file_name: String,
+    pub export_number_of_polling_stations: usize,
+}
+impl AsAuditEvent for PollingStationsExportedAuditData {
+    const EVENT_TYPE: AuditEventType = AuditEventType::PollingStationsExported;
+    const EVENT_LEVEL: AuditEventLevel = AuditEventLevel::Success;
+}
+
 pub fn router() -> OpenApiRouter<AppState> {
     use Role::*;
 
@@ -123,6 +136,7 @@ pub fn router() -> OpenApiRouter<AppState> {
         .routes(routes!(polling_station_delete).authorize(ADMIN_GSB_COORDINATOR))
         .routes(routes!(polling_station_validate_import).authorize(ADMIN_GSB_COORDINATOR))
         .routes(routes!(polling_station_import).authorize(ADMIN_GSB_COORDINATOR))
+        .routes(routes!(polling_station_export).authorize(ADMIN_GSB_COORDINATOR))
 }
 
 pub fn authorize_user_and_gsb_election(
@@ -580,6 +594,74 @@ async fn polling_station_import(
     ))
 }
 
+/// Export Polling Stations for the requested election (and most recent committee session)
+#[utoipa::path(
+    get,
+    path = "/api/elections/{election_id}/polling_stations/export",
+    responses(
+            (
+            status = 200,
+            description = "List of polling stations (EML)",
+            content_type = "text/xml",
+            headers(
+                ("Content-Disposition", description = "attachment; filename=\"filename.eml.xml\"")
+            )
+        ),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
+        (status = 404, description = "Not found", body = ErrorResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+    params(
+        ("election_id" = ElectionId, description = "Election database id"),
+    ),
+)]
+async fn polling_station_export(
+    user: User,
+    State(pool): State<SqlitePool>,
+    Path(election_id): Path<ElectionId>,
+    audit_service: AuditService,
+) -> Result<Attachment<String>, APIError> {
+    let mut conn = pool.acquire().await?;
+
+    let election = election_repo::get(&mut conn, election_id).await?;
+    authorize_user_and_gsb_election(&user, election.committee_category)?;
+
+    let committee_session = get_election_committee_session(&mut conn, election_id).await?;
+    let polling_stations =
+        polling_station_repo::list_polling_stations(&mut conn, committee_session.id).await?;
+
+    let eml = election.as_polling_stations_eml(&polling_stations, None, None)?;
+    let xml = eml.write_eml_root_str(true, true)?;
+
+    // E.g. `eml110b_stembureaulijst-juinen-zitting1.eml.xml`, `eml110b_stembureaulijst-denhaag-zitting2.eml.xml`.
+    let file_name = format!(
+        "eml110b_stembureaulijst-{}-zitting{}.eml.xml",
+        election
+            .location
+            .split_whitespace()
+            .collect::<String>()
+            .to_lowercase(),
+        committee_session.number
+    );
+
+    audit_service
+        .log(
+            &mut conn,
+            &PollingStationsExportedAuditData {
+                export_election_id: election_id,
+                export_file_name: file_name.clone(),
+                export_number_of_polling_stations: polling_stations.len(),
+            },
+            None,
+        )
+        .await?;
+
+    Ok(Attachment::new(xml)
+        .filename(&file_name)
+        .content_type("text/xml"))
+}
+
 #[cfg(test)]
 mod tests {
     use sqlx::{SqlitePool, query};
@@ -771,6 +853,7 @@ VALUES
                 ("create", polling_station_create(user.clone(), State(pool.clone()), Path(election_id), audit.clone(), polling_station_request.clone()).await.into_response()),
                 ("import", polling_station_import(user.clone(), State(pool.clone()), Path(import_election_id), audit.clone(), Json(PollingStationsRequest { file_name: "test.xml".into(), polling_stations: "<xml/>".into() })).await.into_response()),
                 ("validate_import", polling_station_validate_import(user.clone(), State(pool.clone()), Path(import_election_id), Json(PollingStationFileRequest { data: "<xml/>".into() })).await.into_response()),
+                ("export", polling_station_export(user.clone(), State(pool.clone()), Path(election_id), audit.clone()).await.into_response()),
                 ("get", polling_station_get(user.clone(), State(pool.clone()), Path((election_id, polling_station_id))).await.into_response()),
                 ("update", polling_station_update(user.clone(), State(pool.clone()), audit.clone(), Path((election_id, polling_station_id)), polling_station_request.clone()).await.into_response()),
                 ("delete", polling_station_delete(user.clone(), State(pool.clone()), audit.clone(), Path((election_id, polling_station_id))).await.into_response()),

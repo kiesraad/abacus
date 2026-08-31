@@ -50,7 +50,7 @@ test.describe("Election creation", () => {
 
       // Counting method page
       const countingMethodPage = new CountingMethodTypePgObj(page);
-      await expect(countingMethodPage.header).toBeVisible();
+      await countingMethodPage.checkHeaderContainsName("Test");
       await expect(countingMethodPage.cso).not.toBeChecked();
       await expect(countingMethodPage.dso).not.toBeChecked();
       await countingMethodPage.cso.check();
@@ -127,7 +127,7 @@ test.describe("Election creation", () => {
 
       // Counting method page
       const countingMethodPage = new CountingMethodTypePgObj(page);
-      await expect(countingMethodPage.header).toBeVisible();
+      await countingMethodPage.checkHeaderContainsName("Test");
       await countingMethodPage.cso.check();
       await countingMethodPage.next.click();
 
@@ -207,7 +207,7 @@ test.describe("Election creation", () => {
 
       // Counting method page
       const countingMethodPage = new CountingMethodTypePgObj(page);
-      await expect(countingMethodPage.header).toBeVisible();
+      await countingMethodPage.checkHeaderContainsName("Test");
       await expect(countingMethodPage.cso).not.toBeChecked();
       await expect(countingMethodPage.dso).not.toBeChecked();
       await countingMethodPage.dso.check();
@@ -284,7 +284,7 @@ test.describe("Election creation", () => {
 
       // Counting method page
       const countingMethodPage = new CountingMethodTypePgObj(page);
-      await expect(countingMethodPage.header).toBeVisible();
+      await countingMethodPage.checkHeaderContainsName("Test");
       await countingMethodPage.dso.check();
       await countingMethodPage.next.click();
 
@@ -620,7 +620,7 @@ test.describe("Election creation", () => {
 
       // Counting method page
       const countingMethodPage = new CountingMethodTypePgObj(page);
-      await expect(countingMethodPage.header).toBeVisible();
+      await countingMethodPage.checkHeaderContainsName("Test");
       await countingMethodPage.cso.check();
       await countingMethodPage.next.click();
 
@@ -663,7 +663,7 @@ test.describe("Election creation", () => {
       await uploadPollingStations(page, eml110b_zero_voters);
 
       const countingMethodPage = new CountingMethodTypePgObj(page);
-      await expect(countingMethodPage.header).toBeVisible();
+      await countingMethodPage.checkHeaderContainsName("Test");
       await countingMethodPage.cso.check();
       await countingMethodPage.next.click();
 

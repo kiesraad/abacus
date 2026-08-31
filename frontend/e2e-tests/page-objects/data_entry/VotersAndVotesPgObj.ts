@@ -62,7 +62,7 @@ export class VotersAndVotesPage extends DataEntryBasePage {
   async inputVotersCounts(votersCounts: VotersCounts) {
     await this.pollCardCount.fill(votersCounts.poll_card_count.toString());
     await this.proxyCertificateCount.fill(votersCounts.proxy_certificate_count.toString());
-    if (votersCounts.voter_card_count) {
+    if (votersCounts.voter_card_count !== undefined) {
       await this.voterCardCount.fill(votersCounts.voter_card_count.toString());
     } else {
       await expect(this.voterCardCount).toBeDisabled();

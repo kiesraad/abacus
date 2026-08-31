@@ -130,7 +130,7 @@ test.describe("full flow GR GSB CSO", () => {
     await uploadPollingStations(page, eml110b_single);
 
     const countingMethodPage = new CountingMethodTypePgObj(page);
-    await expect(countingMethodPage.header).toBeVisible();
+    await countingMethodPage.checkHeaderContainsName("Test");
     await expect(countingMethodPage.cso).not.toBeChecked();
     await expect(countingMethodPage.dso).not.toBeChecked();
     await countingMethodPage.cso.check();

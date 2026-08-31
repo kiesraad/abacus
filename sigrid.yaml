@@ -1,5 +1,7 @@
 languages:
   - name: "css"
+  # TODO: "sqlite" is not on Sigrid's supported technology list
+  # https://docs.sigrid-says.com/reference/technology-support.html
   - name: "sqlite"
     production:
       include:
@@ -12,11 +14,13 @@ languages:
     production:
     test:
       include:
-        - ".*/backend/apportionment/src/test_helpers.rs"
+        - ".*/backend/apportionment/src/test_helpers[.]rs"
         - ".*/backend/apportionment/fuzz/.*[.]rs"
-        - ".*/gen-test-gsb-election[.]rs"
+        - ".*/backend/src/api/tests[.]rs"
+        - ".*/backend/src/infra/pdf_gen/typst_.*tests[.]rs"
+        - ".*/backend/src/test_support[.]rs"
+        - ".*/backend/tests/.*[.]rs"
         - ".*/test_data_gen/.*[.]rs"
-        - ".*/typst_tests[.]rs"
         - ".*/backend/fuzz/.*[.]rs"
 
   - name: "typescript"
@@ -25,14 +29,16 @@ languages:
       include:
         - ".*/frontend/[.]storybook/.*"
         - ".*/frontend/.*[.]e2e[.]ts"
-        - ".*/frontend/.*.stories[.]tsx"
+        - ".*/frontend/.*[.]stories[.]tsx"
+        - ".*/frontend/.*[.]test[.]tsx?"
+        - ".*/frontend/@types/.*[.]d[.]ts"
         - ".*/frontend/src/components/error/NotAvailableInMock[.]tsx"
         - ".*/frontend/src/features/dev/.*"
         - ".*/frontend/.*/testing/.*"
         - ".*/frontend/e2e-tests/.*"
     generated:
       include:
-        - ".*/frontend/.*/generated/.*[.]ts"
+        - ".*/frontend/.*/generated/.*[.]tsx?"
 
 exclude:
   - ".*/backend/[.]env"
@@ -48,6 +54,9 @@ dependencychecker:
     - "abacus-fuzz"
     - "apportionment"
     - "apportionment-fuzz"
+    - "pdf_gen"
+    - "pdf_gen_impl"
+    - "pdf_gen_types"
   transitive: true
   exclude:
     # Marvin Attack on RSA crate, which we do not use (Cargo weak dependency, https://github.com/rust-lang/cargo/issues/10801)

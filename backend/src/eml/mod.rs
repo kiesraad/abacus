@@ -46,9 +46,7 @@ use crate::{
             ElectionDomain, ElectionWithPoliticalGroups, NewElection, PGNumber, RegionKey,
             RegisteredPoliticalGroup,
         },
-        results::{
-            political_group_candidate_votes::PoliticalGroupCandidateVotes, yes_no::YesNo, Results,
-        },
+        results::{political_group_candidate_votes::PoliticalGroupCandidateVotes, Results},
         tabulation::{CommitteeSpecificTotals, ElectionTotals},
     },
     eml::committees::ElectionTreeDetails,
@@ -986,13 +984,16 @@ fn add_reporting_unit_investigations(
                         .other_error,
                 );
 
-                builder = builder.investigation(
-                    InvestigationReason::ResultCorrected,
-                    dso_first_session_result
-                        .checks_and_corrections
-                        .corrected_results_own_initiative
-                        == YesNo::yes(),
-                );
+                if let Some(corrected_results_own_initiative) = dso_first_session_result
+                    .checks_and_corrections
+                    .corrected_results_own_initiative
+                    .as_bool()
+                {
+                    builder = builder.investigation(
+                        InvestigationReason::ResultCorrected,
+                        corrected_results_own_initiative,
+                    );
+                }
             }
             Results::CSOFirstSession(cso_first_session_result) => {
                 if let Some(extra_investigation_other_reason) = cso_first_session_result
@@ -1112,16 +1113,16 @@ mod tests {
 
     use super::*;
     use crate::domain::{
-        committee_session::{CommitteeSessionId, committee_session_fixture},
+        committee_session::{committee_session_fixture, CommitteeSessionId},
         data_entry::{DataEntryId, DataEntrySource},
-        election::{ElectionCategory, tests::election_fixture},
+        election::{tests::election_fixture, ElectionCategory},
         polling_station::{
-            PollingStationFirstSession, PollingStationForSession,
-            test_helpers::polling_stations_fixture,
+            test_helpers::polling_stations_fixture, PollingStationFirstSession,
+            PollingStationForSession,
         },
         results::{
-            Results, count::Count, political_group_candidate_votes::CandidateVotes,
-            tests::example_results,
+            count::Count, political_group_candidate_votes::CandidateVotes, tests::example_results,
+            Results,
         },
     };
 
@@ -1311,11 +1312,9 @@ mod tests {
             total_votes_csb.eligible_voter_count,
             StringValue::from_value(1001u64)
         );
-        assert!(
-            !total_votes_csb
-                .uncounted_votes
-                .contains_key(&UncountedVotesReason::ValidVoterCards)
-        );
+        assert!(!total_votes_csb
+            .uncounted_votes
+            .contains_key(&UncountedVotesReason::ValidVoterCards));
         assert!(result_csb.reporting_unit_votes.is_empty());
 
         // GSB elections take the eligible voter count from the election (default number_of_voters=1000)
@@ -1338,14 +1337,12 @@ mod tests {
                 .get(&UncountedVotesReason::ValidVoterCards),
             None
         );
-        assert!(
-            !result_gsb
-                .reporting_unit_votes
-                .first()
-                .unwrap()
-                .uncounted_votes
-                .contains_key(&UncountedVotesReason::ValidVoterCards)
-        );
+        assert!(!result_gsb
+            .reporting_unit_votes
+            .first()
+            .unwrap()
+            .uncounted_votes
+            .contains_key(&UncountedVotesReason::ValidVoterCards));
     }
 
     #[test]

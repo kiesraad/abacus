@@ -19,7 +19,7 @@ import { renderReturningRouter, screen, spyOnHandler, within } from "@/testing/t
 import type { DataEntryStatusResponse } from "@/types/generated/openapi";
 import { ValidationResultSet } from "@/utils/ValidationResults";
 
-import { getDefaultDataEntryState, getEmptyDataEntryRequest, getInitialValues } from "../../testing/mock-data";
+import { getCSOInitialValues, getDefaultDataEntryState, getEmptyDataEntryRequest } from "../../testing/mock-data";
 import { overrideServerClaimDataEntryResponse } from "../../testing/test.utils";
 import type { FormState } from "../../types/types";
 import { DataEntryProvider } from "../DataEntryProvider";
@@ -160,7 +160,7 @@ describe("Test CheckAndSaveForm", () => {
   test("Data entry does not show finalise button with errors", async () => {
     overrideServerClaimDataEntryResponse({
       formState: customFormState(),
-      results: getInitialValues(),
+      results: getCSOInitialValues(),
       validationResults: { errors: [validationResultMockData.F201], warnings: [] },
     });
     renderForm();
@@ -175,7 +175,7 @@ describe("Test CheckAndSaveForm", () => {
   test("Data entry does not show finalise button with unaccepted warnings", async () => {
     overrideServerClaimDataEntryResponse({
       formState: customFormState(),
-      results: getInitialValues(),
+      results: getCSOInitialValues(),
       validationResults: { errors: [], warnings: [validationResultMockData.W202] },
     });
     renderForm();
@@ -193,7 +193,7 @@ describe("Test CheckAndSaveForm", () => {
 
     overrideServerClaimDataEntryResponse({
       formState: formState,
-      results: getInitialValues(),
+      results: getCSOInitialValues(),
       validationResults: { errors: [], warnings: [validationResultMockData.W202] },
     });
     renderForm();
@@ -219,7 +219,7 @@ describe("Test CheckAndSaveForm", () => {
 
     overrideServerClaimDataEntryResponse({
       formState: mockFormState,
-      results: getInitialValues(),
+      results: getCSOInitialValues(),
       validationResults: { errors: [validationResultMockData.F201], warnings: [validationResultMockData.W203] },
     });
     renderForm();
@@ -302,7 +302,7 @@ describe("Test CheckAndSaveForm summary", () => {
   test("Blocking", async () => {
     overrideServerClaimDataEntryResponse({
       formState: customFormState(),
-      results: getInitialValues(),
+      results: getCSOInitialValues(),
       validationResults: { errors: [validationResultMockData.F201], warnings: [validationResultMockData.W201] },
     });
     renderForm();
@@ -325,7 +325,7 @@ describe("Test CheckAndSaveForm summary", () => {
     formState.sections.voters_votes_counts!.acceptErrorsAndWarnings = true;
     overrideServerClaimDataEntryResponse({
       formState: formState,
-      results: getInitialValues(),
+      results: getCSOInitialValues(),
       validationResults: { errors: [], warnings: [validationResultMockData.W201] },
     });
     renderForm();

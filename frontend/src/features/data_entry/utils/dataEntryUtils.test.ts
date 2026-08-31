@@ -8,11 +8,11 @@ import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 import { ValidationResultSet } from "@/utils/ValidationResults";
 
 import {
+  getCSOInitialValues,
   getDefaultDataEntryState,
   getDefaultDataEntryStructure,
   getDefaultFormSection,
   getDSOInitialValues,
-  getInitialValues,
 } from "../testing/mock-data";
 import type { DataEntryStateLoaded, FormState } from "../types/types";
 import {
@@ -238,14 +238,14 @@ describe("isFormSectionEmpty", () => {
 
   test("political group form is empty", () => {
     const section = getDefaultFormSection("political_group_votes_1", 0);
-    const values = getInitialValues();
+    const values = getCSOInitialValues();
 
     expect(isFormSectionEmpty(dataEntryStructure, section, values)).toBeTruthy();
   });
 
   test("political group form: total is not empty", () => {
     const section = getDefaultFormSection("political_group_votes_1", 0);
-    const values = getInitialValues();
+    const values = getCSOInitialValues();
     values.political_group_votes[0]!.total = 100;
 
     expect(isFormSectionEmpty(dataEntryStructure, section, values)).toBeFalsy();
@@ -253,7 +253,7 @@ describe("isFormSectionEmpty", () => {
 
   test("political group form: candidate votes is not empty", () => {
     const section = getDefaultFormSection("political_group_votes_1", 0);
-    const values = getInitialValues();
+    const values = getCSOInitialValues();
     values.political_group_votes[0]!.candidate_votes[0]!.votes = 100;
 
     expect(isFormSectionEmpty(dataEntryStructure, section, values)).toBeFalsy();
@@ -261,14 +261,14 @@ describe("isFormSectionEmpty", () => {
 
   test("voters and votes form is empty", () => {
     const section = getDefaultFormSection("voters_votes_counts", 0);
-    const values = getInitialValues();
+    const values = getCSOInitialValues();
 
     expect(isFormSectionEmpty(dataEntryStructure, section, values)).toBeTruthy();
   });
 
   test("voters and votes form: votes is not empty", () => {
     const section = getDefaultFormSection("voters_votes_counts", 0);
-    const values = getInitialValues();
+    const values = getCSOInitialValues();
     values.votes_counts.invalid_votes_count = 3;
 
     expect(isFormSectionEmpty(dataEntryStructure, section, values)).toBeFalsy();
@@ -276,7 +276,7 @@ describe("isFormSectionEmpty", () => {
 
   test("voters and votes form: voters is not empty", () => {
     const section = getDefaultFormSection("voters_votes_counts", 0);
-    const values = getInitialValues();
+    const values = getCSOInitialValues();
     values.voters_counts.total_admitted_voters_count = 6;
 
     expect(isFormSectionEmpty(dataEntryStructure, section, values)).toBeFalsy();
@@ -284,14 +284,14 @@ describe("isFormSectionEmpty", () => {
 
   test("differences form is empty", () => {
     const section = getDefaultFormSection("differences_counts", 0);
-    const values = getInitialValues();
+    const values = getCSOInitialValues();
 
     expect(isFormSectionEmpty(dataEntryStructure, section, values)).toBeTruthy();
   });
 
   test("differences form is not empty", () => {
     const section = getDefaultFormSection("differences_counts", 0);
-    const values = getInitialValues();
+    const values = getCSOInitialValues();
     values.differences_counts.more_ballots_count = 5;
 
     expect(isFormSectionEmpty(dataEntryStructure, section, values)).toBeFalsy();
@@ -299,7 +299,7 @@ describe("isFormSectionEmpty", () => {
 
   test("section not in data entry structure is considered empty", () => {
     const section = getDefaultFormSection("unknown_section", 0);
-    const values = getInitialValues();
+    const values = getCSOInitialValues();
 
     expect(isFormSectionEmpty(dataEntryStructure, section, values)).toBeTruthy();
   });
@@ -330,7 +330,7 @@ describe("isFormSectionEmpty", () => {
 
     // Test with false values - should be considered empty
     const valuesWithFalse = {
-      ...getInitialValues(),
+      ...getCSOInitialValues(),
       test: {
         checkbox_field: false,
       },
@@ -340,7 +340,7 @@ describe("isFormSectionEmpty", () => {
 
     // Test with a true value - should be considered non-empty
     const valuesWithTrue = {
-      ...getInitialValues(),
+      ...getCSOInitialValues(),
       test: {
         checkbox_field: true,
       },
@@ -369,7 +369,7 @@ describe("isFormSectionEmpty", () => {
 
     // Test with empty values - should be considered null
     const data = {
-      ...getInitialValues(),
+      ...getCSOInitialValues(),
       test: {
         radio_field: "",
       },
@@ -379,7 +379,7 @@ describe("isFormSectionEmpty", () => {
 
     // Test with a non-empty value - should be considered non-empty
     const valuesWithTrue = {
-      ...getInitialValues(),
+      ...getCSOInitialValues(),
       test: {
         radio_field: "OptionA",
       },

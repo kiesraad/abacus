@@ -11,7 +11,7 @@ import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMo
 import { overrideOnce, server } from "@/testing/server";
 import { renderReturningRouter, screen, within } from "@/testing/test-utils";
 import type { ErrorResponse } from "@/types/generated/openapi";
-import { getDefaultDataEntryState, getInitialValues } from "../../testing/mock-data";
+import { getCSOInitialValues, getDefaultDataEntryState } from "../../testing/mock-data";
 import { overrideServerClaimDataEntryResponse } from "../../testing/test.utils";
 import type { FormState } from "../../types/types";
 import { DataEntryProvider } from "../DataEntryProvider";
@@ -50,7 +50,7 @@ describe("Test CheckAndSaveSection", () => {
 
     overrideServerClaimDataEntryResponse({
       formState,
-      results: getInitialValues(),
+      results: getCSOInitialValues(),
       validationResults: { errors: [validationResultMockData.F201], warnings: [validationResultMockData.W201] },
     });
 

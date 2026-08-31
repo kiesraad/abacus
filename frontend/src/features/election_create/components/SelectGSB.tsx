@@ -61,7 +61,7 @@ export function SelectGSB() {
           <p>{error}</p>
         </Alert>
       )}
-      <Table className="mt-lg">
+      <Table id="region_list" className="mt-lg">
         <Table.Header>
           <Table.HeaderCell numberWidth className="text-align-r">
             {t("number")}

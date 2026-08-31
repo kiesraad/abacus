@@ -1,4 +1,14 @@
-export const eml110a = {
+export type Eml110a = {
+  filename: string;
+  path: string;
+  electionName: string;
+  electionDate: string;
+  hashInput1: string;
+  hashInput2: string;
+  fullHash: string[];
+};
+
+export const eml110a: Eml110a = {
   filename: "eml110a_test.eml.xml",
   path: "../backend/src/eml/tests/eml110a_test.eml.xml",
   electionName: "Gemeenteraad Test 2022",
@@ -25,7 +35,7 @@ export const eml110a = {
   ],
 };
 
-export const eml110a_less_than_19_seats = {
+export const eml110a_less_than_19_seats: Eml110a = {
   filename: "eml110a_test_less_than_19_seats.eml.xml",
   path: "e2e-tests/test-data/eml-files/eml110a_test_less_than_19_seats.eml.xml",
   electionName: "Gemeenteraad Test 2022",
@@ -49,6 +59,33 @@ export const eml110a_less_than_19_seats = {
     "e869",
     "e3c3",
     "9848",
+  ],
+};
+
+export const eml110a_AB2023_Limburg: Eml110a = {
+  filename: "Verkiezingsdefinitie_AB2023_Limburg.eml.xml",
+  path: "../backend/src/eml/tests/definitions/Verkiezingsdefinitie_AB2023_Limburg.eml.xml",
+  electionName: "Waterschap Limburg 2023",
+  electionDate: "woensdag 15 maart 2023",
+  hashInput1: "7776",
+  hashInput2: "92ce",
+  fullHash: [
+    "8ca6",
+    "b30d",
+    "f37e",
+    "5b8d",
+    "b3e3",
+    "b027",
+    "7776",
+    "7166",
+    "d058",
+    "92ce",
+    "9202",
+    "a90e",
+    "acd9",
+    "3e30",
+    "a925",
+    "44c2",
   ],
 };
 
@@ -156,5 +193,31 @@ export const eml230b_more_than_45_candidates: Eml230b = {
     "56c2",
     "1aa6",
     "ddbc",
+  ],
+};
+
+export const eml230b_AB2023_Limburg: Eml230b = {
+  filename: "Kandidatenlijsten_AB2023_Limburg.eml.xml",
+  path: "../backend/src/eml/tests/definitions/Kandidatenlijsten_AB2023_Limburg.eml.xml",
+  electionDate: "woensdag 15 maart 2023",
+  hashInput1: "cd86",
+  hashInput2: "92ac",
+  fullHash: [
+    "dbac",
+    "871e",
+    "4e26",
+    "8ddf",
+    "5127",
+    "bbd3",
+    "d744",
+    "cd86",
+    "f353",
+    "3158",
+    "fbbb",
+    "92ac",
+    "3a08",
+    "f2ff",
+    "c4df",
+    "6510",
   ],
 };

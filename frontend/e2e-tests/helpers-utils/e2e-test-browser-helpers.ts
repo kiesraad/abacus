@@ -23,7 +23,7 @@ import { InvestigationPrintCorrigendumPgObj } from "e2e-tests/page-objects/inves
 import { InvestigationReasonPgObj } from "e2e-tests/page-objects/investigations/InvestigationReasonPgObj";
 import { UserInfoTopBar } from "e2e-tests/page-objects/nav_bar/UserInfoTopBarPgObj";
 import type { Results, VoteCountingMethod } from "@/types/generated/openapi";
-import { type Eml230b, eml110a, eml110b } from "../test-data/eml-files";
+import { type Eml110a, type Eml230b, eml110a, eml110b } from "../test-data/eml-files";
 
 export async function fillDataEntryPages(page: Page, results: Results) {
   if (results.model === "CSOFirstSession") {
@@ -109,16 +109,16 @@ export async function fillDataEntryPagesAndSave(page: Page, results: Results) {
   return dataEntryHomePage;
 }
 
-export async function uploadElectionAndInputHash(page: Page) {
+export async function uploadElectionAndInputHash(page: Page, eml: Eml110a = eml110a) {
   const uploadElectionDefinitionPage = new UploadElectionDefinitionPgObj(page);
   await expect(uploadElectionDefinitionPage.header).toBeVisible();
-  await uploadElectionDefinitionPage.uploadFile(eml110a.path);
-  await expect(uploadElectionDefinitionPage.main).toContainText(eml110a.filename);
-  await expect(uploadElectionDefinitionPage.main).toContainText(eml110a.electionDate);
+  await uploadElectionDefinitionPage.uploadFile(eml.path);
+  await expect(uploadElectionDefinitionPage.main).toContainText(eml.filename);
+  await expect(uploadElectionDefinitionPage.main).toContainText(eml.electionDate);
 
   const checkDefinitionPage = new CheckElectionDefinitionPgObj(page);
   await expect(checkDefinitionPage.header).toBeVisible();
-  await checkDefinitionPage.inputHash(eml110a.hashInput1, eml110a.hashInput2);
+  await checkDefinitionPage.inputHash(eml.hashInput1, eml.hashInput2);
 }
 
 export async function uploadCandidatesAndInputHash(page: Page, eml: Eml230b) {
@@ -147,9 +147,9 @@ export async function uploadPollingStations(page: Page, eml = eml110b) {
 function getCorrigendumFilename(countingMethod: VoteCountingMethod): RegExp {
   switch (countingMethod) {
     case "CSO":
-      return /Model_Na14-2_GR2022_Stembureau_\d+_Bijlage_1.pdf/;
+      return /Model_Na14-2_[A-Z]{2}\d{4}_Stembureau_\d+_Bijlage_1.pdf/;
     case "DSO":
-      return /Model_Na14-1_versie_2_GR2022_Stembureau_\d+.pdf/;
+      return /Model_Na14-1_versie_2_[A-Z]{2}\d{4}_Stembureau_\d+.pdf/;
   }
 }
 

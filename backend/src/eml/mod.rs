@@ -1022,7 +1022,7 @@ fn add_reporting_unit_investigations(
                     cso_first_session_result.admitted_voters_have_been_recounted(),
                 );
             }
-            _ => {}
+            Results::DSONextSession(_) | Results::CSONextSession(_) | Results::GSB(_) => {}
         }
     };
 

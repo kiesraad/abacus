@@ -7,6 +7,7 @@ pub mod hash;
 use apportionment::CandidateNominationDetails;
 use chrono::{DateTime, Local};
 use eml_nl::{
+    EMLError,
     common::{
         AuthorityIdentifier, ContestIdentifier, ElectionTree, ManagingAuthority, PersonName,
         ReportingUnitIdentifier,
@@ -33,7 +34,6 @@ use eml_nl::{
         Gender, ReportingUnitIdentifierId, StringValue, StringValueData, VotingChannelType,
         VotingMethod,
     },
-    EMLError,
 };
 pub use error::EMLImportError;
 pub use hash::{EmlHash, RedactedEmlHash};
@@ -46,7 +46,7 @@ use crate::{
             ElectionDomain, ElectionWithPoliticalGroups, NewElection, PGNumber, RegionKey,
             RegisteredPoliticalGroup,
         },
-        results::{political_group_candidate_votes::PoliticalGroupCandidateVotes, Results},
+        results::{Results, political_group_candidate_votes::PoliticalGroupCandidateVotes},
         tabulation::{CommitteeSpecificTotals, ElectionTotals},
     },
     eml::committees::ElectionTreeDetails,
@@ -1113,16 +1113,16 @@ mod tests {
 
     use super::*;
     use crate::domain::{
-        committee_session::{committee_session_fixture, CommitteeSessionId},
+        committee_session::{CommitteeSessionId, committee_session_fixture},
         data_entry::{DataEntryId, DataEntrySource},
-        election::{tests::election_fixture, ElectionCategory},
+        election::{ElectionCategory, tests::election_fixture},
         polling_station::{
-            test_helpers::polling_stations_fixture, PollingStationFirstSession,
-            PollingStationForSession,
+            PollingStationFirstSession, PollingStationForSession,
+            test_helpers::polling_stations_fixture,
         },
         results::{
-            count::Count, political_group_candidate_votes::CandidateVotes, tests::example_results,
-            Results,
+            Results, count::Count, political_group_candidate_votes::CandidateVotes,
+            tests::example_results,
         },
     };
 
@@ -1312,9 +1312,11 @@ mod tests {
             total_votes_csb.eligible_voter_count,
             StringValue::from_value(1001u64)
         );
-        assert!(!total_votes_csb
-            .uncounted_votes
-            .contains_key(&UncountedVotesReason::ValidVoterCards));
+        assert!(
+            !total_votes_csb
+                .uncounted_votes
+                .contains_key(&UncountedVotesReason::ValidVoterCards)
+        );
         assert!(result_csb.reporting_unit_votes.is_empty());
 
         // GSB elections take the eligible voter count from the election (default number_of_voters=1000)
@@ -1337,12 +1339,14 @@ mod tests {
                 .get(&UncountedVotesReason::ValidVoterCards),
             None
         );
-        assert!(!result_gsb
-            .reporting_unit_votes
-            .first()
-            .unwrap()
-            .uncounted_votes
-            .contains_key(&UncountedVotesReason::ValidVoterCards));
+        assert!(
+            !result_gsb
+                .reporting_unit_votes
+                .first()
+                .unwrap()
+                .uncounted_votes
+                .contains_key(&UncountedVotesReason::ValidVoterCards)
+        );
     }
 
     #[test]

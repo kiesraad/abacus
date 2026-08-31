@@ -42,6 +42,7 @@ describe("PollingStationListPage", () => {
 
     expect(await screen.findByRole("heading", { level: 1, name: "Stembureaus beheren" })).toBeVisible();
     expect(await screen.findByRole("link", { name: "Stembureau toevoegen" })).toBeVisible();
+    expect(await screen.findByRole("button", { name: "Lijst exporteren" })).toBeVisible();
 
     const table = await screen.findByRole("table");
     expect(table).toBeVisible();
@@ -74,6 +75,7 @@ describe("PollingStationListPage", () => {
 
     expect(await screen.findByRole("heading", { level: 1, name: "Stembureaus beheren" })).toBeVisible();
     expect(await screen.findByText(/Er zijn nog geen stembureaus ingevoerd/)).toBeVisible();
+    expect(screen.queryByRole("button", { name: "Lijst exporteren" })).not.toBeInTheDocument();
     expect(screen.queryByRole("table")).toBeNull();
   });
 
@@ -108,6 +110,7 @@ describe("PollingStationListPage", () => {
     renderPage("administrator");
 
     expect(await screen.findByRole("heading", { level: 1, name: "Stembureaus beheren" })).toBeVisible();
+    expect(screen.queryByRole("button", { name: "Lijst exporteren" })).toBeInTheDocument();
 
     const table = await screen.findByRole("table");
     expect(table).toBeVisible();

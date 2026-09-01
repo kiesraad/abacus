@@ -43,7 +43,7 @@ import { UserCreateRolePgObj } from "e2e-tests/page-objects/users/UserCreateRole
 import { UserCreateTypePgObj } from "e2e-tests/page-objects/users/UserCreateTypePgObj";
 import { UserListPgObj } from "e2e-tests/page-objects/users/UserListPgObj";
 import { eml110a_AB2023_Limburg, eml110b_single, eml230b_AB2023_Limburg } from "e2e-tests/test-data/eml-files";
-import { dataEntryAB2023_LimburgDSO } from "e2e-tests/test-data/request-response-templates";
+import { dataEntryAB2023_LimburgDSO } from "e2e-tests/test-data/specific-data-entries/AB2023_Limburg";
 import type { TestUser } from "e2e-tests/test-data/users";
 import { test } from "../../fixtures";
 

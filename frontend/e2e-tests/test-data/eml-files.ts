@@ -89,6 +89,33 @@ export const eml110a_AB2023_Limburg: Eml110a = {
   ],
 };
 
+export const eml110a_PS2023_Drenthe: Eml110a = {
+  filename: "Verkiezingsdefinitie_PS2023_Drenthe.eml.xml",
+  path: "../backend/src/eml/tests/definitions/Verkiezingsdefinitie_PS2023_Drenthe.eml.xml",
+  electionName: "Provinciale Staten Drenthe 2023",
+  electionDate: "woensdag 15 maart 2023",
+  hashInput1: "623b",
+  hashInput2: "4080",
+  fullHash: [
+    "e8e0",
+    "b931",
+    "623b",
+    "cd14",
+    "4a77",
+    "35a4",
+    "3012",
+    "fef2",
+    "a7e1",
+    "ab0b",
+    "d1dd",
+    "4080",
+    "b72c",
+    "84e6",
+    "1697",
+    "8ff3",
+  ],
+};
+
 export const eml110b = {
   filename: "eml110b_test_420_polling_stations.eml.xml",
   path: "e2e-tests/test-data/eml-files/eml110b_test_420_polling_stations.eml.xml",
@@ -219,5 +246,31 @@ export const eml230b_AB2023_Limburg: Eml230b = {
     "f2ff",
     "c4df",
     "6510",
+  ],
+};
+
+export const eml230b_PS2023_Drenthe: Eml230b = {
+  filename: "Kandidatenlijsten_PS2023_Drenthe.eml.xml",
+  path: "../backend/src/eml/tests/definitions/Kandidatenlijsten_PS2023_Drenthe.eml.xml",
+  electionDate: "woensdag 15 maart 2023",
+  hashInput1: "55e4",
+  hashInput2: "f349",
+  fullHash: [
+    "fa92",
+    "0b2b",
+    "55e4",
+    "086d",
+    "cb23",
+    "b346",
+    "b475",
+    "91f5",
+    "a0d0",
+    "6391",
+    "bc76",
+    "0610",
+    "ca8d",
+    "359c",
+    "5f4d",
+    "f349",
   ],
 };

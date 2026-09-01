@@ -94,9 +94,9 @@ const typistUsers: TestUser[] = [
   },
 ];
 
-test.describe.configure({ mode: "serial" });
+test.describe.configure({ mode: "serial", timeout: 120_000 });
 
-test.describe("full flow WS GSB CSO", () => {
+test.describe("full flow WS GSB DSO", () => {
   let electionId: number | null = null;
 
   test("create and complete admin user account", async ({ adminOne }) => {

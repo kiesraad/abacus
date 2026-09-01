@@ -635,11 +635,8 @@ async fn import_csb_election(
         false,
         Some(&edu.candidate_data),
     )?;
-    // PS/WS CSB support will be implemented later
-    if matches!(
-        new_election.category,
-        ElectionCategory::Provincial | ElectionCategory::WaterAuthority
-    ) {
+    // PS CSB support will be implemented later
+    if new_election.category == ElectionCategory::Provincial {
         return Err(EMLImportError::CommitteeCategoryForElectionCategoryNotSupported.into());
     }
     new_election.committee_category = CommitteeCategory::CSB;
@@ -683,8 +680,10 @@ fn parse_election_candidates_eml(
 ) -> Result<(NewElection, ElectionTreeDetails), APIError> {
     let (mut election, election_tree) =
         NewElection::from_eml_str(election_eml_data, selected_committee, fallback_to_csb)?;
-    if election.district == CommitteeDistrict::All {
-        // Committees concerning all districts are not supported yet
+    // Committees concerning all districts are not supported yet.
+    // When `fallback_to_csb` is true, we allow it so that the list
+    // of GSBs can be shown.
+    if election.district == CommitteeDistrict::All && !fallback_to_csb {
         return Err(APIError::EmlImportError(
             EMLImportError::UnsupportedDistrictElection,
         ));

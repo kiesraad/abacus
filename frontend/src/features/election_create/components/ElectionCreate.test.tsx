@@ -1,5 +1,6 @@
 import { render as rtlRender } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import type { HttpHandler } from "msw";
 import type { ReactNode } from "react";
 import { RouterProvider } from "react-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
@@ -7,22 +8,29 @@ import { ApiProvider } from "@/api/ApiProvider";
 import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
 import * as useMessages from "@/hooks/messages/useMessages";
 import {
-  csbElectionImportValidateMockResponse,
-  gsbElectionImportValidateMockResponse,
-  newCSBElectionMockData,
-  newElectionMockData,
+  csbElectionMockData,
+  csbWaterAuthorityElectionMockData,
+  type ElectionImportValidateMockOptions,
+  electionImportValidateMockResponse,
+  electionMockData,
+  gsbListMockData,
+  provincialElectionMockData,
+  waterAuthorityElectionMockData,
 } from "@/testing/api-mocks/ElectionMockData";
 import {
-  CSBElectionImportRequestHandler,
+  CSBABElectionImportRequestHandler,
+  CSBGRElectionImportRequestHandler,
   ElectionListRequestHandler,
   ElectionRequestHandler,
-  GSBElectionImportRequestHandler,
+  GSBABElectionImportRequestHandler,
+  GSBGRElectionImportRequestHandler,
+  GSBPSElectionImportRequestHandler,
 } from "@/testing/api-mocks/RequestHandlers";
 import { getRouter, type Router } from "@/testing/router";
 import { overrideOnce, server } from "@/testing/server";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 import { screen, setupTestRouter, waitFor } from "@/testing/test-utils";
-import type { CommitteeCategory } from "@/types/generated/openapi";
+import type { CommitteeCategory, Election, RegionDetails, VoteCountingMethod } from "@/types/generated/openapi";
 import { electionCreateRoutes } from "../routes";
 
 const Providers = ({
@@ -67,150 +75,117 @@ function renderWithRouter() {
   return router;
 }
 
-/**
- * Helper function; navigate to /elections/create
- * and upload an election definition.
- */
-async function uploadElectionDefinition(router: Router, file: File, committeeCategory: CommitteeCategory = "GSB") {
+function mockValidateResponse(options: ElectionImportValidateMockOptions) {
+  overrideOnce("post", "/api/elections/import/validate", 200, electionImportValidateMockResponse(options));
+}
+
+async function uploadFile(file: File) {
   const user = userEvent.setup();
-  if (committeeCategory === "CSB") {
-    overrideOnce("post", "/api/elections/import/validate", 200, csbElectionImportValidateMockResponse);
-  } else {
-    overrideOnce("post", "/api/elections/import/validate", 200, gsbElectionImportValidateMockResponse(true, 2000));
-  }
+  const input = await screen.findByLabelText("Bestand kiezen");
+  expect(input).toBeVisible();
+  expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
+  await user.upload(input, file);
+}
+
+async function inputHash() {
+  const user = userEvent.setup();
+  await user.type(screen.getByRole("textbox", { name: "Controle deel 1" }), "zxcv");
+  await user.type(screen.getByRole("textbox", { name: "Controle deel 2" }), "gfsd");
+  await user.click(screen.getByRole("button", { name: "Volgende" }));
+}
+
+async function uploadElectionDefinition(router: Router, file: File, election: Election = electionMockData) {
+  mockValidateResponse({ election });
   await router.navigate("/elections/create");
 
   // Wait for the page to be loaded
   expect(await screen.findByRole("heading", { level: 1, name: "Verkiezing toevoegen" })).toBeVisible();
   expect(await screen.findByRole("heading", { level: 2, name: "Importeer verkiezingsdefinitie" })).toBeVisible();
-  const input = await screen.findByLabelText("Bestand kiezen");
-  expect(input).toBeVisible();
-  expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
-
-  await user.upload(input, file);
+  await uploadFile(file);
 }
 
-/**
- * Helper function; assuming we are at the check election hash stage,
- * input the hash and continue.
- */
-async function inputElectionHash(committeeCategory: CommitteeCategory = "GSB") {
+async function inputElectionHash(election: Election = electionMockData) {
+  mockValidateResponse({ election });
+
+  // Wait for the page to be loaded and expect the election name to be present
+  expect(await screen.findByText(election.name)).toBeInTheDocument();
+  await inputHash();
+}
+
+async function setCommitteeCategory(election: Election = electionMockData) {
+  const committeeCategoryLabels: Record<CommitteeCategory, string> = {
+    GSB: "Gemeentelijk stembureau (GSB)",
+    CSB: "Centraal stembureau (CSB)",
+  };
+
   const user = userEvent.setup();
+  mockValidateResponse({ election });
 
-  if (committeeCategory === "CSB") {
-    overrideOnce("post", "/api/elections/import/validate", 200, csbElectionImportValidateMockResponse);
-
-    // Wait for the page to be loaded and expect the election name to be present
-    expect(await screen.findByText(newCSBElectionMockData.name)).toBeInTheDocument();
-  } else {
-    overrideOnce("post", "/api/elections/import/validate", 200, gsbElectionImportValidateMockResponse(false, 2000));
-
-    // Wait for the page to be loaded and expect the election name to be present
-    expect(await screen.findByText(newElectionMockData.name)).toBeInTheDocument();
-  }
-
-  const inputPart1 = screen.getByRole("textbox", { name: "Controle deel 1" });
-  await user.type(inputPart1, "zxcv");
-
-  const inputPart2 = screen.getByRole("textbox", { name: "Controle deel 2" });
-  await user.type(inputPart2, "gfsd");
-
+  expect(await screen.findByRole("heading", { level: 2, name: "Type stembureau" })).toBeInTheDocument();
+  const radio = screen.getByRole("radio", { name: committeeCategoryLabels[election.committee_category] });
+  await waitFor(() => {
+    radio.click();
+  });
+  expect(radio).toBeChecked();
   await user.click(screen.getByRole("button", { name: "Volgende" }));
 }
 
-/**
- * Helper function: assuming we are on the committee category page,
- * assert right checkbox is checked and continue.
- */
-async function setCommitteeCategory(committeeCategory: CommitteeCategory = "GSB") {
-  const user = userEvent.setup();
-
-  if (committeeCategory === "CSB") {
-    overrideOnce("post", "/api/elections/import/validate", 200, csbElectionImportValidateMockResponse);
-
-    expect(await screen.findByRole("heading", { level: 2, name: "Type stembureau" })).toBeInTheDocument();
-    await waitFor(() => {
-      screen.getByRole("radio", { name: "Centraal stembureau (CSB)" }).click();
-    });
-    expect(screen.getByRole("radio", { name: "Centraal stembureau (CSB)" })).toBeChecked();
-    expect(screen.getByRole("radio", { name: "Gemeentelijk stembureau (GSB)" })).not.toBeChecked();
-  } else {
-    overrideOnce("post", "/api/elections/import/validate", 200, gsbElectionImportValidateMockResponse(true, 2000));
-    await waitFor(() => {
-      screen.getByRole("radio", { name: "Gemeentelijk stembureau (GSB)" }).click();
-    });
-    expect(screen.getByRole("radio", { name: "Gemeentelijk stembureau (GSB)" })).toBeChecked();
-    expect(screen.getByRole("radio", { name: "Centraal stembureau (CSB)" })).not.toBeChecked();
-  }
-
-  await user.click(screen.getByRole("button", { name: "Volgende" }));
-}
-
-/**
- * Helper function; assuming we are on the upload candidate page,
- * upload a valid candidate file.
- */
-async function uploadCandidateDefinition(file: File, committeeCategory: CommitteeCategory = "GSB") {
-  const user = userEvent.setup();
-  if (committeeCategory === "CSB") {
-    overrideOnce("post", "/api/elections/import/validate", 200, csbElectionImportValidateMockResponse);
-  } else {
-    overrideOnce("post", "/api/elections/import/validate", 200, gsbElectionImportValidateMockResponse(true, 2000));
-  }
+async function uploadCandidateDefinition(file: File, election: Election = electionMockData) {
+  mockValidateResponse({ election });
 
   // Wait for the candidate page to be loaded
   expect(await screen.findByRole("heading", { level: 2, name: "Importeer kandidatenlijsten" })).toBeVisible();
-  const input = await screen.findByLabelText("Bestand kiezen");
-  expect(input).toBeVisible();
-  expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
-
-  await user.upload(input, file);
-
+  await uploadFile(file);
   expect(await screen.findByRole("heading", { level: 2, name: "Controleer kandidatenlijsten" })).toBeVisible();
 }
 
-/**
- * Helper function; assuming we are at the check candidate hash stage,
- * input the hash and continue.
- */
-async function inputCandidateHash(committeeCategory: CommitteeCategory = "GSB") {
-  const user = userEvent.setup();
-  if (committeeCategory === "CSB") {
-    overrideOnce("post", "/api/elections/import/validate", 200, csbElectionImportValidateMockResponse);
-  } else {
-    overrideOnce("post", "/api/elections/import/validate", 200, gsbElectionImportValidateMockResponse(true, 2000));
-  }
-
-  const inputPart1 = screen.getByRole("textbox", { name: "Controle deel 1" });
-  await user.type(inputPart1, "zxcv");
-
-  const inputPart2 = screen.getByRole("textbox", { name: "Controle deel 2" });
-  await user.type(inputPart2, "gfsd");
-
-  await user.click(screen.getByRole("button", { name: "Volgende" }));
+async function inputCandidateHash(election: Election = electionMockData) {
+  mockValidateResponse({ election });
+  await inputHash();
 }
 
-/**
- * Helper function; assuming we are on the upload polling stations page,
- * upload a valid polling stations file.
- */
-async function uploadPollingStationList(file: File, matching_election: boolean, number_of_voters: number = 0) {
+async function importDefinitions(router: Router, file: File, election: Election = electionMockData) {
+  await uploadElectionDefinition(router, file, election);
+  await inputElectionHash(election);
+  await setCommitteeCategory(election);
+  await uploadCandidateDefinition(file, election);
+  await inputCandidateHash(election);
+}
+
+async function selectGSB(election: Election, gsb: RegionDetails) {
   const user = userEvent.setup();
-  overrideOnce(
-    "post",
-    "/api/elections/import/validate",
-    200,
-    gsbElectionImportValidateMockResponse(matching_election, number_of_voters),
-  );
+  mockValidateResponse({ election, gsbSelected: gsb.key });
+
+  expect(await screen.findByRole("heading", { level: 2, name: "Selecteer het gemeentelijk stembureau" })).toBeVisible();
+  await user.click(screen.getByRole("cell", { name: gsb.name }));
+}
+
+async function uploadPollingStationList(file: File, location: string, options: ElectionImportValidateMockOptions) {
+  mockValidateResponse(options);
 
   // Wait for the polling station list page to be loaded
   expect(
-    await screen.findByRole("heading", { level: 2, name: "Importeer stembureaus gemeente Heemdamseburg" }),
+    await screen.findByRole("heading", { level: 2, name: `Importeer stembureaus gemeente ${location}` }),
   ).toBeVisible();
-  const input = await screen.findByLabelText("Bestand kiezen");
-  expect(input).toBeVisible();
-  expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
-  await user.upload(input, file);
+  await uploadFile(file);
+}
+
+async function setCountingMethod(location: string, countingMethod: VoteCountingMethod) {
+  const countingMethodLabels: Record<VoteCountingMethod, RegExp> = {
+    CSO: /Centrale stemopneming \(CSO\)/,
+    DSO: /Decentrale stemopneming \(DSO\)/,
+  };
+
+  const user = userEvent.setup();
+
+  expect(await screen.findByRole("heading", { level: 2, name: `Type stemopneming in ${location}` })).toBeVisible();
+  const radio = screen.getByRole("radio", { name: countingMethodLabels[countingMethod] });
+  expect(radio).not.toBeChecked();
+  await waitFor(() => {
+    radio.click();
+  });
+  expect(radio).toBeChecked();
+  await user.click(screen.getByRole("button", { name: "Volgende" }));
 }
 
 describe("Election create pages", () => {
@@ -221,7 +196,12 @@ describe("Election create pages", () => {
 
   describe("Confirmation modal", () => {
     test("Shown when the abort button is clicked", async () => {
-      overrideOnce("post", "/api/elections/import/validate", 200, gsbElectionImportValidateMockResponse(false, 2000));
+      overrideOnce(
+        "post",
+        "/api/elections/import/validate",
+        200,
+        electionImportValidateMockResponse({ matchingElection: false, numberOfVoters: 2000 }),
+      );
 
       const router = renderWithRouter();
       const user = userEvent.setup();
@@ -245,7 +225,12 @@ describe("Election create pages", () => {
     });
 
     test("Shown when attempting to navigate away", async () => {
-      overrideOnce("post", "/api/elections/import/validate", 200, gsbElectionImportValidateMockResponse(true, 2000));
+      overrideOnce(
+        "post",
+        "/api/elections/import/validate",
+        200,
+        electionImportValidateMockResponse({ numberOfVoters: 2000 }),
+      );
 
       const router = renderWithRouter();
       const user = userEvent.setup();
@@ -272,7 +257,12 @@ describe("Election create pages", () => {
 
     test("Not shown when attempting to navigate away if nothing was done", async () => {
       vi.spyOn(console, "warn").mockImplementation(() => {});
-      overrideOnce("post", "/api/elections/import/validate", 200, gsbElectionImportValidateMockResponse(true, 2000));
+      overrideOnce(
+        "post",
+        "/api/elections/import/validate",
+        200,
+        electionImportValidateMockResponse({ numberOfVoters: 2000 }),
+      );
 
       const router = renderWithRouter();
       const user = userEvent.setup();
@@ -291,7 +281,12 @@ describe("Election create pages", () => {
     });
 
     test("Cancel button closes the modal", async () => {
-      overrideOnce("post", "/api/elections/import/validate", 200, gsbElectionImportValidateMockResponse(true, 2000));
+      overrideOnce(
+        "post",
+        "/api/elections/import/validate",
+        200,
+        electionImportValidateMockResponse({ numberOfVoters: 2000 }),
+      );
 
       const router = renderWithRouter();
       const user = userEvent.setup();
@@ -322,7 +317,12 @@ describe("Election create pages", () => {
     });
 
     test("Delete button closes the modal", async () => {
-      overrideOnce("post", "/api/elections/import/validate", 200, gsbElectionImportValidateMockResponse(true, 2000));
+      overrideOnce(
+        "post",
+        "/api/elections/import/validate",
+        200,
+        electionImportValidateMockResponse({ numberOfVoters: 2000 }),
+      );
 
       const router = renderWithRouter();
       const user = userEvent.setup();
@@ -354,7 +354,12 @@ describe("Election create pages", () => {
     });
 
     test("Close button closes the modal", async () => {
-      overrideOnce("post", "/api/elections/import/validate", 200, gsbElectionImportValidateMockResponse(true, 2000));
+      overrideOnce(
+        "post",
+        "/api/elections/import/validate",
+        200,
+        electionImportValidateMockResponse({ numberOfVoters: 2000 }),
+      );
 
       const router = renderWithRouter();
       const user = userEvent.setup();
@@ -391,15 +396,8 @@ describe("Election create pages", () => {
       const user = userEvent.setup();
       const file = new File(["foo"], "foo.txt", { type: "text/plain" });
 
-      // upload election and set hash, and continue
-      await uploadElectionDefinition(router, file);
-      await inputElectionHash();
-
-      await setCommitteeCategory();
-
-      // upload candidate file, set hash and continue
-      await uploadCandidateDefinition(file);
-      await inputCandidateHash();
+      // upload election and candidate files, set hashes and continue
+      await importDefinitions(router, file);
 
       // Make sure we are on the correct page
       expect(
@@ -417,18 +415,11 @@ describe("Election create pages", () => {
       const user = userEvent.setup();
       const file = new File(["foo"], "foo.txt", { type: "text/plain" });
 
-      // upload election and set hash, and continue
-      await uploadElectionDefinition(router, file);
-      await inputElectionHash();
-
-      await setCommitteeCategory();
-
-      // upload candidate file, set hash and continue
-      await uploadCandidateDefinition(file);
-      await inputCandidateHash();
+      // upload election and candidate files, set hashes and continue
+      await importDefinitions(router, file);
 
       // upload polling station list file
-      await uploadPollingStationList(file, false);
+      await uploadPollingStationList(file, "Heemdamseburg", { matchingElection: false });
 
       // We should be at the check polling stations page
       expect(await screen.findByRole("heading", { level: 2, name: "Controleer stembureaus" })).toBeVisible();
@@ -450,11 +441,13 @@ describe("Election create pages", () => {
     });
   });
 
-  describe("Full flow GSB", () => {
+  describe("Full flow", () => {
     const pushMessage = vi.fn();
+    const file = new File(["foo"], "foo.txt", { type: "text/plain" });
+    const eligibleVoters = 1234;
 
     beforeEach(() => {
-      server.use(GSBElectionImportRequestHandler);
+      vi.spyOn(console, "warn").mockImplementation(() => {});
       vi.spyOn(useMessages, "useMessages").mockReturnValue({
         pushMessage,
         popMessages: vi.fn(() => []),
@@ -462,26 +455,86 @@ describe("Election create pages", () => {
       });
     });
 
-    test("Adds new CSO election when finishing election import", async () => {
-      vi.spyOn(console, "warn").mockImplementation(() => {});
+    async function saveElection(election: Election) {
+      const user = userEvent.setup();
+      expect(await screen.findByRole("heading", { name: "Controleren en opslaan" })).toBeVisible();
+      await user.click(screen.getByRole("button", { name: "Opslaan" }));
+
+      await waitFor(() => {
+        expect(pushMessage).toHaveBeenCalledWith({
+          title: `Verkiezing ${election.committee_category} ${election.name} toegevoegd`,
+        });
+      });
+    }
+
+    type GSBFlow = {
+      name: string;
+      election: Election;
+      countingMethod: VoteCountingMethod;
+      gsbSelected?: RegionDetails;
+      importHandler: HttpHandler;
+    };
+
+    const gsbFlows: GSBFlow[] = [
+      {
+        name: "GSB AB CSO",
+        election: waterAuthorityElectionMockData,
+        gsbSelected: gsbListMockData[0]!,
+        countingMethod: "CSO",
+        importHandler: GSBABElectionImportRequestHandler,
+      },
+      {
+        name: "GSB AB DSO",
+        election: waterAuthorityElectionMockData,
+        gsbSelected: gsbListMockData[0]!,
+        countingMethod: "DSO",
+        importHandler: GSBABElectionImportRequestHandler,
+      },
+      {
+        name: "GSB GR CSO",
+        election: electionMockData,
+        countingMethod: "CSO",
+        importHandler: GSBGRElectionImportRequestHandler,
+      },
+      {
+        name: "GSB GR DSO",
+        election: electionMockData,
+        countingMethod: "DSO",
+        importHandler: GSBGRElectionImportRequestHandler,
+      },
+      {
+        name: "GSB PS CSO",
+        election: provincialElectionMockData,
+        gsbSelected: gsbListMockData[0]!,
+        countingMethod: "CSO",
+        importHandler: GSBPSElectionImportRequestHandler,
+      },
+      {
+        name: "GSB PS DSO",
+        election: provincialElectionMockData,
+        gsbSelected: gsbListMockData[0]!,
+        countingMethod: "DSO",
+        importHandler: GSBPSElectionImportRequestHandler,
+      },
+    ];
+
+    test.each(gsbFlows)("$name", async ({ election, countingMethod, gsbSelected, importHandler }) => {
+      server.use(importHandler);
       const router = renderWithRouter();
       const user = userEvent.setup();
-      const file = new File(["foo"], "foo.txt", { type: "text/plain" });
+      await importDefinitions(router, file, election);
 
-      // election definition
-      await uploadElectionDefinition(router, file);
-      await inputElectionHash();
-
-      // committee category
-      await setCommitteeCategory();
-
-      // candidates lists
-      await uploadCandidateDefinition(file);
-      await inputCandidateHash();
+      if (gsbSelected) {
+        await selectGSB(election, gsbSelected);
+      }
+      const location = gsbSelected?.name ?? election.location;
 
       // polling stations
-      const eligibleVoters = 1234;
-      await uploadPollingStationList(file, true, eligibleVoters);
+      await uploadPollingStationList(file, location, {
+        election,
+        matchingElection: true,
+        numberOfVoters: eligibleVoters,
+      });
       expect(await screen.findByRole("heading", { level: 2, name: "Controleer stembureaus" })).toBeVisible();
       expect(await screen.findByRole("table")).toBeVisible();
       expect(await screen.findAllByRole("row")).toHaveLength(8);
@@ -489,18 +542,7 @@ describe("Election create pages", () => {
       await user.click(screen.getByRole("button", { name: "Volgende" }));
 
       // vote counting
-      expect(
-        await screen.findByRole("heading", { level: 2, name: "Type stemopneming in Heemdamseburg" }),
-      ).toBeVisible();
-      const CSORadio = screen.getByRole("radio", { name: /Centrale stemopneming \(CSO\)/ });
-      expect(CSORadio).not.toBeChecked();
-      expect(screen.getByRole("radio", { name: /Decentrale stemopneming \(DSO\)/ })).not.toBeChecked();
-      await waitFor(() => {
-        CSORadio.click();
-      });
-      expect(CSORadio).toBeChecked();
-
-      await user.click(screen.getByRole("button", { name: "Volgende" }));
+      await setCountingMethod(location, countingMethod);
 
       // eligible voters
       expect(await screen.findByRole("heading", { name: "Hoeveel kiesgerechtigden telt het GSB?" })).toBeVisible();
@@ -508,107 +550,21 @@ describe("Election create pages", () => {
       await user.click(screen.getByRole("button", { name: "Volgende" }));
 
       // check and save
-      expect(await screen.findByRole("heading", { name: "Controleren en opslaan" })).toBeVisible();
-      await user.click(screen.getByRole("button", { name: "Opslaan" }));
-
-      await waitFor(() => {
-        expect(pushMessage).toHaveBeenCalledWith({ title: "Verkiezing GSB Gemeenteraad Test 2022 toegevoegd" });
-      });
+      await saveElection(election);
     });
 
-    test("Adds new DSO election when finishing election import", async () => {
-      vi.spyOn(console, "warn").mockImplementation(() => {});
+    test("CSB for municipal election", async () => {
+      server.use(CSBGRElectionImportRequestHandler);
       const router = renderWithRouter();
-      const user = userEvent.setup();
-      const file = new File(["foo"], "foo.txt", { type: "text/plain" });
-
-      // election definition
-      await uploadElectionDefinition(router, file);
-      await inputElectionHash();
-
-      // committee category
-      await setCommitteeCategory();
-
-      // candidates lists
-      await uploadCandidateDefinition(file);
-      await inputCandidateHash();
-
-      // polling stations
-      const eligibleVoters = 1234;
-      await uploadPollingStationList(file, true, eligibleVoters);
-      expect(await screen.findByRole("heading", { level: 2, name: "Controleer stembureaus" })).toBeVisible();
-      expect(await screen.findByRole("table")).toBeVisible();
-      expect(await screen.findAllByRole("row")).toHaveLength(8);
-      expect(screen.queryByRole("alert")).not.toBeInTheDocument();
-      await user.click(screen.getByRole("button", { name: "Volgende" }));
-
-      // vote counting
-      expect(
-        await screen.findByRole("heading", { level: 2, name: "Type stemopneming in Heemdamseburg" }),
-      ).toBeVisible();
-      expect(screen.getByRole("radio", { name: /Centrale stemopneming \(CSO\)/ })).not.toBeChecked();
-      const DSORadio = screen.getByRole("radio", { name: /Decentrale stemopneming \(DSO\)/ });
-      expect(DSORadio).not.toBeChecked();
-      await waitFor(() => {
-        DSORadio.click();
-      });
-      expect(DSORadio).toBeChecked();
-
-      await user.click(screen.getByRole("button", { name: "Volgende" }));
-
-      // eligible voters
-      expect(await screen.findByRole("heading", { name: "Hoeveel kiesgerechtigden telt het GSB?" })).toBeVisible();
-      expect(screen.getByRole("textbox", { name: "Aantal kiesgerechtigden" })).toHaveValue(eligibleVoters.toString());
-      await user.click(screen.getByRole("button", { name: "Volgende" }));
-
-      // check and save
-      expect(await screen.findByRole("heading", { name: "Controleren en opslaan" })).toBeVisible();
-      await user.click(screen.getByRole("button", { name: "Opslaan" }));
-
-      await waitFor(() => {
-        expect(pushMessage).toHaveBeenCalledWith({ title: "Verkiezing GSB Gemeenteraad Test 2022 toegevoegd" });
-      });
-    });
-  });
-
-  describe("Full flow CSB", () => {
-    const pushMessage = vi.fn();
-
-    beforeEach(() => {
-      server.use(CSBElectionImportRequestHandler);
-      vi.spyOn(useMessages, "useMessages").mockReturnValue({
-        pushMessage,
-        popMessages: vi.fn(() => []),
-        hasMessages: vi.fn(() => false),
-      });
+      await importDefinitions(router, file, csbElectionMockData);
+      await saveElection(csbElectionMockData);
     });
 
-    test("Adds new election when finishing election import", async () => {
-      vi.spyOn(console, "warn").mockImplementation(() => {});
+    test("CSB for water authority election", async () => {
+      server.use(CSBABElectionImportRequestHandler);
       const router = renderWithRouter();
-      const user = userEvent.setup();
-      const file = new File(["foo"], "foo.txt", { type: "text/plain" });
-
-      // election definition
-      await uploadElectionDefinition(router, file, "CSB");
-      await inputElectionHash("CSB");
-
-      // committee category
-      await setCommitteeCategory("CSB");
-
-      // candidates lists
-      await uploadCandidateDefinition(file, "CSB");
-      await inputCandidateHash("CSB");
-
-      // check and save
-      await waitFor(async () => {
-        expect(await screen.findByRole("heading", { name: "Controleren en opslaan" })).toBeVisible();
-      });
-      await user.click(screen.getByRole("button", { name: "Opslaan" }));
-
-      await waitFor(() => {
-        expect(pushMessage).toHaveBeenCalledWith({ title: "Verkiezing CSB Gemeenteraad Test 2022 toegevoegd" });
-      });
+      await importDefinitions(router, file, csbWaterAuthorityElectionMockData);
+      await saveElection(csbWaterAuthorityElectionMockData);
     });
   });
 });

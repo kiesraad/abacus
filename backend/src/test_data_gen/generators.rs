@@ -378,7 +378,8 @@ fn generate_election(
 
     // and put it all in the struct (generating some additional fields where needed)
     NewElection {
-        name,
+        name: name.clone(),
+        eml_name: name,
         committee_category: args.committee_category,
         counting_method,
         authority_id: match args.committee_category {

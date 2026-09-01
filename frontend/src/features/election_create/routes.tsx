@@ -5,6 +5,7 @@ import { CommitteeCategory } from "./components/CommitteeCategory";
 import { CountingMethodType } from "./components/CountingMethodType";
 import { ElectionCreateLayout } from "./components/ElectionCreateLayout";
 import { NumberOfVoters } from "./components/NumberOfVoters";
+import { SelectGSB } from "./components/SelectGSB";
 import { UploadCandidatesDefinition } from "./components/UploadCandidatesDefinition";
 import { UploadElectionDefinition } from "./components/UploadElectionDefinition";
 import { UploadPollingStationDefinition } from "./components/UploadPollingStationDefinition";
@@ -16,6 +17,7 @@ export const electionCreateRoutes: RouteObject[] = [
       { index: true, Component: UploadElectionDefinition, handle: { roles: ["administrator"] } },
       { path: "committee-category", Component: CommitteeCategory, handle: { roles: ["administrator"] } },
       { path: "list-of-candidates", Component: UploadCandidatesDefinition, handle: { roles: ["administrator"] } },
+      { path: "select-gsb", Component: SelectGSB, handle: { roles: ["administrator"] } },
       { path: "polling-stations", Component: UploadPollingStationDefinition, handle: { roles: ["administrator"] } },
       { path: "counting-method-type", Component: CountingMethodType, handle: { roles: ["administrator"] } },
       { path: "number-of-voters", Component: NumberOfVoters, handle: { roles: ["administrator"] } },

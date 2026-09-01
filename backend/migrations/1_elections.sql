@@ -2,6 +2,7 @@ CREATE TABLE elections
 (
     id                  INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
     name                TEXT                              NOT NULL,
+    eml_name            TEXT                              NOT NULL,
     committee_category  TEXT                              NOT NULL,
     counting_method     TEXT,
     election_id         TEXT                              NOT NULL,

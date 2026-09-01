@@ -19,6 +19,7 @@ pub async fn list(
         r#"SELECT
             id,
             name,
+            eml_name,
             committee_category,
             counting_method,
             election_id,
@@ -48,6 +49,7 @@ pub async fn list(
 pub struct ElectionRow {
     pub id: ElectionId,
     pub name: String,
+    pub eml_name: String,
     pub committee_category: CommitteeCategory,
     pub counting_method: Option<VoteCountingMethod>,
     pub election_id: String,
@@ -71,6 +73,7 @@ impl From<ElectionRow> for ElectionWithPoliticalGroups {
         Self {
             id: row.id,
             name: row.name,
+            eml_name: row.eml_name,
             committee_category: row.committee_category,
             counting_method: row.counting_method,
             election_id: row.election_id,
@@ -150,6 +153,7 @@ pub async fn get(
         SELECT
             id,
             name,
+            eml_name,
             committee_category,
             counting_method,
             election_id,
@@ -189,6 +193,7 @@ pub async fn create(
         r#"
         INSERT INTO elections (
             name,
+            eml_name,
             committee_category,
             counting_method,
             election_id,
@@ -205,10 +210,11 @@ pub async fn create(
             election_date,
             nomination_date,
             political_groups
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         RETURNING
             id,
             name,
+            eml_name,
             committee_category,
             counting_method,
             election_id,
@@ -227,6 +233,7 @@ pub async fn create(
             political_groups
         "#,
         election.name,
+        election.eml_name,
         election.committee_category,
         election.counting_method,
         election.election_id,
@@ -263,6 +270,7 @@ pub async fn change_number_of_voters(
         RETURNING
             id,
             name,
+            eml_name,
             committee_category,
             counting_method,
             election_id,

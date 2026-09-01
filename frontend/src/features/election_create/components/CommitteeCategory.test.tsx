@@ -1,9 +1,6 @@
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
-import {
-  csbElectionImportValidateMockResponse,
-  gsbElectionImportValidateMockResponse,
-} from "@/testing/api-mocks/ElectionMockData";
+import { csbElectionMockData, electionImportValidateMockResponse } from "@/testing/api-mocks/ElectionMockData";
 import { overrideOnce } from "@/testing/server";
 import { renderReturningRouter, screen } from "@/testing/test-utils";
 import type { CommitteeCategory as CommitteeCategoryType, NewElection } from "@/types/generated/openapi";
@@ -27,7 +24,12 @@ describe("CommitteeCategory component", () => {
     const state = { election, committeeCategory: "GSB" as CommitteeCategoryType };
     const dispatch = vi.fn();
     vi.spyOn(useElectionCreateContext, "useElectionCreateContext").mockReturnValue({ state, dispatch });
-    overrideOnce("post", "/api/elections/import/validate", 200, gsbElectionImportValidateMockResponse(false, 2000));
+    overrideOnce(
+      "post",
+      "/api/elections/import/validate",
+      200,
+      electionImportValidateMockResponse({ matchingElection: false, numberOfVoters: 2000 }),
+    );
     const user = userEvent.setup();
 
     const router = renderReturningRouter(
@@ -38,7 +40,10 @@ describe("CommitteeCategory component", () => {
 
     expect(await screen.findByRole("heading", { name: "Type stembureau" })).toBeInTheDocument();
     expect(screen.getByRole("radio", { name: "Gemeentelijk stembureau (GSB)" })).toBeChecked();
-    expect(screen.getByRole("radio", { name: "Centraal stembureau (CSB)" })).not.toBeChecked();
+    const optionCsb = screen.getByRole("radio", { name: "Centraal stembureau (CSB)" });
+    expect(optionCsb).not.toBeChecked();
+    expect(optionCsb).not.toBeDisabled();
+
     await user.click(screen.getByRole("button", { name: "Volgende" }));
 
     expect(dispatch).toHaveBeenCalledWith({
@@ -49,11 +54,40 @@ describe("CommitteeCategory component", () => {
     expect(router.state.location.pathname).toEqual("/elections/create/list-of-candidates");
   });
 
+  test("CSB option is disabled for provincial elections", async () => {
+    const state = { election: { ...election, category: "Provincial" } as NewElection };
+    const dispatch = vi.fn();
+    vi.spyOn(useElectionCreateContext, "useElectionCreateContext").mockReturnValue({ state, dispatch });
+    const user = userEvent.setup();
+
+    const router = renderReturningRouter(
+      <ElectionCreateContextProvider>
+        <CommitteeCategory />
+      </ElectionCreateContextProvider>,
+    );
+
+    expect(await screen.findByRole("heading", { name: "Type stembureau" })).toBeInTheDocument();
+    expect(screen.getByRole("radio", { name: "Gemeentelijk stembureau (GSB)" })).toBeChecked();
+    expect(screen.getByRole("radio", { name: "Centraal stembureau (CSB)" })).toBeDisabled();
+    await user.click(screen.getByRole("button", { name: "Volgende" }));
+
+    expect(dispatch).toHaveBeenCalledWith({
+      type: "SET_COMMITTEE_CATEGORY",
+      committeeCategory: "GSB",
+    });
+    expect(router.state.location.pathname).toEqual("/elections/create/list-of-candidates");
+  });
+
   test("CSB: Navigates to candidate list upload page", async () => {
     const state = { election, committeeCategory: "CSB" as CommitteeCategoryType };
     const dispatch = vi.fn();
     vi.spyOn(useElectionCreateContext, "useElectionCreateContext").mockReturnValue({ state, dispatch });
-    overrideOnce("post", "/api/elections/import/validate", 200, csbElectionImportValidateMockResponse);
+    overrideOnce(
+      "post",
+      "/api/elections/import/validate",
+      200,
+      electionImportValidateMockResponse({ election: csbElectionMockData }),
+    );
     const user = userEvent.setup();
 
     const router = renderReturningRouter(

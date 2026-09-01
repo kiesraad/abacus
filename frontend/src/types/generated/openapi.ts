@@ -1230,7 +1230,7 @@ For GSB committees this will be the same as the authority region, but
 for HSBs and CSBs this may also be a specific town or city within the
 authority region. */
   location: string;
-  /** Name of the election, as defined in the EML_NL election definition. */
+  /** Name of the election, as formatted for display in Abacus. */
   name: string;
   /** The date when candidate nominations for this election are/were closed. */
   nomination_date: string;

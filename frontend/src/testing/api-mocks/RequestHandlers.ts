@@ -150,11 +150,10 @@ import {
 } from "./DataEntryMockData";
 import {
   csbElectionDetailsMockResponse,
-  csbElectionImportMockResponse,
   electionDetailsMockResponse,
   electionImportMockResponse,
+  electionImportValidateMockResponse,
   electionListMockResponse,
-  gsbElectionImportValidateMockResponse,
   investigationListMockResponse,
 } from "./ElectionMockData";
 import { statusResponseMock } from "./ElectionStatusMockData";
@@ -355,20 +354,48 @@ export const CSBElectionStatusRequestHandler = http.get<
   HttpResponse.json(statusResponseMock, { status: 200 }),
 );
 
-export const GSBElectionImportRequestHandler = http.post<
+export const GSBABElectionImportRequestHandler = http.post<
   ParamsToString<ELECTION_IMPORT_REQUEST_PARAMS>,
   ELECTION_IMPORT_REQUEST_BODY,
   ElectionWithPoliticalGroups
 >("/api/elections/import" satisfies ELECTION_IMPORT_REQUEST_PATH, () =>
-  HttpResponse.json(electionImportMockResponse, { status: 201 }),
+  HttpResponse.json(electionImportMockResponse({ committeeCategory: "GSB", category: "WaterAuthority" }), {
+    status: 201,
+  }),
 );
 
-export const CSBElectionImportRequestHandler = http.post<
+export const GSBGRElectionImportRequestHandler = http.post<
   ParamsToString<ELECTION_IMPORT_REQUEST_PARAMS>,
   ELECTION_IMPORT_REQUEST_BODY,
   ElectionWithPoliticalGroups
 >("/api/elections/import" satisfies ELECTION_IMPORT_REQUEST_PATH, () =>
-  HttpResponse.json(csbElectionImportMockResponse, { status: 201 }),
+  HttpResponse.json(electionImportMockResponse({ committeeCategory: "GSB", category: "Municipal" }), { status: 201 }),
+);
+
+export const GSBPSElectionImportRequestHandler = http.post<
+  ParamsToString<ELECTION_IMPORT_REQUEST_PARAMS>,
+  ELECTION_IMPORT_REQUEST_BODY,
+  ElectionWithPoliticalGroups
+>("/api/elections/import" satisfies ELECTION_IMPORT_REQUEST_PATH, () =>
+  HttpResponse.json(electionImportMockResponse({ committeeCategory: "GSB", category: "Provincial" }), { status: 201 }),
+);
+
+export const CSBABElectionImportRequestHandler = http.post<
+  ParamsToString<ELECTION_IMPORT_REQUEST_PARAMS>,
+  ELECTION_IMPORT_REQUEST_BODY,
+  ElectionWithPoliticalGroups
+>("/api/elections/import" satisfies ELECTION_IMPORT_REQUEST_PATH, () =>
+  HttpResponse.json(electionImportMockResponse({ committeeCategory: "CSB", category: "WaterAuthority" }), {
+    status: 201,
+  }),
+);
+
+export const CSBGRElectionImportRequestHandler = http.post<
+  ParamsToString<ELECTION_IMPORT_REQUEST_PARAMS>,
+  ELECTION_IMPORT_REQUEST_BODY,
+  ElectionWithPoliticalGroups
+>("/api/elections/import" satisfies ELECTION_IMPORT_REQUEST_PATH, () =>
+  HttpResponse.json(electionImportMockResponse({ committeeCategory: "CSB", category: "Municipal" }), { status: 201 }),
 );
 
 export const ElectionImportValidateRequestHandler = http.post<
@@ -376,7 +403,7 @@ export const ElectionImportValidateRequestHandler = http.post<
   ELECTION_IMPORT_VALIDATE_REQUEST_BODY,
   ElectionDefinitionValidateResponse
 >("/api/elections/import/validate" satisfies ELECTION_IMPORT_VALIDATE_REQUEST_PATH, () =>
-  HttpResponse.json(gsbElectionImportValidateMockResponse(), { status: 200 }),
+  HttpResponse.json(electionImportValidateMockResponse(), { status: 200 }),
 );
 
 export const ElectionChangeNumberOfVotersHandler = http.put<
@@ -646,8 +673,11 @@ export const handlers: HttpHandler[] = [
   ElectionRequestHandler,
   ElectionStatusRequestHandler,
   CSBElectionStatusRequestHandler,
-  GSBElectionImportRequestHandler,
-  CSBElectionImportRequestHandler,
+  GSBABElectionImportRequestHandler,
+  GSBGRElectionImportRequestHandler,
+  GSBPSElectionImportRequestHandler,
+  CSBABElectionImportRequestHandler,
+  CSBGRElectionImportRequestHandler,
   ElectionImportValidateRequestHandler,
   ElectionChangeNumberOfVotersHandler,
   LoginHandler,

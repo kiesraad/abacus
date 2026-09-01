@@ -43,6 +43,9 @@ describe("OverviewPage", () => {
       ["Verkiezing", "Gebied", "Status"],
       ["Gemeenteraadsverkiezingen 2026", "Heemdamseburg", "Je kan invoeren"],
       ["Gemeenteraadsverkiezingen 2026", "Heemdamseburg", ""],
+      ["Waterschap Juinen 2027", "Juinen", ""],
+      ["Waterschap Juinen 2027", "Juinen", ""],
+      ["Provinciale Staten Juinen 2027", "Juinen", ""],
     ]);
 
     const tableRows = within(table).queryAllByRole("row");
@@ -67,6 +70,9 @@ describe("OverviewPage", () => {
       ["Verkiezing", "Type stembureau", "Status"],
       ["Gemeenteraadsverkiezingen 2026", "GSB - Heemdamseburg (0035)", "Invoer bezig — Eerste zitting"],
       ["Gemeenteraadsverkiezingen 2026", "CSB - Heemdamseburg (0035)", ""],
+      ["Waterschap Juinen 2027", "GSB - Juinen (0037)", ""],
+      ["Waterschap Juinen 2027", "CSB - Juinen (0037)", ""],
+      ["Provinciale Staten Juinen 2027", "GSB - Juinen", ""],
     ]);
 
     const tableRows = within(table).queryAllByRole("row");
@@ -91,6 +97,9 @@ describe("OverviewPage", () => {
       ["Verkiezing", "Type stembureau", "Status"],
       ["Gemeenteraadsverkiezingen 2026", "GSB - Heemdamseburg (0035)", "Invoer bezig — Eerste zitting"],
       ["Gemeenteraadsverkiezingen 2026", "CSB - Heemdamseburg (0035)", ""],
+      ["Waterschap Juinen 2027", "GSB - Juinen (0037)", ""],
+      ["Waterschap Juinen 2027", "CSB - Juinen (0037)", ""],
+      ["Provinciale Staten Juinen 2027", "GSB - Juinen", ""],
     ]);
 
     const tableRows = within(table).queryAllByRole("row");

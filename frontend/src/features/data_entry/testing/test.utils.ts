@@ -11,7 +11,7 @@ import type {
 import { getCandidateFullName } from "@/utils/candidate";
 import type { FormState } from "../types/types";
 import { getClientState } from "../utils/dataEntryUtils";
-import { getDSOInitialValues, getInitialValues } from "./mock-data";
+import { getCommonInitialValues, getCSOInitialValues, getDSOInitialValues } from "./mock-data";
 
 type FirstSessionModel = Extract<Results["model"], "CSOFirstSession" | "DSOFirstSession">;
 
@@ -35,9 +35,11 @@ export function overrideServerClaimDataEntryResponse<T extends FirstSessionModel
   overrideOnce("post", "/api/data_entries/1/1/claim" satisfies DATA_ENTRY_CLAIM_REQUEST_PATH, 200, {
     client_state: getClientState(formState, formState.furthest, false, continueToNextSection),
     data:
-      model === "DSOFirstSession"
-        ? { model, ...getDSOInitialValues(), ...results }
-        : { model, ...getInitialValues(), ...results },
+      model === "CSOFirstSession"
+        ? { model, ...getCSOInitialValues(), ...results }
+        : model === "DSOFirstSession"
+          ? { model, ...getDSOInitialValues(), ...results }
+          : { model, ...getCommonInitialValues(), ...results },
     validation_results: validationResults,
     source: {
       type: "PollingStation",

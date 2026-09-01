@@ -10,7 +10,7 @@ import { overrideOnce, server } from "@/testing/server";
 import type { DATA_ENTRY_FINALISE_REQUEST_PATH, DataEntrySource, Results } from "@/types/generated/openapi";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 import { ValidationResultSet } from "@/utils/ValidationResults";
-import { getDefaultDataEntryState, getDSOInitialValues, getInitialValues } from "../testing/mock-data";
+import { getCSOInitialValues, getDefaultDataEntryState, getDSOInitialValues } from "../testing/mock-data";
 import type { DataEntryAction, DataEntryState } from "../types/types";
 import { onDiscardDataEntry, onFinaliseDataEntry, onSubmitForm } from "./actions";
 import { getInitialFormState } from "./dataEntryUtils";
@@ -40,7 +40,7 @@ test("should handle CSOFirstSession DATA_ENTRY_CLAIMED with no client_state", ()
       client_state: null,
       data: {
         model: "CSOFirstSession",
-        ...getInitialValues(),
+        ...getCSOInitialValues(),
       },
       source,
       status: "first_entry_in_progress",
@@ -73,7 +73,7 @@ test("should handle CSONextSession DATA_ENTRY_CLAIMED with no client_state", () 
       client_state: null,
       data: {
         model: "CSONextSession",
-        ...getInitialValues(),
+        ...getCSOInitialValues(),
       },
       source,
       status: "first_entry_in_progress",
@@ -138,7 +138,7 @@ test("should handle DATA_ENTRY_CLAIMED for a correction", () => {
       client_state: null,
       data: {
         model: "CSOFirstSession",
-        ...getInitialValues(),
+        ...getCSOInitialValues(),
       },
       source,
       status: "first_entry_in_progress",
@@ -258,7 +258,7 @@ test("should handle FORM_SAVE_FAILED", () => {
 test("should handle FORM_SAVED", () => {
   const action: DataEntryAction = {
     type: "FORM_SAVED",
-    data: getInitialValues(),
+    data: getCSOInitialValues(),
     validationResults: {
       errors: [],
       warnings: [],
@@ -390,7 +390,7 @@ describe("onSubmitForm", () => {
       ...defaultState,
       results: {
         model: "CSOFirstSession",
-        ...getInitialValues(),
+        ...getCSOInitialValues(),
       },
       formState: {
         furthest: "voters_votes_counts",
@@ -424,7 +424,7 @@ describe("onSubmitForm", () => {
       ...defaultState,
       results: {
         model: "CSOFirstSession",
-        ...getInitialValues(),
+        ...getCSOInitialValues(),
       },
       cache: {
         key: "voters_votes_counts",
@@ -465,7 +465,7 @@ describe("onSubmitForm", () => {
 
     const data: Results = {
       model: "CSOFirstSession",
-      ...getInitialValues(),
+      ...getCSOInitialValues(),
       voters_counts: {
         poll_card_count: 1,
         proxy_certificate_count: 2,

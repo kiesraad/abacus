@@ -2,3 +2,4 @@
 .idea
 *swp
 backend/*.zip
+sqlx-cache-tmp.sqlite

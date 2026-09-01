@@ -1,8 +1,4 @@
-import type {
-  CommonPollingStationResults,
-  CSOFirstSessionResults,
-  DSOFirstSessionResults,
-} from "@/types/generated/openapi";
+import type { CommonPollingStationResults, CSOFirstSessionResults } from "@/types/generated/openapi";
 
 export const commonDataEntryPS2023_Drenthe: CommonPollingStationResults = {
   voters_counts: {
@@ -595,22 +591,6 @@ export const dataEntryPS2023_DrentheCSO: CSOFirstSessionResults & { model: "CSOF
   counting_differences_polling_station: {
     difference_ballots_voters_completely_accounted_for: { yes: true, no: false },
     difference_ballots_per_list: { yes: false, no: true },
-  },
-  ...structuredClone(commonDataEntryPS2023_Drenthe),
-};
-
-export const dataEntryPS2023_DrentheDSO: DSOFirstSessionResults & {
-  model: "DSOFirstSession";
-} = {
-  model: "DSOFirstSession",
-  about_report: {
-    corrigendum_present: "TwoDocuments",
-    checks_and_corrections_present: "PagePresent",
-  },
-  checks_and_corrections: {
-    reason_investigation_own_initiative: { unaccounted_difference: true, other_error: true },
-    corrected_results_own_initiative: { yes: true, no: false },
-    corrected_results_csb_request: { yes: false, no: false },
   },
   ...structuredClone(commonDataEntryPS2023_Drenthe),
 };

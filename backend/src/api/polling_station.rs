@@ -1,12 +1,12 @@
-use crate::domain::report::structs::election_filename;
 use axum::{
     Json,
     extract::{Path, State},
     http::StatusCode,
 };
 use axum_extra::response::Attachment;
+use chrono::{Datelike, Local};
 use eml_nl::io::EMLWrite;
-use pdf_gen::zip::slugify_filename;
+use pdf_gen::zip::zip_single_file;
 use serde::Serialize;
 use sqlx::{Connection, SqliteConnection, SqlitePool};
 use utoipa_axum::{router::OpenApiRouter, routes};
@@ -596,17 +596,17 @@ async fn polling_station_import(
     ))
 }
 
-/// Export Polling Stations for the requested election (and most recent committee session)
+/// Export Polling Stations for the requested election (most recent committee session)
 #[utoipa::path(
     get,
     path = "/api/elections/{election_id}/polling_stations/export",
     responses(
-            (
+        (
             status = 200,
-            description = "List of polling stations (EML)",
-            content_type = "text/xml",
+            description = "List of polling stations (EML in ZIP)",
+            content_type = "application/zip",
             headers(
-                ("Content-Disposition", description = "attachment; filename=\"filename.eml.xml\"")
+                ("Content-Disposition", description = "attachment; filename=\"filename.zip\"")
             )
         ),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
@@ -623,7 +623,7 @@ async fn polling_station_export(
     State(pool): State<SqlitePool>,
     Path(election_id): Path<ElectionId>,
     audit_service: AuditService,
-) -> Result<Attachment<String>, APIError> {
+) -> Result<Attachment<Vec<u8>>, APIError> {
     let mut conn = pool.acquire().await?;
 
     let election = election_repo::get(&mut conn, election_id).await?;
@@ -636,24 +636,54 @@ async fn polling_station_export(
     let eml = election.as_polling_stations_eml(&polling_stations, None, None)?;
     let xml = eml.write_eml_root_str(true, true)?;
 
-    // E.g. `Stembureaus_GR2025_Juinen.eml.xml`
-    let file_name = slugify_filename(&election_filename(&election, "Stembureaus", "eml.xml"));
+    // Format EML file name for regional elections:
+    //      `Stembureaus_{election.category.to_eml_code()}{election_date.year()}_{election.domain.name}_{election.authority_region}.eml.xml`
+    // Format EML file name for country-wide elections (no election.domain):
+    //      `Stembureaus_{election.category.to_eml_code()}{election_date.year()}_{election.authority_region}.eml.xml`
+    let parts: Vec<String> = [
+        "Stembureaus",
+        format!(
+            "{}{}",
+            election.category.to_eml_code(),
+            election.election_date.year()
+        )
+        .as_str(),
+        election
+            .domain
+            .as_ref()
+            .map_or("", |domain| domain.name.as_str()),
+        election.authority_region.as_str(),
+    ]
+    .into_iter()
+    .map(|part| part.split_whitespace().collect::<String>())
+    .filter(|part| !part.is_empty())
+    .collect();
+
+    let eml_file_name = format!("{}.eml.xml", parts.join("_"));
+
+    let zip_file_name = format!(
+        "abacus-exporteren_stemgebieden-{}-eml_110b_stembureaus-{}.zip",
+        election.eml_name.replace(" ", "_").to_lowercase(),
+        Local::now().format("%Y%m%d-%H%M%S"),
+    );
+
+    let zip = zip_single_file(&eml_file_name, xml.as_bytes()).await?;
 
     audit_service
         .log(
             &mut conn,
             &PollingStationsExportedAuditData {
                 export_election_id: election_id,
-                export_file_name: file_name.clone(),
+                export_file_name: zip_file_name.clone(),
                 export_number_of_polling_stations: polling_stations.len(),
             },
             None,
         )
         .await?;
 
-    Ok(Attachment::new(xml)
-        .filename(&file_name)
-        .content_type("text/xml"))
+    Ok(Attachment::new(zip)
+        .filename(&zip_file_name)
+        .content_type("application/zip"))
 }
 
 #[cfg(test)]

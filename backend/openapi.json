@@ -3886,7 +3886,7 @@
     },
     "/api/elections/{election_id}/polling_stations/export": {
       "get": {
-        "summary": "Export Polling Stations for the requested election (and most recent committee session) (administrator, coordinator_gsb)",
+        "summary": "Export Polling Stations for the requested election (most recent committee session) (administrator, coordinator_gsb)",
         "operationId": "polling_station_export",
         "parameters": [
           {
@@ -3901,17 +3901,17 @@
         ],
         "responses": {
           "200": {
-            "description": "List of polling stations (EML)",
+            "description": "List of polling stations (EML in ZIP)",
             "headers": {
               "Content-Disposition": {
                 "schema": {
                   "type": "string"
                 },
-                "description": "attachment; filename=\"filename.eml.xml\""
+                "description": "attachment; filename=\"filename.zip\""
               }
             },
             "content": {
-              "text/xml": {}
+              "application/zip": {}
             }
           },
           "401": {
